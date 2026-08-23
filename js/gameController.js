@@ -22,6 +22,7 @@ let countdownInterval;
 let isAutoPaused = false;
 let shouldResumeMusic = false;
 let navigation = { showDifficulty: () => {}, createMenu: () => {} };
+const TILE_HIDE_ANIMATION_MS = 180;
 
 export function configureGameController(actions) {
   navigation = { ...navigation, ...actions };
@@ -220,12 +221,24 @@ function revealHintPair(tiles, roundId) {
     if (gameState.roundId !== roundId) return;
 
     tiles.forEach((tile) => {
-      if (!tile.classList.contains('matched')) tile.querySelector('img')?.classList.add('hidden');
+      const image = tile.querySelector('img');
+      if (!tile.classList.contains('matched') && image) {
+        image.classList.remove('appear-bounce', 'hide-fade-scale');
+        void image.offsetWidth;
+        image.classList.add('hide-fade-scale');
+        setTimeout(() => {
+          if (gameState.roundId === roundId) image.classList.add('hidden');
+          image.classList.remove('hide-fade-scale');
+        }, TILE_HIDE_ANIMATION_MS);
+      }
       tile.classList.remove('hint-reveal');
     });
 
-    gameState.isLocked = false;
-    grid?.classList.remove('is-locked');
+    setTimeout(() => {
+      if (gameState.roundId !== roundId) return;
+      gameState.isLocked = false;
+      grid?.classList.remove('is-locked');
+    }, TILE_HIDE_ANIMATION_MS);
   }, GAME_CONFIG.hintRevealDurationMs);
 }
 

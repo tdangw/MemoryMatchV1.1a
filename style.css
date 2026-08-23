@@ -942,6 +942,22 @@ button {
   animation: bounceIn 0.5s ease;
 }
 
+@keyframes hideFadeScale {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(0.88);
+  }
+}
+
+.tile img.hide-fade-scale {
+  animation: hideFadeScale 180ms ease-in forwards;
+}
+
 @keyframes slideUp {
   0% {
     transform: translateY(20px);

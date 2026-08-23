@@ -17,6 +17,7 @@ import { saveHighScore } from './persistence.js';
 
 let selectedTiles = [];
 let levelCompleteActions = { onNext: () => {}, onMenu: () => {} };
+const TILE_HIDE_ANIMATION_MS = 180;
 
 export function configureLogic(actions) {
   levelCompleteActions = { ...levelCompleteActions, ...actions };
@@ -33,6 +34,19 @@ function revealTile(img) {
   void img.offsetWidth;
   img.classList.add('appear-bounce');
   setTimeout(() => img.classList.remove('appear-bounce'), 600);
+}
+
+function hideTile(img, roundId, onHidden) {
+  if (!img) return onHidden?.();
+
+  img.classList.remove('appear-bounce', 'hide-fade-scale');
+  void img.offsetWidth;
+  img.classList.add('hide-fade-scale');
+  setTimeout(() => {
+    if (gameState.roundId === roundId) img.classList.add('hidden');
+    img.classList.remove('hide-fade-scale');
+    onHidden?.();
+  }, TILE_HIDE_ANIMATION_MS);
 }
 
 /**
@@ -124,9 +138,13 @@ function checkMatch(roundId) {
 
       const img1 = first.element.querySelector('img');
       const img2 = second.element.querySelector('img');
-      if (img1) img1.classList.add('hidden');
-      if (img2) img2.classList.add('hidden');
-      setInteractionLocked(false, roundId);
+      let pendingHides = 2;
+      const onHidden = () => {
+        pendingHides -= 1;
+        if (pendingHides === 0) setInteractionLocked(false, roundId);
+      };
+      hideTile(img1, roundId, onHidden);
+      hideTile(img2, roundId, onHidden);
     }, 800);
   }
 
