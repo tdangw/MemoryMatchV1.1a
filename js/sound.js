@@ -1,19 +1,21 @@
 // js/sound.js
 // Quản lý âm thanh của dự án
 
+const assetUrl = (path) => `${import.meta.env.BASE_URL}${path}`;
+
 export const sounds = {
-  click: new Audio('assets/sounds/click.mp3'),
-  match: new Audio('assets/sounds/match.mp3'),
-  wrong: new Audio('assets/sounds/wrong.mp3'),
-  overlay: new Audio('assets/sounds/overlay.mp3'),
-  bonus: new Audio('assets/sounds/bonus.mp3'),
-  victory: new Audio('assets/sounds/victory.mp3'),
-  defeat: new Audio('assets/sounds/defeat.mp3'),
-  confirm: new Audio('assets/sounds/confirm.mp3'),
-  timerunningout: new Audio('assets/sounds/time-running-out.mp3'),
+  click: new Audio(assetUrl('assets/sounds/click.mp3')),
+  match: new Audio(assetUrl('assets/sounds/match.mp3')),
+  wrong: new Audio(assetUrl('assets/sounds/wrong.mp3')),
+  overlay: new Audio(assetUrl('assets/sounds/overlay.mp3')),
+  bonus: new Audio(assetUrl('assets/sounds/bonus.mp3')),
+  victory: new Audio(assetUrl('assets/sounds/victory.mp3')),
+  defeat: new Audio(assetUrl('assets/sounds/defeat.mp3')),
+  confirm: new Audio(assetUrl('assets/sounds/confirm.mp3')),
+  timerunningout: new Audio(assetUrl('assets/sounds/time-running-out.mp3')),
 };
 
-export const DEFAULT_MUSIC_TRACK = 'assets/sounds/menu1.mp3';
+export const DEFAULT_MUSIC_TRACK = assetUrl('assets/sounds/menu1.mp3');
 
 const clampVolume = (value, fallback) => {
   const parsed = Number(value);

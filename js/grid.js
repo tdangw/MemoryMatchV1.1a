@@ -85,7 +85,7 @@ export function createGrid({ tileCount, columns, mobileColumns }, { roundId, onP
     tile.id = tileId;
 
     const img = document.createElement('img');
-    img.src = `/assets/images/themes/${GAME_CONFIG.cardImages.defaultTheme}/MM-image (${imageId}).webp`;
+    img.src = `${import.meta.env.BASE_URL}assets/images/themes/${GAME_CONFIG.cardImages.defaultTheme}/MM-image (${imageId}).webp`;
     img.alt = `MM-image ${imageId}`;
     img.draggable = false;
     img.classList.add('hidden');
