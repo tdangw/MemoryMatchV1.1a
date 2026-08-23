@@ -2230,7 +2230,8 @@ button {
 .ui-icon--star,
 .ui-icon--status-easy,
 .ui-icon--status-normal,
-.ui-icon--status-hard {
+.ui-icon--status-hard,
+.ui-icon--status-super-hard {
   fill: currentColor;
   stroke: none;
 }
@@ -2238,6 +2239,7 @@ button {
 .ui-icon--status-easy { color: #45c879; }
 .ui-icon--status-normal { color: #f2bd3d; }
 .ui-icon--status-hard { color: #e04f5f; }
+.ui-icon--status-super-hard { color: #b879e5; }
 
 .game-menu-toggle .ui-icon {
   width: 18px;
@@ -3514,4 +3516,14 @@ body.game-is-paused .shooting-star {
 #level-summary-modal .app-button--primary {
   background: #2f73b8;
   color: #fff;
+}
+
+/* Popup thông tin đầu màn nằm cao hơn tâm màn hình một chút. */
+.level-reward-overlay .reward-container {
+  position: relative;
+  top: -5vh;
+}
+
+@media screen and (width <= 600px) {
+  .level-reward-overlay .reward-container { top: -3vh; }
 }

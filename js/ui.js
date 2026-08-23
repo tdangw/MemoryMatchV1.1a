@@ -3,7 +3,6 @@ import { gameState } from './gameState.js';
 import { sounds } from './sound.js'; // ✅ Đã tách âm thanh
 import { openAppModal, showAppToast } from './modal.js';
 import { createIcon } from './icons.js';
-import { GAME_CONFIG } from './config.js';
 import confetti from 'canvas-confetti';
 import { clearPersistentGameData } from './persistence.js';
 
@@ -95,8 +94,7 @@ export function showLevelRewardOverlay({ reward, hintGain, timeBonus }) {
   container.className = 'reward-container direct-layout app-modal app-modal--small';
   const isFirstLevel = gameState.currentLevel === 1;
   const mode = gameState.settings.mode || 'easy';
-  const modeLabels = { easy: 'Dễ', normal: 'Trung bình', hard: 'Khó' };
-  const layout = GAME_CONFIG.modes[mode] || GAME_CONFIG.modes.easy;
+  const modeLabels = { easy: 'Dễ', normal: 'Trung bình', hard: 'Khó', superHard: 'Siêu khó' };
   const minutes = String(Math.floor(gameState.remainingTime / 60)).padStart(2, '0');
   const seconds = String(gameState.remainingTime % 60).padStart(2, '0');
 
@@ -107,7 +105,7 @@ export function showLevelRewardOverlay({ reward, hintGain, timeBonus }) {
   const subtitle = document.createElement('p');
   subtitle.className = 'reward-subtitle';
   subtitle.textContent = isFirstLevel
-    ? `${modeLabels[mode]} · ${layout.tileCount} thẻ`
+    ? modeLabels[mode]
     : 'Phần thưởng khi qua màn trước';
 
   const createRewardLine = (className, icon, text) => {

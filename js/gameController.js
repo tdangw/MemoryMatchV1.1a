@@ -35,7 +35,7 @@ export function initializeLevel(level) {
   const gameContainer = document.getElementById('game-container');
   if (gameContainer) gameContainer.style.display = 'flex';
 
-  const layout = getModeLayout(gameState.settings.mode || 'easy');
+  const layout = getModeLayout(gameState.settings.mode || 'easy', level);
   const roundId = beginRound();
   createGrid(layout, { roundId, onPreviewComplete: startCountdown });
 

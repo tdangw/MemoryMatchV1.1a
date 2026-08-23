@@ -53,6 +53,17 @@ Các module được nối qua hàm `configure*`; tránh import vòng giữa con
 
 ## 4. Luồng runtime và gameplay
 
+### Chế độ chơi
+
+| Chế độ | Board chuẩn | Quy tắc mở rộng |
+| --- | --- | --- |
+| Dễ | 12 thẻ | Không đổi theo level. |
+| Trung bình | 24 thẻ | Không đổi theo level. |
+| Khó | 36 thẻ | Không đổi theo level. |
+| Siêu khó | 48 thẻ, 6 cột × 8 hàng | Từ level 10: 54 thẻ, 6 cột × 9 hàng. |
+
+`getModeLayout(mode, level)` là điểm duy nhất quyết định kích thước board theo chế độ và level. Giao diện chỉ hiển thị tên chế độ, không hiển thị số thẻ.
+
 1. `main.js` nạp dữ liệu từ `persistence.js`, hydrate `gameState`, áp dụng âm thanh và hiển thị menu chính.
 2. Người chơi chọn độ khó; `gameController.initializeLevel()` tạo `roundId` mới và board mới.
 3. Board preview toàn bộ thẻ. Khi preview hoàn tất và `roundId` vẫn hợp lệ, countdown mới bắt đầu và nhạc nền tiếp tục.

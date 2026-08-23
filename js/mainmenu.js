@@ -136,9 +136,10 @@ export function showDifficultyOverlay(fromGame = false) {
     title: 'Chọn chế độ chơi',
     content: '<p>Chọn độ khó phù hợp để bắt đầu.</p>',
     actions: [
-      { label: 'Dễ · 12 ô', icon: 'status-easy', variant: 'primary', onClick: (close) => startMode('easy', close) },
-      { label: 'Trung bình · 24 ô', icon: 'status-normal', variant: 'primary', onClick: (close) => startMode('normal', close) },
-      { label: 'Khó · 36 ô', icon: 'status-hard', variant: 'primary', onClick: (close) => startMode('hard', close) },
+      { label: 'Dễ', icon: 'status-easy', variant: 'primary', onClick: (close) => startMode('easy', close) },
+      { label: 'Trung bình', icon: 'status-normal', variant: 'primary', onClick: (close) => startMode('normal', close) },
+      { label: 'Khó', icon: 'status-hard', variant: 'primary', onClick: (close) => startMode('hard', close) },
+      { label: 'Siêu khó', icon: 'status-super-hard', variant: 'primary', onClick: (close) => startMode('superHard', close) },
     ],
     onClose: () => {
       if (modeSelected) return;

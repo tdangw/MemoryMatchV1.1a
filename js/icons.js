@@ -24,6 +24,7 @@ const ICON_PATHS = Object.freeze({
   'status-easy': '<circle cx="12" cy="12" r="7"/>',
   'status-normal': '<circle cx="12" cy="12" r="7"/>',
   'status-hard': '<circle cx="12" cy="12" r="7"/>',
+  'status-super-hard': '<circle cx="12" cy="12" r="7"/>',
 });
 
 export function createIcon(name) {
