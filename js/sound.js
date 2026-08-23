@@ -42,6 +42,12 @@ export function syncDefaultMusic(settings, shouldPlay = true) {
     return;
   }
 
+  // Không được khởi động lại âm thanh khi tab/app đang ở nền.
+  if (document.hidden) {
+    music.pause();
+    return;
+  }
+
   if (shouldPlay) music.play().catch(() => {});
 }
 
@@ -52,6 +58,11 @@ export function pauseGameAudio() {
 
 export function pauseBackgroundMusic() {
   document.getElementById('bg-music')?.pause();
+}
+
+export function isBackgroundMusicPlaying() {
+  const music = document.getElementById('bg-music');
+  return Boolean(music && !music.paused && !music.ended);
 }
 
 export function enableButtonClickSounds(getSettings) {

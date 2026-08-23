@@ -1,4 +1,4 @@
-import { pauseBackgroundMusic, pauseGameAudio, sounds, syncDefaultMusic } from './sound.js';
+import { isBackgroundMusicPlaying, pauseBackgroundMusic, pauseGameAudio, sounds, syncDefaultMusic } from './sound.js';
 import { openAppModal } from './modal.js';
 import { GAME_CONFIG, getModeLayout } from './config.js';
 import { createGrid } from './grid.js';
@@ -79,10 +79,11 @@ function isGameVisible() {
 }
 
 function pauseForBackground() {
-  if (!isGameVisible()) return;
-
-  shouldResumeMusic = gameState.settings.music;
+  // Âm thanh phải dừng ở mọi màn hình, kể cả menu và popup.
+  shouldResumeMusic = isBackgroundMusicPlaying();
   pauseGameAudio();
+
+  if (!isGameVisible()) return;
   if (gameState.isPaused) return;
 
   isAutoPaused = true;
