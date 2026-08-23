@@ -3042,24 +3042,6 @@ button {
   text-shadow: 0 2px 14px rgb(242 191 91 / 20%);
 }
 
-.menu-wallet {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  width: fit-content;
-  min-height: 32px;
-  margin: -12px auto 18px;
-  padding: 4px 11px;
-  border: 1px solid rgb(242 191 91 / 28%);
-  border-radius: 999px;
-  background: rgb(242 191 91 / 12%);
-  color: #ffe09a;
-  font-size: 0.88rem;
-  font-variant-numeric: tabular-nums;
-}
-
-.menu-wallet .ui-icon,
 .app-button--purchase .ui-icon--coin {
   width: 18px;
   height: 18px;

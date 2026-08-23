@@ -47,15 +47,6 @@ export function createMainMenu() {
   title.textContent = "Memory Match";
   wrapper.appendChild(title);
 
-  const wallet = document.createElement("div");
-  wallet.className = "menu-wallet";
-  wallet.setAttribute("aria-label", "Số Xu hiện có");
-  const walletValue = document.createElement("span");
-  walletValue.id = "coin-balance";
-  walletValue.textContent = `${gameState.coins} Xu`;
-  wallet.append(createIcon("coin"), walletValue);
-  wrapper.appendChild(wallet);
-
   const menuList = document.createElement("ul");
   menuList.className = "menu-list";
 
