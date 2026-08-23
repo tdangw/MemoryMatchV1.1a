@@ -206,7 +206,13 @@ function revealHintPair(tiles, roundId) {
   grid?.classList.add('is-locked');
 
   tiles.forEach((tile) => {
-    tile.querySelector('img')?.classList.remove('hidden');
+    const image = tile.querySelector('img');
+    if (image) {
+      image.classList.remove('hidden', 'appear-bounce');
+      void image.offsetWidth;
+      image.classList.add('appear-bounce');
+      setTimeout(() => image.classList.remove('appear-bounce'), 600);
+    }
     tile.classList.add('hint-reveal');
   });
 

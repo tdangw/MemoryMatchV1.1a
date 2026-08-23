@@ -3527,3 +3527,13 @@ body.game-is-paused .shooting-star {
 @media screen and (width <= 600px) {
   .level-reward-overlay .reward-container { top: -3vh; }
 }
+
+/* LV là nhãn chính của HUD, giữ cùng cỡ với giá trị level. */
+#game-title.game-hud .stat-level .stat-label {
+  font-size: 0.82rem;
+  letter-spacing: 0;
+}
+
+@media screen and (width <= 600px) {
+  #game-title.game-hud .stat-level .stat-label { font-size: 0.68rem; }
+}
