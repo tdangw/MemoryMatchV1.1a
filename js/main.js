@@ -19,6 +19,9 @@ unlockSound();
 enableButtonClickSounds(() => gameState.settings);
 decorateIcons();
 
+// Tránh mở menu ngữ cảnh khi người chơi thao tác nhanh trên bàn chơi.
+document.addEventListener('contextmenu', (event) => event.preventDefault());
+
 window.onload = () => {
   createMainMenu();
   updateHighScoreDisplay(gameState.highScore);

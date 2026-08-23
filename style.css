@@ -11,8 +11,22 @@ body {
   justify-content: flex-start; /* thêm dòng này để nội dung bám lên trên */
   min-height: 100vh;
   overflow-x: hidden;
+  user-select: none;
+  -webkit-user-select: none;
   background: url('/assets/images/background-main.webp') no-repeat center center fixed;
   background-size: cover;
+}
+
+input,
+textarea,
+[contenteditable='true'] {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+img,
+svg {
+  -webkit-user-drag: none;
 }
 
 /* === Wrapper chính chứa game === */
