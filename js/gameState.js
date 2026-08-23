@@ -1,7 +1,11 @@
 // 📦 Trạng thái thuần của game: không thao tác DOM hoặc localStorage ở đây.
-import { GAME_CONFIG } from './config.js';
+import { GAME_CONFIG } from "./config.js";
 
-const { hints: defaultHints, timeSeconds: remainingTime, score: defaultScore } = GAME_CONFIG.initialState;
+const {
+  hints: defaultHints,
+  timeSeconds: remainingTime,
+  score: defaultScore,
+} = GAME_CONFIG.initialState;
 export const gameState = {
   currentLevel: 1,
   score: defaultScore,
@@ -15,8 +19,9 @@ export const gameState = {
   roundId: 0,
   remainingTime: remainingTime,
   highScore: 0,
+  coins: 0,
   settings: {
-    mode: 'easy',
+    mode: "easy",
     sound: true,
     music: true,
     soundVolume: 0.4,
@@ -26,8 +31,9 @@ export const gameState = {
 };
 gameState._timeRunningOutPlayed = false;
 
-export function hydrateGameState({ highScore = 0, settings = {} } = {}) {
+export function hydrateGameState({ highScore = 0, coins = 0, settings = {} } = {}) {
   gameState.highScore = Number.isFinite(highScore) ? highScore : 0;
+  gameState.coins = Number.isFinite(coins) ? Math.max(0, Math.floor(coins)) : 0;
   Object.assign(gameState.settings, settings);
 }
 
@@ -59,7 +65,7 @@ export function resetGame() {
   gameState.remainingTime = remainingTime;
   gameState.isLocked = true;
   gameState.isPaused = false;
-  gameState.settings.mode = 'easy';
+  gameState.settings.mode = "easy";
 }
 
 // ➕ Cộng điểm + tự động cập nhật highscore
@@ -72,5 +78,21 @@ export function increaseScore(points) {
     highScoreChanged = true;
   }
 
-  return { score: gameState.score, highScore: gameState.highScore, highScoreChanged };
+  return {
+    score: gameState.score,
+    highScore: gameState.highScore,
+    highScoreChanged,
+  };
+}
+
+export function increaseCoins(amount) {
+  gameState.coins += Math.max(0, Math.floor(amount));
+  return gameState.coins;
+}
+
+export function spendCoins(amount) {
+  const cost = Math.max(0, Math.floor(amount));
+  if (gameState.coins < cost) return false;
+  gameState.coins -= cost;
+  return true;
 }

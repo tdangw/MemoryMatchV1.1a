@@ -1,19 +1,19 @@
-import { gameState } from './gameState.js';
-import { openAppModal } from './modal.js';
-import { applyEffectsSettings, syncDefaultMusic } from './sound.js';
-import { saveSetting } from './persistence.js';
-import { APP_VERSION } from './appMeta.js';
+import { gameState } from "./gameState.js";
+import { openAppModal } from "./modal.js";
+import { applyEffectsSettings, syncDefaultMusic } from "./sound.js";
+import { saveSetting } from "./persistence.js";
+import { APP_VERSION } from "./appMeta.js";
 
-const settingsContainer = document.getElementById('settings-container');
+const settingsContainer = document.getElementById("settings-container");
 const settingsHome = settingsContainer?.parentElement;
-const soundToggle = document.getElementById('toggle-sound');
-const musicToggle = document.getElementById('toggle-music');
-const soundVolume = document.getElementById('sound-volume');
-const musicVolume = document.getElementById('music-volume');
-const soundVolumeValue = document.getElementById('sound-volume-value');
-const musicVolumeValue = document.getElementById('music-volume-value');
-const versionInfoButton = document.getElementById('version-info');
-const versionValue = document.getElementById('settings-version-value');
+const soundToggle = document.getElementById("toggle-sound");
+const musicToggle = document.getElementById("toggle-music");
+const soundVolume = document.getElementById("sound-volume");
+const musicVolume = document.getElementById("music-volume");
+const soundVolumeValue = document.getElementById("sound-volume-value");
+const musicVolumeValue = document.getElementById("music-volume-value");
+const versionInfoButton = document.getElementById("version-info");
+const versionValue = document.getElementById("settings-version-value");
 
 let onCloseFromMenu = () => {};
 
@@ -45,7 +45,7 @@ function syncSettingsControls() {
 function bindSettingsControls() {
   if (soundToggle) {
     soundToggle.onchange = () => {
-      saveGameSetting('sound', soundToggle.checked);
+      saveGameSetting("sound", soundToggle.checked);
       if (soundVolume) soundVolume.disabled = !soundToggle.checked;
       applyEffectsSettings(gameState.settings);
     };
@@ -53,7 +53,7 @@ function bindSettingsControls() {
 
   if (musicToggle) {
     musicToggle.onchange = () => {
-      saveGameSetting('music', musicToggle.checked);
+      saveGameSetting("music", musicToggle.checked);
       if (musicVolume) musicVolume.disabled = !musicToggle.checked;
       syncDefaultMusic(gameState.settings, musicToggle.checked);
     };
@@ -62,7 +62,7 @@ function bindSettingsControls() {
   if (soundVolume) {
     soundVolume.oninput = () => {
       const value = Number(soundVolume.value) / 100;
-      saveGameSetting('soundVolume', value);
+      saveGameSetting("soundVolume", value);
       updateVolumeLabel(soundVolumeValue, value);
       applyEffectsSettings(gameState.settings);
     };
@@ -71,7 +71,7 @@ function bindSettingsControls() {
   if (musicVolume) {
     musicVolume.oninput = () => {
       const value = Number(musicVolume.value) / 100;
-      saveGameSetting('musicVolume', value);
+      saveGameSetting("musicVolume", value);
       updateVolumeLabel(musicVolumeValue, value);
       syncDefaultMusic(gameState.settings, gameState.settings.music);
     };
@@ -80,8 +80,8 @@ function bindSettingsControls() {
 
 function showVersionInfo() {
   openAppModal({
-    id: 'version-modal',
-    icon: 'info',
+    id: "version-modal",
+    icon: "info",
     title: `Phiên bản ${APP_VERSION}`,
     content: `
       <ul class="app-feature-list">
@@ -97,23 +97,23 @@ function showVersionInfo() {
 applyEffectsSettings(gameState.settings);
 bindSettingsControls();
 if (versionValue) versionValue.textContent = APP_VERSION;
-versionInfoButton?.addEventListener('click', showVersionInfo);
+versionInfoButton?.addEventListener("click", showVersionInfo);
 
 export function showSettingsPanel(fromGame = false) {
   if (!settingsContainer || !settingsHome) return;
 
-  settingsContainer.style.display = 'grid';
+  settingsContainer.style.display = "grid";
   gameState.isPaused = fromGame;
   syncSettingsControls();
 
   openAppModal({
-    id: 'settings-modal',
-    icon: 'settings',
-    title: 'Cài đặt',
+    id: "settings-modal",
+    icon: "settings",
+    title: "Cài đặt",
     content: settingsContainer,
-    size: 'medium',
+    size: "medium",
     onClose: () => {
-      settingsContainer.style.display = 'none';
+      settingsContainer.style.display = "none";
       settingsHome.appendChild(settingsContainer);
       gameState.isPaused = false;
       if (!fromGame) onCloseFromMenu();

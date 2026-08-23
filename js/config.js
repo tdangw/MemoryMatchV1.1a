@@ -1,7 +1,7 @@
 export const GAME_CONFIG = Object.freeze({
   cardImages: Object.freeze({
     count: 1000,
-    defaultTheme: 'default',
+    defaultTheme: "default",
   }),
   modes: Object.freeze({
     easy: Object.freeze({ tileCount: 12, columns: 4, mobileColumns: 3 }),
@@ -24,7 +24,7 @@ export const GAME_CONFIG = Object.freeze({
   hintRevealDurationMs: 2500,
 });
 
-export function getModeLayout(mode = 'easy', level = 1) {
+export function getModeLayout(mode = "easy", level = 1) {
   const layout = GAME_CONFIG.modes[mode] || GAME_CONFIG.modes.easy;
   if (layout.expandedAtLevel && level >= layout.expandedAtLevel) {
     return { ...layout, tileCount: layout.expandedTileCount };

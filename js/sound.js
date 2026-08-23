@@ -4,18 +4,18 @@
 const assetUrl = (path) => `${import.meta.env.BASE_URL}${path}`;
 
 export const sounds = {
-  click: new Audio(assetUrl('assets/sounds/click.mp3')),
-  match: new Audio(assetUrl('assets/sounds/match.mp3')),
-  wrong: new Audio(assetUrl('assets/sounds/wrong.mp3')),
-  overlay: new Audio(assetUrl('assets/sounds/overlay.mp3')),
-  bonus: new Audio(assetUrl('assets/sounds/bonus.mp3')),
-  victory: new Audio(assetUrl('assets/sounds/victory.mp3')),
-  defeat: new Audio(assetUrl('assets/sounds/defeat.mp3')),
-  confirm: new Audio(assetUrl('assets/sounds/confirm.mp3')),
-  timerunningout: new Audio(assetUrl('assets/sounds/time-running-out.mp3')),
+  click: new Audio(assetUrl("assets/sounds/click.mp3")),
+  match: new Audio(assetUrl("assets/sounds/match.mp3")),
+  wrong: new Audio(assetUrl("assets/sounds/wrong.mp3")),
+  overlay: new Audio(assetUrl("assets/sounds/overlay.mp3")),
+  bonus: new Audio(assetUrl("assets/sounds/bonus.mp3")),
+  victory: new Audio(assetUrl("assets/sounds/victory.mp3")),
+  defeat: new Audio(assetUrl("assets/sounds/defeat.mp3")),
+  confirm: new Audio(assetUrl("assets/sounds/confirm.mp3")),
+  timerunningout: new Audio(assetUrl("assets/sounds/time-running-out.mp3")),
 };
 
-export const DEFAULT_MUSIC_TRACK = assetUrl('assets/sounds/menu1.mp3');
+export const DEFAULT_MUSIC_TRACK = assetUrl("assets/sounds/menu1.mp3");
 
 const clampVolume = (value, fallback) => {
   const parsed = Number(value);
@@ -30,10 +30,10 @@ export function applyEffectsSettings(settings) {
 }
 
 export function syncDefaultMusic(settings, shouldPlay = true) {
-  const music = document.getElementById('bg-music');
+  const music = document.getElementById("bg-music");
   if (!music) return;
 
-  if (!music.src.endsWith('/menu1.mp3')) music.src = DEFAULT_MUSIC_TRACK;
+  if (!music.src.endsWith("/menu1.mp3")) music.src = DEFAULT_MUSIC_TRACK;
   music.loop = true;
   music.volume = clampVolume(settings?.musicVolume, 0.35);
 
@@ -57,17 +57,19 @@ export function pauseGameAudio() {
 }
 
 export function pauseBackgroundMusic() {
-  document.getElementById('bg-music')?.pause();
+  document.getElementById("bg-music")?.pause();
 }
 
 export function isBackgroundMusicPlaying() {
-  const music = document.getElementById('bg-music');
+  const music = document.getElementById("bg-music");
   return Boolean(music && !music.paused && !music.ended);
 }
 
 export function enableButtonClickSounds(getSettings) {
-  document.addEventListener('click', (event) => {
-    const interactive = event.target.closest('button, .menu-item, [role="button"]');
+  document.addEventListener("click", (event) => {
+    const interactive = event.target.closest(
+      'button, .menu-item, [role="button"]',
+    );
     if (!interactive || interactive.disabled || !getSettings?.()?.sound) return;
 
     sounds.click.currentTime = 0;
@@ -87,10 +89,10 @@ export function unlockSound() {
         // ignore error
       }
     });
-    document.removeEventListener('click', unlock);
-    document.removeEventListener('touchstart', unlock);
+    document.removeEventListener("click", unlock);
+    document.removeEventListener("touchstart", unlock);
   };
 
-  document.addEventListener('click', unlock, { once: true });
-  document.addEventListener('touchstart', unlock, { once: true });
+  document.addEventListener("click", unlock, { once: true });
+  document.addEventListener("touchstart", unlock, { once: true });
 }

@@ -69,7 +69,8 @@ Các module được nối qua hàm `configure*`; tránh import vòng giữa con
 3. Board preview toàn bộ thẻ. Khi preview hoàn tất và `roundId` vẫn hợp lệ, countdown mới bắt đầu và nhạc nền tiếp tục.
 4. `logic.js` xử lý hai thẻ được chọn. Match cập nhật điểm/progress; miss khóa board trong khoảng thời gian cần thiết.
 5. Hint tiêu thụ một lượt, lật tạm một cặp chưa match và **không** tự ghép cặp hay cộng điểm.
-6. Khi hoàn thành, popup tổng kết gọi `onNext` hoặc `onMenu`; timer cũ bị vô hiệu bằng `roundId`.
+6. Mỗi cặp ghép đúng cộng `1` điểm; điểm chỉ phục vụ thành tích và high score, không dùng mua vật phẩm.
+7. Khi hoàn thành màn, người chơi nhận `50 + floor(thời gian còn lại)` Xu. Xu được cộng/lưu trước khi popup tổng kết hiển thị; popup gọi `onNext` hoặc `onMenu`; timer cũ bị vô hiệu bằng `roundId`.
 
 ### Chống race condition
 
@@ -90,12 +91,13 @@ Lưu trữ dùng `localStorage`, theo thiết bị/trình duyệt. Không có d�
 | Key | Kiểu/giá trị | Chủ sở hữu |
 | --- | --- | --- |
 | `highScore` | số nguyên, mặc định `0` | `persistence.js` |
+| `coins` | số nguyên không âm, mặc định `0` | `persistence.js` / `gameState.js` |
 | `sound` | chuỗi boolean, mặc định `true` | `persistence.js` / `settings.js` |
 | `music` | chuỗi boolean, mặc định `true` | `persistence.js` / `settings.js` |
 | `soundVolume` | số `0..1`, mặc định `0.4` | `persistence.js` / `settings.js` |
 | `musicVolume` | số `0..1`, mặc định `0.35` | `persistence.js` / `settings.js` |
 
-`clearPersistentGameData()` chỉ xóa các key trên. Trạng thái ván đang chơi, level hiện tại và hint không được lưu qua lần tải lại.
+`clearPersistentGameData()` chỉ xóa các key trên. Trạng thái ván đang chơi, level hiện tại và hint không được lưu qua lần tải lại. Xu được dùng cho shop; việc mua vật phẩm không làm giảm điểm hoặc high score.
 
 ## 6. Tài nguyên và đường dẫn
 
