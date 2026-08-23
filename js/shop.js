@@ -107,13 +107,25 @@ export function openShopOverlay() {
   const modal = openAppModal({
     id: "shop-modal",
     icon: "shop",
-    title: `Cửa hàng · ${gameState.coins} Xu`,
+    title: "Cửa hàng",
     content: grid,
     size: "large",
     onClose: () => {
       if (gameState.roundId === roundId) gameState.isPaused = false;
     },
   });
+
+  const wallet = document.createElement("div");
+  wallet.className = "shop-wallet";
+  wallet.setAttribute("aria-label", "Số Xu hiện có");
+  const walletValue = document.createElement("span");
+  walletValue.id = "coin-balance";
+  walletValue.textContent = String(gameState.coins);
+  wallet.append(createIcon("coin"), walletValue);
+  const closeButton = modal.panel.querySelector(".app-modal__close");
+  modal.panel
+    .querySelector(".app-modal__header")
+    .insertBefore(wallet, closeButton);
 
   shopData.forEach((item) => {
     const card = document.createElement("div");
@@ -129,13 +141,46 @@ export function openShopOverlay() {
       document.createTextNode(String(item.price)),
       createIcon("coin"),
     );
-    button.onclick = () => {
-      if (handleBuyItem(item, roundId)) modal.close();
-    };
+    button.onclick = () => openPurchaseConfirmation(item, roundId, modal);
 
     card.appendChild(title);
     card.appendChild(button);
     grid.appendChild(card);
+  });
+}
+
+function openPurchaseConfirmation(item, roundId, shopModal) {
+  const content = document.createElement("div");
+  content.className = "shop-confirmation";
+
+  const message = document.createElement("p");
+  message.textContent = `Mua ${item.title}?`;
+
+  const price = document.createElement("strong");
+  price.className = "shop-confirmation__price";
+  price.append(createIcon("coin"), document.createTextNode(`${item.price} Xu`));
+  content.append(message, price);
+
+  openAppModal({
+    id: "shop-confirm-modal",
+    icon: "shop",
+    title: "Xác nhận mua",
+    content,
+    size: "small",
+    actions: [
+      { label: "Hủy", variant: "secondary" },
+      {
+        label: "Mua ngay",
+        icon: "coin",
+        variant: "primary",
+        onClick: (closeConfirmation) => {
+          if (!handleBuyItem(item, roundId)) return true;
+          closeConfirmation();
+          shopModal.close();
+          return true;
+        },
+      },
+    ],
   });
 }
 
