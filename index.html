@@ -1,0 +1,118 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Memory Match Adventure</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <script type="module" crossorigin src="/assets/index-CzYnYGc8.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-BwKY3rx-.css">
+</head>
+<body>
+  <div class="main-wrapper">
+    <!-- Game Container -->
+    <div id="game-container" style="display: none;">
+      <div id="game-logo" class="game-name">Memory Match</div>
+
+      <div id="game-progress-hud" class="game-progress-hud" aria-label="Tiến trình màn chơi">
+        <span class="info stat-card stat-moves"><span class="stat-label">MOVES</span><span id="moves">0</span></span>
+        <span class="info stat-card stat-misses"><span class="stat-label">MISS</span><span id="misses">0</span></span>
+        <span class="info stat-card stat-progress" id="pair-progress"><span data-icon="trophy"></span><span id="matched-pairs">0</span>/<span id="total-pairs">0</span></span>
+      </div>
+
+      <div id="game-title" class="game-hud">
+        <button
+          id="btn-actions-menu"
+          class="game-menu-toggle"
+          type="button"
+          aria-label="Mở menu chức năng"
+          aria-controls="game-actions-menu"
+          aria-expanded="false"
+          data-icon="menu"
+        ></button>
+
+        <div id="game-actions-menu" class="game-actions-menu" hidden>
+          <button id="btn-menu" class="game-action-item" type="button" data-icon="home">Menu</button>
+          <button id="btn-restart" class="game-action-item" type="button" data-icon="restart">Chơi lại</button>
+          <button id="btn-full-reset" class="game-action-item" type="button" data-icon="wand">Xóa dữ liệu</button>
+          <button id="btn-game-settings" class="game-action-item" type="button" data-icon="settings">Cài đặt</button>
+          <button id="btn-shop" class="game-action-item" type="button" data-icon="shop">Cửa hàng</button>
+        </div>
+
+        <button id="btn-hint" class="game-hint-fab" type="button" aria-label="Dùng gợi ý">
+          <span data-icon="search"></span>
+          <span id="hint">0</span>
+        </button>
+
+        <div class="game-stats" aria-label="Thông tin màn chơi">
+          <span class="info stat-card stat-level"><span class="stat-label">LV</span><span id="level">1</span></span>
+          <span class="info stat-card stat-timer" id="timer"><span data-icon="timer"></span><span id="timer-value">--:--</span></span>
+          <span class="info stat-card stat-score"><span data-icon="star"></span><span id="score">0</span></span>
+        </div>
+      </div>
+      <div id="grid-container"></div>
+    </div>
+
+    <!-- Settings Overlay -->
+    <div id="settings-container" style="display: none;">
+      <div class="settings-control">
+        <div class="settings-row">
+          <label for="toggle-sound">Âm thanh hiệu ứng</label>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggle-sound" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="settings-range-row">
+          <input
+            id="sound-volume"
+            class="settings-range"
+            type="range"
+            min="0"
+            max="100"
+            step="1"
+            value="40"
+            aria-label="Âm lượng hiệu ứng"
+          />
+          <output id="sound-volume-value">40%</output>
+        </div>
+      </div>
+
+      <div class="settings-control">
+        <div class="settings-row">
+          <label for="toggle-music">Nhạc nền</label>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggle-music" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="settings-range-row">
+          <input
+            id="music-volume"
+            class="settings-range"
+            type="range"
+            min="0"
+            max="100"
+            step="1"
+            value="35"
+            aria-label="Âm lượng nhạc"
+          />
+          <output id="music-volume-value">35%</output>
+        </div>
+      </div>
+
+      <button id="version-info" class="settings-version-button" type="button">
+        <span data-icon="info"></span>
+        <span>Phiên bản</span>
+        <span id="settings-version-value"></span>
+      </button>
+
+      <!-- Audio player (hidden) -->
+      <audio id="bg-music" loop></audio>
+    </div>
+  </div>
+
+
+</body>
+</html>
