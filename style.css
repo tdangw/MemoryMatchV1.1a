@@ -3564,6 +3564,17 @@ body.game-is-paused .shooting-star {
   color: #f2bf5b;
 }
 
+/* Hiệu ứng xem trước tạm dùng chính ô đồng hồ, không che HUD hoặc lưới thẻ. */
+#game-title.game-hud .stat-timer.is-previewing {
+  border-color: rgb(137 197 255 / 52%);
+  background: rgb(51 127 193 / 72%);
+  color: #eef8ff;
+}
+
+#game-title.game-hud .stat-timer.is-previewing .ui-icon--eye {
+  color: #b9e5ff;
+}
+
 /* Cửa hàng dùng lưới cố định để không tạo thanh cuộn trong lúc chơi. */
 #shop-modal .app-modal,
 #shop-confirm-modal .app-modal {

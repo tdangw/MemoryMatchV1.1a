@@ -5,8 +5,8 @@ import {
   updateTimerDisplay,
   showShopMessage,
   animateIconToTarget,
+  showRevealTimerInHud,
 } from "./ui.js";
-import { showRevealTimerNextToHint } from "./ui.js";
 import { openAppModal } from "./modal.js";
 import { createIcon } from "./icons.js";
 import { shuffleArray } from "./utils.js";
@@ -238,7 +238,7 @@ function revealRandomTiles(
     img.classList.remove("hidden");
     img.classList.add("highlight-tile");
   });
-  showRevealTimerNextToHint(duration / 1000);
+  showRevealTimerInHud(duration / 1000, roundId);
 
   setTimeout(() => {
     if (gameState.roundId !== roundId) return;
@@ -257,7 +257,7 @@ function revealAllTiles(duration = 5000, roundId = gameState.roundId) {
     img.classList.remove("hidden");
     img.classList.add("highlight-tile");
   });
-  showRevealTimerNextToHint(duration / 1000);
+  showRevealTimerInHud(duration / 1000, roundId);
 
   setTimeout(() => {
     if (gameState.roundId !== roundId) return;

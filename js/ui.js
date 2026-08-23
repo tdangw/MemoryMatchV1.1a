@@ -16,6 +16,8 @@ const movesElement = document.getElementById("moves");
 const missesElement = document.getElementById("misses");
 const matchedPairsElement = document.getElementById("matched-pairs");
 const totalPairsElement = document.getElementById("total-pairs");
+let revealTimerInterval = null;
+let revealTimerRoundId = null;
 
 export function updateCoinDisplay(coins) {
   const coinElement = document.getElementById("coin-balance");
@@ -58,6 +60,8 @@ export function updatePairProgressDisplay(
 
 export function updateTimerDisplay(seconds) {
   if (!timerElement) return;
+
+  if (revealTimerInterval !== null) return;
 
   const m = String(Math.floor(seconds / 60)).padStart(2, "0");
   const s = String(seconds % 60).padStart(2, "0");
@@ -388,41 +392,43 @@ export function highlightTarget(selector, isNegative = false) {
   }, 1000);
 }
 
-// Hiển thị thời gian đếm ngược khi mua gợi ý
-export function showRevealTimerNextToHint(duration = 5) {
-  const hintEl = document.getElementById("hint");
-  const parentEl = hintEl?.parentElement;
-  if (!hintEl || !parentEl) return;
+// Tạm thay đồng hồ màn chơi bằng đếm ngược hiệu ứng xem trước.
+export function showRevealTimerInHud(duration = 5, roundId = gameState.roundId) {
+  if (!timerElement || !timerContainer) return;
 
-  const old = document.querySelector(".hint-timer-indicator");
-  if (old) old.remove();
+  clearRevealTimer(false);
+  revealTimerRoundId = roundId;
+  let remaining = Math.max(1, Math.ceil(duration));
 
-  const wrapper = document.createElement("span");
-  wrapper.className = "hint-timer-indicator";
+  timerContainer.classList.add("is-previewing");
+  replaceTimerIcon("eye");
+  timerElement.textContent = `${remaining}s`;
 
-  // ✅ tách phần icon ⏳ và số giây
-  const icon = document.createElement("span");
-  icon.className = "hint-timer-icon";
-  icon.appendChild(createIcon("hourglass"));
-
-  const text = document.createElement("span");
-  text.className = "hint-timer-text";
-  const seconds = document.createElement("span");
-  seconds.textContent = duration;
-  text.append(seconds, document.createTextNode("s"));
-  wrapper.append(icon, text);
-
-  parentEl.appendChild(wrapper);
-
-  let remaining = duration;
-  const span = seconds;
-
-  const interval = setInterval(() => {
-    remaining--;
-    span.textContent = remaining;
-    if (remaining <= 0) {
-      clearInterval(interval);
-      wrapper.remove();
+  revealTimerInterval = setInterval(() => {
+    if (gameState.roundId !== revealTimerRoundId) {
+      clearRevealTimer(true);
+      return;
     }
+
+    remaining -= 1;
+    if (remaining <= 0) {
+      clearRevealTimer(true);
+      return;
+    }
+    timerElement.textContent = `${remaining}s`;
   }, 1000);
+}
+
+function clearRevealTimer(restoreTimer) {
+  if (revealTimerInterval !== null) clearInterval(revealTimerInterval);
+  revealTimerInterval = null;
+  revealTimerRoundId = null;
+  timerContainer?.classList.remove("is-previewing");
+  replaceTimerIcon("timer");
+  if (restoreTimer) updateTimerDisplay(gameState.remainingTime);
+}
+
+function replaceTimerIcon(iconName) {
+  const currentIcon = timerContainer?.querySelector(".ui-icon");
+  if (currentIcon) currentIcon.replaceWith(createIcon(iconName));
 }
