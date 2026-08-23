@@ -3403,3 +3403,47 @@ body.game-is-paused .shooting-star {
 #version-modal .app-modal__body {
   color: rgb(245 247 251 / 86%);
 }
+
+/* Popup xác nhận trong màn chơi cũng dùng tông menu chính. */
+#reset-modal .app-modal,
+#return-modal .app-modal {
+  border-color: rgb(255 255 255 / 16%);
+  border-radius: 24px;
+  background: linear-gradient(155deg, #182942 0%, #243b64 100%);
+  color: #f5f7fb;
+}
+
+#reset-modal .app-modal__header,
+#return-modal .app-modal__header,
+#reset-modal .app-modal__footer,
+#return-modal .app-modal__footer {
+  border-color: rgb(255 255 255 / 11%);
+}
+
+#reset-modal .app-modal__title,
+#return-modal .app-modal__title,
+#reset-modal .app-modal__title .ui-icon,
+#return-modal .app-modal__title .ui-icon {
+  color: #f2bf5b;
+}
+
+#reset-modal .app-modal__close,
+#return-modal .app-modal__close {
+  background: rgb(255 255 255 / 9%);
+  color: #f5f7fb;
+}
+
+#reset-modal .app-modal__body,
+#return-modal .app-modal__body {
+  color: rgb(245 247 251 / 86%);
+}
+
+#return-modal .app-button--primary {
+  background: #2f73b8;
+  color: #fff;
+}
+
+#reset-modal .app-button--danger {
+  background: #bd4a58;
+  color: #fff;
+}
