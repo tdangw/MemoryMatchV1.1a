@@ -7,6 +7,12 @@ export const GAMEPLAY_TIMING = Object.freeze({
   comboPopupVisibleMs: 1900,
   comboPopupFadeMs: 650,
   timePurchaseGraceMs: 1000,
+  victoryCelebration: Object.freeze({
+    // Mốc thử nghiệm: đổi triggerLevel thành 100 sau khi duyệt hiệu ứng.
+    triggerLevel: 1,
+    finalLevel: 100,
+    flowerGrowthDurationMs: 6400,
+  }),
 });
 
 const COMBO_TIERS = Object.freeze([
@@ -22,4 +28,8 @@ export function getComboTimeBonus(combo) {
 
 export function getComboPresentation(combo) {
   return COMBO_TIERS.find((tier) => combo >= tier.minimum) || null;
+}
+
+export function shouldShowVictoryCelebration(level) {
+  return level === GAMEPLAY_TIMING.victoryCelebration.triggerLevel;
 }

@@ -3675,6 +3675,37 @@ body.game-is-paused .shooting-star {
   color: #fff;
 }
 
+/* Trạng thái chiến thắng chỉ có một hành động chính, chiếm trọn hàng. */
+.level-summary-modal--victory {
+  position: relative;
+  top: clamp(14px, 3vh, 32px);
+}
+
+.level-summary-modal--victory .app-modal__footer {
+  grid-template-columns: 1fr;
+}
+
+.level-summary-modal--victory .app-button {
+  width: 100%;
+}
+
+#level-summary-modal .level-summary-modal--victory .app-button--primary,
+.level-summary-modal--victory .app-button--primary {
+  border-color: #ffd871;
+  background: linear-gradient(135deg, #b92f42, #7f1830);
+  color: #ffe88a;
+  text-shadow: 0 1px 0 rgb(67 8 18 / 65%);
+  box-shadow: 0 8px 18px rgb(72 6 20 / 38%), inset 0 1px 0 rgb(255 221 152 / 24%);
+}
+
+#level-summary-modal .level-summary-modal--victory .app-button--primary:hover,
+#level-summary-modal .level-summary-modal--victory .app-button--primary:focus-visible,
+.level-summary-modal--victory .app-button--primary:hover,
+.level-summary-modal--victory .app-button--primary:focus-visible {
+  background: linear-gradient(135deg, #d44351, #951d37);
+  box-shadow: 0 10px 22px rgb(72 6 20 / 48%), inset 0 1px 0 rgb(255 231 177 / 32%);
+}
+
 /* Popup thông tin đầu màn nằm cao hơn tâm màn hình một chút. */
 .level-reward-overlay .reward-container {
   position: relative;

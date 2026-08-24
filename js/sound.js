@@ -9,13 +9,20 @@ export const sounds = {
   wrong: new Audio(assetUrl("assets/sounds/wrong.mp3")),
   overlay: new Audio(assetUrl("assets/sounds/overlay.mp3")),
   bonus: new Audio(assetUrl("assets/sounds/bonus.mp3")),
+  congratulations: new Audio(assetUrl("assets/sounds/congratulations.mp3")),
   victory: new Audio(assetUrl("assets/sounds/victory.mp3")),
   defeat: new Audio(assetUrl("assets/sounds/defeat.mp3")),
   confirm: new Audio(assetUrl("assets/sounds/confirm.mp3")),
   timerunningout: new Audio(assetUrl("assets/sounds/time-running-out.mp3")),
+  victoryFlowerTheme: new Audio(assetUrl("assets/sounds/victory-flower-theme.mp3")),
 };
 
-export const DEFAULT_MUSIC_TRACK = assetUrl("assets/sounds/menu1.mp3");
+export const MENU_MUSIC_TRACKS = Object.freeze([
+  assetUrl("assets/sounds/menu1.mp3"),
+  assetUrl("assets/sounds/menu2.mp3"),
+]);
+
+let selectedMenuTrack = null;
 
 const clampVolume = (value, fallback) => {
   const parsed = Number(value);
@@ -33,7 +40,11 @@ export function syncDefaultMusic(settings, shouldPlay = true) {
   const music = document.getElementById("bg-music");
   if (!music) return;
 
-  if (!music.src.endsWith("/menu1.mp3")) music.src = DEFAULT_MUSIC_TRACK;
+  if (!selectedMenuTrack) {
+    selectedMenuTrack =
+      MENU_MUSIC_TRACKS[Math.floor(Math.random() * MENU_MUSIC_TRACKS.length)];
+  }
+  if (music.src !== selectedMenuTrack) music.src = selectedMenuTrack;
   music.loop = true;
   music.volume = clampVolume(settings?.musicVolume, 0.35);
 
@@ -49,6 +60,23 @@ export function syncDefaultMusic(settings, shouldPlay = true) {
   }
 
   if (shouldPlay) music.play().catch(() => {});
+}
+
+export function playVictoryFlowerTheme(settings) {
+  const theme = sounds.victoryFlowerTheme;
+  if (!settings?.music || document.hidden) return;
+
+  theme.pause();
+  theme.currentTime = 0;
+  theme.loop = false;
+  theme.volume = clampVolume(settings.musicVolume, 0.35);
+  theme.play().catch(() => {});
+}
+
+export function pauseVictoryFlowerTheme() {
+  const theme = sounds.victoryFlowerTheme;
+  theme.pause();
+  theme.currentTime = 0;
 }
 
 export function pauseGameAudio() {

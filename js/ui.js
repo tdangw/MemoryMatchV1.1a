@@ -172,6 +172,8 @@ export function showLevelSummaryOverlay({
   coinsEarned,
   onNext,
   onMenu,
+  isVictoryCelebration = false,
+  onCelebrate,
 }) {
   gameState.isPaused = true;
   let actionSelected = false;
@@ -214,7 +216,17 @@ export function showLevelSummaryOverlay({
     content,
     size: "medium",
     closeOnBackdrop: false,
-    actions: [
+    actions: isVictoryCelebration ? [
+      {
+        label: "Congratulations!",
+        variant: "primary",
+        onClick: (close) => {
+          actionSelected = true;
+          close();
+          setTimeout(() => onCelebrate?.(), 200);
+        },
+      },
+    ] : [
       {
         label: "Menu",
         icon: "home",
@@ -245,6 +257,9 @@ export function showLevelSummaryOverlay({
   });
 
   modal.panel.classList.add("level-summary-modal");
+  if (isVictoryCelebration) {
+    modal.panel.classList.add("level-summary-modal--victory");
+  }
   launchSummaryConfetti();
 }
 

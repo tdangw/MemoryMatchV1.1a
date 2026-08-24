@@ -18,7 +18,12 @@ import {
 import { pauseBackgroundMusic, sounds } from "./sound.js"; // 📦 Tách âm thanh
 import { saveCoins } from "./persistence.js";
 import { getFlipAnimationClass } from "./appearance.js";
-import { GAMEPLAY_TIMING, getComboTimeBonus } from "./gameplayTuning.js";
+import {
+  GAMEPLAY_TIMING,
+  getComboTimeBonus,
+  shouldShowVictoryCelebration,
+} from "./gameplayTuning.js";
+import { showVictoryCelebration } from "./victoryCelebration.js";
 
 let selectedTiles = [];
 let levelCompleteActions = { onNext: () => {}, onMenu: () => {} };
@@ -232,14 +237,24 @@ export function checkLevelComplete() {
       sounds.victory.currentTime = 0;
       sounds.victory.play().catch(() => {});
     }
-    showLevelSummaryOverlay({
+    const completion = {
       level: gameState.currentLevel,
       remainingTime: gameState.remainingTime,
       moves: gameState.moves,
       misses: gameState.misses,
       coinsEarned,
+      settings: gameState.settings,
       onNext: levelCompleteActions.onNext,
       onMenu: levelCompleteActions.onMenu,
-    });
+    };
+    if (shouldShowVictoryCelebration(gameState.currentLevel)) {
+      showLevelSummaryOverlay({
+        ...completion,
+        isVictoryCelebration: true,
+        onCelebrate: () => showVictoryCelebration(completion),
+      });
+    } else {
+      showLevelSummaryOverlay(completion);
+    }
   }
 }
