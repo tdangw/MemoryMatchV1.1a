@@ -22,7 +22,9 @@ Vite build → dist → GitHub Pages hoặc Capacitor Android
 | Khu vực | Vai trò |
 | --- | --- |
 | `index.html` | Khung DOM cố định: game, HUD, menu tác vụ, cài đặt và audio nền. |
-| `style.css` | Giao diện responsive, HUD, board, menu, popup và trạng thái tạm dừng. |
+| `style.css` | Kiểu giao diện dùng chung: responsive, HUD, board, menu, popup và trạng thái tạm dừng. |
+| `styles/shop.css` | Kiểu giao diện riêng của Cửa hàng và hộp xác nhận mua. |
+| `styles/gameplay-effects.css` | Mặt lưng thẻ và hiệu ứng phản hồi combo. |
 | `js/` | Các ES module theo trách nhiệm. |
 | `public/assets/` | Tài nguyên runtime được copy nguyên vẹn vào `dist/assets/`. |
 | `source-assets/` | Ảnh nguồn PNG lưu trữ, không được phát hành. |
@@ -44,6 +46,8 @@ Vite build → dist → GitHub Pages hoặc Capacitor Android
 | `mainmenu.js` | Menu chính và chọn độ khó. |
 | `settings.js` | Cài đặt âm thanh, nhạc, âm lượng và popup Phiên bản. |
 | `shop.js` | Cửa hàng/vật phẩm trong game. |
+| `shopCatalog.js` | Catalog vật phẩm Shop và quy tắc giá động của từng vật phẩm. |
+| `gameplayTuning.js` | Mốc combo, phần thưởng thời gian theo combo và thời lượng hiệu ứng gameplay. |
 | `gameMenu.js` | Menu tác vụ trong HUD. |
 | `sound.js` | Âm thanh hiệu ứng, nhạc nền và quy tắc phát/dừng theo trạng thái trang. |
 | `persistence.js` | Đọc/ghi/xóa dữ liệu trình duyệt. |
@@ -57,20 +61,22 @@ Các module được nối qua hàm `configure*`; tránh import vòng giữa con
 
 | Chế độ | Board chuẩn | Quy tắc mở rộng |
 | --- | --- | --- |
-| Dễ | 12 thẻ | Không đổi theo level. |
-| Trung bình | 24 thẻ | Không đổi theo level. |
-| Khó | 36 thẻ | Không đổi theo level. |
-| Siêu khó | 48 thẻ, 6 cột × 8 hàng | Từ level 10: 54 thẻ, 6 cột × 9 hàng. |
+| Dễ | 12 thẻ, 60 giây | Không đổi theo level. |
+| Trung bình | 24 thẻ, 90 giây | Không đổi theo level. |
+| Khó | 36 thẻ, 120 giây | Không đổi theo level. |
+| Siêu khó | 48 thẻ, 180 giây, 6 cột × 8 hàng | Không đổi theo level. |
 
 `getModeLayout(mode, level)` là điểm duy nhất quyết định kích thước board theo chế độ và level. Giao diện chỉ hiển thị tên chế độ, không hiển thị số thẻ.
 
 1. `main.js` nạp dữ liệu từ `persistence.js`, hydrate `gameState`, áp dụng âm thanh và hiển thị menu chính.
 2. Người chơi chọn độ khó; `gameController.initializeLevel()` tạo `roundId` mới và board mới.
 3. Board preview toàn bộ thẻ. Khi preview hoàn tất và `roundId` vẫn hợp lệ, countdown mới bắt đầu và nhạc nền tiếp tục.
-4. `logic.js` xử lý hai thẻ được chọn. Match cập nhật điểm/progress; miss khóa board trong khoảng thời gian cần thiết.
+4. `logic.js` xử lý hai thẻ được chọn. Match cập nhật điểm/progress và combo; từ combo x2, mỗi cặp đúng nhận số giây bằng cấp combo (x2 +2 giây, x3 +3 giây…). Miss đặt combo về 0, khóa board trong khoảng thời gian cần thiết và trừ 1 Xu từ phần thưởng cuối màn.
 5. Hint tiêu thụ một lượt, lật tạm một cặp chưa match và **không** tự ghép cặp hay cộng điểm.
-6. Mỗi cặp ghép đúng cộng `1` điểm; điểm chỉ phục vụ thành tích và high score, không dùng mua vật phẩm.
-7. Khi hoàn thành màn, người chơi nhận `50 + floor(thời gian còn lại)` Xu. Xu được cộng/lưu trước khi popup tổng kết hiển thị; popup gọi `onNext` hoặc `onMenu`; timer cũ bị vô hiệu bằng `roundId`.
+6. Mỗi cặp ghép đúng cộng `1` điểm; điểm HUD là điểm của lượt chơi hiện tại và không dùng mua vật phẩm.
+7. Khi hoàn thành màn, người chơi nhận Xu theo độ khó và thời gian còn lại: Dễ `30 + floor(t × 0.35)`, Trung bình `50 + floor(t × 0.5)`, Khó `70 + floor(t × 0.65)`, Siêu khó `90 + floor(t × 0.8)`; sau đó trừ 1 Xu cho mỗi miss, không thấp hơn 0. Xu được cộng/lưu trước khi popup tổng kết hiển thị; popup gọi `onNext` hoặc `onMenu`; timer cũ bị vô hiệu bằng `roundId`.
+
+Mỗi level bắt đầu lại với thời gian nền theo độ khó, cộng `min((level - 1) × 3, 30)` giây. Lượt gợi ý chưa dùng được giữ lại; từ level 2, người chơi nhận thêm 1 lượt mỗi màn đến tối đa 10 lượt.
 
 ### Chống race condition
 
@@ -90,14 +96,14 @@ Lưu trữ dùng `localStorage`, theo thiết bị/trình duyệt. Không có d�
 
 | Key | Kiểu/giá trị | Chủ sở hữu |
 | --- | --- | --- |
-| `highScore` | số nguyên, mặc định `0` | `persistence.js` |
 | `coins` | số nguyên không âm, mặc định `0` | `persistence.js` / `gameState.js` |
 | `sound` | chuỗi boolean, mặc định `true` | `persistence.js` / `settings.js` |
 | `music` | chuỗi boolean, mặc định `true` | `persistence.js` / `settings.js` |
 | `soundVolume` | số `0..1`, mặc định `0.4` | `persistence.js` / `settings.js` |
 | `musicVolume` | số `0..1`, mặc định `0.35` | `persistence.js` / `settings.js` |
+| `appearance` | JSON: ngoại hình đã sở hữu và đang trang bị | `persistence.js` / `appearance.js` |
 
-`clearPersistentGameData()` chỉ xóa các key trên. Trạng thái ván đang chơi, level hiện tại và hint không được lưu qua lần tải lại. Xu được dùng cho shop; việc mua vật phẩm không làm giảm điểm hoặc high score.
+`clearPersistentGameData()` chỉ xóa các key trên. Trạng thái ván đang chơi, level hiện tại và hint không được lưu qua lần tải lại. Xu được dùng cho shop; vật phẩm ngoại hình mua một lần, được sở hữu vĩnh viễn trên thiết bị và có thể trang bị trong tab Ngoại hình của Cửa hàng.
 
 ## 6. Tài nguyên và đường dẫn
 

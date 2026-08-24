@@ -12,11 +12,7 @@ import {
 } from "./mainmenu.js";
 import { configureSettings, showSettingsPanel } from "./settings.js";
 import { openShopOverlay } from "./shop.js";
-import {
-  showResetConfirmationOverlay,
-  showReturnToMenuOverlay,
-  updateHighScoreDisplay,
-} from "./ui.js";
+import { showResetConfirmationOverlay, showReturnToMenuOverlay } from "./ui.js";
 import { gameState, hydrateGameState } from "./gameState.js";
 import { loadPersistentGameData } from "./persistence.js";
 import {
@@ -44,7 +40,6 @@ document.addEventListener("contextmenu", (event) => event.preventDefault());
 
 window.onload = () => {
   createMainMenu();
-  updateHighScoreDisplay(gameState.highScore);
 };
 
 document

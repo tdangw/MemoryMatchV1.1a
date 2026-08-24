@@ -6,7 +6,12 @@ import {
   syncDefaultMusic,
 } from "./sound.js";
 import { openAppModal } from "./modal.js";
-import { GAME_CONFIG, getModeLayout } from "./config.js";
+import {
+  GAME_CONFIG,
+  getLevelHintBonus,
+  getLevelTimeBonus,
+  getModeLayout,
+} from "./config.js";
 import { createGrid } from "./grid.js";
 import {
   updateLevelDisplay,
@@ -15,8 +20,10 @@ import {
   updateTimerDisplay,
   updateMovesDisplay,
   updateMissesDisplay,
+  updateComboDisplay,
   updatePairProgressDisplay,
   showBonusOverlay,
+  showRevealTimerInHud,
   showLevelRewardOverlay,
 } from "./ui.js";
 import {
@@ -24,14 +31,16 @@ import {
   gameState,
   invalidateRound,
   resetGame,
+  spendCoins,
 } from "./gameState.js";
+import { saveCoins } from "./persistence.js";
 import { configureLogic } from "./logic.js";
+import { GAMEPLAY_TIMING } from "./gameplayTuning.js";
 
 let countdownInterval;
 let isAutoPaused = false;
 let shouldResumeMusic = false;
 let navigation = { showDifficulty: () => {}, createMenu: () => {} };
-const TILE_HIDE_ANIMATION_MS = 180;
 
 export function configureGameController(actions) {
   navigation = { ...navigation, ...actions };
@@ -45,12 +54,17 @@ export function initializeLevel(level) {
   const gameContainer = document.getElementById("game-container");
   if (gameContainer) gameContainer.style.display = "flex";
 
-  const layout = getModeLayout(gameState.settings.mode || "easy", level);
+  const layout = getModeLayout(gameState.settings.mode || "easy");
   const roundId = beginRound();
+  const timeBonus = getLevelTimeBonus(level);
+  const hintBonus = getLevelHintBonus(level, gameState.hints);
+  gameState.remainingTime = layout.timeSeconds + timeBonus;
+  gameState.hints += hintBonus;
   createGrid(layout, { roundId, onPreviewComplete: startCountdown });
 
   gameState.moves = 0;
   gameState.misses = 0;
+  gameState.combo = 0;
   gameState.matchedPairs = 0;
   gameState.totalPairs = layout.tileCount / 2;
 
@@ -59,9 +73,11 @@ export function initializeLevel(level) {
   updateHintDisplay(gameState.hints);
   updateMovesDisplay(gameState.moves);
   updateMissesDisplay(gameState.misses);
+  updateComboDisplay(gameState.combo);
   updatePairProgressDisplay(gameState.matchedPairs, gameState.totalPairs);
   updateTimerDisplay(gameState.remainingTime);
   showLevelRewardOverlay();
+  showRevealTimerInHud(GAME_CONFIG.previewDurationMs / 1000, roundId);
 }
 
 function startCountdown(roundId = gameState.roundId) {
@@ -125,20 +141,45 @@ function handleTimeUp() {
     syncDefaultMusic(gameState.settings);
   };
 
+  const buyMoreTime = (seconds, price, close) => {
+    if (!spendCoins(price)) {
+      showBonusOverlay("Bạn không đủ Xu để mua thêm thời gian.");
+      return true;
+    }
+
+    saveCoins(gameState.coins);
+    actionSelected = true;
+    gameState.remainingTime = seconds;
+    const roundId = beginRound();
+    gameState.isLocked = false;
+    gameState.isPaused = false;
+    document.getElementById("grid-container")?.classList.remove("is-locked");
+    updateTimerDisplay(gameState.remainingTime);
+    close();
+    showBonusOverlay(`Đã mua +${seconds}s với ${price} Xu.`);
+    syncDefaultMusic(gameState.settings);
+    setTimeout(
+      () => startCountdown(roundId),
+      GAMEPLAY_TIMING.timePurchaseGraceMs,
+    );
+    return true;
+  };
+
   pauseBackgroundMusic();
   if (gameState.settings.sound) {
     sounds.defeat.currentTime = 0;
     sounds.defeat.play().catch(() => {});
   }
 
-  openAppModal({
+  const timeUpModal = openAppModal({
     id: "time-up-modal",
     icon: "timer",
     title: "Hết giờ",
-    content: "<p>Thời gian đã hết. Bạn có thể chơi lại hoặc quay về Menu.</p>",
+    content: "<p>Chọn một cách để tiếp tục hành trình của bạn.</p>",
     actions: [
       {
         label: "Về Menu",
+        icon: "home",
         variant: "secondary",
         onClick: (close) => {
           actionSelected = true;
@@ -148,6 +189,7 @@ function handleTimeUp() {
       },
       {
         label: "Chơi lại",
+        icon: "restart",
         variant: "primary",
         onClick: (close) => {
           actionSelected = true;
@@ -156,11 +198,27 @@ function handleTimeUp() {
           navigation.showDifficulty(true);
         },
       },
+      {
+        label: "+1 giây · 2 Xu",
+        icon: "coin",
+        variant: "time-purchase",
+        onClick: (close) => buyMoreTime(1, 2, close),
+      },
+      {
+        label: "+5 giây · 10 Xu",
+        icon: "coin",
+        variant: "time-purchase",
+        onClick: (close) => buyMoreTime(5, 10, close),
+      },
     ],
     onClose: () => {
       if (!actionSelected) returnToMenu();
     },
   });
+
+  setTimeout(() => {
+    timeUpModal.panel.classList.add("is-defeat-shaking");
+  }, 520);
 }
 
 export function nextLevel() {
@@ -220,7 +278,10 @@ function revealHintPair(tiles, roundId) {
       image.classList.remove("hidden", "appear-bounce");
       void image.offsetWidth;
       image.classList.add("appear-bounce");
-      setTimeout(() => image.classList.remove("appear-bounce"), 600);
+      setTimeout(
+        () => image.classList.remove("appear-bounce"),
+        GAMEPLAY_TIMING.tileRevealAnimationMs,
+      );
     }
     tile.classList.add("hint-reveal");
   });
@@ -237,7 +298,7 @@ function revealHintPair(tiles, roundId) {
         setTimeout(() => {
           if (gameState.roundId === roundId) image.classList.add("hidden");
           image.classList.remove("hide-fade-scale");
-        }, TILE_HIDE_ANIMATION_MS);
+        }, GAMEPLAY_TIMING.tileHideAnimationMs);
       }
       tile.classList.remove("hint-reveal");
     });
@@ -246,7 +307,7 @@ function revealHintPair(tiles, roundId) {
       if (gameState.roundId !== roundId) return;
       gameState.isLocked = false;
       grid?.classList.remove("is-locked");
-    }, TILE_HIDE_ANIMATION_MS);
+    }, GAMEPLAY_TIMING.tileHideAnimationMs);
   }, GAME_CONFIG.hintRevealDurationMs);
 }
 

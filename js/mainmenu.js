@@ -55,7 +55,6 @@ export function createMainMenu() {
       icon: "play",
       text: "Bắt đầu",
       action: () => {
-        document.body.removeChild(menuOverlay);
         showDifficultyOverlay();
       },
     },
@@ -63,7 +62,6 @@ export function createMainMenu() {
       icon: "settings",
       text: "Cài đặt",
       action: () => {
-        document.body.removeChild(menuOverlay);
         showSettingsPanel();
       },
     },
@@ -76,6 +74,7 @@ export function createMainMenu() {
           `<ul class="app-feature-list">
             <li>Lật hai thẻ để tìm cặp hình giống nhau.</li>
             <li>Ghép hết các cặp trước khi thời gian kết thúc.</li>
+            <li>Ghép đúng liên tiếp để tạo Combo và nhận thêm thời gian; mỗi lần ghép sai sẽ làm Combo về 0 và giảm phần thưởng Xu của màn.</li>
             <li>Dùng gợi ý hoặc vật phẩm trong cửa hàng khi cần.</li>
           </ul>`,
           "book",
@@ -126,6 +125,7 @@ export function showDifficultyOverlay(fromGame = false) {
     gameState.fromDefeat = false;
     resetGame();
     gameState.settings.mode = mode;
+    document.getElementById("menu-container")?.remove();
     close();
     onStartGame(1);
   };

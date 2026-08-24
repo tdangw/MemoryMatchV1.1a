@@ -1,20 +1,19 @@
 const STORAGE_KEYS = Object.freeze({
-  highScore: "highScore",
   coins: "coins",
   sound: "sound",
   music: "music",
   soundVolume: "soundVolume",
   musicVolume: "musicVolume",
+  appearance: "appearance",
 });
 
 export function loadPersistentGameData() {
+  // Dọn dữ liệu kỷ lục cũ: điểm hiện chỉ đại diện cho lượt chơi đang diễn ra.
+  localStorage.removeItem("highScore");
   return {
-    highScore:
-      Number.parseInt(
-        localStorage.getItem(STORAGE_KEYS.highScore) || "0",
-        10,
-      ) || 0,
-    coins: Number.parseInt(localStorage.getItem(STORAGE_KEYS.coins) || "0", 10) || 0,
+    coins:
+      Number.parseInt(localStorage.getItem(STORAGE_KEYS.coins) || "0", 10) || 0,
+    appearance: loadAppearance(),
     settings: {
       sound: localStorage.getItem(STORAGE_KEYS.sound) !== "false",
       music: localStorage.getItem(STORAGE_KEYS.music) !== "false",
@@ -28,20 +27,28 @@ export function loadPersistentGameData() {
   };
 }
 
-export function saveHighScore(score) {
-  localStorage.setItem(STORAGE_KEYS.highScore, String(score));
+function loadAppearance() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEYS.appearance) || "{}");
+  } catch {
+    return {};
+  }
 }
 
 export function saveCoins(coins) {
-  localStorage.setItem(STORAGE_KEYS.coins, String(Math.max(0, Math.floor(coins))));
+  localStorage.setItem(
+    STORAGE_KEYS.coins,
+    String(Math.max(0, Math.floor(coins))),
+  );
 }
 
-export function clearHighScore() {
-  localStorage.removeItem(STORAGE_KEYS.highScore);
+export function saveAppearance(appearance) {
+  localStorage.setItem(STORAGE_KEYS.appearance, JSON.stringify(appearance));
 }
 
 export function clearPersistentGameData() {
   Object.values(STORAGE_KEYS).forEach((key) => localStorage.removeItem(key));
+  localStorage.removeItem("highScore");
 }
 
 export function saveSetting(key, value) {

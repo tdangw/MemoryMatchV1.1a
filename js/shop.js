@@ -10,90 +10,10 @@ import {
 import { openAppModal } from "./modal.js";
 import { createIcon } from "./icons.js";
 import { shuffleArray } from "./utils.js";
-import { saveCoins } from "./persistence.js";
-
-// Danh sách vật phẩm
-const shopData = [
-  {
-    id: "time-10",
-    icon: "timer",
-    title: "10 giây",
-    price: 25,
-    type: "time",
-    value: 10,
-  },
-  {
-    id: "time-30",
-    icon: "timer",
-    title: "30 giây",
-    price: 70,
-    type: "time",
-    value: 30,
-  },
-  {
-    id: "time-45",
-    icon: "timer",
-    title: "45 giây",
-    price: 110,
-    type: "time",
-    value: 45,
-  },
-  {
-    id: "time-60",
-    icon: "timer",
-    title: "60 giây",
-    price: 150,
-    type: "time",
-    value: 60,
-  },
-  {
-    id: "hint-1",
-    icon: "search",
-    title: "1 lượt gợi ý",
-    price: 35,
-    type: "hint",
-    value: 1,
-  },
-  {
-    id: "hint-2",
-    icon: "search",
-    title: "2 lượt gợi ý",
-    price: 65,
-    type: "hint",
-    value: 2,
-  },
-  {
-    id: "hint-3",
-    icon: "search",
-    title: "3 lượt gợi ý",
-    price: 90,
-    type: "hint",
-    value: 3,
-  },
-  {
-    id: "reveal-4",
-    icon: "puzzle",
-    title: "Xem trước 4 thẻ",
-    price: 60,
-    type: "reveal-random",
-    value: 4,
-  },
-  {
-    id: "reveal-8",
-    icon: "puzzle",
-    title: "Xem trước 8 thẻ",
-    price: 110,
-    type: "reveal-random",
-    value: 8,
-  },
-  {
-    id: "reveal-all",
-    icon: "puzzle",
-    title: "Xem trước tất cả thẻ",
-    price: 250,
-    type: "reveal-all",
-  },
-];
+import { saveAppearance, saveCoins } from "./persistence.js";
+import { CARD_BACKS, FLIP_EFFECTS, getCardBackClass } from "./appearance.js";
+import { SHOP_ITEMS, getShopItemPrice } from "./shopCatalog.js";
+import { GAMEPLAY_TIMING } from "./gameplayTuning.js";
 
 export function openShopOverlay() {
   if (gameState.isLocked || gameState.isPaused) return;
@@ -101,14 +21,20 @@ export function openShopOverlay() {
   const roundId = gameState.roundId;
   gameState.isPaused = true;
 
+  const content = document.createElement("div");
+  content.className = "shop-content";
+  const tabs = document.createElement("div");
+  tabs.className = "shop-tabs";
+  tabs.setAttribute("role", "tablist");
   const grid = document.createElement("div");
   grid.className = "shop-item-grid";
+  content.append(tabs, grid);
 
   const modal = openAppModal({
     id: "shop-modal",
     icon: "shop",
     title: "Cửa hàng",
-    content: grid,
+    content,
     size: "large",
     onClose: () => {
       if (gameState.roundId === roundId) gameState.isPaused = false;
@@ -121,13 +47,48 @@ export function openShopOverlay() {
   const walletValue = document.createElement("span");
   walletValue.id = "coin-balance";
   walletValue.textContent = String(gameState.coins);
-  wallet.append(createIcon("coin"), walletValue);
+  wallet.append(walletValue, createIcon("coin"));
   const closeButton = modal.panel.querySelector(".app-modal__close");
   modal.panel
     .querySelector(".app-modal__header")
     .insertBefore(wallet, closeButton);
 
-  shopData.forEach((item) => {
+  const consumableTab = createTab("Vật phẩm", true, () =>
+    renderConsumables(grid, roundId, modal),
+  );
+  const appearanceTab = createTab("Ngoại hình", false, () =>
+    renderAppearance(grid, roundId, modal),
+  );
+  tabs.append(consumableTab, appearanceTab);
+  renderConsumables(grid, roundId, modal);
+}
+
+function createTab(label, selected, onSelect) {
+  const tab = document.createElement("button");
+  tab.type = "button";
+  tab.className = "shop-tab";
+  tab.textContent = label;
+  tab.setAttribute("role", "tab");
+  tab.setAttribute("aria-selected", String(selected));
+  tab.onclick = () => {
+    tab.parentElement.querySelectorAll(".shop-tab").forEach((button) => {
+      button.classList.toggle("is-active", button === tab);
+      button.setAttribute("aria-selected", String(button === tab));
+    });
+    onSelect();
+  };
+  if (selected) tab.classList.add("is-active");
+  return tab;
+}
+
+function renderConsumables(grid, roundId, modal) {
+  grid.className = "shop-item-grid shop-item-grid--consumables";
+  grid.replaceChildren();
+  SHOP_ITEMS.forEach((item) => {
+    const price = getShopItemPrice(item, {
+      unmatchedTileCount: document.querySelectorAll(".tile:not(.matched)")
+        .length,
+    });
     const card = document.createElement("div");
     card.className = "shop-item";
 
@@ -137,28 +98,111 @@ export function openShopOverlay() {
 
     const button = document.createElement("button");
     button.className = "app-button app-button--purchase shop-buy-button";
-    button.append(
-      document.createTextNode(String(item.price)),
-      createIcon("coin"),
-    );
-    button.onclick = () => openPurchaseConfirmation(item, roundId, modal);
+    button.append(document.createTextNode(String(price)), createIcon("coin"));
+    button.onclick = () =>
+      openPurchaseConfirmation({ ...item, price }, roundId, modal);
 
     card.appendChild(title);
     card.appendChild(button);
-    grid.appendChild(card);
+    grid.append(card);
   });
 }
 
+function renderAppearance(grid, roundId, modal) {
+  grid.className = "shop-item-grid shop-item-grid--appearance";
+  grid.replaceChildren();
+  renderAppearanceGroup(
+    grid,
+    "Mặt lưng thẻ",
+    "cardBack",
+    CARD_BACKS,
+    roundId,
+    modal,
+  );
+  renderAppearanceGroup(
+    grid,
+    "Hiệu ứng lật",
+    "flipEffect",
+    FLIP_EFFECTS,
+    roundId,
+    modal,
+  );
+}
+
+function renderAppearanceGroup(grid, title, type, items, roundId, modal) {
+  const group = document.createElement("section");
+  group.className = "appearance-group";
+  const heading = document.createElement("h3");
+  heading.textContent = title;
+  const choices = document.createElement("div");
+  choices.className = "appearance-choice-grid";
+
+  items.forEach((item) => {
+    const ownedKey =
+      type === "cardBack" ? "ownedCardBacks" : "ownedFlipEffects";
+    const owned = gameState.appearance[ownedKey].includes(item.id);
+    const equipped = gameState.appearance[type] === item.id;
+    const card = document.createElement("article");
+    card.className = `appearance-choice${equipped ? " is-equipped" : ""}`;
+    if (type === "cardBack") {
+      const preview = document.createElement("div");
+      preview.className = `appearance-preview ${item.previewClass}`;
+      preview.setAttribute("aria-hidden", "true");
+      card.append(preview);
+    } else {
+      const preview = document.createElement("div");
+      preview.className = "appearance-effect-preview";
+      preview.textContent = "A";
+      preview.classList.add(item.animationClass);
+      card.append(preview);
+    }
+    const name = document.createElement("strong");
+    name.textContent = item.title;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "app-button app-button--purchase shop-buy-button";
+    if (equipped) {
+      button.classList.add("appearance-action--equipped");
+      button.textContent = "Đang dùng";
+      button.disabled = true;
+    } else if (owned) {
+      button.classList.add("appearance-action--equip");
+      button.textContent = "Trang bị";
+      button.onclick = () =>
+        equipAppearance(type, item.id, roundId, grid, modal);
+    } else {
+      button.append(
+        document.createTextNode(String(item.price)),
+        createIcon("coin"),
+      );
+      button.onclick = () =>
+        openPurchaseConfirmation(
+          { ...item, type: "appearance", appearanceType: type },
+          roundId,
+          modal,
+        );
+    }
+    card.append(name, button);
+    choices.append(card);
+  });
+  group.append(heading, choices);
+  grid.append(group);
+}
+
 function openPurchaseConfirmation(item, roundId, shopModal) {
+  let isSubmitting = false;
   const content = document.createElement("div");
   content.className = "shop-confirmation";
 
   const message = document.createElement("p");
-  message.textContent = `Mua ${item.title}?`;
+  message.textContent =
+    item.type === "appearance"
+      ? `Mua và trang bị ${item.title}?`
+      : `Mua ${item.title}?`;
 
   const price = document.createElement("strong");
   price.className = "shop-confirmation__price";
-  price.append(createIcon("coin"), document.createTextNode(`${item.price} Xu`));
+  price.append(document.createTextNode(String(item.price)), createIcon("coin"));
   content.append(message, price);
 
   openAppModal({
@@ -174,7 +218,12 @@ function openPurchaseConfirmation(item, roundId, shopModal) {
         icon: "coin",
         variant: "primary",
         onClick: (closeConfirmation) => {
-          if (!handleBuyItem(item, roundId)) return true;
+          if (isSubmitting) return true;
+          isSubmitting = true;
+          if (!handleBuyItem(item, roundId)) {
+            isSubmitting = false;
+            return true;
+          }
           closeConfirmation();
           shopModal.close();
           return true;
@@ -188,6 +237,17 @@ function openPurchaseConfirmation(item, roundId, shopModal) {
 function handleBuyItem(item, roundId) {
   if (gameState.roundId !== roundId || gameState.isLocked) return false;
 
+  if (item.type === "appearance") {
+    const ownedKey =
+      item.appearanceType === "cardBack"
+        ? "ownedCardBacks"
+        : "ownedFlipEffects";
+    if (gameState.appearance[ownedKey].includes(item.id)) {
+      showShopMessage("Bạn đã sở hữu vật phẩm này.", "info");
+      return false;
+    }
+  }
+
   if (!spendCoins(item.price)) {
     showShopMessage("Bạn không đủ Xu để mua vật phẩm này.", "error");
     return false;
@@ -195,6 +255,20 @@ function handleBuyItem(item, roundId) {
 
   saveCoins(gameState.coins);
   updateCoinDisplay(gameState.coins);
+
+  if (item.type === "appearance") {
+    const ownedKey =
+      item.appearanceType === "cardBack"
+        ? "ownedCardBacks"
+        : "ownedFlipEffects";
+    if (!gameState.appearance[ownedKey].includes(item.id))
+      gameState.appearance[ownedKey].push(item.id);
+    gameState.appearance[item.appearanceType] = item.id;
+    saveAppearance(gameState.appearance);
+    if (item.appearanceType === "cardBack") applyEquippedCardBack();
+    showShopMessage(`Đã trang bị ${item.title}`);
+    return true;
+  }
 
   switch (item.type) {
     case "time":
@@ -210,11 +284,15 @@ function handleBuyItem(item, roundId) {
       showShopMessage(`+${item.value} gợi ý`);
       break;
     case "reveal-random":
-      revealRandomTiles(item.value, 5000, roundId);
+      revealRandomTiles(
+        item.value,
+        GAMEPLAY_TIMING.shopRevealDurationMs,
+        roundId,
+      );
       showShopMessage(`Đang xem trước ${item.value} thẻ`);
       break;
     case "reveal-all":
-      revealAllTiles(5000, roundId);
+      revealAllTiles(GAMEPLAY_TIMING.shopRevealDurationMs, roundId);
       showShopMessage("Đang xem trước tất cả thẻ");
       break;
   }
@@ -222,10 +300,31 @@ function handleBuyItem(item, roundId) {
   return true;
 }
 
+function equipAppearance(type, id, roundId, grid, modal) {
+  if (gameState.roundId !== roundId) return;
+  gameState.appearance[type] = id;
+  saveAppearance(gameState.appearance);
+  if (type === "cardBack") applyEquippedCardBack();
+  const item = (type === "cardBack" ? CARD_BACKS : FLIP_EFFECTS).find(
+    (entry) => entry.id === id,
+  );
+  showShopMessage(`Đã trang bị ${item?.title || "ngoại hình"}`);
+  renderAppearance(grid, roundId, modal);
+}
+
+function applyEquippedCardBack() {
+  const backClasses = CARD_BACKS.map((item) => item.previewClass);
+  const equippedClass = getCardBackClass(gameState.appearance.cardBack);
+  document.querySelectorAll(".tile").forEach((tile) => {
+    tile.classList.remove(...backClasses);
+    tile.classList.add(equippedClass);
+  });
+}
+
 // Hỗ trợ hiệu ứng
 function revealRandomTiles(
   count,
-  duration = 5000,
+  duration = GAMEPLAY_TIMING.shopRevealDurationMs,
   roundId = gameState.roundId,
 ) {
   const tiles = Array.from(
@@ -250,7 +349,10 @@ function revealRandomTiles(
   }, duration);
 }
 
-function revealAllTiles(duration = 5000, roundId = gameState.roundId) {
+function revealAllTiles(
+  duration = GAMEPLAY_TIMING.shopRevealDurationMs,
+  roundId = gameState.roundId,
+) {
   const tiles = document.querySelectorAll(".tile:not(.matched) img.hidden");
 
   tiles.forEach((img) => {

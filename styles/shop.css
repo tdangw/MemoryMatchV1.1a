@@ -1,0 +1,269 @@
+/* Cửa hàng: kích thước cố định, phần nội dung tự cuộn. */
+#shop-modal .app-modal,
+#shop-confirm-modal .app-modal {
+  border-color: rgb(255 255 255 / 16%);
+  border-radius: 24px;
+  background: linear-gradient(155deg, #182942 0%, #243b64 100%);
+  color: #f5f7fb;
+}
+
+#shop-modal .app-modal {
+  width: min(620px, calc(100vw - 24px));
+  height: min(650px, calc(100dvh - 24px));
+  max-height: none;
+}
+#shop-modal .app-modal__header,
+#shop-confirm-modal .app-modal__header,
+#shop-confirm-modal .app-modal__footer {
+  border-color: rgb(255 255 255 / 11%);
+}
+#shop-modal .app-modal__title,
+#shop-modal .app-modal__title .ui-icon,
+#shop-confirm-modal .app-modal__title,
+#shop-confirm-modal .app-modal__title .ui-icon {
+  color: #f2bf5b;
+}
+#shop-modal .app-modal__close,
+#shop-confirm-modal .app-modal__close {
+  background: rgb(255 255 255 / 9%);
+  color: #f5f7fb;
+}
+
+.shop-wallet {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+  color: #ffe09a;
+  font:
+    700 0.92rem/1 "Segoe UI",
+    sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+.shop-wallet .ui-icon,
+.shop-confirmation__price .ui-icon {
+  width: 19px;
+  height: 19px;
+  color: #f2bf5b;
+}
+#shop-modal .app-modal__body {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  padding: 14px;
+}
+.shop-content {
+  display: grid;
+  width: 100%;
+  min-height: 0;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 12px;
+}
+.shop-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.shop-tab {
+  min-height: 34px;
+  border: 1px solid rgb(255 255 255 / 13%);
+  border-radius: 10px;
+  background: rgb(7 17 37 / 32%);
+  color: rgb(245 247 251 / 72%);
+  font:
+    700 0.82rem/1 "Segoe UI",
+    sans-serif;
+  cursor: pointer;
+}
+.shop-tab.is-active {
+  border-color: rgb(242 191 91 / 44%);
+  background: rgb(242 191 91 / 16%);
+  color: #ffe09a;
+}
+
+#shop-modal .shop-item-grid {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(4, minmax(0, 1fr));
+  gap: 9px;
+  margin: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+#shop-modal .shop-item-grid::-webkit-scrollbar {
+  display: none;
+}
+#shop-modal .shop-item-grid--appearance {
+  display: grid;
+  height: 100%;
+  grid-template-columns: 1fr;
+  grid-template-rows: none;
+  align-content: start;
+  gap: 15px;
+  overflow-y: auto;
+}
+.appearance-group {
+  display: grid;
+  gap: 8px;
+}
+.appearance-group h3 {
+  margin: 0;
+  color: #ffe09a;
+  font-size: 0.92rem;
+}
+.appearance-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+.appearance-choice {
+  display: grid;
+  min-width: 0;
+  justify-items: center;
+  gap: 7px;
+  padding: 8px 6px;
+  border: 1px solid rgb(255 255 255 / 12%);
+  border-radius: 12px;
+  background: rgb(7 17 37 / 32%);
+  text-align: center;
+}
+.appearance-choice.is-equipped {
+  border-color: rgb(242 191 91 / 58%);
+  box-shadow: inset 0 0 0 1px rgb(242 191 91 / 14%);
+}
+.appearance-choice strong {
+  min-height: 2.1em;
+  color: #eef5ff;
+  font-size: 0.73rem;
+  line-height: 1.08;
+}
+.appearance-preview,
+.appearance-effect-preview {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  border-radius: 10px;
+  box-shadow: 0 3px 8px rgb(0 0 0 / 25%);
+}
+.appearance-effect-preview {
+  border: 1px solid rgb(255 255 255 / 20%);
+  background: linear-gradient(145deg, #5277ba, #253c70);
+  color: #fff4c9;
+  font:
+    800 1.35rem/1 "Trebuchet MS",
+    sans-serif;
+  animation-duration: 1.8s;
+  animation-iteration-count: infinite;
+}
+.appearance-choice .shop-buy-button {
+  min-height: 27px;
+  padding: 4px 7px;
+  font-size: 0.72rem;
+}
+.appearance-choice .shop-buy-button:disabled {
+  cursor: default;
+  opacity: 0.62;
+}
+#shop-modal .shop-item {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 9px;
+  border: 1px solid rgb(255 255 255 / 12%);
+  border-radius: 12px;
+  background: rgb(7 17 37 / 32%);
+}
+#shop-modal .shop-item-title {
+  justify-content: center;
+  gap: 6px;
+  color: #eef5ff;
+  font-size: 0.84rem;
+  line-height: 1.15;
+  text-align: center;
+}
+#shop-modal .shop-item-title .ui-icon {
+  flex: 0 0 auto;
+  width: 17px;
+  height: 17px;
+  color: #86bff5;
+}
+#shop-modal .shop-buy-button {
+  align-self: center;
+  min-height: 29px;
+  padding: 5px 10px;
+  border: 1px solid rgb(242 191 91 / 34%);
+  background: rgb(242 191 91 / 16%);
+  color: #ffe09a;
+}
+#shop-modal .appearance-action--equip,
+#shop-modal .appearance-action--equipped {
+  border-color: rgb(111 190 255 / 58%);
+  background: rgb(47 115 184 / 72%);
+  color: #eef8ff;
+}
+#shop-modal .appearance-action--equipped {
+  background: rgb(42 92 149 / 72%);
+}
+#shop-confirm-modal .app-modal__body {
+  padding: 20px;
+  color: rgb(245 247 251 / 88%);
+  text-align: center;
+}
+.shop-confirmation {
+  display: grid;
+  justify-items: center;
+  gap: 13px;
+}
+.shop-confirmation__price {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #ffe09a;
+  font-size: 1.1rem;
+}
+#shop-confirm-modal .app-modal__footer {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+#shop-confirm-modal .app-button--secondary {
+  border-color: rgb(255 255 255 / 16%);
+  background: rgb(255 255 255 / 10%);
+  color: #f5f7fb;
+}
+#shop-confirm-modal .app-button--primary {
+  background: #2f73b8;
+  color: #fff;
+}
+
+@media screen and (width <= 600px) {
+  #shop-modal .app-modal__header {
+    padding: 11px 13px;
+  }
+  #shop-modal .shop-item-grid {
+    height: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(5, minmax(0, 1fr));
+    gap: 7px;
+  }
+  #shop-modal .shop-item {
+    padding: 7px;
+  }
+  #shop-modal .shop-item-title {
+    font-size: 0.78rem;
+  }
+  .appearance-choice-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .appearance-preview,
+  .appearance-effect-preview {
+    width: 54px;
+    height: 54px;
+  }
+}

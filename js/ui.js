@@ -1,5 +1,6 @@
 // ui.js
 import { gameState } from "./gameState.js";
+import { GAMEPLAY_TIMING, getComboPresentation } from "./gameplayTuning.js";
 import { sounds } from "./sound.js"; // ✅ Đã tách âm thanh
 import { openAppModal, showAppToast } from "./modal.js";
 import { createIcon } from "./icons.js";
@@ -11,9 +12,9 @@ const levelElement = document.getElementById("level");
 const hintElement = document.getElementById("hint");
 const timerElement = document.getElementById("timer-value");
 const timerContainer = document.getElementById("timer");
-const highScoreEl = document.getElementById("high-score-value");
 const movesElement = document.getElementById("moves");
 const missesElement = document.getElementById("misses");
+const comboElement = document.getElementById("combo");
 const matchedPairsElement = document.getElementById("matched-pairs");
 const totalPairsElement = document.getElementById("total-pairs");
 let revealTimerInterval = null;
@@ -21,13 +22,7 @@ let revealTimerRoundId = null;
 
 export function updateCoinDisplay(coins) {
   const coinElement = document.getElementById("coin-balance");
-  if (coinElement) coinElement.textContent = `${coins} Xu`;
-}
-
-export function updateHighScoreDisplay(score) {
-  if (highScoreEl) {
-    highScoreEl.textContent = score;
-  }
+  if (coinElement) coinElement.textContent = String(coins);
 }
 
 export function updateScoreDisplay(score) {
@@ -48,6 +43,10 @@ export function updateMovesDisplay(moves) {
 
 export function updateMissesDisplay(misses) {
   if (missesElement) missesElement.textContent = misses;
+}
+
+export function updateComboDisplay(combo) {
+  if (comboElement) comboElement.textContent = combo > 1 ? `x${combo}` : "0";
 }
 
 export function updatePairProgressDisplay(
@@ -116,7 +115,6 @@ export function showLevelRewardOverlay() {
     "0",
   );
   const seconds = String(gameState.remainingTime % 60).padStart(2, "0");
-
   const rewardTitle = document.createElement("h2");
   rewardTitle.className = "reward-title glow";
   rewardTitle.textContent = `Màn ${gameState.currentLevel}`;
@@ -125,18 +123,18 @@ export function showLevelRewardOverlay() {
   subtitle.className = "reward-subtitle";
   subtitle.textContent = modeLabels[mode];
 
-  const createRewardLine = (className, icon, text) => {
+  const createRewardLine = (className, icon, value) => {
     const line = document.createElement("div");
     line.className = className;
-    line.append(createIcon(icon), document.createTextNode(text));
+    line.append(createIcon(icon), document.createTextNode(value));
     return line;
   };
 
   container.append(rewardTitle, subtitle);
   container.append(
-    createRewardLine("reward-points", "star", `${gameState.score} điểm`),
-    createRewardLine("reward-time", "timer", `Thời gian ${minutes}:${seconds}`),
-    createRewardLine("reward-hints", "search", `${gameState.hints} lượt gợi ý`),
+    createRewardLine("reward-points", "star", String(gameState.score)),
+    createRewardLine("reward-time", "timer", `${minutes}:${seconds}`),
+    createRewardLine("reward-hints", "search", String(gameState.hints)),
   );
 
   overlay.appendChild(container);
@@ -152,7 +150,7 @@ export function showLevelRewardOverlay() {
   setTimeout(() => {
     overlay.classList.replace("fade-in", "fade-out");
     setTimeout(() => overlay.remove(), 400);
-  }, 3000);
+  }, GAMEPLAY_TIMING.levelIntroDurationMs);
 }
 
 function launchSummaryConfetti() {
@@ -189,12 +187,14 @@ export function showLevelSummaryOverlay({
 
   const stats = document.createElement("div");
   stats.className = "level-summary__stats";
-  [
+  const summaryStats = [
     ["THỜI GIAN", `${minutes}:${seconds}`, "summary-time"],
     ["MOVES", moves, "summary-moves"],
     ["MISS", misses, "summary-misses"],
-    ["XU NHẬN", `+${coinsEarned}`, "summary-coins"],
-  ].forEach(([label, value, className]) => {
+  ];
+  summaryStats.push(["XU NHẬN", `+${coinsEarned}`, "summary-coins"]);
+
+  summaryStats.forEach(([label, value, className]) => {
     const item = document.createElement("div");
     item.className = `level-summary__stat ${className}`;
     const statLabel = document.createElement("span");
@@ -314,20 +314,14 @@ export function showReturnToMenuOverlay({ onConfirm } = {}) {
     },
   });
 }
-/**
- * 💡 Hiển thị hiệu ứng cộng điểm tại vị trí tile cụ thể (ví dụ ô thứ 2 khi match)
- * @param {HTMLElement} tileElement - Ô tile DOM
- * @param {string|number} text - Nội dung hiển thị (ví dụ: 12 hoặc '+12 points')
- */
-export function showTilePointEffect(tileElement, text = "") {
-  const effect = document.createElement("div");
-  effect.className = "tile-point-effect"; // Giữ base class luôn luôn
+// Chỉ hiện phản hồi khi người chơi tạo combo; điểm thường không cần popup.
+export function showComboEffect(tileElement, combo) {
+  const presentation = getComboPresentation(combo);
+  if (!presentation) return;
 
-  if (typeof text === "number") {
-    effect.textContent = `+${text}`;
-  } else {
-    effect.textContent = text;
-  }
+  const effect = document.createElement("div");
+  effect.className = `tile-combo-effect tile-combo-effect--${presentation.id}`;
+  effect.textContent = `${presentation.label}  x${combo}`;
 
   const rect = tileElement.getBoundingClientRect();
   const centerX = rect.left + rect.width / 2;
@@ -342,8 +336,8 @@ export function showTilePointEffect(tileElement, text = "") {
     effect.classList.add("fade-out");
     setTimeout(() => {
       effect.remove();
-    }, 500);
-  }, 1600);
+    }, GAMEPLAY_TIMING.comboPopupFadeMs);
+  }, GAMEPLAY_TIMING.comboPopupVisibleMs);
 }
 
 // Shop
@@ -393,7 +387,10 @@ export function highlightTarget(selector, isNegative = false) {
 }
 
 // Tạm thay đồng hồ màn chơi bằng đếm ngược hiệu ứng xem trước.
-export function showRevealTimerInHud(duration = 5, roundId = gameState.roundId) {
+export function showRevealTimerInHud(
+  duration = 5,
+  roundId = gameState.roundId,
+) {
   if (!timerElement || !timerContainer) return;
 
   clearRevealTimer(false);

@@ -1,5 +1,6 @@
 // 📦 Trạng thái thuần của game: không thao tác DOM hoặc localStorage ở đây.
 import { GAME_CONFIG } from "./config.js";
+import { normalizeAppearance } from "./appearance.js";
 
 const {
   hints: defaultHints,
@@ -12,14 +13,15 @@ export const gameState = {
   hints: defaultHints, // Gắn theo biến gốc
   moves: 0,
   misses: 0,
+  combo: 0,
   matchedPairs: 0,
   totalPairs: GAME_CONFIG.modes.easy.tileCount / 2,
   isLocked: false,
   isPaused: false,
   roundId: 0,
   remainingTime: remainingTime,
-  highScore: 0,
   coins: 0,
+  appearance: normalizeAppearance(),
   settings: {
     mode: "easy",
     sound: true,
@@ -31,10 +33,14 @@ export const gameState = {
 };
 gameState._timeRunningOutPlayed = false;
 
-export function hydrateGameState({ highScore = 0, coins = 0, settings = {} } = {}) {
-  gameState.highScore = Number.isFinite(highScore) ? highScore : 0;
+export function hydrateGameState({
+  coins = 0,
+  settings = {},
+  appearance = {},
+} = {}) {
   gameState.coins = Number.isFinite(coins) ? Math.max(0, Math.floor(coins)) : 0;
   Object.assign(gameState.settings, settings);
+  gameState.appearance = normalizeAppearance(appearance);
 }
 
 // Mỗi bàn chơi có mã riêng để timeout của bàn cũ không thể sửa UI bàn mới.
@@ -60,6 +66,7 @@ export function resetGame() {
   gameState.hints = defaultHints; // Lấy từ giá trị mặc định
   gameState.moves = 0;
   gameState.misses = 0;
+  gameState.combo = 0;
   gameState.matchedPairs = 0;
   gameState.totalPairs = GAME_CONFIG.modes.easy.tileCount / 2;
   gameState.remainingTime = remainingTime;
@@ -68,21 +75,10 @@ export function resetGame() {
   gameState.settings.mode = "easy";
 }
 
-// ➕ Cộng điểm + tự động cập nhật highscore
+// ➕ Cộng điểm trong lượt chơi hiện tại.
 export function increaseScore(points) {
   gameState.score += points;
-  let highScoreChanged = false;
-
-  if (gameState.score > gameState.highScore) {
-    gameState.highScore = gameState.score;
-    highScoreChanged = true;
-  }
-
-  return {
-    score: gameState.score,
-    highScore: gameState.highScore,
-    highScoreChanged,
-  };
+  return gameState.score;
 }
 
 export function increaseCoins(amount) {

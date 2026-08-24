@@ -2,23 +2,27 @@
 // chức năng của logic.js là xử lý logic của trò chơi, bao gồm việc xử lý sự kiện khi người chơi nhấp vào ô, kiểm tra xem hai ô có khớp nhau hay không, và kiểm tra xem người chơi đã hoàn thành cấp độ hay chưa. Nó cũng bao gồm các chức năng để khởi tạo logic và xử lý âm thanh khi người chơi tương tác với trò chơi.
 
 import { increaseCoins, increaseScore, gameState } from "./gameState.js";
+import { calculateCoinReward } from "./config.js";
 import {
   updateScoreDisplay,
-  updateHighScoreDisplay,
+  updateTimerDisplay,
   updateMovesDisplay,
   updateMissesDisplay,
+  updateComboDisplay,
   updatePairProgressDisplay,
   updateCoinDisplay,
-  showTilePointEffect,
+  showComboEffect,
   highlightTarget,
   showLevelSummaryOverlay,
 } from "./ui.js";
 import { pauseBackgroundMusic, sounds } from "./sound.js"; // 📦 Tách âm thanh
-import { saveCoins, saveHighScore } from "./persistence.js";
+import { saveCoins } from "./persistence.js";
+import { getFlipAnimationClass } from "./appearance.js";
+import { GAMEPLAY_TIMING, getComboTimeBonus } from "./gameplayTuning.js";
 
 let selectedTiles = [];
 let levelCompleteActions = { onNext: () => {}, onMenu: () => {} };
-const TILE_HIDE_ANIMATION_MS = 180;
+let pendingMismatch = null;
 
 export function configureLogic(actions) {
   levelCompleteActions = { ...levelCompleteActions, ...actions };
@@ -33,10 +37,23 @@ function setInteractionLocked(locked, roundId = gameState.roundId) {
 }
 
 function revealTile(img) {
-  img.classList.remove("hidden", "appear-bounce");
+  const animationClass = getFlipAnimationClass(gameState.appearance.flipEffect);
+  img.classList.remove(
+    "hidden",
+    "appear-bounce",
+    "appear-fade-scale",
+    "appear-pop",
+    "appear-slide-up",
+    "appear-flip-y",
+    "appear-zoom-rotate",
+    "appear-blur-in",
+  );
   void img.offsetWidth;
-  img.classList.add("appear-bounce");
-  setTimeout(() => img.classList.remove("appear-bounce"), 600);
+  img.classList.add(animationClass);
+  setTimeout(
+    () => img.classList.remove(animationClass),
+    GAMEPLAY_TIMING.tileRevealAnimationMs,
+  );
 }
 
 function hideTile(img, roundId, onHidden) {
@@ -49,13 +66,43 @@ function hideTile(img, roundId, onHidden) {
     if (gameState.roundId === roundId) img.classList.add("hidden");
     img.classList.remove("hide-fade-scale");
     onHidden?.();
-  }, TILE_HIDE_ANIMATION_MS);
+  }, GAMEPLAY_TIMING.tileHideAnimationMs);
+}
+
+function resolvePendingMismatch({ immediately = false } = {}) {
+  const mismatch = pendingMismatch;
+  if (!mismatch) return;
+
+  pendingMismatch = null;
+  clearTimeout(mismatch.timeoutId);
+  if (gameState.roundId !== mismatch.roundId) return;
+
+  mismatch.tiles.forEach((tile) => tile.classList.remove("selected", "wrong"));
+  if (immediately) {
+    mismatch.tiles.forEach((tile) =>
+      tile.querySelector("img")?.classList.add("hidden"),
+    );
+    setInteractionLocked(false, mismatch.roundId);
+    return;
+  }
+
+  setInteractionLocked(true, mismatch.roundId);
+  let remainingHides = mismatch.tiles.length;
+  const unlockWhenHidden = () => {
+    remainingHides -= 1;
+    if (remainingHides === 0) setInteractionLocked(false, mismatch.roundId);
+  };
+  mismatch.tiles.forEach((tile) =>
+    hideTile(tile.querySelector("img"), mismatch.roundId, unlockWhenHidden),
+  );
 }
 
 /**
  * Khởi tạo logic và gán sự kiện click cho tất cả tile
  */
 export function initLogic() {
+  if (pendingMismatch) clearTimeout(pendingMismatch.timeoutId);
+  pendingMismatch = null;
   selectedTiles = [];
   const tiles = document.querySelectorAll(".tile");
   tiles.forEach((tile) => {
@@ -67,6 +114,8 @@ export function initLogic() {
  * Xử lý khi người chơi click vào tile
  */
 export function handleTileClick(tileElement) {
+  // Chạm một thẻ mới trong lúc cặp sai đang hiện sẽ đóng cặp đó ngay.
+  resolvePendingMismatch({ immediately: true });
   if (gameState.isLocked || selectedTiles.length >= 2) return;
 
   const imageId = tileElement.dataset.imageId;
@@ -109,15 +158,19 @@ function checkMatch(roundId) {
     second.element.classList.add("matched");
 
     const matchPoints = 1;
-    const scoreUpdate = increaseScore(matchPoints);
-    updateScoreDisplay(scoreUpdate.score);
-    if (scoreUpdate.highScoreChanged) {
-      saveHighScore(scoreUpdate.highScore);
-      updateHighScoreDisplay(scoreUpdate.highScore);
+    const score = increaseScore(matchPoints);
+    updateScoreDisplay(score);
+    gameState.combo += 1;
+    updateComboDisplay(gameState.combo);
+    const comboTimeBonus = getComboTimeBonus(gameState.combo);
+    if (comboTimeBonus > 0) {
+      gameState.remainingTime += comboTimeBonus;
+      updateTimerDisplay(gameState.remainingTime);
+      highlightTarget("#timer");
     }
     gameState.matchedPairs++;
     updatePairProgressDisplay(gameState.matchedPairs);
-    showTilePointEffect(second.element, `+${matchPoints} điểm`);
+    if (comboTimeBonus > 0) showComboEffect(second.element, gameState.combo);
     highlightTarget("#pair-progress");
 
     if (gameState.settings?.sound) {
@@ -129,7 +182,9 @@ function checkMatch(roundId) {
     checkLevelComplete();
   } else {
     gameState.misses++;
+    gameState.combo = 0;
     updateMissesDisplay(gameState.misses);
+    updateComboDisplay(gameState.combo);
     first.element.classList.add("wrong");
     second.element.classList.add("wrong");
 
@@ -138,22 +193,16 @@ function checkMatch(roundId) {
       sounds.wrong.play().catch(() => {});
     }
 
-    setTimeout(() => {
-      if (gameState.roundId !== roundId) return;
-
-      first.element.classList.remove("selected", "wrong");
-      second.element.classList.remove("selected", "wrong");
-
-      const img1 = first.element.querySelector("img");
-      const img2 = second.element.querySelector("img");
-      let pendingHides = 2;
-      const onHidden = () => {
-        pendingHides -= 1;
-        if (pendingHides === 0) setInteractionLocked(false, roundId);
-      };
-      hideTile(img1, roundId, onHidden);
-      hideTile(img2, roundId, onHidden);
-    }, 800);
+    // Trong thời gian viền đỏ hiển thị, người chơi có thể chạm thẻ khác để ẩn ngay.
+    setInteractionLocked(false, roundId);
+    pendingMismatch = {
+      roundId,
+      tiles: [first.element, second.element],
+      timeoutId: setTimeout(
+        () => resolvePendingMismatch(),
+        GAMEPLAY_TIMING.mismatchRevealMs,
+      ),
+    };
   }
 
   selectedTiles = [];
@@ -169,7 +218,12 @@ export function checkLevelComplete() {
   if (allTiles.length > 0 && allTiles.length === matchedTiles.length) {
     setInteractionLocked(true);
     gameState.isPaused = true;
-    const coinsEarned = 50 + Math.max(0, Math.floor(gameState.remainingTime));
+    const grossCoins = calculateCoinReward(
+      gameState.settings.mode,
+      gameState.remainingTime,
+    );
+    const coinPenalty = Math.min(grossCoins, gameState.misses);
+    const coinsEarned = grossCoins - coinPenalty;
     const totalCoins = increaseCoins(coinsEarned);
     saveCoins(totalCoins);
     updateCoinDisplay(totalCoins);

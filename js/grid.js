@@ -1,6 +1,7 @@
 import { shuffleArray } from "./utils.js";
 import { GAME_CONFIG } from "./config.js";
 import { gameState } from "./gameState.js";
+import { getCardBackClass } from "./appearance.js";
 import { initLogic } from "./logic.js";
 
 const MOBILE_BREAKPOINT = 600;
@@ -100,6 +101,7 @@ export function createGrid(
 
     const tile = document.createElement("div");
     tile.classList.add("tile");
+    tile.classList.add(getCardBackClass(gameState.appearance.cardBack));
     tile.id = tileId;
 
     const img = document.createElement("img");

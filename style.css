@@ -2,7 +2,7 @@
 
 /* === Layout toàn trang === */
 body {
-  font-family: 'Segoe UI', sans-serif;
+  font-family: "Segoe UI", sans-serif;
   margin: 0;
   padding: 0;
   display: flex;
@@ -13,13 +13,14 @@ body {
   overflow-x: hidden;
   user-select: none;
   -webkit-user-select: none;
-  background: url('/assets/images/background-main.webp') no-repeat center center fixed;
+  background: url("/assets/images/background-main.webp") no-repeat center center
+    fixed;
   background-size: cover;
 }
 
 input,
 textarea,
-[contenteditable='true'] {
+[contenteditable="true"] {
   user-select: text;
   -webkit-user-select: text;
 }
@@ -114,7 +115,10 @@ button {
 /* === Lưới game === */
 #grid-container {
   display: grid;
-  grid-template-columns: repeat(var(--grid-columns, 4), var(--tile-size, 120px));
+  grid-template-columns: repeat(
+    var(--grid-columns, 4),
+    var(--tile-size, 120px)
+  );
   grid-auto-rows: var(--tile-size, 120px);
   gap: var(--grid-gap, 8px);
   justify-content: center;
@@ -148,7 +152,9 @@ button {
   background: linear-gradient(135deg, #ffecd2, #fcb69f, #ffdde1);
   border-radius: 12px;
   box-shadow: 0 4px 8px rgb(0 0 0 / 20%);
-  transition: transform 0.6s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.6s ease,
+    box-shadow 0.3s ease;
   transform-style: preserve-3d;
   perspective: 1000px;
 }
@@ -284,7 +290,7 @@ button {
 }
 
 .toggle-switch .slider::before {
-  content: '';
+  content: "";
   position: absolute;
   height: 22px;
   width: 22px;
@@ -483,7 +489,9 @@ button {
   background-color: #f00;
   transform: scale(1.2);
   box-shadow: 0 0 10px rgb(255 255 255 / 40%);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
   border-radius: 100px;
 }
 
@@ -511,7 +519,9 @@ button {
   border-radius: 50%;
   cursor: pointer;
   box-shadow: 0 0 5px rgb(0 0 0 / 30%);
-  transition: transform 0.2s ease, background-color 0.2s;
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s;
 }
 
 .menu-icon-btn:hover {
@@ -555,11 +565,15 @@ button {
 
 @keyframes glow {
   from {
-    text-shadow: 0 0 5px #fff, 0 0 10px #f9c;
+    text-shadow:
+      0 0 5px #fff,
+      0 0 10px #f9c;
   }
 
   to {
-    text-shadow: 0 0 10px #f6f, 0 0 20px #3cf;
+    text-shadow:
+      0 0 10px #f6f,
+      0 0 20px #3cf;
   }
 }
 
@@ -791,7 +805,11 @@ button {
   left: -500px;
   width: 1200px;
   height: 300px;
-  background: radial-gradient(ellipse at center, rgb(255 255 255 / 15%), rgb(255 255 255 / 0%));
+  background: radial-gradient(
+    ellipse at center,
+    rgb(255 255 255 / 15%),
+    rgb(255 255 255 / 0%)
+  );
   filter: blur(60px);
   z-index: -1;
   animation: fogMove 120s linear infinite;
@@ -815,7 +833,11 @@ button {
   left: -400px;
   width: 400px;
   height: 120px;
-  background: radial-gradient(ellipse at center, rgb(255 255 255 / 60%) 0%, rgb(200 200 200 / 10%) 80%);
+  background: radial-gradient(
+    ellipse at center,
+    rgb(255 255 255 / 60%) 0%,
+    rgb(200 200 200 / 10%) 80%
+  );
   border-radius: 50%;
   filter: blur(40px);
   animation: cloudFloat 90s linear infinite;
@@ -844,7 +866,7 @@ button {
 }
 
 /* TILE khi hover */
-.tile:hover {
+.tile:not(.matched):not(.wrong):hover {
   transform: scale(1.05);
   box-shadow: 0 6px 12px rgb(0 0 0 / 30%);
   background: linear-gradient(135deg, #c2e9fb, #a1c4fd);
@@ -882,7 +904,9 @@ button {
 
 .tile.hint-reveal {
   border-color: #f2bd3d;
-  box-shadow: 0 0 0 2px rgb(242 189 61 / 42%), 0 0 12px rgb(242 189 61 / 52%);
+  box-shadow:
+    0 0 0 2px rgb(242 189 61 / 42%),
+    0 0 12px rgb(242 189 61 / 52%);
 }
 
 /* Hiệu ứng khi chọn tile */
@@ -1077,7 +1101,7 @@ button {
 }
 
 .toggle-switch::before {
-  content: '';
+  content: "";
   position: absolute;
   width: 26px;
   height: 26px;
@@ -1107,7 +1131,7 @@ button {
   cursor: pointer;
 }
 
-.radio-group input[type='radio']:checked + label {
+.radio-group input[type="radio"]:checked + label {
   background: #0bd36f;
   color: #000;
   font-weight: bold;
@@ -1159,7 +1183,9 @@ button {
   background-color: #3498db;
   color: white;
   border: none;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
   border-radius: 100px;
 }
 
@@ -1209,52 +1235,15 @@ button {
 @keyframes glowText {
   0%,
   100% {
-    text-shadow: 0 0 8px #ff0, 0 0 16px #f00;
+    text-shadow:
+      0 0 8px #ff0,
+      0 0 16px #f00;
   }
 
   50% {
-    text-shadow: 0 0 12px #0ff, 0 0 20px #0f0;
-  }
-}
-
-.tile-point-effect {
-  position: fixed;
-  transform: translate(-50%, -50%);
-  color: #0ff;
-  font-size: 20px;
-  font-weight: bold;
-  text-shadow: 0 0 6px #fff000, 0 0 10px #ffa500;
-  pointer-events: none;
-  z-index: 9999;
-  animation: float-pop 2s ease-out forwards;
-  white-space: nowrap;
-}
-
-.tile-point-effect.fade-out {
-  opacity: 0;
-  transform: translate(-50%, -100px);
-  transition: all 2s ease;
-}
-
-@keyframes float-pop {
-  0% {
-    transform: translate(-50%, 0);
-    opacity: 0;
-    scale: 0.5;
-  }
-
-  20% {
-    opacity: 1;
-    scale: 1.1;
-  }
-
-  80% {
-    scale: 1;
-  }
-
-  100% {
-    transform: translate(-50%, -50px);
-    opacity: 0;
+    text-shadow:
+      0 0 12px #0ff,
+      0 0 20px #0f0;
   }
 }
 
@@ -1293,7 +1282,9 @@ button {
   animation: popupLift 0.4s ease-out;
   transform-style: preserve-3d;
   border: 1px solid #ccc;
-  box-shadow: 0 12px 30px rgb(0 0 0 / 20%), 0 0 12px rgb(0 140 255 / 15%); /* 🔵 ánh sáng nhẹ */
+  box-shadow:
+    0 12px 30px rgb(0 0 0 / 20%),
+    0 0 12px rgb(0 140 255 / 15%); /* 🔵 ánh sáng nhẹ */
 }
 
 .version-overlay {
@@ -1310,7 +1301,8 @@ button {
 @keyframes popupLift {
   0% {
     opacity: 0;
-    transform: translate(-50%, -60%) perspective(800px) rotateX(25deg) scale(0.95);
+    transform: translate(-50%, -60%) perspective(800px) rotateX(25deg)
+      scale(0.95);
   }
 
   100% {
@@ -1588,15 +1580,16 @@ button {
 .game-hint-fab {
   position: absolute;
   top: 50%;
-  right: 8px;
+  right: 0;
   z-index: 12002;
-  min-width: 42px;
+  min-width: 0;
+  width: auto;
   min-height: 34px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 5px 6px;
+  gap: 4px;
+  padding: 0 7px;
   border: 0;
   border-radius: 9px;
   background: #f2bd3d;
@@ -1608,8 +1601,8 @@ button {
 }
 
 .game-hint-fab .ui-icon {
-  width: 22px;
-  height: 22px;
+  width: 18px;
+  height: 18px;
   color: currentcolor;
   stroke-width: 2.25;
 }
@@ -1630,10 +1623,10 @@ button {
 
 @media screen and (width <= 600px) {
   .game-hint-fab {
-    right: 6px;
-    min-width: 36px;
+    right: 0;
+    min-width: 0;
     min-height: 30px;
-    padding: 4px 5px;
+    padding: 0 6px;
     border-radius: 9px;
     font-size: 0.72rem;
   }
@@ -1690,7 +1683,9 @@ button {
   font-size: 24px;
   font-weight: bold;
   box-shadow: 0 0 20px rgb(255 255 255 / 50%);
-  animation: pop-in 0.5s ease, shimmer 3s infinite;
+  animation:
+    pop-in 0.5s ease,
+    shimmer 3s infinite;
   z-index: 9999;
 }
 
@@ -1740,7 +1735,10 @@ button {
   font-size: 32px;
   margin-bottom: 20px;
   color: #fff;
-  text-shadow: 0 0 10px #00ffe0, 0 0 20px #00d1ff, 0 0 30px #08f;
+  text-shadow:
+    0 0 10px #00ffe0,
+    0 0 20px #00d1ff,
+    0 0 30px #08f;
 }
 
 .reward-container {
@@ -1849,7 +1847,9 @@ button {
 .reward-title.glow {
   font-size: 32px;
   margin-bottom: 18px;
-  text-shadow: 0 0 10px #00f2ff, 0 0 20px #007fff;
+  text-shadow:
+    0 0 10px #00f2ff,
+    0 0 20px #007fff;
 }
 
 @keyframes pop {
@@ -1974,7 +1974,7 @@ button {
   padding: 0;
   box-sizing: border-box;
   font-size: clamp(2rem, 4vw, 2.8rem);
-  font-family: 'Trebuchet MS', 'Segoe UI', sans-serif;
+  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
   font-weight: 900;
   line-height: 1.1;
   letter-spacing: 0.8px;
@@ -1983,7 +1983,9 @@ button {
   color: #ffd166;
   background: none;
   -webkit-text-fill-color: currentcolor;
-  text-shadow: 0 3px 0 #7a451c, 0 0 14px rgb(255 209 102 / 32%);
+  text-shadow:
+    0 3px 0 #7a451c,
+    0 0 14px rgb(255 209 102 / 32%);
   animation: none;
   position: relative;
   z-index: 1300;
@@ -1995,12 +1997,12 @@ button {
   align-items: center;
   justify-content: center;
   width: min(var(--board-width, 100%), calc(100vw - 12px));
-  min-height: 50px;
+  min-height: 34px;
   max-width: none;
-  padding: 7px 48px;
-  margin: 0 auto 10px;
+  padding: 0 38px;
+  margin: 0 auto 8px;
   box-sizing: border-box;
-  border-radius: 12px;
+  border-radius: 9px;
   background: linear-gradient(100deg, #182942, #243b64);
   box-shadow: 0 6px 16px rgb(0 0 0 / 28%);
   position: relative;
@@ -2048,8 +2050,16 @@ button {
   letter-spacing: 0.03em;
 }
 
-.game-progress-hud .stat-misses .stat-label { color: #ffb6c0; }
-.game-progress-hud .stat-progress .ui-icon { color: #ffd166; }
+.game-progress-hud .stat-misses,
+.game-progress-hud .stat-misses .stat-label {
+  color: #ff9da8;
+}
+.game-progress-hud .stat-combo .stat-label {
+  color: #ffd889;
+}
+.game-progress-hud .stat-progress .ui-icon {
+  color: #ffd166;
+}
 
 @media screen and (width <= 600px) {
   .game-progress-hud {
@@ -2064,7 +2074,9 @@ button {
     font-size: 0.66rem;
   }
 
-  .game-progress-hud .stat-label { font-size: 0.45rem; }
+  .game-progress-hud .stat-label {
+    font-size: 0.45rem;
+  }
 }
 
 #game-title.game-hud .game-stats {
@@ -2079,12 +2091,12 @@ button {
 
 #game-title.game-hud .game-menu-toggle {
   top: 50%;
-  left: 8px;
+  left: 0;
   transform: translateY(-50%);
 }
 
 #game-title.game-hud .game-menu-toggle:hover,
-#game-title.game-hud .game-menu-toggle[aria-expanded='true'] {
+#game-title.game-hud .game-menu-toggle[aria-expanded="true"] {
   transform: translateY(-50%);
 }
 
@@ -2125,9 +2137,9 @@ button {
   }
 
   #game-title.game-hud {
-    min-height: 46px;
-    padding: 6px 42px;
-    margin-bottom: 8px;
+    min-height: 30px;
+    padding: 0 34px;
+    margin-bottom: 6px;
   }
 
   #game-title.game-hud .game-stats {
@@ -2135,7 +2147,7 @@ button {
   }
 
   #game-title.game-hud .game-menu-toggle {
-    left: 6px;
+    left: 0;
   }
 
   #game-title.game-hud .game-actions-menu {
@@ -2151,13 +2163,13 @@ button {
   }
 
   #game-title.game-hud {
-    min-height: 38px;
-    padding: 4px 36px;
-    margin-bottom: 5px;
+    min-height: 34px;
+    padding: 0 38px;
+    margin-bottom: 4px;
   }
 
   #game-title.game-hud .game-menu-toggle {
-    left: 4px;
+    left: 0;
   }
 
   #game-title.game-hud .game-actions-menu {
@@ -2252,10 +2264,18 @@ button {
   stroke: none;
 }
 
-.ui-icon--status-easy { color: #45c879; }
-.ui-icon--status-normal { color: #f2bd3d; }
-.ui-icon--status-hard { color: #e04f5f; }
-.ui-icon--status-super-hard { color: #b879e5; }
+.ui-icon--status-easy {
+  color: #45c879;
+}
+.ui-icon--status-normal {
+  color: #f2bd3d;
+}
+.ui-icon--status-hard {
+  color: #e04f5f;
+}
+.ui-icon--status-super-hard {
+  color: #b879e5;
+}
 
 .game-menu-toggle .ui-icon {
   width: 18px;
@@ -2263,7 +2283,7 @@ button {
 }
 
 .game-menu-toggle:hover,
-.game-menu-toggle[aria-expanded='true'] {
+.game-menu-toggle[aria-expanded="true"] {
   background: #245b91;
   transform: none;
 }
@@ -2445,7 +2465,10 @@ button {
   gap: 9px;
   margin: 0;
   color: #243b64;
-  font: 800 1.25rem/1.25 'Trebuchet MS', 'Segoe UI', sans-serif;
+  font:
+    800 1.25rem/1.25 "Trebuchet MS",
+    "Segoe UI",
+    sans-serif;
 }
 
 .app-modal__title .ui-icon {
@@ -2509,8 +2532,13 @@ button {
   padding: 9px 16px;
   border: 1px solid transparent;
   border-radius: 10px;
-  font: 700 14px/1.2 'Segoe UI', sans-serif;
-  transition: transform 140ms ease, filter 140ms ease, background 140ms ease;
+  font:
+    700 14px/1.2 "Segoe UI",
+    sans-serif;
+  transition:
+    transform 140ms ease,
+    filter 140ms ease,
+    background 140ms ease;
 }
 
 .app-button:hover {
@@ -2587,7 +2615,18 @@ button {
 }
 
 .app-toast--success {
-  background: #24764a;
+  border: 1px solid rgb(242 191 91 / 48%);
+  background: linear-gradient(135deg, #1c3155, #2d4a78);
+  color: #fff3ca;
+  box-shadow:
+    0 12px 30px rgb(5 12 30 / 48%),
+    inset 0 1px 0 rgb(255 255 255 / 10%);
+}
+
+.app-toast--info {
+  border: 1px solid rgb(134 191 245 / 42%);
+  background: linear-gradient(135deg, #182d4e, #28527c);
+  color: #e8f4ff;
 }
 
 .app-toast--error {
@@ -2685,28 +2724,54 @@ button {
 }
 
 @keyframes app-overlay-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes app-overlay-out {
-  from { opacity: 1; }
-  to { opacity: 0; }
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }
 
 @keyframes app-modal-in {
-  from { opacity: 0; transform: translateY(14px) scale(0.97); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 @keyframes app-modal-out {
-  from { opacity: 1; transform: translateY(0) scale(1); }
-  to { opacity: 0; transform: translateY(10px) scale(0.98); }
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
 }
 
 @keyframes app-toast-in {
-  from { opacity: 0; transform: translateY(-8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media screen and (width <= 600px) {
@@ -2743,24 +2808,60 @@ button {
 }
 
 /* Màu nhấn cho bộ icon SVG */
-.ui-icon--home { color: #4c9fea; }
-.ui-icon--restart { color: #7187d8; }
-.ui-icon--wand { color: #a56bc2; }
-.ui-icon--settings { color: #4779c5; }
-.ui-icon--shop { color: #4c9fea; }
-.ui-icon--search { color: #438bc5; }
-.ui-icon--info { color: #6e7fc2; }
-.ui-icon--play { color: #4c9fea; }
-.ui-icon--book { color: #4e82bd; }
-.ui-icon--exit { color: #cb5e67; }
-.ui-icon--timer { color: #7567b7; }
-.ui-icon--trophy { color: #c99222; }
-.ui-icon--star { color: #dca51f; }
-.ui-icon--puzzle { color: #58a26d; }
-.ui-icon--sliders { color: #388e7a; }
-.ui-icon--music { color: #835fb6; }
-.ui-icon--hourglass { color: #c86a54; }
-.ui-icon--celebrate { color: #c361a4; }
+.ui-icon--home {
+  color: #4c9fea;
+}
+.ui-icon--restart {
+  color: #7187d8;
+}
+.ui-icon--wand {
+  color: #a56bc2;
+}
+.ui-icon--settings {
+  color: #4779c5;
+}
+.ui-icon--shop {
+  color: #4c9fea;
+}
+.ui-icon--search {
+  color: #438bc5;
+}
+.ui-icon--info {
+  color: #6e7fc2;
+}
+.ui-icon--play {
+  color: #4c9fea;
+}
+.ui-icon--book {
+  color: #4e82bd;
+}
+.ui-icon--exit {
+  color: #cb5e67;
+}
+.ui-icon--timer {
+  color: #7567b7;
+}
+.ui-icon--trophy {
+  color: #c99222;
+}
+.ui-icon--star {
+  color: #dca51f;
+}
+.ui-icon--puzzle {
+  color: #58a26d;
+}
+.ui-icon--sliders {
+  color: #388e7a;
+}
+.ui-icon--music {
+  color: #835fb6;
+}
+.ui-icon--hourglass {
+  color: #c86a54;
+}
+.ui-icon--celebrate {
+  color: #c361a4;
+}
 
 /* Bố cục Cài đặt tối giản */
 #settings-container {
@@ -2839,11 +2940,21 @@ button {
   filter: drop-shadow(0 1px 0 rgb(255 255 255 / 90%));
 }
 
-#game-title.game-hud .game-stats .ui-icon--timer { color: #5c4db4; }
-#game-title.game-hud .game-stats .ui-icon--trophy { color: #a86f00; }
-#game-title.game-hud .game-stats .ui-icon--star { color: #b87800; }
-#game-title.game-hud .game-stats .ui-icon--puzzle { color: #287d4c; }
-#game-title.game-hud .game-stats .ui-icon--search { color: #176fa8; }
+#game-title.game-hud .game-stats .ui-icon--timer {
+  color: #5c4db4;
+}
+#game-title.game-hud .game-stats .ui-icon--trophy {
+  color: #a86f00;
+}
+#game-title.game-hud .game-stats .ui-icon--star {
+  color: #b87800;
+}
+#game-title.game-hud .game-stats .ui-icon--puzzle {
+  color: #287d4c;
+}
+#game-title.game-hud .game-stats .ui-icon--search {
+  color: #176fa8;
+}
 
 @media screen and (width <= 600px) {
   #game-title.game-hud .game-stats {
@@ -3030,7 +3141,10 @@ button {
   color: #f2bf5b;
   background: none;
   -webkit-text-fill-color: currentColor;
-  font: 800 clamp(2rem, 8vw, 2.55rem)/1.1 'Trebuchet MS', 'Segoe UI', sans-serif;
+  font:
+    800 clamp(2rem, 8vw, 2.55rem)/1.1 "Trebuchet MS",
+    "Segoe UI",
+    sans-serif;
   letter-spacing: -0.04em;
   text-shadow: 0 2px 14px rgb(242 191 91 / 20%);
   animation: none;
@@ -3072,10 +3186,16 @@ button {
   background: rgb(39 57 88 / 78%);
   color: #f5f7fb;
   box-shadow: 0 5px 15px rgb(0 0 0 / 18%);
-  font: 700 1rem/1.2 'Segoe UI', sans-serif;
+  font:
+    700 1rem/1.2 "Segoe UI",
+    sans-serif;
   text-align: left;
   text-shadow: none;
-  transition: transform 160ms ease, background 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+  transition:
+    transform 160ms ease,
+    background 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease;
 }
 
 .menu-wrapper .menu-item .ui-icon {
@@ -3119,7 +3239,7 @@ button {
 
 /* Cụm chỉ số theo từng màn chơi */
 #game-title.game-hud .game-stats .stat-card {
-  min-height: 30px;
+  min-height: 34px;
   padding: 3px 6px;
   box-sizing: border-box;
   border: 1px solid rgb(36 59 100 / 8%);
@@ -3169,7 +3289,7 @@ button {
 
 @media screen and (width <= 600px) {
   #game-title.game-hud .game-stats .stat-card {
-    min-height: 26px;
+    min-height: 30px;
     padding: 2px 4px;
     border-radius: 9px;
     font-size: 0.68rem;
@@ -3202,7 +3322,7 @@ body.game-is-paused .shooting-star {
 }
 
 .level-summary-modal::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0 0 auto;
   height: 7px;
@@ -3252,7 +3372,10 @@ body.game-is-paused .shooting-star {
 .level-summary__heading {
   margin: 0 0 24px;
   color: #151a2b;
-  font: 900 clamp(1.55rem, 7vw, 2rem)/1.15 'Trebuchet MS', 'Segoe UI', sans-serif;
+  font:
+    900 clamp(1.55rem, 7vw, 2rem)/1.15 "Trebuchet MS",
+    "Segoe UI",
+    sans-serif;
 }
 
 .level-summary__stats {
@@ -3282,8 +3405,15 @@ body.game-is-paused .shooting-star {
   font-size: 1.35rem;
 }
 
-.level-summary__stat.summary-misses strong { color: #dd3659; }
-.level-summary__stat.summary-next strong { color: #26a978; }
+.level-summary__stat.summary-misses strong {
+  color: #dd3659;
+}
+.level-summary__stat.summary-misses span {
+  color: #dd3659;
+}
+.level-summary__stat.summary-next strong {
+  color: #26a978;
+}
 
 #level-summary-modal .app-button--primary {
   background: linear-gradient(135deg, #6045ff, #4934e8);
@@ -3529,6 +3659,11 @@ body.game-is-paused .shooting-star {
   color: #f5f7fb;
 }
 
+.level-summary__stat.summary-misses strong,
+.level-summary__stat.summary-misses span {
+  color: #ff9da8;
+}
+
 #level-summary-modal .app-button--secondary {
   border-color: rgb(255 255 255 / 16%);
   background: rgb(255 255 255 / 10%);
@@ -3547,7 +3682,9 @@ body.game-is-paused .shooting-star {
 }
 
 @media screen and (width <= 600px) {
-  .level-reward-overlay .reward-container { top: -3vh; }
+  .level-reward-overlay .reward-container {
+    top: -3vh;
+  }
 }
 
 /* LV là nhãn chính của HUD, giữ cùng cỡ với giá trị level. */
@@ -3557,7 +3694,9 @@ body.game-is-paused .shooting-star {
 }
 
 @media screen and (width <= 600px) {
-  #game-title.game-hud .stat-level .stat-label { font-size: 0.68rem; }
+  #game-title.game-hud .stat-level .stat-label {
+    font-size: 0.68rem;
+  }
 }
 
 .level-summary__stat.summary-coins strong {
@@ -3575,7 +3714,7 @@ body.game-is-paused .shooting-star {
   color: #b9e5ff;
 }
 
-/* Cửa hàng dùng lưới cố định để không tạo thanh cuộn trong lúc chơi. */
+/* Cửa hàng giữ cùng kích thước ở mọi tab; chỉ phần nội dung bên trong cuộn. */
 #shop-modal .app-modal,
 #shop-confirm-modal .app-modal {
   border-color: rgb(255 255 255 / 16%);
@@ -3586,7 +3725,8 @@ body.game-is-paused .shooting-star {
 
 #shop-modal .app-modal {
   width: min(620px, calc(100vw - 24px));
-  max-height: min(650px, calc(100dvh - 24px));
+  height: min(650px, calc(100dvh - 24px));
+  max-height: none;
 }
 
 #shop-modal .app-modal__header,
@@ -3614,7 +3754,9 @@ body.game-is-paused .shooting-star {
   gap: 5px;
   margin-left: auto;
   color: #ffe09a;
-  font: 700 0.92rem/1 'Segoe UI', sans-serif;
+  font:
+    700 0.92rem/1 "Segoe UI",
+    sans-serif;
   font-variant-numeric: tabular-nums;
 }
 
@@ -3627,19 +3769,142 @@ body.game-is-paused .shooting-star {
 
 #shop-modal .app-modal__body {
   display: flex;
+  flex: 1 1 auto;
   min-height: 0;
   overflow: hidden;
   padding: 14px;
 }
 
+.shop-content {
+  display: grid;
+  width: 100%;
+  min-height: 0;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 12px;
+}
+
+.shop-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.shop-tab {
+  min-height: 34px;
+  border: 1px solid rgb(255 255 255 / 13%);
+  border-radius: 10px;
+  background: rgb(7 17 37 / 32%);
+  color: rgb(245 247 251 / 72%);
+  font:
+    700 0.82rem/1 "Segoe UI",
+    sans-serif;
+  cursor: pointer;
+}
+
+.shop-tab.is-active {
+  border-color: rgb(242 191 91 / 44%);
+  background: rgb(242 191 91 / 16%);
+  color: #ffe09a;
+}
+
 #shop-modal .shop-item-grid {
   width: 100%;
-  height: min(400px, calc(100dvh - 120px));
+  height: 100%;
+  min-height: 0;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   grid-template-rows: repeat(4, minmax(0, 1fr));
   gap: 9px;
   margin: 0;
-  overflow: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+#shop-modal .shop-item-grid::-webkit-scrollbar {
+  display: none;
+}
+
+#shop-modal .shop-item-grid--appearance {
+  display: grid;
+  height: 100%;
+  grid-template-columns: 1fr;
+  grid-template-rows: none;
+  align-content: start;
+  gap: 15px;
+  overflow-y: auto;
+}
+
+.appearance-group {
+  display: grid;
+  gap: 8px;
+}
+
+.appearance-group h3 {
+  margin: 0;
+  color: #ffe09a;
+  font-size: 0.92rem;
+}
+
+.appearance-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.appearance-choice {
+  display: grid;
+  justify-items: center;
+  gap: 7px;
+  min-width: 0;
+  padding: 8px 6px;
+  border: 1px solid rgb(255 255 255 / 12%);
+  border-radius: 12px;
+  background: rgb(7 17 37 / 32%);
+  text-align: center;
+}
+
+.appearance-choice.is-equipped {
+  border-color: rgb(242 191 91 / 58%);
+  box-shadow: inset 0 0 0 1px rgb(242 191 91 / 14%);
+}
+
+.appearance-choice strong {
+  min-height: 2.1em;
+  color: #eef5ff;
+  font-size: 0.73rem;
+  line-height: 1.08;
+}
+
+.appearance-preview,
+.appearance-effect-preview {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  border-radius: 10px;
+  box-shadow: 0 3px 8px rgb(0 0 0 / 25%);
+}
+
+.appearance-effect-preview {
+  border: 1px solid rgb(255 255 255 / 20%);
+  background: linear-gradient(145deg, #5277ba, #253c70);
+  color: #fff4c9;
+  font:
+    800 1.35rem/1 "Trebuchet MS",
+    sans-serif;
+  animation-duration: 1.8s;
+  animation-iteration-count: infinite;
+}
+
+.appearance-choice .shop-buy-button {
+  min-height: 27px;
+  padding: 4px 7px;
+  font-size: 0.72rem;
+}
+
+.appearance-choice .shop-buy-button:disabled {
+  cursor: default;
+  opacity: 0.62;
 }
 
 #shop-modal .shop-item {
@@ -3678,6 +3943,17 @@ body.game-is-paused .shooting-star {
   border: 1px solid rgb(242 191 91 / 34%);
   background: rgb(242 191 91 / 16%);
   color: #ffe09a;
+}
+
+#shop-modal .appearance-action--equip,
+#shop-modal .appearance-action--equipped {
+  border-color: rgb(111 190 255 / 58%);
+  background: rgb(47 115 184 / 72%);
+  color: #eef8ff;
+}
+
+#shop-modal .appearance-action--equipped {
+  background: rgb(42 92 149 / 72%);
 }
 
 #shop-confirm-modal .app-modal__body {
@@ -3721,7 +3997,7 @@ body.game-is-paused .shooting-star {
   }
 
   #shop-modal .shop-item-grid {
-    height: min(400px, calc(100dvh - 104px));
+    height: 100%;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-template-rows: repeat(5, minmax(0, 1fr));
     gap: 7px;
@@ -3733,5 +4009,15 @@ body.game-is-paused .shooting-star {
 
   #shop-modal .shop-item-title {
     font-size: 0.78rem;
+  }
+
+  .appearance-choice-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .appearance-preview,
+  .appearance-effect-preview {
+    width: 54px;
+    height: 54px;
   }
 }

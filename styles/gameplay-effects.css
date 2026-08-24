@@ -1,0 +1,200 @@
+/* Hiệu ứng trực quan trong màn chơi: mặt lưng, lật thẻ và combo. */
+.card-back--classic {
+  background: linear-gradient(135deg, #ffecd2, #fcb69f, #ffdde1);
+}
+
+.card-back--midnight {
+  background:
+    radial-gradient(circle at 22% 25%, #f8e7a1 0 2%, transparent 2.6%),
+    radial-gradient(circle at 74% 66%, #d4d9ff 0 1.7%, transparent 2.3%),
+    radial-gradient(circle at 63% 22%, #fff 0 1.2%, transparent 1.8%),
+    linear-gradient(145deg, #101b47, #384f91 55%, #19224e);
+}
+
+.card-back--aurora {
+  background:
+    linear-gradient(
+      130deg,
+      transparent 34%,
+      rgb(116 194 181 / 46%) 48%,
+      transparent 62%
+    ),
+    linear-gradient(35deg, #1d2d55, #4d6192 50%, #453766);
+}
+
+.card-back--candy {
+  position: relative;
+  isolation: isolate;
+  background: linear-gradient(135deg, #ff6b9c, #9a67e7 48%, #5ac8e9);
+}
+
+.card-back--candy::after {
+  position: absolute;
+  inset: 41% 22%;
+  content: "";
+  border: 1px solid rgb(255 255 255 / 58%);
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    rgb(255 238 191 / 88%),
+    rgb(255 255 255 / 68%)
+  );
+  box-shadow: 0 2px 7px rgb(69 33 120 / 22%);
+  pointer-events: none;
+}
+
+.tile.card-back--candy::after {
+  display: none;
+}
+.tile.card-back--candy:has(img.hidden)::after,
+.appearance-preview.card-back--candy::after {
+  display: block;
+}
+
+.tile-combo-effect {
+  position: fixed;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  color: #b8e3ff;
+  font:
+    650 clamp(1rem, 4vw, 1.16rem)/1.1 "Trebuchet MS",
+    "Segoe UI",
+    sans-serif;
+  letter-spacing: 0.025em;
+  pointer-events: none;
+  white-space: nowrap;
+  animation: combo-appear 1.3s cubic-bezier(0.2, 0.75, 0.3, 1) forwards;
+}
+
+.tile-combo-effect--nice {
+  text-shadow: 0 2px 8px rgb(68 135 194 / 36%);
+}
+.tile-combo-effect--great {
+  color: #ffdc78;
+  text-shadow: 0 2px 9px rgb(194 127 12 / 44%);
+}
+.tile-combo-effect--excellent {
+  color: #ffbf8b;
+  text-shadow: 0 2px 10px rgb(204 90 30 / 46%);
+}
+.tile-combo-effect--perfect {
+  color: #ffaaa2;
+  text-shadow: 0 2px 11px rgb(184 55 47 / 50%);
+}
+
+.tile-combo-effect.fade-out {
+  opacity: 0;
+  transform: translate(-50%, -100px);
+  transition: all 0.7s ease;
+}
+
+@keyframes combo-appear {
+  0% {
+    transform: translate(-50%, 8px) scale(0.72);
+    opacity: 0;
+  }
+  42% {
+    transform: translate(-50%, -4px) scale(1.03);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -13px) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Popup hết giờ: giữ cùng bảng màu xanh đậm của màn chơi. */
+#time-up-modal .app-modal {
+  width: min(440px, calc(100vw - 32px));
+  border-color: rgb(128 184 243 / 35%);
+  background: linear-gradient(155deg, #182942 0%, #243b64 100%);
+  color: #eef5ff;
+  animation: time-up-modal-enter 460ms cubic-bezier(0.16, 0.85, 0.24, 1.08) both;
+}
+
+#time-up-modal .app-modal.is-defeat-shaking {
+  animation: time-up-modal-shake 420ms ease-in-out both;
+}
+
+#time-up-modal .app-modal__header,
+#time-up-modal .app-modal__footer {
+  border-color: rgb(255 255 255 / 11%);
+}
+
+#time-up-modal .app-modal__title,
+#time-up-modal .app-modal__title .ui-icon {
+  color: #f2bf5b;
+}
+#time-up-modal .app-modal__close {
+  background: rgb(255 255 255 / 9%);
+  color: #f5f7fb;
+}
+#time-up-modal .app-modal__body {
+  padding: 18px;
+  color: rgb(238 245 255 / 88%);
+}
+
+#time-up-modal .app-modal__footer {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+#time-up-modal .app-button {
+  min-height: 42px;
+  padding: 8px 10px;
+  font-size: 0.82rem;
+}
+#time-up-modal .app-button--secondary {
+  border-color: rgb(255 255 255 / 18%);
+  background: rgb(255 255 255 / 8%);
+  color: #eef5ff;
+}
+#time-up-modal .app-button--primary {
+  background: #2f73b8;
+  color: #fff;
+}
+#time-up-modal .app-button--time-purchase {
+  border-color: rgb(242 191 91 / 40%);
+  background: rgb(242 191 91 / 16%);
+  color: #ffe09a;
+}
+#time-up-modal .app-button--time-purchase .ui-icon {
+  width: 16px;
+  height: 16px;
+}
+
+@keyframes time-up-modal-enter {
+  from {
+    opacity: 0;
+    transform: translateY(42px) scale(0.76);
+  }
+  72% {
+    opacity: 1;
+    transform: translateY(-3px) scale(1.018);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes time-up-modal-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20%,
+  60% {
+    transform: translateX(-7px) rotate(-0.5deg);
+  }
+  40%,
+  80% {
+    transform: translateX(7px) rotate(0.5deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #time-up-modal .app-modal {
+    animation: none;
+  }
+}
