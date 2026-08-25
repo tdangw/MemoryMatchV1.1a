@@ -1,30 +1,43 @@
-# CONTEXT — Bộ nhớ làm việc
+# CONTEXT — Trạng thái dự án hiện tại
 
-## Hạng mục đã hoàn thành
+## Phạm vi
 
-Đã triển khai hệ ngoại hình thẻ: mua một lần bằng Xu, lưu vĩnh viễn theo thiết bị và trang bị ngay trong tab **Ngoại hình** của Cửa hàng.
+- Dự án là game web JavaScript thuần, tối ưu cho màn hình mobile dọc.
+- Không còn Android/Capacitor, APK/AAB, AdMob, quảng cáo hoặc vùng giữ chỗ quảng cáo.
+- Firebase Web SDK vẫn được dùng; Firebase Hosting project là `memorymatchv1-1a`.
 
-## Phạm vi đã triển khai
+## Chạy, kiểm tra và phát hành
 
-- 4 mặt lưng: Hoàng hôn (mặc định), Đêm sao, Cực quang, Kẹo sắc màu.
-- 7 hiệu ứng lật/hiện thẻ: Bật nảy (mặc định), Mờ phóng to, Nảy nhanh, Trượt lên, Lật 3D, Xoay thu phóng, Tan mờ.
-- Ngoại hình được chọn áp dụng cho các bàn chơi tạo sau khi trang bị; hiệu ứng lật áp dụng ngay cho lần lật tiếp theo.
+- `npm run dev`: chạy môi trường Vite cục bộ.
+- `npm run check`: kiểm tra các module JavaScript trong `js/`.
+- `npm run build`: build cho Firebase Hosting tại base `/`.
+- `npm run deploy`: build và deploy Firebase Hosting.
+- `npm run build:gh-pages`: build tại base `/MemoryMatchV1.1a/`.
+- `npm run deploy:gh-pages`: deploy `dist/` lên nhánh GitHub Pages.
 
-## Hướng tiếp theo (nếu cần)
+## PWA
 
-- Thêm vật phẩm tiêu hao tại `js/shopCatalog.js`; điều chỉnh mốc combo hoặc thời lượng lật/ẩn thẻ, popup combo, Shop và intro màn tại `js/gameplayTuning.js`.
-- CSS Shop và CSS hiệu ứng gameplay đã được tách tương ứng sang `styles/shop.css` và `styles/gameplay-effects.css`; `style.css` tiếp tục giữ kiểu nền dùng chung.
+- `public/manifest.webmanifest` đặt chế độ `standalone` và ưu tiên `portrait-primary`.
+- `js/pwa.js` đăng ký `public/sw.js`; service worker cache app shell và chỉ cache phản hồi đầy đủ HTTP `200`, bỏ qua request `Range` để không lỗi với audio tải từng đoạn.
+- Người chơi cài từ Chrome qua “Cài đặt ứng dụng” hoặc “Thêm vào Màn hình chính”; mở từ icon sẽ chạy toàn màn hình.
 
-- Có thể bổ sung thêm mẫu mặt lưng dạng ảnh hoặc gói ngoại hình theo chủ đề.
-- Kinh tế hiện dùng thời gian màn 60/90/120/180 giây (Dễ đến Siêu khó), thưởng Xu tăng theo độ khó và tốc độ; "Xem trước tất cả" tính 10 Xu cho mỗi thẻ chưa ghép.
-- Combo bắt đầu từ x2: mỗi cặp đúng cộng số giây bằng cấp combo (x2 +2 giây, x3 +3 giây…); miss đặt lại combo và trừ 1 Xu từ phần thưởng cuối màn. Kỷ lục lưu lâu dài đã được loại bỏ, HUD chỉ hiển thị điểm của lượt chơi hiện tại.
-- Mỗi level cộng tối đa 30 giây tiến trình (3 giây/level), đặt lại từ thời gian nền; gợi ý chưa dùng tích lũy, nhận thêm 1 lượt từ level 2 và giới hạn 10 lượt.
-- Popup đầu màn hiển thị màn chơi, độ khó và ba chỉ số gọn bằng icon: điểm, thời gian, gợi ý.
+## Gameplay và Cửa hàng
 
-## Hiệu ứng chiến thắng cuối chặng
+- Có 4 mặt lưng thẻ và 7 hiệu ứng lật/hiện thẻ. Ngoại hình mua bằng Xu, lưu theo thiết bị và trang bị trong tab **Ngoại hình** của Cửa hàng.
+- Tab **Vật phẩm** chỉ chứa vật phẩm tiêu hao từ `js/shopCatalog.js`; không có phần thưởng xem quảng cáo.
+- Thời gian nền theo độ khó: 60/90/120/180 giây từ Dễ đến Siêu khó. Gợi ý chưa dùng tích lũy, nhận thêm từ level 2 và giới hạn 10 lượt.
+- Combo bắt đầu tại x2: mỗi cặp đúng cộng số giây bằng cấp combo; ghép sai đặt lại combo và trừ 1 Xu khỏi thưởng cuối màn.
+- `style.css` giữ kiểu nền dùng chung; CSS Shop và hiệu ứng gameplay đã tách sang `styles/shop.css` và `styles/gameplay-effects.css`.
 
-- Hiệu ứng vườn hoa là một lớp riêng, không can thiệp luật chơi: `js/victoryCelebration.js` điều phối, `js/victoryFlowerScene.js` và `js/victoryFlowerSourceTemplate.js` giữ cảnh hoa, CSS nằm tại `styles/victory-flower*.css`.
-- Hiện đang thử nghiệm ở level 2 (`GAMEPLAY_TIMING.victoryCelebration.triggerLevel`); trước khi phát hành đổi mốc này thành level 100. Người chơi vẫn xem popup tổng kết và pháo hoa như bình thường, sau đó bấm nút `Congratulations!` để vào cảnh hoa.
-- Trong cảnh hoa, sau khi hoa nở xong mới hiện chữ `Congratulations!` và phát `congratulations.mp3`. Chạm/rê lên chữ chỉ làm hiện hạt; chạm lần nữa để hiện hoặc ẩn nút Menu/Tiếp tục. Ba bông hoa chính có thể đu đưa khi chạm.
-- Nhạc cảnh hoa là `victory-flower-theme.mp3`; nhạc menu chọn ngẫu nhiên một lần mỗi phiên giữa `menu1.mp3` và `menu2.mp3`.
-- Nút `Congratulations!` trong popup tổng kết dùng nền đỏ chiến thắng, chữ và viền vàng sáng. Selector phải đi qua overlay `#level-summary-modal .level-summary-modal--victory` để không bị style nút xanh chung ghi đè.
+## Hiệu ứng chiến thắng
+
+- Pháo hoa canvas nằm ở `js/fireworkEffect.js`. Ba vụ nổ cuối luôn xóa hạt cũ trước khi nổ để tạo vòng tròn đầy đủ, không bị khuyết.
+- Cảnh hoa độc lập ở `js/victoryCelebration.js`; template và CSS tương ứng là `js/victoryFlowerScene.js`, `js/victoryFlowerSourceTemplate.js` và `styles/victory-flower*.css`.
+- Hiện thử nghiệm cảnh hoa ở level 1: `GAMEPLAY_TIMING.victoryCelebration.triggerLevel = 1`. Trước phát hành chính thức, đổi mốc này thành 100.
+- Hoa nở trong 6,4 giây; pháo hoa khởi động trước khi hoa nở xong 2 giây. Sau khi hiện lời chúc và âm thanh `congratulations.mp3` kết thúc sẽ có ba đợt pháo hoa cuối.
+
+## Dữ liệu và asset
+
+- Hình/âm thanh runtime ở `public/assets/`; ảnh thẻ mặc định ở `public/assets/images/themes/default/`.
+- `source-assets/` là asset gốc để chỉnh sửa, không được build/deploy.
+- Dữ liệu người chơi lưu bằng `localStorage`, không commit.
