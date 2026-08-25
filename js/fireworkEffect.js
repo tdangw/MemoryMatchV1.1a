@@ -44,8 +44,8 @@ export function showVictoryFireworks({
   const particles = [];
   // Android WebView composites the canvas with the animated flower scene below it.
   // Fewer, larger particles keep the burst readable without overloading that compositor.
-  const particleLimit = nativeAndroid ? 60 : compact ? 175 : 250;
-  const particlesPerBurst = nativeAndroid ? 14 : compact ? 44 : 60;
+  const particleLimit = nativeAndroid ? 72 : compact ? 175 : 250;
+  const particlesPerBurst = nativeAndroid ? 22 : compact ? 44 : 60;
   let frameId;
   let previous = performance.now();
   let nextBurstAt = 0;
@@ -54,9 +54,13 @@ export function showVictoryFireworks({
 
   const burst = (x, y, hue, isFinalBurst = false) => {
     const count = isFinalBurst
-      ? nativeAndroid ? 32 : compact ? 74 : 96
+      ? nativeAndroid ? 42 : compact ? 74 : 96
       : particlesPerBurst;
-    for (let index = 0; index < count && particles.length < particleLimit; index += 1) {
+    // A finale must remain a complete radial ring. Existing trails otherwise
+    // consume the shared cap and leave visibly missing sectors in the circle.
+    if (isFinalBurst) particles.length = 0;
+    const burstLimit = isFinalBurst ? count : particleLimit;
+    for (let index = 0; index < count && particles.length < burstLimit; index += 1) {
       const angle = (Math.PI * 2 * index) / count + (isFinalBurst ? 0 : random(-0.12, 0.12));
       const speed = random(compact ? 3.6 : 4.2, isFinalBurst ? (compact ? 8.2 : 10) : (compact ? 6.8 : 8)) * scale;
       particles.push({ x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, life: 1, decay: random(isFinalBurst ? 0.009 : 0.012, isFinalBurst ? 0.014 : 0.022), hue: isFinalBurst ? (hue + (index / count) * 180) % 360 : hue, size: random(nativeAndroid ? 2 : isFinalBurst ? 1.5 : 1.25, compact ? 2.4 : 3) * scale });

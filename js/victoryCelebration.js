@@ -104,7 +104,7 @@ export function showVictoryCelebration({
   const startFlowerFireworks = () => runFireworks({
     durationMs: 3600,
     containerId: "victory-celebration",
-    burstCount: nativeAndroid ? 6 : 8,
+    burstCount: 8,
     burstIntervalMs: 260,
   });
   const startFinaleFireworks = () => runFireworks({

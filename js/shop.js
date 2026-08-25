@@ -59,17 +59,13 @@ export function openShopOverlay() {
     .querySelector(".app-modal__header")
     .insertBefore(wallet, closeButton);
 
-  const consumableTab = createTab("Vật phẩm", true, () =>
-    renderConsumables(grid, roundId, modal, () => {
-      renderConsumables(grid, roundId, modal, refreshConsumables);
-    }),
-  );
+  const refreshConsumables = () =>
+    renderConsumables(grid, roundId, modal, refreshConsumables);
+  const consumableTab = createTab("Vật phẩm", true, refreshConsumables);
   const appearanceTab = createTab("Ngoại hình", false, () =>
     renderAppearance(grid, roundId, modal),
   );
   tabs.append(consumableTab, appearanceTab);
-  const refreshConsumables = () =>
-    renderConsumables(grid, roundId, modal, refreshConsumables);
   renderConsumables(grid, roundId, modal, refreshConsumables);
 }
 
