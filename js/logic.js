@@ -24,6 +24,11 @@ import {
   shouldShowVictoryCelebration,
 } from "./gameplayTuning.js";
 import { showVictoryCelebration } from "./victoryCelebration.js";
+import {
+  isNativeAdMobSupported,
+  showLevelTransitionInterstitial,
+} from "./adMobService.js";
+import { shouldShowLevelTransitionInterstitial } from "./automaticAdCadence.js";
 
 let selectedTiles = [];
 let levelCompleteActions = { onNext: () => {}, onMenu: () => {} };
@@ -237,6 +242,13 @@ export function checkLevelComplete() {
       sounds.victory.currentTime = 0;
       sounds.victory.play().catch(() => {});
     }
+    const continueToNextLevel = () => {
+      if (!isNativeAdMobSupported() || !shouldShowLevelTransitionInterstitial()) {
+        levelCompleteActions.onNext();
+        return;
+      }
+      void showLevelTransitionInterstitial().finally(levelCompleteActions.onNext);
+    };
     const completion = {
       level: gameState.currentLevel,
       remainingTime: gameState.remainingTime,
@@ -244,7 +256,7 @@ export function checkLevelComplete() {
       misses: gameState.misses,
       coinsEarned,
       settings: gameState.settings,
-      onNext: levelCompleteActions.onNext,
+      onNext: continueToNextLevel,
       onMenu: levelCompleteActions.onMenu,
     };
     if (shouldShowVictoryCelebration(gameState.currentLevel)) {

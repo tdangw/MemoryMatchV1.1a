@@ -19,3 +19,11 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Keep Capacitor's JavaScript bridge and annotated plugin entry points when R8 is enabled.
+-keep class com.getcapacitor.** { *; }
+-keep @com.getcapacitor.NativePlugin class * { *; }
+-keep @com.getcapacitor.annotation.CapacitorPlugin class * { *; }
+-keepclassmembers class * {
+    @com.getcapacitor.PluginMethod <methods>;
+}

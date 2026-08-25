@@ -4,6 +4,7 @@ import {
   BannerAdPluginEvents,
   BannerAdPosition,
   BannerAdSize,
+  InterstitialAdPluginEvents,
   MaxAdContentRating,
 } from "@capacitor-community/admob";
 import { Capacitor } from "@capacitor/core";
@@ -86,6 +87,43 @@ export async function hideGameplayBanner() {
     await AdMob.removeBanner();
   } catch {
     // The banner may not have been created yet.
+  }
+}
+
+/** Shows a full-screen ad only at a confirmed level transition. */
+export async function showLevelTransitionInterstitial() {
+  if (!(await initializeAdMob()) || !ADMOB_ANDROID_IDS.interstitial) {
+    return "unavailable";
+  }
+
+  const handles = [];
+  let settled = false;
+  let resolveResult = () => {};
+  const result = new Promise((resolve) => {
+    resolveResult = (value) => {
+      if (settled) return;
+      settled = true;
+      resolve(value);
+    };
+  });
+
+  try {
+    handles.push(
+      await AdMob.addListener(InterstitialAdPluginEvents.Dismissed, () => resolveResult("shown")),
+      await AdMob.addListener(InterstitialAdPluginEvents.FailedToLoad, () => resolveResult("unavailable")),
+      await AdMob.addListener(InterstitialAdPluginEvents.FailedToShow, () => resolveResult("unavailable")),
+    );
+    await AdMob.prepareInterstitial({
+      adId: ADMOB_ANDROID_IDS.interstitial,
+      immersiveMode: true,
+    });
+    void AdMob.showInterstitial().catch(() => resolveResult("unavailable"));
+    return await result;
+  } catch (error) {
+    console.warn("AdMob interstitial failed:", error);
+    return "unavailable";
+  } finally {
+    await Promise.allSettled(handles.map((handle) => handle.remove()));
   }
 }
 
