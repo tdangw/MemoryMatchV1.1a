@@ -26,11 +26,17 @@ function updateGridLayout() {
   const padding = isCompactViewport ? 2 : 6;
   const headerBottom =
     document.getElementById("game-title")?.getBoundingClientRect().bottom || 0;
+  const adReserveHeight =
+    document.getElementById("ad-banner-placeholder")?.getBoundingClientRect()
+      .height || 0;
   const availableWidth = Math.max(
     240,
     isCompactViewport ? window.innerWidth - 20 : window.innerWidth * 0.9,
   );
-  const availableHeight = Math.max(240, window.innerHeight - headerBottom - 32);
+  const availableHeight = Math.max(
+    180,
+    window.innerHeight - headerBottom - adReserveHeight - 32,
+  );
   const widthPerTile =
     (availableWidth - padding * 2 - gap * (columns - 1)) / columns;
   const heightPerTile =
