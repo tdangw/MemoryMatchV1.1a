@@ -9,7 +9,7 @@ Memory Match Adventure là game ghép thẻ chạy trên web, viết bằng HTML
 ```text
 index.html → js/main.js → controller / UI / gameplay modules
                          ↘ public/assets (ảnh WebP, âm thanh)
-Vite build → dist → Firebase Hosting
+Vite build → dist → Firebase Hosting hoặc GitHub Pages
 ```
 
 - Phiên bản hiển thị cho người chơi: `js/appMeta.js` (`V1.1a`).
@@ -120,12 +120,14 @@ Lưu trữ dùng `localStorage`, theo thiết bị/trình duyệt. Không có d�
 | `npm run check` | Kiểm tra module JavaScript. |
 | `npm run build` | Tạo production build vào `dist/`. |
 | `npm run preview` | Xem thử production build tại local. |
+| `npm run deploy` | Build rồi phát hành lên Firebase Hosting. |
+| `npm run deploy:gh-pages` | Build rồi phát hành `dist` sang nhánh `gh-pages`. |
 
 ## 8. Repository và chính sách Git
 
 | Remote | Mục đích | Nội dung |
 | --- | --- | --- |
-| `origin` → `tdangw/MemoryMatchV1.1a` | Repository công khai | Mã nguồn dự án. |
+| `origin` → `tdangw/MemoryMatchV1.1a` | Repository công khai/GitHub Pages | Nhánh `gh-pages` nhận nội dung build qua deploy. |
 | `data` → `tdangw/MemoryMatchV1.1a-data` | Repository Private | Mã nguồn, cấu hình, tài liệu và lịch sử Git trên nhánh `main`. |
 
 - `dist/` bị bỏ qua khỏi repository Private.

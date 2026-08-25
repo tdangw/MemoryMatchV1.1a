@@ -22,9 +22,11 @@ import {
   returnToMainMenu,
 } from "./gameController.js";
 import { initializeFirebase } from "./firebaseApp.js";
+import { registerProgressiveWebApp } from "./pwa.js";
 
 // Entry point: nạp dữ liệu đã lưu và nối các module qua callback.
 initializeFirebase();
+registerProgressiveWebApp();
 hydrateGameState(loadPersistentGameData());
 applyEffectsSettings(gameState.settings);
 configureGameController({
