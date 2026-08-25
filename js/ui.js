@@ -5,6 +5,7 @@ import { sounds } from "./sound.js"; // ✅ Đã tách âm thanh
 import { openAppModal, showAppToast } from "./modal.js";
 import { createIcon } from "./icons.js";
 import confetti from "canvas-confetti";
+import { showVictoryFireworks } from "./fireworkEffect.js";
 import { clearPersistentGameData } from "./persistence.js";
 
 const scoreElement = document.getElementById("score");
@@ -164,7 +165,14 @@ function launchSummaryConfetti() {
   });
 }
 
-export function showLevelSummaryOverlay({
+export function showLevelSummaryOverlay(completion) {
+  gameState.isPaused = true;
+  showVictoryFireworks({
+    durationMs: GAMEPLAY_TIMING.victoryFireworksDurationMs,
+  }).finally(() => openLevelSummaryOverlay(completion));
+}
+
+function openLevelSummaryOverlay({
   level,
   remainingTime,
   moves,
@@ -175,7 +183,6 @@ export function showLevelSummaryOverlay({
   isVictoryCelebration = false,
   onCelebrate,
 }) {
-  gameState.isPaused = true;
   let actionSelected = false;
   const minutes = String(Math.floor(remainingTime / 60)).padStart(2, "0");
   const seconds = String(remainingTime % 60).padStart(2, "0");
