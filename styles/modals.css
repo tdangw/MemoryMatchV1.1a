@@ -1,0 +1,891 @@
+/* Hệ modal và nút dùng chung */
+.app-modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  box-sizing: border-box;
+  background: transparent;
+  backdrop-filter: none;
+  z-index: 30000;
+  animation: app-overlay-in 180ms ease-out both;
+}
+
+.app-modal-overlay.is-closing {
+  animation: app-overlay-out 180ms ease-in both;
+}
+
+.app-modal {
+  width: min(420px, calc(100vw - 32px));
+  max-height: min(680px, calc(100dvh - 32px));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+  border: 1px solid rgb(255 255 255 / 55%);
+  border-radius: 18px;
+  background: linear-gradient(150deg, #fff8ef, #ffe0cf);
+  color: #25324a;
+  box-shadow: 0 24px 70px rgb(0 0 0 / 42%);
+  animation: app-modal-in 220ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.app-modal-overlay.is-closing .app-modal {
+  animation: app-modal-out 160ms ease-in both;
+}
+
+.app-modal--small {
+  width: min(360px, calc(100vw - 32px));
+}
+
+.app-modal--large {
+  width: min(520px, calc(100vw - 32px));
+}
+
+.app-modal__header {
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 18px;
+  box-sizing: border-box;
+  border-bottom: 1px solid rgb(91 73 63 / 14%);
+}
+
+.app-modal__title {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0;
+  color: #243b64;
+  font:
+    800 1.25rem/1.25 "Trebuchet MS",
+    "Segoe UI",
+    sans-serif;
+}
+
+.app-modal__title .ui-icon {
+  width: 22px;
+  height: 22px;
+}
+
+.app-modal__close {
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border-radius: 50%;
+  background: rgb(36 59 100 / 10%);
+  color: #243b64;
+  font-size: 24px;
+  line-height: 1;
+}
+
+.app-modal__close:hover {
+  background: rgb(36 59 100 / 18%);
+  transform: none;
+}
+
+.app-modal__body {
+  overflow-y: auto;
+  padding: 18px;
+  line-height: 1.55;
+}
+
+.app-modal__body p {
+  margin: 0;
+}
+
+.app-modal__body p + p {
+  margin-top: 10px;
+}
+
+.app-modal__note {
+  color: #667085;
+  font-size: 0.9rem;
+}
+
+.app-modal__footer {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  padding: 12px 18px 16px;
+  border-top: 1px solid rgb(91 73 63 / 14%);
+}
+
+.app-button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 9px 16px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font:
+    700 14px/1.2 "Segoe UI",
+    sans-serif;
+  transition:
+    transform 140ms ease,
+    filter 140ms ease,
+    background 140ms ease;
+}
+
+.app-button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+.app-button--primary {
+  background: #2167b1;
+  color: #fff;
+}
+
+.app-button--secondary {
+  border-color: rgb(36 59 100 / 20%);
+  background: #fff;
+  color: #243b64;
+}
+
+.app-button--danger {
+  background: #c53e4d;
+  color: #fff;
+}
+
+.app-button--purchase {
+  width: auto;
+  min-height: 34px;
+  padding: 7px 12px;
+  background: #243b64;
+  color: #ffd166;
+}
+
+.app-button--purchase .ui-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.app-feature-list {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.app-feature-list li + li {
+  margin-top: 8px;
+}
+
+.app-toast-region {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  width: min(420px, calc(100vw - 24px));
+  display: grid;
+  gap: 8px;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 31000;
+}
+
+.app-toast {
+  padding: 11px 16px;
+  border-radius: 12px;
+  background: #243b64;
+  color: #fff;
+  box-shadow: 0 10px 28px rgb(0 0 0 / 28%);
+  font-weight: 700;
+  text-align: center;
+  animation: app-toast-in 180ms ease-out both;
+}
+
+.app-toast--success {
+  border: 1px solid rgb(242 191 91 / 48%);
+  background: linear-gradient(135deg, #1c3155, #2d4a78);
+  color: #fff3ca;
+  box-shadow:
+    0 12px 30px rgb(5 12 30 / 48%),
+    inset 0 1px 0 rgb(255 255 255 / 10%);
+}
+
+.app-toast--info {
+  border: 1px solid rgb(134 191 245 / 42%);
+  background: linear-gradient(135deg, #182d4e, #28527c);
+  color: #e8f4ff;
+}
+
+.app-toast--error {
+  background: #a93443;
+}
+
+.app-toast.is-closing {
+  animation: app-overlay-out 180ms ease-in both;
+}
+
+#settings-container {
+  position: static;
+  inset: auto;
+  transform: none;
+  width: 100%;
+  max-width: none;
+  min-height: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #25324a;
+  animation: none;
+}
+
+#settings-container .settings-option {
+  margin: 0 0 10px;
+  padding: 12px 14px;
+  border: 1px solid rgb(36 59 100 / 12%);
+  border-radius: 12px;
+  background: rgb(255 255 255 / 55%);
+}
+
+#settings-container .settings-group {
+  padding: 12px 14px;
+  border: 1px solid rgb(36 59 100 / 12%);
+  border-radius: 12px;
+  background: rgb(255 255 255 / 55%);
+}
+
+#settings-container .settings-group + .settings-group {
+  margin-top: 10px;
+}
+
+#settings-container .settings-group h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px;
+  color: #243b64;
+}
+
+.shop-item-grid {
+  grid-template-columns: 1fr;
+  max-height: none;
+  margin: 0;
+}
+
+.shop-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px;
+  background: rgb(255 255 255 / 62%);
+  border: 1px solid rgb(36 59 100 / 12%);
+}
+
+.shop-item-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: #25324a;
+  text-align: left;
+}
+
+.game-stats .info > [data-icon],
+#settings-container .label > [data-icon],
+#settings-container h3 > [data-icon] {
+  display: inline-flex;
+  align-items: center;
+}
+
+#settings-container .label,
+.game-stats .info {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.reward-container.app-modal {
+  padding: 22px;
+  text-align: center;
+}
+
+@keyframes app-overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes app-overlay-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes app-modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes app-modal-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+}
+
+@keyframes app-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media screen and (width <= 600px) {
+  .app-modal-overlay {
+    padding: 10px;
+  }
+
+  .app-modal {
+    max-height: calc(100dvh - 20px);
+    border-radius: 15px;
+  }
+
+  .app-modal__header {
+    min-height: 52px;
+    padding: 11px 13px;
+  }
+
+  .app-modal__body {
+    padding: 13px;
+  }
+
+  .app-modal__footer {
+    gap: 7px;
+    padding: 10px 13px 13px;
+  }
+
+  .app-modal__footer .app-button {
+    width: 100%;
+  }
+
+  .shop-item-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Popup thông tin đầu màn */
+.reward-container.app-modal {
+  padding: 24px;
+}
+
+.reward-container .reward-title {
+  margin: 0;
+  font-size: clamp(1.8rem, 8vw, 2.2rem);
+}
+
+.reward-subtitle {
+  margin: 6px 0 14px;
+  color: rgb(255 255 255 / 82%);
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.reward-container .reward-points,
+.reward-container .reward-hints,
+.reward-container .reward-time {
+  width: min(250px, 100%);
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  align-items: center;
+  gap: 10px;
+  margin: 10px auto 0;
+  font-size: clamp(1.05rem, 5vw, 1.35rem);
+  text-align: left;
+}
+
+.reward-container .ui-icon {
+  width: 24px;
+  height: 24px;
+}
+
+#difficulty-modal .app-button {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+/* Chọn chế độ chơi dùng cùng hệ màu với menu chính. */
+#difficulty-modal .app-modal {
+  width: min(370px, calc(100vw - 36px));
+  border-color: rgb(255 255 255 / 16%);
+  border-radius: 24px;
+  background: linear-gradient(150deg, rgb(24 38 64 / 97%), rgb(10 20 38 / 97%));
+  color: #f5f7fb;
+}
+
+#difficulty-modal .app-modal__header {
+  border-bottom-color: rgb(255 255 255 / 11%);
+}
+
+#difficulty-modal .app-modal__title {
+  color: #f2bf5b;
+}
+
+#difficulty-modal .app-modal__title .ui-icon {
+  color: #f2bf5b;
+}
+
+#difficulty-modal .app-modal__close {
+  background: rgb(255 255 255 / 9%);
+  color: #f5f7fb;
+}
+
+#difficulty-modal .app-modal__body {
+  color: rgb(245 247 251 / 82%);
+}
+
+#difficulty-modal .app-modal__footer {
+  border-top-color: rgb(255 255 255 / 11%);
+}
+
+#difficulty-modal .app-button--primary {
+  justify-content: flex-start;
+  border-color: rgb(255 255 255 / 11%);
+  background: rgb(39 57 88 / 78%);
+  color: #f5f7fb;
+  box-shadow: 0 5px 15px rgb(0 0 0 / 18%);
+}
+
+#difficulty-modal .app-button--primary:hover,
+#difficulty-modal .app-button--primary:focus-visible {
+  border-color: rgb(242 191 91 / 42%);
+  background: rgb(55 78 116 / 94%);
+  box-shadow: 0 8px 20px rgb(0 0 0 / 28%);
+}
+
+/* Các popup từ menu chính dùng cùng một ngôn ngữ thiết kế. */
+#settings-modal .app-modal,
+#info-modal .app-modal {
+  border-color: rgb(255 255 255 / 16%);
+  border-radius: 24px;
+  background: linear-gradient(155deg, #182942 0%, #243b64 100%);
+  color: #f5f7fb;
+}
+
+#settings-modal .app-modal__header,
+#info-modal .app-modal__header {
+  border-bottom-color: rgb(255 255 255 / 11%);
+}
+
+#settings-modal .app-modal__title,
+#info-modal .app-modal__title,
+#settings-modal .app-modal__title .ui-icon,
+#info-modal .app-modal__title .ui-icon {
+  color: #f2bf5b;
+}
+
+#settings-modal .app-modal__close,
+#info-modal .app-modal__close {
+  background: rgb(255 255 255 / 9%);
+  color: #f5f7fb;
+}
+
+#settings-modal .app-modal__close:hover,
+#info-modal .app-modal__close:hover {
+  background: rgb(255 255 255 / 17%);
+}
+
+#settings-modal .app-modal__body,
+#info-modal .app-modal__body {
+  color: rgb(245 247 251 / 86%);
+}
+
+#info-modal .app-modal__note {
+  color: rgb(245 247 251 / 62%);
+}
+
+#settings-modal #settings-container .settings-control {
+  border-color: rgb(255 255 255 / 11%);
+  background: rgb(8 18 38 / 28%);
+}
+
+#settings-modal #settings-container .settings-row > label:first-child,
+#settings-modal #settings-container output {
+  color: #f5f7fb;
+}
+
+/* Tạm dừng tự động: dừng các animation của game nhưng giữ popup tiếp tục hiển thị. */
+body.game-is-paused #game-container *,
+body.game-is-paused .fog,
+body.game-is-paused .cloud,
+body.game-is-paused .shooting-star {
+  animation-play-state: paused !important;
+}
+
+/* Popup tổng kết màn chơi */
+.level-summary-modal {
+  position: relative;
+  isolation: isolate;
+  width: min(390px, calc(100vw - 28px));
+  border: 4px solid #e4e7ff;
+  border-radius: 34px;
+  background: #fff;
+  box-shadow: 0 28px 80px rgb(38 36 100 / 42%);
+  animation: summary-modal-in 260ms cubic-bezier(0.2, 0.85, 0.25, 1) both;
+}
+
+.level-summary-modal::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 7px;
+  background: linear-gradient(90deg, #5d45ff, #ad52ec, #ec5bb5);
+  z-index: 4;
+}
+
+.level-summary-modal .app-modal__body,
+.level-summary-modal .app-modal__footer {
+  position: relative;
+  z-index: 2;
+}
+
+.level-summary-modal .app-modal__header {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  z-index: 5;
+}
+
+.level-summary-modal .app-modal__title {
+  display: none;
+}
+
+.level-summary-modal .app-modal__close {
+  background: #eef0f6;
+  color: #526079;
+}
+
+.level-summary-modal .app-modal__body {
+  padding: 42px 30px 24px;
+}
+
+.level-summary-modal .app-modal__footer {
+  gap: 10px;
+  padding: 0 30px 30px;
+  border: 0;
+}
+
+.level-summary {
+  text-align: center;
+}
+
+.level-summary__heading {
+  margin: 0 0 24px;
+  color: #151a2b;
+  font:
+    900 clamp(1.55rem, 7vw, 2rem)/1.15 "Trebuchet MS",
+    "Segoe UI",
+    sans-serif;
+}
+
+.level-summary__stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 12px;
+  padding: 18px 14px;
+  border-radius: 18px;
+  background: #f7f8fc;
+}
+
+.level-summary__stat {
+  display: grid;
+  gap: 4px;
+  padding: 0;
+}
+
+.level-summary__stat span {
+  color: #7d879d;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+}
+
+.level-summary__stat strong {
+  color: #5740f0;
+  font-size: 1.35rem;
+}
+
+.level-summary__stat.summary-misses strong {
+  color: #dd3659;
+}
+.level-summary__stat.summary-misses span {
+  color: #dd3659;
+}
+.level-summary__stat.summary-next strong {
+  color: #26a978;
+}
+
+#level-summary-modal .app-button--primary {
+  background: linear-gradient(135deg, #6045ff, #4934e8);
+  box-shadow: 0 12px 24px rgb(91 69 255 / 24%);
+}
+
+#level-summary-modal .app-button {
+  min-height: 52px;
+  border-radius: 15px;
+  font-size: 1rem;
+}
+
+#level-summary-modal .app-button--secondary {
+  background: #f7f8fc;
+  border-color: #dfe3ed;
+}
+
+/* Giao diện tổng kết gọn đã chọn trước đó */
+.level-summary-modal {
+  width: min(440px, calc(100vw - 32px));
+  border: 1px solid rgb(91 69 255 / 26%);
+  border-radius: 18px;
+  background: linear-gradient(160deg, #fff, #f6f7ff);
+  box-shadow: 0 24px 70px rgb(0 0 0 / 42%);
+  animation: app-modal-in 220ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.level-summary-modal::before {
+  display: none;
+}
+
+.level-summary-modal .app-modal__header {
+  position: relative;
+  inset: auto;
+  min-height: 58px;
+  padding: 14px 18px;
+  border-bottom: 1px solid rgb(91 73 63 / 14%);
+}
+
+.level-summary-modal .app-modal__title {
+  display: flex;
+}
+
+.level-summary-modal .app-modal__close {
+  background: rgb(36 59 100 / 10%);
+  color: #243b64;
+}
+
+.level-summary-modal .app-modal__body {
+  padding: 10px 18px 18px;
+}
+
+.level-summary-modal .app-modal__footer {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  padding: 12px 18px 16px;
+  border-top: 1px solid rgb(91 73 63 / 14%);
+}
+
+.level-summary__heading {
+  margin: 0 0 12px;
+}
+
+.level-summary__stats {
+  gap: 10px;
+  padding: 0;
+  background: transparent;
+}
+
+.level-summary__stat {
+  padding: 12px 8px;
+  border-radius: 13px;
+  background: rgb(241 243 250 / 88%);
+}
+
+#level-summary-modal .app-button {
+  min-height: 40px;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+#level-summary-modal .app-button--primary {
+  background: linear-gradient(135deg, #6045ff, #4934e8);
+  box-shadow: none;
+}
+
+/* Popup xác nhận trong màn chơi cũng dùng tông menu chính. */
+#reset-modal .app-modal,
+#return-modal .app-modal {
+  border-color: rgb(255 255 255 / 16%);
+  border-radius: 24px;
+  background: linear-gradient(155deg, #182942 0%, #243b64 100%);
+  color: #f5f7fb;
+}
+
+#reset-modal .app-modal__header,
+#return-modal .app-modal__header,
+#reset-modal .app-modal__footer,
+#return-modal .app-modal__footer {
+  border-color: rgb(255 255 255 / 11%);
+}
+
+#reset-modal .app-modal__title,
+#return-modal .app-modal__title,
+#reset-modal .app-modal__title .ui-icon,
+#return-modal .app-modal__title .ui-icon {
+  color: #f2bf5b;
+}
+
+#reset-modal .app-modal__close,
+#return-modal .app-modal__close {
+  background: rgb(255 255 255 / 9%);
+  color: #f5f7fb;
+}
+
+#reset-modal .app-modal__body,
+#return-modal .app-modal__body {
+  color: rgb(245 247 251 / 86%);
+}
+
+#return-modal .app-button--primary {
+  background: #2f73b8;
+  color: #fff;
+}
+
+#reset-modal .app-button--danger {
+  background: #bd4a58;
+  color: #fff;
+}
+
+/* Tổng kết màn chơi dùng cùng ngôn ngữ với menu và popup hệ thống. */
+.level-summary-modal {
+  border-color: rgb(255 255 255 / 16%);
+  border-radius: 24px;
+  background: linear-gradient(155deg, #182942 0%, #243b64 100%);
+  color: #f5f7fb;
+}
+
+.level-summary-modal .app-modal__header,
+.level-summary-modal .app-modal__footer {
+  border-color: rgb(255 255 255 / 11%);
+}
+
+.level-summary-modal .app-modal__title,
+.level-summary-modal .app-modal__title .ui-icon,
+.level-summary__heading {
+  color: #f2bf5b;
+}
+
+.level-summary-modal .app-modal__close {
+  background: rgb(255 255 255 / 9%);
+  color: #f5f7fb;
+}
+
+.level-summary__stats {
+  background: transparent;
+}
+
+.level-summary__stat {
+  border: 1px solid rgb(255 255 255 / 10%);
+  background: rgb(8 18 38 / 28%);
+}
+
+.level-summary__stat span {
+  color: #b9d5ff;
+}
+
+.level-summary__stat strong,
+.level-summary__stat.summary-misses strong,
+.level-summary__stat.summary-next strong {
+  color: #f5f7fb;
+}
+
+.level-summary__stat.summary-misses strong,
+.level-summary__stat.summary-misses span {
+  color: #ff9da8;
+}
+
+#level-summary-modal .app-button--secondary {
+  border-color: rgb(255 255 255 / 16%);
+  background: rgb(255 255 255 / 10%);
+  color: #f5f7fb;
+}
+
+#level-summary-modal .app-button--primary {
+  background: #2f73b8;
+  color: #fff;
+}
+
+/* Trạng thái chiến thắng chỉ có một hành động chính, chiếm trọn hàng. */
+.level-summary-modal--victory {
+  position: relative;
+  top: clamp(14px, 3vh, 32px);
+}
+
+.level-summary-modal--victory .app-modal__footer {
+  grid-template-columns: 1fr;
+}
+
+.level-summary-modal--victory .app-button {
+  width: 100%;
+}
+
+#level-summary-modal .level-summary-modal--victory .app-button--primary,
+.level-summary-modal--victory .app-button--primary {
+  border-color: #ffd871;
+  background: linear-gradient(135deg, #b92f42, #7f1830);
+  color: #ffe88a;
+  text-shadow: 0 1px 0 rgb(67 8 18 / 65%);
+  box-shadow: 0 8px 18px rgb(72 6 20 / 38%), inset 0 1px 0 rgb(255 221 152 / 24%);
+}
+
+#level-summary-modal .level-summary-modal--victory .app-button--primary:hover,
+#level-summary-modal .level-summary-modal--victory .app-button--primary:focus-visible,
+.level-summary-modal--victory .app-button--primary:hover,
+.level-summary-modal--victory .app-button--primary:focus-visible {
+  background: linear-gradient(135deg, #d44351, #951d37);
+  box-shadow: 0 10px 22px rgb(72 6 20 / 48%), inset 0 1px 0 rgb(255 231 177 / 32%);
+}
+
+/* Popup thông tin đầu màn nằm cao hơn tâm màn hình một chút. */
+.level-reward-overlay .reward-container {
+  position: relative;
+  top: -5vh;
+}
+
+@media screen and (width <= 600px) {
+  .level-reward-overlay .reward-container {
+    top: -3vh;
+  }
+}
+
