@@ -1,0 +1,54 @@
+/* Bố cục Cài đặt tối giản */
+#settings-container {
+  gap: 14px;
+}
+
+#settings-container .settings-control {
+  display: grid;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 1px solid rgb(36 59 100 / 14%);
+  border-radius: 14px;
+  background: rgb(255 255 255 / 58%);
+}
+
+#settings-container .toggle-switch {
+  width: 50px;
+  height: 26px;
+  flex: 0 0 50px;
+  background: transparent;
+}
+
+#settings-container .toggle-switch::before {
+  display: none;
+}
+
+#settings-container .settings-row,
+#settings-container .settings-range-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+#settings-container .settings-row > label:first-child {
+  color: #243b64;
+  font-weight: 700;
+}
+
+#settings-container output {
+  min-width: 42px;
+  color: #596780;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+#settings-container .settings-range {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 6px;
+  margin: 0;
+  accent-color: #4779c5;
+  cursor: pointer;
+}
+
