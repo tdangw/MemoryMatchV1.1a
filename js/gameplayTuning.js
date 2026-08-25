@@ -7,7 +7,7 @@ export const GAMEPLAY_TIMING = Object.freeze({
   comboPopupVisibleMs: 1900,
   comboPopupFadeMs: 650,
   timePurchaseGraceMs: 1000,
-  victoryFireworksDurationMs: 3600,
+  victoryFireworksDurationMs: 2500,
   victoryCelebration: Object.freeze({
     // Mốc thử nghiệm: đổi triggerLevel thành 100 sau khi duyệt hiệu ứng.
     triggerLevel: 1,

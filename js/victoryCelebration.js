@@ -1,4 +1,5 @@
 import { GAMEPLAY_TIMING } from "./gameplayTuning.js";
+import { showVictoryFireworks } from "./fireworkEffect.js";
 import { createIcon } from "./icons.js";
 import { createVictoryFlowerSceneMarkup } from "./victoryFlowerScene.js";
 import {
@@ -88,6 +89,18 @@ export function showVictoryCelebration({
 
   document.body.appendChild(overlay);
   playVictoryFlowerTheme(settings);
+  const startFlowerFireworks = () => showVictoryFireworks({
+    durationMs: 3600,
+    containerId: "victory-celebration",
+    burstCount: 8,
+    burstIntervalMs: 260,
+  });
+  const startFinaleFireworks = () => showVictoryFireworks({
+    durationMs: 2200,
+    containerId: "victory-celebration",
+    burstCount: 3,
+    burstIntervalMs: 360,
+  });
   requestAnimationFrame(() => {
     overlay.classList.add("is-playing");
     overlay
@@ -99,6 +112,12 @@ export function showVictoryCelebration({
     if (settings?.sound) {
       sounds.congratulations.currentTime = 0;
       sounds.congratulations.play().catch(() => {});
+      sounds.congratulations.addEventListener("ended", startFinaleFireworks, {
+        once: true,
+      });
+    } else {
+      setTimeout(startFinaleFireworks, 4000);
     }
   }, flowerGrowthDurationMs);
+  setTimeout(startFlowerFireworks, Math.max(0, flowerGrowthDurationMs - 2000));
 }
