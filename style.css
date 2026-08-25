@@ -106,12 +106,6 @@ button {
   transition: 0.2s;
 }
 
-.menu-item:hover,
-.difficulty-btn:hover,
-.back-menu-btn:hover {
-  transform: scale(1.2);
-}
-
 /* === Lưới game === */
 #grid-container {
   display: grid;
@@ -237,37 +231,6 @@ button {
   text-shadow: 1px 1px 3px #000;
 }
 
-/* === Cài đặt nâng cao === */
-.difficulty-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin: 20px 0;
-}
-
-/* Giao diện nút chọn độ khó */
-.difficulty-btn {
-  display: block;
-  width: 180px;
-  padding: 12px 20px;
-  margin: 8px 0;
-  font-size: 18px;
-  border-radius: 12px;
-  background: #d9ff00;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-}
-
-/* Giao diện nút gạt âm thanh */
-.sound-setting {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 10px 0 20px;
-  gap: 12px;
-}
-
 .toggle-switch {
   position: relative;
   width: 50px;
@@ -307,27 +270,6 @@ button {
 
 .toggle-switch input:checked + .slider::before {
   transform: translateX(24px);
-}
-
-.center-option {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
-}
-
-.back-menu-btn {
-  background-color: #6c757d;
-  color: white;
-  padding: 12px 24px;
-  font-size: 1.1em;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.back-menu-btn:hover {
-  background-color: #5a6268;
 }
 
 /* === Hiệu ứng animation === */
@@ -418,83 +360,6 @@ button {
   font-size: 1.05rem;
 }
 
-/* Xóa dữ liệu game */
-
-/* Overlay mờ toàn màn hình */
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgb(0 0 0 / 70%); /* overlay nền tối */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-  opacity: 1;
-  animation: fadein 0.4s ease-in-out;
-  transition: opacity 0.4s ease;
-}
-
-.fade-in {
-  opacity: 1;
-}
-
-.fade-out {
-  opacity: 0;
-}
-
-/* Hộp xác nhận */
-.confirm-box {
-  background: #fff;
-  border-radius: 20px;
-  padding: 30px 40px;
-  text-align: center;
-  box-shadow: 0 0 20px rgb(255 0 0 / 40%);
-  animation: popup 0.3s ease-out;
-}
-
-.confirm-box p {
-  font-size: 1.2rem;
-  margin-bottom: 20px;
-}
-
-.confirm-btn,
-.cancel-btn {
-  margin: 5px 10px;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 12px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.confirm-btn {
-  background-color: #e74c3c;
-  color: white;
-}
-
-.cancel-btn {
-  background-color: #95a5a6;
-  color: white;
-}
-
-.confirm-btn:hover {
-  background-color: #c0392b;
-}
-
-.cancel-btn:hover {
-  background-color: #f00;
-  transform: scale(1.2);
-  box-shadow: 0 0 10px rgb(255 255 255 / 40%);
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-  border-radius: 100px;
-}
-
 @keyframes popup {
   from {
     transform: scale(0.8);
@@ -505,62 +370,6 @@ button {
     transform: scale(1);
     opacity: 1;
   }
-}
-
-.menu-icon-btn {
-  position: fixed;
-  top: 60px;
-  left: 180px;
-  z-index: 999;
-  background-color: rgb(255 255 255 / 80%);
-  border: none;
-  font-size: 24px;
-  padding: 10px;
-  border-radius: 50%;
-  cursor: pointer;
-  box-shadow: 0 0 5px rgb(0 0 0 / 30%);
-  transition:
-    transform 0.2s ease,
-    background-color 0.2s;
-}
-
-.menu-icon-btn:hover {
-  transform: scale(1.1);
-  background-color: rgb(200 200 200 / 90%);
-}
-
-/* 🌟 Giao diện mới cho phần header */
-.game-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: linear-gradient(90deg, #ffecd2, #fcb69f);
-  padding: 12px 20px;
-  border-radius: 14px;
-  box-shadow: 0 6px 16px rgb(0 0 0 / 15%);
-  flex-wrap: wrap;
-  max-width: 1080px;
-  width: 100%;
-  margin-bottom: 16px;
-}
-
-.header-left,
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.header-title {
-  flex: 1 1 100%;
-  text-align: center;
-  font-size: 28px;
-  font-weight: bold;
-  color: #fff;
-  margin-top: 2px;
-  text-shadow: 2px 2px 8px rgb(0 0 0 / 25%);
-  animation: glow 2s ease-in-out infinite alternate;
 }
 
 @keyframes glow {
@@ -575,35 +384,6 @@ button {
       0 0 10px #f6f,
       0 0 20px #3cf;
   }
-}
-
-.btn {
-  background-color: #1d72b8;
-  color: #fff;
-  padding: 6px 14px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-.btn:hover {
-  transform: scale(1.08);
-  background-color: #125a91;
-  box-shadow: 0 0 12px rgb(0 128 255 / 40%);
-}
-
-.menu-icon-btn {
-  background: transparent;
-  border: none;
-  font-size: 22px;
-  cursor: pointer;
-  transition: transform 0.3s ease;
-}
-
-.menu-icon-btn:hover {
-  transform: scale(1.2);
 }
 
 .info {
@@ -666,41 +446,6 @@ button {
     font-size: 13px;
     padding: 3px 6px;
   }
-}
-
-/* 🌈 Tên game lung linh chuyển màu mượt */
-.sparkle-text {
-  background: linear-gradient(270deg, #ffb300, #ff0008, #0f6, #00ff5e);
-  background-size: 800% 800%;
-  background-clip: text;
-  color: transparent;
-  font-size: 2.5rem;
-  -webkit-text-fill-color: transparent;
-  animation: shimmerText 5s ease infinite;
-}
-
-/* === Header Layout mới === */
-.header-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-}
-
-.icon-btn {
-  background: #1d72b8;
-  color: white;
-  border: none;
-  font-size: 18px;
-  border-radius: 8px;
-  padding: 6px 10px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.icon-btn:hover {
-  transform: scale(1.1);
-  background-color: #f00;
 }
 
 /* Responsive */
@@ -1120,27 +865,6 @@ button {
   transform: translateX(30px);
 }
 
-/* Radio chọn nhạc */
-.radio-group label {
-  display: block;
-  background: #333;
-  padding: 10px 14px;
-  border-radius: 8px;
-  margin: 6px 0;
-  transition: all 0.2s ease;
-  cursor: pointer;
-}
-
-.radio-group input[type="radio"]:checked + label {
-  background: #0bd36f;
-  color: #000;
-  font-weight: bold;
-}
-
-.radio-group label:hover {
-  background: #0bd36f88;
-}
-
 @keyframes fadeInPop {
   0% {
     opacity: 0;
@@ -1151,54 +875,6 @@ button {
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
   }
-}
-
-/* Hiệu ứng cho chế độ chơi */
-.popup-box {
-  border-radius: 20px;
-  gap: 2px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  box-shadow: 0 0 20px rgb(0 255 128 / 30%);
-  overflow: hidden;
-  z-index: 1;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgb(30 30 30 / 95%);
-  padding: 24px 32px;
-  width: fit-content;
-  max-width: 90vw;
-  max-height: 90vh;
-  animation: fadeInPop 0.3s ease-out forwards;
-}
-
-.difficulty-btn {
-  margin: 6px 0;
-  padding: 10px 20px;
-  font-size: 18px;
-  width: 180px;
-  background-color: #3498db;
-  color: white;
-  border: none;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-  border-radius: 100px;
-}
-
-.difficulty-btn:hover {
-  transform: scale(1.2);
-  box-shadow: 0 0 10px rgb(255 255 255 / 40%);
-}
-
-.popup-box h2 {
-  font-size: 22px;
-  color: #0f7;
-  margin-bottom: 12px;
-  text-shadow: 0 0 6px rgb(0 255 140 / 50%);
 }
 
 .bonus-overlay {
@@ -1245,57 +921,6 @@ button {
       0 0 12px #0ff,
       0 0 20px #0f0;
   }
-}
-
-/* ver info */
-.version-icon {
-  position: fixed;
-  bottom: 12px;
-  right: 12px;
-  font-size: 14px;
-  background: rgb(0 0 0 / 0%);
-  color: #fff;
-  padding: 4px 10px;
-  border-radius: 8px;
-  cursor: pointer;
-  z-index: 1000;
-  transition: background 0.3s;
-}
-
-.version-icon:hover {
-  background: #0635c3cc;
-}
-
-.version-overlay {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) perspective(800px) rotateX(0deg);
-  background: linear-gradient(145deg, #fff, #e6e6e6);
-  color: #222;
-  padding: 24px;
-  border-radius: 12px;
-  z-index: 9999;
-  max-width: 420px;
-  width: 90%;
-  text-align: center;
-  animation: popupLift 0.4s ease-out;
-  transform-style: preserve-3d;
-  border: 1px solid #ccc;
-  box-shadow:
-    0 12px 30px rgb(0 0 0 / 20%),
-    0 0 12px rgb(0 140 255 / 15%); /* 🔵 ánh sáng nhẹ */
-}
-
-.version-overlay {
-  margin-top: 16px;
-  padding: 6px 12px;
-  font-size: 14px;
-  border: none;
-  background: #555;
-  color: #fff;
-  border-radius: 6px;
-  cursor: pointer;
 }
 
 @keyframes popupLift {
@@ -1354,30 +979,6 @@ button {
   }
 }
 
-/* Shop */
-.shop-fullscreen-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgb(0 0 0 / 80%);
-  z-index: 9999;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.shop-container {
-  background: #fff;
-  border-radius: 14px;
-  padding: 20px;
-  max-width: 600px;
-  width: 90%;
-  box-shadow: 0 10px 30px rgb(0 0 0 / 40%);
-  animation: popScale 0.3s ease;
-}
-
 .shop-item-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -1417,15 +1018,6 @@ button {
   transform: scale(1.2);
 }
 
-.shop-close-button {
-  background: #02f;
-  padding: 8px 16px;
-  font-size: 14px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
 @keyframes popScale {
   from {
     transform: scale(0.9);
@@ -1436,32 +1028,6 @@ button {
     transform: scale(1);
     opacity: 1;
   }
-}
-
-.shop-message-overlay {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 10001;
-  animation: fadein 0.3s ease;
-  pointer-events: none;
-}
-
-.shop-message-box {
-  background: #fff;
-  color: #333;
-  padding: 12px 20px;
-  border-radius: 10px;
-  box-shadow: 0 6px 20px rgb(0 0 0 / 30%);
-  font-size: 16px;
-  font-weight: bold;
-  animation: popScale 0.3s ease-out;
-}
-
-.shop-message-overlay.fade-out {
-  opacity: 0;
-  transition: opacity 0.4s ease;
 }
 
 .fly-icon {
@@ -2175,40 +1741,6 @@ button {
   #game-title.game-hud .game-actions-menu {
     left: 4px;
   }
-}
-
-/* Header đồng bộ theo chiều rộng board */
-#game-title.game-header {
-  display: block;
-  position: relative;
-  width: min(var(--board-width, 100%), calc(100vw - 12px));
-  max-width: none;
-  padding: 12px 16px 10px;
-  margin: 0 auto 12px;
-  box-sizing: border-box;
-  border-radius: 14px;
-}
-
-.game-header-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  gap: 8px;
-}
-
-#game-logo.header-title {
-  display: block !important;
-  flex: none;
-  width: 100%;
-  margin: 0;
-  padding: 0 48px;
-  box-sizing: border-box;
-  font-size: clamp(1.75rem, 4vw, 2.4rem);
-  line-height: 1.1;
-  white-space: nowrap;
-  text-align: center;
 }
 
 .game-stats {
@@ -3744,3 +3276,4 @@ body.game-is-paused .shooting-star {
 #game-title.game-hud .stat-timer.is-previewing .ui-icon--eye {
   color: #b9e5ff;
 }
+
