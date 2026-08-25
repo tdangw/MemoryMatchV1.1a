@@ -133,7 +133,6 @@ function handleTimeUp() {
 
   const returnToMenu = () => {
     resetGame();
-    void hideGameplayBanner();
     document
       .getElementById("game-container")
       ?.style.setProperty("display", "none");
@@ -231,7 +230,6 @@ export function returnToMainMenu() {
   isAutoPaused = false;
   document.body.classList.remove("game-is-paused");
   resetGame();
-  void hideGameplayBanner();
   document
     .getElementById("game-container")
     ?.style.setProperty("display", "none");
