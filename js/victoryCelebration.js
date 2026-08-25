@@ -1,4 +1,5 @@
 import { GAMEPLAY_TIMING } from "./gameplayTuning.js";
+import { Capacitor } from "@capacitor/core";
 import { hideGameplayBanner } from "./adMobService.js";
 import { showVictoryFireworks } from "./fireworkEffect.js";
 import { createIcon } from "./icons.js";
@@ -24,6 +25,9 @@ export function showVictoryCelebration({
   const overlay = document.createElement("section");
   overlay.id = "victory-celebration";
   overlay.className = "victory-flower-overlay";
+  const nativeAndroid =
+    Capacitor.isNativePlatform() && Capacitor.getPlatform() === "android";
+  overlay.classList.toggle("is-native-android", nativeAndroid);
   overlay.setAttribute("role", "dialog");
   overlay.setAttribute("aria-modal", "true");
   overlay.setAttribute("aria-label", "Chúc mừng chiến thắng");
@@ -91,13 +95,19 @@ export function showVictoryCelebration({
 
   document.body.appendChild(overlay);
   playVictoryFlowerTheme(settings);
-  const startFlowerFireworks = () => showVictoryFireworks({
+  const runFireworks = (options) => {
+    if (nativeAndroid) overlay.classList.add("is-fireworks-active");
+    return showVictoryFireworks(options).finally(() => {
+      overlay.classList.remove("is-fireworks-active");
+    });
+  };
+  const startFlowerFireworks = () => runFireworks({
     durationMs: 3600,
     containerId: "victory-celebration",
-    burstCount: 8,
+    burstCount: nativeAndroid ? 6 : 8,
     burstIntervalMs: 260,
   });
-  const startFinaleFireworks = () => showVictoryFireworks({
+  const startFinaleFireworks = () => runFireworks({
     durationMs: 2200,
     containerId: "victory-celebration",
     burstCount: 3,

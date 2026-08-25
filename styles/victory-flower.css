@@ -14,6 +14,11 @@
 
 .victory-flower-overlay *, .victory-flower-overlay *::before, .victory-flower-overlay *::after { box-sizing: border-box; }
 .victory-flower-overlay:not(.is-playing) * { animation-play-state: paused !important; }
+.victory-flower-overlay.is-native-android.is-fireworks-active .victory-flower-overlay__source *,
+.victory-flower-overlay.is-native-android.is-fireworks-active .victory-flower-overlay__source *::before,
+.victory-flower-overlay.is-native-android.is-fireworks-active .victory-flower-overlay__source *::after {
+  animation-play-state: paused !important;
+}
 .victory-flower-overlay.is-closing { animation: victory-fade-out .3s ease-in both; }
 .victory-flower-overlay__source { position: absolute; inset: 0; overflow: hidden; }
 

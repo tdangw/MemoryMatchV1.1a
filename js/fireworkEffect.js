@@ -23,7 +23,7 @@ export function showVictoryFireworks({
   canvas.setAttribute("aria-hidden", "true");
   Object.assign(canvas.style, {
     position: "fixed", inset: "0", width: "100vw", height: "100dvh",
-    pointerEvents: "none", zIndex: "32001",
+    pointerEvents: "none", zIndex: "32001", contain: "strict",
   });
   document.body.append(canvas);
 
@@ -42,8 +42,10 @@ export function showVictoryFireworks({
   const context = canvas.getContext("2d", { alpha: true });
   const rockets = [];
   const particles = [];
-  const particleLimit = nativeAndroid ? 100 : compact ? 175 : 250;
-  const particlesPerBurst = nativeAndroid ? 26 : compact ? 44 : 60;
+  // Android WebView composites the canvas with the animated flower scene below it.
+  // Fewer, larger particles keep the burst readable without overloading that compositor.
+  const particleLimit = nativeAndroid ? 60 : compact ? 175 : 250;
+  const particlesPerBurst = nativeAndroid ? 14 : compact ? 44 : 60;
   let frameId;
   let previous = performance.now();
   let nextBurstAt = 0;
@@ -52,12 +54,12 @@ export function showVictoryFireworks({
 
   const burst = (x, y, hue, isFinalBurst = false) => {
     const count = isFinalBurst
-      ? nativeAndroid ? 48 : compact ? 74 : 96
+      ? nativeAndroid ? 32 : compact ? 74 : 96
       : particlesPerBurst;
     for (let index = 0; index < count && particles.length < particleLimit; index += 1) {
       const angle = (Math.PI * 2 * index) / count + (isFinalBurst ? 0 : random(-0.12, 0.12));
       const speed = random(compact ? 3.6 : 4.2, isFinalBurst ? (compact ? 8.2 : 10) : (compact ? 6.8 : 8)) * scale;
-      particles.push({ x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, life: 1, decay: random(isFinalBurst ? 0.009 : 0.012, isFinalBurst ? 0.014 : 0.022), hue: isFinalBurst ? (hue + (index / count) * 180) % 360 : hue, size: random(isFinalBurst ? 1.5 : 1.25, compact ? 2.4 : 3) * scale });
+      particles.push({ x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, life: 1, decay: random(isFinalBurst ? 0.009 : 0.012, isFinalBurst ? 0.014 : 0.022), hue: isFinalBurst ? (hue + (index / count) * 180) % 360 : hue, size: random(nativeAndroid ? 2 : isFinalBurst ? 1.5 : 1.25, compact ? 2.4 : 3) * scale });
     }
   };
 
@@ -91,7 +93,7 @@ export function showVictoryFireworks({
   };
 
   const render = (now) => {
-    if (nativeAndroid && now - lastRenderAt < 33) {
+    if (nativeAndroid && now - lastRenderAt < 42) {
       frameId = requestAnimationFrame(render);
       return;
     }
