@@ -1,6 +1,5 @@
 node_modules/
 dist/
 .firebase/
-android/keystores/
 .env*
 !.env.example
