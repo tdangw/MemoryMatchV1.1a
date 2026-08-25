@@ -1,0 +1,20 @@
+{
+  "name": "Memory Match Adventure",
+  "short_name": "Memory Match",
+  "description": "Trò chơi ghép cặp thẻ tối ưu cho mobile.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#081b22",
+  "theme_color": "#081b22",
+  "categories": ["games", "puzzle"],
+  "icons": [
+    {
+      "src": "./icons/memory-match-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
