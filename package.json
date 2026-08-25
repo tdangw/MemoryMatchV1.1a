@@ -21,6 +21,7 @@
   "dependencies": {
     "@capacitor-community/admob": "^8.1.0",
     "@capacitor/android": "^8.0.0",
+    "@capacitor/app": "^8.1.1",
     "@capacitor/core": "^8.0.0",
     "canvas-confetti": "^1.9.4",
     "firebase": "^12.18.0"

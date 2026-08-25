@@ -108,12 +108,11 @@ function isGameVisible() {
 
 function pauseForBackground() {
   // Âm thanh phải dừng ở mọi màn hình, kể cả menu và popup.
+  if (isAutoPaused) return;
   shouldResumeMusic = isBackgroundMusicPlaying();
   pauseGameAudio();
 
-  if (!isGameVisible()) return;
-  if (gameState.isPaused) return;
-
+  if (!isGameVisible() || gameState.isPaused) return;
   isAutoPaused = true;
   gameState.isPaused = true;
   document.body.classList.add("game-is-paused");
@@ -320,4 +319,9 @@ configureLogic({ onNext: nextLevel, onMenu: returnToMainMenu });
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) pauseForBackground();
   else resumeFromBackground();
+});
+
+document.addEventListener("memory-match-app-state", (event) => {
+  if (event.detail?.isActive) resumeFromBackground();
+  else pauseForBackground();
 });

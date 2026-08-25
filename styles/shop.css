@@ -106,6 +106,28 @@
   gap: 15px;
   overflow-y: auto;
 }
+.shop-ad-reward {
+  display: grid;
+  grid-column: 1 / -1;
+  gap: 7px;
+  padding: 10px;
+  border: 1px solid rgb(242 191 91 / 38%);
+  border-radius: 13px;
+  background: rgb(242 191 91 / 10%);
+  text-align: center;
+}
+.shop-ad-reward strong {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: #ffe09a;
+  font-size: .82rem;
+}
+.shop-ad-reward strong .ui-icon { width: 18px; height: 18px; }
+.shop-ad-reward > span { color: rgb(245 247 251 / 66%); font-size: .72rem; }
+.shop-ad-reward__actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.shop-ad-reward__actions .app-button { min-height: 36px; }
 .appearance-group {
   display: grid;
   gap: 8px;

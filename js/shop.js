@@ -1,4 +1,4 @@
-import { gameState, spendCoins } from "./gameState.js";
+import { gameState, increaseCoins, spendCoins } from "./gameState.js";
 import {
   updateCoinDisplay,
   updateHintDisplay,
@@ -14,11 +14,17 @@ import { saveAppearance, saveCoins } from "./persistence.js";
 import { CARD_BACKS, FLIP_EFFECTS, getCardBackClass } from "./appearance.js";
 import { SHOP_ITEMS, getShopItemPrice } from "./shopCatalog.js";
 import { GAMEPLAY_TIMING } from "./gameplayTuning.js";
+import {
+  claimRewardedAdReward,
+  getRemainingRewardedClaims,
+} from "./adRewardEntitlements.js";
+import { rewardedAdService } from "./adMobService.js";
 
 export function openShopOverlay() {
   if (gameState.isLocked || gameState.isPaused) return;
 
   const roundId = gameState.roundId;
+  let rewarding = false;
   gameState.isPaused = true;
 
   const content = document.createElement("div");
@@ -54,13 +60,17 @@ export function openShopOverlay() {
     .insertBefore(wallet, closeButton);
 
   const consumableTab = createTab("Vật phẩm", true, () =>
-    renderConsumables(grid, roundId, modal),
+    renderConsumables(grid, roundId, modal, () => {
+      renderConsumables(grid, roundId, modal, refreshConsumables);
+    }),
   );
   const appearanceTab = createTab("Ngoại hình", false, () =>
     renderAppearance(grid, roundId, modal),
   );
   tabs.append(consumableTab, appearanceTab);
-  renderConsumables(grid, roundId, modal);
+  const refreshConsumables = () =>
+    renderConsumables(grid, roundId, modal, refreshConsumables);
+  renderConsumables(grid, roundId, modal, refreshConsumables);
 }
 
 function createTab(label, selected, onSelect) {
@@ -81,9 +91,10 @@ function createTab(label, selected, onSelect) {
   return tab;
 }
 
-function renderConsumables(grid, roundId, modal) {
+function renderConsumables(grid, roundId, modal, refresh) {
   grid.className = "shop-item-grid shop-item-grid--consumables";
   grid.replaceChildren();
+  grid.append(createRewardedAdCard(roundId, refresh));
   SHOP_ITEMS.forEach((item) => {
     const price = getShopItemPrice(item, {
       unmatchedTileCount: document.querySelectorAll(".tile:not(.matched)")
@@ -105,6 +116,83 @@ function renderConsumables(grid, roundId, modal) {
     card.appendChild(title);
     card.appendChild(button);
     grid.append(card);
+  });
+}
+
+function createRewardedAdCard(roundId, refresh) {
+  const card = document.createElement("section");
+  card.className = "shop-ad-reward";
+  const title = document.createElement("strong");
+  title.append(createIcon("star"), document.createTextNode("Xem quảng cáo nhận thưởng"));
+  const remaining = document.createElement("span");
+  remaining.textContent = `Còn ${getRemainingRewardedClaims()}/5 lượt hôm nay`;
+  const actions = document.createElement("div");
+  actions.className = "shop-ad-reward__actions";
+  const createRewardButton = (label, icon, reward) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "app-button app-button--purchase";
+    button.disabled = rewarding || getRemainingRewardedClaims() === 0;
+    button.append(createIcon(icon), document.createTextNode(label));
+    button.onclick = () => {
+      if (rewarding) return;
+      openRewardedAdConfirmation(reward, roundId, refresh);
+    };
+    return button;
+  };
+  actions.append(
+    createRewardButton("+2 gợi ý", "search", "hint"),
+    createRewardButton("+50 Xu", "coin", "coins"),
+  );
+  card.append(title, remaining, actions);
+  return card;
+}
+
+function openRewardedAdConfirmation(reward, roundId, refresh) {
+  const label = reward === "hint" ? "2 lượt gợi ý" : "50 Xu";
+  openAppModal({
+    id: "rewarded-ad-modal",
+    icon: "star",
+    title: "Xem quảng cáo",
+    content: `<p>Xem video ngắn để nhận ${label}?</p>`,
+    size: "small",
+    actions: [
+      { label: "Hủy", variant: "secondary" },
+      {
+        label: "Xem quảng cáo",
+        variant: "primary",
+        onClick: (close) => {
+          if (rewarding || gameState.roundId !== roundId) return true;
+          rewarding = true;
+          close();
+          showShopMessage("Đang chuẩn bị quảng cáo...", "info");
+          void rewardedAdService.showRewardedAd().then((result) => {
+            if (result !== "rewarded" || !claimRewardedAdReward()) {
+              if (result !== "rewarded") {
+                showShopMessage("Chưa thể tải quảng cáo. Hãy thử lại sau.", "error");
+              }
+              return;
+            }
+            if (reward === "hint") {
+              gameState.hints += 2;
+              updateHintDisplay(gameState.hints);
+              animateIconToTarget("search", "#hint");
+              showShopMessage("Bạn nhận được 2 lượt gợi ý.");
+            } else {
+              increaseCoins(50);
+              saveCoins(gameState.coins);
+              updateCoinDisplay(gameState.coins);
+              animateIconToTarget("coin", "#coin-balance");
+              showShopMessage("Bạn nhận được 50 Xu.");
+            }
+          }).finally(() => {
+            rewarding = false;
+            refresh();
+          });
+          return true;
+        },
+      },
+    ],
   });
 }
 

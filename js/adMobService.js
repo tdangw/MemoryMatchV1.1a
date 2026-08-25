@@ -6,6 +6,7 @@ import {
   BannerAdSize,
   InterstitialAdPluginEvents,
   MaxAdContentRating,
+  RewardAdPluginEvents,
 } from "@capacitor-community/admob";
 import { Capacitor } from "@capacitor/core";
 
@@ -58,6 +59,8 @@ async function initializeAdMob() {
 
 /** Shows the Android-only adaptive banner while a game board is visible. */
 export async function showGameplayBanner() {
+  if (!isNativeAdMobSupported()) return false;
+  setBannerReserveHeight();
   if (!(await initializeAdMob()) || !ADMOB_ANDROID_IDS.banner) return false;
 
   try {
@@ -80,6 +83,54 @@ export async function showGameplayBanner() {
     return false;
   }
 }
+
+export const rewardedAdService = {
+  async showRewardedAd() {
+    if (!isNativeAdMobSupported()) {
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      return "rewarded";
+    }
+    if (!(await initializeAdMob()) || !ADMOB_ANDROID_IDS.rewarded) {
+      return "unavailable";
+    }
+
+    const handles = [];
+    let rewardEarned = false;
+    let settled = false;
+    let resolveResult = () => {};
+    const result = new Promise((resolve) => {
+      resolveResult = (value) => {
+        if (settled) return;
+        settled = true;
+        resolve(value);
+      };
+    });
+
+    try {
+      handles.push(
+        await AdMob.addListener(RewardAdPluginEvents.Rewarded, () => {
+          rewardEarned = true;
+        }),
+        await AdMob.addListener(RewardAdPluginEvents.Dismissed, () => {
+          resolveResult(rewardEarned ? "rewarded" : "closed");
+        }),
+        await AdMob.addListener(RewardAdPluginEvents.FailedToLoad, () => resolveResult("unavailable")),
+        await AdMob.addListener(RewardAdPluginEvents.FailedToShow, () => resolveResult("unavailable")),
+      );
+      await AdMob.prepareRewardVideoAd({
+        adId: ADMOB_ANDROID_IDS.rewarded,
+        immersiveMode: true,
+      });
+      void AdMob.showRewardVideoAd().catch(() => resolveResult("unavailable"));
+      return await result;
+    } catch (error) {
+      console.warn("AdMob rewarded ad failed:", error);
+      return "unavailable";
+    } finally {
+      await Promise.allSettled(handles.map((handle) => handle.remove()));
+    }
+  },
+};
 
 export async function hideGameplayBanner() {
   if (!isNativeAdMobSupported()) return;
