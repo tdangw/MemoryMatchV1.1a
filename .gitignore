@@ -5,3 +5,4 @@ android/app/build/
 *.keystore
 *.jks
 .env*
+!.env.example

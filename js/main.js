@@ -21,8 +21,10 @@ import {
   initializeLevel,
   returnToMainMenu,
 } from "./gameController.js";
+import { initializeFirebase } from "./firebaseApp.js";
 
 // Entry point: nạp dữ liệu đã lưu và nối các module qua callback.
+initializeFirebase();
 hydrateGameState(loadPersistentGameData());
 applyEffectsSettings(gameState.settings);
 configureGameController({
