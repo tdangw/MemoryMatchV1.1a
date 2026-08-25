@@ -7,6 +7,7 @@ import { createIcon } from "./icons.js";
 import confetti from "canvas-confetti";
 import { showVictoryFireworks } from "./fireworkEffect.js";
 import { clearPersistentGameData } from "./persistence.js";
+import { getTheme } from "./themeCatalog.js";
 
 const scoreElement = document.getElementById("score");
 const levelElement = document.getElementById("level");
@@ -103,7 +104,7 @@ export function showLevelRewardOverlay() {
   // Layout trực tiếp, không bọc trong .modal
   const container = document.createElement("div");
   container.className =
-    "reward-container direct-layout app-modal app-modal--small";
+    "reward-container direct-layout app-modal";
   const mode = gameState.settings.mode || "easy";
   const modeLabels = {
     easy: "Dễ",
@@ -122,7 +123,7 @@ export function showLevelRewardOverlay() {
 
   const subtitle = document.createElement("p");
   subtitle.className = "reward-subtitle";
-  subtitle.textContent = modeLabels[mode];
+  subtitle.textContent = `${modeLabels[mode]} · Chủ đề ${getTheme(gameState.appearance.theme).title}`;
 
   const createRewardLine = (className, icon, value) => {
     const line = document.createElement("div");
@@ -133,9 +134,9 @@ export function showLevelRewardOverlay() {
 
   container.append(rewardTitle, subtitle);
   container.append(
-    createRewardLine("reward-points", "star", String(gameState.score)),
+    createRewardLine("reward-points", "trophy", `Mục tiêu: ${gameState.totalPairs} cặp`),
     createRewardLine("reward-time", "timer", `${minutes}:${seconds}`),
-    createRewardLine("reward-hints", "search", String(gameState.hints)),
+    createRewardLine("reward-hints", "search", `Gợi ý: ${gameState.hints}`),
   );
 
   overlay.appendChild(container);

@@ -15,7 +15,7 @@ Vite build → dist → Firebase Hosting hoặc GitHub Pages
 - Phiên bản hiển thị cho người chơi: `js/appMeta.js` (`V1.1a`).
 - Cấu hình gameplay: `js/config.js`.
 - Entry point: `js/main.js`.
-- Không có backend; hệ thống hoạt động offline-first trên từng trình duyệt/thiết bị.
+- Không có backend hoặc Firebase Web SDK; hệ thống hoạt động offline-first trên từng trình duyệt/thiết bị. Firebase chỉ được dùng làm Hosting.
 
 ## 2. Cấu trúc thư mục
 
@@ -46,6 +46,7 @@ Vite build → dist → Firebase Hosting hoặc GitHub Pages
 | `settings.js` | Cài đặt âm thanh, nhạc, âm lượng và popup Phiên bản. |
 | `shop.js` | Cửa hàng/vật phẩm trong game. |
 | `shopCatalog.js` | Catalog vật phẩm Shop và quy tắc giá động của từng vật phẩm. |
+| `themeCatalog.js` | Catalog chủ đề thẻ, tạo nội dung chữ/số/ký hiệu bằng SVG và cung cấp dữ liệu thẻ cho board. |
 | `gameplayTuning.js` | Mốc combo, phần thưởng thời gian theo combo và thời lượng hiệu ứng gameplay. |
 | `gameMenu.js` | Menu tác vụ trong HUD. |
 | `sound.js` | Âm thanh hiệu ứng, nhạc nền và quy tắc phát/dừng theo trạng thái trang. |
@@ -65,7 +66,7 @@ Các module được nối qua hàm `configure*`; tránh import vòng giữa con
 | Khó | 36 thẻ, 120 giây | Không đổi theo level. |
 | Siêu khó | 48 thẻ, 180 giây, 6 cột × 8 hàng | Không đổi theo level. |
 
-`getModeLayout(mode, level)` là điểm duy nhất quyết định kích thước board theo chế độ và level. Giao diện chỉ hiển thị tên chế độ, không hiển thị số thẻ.
+`getModeLayout(mode)` là điểm duy nhất quyết định kích thước board theo chế độ. Giao diện chỉ hiển thị tên chế độ, không hiển thị số thẻ.
 
 1. `main.js` nạp dữ liệu từ `persistence.js`, hydrate `gameState`, áp dụng âm thanh và hiển thị menu chính.
 2. Người chơi chọn độ khó; `gameController.initializeLevel()` tạo `roundId` mới và board mới.
@@ -75,7 +76,7 @@ Các module được nối qua hàm `configure*`; tránh import vòng giữa con
 6. Mỗi cặp ghép đúng cộng `1` điểm; điểm HUD là điểm của lượt chơi hiện tại và không dùng mua vật phẩm.
 7. Khi hoàn thành màn, người chơi nhận Xu theo độ khó và thời gian còn lại: Dễ `30 + floor(t × 0.35)`, Trung bình `50 + floor(t × 0.5)`, Khó `70 + floor(t × 0.65)`, Siêu khó `90 + floor(t × 0.8)`; sau đó trừ 1 Xu cho mỗi miss, không thấp hơn 0. Xu được cộng/lưu trước khi popup tổng kết hiển thị; popup gọi `onNext` hoặc `onMenu`; timer cũ bị vô hiệu bằng `roundId`.
 
-Mỗi level bắt đầu lại với thời gian nền theo độ khó, cộng `min((level - 1) × 3, 30)` giây. Lượt gợi ý chưa dùng được giữ lại; từ level 2, người chơi nhận thêm 1 lượt mỗi màn đến tối đa 10 lượt.
+Mỗi level bắt đầu lại với thời gian nền theo độ khó (Dễ hiện là 6 giây để thử nghiệm; đổi 60 khi phát hành), cộng `min((level - 1) × 3, 30)` giây. Lượt gợi ý chưa dùng được giữ lại; từ level 2, người chơi nhận thêm 1 lượt mỗi màn đến tối đa 10 lượt.
 
 ### Chống race condition
 
@@ -100,13 +101,13 @@ Lưu trữ dùng `localStorage`, theo thiết bị/trình duyệt. Không có d�
 | `music` | chuỗi boolean, mặc định `true` | `persistence.js` / `settings.js` |
 | `soundVolume` | số `0..1`, mặc định `0.4` | `persistence.js` / `settings.js` |
 | `musicVolume` | số `0..1`, mặc định `0.35` | `persistence.js` / `settings.js` |
-| `appearance` | JSON: ngoại hình đã sở hữu và đang trang bị | `persistence.js` / `appearance.js` |
+| `appearance` | JSON: ngoại hình và chủ đề đã sở hữu/đang trang bị | `persistence.js` / `appearance.js` |
 
-`clearPersistentGameData()` chỉ xóa các key trên. Trạng thái ván đang chơi, level hiện tại và hint không được lưu qua lần tải lại. Xu được dùng cho shop; vật phẩm ngoại hình mua một lần, được sở hữu vĩnh viễn trên thiết bị và có thể trang bị trong tab Ngoại hình của Cửa hàng.
+`clearPersistentGameData()` chỉ xóa các key trên. Trạng thái ván đang chơi, level hiện tại và hint không được lưu qua lần tải lại. Xu được dùng cho shop; vật phẩm ngoại hình mua một lần, được sở hữu vĩnh viễn trên thiết bị và có thể trang bị trong tab Ngoại hình của Cửa hàng. Key `highScore` cũ không còn được đọc, ghi hoặc xóa.
 
 ## 6. Tài nguyên và đường dẫn
 
-- Ảnh phát hành là WebP trong `public/assets/images/`; bộ thẻ mặc định gồm 1.000 ảnh.
+- Ảnh phát hành là WebP trong `public/assets/images/`; bộ thẻ mặc định gồm 1.000 ảnh. Mỗi chủ đề ảnh khai báo `assetFolder`, `assetPrefix` và `imageCount` trong `themeCatalog.js`; khi bổ sung ảnh, cập nhật số lượng tại đó.
 - Âm thanh ở `public/assets/sounds/`.
 - `vite.config.js` đặt `base: '/MemoryMatchV1.1a/'` cho GitHub Pages.
 - JavaScript dùng `import.meta.env.BASE_URL` cho ảnh thẻ và âm thanh. Không thay bằng đường dẫn tuyệt đối `/assets/...` trong JavaScript.

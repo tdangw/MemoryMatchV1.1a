@@ -59,7 +59,7 @@ export const SHOP_ITEMS = Object.freeze([
     id: "reveal-4",
     icon: "puzzle",
     title: "Xem trước 4 thẻ",
-    price: 50,
+    price: 5,
     type: "reveal-random",
     value: 4,
   },
@@ -67,9 +67,17 @@ export const SHOP_ITEMS = Object.freeze([
     id: "reveal-8",
     icon: "puzzle",
     title: "Xem trước 8 thẻ",
-    price: 90,
+    price: 10,
     type: "reveal-random",
     value: 8,
+  },
+  {
+    id: "reveal-12",
+    icon: "puzzle",
+    title: "Xem trước 12 thẻ",
+    price: 15,
+    type: "reveal-random",
+    value: 12,
   },
   {
     id: "reveal-all",
@@ -80,5 +88,7 @@ export const SHOP_ITEMS = Object.freeze([
 ]);
 
 export function getShopItemPrice(item, { unmatchedTileCount = 0 } = {}) {
-  return item.type === "reveal-all" ? unmatchedTileCount * 10 : item.price;
+  return item.type === "reveal-all"
+    ? Math.ceil(unmatchedTileCount * 1.25)
+    : item.price;
 }

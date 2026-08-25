@@ -15,40 +15,15 @@
   background:
     linear-gradient(
       130deg,
-      transparent 34%,
-      rgb(116 194 181 / 46%) 48%,
-      transparent 62%
+      transparent 40%,
+      rgb(166 219 199 / 18%) 50%,
+      transparent 60%
     ),
-    linear-gradient(35deg, #1d2d55, #4d6192 50%, #453766);
+    linear-gradient(135deg, #30496f, #61799a 52%, #5c6385);
 }
 
 .card-back--candy {
-  position: relative;
-  isolation: isolate;
   background: linear-gradient(135deg, #ff6b9c, #9a67e7 48%, #5ac8e9);
-}
-
-.card-back--candy::after {
-  position: absolute;
-  inset: 41% 22%;
-  content: "";
-  border: 1px solid rgb(255 255 255 / 58%);
-  border-radius: 999px;
-  background: linear-gradient(
-    90deg,
-    rgb(255 238 191 / 88%),
-    rgb(255 255 255 / 68%)
-  );
-  box-shadow: 0 2px 7px rgb(69 33 120 / 22%);
-  pointer-events: none;
-}
-
-.tile.card-back--candy::after {
-  display: none;
-}
-.tile.card-back--candy:has(img.hidden)::after,
-.appearance-preview.card-back--candy::after {
-  display: block;
 }
 
 .tile-combo-effect {

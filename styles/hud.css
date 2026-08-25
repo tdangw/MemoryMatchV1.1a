@@ -31,7 +31,7 @@
   width: min(var(--board-width, 100%), calc(100vw - 12px));
   min-height: 34px;
   max-width: none;
-  padding: 0 38px;
+  padding: 0 74px;
   margin: 0 auto 8px;
   box-sizing: border-box;
   border-radius: 9px;
@@ -91,6 +91,9 @@
 }
 .game-progress-hud .stat-progress .ui-icon {
   color: #ffd166;
+}
+.game-progress-hud .stat-hints .ui-icon {
+  color: #79c7ff;
 }
 
 @media screen and (width <= 600px) {
@@ -170,7 +173,7 @@
 
   #game-title.game-hud {
     min-height: 30px;
-    padding: 0 34px;
+    padding: 0 64px;
     margin-bottom: 6px;
   }
 
@@ -196,7 +199,7 @@
 
   #game-title.game-hud {
     min-height: 34px;
-    padding: 0 38px;
+    padding: 0 74px;
     margin-bottom: 4px;
   }
 
@@ -299,7 +302,14 @@
   border-radius: 12px;
   background: rgb(16 22 47 / 96%);
   box-shadow: 0 12px 30px rgb(0 0 0 / 35%);
+  max-height: calc(100dvh - 130px);
+  overflow-y: auto;
+  scrollbar-width: none;
   z-index: 12001;
+}
+
+.game-actions-menu::-webkit-scrollbar {
+  display: none;
 }
 
 .game-actions-menu[hidden] {

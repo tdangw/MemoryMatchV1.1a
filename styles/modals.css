@@ -317,6 +317,11 @@
 .reward-container.app-modal {
   padding: 22px;
   text-align: center;
+  width: min(370px, calc(100vw - 36px));
+  border-color: rgb(255 255 255 / 16%);
+  border-radius: 24px;
+  background: linear-gradient(150deg, rgb(24 38 64 / 97%), rgb(10 20 38 / 97%));
+  color: #f5f7fb;
 }
 
 @keyframes app-overlay-in {
@@ -439,11 +444,6 @@
   height: 24px;
 }
 
-#difficulty-modal .app-button {
-  justify-content: flex-start;
-  text-align: left;
-}
-
 /* Chọn chế độ chơi dùng cùng hệ màu với menu chính. */
 #difficulty-modal .app-modal {
   width: min(370px, calc(100vw - 36px));
@@ -451,6 +451,12 @@
   border-radius: 24px;
   background: linear-gradient(150deg, rgb(24 38 64 / 97%), rgb(10 20 38 / 97%));
   color: #f5f7fb;
+}
+
+#settings-modal .app-modal,
+#info-modal .app-modal,
+#version-modal .app-modal {
+  width: min(370px, calc(100vw - 36px));
 }
 
 #difficulty-modal .app-modal__header {
@@ -471,23 +477,94 @@
 }
 
 #difficulty-modal .app-modal__body {
+  display: grid;
+  min-height: 0;
+  gap: 14px;
   color: rgb(245 247 251 / 82%);
 }
 
-#difficulty-modal .app-modal__footer {
-  border-top-color: rgb(255 255 255 / 11%);
+.difficulty-content {
+  display: grid;
+  gap: 14px;
 }
 
-#difficulty-modal .app-button--primary {
-  justify-content: flex-start;
+.difficulty-theme {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
   border-color: rgb(255 255 255 / 11%);
+  border: 1px solid rgb(255 255 255 / 11%);
+  border-radius: 14px;
+  background: rgb(7 17 37 / 32%);
+}
+
+.difficulty-theme > .ui-icon {
+  width: 28px;
+  height: 28px;
+  padding: 3px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #f5c260, #c86a32);
+  color: #10233f;
+}
+
+.difficulty-theme small,
+.difficulty-theme strong {
+  display: block;
+}
+
+.difficulty-theme small {
+  color: rgb(245 247 251 / 62%);
+  font-size: 0.72rem;
+}
+
+.difficulty-theme strong {
+  color: #f5f7fb;
+  font-size: 0.92rem;
+}
+
+.difficulty-theme__change {
+  min-height: 32px;
+  padding: 6px 11px;
+  border: 1px solid rgb(242 191 91 / 42%);
+  border-radius: 9px;
+  background: rgb(242 191 91 / 16%);
+  color: #ffe09a;
+  font: 700 0.76rem/1 "Segoe UI", sans-serif;
+}
+
+.difficulty-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.difficulty-option {
+  display: grid;
+  min-height: 76px;
+  grid-template-rows: 26px auto;
+  justify-items: center;
+  align-content: center;
+  gap: 7px;
+  padding: 10px 8px;
+  border: 1px solid rgb(255 255 255 / 11%);
+  border-radius: 14px;
   background: rgb(39 57 88 / 78%);
   color: #f5f7fb;
+  font: 700 0.88rem/1.15 "Segoe UI", sans-serif;
   box-shadow: 0 5px 15px rgb(0 0 0 / 18%);
 }
 
-#difficulty-modal .app-button--primary:hover,
-#difficulty-modal .app-button--primary:focus-visible {
+.difficulty-option .ui-icon {
+  width: 22px;
+  height: 22px;
+}
+
+.difficulty-option:hover,
+.difficulty-option:focus-visible,
+.difficulty-theme__change:hover,
+.difficulty-theme__change:focus-visible {
   border-color: rgb(242 191 91 / 42%);
   background: rgb(55 78 116 / 94%);
   box-shadow: 0 8px 20px rgb(0 0 0 / 28%);

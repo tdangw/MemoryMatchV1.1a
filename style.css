@@ -273,17 +273,17 @@ button {
 .fog {
   position: fixed;
   bottom: 0;
-  left: -500px;
-  width: 1200px;
-  height: 300px;
+  left: -420px;
+  width: 1040px;
+  height: 220px;
   background: radial-gradient(
     ellipse at center,
-    rgb(255 255 255 / 15%),
+    rgb(255 255 255 / 8%),
     rgb(255 255 255 / 0%)
   );
-  filter: blur(60px);
+  filter: blur(42px);
   z-index: -1;
-  animation: fogMove 120s linear infinite;
+  animation: fogMove 180s linear infinite;
   pointer-events: none;
 }
 
@@ -301,32 +301,36 @@ button {
 .cloud {
   position: fixed;
   top: 100px;
-  left: -400px;
-  width: 400px;
-  height: 120px;
+  left: -360px;
+  width: 360px;
+  height: 104px;
   background: radial-gradient(
     ellipse at center,
-    rgb(255 255 255 / 60%) 0%,
-    rgb(200 200 200 / 10%) 80%
+    rgb(255 255 255 / 28%) 0%,
+    rgb(200 200 200 / 5%) 80%
   );
   border-radius: 50%;
-  filter: blur(40px);
-  animation: cloudFloat 90s linear infinite;
+  filter: blur(30px);
+  animation: cloudFloat 150s linear infinite;
   z-index: 0; /* Muốn có chiều sâu → dùng z-index: -2 cho sương mù, z-index: 0 cho mây */
   pointer-events: none;
 }
 
-@keyframes cloudFloat {
-  0% {
-    transform: translateX(0);
-  }
+/* Cài đặt Hiệu ứng nền điều khiển mọi lớp động, không chỉ sao băng. */
+body.meteor-effects-disabled .fog,
+body.meteor-effects-disabled .cloud,
+body.meteor-effects-disabled .shooting-star {
+  display: none;
+}
 
-  100% {
-    transform: translateX(150vw);
+@media (prefers-reduced-motion: reduce) {
+  .fog,
+  .cloud {
+    display: none;
   }
 }
 
-@keyframes cloudMove {
+@keyframes cloudFloat {
   0% {
     transform: translateX(0);
   }

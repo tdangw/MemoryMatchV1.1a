@@ -38,6 +38,7 @@
         <span class="info stat-card stat-misses"><span class="stat-label">MISS</span><span id="misses">0</span></span>
         <span class="info stat-card stat-combo"><span class="stat-label">COMBO</span><span id="combo">0</span></span>
         <span class="info stat-card stat-progress" id="pair-progress"><span data-icon="trophy"></span><span id="matched-pairs">0</span>/<span id="total-pairs">0</span></span>
+        <span class="info stat-card stat-hints" aria-label="Lượt gợi ý còn lại"><span data-icon="search"></span><span id="hint">0</span></span>
       </div>
 
       <div id="game-title" class="game-hud">
@@ -57,11 +58,17 @@
           <button id="btn-full-reset" class="game-action-item" type="button" data-icon="wand">Xóa dữ liệu</button>
           <button id="btn-game-settings" class="game-action-item" type="button" data-icon="settings">Cài đặt</button>
           <button id="btn-shop" class="game-action-item" type="button" data-icon="shop">Cửa hàng</button>
+          <button id="btn-game-help" class="game-action-item" type="button" data-icon="book">Hướng dẫn</button>
+          <button id="btn-game-info" class="game-action-item" type="button" data-icon="info">Thông tin</button>
+        </div>
+
+        <div class="game-quick-actions" aria-label="Hỗ trợ nhanh">
+          <button id="btn-buy-time" class="game-quick-action" type="button" aria-label="Mua thời gian" data-icon="timer"></button>
+          <button id="btn-preview-cards" class="game-quick-action" type="button" aria-label="Xem trước thẻ" data-icon="eye"></button>
         </div>
 
         <button id="btn-hint" class="game-hint-fab" type="button" aria-label="Dùng gợi ý">
           <span data-icon="search"></span>
-          <span id="hint">0</span>
         </button>
 
         <div class="game-stats" aria-label="Thông tin màn chơi">
@@ -118,6 +125,16 @@
             aria-label="Âm lượng nhạc"
           />
           <output id="music-volume-value">35%</output>
+        </div>
+      </div>
+
+      <div class="settings-control">
+        <div class="settings-row">
+          <label for="toggle-meteor-effects">Hiệu ứng nền</label>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggle-meteor-effects" checked />
+            <span class="slider"></span>
+          </label>
         </div>
       </div>
 

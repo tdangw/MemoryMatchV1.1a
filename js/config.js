@@ -8,6 +8,7 @@ export const GAME_CONFIG = Object.freeze({
       tileCount: 12,
       columns: 4,
       mobileColumns: 3,
+      // Mốc thử nghiệm để kiểm tra nhanh luồng hết giờ; phát hành đổi lại 60.
       timeSeconds: 6,
       coinReward: Object.freeze({ base: 30, speedMultiplier: 0.35 }),
     }),

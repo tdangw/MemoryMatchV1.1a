@@ -3,6 +3,7 @@ import { GAME_CONFIG } from "./config.js";
 import { gameState } from "./gameState.js";
 import { getCardBackClass } from "./appearance.js";
 import { initLogic } from "./logic.js";
+import { getThemeCards } from "./themeCatalog.js";
 
 const MOBILE_BREAKPOINT = 600;
 const MAX_TILE_SIZE = 180;
@@ -72,21 +73,13 @@ export function createGrid(
   const totalTiles = tileCount;
   const numberOfPairs = Math.floor(totalTiles / 2);
 
-  const availableImages = Array.from(
-    { length: GAME_CONFIG.cardImages.count },
-    (_, i) => i + 1,
-  );
-  shuffleArray(availableImages);
-
-  // ✅ Chọn ảnh không trùng → mỗi ảnh dùng đúng 2 lần
-  const selectedImages = availableImages.slice(0, numberOfPairs);
-  let imageIds = [];
-  selectedImages.forEach((id) => {
-    imageIds.push(id, id);
+  const selectedCards = getThemeCards(gameState.appearance.theme, numberOfPairs);
+  let cards = [];
+  selectedCards.forEach((card) => {
+    cards.push(card, card);
   });
 
-  // 🔀 Trộn mảng ảnh cuối cùng
-  shuffleArray(imageIds);
+  shuffleArray(cards);
 
   // Chuẩn bị DOM
   const gridContainer = document.getElementById("grid-container");
@@ -99,7 +92,7 @@ export function createGrid(
   updateGridLayout();
   requestAnimationFrame(updateGridLayout);
 
-  imageIds.forEach((imageId, idx) => {
+  cards.forEach((cardData, idx) => {
     const tileId = `tile-${idx}`;
 
     const tile = document.createElement("div");
@@ -108,12 +101,12 @@ export function createGrid(
     tile.id = tileId;
 
     const img = document.createElement("img");
-    img.src = `${import.meta.env.BASE_URL}assets/images/themes/${GAME_CONFIG.cardImages.defaultTheme}/MM-image (${imageId}).webp`;
-    img.alt = `MM-image ${imageId}`;
+    img.src = cardData.src;
+    img.alt = cardData.alt;
     img.draggable = false;
     img.classList.add("hidden");
 
-    tile.dataset.imageId = imageId;
+    tile.dataset.imageId = cardData.id;
     tile.appendChild(img);
     gridContainer.appendChild(tile);
   });

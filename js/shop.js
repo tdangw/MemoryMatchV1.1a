@@ -1,4 +1,4 @@
-import { gameState, increaseCoins, spendCoins } from "./gameState.js";
+import { gameState, spendCoins } from "./gameState.js";
 import {
   updateCoinDisplay,
   updateHintDisplay,
@@ -14,12 +14,72 @@ import { saveAppearance, saveCoins } from "./persistence.js";
 import { CARD_BACKS, FLIP_EFFECTS, getCardBackClass } from "./appearance.js";
 import { SHOP_ITEMS, getShopItemPrice } from "./shopCatalog.js";
 import { GAMEPLAY_TIMING } from "./gameplayTuning.js";
+import { THEMES, getTheme } from "./themeCatalog.js";
 
-export function openShopOverlay() {
+export function openQuickAssistOverlay(kind) {
   if (gameState.isLocked || gameState.isPaused) return;
 
   const roundId = gameState.roundId;
+  const isTime = kind === "time";
+  const items = SHOP_ITEMS.filter((item) =>
+    isTime ? item.type === "time" : item.type.startsWith("reveal-"),
+  ).map((item) => ({
+    ...item,
+    price: getShopItemPrice(item, {
+      unmatchedTileCount: document.querySelectorAll(".tile:not(.matched)").length,
+    }),
+  }));
+  if (!items.length) return;
+
   gameState.isPaused = true;
+  const content = document.createElement("div");
+  content.className = "quick-assist";
+  const choices = document.createElement("div");
+  choices.className = "quick-assist__choices";
+  content.append(choices);
+
+  const modal = openAppModal({
+    id: `quick-${kind}-modal`,
+    icon: isTime ? "timer" : "eye",
+    title: isTime ? "Mua thời gian" : "Xem trước thẻ",
+    content,
+    size: "small",
+    onClose: () => {
+      if (gameState.roundId === roundId) gameState.isPaused = false;
+    },
+  });
+
+  const wallet = document.createElement("div");
+  wallet.className = "shop-wallet quick-assist-wallet";
+  wallet.setAttribute("aria-label", "Số Xu hiện có");
+  wallet.append(document.createTextNode(String(gameState.coins)), createIcon("coin"));
+  const closeButton = modal.panel.querySelector(".app-modal__close");
+  modal.panel
+    .querySelector(".app-modal__header")
+    .insertBefore(wallet, closeButton);
+
+  items.forEach((item) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "quick-assist__choice";
+    const label = document.createElement("strong");
+    label.textContent = isTime ? `+${item.value} giây` : item.title;
+    const price = document.createElement("span");
+    price.append(document.createTextNode(`${item.price} `), createIcon("coin"));
+    button.append(createIcon(item.icon), label, price);
+    button.addEventListener("click", () => {
+      if (!handleBuyItem(item, roundId)) return;
+      modal.close();
+    });
+    choices.append(button);
+  });
+}
+
+export function openShopOverlay({ fromMenu = false } = {}) {
+  if (!fromMenu && (gameState.isLocked || gameState.isPaused)) return;
+
+  const roundId = gameState.roundId;
+  if (!fromMenu) gameState.isPaused = true;
 
   const content = document.createElement("div");
   content.className = "shop-content";
@@ -37,9 +97,10 @@ export function openShopOverlay() {
     content,
     size: "large",
     onClose: () => {
-      if (gameState.roundId === roundId) gameState.isPaused = false;
+      if (!fromMenu && gameState.roundId === roundId) gameState.isPaused = false;
     },
   });
+  modal.overlay.dataset.fromMenu = String(fromMenu);
 
   const wallet = document.createElement("div");
   wallet.className = "shop-wallet";
@@ -59,8 +120,17 @@ export function openShopOverlay() {
   const appearanceTab = createTab("Ngoại hình", false, () =>
     renderAppearance(grid, roundId, modal),
   );
-  tabs.append(consumableTab, appearanceTab);
-  renderConsumables(grid, roundId, modal, refreshConsumables);
+  const themesTab = createTab("Chủ đề", false, () =>
+    renderThemes(grid, roundId, modal),
+  );
+  if (fromMenu) {
+    tabs.classList.add("shop-tabs--catalog");
+    tabs.append(appearanceTab, themesTab);
+    renderAppearance(grid, roundId, modal);
+  } else {
+    tabs.append(consumableTab, appearanceTab, themesTab);
+    renderConsumables(grid, roundId, modal, refreshConsumables);
+  }
 }
 
 function createTab(label, selected, onSelect) {
@@ -100,7 +170,7 @@ function renderConsumables(grid, roundId, modal, refresh) {
     button.className = "app-button app-button--purchase shop-buy-button";
     button.append(document.createTextNode(String(price)), createIcon("coin"));
     button.onclick = () =>
-      openPurchaseConfirmation({ ...item, price }, roundId, modal);
+      openPurchaseConfirmation({ ...item, price }, roundId, modal, refresh);
 
     card.appendChild(title);
     card.appendChild(button);
@@ -127,6 +197,58 @@ function renderAppearance(grid, roundId, modal) {
     roundId,
     modal,
   );
+}
+
+function renderThemes(grid, roundId, modal) {
+  grid.className = "shop-item-grid shop-item-grid--themes";
+  grid.replaceChildren();
+  const group = document.createElement("section");
+  group.className = "appearance-group theme-group";
+  const heading = document.createElement("h3");
+  heading.textContent = "Chủ đề thẻ";
+  const choices = document.createElement("div");
+  choices.className = "theme-choice-grid";
+
+  THEMES.forEach((theme) => {
+    const owned = gameState.appearance.ownedThemes.includes(theme.id);
+    const equipped = gameState.appearance.theme === theme.id;
+    const card = document.createElement("article");
+    card.className = `theme-choice${equipped ? " is-equipped" : ""}`;
+    const preview = document.createElement("div");
+    preview.className = "appearance-preview theme-preview";
+    preview.append(createIcon(theme.icon));
+    const name = document.createElement("strong");
+    name.textContent = theme.title;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "app-button app-button--purchase shop-buy-button";
+
+    if (theme.comingSoon) {
+      button.textContent = "Sắp có";
+      button.disabled = true;
+    } else if (equipped) {
+      button.classList.add("appearance-action--equipped");
+      button.textContent = "Đang dùng";
+      button.disabled = true;
+    } else if (owned) {
+      button.classList.add("appearance-action--equip");
+      button.textContent = "Trang bị";
+      button.onclick = () => equipTheme(theme.id, roundId, grid, modal);
+    } else {
+      button.append(document.createTextNode(String(theme.price)), createIcon("coin"));
+      button.onclick = () =>
+        openPurchaseConfirmation(
+          { ...theme, type: "theme" },
+          roundId,
+          modal,
+          () => renderThemes(grid, roundId, modal),
+        );
+    }
+    card.append(preview, name, button);
+    choices.append(card);
+  });
+  group.append(heading, choices);
+  grid.append(group);
 }
 
 function renderAppearanceGroup(grid, title, type, items, roundId, modal) {
@@ -180,6 +302,7 @@ function renderAppearanceGroup(grid, title, type, items, roundId, modal) {
           { ...item, type: "appearance", appearanceType: type },
           roundId,
           modal,
+          () => renderAppearance(grid, roundId, modal),
         );
     }
     card.append(name, button);
@@ -189,14 +312,14 @@ function renderAppearanceGroup(grid, title, type, items, roundId, modal) {
   grid.append(group);
 }
 
-function openPurchaseConfirmation(item, roundId, shopModal) {
+function openPurchaseConfirmation(item, roundId, shopModal, onPurchase) {
   let isSubmitting = false;
   const content = document.createElement("div");
   content.className = "shop-confirmation";
 
   const message = document.createElement("p");
   message.textContent =
-    item.type === "appearance"
+    item.type === "appearance" || item.type === "theme"
       ? `Mua và trang bị ${item.title}?`
       : `Mua ${item.title}?`;
 
@@ -220,12 +343,12 @@ function openPurchaseConfirmation(item, roundId, shopModal) {
         onClick: (closeConfirmation) => {
           if (isSubmitting) return true;
           isSubmitting = true;
-          if (!handleBuyItem(item, roundId)) {
+          if (!handleBuyItem(item, roundId, shopModal.overlay.dataset.fromMenu === "true")) {
             isSubmitting = false;
             return true;
           }
           closeConfirmation();
-          shopModal.close();
+          onPurchase?.();
           return true;
         },
       },
@@ -234,8 +357,8 @@ function openPurchaseConfirmation(item, roundId, shopModal) {
 }
 
 // Mua vật phẩm
-function handleBuyItem(item, roundId) {
-  if (gameState.roundId !== roundId || gameState.isLocked) return false;
+function handleBuyItem(item, roundId, fromMenu = false) {
+  if (gameState.roundId !== roundId || (!fromMenu && gameState.isLocked)) return false;
 
   if (item.type === "appearance") {
     const ownedKey =
@@ -246,6 +369,10 @@ function handleBuyItem(item, roundId) {
       showShopMessage("Bạn đã sở hữu vật phẩm này.", "info");
       return false;
     }
+  }
+  if (item.type === "theme" && gameState.appearance.ownedThemes.includes(item.id)) {
+    showShopMessage("Bạn đã sở hữu chủ đề này.", "info");
+    return false;
   }
 
   if (!spendCoins(item.price)) {
@@ -266,7 +393,15 @@ function handleBuyItem(item, roundId) {
     gameState.appearance[item.appearanceType] = item.id;
     saveAppearance(gameState.appearance);
     if (item.appearanceType === "cardBack") applyEquippedCardBack();
-    showShopMessage(`Đã trang bị ${item.title}`);
+    showShopMessage(`Đã mua và trang bị ${item.title}`);
+    return true;
+  }
+
+  if (item.type === "theme") {
+    gameState.appearance.ownedThemes.push(item.id);
+    gameState.appearance.theme = item.id;
+    saveAppearance(gameState.appearance);
+    showShopMessage(`Đã mua và trang bị chủ đề ${item.title}`);
     return true;
   }
 
@@ -275,13 +410,13 @@ function handleBuyItem(item, roundId) {
       gameState.remainingTime += item.value;
       updateTimerDisplay(gameState.remainingTime);
       animateIconToTarget("timer", "#timer");
-      showShopMessage(`+${item.value}s thời gian`);
+      showShopMessage(`Đã mua +${item.value}s thời gian`);
       break;
     case "hint":
       gameState.hints += item.value;
       updateHintDisplay(gameState.hints);
       animateIconToTarget("search", "#hint");
-      showShopMessage(`+${item.value} gợi ý`);
+      showShopMessage(`Đã mua +${item.value} gợi ý`);
       break;
     case "reveal-random":
       revealRandomTiles(
@@ -289,15 +424,25 @@ function handleBuyItem(item, roundId) {
         GAMEPLAY_TIMING.shopRevealDurationMs,
         roundId,
       );
-      showShopMessage(`Đang xem trước ${item.value} thẻ`);
+      showShopMessage(`Đã mua xem trước ${item.value} thẻ`);
       break;
     case "reveal-all":
       revealAllTiles(GAMEPLAY_TIMING.shopRevealDurationMs, roundId);
-      showShopMessage("Đang xem trước tất cả thẻ");
+      showShopMessage("Đã mua xem trước tất cả thẻ");
       break;
   }
 
   return true;
+}
+
+function equipTheme(id, roundId, grid, modal) {
+  if (gameState.roundId !== roundId) return;
+  const theme = getTheme(id);
+  if (theme.comingSoon || !gameState.appearance.ownedThemes.includes(id)) return;
+  gameState.appearance.theme = id;
+  saveAppearance(gameState.appearance);
+  showShopMessage(`Đã trang bị chủ đề ${theme.title}`);
+  renderThemes(grid, roundId, modal);
 }
 
 function equipAppearance(type, id, roundId, grid, modal) {
@@ -327,6 +472,9 @@ function revealRandomTiles(
   duration = GAMEPLAY_TIMING.shopRevealDurationMs,
   roundId = gameState.roundId,
 ) {
+  const grid = document.getElementById("grid-container");
+  gameState.isLocked = true;
+  grid?.classList.add("is-locked");
   const tiles = Array.from(
     document.querySelectorAll(".tile:not(.matched) img.hidden"),
   );
@@ -346,6 +494,8 @@ function revealRandomTiles(
       img.classList.add("hidden");
       img.classList.remove("highlight-tile");
     });
+    gameState.isLocked = false;
+    grid?.classList.remove("is-locked");
   }, duration);
 }
 
@@ -353,6 +503,9 @@ function revealAllTiles(
   duration = GAMEPLAY_TIMING.shopRevealDurationMs,
   roundId = gameState.roundId,
 ) {
+  const grid = document.getElementById("grid-container");
+  gameState.isLocked = true;
+  grid?.classList.add("is-locked");
   const tiles = document.querySelectorAll(".tile:not(.matched) img.hidden");
 
   tiles.forEach((img) => {
@@ -368,5 +521,7 @@ function revealAllTiles(
       img.classList.add("hidden");
       img.classList.remove("highlight-tile");
     });
+    gameState.isLocked = false;
+    grid?.classList.remove("is-locked");
   }, duration);
 }

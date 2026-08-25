@@ -3,9 +3,12 @@
 import { syncDefaultMusic } from "./sound.js";
 import { showSettingsPanel } from "./settings.js";
 import { gameState, resetGame } from "./gameState.js";
-import { openAppModal } from "./modal.js";
+import { openAppModal, showAppToast } from "./modal.js";
 import { createIcon } from "./icons.js";
 import { APP_VERSION } from "./appMeta.js";
+import { THEMES, getTheme } from "./themeCatalog.js";
+import { saveAppearance } from "./persistence.js";
+import { openShopOverlay } from "./shop.js";
 
 let onStartGame = () => {};
 
@@ -82,6 +85,18 @@ export function createMainMenu() {
       },
     },
     {
+      icon: "collection",
+      text: "Bộ sưu tập",
+      action: () => {
+        showCollectionModal();
+      },
+    },
+    {
+      icon: "shop",
+      text: "Cửa hàng",
+      action: () => openShopOverlay({ fromMenu: true }),
+    },
+    {
       icon: "info",
       text: "Thông tin",
       action: () => {
@@ -125,41 +140,134 @@ export function showDifficultyOverlay(fromGame = false) {
     onStartGame(1);
   };
 
-  openAppModal({
+  const content = document.createElement("div");
+  content.className = "difficulty-content";
+  const activeTheme = getTheme(gameState.appearance.theme);
+  const themeRow = document.createElement("div");
+  themeRow.className = "difficulty-theme";
+  themeRow.append(createIcon(activeTheme.icon));
+  const themeText = document.createElement("div");
+  const themeLabel = document.createElement("small");
+  themeLabel.textContent = "Chủ đề đang dùng";
+  const themeName = document.createElement("strong");
+  themeName.textContent = activeTheme.title;
+  themeText.append(themeLabel, themeName);
+  const changeThemeButton = document.createElement("button");
+  changeThemeButton.type = "button";
+  changeThemeButton.className = "difficulty-theme__change";
+  changeThemeButton.textContent = "Đổi";
+  themeRow.append(themeText, changeThemeButton);
+
+  const options = document.createElement("div");
+  options.className = "difficulty-options";
+  const modal = openAppModal({
     id: "difficulty-modal",
     icon: "play",
     title: "Chọn chế độ chơi",
-    content: "<p>Chọn độ khó phù hợp để bắt đầu.</p>",
-    actions: [
-      {
-        label: "Dễ",
-        icon: "status-easy",
-        variant: "primary",
-        onClick: (close) => startMode("easy", close),
-      },
-      {
-        label: "Trung bình",
-        icon: "status-normal",
-        variant: "primary",
-        onClick: (close) => startMode("normal", close),
-      },
-      {
-        label: "Khó",
-        icon: "status-hard",
-        variant: "primary",
-        onClick: (close) => startMode("hard", close),
-      },
-      {
-        label: "Siêu khó",
-        icon: "status-super-hard",
-        variant: "primary",
-        onClick: (close) => startMode("superHard", close),
-      },
-    ],
+    content,
     onClose: () => {
       if (modeSelected) return;
       gameState.isPaused = false;
       handleCancelAction(fromGame);
+    },
+  });
+  changeThemeButton.onclick = () => {
+    modal.close();
+    setTimeout(showCollectionModal, 180);
+  };
+  [
+    ["easy", "Dễ", "status-easy"],
+    ["normal", "Trung bình", "status-normal"],
+    ["hard", "Khó", "status-hard"],
+    ["superHard", "Siêu khó", "status-super-hard"],
+  ].forEach(([mode, label, icon]) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "difficulty-option";
+    button.append(createIcon(icon), document.createTextNode(label));
+    button.onclick = () => startMode(mode, modal.close);
+    options.append(button);
+  });
+  content.append(themeRow, options);
+}
+
+export function showCollectionModal({ fromGame = false } = {}) {
+  if (fromGame) gameState.isPaused = true;
+  const content = document.createElement("div");
+  content.className = "collection-content";
+  const modal = openAppModal({
+    id: "collection-modal",
+    icon: "collection",
+    title: "Bộ sưu tập",
+    content,
+    size: "large",
+    onClose: () => {
+      if (fromGame) gameState.isPaused = false;
+      syncDefaultMusic(gameState.settings);
+    },
+  });
+
+  const render = () => {
+    content.replaceChildren();
+    const intro = document.createElement("p");
+    intro.textContent = "Chọn một chủ đề đã sở hữu để dùng cho màn chơi tiếp theo.";
+    const list = document.createElement("div");
+    list.className = "collection-theme-list";
+    THEMES.forEach((theme) => {
+      const owned = gameState.appearance.ownedThemes.includes(theme.id);
+      const equipped = gameState.appearance.theme === theme.id;
+      const item = document.createElement("article");
+      item.className = `collection-theme${equipped ? " is-equipped" : ""}`;
+      const preview = document.createElement("span");
+      preview.className = "collection-theme__preview";
+      preview.append(createIcon(theme.icon));
+      const details = document.createElement("div");
+      const name = document.createElement("strong");
+      name.textContent = theme.title;
+      details.append(name);
+      item.append(preview, details);
+      if (equipped) {
+        const status = document.createElement("span");
+        status.className = "collection-theme__status";
+        status.textContent = "Đang dùng";
+        item.append(status);
+      } else if (owned) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "app-button app-button--purchase collection-theme__equip";
+        button.textContent = "Trang bị";
+        button.onclick = () => {
+          gameState.appearance.theme = theme.id;
+          saveAppearance(gameState.appearance);
+          render();
+          showAppToast(`Đã trang bị chủ đề ${theme.title}.`, {
+            tone: "info",
+          });
+        };
+        item.append(button);
+      } else {
+        const status = document.createElement("span");
+        status.className = "collection-theme__status";
+        status.textContent = theme.comingSoon ? "Sắp có" : "Chưa sở hữu";
+        item.append(status);
+      }
+      list.append(item);
+    });
+    content.append(intro, list);
+  };
+  render();
+  return modal;
+}
+
+export function showGameInfoModal(title, message, icon = "info") {
+  gameState.isPaused = true;
+  openAppModal({
+    id: "info-modal",
+    icon,
+    title,
+    content: message,
+    onClose: () => {
+      gameState.isPaused = false;
     },
   });
 }
@@ -181,18 +289,14 @@ function handleCancelAction(fromGame) {
   }
 }
 
-// ==========================
-// 🌌 Hiệu ứng nền menu: Mưa sao băng + Mây + Sương mù
-// ==========================
+// Lớp nền động nhẹ: chỉ giữ hai mây để không che nền sao hoặc tăng chi phí vẽ trên mobile.
 const fog = document.createElement("div");
 fog.className = "fog";
 document.body.appendChild(fog);
 
 const cloudConfigs = [
-  { top: 80, delay: 0 },
-  { top: 180, delay: 30 },
-  { top: 250, delay: 20 },
-  { top: 300, delay: 45 },
+  { top: 110, delay: 0 },
+  { top: 280, delay: 55 },
 ];
 
 cloudConfigs.forEach(({ top, delay }) => {
@@ -202,33 +306,6 @@ cloudConfigs.forEach(({ top, delay }) => {
   cloud.style.animationDelay = `${delay}s`;
   document.body.appendChild(cloud);
 });
-
-function createShootingStar() {
-  const star = document.createElement("div");
-  star.classList.add("shooting-star");
-
-  const left = Math.random() * window.innerWidth;
-  const isBright = Math.random() < 0.15;
-  const length = isBright ? 160 : 60 + Math.random() * 100;
-  const duration = 0.3 + Math.random() * 5;
-  const brightness = isBright ? 0.95 : 0.4 + Math.random() * 0.5;
-
-  star.style.left = `${left}px`;
-  star.style.height = `${length}px`;
-  star.style.opacity = brightness;
-  star.style.animationDuration = `${duration}s`;
-
-  if (isBright) {
-    const head = document.createElement("div");
-    head.className = "star-head";
-    star.appendChild(head);
-  }
-
-  document.body.appendChild(star);
-  setTimeout(() => star.remove(), duration * 1000 + 100);
-}
-
-setInterval(createShootingStar, 800);
 
 window.addEventListener(
   "click",

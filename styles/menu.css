@@ -41,6 +41,7 @@
     "Segoe UI",
     sans-serif;
   letter-spacing: -0.04em;
+  text-align: center;
   text-shadow: 0 2px 14px rgb(242 191 91 / 20%);
   animation: none;
   transform: none;
@@ -112,9 +113,62 @@
   outline: none;
 }
 
-.menu-wrapper .menu-item:last-child {
-  margin-top: 2px;
-  background: rgb(75 40 51 / 72%);
+.collection-theme-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.collection-theme {
+  display: grid;
+  min-height: 126px;
+  grid-template-columns: 1fr;
+  grid-template-rows: 46px minmax(1.3em, auto) 32px;
+  align-items: center;
+  justify-items: center;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid rgb(255 255 255 / 10%);
+  border-radius: 12px;
+  background: rgb(28 49 82 / 56%);
+  text-align: center;
+}
+
+.collection-theme.is-equipped {
+  border-color: rgb(242 191 91 / 60%);
+}
+
+.collection-theme__preview {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #f5c260, #c86a32);
+  color: #10233f;
+}
+
+.collection-theme__preview .ui-icon {
+  width: 24px;
+  height: 24px;
+  stroke-width: 2;
+}
+
+.collection-theme strong,
+.collection-theme small {
+  display: block;
+}
+
+
+.collection-theme small,
+.collection-theme__status {
+  color: rgb(230 237 250 / 70%);
+  font-size: 0.76rem;
+}
+
+.collection-theme__equip {
+  padding: 7px 10px;
+  font-size: 0.78rem;
 }
 
 @media screen and (width <= 480px) {

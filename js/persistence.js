@@ -4,12 +4,11 @@ const STORAGE_KEYS = Object.freeze({
   music: "music",
   soundVolume: "soundVolume",
   musicVolume: "musicVolume",
+  meteorEffects: "meteorEffects",
   appearance: "appearance",
 });
 
 export function loadPersistentGameData() {
-  // Dọn dữ liệu kỷ lục cũ: điểm hiện chỉ đại diện cho lượt chơi đang diễn ra.
-  localStorage.removeItem("highScore");
   return {
     coins:
       Number.parseInt(localStorage.getItem(STORAGE_KEYS.coins) || "0", 10) || 0,
@@ -23,6 +22,7 @@ export function loadPersistentGameData() {
       musicVolume: Number(
         localStorage.getItem(STORAGE_KEYS.musicVolume) || 0.35,
       ),
+      meteorEffects: localStorage.getItem(STORAGE_KEYS.meteorEffects) !== "false",
     },
   };
 }
@@ -48,7 +48,6 @@ export function saveAppearance(appearance) {
 
 export function clearPersistentGameData() {
   Object.values(STORAGE_KEYS).forEach((key) => localStorage.removeItem(key));
-  localStorage.removeItem("highScore");
 }
 
 export function saveSetting(key, value) {

@@ -13,8 +13,7 @@
     "check": "node scripts/check-js.mjs"
   },
   "dependencies": {
-    "canvas-confetti": "^1.9.4",
-    "firebase": "^12.18.0"
+    "canvas-confetti": "^1.9.4"
   },
   "devDependencies": {
     "firebase-tools": "^15.28.1",

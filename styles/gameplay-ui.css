@@ -98,20 +98,19 @@
   top: 50%;
   right: 0;
   z-index: 12002;
-  min-width: 0;
-  width: auto;
-  min-height: 34px;
+  width: 30px;
+  height: 30px;
+  min-height: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  padding: 0 7px;
+  padding: 0;
   border: 0;
   border-radius: 9px;
   background: #f2bd3d;
   color: #5e4000;
   box-shadow: none;
-  font-size: 0.82rem;
+  font-size: 0.7rem;
   font-weight: 500;
   transform: translateY(-50%);
 }
@@ -121,6 +120,47 @@
   height: 18px;
   color: currentcolor;
   stroke-width: 2.25;
+}
+
+.game-quick-actions {
+  display: contents;
+}
+
+.game-quick-action {
+  position: absolute;
+  top: 50%;
+  z-index: 12002;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: rgb(255 255 255 / 13%);
+  color: #d9e8ff;
+  transform: translateY(-50%);
+}
+
+#btn-buy-time {
+  left: 40px;
+}
+
+#btn-preview-cards {
+  right: 40px;
+}
+
+.game-quick-action:hover,
+.game-quick-action:focus-visible {
+  background: rgb(255 255 255 / 22%);
+  color: #ffd166;
+  outline: none;
+  transform: translateY(-50%);
+}
+
+.game-quick-action .ui-icon {
+  width: 16px;
+  height: 16px;
 }
 
 .game-hint-fab:hover,
@@ -137,12 +177,69 @@
   margin: 0;
 }
 
+.quick-assist-wallet {
+  color: #9b6c12;
+}
+
+.quick-assist-wallet .ui-icon,
+.quick-assist__choice span .ui-icon {
+  width: 16px;
+  height: 16px;
+  color: #d49a1f;
+}
+
+.quick-assist__choices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.quick-assist__choice {
+  min-height: 78px;
+  display: grid;
+  place-items: center;
+  gap: 4px;
+  padding: 10px 6px;
+  border: 1px solid rgb(36 59 100 / 16%);
+  border-radius: 12px;
+  background: #fff;
+  color: #243b64;
+}
+
+.quick-assist__choice > .ui-icon {
+  width: 21px;
+  height: 21px;
+  color: #2167b1;
+}
+
+.quick-assist__choice strong {
+  font-size: 0.83rem;
+}
+
+.quick-assist__choice span {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: #9b6c12;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.quick-assist__choice:hover,
+.quick-assist__choice:focus-visible {
+  border-color: #d49a1f;
+  background: #fff8df;
+  outline: none;
+  transform: translateY(-1px);
+}
+
 @media screen and (width <= 600px) {
   .game-hint-fab {
     right: 0;
-    min-width: 0;
-    min-height: 30px;
-    padding: 0 6px;
+    width: 27px;
+    height: 27px;
+    min-height: 0;
+    padding: 0;
     border-radius: 9px;
     font-size: 0.72rem;
   }
@@ -150,6 +247,29 @@
   .game-hint-fab .ui-icon {
     width: 16px;
     height: 16px;
+  }
+
+  .game-quick-actions {
+    display: contents;
+  }
+
+  .game-quick-action {
+    width: 27px;
+    height: 27px;
+    border-radius: 7px;
+  }
+
+  .game-quick-action .ui-icon {
+    width: 15px;
+    height: 15px;
+  }
+
+  #btn-buy-time {
+    left: 34px;
+  }
+
+  #btn-preview-cards {
+    right: 35px;
   }
 }
 

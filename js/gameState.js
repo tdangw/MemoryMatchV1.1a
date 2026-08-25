@@ -28,6 +28,7 @@ export const gameState = {
     music: true,
     soundVolume: 0.4,
     musicVolume: 0.35,
+    meteorEffects: true,
   },
   fromDefeat: false, // ➕ biến cờ xác định đang gọi từ trạng thái "thua"
 };

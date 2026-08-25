@@ -3,11 +3,13 @@ import { openAppModal } from "./modal.js";
 import { applyEffectsSettings, syncDefaultMusic } from "./sound.js";
 import { saveSetting } from "./persistence.js";
 import { APP_VERSION } from "./appMeta.js";
+import { setMeteorEffectsEnabled } from "./backgroundEffects.js";
 
 const settingsContainer = document.getElementById("settings-container");
 const settingsHome = settingsContainer?.parentElement;
 const soundToggle = document.getElementById("toggle-sound");
 const musicToggle = document.getElementById("toggle-music");
+const meteorEffectsToggle = document.getElementById("toggle-meteor-effects");
 const soundVolume = document.getElementById("sound-volume");
 const musicVolume = document.getElementById("music-volume");
 const soundVolumeValue = document.getElementById("sound-volume-value");
@@ -34,6 +36,7 @@ function syncSettingsControls() {
   const settings = gameState.settings;
   if (soundToggle) soundToggle.checked = settings.sound;
   if (musicToggle) musicToggle.checked = settings.music;
+  if (meteorEffectsToggle) meteorEffectsToggle.checked = settings.meteorEffects;
   if (soundVolume) soundVolume.value = Math.round(settings.soundVolume * 100);
   if (musicVolume) musicVolume.value = Math.round(settings.musicVolume * 100);
   if (soundVolume) soundVolume.disabled = !settings.sound;
@@ -56,6 +59,13 @@ function bindSettingsControls() {
       saveGameSetting("music", musicToggle.checked);
       if (musicVolume) musicVolume.disabled = !musicToggle.checked;
       syncDefaultMusic(gameState.settings, musicToggle.checked);
+    };
+  }
+
+  if (meteorEffectsToggle) {
+    meteorEffectsToggle.onchange = () => {
+      saveGameSetting("meteorEffects", meteorEffectsToggle.checked);
+      setMeteorEffectsEnabled(meteorEffectsToggle.checked);
     };
   }
 

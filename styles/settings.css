@@ -13,14 +13,60 @@
 }
 
 #settings-container .toggle-switch {
+  position: relative;
+  display: inline-block;
   width: 50px;
   height: 26px;
   flex: 0 0 50px;
   background: transparent;
+  cursor: pointer;
 }
 
 #settings-container .toggle-switch::before {
   display: none;
+}
+
+#settings-container .toggle-switch input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+#settings-container .toggle-switch .slider {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 18%);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 16%);
+  transition: background 180ms ease;
+}
+
+#settings-container .toggle-switch .slider::after {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #d6e3f5;
+  box-shadow: 0 2px 5px rgb(0 0 0 / 28%);
+  content: "";
+  transition: transform 180ms ease, background 180ms ease;
+}
+
+#settings-container .toggle-switch input:checked + .slider {
+  background: #2f73b8;
+}
+
+#settings-container .toggle-switch input:checked + .slider::after {
+  transform: translateX(24px);
+  background: #fff;
+}
+
+#settings-container .toggle-switch input:focus-visible + .slider {
+  outline: 2px solid #ffd166;
+  outline-offset: 3px;
 }
 
 #settings-container .settings-row,

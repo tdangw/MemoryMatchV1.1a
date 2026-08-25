@@ -1,8 +1,12 @@
+import { THEMES, getUsableTheme } from "./themeCatalog.js";
+
 const DEFAULT_APPEARANCE = Object.freeze({
   cardBack: "classic",
   flipEffect: "bounce",
+  theme: "default",
   ownedCardBacks: ["classic"],
   ownedFlipEffects: ["bounce"],
+  ownedThemes: ["default"],
 });
 
 export const CARD_BACKS = Object.freeze([
@@ -99,6 +103,9 @@ export function normalizeAppearance(value = {}) {
     value.flipEffect,
     DEFAULT_APPEARANCE.flipEffect,
   );
+  const ownedThemes = ownedIds(THEMES, value.ownedThemes, DEFAULT_APPEARANCE.theme)
+    .filter((id) => getUsableTheme(id).id === id);
+  const requestedTheme = getUsableTheme(value.theme).id;
   return {
     cardBack: ownedCardBacks.includes(cardBack)
       ? cardBack
@@ -106,8 +113,12 @@ export function normalizeAppearance(value = {}) {
     flipEffect: ownedFlipEffects.includes(flipEffect)
       ? flipEffect
       : DEFAULT_APPEARANCE.flipEffect,
+    theme: ownedThemes.includes(requestedTheme)
+      ? requestedTheme
+      : DEFAULT_APPEARANCE.theme,
     ownedCardBacks,
     ownedFlipEffects,
+    ownedThemes,
   };
 }
 
