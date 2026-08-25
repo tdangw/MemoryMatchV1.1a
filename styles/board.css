@@ -64,6 +64,10 @@
   pointer-events: none;
 }
 
+.ad-banner-placeholder.is-native-admob span {
+  visibility: hidden;
+}
+
 .tile img {
   width: 100%;
   height: 100%;

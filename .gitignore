@@ -1,5 +1,6 @@
 node_modules/
 dist/
+.firebase/
 android/.gradle/
 android/app/build/
 *.keystore

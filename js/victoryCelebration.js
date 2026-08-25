@@ -1,4 +1,5 @@
 import { GAMEPLAY_TIMING } from "./gameplayTuning.js";
+import { hideGameplayBanner } from "./adMobService.js";
 import { showVictoryFireworks } from "./fireworkEffect.js";
 import { createIcon } from "./icons.js";
 import { createVictoryFlowerSceneMarkup } from "./victoryFlowerScene.js";
@@ -15,6 +16,7 @@ export function showVictoryCelebration({
   onMenu,
   settings,
 }) {
+  void hideGameplayBanner();
   document.getElementById("victory-celebration")?.remove();
 
   const { finalLevel, flowerGrowthDurationMs } = GAMEPLAY_TIMING.victoryCelebration;
