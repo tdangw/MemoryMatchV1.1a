@@ -5,7 +5,6 @@ import { sounds } from "./sound.js"; // ✅ Đã tách âm thanh
 import { openAppModal, showAppToast } from "./modal.js";
 import { createIcon } from "./icons.js";
 import confetti from "canvas-confetti";
-import { Capacitor } from "@capacitor/core";
 import { showVictoryFireworks } from "./fireworkEffect.js";
 import { clearPersistentGameData } from "./persistence.js";
 
@@ -156,9 +155,6 @@ export function showLevelRewardOverlay() {
 }
 
 function launchSummaryConfetti() {
-  // The preceding canvas fireworks already provide the celebration on Android.
-  // Avoid a second full-screen additive canvas in WebView, which causes visible flashes.
-  if (Capacitor.isNativePlatform() && Capacitor.getPlatform() === "android") return;
   confetti({
     particleCount: 150,
     spread: 70,

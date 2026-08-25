@@ -36,7 +36,6 @@ import {
 import { saveCoins } from "./persistence.js";
 import { configureLogic } from "./logic.js";
 import { GAMEPLAY_TIMING } from "./gameplayTuning.js";
-import { hideGameplayBanner, showGameplayBanner } from "./adMobService.js";
 
 let countdownInterval;
 let isAutoPaused = false;
@@ -54,7 +53,6 @@ export function initializeLevel(level) {
   document.body.classList.remove("game-is-paused");
   const gameContainer = document.getElementById("game-container");
   if (gameContainer) gameContainer.style.display = "flex";
-  void showGameplayBanner();
 
   const layout = getModeLayout(gameState.settings.mode || "easy");
   const roundId = beginRound();
@@ -319,9 +317,4 @@ configureLogic({ onNext: nextLevel, onMenu: returnToMainMenu });
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) pauseForBackground();
   else resumeFromBackground();
-});
-
-document.addEventListener("memory-match-app-state", (event) => {
-  if (event.detail?.isActive) resumeFromBackground();
-  else pauseForBackground();
 });

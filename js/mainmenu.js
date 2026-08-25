@@ -6,7 +6,6 @@ import { gameState, resetGame } from "./gameState.js";
 import { openAppModal } from "./modal.js";
 import { createIcon } from "./icons.js";
 import { APP_VERSION } from "./appMeta.js";
-import { exitApplication } from "./appLifecycle.js";
 
 let onStartGame = () => {};
 
@@ -94,11 +93,6 @@ export function createMainMenu() {
         );
       },
     },
-    {
-      icon: "exit",
-      text: "Thoát",
-      action: showExitConfirmation,
-    },
   ];
 
   menuItems.forEach(({ icon, text, action }) => {
@@ -112,26 +106,6 @@ export function createMainMenu() {
   wrapper.appendChild(menuList);
   menuOverlay.appendChild(wrapper);
   document.body.appendChild(menuOverlay);
-}
-
-function showExitConfirmation() {
-  openAppModal({
-    id: "exit-app-modal",
-    icon: "exit",
-    title: "Thoát game",
-    content: "<p>Bạn có muốn đóng hoàn toàn Memory Match không?</p>",
-    size: "small",
-    actions: [
-      { label: "Ở lại", variant: "secondary" },
-      {
-        label: "Thoát game",
-        variant: "danger",
-        onClick: () => {
-          void exitApplication();
-        },
-      },
-    ],
-  });
 }
 
 /**

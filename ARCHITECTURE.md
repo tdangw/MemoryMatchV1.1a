@@ -4,12 +4,12 @@
 
 ## 1. Tổng quan
 
-Memory Match Adventure là game ghép thẻ chạy trên web, viết bằng HTML/CSS/JavaScript ES modules. Vite đảm nhận dev server và build; Capacitor đóng gói Android từ thư mục build web.
+Memory Match Adventure là game ghép thẻ chạy trên web, viết bằng HTML/CSS/JavaScript ES modules. Vite đảm nhận dev server và build.
 
 ```text
 index.html → js/main.js → controller / UI / gameplay modules
                          ↘ public/assets (ảnh WebP, âm thanh)
-Vite build → dist → GitHub Pages hoặc Capacitor Android
+Vite build → dist → Firebase Hosting
 ```
 
 - Phiên bản hiển thị cho người chơi: `js/appMeta.js` (`V1.1a`).
@@ -29,8 +29,7 @@ Vite build → dist → GitHub Pages hoặc Capacitor Android
 | `public/assets/` | Tài nguyên runtime được copy nguyên vẹn vào `dist/assets/`. |
 | `source-assets/` | Ảnh nguồn PNG lưu trữ, không được phát hành. |
 | `scripts/check-js.mjs` | Kiểm tra tĩnh import/cú pháp module JavaScript. |
-| `dist/` | Sản phẩm build, bị Git bỏ qua; chỉ được publish sang nhánh `gh-pages`. |
-| `android/` | Dự án Android do Capacitor quản lý. |
+| `dist/` | Sản phẩm build, bị Git bỏ qua; được phát hành lên Firebase Hosting. |
 
 ## 3. Quyền sở hữu module
 
@@ -121,22 +120,14 @@ Lưu trữ dùng `localStorage`, theo thiết bị/trình duyệt. Không có d�
 | `npm run check` | Kiểm tra module JavaScript. |
 | `npm run build` | Tạo production build vào `dist/`. |
 | `npm run preview` | Xem thử production build tại local. |
-| `npm run deploy:gh-pages` | Build rồi phát hành `dist` sang nhánh `gh-pages`. |
-| `npm run android:sync` | Build web và đồng bộ sang Capacitor Android. |
-
-`deploy:gh-pages` dùng `gh-pages -d dist --add`. Cờ `--add` là yêu cầu vận hành trên Windows để tránh lỗi `ENAMETOOLONG` khi package cố xóa hơn 1.000 tệp asset trong một lệnh.
 
 ## 8. Repository và chính sách Git
 
 | Remote | Mục đích | Nội dung |
 | --- | --- | --- |
-| `origin` → `tdangw/MemoryMatchV1.1a` | Repository công khai/GitHub Pages | Chỉ nhánh `gh-pages` nhận nội dung build qua deploy. |
+| `origin` → `tdangw/MemoryMatchV1.1a` | Repository công khai | Mã nguồn dự án. |
 | `data` → `tdangw/MemoryMatchV1.1a-data` | Repository Private | Mã nguồn, cấu hình, tài liệu và lịch sử Git trên nhánh `main`. |
 
 - `dist/` bị bỏ qua khỏi repository Private.
 - Dữ liệu `localStorage` không được commit hoặc deploy.
 - Sau thay đổi mã nguồn: chạy `npm run check`; với thay đổi ảnh hưởng runtime/build, chạy thêm `npm run build`; sau đó deploy và push source khi được yêu cầu.
-
-## 9. Android
-
-Capacitor dùng `dist` làm `webDir`, `appId` là `com.memorymatch.adventure`, nền Android là `#10162f`. Mọi thay đổi web cần `npm run android:sync` trước khi build APK/AAB.

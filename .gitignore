@@ -1,10 +1,6 @@
 node_modules/
 dist/
 .firebase/
-android/.gradle/
-android/app/build/
-*.keystore
-*.jks
-android/keystore.properties
+android/keystores/
 .env*
 !.env.example
