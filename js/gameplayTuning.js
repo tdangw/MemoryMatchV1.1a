@@ -9,8 +9,7 @@ export const GAMEPLAY_TIMING = Object.freeze({
   timePurchaseGraceMs: 1000,
   victoryFireworksDurationMs: 2500,
   victoryCelebration: Object.freeze({
-    // Mốc thử nghiệm: đổi triggerLevel thành 100 sau khi duyệt hiệu ứng.
-    triggerLevel: 1,
+    triggerLevel: 100,
     finalLevel: 100,
     flowerGrowthDurationMs: 6400,
   }),
