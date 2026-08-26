@@ -214,6 +214,11 @@ function openLevelSummaryOverlay({
   summaryStats.push(["XU NHẬN", `+${coinsEarned}`, "summary-coins"]);
   if (luckyAwards.length > 0) {
     summaryStats.push(["Ô MAY MẮN", `${luckyAwards.length} phần thưởng`, "summary-lucky"]);
+    summaryStats.push([
+      "PHẦN THƯỞNG",
+      formatLuckyAwardSummary(luckyAwards),
+      "summary-lucky-details",
+    ]);
   }
 
   summaryStats.forEach(([label, value, className]) => {
@@ -281,6 +286,18 @@ function openLevelSummaryOverlay({
     modal.panel.classList.add("level-summary-modal--victory");
   }
   launchSummaryConfetti();
+}
+
+function formatLuckyAwardSummary(awards) {
+  const totals = awards.reduce((result, award) => {
+    result[award.type] = (result[award.type] || 0) + award.value;
+    return result;
+  }, {});
+  return [
+    totals.time && `+${totals.time}s`,
+    totals.hints && `+${totals.hints} gợi ý`,
+    totals.coins && `+${totals.coins} Xu`,
+  ].filter(Boolean).join(" · ");
 }
 
 export function showResetConfirmationOverlay() {

@@ -60,14 +60,15 @@ export function initializeLevel(level) {
   if (gameContainer) gameContainer.style.display = "flex";
 
   const mode = gameState.settings.mode || "easy";
-  const layout = isChallengeMode(mode) ? getChallengeLayout(level) : getModeLayout(mode);
+  const modeLayout = getModeLayout(mode);
+  const layout = isChallengeMode(mode) ? getChallengeLayout(level) : modeLayout;
   const roundId = beginRound();
   const timeBonus = getLevelTimeBonus(level);
   const hintBonus = getLevelHintBonus(level, gameState.hints);
   if (isEndlessMode(mode)) gameState.remainingTime = 0;
   else if (isChallengeMode(mode)) {
     gameState.remainingTime = level === 1
-      ? layout.timeSeconds
+      ? modeLayout.timeSeconds
       : gameState.remainingTime + GAME_CONFIG.specialModes.challengeTimeBonusSeconds;
   } else gameState.remainingTime = layout.timeSeconds + timeBonus;
   gameState.hints += hintBonus;
