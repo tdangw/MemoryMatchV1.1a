@@ -8,9 +8,14 @@ import {
 import { openAppModal } from "./modal.js";
 import {
   GAME_CONFIG,
+  getChallengeLayout,
   getLevelHintBonus,
   getLevelTimeBonus,
   getModeLayout,
+  getPreviewDurationMs,
+  getTimerDirection,
+  isChallengeMode,
+  isEndlessMode,
 } from "./config.js";
 import { createGrid } from "./grid.js";
 import {
@@ -54,13 +59,20 @@ export function initializeLevel(level) {
   const gameContainer = document.getElementById("game-container");
   if (gameContainer) gameContainer.style.display = "flex";
 
-  const layout = getModeLayout(gameState.settings.mode || "easy");
+  const mode = gameState.settings.mode || "easy";
+  const layout = isChallengeMode(mode) ? getChallengeLayout(level) : getModeLayout(mode);
   const roundId = beginRound();
   const timeBonus = getLevelTimeBonus(level);
   const hintBonus = getLevelHintBonus(level, gameState.hints);
-  gameState.remainingTime = layout.timeSeconds + timeBonus;
+  if (isEndlessMode(mode)) gameState.remainingTime = 0;
+  else if (isChallengeMode(mode)) {
+    gameState.remainingTime = level === 1
+      ? layout.timeSeconds
+      : gameState.remainingTime + GAME_CONFIG.specialModes.challengeTimeBonusSeconds;
+  } else gameState.remainingTime = layout.timeSeconds + timeBonus;
   gameState.hints += hintBonus;
-  createGrid(layout, { roundId, onPreviewComplete: startCountdown });
+  const previewDurationMs = getPreviewDurationMs(mode);
+  createGrid(layout, { roundId, onPreviewComplete: startCountdown, previewDurationMs });
 
   gameState.moves = 0;
   gameState.misses = 0;
@@ -77,7 +89,8 @@ export function initializeLevel(level) {
   updatePairProgressDisplay(gameState.matchedPairs, gameState.totalPairs);
   updateTimerDisplay(gameState.remainingTime);
   showLevelRewardOverlay();
-  showRevealTimerInHud(GAME_CONFIG.previewDurationMs / 1000, roundId);
+  showRevealTimerInHud(previewDurationMs / 1000, roundId);
+  document.getElementById("btn-buy-time")?.toggleAttribute("hidden", isEndlessMode(mode));
 }
 
 function startCountdown(roundId = gameState.roundId) {
@@ -88,9 +101,10 @@ function startCountdown(roundId = gameState.roundId) {
     if (gameState.roundId !== roundId) return stopCountdown();
     if (gameState.isPaused || gameState.isLocked) return;
 
-    gameState.remainingTime -= 1;
+    const direction = getTimerDirection(gameState.settings.mode);
+    gameState.remainingTime += direction === "up" ? 1 : -1;
     updateTimerDisplay(gameState.remainingTime);
-    if (gameState.remainingTime <= 0) handleTimeUp();
+    if (direction === "down" && gameState.remainingTime <= 0) handleTimeUp();
   }, 1000);
 }
 

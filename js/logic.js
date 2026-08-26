@@ -1,8 +1,8 @@
 // logic.js - Xử lý logic của trò chơi
 // chức năng của logic.js là xử lý logic của trò chơi, bao gồm việc xử lý sự kiện khi người chơi nhấp vào ô, kiểm tra xem hai ô có khớp nhau hay không, và kiểm tra xem người chơi đã hoàn thành cấp độ hay chưa. Nó cũng bao gồm các chức năng để khởi tạo logic và xử lý âm thanh khi người chơi tương tác với trò chơi.
 
-import { increaseCoins, increaseScore, gameState } from "./gameState.js";
-import { calculateCoinReward } from "./config.js";
+import { consumeLuckyReward, increaseCoins, increaseScore, gameState } from "./gameState.js";
+import { calculateCoinReward, getLuckyReward, isEndlessMode } from "./config.js";
 import {
   updateScoreDisplay,
   updateTimerDisplay,
@@ -11,7 +11,9 @@ import {
   updateComboDisplay,
   updatePairProgressDisplay,
   updateCoinDisplay,
+  updateHintDisplay,
   showComboEffect,
+  showBonusOverlay,
   highlightTarget,
   showLevelSummaryOverlay,
 } from "./ui.js";
@@ -168,7 +170,7 @@ function checkMatch(roundId) {
     gameState.combo += 1;
     updateComboDisplay(gameState.combo);
     const comboTimeBonus = getComboTimeBonus(gameState.combo);
-    if (comboTimeBonus > 0) {
+    if (comboTimeBonus > 0 && !isEndlessMode(gameState.settings.mode)) {
       gameState.remainingTime += comboTimeBonus;
       updateTimerDisplay(gameState.remainingTime);
       highlightTarget("#timer");
@@ -182,6 +184,8 @@ function checkMatch(roundId) {
       sounds.match.currentTime = 0;
       sounds.match.play().catch(() => {});
     }
+
+    awardLuckyReward(first.imageId);
 
     setInteractionLocked(false, roundId);
     checkLevelComplete();
@@ -227,7 +231,9 @@ export function checkLevelComplete() {
       gameState.settings.mode,
       gameState.remainingTime,
     );
-    const coinPenalty = Math.min(grossCoins, gameState.misses);
+    const coinPenalty = isEndlessMode(gameState.settings.mode)
+      ? 0
+      : Math.min(grossCoins, gameState.misses);
     const coinsEarned = grossCoins - coinPenalty;
     const totalCoins = increaseCoins(coinsEarned);
     saveCoins(totalCoins);
@@ -258,4 +264,40 @@ export function checkLevelComplete() {
       showLevelSummaryOverlay(completion);
     }
   }
+}
+
+function awardLuckyReward(imageId) {
+  awardLuckyRewardValue(consumeLuckyReward(imageId));
+}
+
+function awardLuckyRewardValue(reward) {
+  if (!reward) return;
+
+  if (reward.type === "time") {
+    gameState.remainingTime += reward.value;
+    updateTimerDisplay(gameState.remainingTime);
+    highlightTarget("#timer");
+    showBonusOverlay(`Ô may mắn: +${reward.value} giây!`);
+    return;
+  }
+
+  if (reward.type === "hints") {
+    const before = gameState.hints;
+    gameState.hints = Math.min(10, gameState.hints + reward.value);
+    if (gameState.hints > before) {
+      updateHintDisplay(gameState.hints);
+      highlightTarget("#hint");
+      showBonusOverlay(`Ô may mắn: +${gameState.hints - before} gợi ý!`);
+      return;
+    }
+    let fallback = getLuckyReward();
+    while (fallback.type === "hints") fallback = getLuckyReward();
+    awardLuckyRewardValue(fallback);
+    return;
+  }
+
+  const totalCoins = increaseCoins(reward.value);
+  saveCoins(totalCoins);
+  updateCoinDisplay(totalCoins);
+  showBonusOverlay(`Ô may mắn: +${reward.value} Xu!`);
 }

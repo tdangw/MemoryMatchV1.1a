@@ -1,6 +1,6 @@
 import { shuffleArray } from "./utils.js";
-import { GAME_CONFIG } from "./config.js";
-import { gameState } from "./gameState.js";
+import { GAME_CONFIG, getLuckyReward, isChallengeMode } from "./config.js";
+import { gameState, setLuckyRewards } from "./gameState.js";
 import { getCardBackClass } from "./appearance.js";
 import { initLogic } from "./logic.js";
 import { getThemeCards } from "./themeCatalog.js";
@@ -68,7 +68,7 @@ window.addEventListener("resize", () => {
  */
 export function createGrid(
   { tileCount, columns, mobileColumns },
-  { roundId, onPreviewComplete } = {},
+  { roundId, onPreviewComplete, previewDurationMs = GAME_CONFIG.previewDurationMs } = {},
 ) {
   const totalTiles = tileCount;
   const numberOfPairs = Math.floor(totalTiles / 2);
@@ -78,6 +78,19 @@ export function createGrid(
   selectedCards.forEach((card) => {
     cards.push(card, card);
   });
+
+  if (isChallengeMode(gameState.settings.mode)) {
+    const maximum = Math.min(
+      GAME_CONFIG.specialModes.luckyTileCount.maximum,
+      selectedCards.length,
+    );
+    const minimum = Math.min(GAME_CONFIG.specialModes.luckyTileCount.minimum, maximum);
+    const luckyCount = Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
+    const luckyCards = shuffleArray([...selectedCards]).slice(0, luckyCount);
+    setLuckyRewards(luckyCards.map((card) => [card.id, getLuckyReward()]));
+  } else {
+    setLuckyRewards([]);
+  }
 
   shuffleArray(cards);
 
@@ -114,14 +127,14 @@ export function createGrid(
   // ✅ Preview ảnh trước khi bắt đầu
   setTimeout(() => {
     if (gameState.roundId === roundId)
-      revealAndHideTiles(roundId, onPreviewComplete);
+      revealAndHideTiles(roundId, onPreviewComplete, previewDurationMs);
   }, 0);
 }
 
 /**
  * Hiển thị tất cả ảnh trong 5s rồi ẩn lại nếu chưa matched
  */
-function revealAndHideTiles(roundId, onPreviewComplete) {
+function revealAndHideTiles(roundId, onPreviewComplete, previewDurationMs) {
   if (gameState.roundId !== roundId) return;
 
   const allImgs = document.querySelectorAll(".tile img");
@@ -141,5 +154,5 @@ function revealAndHideTiles(roundId, onPreviewComplete) {
     document.getElementById("grid-container")?.classList.remove("is-locked");
     initLogic();
     onPreviewComplete?.(roundId);
-  }, GAME_CONFIG.previewDurationMs);
+  }, previewDurationMs);
 }

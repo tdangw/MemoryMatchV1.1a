@@ -31,6 +31,7 @@ export const gameState = {
     meteorEffects: true,
   },
   fromDefeat: false, // ➕ biến cờ xác định đang gọi từ trạng thái "thua"
+  luckyRewards: new Map(),
 };
 gameState._timeRunningOutPlayed = false;
 
@@ -57,6 +58,18 @@ export function invalidateRound() {
   gameState.roundId += 1;
   gameState.isLocked = true;
   gameState._timeRunningOutPlayed = false;
+  gameState.luckyRewards.clear();
+}
+
+export function setLuckyRewards(rewards) {
+  gameState.luckyRewards = new Map(rewards);
+}
+
+export function consumeLuckyReward(imageId) {
+  const reward = gameState.luckyRewards.get(imageId);
+  if (!reward) return null;
+  gameState.luckyRewards.delete(imageId);
+  return reward;
 }
 
 // 🔄 Reset toàn bộ game về trạng thái ban đầu
