@@ -29,6 +29,7 @@ export const gameState = {
     soundVolume: 0.4,
     musicVolume: 0.35,
     meteorEffects: true,
+    boardCoordinates: false,
   },
   fromDefeat: false, // ➕ biến cờ xác định đang gọi từ trạng thái "thua"
   luckyRewards: new Map(),

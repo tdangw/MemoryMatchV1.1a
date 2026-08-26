@@ -4,12 +4,14 @@ import { applyEffectsSettings, syncDefaultMusic } from "./sound.js";
 import { saveSetting } from "./persistence.js";
 import { APP_VERSION } from "./appMeta.js";
 import { setMeteorEffectsEnabled } from "./backgroundEffects.js";
+import { setBoardCoordinatesVisible } from "./grid.js";
 
 const settingsContainer = document.getElementById("settings-container");
 const settingsHome = settingsContainer?.parentElement;
 const soundToggle = document.getElementById("toggle-sound");
 const musicToggle = document.getElementById("toggle-music");
 const meteorEffectsToggle = document.getElementById("toggle-meteor-effects");
+const boardCoordinatesToggle = document.getElementById("toggle-board-coordinates");
 const soundVolume = document.getElementById("sound-volume");
 const musicVolume = document.getElementById("music-volume");
 const soundVolumeValue = document.getElementById("sound-volume-value");
@@ -37,6 +39,7 @@ function syncSettingsControls() {
   if (soundToggle) soundToggle.checked = settings.sound;
   if (musicToggle) musicToggle.checked = settings.music;
   if (meteorEffectsToggle) meteorEffectsToggle.checked = settings.meteorEffects;
+  if (boardCoordinatesToggle) boardCoordinatesToggle.checked = settings.boardCoordinates;
   if (soundVolume) soundVolume.value = Math.round(settings.soundVolume * 100);
   if (musicVolume) musicVolume.value = Math.round(settings.musicVolume * 100);
   if (soundVolume) soundVolume.disabled = !settings.sound;
@@ -66,6 +69,13 @@ function bindSettingsControls() {
     meteorEffectsToggle.onchange = () => {
       saveGameSetting("meteorEffects", meteorEffectsToggle.checked);
       setMeteorEffectsEnabled(meteorEffectsToggle.checked);
+    };
+  }
+
+  if (boardCoordinatesToggle) {
+    boardCoordinatesToggle.onchange = () => {
+      saveGameSetting("boardCoordinates", boardCoordinatesToggle.checked);
+      setBoardCoordinatesVisible(boardCoordinatesToggle.checked);
     };
   }
 

@@ -1,5 +1,50 @@
 /* === Lưới game === */
+#grid-board-frame {
+  --coordinate-gutter: 0px;
+  display: grid;
+  grid-template-columns: var(--coordinate-gutter) auto;
+  grid-template-rows: var(--coordinate-gutter) auto;
+  justify-content: center;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.grid-coordinate-labels {
+  display: none;
+  color: rgb(230 241 255 / 78%);
+  font-size: 6px;
+  font-weight: 700;
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}
+
+#grid-board-frame.is-coordinate-visible .grid-coordinate-labels {
+  display: grid;
+}
+
+.grid-coordinate-labels--columns {
+  grid-column: 2;
+  grid-row: 1;
+  grid-template-columns: repeat(var(--grid-columns, 4), var(--tile-size, 120px));
+  gap: var(--grid-gap, 8px);
+  padding-inline: var(--grid-padding, 10px);
+  place-items: center;
+}
+
+.grid-coordinate-labels--rows {
+  grid-column: 1;
+  grid-row: 2;
+  grid-template-rows: repeat(var(--grid-rows, 3), var(--tile-size, 120px));
+  gap: var(--grid-gap, 8px);
+  padding-block: var(--grid-padding, 10px);
+  place-items: center;
+}
+
 #grid-container {
+  grid-column: 2;
+  grid-row: 2;
   display: grid;
   grid-template-columns: repeat(
     var(--grid-columns, 4),
@@ -16,7 +61,7 @@
   height: auto;
   max-width: 100%;
   box-sizing: border-box;
-  margin: 0 auto;
+  margin: 0;
   background: transparent;
   z-index: 1001;
   position: relative;

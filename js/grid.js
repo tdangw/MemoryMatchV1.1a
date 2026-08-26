@@ -8,8 +8,30 @@ import { getThemeCards } from "./themeCatalog.js";
 const MOBILE_BREAKPOINT = 600;
 const MAX_TILE_SIZE = 180;
 const MIN_TILE_SIZE = 36;
+const COORDINATE_GUTTER_PX = 10;
 let activeLayout = null;
 let resizeFrame = null;
+
+function updateCoordinateLabels(columns, rows) {
+  const columnLabels = document.getElementById("grid-coordinate-columns");
+  const rowLabels = document.getElementById("grid-coordinate-rows");
+  if (!columnLabels || !rowLabels) return;
+
+  columnLabels.replaceChildren(
+    ...Array.from({ length: columns }, (_, index) => {
+      const label = document.createElement("span");
+      label.textContent = String.fromCharCode(65 + index);
+      return label;
+    }),
+  );
+  rowLabels.replaceChildren(
+    ...Array.from({ length: rows }, (_, index) => {
+      const label = document.createElement("span");
+      label.textContent = String(index);
+      return label;
+    }),
+  );
+}
 
 function updateGridLayout() {
   if (!activeLayout) return;
@@ -23,17 +45,20 @@ function updateGridLayout() {
     ? activeLayout.mobileColumns
     : activeLayout.columns;
   const rows = Math.ceil(activeLayout.tileCount / columns);
+  const showCoordinates = Boolean(gameState.settings.boardCoordinates);
   const gap = isCompactViewport ? 1 : 3;
   const padding = isCompactViewport ? 2 : 6;
   const headerBottom =
     document.getElementById("game-title")?.getBoundingClientRect().bottom || 0;
   const availableWidth = Math.max(
     240,
-    isCompactViewport ? window.innerWidth - 20 : window.innerWidth * 0.9,
+    (isCompactViewport ? window.innerWidth - 20 : window.innerWidth * 0.9)
+      - (showCoordinates ? COORDINATE_GUTTER_PX : 0),
   );
   const availableHeight = Math.max(
     180,
-    window.innerHeight - headerBottom - 32,
+    window.innerHeight - headerBottom - 32
+      - (showCoordinates ? COORDINATE_GUTTER_PX : 0),
   );
   const widthPerTile =
     (availableWidth - padding * 2 - gap * (columns - 1)) / columns;
@@ -44,17 +69,33 @@ function updateGridLayout() {
     Math.floor(Math.min(widthPerTile, heightPerTile, MAX_TILE_SIZE)),
   );
   const boardWidth = tileSize * columns + gap * (columns - 1) + padding * 2;
+  const boardFrame = document.getElementById("grid-board-frame");
+  const layoutVariables = [
+    ["--grid-columns", columns],
+    ["--grid-rows", rows],
+    ["--grid-gap", `${gap}px`],
+    ["--grid-padding", `${padding}px`],
+    ["--tile-size", `${tileSize}px`],
+  ];
 
-  gridContainer.style.setProperty("--grid-columns", columns);
-  gridContainer.style.setProperty("--grid-gap", `${gap}px`);
-  gridContainer.style.setProperty("--grid-padding", `${padding}px`);
-  gridContainer.style.setProperty("--tile-size", `${tileSize}px`);
+  layoutVariables.forEach(([name, value]) => {
+    gridContainer.style.setProperty(name, value);
+    boardFrame?.style.setProperty(name, value);
+  });
   document
     .getElementById("game-title")
-    ?.style.setProperty("--board-width", `${boardWidth}px`);
+    ?.style.setProperty("--board-width", `${boardWidth + (showCoordinates ? COORDINATE_GUTTER_PX : 0)}px`);
   document
     .getElementById("game-progress-hud")
-    ?.style.setProperty("--board-width", `${boardWidth}px`);
+    ?.style.setProperty("--board-width", `${boardWidth + (showCoordinates ? COORDINATE_GUTTER_PX : 0)}px`);
+  boardFrame?.classList.toggle("is-coordinate-visible", showCoordinates);
+  boardFrame?.style.setProperty("--coordinate-gutter", showCoordinates ? `${COORDINATE_GUTTER_PX}px` : "0px");
+  updateCoordinateLabels(columns, rows);
+}
+
+export function setBoardCoordinatesVisible(visible) {
+  gameState.settings.boardCoordinates = Boolean(visible);
+  updateGridLayout();
 }
 
 window.addEventListener("resize", () => {

@@ -77,7 +77,12 @@
           <span class="info stat-card stat-score"><span data-icon="star"></span><span id="score">0</span></span>
         </div>
       </div>
-      <div id="grid-container"></div>
+      <div id="grid-board-frame">
+        <div class="grid-coordinate-corner" aria-hidden="true"></div>
+        <div id="grid-coordinate-columns" class="grid-coordinate-labels grid-coordinate-labels--columns" aria-hidden="true"></div>
+        <div id="grid-coordinate-rows" class="grid-coordinate-labels grid-coordinate-labels--rows" aria-hidden="true"></div>
+        <div id="grid-container"></div>
+      </div>
     </div>
 
     <!-- Settings Overlay -->
@@ -133,6 +138,16 @@
           <label for="toggle-meteor-effects">Hiệu ứng nền</label>
           <label class="toggle-switch">
             <input type="checkbox" id="toggle-meteor-effects" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="settings-control">
+        <div class="settings-row">
+          <label for="toggle-board-coordinates">Hiện tọa độ bàn cờ</label>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggle-board-coordinates" />
             <span class="slider"></span>
           </label>
         </div>

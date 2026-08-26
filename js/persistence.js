@@ -5,6 +5,7 @@ const STORAGE_KEYS = Object.freeze({
   soundVolume: "soundVolume",
   musicVolume: "musicVolume",
   meteorEffects: "meteorEffects",
+  boardCoordinates: "boardCoordinates",
   appearance: "appearance",
 });
 
@@ -23,6 +24,7 @@ export function loadPersistentGameData() {
         localStorage.getItem(STORAGE_KEYS.musicVolume) || 0.35,
       ),
       meteorEffects: localStorage.getItem(STORAGE_KEYS.meteorEffects) !== "false",
+      boardCoordinates: localStorage.getItem(STORAGE_KEYS.boardCoordinates) === "true",
     },
   };
 }
