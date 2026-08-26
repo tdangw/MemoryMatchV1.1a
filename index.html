@@ -13,8 +13,8 @@
   <link rel="icon" type="image/x-icon" href="favicon.ico" />
   <link rel="manifest" href="./manifest.webmanifest" />
   <link rel="apple-touch-icon" href="./icons/memory-match-icon.svg" />
-  <script type="module" crossorigin src="/MemoryMatchV1.1a/assets/index-FUXn2Cix.js"></script>
-  <link rel="stylesheet" crossorigin href="/MemoryMatchV1.1a/assets/index-Dupy08NV.css">
+  <script type="module" crossorigin src="/MemoryMatchV1.1a/assets/index-Dde0-Ilj.js"></script>
+  <link rel="stylesheet" crossorigin href="/MemoryMatchV1.1a/assets/index-2Eo3XD-e.css">
 </head>
 <body>
   <div class="main-wrapper">
@@ -66,7 +66,12 @@
           <span class="info stat-card stat-score"><span data-icon="star"></span><span id="score">0</span></span>
         </div>
       </div>
-      <div id="grid-container"></div>
+      <div id="grid-board-frame">
+        <div class="grid-coordinate-corner" aria-hidden="true"></div>
+        <div id="grid-coordinate-columns" class="grid-coordinate-labels grid-coordinate-labels--columns" aria-hidden="true"></div>
+        <div id="grid-coordinate-rows" class="grid-coordinate-labels grid-coordinate-labels--rows" aria-hidden="true"></div>
+        <div id="grid-container"></div>
+      </div>
     </div>
 
     <!-- Settings Overlay -->
@@ -122,6 +127,16 @@
           <label for="toggle-meteor-effects">Hiệu ứng nền</label>
           <label class="toggle-switch">
             <input type="checkbox" id="toggle-meteor-effects" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="settings-control">
+        <div class="settings-row">
+          <label for="toggle-board-coordinates">Hiện tọa độ bàn cờ</label>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggle-board-coordinates" />
             <span class="slider"></span>
           </label>
         </div>
