@@ -32,6 +32,7 @@ export const gameState = {
   },
   fromDefeat: false, // ➕ biến cờ xác định đang gọi từ trạng thái "thua"
   luckyRewards: new Map(),
+  luckyAwards: [],
 };
 gameState._timeRunningOutPlayed = false;
 
@@ -51,6 +52,7 @@ export function beginRound() {
   gameState.isLocked = true;
   gameState.isPaused = false;
   gameState._timeRunningOutPlayed = false;
+  gameState.luckyAwards = [];
   return gameState.roundId;
 }
 
@@ -70,6 +72,10 @@ export function consumeLuckyReward(imageId) {
   if (!reward) return null;
   gameState.luckyRewards.delete(imageId);
   return reward;
+}
+
+export function recordLuckyAward(reward) {
+  gameState.luckyAwards.push(reward);
 }
 
 // 🔄 Reset toàn bộ game về trạng thái ban đầu

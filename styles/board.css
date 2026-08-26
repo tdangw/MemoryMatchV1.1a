@@ -69,6 +69,19 @@
   box-shadow: 0 0 8px #28a74599;
 }
 
+/* Chỉ xuất hiện sau khi cặp thẻ bí mật đã được ghép đúng. */
+.tile.lucky-reward {
+  animation: lucky-reward 720ms ease-out both;
+  border-color: #f4c542;
+  box-shadow: 0 0 16px rgb(244 197 66 / 88%);
+}
+
+@keyframes lucky-reward {
+  0% { transform: scale(1); filter: brightness(1); }
+  45% { transform: scale(1.12); filter: brightness(1.42); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+
 /* ❌ Ghép sai */
 .tile.wrong {
   animation: shake 0.5s;

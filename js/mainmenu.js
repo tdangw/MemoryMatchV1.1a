@@ -180,6 +180,8 @@ export function showDifficultyOverlay(fromGame = false) {
     ["normal", "Trung bình", "status-normal"],
     ["hard", "Khó", "status-hard"],
     ["superHard", "Siêu khó", "status-super-hard"],
+    ["endless", "Vô tận", "timer"],
+    ["challenge", "Thử thách", "trophy"],
   ].forEach(([mode, label, icon]) => {
     const button = document.createElement("button");
     button.type = "button";

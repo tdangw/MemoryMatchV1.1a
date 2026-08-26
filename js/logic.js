@@ -1,7 +1,13 @@
 // logic.js - Xử lý logic của trò chơi
 // chức năng của logic.js là xử lý logic của trò chơi, bao gồm việc xử lý sự kiện khi người chơi nhấp vào ô, kiểm tra xem hai ô có khớp nhau hay không, và kiểm tra xem người chơi đã hoàn thành cấp độ hay chưa. Nó cũng bao gồm các chức năng để khởi tạo logic và xử lý âm thanh khi người chơi tương tác với trò chơi.
 
-import { consumeLuckyReward, increaseCoins, increaseScore, gameState } from "./gameState.js";
+import {
+  consumeLuckyReward,
+  increaseCoins,
+  increaseScore,
+  gameState,
+  recordLuckyAward,
+} from "./gameState.js";
 import { calculateCoinReward, getLuckyReward, isEndlessMode } from "./config.js";
 import {
   updateScoreDisplay,
@@ -185,7 +191,7 @@ function checkMatch(roundId) {
       sounds.match.play().catch(() => {});
     }
 
-    awardLuckyReward(first.imageId);
+    awardLuckyReward(first.imageId, first.element);
 
     setInteractionLocked(false, roundId);
     checkLevelComplete();
@@ -250,6 +256,7 @@ export function checkLevelComplete() {
       moves: gameState.moves,
       misses: gameState.misses,
       coinsEarned,
+      luckyAwards: gameState.luckyAwards,
       settings: gameState.settings,
       onNext: continueToNextLevel,
       onMenu: levelCompleteActions.onMenu,
@@ -266,14 +273,16 @@ export function checkLevelComplete() {
   }
 }
 
-function awardLuckyReward(imageId) {
-  awardLuckyRewardValue(consumeLuckyReward(imageId));
+function awardLuckyReward(imageId, tileElement) {
+  awardLuckyRewardValue(consumeLuckyReward(imageId), tileElement);
 }
 
-function awardLuckyRewardValue(reward) {
+function awardLuckyRewardValue(reward, tileElement) {
   if (!reward) return;
 
   if (reward.type === "time") {
+    tileElement?.classList.add("lucky-reward");
+    recordLuckyAward(reward);
     gameState.remainingTime += reward.value;
     updateTimerDisplay(gameState.remainingTime);
     highlightTarget("#timer");
@@ -285,6 +294,8 @@ function awardLuckyRewardValue(reward) {
     const before = gameState.hints;
     gameState.hints = Math.min(10, gameState.hints + reward.value);
     if (gameState.hints > before) {
+      tileElement?.classList.add("lucky-reward");
+      recordLuckyAward(reward);
       updateHintDisplay(gameState.hints);
       highlightTarget("#hint");
       showBonusOverlay(`Ô may mắn: +${gameState.hints - before} gợi ý!`);
@@ -292,11 +303,13 @@ function awardLuckyRewardValue(reward) {
     }
     let fallback = getLuckyReward();
     while (fallback.type === "hints") fallback = getLuckyReward();
-    awardLuckyRewardValue(fallback);
+    awardLuckyRewardValue(fallback, tileElement);
     return;
   }
 
   const totalCoins = increaseCoins(reward.value);
+  tileElement?.classList.add("lucky-reward");
+  recordLuckyAward(reward);
   saveCoins(totalCoins);
   updateCoinDisplay(totalCoins);
   showBonusOverlay(`Ô may mắn: +${reward.value} Xu!`);

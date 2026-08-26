@@ -8,6 +8,7 @@ import confetti from "canvas-confetti";
 import { showVictoryFireworks } from "./fireworkEffect.js";
 import { clearPersistentGameData } from "./persistence.js";
 import { getTheme } from "./themeCatalog.js";
+import { getTimerDirection, isEndlessMode } from "./config.js";
 
 const scoreElement = document.getElementById("score");
 const levelElement = document.getElementById("level");
@@ -69,7 +70,7 @@ export function updateTimerDisplay(seconds) {
   timerElement.textContent = `${m}:${s}`;
 
   // 🔴 Cảnh báo khi còn <= 10s
-  if (seconds <= 10) {
+  if (getTimerDirection(gameState.settings.mode) === "down" && seconds <= 10) {
     timerContainer?.classList.add("timer-warning");
 
     if (gameState.settings?.sound && !gameState._timeRunningOutPlayed) {
@@ -111,6 +112,8 @@ export function showLevelRewardOverlay() {
     normal: "Trung bình",
     hard: "Khó",
     superHard: "Siêu khó",
+    endless: "Vô tận",
+    challenge: "Thử thách",
   };
   const minutes = String(Math.floor(gameState.remainingTime / 60)).padStart(
     2,
@@ -179,6 +182,8 @@ function openLevelSummaryOverlay({
   moves,
   misses,
   coinsEarned,
+  luckyAwards = [],
+  settings = {},
   onNext,
   onMenu,
   isVictoryCelebration = false,
@@ -198,11 +203,18 @@ function openLevelSummaryOverlay({
   const stats = document.createElement("div");
   stats.className = "level-summary__stats";
   const summaryStats = [
-    ["THỜI GIAN", `${minutes}:${seconds}`, "summary-time"],
+    [
+      isEndlessMode(settings.mode) ? "THỜI GIAN ĐÃ CHƠI" : "THỜI GIAN CÒN LẠI",
+      `${minutes}:${seconds}`,
+      "summary-time",
+    ],
     ["MOVES", moves, "summary-moves"],
     ["MISS", misses, "summary-misses"],
   ];
   summaryStats.push(["XU NHẬN", `+${coinsEarned}`, "summary-coins"]);
+  if (luckyAwards.length > 0) {
+    summaryStats.push(["Ô MAY MẮN", `${luckyAwards.length} phần thưởng`, "summary-lucky"]);
+  }
 
   summaryStats.forEach(([label, value, className]) => {
     const item = document.createElement("div");
