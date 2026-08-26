@@ -20,6 +20,7 @@ import {
   updateHintDisplay,
   showComboEffect,
   showBonusOverlay,
+  showLuckyRewardPopup,
   highlightTarget,
   showLevelSummaryOverlay,
 } from "./ui.js";
@@ -286,7 +287,7 @@ function awardLuckyRewardValue(reward, tileElement) {
     gameState.remainingTime += reward.value;
     updateTimerDisplay(gameState.remainingTime);
     highlightTarget("#timer");
-    showBonusOverlay(`Ô may mắn: +${reward.value} giây!`);
+    showLuckyRewardPopup(reward);
     return;
   }
 
@@ -298,7 +299,10 @@ function awardLuckyRewardValue(reward, tileElement) {
       recordLuckyAward(reward);
       updateHintDisplay(gameState.hints);
       highlightTarget("#hint");
-      showBonusOverlay(`Ô may mắn: +${gameState.hints - before} gợi ý!`);
+      showLuckyRewardPopup({
+        ...reward,
+        value: gameState.hints - before,
+      });
       return;
     }
     let fallback = getLuckyReward();
@@ -312,5 +316,5 @@ function awardLuckyRewardValue(reward, tileElement) {
   recordLuckyAward(reward);
   saveCoins(totalCoins);
   updateCoinDisplay(totalCoins);
-  showBonusOverlay(`Ô may mắn: +${reward.value} Xu!`);
+  showLuckyRewardPopup(reward);
 }

@@ -92,6 +92,46 @@ export function showBonusOverlay(message) {
     sounds.overlay.play().catch(() => {});
   }
 }
+
+export function showLuckyRewardPopup(reward) {
+  document.querySelector(".lucky-reward-popup-overlay")?.remove();
+
+  const presentations = {
+    time: { icon: "timer", label: `+${reward.value} giây` },
+    hints: { icon: "search", label: `+${reward.value} gợi ý` },
+    coins: { icon: "coin", label: `+${reward.value} Xu` },
+  };
+  const presentation = presentations[reward.type];
+  if (!presentation) return;
+
+  const overlay = document.createElement("div");
+  overlay.className = "lucky-reward-popup-overlay";
+  overlay.setAttribute("role", "status");
+  overlay.setAttribute("aria-live", "polite");
+  const popup = document.createElement("div");
+  popup.className = "lucky-reward-popup";
+  const badge = document.createElement("span");
+  badge.className = "lucky-reward-popup__badge";
+  badge.append(createIcon("star"));
+  const title = document.createElement("strong");
+  title.textContent = "Ô may mắn!";
+  const value = document.createElement("span");
+  value.className = "lucky-reward-popup__value";
+  value.append(createIcon(presentation.icon), document.createTextNode(presentation.label));
+  popup.append(badge, title, value);
+  overlay.append(popup);
+  document.body.append(overlay);
+
+  if (gameState.settings?.sound) {
+    sounds.overlay.currentTime = 0;
+    sounds.overlay.play().catch(() => {});
+  }
+
+  setTimeout(() => {
+    overlay.classList.add("is-leaving");
+    setTimeout(() => overlay.remove(), 240);
+  }, 1500);
+}
 // Thưởng qua màn
 export function showLevelRewardOverlay() {
   // 🔄 Xoá overlay cũ nếu còn

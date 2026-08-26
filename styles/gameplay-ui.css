@@ -456,6 +456,75 @@
   pointer-events: all;
 }
 
+.lucky-reward-popup-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 32000;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.lucky-reward-popup {
+  width: min(280px, calc(100vw - 44px));
+  display: grid;
+  justify-items: center;
+  gap: 7px;
+  padding: 20px 24px;
+  color: #fff8d5;
+  text-align: center;
+  background: linear-gradient(145deg, #5d3b08, #b97813 52%, #6a3e06);
+  border: 2px solid #ffe18a;
+  border-radius: 22px;
+  box-shadow: 0 16px 42px rgb(0 0 0 / 44%), 0 0 28px rgb(255 196 46 / 65%);
+  animation: lucky-reward-popup-enter 240ms cubic-bezier(.18, .89, .32, 1.28) both;
+}
+
+.lucky-reward-popup__badge {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  color: #ffd95c;
+  background: rgb(61 34 3 / 45%);
+  border-radius: 50%;
+}
+
+.lucky-reward-popup__badge .ui-icon {
+  width: 28px;
+  height: 28px;
+}
+
+.lucky-reward-popup strong {
+  font-size: 1.35rem;
+}
+
+.lucky-reward-popup__value {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 1.55rem;
+  font-weight: 800;
+}
+
+.lucky-reward-popup__value .ui-icon {
+  width: 27px;
+  height: 27px;
+}
+
+.lucky-reward-popup-overlay.is-leaving .lucky-reward-popup {
+  animation: lucky-reward-popup-leave 240ms ease-in both;
+}
+
+@keyframes lucky-reward-popup-enter {
+  from { opacity: 0; transform: scale(.72) translateY(18px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes lucky-reward-popup-leave {
+  to { opacity: 0; transform: scale(.88) translateY(-8px); }
+}
+
 .level-reward-overlay {
   position: fixed;
   top: 0;
