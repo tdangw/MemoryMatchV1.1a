@@ -27,7 +27,7 @@ export const GAME_CONFIG = Object.freeze({
       coinReward: Object.freeze({ base: 70, speedMultiplier: 0.65 }),
     }),
     superHard: Object.freeze({
-      tileCount: 48,
+      tileCount: 60,
       columns: 6,
       mobileColumns: 6,
       timeSeconds: 180,
