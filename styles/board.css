@@ -12,12 +12,16 @@
 
 .grid-coordinate-labels {
   display: none;
-  color: rgb(230 241 255 / 78%);
-  font-size: 6px;
-  font-weight: 700;
+  color: #b9efff;
+  font-size: 12px;
+  font-weight: 800;
   line-height: 1;
   pointer-events: none;
+  text-shadow:
+    0 1px 1px rgb(4 13 29 / 96%),
+    0 0 3px rgb(4 13 29 / 96%);
   user-select: none;
+  -webkit-text-stroke: 0.3px #071425;
 }
 
 #grid-board-frame.is-coordinate-visible .grid-coordinate-labels {

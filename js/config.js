@@ -8,8 +8,7 @@ export const GAME_CONFIG = Object.freeze({
       tileCount: 12,
       columns: 4,
       mobileColumns: 3,
-      // Mốc thử nghiệm để kiểm tra nhanh luồng hết giờ; phát hành đổi lại 60.
-      timeSeconds: 6,
+      timeSeconds: 60,
       coinReward: Object.freeze({ base: 30, speedMultiplier: 0.35 }),
     }),
     normal: Object.freeze({
@@ -77,11 +76,36 @@ const CHALLENGE_LAYOUTS = Object.freeze([
   Object.freeze({ untilLevel: 3, tileCount: 12, columns: 4, mobileColumns: 3 }),
   Object.freeze({ untilLevel: 6, tileCount: 16, columns: 4, mobileColumns: 4 }),
   Object.freeze({ untilLevel: 9, tileCount: 20, columns: 4, mobileColumns: 4 }),
-  Object.freeze({ untilLevel: 12, tileCount: 24, columns: 6, mobileColumns: 4 }),
-  Object.freeze({ untilLevel: 15, tileCount: 30, columns: 6, mobileColumns: 5 }),
-  Object.freeze({ untilLevel: 18, tileCount: 36, columns: 6, mobileColumns: 6 }),
-  Object.freeze({ untilLevel: 21, tileCount: 42, columns: 6, mobileColumns: 6 }),
-  Object.freeze({ untilLevel: Infinity, tileCount: 48, columns: 6, mobileColumns: 6 }),
+  Object.freeze({
+    untilLevel: 12,
+    tileCount: 24,
+    columns: 6,
+    mobileColumns: 4,
+  }),
+  Object.freeze({
+    untilLevel: 15,
+    tileCount: 30,
+    columns: 6,
+    mobileColumns: 5,
+  }),
+  Object.freeze({
+    untilLevel: 18,
+    tileCount: 36,
+    columns: 6,
+    mobileColumns: 6,
+  }),
+  Object.freeze({
+    untilLevel: 21,
+    tileCount: 42,
+    columns: 6,
+    mobileColumns: 6,
+  }),
+  Object.freeze({
+    untilLevel: Infinity,
+    tileCount: 48,
+    columns: 6,
+    mobileColumns: 6,
+  }),
 ]);
 
 export function getModeLayout(mode = "easy") {
@@ -90,8 +114,10 @@ export function getModeLayout(mode = "easy") {
 }
 
 export function getChallengeLayout(level = 1) {
-  return CHALLENGE_LAYOUTS.find((layout) => level <= layout.untilLevel)
-    || CHALLENGE_LAYOUTS.at(-1);
+  return (
+    CHALLENGE_LAYOUTS.find((layout) => level <= layout.untilLevel) ||
+    CHALLENGE_LAYOUTS.at(-1)
+  );
 }
 
 export function isEndlessMode(mode) {
@@ -117,7 +143,9 @@ export function getLuckyReward() {
   const types = Object.keys(rewards);
   const type = types[Math.floor(Math.random() * types.length)];
   const range = rewards[type];
-  const value = Math.floor(Math.random() * (range.maximum - range.minimum + 1)) + range.minimum;
+  const value =
+    Math.floor(Math.random() * (range.maximum - range.minimum + 1)) +
+    range.minimum;
   return { type, value };
 }
 

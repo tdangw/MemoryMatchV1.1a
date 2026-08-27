@@ -27,7 +27,7 @@ Vite build → dist → Firebase Hosting hoặc GitHub Pages
 | `styles/gameplay-effects.css` | Mặt lưng thẻ và hiệu ứng phản hồi combo. |
 | `js/` | Các ES module theo trách nhiệm. |
 | `public/assets/` | Tài nguyên runtime được copy nguyên vẹn vào `dist/assets/`. |
-| `source-assets/` | Ảnh nguồn PNG lưu trữ, không được phát hành. |
+| *(không có)* `source-assets/` | Không còn trong workspace. Nếu cần tạo ảnh nguồn, lưu ngoài `public/assets/` trong quá trình xử lý và không phát hành. |
 | `scripts/check-js.mjs` | Kiểm tra tĩnh import/cú pháp module JavaScript. |
 | `dist/` | Sản phẩm build, bị Git bỏ qua; được phát hành lên Firebase Hosting. |
 

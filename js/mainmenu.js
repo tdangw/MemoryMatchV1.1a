@@ -6,7 +6,7 @@ import { gameState, resetGame } from "./gameState.js";
 import { openAppModal, showAppToast } from "./modal.js";
 import { createIcon } from "./icons.js";
 import { APP_VERSION } from "./appMeta.js";
-import { THEMES, getTheme } from "./themeCatalog.js";
+import { THEMES, getTheme, isThemePlayable } from "./themeCatalog.js";
 import { saveAppearance } from "./persistence.js";
 import { openShopOverlay } from "./shop.js";
 
@@ -218,6 +218,7 @@ export function showCollectionModal({ fromGame = false } = {}) {
     THEMES.forEach((theme) => {
       const owned = gameState.appearance.ownedThemes.includes(theme.id);
       const equipped = gameState.appearance.theme === theme.id;
+      const playable = isThemePlayable(theme);
       const item = document.createElement("article");
       item.className = `collection-theme${equipped ? " is-equipped" : ""}`;
       const preview = document.createElement("span");
@@ -232,6 +233,11 @@ export function showCollectionModal({ fromGame = false } = {}) {
         const status = document.createElement("span");
         status.className = "collection-theme__status";
         status.textContent = "Đang dùng";
+        item.append(status);
+      } else if (owned && !playable) {
+        const status = document.createElement("span");
+        status.className = "collection-theme__status";
+        status.textContent = "Chờ ảnh";
         item.append(status);
       } else if (owned) {
         const button = document.createElement("button");

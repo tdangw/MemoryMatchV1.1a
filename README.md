@@ -49,7 +49,7 @@ npm run preview
 - `public/assets/`: hình ảnh và âm thanh được sao chép nguyên trạng vào bản build.
 - `public/assets/images/`: các ảnh giao diện WebP, gồm nền chính, nền lưới, tile và logo.
 - `public/assets/images/themes/default/`: kho 1.000 ảnh thẻ WebP 256×256 dùng chung cho mọi level. Khi bổ sung chủ đề, tạo thư mục mới cạnh `default`; không nhân bản ảnh giữa các level.
-- `source-assets/images/themes/default/`: PNG gốc để chỉnh sửa hoặc xuất lại ảnh; thư mục này không được đưa vào bản web.
+- Hiện không có thư mục `source-assets/`. Khi tạo hoặc xuất lại ảnh, lưu bản nguồn ngoài `public/assets/`; chỉ asset runtime đã chuẩn bị mới được đưa vào bản web.
 - `vite.config.js`: cấu hình web JavaScript thuần.
 
 Ba chế độ giữ level độc lập theo mỗi lượt chơi: Dễ 12 ô, Trung bình 24 ô, Khó 36 ô. Qua level mới game chọn lại các cặp ngẫu nhiên từ kho ảnh của chủ đề. Lưới tự đổi từ 4×3, 6×4, 6×6 trên PC sang 3×4, 4×6, 6×6 trên mobile; kích thước thẻ được tính lại khi đổi kích thước hoặc xoay màn hình.

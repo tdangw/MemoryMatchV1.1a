@@ -1,4 +1,4 @@
-import { THEMES, getUsableTheme } from "./themeCatalog.js";
+import { THEMES, getTheme, getUsableTheme } from "./themeCatalog.js";
 
 const DEFAULT_APPEARANCE = Object.freeze({
   cardBack: "classic",
@@ -104,7 +104,7 @@ export function normalizeAppearance(value = {}) {
     DEFAULT_APPEARANCE.flipEffect,
   );
   const ownedThemes = ownedIds(THEMES, value.ownedThemes, DEFAULT_APPEARANCE.theme)
-    .filter((id) => getUsableTheme(id).id === id);
+    .filter((id) => getTheme(id).id === id);
   const requestedTheme = getUsableTheme(value.theme).id;
   return {
     cardBack: ownedCardBacks.includes(cardBack)

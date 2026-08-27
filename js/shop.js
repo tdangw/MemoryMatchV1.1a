@@ -14,7 +14,7 @@ import { saveAppearance, saveCoins } from "./persistence.js";
 import { CARD_BACKS, FLIP_EFFECTS, getCardBackClass } from "./appearance.js";
 import { SHOP_ITEMS, getShopItemPrice } from "./shopCatalog.js";
 import { GAMEPLAY_TIMING } from "./gameplayTuning.js";
-import { THEMES, getTheme } from "./themeCatalog.js";
+import { THEMES, getTheme, isThemePlayable } from "./themeCatalog.js";
 
 export function openQuickAssistOverlay(kind) {
   if (gameState.isLocked || gameState.isPaused) return;
@@ -212,6 +212,7 @@ function renderThemes(grid, roundId, modal) {
   THEMES.forEach((theme) => {
     const owned = gameState.appearance.ownedThemes.includes(theme.id);
     const equipped = gameState.appearance.theme === theme.id;
+    const playable = isThemePlayable(theme);
     const card = document.createElement("article");
     card.className = `theme-choice${equipped ? " is-equipped" : ""}`;
     const preview = document.createElement("div");
@@ -225,6 +226,9 @@ function renderThemes(grid, roundId, modal) {
 
     if (theme.comingSoon) {
       button.textContent = "Sắp có";
+      button.disabled = true;
+    } else if (owned && !playable) {
+      button.textContent = "Chờ ảnh";
       button.disabled = true;
     } else if (equipped) {
       button.classList.add("appearance-action--equipped");
@@ -320,7 +324,9 @@ function openPurchaseConfirmation(item, roundId, shopModal, onPurchase) {
   const message = document.createElement("p");
   message.textContent =
     item.type === "appearance" || item.type === "theme"
-      ? `Mua và trang bị ${item.title}?`
+      ? item.type === "theme" && !isThemePlayable(item)
+        ? `Mua trước ${item.title}? Chủ đề sẽ mở trang bị khi đủ ảnh.`
+        : `Mua và trang bị ${item.title}?`
       : `Mua ${item.title}?`;
 
   const price = document.createElement("strong");
@@ -399,9 +405,14 @@ function handleBuyItem(item, roundId, fromMenu = false) {
 
   if (item.type === "theme") {
     gameState.appearance.ownedThemes.push(item.id);
-    gameState.appearance.theme = item.id;
+    const theme = getTheme(item.id);
+    if (isThemePlayable(theme)) gameState.appearance.theme = item.id;
     saveAppearance(gameState.appearance);
-    showShopMessage(`Đã mua và trang bị chủ đề ${item.title}`);
+    showShopMessage(
+      isThemePlayable(theme)
+        ? `Đã mua và trang bị chủ đề ${item.title}`
+        : `Đã mua trước ${item.title}. Chủ đề sẽ mở khi đủ ảnh.`,
+    );
     return true;
   }
 
@@ -438,7 +449,7 @@ function handleBuyItem(item, roundId, fromMenu = false) {
 function equipTheme(id, roundId, grid, modal) {
   if (gameState.roundId !== roundId) return;
   const theme = getTheme(id);
-  if (theme.comingSoon || !gameState.appearance.ownedThemes.includes(id)) return;
+  if (theme.comingSoon || !isThemePlayable(theme) || !gameState.appearance.ownedThemes.includes(id)) return;
   gameState.appearance.theme = id;
   saveAppearance(gameState.appearance);
   showShopMessage(`Đã trang bị chủ đề ${theme.title}`);

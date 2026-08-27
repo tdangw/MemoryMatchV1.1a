@@ -1,4 +1,5 @@
 import { GAME_CONFIG } from "./config.js";
+import { IMAGE_THEME_ASSETS } from "./themeAssets.js";
 import { shuffleArray } from "./utils.js";
 
 const COMPUTER_SYMBOLS = Object.freeze([
@@ -7,24 +8,34 @@ const COMPUTER_SYMBOLS = Object.freeze([
   "{", "}", "*", "!", "?", ":", ";",
 ]);
 
+const LEGACY_THEME_IDS = Object.freeze({
+  food: "foods",
+  "antiques-spy": "historical-artifacts",
+});
+
 export const THEMES = Object.freeze([
   // Mặc định dùng 1.000 ảnh WebP; các chủ đề tạo mã dùng generator bên dưới.
   { id: "default", title: "Mặc định", price: 0, kind: "image", imageCount: GAME_CONFIG.cardImages.count, assetFolder: GAME_CONFIG.cardImages.defaultTheme, icon: "images" },
-  { id: "animals", title: "Động vật chibi", price: 1, kind: "image", imageCount: 24, assetFolder: "animals", assetPrefix: "animals-", icon: "paw" },
-  { id: "food", title: "Đồ ăn & thức uống", price: 1, kind: "image", imageCount: 24, assetFolder: "food", assetPrefix: "food-", icon: "utensils" },
-  { id: "nature", title: "Thiên nhiên", price: 1, kind: "image", imageCount: 24, assetFolder: "nature", assetPrefix: "nature-", icon: "leaf" },
-  { id: "flowers", title: "Cây cối & hoa lá", price: 1, kind: "image", imageCount: 24, assetFolder: "flowers", assetPrefix: "flowers-", icon: "flower" },
-  { id: "geometry", title: "Hình học", price: 1, kind: "image", imageCount: 24, assetFolder: "geometry", assetPrefix: "geometry-", icon: "shapes" },
-  { id: "cyberpunk", title: "Cyberpunk", comingSoon: true, icon: "terminal" },
-  { id: "magic-rpg", title: "RPG phép thuật", comingSoon: true, icon: "wand" },
-  { id: "space", title: "Vũ trụ", comingSoon: true, icon: "star" },
-  { id: "household", title: "Vật dụng gia đình", comingSoon: true, icon: "home" },
-  { id: "office-supplies", title: "Đồ dùng văn phòng", comingSoon: true, icon: "briefcase" },
-  { id: "garden-tools", title: "Dụng cụ làm vườn", comingSoon: true, icon: "shovel" },
-  { id: "fashion", title: "Thời trang & phụ kiện", comingSoon: true, icon: "hanger" },
-  { id: "vehicles", title: "Phương tiện giao thông", comingSoon: true, icon: "car" },
-  { id: "antiques-spy", title: "Cổ vật & gián điệp", comingSoon: true, icon: "spyglass" },
-  { id: "festivals", title: "Lễ hội", comingSoon: true, icon: "celebrate" },
+  { id: "animals", title: "Động vật", price: 1, kind: "image", assetFolder: "animals", assets: IMAGE_THEME_ASSETS.animals, icon: "paw" },
+  { id: "foods", title: "Đồ ăn", price: 1, kind: "image", assetFolder: "foods", assets: IMAGE_THEME_ASSETS.foods, icon: "utensils" },
+  { id: "drinks", title: "Đồ uống", price: 1, kind: "image", assetFolder: "drinks", assets: IMAGE_THEME_ASSETS.drinks, icon: "cup" },
+  { id: "fruits", title: "Trái cây", price: 1, kind: "image", assetFolder: "fruits", assets: IMAGE_THEME_ASSETS.fruits, icon: "apple", playable: false },
+  { id: "vegetables", title: "Rau củ", price: 1, kind: "image", assetFolder: "vegetables", assets: IMAGE_THEME_ASSETS.vegetables, icon: "carrot", playable: false },
+  { id: "nature", title: "Thiên nhiên", price: 1, kind: "image", assetFolder: "nature", assets: IMAGE_THEME_ASSETS.nature, icon: "leaf" },
+  { id: "flowers", title: "Hoa", price: 1, kind: "image", assetFolder: "flowers", assets: IMAGE_THEME_ASSETS.flowers, icon: "flower" },
+  { id: "plants", title: "Cây cối & lá", price: 1, kind: "image", assetFolder: "plants", assets: IMAGE_THEME_ASSETS.plants, icon: "leaf" },
+  { id: "geometry", title: "Hình học", price: 1, kind: "image", assetFolder: "geometry", assets: IMAGE_THEME_ASSETS.geometry, icon: "shapes" },
+  { id: "cyberpunk", title: "Cyberpunk", price: 1, kind: "image", assetFolder: "cyberpunk", assets: IMAGE_THEME_ASSETS.cyberpunk, icon: "terminal" },
+  { id: "magic-rpg", title: "RPG phép thuật", price: 1, kind: "image", assetFolder: "magic-rpg", assets: IMAGE_THEME_ASSETS["magic-rpg"], icon: "wand" },
+  { id: "space", title: "Vũ trụ", price: 1, kind: "image", assetFolder: "space", assets: IMAGE_THEME_ASSETS.space, icon: "star" },
+  { id: "household", title: "Vật dụng gia đình", price: 1, kind: "image", assetFolder: "household", assets: IMAGE_THEME_ASSETS.household, icon: "home" },
+  { id: "office-supplies", title: "Đồ dùng văn phòng", price: 1, kind: "image", assetFolder: "office-supplies", assets: IMAGE_THEME_ASSETS["office-supplies"], icon: "briefcase" },
+  { id: "garden-tools", title: "Dụng cụ làm vườn", price: 1, kind: "image", assetFolder: "garden-tools", assets: IMAGE_THEME_ASSETS["garden-tools"], icon: "shovel" },
+  { id: "fashion", title: "Thời trang & phụ kiện", price: 1, kind: "image", assetFolder: "fashion", assets: IMAGE_THEME_ASSETS.fashion, icon: "hanger" },
+  { id: "vehicles", title: "Phương tiện giao thông", price: 1, kind: "image", assetFolder: "vehicles", assets: IMAGE_THEME_ASSETS.vehicles, icon: "car" },
+  { id: "historical-artifacts", title: "Cổ vật lịch sử", price: 1, kind: "image", assetFolder: "historical-artifacts", assets: IMAGE_THEME_ASSETS["historical-artifacts"], icon: "landmark" },
+  { id: "spy-gadgets", title: "Thiết bị gián điệp", price: 1, kind: "image", assetFolder: "spy-gadgets", assets: IMAGE_THEME_ASSETS["spy-gadgets"], icon: "spyglass" },
+  { id: "festivals", title: "Lễ hội", price: 1, kind: "image", assetFolder: "festivals", assets: IMAGE_THEME_ASSETS.festivals, icon: "celebrate" },
   { id: "alphabet", title: "Chữ cái", price: 1, kind: "generated", generator: "alphabet", icon: "type" },
   { id: "numbers-2", title: "2 Số", price: 1, kind: "generated", generator: "numbers-2", icon: "hash" },
   { id: "numbers-3", title: "3 Số", price: 1, kind: "generated", generator: "numbers-3", icon: "hash" },
@@ -32,12 +43,17 @@ export const THEMES = Object.freeze([
 ]);
 
 export function getTheme(id) {
-  return THEMES.find((theme) => theme.id === id) || THEMES[0];
+  const resolvedId = LEGACY_THEME_IDS[id] || id;
+  return THEMES.find((theme) => theme.id === resolvedId) || THEMES[0];
 }
 
 export function getUsableTheme(id) {
   const theme = getTheme(id);
-  return theme.kind ? theme : THEMES[0];
+  return theme.kind && theme.playable !== false ? theme : THEMES[0];
+}
+
+export function isThemePlayable(theme) {
+  return theme.kind && theme.playable !== false;
 }
 
 export function getThemeCards(themeId, pairCount) {
@@ -45,6 +61,13 @@ export function getThemeCards(themeId, pairCount) {
   const values = pickThemeValues(theme, pairCount);
   return values.map((value) => {
     if (theme.kind === "image") {
+      if (theme.assets) {
+        return {
+          id: `${theme.id}-${value.id}`,
+          alt: `${theme.title}: ${value.label}`,
+          src: `${import.meta.env.BASE_URL}assets/images/themes/${theme.assetFolder}/${value.file}`,
+        };
+      }
       const filename = theme.assetPrefix
         ? `${theme.assetPrefix}${String(value).padStart(2, "0")}.webp`
         : `MM-image (${value}).webp`;
@@ -61,7 +84,7 @@ export function getThemeCards(themeId, pairCount) {
 
 function pickThemeValues(theme, pairCount) {
   let values;
-  if (theme.kind === "image") values = Array.from({ length: theme.imageCount }, (_, index) => index + 1);
+  if (theme.kind === "image") values = theme.assets ? [...theme.assets] : Array.from({ length: theme.imageCount }, (_, index) => index + 1);
   else if (theme.generator === "alphabet") values = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
   else if (theme.generator === "numbers-2") values = Array.from({ length: 90 }, (_, index) => index + 10);
   else if (theme.generator === "numbers-3") values = Array.from({ length: 900 }, (_, index) => index + 100);
