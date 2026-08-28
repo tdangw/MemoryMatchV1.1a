@@ -4,8 +4,7 @@ import { GAMEPLAY_TIMING, getComboPresentation } from "./gameplayTuning.js";
 import { sounds } from "./sound.js"; // ✅ Đã tách âm thanh
 import { openAppModal, showAppToast } from "./modal.js";
 import { createIcon } from "./icons.js";
-import confetti from "canvas-confetti";
-import { showVictoryFireworks } from "./fireworkEffect.js";
+import { launchSummaryConfetti, showSummaryFireworks } from "victory-presentation";
 import { clearPersistentGameData } from "./persistence.js";
 import { getTheme } from "./themeCatalog.js";
 import { getTimerDirection, isEndlessMode } from "./config.js";
@@ -198,20 +197,9 @@ export function showLevelRewardOverlay() {
   }, GAMEPLAY_TIMING.levelIntroDurationMs);
 }
 
-function launchSummaryConfetti() {
-  confetti({
-    particleCount: 150,
-    spread: 70,
-    origin: { y: 0.6 },
-    colors: ["#6366f1", "#a855f7", "#10b981"],
-    disableForReducedMotion: true,
-    zIndex: 31000,
-  });
-}
-
 export function showLevelSummaryOverlay(completion) {
   gameState.isPaused = true;
-  showVictoryFireworks({
+  showSummaryFireworks({
     durationMs: GAMEPLAY_TIMING.victoryFireworksDurationMs,
   }).finally(() => openLevelSummaryOverlay(completion));
 }

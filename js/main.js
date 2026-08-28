@@ -25,6 +25,9 @@ import {
 import { registerProgressiveWebApp } from "./pwa.js";
 import { initializeMeteorEffects } from "./backgroundEffects.js";
 
+document.documentElement.dataset.buildTarget =
+  import.meta.env.MODE === "android" ? "android" : "web";
+
 // Entry point: nạp dữ liệu đã lưu và nối các module qua callback.
 registerProgressiveWebApp();
 hydrateGameState(loadPersistentGameData());

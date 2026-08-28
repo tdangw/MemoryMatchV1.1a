@@ -2,6 +2,7 @@
 // Quản lý âm thanh của dự án
 
 const assetUrl = (path) => `${import.meta.env.BASE_URL}${path}`;
+const isAndroidBuild = import.meta.env.MODE === "android";
 
 export const sounds = {
   click: new Audio(assetUrl("assets/sounds/click.mp3")),
@@ -14,7 +15,9 @@ export const sounds = {
   defeat: new Audio(assetUrl("assets/sounds/defeat.mp3")),
   confirm: new Audio(assetUrl("assets/sounds/confirm.mp3")),
   timerunningout: new Audio(assetUrl("assets/sounds/time-running-out.mp3")),
-  victoryFlowerTheme: new Audio(assetUrl("assets/sounds/victory-flower-theme.mp3")),
+  victoryFlowerTheme: isAndroidBuild
+    ? null
+    : new Audio(assetUrl("assets/sounds/victory-flower-theme.mp3")),
 };
 
 export const MENU_MUSIC_TRACKS = Object.freeze([
@@ -31,7 +34,7 @@ const clampVolume = (value, fallback) => {
 
 export function applyEffectsSettings(settings) {
   const volume = settings?.sound ? clampVolume(settings.soundVolume, 0.4) : 0;
-  Object.values(sounds).forEach((sound) => {
+  Object.values(sounds).filter(Boolean).forEach((sound) => {
     sound.volume = volume;
   });
 }
@@ -64,7 +67,7 @@ export function syncDefaultMusic(settings, shouldPlay = true) {
 
 export function playVictoryFlowerTheme(settings) {
   const theme = sounds.victoryFlowerTheme;
-  if (!settings?.music || document.hidden) return;
+  if (!theme || !settings?.music || document.hidden) return;
 
   theme.pause();
   theme.currentTime = 0;
@@ -75,13 +78,14 @@ export function playVictoryFlowerTheme(settings) {
 
 export function pauseVictoryFlowerTheme() {
   const theme = sounds.victoryFlowerTheme;
+  if (!theme) return;
   theme.pause();
   theme.currentTime = 0;
 }
 
 export function pauseGameAudio() {
   pauseBackgroundMusic();
-  Object.values(sounds).forEach((sound) => sound.pause());
+  Object.values(sounds).filter(Boolean).forEach((sound) => sound.pause());
 }
 
 export function pauseBackgroundMusic() {
@@ -108,7 +112,7 @@ export function enableButtonClickSounds(getSettings) {
 // ✅ Unlock âm thanh sau tương tác đầu tiên
 export function unlockSound() {
   const unlock = () => {
-    Object.values(sounds).forEach((sound) => {
+    Object.values(sounds).filter(Boolean).forEach((sound) => {
       try {
         sound.play().catch(() => {});
         sound.pause();

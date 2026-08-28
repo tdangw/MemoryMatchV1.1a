@@ -32,7 +32,10 @@ import {
   getComboTimeBonus,
   shouldShowVictoryCelebration,
 } from "./gameplayTuning.js";
-import { showVictoryCelebration } from "./victoryCelebration.js";
+import {
+  canShowFullVictoryCelebration,
+  showFullVictoryCelebration,
+} from "victory-presentation";
 
 let selectedTiles = [];
 let levelCompleteActions = { onNext: () => {}, onMenu: () => {} };
@@ -262,11 +265,14 @@ export function checkLevelComplete() {
       onNext: continueToNextLevel,
       onMenu: levelCompleteActions.onMenu,
     };
-    if (shouldShowVictoryCelebration(gameState.currentLevel)) {
+    if (
+      canShowFullVictoryCelebration
+      && shouldShowVictoryCelebration(gameState.currentLevel)
+    ) {
       showLevelSummaryOverlay({
         ...completion,
         isVictoryCelebration: true,
-        onCelebrate: () => showVictoryCelebration(completion),
+        onCelebrate: () => showFullVictoryCelebration(completion),
       });
     } else {
       showLevelSummaryOverlay(completion);

@@ -18,6 +18,10 @@ body {
   background-size: cover;
 }
 
+html[data-build-target="android"] body {
+  background-attachment: scroll;
+}
+
 input,
 textarea,
 [contenteditable="true"] {
