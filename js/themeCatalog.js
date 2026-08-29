@@ -11,19 +11,24 @@ const COMPUTER_SYMBOLS = Object.freeze([
 const LEGACY_THEME_IDS = Object.freeze({
   food: "foods",
   "antiques-spy": "historical-artifacts",
+  animals: "animals-land",
+  plants: "trees",
 });
 
 export const THEMES = Object.freeze([
   // Mặc định dùng 1.000 ảnh WebP; các chủ đề tạo mã dùng generator bên dưới.
   { id: "default", title: "Mặc định", price: 0, kind: "image", imageCount: GAME_CONFIG.cardImages.count, assetFolder: GAME_CONFIG.cardImages.defaultTheme, icon: "images" },
-  { id: "animals", title: "Động vật", price: 1, kind: "image", assetFolder: "animals", assets: IMAGE_THEME_ASSETS.animals, icon: "paw" },
+  { id: "animals-land", title: "Động vật trên cạn", price: 1, kind: "image", assetFolder: "animals-land", assets: IMAGE_THEME_ASSETS["animals-land"], icon: "paw", playable: false },
+  { id: "animals-air", title: "Động vật trên không", price: 1, kind: "image", assetFolder: "animals-air", assets: IMAGE_THEME_ASSETS["animals-air"], icon: "bird", playable: false },
+  { id: "animals-sea", title: "Động vật dưới biển", price: 1, kind: "image", assetFolder: "animals-sea", assets: IMAGE_THEME_ASSETS["animals-sea"], icon: "fish", playable: false },
   { id: "foods", title: "Đồ ăn", price: 1, kind: "image", assetFolder: "foods", assets: IMAGE_THEME_ASSETS.foods, icon: "utensils" },
   { id: "drinks", title: "Đồ uống", price: 1, kind: "image", assetFolder: "drinks", assets: IMAGE_THEME_ASSETS.drinks, icon: "cup" },
   { id: "fruits", title: "Trái cây", price: 1, kind: "image", assetFolder: "fruits", assets: IMAGE_THEME_ASSETS.fruits, icon: "apple", playable: false },
   { id: "vegetables", title: "Rau củ", price: 1, kind: "image", assetFolder: "vegetables", assets: IMAGE_THEME_ASSETS.vegetables, icon: "carrot", playable: false },
   { id: "nature", title: "Thiên nhiên", price: 1, kind: "image", assetFolder: "nature", assets: IMAGE_THEME_ASSETS.nature, icon: "leaf" },
   { id: "flowers", title: "Hoa", price: 1, kind: "image", assetFolder: "flowers", assets: IMAGE_THEME_ASSETS.flowers, icon: "flower" },
-  { id: "plants", title: "Cây cối & lá", price: 1, kind: "image", assetFolder: "plants", assets: IMAGE_THEME_ASSETS.plants, icon: "leaf" },
+  { id: "trees", title: "Cây", price: 1, kind: "image", assetFolder: "trees", assets: IMAGE_THEME_ASSETS.trees, icon: "tree", playable: false },
+  { id: "leaves", title: "Lá", price: 1, kind: "image", assetFolder: "leaves", assets: IMAGE_THEME_ASSETS.leaves, icon: "leaf", playable: false },
   { id: "geometry", title: "Hình học", price: 1, kind: "image", assetFolder: "geometry", assets: IMAGE_THEME_ASSETS.geometry, icon: "shapes" },
   { id: "cyberpunk", title: "Cyberpunk", price: 1, kind: "image", assetFolder: "cyberpunk", assets: IMAGE_THEME_ASSETS.cyberpunk, icon: "terminal" },
   { id: "magic-rpg", title: "RPG phép thuật", price: 1, kind: "image", assetFolder: "magic-rpg", assets: IMAGE_THEME_ASSETS["magic-rpg"], icon: "wand" },
@@ -36,6 +41,8 @@ export const THEMES = Object.freeze([
   { id: "historical-artifacts", title: "Cổ vật lịch sử", price: 1, kind: "image", assetFolder: "historical-artifacts", assets: IMAGE_THEME_ASSETS["historical-artifacts"], icon: "landmark" },
   { id: "spy-gadgets", title: "Thiết bị gián điệp", price: 1, kind: "image", assetFolder: "spy-gadgets", assets: IMAGE_THEME_ASSETS["spy-gadgets"], icon: "spyglass" },
   { id: "festivals", title: "Lễ hội", price: 1, kind: "image", assetFolder: "festivals", assets: IMAGE_THEME_ASSETS.festivals, icon: "celebrate" },
+  { id: "instruments", title: "Nhạc cụ", price: 1, kind: "image", assetFolder: "instruments", assets: IMAGE_THEME_ASSETS.instruments, icon: "music", playable: false },
+  { id: "mystery", title: "Huyền bí", price: 1, kind: "image", assetFolder: "mystery", assets: IMAGE_THEME_ASSETS.mystery, icon: "wand", playable: false },
   { id: "alphabet", title: "Chữ cái", price: 1, kind: "generated", generator: "alphabet", icon: "type" },
   { id: "numbers-2", title: "2 Số", price: 1, kind: "generated", generator: "numbers-2", icon: "hash" },
   { id: "numbers-3", title: "3 Số", price: 1, kind: "generated", generator: "numbers-3", icon: "hash" },

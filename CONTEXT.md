@@ -24,12 +24,18 @@
 ## Gameplay và Cửa hàng
 
 - Có 4 mặt lưng thẻ và 7 hiệu ứng lật/hiện thẻ. Ngoại hình mua bằng Xu, lưu theo thiết bị và trang bị trong tab **Ngoại hình** của Cửa hàng.
-- **Bộ sưu tập** gồm chủ đề Mặc định (1.000 ảnh); 20 chủ đề ảnh 3D đang mở rộng theo `themes.md`; và các chủ đề tạo bằng mã: Chữ cái, 2 Số, 3 Số, Ký hiệu máy tính. Tên asset là mô tả ASCII dạng `kebab-case.webp`; danh mục `{ id, label, file }` ở `js/themeAssets.js` là nguồn runtime. Đồ uống, Cây cối & lá và Thiết bị gián điệp đã đồng bộ vào Shop. Trái cây và Rau củ cũng có mặt trong Shop với giá thử nghiệm **1 Xu**, cho phép mua trước nhưng chỉ mở trang bị khi đủ ảnh tối thiểu cho gameplay. Các thẻ tạo mã dùng SVG, không emoji: Chữ cái là khối đồ chơi 3D xanh–tím, 2/3 Số là bảng số điện tử xanh ngọc, Ký hiệu máy tính là phím chức năng xanh đậm; mỗi giá trị có biến thể màu cố định để hai thẻ cùng cặp luôn giống nhau. Trong giai đoạn kiểm thử, mọi chủ đề có thể mua đều có giá **1 Xu**; cần cân bằng lại trước phát hành.
+- **Bộ sưu tập V2** gồm chủ đề Mặc định (1.000 ảnh), **25** chủ đề ảnh 3D theo `themes.md`, và các chủ đề tạo bằng mã: Chữ cái, 2 Số, 3 Số, Ký hiệu máy tính. `animals-land`, `animals-air`, `animals-sea`, `trees`, `leaves`, `instruments` và `mystery` đã được dành chỗ trong code nhưng hiển thị **Sắp có** cho đến khi mỗi chủ đề có asset riêng tối thiểu. Danh mục `{ id, label, file }` ở `js/themeAssets.js` là nguồn runtime; mọi asset hiện có của 20 theme legacy đã được đồng bộ vào đó. Các thẻ tạo mã dùng SVG, không emoji: Chữ cái là khối đồ chơi 3D xanh–tím, 2/3 Số là bảng số điện tử xanh ngọc, Ký hiệu máy tính là phím chức năng xanh đậm; mỗi giá trị có biến thể màu cố định để hai thẻ cùng cặp luôn giống nhau.
 - Cyberpunk, RPG phép thuật, Vũ trụ, Vật dụng gia đình, Đồ dùng văn phòng, Dụng cụ làm vườn, Thời trang & phụ kiện, Phương tiện giao thông, Cổ vật & gián điệp và Lễ hội đã có lô đầu 24 ảnh WebP 256×256/chủ đề, đang quy hoạch đến 96 ảnh và vẫn hiển thị **Sắp có** cho đến khi có quyết định mở khóa catalog.
 - Tab **Vật phẩm** chỉ chứa vật phẩm tiêu hao từ `js/shopCatalog.js`; không có phần thưởng xem quảng cáo. Mua thời gian 10/30/45/60 giây có giá 18/50/70/90 Xu; gợi ý 1/2/3 lượt có giá 8/15/21 Xu; xem trước 4/8/12 thẻ có giá 8/15/22 Xu; xem tất cả có giá `max(6, ceil(số thẻ chưa ghép × 1,75))` Xu.
 - Khi đang chơi, HUD có bảy thành phần cân đối: Menu và Mua thời gian bên trái; Cấp, Thời gian, Điểm ở giữa; Xem trước thẻ và Gợi ý bên phải. Hai thao tác mua/xem trước mở popup tối, hiện số Xu tại header, mua/dùng ngay; bàn cờ khóa trong lúc xem trước.
-- **Bộ sưu tập** chỉ mở bên ngoài ván chơi (menu chính và màn chọn chế độ), không nằm trong menu trong game.
-- Thời gian nền theo độ khó: **6/90/120/180 giây** từ Dễ đến Siêu khó. Mốc 6 giây ở Dễ là cấu hình thử nghiệm; đổi lại 60 trước khi phát hành. Gợi ý chưa dùng tích lũy, nhận thêm từ level 2 và giới hạn 10 lượt.
+- Có **6 chế độ chơi**:
+  1. **Dễ**: 12 thẻ (4×3), 60 giây, thưởng Xu `30 + floor(t × 0.35)`.
+  2. **Trung bình**: 24 thẻ (6×4), 90 giây, thưởng Xu `50 + floor(t × 0.5)`.
+  3. **Khó**: 36 thẻ (6×6), 120 giây, thưởng Xu `70 + floor(t × 0.65)`.
+  4. **Siêu khó**: 60 thẻ (6×10, mobile 6 cột), 180 giây, thưởng Xu `90 + floor(t × 0.8)`.
+  5. **Vô tận (Endless)**: 60 thẻ, preview 8 giây, đếm xuôi thời gian, thưởng cố định 10 Xu, không hiển thị nút mua thời gian.
+  6. **Thử thách (Challenge)**: Kích thước bàn cờ tự mở rộng linh hoạt theo cấp độ (từ 12 thẻ đến 48 thẻ theo `CHALLENGE_LAYOUTS`), khởi đầu 60 giây, mỗi màn cộng dồn +10 giây thưởng, xuất hiện ô may mắn (Lucky Tiles) tặng thêm thời gian/gợi ý/xu.
+- Thời gian nền và cấp độ: các chế độ thông thường cộng `min((level - 1) × 3, 30)` giây. Gợi ý chưa dùng tích lũy, nhận thêm từ level 2 và giới hạn 10 lượt.
 - Combo bắt đầu tại x2: mỗi cặp đúng cộng số giây bằng cấp combo; ghép sai đặt lại combo và trừ 1 Xu khỏi thưởng cuối màn.
 - `style.css` giữ kiểu nền dùng chung; CSS Shop và hiệu ứng gameplay đã tách sang `styles/shop.css` và `styles/gameplay-effects.css`.
 

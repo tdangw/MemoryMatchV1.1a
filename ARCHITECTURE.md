@@ -61,12 +61,14 @@ Các module được nối qua hàm `configure*`; tránh import vòng giữa con
 
 | Chế độ | Board chuẩn | Quy tắc mở rộng |
 | --- | --- | --- |
-| Dễ | 12 thẻ, 60 giây | Không đổi theo level. |
-| Trung bình | 24 thẻ, 90 giây | Không đổi theo level. |
-| Khó | 36 thẻ, 120 giây | Không đổi theo level. |
-| Siêu khó | 48 thẻ, 180 giây, 6 cột × 8 hàng | Không đổi theo level. |
+| Dễ | 12 thẻ (4×3), 60 giây | Không đổi theo level, thưởng `30 + floor(t × 0.35)`. |
+| Trung bình | 24 thẻ (6×4), 90 giây | Không đổi theo level, thưởng `50 + floor(t × 0.5)`. |
+| Khó | 36 thẻ (6×6), 120 giây | Không đổi theo level, thưởng `70 + floor(t × 0.65)`. |
+| Siêu khó | 60 thẻ (6×10), 180 giây | Không đổi theo level, thưởng `90 + floor(t × 0.8)`. |
+| Vô tận (Endless) | 60 thẻ (6×10), preview 8 giây | Đếm thời gian xuôi, thưởng cố định 10 Xu, không mua thời gian. |
+| Thử thách (Challenge) | 12–48 thẻ theo `CHALLENGE_LAYOUTS` | Khởi đầu 60 giây, cộng dồn +10s mỗi level, ô may mắn Lucky Tiles. |
 
-`getModeLayout(mode)` là điểm duy nhất quyết định kích thước board theo chế độ. Giao diện chỉ hiển thị tên chế độ, không hiển thị số thẻ.
+`getModeLayout(mode)` và `getChallengeLayout(level)` quyết định kích thước board theo chế độ và cấp độ. Giao diện chỉ hiển thị tên chế độ, không hiển thị số thẻ.
 
 1. `main.js` nạp dữ liệu từ `persistence.js`, hydrate `gameState`, áp dụng âm thanh và hiển thị menu chính.
 2. Người chơi chọn độ khó; `gameController.initializeLevel()` tạo `roundId` mới và board mới.
