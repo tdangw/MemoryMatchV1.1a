@@ -46,7 +46,7 @@ export function findAvailableConnections(grid) {
   if (!isValidGrid(grid)) return [];
   const positionsById = new Map();
   grid.forEach((row, rowIndex) => row.forEach((tile, columnIndex) => {
-    if (!tile?.id) return;
+    if (!tile?.id || tile.frozen) return;
     const positions = positionsById.get(tile.id) || [];
     positions.push({ row: rowIndex, column: columnIndex });
     positionsById.set(tile.id, positions);

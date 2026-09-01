@@ -3,7 +3,11 @@ import {
   createLinkBoard,
   ensurePlayableBoard,
   getRemainingLinkTiles,
+  makeRandomLinkPairSpecial,
   removeLinkBoardPair,
+  removeRandomLinkPair,
+  unlockAllFrozenLinkTiles,
+  unlockFrozenLinkTiles,
 } from "../js/linkConnect/linkBoard.js";
 import { hasAvailableConnection } from "../js/linkConnect/pathfinder.js";
 
@@ -47,5 +51,18 @@ const emptyPositionsAfterShuffle = board.grid.flatMap((row, rowIndex) => row.fla
     : []
 ))).sort();
 assert.deepEqual(emptyPositionsAfterShuffle, emptyPositionsBeforeShuffle);
+
+const specialBoard = createLinkBoard({
+  layout: { tileCount: 12, columns: 4 },
+  level: 3,
+  cardProvider: () => cards,
+});
+assert.equal(getRemainingLinkTiles(specialBoard).filter((tile) => tile.special).length, 2);
+assert.equal(getRemainingLinkTiles(specialBoard).filter((tile) => tile.frozen).length, 1);
+assert.equal(unlockFrozenLinkTiles(specialBoard), 1);
+assert.equal(getRemainingLinkTiles(specialBoard).filter((tile) => tile.frozen).length, 0);
+assert.ok(makeRandomLinkPairSpecial(specialBoard));
+assert.ok(removeRandomLinkPair(specialBoard));
+assert.equal(unlockAllFrozenLinkTiles(specialBoard), 0);
 
 console.log("Link Connect board checks passed.");

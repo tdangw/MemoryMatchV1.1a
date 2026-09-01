@@ -51,5 +51,6 @@ assert.equal(getLinkModeLayout("hard").tileCount, 36);
 assert.equal(getLinkChallengeLayout(10).tileCount, 24);
 assert.equal(getLinkTimerDirection("endless"), "up");
 assert.equal(calculateLinkMatchPoints(3), 16);
+assert.equal(calculateLinkMatchPoints(3, { special: true }), 24);
 
 console.log("Link Connect core checks passed.");

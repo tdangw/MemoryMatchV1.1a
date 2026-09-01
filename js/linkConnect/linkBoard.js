@@ -1,5 +1,6 @@
 import { getThemeCards } from "../themeCatalog.js";
 import { shuffleArray } from "../utils.js";
+import { getLinkFrozenTileCount } from "./linkConfig.js";
 import { hasAvailableConnection } from "./pathfinder.js";
 
 const MAX_SHUFFLE_ATTEMPTS = 100;
@@ -7,6 +8,7 @@ const MAX_SHUFFLE_ATTEMPTS = 100;
 export function createLinkBoard({
   layout,
   themeId = "default",
+  level = 1,
   cardProvider = getThemeCards,
 }) {
   const pairCount = layout.tileCount / 2;
@@ -14,7 +16,8 @@ export function createLinkBoard({
   if (cards.length !== pairCount) {
     throw new Error("Chủ đề không có đủ ảnh cho bàn Link Connect.");
   }
-  const tiles = cards.flatMap((card) => [
+  const playableCards = ensureSpecialPair(cards);
+  const tiles = playableCards.flatMap((card) => [
     createTile(card),
     createTile(card),
   ]);
@@ -25,6 +28,8 @@ export function createLinkBoard({
   };
   board.grid = createPaddedGrid(board.rows, board.columns, tiles);
   shuffleIntoPlayableBoard(board);
+  freezeRandomTiles(board, level);
+  ensurePlayableBoard(board);
   return board;
 }
 
@@ -43,6 +48,39 @@ export function ensurePlayableBoard(board) {
   if (hasAvailableConnection(board.grid)) return false;
   shuffleIntoPlayableBoard(board);
   return true;
+}
+
+export function unlockFrozenLinkTiles(board, count = 1) {
+  const frozenPositions = getInteriorPositions(board)
+    .filter((position) => getLinkBoardTile(board, position)?.frozen);
+  shuffleArray(frozenPositions);
+  frozenPositions.slice(0, Math.max(0, count)).forEach((position) => {
+    replaceTile(board, position, { frozen: false });
+  });
+  return Math.min(frozenPositions.length, Math.max(0, count));
+}
+
+export function unlockAllFrozenLinkTiles(board) {
+  return unlockFrozenLinkTiles(board, Number.POSITIVE_INFINITY);
+}
+
+export function makeRandomLinkPairSpecial(board) {
+  const pairs = getLinkPairs(board).filter((pair) => !pair.positions.every((position) => (
+    getLinkBoardTile(board, position)?.special
+  )));
+  const pair = pairs[Math.floor(Math.random() * pairs.length)];
+  if (!pair) return null;
+  pair.positions.forEach((position) => replaceTile(board, position, { special: true }));
+  return pair;
+}
+
+export function removeRandomLinkPair(board) {
+  const pairs = getLinkPairs(board).filter((pair) => pair.positions.length === 2);
+  const pair = pairs[Math.floor(Math.random() * pairs.length)];
+  if (!pair) return null;
+  const [start, end] = pair.positions;
+  removeLinkBoardPair(board, start, end);
+  return pair;
 }
 
 function shuffleIntoPlayableBoard(board) {
@@ -67,7 +105,23 @@ function createTile(card) {
     src: card.src,
     alt: card.alt,
     special: card.special === true,
+    frozen: false,
   });
+}
+
+function ensureSpecialPair(cards) {
+  if (cards.some((card) => card.special === true)) return cards;
+  return cards.map((card, index) => index === 0 ? { ...card, special: true } : card);
+}
+
+function freezeRandomTiles(board, level) {
+  const count = getLinkFrozenTileCount(level);
+  const positions = getInteriorPositions(board).filter((position) => {
+    const tile = getLinkBoardTile(board, position);
+    return tile && !tile.special;
+  });
+  shuffleArray(positions);
+  positions.slice(0, count).forEach((position) => replaceTile(board, position, { frozen: true }));
 }
 
 function createPaddedGrid(rows, columns, tiles) {
@@ -85,6 +139,33 @@ function createPaddedGrid(rows, columns, tiles) {
 
 function getInteriorTiles(board) {
   return board.grid.slice(1, -1).flatMap((row) => row.slice(1, -1)).filter(Boolean);
+}
+
+function getInteriorPositions(board) {
+  const positions = [];
+  board.grid.slice(1, -1).forEach((row, rowIndex) => {
+    row.slice(1, -1).forEach((tile, columnIndex) => {
+      if (tile) positions.push({ row: rowIndex + 1, column: columnIndex + 1 });
+    });
+  });
+  return positions;
+}
+
+function getLinkPairs(board) {
+  const byId = new Map();
+  getInteriorPositions(board).forEach((position) => {
+    const tile = getLinkBoardTile(board, position);
+    const pair = byId.get(tile.id) || { id: tile.id, positions: [] };
+    pair.positions.push(position);
+    byId.set(tile.id, pair);
+  });
+  return [...byId.values()];
+}
+
+function replaceTile(board, position, changes) {
+  const tile = getLinkBoardTile(board, position);
+  if (!tile) return;
+  board.grid[position.row][position.column] = Object.freeze({ ...tile, ...changes });
 }
 
 function getOccupiedInteriorPositions(board) {

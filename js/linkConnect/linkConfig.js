@@ -10,6 +10,15 @@ export const LINK_CONNECT_CONFIG = Object.freeze({
   pathfinding: Object.freeze({ maxTurns: 2, boundaryPadding: 1 }),
   scoring: Object.freeze({ baseMatchPoints: 10, comboStepPoints: 3 }),
   levelProgression: Object.freeze({ timeBonusPerLevel: 2, timeBonusCap: 10 }),
+  special: Object.freeze({
+    scoreMultiplier: 1.5,
+    progressTarget: 10,
+    coinReward: Object.freeze({ min: 10, max: 50 }),
+    timeReward: Object.freeze({ min: 3, max: 10 }),
+    milestoneTenCoins: 100,
+    frozenTilesFromLevel: 3,
+    frozenTilesPerLevel: 1,
+  }),
 });
 
 const CHALLENGE_LAYOUTS = Object.freeze([
@@ -52,8 +61,14 @@ export function getLinkLevelTimeBonus(level = 1) {
   );
 }
 
-export function calculateLinkMatchPoints(combo = 1) {
+export function calculateLinkMatchPoints(combo = 1, { special = false } = {}) {
   const scoring = LINK_CONNECT_CONFIG.scoring;
-  return scoring.baseMatchPoints
+  const points = scoring.baseMatchPoints
     + scoring.comboStepPoints * Math.max(0, combo - 1);
+  return Math.round(points * (special ? LINK_CONNECT_CONFIG.special.scoreMultiplier : 1));
+}
+
+export function getLinkFrozenTileCount(level = 1) {
+  const special = LINK_CONNECT_CONFIG.special;
+  return level >= special.frozenTilesFromLevel ? special.frozenTilesPerLevel : 0;
 }

@@ -2,11 +2,13 @@ import { createIcon } from "../icons.js";
 import { openAppModal, showAppToast } from "../modal.js";
 import { syncDefaultMusic } from "../sound.js";
 import { getEquippedThemeId } from "../appearance.js";
-import { gameState } from "../gameState.js";
+import { gameState, increaseCoins } from "../gameState.js";
+import { saveCoins } from "../persistence.js";
 import { getTheme } from "../themeCatalog.js";
 import {
   calculateLinkMatchPoints,
   getLinkChallengeLayout,
+  LINK_CONNECT_CONFIG,
   getLinkLevelTimeBonus,
   getLinkModeLayout,
   getLinkTimerDirection,
@@ -18,6 +20,10 @@ import {
   ensurePlayableBoard,
   getLinkBoardTile,
   removeLinkBoardPair,
+  removeRandomLinkPair,
+  makeRandomLinkPairSpecial,
+  unlockAllFrozenLinkTiles,
+  unlockFrozenLinkTiles,
 } from "./linkBoard.js";
 import { findConnectionPath } from "./pathfinder.js";
 import {
@@ -105,7 +111,9 @@ export function startLinkLevel({ mode = linkGameState.mode, level = 1 } = {}) {
   const board = createLinkBoard({
     layout,
     themeId: getEquippedThemeId(gameState.appearance, "link-connect"),
+    level,
   });
+  if (level === 1) linkGameState.specialProgress = 0;
   const roundId = beginLinkRound({ mode, level, layout, board });
   if (isLinkEndlessMode(mode)) linkGameState.remainingTime = 0;
   else if (isLinkChallengeMode(mode) && level > 1) {
@@ -163,6 +171,7 @@ function showLinkGame() {
       </div>
       <footer class="link-connect-game__footer">
         <span id="link-pair-progress">0/0 cặp</span>
+        <span id="link-special-progress">Đặc biệt 0/10</span>
         <strong id="link-timer">00:00</strong>
       </footer>`;
     document.querySelector(".main-wrapper")?.append(container);
@@ -247,7 +256,7 @@ function resumeLinkAfterModal() {
 }
 
 function handleLinkTileClick(position) {
-  if (linkGameState.isLocked || linkGameState.isPaused) return;
+  if (linkGameState.isLocked || linkGameState.isPaused || tile.frozen) return;
   const tile = getLinkBoardTile(linkGameState.board, position);
   if (!tile) return;
   if (!selectedPosition) {
@@ -272,12 +281,14 @@ function handleLinkTileClick(position) {
 
   linkGameState.isLocked = true;
   linkGameState.combo += 1;
-  linkGameState.score += calculateLinkMatchPoints(linkGameState.combo);
+  const isSpecialMatch = firstTile.special && tile.special;
+  linkGameState.score += calculateLinkMatchPoints(linkGameState.combo, { special: isSpecialMatch });
   drawLinkPath(path, linkGameState.board);
   playLinkMatchExit(selectedPosition, position);
   setTimeout(() => {
     removeLinkBoardPair(linkGameState.board, selectedPosition, position);
     linkGameState.matchedPairs += 1;
+    if (isSpecialMatch) applySpecialMatchRewards();
     selectedPosition = null;
     clearLinkPath();
     renderLinkBoard(linkGameState.board, { onTileClick: handleLinkTileClick });
@@ -343,7 +354,90 @@ function updateLinkHud() {
   setText("link-combo", linkGameState.combo);
   setText("link-score", linkGameState.score);
   setText("link-pair-progress", `${linkGameState.matchedPairs}/${linkGameState.totalPairs} cặp`);
+  setText(
+    "link-special-progress",
+    `Đặc biệt ${linkGameState.specialProgress}/${LINK_CONNECT_CONFIG.special.progressTarget}`,
+  );
   setText("link-timer", formatTime(linkGameState.remainingTime));
+}
+
+function applySpecialMatchRewards() {
+  linkGameState.specialProgress += 1;
+  const special = LINK_CONNECT_CONFIG.special;
+  const endless = isLinkEndlessMode(linkGameState.mode);
+  const rewardType = endless || Math.random() < 0.5 ? "coins" : "time";
+  const amount = rewardType === "coins"
+    ? randomInteger(special.coinReward.min, special.coinReward.max)
+    : randomInteger(special.timeReward.min, special.timeReward.max);
+  if (rewardType === "coins") {
+    increaseCoins(amount);
+    saveCoins(gameState.coins);
+    showAppToast(`Cặp đặc biệt: +${amount} Xu`);
+  } else {
+    linkGameState.remainingTime += amount;
+    showAppToast(`Cặp đặc biệt: +${amount} giây`);
+  }
+  applySpecialMilestone(linkGameState.specialProgress);
+  if (linkGameState.specialProgress >= special.progressTarget) {
+    linkGameState.specialProgress = 0;
+  }
+}
+
+function applySpecialMilestone(progress) {
+  let message = "";
+  if (progress === 1) {
+    removeAutomaticPair();
+    message = "Mốc đặc biệt 1: phá hủy một cặp thẻ.";
+  } else if (progress === 3) {
+    message = unlockFrozenLinkTiles(linkGameState.board, 1)
+      ? "Mốc đặc biệt 3: đã mở khóa một thẻ đóng băng."
+      : removeAutomaticPair("Mốc đặc biệt 3: không có thẻ đóng băng, đã phá hủy một cặp.");
+  } else if (progress === 5) {
+    makeRandomLinkPairSpecial(linkGameState.board);
+    message = "Mốc đặc biệt 5: đã tạo một cặp đặc biệt.";
+  } else if (progress === 7) {
+    message = applyMilestoneSevenReward();
+  } else if (progress === 9) {
+    message = unlockFrozenLinkTiles(linkGameState.board, 1)
+      ? "Mốc đặc biệt 9: đã mở khóa một thẻ đóng băng."
+      : removeAutomaticPair("Mốc đặc biệt 9: không có thẻ đóng băng, đã phá hủy một cặp.");
+  } else if (progress === 10) {
+    increaseCoins(LINK_CONNECT_CONFIG.special.milestoneTenCoins);
+    saveCoins(gameState.coins);
+    unlockAllFrozenLinkTiles(linkGameState.board);
+    makeRandomLinkPairSpecial(linkGameState.board);
+    removeAutomaticPair();
+    message = "Mốc đặc biệt 10: +100 Xu, mở khóa băng và kích hoạt phần thưởng.";
+  }
+  if (message) showAppToast(message, { tone: "info", duration: 2400 });
+}
+
+function applyMilestoneSevenReward() {
+  const choices = isLinkEndlessMode(linkGameState.mode)
+    ? ["hint", "reshuffle"]
+    : ["time", "hint", "reshuffle"];
+  const reward = choices[Math.floor(Math.random() * choices.length)];
+  if (reward === "time") {
+    linkGameState.remainingTime += randomInteger(3, 10);
+    return "Mốc đặc biệt 7: nhận thêm thời gian.";
+  }
+  if (reward === "hint") {
+    linkGameState.hints += 1;
+    return "Mốc đặc biệt 7: nhận một lượt gợi ý.";
+  }
+  linkGameState.reshuffles += 1;
+  return "Mốc đặc biệt 7: nhận một lượt xáo trộn.";
+}
+
+function removeAutomaticPair(fallbackMessage = "") {
+  const pair = removeRandomLinkPair(linkGameState.board);
+  if (!pair) return fallbackMessage;
+  linkGameState.matchedPairs += 1;
+  return fallbackMessage;
+}
+
+function randomInteger(minimum, maximum) {
+  return minimum + Math.floor(Math.random() * (maximum - minimum + 1));
 }
 
 function stopCountdown() {

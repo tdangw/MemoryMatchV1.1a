@@ -22,6 +22,12 @@ export function renderLinkBoard(board, { onTileClick } = {}) {
       const button = document.createElement("button");
       button.type = "button";
       button.className = "link-tile";
+      if (tile.special) button.classList.add("is-special");
+      if (tile.frozen) {
+        button.classList.add("is-frozen");
+        button.disabled = true;
+        button.setAttribute("aria-label", `${tile.alt} · đang đóng băng`);
+      }
       button.dataset.row = String(position.row);
       button.dataset.column = String(position.column);
       button.setAttribute("aria-label", tile.alt);
