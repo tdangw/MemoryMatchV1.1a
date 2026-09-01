@@ -61,9 +61,11 @@ export function drawLinkPath(path, board) {
   svg.replaceChildren();
   const glow = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
   glow.setAttribute("points", points.map(({ x, y }) => `${x},${y}`).join(" "));
+  glow.setAttribute("pathLength", "1");
   glow.classList.add("link-path-overlay__glow");
   const polyline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
   polyline.setAttribute("points", points.map(({ x, y }) => `${x},${y}`).join(" "));
+  polyline.setAttribute("pathLength", "1");
   polyline.classList.add("link-path-overlay__beam");
   svg.append(glow, polyline);
   svg.classList.add("is-visible");
