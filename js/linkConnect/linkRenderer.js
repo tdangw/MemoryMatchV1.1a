@@ -32,18 +32,16 @@ export function renderLinkBoard(board, { onTileClick } = {}) {
       button.type = "button";
       button.className = "link-tile";
       if (tile.special) button.classList.add("is-special");
-      if (tile.iceBreaker) button.classList.add("is-ice-breaker");
       if (tile.luckyReward) button.classList.add("is-lucky");
       if (tile.frozen) {
         button.classList.add("is-frozen");
+        button.disabled = true;
       }
       button.dataset.row = String(position.row);
       button.dataset.column = String(position.column);
       button.setAttribute(
         "aria-label",
-        tile.frozen ? `${tile.alt} · thẻ đóng băng`
-          : tile.iceBreaker ? `${tile.alt} · thẻ phá băng`
-            : tile.alt,
+        tile.frozen ? `${tile.alt} · thẻ đóng băng` : tile.alt,
       );
       const image = document.createElement("img");
       image.src = tile.src;

@@ -207,23 +207,6 @@
   box-shadow: 0 0 0 2px rgb(242 191 91 / 30%), 0 4px 12px rgb(0 0 0 / 30%);
 }
 
-.link-tile.is-ice-breaker::before {
-  content: "";
-  position: absolute;
-  top: 4px;
-  right: 5px;
-  z-index: 2;
-  width: 17px;
-  height: 17px;
-  border: 1px solid rgb(213 245 255 / 70%);
-  border-radius: 50%;
-  background:
-    linear-gradient(135deg, transparent 42%, #f4fdff 43% 53%, transparent 54%),
-    linear-gradient(45deg, transparent 42%, #f4fdff 43% 53%, transparent 54%),
-    #2b9cc0;
-  box-shadow: 0 1px 5px rgb(10 84 120 / 55%);
-}
-
 .link-tile.is-lucky {
   border-color: #ad72ff;
   box-shadow: 0 0 0 2px rgb(173 114 255 / 30%), 0 0 15px rgb(173 114 255 / 38%);
@@ -231,7 +214,7 @@
 
 .link-tile.is-frozen {
   position: relative;
-  cursor: pointer;
+  cursor: not-allowed;
   filter: saturate(0.68) brightness(0.86);
 }
 

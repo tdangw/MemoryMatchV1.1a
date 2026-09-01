@@ -59,7 +59,7 @@ Sau khi một cặp thẻ bị loại bỏ, bàn cờ có thể kích hoạt hi�
 ### B. Các Chướng ngại vật & Ô tương tác đặc biệt
 
 1. **Ghép đủ bộ 3:** Khi ghép đủ 3 cặp thẻ đặc biệt sẽ mở khóa 1 thẻ bị đóng băng (nếu có).
-2. **Ghép cặp đặc biệt:** Khi ghép được 1 cặp thẻ đặc biệt sẽ đồng thời phá hủy 1 cặp thẻ bất kì.
+2. **Ghép cặp đặc biệt:** Mỗi màn luôn có ít nhất 1 cặp thẻ đặc biệt. Khi ghép được cặp này, thẻ đóng băng trong màn sẽ được mở khóa; đồng thời phá hủy 1 cặp thẻ bất kì.
 3. **Ghép đủ bộ 5:** Khi ghép đủ 5 cặp thẻ đặc biệt sẽ biến 1 cặp thẻ bất kì thành 1 cặp thẻ đặc biệt.
 4. **Ghép đủ bộ 7:** Khi ghép đủ 7 cặp thẻ đặc biệt sẽ nhận 1 trong các hiệu ứng: Thêm thời gian, thêm 1 lượt gợi ý, thêm 1 lượt xáo trộn.
 5. **Ghép đủ bộ 9:** Khi ghép đủ 9 cặp thẻ đặc biệt sẽ nhận 1 trong các hiệu ứng: Mở khóa 1 thẻ đóng băng, phá hủy 1 cặp thẻ bất kì.

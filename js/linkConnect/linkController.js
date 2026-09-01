@@ -354,12 +354,7 @@ function resumeLinkAfterModal() {
 function handleLinkTileClick(position) {
   if (linkGameState.isLocked || linkGameState.isPaused) return;
   const tile = getLinkBoardTile(linkGameState.board, position);
-  if (!tile) return;
-  // Thẻ đóng băng chỉ được chọn làm điểm đến bởi thẻ cùng hình để phá băng.
-  if (!selectedPosition && tile.frozen) {
-    showAppToast("Hãy chọn thẻ phá băng cùng hình trước.");
-    return;
-  }
+  if (!tile || tile.frozen) return;
   if (!selectedPosition) {
     selectedPosition = position;
     setLinkTileSelected(position, true);
@@ -638,7 +633,10 @@ function applySpecialMatchRewards() {
     linkGameState.remainingTime += amount;
     showAppToast(`Cặp đặc biệt: +${amount} giây`);
   }
-  const boardChanged = applySpecialMilestone(linkGameState.specialProgress);
+  // Mỗi màn luôn có ít nhất một cặp đặc biệt; ghép cặp này mở băng để ván không thể kẹt.
+  const thawedCount = unlockFrozenLinkTiles(linkGameState.board, 1);
+  const boardChanged = Boolean(thawedCount) || applySpecialMilestone(linkGameState.specialProgress);
+  if (thawedCount) showAppToast("Cặp đặc biệt đã mở khóa thẻ đóng băng.");
   if (linkGameState.specialProgress >= special.progressTarget) {
     linkGameState.specialProgress = 0;
   }
