@@ -273,16 +273,17 @@ function showSessionPicker(gameId, onContinue) {
 }
 
 function showSessionChoice({ label, session, onContinue, onNew }) {
-  openAppModal({
+  const modal = openAppModal({
     id: "session-choice-modal",
     icon: "play",
     title: `${label} - Level ${session.level}`,
     content: "<p>Bạn muốn tiếp tục hành trình đã lưu hay bắt đầu lại từ cấp 1?</p>",
     actions: [
-      { label: "Tiếp tục", icon: "play", onClick: onContinue },
-      { label: "Chơi mới", icon: "restart", variant: "primary", onClick: onNew },
+      { label: "Chơi mới", icon: "restart", onClick: onNew },
+      { label: "Tiếp tục", icon: "play", variant: "primary", onClick: onContinue },
     ],
   });
+  modal.panel.classList.add("session-choice-modal");
 }
 
 function modeLabel(mode) {

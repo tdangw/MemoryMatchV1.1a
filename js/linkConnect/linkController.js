@@ -113,31 +113,32 @@ function chooseLinkMode(mode, label, difficultyModal) {
     startLinkLevel({ mode, level: 1 });
     return;
   }
-  openAppModal({
+  const modal = openAppModal({
     id: "link-session-choice-modal",
     icon: "play",
     title: `${label} - Level ${session.level}`,
     content: "<p>Bạn muốn tiếp tục hành trình đã lưu hay bắt đầu lại từ cấp 1?</p>",
     actions: [
       {
-        label: "Tiếp tục",
-        icon: "play",
-        onClick: () => {
-          difficultyModal.close();
-          continueLinkSession(session);
-        },
-      },
-      {
         label: "Chơi mới",
         icon: "restart",
-        variant: "primary",
         onClick: () => {
           difficultyModal.close();
           startLinkLevel({ mode, level: 1 });
         },
       },
+      {
+        label: "Tiếp tục",
+        icon: "play",
+        variant: "primary",
+        onClick: () => {
+          difficultyModal.close();
+          continueLinkSession(session);
+        },
+      },
     ],
   });
+  modal.panel.classList.add("session-choice-modal");
 }
 
 export function startLinkLevel({ mode = linkGameState.mode, level = 1, resume = false } = {}) {
