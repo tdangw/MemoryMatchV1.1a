@@ -70,6 +70,16 @@ export function playLinkMatchExit(start, end) {
   });
 }
 
+// Giữ nguyên các thẻ còn lại sau khi ghép đúng để tránh nháy do dựng lại ảnh.
+export function clearLinkMatchedPair(start, end) {
+  [start, end].forEach((position) => {
+    const cell = getLinkBoardCell(position);
+    if (!cell) return;
+    cell.replaceChildren();
+    cell.classList.add("is-empty");
+  });
+}
+
 export function drawLinkPath(path, board) {
   const svg = document.getElementById("link-path-overlay");
   const boardElement = document.getElementById("link-board");

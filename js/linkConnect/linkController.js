@@ -34,6 +34,7 @@ import { clearActiveSession, getActiveSession, saveActiveSession } from "../sess
 import { showLevelRewardOverlay, showLevelSummaryOverlay } from "../ui.js";
 import {
   clearLinkPath,
+  clearLinkMatchedPair,
   clearLinkTileSelection,
   drawLinkPath,
   playLinkMatchExit,
@@ -376,13 +377,14 @@ function handleLinkTileClick(position) {
   drawLinkPath(path, linkGameState.board);
   playLinkMatchExit(selectedPosition, position);
   setTimeout(() => {
-    removeLinkBoardPair(linkGameState.board, selectedPosition, position);
+    const matchedStart = selectedPosition;
+    removeLinkBoardPair(linkGameState.board, matchedStart, position);
     linkGameState.matchedPairs += 1;
     if (isSpecialMatch) applySpecialMatchRewards();
     if (firstTile.luckyReward) applyLinkLuckyReward(firstTile.luckyReward);
     selectedPosition = null;
     clearLinkPath();
-    renderLinkBoard(linkGameState.board, { onTileClick: handleLinkTileClick });
+    clearLinkMatchedPair(matchedStart, position);
     updateLinkHud();
     if (linkGameState.matchedPairs >= linkGameState.totalPairs) {
       completeLinkLevel();

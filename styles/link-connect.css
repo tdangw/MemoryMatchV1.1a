@@ -183,6 +183,8 @@
   border-radius: 11px;
   background: #1c3155;
   box-shadow: 0 4px 10px rgb(0 0 0 / 24%);
+  backface-visibility: hidden;
+  transform: translateZ(0);
   transition: border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease;
 }
 
@@ -229,10 +231,12 @@
 
 .link-tile.is-removing {
   pointer-events: none;
+  will-change: transform, opacity;
   animation: link-tile-dissolve 320ms cubic-bezier(0.2, 0.75, 0.25, 1) 680ms both;
 }
 
 .link-tile.is-removing img {
+  will-change: transform, opacity;
   animation: link-tile-image-dissolve 320ms ease-in 680ms both;
 }
 
@@ -364,4 +368,21 @@
   .link-board { gap: 4px; padding: 6px; border-radius: 14px; }
   .link-tile { border-radius: 8px; }
   .link-connect-game__stats { gap: 4px; }
+}
+
+/* Thiết bị cảm ứng yếu dễ nháy khi filter/blur chạy trên ảnh lớn. */
+@media (hover: none) and (pointer: coarse) {
+  .link-tile.is-removing {
+    animation-name: link-tile-dissolve-mobile;
+  }
+
+  .link-tile.is-removing img {
+    animation: none;
+  }
+}
+
+@keyframes link-tile-dissolve-mobile {
+  0% { opacity: 1; transform: translateZ(0) scale(1); }
+  55% { opacity: 0.86; transform: translateZ(0) scale(0.97); }
+  100% { opacity: 0; transform: translateZ(0) scale(0.82); }
 }
