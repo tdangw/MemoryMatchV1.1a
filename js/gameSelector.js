@@ -27,13 +27,13 @@ export function showGameSelector() {
     createGameChoice({
       icon: "images",
       title: "Memory Match",
-      description: "Ghi nhớ và tìm các cặp hình giống nhau khi lật thẻ.",
+      description: "Thử thách cách mà bạn ghi nhớ.",
       onClick: () => openGameMenu("memory-match"),
     }),
     createGameChoice({
       icon: "puzzle",
       title: "Link Connect",
-      description: "Quan sát và nối cặp hình giống nhau không có vật cản.",
+      description: "Thử thách cách mà bạn quan sát.",
       onClick: () => openGameMenu("link-connect"),
     }),
   );
@@ -66,7 +66,7 @@ function createLinkConnectMenu() {
   const overlay = createMenuOverlay("link-connect-menu");
   const wrapper = createMenuWrapper(
     "Link Connect",
-    "Quan sát và nối cặp hình giống nhau không có vật cản.",
+    "Thử thách cách mà bạn quan sát.",
   );
   const menuList = document.createElement("ul");
   menuList.className = "menu-list";

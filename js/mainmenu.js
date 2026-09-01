@@ -62,7 +62,7 @@ export function createMainMenu() {
   wrapper.appendChild(title);
   const description = document.createElement("p");
   description.className = "menu-description";
-  description.textContent = "Ghi nhớ và tìm các cặp hình giống nhau khi lật thẻ.";
+  description.textContent = "Thử thách cách mà bạn ghi nhớ.";
   wrapper.appendChild(description);
 
   const menuList = document.createElement("ul");
