@@ -56,6 +56,14 @@ export const SHOP_ITEMS = Object.freeze([
     value: 3,
   },
   {
+    id: "hint-5",
+    icon: "search",
+    title: "5 lượt gợi ý",
+    price: 30,
+    type: "hint",
+    value: 5,
+  },
+  {
     id: "reveal-4",
     icon: "puzzle",
     title: "Xem trước 4 thẻ",
@@ -83,12 +91,11 @@ export const SHOP_ITEMS = Object.freeze([
     id: "reveal-all",
     icon: "puzzle",
     title: "Xem trước tất cả thẻ",
+    price: 30,
     type: "reveal-all",
   },
 ]);
 
-export function getShopItemPrice(item, { unmatchedTileCount = 0 } = {}) {
-  return item.type === "reveal-all"
-    ? Math.max(6, Math.ceil(unmatchedTileCount * 1.75))
-    : item.price;
+export function getShopItemPrice(item) {
+  return item.price;
 }

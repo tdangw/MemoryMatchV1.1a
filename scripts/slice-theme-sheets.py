@@ -7,6 +7,8 @@ SOURCES = Path(r"C:\Users\Dang\.codex\generated_images\01a03e56-e5de-7981-8f4f-0
 ANIMAL_SOURCES = Path(r"C:\Users\Dang\.codex\generated_images\01a058ee-a066-7610-ac88-aaff8a0d0a96")
 
 THEMES = {
+    "animals-land-batch-1a": (ANIMAL_SOURCES, "exec-2279fcf8-1f73-4d8f-b06d-bd163a662940.png", "elephant tiger lion rabbit fox giant-panda giraffe monkey sloth zebra hedgehog alpaca red-panda beaver pangolin tapir", ((21,22,310,311),(328,22,617,311),(636,22,925,311),(943,22,1232,311),(21,329,310,618),(328,329,617,618),(636,329,925,618),(943,329,1232,618),(21,636,310,925),(328,636,617,925),(636,636,925,925),(943,636,1232,925),(21,943,310,1232),(328,943,617,1232),(636,943,925,1232),(943,943,1232,1232))),
+    "animals-land-batch-1b": (ANIMAL_SOURCES, "exec-323d3368-5d65-4e11-8183-91243ba812ba.png", "capybara rhinoceros hippopotamus camel wolf deer wild-boar tortoise", ((35,35,316,316),(336,35,617,316),(636,35,917,316),(936,35,1217,316),(35,343,316,624),(336,343,617,624),(636,343,917,624),(936,343,1217,624),(35,652,316,933))),
     "animals-land": (
         ANIMAL_SOURCES,
         "exec-90f2f048-6c31-4d50-8c90-aea3b4f4fc2c.png",
@@ -27,8 +29,14 @@ THEMES = {
     ),
     "animals-land-batch-4": (
         ANIMAL_SOURCES,
-        "exec-815a40de-d92b-45f5-a1da-3d55f226afc5.png",
+        "exec-68344041-4d02-48b0-ae7e-2ac688c920ce.png",
         "chameleon monitor-lizard toad tree-frog newt box-turtle sulcata-tortoise gecko corn-snake cobra-snake ball-python green-iguana tarantula rhinoceros-beetle stick-insect praying-mantis ladybug worker-ant cricket caterpillar african-pygmy-hedgehog echidna aardvark wombat",
+        ((0, 0, 245, 248), (253, 0, 497, 248), (505, 0, 749, 248), (757, 0, 999, 248), (1008, 0, 1254, 248), (0, 257, 245, 503), (253, 257, 497, 503), (505, 257, 749, 503), (757, 257, 999, 503), (1008, 257, 1254, 503), (0, 510, 245, 757), (253, 510, 497, 757), (505, 510, 749, 757), (757, 510, 999, 757), (1008, 510, 1254, 757), (0, 765, 245, 1005), (253, 765, 497, 1005), (505, 765, 749, 1005), (757, 765, 999, 1005), (1008, 765, 1254, 1005), (0, 1013, 245, 1254), (253, 1013, 497, 1254), (505, 1013, 749, 1254), (757, 1013, 999, 1254), (1008, 1013, 1254, 1254)),
+    ),
+    "animals-land-batch-5": (
+        ANIMAL_SOURCES,
+        "exec-5484a584-75cd-498f-a773-33e9ac0bf3c1.png",
+        "baby-koala quokka possum red-kangaroo wallaby european-badger wolverine pine-marten sable civet genet binturong coati kinkajou peccary brazilian-tapir babirusa okapi bongo-antelope oryx kudu alpine-ibex markhor pronghorn",
         ((0, 0, 251, 251), (251, 0, 502, 251), (502, 0, 752, 251), (752, 0, 1003, 251), (1003, 0, 1254, 251), (0, 251, 251, 502), (251, 251, 502, 502), (502, 251, 752, 502), (752, 251, 1003, 502), (1003, 251, 1254, 502), (0, 502, 251, 752), (251, 502, 502, 752), (502, 502, 752, 752), (752, 502, 1003, 752), (1003, 502, 1254, 752), (0, 752, 251, 1003), (251, 752, 502, 1003), (502, 752, 752, 1003), (752, 752, 1003, 1003), (1003, 752, 1254, 1003), (0, 1003, 251, 1254), (251, 1003, 502, 1254), (502, 1003, 752, 1254), (752, 1003, 1003, 1254), (1003, 1003, 1254, 1254)),
     ),
     "cyberpunk": ("exec-fea4ecb5-f5e2-42eb-bc34-683cbe0b7fb3.png", "delivery-robot robot-cat round-drone neon-helmet ar-glasses robotic-arm ai-chip glowing-circuit-board energy-battery hologram-speaker vending-machine neon-arrow future-motorcycle flying-taxi teleport-gate tech-suitcase cyber-headphones holographic-keyboard drone-camera mini-satellite neon-tree electronic-mask laser-toolbox data-crystal"),
@@ -44,16 +52,21 @@ THEMES = {
 }
 
 SPECIAL_ASSET_NAMES = {
+    "animals-land-batch-1b": "crystal-antlered-deer",
     "animals-land": "mythical-griffin",
     "animals-land-batch-2": "mythical-winged-lion",
     "animals-land-batch-3": "mythical-winged-lynx",
-    "animals-land-batch-4": "crystal-crowned-lynx",
+    "animals-land-batch-4": "crystal-crowned-chimera",
+    "animals-land-batch-5": "prismatic-antlered-deer",
 }
 
 OUTPUT_THEMES = {
+    "animals-land-batch-1a": "animals-land",
+    "animals-land-batch-1b": "animals-land",
     "animals-land-batch-2": "animals-land",
     "animals-land-batch-3": "animals-land",
     "animals-land-batch-4": "animals-land",
+    "animals-land-batch-5": "animals-land",
 }
 
 selected_themes = sys.argv[1:] or list(THEMES)
@@ -68,8 +81,8 @@ for theme in selected_themes:
     else:
         source_directory, source_name, names_string, boxes = config
     names = names_string.split()
-    if len(names) != 24:
-        raise ValueError(f"{theme} must have 24 names")
+    if len(names) not in (8, 16, 24):
+        raise ValueError(f"{theme} must have 8, 16, or 24 names")
     with Image.open(source_directory / source_name) as source:
         if source.width != source.height:
             raise ValueError(f"{source_name} is not square")
@@ -91,7 +104,7 @@ for theme in selected_themes:
             card.save(target_dir / f"{name}.webp", "WEBP", quality=90, method=6)
             card.close()
         if theme in SPECIAL_ASSET_NAMES:
-            special_box = boxes[24] if boxes else (
+            special_box = boxes[len(names)] if boxes else (
                 round(4 * source.width / 5),
                 round(4 * source.height / 5),
                 source.width,

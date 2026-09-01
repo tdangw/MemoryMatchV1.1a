@@ -24,7 +24,7 @@ export function openQuickAssistOverlay(kind) {
   const items = SHOP_ITEMS.filter((item) =>
     kind === "time"
       ? item.type === "time" || item.type === "hint"
-      : item.type.startsWith("reveal-") || item.type === "hint",
+      : item.type.startsWith("reveal-"),
   ).map((item) => ({
     ...item,
     price: getShopItemPrice(item, {
@@ -119,11 +119,13 @@ export function openShopOverlay({ fromMenu = false } = {}) {
   const appearanceTab = createTab("Ngoại hình", true, () =>
     renderAppearance(grid, roundId, modal),
   );
+  const flipEffectsTab = createTab("Hiệu ứng lật", false, () =>
+    renderFlipEffects(grid, roundId, modal),
+  );
   const themesTab = createTab("Chủ đề", false, () =>
     renderThemes(grid, roundId, modal),
   );
-  tabs.classList.add("shop-tabs--catalog");
-  tabs.append(appearanceTab, themesTab);
+  tabs.append(appearanceTab, flipEffectsTab, themesTab);
   renderAppearance(grid, roundId, modal);
 }
 
@@ -156,6 +158,11 @@ function renderAppearance(grid, roundId, modal) {
     roundId,
     modal,
   );
+}
+
+function renderFlipEffects(grid, roundId, modal) {
+  grid.className = "shop-item-grid shop-item-grid--appearance";
+  grid.replaceChildren();
   renderAppearanceGroup(
     grid,
     "Hiệu ứng lật",

@@ -161,6 +161,7 @@ export function createGrid(
     img.classList.add("hidden");
 
     tile.dataset.imageId = cardData.id;
+    tile.dataset.special = String(cardData.special === true);
     tile.appendChild(img);
     gridContainer.appendChild(tile);
   });

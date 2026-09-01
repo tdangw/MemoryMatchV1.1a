@@ -6,13 +6,13 @@ Tài liệu này là bản phân tích toàn diện và kế hoạch thiết k�
 
 ## 1. Tổng quan & Tầm nhìn thiết kế (Design Vision)
 
-| Tiêu chí | Memory Match (Hiện tại) | Link Connect (Chế độ mới) |
-| :--- | :--- | :--- |
-| **Trạng thái thẻ** | Ẩn mặt (úp thẻ) | **Mở ngửa toàn bộ thẻ ngay từ đầu** |
-| **Mục tiêu cốt lõi** | Rèn luyện **trí nhớ ngắn hạn** và sự tập trung | Rèn luyện **khả năng quan sát nhanh, phản xạ mắt** và tư duy đường đi trực giao |
-| **Luật ghép đôi** | Lật trúng 2 thẻ giống nhau ở bất kỳ đâu | Ghép 2 thẻ giống nhau có **đường nối hợp lệ không bị cản** |
-| **Nhịp độ chơi** | Cẩn trọng, ghi nhớ vị trí, tính toán lật mở | Nhanh, dồn dập, tạo chuỗi combo liên hoàn cực kỳ thỏa mãn (satisfying) |
-| **Tài nguyên sử dụng** | 25 chủ đề ảnh 3D + 1000 ảnh default | **Tái sử dụng 100% tài nguyên ảnh 3D và hệ thống Shop/Xu** |
+| Tiêu chí               | Memory Match (Hiện tại)                        | Link Connect (Chế độ mới)                                                       |
+| :--------------------- | :--------------------------------------------- | :------------------------------------------------------------------------------ |
+| **Trạng thái thẻ**     | Ẩn mặt (úp thẻ)                                | **Mở ngửa toàn bộ thẻ ngay từ đầu**                                             |
+| **Mục tiêu cốt lõi**   | Rèn luyện **trí nhớ ngắn hạn** và sự tập trung | Rèn luyện **khả năng quan sát nhanh, phản xạ mắt** và tư duy đường đi trực giao |
+| **Luật ghép đôi**      | Lật trúng 2 thẻ giống nhau ở bất kỳ đâu        | Ghép 2 thẻ giống nhau có **đường nối hợp lệ không bị cản**                      |
+| **Nhịp độ chơi**       | Cẩn trọng, ghi nhớ vị trí, tính toán lật mở    | Nhanh, dồn dập, tạo chuỗi combo liên hoàn cực kỳ thỏa mãn (satisfying)          |
+| **Tài nguyên sử dụng** | 25 chủ đề ảnh 3D + 1000 ảnh default            | **Tái sử dụng 100% tài nguyên ảnh 3D và hệ thống Shop/Xu**                      |
 
 ---
 
@@ -43,7 +43,9 @@ Hai thẻ cùng hình chỉ được ghép nối thành công khi đường đi 
 Để tạo sự đột phá và đa dạng qua từng màn chơi, hệ thống hỗ trợ 6 cơ chế biến chuyển bàn cờ:
 
 ### A. Cơ chế Dồn thẻ (Gravity Shifts)
+
 Sau khi một cặp thẻ bị loại bỏ, bàn cờ có thể kích hoạt hiệu ứng dịch chuyển:
+
 1. **Bàn cờ Tĩnh (Classic Static):** Ô ăn xong để trống cố định.
 2. **Rơi tự do (Gravity Down):** Các thẻ ở phía trên tự động rơi xuống lấp đầy các khoảng trống bên dưới.
 3. **Dồn lên trên (Gravity Up):** Các thẻ bên dưới tự động trượt nổi lên trên.
@@ -55,35 +57,38 @@ Sau khi một cặp thẻ bị loại bỏ, bàn cờ có thể kích hoạt hi�
 9. **Xoay tròn:** Các thẻ xoay tròn theo chiều kim đồng hồ hoặc ngược chiều kim đồng hồ.
 
 ### B. Các Chướng ngại vật & Ô tương tác đặc biệt
-1. **Ghép đủ bộ 3:** Khi ghép đủ 3 thẻ giống nhau sẽ mở khóa 1 thẻ bị đóng băng (nếu có).
+
+1. **Ghép đủ bộ 3:** Khi ghép đủ 3 cặp thẻ đặc biệt sẽ mở khóa 1 thẻ bị đóng băng (nếu có).
 2. **Ghép cặp đặc biệt:** Khi ghép được 1 cặp thẻ đặc biệt sẽ đồng thời phá hủy 1 cặp thẻ bất kì.
-3. **Ghép đủ bộ 5:** Khi ghép đủ 5 thẻ giống nhau sẽ biến 1 cặp thẻ bất kì thành 1 cặp thẻ đặc biệt.
-4. **Ghép đủ bộ 7:** Khi ghép đủ 7 thẻ ngẫu nhiên sẽ nhận 1 trong các hiệu ứng: Thêm thời gian, thêm 1 lượt gợi ý, thêm 1 lượt xáo trộn.
-5. **Ghép đủ bộ 9:** Khi ghép đủ 9 thẻ ngẫu nhiên sẽ nhận 1 trong các hiệu ứng: Mở khóa 1 thẻ đóng băng, phá hủy 1 cặp thẻ bất kì.
-6. **Ghép đủ bộ 10:** Khi ghép đủ 10 thẻ giống nhau, nhận 100 xu đồng thời phá hủy tất cả thẻ đóng băng, tạo 1 cặp thẻ đặc biệt ngẫu nhiên và phá hủy 1 cặp thẻ ngẫu nhiên.
-- Các bộ thẻ có thể tích lũy qua các màn chơi. Ví dụ: Màn 1 ghép được 3 thẻ, màn 2 ghép được 2 thẻ => Tổng cộng 5 thẻ, sẽ nhận được hiệu ứng của bộ 5. Màn 3 ghép được 2 thẻ => Tổng cộng 7 thẻ, sẽ nhận được hiệu ứng của bộ 7.
-- Đối với hiệu ứng cặp thẻ giống nhau, mỗi lần sẽ reset và hệ thống chọn 1 thẻ ngẫu nhiên làm điều kiện tiếp theo. Tức là với các cặp thẻ ngẫu nhiên thì chỉ cần đếm số lượng. Còn cặp thẻ giống nhau sẽ dựa theo yêu cầu của game, ví dụ như game yêu cầu bộ thẻ giống nhau là gấu trúc thì cần tích lũy cặp thẻ gấu trúc là 3-5-10, sẽ có màn không có gấu trúc nên tiếp tục chơi đến màn có gấu trúc và tích lũy tiếp. Vậy nên cặp thẻ giống nhau có thể sẽ lâu hơn.
+3. **Ghép đủ bộ 5:** Khi ghép đủ 5 cặp thẻ đặc biệt sẽ biến 1 cặp thẻ bất kì thành 1 cặp thẻ đặc biệt.
+4. **Ghép đủ bộ 7:** Khi ghép đủ 7 cặp thẻ đặc biệt sẽ nhận 1 trong các hiệu ứng: Thêm thời gian, thêm 1 lượt gợi ý, thêm 1 lượt xáo trộn.
+5. **Ghép đủ bộ 9:** Khi ghép đủ 9 cặp thẻ đặc biệt sẽ nhận 1 trong các hiệu ứng: Mở khóa 1 thẻ đóng băng, phá hủy 1 cặp thẻ bất kì.
+6. **Ghép đủ bộ 10:** Khi ghép đủ 10 cặp thẻ đặc biệt, nhận 100 xu đồng thời phá hủy tất cả thẻ đóng băng, tạo 1 cặp thẻ đặc biệt ngẫu nhiên và phá hủy 1 cặp thẻ ngẫu nhiên.
+
+- Các bộ thẻ có thể tích lũy qua các màn chơi. Ví dụ: Màn 1 ghép được 3 thẻ, màn 2 ghép được 2 thẻ => Tổng cộng 5 thẻ, sẽ nhận được hiệu ứng của bộ 5. Đến đủ mốc 10 thì sẽ reset lại từ 1.
+
 ---
 
 ## 4. Hệ thống Vật phẩm Đặc biệt & Kỹ năng (Unique Items & Power-ups)
 
 Các vật phẩm được tích hợp trực tiếp vào hệ thống tiền tệ Xu và Cửa hàng:
 
-| Vật phẩm | Biểu tượng | Chức năng chi tiết | Giá dự kiến (Xu) |
-| :--- | :---: | :--- | :---: |
-| **Kính Định Vị (Smart Hint)** | 🔍 | Tự động vẽ vệt sáng chỉ rõ đường nối của 1 cặp thẻ có thể ghép ngay. | 8 Xu |
-| **Xáo Trộn Không Gian (Reshuffle)** | 🔀 | Xáo lại toàn bộ vị trí các thẻ còn lại trên bàn cờ, cam kết luôn tạo ra ít nhất 3 đường nối khả dụng. | 15 Xu |
-| **Sấm Sét Hủy Diệt (Thunder Strike)** | ⚡ | Tự động chọn và tiêu diệt ngay 1~3 cặp thẻ bất kỳ mà không cần đường nối. | 25 Xu |
-| **Đồng Hồ Ngưng Đọng (Chrono Freeze)** | ⏱️ | Đóng băng đồng hồ đếm ngược trong 10 giây để người chơi thoải mái quan sát. | 20 Xu |
+| Vật phẩm                               | Biểu tượng | Chức năng chi tiết                                                                                    | Giá dự kiến (Xu) |
+| :------------------------------------- | :--------: | :---------------------------------------------------------------------------------------------------- | :--------------: |
+| **Kính Định Vị (Smart Hint)**          |     🔍     | Tự động vẽ vệt sáng chỉ rõ đường nối của 1 cặp thẻ có thể ghép ngay.                                  |       8 Xu       |
+| **Xáo Trộn Không Gian (Reshuffle)**    |     🔀     | Xáo lại toàn bộ vị trí các thẻ còn lại trên bàn cờ, cam kết luôn tạo ra ít nhất 3 đường nối khả dụng. |      15 Xu       |
+| **Sấm Sét Hủy Diệt (Thunder Strike)**  |     ⚡     | Tự động chọn và tiêu diệt ngay 1~3 cặp thẻ bất kỳ mà không cần đường nối.                             |      25 Xu       |
+| **Đồng Hồ Ngưng Đọng (Chrono Freeze)** |     ⏱️     | Đóng băng đồng hồ đếm ngược trong 10 giây để người chơi thoải mái quan sát.                           |      20 Xu       |
 
 ---
 
 ## 5. Tận dụng Thẻ Đặc Biệt (Special Cards Integration)
 
 Mỗi chủ đề có 5 thẻ đặc biệt ở thư mục `special/`. Khi xuất hiện trong chế độ Link Connect:
+
 - **Hiệu ứng nổi bật:** Viền thẻ phát sáng lấp lánh ánh kim/ngọc dạ quang.
 - **Kích hoạt Siêu Phần Thưởng khi ghép trúng cặp thẻ đặc biệt:**
-  - *Cộng thưởng:* Cộng thời gian hoặc Xu.
+  - _Cộng thưởng:_ Cộng thời gian hoặc Xu.
 
 ---
 
@@ -116,22 +121,24 @@ Mỗi chủ đề có 5 thẻ đặc biệt ở thư mục `special/`. Khi xuấ
 ## 8. Kiến trúc Kỹ thuật & Lộ trình Triển khai (Technical Blueprint)
 
 ### A. Cấu trúc Module đề xuất:
+
 ```text
 js/
 ├── linkConnect/
 │   ├── pathfinder.js       # Thuật toán tìm đường trực giao tối đa 2 khúc gấp (BFS 2-turn)
 │   ├── linkBoard.js        # Khởi tạo ma trận bàn cờ, xử lý viền đệm và trọng lực
 │   ├── linkRenderer.js     # Vẽ đường nối canvas/SVG neon và hiệu ứng hạt nổ
-│   ├── linkObstacles.js    # Logic băng giá, khối đá, cổng dịch chuyển
 │   └── linkController.js   # Quản lý vòng đời màn chơi, combo, timer, deadlock check
 ```
 
 ### B. Thuật toán Tìm đường (2-Turn Orthogonal BFS):
+
 ```javascript
 // Ý tưởng giải thuật tìm đường tối đa 2 khúc gấp:
 function canConnect(startPos, endPos, grid) {
   // 1. Kiểm tra nối thẳng 0 khúc gấp (cùng hàng hoặc cột, không vật cản)
-  if (checkStraightLine(startPos, endPos, grid)) return [{ path: [startPos, endPos], turns: 0 }];
+  if (checkStraightLine(startPos, endPos, grid))
+    return [{ path: [startPos, endPos], turns: 0 }];
 
   // 2. Kiểm tra nối 1 khúc gấp (hình chữ L: đi qua 1 điểm trung gian)
   // 3. Kiểm tra nối 2 khúc gấp (hình chữ U/Z: quét theo tia trực giao từ 2 đầu đến khi gặp đường nối thẳng qua ô trống)
@@ -140,6 +147,7 @@ function canConnect(startPos, endPos, grid) {
 ```
 
 ### C. Tự động kiểm tra Ngõ Cụt (Deadlock Prevention):
+
 - Sau mỗi nước đi, một hàm kiểm tra chạy ngầm (`hasAvailableMoves()`) sẽ quét nhanh xem còn ít nhất 1 cặp thẻ nào nối được không.
 - Nếu không còn cặp nào nối được, hệ thống tự động chạy hiệu ứng xoay lốc xoáy và xáo bài miễn phí (Smart Auto-Reshuffle) mà không làm gián đoạn ván chơi của người dùng.
 

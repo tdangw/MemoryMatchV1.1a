@@ -4,12 +4,12 @@
 
 # PROMPT MASTER — NỀN PHẲNG, BIẾN TIỂU CẢNH
 
-Dùng prompt master này cho mọi lô 24 thẻ thường + 1 thẻ đặc biệt. Thay biến trong ngoặc vuông trước khi tạo ảnh; không để biến còn sót trong prompt gửi AI.
+Dùng prompt master này cho mọi lô 24 thẻ thường + 1 thẻ đặc biệt. Mỗi lô vẫn giữ danh sách 24 mẫu hiện có, nhưng tạo qua hai sheet 4×4: sheet A gồm 16 mẫu đầu; sheet B gồm 8 mẫu còn lại, 1 thẻ đặc biệt và 7 ô trống. Thay biến trong ngoặc vuông trước khi tạo ảnh; không để biến còn sót trong prompt gửi AI.
 
 | Biến                         | Nội dung thay thế                                                                                                               |
 | :--------------------------- | :------------------------------------------------------------------------------------------------------------------------------ |
 | `[THEME]`                    | Tên nhóm nội dung bằng tiếng Anh, ví dụ `land animals`.                                                                         |
-| `[SUBJECTS]`                 | Đúng 24 mô tả tiếng Anh, giàu dấu hiệu thị giác; thay theo từng lô 01–24, 25–48…                                                |
+| `[SHEET_SUBJECTS]`           | Đúng 16 mô tả cho sheet A, hoặc 8 mô tả cho sheet B, theo thứ tự trái sang phải, trên xuống dưới.                              |
 | `[STYLE]` / `[STYLE_FINISH]` | Phong cách và bề mặt được chọn trong thư viện bên dưới.                                                                         |
 | `[BACKGROUND_HEX]`           | Màu nền của chủ đề trong bảng palette.                                                                                          |
 | `[SCENE_MODE]`               | Chọn nguyên văn một trong hai giá trị `MICRO_PROP_RULE` hoặc `MINI_SCENE_RULE` bên dưới.                                        |
@@ -17,9 +17,9 @@ Dùng prompt master này cho mọi lô 24 thẻ thường + 1 thẻ đặc biệ
 | `[SPECIAL_BRIEF]`            | Thẻ đặc biệt đúng chủ đề, ví dụ `rare legendary hybrid land animal`, `golden museum heirloom`, `magical masterwork instrument`. |
 
 ```text
-A 5x5 contact sheet grid of 25 distinct individual slots featuring stylized game assets of [THEME] in [STYLE] style. Slots 1–24 contain these 24 distinct subjects: [SUBJECTS]. Slot 25 at position [5,5] contains one special rare [SPECIAL_BRIEF]. [SCENE_MODE]
+A 4x4 contact sheet of square, borderless game-asset cells for [THEME] in [STYLE] style. Place [SHEET_SUBJECTS] in the first slots, left to right and top to bottom. For sheet B, place one special rare [SPECIAL_BRIEF] immediately after the eight normal subjects; every remaining slot must be completely blank flat background. [SCENE_MODE]
 
-Universal rules: Each main subject is fully visible and entirely contained inside the central 60% safe area of its own cell, with at least 20% clear margin on all sides; every part, including its shadow and prop, stays away from corners and gutters. No cropping or cutoff. Arrange the 24 listed subjects in their given order, left to right and top to bottom. Use varied front, side, three-quarter, and top-down views where natural; avoid a templated pose. Make all 24 subjects instantly distinguishable through their silhouette, color, container, material, topping, pattern, size, or viewing angle. Single solid flat background color [BACKGROUND_HEX] across the entire sheet, including gutters; no gradients, no patterns, no full landscape or room scene. Soft clean studio lighting, soft drop shadows, high detail, vibrant colors, clean sharp edges, [STYLE_FINISH]. No text, letters, numbers, labels, captions, watermark, logo, borders, frames, or UI icons. Each item and its prop stays fully inside its own square cell; generous gutters in [BACKGROUND_HEX], no overlap, no crossing cell boundaries --ar 1:1
+Layout contract: the generated source is 1254×1254. Use four 289–300px square content cells per axis, clear empty gutters between cells, and an empty outer margin. Gutters and margins must be the same single solid flat background color [BACKGROUND_HEX]; they are blank space, not visible frames. Every main subject, shadow and prop stays entirely inside the central 60% safe area of its own cell, with at least 20% clear margin from that cell's measured edge. No cropping, cutoff, overlap, or pixel of subject/shadow/prop in any gutter. Use varied front, side, three-quarter, high, and low views where natural; neighboring subjects must not repeat the same pose or facing direction. Use gentle, natural distinct expressions only. Make subjects instantly distinguishable through silhouette, color, material, pattern, size, or viewing angle. No gradients, patterns, full landscape, text, labels, watermark, logo, borders, frames, or UI icons. Soft clean studio lighting, restrained contact shadows, high detail, vibrant colors, clean sharp edges, [STYLE_FINISH] --ar 1:1
 ```
 
 Chọn **một** giá trị cho `[SCENE_MODE]`:
@@ -95,11 +95,11 @@ Tài liệu này là nguồn theo dõi duy nhất cho toàn bộ chủ đề th�
 
 ## Quy ước chung
 
-- **Quy cách lô:** Mỗi lô tạo ảnh gồm 24 thẻ thường khác nhau, xuất ở kích thước 256×256 px. Mục tiêu V2 là **120 ảnh thường cho mỗi chủ đề ảnh**, chia thành 5 lô theo thứ tự: `01–24`, `25–48`, `49–72`, `73–96`, `97–120`. Asset mới dùng tên mô tả ASCII dạng `kebab-case.webp` (ví dụ `red-panda.webp`).
-- **Thẻ đặc biệt theo từng lô (Slot 25):** Vì lưới contact sheet vuông 5×5 có tổng cộng 25 ô mà mỗi lô chỉ cần 24 thẻ thường, ô góc dưới bên phải **[5, 5] (slot 25)** được quy hoạch để AI tự do sáng tạo **1 thẻ đặc biệt cho chính lô đó**. Một chủ đề hoàn chỉnh 5 lô sẽ tạo ra **5 thẻ đặc biệt độc đáo**.
-- **Lưu trữ thẻ đặc biệt:** Thẻ đặc biệt được lưu trong thư mục con `special/` của từng chủ đề với tên mô tả `kebab-case.webp` (ví dụ `public/assets/images/themes/animals-land/special/golden-horned-lion.webp`). Chúng không thuộc pool 24 thẻ thường của ván chơi tiêu chuẩn và sẵn sàng cho các cơ chế gameplay/sự kiện đặc biệt.
+- **Quy cách lô:** Mỗi lô giữ 24 thẻ thường khác nhau, xuất ở kích thước 256×256 px, qua hai sheet nguồn 4×4: A có 16 thẻ đầu; B có 8 thẻ cuối, một thẻ đặc biệt và 7 ô trống. Mục tiêu V2 là **120 ảnh thường cho mỗi chủ đề ảnh**, chia thành 5 lô theo thứ tự: `01–24`, `25–48`, `49–72`, `73–96`, `97–120`. Asset mới dùng tên mô tả ASCII dạng `kebab-case.webp` (ví dụ `red-panda.webp`).
+- **Thẻ đặc biệt theo từng lô:** Sheet B đặt thẻ đặc biệt ở ô thứ 9, sau tám thẻ thường; bảy ô còn lại bắt buộc trống. Một chủ đề hoàn chỉnh 5 lô sẽ tạo ra 5 thẻ đặc biệt độc đáo.
+- **Lưu trữ thẻ đặc biệt:** Thẻ đặc biệt được lưu trong thư mục con `special/` của từng chủ đề với tên mô tả `kebab-case.webp` (ví dụ `public/assets/images/themes/animals-land/special/golden-horned-lion.webp`). Trình tạo manifest quét đệ quy toàn bộ thư mục chủ đề, nên mọi WebP trong `special/` hoặc thư mục con khác đều có thể được dùng trong pool runtime. Ảnh nằm trong thư mục tên `special/` được gắn cờ `special: true`; khi ghép đúng cặp, điểm sau Combo nhận thêm 50%.
 - **Hướng sáng tạo thẻ đặc biệt:** AI tự do sáng tạo thẻ đặc biệt tại ô [5, 5] dựa trên chủ đề của lô đang tạo (sinh vật lai hiếm, phiên bản huyền thoại, tổ hợp độc đáo, chi tiết nạm vàng/ngọc...). Không gán cứng tên đối tượng trong prompt để có thể tái sử dụng prompt cho mọi lô.
-- **Quy tắc cắt bắt buộc:** Không chia đều toàn bộ kích thước sheet theo 5 vì phép chia đó bao gồm cả viền ngoài và gutter. Sau khi kiểm tra sheet vuông, xác định riêng biên trái/phải và trên/dưới của 5 ô, cắt đúng nội dung từng ô, rồi mới resize thành WebP 256×256. Không dùng phương pháp cắt theo khung đều 5×5 mà bỏ qua bounding box thực tế của từng icon.
+- **Quy tắc cắt bắt buộc:** Không dùng tọa độ quy ước trong prompt để cắt. Sau khi kiểm tra sheet vuông, đo biên thật của từng ô và gutter trên chính ảnh nguồn; chỉ cắt một vùng vuông theo biên đã đo, rồi resize riêng thành WebP 256×256. Trước khi xuất cả sheet, cắt thử bốn góc và ít nhất một ô giữa; loại sheet nếu có pixel chủ thể, bóng hoặc tiểu cảnh chạm biên vùng cắt/gutter.
 - Không đưa ảnh nguồn vào `public/assets/`. Lưu sheet nguồn ở vị trí tạm/ngoài runtime đã thống nhất khi bắt đầu tạo, rồi kiểm tra trước khi cắt.
 - Chỉ đánh dấu **Hoàn thành** sau khi có đủ WebP 256×256 đạt chuẩn và chạy `npm run assets:sync`.
 
@@ -107,10 +107,10 @@ Tài liệu này là nguồn theo dõi duy nhất cho toàn bộ chủ đề th�
 
 ## Checklist dùng Prompt Master
 
-- Thay hết biến, đặc biệt là đúng 24 mô tả ở `[SUBJECTS]`, màu `[BACKGROUND_HEX]`, chế độ tiểu cảnh và thẻ đặc biệt.
+- Chia đúng danh sách 24 mẫu thành 16 mẫu ở sheet A và 8 mẫu ở sheet B; không thay đổi danh sách gốc trong tài liệu.
 - Chỉ dùng **một** trong hai chế độ: `MICRO_PROP_RULE` hoặc `MINI_SCENE_RULE`; tiểu cảnh không được thành nền phong cảnh.
-- Giữ lưới 5×5, chủ thể nằm gọn trong từng ô, có gutter rõ, không chữ/nhãn/logo và luôn kết thúc bằng `--ar 1:1`.
-- Trước khi cắt, kiểm tra sheet vuông và đo biên/gutter thật; sau đó kiểm tra WebP 256×256 đại diện đầu, giữa, cuối lô.
+- Giữ lưới 4×4, gutter trống rõ, không chữ/nhãn/logo và luôn kết thúc bằng `--ar 1:1`.
+- Trước khi cắt, kiểm tra sheet vuông, đo biên/gutter thật và kiểm tra pixel sát mọi biên; sau đó kiểm tra WebP 256×256 đại diện đầu, giữa, cuối lô.
 
 ---
 
@@ -153,7 +153,7 @@ Mọi prompt lô và ảnh tạo lẻ phải dùng **một nền phẳng duy nh�
 | ID                     | Chủ đề                 | Loại        | Trạng thái   |    Đã tạo | Chi tiết                                            |
 | :--------------------- | :--------------------- | :---------- | :----------- | --------: | :-------------------------------------------------- |
 | `default`              | Mặc định               | Ảnh WebP    | Hoàn thành   | 1000/1000 | [Chi tiết](#mặc-định-default)                       |
-| `animals-land`         | Động vật trên cạn      | Ảnh WebP    | Đang mở rộng |    96/120 | [Chi tiết](#1-động-vật-trên-cạn-animals-land)       |
+| `animals-land`         | Động vật trên cạn      | Ảnh WebP    | Hoàn thành   |   120/120 | [Chi tiết](#1-động-vật-trên-cạn-animals-land)       |
 | `animals-air`          | Động vật trên không    | Ảnh WebP    | Sắp có       |     0/120 | [Chi tiết](#2-động-vật-trên-không-animals-air)      |
 | `animals-sea`          | Động vật dưới biển     | Ảnh WebP    | Sắp có       |     0/120 | [Chi tiết](#3-động-vật-dưới-biển-animals-sea)       |
 | `foods`                | Đồ ăn                  | Ảnh WebP    | Đang mở rộng |     0/120 | [Chi tiết](#4-đồ-ăn-foods)                          |
@@ -214,7 +214,7 @@ Roadmap V2 chuẩn hóa **25 chủ đề ảnh**:
 - `[THEME]`: `land animals`
 - `[BACKGROUND_HEX]`: `#f6f0e5`
 - `[STYLE]` / `[STYLE_FINISH]`: `isometric 3D render` / `cute stylized clay toy finish, soft fur textures, charming chibi proportions`
-- `[SCENE_MODE]` / `[MICRO_PROP]`: `MINI_SCENE_RULE` / `a small species-appropriate earth, grass, rock, mud, bark, or leaf-litter base; varied natural viewing angles`
+- `[SCENE_MODE]` / `[MICRO_PROP]`: `MINI_SCENE_RULE` / `a restrained species-appropriate earth, grass, rock, mud, bark, or leaf-litter contact base; varied natural viewing angles and no repeated neighboring pose or facing direction`
 - `[SPECIAL_BRIEF]`: `mythical or hybrid land animal`
 - **01–24:** elephant, tiger, lion, rabbit, fox, giant panda, giraffe, monkey, sloth, zebra, hedgehog, alpaca, red panda, beaver, pangolin, tapir, capybara, rhinoceros, hippopotamus, camel, wolf, deer, wild boar, tortoise.
 - **25–48:** cheetah, leopard, snow leopard, lynx, serval cat, hyena, meerkat, mongoose, skunk, ferret, marten, dhole, arctic fox, fennec fox, corgi dog, shiba inu, husky dog, dachshund, bengal cat, maine coon cat, scottish fold cat, sheep, mountain goat, american bison.

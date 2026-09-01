@@ -159,7 +159,11 @@ export function handleTileClick(tileElement) {
   revealTile(img);
   tileElement.classList.add("selected");
 
-  selectedTiles.push({ element: tileElement, imageId });
+  selectedTiles.push({
+    element: tileElement,
+    imageId,
+    special: tileElement.dataset.special === "true",
+  });
   if (selectedTiles.length === 2) {
     gameState.moves++;
     updateMovesDisplay(gameState.moves);
@@ -179,7 +183,9 @@ function checkMatch(roundId) {
     second.element.classList.add("matched");
 
     gameState.combo += 1;
-    const matchPoints = calculateMatchPoints(gameState.combo);
+    const comboAdjustedPoints = calculateMatchPoints(gameState.combo);
+    const specialBonus = first.special ? Math.round(comboAdjustedPoints * 0.5) : 0;
+    const matchPoints = comboAdjustedPoints + specialBonus;
     const score = increaseScore(matchPoints);
     updateScoreDisplay(score);
     showScoreEffect(second.element, matchPoints);

@@ -175,7 +175,7 @@ export function showDifficultyOverlay(fromGame = false) {
   });
   changeThemeButton.onclick = () => {
     modal.close();
-    setTimeout(showCollectionModal, 180);
+    setTimeout(() => showCollectionModal({ fromGame }), 180);
   };
   [
     ["easy", "Dễ", "status-easy"],
@@ -212,7 +212,7 @@ export function showCollectionModal({ fromGame = false } = {}) {
   });
 
   const tabs = document.createElement("div");
-  tabs.className = "shop-tabs shop-tabs--catalog";
+  tabs.className = "shop-tabs";
   tabs.setAttribute("role", "tablist");
   const grid = document.createElement("div");
   grid.className = "shop-item-grid";
@@ -222,6 +222,10 @@ export function showCollectionModal({ fromGame = false } = {}) {
     grid.className = "shop-item-grid shop-item-grid--appearance";
     grid.replaceChildren();
     renderCollectionAppearanceGroup(grid, "Mặt lưng thẻ", "cardBack", CARD_BACKS);
+  };
+  const renderFlipEffects = () => {
+    grid.className = "shop-item-grid shop-item-grid--appearance";
+    grid.replaceChildren();
     renderCollectionAppearanceGroup(grid, "Hiệu ứng lật", "flipEffect", FLIP_EFFECTS);
   };
   const renderThemes = () => {
@@ -272,8 +276,9 @@ export function showCollectionModal({ fromGame = false } = {}) {
   };
 
   const appearanceTab = createCollectionTab("Ngoại hình", true, renderAppearance);
+  const flipEffectsTab = createCollectionTab("Hiệu ứng lật", false, renderFlipEffects);
   const themesTab = createCollectionTab("Chủ đề", false, renderThemes);
-  tabs.append(appearanceTab, themesTab);
+  tabs.append(appearanceTab, flipEffectsTab, themesTab);
   renderAppearance();
   return modal;
 }
@@ -332,8 +337,12 @@ function renderCollectionAppearanceGroup(grid, title, type, items) {
         saveAppearance(gameState.appearance);
         if (type === "cardBack") applyCollectionCardBack();
         grid.replaceChildren();
-        renderCollectionAppearanceGroup(grid, "Mặt lưng thẻ", "cardBack", CARD_BACKS);
-        renderCollectionAppearanceGroup(grid, "Hiệu ứng lật", "flipEffect", FLIP_EFFECTS);
+        renderCollectionAppearanceGroup(
+          grid,
+          type === "cardBack" ? "Mặt lưng thẻ" : "Hiệu ứng lật",
+          type,
+          type === "cardBack" ? CARD_BACKS : FLIP_EFFECTS,
+        );
       };
     }
     card.append(preview, name, button);

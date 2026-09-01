@@ -95,9 +95,10 @@ export function getThemeCards(themeId, pairCount) {
   return values.map((value) => {
     if (theme.kind === "image") {
       return {
-        id: `${theme.id}-${assetIdFromFile(value)}`,
-        alt: `${theme.title}: ${humanizeAssetId(assetIdFromFile(value))}`,
-        src: `${import.meta.env.BASE_URL}assets/images/themes/${theme.assetFolder}/${value}`,
+        id: `${theme.id}-${assetIdFromFile(value.path)}`,
+        alt: `${theme.title}: ${humanizeAssetId(assetIdFromFile(value.path))}`,
+        src: `${import.meta.env.BASE_URL}assets/images/themes/${theme.assetFolder}/${value.path}`,
+        special: value.special === true,
       };
     }
     const label = String(value);
@@ -105,6 +106,7 @@ export function getThemeCards(themeId, pairCount) {
       id: `${theme.id}-${label}`,
       alt: `${theme.title}: ${label}`,
       src: createGeneratedCardImage(label, theme),
+      special: false,
     };
   });
 }
@@ -125,7 +127,7 @@ function humanizeAssetId(id) {
 }
 
 function assetIdFromFile(file) {
-  return file.replace(/\.webp$/i, "");
+  return file.replace(/\.webp$/i, "").replaceAll(/[\\/]/g, "-");
 }
 
 function createGeneratedCardImage(label, theme) {
