@@ -5,10 +5,12 @@ import { showSettingsPanel } from "./settings.js";
 let activeGameId = null;
 let onStartLinkConnect = () => {};
 let onOpenLinkCollection = () => {};
+let onOpenLinkShop = () => {};
 
-export function configureGameSelector({ startLinkConnect, openLinkCollection } = {}) {
+export function configureGameSelector({ startLinkConnect, openLinkCollection, openLinkShop } = {}) {
   onStartLinkConnect = startLinkConnect || onStartLinkConnect;
   onOpenLinkCollection = openLinkCollection || onOpenLinkCollection;
+  onOpenLinkShop = openLinkShop || onOpenLinkShop;
 }
 
 export function showGameSelector() {
@@ -83,6 +85,11 @@ function createLinkConnectMenu() {
       icon: "collection",
       text: "Bộ sưu tập",
       onClick: onOpenLinkCollection,
+    }),
+    createMenuItem({
+      icon: "shop",
+      text: "Cửa hàng",
+      onClick: onOpenLinkShop,
     }),
     createMenuItem({
       icon: "book",

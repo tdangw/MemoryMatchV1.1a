@@ -53,6 +53,7 @@ configureSettings({ onCloseMenu: createActiveGameMenu });
 configureGameSelector({
   startLinkConnect: showLinkDifficultyOverlay,
   openLinkCollection: () => showCollectionModal({ gameId: "link-connect" }),
+  openLinkShop: () => openShopOverlay({ fromMenu: true, gameId: "link-connect" }),
 });
 configureLinkController({
   showMenu: () => openGameMenu("link-connect"),

@@ -13,6 +13,7 @@ import { shuffleArray } from "./utils.js";
 import { saveAppearance, saveCoins } from "./persistence.js";
 import { CARD_BACKS, FLIP_EFFECTS } from "./appearance.js";
 import { SHOP_ITEMS, getShopItemPrice } from "./shopCatalog.js";
+import { getOwnedThemeIds, ownTheme } from "./appearance.js";
 import { GAMEPLAY_TIMING } from "./gameplayTuning.js";
 import { THEMES, getTheme, isThemePlayable } from "./themeCatalog.js";
 
@@ -77,7 +78,7 @@ export function openQuickAssistOverlay(kind) {
   });
 }
 
-export function openShopOverlay({ fromMenu = false } = {}) {
+export function openShopOverlay({ fromMenu = false, gameId = "memory-match" } = {}) {
   if (!fromMenu && (gameState.isLocked || gameState.isPaused)) return;
 
   const roundId = gameState.roundId;
@@ -116,17 +117,22 @@ export function openShopOverlay({ fromMenu = false } = {}) {
     .querySelector(".app-modal__header")
     .insertBefore(wallet, closeButton);
 
-  const appearanceTab = createTab("Ngoại hình", true, () =>
-    renderAppearance(grid, roundId, modal),
-  );
-  const flipEffectsTab = createTab("Hiệu ứng lật", false, () =>
-    renderFlipEffects(grid, roundId, modal),
-  );
-  const themesTab = createTab("Chủ đề", false, () =>
-    renderThemes(grid, roundId, modal),
-  );
-  tabs.append(appearanceTab, flipEffectsTab, themesTab);
-  renderAppearance(grid, roundId, modal);
+  if (gameId === "link-connect") {
+    tabs.append(createTab("Chủ đề", true, () => renderThemes(grid, roundId, modal, gameId)));
+    renderThemes(grid, roundId, modal, gameId);
+  } else {
+    const appearanceTab = createTab("Ngoại hình", true, () =>
+      renderAppearance(grid, roundId, modal),
+    );
+    const flipEffectsTab = createTab("Hiệu ứng lật", false, () =>
+      renderFlipEffects(grid, roundId, modal),
+    );
+    const themesTab = createTab("Chủ đề", false, () =>
+      renderThemes(grid, roundId, modal, gameId),
+    );
+    tabs.append(appearanceTab, flipEffectsTab, themesTab);
+    renderAppearance(grid, roundId, modal);
+  }
 }
 
 function createTab(label, selected, onSelect) {
@@ -173,7 +179,7 @@ function renderFlipEffects(grid, roundId, modal) {
   );
 }
 
-function renderThemes(grid, roundId, modal) {
+function renderThemes(grid, roundId, modal, gameId) {
   grid.className = "shop-item-grid shop-item-grid--themes";
   grid.replaceChildren();
   const group = document.createElement("section");
@@ -184,7 +190,7 @@ function renderThemes(grid, roundId, modal) {
   choices.className = "theme-choice-grid";
 
   THEMES.forEach((theme) => {
-    const owned = gameState.appearance.ownedThemes.includes(theme.id);
+    const owned = getOwnedThemeIds(gameState.appearance, gameId).includes(theme.id);
     const playable = isThemePlayable(theme);
     const card = document.createElement("article");
     card.className = "theme-choice";
@@ -211,10 +217,10 @@ function renderThemes(grid, roundId, modal) {
       button.append(document.createTextNode(String(theme.price)), createIcon("coin"));
       button.onclick = () =>
         openPurchaseConfirmation(
-          { ...theme, type: "theme" },
+          { ...theme, type: "theme", gameId },
           roundId,
           modal,
-          () => renderThemes(grid, roundId, modal),
+          () => renderThemes(grid, roundId, modal, gameId),
         );
     }
     card.append(preview, name, button);
@@ -339,7 +345,7 @@ function handleBuyItem(item, roundId, fromMenu = false) {
       return false;
     }
   }
-  if (item.type === "theme" && gameState.appearance.ownedThemes.includes(item.id)) {
+  if (item.type === "theme" && getOwnedThemeIds(gameState.appearance, item.gameId).includes(item.id)) {
     showShopMessage("Bạn đã sở hữu chủ đề này.", "info");
     return false;
   }
@@ -365,7 +371,7 @@ function handleBuyItem(item, roundId, fromMenu = false) {
   }
 
   if (item.type === "theme") {
-    gameState.appearance.ownedThemes.push(item.id);
+    ownTheme(gameState.appearance, item.gameId, item.id);
     const theme = getTheme(item.id);
     saveAppearance(gameState.appearance);
     showShopMessage(

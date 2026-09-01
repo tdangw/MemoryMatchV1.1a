@@ -16,6 +16,7 @@ import {
   FLIP_EFFECTS,
   getCardBackClass,
   getEquippedThemeId,
+  getOwnedThemeIds,
 } from "./appearance.js";
 
 let onStartGame = () => {};
@@ -254,7 +255,7 @@ export function showCollectionModal({ fromGame = false, gameId = "memory-match" 
     heading.textContent = "Chủ đề thẻ";
     const choices = document.createElement("div");
     choices.className = "theme-choice-grid";
-    THEMES.filter((theme) => gameState.appearance.ownedThemes.includes(theme.id)).forEach((theme) => {
+    THEMES.filter((theme) => getOwnedThemeIds(gameState.appearance, gameId).includes(theme.id)).forEach((theme) => {
       const playable = isThemePlayable(theme);
       const equipped = getEquippedThemeId(gameState.appearance, gameId) === theme.id;
       const card = document.createElement("article");
