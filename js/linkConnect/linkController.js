@@ -28,6 +28,7 @@ import {
 } from "./linkBoard.js";
 import { findAvailableConnections, findConnectionPath } from "./pathfinder.js";
 import { consumeLinkItem, getLinkItemCount, grantLinkItem, LINK_ITEMS } from "./linkItems.js";
+import { clearActiveSession, saveActiveSession } from "../sessionProgress.js";
 import {
   clearLinkPath,
   clearLinkTileSelection,
@@ -47,6 +48,7 @@ let navigation = {
   showCollection: () => {},
   showShop: () => {},
   showSettings: () => {},
+  showReset: () => {},
 };
 
 export function configureLinkController(options = {}) {
@@ -104,7 +106,7 @@ export function showLinkDifficultyOverlay() {
   content.append(themeRow, options);
 }
 
-export function startLinkLevel({ mode = linkGameState.mode, level = 1 } = {}) {
+export function startLinkLevel({ mode = linkGameState.mode, level = 1, resume = false } = {}) {
   stopCountdown();
   clearLinkPath();
   selectedPosition = null;
@@ -115,7 +117,11 @@ export function startLinkLevel({ mode = linkGameState.mode, level = 1 } = {}) {
     themeId: getEquippedThemeId(gameState.appearance, "link-connect"),
     level,
   });
-  if (level === 1) linkGameState.specialProgress = 0;
+  if (level === 1 && !resume) {
+    linkGameState.specialProgress = 0;
+    clearActiveSession("link-connect");
+  }
+  saveActiveSession("link-connect", { mode, level });
   const roundId = beginLinkRound({ mode, level, layout, board });
   if (isLinkEndlessMode(mode)) linkGameState.remainingTime = 0;
   else if (isLinkChallengeMode(mode) && level > 1) {
@@ -128,6 +134,11 @@ export function startLinkLevel({ mode = linkGameState.mode, level = 1 } = {}) {
   updateLinkHud();
   linkGameState.isLocked = false;
   startCountdown(roundId);
+}
+
+export function continueLinkSession(session) {
+  if (!session) return;
+  startLinkLevel({ ...session, resume: true });
 }
 
 export function returnToLinkMenu() {
@@ -150,13 +161,14 @@ function showLinkGame() {
       <header class="link-connect-game__header">
         <button id="link-actions-menu-toggle" class="link-connect-game__menu" type="button" aria-label="Mở menu chức năng" aria-controls="link-actions-menu" aria-expanded="false"></button>
         <div id="link-actions-menu" class="link-connect-game__actions game-actions-menu" hidden>
-          <button class="game-action-item" type="button" data-action="menu">Menu</button>
           <button class="game-action-item" type="button" data-action="restart">Chơi lại</button>
+          <button class="game-action-item" type="button" data-action="menu">Menu</button>
           <button class="game-action-item" type="button" data-action="settings">Cài đặt</button>
-          <button class="game-action-item" type="button" data-action="collection">Bộ sưu tập</button>
           <button class="game-action-item" type="button" data-action="shop">Cửa hàng</button>
+          <button class="game-action-item" type="button" data-action="collection">Bộ sưu tập</button>
           <button class="game-action-item" type="button" data-action="help">Hướng dẫn</button>
           <button class="game-action-item" type="button" data-action="info">Thông tin</button>
+          <button class="game-action-item" type="button" data-action="reset">Xóa dữ liệu</button>
         </div>
         <div><strong>Link Connect</strong><span id="link-level-label">Cấp 1</span></div>
         <span class="link-connect-game__header-spacer" aria-hidden="true"></span>
@@ -209,13 +221,14 @@ function configureLinkGameActions(container) {
   const actions = container.querySelector("#link-actions-menu");
   toggle?.append(createIcon("menu"));
   const actionIcons = {
-    menu: "home",
     restart: "restart",
+    menu: "home",
     settings: "settings",
     collection: "collection",
     shop: "shop",
     help: "book",
     info: "info",
+    reset: "wand",
   };
   actions?.querySelectorAll("button[data-action]").forEach((button) => {
     button.prepend(createIcon(actionIcons[button.dataset.action]));
@@ -243,7 +256,9 @@ function configureLinkGameActions(container) {
 
 function runLinkGameAction(action) {
   if (action === "menu") return returnToLinkMenu();
-  if (action === "restart") return showLinkDifficultyOverlay();
+  if (action === "restart") {
+    return startLinkLevel({ mode: linkGameState.mode, level: linkGameState.level, resume: true });
+  }
   if (action === "settings") {
     pauseLinkForModal();
     return navigation.showSettings(resumeLinkAfterModal);
@@ -261,6 +276,10 @@ function runLinkGameAction(action) {
   }
   if (action === "info") {
     return showLinkGameModal("Giới thiệu", "<p><strong>Link Connect</strong> là trò chơi nối cặp hình giúp rèn luyện khả năng quan sát.</p>", "info");
+  }
+  if (action === "reset") {
+    pauseLinkForModal();
+    return navigation.showReset(resumeLinkAfterModal);
   }
 }
 
@@ -425,7 +444,7 @@ function handleLinkTimeUp() {
     content: "<p>Hãy quan sát đường nối nhanh hơn ở lượt tiếp theo.</p>",
     actions: [
       { label: "Menu", icon: "home", onClick: () => returnToLinkMenu() },
-      { label: "Chơi lại", icon: "restart", variant: "primary", onClick: () => startLinkLevel({ mode: linkGameState.mode, level: 1 }) },
+      { label: "Chơi lại", icon: "restart", variant: "primary", onClick: () => startLinkLevel({ mode: linkGameState.mode, level: linkGameState.level, resume: true }) },
     ],
   });
 }

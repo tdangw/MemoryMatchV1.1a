@@ -53,6 +53,7 @@ export function hydrateGameState({
     totalStars: Math.max(0, Math.floor(memoryMatch.totalStars || 0)),
     totalScore: Math.max(0, Math.floor(memoryMatch.totalScore || 0)),
     bestByLevel: typeof memoryMatch.bestByLevel === "object" && memoryMatch.bestByLevel ? memoryMatch.bestByLevel : {},
+    activeSession: normalizeActiveSession(memoryMatch.activeSession),
   };
   const linkItems = progress?.linkConnect?.items || {};
   gameState.progress.linkConnect = {
@@ -62,9 +63,17 @@ export function hydrateGameState({
       thunder: Math.max(0, Math.floor(linkItems.thunder || 0)),
       freeze: Math.max(0, Math.floor(linkItems.freeze || 0)),
     },
+    activeSession: normalizeActiveSession(progress?.linkConnect?.activeSession),
   };
   Object.assign(gameState.settings, settings);
   gameState.appearance = normalizeAppearance(appearance);
+}
+
+function normalizeActiveSession(session) {
+  if (!session || typeof session !== "object") return null;
+  if (typeof session.mode !== "string") return null;
+  const level = Math.max(1, Math.floor(session.level || 1));
+  return { mode: session.mode, level };
 }
 
 // Mỗi bàn chơi có mã riêng để timeout của bàn cũ không thể sửa UI bàn mới.

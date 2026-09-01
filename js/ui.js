@@ -368,7 +368,7 @@ function formatLuckyAwardSummary(awards) {
   ].filter(Boolean).join(" · ");
 }
 
-export function showResetConfirmationOverlay() {
+export function showResetConfirmationOverlay({ onClose = () => {} } = {}) {
   gameState.isPaused = true;
 
   if (gameState.settings?.sound) {
@@ -395,6 +395,7 @@ export function showResetConfirmationOverlay() {
     ],
     onClose: () => {
       gameState.isPaused = false;
+      onClose();
     },
   });
 }

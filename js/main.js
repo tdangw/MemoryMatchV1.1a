@@ -20,6 +20,7 @@ import {
 } from "./gameSelector.js";
 import {
   configureLinkController,
+  continueLinkSession,
   showLinkDifficultyOverlay,
 } from "./linkConnect/linkController.js";
 import { configureSettings, showSettingsPanel } from "./settings.js";
@@ -35,6 +36,7 @@ import {
 } from "./gameController.js";
 import { registerProgressiveWebApp } from "./pwa.js";
 import { initializeMeteorEffects } from "./backgroundEffects.js";
+import { getActiveSession } from "./sessionProgress.js";
 
 document.documentElement.dataset.buildTarget =
   import.meta.env.MODE === "android" ? "android" : "web";
@@ -48,10 +50,20 @@ configureGameController({
   showDifficulty: showDifficultyOverlay,
   createMenu: createMainMenu,
 });
-configureMainMenu({ startGame: initializeLevel, changeGame: showGameSelector });
+configureMainMenu({
+  startGame: initializeLevel,
+  changeGame: showGameSelector,
+  continueGame: () => {
+    const session = getActiveSession("memory-match");
+    if (!session) return;
+    gameState.settings.mode = session.mode;
+    initializeLevel(session.level);
+  },
+});
 configureSettings({ onCloseMenu: createActiveGameMenu });
 configureGameSelector({
   startLinkConnect: showLinkDifficultyOverlay,
+  continueLinkConnect: () => continueLinkSession(getActiveSession("link-connect")),
   openLinkCollection: () => showCollectionModal({ gameId: "link-connect" }),
   openLinkShop: () => openShopOverlay({ fromMenu: true, gameId: "link-connect" }),
 });
@@ -71,6 +83,7 @@ configureLinkController({
     onClose,
   }),
   showSettings: (onClose) => showSettingsPanel(true, onClose),
+  showReset: (onClose) => showResetConfirmationOverlay({ onClose }),
 });
 unlockSound();
 enableButtonClickSounds(() => gameState.settings);
@@ -129,7 +142,7 @@ document
   );
 document
   .getElementById("btn-restart")
-  ?.addEventListener("click", () => showDifficultyOverlay(true));
+  ?.addEventListener("click", () => initializeLevel(gameState.currentLevel));
 document
   .getElementById("btn-menu")
   ?.addEventListener("click", () =>

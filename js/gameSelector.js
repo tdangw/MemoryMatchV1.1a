@@ -1,16 +1,19 @@
 import { createIcon } from "./icons.js";
 import { createMainMenu, showGameInfoModal } from "./mainmenu.js";
 import { showSettingsPanel } from "./settings.js";
+import { getActiveSession } from "./sessionProgress.js";
 
 let activeGameId = null;
 let onStartLinkConnect = () => {};
 let onOpenLinkCollection = () => {};
 let onOpenLinkShop = () => {};
+let onContinueLinkConnect = () => {};
 
-export function configureGameSelector({ startLinkConnect, openLinkCollection, openLinkShop } = {}) {
+export function configureGameSelector({ startLinkConnect, openLinkCollection, openLinkShop, continueLinkConnect } = {}) {
   onStartLinkConnect = startLinkConnect || onStartLinkConnect;
   onOpenLinkCollection = openLinkCollection || onOpenLinkCollection;
   onOpenLinkShop = openLinkShop || onOpenLinkShop;
+  onContinueLinkConnect = continueLinkConnect || onContinueLinkConnect;
 }
 
 export function showGameSelector() {
@@ -71,6 +74,11 @@ function createLinkConnectMenu() {
   const menuList = document.createElement("ul");
   menuList.className = "menu-list";
   menuList.append(
+    ...(getActiveSession("link-connect") ? [createMenuItem({
+      icon: "play",
+      text: "Tiếp tục",
+      onClick: onContinueLinkConnect,
+    })] : []),
     createMenuItem({
       icon: "play",
       text: "Bắt đầu",

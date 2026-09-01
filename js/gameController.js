@@ -41,6 +41,7 @@ import {
   spendCoins,
 } from "./gameState.js";
 import { saveCoins } from "./persistence.js";
+import { saveActiveSession } from "./sessionProgress.js";
 import { configureLogic } from "./logic.js";
 import { GAMEPLAY_TIMING } from "./gameplayTuning.js";
 
@@ -62,6 +63,8 @@ export function initializeLevel(level) {
   if (gameContainer) gameContainer.style.display = "flex";
 
   const mode = gameState.settings.mode || "easy";
+  gameState.currentLevel = level;
+  saveActiveSession("memory-match", { mode, level });
   const modeLayout = getModeLayout(mode);
   const layout = isChallengeMode(mode) ? getChallengeLayout(level) : modeLayout;
   const roundId = beginRound();
@@ -216,7 +219,7 @@ function handleTimeUp() {
           actionSelected = true;
           close();
           gameState.fromDefeat = true;
-          navigation.showDifficulty(true);
+          initializeLevel(gameState.currentLevel);
         },
       },
       {

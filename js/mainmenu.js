@@ -9,6 +9,7 @@ import { APP_VERSION } from "./appMeta.js";
 import { THEMES, getTheme, isThemePlayable } from "./themeCatalog.js";
 import { saveAppearance } from "./persistence.js";
 import { openShopOverlay } from "./shop.js";
+import { clearActiveSession, getActiveSession } from "./sessionProgress.js";
 import { showThemeChangeNotice } from "./themeChangeNotice.js";
 import {
   CARD_BACKS,
@@ -21,10 +22,12 @@ import {
 
 let onStartGame = () => {};
 let onChangeGame = () => {};
+let onContinueGame = () => {};
 
-export function configureMainMenu({ startGame, changeGame } = {}) {
+export function configureMainMenu({ startGame, changeGame, continueGame } = {}) {
   onStartGame = startGame || onStartGame;
   onChangeGame = changeGame || onChangeGame;
+  onContinueGame = continueGame || onContinueGame;
 }
 
 /**
@@ -69,6 +72,11 @@ export function createMainMenu() {
   menuList.className = "menu-list";
 
   const menuItems = [
+    ...(getActiveSession("memory-match") ? [{
+      icon: "play",
+      text: "Tiếp tục",
+      action: onContinueGame,
+    }] : []),
     {
       icon: "play",
       text: "Bắt đầu",
@@ -153,6 +161,7 @@ export function showDifficultyOverlay(fromGame = false) {
   const startMode = (mode, close) => {
     modeSelected = true;
     gameState.fromDefeat = false;
+    clearActiveSession("memory-match");
     resetGame();
     gameState.settings.mode = mode;
     document.getElementById("menu-container")?.remove();
