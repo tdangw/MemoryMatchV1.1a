@@ -382,11 +382,12 @@ function handleLinkTileClick(position) {
     const matchedStart = selectedPosition;
     removeLinkBoardPair(linkGameState.board, matchedStart, position);
     linkGameState.matchedPairs += 1;
-    if (isSpecialMatch) applySpecialMatchRewards();
+    const specialBoardChanged = isSpecialMatch && applySpecialMatchRewards();
     if (firstTile.luckyReward) applyLinkLuckyReward(firstTile.luckyReward);
     selectedPosition = null;
     clearLinkPath();
-    clearLinkMatchedPair(matchedStart, position);
+    if (specialBoardChanged) renderLinkBoard(linkGameState.board, { onTileClick: handleLinkTileClick });
+    else clearLinkMatchedPair(matchedStart, position);
     updateLinkHud();
     if (linkGameState.matchedPairs >= linkGameState.totalPairs) {
       completeLinkLevel();
@@ -627,39 +628,51 @@ function applySpecialMatchRewards() {
     linkGameState.remainingTime += amount;
     showAppToast(`Cặp đặc biệt: +${amount} giây`);
   }
-  applySpecialMilestone(linkGameState.specialProgress);
+  const boardChanged = applySpecialMilestone(linkGameState.specialProgress);
   if (linkGameState.specialProgress >= special.progressTarget) {
     linkGameState.specialProgress = 0;
   }
+  return boardChanged;
 }
 
 function applySpecialMilestone(progress) {
   let message = "";
+  let boardChanged = false;
   if (progress === 1) {
-    removeAutomaticPair();
+    boardChanged = Boolean(removeAutomaticPair());
     message = "Mốc đặc biệt 1: phá hủy một cặp thẻ.";
   } else if (progress === 3) {
-    message = unlockFrozenLinkTiles(linkGameState.board, 1)
-      ? "Mốc đặc biệt 3: đã mở khóa một thẻ đóng băng."
-      : removeAutomaticPair("Mốc đặc biệt 3: không có thẻ đóng băng, đã phá hủy một cặp.");
+    const unlocked = unlockFrozenLinkTiles(linkGameState.board, 1);
+    boardChanged = Boolean(unlocked);
+    if (unlocked) message = "Mốc đặc biệt 3: đã mở khóa một thẻ đóng băng.";
+    else {
+      boardChanged = Boolean(removeAutomaticPair());
+      message = "Mốc đặc biệt 3: không có thẻ đóng băng, đã phá hủy một cặp.";
+    }
   } else if (progress === 5) {
-    makeRandomLinkPairSpecial(linkGameState.board);
+    boardChanged = Boolean(makeRandomLinkPairSpecial(linkGameState.board));
     message = "Mốc đặc biệt 5: đã tạo một cặp đặc biệt.";
   } else if (progress === 7) {
     message = applyMilestoneSevenReward();
   } else if (progress === 9) {
-    message = unlockFrozenLinkTiles(linkGameState.board, 1)
-      ? "Mốc đặc biệt 9: đã mở khóa một thẻ đóng băng."
-      : removeAutomaticPair("Mốc đặc biệt 9: không có thẻ đóng băng, đã phá hủy một cặp.");
+    const unlocked = unlockFrozenLinkTiles(linkGameState.board, 1);
+    boardChanged = Boolean(unlocked);
+    if (unlocked) message = "Mốc đặc biệt 9: đã mở khóa một thẻ đóng băng.";
+    else {
+      boardChanged = Boolean(removeAutomaticPair());
+      message = "Mốc đặc biệt 9: không có thẻ đóng băng, đã phá hủy một cặp.";
+    }
   } else if (progress === 10) {
     increaseCoins(LINK_CONNECT_CONFIG.special.milestoneTenCoins);
     saveCoins(gameState.coins);
-    unlockAllFrozenLinkTiles(linkGameState.board);
-    makeRandomLinkPairSpecial(linkGameState.board);
-    removeAutomaticPair();
+    const unlocked = unlockAllFrozenLinkTiles(linkGameState.board);
+    const specialPair = makeRandomLinkPairSpecial(linkGameState.board);
+    const removedPair = removeAutomaticPair();
+    boardChanged = Boolean(unlocked || specialPair || removedPair);
     message = "Mốc đặc biệt 10: +100 Xu, mở khóa băng và kích hoạt phần thưởng.";
   }
   if (message) showAppToast(message, { tone: "info", duration: 2400 });
+  return boardChanged;
 }
 
 function applyMilestoneSevenReward() {
