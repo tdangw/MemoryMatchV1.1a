@@ -1,6 +1,6 @@
 import { getThemeCards } from "../themeCatalog.js";
 import { shuffleArray } from "../utils.js";
-import { getLinkFrozenTileCount } from "./linkConfig.js";
+import { getLinkFrozenTileCount, getLinkLuckyReward, isLinkChallengeMode, LINK_CONNECT_CONFIG } from "./linkConfig.js";
 import { hasAvailableConnection } from "./pathfinder.js";
 
 const MAX_SHUFFLE_ATTEMPTS = 100;
@@ -9,6 +9,7 @@ export function createLinkBoard({
   layout,
   themeId = "default",
   level = 1,
+  mode = "easy",
   cardProvider = getThemeCards,
 }) {
   const pairCount = layout.tileCount / 2;
@@ -16,7 +17,7 @@ export function createLinkBoard({
   if (cards.length !== pairCount) {
     throw new Error("Chủ đề không có đủ ảnh cho bàn Link Connect.");
   }
-  const playableCards = ensureSpecialPair(cards);
+  const playableCards = assignLuckyPairs(ensureSpecialPair(cards), mode);
   const tiles = playableCards.flatMap((card) => [
     createTile(card),
     createTile(card),
@@ -110,7 +111,22 @@ function createTile(card) {
     alt: card.alt,
     special: card.special === true,
     frozen: false,
+    luckyReward: card.luckyReward || null,
   });
+}
+
+function assignLuckyPairs(cards, mode) {
+  if (!isLinkChallengeMode(mode)) return cards;
+  const { min, max } = LINK_CONNECT_CONFIG.challenge.luckyPairCount;
+  const count = Math.min(cards.length, randomInteger(min, max));
+  const indices = shuffleArray(Array.from({ length: cards.length }, (_, index) => index)).slice(0, count);
+  return cards.map((card, index) => indices.includes(index)
+    ? { ...card, luckyReward: getLinkLuckyReward(mode) }
+    : card);
+}
+
+function randomInteger(minimum, maximum) {
+  return minimum + Math.floor(Math.random() * (maximum - minimum + 1));
 }
 
 function ensureSpecialPair(cards) {

@@ -195,6 +195,11 @@
   box-shadow: 0 0 0 2px rgb(242 191 91 / 30%), 0 4px 12px rgb(0 0 0 / 30%);
 }
 
+.link-tile.is-lucky {
+  border-color: #ad72ff;
+  box-shadow: 0 0 0 2px rgb(173 114 255 / 30%), 0 0 15px rgb(173 114 255 / 38%);
+}
+
 .link-tile.is-frozen {
   position: relative;
   cursor: not-allowed;

@@ -12,6 +12,7 @@ export function createLinkGameState() {
     hints: 0,
     reshuffles: 0,
     freezeSeconds: 0,
+    luckyAwards: [],
     matchedPairs: 0,
     totalPairs: getLinkModeLayout().tileCount / 2,
     remainingTime: getLinkModeLayout().timeSeconds,
@@ -42,6 +43,7 @@ export function beginLinkRound({
   linkGameState.remainingTime = layout.timeSeconds;
   linkGameState.isLocked = true;
   linkGameState.isPaused = false;
+  linkGameState.luckyAwards = [];
   linkGameState.board = board || null;
   return linkGameState.roundId;
 }

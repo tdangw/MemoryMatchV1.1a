@@ -23,6 +23,7 @@ export function renderLinkBoard(board, { onTileClick } = {}) {
       button.type = "button";
       button.className = "link-tile";
       if (tile.special) button.classList.add("is-special");
+      if (tile.luckyReward) button.classList.add("is-lucky");
       if (tile.frozen) {
         button.classList.add("is-frozen");
         button.disabled = true;

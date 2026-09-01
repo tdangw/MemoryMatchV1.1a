@@ -7,6 +7,8 @@ import { saveCoins } from "../persistence.js";
 import { getTheme } from "../themeCatalog.js";
 import {
   calculateLinkMatchPoints,
+  calculateLinkCoinReward,
+  getLinkChallengeTime,
   getLinkChallengeLayout,
   LINK_CONNECT_CONFIG,
   getLinkLevelTimeBonus,
@@ -147,6 +149,7 @@ export function startLinkLevel({ mode = linkGameState.mode, level = 1, resume = 
     layout,
     themeId: getEquippedThemeId(gameState.appearance, "link-connect"),
     level,
+    mode,
   });
   if (level === 1 && !resume) {
     linkGameState.specialProgress = 0;
@@ -155,9 +158,8 @@ export function startLinkLevel({ mode = linkGameState.mode, level = 1, resume = 
   saveActiveSession("link-connect", { mode, level });
   const roundId = beginLinkRound({ mode, level, layout, board });
   if (isLinkEndlessMode(mode)) linkGameState.remainingTime = 0;
-  else if (isLinkChallengeMode(mode) && level > 1) {
-    linkGameState.remainingTime = 60 + (level - 1) * 10;
-  } else {
+  else if (isLinkChallengeMode(mode)) linkGameState.remainingTime = getLinkChallengeTime(level);
+  else {
     linkGameState.remainingTime = modeLayout.timeSeconds + getLinkLevelTimeBonus(level);
   }
   showLinkGame();
@@ -361,6 +363,7 @@ function handleLinkTileClick(position) {
     removeLinkBoardPair(linkGameState.board, selectedPosition, position);
     linkGameState.matchedPairs += 1;
     if (isSpecialMatch) applySpecialMatchRewards();
+    if (firstTile.luckyReward) applyLinkLuckyReward(firstTile.luckyReward);
     selectedPosition = null;
     clearLinkPath();
     renderLinkBoard(linkGameState.board, { onTileClick: handleLinkTileClick });
@@ -436,16 +439,56 @@ function useLinkFreeze() {
 function completeLinkLevel() {
   stopCountdown();
   linkGameState.isLocked = true;
-  openAppModal({
+  const coinsEarned = calculateLinkCoinReward(linkGameState.mode, linkGameState.remainingTime);
+  increaseCoins(coinsEarned);
+  saveCoins(gameState.coins);
+  const content = document.createElement("div");
+  content.className = "level-summary";
+  content.innerHTML = `
+    <h3 class="level-summary__heading">Hoàn thành Màn ${linkGameState.level}!</h3>
+    <div class="level-summary__result"><strong class="level-summary__score">${linkGameState.score.toLocaleString("vi-VN")} ĐIỂM</strong></div>
+    <div class="level-summary__stats">
+      <div class="level-summary__stat summary-coins"><span>XU NHẬN</span><strong>+${coinsEarned}</strong></div>
+      <div class="level-summary__stat summary-time"><span>${isLinkEndlessMode(linkGameState.mode) ? "THỜI GIAN ĐÃ CHƠI" : "THỜI GIAN CÒN LẠI"}</span><strong>${formatTime(linkGameState.remainingTime)}</strong></div>
+      <div class="level-summary__stat"><span>SỐ NƯỚC ĐI</span><strong>${linkGameState.moves}</strong></div>
+      <div class="level-summary__stat summary-misses"><span>LƯỢT SAI</span><strong>${linkGameState.misses}</strong></div>
+      ${linkGameState.luckyAwards.length ? `<div class="level-summary__stat"><span>Ô MAY MẮN</span><strong>${formatLuckyAwards()}</strong></div>` : ""}
+    </div>`;
+  const modal = openAppModal({
     id: "link-level-summary-modal",
-    icon: "trophy",
-    title: "Hoàn thành màn",
-    content: `<p>Điểm: <strong>${linkGameState.score}</strong></p><p>Số lượt: <strong>${linkGameState.moves}</strong></p>`,
+    showHeader: false,
+    dismissible: false,
+    closeOnBackdrop: false,
+    content,
     actions: [
       { label: "Menu", icon: "home", onClick: () => returnToLinkMenu() },
       { label: "Màn tiếp", icon: "arrow-right", variant: "primary", onClick: () => startLinkLevel({ mode: linkGameState.mode, level: linkGameState.level + 1 }) },
     ],
   });
+  modal.panel.classList.add("level-summary-modal");
+}
+
+function applyLinkLuckyReward(reward) {
+  linkGameState.luckyAwards.push(reward);
+  if (reward.type === "coins") {
+    increaseCoins(reward.value);
+    saveCoins(gameState.coins);
+    showAppToast(`Ô may mắn: +${reward.value} Xu`);
+    return;
+  }
+  linkGameState.remainingTime += reward.value;
+  showAppToast(`Ô may mắn: +${reward.value} giây`);
+}
+
+function formatLuckyAwards() {
+  const totals = linkGameState.luckyAwards.reduce((result, reward) => {
+    result[reward.type] = (result[reward.type] || 0) + reward.value;
+    return result;
+  }, {});
+  return [
+    totals.coins && `+${totals.coins} Xu`,
+    totals.time && `+${totals.time}s`,
+  ].filter(Boolean).join(" · ");
 }
 
 function startCountdown(roundId) {

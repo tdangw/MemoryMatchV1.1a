@@ -1,15 +1,23 @@
 export const LINK_CONNECT_CONFIG = Object.freeze({
   modes: Object.freeze({
-    easy: Object.freeze({ tileCount: 12, columns: 4, timeSeconds: 60 }),
-    normal: Object.freeze({ tileCount: 24, columns: 6, timeSeconds: 90 }),
-    hard: Object.freeze({ tileCount: 36, columns: 6, timeSeconds: 120 }),
-    superHard: Object.freeze({ tileCount: 60, columns: 6, timeSeconds: 180 }),
-    endless: Object.freeze({ tileCount: 60, columns: 6, timeSeconds: 0 }),
-    challenge: Object.freeze({ tileCount: 12, columns: 4, timeSeconds: 60 }),
+    easy: Object.freeze({ tileCount: 12, columns: 4, timeSeconds: 60, coinReward: Object.freeze({ base: 25, speedMultiplier: 0.25 }) }),
+    normal: Object.freeze({ tileCount: 24, columns: 6, timeSeconds: 90, coinReward: Object.freeze({ base: 40, speedMultiplier: 0.35 }) }),
+    hard: Object.freeze({ tileCount: 36, columns: 6, timeSeconds: 120, coinReward: Object.freeze({ base: 55, speedMultiplier: 0.45 }) }),
+    superHard: Object.freeze({ tileCount: 60, columns: 6, timeSeconds: 180, coinReward: Object.freeze({ base: 75, speedMultiplier: 0.55 }) }),
+    endless: Object.freeze({ tileCount: 60, columns: 6, timeSeconds: 0, coinReward: Object.freeze({ base: 10, speedMultiplier: 0 }) }),
+    challenge: Object.freeze({ tileCount: 12, columns: 4, timeSeconds: 60, coinReward: Object.freeze({ base: 30, speedMultiplier: 0.25 }) }),
   }),
   pathfinding: Object.freeze({ maxTurns: 2, boundaryPadding: 1 }),
   scoring: Object.freeze({ baseMatchPoints: 10, comboStepPoints: 3 }),
   levelProgression: Object.freeze({ timeBonusPerLevel: 2, timeBonusCap: 10 }),
+  challenge: Object.freeze({
+    timeBonusPerLevel: 10,
+    luckyPairCount: Object.freeze({ min: 1, max: 3 }),
+    luckyRewards: Object.freeze({
+      coins: Object.freeze({ min: 10, max: 50 }),
+      time: Object.freeze({ min: 3, max: 10 }),
+    }),
+  }),
   special: Object.freeze({
     scoreMultiplier: 1.5,
     progressTarget: 10,
@@ -59,6 +67,28 @@ export function getLinkLevelTimeBonus(level = 1) {
     Math.max(0, level - 1) * progression.timeBonusPerLevel,
     progression.timeBonusCap,
   );
+}
+
+export function getLinkChallengeTime(level = 1) {
+  return getLinkModeLayout("challenge").timeSeconds
+    + Math.max(0, level - 1) * LINK_CONNECT_CONFIG.challenge.timeBonusPerLevel;
+}
+
+export function getLinkLuckyReward(mode) {
+  const rewards = LINK_CONNECT_CONFIG.challenge.luckyRewards;
+  const types = isLinkEndlessMode(mode) ? ["coins"] : Object.keys(rewards);
+  const type = types[Math.floor(Math.random() * types.length)];
+  const range = rewards[type];
+  return { type, value: randomInteger(range.min, range.max) };
+}
+
+export function calculateLinkCoinReward(mode, remainingTime) {
+  const reward = getLinkModeLayout(mode).coinReward;
+  return reward.base + Math.floor(Math.max(0, remainingTime) * reward.speedMultiplier);
+}
+
+function randomInteger(minimum, maximum) {
+  return minimum + Math.floor(Math.random() * (maximum - minimum + 1));
 }
 
 export function calculateLinkMatchPoints(combo = 1, { special = false } = {}) {
