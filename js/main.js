@@ -10,6 +10,7 @@ import {
   showDifficultyOverlay,
   configureMainMenu,
   showGameInfoModal,
+  showCollectionModal,
 } from "./mainmenu.js";
 import { configureSettings, showSettingsPanel } from "./settings.js";
 import { openQuickAssistOverlay, openShopOverlay } from "./shop.js";
@@ -46,6 +47,21 @@ decorateIcons();
 // Tránh mở menu ngữ cảnh khi người chơi thao tác nhanh trên bàn chơi.
 document.addEventListener("contextmenu", (event) => event.preventDefault());
 
+// Khóa pinch-zoom trên Safari/iOS; cuộn nội dung bên trong modal vẫn do CSS quản lý.
+for (const eventName of ["gesturestart", "gesturechange", "gestureend"]) {
+  document.addEventListener(eventName, (event) => event.preventDefault(), {
+    passive: false,
+  });
+}
+
+document.addEventListener(
+  "touchmove",
+  (event) => {
+    if (event.touches.length > 1) event.preventDefault();
+  },
+  { passive: false },
+);
+
 window.onload = () => {
   createMainMenu();
 };
@@ -53,6 +69,9 @@ window.onload = () => {
 document
   .getElementById("btn-game-settings")
   ?.addEventListener("click", () => showSettingsPanel(true));
+document
+  .getElementById("btn-game-collection")
+  ?.addEventListener("click", () => showCollectionModal({ fromGame: true }));
 document.getElementById("btn-shop")?.addEventListener("click", openShopOverlay);
 document
   .getElementById("btn-game-help")

@@ -41,6 +41,21 @@
   animation: combo-appear 1.3s cubic-bezier(0.2, 0.75, 0.3, 1) forwards;
 }
 
+.tile-score-effect {
+  position: fixed;
+  z-index: 9999;
+  color: #ffe09a;
+  font:
+    900 clamp(0.95rem, 3.8vw, 1.12rem)/1 "Trebuchet MS",
+    "Segoe UI",
+    sans-serif;
+  letter-spacing: 0.03em;
+  pointer-events: none;
+  text-shadow: 0 2px 7px rgb(80 50 5 / 72%);
+  transform: translate(-50%, -50%);
+  animation: score-float 1.35s cubic-bezier(0.18, 0.76, 0.28, 1) forwards;
+}
+
 .tile-combo-effect--nice {
   text-shadow: 0 2px 8px rgb(68 135 194 / 36%);
 }
@@ -75,6 +90,21 @@
   100% {
     transform: translate(-50%, -13px) scale(1);
     opacity: 1;
+  }
+}
+
+@keyframes score-float {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 5px) scale(0.78);
+  }
+  16% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1.08);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -22px) scale(1);
   }
 }
 

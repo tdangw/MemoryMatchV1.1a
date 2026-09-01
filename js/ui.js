@@ -7,7 +7,7 @@ import { createIcon } from "./icons.js";
 import { launchSummaryConfetti, showSummaryFireworks } from "victory-presentation";
 import { clearPersistentGameData } from "./persistence.js";
 import { getTheme } from "./themeCatalog.js";
-import { getTimerDirection, isEndlessMode } from "./config.js";
+import { getStarScoreTargets, getTimerDirection, isEndlessMode } from "./config.js";
 
 const scoreElement = document.getElementById("score");
 const levelElement = document.getElementById("level");
@@ -19,6 +19,9 @@ const missesElement = document.getElementById("misses");
 const comboElement = document.getElementById("combo");
 const matchedPairsElement = document.getElementById("matched-pairs");
 const totalPairsElement = document.getElementById("total-pairs");
+const totalStarsElement = document.getElementById("total-stars");
+const levelStarsElement = document.getElementById("level-stars");
+const levelStarsFillElement = document.getElementById("level-stars-fill");
 let revealTimerInterval = null;
 let revealTimerRoundId = null;
 
@@ -29,6 +32,21 @@ export function updateCoinDisplay(coins) {
 
 export function updateScoreDisplay(score) {
   if (scoreElement) scoreElement.textContent = score;
+  const target = getStarScoreTargets(gameState.totalPairs, gameState.settings.mode).three;
+  if (levelStarsFillElement) levelStarsFillElement.style.width = `${Math.min(100, Math.round(score / target * 100))}%`;
+}
+
+export function updateLevelStarsDisplay(stars) {
+  if (!levelStarsElement) return;
+  const earnedStars = Math.max(0, Math.min(3, Number(stars) || 0));
+  levelStarsElement.setAttribute("aria-label", `${earnedStars} trên 3 sao`);
+  levelStarsElement.querySelectorAll(".star-progress__milestone").forEach((star, index) => {
+    star.classList.toggle("is-earned", index < earnedStars);
+  });
+}
+
+export function updateTotalStarsDisplay(stars) {
+  if (totalStarsElement) totalStarsElement.textContent = String(stars);
 }
 
 export function updateLevelDisplay(level) {
@@ -210,6 +228,9 @@ function openLevelSummaryOverlay({
   moves,
   misses,
   coinsEarned,
+  score,
+  stars,
+  timeBonus,
   luckyAwards = [],
   settings = {},
   onNext,
@@ -228,18 +249,36 @@ function openLevelSummaryOverlay({
   heading.className = "level-summary__heading";
   heading.textContent = `Hoàn thành Màn ${level}!`;
 
+  const result = document.createElement("div");
+  result.className = "level-summary__result";
+  const resultStars = document.createElement("div");
+  resultStars.className = "level-summary__stars";
+  resultStars.setAttribute("aria-label", `${stars} trên 3 sao`);
+  for (let index = 0; index < 3; index += 1) {
+    const star = document.createElement("span");
+    star.className = `level-summary__star${index === 1 ? " level-summary__star--middle" : ""}`;
+    star.textContent = index < stars ? "★" : "☆";
+    star.setAttribute("aria-hidden", "true");
+    resultStars.appendChild(star);
+  }
+  const resultScore = document.createElement("strong");
+  resultScore.className = "level-summary__score";
+  resultScore.textContent = `${Number(score).toLocaleString("en-US")} ĐIỂM`;
+  result.append(resultStars, resultScore);
+
   const stats = document.createElement("div");
   stats.className = "level-summary__stats";
   const summaryStats = [
+    ["XU NHẬN", `+${coinsEarned}`, "summary-coins"],
     [
       isEndlessMode(settings.mode) ? "THỜI GIAN ĐÃ CHƠI" : "THỜI GIAN CÒN LẠI",
       `${minutes}:${seconds}`,
       "summary-time",
     ],
-    ["MOVES", moves, "summary-moves"],
-    ["MISS", misses, "summary-misses"],
+    ["SỐ NƯỚC ĐI", moves, "summary-moves"],
+    ["LƯỢT SAI", misses, "summary-misses"],
   ];
-  summaryStats.push(["XU NHẬN", `+${coinsEarned}`, "summary-coins"]);
+  if (timeBonus > 0) summaryStats.push(["THƯỞNG THỜI GIAN", `+${timeBonus}`, "summary-time-bonus"]);
   if (luckyAwards.length > 0) {
     summaryStats.push(["Ô MAY MẮN", `${luckyAwards.length} phần thưởng`, "summary-lucky"]);
     summaryStats.push([
@@ -260,12 +299,12 @@ function openLevelSummaryOverlay({
     stats.appendChild(item);
   });
 
-  content.append(heading, stats);
+  content.append(heading, result, stats);
 
   const modal = openAppModal({
     id: "level-summary-modal",
-    icon: "trophy",
-    title: "Tổng kết",
+    showHeader: false,
+    dismissible: false,
     content,
     size: "medium",
     closeOnBackdrop: false,
@@ -394,7 +433,21 @@ export function showReturnToMenuOverlay({ onConfirm } = {}) {
     },
   });
 }
-// Chỉ hiện phản hồi khi người chơi tạo combo; điểm thường không cần popup.
+export function showScoreEffect(tileElement, points) {
+  if (!tileElement || points <= 0) return;
+
+  const rect = tileElement.getBoundingClientRect();
+  const effect = document.createElement("div");
+  effect.className = "tile-score-effect";
+  effect.textContent = `+${points}`;
+  effect.setAttribute("aria-hidden", "true");
+  effect.style.left = `${rect.left + rect.width / 2}px`;
+  effect.style.top = `${rect.top + rect.height / 2}px`;
+  document.body.appendChild(effect);
+
+  setTimeout(() => effect.remove(), 1400);
+}
+
 export function showComboEffect(tileElement, combo) {
   const presentation = getComboPresentation(combo);
   if (!presentation) return;

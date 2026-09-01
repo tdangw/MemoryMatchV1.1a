@@ -1,6 +1,15 @@
 /* 🌟Memory Match - CSS Tổng thể */
 
 /* === Layout toàn trang === */
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
 body {
   font-family: "Segoe UI", sans-serif;
   margin: 0;
@@ -9,8 +18,11 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start; /* thêm dòng này để nội dung bám lên trên */
-  min-height: 100vh;
-  overflow-x: hidden;
+  min-height: 100dvh;
+  height: 100dvh;
+  overflow: hidden;
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
   user-select: none;
   -webkit-user-select: none;
   background: url("/assets/images/background-main.webp") no-repeat center center
@@ -42,7 +54,10 @@ svg {
   justify-content: flex-start;
   max-width: 100vw;
   width: 100%;
-  min-height: 100vh;
+  min-height: 100dvh;
+  height: 100dvh;
+  overflow: hidden;
+  overscroll-behavior: none;
 }
 
 /* === Game Container === */
@@ -61,6 +76,7 @@ svg {
   background-image: none;
   position: relative; /* Để có thể đặt các phần tử con bên trong */
   overflow: visible;
+  touch-action: manipulation;
   z-index: 1000; /* Để đảm bảo nó nằm trên các phần tử khác */
 }
 

@@ -46,7 +46,8 @@ Vite build → dist → Firebase Hosting hoặc GitHub Pages
 | `settings.js` | Cài đặt âm thanh, nhạc, âm lượng và popup Phiên bản. |
 | `shop.js` | Cửa hàng/vật phẩm trong game. |
 | `shopCatalog.js` | Catalog vật phẩm Shop và quy tắc giá động của từng vật phẩm. |
-| `themeCatalog.js` | Catalog chủ đề thẻ, tạo nội dung chữ/số/ký hiệu bằng SVG và cung cấp dữ liệu thẻ cho board. |
+| `themeCatalog.js` | Metadata chủ đề, tạo nội dung chữ/số/ký hiệu bằng SVG và cung cấp dữ liệu thẻ cho board. Không chứa tên tệp ảnh. |
+| `scripts/generate-theme-manifest.mjs` | Quét ảnh WebP trong từng thư mục chủ đề và sinh manifest runtime tự động. |
 | `gameplayTuning.js` | Mốc combo, phần thưởng thời gian theo combo và thời lượng hiệu ứng gameplay. |
 | `gameMenu.js` | Menu tác vụ trong HUD. |
 | `sound.js` | Âm thanh hiệu ứng, nhạc nền và quy tắc phát/dừng theo trạng thái trang. |
@@ -109,7 +110,9 @@ Lưu trữ dùng `localStorage`, theo thiết bị/trình duyệt. Không có d�
 
 ## 6. Tài nguyên và đường dẫn
 
-- Ảnh phát hành là WebP trong `public/assets/images/`; bộ thẻ mặc định gồm 1.000 ảnh. Mỗi chủ đề ảnh khai báo `assetFolder`, `assetPrefix` và `imageCount` trong `themeCatalog.js`; khi bổ sung ảnh, cập nhật số lượng tại đó.
+- Ảnh phát hành là WebP trong `public/assets/images/themes/<theme-id>/`. Tên thư mục và tên tệp mới dùng English `kebab-case`; ví dụ `animals-land/red-panda.webp`. `scripts/generate-theme-manifest.mjs` quét các tệp WebP trực tiếp trong từng thư mục (không lấy thư mục `special/`) rồi tạo `js/generated/themeAssetManifest.js`. File sinh tự động bị Git bỏ qua.
+- `themeCatalog.js` chỉ giữ metadata ổn định: ID tiếng Anh, icon, giá và nhãn hiển thị tiếng Việt. Mỗi ảnh được game nhận diện theo tên tệp trong manifest; không duy trì danh sách filename bằng tay trong JavaScript.
+- `npm run dev`, `npm run build`, `npm run build:gh-pages`, `npm run build:android` và `npm run check` đều đồng bộ manifest trước khi chạy. Khi thêm ảnh trong lúc dev server đang mở, chạy `npm run assets:sync` rồi tải lại trang.
 - Âm thanh ở `public/assets/sounds/`.
 - `vite.config.js` đặt `base: '/MemoryMatchV1.1a/'` cho GitHub Pages.
 - JavaScript dùng `import.meta.env.BASE_URL` cho ảnh thẻ và âm thanh. Không thay bằng đường dẫn tuyệt đối `/assets/...` trong JavaScript.

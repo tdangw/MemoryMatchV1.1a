@@ -7,6 +7,7 @@ const STORAGE_KEYS = Object.freeze({
   meteorEffects: "meteorEffects",
   boardCoordinates: "boardCoordinates",
   appearance: "appearance",
+  progress: "progress",
 });
 
 export function loadPersistentGameData() {
@@ -14,6 +15,7 @@ export function loadPersistentGameData() {
     coins:
       Number.parseInt(localStorage.getItem(STORAGE_KEYS.coins) || "0", 10) || 0,
     appearance: loadAppearance(),
+    progress: loadProgress(),
     settings: {
       sound: localStorage.getItem(STORAGE_KEYS.sound) !== "false",
       music: localStorage.getItem(STORAGE_KEYS.music) !== "false",
@@ -27,6 +29,14 @@ export function loadPersistentGameData() {
       boardCoordinates: localStorage.getItem(STORAGE_KEYS.boardCoordinates) === "true",
     },
   };
+}
+
+function loadProgress() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.progress) || "{}"); } catch { return {}; }
+}
+
+export function saveProgress(progress) {
+  localStorage.setItem(STORAGE_KEYS.progress, JSON.stringify(progress));
 }
 
 function loadAppearance() {

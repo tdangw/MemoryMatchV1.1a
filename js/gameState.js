@@ -21,6 +21,7 @@ export const gameState = {
   roundId: 0,
   remainingTime: remainingTime,
   coins: 0,
+  progress: { memoryMatch: { totalStars: 0, totalScore: 0, bestByLevel: {} } },
   appearance: normalizeAppearance(),
   settings: {
     mode: "easy",
@@ -39,10 +40,17 @@ gameState._timeRunningOutPlayed = false;
 
 export function hydrateGameState({
   coins = 0,
+  progress = {},
   settings = {},
   appearance = {},
 } = {}) {
   gameState.coins = Number.isFinite(coins) ? Math.max(0, Math.floor(coins)) : 0;
+  const memoryMatch = progress?.memoryMatch || {};
+  gameState.progress.memoryMatch = {
+    totalStars: Math.max(0, Math.floor(memoryMatch.totalStars || 0)),
+    totalScore: Math.max(0, Math.floor(memoryMatch.totalScore || 0)),
+    bestByLevel: typeof memoryMatch.bestByLevel === "object" && memoryMatch.bestByLevel ? memoryMatch.bestByLevel : {},
+  };
   Object.assign(gameState.settings, settings);
   gameState.appearance = normalizeAppearance(appearance);
 }
@@ -100,6 +108,18 @@ export function resetGame() {
 export function increaseScore(points) {
   gameState.score += points;
   return gameState.score;
+}
+
+export function recordMemoryMatchResult({ mode, level, score, stars }) {
+  const progress = gameState.progress.memoryMatch;
+  const key = `${mode}:${level}`;
+  const previous = progress.bestByLevel[key] || { score: 0, stars: 0 };
+  const nextScore = Math.max(previous.score || 0, score);
+  const nextStars = Math.max(previous.stars || 0, stars);
+  progress.totalScore += nextScore - (previous.score || 0);
+  progress.totalStars += nextStars - (previous.stars || 0);
+  progress.bestByLevel[key] = { score: nextScore, stars: nextStars };
+  return { totalStars: progress.totalStars, isNewBest: score > (previous.score || 0) || stars > (previous.stars || 0) };
 }
 
 export function increaseCoins(amount) {

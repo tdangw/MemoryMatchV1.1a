@@ -52,9 +52,15 @@ export const GAME_CONFIG = Object.freeze({
     score: 0,
     timeSeconds: 180,
   }),
+  scoring: Object.freeze({
+    baseMatchPoints: 10,
+    comboStepPoints: 3,
+    starPointsPerPair: Object.freeze({ one: 12, two: 18, three: 25 }),
+    endlessStarPointsPerPair: Object.freeze({ one: 10, two: 15, three: 20 }),
+  }),
   levelProgression: Object.freeze({
-    timeBonusPerLevel: 3,
-    timeBonusCap: 30,
+    timeBonusPerLevel: 2,
+    timeBonusCap: 10,
     hintBonusPerLevel: 1,
     hintCap: 10,
   }),
@@ -156,6 +162,40 @@ export function calculateCoinReward(mode, remainingTime) {
     reward.base +
     Math.floor(Math.max(0, remainingTime) * reward.speedMultiplier)
   );
+}
+
+export function calculateMatchPoints(combo = 1) {
+  const score = GAME_CONFIG.scoring;
+  return score.baseMatchPoints + score.comboStepPoints * Math.max(0, combo - 1);
+}
+
+export function calculateCompletionTimeBonus(mode, remainingTime) {
+  if ((GAME_CONFIG.modes[mode]?.timeSeconds || 0) <= 0) return 0;
+  return Math.floor(Math.max(0, remainingTime));
+}
+
+export function getStarScoreTargets(totalPairs, mode = "easy") {
+  const scoring = GAME_CONFIG.scoring;
+  const pairs = Math.max(1, Number(totalPairs) || 1);
+  const hasTimeBonus = (GAME_CONFIG.modes[mode] || GAME_CONFIG.modes.easy).timeSeconds > 0;
+  const points = hasTimeBonus ? scoring.starPointsPerPair : scoring.endlessStarPointsPerPair;
+  return Object.freeze({
+    one: pairs * points.one,
+    two: pairs * points.two,
+    three: pairs * points.three,
+  });
+}
+
+export function calculateStarProgress(score, totalPairs, mode) {
+  const targets = getStarScoreTargets(totalPairs, mode);
+  const rating = score >= targets.three ? 3
+    : score >= targets.two ? 2
+      : score >= targets.one ? 1 : 0;
+  return rating;
+}
+
+export function calculateStarRating(score, totalPairs, mode) {
+  return calculateStarProgress(score, totalPairs, mode);
 }
 
 export function getLevelTimeBonus(level = 1) {

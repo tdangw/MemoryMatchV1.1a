@@ -1,5 +1,6 @@
 node_modules/
 dist/
+js/generated/
 .firebase/
 .env*
 !.env.example

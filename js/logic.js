@@ -7,8 +7,9 @@ import {
   increaseScore,
   gameState,
   recordLuckyAward,
+  recordMemoryMatchResult,
 } from "./gameState.js";
-import { calculateCoinReward, getLuckyReward, isEndlessMode } from "./config.js";
+import { calculateCoinReward, calculateCompletionTimeBonus, calculateMatchPoints, calculateStarProgress, calculateStarRating, getLuckyReward, isEndlessMode } from "./config.js";
 import {
   updateScoreDisplay,
   updateTimerDisplay,
@@ -16,16 +17,19 @@ import {
   updateMissesDisplay,
   updateComboDisplay,
   updatePairProgressDisplay,
+  updateLevelStarsDisplay,
+  updateTotalStarsDisplay,
   updateCoinDisplay,
   updateHintDisplay,
   showComboEffect,
   showBonusOverlay,
   showLuckyRewardPopup,
   highlightTarget,
+  showScoreEffect,
   showLevelSummaryOverlay,
 } from "./ui.js";
 import { pauseBackgroundMusic, sounds } from "./sound.js"; // 📦 Tách âm thanh
-import { saveCoins } from "./persistence.js";
+import { saveCoins, saveProgress } from "./persistence.js";
 import { getFlipAnimationClass } from "./appearance.js";
 import {
   GAMEPLAY_TIMING,
@@ -174,10 +178,13 @@ function checkMatch(roundId) {
     first.element.classList.add("matched");
     second.element.classList.add("matched");
 
-    const matchPoints = 1;
+    gameState.combo += 1;
+    const matchPoints = calculateMatchPoints(gameState.combo);
     const score = increaseScore(matchPoints);
     updateScoreDisplay(score);
-    gameState.combo += 1;
+    showScoreEffect(second.element, matchPoints);
+    highlightTarget("#score");
+    updateLevelStarsDisplay(calculateStarProgress(score, gameState.totalPairs, gameState.settings.mode));
     updateComboDisplay(gameState.combo);
     const comboTimeBonus = getComboTimeBonus(gameState.combo);
     if (comboTimeBonus > 0 && !isEndlessMode(gameState.settings.mode)) {
@@ -187,7 +194,9 @@ function checkMatch(roundId) {
     }
     gameState.matchedPairs++;
     updatePairProgressDisplay(gameState.matchedPairs);
-    if (comboTimeBonus > 0) showComboEffect(second.element, gameState.combo);
+    if (comboTimeBonus > 0) {
+      setTimeout(() => showComboEffect(second.element, gameState.combo), 650);
+    }
     highlightTarget("#pair-progress");
 
     if (gameState.settings?.sound) {
@@ -245,6 +254,22 @@ export function checkLevelComplete() {
       ? 0
       : Math.min(grossCoins, gameState.misses);
     const coinsEarned = grossCoins - coinPenalty;
+    const timeBonus = calculateCompletionTimeBonus(
+      gameState.settings.mode,
+      gameState.remainingTime,
+    );
+    const finalScore = increaseScore(timeBonus);
+    const stars = calculateStarRating(finalScore, gameState.totalPairs, gameState.settings.mode);
+    const progressResult = recordMemoryMatchResult({
+      mode: gameState.settings.mode,
+      level: gameState.currentLevel,
+      score: finalScore,
+      stars,
+    });
+    saveProgress(gameState.progress);
+    updateScoreDisplay(finalScore);
+    updateLevelStarsDisplay(stars);
+    updateTotalStarsDisplay(progressResult.totalStars);
     const totalCoins = increaseCoins(coinsEarned);
     saveCoins(totalCoins);
     updateCoinDisplay(totalCoins);
@@ -260,6 +285,9 @@ export function checkLevelComplete() {
       moves: gameState.moves,
       misses: gameState.misses,
       coinsEarned,
+      score: finalScore,
+      stars,
+      timeBonus,
       luckyAwards: gameState.luckyAwards,
       settings: gameState.settings,
       onNext: continueToNextLevel,

@@ -27,6 +27,8 @@ import {
   updateMissesDisplay,
   updateComboDisplay,
   updatePairProgressDisplay,
+  updateLevelStarsDisplay,
+  updateTotalStarsDisplay,
   showBonusOverlay,
   showRevealTimerInHud,
   showLevelRewardOverlay,
@@ -78,11 +80,14 @@ export function initializeLevel(level) {
   gameState.moves = 0;
   gameState.misses = 0;
   gameState.combo = 0;
+  gameState.score = 0;
   gameState.matchedPairs = 0;
   gameState.totalPairs = layout.tileCount / 2;
 
   updateLevelDisplay(level);
   updateScoreDisplay(gameState.score);
+  updateLevelStarsDisplay(0);
+  updateTotalStarsDisplay(gameState.progress.memoryMatch.totalStars);
   updateHintDisplay(gameState.hints);
   updateMovesDisplay(gameState.moves);
   updateMissesDisplay(gameState.misses);
@@ -190,6 +195,8 @@ function handleTimeUp() {
     icon: "timer",
     title: "Hết giờ",
     content: "<p>Chọn một cách để tiếp tục hành trình của bạn.</p>",
+    closeOnBackdrop: false,
+    closeOnEscape: false,
     actions: [
       {
         label: "Về Menu",

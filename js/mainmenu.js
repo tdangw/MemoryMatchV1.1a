@@ -9,6 +9,8 @@ import { APP_VERSION } from "./appMeta.js";
 import { THEMES, getTheme, isThemePlayable } from "./themeCatalog.js";
 import { saveAppearance } from "./persistence.js";
 import { openShopOverlay } from "./shop.js";
+import { showThemeChangeNotice } from "./themeChangeNotice.js";
+import { CARD_BACKS, FLIP_EFFECTS, getCardBackClass } from "./appearance.js";
 
 let onStartGame = () => {};
 
@@ -209,62 +211,145 @@ export function showCollectionModal({ fromGame = false } = {}) {
     },
   });
 
-  const render = () => {
-    content.replaceChildren();
-    const intro = document.createElement("p");
-    intro.textContent = "Chọn một chủ đề đã sở hữu để dùng cho màn chơi tiếp theo.";
-    const list = document.createElement("div");
-    list.className = "collection-theme-list";
-    THEMES.forEach((theme) => {
-      const owned = gameState.appearance.ownedThemes.includes(theme.id);
-      const equipped = gameState.appearance.theme === theme.id;
+  const tabs = document.createElement("div");
+  tabs.className = "shop-tabs shop-tabs--catalog";
+  tabs.setAttribute("role", "tablist");
+  const grid = document.createElement("div");
+  grid.className = "shop-item-grid";
+  content.append(tabs, grid);
+
+  const renderAppearance = () => {
+    grid.className = "shop-item-grid shop-item-grid--appearance";
+    grid.replaceChildren();
+    renderCollectionAppearanceGroup(grid, "Mặt lưng thẻ", "cardBack", CARD_BACKS);
+    renderCollectionAppearanceGroup(grid, "Hiệu ứng lật", "flipEffect", FLIP_EFFECTS);
+  };
+  const renderThemes = () => {
+    grid.className = "shop-item-grid shop-item-grid--themes";
+    grid.replaceChildren();
+    const group = document.createElement("section");
+    group.className = "appearance-group theme-group";
+    const heading = document.createElement("h3");
+    heading.textContent = "Chủ đề thẻ";
+    const choices = document.createElement("div");
+    choices.className = "theme-choice-grid";
+    THEMES.filter((theme) => gameState.appearance.ownedThemes.includes(theme.id)).forEach((theme) => {
       const playable = isThemePlayable(theme);
-      const item = document.createElement("article");
-      item.className = `collection-theme${equipped ? " is-equipped" : ""}`;
-      const preview = document.createElement("span");
-      preview.className = "collection-theme__preview";
+      const equipped = gameState.appearance.theme === theme.id;
+      const card = document.createElement("article");
+      card.className = `theme-choice${equipped ? " is-equipped" : ""}`;
+      const preview = document.createElement("div");
+      preview.className = "appearance-preview theme-preview";
       preview.append(createIcon(theme.icon));
-      const details = document.createElement("div");
       const name = document.createElement("strong");
       name.textContent = theme.title;
-      details.append(name);
-      item.append(preview, details);
-      if (equipped) {
-        const status = document.createElement("span");
-        status.className = "collection-theme__status";
-        status.textContent = "Đang dùng";
-        item.append(status);
-      } else if (owned && !playable) {
-        const status = document.createElement("span");
-        status.className = "collection-theme__status";
-        status.textContent = "Chờ ảnh";
-        item.append(status);
-      } else if (owned) {
-        const button = document.createElement("button");
-        button.type = "button";
-        button.className = "app-button app-button--purchase collection-theme__equip";
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "app-button app-button--purchase shop-buy-button";
+      if (!playable) {
+        button.textContent = "Chờ ảnh";
+        button.disabled = true;
+      } else if (equipped) {
+        button.classList.add("appearance-action--equipped");
+        button.textContent = "Đang dùng";
+        button.disabled = true;
+      } else {
+        button.classList.add("appearance-action--equip");
         button.textContent = "Trang bị";
         button.onclick = () => {
           gameState.appearance.theme = theme.id;
           saveAppearance(gameState.appearance);
-          render();
-          showAppToast(`Đã trang bị chủ đề ${theme.title}.`, {
-            tone: "info",
-          });
+          renderThemes();
+          if (fromGame) showThemeChangeNotice();
+          else showAppToast(`Đã trang bị chủ đề ${theme.title}.`, { tone: "info" });
         };
-        item.append(button);
-      } else {
-        const status = document.createElement("span");
-        status.className = "collection-theme__status";
-        status.textContent = theme.comingSoon ? "Sắp có" : "Chưa sở hữu";
-        item.append(status);
       }
-      list.append(item);
+      card.append(preview, name, button);
+      choices.append(card);
     });
-    content.append(intro, list);
+    group.append(heading, choices);
+    grid.append(group);
   };
-  render();
+
+  const appearanceTab = createCollectionTab("Ngoại hình", true, renderAppearance);
+  const themesTab = createCollectionTab("Chủ đề", false, renderThemes);
+  tabs.append(appearanceTab, themesTab);
+  renderAppearance();
   return modal;
+}
+
+function createCollectionTab(label, selected, onSelect) {
+  const tab = document.createElement("button");
+  tab.type = "button";
+  tab.className = "shop-tab";
+  tab.textContent = label;
+  tab.setAttribute("role", "tab");
+  tab.setAttribute("aria-selected", String(selected));
+  tab.onclick = () => {
+    tab.parentElement.querySelectorAll(".shop-tab").forEach((button) => {
+      button.classList.toggle("is-active", button === tab);
+      button.setAttribute("aria-selected", String(button === tab));
+    });
+    onSelect();
+  };
+  if (selected) tab.classList.add("is-active");
+  return tab;
+}
+
+function renderCollectionAppearanceGroup(grid, title, type, items) {
+  const ownedKey = type === "cardBack" ? "ownedCardBacks" : "ownedFlipEffects";
+  const group = document.createElement("section");
+  group.className = "appearance-group";
+  const heading = document.createElement("h3");
+  heading.textContent = title;
+  const choices = document.createElement("div");
+  choices.className = "appearance-choice-grid";
+  items.filter((item) => gameState.appearance[ownedKey].includes(item.id)).forEach((item) => {
+    const equipped = gameState.appearance[type] === item.id;
+    const card = document.createElement("article");
+    card.className = `appearance-choice${equipped ? " is-equipped" : ""}`;
+    const preview = document.createElement("div");
+    if (type === "cardBack") preview.className = `appearance-preview ${item.previewClass}`;
+    else {
+      preview.className = `appearance-effect-preview ${item.animationClass}`;
+      preview.textContent = "A";
+    }
+    preview.setAttribute("aria-hidden", "true");
+    const name = document.createElement("strong");
+    name.textContent = item.title;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "app-button app-button--purchase shop-buy-button";
+    if (equipped) {
+      button.classList.add("appearance-action--equipped");
+      button.textContent = "Đang dùng";
+      button.disabled = true;
+    } else {
+      button.classList.add("appearance-action--equip");
+      button.textContent = "Trang bị";
+      button.onclick = () => {
+        gameState.appearance[type] = item.id;
+        saveAppearance(gameState.appearance);
+        if (type === "cardBack") applyCollectionCardBack();
+        grid.replaceChildren();
+        renderCollectionAppearanceGroup(grid, "Mặt lưng thẻ", "cardBack", CARD_BACKS);
+        renderCollectionAppearanceGroup(grid, "Hiệu ứng lật", "flipEffect", FLIP_EFFECTS);
+      };
+    }
+    card.append(preview, name, button);
+    choices.append(card);
+  });
+  group.append(heading, choices);
+  grid.append(group);
+}
+
+function applyCollectionCardBack() {
+  const backClasses = CARD_BACKS.map((item) => item.previewClass);
+  const equippedClass = getCardBackClass(gameState.appearance.cardBack);
+  document.querySelectorAll(".tile").forEach((tile) => {
+    tile.classList.remove(...backClasses);
+    tile.classList.add(equippedClass);
+  });
 }
 
 export function showGameInfoModal(title, message, icon = "info") {

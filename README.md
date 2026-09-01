@@ -49,6 +49,7 @@ npm run preview
 - `public/assets/`: hình ảnh và âm thanh được sao chép nguyên trạng vào bản build.
 - `public/assets/images/`: các ảnh giao diện WebP, gồm nền chính, nền lưới, tile và logo.
 - `public/assets/images/themes/default/`: kho 1.000 ảnh thẻ WebP 256×256 dùng chung cho mọi level. Khi bổ sung chủ đề, tạo thư mục mới cạnh `default`; không nhân bản ảnh giữa các level.
+- Ảnh theme mới dùng tên English `kebab-case.webp` và đặt tại `public/assets/images/themes/<theme-id>/`. Chạy `npm run assets:sync` sau khi thêm/xóa ảnh; game tự lập chỉ mục tệp, không cần cập nhật danh sách filename trong code.
 - Hiện không có thư mục `source-assets/`. Khi tạo hoặc xuất lại ảnh, lưu bản nguồn ngoài `public/assets/`; chỉ asset runtime đã chuẩn bị mới được đưa vào bản web.
 - `vite.config.js`: cấu hình web JavaScript thuần.
 

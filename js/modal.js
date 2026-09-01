@@ -9,8 +9,10 @@ export function openAppModal({
   content = "",
   actions = [],
   size = "medium",
+  showHeader = true,
   dismissible = true,
   closeOnBackdrop = true,
+  closeOnEscape = true,
   onClose,
 }) {
   if (id) document.getElementById(id)?.remove();
@@ -60,7 +62,8 @@ export function openAppModal({
   if (typeof content === "string") body.innerHTML = content;
   else if (content) body.appendChild(content);
 
-  panel.append(header, body);
+  if (showHeader) panel.appendChild(header);
+  panel.appendChild(body);
 
   if (actions.length > 0) {
     const footer = document.createElement("footer");
@@ -81,7 +84,7 @@ export function openAppModal({
   document.body.appendChild(overlay);
 
   function handleKeydown(event) {
-    if (event.key === "Escape" && dismissible) close();
+    if (event.key === "Escape" && dismissible && closeOnEscape) close();
   }
 
   document.addEventListener("keydown", handleKeydown);

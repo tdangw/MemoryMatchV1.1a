@@ -966,3 +966,118 @@ body.game-is-paused .shooting-star {
   }
 }
 
+/* Kết quả màn: tập trung vào sao và điểm, các chỉ số còn lại là một bảng tóm tắt. */
+#level-summary-modal .level-summary-modal {
+  width: min(420px, calc(100vw - 28px));
+  border-color: rgb(255 255 255 / 22%);
+  border-radius: 18px;
+}
+
+#level-summary-modal .level-summary-modal .app-modal__body {
+  padding: 26px 24px 18px;
+}
+
+#level-summary-modal .level-summary-modal .app-modal__footer {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding: 16px 24px 22px;
+  border-top: 0;
+}
+
+#level-summary-modal .level-summary__heading {
+  margin: 0 0 13px;
+  color: #f5f7fb;
+  font-size: clamp(1.25rem, 5.5vw, 1.65rem);
+  text-align: center;
+}
+
+#level-summary-modal .level-summary__result {
+  gap: 7px;
+  margin-bottom: 20px;
+}
+
+#level-summary-modal .level-summary__stars {
+  color: #ffd166;
+  font-size: 2rem;
+  text-shadow: 0 2px 8px rgb(255 190 61 / 38%);
+}
+
+#level-summary-modal .level-summary__star {
+  display: inline-block;
+}
+
+#level-summary-modal .level-summary__star--middle {
+  margin: 0 0.06em;
+  font-size: 1.24em;
+  line-height: 0.75;
+  transform: translateY(-0.07em);
+}
+
+#level-summary-modal .level-summary__score {
+  color: #f5f7fb;
+  font-size: 1.12rem;
+  letter-spacing: 0.07em;
+}
+
+#level-summary-modal .level-summary__stats {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+  padding: 9px 15px;
+  border: 1px solid rgb(255 255 255 / 58%);
+  border-radius: 10px;
+  background: rgb(7 17 36 / 38%);
+}
+
+#level-summary-modal .level-summary__stat {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 30px;
+  padding: 0 2px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+#level-summary-modal .level-summary__stat span {
+  color: #dceaff;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+#level-summary-modal .level-summary__stat strong,
+#level-summary-modal .level-summary__stat.summary-misses strong,
+#level-summary-modal .level-summary__stat.summary-next strong {
+  color: #f5f7fb;
+  font-size: 1rem;
+}
+
+#level-summary-modal .level-summary__stat.summary-coins strong,
+#level-summary-modal .level-summary__stat.summary-time-bonus strong,
+#level-summary-modal .level-summary__stat.summary-new-best strong {
+  color: #ffd166;
+}
+
+#level-summary-modal .level-summary__stat.summary-misses span,
+#level-summary-modal .level-summary__stat.summary-misses strong {
+  color: #ff9da8;
+}
+
+#level-summary-modal .app-button {
+  min-height: 42px;
+  border-radius: 11px;
+  font-size: 0.88rem;
+}
+
+@media screen and (width <= 420px) {
+  #level-summary-modal .level-summary-modal .app-modal__body {
+    padding: 22px 18px 14px;
+  }
+
+  #level-summary-modal .level-summary-modal .app-modal__footer {
+    padding: 14px 18px 18px;
+  }
+}
+

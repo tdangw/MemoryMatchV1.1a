@@ -65,7 +65,16 @@
 
 #quick-time-modal .app-modal__body,
 #quick-preview-modal .app-modal__body {
+  max-height: min(390px, calc(100dvh - 150px));
+  overflow-y: auto;
   padding: 14px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+#quick-time-modal .app-modal__body::-webkit-scrollbar,
+#quick-preview-modal .app-modal__body::-webkit-scrollbar {
+  display: none;
 }
 
 #quick-time-modal .quick-assist__choice,
@@ -133,7 +142,8 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-#shop-modal .shop-item-grid {
+#shop-modal .shop-item-grid,
+#collection-modal .shop-item-grid {
   width: 100%;
   height: 100%;
   min-height: 0;
@@ -147,10 +157,12 @@
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
-#shop-modal .shop-item-grid::-webkit-scrollbar {
+#shop-modal .shop-item-grid::-webkit-scrollbar,
+#collection-modal .shop-item-grid::-webkit-scrollbar {
   display: none;
 }
-#shop-modal .shop-item-grid--appearance {
+#shop-modal .shop-item-grid--appearance,
+#collection-modal .shop-item-grid--appearance {
   display: grid;
   height: 100%;
   grid-template-columns: 1fr;
@@ -160,7 +172,8 @@
   overflow-y: auto;
 }
 
-#shop-modal .shop-item-grid.shop-item-grid--themes {
+#shop-modal .shop-item-grid.shop-item-grid--themes,
+#collection-modal .shop-item-grid.shop-item-grid--themes {
   display: grid;
   height: 100%;
   grid-template-columns: 1fr;
@@ -333,7 +346,8 @@
   height: 17px;
   color: #86bff5;
 }
-#shop-modal .shop-buy-button {
+#shop-modal .shop-buy-button,
+#collection-modal .shop-buy-button {
   align-self: center;
   min-height: 29px;
   padding: 5px 10px;
@@ -342,12 +356,15 @@
   color: #ffe09a;
 }
 #shop-modal .appearance-action--equip,
-#shop-modal .appearance-action--equipped {
+#shop-modal .appearance-action--equipped,
+#collection-modal .appearance-action--equip,
+#collection-modal .appearance-action--equipped {
   border-color: rgb(111 190 255 / 58%);
   background: rgb(47 115 184 / 72%);
   color: #eef8ff;
 }
-#shop-modal .appearance-action--equipped {
+#shop-modal .appearance-action--equipped,
+#collection-modal .appearance-action--equipped {
   background: rgb(42 92 149 / 72%);
 }
 #shop-confirm-modal .app-modal__body {
@@ -384,7 +401,8 @@
   #shop-modal .app-modal__header {
     padding: 11px 13px;
   }
-  #shop-modal .shop-item-grid {
+  #shop-modal .shop-item-grid,
+  #collection-modal .shop-item-grid {
     height: 100%;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-template-rows: none;
@@ -393,7 +411,9 @@
   /* Mỗi nhóm Ngoại hình/Chủ đề phải chiếm trọn một hàng; chỉ các lựa chọn
      bên trong nhóm mới chia cột để không bị ép hai nhóm cạnh nhau. */
   #shop-modal .shop-item-grid.shop-item-grid--appearance,
-  #shop-modal .shop-item-grid.shop-item-grid--themes {
+  #shop-modal .shop-item-grid.shop-item-grid--themes,
+  #collection-modal .shop-item-grid.shop-item-grid--appearance,
+  #collection-modal .shop-item-grid.shop-item-grid--themes {
     grid-template-columns: 1fr;
   }
   #shop-modal .shop-item {

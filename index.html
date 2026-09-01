@@ -3,7 +3,7 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
   <meta name="theme-color" content="#081b22" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -34,6 +34,15 @@
         <span class="info stat-card stat-moves"><span class="stat-label">MOVES</span><span id="moves">0</span></span>
         <span class="info stat-card stat-misses"><span class="stat-label">MISS</span><span id="misses">0</span></span>
         <span class="info stat-card stat-combo"><span class="stat-label">COMBO</span><span id="combo">0</span></span>
+        <span class="info stat-card stat-star-progress" aria-label="Tiến trình sao màn hiện tại">
+          <span id="level-stars" class="star-progress__stars" role="img" aria-label="0 trên 3 sao">
+            <span class="star-progress__milestone" aria-hidden="true">★</span>
+            <span class="star-progress__milestone" aria-hidden="true">★</span>
+            <span class="star-progress__milestone" aria-hidden="true">★</span>
+          </span>
+          <span class="star-progress__track"><span id="level-stars-fill" class="star-progress__fill"></span></span>
+        </span>
+        <span class="info stat-card stat-points"><span class="stat-label">ĐIỂM</span><span id="score">0</span></span>
         <span class="info stat-card stat-progress" id="pair-progress"><span data-icon="trophy"></span><span id="matched-pairs">0</span>/<span id="total-pairs">0</span></span>
         <span class="info stat-card stat-hints" aria-label="Lượt gợi ý còn lại"><span data-icon="search"></span><span id="hint">0</span></span>
       </div>
@@ -54,6 +63,7 @@
           <button id="btn-restart" class="game-action-item" type="button" data-icon="restart">Chơi lại</button>
           <button id="btn-full-reset" class="game-action-item" type="button" data-icon="wand">Xóa dữ liệu</button>
           <button id="btn-game-settings" class="game-action-item" type="button" data-icon="settings">Cài đặt</button>
+          <button id="btn-game-collection" class="game-action-item" type="button" data-icon="collection">Bộ sưu tập</button>
           <button id="btn-shop" class="game-action-item" type="button" data-icon="shop">Cửa hàng</button>
           <button id="btn-game-help" class="game-action-item" type="button" data-icon="book">Hướng dẫn</button>
           <button id="btn-game-info" class="game-action-item" type="button" data-icon="info">Thông tin</button>
@@ -71,7 +81,7 @@
         <div class="game-stats" aria-label="Thông tin màn chơi">
           <span class="info stat-card stat-level"><span class="stat-label">LV</span><span id="level">1</span></span>
           <span class="info stat-card stat-timer" id="timer"><span data-icon="timer"></span><span id="timer-value">--:--</span></span>
-          <span class="info stat-card stat-score"><span data-icon="star"></span><span id="score">0</span></span>
+          <span class="info stat-card stat-score"><span data-icon="star"></span><span id="total-stars">0</span></span>
         </div>
       </div>
       <div id="grid-board-frame">
