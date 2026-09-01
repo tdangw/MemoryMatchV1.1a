@@ -5,7 +5,6 @@ import {
   sounds,
   syncDefaultMusic,
 } from "./sound.js";
-import { openAppModal } from "./modal.js";
 import {
   GAME_CONFIG,
   getChallengeLayout,
@@ -30,6 +29,7 @@ import {
   updateLevelStarsDisplay,
   updateTotalStarsDisplay,
   showBonusOverlay,
+  openTimeUpModal,
   showRevealTimerInHud,
   showLevelRewardOverlay,
 } from "./ui.js";
@@ -194,13 +194,8 @@ function handleTimeUp() {
     sounds.defeat.play().catch(() => {});
   }
 
-  const timeUpModal = openAppModal({
-    id: "time-up-modal",
-    icon: "timer",
-    title: "Hết giờ",
+  openTimeUpModal({
     content: "<p>Chọn một cách để tiếp tục hành trình của bạn.</p>",
-    closeOnBackdrop: false,
-    closeOnEscape: false,
     actions: [
       {
         label: "Về Menu",
@@ -241,9 +236,6 @@ function handleTimeUp() {
     },
   });
 
-  setTimeout(() => {
-    timeUpModal.panel.classList.add("is-defeat-shaking");
-  }, 520);
 }
 
 export function nextLevel() {

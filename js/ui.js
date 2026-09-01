@@ -111,6 +111,26 @@ export function showBonusOverlay(message) {
   }
 }
 
+// Popup hết giờ dùng chung để hai trò luôn có cùng cấu trúc và hiệu ứng.
+export function openTimeUpModal({
+  content = "<p>Chọn một cách để tiếp tục hành trình của bạn.</p>",
+  actions = [],
+  onClose,
+} = {}) {
+  const modal = openAppModal({
+    id: "time-up-modal",
+    icon: "timer",
+    title: "Hết giờ",
+    content,
+    closeOnBackdrop: false,
+    closeOnEscape: false,
+    actions,
+    onClose,
+  });
+  setTimeout(() => modal.panel.classList.add("is-defeat-shaking"), 520);
+  return modal;
+}
+
 export function showLuckyRewardPopup(reward) {
   document.querySelector(".lucky-reward-popup-overlay")?.remove();
 

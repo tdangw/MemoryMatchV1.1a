@@ -1,8 +1,8 @@
 import { createIcon } from "../icons.js";
 import { openAppModal, showAppToast } from "../modal.js";
-import { sounds, syncDefaultMusic } from "../sound.js";
+import { pauseBackgroundMusic, sounds, syncDefaultMusic } from "../sound.js";
 import { getEquippedThemeId } from "../appearance.js";
-import { gameState, increaseCoins } from "../gameState.js";
+import { gameState, increaseCoins, spendCoins } from "../gameState.js";
 import { saveCoins } from "../persistence.js";
 import { getTheme } from "../themeCatalog.js";
 import {
@@ -31,7 +31,7 @@ import {
 import { findAvailableConnections, findConnectionPath } from "./pathfinder.js";
 import { consumeLinkItem, getLinkItemCount, grantLinkItem, LINK_ITEMS } from "./linkItems.js";
 import { clearActiveSession, getActiveSession, saveActiveSession } from "../sessionProgress.js";
-import { showLevelRewardOverlay, showLevelSummaryOverlay } from "../ui.js";
+import { openTimeUpModal, showLevelRewardOverlay, showLevelSummaryOverlay } from "../ui.js";
 import {
   clearLinkPath,
   clearLinkMatchedPair,
@@ -47,6 +47,7 @@ import { beginLinkRound, linkGameState, resetLinkGame } from "./linkState.js";
 const LINK_MATCH_DELAY_MS = 1020;
 let countdownInterval;
 let selectedPosition = null;
+let linkTimeWarningPlayed = false;
 let navigation = {
   showMenu: () => {},
   showCollection: () => {},
@@ -146,6 +147,7 @@ export function startLinkLevel({ mode = linkGameState.mode, level = 1, resume = 
   stopCountdown();
   clearLinkPath();
   selectedPosition = null;
+  linkTimeWarningPlayed = false;
   const modeLayout = getLinkModeLayout(mode);
   const layout = isLinkChallengeMode(mode) ? getLinkChallengeLayout(level) : modeLayout;
   const board = createLinkBoard({
@@ -196,7 +198,7 @@ export function returnToLinkMenu() {
   clearLinkPath();
   document.getElementById("link-connect-container")?.setAttribute("hidden", "");
   navigation.showMenu();
-  syncDefaultMusic();
+  syncDefaultMusic(gameState.settings);
 }
 
 function showLinkGame() {
@@ -408,6 +410,7 @@ function useLinkItem(id) {
     showAppToast("Bạn chưa có vật phẩm này.");
     return;
   }
+  playLinkSound("overlay");
   if (id === "hint") useLinkHint();
   else if (id === "reshuffle") useLinkReshuffle();
   else if (id === "thunder") useLinkThunder();
@@ -457,6 +460,8 @@ function useLinkFreeze() {
 function completeLinkLevel() {
   stopCountdown();
   linkGameState.isLocked = true;
+  pauseBackgroundMusic();
+  playLinkSound("victory");
   const coinsEarned = calculateLinkCoinReward(linkGameState.mode, linkGameState.remainingTime);
   increaseCoins(coinsEarned);
   saveCoins(gameState.coins);
@@ -508,6 +513,7 @@ function calculateLinkStars() {
 
 function startCountdown(roundId) {
   stopCountdown();
+  syncDefaultMusic(gameState.settings);
   countdownInterval = setInterval(() => {
     if (linkGameState.roundId !== roundId || linkGameState.isLocked || linkGameState.isPaused) return;
     if (linkGameState.freezeSeconds > 0) {
@@ -517,6 +523,10 @@ function startCountdown(roundId) {
     }
     linkGameState.remainingTime += getLinkTimerDirection(linkGameState.mode) === "up" ? 1 : -1;
     updateLinkHud();
+    if (!isLinkEndlessMode(linkGameState.mode) && linkGameState.remainingTime <= 10 && !linkTimeWarningPlayed) {
+      playLinkSound("timerunningout");
+      linkTimeWarningPlayed = true;
+    }
     if (linkGameState.remainingTime <= 0 && !isLinkEndlessMode(linkGameState.mode)) {
       handleLinkTimeUp();
     }
@@ -526,15 +536,57 @@ function startCountdown(roundId) {
 function handleLinkTimeUp() {
   stopCountdown();
   linkGameState.isLocked = true;
-  openAppModal({
-    id: "link-time-up-modal",
-    icon: "timer",
-    title: "Hết giờ",
-    content: "<p>Hãy quan sát đường nối nhanh hơn ở lượt tiếp theo.</p>",
+  pauseBackgroundMusic();
+  playLinkSound("defeat");
+  let actionSelected = false;
+  const returnToMenu = () => returnToLinkMenu();
+  const buyMoreTime = (seconds, price, close) => {
+    if (!spendCoins(price)) {
+      showAppToast("Bạn không đủ Xu để mua thêm thời gian.");
+      playLinkSound("overlay");
+      return true;
+    }
+    actionSelected = true;
+    saveCoins(gameState.coins);
+    linkGameState.remainingTime = seconds;
+    linkTimeWarningPlayed = false;
+    linkGameState.isLocked = false;
+    close();
+    showAppToast(`Đã mua +${seconds}s với ${price} Xu.`);
+    playLinkSound("bonus");
+    syncDefaultMusic(gameState.settings);
+    setTimeout(() => startCountdown(linkGameState.roundId), 1000);
+    return true;
+  };
+  openTimeUpModal({
+    content: "<p>Chọn một cách để tiếp tục hành trình của bạn.</p>",
     actions: [
-      { label: "Menu", icon: "home", onClick: () => returnToLinkMenu() },
-      { label: "Chơi lại", icon: "restart", variant: "primary", onClick: () => startLinkLevel({ mode: linkGameState.mode, level: linkGameState.level, resume: true }) },
+      {
+        label: "Về Menu",
+        icon: "home",
+        variant: "secondary",
+        onClick: (close) => {
+          actionSelected = true;
+          close();
+          returnToMenu();
+        },
+      },
+      {
+        label: "Chơi lại",
+        icon: "restart",
+        variant: "primary",
+        onClick: (close) => {
+          actionSelected = true;
+          close();
+          startLinkLevel({ mode: linkGameState.mode, level: linkGameState.level, resume: true });
+        },
+      },
+      { label: "+1 giây · 2 Xu", icon: "coin", variant: "time-purchase", onClick: (close) => buyMoreTime(1, 2, close) },
+      { label: "+5 giây · 10 Xu", icon: "coin", variant: "time-purchase", onClick: (close) => buyMoreTime(5, 10, close) },
     ],
+    onClose: () => {
+      if (!actionSelected) returnToMenu();
+    },
   });
 }
 

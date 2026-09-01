@@ -230,6 +230,7 @@ function chooseMemoryMode(mode, label, startMode, closeDifficulty) {
     session,
     onContinue: () => {
       closeDifficulty();
+      document.getElementById("menu-container")?.remove();
       onContinueGame(session);
     },
     onNew: () => startMode(mode, closeDifficulty),
@@ -260,6 +261,7 @@ function showSessionPicker(gameId, onContinue) {
     button.append(createIcon(modeIcon(session.mode)), document.createTextNode(`${modeLabel(session.mode)} - Level ${session.level}`));
     button.onclick = () => {
       modal.close();
+      document.getElementById("menu-container")?.remove();
       setTimeout(() => onContinue(session), 180);
     };
     options.append(button);
