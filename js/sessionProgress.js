@@ -6,24 +6,32 @@ const PROGRESS_KEYS = Object.freeze({
   "link-connect": "linkConnect",
 });
 
-export function getActiveSession(gameId) {
+export function getActiveSession(gameId, mode) {
   const key = PROGRESS_KEYS[gameId];
-  return key ? gameState.progress[key]?.activeSession || null : null;
+  if (!key || !mode) return null;
+  return gameState.progress[key]?.sessionsByMode?.[mode] || null;
+}
+
+export function getActiveSessions(gameId) {
+  const key = PROGRESS_KEYS[gameId];
+  return key ? Object.values(gameState.progress[key]?.sessionsByMode || {}) : [];
 }
 
 export function saveActiveSession(gameId, session) {
   const key = PROGRESS_KEYS[gameId];
   if (!key || !session?.mode) return;
-  gameState.progress[key].activeSession = {
+  gameState.progress[key].sessionsByMode ||= {};
+  gameState.progress[key].sessionsByMode[session.mode] = {
     mode: session.mode,
     level: Math.max(1, Math.floor(session.level || 1)),
   };
   saveProgress(gameState.progress);
 }
 
-export function clearActiveSession(gameId) {
+export function clearActiveSession(gameId, mode) {
   const key = PROGRESS_KEYS[gameId];
   if (!key) return;
-  gameState.progress[key].activeSession = null;
+  if (!mode) gameState.progress[key].sessionsByMode = {};
+  else delete gameState.progress[key].sessionsByMode?.[mode];
   saveProgress(gameState.progress);
 }

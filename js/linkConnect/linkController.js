@@ -28,7 +28,7 @@ import {
 } from "./linkBoard.js";
 import { findAvailableConnections, findConnectionPath } from "./pathfinder.js";
 import { consumeLinkItem, getLinkItemCount, grantLinkItem, LINK_ITEMS } from "./linkItems.js";
-import { clearActiveSession, saveActiveSession } from "../sessionProgress.js";
+import { clearActiveSession, getActiveSession, saveActiveSession } from "../sessionProgress.js";
 import {
   clearLinkPath,
   clearLinkTileSelection,
@@ -97,13 +97,44 @@ export function showLinkDifficultyOverlay() {
     button.type = "button";
     button.className = "difficulty-option";
     button.append(createIcon(icon), document.createTextNode(label));
-    button.addEventListener("click", () => {
-      modal.close();
-      startLinkLevel({ mode, level: 1 });
-    });
+    button.addEventListener("click", () => chooseLinkMode(mode, label, modal));
     options.append(button);
   });
   content.append(themeRow, options);
+}
+
+function chooseLinkMode(mode, label, difficultyModal) {
+  const session = getActiveSession("link-connect", mode);
+  if (!session) {
+    difficultyModal.close();
+    startLinkLevel({ mode, level: 1 });
+    return;
+  }
+  openAppModal({
+    id: "link-session-choice-modal",
+    icon: "play",
+    title: `${label} đang ở cấp ${session.level}`,
+    content: "<p>Bạn muốn tiếp tục hành trình đã lưu hay bắt đầu lại từ cấp 1?</p>",
+    actions: [
+      {
+        label: "Tiếp tục",
+        icon: "play",
+        onClick: () => {
+          difficultyModal.close();
+          continueLinkSession(session);
+        },
+      },
+      {
+        label: "Chơi mới",
+        icon: "restart",
+        variant: "primary",
+        onClick: () => {
+          difficultyModal.close();
+          startLinkLevel({ mode, level: 1 });
+        },
+      },
+    ],
+  });
 }
 
 export function startLinkLevel({ mode = linkGameState.mode, level = 1, resume = false } = {}) {
@@ -119,7 +150,7 @@ export function startLinkLevel({ mode = linkGameState.mode, level = 1, resume = 
   });
   if (level === 1 && !resume) {
     linkGameState.specialProgress = 0;
-    clearActiveSession("link-connect");
+    clearActiveSession("link-connect", mode);
   }
   saveActiveSession("link-connect", { mode, level });
   const roundId = beginLinkRound({ mode, level, layout, board });

@@ -1,7 +1,8 @@
 import { createIcon } from "./icons.js";
 import { createMainMenu, showGameInfoModal } from "./mainmenu.js";
 import { showSettingsPanel } from "./settings.js";
-import { getActiveSession } from "./sessionProgress.js";
+import { openAppModal } from "./modal.js";
+import { getActiveSessions } from "./sessionProgress.js";
 
 let activeGameId = null;
 let onStartLinkConnect = () => {};
@@ -74,10 +75,10 @@ function createLinkConnectMenu() {
   const menuList = document.createElement("ul");
   menuList.className = "menu-list";
   menuList.append(
-    ...(getActiveSession("link-connect") ? [createMenuItem({
+    ...(getActiveSessions("link-connect").length ? [createMenuItem({
       icon: "play",
       text: "Tiếp tục",
-      onClick: onContinueLinkConnect,
+      onClick: () => showLinkSessionPicker(onContinueLinkConnect),
     })] : []),
     createMenuItem({
       icon: "play",
@@ -125,6 +126,27 @@ function createLinkConnectMenu() {
   wrapper.append(menuList);
   overlay.append(wrapper);
   document.body.append(overlay);
+}
+
+function showLinkSessionPicker(onContinue) {
+  const content = document.createElement("div");
+  content.className = "difficulty-options";
+  getActiveSessions("link-connect").forEach((session) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "difficulty-option";
+    button.textContent = `${modeLabel(session.mode)} · Cấp ${session.level}`;
+    button.onclick = () => {
+      document.getElementById("continue-link-session-modal")?.remove();
+      onContinue(session);
+    };
+    content.append(button);
+  });
+  openAppModal({ id: "continue-link-session-modal", icon: "play", title: "Tiếp tục hành trình", content });
+}
+
+function modeLabel(mode) {
+  return ({ easy: "Dễ", normal: "Trung bình", hard: "Khó", superHard: "Siêu khó", endless: "Vô tận", challenge: "Thử thách" })[mode] || mode;
 }
 
 function createMenuOverlay(variant) {

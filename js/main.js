@@ -36,7 +36,6 @@ import {
 } from "./gameController.js";
 import { registerProgressiveWebApp } from "./pwa.js";
 import { initializeMeteorEffects } from "./backgroundEffects.js";
-import { getActiveSession } from "./sessionProgress.js";
 
 document.documentElement.dataset.buildTarget =
   import.meta.env.MODE === "android" ? "android" : "web";
@@ -53,8 +52,7 @@ configureGameController({
 configureMainMenu({
   startGame: initializeLevel,
   changeGame: showGameSelector,
-  continueGame: () => {
-    const session = getActiveSession("memory-match");
+  continueGame: (session) => {
     if (!session) return;
     gameState.settings.mode = session.mode;
     initializeLevel(session.level);
@@ -63,7 +61,7 @@ configureMainMenu({
 configureSettings({ onCloseMenu: createActiveGameMenu });
 configureGameSelector({
   startLinkConnect: showLinkDifficultyOverlay,
-  continueLinkConnect: () => continueLinkSession(getActiveSession("link-connect")),
+  continueLinkConnect: (session) => continueLinkSession(session),
   openLinkCollection: () => showCollectionModal({ gameId: "link-connect" }),
   openLinkShop: () => openShopOverlay({ fromMenu: true, gameId: "link-connect" }),
 });

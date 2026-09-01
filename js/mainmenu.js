@@ -9,7 +9,7 @@ import { APP_VERSION } from "./appMeta.js";
 import { THEMES, getTheme, isThemePlayable } from "./themeCatalog.js";
 import { saveAppearance } from "./persistence.js";
 import { openShopOverlay } from "./shop.js";
-import { clearActiveSession, getActiveSession } from "./sessionProgress.js";
+import { clearActiveSession, getActiveSession, getActiveSessions } from "./sessionProgress.js";
 import { showThemeChangeNotice } from "./themeChangeNotice.js";
 import {
   CARD_BACKS,
@@ -72,10 +72,10 @@ export function createMainMenu() {
   menuList.className = "menu-list";
 
   const menuItems = [
-    ...(getActiveSession("memory-match") ? [{
+    ...(getActiveSessions("memory-match").length ? [{
       icon: "play",
       text: "Tiếp tục",
-      action: onContinueGame,
+      action: () => showSessionPicker("memory-match", onContinueGame),
     }] : []),
     {
       icon: "play",
@@ -161,7 +161,7 @@ export function showDifficultyOverlay(fromGame = false) {
   const startMode = (mode, close) => {
     modeSelected = true;
     gameState.fromDefeat = false;
-    clearActiveSession("memory-match");
+    clearActiveSession("memory-match", mode);
     resetGame();
     gameState.settings.mode = mode;
     document.getElementById("menu-container")?.remove();
@@ -216,10 +216,59 @@ export function showDifficultyOverlay(fromGame = false) {
     button.type = "button";
     button.className = "difficulty-option";
     button.append(createIcon(icon), document.createTextNode(label));
-    button.onclick = () => startMode(mode, modal.close);
+    button.onclick = () => chooseMemoryMode(mode, label, startMode, modal.close);
     options.append(button);
   });
   content.append(themeRow, options);
+}
+
+function chooseMemoryMode(mode, label, startMode, closeDifficulty) {
+  const session = getActiveSession("memory-match", mode);
+  if (!session) return startMode(mode, closeDifficulty);
+  showSessionChoice({
+    label,
+    session,
+    onContinue: () => {
+      closeDifficulty();
+      onContinueGame(session);
+    },
+    onNew: () => startMode(mode, closeDifficulty),
+  });
+}
+
+function showSessionPicker(gameId, onContinue) {
+  const sessions = getActiveSessions(gameId);
+  const content = document.createElement("div");
+  content.className = "difficulty-options";
+  sessions.forEach((session) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "difficulty-option";
+    button.textContent = `${modeLabel(session.mode)} · Cấp ${session.level}`;
+    button.onclick = () => {
+      document.getElementById("continue-session-modal")?.remove();
+      onContinue(session);
+    };
+    content.append(button);
+  });
+  openAppModal({ id: "continue-session-modal", icon: "play", title: "Tiếp tục hành trình", content });
+}
+
+function showSessionChoice({ label, session, onContinue, onNew }) {
+  openAppModal({
+    id: "session-choice-modal",
+    icon: "play",
+    title: `${label} đang ở cấp ${session.level}`,
+    content: "<p>Bạn muốn tiếp tục hành trình đã lưu hay bắt đầu lại từ cấp 1?</p>",
+    actions: [
+      { label: "Tiếp tục", icon: "play", onClick: onContinue },
+      { label: "Chơi mới", icon: "restart", variant: "primary", onClick: onNew },
+    ],
+  });
+}
+
+function modeLabel(mode) {
+  return ({ easy: "Dễ", normal: "Trung bình", hard: "Khó", superHard: "Siêu khó", endless: "Vô tận", challenge: "Thử thách" })[mode] || mode;
 }
 
 export function showCollectionModal({ fromGame = false, gameId = "memory-match", onClose = () => {} } = {}) {
