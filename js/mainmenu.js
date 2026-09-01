@@ -239,19 +239,37 @@ function chooseMemoryMode(mode, label, startMode, closeDifficulty) {
 function showSessionPicker(gameId, onContinue) {
   const sessions = getActiveSessions(gameId);
   const content = document.createElement("div");
-  content.className = "difficulty-options";
+  content.className = "difficulty-content";
+  const theme = getTheme(getEquippedThemeId(gameState.appearance, gameId));
+  const themeRow = document.createElement("div");
+  themeRow.className = "difficulty-theme";
+  themeRow.append(createIcon(theme.icon));
+  const themeText = document.createElement("div");
+  themeText.innerHTML = `<small>Chủ đề đang dùng</small><strong>${theme.title}</strong>`;
+  const changeTheme = document.createElement("button");
+  changeTheme.type = "button";
+  changeTheme.className = "difficulty-theme__change";
+  changeTheme.textContent = "Đổi";
+  themeRow.append(themeText, changeTheme);
+  const options = document.createElement("div");
+  options.className = "difficulty-options";
   sessions.forEach((session) => {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "difficulty-option";
     button.textContent = `${modeLabel(session.mode)} · Cấp ${session.level}`;
     button.onclick = () => {
-      document.getElementById("continue-session-modal")?.remove();
-      onContinue(session);
+      modal.close();
+      setTimeout(() => onContinue(session), 180);
     };
-    content.append(button);
+    options.append(button);
   });
-  openAppModal({ id: "continue-session-modal", icon: "play", title: "Tiếp tục hành trình", content });
+  content.append(themeRow, options);
+  const modal = openAppModal({ id: "difficulty-modal", icon: "play", title: "Tiếp tục hành trình", content });
+  changeTheme.onclick = () => {
+    modal.close();
+    setTimeout(() => showCollectionModal({ gameId, onClose: () => showSessionPicker(gameId, onContinue) }), 180);
+  };
 }
 
 function showSessionChoice({ label, session, onContinue, onNew }) {

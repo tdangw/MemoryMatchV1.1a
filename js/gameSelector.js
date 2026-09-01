@@ -3,6 +3,9 @@ import { createMainMenu, showGameInfoModal } from "./mainmenu.js";
 import { showSettingsPanel } from "./settings.js";
 import { openAppModal } from "./modal.js";
 import { getActiveSessions } from "./sessionProgress.js";
+import { gameState } from "./gameState.js";
+import { getEquippedThemeId } from "./appearance.js";
+import { getTheme } from "./themeCatalog.js";
 
 let activeGameId = null;
 let onStartLinkConnect = () => {};
@@ -130,19 +133,37 @@ function createLinkConnectMenu() {
 
 function showLinkSessionPicker(onContinue) {
   const content = document.createElement("div");
-  content.className = "difficulty-options";
+  content.className = "difficulty-content";
+  const theme = getTheme(getEquippedThemeId(gameState.appearance, "link-connect"));
+  const themeRow = document.createElement("div");
+  themeRow.className = "difficulty-theme";
+  themeRow.append(createIcon(theme.icon));
+  const themeText = document.createElement("div");
+  themeText.innerHTML = `<small>Chủ đề đang dùng</small><strong>${theme.title}</strong>`;
+  const changeTheme = document.createElement("button");
+  changeTheme.type = "button";
+  changeTheme.className = "difficulty-theme__change";
+  changeTheme.textContent = "Đổi";
+  themeRow.append(themeText, changeTheme);
+  const options = document.createElement("div");
+  options.className = "difficulty-options";
   getActiveSessions("link-connect").forEach((session) => {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "difficulty-option";
     button.textContent = `${modeLabel(session.mode)} · Cấp ${session.level}`;
     button.onclick = () => {
-      document.getElementById("continue-link-session-modal")?.remove();
-      onContinue(session);
+      modal.close();
+      setTimeout(() => onContinue(session), 180);
     };
-    content.append(button);
+    options.append(button);
   });
-  openAppModal({ id: "continue-link-session-modal", icon: "play", title: "Tiếp tục hành trình", content });
+  content.append(themeRow, options);
+  const modal = openAppModal({ id: "difficulty-modal", icon: "play", title: "Tiếp tục hành trình", content });
+  changeTheme.onclick = () => {
+    modal.close();
+    setTimeout(() => onOpenLinkCollection(() => showLinkSessionPicker(onContinue)), 180);
+  };
 }
 
 function modeLabel(mode) {

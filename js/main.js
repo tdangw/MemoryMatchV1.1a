@@ -62,7 +62,7 @@ configureSettings({ onCloseMenu: createActiveGameMenu });
 configureGameSelector({
   startLinkConnect: showLinkDifficultyOverlay,
   continueLinkConnect: (session) => continueLinkSession(session),
-  openLinkCollection: () => showCollectionModal({ gameId: "link-connect" }),
+  openLinkCollection: (onClose) => showCollectionModal({ gameId: "link-connect", onClose }),
   openLinkShop: () => openShopOverlay({ fromMenu: true, gameId: "link-connect" }),
 });
 configureLinkController({
