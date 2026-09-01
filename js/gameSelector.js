@@ -3,6 +3,11 @@ import { createMainMenu, showGameInfoModal } from "./mainmenu.js";
 import { showSettingsPanel } from "./settings.js";
 
 let activeGameId = null;
+let onStartLinkConnect = () => {};
+
+export function configureGameSelector({ startLinkConnect } = {}) {
+  onStartLinkConnect = startLinkConnect || onStartLinkConnect;
+}
 
 export function showGameSelector() {
   activeGameId = null;
@@ -65,8 +70,7 @@ function createLinkConnectMenu() {
     createMenuItem({
       icon: "play",
       text: "Bắt đầu",
-      detail: "Sẵn sàng ở Phase 2",
-      disabled: true,
+      onClick: onStartLinkConnect,
     }),
     createMenuItem({
       icon: "settings",

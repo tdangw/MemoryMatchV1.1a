@@ -12,7 +12,16 @@ import {
   showGameInfoModal,
   showCollectionModal,
 } from "./mainmenu.js";
-import { createActiveGameMenu, showGameSelector } from "./gameSelector.js";
+import {
+  configureGameSelector,
+  createActiveGameMenu,
+  openGameMenu,
+  showGameSelector,
+} from "./gameSelector.js";
+import {
+  configureLinkController,
+  showLinkDifficultyOverlay,
+} from "./linkConnect/linkController.js";
 import { configureSettings, showSettingsPanel } from "./settings.js";
 import { openQuickAssistOverlay, openShopOverlay } from "./shop.js";
 import { showResetConfirmationOverlay, showReturnToMenuOverlay } from "./ui.js";
@@ -41,6 +50,8 @@ configureGameController({
 });
 configureMainMenu({ startGame: initializeLevel, changeGame: showGameSelector });
 configureSettings({ onCloseMenu: createActiveGameMenu });
+configureGameSelector({ startLinkConnect: showLinkDifficultyOverlay });
+configureLinkController({ showMenu: () => openGameMenu("link-connect") });
 unlockSound();
 enableButtonClickSounds(() => gameState.settings);
 decorateIcons();
