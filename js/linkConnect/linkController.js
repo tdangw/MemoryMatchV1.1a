@@ -26,7 +26,7 @@ import {
 } from "./linkRenderer.js";
 import { beginLinkRound, linkGameState, resetLinkGame } from "./linkState.js";
 
-const LINK_MATCH_DELAY_MS = 420;
+const LINK_MATCH_DELAY_MS = 760;
 let countdownInterval;
 let selectedPosition = null;
 let navigation = { showMenu: () => {} };
