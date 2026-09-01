@@ -2,9 +2,7 @@ import { readdirSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { join } from 'node:path';
 
-const files = readdirSync('js', { withFileTypes: true })
-  .filter((entry) => entry.isFile() && entry.name.endsWith('.js'))
-  .map((entry) => join('js', entry.name));
+const files = collectJavaScriptFiles('js');
 
 for (const file of files) {
   const result = spawnSync(process.execPath, ['--check', file], { stdio: 'inherit' });
@@ -12,3 +10,11 @@ for (const file of files) {
 }
 
 console.log(`Checked ${files.length} JavaScript modules.`);
+
+function collectJavaScriptFiles(directory) {
+  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const filePath = join(directory, entry.name);
+    if (entry.isDirectory()) return collectJavaScriptFiles(filePath);
+    return entry.isFile() && entry.name.endsWith('.js') ? [filePath] : [];
+  });
+}
