@@ -1,3 +1,5 @@
+import { getActiveLinkConnectionEffect } from "./linkEffects.js";
+
 const PATH_VIEWBOX = "0 0 100 100";
 const ELECTRIC_JITTER_PERCENT = 0.65;
 const ELECTRIC_SEGMENT_LENGTH_PERCENT = 7;
@@ -54,8 +56,9 @@ export function clearLinkTileSelection() {
 }
 
 export function playLinkMatchExit(start, end) {
+  const effect = getActiveLinkConnectionEffect();
   [start, end].forEach((position) => {
-    getLinkTileButton(position)?.classList.add("is-removing");
+    getLinkTileButton(position)?.classList.add("is-removing", effect.exitClass);
   });
 }
 
@@ -66,9 +69,11 @@ export function drawLinkPath(path, board) {
   const points = path.map((position) => toPercentPoint(position, board, boardElement));
   if (points.some((point) => !point)) return;
   const electricPoints = createElectricPoints(points);
+  const effect = getActiveLinkConnectionEffect();
   const serializedPoints = electricPoints.map(({ x, y }) => `${x},${y}`).join(" ");
   svg.setAttribute("viewBox", PATH_VIEWBOX);
   svg.setAttribute("preserveAspectRatio", "none");
+  svg.setAttribute("class", `link-path-overlay ${effect.pathClass}`);
   svg.replaceChildren();
   const glow = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
   glow.setAttribute("points", serializedPoints);

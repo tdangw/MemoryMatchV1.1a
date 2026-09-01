@@ -1,6 +1,6 @@
 import { createIcon } from "../icons.js";
 import { openAppModal, showAppToast } from "../modal.js";
-import { syncDefaultMusic } from "../sound.js";
+import { sounds, syncDefaultMusic } from "../sound.js";
 import { getEquippedThemeId } from "../appearance.js";
 import { gameState, increaseCoins } from "../gameState.js";
 import { saveCoins } from "../persistence.js";
@@ -345,6 +345,7 @@ function handleLinkTileClick(position) {
     ? findConnectionPath(linkGameState.board.grid, selectedPosition, position)
     : null;
   if (!path) {
+    playLinkSound("wrong");
     linkGameState.misses += 1;
     linkGameState.combo = 0;
     clearLinkTileSelection();
@@ -354,6 +355,7 @@ function handleLinkTileClick(position) {
   }
 
   linkGameState.isLocked = true;
+  playLinkSound("match");
   linkGameState.combo += 1;
   const isSpecialMatch = firstTile.special && tile.special;
   linkGameState.score += calculateLinkMatchPoints(linkGameState.combo, { special: isSpecialMatch });
@@ -469,6 +471,7 @@ function completeLinkLevel() {
 }
 
 function applyLinkLuckyReward(reward) {
+  playLinkSound("bonus");
   linkGameState.luckyAwards.push(reward);
   if (reward.type === "coins") {
     increaseCoins(reward.value);
@@ -478,6 +481,13 @@ function applyLinkLuckyReward(reward) {
   }
   linkGameState.remainingTime += reward.value;
   showAppToast(`Ô may mắn: +${reward.value} giây`);
+}
+
+function playLinkSound(name) {
+  const sound = sounds[name];
+  if (!gameState.settings?.sound || !sound) return;
+  sound.currentTime = 0;
+  sound.play().catch(() => {});
 }
 
 function formatLuckyAwards() {
