@@ -3,11 +3,18 @@ import { getActiveLinkConnectionEffect } from "./linkEffects.js";
 const PATH_VIEWBOX = "0 0 100 100";
 const ELECTRIC_JITTER_PERCENT = 0.65;
 const ELECTRIC_SEGMENT_LENGTH_PERCENT = 7;
+let layoutFrame;
+
+window.addEventListener("resize", () => {
+  cancelAnimationFrame(layoutFrame);
+  layoutFrame = requestAnimationFrame(updateLinkBoardLayout);
+});
 
 export function renderLinkBoard(board, { onTileClick } = {}) {
   const container = document.getElementById("link-board");
   if (!container) return;
   container.style.setProperty("--link-columns", String(board.columns));
+  container.style.setProperty("--link-rows", String(board.grid.length - 2));
   container.replaceChildren();
   board.grid.slice(1, -1).forEach((row, rowIndex) => {
     row.slice(1, -1).forEach((tile, columnIndex) => {
@@ -43,6 +50,7 @@ export function renderLinkBoard(board, { onTileClick } = {}) {
       container.append(cell);
     });
   });
+  updateLinkBoardLayout();
 }
 
 export function setLinkTileSelected(position, selected) {
@@ -156,4 +164,42 @@ function interpolate(start, end, progress) {
 
 function readBoardGap(boardElement) {
   return Number.parseFloat(getComputedStyle(boardElement).gap) || 0;
+}
+
+function updateLinkBoardLayout() {
+  const game = document.getElementById("link-connect-container");
+  const board = document.getElementById("link-board");
+  const frame = document.getElementById("link-board-frame");
+  if (!game || !board || !frame || game.hidden) return;
+
+  const columns = Number.parseInt(board.style.getPropertyValue("--link-columns"), 10);
+  const rows = Number.parseInt(board.style.getPropertyValue("--link-rows"), 10);
+  if (!columns || !rows) return;
+
+  const boardStyles = getComputedStyle(board);
+  const gameStyles = getComputedStyle(game);
+  const gap = readBoardGap(board);
+  const horizontalPadding = Number.parseFloat(boardStyles.paddingLeft) || 0;
+  const verticalPadding = Number.parseFloat(boardStyles.paddingTop) || 0;
+  const gamePadding = (Number.parseFloat(gameStyles.paddingTop) || 0)
+    + (Number.parseFloat(gameStyles.paddingBottom) || 0);
+  const gameGap = Number.parseFloat(gameStyles.rowGap) || 0;
+  const chromeHeight = [
+    ".link-connect-game__header",
+    ".link-connect-game__stats",
+    ".link-connect-game__footer",
+    ".link-connect-game__items",
+  ].reduce((total, selector) => total + (game.querySelector(selector)?.getBoundingClientRect().height || 0), 0);
+  const availableWidth = Math.min(700, game.clientWidth);
+  const availableHeight = Math.max(
+    168,
+    window.innerHeight - chromeHeight - gamePadding - gameGap * 4,
+  );
+  const tileByWidth = (availableWidth - horizontalPadding * 2 - gap * (columns - 1)) / columns;
+  const tileByHeight = (availableHeight - verticalPadding * 2 - gap * (rows - 1)) / rows;
+  const tileSize = Math.max(28, Math.floor(Math.min(tileByWidth, tileByHeight)));
+  const boardWidth = tileSize * columns + gap * (columns - 1) + horizontalPadding * 2;
+
+  board.style.setProperty("--link-tile-size", `${tileSize}px`);
+  frame.style.width = `${boardWidth}px`;
 }

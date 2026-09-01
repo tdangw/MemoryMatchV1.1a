@@ -459,6 +459,7 @@ function completeLinkLevel() {
   increaseCoins(coinsEarned);
   saveCoins(gameState.coins);
   showLevelSummaryOverlay({
+    fireworksContainerId: "link-connect-container",
     level: linkGameState.level,
     remainingTime: linkGameState.remainingTime,
     moves: linkGameState.moves,

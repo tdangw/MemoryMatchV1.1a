@@ -230,6 +230,7 @@ export function showLevelSummaryOverlay(completion) {
   gameState.isPaused = true;
   showSummaryFireworks({
     durationMs: GAMEPLAY_TIMING.victoryFireworksDurationMs,
+    containerId: completion.fireworksContainerId,
   }).finally(() => openLevelSummaryOverlay(completion));
 }
 
