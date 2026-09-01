@@ -46,11 +46,12 @@ export function ensurePlayableBoard(board) {
 }
 
 function shuffleIntoPlayableBoard(board) {
-  const tiles = getInteriorTiles(board);
+  const positions = getOccupiedInteriorPositions(board);
+  const tiles = positions.map((position) => board.grid[position.row][position.column]);
   if (tiles.length < 2) return;
   for (let attempt = 0; attempt < MAX_SHUFFLE_ATTEMPTS; attempt += 1) {
     shuffleArray(tiles);
-    placeInteriorTiles(board, tiles);
+    placeTilesAtPositions(board, tiles, positions);
     if (hasAvailableConnection(board.grid)) return;
   }
   throw new Error("Không thể tạo bàn Link Connect có nước đi hợp lệ.");
@@ -86,13 +87,18 @@ function getInteriorTiles(board) {
   return board.grid.slice(1, -1).flatMap((row) => row.slice(1, -1)).filter(Boolean);
 }
 
-function placeInteriorTiles(board, tiles) {
-  board.grid.slice(1, -1).forEach((row) => {
-    row.fill(null, 1, -1);
+function getOccupiedInteriorPositions(board) {
+  const positions = [];
+  board.grid.slice(1, -1).forEach((row, rowIndex) => {
+    row.slice(1, -1).forEach((tile, columnIndex) => {
+      if (tile) positions.push({ row: rowIndex + 1, column: columnIndex + 1 });
+    });
   });
-  tiles.forEach((tile, index) => {
-    const row = Math.floor(index / board.columns) + 1;
-    const column = (index % board.columns) + 1;
-    board.grid[row][column] = tile;
+  return positions;
+}
+
+function placeTilesAtPositions(board, tiles, positions) {
+  positions.forEach((position, index) => {
+    board.grid[position.row][position.column] = tiles[index];
   });
 }

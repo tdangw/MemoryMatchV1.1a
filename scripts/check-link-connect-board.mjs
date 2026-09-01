@@ -37,8 +37,15 @@ board.grid.forEach((row, rowIndex) => row.forEach((tile, columnIndex) => {
 }));
 assert.equal(positions.length, 2);
 assert.equal(removeLinkBoardPair(board, positions[0], positions[1]), true);
+const emptyPositionsBeforeShuffle = positions.map(({ row, column }) => `${row}:${column}`).sort();
 ensurePlayableBoard(board);
 assert.equal(getRemainingLinkTiles(board).length, 10);
 assert.equal(hasAvailableConnection(board.grid), true);
+const emptyPositionsAfterShuffle = board.grid.flatMap((row, rowIndex) => row.flatMap((tile, columnIndex) => (
+  rowIndex > 0 && rowIndex < board.rows + 1 && columnIndex > 0 && columnIndex < board.columns + 1 && !tile
+    ? [`${rowIndex}:${columnIndex}`]
+    : []
+))).sort();
+assert.deepEqual(emptyPositionsAfterShuffle, emptyPositionsBeforeShuffle);
 
 console.log("Link Connect board checks passed.");
