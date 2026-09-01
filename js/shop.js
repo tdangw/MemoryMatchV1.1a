@@ -78,7 +78,7 @@ export function openQuickAssistOverlay(kind) {
   });
 }
 
-export function openShopOverlay({ fromMenu = false, gameId = "memory-match" } = {}) {
+export function openShopOverlay({ fromMenu = false, gameId = "memory-match", onClose = () => {} } = {}) {
   if (!fromMenu && (gameState.isLocked || gameState.isPaused)) return;
 
   const roundId = gameState.roundId;
@@ -101,6 +101,7 @@ export function openShopOverlay({ fromMenu = false, gameId = "memory-match" } = 
     size: "large",
     onClose: () => {
       if (!fromMenu && gameState.roundId === roundId) gameState.isPaused = false;
+      onClose();
     },
   });
   modal.overlay.dataset.fromMenu = String(fromMenu);

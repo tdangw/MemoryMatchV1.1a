@@ -55,6 +55,7 @@ export function createMainMenu() {
 
   const wrapper = document.createElement("div");
   wrapper.className = "menu-wrapper";
+  wrapper.appendChild(createGameSwitchButton(onChangeGame));
 
   const title = document.createElement("h1");
   title.className = "game-title";
@@ -100,11 +101,6 @@ export function createMainMenu() {
       },
     },
     {
-      icon: "restart",
-      text: "Đổi trò chơi",
-      action: onChangeGame,
-    },
-    {
       icon: "collection",
       text: "Bộ sưu tập",
       action: () => {
@@ -141,6 +137,16 @@ export function createMainMenu() {
   wrapper.appendChild(menuList);
   menuOverlay.appendChild(wrapper);
   document.body.appendChild(menuOverlay);
+}
+
+function createGameSwitchButton(onClick) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "menu-game-exit";
+  button.setAttribute("aria-label", "Đổi trò chơi");
+  button.append(createIcon("exit"));
+  button.addEventListener("click", onClick);
+  return button;
 }
 
 /**
@@ -213,7 +219,7 @@ export function showDifficultyOverlay(fromGame = false) {
   content.append(themeRow, options);
 }
 
-export function showCollectionModal({ fromGame = false, gameId = "memory-match" } = {}) {
+export function showCollectionModal({ fromGame = false, gameId = "memory-match", onClose = () => {} } = {}) {
   if (fromGame) gameState.isPaused = true;
   const content = document.createElement("div");
   content.className = "collection-content";
@@ -226,6 +232,7 @@ export function showCollectionModal({ fromGame = false, gameId = "memory-match" 
     onClose: () => {
       if (fromGame) gameState.isPaused = false;
       syncDefaultMusic(gameState.settings);
+      onClose();
     },
   });
 

@@ -119,7 +119,7 @@ bindSettingsControls();
 if (versionValue) versionValue.textContent = APP_VERSION;
 versionInfoButton?.addEventListener("click", showVersionInfo);
 
-export function showSettingsPanel(fromGame = false) {
+export function showSettingsPanel(fromGame = false, onClose = () => {}) {
   if (!settingsContainer || !settingsHome) return;
 
   settingsContainer.style.display = "grid";
@@ -137,6 +137,7 @@ export function showSettingsPanel(fromGame = false) {
       settingsHome.appendChild(settingsContainer);
       gameState.isPaused = false;
       if (!fromGame) onCloseFromMenu();
+      onClose();
     },
   });
 }

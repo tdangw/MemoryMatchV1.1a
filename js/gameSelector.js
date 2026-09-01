@@ -68,6 +68,7 @@ function createLinkConnectMenu() {
     "Link Connect",
     "Thử thách cách mà bạn quan sát.",
   );
+  wrapper.append(createGameExitButton(showGameSelector));
   const menuList = document.createElement("ul");
   menuList.className = "menu-list";
   menuList.append(
@@ -82,6 +83,15 @@ function createLinkConnectMenu() {
       onClick: () => showSettingsPanel(),
     }),
     createMenuItem({
+      icon: "book",
+      text: "Hướng dẫn",
+      onClick: () => showGameInfoModal(
+        "Cách chơi Link Connect",
+        "<p>Quan sát các hình đang mở và nối hai hình giống nhau bằng đường đi không có vật cản.</p><p>Đường nối có tối đa hai lần rẽ.</p>",
+        "book",
+      ),
+    }),
+    createMenuItem({
       icon: "collection",
       text: "Bộ sưu tập",
       onClick: onOpenLinkCollection,
@@ -92,18 +102,12 @@ function createLinkConnectMenu() {
       onClick: onOpenLinkShop,
     }),
     createMenuItem({
-      icon: "book",
-      text: "Hướng dẫn",
+      icon: "info",
+      text: "Thông tin",
       onClick: () => showGameInfoModal(
-        "Cách chơi Link Connect",
-        "<p>Quan sát các hình đang mở và nối hai hình giống nhau bằng đường đi không có vật cản.</p><p>Đường nối có tối đa hai lần rẽ.</p>",
-        "book",
+        "Giới thiệu",
+        "<p><strong>Link Connect</strong> là trò chơi nối cặp hình giúp rèn luyện khả năng quan sát.</p>",
       ),
-    }),
-    createMenuItem({
-      icon: "restart",
-      text: "Đổi trò chơi",
-      onClick: showGameSelector,
     }),
   );
   wrapper.append(menuList);
@@ -129,6 +133,16 @@ function createMenuWrapper(titleText, description) {
   subtitle.textContent = description;
   wrapper.append(title, subtitle);
   return wrapper;
+}
+
+function createGameExitButton(onClick) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "menu-game-exit";
+  button.setAttribute("aria-label", "Đổi trò chơi");
+  button.append(createIcon("exit"));
+  button.addEventListener("click", onClick);
+  return button;
 }
 
 function createGameChoice({ icon, title, description, onClick }) {

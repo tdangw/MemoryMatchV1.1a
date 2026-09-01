@@ -57,7 +57,16 @@ configureGameSelector({
 });
 configureLinkController({
   showMenu: () => openGameMenu("link-connect"),
-  showCollection: () => showCollectionModal({ gameId: "link-connect" }),
+  showGameSelector,
+  showCollection: (onClose) => {
+    showCollectionModal({
+      fromGame: true,
+      gameId: "link-connect",
+      onClose,
+    });
+  },
+  showShop: (onClose) => openShopOverlay({ fromMenu: false, gameId: "link-connect", onClose }),
+  showSettings: (onClose) => showSettingsPanel(true, onClose),
 });
 unlockSound();
 enableButtonClickSounds(() => gameState.settings);

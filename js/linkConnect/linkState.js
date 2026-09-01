@@ -12,6 +12,7 @@ export function createLinkGameState() {
     totalPairs: getLinkModeLayout().tileCount / 2,
     remainingTime: getLinkModeLayout().timeSeconds,
     isLocked: true,
+    isPaused: false,
     roundId: 0,
     board: null,
   };
@@ -36,6 +37,7 @@ export function beginLinkRound({
   linkGameState.totalPairs = layout.tileCount / 2;
   linkGameState.remainingTime = layout.timeSeconds;
   linkGameState.isLocked = true;
+  linkGameState.isPaused = false;
   linkGameState.board = board || null;
   return linkGameState.roundId;
 }

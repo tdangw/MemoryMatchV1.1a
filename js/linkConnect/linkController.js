@@ -1,3 +1,4 @@
+import { createIcon } from "../icons.js";
 import { openAppModal, showAppToast } from "../modal.js";
 import { syncDefaultMusic } from "../sound.js";
 import { getEquippedThemeId } from "../appearance.js";
@@ -33,10 +34,16 @@ import { beginLinkRound, linkGameState, resetLinkGame } from "./linkState.js";
 const LINK_MATCH_DELAY_MS = 1020;
 let countdownInterval;
 let selectedPosition = null;
-let navigation = { showMenu: () => {}, showCollection: () => {} };
+let navigation = {
+  showMenu: () => {},
+  showGameSelector: () => {},
+  showCollection: () => {},
+  showShop: () => {},
+  showSettings: () => {},
+};
 
-export function configureLinkController({ showMenu, showCollection } = {}) {
-  navigation = { ...navigation, showMenu, showCollection };
+export function configureLinkController(options = {}) {
+  navigation = { ...navigation, ...options };
 }
 
 export function showLinkDifficultyOverlay() {
@@ -114,6 +121,16 @@ export function returnToLinkMenu() {
   syncDefaultMusic();
 }
 
+function returnToGameSelector() {
+  stopCountdown();
+  resetLinkGame();
+  selectedPosition = null;
+  clearLinkPath();
+  document.getElementById("link-connect-container")?.setAttribute("hidden", "");
+  navigation.showGameSelector();
+  syncDefaultMusic();
+}
+
 function showLinkGame() {
   let container = document.getElementById("link-connect-container");
   if (!container) {
@@ -122,9 +139,18 @@ function showLinkGame() {
     container.className = "link-connect-game";
     container.innerHTML = `
       <header class="link-connect-game__header">
-        <button id="link-menu-button" class="link-connect-game__menu" type="button">Menu</button>
+        <button id="link-actions-menu-toggle" class="link-connect-game__menu" type="button" aria-label="Mở menu chức năng" aria-controls="link-actions-menu" aria-expanded="false"></button>
+        <div id="link-actions-menu" class="link-connect-game__actions" hidden>
+          <button type="button" data-action="menu">Menu</button>
+          <button type="button" data-action="restart">Chơi lại</button>
+          <button type="button" data-action="settings">Cài đặt</button>
+          <button type="button" data-action="collection">Bộ sưu tập</button>
+          <button type="button" data-action="shop">Cửa hàng</button>
+          <button type="button" data-action="help">Hướng dẫn</button>
+          <button type="button" data-action="info">Thông tin</button>
+        </div>
         <div><strong>Link Connect</strong><span id="link-level-label">Cấp 1</span></div>
-        <button id="link-restart-button" class="link-connect-game__menu" type="button">Chơi lại</button>
+        <button id="link-game-exit" class="link-connect-game__menu" type="button" aria-label="Đổi trò chơi"></button>
       </header>
       <div class="link-connect-game__stats" aria-label="Tiến trình màn chơi">
         <span>Nước <strong id="link-moves">0</strong></span>
@@ -141,16 +167,105 @@ function showLinkGame() {
         <strong id="link-timer">00:00</strong>
       </footer>`;
     document.querySelector(".main-wrapper")?.append(container);
-    document.getElementById("link-menu-button")?.addEventListener("click", returnToLinkMenu);
-    document.getElementById("link-restart-button")?.addEventListener("click", showLinkDifficultyOverlay);
+    configureLinkGameActions(container);
   }
   document.getElementById("menu-container")?.remove();
   document.getElementById("game-container")?.style.setProperty("display", "none");
   container.removeAttribute("hidden");
 }
 
+function configureLinkGameActions(container) {
+  const toggle = container.querySelector("#link-actions-menu-toggle");
+  const actions = container.querySelector("#link-actions-menu");
+  const exit = container.querySelector("#link-game-exit");
+  toggle?.append(createIcon("menu"));
+  exit?.append(createIcon("exit"));
+  const actionIcons = {
+    menu: "home",
+    restart: "restart",
+    settings: "settings",
+    collection: "collection",
+    shop: "shop",
+    help: "book",
+    info: "info",
+  };
+  actions?.querySelectorAll("button[data-action]").forEach((button) => {
+    button.prepend(createIcon(actionIcons[button.dataset.action]));
+  });
+  toggle?.addEventListener("click", (event) => {
+    event.stopPropagation();
+    const nextHidden = !actions.hidden;
+    actions.hidden = nextHidden;
+    toggle.setAttribute("aria-expanded", String(!nextHidden));
+  });
+  actions?.addEventListener("click", (event) => {
+    const action = event.target.closest("button")?.dataset.action;
+    if (!action) return;
+    actions.hidden = true;
+    toggle?.setAttribute("aria-expanded", "false");
+    runLinkGameAction(action);
+  });
+  exit?.addEventListener("click", showLinkGameExitConfirmation);
+  document.addEventListener("click", (event) => {
+    if (!actions?.hidden && !event.target.closest(".link-connect-game__header")) {
+      actions.hidden = true;
+      toggle?.setAttribute("aria-expanded", "false");
+    }
+  });
+}
+
+function runLinkGameAction(action) {
+  if (action === "menu") return returnToLinkMenu();
+  if (action === "restart") return showLinkDifficultyOverlay();
+  if (action === "settings") {
+    pauseLinkForModal();
+    return navigation.showSettings(resumeLinkAfterModal);
+  }
+  if (action === "collection") {
+    pauseLinkForModal();
+    return navigation.showCollection(resumeLinkAfterModal);
+  }
+  if (action === "shop") {
+    pauseLinkForModal();
+    return navigation.showShop(resumeLinkAfterModal);
+  }
+  if (action === "help") {
+    return showLinkGameModal("Cách chơi Link Connect", "<p>Quan sát các hình đang mở và nối hai hình giống nhau bằng đường đi không có vật cản.</p><p>Đường nối có tối đa hai lần rẽ.</p>", "book");
+  }
+  if (action === "info") {
+    return showLinkGameModal("Giới thiệu", "<p><strong>Link Connect</strong> là trò chơi nối cặp hình giúp rèn luyện khả năng quan sát.</p>", "info");
+  }
+}
+
+function showLinkGameModal(title, content, icon) {
+  pauseLinkForModal();
+  openAppModal({ id: "link-game-info-modal", title, content, icon, onClose: resumeLinkAfterModal });
+}
+
+function pauseLinkForModal() {
+  linkGameState.isPaused = true;
+}
+
+function resumeLinkAfterModal() {
+  linkGameState.isPaused = false;
+}
+
+function showLinkGameExitConfirmation() {
+  pauseLinkForModal();
+  openAppModal({
+    id: "link-game-exit-modal",
+    icon: "exit",
+    title: "Đổi trò chơi",
+    content: "<p>Ván hiện tại sẽ kết thúc và không được lưu.</p>",
+    actions: [
+      { label: "Đổi trò chơi", variant: "primary", onClick: returnToGameSelector },
+    ],
+    onClose: resumeLinkAfterModal,
+  });
+}
+
 function handleLinkTileClick(position) {
-  if (linkGameState.isLocked) return;
+  if (linkGameState.isLocked || linkGameState.isPaused) return;
   const tile = getLinkBoardTile(linkGameState.board, position);
   if (!tile) return;
   if (!selectedPosition) {
@@ -215,7 +330,7 @@ function completeLinkLevel() {
 function startCountdown(roundId) {
   stopCountdown();
   countdownInterval = setInterval(() => {
-    if (linkGameState.roundId !== roundId || linkGameState.isLocked) return;
+    if (linkGameState.roundId !== roundId || linkGameState.isLocked || linkGameState.isPaused) return;
     linkGameState.remainingTime += getLinkTimerDirection(linkGameState.mode) === "up" ? 1 : -1;
     updateLinkHud();
     if (linkGameState.remainingTime <= 0 && !isLinkEndlessMode(linkGameState.mode)) {
