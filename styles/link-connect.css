@@ -208,21 +208,19 @@
 }
 
 .link-tile.is-ice-breaker::before {
-  content: "✦";
+  content: "";
   position: absolute;
   top: 4px;
   right: 5px;
   z-index: 2;
-  display: grid;
   width: 17px;
   height: 17px;
-  place-items: center;
   border: 1px solid rgb(213 245 255 / 70%);
   border-radius: 50%;
-  background: #2b9cc0;
-  color: #f4fdff;
-  font-size: 0.7rem;
-  line-height: 1;
+  background:
+    linear-gradient(135deg, transparent 42%, #f4fdff 43% 53%, transparent 54%),
+    linear-gradient(45deg, transparent 42%, #f4fdff 43% 53%, transparent 54%),
+    #2b9cc0;
   box-shadow: 0 1px 5px rgb(10 84 120 / 55%);
 }
 
@@ -238,15 +236,17 @@
 }
 
 .link-tile.is-frozen::after {
-  content: "❄";
+  content: "";
   position: absolute;
   inset: 0;
   display: grid;
   place-items: center;
-  background: rgb(116 211 255 / 34%);
-  color: #e6fbff;
-  font-size: clamp(1.1rem, 4vw, 1.75rem);
-  text-shadow: 0 0 8px #53cfff;
+  background:
+    linear-gradient(90deg, transparent 47%, #e6fbff 48% 52%, transparent 53%) center / 44% 44% no-repeat,
+    linear-gradient(30deg, transparent 47%, #e6fbff 48% 52%, transparent 53%) center / 44% 44% no-repeat,
+    linear-gradient(-30deg, transparent 47%, #e6fbff 48% 52%, transparent 53%) center / 44% 44% no-repeat,
+    rgb(116 211 255 / 34%);
+  filter: drop-shadow(0 0 5px #53cfff);
 }
 
 .link-tile.is-removing {

@@ -73,12 +73,12 @@ Sau khi một cặp thẻ bị loại bỏ, bàn cờ có thể kích hoạt hi�
 
 Các vật phẩm được tích hợp trực tiếp vào hệ thống tiền tệ Xu và Cửa hàng:
 
-| Vật phẩm                               | Biểu tượng | Chức năng chi tiết                                                                                    | Giá dự kiến (Xu) |
-| :------------------------------------- | :--------: | :---------------------------------------------------------------------------------------------------- | :--------------: |
-| **Kính Định Vị (Smart Hint)**          |     🔍     | Tự động vẽ vệt sáng chỉ rõ đường nối của 1 cặp thẻ có thể ghép ngay.                                  |       8 Xu       |
-| **Xáo Trộn Không Gian (Reshuffle)**    |     🔀     | Xáo lại toàn bộ vị trí các thẻ còn lại trên bàn cờ, cam kết luôn tạo ra ít nhất 3 đường nối khả dụng. |      15 Xu       |
-| **Sấm Sét Hủy Diệt (Thunder Strike)**  |     ⚡     | Tự động chọn và tiêu diệt ngay 1~3 cặp thẻ bất kỳ mà không cần đường nối.                             |      25 Xu       |
-| **Đồng Hồ Ngưng Đọng (Chrono Freeze)** |     ⏱️     | Đóng băng đồng hồ đếm ngược trong 10 giây để người chơi thoải mái quan sát.                           |      20 Xu       |
+| Vật phẩm                               | Icon SVG | Chức năng chi tiết                                                                                    | Giá dự kiến (Xu) |
+| :------------------------------------- | :------: | :---------------------------------------------------------------------------------------------------- | :--------------: |
+| **Kính Định Vị (Smart Hint)**          | `search`  | Tự động vẽ vệt sáng chỉ rõ đường nối của 1 cặp thẻ có thể ghép ngay.                                  |       8 Xu       |
+| **Xáo Trộn Không Gian (Reshuffle)**    | `restart` | Xáo lại toàn bộ vị trí các thẻ còn lại trên bàn cờ, cam kết luôn tạo ra ít nhất 3 đường nối khả dụng. |      15 Xu       |
+| **Sấm Sét Hủy Diệt (Thunder Strike)**  | `wand`    | Tự động chọn và tiêu diệt ngay 1~3 cặp thẻ bất kỳ mà không cần đường nối.                             |      25 Xu       |
+| **Đồng Hồ Ngưng Đọng (Chrono Freeze)** | `timer`   | Đóng băng đồng hồ đếm ngược trong 10 giây để người chơi thoải mái quan sát.                           |      20 Xu       |
 
 ---
 
