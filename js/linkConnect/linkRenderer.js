@@ -44,6 +44,12 @@ export function clearLinkTileSelection() {
   });
 }
 
+export function playLinkMatchExit(start, end) {
+  [start, end].forEach((position) => {
+    getLinkTileButton(position)?.classList.add("is-removing");
+  });
+}
+
 export function drawLinkPath(path, board) {
   const svg = document.getElementById("link-path-overlay");
   const boardElement = document.getElementById("link-board");
@@ -73,16 +79,32 @@ function getLinkTileButton(position) {
 }
 
 function toPercentPoint(position, board, boardElement) {
-  const firstTile = boardElement.querySelector(".link-tile");
-  if (!firstTile) return null;
   const boardRect = boardElement.getBoundingClientRect();
-  const tileRect = firstTile.getBoundingClientRect();
+  const cell = getLinkBoardCell(position);
+  if (cell) return toPercent(cell.getBoundingClientRect(), boardRect);
+
+  const firstCell = getLinkBoardCell({ row: 1, column: 1 });
+  if (!firstCell) return null;
+  const cellRect = firstCell.getBoundingClientRect();
   const gap = readBoardGap(boardElement);
-  const x = tileRect.left + (position.column - 1) * (tileRect.width + gap) + tileRect.width / 2;
-  const y = tileRect.top + (position.row - 1) * (tileRect.height + gap) + tileRect.height / 2;
+  const x = cellRect.left + (position.column - 1) * (cellRect.width + gap) + cellRect.width / 2;
+  const y = cellRect.top + (position.row - 1) * (cellRect.height + gap) + cellRect.height / 2;
   return {
     x: ((x - boardRect.left) / boardRect.width) * 100,
     y: ((y - boardRect.top) / boardRect.height) * 100,
+  };
+}
+
+function getLinkBoardCell(position) {
+  return document.querySelector(
+    `.link-board__cell[data-row="${position.row}"][data-column="${position.column}"]`,
+  );
+}
+
+function toPercent(cellRect, boardRect) {
+  return {
+    x: ((cellRect.left + cellRect.width / 2 - boardRect.left) / boardRect.width) * 100,
+    y: ((cellRect.top + cellRect.height / 2 - boardRect.top) / boardRect.height) * 100,
   };
 }
 

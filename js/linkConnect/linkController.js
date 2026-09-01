@@ -20,6 +20,7 @@ import {
   clearLinkPath,
   clearLinkTileSelection,
   drawLinkPath,
+  playLinkMatchExit,
   renderLinkBoard,
   setLinkTileSelected,
 } from "./linkRenderer.js";
@@ -157,6 +158,7 @@ function handleLinkTileClick(position) {
   linkGameState.combo += 1;
   linkGameState.score += calculateLinkMatchPoints(linkGameState.combo);
   drawLinkPath(path, linkGameState.board);
+  playLinkMatchExit(selectedPosition, position);
   setTimeout(() => {
     removeLinkBoardPair(linkGameState.board, selectedPosition, position);
     linkGameState.matchedPairs += 1;

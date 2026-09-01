@@ -136,6 +136,15 @@
   transform: scale(0.96);
 }
 
+.link-tile.is-removing {
+  pointer-events: none;
+  animation: link-tile-dissolve 420ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+}
+
+.link-tile.is-removing img {
+  animation: link-tile-image-dissolve 420ms ease-in both;
+}
+
 .link-path-overlay {
   position: absolute;
   inset: 0;
@@ -174,6 +183,17 @@
 @keyframes link-beam {
   from { stroke-dashoffset: 160; opacity: 0.35; }
   to { stroke-dashoffset: 0; opacity: 1; }
+}
+
+@keyframes link-tile-dissolve {
+  0% { opacity: 1; transform: scale(1); filter: brightness(1); }
+  35% { opacity: 1; transform: scale(1.08) rotate(1.5deg); filter: brightness(1.45); }
+  100% { opacity: 0; transform: scale(0.45) rotate(-5deg); filter: brightness(2.2) blur(2px); }
+}
+
+@keyframes link-tile-image-dissolve {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.22); filter: saturate(1.5) brightness(1.25); }
 }
 
 @media screen and (width <= 420px) {
