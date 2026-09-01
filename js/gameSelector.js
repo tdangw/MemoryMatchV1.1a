@@ -4,9 +4,11 @@ import { showSettingsPanel } from "./settings.js";
 
 let activeGameId = null;
 let onStartLinkConnect = () => {};
+let onOpenLinkCollection = () => {};
 
-export function configureGameSelector({ startLinkConnect } = {}) {
+export function configureGameSelector({ startLinkConnect, openLinkCollection } = {}) {
   onStartLinkConnect = startLinkConnect || onStartLinkConnect;
+  onOpenLinkCollection = openLinkCollection || onOpenLinkCollection;
 }
 
 export function showGameSelector() {
@@ -76,6 +78,11 @@ function createLinkConnectMenu() {
       icon: "settings",
       text: "Cài đặt",
       onClick: () => showSettingsPanel(),
+    }),
+    createMenuItem({
+      icon: "collection",
+      text: "Bộ sưu tập",
+      onClick: onOpenLinkCollection,
     }),
     createMenuItem({
       icon: "book",

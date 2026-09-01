@@ -3,7 +3,7 @@ import { THEMES, getTheme, getUsableTheme } from "./themeCatalog.js";
 const DEFAULT_APPEARANCE = Object.freeze({
   cardBack: "classic",
   flipEffect: "bounce",
-  theme: "default",
+  themes: Object.freeze({ memoryMatch: "default", linkConnect: "default" }),
   ownedCardBacks: ["classic"],
   ownedFlipEffects: ["bounce"],
   ownedThemes: ["default"],
@@ -105,7 +105,7 @@ export function normalizeAppearance(value = {}) {
   );
   const ownedThemes = ownedIds(THEMES, value.ownedThemes, DEFAULT_APPEARANCE.theme)
     .filter((id) => getTheme(id).id === id);
-  const requestedTheme = getUsableTheme(value.theme).id;
+  const themes = normalizeEquippedThemes(value, ownedThemes);
   return {
     cardBack: ownedCardBacks.includes(cardBack)
       ? cardBack
@@ -113,13 +113,44 @@ export function normalizeAppearance(value = {}) {
     flipEffect: ownedFlipEffects.includes(flipEffect)
       ? flipEffect
       : DEFAULT_APPEARANCE.flipEffect,
-    theme: ownedThemes.includes(requestedTheme)
-      ? requestedTheme
-      : DEFAULT_APPEARANCE.theme,
+    themes,
     ownedCardBacks,
     ownedFlipEffects,
     ownedThemes,
   };
+}
+
+export function getEquippedThemeId(appearance, gameId = "memory-match") {
+  const key = getThemeKey(gameId);
+  return appearance?.themes?.[key] || DEFAULT_APPEARANCE.themes[key];
+}
+
+export function equipTheme(appearance, gameId, themeId) {
+  const key = getThemeKey(gameId);
+  const requestedTheme = getUsableTheme(themeId).id;
+  if (!appearance?.ownedThemes?.includes(requestedTheme)) return false;
+  appearance.themes = { ...appearance.themes, [key]: requestedTheme };
+  return true;
+}
+
+function normalizeEquippedThemes(value, ownedThemes) {
+  const savedThemes = value.themes && typeof value.themes === "object" ? value.themes : {};
+  const legacyTheme = value.theme;
+  return {
+    memoryMatch: normalizeEquippedTheme(savedThemes.memoryMatch ?? legacyTheme, ownedThemes, "memoryMatch"),
+    linkConnect: normalizeEquippedTheme(savedThemes.linkConnect, ownedThemes, "linkConnect"),
+  };
+}
+
+function normalizeEquippedTheme(requestedTheme, ownedThemes, gameKey) {
+  const themeId = getUsableTheme(requestedTheme).id;
+  return ownedThemes.includes(themeId) ? themeId : DEFAULT_APPEARANCE.themes[gameKey];
+}
+
+function getThemeKey(gameId) {
+  return gameId === "link-connect" || gameId === "linkConnect"
+    ? "linkConnect"
+    : "memoryMatch";
 }
 
 export function getCardBackClass(id) {

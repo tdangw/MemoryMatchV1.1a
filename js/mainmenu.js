@@ -10,7 +10,13 @@ import { THEMES, getTheme, isThemePlayable } from "./themeCatalog.js";
 import { saveAppearance } from "./persistence.js";
 import { openShopOverlay } from "./shop.js";
 import { showThemeChangeNotice } from "./themeChangeNotice.js";
-import { CARD_BACKS, FLIP_EFFECTS, getCardBackClass } from "./appearance.js";
+import {
+  CARD_BACKS,
+  equipTheme,
+  FLIP_EFFECTS,
+  getCardBackClass,
+  getEquippedThemeId,
+} from "./appearance.js";
 
 let onStartGame = () => {};
 let onChangeGame = () => {};
@@ -155,7 +161,7 @@ export function showDifficultyOverlay(fromGame = false) {
 
   const content = document.createElement("div");
   content.className = "difficulty-content";
-  const activeTheme = getTheme(gameState.appearance.theme);
+  const activeTheme = getTheme(getEquippedThemeId(gameState.appearance));
   const themeRow = document.createElement("div");
   themeRow.className = "difficulty-theme";
   themeRow.append(createIcon(activeTheme.icon));
@@ -186,7 +192,7 @@ export function showDifficultyOverlay(fromGame = false) {
   });
   changeThemeButton.onclick = () => {
     modal.close();
-    setTimeout(() => showCollectionModal({ fromGame }), 180);
+    setTimeout(() => showCollectionModal({ fromGame, gameId: "memory-match" }), 180);
   };
   [
     ["easy", "Dễ", "status-easy"],
@@ -206,14 +212,14 @@ export function showDifficultyOverlay(fromGame = false) {
   content.append(themeRow, options);
 }
 
-export function showCollectionModal({ fromGame = false } = {}) {
+export function showCollectionModal({ fromGame = false, gameId = "memory-match" } = {}) {
   if (fromGame) gameState.isPaused = true;
   const content = document.createElement("div");
   content.className = "collection-content";
   const modal = openAppModal({
     id: "collection-modal",
     icon: "collection",
-    title: "Bộ sưu tập",
+    title: gameId === "link-connect" ? "Bộ sưu tập · Link Connect" : "Bộ sưu tập",
     content,
     size: "large",
     onClose: () => {
@@ -250,7 +256,7 @@ export function showCollectionModal({ fromGame = false } = {}) {
     choices.className = "theme-choice-grid";
     THEMES.filter((theme) => gameState.appearance.ownedThemes.includes(theme.id)).forEach((theme) => {
       const playable = isThemePlayable(theme);
-      const equipped = gameState.appearance.theme === theme.id;
+      const equipped = getEquippedThemeId(gameState.appearance, gameId) === theme.id;
       const card = document.createElement("article");
       card.className = `theme-choice${equipped ? " is-equipped" : ""}`;
       const preview = document.createElement("div");
@@ -272,7 +278,7 @@ export function showCollectionModal({ fromGame = false } = {}) {
         button.classList.add("appearance-action--equip");
         button.textContent = "Trang bị";
         button.onclick = () => {
-          gameState.appearance.theme = theme.id;
+          equipTheme(gameState.appearance, gameId, theme.id);
           saveAppearance(gameState.appearance);
           renderThemes();
           if (fromGame) showThemeChangeNotice();
@@ -286,11 +292,16 @@ export function showCollectionModal({ fromGame = false } = {}) {
     grid.append(group);
   };
 
-  const appearanceTab = createCollectionTab("Ngoại hình", true, renderAppearance);
-  const flipEffectsTab = createCollectionTab("Hiệu ứng lật", false, renderFlipEffects);
-  const themesTab = createCollectionTab("Chủ đề", false, renderThemes);
-  tabs.append(appearanceTab, flipEffectsTab, themesTab);
-  renderAppearance();
+  if (gameId === "link-connect") {
+    tabs.append(createCollectionTab("Chủ đề", true, renderThemes));
+    renderThemes();
+  } else {
+    const appearanceTab = createCollectionTab("Ngoại hình", true, renderAppearance);
+    const flipEffectsTab = createCollectionTab("Hiệu ứng lật", false, renderFlipEffects);
+    const themesTab = createCollectionTab("Chủ đề", false, renderThemes);
+    tabs.append(appearanceTab, flipEffectsTab, themesTab);
+    renderAppearance();
+  }
   return modal;
 }
 

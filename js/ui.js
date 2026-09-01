@@ -7,6 +7,7 @@ import { createIcon } from "./icons.js";
 import { launchSummaryConfetti, showSummaryFireworks } from "victory-presentation";
 import { clearPersistentGameData } from "./persistence.js";
 import { getTheme } from "./themeCatalog.js";
+import { getEquippedThemeId } from "./appearance.js";
 import { getStarScoreTargets, getTimerDirection, isEndlessMode } from "./config.js";
 
 const scoreElement = document.getElementById("score");
@@ -183,7 +184,7 @@ export function showLevelRewardOverlay() {
 
   const subtitle = document.createElement("p");
   subtitle.className = "reward-subtitle";
-  subtitle.textContent = `${modeLabels[mode]} · Chủ đề ${getTheme(gameState.appearance.theme).title}`;
+  subtitle.textContent = `${modeLabels[mode]} · Chủ đề ${getTheme(getEquippedThemeId(gameState.appearance)).title}`;
 
   const createRewardLine = (className, icon, value) => {
     const line = document.createElement("div");

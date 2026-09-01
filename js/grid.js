@@ -3,6 +3,7 @@ import { GAME_CONFIG, getLuckyReward, isChallengeMode } from "./config.js";
 import { gameState, setLuckyRewards } from "./gameState.js";
 import { getCardBackClass } from "./appearance.js";
 import { initLogic } from "./logic.js";
+import { getEquippedThemeId } from "./appearance.js";
 import { getThemeCards } from "./themeCatalog.js";
 
 const MOBILE_BREAKPOINT = 600;
@@ -114,7 +115,7 @@ export function createGrid(
   const totalTiles = tileCount;
   const numberOfPairs = Math.floor(totalTiles / 2);
 
-  const selectedCards = getThemeCards(gameState.appearance.theme, numberOfPairs);
+  const selectedCards = getThemeCards(getEquippedThemeId(gameState.appearance), numberOfPairs);
   let cards = [];
   selectedCards.forEach((card) => {
     cards.push(card, card);

@@ -50,8 +50,14 @@ configureGameController({
 });
 configureMainMenu({ startGame: initializeLevel, changeGame: showGameSelector });
 configureSettings({ onCloseMenu: createActiveGameMenu });
-configureGameSelector({ startLinkConnect: showLinkDifficultyOverlay });
-configureLinkController({ showMenu: () => openGameMenu("link-connect") });
+configureGameSelector({
+  startLinkConnect: showLinkDifficultyOverlay,
+  openLinkCollection: () => showCollectionModal({ gameId: "link-connect" }),
+});
+configureLinkController({
+  showMenu: () => openGameMenu("link-connect"),
+  showCollection: () => showCollectionModal({ gameId: "link-connect" }),
+});
 unlockSound();
 enableButtonClickSounds(() => gameState.settings);
 decorateIcons();

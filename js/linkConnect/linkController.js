@@ -1,5 +1,8 @@
 import { openAppModal, showAppToast } from "../modal.js";
 import { syncDefaultMusic } from "../sound.js";
+import { getEquippedThemeId } from "../appearance.js";
+import { gameState } from "../gameState.js";
+import { getTheme } from "../themeCatalog.js";
 import {
   calculateLinkMatchPoints,
   getLinkChallengeLayout,
@@ -29,10 +32,10 @@ import { beginLinkRound, linkGameState, resetLinkGame } from "./linkState.js";
 const LINK_MATCH_DELAY_MS = 760;
 let countdownInterval;
 let selectedPosition = null;
-let navigation = { showMenu: () => {} };
+let navigation = { showMenu: () => {}, showCollection: () => {} };
 
-export function configureLinkController({ showMenu } = {}) {
-  navigation = { ...navigation, showMenu };
+export function configureLinkController({ showMenu, showCollection } = {}) {
+  navigation = { ...navigation, showMenu, showCollection };
 }
 
 export function showLinkDifficultyOverlay() {
@@ -44,6 +47,18 @@ export function showLinkDifficultyOverlay() {
     title: "Chọn chế độ Link Connect",
     content: options,
   });
+  const activeTheme = document.createElement("p");
+  activeTheme.className = "link-difficulty-theme";
+  activeTheme.textContent = `Chủ đề: ${getTheme(getEquippedThemeId(gameState.appearance, "link-connect")).title}`;
+  const changeTheme = document.createElement("button");
+  changeTheme.type = "button";
+  changeTheme.className = "difficulty-theme__change";
+  changeTheme.textContent = "Đổi chủ đề";
+  changeTheme.addEventListener("click", () => {
+    modal.close();
+    setTimeout(() => navigation.showCollection(), 180);
+  });
+  options.before(activeTheme, changeTheme);
   [
     ["easy", "Dễ"],
     ["normal", "Trung bình"],
@@ -70,7 +85,10 @@ export function startLinkLevel({ mode = linkGameState.mode, level = 1 } = {}) {
   selectedPosition = null;
   const modeLayout = getLinkModeLayout(mode);
   const layout = isLinkChallengeMode(mode) ? getLinkChallengeLayout(level) : modeLayout;
-  const board = createLinkBoard({ layout });
+  const board = createLinkBoard({
+    layout,
+    themeId: getEquippedThemeId(gameState.appearance, "link-connect"),
+  });
   const roundId = beginLinkRound({ mode, level, layout, board });
   if (isLinkEndlessMode(mode)) linkGameState.remainingTime = 0;
   else if (isLinkChallengeMode(mode) && level > 1) {
