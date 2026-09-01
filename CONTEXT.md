@@ -2,7 +2,7 @@
 
 ## Phạm vi
 
-- Dự án là game web JavaScript thuần, tối ưu cho màn hình mobile dọc.
+- Dự án là game web JavaScript thuần, tối ưu cho màn hình mobile dọc. Khi mở game luôn chọn một trong hai trò độc lập: **Memory Match** (ghi nhớ và lật cặp thẻ) hoặc **Link Connect** (quan sát và nối cặp hình không có vật cản).
 - Không còn Android/Capacitor, APK/AAB, AdMob, quảng cáo hoặc vùng giữ chỗ quảng cáo.
 - Firebase Hosting project là `memorymatchv1-1a`; game không dùng Firebase Web SDK hay backend.
 
@@ -22,6 +22,22 @@
 - Người chơi cài từ Chrome qua “Cài đặt ứng dụng” hoặc “Thêm vào Màn hình chính”; mở từ icon sẽ chạy toàn màn hình.
 
 ## Gameplay và Cửa hàng
+
+### Memory Match và Link Connect
+
+- Hai trò dùng chung **Xu**, danh sách chủ đề và chủ đề đã sở hữu; chủ đề đang trang bị được lưu riêng theo từng trò. Vật phẩm hỗ trợ/tồn kho của mỗi trò độc lập.
+- Mỗi trò có sáu chế độ: Dễ, Trung bình, Khó, Siêu khó, Vô tận và Thử thách. Tiến trình tiếp tục được lưu độc lập theo từng chế độ; bắt đầu ván mới chỉ ghi đè tiến trình của đúng chế độ đó. Popup chọn tiếp tục dùng cùng phong cách với popup chọn chế độ; **Chơi mới** ở bên trái, **Tiếp tục** ở bên phải.
+- Khi đổi chủ đề trong lúc đang chơi, chủ đề mới chỉ áp dụng từ ván tiếp theo. Popup thông báo dùng chung, không tạo biến thể riêng cho từng màn.
+- Popup đầu màn, tổng kết màn và hết giờ dùng các thành phần chung cho hai trò. Popup hết giờ có Về Menu, Chơi lại, mua +1 giây (2 Xu) hoặc +5 giây (10 Xu).
+
+### Link Connect
+
+- Luật cơ bản: chọn hai hình giống nhau có thể nối bằng tối đa **ba đoạn thẳng** (hai lần rẽ), được phép đi quanh viền ngoài bàn. Ghép đúng sẽ vẽ đường nối rồi thẻ tan biến; ghép sai tăng lượt sai và reset combo. Bàn chỉ xáo các thẻ còn lại, không đổi vị trí ô trống.
+- Bàn dùng lưới tĩnh và tự co theo cả chiều rộng lẫn chiều cao khả dụng trên mobile. Khi ghép đúng chỉ hai ô vừa ghép được cập nhật; chỉ dựng lại toàn bàn khi xáo hoặc mốc đặc biệt thay đổi bàn, để tránh chớp ảnh trên thiết bị cảm ứng.
+- Chế độ hiện dùng: Dễ 12 thẻ (4×3), Trung bình 24 (6×4), Khó 36 (6×6), Siêu khó/Vô tận 60 (6×10), Thử thách tăng từ 12 đến 48 thẻ theo cấp. Vô tận đếm xuôi nhưng vẫn qua màn; không nhận thưởng thời gian hoặc vật phẩm đóng băng.
+- Từ cấp 3, bàn có một thẻ đóng băng. Cặp đặc biệt lấy từ asset `special/` (hoặc một cặp fallback khi pool chưa có asset đặc biệt), điểm nhận thêm 50% sau combo. Bộ đếm đặc biệt chỉ tồn tại trong ván hiện tại; các mốc 1/3/5/7/9/10 áp dụng hiệu ứng, đến mốc 10 reset về 0. Khi mốc tự xóa/mở khóa/đánh dấu thẻ, cả dữ liệu và giao diện phải được đồng bộ trong cùng lượt để không tạo “thẻ ma”.
+- Vật phẩm Link Connect: Gợi ý đường nối, Xáo trộn, Sấm sét và Đóng băng thời gian. Từ màn 2, nhận +1 Gợi ý mỗi màn, tối đa 10; tiếp tục hoặc chơi lại cùng màn không cộng lặp. Âm thanh dùng chung với Memory Match: click, đúng/sai, thưởng, cảnh báo còn 10 giây, thua, thắng và nhạc nền.
+- Danh mục hiệu ứng nối/tan đã tách tại `js/linkConnect/linkEffects.js` để sau này mở bán Laser, Điện, Xung Cyber, Bụi phép… Hiện hiệu ứng Điện là mặc định. Phần tinh chỉnh giao diện/menu Link Connect vẫn là thiết kế tạm và sẽ được rà soát riêng sau khi chốt gameplay.
 
 - Có 4 mặt lưng thẻ và 7 hiệu ứng lật/hiện thẻ. Ngoại hình mua bằng Xu, lưu theo thiết bị và trang bị trong tab **Ngoại hình** của Cửa hàng.
 - **Bộ sưu tập V2** gồm chủ đề Mặc định (1.000 ảnh), **25** chủ đề ảnh 3D theo `themes.md`, và các chủ đề tạo bằng mã: Chữ cái (48 giá trị), 2 Số (96), 3 Số (900), Ký hiệu máy tính (48). `animals-land`, `animals-air`, `animals-sea`, `trees`, `leaves`, `instruments` và `mystery` hiển thị **Sắp có** cho đến khi có đủ ảnh cho bàn chơi lớn nhất. `themeCatalog.js` chỉ giữ ID tiếng Anh cùng metadata UI; `scripts/generate-theme-manifest.mjs` tự quét tất cả WebP trong `public/assets/images/themes/<theme-id>/` để sinh catalog ảnh runtime. Không còn danh sách filename viết tay trong JavaScript. Các thẻ tạo mã dùng SVG, không emoji: Chữ cái là khối đồ chơi 3D xanh–tím, 2/3 Số là bảng số điện tử xanh ngọc, Ký hiệu máy tính là phím chức năng xanh đậm; mỗi giá trị có biến thể màu cố định để hai thẻ cùng cặp luôn giống nhau.
