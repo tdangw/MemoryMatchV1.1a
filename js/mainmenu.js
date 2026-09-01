@@ -13,9 +13,11 @@ import { showThemeChangeNotice } from "./themeChangeNotice.js";
 import { CARD_BACKS, FLIP_EFFECTS, getCardBackClass } from "./appearance.js";
 
 let onStartGame = () => {};
+let onChangeGame = () => {};
 
-export function configureMainMenu({ startGame } = {}) {
+export function configureMainMenu({ startGame, changeGame } = {}) {
   onStartGame = startGame || onStartGame;
+  onChangeGame = changeGame || onChangeGame;
 }
 
 /**
@@ -51,6 +53,10 @@ export function createMainMenu() {
   title.className = "game-title";
   title.textContent = "Memory Match";
   wrapper.appendChild(title);
+  const description = document.createElement("p");
+  description.className = "menu-description";
+  description.textContent = "Ghi nhớ và tìm các cặp hình giống nhau khi lật thẻ.";
+  wrapper.appendChild(description);
 
   const menuList = document.createElement("ul");
   menuList.className = "menu-list";
@@ -85,6 +91,11 @@ export function createMainMenu() {
           "book",
         );
       },
+    },
+    {
+      icon: "restart",
+      text: "Đổi trò chơi",
+      action: onChangeGame,
     },
     {
       icon: "collection",

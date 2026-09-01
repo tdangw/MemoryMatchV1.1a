@@ -12,6 +12,7 @@ import {
   showGameInfoModal,
   showCollectionModal,
 } from "./mainmenu.js";
+import { createActiveGameMenu, showGameSelector } from "./gameSelector.js";
 import { configureSettings, showSettingsPanel } from "./settings.js";
 import { openQuickAssistOverlay, openShopOverlay } from "./shop.js";
 import { showResetConfirmationOverlay, showReturnToMenuOverlay } from "./ui.js";
@@ -38,8 +39,8 @@ configureGameController({
   showDifficulty: showDifficultyOverlay,
   createMenu: createMainMenu,
 });
-configureMainMenu({ startGame: initializeLevel });
-configureSettings({ onCloseMenu: createMainMenu });
+configureMainMenu({ startGame: initializeLevel, changeGame: showGameSelector });
+configureSettings({ onCloseMenu: createActiveGameMenu });
 unlockSound();
 enableButtonClickSounds(() => gameState.settings);
 decorateIcons();
@@ -63,7 +64,7 @@ document.addEventListener(
 );
 
 window.onload = () => {
-  createMainMenu();
+  showGameSelector();
 };
 
 document

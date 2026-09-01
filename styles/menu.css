@@ -52,6 +52,75 @@
   text-shadow: 0 2px 14px rgb(242 191 91 / 20%);
 }
 
+.menu-description {
+  width: 100%;
+  margin: -10px 0 22px;
+  color: rgb(245 247 251 / 76%);
+  font: 600 0.94rem/1.45 "Segoe UI", sans-serif;
+  text-align: center;
+}
+
+.game-selector__choices {
+  display: grid;
+  width: 100%;
+  gap: 12px;
+}
+
+.game-selector__choice {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr) 22px;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 94px;
+  padding: 14px;
+  border: 1px solid rgb(255 255 255 / 13%);
+  border-radius: 16px;
+  background: rgb(39 57 88 / 78%);
+  color: #f5f7fb;
+  box-shadow: 0 5px 15px rgb(0 0 0 / 18%);
+  text-align: left;
+  transition: transform 160ms ease, background 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.game-selector__choice > .ui-icon:first-child {
+  width: 25px;
+  height: 25px;
+  padding: 10px;
+  border-radius: 13px;
+  background: linear-gradient(135deg, #f5c260, #c86a32);
+  color: #10233f;
+}
+
+.game-selector__choice > span {
+  display: grid;
+  gap: 5px;
+}
+
+.game-selector__choice strong {
+  font: 800 1.08rem/1.15 "Segoe UI", sans-serif;
+}
+
+.game-selector__choice small {
+  color: rgb(245 247 251 / 70%);
+  font: 600 0.78rem/1.35 "Segoe UI", sans-serif;
+}
+
+.game-selector__choice > .ui-icon:last-child {
+  width: 20px;
+  height: 20px;
+  color: #f2bf5b;
+}
+
+.game-selector__choice:hover,
+.game-selector__choice:focus-visible {
+  border-color: rgb(242 191 91 / 50%);
+  background: rgb(55 78 116 / 94%);
+  box-shadow: 0 8px 20px rgb(0 0 0 / 28%);
+  outline: none;
+  transform: translateY(-1px);
+}
+
 .app-button--purchase .ui-icon--coin {
   width: 18px;
   height: 18px;
@@ -111,6 +180,19 @@
   box-shadow: 0 8px 20px rgb(0 0 0 / 28%);
   transform: translateY(-1px);
   outline: none;
+}
+
+.menu-wrapper .menu-item.is-disabled {
+  grid-template-columns: 38px 1fr auto;
+  cursor: default;
+  opacity: 0.58;
+}
+
+.menu-wrapper .menu-item.is-disabled small {
+  color: rgb(245 247 251 / 68%);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-align: right;
 }
 
 .collection-theme-list {
