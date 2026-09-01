@@ -18,6 +18,7 @@ import { getOwnedThemeIds, ownTheme } from "./appearance.js";
 import { GAMEPLAY_TIMING } from "./gameplayTuning.js";
 import { THEMES, getTheme, isThemePlayable } from "./themeCatalog.js";
 import { grantLinkItem, getLinkItemCount, LINK_ITEMS } from "./linkConnect/linkItems.js";
+import { LINK_EXIT_EFFECTS, LINK_PATH_EFFECTS } from "./linkConnect/linkEffects.js";
 
 export function openQuickAssistOverlay(kind) {
   if (gameState.isLocked || gameState.isPaused) return;
@@ -122,8 +123,14 @@ export function openShopOverlay({ fromMenu = false, gameId = "memory-match", lin
 
   if (gameId === "link-connect") {
     const itemsTab = createTab("Vật phẩm", true, () => renderLinkItems(grid, roundId, modal));
+    const pathEffectsTab = createTab("Đường nối", false, () =>
+      renderLinkEffectShop(grid, "Hiệu ứng đường nối", "linkPathEffect", "ownedLinkPathEffects", LINK_PATH_EFFECTS, roundId, modal),
+    );
+    const exitEffectsTab = createTab("Xóa thẻ", false, () =>
+      renderLinkEffectShop(grid, "Hiệu ứng xóa thẻ", "linkExitEffect", "ownedLinkExitEffects", LINK_EXIT_EFFECTS, roundId, modal),
+    );
     const themesTab = createTab("Chủ đề", false, () => renderThemes(grid, roundId, modal, gameId));
-    tabs.append(itemsTab, themesTab);
+    tabs.append(itemsTab, pathEffectsTab, exitEffectsTab, themesTab);
     renderLinkItems(grid, roundId, modal);
   } else {
     const appearanceTab = createTab("Ngoại hình", true, () =>
@@ -138,6 +145,47 @@ export function openShopOverlay({ fromMenu = false, gameId = "memory-match", lin
     tabs.append(appearanceTab, flipEffectsTab, themesTab);
     renderAppearance(grid, roundId, modal);
   }
+}
+
+function renderLinkEffectShop(grid, title, equippedKey, ownedKey, effects, roundId, modal) {
+  grid.className = "shop-item-grid shop-item-grid--appearance";
+  grid.replaceChildren();
+  const group = document.createElement("section");
+  group.className = "appearance-group";
+  const heading = document.createElement("h3");
+  heading.textContent = title;
+  const choices = document.createElement("div");
+  choices.className = "appearance-choice-grid";
+  effects.forEach((item) => {
+    const owned = gameState.appearance[ownedKey].includes(item.id);
+    const card = document.createElement("article");
+    card.className = "appearance-choice";
+    const preview = document.createElement("div");
+    preview.className = `link-effect-preview ${item.className}`;
+    preview.append(createIcon(item.icon));
+    const name = document.createElement("strong");
+    name.textContent = item.title;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "app-button app-button--purchase shop-buy-button";
+    if (owned) {
+      button.classList.add("appearance-action--equipped");
+      button.textContent = "Đã sở hữu";
+      button.disabled = true;
+    } else {
+      button.append(document.createTextNode(String(item.price)), createIcon("coin"));
+      button.onclick = () => openPurchaseConfirmation(
+        { ...item, type: "link-effect", equippedKey, ownedKey },
+        roundId,
+        modal,
+        () => renderLinkEffectShop(grid, title, equippedKey, ownedKey, effects, roundId, modal),
+      );
+    }
+    card.append(preview, name, button);
+    choices.append(card);
+  });
+  group.append(heading, choices);
+  grid.append(group);
 }
 
 function renderLinkItems(grid, roundId, modal) {
@@ -376,9 +424,9 @@ function openPurchaseConfirmation(item, roundId, shopModal, onPurchase) {
 function handleBuyItem(item, roundId, fromMenu = false) {
   if (item.type !== "link-item" && (gameState.roundId !== roundId || (!fromMenu && gameState.isLocked))) return false;
 
-  if (item.type === "appearance") {
+  if (item.type === "appearance" || item.type === "link-effect") {
     const ownedKey =
-      item.appearanceType === "cardBack"
+      item.type === "link-effect" ? item.ownedKey : item.appearanceType === "cardBack"
         ? "ownedCardBacks"
         : "ownedFlipEffects";
     if (gameState.appearance[ownedKey].includes(item.id)) {
@@ -399,9 +447,9 @@ function handleBuyItem(item, roundId, fromMenu = false) {
   saveCoins(gameState.coins);
   updateCoinDisplay(gameState.coins);
 
-  if (item.type === "appearance") {
+  if (item.type === "appearance" || item.type === "link-effect") {
     const ownedKey =
-      item.appearanceType === "cardBack"
+      item.type === "link-effect" ? item.ownedKey : item.appearanceType === "cardBack"
         ? "ownedCardBacks"
         : "ownedFlipEffects";
     if (!gameState.appearance[ownedKey].includes(item.id))

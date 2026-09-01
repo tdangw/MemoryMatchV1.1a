@@ -2,6 +2,7 @@ import { createIcon } from "../icons.js";
 import { openAppModal, showAppToast } from "../modal.js";
 import { pauseBackgroundMusic, sounds, syncDefaultMusic } from "../sound.js";
 import { getEquippedThemeId } from "../appearance.js";
+import { GAMEPLAY_TIMING } from "../gameplayTuning.js";
 import { gameState, increaseCoins, spendCoins } from "../gameState.js";
 import { saveCoins } from "../persistence.js";
 import { getTheme } from "../themeCatalog.js";
@@ -15,8 +16,10 @@ import {
   getLinkLevelTimeBonus,
   getLinkModeLayout,
   getLinkTimerDirection,
+  getLinkMatchResolveDelay,
   isLinkChallengeMode,
   isLinkEndlessMode,
+  LINK_CONNECT_TIMING,
 } from "./linkConfig.js";
 import {
   createLinkBoard,
@@ -26,8 +29,8 @@ import {
   removeRandomLinkPair,
   shuffleLinkBoard,
   makeRandomLinkPairSpecial,
-  unlockAllFrozenLinkTiles,
-  unlockFrozenLinkTiles,
+  unlockAllFrozenLinkPairs,
+  unlockFrozenLinkPairs,
 } from "./linkBoard.js";
 import { findAvailableConnections, findConnectionPath } from "./pathfinder.js";
 import { consumeLinkItem, getLinkItemCount, grantLinkItem, LINK_ITEMS } from "./linkItems.js";
@@ -41,17 +44,17 @@ import {
 } from "../ui.js";
 import {
   clearLinkPath,
+  clearLinkThunderStrikes,
   clearLinkMatchedPair,
   clearLinkTileSelection,
   drawLinkPath,
   playLinkMatchExit,
+  playLinkThunderStrike,
   renderLinkBoard,
   setLinkTileSelected,
 } from "./linkRenderer.js";
 import { beginLinkRound, linkGameState, resetLinkGame } from "./linkState.js";
 
-// Đồng bộ với CSS: tia hoàn tất trước, sau đó mới bắt đầu hiệu ứng tan thẻ.
-const LINK_MATCH_DELAY_MS = 1020;
 let countdownInterval;
 let selectedPosition = null;
 let linkTimeWarningPlayed = false;
@@ -95,7 +98,7 @@ export function showLinkDifficultyOverlay() {
   });
   changeTheme.addEventListener("click", () => {
     modal.close();
-    setTimeout(() => navigation.showCollection(), 180);
+    setTimeout(() => navigation.showCollection(), LINK_CONNECT_TIMING.postModalNavigationDelayMs);
   });
   [
     ["easy", "Dễ", "status-easy"],
@@ -154,6 +157,7 @@ export function startLinkLevel({ mode = linkGameState.mode, level = 1, resume = 
   stopCountdown();
   clearGameplayRewardPopups();
   clearLinkPath();
+  clearLinkThunderStrikes();
   selectedPosition = null;
   linkTimeWarningPlayed = false;
   const modeLayout = getLinkModeLayout(mode);
@@ -209,6 +213,7 @@ export function returnToLinkMenu() {
   resetLinkGame();
   selectedPosition = null;
   clearLinkPath();
+  clearLinkThunderStrikes();
   document.getElementById("link-connect-container")?.setAttribute("hidden", "");
   navigation.showMenu();
   syncDefaultMusic(gameState.settings);
@@ -269,6 +274,7 @@ function showLinkGame() {
         <div id="link-board" class="link-board" aria-label="Bàn Link Connect"></div>
         <svg id="link-path-overlay" class="link-path-overlay" aria-hidden="true"></svg>
       </div>`;
+    applyLinkTimingStyles(container);
     document.querySelector(".main-wrapper")?.append(container);
     configureLinkGameActions(container);
     configureLinkItemActions(container);
@@ -450,7 +456,7 @@ function handleLinkTileClick(position) {
       showAppToast("Không còn đường nối. Bàn đã được xáo lại.");
     }
     linkGameState.isLocked = false;
-  }, LINK_MATCH_DELAY_MS);
+  }, getLinkMatchResolveDelay());
 }
 
 function useLinkItem(id) {
@@ -484,7 +490,7 @@ function useLinkHint() {
   setTimeout(() => {
     clearLinkPath();
     linkGameState.isLocked = false;
-  }, 1000);
+  }, LINK_CONNECT_TIMING.hintPreviewMs);
 }
 
 function useLinkReshuffle() {
@@ -495,14 +501,60 @@ function useLinkReshuffle() {
 
 function useLinkThunder() {
   const pairCount = randomInteger(1, 3);
-  let removed = 0;
+  const removedPairs = [];
   for (let index = 0; index < pairCount; index += 1) {
-    if (!removeAutomaticPair()) break;
-    removed += 1;
+    const pair = removeRandomLinkPair(linkGameState.board);
+    if (!pair) break;
+    removedPairs.push(pair);
   }
-  renderLinkBoard(linkGameState.board, { onTileClick: handleLinkTileClick });
-  showAppToast(`Sấm sét đã phá hủy ${removed} cặp thẻ.`);
-  if (linkGameState.matchedPairs >= linkGameState.totalPairs) completeLinkLevel();
+  if (!removedPairs.length) {
+    showAppToast("Không còn cặp thẻ để Sấm sét phá hủy.");
+    return;
+  }
+  linkGameState.isLocked = true;
+  const roundId = linkGameState.roundId;
+  const board = linkGameState.board;
+  showAppToast(`Sấm sét đang phá hủy ${removedPairs.length} cặp thẻ.`);
+  playNextThunderStrike(removedPairs, 0, roundId, board, getThunderColor(removedPairs.length));
+}
+
+function playNextThunderStrike(pairs, index, roundId, board, colorId) {
+  if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
+  const pair = pairs[index];
+  const strike = playLinkThunderStrike(pair.positions, colorId);
+  setTimeout(() => {
+    strike?.remove();
+    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
+    const [start, end] = pair.positions;
+    clearLinkMatchedPair(start, end);
+    linkGameState.matchedPairs += 1;
+    updateLinkHud();
+    if (index < pairs.length - 1) {
+      setTimeout(
+        () => playNextThunderStrike(pairs, index + 1, roundId, board, colorId),
+        LINK_CONNECT_TIMING.thunderNextPairDelayMs,
+      );
+      return;
+    }
+    finishLinkThunder(board, roundId);
+  }, LINK_CONNECT_TIMING.thunderStrikeMs);
+}
+
+function getThunderColor(pairCount) {
+  return pairCount === 1 ? "yellow" : pairCount === 2 ? "blue" : "red";
+}
+
+function finishLinkThunder(board, roundId) {
+  if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
+  if (linkGameState.matchedPairs >= linkGameState.totalPairs) {
+    completeLinkLevel();
+    return;
+  }
+  if (ensurePlayableBoard(board)) {
+    renderLinkBoard(board, { onTileClick: handleLinkTileClick });
+    showAppToast("Không còn đường nối. Bàn đã được xáo lại.");
+  }
+  linkGameState.isLocked = false;
 }
 
 function useLinkFreeze() {
@@ -583,7 +635,7 @@ function startCountdown(roundId) {
     if (linkGameState.remainingTime <= 0 && !isLinkEndlessMode(linkGameState.mode)) {
       handleLinkTimeUp();
     }
-  }, 1000);
+  }, GAMEPLAY_TIMING.secondMs);
 }
 
 function handleLinkTimeUp() {
@@ -608,7 +660,7 @@ function handleLinkTimeUp() {
     showAppToast(`Đã mua +${seconds}s với ${price} Xu.`);
     playLinkSound("bonus");
     syncDefaultMusic(gameState.settings);
-    setTimeout(() => startCountdown(linkGameState.roundId), 1000);
+    setTimeout(() => startCountdown(linkGameState.roundId), LINK_CONNECT_TIMING.countdownResumeDelayMs);
     return true;
   };
   openTimeUpModal({
@@ -717,10 +769,10 @@ function applySpecialMatchRewards() {
     linkGameState.remainingTime += amount;
     showGameplayRewardPopup({ title: "Phần thưởng!", type: "time", value: amount, sound: false });
   }
-  // Mỗi màn luôn có ít nhất một cặp đặc biệt; ghép cặp này mở băng để ván không thể kẹt.
-  const thawedCount = unlockFrozenLinkTiles(linkGameState.board, 1);
-  const boardChanged = Boolean(thawedCount) || applySpecialMilestone(linkGameState.specialProgress);
-  if (thawedCount) showGameplayRewardPopup({ title: "Đã mở khóa!", icon: "wand", label: "Thẻ đóng băng", sound: false });
+  // Mỗi màn luôn có ít nhất một cặp đặc biệt; ghép cặp này mở một cặp băng để ván không thể kẹt.
+  const thawedPairs = unlockFrozenLinkPairs(linkGameState.board, 1);
+  const boardChanged = Boolean(thawedPairs) || applySpecialMilestone(linkGameState.specialProgress);
+  if (thawedPairs) showGameplayRewardPopup({ title: "Đã mở khóa!", icon: "wand", label: "Cặp thẻ đóng băng", sound: false });
   if (linkGameState.specialProgress >= special.progressTarget) {
     linkGameState.specialProgress = 0;
   }
@@ -734,9 +786,9 @@ function applySpecialMilestone(progress) {
     boardChanged = Boolean(removeAutomaticPair());
     message = "Mốc đặc biệt 1: phá hủy một cặp thẻ.";
   } else if (progress === 3) {
-    const unlocked = unlockFrozenLinkTiles(linkGameState.board, 1);
+    const unlocked = unlockFrozenLinkPairs(linkGameState.board, 1);
     boardChanged = Boolean(unlocked);
-    if (unlocked) message = "Mốc đặc biệt 3: đã mở khóa một thẻ đóng băng.";
+    if (unlocked) message = "Mốc đặc biệt 3: đã mở khóa một cặp thẻ đóng băng.";
     else {
       boardChanged = Boolean(removeAutomaticPair());
       message = "Mốc đặc biệt 3: không có thẻ đóng băng, đã phá hủy một cặp.";
@@ -747,9 +799,9 @@ function applySpecialMilestone(progress) {
   } else if (progress === 7) {
     message = applyMilestoneSevenReward();
   } else if (progress === 9) {
-    const unlocked = unlockFrozenLinkTiles(linkGameState.board, 1);
+    const unlocked = unlockFrozenLinkPairs(linkGameState.board, 1);
     boardChanged = Boolean(unlocked);
-    if (unlocked) message = "Mốc đặc biệt 9: đã mở khóa một thẻ đóng băng.";
+    if (unlocked) message = "Mốc đặc biệt 9: đã mở khóa một cặp thẻ đóng băng.";
     else {
       boardChanged = Boolean(removeAutomaticPair());
       message = "Mốc đặc biệt 9: không có thẻ đóng băng, đã phá hủy một cặp.";
@@ -757,7 +809,7 @@ function applySpecialMilestone(progress) {
   } else if (progress === 10) {
     increaseCoins(LINK_CONNECT_CONFIG.special.milestoneTenCoins);
     saveCoins(gameState.coins);
-    const unlocked = unlockAllFrozenLinkTiles(linkGameState.board);
+    const unlocked = unlockAllFrozenLinkPairs(linkGameState.board);
     const specialPair = makeRandomLinkPairSpecial(linkGameState.board);
     const removedPair = removeAutomaticPair();
     boardChanged = Boolean(unlocked || specialPair || removedPair);
@@ -798,6 +850,13 @@ function randomInteger(minimum, maximum) {
 function stopCountdown() {
   clearInterval(countdownInterval);
   countdownInterval = undefined;
+}
+
+function applyLinkTimingStyles(container) {
+  container.style.setProperty("--link-path-animation-duration", `${LINK_CONNECT_TIMING.pathAnimationMs}ms`);
+  container.style.setProperty("--link-tile-exit-delay", `${LINK_CONNECT_TIMING.tileExitDelayMs}ms`);
+  container.style.setProperty("--link-tile-exit-duration", `${LINK_CONNECT_TIMING.tileExitAnimationMs}ms`);
+  container.style.setProperty("--link-thunder-strike-duration", `${LINK_CONNECT_TIMING.thunderStrikeMs}ms`);
 }
 
 function setText(id, value) {

@@ -30,9 +30,30 @@ export const LINK_CONNECT_CONFIG = Object.freeze({
     timeReward: Object.freeze({ min: 3, max: 10 }),
     milestoneTenCoins: 100,
     frozenTilesFromLevel: 3,
-    frozenTilesPerLevel: 1,
+    frozenPairsPerLevel: 1,
   }),
 });
+
+// Một nguồn thời lượng duy nhất cho hiệu ứng và nhịp chuyển trạng thái của Link Connect.
+export const LINK_CONNECT_TIMING = Object.freeze({
+  pathAnimationMs: 760,
+  tileExitDelayMs: 260,
+  tileExitAnimationMs: 520,
+  matchSettleMs: 20,
+  hintPreviewMs: 1000,
+  thunderStrikeMs: 620,
+  thunderNextPairDelayMs: 130,
+  countdownResumeDelayMs: 1000,
+  postModalNavigationDelayMs: 180,
+});
+
+export function getLinkMatchResolveDelay() {
+  const timing = LINK_CONNECT_TIMING;
+  return Math.max(
+    timing.pathAnimationMs,
+    timing.tileExitDelayMs + timing.tileExitAnimationMs,
+  ) + timing.matchSettleMs;
+}
 
 const CHALLENGE_LAYOUTS = Object.freeze([
   Object.freeze({ untilLevel: 3, tileCount: 12, columns: 4 }),
@@ -109,7 +130,7 @@ export function calculateLinkMatchPoints(combo = 1, { special = false } = {}) {
   return Math.round(points * (special ? LINK_CONNECT_CONFIG.special.scoreMultiplier : 1));
 }
 
-export function getLinkFrozenTileCount(level = 1) {
+export function getLinkFrozenPairCount(level = 1) {
   const special = LINK_CONNECT_CONFIG.special;
-  return level >= special.frozenTilesFromLevel ? special.frozenTilesPerLevel : 0;
+  return level >= special.frozenTilesFromLevel ? special.frozenPairsPerLevel : 0;
 }

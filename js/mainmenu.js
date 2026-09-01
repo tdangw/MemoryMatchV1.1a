@@ -23,6 +23,7 @@ import {
   getEquippedThemeId,
   getOwnedThemeIds,
 } from "./appearance.js";
+import { LINK_EXIT_EFFECTS, LINK_PATH_EFFECTS } from "./linkConnect/linkEffects.js";
 
 let onStartGame = () => {};
 let onChangeGame = () => {};
@@ -368,6 +369,9 @@ export function showCollectionModal({
   gameId = "memory-match",
   onClose = () => {},
 } = {}) {
+  // Khi mở từ item menu, trình duyệt truyền MouseEvent làm đối số đầu tiên.
+  // Chỉ callback thực sự mới được dùng khi đóng để không gọi nhầm event như hàm.
+  const closeHandler = typeof onClose === "function" ? onClose : () => {};
   if (fromGame) gameState.isPaused = true;
   const content = document.createElement("div");
   content.className = "collection-content";
@@ -381,7 +385,7 @@ export function showCollectionModal({
     onClose: () => {
       if (fromGame) gameState.isPaused = false;
       syncDefaultMusic(gameState.settings);
-      onClose();
+      closeHandler();
     },
   });
 
@@ -466,7 +470,57 @@ export function showCollectionModal({
   };
 
   if (gameId === "link-connect") {
-    tabs.append(createCollectionTab("Chủ đề", true, renderThemes));
+    const renderLinkEffects = (title, equippedKey, ownedKey, effects) => {
+      grid.className = "shop-item-grid shop-item-grid--appearance";
+      grid.replaceChildren();
+      const group = document.createElement("section");
+      group.className = "appearance-group";
+      const heading = document.createElement("h3");
+      heading.textContent = title;
+      const choices = document.createElement("div");
+      choices.className = "appearance-choice-grid";
+      effects
+        .filter((item) => gameState.appearance[ownedKey].includes(item.id))
+        .forEach((item) => {
+          const equipped = gameState.appearance[equippedKey] === item.id;
+          const card = document.createElement("article");
+          card.className = `appearance-choice${equipped ? " is-equipped" : ""}`;
+          const preview = document.createElement("div");
+          preview.className = `link-effect-preview ${item.className}`;
+          preview.append(createIcon(item.icon));
+          const name = document.createElement("strong");
+          name.textContent = item.title;
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "app-button app-button--purchase shop-buy-button";
+          if (equipped) {
+            button.classList.add("appearance-action--equipped");
+            button.textContent = "Đang dùng";
+            button.disabled = true;
+          } else {
+            button.classList.add("appearance-action--equip");
+            button.textContent = "Trang bị";
+            button.onclick = () => {
+              gameState.appearance[equippedKey] = item.id;
+              saveAppearance(gameState.appearance);
+              renderLinkEffects(title, equippedKey, ownedKey, effects);
+              showAppToast(`Đã trang bị ${item.title}.`, { tone: "info" });
+            };
+          }
+          card.append(preview, name, button);
+          choices.append(card);
+        });
+      group.append(heading, choices);
+      grid.append(group);
+    };
+    const themesTab = createCollectionTab("Chủ đề", true, renderThemes);
+    const pathTab = createCollectionTab("Đường nối", false, () =>
+      renderLinkEffects("Hiệu ứng đường nối", "linkPathEffect", "ownedLinkPathEffects", LINK_PATH_EFFECTS),
+    );
+    const exitTab = createCollectionTab("Xóa thẻ", false, () =>
+      renderLinkEffects("Hiệu ứng xóa thẻ", "linkExitEffect", "ownedLinkExitEffects", LINK_EXIT_EFFECTS),
+    );
+    tabs.append(themesTab, pathTab, exitTab);
     renderThemes();
   } else {
     const appearanceTab = createCollectionTab(

@@ -9,8 +9,6 @@ export function createLinkGameState() {
     misses: 0,
     combo: 0,
     specialProgress: 0,
-    hints: 0,
-    reshuffles: 0,
     freezeSeconds: 0,
     luckyAwards: [],
     matchedPairs: 0,

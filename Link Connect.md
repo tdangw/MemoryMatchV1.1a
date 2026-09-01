@@ -27,7 +27,7 @@ Hai thẻ cùng hình chỉ được ghép nối thành công khi đường đi 
 2. **Quy tắc viền ngoài (Outer Boundary Routing):**
    - Xung quanh bàn cờ luôn có một "vùng đệm rỗng" (1 lớp ô trống bao quanh). Các thẻ nằm ở mép ngoài cùng có thể nối vòng qua khoảng không này để ghép với nhau.
 3. **Hiệu ứng tia sáng kết nối (Laser Beam FX):**
-   - Khi ghép đúng, một vệt sáng neon phát quang (màu ngọc lam hoặc vàng ánh kim) vẽ lướt qua chính xác lộ trình nối, 2 thẻ phát nổ hạt ánh sáng và biến mất để lại ô trống.
+   - Khi ghép đúng, một vệt sáng neon phát quang vẽ lướt qua chính xác lộ trình nối; hai thẻ tan biến và để lại ô trống.
 
 ```text
   [A] ──── [A]             [A] ─────┐              ┌─────── [A]
@@ -38,31 +38,17 @@ Hai thẻ cùng hình chỉ được ghép nối thành công khi đường đi 
 
 ---
 
-## 3. Các Cơ chế Bàn cờ Động & Môi trường Tương tác (Dynamic Board Mechanics)
+## 3. Bàn cờ Tĩnh & Thẻ Tương tác
 
-Để tạo sự đột phá và đa dạng qua từng màn chơi, hệ thống hỗ trợ 6 cơ chế biến chuyển bàn cờ:
+Link Connect dùng bàn cờ tĩnh: sau khi ghép đúng, hai ô được để trống. Khi không còn đường nối, hệ thống tự xáo các thẻ còn lại nhưng giữ nguyên các ô trống.
 
-### A. Cơ chế Dồn thẻ (Gravity Shifts)
+### Thẻ đặc biệt và thẻ đóng băng
 
-Sau khi một cặp thẻ bị loại bỏ, bàn cờ có thể kích hoạt hiệu ứng dịch chuyển:
-
-1. **Bàn cờ Tĩnh (Classic Static):** Ô ăn xong để trống cố định.
-2. **Rơi tự do (Gravity Down):** Các thẻ ở phía trên tự động rơi xuống lấp đầy các khoảng trống bên dưới.
-3. **Dồn lên trên (Gravity Up):** Các thẻ bên dưới tự động trượt nổi lên trên.
-4. **Dồn sang bên (Gravity Left / Right):** Thẻ tự động trượt dồn về phía cạnh trái hoặc cạnh phải bàn cờ.
-5. **Hút vào tâm (Center Pull):** Thẻ ở 4 phía tự động trượt hút về tâm bàn cờ.
-6. **Tách đôi ra biên (Split Push):** Nửa trên dồn lên, nửa dưới dồn xuống từ giữa tim bàn cờ.
-7. **Thẻ tráo đổi vị trí (Swap):** Khi 2 thẻ bị loại bỏ, các thẻ xung quanh sẽ tráo đổi vị trí với nhau.
-8. **Tách đôi ra trái/phải:** Nửa trái dồn sang trái, nửa phải dồn sang phải.
-9. **Xoay tròn:** Các thẻ xoay tròn theo chiều kim đồng hồ hoặc ngược chiều kim đồng hồ.
-
-### B. Các Chướng ngại vật & Ô tương tác đặc biệt
-
-1. **Ghép đủ bộ 3:** Khi ghép đủ 3 cặp thẻ đặc biệt sẽ mở khóa 1 thẻ bị đóng băng (nếu có).
-2. **Ghép cặp đặc biệt:** Mỗi màn luôn có ít nhất 1 cặp thẻ đặc biệt. Khi ghép được cặp này, thẻ đóng băng trong màn sẽ được mở khóa; đồng thời phá hủy 1 cặp thẻ bất kì.
+1. **Ghép đủ bộ 3:** Khi ghép đủ 3 cặp thẻ đặc biệt sẽ mở khóa 1 cặp thẻ đóng băng (nếu có).
+2. **Ghép cặp đặc biệt:** Mỗi màn luôn có ít nhất 1 cặp thẻ đặc biệt. Khi ghép được cặp này, cặp thẻ đóng băng trong màn sẽ được mở khóa; đồng thời phá hủy 1 cặp thẻ bất kì.
 3. **Ghép đủ bộ 5:** Khi ghép đủ 5 cặp thẻ đặc biệt sẽ biến 1 cặp thẻ bất kì thành 1 cặp thẻ đặc biệt.
 4. **Ghép đủ bộ 7:** Khi ghép đủ 7 cặp thẻ đặc biệt sẽ nhận 1 trong các hiệu ứng: Thêm thời gian, thêm 1 lượt gợi ý, thêm 1 lượt xáo trộn.
-5. **Ghép đủ bộ 9:** Khi ghép đủ 9 cặp thẻ đặc biệt sẽ nhận 1 trong các hiệu ứng: Mở khóa 1 thẻ đóng băng, phá hủy 1 cặp thẻ bất kì.
+5. **Ghép đủ bộ 9:** Khi ghép đủ 9 cặp thẻ đặc biệt sẽ nhận 1 trong các hiệu ứng: Mở khóa 1 cặp thẻ đóng băng, phá hủy 1 cặp thẻ bất kì.
 6. **Ghép đủ bộ 10:** Khi ghép đủ 10 cặp thẻ đặc biệt, nhận 100 xu đồng thời phá hủy tất cả thẻ đóng băng, tạo 1 cặp thẻ đặc biệt ngẫu nhiên và phá hủy 1 cặp thẻ ngẫu nhiên.
 
 - Các bộ thẻ có thể tích lũy qua các màn chơi. Ví dụ: Màn 1 ghép được 3 thẻ, màn 2 ghép được 2 thẻ => Tổng cộng 5 thẻ, sẽ nhận được hiệu ứng của bộ 5. Đến đủ mốc 10 thì sẽ reset lại từ 1.
@@ -76,7 +62,7 @@ Các vật phẩm được tích hợp trực tiếp vào hệ thống tiền t�
 | Vật phẩm                               | Icon SVG | Chức năng chi tiết                                                                                    | Giá dự kiến (Xu) |
 | :------------------------------------- | :------: | :---------------------------------------------------------------------------------------------------- | :--------------: |
 | **Kính Định Vị (Smart Hint)**          | `search`  | Tự động vẽ vệt sáng chỉ rõ đường nối của 1 cặp thẻ có thể ghép ngay.                                  |       8 Xu       |
-| **Xáo Trộn Không Gian (Reshuffle)**    | `restart` | Xáo lại toàn bộ vị trí các thẻ còn lại trên bàn cờ, cam kết luôn tạo ra ít nhất 3 đường nối khả dụng. |      15 Xu       |
+| **Xáo Trộn Không Gian (Reshuffle)**    | `restart` | Xáo lại toàn bộ vị trí các thẻ còn lại trên bàn cờ để tạo đường nối mới.                              |      15 Xu       |
 | **Sấm Sét Hủy Diệt (Thunder Strike)**  | `wand`    | Tự động chọn và tiêu diệt ngay 1~3 cặp thẻ bất kỳ mà không cần đường nối.                             |      25 Xu       |
 | **Đồng Hồ Ngưng Đọng (Chrono Freeze)** | `timer`   | Đóng băng đồng hồ đếm ngược trong 10 giây để người chơi thoải mái quan sát.                           |      20 Xu       |
 
@@ -92,33 +78,7 @@ Mỗi chủ đề có 5 thẻ đặc biệt ở thư mục `special/`. Khi xuấ
 
 ---
 
-## 6. Các Chế độ Chơi Con (Sub-game Modes)
-
-1. **Chế độ Hành Trình Vượt Ải (Adventure Quest):**
-   - Gồm 100 màn chơi với bàn cờ tạo hình học nghệ thuật (hình trái tim, hình ngôi sao, kim tự tháp, chữ thập...).
-   - Mỗi màn kết hợp một kiểu dồn trọng lực hoặc chướng ngại vật khác nhau.
-2. **Chế độ Cuồng Nhiệt Thời Gian (Time Rush):**
-   - Khởi đầu với 45 giây; mỗi cặp ghép đúng cộng thêm `+2s` đến `+5s`.
-   - Mục tiêu duy trì tốc độ ghép tối đa để sống sót qua nhiều đợt dọn bàn cờ nhất có thể.
-3. **Chế độ Thiền Định Thư Giãn (Zen Mode):**
-   - Hoàn toàn không giới hạn thời gian, không có áp lực thua cuộc, kết hợp nhạc nền nhẹ nhàng.
-4. **Chế độ Bão Thẻ Sinh Tồn (Endless Rising):**
-   - Cứ mỗi 20 giây, bàn cờ tự động đẩy thêm 1 hàng thẻ mới từ dưới lên. Nếu thẻ bị đẩy chạm nóc trên cùng thì ván chơi kết thúc.
-
----
-
-## 7. Hệ thống Combo & Trạng thái Quá Tải (Fever Mode)
-
-- **Chuỗi Combo:** Ghép thành công cặp tiếp theo trong vòng **2.5 giây** sẽ tăng cấp Combo (`x2`, `x3`, `x4`...).
-- **Trạng thái Quá Tải (Fever Mode):**
-  - Khi đạt chuỗi **Combo x5**, toàn màn hình kích hoạt hiệu ứng ánh sáng rực rỡ trong 8 giây:
-    - Điểm số và Xu nhận được nhân đôi (x2).
-    - Mọi đường nối đổi sang màu lửa cầu vồng rực sáng.
-    - Nhạc nền tăng tiết tấu vui nhộn, tạo cảm giác vô cùng phấn khích.
-
----
-
-## 8. Kiến trúc Kỹ thuật & Lộ trình Triển khai (Technical Blueprint)
+## 6. Kiến trúc Kỹ thuật
 
 ### A. Cấu trúc Module đề xuất:
 
@@ -126,8 +86,8 @@ Mỗi chủ đề có 5 thẻ đặc biệt ở thư mục `special/`. Khi xuấ
 js/
 ├── linkConnect/
 │   ├── pathfinder.js       # Thuật toán tìm đường trực giao tối đa 2 khúc gấp (BFS 2-turn)
-│   ├── linkBoard.js        # Khởi tạo ma trận bàn cờ, xử lý viền đệm và trọng lực
-│   ├── linkRenderer.js     # Vẽ đường nối canvas/SVG neon và hiệu ứng hạt nổ
+│   ├── linkBoard.js        # Khởi tạo ma trận bàn cờ và xử lý viền đệm
+│   ├── linkRenderer.js     # Vẽ đường nối SVG neon và hiệu ứng tan thẻ
 │   └── linkController.js   # Quản lý vòng đời màn chơi, combo, timer, deadlock check
 ```
 
@@ -149,14 +109,12 @@ function canConnect(startPos, endPos, grid) {
 ### C. Tự động kiểm tra Ngõ Cụt (Deadlock Prevention):
 
 - Sau mỗi nước đi, một hàm kiểm tra chạy ngầm (`hasAvailableMoves()`) sẽ quét nhanh xem còn ít nhất 1 cặp thẻ nào nối được không.
-- Nếu không còn cặp nào nối được, hệ thống tự động chạy hiệu ứng xoay lốc xoáy và xáo bài miễn phí (Smart Auto-Reshuffle) mà không làm gián đoạn ván chơi của người dùng.
+- Nếu không còn cặp nào nối được, hệ thống tự xáo bài miễn phí để ván chơi tiếp tục mà không làm gián đoạn người dùng.
 
 ---
 
-## 9. Kế hoạch từng giai đoạn (Implementation Roadmap)
+## 7. Phạm vi triển khai hiện tại
 
-1. **Giai đoạn 1 (Core Engine):** Xây dựng module thuật toán `pathfinder.js`, bàn cờ ma trận cơ bản, kiểm tra 0-1-2 khúc gấp và vẽ vệt sáng kết nối.
-2. **Giai đoạn 2 (Gameplay & UI):** Nối module với `themeCatalog.js`, tạo giao diện HUD Link Connect, hệ thống tính điểm, combo và timer.
-3. **Giai đoạn 3 (Vật phẩm & Trọng lực):** Tích hợp vật phẩm (Gợi ý, Xáo bài, Sấm sét) và các cơ chế dồn thẻ trọng lực.
-4. **Giai đoạn 4 (Chướng ngại vật & Màn chơi):** Thêm ô băng giá, khối đá, cổng không gian và xây dựng hệ thống 100 màn chơi Adventure.
-5. **Giai đoạn 5 (Âm thanh, FX & Đánh bóng):** Hoàn thiện âm thanh zap laser, hiệu ứng Fever mode và tối ưu hóa hiệu năng trên thiết bị di động.
+1. **Lõi trò chơi:** Thuật toán nối tối đa hai lần rẽ, vùng đệm ngoài biên, bàn cờ ma trận và tự phát hiện ngõ cụt.
+2. **Gameplay & giao diện:** Chủ đề ảnh dùng chung, HUD, điểm, combo, thời gian, Xu, popup đầu/cuối màn và bố cục responsive cho mobile.
+3. **Vật phẩm & thẻ đặc biệt:** Gợi ý, xáo trộn, sấm sét, đóng băng thời gian, thẻ đặc biệt, thẻ đóng băng, mốc thưởng và chế độ Thử thách.

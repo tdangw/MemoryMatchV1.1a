@@ -1,6 +1,6 @@
 import { getThemeCards } from "../themeCatalog.js";
 import { shuffleArray } from "../utils.js";
-import { getLinkFrozenTileCount, getLinkLuckyReward, isLinkChallengeMode, LINK_CONNECT_CONFIG } from "./linkConfig.js";
+import { getLinkFrozenPairCount, getLinkLuckyReward, isLinkChallengeMode, LINK_CONNECT_CONFIG } from "./linkConfig.js";
 import { hasAvailableConnection } from "./pathfinder.js";
 
 const MAX_SHUFFLE_ATTEMPTS = 100;
@@ -29,7 +29,7 @@ export function createLinkBoard({
   };
   board.grid = createPaddedGrid(board.rows, board.columns, tiles);
   shuffleIntoPlayableBoard(board);
-  freezeRandomTiles(board, level);
+  freezeRandomPairs(board, level);
   ensurePlayableBoard(board);
   return board;
 }
@@ -55,18 +55,20 @@ export function shuffleLinkBoard(board) {
   shuffleIntoPlayableBoard(board);
 }
 
-export function unlockFrozenLinkTiles(board, count = 1) {
-  const frozenPositions = getInteriorPositions(board)
-    .filter((position) => getLinkBoardTile(board, position)?.frozen);
-  shuffleArray(frozenPositions);
-  frozenPositions.slice(0, Math.max(0, count)).forEach((position) => {
-    replaceTile(board, position, { frozen: false });
+export function unlockFrozenLinkPairs(board, count = 1) {
+  const frozenPairs = getLinkPairs(board).filter((pair) => (
+    pair.positions.length === 2
+      && pair.positions.every((position) => getLinkBoardTile(board, position)?.frozen)
+  ));
+  shuffleArray(frozenPairs);
+  frozenPairs.slice(0, Math.max(0, count)).forEach((pair) => {
+    pair.positions.forEach((position) => replaceTile(board, position, { frozen: false }));
   });
-  return Math.min(frozenPositions.length, Math.max(0, count));
+  return Math.min(frozenPairs.length, Math.max(0, count));
 }
 
-export function unlockAllFrozenLinkTiles(board) {
-  return unlockFrozenLinkTiles(board, Number.POSITIVE_INFINITY);
+export function unlockAllFrozenLinkPairs(board) {
+  return unlockFrozenLinkPairs(board, Number.POSITIVE_INFINITY);
 }
 
 export function makeRandomLinkPairSpecial(board) {
@@ -134,14 +136,16 @@ function ensureSpecialPair(cards) {
   return cards.map((card, index) => index === 0 ? { ...card, special: true } : card);
 }
 
-function freezeRandomTiles(board, level) {
-  const count = getLinkFrozenTileCount(level);
-  const positions = getInteriorPositions(board).filter((position) => {
-    const tile = getLinkBoardTile(board, position);
-    return tile && !tile.special;
+function freezeRandomPairs(board, level) {
+  const count = getLinkFrozenPairCount(level);
+  const pairs = getLinkPairs(board).filter((pair) => (
+    pair.positions.length === 2
+      && pair.positions.every((position) => !getLinkBoardTile(board, position)?.special)
+  ));
+  shuffleArray(pairs);
+  pairs.slice(0, count).forEach((pair) => {
+    pair.positions.forEach((position) => replaceTile(board, position, { frozen: true }));
   });
-  shuffleArray(positions);
-  positions.slice(0, count).forEach((position) => replaceTile(board, position, { frozen: true }));
 }
 
 function createPaddedGrid(rows, columns, tiles) {

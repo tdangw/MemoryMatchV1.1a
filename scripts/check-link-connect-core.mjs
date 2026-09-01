@@ -10,7 +10,11 @@ import {
   getLinkModeLayout,
   getLinkTimerDirection,
 } from "../js/linkConnect/linkConfig.js";
-import { getActiveLinkConnectionEffect, LINK_CONNECTION_EFFECTS } from "../js/linkConnect/linkEffects.js";
+import {
+  getActiveLinkConnectionEffect,
+  LINK_EXIT_EFFECTS,
+  LINK_PATH_EFFECTS,
+} from "../js/linkConnect/linkEffects.js";
 
 const tile = (id) => ({ id });
 
@@ -53,7 +57,8 @@ assert.equal(getLinkChallengeLayout(10).tileCount, 24);
 assert.equal(getLinkTimerDirection("endless"), "up");
 assert.equal(calculateLinkMatchPoints(3), 16);
 assert.equal(calculateLinkMatchPoints(3, { special: true }), 24);
-assert.equal(getActiveLinkConnectionEffect().id, "electric");
-assert.equal(LINK_CONNECTION_EFFECTS.length, 4);
+assert.equal(getActiveLinkConnectionEffect({ linkPathEffect: "electric", linkExitEffect: "dissolve" }).pathClass, "link-path-overlay--electric");
+assert.equal(LINK_PATH_EFFECTS.length, 20);
+assert.equal(LINK_EXIT_EFFECTS.length, 20);
 
 console.log("Link Connect core checks passed.");

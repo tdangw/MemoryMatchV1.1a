@@ -1,19 +1,27 @@
 import { getActiveLinkConnectionEffect } from "./linkEffects.js";
+import { gameState } from "../gameState.js";
 
 const PATH_VIEWBOX = "0 0 100 100";
 const ELECTRIC_JITTER_PERCENT = 0.65;
 const ELECTRIC_SEGMENT_LENGTH_PERCENT = 7;
 const OUTER_ROUTE_INSET_PERCENT = 1.5;
 let layoutFrame;
+let layoutObserver;
+let observedGame;
 
 window.addEventListener("resize", () => {
+  scheduleLinkBoardLayout();
+});
+
+function scheduleLinkBoardLayout() {
   cancelAnimationFrame(layoutFrame);
   layoutFrame = requestAnimationFrame(updateLinkBoardLayout);
-});
+}
 
 export function renderLinkBoard(board, { onTileClick } = {}) {
   const container = document.getElementById("link-board");
   if (!container) return;
+  observeLinkBoardLayout(document.getElementById("link-connect-container"));
   container.style.setProperty("--link-columns", String(board.columns));
   container.style.setProperty("--link-rows", String(board.grid.length - 2));
   container.replaceChildren();
@@ -48,6 +56,14 @@ export function renderLinkBoard(board, { onTileClick } = {}) {
       image.src = tile.src;
       image.alt = "";
       button.append(image);
+      if (tile.frozen) {
+        const frostOverlay = document.createElement("img");
+        frostOverlay.className = "link-tile__frost-overlay";
+        frostOverlay.src = "/assets/images/ui/frozen-card-overlay.png";
+        frostOverlay.alt = "";
+        frostOverlay.setAttribute("aria-hidden", "true");
+        button.append(frostOverlay);
+      }
       button.addEventListener("click", () => onTileClick?.(position));
       cell.append(button);
       container.append(cell);
@@ -67,11 +83,318 @@ export function clearLinkTileSelection() {
 }
 
 export function playLinkMatchExit(start, end) {
-  const effect = getActiveLinkConnectionEffect();
+  const effect = getActiveLinkConnectionEffect(gameState.appearance);
   [start, end].forEach((position) => {
-    getLinkTileButton(position)?.classList.add("is-removing", effect.exitClass);
+    const tile = getLinkTileButton(position);
+    if (!tile) return;
+    tile.classList.add("is-removing", effect.exitClass);
+    playLinkCardExitEffect(tile, effect.exitId);
   });
 }
+
+const FRAGMENT_LAYOUTS = Object.freeze({
+  split2: Object.freeze({ columns: 2, rows: 1 }),
+  split4: Object.freeze({ columns: 2, rows: 2 }),
+  split8: Object.freeze({ columns: 4, rows: 2 }),
+  triangles: Object.freeze({ columns: 2, rows: 2, triangular: true }),
+  crumble: Object.freeze({ columns: 6, rows: 6 }),
+  pixel: Object.freeze({ columns: 5, rows: 5 }),
+});
+
+function playLinkCardExitEffect(tile, exitId) {
+  const source = tile.querySelector("img:not(.link-tile__frost-overlay)");
+  const frame = document.getElementById("link-board-frame");
+  if (!source?.complete || !source.naturalWidth || !frame) return;
+  const frameRect = frame.getBoundingClientRect();
+  const tileRect = tile.getBoundingClientRect();
+  const density = Math.min(window.devicePixelRatio || 1, 2);
+  const canvas = document.createElement("canvas");
+  canvas.className = "link-card-exit-effect";
+  canvas.width = Math.round(frameRect.width * density);
+  canvas.height = Math.round(frameRect.height * density);
+  canvas.style.width = `${frameRect.width}px`;
+  canvas.style.height = `${frameRect.height}px`;
+  const context = canvas.getContext("2d");
+  if (!context) return;
+  context.scale(density, density);
+  const bounds = {
+    x: tileRect.left - frameRect.left,
+    y: tileRect.top - frameRect.top,
+    width: tileRect.width,
+    height: tileRect.height,
+  };
+  const timing = readExitEffectTiming(tile);
+  const fragments = createCardExitFragments(bounds, exitId);
+  tile.classList.add("has-canvas-exit");
+  frame.append(canvas);
+  const startedAt = performance.now();
+  const draw = (now) => {
+    const elapsed = now - startedAt;
+    context.clearRect(0, 0, frameRect.width, frameRect.height);
+    if (elapsed >= timing.delayMs) {
+      const progress = Math.min((elapsed - timing.delayMs) / timing.durationMs, 1);
+      renderCardExitEffect(context, source, fragments, bounds, exitId, progress);
+    }
+    if (elapsed < timing.delayMs + timing.durationMs) requestAnimationFrame(draw);
+    else canvas.remove();
+  };
+  requestAnimationFrame(draw);
+}
+
+function createCardExitFragments(bounds, exitId) {
+  const layout = FRAGMENT_LAYOUTS[exitId];
+  if (layout) {
+    return Array.from({ length: layout.columns * layout.rows }, (_, index) => {
+      const column = index % layout.columns;
+      const row = Math.floor(index / layout.columns);
+      return {
+        x: bounds.x + (column * bounds.width) / layout.columns,
+        y: bounds.y + (row * bounds.height) / layout.rows,
+        width: bounds.width / layout.columns,
+        height: bounds.height / layout.rows,
+        column,
+        row,
+        columns: layout.columns,
+        rows: layout.rows,
+        triangle: layout.triangular && index % 2 === 1,
+        velocityX: (column - (layout.columns - 1) / 2) * 3.4 + randomFragmentOffset(1.8),
+        velocityY: (row - (layout.rows - 1) / 2) * 3.4 + randomFragmentOffset(1.8),
+        rotation: randomFragmentOffset(0.24),
+      };
+    });
+  }
+  const particleCount = exitId === "finedust" ? 64 : exitId === "dissolve" ? 42 : 1;
+  return Array.from({ length: particleCount }, () => ({
+    x: bounds.x + Math.random() * bounds.width,
+    y: bounds.y + Math.random() * bounds.height,
+    size: 1.5 + Math.random() * (exitId === "finedust" ? 3.5 : 6),
+    velocityX: randomFragmentOffset(3.6),
+    velocityY: -1.6 - Math.random() * 3.8,
+  }));
+}
+
+function renderCardExitEffect(context, image, fragments, bounds, exitId, progress) {
+  context.save();
+  if (exitId === "finedust" || exitId === "dissolve") {
+    fragments.forEach((fragment) => {
+      context.globalAlpha = Math.max(0, 1 - progress);
+      context.fillStyle = exitId === "finedust" ? "#d7f6ff" : "#7ee9ff";
+      context.shadowBlur = 8;
+      context.shadowColor = context.fillStyle;
+      context.beginPath();
+      context.arc(fragment.x + fragment.velocityX * progress * 16, fragment.y + fragment.velocityY * progress * 20, Math.max(.5, fragment.size * (1 - progress * .55)), 0, Math.PI * 2);
+      context.fill();
+    });
+  } else if (FRAGMENT_LAYOUTS[exitId]) {
+    fragments.forEach((fragment) => drawImageFragment(context, image, fragment, progress));
+  } else {
+    drawWholeCardEffect(context, image, bounds, exitId, progress);
+  }
+  context.restore();
+}
+
+function drawImageFragment(context, image, fragment, progress) {
+  const x = fragment.x + fragment.velocityX * progress * 15;
+  const y = fragment.y + fragment.velocityY * progress * 15 + (fragment.rows >= 6 ? progress * progress * 38 : 0);
+  context.save();
+  context.globalAlpha = Math.max(0, 1 - progress * 1.14);
+  context.translate(x + fragment.width / 2, y + fragment.height / 2);
+  context.rotate(fragment.rotation * progress * 12);
+  if (fragment.triangle) {
+    context.beginPath();
+    context.moveTo(-fragment.width / 2, -fragment.height / 2);
+    context.lineTo(fragment.width / 2, -fragment.height / 2);
+    context.lineTo(-fragment.width / 2, fragment.height / 2);
+    context.closePath();
+    context.clip();
+  }
+  context.drawImage(
+    image,
+    (fragment.column * image.naturalWidth) / fragment.columns,
+    (fragment.row * image.naturalHeight) / fragment.rows,
+    image.naturalWidth / fragment.columns,
+    image.naturalHeight / fragment.rows,
+    -fragment.width / 2,
+    -fragment.height / 2,
+    fragment.width,
+    fragment.height,
+  );
+  context.restore();
+}
+
+function drawWholeCardEffect(context, image, bounds, exitId, progress) {
+  const centerX = bounds.x + bounds.width / 2;
+  const centerY = bounds.y + bounds.height / 2;
+  const effect = getWholeCardEffectTransform(exitId, progress, bounds);
+  context.save();
+  context.globalAlpha = effect.opacity;
+  context.translate(centerX + effect.x, centerY + effect.y);
+  context.rotate(effect.rotation);
+  context.scale(effect.scaleX, effect.scaleY);
+  context.filter = effect.filter;
+  context.drawImage(image, -bounds.width / 2, -bounds.height / 2, bounds.width, bounds.height);
+  context.restore();
+  if (["portal", "blackhole", "electric-shock", "bubble"].includes(exitId)) {
+    context.save();
+    context.globalAlpha = Math.max(0, 1 - progress);
+    context.strokeStyle = exitId === "electric-shock" ? "#c8f7ff" : "#b493ff";
+    context.lineWidth = Math.max(1, 4 * (1 - progress));
+    context.beginPath();
+    context.arc(centerX, centerY, Math.max(bounds.width, bounds.height) * progress, 0, Math.PI * 2);
+    context.stroke();
+    context.restore();
+  }
+}
+
+function getWholeCardEffectTransform(exitId, progress, bounds) {
+  const standard = { x: 0, y: 0, rotation: 0, scaleX: 1 - progress * .42, scaleY: 1 - progress * .42, opacity: 1 - progress, filter: "none" };
+  if (exitId === "gravity") return { ...standard, y: progress * progress * bounds.height * 2.6, rotation: progress * .45 };
+  if (exitId === "ghost") return { ...standard, y: -progress * bounds.height * 1.5, scaleX: 1 - progress * .2, scaleY: 1 - progress * .2, filter: "blur(2px) saturate(.45)" };
+  if (exitId === "slice") return { ...standard, x: progress * bounds.width * .42, y: -progress * bounds.height * .32, rotation: progress * .3 };
+  if (exitId === "portal" || exitId === "blackhole" || exitId === "implode") return { ...standard, rotation: progress * Math.PI * 4, scaleX: Math.max(0, 1 - progress * 1.35), scaleY: Math.max(0, 1 - progress * 1.35) };
+  if (exitId === "burn") return { ...standard, y: -progress * bounds.height * .55, filter: "sepia(1) saturate(2.3) hue-rotate(-24deg) brightness(1.5)" };
+  if (exitId === "freeze") return { ...standard, scaleX: 1 + Math.sin(progress * 30) * .06, scaleY: 1 + Math.cos(progress * 27) * .06, filter: "saturate(.35) brightness(1.7)" };
+  if (exitId === "bubble") return { ...standard, scaleX: 1 + progress * .7, scaleY: 1 + progress * .7 };
+  if (exitId === "origami") return { ...standard, rotation: progress * Math.PI / 2, scaleX: Math.max(0, 1 - progress * .8) };
+  if (exitId === "electric-shock") return { ...standard, x: Math.sin(progress * 46) * bounds.width * .08, filter: "brightness(2) saturate(1.7)" };
+  return standard;
+}
+
+function readExitEffectTiming(tile) {
+  const style = getComputedStyle(tile);
+  return {
+    delayMs: Number.parseFloat(style.getPropertyValue("--link-tile-exit-delay")) || 0,
+    durationMs: Number.parseFloat(style.getPropertyValue("--link-tile-exit-duration")) || 520,
+  };
+}
+
+function randomFragmentOffset(range) {
+  return (Math.random() * 2 - 1) * range;
+}
+
+const THUNDER_COLORS = Object.freeze({
+  yellow: Object.freeze({ main: "#facc15", glow: "#fde047", shadow: "#eab308" }),
+  blue: Object.freeze({ main: "#22d3ee", glow: "#67e8f9", shadow: "#0891b2" }),
+  red: Object.freeze({ main: "#ef4444", glow: "#fca5a5", shadow: "#dc2626" }),
+});
+
+export function playLinkThunderStrike(positions, colorId = "yellow") {
+  const frame = document.getElementById("link-board-frame");
+  if (!frame) return null;
+  const frameRect = frame.getBoundingClientRect();
+  const density = Math.min(window.devicePixelRatio || 1, 2);
+  const effect = document.createElement("canvas");
+  effect.className = "link-thunder-strike";
+  effect.width = Math.round(frameRect.width * density);
+  effect.height = Math.round(frameRect.height * density);
+  effect.style.width = `${frameRect.width}px`;
+  effect.style.height = `${frameRect.height}px`;
+  const context = effect.getContext("2d");
+  if (!context) return null;
+  context.scale(density, density);
+  const targets = positions.flatMap((position) => {
+    const tile = getLinkTileButton(position);
+    if (!tile) return [];
+    const tileRect = tile.getBoundingClientRect();
+    return [{
+      x: tileRect.left - frameRect.left + tileRect.width / 2,
+      y: tileRect.top - frameRect.top + tileRect.height / 2,
+      size: Math.min(tileRect.width, tileRect.height),
+      arcDirection: Math.random() < .5 ? -1 : 1,
+    }];
+  });
+  if (!targets.length) return null;
+  const palette = THUNDER_COLORS[colorId] || THUNDER_COLORS.yellow;
+  const startedAt = performance.now();
+  const duration = readThunderDuration(frame);
+  const draw = (now) => {
+    const progress = Math.min((now - startedAt) / duration, 1);
+    context.clearRect(0, 0, frameRect.width, frameRect.height);
+    targets.forEach((target) => drawThunderBolt(context, target, palette, progress));
+    if (progress < 1 && effect.isConnected) requestAnimationFrame(draw);
+  };
+  frame.append(effect);
+  requestAnimationFrame(draw);
+  return effect;
+}
+
+export function clearLinkThunderStrikes() {
+  document.querySelectorAll(".link-thunder-strike").forEach((effect) => effect.remove());
+}
+
+function drawThunderBolt(context, target, palette, progress) {
+  const intensity = Math.max(0, 1 - progress * .72) * (.82 + Math.random() * .18);
+  const points = createThunderCanvasPath(target);
+  drawThunderStroke(context, points, palette.glow, target.size * .21, intensity * .38, 24, palette.shadow);
+  drawThunderStroke(context, points, palette.main, Math.max(4, target.size * .085), intensity, 12, palette.shadow);
+  drawThunderStroke(context, points, "#ffffff", Math.max(1.5, target.size * .031), intensity, 0);
+  drawThunderBranches(context, points, target, palette, intensity);
+  drawThunderImpact(context, target, palette, progress, intensity);
+}
+
+function createThunderCanvasPath(target) {
+  const steps = Math.max(9, Math.round(target.y / 16));
+  const curve = target.arcDirection * target.size * .32;
+  return Array.from({ length: steps + 1 }, (_, index) => {
+    const progress = index / steps;
+    if (index === 0) return { x: target.x + randomThunderOffset(target.size * .12), y: 0 };
+    if (index === steps) return { x: target.x, y: target.y };
+    const taper = Math.sin(progress * Math.PI);
+    return {
+      x: target.x + curve * taper + randomThunderOffset(target.size * .16 * taper),
+      y: target.y * progress,
+    };
+  });
+}
+
+function drawThunderStroke(context, points, color, width, alpha, blur, shadowColor = color) {
+  context.save();
+  context.beginPath();
+  context.moveTo(points[0].x, points[0].y);
+  points.slice(1).forEach((point) => context.lineTo(point.x, point.y));
+  context.strokeStyle = color;
+  context.lineWidth = width;
+  context.lineCap = "round";
+  context.lineJoin = "round";
+  context.shadowColor = shadowColor;
+  context.shadowBlur = blur;
+  context.globalAlpha = alpha;
+  context.stroke();
+  context.restore();
+}
+
+function drawThunderBranches(context, points, target, palette, intensity) {
+  points.slice(2, -2).forEach((point, index) => {
+    if (index % 3 || Math.random() > .58) return;
+    const length = target.size * (.25 + Math.random() * .24);
+    const end = { x: point.x + target.arcDirection * length, y: point.y + target.size * (.12 + Math.random() * .2) };
+    drawThunderStroke(context, [point, { x: (point.x + end.x) / 2 + randomThunderOffset(7), y: (point.y + end.y) / 2 }, end], palette.main, Math.max(1.2, target.size * .035), intensity * .7, 5, palette.shadow);
+  });
+}
+
+function drawThunderImpact(context, target, palette, progress, intensity) {
+  const radius = target.size * (.16 + progress * .48);
+  context.save();
+  context.globalAlpha = intensity * .8;
+  context.fillStyle = "#ffffff";
+  context.shadowColor = palette.main;
+  context.shadowBlur = 18;
+  context.beginPath();
+  context.arc(target.x, target.y, Math.max(4, target.size * .115 * (1 - progress * .45)), 0, Math.PI * 2);
+  context.fill();
+  context.strokeStyle = palette.glow;
+  context.lineWidth = Math.max(1, target.size * .025);
+  context.beginPath();
+  context.arc(target.x, target.y, radius, 0, Math.PI * 2);
+  context.stroke();
+  context.restore();
+}
+
+function readThunderDuration(frame) {
+  return Number.parseFloat(getComputedStyle(frame).getPropertyValue("--link-thunder-strike-duration")) || 620;
+}
+
+function randomThunderOffset(range) { return (Math.random() * 2 - 1) * range; }
 
 // Giữ nguyên các thẻ còn lại sau khi ghép đúng để tránh nháy do dựng lại ảnh.
 export function clearLinkMatchedPair(start, end) {
@@ -90,7 +413,7 @@ export function drawLinkPath(path, board) {
   const points = path.map((position) => toPercentPoint(position, board, boardElement));
   if (points.some((point) => !point)) return;
   const electricPoints = createElectricPoints(points);
-  const effect = getActiveLinkConnectionEffect();
+  const effect = getActiveLinkConnectionEffect(gameState.appearance);
   const serializedPoints = electricPoints.map(({ x, y }) => `${x},${y}`).join(" ");
   svg.setAttribute("viewBox", PATH_VIEWBOX);
   svg.setAttribute("preserveAspectRatio", "none");
@@ -190,6 +513,14 @@ function readBoardGap(boardElement) {
   return Number.parseFloat(getComputedStyle(boardElement).gap) || 0;
 }
 
+function observeLinkBoardLayout(game) {
+  if (!game || observedGame === game || typeof ResizeObserver === "undefined") return;
+  layoutObserver?.disconnect();
+  layoutObserver = new ResizeObserver(scheduleLinkBoardLayout);
+  layoutObserver.observe(game);
+  observedGame = game;
+}
+
 function updateLinkBoardLayout() {
   const game = document.getElementById("link-connect-container");
   const board = document.getElementById("link-board");
@@ -203,9 +534,9 @@ function updateLinkBoardLayout() {
   const boardStyles = getComputedStyle(board);
   const gameStyles = getComputedStyle(game);
   const gap = readBoardGap(board);
-  const horizontalPadding = Number.parseFloat(boardStyles.paddingLeft) || 0;
-  const verticalPadding = Number.parseFloat(boardStyles.paddingTop) || 0;
-  const gamePadding = (Number.parseFloat(gameStyles.paddingTop) || 0)
+  const boardHorizontalInsets = readHorizontalInsets(boardStyles);
+  const boardVerticalInsets = readVerticalInsets(boardStyles);
+  const gameVerticalPadding = (Number.parseFloat(gameStyles.paddingTop) || 0)
     + (Number.parseFloat(gameStyles.paddingBottom) || 0);
   const boardSafeInset = Number.parseFloat(gameStyles.getPropertyValue("--link-board-safe-inset")) || 0;
   const gameGap = Number.parseFloat(gameStyles.rowGap) || 0;
@@ -217,19 +548,37 @@ function updateLinkBoardLayout() {
   ].reduce((total, selector) => total + (game.querySelector(selector)?.getBoundingClientRect().height || 0), 0);
   const horizontalGamePadding = (Number.parseFloat(gameStyles.paddingLeft) || 0)
     + (Number.parseFloat(gameStyles.paddingRight) || 0);
+  const maxBoardWidth = Number.parseFloat(gameStyles.getPropertyValue("--link-content-max-width")) || Infinity;
   const availableWidth = Math.min(
-    700,
+    maxBoardWidth,
     Math.max(0, game.clientWidth - horizontalGamePadding - boardSafeInset * 2),
   );
+  const gridGapCount = Math.max(0, game.children.length - 1);
   const availableHeight = Math.max(
-    168,
-    window.innerHeight - chromeHeight - gamePadding - gameGap * 4 - boardSafeInset,
+    0,
+    game.clientHeight - gameVerticalPadding - chromeHeight - gameGap * gridGapCount,
   );
-  const tileByWidth = (availableWidth - horizontalPadding * 2 - gap * (columns - 1)) / columns;
-  const tileByHeight = (availableHeight - verticalPadding * 2 - gap * (rows - 1)) / rows;
-  const tileSize = Math.max(28, Math.floor(Math.min(tileByWidth, tileByHeight)));
-  const boardWidth = tileSize * columns + gap * (columns - 1) + horizontalPadding * 2;
+  const tileByWidth = (availableWidth - boardHorizontalInsets - gap * (columns - 1)) / columns;
+  const tileByHeight = (availableHeight - boardVerticalInsets - gap * (rows - 1)) / rows;
+  const tileSize = Math.min(tileByWidth, tileByHeight);
+  if (!Number.isFinite(tileSize) || tileSize <= 0) return;
+  const fittedTileSize = Math.floor(tileSize * 1000) / 1000;
+  const boardWidth = fittedTileSize * columns + gap * (columns - 1) + boardHorizontalInsets;
 
-  board.style.setProperty("--link-tile-size", `${tileSize}px`);
+  board.style.setProperty("--link-tile-size", `${fittedTileSize}px`);
   frame.style.width = `${boardWidth}px`;
+}
+
+function readHorizontalInsets(styles) {
+  return (Number.parseFloat(styles.paddingLeft) || 0)
+    + (Number.parseFloat(styles.paddingRight) || 0)
+    + (Number.parseFloat(styles.borderLeftWidth) || 0)
+    + (Number.parseFloat(styles.borderRightWidth) || 0);
+}
+
+function readVerticalInsets(styles) {
+  return (Number.parseFloat(styles.paddingTop) || 0)
+    + (Number.parseFloat(styles.paddingBottom) || 0)
+    + (Number.parseFloat(styles.borderTopWidth) || 0)
+    + (Number.parseFloat(styles.borderBottomWidth) || 0);
 }

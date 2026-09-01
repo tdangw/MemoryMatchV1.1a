@@ -123,11 +123,19 @@
   gap: 12px;
 }
 .shop-tabs {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  display: flex;
   gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.shop-tabs::-webkit-scrollbar {
+  display: none;
 }
 .shop-tab {
+  flex: 0 0 auto;
+  min-width: 102px;
   min-height: 34px;
   border: 1px solid rgb(255 255 255 / 13%);
   border-radius: 10px;
@@ -307,6 +315,23 @@
   border-radius: 10px;
   box-shadow: 0 3px 8px rgb(0 0 0 / 25%);
 }
+.link-effect-preview {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 20%);
+  border-radius: 10px;
+  background: linear-gradient(145deg, #1e416c, #102541);
+  color: #9ae8ff;
+  box-shadow: 0 3px 8px rgb(0 0 0 / 25%);
+}
+.link-effect-preview .ui-icon { width: 25px; height: 25px; filter: drop-shadow(0 0 5px currentColor); }
+.link-effect-preview.link-path-overlay--fire, .link-effect-preview.link-tile--burn { color: #ffb15e; background: linear-gradient(145deg, #6d3924, #1a2038); }
+.link-effect-preview.link-path-overlay--magic, .link-effect-preview.link-path-overlay--plasma, .link-effect-preview.link-tile--portal, .link-effect-preview.link-tile--blackhole { color: #d8a7ff; background: linear-gradient(145deg, #4d2e73, #172144); }
+.link-effect-preview.link-path-overlay--rainbow, .link-effect-preview.link-path-overlay--holy, .link-effect-preview.link-tile--bubble { color: #ffe39b; background: linear-gradient(145deg, #5b4b91, #254b6d); }
+.link-effect-preview.link-path-overlay--poison, .link-effect-preview.link-path-overlay--matrix, .link-effect-preview.link-tile--freeze { color: #86f1b3; background: linear-gradient(145deg, #174d48, #172d43); }
 .appearance-effect-preview {
   border: 1px solid rgb(255 255 255 / 20%);
   background: linear-gradient(145deg, #5277ba, #253c70);

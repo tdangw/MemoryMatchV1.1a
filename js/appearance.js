@@ -1,11 +1,16 @@
 import { THEMES, getTheme, getUsableTheme } from "./themeCatalog.js";
+import { LINK_EXIT_EFFECTS, LINK_PATH_EFFECTS } from "./linkConnect/linkEffects.js";
 
 const DEFAULT_APPEARANCE = Object.freeze({
   cardBack: "classic",
   flipEffect: "bounce",
+  linkPathEffect: "electric",
+  linkExitEffect: "dissolve",
   themes: Object.freeze({ memoryMatch: "default", linkConnect: "default" }),
   ownedCardBacks: ["classic"],
   ownedFlipEffects: ["bounce"],
+  ownedLinkPathEffects: ["electric"],
+  ownedLinkExitEffects: ["dissolve"],
   ownedThemes: ["default"],
 });
 
@@ -93,6 +98,16 @@ export function normalizeAppearance(value = {}) {
     value.ownedFlipEffects,
     DEFAULT_APPEARANCE.flipEffect,
   );
+  const ownedLinkPathEffects = ownedIds(
+    LINK_PATH_EFFECTS,
+    value.ownedLinkPathEffects,
+    DEFAULT_APPEARANCE.linkPathEffect,
+  );
+  const ownedLinkExitEffects = ownedIds(
+    LINK_EXIT_EFFECTS,
+    value.ownedLinkExitEffects,
+    DEFAULT_APPEARANCE.linkExitEffect,
+  );
   const cardBack = knownId(
     CARD_BACKS,
     value.cardBack,
@@ -103,6 +118,8 @@ export function normalizeAppearance(value = {}) {
     value.flipEffect,
     DEFAULT_APPEARANCE.flipEffect,
   );
+  const linkPathEffect = knownId(LINK_PATH_EFFECTS, value.linkPathEffect, DEFAULT_APPEARANCE.linkPathEffect);
+  const linkExitEffect = knownId(LINK_EXIT_EFFECTS, value.linkExitEffect, DEFAULT_APPEARANCE.linkExitEffect);
   const ownedThemes = normalizeOwnedThemes(value);
   const themes = normalizeEquippedThemes(value, ownedThemes);
   return {
@@ -112,9 +129,17 @@ export function normalizeAppearance(value = {}) {
     flipEffect: ownedFlipEffects.includes(flipEffect)
       ? flipEffect
       : DEFAULT_APPEARANCE.flipEffect,
+    linkPathEffect: ownedLinkPathEffects.includes(linkPathEffect)
+      ? linkPathEffect
+      : DEFAULT_APPEARANCE.linkPathEffect,
+    linkExitEffect: ownedLinkExitEffects.includes(linkExitEffect)
+      ? linkExitEffect
+      : DEFAULT_APPEARANCE.linkExitEffect,
     themes,
     ownedCardBacks,
     ownedFlipEffects,
+    ownedLinkPathEffects,
+    ownedLinkExitEffects,
     ownedThemes,
   };
 }

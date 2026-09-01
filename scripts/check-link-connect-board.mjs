@@ -6,8 +6,8 @@ import {
   makeRandomLinkPairSpecial,
   removeLinkBoardPair,
   removeRandomLinkPair,
-  unlockAllFrozenLinkTiles,
-  unlockFrozenLinkTiles,
+  unlockAllFrozenLinkPairs,
+  unlockFrozenLinkPairs,
 } from "../js/linkConnect/linkBoard.js";
 import { hasAvailableConnection } from "../js/linkConnect/pathfinder.js";
 
@@ -58,11 +58,14 @@ const specialBoard = createLinkBoard({
   cardProvider: () => cards,
 });
 assert.equal(getRemainingLinkTiles(specialBoard).filter((tile) => tile.special).length, 2);
-assert.equal(getRemainingLinkTiles(specialBoard).filter((tile) => tile.frozen).length, 1);
-assert.equal(unlockFrozenLinkTiles(specialBoard), 1);
+const frozenTiles = getRemainingLinkTiles(specialBoard).filter((tile) => tile.frozen);
+assert.equal(frozenTiles.length, 2);
+assert.equal(new Set(frozenTiles.map((tile) => tile.id)).size, 1);
+assert.equal(frozenTiles.some((tile) => tile.special), false);
+assert.equal(unlockFrozenLinkPairs(specialBoard), 1);
 assert.equal(getRemainingLinkTiles(specialBoard).filter((tile) => tile.frozen).length, 0);
 assert.ok(makeRandomLinkPairSpecial(specialBoard));
 assert.ok(removeRandomLinkPair(specialBoard));
-assert.equal(unlockAllFrozenLinkTiles(specialBoard), 0);
+assert.equal(unlockAllFrozenLinkPairs(specialBoard), 0);
 
 console.log("Link Connect board checks passed.");
