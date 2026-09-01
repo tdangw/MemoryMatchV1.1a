@@ -151,7 +151,7 @@ function showLinkSessionPicker(onContinue) {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "difficulty-option";
-    button.textContent = `${modeLabel(session.mode)} · Cấp ${session.level}`;
+    button.append(createIcon(modeIcon(session.mode)), document.createTextNode(`${modeLabel(session.mode)} - Level ${session.level}`));
     button.onclick = () => {
       modal.close();
       setTimeout(() => onContinue(session), 180);
@@ -168,6 +168,10 @@ function showLinkSessionPicker(onContinue) {
 
 function modeLabel(mode) {
   return ({ easy: "Dễ", normal: "Trung bình", hard: "Khó", superHard: "Siêu khó", endless: "Vô tận", challenge: "Thử thách" })[mode] || mode;
+}
+
+function modeIcon(mode) {
+  return ({ easy: "status-easy", normal: "status-normal", hard: "status-hard", superHard: "status-super-hard", endless: "timer", challenge: "trophy" })[mode] || "play";
 }
 
 function createMenuOverlay(variant) {
