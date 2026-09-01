@@ -29,7 +29,8 @@ import {
 } from "./linkRenderer.js";
 import { beginLinkRound, linkGameState, resetLinkGame } from "./linkState.js";
 
-const LINK_MATCH_DELAY_MS = 760;
+// Đồng bộ với CSS: tia hoàn tất trước, sau đó mới bắt đầu hiệu ứng tan thẻ.
+const LINK_MATCH_DELAY_MS = 1020;
 let countdownInterval;
 let selectedPosition = null;
 let navigation = { showMenu: () => {}, showCollection: () => {} };

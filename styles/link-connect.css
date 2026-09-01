@@ -138,11 +138,11 @@
 
 .link-tile.is-removing {
   pointer-events: none;
-  animation: link-tile-dissolve 760ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+  animation: link-tile-dissolve 320ms cubic-bezier(0.2, 0.75, 0.25, 1) 680ms both;
 }
 
 .link-tile.is-removing img {
-  animation: link-tile-image-dissolve 760ms ease-in both;
+  animation: link-tile-image-dissolve 320ms ease-in 680ms both;
 }
 
 .link-path-overlay {
