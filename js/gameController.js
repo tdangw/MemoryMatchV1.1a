@@ -58,6 +58,7 @@ export function initializeLevel(level) {
   stopCountdown();
   pauseBackgroundMusic();
   isAutoPaused = false;
+  document.getElementById("menu-container")?.remove();
   document.body.classList.remove("game-is-paused");
   const gameContainer = document.getElementById("game-container");
   if (gameContainer) gameContainer.style.display = "flex";
