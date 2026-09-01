@@ -5,6 +5,7 @@ const PROGRESS_KEYS = Object.freeze({
   "memory-match": "memoryMatch",
   "link-connect": "linkConnect",
 });
+const MODE_ORDER = Object.freeze(["easy", "normal", "hard", "superHard", "endless", "challenge"]);
 
 export function getActiveSession(gameId, mode) {
   const key = PROGRESS_KEYS[gameId];
@@ -14,7 +15,9 @@ export function getActiveSession(gameId, mode) {
 
 export function getActiveSessions(gameId) {
   const key = PROGRESS_KEYS[gameId];
-  return key ? Object.values(gameState.progress[key]?.sessionsByMode || {}) : [];
+  if (!key) return [];
+  const sessions = gameState.progress[key]?.sessionsByMode || {};
+  return MODE_ORDER.map((mode) => sessions[mode]).filter(Boolean);
 }
 
 export function saveActiveSession(gameId, session) {
