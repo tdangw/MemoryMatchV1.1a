@@ -1,4 +1,6 @@
 const PATH_VIEWBOX = "0 0 100 100";
+const ELECTRIC_JITTER_PERCENT = 0.65;
+const ELECTRIC_SEGMENT_LENGTH_PERCENT = 7;
 
 export function renderLinkBoard(board, { onTileClick } = {}) {
   const container = document.getElementById("link-board");
@@ -56,15 +58,17 @@ export function drawLinkPath(path, board) {
   if (!svg || !boardElement || !path) return;
   const points = path.map((position) => toPercentPoint(position, board, boardElement));
   if (points.some((point) => !point)) return;
+  const electricPoints = createElectricPoints(points);
+  const serializedPoints = electricPoints.map(({ x, y }) => `${x},${y}`).join(" ");
   svg.setAttribute("viewBox", PATH_VIEWBOX);
   svg.setAttribute("preserveAspectRatio", "none");
   svg.replaceChildren();
   const glow = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
-  glow.setAttribute("points", points.map(({ x, y }) => `${x},${y}`).join(" "));
+  glow.setAttribute("points", serializedPoints);
   glow.setAttribute("pathLength", "1");
   glow.classList.add("link-path-overlay__glow");
   const polyline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
-  polyline.setAttribute("points", points.map(({ x, y }) => `${x},${y}`).join(" "));
+  polyline.setAttribute("points", serializedPoints);
   polyline.setAttribute("pathLength", "1");
   polyline.classList.add("link-path-overlay__beam");
   svg.append(glow, polyline);
@@ -112,6 +116,30 @@ function toPercent(cellRect, boardRect) {
     x: ((cellRect.left + cellRect.width / 2 - boardRect.left) / boardRect.width) * 100,
     y: ((cellRect.top + cellRect.height / 2 - boardRect.top) / boardRect.height) * 100,
   };
+}
+
+function createElectricPoints(points) {
+  return points.flatMap((point, index) => {
+    if (index === points.length - 1) return [point];
+    const next = points[index + 1];
+    const horizontal = Math.abs(next.x - point.x) >= Math.abs(next.y - point.y);
+    const distance = horizontal ? Math.abs(next.x - point.x) : Math.abs(next.y - point.y);
+    const steps = Math.max(2, Math.round(distance / ELECTRIC_SEGMENT_LENGTH_PERCENT));
+    const segmentPoints = index === 0 ? [point] : [];
+    for (let step = 1; step < steps; step += 1) {
+      const progress = step / steps;
+      const jitter = (Math.random() * 2 - 1) * ELECTRIC_JITTER_PERCENT;
+      segmentPoints.push(horizontal
+        ? { x: interpolate(point.x, next.x, progress), y: point.y + jitter }
+        : { x: point.x + jitter, y: interpolate(point.y, next.y, progress) });
+    }
+    segmentPoints.push(next);
+    return segmentPoints;
+  });
+}
+
+function interpolate(start, end, progress) {
+  return start + (end - start) * progress;
 }
 
 function readBoardGap(boardElement) {
