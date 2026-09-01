@@ -31,6 +31,7 @@ import {
 import { findAvailableConnections, findConnectionPath } from "./pathfinder.js";
 import { consumeLinkItem, getLinkItemCount, grantLinkItem, LINK_ITEMS } from "./linkItems.js";
 import { clearActiveSession, getActiveSession, saveActiveSession } from "../sessionProgress.js";
+import { showLevelRewardOverlay, showLevelSummaryOverlay } from "../ui.js";
 import {
   clearLinkPath,
   clearLinkTileSelection,
@@ -115,7 +116,7 @@ function chooseLinkMode(mode, label, difficultyModal) {
   openAppModal({
     id: "link-session-choice-modal",
     icon: "play",
-    title: `${label} đang ở cấp ${session.level}`,
+    title: `${label} - Level ${session.level}`,
     content: "<p>Bạn muốn tiếp tục hành trình đã lưu hay bắt đầu lại từ cấp 1?</p>",
     actions: [
       {
@@ -165,8 +166,20 @@ export function startLinkLevel({ mode = linkGameState.mode, level = 1, resume = 
   showLinkGame();
   renderLinkBoard(board, { onTileClick: handleLinkTileClick });
   updateLinkHud();
-  linkGameState.isLocked = false;
-  startCountdown(roundId);
+  linkGameState.isLocked = true;
+  showLevelRewardOverlay({
+    level,
+    mode,
+    themeId: getEquippedThemeId(gameState.appearance, "link-connect"),
+    totalPairs: linkGameState.totalPairs,
+    remainingTime: linkGameState.remainingTime,
+    assistText: `Vật phẩm: ${getLinkItemCount("hint")} gợi ý`,
+    onComplete: () => {
+      if (linkGameState.roundId !== roundId) return;
+      linkGameState.isLocked = false;
+      startCountdown(roundId);
+    },
+  });
 }
 
 export function continueLinkSession(session) {
@@ -444,30 +457,20 @@ function completeLinkLevel() {
   const coinsEarned = calculateLinkCoinReward(linkGameState.mode, linkGameState.remainingTime);
   increaseCoins(coinsEarned);
   saveCoins(gameState.coins);
-  const content = document.createElement("div");
-  content.className = "level-summary";
-  content.innerHTML = `
-    <h3 class="level-summary__heading">Hoàn thành Màn ${linkGameState.level}!</h3>
-    <div class="level-summary__result"><strong class="level-summary__score">${linkGameState.score.toLocaleString("vi-VN")} ĐIỂM</strong></div>
-    <div class="level-summary__stats">
-      <div class="level-summary__stat summary-coins"><span>XU NHẬN</span><strong>+${coinsEarned}</strong></div>
-      <div class="level-summary__stat summary-time"><span>${isLinkEndlessMode(linkGameState.mode) ? "THỜI GIAN ĐÃ CHƠI" : "THỜI GIAN CÒN LẠI"}</span><strong>${formatTime(linkGameState.remainingTime)}</strong></div>
-      <div class="level-summary__stat"><span>SỐ NƯỚC ĐI</span><strong>${linkGameState.moves}</strong></div>
-      <div class="level-summary__stat summary-misses"><span>LƯỢT SAI</span><strong>${linkGameState.misses}</strong></div>
-      ${linkGameState.luckyAwards.length ? `<div class="level-summary__stat"><span>Ô MAY MẮN</span><strong>${formatLuckyAwards()}</strong></div>` : ""}
-    </div>`;
-  const modal = openAppModal({
-    id: "link-level-summary-modal",
-    showHeader: false,
-    dismissible: false,
-    closeOnBackdrop: false,
-    content,
-    actions: [
-      { label: "Menu", icon: "home", onClick: () => returnToLinkMenu() },
-      { label: "Màn tiếp", icon: "arrow-right", variant: "primary", onClick: () => startLinkLevel({ mode: linkGameState.mode, level: linkGameState.level + 1 }) },
-    ],
+  showLevelSummaryOverlay({
+    level: linkGameState.level,
+    remainingTime: linkGameState.remainingTime,
+    moves: linkGameState.moves,
+    misses: linkGameState.misses,
+    coinsEarned,
+    score: linkGameState.score,
+    stars: calculateLinkStars(),
+    timeBonus: 0,
+    luckyAwards: linkGameState.luckyAwards,
+    settings: { mode: linkGameState.mode },
+    onMenu: returnToLinkMenu,
+    onNext: () => startLinkLevel({ mode: linkGameState.mode, level: linkGameState.level + 1 }),
   });
-  modal.panel.classList.add("level-summary-modal");
 }
 
 function applyLinkLuckyReward(reward) {
@@ -490,15 +493,13 @@ function playLinkSound(name) {
   sound.play().catch(() => {});
 }
 
-function formatLuckyAwards() {
-  const totals = linkGameState.luckyAwards.reduce((result, reward) => {
-    result[reward.type] = (result[reward.type] || 0) + reward.value;
-    return result;
-  }, {});
-  return [
-    totals.coins && `+${totals.coins} Xu`,
-    totals.time && `+${totals.time}s`,
-  ].filter(Boolean).join(" · ");
+function calculateLinkStars() {
+  const pairCount = Math.max(1, linkGameState.totalPairs);
+  const targets = isLinkEndlessMode(linkGameState.mode) ? [10, 15, 20] : [12, 18, 25];
+  const score = linkGameState.score;
+  return score >= pairCount * targets[2] ? 3
+    : score >= pairCount * targets[1] ? 2
+      : score >= pairCount * targets[0] ? 1 : 0;
 }
 
 function startCountdown(roundId) {

@@ -276,7 +276,7 @@ function showSessionChoice({ label, session, onContinue, onNew }) {
   openAppModal({
     id: "session-choice-modal",
     icon: "play",
-    title: `${label} đang ở cấp ${session.level}`,
+    title: `${label} - Level ${session.level}`,
     content: "<p>Bạn muốn tiếp tục hành trình đã lưu hay bắt đầu lại từ cấp 1?</p>",
     actions: [
       { label: "Tiếp tục", icon: "play", onClick: onContinue },

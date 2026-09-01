@@ -151,7 +151,15 @@ export function showLuckyRewardPopup(reward) {
   }, 1500);
 }
 // Thưởng qua màn
-export function showLevelRewardOverlay() {
+export function showLevelRewardOverlay({
+  level = gameState.currentLevel,
+  mode = gameState.settings.mode || "easy",
+  themeId = getEquippedThemeId(gameState.appearance),
+  totalPairs = gameState.totalPairs,
+  remainingTime = gameState.remainingTime,
+  assistText = `Gợi ý: ${gameState.hints}`,
+  onComplete = () => {},
+} = {}) {
   // 🔄 Xoá overlay cũ nếu còn
   const existing = document.querySelector(".level-reward-overlay");
   if (existing) existing.remove();
@@ -164,7 +172,6 @@ export function showLevelRewardOverlay() {
   const container = document.createElement("div");
   container.className =
     "reward-container direct-layout app-modal";
-  const mode = gameState.settings.mode || "easy";
   const modeLabels = {
     easy: "Dễ",
     normal: "Trung bình",
@@ -173,18 +180,18 @@ export function showLevelRewardOverlay() {
     endless: "Vô tận",
     challenge: "Thử thách",
   };
-  const minutes = String(Math.floor(gameState.remainingTime / 60)).padStart(
+  const minutes = String(Math.floor(remainingTime / 60)).padStart(
     2,
     "0",
   );
-  const seconds = String(gameState.remainingTime % 60).padStart(2, "0");
+  const seconds = String(remainingTime % 60).padStart(2, "0");
   const rewardTitle = document.createElement("h2");
   rewardTitle.className = "reward-title glow";
-  rewardTitle.textContent = `Màn ${gameState.currentLevel}`;
+  rewardTitle.textContent = `Màn ${level}`;
 
   const subtitle = document.createElement("p");
   subtitle.className = "reward-subtitle";
-  subtitle.textContent = `${modeLabels[mode]} · Chủ đề ${getTheme(getEquippedThemeId(gameState.appearance)).title}`;
+  subtitle.textContent = `${modeLabels[mode]} · Chủ đề ${getTheme(themeId).title}`;
 
   const createRewardLine = (className, icon, value) => {
     const line = document.createElement("div");
@@ -195,9 +202,9 @@ export function showLevelRewardOverlay() {
 
   container.append(rewardTitle, subtitle);
   container.append(
-    createRewardLine("reward-points", "trophy", `Mục tiêu: ${gameState.totalPairs} cặp`),
+    createRewardLine("reward-points", "trophy", `Mục tiêu: ${totalPairs} cặp`),
     createRewardLine("reward-time", "timer", `${minutes}:${seconds}`),
-    createRewardLine("reward-hints", "search", `Gợi ý: ${gameState.hints}`),
+    createRewardLine("reward-hints", "search", assistText),
   );
 
   overlay.appendChild(container);
@@ -212,7 +219,10 @@ export function showLevelRewardOverlay() {
   // Tự động ẩn overlay
   setTimeout(() => {
     overlay.classList.replace("fade-in", "fade-out");
-    setTimeout(() => overlay.remove(), 400);
+    setTimeout(() => {
+      overlay.remove();
+      onComplete();
+    }, 400);
   }, GAMEPLAY_TIMING.levelIntroDurationMs);
 }
 
