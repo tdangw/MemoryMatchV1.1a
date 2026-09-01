@@ -12,13 +12,24 @@ const cards = Array.from({ length: 6 }, (_, index) => ({
   src: `card-${index}.webp`,
   alt: `Card ${index}`,
 }));
-const board = createLinkBoard({
-  layout: { tileCount: 12, columns: 4 },
-  cardProvider: () => cards,
-});
+const originalRandom = Math.random;
+let board;
+try {
+  Math.random = () => 0;
+  board = createLinkBoard({
+    layout: { tileCount: 12, columns: 4 },
+    cardProvider: () => cards,
+  });
+} finally {
+  Math.random = originalRandom;
+}
 
 assert.equal(getRemainingLinkTiles(board).length, 12);
 assert.equal(hasAvailableConnection(board.grid), true);
+assert.notDeepEqual(
+  getRemainingLinkTiles(board).map((tile) => tile.id),
+  cards.flatMap((card) => [card.id, card.id]),
+);
 
 const positions = [];
 board.grid.forEach((row, rowIndex) => row.forEach((tile, columnIndex) => {

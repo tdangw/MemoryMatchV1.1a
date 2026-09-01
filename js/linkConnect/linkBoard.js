@@ -24,7 +24,7 @@ export function createLinkBoard({
     grid: null,
   };
   board.grid = createPaddedGrid(board.rows, board.columns, tiles);
-  ensurePlayableBoard(board);
+  shuffleIntoPlayableBoard(board);
   return board;
 }
 
@@ -41,12 +41,17 @@ export function removeLinkBoardPair(board, start, end) {
 
 export function ensurePlayableBoard(board) {
   if (hasAvailableConnection(board.grid)) return false;
+  shuffleIntoPlayableBoard(board);
+  return true;
+}
+
+function shuffleIntoPlayableBoard(board) {
   const tiles = getInteriorTiles(board);
-  if (tiles.length < 2) return false;
+  if (tiles.length < 2) return;
   for (let attempt = 0; attempt < MAX_SHUFFLE_ATTEMPTS; attempt += 1) {
     shuffleArray(tiles);
     placeInteriorTiles(board, tiles);
-    if (hasAvailableConnection(board.grid)) return true;
+    if (hasAvailableConnection(board.grid)) return;
   }
   throw new Error("Không thể tạo bàn Link Connect có nước đi hợp lệ.");
 }
