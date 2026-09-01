@@ -75,37 +75,31 @@
   left: 0;
   display: grid;
   gap: 5px;
-  width: min(210px, calc(100vw - 28px));
-  padding: 7px;
-  border: 1px solid rgb(255 255 255 / 16%);
-  border-radius: 13px;
-  background: rgb(16 32 61 / 97%);
-  box-shadow: 0 12px 30px rgb(0 0 0 / 34%);
+  width: min(220px, calc(100vw - 28px));
+  padding: 8px;
+  border-color: rgb(255 255 255 / 45%);
+  border-radius: 12px;
+  background: rgb(16 22 47 / 96%);
+  box-shadow: 0 12px 30px rgb(0 0 0 / 35%);
 }
 
 .link-connect-game__actions button {
   display: flex;
   width: 100%;
-  min-height: 38px;
+  min-height: 0;
   align-items: center;
   gap: 9px;
-  padding: 8px 10px;
+  padding: 9px 12px;
   border: 0;
   border-radius: 8px;
   background: transparent;
   color: #f5f7fb;
-  font: 700 0.82rem/1 "Segoe UI", sans-serif;
+  font: 700 0.875rem/1.2 "Segoe UI", sans-serif;
   text-align: left;
 }
 
-.link-connect-game__actions .ui-icon {
-  width: 18px;
-  height: 18px;
-  color: #64b5f6;
-}
-
 .link-connect-game__actions button:hover {
-  background: rgb(255 255 255 / 10%);
+  background: rgb(255 255 255 / 16%);
 }
 
 .link-connect-game__stats {

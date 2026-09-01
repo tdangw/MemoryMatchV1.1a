@@ -47,44 +47,54 @@ export function configureLinkController(options = {}) {
 }
 
 export function showLinkDifficultyOverlay() {
-  const options = document.createElement("div");
-  options.className = "difficulty-options";
-  const modal = openAppModal({
-    id: "link-difficulty-modal",
-    icon: "puzzle",
-    title: "Chọn chế độ Link Connect",
-    content: options,
-  });
-  const activeTheme = document.createElement("p");
-  activeTheme.className = "link-difficulty-theme";
-  activeTheme.textContent = `Chủ đề: ${getTheme(getEquippedThemeId(gameState.appearance, "link-connect")).title}`;
+  const content = document.createElement("div");
+  content.className = "difficulty-content";
+  const activeTheme = getTheme(getEquippedThemeId(gameState.appearance, "link-connect"));
+  const themeRow = document.createElement("div");
+  themeRow.className = "difficulty-theme";
+  themeRow.append(createIcon(activeTheme.icon));
+  const themeText = document.createElement("div");
+  const themeLabel = document.createElement("small");
+  themeLabel.textContent = "Chủ đề đang dùng";
+  const themeName = document.createElement("strong");
+  themeName.textContent = activeTheme.title;
+  themeText.append(themeLabel, themeName);
   const changeTheme = document.createElement("button");
   changeTheme.type = "button";
   changeTheme.className = "difficulty-theme__change";
-  changeTheme.textContent = "Đổi chủ đề";
+  changeTheme.textContent = "Đổi";
+  themeRow.append(themeText, changeTheme);
+  const options = document.createElement("div");
+  options.className = "difficulty-options";
+  const modal = openAppModal({
+    id: "difficulty-modal",
+    icon: "play",
+    title: "Chọn chế độ Link Connect",
+    content,
+  });
   changeTheme.addEventListener("click", () => {
     modal.close();
     setTimeout(() => navigation.showCollection(), 180);
   });
-  options.before(activeTheme, changeTheme);
   [
-    ["easy", "Dễ"],
-    ["normal", "Trung bình"],
-    ["hard", "Khó"],
-    ["superHard", "Siêu khó"],
-    ["endless", "Vô tận"],
-    ["challenge", "Thử thách"],
-  ].forEach(([mode, label]) => {
+    ["easy", "Dễ", "status-easy"],
+    ["normal", "Trung bình", "status-normal"],
+    ["hard", "Khó", "status-hard"],
+    ["superHard", "Siêu khó", "status-super-hard"],
+    ["endless", "Vô tận", "timer"],
+    ["challenge", "Thử thách", "trophy"],
+  ].forEach(([mode, label, icon]) => {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "difficulty-option";
-    button.textContent = label;
+    button.append(createIcon(icon), document.createTextNode(label));
     button.addEventListener("click", () => {
       modal.close();
       startLinkLevel({ mode, level: 1 });
     });
     options.append(button);
   });
+  content.append(themeRow, options);
 }
 
 export function startLinkLevel({ mode = linkGameState.mode, level = 1 } = {}) {
@@ -140,14 +150,14 @@ function showLinkGame() {
     container.innerHTML = `
       <header class="link-connect-game__header">
         <button id="link-actions-menu-toggle" class="link-connect-game__menu" type="button" aria-label="Mở menu chức năng" aria-controls="link-actions-menu" aria-expanded="false"></button>
-        <div id="link-actions-menu" class="link-connect-game__actions" hidden>
-          <button type="button" data-action="menu">Menu</button>
-          <button type="button" data-action="restart">Chơi lại</button>
-          <button type="button" data-action="settings">Cài đặt</button>
-          <button type="button" data-action="collection">Bộ sưu tập</button>
-          <button type="button" data-action="shop">Cửa hàng</button>
-          <button type="button" data-action="help">Hướng dẫn</button>
-          <button type="button" data-action="info">Thông tin</button>
+        <div id="link-actions-menu" class="link-connect-game__actions game-actions-menu" hidden>
+          <button class="game-action-item" type="button" data-action="menu">Menu</button>
+          <button class="game-action-item" type="button" data-action="restart">Chơi lại</button>
+          <button class="game-action-item" type="button" data-action="settings">Cài đặt</button>
+          <button class="game-action-item" type="button" data-action="collection">Bộ sưu tập</button>
+          <button class="game-action-item" type="button" data-action="shop">Cửa hàng</button>
+          <button class="game-action-item" type="button" data-action="help">Hướng dẫn</button>
+          <button class="game-action-item" type="button" data-action="info">Thông tin</button>
         </div>
         <div><strong>Link Connect</strong><span id="link-level-label">Cấp 1</span></div>
         <button id="link-game-exit" class="link-connect-game__menu" type="button" aria-label="Đổi trò chơi"></button>
