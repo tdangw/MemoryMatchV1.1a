@@ -6,10 +6,7 @@ const DEFAULT_APPEARANCE = Object.freeze({
   themes: Object.freeze({ memoryMatch: "default", linkConnect: "default" }),
   ownedCardBacks: ["classic"],
   ownedFlipEffects: ["bounce"],
-  ownedThemesByGame: Object.freeze({
-    memoryMatch: Object.freeze(["default"]),
-    linkConnect: Object.freeze(["default"]),
-  }),
+  ownedThemes: ["default"],
 });
 
 export const CARD_BACKS = Object.freeze([
@@ -106,8 +103,8 @@ export function normalizeAppearance(value = {}) {
     value.flipEffect,
     DEFAULT_APPEARANCE.flipEffect,
   );
-  const ownedThemesByGame = normalizeOwnedThemes(value);
-  const themes = normalizeEquippedThemes(value, ownedThemesByGame);
+  const ownedThemes = normalizeOwnedThemes(value);
+  const themes = normalizeEquippedThemes(value, ownedThemes);
   return {
     cardBack: ownedCardBacks.includes(cardBack)
       ? cardBack
@@ -118,7 +115,7 @@ export function normalizeAppearance(value = {}) {
     themes,
     ownedCardBacks,
     ownedFlipEffects,
-    ownedThemesByGame,
+    ownedThemes,
   };
 }
 
@@ -130,56 +127,44 @@ export function getEquippedThemeId(appearance, gameId = "memory-match") {
 export function equipTheme(appearance, gameId, themeId) {
   const key = getThemeKey(gameId);
   const requestedTheme = getUsableTheme(themeId).id;
-  if (!getOwnedThemeIds(appearance, gameId).includes(requestedTheme)) return false;
+  if (!getOwnedThemeIds(appearance).includes(requestedTheme)) return false;
   appearance.themes = { ...appearance.themes, [key]: requestedTheme };
   return true;
 }
 
 export function getOwnedThemeIds(appearance, gameId = "memory-match") {
-  const key = getThemeKey(gameId);
-  return appearance?.ownedThemesByGame?.[key]
-    || DEFAULT_APPEARANCE.ownedThemesByGame[key];
+  return appearance?.ownedThemes || DEFAULT_APPEARANCE.ownedThemes;
 }
 
 export function ownTheme(appearance, gameId, themeId) {
-  const key = getThemeKey(gameId);
   const requestedTheme = getUsableTheme(themeId).id;
   if (!THEMES.some((theme) => theme.id === requestedTheme)) return false;
-  const ownedThemes = getOwnedThemeIds(appearance, gameId);
+  const ownedThemes = getOwnedThemeIds(appearance);
   if (ownedThemes.includes(requestedTheme)) return false;
-  appearance.ownedThemesByGame = {
-    ...appearance.ownedThemesByGame,
-    [key]: [...ownedThemes, requestedTheme],
-  };
+  appearance.ownedThemes = [...ownedThemes, requestedTheme];
   return true;
 }
 
 function normalizeOwnedThemes(value) {
-  const saved = value.ownedThemesByGame && typeof value.ownedThemesByGame === "object"
-    ? value.ownedThemesByGame
-    : {};
-  // Dữ liệu trước Phase 4 chỉ thuộc Memory Match; không tự mở chủ đề ở Link Connect.
-  const legacyMemoryThemes = value.ownedThemes;
-  return {
-    memoryMatch: normalizeOwnedThemeIds(saved.memoryMatch ?? legacyMemoryThemes, "memoryMatch"),
-    linkConnect: normalizeOwnedThemeIds(saved.linkConnect, "linkConnect"),
-  };
-}
-
-function normalizeOwnedThemeIds(value, gameKey) {
+  const splitOwnership = value.ownedThemesByGame && typeof value.ownedThemesByGame === "object"
+    ? Object.values(value.ownedThemesByGame).flatMap((themes) => Array.isArray(themes) ? themes : [])
+    : [];
+  const savedThemes = Array.isArray(value.ownedThemes)
+    ? value.ownedThemes
+    : splitOwnership;
   return ownedIds(
     THEMES,
-    value,
-    DEFAULT_APPEARANCE.ownedThemesByGame[gameKey][0],
+    savedThemes,
+    DEFAULT_APPEARANCE.ownedThemes[0],
   ).filter((id) => getTheme(id).id === id);
 }
 
-function normalizeEquippedThemes(value, ownedThemesByGame) {
+function normalizeEquippedThemes(value, ownedThemes) {
   const savedThemes = value.themes && typeof value.themes === "object" ? value.themes : {};
   const legacyTheme = value.theme;
   return {
-    memoryMatch: normalizeEquippedTheme(savedThemes.memoryMatch ?? legacyTheme, ownedThemesByGame.memoryMatch, "memoryMatch"),
-    linkConnect: normalizeEquippedTheme(savedThemes.linkConnect, ownedThemesByGame.linkConnect, "linkConnect"),
+    memoryMatch: normalizeEquippedTheme(savedThemes.memoryMatch ?? legacyTheme, ownedThemes, "memoryMatch"),
+    linkConnect: normalizeEquippedTheme(savedThemes.linkConnect, ownedThemes, "linkConnect"),
   };
 }
 
