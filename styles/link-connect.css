@@ -1,11 +1,20 @@
 .link-connect-game {
+  --link-ink: #eff8ff;
+  --link-muted: rgb(211 229 247 / 67%);
+  --link-panel: rgb(7 23 49 / 72%);
+  --link-line: rgb(146 219 255 / 18%);
+  --link-cyan: #66e5ff;
+  --link-gold: #ffd46f;
   min-height: 100dvh;
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr) auto;
-  gap: 12px;
+  gap: 10px;
   padding: max(14px, env(safe-area-inset-top)) 14px max(16px, env(safe-area-inset-bottom));
   box-sizing: border-box;
-  color: #f5f7fb;
+  color: var(--link-ink);
+  background:
+    radial-gradient(circle at 50% -14%, rgb(82 182 255 / 20%), transparent 38%),
+    linear-gradient(180deg, rgb(3 17 39 / 34%), transparent 34%);
 }
 
 .link-connect-game[hidden] {
@@ -23,10 +32,10 @@
 .link-connect-game__header {
   position: relative;
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
   align-items: center;
   gap: 10px;
-  text-align: center;
+  text-align: left;
 }
 
 .link-connect-game__header strong,
@@ -34,28 +43,35 @@
   display: block;
 }
 
-.link-connect-game__header strong {
-  color: #f2bf5b;
-  font: 800 clamp(1.2rem, 5vw, 1.55rem)/1.1 "Trebuchet MS", "Segoe UI", sans-serif;
+.link-connect-game__identity {
+  display: grid;
+  gap: 2px;
 }
 
-.link-connect-game__header span {
-  margin-top: 3px;
-  color: rgb(245 247 251 / 74%);
-  font-size: 0.78rem;
+.link-connect-game__header .link-connect-game__identity strong {
+  color: var(--link-ink);
+  font: 800 clamp(1.1rem, 4.6vw, 1.42rem)/1.1 "Trebuchet MS", "Segoe UI", sans-serif;
+  letter-spacing: -0.03em;
+}
+
+.link-connect-game__identity span {
+  color: var(--link-cyan);
+  font-size: 0.72rem;
   font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .link-connect-game__menu {
-  width: 36px;
-  min-height: 36px;
+  width: 38px;
+  min-height: 38px;
   display: grid;
   place-items: center;
   padding: 7px;
-  border: 1px solid rgb(255 255 255 / 16%);
-  border-radius: 10px;
-  background: rgb(39 57 88 / 78%);
-  color: #f5f7fb;
+  border: 1px solid var(--link-line);
+  border-radius: 12px;
+  background: var(--link-panel);
+  color: var(--link-ink);
   font: 700 0.78rem/1 "Segoe UI", sans-serif;
 }
 
@@ -69,9 +85,29 @@
   background: rgb(55 82 126 / 92%);
 }
 
-.link-connect-game__header-spacer {
-  width: 36px;
-  height: 36px;
+.link-connect-game__timer {
+  display: grid;
+  min-width: 75px;
+  gap: 1px;
+  padding: 6px 9px 5px;
+  border: 1px solid rgb(102 229 255 / 28%);
+  border-radius: 12px;
+  background: linear-gradient(145deg, rgb(22 80 112 / 80%), rgb(8 34 70 / 80%));
+  text-align: right;
+}
+
+.link-connect-game__timer-label {
+  color: rgb(211 247 255 / 70%);
+  font-size: 0.52rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.link-connect-game__timer strong {
+  color: #fff;
+  font-size: 1.05rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
 }
 
 .link-connect-game__actions {
@@ -111,29 +147,48 @@
 .link-connect-game__stats {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 7px;
+  gap: 6px;
 }
 
-.link-connect-game__stats span,
+.link-stat,
 .link-connect-game__footer {
-  border: 1px solid rgb(255 255 255 / 12%);
-  border-radius: 11px;
-  background: rgb(9 20 42 / 64%);
+  border: 1px solid var(--link-line);
+  border-radius: 12px;
+  background: var(--link-panel);
 }
 
-.link-connect-game__stats span {
+.link-stat {
   display: grid;
-  gap: 3px;
-  padding: 7px 5px;
-  color: rgb(245 247 251 / 70%);
-  font-size: 0.67rem;
+  gap: 2px;
+  min-height: 45px;
+  padding: 6px 5px;
+  color: var(--link-muted);
+  font-size: 0.62rem;
   font-weight: 700;
   text-align: center;
 }
 
-.link-connect-game__stats strong {
-  color: #fff;
-  font-size: 0.96rem;
+.link-stat small {
+  font-size: inherit;
+  letter-spacing: 0.035em;
+}
+
+.link-stat strong {
+  color: var(--link-ink);
+  font-size: 0.94rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.link-stat--combo {
+  border-color: rgb(255 212 111 / 30%);
+  background: linear-gradient(145deg, rgb(106 72 20 / 68%), rgb(43 34 23 / 72%));
+}
+
+.link-stat--combo strong { color: var(--link-gold); }
+.link-stat--score strong { color: var(--link-cyan); }
+.link-stat--moves strong { display: flex; justify-content: center; gap: 3px; }
+.link-stat--moves i { color: rgb(211 229 247 / 44%); font-style: normal; }
+.link-stat--moves b:last-child { color: #ff9b9b; }
 }
 
 .link-board-frame {
@@ -145,6 +200,26 @@
   box-sizing: border-box;
 }
 
+.link-board-frame__caption {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin: 0 0 6px;
+  color: rgb(168 224 250 / 62%);
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
+.link-board-frame__caption span {
+  width: 24px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgb(102 229 255 / 60%));
+}
+
+.link-board-frame__caption span:last-child { transform: rotate(180deg); }
+
 .link-board {
   --link-columns: 4;
   --link-tile-size: 80px;
@@ -155,9 +230,14 @@
   gap: 6px;
   padding: 8px;
   box-sizing: border-box;
-  border: 1px solid rgb(255 255 255 / 16%);
-  border-radius: 18px;
-  background: rgb(7 17 37 / 52%);
+  border: 1px solid rgb(102 229 255 / 25%);
+  border-radius: 19px;
+  background:
+    linear-gradient(rgb(124 225 255 / 4%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(124 225 255 / 4%) 1px, transparent 1px),
+    rgb(4 20 44 / 68%);
+  background-size: 18px 18px;
+  box-shadow: inset 0 1px rgb(255 255 255 / 8%), 0 16px 36px rgb(0 0 0 / 20%);
 }
 
 .link-board__cell {
@@ -168,7 +248,7 @@
 
 .link-board__cell.is-empty {
   border-radius: 10px;
-  background: rgb(255 255 255 / 4%);
+  background: rgb(111 207 255 / 5%);
 }
 
 .link-tile {
@@ -180,10 +260,10 @@
   overflow: hidden;
   box-sizing: border-box;
   padding: 0;
-  border: 2px solid transparent;
+  border: 2px solid rgb(231 251 255 / 42%);
   border-radius: 11px;
-  background: #1c3155;
-  box-shadow: 0 4px 10px rgb(0 0 0 / 24%);
+  background: #16395f;
+  box-shadow: 0 4px 10px rgb(0 0 0 / 27%), inset 0 1px rgb(255 255 255 / 22%);
   backface-visibility: hidden;
   transform: translateZ(0);
   transition: border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease;
@@ -281,43 +361,46 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 13px;
-  color: rgb(245 247 251 / 80%);
-  font-size: 0.86rem;
-  font-weight: 700;
+  gap: 8px;
+  padding: 8px 12px;
+  color: var(--link-muted);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
 }
 
 .link-connect-game__footer strong {
-  color: #f2bf5b;
-  font-size: 1rem;
+  color: var(--link-gold);
+  font-size: 0.88rem;
+  font-variant-numeric: tabular-nums;
 }
 
 .link-connect-game__items {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 7px;
+  gap: 6px;
   margin: 0 auto;
 }
 
 .link-connect-game__item {
   display: grid;
-  min-height: 46px;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  min-height: 50px;
+  grid-template-columns: 20px minmax(0, 1fr) 18px;
   align-items: center;
   gap: 5px;
-  padding: 7px;
-  border: 1px solid rgb(255 255 255 / 12%);
-  border-radius: 11px;
-  background: rgb(9 20 42 / 64%);
-  color: #f5f7fb;
-  font: 700 0.67rem/1.1 "Segoe UI", sans-serif;
+  padding: 7px 6px;
+  border: 1px solid var(--link-line);
+  border-radius: 12px;
+  background: var(--link-panel);
+  color: var(--link-ink);
+  font: 700 0.62rem/1.1 "Segoe UI", sans-serif;
   text-align: left;
 }
 
 .link-connect-game__item .ui-icon {
-  width: 16px;
-  height: 16px;
-  color: #70c5ff;
+  width: 18px;
+  height: 18px;
+  color: var(--link-cyan);
 }
 
 .link-connect-game__item strong {
@@ -326,8 +409,8 @@
   height: 18px;
   place-items: center;
   border-radius: 50%;
-  background: rgb(242 191 91 / 18%);
-  color: #f2bf5b;
+  background: rgb(255 212 111 / 18%);
+  color: var(--link-gold);
   font-size: 0.7rem;
 }
 
@@ -371,6 +454,9 @@
   .link-board { gap: 4px; padding: 6px; border-radius: 14px; }
   .link-tile { border-radius: 8px; }
   .link-connect-game__stats { gap: 4px; }
+  .link-stat { min-height: 42px; padding-inline: 2px; font-size: 0.56rem; }
+  .link-stat strong { font-size: 0.84rem; }
+  .link-connect-game__item { grid-template-columns: 18px minmax(0, 1fr) 17px; gap: 3px; padding-inline: 4px; font-size: 0.56rem; }
 }
 
 /* Thiết bị cảm ứng yếu dễ nháy khi filter/blur chạy trên ảnh lớn. */

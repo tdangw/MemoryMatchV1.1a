@@ -225,23 +225,26 @@ function showLinkGame() {
           <button class="game-action-item" type="button" data-action="info">Thông tin</button>
           <button class="game-action-item" type="button" data-action="reset">Xóa dữ liệu</button>
         </div>
-        <div><strong>Link Connect</strong><span id="link-level-label">Cấp 1</span></div>
-        <span class="link-connect-game__header-spacer" aria-hidden="true"></span>
+        <div class="link-connect-game__identity"><strong>Link Connect</strong><span id="link-level-label">Cấp 1</span></div>
+        <div class="link-connect-game__timer" aria-label="Thời gian còn lại">
+          <span class="link-connect-game__timer-label">THỜI GIAN</span>
+          <strong id="link-timer">00:00</strong>
+        </div>
       </header>
       <div class="link-connect-game__stats" aria-label="Tiến trình màn chơi">
-        <span>Nước <strong id="link-moves">0</strong></span>
-        <span>Sai <strong id="link-misses">0</strong></span>
-        <span>Combo <strong id="link-combo">0</strong></span>
-        <span>Điểm <strong id="link-score">0</strong></span>
+        <span class="link-stat link-stat--progress"><small>CẶP ĐÃ NỐI</small><strong id="link-pair-progress">0/0</strong></span>
+        <span class="link-stat link-stat--combo"><small>COMBO</small><strong id="link-combo">0</strong></span>
+        <span class="link-stat link-stat--score"><small>ĐIỂM</small><strong id="link-score">0</strong></span>
+        <span class="link-stat link-stat--moves"><small>NƯỚC · SAI</small><strong><b id="link-moves">0</b><i aria-hidden="true">·</i><b id="link-misses">0</b></strong></span>
       </div>
       <div id="link-board-frame" class="link-board-frame">
+        <div class="link-board-frame__caption" aria-hidden="true"><span></span> TÌM ĐƯỜNG NỐI <span></span></div>
         <div id="link-board" class="link-board" aria-label="Bàn Link Connect"></div>
         <svg id="link-path-overlay" class="link-path-overlay" aria-hidden="true"></svg>
       </div>
       <footer class="link-connect-game__footer">
-        <span id="link-pair-progress">0/0 cặp</span>
-        <span id="link-special-progress">Đặc biệt 0/10</span>
-        <strong id="link-timer">00:00</strong>
+        <span class="link-connect-game__special-label">NĂNG LƯỢNG ĐẶC BIỆT</span>
+        <strong id="link-special-progress">0/10</strong>
       </footer>
       <aside id="link-item-actions" class="link-connect-game__items" aria-label="Vật phẩm hỗ trợ"></aside>`;
     document.querySelector(".main-wrapper")?.append(container);
