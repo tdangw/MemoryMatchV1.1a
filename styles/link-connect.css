@@ -68,6 +68,11 @@
   background: rgb(55 82 126 / 92%);
 }
 
+.link-connect-game__header-spacer {
+  width: 36px;
+  height: 36px;
+}
+
 .link-connect-game__actions {
   position: absolute;
   z-index: 20;

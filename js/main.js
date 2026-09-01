@@ -57,7 +57,6 @@ configureGameSelector({
 });
 configureLinkController({
   showMenu: () => openGameMenu("link-connect"),
-  showGameSelector,
   showCollection: (onClose) => {
     showCollectionModal({
       fromGame: true,

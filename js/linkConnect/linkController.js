@@ -36,7 +36,6 @@ let countdownInterval;
 let selectedPosition = null;
 let navigation = {
   showMenu: () => {},
-  showGameSelector: () => {},
   showCollection: () => {},
   showShop: () => {},
   showSettings: () => {},
@@ -131,16 +130,6 @@ export function returnToLinkMenu() {
   syncDefaultMusic();
 }
 
-function returnToGameSelector() {
-  stopCountdown();
-  resetLinkGame();
-  selectedPosition = null;
-  clearLinkPath();
-  document.getElementById("link-connect-container")?.setAttribute("hidden", "");
-  navigation.showGameSelector();
-  syncDefaultMusic();
-}
-
 function showLinkGame() {
   let container = document.getElementById("link-connect-container");
   if (!container) {
@@ -160,7 +149,7 @@ function showLinkGame() {
           <button class="game-action-item" type="button" data-action="info">Thông tin</button>
         </div>
         <div><strong>Link Connect</strong><span id="link-level-label">Cấp 1</span></div>
-        <button id="link-game-exit" class="link-connect-game__menu" type="button" aria-label="Đổi trò chơi"></button>
+        <span class="link-connect-game__header-spacer" aria-hidden="true"></span>
       </header>
       <div class="link-connect-game__stats" aria-label="Tiến trình màn chơi">
         <span>Nước <strong id="link-moves">0</strong></span>
@@ -187,9 +176,7 @@ function showLinkGame() {
 function configureLinkGameActions(container) {
   const toggle = container.querySelector("#link-actions-menu-toggle");
   const actions = container.querySelector("#link-actions-menu");
-  const exit = container.querySelector("#link-game-exit");
   toggle?.append(createIcon("menu"));
-  exit?.append(createIcon("exit"));
   const actionIcons = {
     menu: "home",
     restart: "restart",
@@ -215,7 +202,6 @@ function configureLinkGameActions(container) {
     toggle?.setAttribute("aria-expanded", "false");
     runLinkGameAction(action);
   });
-  exit?.addEventListener("click", showLinkGameExitConfirmation);
   document.addEventListener("click", (event) => {
     if (!actions?.hidden && !event.target.closest(".link-connect-game__header")) {
       actions.hidden = true;
@@ -258,20 +244,6 @@ function pauseLinkForModal() {
 
 function resumeLinkAfterModal() {
   linkGameState.isPaused = false;
-}
-
-function showLinkGameExitConfirmation() {
-  pauseLinkForModal();
-  openAppModal({
-    id: "link-game-exit-modal",
-    icon: "exit",
-    title: "Đổi trò chơi",
-    content: "<p>Ván hiện tại sẽ kết thúc và không được lưu.</p>",
-    actions: [
-      { label: "Đổi trò chơi", variant: "primary", onClick: returnToGameSelector },
-    ],
-    onClose: resumeLinkAfterModal,
-  });
 }
 
 function handleLinkTileClick(position) {
