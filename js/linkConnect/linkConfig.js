@@ -9,7 +9,12 @@ export const LINK_CONNECT_CONFIG = Object.freeze({
   }),
   pathfinding: Object.freeze({ maxTurns: 2, boundaryPadding: 1 }),
   scoring: Object.freeze({ baseMatchPoints: 10, comboStepPoints: 3 }),
-  levelProgression: Object.freeze({ timeBonusPerLevel: 2, timeBonusCap: 10 }),
+  levelProgression: Object.freeze({
+    timeBonusPerLevel: 2,
+    timeBonusCap: 10,
+    hintBonusPerLevel: 1,
+    hintCap: 10,
+  }),
   challenge: Object.freeze({
     timeBonusPerLevel: 10,
     luckyPairCount: Object.freeze({ min: 1, max: 3 }),
@@ -67,6 +72,12 @@ export function getLinkLevelTimeBonus(level = 1) {
     Math.max(0, level - 1) * progression.timeBonusPerLevel,
     progression.timeBonusCap,
   );
+}
+
+export function getLinkLevelHintBonus(level = 1, currentHints = 0) {
+  const progression = LINK_CONNECT_CONFIG.levelProgression;
+  if (level <= 1 || currentHints >= progression.hintCap) return 0;
+  return Math.min(progression.hintBonusPerLevel, progression.hintCap - currentHints);
 }
 
 export function getLinkChallengeTime(level = 1) {

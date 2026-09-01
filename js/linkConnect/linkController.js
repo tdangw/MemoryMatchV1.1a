@@ -11,6 +11,7 @@ import {
   getLinkChallengeTime,
   getLinkChallengeLayout,
   LINK_CONNECT_CONFIG,
+  getLinkLevelHintBonus,
   getLinkLevelTimeBonus,
   getLinkModeLayout,
   getLinkTimerDirection,
@@ -167,6 +168,10 @@ export function startLinkLevel({ mode = linkGameState.mode, level = 1, resume = 
   else {
     linkGameState.remainingTime = modeLayout.timeSeconds + getLinkLevelTimeBonus(level);
   }
+  if (!resume) {
+    const hintBonus = getLinkLevelHintBonus(level, getLinkItemCount("hint"));
+    if (hintBonus > 0) grantLinkItem("hint", hintBonus);
+  }
   showLinkGame();
   renderLinkBoard(board, { onTileClick: handleLinkTileClick });
   updateLinkHud();
@@ -177,7 +182,7 @@ export function startLinkLevel({ mode = linkGameState.mode, level = 1, resume = 
     themeId: getEquippedThemeId(gameState.appearance, "link-connect"),
     totalPairs: linkGameState.totalPairs,
     remainingTime: linkGameState.remainingTime,
-    assistText: `Vật phẩm: ${getLinkItemCount("hint")} gợi ý`,
+    assistText: `Gợi ý: ${getLinkItemCount("hint")}`,
     onComplete: () => {
       if (linkGameState.roundId !== roundId) return;
       linkGameState.isLocked = false;
