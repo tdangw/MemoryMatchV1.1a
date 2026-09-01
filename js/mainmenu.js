@@ -216,21 +216,29 @@ export function showDifficultyOverlay(fromGame = false) {
     button.type = "button";
     button.className = "difficulty-option";
     button.append(createIcon(icon), document.createTextNode(label));
-    button.onclick = () => chooseMemoryMode(mode, label, startMode, modal.close);
+    button.onclick = () => chooseMemoryMode(
+      mode,
+      label,
+      startMode,
+      modal.close,
+      () => { modeSelected = true; },
+    );
     options.append(button);
   });
   content.append(themeRow, options);
 }
 
-function chooseMemoryMode(mode, label, startMode, closeDifficulty) {
+function chooseMemoryMode(mode, label, startMode, closeDifficulty, confirmModeSelection) {
   const session = getActiveSession("memory-match", mode);
   if (!session) return startMode(mode, closeDifficulty);
   showSessionChoice({
     label,
     session,
     onContinue: () => {
-      closeDifficulty();
+      // Đánh dấu trước khi đóng vì callback close chạy sau hoạt ảnh 180ms.
+      confirmModeSelection();
       document.getElementById("menu-container")?.remove();
+      closeDifficulty();
       onContinueGame(session);
     },
     onNew: () => startMode(mode, closeDifficulty),
