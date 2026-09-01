@@ -11,6 +11,7 @@ export function createLinkGameState() {
     specialProgress: 0,
     hints: 0,
     reshuffles: 0,
+    freezeSeconds: 0,
     matchedPairs: 0,
     totalPairs: getLinkModeLayout().tileCount / 2,
     remainingTime: getLinkModeLayout().timeSeconds,

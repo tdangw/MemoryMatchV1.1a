@@ -21,11 +21,13 @@ import {
   getLinkBoardTile,
   removeLinkBoardPair,
   removeRandomLinkPair,
+  shuffleLinkBoard,
   makeRandomLinkPairSpecial,
   unlockAllFrozenLinkTiles,
   unlockFrozenLinkTiles,
 } from "./linkBoard.js";
-import { findConnectionPath } from "./pathfinder.js";
+import { findAvailableConnections, findConnectionPath } from "./pathfinder.js";
+import { consumeLinkItem, getLinkItemCount, grantLinkItem, LINK_ITEMS } from "./linkItems.js";
 import {
   clearLinkPath,
   clearLinkTileSelection,
@@ -173,13 +175,33 @@ function showLinkGame() {
         <span id="link-pair-progress">0/0 cặp</span>
         <span id="link-special-progress">Đặc biệt 0/10</span>
         <strong id="link-timer">00:00</strong>
-      </footer>`;
+      </footer>
+      <aside id="link-item-actions" class="link-connect-game__items" aria-label="Vật phẩm hỗ trợ"></aside>`;
     document.querySelector(".main-wrapper")?.append(container);
     configureLinkGameActions(container);
+    configureLinkItemActions(container);
   }
   document.getElementById("menu-container")?.remove();
   document.getElementById("game-container")?.style.setProperty("display", "none");
   container.removeAttribute("hidden");
+}
+
+function configureLinkItemActions(container) {
+  const actions = container.querySelector("#link-item-actions");
+  LINK_ITEMS.forEach((item) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "link-connect-game__item";
+    button.dataset.item = item.id;
+    button.append(createIcon(item.icon));
+    const label = document.createElement("span");
+    label.textContent = item.title;
+    const count = document.createElement("strong");
+    count.dataset.itemCount = item.id;
+    button.append(label, count);
+    button.addEventListener("click", () => useLinkItem(item.id));
+    actions?.append(button);
+  });
 }
 
 function configureLinkGameActions(container) {
@@ -305,6 +327,62 @@ function handleLinkTileClick(position) {
   }, LINK_MATCH_DELAY_MS);
 }
 
+function useLinkItem(id) {
+  if (linkGameState.isLocked || linkGameState.isPaused) return;
+  if (id === "freeze" && isLinkEndlessMode(linkGameState.mode)) {
+    showAppToast("Chế độ Vô tận không dùng đóng băng thời gian.");
+    return;
+  }
+  if (!consumeLinkItem(id)) {
+    showAppToast("Bạn chưa có vật phẩm này.");
+    return;
+  }
+  if (id === "hint") useLinkHint();
+  else if (id === "reshuffle") useLinkReshuffle();
+  else if (id === "thunder") useLinkThunder();
+  else if (id === "freeze") useLinkFreeze();
+  updateLinkHud();
+}
+
+function useLinkHint() {
+  const connection = findAvailableConnections(linkGameState.board.grid)[0];
+  if (!connection) {
+    showAppToast("Không có đường nối khả dụng để gợi ý.");
+    grantLinkItem("hint");
+    return;
+  }
+  linkGameState.isLocked = true;
+  drawLinkPath(connection.path, linkGameState.board);
+  showAppToast("Đây là một đường nối khả dụng.");
+  setTimeout(() => {
+    clearLinkPath();
+    linkGameState.isLocked = false;
+  }, 1000);
+}
+
+function useLinkReshuffle() {
+  shuffleLinkBoard(linkGameState.board);
+  renderLinkBoard(linkGameState.board, { onTileClick: handleLinkTileClick });
+  showAppToast("Đã xáo lại các thẻ còn lại.");
+}
+
+function useLinkThunder() {
+  const pairCount = randomInteger(1, 3);
+  let removed = 0;
+  for (let index = 0; index < pairCount; index += 1) {
+    if (!removeAutomaticPair()) break;
+    removed += 1;
+  }
+  renderLinkBoard(linkGameState.board, { onTileClick: handleLinkTileClick });
+  showAppToast(`Sấm sét đã phá hủy ${removed} cặp thẻ.`);
+  if (linkGameState.matchedPairs >= linkGameState.totalPairs) completeLinkLevel();
+}
+
+function useLinkFreeze() {
+  linkGameState.freezeSeconds += 10;
+  showAppToast("Đồng hồ đã đóng băng trong 10 giây.");
+}
+
 function completeLinkLevel() {
   stopCountdown();
   linkGameState.isLocked = true;
@@ -324,6 +402,11 @@ function startCountdown(roundId) {
   stopCountdown();
   countdownInterval = setInterval(() => {
     if (linkGameState.roundId !== roundId || linkGameState.isLocked || linkGameState.isPaused) return;
+    if (linkGameState.freezeSeconds > 0) {
+      linkGameState.freezeSeconds -= 1;
+      updateLinkHud();
+      return;
+    }
     linkGameState.remainingTime += getLinkTimerDirection(linkGameState.mode) === "up" ? 1 : -1;
     updateLinkHud();
     if (linkGameState.remainingTime <= 0 && !isLinkEndlessMode(linkGameState.mode)) {
@@ -359,6 +442,13 @@ function updateLinkHud() {
     `Đặc biệt ${linkGameState.specialProgress}/${LINK_CONNECT_CONFIG.special.progressTarget}`,
   );
   setText("link-timer", formatTime(linkGameState.remainingTime));
+  document.querySelectorAll("[data-item-count]").forEach((element) => {
+    const itemId = element.dataset.itemCount;
+    element.textContent = String(getLinkItemCount(itemId));
+  });
+  const freezeButton = document.querySelector('[data-item="freeze"]');
+  freezeButton?.classList.toggle("is-disabled", isLinkEndlessMode(linkGameState.mode));
+  freezeButton?.setAttribute("aria-disabled", String(isLinkEndlessMode(linkGameState.mode)));
 }
 
 function applySpecialMatchRewards() {
@@ -422,18 +512,18 @@ function applyMilestoneSevenReward() {
     return "Mốc đặc biệt 7: nhận thêm thời gian.";
   }
   if (reward === "hint") {
-    linkGameState.hints += 1;
+    grantLinkItem("hint");
     return "Mốc đặc biệt 7: nhận một lượt gợi ý.";
   }
-  linkGameState.reshuffles += 1;
+  grantLinkItem("reshuffle");
   return "Mốc đặc biệt 7: nhận một lượt xáo trộn.";
 }
 
 function removeAutomaticPair(fallbackMessage = "") {
   const pair = removeRandomLinkPair(linkGameState.board);
-  if (!pair) return fallbackMessage;
+  if (!pair) return null;
   linkGameState.matchedPairs += 1;
-  return fallbackMessage;
+  return fallbackMessage || "Đã phá hủy một cặp thẻ.";
 }
 
 function randomInteger(minimum, maximum) {

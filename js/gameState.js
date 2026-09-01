@@ -21,7 +21,10 @@ export const gameState = {
   roundId: 0,
   remainingTime: remainingTime,
   coins: 0,
-  progress: { memoryMatch: { totalStars: 0, totalScore: 0, bestByLevel: {} } },
+  progress: {
+    memoryMatch: { totalStars: 0, totalScore: 0, bestByLevel: {} },
+    linkConnect: { items: { hint: 0, reshuffle: 0, thunder: 0, freeze: 0 } },
+  },
   appearance: normalizeAppearance(),
   settings: {
     mode: "easy",
@@ -50,6 +53,15 @@ export function hydrateGameState({
     totalStars: Math.max(0, Math.floor(memoryMatch.totalStars || 0)),
     totalScore: Math.max(0, Math.floor(memoryMatch.totalScore || 0)),
     bestByLevel: typeof memoryMatch.bestByLevel === "object" && memoryMatch.bestByLevel ? memoryMatch.bestByLevel : {},
+  };
+  const linkItems = progress?.linkConnect?.items || {};
+  gameState.progress.linkConnect = {
+    items: {
+      hint: Math.max(0, Math.floor(linkItems.hint || 0)),
+      reshuffle: Math.max(0, Math.floor(linkItems.reshuffle || 0)),
+      thunder: Math.max(0, Math.floor(linkItems.thunder || 0)),
+      freeze: Math.max(0, Math.floor(linkItems.freeze || 0)),
+    },
   };
   Object.assign(gameState.settings, settings);
   gameState.appearance = normalizeAppearance(appearance);

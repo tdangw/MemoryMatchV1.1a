@@ -14,7 +14,8 @@
 
 .link-connect-game__header,
 .link-connect-game__stats,
-.link-connect-game__footer {
+.link-connect-game__footer,
+.link-connect-game__items {
   width: min(700px, 100%);
   margin: 0 auto;
 }
@@ -268,6 +269,55 @@
 .link-connect-game__footer strong {
   color: #f2bf5b;
   font-size: 1rem;
+}
+
+.link-connect-game__items {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 7px;
+  margin: 0 auto;
+}
+
+.link-connect-game__item {
+  display: grid;
+  min-height: 46px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 5px;
+  padding: 7px;
+  border: 1px solid rgb(255 255 255 / 12%);
+  border-radius: 11px;
+  background: rgb(9 20 42 / 64%);
+  color: #f5f7fb;
+  font: 700 0.67rem/1.1 "Segoe UI", sans-serif;
+  text-align: left;
+}
+
+.link-connect-game__item .ui-icon {
+  width: 16px;
+  height: 16px;
+  color: #70c5ff;
+}
+
+.link-connect-game__item strong {
+  display: grid;
+  min-width: 18px;
+  height: 18px;
+  place-items: center;
+  border-radius: 50%;
+  background: rgb(242 191 91 / 18%);
+  color: #f2bf5b;
+  font-size: 0.7rem;
+}
+
+.link-connect-game__item:hover {
+  border-color: rgb(112 197 255 / 55%);
+  background: rgb(33 60 98 / 78%);
+}
+
+.link-connect-game__item.is-disabled {
+  cursor: not-allowed;
+  opacity: 0.44;
 }
 
 @keyframes link-electric-trace {

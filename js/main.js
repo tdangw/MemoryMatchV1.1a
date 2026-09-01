@@ -64,7 +64,12 @@ configureLinkController({
       onClose,
     });
   },
-  showShop: (onClose) => openShopOverlay({ fromMenu: false, gameId: "link-connect", onClose }),
+  showShop: (onClose) => openShopOverlay({
+    fromMenu: false,
+    gameId: "link-connect",
+    linkConnect: true,
+    onClose,
+  }),
   showSettings: (onClose) => showSettingsPanel(true, onClose),
 });
 unlockSound();

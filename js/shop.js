@@ -16,6 +16,7 @@ import { SHOP_ITEMS, getShopItemPrice } from "./shopCatalog.js";
 import { getOwnedThemeIds, ownTheme } from "./appearance.js";
 import { GAMEPLAY_TIMING } from "./gameplayTuning.js";
 import { THEMES, getTheme, isThemePlayable } from "./themeCatalog.js";
+import { grantLinkItem, getLinkItemCount, LINK_ITEMS } from "./linkConnect/linkItems.js";
 
 export function openQuickAssistOverlay(kind) {
   if (gameState.isLocked || gameState.isPaused) return;
@@ -78,11 +79,11 @@ export function openQuickAssistOverlay(kind) {
   });
 }
 
-export function openShopOverlay({ fromMenu = false, gameId = "memory-match", onClose = () => {} } = {}) {
-  if (!fromMenu && (gameState.isLocked || gameState.isPaused)) return;
+export function openShopOverlay({ fromMenu = false, gameId = "memory-match", linkConnect = false, onClose = () => {} } = {}) {
+  if (!fromMenu && !linkConnect && (gameState.isLocked || gameState.isPaused)) return;
 
   const roundId = gameState.roundId;
-  if (!fromMenu) gameState.isPaused = true;
+  if (!fromMenu && !linkConnect) gameState.isPaused = true;
 
   const content = document.createElement("div");
   content.className = "shop-content";
@@ -100,7 +101,7 @@ export function openShopOverlay({ fromMenu = false, gameId = "memory-match", onC
     content,
     size: "large",
     onClose: () => {
-      if (!fromMenu && gameState.roundId === roundId) gameState.isPaused = false;
+      if (!fromMenu && !linkConnect && gameState.roundId === roundId) gameState.isPaused = false;
       onClose();
     },
   });
@@ -119,8 +120,10 @@ export function openShopOverlay({ fromMenu = false, gameId = "memory-match", onC
     .insertBefore(wallet, closeButton);
 
   if (gameId === "link-connect") {
-    tabs.append(createTab("Chủ đề", true, () => renderThemes(grid, roundId, modal, gameId)));
-    renderThemes(grid, roundId, modal, gameId);
+    const itemsTab = createTab("Vật phẩm", true, () => renderLinkItems(grid, roundId, modal));
+    const themesTab = createTab("Chủ đề", false, () => renderThemes(grid, roundId, modal, gameId));
+    tabs.append(itemsTab, themesTab);
+    renderLinkItems(grid, roundId, modal);
   } else {
     const appearanceTab = createTab("Ngoại hình", true, () =>
       renderAppearance(grid, roundId, modal),
@@ -134,6 +137,42 @@ export function openShopOverlay({ fromMenu = false, gameId = "memory-match", onC
     tabs.append(appearanceTab, flipEffectsTab, themesTab);
     renderAppearance(grid, roundId, modal);
   }
+}
+
+function renderLinkItems(grid, roundId, modal) {
+  grid.className = "shop-item-grid shop-item-grid--appearance";
+  grid.replaceChildren();
+  const group = document.createElement("section");
+  group.className = "appearance-group";
+  const heading = document.createElement("h3");
+  heading.textContent = "Vật phẩm Link Connect";
+  const choices = document.createElement("div");
+  choices.className = "appearance-choice-grid";
+  LINK_ITEMS.forEach((item) => {
+    const card = document.createElement("article");
+    card.className = "appearance-choice";
+    const preview = document.createElement("div");
+    preview.className = "appearance-preview theme-preview";
+    preview.append(createIcon(item.icon));
+    const name = document.createElement("strong");
+    name.textContent = item.title;
+    const count = document.createElement("small");
+    count.textContent = `Đang có: ${getLinkItemCount(item.id)}`;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "app-button app-button--purchase shop-buy-button";
+    button.append(document.createTextNode(String(item.price)), createIcon("coin"));
+    button.onclick = () => openPurchaseConfirmation(
+      { ...item, type: "link-item" },
+      roundId,
+      modal,
+      () => renderLinkItems(grid, roundId, modal),
+    );
+    card.append(preview, name, count, button);
+    choices.append(card);
+  });
+  group.append(heading, choices);
+  grid.append(group);
 }
 
 function createTab(label, selected, onSelect) {
@@ -334,7 +373,7 @@ function openPurchaseConfirmation(item, roundId, shopModal, onPurchase) {
 
 // Mua vật phẩm
 function handleBuyItem(item, roundId, fromMenu = false) {
-  if (gameState.roundId !== roundId || (!fromMenu && gameState.isLocked)) return false;
+  if (item.type !== "link-item" && (gameState.roundId !== roundId || (!fromMenu && gameState.isLocked))) return false;
 
   if (item.type === "appearance") {
     const ownedKey =
@@ -380,6 +419,12 @@ function handleBuyItem(item, roundId, fromMenu = false) {
         ? `Đã mua chủ đề ${item.title}`
         : `Đã mua trước ${item.title}. Chủ đề sẽ mở khi đủ ảnh.`,
     );
+    return true;
+  }
+
+  if (item.type === "link-item") {
+    grantLinkItem(item.id);
+    showShopMessage(`Đã mua ${item.title}`);
     return true;
   }
 

@@ -50,6 +50,10 @@ export function ensurePlayableBoard(board) {
   return true;
 }
 
+export function shuffleLinkBoard(board) {
+  shuffleIntoPlayableBoard(board);
+}
+
 export function unlockFrozenLinkTiles(board, count = 1) {
   const frozenPositions = getInteriorPositions(board)
     .filter((position) => getLinkBoardTile(board, position)?.frozen);
