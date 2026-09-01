@@ -46,7 +46,8 @@ export function findAvailableConnections(grid) {
   if (!isValidGrid(grid)) return [];
   const positionsById = new Map();
   grid.forEach((row, rowIndex) => row.forEach((tile, columnIndex) => {
-    if (!tile?.id || tile.frozen) return;
+    // Thẻ đóng băng vẫn là điểm đến hợp lệ của thẻ phá băng cùng hình.
+    if (!tile?.id) return;
     const positions = positionsById.get(tile.id) || [];
     positions.push({ row: rowIndex, column: columnIndex });
     positionsById.set(tile.id, positions);

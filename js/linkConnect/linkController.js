@@ -354,7 +354,12 @@ function resumeLinkAfterModal() {
 function handleLinkTileClick(position) {
   if (linkGameState.isLocked || linkGameState.isPaused) return;
   const tile = getLinkBoardTile(linkGameState.board, position);
-  if (!tile || tile.frozen) return;
+  if (!tile) return;
+  // Thẻ đóng băng chỉ được chọn làm điểm đến bởi thẻ cùng hình để phá băng.
+  if (!selectedPosition && tile.frozen) {
+    showAppToast("Hãy chọn thẻ phá băng cùng hình trước.");
+    return;
+  }
   if (!selectedPosition) {
     selectedPosition = position;
     setLinkTileSelected(position, true);

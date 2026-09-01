@@ -111,6 +111,7 @@ function createTile(card) {
     alt: card.alt,
     special: card.special === true,
     frozen: false,
+    iceBreaker: false,
     luckyReward: card.luckyReward || null,
   });
 }
@@ -136,12 +137,16 @@ function ensureSpecialPair(cards) {
 
 function freezeRandomTiles(board, level) {
   const count = getLinkFrozenTileCount(level);
-  const positions = getInteriorPositions(board).filter((position) => {
-    const tile = getLinkBoardTile(board, position);
-    return tile && !tile.special;
+  const pairs = getLinkPairs(board).filter((pair) => pair.positions.length === 2
+    && pair.positions.every((position) => !getLinkBoardTile(board, position)?.special));
+  shuffleArray(pairs);
+  pairs.slice(0, count).forEach((pair) => {
+    const [first, second] = pair.positions;
+    const frozenPosition = Math.random() < 0.5 ? first : second;
+    const iceBreakerPosition = frozenPosition === first ? second : first;
+    replaceTile(board, frozenPosition, { frozen: true });
+    replaceTile(board, iceBreakerPosition, { iceBreaker: true });
   });
-  shuffleArray(positions);
-  positions.slice(0, count).forEach((position) => replaceTile(board, position, { frozen: true }));
 }
 
 function createPaddedGrid(rows, columns, tiles) {
