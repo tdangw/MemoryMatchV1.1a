@@ -256,9 +256,9 @@ function resumeLinkAfterModal() {
 }
 
 function handleLinkTileClick(position) {
-  if (linkGameState.isLocked || linkGameState.isPaused || tile.frozen) return;
+  if (linkGameState.isLocked || linkGameState.isPaused) return;
   const tile = getLinkBoardTile(linkGameState.board, position);
-  if (!tile) return;
+  if (!tile || tile.frozen) return;
   if (!selectedPosition) {
     selectedPosition = position;
     setLinkTileSelected(position, true);
