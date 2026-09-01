@@ -4,6 +4,7 @@ export function createLinkGameState() {
   return {
     mode: "easy",
     level: 1,
+    gravityShift: "static",
     score: 0,
     moves: 0,
     misses: 0,
@@ -26,12 +27,14 @@ export const linkGameState = createLinkGameState();
 export function beginLinkRound({
   mode = "easy",
   level = 1,
+  gravityShift = "static",
   layout = getLinkModeLayout(mode),
   board,
 } = {}) {
   linkGameState.roundId += 1;
   linkGameState.mode = mode;
   linkGameState.level = level;
+  linkGameState.gravityShift = gravityShift;
   linkGameState.score = 0;
   linkGameState.moves = 0;
   linkGameState.misses = 0;

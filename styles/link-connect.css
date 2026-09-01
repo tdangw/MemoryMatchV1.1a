@@ -89,6 +89,7 @@
   box-sizing: border-box;
 }
 
+
 .link-board {
   --link-columns: 4;
   --link-tile-size: 80px;

@@ -338,11 +338,12 @@ export function showLevelRewardOverlay({
   };
 
   container.append(rewardTitle, subtitle);
-  container.append(
+  const lines = [
     createRewardLine("reward-points", "trophy", `Mục tiêu: ${totalPairs} cặp`),
     createRewardLine("reward-time", "timer", `${minutes}:${seconds}`),
     createRewardLine("reward-hints", "search", assistText),
-  );
+  ];
+  container.append(...lines);
 
   overlay.appendChild(container);
   document.body.appendChild(overlay);

@@ -45,6 +45,31 @@ export function removeLinkBoardPair(board, start, end) {
   return true;
 }
 
+export function applyLinkGravityShift(board, direction = "static") {
+  if (!board || direction === "static") return false;
+  const before = board.grid.map((row) => [...row]);
+  if (direction === "down" || direction === "up") {
+    for (let column = 1; column <= board.columns; column += 1) {
+      const tiles = Array.from({ length: board.rows }, (_, index) => board.grid[index + 1][column]).filter(Boolean);
+      for (let row = 1; row <= board.rows; row += 1) board.grid[row][column] = null;
+      tiles.forEach((tile, index) => {
+        const row = direction === "down" ? board.rows - (tiles.length - 1 - index) : index + 1;
+        board.grid[row][column] = tile;
+      });
+    }
+  } else if (direction === "left" || direction === "right") {
+    for (let row = 1; row <= board.rows; row += 1) {
+      const tiles = Array.from({ length: board.columns }, (_, index) => board.grid[row][index + 1]).filter(Boolean);
+      for (let column = 1; column <= board.columns; column += 1) board.grid[row][column] = null;
+      tiles.forEach((tile, index) => {
+        const column = direction === "right" ? board.columns - (tiles.length - 1 - index) : index + 1;
+        board.grid[row][column] = tile;
+      });
+    }
+  }
+  return board.grid.some((row, rowIndex) => row.some((tile, columnIndex) => tile !== before[rowIndex][columnIndex]));
+}
+
 export function ensurePlayableBoard(board) {
   if (hasAvailableConnection(board.grid)) return false;
   shuffleIntoPlayableBoard(board);
@@ -106,8 +131,11 @@ export function getRemainingLinkTiles(board) {
   return getInteriorTiles(board);
 }
 
+let nextTileInstanceId = 1;
+
 function createTile(card) {
   return Object.freeze({
+    instanceId: `link-tile-${nextTileInstanceId++}`,
     id: card.id,
     src: card.src,
     alt: card.alt,

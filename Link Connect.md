@@ -38,9 +38,34 @@ Hai thẻ cùng hình chỉ được ghép nối thành công khi đường đi 
 
 ---
 
-## 3. Bàn cờ Tĩnh & Thẻ Tương tác
+## 3. Bàn cờ & Thẻ Tương tác
 
-Link Connect dùng bàn cờ tĩnh: sau khi ghép đúng, hai ô được để trống. Khi không còn đường nối, hệ thống tự xáo các thẻ còn lại nhưng giữ nguyên các ô trống.
+Sau mỗi cặp ghép, Link Connect áp dụng quy tắc bàn cờ của cả màn. Dù bàn tĩnh hay động, sau khi trạng thái ổn định hệ thống luôn kiểm tra còn ít nhất một đường nối; nếu không, game xáo các thẻ còn lại để ván tiếp tục.
+
+### Cơ chế dồn thẻ — Gravity Shifts
+
+Đây là cơ chế gameplay riêng, không phải hiệu ứng thẻ biến mất trong Bộ sưu tập. Sau khi một cặp thẻ bị loại bỏ, bàn cờ có thể dịch chuyển các thẻ còn lại theo quy tắc của màn, rồi tính lại các đường nối hợp lệ.
+
+1. **Bàn cờ tĩnh — Classic Static:** Ô ghép xong để trống cố định.
+2. **Rơi tự do — Gravity Down:** Thẻ phía trên rơi xuống lấp khoảng trống bên dưới.
+3. **Dồn lên trên — Gravity Up:** Thẻ phía dưới trượt lên lấp các vị trí phía trên.
+4. **Dồn sang bên — Gravity Left / Right:** Thẻ trượt dồn về cạnh trái hoặc cạnh phải bàn cờ.
+5. **Hút vào tâm — Center Pull:** Thẻ từ bốn phía trượt về tâm bàn cờ.
+6. **Tách đôi ra biên dọc — Split Push:** Nửa trên dồn lên, nửa dưới dồn xuống từ tâm bàn cờ.
+7. **Tráo đổi vị trí — Swap:** Khi một cặp bị loại bỏ, các thẻ xung quanh tráo đổi vị trí với nhau.
+8. **Tách đôi ra biên ngang:** Nửa trái dồn sang trái, nửa phải dồn sang phải.
+9. **Xoay tròn — Rotation:** Các thẻ xoay theo chiều kim đồng hồ hoặc ngược chiều kim đồng hồ.
+
+#### Đã triển khai
+
+- **Tĩnh, Dồn xuống, Dồn lên, Dồn trái và Dồn phải**. Các thẻ chuyển động bằng hoạt ảnh dịch vị; trạng thái thẻ (đặc biệt, băng và phần thưởng) đi theo chính thẻ, không theo ô cũ.
+- Phân bổ cấp độ, áp dụng cho mọi chế độ: **1–2 Tĩnh; 3–5 Dồn xuống; 6–8 Dồn lên; 9–12 luân phiên Dồn trái/phải; từ 13 ngẫu nhiên một trong bốn hướng cơ bản**. Hướng đã chọn được lưu cùng phiên đang chơi để không đổi khi tiếp tục màn.
+- Sau popup giới thiệu màn, màn động dùng popup chung **Quy tắc màn chơi** để nói rõ hướng dịch chuyển. Popup không dùng banner/toast riêng và chỉ bắt đầu đếm giờ khi người chơi đóng popup.
+- Sau dịch chuyển hoặc Sấm sét xóa cặp, hệ thống kiểm tra nước đi; nếu cần sẽ xáo các thẻ còn lại.
+
+#### Chờ triển khai sau
+
+- **Hút vào tâm, Tách đôi dọc, Tráo đổi, Tách đôi ngang và Xoay tròn.** Chỉ mở từng loại khi đã có thuật toán bảo toàn cặp, hoạt ảnh rõ ràng và kiểm thử với cặp băng, thẻ đặc biệt, Sấm sét cùng các bàn nhiều cột.
 
 ### Thẻ đặc biệt và thẻ đóng băng
 
@@ -113,8 +138,15 @@ function canConnect(startPos, endPos, grid) {
 
 ---
 
-## 7. Phạm vi triển khai hiện tại
+## 7. Trạng thái triển khai & phạm vi
 
 1. **Lõi trò chơi:** Thuật toán nối tối đa hai lần rẽ, vùng đệm ngoài biên, bàn cờ ma trận và tự phát hiện ngõ cụt.
-2. **Gameplay & giao diện:** Chủ đề ảnh dùng chung, HUD, điểm, combo, thời gian, Xu, popup đầu/cuối màn và bố cục responsive cho mobile.
-3. **Vật phẩm & thẻ đặc biệt:** Gợi ý, xáo trộn, sấm sét, đóng băng thời gian, thẻ đặc biệt, thẻ đóng băng, mốc thưởng và chế độ Thử thách.
+2. **Bàn cờ động cơ bản:** Đã có Tĩnh/Dồn xuống/Dồn lên/Dồn trái/Dồn phải, hoạt ảnh dịch chuyển và kiểm tra nước đi. Nhóm quy tắc nâng cao ở mục 3 vẫn chờ thiết kế và kiểm thử riêng.
+3. **Gameplay & giao diện:** Chủ đề ảnh dùng chung, HUD, điểm, combo, thời gian, Xu, popup đầu/cuối màn và bố cục responsive cho mobile.
+4. **Vật phẩm & thẻ đặc biệt:** Gợi ý, xáo trộn, sấm sét, đóng băng thời gian, thẻ đặc biệt, thẻ đóng băng, mốc thưởng và chế độ Thử thách.
+
+### Chủ động không triển khai trong phạm vi này
+
+- Đá, cổng không gian và các chướng ngại khác.
+- 100 màn Adventure có hình bàn riêng, Time Rush và Zen Mode.
+- Fever ×5, hạt nổ, Fever FX, nhạc tăng nhịp và hiệu ứng xáo “xoáy” với ràng buộc ba nước đi.

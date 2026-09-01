@@ -14,6 +14,7 @@ import {
   LINK_CONNECT_CONFIG,
   getLinkLevelHintBonus,
   getLinkLevelTimeBonus,
+  getLinkGravityShift,
   getLinkModeLayout,
   getLinkTimerDirection,
   getLinkMatchResolveDelay,
@@ -23,6 +24,7 @@ import {
 } from "./linkConfig.js";
 import {
   createLinkBoard,
+  applyLinkGravityShift,
   ensurePlayableBoard,
   getLinkBoardTile,
   removeLinkBoardPair,
@@ -51,6 +53,7 @@ import {
   playLinkMatchExit,
   playLinkThunderStrike,
   renderLinkBoard,
+  renderLinkBoardShift,
   setLinkTileSelected,
 } from "./linkRenderer.js";
 import { beginLinkRound, linkGameState, resetLinkGame } from "./linkState.js";
@@ -153,7 +156,7 @@ function chooseLinkMode(mode, label, difficultyModal) {
   modal.panel.classList.add("session-choice-modal");
 }
 
-export function startLinkLevel({ mode = linkGameState.mode, level = 1, resume = false } = {}) {
+export function startLinkLevel({ mode = linkGameState.mode, level = 1, resume = false, gravityShift } = {}) {
   stopCountdown();
   clearGameplayRewardPopups();
   clearLinkPath();
@@ -172,8 +175,9 @@ export function startLinkLevel({ mode = linkGameState.mode, level = 1, resume = 
     linkGameState.specialProgress = 0;
     clearActiveSession("link-connect", mode);
   }
-  saveActiveSession("link-connect", { mode, level });
-  const roundId = beginLinkRound({ mode, level, layout, board });
+  const resolvedGravityShift = gravityShift || getLinkGravityShift(level);
+  saveActiveSession("link-connect", { mode, level, gravityShift: resolvedGravityShift });
+  const roundId = beginLinkRound({ mode, level, layout, board, gravityShift: resolvedGravityShift });
   if (isLinkEndlessMode(mode)) linkGameState.remainingTime = 0;
   else if (isLinkChallengeMode(mode)) linkGameState.remainingTime = getLinkChallengeTime(level);
   else {
@@ -196,8 +200,13 @@ export function startLinkLevel({ mode = linkGameState.mode, level = 1, resume = 
     assistText: `Gợi ý: ${getLinkItemCount("hint")}`,
     onComplete: () => {
       if (linkGameState.roundId !== roundId) return;
-      linkGameState.isLocked = false;
-      startCountdown(roundId);
+      const startRound = () => {
+        if (linkGameState.roundId !== roundId) return;
+        linkGameState.isLocked = false;
+        startCountdown(roundId);
+      };
+      if (resolvedGravityShift === "static") startRound();
+      else showLinkGravityRuleModal(resolvedGravityShift, startRound);
     },
   });
 }
@@ -442,9 +451,11 @@ function handleLinkTileClick(position) {
     linkGameState.matchedPairs += 1;
     const specialBoardChanged = isSpecialMatch && applySpecialMatchRewards();
     if (firstTile.luckyReward) applyLinkLuckyReward(firstTile.luckyReward);
+    const boardShifted = applyLinkGravityShift(board, linkGameState.gravityShift);
     selectedPosition = null;
     clearLinkPath();
-    if (specialBoardChanged) renderLinkBoard(linkGameState.board, { onTileClick: handleLinkTileClick });
+    if (boardShifted) renderLinkBoardShift(linkGameState.board, { onTileClick: handleLinkTileClick });
+    else if (specialBoardChanged) renderLinkBoard(linkGameState.board, { onTileClick: handleLinkTileClick });
     else clearLinkMatchedPair(matchedStart, position);
     updateLinkHud();
     if (linkGameState.matchedPairs >= linkGameState.totalPairs) {
@@ -550,12 +561,44 @@ function finishLinkThunder(board, roundId) {
     completeLinkLevel();
     return;
   }
+  const boardShifted = applyLinkGravityShift(board, linkGameState.gravityShift);
+  if (boardShifted) renderLinkBoardShift(board, { onTileClick: handleLinkTileClick });
   if (ensurePlayableBoard(board)) {
     renderLinkBoard(board, { onTileClick: handleLinkTileClick });
     showAppToast("Không còn đường nối. Bàn đã được xáo lại.");
   }
   linkGameState.isLocked = false;
 }
+
+function getGravityShiftLabel(direction) {
+  return {
+    down: "Dồn xuống",
+    up: "Dồn lên",
+    left: "Dồn sang trái",
+    right: "Dồn sang phải",
+  }[direction] || "Bàn cờ tĩnh";
+}
+
+function showLinkGravityRuleModal(direction, onComplete) {
+  const content = document.createElement("p");
+  content.className = "link-gravity-rule__copy";
+  const directionText = {
+    down: "dồn xuống dưới",
+    up: "dồn lên trên",
+    left: "dồn sang bên trái",
+    right: "dồn sang bên phải",
+  }[direction] || "giữ nguyên vị trí";
+  content.textContent = `Sau mỗi cặp ghép, các thẻ còn lại sẽ ${directionText}.`;
+  openAppModal({
+    id: "link-gravity-rule-modal",
+    icon: "restart",
+    title: "Quy tắc màn chơi",
+    content,
+    actions: [{ label: "Đã hiểu", icon: "play", variant: "primary" }],
+    onClose: onComplete,
+  });
+}
+
 
 function useLinkFreeze() {
   linkGameState.freezeSeconds += 10;

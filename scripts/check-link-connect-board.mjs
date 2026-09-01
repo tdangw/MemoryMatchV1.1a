@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import {
   createLinkBoard,
+  applyLinkGravityShift,
   ensurePlayableBoard,
   getRemainingLinkTiles,
   makeRandomLinkPairSpecial,
@@ -67,5 +68,26 @@ assert.equal(getRemainingLinkTiles(specialBoard).filter((tile) => tile.frozen).l
 assert.ok(makeRandomLinkPairSpecial(specialBoard));
 assert.ok(removeRandomLinkPair(specialBoard));
 assert.equal(unlockAllFrozenLinkPairs(specialBoard), 0);
+
+const gravityBoard = {
+  rows: 3,
+  columns: 3,
+  grid: [
+    [null, null, null, null, null],
+    [null, { id: "a" }, null, { id: "b" }, null],
+    [null, null, { id: "c" }, null, null],
+    [null, { id: "d" }, null, null, null],
+    [null, null, null, null, null],
+  ],
+};
+assert.equal(applyLinkGravityShift(gravityBoard, "down"), true);
+assert.equal(gravityBoard.grid[3][1].id, "d");
+assert.equal(gravityBoard.grid[3][2].id, "c");
+assert.equal(gravityBoard.grid[3][3].id, "b");
+assert.equal(gravityBoard.grid[2][1].id, "a");
+assert.equal(applyLinkGravityShift(gravityBoard, "right"), true);
+assert.equal(gravityBoard.grid[2][3].id, "a");
+assert.equal(applyLinkGravityShift(gravityBoard, "left"), true);
+assert.equal(gravityBoard.grid[2][1].id, "a");
 
 console.log("Link Connect board checks passed.");

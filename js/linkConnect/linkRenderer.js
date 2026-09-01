@@ -48,6 +48,7 @@ export function renderLinkBoard(board, { onTileClick } = {}) {
       }
       button.dataset.row = String(position.row);
       button.dataset.column = String(position.column);
+      button.dataset.tileKey = tile.instanceId;
       button.setAttribute(
         "aria-label",
         tile.frozen ? `${tile.alt} · thẻ đóng băng` : tile.alt,
@@ -70,6 +71,33 @@ export function renderLinkBoard(board, { onTileClick } = {}) {
     });
   });
   updateLinkBoardLayout();
+}
+
+export function renderLinkBoardShift(board, { onTileClick } = {}) {
+  const before = getLinkTileRects();
+  renderLinkBoard(board, { onTileClick });
+  const after = getLinkTileRects();
+  after.forEach(({ element, rect, key }) => {
+    const previous = before.get(key);
+    if (!previous) return;
+    const deltaX = previous.left - rect.left;
+    const deltaY = previous.top - rect.top;
+    if (!deltaX && !deltaY) return;
+    element.style.transition = "none";
+    element.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+    requestAnimationFrame(() => {
+      element.style.transition = "transform var(--link-board-shift-duration, 300ms) cubic-bezier(.2,.75,.25,1)";
+      element.style.transform = "";
+      element.addEventListener("transitionend", () => { element.style.transition = ""; }, { once: true });
+    });
+  });
+}
+
+function getLinkTileRects() {
+  return new Map(Array.from(document.querySelectorAll(".link-tile[data-tile-key]")).map((element) => [
+    element.dataset.tileKey,
+    { element, rect: element.getBoundingClientRect(), key: element.dataset.tileKey },
+  ]));
 }
 
 export function setLinkTileSelected(position, selected) {

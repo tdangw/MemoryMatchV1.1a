@@ -1,4 +1,8 @@
 export const LINK_CONNECT_CONFIG = Object.freeze({
+  gravity: Object.freeze({
+    basicDirections: Object.freeze(["down", "up", "left", "right"]),
+    randomFromLevel: 13,
+  }),
   modes: Object.freeze({
     easy: Object.freeze({ tileCount: 12, columns: 4, timeSeconds: 60, coinReward: Object.freeze({ base: 25, speedMultiplier: 0.25 }) }),
     normal: Object.freeze({ tileCount: 24, columns: 6, timeSeconds: 90, coinReward: Object.freeze({ base: 40, speedMultiplier: 0.35 }) }),
@@ -133,4 +137,17 @@ export function calculateLinkMatchPoints(combo = 1, { special = false } = {}) {
 export function getLinkFrozenPairCount(level = 1) {
   const special = LINK_CONNECT_CONFIG.special;
   return level >= special.frozenTilesFromLevel ? special.frozenPairsPerLevel : 0;
+}
+
+export function getLinkGravityShift(level = 1, random = Math.random) {
+  const normalizedLevel = Math.max(1, Math.floor(level));
+  if (normalizedLevel <= 2) return "static";
+  if (normalizedLevel <= 5) return "down";
+  if (normalizedLevel <= 8) return "up";
+  if (normalizedLevel <= 12) return normalizedLevel % 2 === 1 ? "left" : "right";
+  if (normalizedLevel >= LINK_CONNECT_CONFIG.gravity.randomFromLevel) {
+    const directions = LINK_CONNECT_CONFIG.gravity.basicDirections;
+    return directions[Math.floor(random() * directions.length)];
+  }
+  return "static";
 }

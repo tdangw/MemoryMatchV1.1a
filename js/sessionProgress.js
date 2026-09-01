@@ -27,6 +27,7 @@ export function saveActiveSession(gameId, session) {
   gameState.progress[key].sessionsByMode[session.mode] = {
     mode: session.mode,
     level: Math.max(1, Math.floor(session.level || 1)),
+    ...(typeof session.gravityShift === "string" ? { gravityShift: session.gravityShift } : {}),
   };
   saveProgress(gameState.progress);
 }

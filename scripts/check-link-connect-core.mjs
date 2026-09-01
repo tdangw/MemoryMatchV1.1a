@@ -9,6 +9,7 @@ import {
   getLinkChallengeLayout,
   getLinkModeLayout,
   getLinkTimerDirection,
+  getLinkGravityShift,
 } from "../js/linkConnect/linkConfig.js";
 import {
   getActiveLinkConnectionEffect,
@@ -57,6 +58,12 @@ assert.equal(getLinkChallengeLayout(10).tileCount, 24);
 assert.equal(getLinkTimerDirection("endless"), "up");
 assert.equal(calculateLinkMatchPoints(3), 16);
 assert.equal(calculateLinkMatchPoints(3, { special: true }), 24);
+assert.equal(getLinkGravityShift(1), "static");
+assert.equal(getLinkGravityShift(3), "down");
+assert.equal(getLinkGravityShift(6), "up");
+assert.equal(getLinkGravityShift(9), "left");
+assert.equal(getLinkGravityShift(10), "right");
+assert.equal(getLinkGravityShift(13, () => 0.51), "left");
 assert.equal(getActiveLinkConnectionEffect({ linkPathEffect: "electric", linkExitEffect: "dissolve" }).pathClass, "link-path-overlay--electric");
 assert.equal(LINK_PATH_EFFECTS.length, 20);
 assert.equal(LINK_EXIT_EFFECTS.length, 20);
