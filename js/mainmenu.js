@@ -55,7 +55,6 @@ export function createMainMenu() {
 
   const wrapper = document.createElement("div");
   wrapper.className = "menu-wrapper";
-  wrapper.appendChild(createGameSwitchButton(onChangeGame));
 
   const title = document.createElement("h1");
   title.className = "game-title";
@@ -78,11 +77,16 @@ export function createMainMenu() {
       },
     },
     {
-      icon: "settings",
-      text: "Cài đặt",
+      icon: "collection",
+      text: "Bộ sưu tập",
       action: () => {
-        showSettingsPanel();
+        showCollectionModal();
       },
+    },
+    {
+      icon: "shop",
+      text: "Cửa hàng",
+      action: () => openShopOverlay({ fromMenu: true }),
     },
     {
       icon: "book",
@@ -101,16 +105,11 @@ export function createMainMenu() {
       },
     },
     {
-      icon: "collection",
-      text: "Bộ sưu tập",
+      icon: "settings",
+      text: "Cài đặt",
       action: () => {
-        showCollectionModal();
+        showSettingsPanel();
       },
-    },
-    {
-      icon: "shop",
-      text: "Cửa hàng",
-      action: () => openShopOverlay({ fromMenu: true }),
     },
     {
       icon: "info",
@@ -123,6 +122,11 @@ export function createMainMenu() {
            <p class="app-modal__note">Tác giả: Đăng · Phiên bản ${APP_VERSION}</p>`,
         );
       },
+    },
+    {
+      icon: "home",
+      text: "Home",
+      action: onChangeGame,
     },
   ];
 
@@ -137,16 +141,6 @@ export function createMainMenu() {
   wrapper.appendChild(menuList);
   menuOverlay.appendChild(wrapper);
   document.body.appendChild(menuOverlay);
-}
-
-function createGameSwitchButton(onClick) {
-  const button = document.createElement("button");
-  button.type = "button";
-  button.className = "menu-game-exit";
-  button.setAttribute("aria-label", "Đổi trò chơi");
-  button.append(createIcon("exit"));
-  button.addEventListener("click", onClick);
-  return button;
 }
 
 /**
