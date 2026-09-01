@@ -13,7 +13,12 @@ let onOpenLinkCollection = () => {};
 let onOpenLinkShop = () => {};
 let onContinueLinkConnect = () => {};
 
-export function configureGameSelector({ startLinkConnect, openLinkCollection, openLinkShop, continueLinkConnect } = {}) {
+export function configureGameSelector({
+  startLinkConnect,
+  openLinkCollection,
+  openLinkShop,
+  continueLinkConnect,
+} = {}) {
   onStartLinkConnect = startLinkConnect || onStartLinkConnect;
   onOpenLinkCollection = openLinkCollection || onOpenLinkCollection;
   onOpenLinkShop = openLinkShop || onOpenLinkShop;
@@ -24,23 +29,28 @@ export function showGameSelector() {
   activeGameId = null;
   document.documentElement.dataset.activeGame = "selector";
   document.getElementById("menu-container")?.remove();
-  document.getElementById("game-container")?.style.setProperty("display", "none");
+  document
+    .getElementById("game-container")
+    ?.style.setProperty("display", "none");
 
   const overlay = createMenuOverlay("game-selector");
-  const wrapper = createMenuWrapper("Chọn trò chơi", "Chọn cách bạn muốn rèn luyện hôm nay.");
+  const wrapper = createMenuWrapper(
+    "Chọn trò chơi",
+    "Chọn cách bạn muốn rèn luyện hôm nay.",
+  );
   const choices = document.createElement("div");
   choices.className = "game-selector__choices";
   choices.append(
     createGameChoice({
       icon: "images",
       title: "Memory Match",
-      description: "Thử thách cách mà bạn ghi nhớ.",
+      description: "Thử thách rèn luyện ghi nhớ.",
       onClick: () => openGameMenu("memory-match"),
     }),
     createGameChoice({
       icon: "puzzle",
       title: "Link Connect",
-      description: "Thử thách cách mà bạn quan sát.",
+      description: "Thử thách rèn luyện quan sát.",
       onClick: () => openGameMenu("link-connect"),
     }),
   );
@@ -73,16 +83,20 @@ function createLinkConnectMenu() {
   const overlay = createMenuOverlay("link-connect-menu");
   const wrapper = createMenuWrapper(
     "Link Connect",
-    "Thử thách cách mà bạn quan sát.",
+    "Thử thách rèn luyện quan sát.",
   );
   const menuList = document.createElement("ul");
   menuList.className = "menu-list";
   menuList.append(
-    ...(getActiveSessions("link-connect").length ? [createMenuItem({
-      icon: "play",
-      text: "Tiếp tục",
-      onClick: () => showLinkSessionPicker(onContinueLinkConnect),
-    })] : []),
+    ...(getActiveSessions("link-connect").length
+      ? [
+          createMenuItem({
+            icon: "play",
+            text: "Tiếp tục",
+            onClick: () => showLinkSessionPicker(onContinueLinkConnect),
+          }),
+        ]
+      : []),
     createMenuItem({
       icon: "play",
       text: "Bắt đầu",
@@ -101,11 +115,12 @@ function createLinkConnectMenu() {
     createMenuItem({
       icon: "book",
       text: "Hướng dẫn",
-      onClick: () => showGameInfoModal(
-        "Cách chơi Link Connect",
-        "<p>Quan sát các hình đang mở và nối hai hình giống nhau bằng đường đi không có vật cản.</p><p>Đường nối có tối đa hai lần rẽ.</p>",
-        "book",
-      ),
+      onClick: () =>
+        showGameInfoModal(
+          "Cách chơi Link Connect",
+          "<p>Quan sát các hình đang mở và nối hai hình giống nhau bằng đường đi không có vật cản.</p><p>Đường nối có tối đa hai lần rẽ.</p>",
+          "book",
+        ),
     }),
     createMenuItem({
       icon: "settings",
@@ -115,10 +130,11 @@ function createLinkConnectMenu() {
     createMenuItem({
       icon: "info",
       text: "Thông tin",
-      onClick: () => showGameInfoModal(
-        "Giới thiệu",
-        "<p><strong>Link Connect</strong> là trò chơi nối cặp hình giúp rèn luyện khả năng quan sát.</p>",
-      ),
+      onClick: () =>
+        showGameInfoModal(
+          "Giới thiệu",
+          "<p><strong>Link Connect</strong> là trò chơi nối cặp hình giúp rèn luyện khả năng quan sát.</p>",
+        ),
     }),
     createMenuItem({
       icon: "home",
@@ -134,7 +150,9 @@ function createLinkConnectMenu() {
 function showLinkSessionPicker(onContinue) {
   const content = document.createElement("div");
   content.className = "difficulty-content";
-  const theme = getTheme(getEquippedThemeId(gameState.appearance, "link-connect"));
+  const theme = getTheme(
+    getEquippedThemeId(gameState.appearance, "link-connect"),
+  );
   const themeRow = document.createElement("div");
   themeRow.className = "difficulty-theme";
   themeRow.append(createIcon(theme.icon));
@@ -151,7 +169,12 @@ function showLinkSessionPicker(onContinue) {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "difficulty-option";
-    button.append(createIcon(modeIcon(session.mode)), document.createTextNode(`${modeLabel(session.mode)} - Level ${session.level}`));
+    button.append(
+      createIcon(modeIcon(session.mode)),
+      document.createTextNode(
+        `${modeLabel(session.mode)} - Level ${session.level}`,
+      ),
+    );
     button.onclick = () => {
       modal.close();
       setTimeout(() => onContinue(session), 180);
@@ -159,19 +182,45 @@ function showLinkSessionPicker(onContinue) {
     options.append(button);
   });
   content.append(themeRow, options);
-  const modal = openAppModal({ id: "difficulty-modal", icon: "play", title: "Tiếp tục hành trình", content });
+  const modal = openAppModal({
+    id: "difficulty-modal",
+    icon: "play",
+    title: "Tiếp tục hành trình",
+    content,
+  });
   changeTheme.onclick = () => {
     modal.close();
-    setTimeout(() => onOpenLinkCollection(() => showLinkSessionPicker(onContinue)), 180);
+    setTimeout(
+      () => onOpenLinkCollection(() => showLinkSessionPicker(onContinue)),
+      180,
+    );
   };
 }
 
 function modeLabel(mode) {
-  return ({ easy: "Dễ", normal: "Trung bình", hard: "Khó", superHard: "Siêu khó", endless: "Vô tận", challenge: "Thử thách" })[mode] || mode;
+  return (
+    {
+      easy: "Dễ",
+      normal: "Trung bình",
+      hard: "Khó",
+      superHard: "Siêu khó",
+      endless: "Vô tận",
+      challenge: "Thử thách",
+    }[mode] || mode
+  );
 }
 
 function modeIcon(mode) {
-  return ({ easy: "status-easy", normal: "status-normal", hard: "status-hard", superHard: "status-super-hard", endless: "timer", challenge: "trophy" })[mode] || "play";
+  return (
+    {
+      easy: "status-easy",
+      normal: "status-normal",
+      hard: "status-hard",
+      superHard: "status-super-hard",
+      endless: "timer",
+      challenge: "trophy",
+    }[mode] || "play"
+  );
 }
 
 function createMenuOverlay(variant) {

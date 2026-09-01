@@ -1,4 +1,5 @@
 export const GAMEPLAY_TIMING = Object.freeze({
+  secondMs: 1000,
   tileRevealAnimationMs: 600,
   tileHideAnimationMs: 180,
   mismatchRevealMs: 800,

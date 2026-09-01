@@ -15,6 +15,15 @@ const levelElement = document.getElementById("level");
 const hintElement = document.getElementById("hint");
 const timerElement = document.getElementById("timer-value");
 const timerContainer = document.getElementById("timer");
+const memoryTimeHudElement = document.getElementById("memory-time-hud");
+const memoryTimeProgressElement = document.getElementById("memory-time-progress");
+let memoryTimeAnimationFrame = null;
+let memoryTimeProgressState = null;
+const rewardPopupQueue = [];
+let rewardPopupActive = false;
+let rewardPopupOverlay = null;
+let rewardPopupDismissTimer;
+let rewardPopupRemoveTimer;
 const movesElement = document.getElementById("moves");
 const missesElement = document.getElementById("misses");
 const comboElement = document.getElementById("combo");
@@ -102,6 +111,72 @@ export function updateTimerDisplay(seconds) {
   }
 }
 
+export function setMemoryTimeProgress({ remainingSeconds, timeLimit }) {
+  stopMemoryTimeProgress();
+  memoryTimeProgressState = createMemoryTimeProgressState({ remainingSeconds, timeLimit, running: false });
+  renderMemoryTimeProgress(memoryTimeProgressState.remainingMs, memoryTimeProgressState);
+}
+
+export function startMemoryTimeProgress({ remainingSeconds, timeLimit }) {
+  stopMemoryTimeProgress();
+  memoryTimeProgressState = createMemoryTimeProgressState({ remainingSeconds, timeLimit, running: true });
+  if (memoryTimeProgressState.endless) {
+    renderMemoryTimeProgress(memoryTimeProgressState.remainingMs, memoryTimeProgressState);
+    return;
+  }
+  memoryTimeProgressState.deadline = performance.now() + memoryTimeProgressState.remainingMs;
+  updateMemoryTimeProgressFrame();
+}
+
+export function syncMemoryTimeProgress({ remainingSeconds, timeLimit }) {
+  const wasRunning = Boolean(memoryTimeProgressState?.running);
+  if (wasRunning) startMemoryTimeProgress({ remainingSeconds, timeLimit });
+  else setMemoryTimeProgress({ remainingSeconds, timeLimit });
+}
+
+export function stopMemoryTimeProgress() {
+  if (memoryTimeAnimationFrame !== null) cancelAnimationFrame(memoryTimeAnimationFrame);
+  memoryTimeAnimationFrame = null;
+  if (!memoryTimeProgressState) return;
+  if (memoryTimeProgressState.running && !memoryTimeProgressState.endless) {
+    memoryTimeProgressState.remainingMs = Math.max(0, memoryTimeProgressState.deadline - performance.now());
+  }
+  memoryTimeProgressState.running = false;
+  renderMemoryTimeProgress(memoryTimeProgressState.remainingMs, memoryTimeProgressState);
+}
+
+function createMemoryTimeProgressState({ remainingSeconds, timeLimit, running }) {
+  const endless = isEndlessMode(gameState.settings.mode);
+  return {
+    endless,
+    running,
+    timeLimitMs: Math.max(1, Number(timeLimit || remainingSeconds || 1)) * GAMEPLAY_TIMING.secondMs,
+    remainingMs: Math.max(0, Number(remainingSeconds || 0)) * GAMEPLAY_TIMING.secondMs,
+    deadline: null,
+  };
+}
+
+function updateMemoryTimeProgressFrame() {
+  if (!memoryTimeProgressState?.running || memoryTimeProgressState.endless) return;
+  memoryTimeProgressState.remainingMs = Math.max(0, memoryTimeProgressState.deadline - performance.now());
+  renderMemoryTimeProgress(memoryTimeProgressState.remainingMs, memoryTimeProgressState);
+  if (memoryTimeProgressState.remainingMs > 0) {
+    memoryTimeAnimationFrame = requestAnimationFrame(updateMemoryTimeProgressFrame);
+  } else {
+    memoryTimeAnimationFrame = null;
+    memoryTimeProgressState.running = false;
+  }
+}
+
+function renderMemoryTimeProgress(remainingMs, state) {
+  if (!memoryTimeHudElement || !memoryTimeProgressElement) return;
+  const ratio = state.endless ? 1 : Math.max(0, Math.min(1, remainingMs / state.timeLimitMs));
+  memoryTimeProgressElement.style.width = `${(ratio * 100).toFixed(4)}%`;
+  memoryTimeHudElement.classList.toggle("is-warning", !state.endless && ratio < 0.7 && ratio >= 0.3);
+  memoryTimeHudElement.classList.toggle("is-critical", !state.endless && ratio < 0.3);
+  memoryTimeHudElement.classList.toggle("is-endless", state.endless);
+}
+
 export function showBonusOverlay(message) {
   showAppToast(message, { tone: "info", duration: 1600 });
 
@@ -132,15 +207,52 @@ export function openTimeUpModal({
 }
 
 export function showLuckyRewardPopup(reward) {
-  document.querySelector(".lucky-reward-popup-overlay")?.remove();
+  showGameplayRewardPopup({
+    title: "Ô may mắn!",
+    type: reward.type,
+    value: reward.value,
+  });
+}
 
+export function showGameplayRewardPopup({
+  title = "Phần thưởng!",
+  type,
+  value,
+  icon,
+  label,
+  sound = true,
+} = {}) {
   const presentations = {
-    time: { icon: "timer", label: `+${reward.value} giây` },
-    hints: { icon: "search", label: `+${reward.value} gợi ý` },
-    coins: { icon: "coin", label: `+${reward.value} Xu` },
+    time: { icon: "timer", label: `+${value} giây` },
+    hints: { icon: "search", label: `+${value} gợi ý` },
+    coins: { icon: "coin", label: `+${value} Xu` },
+    reshuffle: { icon: "restart", label: `+${value} lượt xáo trộn` },
   };
-  const presentation = presentations[reward.type];
+  const presentation = presentations[type] || (icon && label ? { icon, label } : null);
   if (!presentation) return;
+
+  rewardPopupQueue.push({ title, presentation, sound });
+  if (!rewardPopupActive) showNextGameplayRewardPopup();
+}
+
+export function clearGameplayRewardPopups() {
+  rewardPopupQueue.length = 0;
+  rewardPopupActive = false;
+  clearTimeout(rewardPopupDismissTimer);
+  clearTimeout(rewardPopupRemoveTimer);
+  rewardPopupDismissTimer = undefined;
+  rewardPopupRemoveTimer = undefined;
+  rewardPopupOverlay?.remove();
+  rewardPopupOverlay = null;
+}
+
+function showNextGameplayRewardPopup() {
+  const next = rewardPopupQueue.shift();
+  if (!next) {
+    rewardPopupActive = false;
+    return;
+  }
+  rewardPopupActive = true;
 
   const overlay = document.createElement("div");
   overlay.className = "lucky-reward-popup-overlay";
@@ -152,22 +264,27 @@ export function showLuckyRewardPopup(reward) {
   badge.className = "lucky-reward-popup__badge";
   badge.append(createIcon("star"));
   const title = document.createElement("strong");
-  title.textContent = "Ô may mắn!";
+  title.textContent = next.title;
   const value = document.createElement("span");
   value.className = "lucky-reward-popup__value";
-  value.append(createIcon(presentation.icon), document.createTextNode(presentation.label));
+  value.append(createIcon(next.presentation.icon), document.createTextNode(next.presentation.label));
   popup.append(badge, title, value);
   overlay.append(popup);
   document.body.append(overlay);
+  rewardPopupOverlay = overlay;
 
-  if (gameState.settings?.sound) {
+  if (next.sound && gameState.settings?.sound) {
     sounds.overlay.currentTime = 0;
     sounds.overlay.play().catch(() => {});
   }
 
-  setTimeout(() => {
+  rewardPopupDismissTimer = setTimeout(() => {
     overlay.classList.add("is-leaving");
-    setTimeout(() => overlay.remove(), 240);
+    rewardPopupRemoveTimer = setTimeout(() => {
+      overlay.remove();
+      if (rewardPopupOverlay === overlay) rewardPopupOverlay = null;
+      showNextGameplayRewardPopup();
+    }, 240);
   }, 1500);
 }
 // Thưởng qua màn

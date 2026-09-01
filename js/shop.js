@@ -3,6 +3,7 @@ import {
   updateCoinDisplay,
   updateHintDisplay,
   updateTimerDisplay,
+  syncMemoryTimeProgress,
   showShopMessage,
   animateIconToTarget,
   showRevealTimerInHud,
@@ -432,6 +433,7 @@ function handleBuyItem(item, roundId, fromMenu = false) {
     case "time":
       gameState.remainingTime += item.value;
       updateTimerDisplay(gameState.remainingTime);
+      syncMemoryTimeProgress({ remainingSeconds: gameState.remainingTime, timeLimit: gameState.timeLimit });
       animateIconToTarget("timer", "#timer");
       showShopMessage(`Đã mua +${item.value}s thời gian`);
       break;

@@ -22,6 +22,10 @@ import {
   updateScoreDisplay,
   updateHintDisplay,
   updateTimerDisplay,
+  setMemoryTimeProgress,
+  startMemoryTimeProgress,
+  stopMemoryTimeProgress,
+  syncMemoryTimeProgress,
   updateMovesDisplay,
   updateMissesDisplay,
   updateComboDisplay,
@@ -77,6 +81,7 @@ export function initializeLevel(level) {
       ? modeLayout.timeSeconds
       : gameState.remainingTime + GAME_CONFIG.specialModes.challengeTimeBonusSeconds;
   } else gameState.remainingTime = layout.timeSeconds + timeBonus;
+  gameState.timeLimit = gameState.remainingTime;
   gameState.hints += hintBonus;
   const previewDurationMs = getPreviewDurationMs(mode);
   createGrid(layout, { roundId, onPreviewComplete: startCountdown, previewDurationMs });
@@ -98,6 +103,7 @@ export function initializeLevel(level) {
   updateComboDisplay(gameState.combo);
   updatePairProgressDisplay(gameState.matchedPairs, gameState.totalPairs);
   updateTimerDisplay(gameState.remainingTime);
+  setMemoryTimeProgress({ remainingSeconds: gameState.remainingTime, timeLimit: gameState.timeLimit });
   showLevelRewardOverlay();
   showRevealTimerInHud(previewDurationMs / 1000, roundId);
   document.getElementById("btn-buy-time")?.toggleAttribute("hidden", isEndlessMode(mode));
@@ -106,6 +112,7 @@ export function initializeLevel(level) {
 function startCountdown(roundId = gameState.roundId) {
   if (gameState.roundId !== roundId) return;
   stopCountdown();
+  startMemoryTimeProgress({ remainingSeconds: gameState.remainingTime, timeLimit: gameState.timeLimit });
   syncDefaultMusic(gameState.settings);
   countdownInterval = setInterval(() => {
     if (gameState.roundId !== roundId) return stopCountdown();
@@ -121,6 +128,7 @@ function startCountdown(roundId = gameState.roundId) {
 function stopCountdown() {
   clearInterval(countdownInterval);
   countdownInterval = undefined;
+  stopMemoryTimeProgress();
 }
 
 function isGameVisible() {
@@ -173,11 +181,13 @@ function handleTimeUp() {
     saveCoins(gameState.coins);
     actionSelected = true;
     gameState.remainingTime = seconds;
+    gameState.timeLimit = seconds;
     const roundId = beginRound();
     gameState.isLocked = false;
     gameState.isPaused = false;
     document.getElementById("grid-container")?.classList.remove("is-locked");
     updateTimerDisplay(gameState.remainingTime);
+    syncMemoryTimeProgress({ remainingSeconds: gameState.remainingTime, timeLimit: gameState.timeLimit });
     close();
     showBonusOverlay(`Đã mua +${seconds}s với ${price} Xu.`);
     syncDefaultMusic(gameState.settings);

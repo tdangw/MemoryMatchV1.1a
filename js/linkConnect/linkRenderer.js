@@ -3,6 +3,7 @@ import { getActiveLinkConnectionEffect } from "./linkEffects.js";
 const PATH_VIEWBOX = "0 0 100 100";
 const ELECTRIC_JITTER_PERCENT = 0.65;
 const ELECTRIC_SEGMENT_LENGTH_PERCENT = 7;
+const OUTER_ROUTE_INSET_PERCENT = 1.5;
 let layoutFrame;
 
 window.addEventListener("resize", () => {
@@ -131,10 +132,10 @@ function toPercentPoint(position, board, boardElement) {
   const gap = readBoardGap(boardElement);
   const x = cellRect.left + (position.column - 1) * (cellRect.width + gap) + cellRect.width / 2;
   const y = cellRect.top + (position.row - 1) * (cellRect.height + gap) + cellRect.height / 2;
-  return {
+  return clampPathPoint({
     x: ((x - boardRect.left) / boardRect.width) * 100,
     y: ((y - boardRect.top) / boardRect.height) * 100,
-  };
+  });
 }
 
 function getLinkBoardCell(position) {
@@ -148,6 +149,17 @@ function toPercent(cellRect, boardRect) {
     x: ((cellRect.left + cellRect.width / 2 - boardRect.left) / boardRect.width) * 100,
     y: ((cellRect.top + cellRect.height / 2 - boardRect.top) / boardRect.height) * 100,
   };
+}
+
+function clampPathPoint(point) {
+  return {
+    x: clamp(point.x, OUTER_ROUTE_INSET_PERCENT, 100 - OUTER_ROUTE_INSET_PERCENT),
+    y: clamp(point.y, OUTER_ROUTE_INSET_PERCENT, 100 - OUTER_ROUTE_INSET_PERCENT),
+  };
+}
+
+function clamp(value, minimum, maximum) {
+  return Math.min(maximum, Math.max(minimum, value));
 }
 
 function createElectricPoints(points) {
@@ -195,17 +207,23 @@ function updateLinkBoardLayout() {
   const verticalPadding = Number.parseFloat(boardStyles.paddingTop) || 0;
   const gamePadding = (Number.parseFloat(gameStyles.paddingTop) || 0)
     + (Number.parseFloat(gameStyles.paddingBottom) || 0);
+  const boardSafeInset = Number.parseFloat(gameStyles.getPropertyValue("--link-board-safe-inset")) || 0;
   const gameGap = Number.parseFloat(gameStyles.rowGap) || 0;
   const chromeHeight = [
-    ".link-connect-game__header",
-    ".link-connect-game__stats",
-    ".link-connect-game__footer",
-    ".link-connect-game__items",
+    ".link-game-name",
+    ".link-game-progress-hud",
+    ".link-game-hud",
+    ".link-special-hud",
   ].reduce((total, selector) => total + (game.querySelector(selector)?.getBoundingClientRect().height || 0), 0);
-  const availableWidth = Math.min(700, game.clientWidth);
+  const horizontalGamePadding = (Number.parseFloat(gameStyles.paddingLeft) || 0)
+    + (Number.parseFloat(gameStyles.paddingRight) || 0);
+  const availableWidth = Math.min(
+    700,
+    Math.max(0, game.clientWidth - horizontalGamePadding - boardSafeInset * 2),
+  );
   const availableHeight = Math.max(
     168,
-    window.innerHeight - chromeHeight - gamePadding - gameGap * 4,
+    window.innerHeight - chromeHeight - gamePadding - gameGap * 4 - boardSafeInset,
   );
   const tileByWidth = (availableWidth - horizontalPadding * 2 - gap * (columns - 1)) / columns;
   const tileByHeight = (availableHeight - verticalPadding * 2 - gap * (rows - 1)) / rows;

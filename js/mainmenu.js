@@ -9,7 +9,11 @@ import { APP_VERSION } from "./appMeta.js";
 import { THEMES, getTheme, isThemePlayable } from "./themeCatalog.js";
 import { saveAppearance } from "./persistence.js";
 import { openShopOverlay } from "./shop.js";
-import { clearActiveSession, getActiveSession, getActiveSessions } from "./sessionProgress.js";
+import {
+  clearActiveSession,
+  getActiveSession,
+  getActiveSessions,
+} from "./sessionProgress.js";
 import { showThemeChangeNotice } from "./themeChangeNotice.js";
 import {
   CARD_BACKS,
@@ -24,7 +28,11 @@ let onStartGame = () => {};
 let onChangeGame = () => {};
 let onContinueGame = () => {};
 
-export function configureMainMenu({ startGame, changeGame, continueGame } = {}) {
+export function configureMainMenu({
+  startGame,
+  changeGame,
+  continueGame,
+} = {}) {
   onStartGame = startGame || onStartGame;
   onChangeGame = changeGame || onChangeGame;
   onContinueGame = continueGame || onContinueGame;
@@ -65,18 +73,22 @@ export function createMainMenu() {
   wrapper.appendChild(title);
   const description = document.createElement("p");
   description.className = "menu-description";
-  description.textContent = "Thử thách cách mà bạn ghi nhớ.";
+  description.textContent = "Thử thách rèn luyện ghi nhớ.";
   wrapper.appendChild(description);
 
   const menuList = document.createElement("ul");
   menuList.className = "menu-list";
 
   const menuItems = [
-    ...(getActiveSessions("memory-match").length ? [{
-      icon: "play",
-      text: "Tiếp tục",
-      action: () => showSessionPicker("memory-match", onContinueGame),
-    }] : []),
+    ...(getActiveSessions("memory-match").length
+      ? [
+          {
+            icon: "play",
+            text: "Tiếp tục",
+            action: () => showSessionPicker("memory-match", onContinueGame),
+          },
+        ]
+      : []),
     {
       icon: "play",
       text: "Bắt đầu",
@@ -202,7 +214,10 @@ export function showDifficultyOverlay(fromGame = false) {
   });
   changeThemeButton.onclick = () => {
     modal.close();
-    setTimeout(() => showCollectionModal({ fromGame, gameId: "memory-match" }), 180);
+    setTimeout(
+      () => showCollectionModal({ fromGame, gameId: "memory-match" }),
+      180,
+    );
   };
   [
     ["easy", "Dễ", "status-easy"],
@@ -216,19 +231,22 @@ export function showDifficultyOverlay(fromGame = false) {
     button.type = "button";
     button.className = "difficulty-option";
     button.append(createIcon(icon), document.createTextNode(label));
-    button.onclick = () => chooseMemoryMode(
-      mode,
-      label,
-      startMode,
-      modal.close,
-      () => { modeSelected = true; },
-    );
+    button.onclick = () =>
+      chooseMemoryMode(mode, label, startMode, modal.close, () => {
+        modeSelected = true;
+      });
     options.append(button);
   });
   content.append(themeRow, options);
 }
 
-function chooseMemoryMode(mode, label, startMode, closeDifficulty, confirmModeSelection) {
+function chooseMemoryMode(
+  mode,
+  label,
+  startMode,
+  closeDifficulty,
+  confirmModeSelection,
+) {
   const session = getActiveSession("memory-match", mode);
   if (!session) return startMode(mode, closeDifficulty);
   showSessionChoice({
@@ -266,7 +284,12 @@ function showSessionPicker(gameId, onContinue) {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "difficulty-option";
-    button.append(createIcon(modeIcon(session.mode)), document.createTextNode(`${modeLabel(session.mode)} - Level ${session.level}`));
+    button.append(
+      createIcon(modeIcon(session.mode)),
+      document.createTextNode(
+        `${modeLabel(session.mode)} - Level ${session.level}`,
+      ),
+    );
     button.onclick = () => {
       modal.close();
       document.getElementById("menu-container")?.remove();
@@ -275,10 +298,22 @@ function showSessionPicker(gameId, onContinue) {
     options.append(button);
   });
   content.append(themeRow, options);
-  const modal = openAppModal({ id: "difficulty-modal", icon: "play", title: "Tiếp tục hành trình", content });
+  const modal = openAppModal({
+    id: "difficulty-modal",
+    icon: "play",
+    title: "Tiếp tục hành trình",
+    content,
+  });
   changeTheme.onclick = () => {
     modal.close();
-    setTimeout(() => showCollectionModal({ gameId, onClose: () => showSessionPicker(gameId, onContinue) }), 180);
+    setTimeout(
+      () =>
+        showCollectionModal({
+          gameId,
+          onClose: () => showSessionPicker(gameId, onContinue),
+        }),
+      180,
+    );
   };
 }
 
@@ -287,31 +322,60 @@ function showSessionChoice({ label, session, onContinue, onNew }) {
     id: "session-choice-modal",
     icon: "play",
     title: `${label} - Level ${session.level}`,
-    content: "<p>Bạn muốn tiếp tục hành trình đã lưu hay bắt đầu lại từ cấp 1?</p>",
+    content:
+      "<p>Bạn muốn tiếp tục hành trình đã lưu hay bắt đầu lại từ cấp 1?</p>",
     actions: [
       { label: "Chơi mới", icon: "restart", onClick: onNew },
-      { label: "Tiếp tục", icon: "play", variant: "primary", onClick: onContinue },
+      {
+        label: "Tiếp tục",
+        icon: "play",
+        variant: "primary",
+        onClick: onContinue,
+      },
     ],
   });
   modal.panel.classList.add("session-choice-modal");
 }
 
 function modeLabel(mode) {
-  return ({ easy: "Dễ", normal: "Trung bình", hard: "Khó", superHard: "Siêu khó", endless: "Vô tận", challenge: "Thử thách" })[mode] || mode;
+  return (
+    {
+      easy: "Dễ",
+      normal: "Trung bình",
+      hard: "Khó",
+      superHard: "Siêu khó",
+      endless: "Vô tận",
+      challenge: "Thử thách",
+    }[mode] || mode
+  );
 }
 
 function modeIcon(mode) {
-  return ({ easy: "status-easy", normal: "status-normal", hard: "status-hard", superHard: "status-super-hard", endless: "timer", challenge: "trophy" })[mode] || "play";
+  return (
+    {
+      easy: "status-easy",
+      normal: "status-normal",
+      hard: "status-hard",
+      superHard: "status-super-hard",
+      endless: "timer",
+      challenge: "trophy",
+    }[mode] || "play"
+  );
 }
 
-export function showCollectionModal({ fromGame = false, gameId = "memory-match", onClose = () => {} } = {}) {
+export function showCollectionModal({
+  fromGame = false,
+  gameId = "memory-match",
+  onClose = () => {},
+} = {}) {
   if (fromGame) gameState.isPaused = true;
   const content = document.createElement("div");
   content.className = "collection-content";
   const modal = openAppModal({
     id: "collection-modal",
     icon: "collection",
-    title: gameId === "link-connect" ? "Bộ sưu tập · Link Connect" : "Bộ sưu tập",
+    title:
+      gameId === "link-connect" ? "Bộ sưu tập · Link Connect" : "Bộ sưu tập",
     content,
     size: "large",
     onClose: () => {
@@ -331,12 +395,22 @@ export function showCollectionModal({ fromGame = false, gameId = "memory-match",
   const renderAppearance = () => {
     grid.className = "shop-item-grid shop-item-grid--appearance";
     grid.replaceChildren();
-    renderCollectionAppearanceGroup(grid, "Mặt lưng thẻ", "cardBack", CARD_BACKS);
+    renderCollectionAppearanceGroup(
+      grid,
+      "Mặt lưng thẻ",
+      "cardBack",
+      CARD_BACKS,
+    );
   };
   const renderFlipEffects = () => {
     grid.className = "shop-item-grid shop-item-grid--appearance";
     grid.replaceChildren();
-    renderCollectionAppearanceGroup(grid, "Hiệu ứng lật", "flipEffect", FLIP_EFFECTS);
+    renderCollectionAppearanceGroup(
+      grid,
+      "Hiệu ứng lật",
+      "flipEffect",
+      FLIP_EFFECTS,
+    );
   };
   const renderThemes = () => {
     grid.className = "shop-item-grid shop-item-grid--themes";
@@ -347,9 +421,12 @@ export function showCollectionModal({ fromGame = false, gameId = "memory-match",
     heading.textContent = "Chủ đề thẻ";
     const choices = document.createElement("div");
     choices.className = "theme-choice-grid";
-    THEMES.filter((theme) => getOwnedThemeIds(gameState.appearance, gameId).includes(theme.id)).forEach((theme) => {
+    THEMES.filter((theme) =>
+      getOwnedThemeIds(gameState.appearance, gameId).includes(theme.id),
+    ).forEach((theme) => {
       const playable = isThemePlayable(theme);
-      const equipped = getEquippedThemeId(gameState.appearance, gameId) === theme.id;
+      const equipped =
+        getEquippedThemeId(gameState.appearance, gameId) === theme.id;
       const card = document.createElement("article");
       card.className = `theme-choice${equipped ? " is-equipped" : ""}`;
       const preview = document.createElement("div");
@@ -375,7 +452,10 @@ export function showCollectionModal({ fromGame = false, gameId = "memory-match",
           saveAppearance(gameState.appearance);
           renderThemes();
           if (fromGame) showThemeChangeNotice();
-          else showAppToast(`Đã trang bị chủ đề ${theme.title}.`, { tone: "info" });
+          else
+            showAppToast(`Đã trang bị chủ đề ${theme.title}.`, {
+              tone: "info",
+            });
         };
       }
       card.append(preview, name, button);
@@ -389,8 +469,16 @@ export function showCollectionModal({ fromGame = false, gameId = "memory-match",
     tabs.append(createCollectionTab("Chủ đề", true, renderThemes));
     renderThemes();
   } else {
-    const appearanceTab = createCollectionTab("Ngoại hình", true, renderAppearance);
-    const flipEffectsTab = createCollectionTab("Hiệu ứng lật", false, renderFlipEffects);
+    const appearanceTab = createCollectionTab(
+      "Ngoại hình",
+      true,
+      renderAppearance,
+    );
+    const flipEffectsTab = createCollectionTab(
+      "Hiệu ứng lật",
+      false,
+      renderFlipEffects,
+    );
     const themesTab = createCollectionTab("Chủ đề", false, renderThemes);
     tabs.append(appearanceTab, flipEffectsTab, themesTab);
     renderAppearance();
@@ -424,45 +512,48 @@ function renderCollectionAppearanceGroup(grid, title, type, items) {
   heading.textContent = title;
   const choices = document.createElement("div");
   choices.className = "appearance-choice-grid";
-  items.filter((item) => gameState.appearance[ownedKey].includes(item.id)).forEach((item) => {
-    const equipped = gameState.appearance[type] === item.id;
-    const card = document.createElement("article");
-    card.className = `appearance-choice${equipped ? " is-equipped" : ""}`;
-    const preview = document.createElement("div");
-    if (type === "cardBack") preview.className = `appearance-preview ${item.previewClass}`;
-    else {
-      preview.className = `appearance-effect-preview ${item.animationClass}`;
-      preview.textContent = "A";
-    }
-    preview.setAttribute("aria-hidden", "true");
-    const name = document.createElement("strong");
-    name.textContent = item.title;
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "app-button app-button--purchase shop-buy-button";
-    if (equipped) {
-      button.classList.add("appearance-action--equipped");
-      button.textContent = "Đang dùng";
-      button.disabled = true;
-    } else {
-      button.classList.add("appearance-action--equip");
-      button.textContent = "Trang bị";
-      button.onclick = () => {
-        gameState.appearance[type] = item.id;
-        saveAppearance(gameState.appearance);
-        if (type === "cardBack") applyCollectionCardBack();
-        grid.replaceChildren();
-        renderCollectionAppearanceGroup(
-          grid,
-          type === "cardBack" ? "Mặt lưng thẻ" : "Hiệu ứng lật",
-          type,
-          type === "cardBack" ? CARD_BACKS : FLIP_EFFECTS,
-        );
-      };
-    }
-    card.append(preview, name, button);
-    choices.append(card);
-  });
+  items
+    .filter((item) => gameState.appearance[ownedKey].includes(item.id))
+    .forEach((item) => {
+      const equipped = gameState.appearance[type] === item.id;
+      const card = document.createElement("article");
+      card.className = `appearance-choice${equipped ? " is-equipped" : ""}`;
+      const preview = document.createElement("div");
+      if (type === "cardBack")
+        preview.className = `appearance-preview ${item.previewClass}`;
+      else {
+        preview.className = `appearance-effect-preview ${item.animationClass}`;
+        preview.textContent = "A";
+      }
+      preview.setAttribute("aria-hidden", "true");
+      const name = document.createElement("strong");
+      name.textContent = item.title;
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "app-button app-button--purchase shop-buy-button";
+      if (equipped) {
+        button.classList.add("appearance-action--equipped");
+        button.textContent = "Đang dùng";
+        button.disabled = true;
+      } else {
+        button.classList.add("appearance-action--equip");
+        button.textContent = "Trang bị";
+        button.onclick = () => {
+          gameState.appearance[type] = item.id;
+          saveAppearance(gameState.appearance);
+          if (type === "cardBack") applyCollectionCardBack();
+          grid.replaceChildren();
+          renderCollectionAppearanceGroup(
+            grid,
+            type === "cardBack" ? "Mặt lưng thẻ" : "Hiệu ứng lật",
+            type,
+            type === "cardBack" ? CARD_BACKS : FLIP_EFFECTS,
+          );
+        };
+      }
+      card.append(preview, name, button);
+      choices.append(card);
+    });
   group.append(heading, choices);
   grid.append(group);
 }

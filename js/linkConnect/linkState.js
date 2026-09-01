@@ -41,6 +41,8 @@ export function beginLinkRound({
   linkGameState.matchedPairs = 0;
   linkGameState.totalPairs = layout.tileCount / 2;
   linkGameState.remainingTime = layout.timeSeconds;
+  // Đóng băng thời gian chỉ có hiệu lực trong màn đang chơi, không mang sang màn kế tiếp.
+  linkGameState.freezeSeconds = 0;
   linkGameState.isLocked = true;
   linkGameState.isPaused = false;
   linkGameState.luckyAwards = [];

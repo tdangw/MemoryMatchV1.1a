@@ -13,6 +13,7 @@ import { calculateCoinReward, calculateCompletionTimeBonus, calculateMatchPoints
 import {
   updateScoreDisplay,
   updateTimerDisplay,
+  syncMemoryTimeProgress,
   updateMovesDisplay,
   updateMissesDisplay,
   updateComboDisplay,
@@ -196,6 +197,7 @@ function checkMatch(roundId) {
     if (comboTimeBonus > 0 && !isEndlessMode(gameState.settings.mode)) {
       gameState.remainingTime += comboTimeBonus;
       updateTimerDisplay(gameState.remainingTime);
+      syncMemoryTimeProgress({ remainingSeconds: gameState.remainingTime, timeLimit: gameState.timeLimit });
       highlightTarget("#timer");
     }
     gameState.matchedPairs++;
@@ -326,6 +328,7 @@ function awardLuckyRewardValue(reward, tileElement) {
     recordLuckyAward(reward);
     gameState.remainingTime += reward.value;
     updateTimerDisplay(gameState.remainingTime);
+    syncMemoryTimeProgress({ remainingSeconds: gameState.remainingTime, timeLimit: gameState.timeLimit });
     highlightTarget("#timer");
     showLuckyRewardPopup(reward);
     return;

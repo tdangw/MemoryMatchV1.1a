@@ -20,6 +20,7 @@ export const gameState = {
   isPaused: false,
   roundId: 0,
   remainingTime: remainingTime,
+  timeLimit: remainingTime,
   coins: 0,
   progress: {
     memoryMatch: { totalStars: 0, totalScore: 0, bestByLevel: {} },
@@ -132,6 +133,7 @@ export function resetGame() {
   gameState.matchedPairs = 0;
   gameState.totalPairs = GAME_CONFIG.modes.easy.tileCount / 2;
   gameState.remainingTime = remainingTime;
+  gameState.timeLimit = remainingTime;
   gameState.isLocked = true;
   gameState.isPaused = false;
   gameState.settings.mode = "easy";

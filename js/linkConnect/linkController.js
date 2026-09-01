@@ -32,7 +32,13 @@ import {
 import { findAvailableConnections, findConnectionPath } from "./pathfinder.js";
 import { consumeLinkItem, getLinkItemCount, grantLinkItem, LINK_ITEMS } from "./linkItems.js";
 import { clearActiveSession, getActiveSession, saveActiveSession } from "../sessionProgress.js";
-import { openTimeUpModal, showLevelRewardOverlay, showLevelSummaryOverlay } from "../ui.js";
+import {
+  clearGameplayRewardPopups,
+  openTimeUpModal,
+  showGameplayRewardPopup,
+  showLevelRewardOverlay,
+  showLevelSummaryOverlay,
+} from "../ui.js";
 import {
   clearLinkPath,
   clearLinkMatchedPair,
@@ -146,6 +152,7 @@ function chooseLinkMode(mode, label, difficultyModal) {
 
 export function startLinkLevel({ mode = linkGameState.mode, level = 1, resume = false } = {}) {
   stopCountdown();
+  clearGameplayRewardPopups();
   clearLinkPath();
   selectedPosition = null;
   linkTimeWarningPlayed = false;
@@ -198,6 +205,7 @@ export function continueLinkSession(session) {
 
 export function returnToLinkMenu() {
   stopCountdown();
+  clearGameplayRewardPopups();
   resetLinkGame();
   selectedPosition = null;
   clearLinkPath();
@@ -213,8 +221,25 @@ function showLinkGame() {
     container.id = "link-connect-container";
     container.className = "link-connect-game";
     container.innerHTML = `
-      <header class="link-connect-game__header">
-        <button id="link-actions-menu-toggle" class="link-connect-game__menu" type="button" aria-label="Mở menu chức năng" aria-controls="link-actions-menu" aria-expanded="false"></button>
+      <div id="link-game-logo" class="link-game-name game-name">Link Connect</div>
+      <div class="link-game-progress-hud game-progress-hud" aria-label="Tiến trình màn chơi">
+        <span class="info stat-card stat-moves"><span class="stat-label">MOVES</span><span id="link-moves">0</span></span>
+        <span class="info stat-card stat-misses"><span class="stat-label">MISS</span><span id="link-misses">0</span></span>
+        <span class="info stat-card stat-combo"><span class="stat-label">COMBO</span><span id="link-combo">0</span></span>
+        <span class="info stat-card stat-star-progress" aria-label="Tiến trình sao màn hiện tại">
+          <span id="link-level-stars" class="star-progress__stars" role="img" aria-label="0 trên 3 sao">
+            <span class="star-progress__milestone" aria-hidden="true">★</span>
+            <span class="star-progress__milestone" aria-hidden="true">★</span>
+            <span class="star-progress__milestone" aria-hidden="true">★</span>
+          </span>
+          <span class="star-progress__track"><span id="link-level-stars-fill" class="star-progress__fill"></span></span>
+        </span>
+        <span class="info stat-card stat-points"><span class="stat-label">ĐIỂM</span><span id="link-score">0</span></span>
+        <span class="info stat-card stat-progress" id="link-pair-progress"><span data-link-icon="trophy"></span><span id="link-matched-pairs">0</span>/<span id="link-total-pairs">0</span></span>
+        <span class="info stat-card stat-hints" aria-label="Lượt gợi ý còn lại"><span data-link-icon="search"></span><span id="link-hint">0</span></span>
+      </div>
+      <header id="link-game-title" class="link-game-hud game-hud">
+        <button id="link-actions-menu-toggle" class="link-connect-game__menu game-menu-toggle" type="button" aria-label="Mở menu chức năng" aria-controls="link-actions-menu" aria-expanded="false"></button>
         <div id="link-actions-menu" class="link-connect-game__actions game-actions-menu" hidden>
           <button class="game-action-item" type="button" data-action="restart">Chơi lại</button>
           <button class="game-action-item" type="button" data-action="menu">Menu</button>
@@ -225,28 +250,25 @@ function showLinkGame() {
           <button class="game-action-item" type="button" data-action="info">Thông tin</button>
           <button class="game-action-item" type="button" data-action="reset">Xóa dữ liệu</button>
         </div>
-        <div class="link-connect-game__identity"><strong>Link Connect</strong><span id="link-level-label">Cấp 1</span></div>
-        <div class="link-connect-game__timer" aria-label="Thời gian còn lại">
-          <span class="link-connect-game__timer-label">THỜI GIAN</span>
-          <strong id="link-timer">00:00</strong>
+        <div class="game-stats" aria-label="Thông tin màn chơi">
+          <span class="info stat-card stat-level"><span class="stat-label">LV</span><span id="link-level-label">1</span></span>
+          <span class="info stat-card stat-timer"><span data-link-icon="timer"></span><span id="link-timer">00:00</span></span>
+          <span class="info stat-card stat-score"><span data-link-icon="star"></span><span id="link-total-stars">0</span></span>
+        </div>
+        <button id="link-tools-toggle" class="link-tools-toggle" type="button" aria-label="Mở công cụ hỗ trợ" aria-controls="link-tools-menu" aria-expanded="false"></button>
+        <div id="link-tools-menu" class="link-tools-menu" hidden>
+          <aside id="link-item-actions" class="link-tool-list" aria-label="Vật phẩm hỗ trợ"></aside>
         </div>
       </header>
-      <div class="link-connect-game__stats" aria-label="Tiến trình màn chơi">
-        <span class="link-stat link-stat--progress"><small>CẶP ĐÃ NỐI</small><strong id="link-pair-progress">0/0</strong></span>
-        <span class="link-stat link-stat--combo"><small>COMBO</small><strong id="link-combo">0</strong></span>
-        <span class="link-stat link-stat--score"><small>ĐIỂM</small><strong id="link-score">0</strong></span>
-        <span class="link-stat link-stat--moves"><small>NƯỚC · SAI</small><strong><b id="link-moves">0</b><i aria-hidden="true">·</i><b id="link-misses">0</b></strong></span>
-      </div>
+      <section class="link-special-hud" aria-label="Tiến trình cặp đặc biệt">
+        <div class="link-special-hud__milestones" aria-label="Các mốc kích hoạt đặc biệt">
+          <span data-link-special-milestone="1">1</span><span data-link-special-milestone="3">3</span><span data-link-special-milestone="5">5</span><span data-link-special-milestone="7">7</span><span data-link-special-milestone="9">9</span><span data-link-special-milestone="10">10</span>
+        </div>
+      </section>
       <div id="link-board-frame" class="link-board-frame">
-        <div class="link-board-frame__caption" aria-hidden="true"><span></span> TÌM ĐƯỜNG NỐI <span></span></div>
         <div id="link-board" class="link-board" aria-label="Bàn Link Connect"></div>
         <svg id="link-path-overlay" class="link-path-overlay" aria-hidden="true"></svg>
-      </div>
-      <footer class="link-connect-game__footer">
-        <span class="link-connect-game__special-label">NĂNG LƯỢNG ĐẶC BIỆT</span>
-        <strong id="link-special-progress">0/10</strong>
-      </footer>
-      <aside id="link-item-actions" class="link-connect-game__items" aria-label="Vật phẩm hỗ trợ"></aside>`;
+      </div>`;
     document.querySelector(".main-wrapper")?.append(container);
     configureLinkGameActions(container);
     configureLinkItemActions(container);
@@ -263,9 +285,10 @@ function configureLinkItemActions(container) {
     button.type = "button";
     button.className = "link-connect-game__item";
     button.dataset.item = item.id;
+    button.setAttribute("aria-label", item.title);
     button.append(createIcon(item.icon));
     const label = document.createElement("span");
-    label.textContent = item.title;
+    label.textContent = item.id === "hint" ? "Gợi ý" : item.title;
     const count = document.createElement("strong");
     count.dataset.itemCount = item.id;
     button.append(label, count);
@@ -277,7 +300,13 @@ function configureLinkItemActions(container) {
 function configureLinkGameActions(container) {
   const toggle = container.querySelector("#link-actions-menu-toggle");
   const actions = container.querySelector("#link-actions-menu");
+  const toolsToggle = container.querySelector("#link-tools-toggle");
+  const toolsMenu = container.querySelector("#link-tools-menu");
+  container.querySelectorAll("[data-link-icon]").forEach((element) => {
+    element.append(createIcon(element.dataset.linkIcon));
+  });
   toggle?.append(createIcon("menu"));
+  toolsToggle?.append(createIcon("wand"));
   const actionIcons = {
     restart: "restart",
     menu: "home",
@@ -297,6 +326,12 @@ function configureLinkGameActions(container) {
     actions.hidden = nextHidden;
     toggle.setAttribute("aria-expanded", String(!nextHidden));
   });
+  toolsToggle?.addEventListener("click", (event) => {
+    event.stopPropagation();
+    const nextHidden = !toolsMenu.hidden;
+    toolsMenu.hidden = nextHidden;
+    toolsToggle.setAttribute("aria-expanded", String(!nextHidden));
+  });
   actions?.addEventListener("click", (event) => {
     const action = event.target.closest("button")?.dataset.action;
     if (!action) return;
@@ -305,9 +340,13 @@ function configureLinkGameActions(container) {
     runLinkGameAction(action);
   });
   document.addEventListener("click", (event) => {
-    if (!actions?.hidden && !event.target.closest(".link-connect-game__header")) {
+    if (!actions?.hidden && !event.target.closest("#link-game-title")) {
       actions.hidden = true;
       toggle?.setAttribute("aria-expanded", "false");
+    }
+    if (!toolsMenu?.hidden && !event.target.closest("#link-game-title")) {
+      toolsMenu.hidden = true;
+      toolsToggle?.setAttribute("aria-expanded", "false");
     }
   });
 }
@@ -383,12 +422,17 @@ function handleLinkTileClick(position) {
   playLinkSound("match");
   linkGameState.combo += 1;
   const isSpecialMatch = firstTile.special && tile.special;
+  const roundId = linkGameState.roundId;
+  const board = linkGameState.board;
+  const matchedStart = selectedPosition;
   linkGameState.score += calculateLinkMatchPoints(linkGameState.combo, { special: isSpecialMatch });
   drawLinkPath(path, linkGameState.board);
   playLinkMatchExit(selectedPosition, position);
   setTimeout(() => {
-    const matchedStart = selectedPosition;
-    removeLinkBoardPair(linkGameState.board, matchedStart, position);
+    // Người chơi có thể khởi động màn khác trước khi hiệu ứng kết thúc.
+    // Khi đó callback cũ không được phép thay đổi trạng thái của bàn mới.
+    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
+    removeLinkBoardPair(board, matchedStart, position);
     linkGameState.matchedPairs += 1;
     const specialBoardChanged = isSpecialMatch && applySpecialMatchRewards();
     if (firstTile.luckyReward) applyLinkLuckyReward(firstTile.luckyReward);
@@ -497,11 +541,11 @@ function applyLinkLuckyReward(reward) {
   if (reward.type === "coins") {
     increaseCoins(reward.value);
     saveCoins(gameState.coins);
-    showAppToast(`Ô may mắn: +${reward.value} Xu`);
+    showGameplayRewardPopup({ title: "Ô may mắn!", type: "coins", value: reward.value, sound: false });
     return;
   }
   linkGameState.remainingTime += reward.value;
-  showAppToast(`Ô may mắn: +${reward.value} giây`);
+  showGameplayRewardPopup({ title: "Ô may mắn!", type: "time", value: reward.value, sound: false });
 }
 
 function playLinkSound(name) {
@@ -600,17 +644,17 @@ function handleLinkTimeUp() {
 }
 
 function updateLinkHud() {
-  setText("link-level-label", `Cấp ${linkGameState.level}`);
+  setText("link-level-label", linkGameState.level);
   setText("link-moves", linkGameState.moves);
   setText("link-misses", linkGameState.misses);
   setText("link-combo", linkGameState.combo);
   setText("link-score", linkGameState.score);
-  setText("link-pair-progress", `${linkGameState.matchedPairs}/${linkGameState.totalPairs} cặp`);
-  setText(
-    "link-special-progress",
-    `Đặc biệt ${linkGameState.specialProgress}/${LINK_CONNECT_CONFIG.special.progressTarget}`,
-  );
+  setText("link-matched-pairs", linkGameState.matchedPairs);
+  setText("link-total-pairs", linkGameState.totalPairs);
+  setText("link-hint", getLinkItemCount("hint"));
   setText("link-timer", formatTime(linkGameState.remainingTime));
+  updateLinkStarsHud();
+  updateLinkSpecialMilestones();
   document.querySelectorAll("[data-item-count]").forEach((element) => {
     const itemId = element.dataset.itemCount;
     element.textContent = String(getLinkItemCount(itemId));
@@ -618,6 +662,43 @@ function updateLinkHud() {
   const freezeButton = document.querySelector('[data-item="freeze"]');
   freezeButton?.classList.toggle("is-disabled", isLinkEndlessMode(linkGameState.mode));
   freezeButton?.setAttribute("aria-disabled", String(isLinkEndlessMode(linkGameState.mode)));
+}
+
+function updateLinkStarsHud() {
+  const stars = calculateLinkStars();
+  const targets = isLinkEndlessMode(linkGameState.mode) ? [10, 15, 20] : [12, 18, 25];
+  const target = Math.max(1, linkGameState.totalPairs * targets[2]);
+  const levelStars = document.getElementById("link-level-stars");
+  if (levelStars) {
+    levelStars.setAttribute("aria-label", `${stars} trên 3 sao`);
+    levelStars.querySelectorAll(".star-progress__milestone").forEach((star, index) => {
+      star.classList.toggle("is-earned", index < stars);
+    });
+  }
+  const fill = document.getElementById("link-level-stars-fill");
+  if (fill) fill.style.width = `${Math.min(100, Math.round(linkGameState.score / target * 100))}%`;
+  setText("link-total-stars", stars);
+}
+
+function updateLinkSpecialMilestones() {
+  const progress = linkGameState.specialProgress;
+  const milestones = [...document.querySelectorAll("[data-link-special-milestone]")];
+  const track = document.querySelector(".link-special-hud__milestones");
+  const target = LINK_CONNECT_CONFIG.special.progressTarget;
+  track?.style.setProperty(
+    "--link-special-progress",
+    // Điểm đầu thanh là mốc 1: vừa đạt 1 chỉ sáng marker, không tô sang mốc 2.
+    String(Math.max(0, Math.min(1, (progress - 1) / Math.max(1, target - 1)))),
+  );
+  let nextMarked = false;
+  milestones.forEach((marker) => {
+    const milestone = Number(marker.dataset.linkSpecialMilestone);
+    const earned = milestone <= progress;
+    marker.classList.toggle("is-earned", earned);
+    const isNext = !earned && !nextMarked;
+    marker.classList.toggle("is-next", isNext);
+    if (isNext) nextMarked = true;
+  });
 }
 
 function applySpecialMatchRewards() {
@@ -631,15 +712,15 @@ function applySpecialMatchRewards() {
   if (rewardType === "coins") {
     increaseCoins(amount);
     saveCoins(gameState.coins);
-    showAppToast(`Cặp đặc biệt: +${amount} Xu`);
+    showGameplayRewardPopup({ title: "Phần thưởng!", type: "coins", value: amount, sound: false });
   } else {
     linkGameState.remainingTime += amount;
-    showAppToast(`Cặp đặc biệt: +${amount} giây`);
+    showGameplayRewardPopup({ title: "Phần thưởng!", type: "time", value: amount, sound: false });
   }
   // Mỗi màn luôn có ít nhất một cặp đặc biệt; ghép cặp này mở băng để ván không thể kẹt.
   const thawedCount = unlockFrozenLinkTiles(linkGameState.board, 1);
   const boardChanged = Boolean(thawedCount) || applySpecialMilestone(linkGameState.specialProgress);
-  if (thawedCount) showAppToast("Cặp đặc biệt đã mở khóa thẻ đóng băng.");
+  if (thawedCount) showGameplayRewardPopup({ title: "Đã mở khóa!", icon: "wand", label: "Thẻ đóng băng", sound: false });
   if (linkGameState.specialProgress >= special.progressTarget) {
     linkGameState.specialProgress = 0;
   }
@@ -682,7 +763,7 @@ function applySpecialMilestone(progress) {
     boardChanged = Boolean(unlocked || specialPair || removedPair);
     message = "Mốc đặc biệt 10: +100 Xu, mở khóa băng và kích hoạt phần thưởng.";
   }
-  if (message) showAppToast(message, { tone: "info", duration: 2400 });
+  if (message) showGameplayRewardPopup({ title: `Mốc đặc biệt ${progress}`, icon: "star", label: message.replace(/^Mốc đặc biệt \d+: /, ""), sound: false });
   return boardChanged;
 }
 
