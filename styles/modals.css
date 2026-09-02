@@ -1054,7 +1054,7 @@ body.game-is-paused .shooting-star {
 
 #level-summary-modal .level-summary__heading {
   margin: 0 0 13px;
-  color: #f5f7fb;
+  color: #ffd166;
   font-size: clamp(1.25rem, 5.5vw, 1.65rem);
   text-align: center;
 }
@@ -1133,7 +1133,7 @@ body.game-is-paused .shooting-star {
 }
 
 #level-summary-modal .level-summary__score {
-  color: #f5f7fb;
+  color: #ffd166;
   font-size: 1.12rem;
   letter-spacing: 0.07em;
 }

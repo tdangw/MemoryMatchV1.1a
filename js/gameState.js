@@ -24,7 +24,12 @@ export const gameState = {
   coins: 0,
   progress: {
     memoryMatch: { totalStars: 0, totalScore: 0, bestByLevel: {} },
-    linkConnect: { items: { hint: 0, reshuffle: 0, thunder: 0, freeze: 0 } },
+    linkConnect: {
+      totalStars: 0,
+      totalScore: 0,
+      bestByLevel: {},
+      items: { hint: 0, reshuffle: 0, thunder: 0, freeze: 0 },
+    },
   },
   appearance: normalizeAppearance(),
   settings: {
@@ -56,15 +61,19 @@ export function hydrateGameState({
     bestByLevel: typeof memoryMatch.bestByLevel === "object" && memoryMatch.bestByLevel ? memoryMatch.bestByLevel : {},
     sessionsByMode: normalizeSessions(memoryMatch.sessionsByMode, memoryMatch.activeSession),
   };
-  const linkItems = progress?.linkConnect?.items || {};
+  const linkConnect = progress?.linkConnect || {};
+  const linkItems = linkConnect.items || {};
   gameState.progress.linkConnect = {
+    totalStars: Math.max(0, Math.floor(linkConnect.totalStars || 0)),
+    totalScore: Math.max(0, Math.floor(linkConnect.totalScore || 0)),
+    bestByLevel: typeof linkConnect.bestByLevel === "object" && linkConnect.bestByLevel ? linkConnect.bestByLevel : {},
     items: {
       hint: Math.max(0, Math.floor(linkItems.hint || 0)),
       reshuffle: Math.max(0, Math.floor(linkItems.reshuffle || 0)),
       thunder: Math.max(0, Math.floor(linkItems.thunder || 0)),
       freeze: Math.max(0, Math.floor(linkItems.freeze || 0)),
     },
-    sessionsByMode: normalizeSessions(progress?.linkConnect?.sessionsByMode, progress?.linkConnect?.activeSession),
+    sessionsByMode: normalizeSessions(linkConnect.sessionsByMode, linkConnect.activeSession),
   };
   Object.assign(gameState.settings, settings);
   gameState.appearance = normalizeAppearance(appearance);
@@ -147,6 +156,18 @@ export function increaseScore(points) {
 
 export function recordMemoryMatchResult({ mode, level, score, stars }) {
   const progress = gameState.progress.memoryMatch;
+  const key = `${mode}:${level}`;
+  const previous = progress.bestByLevel[key] || { score: 0, stars: 0 };
+  const nextScore = Math.max(previous.score || 0, score);
+  const nextStars = Math.max(previous.stars || 0, stars);
+  progress.totalScore += nextScore - (previous.score || 0);
+  progress.totalStars += nextStars - (previous.stars || 0);
+  progress.bestByLevel[key] = { score: nextScore, stars: nextStars };
+  return { totalStars: progress.totalStars, isNewBest: score > (previous.score || 0) || stars > (previous.stars || 0) };
+}
+
+export function recordLinkConnectResult({ mode, level, score, stars }) {
+  const progress = gameState.progress.linkConnect;
   const key = `${mode}:${level}`;
   const previous = progress.bestByLevel[key] || { score: 0, stars: 0 };
   const nextScore = Math.max(previous.score || 0, score);

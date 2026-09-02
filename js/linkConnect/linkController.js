@@ -3,8 +3,8 @@ import { openAppModal, showAppToast } from "../modal.js";
 import { pauseBackgroundMusic, sounds, syncDefaultMusic } from "../sound.js";
 import { getEquippedThemeId } from "../appearance.js";
 import { GAMEPLAY_TIMING } from "../gameplayTuning.js";
-import { gameState, increaseCoins, spendCoins } from "../gameState.js";
-import { saveCoins } from "../persistence.js";
+import { gameState, increaseCoins, recordLinkConnectResult, spendCoins } from "../gameState.js";
+import { saveCoins, saveProgress } from "../persistence.js";
 import { getTheme } from "../themeCatalog.js";
 import { GAME_MODES } from "../gameCatalog.js";
 import { TIME_UP_PURCHASES } from "../shopCatalog.js";
@@ -655,6 +655,15 @@ function completeLinkLevel() {
   pauseBackgroundMusic();
   playLinkSound("victory");
   const coinsEarned = calculateLinkCoinReward(linkGameState.mode, linkGameState.remainingTime);
+  const stars = calculateLinkStars();
+  recordLinkConnectResult({
+    mode: linkGameState.mode,
+    level: linkGameState.level,
+    score: linkGameState.score,
+    stars,
+  });
+  saveProgress(gameState.progress);
+  updateLinkStarsHud();
   increaseCoins(coinsEarned);
   saveCoins(gameState.coins);
   showLevelSummaryOverlay({
@@ -665,7 +674,7 @@ function completeLinkLevel() {
     misses: linkGameState.misses,
     coinsEarned,
     score: linkGameState.score,
-    stars: calculateLinkStars(),
+    stars,
     timeBonus: 0,
     luckyAwards: linkGameState.luckyAwards,
     settings: { mode: linkGameState.mode },
@@ -822,7 +831,7 @@ function updateLinkStarsHud(hud = getLinkHudElements()) {
   }
   const fill = hud.starsFill;
   if (fill) fill.style.width = `${Math.min(100, Math.round(linkGameState.score / target * 100))}%`;
-  setHudText(hud.totalStars, stars);
+  setHudText(hud.totalStars, gameState.progress.linkConnect.totalStars);
 }
 
 function updateLinkSpecialMilestones(hud = getLinkHudElements()) {

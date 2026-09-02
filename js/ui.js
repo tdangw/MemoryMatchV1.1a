@@ -218,17 +218,16 @@ export function showGameplayRewardPopup({
   title = "Phần thưởng!",
   type,
   value,
-  icon,
   label,
   sound = true,
 } = {}) {
   const presentations = {
-    time: { icon: "timer", label: `+${value} giây` },
-    hints: { icon: "search", label: `+${value} gợi ý` },
-    coins: { icon: "coin", label: `+${value} Xu` },
-    reshuffle: { icon: "restart", label: `+${value} lượt xáo trộn` },
+    time: `+${value} giây`,
+    hints: `+${value} gợi ý`,
+    coins: `+${value} Xu`,
+    reshuffle: `+${value} lượt xáo trộn`,
   };
-  const presentation = presentations[type] || (icon && label ? { icon, label } : null);
+  const presentation = presentations[type] || label;
   if (!presentation) return;
 
   rewardPopupQueue.push({ title, presentation, sound });
@@ -254,24 +253,19 @@ function showNextGameplayRewardPopup() {
   }
   rewardPopupActive = true;
 
-  const overlay = document.createElement("div");
-  overlay.className = "lucky-reward-popup-overlay";
-  overlay.setAttribute("role", "status");
-  overlay.setAttribute("aria-live", "polite");
   const popup = document.createElement("div");
-  popup.className = "lucky-reward-popup";
-  const badge = document.createElement("span");
-  badge.className = "lucky-reward-popup__badge";
-  badge.append(createIcon("star"));
-  const title = document.createElement("strong");
+  popup.className = "gameplay-reward-toast";
+  popup.setAttribute("role", "status");
+  popup.setAttribute("aria-live", "polite");
+  const title = document.createElement("span");
+  title.className = "gameplay-reward-toast__title";
   title.textContent = next.title;
-  const value = document.createElement("span");
-  value.className = "lucky-reward-popup__value";
-  value.append(createIcon(next.presentation.icon), document.createTextNode(next.presentation.label));
-  popup.append(badge, title, value);
-  overlay.append(popup);
-  document.body.append(overlay);
-  rewardPopupOverlay = overlay;
+  const value = document.createElement("strong");
+  value.className = "gameplay-reward-toast__value";
+  value.textContent = next.presentation;
+  popup.append(title, value);
+  document.body.append(popup);
+  rewardPopupOverlay = popup;
 
   if (next.sound && gameState.settings?.sound) {
     sounds.overlay.currentTime = 0;
@@ -279,10 +273,10 @@ function showNextGameplayRewardPopup() {
   }
 
   rewardPopupDismissTimer = setTimeout(() => {
-    overlay.classList.add("is-leaving");
+    popup.classList.add("is-leaving");
     rewardPopupRemoveTimer = setTimeout(() => {
-      overlay.remove();
-      if (rewardPopupOverlay === overlay) rewardPopupOverlay = null;
+      popup.remove();
+      if (rewardPopupOverlay === popup) rewardPopupOverlay = null;
       showNextGameplayRewardPopup();
     }, GAMEPLAY_TIMING.rewardPopupExitMs);
   }, GAMEPLAY_TIMING.rewardPopupVisibleMs);
@@ -405,11 +399,12 @@ function openLevelSummaryOverlay({
   }
   const resultScore = document.createElement("strong");
   resultScore.className = "level-summary__score";
-  resultScore.textContent = `${Number(score).toLocaleString("en-US")} ĐIỂM`;
+  resultScore.textContent = "0 ĐIỂM";
   result.append(resultStars, resultScore);
 
   const stats = document.createElement("div");
   stats.className = "level-summary__stats";
+  let coinsValueElement;
   const summaryStats = [
     ["XU NHẬN", `+${coinsEarned}`, "summary-coins"],
     [
@@ -436,7 +431,8 @@ function openLevelSummaryOverlay({
     const statLabel = document.createElement("span");
     statLabel.textContent = label;
     const statValue = document.createElement("strong");
-    statValue.textContent = value;
+    statValue.textContent = className === "summary-coins" ? "+0" : value;
+    if (className === "summary-coins") coinsValueElement = statValue;
     item.append(statLabel, statValue);
     stats.appendChild(item);
   });
@@ -495,6 +491,40 @@ function openLevelSummaryOverlay({
     modal.panel.classList.add("level-summary-modal--victory");
   }
   launchSummaryConfetti();
+  animateSummaryNumber(resultScore, score, { suffix: " ĐIỂM", delayMs: 360, durationMs: 1250 });
+  if (coinsValueElement) {
+    animateSummaryNumber(coinsValueElement, coinsEarned, { prefix: "+", delayMs: 760, durationMs: 1000 });
+  }
+}
+
+function animateSummaryNumber(element, target, {
+  prefix = "",
+  suffix = "",
+  delayMs = 0,
+  durationMs = 700,
+} = {}) {
+  const total = Math.max(0, Math.round(Number(target) || 0));
+  const render = (value) => {
+    element.textContent = `${prefix}${Number(value).toLocaleString("en-US")}${suffix}`;
+  };
+  const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+  if (!total || reducedMotion) {
+    render(total);
+    return;
+  }
+
+  window.setTimeout(() => {
+    if (!element.isConnected) return;
+    const startedAt = performance.now();
+    const tick = (now) => {
+      if (!element.isConnected) return;
+      const progress = Math.min(1, (now - startedAt) / durationMs);
+      const easedProgress = 1 - (1 - progress) ** 3;
+      render(Math.round(total * easedProgress));
+      if (progress < 1) window.requestAnimationFrame(tick);
+    };
+    window.requestAnimationFrame(tick);
+  }, delayMs);
 }
 
 function formatLuckyAwardSummary(awards) {

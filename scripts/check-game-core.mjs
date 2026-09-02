@@ -10,6 +10,7 @@ import {
 import { LINK_CONNECT_CONFIG } from "../js/linkConnect/linkConfig.js";
 import { TIME_UP_PURCHASES } from "../js/shopCatalog.js";
 import { formatClockTime, UI_COPY, UI_TIMING } from "../js/uiCatalog.js";
+import { gameState, hydrateGameState, recordLinkConnectResult } from "../js/gameState.js";
 
 const modeIds = GAME_MODES.map((mode) => mode.id);
 
@@ -31,6 +32,21 @@ assert.equal(new Set(GAME_DEFINITIONS.map((game) => game.id)).size, GAME_DEFINIT
 
 assert.deepEqual(Object.keys(GAME_CONFIG.modes), modeIds);
 assert.deepEqual(Object.keys(LINK_CONNECT_CONFIG.modes), modeIds);
+
+hydrateGameState({
+  progress: {
+    linkConnect: {
+      totalStars: 2,
+      totalScore: 120,
+      bestByLevel: { "easy:1": { score: 120, stars: 2 } },
+    },
+  },
+});
+const linkProgress = recordLinkConnectResult({ mode: "easy", level: 1, score: 150, stars: 3 });
+assert.equal(linkProgress.totalStars, 3, "Link Connect chỉ cộng phần sao tăng thêm khi chơi lại màn.");
+assert.equal(gameState.progress.linkConnect.totalScore, 150);
+const repeatedLinkProgress = recordLinkConnectResult({ mode: "easy", level: 1, score: 140, stars: 2 });
+assert.equal(repeatedLinkProgress.totalStars, 3, "Link Connect không được cộng trùng sao khi thành tích thấp hơn.");
 
 assert.deepEqual(TIME_UP_PURCHASES, [
   { seconds: 1, price: 2 },
