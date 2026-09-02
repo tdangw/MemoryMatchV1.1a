@@ -313,46 +313,36 @@
   animation: link-electric-glow var(--link-path-animation-duration) cubic-bezier(0.22, 0.78, 0.22, 1) both;
 }
 
-/* Bộ sưu tập đường nối: mỗi lựa chọn chỉ thay đổi lớp trình bày của cùng một
-   đường đi hợp lệ, nên không làm ảnh hưởng luật nối tối đa ba đoạn. */
-.link-path-overlay--laser .link-path-overlay__beam { stroke: #ff7bc4; stroke-width: 1.55; filter: drop-shadow(0 0 4px #ff4fab) drop-shadow(0 0 9px #ff8bd2); }
-.link-path-overlay--laser .link-path-overlay__glow { stroke: #ff4fab; }
-.link-path-overlay--fire .link-path-overlay__beam { stroke: #ffe09a; stroke-width: 1.7; filter: drop-shadow(0 0 4px #ff8f39) drop-shadow(0 0 10px #ee4b24); }
-.link-path-overlay--fire .link-path-overlay__glow { stroke: #ff642f; }
-.link-path-overlay--magic .link-path-overlay__beam { stroke: #e8c4ff; stroke-dasharray: .06 .08; filter: drop-shadow(0 0 5px #c17bff); }
-.link-path-overlay--magic .link-path-overlay__glow { stroke: #a870ff; }
-.link-path-overlay--cyber .link-path-overlay__beam { stroke: #76f4ff; stroke-dasharray: .03 .04; filter: drop-shadow(0 0 5px #00cbeb); }
-.link-path-overlay--cyber .link-path-overlay__glow { stroke: #0bc0e6; }
-.link-path-overlay--rainbow .link-path-overlay__beam { stroke: #fff; stroke-width: 1.8; filter: drop-shadow(0 0 3px #ff83cf) drop-shadow(3px 0 2px #5bd8ff) drop-shadow(-3px 0 2px #ffe179); }
-.link-path-overlay--rainbow .link-path-overlay__glow { stroke: #d48dff; }
-.link-path-overlay--hydro .link-path-overlay__beam { stroke: #c1f7ff; stroke-width: 1.8; filter: drop-shadow(0 0 7px #3bc9ff); }
-.link-path-overlay--hydro .link-path-overlay__glow { stroke: #168bdf; }
-.link-path-overlay--plasma .link-path-overlay__beam { stroke: #f1b9ff; stroke-width: 1.7; filter: drop-shadow(0 0 6px #b35dff); }
-.link-path-overlay--plasma .link-path-overlay__glow { stroke: #8d38dc; }
-.link-path-overlay--holy .link-path-overlay__beam { stroke: #fff5c7; stroke-width: 2; filter: drop-shadow(0 0 7px #ffd25c); }
-.link-path-overlay--holy .link-path-overlay__glow { stroke: #ffc13d; }
-.link-path-overlay--shadow .link-path-overlay__beam { stroke: #9b84c7; stroke-width: 1.6; filter: drop-shadow(0 0 6px #45306b); }
-.link-path-overlay--shadow .link-path-overlay__glow { stroke: #33244f; opacity: .84; }
-.link-path-overlay--spiral .link-path-overlay__beam { stroke: #83f3df; stroke-width: 1.5; stroke-dasharray: .015 .04; filter: drop-shadow(0 0 5px #33d8b9); }
-.link-path-overlay--spiral .link-path-overlay__glow { stroke: #279d9b; }
-.link-path-overlay--dashed .link-path-overlay__beam { stroke: #d7ff84; stroke-width: 1.8; stroke-dasharray: .08 .055; }
-.link-path-overlay--dashed .link-path-overlay__glow { stroke: #8ccf3d; }
-.link-path-overlay--bullet .link-path-overlay__beam { stroke: #fff0a0; stroke-width: 2.1; filter: drop-shadow(0 0 4px #ffa53b); }
-.link-path-overlay--bullet .link-path-overlay__glow { stroke: #ff9d35; }
-.link-path-overlay--kame .link-path-overlay__beam { stroke: #d1faff; stroke-width: 2.4; filter: drop-shadow(0 0 8px #3ac7ff); }
-.link-path-overlay--kame .link-path-overlay__glow { stroke: #168be7; stroke-width: 4.2; }
-.link-path-overlay--halo .link-path-overlay__beam { stroke: #fff1ba; stroke-width: 1.8; stroke-dasharray: .025 .035; filter: drop-shadow(0 0 6px #ffd65f); }
-.link-path-overlay--halo .link-path-overlay__glow { stroke: #eeb648; }
-.link-path-overlay--matrix .link-path-overlay__beam { stroke: #8effa8; stroke-width: 1.35; stroke-dasharray: .02 .035; filter: drop-shadow(0 0 5px #35d365); }
-.link-path-overlay--matrix .link-path-overlay__glow { stroke: #128d45; }
-.link-path-overlay--sonic .link-path-overlay__beam { stroke: #b8c4ff; stroke-width: 2; stroke-dasharray: .09 .025 .015 .025; filter: drop-shadow(0 0 5px #7788ff); }
-.link-path-overlay--sonic .link-path-overlay__glow { stroke: #6877d8; }
-.link-path-overlay--chains .link-path-overlay__beam { stroke: #ffe38a; stroke-width: 2.15; stroke-dasharray: .045 .035; filter: drop-shadow(0 0 4px #d69b29); }
-.link-path-overlay--chains .link-path-overlay__glow { stroke: #b87515; }
-.link-path-overlay--meteor .link-path-overlay__beam { stroke: #fff1ca; stroke-width: 2.2; filter: drop-shadow(0 0 6px #ff8b3f) drop-shadow(-6px 0 3px #e45832); }
-.link-path-overlay--meteor .link-path-overlay__glow { stroke: #f06b36; }
-.link-path-overlay--poison .link-path-overlay__beam { stroke: #caff9c; stroke-width: 1.9; stroke-dasharray: .025 .05; filter: drop-shadow(0 0 6px #72d73e); }
-.link-path-overlay--poison .link-path-overlay__glow { stroke: #42a44a; }
+/* Đường nối dùng SVG khai báo: tối đa hai nét và ba hạt chuyển động, tránh
+   tạo canvas hoặc hiệu ứng lọc lớn lặp vô hạn trên board. */
+.link-path-overlay__motion-path { fill: none; stroke: none; }
+.link-path-overlay--electric .link-path-overlay__beam { stroke: #eaffff; stroke-width: 1.25; }
+.link-path-overlay--electric .link-path-overlay__glow { stroke: #55eddc; }
+.link-path-overlay--storm .link-path-overlay__beam { stroke: #f5fbff; stroke-width: 1.55; filter: drop-shadow(0 0 3px #65dfff) drop-shadow(0 0 7px #3d8dff); }
+.link-path-overlay--storm .link-path-overlay__glow { stroke: #4f8dff; opacity: .68; stroke-width: 3.1; }
+.link-path-overlay--laser .link-path-overlay__beam { stroke: #ffd3ec; stroke-width: 1.65; filter: drop-shadow(0 0 3px #ff4fab) drop-shadow(0 0 7px #ff82c8); }
+.link-path-overlay--laser .link-path-overlay__glow { stroke: #ff3f9d; opacity: .62; }
+.link-path-overlay--laser-ice .link-path-overlay__beam { stroke: #efffff; stroke-width: 1.65; filter: drop-shadow(0 0 3px #60e7ff) drop-shadow(0 0 7px #4a9dff); }
+.link-path-overlay--laser-ice .link-path-overlay__glow { stroke: #35c8ff; opacity: .62; }
+.link-path-overlay--rainbow .link-path-overlay__beam { stroke: #fff; stroke-width: 1.72; filter: drop-shadow(2px 0 2px #ff83c8) drop-shadow(-2px 0 2px #6ce4ff) drop-shadow(0 0 4px #fff08f); }
+.link-path-overlay--rainbow .link-path-overlay__glow { stroke: #bc8eff; opacity: .58; }
+.link-path-overlay--fire .link-path-overlay__beam { stroke: #fff1ba; stroke-width: 1.55; filter: drop-shadow(0 0 3px #ff9a3e) drop-shadow(0 0 7px #e9582b); }
+.link-path-overlay--fire .link-path-overlay__glow { stroke: #ff6437; opacity: .62; }
+.link-path-overlay--magic .link-path-overlay__beam { stroke: #f0d7ff; stroke-width: 1.42; stroke-dasharray: .04 .055; filter: drop-shadow(0 0 4px #c98aff); }
+.link-path-overlay--magic .link-path-overlay__glow { stroke: #a66dff; opacity: .58; }
+.link-path-overlay--pulse .link-path-overlay__beam { stroke: #d9e4ff; stroke-width: 1.55; stroke-dasharray: .09 .04; filter: drop-shadow(0 0 4px #7c91ff); }
+.link-path-overlay--pulse .link-path-overlay__glow { stroke: #6279de; opacity: .56; }
+.link-path-overlay--arrows .link-path-overlay__beam { stroke: #d8fff0; stroke-width: 1.28; filter: drop-shadow(0 0 4px #46dca4); }
+.link-path-overlay--arrows .link-path-overlay__glow { stroke: #259b75; opacity: .55; }
+.link-path-overlay--fireworks .link-path-overlay__beam { stroke: #fff6dc; stroke-width: 1.38; stroke-dasharray: .018 .055; filter: drop-shadow(0 0 3px #ffd062); }
+.link-path-overlay--fireworks .link-path-overlay__glow { stroke: #ffac5b; opacity: .48; }
+
+.link-path-overlay__spark { fill: #f4ddff; filter: drop-shadow(0 0 2px #bd82ff); }
+.link-path-overlay__ember { fill: #ffe39b; filter: drop-shadow(0 0 2px #ff7c32); }
+.link-path-overlay__pulse { fill: none; stroke: #d5ddff; stroke-width: .8; filter: drop-shadow(0 0 2px #788cff); }
+.link-path-overlay__arrow { fill: #d4ffef; filter: drop-shadow(0 0 2px #41d9a2); }
+.link-path-overlay__firework { fill: #fff0a1; filter: drop-shadow(0 0 2px #ffab56); }
+.link-path-overlay__firework-burst { fill: none; stroke: #ffe3a2; stroke-width: .75; filter: drop-shadow(0 0 2px #ff9956); animation: link-firework-burst 520ms ease-out both; }
 
 @keyframes link-electric-trace {
   0% { stroke-dashoffset: 1; opacity: 0; }
@@ -366,6 +356,12 @@
   12% { opacity: 0.58; }
   82% { stroke-dashoffset: 0; opacity: 0.62; }
   100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+@keyframes link-firework-burst {
+  0%, 58% { opacity: 0; transform: scale(.25); }
+  72% { opacity: .92; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.85); }
 }
 
 @keyframes link-tile-dissolve {
