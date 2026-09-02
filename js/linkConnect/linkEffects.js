@@ -48,5 +48,10 @@ export function getLinkExitEffect(id) { return LINK_EXIT_EFFECTS.find((item) => 
 export function getActiveLinkConnectionEffect(appearance) {
   const pathEffect = getLinkPathEffect(migrateLinkPathEffectId(appearance?.linkPathEffect));
   const exitEffect = getLinkExitEffect(migrateLinkExitEffectId(appearance?.linkExitEffect));
-  return { pathClass: pathEffect.className, exitClass: exitEffect.className, exitId: exitEffect.id };
+  return {
+    pathId: pathEffect.id,
+    pathClass: pathEffect.className,
+    exitClass: exitEffect.className,
+    exitId: exitEffect.id,
+  };
 }

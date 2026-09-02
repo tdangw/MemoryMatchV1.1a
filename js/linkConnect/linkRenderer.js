@@ -242,13 +242,14 @@ export function playLinkMismatch(start, end) {
 
 export function playLinkMatchExit(start, end) {
   const effect = getActiveLinkConnectionEffect(gameState.appearance);
-  return [start, end].flatMap((position) => {
+  const tiles = [start, end].flatMap((position) => {
     const tile = getLinkTileButton(position);
     if (!tile) return [];
     tile.classList.add("is-removing", effect.exitClass);
-    playLinkCardExitEffect(tile, effect.exitId);
     return [tile];
   });
+  playLinkCardExitEffects(tiles, effect.exitId);
+  return tiles;
 }
 
 const FRAGMENT_LAYOUTS = Object.freeze({
@@ -260,15 +261,28 @@ const FRAGMENT_LAYOUTS = Object.freeze({
   pixel: Object.freeze({ columns: 5, rows: 5 }),
 });
 
-function playLinkCardExitEffect(tile, exitId) {
-  // Hiệu ứng tiêu chuẩn dùng animation CSS gốc; không dựng canvas phủ toàn board.
-  if (exitId === "default") return;
-  const source = tile.querySelector("img:not(.link-tile__frost-overlay)");
+const CANVAS_EXIT_EFFECTS = new Set(["finedust", "split4"]);
+
+function playLinkCardExitEffects(tiles, exitId) {
+  if (!CANVAS_EXIT_EFFECTS.has(exitId)) return;
   const frame = document.getElementById("link-board-frame");
-  if (!source?.complete || !source.naturalWidth || !frame) return;
+  if (!frame) return;
   const frameRect = frame.getBoundingClientRect();
-  const tileRect = tile.getBoundingClientRect();
   const density = Math.min(window.devicePixelRatio || 1, 2);
+  const cards = tiles.flatMap((tile) => {
+    const source = tile.querySelector("img:not(.link-tile__frost-overlay)");
+    if (!source?.complete || !source.naturalWidth) return [];
+    const tileRect = tile.getBoundingClientRect();
+    const bounds = {
+      x: tileRect.left - frameRect.left,
+      y: tileRect.top - frameRect.top,
+      width: tileRect.width,
+      height: tileRect.height,
+    };
+    tile.classList.add("has-canvas-exit");
+    return [{ source, bounds, fragments: createCardExitFragments(bounds, exitId), timing: readExitEffectTiming(tile) }];
+  });
+  if (!cards.length) return;
   const canvas = document.createElement("canvas");
   canvas.className = "link-card-exit-effect";
   canvas.width = Math.round(frameRect.width * density);
@@ -278,25 +292,18 @@ function playLinkCardExitEffect(tile, exitId) {
   const context = canvas.getContext("2d");
   if (!context) return;
   context.scale(density, density);
-  const bounds = {
-    x: tileRect.left - frameRect.left,
-    y: tileRect.top - frameRect.top,
-    width: tileRect.width,
-    height: tileRect.height,
-  };
-  const timing = readExitEffectTiming(tile);
-  const fragments = createCardExitFragments(bounds, exitId);
-  tile.classList.add("has-canvas-exit");
   frame.append(canvas);
   const startedAt = performance.now();
   const draw = (now) => {
     const elapsed = now - startedAt;
     context.clearRect(0, 0, frameRect.width, frameRect.height);
-    if (elapsed >= timing.delayMs) {
+    cards.forEach(({ source, bounds, fragments, timing }) => {
+      if (elapsed < timing.delayMs) return;
       const progress = Math.min((elapsed - timing.delayMs) / timing.durationMs, 1);
       renderCardExitEffect(context, source, fragments, bounds, exitId, progress);
-    }
-    if (elapsed < timing.delayMs + timing.durationMs) requestAnimationFrame(draw);
+    });
+    const duration = Math.max(...cards.map(({ timing }) => timing.delayMs + timing.durationMs));
+    if (elapsed < duration) requestAnimationFrame(draw);
     else canvas.remove();
   };
   requestAnimationFrame(draw);
@@ -583,13 +590,21 @@ export function drawLinkPath(path, board) {
   if (!svg || !boardElement || !path) return;
   const points = path.map((position) => toPercentPoint(position, board, boardElement));
   if (points.some((point) => !point)) return;
-  const electricPoints = createElectricPoints(points);
   const effect = getActiveLinkConnectionEffect(gameState.appearance);
-  const serializedPoints = electricPoints.map(({ x, y }) => `${x},${y}`).join(" ");
+  const renderedPoints = ["electric", "storm"].includes(effect.pathId)
+    ? createElectricPoints(points, effect.pathId === "storm" ? 1.45 : 1)
+    : points;
+  const serializedPoints = renderedPoints.map(({ x, y }) => `${x},${y}`).join(" ");
+  const pathData = `M ${renderedPoints.map(({ x, y }) => `${x} ${y}`).join(" L ")}`;
   svg.setAttribute("viewBox", PATH_VIEWBOX);
   svg.setAttribute("preserveAspectRatio", "none");
   svg.setAttribute("class", `link-path-overlay ${effect.pathClass}`);
   svg.replaceChildren();
+  const motionPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  const motionPathId = `link-motion-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+  motionPath.setAttribute("id", motionPathId);
+  motionPath.setAttribute("d", pathData);
+  motionPath.classList.add("link-path-overlay__motion-path");
   const glow = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
   glow.setAttribute("points", serializedPoints);
   glow.setAttribute("pathLength", "1");
@@ -598,7 +613,8 @@ export function drawLinkPath(path, board) {
   polyline.setAttribute("points", serializedPoints);
   polyline.setAttribute("pathLength", "1");
   polyline.classList.add("link-path-overlay__beam");
-  svg.append(glow, polyline);
+  svg.append(motionPath, glow, polyline);
+  appendLinkPathDecoration(svg, effect.pathId, motionPathId, renderedPoints.at(-1));
   svg.classList.add("is-visible");
 }
 
@@ -654,7 +670,7 @@ function clamp(value, minimum, maximum) {
   return Math.min(maximum, Math.max(minimum, value));
 }
 
-function createElectricPoints(points) {
+function createElectricPoints(points, intensity = 1) {
   return points.flatMap((point, index) => {
     if (index === points.length - 1) return [point];
     const next = points[index + 1];
@@ -664,7 +680,7 @@ function createElectricPoints(points) {
     const segmentPoints = index === 0 ? [point] : [];
     for (let step = 1; step < steps; step += 1) {
       const progress = step / steps;
-      const jitter = (Math.random() * 2 - 1) * ELECTRIC_JITTER_PERCENT;
+      const jitter = (Math.random() * 2 - 1) * ELECTRIC_JITTER_PERCENT * intensity;
       segmentPoints.push(horizontal
         ? { x: interpolate(point.x, next.x, progress), y: point.y + jitter }
         : { x: point.x + jitter, y: interpolate(point.y, next.y, progress) });
@@ -672,6 +688,49 @@ function createElectricPoints(points) {
     segmentPoints.push(next);
     return segmentPoints;
   });
+}
+
+function appendLinkPathDecoration(svg, pathId, motionPathId, destination) {
+  if (pathId === "magic") {
+    appendMovingPathNode(svg, motionPathId, "link-path-overlay__spark", 3, .14);
+  } else if (pathId === "fire") {
+    appendMovingPathNode(svg, motionPathId, "link-path-overlay__ember", 2, .18);
+  } else if (pathId === "sonic") {
+    appendMovingPathNode(svg, motionPathId, "link-path-overlay__pulse", 2, .24);
+  } else if (pathId === "matrix") {
+    appendMovingPathNode(svg, motionPathId, "link-path-overlay__arrow", 3, .16, "polygon");
+  } else if (pathId === "fireworks") {
+    appendMovingPathNode(svg, motionPathId, "link-path-overlay__firework", 3, .12);
+    if (destination) appendFireworkBurst(svg, destination);
+  }
+}
+
+function appendMovingPathNode(svg, motionPathId, className, count, delay, tagName = "circle") {
+  for (let index = 0; index < count; index += 1) {
+    const node = document.createElementNS("http://www.w3.org/2000/svg", tagName);
+    node.classList.add(className);
+    if (tagName === "polygon") node.setAttribute("points", "-1.8,-1.35 2.2,0 -1.8,1.35 -.55,0");
+    else node.setAttribute("r", "1.15");
+    const motion = document.createElementNS("http://www.w3.org/2000/svg", "animateMotion");
+    motion.setAttribute("dur", "620ms");
+    motion.setAttribute("begin", `${index * delay}s`);
+    motion.setAttribute("repeatCount", "indefinite");
+    motion.setAttribute("rotate", tagName === "polygon" ? "auto" : "0");
+    const pathRef = document.createElementNS("http://www.w3.org/2000/svg", "mpath");
+    pathRef.setAttribute("href", `#${motionPathId}`);
+    motion.append(pathRef);
+    node.append(motion);
+    svg.append(node);
+  }
+}
+
+function appendFireworkBurst(svg, destination) {
+  const burst = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+  burst.setAttribute("cx", destination.x);
+  burst.setAttribute("cy", destination.y);
+  burst.setAttribute("r", "2.2");
+  burst.classList.add("link-path-overlay__firework-burst");
+  svg.append(burst);
 }
 
 function interpolate(start, end, progress) {
