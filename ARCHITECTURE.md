@@ -74,7 +74,7 @@ Các module được nối qua hàm `configure*`; tránh import vòng giữa con
 
 `getModeLayout(mode)` và `getChallengeLayout(level)` quyết định kích thước board theo chế độ và cấp độ. Giao diện chỉ hiển thị tên chế độ, không hiển thị số thẻ.
 
-1. `main.js` nạp dữ liệu từ `persistence.js`, hydrate `gameState`, áp dụng âm thanh và hiển thị menu chính.
+1. `main.js` nạp dữ liệu từ `persistence.js`, hydrate `gameState`, áp dụng âm thanh và hiển thị game selector.
 2. Người chơi chọn độ khó; `gameController.initializeLevel()` tạo `roundId` mới và board mới.
 3. Board preview toàn bộ thẻ. Khi preview hoàn tất và `roundId` vẫn hợp lệ, countdown mới bắt đầu và nhạc nền tiếp tục.
 4. `logic.js` xử lý hai thẻ được chọn. Match cập nhật điểm/progress và combo; từ combo x2, mỗi cặp đúng nhận số giây bằng cấp combo (x2 +2 giây, x3 +3 giây…). Miss đặt combo về 0, khóa board trong khoảng thời gian cần thiết và trừ 1 Xu từ phần thưởng cuối màn.
@@ -82,7 +82,7 @@ Các module được nối qua hàm `configure*`; tránh import vòng giữa con
 6. Mỗi cặp ghép đúng cộng `1` điểm; điểm HUD là điểm của lượt chơi hiện tại và không dùng mua vật phẩm.
 7. Khi hoàn thành màn, người chơi nhận Xu theo độ khó và thời gian còn lại: Dễ `30 + floor(t × 0.35)`, Trung bình `50 + floor(t × 0.5)`, Khó `70 + floor(t × 0.65)`, Siêu khó `90 + floor(t × 0.8)`; sau đó trừ 1 Xu cho mỗi miss, không thấp hơn 0. Xu được cộng/lưu trước khi popup tổng kết hiển thị; popup gọi `onNext` hoặc `onMenu`; timer cũ bị vô hiệu bằng `roundId`.
 
-Mỗi level bắt đầu lại với thời gian nền theo độ khó (Dễ hiện là 6 giây để thử nghiệm; đổi 60 khi phát hành), cộng `min((level - 1) × 3, 30)` giây. Lượt gợi ý chưa dùng được giữ lại; từ level 2, người chơi nhận thêm 1 lượt mỗi màn đến tối đa 10 lượt.
+Mỗi level bắt đầu lại với thời gian nền theo độ khó, cộng `min((level - 1) × 2, 10)` giây. Lượt gợi ý chưa dùng được giữ lại; từ level 2, người chơi nhận thêm 1 lượt mỗi màn đến tối đa 10 lượt.
 
 ### Chống race condition
 
@@ -131,6 +131,9 @@ Lưu trữ dùng `localStorage`, theo thiết bị/trình duyệt. Không có d�
 | `npm run preview` | Xem thử production build tại local. |
 | `npm run deploy` | Build rồi phát hành lên Firebase Hosting. |
 | `npm run deploy:gh-pages` | Build rồi phát hành `dist` sang nhánh `gh-pages`. |
+| `npm run build:android` | Build profile Android rồi chuẩn bị `dist/` cho Capacitor. |
+| `npm run android:apk` | Đồng bộ Capacitor và tạo debug APK. |
+| `npm run android:apk:release` | Đồng bộ Capacitor và tạo release APK với keystore cục bộ. |
 
 ## 8. Repository và chính sách Git
 
