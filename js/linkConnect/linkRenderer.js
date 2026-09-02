@@ -1,5 +1,6 @@
 import { getActiveLinkConnectionEffect } from "./linkEffects.js";
 import { gameState } from "../gameState.js";
+import { measureLinkRender, recordLinkLayoutPass } from "./linkPerformance.js";
 
 const PATH_VIEWBOX = "0 0 100 100";
 const ELECTRIC_JITTER_PERCENT = 0.65;
@@ -20,76 +21,80 @@ function scheduleLinkBoardLayout() {
 }
 
 export function renderLinkBoard(board, { onTileClick } = {}) {
-  const container = document.getElementById("link-board");
-  if (!container) return;
-  observeLinkBoardLayout(document.getElementById("link-connect-container"));
-  container.style.setProperty("--link-columns", String(board.columns));
-  container.style.setProperty("--link-rows", String(board.grid.length - 2));
-  container.replaceChildren();
-  board.grid.slice(1, -1).forEach((row, rowIndex) => {
-    row.slice(1, -1).forEach((tile, columnIndex) => {
-      const position = { row: rowIndex + 1, column: columnIndex + 1 };
-      const cell = document.createElement("div");
-      cell.className = "link-board__cell";
-      cell.dataset.row = String(position.row);
-      cell.dataset.column = String(position.column);
-      if (!tile) {
-        cell.classList.add("is-empty");
+  return measureLinkRender("board render", () => {
+    const container = document.getElementById("link-board");
+    if (!container) return;
+    observeLinkBoardLayout(document.getElementById("link-connect-container"));
+    container.style.setProperty("--link-columns", String(board.columns));
+    container.style.setProperty("--link-rows", String(board.grid.length - 2));
+    container.replaceChildren();
+    board.grid.slice(1, -1).forEach((row, rowIndex) => {
+      row.slice(1, -1).forEach((tile, columnIndex) => {
+        const position = { row: rowIndex + 1, column: columnIndex + 1 };
+        const cell = document.createElement("div");
+        cell.className = "link-board__cell";
+        cell.dataset.row = String(position.row);
+        cell.dataset.column = String(position.column);
+        if (!tile) {
+          cell.classList.add("is-empty");
+          container.append(cell);
+          return;
+        }
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "link-tile";
+        if (tile.special) button.classList.add("is-special");
+        if (tile.luckyReward) button.classList.add("is-lucky");
+        if (tile.frozen) {
+          button.classList.add("is-frozen");
+          button.disabled = true;
+        }
+        button.dataset.row = String(position.row);
+        button.dataset.column = String(position.column);
+        button.dataset.tileKey = tile.instanceId;
+        button.setAttribute(
+          "aria-label",
+          tile.frozen ? `${tile.alt} · thẻ đóng băng` : tile.alt,
+        );
+        const image = document.createElement("img");
+        image.src = tile.src;
+        image.alt = "";
+        button.append(image);
+        if (tile.frozen) {
+          const frostOverlay = document.createElement("img");
+          frostOverlay.className = "link-tile__frost-overlay";
+          frostOverlay.src = assetUrl("assets/images/ui/frozen-card-overlay.png");
+          frostOverlay.alt = "";
+          frostOverlay.setAttribute("aria-hidden", "true");
+          button.append(frostOverlay);
+        }
+        button.addEventListener("click", () => onTileClick?.(position));
+        cell.append(button);
         container.append(cell);
-        return;
-      }
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "link-tile";
-      if (tile.special) button.classList.add("is-special");
-      if (tile.luckyReward) button.classList.add("is-lucky");
-      if (tile.frozen) {
-        button.classList.add("is-frozen");
-        button.disabled = true;
-      }
-      button.dataset.row = String(position.row);
-      button.dataset.column = String(position.column);
-      button.dataset.tileKey = tile.instanceId;
-      button.setAttribute(
-        "aria-label",
-        tile.frozen ? `${tile.alt} · thẻ đóng băng` : tile.alt,
-      );
-      const image = document.createElement("img");
-      image.src = tile.src;
-      image.alt = "";
-      button.append(image);
-      if (tile.frozen) {
-        const frostOverlay = document.createElement("img");
-        frostOverlay.className = "link-tile__frost-overlay";
-        frostOverlay.src = assetUrl("assets/images/ui/frozen-card-overlay.png");
-        frostOverlay.alt = "";
-        frostOverlay.setAttribute("aria-hidden", "true");
-        button.append(frostOverlay);
-      }
-      button.addEventListener("click", () => onTileClick?.(position));
-      cell.append(button);
-      container.append(cell);
+      });
     });
+    updateLinkBoardLayout();
   });
-  updateLinkBoardLayout();
 }
 
 export function renderLinkBoardShift(board, { onTileClick } = {}) {
-  const before = getLinkTileRects();
-  renderLinkBoard(board, { onTileClick });
-  const after = getLinkTileRects();
-  after.forEach(({ element, rect, key }) => {
-    const previous = before.get(key);
-    if (!previous) return;
-    const deltaX = previous.left - rect.left;
-    const deltaY = previous.top - rect.top;
-    if (!deltaX && !deltaY) return;
-    element.style.transition = "none";
-    element.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-    requestAnimationFrame(() => {
-      element.style.transition = "transform var(--link-board-shift-duration, 300ms) cubic-bezier(.2,.75,.25,1)";
-      element.style.transform = "";
-      element.addEventListener("transitionend", () => { element.style.transition = ""; }, { once: true });
+  return measureLinkRender("board shift", () => {
+    const before = getLinkTileRects();
+    renderLinkBoard(board, { onTileClick });
+    const after = getLinkTileRects();
+    after.forEach(({ element, rect, key }) => {
+      const previous = before.get(key);
+      if (!previous) return;
+      const deltaX = previous.left - rect.left;
+      const deltaY = previous.top - rect.top;
+      if (!deltaX && !deltaY) return;
+      element.style.transition = "none";
+      element.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+      requestAnimationFrame(() => {
+        element.style.transition = "transform var(--link-board-shift-duration, 300ms) cubic-bezier(.2,.75,.25,1)";
+        element.style.transform = "";
+        element.addEventListener("transitionend", () => { element.style.transition = ""; }, { once: true });
+      });
     });
   });
 }
@@ -551,6 +556,7 @@ function observeLinkBoardLayout(game) {
 }
 
 function updateLinkBoardLayout() {
+  recordLinkLayoutPass();
   const game = document.getElementById("link-connect-container");
   const board = document.getElementById("link-board");
   const frame = document.getElementById("link-board-frame");
