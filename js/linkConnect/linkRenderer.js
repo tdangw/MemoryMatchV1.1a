@@ -253,10 +253,15 @@ export function playLinkMatchExit(start, end) {
 }
 
 const FRAGMENT_LAYOUTS = Object.freeze({
+  split2: Object.freeze({ columns: 2, rows: 1 }),
   split4: Object.freeze({ columns: 2, rows: 2 }),
+  split8: Object.freeze({ columns: 4, rows: 2 }),
+  triangles: Object.freeze({ columns: 2, rows: 2, triangular: true }),
+  crumble: Object.freeze({ columns: 6, rows: 6 }),
+  pixel: Object.freeze({ columns: 5, rows: 5 }),
 });
 
-const CANVAS_EXIT_EFFECTS = new Set(["finedust", "split4"]);
+const CANVAS_EXIT_EFFECTS = new Set(["finedust", ...Object.keys(FRAGMENT_LAYOUTS)]);
 
 function playLinkCardExitEffects(tiles, exitId) {
   if (!CANVAS_EXIT_EFFECTS.has(exitId)) return;
@@ -319,6 +324,7 @@ function createCardExitFragments(bounds, exitId) {
         row,
         columns: layout.columns,
         rows: layout.rows,
+        triangle: layout.triangular && index % 2 === 1,
         velocityX: (column - (layout.columns - 1) / 2) * 3.4 + randomFragmentOffset(1.8),
         velocityY: (row - (layout.rows - 1) / 2) * 3.4 + randomFragmentOffset(1.8),
         rotation: randomFragmentOffset(0.24),
@@ -360,6 +366,14 @@ function drawImageFragment(context, image, fragment, progress) {
   context.globalAlpha = Math.max(0, 1 - progress * 1.14);
   context.translate(x + fragment.width / 2, y + fragment.height / 2);
   context.rotate(fragment.rotation * progress * 12);
+  if (fragment.triangle) {
+    context.beginPath();
+    context.moveTo(-fragment.width / 2, -fragment.height / 2);
+    context.lineTo(fragment.width / 2, -fragment.height / 2);
+    context.lineTo(-fragment.width / 2, fragment.height / 2);
+    context.closePath();
+    context.clip();
+  }
   context.drawImage(
     image,
     (fragment.column * image.naturalWidth) / fragment.columns,
@@ -541,8 +555,8 @@ export function drawLinkPath(path, board) {
   const points = path.map((position) => toPercentPoint(position, board, boardElement));
   if (points.some((point) => !point)) return;
   const effect = getActiveLinkConnectionEffect(gameState.appearance);
-  const renderedPoints = ["electric", "storm"].includes(effect.pathId)
-    ? createElectricPoints(points, effect.pathId === "storm" ? 1.45 : 1)
+  const renderedPoints = ["electric", "spiral"].includes(effect.pathId)
+    ? createElectricPoints(points, effect.pathId === "spiral" ? 1.3 : 1)
     : points;
   const serializedPoints = renderedPoints.map(({ x, y }) => `${x},${y}`).join(" ");
   const pathData = `M ${renderedPoints.map(({ x, y }) => `${x} ${y}`).join(" L ")}`;
@@ -646,13 +660,15 @@ function appendLinkPathDecoration(svg, pathId, motionPathId, destination) {
     appendMovingPathNode(svg, motionPathId, "link-path-overlay__spark", 3, .14);
   } else if (pathId === "fire") {
     appendMovingPathNode(svg, motionPathId, "link-path-overlay__ember", 2, .18);
+  } else if (pathId === "cyber") {
+    appendMovingPathNode(svg, motionPathId, "link-path-overlay__packet", 3, .16);
   } else if (pathId === "sonic") {
     appendMovingPathNode(svg, motionPathId, "link-path-overlay__pulse", 2, .24);
   } else if (pathId === "matrix") {
     appendMovingPathNode(svg, motionPathId, "link-path-overlay__arrow", 3, .16, "polygon");
-  } else if (pathId === "fireworks") {
+  } else if (pathId === "bullet" || pathId === "meteor") {
     appendMovingPathNode(svg, motionPathId, "link-path-overlay__firework", 3, .12);
-    if (destination) appendFireworkBurst(svg, destination);
+    if (destination && pathId === "meteor") appendFireworkBurst(svg, destination);
   }
 }
 

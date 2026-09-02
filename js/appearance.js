@@ -9,12 +9,12 @@ import {
 const DEFAULT_APPEARANCE = Object.freeze({
   cardBack: "classic",
   flipEffect: "bounce",
-  linkPathEffect: "electric",
+  linkPathEffect: "default",
   linkExitEffect: "default",
   themes: Object.freeze({ memoryMatch: "default", linkConnect: "default" }),
   ownedCardBacks: ["classic"],
   ownedFlipEffects: ["bounce"],
-  ownedLinkPathEffects: ["electric"],
+  ownedLinkPathEffects: ["default"],
   ownedLinkExitEffects: ["default"],
   ownedThemes: ["default"],
 });
