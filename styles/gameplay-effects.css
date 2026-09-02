@@ -97,20 +97,23 @@
 .tile-combo-effect.fade-out {
   opacity: 0;
   transform: translate(-50%, -100px);
-  transition: all 0.7s ease;
+  transition: transform 0.7s ease, opacity 0.7s ease;
 }
 
 @keyframes combo-appear {
   0% {
-    transform: translate(-50%, 8px) scale(0.72);
+    transform: translate(-50%, 8px) scale(0.72) rotate(0deg);
     opacity: 0;
   }
-  42% {
-    transform: translate(-50%, -4px) scale(1.03);
+  30% {
+    transform: translate(-50%, -5px) scale(1.17) rotate(-1deg);
     opacity: 1;
   }
+  48% { transform: translate(-50%, -8px) scale(1.07) rotate(0.8deg); }
+  64% { transform: translate(-50%, -10px) scale(1.1) rotate(-0.5deg); }
+  82%,
   100% {
-    transform: translate(-50%, -13px) scale(1);
+    transform: translate(-50%, -13px) scale(1) rotate(0deg);
     opacity: 1;
   }
 }

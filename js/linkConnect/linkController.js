@@ -60,6 +60,7 @@ import {
   clearLinkTileSelection,
   drawLinkPath,
   playLinkMatchExit,
+  playLinkMismatch,
   playLinkThunderStrike,
   renderLinkBoard,
   renderLinkBoardShift,
@@ -423,12 +424,21 @@ function handleLinkTileClick(position) {
     ? findConnectionPath(linkGameState.board.grid, selectedPosition, position)
     : null;
   if (!path) {
+    const roundId = linkGameState.roundId;
+    const board = linkGameState.board;
     playLinkSound("wrong");
     linkGameState.misses += 1;
     linkGameState.combo = 0;
-    clearLinkTileSelection();
-    selectedPosition = null;
+    linkGameState.isLocked = true;
+    const wrongTiles = playLinkMismatch(selectedPosition, position);
     updateLinkHud();
+    setTimeout(() => {
+      if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
+      wrongTiles.forEach((tileElement) => tileElement.classList.remove("is-wrong"));
+      clearLinkTileSelection();
+      selectedPosition = null;
+      linkGameState.isLocked = false;
+    }, LINK_CONNECT_TIMING.mismatchFeedbackMs);
     return;
   }
 
@@ -484,12 +494,20 @@ function useLinkItem(id) {
     showAppToast("Bạn chưa có vật phẩm này.");
     return;
   }
+  closeLinkToolsMenu();
   playLinkSound("overlay");
   if (id === "hint") useLinkHint();
   else if (id === "reshuffle") useLinkReshuffle();
   else if (id === "thunder") useLinkThunder();
   else if (id === "freeze") useLinkFreeze();
   updateLinkHud();
+}
+
+function closeLinkToolsMenu() {
+  const menu = document.getElementById("link-tools-menu");
+  const toggle = document.getElementById("link-tools-toggle");
+  if (menu) menu.hidden = true;
+  toggle?.setAttribute("aria-expanded", "false");
 }
 
 function useLinkHint() {
@@ -908,6 +926,7 @@ function applyLinkTimingStyles(container) {
   container.style.setProperty("--link-path-animation-duration", `${LINK_CONNECT_TIMING.pathAnimationMs}ms`);
   container.style.setProperty("--link-tile-exit-delay", `${LINK_CONNECT_TIMING.tileExitDelayMs}ms`);
   container.style.setProperty("--link-tile-exit-duration", `${LINK_CONNECT_TIMING.tileExitAnimationMs}ms`);
+  container.style.setProperty("--link-mismatch-feedback-duration", `${LINK_CONNECT_TIMING.mismatchFeedbackMs}ms`);
   container.style.setProperty("--link-thunder-strike-duration", `${LINK_CONNECT_TIMING.thunderStrikeMs}ms`);
 }
 

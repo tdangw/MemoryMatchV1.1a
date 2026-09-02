@@ -44,6 +44,7 @@ export const LINK_CONNECT_TIMING = Object.freeze({
   tileExitDelayMs: 260,
   tileExitAnimationMs: 520,
   matchSettleMs: 20,
+  mismatchFeedbackMs: 300,
   hintPreviewMs: 1000,
   thunderStrikeMs: 620,
   thunderNextPairDelayMs: 130,

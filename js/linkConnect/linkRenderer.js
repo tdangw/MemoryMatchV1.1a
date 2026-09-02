@@ -138,6 +138,7 @@ function createLinkTileElement(tileKey) {
   button.type = "button";
   button.className = "link-tile";
   button.dataset.tileKey = tileKey;
+  button.setAttribute("aria-pressed", "false");
   const image = document.createElement("img");
   image.alt = "";
   button.append(image);
@@ -207,12 +208,25 @@ function getLinkTileRects() {
 }
 
 export function setLinkTileSelected(position, selected) {
-  getLinkTileButton(position)?.classList.toggle("is-selected", selected);
+  const tile = getLinkTileButton(position);
+  if (!tile) return;
+  tile.classList.toggle("is-selected", selected);
+  tile.setAttribute("aria-pressed", String(selected));
 }
 
 export function clearLinkTileSelection() {
   document.querySelectorAll(".link-tile.is-selected").forEach((tile) => {
     tile.classList.remove("is-selected");
+    tile.setAttribute("aria-pressed", "false");
+  });
+}
+
+export function playLinkMismatch(start, end) {
+  return [start, end].flatMap((position) => {
+    const tile = getLinkTileButton(position);
+    if (!tile) return [];
+    tile.classList.add("is-wrong");
+    return [tile];
   });
 }
 
