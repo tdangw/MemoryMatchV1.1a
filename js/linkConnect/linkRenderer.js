@@ -10,6 +10,10 @@ const assetUrl = (path) => `${import.meta.env.BASE_URL}${path}`;
 let layoutFrame;
 let layoutObserver;
 let observedGame;
+let renderedBoardShape = "";
+let renderedBoardContainer = null;
+const boardCellsByPosition = new Map();
+const tileElementsByKey = new Map();
 
 window.addEventListener("resize", () => {
   scheduleLinkBoardLayout();
@@ -21,66 +25,13 @@ function scheduleLinkBoardLayout() {
 }
 
 export function renderLinkBoard(board, { onTileClick } = {}) {
-  return measureLinkRender("board render", () => {
-    const container = document.getElementById("link-board");
-    if (!container) return;
-    observeLinkBoardLayout(document.getElementById("link-connect-container"));
-    container.style.setProperty("--link-columns", String(board.columns));
-    container.style.setProperty("--link-rows", String(board.grid.length - 2));
-    container.replaceChildren();
-    board.grid.slice(1, -1).forEach((row, rowIndex) => {
-      row.slice(1, -1).forEach((tile, columnIndex) => {
-        const position = { row: rowIndex + 1, column: columnIndex + 1 };
-        const cell = document.createElement("div");
-        cell.className = "link-board__cell";
-        cell.dataset.row = String(position.row);
-        cell.dataset.column = String(position.column);
-        if (!tile) {
-          cell.classList.add("is-empty");
-          container.append(cell);
-          return;
-        }
-        const button = document.createElement("button");
-        button.type = "button";
-        button.className = "link-tile";
-        if (tile.special) button.classList.add("is-special");
-        if (tile.luckyReward) button.classList.add("is-lucky");
-        if (tile.frozen) {
-          button.classList.add("is-frozen");
-          button.disabled = true;
-        }
-        button.dataset.row = String(position.row);
-        button.dataset.column = String(position.column);
-        button.dataset.tileKey = tile.instanceId;
-        button.setAttribute(
-          "aria-label",
-          tile.frozen ? `${tile.alt} · thẻ đóng băng` : tile.alt,
-        );
-        const image = document.createElement("img");
-        image.src = tile.src;
-        image.alt = "";
-        button.append(image);
-        if (tile.frozen) {
-          const frostOverlay = document.createElement("img");
-          frostOverlay.className = "link-tile__frost-overlay";
-          frostOverlay.src = assetUrl("assets/images/ui/frozen-card-overlay.png");
-          frostOverlay.alt = "";
-          frostOverlay.setAttribute("aria-hidden", "true");
-          button.append(frostOverlay);
-        }
-        button.addEventListener("click", () => onTileClick?.(position));
-        cell.append(button);
-        container.append(cell);
-      });
-    });
-    updateLinkBoardLayout();
-  });
+  return measureLinkRender("board patch", () => patchLinkBoard(board, onTileClick));
 }
 
 export function renderLinkBoardShift(board, { onTileClick } = {}) {
   return measureLinkRender("board shift", () => {
     const before = getLinkTileRects();
-    renderLinkBoard(board, { onTileClick });
+    patchLinkBoard(board, onTileClick);
     const after = getLinkTileRects();
     after.forEach(({ element, rect, key }) => {
       const previous = before.get(key);
@@ -99,11 +50,125 @@ export function renderLinkBoardShift(board, { onTileClick } = {}) {
   });
 }
 
+function patchLinkBoard(board, onTileClick) {
+  const container = document.getElementById("link-board");
+  if (!container) return;
+  const rows = board.grid.length - 2;
+  const shape = `${board.columns}x${rows}`;
+  observeLinkBoardLayout(document.getElementById("link-connect-container"));
+  container.style.setProperty("--link-columns", String(board.columns));
+  container.style.setProperty("--link-rows", String(rows));
+  if (renderedBoardContainer !== container || renderedBoardShape !== shape) {
+    createLinkBoardCells(container, board.columns, rows);
+  }
+
+  const activeTileKeys = new Set();
+  board.grid.slice(1, -1).forEach((row, rowIndex) => {
+    row.slice(1, -1).forEach((tile, columnIndex) => {
+      const position = { row: rowIndex + 1, column: columnIndex + 1 };
+      const cell = boardCellsByPosition.get(positionKey(position));
+      if (!cell) return;
+      cell.classList.toggle("is-empty", !tile);
+      if (!tile) {
+        cell.replaceChildren();
+        return;
+      }
+
+      activeTileKeys.add(tile.instanceId);
+      const button = tileElementsByKey.get(tile.instanceId)
+        || createLinkTileElement(tile.instanceId);
+      syncLinkTileElement(button, tile, position, onTileClick);
+      if (cell.firstElementChild !== button) cell.replaceChildren(button);
+    });
+  });
+
+  tileElementsByKey.forEach((element, key) => {
+    if (activeTileKeys.has(key)) return;
+    element.remove();
+    tileElementsByKey.delete(key);
+  });
+  updateLinkBoardLayout();
+}
+
+function createLinkBoardCells(container, columns, rows) {
+  const fragment = document.createDocumentFragment();
+  boardCellsByPosition.clear();
+  tileElementsByKey.clear();
+  for (let row = 1; row <= rows; row += 1) {
+    for (let column = 1; column <= columns; column += 1) {
+      const cell = document.createElement("div");
+      const position = { row, column };
+      cell.className = "link-board__cell is-empty";
+      cell.dataset.row = String(row);
+      cell.dataset.column = String(column);
+      boardCellsByPosition.set(positionKey(position), cell);
+      fragment.append(cell);
+    }
+  }
+  container.replaceChildren(fragment);
+  renderedBoardContainer = container;
+  renderedBoardShape = `${columns}x${rows}`;
+}
+
+function createLinkTileElement(tileKey) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "link-tile";
+  button.dataset.tileKey = tileKey;
+  const image = document.createElement("img");
+  image.alt = "";
+  button.append(image);
+  button.addEventListener("click", () => {
+    const onTileClick = button._onLinkTileClick;
+    if (!onTileClick) return;
+    onTileClick({
+      row: Number(button.dataset.row),
+      column: Number(button.dataset.column),
+    });
+  });
+  tileElementsByKey.set(tileKey, button);
+  return button;
+}
+
+function syncLinkTileElement(button, tile, position, onTileClick) {
+  button._onLinkTileClick = onTileClick;
+  button.className = "link-tile";
+  if (tile.special) button.classList.add("is-special");
+  if (tile.luckyReward) button.classList.add("is-lucky");
+  if (tile.frozen) button.classList.add("is-frozen");
+  button.disabled = tile.frozen;
+  button.dataset.row = String(position.row);
+  button.dataset.column = String(position.column);
+  button.setAttribute(
+    "aria-label",
+    tile.frozen ? `${tile.alt} · thẻ đóng băng` : tile.alt,
+  );
+
+  const image = button.querySelector("img:not(.link-tile__frost-overlay)");
+  if (image?.getAttribute("src") !== tile.src) image.src = tile.src;
+  let frostOverlay = button.querySelector(".link-tile__frost-overlay");
+  if (tile.frozen && !frostOverlay) {
+    frostOverlay = document.createElement("img");
+    frostOverlay.className = "link-tile__frost-overlay";
+    frostOverlay.src = assetUrl("assets/images/ui/frozen-card-overlay.png");
+    frostOverlay.alt = "";
+    frostOverlay.setAttribute("aria-hidden", "true");
+    button.append(frostOverlay);
+  } else if (!tile.frozen) {
+    frostOverlay?.remove();
+  }
+}
+
+function positionKey({ row, column }) {
+  return `${row}:${column}`;
+}
+
 function getLinkTileRects() {
-  return new Map(Array.from(document.querySelectorAll(".link-tile[data-tile-key]")).map((element) => [
-    element.dataset.tileKey,
-    { element, rect: element.getBoundingClientRect(), key: element.dataset.tileKey },
-  ]));
+  return new Map(
+    [...tileElementsByKey.entries()]
+      .filter(([, element]) => element.isConnected)
+      .map(([key, element]) => [key, { element, rect: element.getBoundingClientRect(), key }]),
+  );
 }
 
 export function setLinkTileSelected(position, selected) {
@@ -435,6 +500,8 @@ export function clearLinkMatchedPair(start, end) {
   [start, end].forEach((position) => {
     const cell = getLinkBoardCell(position);
     if (!cell) return;
+    const tile = cell.querySelector(".link-tile[data-tile-key]");
+    if (tile?.dataset.tileKey) tileElementsByKey.delete(tile.dataset.tileKey);
     cell.replaceChildren();
     cell.classList.add("is-empty");
   });
@@ -473,9 +540,7 @@ export function clearLinkPath() {
 }
 
 function getLinkTileButton(position) {
-  return document.querySelector(
-    `.link-tile[data-row="${position.row}"][data-column="${position.column}"]`,
-  );
+  return getLinkBoardCell(position)?.querySelector(".link-tile") || null;
 }
 
 function toPercentPoint(position, board, boardElement) {
@@ -496,7 +561,7 @@ function toPercentPoint(position, board, boardElement) {
 }
 
 function getLinkBoardCell(position) {
-  return document.querySelector(
+  return boardCellsByPosition.get(positionKey(position)) || document.querySelector(
     `.link-board__cell[data-row="${position.row}"][data-column="${position.column}"]`,
   );
 }

@@ -458,7 +458,7 @@ function handleLinkTileClick(position) {
       return;
     }
     if (ensurePlayableBoard(linkGameState.board)) {
-      renderLinkBoard(linkGameState.board, { onTileClick: handleLinkTileClick });
+      renderLinkBoardShift(linkGameState.board, { onTileClick: handleLinkTileClick });
       showAppToast("Không còn đường nối. Bàn đã được xáo lại.");
     }
     linkGameState.isLocked = false;
@@ -501,7 +501,7 @@ function useLinkHint() {
 
 function useLinkReshuffle() {
   shuffleLinkBoard(linkGameState.board);
-  renderLinkBoard(linkGameState.board, { onTileClick: handleLinkTileClick });
+  renderLinkBoardShift(linkGameState.board, { onTileClick: handleLinkTileClick });
   showAppToast("Đã xáo lại các thẻ còn lại.");
 }
 
@@ -559,7 +559,7 @@ function finishLinkThunder(board, roundId) {
   const boardShifted = applyLinkGravityShift(board, linkGameState.gravityShift);
   if (boardShifted) renderLinkBoardShift(board, { onTileClick: handleLinkTileClick });
   if (ensurePlayableBoard(board)) {
-    renderLinkBoard(board, { onTileClick: handleLinkTileClick });
+    renderLinkBoardShift(board, { onTileClick: handleLinkTileClick });
     showAppToast("Không còn đường nối. Bàn đã được xáo lại.");
   }
   linkGameState.isLocked = false;
