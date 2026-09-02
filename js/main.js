@@ -4,6 +4,7 @@ import {
   unlockSound,
 } from "./sound.js";
 import "./gameMenu.js";
+import "./tooltips.js";
 import { decorateIcons } from "./icons.js";
 import {
   createMainMenu,

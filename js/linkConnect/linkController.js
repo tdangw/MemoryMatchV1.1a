@@ -636,6 +636,8 @@ function showLinkGravityRuleModal(direction, onComplete) {
     icon: "restart",
     title: "Quy tắc màn chơi",
     content,
+    dismissible: false,
+    closeOnBackdrop: false,
     actions: [{ label: "Đã hiểu", icon: "play", variant: "primary" }],
     onClose: onComplete,
   });
