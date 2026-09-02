@@ -12,11 +12,22 @@ const MIN_TILE_SIZE = 36;
 const COORDINATE_GUTTER_PX = 10;
 let activeLayout = null;
 let resizeFrame = null;
+let renderedCoordinateShape = "";
 
-function updateCoordinateLabels(columns, rows) {
+function updateCoordinateLabels(columns, rows, visible) {
   const columnLabels = document.getElementById("grid-coordinate-columns");
   const rowLabels = document.getElementById("grid-coordinate-rows");
   if (!columnLabels || !rowLabels) return;
+
+  const nextShape = visible ? `${columns}x${rows}` : "";
+  if (nextShape === renderedCoordinateShape) return;
+  renderedCoordinateShape = nextShape;
+
+  if (!visible) {
+    columnLabels.replaceChildren();
+    rowLabels.replaceChildren();
+    return;
+  }
 
   columnLabels.replaceChildren(
     ...Array.from({ length: columns }, (_, index) => {
@@ -94,7 +105,7 @@ function updateGridLayout() {
     ?.style.setProperty("--board-width", `${boardWidth + (showCoordinates ? COORDINATE_GUTTER_PX : 0)}px`);
   boardFrame?.classList.toggle("is-coordinate-visible", showCoordinates);
   boardFrame?.style.setProperty("--coordinate-gutter", showCoordinates ? `${COORDINATE_GUTTER_PX}px` : "0px");
-  updateCoordinateLabels(columns, rows);
+  updateCoordinateLabels(columns, rows, showCoordinates);
 }
 
 export function setBoardCoordinatesVisible(visible) {
@@ -144,12 +155,12 @@ export function createGrid(
   if (!gridContainer) return;
 
   activeLayout = { tileCount, columns, mobileColumns };
-  gridContainer.innerHTML = "";
   gridContainer.classList.add("is-locked");
   gameState.isLocked = true;
   updateGridLayout();
   requestAnimationFrame(updateGridLayout);
 
+  const tiles = document.createDocumentFragment();
   cards.forEach((cardData, idx) => {
     const tileId = `tile-${idx}`;
 
@@ -167,8 +178,9 @@ export function createGrid(
     tile.dataset.imageId = cardData.id;
     tile.dataset.special = String(cardData.special === true);
     tile.appendChild(img);
-    gridContainer.appendChild(tile);
+    tiles.appendChild(tile);
   });
+  gridContainer.replaceChildren(tiles);
 
   // ✅ Preview ảnh trước khi bắt đầu
   setTimeout(() => {
