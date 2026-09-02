@@ -253,12 +253,7 @@ export function playLinkMatchExit(start, end) {
 }
 
 const FRAGMENT_LAYOUTS = Object.freeze({
-  split2: Object.freeze({ columns: 2, rows: 1 }),
   split4: Object.freeze({ columns: 2, rows: 2 }),
-  split8: Object.freeze({ columns: 4, rows: 2 }),
-  triangles: Object.freeze({ columns: 2, rows: 2, triangular: true }),
-  crumble: Object.freeze({ columns: 6, rows: 6 }),
-  pixel: Object.freeze({ columns: 5, rows: 5 }),
 });
 
 const CANVAS_EXIT_EFFECTS = new Set(["finedust", "split4"]);
@@ -324,18 +319,17 @@ function createCardExitFragments(bounds, exitId) {
         row,
         columns: layout.columns,
         rows: layout.rows,
-        triangle: layout.triangular && index % 2 === 1,
         velocityX: (column - (layout.columns - 1) / 2) * 3.4 + randomFragmentOffset(1.8),
         velocityY: (row - (layout.rows - 1) / 2) * 3.4 + randomFragmentOffset(1.8),
         rotation: randomFragmentOffset(0.24),
       };
     });
   }
-  const particleCount = exitId === "finedust" ? 64 : exitId === "dissolve" ? 42 : 1;
+  const particleCount = isCoarsePointer() ? 42 : 60;
   return Array.from({ length: particleCount }, () => ({
     x: bounds.x + Math.random() * bounds.width,
     y: bounds.y + Math.random() * bounds.height,
-    size: 1.5 + Math.random() * (exitId === "finedust" ? 3.5 : 6),
+    size: 1.4 + Math.random() * 3.2,
     velocityX: randomFragmentOffset(3.6),
     velocityY: -1.6 - Math.random() * 3.8,
   }));
@@ -343,20 +337,18 @@ function createCardExitFragments(bounds, exitId) {
 
 function renderCardExitEffect(context, image, fragments, bounds, exitId, progress) {
   context.save();
-  if (exitId === "finedust" || exitId === "dissolve") {
+  if (exitId === "finedust") {
+    context.fillStyle = "#d7f6ff";
+    context.shadowBlur = 5;
+    context.shadowColor = context.fillStyle;
     fragments.forEach((fragment) => {
       context.globalAlpha = Math.max(0, 1 - progress);
-      context.fillStyle = exitId === "finedust" ? "#d7f6ff" : "#7ee9ff";
-      context.shadowBlur = 8;
-      context.shadowColor = context.fillStyle;
       context.beginPath();
       context.arc(fragment.x + fragment.velocityX * progress * 16, fragment.y + fragment.velocityY * progress * 20, Math.max(.5, fragment.size * (1 - progress * .55)), 0, Math.PI * 2);
       context.fill();
     });
-  } else if (FRAGMENT_LAYOUTS[exitId]) {
-    fragments.forEach((fragment) => drawImageFragment(context, image, fragment, progress));
   } else {
-    drawWholeCardEffect(context, image, bounds, exitId, progress);
+    fragments.forEach((fragment) => drawImageFragment(context, image, fragment, progress));
   }
   context.restore();
 }
@@ -368,14 +360,6 @@ function drawImageFragment(context, image, fragment, progress) {
   context.globalAlpha = Math.max(0, 1 - progress * 1.14);
   context.translate(x + fragment.width / 2, y + fragment.height / 2);
   context.rotate(fragment.rotation * progress * 12);
-  if (fragment.triangle) {
-    context.beginPath();
-    context.moveTo(-fragment.width / 2, -fragment.height / 2);
-    context.lineTo(fragment.width / 2, -fragment.height / 2);
-    context.lineTo(-fragment.width / 2, fragment.height / 2);
-    context.closePath();
-    context.clip();
-  }
   context.drawImage(
     image,
     (fragment.column * image.naturalWidth) / fragment.columns,
@@ -390,50 +374,16 @@ function drawImageFragment(context, image, fragment, progress) {
   context.restore();
 }
 
-function drawWholeCardEffect(context, image, bounds, exitId, progress) {
-  const centerX = bounds.x + bounds.width / 2;
-  const centerY = bounds.y + bounds.height / 2;
-  const effect = getWholeCardEffectTransform(exitId, progress, bounds);
-  context.save();
-  context.globalAlpha = effect.opacity;
-  context.translate(centerX + effect.x, centerY + effect.y);
-  context.rotate(effect.rotation);
-  context.scale(effect.scaleX, effect.scaleY);
-  context.filter = effect.filter;
-  context.drawImage(image, -bounds.width / 2, -bounds.height / 2, bounds.width, bounds.height);
-  context.restore();
-  if (["portal", "blackhole", "electric-shock", "bubble"].includes(exitId)) {
-    context.save();
-    context.globalAlpha = Math.max(0, 1 - progress);
-    context.strokeStyle = exitId === "electric-shock" ? "#c8f7ff" : "#b493ff";
-    context.lineWidth = Math.max(1, 4 * (1 - progress));
-    context.beginPath();
-    context.arc(centerX, centerY, Math.max(bounds.width, bounds.height) * progress, 0, Math.PI * 2);
-    context.stroke();
-    context.restore();
-  }
-}
-
-function getWholeCardEffectTransform(exitId, progress, bounds) {
-  const standard = { x: 0, y: 0, rotation: 0, scaleX: 1 - progress * .42, scaleY: 1 - progress * .42, opacity: 1 - progress, filter: "none" };
-  if (exitId === "gravity") return { ...standard, y: progress * progress * bounds.height * 2.6, rotation: progress * .45 };
-  if (exitId === "ghost") return { ...standard, y: -progress * bounds.height * 1.5, scaleX: 1 - progress * .2, scaleY: 1 - progress * .2, filter: "blur(2px) saturate(.45)" };
-  if (exitId === "slice") return { ...standard, x: progress * bounds.width * .42, y: -progress * bounds.height * .32, rotation: progress * .3 };
-  if (exitId === "portal" || exitId === "blackhole" || exitId === "implode") return { ...standard, rotation: progress * Math.PI * 4, scaleX: Math.max(0, 1 - progress * 1.35), scaleY: Math.max(0, 1 - progress * 1.35) };
-  if (exitId === "burn") return { ...standard, y: -progress * bounds.height * .55, filter: "sepia(1) saturate(2.3) hue-rotate(-24deg) brightness(1.5)" };
-  if (exitId === "freeze") return { ...standard, scaleX: 1 + Math.sin(progress * 30) * .06, scaleY: 1 + Math.cos(progress * 27) * .06, filter: "saturate(.35) brightness(1.7)" };
-  if (exitId === "bubble") return { ...standard, scaleX: 1 + progress * .7, scaleY: 1 + progress * .7 };
-  if (exitId === "origami") return { ...standard, rotation: progress * Math.PI / 2, scaleX: Math.max(0, 1 - progress * .8) };
-  if (exitId === "electric-shock") return { ...standard, x: Math.sin(progress * 46) * bounds.width * .08, filter: "brightness(2) saturate(1.7)" };
-  return standard;
-}
-
 function readExitEffectTiming(tile) {
   const style = getComputedStyle(tile);
   return {
     delayMs: Number.parseFloat(style.getPropertyValue("--link-tile-exit-delay")) || 0,
     durationMs: Number.parseFloat(style.getPropertyValue("--link-tile-exit-duration")) || 520,
   };
+}
+
+function isCoarsePointer() {
+  return window.matchMedia?.("(hover: none) and (pointer: coarse)").matches;
 }
 
 function randomFragmentOffset(range) {
@@ -691,6 +641,7 @@ function createElectricPoints(points, intensity = 1) {
 }
 
 function appendLinkPathDecoration(svg, pathId, motionPathId, destination) {
+  if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
   if (pathId === "magic") {
     appendMovingPathNode(svg, motionPathId, "link-path-overlay__spark", 3, .14);
   } else if (pathId === "fire") {
