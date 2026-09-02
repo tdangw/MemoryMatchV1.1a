@@ -70,6 +70,7 @@ import { beginLinkRound, linkGameState, resetLinkGame } from "./linkState.js";
 let countdownInterval;
 let selectedPosition = null;
 let linkTimeWarningPlayed = false;
+let linkHudElements = null;
 let navigation = {
   showMenu: () => {},
   showCollection: () => {},
@@ -284,6 +285,7 @@ function showLinkGame() {
     document.querySelector(".main-wrapper")?.append(container);
     configureLinkGameActions(container);
     configureLinkItemActions(container);
+    linkHudElements = null;
   }
   document.getElementById("menu-container")?.remove();
   document.getElementById("game-container")?.style.setProperty("display", "none");
@@ -668,11 +670,10 @@ function startCountdown(roundId) {
     if (linkGameState.roundId !== roundId || linkGameState.isLocked || linkGameState.isPaused) return;
     if (linkGameState.freezeSeconds > 0) {
       linkGameState.freezeSeconds -= 1;
-      updateLinkHud();
       return;
     }
     linkGameState.remainingTime += getLinkTimerDirection(linkGameState.mode) === "up" ? 1 : -1;
-    updateLinkHud();
+    updateLinkTimerHud();
     if (!isLinkEndlessMode(linkGameState.mode) && linkGameState.remainingTime <= 10 && !linkTimeWarningPlayed) {
       playLinkSound("timerunningout");
       linkTimeWarningPlayed = true;
@@ -701,6 +702,7 @@ function handleLinkTimeUp() {
     linkGameState.remainingTime = seconds;
     linkTimeWarningPlayed = false;
     linkGameState.isLocked = false;
+    updateLinkTimerHud();
     close();
     showAppToast(`Đã mua +${seconds}s với ${price} Xu.`);
     playLinkSound("bonus");
@@ -744,46 +746,48 @@ function handleLinkTimeUp() {
 }
 
 function updateLinkHud() {
-  setText("link-level-label", linkGameState.level);
-  setText("link-moves", linkGameState.moves);
-  setText("link-misses", linkGameState.misses);
-  setText("link-combo", linkGameState.combo);
-  setText("link-score", linkGameState.score);
-  setText("link-matched-pairs", linkGameState.matchedPairs);
-  setText("link-total-pairs", linkGameState.totalPairs);
-  setText("link-hint", getLinkItemCount("hint"));
-  setText("link-timer", formatClockTime(linkGameState.remainingTime));
-  updateLinkStarsHud();
-  updateLinkSpecialMilestones();
-  document.querySelectorAll("[data-item-count]").forEach((element) => {
-    const itemId = element.dataset.itemCount;
-    element.textContent = String(getLinkItemCount(itemId));
+  const hud = getLinkHudElements();
+  setHudText(hud.level, linkGameState.level);
+  setHudText(hud.moves, linkGameState.moves);
+  setHudText(hud.misses, linkGameState.misses);
+  setHudText(hud.combo, linkGameState.combo);
+  setHudText(hud.score, linkGameState.score);
+  setHudText(hud.matchedPairs, linkGameState.matchedPairs);
+  setHudText(hud.totalPairs, linkGameState.totalPairs);
+  setHudText(hud.hint, getLinkItemCount("hint"));
+  updateLinkTimerHud(hud);
+  updateLinkStarsHud(hud);
+  updateLinkSpecialMilestones(hud);
+  hud.itemCounts.forEach((element) => {
+    setHudText(element, getLinkItemCount(element.dataset.itemCount));
   });
-  const freezeButton = document.querySelector('[data-item="freeze"]');
-  freezeButton?.classList.toggle("is-disabled", isLinkEndlessMode(linkGameState.mode));
-  freezeButton?.setAttribute("aria-disabled", String(isLinkEndlessMode(linkGameState.mode)));
+  hud.freezeButton?.classList.toggle("is-disabled", isLinkEndlessMode(linkGameState.mode));
+  hud.freezeButton?.setAttribute("aria-disabled", String(isLinkEndlessMode(linkGameState.mode)));
 }
 
-function updateLinkStarsHud() {
+function updateLinkTimerHud(hud = getLinkHudElements()) {
+  setHudText(hud.timer, formatClockTime(linkGameState.remainingTime));
+}
+
+function updateLinkStarsHud(hud = getLinkHudElements()) {
   const stars = calculateLinkStars();
   const targets = isLinkEndlessMode(linkGameState.mode) ? [10, 15, 20] : [12, 18, 25];
   const target = Math.max(1, linkGameState.totalPairs * targets[2]);
-  const levelStars = document.getElementById("link-level-stars");
+  const levelStars = hud.levelStars;
   if (levelStars) {
     levelStars.setAttribute("aria-label", `${stars} trên 3 sao`);
     levelStars.querySelectorAll(".star-progress__milestone").forEach((star, index) => {
       star.classList.toggle("is-earned", index < stars);
     });
   }
-  const fill = document.getElementById("link-level-stars-fill");
+  const fill = hud.starsFill;
   if (fill) fill.style.width = `${Math.min(100, Math.round(linkGameState.score / target * 100))}%`;
-  setText("link-total-stars", stars);
+  setHudText(hud.totalStars, stars);
 }
 
-function updateLinkSpecialMilestones() {
+function updateLinkSpecialMilestones(hud = getLinkHudElements()) {
   const progress = linkGameState.specialProgress;
-  const milestones = [...document.querySelectorAll("[data-link-special-milestone]")];
-  const track = document.querySelector(".link-special-hud__milestones");
+  const { milestones, specialTrack: track } = hud;
   const target = LINK_CONNECT_CONFIG.special.progressTarget;
   track?.style.setProperty(
     "--link-special-progress",
@@ -907,9 +911,36 @@ function applyLinkTimingStyles(container) {
   container.style.setProperty("--link-thunder-strike-duration", `${LINK_CONNECT_TIMING.thunderStrikeMs}ms`);
 }
 
-function setText(id, value) {
-  const element = document.getElementById(id);
-  if (element) element.textContent = String(value);
+function getLinkHudElements() {
+  const root = document.getElementById("link-connect-container");
+  if (linkHudElements?.root === root) return linkHudElements;
+  const find = (selector) => root?.querySelector(selector) || null;
+  linkHudElements = {
+    root,
+    level: find("#link-level-label"),
+    moves: find("#link-moves"),
+    misses: find("#link-misses"),
+    combo: find("#link-combo"),
+    score: find("#link-score"),
+    matchedPairs: find("#link-matched-pairs"),
+    totalPairs: find("#link-total-pairs"),
+    hint: find("#link-hint"),
+    timer: find("#link-timer"),
+    levelStars: find("#link-level-stars"),
+    starsFill: find("#link-level-stars-fill"),
+    totalStars: find("#link-total-stars"),
+    specialTrack: find(".link-special-hud__milestones"),
+    milestones: root ? [...root.querySelectorAll("[data-link-special-milestone]")] : [],
+    itemCounts: root ? [...root.querySelectorAll("[data-item-count]")] : [],
+    freezeButton: find('[data-item="freeze"]'),
+  };
+  return linkHudElements;
+}
+
+function setHudText(element, value) {
+  if (!element) return;
+  const text = String(value);
+  if (element.textContent !== text) element.textContent = text;
 }
 
 function samePosition(left, right) {
