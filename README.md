@@ -2,7 +2,7 @@
 
 Phiên bản hiển thị trong ứng dụng: **V1.1a**.
 
-Ứng dụng web dùng HTML, CSS và JavaScript ES modules. Vite phục vụ và build bản web.
+Ứng dụng web/PWA dùng HTML, CSS và JavaScript ES modules. Vite phục vụ và build bản web; Capacitor đóng gói bản Android từ cùng mã nguồn khi cần.
 
 ## Yêu cầu
 
@@ -40,6 +40,16 @@ npm run preview
 - `build`: tạo bản phát hành web trong `dist/`.
 - `preview`: chạy thử nội dung đã build.
 
+## Android
+
+Project Capacitor Android được giữ trong `android/`. Sau khi cài Android SDK và đặt `android/local.properties`, dùng:
+
+```powershell
+npm run android:apk
+```
+
+Để build release, cấu hình keystore theo `android/keystore.properties.example` rồi chạy `npm run android:apk:release`.
+
 ## Cấu trúc
 
 - `index.html`: khung giao diện và entry `/js/main.js`.
@@ -53,4 +63,4 @@ npm run preview
 - Hiện không có thư mục `source-assets/`. Khi tạo hoặc xuất lại ảnh, lưu bản nguồn ngoài `public/assets/`; chỉ asset runtime đã chuẩn bị mới được đưa vào bản web.
 - `vite.config.js`: cấu hình web JavaScript thuần.
 
-Ba chế độ giữ level độc lập theo mỗi lượt chơi: Dễ 12 ô, Trung bình 24 ô, Khó 36 ô. Qua level mới game chọn lại các cặp ngẫu nhiên từ kho ảnh của chủ đề. Lưới tự đổi từ 4×3, 6×4, 6×6 trên PC sang 3×4, 4×6, 6×6 trên mobile; kích thước thẻ được tính lại khi đổi kích thước hoặc xoay màn hình.
+Mỗi game có sáu mode (Dễ, Trung bình, Khó, Siêu khó, Vô tận và Thử thách), giữ session độc lập theo mode. Catalog chung `js/gameCatalog.js` giữ metadata game/mode để game tiếp theo có thể tái sử dụng selector và lưu tiến trình mà không sao chép danh sách mode.

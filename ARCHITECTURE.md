@@ -4,12 +4,12 @@
 
 ## 1. Tổng quan
 
-Memory Match Adventure là game ghép thẻ chạy trên web, viết bằng HTML/CSS/JavaScript ES modules. Vite đảm nhận dev server và build.
+Memory Match Adventure là bộ game ghép thẻ chạy trên web/PWA, viết bằng HTML/CSS/JavaScript ES modules. Vite đảm nhận dev server và build; Capacitor đóng gói cùng bản build web thành Android APK/AAB khi cần.
 
 ```text
 index.html → js/main.js → controller / UI / gameplay modules
                          ↘ public/assets (ảnh WebP, âm thanh)
-Vite build → dist → Firebase Hosting hoặc GitHub Pages
+Vite build → dist → Firebase Hosting, GitHub Pages hoặc Capacitor Android
 ```
 
 - Phiên bản hiển thị cho người chơi: `js/appMeta.js` (`V1.1a`).
@@ -26,16 +26,19 @@ Vite build → dist → Firebase Hosting hoặc GitHub Pages
 | `styles/shop.css` | Kiểu giao diện riêng của Cửa hàng và hộp xác nhận mua. |
 | `styles/gameplay-effects.css` | Mặt lưng thẻ và hiệu ứng phản hồi combo. |
 | `js/` | Các ES module theo trách nhiệm. |
+| `js/gameCatalog.js` | Metadata game, mode dùng chung và mapping namespace tiến trình; điểm đăng ký cho game mới. |
 | `public/assets/` | Tài nguyên runtime được copy nguyên vẹn vào `dist/assets/`. |
 | *(không có)* `source-assets/` | Không còn trong workspace. Nếu cần tạo ảnh nguồn, lưu ngoài `public/assets/` trong quá trình xử lý và không phát hành. |
 | `scripts/check-js.mjs` | Kiểm tra tĩnh import/cú pháp module JavaScript. |
 | `dist/` | Sản phẩm build, bị Git bỏ qua; được phát hành lên Firebase Hosting. |
+| `android/`, `capacitor.config.ts` | Project Android/Capacitor; dùng `dist/` từ build profile Android. |
 
 ## 3. Quyền sở hữu module
 
 | Module | Trách nhiệm duy nhất |
 | --- | --- |
 | `main.js` | Bootstrap: hydrate dữ liệu, nối callback giữa module, gắn sự kiện nút cố định. |
+| `gameCatalog.js` | Danh mục game/mode dùng chung cho selector, menu và session; không chứa gameplay. |
 | `gameState.js` | Trạng thái runtime thuần và vòng đời round (`roundId`); không thao tác DOM hay `localStorage`. |
 | `gameController.js` | Khởi tạo màn, timer, preview, pause/resume khi ẩn tab, chuyển màn và quay menu. |
 | `logic.js` | Luật chọn/match/miss và điều kiện hoàn thành. |
@@ -47,7 +50,7 @@ Vite build → dist → Firebase Hosting hoặc GitHub Pages
 | `shop.js` | Cửa hàng/vật phẩm trong game. |
 | `shopCatalog.js` | Catalog vật phẩm Shop và quy tắc giá động của từng vật phẩm. |
 | `themeCatalog.js` | Metadata chủ đề, tạo nội dung chữ/số/ký hiệu bằng SVG và cung cấp dữ liệu thẻ cho board. Không chứa tên tệp ảnh. |
-| `scripts/generate-theme-manifest.mjs` | Quét ảnh WebP trong từng thư mục chủ đề và sinh manifest runtime tự động. |
+| `scripts/generate-theme-manifest.mjs` | Quét đệ quy ảnh WebP trong từng thư mục chủ đề và sinh manifest runtime tự động; asset dưới `special/` được đánh dấu `special: true`. |
 | `gameplayTuning.js` | Mốc combo, phần thưởng thời gian theo combo và thời lượng hiệu ứng gameplay. |
 | `gameMenu.js` | Menu tác vụ trong HUD. |
 | `sound.js` | Âm thanh hiệu ứng, nhạc nền và quy tắc phát/dừng theo trạng thái trang. |
@@ -110,7 +113,7 @@ Lưu trữ dùng `localStorage`, theo thiết bị/trình duyệt. Không có d�
 
 ## 6. Tài nguyên và đường dẫn
 
-- Ảnh phát hành là WebP trong `public/assets/images/themes/<theme-id>/`. Tên thư mục và tên tệp mới dùng English `kebab-case`; ví dụ `animals-land/red-panda.webp`. `scripts/generate-theme-manifest.mjs` quét các tệp WebP trực tiếp trong từng thư mục (không lấy thư mục `special/`) rồi tạo `js/generated/themeAssetManifest.js`. File sinh tự động bị Git bỏ qua.
+- Ảnh phát hành là WebP trong `public/assets/images/themes/<theme-id>/`. Tên thư mục và tên tệp mới dùng English `kebab-case`; ví dụ `animals-land/red-panda.webp`. `scripts/generate-theme-manifest.mjs` quét đệ quy mọi WebP trong từng thư mục và đánh dấu asset dưới `special/`, rồi tạo `js/generated/themeAssetManifest.js`. File sinh tự động bị Git bỏ qua.
 - `themeCatalog.js` chỉ giữ metadata ổn định: ID tiếng Anh, icon, giá và nhãn hiển thị tiếng Việt. Mỗi ảnh được game nhận diện theo tên tệp trong manifest; không duy trì danh sách filename bằng tay trong JavaScript.
 - `npm run dev`, `npm run build`, `npm run build:gh-pages`, `npm run build:android` và `npm run check` đều đồng bộ manifest trước khi chạy. Khi thêm ảnh trong lúc dev server đang mở, chạy `npm run assets:sync` rồi tải lại trang.
 - Âm thanh ở `public/assets/sounds/`.

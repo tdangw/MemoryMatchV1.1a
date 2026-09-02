@@ -6,6 +6,8 @@ import { GAMEPLAY_TIMING } from "../gameplayTuning.js";
 import { gameState, increaseCoins, spendCoins } from "../gameState.js";
 import { saveCoins } from "../persistence.js";
 import { getTheme } from "../themeCatalog.js";
+import { GAME_MODES } from "../gameCatalog.js";
+import { TIME_UP_PURCHASES } from "../shopCatalog.js";
 import {
   calculateLinkMatchPoints,
   calculateLinkCoinReward,
@@ -103,14 +105,7 @@ export function showLinkDifficultyOverlay() {
     modal.close();
     setTimeout(() => navigation.showCollection(), LINK_CONNECT_TIMING.postModalNavigationDelayMs);
   });
-  [
-    ["easy", "Dễ", "status-easy"],
-    ["normal", "Trung bình", "status-normal"],
-    ["hard", "Khó", "status-hard"],
-    ["superHard", "Siêu khó", "status-super-hard"],
-    ["endless", "Vô tận", "timer"],
-    ["challenge", "Thử thách", "trophy"],
-  ].forEach(([mode, label, icon]) => {
+  GAME_MODES.forEach(({ id: mode, label, icon }) => {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "difficulty-option";
@@ -729,8 +724,12 @@ function handleLinkTimeUp() {
           startLinkLevel({ mode: linkGameState.mode, level: linkGameState.level, resume: true });
         },
       },
-      { label: "+1 giây · 2 Xu", icon: "coin", variant: "time-purchase", onClick: (close) => buyMoreTime(1, 2, close) },
-      { label: "+5 giây · 10 Xu", icon: "coin", variant: "time-purchase", onClick: (close) => buyMoreTime(5, 10, close) },
+      ...TIME_UP_PURCHASES.map(({ seconds, price }) => ({
+        label: `+${seconds} giây · ${price} Xu`,
+        icon: "coin",
+        variant: "time-purchase",
+        onClick: (close) => buyMoreTime(seconds, price, close),
+      })),
     ],
     onClose: () => {
       if (!actionSelected) returnToMenu();

@@ -96,6 +96,13 @@ export const SHOP_ITEMS = Object.freeze([
   },
 ]);
 
+// Gói thời gian dùng trong popup hết giờ của mọi game có countdown.
+// Tách riêng khỏi SHOP_ITEMS vì chúng chỉ xuất hiện sau khi hết giờ.
+export const TIME_UP_PURCHASES = Object.freeze([
+  Object.freeze({ seconds: 1, price: 2 }),
+  Object.freeze({ seconds: 5, price: 10 }),
+]);
+
 export function getShopItemPrice(item) {
   return item.price;
 }

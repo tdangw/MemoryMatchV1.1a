@@ -5,6 +5,7 @@ const PATH_VIEWBOX = "0 0 100 100";
 const ELECTRIC_JITTER_PERCENT = 0.65;
 const ELECTRIC_SEGMENT_LENGTH_PERCENT = 7;
 const OUTER_ROUTE_INSET_PERCENT = 1.5;
+const assetUrl = (path) => `${import.meta.env.BASE_URL}${path}`;
 let layoutFrame;
 let layoutObserver;
 let observedGame;
@@ -60,7 +61,7 @@ export function renderLinkBoard(board, { onTileClick } = {}) {
       if (tile.frozen) {
         const frostOverlay = document.createElement("img");
         frostOverlay.className = "link-tile__frost-overlay";
-        frostOverlay.src = "/assets/images/ui/frozen-card-overlay.png";
+        frostOverlay.src = assetUrl("assets/images/ui/frozen-card-overlay.png");
         frostOverlay.alt = "";
         frostOverlay.setAttribute("aria-hidden", "true");
         button.append(frostOverlay);

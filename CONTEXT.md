@@ -2,8 +2,8 @@
 
 ## Phạm vi
 
-- Dự án là game web JavaScript thuần, tối ưu cho màn hình mobile dọc. Khi mở game luôn chọn một trong hai trò độc lập: **Memory Match** (ghi nhớ và lật cặp thẻ) hoặc **Link Connect** (quan sát và nối cặp hình không có vật cản).
-- Không còn Android/Capacitor, APK/AAB, AdMob, quảng cáo hoặc vùng giữ chỗ quảng cáo.
+- Dự án là game JavaScript thuần, tối ưu cho màn hình mobile dọc và phát hành dưới dạng web/PWA. Khi mở game luôn chọn một trong hai trò độc lập: **Memory Match** (ghi nhớ và lật cặp thẻ) hoặc **Link Connect** (quan sát và nối cặp hình không có vật cản).
+- Android/Capacitor được giữ lại để build APK/AAB sau khi bản web ổn định. Không có AdMob, quảng cáo hoặc vùng giữ chỗ quảng cáo.
 - Firebase Hosting project là `memorymatchv1-1a`; game không dùng Firebase Web SDK hay backend.
 
 ## Chạy, kiểm tra và phát hành
@@ -14,6 +14,8 @@
 - `npm run deploy`: build và deploy Firebase Hosting.
 - `npm run build:gh-pages`: build tại base `/MemoryMatchV1.1a/`.
 - `npm run deploy:gh-pages`: deploy `dist/` lên nhánh GitHub Pages.
+- `npm run android:apk`: build và đồng bộ Capacitor, sau đó tạo debug APK.
+- `npm run android:apk:release`: tạo release APK sau khi đã cấu hình keystore ngoài Git.
 
 ## PWA
 
@@ -29,6 +31,13 @@
 - Mỗi trò có sáu chế độ: Dễ, Trung bình, Khó, Siêu khó, Vô tận và Thử thách. Tiến trình tiếp tục được lưu độc lập theo từng chế độ; bắt đầu ván mới chỉ ghi đè tiến trình của đúng chế độ đó. Popup chọn tiếp tục dùng cùng phong cách với popup chọn chế độ; **Chơi mới** ở bên trái, **Tiếp tục** ở bên phải.
 - Khi đổi chủ đề trong lúc đang chơi, chủ đề mới chỉ áp dụng từ ván tiếp theo. Popup thông báo dùng chung, không tạo biến thể riêng cho từng màn.
 - Popup đầu màn, tổng kết màn và hết giờ dùng các thành phần chung cho hai trò. Popup hết giờ có Về Menu, Chơi lại, mua +1 giây (2 Xu) hoặc +5 giây (10 Xu).
+- `js/gameCatalog.js` là catalog chung cho metadata game và sáu mode. `sessionProgress.js` dùng catalog này để lưu session theo namespace của từng game; game thứ ba phải được đăng ký ở đây trước khi xuất hiện trong selector.
+- Các gói mua thời gian khi hết giờ nằm trong `TIME_UP_PURCHASES` của `js/shopCatalog.js`, dùng chung cho mọi game có countdown.
+
+### Triple Connect — kế hoạch chưa triển khai
+
+- Triple Connect là trò thứ ba độc lập, đã có thiết kế tại `Triple Connect.md`. Trò dùng chung Xu, chủ đề, Bộ sưu tập hiệu ứng, HUD, modal, popup và âm thanh; board nhiều lớp, khay 7+3 ô và state/session/vật phẩm được tách namespace riêng để không ảnh hưởng Memory Match hoặc Link Connect.
+- Chưa thêm Triple Connect vào mã runtime hoặc menu. Mọi thông số giá, sao và cân bằng trong tài liệu chỉ là hạng mục cần test, không phải hành vi đã phát hành.
 
 ### Link Connect
 

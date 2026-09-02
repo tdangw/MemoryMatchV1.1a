@@ -1,27 +1,22 @@
 import { gameState } from "./gameState.js";
 import { saveProgress } from "./persistence.js";
-
-const PROGRESS_KEYS = Object.freeze({
-  "memory-match": "memoryMatch",
-  "link-connect": "linkConnect",
-});
-const MODE_ORDER = Object.freeze(["easy", "normal", "hard", "superHard", "endless", "challenge"]);
+import { GAME_MODES, getGameProgressKey } from "./gameCatalog.js";
 
 export function getActiveSession(gameId, mode) {
-  const key = PROGRESS_KEYS[gameId];
+  const key = getGameProgressKey(gameId);
   if (!key || !mode) return null;
   return gameState.progress[key]?.sessionsByMode?.[mode] || null;
 }
 
 export function getActiveSessions(gameId) {
-  const key = PROGRESS_KEYS[gameId];
+  const key = getGameProgressKey(gameId);
   if (!key) return [];
   const sessions = gameState.progress[key]?.sessionsByMode || {};
-  return MODE_ORDER.map((mode) => sessions[mode]).filter(Boolean);
+  return GAME_MODES.map((mode) => sessions[mode.id]).filter(Boolean);
 }
 
 export function saveActiveSession(gameId, session) {
-  const key = PROGRESS_KEYS[gameId];
+  const key = getGameProgressKey(gameId);
   if (!key || !session?.mode) return;
   gameState.progress[key].sessionsByMode ||= {};
   gameState.progress[key].sessionsByMode[session.mode] = {
@@ -33,7 +28,7 @@ export function saveActiveSession(gameId, session) {
 }
 
 export function clearActiveSession(gameId, mode) {
-  const key = PROGRESS_KEYS[gameId];
+  const key = getGameProgressKey(gameId);
   if (!key) return;
   if (!mode) gameState.progress[key].sessionsByMode = {};
   else delete gameState.progress[key].sessionsByMode?.[mode];

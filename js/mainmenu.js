@@ -24,6 +24,11 @@ import {
   getOwnedThemeIds,
 } from "./appearance.js";
 import { LINK_EXIT_EFFECTS, LINK_PATH_EFFECTS } from "./linkConnect/linkEffects.js";
+import {
+  GAME_MODES,
+  getGameModeIcon,
+  getGameModeLabel,
+} from "./gameCatalog.js";
 
 let onStartGame = () => {};
 let onChangeGame = () => {};
@@ -220,14 +225,7 @@ export function showDifficultyOverlay(fromGame = false) {
       180,
     );
   };
-  [
-    ["easy", "Dễ", "status-easy"],
-    ["normal", "Trung bình", "status-normal"],
-    ["hard", "Khó", "status-hard"],
-    ["superHard", "Siêu khó", "status-super-hard"],
-    ["endless", "Vô tận", "timer"],
-    ["challenge", "Thử thách", "trophy"],
-  ].forEach(([mode, label, icon]) => {
+  GAME_MODES.forEach(({ id: mode, label, icon }) => {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "difficulty-option";
@@ -286,9 +284,9 @@ function showSessionPicker(gameId, onContinue) {
     button.type = "button";
     button.className = "difficulty-option";
     button.append(
-      createIcon(modeIcon(session.mode)),
+      createIcon(getGameModeIcon(session.mode)),
       document.createTextNode(
-        `${modeLabel(session.mode)} - Level ${session.level}`,
+        `${getGameModeLabel(session.mode)} - Level ${session.level}`,
       ),
     );
     button.onclick = () => {
@@ -336,32 +334,6 @@ function showSessionChoice({ label, session, onContinue, onNew }) {
     ],
   });
   modal.panel.classList.add("session-choice-modal");
-}
-
-function modeLabel(mode) {
-  return (
-    {
-      easy: "Dễ",
-      normal: "Trung bình",
-      hard: "Khó",
-      superHard: "Siêu khó",
-      endless: "Vô tận",
-      challenge: "Thử thách",
-    }[mode] || mode
-  );
-}
-
-function modeIcon(mode) {
-  return (
-    {
-      easy: "status-easy",
-      normal: "status-normal",
-      hard: "status-hard",
-      superHard: "status-super-hard",
-      endless: "timer",
-      challenge: "trophy",
-    }[mode] || "play"
-  );
 }
 
 export function showCollectionModal({

@@ -48,6 +48,7 @@ import { saveCoins } from "./persistence.js";
 import { saveActiveSession } from "./sessionProgress.js";
 import { configureLogic } from "./logic.js";
 import { GAMEPLAY_TIMING } from "./gameplayTuning.js";
+import { TIME_UP_PURCHASES } from "./shopCatalog.js";
 
 let countdownInterval;
 let isAutoPaused = false;
@@ -228,18 +229,12 @@ function handleTimeUp() {
           initializeLevel(gameState.currentLevel);
         },
       },
-      {
-        label: "+1 giây · 2 Xu",
+      ...TIME_UP_PURCHASES.map(({ seconds, price }) => ({
+        label: `+${seconds} giây · ${price} Xu`,
         icon: "coin",
         variant: "time-purchase",
-        onClick: (close) => buyMoreTime(1, 2, close),
-      },
-      {
-        label: "+5 giây · 10 Xu",
-        icon: "coin",
-        variant: "time-purchase",
-        onClick: (close) => buyMoreTime(5, 10, close),
-      },
+        onClick: (close) => buyMoreTime(seconds, price, close),
+      })),
     ],
     onClose: () => {
       if (!actionSelected) returnToMenu();

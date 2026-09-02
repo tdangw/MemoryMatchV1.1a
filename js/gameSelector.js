@@ -6,6 +6,11 @@ import { getActiveSessions } from "./sessionProgress.js";
 import { gameState } from "./gameState.js";
 import { getEquippedThemeId } from "./appearance.js";
 import { getTheme } from "./themeCatalog.js";
+import {
+  GAME_DEFINITIONS,
+  getGameModeIcon,
+  getGameModeLabel,
+} from "./gameCatalog.js";
 
 let activeGameId = null;
 let onStartLinkConnect = () => {};
@@ -40,20 +45,12 @@ export function showGameSelector() {
   );
   const choices = document.createElement("div");
   choices.className = "game-selector__choices";
-  choices.append(
-    createGameChoice({
-      icon: "images",
-      title: "Memory Match",
-      description: "Thử thách rèn luyện ghi nhớ.",
-      onClick: () => openGameMenu("memory-match"),
-    }),
-    createGameChoice({
-      icon: "puzzle",
-      title: "Link Connect",
-      description: "Thử thách rèn luyện quan sát.",
-      onClick: () => openGameMenu("link-connect"),
-    }),
-  );
+  GAME_DEFINITIONS.forEach((game) => {
+    choices.append(createGameChoice({
+      ...game,
+      onClick: () => openGameMenu(game.id),
+    }));
+  });
   wrapper.append(choices);
   overlay.append(wrapper);
   document.body.append(overlay);
@@ -170,9 +167,9 @@ function showLinkSessionPicker(onContinue) {
     button.type = "button";
     button.className = "difficulty-option";
     button.append(
-      createIcon(modeIcon(session.mode)),
+      createIcon(getGameModeIcon(session.mode)),
       document.createTextNode(
-        `${modeLabel(session.mode)} - Level ${session.level}`,
+        `${getGameModeLabel(session.mode)} - Level ${session.level}`,
       ),
     );
     button.onclick = () => {
@@ -195,32 +192,6 @@ function showLinkSessionPicker(onContinue) {
       180,
     );
   };
-}
-
-function modeLabel(mode) {
-  return (
-    {
-      easy: "Dễ",
-      normal: "Trung bình",
-      hard: "Khó",
-      superHard: "Siêu khó",
-      endless: "Vô tận",
-      challenge: "Thử thách",
-    }[mode] || mode
-  );
-}
-
-function modeIcon(mode) {
-  return (
-    {
-      easy: "status-easy",
-      normal: "status-normal",
-      hard: "status-hard",
-      superHard: "status-super-hard",
-      endless: "timer",
-      challenge: "trophy",
-    }[mode] || "play"
-  );
 }
 
 function createMenuOverlay(variant) {

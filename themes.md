@@ -9,7 +9,7 @@ Dùng prompt master này cho mọi lô 24 thẻ thường + 1 thẻ đặc biệ
 | Biến                         | Nội dung thay thế                                                                                                               |
 | :--------------------------- | :------------------------------------------------------------------------------------------------------------------------------ |
 | `[THEME]`                    | Tên nhóm nội dung bằng tiếng Anh, ví dụ `land animals`.                                                                         |
-| `[SHEET_SUBJECTS]`           | Đúng 16 mô tả cho sheet A, hoặc 8 mô tả cho sheet B, theo thứ tự trái sang phải, trên xuống dưới.                              |
+| `[SHEET_SUBJECTS]`           | Đúng 16 mô tả cho sheet A, hoặc 8 mô tả cho sheet B, theo thứ tự trái sang phải, trên xuống dưới.                               |
 | `[STYLE]` / `[STYLE_FINISH]` | Phong cách và bề mặt được chọn trong thư viện bên dưới.                                                                         |
 | `[BACKGROUND_HEX]`           | Màu nền của chủ đề trong bảng palette.                                                                                          |
 | `[SCENE_MODE]`               | Chọn nguyên văn một trong hai giá trị `MICRO_PROP_RULE` hoặc `MINI_SCENE_RULE` bên dưới.                                        |
@@ -324,6 +324,7 @@ Roadmap V2 chuẩn hóa **25 chủ đề ảnh**:
 - **49–72:** salak snake fruit, langsat, breadfruit, quince, prickly pear cactus fruit, tamarillo, black mulberry, wild strawberry, redcurrant, blackcurrant, bilberry, acai berry, yuzu, calamansi, blood orange, finger lime, feijoa, loquat, jujube red date, bael fruit, canistel egg fruit, cherimoya, sugar apple, nashi asian pear.
 - **73–96:** hawthorn berry, damson plum, mirabelle plum, greengage plum, chokeberry, serviceberry, rowan berry, sea buckthorn, miracle fruit, jabuticaba, santol, ambarella, hog plum, water apple, rose apple, ugli fruit, black sapote, wild apricot, bael, garcinia fruit, mountain hawthorn, otaheite gooseberry, wild pineapple, pink guava.
 - **97–120:** ackee fruit, lucuma, mangaba, marula fruit, nance fruit, yumberry, cloudberry, huckleberry, elderberry, boysenberry, loganberry, tayberry, dewberry, salmonberry, thimbleberry, baccaurea fruit, java plum, rose myrtle berry, garcinia cowa fruit, duku langsat, wampee fruit, noni fruit, governor's plum, gac fruit.
+- **Special** Buddha's hand, Kiwano, Guarana, Hala fruit, Calabash, Water chestnut, Pistachio, Fresh walnut, Lotus pod, Sweet corn, Bitter melon, Eggplant, Okra, Beetroot, Black olive, Chayote, Abiu, Ginkgo nut, Nipa palm fruit, Palmyra fruit, Breadnut, Surinam cherry, Cupuacu, Macadamia nut, Peanut, Cashew apple, Barbados cherry, Velvet tamarind, Indian almond, Winter melon, Pumpkin, Garlic
 
 ---
 
