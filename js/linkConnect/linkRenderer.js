@@ -1,6 +1,10 @@
 import { getActiveLinkConnectionEffect } from "./linkEffects.js";
 import { gameState } from "../gameState.js";
-import { measureLinkRender, recordLinkLayoutPass } from "./linkPerformance.js";
+import {
+  measureLinkRender,
+  recordLinkLayoutPass,
+  recordLinkPatch,
+} from "./linkPerformance.js";
 
 const PATH_VIEWBOX = "0 0 100 100";
 const ELECTRIC_JITTER_PERCENT = 0.65;
@@ -58,36 +62,55 @@ function patchLinkBoard(board, onTileClick) {
   observeLinkBoardLayout(document.getElementById("link-connect-container"));
   container.style.setProperty("--link-columns", String(board.columns));
   container.style.setProperty("--link-rows", String(rows));
-  if (renderedBoardContainer !== container || renderedBoardShape !== shape) {
+  const boardRebuilt = renderedBoardContainer !== container || renderedBoardShape !== shape;
+  if (boardRebuilt) {
     createLinkBoardCells(container, board.columns, rows);
   }
 
-  const activeTileKeys = new Set();
+  const desiredTiles = new Map();
   board.grid.slice(1, -1).forEach((row, rowIndex) => {
     row.slice(1, -1).forEach((tile, columnIndex) => {
-      const position = { row: rowIndex + 1, column: columnIndex + 1 };
-      const cell = boardCellsByPosition.get(positionKey(position));
-      if (!cell) return;
-      cell.classList.toggle("is-empty", !tile);
-      if (!tile) {
-        cell.replaceChildren();
-        return;
-      }
-
-      activeTileKeys.add(tile.instanceId);
-      const button = tileElementsByKey.get(tile.instanceId)
-        || createLinkTileElement(tile.instanceId);
-      syncLinkTileElement(button, tile, position, onTileClick);
-      if (cell.firstElementChild !== button) cell.replaceChildren(button);
+      if (!tile) return;
+      desiredTiles.set(tile.instanceId, {
+        tile,
+        position: { row: rowIndex + 1, column: columnIndex + 1 },
+      });
     });
   });
 
+  const changedCells = new Set();
+  let updatedTiles = 0;
+  let createdTiles = 0;
   tileElementsByKey.forEach((element, key) => {
-    if (activeTileKeys.has(key)) return;
+    if (desiredTiles.has(key)) return;
+    const previousCell = element.parentElement;
+    if (previousCell) changedCells.add(previousCell);
     element.remove();
     tileElementsByKey.delete(key);
   });
-  updateLinkBoardLayout();
+  desiredTiles.forEach(({ tile, position }, key) => {
+    const cell = boardCellsByPosition.get(positionKey(position));
+    if (!cell) return;
+    let button = tileElementsByKey.get(key);
+    if (!button) {
+      button = createLinkTileElement(key);
+      createdTiles += 1;
+    }
+    if (syncLinkTileElement(button, tile, position, onTileClick)) updatedTiles += 1;
+    if (cell.firstElementChild === button) return;
+    if (button.parentElement) changedCells.add(button.parentElement);
+    changedCells.add(cell);
+    cell.replaceChildren(button);
+  });
+  changedCells.forEach((cell) => {
+    cell.classList.toggle("is-empty", !cell.firstElementChild);
+  });
+  recordLinkPatch({
+    changedCells: changedCells.size,
+    updatedTiles,
+    createdTiles,
+  });
+  if (boardRebuilt) scheduleLinkBoardLayout();
 }
 
 function createLinkBoardCells(container, columns, rows) {
@@ -132,6 +155,17 @@ function createLinkTileElement(tileKey) {
 
 function syncLinkTileElement(button, tile, position, onTileClick) {
   button._onLinkTileClick = onTileClick;
+  const fingerprint = [
+    tile.src,
+    tile.alt,
+    tile.special === true,
+    tile.frozen === true,
+    Boolean(tile.luckyReward),
+  ].join("|");
+  const positionChanged = button.dataset.row !== String(position.row)
+    || button.dataset.column !== String(position.column);
+  if (button._linkTileFingerprint === fingerprint && !positionChanged) return false;
+  button._linkTileFingerprint = fingerprint;
   button.className = "link-tile";
   if (tile.special) button.classList.add("is-special");
   if (tile.luckyReward) button.classList.add("is-lucky");
@@ -157,6 +191,7 @@ function syncLinkTileElement(button, tile, position, onTileClick) {
   } else if (!tile.frozen) {
     frostOverlay?.remove();
   }
+  return true;
 }
 
 function positionKey({ row, column }) {
