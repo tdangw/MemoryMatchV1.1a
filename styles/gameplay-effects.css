@@ -26,49 +26,71 @@
   background: linear-gradient(135deg, #ff6b9c, #9a67e7 48%, #5ac8e9);
 }
 
-.tile-combo-effect {
+.tile-combo-effect,
+.tile-score-effect {
   position: fixed;
-  z-index: 9999;
+  z-index: 32010;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  box-sizing: border-box;
+  padding: 6px 11px;
+  border: 1px solid rgb(255 255 255 / 58%);
+  border-radius: 999px;
+  background: rgb(4 20 45 / 88%);
+  box-shadow: 0 4px 14px rgb(0 0 0 / 52%);
   transform: translate(-50%, -50%);
-  color: #b8e3ff;
+  pointer-events: none;
+  white-space: nowrap;
+  will-change: transform, opacity;
+}
+
+.tile-combo-effect {
+  color: #e4f7ff;
   font:
-    650 clamp(1rem, 4vw, 1.16rem)/1.1 "Trebuchet MS",
+    800 clamp(1rem, 4vw, 1.16rem)/1.1 "Trebuchet MS",
     "Segoe UI",
     sans-serif;
   letter-spacing: 0.025em;
-  pointer-events: none;
-  white-space: nowrap;
+  text-shadow: 0 1px 2px rgb(0 24 55 / 92%);
   animation: combo-appear 1.3s cubic-bezier(0.2, 0.75, 0.3, 1) forwards;
 }
 
 .tile-score-effect {
-  position: fixed;
-  z-index: 9999;
-  color: #ffe09a;
+  color: #fff2a9;
   font:
-    900 clamp(0.95rem, 3.8vw, 1.12rem)/1 "Trebuchet MS",
+    900 clamp(1rem, 3.9vw, 1.18rem)/1 "Trebuchet MS",
     "Segoe UI",
     sans-serif;
   letter-spacing: 0.03em;
-  pointer-events: none;
-  text-shadow: 0 2px 7px rgb(80 50 5 / 72%);
-  transform: translate(-50%, -50%);
-  animation: score-float 1.35s cubic-bezier(0.18, 0.76, 0.28, 1) forwards;
+  border-color: rgb(255 218 102 / 88%);
+  background: rgb(73 45 4 / 92%);
+  text-shadow: 0 2px 4px rgb(41 23 0 / 94%);
+  box-shadow: 0 4px 15px rgb(0 0 0 / 58%), 0 0 10px rgb(255 190 52 / 34%);
+  animation: score-float 1.65s cubic-bezier(0.18, 0.76, 0.28, 1) forwards;
 }
 
 .tile-combo-effect--nice {
+  border-color: rgb(135 226 255 / 92%);
   text-shadow: 0 2px 8px rgb(68 135 194 / 36%);
 }
 .tile-combo-effect--great {
   color: #ffdc78;
+  border-color: rgb(255 220 120 / 92%);
+  background: rgb(73 51 8 / 92%);
   text-shadow: 0 2px 9px rgb(194 127 12 / 44%);
 }
 .tile-combo-effect--excellent {
   color: #ffbf8b;
+  border-color: rgb(255 174 116 / 92%);
+  background: rgb(80 34 10 / 92%);
   text-shadow: 0 2px 10px rgb(204 90 30 / 46%);
 }
 .tile-combo-effect--perfect {
   color: #ffaaa2;
+  border-color: rgb(255 158 151 / 92%);
+  background: rgb(79 21 25 / 92%);
   text-shadow: 0 2px 11px rgb(184 55 47 / 50%);
 }
 
