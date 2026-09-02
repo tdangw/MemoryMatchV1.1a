@@ -218,11 +218,12 @@ export function clearLinkTileSelection() {
 
 export function playLinkMatchExit(start, end) {
   const effect = getActiveLinkConnectionEffect(gameState.appearance);
-  [start, end].forEach((position) => {
+  return [start, end].flatMap((position) => {
     const tile = getLinkTileButton(position);
-    if (!tile) return;
+    if (!tile) return [];
     tile.classList.add("is-removing", effect.exitClass);
     playLinkCardExitEffect(tile, effect.exitId);
+    return [tile];
   });
 }
 

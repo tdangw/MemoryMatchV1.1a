@@ -47,9 +47,11 @@ import { clearActiveSession, getActiveSession, saveActiveSession } from "../sess
 import {
   clearGameplayRewardPopups,
   openTimeUpModal,
+  showComboEffect,
   showGameplayRewardPopup,
   showLevelRewardOverlay,
   showLevelSummaryOverlay,
+  showScoreEffect,
 } from "../ui.js";
 import {
   clearLinkPath,
@@ -435,9 +437,14 @@ function handleLinkTileClick(position) {
   const roundId = linkGameState.roundId;
   const board = linkGameState.board;
   const matchedStart = selectedPosition;
-  linkGameState.score += calculateLinkMatchPoints(linkGameState.combo, { special: isSpecialMatch });
+  const matchPoints = calculateLinkMatchPoints(linkGameState.combo, {
+    special: isSpecialMatch,
+  });
+  linkGameState.score += matchPoints;
   drawLinkPath(path, linkGameState.board);
-  playLinkMatchExit(selectedPosition, position);
+  const matchedTiles = playLinkMatchExit(selectedPosition, position);
+  showScoreEffect(matchedTiles[0], matchPoints);
+  showComboEffect(matchedTiles[1] || matchedTiles[0], linkGameState.combo);
   setTimeout(() => {
     // Người chơi có thể khởi động màn khác trước khi hiệu ứng kết thúc.
     // Khi đó callback cũ không được phép thay đổi trạng thái của bàn mới.

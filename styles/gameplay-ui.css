@@ -513,7 +513,7 @@
 }
 
 .lucky-reward-popup-overlay.is-leaving .lucky-reward-popup {
-  animation: lucky-reward-popup-leave 240ms ease-in both;
+  animation: lucky-reward-popup-leave 260ms ease-in both;
 }
 
 @keyframes lucky-reward-popup-enter {
@@ -522,7 +522,7 @@
 }
 
 @keyframes lucky-reward-popup-leave {
-  to { opacity: 0; transform: scale(.88) translateY(-8px); }
+  to { opacity: 0; transform: scale(.9) translateY(-64px); }
 }
 
 .level-reward-overlay {

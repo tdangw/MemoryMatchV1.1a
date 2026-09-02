@@ -284,8 +284,8 @@ function showNextGameplayRewardPopup() {
       overlay.remove();
       if (rewardPopupOverlay === overlay) rewardPopupOverlay = null;
       showNextGameplayRewardPopup();
-    }, 240);
-  }, 1500);
+    }, GAMEPLAY_TIMING.rewardPopupExitMs);
+  }, GAMEPLAY_TIMING.rewardPopupVisibleMs);
 }
 // Thưởng qua màn
 export function showLevelRewardOverlay({
@@ -581,7 +581,7 @@ export function showScoreEffect(tileElement, points) {
   effect.style.top = `${rect.top + rect.height / 2}px`;
   document.body.appendChild(effect);
 
-  setTimeout(() => effect.remove(), 1400);
+  setTimeout(() => effect.remove(), GAMEPLAY_TIMING.scoreEffectDurationMs);
 }
 
 export function showComboEffect(tileElement, combo) {
