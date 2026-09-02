@@ -46,7 +46,8 @@ export const LINK_CONNECT_TIMING = Object.freeze({
   matchSettleMs: 20,
   mismatchFeedbackMs: 300,
   hintPreviewMs: 1000,
-  thunderStrikeMs: 620,
+  thunderStrikeMs: 520,
+  thunderCardExitDelayMs: 190,
   thunderNextPairDelayMs: 130,
   countdownResumeDelayMs: 1000,
 });
@@ -56,6 +57,14 @@ export function getLinkMatchResolveDelay() {
   return Math.max(
     timing.pathAnimationMs,
     timing.tileExitDelayMs + timing.tileExitAnimationMs,
+  ) + timing.matchSettleMs;
+}
+
+export function getLinkThunderResolveDelay() {
+  const timing = LINK_CONNECT_TIMING;
+  return Math.max(
+    timing.thunderStrikeMs,
+    timing.thunderCardExitDelayMs + timing.tileExitDelayMs + timing.tileExitAnimationMs,
   ) + timing.matchSettleMs;
 }
 

@@ -221,6 +221,16 @@ export function clearLinkTileSelection() {
   });
 }
 
+export function setLinkTileHinted(position, hinted) {
+  const tile = getLinkTileButton(position);
+  if (!tile) return;
+  tile.classList.toggle("is-hinted", hinted);
+}
+
+export function clearLinkTileHints() {
+  document.querySelectorAll(".link-tile.is-hinted").forEach((tile) => tile.classList.remove("is-hinted"));
+}
+
 export function playLinkMismatch(start, end) {
   return [start, end].flatMap((position) => {
     const tile = getLinkTileButton(position);
@@ -451,7 +461,11 @@ export function playLinkThunderStrike(positions, colorId = "yellow") {
       x: tileRect.left - frameRect.left + tileRect.width / 2,
       y: tileRect.top - frameRect.top + tileRect.height / 2,
       size: Math.min(tileRect.width, tileRect.height),
-      arcDirection: Math.random() < .5 ? -1 : 1,
+      points: createThunderCanvasPath({
+        x: tileRect.left - frameRect.left + tileRect.width / 2,
+        y: tileRect.top - frameRect.top + tileRect.height / 2,
+        size: Math.min(tileRect.width, tileRect.height),
+      }),
     }];
   });
   if (!targets.length) return null;
@@ -474,25 +488,25 @@ export function clearLinkThunderStrikes() {
 }
 
 function drawThunderBolt(context, target, palette, progress) {
-  const intensity = Math.max(0, 1 - progress * .72) * (.82 + Math.random() * .18);
-  const points = createThunderCanvasPath(target);
-  drawThunderStroke(context, points, palette.glow, target.size * .21, intensity * .38, 24, palette.shadow);
-  drawThunderStroke(context, points, palette.main, Math.max(4, target.size * .085), intensity, 12, palette.shadow);
-  drawThunderStroke(context, points, "#ffffff", Math.max(1.5, target.size * .031), intensity, 0);
-  drawThunderBranches(context, points, target, palette, intensity);
+  const flash = progress < .16 ? 1 : Math.max(0, 1 - (progress - .16) / .84);
+  const intensity = flash * .94;
+  drawThunderStroke(context, target.points, palette.glow, Math.max(5, target.size * .09), intensity * .18, 12, palette.shadow);
+  drawThunderStroke(context, target.points, palette.main, Math.max(2.1, target.size * .036), intensity, 5, palette.shadow);
+  drawThunderStroke(context, target.points, "#f8feff", Math.max(1, target.size * .014), intensity, 0);
+  drawThunderBranches(context, target, palette, intensity);
   drawThunderImpact(context, target, palette, progress, intensity);
 }
 
 function createThunderCanvasPath(target) {
-  const steps = Math.max(9, Math.round(target.y / 16));
-  const curve = target.arcDirection * target.size * .32;
+  const steps = Math.max(7, Math.round(target.y / 28));
+  const startX = target.x + randomThunderOffset(Math.min(target.size * .32, 24));
   return Array.from({ length: steps + 1 }, (_, index) => {
     const progress = index / steps;
-    if (index === 0) return { x: target.x + randomThunderOffset(target.size * .12), y: 0 };
+    if (index === 0) return { x: startX, y: 0 };
     if (index === steps) return { x: target.x, y: target.y };
-    const taper = Math.sin(progress * Math.PI);
+    const drift = (target.x - startX) * progress;
     return {
-      x: target.x + curve * taper + randomThunderOffset(target.size * .16 * taper),
+      x: startX + drift + randomThunderOffset(Math.max(4, target.size * .11)),
       y: target.y * progress,
     };
   });
@@ -514,27 +528,31 @@ function drawThunderStroke(context, points, color, width, alpha, blur, shadowCol
   context.restore();
 }
 
-function drawThunderBranches(context, points, target, palette, intensity) {
-  points.slice(2, -2).forEach((point, index) => {
-    if (index % 3 || Math.random() > .58) return;
-    const length = target.size * (.25 + Math.random() * .24);
-    const end = { x: point.x + target.arcDirection * length, y: point.y + target.size * (.12 + Math.random() * .2) };
-    drawThunderStroke(context, [point, { x: (point.x + end.x) / 2 + randomThunderOffset(7), y: (point.y + end.y) / 2 }, end], palette.main, Math.max(1.2, target.size * .035), intensity * .7, 5, palette.shadow);
-  });
+function drawThunderBranches(context, target, palette, intensity) {
+  const branchStart = target.points[Math.max(2, Math.floor(target.points.length * .46))];
+  const previous = target.points[Math.max(1, Math.floor(target.points.length * .46) - 1)];
+  if (!branchStart || !previous) return;
+  const direction = branchStart.x - previous.x >= 0 ? -1 : 1;
+  const end = {
+    x: branchStart.x + direction * target.size * .24,
+    y: branchStart.y + target.size * .17,
+  };
+  const branch = [branchStart, { x: (branchStart.x + end.x) / 2, y: branchStart.y + target.size * .08 }, end];
+  drawThunderStroke(context, branch, palette.main, Math.max(1, target.size * .014), intensity * .52, 3, palette.shadow);
 }
 
 function drawThunderImpact(context, target, palette, progress, intensity) {
-  const radius = target.size * (.16 + progress * .48);
+  const radius = target.size * (.07 + progress * .14);
   context.save();
   context.globalAlpha = intensity * .8;
   context.fillStyle = "#ffffff";
   context.shadowColor = palette.main;
-  context.shadowBlur = 18;
+  context.shadowBlur = 10;
   context.beginPath();
-  context.arc(target.x, target.y, Math.max(4, target.size * .115 * (1 - progress * .45)), 0, Math.PI * 2);
+  context.arc(target.x, target.y, Math.max(2.5, target.size * .052 * (1 - progress * .35)), 0, Math.PI * 2);
   context.fill();
   context.strokeStyle = palette.glow;
-  context.lineWidth = Math.max(1, target.size * .025);
+  context.lineWidth = Math.max(1, target.size * .012);
   context.beginPath();
   context.arc(target.x, target.y, radius, 0, Math.PI * 2);
   context.stroke();

@@ -22,6 +22,7 @@ import {
   getLinkLevelHintBonus,
   getLinkLevelTimeBonus,
   getLinkGravityShift,
+  getLinkThunderResolveDelay,
   getLinkModeLayout,
   getLinkTimerDirection,
   getLinkMatchResolveDelay,
@@ -58,6 +59,7 @@ import {
   clearLinkThunderStrikes,
   clearLinkMatchedPair,
   clearLinkTileSelection,
+  clearLinkTileHints,
   drawLinkPath,
   playLinkMatchExit,
   playLinkMismatch,
@@ -65,6 +67,7 @@ import {
   renderLinkBoard,
   renderLinkBoardShift,
   setLinkTileSelected,
+  setLinkTileHinted,
 } from "./linkRenderer.js";
 import { beginLinkRound, linkGameState, resetLinkGame } from "./linkState.js";
 
@@ -159,6 +162,7 @@ export function startLinkLevel({ mode = linkGameState.mode, level = 1, resume = 
   stopCountdown();
   clearGameplayRewardPopups();
   clearLinkPath();
+  clearLinkTileHints();
   clearLinkThunderStrikes();
   selectedPosition = null;
   linkTimeWarningPlayed = false;
@@ -221,6 +225,7 @@ export function returnToLinkMenu() {
   resetLinkGame();
   selectedPosition = null;
   clearLinkPath();
+  clearLinkTileHints();
   clearLinkThunderStrikes();
   document.getElementById("link-connect-container")?.setAttribute("hidden", "");
   navigation.showMenu();
@@ -381,7 +386,7 @@ function runLinkGameAction(action) {
   }
   if (action === "shop") {
     pauseLinkForModal();
-    return navigation.showShop(resumeLinkAfterModal);
+    return navigation.showShop(resumeLinkAfterShop);
   }
   if (action === "help") {
     return showLinkGameModal("Cách chơi Link Connect", "<p>Quan sát các hình đang mở và nối hai hình giống nhau bằng đường đi không có vật cản.</p><p>Đường nối có tối đa hai lần rẽ.</p>", "book");
@@ -406,6 +411,11 @@ function pauseLinkForModal() {
 
 function resumeLinkAfterModal() {
   linkGameState.isPaused = false;
+}
+
+function resumeLinkAfterShop() {
+  resumeLinkAfterModal();
+  updateLinkHud();
 }
 
 function handleLinkTileClick(position) {
@@ -518,10 +528,16 @@ function useLinkHint() {
     return;
   }
   linkGameState.isLocked = true;
+  const roundId = linkGameState.roundId;
+  const board = linkGameState.board;
+  setLinkTileHinted(connection.start, true);
+  setLinkTileHinted(connection.end, true);
   drawLinkPath(connection.path, linkGameState.board);
   showAppToast("Đây là một đường nối khả dụng.");
   setTimeout(() => {
+    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
     clearLinkPath();
+    clearLinkTileHints();
     linkGameState.isLocked = false;
   }, LINK_CONNECT_TIMING.hintPreviewMs);
 }
@@ -555,10 +571,14 @@ function playNextThunderStrike(pairs, index, roundId, board, colorId) {
   if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
   const pair = pairs[index];
   const strike = playLinkThunderStrike(pair.positions, colorId);
+  const [start, end] = pair.positions;
+  setTimeout(() => {
+    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
+    playLinkMatchExit(start, end);
+  }, LINK_CONNECT_TIMING.thunderCardExitDelayMs);
   setTimeout(() => {
     strike?.remove();
     if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
-    const [start, end] = pair.positions;
     clearLinkMatchedPair(start, end);
     linkGameState.matchedPairs += 1;
     updateLinkHud();
@@ -570,7 +590,7 @@ function playNextThunderStrike(pairs, index, roundId, board, colorId) {
       return;
     }
     finishLinkThunder(board, roundId);
-  }, LINK_CONNECT_TIMING.thunderStrikeMs);
+  }, getLinkThunderResolveDelay());
 }
 
 function getThunderColor(pairCount) {
