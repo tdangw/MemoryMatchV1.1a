@@ -391,8 +391,15 @@ function openLevelSummaryOverlay({
   resultStars.setAttribute("aria-label", `${stars} trên 3 sao`);
   for (let index = 0; index < 3; index += 1) {
     const star = document.createElement("span");
-    star.className = `level-summary__star${index === 1 ? " level-summary__star--middle" : ""}`;
-    star.textContent = index < stars ? "★" : "☆";
+    const isEarned = index < stars;
+    star.className = [
+      "level-summary__star",
+      index === 1 && "level-summary__star--middle",
+      isEarned ? "level-summary__star--earned" : "level-summary__star--unearned",
+    ].filter(Boolean).join(" ");
+    // Chừa một nhịp để popup ổn định trước, rồi mới hé từng sao.
+    if (isEarned) star.style.setProperty("--star-delay", `${420 + index * 380}ms`);
+    star.textContent = isEarned ? "★" : "☆";
     star.setAttribute("aria-hidden", "true");
     resultStars.appendChild(star);
   }
