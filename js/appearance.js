@@ -1,5 +1,10 @@
 import { THEMES, getTheme, getUsableTheme } from "./themeCatalog.js";
-import { LINK_EXIT_EFFECTS, LINK_PATH_EFFECTS } from "./linkConnect/linkEffects.js";
+import {
+  LINK_EXIT_EFFECTS,
+  LINK_PATH_EFFECTS,
+  migrateLinkExitEffectId,
+  migrateLinkPathEffectId,
+} from "./linkConnect/linkEffects.js";
 
 const DEFAULT_APPEARANCE = Object.freeze({
   cardBack: "classic",
@@ -87,6 +92,10 @@ function ownedIds(items, value, defaultId) {
   return [...new Set([defaultId, ...ids])];
 }
 
+function migratedOwnedIds(items, value, defaultId, migrateId) {
+  return ownedIds(items, Array.isArray(value) ? value.map(migrateId) : value, defaultId);
+}
+
 export function normalizeAppearance(value = {}) {
   const ownedCardBacks = ownedIds(
     CARD_BACKS,
@@ -98,15 +107,17 @@ export function normalizeAppearance(value = {}) {
     value.ownedFlipEffects,
     DEFAULT_APPEARANCE.flipEffect,
   );
-  const ownedLinkPathEffects = ownedIds(
+  const ownedLinkPathEffects = migratedOwnedIds(
     LINK_PATH_EFFECTS,
     value.ownedLinkPathEffects,
     DEFAULT_APPEARANCE.linkPathEffect,
+    migrateLinkPathEffectId,
   );
-  const ownedLinkExitEffects = ownedIds(
+  const ownedLinkExitEffects = migratedOwnedIds(
     LINK_EXIT_EFFECTS,
     value.ownedLinkExitEffects,
     DEFAULT_APPEARANCE.linkExitEffect,
+    migrateLinkExitEffectId,
   );
   const cardBack = knownId(
     CARD_BACKS,
@@ -118,8 +129,8 @@ export function normalizeAppearance(value = {}) {
     value.flipEffect,
     DEFAULT_APPEARANCE.flipEffect,
   );
-  const linkPathEffect = knownId(LINK_PATH_EFFECTS, value.linkPathEffect, DEFAULT_APPEARANCE.linkPathEffect);
-  const linkExitEffect = knownId(LINK_EXIT_EFFECTS, value.linkExitEffect, DEFAULT_APPEARANCE.linkExitEffect);
+  const linkPathEffect = knownId(LINK_PATH_EFFECTS, migrateLinkPathEffectId(value.linkPathEffect), DEFAULT_APPEARANCE.linkPathEffect);
+  const linkExitEffect = knownId(LINK_EXIT_EFFECTS, migrateLinkExitEffectId(value.linkExitEffect), DEFAULT_APPEARANCE.linkExitEffect);
   const ownedThemes = normalizeOwnedThemes(value);
   const themes = normalizeEquippedThemes(value, ownedThemes);
   return {
