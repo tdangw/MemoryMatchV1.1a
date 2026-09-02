@@ -5,12 +5,12 @@ const DEFAULT_APPEARANCE = Object.freeze({
   cardBack: "classic",
   flipEffect: "bounce",
   linkPathEffect: "electric",
-  linkExitEffect: "dissolve",
+  linkExitEffect: "default",
   themes: Object.freeze({ memoryMatch: "default", linkConnect: "default" }),
   ownedCardBacks: ["classic"],
   ownedFlipEffects: ["bounce"],
   ownedLinkPathEffects: ["electric"],
-  ownedLinkExitEffects: ["dissolve"],
+  ownedLinkExitEffects: ["default"],
   ownedThemes: ["default"],
 });
 

@@ -10,7 +10,9 @@ export const LINK_PATH_EFFECTS = Object.freeze([
 ]);
 
 export const LINK_EXIT_EFFECTS = Object.freeze([
-  effect("dissolve", "Tan biến", "wand", "link-tile--dissolve", true),
+  // Hiệu ứng gốc trước khi bổ sung catalog: CSS thuần, nhẹ và luôn sở hữu.
+  effect("default", "Xóa thẻ tiêu chuẩn", "wand", "link-tile--default", true),
+  effect("dissolve", "Tan biến", "wand", "link-tile--dissolve"),
   effect("split4", "Vỡ 4 mảnh", "collection", "link-tile--split4"), effect("split2", "Vỡ 2 mảnh", "slash", "link-tile--split2"), effect("split8", "Vỡ 8 mảnh", "collection", "link-tile--split8"), effect("triangles", "Mảnh tam giác", "play", "link-tile--triangles"), effect("crumble", "Vụn nhỏ", "celebrate", "link-tile--crumble"), effect("finedust", "Bụi mịn", "star", "link-tile--finedust"), effect("gravity", "Rơi xuống", "arrow-right", "link-tile--gravity"), effect("collide", "Đập vỡ", "celebrate", "link-tile--collide"), effect("portal", "Dịch chuyển", "restart", "link-tile--portal"), effect("blackhole", "Hố đen", "moon", "link-tile--blackhole"), effect("freeze", "Đóng băng", "star", "link-tile--freeze"), effect("burn", "Bốc cháy", "celebrate", "link-tile--burn"), effect("pixel", "Pixel Glitch", "terminal", "link-tile--pixel"), effect("implode", "Sụp đổ", "play", "link-tile--implode"), effect("slice", "Nhát kiếm", "slash", "link-tile--slice"), effect("bubble", "Bong bóng", "celebrate", "link-tile--bubble"), effect("origami", "Origami", "arrow-right", "link-tile--origami"), effect("electric-shock", "Sốc điện", "wand", "link-tile--electric-shock"), effect("ghost", "Hồn bay", "moon", "link-tile--ghost"),
 ]);
 

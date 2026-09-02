@@ -16,6 +16,7 @@ import {
   LINK_EXIT_EFFECTS,
   LINK_PATH_EFFECTS,
 } from "../js/linkConnect/linkEffects.js";
+import { normalizeAppearance } from "../js/appearance.js";
 
 const tile = (id) => ({ id });
 
@@ -66,6 +67,13 @@ assert.equal(getLinkGravityShift(10), "right");
 assert.equal(getLinkGravityShift(13, () => 0.51), "left");
 assert.equal(getActiveLinkConnectionEffect({ linkPathEffect: "electric", linkExitEffect: "dissolve" }).pathClass, "link-path-overlay--electric");
 assert.equal(LINK_PATH_EFFECTS.length, 20);
-assert.equal(LINK_EXIT_EFFECTS.length, 20);
+assert.equal(LINK_EXIT_EFFECTS.length, 21);
+assert.equal(LINK_EXIT_EFFECTS[0].id, "default");
+assert.equal(LINK_EXIT_EFFECTS[0].price, 0);
+assert.equal(normalizeAppearance().linkExitEffect, "default");
+assert.deepEqual(
+  normalizeAppearance({ ownedLinkExitEffects: ["portal"] }).ownedLinkExitEffects,
+  ["default", "portal"],
+);
 
 console.log("Link Connect core checks passed.");

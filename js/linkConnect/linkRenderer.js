@@ -237,6 +237,8 @@ const FRAGMENT_LAYOUTS = Object.freeze({
 });
 
 function playLinkCardExitEffect(tile, exitId) {
+  // Hiệu ứng tiêu chuẩn dùng animation CSS gốc; không dựng canvas phủ toàn board.
+  if (exitId === "default") return;
   const source = tile.querySelector("img:not(.link-tile__frost-overlay)");
   const frame = document.getElementById("link-board-frame");
   if (!source?.complete || !source.naturalWidth || !frame) return;
