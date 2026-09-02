@@ -9,6 +9,7 @@ import {
 } from "../js/gameCatalog.js";
 import { LINK_CONNECT_CONFIG } from "../js/linkConnect/linkConfig.js";
 import { TIME_UP_PURCHASES } from "../js/shopCatalog.js";
+import { formatClockTime, UI_COPY, UI_TIMING } from "../js/uiCatalog.js";
 
 const modeIds = GAME_MODES.map((mode) => mode.id);
 
@@ -40,5 +41,9 @@ assert.equal(
   TIME_UP_PURCHASES.length,
   "Gói mua thời gian không được trùng số giây.",
 );
+assert.equal(UI_TIMING.modalCloseMs, 180);
+assert.equal(UI_COPY.timeUpPrompt, "<p>Chọn một cách để tiếp tục hành trình của bạn.</p>");
+assert.equal(formatClockTime(65), "01:05");
+assert.equal(formatClockTime(-1), "00:00");
 
 console.log("Shared game catalog checks passed.");

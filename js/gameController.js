@@ -206,7 +206,6 @@ function handleTimeUp() {
   }
 
   openTimeUpModal({
-    content: "<p>Chọn một cách để tiếp tục hành trình của bạn.</p>",
     actions: [
       {
         label: "Về Menu",

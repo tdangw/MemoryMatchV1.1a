@@ -39,6 +39,7 @@ Vite build → dist → Firebase Hosting, GitHub Pages hoặc Capacitor Android
 | --- | --- |
 | `main.js` | Bootstrap: hydrate dữ liệu, nối callback giữa module, gắn sự kiện nút cố định. |
 | `gameCatalog.js` | Danh mục game/mode dùng chung cho selector, menu và session; không chứa gameplay. |
+| `uiCatalog.js` | Thời lượng đóng modal, copy UI chung, định dạng đồng hồ và builder DOM cho nhãn chủ đề. |
 | `gameState.js` | Trạng thái runtime thuần và vòng đời round (`roundId`); không thao tác DOM hay `localStorage`. |
 | `gameController.js` | Khởi tạo màn, timer, preview, pause/resume khi ẩn tab, chuyển màn và quay menu. |
 | `logic.js` | Luật chọn/match/miss và điều kiện hoàn thành. |

@@ -11,6 +11,7 @@ import {
   getGameModeIcon,
   getGameModeLabel,
 } from "./gameCatalog.js";
+import { createThemeSummary, UI_TIMING } from "./uiCatalog.js";
 
 let activeGameId = null;
 let onStartLinkConnect = () => {};
@@ -153,8 +154,7 @@ function showLinkSessionPicker(onContinue) {
   const themeRow = document.createElement("div");
   themeRow.className = "difficulty-theme";
   themeRow.append(createIcon(theme.icon));
-  const themeText = document.createElement("div");
-  themeText.innerHTML = `<small>Chủ đề đang dùng</small><strong>${theme.title}</strong>`;
+  const themeText = createThemeSummary(theme.title);
   const changeTheme = document.createElement("button");
   changeTheme.type = "button";
   changeTheme.className = "difficulty-theme__change";
@@ -174,7 +174,7 @@ function showLinkSessionPicker(onContinue) {
     );
     button.onclick = () => {
       modal.close();
-      setTimeout(() => onContinue(session), 180);
+      setTimeout(() => onContinue(session), UI_TIMING.modalCloseMs);
     };
     options.append(button);
   });
@@ -189,7 +189,7 @@ function showLinkSessionPicker(onContinue) {
     modal.close();
     setTimeout(
       () => onOpenLinkCollection(() => showLinkSessionPicker(onContinue)),
-      180,
+      UI_TIMING.modalCloseMs,
     );
   };
 }

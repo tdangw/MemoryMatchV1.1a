@@ -48,7 +48,6 @@ export const LINK_CONNECT_TIMING = Object.freeze({
   thunderStrikeMs: 620,
   thunderNextPairDelayMs: 130,
   countdownResumeDelayMs: 1000,
-  postModalNavigationDelayMs: 180,
 });
 
 export function getLinkMatchResolveDelay() {

@@ -1,6 +1,7 @@
 import "../styles/victory-mobile.css";
 import { createIcon } from "./icons.js";
 import { sounds } from "./sound.js";
+import { UI_TIMING } from "./uiCatalog.js";
 
 export const canShowFullVictoryCelebration = true;
 
@@ -65,7 +66,7 @@ export function showFullVictoryCelebration({
     setTimeout(() => {
       overlay.remove();
       callback?.();
-    }, 180);
+    }, UI_TIMING.modalCloseMs);
   };
   menuButton.addEventListener("click", () => close(onMenu));
   nextButton.addEventListener("click", () => close(onNext));

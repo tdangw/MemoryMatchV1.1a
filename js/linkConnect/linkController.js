@@ -9,6 +9,11 @@ import { getTheme } from "../themeCatalog.js";
 import { GAME_MODES } from "../gameCatalog.js";
 import { TIME_UP_PURCHASES } from "../shopCatalog.js";
 import {
+  createThemeSummary,
+  formatClockTime,
+  UI_TIMING,
+} from "../uiCatalog.js";
+import {
   calculateLinkMatchPoints,
   calculateLinkCoinReward,
   getLinkChallengeTime,
@@ -82,12 +87,7 @@ export function showLinkDifficultyOverlay() {
   const themeRow = document.createElement("div");
   themeRow.className = "difficulty-theme";
   themeRow.append(createIcon(activeTheme.icon));
-  const themeText = document.createElement("div");
-  const themeLabel = document.createElement("small");
-  themeLabel.textContent = "Chủ đề đang dùng";
-  const themeName = document.createElement("strong");
-  themeName.textContent = activeTheme.title;
-  themeText.append(themeLabel, themeName);
+  const themeText = createThemeSummary(activeTheme.title);
   const changeTheme = document.createElement("button");
   changeTheme.type = "button";
   changeTheme.className = "difficulty-theme__change";
@@ -103,7 +103,7 @@ export function showLinkDifficultyOverlay() {
   });
   changeTheme.addEventListener("click", () => {
     modal.close();
-    setTimeout(() => navigation.showCollection(), LINK_CONNECT_TIMING.postModalNavigationDelayMs);
+    setTimeout(() => navigation.showCollection(), UI_TIMING.modalCloseMs);
   });
   GAME_MODES.forEach(({ id: mode, label, icon }) => {
     const button = document.createElement("button");
@@ -702,7 +702,6 @@ function handleLinkTimeUp() {
     return true;
   };
   openTimeUpModal({
-    content: "<p>Chọn một cách để tiếp tục hành trình của bạn.</p>",
     actions: [
       {
         label: "Về Menu",
@@ -746,7 +745,7 @@ function updateLinkHud() {
   setText("link-matched-pairs", linkGameState.matchedPairs);
   setText("link-total-pairs", linkGameState.totalPairs);
   setText("link-hint", getLinkItemCount("hint"));
-  setText("link-timer", formatTime(linkGameState.remainingTime));
+  setText("link-timer", formatClockTime(linkGameState.remainingTime));
   updateLinkStarsHud();
   updateLinkSpecialMilestones();
   document.querySelectorAll("[data-item-count]").forEach((element) => {
@@ -904,11 +903,6 @@ function applyLinkTimingStyles(container) {
 function setText(id, value) {
   const element = document.getElementById(id);
   if (element) element.textContent = String(value);
-}
-
-function formatTime(seconds) {
-  const value = Math.max(0, Math.floor(seconds));
-  return `${String(Math.floor(value / 60)).padStart(2, "0")}:${String(value % 60).padStart(2, "0")}`;
 }
 
 function samePosition(left, right) {

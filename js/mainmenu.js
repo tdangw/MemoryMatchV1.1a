@@ -29,6 +29,7 @@ import {
   getGameModeIcon,
   getGameModeLabel,
 } from "./gameCatalog.js";
+import { createThemeSummary, UI_TIMING } from "./uiCatalog.js";
 
 let onStartGame = () => {};
 let onChangeGame = () => {};
@@ -193,12 +194,7 @@ export function showDifficultyOverlay(fromGame = false) {
   const themeRow = document.createElement("div");
   themeRow.className = "difficulty-theme";
   themeRow.append(createIcon(activeTheme.icon));
-  const themeText = document.createElement("div");
-  const themeLabel = document.createElement("small");
-  themeLabel.textContent = "Chủ đề đang dùng";
-  const themeName = document.createElement("strong");
-  themeName.textContent = activeTheme.title;
-  themeText.append(themeLabel, themeName);
+  const themeText = createThemeSummary(activeTheme.title);
   const changeThemeButton = document.createElement("button");
   changeThemeButton.type = "button";
   changeThemeButton.className = "difficulty-theme__change";
@@ -222,7 +218,7 @@ export function showDifficultyOverlay(fromGame = false) {
     modal.close();
     setTimeout(
       () => showCollectionModal({ fromGame, gameId: "memory-match" }),
-      180,
+      UI_TIMING.modalCloseMs,
     );
   };
   GAME_MODES.forEach(({ id: mode, label, icon }) => {
@@ -252,7 +248,7 @@ function chooseMemoryMode(
     label,
     session,
     onContinue: () => {
-      // Đánh dấu trước khi đóng vì callback close chạy sau hoạt ảnh 180ms.
+      // Đánh dấu trước khi đóng vì callback close chạy sau hoạt ảnh đóng modal.
       confirmModeSelection();
       document.getElementById("menu-container")?.remove();
       closeDifficulty();
@@ -270,8 +266,7 @@ function showSessionPicker(gameId, onContinue) {
   const themeRow = document.createElement("div");
   themeRow.className = "difficulty-theme";
   themeRow.append(createIcon(theme.icon));
-  const themeText = document.createElement("div");
-  themeText.innerHTML = `<small>Chủ đề đang dùng</small><strong>${theme.title}</strong>`;
+  const themeText = createThemeSummary(theme.title);
   const changeTheme = document.createElement("button");
   changeTheme.type = "button";
   changeTheme.className = "difficulty-theme__change";
@@ -292,7 +287,7 @@ function showSessionPicker(gameId, onContinue) {
     button.onclick = () => {
       modal.close();
       document.getElementById("menu-container")?.remove();
-      setTimeout(() => onContinue(session), 180);
+      setTimeout(() => onContinue(session), UI_TIMING.modalCloseMs);
     };
     options.append(button);
   });
@@ -311,7 +306,7 @@ function showSessionPicker(gameId, onContinue) {
           gameId,
           onClose: () => showSessionPicker(gameId, onContinue),
         }),
-      180,
+      UI_TIMING.modalCloseMs,
     );
   };
 }

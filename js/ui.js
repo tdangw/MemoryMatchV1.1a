@@ -9,6 +9,8 @@ import { clearPersistentGameData } from "./persistence.js";
 import { getTheme } from "./themeCatalog.js";
 import { getEquippedThemeId } from "./appearance.js";
 import { getStarScoreTargets, getTimerDirection, isEndlessMode } from "./config.js";
+import { getGameModeLabel } from "./gameCatalog.js";
+import { formatClockTime, UI_COPY } from "./uiCatalog.js";
 
 const scoreElement = document.getElementById("score");
 const levelElement = document.getElementById("level");
@@ -92,9 +94,7 @@ export function updateTimerDisplay(seconds) {
 
   if (revealTimerInterval !== null) return;
 
-  const m = String(Math.floor(seconds / 60)).padStart(2, "0");
-  const s = String(seconds % 60).padStart(2, "0");
-  timerElement.textContent = `${m}:${s}`;
+  timerElement.textContent = formatClockTime(seconds);
 
   // 🔴 Cảnh báo khi còn <= 10s
   if (getTimerDirection(gameState.settings.mode) === "down" && seconds <= 10) {
@@ -188,7 +188,7 @@ export function showBonusOverlay(message) {
 
 // Popup hết giờ dùng chung để hai trò luôn có cùng cấu trúc và hiệu ứng.
 export function openTimeUpModal({
-  content = "<p>Chọn một cách để tiếp tục hành trình của bạn.</p>",
+  content = UI_COPY.timeUpPrompt,
   actions = [],
   onClose,
 } = {}) {
@@ -309,26 +309,13 @@ export function showLevelRewardOverlay({
   const container = document.createElement("div");
   container.className =
     "reward-container direct-layout app-modal";
-  const modeLabels = {
-    easy: "Dễ",
-    normal: "Trung bình",
-    hard: "Khó",
-    superHard: "Siêu khó",
-    endless: "Vô tận",
-    challenge: "Thử thách",
-  };
-  const minutes = String(Math.floor(remainingTime / 60)).padStart(
-    2,
-    "0",
-  );
-  const seconds = String(remainingTime % 60).padStart(2, "0");
   const rewardTitle = document.createElement("h2");
   rewardTitle.className = "reward-title glow";
   rewardTitle.textContent = `Màn ${level}`;
 
   const subtitle = document.createElement("p");
   subtitle.className = "reward-subtitle";
-  subtitle.textContent = `${modeLabels[mode]} · Chủ đề ${getTheme(themeId).title}`;
+  subtitle.textContent = `${getGameModeLabel(mode)} · Chủ đề ${getTheme(themeId).title}`;
 
   const createRewardLine = (className, icon, value) => {
     const line = document.createElement("div");
@@ -340,7 +327,7 @@ export function showLevelRewardOverlay({
   container.append(rewardTitle, subtitle);
   const lines = [
     createRewardLine("reward-points", "trophy", `Mục tiêu: ${totalPairs} cặp`),
-    createRewardLine("reward-time", "timer", `${minutes}:${seconds}`),
+    createRewardLine("reward-time", "timer", formatClockTime(remainingTime)),
     createRewardLine("reward-hints", "search", assistText),
   ];
   container.append(...lines);
@@ -389,8 +376,6 @@ function openLevelSummaryOverlay({
   onCelebrate,
 }) {
   let actionSelected = false;
-  const minutes = String(Math.floor(remainingTime / 60)).padStart(2, "0");
-  const seconds = String(remainingTime % 60).padStart(2, "0");
 
   const content = document.createElement("div");
   content.className = "level-summary";
@@ -422,7 +407,7 @@ function openLevelSummaryOverlay({
     ["XU NHẬN", `+${coinsEarned}`, "summary-coins"],
     [
       isEndlessMode(settings.mode) ? "THỜI GIAN ĐÃ CHƠI" : "THỜI GIAN CÒN LẠI",
-      `${minutes}:${seconds}`,
+      formatClockTime(remainingTime),
       "summary-time",
     ],
     ["SỐ NƯỚC ĐI", moves, "summary-moves"],

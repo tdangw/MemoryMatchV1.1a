@@ -1,6 +1,5 @@
 import { createIcon } from "./icons.js";
-
-const CLOSE_ANIMATION_MS = 180;
+import { UI_TIMING } from "./uiCatalog.js";
 
 export function openAppModal({
   id,
@@ -44,7 +43,7 @@ export function openAppModal({
     setTimeout(() => {
       onClose?.();
       overlay.remove();
-    }, CLOSE_ANIMATION_MS);
+    }, UI_TIMING.modalCloseMs);
   };
 
   if (dismissible) {
@@ -116,6 +115,6 @@ export function showAppToast(message, { tone = "info", duration = 1600 } = {}) {
     setTimeout(() => {
       toast.remove();
       if (!region.children.length) region.remove();
-    }, CLOSE_ANIMATION_MS);
+    }, UI_TIMING.modalCloseMs);
   }, duration);
 }
