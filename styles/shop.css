@@ -328,10 +328,16 @@
   box-shadow: 0 3px 8px rgb(0 0 0 / 25%);
 }
 .link-effect-preview .ui-icon { width: 25px; height: 25px; filter: drop-shadow(0 0 5px currentColor); }
+.link-effect-preview.link-path-overlay--electric, .link-effect-preview.link-path-overlay--storm { color: #9af4ff; background: linear-gradient(145deg, #174b72, #18274d); }
+.link-effect-preview.link-path-overlay--laser { color: #ffb4dc; background: linear-gradient(145deg, #71345e, #241c47); }
+.link-effect-preview.link-path-overlay--laser-ice { color: #b8f6ff; background: linear-gradient(145deg, #245d88, #202c56); }
 .link-effect-preview.link-path-overlay--fire, .link-effect-preview.link-tile--burn { color: #ffb15e; background: linear-gradient(145deg, #6d3924, #1a2038); }
-.link-effect-preview.link-path-overlay--magic, .link-effect-preview.link-path-overlay--plasma, .link-effect-preview.link-tile--portal, .link-effect-preview.link-tile--blackhole { color: #d8a7ff; background: linear-gradient(145deg, #4d2e73, #172144); }
-.link-effect-preview.link-path-overlay--rainbow, .link-effect-preview.link-path-overlay--holy, .link-effect-preview.link-tile--bubble { color: #ffe39b; background: linear-gradient(145deg, #5b4b91, #254b6d); }
-.link-effect-preview.link-path-overlay--poison, .link-effect-preview.link-path-overlay--matrix, .link-effect-preview.link-tile--freeze { color: #86f1b3; background: linear-gradient(145deg, #174d48, #172d43); }
+.link-effect-preview.link-path-overlay--magic, .link-effect-preview.link-tile--portal { color: #d8a7ff; background: linear-gradient(145deg, #4d2e73, #172144); }
+.link-effect-preview.link-path-overlay--rainbow, .link-effect-preview.link-tile--bubble { color: #ffe39b; background: linear-gradient(145deg, #5b4b91, #254b6d); }
+.link-effect-preview.link-path-overlay--pulse, .link-effect-preview.link-tile--pixel { color: #c8d4ff; background: linear-gradient(145deg, #35477b, #1b2444); }
+.link-effect-preview.link-path-overlay--arrows, .link-effect-preview.link-tile--gravity { color: #91f4c6; background: linear-gradient(145deg, #1b665a, #172d43); }
+.link-effect-preview.link-path-overlay--fireworks, .link-effect-preview.link-tile--finedust { color: #ffdda0; background: linear-gradient(145deg, #6f4d72, #253c70); }
+.link-effect-preview.link-tile--split4, .link-effect-preview.link-tile--slice { color: #d6efff; background: linear-gradient(145deg, #315b80, #1d2948); }
 .appearance-effect-preview {
   border: 1px solid rgb(255 255 255 / 20%);
   background: linear-gradient(145deg, #5277ba, #253c70);
