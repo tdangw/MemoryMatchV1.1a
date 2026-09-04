@@ -10,6 +10,7 @@ export function createLinkGameState() {
     misses: 0,
     combo: 0,
     specialProgress: 0,
+    specialNoEnergyDropStreak: 0,
     specialMilestoneRewards: {},
     pendingSpecialPairKeys: [],
     pendingFrozenTileKeys: [],

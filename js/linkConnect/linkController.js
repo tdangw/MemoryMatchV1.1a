@@ -65,6 +65,7 @@ import {
   playLinkMatchExit,
   playLinkMismatch,
   playLinkFrozenPairUnlock,
+  playLinkEnergyFlight,
   playLinkSpecialPairTransform,
   playLinkThunderStrike,
   renderLinkBoard,
@@ -179,6 +180,7 @@ export function startLinkLevel({ mode = linkGameState.mode, level = 1, resume = 
   });
   if (level === 1 && !resume) {
     linkGameState.specialProgress = 0;
+    linkGameState.specialNoEnergyDropStreak = 0;
     clearActiveSession("link-connect", mode);
   }
   const resolvedGravityShift = gravityShift || getLinkGravityShift(level);
@@ -281,7 +283,8 @@ function showLinkGame() {
           <aside id="link-item-actions" class="link-tool-list" aria-label="Vật phẩm hỗ trợ"></aside>
         </div>
       </header>
-      <section class="link-special-hud" aria-label="Tiến trình cặp đặc biệt">
+      <section class="link-special-hud" aria-label="Tiến trình năng lượng đặc biệt">
+        <span id="link-special-energy" class="link-special-hud__energy" aria-label="Năng lượng đặc biệt"><span data-link-icon="energy"></span></span>
         <div class="link-special-hud__milestones" aria-label="Các mốc kích hoạt đặc biệt">
           <span data-link-special-milestone="1">1</span><span data-link-special-milestone="3">3</span><span data-link-special-milestone="5">5</span><span data-link-special-milestone="7">7</span><span data-link-special-milestone="9">9</span><span data-link-special-milestone="10">10</span>
         </div>
@@ -467,6 +470,11 @@ function handleLinkTileClick(position) {
   });
   linkGameState.score += matchPoints;
   drawLinkPath(path, linkGameState.board);
+  if (isSpecialMatch && shouldDropLinkEnergy()) {
+    playLinkEnergyFlight(selectedPosition, position, {
+      onArrive: () => receiveLinkEnergy(roundId, board),
+    });
+  }
   const matchedTiles = playLinkMatchExit(selectedPosition, position);
   showScoreEffect(matchedTiles[0], matchPoints);
   showComboEffect(matchedTiles[1] || matchedTiles[0], linkGameState.combo);
@@ -865,29 +873,39 @@ function updateLinkSpecialMilestones(hud = getLinkHudElements()) {
   });
 }
 
-function applySpecialMatchRewards(anchor) {
+function shouldDropLinkEnergy() {
+  const energy = LINK_CONNECT_CONFIG.special.energyDrop;
+  if (linkGameState.specialNoEnergyDropStreak >= energy.guaranteeAfterMisses) {
+    linkGameState.specialNoEnergyDropStreak = 0;
+    return true;
+  }
+  if (Math.random() < energy.chance) {
+    linkGameState.specialNoEnergyDropStreak = 0;
+    return true;
+  }
+  linkGameState.specialNoEnergyDropStreak += 1;
+  return false;
+}
+
+function receiveLinkEnergy(roundId, board) {
+  if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
   linkGameState.specialProgress += 1;
+  updateLinkHud();
+}
+
+function applySpecialMatchRewards(anchor) {
   const special = LINK_CONNECT_CONFIG.special;
-  const endless = isLinkEndlessMode(linkGameState.mode);
-  const rewardType = endless || Math.random() < 0.5 ? "coins" : "time";
-  const amount = rewardType === "coins"
-    ? randomInteger(special.coinReward.min, special.coinReward.max)
-    : randomInteger(special.timeReward.min, special.timeReward.max);
-  if (rewardType === "coins") {
-    increaseCoins(amount);
-    saveCoins(gameState.coins);
-    showGameplayRewardEffect(anchor, { type: "coins", value: amount });
-  } else {
-    linkGameState.remainingTime += amount;
-    showGameplayRewardEffect(anchor, { type: "time", value: amount });
-  }
-  // Mỗi màn luôn có ít nhất một cặp đặc biệt; ghép cặp này mở một cặp băng để ván không thể kẹt.
   const thawedPairs = unlockFrozenLinkPairs(linkGameState.board, 1, { onUnlock: rememberFrozenPairForTransform });
-  const boardChanged = Boolean(thawedPairs) || applySpecialMilestone(linkGameState.specialProgress, anchor);
-  if (linkGameState.specialProgress >= special.progressTarget) {
-    linkGameState.specialProgress = 0;
-  }
-  return boardChanged;
+  if (thawedPairs) return true;
+  const rewardType = isLinkEndlessMode(linkGameState.mode) || Math.random() < 0.5 ? "coins" : "time";
+  const range = special.frozenFallbackReward[rewardType === "coins" ? "coin" : "time"];
+  const value = randomInteger(range.min, range.max);
+  if (rewardType === "coins") {
+    increaseCoins(value);
+    saveCoins(gameState.coins);
+  } else linkGameState.remainingTime += value;
+  showGameplayRewardEffect(anchor, { type: rewardType, value });
+  return false;
 }
 
 function applySpecialMilestone(progress, anchor) {

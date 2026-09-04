@@ -1,5 +1,6 @@
 import { getActiveLinkConnectionEffect } from "./linkEffects.js";
 import { gameState } from "../gameState.js";
+import { createIcon } from "../icons.js";
 import {
   measureLinkRender,
   recordLinkLayoutPass,
@@ -292,6 +293,40 @@ export function playLinkMatchExit(start, end) {
   });
   playLinkCardExitEffects(tiles, effect.exitId);
   return tiles;
+}
+
+// Năng lượng chỉ là hiệu ứng tạm trên lớp phủ; không tạo hay lưu vật phẩm.
+export function playLinkEnergyFlight(start, end, { onArrive } = {}) {
+  const sourceTiles = [getLinkTileButton(start), getLinkTileButton(end)].filter(Boolean);
+  const target = document.getElementById("link-special-energy");
+  if (!sourceTiles.length || !target) {
+    onArrive?.();
+    return null;
+  }
+  const sourceRect = sourceTiles[0].getBoundingClientRect();
+  const secondRect = sourceTiles[1].getBoundingClientRect();
+  const targetRect = target.getBoundingClientRect();
+  const effect = document.createElement("span");
+  effect.className = "link-energy-flight";
+  effect.setAttribute("aria-hidden", "true");
+  effect.append(createIcon("energy"));
+  const startX = (sourceRect.left + sourceRect.width / 2 + secondRect.left + secondRect.width / 2) / 2;
+  const startY = (sourceRect.top + sourceRect.height / 2 + secondRect.top + secondRect.height / 2) / 2;
+  effect.style.left = `${startX}px`;
+  effect.style.top = `${startY}px`;
+  effect.style.setProperty("--link-energy-flight-x", `${targetRect.left + targetRect.width / 2 - startX}px`);
+  effect.style.setProperty("--link-energy-flight-y", `${targetRect.top + targetRect.height / 2 - startY}px`);
+  document.body.append(effect);
+  let settled = false;
+  const finish = () => {
+    if (settled) return;
+    settled = true;
+    effect.remove();
+    onArrive?.();
+  };
+  effect.addEventListener("animationend", finish, { once: true });
+  setTimeout(finish, 900);
+  return effect;
 }
 
 const FRAGMENT_LAYOUTS = Object.freeze({
