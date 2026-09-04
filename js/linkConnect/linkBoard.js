@@ -111,7 +111,7 @@ export function makeRandomLinkPairSpecial(board) {
   return pair;
 }
 
-export function removeRandomLinkPair(board, { excludeTileKeys = [], eligiblePair } = {}) {
+export function removeRandomLinkPair(board, { excludeTileKeys = [], eligiblePair, remove = true } = {}) {
   const excludedKeys = new Set(excludeTileKeys);
   const pairs = getLinkPairs(board).filter((pair) => (
     pair.positions.length === 2
@@ -121,7 +121,7 @@ export function removeRandomLinkPair(board, { excludeTileKeys = [], eligiblePair
   const pair = pairs[Math.floor(Math.random() * pairs.length)];
   if (!pair) return null;
   const [start, end] = pair.positions;
-  removeLinkBoardPair(board, start, end);
+  if (remove) removeLinkBoardPair(board, start, end);
   return pair;
 }
 

@@ -39,8 +39,6 @@ import {
   removeLinkBoardPair,
   removeRandomLinkPair,
   shuffleLinkBoard,
-  makeRandomLinkPairSpecial,
-  unlockAllFrozenLinkPairs,
   unlockFrozenLinkPairs,
 } from "./linkBoard.js";
 import { findAvailableConnections, findConnectionPath } from "./pathfinder.js";
@@ -502,6 +500,10 @@ function handleLinkTileClick(position) {
       showAppToast("Không còn đường nối. Bàn đã được xáo lại.");
     }
     playPendingBoardTransforms();
+    if (linkGameState.pendingSpecialMilestones.length) {
+      processPendingSpecialMilestones(roundId, board);
+      return;
+    }
     linkGameState.isLocked = false;
   }, getLinkMatchResolveDelay());
 }
@@ -564,7 +566,16 @@ function useLinkThunder() {
   const pairCount = randomInteger(1, 3);
   const removedPairs = [];
   for (let index = 0; index < pairCount; index += 1) {
-    const pair = removeRandomLinkPair(linkGameState.board);
+    const excludedTileKeys = removedPairs.flatMap((pair) => pair.positions
+      .map((position) => getLinkBoardTile(linkGameState.board, position)?.instanceId));
+    const pair = removeRandomLinkPair(linkGameState.board, {
+      remove: false,
+      excludeTileKeys: excludedTileKeys,
+      eligiblePair: (candidate, board) => candidate.positions.every((position) => {
+        const tile = getLinkBoardTile(board, position);
+        return tile && !tile.frozen && !tile.special && !tile.luckyReward;
+      }),
+    });
     if (!pair) break;
     removedPairs.push(pair);
   }
@@ -591,6 +602,7 @@ function playNextThunderStrike(pairs, index, roundId, board, colorId) {
   setTimeout(() => {
     strike?.remove();
     if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
+    removeLinkBoardPair(board, start, end);
     clearLinkMatchedPair(start, end);
     linkGameState.matchedPairs += 1;
     updateLinkHud();
@@ -890,7 +902,9 @@ function shouldDropLinkEnergy() {
 function receiveLinkEnergy(roundId, board) {
   if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
   linkGameState.specialProgress += 1;
+  linkGameState.pendingSpecialMilestones.push(linkGameState.specialProgress);
   updateLinkHud();
+  if (!linkGameState.isLocked) processPendingSpecialMilestones(roundId, board);
 }
 
 function applySpecialMatchRewards(anchor) {
@@ -908,76 +922,99 @@ function applySpecialMatchRewards(anchor) {
   return false;
 }
 
-function applySpecialMilestone(progress, anchor) {
-  let message = "";
-  let boardChanged = false;
-  if (progress === 1) {
-    boardChanged = Boolean(removeAutomaticPair());
-    message = "Mốc đặc biệt 1: phá hủy một cặp thẻ.";
-  } else if (progress === 3) {
-    const unlocked = unlockFrozenLinkPairs(linkGameState.board, 1, { onUnlock: rememberFrozenPairForTransform });
-    boardChanged = Boolean(unlocked);
-    if (unlocked) message = "Mốc đặc biệt 3: đã mở khóa một cặp thẻ đóng băng.";
-    else {
-      boardChanged = Boolean(removeAutomaticPair());
-      message = "Mốc đặc biệt 3: không có thẻ đóng băng, đã phá hủy một cặp.";
-    }
+function processPendingSpecialMilestones(roundId, board) {
+  if (linkGameState.isResolvingSpecialMilestone || linkGameState.roundId !== roundId || linkGameState.board !== board) return;
+  const progress = linkGameState.pendingSpecialMilestones.shift();
+  if (!progress) {
+    linkGameState.isLocked = false;
+    return;
+  }
+  linkGameState.isResolvingSpecialMilestone = true;
+  const anchor = getLinkHudElements().energy;
+  const finish = () => {
+    linkGameState.isResolvingSpecialMilestone = false;
+    if (progress >= LINK_CONNECT_CONFIG.special.progressTarget) linkGameState.specialProgress = 0;
+    updateLinkHud();
+    if (linkGameState.matchedPairs >= linkGameState.totalPairs) return completeLinkLevel();
+    if (ensurePlayableBoard(board)) renderLinkBoardShift(board, { onTileClick: handleLinkTileClick });
+    processPendingSpecialMilestones(roundId, board);
+  };
+  const rewardPairBreak = () => playAutomaticPairBreak(roundId, board, finish);
+  if (progress === 1 || progress === 3) {
+    linkGameState.specialMilestoneRewards[progress] = "Phá 1 cặp thường ngẫu nhiên.";
+    rewardPairBreak();
   } else if (progress === 5) {
-    const specialPair = makeRandomLinkPairSpecial(linkGameState.board);
-    rememberSpecialPairForTransform(specialPair);
-    boardChanged = Boolean(specialPair);
-    message = "Mốc đặc biệt 5: đã tạo một cặp đặc biệt.";
+    const item = Math.random() < 0.5 ? "hint" : "reshuffle";
+    grantLinkItem(item);
+    showGameplayRewardEffect(anchor, { type: item, value: 1 });
+    linkGameState.specialMilestoneRewards[progress] = `+1 ${item === "hint" ? "Gợi ý" : "Xáo trộn"}.`;
+    finish();
   } else if (progress === 7) {
-    message = applyMilestoneSevenReward(anchor);
-  } else if (progress === 9) {
-    const unlocked = unlockFrozenLinkPairs(linkGameState.board, 1, { onUnlock: rememberFrozenPairForTransform });
-    boardChanged = Boolean(unlocked);
-    if (unlocked) message = "Mốc đặc biệt 9: đã mở khóa một cặp thẻ đóng băng.";
-    else {
-      boardChanged = Boolean(removeAutomaticPair());
-      message = "Mốc đặc biệt 9: không có thẻ đóng băng, đã phá hủy một cặp.";
-    }
-  } else if (progress === 10) {
-    increaseCoins(LINK_CONNECT_CONFIG.special.milestoneTenCoins);
+    const rules = LINK_CONNECT_CONFIG.special.milestones.seven;
+    const seconds = randomInteger(rules.time.min, rules.time.max);
+    linkGameState.remainingTime += seconds;
+    increaseCoins(rules.coins);
     saveCoins(gameState.coins);
-    showGameplayRewardEffect(anchor, { type: "coins", value: LINK_CONNECT_CONFIG.special.milestoneTenCoins });
-    const unlocked = unlockAllFrozenLinkPairs(linkGameState.board, { onUnlock: rememberFrozenPairForTransform });
-    const specialPair = makeRandomLinkPairSpecial(linkGameState.board);
-    const specialPairKeys = rememberSpecialPairForTransform(specialPair);
-    const removedPair = removeAutomaticPair("", specialPairKeys);
-    boardChanged = Boolean(unlocked || specialPair || removedPair);
-    message = "Mốc đặc biệt 10: +100 Xu, mở khóa băng và kích hoạt phần thưởng.";
-  }
-  if (message) linkGameState.specialMilestoneRewards[progress] = message.replace(/^Mốc đặc biệt \d+: /, "");
-  return boardChanged;
-}
-
-function applyMilestoneSevenReward(anchor) {
-  const choices = isLinkEndlessMode(linkGameState.mode)
-    ? ["hint", "reshuffle"]
-    : ["time", "hint", "reshuffle"];
-  const reward = choices[Math.floor(Math.random() * choices.length)];
-  if (reward === "time") {
-    const value = randomInteger(3, 10);
-    linkGameState.remainingTime += value;
-    showGameplayRewardEffect(anchor, { type: "time", value });
-    return "Mốc đặc biệt 7: nhận thêm thời gian.";
-  }
-  if (reward === "hint") {
+    showGameplayRewardEffect(anchor, { type: "time", value: seconds });
+    showGameplayRewardEffect(anchor, { type: "coins", value: rules.coins });
+    linkGameState.specialMilestoneRewards[progress] = `+${seconds}s và +${rules.coins} Xu.`;
+    finish();
+  } else if (progress === 9 || progress === 10) {
     grantLinkItem("hint");
     showGameplayRewardEffect(anchor, { type: "hint", value: 1 });
-    return "Mốc đặc biệt 7: nhận một lượt gợi ý.";
-  }
-  grantLinkItem("reshuffle");
-  showGameplayRewardEffect(anchor, { type: "reshuffle", value: 1 });
-  return "Mốc đặc biệt 7: nhận một lượt xáo trộn.";
+    if (progress === 10) {
+      const coins = LINK_CONNECT_CONFIG.special.milestones.ten.coins;
+      increaseCoins(coins);
+      saveCoins(gameState.coins);
+      grantLinkItem("reshuffle");
+      showGameplayRewardEffect(anchor, { type: "coins", value: coins });
+      showGameplayRewardEffect(anchor, { type: "reshuffle", value: 1 });
+      linkGameState.specialMilestoneRewards[progress] = `+${coins} Xu, +1 Xáo trộn, +1 Gợi ý và phá cặp.`;
+    } else linkGameState.specialMilestoneRewards[progress] = "+1 Gợi ý và phá 1 cặp thường.";
+    rewardPairBreak();
+  } else finish();
 }
 
-function removeAutomaticPair(fallbackMessage = "", excludeTileKeys = []) {
-  const pair = removeRandomLinkPair(linkGameState.board, { excludeTileKeys });
-  if (!pair) return null;
-  linkGameState.matchedPairs += 1;
-  return fallbackMessage || "Đã phá hủy một cặp thẻ.";
+function playAutomaticPairBreak(roundId, board, onComplete) {
+  const milestone = LINK_CONNECT_CONFIG.special.milestones;
+  const remainingPairs = Math.ceil((linkGameState.totalPairs - linkGameState.matchedPairs));
+  if (remainingPairs < milestone.pairBreakCoinFallbackBelowPairs) {
+    increaseCoins(milestone.breakCoins);
+    saveCoins(gameState.coins);
+    showGameplayRewardEffect(getLinkHudElements().energy, { type: "coins", value: milestone.breakCoins });
+    onComplete();
+    return;
+  }
+  const pair = removeRandomLinkPair(board, {
+    remove: false,
+    eligiblePair: (candidate, currentBoard) => candidate.positions.every((position) => {
+      const tile = getLinkBoardTile(currentBoard, position);
+      return tile && !tile.frozen && !tile.special && !tile.luckyReward;
+    }),
+  });
+  if (!pair) {
+    increaseCoins(milestone.breakCoins);
+    saveCoins(gameState.coins);
+    showGameplayRewardEffect(getLinkHudElements().energy, { type: "coins", value: milestone.breakCoins });
+    onComplete();
+    return;
+  }
+  const [start, end] = pair.positions;
+  setLinkTileSelected(start, true);
+  setLinkTileSelected(end, true);
+  setTimeout(() => {
+    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
+    playLinkMatchExit(start, end);
+    setTimeout(() => {
+      if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
+      removeLinkBoardPair(board, start, end);
+      clearLinkMatchedPair(start, end);
+      linkGameState.matchedPairs += 1;
+      const shifted = applyLinkGravityShift(board, linkGameState.gravityShift);
+      if (shifted) renderLinkBoardShift(board, { onTileClick: handleLinkTileClick });
+      onComplete();
+    }, getLinkMatchResolveDelay());
+  }, 130);
 }
 
 function rememberSpecialPairForTransform(pair) {

@@ -12,6 +12,8 @@ export function createLinkGameState() {
     specialProgress: 0,
     specialNoEnergyDropStreak: 0,
     specialMilestoneRewards: {},
+    pendingSpecialMilestones: [],
+    isResolvingSpecialMilestone: false,
     pendingSpecialPairKeys: [],
     pendingFrozenTileKeys: [],
     freezeSeconds: 0,
@@ -44,6 +46,8 @@ export function beginLinkRound({
   linkGameState.misses = 0;
   linkGameState.combo = 0;
   linkGameState.specialMilestoneRewards = {};
+  linkGameState.pendingSpecialMilestones = [];
+  linkGameState.isResolvingSpecialMilestone = false;
   linkGameState.pendingSpecialPairKeys = [];
   linkGameState.pendingFrozenTileKeys = [];
   linkGameState.matchedPairs = 0;
