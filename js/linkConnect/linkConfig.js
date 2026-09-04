@@ -63,6 +63,7 @@ export const LINK_CONNECT_TIMING = Object.freeze({
   thunderCardExitDelayMs: 190,
   thunderNextPairDelayMs: 130,
   countdownResumeDelayMs: 1000,
+  specialPairTransformMs: 720,
 });
 
 export function getLinkMatchResolveDelay() {

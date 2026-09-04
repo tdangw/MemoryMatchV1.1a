@@ -231,6 +231,26 @@ export function clearLinkTileHints() {
   document.querySelectorAll(".link-tile.is-hinted").forEach((tile) => tile.classList.remove("is-hinted"));
 }
 
+// Dùng phần tử con tạm thay vì pseudo-element để vẫn tương thích với lớp băng,
+// vốn đã sử dụng cả ::before lẫn ::after trên cùng một thẻ.
+export function playLinkSpecialPairTransform(tileKeys) {
+  if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+  tileKeys.forEach((tileKey) => {
+    const tile = tileElementsByKey.get(tileKey);
+    if (!tile?.isConnected) return;
+    tile.classList.remove("is-becoming-special");
+    const burst = document.createElement("span");
+    burst.className = "link-tile__special-burst";
+    burst.setAttribute("aria-hidden", "true");
+    tile.append(burst);
+    tile.classList.add("is-becoming-special");
+    burst.addEventListener("animationend", () => {
+      burst.remove();
+      tile.classList.remove("is-becoming-special");
+    }, { once: true });
+  });
+}
+
 export function playLinkMismatch(start, end) {
   return [start, end].flatMap((position) => {
     const tile = getLinkTileButton(position);

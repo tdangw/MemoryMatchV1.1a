@@ -64,6 +64,7 @@ import {
   drawLinkPath,
   playLinkMatchExit,
   playLinkMismatch,
+  playLinkSpecialPairTransform,
   playLinkThunderStrike,
   renderLinkBoard,
   renderLinkBoardShift,
@@ -491,6 +492,7 @@ function handleLinkTileClick(position) {
       renderLinkBoardShift(linkGameState.board, { onTileClick: handleLinkTileClick });
       showAppToast("Không còn đường nối. Bàn đã được xáo lại.");
     }
+    playPendingSpecialPairTransform();
     linkGameState.isLocked = false;
   }, getLinkMatchResolveDelay());
 }
@@ -903,7 +905,9 @@ function applySpecialMilestone(progress) {
       message = "Mốc đặc biệt 3: không có thẻ đóng băng, đã phá hủy một cặp.";
     }
   } else if (progress === 5) {
-    boardChanged = Boolean(makeRandomLinkPairSpecial(linkGameState.board));
+    const specialPair = makeRandomLinkPairSpecial(linkGameState.board);
+    rememberSpecialPairForTransform(specialPair);
+    boardChanged = Boolean(specialPair);
     message = "Mốc đặc biệt 5: đã tạo một cặp đặc biệt.";
   } else if (progress === 7) {
     message = applyMilestoneSevenReward();
@@ -920,7 +924,8 @@ function applySpecialMilestone(progress) {
     saveCoins(gameState.coins);
     const unlocked = unlockAllFrozenLinkPairs(linkGameState.board);
     const specialPair = makeRandomLinkPairSpecial(linkGameState.board);
-    const removedPair = removeAutomaticPair();
+    const specialPairKeys = rememberSpecialPairForTransform(specialPair);
+    const removedPair = removeAutomaticPair("", specialPairKeys);
     boardChanged = Boolean(unlocked || specialPair || removedPair);
     message = "Mốc đặc biệt 10: +100 Xu, mở khóa băng và kích hoạt phần thưởng.";
   }
@@ -949,11 +954,25 @@ function applyMilestoneSevenReward() {
   return "Mốc đặc biệt 7: nhận một lượt xáo trộn.";
 }
 
-function removeAutomaticPair(fallbackMessage = "") {
-  const pair = removeRandomLinkPair(linkGameState.board);
+function removeAutomaticPair(fallbackMessage = "", excludeTileKeys = []) {
+  const pair = removeRandomLinkPair(linkGameState.board, { excludeTileKeys });
   if (!pair) return null;
   linkGameState.matchedPairs += 1;
   return fallbackMessage || "Đã phá hủy một cặp thẻ.";
+}
+
+function rememberSpecialPairForTransform(pair) {
+  const tileKeys = pair?.positions
+    .map((position) => getLinkBoardTile(linkGameState.board, position)?.instanceId)
+    .filter(Boolean) || [];
+  linkGameState.pendingSpecialPairKeys = tileKeys;
+  return tileKeys;
+}
+
+function playPendingSpecialPairTransform() {
+  const tileKeys = linkGameState.pendingSpecialPairKeys;
+  linkGameState.pendingSpecialPairKeys = [];
+  if (tileKeys.length) playLinkSpecialPairTransform(tileKeys);
 }
 
 function randomInteger(minimum, maximum) {
@@ -971,6 +990,7 @@ function applyLinkTimingStyles(container) {
   container.style.setProperty("--link-tile-exit-duration", `${LINK_CONNECT_TIMING.tileExitAnimationMs}ms`);
   container.style.setProperty("--link-mismatch-feedback-duration", `${LINK_CONNECT_TIMING.mismatchFeedbackMs}ms`);
   container.style.setProperty("--link-thunder-strike-duration", `${LINK_CONNECT_TIMING.thunderStrikeMs}ms`);
+  container.style.setProperty("--link-special-transform-duration", `${LINK_CONNECT_TIMING.specialPairTransformMs}ms`);
 }
 
 function getLinkHudElements() {
