@@ -802,7 +802,6 @@ function updateLinkHud() {
   setHudText(hud.misses, linkGameState.misses);
   setHudText(hud.combo, linkGameState.combo);
   setHudText(hud.score, linkGameState.score);
-  if (hud.scoreCard) hud.scoreCard.dataset.tooltip = `Tổng điểm màn này: ${linkGameState.score}`;
   setHudText(hud.matchedPairs, linkGameState.matchedPairs);
   setHudText(hud.totalPairs, linkGameState.totalPairs);
   setHudText(hud.hint, getLinkItemCount("hint"));
@@ -834,6 +833,9 @@ function updateLinkStarsHud(hud = getLinkHudElements()) {
   const fill = hud.starsFill;
   if (fill) fill.style.width = `${Math.min(100, Math.round(linkGameState.score / target * 100))}%`;
   setHudText(hud.totalStars, gameState.progress.linkConnect.totalStars);
+  if (hud.scoreCard) {
+    hud.scoreCard.dataset.tooltip = `Tổng điểm Link Connect: ${gameState.progress.linkConnect.totalScore}`;
+  }
 }
 
 function updateLinkSpecialMilestones(hud = getLinkHudElements()) {
