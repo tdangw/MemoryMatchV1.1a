@@ -204,6 +204,30 @@
   box-shadow: 0 0 0 2px rgb(242 191 91 / 66%), 0 0 14px rgb(255 201 87 / 48%), 0 4px 12px rgb(0 0 0 / 30%);
 }
 
+.link-tile__special-mark {
+  position: absolute;
+  z-index: 4;
+  top: 6px;
+  right: 6px;
+  display: grid;
+  width: 23px;
+  aspect-ratio: 1;
+  place-items: center;
+  border: 1px solid rgb(255 238 159 / 94%);
+  border-radius: 50%;
+  color: #fff2a8;
+  background: rgb(100 60 7 / 88%);
+  box-shadow: 0 0 9px rgb(255 203 77 / 84%), 0 1px 3px rgb(0 0 0 / 54%);
+  pointer-events: none;
+}
+
+.link-tile__special-mark .ui-icon {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2.5;
+  fill: currentColor;
+}
+
 .link-tile.is-becoming-special {
   z-index: 3;
   animation: link-special-awaken var(--link-special-transform-duration) cubic-bezier(.18,.76,.27,1) both;
@@ -280,7 +304,7 @@
   background: linear-gradient(180deg, transparent, rgb(235 255 255 / 98%) 42%, rgb(106 226 255 / 88%) 58%, transparent);
   box-shadow: 0 0 13px rgb(103 226 255 / 96%), 0 2px 10px rgb(197 249 255 / 78%);
   will-change: transform, opacity;
-  animation: link-frost-wipe-line var(--link-frozen-unlock-duration) cubic-bezier(.16,.72,.25,1) both;
+  animation: link-frost-wipe-line var(--link-frozen-unlock-duration) linear both;
 }
 
 /* Tín hiệu khóa nổi rõ trên nền băng mờ nhưng không che mất hình của thẻ. */

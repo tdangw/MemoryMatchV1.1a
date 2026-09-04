@@ -1,5 +1,6 @@
 import { getActiveLinkConnectionEffect } from "./linkEffects.js";
 import { gameState } from "../gameState.js";
+import { createIcon } from "../icons.js";
 import {
   measureLinkRender,
   recordLinkLayoutPass,
@@ -176,7 +177,7 @@ function syncLinkTileElement(button, tile, position, onTileClick) {
   button.dataset.column = String(position.column);
   button.setAttribute(
     "aria-label",
-    tile.frozen ? `${tile.alt} · thẻ đóng băng` : tile.alt,
+    [tile.alt, tile.special && "cặp đặc biệt", tile.frozen && "thẻ đóng băng"].filter(Boolean).join(" · "),
   );
 
   const image = button.querySelector("img:not(.link-tile__frost-overlay)");
@@ -191,6 +192,16 @@ function syncLinkTileElement(button, tile, position, onTileClick) {
     button.append(frostOverlay);
   } else if (!tile.frozen) {
     frostOverlay?.remove();
+  }
+  let specialMark = button.querySelector(".link-tile__special-mark");
+  if (tile.special && !specialMark) {
+    specialMark = document.createElement("span");
+    specialMark.className = "link-tile__special-mark";
+    specialMark.setAttribute("aria-hidden", "true");
+    specialMark.append(createIcon("star"));
+    button.append(specialMark);
+  } else if (!tile.special) {
+    specialMark?.remove();
   }
   return true;
 }
