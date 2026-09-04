@@ -283,22 +283,6 @@
   animation: link-frost-wipe-line var(--link-frozen-unlock-duration) linear both;
 }
 
-.link-tile__frost-particle {
-  position: absolute;
-  z-index: 3;
-  top: 83%;
-  left: 47%;
-  width: 8%;
-  aspect-ratio: 1;
-  border: 1px solid rgb(219 255 255 / 92%);
-  border-radius: 24% 76% 42% 58%;
-  background: linear-gradient(135deg, rgb(235 255 255 / 88%), rgb(100 218 255 / 35%));
-  box-shadow: 0 0 7px rgb(133 238 255 / 74%);
-  pointer-events: none;
-  will-change: opacity, transform;
-  animation: link-frost-particle var(--link-frozen-unlock-duration) cubic-bezier(.14,.72,.25,1) both;
-}
-
 /* Tín hiệu khóa nổi rõ trên nền băng mờ nhưng không che mất hình của thẻ. */
 .link-tile.is-frozen::before,
 .link-tile.is-frozen::after {
@@ -509,15 +493,6 @@
   100% { opacity: 0; transform: translateY(825%); }
 }
 
-@keyframes link-frost-particle {
-  0%, 83% { opacity: 0; transform: translate(0, 0) scale(.4) rotate(0deg); }
-  89% { opacity: 1; transform: translate(0, 0) scale(1) rotate(28deg); }
-  100% {
-    opacity: 0;
-    transform: translate(calc(var(--frost-particle-x) * 120%), calc(var(--frost-particle-y) * 120%)) scale(.5) rotate(155deg);
-  }
-}
-
 @keyframes link-hint-pulse {
   from { opacity: .58; transform: scale(.985); }
   to { opacity: 1; transform: scale(1); }
@@ -584,7 +559,6 @@
   .link-tile__frost-wipe,
   .link-tile__frost-wipe-veil,
   .link-tile__frost-wipe-line,
-  .link-tile__frost-particle,
   .link-path-overlay__firework-burst,
   .tile-combo-effect {
     animation: none;

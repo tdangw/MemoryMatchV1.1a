@@ -253,7 +253,6 @@ export function playLinkSpecialPairTransform(tileKeys) {
 
 export function playLinkFrozenPairUnlock(tileKeys) {
   if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
-  const particleVectors = [[-1.1, -.7], [-.55, -1], [0, -.85], [.6, -1], [1.12, -.7]];
   tileKeys.forEach((tileKey) => {
     const tile = tileElementsByKey.get(tileKey);
     if (!tile?.isConnected) return;
@@ -265,13 +264,6 @@ export function playLinkFrozenPairUnlock(tileKeys) {
     const line = document.createElement("span");
     line.className = "link-tile__frost-wipe-line";
     wipe.append(veil, line);
-    particleVectors.forEach(([x, y]) => {
-      const particle = document.createElement("span");
-      particle.className = "link-tile__frost-particle";
-      particle.style.setProperty("--frost-particle-x", String(x));
-      particle.style.setProperty("--frost-particle-y", String(y));
-      wipe.append(particle);
-    });
     tile.classList.add("is-unlocking-frozen");
     tile.append(wipe);
     line.addEventListener("animationend", () => {
