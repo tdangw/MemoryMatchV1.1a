@@ -616,6 +616,7 @@ export function showScoreEffect(tileElement, points) {
   effect.setAttribute("aria-hidden", "true");
   effect.style.left = `${rect.left + rect.width / 2}px`;
   effect.style.top = `${rect.top + rect.height / 2}px`;
+  effect.style.setProperty("--gameplay-feedback-duration", `${GAMEPLAY_TIMING.scoreEffectDurationMs}ms`);
   document.body.appendChild(effect);
 
   setTimeout(() => effect.remove(), GAMEPLAY_TIMING.scoreEffectDurationMs);
@@ -635,15 +636,10 @@ export function showComboEffect(tileElement, combo) {
 
   effect.style.left = `${centerX}px`;
   effect.style.top = `${centerY}px`;
+  effect.style.setProperty("--gameplay-feedback-duration", `${GAMEPLAY_TIMING.scoreEffectDurationMs}ms`);
 
   document.body.appendChild(effect);
-
-  setTimeout(() => {
-    effect.classList.add("fade-out");
-    setTimeout(() => {
-      effect.remove();
-    }, GAMEPLAY_TIMING.comboPopupFadeMs);
-  }, GAMEPLAY_TIMING.comboPopupVisibleMs);
+  setTimeout(() => effect.remove(), GAMEPLAY_TIMING.scoreEffectDurationMs);
 }
 
 // Shop
