@@ -834,7 +834,7 @@ function updateLinkStarsHud(hud = getLinkHudElements()) {
   if (fill) fill.style.width = `${Math.min(100, Math.round(linkGameState.score / target * 100))}%`;
   setHudText(hud.totalStars, gameState.progress.linkConnect.totalStars);
   if (hud.scoreCard) {
-    hud.scoreCard.dataset.tooltip = `Tổng điểm Link Connect: ${gameState.progress.linkConnect.totalScore}`;
+    hud.scoreCard.dataset.tooltip = `Tổng điểm: ${gameState.progress.linkConnect.totalScore}`;
   }
 }
 
