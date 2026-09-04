@@ -259,8 +259,17 @@ export function playLinkFrozenPairUnlock(tileKeys) {
     const wipe = document.createElement("span");
     wipe.className = "link-tile__frost-wipe";
     wipe.setAttribute("aria-hidden", "true");
+    const veil = document.createElement("span");
+    veil.className = "link-tile__frost-wipe-veil";
+    const line = document.createElement("span");
+    line.className = "link-tile__frost-wipe-line";
+    wipe.append(veil, line);
+    tile.classList.add("is-unlocking-frozen");
     tile.append(wipe);
-    wipe.addEventListener("animationend", () => wipe.remove(), { once: true });
+    line.addEventListener("animationend", () => {
+      wipe.remove();
+      tile.classList.remove("is-unlocking-frozen");
+    }, { once: true });
   });
 }
 
