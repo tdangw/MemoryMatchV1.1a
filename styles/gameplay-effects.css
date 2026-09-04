@@ -61,6 +61,31 @@
   box-shadow: 0 4px 15px rgb(0 0 0 / 58%), 0 0 10px rgb(67 214 255 / 46%);
 }
 
+.tile-score-effect--hint {
+  color: #c4f7ff;
+  border-color: rgb(114 232 255 / 92%);
+  background: rgb(6 55 89 / 92%);
+  box-shadow: 0 4px 15px rgb(0 0 0 / 58%), 0 0 10px rgb(76 221 255 / 46%);
+}
+
+.tile-score-effect--reshuffle {
+  color: #d9d0ff;
+  border-color: rgb(173 149 255 / 92%);
+  background: rgb(45 24 91 / 92%);
+  box-shadow: 0 4px 15px rgb(0 0 0 / 58%), 0 0 10px rgb(151 112 255 / 46%);
+}
+
+.tile-score-effect--reward {
+  gap: 4px;
+}
+
+.tile-score-effect__icon.ui-icon {
+  width: 1.05em;
+  height: 1.05em;
+  stroke-width: 2.4;
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 45%));
+}
+
 .tile-combo-effect {
   color: var(--combo-text-color, #e4f7ff);
   font:

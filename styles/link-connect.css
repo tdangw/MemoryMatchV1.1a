@@ -249,31 +249,50 @@
   z-index: 5;
   inset: 0;
   border-radius: inherit;
+  pointer-events: none;
+}
+
+.link-tile__frost-break::before {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset: 3px;
+  border: 2px solid rgb(130 236 255 / 16%);
+  border-top-color: rgb(230 255 255 / 98%);
+  border-right-color: rgb(113 226 255 / 88%);
+  border-radius: inherit;
+  box-shadow: 0 0 12px rgb(93 221 255 / 84%), inset 0 0 10px rgb(123 236 255 / 40%);
+  animation: link-frost-unlock-ring var(--link-frozen-unlock-duration) linear both;
+}
+
+.link-tile__frost-cracks {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  border-radius: inherit;
   background:
     linear-gradient(24deg, transparent 42%, rgb(237 255 255 / 94%) 46% 48%, transparent 52%),
     linear-gradient(127deg, transparent 44%, rgb(123 233 255 / 90%) 48% 50%, transparent 54%),
     linear-gradient(72deg, transparent 45%, rgb(240 255 255 / 88%) 49% 51%, transparent 55%),
     radial-gradient(circle at 50% 50%, rgb(232 255 255 / 62%), transparent 44%);
   box-shadow: inset 0 0 18px rgb(115 227 255 / 74%), 0 0 15px rgb(112 224 255 / 78%);
-  pointer-events: none;
-  will-change: opacity, transform;
-  animation: link-frost-break var(--link-frozen-unlock-duration) cubic-bezier(.15,.74,.24,1) both;
+  animation: link-frost-crack-reveal var(--link-frozen-unlock-duration) cubic-bezier(.15,.74,.24,1) both;
 }
 
-.link-tile__frost-break::before,
-.link-tile__frost-break::after {
-  content: "";
+.link-tile__frost-shard {
   position: absolute;
+  z-index: 3;
   top: 43%;
-  width: 27%;
+  left: 43%;
+  width: 15%;
   aspect-ratio: 1;
-  border: 1px solid rgb(216 253 255 / 90%);
-  background: rgb(101 215 255 / 34%);
-  box-shadow: 0 0 9px rgb(134 238 255 / 72%);
+  border: 1px solid rgb(222 255 255 / 92%);
+  clip-path: polygon(48% 0, 100% 35%, 66% 100%, 0 73%, 16% 20%);
+  background: linear-gradient(135deg, rgb(239 255 255 / 86%), rgb(86 206 255 / 34%));
+  box-shadow: 0 0 8px rgb(131 237 255 / 76%);
+  will-change: opacity, transform;
+  animation: link-frost-shard var(--link-frozen-unlock-duration) cubic-bezier(.12,.75,.26,1) both;
 }
-
-.link-tile__frost-break::before { left: 29%; transform: rotate(28deg); }
-.link-tile__frost-break::after { right: 22%; transform: rotate(-35deg); }
 
 /* Tín hiệu khóa nổi rõ trên nền băng mờ nhưng không che mất hình của thẻ. */
 .link-tile.is-frozen::before,
@@ -466,11 +485,26 @@
   100% { opacity: 0; transform: scale(1.42) rotate(12deg); }
 }
 
-@keyframes link-frost-break {
-  0% { opacity: 0; transform: scale(.92); }
-  22% { opacity: 1; transform: scale(1); }
-  48% { opacity: .94; transform: scale(1.04); }
-  100% { opacity: 0; transform: scale(1.18); }
+@keyframes link-frost-unlock-ring {
+  0% { opacity: 0; transform: rotate(0deg) scale(.98); }
+  7% { opacity: 1; }
+  31% { opacity: 1; transform: rotate(720deg) scale(1); }
+  38%, 100% { opacity: 0; transform: rotate(820deg) scale(1.06); }
+}
+
+@keyframes link-frost-crack-reveal {
+  0%, 29% { opacity: 0; transform: scale(.96); }
+  39%, 58% { opacity: 1; transform: scale(1); }
+  72%, 100% { opacity: 0; transform: scale(1.08); }
+}
+
+@keyframes link-frost-shard {
+  0%, 57% { opacity: 0; transform: translate(0, 0) scale(.35) rotate(0deg); }
+  63% { opacity: 1; transform: translate(0, 0) scale(1) rotate(24deg); }
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--frost-shard-x) * 155%), calc(var(--frost-shard-y) * 155%)) scale(.42) rotate(178deg);
+  }
 }
 
 @keyframes link-hint-pulse {
@@ -537,6 +571,8 @@
   .link-tile.is-becoming-special,
   .link-tile__special-burst,
   .link-tile__frost-break,
+  .link-tile__frost-cracks,
+  .link-tile__frost-shard,
   .link-path-overlay__firework-burst,
   .tile-combo-effect {
     animation: none;

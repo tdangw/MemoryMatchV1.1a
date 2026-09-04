@@ -613,16 +613,36 @@ export function showScoreEffect(tileElement, points) {
 
 export function showGameplayRewardEffect(tileElement, { type, value } = {}) {
   if (!tileElement || !Number.isFinite(value) || value <= 0) return;
-  const presentation = type === "coins" ? `+${value} Xu` : `+${value}s`;
-  const tone = type === "coins" ? "coins" : "time";
-  showGameplayFloatEffect(tileElement, presentation, `tile-score-effect tile-score-effect--${tone}`);
+  const presentations = {
+    coins: { text: `+${value} Xu`, icon: "coin" },
+    time: { text: `+${value}s`, icon: "timer" },
+    hint: { text: `+${value}`, icon: "search" },
+    reshuffle: { text: `+${value}`, icon: "restart" },
+  };
+  const presentation = presentations[type];
+  if (!presentation) return;
+  showGameplayFloatEffect(
+    tileElement,
+    presentation.text,
+    `tile-score-effect tile-score-effect--${type}`,
+    presentation.icon,
+  );
 }
 
-function showGameplayFloatEffect(tileElement, text, className) {
+function showGameplayFloatEffect(tileElement, text, className, iconName) {
   const rect = tileElement.getBoundingClientRect();
   const effect = document.createElement("div");
   effect.className = className;
-  effect.textContent = text;
+  if (iconName) {
+    effect.classList.add("tile-score-effect--reward");
+    const icon = createIcon(iconName);
+    icon.classList.add("tile-score-effect__icon");
+    const label = document.createElement("span");
+    label.textContent = text;
+    effect.append(icon, label);
+  } else {
+    effect.textContent = text;
+  }
   effect.setAttribute("aria-hidden", "true");
   effect.style.left = `${rect.left + rect.width / 2}px`;
   effect.style.top = `${rect.top + rect.height / 2}px`;

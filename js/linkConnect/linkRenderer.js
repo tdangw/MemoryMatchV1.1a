@@ -253,12 +253,26 @@ export function playLinkSpecialPairTransform(tileKeys) {
 
 export function playLinkFrozenPairUnlock(tileKeys) {
   if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+  const shardDirections = [
+    [-1.05, -1.15], [0, -1.38], [1.08, -1.04],
+    [-1.3, 0.2], [1.28, 0.25], [0, 1.25],
+  ];
   tileKeys.forEach((tileKey) => {
     const tile = tileElementsByKey.get(tileKey);
     if (!tile?.isConnected) return;
     const burst = document.createElement("span");
     burst.className = "link-tile__frost-break";
     burst.setAttribute("aria-hidden", "true");
+    const cracks = document.createElement("span");
+    cracks.className = "link-tile__frost-cracks";
+    burst.append(cracks);
+    shardDirections.forEach(([x, y]) => {
+      const shard = document.createElement("span");
+      shard.className = "link-tile__frost-shard";
+      shard.style.setProperty("--frost-shard-x", String(x));
+      shard.style.setProperty("--frost-shard-y", String(y));
+      burst.append(shard);
+    });
     tile.append(burst);
     burst.addEventListener("animationend", () => burst.remove(), { once: true });
   });

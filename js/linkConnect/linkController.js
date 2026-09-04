@@ -50,7 +50,6 @@ import {
   clearGameplayRewardPopups,
   openTimeUpModal,
   showComboEffect,
-  showGameplayRewardPopup,
   showLevelRewardOverlay,
   showLevelSummaryOverlay,
   showGameplayRewardEffect,
@@ -911,7 +910,7 @@ function applySpecialMilestone(progress, anchor) {
     boardChanged = Boolean(specialPair);
     message = "Mốc đặc biệt 5: đã tạo một cặp đặc biệt.";
   } else if (progress === 7) {
-    message = applyMilestoneSevenReward();
+    message = applyMilestoneSevenReward(anchor);
   } else if (progress === 9) {
     const unlocked = unlockFrozenLinkPairs(linkGameState.board, 1, { onUnlock: rememberFrozenPairForTransform });
     boardChanged = Boolean(unlocked);
@@ -931,28 +930,28 @@ function applySpecialMilestone(progress, anchor) {
     boardChanged = Boolean(unlocked || specialPair || removedPair);
     message = "Mốc đặc biệt 10: +100 Xu, mở khóa băng và kích hoạt phần thưởng.";
   }
-  if (message) {
-    const reward = message.replace(/^Mốc đặc biệt \d+: /, "");
-    linkGameState.specialMilestoneRewards[progress] = reward;
-    showGameplayRewardPopup({ title: `Mốc đặc biệt ${progress}`, icon: "star", label: reward, sound: false });
-  }
+  if (message) linkGameState.specialMilestoneRewards[progress] = message.replace(/^Mốc đặc biệt \d+: /, "");
   return boardChanged;
 }
 
-function applyMilestoneSevenReward() {
+function applyMilestoneSevenReward(anchor) {
   const choices = isLinkEndlessMode(linkGameState.mode)
     ? ["hint", "reshuffle"]
     : ["time", "hint", "reshuffle"];
   const reward = choices[Math.floor(Math.random() * choices.length)];
   if (reward === "time") {
-    linkGameState.remainingTime += randomInteger(3, 10);
+    const value = randomInteger(3, 10);
+    linkGameState.remainingTime += value;
+    showGameplayRewardEffect(anchor, { type: "time", value });
     return "Mốc đặc biệt 7: nhận thêm thời gian.";
   }
   if (reward === "hint") {
     grantLinkItem("hint");
+    showGameplayRewardEffect(anchor, { type: "hint", value: 1 });
     return "Mốc đặc biệt 7: nhận một lượt gợi ý.";
   }
   grantLinkItem("reshuffle");
+  showGameplayRewardEffect(anchor, { type: "reshuffle", value: 1 });
   return "Mốc đặc biệt 7: nhận một lượt xáo trộn.";
 }
 
