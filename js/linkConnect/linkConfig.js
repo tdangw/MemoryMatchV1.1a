@@ -30,21 +30,38 @@ export const LINK_CONNECT_CONFIG = Object.freeze({
   special: Object.freeze({
     scoreMultiplier: 1.5,
     progressTarget: 10,
-    coinReward: Object.freeze({ min: 10, max: 50 }),
-    timeReward: Object.freeze({ min: 3, max: 10 }),
-    milestoneTenCoins: 100,
-    frozenTilesFromLevel: 3,
-    frozenPairsPerLevel: 1,
+    pairGeneration: Object.freeze([
+      Object.freeze({ maxPairs: 8, chance: 0.6, min: 1, max: 1 }),
+      Object.freeze({ maxPairs: 15, chance: 0.7, min: 1, max: 2 }),
+      Object.freeze({ maxPairs: Infinity, chance: 0.8, min: 2, max: 3 }),
+    ]),
+    frozenPairGeneration: Object.freeze([
+      Object.freeze({ maxPairs: 8, count: 1 }),
+      Object.freeze({ maxPairs: 15, count: 2 }),
+      Object.freeze({ maxPairs: 24, count: 3 }),
+      Object.freeze({ maxPairs: Infinity, count: 4 }),
+    ]),
+    frozenFallbackReward: Object.freeze({
+      coin: Object.freeze({ min: 5, max: 15 }),
+      time: Object.freeze({ min: 2, max: 5 }),
+    }),
+    energyDrop: Object.freeze({ chance: 0.2, guaranteeAfterMisses: 9 }),
+    milestones: Object.freeze({
+      pairBreakCoinFallbackBelowPairs: 3,
+      breakCoins: 10,
+      seven: Object.freeze({ time: Object.freeze({ min: 2, max: 5 }), coins: 10 }),
+      ten: Object.freeze({ coins: 10 }),
+    }),
   }),
 });
 
 export const LINK_SPECIAL_MILESTONE_TOOLTIPS = Object.freeze({
-  1: "Phá hủy 1 cặp thẻ.",
-  3: "Mở khóa 1 cặp đóng băng; nếu không có sẽ phá hủy 1 cặp.",
-  5: "Tạo 1 cặp thẻ đặc biệt.",
-  7: "Nhận ngẫu nhiên thêm thời gian, 1 Gợi ý hoặc 1 Xáo trộn.",
-  9: "Mở khóa 1 cặp đóng băng; nếu không có sẽ phá hủy 1 cặp.",
-  10: "Nhận 100 Xu, mở khóa băng, tạo cặp đặc biệt và phá hủy 1 cặp.",
+  1: "Phá hủy ngẫu nhiên 1 cặp thường.",
+  3: "Phá hủy ngẫu nhiên 1 cặp thường.",
+  5: "Nhận ngẫu nhiên 1 Gợi ý hoặc 1 Xáo trộn.",
+  7: "Nhận +2–5 giây và +10 Xu.",
+  9: "Phá 1 cặp thường và nhận 1 Gợi ý.",
+  10: "Phá 1 cặp thường, +10 Xu, +1 Xáo trộn, +1 Gợi ý.",
 });
 
 export function getLinkSpecialMilestoneTooltip(milestone) {
@@ -147,8 +164,8 @@ export function calculateLinkCoinReward(mode, remainingTime) {
   return reward.base + Math.floor(Math.max(0, remainingTime) * reward.speedMultiplier);
 }
 
-function randomInteger(minimum, maximum) {
-  return minimum + Math.floor(Math.random() * (maximum - minimum + 1));
+function randomInteger(minimum, maximum, random = Math.random) {
+  return minimum + Math.floor(random() * (maximum - minimum + 1));
 }
 
 export function calculateLinkMatchPoints(combo = 1, { special = false } = {}) {
@@ -158,9 +175,17 @@ export function calculateLinkMatchPoints(combo = 1, { special = false } = {}) {
   return Math.round(points * (special ? LINK_CONNECT_CONFIG.special.scoreMultiplier : 1));
 }
 
-export function getLinkFrozenPairCount(level = 1) {
-  const special = LINK_CONNECT_CONFIG.special;
-  return level >= special.frozenTilesFromLevel ? special.frozenPairsPerLevel : 0;
+export function getLinkSpecialPairCount(pairCount, random = Math.random) {
+  const rule = LINK_CONNECT_CONFIG.special.pairGeneration
+    .find((entry) => pairCount <= entry.maxPairs);
+  if (!rule || random() > rule.chance) return 0;
+  return randomInteger(rule.min, rule.max, random);
+}
+
+export function getLinkFrozenPairCount(pairCount) {
+  const rule = LINK_CONNECT_CONFIG.special.frozenPairGeneration
+    .find((entry) => pairCount <= entry.maxPairs);
+  return rule?.count || 0;
 }
 
 export function getLinkGravityShift(level = 1, random = Math.random) {

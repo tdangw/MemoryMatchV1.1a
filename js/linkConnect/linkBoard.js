@@ -1,6 +1,6 @@
 import { getThemeCards } from "../themeCatalog.js";
 import { shuffleArray } from "../utils.js";
-import { getLinkFrozenPairCount, getLinkLuckyReward, isLinkChallengeMode, LINK_CONNECT_CONFIG } from "./linkConfig.js";
+import { getLinkFrozenPairCount, getLinkLuckyReward, getLinkSpecialPairCount, isLinkChallengeMode, LINK_CONNECT_CONFIG } from "./linkConfig.js";
 import { hasAvailableConnection } from "./pathfinder.js";
 
 const MAX_SHUFFLE_ATTEMPTS = 100;
@@ -8,16 +8,16 @@ const MAX_SHUFFLE_ATTEMPTS = 100;
 export function createLinkBoard({
   layout,
   themeId = "default",
-  level = 1,
   mode = "easy",
   cardProvider = getThemeCards,
+  random = Math.random,
 }) {
   const pairCount = layout.tileCount / 2;
   const cards = cardProvider(themeId, pairCount);
   if (cards.length !== pairCount) {
     throw new Error("Chủ đề không có đủ ảnh cho bàn Link Connect.");
   }
-  const playableCards = assignLuckyPairs(ensureSpecialPair(cards), mode);
+  const playableCards = assignSpecialPairs(assignLuckyPairs(cards, mode), random);
   const tiles = playableCards.flatMap((card) => [
     createTile(card),
     createTile(card),
@@ -29,7 +29,7 @@ export function createLinkBoard({
   };
   board.grid = createPaddedGrid(board.rows, board.columns, tiles);
   shuffleIntoPlayableBoard(board);
-  freezeRandomPairs(board, level);
+  freezeRandomPairs(board);
   ensurePlayableBoard(board);
   return board;
 }
@@ -111,11 +111,12 @@ export function makeRandomLinkPairSpecial(board) {
   return pair;
 }
 
-export function removeRandomLinkPair(board, { excludeTileKeys = [] } = {}) {
+export function removeRandomLinkPair(board, { excludeTileKeys = [], eligiblePair } = {}) {
   const excludedKeys = new Set(excludeTileKeys);
   const pairs = getLinkPairs(board).filter((pair) => (
     pair.positions.length === 2
       && !pair.positions.some((position) => excludedKeys.has(getLinkBoardTile(board, position)?.instanceId))
+      && (!eligiblePair || eligiblePair(pair, board))
   ));
   const pair = pairs[Math.floor(Math.random() * pairs.length)];
   if (!pair) return null;
@@ -168,16 +169,21 @@ function randomInteger(minimum, maximum) {
   return minimum + Math.floor(Math.random() * (maximum - minimum + 1));
 }
 
-function ensureSpecialPair(cards) {
-  if (cards.some((card) => card.special === true)) return cards;
-  return cards.map((card, index) => index === 0 ? { ...card, special: true } : card);
+function assignSpecialPairs(cards, random) {
+  const count = Math.min(cards.length, getLinkSpecialPairCount(cards.length, random));
+  if (!count) return cards.map((card) => ({ ...card, special: false }));
+  const indices = shuffleArray(Array.from({ length: cards.length }, (_, index) => index)).slice(0, count);
+  return cards.map((card, index) => ({ ...card, special: indices.includes(index) }));
 }
 
-function freezeRandomPairs(board, level) {
-  const count = getLinkFrozenPairCount(level);
+function freezeRandomPairs(board) {
+  const count = getLinkFrozenPairCount(getLinkPairs(board).length);
   const pairs = getLinkPairs(board).filter((pair) => (
     pair.positions.length === 2
-      && pair.positions.every((position) => !getLinkBoardTile(board, position)?.special)
+      && pair.positions.every((position) => {
+        const tile = getLinkBoardTile(board, position);
+        return !tile?.special && !tile?.luckyReward;
+      })
   ));
   shuffleArray(pairs);
   pairs.slice(0, count).forEach((pair) => {
