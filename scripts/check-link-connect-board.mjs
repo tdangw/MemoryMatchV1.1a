@@ -11,6 +11,17 @@ import {
   unlockFrozenLinkPairs,
 } from "../js/linkConnect/linkBoard.js";
 import { hasAvailableConnection } from "../js/linkConnect/pathfinder.js";
+import { getLinkFrozenPairCount, getLinkSpecialPairCount } from "../js/linkConnect/linkConfig.js";
+
+assert.equal(getLinkSpecialPairCount(8, () => 0), 1);
+assert.equal(getLinkSpecialPairCount(8, () => 0.99), 0);
+assert.equal(getLinkSpecialPairCount(12, () => 0), 1);
+assert.equal(getLinkSpecialPairCount(16, () => 0), 2);
+assert.equal(getLinkSpecialPairCount(16, () => 0.99), 0);
+assert.deepEqual(
+  [8, 9, 16, 25].map((pairCount) => getLinkFrozenPairCount(pairCount)),
+  [1, 2, 3, 4],
+);
 
 const cards = Array.from({ length: 6 }, (_, index) => ({
   id: `card-${index}`,
@@ -55,8 +66,8 @@ assert.deepEqual(emptyPositionsAfterShuffle, emptyPositionsBeforeShuffle);
 
 const specialBoard = createLinkBoard({
   layout: { tileCount: 12, columns: 4 },
-  level: 3,
   cardProvider: () => cards,
+  random: () => 0,
 });
 assert.equal(getRemainingLinkTiles(specialBoard).filter((tile) => tile.special).length, 2);
 const frozenTiles = getRemainingLinkTiles(specialBoard).filter((tile) => tile.frozen);

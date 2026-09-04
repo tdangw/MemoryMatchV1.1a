@@ -263,8 +263,6 @@
   inset: 0;
   border-radius: inherit;
   background:
-    radial-gradient(ellipse 6% 10% at 24% 22%, rgb(242 255 255 / 70%) 0 40%, transparent 70%),
-    radial-gradient(ellipse 5% 8% at 70% 56%, rgb(180 243 255 / 52%) 0 42%, transparent 72%),
     linear-gradient(145deg, rgb(203 249 255 / 60%), rgb(85 196 240 / 42%));
   box-shadow: inset 0 0 16px rgb(115 227 255 / 74%);
   animation: link-frost-wipe-veil var(--link-frozen-unlock-duration) linear both;
@@ -306,11 +304,7 @@
 
 .link-tile.is-frozen::after {
   inset: 0;
-  background:
-    radial-gradient(ellipse 3% 5% at 22% 22%, rgb(244 255 255 / 88%) 0 42%, rgb(112 216 255 / 48%) 43% 68%, transparent 70%),
-    radial-gradient(ellipse 2.5% 4% at 32% 32%, rgb(244 255 255 / 82%) 0 42%, rgb(112 216 255 / 42%) 43% 68%, transparent 70%),
-    radial-gradient(ellipse 2% 3.5% at 20% 39%, rgb(244 255 255 / 80%) 0 42%, rgb(112 216 255 / 40%) 43% 68%, transparent 70%);
-  filter: drop-shadow(0 0 3px rgb(91 220 255 / 65%));
+  background: linear-gradient(145deg, rgb(220 250 255 / 18%), rgb(77 180 227 / 9%));
 }
 
 .link-tile.is-removing {
