@@ -80,20 +80,25 @@ export function shuffleLinkBoard(board) {
   shuffleIntoPlayableBoard(board);
 }
 
-export function unlockFrozenLinkPairs(board, count = 1) {
+export function unlockFrozenLinkPairs(board, count = 1, { onUnlock } = {}) {
   const frozenPairs = getLinkPairs(board).filter((pair) => (
     pair.positions.length === 2
       && pair.positions.every((position) => getLinkBoardTile(board, position)?.frozen)
   ));
   shuffleArray(frozenPairs);
-  frozenPairs.slice(0, Math.max(0, count)).forEach((pair) => {
+  const pairsToUnlock = frozenPairs.slice(0, Math.max(0, count));
+  pairsToUnlock.forEach((pair) => {
+    const tileKeys = pair.positions
+      .map((position) => getLinkBoardTile(board, position)?.instanceId)
+      .filter(Boolean);
     pair.positions.forEach((position) => replaceTile(board, position, { frozen: false }));
+    onUnlock?.({ positions: pair.positions, tileKeys });
   });
-  return Math.min(frozenPairs.length, Math.max(0, count));
+  return pairsToUnlock.length;
 }
 
-export function unlockAllFrozenLinkPairs(board) {
-  return unlockFrozenLinkPairs(board, Number.POSITIVE_INFINITY);
+export function unlockAllFrozenLinkPairs(board, options) {
+  return unlockFrozenLinkPairs(board, Number.POSITIVE_INFINITY, options);
 }
 
 export function makeRandomLinkPairSpecial(board) {

@@ -12,6 +12,7 @@ export function createLinkGameState() {
     specialProgress: 0,
     specialMilestoneRewards: {},
     pendingSpecialPairKeys: [],
+    pendingFrozenTileKeys: [],
     freezeSeconds: 0,
     luckyAwards: [],
     matchedPairs: 0,
@@ -43,6 +44,7 @@ export function beginLinkRound({
   linkGameState.combo = 0;
   linkGameState.specialMilestoneRewards = {};
   linkGameState.pendingSpecialPairKeys = [];
+  linkGameState.pendingFrozenTileKeys = [];
   linkGameState.matchedPairs = 0;
   linkGameState.totalPairs = layout.tileCount / 2;
   linkGameState.remainingTime = layout.timeSeconds;

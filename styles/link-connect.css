@@ -244,6 +244,37 @@
   pointer-events: none;
 }
 
+.link-tile__frost-break {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    linear-gradient(24deg, transparent 42%, rgb(237 255 255 / 94%) 46% 48%, transparent 52%),
+    linear-gradient(127deg, transparent 44%, rgb(123 233 255 / 90%) 48% 50%, transparent 54%),
+    linear-gradient(72deg, transparent 45%, rgb(240 255 255 / 88%) 49% 51%, transparent 55%),
+    radial-gradient(circle at 50% 50%, rgb(232 255 255 / 62%), transparent 44%);
+  box-shadow: inset 0 0 18px rgb(115 227 255 / 74%), 0 0 15px rgb(112 224 255 / 78%);
+  pointer-events: none;
+  will-change: opacity, transform;
+  animation: link-frost-break var(--link-frozen-unlock-duration) cubic-bezier(.15,.74,.24,1) both;
+}
+
+.link-tile__frost-break::before,
+.link-tile__frost-break::after {
+  content: "";
+  position: absolute;
+  top: 43%;
+  width: 27%;
+  aspect-ratio: 1;
+  border: 1px solid rgb(216 253 255 / 90%);
+  background: rgb(101 215 255 / 34%);
+  box-shadow: 0 0 9px rgb(134 238 255 / 72%);
+}
+
+.link-tile__frost-break::before { left: 29%; transform: rotate(28deg); }
+.link-tile__frost-break::after { right: 22%; transform: rotate(-35deg); }
+
 /* Tín hiệu khóa nổi rõ trên nền băng mờ nhưng không che mất hình của thẻ. */
 .link-tile.is-frozen::before,
 .link-tile.is-frozen::after {
@@ -435,6 +466,13 @@
   100% { opacity: 0; transform: scale(1.42) rotate(12deg); }
 }
 
+@keyframes link-frost-break {
+  0% { opacity: 0; transform: scale(.92); }
+  22% { opacity: 1; transform: scale(1); }
+  48% { opacity: .94; transform: scale(1.04); }
+  100% { opacity: 0; transform: scale(1.18); }
+}
+
 @keyframes link-hint-pulse {
   from { opacity: .58; transform: scale(.985); }
   to { opacity: 1; transform: scale(1); }
@@ -498,6 +536,7 @@
   .link-tile.is-wrong,
   .link-tile.is-becoming-special,
   .link-tile__special-burst,
+  .link-tile__frost-break,
   .link-path-overlay__firework-burst,
   .tile-combo-effect {
     animation: none;

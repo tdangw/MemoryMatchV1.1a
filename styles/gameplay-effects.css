@@ -46,6 +46,21 @@
   will-change: transform, opacity;
 }
 
+.tile-score-effect--coins {
+  color: #fff2a9;
+  border-color: rgb(255 218 102 / 88%);
+  background: rgb(73 45 4 / 92%);
+  box-shadow: 0 4px 15px rgb(0 0 0 / 58%), 0 0 10px rgb(255 190 52 / 42%);
+}
+
+.tile-score-effect--time {
+  color: #baf7ff;
+  border-color: rgb(104 227 255 / 90%);
+  background: rgb(5 53 81 / 92%);
+  text-shadow: 0 2px 4px rgb(0 25 44 / 94%);
+  box-shadow: 0 4px 15px rgb(0 0 0 / 58%), 0 0 10px rgb(67 214 255 / 46%);
+}
+
 .tile-combo-effect {
   color: var(--combo-text-color, #e4f7ff);
   font:

@@ -608,11 +608,21 @@ export function showReturnToMenuOverlay({ onConfirm } = {}) {
 }
 export function showScoreEffect(tileElement, points) {
   if (!tileElement || points <= 0) return;
+  showGameplayFloatEffect(tileElement, `+${points}`, "tile-score-effect");
+}
 
+export function showGameplayRewardEffect(tileElement, { type, value } = {}) {
+  if (!tileElement || !Number.isFinite(value) || value <= 0) return;
+  const presentation = type === "coins" ? `+${value} Xu` : `+${value}s`;
+  const tone = type === "coins" ? "coins" : "time";
+  showGameplayFloatEffect(tileElement, presentation, `tile-score-effect tile-score-effect--${tone}`);
+}
+
+function showGameplayFloatEffect(tileElement, text, className) {
   const rect = tileElement.getBoundingClientRect();
   const effect = document.createElement("div");
-  effect.className = "tile-score-effect";
-  effect.textContent = `+${points}`;
+  effect.className = className;
+  effect.textContent = text;
   effect.setAttribute("aria-hidden", "true");
   effect.style.left = `${rect.left + rect.width / 2}px`;
   effect.style.top = `${rect.top + rect.height / 2}px`;

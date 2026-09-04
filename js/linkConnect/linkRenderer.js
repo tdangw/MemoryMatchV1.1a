@@ -251,6 +251,19 @@ export function playLinkSpecialPairTransform(tileKeys) {
   });
 }
 
+export function playLinkFrozenPairUnlock(tileKeys) {
+  if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+  tileKeys.forEach((tileKey) => {
+    const tile = tileElementsByKey.get(tileKey);
+    if (!tile?.isConnected) return;
+    const burst = document.createElement("span");
+    burst.className = "link-tile__frost-break";
+    burst.setAttribute("aria-hidden", "true");
+    tile.append(burst);
+    burst.addEventListener("animationend", () => burst.remove(), { once: true });
+  });
+}
+
 export function playLinkMismatch(start, end) {
   return [start, end].flatMap((position) => {
     const tile = getLinkTileButton(position);
