@@ -22,6 +22,7 @@ import {
   getLinkLevelHintBonus,
   getLinkLevelTimeBonus,
   getLinkGravityShift,
+  getLinkSpecialMilestoneTooltip,
   getLinkThunderResolveDelay,
   getLinkModeLayout,
   getLinkTimerDirection,
@@ -801,6 +802,7 @@ function updateLinkHud() {
   setHudText(hud.misses, linkGameState.misses);
   setHudText(hud.combo, linkGameState.combo);
   setHudText(hud.score, linkGameState.score);
+  if (hud.scoreCard) hud.scoreCard.dataset.tooltip = `Tổng điểm màn này: ${linkGameState.score}`;
   setHudText(hud.matchedPairs, linkGameState.matchedPairs);
   setHudText(hud.totalPairs, linkGameState.totalPairs);
   setHudText(hud.hint, getLinkItemCount("hint"));
@@ -846,6 +848,10 @@ function updateLinkSpecialMilestones(hud = getLinkHudElements()) {
   let nextMarked = false;
   milestones.forEach((marker) => {
     const milestone = Number(marker.dataset.linkSpecialMilestone);
+    const reward = linkGameState.specialMilestoneRewards[milestone]
+      || getLinkSpecialMilestoneTooltip(milestone);
+    marker.dataset.tooltip = `Mốc ${milestone}: ${reward}`;
+    marker.setAttribute("aria-label", marker.dataset.tooltip);
     const earned = milestone <= progress;
     marker.classList.toggle("is-earned", earned);
     const isNext = !earned && !nextMarked;
@@ -916,7 +922,11 @@ function applySpecialMilestone(progress) {
     boardChanged = Boolean(unlocked || specialPair || removedPair);
     message = "Mốc đặc biệt 10: +100 Xu, mở khóa băng và kích hoạt phần thưởng.";
   }
-  if (message) showGameplayRewardPopup({ title: `Mốc đặc biệt ${progress}`, icon: "star", label: message.replace(/^Mốc đặc biệt \d+: /, ""), sound: false });
+  if (message) {
+    const reward = message.replace(/^Mốc đặc biệt \d+: /, "");
+    linkGameState.specialMilestoneRewards[progress] = reward;
+    showGameplayRewardPopup({ title: `Mốc đặc biệt ${progress}`, icon: "star", label: reward, sound: false });
+  }
   return boardChanged;
 }
 
@@ -972,6 +982,7 @@ function getLinkHudElements() {
     misses: find("#link-misses"),
     combo: find("#link-combo"),
     score: find("#link-score"),
+    scoreCard: find(".stat-points"),
     matchedPairs: find("#link-matched-pairs"),
     totalPairs: find("#link-total-pairs"),
     hint: find("#link-hint"),

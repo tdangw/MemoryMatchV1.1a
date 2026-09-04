@@ -38,6 +38,19 @@ export const LINK_CONNECT_CONFIG = Object.freeze({
   }),
 });
 
+export const LINK_SPECIAL_MILESTONE_TOOLTIPS = Object.freeze({
+  1: "Phá hủy 1 cặp thẻ.",
+  3: "Mở khóa 1 cặp đóng băng; nếu không có sẽ phá hủy 1 cặp.",
+  5: "Tạo 1 cặp thẻ đặc biệt.",
+  7: "Nhận ngẫu nhiên thêm thời gian, 1 Gợi ý hoặc 1 Xáo trộn.",
+  9: "Mở khóa 1 cặp đóng băng; nếu không có sẽ phá hủy 1 cặp.",
+  10: "Nhận 100 Xu, mở khóa băng, tạo cặp đặc biệt và phá hủy 1 cặp.",
+});
+
+export function getLinkSpecialMilestoneTooltip(milestone) {
+  return LINK_SPECIAL_MILESTONE_TOOLTIPS[milestone] || "Phần thưởng mốc đặc biệt.";
+}
+
 // Một nguồn thời lượng duy nhất cho hiệu ứng và nhịp chuyển trạng thái của Link Connect.
 export const LINK_CONNECT_TIMING = Object.freeze({
   pathAnimationMs: 760,

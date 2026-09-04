@@ -5,6 +5,7 @@ const TOOLTIP_GAP = 10;
 
 const INFO_ONLY_SELECTOR = [
   ".stat-star-progress",
+  ".stat-points",
   ".link-special-hud__milestones span",
   ".link-tile.is-frozen",
 ].join(", ");
@@ -18,6 +19,7 @@ let suppressClickFor;
 
 function getTooltipText(element) {
   if (!element) return "";
+  if (element.dataset.tooltip) return element.dataset.tooltip;
   if (element.matches("#btn-buy-time")) return "Mua thêm thời gian để không bị thua.";
   if (element.matches("#btn-preview-cards")) return "Xem nhanh các thẻ bạn đã vô tình quên.";
   if (element.matches("#btn-hint")) return "Lật 2 thẻ để bạn ghi nhớ.";
@@ -31,7 +33,7 @@ function getTooltipText(element) {
       freeze: "Dừng thời gian trong chốc lát.",
     }[element.dataset.item] || "Dùng vật phẩm khi cần trợ giúp.";
   }
-  if (element.matches(".link-special-hud__milestones span")) return "Ghép thẻ đặc biệt để nhận thưởng.";
+  if (element.matches(".link-special-hud__milestones span")) return "Phần thưởng mốc đặc biệt.";
   if (element.matches(".link-tile.is-frozen")) return "Thẻ đang bị khóa.";
   if (element.matches("#toggle-meteor-effects")) return "Bật hoặc tắt hiệu ứng nền.";
   if (element.matches("#toggle-board-coordinates")) return "Hiện hàng và cột trên bàn cờ.";
@@ -75,7 +77,7 @@ function getDisabledButtonTooltip(element) {
 
 function getAnchor(target) {
   const candidate = target instanceof Element
-    ? target.closest("#btn-buy-time, #btn-preview-cards, #btn-hint, .stat-star-progress, #link-tools-toggle, .link-connect-game__item, .link-special-hud__milestones span, .link-tile.is-frozen, #toggle-meteor-effects, #toggle-board-coordinates, #version-info, .app-modal__close, .shop-tab, .appearance-choice, .theme-choice, .shop-buy-button:disabled")
+    ? target.closest("#btn-buy-time, #btn-preview-cards, #btn-hint, .stat-star-progress, .stat-points, #link-tools-toggle, .link-connect-game__item, .link-special-hud__milestones span, .link-tile.is-frozen, #toggle-meteor-effects, #toggle-board-coordinates, #version-info, .app-modal__close, .shop-tab, .appearance-choice, .theme-choice, .shop-buy-button:disabled")
     : null;
   return candidate && getTooltipText(candidate) ? candidate : null;
 }
