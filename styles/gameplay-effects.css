@@ -47,13 +47,16 @@
 }
 
 .tile-combo-effect {
-  color: #e4f7ff;
+  color: var(--combo-text-color, #e4f7ff);
   font:
     800 clamp(1rem, 4vw, 1.16rem)/1.1 "Trebuchet MS",
     "Segoe UI",
     sans-serif;
   letter-spacing: 0.025em;
-  text-shadow: 0 1px 2px rgb(0 24 55 / 92%);
+  border-color: var(--combo-border-color, rgb(255 255 255 / 58%));
+  background: var(--combo-background, rgb(4 20 45 / 88%));
+  box-shadow: 0 4px 14px rgb(0 0 0 / 52%), 0 0 12px var(--combo-glow, transparent);
+  text-shadow: 0 2px 8px var(--combo-shadow, rgb(0 24 55 / 92%));
   animation: combo-float var(--gameplay-feedback-duration, 1900ms) cubic-bezier(0.2, 0.75, 0.3, 1) forwards;
 }
 
@@ -72,26 +75,86 @@
 }
 
 .tile-combo-effect--nice {
-  border-color: rgb(135 226 255 / 92%);
-  text-shadow: 0 2px 8px rgb(68 135 194 / 36%);
+  --combo-border-color: rgb(135 226 255 / 92%);
+  --combo-shadow: rgb(68 135 194 / 56%);
+  --combo-glow: rgb(91 207 255 / 34%);
+}
+.tile-combo-effect--good {
+  --combo-text-color: #aaf6df;
+  --combo-border-color: rgb(126 242 205 / 94%);
+  --combo-background: rgb(8 67 61 / 92%);
+  --combo-shadow: rgb(32 178 139 / 62%);
+  --combo-glow: rgb(76 235 190 / 38%);
 }
 .tile-combo-effect--great {
-  color: #ffdc78;
-  border-color: rgb(255 220 120 / 92%);
-  background: rgb(73 51 8 / 92%);
-  text-shadow: 0 2px 9px rgb(194 127 12 / 44%);
+  --combo-text-color: #ffdc78;
+  --combo-border-color: rgb(255 220 120 / 92%);
+  --combo-background: rgb(73 51 8 / 92%);
+  --combo-shadow: rgb(194 127 12 / 64%);
+  --combo-glow: rgb(255 202 74 / 38%);
 }
 .tile-combo-effect--excellent {
-  color: #ffbf8b;
-  border-color: rgb(255 174 116 / 92%);
-  background: rgb(80 34 10 / 92%);
-  text-shadow: 0 2px 10px rgb(204 90 30 / 46%);
+  --combo-text-color: #ffbf8b;
+  --combo-border-color: rgb(255 174 116 / 92%);
+  --combo-background: rgb(80 34 10 / 92%);
+  --combo-shadow: rgb(204 90 30 / 66%);
+  --combo-glow: rgb(255 132 63 / 42%);
 }
 .tile-combo-effect--perfect {
-  color: #ffaaa2;
-  border-color: rgb(255 158 151 / 92%);
-  background: rgb(79 21 25 / 92%);
-  text-shadow: 0 2px 11px rgb(184 55 47 / 50%);
+  --combo-text-color: #ffaaa2;
+  --combo-border-color: rgb(255 158 151 / 92%);
+  --combo-background: rgb(79 21 25 / 92%);
+  --combo-shadow: rgb(184 55 47 / 70%);
+  --combo-glow: rgb(255 98 91 / 46%);
+}
+.tile-combo-effect--peak {
+  --combo-text-color: #edb7ff;
+  --combo-border-color: rgb(223 149 255 / 94%);
+  --combo-background: rgb(62 21 92 / 93%);
+  --combo-shadow: rgb(188 89 239 / 72%);
+  --combo-glow: rgb(207 102 255 / 48%);
+}
+.tile-combo-effect--unbelievable {
+  --combo-text-color: #a7e5ff;
+  --combo-border-color: rgb(123 213 255 / 96%);
+  --combo-background: rgb(13 48 105 / 94%);
+  --combo-shadow: rgb(55 157 240 / 74%);
+  --combo-glow: rgb(91 194 255 / 52%);
+}
+.tile-combo-effect--supreme {
+  --combo-text-color: #fff0a8;
+  --combo-border-color: rgb(255 220 101 / 96%);
+  --combo-background: rgb(92 55 8 / 94%);
+  --combo-shadow: rgb(244 167 26 / 78%);
+  --combo-glow: rgb(255 205 67 / 56%);
+}
+.tile-combo-effect--legendary {
+  --combo-text-color: #ffe1ac;
+  --combo-border-color: rgb(255 173 76 / 98%);
+  --combo-background: rgb(102 37 8 / 95%);
+  --combo-shadow: rgb(255 106 31 / 80%);
+  --combo-glow: rgb(255 128 44 / 58%);
+}
+.tile-combo-effect--mythic {
+  --combo-text-color: #ffd0fb;
+  --combo-border-color: rgb(244 117 255 / 98%);
+  --combo-background: rgb(79 16 98 / 95%);
+  --combo-shadow: rgb(218 66 255 / 82%);
+  --combo-glow: rgb(229 80 255 / 60%);
+}
+.tile-combo-effect--godlike {
+  --combo-text-color: #c5fff0;
+  --combo-border-color: rgb(93 255 209 / 98%);
+  --combo-background: rgb(7 77 74 / 95%);
+  --combo-shadow: rgb(35 231 178 / 84%);
+  --combo-glow: rgb(62 255 198 / 62%);
+}
+.tile-combo-effect--ultimate {
+  --combo-text-color: #fff4c4;
+  --combo-border-color: rgb(255 244 165 / 99%);
+  --combo-background: linear-gradient(110deg, rgb(111 28 9 / 96%), rgb(135 82 5 / 96%), rgb(84 20 88 / 96%));
+  --combo-shadow: rgb(255 184 47 / 88%);
+  --combo-glow: rgb(255 201 63 / 68%);
 }
 
 @keyframes combo-float {

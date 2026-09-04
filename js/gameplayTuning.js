@@ -18,9 +18,17 @@ export const GAMEPLAY_TIMING = Object.freeze({
 });
 
 const COMBO_TIERS = Object.freeze([
+  { minimum: 26, id: "ultimate", label: "ULTIMATE!" },
+  { minimum: 22, id: "godlike", label: "GODLIKE!" },
+  { minimum: 18, id: "mythic", label: "MYTHIC!" },
+  { minimum: 15, id: "legendary", label: "LEGENDARY!" },
+  { minimum: 12, id: "supreme", label: "Supreme!" },
+  { minimum: 10, id: "unbelievable", label: "Unbelievable!" },
+  { minimum: 8, id: "peak", label: "Peak!" },
   { minimum: 6, id: "perfect", label: "Perfect!" },
-  { minimum: 4, id: "excellent", label: "Excellent!" },
-  { minimum: 3, id: "great", label: "Great!" },
+  { minimum: 5, id: "excellent", label: "Excellent!" },
+  { minimum: 4, id: "great", label: "Great!" },
+  { minimum: 3, id: "good", label: "Good!" },
   { minimum: 2, id: "nice", label: "Nice!" },
 ]);
 
