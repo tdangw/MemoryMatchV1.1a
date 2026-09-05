@@ -284,7 +284,7 @@ function showLinkGame() {
       <section class="link-special-hud" aria-label="Tiến trình năng lượng đặc biệt">
         <span id="link-special-energy" class="link-special-hud__energy" aria-label="Năng lượng đặc biệt"><span data-link-icon="energy"></span></span>
         <div class="link-special-hud__milestones" aria-label="Các mốc kích hoạt đặc biệt">
-          <span data-link-special-milestone="1">1</span><span data-link-special-milestone="3">3</span><span data-link-special-milestone="5">5</span><span data-link-special-milestone="7">7</span><span data-link-special-milestone="9">9</span><span data-link-special-milestone="10">10</span>
+          <span data-link-special-milestone="1" style="--link-milestone-position: 0%">1</span><span data-link-special-milestone="3" style="--link-milestone-position: 22.22%">3</span><span data-link-special-milestone="5" style="--link-milestone-position: 44.44%">5</span><span data-link-special-milestone="7" style="--link-milestone-position: 66.67%">7</span><span data-link-special-milestone="9" style="--link-milestone-position: 88.89%">9</span><span data-link-special-milestone="10" style="--link-milestone-position: 100%">10</span>
         </div>
       </section>
       <div id="link-board-frame" class="link-board-frame">
@@ -864,6 +864,16 @@ function updateLinkSpecialMilestones(hud = getLinkHudElements()) {
     // Điểm đầu thanh là mốc 1: vừa đạt 1 chỉ sáng marker, không tô sang mốc 2.
     String(Math.max(0, Math.min(1, (progress - 1) / Math.max(1, target - 1)))),
   );
+  const currentMilestone = [...milestones]
+    .map((marker) => Number(marker.dataset.linkSpecialMilestone))
+    .filter((milestone) => milestone <= progress)
+    .at(-1) || 0;
+  if (track) {
+    track.dataset.tooltip = progress
+      ? `Năng lượng: ${progress}/${target}. Mốc hiện tại: ${currentMilestone}.`
+      : `Năng lượng: 0/${target}. Chưa đạt mốc thưởng.`;
+    track.setAttribute("aria-label", track.dataset.tooltip);
+  }
   let nextMarked = false;
   milestones.forEach((marker) => {
     const milestone = Number(marker.dataset.linkSpecialMilestone);
@@ -1015,17 +1025,22 @@ function playAutomaticPairBreak(roundId, board, onComplete) {
   setLinkTileSelected(end, true);
   setTimeout(() => {
     if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
-    playLinkMatchExit(start, end);
+    const strike = playLinkThunderStrike([start, end], "yellow");
     setTimeout(() => {
       if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
+      playLinkMatchExit(start, end);
+    }, LINK_CONNECT_TIMING.thunderCardExitDelayMs);
+    setTimeout(() => {
+      if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
+      strike?.remove();
       removeLinkBoardPair(board, start, end);
       clearLinkMatchedPair(start, end);
       linkGameState.matchedPairs += 1;
       const shifted = applyLinkGravityShift(board, linkGameState.gravityShift);
       if (shifted) renderLinkBoardShift(board, { onTileClick: handleLinkTileClick });
       onComplete();
-    }, getLinkMatchResolveDelay());
-  }, 130);
+    }, getLinkThunderResolveDelay());
+  }, LINK_CONNECT_TIMING.automaticPairMarkMs);
 }
 
 function rememberSpecialPairForTransform(pair) {
@@ -1068,6 +1083,8 @@ function applyLinkTimingStyles(container) {
   container.style.setProperty("--link-thunder-strike-duration", `${LINK_CONNECT_TIMING.thunderStrikeMs}ms`);
   container.style.setProperty("--link-special-transform-duration", `${LINK_CONNECT_TIMING.specialPairTransformMs}ms`);
   container.style.setProperty("--link-frozen-unlock-duration", `${LINK_CONNECT_TIMING.frozenPairUnlockMs}ms`);
+  container.style.setProperty("--link-energy-burst-duration", `${LINK_CONNECT_TIMING.energyBurstMs}ms`);
+  container.style.setProperty("--link-energy-flight-duration", `${LINK_CONNECT_TIMING.energyFlightMs}ms`);
 }
 
 function getLinkHudElements() {

@@ -839,23 +839,26 @@
   box-shadow: 0 0 14px rgb(255 215 86 / 80%);
   pointer-events: none;
   will-change: transform, opacity;
-  animation: link-energy-fly 680ms cubic-bezier(.2,.78,.25,1) both;
+  animation: link-energy-fly calc(var(--link-energy-burst-duration, 300ms) + var(--link-energy-flight-duration, 1250ms)) cubic-bezier(.2,.78,.25,1) both;
 }
 
 .link-energy-flight .ui-icon { width: 17px; height: 17px; stroke-width: 2.6; }
 
 @keyframes link-energy-fly {
   0% { opacity: 0; transform: translate(0, 0) scale(.55); }
-  16% { opacity: 1; transform: translate(0, -18px) scale(1.12); }
+  12% { opacity: 1; transform: translate(0, 0) scale(1.15); }
+  23% { opacity: 1; transform: translate(var(--link-energy-burst-x), var(--link-energy-burst-y)) scale(1.24); }
+  32% { opacity: 1; transform: translate(var(--link-energy-burst-x), var(--link-energy-burst-y)) scale(1); }
   100% { opacity: 0; transform: translate(var(--link-energy-flight-x), var(--link-energy-flight-y)) scale(.52); }
 }
 
-.link-special-hud__milestones { position: relative; display: flex; justify-content: space-between; align-items: center; width: 100%; }
+.link-special-hud__milestones { position: relative; display: block; flex: 1; min-width: 0; height: 19px; }
 .link-special-hud__milestones::before,
 .link-special-hud__milestones::after { content: ""; position: absolute; inset: 50% 7px auto; height: 2px; border-radius: 999px; transform: translateY(-50%); }
-.link-special-hud__milestones::before { background: rgb(185 213 255 / 26%); }
-.link-special-hud__milestones::after { right: 7px; background: linear-gradient(90deg, #36d9e7, #79f2ff); box-shadow: 0 0 6px rgb(80 231 255 / 72%); transform: translateY(-50%) scaleX(var(--link-special-progress, 0)); transform-origin: left center; transition: transform 260ms ease-out; }
-.link-special-hud__milestones span { position: relative; z-index: 1; display: grid; width: 15px; height: 15px; place-items: center; border: 1px solid rgb(185 213 255 / 38%); border-radius: 50%; background: #182942; color: #b9d5ff; font-size: 0.5rem; transition: background 160ms ease, border-color 160ms ease, color 160ms ease; }
+.link-special-hud__milestones::before { right: 0; left: 0; background: rgb(185 213 255 / 26%); }
+.link-special-hud__milestones::after { right: 0; left: 0; background: linear-gradient(90deg, #36d9e7, #79f2ff); box-shadow: 0 0 6px rgb(80 231 255 / 72%); transform: translateY(-50%) scaleX(var(--link-special-progress, 0)); transform-origin: left center; transition: transform 260ms ease-out; }
+.link-special-hud__milestones span { position: absolute; z-index: 1; top: 2px; left: var(--link-milestone-position); display: grid; width: 15px; height: 15px; place-items: center; border: 1px solid rgb(185 213 255 / 38%); border-radius: 50%; background: #182942; color: #b9d5ff; font-size: 0.5rem; transform: translateX(-50%); transition: background 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease; }
+.link-special-hud__milestones span.is-earned { transform: translateX(-50%) scale(1.08); }
 .link-special-hud__milestones span.is-earned { border-color: #ffd166; background: #a86f00; color: #fff8dd; }
 .link-special-hud__milestones span.is-next { border-color: #7ceeff; color: #7ceeff; box-shadow: 0 0 0 2px rgb(124 238 255 / 16%); }
 

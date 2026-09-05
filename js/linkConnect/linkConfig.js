@@ -83,6 +83,9 @@ export const LINK_CONNECT_TIMING = Object.freeze({
   countdownResumeDelayMs: 1000,
   specialPairTransformMs: 720,
   frozenPairUnlockMs: 3000,
+  energyBurstMs: 300,
+  energyFlightMs: 1250,
+  automaticPairMarkMs: 360,
 });
 
 export function getLinkMatchResolveDelay() {

@@ -316,6 +316,12 @@ export function playLinkEnergyFlight(start, end, { onArrive } = {}) {
   effect.style.top = `${startY}px`;
   effect.style.setProperty("--link-energy-flight-x", `${targetRect.left + targetRect.width / 2 - startX}px`);
   effect.style.setProperty("--link-energy-flight-y", `${targetRect.top + targetRect.height / 2 - startY}px`);
+  effect.style.setProperty("--link-energy-burst-x", `${Math.round((Math.random() - .5) * Math.min(140, sourceRect.width * 1.4))}px`);
+  effect.style.setProperty("--link-energy-burst-y", `${-Math.round(Math.max(72, sourceRect.height * .9))}px`);
+  const game = document.getElementById("link-connect-container");
+  const styles = game ? getComputedStyle(game) : null;
+  effect.style.setProperty("--link-energy-burst-duration", styles?.getPropertyValue("--link-energy-burst-duration").trim() || "300ms");
+  effect.style.setProperty("--link-energy-flight-duration", styles?.getPropertyValue("--link-energy-flight-duration").trim() || "1250ms");
   document.body.append(effect);
   let settled = false;
   const finish = () => {
@@ -325,7 +331,7 @@ export function playLinkEnergyFlight(start, end, { onArrive } = {}) {
     onArrive?.();
   };
   effect.addEventListener("animationend", finish, { once: true });
-  setTimeout(finish, 900);
+  setTimeout(finish, 1900);
   return effect;
 }
 
