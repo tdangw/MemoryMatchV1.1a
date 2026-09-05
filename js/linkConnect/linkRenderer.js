@@ -316,10 +316,16 @@ export function playLinkEnergyFlight(start, end, { onArrive } = {}) {
   const landingY = Math.max(20, sourceRect.height * (.34 + Math.random() * .16));
   const apexX = landingX * (.45 + Math.random() * .18);
   const apexY = -sourceRect.height * (.68 + Math.random() * .38);
+  const targetX = targetRect.left + targetRect.width / 2 - startX;
+  const targetY = targetRect.top + targetRect.height / 2 - startY;
+  const collectMidX = landingX + (targetX - landingX) * .48;
+  const collectMidY = Math.min(landingY, targetY) - Math.max(64, sourceRect.height * .8);
   effect.style.left = `${startX}px`;
   effect.style.top = `${startY}px`;
-  effect.style.setProperty("--link-energy-flight-x", `${targetRect.left + targetRect.width / 2 - startX}px`);
-  effect.style.setProperty("--link-energy-flight-y", `${targetRect.top + targetRect.height / 2 - startY}px`);
+  effect.style.setProperty("--link-energy-flight-x", `${Math.round(targetX)}px`);
+  effect.style.setProperty("--link-energy-flight-y", `${Math.round(targetY)}px`);
+  effect.style.setProperty("--link-energy-collect-mid-x", `${Math.round(collectMidX)}px`);
+  effect.style.setProperty("--link-energy-collect-mid-y", `${Math.round(collectMidY)}px`);
   effect.style.setProperty("--link-energy-apex-x", `${Math.round(apexX)}px`);
   effect.style.setProperty("--link-energy-apex-y", `${Math.round(apexY)}px`);
   effect.style.setProperty("--link-energy-land-x", `${Math.round(landingX)}px`);

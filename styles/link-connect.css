@@ -670,6 +670,30 @@
 .link-game-progress-hud .stat-misses,
 .link-game-progress-hud .stat-misses .stat-label { color: #ff9da8; }
 .link-game-progress-hud .stat-combo .stat-label { color: #ffd889; }
+.link-game-progress-hud .stat-combo {
+  position: relative;
+  overflow: hidden;
+}
+
+.link-game-progress-hud .stat-combo::after {
+  content: "";
+  position: absolute;
+  right: 3px;
+  bottom: 1px;
+  left: 3px;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #ffd166, #ff9666);
+  box-shadow: 0 0 5px rgb(255 188 91 / 72%);
+  opacity: 0;
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.link-game-progress-hud .stat-combo.is-combo-window-active::after {
+  opacity: 1;
+  animation: link-combo-window-drain var(--link-combo-window-duration, 5000ms) linear forwards;
+}
 .link-game-progress-hud .stat-points,
 .link-game-progress-hud .stat-points .stat-label,
 .link-game-progress-hud .stat-progress { color: #f2bf5b; }
@@ -834,10 +858,16 @@
   height: 28px;
   place-items: center;
   margin: -14px;
+  border: 2px solid #fff2a1;
   border-radius: 50%;
-  background: radial-gradient(circle, #fff9bc 0 26%, #ffd54a 27% 52%, rgb(255 190 41 / 15%) 53%);
-  color: #795300;
-  box-shadow: 0 0 14px rgb(255 215 86 / 80%);
+  background:
+    radial-gradient(circle at 42% 34%, rgb(255 255 255 / 36%) 0 12%, transparent 13%),
+    radial-gradient(circle, #214f72 0 48%, #09233d 49% 72%, #ffd44f 73% 100%);
+  color: #fff07a;
+  box-shadow:
+    0 3px 7px rgb(0 0 0 / 68%),
+    0 0 0 3px rgb(4 18 35 / 72%),
+    0 0 16px 4px rgb(255 213 65 / 88%);
   pointer-events: none;
   will-change: transform, opacity;
   animation:
@@ -845,7 +875,23 @@
     link-energy-fly-to-hud var(--link-energy-flight-duration, 1250ms) cubic-bezier(.2,.78,.25,1) calc(var(--link-energy-burst-duration, 680ms) + var(--link-energy-hold-duration, 1000ms)) forwards;
 }
 
-.link-energy-flight .ui-icon { width: 17px; height: 17px; stroke-width: 2.6; }
+.link-energy-flight::before {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  z-index: -1;
+  border: 2px solid rgb(255 225 103 / 54%);
+  border-radius: 50%;
+  opacity: .8;
+  animation: link-energy-loot-aura 720ms ease-in-out infinite alternate;
+}
+
+.link-energy-flight .ui-icon {
+  width: 17px;
+  height: 17px;
+  stroke-width: 3;
+  filter: drop-shadow(0 1px 1px #07182b) drop-shadow(0 0 4px #ffe56f);
+}
 
 @keyframes link-energy-drop {
   0% { opacity: 0; transform: translate(0, 0) scale(.45) rotate(-18deg); }
@@ -859,8 +905,19 @@
 
 @keyframes link-energy-fly-to-hud {
   0% { opacity: 1; transform: translate(var(--link-energy-land-x), var(--link-energy-land-y)) scale(1) rotate(8deg); }
-  14% { opacity: 1; transform: translate(var(--link-energy-land-x), calc(var(--link-energy-land-y) - 12px)) scale(1.12) rotate(0deg); }
+  14% { opacity: 1; transform: translate(var(--link-energy-land-x), calc(var(--link-energy-land-y) - 12px)) scale(1.16) rotate(0deg); }
+  55% { opacity: 1; transform: translate(var(--link-energy-collect-mid-x), var(--link-energy-collect-mid-y)) scale(.9) rotate(-8deg); }
   100% { opacity: 0; transform: translate(var(--link-energy-flight-x), var(--link-energy-flight-y)) scale(.52); }
+}
+
+@keyframes link-energy-loot-aura {
+  from { opacity: .35; transform: scale(.82); }
+  to { opacity: .9; transform: scale(1.08); }
+}
+
+@keyframes link-combo-window-drain {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
 }
 
 .link-special-hud__milestones { position: relative; display: block; flex: 1; min-width: 0; height: 19px; }

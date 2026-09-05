@@ -76,6 +76,7 @@ import {
 import { beginLinkRound, linkGameState, resetLinkGame } from "./linkState.js";
 
 let countdownInterval;
+let comboExpiryTimer;
 let selectedPosition = null;
 let linkTimeWarningPlayed = false;
 let linkHudElements = null;
@@ -446,6 +447,7 @@ function handleLinkTileClick(position) {
     linkGameState.misses += 1;
     linkGameState.combo = 0;
     linkGameState.lastMatchAt = 0;
+    stopLinkComboWindow();
     linkGameState.isLocked = true;
     const wrongTiles = playLinkMismatch(selectedPosition, position);
     updateLinkHud();
@@ -471,6 +473,7 @@ function handleLinkTileClick(position) {
   const isSpecialMatch = firstTile.special && tile.special;
   const roundId = linkGameState.roundId;
   const board = linkGameState.board;
+  startLinkComboWindow(comboWindowMs, matchedAt, roundId, board);
   const matchedStart = selectedPosition;
   const matchPoints = calculateLinkMatchPoints(linkGameState.combo, {
     special: isSpecialMatch,
@@ -1080,6 +1083,34 @@ function randomInteger(minimum, maximum) {
 function stopCountdown() {
   clearInterval(countdownInterval);
   countdownInterval = undefined;
+  stopLinkComboWindow();
+}
+
+function startLinkComboWindow(durationMs, matchedAt, roundId, board) {
+  clearTimeout(comboExpiryTimer);
+  const card = getLinkHudElements().comboCard;
+  if (card) {
+    card.style.setProperty("--link-combo-window-duration", `${durationMs}ms`);
+    card.classList.remove("is-combo-window-active");
+    // Khởi động lại vạch thời gian từ đầu cho mỗi cặp ghép đúng.
+    void card.offsetWidth;
+    card.classList.add("is-combo-window-active");
+  }
+  comboExpiryTimer = setTimeout(() => {
+    if (linkGameState.roundId !== roundId
+      || linkGameState.board !== board
+      || linkGameState.lastMatchAt !== matchedAt) return;
+    linkGameState.combo = 0;
+    linkGameState.lastMatchAt = 0;
+    setHudText(getLinkHudElements().combo, 0);
+    stopLinkComboWindow();
+  }, durationMs);
+}
+
+function stopLinkComboWindow() {
+  clearTimeout(comboExpiryTimer);
+  comboExpiryTimer = undefined;
+  getLinkHudElements().comboCard?.classList.remove("is-combo-window-active");
 }
 
 function applyLinkTimingStyles(container) {
