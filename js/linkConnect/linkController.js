@@ -192,6 +192,7 @@ export function startLinkLevel({ mode = linkGameState.mode, level = 1, resume = 
   else {
     linkGameState.remainingTime = modeLayout.timeSeconds + getLinkLevelTimeBonus(level);
   }
+  linkGameState.timeLimit = linkGameState.remainingTime;
   if (!resume) {
     const hintBonus = getLinkLevelHintBonus(level, getLinkItemCount("hint"));
     if (hintBonus > 0) grantLinkItem("hint", hintBonus);
@@ -846,6 +847,13 @@ function updateLinkHud() {
 
 function updateLinkTimerHud(hud = getLinkHudElements()) {
   setHudText(hud.timer, formatClockTime(linkGameState.remainingTime));
+  const countdown = !isLinkEndlessMode(linkGameState.mode) && linkGameState.timeLimit > 0;
+  const progress = countdown
+    ? Math.max(0, Math.min(1, linkGameState.remainingTime / linkGameState.timeLimit))
+    : 0;
+  hud.timerCard?.style.setProperty("--link-timer-progress", String(progress));
+  hud.timerCard?.classList.toggle("has-timer-progress", countdown);
+  hud.timerCard?.classList.toggle("is-timer-warning", countdown && linkGameState.remainingTime <= 10);
 }
 
 function updateLinkStarsHud(hud = getLinkHudElements()) {
@@ -1134,6 +1142,7 @@ function getLinkHudElements() {
     totalPairs: find("#link-total-pairs"),
     hint: find("#link-hint"),
     timer: find("#link-timer"),
+    timerCard: find(".stat-timer"),
     levelStars: find("#link-level-stars"),
     starProgressCard: find(".stat-star-progress"),
     starsFill: find("#link-level-stars-fill"),

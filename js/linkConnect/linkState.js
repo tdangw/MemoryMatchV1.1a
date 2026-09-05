@@ -22,6 +22,7 @@ export function createLinkGameState() {
     matchedPairs: 0,
     totalPairs: getLinkModeLayout().tileCount / 2,
     remainingTime: getLinkModeLayout().timeSeconds,
+    timeLimit: getLinkModeLayout().timeSeconds,
     isLocked: true,
     isPaused: false,
     roundId: 0,
@@ -55,6 +56,7 @@ export function beginLinkRound({
   linkGameState.matchedPairs = 0;
   linkGameState.totalPairs = layout.tileCount / 2;
   linkGameState.remainingTime = layout.timeSeconds;
+  linkGameState.timeLimit = layout.timeSeconds;
   // Đóng băng thời gian chỉ có hiệu lực trong màn đang chơi, không mang sang màn kế tiếp.
   linkGameState.freezeSeconds = 0;
   linkGameState.isLocked = true;
