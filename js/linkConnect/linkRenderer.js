@@ -297,9 +297,13 @@ export function playLinkMatchExit(start, end) {
 }
 
 // Năng lượng chỉ là hiệu ứng tạm trên lớp phủ; không tạo hay lưu vật phẩm.
-export function playLinkEnergyFlight(start, end, { onArrive } = {}) {
+export function playLinkEnergyFlight(start, end, {
+  onArrive,
+  targetProgress = 1,
+  progressTarget = 10,
+} = {}) {
   const sourceTile = getLinkTileButton(end) || getLinkTileButton(start);
-  const target = document.querySelector("#link-special-energy .ui-icon");
+  const target = document.querySelector(".link-special-hud__milestones");
   if (!sourceTile || !target) {
     onArrive?.();
     return null;
@@ -354,10 +358,12 @@ export function playLinkEnergyFlight(start, end, { onArrive } = {}) {
   const collectDelayMs = readCssTimeMs(burstDuration, 1100) + readCssTimeMs(holdDuration, 1000);
   setTimeout(() => {
     if (!effect.isConnected) return;
-    const currentTarget = document.querySelector("#link-special-energy .ui-icon");
+    const currentTarget = document.querySelector(".link-special-hud__milestones");
     if (!currentTarget) return finish();
     const targetRect = currentTarget.getBoundingClientRect();
-    effect.style.setProperty("--link-energy-flight-x", `${Math.round(targetRect.left + targetRect.width / 2 - startX)}px`);
+    const targetRatio = clamp((targetProgress - 1) / Math.max(1, progressTarget - 1), 0, 1);
+    const targetX = targetRect.left + targetRect.width * (0.05 + targetRatio * 0.9);
+    effect.style.setProperty("--link-energy-flight-x", `${Math.round(targetX - startX)}px`);
     effect.style.setProperty("--link-energy-flight-y", `${Math.round(targetRect.top + targetRect.height / 2 - startY)}px`);
     effect.classList.add("is-collecting");
   }, collectDelayMs);

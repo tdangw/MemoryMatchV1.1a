@@ -293,8 +293,7 @@ function showLinkGame() {
         </div>
       </header>
       <section class="link-special-hud" aria-label="Tiến trình năng lượng đặc biệt">
-        <span id="link-special-coins" class="link-special-hud__coins" aria-label="Xu"><span data-link-icon="coin"></span></span>
-        <span id="link-special-energy" class="link-special-hud__energy" aria-label="Năng lượng đặc biệt"><span data-link-icon="energy"></span></span>
+        <span id="link-special-coins" class="link-special-hud__coins" aria-label="Xu"><span data-link-icon="coin"></span><strong id="link-coin-balance">0</strong></span>
         <div class="link-special-hud__milestones" aria-label="Các mốc kích hoạt đặc biệt">
           <span data-link-special-milestone="1" style="--link-milestone-position: 5%">1</span><span data-link-special-milestone="3" style="--link-milestone-position: 25%">3</span><span data-link-special-milestone="5" style="--link-milestone-position: 45%">5</span><span data-link-special-milestone="7" style="--link-milestone-position: 65%">7</span><span data-link-special-milestone="9" style="--link-milestone-position: 85%">9</span><span data-link-special-milestone="10" style="--link-milestone-position: 95%">10</span>
         </div>
@@ -491,15 +490,18 @@ function handleLinkTileClick(position) {
   drawLinkPath(path, linkGameState.board);
   if (isSpecialMatch && shouldDropLinkEnergy()) {
     playLinkEnergyFlight(selectedPosition, position, {
+      targetProgress: Math.min(
+        LINK_CONNECT_CONFIG.special.progressTarget,
+        linkGameState.specialProgress + 1,
+      ),
+      progressTarget: LINK_CONNECT_CONFIG.special.progressTarget,
       onArrive: () => receiveLinkEnergy(roundId, board),
     });
   }
   const matchedTiles = playLinkMatchExit(selectedPosition, position);
   const matchRewardCoins = LINK_CONNECT_CONFIG.rewards.coinsPerMatch;
   const matchRewardAnchor = matchedTiles[1] || matchedTiles[0];
-  increaseCoins(matchRewardCoins);
-  saveCoins(gameState.coins);
-  playLinkCoinRewardFlight(matchRewardAnchor, matchRewardCoins);
+  awardLinkCoins(matchRewardCoins, matchRewardAnchor);
   showScoreEffect(matchedTiles[0], matchPoints);
   showComboEffect(matchedTiles[1] || matchedTiles[0], linkGameState.combo);
   setTimeout(() => {
@@ -714,8 +716,7 @@ function completeLinkLevel() {
   });
   saveProgress(gameState.progress);
   updateLinkHud();
-  increaseCoins(coinsEarned);
-  saveCoins(gameState.coins);
+  awardLinkCoins(coinsEarned, null, { animate: false });
   showLevelSummaryOverlay({
     fireworksContainerId: "link-connect-container",
     level: linkGameState.level,
@@ -737,10 +738,8 @@ function applyLinkLuckyReward(reward, anchor) {
   playLinkSound("bonus");
   linkGameState.luckyAwards.push(reward);
   if (reward.type === "coins") {
-    increaseCoins(reward.value);
-    saveCoins(gameState.coins);
+    awardLinkCoins(reward.value, anchor);
     showGameplayRewardEffect(anchor, { type: "coins", value: reward.value });
-    playLinkCoinRewardFlight(anchor, reward.value);
     return;
   }
   linkGameState.remainingTime += reward.value;
@@ -850,6 +849,7 @@ function updateLinkHud() {
   setHudText(hud.matchedPairs, linkGameState.matchedPairs);
   setHudText(hud.totalPairs, linkGameState.totalPairs);
   setHudText(hud.hint, getLinkItemCount("hint"));
+  updateLinkCoinHud(hud);
   updateLinkTimerHud(hud);
   updateLinkStarsHud(hud);
   updateLinkSpecialMilestones(hud);
@@ -867,6 +867,24 @@ function updateLinkTimerHud(hud = getLinkHudElements()) {
     return;
   }
   renderLinkTimeProgress(linkTimeProgressState.remainingMs, linkTimeProgressState, hud);
+}
+
+function updateLinkCoinHud(hud = getLinkHudElements()) {
+  setHudText(hud.coinBalance, gameState.coins);
+  if (!hud.coins) return;
+  const label = `Xu: ${gameState.coins}`;
+  hud.coins.setAttribute("aria-label", label);
+  hud.coins.dataset.tooltip = label;
+}
+
+function awardLinkCoins(amount, anchor, { animate = true } = {}) {
+  const value = Math.max(0, Math.floor(Number(amount) || 0));
+  if (value < 1) return 0;
+  increaseCoins(value);
+  saveCoins(gameState.coins);
+  updateLinkCoinHud();
+  if (animate && anchor) playLinkCoinRewardFlight(anchor, value);
+  return value;
 }
 
 function setLinkTimeProgress(running, roundId = linkGameState.roundId, hud = getLinkHudElements()) {
@@ -1028,9 +1046,7 @@ function applySpecialMatchRewards(anchor) {
   const range = special.frozenFallbackReward[rewardType === "coins" ? "coin" : "time"];
   const value = randomInteger(range.min, range.max);
   if (rewardType === "coins") {
-    increaseCoins(value);
-    saveCoins(gameState.coins);
-    playLinkCoinRewardFlight(anchor, value);
+    awardLinkCoins(value, anchor);
   } else {
     linkGameState.remainingTime += value;
     syncLinkTimeProgress();
@@ -1047,7 +1063,7 @@ function processPendingSpecialMilestones(roundId, board) {
     return;
   }
   linkGameState.isResolvingSpecialMilestone = true;
-  const anchor = getLinkHudElements().energy;
+  const anchor = getLinkHudElements().specialTrack;
   const finish = () => {
     linkGameState.isResolvingSpecialMilestone = false;
     if (progress >= LINK_CONNECT_CONFIG.special.progressTarget) linkGameState.specialProgress = 0;
@@ -1072,11 +1088,9 @@ function processPendingSpecialMilestones(roundId, board) {
     const seconds = randomInteger(rules.time.min, rules.time.max);
     linkGameState.remainingTime += seconds;
     syncLinkTimeProgress();
-    increaseCoins(rules.coins);
-    saveCoins(gameState.coins);
+    awardLinkCoins(rules.coins, anchor);
     showGameplayRewardEffect(anchor, { type: "time", value: seconds });
     showGameplayRewardEffect(anchor, { type: "coins", value: rules.coins });
-    playLinkCoinRewardFlight(anchor, rules.coins);
     linkGameState.specialMilestoneRewards[progress] = `+${seconds}s và +${rules.coins} Xu.`;
     finish();
   } else if (progress === 9 || progress === 10) {
@@ -1085,12 +1099,10 @@ function processPendingSpecialMilestones(roundId, board) {
     playLinkItemRewardFlight(anchor, "hint");
     if (progress === 10) {
       const coins = LINK_CONNECT_CONFIG.special.milestones.ten.coins;
-      increaseCoins(coins);
-      saveCoins(gameState.coins);
+      awardLinkCoins(coins, anchor);
       grantLinkItem("reshuffle");
       showGameplayRewardEffect(anchor, { type: "coins", value: coins });
       showGameplayRewardEffect(anchor, { type: "reshuffle", value: 1 });
-      playLinkCoinRewardFlight(anchor, coins);
       playLinkItemRewardFlight(anchor, "reshuffle", { delayMs: 180 });
       linkGameState.specialMilestoneRewards[progress] = `+${coins} Xu, +1 Xáo trộn, +1 Gợi ý và phá cặp.`;
     } else linkGameState.specialMilestoneRewards[progress] = "+1 Gợi ý và phá 1 cặp thường.";
@@ -1125,10 +1137,9 @@ function playAutomaticPairBreak(roundId, board, onComplete) {
     }),
   });
   if (!pair) {
-    increaseCoins(milestone.breakCoins);
-    saveCoins(gameState.coins);
-    showGameplayRewardEffect(getLinkHudElements().energy, { type: "coins", value: milestone.breakCoins });
-    playLinkCoinRewardFlight(getLinkHudElements().energy, milestone.breakCoins);
+    const anchor = getLinkHudElements().specialTrack;
+    awardLinkCoins(milestone.breakCoins, anchor);
+    showGameplayRewardEffect(anchor, { type: "coins", value: milestone.breakCoins });
     onComplete();
     return;
   }
@@ -1250,6 +1261,8 @@ function getLinkHudElements() {
     matchedPairs: find("#link-matched-pairs"),
     totalPairs: find("#link-total-pairs"),
     hint: find("#link-hint"),
+    coins: find("#link-special-coins"),
+    coinBalance: find("#link-coin-balance"),
     timer: find("#link-timer"),
     gameHud: find("#link-game-title"),
     levelStars: find("#link-level-stars"),

@@ -865,31 +865,28 @@
   background: rgb(106 151 211 / 45%);
 }
 
-.link-special-hud__energy,
-.link-special-hud__coins {
-  display: grid;
-  width: 22px;
-  height: 22px;
-  flex: 0 0 22px;
-  place-items: center;
-  border: 0;
-  background: transparent;
-  color: #ffe16f;
-  box-shadow: none;
-}
-
-.link-special-hud__energy { margin: 0 9px 0 6px; }
-
 .link-special-hud__coins {
   position: absolute;
   top: 50%;
-  right: calc(100% + 6px);
+  right: calc(100% + 7px);
+  display: inline-flex;
+  min-height: 22px;
+  align-items: center;
+  gap: 3px;
+  border: 0;
+  background: transparent;
   color: #ffd25f;
+  box-shadow: none;
+  font-size: .7rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
   transform: translateY(-50%);
 }
 
-.link-special-hud__energy .ui-icon,
 .link-special-hud__coins .ui-icon { width: 18px; height: 18px; stroke-width: 2.25; }
+.link-special-hud__coins strong { color: #fff1a8; font: inherit; }
 
 .link-energy-flight {
   position: fixed;
@@ -1048,7 +1045,6 @@
   .link-game-hud .stat-label { font-size: 0.46rem; }
   .link-tools-toggle { width: 30px; height: 30px; border-radius: 8px; }
   .link-tools-toggle .ui-icon { width: 17px; height: 17px; }
-  .link-special-hud { width: min(240px, calc(100vw - 18px)); min-height: 19px; }
-  .link-special-hud__energy { margin-right: 7px; margin-left: 4px; }
+  .link-special-hud { width: min(220px, calc(100vw - 96px)); min-height: 19px; }
   .link-special-hud__milestones span { width: 15px; height: 15px; font-size: 0.5rem; }
 }
