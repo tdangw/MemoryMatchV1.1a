@@ -741,7 +741,7 @@
   content: "";
   position: absolute;
   right: 6px;
-  bottom: -1px;
+  bottom: -3px;
   left: 6px;
   height: 3px;
   border-radius: 999px;
@@ -750,7 +750,8 @@
   opacity: 0;
   transform: scaleX(var(--link-timer-progress, 0));
   transform-origin: left center;
-  transition: transform 320ms linear, opacity 160ms ease;
+  transition: opacity 160ms ease;
+  will-change: transform;
 }
 
 .link-game-hud.game-hud.has-timer-progress::after { opacity: 1; }

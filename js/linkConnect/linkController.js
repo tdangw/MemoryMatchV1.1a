@@ -76,6 +76,8 @@ import {
 import { beginLinkRound, linkGameState, resetLinkGame } from "./linkState.js";
 
 let countdownInterval;
+let linkTimeAnimationFrame = null;
+let linkTimeProgressState = null;
 let comboExpiryTimer;
 let selectedPosition = null;
 let linkTimeWarningPlayed = false;
@@ -724,6 +726,7 @@ function applyLinkLuckyReward(reward, anchor) {
     return;
   }
   linkGameState.remainingTime += reward.value;
+  syncLinkTimeProgress();
   showGameplayRewardEffect(anchor, { type: "time", value: reward.value });
 }
 
@@ -745,6 +748,7 @@ function calculateLinkStars() {
 
 function startCountdown(roundId) {
   stopCountdown();
+  startLinkTimeProgress(roundId);
   syncDefaultMusic(gameState.settings);
   countdownInterval = setInterval(() => {
     if (linkGameState.roundId !== roundId || linkGameState.isLocked || linkGameState.isPaused) return;
@@ -753,6 +757,7 @@ function startCountdown(roundId) {
       return;
     }
     linkGameState.remainingTime += getLinkTimerDirection(linkGameState.mode) === "up" ? 1 : -1;
+    syncLinkTimeProgress();
     updateLinkTimerHud();
     if (!isLinkEndlessMode(linkGameState.mode) && linkGameState.remainingTime <= 10 && !linkTimeWarningPlayed) {
       playLinkSound("timerunningout");
@@ -780,6 +785,7 @@ function handleLinkTimeUp() {
     actionSelected = true;
     saveCoins(gameState.coins);
     linkGameState.remainingTime = seconds;
+    syncLinkTimeProgress();
     linkTimeWarningPlayed = false;
     linkGameState.isLocked = false;
     updateLinkTimerHud();
@@ -847,13 +853,74 @@ function updateLinkHud() {
 
 function updateLinkTimerHud(hud = getLinkHudElements()) {
   setHudText(hud.timer, formatClockTime(linkGameState.remainingTime));
-  const countdown = !isLinkEndlessMode(linkGameState.mode) && linkGameState.timeLimit > 0;
-  const progress = countdown
-    ? Math.max(0, Math.min(1, linkGameState.remainingTime / linkGameState.timeLimit))
-    : 0;
+  if (!linkTimeProgressState || linkTimeProgressState.roundId !== linkGameState.roundId) {
+    setLinkTimeProgress(false, linkGameState.roundId, hud);
+    return;
+  }
+  renderLinkTimeProgress(linkTimeProgressState.remainingMs, linkTimeProgressState, hud);
+}
+
+function setLinkTimeProgress(running, roundId = linkGameState.roundId, hud = getLinkHudElements()) {
+  stopLinkTimeProgress();
+  const endless = isLinkEndlessMode(linkGameState.mode);
+  linkTimeProgressState = {
+    roundId,
+    endless,
+    running: Boolean(running && !endless),
+    timeLimitMs: Math.max(1, Number(linkGameState.timeLimit || linkGameState.remainingTime || 1))
+      * GAMEPLAY_TIMING.secondMs,
+    remainingMs: Math.max(0, Number(linkGameState.remainingTime || 0)) * GAMEPLAY_TIMING.secondMs,
+    lastFrameAt: null,
+  };
+  renderLinkTimeProgress(linkTimeProgressState.remainingMs, linkTimeProgressState, hud);
+  if (!linkTimeProgressState.running) return;
+  linkTimeProgressState.lastFrameAt = performance.now();
+  linkTimeAnimationFrame = requestAnimationFrame(updateLinkTimeProgressFrame);
+}
+
+function startLinkTimeProgress(roundId) {
+  setLinkTimeProgress(true, roundId);
+}
+
+function syncLinkTimeProgress() {
+  if (!linkTimeProgressState || linkTimeProgressState.roundId !== linkGameState.roundId) return;
+  linkTimeProgressState.remainingMs = Math.max(0, Number(linkGameState.remainingTime || 0))
+    * GAMEPLAY_TIMING.secondMs;
+  linkTimeProgressState.timeLimitMs = Math.max(1, Number(linkGameState.timeLimit || 1))
+    * GAMEPLAY_TIMING.secondMs;
+  linkTimeProgressState.lastFrameAt = performance.now();
+  renderLinkTimeProgress(linkTimeProgressState.remainingMs, linkTimeProgressState);
+}
+
+function updateLinkTimeProgressFrame(timestamp) {
+  const state = linkTimeProgressState;
+  if (!state?.running || state.roundId !== linkGameState.roundId) return;
+  const elapsed = Math.max(0, timestamp - (state.lastFrameAt ?? timestamp));
+  state.lastFrameAt = timestamp;
+  if (!linkGameState.isLocked && !linkGameState.isPaused && linkGameState.freezeSeconds <= 0) {
+    state.remainingMs = Math.max(0, state.remainingMs - elapsed);
+  }
+  renderLinkTimeProgress(state.remainingMs, state);
+  if (state.remainingMs > 0) {
+    linkTimeAnimationFrame = requestAnimationFrame(updateLinkTimeProgressFrame);
+  } else {
+    linkTimeAnimationFrame = null;
+    state.running = false;
+  }
+}
+
+function renderLinkTimeProgress(remainingMs, state, hud = getLinkHudElements()) {
+  const countdown = !state.endless && state.timeLimitMs > 0;
+  const progress = countdown ? Math.max(0, Math.min(1, remainingMs / state.timeLimitMs)) : 0;
   hud.gameHud?.style.setProperty("--link-timer-progress", String(progress));
   hud.gameHud?.classList.toggle("has-timer-progress", countdown);
-  hud.gameHud?.classList.toggle("is-timer-warning", countdown && linkGameState.remainingTime <= 10);
+  hud.gameHud?.classList.toggle("is-timer-warning", countdown && remainingMs <= 10 * GAMEPLAY_TIMING.secondMs);
+}
+
+function stopLinkTimeProgress() {
+  if (linkTimeAnimationFrame !== null) cancelAnimationFrame(linkTimeAnimationFrame);
+  linkTimeAnimationFrame = null;
+  if (linkTimeProgressState) linkTimeProgressState.running = false;
 }
 
 function updateLinkStarsHud(hud = getLinkHudElements()) {
@@ -938,7 +1005,10 @@ function applySpecialMatchRewards(anchor) {
   if (rewardType === "coins") {
     increaseCoins(value);
     saveCoins(gameState.coins);
-  } else linkGameState.remainingTime += value;
+  } else {
+    linkGameState.remainingTime += value;
+    syncLinkTimeProgress();
+  }
   showGameplayRewardEffect(anchor, { type: rewardType, value });
   return false;
 }
@@ -974,6 +1044,7 @@ function processPendingSpecialMilestones(roundId, board) {
     const rules = LINK_CONNECT_CONFIG.special.milestones.seven;
     const seconds = randomInteger(rules.time.min, rules.time.max);
     linkGameState.remainingTime += seconds;
+    syncLinkTimeProgress();
     increaseCoins(rules.coins);
     saveCoins(gameState.coins);
     showGameplayRewardEffect(anchor, { type: "time", value: seconds });
@@ -1082,6 +1153,7 @@ function randomInteger(minimum, maximum) {
 function stopCountdown() {
   clearInterval(countdownInterval);
   countdownInterval = undefined;
+  stopLinkTimeProgress();
   stopLinkComboWindow();
 }
 
