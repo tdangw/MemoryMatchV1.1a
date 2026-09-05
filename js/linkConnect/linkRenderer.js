@@ -428,9 +428,13 @@ export function playLinkItemRewardFlight(source, itemId, { delayMs = 0 } = {}) {
 
 export function playLinkCoinRewardFlight(source, amount) {
   const coinCount = Math.max(0, Math.floor(Number(amount) || 0));
-  const target = document.querySelector("#link-special-coins .ui-icon");
+  const target = document.querySelector("#link-special-coins .ui-icon")
+    || document.querySelector("#link-special-coins");
   if (!source || !target || coinCount < 1) return [];
-  const sourceRect = source.getBoundingClientRect();
+  // Thẻ đang chạy hiệu ứng xóa có thể đã co lại. Dùng ô chứa để giữ đúng
+  // tâm và kích thước ban đầu, giúp đồng Xu luôn xuất hiện rõ trên bàn.
+  const stableSource = source.closest?.(".link-board__cell") || source;
+  const sourceRect = stableSource.getBoundingClientRect();
   const targetRect = target.getBoundingClientRect();
   const startX = sourceRect.left + sourceRect.width / 2;
   const startY = sourceRect.top + sourceRect.height / 2;

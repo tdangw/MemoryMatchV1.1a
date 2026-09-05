@@ -290,10 +290,8 @@ function showLinkGame() {
         </div>
       </header>
       <section class="link-special-hud" aria-label="Tiến trình năng lượng đặc biệt">
-        <div class="link-special-hud__collectibles">
-          <span id="link-special-energy" class="link-special-hud__energy" aria-label="Năng lượng đặc biệt"><span data-link-icon="energy"></span></span>
-          <span id="link-special-coins" class="link-special-hud__coins" aria-label="Xu"><span data-link-icon="coin"></span></span>
-        </div>
+        <span id="link-special-coins" class="link-special-hud__coins" aria-label="Xu"><span data-link-icon="coin"></span></span>
+        <span id="link-special-energy" class="link-special-hud__energy" aria-label="Năng lượng đặc biệt"><span data-link-icon="energy"></span></span>
         <div class="link-special-hud__milestones" aria-label="Các mốc kích hoạt đặc biệt">
           <span data-link-special-milestone="1" style="--link-milestone-position: 5%">1</span><span data-link-special-milestone="3" style="--link-milestone-position: 25%">3</span><span data-link-special-milestone="5" style="--link-milestone-position: 45%">5</span><span data-link-special-milestone="7" style="--link-milestone-position: 65%">7</span><span data-link-special-milestone="9" style="--link-milestone-position: 85%">9</span><span data-link-special-milestone="10" style="--link-milestone-position: 95%">10</span>
         </div>
