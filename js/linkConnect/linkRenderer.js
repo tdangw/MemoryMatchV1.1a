@@ -297,30 +297,37 @@ export function playLinkMatchExit(start, end) {
 
 // Năng lượng chỉ là hiệu ứng tạm trên lớp phủ; không tạo hay lưu vật phẩm.
 export function playLinkEnergyFlight(start, end, { onArrive } = {}) {
-  const sourceTiles = [getLinkTileButton(start), getLinkTileButton(end)].filter(Boolean);
+  const sourceTile = getLinkTileButton(end) || getLinkTileButton(start);
   const target = document.getElementById("link-special-energy");
-  if (!sourceTiles.length || !target) {
+  if (!sourceTile || !target) {
     onArrive?.();
     return null;
   }
-  const sourceRect = sourceTiles[0].getBoundingClientRect();
-  const secondRect = sourceTiles[1].getBoundingClientRect();
+  const sourceRect = sourceTile.getBoundingClientRect();
   const targetRect = target.getBoundingClientRect();
   const effect = document.createElement("span");
   effect.className = "link-energy-flight";
   effect.setAttribute("aria-hidden", "true");
   effect.append(createIcon("energy"));
-  const startX = (sourceRect.left + sourceRect.width / 2 + secondRect.left + secondRect.width / 2) / 2;
-  const startY = (sourceRect.top + sourceRect.height / 2 + secondRect.top + secondRect.height / 2) / 2;
+  const startX = sourceRect.left + sourceRect.width / 2;
+  const startY = sourceRect.top + sourceRect.height / 2;
+  const direction = Math.random() < .5 ? -1 : 1;
+  const landingX = direction * sourceRect.width * (.55 + Math.random() * .55);
+  const landingY = Math.max(20, sourceRect.height * (.34 + Math.random() * .16));
+  const apexX = landingX * (.45 + Math.random() * .18);
+  const apexY = -sourceRect.height * (.68 + Math.random() * .38);
   effect.style.left = `${startX}px`;
   effect.style.top = `${startY}px`;
   effect.style.setProperty("--link-energy-flight-x", `${targetRect.left + targetRect.width / 2 - startX}px`);
   effect.style.setProperty("--link-energy-flight-y", `${targetRect.top + targetRect.height / 2 - startY}px`);
-  effect.style.setProperty("--link-energy-burst-x", `${Math.round((Math.random() - .5) * Math.min(140, sourceRect.width * 1.4))}px`);
-  effect.style.setProperty("--link-energy-burst-y", `${-Math.round(Math.max(72, sourceRect.height * .9))}px`);
+  effect.style.setProperty("--link-energy-apex-x", `${Math.round(apexX)}px`);
+  effect.style.setProperty("--link-energy-apex-y", `${Math.round(apexY)}px`);
+  effect.style.setProperty("--link-energy-land-x", `${Math.round(landingX)}px`);
+  effect.style.setProperty("--link-energy-land-y", `${Math.round(landingY)}px`);
+  effect.style.setProperty("--link-energy-bounce-y", `${Math.round(landingY - Math.max(10, sourceRect.height * .16))}px`);
   const game = document.getElementById("link-connect-container");
   const styles = game ? getComputedStyle(game) : null;
-  effect.style.setProperty("--link-energy-burst-duration", styles?.getPropertyValue("--link-energy-burst-duration").trim() || "300ms");
+  effect.style.setProperty("--link-energy-burst-duration", styles?.getPropertyValue("--link-energy-burst-duration").trim() || "680ms");
   effect.style.setProperty("--link-energy-hold-duration", styles?.getPropertyValue("--link-energy-hold-duration").trim() || "1000ms");
   effect.style.setProperty("--link-energy-flight-duration", styles?.getPropertyValue("--link-energy-flight-duration").trim() || "1250ms");
   document.body.append(effect);
@@ -334,7 +341,7 @@ export function playLinkEnergyFlight(start, end, { onArrive } = {}) {
   effect.addEventListener("animationend", (event) => {
     if (event.animationName === "link-energy-fly-to-hud") finish();
   });
-  setTimeout(finish, 2850);
+  setTimeout(finish, 3250);
   return effect;
 }
 

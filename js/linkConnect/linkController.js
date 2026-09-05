@@ -877,14 +877,8 @@ function updateLinkSpecialMilestones(hud = getLinkHudElements()) {
     // Điểm đầu thanh là mốc 1: vừa đạt 1 chỉ sáng marker, không tô sang mốc 2.
     String(Math.max(0, Math.min(1, (progress - 1) / Math.max(1, target - 1)))),
   );
-  const currentMilestone = [...milestones]
-    .map((marker) => Number(marker.dataset.linkSpecialMilestone))
-    .filter((milestone) => milestone <= progress)
-    .at(-1) || 0;
   if (track) {
-    track.dataset.tooltip = progress
-      ? `Năng lượng: ${progress}/${target}. Mốc hiện tại: ${currentMilestone}.`
-      : `Năng lượng: 0/${target}. Chưa đạt mốc thưởng.`;
+    track.dataset.tooltip = `Năng lượng: ${progress}/${target}`;
     track.setAttribute("aria-label", track.dataset.tooltip);
   }
   let nextMarked = false;
