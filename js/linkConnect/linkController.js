@@ -17,6 +17,7 @@ import {
   calculateLinkMatchPoints,
   calculateLinkCoinReward,
   getLinkChallengeTime,
+  getLinkComboWindowMs,
   getLinkChallengeLayout,
   LINK_CONNECT_CONFIG,
   getLinkLevelHintBonus,
@@ -40,6 +41,7 @@ import {
   removeRandomLinkPair,
   shuffleLinkBoard,
   unlockFrozenLinkPairs,
+  unlockAllFrozenLinkPairs,
 } from "./linkBoard.js";
 import { findAvailableConnections, findConnectionPath } from "./pathfinder.js";
 import { consumeLinkItem, getLinkItemCount, grantLinkItem, LINK_ITEMS } from "./linkItems.js";
@@ -443,6 +445,7 @@ function handleLinkTileClick(position) {
     playLinkSound("wrong");
     linkGameState.misses += 1;
     linkGameState.combo = 0;
+    linkGameState.lastMatchAt = 0;
     linkGameState.isLocked = true;
     const wrongTiles = playLinkMismatch(selectedPosition, position);
     updateLinkHud();
@@ -458,7 +461,13 @@ function handleLinkTileClick(position) {
 
   linkGameState.isLocked = true;
   playLinkSound("match");
-  linkGameState.combo += 1;
+  const matchedAt = performance.now();
+  const comboWindowMs = getLinkComboWindowMs(linkGameState.totalPairs);
+  linkGameState.combo = linkGameState.lastMatchAt
+    && matchedAt - linkGameState.lastMatchAt <= comboWindowMs
+    ? linkGameState.combo + 1
+    : 1;
+  linkGameState.lastMatchAt = matchedAt;
   const isSpecialMatch = firstTile.special && tile.special;
   const roundId = linkGameState.roundId;
   const board = linkGameState.board;
@@ -818,6 +827,10 @@ function updateLinkHud() {
   setHudText(hud.moves, linkGameState.moves);
   setHudText(hud.misses, linkGameState.misses);
   setHudText(hud.combo, linkGameState.combo);
+  if (hud.comboCard) {
+    const seconds = getLinkComboWindowMs(linkGameState.totalPairs) / 1000;
+    hud.comboCard.dataset.tooltip = `Ghép đúng tiếp trong ${seconds}s để tăng combo. Ghép sai hoặc quá thời gian sẽ tính lại.`;
+  }
   setHudText(hud.score, linkGameState.score);
   setHudText(hud.matchedPairs, linkGameState.matchedPairs);
   setHudText(hud.totalPairs, linkGameState.totalPairs);
@@ -987,12 +1000,12 @@ function recoverBlockedLinkBoard(board) {
     return true;
   }
   // Khi cuối màn chỉ còn các cặp băng, xáo không thể tạo nước đi vì chúng đều
-  // bị khóa. Mở đúng một cặp để người chơi tiếp tục; lặp lại nếu cần.
-  const thawedPairs = unlockFrozenLinkPairs(board, 1, { onUnlock: rememberFrozenPairForTransform });
+  // bị khóa. Mở toàn bộ cùng lúc để kết thúc màn liền mạch.
+  const thawedPairs = unlockAllFrozenLinkPairs(board, { onUnlock: rememberFrozenPairForTransform });
   if (!thawedPairs) return false;
   renderLinkBoard(board, { onTileClick: handleLinkTileClick });
   playPendingBoardTransforms();
-  showAppToast("Đã mở một cặp băng để tiếp tục màn chơi.");
+  showAppToast(`Đã mở ${thawedPairs} cặp băng còn lại để tiếp tục màn chơi.`);
   return true;
 }
 
@@ -1084,6 +1097,7 @@ function applyLinkTimingStyles(container) {
   container.style.setProperty("--link-special-transform-duration", `${LINK_CONNECT_TIMING.specialPairTransformMs}ms`);
   container.style.setProperty("--link-frozen-unlock-duration", `${LINK_CONNECT_TIMING.frozenPairUnlockMs}ms`);
   container.style.setProperty("--link-energy-burst-duration", `${LINK_CONNECT_TIMING.energyBurstMs}ms`);
+  container.style.setProperty("--link-energy-hold-duration", `${LINK_CONNECT_TIMING.energyHoldMs}ms`);
   container.style.setProperty("--link-energy-flight-duration", `${LINK_CONNECT_TIMING.energyFlightMs}ms`);
 }
 
@@ -1097,6 +1111,7 @@ function getLinkHudElements() {
     moves: find("#link-moves"),
     misses: find("#link-misses"),
     combo: find("#link-combo"),
+    comboCard: find(".stat-combo"),
     score: find("#link-score"),
     scoreCard: find(".stat-points"),
     matchedPairs: find("#link-matched-pairs"),

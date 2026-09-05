@@ -12,7 +12,15 @@ export const LINK_CONNECT_CONFIG = Object.freeze({
     challenge: Object.freeze({ tileCount: 12, columns: 4, timeSeconds: 60, coinReward: Object.freeze({ base: 30, speedMultiplier: 0.25 }) }),
   }),
   pathfinding: Object.freeze({ maxTurns: 2, boundaryPadding: 1 }),
-  scoring: Object.freeze({ baseMatchPoints: 10, comboStepPoints: 3 }),
+  scoring: Object.freeze({
+    baseMatchPoints: 10,
+    comboStepPoints: 3,
+    comboWindows: Object.freeze([
+      Object.freeze({ maxPairs: 8, seconds: 5 }),
+      Object.freeze({ maxPairs: 15, seconds: 6 }),
+      Object.freeze({ maxPairs: Infinity, seconds: 7 }),
+    ]),
+  }),
   levelProgression: Object.freeze({
     timeBonusPerLevel: 2,
     timeBonusCap: 10,
@@ -84,6 +92,7 @@ export const LINK_CONNECT_TIMING = Object.freeze({
   specialPairTransformMs: 720,
   frozenPairUnlockMs: 3000,
   energyBurstMs: 300,
+  energyHoldMs: 1000,
   energyFlightMs: 1250,
   automaticPairMarkMs: 360,
 });
@@ -177,6 +186,12 @@ export function calculateLinkMatchPoints(combo = 1, { special = false } = {}) {
   const points = scoring.baseMatchPoints
     + scoring.comboStepPoints * Math.max(0, combo - 1);
   return Math.round(points * (special ? LINK_CONNECT_CONFIG.special.scoreMultiplier : 1));
+}
+
+export function getLinkComboWindowMs(pairCount) {
+  const rule = LINK_CONNECT_CONFIG.scoring.comboWindows
+    .find((entry) => pairCount <= entry.maxPairs);
+  return (rule?.seconds || 5) * 1000;
 }
 
 export function getLinkSpecialPairCount(pairCount, random = Math.random) {

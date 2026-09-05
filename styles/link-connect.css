@@ -815,7 +815,8 @@
   height: 22px;
   flex: 0 0 22px;
   place-items: center;
-  margin-left: -1px;
+  margin-left: -30px;
+  margin-right: 12px;
   border: 1px solid rgb(255 220 104 / 70%);
   border-radius: 50%;
   background: rgb(80 57 8 / 90%);
@@ -839,16 +840,22 @@
   box-shadow: 0 0 14px rgb(255 215 86 / 80%);
   pointer-events: none;
   will-change: transform, opacity;
-  animation: link-energy-fly calc(var(--link-energy-burst-duration, 300ms) + var(--link-energy-flight-duration, 1250ms)) cubic-bezier(.2,.78,.25,1) both;
+  animation:
+    link-energy-drop var(--link-energy-burst-duration, 300ms) cubic-bezier(.12,.78,.26,1.2) forwards,
+    link-energy-fly-to-hud var(--link-energy-flight-duration, 1250ms) cubic-bezier(.2,.78,.25,1) calc(var(--link-energy-burst-duration, 300ms) + var(--link-energy-hold-duration, 1000ms)) forwards;
 }
 
 .link-energy-flight .ui-icon { width: 17px; height: 17px; stroke-width: 2.6; }
 
-@keyframes link-energy-fly {
+@keyframes link-energy-drop {
   0% { opacity: 0; transform: translate(0, 0) scale(.55); }
-  12% { opacity: 1; transform: translate(0, 0) scale(1.15); }
-  23% { opacity: 1; transform: translate(var(--link-energy-burst-x), var(--link-energy-burst-y)) scale(1.24); }
-  32% { opacity: 1; transform: translate(var(--link-energy-burst-x), var(--link-energy-burst-y)) scale(1); }
+  45% { opacity: 1; transform: translate(var(--link-energy-burst-x), calc(var(--link-energy-burst-y) - 14px)) scale(1.2); }
+  100% { opacity: 1; transform: translate(var(--link-energy-burst-x), var(--link-energy-burst-y)) scale(1); }
+}
+
+@keyframes link-energy-fly-to-hud {
+  0% { opacity: 1; transform: translate(var(--link-energy-burst-x), var(--link-energy-burst-y)) scale(1); }
+  14% { opacity: 1; transform: translate(var(--link-energy-burst-x), calc(var(--link-energy-burst-y) - 10px)) scale(1.12); }
   100% { opacity: 0; transform: translate(var(--link-energy-flight-x), var(--link-energy-flight-y)) scale(.52); }
 }
 
@@ -875,5 +882,6 @@
   .link-tools-toggle { width: 30px; height: 30px; border-radius: 8px; }
   .link-tools-toggle .ui-icon { width: 17px; height: 17px; }
   .link-special-hud { width: min(240px, calc(100vw - 18px)); min-height: 19px; }
+  .link-special-hud__energy { margin-left: -22px; margin-right: 9px; }
   .link-special-hud__milestones span { width: 15px; height: 15px; font-size: 0.5rem; }
 }

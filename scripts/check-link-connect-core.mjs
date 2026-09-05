@@ -6,6 +6,7 @@ import {
 } from "../js/linkConnect/pathfinder.js";
 import {
   calculateLinkMatchPoints,
+  getLinkComboWindowMs,
   getLinkChallengeLayout,
   getLinkModeLayout,
   getLinkTimerDirection,
@@ -59,6 +60,9 @@ assert.equal(getLinkChallengeLayout(10).tileCount, 24);
 assert.equal(getLinkTimerDirection("endless"), "up");
 assert.equal(calculateLinkMatchPoints(3), 16);
 assert.equal(calculateLinkMatchPoints(3, { special: true }), 24);
+assert.equal(getLinkComboWindowMs(8), 5000);
+assert.equal(getLinkComboWindowMs(12), 6000);
+assert.equal(getLinkComboWindowMs(16), 7000);
 assert.equal(getLinkGravityShift(1), "static");
 assert.equal(getLinkGravityShift(3), "down");
 assert.equal(getLinkGravityShift(6), "up");

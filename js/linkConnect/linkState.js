@@ -9,6 +9,7 @@ export function createLinkGameState() {
     moves: 0,
     misses: 0,
     combo: 0,
+    lastMatchAt: 0,
     specialProgress: 0,
     specialNoEnergyDropStreak: 0,
     specialMilestoneRewards: {},
@@ -45,6 +46,7 @@ export function beginLinkRound({
   linkGameState.moves = 0;
   linkGameState.misses = 0;
   linkGameState.combo = 0;
+  linkGameState.lastMatchAt = 0;
   linkGameState.specialMilestoneRewards = {};
   linkGameState.pendingSpecialMilestones = [];
   linkGameState.isResolvingSpecialMilestone = false;

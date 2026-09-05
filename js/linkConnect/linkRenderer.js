@@ -321,6 +321,7 @@ export function playLinkEnergyFlight(start, end, { onArrive } = {}) {
   const game = document.getElementById("link-connect-container");
   const styles = game ? getComputedStyle(game) : null;
   effect.style.setProperty("--link-energy-burst-duration", styles?.getPropertyValue("--link-energy-burst-duration").trim() || "300ms");
+  effect.style.setProperty("--link-energy-hold-duration", styles?.getPropertyValue("--link-energy-hold-duration").trim() || "1000ms");
   effect.style.setProperty("--link-energy-flight-duration", styles?.getPropertyValue("--link-energy-flight-duration").trim() || "1250ms");
   document.body.append(effect);
   let settled = false;
@@ -330,8 +331,10 @@ export function playLinkEnergyFlight(start, end, { onArrive } = {}) {
     effect.remove();
     onArrive?.();
   };
-  effect.addEventListener("animationend", finish, { once: true });
-  setTimeout(finish, 1900);
+  effect.addEventListener("animationend", (event) => {
+    if (event.animationName === "link-energy-fly-to-hud") finish();
+  });
+  setTimeout(finish, 2850);
   return effect;
 }
 
