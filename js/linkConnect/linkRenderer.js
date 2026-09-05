@@ -310,11 +310,21 @@ export function playLinkEnergyFlight(start, end, { onArrive } = {}) {
   effect.append(createIcon("energy"));
   const startX = sourceRect.left + sourceRect.width / 2;
   const startY = sourceRect.top + sourceRect.height / 2;
-  const direction = Math.random() < .5 ? -1 : 1;
-  const landingX = direction * sourceRect.width * (.55 + Math.random() * .55);
-  const landingY = Math.max(20, sourceRect.height * (.34 + Math.random() * .16));
+  const safeInset = 18;
+  const viewportWidth = document.documentElement.clientWidth;
+  const viewportHeight = document.documentElement.clientHeight;
+  const dropDistance = sourceRect.width * (.55 + Math.random() * .55);
+  const leftRoom = startX - safeInset;
+  const rightRoom = viewportWidth - safeInset - startX;
+  const direction = leftRoom < dropDistance ? 1
+    : rightRoom < dropDistance ? -1
+      : Math.random() < .5 ? -1 : 1;
+  const landingX = clamp(startX + direction * dropDistance, safeInset, viewportWidth - safeInset) - startX;
+  const desiredLandingY = Math.max(20, sourceRect.height * (.34 + Math.random() * .16));
+  const landingY = clamp(startY + desiredLandingY, safeInset, viewportHeight - safeInset) - startY;
   const apexX = landingX * (.45 + Math.random() * .18);
-  const apexY = -sourceRect.height * (.68 + Math.random() * .38);
+  const desiredApexY = -sourceRect.height * (.68 + Math.random() * .38);
+  const apexY = clamp(startY + desiredApexY, safeInset, viewportHeight - safeInset) - startY;
   effect.style.left = `${startX}px`;
   effect.style.top = `${startY}px`;
   effect.style.setProperty("--link-energy-apex-x", `${Math.round(apexX)}px`);
