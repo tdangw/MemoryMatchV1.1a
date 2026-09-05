@@ -887,6 +887,22 @@
 
 .link-special-hud__coins .ui-icon { width: 18px; height: 18px; stroke-width: 2.25; }
 .link-special-hud__coins strong { color: #fff1a8; font: inherit; }
+.link-special-hud__coins.is-gaining .ui-icon {
+  animation: link-coin-target-pop var(--link-coin-counter-duration, 520ms) ease-out;
+}
+.link-special-hud__coins.is-gaining strong {
+  animation: link-coin-count-pop var(--link-coin-counter-duration, 520ms) ease-out;
+}
+
+@keyframes link-coin-target-pop {
+  0%, 100% { transform: scale(1); filter: brightness(1); }
+  42% { transform: scale(1.2) rotate(-8deg); filter: brightness(1.35); }
+}
+
+@keyframes link-coin-count-pop {
+  0%, 100% { transform: translateY(0) scale(1); color: #fff1a8; }
+  42% { transform: translateY(-2px) scale(1.16); color: #fff8d2; }
+}
 
 .link-energy-flight {
   position: fixed;

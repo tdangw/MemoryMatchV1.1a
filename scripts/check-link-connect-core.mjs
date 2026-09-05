@@ -7,6 +7,7 @@ import {
 import {
   calculateLinkMatchPoints,
   calculateLinkCompletionTimeBonus,
+  calculateLinkMatchCoinReward,
   calculateLinkStarRating,
   getLinkComboWindowMs,
   getLinkChallengeLayout,
@@ -63,6 +64,9 @@ assert.equal(getLinkChallengeLayout(10).tileCount, 24);
 assert.equal(getLinkTimerDirection("endless"), "up");
 assert.equal(calculateLinkMatchPoints(3), 16);
 assert.equal(calculateLinkMatchPoints(3, { special: true }), 24);
+assert.equal(calculateLinkMatchCoinReward(1), 2);
+assert.equal(calculateLinkMatchCoinReward(2), 3);
+assert.equal(calculateLinkMatchCoinReward(4), 5);
 assert.deepEqual(getLinkStarScoreTargets(6, "easy"), { one: 72, two: 108, three: 150 });
 assert.equal(calculateLinkCompletionTimeBonus("easy", 45), 45);
 assert.equal(calculateLinkCompletionTimeBonus("endless", 45), 0);

@@ -17,6 +17,7 @@ import {
   calculateLinkMatchPoints,
   calculateLinkCoinReward,
   calculateLinkCompletionTimeBonus,
+  calculateLinkMatchCoinReward,
   calculateLinkStarRating,
   getLinkChallengeTime,
   getLinkComboWindowMs,
@@ -83,6 +84,8 @@ import { beginLinkRound, linkGameState, resetLinkGame } from "./linkState.js";
 let countdownInterval;
 let linkTimeAnimationFrame = null;
 let linkTimeProgressState = null;
+let linkCoinAnimationFrame = null;
+let linkCoinAnimationElement = null;
 let comboExpiryTimer;
 let selectedPosition = null;
 let linkTimeWarningPlayed = false;
@@ -499,7 +502,7 @@ function handleLinkTileClick(position) {
     });
   }
   const matchedTiles = playLinkMatchExit(selectedPosition, position);
-  const matchRewardCoins = LINK_CONNECT_CONFIG.rewards.coinsPerMatch;
+  const matchRewardCoins = calculateLinkMatchCoinReward(linkGameState.combo);
   const matchRewardAnchor = matchedTiles[1] || matchedTiles[0];
   awardLinkCoins(matchRewardCoins, matchRewardAnchor);
   showScoreEffect(matchedTiles[0], matchPoints);
@@ -870,6 +873,10 @@ function updateLinkTimerHud(hud = getLinkHudElements()) {
 }
 
 function updateLinkCoinHud(hud = getLinkHudElements()) {
+  if (linkCoinAnimationFrame !== null && linkCoinAnimationElement === hud.coinBalance) return;
+  if (linkCoinAnimationFrame !== null) cancelAnimationFrame(linkCoinAnimationFrame);
+  linkCoinAnimationFrame = null;
+  linkCoinAnimationElement = null;
   setHudText(hud.coinBalance, gameState.coins);
   if (!hud.coins) return;
   const label = `Xu: ${gameState.coins}`;
@@ -880,11 +887,50 @@ function updateLinkCoinHud(hud = getLinkHudElements()) {
 function awardLinkCoins(amount, anchor, { animate = true } = {}) {
   const value = Math.max(0, Math.floor(Number(amount) || 0));
   if (value < 1) return 0;
+  const previousCoins = gameState.coins;
   increaseCoins(value);
   saveCoins(gameState.coins);
-  updateLinkCoinHud();
+  animateLinkCoinHudIncrease(previousCoins, gameState.coins);
   if (animate && anchor) playLinkCoinRewardFlight(anchor, value);
   return value;
+}
+
+function animateLinkCoinHudIncrease(previousCoins, nextCoins) {
+  const hud = getLinkHudElements();
+  const counter = hud.coinBalance;
+  if (!counter) return;
+  if (linkCoinAnimationFrame !== null) cancelAnimationFrame(linkCoinAnimationFrame);
+  const displayedCoins = Number(counter.textContent);
+  const startCoins = Number.isFinite(displayedCoins) ? displayedCoins : previousCoins;
+  const duration = LINK_CONNECT_TIMING.coinCounterAnimationMs;
+  const startedAt = performance.now();
+  linkCoinAnimationElement = counter;
+  hud.coins?.classList.remove("is-gaining");
+  if (hud.coins) {
+    void hud.coins.offsetWidth;
+    hud.coins.classList.add("is-gaining");
+  }
+  const updateFrame = (timestamp) => {
+    if (!counter.isConnected) {
+      linkCoinAnimationFrame = null;
+      linkCoinAnimationElement = null;
+      return;
+    }
+    const progress = Math.max(0, Math.min(1, (timestamp - startedAt) / duration));
+    const easedProgress = 1 - (1 - progress) ** 3;
+    setHudText(counter, Math.floor(startCoins + (nextCoins - startCoins) * easedProgress));
+    const label = `Xu: ${counter.textContent}`;
+    hud.coins?.setAttribute("aria-label", label);
+    if (hud.coins) hud.coins.dataset.tooltip = label;
+    if (progress < 1) {
+      linkCoinAnimationFrame = requestAnimationFrame(updateFrame);
+      return;
+    }
+    setHudText(counter, nextCoins);
+    linkCoinAnimationFrame = null;
+    linkCoinAnimationElement = null;
+  };
+  linkCoinAnimationFrame = requestAnimationFrame(updateFrame);
 }
 
 function setLinkTimeProgress(running, roundId = linkGameState.roundId, hud = getLinkHudElements()) {
@@ -1243,6 +1289,7 @@ function applyLinkTimingStyles(container) {
   container.style.setProperty("--link-item-reward-flight-duration", `${LINK_CONNECT_TIMING.itemRewardFlightMs}ms`);
   container.style.setProperty("--link-coin-reward-flight-duration", `${LINK_CONNECT_TIMING.coinRewardFlightMs}ms`);
   container.style.setProperty("--link-coin-reward-stagger", `${LINK_CONNECT_TIMING.coinRewardStaggerMs}ms`);
+  container.style.setProperty("--link-coin-counter-duration", `${LINK_CONNECT_TIMING.coinCounterAnimationMs}ms`);
 }
 
 function getLinkHudElements() {
