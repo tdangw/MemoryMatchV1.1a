@@ -6,9 +6,12 @@ import {
 } from "../js/linkConnect/pathfinder.js";
 import {
   calculateLinkMatchPoints,
+  calculateLinkCompletionTimeBonus,
+  calculateLinkStarRating,
   getLinkComboWindowMs,
   getLinkChallengeLayout,
   getLinkModeLayout,
+  getLinkStarScoreTargets,
   getLinkTimerDirection,
   getLinkGravityShift,
 } from "../js/linkConnect/linkConfig.js";
@@ -60,6 +63,15 @@ assert.equal(getLinkChallengeLayout(10).tileCount, 24);
 assert.equal(getLinkTimerDirection("endless"), "up");
 assert.equal(calculateLinkMatchPoints(3), 16);
 assert.equal(calculateLinkMatchPoints(3, { special: true }), 24);
+assert.deepEqual(getLinkStarScoreTargets(6, "easy"), { one: 72, two: 108, three: 150 });
+assert.equal(calculateLinkCompletionTimeBonus("easy", 45), 45);
+assert.equal(calculateLinkCompletionTimeBonus("endless", 45), 0);
+assert.equal(calculateLinkStarRating(150, 6, "easy"), 3);
+assert.equal(calculateLinkStarRating(149, 6, "easy"), 2);
+const perfectEasyMatchScore = Array.from({ length: 6 }, (_, index) => calculateLinkMatchPoints(index + 1))
+  .reduce((total, points) => total + points, 0);
+assert.equal(perfectEasyMatchScore, 105);
+assert.equal(calculateLinkStarRating(perfectEasyMatchScore + 45, 6, "easy"), 3);
 assert.equal(getLinkComboWindowMs(8), 15000);
 assert.equal(getLinkComboWindowMs(12), 20000);
 assert.equal(getLinkComboWindowMs(16), 30000);

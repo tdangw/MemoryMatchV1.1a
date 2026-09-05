@@ -15,6 +15,8 @@ export const LINK_CONNECT_CONFIG = Object.freeze({
   scoring: Object.freeze({
     baseMatchPoints: 10,
     comboStepPoints: 3,
+    starPointsPerPair: Object.freeze({ one: 12, two: 18, three: 25 }),
+    endlessStarPointsPerPair: Object.freeze({ one: 10, two: 15, three: 20 }),
     comboWindows: Object.freeze([
       Object.freeze({ maxPairs: 8, seconds: 15 }),
       Object.freeze({ maxPairs: 15, seconds: 20 }),
@@ -193,6 +195,31 @@ export function calculateLinkMatchPoints(combo = 1, { special = false } = {}) {
   const points = scoring.baseMatchPoints
     + scoring.comboStepPoints * Math.max(0, combo - 1);
   return Math.round(points * (special ? LINK_CONNECT_CONFIG.special.scoreMultiplier : 1));
+}
+
+export function calculateLinkCompletionTimeBonus(mode, remainingTime) {
+  if (isLinkEndlessMode(mode)) return 0;
+  return Math.floor(Math.max(0, Number(remainingTime) || 0));
+}
+
+export function getLinkStarScoreTargets(totalPairs, mode = "easy") {
+  const scoring = LINK_CONNECT_CONFIG.scoring;
+  const pairs = Math.max(1, Number(totalPairs) || 1);
+  const points = isLinkEndlessMode(mode)
+    ? scoring.endlessStarPointsPerPair
+    : scoring.starPointsPerPair;
+  return Object.freeze({
+    one: pairs * points.one,
+    two: pairs * points.two,
+    three: pairs * points.three,
+  });
+}
+
+export function calculateLinkStarRating(score, totalPairs, mode) {
+  const targets = getLinkStarScoreTargets(totalPairs, mode);
+  return score >= targets.three ? 3
+    : score >= targets.two ? 2
+      : score >= targets.one ? 1 : 0;
 }
 
 export function getLinkComboWindowMs(pairCount) {

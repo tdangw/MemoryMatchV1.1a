@@ -16,6 +16,8 @@ import {
 import {
   calculateLinkMatchPoints,
   calculateLinkCoinReward,
+  calculateLinkCompletionTimeBonus,
+  calculateLinkStarRating,
   getLinkChallengeTime,
   getLinkComboWindowMs,
   getLinkChallengeLayout,
@@ -24,6 +26,7 @@ import {
   getLinkLevelTimeBonus,
   getLinkGravityShift,
   getLinkSpecialMilestoneTooltip,
+  getLinkStarScoreTargets,
   getLinkThunderResolveDelay,
   getLinkModeLayout,
   getLinkTimerDirection,
@@ -696,7 +699,13 @@ function completeLinkLevel() {
   pauseBackgroundMusic();
   playLinkSound("victory");
   const coinsEarned = calculateLinkCoinReward(linkGameState.mode, linkGameState.remainingTime);
-  const stars = calculateLinkStars();
+  const timeBonus = calculateLinkCompletionTimeBonus(linkGameState.mode, linkGameState.remainingTime);
+  linkGameState.score += timeBonus;
+  const stars = calculateLinkStarRating(
+    linkGameState.score,
+    linkGameState.totalPairs,
+    linkGameState.mode,
+  );
   recordLinkConnectResult({
     mode: linkGameState.mode,
     level: linkGameState.level,
@@ -704,7 +713,7 @@ function completeLinkLevel() {
     stars,
   });
   saveProgress(gameState.progress);
-  updateLinkStarsHud();
+  updateLinkHud();
   increaseCoins(coinsEarned);
   saveCoins(gameState.coins);
   showLevelSummaryOverlay({
@@ -716,7 +725,7 @@ function completeLinkLevel() {
     coinsEarned,
     score: linkGameState.score,
     stars,
-    timeBonus: 0,
+    timeBonus,
     luckyAwards: linkGameState.luckyAwards,
     settings: { mode: linkGameState.mode },
     onMenu: returnToLinkMenu,
@@ -744,15 +753,6 @@ function playLinkSound(name) {
   if (!gameState.settings?.sound || !sound) return;
   sound.currentTime = 0;
   sound.play().catch(() => {});
-}
-
-function calculateLinkStars() {
-  const pairCount = Math.max(1, linkGameState.totalPairs);
-  const targets = isLinkEndlessMode(linkGameState.mode) ? [10, 15, 20] : [12, 18, 25];
-  const score = linkGameState.score;
-  return score >= pairCount * targets[2] ? 3
-    : score >= pairCount * targets[1] ? 2
-      : score >= pairCount * targets[0] ? 1 : 0;
 }
 
 function startCountdown(roundId) {
@@ -946,9 +946,12 @@ function stopLinkTimeProgress() {
 }
 
 function updateLinkStarsHud(hud = getLinkHudElements()) {
-  const stars = calculateLinkStars();
-  const targets = isLinkEndlessMode(linkGameState.mode) ? [10, 15, 20] : [12, 18, 25];
-  const target = Math.max(1, linkGameState.totalPairs * targets[2]);
+  const stars = calculateLinkStarRating(
+    linkGameState.score,
+    linkGameState.totalPairs,
+    linkGameState.mode,
+  );
+  const target = getLinkStarScoreTargets(linkGameState.totalPairs, linkGameState.mode).three;
   const levelStars = hud.levelStars;
   if (levelStars) {
     levelStars.setAttribute("aria-label", `${stars} trên 3 sao`);
