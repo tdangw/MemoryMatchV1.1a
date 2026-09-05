@@ -911,10 +911,15 @@ function updateLinkTimeProgressFrame(timestamp) {
 
 function renderLinkTimeProgress(remainingMs, state, hud = getLinkHudElements()) {
   const countdown = !state.endless && state.timeLimitMs > 0;
-  const progress = countdown ? Math.max(0, Math.min(1, remainingMs / state.timeLimitMs)) : 0;
+  const progress = state.endless ? 1
+    : countdown ? Math.max(0, Math.min(1, remainingMs / state.timeLimitMs)) : 0;
+  const warning = countdown && progress < 0.7 && progress >= 0.3;
+  const critical = countdown && progress < 0.3;
   hud.gameHud?.style.setProperty("--link-timer-progress", String(progress));
-  hud.gameHud?.classList.toggle("has-timer-progress", countdown);
-  hud.gameHud?.classList.toggle("is-timer-warning", countdown && remainingMs <= 10 * GAMEPLAY_TIMING.secondMs);
+  hud.gameHud?.classList.toggle("has-timer-progress", countdown || state.endless);
+  hud.gameHud?.classList.toggle("is-timer-warning", warning);
+  hud.gameHud?.classList.toggle("is-timer-critical", critical);
+  hud.gameHud?.classList.toggle("is-timer-endless", state.endless);
 }
 
 function stopLinkTimeProgress() {

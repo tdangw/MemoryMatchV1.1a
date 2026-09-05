@@ -741,7 +741,7 @@
   content: "";
   position: absolute;
   right: 6px;
-  bottom: -5px;
+  bottom: -8px;
   left: 6px;
   height: 3px;
   border-radius: 999px;
@@ -756,8 +756,16 @@
 
 .link-game-hud.game-hud.has-timer-progress::after { opacity: 1; }
 .link-game-hud.game-hud.is-timer-warning::after {
-  background: #ff7d89;
-  box-shadow: 0 0 6px rgb(255 91 108 / 72%);
+  background: linear-gradient(90deg, #f2bd3d, #ffd166);
+  box-shadow: 0 0 6px rgb(255 209 102 / 68%);
+}
+.link-game-hud.game-hud.is-timer-critical::after {
+  background: linear-gradient(90deg, #e04f5f, #ff8995);
+  box-shadow: 0 0 6px rgb(255 107 124 / 72%);
+}
+.link-game-hud.game-hud.is-timer-endless::after {
+  background: linear-gradient(90deg, #7c8da7, #b9d5ff);
+  box-shadow: none;
 }
 
 .link-game-hud .stat-label { color: #c7ddff; font-size: 0.5rem; font-weight: 600; }
