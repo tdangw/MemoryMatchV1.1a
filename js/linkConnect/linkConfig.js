@@ -96,6 +96,8 @@ export const LINK_CONNECT_TIMING = Object.freeze({
   itemRewardBurstMs: 620,
   itemRewardHoldMs: 380,
   itemRewardFlightMs: 820,
+  coinRewardFlightMs: 1500,
+  coinRewardStaggerMs: 45,
   automaticPairMarkMs: 360,
 });
 

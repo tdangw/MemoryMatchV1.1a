@@ -65,6 +65,7 @@ import {
   playLinkMatchExit,
   playLinkMismatch,
   playLinkFrozenPairUnlock,
+  playLinkCoinRewardFlight,
   playLinkEnergyFlight,
   playLinkItemRewardFlight,
   playLinkSpecialPairTransform,
@@ -289,7 +290,10 @@ function showLinkGame() {
         </div>
       </header>
       <section class="link-special-hud" aria-label="Tiến trình năng lượng đặc biệt">
-        <span id="link-special-energy" class="link-special-hud__energy" aria-label="Năng lượng đặc biệt"><span data-link-icon="energy"></span></span>
+        <div class="link-special-hud__collectibles">
+          <span id="link-special-energy" class="link-special-hud__energy" aria-label="Năng lượng đặc biệt"><span data-link-icon="energy"></span></span>
+          <span id="link-special-coins" class="link-special-hud__coins" aria-label="Xu"><span data-link-icon="coin"></span></span>
+        </div>
         <div class="link-special-hud__milestones" aria-label="Các mốc kích hoạt đặc biệt">
           <span data-link-special-milestone="1" style="--link-milestone-position: 5%">1</span><span data-link-special-milestone="3" style="--link-milestone-position: 25%">3</span><span data-link-special-milestone="5" style="--link-milestone-position: 45%">5</span><span data-link-special-milestone="7" style="--link-milestone-position: 65%">7</span><span data-link-special-milestone="9" style="--link-milestone-position: 85%">9</span><span data-link-special-milestone="10" style="--link-milestone-position: 95%">10</span>
         </div>
@@ -724,6 +728,7 @@ function applyLinkLuckyReward(reward, anchor) {
     increaseCoins(reward.value);
     saveCoins(gameState.coins);
     showGameplayRewardEffect(anchor, { type: "coins", value: reward.value });
+    playLinkCoinRewardFlight(anchor, reward.value);
     return;
   }
   linkGameState.remainingTime += reward.value;
@@ -1019,6 +1024,7 @@ function applySpecialMatchRewards(anchor) {
   if (rewardType === "coins") {
     increaseCoins(value);
     saveCoins(gameState.coins);
+    playLinkCoinRewardFlight(anchor, value);
   } else {
     linkGameState.remainingTime += value;
     syncLinkTimeProgress();
@@ -1064,6 +1070,7 @@ function processPendingSpecialMilestones(roundId, board) {
     saveCoins(gameState.coins);
     showGameplayRewardEffect(anchor, { type: "time", value: seconds });
     showGameplayRewardEffect(anchor, { type: "coins", value: rules.coins });
+    playLinkCoinRewardFlight(anchor, rules.coins);
     linkGameState.specialMilestoneRewards[progress] = `+${seconds}s và +${rules.coins} Xu.`;
     finish();
   } else if (progress === 9 || progress === 10) {
@@ -1077,6 +1084,7 @@ function processPendingSpecialMilestones(roundId, board) {
       grantLinkItem("reshuffle");
       showGameplayRewardEffect(anchor, { type: "coins", value: coins });
       showGameplayRewardEffect(anchor, { type: "reshuffle", value: 1 });
+      playLinkCoinRewardFlight(anchor, coins);
       playLinkItemRewardFlight(anchor, "reshuffle", { delayMs: 180 });
       linkGameState.specialMilestoneRewards[progress] = `+${coins} Xu, +1 Xáo trộn, +1 Gợi ý và phá cặp.`;
     } else linkGameState.specialMilestoneRewards[progress] = "+1 Gợi ý và phá 1 cặp thường.";
@@ -1114,6 +1122,7 @@ function playAutomaticPairBreak(roundId, board, onComplete) {
     increaseCoins(milestone.breakCoins);
     saveCoins(gameState.coins);
     showGameplayRewardEffect(getLinkHudElements().energy, { type: "coins", value: milestone.breakCoins });
+    playLinkCoinRewardFlight(getLinkHudElements().energy, milestone.breakCoins);
     onComplete();
     return;
   }
@@ -1215,6 +1224,8 @@ function applyLinkTimingStyles(container) {
   container.style.setProperty("--link-item-reward-burst-duration", `${LINK_CONNECT_TIMING.itemRewardBurstMs}ms`);
   container.style.setProperty("--link-item-reward-hold-duration", `${LINK_CONNECT_TIMING.itemRewardHoldMs}ms`);
   container.style.setProperty("--link-item-reward-flight-duration", `${LINK_CONNECT_TIMING.itemRewardFlightMs}ms`);
+  container.style.setProperty("--link-coin-reward-flight-duration", `${LINK_CONNECT_TIMING.coinRewardFlightMs}ms`);
+  container.style.setProperty("--link-coin-reward-stagger", `${LINK_CONNECT_TIMING.coinRewardStaggerMs}ms`);
 }
 
 function getLinkHudElements() {
