@@ -871,6 +871,8 @@ function setLinkTimeProgress(running, roundId = linkGameState.roundId, hud = get
       * GAMEPLAY_TIMING.secondMs,
     remainingMs: Math.max(0, Number(linkGameState.remainingTime || 0)) * GAMEPLAY_TIMING.secondMs,
     lastFrameAt: null,
+    visualTone: null,
+    hudElement: null,
   };
   renderLinkTimeProgress(linkTimeProgressState.remainingMs, linkTimeProgressState, hud);
   if (!linkTimeProgressState.running) return;
@@ -915,11 +917,17 @@ function renderLinkTimeProgress(remainingMs, state, hud = getLinkHudElements()) 
     : countdown ? Math.max(0, Math.min(1, remainingMs / state.timeLimitMs)) : 0;
   const warning = countdown && progress < 0.7 && progress >= 0.3;
   const critical = countdown && progress < 0.3;
-  hud.gameHud?.style.setProperty("--link-timer-progress", String(progress));
-  hud.gameHud?.classList.toggle("has-timer-progress", countdown || state.endless);
-  hud.gameHud?.classList.toggle("is-timer-warning", warning);
-  hud.gameHud?.classList.toggle("is-timer-critical", critical);
-  hud.gameHud?.classList.toggle("is-timer-endless", state.endless);
+  const gameHud = hud.gameHud;
+  if (!gameHud) return;
+  gameHud.style.setProperty("--link-timer-progress", String(progress));
+  const visualTone = state.endless ? "endless" : critical ? "critical" : warning ? "warning" : "normal";
+  if (state.hudElement === gameHud && state.visualTone === visualTone) return;
+  gameHud.classList.toggle("has-timer-progress", countdown || state.endless);
+  gameHud.classList.toggle("is-timer-warning", warning);
+  gameHud.classList.toggle("is-timer-critical", critical);
+  gameHud.classList.toggle("is-timer-endless", state.endless);
+  state.hudElement = gameHud;
+  state.visualTone = visualTone;
 }
 
 function stopLinkTimeProgress() {
