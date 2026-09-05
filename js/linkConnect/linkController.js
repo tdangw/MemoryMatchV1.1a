@@ -495,10 +495,7 @@ function handleLinkTileClick(position) {
       completeLinkLevel();
       return;
     }
-    if (ensurePlayableBoard(linkGameState.board)) {
-      renderLinkBoardShift(linkGameState.board, { onTileClick: handleLinkTileClick });
-      showAppToast("Không còn đường nối. Bàn đã được xáo lại.");
-    }
+    recoverBlockedLinkBoard(linkGameState.board);
     playPendingBoardTransforms();
     if (linkGameState.pendingSpecialMilestones.length) {
       processPendingSpecialMilestones(roundId, board);
@@ -629,10 +626,7 @@ function finishLinkThunder(board, roundId) {
   }
   const boardShifted = applyLinkGravityShift(board, linkGameState.gravityShift);
   if (boardShifted) renderLinkBoardShift(board, { onTileClick: handleLinkTileClick });
-  if (ensurePlayableBoard(board)) {
-    renderLinkBoardShift(board, { onTileClick: handleLinkTileClick });
-    showAppToast("Không còn đường nối. Bàn đã được xáo lại.");
-  }
+  recoverBlockedLinkBoard(board);
   linkGameState.isLocked = false;
 }
 
@@ -936,7 +930,7 @@ function processPendingSpecialMilestones(roundId, board) {
     if (progress >= LINK_CONNECT_CONFIG.special.progressTarget) linkGameState.specialProgress = 0;
     updateLinkHud();
     if (linkGameState.matchedPairs >= linkGameState.totalPairs) return completeLinkLevel();
-    if (ensurePlayableBoard(board)) renderLinkBoardShift(board, { onTileClick: handleLinkTileClick });
+    recoverBlockedLinkBoard(board);
     processPendingSpecialMilestones(roundId, board);
   };
   const rewardPairBreak = () => playAutomaticPairBreak(roundId, board, finish);
@@ -973,6 +967,23 @@ function processPendingSpecialMilestones(roundId, board) {
     } else linkGameState.specialMilestoneRewards[progress] = "+1 Gợi ý và phá 1 cặp thường.";
     rewardPairBreak();
   } else finish();
+}
+
+function recoverBlockedLinkBoard(board) {
+  if (findAvailableConnections(board.grid).length) return false;
+  if (ensurePlayableBoard(board)) {
+    renderLinkBoardShift(board, { onTileClick: handleLinkTileClick });
+    showAppToast("Không còn đường nối. Bàn đã được xáo lại.");
+    return true;
+  }
+  // Khi cuối màn chỉ còn các cặp băng, xáo không thể tạo nước đi vì chúng đều
+  // bị khóa. Mở đúng một cặp để người chơi tiếp tục; lặp lại nếu cần.
+  const thawedPairs = unlockFrozenLinkPairs(board, 1, { onUnlock: rememberFrozenPairForTransform });
+  if (!thawedPairs) return false;
+  renderLinkBoard(board, { onTileClick: handleLinkTileClick });
+  playPendingBoardTransforms();
+  showAppToast("Đã mở một cặp băng để tiếp tục màn chơi.");
+  return true;
 }
 
 function playAutomaticPairBreak(roundId, board, onComplete) {

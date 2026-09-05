@@ -72,6 +72,9 @@ export function applyLinkGravityShift(board, direction = "static") {
 
 export function ensurePlayableBoard(board) {
   if (hasAvailableConnection(board.grid)) return false;
+  // Không thể xáo để tạo nước đi nếu toàn bộ thẻ còn lại đều đang bị băng khóa.
+  // Controller sẽ mở tuần tự một cặp băng trong trường hợp này.
+  if (!getRemainingLinkTiles(board).some((tile) => !tile.frozen)) return false;
   shuffleIntoPlayableBoard(board);
   return true;
 }

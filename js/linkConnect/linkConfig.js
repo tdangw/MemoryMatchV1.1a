@@ -45,7 +45,8 @@ export const LINK_CONNECT_CONFIG = Object.freeze({
       coin: Object.freeze({ min: 5, max: 15 }),
       time: Object.freeze({ min: 2, max: 5 }),
     }),
-    energyDrop: Object.freeze({ chance: 0.2, guaranteeAfterMisses: 9 }),
+    // Tạm để 100% nhằm kiểm tra hiệu ứng bay năng lượng; trả về 0.2 khi kết thúc QA.
+    energyDrop: Object.freeze({ chance: 1, guaranteeAfterMisses: 9 }),
     milestones: Object.freeze({
       pairBreakCoinFallbackBelowPairs: 3,
       breakCoins: 10,
