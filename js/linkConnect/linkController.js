@@ -1007,14 +1007,6 @@ function recoverBlockedLinkBoard(board) {
 
 function playAutomaticPairBreak(roundId, board, onComplete) {
   const milestone = LINK_CONNECT_CONFIG.special.milestones;
-  const remainingPairs = Math.ceil((linkGameState.totalPairs - linkGameState.matchedPairs));
-  if (remainingPairs < milestone.pairBreakCoinFallbackBelowPairs) {
-    increaseCoins(milestone.breakCoins);
-    saveCoins(gameState.coins);
-    showGameplayRewardEffect(getLinkHudElements().energy, { type: "coins", value: milestone.breakCoins });
-    onComplete();
-    return;
-  }
   const pair = removeRandomLinkPair(board, {
     remove: false,
     eligiblePair: (candidate, currentBoard) => candidate.positions.every((position) => {
