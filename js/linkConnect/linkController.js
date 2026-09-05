@@ -851,7 +851,6 @@ function updateLinkTimerHud(hud = getLinkHudElements()) {
 function updateLinkStarsHud(hud = getLinkHudElements()) {
   const stars = calculateLinkStars();
   const targets = isLinkEndlessMode(linkGameState.mode) ? [10, 15, 20] : [12, 18, 25];
-  const starScores = targets.map((multiplier) => linkGameState.totalPairs * multiplier);
   const target = Math.max(1, linkGameState.totalPairs * targets[2]);
   const levelStars = hud.levelStars;
   if (levelStars) {
@@ -863,7 +862,7 @@ function updateLinkStarsHud(hud = getLinkHudElements()) {
   const fill = hud.starsFill;
   if (fill) fill.style.width = `${Math.min(100, Math.round(linkGameState.score / target * 100))}%`;
   if (hud.starProgressCard) {
-    hud.starProgressCard.dataset.tooltip = `Điểm cần đạt: 1★ ${starScores[0]} · 2★ ${starScores[1]} · 3★ ${starScores[2]}`;
+    hud.starProgressCard.dataset.tooltip = `Mục tiêu: ${target}`;
   }
   setHudText(hud.totalStars, gameState.progress.linkConnect.totalStars);
   if (hud.scoreCard) {
