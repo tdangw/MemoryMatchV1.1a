@@ -830,10 +830,6 @@ function updateLinkHud() {
   setHudText(hud.moves, linkGameState.moves);
   setHudText(hud.misses, linkGameState.misses);
   setHudText(hud.combo, linkGameState.combo);
-  if (hud.comboCard) {
-    const seconds = getLinkComboWindowMs(linkGameState.totalPairs) / 1000;
-    hud.comboCard.dataset.tooltip = `Ghép đúng tiếp trong ${seconds}s để tăng combo. Ghép sai hoặc quá thời gian sẽ tính lại.`;
-  }
   setHudText(hud.score, linkGameState.score);
   setHudText(hud.matchedPairs, linkGameState.matchedPairs);
   setHudText(hud.totalPairs, linkGameState.totalPairs);

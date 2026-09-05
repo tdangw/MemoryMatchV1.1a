@@ -6,7 +6,6 @@ const TOOLTIP_GAP = 10;
 const INFO_ONLY_SELECTOR = [
   ".stat-star-progress",
   ".stat-points",
-  ".stat-combo",
   ".link-special-hud__milestones span",
   ".link-special-hud__milestones",
   ".link-tile.is-frozen",
@@ -79,7 +78,7 @@ function getDisabledButtonTooltip(element) {
 
 function getAnchor(target) {
   const candidate = target instanceof Element
-    ? target.closest("#btn-buy-time, #btn-preview-cards, #btn-hint, .stat-star-progress, .stat-points, .stat-combo, #link-tools-toggle, .link-connect-game__item, .link-special-hud__milestones, .link-special-hud__milestones span, .link-tile.is-frozen, #toggle-meteor-effects, #toggle-board-coordinates, #version-info, .app-modal__close, .shop-tab, .appearance-choice, .theme-choice, .shop-buy-button:disabled")
+    ? target.closest("#btn-buy-time, #btn-preview-cards, #btn-hint, .stat-star-progress, .stat-points, #link-tools-toggle, .link-connect-game__item, .link-special-hud__milestones, .link-special-hud__milestones span, .link-tile.is-frozen, #toggle-meteor-effects, #toggle-board-coordinates, #version-info, .app-modal__close, .shop-tab, .appearance-choice, .theme-choice, .shop-buy-button:disabled")
     : null;
   return candidate && getTooltipText(candidate) ? candidate : null;
 }

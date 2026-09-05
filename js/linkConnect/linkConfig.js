@@ -16,9 +16,9 @@ export const LINK_CONNECT_CONFIG = Object.freeze({
     baseMatchPoints: 10,
     comboStepPoints: 3,
     comboWindows: Object.freeze([
-      Object.freeze({ maxPairs: 8, seconds: 5 }),
-      Object.freeze({ maxPairs: 15, seconds: 6 }),
-      Object.freeze({ maxPairs: Infinity, seconds: 7 }),
+      Object.freeze({ maxPairs: 8, seconds: 15 }),
+      Object.freeze({ maxPairs: 15, seconds: 20 }),
+      Object.freeze({ maxPairs: Infinity, seconds: 30 }),
     ]),
   }),
   levelProgression: Object.freeze({
@@ -93,7 +93,7 @@ export const LINK_CONNECT_TIMING = Object.freeze({
   frozenPairUnlockMs: 3000,
   energyBurstMs: 680,
   energyHoldMs: 1000,
-  energyFlightMs: 1250,
+  energyFlightMs: 950,
   automaticPairMarkMs: 360,
 });
 
