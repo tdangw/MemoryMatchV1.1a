@@ -869,8 +869,8 @@
   pointer-events: none;
   will-change: transform, opacity;
   animation:
-    link-energy-drop var(--link-energy-burst-duration, 680ms) linear forwards,
-    link-energy-fly-to-hud var(--link-energy-flight-duration, 950ms) cubic-bezier(.3,.68,.35,1) calc(var(--link-energy-burst-duration, 680ms) + var(--link-energy-hold-duration, 1000ms)) forwards;
+    link-energy-drop var(--link-energy-burst-duration, 1100ms) linear forwards,
+    link-energy-fly-to-hud var(--link-energy-flight-duration, 1050ms) cubic-bezier(.32,.62,.38,1) calc(var(--link-energy-burst-duration, 1100ms) + var(--link-energy-hold-duration, 1000ms)) forwards;
 }
 
 .link-energy-flight::before {
@@ -892,12 +892,12 @@
 }
 
 @keyframes link-energy-drop {
-  0% { opacity: 0; transform: translate(0, 0) scale(.45) rotate(-18deg); }
-  12% { opacity: 1; transform: translate(0, -5px) scale(.9) rotate(-10deg); }
-  38% { opacity: 1; transform: translate(var(--link-energy-apex-x), var(--link-energy-apex-y)) scale(1.12) rotate(12deg); }
-  68% { opacity: 1; transform: translate(var(--link-energy-land-x), var(--link-energy-land-y)) scale(1.1, .76) rotate(18deg); }
-  82% { opacity: 1; transform: translate(var(--link-energy-land-x), var(--link-energy-bounce-y)) scale(.96, 1.06) rotate(12deg); }
-  93% { opacity: 1; transform: translate(var(--link-energy-land-x), var(--link-energy-land-y)) scale(1.04, .88) rotate(8deg); }
+  0% { opacity: 0; transform: translate(0, 0) scale(.62) rotate(-12deg); animation-timing-function: cubic-bezier(.18,.7,.28,1); }
+  16% { opacity: 1; transform: translate(0, -4px) scale(.92) rotate(-7deg); }
+  44% { opacity: 1; transform: translate(var(--link-energy-apex-x), var(--link-energy-apex-y)) scale(1.06) rotate(8deg); animation-timing-function: cubic-bezier(.45,.05,.82,.58); }
+  72% { opacity: 1; transform: translate(var(--link-energy-land-x), var(--link-energy-land-y)) scale(1.04, .92) rotate(12deg); animation-timing-function: cubic-bezier(.16,.72,.3,1); }
+  84% { opacity: 1; transform: translate(var(--link-energy-land-x), var(--link-energy-bounce-y)) scale(.98, 1.03) rotate(9deg); animation-timing-function: ease-in; }
+  95% { opacity: 1; transform: translate(var(--link-energy-land-x), var(--link-energy-land-y)) scale(1.02, .96) rotate(8deg); }
   100% { opacity: 1; transform: translate(var(--link-energy-land-x), var(--link-energy-land-y)) scale(1) rotate(8deg); }
 }
 

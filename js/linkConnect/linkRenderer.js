@@ -326,12 +326,12 @@ export function playLinkEnergyFlight(start, end, { onArrive } = {}) {
   effect.style.setProperty("--link-energy-apex-y", `${Math.round(apexY)}px`);
   effect.style.setProperty("--link-energy-land-x", `${Math.round(landingX)}px`);
   effect.style.setProperty("--link-energy-land-y", `${Math.round(landingY)}px`);
-  effect.style.setProperty("--link-energy-bounce-y", `${Math.round(landingY - Math.max(10, sourceRect.height * .16))}px`);
+  effect.style.setProperty("--link-energy-bounce-y", `${Math.round(landingY - Math.max(6, sourceRect.height * .08))}px`);
   const game = document.getElementById("link-connect-container");
   const styles = game ? getComputedStyle(game) : null;
-  effect.style.setProperty("--link-energy-burst-duration", styles?.getPropertyValue("--link-energy-burst-duration").trim() || "680ms");
+  effect.style.setProperty("--link-energy-burst-duration", styles?.getPropertyValue("--link-energy-burst-duration").trim() || "1100ms");
   effect.style.setProperty("--link-energy-hold-duration", styles?.getPropertyValue("--link-energy-hold-duration").trim() || "1000ms");
-  effect.style.setProperty("--link-energy-flight-duration", styles?.getPropertyValue("--link-energy-flight-duration").trim() || "950ms");
+  effect.style.setProperty("--link-energy-flight-duration", styles?.getPropertyValue("--link-energy-flight-duration").trim() || "1050ms");
   document.body.append(effect);
   let settled = false;
   const finish = () => {
@@ -343,7 +343,7 @@ export function playLinkEnergyFlight(start, end, { onArrive } = {}) {
   effect.addEventListener("animationend", (event) => {
     if (event.animationName === "link-energy-fly-to-hud") finish();
   });
-  setTimeout(finish, 2950);
+  setTimeout(finish, 3550);
   return effect;
 }
 

@@ -91,9 +91,9 @@ export const LINK_CONNECT_TIMING = Object.freeze({
   countdownResumeDelayMs: 1000,
   specialPairTransformMs: 720,
   frozenPairUnlockMs: 3000,
-  energyBurstMs: 680,
+  energyBurstMs: 1100,
   energyHoldMs: 1000,
-  energyFlightMs: 950,
+  energyFlightMs: 1050,
   automaticPairMarkMs: 360,
 });
 
