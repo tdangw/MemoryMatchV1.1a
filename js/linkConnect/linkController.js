@@ -492,6 +492,11 @@ function handleLinkTileClick(position) {
     });
   }
   const matchedTiles = playLinkMatchExit(selectedPosition, position);
+  const matchRewardCoins = LINK_CONNECT_CONFIG.rewards.coinsPerMatch;
+  const matchRewardAnchor = matchedTiles[1] || matchedTiles[0];
+  increaseCoins(matchRewardCoins);
+  saveCoins(gameState.coins);
+  playLinkCoinRewardFlight(matchRewardAnchor, matchRewardCoins);
   showScoreEffect(matchedTiles[0], matchPoints);
   showComboEffect(matchedTiles[1] || matchedTiles[0], linkGameState.combo);
   setTimeout(() => {

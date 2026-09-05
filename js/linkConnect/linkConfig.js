@@ -21,6 +21,9 @@ export const LINK_CONNECT_CONFIG = Object.freeze({
       Object.freeze({ maxPairs: Infinity, seconds: 30 }),
     ]),
   }),
+  rewards: Object.freeze({
+    coinsPerMatch: 10,
+  }),
   levelProgression: Object.freeze({
     timeBonusPerLevel: 2,
     timeBonusCap: 10,
