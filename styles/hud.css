@@ -94,6 +94,21 @@
   color: #f2bf5b;
 }
 
+.game-progress-hud .stat-coins,
+.game-progress-hud .stat-coins strong {
+  color: #ffd25f;
+}
+
+.game-progress-hud .stat-coins .ui-icon {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2.25;
+}
+
+.game-progress-hud .stat-coins strong {
+  font: inherit;
+}
+
 .game-progress-hud .stat-star-progress {
   display: grid;
   grid-template-rows: 12px 8px;

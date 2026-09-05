@@ -86,6 +86,58 @@
   filter: drop-shadow(0 1px 2px rgb(0 0 0 / 45%));
 }
 
+/* Phần thưởng Xu dùng chung cho Memory Match và Link Connect. */
+.game-coin-reward-flight {
+  position: fixed;
+  z-index: 32022;
+  display: grid;
+  width: 18px;
+  height: 18px;
+  place-items: center;
+  margin: -9px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 32%, #fff4a3 0 12%, #f7b928 38%, #9f5b00 100%);
+  color: #fff8bd;
+  box-shadow: 0 2px 5px rgb(0 0 0 / 48%), 0 0 4px rgb(255 199 64 / 42%);
+  pointer-events: none;
+  will-change: transform, opacity;
+  animation: game-coin-reward-loot var(--game-coin-flight-duration, 1500ms) cubic-bezier(.24,.68,.34,1) var(--game-coin-delay, 0ms) both;
+}
+
+.game-coin-reward-flight .ui-icon {
+  width: 12px;
+  height: 12px;
+  stroke-width: 2.8;
+}
+
+.game-coin-hud.is-gaining .ui-icon {
+  animation: game-coin-target-pop var(--game-coin-counter-duration, 520ms) ease-out;
+}
+
+.game-coin-hud.is-gaining strong {
+  animation: game-coin-count-pop var(--game-coin-counter-duration, 520ms) ease-out;
+}
+
+@keyframes game-coin-reward-loot {
+  0% { opacity: 0; transform: translate(0, 0) scale(.5) rotate(-18deg); }
+  12% { opacity: 1; transform: translate(var(--game-coin-apex-x), var(--game-coin-apex-y)) scale(1.08) rotate(12deg); }
+  34% { opacity: 1; transform: translate(var(--game-coin-land-x), var(--game-coin-land-y)) scale(1.05, .9) rotate(18deg); }
+  44% { opacity: 1; transform: translate(var(--game-coin-land-x), calc(var(--game-coin-land-y) - 6px)) scale(.98, 1.03) rotate(8deg); }
+  52% { opacity: 1; transform: translate(var(--game-coin-land-x), var(--game-coin-land-y)) scale(1) rotate(0deg); }
+  64% { opacity: 1; transform: translate(var(--game-coin-land-x), var(--game-coin-land-y)) scale(1.04); }
+  100% { opacity: 0; transform: translate(var(--game-coin-flight-x), var(--game-coin-flight-y)) scale(.42); }
+}
+
+@keyframes game-coin-target-pop {
+  0%, 100% { transform: scale(1); filter: brightness(1); }
+  42% { transform: scale(1.2) rotate(-8deg); filter: brightness(1.35); }
+}
+
+@keyframes game-coin-count-pop {
+  0%, 100% { transform: translateY(0) scale(1); }
+  42% { transform: translateY(-2px) scale(1.16); color: #fff8d2; }
+}
+
 .tile-combo-effect {
   color: var(--combo-text-color, #e4f7ff);
   font:

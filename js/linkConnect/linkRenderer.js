@@ -432,61 +432,6 @@ export function playLinkItemRewardFlight(source, itemId, { delayMs = 0 } = {}) {
   return null;
 }
 
-export function playLinkCoinRewardFlight(source, amount) {
-  const coinCount = Math.max(0, Math.floor(Number(amount) || 0));
-  const target = document.querySelector("#link-special-coins .ui-icon")
-    || document.querySelector("#link-special-coins");
-  if (!source || !target || coinCount < 1) return [];
-  // Thẻ đang chạy hiệu ứng xóa có thể đã co lại. Dùng ô chứa để giữ đúng
-  // tâm và kích thước ban đầu, giúp đồng Xu luôn xuất hiện rõ trên bàn.
-  const stableSource = source.closest?.(".link-board__cell") || source;
-  const sourceRect = stableSource.getBoundingClientRect();
-  const targetRect = target.getBoundingClientRect();
-  const startX = sourceRect.left + sourceRect.width / 2;
-  const startY = sourceRect.top + sourceRect.height / 2;
-  const targetX = targetRect.left + targetRect.width / 2 - startX;
-  const targetY = targetRect.top + targetRect.height / 2 - startY;
-  const safeInset = 14;
-  const viewportWidth = document.documentElement.clientWidth;
-  const viewportHeight = document.documentElement.clientHeight;
-  const game = document.getElementById("link-connect-container");
-  const styles = game ? getComputedStyle(game) : null;
-  const duration = styles?.getPropertyValue("--link-coin-reward-flight-duration").trim() || "1500ms";
-  const stagger = styles?.getPropertyValue("--link-coin-reward-stagger").trim() || "45ms";
-  const durationMs = readCssTimeMs(duration, 1500);
-  const staggerMs = readCssTimeMs(stagger, 45);
-  const fragment = document.createDocumentFragment();
-  const effects = Array.from({ length: coinCount }, (_, index) => {
-    const effect = document.createElement("span");
-    effect.className = "link-coin-reward-flight";
-    effect.setAttribute("aria-hidden", "true");
-    effect.append(createIcon("coin"));
-    const direction = index % 2 ? 1 : -1;
-    const spread = direction * (18 + Math.random() * Math.min(48, Math.max(24, sourceRect.width * 0.55)));
-    const landingX = clamp(startX + spread, safeInset, viewportWidth - safeInset) - startX;
-    const landingDistanceY = Math.max(18, Math.min(46, sourceRect.height * (0.32 + Math.random() * 0.2)));
-    const landingY = clamp(startY + landingDistanceY, safeInset, viewportHeight - safeInset) - startY;
-    const apexX = landingX * (0.42 + Math.random() * 0.2);
-    const apexY = clamp(startY - Math.max(24, landingDistanceY * (1.15 + Math.random() * 0.35)), safeInset, viewportHeight - safeInset) - startY;
-    effect.style.left = `${startX}px`;
-    effect.style.top = `${startY}px`;
-    effect.style.setProperty("--link-coin-apex-x", `${Math.round(apexX)}px`);
-    effect.style.setProperty("--link-coin-apex-y", `${Math.round(apexY)}px`);
-    effect.style.setProperty("--link-coin-land-x", `${Math.round(landingX)}px`);
-    effect.style.setProperty("--link-coin-land-y", `${Math.round(landingY)}px`);
-    effect.style.setProperty("--link-coin-flight-x", `${Math.round(targetX)}px`);
-    effect.style.setProperty("--link-coin-flight-y", `${Math.round(targetY)}px`);
-    effect.style.setProperty("--link-coin-reward-flight-duration", duration);
-    effect.style.setProperty("--link-coin-delay", `${Math.round(index * staggerMs)}ms`);
-    fragment.append(effect);
-    return effect;
-  });
-  document.body.append(fragment);
-  const cleanupDelay = durationMs + Math.max(0, coinCount - 1) * staggerMs + 250;
-  setTimeout(() => effects.forEach((effect) => effect.remove()), cleanupDelay);
-  return effects;
-}
-
 function readCssTimeMs(value, fallback) {
   const parsed = Number.parseFloat(value);
   if (!Number.isFinite(parsed)) return fallback;

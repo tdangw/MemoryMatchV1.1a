@@ -27,6 +27,7 @@ import {
   showLuckyRewardPopup,
   highlightTarget,
   showScoreEffect,
+  showMemoryCoinReward,
   showLevelSummaryOverlay,
 } from "./ui.js";
 import { pauseBackgroundMusic, sounds } from "./sound.js"; // 📦 Tách âm thanh
@@ -37,6 +38,7 @@ import {
   getComboTimeBonus,
   shouldShowVictoryCelebration,
 } from "./gameplayTuning.js";
+import { calculateMatchCoinReward } from "./coinRewards.js";
 import {
   canShowFullVictoryCelebration,
   showFullVictoryCelebration,
@@ -190,6 +192,11 @@ function checkMatch(roundId) {
     const score = increaseScore(matchPoints);
     updateScoreDisplay(score);
     showScoreEffect(second.element, matchPoints);
+    const matchCoins = calculateMatchCoinReward(gameState.combo);
+    const previousCoins = gameState.coins;
+    const totalCoins = increaseCoins(matchCoins);
+    saveCoins(totalCoins);
+    showMemoryCoinReward(second.element, previousCoins, totalCoins, matchCoins);
     highlightTarget("#score");
     updateLevelStarsDisplay(calculateStarProgress(score, gameState.totalPairs, gameState.settings.mode));
     updateComboDisplay(gameState.combo);

@@ -8,6 +8,9 @@ export const GAMEPLAY_TIMING = Object.freeze({
   rewardPopupVisibleMs: 760,
   rewardPopupExitMs: 260,
   scoreEffectDurationMs: 1900,
+  coinRewardFlightMs: 1500,
+  coinRewardStaggerMs: 45,
+  coinCounterAnimationMs: 520,
   timePurchaseGraceMs: 1000,
   victoryFireworksDurationMs: 2500,
   victoryCelebration: Object.freeze({

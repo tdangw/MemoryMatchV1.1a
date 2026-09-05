@@ -23,10 +23,6 @@ export const LINK_CONNECT_CONFIG = Object.freeze({
       Object.freeze({ maxPairs: Infinity, seconds: 30 }),
     ]),
   }),
-  rewards: Object.freeze({
-    baseCoinsPerMatch: 2,
-    comboStepCoins: 1,
-  }),
   levelProgression: Object.freeze({
     timeBonusPerLevel: 2,
     timeBonusCap: 10,
@@ -102,9 +98,6 @@ export const LINK_CONNECT_TIMING = Object.freeze({
   itemRewardBurstMs: 620,
   itemRewardHoldMs: 380,
   itemRewardFlightMs: 820,
-  coinRewardFlightMs: 1500,
-  coinRewardStaggerMs: 45,
-  coinCounterAnimationMs: 520,
   automaticPairMarkMs: 360,
 });
 
@@ -197,12 +190,6 @@ export function calculateLinkMatchPoints(combo = 1, { special = false } = {}) {
   const points = scoring.baseMatchPoints
     + scoring.comboStepPoints * Math.max(0, combo - 1);
   return Math.round(points * (special ? LINK_CONNECT_CONFIG.special.scoreMultiplier : 1));
-}
-
-export function calculateLinkMatchCoinReward(combo = 1) {
-  const rewards = LINK_CONNECT_CONFIG.rewards;
-  return rewards.baseCoinsPerMatch
-    + rewards.comboStepCoins * Math.max(0, Math.floor(Number(combo) || 1) - 1);
 }
 
 export function calculateLinkCompletionTimeBonus(mode, remainingTime) {

@@ -32,6 +32,7 @@ import {
   updatePairProgressDisplay,
   updateLevelStarsDisplay,
   updateTotalStarsDisplay,
+  updateCoinDisplay,
   showBonusOverlay,
   openTimeUpModal,
   showRevealTimerInHud,
@@ -98,6 +99,7 @@ export function initializeLevel(level) {
   updateScoreDisplay(gameState.score);
   updateLevelStarsDisplay(0);
   updateTotalStarsDisplay(gameState.progress.memoryMatch.totalStars);
+  updateCoinDisplay(gameState.coins);
   updateHintDisplay(gameState.hints);
   updateMovesDisplay(gameState.moves);
   updateMissesDisplay(gameState.misses);

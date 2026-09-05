@@ -11,6 +11,11 @@ import { getEquippedThemeId } from "./appearance.js";
 import { getStarScoreTargets, getTimerDirection, isEndlessMode } from "./config.js";
 import { getGameModeLabel } from "./gameCatalog.js";
 import { formatClockTime, UI_COPY } from "./uiCatalog.js";
+import {
+  animateCoinCounter,
+  isCoinCounterAnimating,
+  playCoinRewardFlight,
+} from "./coinRewards.js";
 
 const scoreElement = document.getElementById("score");
 const levelElement = document.getElementById("level");
@@ -19,6 +24,8 @@ const timerElement = document.getElementById("timer-value");
 const timerContainer = document.getElementById("timer");
 const memoryTimeHudElement = document.getElementById("memory-time-hud");
 const memoryTimeProgressElement = document.getElementById("memory-time-progress");
+const memoryCoinHudElement = document.getElementById("memory-game-coins");
+const memoryCoinElement = document.getElementById("memory-coin-balance");
 let memoryTimeAnimationFrame = null;
 let memoryTimeProgressState = null;
 const rewardPopupQueue = [];
@@ -40,6 +47,20 @@ let revealTimerRoundId = null;
 export function updateCoinDisplay(coins) {
   const coinElement = document.getElementById("coin-balance");
   if (coinElement) coinElement.textContent = String(coins);
+  if (!isCoinCounterAnimating(memoryCoinElement) && memoryCoinElement) {
+    memoryCoinElement.textContent = String(coins);
+  }
+  if (memoryCoinHudElement) {
+    const label = `Xu: ${coins}`;
+    memoryCoinHudElement.setAttribute("aria-label", label);
+    memoryCoinHudElement.dataset.tooltip = label;
+  }
+}
+
+export function showMemoryCoinReward(tileElement, previousCoins, nextCoins, amount) {
+  if (!tileElement || !memoryCoinHudElement || !memoryCoinElement) return;
+  playCoinRewardFlight(tileElement, memoryCoinHudElement, amount);
+  animateCoinCounter(memoryCoinHudElement, memoryCoinElement, previousCoins, nextCoins);
 }
 
 export function updateScoreDisplay(score) {
@@ -608,7 +629,7 @@ export function showReturnToMenuOverlay({ onConfirm } = {}) {
 }
 export function showScoreEffect(tileElement, points) {
   if (!tileElement || points <= 0) return;
-  showGameplayFloatEffect(tileElement, `+${points}`, "tile-score-effect");
+  showGameplayFloatEffect(tileElement, `+${points} điểm`, "tile-score-effect");
 }
 
 export function showGameplayRewardEffect(tileElement, { type, value } = {}) {

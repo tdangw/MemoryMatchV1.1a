@@ -3,6 +3,12 @@ import { openAppModal, showAppToast } from "../modal.js";
 import { pauseBackgroundMusic, sounds, syncDefaultMusic } from "../sound.js";
 import { getEquippedThemeId } from "../appearance.js";
 import { GAMEPLAY_TIMING } from "../gameplayTuning.js";
+import {
+  animateCoinCounter,
+  calculateMatchCoinReward,
+  isCoinCounterAnimating,
+  playCoinRewardFlight,
+} from "../coinRewards.js";
 import { gameState, increaseCoins, recordLinkConnectResult, spendCoins } from "../gameState.js";
 import { saveCoins, saveProgress } from "../persistence.js";
 import { getTheme } from "../themeCatalog.js";
@@ -17,7 +23,6 @@ import {
   calculateLinkMatchPoints,
   calculateLinkCoinReward,
   calculateLinkCompletionTimeBonus,
-  calculateLinkMatchCoinReward,
   calculateLinkStarRating,
   getLinkChallengeTime,
   getLinkComboWindowMs,
@@ -69,7 +74,6 @@ import {
   playLinkMatchExit,
   playLinkMismatch,
   playLinkFrozenPairUnlock,
-  playLinkCoinRewardFlight,
   playLinkEnergyFlight,
   playLinkItemRewardFlight,
   playLinkSpecialPairTransform,
@@ -84,8 +88,6 @@ import { beginLinkRound, linkGameState, resetLinkGame } from "./linkState.js";
 let countdownInterval;
 let linkTimeAnimationFrame = null;
 let linkTimeProgressState = null;
-let linkCoinAnimationFrame = null;
-let linkCoinAnimationElement = null;
 let comboExpiryTimer;
 let selectedPosition = null;
 let linkTimeWarningPlayed = false;
@@ -296,7 +298,7 @@ function showLinkGame() {
         </div>
       </header>
       <section class="link-special-hud" aria-label="Tiến trình năng lượng đặc biệt">
-        <span id="link-special-coins" class="link-special-hud__coins" aria-label="Xu"><span data-link-icon="coin"></span><strong id="link-coin-balance">0</strong></span>
+        <span id="link-special-coins" class="link-special-hud__coins game-coin-hud" aria-label="Xu"><span data-link-icon="coin"></span><strong id="link-coin-balance">0</strong></span>
         <div class="link-special-hud__milestones" aria-label="Các mốc kích hoạt đặc biệt">
           <span data-link-special-milestone="1" style="--link-milestone-position: 5%">1</span><span data-link-special-milestone="3" style="--link-milestone-position: 25%">3</span><span data-link-special-milestone="5" style="--link-milestone-position: 45%">5</span><span data-link-special-milestone="7" style="--link-milestone-position: 65%">7</span><span data-link-special-milestone="9" style="--link-milestone-position: 85%">9</span><span data-link-special-milestone="10" style="--link-milestone-position: 95%">10</span>
         </div>
@@ -502,7 +504,7 @@ function handleLinkTileClick(position) {
     });
   }
   const matchedTiles = playLinkMatchExit(selectedPosition, position);
-  const matchRewardCoins = calculateLinkMatchCoinReward(linkGameState.combo);
+  const matchRewardCoins = calculateMatchCoinReward(linkGameState.combo);
   const matchRewardAnchor = matchedTiles[1] || matchedTiles[0];
   awardLinkCoins(matchRewardCoins, matchRewardAnchor);
   showScoreEffect(matchedTiles[0], matchPoints);
@@ -873,10 +875,7 @@ function updateLinkTimerHud(hud = getLinkHudElements()) {
 }
 
 function updateLinkCoinHud(hud = getLinkHudElements()) {
-  if (linkCoinAnimationFrame !== null && linkCoinAnimationElement === hud.coinBalance) return;
-  if (linkCoinAnimationFrame !== null) cancelAnimationFrame(linkCoinAnimationFrame);
-  linkCoinAnimationFrame = null;
-  linkCoinAnimationElement = null;
+  if (isCoinCounterAnimating(hud.coinBalance)) return;
   setHudText(hud.coinBalance, gameState.coins);
   if (!hud.coins) return;
   const label = `Xu: ${gameState.coins}`;
@@ -890,47 +889,10 @@ function awardLinkCoins(amount, anchor, { animate = true } = {}) {
   const previousCoins = gameState.coins;
   increaseCoins(value);
   saveCoins(gameState.coins);
-  animateLinkCoinHudIncrease(previousCoins, gameState.coins);
-  if (animate && anchor) playLinkCoinRewardFlight(anchor, value);
-  return value;
-}
-
-function animateLinkCoinHudIncrease(previousCoins, nextCoins) {
   const hud = getLinkHudElements();
-  const counter = hud.coinBalance;
-  if (!counter) return;
-  if (linkCoinAnimationFrame !== null) cancelAnimationFrame(linkCoinAnimationFrame);
-  const displayedCoins = Number(counter.textContent);
-  const startCoins = Number.isFinite(displayedCoins) ? displayedCoins : previousCoins;
-  const duration = LINK_CONNECT_TIMING.coinCounterAnimationMs;
-  const startedAt = performance.now();
-  linkCoinAnimationElement = counter;
-  hud.coins?.classList.remove("is-gaining");
-  if (hud.coins) {
-    void hud.coins.offsetWidth;
-    hud.coins.classList.add("is-gaining");
-  }
-  const updateFrame = (timestamp) => {
-    if (!counter.isConnected) {
-      linkCoinAnimationFrame = null;
-      linkCoinAnimationElement = null;
-      return;
-    }
-    const progress = Math.max(0, Math.min(1, (timestamp - startedAt) / duration));
-    const easedProgress = 1 - (1 - progress) ** 3;
-    setHudText(counter, Math.floor(startCoins + (nextCoins - startCoins) * easedProgress));
-    const label = `Xu: ${counter.textContent}`;
-    hud.coins?.setAttribute("aria-label", label);
-    if (hud.coins) hud.coins.dataset.tooltip = label;
-    if (progress < 1) {
-      linkCoinAnimationFrame = requestAnimationFrame(updateFrame);
-      return;
-    }
-    setHudText(counter, nextCoins);
-    linkCoinAnimationFrame = null;
-    linkCoinAnimationElement = null;
-  };
-  linkCoinAnimationFrame = requestAnimationFrame(updateFrame);
+  animateCoinCounter(hud.coins, hud.coinBalance, previousCoins, gameState.coins);
+  if (animate && anchor) playCoinRewardFlight(anchor, hud.coins, value);
+  return value;
 }
 
 function setLinkTimeProgress(running, roundId = linkGameState.roundId, hud = getLinkHudElements()) {
@@ -1287,9 +1249,6 @@ function applyLinkTimingStyles(container) {
   container.style.setProperty("--link-item-reward-burst-duration", `${LINK_CONNECT_TIMING.itemRewardBurstMs}ms`);
   container.style.setProperty("--link-item-reward-hold-duration", `${LINK_CONNECT_TIMING.itemRewardHoldMs}ms`);
   container.style.setProperty("--link-item-reward-flight-duration", `${LINK_CONNECT_TIMING.itemRewardFlightMs}ms`);
-  container.style.setProperty("--link-coin-reward-flight-duration", `${LINK_CONNECT_TIMING.coinRewardFlightMs}ms`);
-  container.style.setProperty("--link-coin-reward-stagger", `${LINK_CONNECT_TIMING.coinRewardStaggerMs}ms`);
-  container.style.setProperty("--link-coin-counter-duration", `${LINK_CONNECT_TIMING.coinCounterAnimationMs}ms`);
 }
 
 function getLinkHudElements() {
