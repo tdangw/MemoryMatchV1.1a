@@ -1,6 +1,7 @@
 import { getActiveLinkConnectionEffect } from "./linkEffects.js";
 import { gameState } from "../gameState.js";
 import { createIcon } from "../icons.js";
+import { getLinkItemDefinition } from "./linkItems.js";
 import {
   measureLinkRender,
   recordLinkLayoutPass,
@@ -362,6 +363,67 @@ export function playLinkEnergyFlight(start, end, { onArrive } = {}) {
   }, collectDelayMs);
   setTimeout(finish, collectDelayMs + readCssTimeMs(flightDuration, 1050) + 350);
   return effect;
+}
+
+export function playLinkItemRewardFlight(source, itemId, { delayMs = 0 } = {}) {
+  const item = getLinkItemDefinition(itemId);
+  if (!source || !item) return null;
+  const launch = () => {
+    if (!source.isConnected) return;
+    const sourceRect = source.getBoundingClientRect();
+    const startX = sourceRect.left + sourceRect.width / 2;
+    const startY = sourceRect.top + sourceRect.height / 2;
+    const viewportWidth = document.documentElement.clientWidth;
+    const direction = Math.random() < 0.5 ? -1 : 1;
+    const desiredBurstX = direction * (24 + Math.random() * 20);
+    const burstX = clamp(startX + desiredBurstX, 18, viewportWidth - 18) - startX;
+    const burstDistanceY = 18 + Math.random() * 18;
+    const burstY = startY - burstDistanceY * 1.18 < 18 ? burstDistanceY : -burstDistanceY;
+    const effect = document.createElement("span");
+    effect.className = `link-item-reward-flight link-item-reward-flight--${itemId}`;
+    effect.setAttribute("aria-hidden", "true");
+    effect.append(createIcon(item.icon));
+    effect.style.left = `${startX}px`;
+    effect.style.top = `${startY}px`;
+    effect.style.setProperty("--link-item-reward-burst-x", `${Math.round(burstX)}px`);
+    effect.style.setProperty("--link-item-reward-burst-y", `${Math.round(burstY)}px`);
+    effect.style.setProperty("--link-item-reward-apex-x", `${Math.round(burstX * 0.72)}px`);
+    effect.style.setProperty("--link-item-reward-apex-y", `${Math.round(burstY * 1.18)}px`);
+    const game = document.getElementById("link-connect-container");
+    const styles = game ? getComputedStyle(game) : null;
+    const burstDuration = styles?.getPropertyValue("--link-item-reward-burst-duration").trim() || "620ms";
+    const holdDuration = styles?.getPropertyValue("--link-item-reward-hold-duration").trim() || "380ms";
+    const flightDuration = styles?.getPropertyValue("--link-item-reward-flight-duration").trim() || "820ms";
+    effect.style.setProperty("--link-item-reward-burst-duration", burstDuration);
+    effect.style.setProperty("--link-item-reward-flight-duration", flightDuration);
+    document.body.append(effect);
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      effect.remove();
+    };
+    effect.addEventListener("animationend", (event) => {
+      if (event.animationName === "link-item-reward-collect") finish();
+    });
+    const collectDelayMs = readCssTimeMs(burstDuration, 620) + readCssTimeMs(holdDuration, 380);
+    setTimeout(() => {
+      if (!effect.isConnected) return;
+      const itemTarget = document.querySelector(`#link-item-actions [data-item="${itemId}"] .ui-icon`);
+      const target = itemTarget?.getClientRects().length
+        ? itemTarget
+        : document.querySelector("#link-tools-toggle .ui-icon");
+      if (!target) return finish();
+      const targetRect = target.getBoundingClientRect();
+      effect.style.setProperty("--link-item-reward-flight-x", `${Math.round(targetRect.left + targetRect.width / 2 - startX)}px`);
+      effect.style.setProperty("--link-item-reward-flight-y", `${Math.round(targetRect.top + targetRect.height / 2 - startY)}px`);
+      effect.classList.add("is-collecting");
+    }, collectDelayMs);
+    setTimeout(finish, collectDelayMs + readCssTimeMs(flightDuration, 820) + 300);
+  };
+  if (delayMs > 0) return setTimeout(launch, delayMs);
+  launch();
+  return null;
 }
 
 function readCssTimeMs(value, fallback) {

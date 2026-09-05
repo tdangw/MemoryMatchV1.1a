@@ -66,6 +66,7 @@ import {
   playLinkMismatch,
   playLinkFrozenPairUnlock,
   playLinkEnergyFlight,
+  playLinkItemRewardFlight,
   playLinkSpecialPairTransform,
   playLinkThunderStrike,
   renderLinkBoard,
@@ -1051,6 +1052,7 @@ function processPendingSpecialMilestones(roundId, board) {
     const item = Math.random() < 0.5 ? "hint" : "reshuffle";
     grantLinkItem(item);
     showGameplayRewardEffect(anchor, { type: item, value: 1 });
+    playLinkItemRewardFlight(anchor, item);
     linkGameState.specialMilestoneRewards[progress] = `+1 ${item === "hint" ? "Gợi ý" : "Xáo trộn"}.`;
     finish();
   } else if (progress === 7) {
@@ -1067,6 +1069,7 @@ function processPendingSpecialMilestones(roundId, board) {
   } else if (progress === 9 || progress === 10) {
     grantLinkItem("hint");
     showGameplayRewardEffect(anchor, { type: "hint", value: 1 });
+    playLinkItemRewardFlight(anchor, "hint");
     if (progress === 10) {
       const coins = LINK_CONNECT_CONFIG.special.milestones.ten.coins;
       increaseCoins(coins);
@@ -1074,6 +1077,7 @@ function processPendingSpecialMilestones(roundId, board) {
       grantLinkItem("reshuffle");
       showGameplayRewardEffect(anchor, { type: "coins", value: coins });
       showGameplayRewardEffect(anchor, { type: "reshuffle", value: 1 });
+      playLinkItemRewardFlight(anchor, "reshuffle", { delayMs: 180 });
       linkGameState.specialMilestoneRewards[progress] = `+${coins} Xu, +1 Xáo trộn, +1 Gợi ý và phá cặp.`;
     } else linkGameState.specialMilestoneRewards[progress] = "+1 Gợi ý và phá 1 cặp thường.";
     rewardPairBreak();
@@ -1208,6 +1212,9 @@ function applyLinkTimingStyles(container) {
   container.style.setProperty("--link-energy-burst-duration", `${LINK_CONNECT_TIMING.energyBurstMs}ms`);
   container.style.setProperty("--link-energy-hold-duration", `${LINK_CONNECT_TIMING.energyHoldMs}ms`);
   container.style.setProperty("--link-energy-flight-duration", `${LINK_CONNECT_TIMING.energyFlightMs}ms`);
+  container.style.setProperty("--link-item-reward-burst-duration", `${LINK_CONNECT_TIMING.itemRewardBurstMs}ms`);
+  container.style.setProperty("--link-item-reward-hold-duration", `${LINK_CONNECT_TIMING.itemRewardHoldMs}ms`);
+  container.style.setProperty("--link-item-reward-flight-duration", `${LINK_CONNECT_TIMING.itemRewardFlightMs}ms`);
 }
 
 function getLinkHudElements() {
