@@ -298,13 +298,12 @@ export function playLinkMatchExit(start, end) {
 // Năng lượng chỉ là hiệu ứng tạm trên lớp phủ; không tạo hay lưu vật phẩm.
 export function playLinkEnergyFlight(start, end, { onArrive } = {}) {
   const sourceTile = getLinkTileButton(end) || getLinkTileButton(start);
-  const target = document.getElementById("link-special-energy");
+  const target = document.querySelector("#link-special-energy .ui-icon");
   if (!sourceTile || !target) {
     onArrive?.();
     return null;
   }
   const sourceRect = sourceTile.getBoundingClientRect();
-  const targetRect = target.getBoundingClientRect();
   const effect = document.createElement("span");
   effect.className = "link-energy-flight";
   effect.setAttribute("aria-hidden", "true");
@@ -316,12 +315,8 @@ export function playLinkEnergyFlight(start, end, { onArrive } = {}) {
   const landingY = Math.max(20, sourceRect.height * (.34 + Math.random() * .16));
   const apexX = landingX * (.45 + Math.random() * .18);
   const apexY = -sourceRect.height * (.68 + Math.random() * .38);
-  const targetX = targetRect.left + targetRect.width / 2 - startX;
-  const targetY = targetRect.top + targetRect.height / 2 - startY;
   effect.style.left = `${startX}px`;
   effect.style.top = `${startY}px`;
-  effect.style.setProperty("--link-energy-flight-x", `${Math.round(targetX)}px`);
-  effect.style.setProperty("--link-energy-flight-y", `${Math.round(targetY)}px`);
   effect.style.setProperty("--link-energy-apex-x", `${Math.round(apexX)}px`);
   effect.style.setProperty("--link-energy-apex-y", `${Math.round(apexY)}px`);
   effect.style.setProperty("--link-energy-land-x", `${Math.round(landingX)}px`);
@@ -329,9 +324,11 @@ export function playLinkEnergyFlight(start, end, { onArrive } = {}) {
   effect.style.setProperty("--link-energy-bounce-y", `${Math.round(landingY - Math.max(6, sourceRect.height * .08))}px`);
   const game = document.getElementById("link-connect-container");
   const styles = game ? getComputedStyle(game) : null;
-  effect.style.setProperty("--link-energy-burst-duration", styles?.getPropertyValue("--link-energy-burst-duration").trim() || "1100ms");
-  effect.style.setProperty("--link-energy-hold-duration", styles?.getPropertyValue("--link-energy-hold-duration").trim() || "1000ms");
-  effect.style.setProperty("--link-energy-flight-duration", styles?.getPropertyValue("--link-energy-flight-duration").trim() || "1050ms");
+  const burstDuration = styles?.getPropertyValue("--link-energy-burst-duration").trim() || "1100ms";
+  const holdDuration = styles?.getPropertyValue("--link-energy-hold-duration").trim() || "1000ms";
+  const flightDuration = styles?.getPropertyValue("--link-energy-flight-duration").trim() || "1050ms";
+  effect.style.setProperty("--link-energy-burst-duration", burstDuration);
+  effect.style.setProperty("--link-energy-flight-duration", flightDuration);
   document.body.append(effect);
   let settled = false;
   const finish = () => {
@@ -343,8 +340,24 @@ export function playLinkEnergyFlight(start, end, { onArrive } = {}) {
   effect.addEventListener("animationend", (event) => {
     if (event.animationName === "link-energy-fly-to-hud") finish();
   });
-  setTimeout(finish, 3550);
+  const collectDelayMs = readCssTimeMs(burstDuration, 1100) + readCssTimeMs(holdDuration, 1000);
+  setTimeout(() => {
+    if (!effect.isConnected) return;
+    const currentTarget = document.querySelector("#link-special-energy .ui-icon");
+    if (!currentTarget) return finish();
+    const targetRect = currentTarget.getBoundingClientRect();
+    effect.style.setProperty("--link-energy-flight-x", `${Math.round(targetRect.left + targetRect.width / 2 - startX)}px`);
+    effect.style.setProperty("--link-energy-flight-y", `${Math.round(targetRect.top + targetRect.height / 2 - startY)}px`);
+    effect.classList.add("is-collecting");
+  }, collectDelayMs);
+  setTimeout(finish, collectDelayMs + readCssTimeMs(flightDuration, 1050) + 350);
   return effect;
+}
+
+function readCssTimeMs(value, fallback) {
+  const parsed = Number.parseFloat(value);
+  if (!Number.isFinite(parsed)) return fallback;
+  return value.endsWith("s") && !value.endsWith("ms") ? parsed * 1000 : parsed;
 }
 
 const FRAGMENT_LAYOUTS = Object.freeze({

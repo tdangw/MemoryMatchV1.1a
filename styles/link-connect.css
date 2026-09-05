@@ -845,7 +845,7 @@
   border-radius: 50%;
   background: rgb(80 57 8 / 90%);
   color: #ffe16f;
-  box-shadow: 0 0 10px rgb(255 208 79 / 34%);
+  box-shadow: 0 0 6px rgb(255 208 79 / 20%);
 }
 
 .link-special-hud__energy .ui-icon { width: 14px; height: 14px; stroke-width: 2.5; }
@@ -865,12 +865,14 @@
   color: #fff07a;
   box-shadow:
     0 3px 7px rgb(0 0 0 / 68%),
-    0 0 12px 3px rgb(255 213 65 / 72%);
+    0 0 7px 2px rgb(255 213 65 / 42%);
   pointer-events: none;
   will-change: transform, opacity;
-  animation:
-    link-energy-drop var(--link-energy-burst-duration, 1100ms) linear forwards,
-    link-energy-fly-to-hud var(--link-energy-flight-duration, 1050ms) cubic-bezier(.32,.62,.38,1) calc(var(--link-energy-burst-duration, 1100ms) + var(--link-energy-hold-duration, 1000ms)) forwards;
+  animation: link-energy-drop var(--link-energy-burst-duration, 1100ms) linear forwards;
+}
+
+.link-energy-flight.is-collecting {
+  animation: link-energy-fly-to-hud var(--link-energy-flight-duration, 1050ms) cubic-bezier(.32,.62,.38,1) forwards;
 }
 
 .link-energy-flight::before {
@@ -878,9 +880,9 @@
   position: absolute;
   inset: -5px;
   z-index: -1;
-  background: radial-gradient(circle, rgb(255 225 103 / 32%), transparent 68%);
+  background: radial-gradient(circle, rgb(255 225 103 / 20%), transparent 68%);
   border-radius: 50%;
-  opacity: .8;
+  opacity: .55;
   animation: link-energy-loot-aura 720ms ease-in-out infinite alternate;
 }
 
@@ -888,7 +890,7 @@
   width: 14px;
   height: 14px;
   stroke-width: 3;
-  filter: drop-shadow(0 1px 1px #07182b) drop-shadow(0 0 4px #ffe56f);
+  filter: drop-shadow(0 1px 1px #07182b) drop-shadow(0 0 2px rgb(255 229 111 / 72%));
 }
 
 @keyframes link-energy-drop {
