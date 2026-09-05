@@ -741,7 +741,7 @@
   content: "";
   position: absolute;
   right: 6px;
-  bottom: 1px;
+  bottom: -1px;
   left: 6px;
   height: 3px;
   border-radius: 999px;
