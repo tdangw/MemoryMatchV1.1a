@@ -573,11 +573,10 @@
 }
 
 .link-game-progress-hud.game-progress-hud {
-  width: min(720px, calc(100vw - 12px));
+  width: fit-content;
   max-width: calc(100vw - 12px);
   min-height: 0;
-  display: grid;
-  grid-template-columns: .92fr .92fr 1fr 1.38fr 1fr 1.12fr .72fr;
+  display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
@@ -600,9 +599,6 @@
   font-weight: 500;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
-  min-width: 0;
-  justify-content: center;
-  box-sizing: border-box;
 }
 
 .link-game-progress-hud .stat-label {
@@ -618,7 +614,7 @@
   display: grid;
   grid-template-rows: 12px 8px;
   align-items: end;
-  width: 100%;
+  width: clamp(54px, 16vw, 82px);
   min-height: 26px;
   gap: 1px;
   padding: 3px 4px;
@@ -741,19 +737,13 @@
   font-variant-numeric: tabular-nums;
 }
 
-.link-game-hud .stat-timer {
-  position: relative;
-  overflow: hidden;
-  padding-bottom: 5px;
-}
-
-.link-game-hud .stat-timer::after {
+.link-game-hud.game-hud::after {
   content: "";
   position: absolute;
-  right: 4px;
+  right: 6px;
   bottom: 1px;
-  left: 4px;
-  height: 2px;
+  left: 6px;
+  height: 3px;
   border-radius: 999px;
   background: linear-gradient(90deg, #8fe9ff, #b9b0ff);
   box-shadow: 0 0 5px rgb(119 222 255 / 62%);
@@ -763,8 +753,8 @@
   transition: transform 320ms linear, opacity 160ms ease;
 }
 
-.link-game-hud .stat-timer.has-timer-progress::after { opacity: 1; }
-.link-game-hud .stat-timer.is-timer-warning::after {
+.link-game-hud.game-hud.has-timer-progress::after { opacity: 1; }
+.link-game-hud.game-hud.is-timer-warning::after {
   background: #ff7d89;
   box-shadow: 0 0 6px rgb(255 91 108 / 72%);
 }
