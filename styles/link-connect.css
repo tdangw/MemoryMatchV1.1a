@@ -200,8 +200,26 @@
 }
 
 .link-tile.is-special {
-  border-color: #63ed9c;
-  box-shadow: 0 0 0 2px rgb(99 237 156 / 76%), 0 0 15px rgb(85 233 153 / 52%), 0 4px 12px rgb(0 0 0 / 30%);
+  border-color: var(--link-premium-color, #62e9ef);
+  box-shadow: 0 0 0 2px var(--link-premium-ring, rgb(98 233 239 / 64%)), 0 0 15px var(--link-premium-glow, rgb(72 221 230 / 48%)), 0 4px 12px rgb(0 0 0 / 30%);
+}
+
+.link-tile.is-special--cyan {
+  --link-premium-color: #62e9ef;
+  --link-premium-ring: rgb(98 233 239 / 64%);
+  --link-premium-glow: rgb(72 221 230 / 48%);
+}
+
+.link-tile.is-special--blue {
+  --link-premium-color: #62a8ff;
+  --link-premium-ring: rgb(80 145 255 / 68%);
+  --link-premium-glow: rgb(54 118 255 / 52%);
+}
+
+.link-tile.is-special--red {
+  --link-premium-color: #ff6878;
+  --link-premium-ring: rgb(255 88 108 / 68%);
+  --link-premium-glow: rgb(255 64 88 / 52%);
 }
 
 .link-tile.is-becoming-special {
@@ -213,10 +231,10 @@
   position: absolute;
   z-index: 4;
   inset: 9%;
-  border: 2px solid rgb(197 255 220 / 95%);
+  border: 2px solid var(--link-premium-color, rgb(182 252 255 / 95%));
   border-radius: inherit;
   background: linear-gradient(128deg, transparent 30%, rgb(154 255 203 / 38%) 48%, transparent 66%);
-  box-shadow: 0 0 12px rgb(86 238 157 / 90%), inset 0 0 12px rgb(179 255 214 / 54%);
+  box-shadow: 0 0 12px var(--link-premium-glow, rgb(72 221 230 / 90%)), inset 0 0 12px var(--link-premium-ring, rgb(182 252 255 / 54%));
   pointer-events: none;
   will-change: opacity, transform;
   animation: link-special-burst var(--link-special-transform-duration) cubic-bezier(.18,.76,.27,1) both;

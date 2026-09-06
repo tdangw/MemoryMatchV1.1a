@@ -162,6 +162,7 @@ function syncLinkTileElement(button, tile, position, onTileClick) {
     tile.src,
     tile.alt,
     tile.special === true,
+    tile.premiumType || "",
     tile.frozen === true,
     Boolean(tile.luckyReward),
   ].join("|");
@@ -170,15 +171,21 @@ function syncLinkTileElement(button, tile, position, onTileClick) {
   if (button._linkTileFingerprint === fingerprint && !positionChanged) return false;
   button._linkTileFingerprint = fingerprint;
   button.className = "link-tile";
-  if (tile.special) button.classList.add("is-special");
+  if (tile.special) button.classList.add("is-special", `is-special--${tile.premiumType || "cyan"}`);
   if (tile.luckyReward) button.classList.add("is-lucky");
   if (tile.frozen) button.classList.add("is-frozen");
   button.disabled = tile.frozen;
   button.dataset.row = String(position.row);
   button.dataset.column = String(position.column);
+  if (tile.special) button.dataset.tooltip = `Thẻ Cao Cấp: ${getPremiumTypeLabel(tile.premiumType)}`;
+  else delete button.dataset.tooltip;
   button.setAttribute(
     "aria-label",
-    [tile.alt, tile.special && "cặp đặc biệt", tile.frozen && "thẻ đóng băng"].filter(Boolean).join(" · "),
+    [
+      tile.alt,
+      tile.special && `Thẻ Cao Cấp · ${getPremiumTypeLabel(tile.premiumType)}`,
+      tile.frozen && "thẻ đóng băng",
+    ].filter(Boolean).join(" · "),
   );
 
   const image = button.querySelector("img:not(.link-tile__frost-overlay)");
@@ -195,6 +202,12 @@ function syncLinkTileElement(button, tile, position, onTileClick) {
     frostOverlay?.remove();
   }
   return true;
+}
+
+function getPremiumTypeLabel(type) {
+  if (type === "blue") return "Tiếp Tế";
+  if (type === "red") return "Bùng Nổ";
+  return "Phá Băng";
 }
 
 function positionKey({ row, column }) {
@@ -254,10 +267,19 @@ export function playLinkSpecialPairTransform(tileKeys) {
 }
 
 export function playLinkFrozenPairUnlock(tileKeys) {
-  if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+  const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
   tileKeys.forEach((tileKey) => {
     const tile = tileElementsByKey.get(tileKey);
     if (!tile?.isConnected) return;
+    const finishUnlock = () => {
+      tile.classList.remove("is-frozen", "is-unlocking-frozen");
+      tile.disabled = false;
+      tile.querySelector(".link-tile__frost-overlay")?.remove();
+    };
+    if (reducedMotion) {
+      finishUnlock();
+      return;
+    }
     const wipe = document.createElement("span");
     wipe.className = "link-tile__frost-wipe";
     wipe.setAttribute("aria-hidden", "true");
@@ -270,7 +292,7 @@ export function playLinkFrozenPairUnlock(tileKeys) {
     tile.append(wipe);
     line.addEventListener("animationend", () => {
       wipe.remove();
-      tile.classList.remove("is-unlocking-frozen");
+      finishUnlock();
     }, { once: true });
   });
 }

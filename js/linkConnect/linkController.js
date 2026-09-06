@@ -35,6 +35,8 @@ import {
   getLinkStarScoreTargets,
   getLinkThunderResolveDelay,
   getLinkModeLayout,
+  getLinkPremiumSupplyItem,
+  getLinkPremiumTypeDefinition,
   getLinkTimerDirection,
   getLinkMatchResolveDelay,
   isLinkChallengeMode,
@@ -300,7 +302,7 @@ function showLinkGame() {
       <section class="link-special-hud" aria-label="Tiến trình năng lượng đặc biệt">
         <span id="link-special-coins" class="link-special-hud__coins game-coin-hud" aria-label="Xu"><span data-link-icon="coin"></span><strong id="link-coin-balance">0</strong></span>
         <div class="link-special-hud__milestones" aria-label="Các mốc kích hoạt đặc biệt">
-          <span data-link-special-milestone="1" style="--link-milestone-position: 5%">1</span><span data-link-special-milestone="3" style="--link-milestone-position: 25%">3</span><span data-link-special-milestone="5" style="--link-milestone-position: 45%">5</span><span data-link-special-milestone="7" style="--link-milestone-position: 65%">7</span><span data-link-special-milestone="9" style="--link-milestone-position: 85%">9</span><span data-link-special-milestone="10" style="--link-milestone-position: 95%">10</span>
+          ${Array.from({ length: 10 }, (_, index) => `<span data-link-special-milestone="${index + 1}" style="--link-milestone-position: ${5 + index * 10}%">${index + 1}</span>`).join("")}
         </div>
       </section>
       <div id="link-board-frame" class="link-board-frame">
@@ -484,6 +486,7 @@ function handleLinkTileClick(position) {
     : 1;
   linkGameState.lastMatchAt = matchedAt;
   const isSpecialMatch = firstTile.special && tile.special;
+  const premiumType = isSpecialMatch ? firstTile.premiumType || "cyan" : null;
   const roundId = linkGameState.roundId;
   const board = linkGameState.board;
   startLinkComboWindow(comboWindowMs, matchedAt, roundId, board);
@@ -513,26 +516,34 @@ function handleLinkTileClick(position) {
     if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
     removeLinkBoardPair(board, matchedStart, position);
     linkGameState.matchedPairs += 1;
-    const specialBoardChanged = isSpecialMatch && applySpecialMatchRewards(matchedTiles[0]);
+    const premiumReward = isSpecialMatch
+      ? applyPremiumMatchReward(premiumType, matchedTiles[0])
+      : { triggerPairBreak: false };
     if (firstTile.luckyReward) applyLinkLuckyReward(firstTile.luckyReward, matchedTiles[1] || matchedTiles[0]);
     const boardShifted = applyLinkGravityShift(board, linkGameState.gravityShift);
     selectedPosition = null;
     clearLinkPath();
     if (boardShifted) renderLinkBoardShift(linkGameState.board, { onTileClick: handleLinkTileClick });
-    else if (specialBoardChanged) renderLinkBoard(linkGameState.board, { onTileClick: handleLinkTileClick });
     else clearLinkMatchedPair(matchedStart, position);
-    updateLinkHud();
-    if (linkGameState.matchedPairs >= linkGameState.totalPairs) {
-      completeLinkLevel();
+    const finishResolution = () => {
+      updateLinkHud();
+      if (linkGameState.matchedPairs >= linkGameState.totalPairs) {
+        completeLinkLevel();
+        return;
+      }
+      recoverBlockedLinkBoard(linkGameState.board);
+      playPendingBoardTransforms();
+      if (linkGameState.pendingSpecialMilestones.length) {
+        processPendingSpecialMilestones(roundId, board);
+        return;
+      }
+      linkGameState.isLocked = false;
+    };
+    if (premiumReward.triggerPairBreak && linkGameState.matchedPairs < linkGameState.totalPairs) {
+      playAutomaticPairBreak(roundId, board, finishResolution);
       return;
     }
-    recoverBlockedLinkBoard(linkGameState.board);
-    playPendingBoardTransforms();
-    if (linkGameState.pendingSpecialMilestones.length) {
-      processPendingSpecialMilestones(roundId, board);
-      return;
-    }
-    linkGameState.isLocked = false;
+    finishResolution();
   }, getLinkMatchResolveDelay());
 }
 
@@ -1050,10 +1061,23 @@ function queueLinkEnergyMilestone(progress, roundId, board) {
   if (!linkGameState.isLocked) processPendingSpecialMilestones(roundId, board);
 }
 
-function applySpecialMatchRewards(anchor) {
+function applyPremiumMatchReward(premiumType, anchor) {
+  const definition = getLinkPremiumTypeDefinition(premiumType);
+  if (definition.id === "blue") {
+    if (Math.random() >= definition.effectChance) return { triggerPairBreak: false };
+    const itemId = getLinkPremiumSupplyItem(linkGameState.mode);
+    grantLinkItem(itemId);
+    showGameplayRewardEffect(anchor, { type: itemId, value: 1 });
+    playLinkItemRewardFlight(anchor, itemId);
+    return { triggerPairBreak: false };
+  }
+  if (definition.id === "red") {
+    return { triggerPairBreak: Math.random() < definition.effectChance };
+  }
+
   const special = LINK_CONNECT_CONFIG.special;
   const thawedPairs = unlockFrozenLinkPairs(linkGameState.board, 1, { onUnlock: rememberFrozenPairForTransform });
-  if (thawedPairs) return true;
+  if (thawedPairs) return { triggerPairBreak: false };
   const rewardType = isLinkEndlessMode(linkGameState.mode) || Math.random() < 0.5 ? "coins" : "time";
   const range = special.frozenFallbackReward[rewardType === "coins" ? "coin" : "time"];
   const value = randomInteger(range.min, range.max);
@@ -1064,7 +1088,7 @@ function applySpecialMatchRewards(anchor) {
     syncLinkTimeProgress();
   }
   showGameplayRewardEffect(anchor, { type: rewardType, value });
-  return false;
+  return { triggerPairBreak: false };
 }
 
 function processPendingSpecialMilestones(roundId, board) {
@@ -1088,6 +1112,26 @@ function processPendingSpecialMilestones(roundId, board) {
   if (progress === 1 || progress === 3) {
     linkGameState.specialMilestoneRewards[progress] = "Phá 1 cặp thường ngẫu nhiên.";
     rewardPairBreak();
+  } else if (progress === 2) {
+    const coins = LINK_CONNECT_CONFIG.special.milestones.two.coins;
+    awardLinkCoins(coins, anchor);
+    showGameplayRewardEffect(anchor, { type: "coins", value: coins });
+    linkGameState.specialMilestoneRewards[progress] = `+${coins} Xu.`;
+    finish();
+  } else if (progress === 4) {
+    const rules = LINK_CONNECT_CONFIG.special.milestones.four;
+    if (isLinkEndlessMode(linkGameState.mode)) {
+      awardLinkCoins(rules.fallbackCoins, anchor);
+      showGameplayRewardEffect(anchor, { type: "coins", value: rules.fallbackCoins });
+      linkGameState.specialMilestoneRewards[progress] = `+${rules.fallbackCoins} Xu.`;
+    } else {
+      const seconds = randomInteger(rules.time.min, rules.time.max);
+      linkGameState.remainingTime += seconds;
+      syncLinkTimeProgress();
+      showGameplayRewardEffect(anchor, { type: "time", value: seconds });
+      linkGameState.specialMilestoneRewards[progress] = `+${seconds}s.`;
+    }
+    finish();
   } else if (progress === 5) {
     const item = Math.random() < 0.5 ? "hint" : "reshuffle";
     grantLinkItem(item);
@@ -1095,15 +1139,39 @@ function processPendingSpecialMilestones(roundId, board) {
     playLinkItemRewardFlight(anchor, item);
     linkGameState.specialMilestoneRewards[progress] = `+1 ${item === "hint" ? "Gợi ý" : "Xáo trộn"}.`;
     finish();
+  } else if (progress === 6) {
+    const rules = LINK_CONNECT_CONFIG.special.milestones.six;
+    const thawedPairs = unlockFrozenLinkPairs(board, rules.frozenPairs, { onUnlock: rememberFrozenPairForTransform });
+    if (thawedPairs) {
+      linkGameState.specialMilestoneRewards[progress] = "Mở 1 cặp băng.";
+      playPendingBoardTransforms();
+    } else {
+      awardLinkCoins(rules.fallbackCoins, anchor);
+      showGameplayRewardEffect(anchor, { type: "coins", value: rules.fallbackCoins });
+      linkGameState.specialMilestoneRewards[progress] = `Hết băng: +${rules.fallbackCoins} Xu.`;
+    }
+    finish();
   } else if (progress === 7) {
     const rules = LINK_CONNECT_CONFIG.special.milestones.seven;
     const seconds = randomInteger(rules.time.min, rules.time.max);
-    linkGameState.remainingTime += seconds;
-    syncLinkTimeProgress();
+    if (!isLinkEndlessMode(linkGameState.mode)) {
+      linkGameState.remainingTime += seconds;
+      syncLinkTimeProgress();
+      showGameplayRewardEffect(anchor, { type: "time", value: seconds });
+    }
     awardLinkCoins(rules.coins, anchor);
-    showGameplayRewardEffect(anchor, { type: "time", value: seconds });
     showGameplayRewardEffect(anchor, { type: "coins", value: rules.coins });
-    linkGameState.specialMilestoneRewards[progress] = `+${seconds}s và +${rules.coins} Xu.`;
+    linkGameState.specialMilestoneRewards[progress] = isLinkEndlessMode(linkGameState.mode)
+      ? `+${rules.coins} Xu.`
+      : `+${seconds}s và +${rules.coins} Xu.`;
+    finish();
+  } else if (progress === 8) {
+    const rules = LINK_CONNECT_CONFIG.special.milestones.eight;
+    const itemId = isLinkEndlessMode(linkGameState.mode) ? rules.endlessItem : rules.standardItem;
+    grantLinkItem(itemId);
+    showGameplayRewardEffect(anchor, { type: itemId, value: 1 });
+    playLinkItemRewardFlight(anchor, itemId);
+    linkGameState.specialMilestoneRewards[progress] = `+1 ${itemId === "freeze" ? "Đóng băng thời gian" : "Xáo trộn"}.`;
     finish();
   } else if (progress === 9 || progress === 10) {
     grantLinkItem("hint");

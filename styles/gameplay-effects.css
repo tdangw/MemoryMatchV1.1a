@@ -75,6 +75,13 @@
   box-shadow: 0 4px 15px rgb(0 0 0 / 58%), 0 0 10px rgb(151 112 255 / 46%);
 }
 
+.tile-score-effect--freeze {
+  color: #c6f7ff;
+  border-color: rgb(112 224 255 / 92%);
+  background: rgb(8 55 82 / 92%);
+  box-shadow: 0 4px 15px rgb(0 0 0 / 58%), 0 0 10px rgb(77 218 255 / 44%);
+}
+
 .tile-score-effect--reward {
   gap: 4px;
 }

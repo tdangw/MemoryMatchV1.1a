@@ -639,6 +639,7 @@ export function showGameplayRewardEffect(tileElement, { type, value } = {}) {
     time: { text: `+${value}s`, icon: "timer" },
     hint: { text: `+${value}`, icon: "search" },
     reshuffle: { text: `+${value}`, icon: "restart" },
+    freeze: { text: `+${value}`, icon: "timer" },
   };
   const presentation = presentations[type];
   if (!presentation) return;

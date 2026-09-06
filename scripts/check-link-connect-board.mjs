@@ -70,6 +70,10 @@ const specialBoard = createLinkBoard({
   random: () => 0,
 });
 assert.equal(getRemainingLinkTiles(specialBoard).filter((tile) => tile.special).length, 2);
+assert.deepEqual(
+  [...new Set(getRemainingLinkTiles(specialBoard).filter((tile) => tile.special).map((tile) => tile.premiumType))],
+  ["cyan"],
+);
 const frozenTiles = getRemainingLinkTiles(specialBoard).filter((tile) => tile.frozen);
 assert.equal(frozenTiles.length, 2);
 assert.equal(new Set(frozenTiles.map((tile) => tile.id)).size, 1);
@@ -79,6 +83,23 @@ assert.equal(getRemainingLinkTiles(specialBoard).filter((tile) => tile.frozen).l
 assert.ok(makeRandomLinkPairSpecial(specialBoard));
 assert.ok(removeRandomLinkPair(specialBoard));
 assert.equal(unlockAllFrozenLinkPairs(specialBoard), 0);
+
+let challengeBoard;
+try {
+  Math.random = () => 0;
+  challengeBoard = createLinkBoard({
+    layout: { tileCount: 12, columns: 4 },
+    mode: "challenge",
+    cardProvider: () => cards,
+    random: () => 0,
+  });
+} finally {
+  Math.random = originalRandom;
+}
+assert.equal(
+  getRemainingLinkTiles(challengeBoard).some((tile) => tile.special && tile.luckyReward),
+  false,
+);
 
 const gravityBoard = {
   rows: 3,

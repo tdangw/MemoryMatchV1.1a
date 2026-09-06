@@ -1,6 +1,6 @@
 import { getThemeCards } from "../themeCatalog.js";
 import { shuffleArray } from "../utils.js";
-import { getLinkFrozenPairCount, getLinkLuckyReward, getLinkSpecialPairCount, isLinkChallengeMode, LINK_CONNECT_CONFIG } from "./linkConfig.js";
+import { getLinkFrozenPairCount, getLinkLuckyReward, getLinkPremiumType, getLinkSpecialPairCount, isLinkChallengeMode, LINK_CONNECT_CONFIG } from "./linkConfig.js";
 import { hasAvailableConnection } from "./pathfinder.js";
 
 const MAX_SHUFFLE_ATTEMPTS = 100;
@@ -104,13 +104,14 @@ export function unlockAllFrozenLinkPairs(board, options) {
   return unlockFrozenLinkPairs(board, Number.POSITIVE_INFINITY, options);
 }
 
-export function makeRandomLinkPairSpecial(board) {
+export function makeRandomLinkPairSpecial(board, random = Math.random) {
   const pairs = getLinkPairs(board).filter((pair) => !pair.positions.every((position) => (
     getLinkBoardTile(board, position)?.special
   )));
-  const pair = pairs[Math.floor(Math.random() * pairs.length)];
+  const pair = pairs[Math.floor(random() * pairs.length)];
   if (!pair) return null;
-  pair.positions.forEach((position) => replaceTile(board, position, { special: true }));
+  const premiumType = getLinkPremiumType(random);
+  pair.positions.forEach((position) => replaceTile(board, position, { special: true, premiumType }));
   return pair;
 }
 
@@ -153,6 +154,7 @@ function createTile(card) {
     src: card.src,
     alt: card.alt,
     special: card.special === true,
+    premiumType: card.special ? card.premiumType || "cyan" : null,
     frozen: false,
     luckyReward: card.luckyReward || null,
   });
@@ -173,10 +175,18 @@ function randomInteger(minimum, maximum) {
 }
 
 function assignSpecialPairs(cards, random) {
-  const count = Math.min(cards.length, getLinkSpecialPairCount(cards.length, random));
-  if (!count) return cards.map((card) => ({ ...card, special: false }));
-  const indices = shuffleArray(Array.from({ length: cards.length }, (_, index) => index)).slice(0, count);
-  return cards.map((card, index) => ({ ...card, special: indices.includes(index) }));
+  const eligibleIndices = cards.flatMap((card, index) => card.luckyReward ? [] : [index]);
+  const count = Math.min(eligibleIndices.length, getLinkSpecialPairCount(cards.length, random));
+  if (!count) return cards.map((card) => ({ ...card, special: false, premiumType: null }));
+  const indices = shuffleArray(eligibleIndices).slice(0, count);
+  return cards.map((card, index) => {
+    const special = indices.includes(index);
+    return {
+      ...card,
+      special,
+      premiumType: special ? getLinkPremiumType(random) : null,
+    };
+  });
 }
 
 function freezeRandomPairs(board) {

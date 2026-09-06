@@ -40,6 +40,15 @@ export const LINK_CONNECT_CONFIG = Object.freeze({
   special: Object.freeze({
     scoreMultiplier: 1.5,
     progressTarget: 10,
+    premiumTypes: Object.freeze([
+      Object.freeze({ id: "cyan", label: "Phá Băng", weight: 0.5, effectChance: 1 }),
+      Object.freeze({ id: "blue", label: "Tiếp Tế", weight: 0.3, effectChance: 0.5 }),
+      Object.freeze({ id: "red", label: "Bùng Nổ", weight: 0.2, effectChance: 0.5 }),
+    ]),
+    supplyItems: Object.freeze({
+      standard: Object.freeze(["hint", "reshuffle", "freeze"]),
+      endless: Object.freeze(["hint", "reshuffle"]),
+    }),
     pairGeneration: Object.freeze([
       Object.freeze({ maxPairs: 8, chance: 0.6, min: 1, max: 1 }),
       Object.freeze({ maxPairs: 15, chance: 0.7, min: 1, max: 2 }),
@@ -59,7 +68,11 @@ export const LINK_CONNECT_CONFIG = Object.freeze({
     energyDrop: Object.freeze({ chance: 1, guaranteeAfterMisses: 9 }),
     milestones: Object.freeze({
       breakCoins: 10,
+      two: Object.freeze({ coins: 5 }),
+      four: Object.freeze({ time: Object.freeze({ min: 2, max: 4 }), fallbackCoins: 5 }),
+      six: Object.freeze({ frozenPairs: 1, fallbackCoins: 5 }),
       seven: Object.freeze({ time: Object.freeze({ min: 2, max: 5 }), coins: 10 }),
+      eight: Object.freeze({ standardItem: "freeze", endlessItem: "reshuffle" }),
       ten: Object.freeze({ coins: 10 }),
     }),
   }),
@@ -67,9 +80,13 @@ export const LINK_CONNECT_CONFIG = Object.freeze({
 
 export const LINK_SPECIAL_MILESTONE_TOOLTIPS = Object.freeze({
   1: "Phá hủy ngẫu nhiên 1 cặp thường.",
+  2: "Nhận +5 Xu.",
   3: "Phá hủy ngẫu nhiên 1 cặp thường.",
+  4: "Nhận +2–4 giây.",
   5: "Nhận ngẫu nhiên 1 Gợi ý hoặc 1 Xáo trộn.",
+  6: "Mở 1 cặp băng; nếu hết băng nhận +5 Xu.",
   7: "Nhận +2–5 giây và +10 Xu.",
+  8: "Nhận +1 Đóng băng thời gian; Vô tận nhận +1 Xáo trộn.",
   9: "Phá 1 cặp thường và nhận 1 Gợi ý.",
   10: "Phá 1 cặp thường, +10 Xu, +1 Xáo trộn, +1 Gợi ý.",
 });
@@ -228,6 +245,28 @@ export function getLinkSpecialPairCount(pairCount, random = Math.random) {
     .find((entry) => pairCount <= entry.maxPairs);
   if (!rule || random() > rule.chance) return 0;
   return randomInteger(rule.min, rule.max, random);
+}
+
+export function getLinkPremiumType(random = Math.random) {
+  const types = LINK_CONNECT_CONFIG.special.premiumTypes;
+  const roll = random();
+  let cumulativeWeight = 0;
+  for (const type of types) {
+    cumulativeWeight += type.weight;
+    if (roll < cumulativeWeight) return type.id;
+  }
+  return types.at(-1)?.id || "cyan";
+}
+
+export function getLinkPremiumTypeDefinition(id) {
+  return LINK_CONNECT_CONFIG.special.premiumTypes.find((type) => type.id === id)
+    || LINK_CONNECT_CONFIG.special.premiumTypes[0];
+}
+
+export function getLinkPremiumSupplyItem(mode, random = Math.random) {
+  const pools = LINK_CONNECT_CONFIG.special.supplyItems;
+  const items = isLinkEndlessMode(mode) ? pools.endless : pools.standard;
+  return items[Math.floor(random() * items.length)] || items[0];
 }
 
 export function getLinkFrozenPairCount(pairCount) {

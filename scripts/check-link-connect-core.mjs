@@ -11,6 +11,8 @@ import {
   getLinkComboWindowMs,
   getLinkChallengeLayout,
   getLinkModeLayout,
+  getLinkPremiumSupplyItem,
+  getLinkPremiumType,
   getLinkStarScoreTargets,
   getLinkTimerDirection,
   getLinkGravityShift,
@@ -67,6 +69,10 @@ assert.equal(calculateLinkMatchPoints(3, { special: true }), 24);
 assert.equal(calculateMatchCoinReward(1), 2);
 assert.equal(calculateMatchCoinReward(2), 3);
 assert.equal(calculateMatchCoinReward(4), 5);
+assert.equal(getLinkPremiumType(() => 0.49), "cyan");
+assert.equal(getLinkPremiumType(() => 0.5), "blue");
+assert.equal(getLinkPremiumType(() => 0.8), "red");
+assert.equal(getLinkPremiumSupplyItem("endless", () => 0.99), "reshuffle");
 assert.deepEqual(getLinkStarScoreTargets(6, "easy"), { one: 72, two: 108, three: 150 });
 assert.equal(calculateLinkCompletionTimeBonus("easy", 45), 45);
 assert.equal(calculateLinkCompletionTimeBonus("endless", 45), 0);
