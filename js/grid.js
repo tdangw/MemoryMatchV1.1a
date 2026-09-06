@@ -172,6 +172,7 @@ export function createGrid(
     const img = document.createElement("img");
     img.src = cardData.src;
     img.alt = cardData.alt;
+    img.decoding = "async";
     img.draggable = false;
     img.classList.add("hidden");
 

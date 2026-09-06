@@ -147,7 +147,7 @@ export function startMemoryTimeProgress({ remainingSeconds, timeLimit }) {
     renderMemoryTimeProgress(memoryTimeProgressState.remainingMs, memoryTimeProgressState);
     return;
   }
-  memoryTimeProgressState.deadline = performance.now() + memoryTimeProgressState.remainingMs;
+  memoryTimeProgressState.lastFrameAt = performance.now();
   updateMemoryTimeProgressFrame();
 }
 
@@ -161,9 +161,6 @@ export function stopMemoryTimeProgress() {
   if (memoryTimeAnimationFrame !== null) cancelAnimationFrame(memoryTimeAnimationFrame);
   memoryTimeAnimationFrame = null;
   if (!memoryTimeProgressState) return;
-  if (memoryTimeProgressState.running && !memoryTimeProgressState.endless) {
-    memoryTimeProgressState.remainingMs = Math.max(0, memoryTimeProgressState.deadline - performance.now());
-  }
   memoryTimeProgressState.running = false;
   renderMemoryTimeProgress(memoryTimeProgressState.remainingMs, memoryTimeProgressState);
 }
@@ -175,13 +172,17 @@ function createMemoryTimeProgressState({ remainingSeconds, timeLimit, running })
     running,
     timeLimitMs: Math.max(1, Number(timeLimit || remainingSeconds || 1)) * GAMEPLAY_TIMING.secondMs,
     remainingMs: Math.max(0, Number(remainingSeconds || 0)) * GAMEPLAY_TIMING.secondMs,
-    deadline: null,
+    lastFrameAt: null,
   };
 }
 
-function updateMemoryTimeProgressFrame() {
+function updateMemoryTimeProgressFrame(timestamp = performance.now()) {
   if (!memoryTimeProgressState?.running || memoryTimeProgressState.endless) return;
-  memoryTimeProgressState.remainingMs = Math.max(0, memoryTimeProgressState.deadline - performance.now());
+  const elapsed = Math.max(0, timestamp - (memoryTimeProgressState.lastFrameAt ?? timestamp));
+  memoryTimeProgressState.lastFrameAt = timestamp;
+  if (!gameState.isPaused && !gameState.isLocked) {
+    memoryTimeProgressState.remainingMs = Math.max(0, memoryTimeProgressState.remainingMs - elapsed);
+  }
   renderMemoryTimeProgress(memoryTimeProgressState.remainingMs, memoryTimeProgressState);
   if (memoryTimeProgressState.remainingMs > 0) {
     memoryTimeAnimationFrame = requestAnimationFrame(updateMemoryTimeProgressFrame);
@@ -194,7 +195,7 @@ function updateMemoryTimeProgressFrame() {
 function renderMemoryTimeProgress(remainingMs, state) {
   if (!memoryTimeHudElement || !memoryTimeProgressElement) return;
   const ratio = state.endless ? 1 : Math.max(0, Math.min(1, remainingMs / state.timeLimitMs));
-  memoryTimeProgressElement.style.width = `${(ratio * 100).toFixed(4)}%`;
+  memoryTimeProgressElement.style.transform = `scaleX(${ratio.toFixed(4)})`;
   memoryTimeHudElement.classList.toggle("is-warning", !state.endless && ratio < 0.7 && ratio >= 0.3);
   memoryTimeHudElement.classList.toggle("is-critical", !state.endless && ratio < 0.3);
   memoryTimeHudElement.classList.toggle("is-endless", state.endless);

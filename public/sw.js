@@ -1,6 +1,10 @@
 const SHELL_CACHE = "memory-match-shell-v2";
 const ASSET_CACHE = "memory-match-assets-v2";
 const APP_SHELL = ["./", "./index.html", "./manifest.webmanifest", "./icons/memory-match-icon.svg"];
+const MAX_CONCURRENT_ASSET_FETCHES = 6;
+const inFlightAssetFetches = new Map();
+const pendingAssetFetches = [];
+let activeAssetFetches = 0;
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(SHELL_CACHE).then((cache) => cache.addAll(APP_SHELL)));
@@ -52,6 +56,17 @@ async function cacheFirstAsset(request, event) {
 }
 
 async function refreshAsset(request) {
+  const key = request.url;
+  if (!inFlightAssetFetches.has(key)) {
+    const requestPromise = withAssetFetchSlot(() => fetchAndCacheAsset(request))
+      .finally(() => inFlightAssetFetches.delete(key));
+    inFlightAssetFetches.set(key, requestPromise);
+  }
+  const response = await inFlightAssetFetches.get(key);
+  return response.clone();
+}
+
+async function fetchAndCacheAsset(request) {
   try {
     const response = await fetch(request);
     if (response.status === 200) {
@@ -62,6 +77,24 @@ async function refreshAsset(request) {
   } catch {
     return Response.error();
   }
+}
+
+function withAssetFetchSlot(task) {
+  return new Promise((resolve, reject) => {
+    const run = async () => {
+      activeAssetFetches += 1;
+      try {
+        resolve(await task());
+      } catch (error) {
+        reject(error);
+      } finally {
+        activeAssetFetches -= 1;
+        pendingAssetFetches.shift()?.();
+      }
+    };
+    if (activeAssetFetches < MAX_CONCURRENT_ASSET_FETCHES) run();
+    else pendingAssetFetches.push(run);
+  });
 }
 
 async function networkFirstDocument(request) {

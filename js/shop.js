@@ -11,14 +11,15 @@ import {
 import { openAppModal } from "./modal.js";
 import { createIcon } from "./icons.js";
 import { shuffleArray } from "./utils.js";
-import { saveAppearance, saveCoins } from "./persistence.js";
+import { saveCoins, savePersistentGameData } from "./persistence.js";
 import { CARD_BACKS, FLIP_EFFECTS } from "./appearance.js";
 import { SHOP_ITEMS, getShopItemPrice } from "./shopCatalog.js";
 import { getOwnedThemeIds, ownTheme } from "./appearance.js";
 import { GAMEPLAY_LIMITS, GAMEPLAY_TIMING } from "./gameplayTuning.js";
 import { THEMES, getTheme, isThemePlayable } from "./themeCatalog.js";
-import { grantLinkItem, getLinkItemCount, LINK_ITEMS } from "./linkConnect/linkItems.js";
+import { buyLinkItem, getLinkItemCount, LINK_ITEMS } from "./linkConnect/linkItems.js";
 import { LINK_EXIT_EFFECTS, LINK_PATH_EFFECTS } from "./linkConnect/linkEffects.js";
+import { stageActiveSession } from "./sessionProgress.js";
 
 export function openQuickAssistOverlay(kind) {
   if (gameState.isLocked || gameState.isPaused) return;
@@ -448,13 +449,26 @@ function handleBuyItem(item, roundId, fromMenu = false) {
     return false;
   }
 
-  if (!spendCoins(item.price)) {
+  if (gameState.coins < item.price) {
     showShopMessage("Bạn không đủ Xu để mua vật phẩm này.", "error");
     return false;
   }
 
-  saveCoins(gameState.coins);
-  updateCoinDisplay(gameState.coins);
+  if (item.type === "link-item") {
+    if (!buyLinkItem(item.id)) {
+      showShopMessage("Không thể lưu giao dịch. Xu và vật phẩm chưa thay đổi.", "error");
+      return false;
+    }
+    updateCoinDisplay(gameState.coins);
+    showShopMessage(`Đã mua ${item.title}`);
+    return true;
+  }
+
+  const previousCoins = gameState.coins;
+  if (!spendCoins(item.price)) {
+    showShopMessage("Bạn không đủ Xu để mua vật phẩm này.", "error");
+    return false;
+  }
 
   if (item.type === "appearance" || item.type === "link-effect") {
     const ownedKey =
@@ -463,7 +477,13 @@ function handleBuyItem(item, roundId, fromMenu = false) {
         : "ownedFlipEffects";
     if (!gameState.appearance[ownedKey].includes(item.id))
       gameState.appearance[ownedKey].push(item.id);
-    saveAppearance(gameState.appearance);
+    if (!savePersistentGameData({ coins: gameState.coins, appearance: gameState.appearance })) {
+      gameState.coins = previousCoins;
+      gameState.appearance[ownedKey] = gameState.appearance[ownedKey].filter((id) => id !== item.id);
+      showShopMessage("Không thể lưu giao dịch. Xu và vật phẩm chưa thay đổi.", "error");
+      return false;
+    }
+    updateCoinDisplay(gameState.coins);
     showShopMessage(`Đã mua ${item.title}`);
     return true;
   }
@@ -471,7 +491,14 @@ function handleBuyItem(item, roundId, fromMenu = false) {
   if (item.type === "theme") {
     ownTheme(gameState.appearance, item.gameId, item.id);
     const theme = getTheme(item.id);
-    saveAppearance(gameState.appearance);
+    if (!savePersistentGameData({ coins: gameState.coins, appearance: gameState.appearance })) {
+      gameState.coins = previousCoins;
+      gameState.appearance.ownedThemes = getOwnedThemeIds(gameState.appearance, item.gameId)
+        .filter((id) => id !== item.id);
+      showShopMessage("Không thể lưu giao dịch. Xu và chủ đề chưa thay đổi.", "error");
+      return false;
+    }
+    updateCoinDisplay(gameState.coins);
     showShopMessage(
       isThemePlayable(theme)
         ? `Đã mua chủ đề ${item.title}`
@@ -480,30 +507,55 @@ function handleBuyItem(item, roundId, fromMenu = false) {
     return true;
   }
 
-  if (item.type === "link-item") {
-    grantLinkItem(item.id);
-    showShopMessage(`Đã mua ${item.title}`);
-    return true;
-  }
-
-  switch (item.type) {
-    case "time":
-      gameState.remainingTime += item.value;
+  if (item.type === "time" || item.type === "hint") {
+    const previousRemainingTime = gameState.remainingTime;
+    const previousHints = gameState.hints;
+    const sessions = (gameState.progress.memoryMatch.sessionsByMode ||= {});
+    const mode = gameState.settings.mode;
+    const previousSession = sessions[mode] ? { ...sessions[mode] } : null;
+    if (item.type === "time") gameState.remainingTime += item.value;
+    else gameState.hints = Math.min(GAMEPLAY_LIMITS.itemCount, gameState.hints + item.value);
+    stageActiveSession("memory-match", {
+      ...(previousSession || {}),
+      mode,
+      level: gameState.currentLevel,
+      remainingTime: gameState.remainingTime,
+      timeLimit: gameState.timeLimit,
+      levelStartTime: gameState.levelStartTime,
+      hints: gameState.hints,
+    });
+    if (!savePersistentGameData({ coins: gameState.coins, progress: gameState.progress })) {
+      gameState.coins = previousCoins;
+      gameState.remainingTime = previousRemainingTime;
+      gameState.hints = previousHints;
+      if (previousSession) sessions[mode] = previousSession;
+      else delete sessions[mode];
+      showShopMessage("Không thể lưu giao dịch. Xu và hỗ trợ chưa thay đổi.", "error");
+      return false;
+    }
+    updateCoinDisplay(gameState.coins);
+    if (item.type === "time") {
       updateTimerDisplay(gameState.remainingTime);
       syncMemoryTimeProgress({ remainingSeconds: gameState.remainingTime, timeLimit: gameState.timeLimit });
       animateIconToTarget("timer", "#timer");
       showShopMessage(`Đã mua +${item.value}s thời gian`);
-      break;
-    case "hint":
-    {
-      const previousHints = gameState.hints;
-      gameState.hints = Math.min(GAMEPLAY_LIMITS.itemCount, gameState.hints + item.value);
+    } else {
       const grantedHints = gameState.hints - previousHints;
       updateHintDisplay(gameState.hints);
       animateIconToTarget("search", "#hint");
       showShopMessage(`Đã mua +${grantedHints} gợi ý`);
-      break;
     }
+    return true;
+  }
+
+  if (!saveCoins(gameState.coins)) {
+    gameState.coins = previousCoins;
+    showShopMessage("Không thể lưu giao dịch. Xu chưa bị trừ.", "error");
+    return false;
+  }
+  updateCoinDisplay(gameState.coins);
+
+  switch (item.type) {
     case "reveal-random":
       revealRandomTiles(
         item.value,

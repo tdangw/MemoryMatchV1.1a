@@ -245,6 +245,9 @@
   display: block;
   width: 100%;
   height: 100%;
+  transform: scaleX(1);
+  transform-origin: left center;
+  will-change: transform;
   border-radius: inherit;
   background: linear-gradient(90deg, #36d9e7, #79f2ff);
   box-shadow: 0 0 6px rgb(80 231 255 / 72%);

@@ -23,8 +23,10 @@ export function createLinkGameState() {
     totalPairs: getLinkModeLayout().tileCount / 2,
     remainingTime: getLinkModeLayout().timeSeconds,
     timeLimit: getLinkModeLayout().timeSeconds,
+    levelStartTime: getLinkModeLayout().timeSeconds,
     isLocked: true,
     isPaused: false,
+    isCompleted: false,
     roundId: 0,
     board: null,
   };
@@ -57,10 +59,12 @@ export function beginLinkRound({
   linkGameState.totalPairs = layout.tileCount / 2;
   linkGameState.remainingTime = layout.timeSeconds;
   linkGameState.timeLimit = layout.timeSeconds;
+  linkGameState.levelStartTime = layout.timeSeconds;
   // Đóng băng thời gian chỉ có hiệu lực trong màn đang chơi, không mang sang màn kế tiếp.
   linkGameState.freezeSeconds = 0;
   linkGameState.isLocked = true;
   linkGameState.isPaused = false;
+  linkGameState.isCompleted = false;
   linkGameState.luckyAwards = [];
   linkGameState.board = board || null;
   return linkGameState.roundId;

@@ -99,7 +99,7 @@ Mỗi chủ đề có 5 thẻ đặc biệt ở thư mục `special/`. Khi xuấ
 ## 6. Trạng thái triển khai & phạm vi
 
 1. **Lõi trò chơi:** Thuật toán nối tối đa hai lần rẽ, vùng đệm ngoài biên, bàn cờ ma trận và tự phát hiện ngõ cụt.
-2. **Bàn cờ động:** Đã có toàn bộ các nhóm ở mục 3, dùng lại phần tử thẻ theo `instanceId`, hoạt ảnh FLIP và kiểm tra nước đi sau dịch chuyển.
+2. **Bàn có dịch chuyển:** Đã có toàn bộ các nhóm ở mục 3, dùng lại phần tử thẻ theo `instanceId`, hoạt ảnh FLIP và kiểm tra nước đi sau dịch chuyển.
 3. **Gameplay & giao diện:** Chủ đề ảnh dùng chung, HUD, điểm, combo, thời gian, Xu, popup đầu/cuối màn và bố cục responsive cho mobile.
 4. **Vật phẩm & thẻ đặc biệt:** Gợi ý, xáo trộn, sấm sét, đóng băng thời gian, thẻ đặc biệt, thẻ đóng băng, mốc thưởng và chế độ Thử thách.
 

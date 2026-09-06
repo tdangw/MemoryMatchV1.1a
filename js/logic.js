@@ -31,7 +31,7 @@ import {
   showLevelSummaryOverlay,
 } from "./ui.js";
 import { pauseBackgroundMusic, sounds } from "./sound.js"; // 📦 Tách âm thanh
-import { saveCoins, saveProgress } from "./persistence.js";
+import { saveCoins, savePersistentGameData } from "./persistence.js";
 import { getFlipAnimationClass } from "./appearance.js";
 import {
   GAMEPLAY_LIMITS,
@@ -48,6 +48,16 @@ import {
 let selectedTiles = [];
 let levelCompleteActions = { onNext: () => {}, onMenu: () => {} };
 let pendingMismatch = null;
+const REVEAL_ANIMATION_CLASSES = [
+  "appear-bounce",
+  "appear-fade-scale",
+  "appear-pop",
+  "appear-slide-up",
+  "appear-flip-y",
+  "appear-zoom-rotate",
+  "appear-blur-in",
+];
+const tileAnimationTimers = new WeakMap();
 
 export function configureLogic(actions) {
   levelCompleteActions = { ...levelCompleteActions, ...actions };
@@ -62,36 +72,35 @@ function setInteractionLocked(locked, roundId = gameState.roundId) {
 }
 
 function revealTile(img) {
+  clearTimeout(tileAnimationTimers.get(img));
   const animationClass = getFlipAnimationClass(gameState.appearance.flipEffect);
-  img.classList.remove(
-    "hidden",
-    "appear-bounce",
-    "appear-fade-scale",
-    "appear-pop",
-    "appear-slide-up",
-    "appear-flip-y",
-    "appear-zoom-rotate",
-    "appear-blur-in",
-  );
+  img.classList.remove("hidden", ...REVEAL_ANIMATION_CLASSES);
   void img.offsetWidth;
   img.classList.add(animationClass);
-  setTimeout(
-    () => img.classList.remove(animationClass),
+  const timer = setTimeout(
+    () => {
+      img.classList.remove(animationClass);
+      tileAnimationTimers.delete(img);
+    },
     GAMEPLAY_TIMING.tileRevealAnimationMs,
   );
+  tileAnimationTimers.set(img, timer);
 }
 
 function hideTile(img, roundId, onHidden) {
   if (!img) return onHidden?.();
 
-  img.classList.remove("appear-bounce", "hide-fade-scale");
+  clearTimeout(tileAnimationTimers.get(img));
+  img.classList.remove(...REVEAL_ANIMATION_CLASSES, "hide-fade-scale");
   void img.offsetWidth;
   img.classList.add("hide-fade-scale");
-  setTimeout(() => {
+  const timer = setTimeout(() => {
     if (gameState.roundId === roundId) img.classList.add("hidden");
     img.classList.remove("hide-fade-scale");
+    tileAnimationTimers.delete(img);
     onHidden?.();
   }, GAMEPLAY_TIMING.tileHideAnimationMs);
+  tileAnimationTimers.set(img, timer);
 }
 
 function resolvePendingMismatch({ immediately = false } = {}) {
@@ -146,10 +155,16 @@ export function handleTileClick(tileElement) {
   const imageId = tileElement.dataset.imageId;
   const img = tileElement.querySelector("img");
 
-  // Ngăn double click hoặc click trùng
+  if (tileElement.classList.contains("selected") && img) {
+    tileElement.classList.remove("selected");
+    selectedTiles = selectedTiles.filter(({ element }) => element !== tileElement);
+    hideTile(img, gameState.roundId);
+    return;
+  }
+
+  // Không cho tương tác lại với thẻ đã ghép hoặc phần tử ảnh không hợp lệ.
   if (
     tileElement.classList.contains("matched") ||
-    tileElement.classList.contains("selected") ||
     !img
   )
     return;
@@ -256,10 +271,7 @@ function checkMatch(roundId) {
  * Kiểm tra nếu đã matched hết → qua màn
  */
 export function checkLevelComplete() {
-  const allTiles = document.querySelectorAll(".tile");
-  const matchedTiles = document.querySelectorAll(".tile.matched");
-
-  if (allTiles.length > 0 && allTiles.length === matchedTiles.length) {
+  if (!gameState.isPaused && gameState.totalPairs > 0 && gameState.matchedPairs >= gameState.totalPairs) {
     setInteractionLocked(true);
     gameState.isPaused = true;
     const grossCoins = calculateCoinReward(
@@ -282,12 +294,13 @@ export function checkLevelComplete() {
       score: finalScore,
       stars,
     });
-    saveProgress(gameState.progress);
     updateScoreDisplay(finalScore);
     updateLevelStarsDisplay(stars);
     updateTotalStarsDisplay(progressResult.totalStars);
     const totalCoins = increaseCoins(coinsEarned);
-    saveCoins(totalCoins);
+    if (!savePersistentGameData({ coins: totalCoins, progress: gameState.progress })) {
+      showBonusOverlay("Không thể lưu kết quả lúc này. Tiến trình vẫn được giữ trong lượt chơi.");
+    }
     updateCoinDisplay(totalCoins);
     pauseBackgroundMusic();
     if (gameState.settings?.sound) {

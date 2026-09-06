@@ -17,7 +17,19 @@ export function getActiveSessions(gameId) {
 
 export function saveActiveSession(gameId, session) {
   const key = getGameProgressKey(gameId);
-  if (!key || !session?.mode) return;
+  if (!key || !session?.mode) return false;
+  const sessions = (gameState.progress[key].sessionsByMode ||= {});
+  const previous = sessions[session.mode] ? { ...sessions[session.mode] } : null;
+  if (!stageActiveSession(gameId, session)) return false;
+  if (saveProgress(gameState.progress)) return true;
+  if (previous) sessions[session.mode] = previous;
+  else delete sessions[session.mode];
+  return false;
+}
+
+export function stageActiveSession(gameId, session) {
+  const key = getGameProgressKey(gameId);
+  if (!key || !session?.mode) return false;
   gameState.progress[key].sessionsByMode ||= {};
   gameState.progress[key].sessionsByMode[session.mode] = {
     mode: session.mode,
@@ -29,14 +41,29 @@ export function saveActiveSession(gameId, session) {
     ...(Number.isFinite(session.specialNoEnergyDropStreak)
       ? { specialNoEnergyDropStreak: Math.max(0, Math.floor(session.specialNoEnergyDropStreak)) }
       : {}),
+    ...(Number.isFinite(session.remainingTime)
+      ? { remainingTime: Math.max(0, Math.floor(session.remainingTime)) }
+      : {}),
+    ...(Number.isFinite(session.timeLimit)
+      ? { timeLimit: Math.max(0, Math.floor(session.timeLimit)) }
+      : {}),
+    ...(Number.isFinite(session.levelStartTime)
+      ? { levelStartTime: Math.max(0, Math.floor(session.levelStartTime)) }
+      : {}),
+    ...(Number.isFinite(session.hints)
+      ? { hints: Math.max(0, Math.floor(session.hints)) }
+      : {}),
   };
-  saveProgress(gameState.progress);
+  return true;
 }
 
 export function clearActiveSession(gameId, mode) {
   const key = getGameProgressKey(gameId);
-  if (!key) return;
+  if (!key) return false;
+  const previous = { ...(gameState.progress[key].sessionsByMode || {}) };
   if (!mode) gameState.progress[key].sessionsByMode = {};
   else delete gameState.progress[key].sessionsByMode?.[mode];
-  saveProgress(gameState.progress);
+  if (saveProgress(gameState.progress)) return true;
+  gameState.progress[key].sessionsByMode = previous;
+  return false;
 }

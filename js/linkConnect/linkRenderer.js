@@ -232,6 +232,7 @@ function createLinkTileElement(tileKey) {
   button.setAttribute("aria-pressed", "false");
   const image = document.createElement("img");
   image.alt = "";
+  image.decoding = "async";
   button.append(image);
   button.addEventListener("click", () => {
     const onTileClick = button._onLinkTileClick;
@@ -285,6 +286,7 @@ function syncLinkTileElement(button, tile, position, onTileClick) {
     frostOverlay.className = "link-tile__frost-overlay";
     frostOverlay.src = assetUrl("assets/images/ui/frozen-card-overlay.png");
     frostOverlay.alt = "";
+    frostOverlay.decoding = "async";
     frostOverlay.setAttribute("aria-hidden", "true");
     button.append(frostOverlay);
   } else if (!tile.frozen) {

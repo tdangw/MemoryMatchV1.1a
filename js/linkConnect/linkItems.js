@@ -1,5 +1,5 @@
 import { gameState, spendCoins } from "../gameState.js";
-import { saveCoins, saveProgress } from "../persistence.js";
+import { savePersistentGameData, saveProgress } from "../persistence.js";
 import { GAMEPLAY_LIMITS } from "../gameplayTuning.js";
 
 export const LINK_ITEMS = Object.freeze([
@@ -22,22 +22,35 @@ export function grantLinkItem(id, amount = 1) {
   );
   if (nextCount <= currentCount) return false;
   gameState.progress.linkConnect.items[id] = nextCount;
-  saveProgress(gameState.progress);
+  if (!saveProgress(gameState.progress)) {
+    gameState.progress.linkConnect.items[id] = currentCount;
+    return false;
+  }
   return true;
 }
 
 export function consumeLinkItem(id) {
   if (!getLinkItemDefinition(id) || getLinkItemCount(id) < 1) return false;
+  const previousCount = getLinkItemCount(id);
   gameState.progress.linkConnect.items[id] -= 1;
-  saveProgress(gameState.progress);
+  if (!saveProgress(gameState.progress)) {
+    gameState.progress.linkConnect.items[id] = previousCount;
+    return false;
+  }
   return true;
 }
 
 export function buyLinkItem(id) {
   const item = getLinkItemDefinition(id);
   if (!item || getLinkItemCount(id) >= GAMEPLAY_LIMITS.itemCount || !spendCoins(item.price)) return false;
-  grantLinkItem(id);
-  saveCoins(gameState.coins);
+  const previousCoins = gameState.coins + item.price;
+  const previousCount = getLinkItemCount(id);
+  gameState.progress.linkConnect.items[id] = previousCount + 1;
+  if (!savePersistentGameData({ coins: gameState.coins, progress: gameState.progress })) {
+    gameState.coins = previousCoins;
+    gameState.progress.linkConnect.items[id] = previousCount;
+    return false;
+  }
   return true;
 }
 

@@ -31,7 +31,8 @@ Vite ──→ dist ──→ Web/PWA hoặc Capacitor Android
 | `gameCatalog.js` | Danh mục game/mode và mapping namespace tiến trình. |
 | `gameState.js` | Trạng thái runtime dùng chung và chuẩn hóa dữ liệu đã lưu; không thao tác DOM hoặc `localStorage`. |
 | `sessionProgress.js` | Đọc, ghi và xóa phiên theo game/mode. |
-| `persistence.js` | Cổng duy nhất đọc/ghi các key `localStorage`. |
+| `sessionTiming.js` | Giải quyết thời gian cho màn mới, chơi lại, khôi phục và chuyển màn. |
+| `persistence.js` | Cổng duy nhất đọc/ghi gói dữ liệu có phiên bản trong `localStorage`. |
 | `gameplayTuning.js` | Giới hạn và nhịp gameplay dùng chung. |
 | `motion.js` | Tiện ích thời lượng CSS, tùy chọn giảm chuyển động và phép tính FLIP dùng chung. |
 | `coinRewards.js` | Quy tắc Xu theo cặp và hoạt ảnh bộ đếm/thu thập dùng chung. |
@@ -67,8 +68,10 @@ Vite ──→ dist ──→ Web/PWA hoặc Capacitor Android
 ## 3. Trạng thái và lưu trữ
 
 - `gameState` giữ Xu, cài đặt, ngoại hình và namespace tiến trình `memoryMatch`/`linkConnect`.
-- `localStorage` chỉ được truy cập qua `persistence.js`; các module khác gọi hàm lưu cấp cao.
-- `sessionsByMode` lưu phiên độc lập theo từng mode. Trường chung là `mode` và `level`; Link Connect bổ sung quy tắc dịch chuyển, tiến trình năng lượng và chuỗi không-rơi.
+- `localStorage` chỉ được truy cập qua `persistence.js`; bản lưu gốc có `schemaVersion`, `revision` và toàn bộ snapshot dùng chung. Key cũ chỉ phục vụ migration.
+- Giao dịch thay đổi nhiều miền dữ liệu phải ghi bằng một snapshot; nếu ghi thất bại, caller hoàn tác thay đổi runtime có tính chất mua hàng.
+- `sessionsByMode` lưu phiên độc lập theo từng mode, gồm level, thời gian còn lại, giới hạn và thời gian đầu màn. Link Connect bổ sung quy tắc dịch chuyển, tiến trình năng lượng và chuỗi không-rơi.
+- Sự kiện `storage` phát hiện revision mới từ tab khác. Tab cũ không được ghi đè; dữ liệu chỉ tự hydrate khi không có bàn đang chơi.
 - Vật phẩm Link Connect nằm trong `progress.linkConnect.items`; không dùng chung tồn kho với Memory Match.
 - Dữ liệu đọc từ storage phải được chuẩn hóa trước khi gán vào runtime. Giá trị âm, sai kiểu hoặc vượt giới hạn không được đi thẳng vào gameplay.
 - `roundId` là mã phiên runtime: callback bất đồng bộ phải kiểm tra đúng round và đúng board trước khi sửa trạng thái hoặc DOM.
@@ -88,6 +91,7 @@ Vite ──→ dist ──→ Web/PWA hoặc Capacitor Android
 - Controller dừng timer cũ trước khi tạo level hoặc rời màn.
 - Timeout, animation callback và reward chain không được tác động một round/board mới.
 - Khi tab bị ẩn, timer gameplay tạm dừng và âm thanh dừng. Khi quay lại, chỉ khôi phục trạng thái vốn đang chạy.
+- Controller checkpoint thời gian theo nhịp cấu hình và khi trang bị ẩn/rời; `sessionTiming.js` là nguồn luật duy nhất để phân biệt màn mới, chơi lại và khôi phục.
 - Dữ liệu gameplay được cập nhật trước UI; hiệu ứng chỉ biểu diễn kết quả, không phải nguồn sự thật.
 
 ## 6. Tài nguyên và build
@@ -98,6 +102,7 @@ Vite ──→ dist ──→ Web/PWA hoặc Capacitor Android
 - `vite.config.js` chọn implementation trình bày chiến thắng cho web hoặc Android qua alias `victory-presentation`.
 - Service worker/PWA nằm trong `js/pwa.js` và `public/sw.js`; Capacitor dùng cùng đầu ra web qua profile Android.
 - Service worker chỉ cache phản hồi đầy đủ HTTP `200` và bỏ qua request `Range` để không làm lỗi audio tải từng đoạn.
+- Service worker gộp yêu cầu cùng URL và giới hạn số lượt tải tài nguyên đồng thời; catalog chủ đề không tạo hoặc giải mã toàn bộ ảnh.
 
 ## 7. Nguồn cấu hình
 

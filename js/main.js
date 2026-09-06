@@ -27,13 +27,16 @@ import {
 import { configureSettings, showSettingsPanel } from "./settings.js";
 import { openQuickAssistOverlay, openShopOverlay } from "./shop.js";
 import { showResetConfirmationOverlay, showReturnToMenuOverlay } from "./ui.js";
+import { showAppToast } from "./modal.js";
 import { gameState, hydrateGameState } from "./gameState.js";
-import { loadPersistentGameData } from "./persistence.js";
+import { loadPersistentGameData, subscribeToExternalSave } from "./persistence.js";
 import {
   configureGameController,
   handleHintClick,
-  initializeLevel,
+  continueMemorySession,
+  restartMemoryLevel,
   returnToMainMenu,
+  startNewMemoryRun,
 } from "./gameController.js";
 import { registerProgressiveWebApp } from "./pwa.js";
 import { initializeMeteorEffects } from "./backgroundEffects.js";
@@ -51,13 +54,9 @@ configureGameController({
   createMenu: createMainMenu,
 });
 configureMainMenu({
-  startGame: initializeLevel,
+  startGame: startNewMemoryRun,
   changeGame: showGameSelector,
-  continueGame: (session) => {
-    if (!session) return;
-    gameState.settings.mode = session.mode;
-    initializeLevel(session.level);
-  },
+  continueGame: continueMemorySession,
 });
 configureSettings({ onCloseMenu: createActiveGameMenu });
 configureGameSelector({
@@ -87,6 +86,23 @@ configureLinkController({
 unlockSound();
 enableButtonClickSounds(() => gameState.settings);
 decorateIcons();
+
+subscribeToExternalSave(({ data, accept }) => {
+  const memoryGameVisible = document.getElementById("game-container")?.style.display === "flex";
+  const linkGameVisible = document.getElementById("link-connect-container")?.hasAttribute("hidden") === false;
+  if (memoryGameVisible || linkGameVisible) {
+    showAppToast("Dữ liệu vừa thay đổi ở tab khác. Hãy tải lại trước khi tiếp tục chơi.", {
+      tone: "warning",
+      duration: 5000,
+    });
+    return;
+  }
+  accept();
+  hydrateGameState(data);
+  applyEffectsSettings(gameState.settings);
+  initializeMeteorEffects(gameState.settings.meteorEffects);
+  showAppToast("Đã đồng bộ dữ liệu mới từ tab khác.");
+});
 
 // Tránh mở menu ngữ cảnh khi người chơi thao tác nhanh trên bàn chơi.
 document.addEventListener("contextmenu", (event) => event.preventDefault());
@@ -141,7 +157,7 @@ document
   );
 document
   .getElementById("btn-restart")
-  ?.addEventListener("click", () => initializeLevel(gameState.currentLevel));
+  ?.addEventListener("click", restartMemoryLevel);
 document
   .getElementById("btn-menu")
   ?.addEventListener("click", () =>

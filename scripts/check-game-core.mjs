@@ -10,7 +10,12 @@ import {
 import { LINK_CONNECT_CONFIG } from "../js/linkConnect/linkConfig.js";
 import { TIME_UP_PURCHASES } from "../js/shopCatalog.js";
 import { formatClockTime, UI_COPY, UI_TIMING } from "../js/uiCatalog.js";
-import { gameState, hydrateGameState, recordLinkConnectResult } from "../js/gameState.js";
+import {
+  gameState,
+  hydrateGameState,
+  recordLinkConnectResult,
+  recordMemoryMatchResult,
+} from "../js/gameState.js";
 import { GAMEPLAY_LIMITS } from "../js/gameplayTuning.js";
 import { calculateMotionDelta, readCssTimeMs } from "../js/motion.js";
 
@@ -70,6 +75,10 @@ assert.equal(linkProgress.totalStars, 3, "Link Connect chỉ cộng phần sao t
 assert.equal(gameState.progress.linkConnect.totalScore, 150);
 const repeatedLinkProgress = recordLinkConnectResult({ mode: "easy", level: 1, score: 140, stars: 2 });
 assert.equal(repeatedLinkProgress.totalStars, 3, "Link Connect không được cộng trùng sao khi thành tích thấp hơn.");
+const memoryProgress = recordMemoryMatchResult({ mode: "easy", level: 1, score: 120, stars: 3 });
+assert.equal(memoryProgress.totalStars, 3);
+const repeatedMemoryProgress = recordMemoryMatchResult({ mode: "easy", level: 1, score: 90, stars: 2 });
+assert.equal(repeatedMemoryProgress.totalStars, 3, "Memory Match không được cộng trùng sao khi chơi lại.");
 
 assert.deepEqual(TIME_UP_PURCHASES, [
   { seconds: 1, price: 2 },
@@ -92,5 +101,27 @@ assert.equal(readCssTimeMs("720ms", 0), 720);
 assert.equal(UI_COPY.timeUpPrompt, "<p>Chọn một cách để tiếp tục hành trình của bạn.</p>");
 assert.equal(formatClockTime(65), "01:05");
 assert.equal(formatClockTime(-1), "00:00");
+
+hydrateGameState({
+  coins: NaN,
+  settings: { soundVolume: Infinity, musicVolume: -4, mode: "unknown" },
+  progress: {
+    memoryMatch: {
+      totalStars: "bad",
+      sessionsByMode: {
+        challenge: { mode: "challenge", level: 2, remainingTime: NaN, hints: 4 },
+      },
+    },
+  },
+});
+assert.equal(gameState.coins, 0);
+assert.equal(gameState.settings.mode, "easy");
+assert.equal(gameState.settings.soundVolume, 0.4);
+assert.equal(gameState.settings.musicVolume, 0);
+assert.deepEqual(gameState.progress.memoryMatch.sessionsByMode.challenge, {
+  mode: "challenge",
+  level: 2,
+  hints: 4,
+});
 
 console.log("Shared game catalog checks passed.");

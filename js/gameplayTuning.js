@@ -11,6 +11,7 @@ export const GAMEPLAY_TIMING = Object.freeze({
   coinRewardFlightMs: 1500,
   coinRewardStaggerMs: 45,
   coinCounterAnimationMs: 520,
+  sessionCheckpointSeconds: 5,
   timePurchaseGraceMs: 1000,
   victoryFireworksDurationMs: 2500,
   victoryCelebration: Object.freeze({

@@ -26,6 +26,7 @@ import {
   LINK_PATH_EFFECTS,
 } from "../js/linkConnect/linkEffects.js";
 import { normalizeAppearance } from "../js/appearance.js";
+import { beginLinkRound, linkGameState } from "../js/linkConnect/linkState.js";
 
 const tile = (id) => ({ id });
 
@@ -89,7 +90,7 @@ assert.equal(calculateLinkStarRating(perfectEasyMatchScore + 45, 6, "easy"), 3);
 assert.equal(getLinkComboWindowMs(8), 15000);
 assert.equal(getLinkComboWindowMs(12), 20000);
 assert.equal(getLinkComboWindowMs(16), 30000);
-assert.equal(LINK_CONNECT_TIMING.frozenPairUnlockMs, 1500);
+assert.equal(LINK_CONNECT_TIMING.frozenPairUnlockMs, 1000);
 assert.equal(getLinkGravityShift(1), "static");
 assert.equal(getLinkGravityShift(3), "down");
 assert.equal(getLinkGravityShift(6), "up");
@@ -104,6 +105,9 @@ assert.equal(LINK_PATH_EFFECTS[0].price, 0);
 assert.equal(LINK_EXIT_EFFECTS[0].id, "default");
 assert.equal(LINK_EXIT_EFFECTS[0].price, 0);
 assert.equal(normalizeAppearance().linkExitEffect, "default");
+linkGameState.isCompleted = true;
+beginLinkRound({ mode: "easy", level: 1 });
+assert.equal(linkGameState.isCompleted, false, "Màn mới phải xóa cờ hoàn thành để không lặp thưởng.");
 assert.deepEqual(
   normalizeAppearance({ ownedLinkExitEffects: ["portal"] }).ownedLinkExitEffects,
   ["default", "portal"],

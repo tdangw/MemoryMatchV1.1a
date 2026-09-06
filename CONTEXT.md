@@ -13,7 +13,7 @@ Tài liệu này chỉ ghi trạng thái sản phẩm và các quy tắc đang c
 
 - Cả hai trò có sáu chế độ: Dễ, Trung bình, Khó, Siêu khó, Vô tận và Thử thách.
 - Xu, chủ đề và nội dung đã sở hữu được dùng chung; chủ đề đang trang bị và vật phẩm hỗ trợ được quản lý riêng theo từng trò.
-- Phiên chơi được lưu riêng theo trò và chế độ. **Tiếp tục** giữ level cùng dữ liệu phiên; **Chơi mới** chỉ thay thế phiên của chế độ đã chọn.
+- Phiên chơi được lưu riêng theo trò và chế độ. **Tiếp tục** khôi phục level và thời gian checkpoint; **Chơi lại** dùng thời gian đầu màn; **Chơi mới** thay thế phiên của chế độ đã chọn.
 - Điểm mỗi cặp là `10 + (combo - 1) × 3`. Mốc sao dựa trên số cặp; màn đếm ngược cộng thời gian còn lại vào điểm trước khi xét sao.
 - Giới hạn thử nghiệm của vật phẩm tích trữ là `999`, lấy từ `GAMEPLAY_LIMITS.itemCount`.
 - Popup đầu màn, tổng kết, hết giờ, HUD, Xu, âm thanh, tooltip và hệ modal được dùng chung khi phù hợp.
@@ -37,11 +37,19 @@ Tài liệu này chỉ ghi trạng thái sản phẩm và các quy tắc đang c
 - Không có popup giải thích quy tắc khi vào màn. Mục **Hướng dẫn** trong Menu chứa bản tóm tắt dành cho người chơi.
 - Cấu hình và quy tắc chi tiết nằm trong `js/linkConnect/linkConfig.js` và `Link Connect.md`.
 
+## Lưu dữ liệu và hiệu suất
+
+- Bản lưu dùng một gói có `schemaVersion` và `revision`; giao dịch Xu + vật phẩm/ngoại hình ghi cùng lần và hoàn tác RAM nếu ghi thất bại.
+- Lỗi đọc/ghi storage không làm ngắt khởi động. Tab cũ không được ghi đè revision mới; khi đang chơi, ứng dụng yêu cầu tải lại trước khi ghi tiếp.
+- Thời gian phiên được checkpoint mỗi 5 giây và khi ẩn/rời trang. Thanh thời gian dùng `transform`, dừng theo trạng thái pause/lock.
+- Catalog chỉ giữ metadata đường dẫn. Trình duyệt chỉ giải mã ảnh của bàn hiện tại; service worker gộp URL trùng và giới hạn 6 yêu cầu tài nguyên đang tải.
+
 ## Phần còn cần kiểm tra
 
 1. Rà trực quan từng hiệu ứng đường nối và xóa thẻ trong Bộ sưu tập trước khi coi là đạt chất lượng phát hành.
 2. Kiểm thử Link Connect trên thiết bị mobile hẹp, bàn 6 cột và level cao với mọi kiểu dịch chuyển.
 3. Một số selector giao diện cũ vẫn chồng lấn giữa các file CSS; không xóa hàng loạt trước khi kiểm thử hiển thị.
+4. Cần bổ sung bộ E2E trình duyệt thật cho toàn bộ luồng DOM hoàn thành màn và chuyển game giữa lúc preview/hiệu ứng đang chạy.
 
 ## Ngoài phạm vi hiện tại
 
