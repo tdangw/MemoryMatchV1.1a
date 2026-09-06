@@ -54,7 +54,9 @@ npm run android:apk
 
 - `index.html`: khung giao diện và entry `/js/main.js`.
 - `js/`: các module gameplay, UI, âm thanh, shop và hiệu ứng.
-- `js/config.js`: cấu hình tập trung cho số ảnh, chủ đề, số ô, thời gian và lượt gợi ý.
+- `js/config.js`: cấu hình gameplay của Memory Match.
+- `js/linkConnect/linkConfig.js`: cấu hình gameplay của Link Connect.
+- `js/gameplayTuning.js`: giới hạn và thời lượng dùng chung giữa các trò.
 - `style.css`: giao diện.
 - `public/assets/`: hình ảnh và âm thanh được sao chép nguyên trạng vào bản build.
 - `public/assets/images/`: các ảnh giao diện WebP, gồm nền chính, nền lưới, tile và logo.
@@ -63,4 +65,4 @@ npm run android:apk
 - Hiện không có thư mục `source-assets/`. Khi tạo hoặc xuất lại ảnh, lưu bản nguồn ngoài `public/assets/`; chỉ asset runtime đã chuẩn bị mới được đưa vào bản web.
 - `vite.config.js`: cấu hình web JavaScript thuần.
 
-Mỗi game có sáu mode (Dễ, Trung bình, Khó, Siêu khó, Vô tận và Thử thách), giữ session độc lập theo mode. Catalog chung `js/gameCatalog.js` giữ metadata game/mode để game tiếp theo có thể tái sử dụng selector và lưu tiến trình mà không sao chép danh sách mode.
+Mỗi game có sáu mode và giữ session độc lập theo mode. `js/gameCatalog.js` là catalog chung cho selector và namespace tiến trình. Xem trạng thái sản phẩm trong `CONTEXT.md`, kiến trúc module trong `ARCHITECTURE.md`, và thiết kế chi tiết trong `Link Connect.md`/`Triple Connect.md`.

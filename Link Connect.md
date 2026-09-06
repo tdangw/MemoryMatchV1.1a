@@ -1,18 +1,18 @@
-# Kế hoạch & Thiết kế Chế độ chơi: Link Connect (Lộ Tuyến Quang Học)
+# Quy tắc & Thiết kế — Link Connect
 
-Tài liệu này là bản phân tích toàn diện và kế hoạch thiết kế cho chế độ chơi mới **Link Connect** (ghép nối lộ trình không vật cản). Chế độ này vận hành song song với chế độ truyền thống **Memory Match** (lật thẻ luyện trí nhớ), dùng chung toàn bộ kho tài nguyên 25 chủ đề ảnh 3D và hệ thống kinh tế trong game.
+Tài liệu này mô tả luật chơi, cân bằng và phạm vi sản phẩm của **Link Connect**. Ranh giới module nằm trong `ARCHITECTURE.md`; trạng thái ngắn gọn của dự án nằm trong `CONTEXT.md`.
 
 ---
 
 ## 1. Tổng quan & Tầm nhìn thiết kế (Design Vision)
 
-| Tiêu chí               | Memory Match (Hiện tại)                        | Link Connect (Chế độ mới)                                                       |
+| Tiêu chí               | Memory Match                                   | Link Connect                                                                    |
 | :--------------------- | :--------------------------------------------- | :------------------------------------------------------------------------------ |
 | **Trạng thái thẻ**     | Ẩn mặt (úp thẻ)                                | **Mở ngửa toàn bộ thẻ ngay từ đầu**                                             |
 | **Mục tiêu cốt lõi**   | Rèn luyện **trí nhớ ngắn hạn** và sự tập trung | Rèn luyện **khả năng quan sát nhanh, phản xạ mắt** và tư duy đường đi trực giao |
 | **Luật ghép đôi**      | Lật trúng 2 thẻ giống nhau ở bất kỳ đâu        | Ghép 2 thẻ giống nhau có **đường nối hợp lệ không bị cản**                      |
 | **Nhịp độ chơi**       | Cẩn trọng, ghi nhớ vị trí, tính toán lật mở    | Nhanh, dồn dập, tạo chuỗi combo liên hoàn cực kỳ thỏa mãn (satisfying)          |
-| **Tài nguyên sử dụng** | 25 chủ đề ảnh 3D + 1000 ảnh default            | **Tái sử dụng 100% tài nguyên ảnh 3D và hệ thống Shop/Xu**                      |
+| **Tài nguyên sử dụng** | Kho chủ đề dùng chung                          | **Kho chủ đề và hệ thống Xu dùng chung**                                        |
 
 ---
 
@@ -59,7 +59,7 @@ Sau mỗi cặp ghép, Link Connect áp dụng quy tắc bàn cờ của cả m�
 #### Đã triển khai
 
 - Đã có đủ **Tĩnh và 9 nhóm dịch chuyển**: Dồn xuống, Dồn lên, Dồn trái/phải, Hút vào tâm, Tách dọc, Tách ngang, Tráo đổi và Xoay. Xoay có hai chiều nên runtime có tổng cộng 10 quy tắc dịch chuyển cụ thể.
-- Phân bổ cấp độ, áp dụng cho mọi chế độ: **1–2 Tĩnh; 3–5 Dồn xuống; 6–8 Dồn lên; 9–12 luân phiên Trái/phải; 13–15 Hút vào tâm; 16–18 Tách dọc; 19–21 Tách ngang; 22–24 Tráo đổi; 25–27 luân phiên hai chiều Xoay; từ 28 chọn ngẫu nhiên trong toàn bộ quy tắc động**. Quy tắc đã chọn được lưu cùng phiên đang chơi để không đổi khi tiếp tục màn.
+- Phân bổ cấp độ, áp dụng cho mọi chế độ: **1–2 Tĩnh; 3–5 Dồn xuống; 6–8 Dồn lên; 9–12 luân phiên Trái/phải; 13–15 Hút vào tâm; 16–18 Tách dọc; 19–21 Tách ngang; 22–24 Tráo đổi; 25–27 luân phiên hai chiều Xoay; từ 28 chọn ngẫu nhiên trong toàn bộ kiểu dịch chuyển**. Quy tắc đã chọn được lưu cùng phiên đang chơi để không đổi khi tiếp tục màn.
 - Không hiển thị popup quy tắc khi bắt đầu màn. Mục **Hướng dẫn** trong Menu giải thích ngắn gọn cách nối, các kiểu dịch chuyển, thẻ cao cấp, năng lượng, tự xáo và tự mở băng cuối màn.
 - Sau dịch chuyển hoặc Sấm sét xóa cặp, hệ thống kiểm tra nước đi; nếu cần sẽ xáo các thẻ còn lại.
 
@@ -78,7 +78,7 @@ Sau mỗi cặp ghép, Link Connect áp dụng quy tắc bàn cờ của cả m�
 
 Các vật phẩm được tích hợp trực tiếp vào hệ thống tiền tệ Xu và Cửa hàng:
 
-| Vật phẩm                               | Icon SVG | Chức năng chi tiết                                                                                    | Giá dự kiến (Xu) |
+| Vật phẩm                               | Icon SVG | Chức năng chi tiết                                                                                    | Giá (Xu) |
 | :------------------------------------- | :------: | :---------------------------------------------------------------------------------------------------- | :--------------: |
 | **Kính Định Vị (Smart Hint)**          | `search`  | Tự động vẽ vệt sáng chỉ rõ đường nối của 1 cặp thẻ có thể ghép ngay.                                  |       8 Xu       |
 | **Xáo Trộn Không Gian (Reshuffle)**    | `restart` | Xáo lại toàn bộ vị trí các thẻ còn lại trên bàn cờ để tạo đường nối mới.                              |      15 Xu       |
@@ -96,42 +96,7 @@ Mỗi chủ đề có 5 thẻ đặc biệt ở thư mục `special/`. Khi xuấ
 
 ---
 
-## 6. Kiến trúc Kỹ thuật
-
-### A. Cấu trúc Module đề xuất:
-
-```text
-js/
-├── linkConnect/
-│   ├── pathfinder.js       # Thuật toán tìm đường trực giao tối đa 2 khúc gấp (BFS 2-turn)
-│   ├── linkBoard.js        # Khởi tạo ma trận bàn cờ và xử lý viền đệm
-│   ├── linkRenderer.js     # Vẽ đường nối SVG neon và hiệu ứng tan thẻ
-│   └── linkController.js   # Quản lý vòng đời màn chơi, combo, timer, deadlock check
-```
-
-### B. Thuật toán Tìm đường (2-Turn Orthogonal BFS):
-
-```javascript
-// Ý tưởng giải thuật tìm đường tối đa 2 khúc gấp:
-function canConnect(startPos, endPos, grid) {
-  // 1. Kiểm tra nối thẳng 0 khúc gấp (cùng hàng hoặc cột, không vật cản)
-  if (checkStraightLine(startPos, endPos, grid))
-    return [{ path: [startPos, endPos], turns: 0 }];
-
-  // 2. Kiểm tra nối 1 khúc gấp (hình chữ L: đi qua 1 điểm trung gian)
-  // 3. Kiểm tra nối 2 khúc gấp (hình chữ U/Z: quét theo tia trực giao từ 2 đầu đến khi gặp đường nối thẳng qua ô trống)
-  // Trả về lộ trình các điểm tọa độ [p1, p2, p3, p4] để linkRenderer vẽ đường sáng.
-}
-```
-
-### C. Tự động kiểm tra Ngõ Cụt (Deadlock Prevention):
-
-- Sau mỗi nước đi, một hàm kiểm tra chạy ngầm (`hasAvailableMoves()`) sẽ quét nhanh xem còn ít nhất 1 cặp thẻ nào nối được không.
-- Nếu không còn cặp nào nối được, hệ thống tự xáo bài miễn phí để ván chơi tiếp tục mà không làm gián đoạn người dùng.
-
----
-
-## 7. Trạng thái triển khai & phạm vi
+## 6. Trạng thái triển khai & phạm vi
 
 1. **Lõi trò chơi:** Thuật toán nối tối đa hai lần rẽ, vùng đệm ngoài biên, bàn cờ ma trận và tự phát hiện ngõ cụt.
 2. **Bàn cờ động:** Đã có toàn bộ các nhóm ở mục 3, dùng lại phần tử thẻ theo `instanceId`, hoạt ảnh FLIP và kiểm tra nước đi sau dịch chuyển.
