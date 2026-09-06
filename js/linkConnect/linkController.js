@@ -230,7 +230,7 @@ export function startLinkLevel({ mode = linkGameState.mode, level = 1, resume = 
         linkGameState.isLocked = false;
         startCountdown(roundId);
       };
-      if (resolvedGravityShift === "static") startRound();
+      if (resolvedGravityShift === "static" || gameState.progress.linkConnect.gravityGuideSeen) startRound();
       else showLinkGravityRuleModal(resolvedGravityShift, startRound);
     },
   });
@@ -685,24 +685,39 @@ function getGravityShiftLabel(direction) {
 }
 
 function showLinkGravityRuleModal(direction, onComplete) {
-  const content = document.createElement("p");
+  const content = document.createElement("div");
   content.className = "link-gravity-rule__copy";
-  const directionText = {
-    down: "dồn xuống dưới",
-    up: "dồn lên trên",
-    left: "dồn sang bên trái",
-    right: "dồn sang bên phải",
-  }[direction] || "giữ nguyên vị trí";
-  content.textContent = `Sau mỗi cặp ghép, các thẻ còn lại sẽ ${directionText}.`;
+  const intro = document.createElement("p");
+  intro.textContent = "Từ Level 3, sau mỗi cặp ghép đúng, các thẻ còn lại có thể tự dồn theo quy tắc của màn:";
+  const rules = document.createElement("ul");
+  [
+    "Dồn xuống: mọi thẻ trượt xuống hàng thấp nhất còn trống.",
+    "Dồn lên: mọi thẻ trượt lên hàng cao nhất còn trống.",
+    "Dồn trái: các thẻ trong từng hàng trượt sát về bên trái.",
+    "Dồn phải: các thẻ trong từng hàng trượt sát về bên phải.",
+    "Từ Level 13, hướng dồn được chọn ngẫu nhiên giữa bốn kiểu trên cho mỗi màn.",
+  ].forEach((text) => {
+    const item = document.createElement("li");
+    item.textContent = text;
+    rules.append(item);
+  });
+  const current = document.createElement("p");
+  current.className = "link-gravity-rule__current";
+  current.textContent = `Màn hiện tại: ${getGravityShiftLabel(direction)}.`;
+  content.append(intro, rules, current);
   openAppModal({
     id: "link-gravity-rule-modal",
     icon: "restart",
-    title: "Quy tắc màn chơi",
+    title: "Luật Bàn Động",
     content,
     dismissible: false,
     closeOnBackdrop: false,
     actions: [{ label: "Đã hiểu", icon: "play", variant: "primary" }],
-    onClose: onComplete,
+    onClose: () => {
+      gameState.progress.linkConnect.gravityGuideSeen = true;
+      saveProgress(gameState.progress);
+      onComplete?.();
+    },
   });
 }
 

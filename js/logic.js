@@ -34,6 +34,7 @@ import { pauseBackgroundMusic, sounds } from "./sound.js"; // 📦 Tách âm tha
 import { saveCoins, saveProgress } from "./persistence.js";
 import { getFlipAnimationClass } from "./appearance.js";
 import {
+  GAMEPLAY_LIMITS,
   GAMEPLAY_TIMING,
   getComboTimeBonus,
   shouldShowVictoryCelebration,
@@ -343,7 +344,7 @@ function awardLuckyRewardValue(reward, tileElement) {
 
   if (reward.type === "hints") {
     const before = gameState.hints;
-    gameState.hints = Math.min(10, gameState.hints + reward.value);
+    gameState.hints = Math.min(GAMEPLAY_LIMITS.itemCount, gameState.hints + reward.value);
     if (gameState.hints > before) {
       tileElement?.classList.add("lucky-reward");
       recordLuckyAward(reward);

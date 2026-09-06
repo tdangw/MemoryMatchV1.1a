@@ -1,3 +1,5 @@
+import { GAMEPLAY_LIMITS } from "../gameplayTuning.js";
+
 export const LINK_CONNECT_CONFIG = Object.freeze({
   gravity: Object.freeze({
     basicDirections: Object.freeze(["down", "up", "left", "right"]),
@@ -27,7 +29,7 @@ export const LINK_CONNECT_CONFIG = Object.freeze({
     timeBonusPerLevel: 2,
     timeBonusCap: 10,
     hintBonusPerLevel: 1,
-    hintCap: 10,
+    hintCap: GAMEPLAY_LIMITS.itemCount,
   }),
   challenge: Object.freeze({
     timeBonusPerLevel: 10,

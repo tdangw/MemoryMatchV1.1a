@@ -1,3 +1,5 @@
+import { GAMEPLAY_LIMITS } from "./gameplayTuning.js";
+
 export const GAME_CONFIG = Object.freeze({
   cardImages: Object.freeze({
     count: 1000,
@@ -62,7 +64,7 @@ export const GAME_CONFIG = Object.freeze({
     timeBonusPerLevel: 2,
     timeBonusCap: 10,
     hintBonusPerLevel: 1,
-    hintCap: 10,
+    hintCap: GAMEPLAY_LIMITS.itemCount,
   }),
   previewDurationMs: 5000,
   hintRevealDurationMs: 2500,

@@ -15,7 +15,7 @@ import { saveAppearance, saveCoins } from "./persistence.js";
 import { CARD_BACKS, FLIP_EFFECTS } from "./appearance.js";
 import { SHOP_ITEMS, getShopItemPrice } from "./shopCatalog.js";
 import { getOwnedThemeIds, ownTheme } from "./appearance.js";
-import { GAMEPLAY_TIMING } from "./gameplayTuning.js";
+import { GAMEPLAY_LIMITS, GAMEPLAY_TIMING } from "./gameplayTuning.js";
 import { THEMES, getTheme, isThemePlayable } from "./themeCatalog.js";
 import { grantLinkItem, getLinkItemCount, LINK_ITEMS } from "./linkConnect/linkItems.js";
 import { LINK_EXIT_EFFECTS, LINK_PATH_EFFECTS } from "./linkConnect/linkEffects.js";
@@ -439,6 +439,15 @@ function handleBuyItem(item, roundId, fromMenu = false) {
     return false;
   }
 
+  if (item.type === "link-item" && getLinkItemCount(item.id) >= GAMEPLAY_LIMITS.itemCount) {
+    showShopMessage(`Bạn đã đạt giới hạn ${GAMEPLAY_LIMITS.itemCount} vật phẩm này.`, "info");
+    return false;
+  }
+  if (item.type === "hint" && gameState.hints >= GAMEPLAY_LIMITS.itemCount) {
+    showShopMessage(`Bạn đã đạt giới hạn ${GAMEPLAY_LIMITS.itemCount} lượt gợi ý.`, "info");
+    return false;
+  }
+
   if (!spendCoins(item.price)) {
     showShopMessage("Bạn không đủ Xu để mua vật phẩm này.", "error");
     return false;
@@ -486,11 +495,15 @@ function handleBuyItem(item, roundId, fromMenu = false) {
       showShopMessage(`Đã mua +${item.value}s thời gian`);
       break;
     case "hint":
-      gameState.hints += item.value;
+    {
+      const previousHints = gameState.hints;
+      gameState.hints = Math.min(GAMEPLAY_LIMITS.itemCount, gameState.hints + item.value);
+      const grantedHints = gameState.hints - previousHints;
       updateHintDisplay(gameState.hints);
       animateIconToTarget("search", "#hint");
-      showShopMessage(`Đã mua +${item.value} gợi ý`);
+      showShopMessage(`Đã mua +${grantedHints} gợi ý`);
       break;
+    }
     case "reveal-random":
       revealRandomTiles(
         item.value,

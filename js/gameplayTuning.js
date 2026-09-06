@@ -20,6 +20,11 @@ export const GAMEPLAY_TIMING = Object.freeze({
   }),
 });
 
+// Giới hạn thử nghiệm dùng chung cho mọi vật phẩm có thể tích trữ.
+export const GAMEPLAY_LIMITS = Object.freeze({
+  itemCount: 999,
+});
+
 const COMBO_TIERS = Object.freeze([
   { minimum: 26, id: "ultimate", label: "ULTIMATE!" },
   { minimum: 22, id: "godlike", label: "GODLIKE!" },

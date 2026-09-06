@@ -1,5 +1,6 @@
 import { gameState, spendCoins } from "../gameState.js";
 import { saveCoins, saveProgress } from "../persistence.js";
+import { GAMEPLAY_LIMITS } from "../gameplayTuning.js";
 
 export const LINK_ITEMS = Object.freeze([
   Object.freeze({ id: "hint", title: "Gợi ý đường nối", icon: "search", price: 8 }),
@@ -14,7 +15,13 @@ export function getLinkItemCount(id) {
 
 export function grantLinkItem(id, amount = 1) {
   if (!getLinkItemDefinition(id)) return false;
-  gameState.progress.linkConnect.items[id] = getLinkItemCount(id) + Math.max(0, Math.floor(amount));
+  const currentCount = getLinkItemCount(id);
+  const nextCount = Math.min(
+    GAMEPLAY_LIMITS.itemCount,
+    currentCount + Math.max(0, Math.floor(amount)),
+  );
+  if (nextCount <= currentCount) return false;
+  gameState.progress.linkConnect.items[id] = nextCount;
   saveProgress(gameState.progress);
   return true;
 }
@@ -28,7 +35,7 @@ export function consumeLinkItem(id) {
 
 export function buyLinkItem(id) {
   const item = getLinkItemDefinition(id);
-  if (!item || !spendCoins(item.price)) return false;
+  if (!item || getLinkItemCount(id) >= GAMEPLAY_LIMITS.itemCount || !spendCoins(item.price)) return false;
   grantLinkItem(id);
   saveCoins(gameState.coins);
   return true;

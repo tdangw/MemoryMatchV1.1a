@@ -499,8 +499,28 @@
   margin: 0;
   color: #e8f4ff;
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: 500;
   line-height: 1.55;
+  text-align: left;
+}
+
+#link-gravity-rule-modal .link-gravity-rule__copy p {
+  margin: 0 0 10px;
+}
+
+#link-gravity-rule-modal .link-gravity-rule__copy ul {
+  margin: 0 0 12px;
+  padding-left: 20px;
+}
+
+#link-gravity-rule-modal .link-gravity-rule__copy li + li {
+  margin-top: 5px;
+}
+
+#link-gravity-rule-modal .link-gravity-rule__current {
+  margin-bottom: 0;
+  color: #ffd889;
+  font-weight: 800;
 }
 
 #link-gravity-rule-modal .app-button--primary {

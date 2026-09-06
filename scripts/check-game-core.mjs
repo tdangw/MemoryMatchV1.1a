@@ -11,6 +11,7 @@ import { LINK_CONNECT_CONFIG } from "../js/linkConnect/linkConfig.js";
 import { TIME_UP_PURCHASES } from "../js/shopCatalog.js";
 import { formatClockTime, UI_COPY, UI_TIMING } from "../js/uiCatalog.js";
 import { gameState, hydrateGameState, recordLinkConnectResult } from "../js/gameState.js";
+import { GAMEPLAY_LIMITS } from "../js/gameplayTuning.js";
 
 const modeIds = GAME_MODES.map((mode) => mode.id);
 
@@ -32,6 +33,9 @@ assert.equal(new Set(GAME_DEFINITIONS.map((game) => game.id)).size, GAME_DEFINIT
 
 assert.deepEqual(Object.keys(GAME_CONFIG.modes), modeIds);
 assert.deepEqual(Object.keys(LINK_CONNECT_CONFIG.modes), modeIds);
+assert.equal(GAMEPLAY_LIMITS.itemCount, 999);
+assert.equal(GAME_CONFIG.levelProgression.hintCap, 999);
+assert.equal(LINK_CONNECT_CONFIG.levelProgression.hintCap, 999);
 
 hydrateGameState({
   progress: {
@@ -39,9 +43,13 @@ hydrateGameState({
       totalStars: 2,
       totalScore: 120,
       bestByLevel: { "easy:1": { score: 120, stars: 2 } },
+      gravityGuideSeen: true,
+      items: { hint: 1200 },
     },
   },
 });
+assert.equal(gameState.progress.linkConnect.gravityGuideSeen, true);
+assert.equal(gameState.progress.linkConnect.items.hint, 999);
 const linkProgress = recordLinkConnectResult({ mode: "easy", level: 1, score: 150, stars: 3 });
 assert.equal(linkProgress.totalStars, 3, "Link Connect chỉ cộng phần sao tăng thêm khi chơi lại màn.");
 assert.equal(gameState.progress.linkConnect.totalScore, 150);

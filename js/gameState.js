@@ -1,6 +1,7 @@
 // 📦 Trạng thái thuần của game: không thao tác DOM hoặc localStorage ở đây.
 import { GAME_CONFIG } from "./config.js";
 import { normalizeAppearance } from "./appearance.js";
+import { GAMEPLAY_LIMITS } from "./gameplayTuning.js";
 
 const {
   hints: defaultHints,
@@ -29,6 +30,7 @@ export const gameState = {
       totalScore: 0,
       bestByLevel: {},
       items: { hint: 0, reshuffle: 0, thunder: 0, freeze: 0 },
+      gravityGuideSeen: false,
     },
   },
   appearance: normalizeAppearance(),
@@ -68,15 +70,20 @@ export function hydrateGameState({
     totalScore: Math.max(0, Math.floor(linkConnect.totalScore || 0)),
     bestByLevel: typeof linkConnect.bestByLevel === "object" && linkConnect.bestByLevel ? linkConnect.bestByLevel : {},
     items: {
-      hint: Math.max(0, Math.floor(linkItems.hint || 0)),
-      reshuffle: Math.max(0, Math.floor(linkItems.reshuffle || 0)),
-      thunder: Math.max(0, Math.floor(linkItems.thunder || 0)),
-      freeze: Math.max(0, Math.floor(linkItems.freeze || 0)),
+      hint: normalizeItemCount(linkItems.hint),
+      reshuffle: normalizeItemCount(linkItems.reshuffle),
+      thunder: normalizeItemCount(linkItems.thunder),
+      freeze: normalizeItemCount(linkItems.freeze),
     },
+    gravityGuideSeen: linkConnect.gravityGuideSeen === true,
     sessionsByMode: normalizeSessions(linkConnect.sessionsByMode, linkConnect.activeSession),
   };
   Object.assign(gameState.settings, settings);
   gameState.appearance = normalizeAppearance(appearance);
+}
+
+function normalizeItemCount(value) {
+  return Math.min(GAMEPLAY_LIMITS.itemCount, Math.max(0, Math.floor(value || 0)));
 }
 
 function normalizeActiveSession(session) {
