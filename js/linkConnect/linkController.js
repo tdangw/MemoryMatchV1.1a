@@ -494,13 +494,11 @@ function handleLinkTileClick(position) {
   linkGameState.score += matchPoints;
   drawLinkPath(path, linkGameState.board);
   if (isSpecialMatch && shouldDropLinkEnergy()) {
+    const energyProgress = receiveLinkEnergy(roundId, board);
     playLinkEnergyFlight(selectedPosition, position, {
-      targetProgress: Math.min(
-        LINK_CONNECT_CONFIG.special.progressTarget,
-        linkGameState.specialProgress + 1,
-      ),
+      targetProgress: energyProgress,
       progressTarget: LINK_CONNECT_CONFIG.special.progressTarget,
-      onArrive: () => receiveLinkEnergy(roundId, board),
+      onArrive: () => queueLinkEnergyMilestone(energyProgress, roundId, board),
     });
   }
   const matchedTiles = playLinkMatchExit(selectedPosition, position);
@@ -1026,6 +1024,7 @@ function updateLinkSpecialMilestones(hud = getLinkHudElements()) {
 
 function shouldDropLinkEnergy() {
   const energy = LINK_CONNECT_CONFIG.special.energyDrop;
+  if (linkGameState.specialProgress >= LINK_CONNECT_CONFIG.special.progressTarget) return false;
   if (linkGameState.specialNoEnergyDropStreak >= energy.guaranteeAfterMisses) {
     linkGameState.specialNoEnergyDropStreak = 0;
     return true;
@@ -1039,10 +1038,15 @@ function shouldDropLinkEnergy() {
 }
 
 function receiveLinkEnergy(roundId, board) {
-  if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
+  if (linkGameState.roundId !== roundId || linkGameState.board !== board) return 0;
   linkGameState.specialProgress += 1;
-  linkGameState.pendingSpecialMilestones.push(linkGameState.specialProgress);
   updateLinkHud();
+  return linkGameState.specialProgress;
+}
+
+function queueLinkEnergyMilestone(progress, roundId, board) {
+  if (!progress || linkGameState.roundId !== roundId || linkGameState.board !== board) return;
+  linkGameState.pendingSpecialMilestones.push(progress);
   if (!linkGameState.isLocked) processPendingSpecialMilestones(roundId, board);
 }
 

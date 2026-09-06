@@ -70,6 +70,8 @@ export function playCoinRewardFlight(source, target, amount) {
     return effect;
   });
   document.body.append(fragment);
+  const finalArrivalDelay = durationMs + Math.max(0, coinCount - 1) * staggerMs;
+  setTimeout(() => showCoinGainLabel(target, coinCount), finalArrivalDelay);
   setTimeout(
     () => effects.forEach((effect) => effect.remove()),
     durationMs + durationVarianceMs + Math.max(0, coinCount - 1) * staggerMs + 300,
@@ -112,6 +114,20 @@ export function animateCoinCounter(container, counter, previousCoins, nextCoins)
 
 export function isCoinCounterAnimating(counter) {
   return Boolean(counter && counterAnimations.has(counter));
+}
+
+function showCoinGainLabel(target, amount) {
+  if (!target?.isConnected) return;
+  const rect = target.getBoundingClientRect();
+  const label = document.createElement("span");
+  label.className = "game-coin-gain-label";
+  label.setAttribute("aria-hidden", "true");
+  label.textContent = `+${amount} Xu`;
+  label.style.left = `${rect.left + rect.width / 2}px`;
+  label.style.top = `${Math.max(8, rect.top - 4)}px`;
+  label.style.setProperty("--game-coin-gain-duration", `${GAMEPLAY_TIMING.coinCounterAnimationMs + 420}ms`);
+  document.body.append(label);
+  setTimeout(() => label.remove(), GAMEPLAY_TIMING.coinCounterAnimationMs + 520);
 }
 
 function clamp(value, minimum, maximum) {

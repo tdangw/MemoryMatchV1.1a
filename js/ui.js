@@ -675,18 +675,23 @@ function showGameplayFloatEffect(tileElement, text, className, iconName) {
 
 export function showComboEffect(tileElement, combo) {
   const presentation = getComboPresentation(combo);
-  if (!presentation) return;
+  if (!presentation || !tileElement) return;
+
+  document.querySelector(".tile-combo-effect")?.remove();
 
   const effect = document.createElement("div");
   effect.className = `tile-combo-effect tile-combo-effect--${presentation.id}`;
   effect.textContent = `${presentation.label}  x${combo}`;
 
-  const rect = tileElement.getBoundingClientRect();
+  const board = tileElement.closest("#grid-board-frame, #link-board-frame");
+  const rect = (board || tileElement).getBoundingClientRect();
   const centerX = rect.left + rect.width / 2;
-  const centerY = rect.top + rect.height / 2;
+  const upperBoardY = board
+    ? rect.top + Math.min(42, Math.max(26, rect.height * 0.08))
+    : rect.top + rect.height / 2;
 
   effect.style.left = `${centerX}px`;
-  effect.style.top = `${centerY}px`;
+  effect.style.top = `${upperBoardY}px`;
   effect.style.setProperty("--gameplay-feedback-duration", `${GAMEPLAY_TIMING.scoreEffectDurationMs}ms`);
 
   document.body.appendChild(effect);
