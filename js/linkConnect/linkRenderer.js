@@ -2,6 +2,8 @@ import { getActiveLinkConnectionEffect } from "./linkEffects.js";
 import { gameState } from "../gameState.js";
 import { createIcon } from "../icons.js";
 import { getLinkItemDefinition } from "./linkItems.js";
+import { calculateMotionDelta, prefersReducedMotion, readCssTimeMs } from "../motion.js";
+import { LINK_CONNECT_TIMING } from "./linkConfig.js";
 import {
   measureLinkRender,
   recordLinkLayoutPass,
@@ -15,13 +17,15 @@ const OUTER_ROUTE_INSET_PERCENT = 1.5;
 const assetUrl = (path) => `${import.meta.env.BASE_URL}${path}`;
 let layoutFrame;
 let layoutObserver;
-let shuffleInteractionTimer;
+let boardInteractionTimer;
 let observedGame;
 let renderedBoardShape = "";
 let renderedBoardContainer = null;
 const boardCellsByPosition = new Map();
 const tileElementsByKey = new Map();
 const tileMotionAnimations = new WeakMap();
+const activeTileMotionAnimations = new Set();
+const transientEffectTimers = new Set();
 
 window.addEventListener("resize", () => {
   scheduleLinkBoardLayout();
@@ -49,47 +53,63 @@ function renderLinkBoardMotion(board, onTileClick, motion) {
     const before = getLinkTileRects();
     patchLinkBoard(board, onTileClick);
     const after = getLinkTileRects();
+    const settings = readLinkBoardMotionSettings(motion);
     let motionIndex = 0;
     after.forEach(({ element, rect, key }) => {
       const previous = before.get(key);
       if (!previous) return;
-      const deltaX = previous.rect.left - rect.left;
-      const deltaY = previous.rect.top - rect.top;
+      const { x: deltaX, y: deltaY } = calculateMotionDelta(previous.rect, rect);
       if (!deltaX && !deltaY) return;
-      animateLinkTileMotion(element, deltaX, deltaY, motion, motionIndex);
+      animateLinkTileMotion(element, deltaX, deltaY, motionIndex, settings);
       motionIndex += 1;
     });
-    if (motion === "shuffle") holdLinkBoardDuringShuffle();
+    return holdLinkBoardDuringMotion(settings);
   });
 }
 
-function holdLinkBoardDuringShuffle() {
-  const board = document.getElementById("link-board");
+function readLinkBoardMotionSettings(motion) {
+  const shuffle = motion === "shuffle";
   const game = document.getElementById("link-connect-container");
-  if (!board || !game) return;
-  const styles = getComputedStyle(game);
-  const duration = readCssTimeMs(styles.getPropertyValue("--link-board-shuffle-duration"), 720);
-  const stagger = readCssTimeMs(styles.getPropertyValue("--link-board-shuffle-stagger"), 12);
-  clearTimeout(shuffleInteractionTimer);
-  board.classList.add("is-shuffling");
-  shuffleInteractionTimer = setTimeout(() => {
-    board.classList.remove("is-shuffling");
-  }, duration + Math.min(stagger * 8, 96) + 40);
+  const styles = game ? getComputedStyle(game) : null;
+  const duration = readCssTimeMs(
+    styles?.getPropertyValue(shuffle ? "--link-board-shuffle-duration" : "--link-board-shift-duration"),
+    shuffle ? LINK_CONNECT_TIMING.boardShuffleMs : LINK_CONNECT_TIMING.boardShiftMs,
+  );
+  const staggerStep = shuffle
+    ? readCssTimeMs(
+      styles?.getPropertyValue("--link-board-shuffle-stagger"),
+      LINK_CONNECT_TIMING.boardShuffleStaggerMs,
+    )
+    : 0;
+  const reducedMotion = prefersReducedMotion();
+  return {
+    shuffle,
+    duration,
+    staggerStep,
+    reducedMotion,
+    settleMs: reducedMotion ? 0 : duration + Math.min(staggerStep * 8, 96) + 40,
+  };
 }
 
-function animateLinkTileMotion(element, deltaX, deltaY, motion, index) {
+function holdLinkBoardDuringMotion(settings) {
+  const board = document.getElementById("link-board");
+  if (!board || settings.reducedMotion) return 0;
+  clearTimeout(boardInteractionTimer);
+  board.classList.add("is-moving");
+  board.classList.toggle("is-shuffling", settings.shuffle);
+  boardInteractionTimer = scheduleTransientEffect(() => {
+    board.classList.remove("is-moving", "is-shuffling");
+  }, settings.settleMs);
+  return settings.settleMs;
+}
+
+function animateLinkTileMotion(element, deltaX, deltaY, index, settings) {
   tileMotionAnimations.get(element)?.cancel();
-  if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
-  const styles = getComputedStyle(document.getElementById("link-connect-container") || element);
-  const shuffle = motion === "shuffle";
-  const duration = readCssTimeMs(
-    styles.getPropertyValue(shuffle ? "--link-board-shuffle-duration" : "--link-board-shift-duration"),
-    shuffle ? 720 : 540,
-  );
-  const stagger = shuffle
-    ? Math.min(index * readCssTimeMs(styles.getPropertyValue("--link-board-shuffle-stagger"), 12), 96)
+  if (settings.reducedMotion) return;
+  const stagger = settings.shuffle
+    ? Math.min(index * settings.staggerStep, 96)
     : 0;
-  const keyframes = shuffle
+  const keyframes = settings.shuffle
     ? [
       { transform: `translate(${deltaX}px, ${deltaY}px) scale(.94)`, opacity: .58 },
       { transform: `translate(${deltaX * .24}px, ${deltaY * .24}px) scale(1.025)`, opacity: .92, offset: .72 },
@@ -104,20 +124,22 @@ function animateLinkTileMotion(element, deltaX, deltaY, motion, index) {
     element.style.transition = "none";
     element.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
     requestAnimationFrame(() => {
-      element.style.transition = `transform ${duration}ms cubic-bezier(.18,.72,.2,1)`;
+      element.style.transition = `transform ${settings.duration}ms cubic-bezier(.18,.72,.2,1)`;
       element.style.transform = "";
       element.addEventListener("transitionend", () => { element.style.transition = ""; }, { once: true });
     });
     return;
   }
   const animation = element.animate(keyframes, {
-    duration,
+    duration: settings.duration,
     delay: stagger,
-    easing: shuffle ? "cubic-bezier(.16,.74,.2,1)" : "cubic-bezier(.18,.72,.2,1)",
+    easing: settings.shuffle ? "cubic-bezier(.16,.74,.2,1)" : "cubic-bezier(.18,.72,.2,1)",
   });
   tileMotionAnimations.set(element, animation);
+  activeTileMotionAnimations.add(animation);
   const clearAnimation = () => {
     if (tileMotionAnimations.get(element) === animation) tileMotionAnimations.delete(element);
+    activeTileMotionAnimations.delete(animation);
   };
   animation.addEventListener("finish", clearAnimation, { once: true });
   animation.addEventListener("cancel", clearAnimation, { once: true });
@@ -316,7 +338,7 @@ export function clearLinkTileHints() {
 // Dùng phần tử con tạm thay vì pseudo-element để vẫn tương thích với lớp băng,
 // vốn đã sử dụng cả ::before lẫn ::after trên cùng một thẻ.
 export function playLinkSpecialPairTransform(tileKeys) {
-  if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+  if (prefersReducedMotion()) return;
   tileKeys.forEach((tileKey) => {
     const tile = tileElementsByKey.get(tileKey);
     if (!tile?.isConnected) return;
@@ -326,23 +348,30 @@ export function playLinkSpecialPairTransform(tileKeys) {
     burst.setAttribute("aria-hidden", "true");
     tile.append(burst);
     tile.classList.add("is-becoming-special");
-    burst.addEventListener("animationend", () => {
+    const finish = once(() => {
       burst.remove();
       tile.classList.remove("is-becoming-special");
-    }, { once: true });
+    });
+    burst.addEventListener("animationend", finish, { once: true });
+    const duration = readCssTimeMs(
+      getComputedStyle(tile).getPropertyValue("--link-special-transform-duration"),
+      LINK_CONNECT_TIMING.specialPairTransformMs,
+    );
+    scheduleTransientEffect(finish, duration + 120);
   });
 }
 
 export function playLinkFrozenPairUnlock(tileKeys) {
-  const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  const reducedMotion = prefersReducedMotion();
   tileKeys.forEach((tileKey) => {
     const tile = tileElementsByKey.get(tileKey);
     if (!tile?.isConnected) return;
-    const finishUnlock = () => {
+    const finishUnlock = once(() => {
       tile.classList.remove("is-frozen", "is-unlocking-frozen");
       tile.disabled = false;
       tile.querySelector(".link-tile__frost-overlay")?.remove();
-    };
+      tile.querySelector(".link-tile__frost-wipe")?.remove();
+    });
     if (reducedMotion) {
       finishUnlock();
       return;
@@ -358,9 +387,13 @@ export function playLinkFrozenPairUnlock(tileKeys) {
     tile.classList.add("is-unlocking-frozen");
     tile.append(wipe);
     line.addEventListener("animationend", () => {
-      wipe.remove();
       finishUnlock();
     }, { once: true });
+    const duration = readCssTimeMs(
+      getComputedStyle(tile).getPropertyValue("--link-frozen-unlock-duration"),
+      LINK_CONNECT_TIMING.frozenPairUnlockMs,
+    );
+    scheduleTransientEffect(finishUnlock, duration + 120);
   });
 }
 
@@ -391,6 +424,10 @@ export function playLinkEnergyFlight(start, end, {
   targetProgress = 1,
   progressTarget = 10,
 } = {}) {
+  if (prefersReducedMotion()) {
+    onArrive?.();
+    return null;
+  }
   const sourceTile = getLinkTileButton(end) || getLinkTileButton(start);
   const target = document.querySelector(".link-special-hud__milestones");
   if (!sourceTile || !target) {
@@ -428,9 +465,12 @@ export function playLinkEnergyFlight(start, end, {
   effect.style.setProperty("--link-energy-bounce-y", `${Math.round(landingY - Math.max(6, sourceRect.height * .08))}px`);
   const game = document.getElementById("link-connect-container");
   const styles = game ? getComputedStyle(game) : null;
-  const burstDuration = styles?.getPropertyValue("--link-energy-burst-duration").trim() || "1100ms";
-  const holdDuration = styles?.getPropertyValue("--link-energy-hold-duration").trim() || "1000ms";
-  const flightDuration = styles?.getPropertyValue("--link-energy-flight-duration").trim() || "1050ms";
+  const burstDuration = styles?.getPropertyValue("--link-energy-burst-duration").trim()
+    || `${LINK_CONNECT_TIMING.energyBurstMs}ms`;
+  const holdDuration = styles?.getPropertyValue("--link-energy-hold-duration").trim()
+    || `${LINK_CONNECT_TIMING.energyHoldMs}ms`;
+  const flightDuration = styles?.getPropertyValue("--link-energy-flight-duration").trim()
+    || `${LINK_CONNECT_TIMING.energyFlightMs}ms`;
   effect.style.setProperty("--link-energy-burst-duration", burstDuration);
   effect.style.setProperty("--link-energy-flight-duration", flightDuration);
   document.body.append(effect);
@@ -444,8 +484,9 @@ export function playLinkEnergyFlight(start, end, {
   effect.addEventListener("animationend", (event) => {
     if (event.animationName === "link-energy-fly-to-hud") finish();
   });
-  const collectDelayMs = readCssTimeMs(burstDuration, 1100) + readCssTimeMs(holdDuration, 1000);
-  setTimeout(() => {
+  const collectDelayMs = readCssTimeMs(burstDuration, LINK_CONNECT_TIMING.energyBurstMs)
+    + readCssTimeMs(holdDuration, LINK_CONNECT_TIMING.energyHoldMs);
+  scheduleTransientEffect(() => {
     if (!effect.isConnected) return;
     const currentTarget = document.querySelector(".link-special-hud__milestones");
     if (!currentTarget) return finish();
@@ -456,13 +497,16 @@ export function playLinkEnergyFlight(start, end, {
     effect.style.setProperty("--link-energy-flight-y", `${Math.round(targetRect.top + targetRect.height / 2 - startY)}px`);
     effect.classList.add("is-collecting");
   }, collectDelayMs);
-  setTimeout(finish, collectDelayMs + readCssTimeMs(flightDuration, 1050) + 350);
+  scheduleTransientEffect(
+    finish,
+    collectDelayMs + readCssTimeMs(flightDuration, LINK_CONNECT_TIMING.energyFlightMs) + 350,
+  );
   return effect;
 }
 
 export function playLinkItemRewardFlight(source, itemId, { delayMs = 0 } = {}) {
   const item = getLinkItemDefinition(itemId);
-  if (!source || !item) return null;
+  if (!source || !item || prefersReducedMotion()) return null;
   const launch = () => {
     if (!source.isConnected) return;
     const sourceRect = source.getBoundingClientRect();
@@ -486,9 +530,12 @@ export function playLinkItemRewardFlight(source, itemId, { delayMs = 0 } = {}) {
     effect.style.setProperty("--link-item-reward-apex-y", `${Math.round(burstY * 1.18)}px`);
     const game = document.getElementById("link-connect-container");
     const styles = game ? getComputedStyle(game) : null;
-    const burstDuration = styles?.getPropertyValue("--link-item-reward-burst-duration").trim() || "620ms";
-    const holdDuration = styles?.getPropertyValue("--link-item-reward-hold-duration").trim() || "380ms";
-    const flightDuration = styles?.getPropertyValue("--link-item-reward-flight-duration").trim() || "820ms";
+    const burstDuration = styles?.getPropertyValue("--link-item-reward-burst-duration").trim()
+      || `${LINK_CONNECT_TIMING.itemRewardBurstMs}ms`;
+    const holdDuration = styles?.getPropertyValue("--link-item-reward-hold-duration").trim()
+      || `${LINK_CONNECT_TIMING.itemRewardHoldMs}ms`;
+    const flightDuration = styles?.getPropertyValue("--link-item-reward-flight-duration").trim()
+      || `${LINK_CONNECT_TIMING.itemRewardFlightMs}ms`;
     effect.style.setProperty("--link-item-reward-burst-duration", burstDuration);
     effect.style.setProperty("--link-item-reward-flight-duration", flightDuration);
     document.body.append(effect);
@@ -501,8 +548,9 @@ export function playLinkItemRewardFlight(source, itemId, { delayMs = 0 } = {}) {
     effect.addEventListener("animationend", (event) => {
       if (event.animationName === "link-item-reward-collect") finish();
     });
-    const collectDelayMs = readCssTimeMs(burstDuration, 620) + readCssTimeMs(holdDuration, 380);
-    setTimeout(() => {
+    const collectDelayMs = readCssTimeMs(burstDuration, LINK_CONNECT_TIMING.itemRewardBurstMs)
+      + readCssTimeMs(holdDuration, LINK_CONNECT_TIMING.itemRewardHoldMs);
+    scheduleTransientEffect(() => {
       if (!effect.isConnected) return;
       const itemTarget = document.querySelector(`#link-item-actions [data-item="${itemId}"] .ui-icon`);
       const target = itemTarget?.getClientRects().length
@@ -514,17 +562,14 @@ export function playLinkItemRewardFlight(source, itemId, { delayMs = 0 } = {}) {
       effect.style.setProperty("--link-item-reward-flight-y", `${Math.round(targetRect.top + targetRect.height / 2 - startY)}px`);
       effect.classList.add("is-collecting");
     }, collectDelayMs);
-    setTimeout(finish, collectDelayMs + readCssTimeMs(flightDuration, 820) + 300);
+    scheduleTransientEffect(
+      finish,
+      collectDelayMs + readCssTimeMs(flightDuration, LINK_CONNECT_TIMING.itemRewardFlightMs) + 300,
+    );
   };
-  if (delayMs > 0) return setTimeout(launch, delayMs);
+  if (delayMs > 0) return scheduleTransientEffect(launch, delayMs);
   launch();
   return null;
-}
-
-function readCssTimeMs(value, fallback) {
-  const parsed = Number.parseFloat(value);
-  if (!Number.isFinite(parsed)) return fallback;
-  return value.endsWith("s") && !value.endsWith("ms") ? parsed * 1000 : parsed;
 }
 
 const FRAGMENT_LAYOUTS = Object.freeze({
@@ -539,7 +584,7 @@ const FRAGMENT_LAYOUTS = Object.freeze({
 const CANVAS_EXIT_EFFECTS = new Set(["finedust", ...Object.keys(FRAGMENT_LAYOUTS)]);
 
 function playLinkCardExitEffects(tiles, exitId) {
-  if (!CANVAS_EXIT_EFFECTS.has(exitId)) return;
+  if (!CANVAS_EXIT_EFFECTS.has(exitId) || prefersReducedMotion()) return;
   const frame = document.getElementById("link-board-frame");
   if (!frame) return;
   const frameRect = frame.getBoundingClientRect();
@@ -578,7 +623,7 @@ function playLinkCardExitEffects(tiles, exitId) {
       renderCardExitEffect(context, source, fragments, bounds, exitId, progress);
     });
     const duration = Math.max(...cards.map(({ timing }) => timing.delayMs + timing.durationMs));
-    if (elapsed < duration) requestAnimationFrame(draw);
+    if (elapsed < duration && canvas.isConnected) requestAnimationFrame(draw);
     else canvas.remove();
   };
   requestAnimationFrame(draw);
@@ -667,7 +712,8 @@ function readExitEffectTiming(tile) {
   const style = getComputedStyle(tile);
   return {
     delayMs: Number.parseFloat(style.getPropertyValue("--link-tile-exit-delay")) || 0,
-    durationMs: Number.parseFloat(style.getPropertyValue("--link-tile-exit-duration")) || 520,
+    durationMs: Number.parseFloat(style.getPropertyValue("--link-tile-exit-duration"))
+      || LINK_CONNECT_TIMING.tileExitAnimationMs,
   };
 }
 
@@ -686,6 +732,7 @@ const THUNDER_COLORS = Object.freeze({
 });
 
 export function playLinkThunderStrike(positions, colorId = "yellow") {
+  if (prefersReducedMotion()) return null;
   const frame = document.getElementById("link-board-frame");
   if (!frame) return null;
   const frameRect = frame.getBoundingClientRect();
@@ -729,8 +776,23 @@ export function playLinkThunderStrike(positions, colorId = "yellow") {
   return effect;
 }
 
-export function clearLinkThunderStrikes() {
-  document.querySelectorAll(".link-thunder-strike").forEach((effect) => effect.remove());
+export function clearLinkTransientEffects() {
+  clearTimeout(boardInteractionTimer);
+  boardInteractionTimer = undefined;
+  transientEffectTimers.forEach((timer) => clearTimeout(timer));
+  transientEffectTimers.clear();
+  activeTileMotionAnimations.forEach((animation) => animation.cancel());
+  activeTileMotionAnimations.clear();
+  document.getElementById("link-board")?.classList.remove("is-moving", "is-shuffling");
+  document.querySelectorAll(
+    ".link-energy-flight, .link-item-reward-flight, .link-card-exit-effect, .link-thunder-strike",
+  ).forEach((effect) => effect.remove());
+  tileElementsByKey.forEach((tile) => {
+    tile.style.removeProperty("transition");
+    tile.style.removeProperty("transform");
+    tile.classList.remove("is-becoming-special", "is-unlocking-frozen");
+    tile.querySelectorAll(".link-tile__special-burst, .link-tile__frost-wipe").forEach((effect) => effect.remove());
+  });
 }
 
 function drawThunderBolt(context, target, palette, progress) {
@@ -806,7 +868,8 @@ function drawThunderImpact(context, target, palette, progress, intensity) {
 }
 
 function readThunderDuration(frame) {
-  return Number.parseFloat(getComputedStyle(frame).getPropertyValue("--link-thunder-strike-duration")) || 620;
+  return Number.parseFloat(getComputedStyle(frame).getPropertyValue("--link-thunder-strike-duration"))
+    || LINK_CONNECT_TIMING.thunderStrikeMs;
 }
 
 function randomThunderOffset(range) { return (Math.random() * 2 - 1) * range; }
@@ -907,6 +970,24 @@ function clampPathPoint(point) {
 
 function clamp(value, minimum, maximum) {
   return Math.min(maximum, Math.max(minimum, value));
+}
+
+function once(callback) {
+  let called = false;
+  return (...args) => {
+    if (called) return;
+    called = true;
+    callback(...args);
+  };
+}
+
+function scheduleTransientEffect(callback, delayMs) {
+  const timer = setTimeout(() => {
+    transientEffectTimers.delete(timer);
+    callback();
+  }, Math.max(0, Number(delayMs) || 0));
+  transientEffectTimers.add(timer);
+  return timer;
 }
 
 function createElectricPoints(points, intensity = 1) {

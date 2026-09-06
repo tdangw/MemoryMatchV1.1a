@@ -110,6 +110,7 @@
   box-shadow: inset 0 1px rgb(255 255 255 / 8%), 0 16px 36px rgb(0 0 0 / 20%);
 }
 
+.link-board.is-moving,
 .link-board.is-shuffling {
   pointer-events: none;
 }

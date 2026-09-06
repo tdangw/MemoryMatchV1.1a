@@ -11,8 +11,10 @@ import { getEquippedThemeId } from "./appearance.js";
 import { getStarScoreTargets, getTimerDirection, isEndlessMode } from "./config.js";
 import { getGameModeLabel } from "./gameCatalog.js";
 import { formatClockTime, UI_COPY } from "./uiCatalog.js";
+import { prefersReducedMotion } from "./motion.js";
 import {
   animateCoinCounter,
+  clearCoinRewardEffects,
   isCoinCounterAnimating,
   playCoinRewardFlight,
 } from "./coinRewards.js";
@@ -264,6 +266,8 @@ export function clearGameplayRewardPopups() {
   rewardPopupRemoveTimer = undefined;
   rewardPopupOverlay?.remove();
   rewardPopupOverlay = null;
+  clearCoinRewardEffects();
+  document.querySelectorAll(".tile-score-effect, .tile-combo-effect").forEach((effect) => effect.remove());
 }
 
 function showNextGameplayRewardPopup() {
@@ -652,6 +656,7 @@ export function showGameplayRewardEffect(tileElement, { type, value } = {}) {
 }
 
 function showGameplayFloatEffect(tileElement, text, className, iconName) {
+  if (prefersReducedMotion()) return;
   const rect = tileElement.getBoundingClientRect();
   const effect = document.createElement("div");
   effect.className = className;
@@ -676,7 +681,7 @@ function showGameplayFloatEffect(tileElement, text, className, iconName) {
 
 export function showComboEffect(tileElement, combo) {
   const presentation = getComboPresentation(combo);
-  if (!presentation || !tileElement) return;
+  if (!presentation || !tileElement || prefersReducedMotion()) return;
 
   document.querySelector(".tile-combo-effect")?.remove();
 

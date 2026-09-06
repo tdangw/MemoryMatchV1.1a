@@ -71,7 +71,7 @@ import {
 } from "../ui.js";
 import {
   clearLinkPath,
-  clearLinkThunderStrikes,
+  clearLinkTransientEffects,
   clearLinkMatchedPair,
   clearLinkTileSelection,
   clearLinkTileHints,
@@ -191,9 +191,9 @@ export function startLinkLevel({
 } = {}) {
   stopCountdown();
   clearGameplayRewardPopups();
+  clearLinkTransientEffects();
   clearLinkPath();
   clearLinkTileHints();
-  clearLinkThunderStrikes();
   selectedPosition = null;
   linkTimeWarningPlayed = false;
   const modeLayout = getLinkModeLayout(mode);
@@ -270,7 +270,7 @@ export function returnToLinkMenu() {
   selectedPosition = null;
   clearLinkPath();
   clearLinkTileHints();
-  clearLinkThunderStrikes();
+  clearLinkTransientEffects();
   document.getElementById("link-connect-container")?.setAttribute("hidden", "");
   navigation.showMenu();
   syncDefaultMusic(gameState.settings);
@@ -571,7 +571,7 @@ function handleLinkTileClick(position) {
 }
 
 function useLinkItem(id) {
-  if (linkGameState.isLocked || linkGameState.isPaused) return;
+  if (linkGameState.isLocked || linkGameState.isPaused || isLinkBoardMoving()) return;
   if (id === "freeze" && isLinkEndlessMode(linkGameState.mode)) {
     showAppToast("Chế độ Vô tận không dùng đóng băng thời gian.");
     return;
@@ -619,9 +619,23 @@ function useLinkHint() {
 }
 
 function useLinkReshuffle() {
+  const roundId = linkGameState.roundId;
+  const board = linkGameState.board;
+  linkGameState.isLocked = true;
+  selectedPosition = null;
+  clearLinkTileSelection();
+  clearLinkPath();
   shuffleLinkBoard(linkGameState.board);
-  renderLinkBoardShuffle(linkGameState.board, { onTileClick: handleLinkTileClick });
+  const settleMs = renderLinkBoardShuffle(linkGameState.board, { onTileClick: handleLinkTileClick });
   showAppToast("Đã xáo lại các thẻ còn lại.");
+  setTimeout(() => {
+    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
+    linkGameState.isLocked = false;
+  }, settleMs);
+}
+
+function isLinkBoardMoving() {
+  return Boolean(document.getElementById("link-board")?.classList.contains("is-moving"));
 }
 
 function useLinkThunder() {

@@ -33,6 +33,7 @@ Vite ──→ dist ──→ Web/PWA hoặc Capacitor Android
 | `sessionProgress.js` | Đọc, ghi và xóa phiên theo game/mode. |
 | `persistence.js` | Cổng duy nhất đọc/ghi các key `localStorage`. |
 | `gameplayTuning.js` | Giới hạn và nhịp gameplay dùng chung. |
+| `motion.js` | Tiện ích thời lượng CSS, tùy chọn giảm chuyển động và phép tính FLIP dùng chung. |
 | `coinRewards.js` | Quy tắc Xu theo cặp và hoạt ảnh bộ đếm/thu thập dùng chung. |
 | `ui.js`, `modal.js`, `uiCatalog.js` | HUD, popup gameplay, modal, toast, copy và thời lượng UI chung. |
 | `gameSelector.js`, `mainmenu.js`, `gameMenu.js` | Chọn trò, menu chính và menu trong màn. |
@@ -76,8 +77,10 @@ Vite ──→ dist ──→ Web/PWA hoặc Capacitor Android
 
 - Memory Match dùng board riêng trong `grid.js`; Link Connect dùng renderer riêng vì cần đường nối, dịch chuyển và tái sử dụng tile.
 - Link Connect định danh mỗi tile bằng `instanceId`. Patch chỉ cập nhật ô thay đổi; dịch chuyển dùng FLIP/Web Animations thay vì dựng lại toàn bàn.
+- Timing của một lượt FLIP được đọc một lần rồi dùng cho toàn bộ thẻ; board chặn thao tác đến khi vị trí hiển thị ổn định.
 - Canvas chỉ dùng cho hiệu ứng cần vẽ theo khung hình như Sấm sét hoặc mảnh vỡ. Mật độ canvas được giới hạn theo `devicePixelRatio`.
 - Hiệu ứng DOM tạm chỉ thay đổi `transform`/`opacity`, tự xóa khi kết thúc và tôn trọng `prefers-reduced-motion`.
+- Hiệu ứng tạm và animation còn chạy phải được dọn khi bắt đầu round mới hoặc rời màn.
 - Trong lúc xáo, board chặn tương tác đến khi hoạt ảnh ổn định. Hiệu ứng thu thập không khóa gameplay.
 
 ## 5. Vòng đời bất đồng bộ

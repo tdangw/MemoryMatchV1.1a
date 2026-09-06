@@ -12,6 +12,7 @@ import { TIME_UP_PURCHASES } from "../js/shopCatalog.js";
 import { formatClockTime, UI_COPY, UI_TIMING } from "../js/uiCatalog.js";
 import { gameState, hydrateGameState, recordLinkConnectResult } from "../js/gameState.js";
 import { GAMEPLAY_LIMITS } from "../js/gameplayTuning.js";
+import { calculateMotionDelta, readCssTimeMs } from "../js/motion.js";
 
 const modeIds = GAME_MODES.map((mode) => mode.id);
 
@@ -80,6 +81,14 @@ assert.equal(
   "Gói mua thời gian không được trùng số giây.",
 );
 assert.equal(UI_TIMING.modalCloseMs, 180);
+assert.deepEqual(
+  calculateMotionDelta({ left: 120, top: 80 }, { left: 45, top: 20 }),
+  { x: 75, y: 60 },
+  "FLIP phải tính độ lệch từ DOMRect cũ sang DOMRect mới.",
+);
+assert.deepEqual(calculateMotionDelta(undefined, { left: 45, top: 20 }), { x: 0, y: 0 });
+assert.equal(readCssTimeMs("1.5s", 0), 1500);
+assert.equal(readCssTimeMs("720ms", 0), 720);
 assert.equal(UI_COPY.timeUpPrompt, "<p>Chọn một cách để tiếp tục hành trình của bạn.</p>");
 assert.equal(formatClockTime(65), "01:05");
 assert.equal(formatClockTime(-1), "00:00");

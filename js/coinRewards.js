@@ -1,5 +1,6 @@
 import { createIcon } from "./icons.js";
 import { GAMEPLAY_TIMING } from "./gameplayTuning.js";
+import { prefersReducedMotion } from "./motion.js";
 
 export const MATCH_COIN_REWARD = Object.freeze({
   base: 2,
@@ -7,6 +8,8 @@ export const MATCH_COIN_REWARD = Object.freeze({
 });
 
 const counterAnimations = new WeakMap();
+const activeCoinCounters = new Set();
+const activeCoinEffects = new Set();
 
 export function calculateMatchCoinReward(combo = 1) {
   return MATCH_COIN_REWARD.base
@@ -16,6 +19,7 @@ export function calculateMatchCoinReward(combo = 1) {
 export function playCoinRewardFlight(source, target, amount) {
   const coinCount = Math.max(0, Math.floor(Number(amount) || 0));
   if (!source || !target || coinCount < 1) return [];
+  if (prefersReducedMotion()) return [];
   const stableSource = source.closest?.(".link-board__cell, .tile") || source;
   const targetIcon = target.querySelector?.(".ui-icon") || target;
   const sourceRect = stableSource.getBoundingClientRect();
@@ -66,6 +70,7 @@ export function playCoinRewardFlight(source, target, amount) {
     effect.style.setProperty("--game-coin-land-rotation", `${Math.round(randomBetween(-12, 12))}deg`);
     effect.style.setProperty("--game-coin-flight-duration", `${flightDuration}ms`);
     effect.style.setProperty("--game-coin-delay", `${delay}ms`);
+    activeCoinEffects.add(effect);
     fragment.append(effect);
     return effect;
   });
@@ -73,7 +78,7 @@ export function playCoinRewardFlight(source, target, amount) {
   const finalArrivalDelay = durationMs + Math.max(0, coinCount - 1) * staggerMs;
   setTimeout(() => showCoinGainLabel(target, coinCount), finalArrivalDelay);
   setTimeout(
-    () => effects.forEach((effect) => effect.remove()),
+    () => effects.forEach(removeCoinEffect),
     durationMs + durationVarianceMs + Math.max(0, coinCount - 1) * staggerMs + 300,
   );
   return effects;
@@ -85,6 +90,15 @@ export function animateCoinCounter(container, counter, previousCoins, nextCoins)
   if (activeFrame) cancelAnimationFrame(activeFrame);
   const displayedCoins = Number(counter.textContent);
   const startCoins = Number.isFinite(displayedCoins) ? displayedCoins : previousCoins;
+  if (prefersReducedMotion()) {
+    counter.textContent = String(nextCoins);
+    const label = `Xu: ${nextCoins}`;
+    container.setAttribute("aria-label", label);
+    container.dataset.tooltip = label;
+    counterAnimations.delete(counter);
+    activeCoinCounters.delete(counter);
+    return;
+  }
   const duration = GAMEPLAY_TIMING.coinCounterAnimationMs;
   const startedAt = performance.now();
   container.style.setProperty("--game-coin-counter-duration", `${duration}ms`);
@@ -94,6 +108,7 @@ export function animateCoinCounter(container, counter, previousCoins, nextCoins)
   const updateFrame = (timestamp) => {
     if (!counter.isConnected) {
       counterAnimations.delete(counter);
+      activeCoinCounters.delete(counter);
       return;
     }
     const progress = Math.max(0, Math.min(1, (timestamp - startedAt) / duration));
@@ -108,7 +123,9 @@ export function animateCoinCounter(container, counter, previousCoins, nextCoins)
     }
     counter.textContent = String(nextCoins);
     counterAnimations.delete(counter);
+    activeCoinCounters.delete(counter);
   };
+  activeCoinCounters.add(counter);
   counterAnimations.set(counter, requestAnimationFrame(updateFrame));
 }
 
@@ -126,8 +143,26 @@ function showCoinGainLabel(target, amount) {
   label.style.left = `${rect.left + rect.width / 2}px`;
   label.style.top = `${Math.max(8, rect.top - 4)}px`;
   label.style.setProperty("--game-coin-gain-duration", `${GAMEPLAY_TIMING.coinCounterAnimationMs + 420}ms`);
+  activeCoinEffects.add(label);
   document.body.append(label);
-  setTimeout(() => label.remove(), GAMEPLAY_TIMING.coinCounterAnimationMs + 520);
+  setTimeout(() => removeCoinEffect(label), GAMEPLAY_TIMING.coinCounterAnimationMs + 520);
+}
+
+export function clearCoinRewardEffects() {
+  activeCoinCounters.forEach((counter) => {
+    const frame = counterAnimations.get(counter);
+    if (frame) cancelAnimationFrame(frame);
+    counterAnimations.delete(counter);
+    counter.closest?.(".game-coin-hud")?.classList.remove("is-gaining");
+  });
+  activeCoinCounters.clear();
+  activeCoinEffects.forEach((effect) => effect.remove());
+  activeCoinEffects.clear();
+}
+
+function removeCoinEffect(effect) {
+  effect.remove();
+  activeCoinEffects.delete(effect);
 }
 
 function clamp(value, minimum, maximum) {

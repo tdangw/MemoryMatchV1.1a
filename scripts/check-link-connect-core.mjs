@@ -17,6 +17,7 @@ import {
   getLinkStarScoreTargets,
   getLinkTimerDirection,
   getLinkGravityShift,
+  LINK_CONNECT_TIMING,
 } from "../js/linkConnect/linkConfig.js";
 import { calculateMatchCoinReward } from "../js/coinRewards.js";
 import {
@@ -88,6 +89,7 @@ assert.equal(calculateLinkStarRating(perfectEasyMatchScore + 45, 6, "easy"), 3);
 assert.equal(getLinkComboWindowMs(8), 15000);
 assert.equal(getLinkComboWindowMs(12), 20000);
 assert.equal(getLinkComboWindowMs(16), 30000);
+assert.equal(LINK_CONNECT_TIMING.frozenPairUnlockMs, 1500);
 assert.equal(getLinkGravityShift(1), "static");
 assert.equal(getLinkGravityShift(3), "down");
 assert.equal(getLinkGravityShift(6), "up");
