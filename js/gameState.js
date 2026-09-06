@@ -88,7 +88,17 @@ function normalizeActiveSession(session) {
   if (!session || typeof session !== "object") return null;
   if (typeof session.mode !== "string") return null;
   const level = Math.max(1, Math.floor(session.level || 1));
-  return { mode: session.mode, level };
+  return {
+    mode: session.mode,
+    level,
+    ...(typeof session.gravityShift === "string" ? { gravityShift: session.gravityShift } : {}),
+    ...(Number.isFinite(session.specialProgress)
+      ? { specialProgress: Math.max(0, Math.floor(session.specialProgress)) }
+      : {}),
+    ...(Number.isFinite(session.specialNoEnergyDropStreak)
+      ? { specialNoEnergyDropStreak: Math.max(0, Math.floor(session.specialNoEnergyDropStreak)) }
+      : {}),
+  };
 }
 
 function normalizeSessions(sessions, legacySession) {

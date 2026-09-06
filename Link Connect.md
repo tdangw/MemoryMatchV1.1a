@@ -69,7 +69,7 @@ Sau mỗi cặp ghép, Link Connect áp dụng quy tắc bàn cờ của cả m�
 - Số cặp băng: tối đa 8 cặp có 1; 9–15 có 2; 16–24 có 3; từ 25 có 4. Nếu chỉ còn băng hoặc không còn nước đi với thẻ mở, hệ thống mở đồng thời số băng cần thiết để tránh kẹt màn.
 - Ba loại thẻ cao cấp: **Cyan – Phá Băng** luôn mở một cặp băng (hết băng thì nhận ngẫu nhiên Xu hoặc thời gian); **Xanh dương – Tiếp Tế** có 50% nhận Gợi ý, Xáo trộn hoặc Đóng băng thời gian; **Đỏ – Bùng Nổ** có 50% gọi Sấm sét phá một cặp thường. Sấm sét từ thẻ cao cấp tiếp tục combo; Sấm sét từ vật phẩm không tăng combo.
 - Mỗi cặp cao cấp có cơ hội rơi một năng lượng. Trong giai đoạn kiểm thử tỷ lệ đang là 100%; cấu hình phát hành dự kiến là 20%, bảo hiểm rơi ở lần thứ 10 sau 9 lần trượt.
-- Tiến trình năng lượng giữ xuyên các level trong cùng lượt chơi và reset khi chơi mới/quay Menu. Năng lượng được tính ngay lúc rơi ra bàn; hiệu ứng thu thập bay vào thanh mốc nhưng không khóa thao tác.
+- Tiến trình năng lượng giữ xuyên các level, khi thua/Chơi lại và khi quay Menu rồi Tiếp tục; chỉ reset khi chọn **Chơi mới**. Sau mốc 10, tiến trình quay về đầu và lặp vòng thưởng. Năng lượng được tính ngay lúc rơi ra bàn; hiệu ứng thu thập bay vào thanh mốc nhưng không khóa thao tác.
 - Có đủ 10 mốc thưởng: phá cặp thường, Xu, thời gian, Gợi ý, Xáo trộn, Đóng băng thời gian và mở băng theo cấu hình tập trung. Thưởng phá cặp vẫn xử lý được cặp cuối để hoàn thành màn; không chọn băng, thẻ cao cấp hoặc ô may mắn.
 
 ---

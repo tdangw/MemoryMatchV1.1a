@@ -44,10 +44,26 @@ hydrateGameState({
       totalScore: 120,
       bestByLevel: { "easy:1": { score: 120, stars: 2 } },
       items: { hint: 1200 },
+      sessionsByMode: {
+        easy: {
+          mode: "easy",
+          level: 4,
+          gravityShift: "down",
+          specialProgress: 7,
+          specialNoEnergyDropStreak: 6,
+        },
+      },
     },
   },
 });
 assert.equal(gameState.progress.linkConnect.items.hint, 999);
+assert.deepEqual(gameState.progress.linkConnect.sessionsByMode.easy, {
+  mode: "easy",
+  level: 4,
+  gravityShift: "down",
+  specialProgress: 7,
+  specialNoEnergyDropStreak: 6,
+});
 const linkProgress = recordLinkConnectResult({ mode: "easy", level: 1, score: 150, stars: 3 });
 assert.equal(linkProgress.totalStars, 3, "Link Connect chỉ cộng phần sao tăng thêm khi chơi lại màn.");
 assert.equal(gameState.progress.linkConnect.totalScore, 150);

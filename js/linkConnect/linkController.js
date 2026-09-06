@@ -181,7 +181,14 @@ function chooseLinkMode(mode, label, difficultyModal) {
   modal.panel.classList.add("session-choice-modal");
 }
 
-export function startLinkLevel({ mode = linkGameState.mode, level = 1, resume = false, gravityShift } = {}) {
+export function startLinkLevel({
+  mode = linkGameState.mode,
+  level = 1,
+  resume = false,
+  gravityShift,
+  specialProgress,
+  specialNoEnergyDropStreak,
+} = {}) {
   stopCountdown();
   clearGameplayRewardPopups();
   clearLinkPath();
@@ -201,9 +208,26 @@ export function startLinkLevel({ mode = linkGameState.mode, level = 1, resume = 
     linkGameState.specialProgress = 0;
     linkGameState.specialNoEnergyDropStreak = 0;
     clearActiveSession("link-connect", mode);
+  } else if (resume) {
+    const progressTarget = LINK_CONNECT_CONFIG.special.progressTarget;
+    if (Number.isFinite(specialProgress)) {
+      linkGameState.specialProgress = Math.max(0, Math.floor(specialProgress)) % progressTarget;
+    }
+    if (Number.isFinite(specialNoEnergyDropStreak)) {
+      linkGameState.specialNoEnergyDropStreak = Math.min(
+        LINK_CONNECT_CONFIG.special.energyDrop.guaranteeAfterMisses,
+        Math.max(0, Math.floor(specialNoEnergyDropStreak)),
+      );
+    }
   }
   const resolvedGravityShift = gravityShift || getLinkGravityShift(level);
-  saveActiveSession("link-connect", { mode, level, gravityShift: resolvedGravityShift });
+  saveActiveSession("link-connect", {
+    mode,
+    level,
+    gravityShift: resolvedGravityShift,
+    specialProgress: linkGameState.specialProgress,
+    specialNoEnergyDropStreak: linkGameState.specialNoEnergyDropStreak,
+  });
   const roundId = beginLinkRound({ mode, level, layout, board, gravityShift: resolvedGravityShift });
   if (isLinkEndlessMode(mode)) linkGameState.remainingTime = 0;
   else if (isLinkChallengeMode(mode)) linkGameState.remainingTime = getLinkChallengeTime(level);
@@ -1014,12 +1038,14 @@ function shouldDropLinkEnergy() {
     return true;
   }
   linkGameState.specialNoEnergyDropStreak += 1;
+  persistLinkRunProgress();
   return false;
 }
 
 function receiveLinkEnergy(roundId, board) {
   if (linkGameState.roundId !== roundId || linkGameState.board !== board) return 0;
   linkGameState.specialProgress += 1;
+  persistLinkRunProgress();
   updateLinkHud();
   return linkGameState.specialProgress;
 }
@@ -1072,6 +1098,7 @@ function processPendingSpecialMilestones(roundId, board) {
   const finish = () => {
     linkGameState.isResolvingSpecialMilestone = false;
     if (progress >= LINK_CONNECT_CONFIG.special.progressTarget) linkGameState.specialProgress = 0;
+    persistLinkRunProgress();
     updateLinkHud();
     if (linkGameState.matchedPairs >= linkGameState.totalPairs) return completeLinkLevel();
     recoverBlockedLinkBoard(board);
@@ -1268,6 +1295,16 @@ function playPendingBoardTransforms() {
 
 function randomInteger(minimum, maximum) {
   return minimum + Math.floor(Math.random() * (maximum - minimum + 1));
+}
+
+function persistLinkRunProgress() {
+  saveActiveSession("link-connect", {
+    mode: linkGameState.mode,
+    level: linkGameState.level,
+    gravityShift: linkGameState.gravityShift,
+    specialProgress: linkGameState.specialProgress,
+    specialNoEnergyDropStreak: linkGameState.specialNoEnergyDropStreak,
+  });
 }
 
 function stopCountdown() {

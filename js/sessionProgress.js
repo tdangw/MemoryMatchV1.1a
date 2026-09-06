@@ -23,6 +23,12 @@ export function saveActiveSession(gameId, session) {
     mode: session.mode,
     level: Math.max(1, Math.floor(session.level || 1)),
     ...(typeof session.gravityShift === "string" ? { gravityShift: session.gravityShift } : {}),
+    ...(Number.isFinite(session.specialProgress)
+      ? { specialProgress: Math.max(0, Math.floor(session.specialProgress)) }
+      : {}),
+    ...(Number.isFinite(session.specialNoEnergyDropStreak)
+      ? { specialNoEnergyDropStreak: Math.max(0, Math.floor(session.specialNoEnergyDropStreak)) }
+      : {}),
   };
   saveProgress(gameState.progress);
 }
