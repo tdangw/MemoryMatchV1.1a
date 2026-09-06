@@ -445,8 +445,7 @@
 }
 
 /* Chọn chế độ chơi dùng cùng hệ màu với menu chính. */
-#difficulty-modal .app-modal,
-#link-gravity-rule-modal .app-modal {
+#difficulty-modal .app-modal {
   width: min(370px, calc(100vw - 36px));
   border-color: rgb(255 255 255 / 16%);
   border-radius: 24px;
@@ -460,15 +459,11 @@
   width: min(370px, calc(100vw - 36px));
 }
 
-#difficulty-modal .app-modal__header,
-#link-gravity-rule-modal .app-modal__header,
-#link-gravity-rule-modal .app-modal__footer {
+#difficulty-modal .app-modal__header {
   border-bottom-color: rgb(255 255 255 / 11%);
 }
 
-#difficulty-modal .app-modal__title,
-#link-gravity-rule-modal .app-modal__title,
-#link-gravity-rule-modal .app-modal__title .ui-icon {
+#difficulty-modal .app-modal__title {
   color: #f2bf5b;
 }
 
@@ -476,56 +471,16 @@
   color: #f2bf5b;
 }
 
-#difficulty-modal .app-modal__close,
-#link-gravity-rule-modal .app-modal__close {
+#difficulty-modal .app-modal__close {
   background: rgb(255 255 255 / 9%);
   color: #f5f7fb;
 }
 
-#difficulty-modal .app-modal__body,
-#link-gravity-rule-modal .app-modal__body {
+#difficulty-modal .app-modal__body {
   display: grid;
   min-height: 0;
   gap: 14px;
   color: rgb(245 247 251 / 82%);
-}
-
-#link-gravity-rule-modal .app-modal__body {
-  padding: 20px 18px;
-  text-align: center;
-}
-
-#link-gravity-rule-modal .link-gravity-rule__copy {
-  margin: 0;
-  color: #e8f4ff;
-  font-size: 1rem;
-  font-weight: 500;
-  line-height: 1.55;
-  text-align: left;
-}
-
-#link-gravity-rule-modal .link-gravity-rule__copy p {
-  margin: 0 0 10px;
-}
-
-#link-gravity-rule-modal .link-gravity-rule__copy ul {
-  margin: 0 0 12px;
-  padding-left: 20px;
-}
-
-#link-gravity-rule-modal .link-gravity-rule__copy li + li {
-  margin-top: 5px;
-}
-
-#link-gravity-rule-modal .link-gravity-rule__current {
-  margin-bottom: 0;
-  color: #ffd889;
-  font-weight: 800;
-}
-
-#link-gravity-rule-modal .app-button--primary {
-  background: #2f73b8;
-  color: #fff;
 }
 
 /* Popup chọn tiếp tục/chơi mới tái sử dụng cho cả hai trò. */

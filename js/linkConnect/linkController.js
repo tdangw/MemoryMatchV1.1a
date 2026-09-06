@@ -29,6 +29,7 @@ import {
   getLinkComboWindowMs,
   getLinkChallengeLayout,
   LINK_CONNECT_CONFIG,
+  LINK_CONNECT_HELP_CONTENT,
   getLinkLevelHintBonus,
   getLinkLevelTimeBonus,
   getLinkGravityShift,
@@ -49,6 +50,7 @@ import {
   applyLinkGravityShift,
   ensurePlayableBoard,
   getLinkBoardTile,
+  hasOnlyFrozenLinkTiles,
   removeLinkBoardPair,
   removeRandomLinkPair,
   shuffleLinkBoard,
@@ -83,6 +85,7 @@ import {
   playLinkThunderStrike,
   renderLinkBoard,
   renderLinkBoardShift,
+  renderLinkBoardShuffle,
   setLinkTileSelected,
   setLinkTileHinted,
 } from "./linkRenderer.js";
@@ -225,13 +228,8 @@ export function startLinkLevel({ mode = linkGameState.mode, level = 1, resume = 
     assistText: `Gợi ý: ${getLinkItemCount("hint")}`,
     onComplete: () => {
       if (linkGameState.roundId !== roundId) return;
-      const startRound = () => {
-        if (linkGameState.roundId !== roundId) return;
-        linkGameState.isLocked = false;
-        startCountdown(roundId);
-      };
-      if (resolvedGravityShift === "static" || gameState.progress.linkConnect.gravityGuideSeen) startRound();
-      else showLinkGravityRuleModal(resolvedGravityShift, startRound);
+      linkGameState.isLocked = false;
+      startCountdown(roundId);
     },
   });
 }
@@ -412,7 +410,7 @@ function runLinkGameAction(action) {
     return navigation.showShop(resumeLinkAfterShop);
   }
   if (action === "help") {
-    return showLinkGameModal("Cách chơi Link Connect", "<p>Quan sát các hình đang mở và nối hai hình giống nhau bằng đường đi không có vật cản.</p><p>Đường nối có tối đa hai lần rẽ.</p>", "book");
+    return showLinkGameModal("Cách chơi Link Connect", LINK_CONNECT_HELP_CONTENT, "book");
   }
   if (action === "info") {
     return showLinkGameModal("Giới thiệu", "<p><strong>Link Connect</strong> là trò chơi nối cặp hình giúp rèn luyện khả năng quan sát.</p>", "info");
@@ -598,7 +596,7 @@ function useLinkHint() {
 
 function useLinkReshuffle() {
   shuffleLinkBoard(linkGameState.board);
-  renderLinkBoardShift(linkGameState.board, { onTileClick: handleLinkTileClick });
+  renderLinkBoardShuffle(linkGameState.board, { onTileClick: handleLinkTileClick });
   showAppToast("Đã xáo lại các thẻ còn lại.");
 }
 
@@ -674,63 +672,6 @@ function finishLinkThunder(board, roundId) {
   recoverBlockedLinkBoard(board);
   linkGameState.isLocked = false;
 }
-
-function getGravityShiftLabel(direction) {
-  return {
-    down: "Dồn xuống",
-    up: "Dồn lên",
-    left: "Dồn sang trái",
-    right: "Dồn sang phải",
-    center: "Hút vào tâm",
-    "split-vertical": "Tách về biên trên/dưới",
-    "split-horizontal": "Tách về biên trái/phải",
-    swap: "Tráo đổi thẻ lân cận",
-    "rotate-clockwise": "Xoay theo chiều kim đồng hồ",
-    "rotate-counterclockwise": "Xoay ngược chiều kim đồng hồ",
-  }[direction] || "Bàn cờ tĩnh";
-}
-
-function showLinkGravityRuleModal(direction, onComplete) {
-  const content = document.createElement("div");
-  content.className = "link-gravity-rule__copy";
-  const intro = document.createElement("p");
-  intro.textContent = "Từ Level 3, sau mỗi cặp ghép đúng, các thẻ còn lại có thể tự dồn theo quy tắc của màn:";
-  const rules = document.createElement("ul");
-  [
-    "Dồn xuống: mọi thẻ trượt xuống hàng thấp nhất còn trống.",
-    "Dồn lên: mọi thẻ trượt lên hàng cao nhất còn trống.",
-    "Dồn trái: các thẻ trong từng hàng trượt sát về bên trái.",
-    "Dồn phải: các thẻ trong từng hàng trượt sát về bên phải.",
-    "Hút vào tâm: thẻ từ các phía dồn về vùng giữa bàn.",
-    "Tách dọc/ngang: hai nửa bàn dồn ra hai biên đối diện.",
-    "Tráo đổi: các thẻ lân cận đổi chỗ với nhau.",
-    "Xoay: các vòng thẻ dịch chuyển theo hoặc ngược chiều kim đồng hồ.",
-    "Từ Level 28, quy tắc bàn động được chọn ngẫu nhiên cho mỗi màn.",
-  ].forEach((text) => {
-    const item = document.createElement("li");
-    item.textContent = text;
-    rules.append(item);
-  });
-  const current = document.createElement("p");
-  current.className = "link-gravity-rule__current";
-  current.textContent = `Màn hiện tại: ${getGravityShiftLabel(direction)}.`;
-  content.append(intro, rules, current);
-  openAppModal({
-    id: "link-gravity-rule-modal",
-    icon: "restart",
-    title: "Luật Bàn Động",
-    content,
-    dismissible: false,
-    closeOnBackdrop: false,
-    actions: [{ label: "Đã hiểu", icon: "play", variant: "primary" }],
-    onClose: () => {
-      gameState.progress.linkConnect.gravityGuideSeen = true;
-      saveProgress(gameState.progress);
-      onComplete?.();
-    },
-  });
-}
-
 
 function useLinkFreeze() {
   linkGameState.freezeSeconds += 10;
@@ -1220,19 +1161,20 @@ function processPendingSpecialMilestones(roundId, board) {
 
 function recoverBlockedLinkBoard(board) {
   if (findAvailableConnections(board.grid).length) return false;
+  if (hasOnlyFrozenLinkTiles(board)) {
+    const thawedPairs = unlockAllFrozenLinkPairs(board, { onUnlock: rememberFrozenPairForTransform });
+    if (!thawedPairs) return false;
+    renderLinkBoard(board, { onTileClick: handleLinkTileClick });
+    playPendingBoardTransforms();
+    showAppToast(`Đã mở toàn bộ ${thawedPairs} cặp băng còn lại.`);
+    return true;
+  }
   if (ensurePlayableBoard(board)) {
-    renderLinkBoardShift(board, { onTileClick: handleLinkTileClick });
+    renderLinkBoardShuffle(board, { onTileClick: handleLinkTileClick });
     showAppToast("Không còn đường nối. Bàn đã được xáo lại.");
     return true;
   }
-  // Khi cuối màn chỉ còn các cặp băng, xáo không thể tạo nước đi vì chúng đều
-  // bị khóa. Mở toàn bộ cùng lúc để kết thúc màn liền mạch.
-  const thawedPairs = unlockAllFrozenLinkPairs(board, { onUnlock: rememberFrozenPairForTransform });
-  if (!thawedPairs) return false;
-  renderLinkBoard(board, { onTileClick: handleLinkTileClick });
-  playPendingBoardTransforms();
-  showAppToast(`Đã mở ${thawedPairs} cặp băng còn lại để tiếp tục màn chơi.`);
-  return true;
+  return false;
 }
 
 function playAutomaticPairBreak(roundId, board, onComplete, { scoreMode = "none" } = {}) {
@@ -1376,6 +1318,9 @@ function applyLinkTimingStyles(container) {
   container.style.setProperty("--link-item-reward-burst-duration", `${LINK_CONNECT_TIMING.itemRewardBurstMs}ms`);
   container.style.setProperty("--link-item-reward-hold-duration", `${LINK_CONNECT_TIMING.itemRewardHoldMs}ms`);
   container.style.setProperty("--link-item-reward-flight-duration", `${LINK_CONNECT_TIMING.itemRewardFlightMs}ms`);
+  container.style.setProperty("--link-board-shift-duration", `${LINK_CONNECT_TIMING.boardShiftMs}ms`);
+  container.style.setProperty("--link-board-shuffle-duration", `${LINK_CONNECT_TIMING.boardShuffleMs}ms`);
+  container.style.setProperty("--link-board-shuffle-stagger", `${LINK_CONNECT_TIMING.boardShuffleStaggerMs}ms`);
 }
 
 function getLinkHudElements() {

@@ -43,12 +43,10 @@ hydrateGameState({
       totalStars: 2,
       totalScore: 120,
       bestByLevel: { "easy:1": { score: 120, stars: 2 } },
-      gravityGuideSeen: true,
       items: { hint: 1200 },
     },
   },
 });
-assert.equal(gameState.progress.linkConnect.gravityGuideSeen, true);
 assert.equal(gameState.progress.linkConnect.items.hint, 999);
 const linkProgress = recordLinkConnectResult({ mode: "easy", level: 1, score: 150, stars: 3 });
 assert.equal(linkProgress.totalStars, 3, "Link Connect chỉ cộng phần sao tăng thêm khi chơi lại màn.");

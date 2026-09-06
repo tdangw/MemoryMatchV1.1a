@@ -1,5 +1,15 @@
 import { GAMEPLAY_LIMITS } from "../gameplayTuning.js";
 
+export const LINK_CONNECT_HELP_CONTENT = `
+  <ul class="app-feature-list">
+    <li>Ghép hai hình giống nhau khi đường nối không quá hai lần rẽ.</li>
+    <li>Sau mỗi cặp, các thẻ có thể dồn, tách, đổi chỗ hoặc xoay theo quy tắc của cấp.</li>
+    <li>Thẻ cao cấp có thể mở băng, tặng công cụ hoặc gọi Sấm sét.</li>
+    <li>Ghép thẻ cao cấp để thu thập năng lượng và mở các mốc thưởng.</li>
+    <li>Hết đường nối, game sẽ tự xáo; nếu chỉ còn thẻ băng, tất cả sẽ tự mở.</li>
+  </ul>
+`;
+
 export const LINK_CONNECT_CONFIG = Object.freeze({
   gravity: Object.freeze({
     basicDirections: Object.freeze(["down", "up", "left", "right"]),
@@ -140,6 +150,9 @@ export const LINK_CONNECT_TIMING = Object.freeze({
   itemRewardHoldMs: 380,
   itemRewardFlightMs: 820,
   automaticPairMarkMs: 360,
+  boardShiftMs: 540,
+  boardShuffleMs: 720,
+  boardShuffleStaggerMs: 12,
 });
 
 export function getLinkMatchResolveDelay() {

@@ -15,11 +15,13 @@ const OUTER_ROUTE_INSET_PERCENT = 1.5;
 const assetUrl = (path) => `${import.meta.env.BASE_URL}${path}`;
 let layoutFrame;
 let layoutObserver;
+let shuffleInteractionTimer;
 let observedGame;
 let renderedBoardShape = "";
 let renderedBoardContainer = null;
 const boardCellsByPosition = new Map();
 const tileElementsByKey = new Map();
+const tileMotionAnimations = new WeakMap();
 
 window.addEventListener("resize", () => {
   scheduleLinkBoardLayout();
@@ -35,25 +37,90 @@ export function renderLinkBoard(board, { onTileClick } = {}) {
 }
 
 export function renderLinkBoardShift(board, { onTileClick } = {}) {
-  return measureLinkRender("board shift", () => {
+  return renderLinkBoardMotion(board, onTileClick, "shift");
+}
+
+export function renderLinkBoardShuffle(board, { onTileClick } = {}) {
+  return renderLinkBoardMotion(board, onTileClick, "shuffle");
+}
+
+function renderLinkBoardMotion(board, onTileClick, motion) {
+  return measureLinkRender(motion === "shuffle" ? "board shuffle" : "board shift", () => {
     const before = getLinkTileRects();
     patchLinkBoard(board, onTileClick);
     const after = getLinkTileRects();
+    let motionIndex = 0;
     after.forEach(({ element, rect, key }) => {
       const previous = before.get(key);
       if (!previous) return;
       const deltaX = previous.left - rect.left;
       const deltaY = previous.top - rect.top;
       if (!deltaX && !deltaY) return;
-      element.style.transition = "none";
-      element.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-      requestAnimationFrame(() => {
-        element.style.transition = "transform var(--link-board-shift-duration, 300ms) cubic-bezier(.2,.75,.25,1)";
-        element.style.transform = "";
-        element.addEventListener("transitionend", () => { element.style.transition = ""; }, { once: true });
-      });
+      animateLinkTileMotion(element, deltaX, deltaY, motion, motionIndex);
+      motionIndex += 1;
     });
+    if (motion === "shuffle") holdLinkBoardDuringShuffle();
   });
+}
+
+function holdLinkBoardDuringShuffle() {
+  const board = document.getElementById("link-board");
+  const game = document.getElementById("link-connect-container");
+  if (!board || !game) return;
+  const styles = getComputedStyle(game);
+  const duration = readCssTimeMs(styles.getPropertyValue("--link-board-shuffle-duration"), 720);
+  const stagger = readCssTimeMs(styles.getPropertyValue("--link-board-shuffle-stagger"), 12);
+  clearTimeout(shuffleInteractionTimer);
+  board.classList.add("is-shuffling");
+  shuffleInteractionTimer = setTimeout(() => {
+    board.classList.remove("is-shuffling");
+  }, duration + Math.min(stagger * 8, 96) + 40);
+}
+
+function animateLinkTileMotion(element, deltaX, deltaY, motion, index) {
+  tileMotionAnimations.get(element)?.cancel();
+  if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+  const styles = getComputedStyle(document.getElementById("link-connect-container") || element);
+  const shuffle = motion === "shuffle";
+  const duration = readCssTimeMs(
+    styles.getPropertyValue(shuffle ? "--link-board-shuffle-duration" : "--link-board-shift-duration"),
+    shuffle ? 720 : 540,
+  );
+  const stagger = shuffle
+    ? Math.min(index * readCssTimeMs(styles.getPropertyValue("--link-board-shuffle-stagger"), 12), 96)
+    : 0;
+  const keyframes = shuffle
+    ? [
+      { transform: `translate(${deltaX}px, ${deltaY}px) scale(.94)`, opacity: .58 },
+      { transform: `translate(${deltaX * .24}px, ${deltaY * .24}px) scale(1.025)`, opacity: .92, offset: .72 },
+      { transform: "translate(0, 0) scale(1)", opacity: 1 },
+    ]
+    : [
+      { transform: `translate(${deltaX}px, ${deltaY}px)` },
+      { transform: `translate(${-deltaX * .025}px, ${-deltaY * .025}px)`, offset: .84 },
+      { transform: "translate(0, 0)" },
+    ];
+  if (typeof element.animate !== "function") {
+    element.style.transition = "none";
+    element.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+    requestAnimationFrame(() => {
+      element.style.transition = `transform ${duration}ms cubic-bezier(.18,.72,.2,1)`;
+      element.style.transform = "";
+      element.addEventListener("transitionend", () => { element.style.transition = ""; }, { once: true });
+    });
+    return;
+  }
+  const animation = element.animate(keyframes, {
+    duration,
+    delay: stagger,
+    easing: shuffle ? "cubic-bezier(.16,.74,.2,1)" : "cubic-bezier(.18,.72,.2,1)",
+  });
+  tileMotionAnimations.set(element, animation);
+  const clearAnimation = () => {
+    if (tileMotionAnimations.get(element) === animation) tileMotionAnimations.delete(element);
+  };
+  animation.addEventListener("finish", clearAnimation, { once: true });
+  animation.addEventListener("cancel", clearAnimation, { once: true });
 }
 
 function patchLinkBoard(board, onTileClick) {

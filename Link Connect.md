@@ -42,7 +42,7 @@ Hai thẻ cùng hình chỉ được ghép nối thành công khi đường đi 
 
 Sau mỗi cặp ghép, Link Connect áp dụng quy tắc bàn cờ của cả màn. Dù bàn tĩnh hay động, sau khi trạng thái ổn định hệ thống luôn kiểm tra còn ít nhất một đường nối; nếu không, game xáo các thẻ còn lại để ván tiếp tục.
 
-### Cơ chế dồn thẻ — Gravity Shifts
+### Các kiểu dịch chuyển thẻ — Gravity Shifts
 
 Đây là cơ chế gameplay riêng, không phải hiệu ứng thẻ biến mất trong Bộ sưu tập. Sau khi một cặp thẻ bị loại bỏ, bàn cờ có thể dịch chuyển các thẻ còn lại theo quy tắc của màn, rồi tính lại các đường nối hợp lệ.
 
@@ -58,9 +58,9 @@ Sau mỗi cặp ghép, Link Connect áp dụng quy tắc bàn cờ của cả m�
 
 #### Đã triển khai
 
-- Đã có đủ **Tĩnh và 9 nhóm bàn động**: Dồn xuống, Dồn lên, Dồn trái/phải, Hút vào tâm, Tách dọc, Tách ngang, Tráo đổi và Xoay. Xoay có hai chiều nên runtime có tổng cộng 10 quy tắc động cụ thể.
+- Đã có đủ **Tĩnh và 9 nhóm dịch chuyển**: Dồn xuống, Dồn lên, Dồn trái/phải, Hút vào tâm, Tách dọc, Tách ngang, Tráo đổi và Xoay. Xoay có hai chiều nên runtime có tổng cộng 10 quy tắc dịch chuyển cụ thể.
 - Phân bổ cấp độ, áp dụng cho mọi chế độ: **1–2 Tĩnh; 3–5 Dồn xuống; 6–8 Dồn lên; 9–12 luân phiên Trái/phải; 13–15 Hút vào tâm; 16–18 Tách dọc; 19–21 Tách ngang; 22–24 Tráo đổi; 25–27 luân phiên hai chiều Xoay; từ 28 chọn ngẫu nhiên trong toàn bộ quy tắc động**. Quy tắc đã chọn được lưu cùng phiên đang chơi để không đổi khi tiếp tục màn.
-- Lần đầu gặp bàn động, game hiển thị một popup **Luật Bàn Động** giải thích đầy đủ các nhóm quy tắc và hướng của màn hiện tại. Sau khi người chơi xác nhận, popup không lặp lại ở các màn sau; đồng hồ chỉ bắt đầu khi popup được đóng.
+- Không hiển thị popup quy tắc khi bắt đầu màn. Mục **Hướng dẫn** trong Menu giải thích ngắn gọn cách nối, các kiểu dịch chuyển, thẻ cao cấp, năng lượng, tự xáo và tự mở băng cuối màn.
 - Sau dịch chuyển hoặc Sấm sét xóa cặp, hệ thống kiểm tra nước đi; nếu cần sẽ xáo các thẻ còn lại.
 
 ### Thẻ đặc biệt và thẻ đóng băng

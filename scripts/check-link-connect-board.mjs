@@ -4,6 +4,7 @@ import {
   applyLinkGravityShift,
   ensurePlayableBoard,
   getRemainingLinkTiles,
+  hasOnlyFrozenLinkTiles,
   makeRandomLinkPairSpecial,
   removeLinkBoardPair,
   removeRandomLinkPair,
@@ -78,11 +79,26 @@ const frozenTiles = getRemainingLinkTiles(specialBoard).filter((tile) => tile.fr
 assert.equal(frozenTiles.length, 2);
 assert.equal(new Set(frozenTiles.map((tile) => tile.id)).size, 1);
 assert.equal(frozenTiles.some((tile) => tile.special), false);
+assert.equal(hasOnlyFrozenLinkTiles(specialBoard), false);
 assert.equal(unlockFrozenLinkPairs(specialBoard), 1);
 assert.equal(getRemainingLinkTiles(specialBoard).filter((tile) => tile.frozen).length, 0);
 assert.ok(makeRandomLinkPairSpecial(specialBoard));
 assert.ok(removeRandomLinkPair(specialBoard));
 assert.equal(unlockAllFrozenLinkPairs(specialBoard), 0);
+
+const frozenOnlyBoard = {
+  rows: 2,
+  columns: 2,
+  grid: [
+    [null, null, null, null],
+    [null, { id: "ice", frozen: true }, { id: "ice", frozen: true }, null],
+    [null, { id: "ice-2", frozen: true }, { id: "ice-2", frozen: true }, null],
+    [null, null, null, null],
+  ],
+};
+assert.equal(hasOnlyFrozenLinkTiles(frozenOnlyBoard), true);
+assert.equal(unlockAllFrozenLinkPairs(frozenOnlyBoard), 2);
+assert.equal(hasOnlyFrozenLinkTiles(frozenOnlyBoard), false);
 
 let challengeBoard;
 try {

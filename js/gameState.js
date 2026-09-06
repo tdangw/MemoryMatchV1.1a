@@ -30,7 +30,6 @@ export const gameState = {
       totalScore: 0,
       bestByLevel: {},
       items: { hint: 0, reshuffle: 0, thunder: 0, freeze: 0 },
-      gravityGuideSeen: false,
     },
   },
   appearance: normalizeAppearance(),
@@ -75,7 +74,6 @@ export function hydrateGameState({
       thunder: normalizeItemCount(linkItems.thunder),
       freeze: normalizeItemCount(linkItems.freeze),
     },
-    gravityGuideSeen: linkConnect.gravityGuideSeen === true,
     sessionsByMode: normalizeSessions(linkConnect.sessionsByMode, linkConnect.activeSession),
   };
   Object.assign(gameState.settings, settings);

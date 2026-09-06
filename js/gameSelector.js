@@ -12,6 +12,7 @@ import {
   getGameModeLabel,
 } from "./gameCatalog.js";
 import { createThemeSummary, UI_TIMING } from "./uiCatalog.js";
+import { LINK_CONNECT_HELP_CONTENT } from "./linkConnect/linkConfig.js";
 
 let activeGameId = null;
 let onStartLinkConnect = () => {};
@@ -116,7 +117,7 @@ function createLinkConnectMenu() {
       onClick: () =>
         showGameInfoModal(
           "Cách chơi Link Connect",
-          "<p>Quan sát các hình đang mở và nối hai hình giống nhau bằng đường đi không có vật cản.</p><p>Đường nối có tối đa hai lần rẽ.</p>",
+          LINK_CONNECT_HELP_CONTENT,
           "book",
         ),
     }),

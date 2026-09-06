@@ -204,7 +204,7 @@ function positionKey(position) {
 export function ensurePlayableBoard(board) {
   if (hasAvailableConnection(board.grid)) return false;
   // Không thể xáo để tạo nước đi nếu toàn bộ thẻ còn lại đều đang bị băng khóa.
-  // Controller sẽ mở tuần tự một cặp băng trong trường hợp này.
+  // Controller sẽ mở tất cả cặp băng cùng lúc trong trường hợp này.
   if (!getRemainingLinkTiles(board).some((tile) => !tile.frozen)) return false;
   shuffleIntoPlayableBoard(board);
   return true;
@@ -274,6 +274,11 @@ function shuffleIntoPlayableBoard(board) {
 
 export function getRemainingLinkTiles(board) {
   return getInteriorTiles(board);
+}
+
+export function hasOnlyFrozenLinkTiles(board) {
+  const tiles = getRemainingLinkTiles(board);
+  return tiles.length > 0 && tiles.every((tile) => tile.frozen);
 }
 
 let nextTileInstanceId = 1;
