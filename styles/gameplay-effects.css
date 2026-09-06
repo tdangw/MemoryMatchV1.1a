@@ -119,12 +119,12 @@
 }
 
 @keyframes game-coin-reward-loot {
-  0% { opacity: 0; transform: translate(0, 0) scale(.5) rotate(-18deg); }
-  12% { opacity: 1; transform: translate(var(--game-coin-apex-x), var(--game-coin-apex-y)) scale(1.08) rotate(12deg); }
-  34% { opacity: 1; transform: translate(var(--game-coin-land-x), var(--game-coin-land-y)) scale(1.05, .9) rotate(18deg); }
-  44% { opacity: 1; transform: translate(var(--game-coin-land-x), calc(var(--game-coin-land-y) - 6px)) scale(.98, 1.03) rotate(8deg); }
-  52% { opacity: 1; transform: translate(var(--game-coin-land-x), var(--game-coin-land-y)) scale(1) rotate(0deg); }
-  64% { opacity: 1; transform: translate(var(--game-coin-land-x), var(--game-coin-land-y)) scale(1.04); }
+  0% { opacity: 0; transform: translate(0, 0) scale(.5) rotate(var(--game-coin-start-rotation, -18deg)); }
+  12% { opacity: 1; transform: translate(var(--game-coin-apex-x), var(--game-coin-apex-y)) scale(1.08) rotate(var(--game-coin-apex-rotation, 12deg)); }
+  34% { opacity: 1; transform: translate(var(--game-coin-land-x), var(--game-coin-land-y)) scale(1.05, .9) rotate(var(--game-coin-land-rotation, 8deg)); }
+  44% { opacity: 1; transform: translate(var(--game-coin-bounce-x), var(--game-coin-bounce-y)) scale(.98, 1.03) rotate(var(--game-coin-apex-rotation, 5deg)); }
+  52% { opacity: 1; transform: translate(var(--game-coin-land-x), var(--game-coin-land-y)) scale(1) rotate(var(--game-coin-land-rotation, 0deg)); }
+  64% { opacity: 1; transform: translate(var(--game-coin-land-x), var(--game-coin-land-y)) scale(1.04) rotate(var(--game-coin-land-rotation, 0deg)); }
   100% { opacity: 0; transform: translate(var(--game-coin-flight-x), var(--game-coin-flight-y)) scale(.42); }
 }
 

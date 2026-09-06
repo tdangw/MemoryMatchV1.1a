@@ -20,45 +20,59 @@ export function playCoinRewardFlight(source, target, amount) {
   const targetIcon = target.querySelector?.(".ui-icon") || target;
   const sourceRect = stableSource.getBoundingClientRect();
   const targetRect = targetIcon.getBoundingClientRect();
-  const startX = sourceRect.left + sourceRect.width / 2;
-  const startY = sourceRect.top + sourceRect.height / 2;
-  const targetX = targetRect.left + targetRect.width / 2 - startX;
-  const targetY = targetRect.top + targetRect.height / 2 - startY;
+  const sourceCenterX = sourceRect.left + sourceRect.width / 2;
+  const sourceCenterY = sourceRect.top + sourceRect.height / 2;
+  const targetCenterX = targetRect.left + targetRect.width / 2;
+  const targetCenterY = targetRect.top + targetRect.height / 2;
   const safeInset = 14;
   const viewportWidth = document.documentElement.clientWidth;
   const viewportHeight = document.documentElement.clientHeight;
   const durationMs = GAMEPLAY_TIMING.coinRewardFlightMs;
   const staggerMs = GAMEPLAY_TIMING.coinRewardStaggerMs;
+  const durationVarianceMs = 140;
   const fragment = document.createDocumentFragment();
   const effects = Array.from({ length: coinCount }, (_, index) => {
     const effect = document.createElement("span");
     effect.className = "game-coin-reward-flight";
     effect.setAttribute("aria-hidden", "true");
     effect.append(createIcon("coin"));
-    const direction = index % 2 ? 1 : -1;
-    const spread = direction * (18 + Math.random() * Math.min(48, Math.max(24, sourceRect.width * 0.55)));
+    const startX = clamp(sourceCenterX + randomBetween(-7, 7), safeInset, viewportWidth - safeInset);
+    const startY = clamp(sourceCenterY + randomBetween(-5, 5), safeInset, viewportHeight - safeInset);
+    const horizontalRange = Math.min(58, Math.max(30, sourceRect.width * 0.68));
+    const spread = randomBetween(-horizontalRange, horizontalRange);
+    const downwardRange = Math.min(54, Math.max(30, sourceRect.height * 0.5));
     const landingX = clamp(startX + spread, safeInset, viewportWidth - safeInset) - startX;
-    const landingDistanceY = Math.max(18, Math.min(46, sourceRect.height * (0.32 + Math.random() * 0.2)));
-    const landingY = clamp(startY + landingDistanceY, safeInset, viewportHeight - safeInset) - startY;
-    const apexX = landingX * (0.42 + Math.random() * 0.2);
-    const apexY = clamp(startY - Math.max(24, landingDistanceY * (1.15 + Math.random() * 0.35)), safeInset, viewportHeight - safeInset) - startY;
+    const landingY = clamp(startY + randomBetween(16, downwardRange), safeInset, viewportHeight - safeInset) - startY;
+    const apexX = landingX * randomBetween(0.28, 0.68) + randomBetween(-7, 7);
+    const apexY = clamp(startY - randomBetween(28, 54), safeInset, viewportHeight - safeInset) - startY;
+    const bounceX = landingX + randomBetween(-3, 3);
+    const bounceY = landingY - randomBetween(5, 10);
+    const targetX = targetCenterX - startX;
+    const targetY = targetCenterY - startY;
+    const flightDuration = Math.round(durationMs + randomBetween(-durationVarianceMs, durationVarianceMs));
+    const delay = Math.round(index * staggerMs + randomBetween(0, staggerMs * 0.65));
     effect.style.left = `${startX}px`;
     effect.style.top = `${startY}px`;
     effect.style.setProperty("--game-coin-apex-x", `${Math.round(apexX)}px`);
     effect.style.setProperty("--game-coin-apex-y", `${Math.round(apexY)}px`);
     effect.style.setProperty("--game-coin-land-x", `${Math.round(landingX)}px`);
     effect.style.setProperty("--game-coin-land-y", `${Math.round(landingY)}px`);
+    effect.style.setProperty("--game-coin-bounce-x", `${Math.round(bounceX)}px`);
+    effect.style.setProperty("--game-coin-bounce-y", `${Math.round(bounceY)}px`);
     effect.style.setProperty("--game-coin-flight-x", `${Math.round(targetX)}px`);
     effect.style.setProperty("--game-coin-flight-y", `${Math.round(targetY)}px`);
-    effect.style.setProperty("--game-coin-flight-duration", `${durationMs}ms`);
-    effect.style.setProperty("--game-coin-delay", `${index * staggerMs}ms`);
+    effect.style.setProperty("--game-coin-start-rotation", `${Math.round(randomBetween(-28, 28))}deg`);
+    effect.style.setProperty("--game-coin-apex-rotation", `${Math.round(randomBetween(-16, 24))}deg`);
+    effect.style.setProperty("--game-coin-land-rotation", `${Math.round(randomBetween(-12, 12))}deg`);
+    effect.style.setProperty("--game-coin-flight-duration", `${flightDuration}ms`);
+    effect.style.setProperty("--game-coin-delay", `${delay}ms`);
     fragment.append(effect);
     return effect;
   });
   document.body.append(fragment);
   setTimeout(
     () => effects.forEach((effect) => effect.remove()),
-    durationMs + Math.max(0, coinCount - 1) * staggerMs + 250,
+    durationMs + durationVarianceMs + Math.max(0, coinCount - 1) * staggerMs + 300,
   );
   return effects;
 }
@@ -102,4 +116,8 @@ export function isCoinCounterAnimating(counter) {
 
 function clamp(value, minimum, maximum) {
   return Math.min(maximum, Math.max(minimum, value));
+}
+
+function randomBetween(minimum, maximum) {
+  return minimum + Math.random() * (maximum - minimum);
 }
