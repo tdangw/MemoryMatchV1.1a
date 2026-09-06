@@ -68,6 +68,33 @@ export const GAME_CONFIG = Object.freeze({
   }),
   previewDurationMs: 5000,
   hintRevealDurationMs: 2500,
+  special: Object.freeze({
+    progressTarget: 10,
+    energyDrop: Object.freeze({ chance: 1, guaranteeAfterMisses: 9 }),
+    supportDrop: Object.freeze({
+      chance: 0.5,
+      types: Object.freeze(["preview-auto", "hint", "time-item"]),
+      timeValues: Object.freeze([10, 30, 45, 60]),
+    }),
+    previewDropValues: Object.freeze([4, 8, 12]),
+    previewTierColors: Object.freeze({ 4: "teal", 8: "blue", 12: "purple", all: "gold" }),
+    milestones: Object.freeze([
+      Object.freeze([{ type: "preview-auto", value: 4 }]),
+      Object.freeze([{ type: "time-item", value: 10 }]),
+      Object.freeze([{ type: "hint", value: 1 }]),
+      Object.freeze([{ type: "coins", value: 5 }]),
+      Object.freeze([{ type: "preview-auto", values: Object.freeze([4, 8]) }]),
+      Object.freeze([{ type: "time-item", values: Object.freeze([10, 30]) }]),
+      Object.freeze([{ type: "hint", value: 1 }, { type: "coins", value: 5 }]),
+      Object.freeze([{ type: "preview-auto", value: 12 }]),
+      Object.freeze([{ type: "time-item", value: 30 }, { type: "hint", value: 1 }]),
+      Object.freeze([
+        { type: "preview-item", value: "all" },
+        { type: "time-item", value: 60 },
+        { type: "coins", value: 10 },
+      ]),
+    ]),
+  }),
   specialModes: Object.freeze({
     endlessPreviewDurationMs: 8000,
     challengeTimeBonusSeconds: 10,
@@ -209,4 +236,34 @@ export function getLevelHintBonus(level = 1, currentHints = 0) {
   const { hintBonusPerLevel, hintCap } = GAME_CONFIG.levelProgression;
   if (level <= 1 || currentHints >= hintCap) return 0;
   return Math.min(hintBonusPerLevel, hintCap - currentHints);
+}
+
+export function shouldDropMemoryEnergy(noDropStreak = 0, random = Math.random) {
+  const { chance, guaranteeAfterMisses } = GAME_CONFIG.special.energyDrop;
+  return noDropStreak >= guaranteeAfterMisses || random() < chance;
+}
+
+export function getMemoryPreviewDropValue(random = Math.random) {
+  return pickRandom(GAME_CONFIG.special.previewDropValues, random);
+}
+
+export function resolveMemoryMilestoneRewards(progress, random = Math.random) {
+  const rewards = GAME_CONFIG.special.milestones[Math.floor(Number(progress) || 0) - 1] || [];
+  return rewards.map((reward) => ({
+    ...reward,
+    value: reward.values ? pickRandom(reward.values, random) : reward.value,
+  }));
+}
+
+export function getMemorySupportDrop(random = Math.random) {
+  const support = GAME_CONFIG.special.supportDrop;
+  if (random() >= support.chance) return null;
+  const type = pickRandom(support.types, random);
+  if (type === "preview-auto") return { type, value: getMemoryPreviewDropValue(random) };
+  if (type === "time-item") return { type, value: pickRandom(support.timeValues, random) };
+  return { type, value: 1 };
+}
+
+function pickRandom(values, random) {
+  return values[Math.min(values.length - 1, Math.floor(random() * values.length))];
 }

@@ -37,6 +37,7 @@ import {
   GAMEPLAY_LIMITS,
   GAMEPLAY_TIMING,
   getComboTimeBonus,
+  getComboWindowMs,
   shouldShowVictoryCelebration,
 } from "./gameplayTuning.js";
 import { calculateMatchCoinReward } from "./coinRewards.js";
@@ -44,10 +45,13 @@ import {
   canShowFullVictoryCelebration,
   showFullVictoryCelebration,
 } from "victory-presentation";
+import { handleMemorySpecialMatch } from "./memorySpecial.js";
 
 let selectedTiles = [];
 let levelCompleteActions = { onNext: () => {}, onMenu: () => {} };
 let pendingMismatch = null;
+let comboExpiryTimer;
+let lastMatchAt = 0;
 const REVEAL_ANIMATION_CLASSES = [
   "appear-bounce",
   "appear-fade-scale",
@@ -61,6 +65,14 @@ const tileAnimationTimers = new WeakMap();
 
 export function configureLogic(actions) {
   levelCompleteActions = { ...levelCompleteActions, ...actions };
+}
+
+export function resetLogicRuntime() {
+  if (pendingMismatch) clearTimeout(pendingMismatch.timeoutId);
+  pendingMismatch = null;
+  selectedTiles = [];
+  lastMatchAt = 0;
+  stopComboWindow();
 }
 
 function setInteractionLocked(locked, roundId = gameState.roundId) {
@@ -135,9 +147,7 @@ function resolvePendingMismatch({ immediately = false } = {}) {
  * Khởi tạo logic và gán sự kiện click cho tất cả tile
  */
 export function initLogic() {
-  if (pendingMismatch) clearTimeout(pendingMismatch.timeoutId);
-  pendingMismatch = null;
-  selectedTiles = [];
+  resetLogicRuntime();
   const tiles = document.querySelectorAll(".tile");
   tiles.forEach((tile) => {
     tile.onclick = () => handleTileClick(tile);
@@ -201,7 +211,14 @@ function checkMatch(roundId) {
     first.element.classList.add("matched");
     second.element.classList.add("matched");
 
-    gameState.combo += 1;
+    const matchedAt = performance.now();
+    const comboWindowMs = getComboWindowMs(gameState.totalPairs);
+    gameState.combo = lastMatchAt && matchedAt - lastMatchAt <= comboWindowMs
+      ? gameState.combo + 1
+      : 1;
+    const resolvedCombo = gameState.combo;
+    lastMatchAt = matchedAt;
+    startComboWindow(comboWindowMs, matchedAt, roundId);
     const comboAdjustedPoints = calculateMatchPoints(gameState.combo);
     const specialBonus = first.special ? Math.round(comboAdjustedPoints * 0.5) : 0;
     const matchPoints = comboAdjustedPoints + specialBonus;
@@ -226,7 +243,7 @@ function checkMatch(roundId) {
     gameState.matchedPairs++;
     updatePairProgressDisplay(gameState.matchedPairs);
     if (comboTimeBonus > 0) {
-      setTimeout(() => showComboEffect(second.element, gameState.combo), 650);
+      setTimeout(() => showComboEffect(second.element, resolvedCombo), 650);
     }
     highlightTarget("#pair-progress");
 
@@ -236,12 +253,15 @@ function checkMatch(roundId) {
     }
 
     awardLuckyReward(first.imageId, first.element);
+    if (first.special) handleMemorySpecialMatch(second.element, roundId);
 
     setInteractionLocked(false, roundId);
     checkLevelComplete();
   } else {
     gameState.misses++;
     gameState.combo = 0;
+    lastMatchAt = 0;
+    stopComboWindow();
     updateMissesDisplay(gameState.misses);
     updateComboDisplay(gameState.combo);
     first.element.classList.add("wrong");
@@ -265,6 +285,30 @@ function checkMatch(roundId) {
   }
 
   selectedTiles = [];
+}
+
+function startComboWindow(durationMs, matchedAt, roundId) {
+  clearTimeout(comboExpiryTimer);
+  const card = document.getElementById("combo")?.closest(".stat-combo");
+  if (card) {
+    card.style.setProperty("--combo-window-duration", `${durationMs}ms`);
+    card.classList.remove("is-combo-window-active");
+    void card.offsetWidth;
+    card.classList.add("is-combo-window-active");
+  }
+  comboExpiryTimer = setTimeout(() => {
+    if (gameState.roundId !== roundId || lastMatchAt !== matchedAt) return;
+    gameState.combo = 0;
+    lastMatchAt = 0;
+    updateComboDisplay(0);
+    stopComboWindow();
+  }, durationMs);
+}
+
+function stopComboWindow() {
+  clearTimeout(comboExpiryTimer);
+  comboExpiryTimer = undefined;
+  document.getElementById("combo")?.closest(".stat-combo")?.classList.remove("is-combo-window-active");
 }
 
 /**

@@ -233,6 +233,12 @@
   transform: translateY(-1px);
 }
 
+.quick-assist__choice--teal > .ui-icon { color: #48e0d1; }
+.quick-assist__choice--blue > .ui-icon { color: #68a7ff; }
+.quick-assist__choice--purple > .ui-icon { color: #c78aff; }
+.quick-assist__choice--gold > .ui-icon { color: #ffd166; }
+.quick-assist__choice:disabled { cursor: not-allowed; filter: saturate(.45); opacity: .55; }
+
 @media screen and (width <= 600px) {
   .game-hint-fab {
     right: 0;

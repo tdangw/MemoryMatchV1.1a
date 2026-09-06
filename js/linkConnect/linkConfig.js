@@ -1,4 +1,4 @@
-import { GAMEPLAY_LIMITS } from "../gameplayTuning.js";
+import { COMBO_WINDOWS, GAMEPLAY_LIMITS, getComboWindowMs } from "../gameplayTuning.js";
 
 export const LINK_CONNECT_HELP_CONTENT = `
   <ul class="app-feature-list">
@@ -51,11 +51,7 @@ export const LINK_CONNECT_CONFIG = Object.freeze({
     comboStepPoints: 3,
     starPointsPerPair: Object.freeze({ one: 12, two: 18, three: 25 }),
     endlessStarPointsPerPair: Object.freeze({ one: 10, two: 15, three: 20 }),
-    comboWindows: Object.freeze([
-      Object.freeze({ maxPairs: 8, seconds: 15 }),
-      Object.freeze({ maxPairs: 15, seconds: 20 }),
-      Object.freeze({ maxPairs: Infinity, seconds: 30 }),
-    ]),
+    comboWindows: COMBO_WINDOWS,
   }),
   levelProgression: Object.freeze({
     timeBonusPerLevel: 2,
@@ -276,9 +272,7 @@ export function calculateLinkStarRating(score, totalPairs, mode) {
 }
 
 export function getLinkComboWindowMs(pairCount) {
-  const rule = LINK_CONNECT_CONFIG.scoring.comboWindows
-    .find((entry) => pairCount <= entry.maxPairs);
-  return (rule?.seconds || 5) * 1000;
+  return getComboWindowMs(pairCount);
 }
 
 export function getLinkSpecialPairCount(pairCount, random = Math.random) {

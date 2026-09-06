@@ -6,12 +6,11 @@ import {
   syncMemoryTimeProgress,
   showShopMessage,
   animateIconToTarget,
-  showRevealTimerInHud,
+  updateMemoryAssistInventoryDisplay,
 } from "./ui.js";
 import { openAppModal } from "./modal.js";
 import { createIcon } from "./icons.js";
-import { shuffleArray } from "./utils.js";
-import { saveCoins, savePersistentGameData } from "./persistence.js";
+import { savePersistentGameData } from "./persistence.js";
 import { CARD_BACKS, FLIP_EFFECTS } from "./appearance.js";
 import { SHOP_ITEMS, getShopItemPrice } from "./shopCatalog.js";
 import { getOwnedThemeIds, ownTheme } from "./appearance.js";
@@ -19,23 +18,25 @@ import { GAMEPLAY_LIMITS, GAMEPLAY_TIMING } from "./gameplayTuning.js";
 import { THEMES, getTheme, isThemePlayable } from "./themeCatalog.js";
 import { buyLinkItem, getLinkItemCount, LINK_ITEMS } from "./linkConnect/linkItems.js";
 import { LINK_EXIT_EFFECTS, LINK_PATH_EFFECTS } from "./linkConnect/linkEffects.js";
-import { stageActiveSession } from "./sessionProgress.js";
+import { stageMemorySession } from "./memorySession.js";
+import {
+  MEMORY_ITEMS,
+  changeMemoryItemCount,
+  getMemoryItemCount,
+  getMemoryItemId,
+} from "./memoryItems.js";
+import { revealMemoryTiles } from "./memoryPreview.js";
 
 export function openQuickAssistOverlay(kind) {
   if (gameState.isLocked || gameState.isPaused) return;
+  if (document.querySelector(".tile.selected")) {
+    showShopMessage("Hãy hoàn thành lượt chọn hiện tại trước khi dùng vật phẩm.", "info");
+    return;
+  }
 
   const roundId = gameState.roundId;
   const isTime = kind === "time";
-  const items = SHOP_ITEMS.filter((item) =>
-    kind === "time"
-      ? item.type === "time" || item.type === "hint"
-      : item.type.startsWith("reveal-"),
-  ).map((item) => ({
-    ...item,
-    price: getShopItemPrice(item, {
-      unmatchedTileCount: document.querySelectorAll(".tile:not(.matched)").length,
-    }),
-  }));
+  const items = MEMORY_ITEMS.filter((item) => item.type === kind);
   if (!items.length) return;
 
   gameState.isPaused = true;
@@ -48,7 +49,7 @@ export function openQuickAssistOverlay(kind) {
   const modal = openAppModal({
     id: `quick-${kind}-modal`,
     icon: isTime ? "timer" : "eye",
-    title: isTime ? "Mua thời gian" : "Xem trước thẻ",
+    title: isTime ? "Kho thời gian" : "Kho xem trước",
     content,
     size: "small",
     onClose: () => {
@@ -56,30 +57,55 @@ export function openQuickAssistOverlay(kind) {
     },
   });
 
-  const wallet = document.createElement("div");
-  wallet.className = "shop-wallet quick-assist-wallet";
-  wallet.setAttribute("aria-label", "Số Xu hiện có");
-  wallet.append(document.createTextNode(String(gameState.coins)), createIcon("coin"));
-  const closeButton = modal.panel.querySelector(".app-modal__close");
-  modal.panel
-    .querySelector(".app-modal__header")
-    .insertBefore(wallet, closeButton);
-
   items.forEach((item) => {
     const button = document.createElement("button");
     button.type = "button";
-    button.className = "quick-assist__choice";
+    button.className = `quick-assist__choice quick-assist__choice--${item.tier}`;
+    const count = getMemoryItemCount(item.id);
+    button.disabled = count <= 0;
     const label = document.createElement("strong");
-    label.textContent = item.type === "time" ? `+${item.value} giây` : item.title;
-    const price = document.createElement("span");
-    price.append(document.createTextNode(`${item.price} `), createIcon("coin"));
-    button.append(createIcon(item.icon), label, price);
+    label.textContent = item.title;
+    const quantity = document.createElement("span");
+    quantity.textContent = `Có ${count}`;
+    button.append(createIcon(item.icon), label, quantity);
     button.addEventListener("click", () => {
-      if (!handleBuyItem(item, roundId)) return;
+      if (!useMemoryAssistItem(item, roundId)) return;
       modal.close();
+      if (item.type === "preview") {
+        requestAnimationFrame(() => revealMemoryTiles(item.value, GAMEPLAY_TIMING.shopRevealDurationMs, roundId));
+      }
     });
     choices.append(button);
   });
+}
+
+function useMemoryAssistItem(item, roundId) {
+  if (gameState.roundId !== roundId || getMemoryItemCount(item.id) <= 0) return false;
+  const previousItems = { ...gameState.progress.memoryMatch.items };
+  const previousTime = gameState.remainingTime;
+  const sessions = (gameState.progress.memoryMatch.sessionsByMode ||= {});
+  const mode = gameState.settings.mode;
+  const previousSession = sessions[mode] ? { ...sessions[mode] } : null;
+  if (!changeMemoryItemCount(item.id, -1)) return false;
+  if (item.type === "time") {
+    gameState.remainingTime += item.value;
+    stageMemorySession();
+  }
+  if (!savePersistentGameData({ progress: gameState.progress })) {
+    gameState.progress.memoryMatch.items = previousItems;
+    gameState.remainingTime = previousTime;
+    if (previousSession) sessions[mode] = previousSession;
+    else delete sessions[mode];
+    showShopMessage("Không thể lưu. Vật phẩm chưa được sử dụng.", "error");
+    return false;
+  }
+  updateMemoryAssistInventoryDisplay();
+  if (item.type === "time") {
+    updateTimerDisplay(gameState.remainingTime);
+    syncMemoryTimeProgress({ remainingSeconds: gameState.remainingTime, timeLimit: gameState.timeLimit });
+    animateIconToTarget("timer", "#timer");
+  }
+  return true;
 }
 
 export function openShopOverlay({ fromMenu = false, gameId = "memory-match", linkConnect = false, onClose = () => {} } = {}) {
@@ -507,26 +533,37 @@ function handleBuyItem(item, roundId, fromMenu = false) {
     return true;
   }
 
-  if (item.type === "time" || item.type === "hint") {
-    const previousRemainingTime = gameState.remainingTime;
+  if (item.type === "time" || item.type === "reveal-random" || item.type === "reveal-all") {
+    const memoryItemId = item.type === "time"
+      ? getMemoryItemId("time", item.value)
+      : getMemoryItemId("preview", item.type === "reveal-all" ? "all" : item.value);
+    const previousItems = { ...gameState.progress.memoryMatch.items };
+    if (!changeMemoryItemCount(memoryItemId, 1)) {
+      gameState.coins = previousCoins;
+      showShopMessage("Kho vật phẩm này đã đầy.", "info");
+      return false;
+    }
+    if (!savePersistentGameData({ coins: gameState.coins, progress: gameState.progress })) {
+      gameState.coins = previousCoins;
+      gameState.progress.memoryMatch.items = previousItems;
+      showShopMessage("Không thể lưu giao dịch. Xu và vật phẩm chưa thay đổi.", "error");
+      return false;
+    }
+    updateCoinDisplay(gameState.coins);
+    updateMemoryAssistInventoryDisplay();
+    showShopMessage(`Đã thêm ${item.title} vào kho`);
+    return true;
+  }
+
+  if (item.type === "hint") {
     const previousHints = gameState.hints;
     const sessions = (gameState.progress.memoryMatch.sessionsByMode ||= {});
     const mode = gameState.settings.mode;
     const previousSession = sessions[mode] ? { ...sessions[mode] } : null;
-    if (item.type === "time") gameState.remainingTime += item.value;
-    else gameState.hints = Math.min(GAMEPLAY_LIMITS.itemCount, gameState.hints + item.value);
-    stageActiveSession("memory-match", {
-      ...(previousSession || {}),
-      mode,
-      level: gameState.currentLevel,
-      remainingTime: gameState.remainingTime,
-      timeLimit: gameState.timeLimit,
-      levelStartTime: gameState.levelStartTime,
-      hints: gameState.hints,
-    });
+    gameState.hints = Math.min(GAMEPLAY_LIMITS.itemCount, gameState.hints + item.value);
+    stageMemorySession({ hints: gameState.hints });
     if (!savePersistentGameData({ coins: gameState.coins, progress: gameState.progress })) {
       gameState.coins = previousCoins;
-      gameState.remainingTime = previousRemainingTime;
       gameState.hints = previousHints;
       if (previousSession) sessions[mode] = previousSession;
       else delete sessions[mode];
@@ -534,101 +571,12 @@ function handleBuyItem(item, roundId, fromMenu = false) {
       return false;
     }
     updateCoinDisplay(gameState.coins);
-    if (item.type === "time") {
-      updateTimerDisplay(gameState.remainingTime);
-      syncMemoryTimeProgress({ remainingSeconds: gameState.remainingTime, timeLimit: gameState.timeLimit });
-      animateIconToTarget("timer", "#timer");
-      showShopMessage(`Đã mua +${item.value}s thời gian`);
-    } else {
-      const grantedHints = gameState.hints - previousHints;
-      updateHintDisplay(gameState.hints);
-      animateIconToTarget("search", "#hint");
-      showShopMessage(`Đã mua +${grantedHints} gợi ý`);
-    }
+    const grantedHints = gameState.hints - previousHints;
+    updateHintDisplay(gameState.hints);
+    animateIconToTarget("search", "#hint");
+    showShopMessage(`Đã mua +${grantedHints} gợi ý`);
     return true;
   }
 
-  if (!saveCoins(gameState.coins)) {
-    gameState.coins = previousCoins;
-    showShopMessage("Không thể lưu giao dịch. Xu chưa bị trừ.", "error");
-    return false;
-  }
-  updateCoinDisplay(gameState.coins);
-
-  switch (item.type) {
-    case "reveal-random":
-      revealRandomTiles(
-        item.value,
-        GAMEPLAY_TIMING.shopRevealDurationMs,
-        roundId,
-      );
-      showShopMessage(`Đã mua xem trước ${item.value} thẻ`);
-      break;
-    case "reveal-all":
-      revealAllTiles(GAMEPLAY_TIMING.shopRevealDurationMs, roundId);
-      showShopMessage("Đã mua xem trước tất cả thẻ");
-      break;
-  }
-
   return true;
-}
-
-// Hỗ trợ hiệu ứng
-function revealRandomTiles(
-  count,
-  duration = GAMEPLAY_TIMING.shopRevealDurationMs,
-  roundId = gameState.roundId,
-) {
-  const grid = document.getElementById("grid-container");
-  gameState.isLocked = true;
-  grid?.classList.add("is-locked");
-  const tiles = Array.from(
-    document.querySelectorAll(".tile:not(.matched) img.hidden"),
-  );
-  shuffleArray(tiles);
-  const selected = tiles.slice(0, count);
-
-  selected.forEach((img) => {
-    img.classList.remove("hidden");
-    img.classList.add("highlight-tile");
-  });
-  showRevealTimerInHud(duration / 1000, roundId);
-
-  setTimeout(() => {
-    if (gameState.roundId !== roundId) return;
-
-    selected.forEach((img) => {
-      img.classList.add("hidden");
-      img.classList.remove("highlight-tile");
-    });
-    gameState.isLocked = false;
-    grid?.classList.remove("is-locked");
-  }, duration);
-}
-
-function revealAllTiles(
-  duration = GAMEPLAY_TIMING.shopRevealDurationMs,
-  roundId = gameState.roundId,
-) {
-  const grid = document.getElementById("grid-container");
-  gameState.isLocked = true;
-  grid?.classList.add("is-locked");
-  const tiles = document.querySelectorAll(".tile:not(.matched) img.hidden");
-
-  tiles.forEach((img) => {
-    img.classList.remove("hidden");
-    img.classList.add("highlight-tile");
-  });
-  showRevealTimerInHud(duration / 1000, roundId);
-
-  setTimeout(() => {
-    if (gameState.roundId !== roundId) return;
-
-    tiles.forEach((img) => {
-      img.classList.add("hidden");
-      img.classList.remove("highlight-tile");
-    });
-    gameState.isLocked = false;
-    grid?.classList.remove("is-locked");
-  }, duration);
 }

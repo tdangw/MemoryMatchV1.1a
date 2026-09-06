@@ -36,6 +36,7 @@ Vite ──→ dist ──→ Web/PWA hoặc Capacitor Android
 | `gameplayTuning.js` | Giới hạn và nhịp gameplay dùng chung. |
 | `motion.js` | Tiện ích thời lượng CSS, tùy chọn giảm chuyển động và phép tính FLIP dùng chung. |
 | `coinRewards.js` | Quy tắc Xu theo cặp và hoạt ảnh bộ đếm/thu thập dùng chung. |
+| `lootEffects.js` | Hiệu ứng vật phẩm rơi và bay tới HUD dùng chung, không chứa luật thưởng. |
 | `ui.js`, `modal.js`, `uiCatalog.js` | HUD, popup gameplay, modal, toast, copy và thời lượng UI chung. |
 | `gameSelector.js`, `mainmenu.js`, `gameMenu.js` | Chọn trò, menu chính và menu trong màn. |
 | `shop.js`, `shopCatalog.js` | Giao diện mua và catalog/giá sản phẩm. |
@@ -50,6 +51,10 @@ Vite ──→ dist ──→ Web/PWA hoặc Capacitor Android
 | `gameController.js` | Vòng đời level, timer, preview, kết thúc và điều hướng. |
 | `logic.js` | Luật chọn thẻ, match, miss và hoàn thành. |
 | `grid.js` | Tạo/render board và thao tác thẻ. |
+| `memoryItems.js` | Catalog, màu cấp và số lượng kho Xem trước/Thời gian. |
+| `memorySession.js` | Snapshot phiên Memory Match dùng chung cho controller, kho và phần thưởng. |
+| `memoryPreview.js` | Hiệu ứng xem trước 4/8/12/tất cả dùng chung cho kho và phần thưởng. |
+| `memorySpecial.js` | Năng lượng, vòng 10 mốc và phần thưởng từ cặp đặc biệt. |
 
 ### Link Connect
 
@@ -70,9 +75,9 @@ Vite ──→ dist ──→ Web/PWA hoặc Capacitor Android
 - `gameState` giữ Xu, cài đặt, ngoại hình và namespace tiến trình `memoryMatch`/`linkConnect`.
 - `localStorage` chỉ được truy cập qua `persistence.js`; bản lưu gốc có `schemaVersion`, `revision` và toàn bộ snapshot dùng chung. Key cũ chỉ phục vụ migration.
 - Giao dịch thay đổi nhiều miền dữ liệu phải ghi bằng một snapshot; nếu ghi thất bại, caller hoàn tác thay đổi runtime có tính chất mua hàng.
-- `sessionsByMode` lưu phiên độc lập theo từng mode, gồm level, thời gian còn lại, giới hạn và thời gian đầu màn. Link Connect bổ sung quy tắc dịch chuyển, tiến trình năng lượng và chuỗi không-rơi.
+- `sessionsByMode` lưu phiên độc lập theo từng mode, gồm level, thời gian còn lại, giới hạn và thời gian đầu màn. Mỗi trò lưu riêng tiến trình năng lượng/chuỗi không-rơi; Link Connect lưu thêm quy tắc dịch chuyển.
 - Sự kiện `storage` phát hiện revision mới từ tab khác. Tab cũ không được ghi đè; dữ liệu chỉ tự hydrate khi không có bàn đang chơi.
-- Vật phẩm Link Connect nằm trong `progress.linkConnect.items`; không dùng chung tồn kho với Memory Match.
+- Vật phẩm mỗi trò nằm trong namespace `progress.<game>.items`; không dùng chung tồn kho giữa các trò.
 - Dữ liệu đọc từ storage phải được chuẩn hóa trước khi gán vào runtime. Giá trị âm, sai kiểu hoặc vượt giới hạn không được đi thẳng vào gameplay.
 - `roundId` là mã phiên runtime: callback bất đồng bộ phải kiểm tra đúng round và đúng board trước khi sửa trạng thái hoặc DOM.
 

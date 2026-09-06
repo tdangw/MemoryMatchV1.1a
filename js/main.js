@@ -26,7 +26,7 @@ import {
 } from "./linkConnect/linkController.js";
 import { configureSettings, showSettingsPanel } from "./settings.js";
 import { openQuickAssistOverlay, openShopOverlay } from "./shop.js";
-import { showResetConfirmationOverlay, showReturnToMenuOverlay } from "./ui.js";
+import { showResetConfirmationOverlay, showReturnToMenuOverlay, updateMemoryAssistInventoryDisplay } from "./ui.js";
 import { showAppToast } from "./modal.js";
 import { gameState, hydrateGameState } from "./gameState.js";
 import { loadPersistentGameData, subscribeToExternalSave } from "./persistence.js";
@@ -47,6 +47,7 @@ document.documentElement.dataset.buildTarget =
 // Entry point: nạp dữ liệu đã lưu và nối các module qua callback.
 registerProgressiveWebApp();
 hydrateGameState(loadPersistentGameData());
+updateMemoryAssistInventoryDisplay();
 initializeMeteorEffects(gameState.settings.meteorEffects);
 applyEffectsSettings(gameState.settings);
 configureGameController({
@@ -99,6 +100,7 @@ subscribeToExternalSave(({ data, accept }) => {
   }
   accept();
   hydrateGameState(data);
+  updateMemoryAssistInventoryDisplay();
   applyEffectsSettings(gameState.settings);
   initializeMeteorEffects(gameState.settings.meteorEffects);
   showAppToast("Đã đồng bộ dữ liệu mới từ tab khác.");
@@ -142,7 +144,8 @@ document
         <li>Lật hai thẻ để tìm cặp hình giống nhau.</li>
         <li>Ghép hết các cặp trước khi thời gian kết thúc.</li>
         <li>Ghép đúng liên tiếp để tạo Combo và nhận thêm thời gian.</li>
-        <li>Dùng gợi ý hoặc vật phẩm trong cửa hàng khi cần.</li>
+        <li>Ghép thẻ đặc biệt để thu thập năng lượng và nhận hỗ trợ.</li>
+        <li>Vật phẩm Thời gian và Xem trước mua ở cửa hàng sẽ được cất vào kho trên HUD.</li>
       </ul>`,
       "book",
     ),

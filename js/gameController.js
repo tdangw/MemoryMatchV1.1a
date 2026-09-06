@@ -33,10 +33,12 @@ import {
   updateLevelStarsDisplay,
   updateTotalStarsDisplay,
   updateCoinDisplay,
+  updateMemorySpecialProgress,
   showBonusOverlay,
   openTimeUpModal,
   showRevealTimerInHud,
   showLevelRewardOverlay,
+  clearGameplayRewardPopups,
 } from "./ui.js";
 import {
   beginRound,
@@ -46,11 +48,13 @@ import {
   spendCoins,
 } from "./gameState.js";
 import { savePersistentGameData } from "./persistence.js";
-import { getActiveSession, saveActiveSession, stageActiveSession } from "./sessionProgress.js";
-import { configureLogic } from "./logic.js";
+import { getActiveSession } from "./sessionProgress.js";
+import { configureLogic, resetLogicRuntime } from "./logic.js";
 import { GAMEPLAY_TIMING } from "./gameplayTuning.js";
 import { TIME_UP_PURCHASES } from "./shopCatalog.js";
 import { resolveSessionTiming } from "./sessionTiming.js";
+import { clearLootEffects } from "./lootEffects.js";
+import { saveMemorySession, stageMemorySession } from "./memorySession.js";
 
 let countdownInterval;
 let isAutoPaused = false;
@@ -79,6 +83,9 @@ export function restartMemoryLevel() {
 
 export function initializeLevel(level, { reason = "new", session = null } = {}) {
   stopCountdown();
+  resetLogicRuntime();
+  clearLootEffects();
+  clearGameplayRewardPopups();
   pauseBackgroundMusic();
   isAutoPaused = false;
   document.getElementById("menu-container")?.remove();
@@ -102,6 +109,14 @@ export function initializeLevel(level, { reason = "new", session = null } = {}) 
   gameState.hints = reason === "resume" && Number.isFinite(session?.hints)
     ? Math.max(0, Math.floor(session.hints))
     : gameState.hints + hintBonus;
+  if (reason === "resume") {
+    gameState.specialProgress = Math.max(0, Math.floor(session?.specialProgress || 0))
+      % GAME_CONFIG.special.progressTarget;
+    gameState.specialNoEnergyDropStreak = Math.min(
+      GAME_CONFIG.special.energyDrop.guaranteeAfterMisses,
+      Math.max(0, Math.floor(session?.specialNoEnergyDropStreak || 0)),
+    );
+  }
   persistMemorySession();
   const previewDurationMs = getPreviewDurationMs(mode);
   createGrid(layout, { roundId, onPreviewComplete: startCountdown, previewDurationMs });
@@ -118,6 +133,7 @@ export function initializeLevel(level, { reason = "new", session = null } = {}) 
   updateLevelStarsDisplay(0);
   updateTotalStarsDisplay(gameState.progress.memoryMatch.totalStars);
   updateCoinDisplay(gameState.coins);
+  updateMemorySpecialProgress(gameState.specialProgress);
   updateHintDisplay(gameState.hints);
   updateMovesDisplay(gameState.moves);
   updateMissesDisplay(gameState.misses);
@@ -218,14 +234,10 @@ function handleTimeUp() {
     gameState.remainingTime = seconds;
     gameState.timeLimit = seconds;
     gameState.levelStartTime = seconds;
-    stageActiveSession("memory-match", {
-      mode,
-      level: gameState.currentLevel,
-      ...previousTiming,
+    stageMemorySession({
       remainingTime: seconds,
       timeLimit: seconds,
       levelStartTime: seconds,
-      hints: gameState.hints,
     });
     if (!savePersistentGameData({ coins: gameState.coins, progress: gameState.progress })) {
       gameState.coins = previousCoins;
@@ -329,14 +341,7 @@ function resolveMemoryLevelTiming({ mode, level, modeLayout, reason, session }) 
 
 function persistMemorySession() {
   if (!gameState.settings.mode || gameState.currentLevel < 1) return false;
-  return saveActiveSession("memory-match", {
-    mode: gameState.settings.mode,
-    level: gameState.currentLevel,
-    remainingTime: gameState.remainingTime,
-    timeLimit: gameState.timeLimit,
-    levelStartTime: gameState.levelStartTime,
-    hints: gameState.hints,
-  });
+  return saveMemorySession();
 }
 
 export function handleHintClick() {

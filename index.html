@@ -33,7 +33,6 @@
       <div id="game-logo" class="game-name">Memory Match</div>
 
       <div id="game-progress-hud" class="game-progress-hud" aria-label="Tiến trình màn chơi">
-        <span id="memory-game-coins" class="info stat-card stat-coins game-coin-hud" aria-label="Xu"><span data-icon="coin"></span><strong id="memory-coin-balance">0</strong></span>
         <span class="info stat-card stat-moves"><span class="stat-label">MOVES</span><span id="moves">0</span></span>
         <span class="info stat-card stat-misses"><span class="stat-label">MISS</span><span id="misses">0</span></span>
         <span class="info stat-card stat-combo"><span class="stat-label">COMBO</span><span id="combo">0</span></span>
@@ -73,8 +72,8 @@
         </div>
 
         <div class="game-quick-actions" aria-label="Hỗ trợ nhanh">
-          <button id="btn-buy-time" class="game-quick-action" type="button" aria-label="Mua thời gian" data-icon="timer"></button>
-          <button id="btn-preview-cards" class="game-quick-action" type="button" aria-label="Xem trước thẻ" data-icon="eye"></button>
+          <button id="btn-buy-time" class="game-quick-action" type="button" aria-label="Kho thời gian" data-icon="timer"><strong id="memory-time-item-count">0</strong></button>
+          <button id="btn-preview-cards" class="game-quick-action" type="button" aria-label="Kho xem trước" data-icon="eye"><strong id="memory-preview-item-count">0</strong></button>
         </div>
 
         <button id="btn-hint" class="game-hint-fab" type="button" aria-label="Dùng gợi ý">
@@ -90,6 +89,21 @@
       <div id="memory-time-hud" class="memory-time-hud" aria-label="Tiến trình thời gian còn lại">
         <span id="memory-time-progress" class="memory-time-hud__fill"></span>
       </div>
+      <section id="memory-special-hud" class="memory-special-hud" aria-label="Tiến trình năng lượng đặc biệt">
+        <span id="memory-game-coins" class="memory-special-hud__coins game-coin-hud" aria-label="Xu"><span data-icon="coin"></span><strong id="memory-coin-balance">0</strong></span>
+        <div id="memory-special-milestones" class="memory-special-hud__milestones" aria-label="Các mốc phần thưởng">
+          <span data-memory-special-milestone="1" style="--memory-milestone-position:5%">1</span>
+          <span data-memory-special-milestone="2" style="--memory-milestone-position:15%">2</span>
+          <span data-memory-special-milestone="3" style="--memory-milestone-position:25%">3</span>
+          <span data-memory-special-milestone="4" style="--memory-milestone-position:35%">4</span>
+          <span data-memory-special-milestone="5" style="--memory-milestone-position:45%">5</span>
+          <span data-memory-special-milestone="6" style="--memory-milestone-position:55%">6</span>
+          <span data-memory-special-milestone="7" style="--memory-milestone-position:65%">7</span>
+          <span data-memory-special-milestone="8" style="--memory-milestone-position:75%">8</span>
+          <span data-memory-special-milestone="9" style="--memory-milestone-position:85%">9</span>
+          <span data-memory-special-milestone="10" style="--memory-milestone-position:95%">10</span>
+        </div>
+      </section>
       <div id="grid-board-frame">
         <div class="grid-coordinate-corner" aria-hidden="true"></div>
         <div id="grid-coordinate-columns" class="grid-coordinate-labels grid-coordinate-labels--columns" aria-hidden="true"></div>

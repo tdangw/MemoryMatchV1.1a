@@ -18,6 +18,8 @@ export const gameState = {
   moves: 0,
   misses: 0,
   combo: 0,
+  specialProgress: 0,
+  specialNoEnergyDropStreak: 0,
   matchedPairs: 0,
   totalPairs: GAME_CONFIG.modes.easy.tileCount / 2,
   isLocked: false,
@@ -28,7 +30,12 @@ export const gameState = {
   levelStartTime: remainingTime,
   coins: 0,
   progress: {
-    memoryMatch: { totalStars: 0, totalScore: 0, bestByLevel: {} },
+    memoryMatch: {
+      totalStars: 0,
+      totalScore: 0,
+      bestByLevel: {},
+      items: { preview4: 0, preview8: 0, preview12: 0, previewAll: 0, time10: 0, time30: 0, time45: 0, time60: 0 },
+    },
     linkConnect: {
       totalStars: 0,
       totalScore: 0,
@@ -65,6 +72,7 @@ export function hydrateGameState({
     totalScore: normalizeNonNegativeInteger(memoryMatch.totalScore),
     bestByLevel: normalizeBestByLevel(memoryMatch.bestByLevel),
     sessionsByMode: normalizeSessions(memoryMatch.sessionsByMode, memoryMatch.activeSession),
+    items: normalizeMemoryItems(memoryMatch.items),
   };
   const linkConnect = progress?.linkConnect || {};
   const linkItems = linkConnect.items || {};
@@ -82,6 +90,13 @@ export function hydrateGameState({
   };
   gameState.settings = normalizeSettings(settings, gameState.settings);
   gameState.appearance = normalizeAppearance(appearance);
+}
+
+function normalizeMemoryItems(items = {}) {
+  return Object.fromEntries(
+    ["preview4", "preview8", "preview12", "previewAll", "time10", "time30", "time45", "time60"]
+      .map((id) => [id, normalizeItemCount(items?.[id])]),
+  );
 }
 
 function normalizeItemCount(value) {
@@ -204,6 +219,8 @@ export function resetGame() {
   gameState.moves = 0;
   gameState.misses = 0;
   gameState.combo = 0;
+  gameState.specialProgress = 0;
+  gameState.specialNoEnergyDropStreak = 0;
   gameState.matchedPairs = 0;
   gameState.totalPairs = GAME_CONFIG.modes.easy.tileCount / 2;
   gameState.remainingTime = remainingTime;

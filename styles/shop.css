@@ -107,6 +107,15 @@
   border-color: rgb(242 191 91 / 44%);
   background: rgb(242 191 91 / 16%);
 }
+
+#quick-time-modal .quick-assist__choice--teal > .ui-icon,
+#quick-preview-modal .quick-assist__choice--teal > .ui-icon { color: #48e0d1; }
+#quick-time-modal .quick-assist__choice--blue > .ui-icon,
+#quick-preview-modal .quick-assist__choice--blue > .ui-icon { color: #68a7ff; }
+#quick-time-modal .quick-assist__choice--purple > .ui-icon,
+#quick-preview-modal .quick-assist__choice--purple > .ui-icon { color: #c78aff; }
+#quick-time-modal .quick-assist__choice--gold > .ui-icon,
+#quick-preview-modal .quick-assist__choice--gold > .ui-icon { color: #ffd166; }
 #shop-modal .app-modal__body,
 #collection-modal .app-modal__body {
   display: flex;

@@ -26,6 +26,17 @@ export const GAMEPLAY_LIMITS = Object.freeze({
   itemCount: 999,
 });
 
+export const COMBO_WINDOWS = Object.freeze([
+  Object.freeze({ maxPairs: 8, seconds: 15 }),
+  Object.freeze({ maxPairs: 15, seconds: 20 }),
+  Object.freeze({ maxPairs: Infinity, seconds: 30 }),
+]);
+
+export function getComboWindowMs(pairCount) {
+  const rule = COMBO_WINDOWS.find((entry) => pairCount <= entry.maxPairs);
+  return (rule?.seconds || 15) * GAMEPLAY_TIMING.secondMs;
+}
+
 const COMBO_TIERS = Object.freeze([
   { minimum: 26, id: "ultimate", label: "ULTIMATE!" },
   { minimum: 22, id: "godlike", label: "GODLIKE!" },

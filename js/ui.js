@@ -8,7 +8,7 @@ import { launchSummaryConfetti, showSummaryFireworks } from "victory-presentatio
 import { clearPersistentGameData } from "./persistence.js";
 import { getTheme } from "./themeCatalog.js";
 import { getEquippedThemeId } from "./appearance.js";
-import { getStarScoreTargets, getTimerDirection, isEndlessMode } from "./config.js";
+import { GAME_CONFIG, getStarScoreTargets, getTimerDirection, isEndlessMode } from "./config.js";
 import { getGameModeLabel } from "./gameCatalog.js";
 import { formatClockTime, UI_COPY } from "./uiCatalog.js";
 import { prefersReducedMotion } from "./motion.js";
@@ -18,6 +18,7 @@ import {
   isCoinCounterAnimating,
   playCoinRewardFlight,
 } from "./coinRewards.js";
+import { getMemoryItemTotal } from "./memoryItems.js";
 
 const scoreElement = document.getElementById("score");
 const levelElement = document.getElementById("level");
@@ -43,6 +44,8 @@ const totalPairsElement = document.getElementById("total-pairs");
 const totalStarsElement = document.getElementById("total-stars");
 const levelStarsElement = document.getElementById("level-stars");
 const levelStarsFillElement = document.getElementById("level-stars-fill");
+const memorySpecialHudElement = document.getElementById("memory-special-hud");
+const memorySpecialMilestonesElement = document.getElementById("memory-special-milestones");
 let revealTimerInterval = null;
 let revealTimerRoundId = null;
 
@@ -69,6 +72,41 @@ export function updateScoreDisplay(score) {
   if (scoreElement) scoreElement.textContent = score;
   const target = getStarScoreTargets(gameState.totalPairs, gameState.settings.mode).three;
   if (levelStarsFillElement) levelStarsFillElement.style.width = `${Math.min(100, Math.round(score / target * 100))}%`;
+  if (levelStarsElement) levelStarsElement.dataset.tooltip = `Mục tiêu: ${target}`;
+}
+
+export function updateMemorySpecialProgress(progress = gameState.specialProgress) {
+  if (!memorySpecialHudElement || !memorySpecialMilestonesElement) return;
+  const target = GAME_CONFIG.special.progressTarget;
+  const normalized = Math.max(0, Math.min(target, Math.floor(Number(progress) || 0)));
+  memorySpecialHudElement.style.setProperty(
+    "--memory-special-progress",
+    String(normalized > 0 ? (normalized - 1) / Math.max(1, target - 1) : 0),
+  );
+  memorySpecialHudElement.dataset.tooltip = `Năng lượng ${normalized}/${target}`;
+  memorySpecialMilestonesElement.querySelectorAll("[data-memory-special-milestone]").forEach((milestone) => {
+    const value = Number(milestone.dataset.memorySpecialMilestone);
+    milestone.classList.toggle("is-earned", value <= normalized);
+    milestone.classList.toggle("is-next", value === normalized + 1);
+  });
+}
+
+export function updateMemoryAssistInventoryDisplay() {
+  const timeCount = getMemoryItemTotal("time");
+  const previewCount = getMemoryItemTotal("preview");
+  updateAssistButton("btn-buy-time", "memory-time-item-count", "Kho thời gian", timeCount);
+  updateAssistButton("btn-preview-cards", "memory-preview-item-count", "Kho xem trước", previewCount);
+}
+
+function updateAssistButton(buttonId, countId, label, count) {
+  const button = document.getElementById(buttonId);
+  const value = document.getElementById(countId);
+  if (value) value.textContent = String(count);
+  if (button) {
+    const description = `${label}: ${count} vật phẩm`;
+    button.setAttribute("aria-label", description);
+    button.dataset.tooltip = description;
+  }
 }
 
 export function updateLevelStarsDisplay(stars) {

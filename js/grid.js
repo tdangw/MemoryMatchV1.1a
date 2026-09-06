@@ -103,6 +103,9 @@ function updateGridLayout() {
   document
     .getElementById("memory-time-hud")
     ?.style.setProperty("--board-width", `${boardWidth + (showCoordinates ? COORDINATE_GUTTER_PX : 0)}px`);
+  document
+    .getElementById("memory-special-hud")
+    ?.style.setProperty("--board-width", `${boardWidth + (showCoordinates ? COORDINATE_GUTTER_PX : 0)}px`);
   boardFrame?.classList.toggle("is-coordinate-visible", showCoordinates);
   boardFrame?.style.setProperty("--coordinate-gutter", showCoordinates ? `${COORDINATE_GUTTER_PX}px` : "0px");
   updateCoordinateLabels(columns, rows, showCoordinates);

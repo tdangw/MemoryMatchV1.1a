@@ -140,6 +140,27 @@
   animation: game-coin-gain-label var(--game-coin-gain-duration, 940ms) ease-out forwards;
 }
 
+.game-loot-drop {
+  position: fixed;
+  z-index: 32023;
+  display: grid;
+  width: 26px;
+  height: 26px;
+  place-items: center;
+  margin: -13px;
+  border-radius: 8px;
+  background: #164f58;
+  color: #b9fff4;
+  box-shadow: 0 4px 10px rgb(0 0 0 / 52%), 0 0 7px currentcolor;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+.game-loot-drop--blue { background: #153e76; color: #a9d7ff; }
+.game-loot-drop--purple { background: #4b2876; color: #e0c4ff; }
+.game-loot-drop--gold { background: #72510d; color: #ffe59a; }
+.game-loot-drop--energy { background: #214f72; color: #fff07a; }
+.game-loot-drop .ui-icon { width: 16px; height: 16px; stroke-width: 2.7; }
+
 @keyframes game-coin-reward-loot {
   0% { opacity: 0; transform: translate(0, 0) scale(.5) rotate(var(--game-coin-start-rotation, -18deg)); }
   12% { opacity: 1; transform: translate(var(--game-coin-apex-x), var(--game-coin-apex-y)) scale(1.08) rotate(var(--game-coin-apex-rotation, 12deg)); }

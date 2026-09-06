@@ -89,6 +89,25 @@
 .game-progress-hud .stat-combo .stat-label {
   color: #ffd889;
 }
+.game-progress-hud .stat-combo { position: relative; overflow: hidden; }
+.game-progress-hud .stat-combo::after {
+  content: "";
+  position: absolute;
+  right: 3px;
+  bottom: 1px;
+  left: 3px;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #ffd166, #ff9666);
+  opacity: 0;
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+.game-progress-hud .stat-combo.is-combo-window-active::after {
+  opacity: 1;
+  animation: combo-window-drain var(--combo-window-duration, 15000ms) linear forwards;
+}
+@keyframes combo-window-drain { from { transform: scaleX(1); } to { transform: scaleX(0); } }
 .game-progress-hud .stat-points,
 .game-progress-hud .stat-points .stat-label {
   color: #f2bf5b;
@@ -257,6 +276,54 @@
 #memory-time-hud.is-warning #memory-time-progress { background: linear-gradient(90deg, #f2bd3d, #ffd166); box-shadow: 0 0 6px rgb(255 209 102 / 68%); }
 #memory-time-hud.is-critical #memory-time-progress { background: linear-gradient(90deg, #e04f5f, #ff8995); box-shadow: 0 0 6px rgb(255 107 124 / 72%); }
 #memory-time-hud.is-endless #memory-time-progress { background: linear-gradient(90deg, #7c8da7, #b9d5ff); box-shadow: none; }
+
+.memory-special-hud {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: min(var(--board-width, 260px), calc(100vw - 120px));
+  min-height: 19px;
+  margin: -2px auto 4px;
+  border: 1px solid rgb(185 213 255 / 24%);
+  border-radius: 9px;
+  background: rgb(106 151 211 / 45%);
+}
+.memory-special-hud__coins {
+  position: absolute;
+  top: 50%;
+  right: calc(100% + 7px);
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: #ffd25f;
+  font: 800 .7rem/1 "Segoe UI", sans-serif;
+  transform: translateY(-50%);
+}
+.memory-special-hud__coins .ui-icon { width: 18px; height: 18px; }
+.memory-special-hud__milestones { position: relative; flex: 1; height: 19px; }
+.memory-special-hud__milestones::before,
+.memory-special-hud__milestones::after { content: ""; position: absolute; inset: 50% 5% auto; height: 2px; border-radius: 999px; transform: translateY(-50%); }
+.memory-special-hud__milestones::before { background: rgb(185 213 255 / 26%); }
+.memory-special-hud__milestones::after { background: linear-gradient(90deg, #36d9e7, #79f2ff); transform: translateY(-50%) scaleX(var(--memory-special-progress, 0)); transform-origin: left; transition: transform 260ms ease-out; }
+.memory-special-hud__milestones > span { position: absolute; z-index: 1; top: 2px; left: var(--memory-milestone-position); display: grid; width: 15px; height: 15px; place-items: center; border: 1px solid rgb(185 213 255 / 38%); border-radius: 50%; background: #182942; color: #b9d5ff; font-size: .5rem; transform: translateX(-50%); }
+.memory-special-hud__milestones > span.is-earned { border-color: #ffd166; background: #a86f00; color: #fff8dd; transform: translateX(-50%) scale(1.08); }
+.memory-special-hud__milestones > span.is-next { border-color: #7ceeff; color: #7ceeff; }
+
+.game-quick-action { position: relative; }
+.game-quick-action > strong {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  display: grid;
+  min-width: 15px;
+  height: 15px;
+  padding: 0 3px;
+  place-items: center;
+  border-radius: 999px;
+  background: #f2bf5b;
+  color: #17243a;
+  font: 800 .55rem/1 "Segoe UI", sans-serif;
+}
 
 /* Thanh HUD dùng cùng nền xanh với menu chính. */
 #game-title.game-hud .game-stats .stat-card {

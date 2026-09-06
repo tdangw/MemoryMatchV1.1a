@@ -20,9 +20,11 @@ Tài liệu này chỉ ghi trạng thái sản phẩm và các quy tắc đang c
 
 ## Memory Match
 
-- Người chơi lật hai thẻ để tìm cặp giống nhau. Ghép sai đặt combo về 0; ghép đúng liên tiếp tăng combo và thưởng thời gian từ combo x2.
+- Người chơi lật hai thẻ để tìm cặp giống nhau. Ghép sai hoặc để hết cửa sổ combo đặt combo về 0. Cửa sổ dùng chung theo kích thước bàn là 15/20/30 giây; chạm lại cùng thẻ chỉ bỏ chọn và không làm mất combo.
 - Dễ/Trung bình/Khó/Siêu khó dùng bàn cố định; Thử thách tăng kích thước theo level; Vô tận đếm thời gian xuôi.
 - Ô may mắn của Thử thách có thể thưởng thời gian, Gợi ý hoặc Xu.
+- Cặp đặc biệt có thể rơi năng lượng và hỗ trợ. Năng lượng chạy vòng 10 mốc riêng của Memory Match; tỷ lệ đang là 100% để kiểm thử. Gói Xem trước rơi ra tự dùng và được phân biệt bằng màu, không hiện nhãn số trên vật phẩm.
+- Kho Memory Match lưu riêng các gói Xem trước 4/8/12/tất cả và Thời gian 10/30/45/60 giây. Mua trong cửa hàng chỉ thêm vào kho; hai nút HUD mở kho để dùng. Gợi ý giữ luồng sử dụng hiện tại.
 - Hoàn thành màn 100 chạy cảnh chiến thắng cuối; thời lượng và trình tự hiệu ứng lấy từ `js/gameplayTuning.js` và `js/victoryCelebration.js`.
 - Cấu hình và công thức chính nằm trong `js/config.js`; luồng chơi nằm trong `js/gameController.js`, `js/logic.js` và `js/grid.js`.
 
@@ -41,7 +43,7 @@ Tài liệu này chỉ ghi trạng thái sản phẩm và các quy tắc đang c
 
 - Bản lưu dùng một gói có `schemaVersion` và `revision`; giao dịch Xu + vật phẩm/ngoại hình ghi cùng lần và hoàn tác RAM nếu ghi thất bại.
 - Lỗi đọc/ghi storage không làm ngắt khởi động. Tab cũ không được ghi đè revision mới; khi đang chơi, ứng dụng yêu cầu tải lại trước khi ghi tiếp.
-- Thời gian phiên được checkpoint mỗi 5 giây và khi ẩn/rời trang. Thanh thời gian dùng `transform`, dừng theo trạng thái pause/lock.
+- Thời gian phiên được checkpoint mỗi 5 giây và khi ẩn/rời trang. Thanh thời gian dùng `transform`, dừng theo trạng thái pause/lock; hiệu ứng vật phẩm rơi dùng Web Animations và không dựng lại board.
 - Catalog chỉ giữ metadata đường dẫn. Trình duyệt chỉ giải mã ảnh của bàn hiện tại; service worker gộp URL trùng và giới hạn 6 yêu cầu tài nguyên đang tải.
 
 ## Phần còn cần kiểm tra
