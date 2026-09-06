@@ -209,6 +209,10 @@ export function calculateLinkMatchPoints(combo = 1, { special = false } = {}) {
   return Math.round(points * (special ? LINK_CONNECT_CONFIG.special.scoreMultiplier : 1));
 }
 
+export function calculateLinkThunderPairPoints(combo = 1, { countsCombo = false } = {}) {
+  return calculateLinkMatchPoints(countsCombo ? combo : 1);
+}
+
 export function calculateLinkCompletionTimeBonus(mode, remainingTime) {
   if (isLinkEndlessMode(mode)) return 0;
   return Math.floor(Math.max(0, Number(remainingTime) || 0));

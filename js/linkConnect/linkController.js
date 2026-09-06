@@ -23,6 +23,7 @@ import {
   calculateLinkMatchPoints,
   calculateLinkCoinReward,
   calculateLinkCompletionTimeBonus,
+  calculateLinkThunderPairPoints,
   calculateLinkStarRating,
   getLinkChallengeTime,
   getLinkComboWindowMs,
@@ -540,7 +541,7 @@ function handleLinkTileClick(position) {
       linkGameState.isLocked = false;
     };
     if (premiumReward.triggerPairBreak && linkGameState.matchedPairs < linkGameState.totalPairs) {
-      playAutomaticPairBreak(roundId, board, finishResolution);
+      playAutomaticPairBreak(roundId, board, finishResolution, { scoreMode: "combo" });
       return;
     }
     finishResolution();
@@ -634,13 +635,15 @@ function playNextThunderStrike(pairs, index, roundId, board, colorId) {
   const pair = pairs[index];
   const strike = playLinkThunderStrike(pair.positions, colorId);
   const [start, end] = pair.positions;
+  let affectedTiles = [];
   setTimeout(() => {
     if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
-    playLinkMatchExit(start, end);
+    affectedTiles = playLinkMatchExit(start, end);
   }, LINK_CONNECT_TIMING.thunderCardExitDelayMs);
   setTimeout(() => {
     strike?.remove();
     if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
+    applyThunderPairScore("normal", affectedTiles[0]);
     removeLinkBoardPair(board, start, end);
     clearLinkMatchedPair(start, end);
     linkGameState.matchedPairs += 1;
@@ -1207,7 +1210,7 @@ function recoverBlockedLinkBoard(board) {
   return true;
 }
 
-function playAutomaticPairBreak(roundId, board, onComplete) {
+function playAutomaticPairBreak(roundId, board, onComplete, { scoreMode = "none" } = {}) {
   const milestone = LINK_CONNECT_CONFIG.special.milestones;
   const pair = removeRandomLinkPair(board, {
     remove: false,
@@ -1229,13 +1232,15 @@ function playAutomaticPairBreak(roundId, board, onComplete) {
   setTimeout(() => {
     if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
     const strike = playLinkThunderStrike([start, end], "yellow");
+    let affectedTiles = [];
     setTimeout(() => {
       if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
-      playLinkMatchExit(start, end);
+      affectedTiles = playLinkMatchExit(start, end);
     }, LINK_CONNECT_TIMING.thunderCardExitDelayMs);
     setTimeout(() => {
       if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
       strike?.remove();
+      applyThunderPairScore(scoreMode, affectedTiles[0]);
       removeLinkBoardPair(board, start, end);
       clearLinkMatchedPair(start, end);
       linkGameState.matchedPairs += 1;
@@ -1244,6 +1249,31 @@ function playAutomaticPairBreak(roundId, board, onComplete) {
       onComplete();
     }, getLinkThunderResolveDelay());
   }, LINK_CONNECT_TIMING.automaticPairMarkMs);
+}
+
+function applyThunderPairScore(mode, anchor) {
+  if (mode === "none") return 0;
+  if (mode === "combo") {
+    linkGameState.combo += 1;
+    const matchedAt = performance.now();
+    linkGameState.lastMatchAt = matchedAt;
+    const comboWindowMs = getLinkComboWindowMs(linkGameState.totalPairs);
+    startLinkComboWindow(
+      comboWindowMs,
+      matchedAt,
+      linkGameState.roundId,
+      linkGameState.board,
+    );
+    setHudText(getLinkHudElements().combo, linkGameState.combo);
+    showComboEffect(anchor, linkGameState.combo);
+  }
+  const points = calculateLinkThunderPairPoints(linkGameState.combo, {
+    countsCombo: mode === "combo",
+  });
+  linkGameState.score += points;
+  setHudText(getLinkHudElements().score, linkGameState.score);
+  showScoreEffect(anchor, points);
+  return points;
 }
 
 function rememberSpecialPairForTransform(pair) {
