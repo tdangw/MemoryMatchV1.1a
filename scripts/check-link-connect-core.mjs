@@ -93,7 +93,7 @@ assert.equal(getLinkGravityShift(3), "down");
 assert.equal(getLinkGravityShift(6), "up");
 assert.equal(getLinkGravityShift(9), "left");
 assert.equal(getLinkGravityShift(10), "right");
-assert.equal(getLinkGravityShift(13, () => 0.51), "left");
+assert.equal(getLinkGravityShift(13, () => 0.51), "center");
 assert.equal(getActiveLinkConnectionEffect({ linkPathEffect: "electric", linkExitEffect: "dissolve" }).pathClass, "link-path-overlay--electric");
 assert.equal(LINK_PATH_EFFECTS.length, 21);
 assert.equal(LINK_EXIT_EFFECTS.length, 21);

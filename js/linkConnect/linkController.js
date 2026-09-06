@@ -681,6 +681,12 @@ function getGravityShiftLabel(direction) {
     up: "Dồn lên",
     left: "Dồn sang trái",
     right: "Dồn sang phải",
+    center: "Hút vào tâm",
+    "split-vertical": "Tách về biên trên/dưới",
+    "split-horizontal": "Tách về biên trái/phải",
+    swap: "Tráo đổi thẻ lân cận",
+    "rotate-clockwise": "Xoay theo chiều kim đồng hồ",
+    "rotate-counterclockwise": "Xoay ngược chiều kim đồng hồ",
   }[direction] || "Bàn cờ tĩnh";
 }
 
@@ -695,7 +701,11 @@ function showLinkGravityRuleModal(direction, onComplete) {
     "Dồn lên: mọi thẻ trượt lên hàng cao nhất còn trống.",
     "Dồn trái: các thẻ trong từng hàng trượt sát về bên trái.",
     "Dồn phải: các thẻ trong từng hàng trượt sát về bên phải.",
-    "Từ Level 13, hướng dồn được chọn ngẫu nhiên giữa bốn kiểu trên cho mỗi màn.",
+    "Hút vào tâm: thẻ từ các phía dồn về vùng giữa bàn.",
+    "Tách dọc/ngang: hai nửa bàn dồn ra hai biên đối diện.",
+    "Tráo đổi: các thẻ lân cận đổi chỗ với nhau.",
+    "Xoay: các vòng thẻ dịch chuyển theo hoặc ngược chiều kim đồng hồ.",
+    "Từ Level 28, quy tắc bàn động được chọn ngẫu nhiên cho mỗi màn.",
   ].forEach((text) => {
     const item = document.createElement("li");
     item.textContent = text;

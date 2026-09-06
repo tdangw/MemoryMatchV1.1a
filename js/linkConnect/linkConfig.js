@@ -3,7 +3,29 @@ import { GAMEPLAY_LIMITS } from "../gameplayTuning.js";
 export const LINK_CONNECT_CONFIG = Object.freeze({
   gravity: Object.freeze({
     basicDirections: Object.freeze(["down", "up", "left", "right"]),
-    randomFromLevel: 13,
+    advancedDirections: Object.freeze([
+      "center",
+      "split-vertical",
+      "split-horizontal",
+      "swap",
+      "rotate-clockwise",
+      "rotate-counterclockwise",
+    ]),
+    progression: Object.freeze([
+      Object.freeze({ fromLevel: 1, untilLevel: 2, directions: Object.freeze(["static"]) }),
+      Object.freeze({ fromLevel: 3, untilLevel: 5, directions: Object.freeze(["down"]) }),
+      Object.freeze({ fromLevel: 6, untilLevel: 8, directions: Object.freeze(["up"]) }),
+      Object.freeze({ fromLevel: 9, untilLevel: 12, directions: Object.freeze(["left", "right"]), alternate: true }),
+      Object.freeze({ fromLevel: 13, untilLevel: 15, directions: Object.freeze(["center"]) }),
+      Object.freeze({ fromLevel: 16, untilLevel: 18, directions: Object.freeze(["split-vertical"]) }),
+      Object.freeze({ fromLevel: 19, untilLevel: 21, directions: Object.freeze(["split-horizontal"]) }),
+      Object.freeze({ fromLevel: 22, untilLevel: 24, directions: Object.freeze(["swap"]) }),
+      Object.freeze({ fromLevel: 25, untilLevel: 27, directions: Object.freeze(["rotate-clockwise", "rotate-counterclockwise"]), alternate: true }),
+      Object.freeze({ fromLevel: 28, untilLevel: Infinity, directions: Object.freeze([
+        "down", "up", "left", "right", "center", "split-vertical",
+        "split-horizontal", "swap", "rotate-clockwise", "rotate-counterclockwise",
+      ]), random: true }),
+    ]),
   }),
   modes: Object.freeze({
     easy: Object.freeze({ tileCount: 12, columns: 4, timeSeconds: 60, coinReward: Object.freeze({ base: 25, speedMultiplier: 0.25 }) }),
@@ -283,13 +305,12 @@ export function getLinkFrozenPairCount(pairCount) {
 
 export function getLinkGravityShift(level = 1, random = Math.random) {
   const normalizedLevel = Math.max(1, Math.floor(level));
-  if (normalizedLevel <= 2) return "static";
-  if (normalizedLevel <= 5) return "down";
-  if (normalizedLevel <= 8) return "up";
-  if (normalizedLevel <= 12) return normalizedLevel % 2 === 1 ? "left" : "right";
-  if (normalizedLevel >= LINK_CONNECT_CONFIG.gravity.randomFromLevel) {
-    const directions = LINK_CONNECT_CONFIG.gravity.basicDirections;
-    return directions[Math.floor(random() * directions.length)];
+  const rule = LINK_CONNECT_CONFIG.gravity.progression
+    .find((entry) => normalizedLevel <= entry.untilLevel);
+  if (!rule) return "static";
+  if (rule.random) return rule.directions[Math.floor(random() * rule.directions.length)];
+  if (rule.alternate) {
+    return rule.directions[(normalizedLevel - rule.fromLevel) % rule.directions.length];
   }
-  return "static";
+  return rule.directions[0] || "static";
 }

@@ -50,33 +50,27 @@ Sau mỗi cặp ghép, Link Connect áp dụng quy tắc bàn cờ của cả m�
 2. **Rơi tự do — Gravity Down:** Thẻ phía trên rơi xuống lấp khoảng trống bên dưới.
 3. **Dồn lên trên — Gravity Up:** Thẻ phía dưới trượt lên lấp các vị trí phía trên.
 4. **Dồn sang bên — Gravity Left / Right:** Thẻ trượt dồn về cạnh trái hoặc cạnh phải bàn cờ.
-5. **Hút vào tâm — Center Pull:** Thẻ từ bốn phía trượt về tâm bàn cờ.
-6. **Tách đôi ra biên dọc — Split Push:** Nửa trên dồn lên, nửa dưới dồn xuống từ tâm bàn cờ.
-7. **Tráo đổi vị trí — Swap:** Khi một cặp bị loại bỏ, các thẻ xung quanh tráo đổi vị trí với nhau.
-8. **Tách đôi ra biên ngang:** Nửa trái dồn sang trái, nửa phải dồn sang phải.
-9. **Xoay tròn — Rotation:** Các thẻ xoay theo chiều kim đồng hồ hoặc ngược chiều kim đồng hồ.
+5. **Hút vào tâm — Center Pull:** Thẻ từ bốn phía trượt về vùng giữa bàn cờ.
+6. **Tách đôi ra biên dọc — Vertical Split:** Nửa trên dồn lên, nửa dưới dồn xuống.
+7. **Tách đôi ra biên ngang — Horizontal Split:** Nửa trái dồn sang trái, nửa phải dồn sang phải.
+8. **Tráo đổi vị trí — Swap:** Các thẻ gần nhau đổi chỗ theo từng cặp.
+9. **Xoay tròn — Rotation:** Các vòng thẻ dịch một ô theo chiều kim đồng hồ hoặc ngược chiều kim đồng hồ.
 
 #### Đã triển khai
 
-- **Tĩnh, Dồn xuống, Dồn lên, Dồn trái và Dồn phải**. Các thẻ chuyển động bằng hoạt ảnh dịch vị; trạng thái thẻ (đặc biệt, băng và phần thưởng) đi theo chính thẻ, không theo ô cũ.
-- Phân bổ cấp độ, áp dụng cho mọi chế độ: **1–2 Tĩnh; 3–5 Dồn xuống; 6–8 Dồn lên; 9–12 luân phiên Dồn trái/phải; từ 13 ngẫu nhiên một trong bốn hướng cơ bản**. Hướng đã chọn được lưu cùng phiên đang chơi để không đổi khi tiếp tục màn.
-- Sau popup giới thiệu màn, màn động dùng popup chung **Quy tắc màn chơi** để nói rõ hướng dịch chuyển. Popup không dùng banner/toast riêng và chỉ bắt đầu đếm giờ khi người chơi đóng popup.
+- Đã có đủ **Tĩnh và 9 nhóm bàn động**: Dồn xuống, Dồn lên, Dồn trái/phải, Hút vào tâm, Tách dọc, Tách ngang, Tráo đổi và Xoay. Xoay có hai chiều nên runtime có tổng cộng 10 quy tắc động cụ thể.
+- Phân bổ cấp độ, áp dụng cho mọi chế độ: **1–2 Tĩnh; 3–5 Dồn xuống; 6–8 Dồn lên; 9–12 luân phiên Trái/phải; 13–15 Hút vào tâm; 16–18 Tách dọc; 19–21 Tách ngang; 22–24 Tráo đổi; 25–27 luân phiên hai chiều Xoay; từ 28 chọn ngẫu nhiên trong toàn bộ quy tắc động**. Quy tắc đã chọn được lưu cùng phiên đang chơi để không đổi khi tiếp tục màn.
+- Lần đầu gặp bàn động, game hiển thị một popup **Luật Bàn Động** giải thích đầy đủ các nhóm quy tắc và hướng của màn hiện tại. Sau khi người chơi xác nhận, popup không lặp lại ở các màn sau; đồng hồ chỉ bắt đầu khi popup được đóng.
 - Sau dịch chuyển hoặc Sấm sét xóa cặp, hệ thống kiểm tra nước đi; nếu cần sẽ xáo các thẻ còn lại.
-
-#### Chờ triển khai sau
-
-- **Hút vào tâm, Tách đôi dọc, Tráo đổi, Tách đôi ngang và Xoay tròn.** Chỉ mở từng loại khi đã có thuật toán bảo toàn cặp, hoạt ảnh rõ ràng và kiểm thử với cặp băng, thẻ đặc biệt, Sấm sét cùng các bàn nhiều cột.
 
 ### Thẻ đặc biệt và thẻ đóng băng
 
-1. **Ghép đủ bộ 3:** Khi ghép đủ 3 cặp thẻ đặc biệt sẽ mở khóa 1 cặp thẻ đóng băng (nếu có).
-2. **Ghép cặp đặc biệt:** Mỗi màn luôn có ít nhất 1 cặp thẻ đặc biệt. Khi ghép được cặp này, cặp thẻ đóng băng trong màn sẽ được mở khóa; đồng thời phá hủy 1 cặp thẻ bất kì.
-3. **Ghép đủ bộ 5:** Khi ghép đủ 5 cặp thẻ đặc biệt sẽ biến 1 cặp thẻ bất kì thành 1 cặp thẻ đặc biệt.
-4. **Ghép đủ bộ 7:** Khi ghép đủ 7 cặp thẻ đặc biệt sẽ nhận 1 trong các hiệu ứng: Thêm thời gian, thêm 1 lượt gợi ý, thêm 1 lượt xáo trộn.
-5. **Ghép đủ bộ 9:** Khi ghép đủ 9 cặp thẻ đặc biệt sẽ nhận 1 trong các hiệu ứng: Mở khóa 1 cặp thẻ đóng băng, phá hủy 1 cặp thẻ bất kì.
-6. **Ghép đủ bộ 10:** Khi ghép đủ 10 cặp thẻ đặc biệt, nhận 100 xu đồng thời phá hủy tất cả thẻ đóng băng, tạo 1 cặp thẻ đặc biệt ngẫu nhiên và phá hủy 1 cặp thẻ ngẫu nhiên.
-
-- Các bộ thẻ có thể tích lũy qua các màn chơi. Ví dụ: Màn 1 ghép được 3 thẻ, màn 2 ghép được 2 thẻ => Tổng cộng 5 thẻ, sẽ nhận được hiệu ứng của bộ 5. Đến đủ mốc 10 thì sẽ reset lại từ 1.
+- Thẻ cao cấp không bắt buộc xuất hiện ở mọi màn. Tỷ lệ/số cặp theo kích thước bàn: tối đa 8 cặp là 60% có 1 cặp; 9–15 cặp là 70% có 1–2 cặp; từ 16 cặp là 80% có 2–3 cặp.
+- Số cặp băng: tối đa 8 cặp có 1; 9–15 có 2; 16–24 có 3; từ 25 có 4. Nếu chỉ còn băng hoặc không còn nước đi với thẻ mở, hệ thống mở đồng thời số băng cần thiết để tránh kẹt màn.
+- Ba loại thẻ cao cấp: **Cyan – Phá Băng** luôn mở một cặp băng (hết băng thì nhận ngẫu nhiên Xu hoặc thời gian); **Xanh dương – Tiếp Tế** có 50% nhận Gợi ý, Xáo trộn hoặc Đóng băng thời gian; **Đỏ – Bùng Nổ** có 50% gọi Sấm sét phá một cặp thường. Sấm sét từ thẻ cao cấp tiếp tục combo; Sấm sét từ vật phẩm không tăng combo.
+- Mỗi cặp cao cấp có cơ hội rơi một năng lượng. Trong giai đoạn kiểm thử tỷ lệ đang là 100%; cấu hình phát hành dự kiến là 20%, bảo hiểm rơi ở lần thứ 10 sau 9 lần trượt.
+- Tiến trình năng lượng giữ xuyên các level trong cùng lượt chơi và reset khi chơi mới/quay Menu. Năng lượng được tính ngay lúc rơi ra bàn; hiệu ứng thu thập bay vào thanh mốc nhưng không khóa thao tác.
+- Có đủ 10 mốc thưởng: phá cặp thường, Xu, thời gian, Gợi ý, Xáo trộn, Đóng băng thời gian và mở băng theo cấu hình tập trung. Thưởng phá cặp vẫn xử lý được cặp cuối để hoàn thành màn; không chọn băng, thẻ cao cấp hoặc ô may mắn.
 
 ---
 
@@ -97,9 +91,8 @@ Các vật phẩm được tích hợp trực tiếp vào hệ thống tiền t�
 
 Mỗi chủ đề có 5 thẻ đặc biệt ở thư mục `special/`. Khi xuất hiện trong chế độ Link Connect:
 
-- **Hiệu ứng nổi bật:** Viền thẻ phát sáng lấp lánh ánh kim/ngọc dạ quang.
-- **Kích hoạt Siêu Phần Thưởng khi ghép trúng cặp thẻ đặc biệt:**
-  - _Cộng thưởng:_ Cộng thời gian hoặc Xu.
+- **Nhận diện:** chỉ dùng viền phát sáng theo màu loại thẻ cao cấp, không gắn huy hiệu che hình. Ô may mắn dùng viền tím; băng dùng vệt lau sương từ trên xuống và không tạo hạt băng.
+- **Hiệu ứng thưởng:** năng lượng, Xu và vật phẩm hỗ trợ rơi quanh vị trí ghép rồi bay về đúng HUD/công cụ bằng `transform` và `opacity`; phần tử tạm tự dọn sau hoạt ảnh và không khóa bàn.
 
 ---
 
@@ -141,7 +134,7 @@ function canConnect(startPos, endPos, grid) {
 ## 7. Trạng thái triển khai & phạm vi
 
 1. **Lõi trò chơi:** Thuật toán nối tối đa hai lần rẽ, vùng đệm ngoài biên, bàn cờ ma trận và tự phát hiện ngõ cụt.
-2. **Bàn cờ động cơ bản:** Đã có Tĩnh/Dồn xuống/Dồn lên/Dồn trái/Dồn phải, hoạt ảnh dịch chuyển và kiểm tra nước đi. Nhóm quy tắc nâng cao ở mục 3 vẫn chờ thiết kế và kiểm thử riêng.
+2. **Bàn cờ động:** Đã có toàn bộ các nhóm ở mục 3, dùng lại phần tử thẻ theo `instanceId`, hoạt ảnh FLIP và kiểm tra nước đi sau dịch chuyển.
 3. **Gameplay & giao diện:** Chủ đề ảnh dùng chung, HUD, điểm, combo, thời gian, Xu, popup đầu/cuối màn và bố cục responsive cho mobile.
 4. **Vật phẩm & thẻ đặc biệt:** Gợi ý, xáo trộn, sấm sét, đóng băng thời gian, thẻ đặc biệt, thẻ đóng băng, mốc thưởng và chế độ Thử thách.
 

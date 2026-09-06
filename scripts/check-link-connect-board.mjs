@@ -11,7 +11,7 @@ import {
   unlockFrozenLinkPairs,
 } from "../js/linkConnect/linkBoard.js";
 import { hasAvailableConnection } from "../js/linkConnect/pathfinder.js";
-import { getLinkFrozenPairCount, getLinkSpecialPairCount } from "../js/linkConnect/linkConfig.js";
+import { getLinkFrozenPairCount, getLinkGravityShift, getLinkSpecialPairCount } from "../js/linkConnect/linkConfig.js";
 
 assert.equal(getLinkSpecialPairCount(8, () => 0), 1);
 assert.equal(getLinkSpecialPairCount(8, () => 0.99), 0);
@@ -121,5 +121,42 @@ assert.equal(applyLinkGravityShift(gravityBoard, "right"), true);
 assert.equal(gravityBoard.grid[2][3].id, "a");
 assert.equal(applyLinkGravityShift(gravityBoard, "left"), true);
 assert.equal(gravityBoard.grid[2][1].id, "a");
+
+assert.deepEqual(
+  [1, 3, 6, 9, 10, 13, 16, 19, 22, 25, 26].map((level) => getLinkGravityShift(level, () => 0)),
+  ["static", "down", "up", "left", "right", "center", "split-vertical", "split-horizontal", "swap", "rotate-clockwise", "rotate-counterclockwise"],
+);
+assert.equal(getLinkGravityShift(28, () => 0), "down");
+assert.equal(getLinkGravityShift(28, () => 0.999), "rotate-counterclockwise");
+
+const advancedGravitySource = {
+  rows: 4,
+  columns: 4,
+  grid: [
+    [null, null, null, null, null, null],
+    [null, { id: "a" }, null, null, { id: "b" }, null],
+    [null, null, { id: "c" }, null, null, null],
+    [null, null, null, { id: "d" }, null, null],
+    [null, { id: "e" }, null, null, { id: "f" }, null],
+    [null, null, null, null, null, null],
+  ],
+};
+const advancedDirections = [
+  "center", "split-vertical", "split-horizontal", "swap",
+  "rotate-clockwise", "rotate-counterclockwise",
+];
+advancedDirections.forEach((direction) => {
+  const testBoard = {
+    ...advancedGravitySource,
+    grid: advancedGravitySource.grid.map((row) => [...row]),
+  };
+  const beforeIds = getRemainingLinkTiles(testBoard).map((tile) => tile.id).sort();
+  assert.equal(applyLinkGravityShift(testBoard, direction), true, `${direction} should move tiles`);
+  assert.deepEqual(
+    getRemainingLinkTiles(testBoard).map((tile) => tile.id).sort(),
+    beforeIds,
+    `${direction} should preserve every tile`,
+  );
+});
 
 console.log("Link Connect board checks passed.");

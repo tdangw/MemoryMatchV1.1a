@@ -66,8 +66,139 @@ export function applyLinkGravityShift(board, direction = "static") {
         board.grid[row][column] = tile;
       });
     }
+  } else if (direction === "center") {
+    pullLinkTilesToCenter(board);
+  } else if (direction === "split-vertical") {
+    splitLinkTilesVertically(board);
+  } else if (direction === "split-horizontal") {
+    splitLinkTilesHorizontally(board);
+  } else if (direction === "swap") {
+    swapNearbyLinkTiles(board);
+  } else if (direction === "rotate-clockwise" || direction === "rotate-counterclockwise") {
+    rotateLinkBoardRings(board, direction === "rotate-clockwise");
   }
   return board.grid.some((row, rowIndex) => row.some((tile, columnIndex) => tile !== before[rowIndex][columnIndex]));
+}
+
+function pullLinkTilesToCenter(board) {
+  const topEnd = Math.floor(board.rows / 2);
+  for (let column = 1; column <= board.columns; column += 1) {
+    compactLine(board, positionsInColumn(column, 1, topEnd), "end");
+    compactLine(board, positionsInColumn(column, topEnd + 1, board.rows), "start");
+  }
+  const leftEnd = Math.floor(board.columns / 2);
+  for (let row = 1; row <= board.rows; row += 1) {
+    compactLine(board, positionsInRow(row, 1, leftEnd), "end");
+    compactLine(board, positionsInRow(row, leftEnd + 1, board.columns), "start");
+  }
+}
+
+function splitLinkTilesVertically(board) {
+  const topEnd = Math.floor(board.rows / 2);
+  for (let column = 1; column <= board.columns; column += 1) {
+    compactLine(board, positionsInColumn(column, 1, topEnd), "start");
+    compactLine(board, positionsInColumn(column, topEnd + 1, board.rows), "end");
+  }
+}
+
+function splitLinkTilesHorizontally(board) {
+  const leftEnd = Math.floor(board.columns / 2);
+  for (let row = 1; row <= board.rows; row += 1) {
+    compactLine(board, positionsInRow(row, 1, leftEnd), "start");
+    compactLine(board, positionsInRow(row, leftEnd + 1, board.columns), "end");
+  }
+}
+
+function compactLine(board, positions, edge) {
+  if (!positions.length) return;
+  const tiles = positions.map((position) => getLinkBoardTile(board, position)).filter(Boolean);
+  const emptyCount = positions.length - tiles.length;
+  const values = edge === "end"
+    ? [...Array(emptyCount).fill(null), ...tiles]
+    : [...tiles, ...Array(emptyCount).fill(null)];
+  positions.forEach((position, index) => {
+    board.grid[position.row][position.column] = values[index];
+  });
+}
+
+function positionsInColumn(column, startRow, endRow) {
+  return Array.from(
+    { length: Math.max(0, endRow - startRow + 1) },
+    (_, index) => ({ row: startRow + index, column }),
+  );
+}
+
+function positionsInRow(row, startColumn, endColumn) {
+  return Array.from(
+    { length: Math.max(0, endColumn - startColumn + 1) },
+    (_, index) => ({ row, column: startColumn + index }),
+  );
+}
+
+function swapNearbyLinkTiles(board) {
+  const occupied = getInteriorPositions(board);
+  const occupiedKeys = new Set(occupied.map(positionKey));
+  const swappedKeys = new Set();
+  occupied.forEach((position) => {
+    const key = positionKey(position);
+    if (swappedKeys.has(key)) return;
+    const partner = occupied
+      .filter((candidate) => {
+        const candidateKey = positionKey(candidate);
+        return candidateKey !== key
+          && occupiedKeys.has(candidateKey)
+          && !swappedKeys.has(candidateKey);
+      })
+      .sort((first, second) => (
+        manhattanDistance(position, first) - manhattanDistance(position, second)
+      ))[0];
+    if (!partner) return;
+    const partnerKey = positionKey(partner);
+    const tile = board.grid[position.row][position.column];
+    board.grid[position.row][position.column] = board.grid[partner.row][partner.column];
+    board.grid[partner.row][partner.column] = tile;
+    swappedKeys.add(key);
+    swappedKeys.add(partnerKey);
+  });
+}
+
+function manhattanDistance(first, second) {
+  return Math.abs(first.row - second.row) + Math.abs(first.column - second.column);
+}
+
+function rotateLinkBoardRings(board, clockwise) {
+  const ringCount = Math.ceil(Math.min(board.rows, board.columns) / 2);
+  for (let layer = 0; layer < ringCount; layer += 1) {
+    const positions = getRingPositions(board, layer);
+    if (positions.length < 2) continue;
+    const values = positions.map((position) => getLinkBoardTile(board, position));
+    const rotated = clockwise
+      ? [values.at(-1), ...values.slice(0, -1)]
+      : [...values.slice(1), values[0]];
+    positions.forEach((position, index) => {
+      board.grid[position.row][position.column] = rotated[index];
+    });
+  }
+}
+
+function getRingPositions(board, layer) {
+  const top = layer + 1;
+  const bottom = board.rows - layer;
+  const left = layer + 1;
+  const right = board.columns - layer;
+  if (top > bottom || left > right) return [];
+  if (top === bottom) return positionsInRow(top, left, right);
+  if (left === right) return positionsInColumn(left, top, bottom);
+  const positions = [];
+  for (let column = left; column <= right; column += 1) positions.push({ row: top, column });
+  for (let row = top + 1; row <= bottom; row += 1) positions.push({ row, column: right });
+  for (let column = right - 1; column >= left; column -= 1) positions.push({ row: bottom, column });
+  for (let row = bottom - 1; row > top; row -= 1) positions.push({ row, column: left });
+  return positions;
+}
+
+function positionKey(position) {
+  return `${position.row}:${position.column}`;
 }
 
 export function ensurePlayableBoard(board) {
