@@ -23,6 +23,7 @@ Tài liệu này chỉ ghi trạng thái sản phẩm và các quy tắc đang c
 - Người chơi lật hai thẻ để tìm cặp giống nhau. Ghép sai đặt combo về 0; ghép đúng liên tiếp tăng combo và thưởng thời gian từ combo x2.
 - Dễ/Trung bình/Khó/Siêu khó dùng bàn cố định; Thử thách tăng kích thước theo level; Vô tận đếm thời gian xuôi.
 - Ô may mắn của Thử thách có thể thưởng thời gian, Gợi ý hoặc Xu.
+- Hoàn thành màn 100 chạy cảnh chiến thắng cuối; thời lượng và trình tự hiệu ứng lấy từ `js/gameplayTuning.js` và `js/victoryCelebration.js`.
 - Cấu hình và công thức chính nằm trong `js/config.js`; luồng chơi nằm trong `js/gameController.js`, `js/logic.js` và `js/grid.js`.
 
 ## Link Connect
@@ -40,6 +41,7 @@ Tài liệu này chỉ ghi trạng thái sản phẩm và các quy tắc đang c
 
 1. Rà trực quan từng hiệu ứng đường nối và xóa thẻ trong Bộ sưu tập trước khi coi là đạt chất lượng phát hành.
 2. Kiểm thử Link Connect trên thiết bị mobile hẹp, bàn 6 cột và level cao với mọi kiểu dịch chuyển.
+3. Một số selector giao diện cũ vẫn chồng lấn giữa các file CSS; không xóa hàng loạt trước khi kiểm thử hiển thị.
 
 ## Ngoài phạm vi hiện tại
 

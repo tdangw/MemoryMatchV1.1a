@@ -94,6 +94,7 @@ Vite ──→ dist ──→ Web/PWA hoặc Capacitor Android
 - JavaScript tạo URL asset bằng `import.meta.env.BASE_URL`; CSS để Vite viết lại URL theo build target.
 - `vite.config.js` chọn implementation trình bày chiến thắng cho web hoặc Android qua alias `victory-presentation`.
 - Service worker/PWA nằm trong `js/pwa.js` và `public/sw.js`; Capacitor dùng cùng đầu ra web qua profile Android.
+- Service worker chỉ cache phản hồi đầy đủ HTTP `200` và bỏ qua request `Range` để không làm lỗi audio tải từng đoạn.
 
 ## 7. Nguồn cấu hình
 
