@@ -53,8 +53,8 @@ function renderLinkBoardMotion(board, onTileClick, motion) {
     after.forEach(({ element, rect, key }) => {
       const previous = before.get(key);
       if (!previous) return;
-      const deltaX = previous.left - rect.left;
-      const deltaY = previous.top - rect.top;
+      const deltaX = previous.rect.left - rect.left;
+      const deltaY = previous.rect.top - rect.top;
       if (!deltaX && !deltaY) return;
       animateLinkTileMotion(element, deltaX, deltaY, motion, motionIndex);
       motionIndex += 1;
