@@ -38,6 +38,7 @@ assert.equal(gameState.progress.memoryMatch.items.preview4, 1);
 
 const hudCss = readFileSync(new URL("../styles/hud.css", import.meta.url), "utf8");
 const gameplayUiCss = readFileSync(new URL("../styles/gameplay-ui.css", import.meta.url), "utf8");
+const tooltipJs = readFileSync(new URL("../js/tooltips.js", import.meta.url), "utf8");
 const indexHtml = readFileSync(new URL("../index.html", import.meta.url), "utf8");
 assert.doesNotMatch(
   hudCss,
@@ -51,5 +52,8 @@ assert.match(
   /\.game-hud\.has-timer-progress::after\s*\{[^}]*height:\s*3px/s,
   "games must share the compact 3px HUD timer bar",
 );
+assert.match(hudCss, /\.memory-special-hud\s*\{[^}]*margin:\s*4px auto 0/s, "Memory milestones must clear the HUD timer");
+assert.match(hudCss, /#grid-board-frame\s*\{[^}]*margin-top:\s*10px/s, "Memory board must keep the same post-milestone gap as Link");
+assert.match(tooltipJs, /\.memory-special-hud__milestones span/, "Memory milestone rewards must be reachable by tooltip");
 
 console.log("Memory special rewards and inventory checks passed.");

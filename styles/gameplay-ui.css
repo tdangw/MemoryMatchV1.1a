@@ -177,6 +177,7 @@
   opacity: 1;
   transform: scaleX(var(--game-timer-progress, 0));
   transform-origin: left center;
+  pointer-events: none;
   will-change: transform;
 }
 

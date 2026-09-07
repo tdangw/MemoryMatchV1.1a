@@ -96,9 +96,26 @@ export function updateMemorySpecialProgress(progress = gameState.specialProgress
   memorySpecialHudElement.dataset.tooltip = `Năng lượng ${normalized}/${target}`;
   memorySpecialMilestonesElement.querySelectorAll("[data-memory-special-milestone]").forEach((milestone) => {
     const value = Number(milestone.dataset.memorySpecialMilestone);
+    const rewardDescription = describeMemoryMilestoneRewards(GAME_CONFIG.special.milestones[value - 1]);
+    const label = `Mốc ${value}: ${rewardDescription}`;
+    milestone.dataset.tooltip = label;
+    milestone.setAttribute("aria-label", label);
     milestone.classList.toggle("is-earned", value <= normalized);
     milestone.classList.toggle("is-next", value === normalized + 1);
   });
+}
+
+function describeMemoryMilestoneRewards(rewards = []) {
+  return rewards.map((reward) => {
+    const values = reward.values || [reward.value];
+    const valueText = values.join(" hoặc ");
+    if (reward.type === "preview-auto") return `Xem trước ${valueText} thẻ`;
+    if (reward.type === "preview-item") return reward.value === "all" ? "Xem trước tất cả vào kho" : `Xem trước ${valueText} thẻ vào kho`;
+    if (reward.type === "time-item") return `+${valueText} giây vào kho`;
+    if (reward.type === "hint") return `+${valueText} Gợi ý`;
+    if (reward.type === "coins") return `+${valueText} Xu`;
+    return "Phần thưởng đặc biệt";
+  }).join(" + ");
 }
 
 export function updateMemoryAssistInventoryDisplay() {

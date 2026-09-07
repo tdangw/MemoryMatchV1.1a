@@ -248,7 +248,9 @@ Ba luồng phải được hiểu tách biệt:
 ## 12. HUD và hiệu ứng
 
 - HUD tiến trình trên cùng hiển thị Moves, Miss, Combo, sao màn, Điểm, số cặp và Gợi ý.
-- HUD menu hiển thị level, timer, tổng sao; thanh thời gian 3px nằm liền dưới HUD, thụt hai mép 6px giống Link Connect và đổi màu theo tỷ lệ còn lại:
+- HUD menu hiển thị level, timer, tổng sao; thanh thời gian 3px nằm liền dưới HUD, thụt hai mép 6px giống Link Connect và không chặn thao tác với thanh mốc.
+- Thanh mốc cách HUD và bàn theo cùng nhịp dọc của Link Connect; rê chuột hoặc nhấn giữ từng mốc để xem phần thưởng.
+- Thanh thời gian đổi màu theo tỷ lệ còn lại:
   - Bình thường từ 70% trở lên.
   - Cảnh báo từ 30% đến dưới 70%.
   - Nguy cấp dưới 30%.
