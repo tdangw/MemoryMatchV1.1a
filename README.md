@@ -1,5 +1,7 @@
 # Memory Match Adventure — JavaScript thuần
 
+Kế hoạch hạ tầng giao diện dùng chung cho các game: [`GAME_SHELL_PLAN.md`](GAME_SHELL_PLAN.md).
+
 Phiên bản hiển thị trong ứng dụng: **V1.1a**.
 
 Ứng dụng web/PWA dùng HTML, CSS và JavaScript ES modules. Vite phục vụ và build bản web; Capacitor đóng gói bản Android từ cùng mã nguồn khi cần.

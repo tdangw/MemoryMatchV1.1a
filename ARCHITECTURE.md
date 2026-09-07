@@ -16,6 +16,8 @@ js/main.js ── cấu hình callback giữa menu, controller và UI
 Vite ──→ dist ──→ Web/PWA hoặc Capacitor Android
 ```
 
+Kế hoạch chuẩn hóa shell/HUD/layout dùng chung trước khi thêm game mới nằm trong `GAME_SHELL_PLAN.md`.
+
 - Ứng dụng dùng HTML/CSS và JavaScript ES modules, không có framework UI.
 - `js/main.js` là entry point duy nhất; module chức năng không tự bootstrap ứng dụng.
 - Các controller phụ thuộc module dùng chung, nhưng không import lẫn nhau. Callback `configure*` nối các luồng cần điều hướng chéo.

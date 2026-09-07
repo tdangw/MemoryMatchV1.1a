@@ -1,0 +1,312 @@
+# Kế hoạch chuẩn hóa Game Shell dùng chung
+
+## 1. Mục tiêu và phạm vi đã chốt
+
+Đợt này xây hạ tầng giao diện/gameplay dùng chung đủ ổn định cho **Memory Match**, **Link Connect**, **Triple Connect** và các game 4–5 trong tương lai. Chỉ chuyển hai game hiện có sang hạ tầng mới; chưa triển khai Triple Connect và không thay đổi luật, kinh tế hoặc dữ liệu người chơi.
+
+Link Connect là mốc tham chiếu hình học ban đầu vì bố cục hiện tại gọn và ổn định hơn. Mốc tham chiếu không ngăn từng game tùy chỉnh hợp lệ qua config.
+
+### Ngoài phạm vi
+
+- Không thêm gameplay Triple Connect.
+- Không cân bằng lại điểm, Xu, vật phẩm, thời gian hoặc tỷ lệ thưởng.
+- Không viết lại persistence, controller hoặc renderer riêng nếu chúng không cản trở hợp đồng dùng chung.
+- Không thay framework và không đưa thư viện kiểm thử vào bundle production.
+
+## 2. Nguyên tắc bắt buộc
+
+1. **Mặc định dùng chung, khác biệt qua config:** không thêm margin, timing hoặc kích thước bí mật trong CSS/controller riêng.
+2. **Dữ liệu trước, hiệu ứng sau:** UI và animation chỉ trình bày trạng thái; không quyết định phần thưởng hoặc gameplay.
+3. **Không nhánh theo tên game trong lõi:** component chung nhận cấu hình/callback; luật riêng nằm trong adapter của game.
+4. **DOM ổn định:** Game Shell tạo node một lần và patch phần thay đổi; board renderer không bị ép render lại toàn bàn.
+5. **Không compatibility layer vĩnh viễn:** adapter tạm phải có phase xóa và test chứng minh đã hết người dùng cũ.
+6. **Không chuyển phase khi gate chưa đạt:** lỗi chức năng, hiệu suất, accessibility, build hoặc tài liệu phải xử lý ngay trong phase phát sinh.
+7. **Mỗi phase một commit riêng:** commit chỉ chứa phạm vi phase, worktree sạch trước khi chuyển tiếp.
+
+## 3. Kiến trúc đích
+
+```text
+js/gameShell/
+├── gameShell.js          # tạo/hủy shell và các vùng cố định
+├── gameShellConfig.js    # schema, mặc định và merge override
+├── gameShellHud.js       # patch chỉ số, sao, timer, Xu và mốc
+├── gameShellLayout.js    # đo viewport và tính hình học board
+├── gameShellEffects.js   # đăng ký target và vòng đời hiệu ứng chung
+└── gameShellLifecycle.js # pause/resume/round cleanup/navigation cleanup
+
+styles/game-shell/
+├── tokens.css            # kích thước, màu, layer, motion token
+├── shell.css             # cấu trúc HUD → mốc → board
+├── hud.css               # component HUD dùng chung
+└── responsive.css        # breakpoint/viewport/safe-area dùng chung
+```
+
+Mỗi game cung cấp adapter gồm `id`, `title`, `hudDefinition`, `tools`, `layout`, formatter, callback hành động và board adapter.
+
+### Ba tầng cấu hình
+
+1. `GAME_SHELL_DEFAULTS`: tiêu chuẩn chung.
+2. `game.ui`: override có tên và được schema cho phép.
+3. Giá trị runtime: hàng/cột, viewport, safe area và trạng thái HUD.
+
+Override không thuộc schema phải gây lỗi trong development. Production dùng mặc định an toàn và ghi cảnh báo một lần.
+
+## 4. Ngân sách chất lượng và hiệu suất
+
+### Hình học
+
+- Chênh lệch cùng component giữa hai game: tối đa 1px tại cùng viewport, trừ override đã khai báo.
+- Không giao nhau giữa timer, thanh mốc và board.
+- Board không vượt viewport; safe area được tính trên mobile.
+- Không có nút, mốc hoặc tooltip bị cắt ở 320px chiều rộng.
+
+### Render
+
+- Cập nhật HUD không được gọi renderer toàn board.
+- Layout read và write được gom theo frame; không xen kẽ vòng lặp đọc/ghi gây forced reflow.
+- `ResizeObserver` chỉ lên lịch tối đa một lần đo trong mỗi animation frame.
+- Timer chỉ ghi một custom property transform; dừng khi pause/hidden/round kết thúc.
+- Tile Link tiếp tục tái sử dụng theo `instanceId`; Memory giữ node ổn định khi chỉ đổi HUD.
+
+### Hiệu ứng
+
+- Chỉ dùng `transform`/`opacity` cho phần tử bay hoặc dịch chuyển thông thường.
+- Mọi animation, timeout và node tạm phải được đăng ký và dọn khi đổi round/game.
+- `prefers-reduced-motion` có đường đi không animation nhưng vẫn cập nhật kết quả.
+- Không giữ `will-change` thường trực ngoài phần tử đang animation.
+
+### Bundle và bộ nhớ
+
+- Sau khi di chuyển xong, tổng CSS/JS không tăng quá 5KB gzip nếu không có lý do ghi trong báo cáo phase.
+- Không thêm ảnh, font hoặc dependency runtime cho Game Shell.
+- Sau 20 lần chuyển game, số listener, timer và node hiệu ứng tạm phải trở về baseline.
+
+## 5. Quy trình bắt buộc cho mọi phase
+
+### Trước khi sửa
+
+1. Worktree sạch; ghi commit gốc.
+2. Chạy `npm run check`, `npm run build` và test UI liên quan.
+3. Ghi baseline: bundle gzip, số node shell, số listener/timer đo được và hình học bốn viewport.
+4. Liệt kê file sẽ sửa, hành vi phải giữ và rủi ro riêng của phase.
+
+### Sau khi sửa
+
+1. Review diff để tìm mã trùng, selector quá rộng, hard-code và API bị rò rỉ luật game.
+2. Chạy unit/static checks, test UI hình học, test chức năng mục tiêu và production build.
+3. So sánh hiệu suất với baseline; nếu vượt ngân sách thì sửa trước khi tiếp tục.
+4. Kiểm tra đổi game/round trong lúc timer, tooltip hoặc animation đang hoạt động.
+5. Cập nhật tài liệu đúng nguồn sở hữu; xóa code, selector, import và adapter tạm không còn dùng.
+6. Commit phase; xác nhận worktree sạch.
+
+## 6. Các phase triển khai
+
+### Phase 0 — Baseline và công cụ kiểm thử
+
+**Trạng thái: hoàn tất ngày 2026-09-07**
+
+- Đã cài `@playwright/test` và Chromium-only; browser dùng cache chung ngoài repository.
+- `npm run test:ui:geometry`: 8/8 kiểm tra đạt trên bốn viewport cho Memory Match và Link Connect.
+- `npm run check` và `npm run build`: đạt; Playwright không nằm trong bundle production.
+- `npm audit --omit=dev`: 0 lỗ hổng production. Còn 12 cảnh báo mức vừa chỉ trong dependency phát triển của Firebase/Capacitor; không chạy sửa tự động vì npm đề xuất thay đổi có nguy cơ breaking.
+- Bước tiếp theo trong task mới: bắt đầu Phase 1; chưa triển khai Triple Connect.
+
+**Thực hiện**
+
+- Cài `@playwright/test` và Chromium-only dưới dạng dev dependency.
+- Tạo lệnh thủ công `test:ui:geometry`; không nối vào build hoặc `npm run check`.
+- Cấu hình 1024×900, 390×844, 320×568 và 844×390.
+- Khi đạt chỉ in kết quả ngắn; screenshot/trace chỉ giữ khi lỗi.
+- Chặn service worker và dùng reduced motion để giảm nhiễu.
+- Đo HUD, timer, thanh mốc, board và viewport của cả hai game.
+
+**Gate**
+
+- Chromium khởi chạy được trên máy hiện tại.
+- Test chạy độc lập và không sửa bản lưu thật của người chơi.
+- Build/check không phụ thuộc Playwright; report/cache không được commit.
+
+**Rủi ro và xử lý**
+
+- Ảnh/font khác hệ điều hành: chưa dùng golden screenshot ở phase này.
+- Test phụ thuộc animation: chờ phần tử mục tiêu, không sleep cố định.
+- Tăng dung lượng: chỉ Chromium; browser nằm ngoài repository.
+
+### Phase 1 — Khảo sát ownership và đóng băng hành vi
+
+**Thực hiện**
+
+- Lập bản đồ DOM/CSS/controller của hai shell hiện tại.
+- Đánh dấu selector dùng chung, selector xung đột và giá trị trùng lặp.
+- Chốt hợp đồng HUD, timer, mốc, Xu, tools, board slot và lifecycle.
+- Chụp baseline có kiểm soát sau khi hình học hiện tại được duyệt.
+- Ghi override hợp lệ; khác biệt không có lý do được xem là lỗi.
+
+**Gate và rủi ro**
+
+- Không đổi runtime trong phase này; mọi node/rule có owner và danh sách xóa cụ thể.
+- Baseline không chứa dữ liệu ngẫu nhiên, nền động hoặc animation đang chạy.
+- Tránh đóng băng lỗi cũ bằng cách ưu tiên geometry contract và duyệt ảnh trước.
+
+### Phase 2 — Token và schema cấu hình chung
+
+**Thực hiện**
+
+- Tách token width, gap, height, radius, breakpoint, safe-area, z-index và motion.
+- Tạo `gameShellConfig.js` với defaults, normalize, validation và override allowlist.
+- Chuyển số dùng chung khỏi CSS/controller riêng.
+- Gameplay timing vẫn thuộc `gameplayTuning.js`; không trộn luật chơi với timing trình bày.
+
+**Gate và rủi ro**
+
+- Test default, override hợp lệ, kiểu sai, số âm, `NaN`, key lạ và fallback production.
+- Không còn bản sao của token đã chuyển; geometry không đổi quá 1px.
+- Chuyển từng nhóm token và kiểm computed style trước khi xóa rule cũ.
+- Không biến mọi thuộc tính CSS thành config.
+
+### Phase 3 — Layout engine dùng chung
+
+**Thực hiện**
+
+- Một phép đo cho title → progress HUD → menu HUD → milestones → board.
+- Tính board từ `boardTop`, viewport, safe area, hàng/cột, gap, padding và max width.
+- Gom read/write theo `requestAnimationFrame`; dùng một `ResizeObserver` trên shell.
+- Board adapter chỉ nhận `{ tileSize, boardWidth, boardHeight, gap, padding }`.
+
+**Gate và rủi ro**
+
+- Bốn viewport × sáu mode × bật/tắt tọa độ nếu có.
+- Xoay màn hình, resize nhanh, mở/đóng modal và đổi game 20 lần.
+- Không overflow, overlap, ResizeObserver loop hoặc layout thrashing; tối đa một layout/frame.
+- Đo lại có giới hạn sau khi font/asset sẵn sàng; dùng `visualViewport` với fallback an toàn.
+
+### Phase 4 — Game Shell DOM và lifecycle
+
+**Thực hiện**
+
+- Tạo cấu trúc semantic chung và trả reference để controller không query DOM lặp lại.
+- API mount/update/unmount rõ ràng; ID cũ chỉ ở adapter tương thích tạm.
+- Lifecycle registry quản lý listener, timeout, animation frame, Web Animation và node tạm.
+- Cleanup idempotent khi đổi game hoặc round.
+
+**Gate và rủi ro**
+
+- Mount/unmount 20 lần không tăng node/listener/timer.
+- Đổi game khi preview, loot, coin, tooltip và modal đang chạy.
+- Callback cũ không sửa DOM/state mới; gameplay callback vẫn kiểm tra `roundId`.
+- Adapter ID cũ phải có test và phase xóa cụ thể.
+
+### Phase 5 — HUD component dùng chung
+
+**Thực hiện**
+
+- Component hóa stats, sao, điểm, level, timer, tổng sao, Xu, tools và mốc.
+- Timer/combo dùng custom property chung; cache giá trị để bỏ DOM write không đổi.
+- Tooltip lấy copy từ definition/config, không phụ thuộc ID game.
+- Game khai báo component nào xuất hiện và formatter riêng khi cần.
+
+**Gate và rủi ro**
+
+- Update một stat không thay node khác và không render board.
+- Kiểm timer bốn trạng thái, pause/resume, tooltip chuột/bàn phím/nhấn giữ.
+- Hình học hai game sai tối đa 1px nếu không có override.
+- HUD không import state game và không trở thành controller tổng hợp.
+
+### Phase 6 — Motion và hiệu ứng dùng chung
+
+**Thực hiện**
+
+- Chuẩn hóa API loot, coin, score/combo, item collect, target highlight và FLIP.
+- Tách quỹ đạo/timing khỏi luật thưởng; game chỉ cung cấp source, target, type và amount.
+- Thêm effect registry, giới hạn đồng thời có cấu hình và cleanup thống nhất.
+- Canvas chuyên biệt ở renderer riêng nhưng dùng lifecycle chung.
+
+**Gate và rủi ro**
+
+- Spam match/reward, đổi game giữa animation và reduced motion.
+- Không node tạm tồn tại; không callback cập nhật sai game.
+- DOM effect chỉ transform/opacity; kiểm tra số phần tử đồng thời và layer promotion.
+- Phong cách riêng đi qua preset/strategy có schema, không copy animation.
+
+### Phase 7 — Di chuyển Memory Match
+
+**Thực hiện**
+
+- Memory dùng Game Shell, HUD/layout/effect adapter chung.
+- Giữ controller, logic, preview, special, session và board gameplay.
+- Xóa CSS/DOM/helper cũ sau khi không còn import/người dùng.
+
+**Gate và rủi ro**
+
+- Sáu mode; chơi mới/chơi lại/tiếp tục; reload Challenge; thắng/thua.
+- Chọn/bỏ chọn, combo, sao/điểm, timer, 10 mốc, Xu và kho.
+- Board mobile 4×3, bàn lớn, tọa độ, orientation và màn hình hẹp.
+- Không render board khi chỉ HUD/reward đổi; geometry/visual/build đạt.
+
+### Phase 8 — Di chuyển Link Connect
+
+**Thực hiện**
+
+- Link dùng Game Shell/HUD/layout/effect contracts.
+- Giữ renderer `instanceId`, pathfinder, shift, băng, thẻ cao cấp và chống kẹt riêng.
+- Xóa markup/CSS HUD dựng thủ công trong controller khi adapter ổn định.
+
+**Gate và rủi ro**
+
+- Sáu mode, board nhỏ/lớn/6 cột, level 1–28+ và mọi hướng dịch chuyển.
+- Có/không đặc biệt, nhiều băng, mở băng cuối, hết nước đi, shuffle và thunder.
+- Timer/combo/mốc/tooltips/coin/reward; đổi game giữa path/effect.
+- Patch metrics không xấu hơn baseline; không full render ngoài tạo board mới.
+- Shell chỉ cấp mount/layout, không sở hữu tile hoặc path.
+
+### Phase 9 — Xóa tương thích tạm và khóa contract
+
+**Thực hiện**
+
+- Xóa selector, helper, markup, token và adapter tạm không còn người dùng.
+- Kiểm import chết, duplicate ID, selector không khớp và hard-code bị cấm.
+- Thêm visual snapshots ổn định cho bốn viewport; chỉ cập nhật khi có review.
+- Cập nhật tài liệu và checklist “Add a game” cho Triple/game 4–5.
+
+**Gate cuối**
+
+- `npm run check`, geometry, visual tests và production build đạt.
+- Worktree sạch; không TODO tạm, code chết hoặc compatibility layer vô chủ.
+- Bundle, DOM, layout pass và cleanup đạt ngân sách.
+- Chơi thử trên ít nhất một mobile thật trước khi khóa phiên bản.
+
+## 7. Chiến lược commit và hoàn tác
+
+1. `test: add opt-in game shell geometry checks`
+2. `refactor: centralize game shell tokens and config`
+3. `refactor: add shared game shell layout engine`
+4. `refactor: add game shell lifecycle and DOM contract`
+5. `refactor: share game hud components`
+6. `refactor: consolidate gameplay motion effects`
+7. `refactor: migrate memory match to game shell`
+8. `refactor: migrate link connect to game shell`
+9. `test: lock game shell contracts and visual baselines`
+
+Nếu gate thất bại, sửa trong commit phase hiện tại hoặc hoàn tác đúng commit đó; không chồng phase sau lên lỗi chưa xử lý.
+
+## 8. Điều kiện phải hỏi lại người dùng
+
+Dừng phase và hỏi trước khi:
+
+- Một khác biệt giao diện không xác định được là lỗi hay chủ ý.
+- Cần đổi luật, kinh tế, dữ liệu lưu hoặc trải nghiệm người chơi.
+- Baseline mới khác hình ảnh đã duyệt quá 1px ở component chuẩn.
+- Cần dependency runtime, bundle vượt ngân sách hoặc đổi hỗ trợ trình duyệt.
+- Phải bỏ hiệu ứng/tính năng để đạt hiệu suất.
+- Test mobile thật khác mô phỏng Chromium.
+
+## 9. Cách bắt đầu ở chat mới
+
+Chat mới đọc theo thứ tự:
+
+1. `CONTEXT.md`
+2. `ARCHITECTURE.md`
+3. `GAME_SHELL_PLAN.md`
+4. `Memory Match.md` và `Link Connect.md` khi tới phase tương ứng
+
+Sau đó bắt đầu từ phase chưa hoàn tất gần nhất, kiểm tra commit/worktree trước khi sửa và không tự động triển khai Triple Connect.
