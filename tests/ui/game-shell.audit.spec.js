@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
-import { writeFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
+
+const preservationBaseline = JSON.parse(await readFile(new URL("./baselines/phase1-measurements.json", import.meta.url), "utf8"));
 
 // Review candidates only: never update an approved golden image implicitly.
 for (const [id, title, root, board] of [
@@ -78,6 +80,18 @@ for (const [id, title, root, board] of [
       };
     }, { root, board });
     expect(metrics.animationsRunning).toBe(0);
+    const baseline = preservationBaseline.samples.find(sample => sample.case ===
+      `game-shell.audit-${title.replaceAll(" ", "-")}-controlled-Phase-1-audit-${testInfo.project.name}`);
+    expect(baseline, "Every viewport/game must have a preservation baseline").toBeTruthy();
+    expect(metrics.regions.map(region => region.selector)).toEqual(baseline.metrics.regions.map(region => region.selector));
+    metrics.regions.forEach((region, index) => {
+      for (const dimension of ["x", "y", "width", "height"]) {
+        expect(Math.abs(region[dimension] - baseline.metrics.regions[index][dimension]),
+          `${region.selector}.${dimension} must stay within 1px`).toBeLessThanOrEqual(1);
+      }
+    });
+    expect(metrics.shellElementsExcludingBoard).toBe(baseline.metrics.shellElementsExcludingBoard);
+    expect(metrics.boardElements).toBe(baseline.metrics.boardElements);
     const cdp = await page.context().newCDPSession(page);
     await cdp.send("HeapProfiler.collectGarbage");
     metrics.documentCounters = await cdp.send("Memory.getDOMCounters");

@@ -7,6 +7,10 @@ const viewports = {
   landscape: { width: 844, height: 390 },
 };
 
+const testPort = Number(process.env.GAME_SHELL_TEST_PORT || 4173);
+if (!Number.isInteger(testPort) || testPort < 1024 || testPort > 65535) throw new Error("Invalid GAME_SHELL_TEST_PORT");
+const baseURL = `http://127.0.0.1:${testPort}`;
+
 export default defineConfig({
   testDir: "./tests/ui",
   outputDir: "test-results",
@@ -16,7 +20,7 @@ export default defineConfig({
   reporter: [["list"]],
   expect: { timeout: 5000 },
   use: {
-    baseURL: "http://127.0.0.1:4173",
+    baseURL,
     browserName: "chromium",
     headless: true,
     locale: "vi-VN",
@@ -28,9 +32,9 @@ export default defineConfig({
   },
   projects: Object.entries(viewports).map(([name, viewport]) => ({ name, use: { viewport } })),
   webServer: {
-    command: "npm run dev",
-    url: "http://127.0.0.1:4173",
-    reuseExistingServer: true,
+    command: `npm run dev -- --host 127.0.0.1 --port ${testPort} --strictPort`,
+    url: baseURL,
+    reuseExistingServer: !process.env.GAME_SHELL_TEST_PORT,
     timeout: 30000,
     stdout: "ignore",
     stderr: "pipe",

@@ -5,12 +5,11 @@ import { getCardBackClass } from "./appearance.js";
 import { initLogic } from "./logic.js";
 import { getEquippedThemeId } from "./appearance.js";
 import { getThemeCards } from "./themeCatalog.js";
+import { GAME_SHELL_DEFAULTS } from "./gameShell/gameShellConfig.js";
 
-const MOBILE_BREAKPOINT = 600;
 const MAX_TILE_SIZE = 180;
 const MIN_TILE_SIZE = 36;
 const COORDINATE_GUTTER_PX = 10;
-const DEFAULT_CONTENT_MAX_WIDTH_PX = 700;
 const BOARD_BOTTOM_INSET_PX = 8;
 let activeLayout = null;
 let resizeFrame = null;
@@ -55,19 +54,19 @@ function updateGridLayout() {
   const boardFrame = document.getElementById("grid-board-frame");
   if (!boardFrame) return;
 
-  const isPortraitMobile = window.innerWidth <= MOBILE_BREAKPOINT;
-  const isNarrowMobile = window.innerWidth <= 420;
+  const isPortraitMobile = window.innerWidth <= GAME_SHELL_DEFAULTS.breakpoints.mobile;
+  const isNarrowMobile = window.innerWidth <= GAME_SHELL_DEFAULTS.breakpoints.narrow;
   const columns = isPortraitMobile
     ? activeLayout.mobileColumns
     : activeLayout.columns;
   const rows = Math.ceil(activeLayout.tileCount / columns);
   const showCoordinates = Boolean(gameState.settings.boardCoordinates);
-  const gap = isNarrowMobile ? 4 : 6;
-  const padding = isNarrowMobile ? 6 : 8;
+  const gap = isNarrowMobile ? GAME_SHELL_DEFAULTS.board.narrowGap : GAME_SHELL_DEFAULTS.board.gap;
+  const padding = isNarrowMobile ? GAME_SHELL_DEFAULTS.board.narrowPadding : GAME_SHELL_DEFAULTS.board.padding;
   const gameContainer = document.getElementById("game-container");
   const contentMaxWidth = Number.parseFloat(
-    gameContainer ? getComputedStyle(gameContainer).getPropertyValue("--game-content-max-width") : "",
-  ) || DEFAULT_CONTENT_MAX_WIDTH_PX;
+    gameContainer ? getComputedStyle(gameContainer).getPropertyValue("--shell-layout-content-max-width") : "",
+  ) || GAME_SHELL_DEFAULTS.layout.contentMaxWidth;
   const availableWidth = Math.max(
     240,
     Math.min(

@@ -78,11 +78,6 @@
   animation: fadein 0.4s ease;
 }
 
-:root {
-  --game-content-max-width: 700px;
-  --game-layout-gap: 10px;
-}
-
 .hint-timer-indicator {
   display: inline-flex;
   align-items: center;
@@ -172,10 +167,10 @@
 .game-hud.has-timer-progress::after {
   content: "";
   position: absolute;
-  right: 6px;
-  bottom: -8px;
-  left: 6px;
-  height: 3px;
+  right: var(--shell-hud-timer-inset);
+  bottom: calc(-1 * var(--shell-hud-timer-offset));
+  left: var(--shell-hud-timer-inset);
+  height: var(--shell-hud-timer-height);
   border-radius: 999px;
   background: linear-gradient(90deg, #8fe9ff, #b9b0ff);
   box-shadow: 0 0 5px rgb(119 222 255 / 62%);

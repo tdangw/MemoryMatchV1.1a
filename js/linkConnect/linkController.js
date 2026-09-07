@@ -301,7 +301,7 @@ function showLinkGame() {
   if (!container) {
     container = document.createElement("section");
     container.id = "link-connect-container";
-    container.className = "link-connect-game";
+    container.className = "link-connect-game game-shell-tokens";
     container.innerHTML = `
       <div id="link-game-logo" class="link-game-name game-name">Link Connect</div>
       <div class="link-game-progress-hud game-progress-hud" aria-label="Tiến trình màn chơi">

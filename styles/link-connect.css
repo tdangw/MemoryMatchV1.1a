@@ -2,13 +2,13 @@
   --link-ink: #eff8ff;
   --link-panel: rgb(7 23 49 / 72%);
   --link-line: rgb(146 219 255 / 18%);
-  --link-content-max-width: var(--game-content-max-width, 700px);
+  --link-content-max-width: var(--shell-layout-content-max-width);
   --link-board-safe-inset: clamp(4px, 1vw, 8px);
   min-height: 100dvh;
   display: grid;
   grid-template-rows: auto auto auto auto minmax(0, 1fr);
-  gap: var(--game-layout-gap, 10px);
-  padding: max(14px, env(safe-area-inset-top)) 14px max(16px, env(safe-area-inset-bottom));
+  gap: var(--shell-layout-gap);
+  padding: var(--shell-safe-top) 14px var(--shell-safe-bottom);
   box-sizing: border-box;
   color: var(--link-ink);
   background:
@@ -97,8 +97,8 @@
   grid-template-columns: repeat(var(--link-columns), var(--link-tile-size));
   grid-auto-rows: var(--link-tile-size);
   justify-content: center;
-  gap: 6px;
-  padding: 8px;
+  gap: var(--shell-active-board-gap);
+  padding: var(--shell-active-board-padding);
   box-sizing: border-box;
   border: 1px solid rgb(102 229 255 / 25%);
   border-radius: 19px;
@@ -564,7 +564,7 @@
 
 @media screen and (width <= 420px) {
   .link-connect-game { gap: 9px; padding-inline: 9px; }
-  .link-board { gap: 4px; padding: 6px; border-radius: 14px; }
+  .link-board { border-radius: 14px; }
   .link-tile { border-radius: 8px; }
 }
 
@@ -659,7 +659,7 @@
   line-height: 1;
   text-shadow: 0 1px 1px rgb(0 0 0 / 42%);
   transform: translateX(-50%);
-  transition: color 180ms ease-out, filter 180ms ease-out, transform 180ms ease-out;
+  transition: color var(--shell-motion-star) ease-out, filter var(--shell-motion-star) ease-out, transform var(--shell-motion-star) ease-out;
 }
 
 .link-game-progress-hud .stat-star-progress .star-progress__milestone:nth-child(1) { left: 48%; }
@@ -687,7 +687,7 @@
   border-radius: inherit;
   background: linear-gradient(90deg, #36d9e7, #79f2ff);
   box-shadow: 0 0 6px rgb(80 231 255 / 72%);
-  transition: width 240ms ease-out;
+  transition: width var(--shell-motion-star-fill) ease-out;
 }
 
 .link-game-progress-hud .stat-misses,
@@ -726,16 +726,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: min(700px, calc(100vw - 12px));
-  min-height: 34px;
-  padding: 0 74px;
+  width: min(var(--shell-layout-content-max-width), calc(100vw - 12px));
+  min-height: var(--shell-hud-min-height);
+  padding: 0 var(--shell-hud-side-padding);
   margin: 0 auto 8px;
   box-sizing: border-box;
-  border-radius: 9px;
+  border-radius: var(--shell-hud-radius);
   background: linear-gradient(100deg, #182942, #243b64);
   box-shadow: 0 6px 16px rgb(0 0 0 / 28%);
   overflow: visible;
-  z-index: 5000;
+  z-index: var(--shell-layers-hud);
 }
 
 .link-game-hud .game-stats {
@@ -769,7 +769,7 @@
 .link-game-hud .game-menu-toggle { top: 50%; left: 0; transform: translateY(-50%); }
 .link-game-hud .game-menu-toggle:hover,
 .link-game-hud .game-menu-toggle[aria-expanded="true"] { transform: translateY(-50%); }
-.link-game-hud .game-actions-menu { top: calc(100% + 6px); left: 8px; z-index: 6000; }
+.link-game-hud .game-actions-menu { top: calc(100% + var(--shell-hud-menu-offset)); left: 8px; z-index: var(--shell-layers-menu); }
 
 .link-star-total {
   display: inline-flex;
@@ -807,9 +807,9 @@
 
 .link-tools-menu {
   position: absolute;
-  top: calc(100% + 6px);
+  top: calc(100% + var(--shell-hud-menu-offset));
   right: 0;
-  z-index: 6000;
+  z-index: var(--shell-layers-menu);
   width: min(204px, calc(100vw - 18px));
   padding: 5px;
   border: 1px solid rgb(255 255 255 / 32%);
@@ -822,7 +822,7 @@
 
 .link-tool-list .link-connect-game__item {
   display: grid;
-  min-height: 34px;
+  min-height: var(--shell-hud-min-height);
   grid-template-columns: 19px minmax(0, 1fr) 19px;
   align-items: center;
   gap: 7px;
@@ -847,13 +847,13 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  width: min(260px, calc(100vw - 28px));
-  min-height: 19px;
+  width: min(var(--shell-milestones-width), calc(100vw - 28px));
+  min-height: var(--shell-milestones-track-height);
   margin: -6px auto 0;
   padding: 0;
   box-sizing: border-box;
   border: 1px solid rgb(185 213 255 / 24%);
-  border-radius: 9px;
+  border-radius: var(--shell-hud-radius);
   background: rgb(106 151 211 / 45%);
 }
 
@@ -986,12 +986,12 @@
   to { transform: scaleX(0); }
 }
 
-.link-special-hud__milestones { position: relative; display: block; flex: 1; min-width: 0; height: 19px; }
+.link-special-hud__milestones { position: relative; display: block; flex: 1; min-width: 0; height: var(--shell-milestones-track-height); }
 .link-special-hud__milestones::before,
-.link-special-hud__milestones::after { content: ""; position: absolute; inset: 50% 5% auto; height: 2px; border-radius: 999px; transform: translateY(-50%); }
+.link-special-hud__milestones::after { content: ""; position: absolute; inset: 50% 5% auto; height: var(--shell-milestones-rail-height); border-radius: 999px; transform: translateY(-50%); }
 .link-special-hud__milestones::before { background: rgb(185 213 255 / 26%); }
-.link-special-hud__milestones::after { background: linear-gradient(90deg, #36d9e7, #79f2ff); box-shadow: 0 0 6px rgb(80 231 255 / 72%); transform: translateY(-50%) scaleX(var(--link-special-progress, 0)); transform-origin: left center; transition: transform 260ms ease-out; }
-.link-special-hud__milestones span { position: absolute; z-index: 1; top: 2px; left: var(--link-milestone-position); display: grid; width: 15px; height: 15px; place-items: center; border: 1px solid rgb(185 213 255 / 38%); border-radius: 50%; background: #182942; color: #b9d5ff; font-size: 0.5rem; transform: translateX(-50%); transition: background 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease; }
+.link-special-hud__milestones::after { background: linear-gradient(90deg, #36d9e7, #79f2ff); box-shadow: 0 0 6px rgb(80 231 255 / 72%); transform: translateY(-50%) scaleX(var(--link-special-progress, 0)); transform-origin: left center; transition: transform var(--shell-motion-milestone-fill) ease-out; }
+.link-special-hud__milestones span { position: absolute; z-index: 1; top: 2px; left: var(--link-milestone-position); display: grid; width: var(--shell-milestones-marker-size); height: var(--shell-milestones-marker-size); place-items: center; border: 1px solid rgb(185 213 255 / 38%); border-radius: 50%; background: #182942; color: #b9d5ff; font-size: 0.5rem; transform: translateX(-50%); transition: background var(--shell-motion-milestone-state) ease, border-color var(--shell-motion-milestone-state) ease, color var(--shell-motion-milestone-state) ease, transform var(--shell-motion-milestone-state) ease; }
 .link-special-hud__milestones span.is-earned { transform: translateX(-50%) scale(1.08); }
 .link-special-hud__milestones span.is-earned { border-color: #ffd166; background: #a86f00; color: #fff8dd; }
 .link-special-hud__milestones span.is-next { border-color: #7ceeff; color: #7ceeff; box-shadow: 0 0 0 2px rgb(124 238 255 / 16%); }
@@ -1002,12 +1002,12 @@
   .link-game-progress-hud .info { min-height: 24px; padding: 2px 4px; font-size: 0.66rem; }
   .link-game-progress-hud .info.stat-star-progress { min-height: 24px; padding: 3px 4px; }
   .link-game-progress-hud .stat-label { font-size: 0.45rem; }
-  .link-game-hud.game-hud { min-height: 30px; padding: 0 104px; margin-bottom: 6px; }
+  .link-game-hud.game-hud { min-height: var(--shell-hud-mobile-min-height); padding: 0 var(--shell-hud-mobile-side-padding); margin-bottom: 6px; }
   .link-game-hud .game-stats { gap: 4px; }
   .link-game-hud .stat-card { min-height: 26px; padding: 2px 4px; font-size: 0.68rem; }
   .link-game-hud .stat-label { font-size: 0.46rem; }
   .link-tools-toggle { width: 30px; height: 30px; border-radius: 8px; }
   .link-tools-toggle .ui-icon { width: 17px; height: 17px; }
-  .link-special-hud { width: min(220px, calc(100vw - 96px)); min-height: 19px; }
-  .link-special-hud__milestones span { width: 15px; height: 15px; font-size: 0.5rem; }
+  .link-special-hud { width: min(var(--shell-milestones-mobile-width), calc(100vw - 96px)); min-height: var(--shell-milestones-track-height); }
+  .link-special-hud__milestones span { width: var(--shell-milestones-marker-size); height: var(--shell-milestones-marker-size); font-size: 0.5rem; }
 }

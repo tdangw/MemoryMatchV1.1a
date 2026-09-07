@@ -29,9 +29,9 @@
   align-items: center;
   justify-content: center;
   width: min(var(--board-width, 100%), calc(100vw - 12px));
-  min-height: 34px;
+  min-height: var(--shell-hud-min-height);
   max-width: none;
-  padding: 0 74px;
+  padding: 0 var(--shell-hud-side-padding);
   margin: 0 auto 8px;
   box-sizing: border-box;
   border-radius: 9px;
@@ -39,7 +39,7 @@
   box-shadow: 0 6px 16px rgb(0 0 0 / 28%);
   position: relative;
   overflow: visible;
-  z-index: 5000;
+  z-index: var(--shell-layers-hud);
 }
 
 /* HUD tiến trình: nằm giữa tên game và thanh thao tác. */
@@ -153,7 +153,7 @@
   line-height: 1;
   text-shadow: 0 1px 1px rgb(0 0 0 / 42%);
   transform: translateX(-50%);
-  transition: color 180ms ease-out, filter 180ms ease-out, transform 180ms ease-out;
+  transition: color var(--shell-motion-star) ease-out, filter var(--shell-motion-star) ease-out, transform var(--shell-motion-star) ease-out;
 }
 
 .star-progress__milestone:nth-child(1) {
@@ -193,7 +193,7 @@
   border-radius: inherit;
   background: linear-gradient(90deg, #36d9e7, #79f2ff);
   box-shadow: 0 0 6px rgb(80 231 255 / 72%);
-  transition: width 240ms ease-out;
+  transition: width var(--shell-motion-star-fill) ease-out;
 }
 .game-progress-hud .stat-progress .ui-icon {
   color: #ffd166;
@@ -242,9 +242,9 @@
 }
 
 #game-title.game-hud .game-actions-menu {
-  top: calc(100% + 6px);
+  top: calc(100% + var(--shell-hud-menu-offset));
   left: 8px;
-  z-index: 6000;
+  z-index: var(--shell-layers-menu);
 }
 
 .memory-special-hud {
@@ -252,13 +252,13 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  width: min(260px, calc(100vw - 28px));
-  min-height: 19px;
+  width: min(var(--shell-milestones-width), calc(100vw - 28px));
+  min-height: var(--shell-milestones-track-height);
   margin: -6px auto 0;
   padding: 0;
   box-sizing: border-box;
   border: 1px solid rgb(185 213 255 / 24%);
-  border-radius: 9px;
+  border-radius: var(--shell-hud-radius);
   background: rgb(106 151 211 / 45%);
 }
 .memory-special-hud__coins {
@@ -286,13 +286,13 @@
   display: block;
   flex: 1;
   min-width: 0;
-  height: 19px;
+  height: var(--shell-milestones-track-height);
 }
 .memory-special-hud__milestones::before,
-.memory-special-hud__milestones::after { content: ""; position: absolute; inset: 50% 5% auto; height: 2px; border-radius: 999px; transform: translateY(-50%); }
+.memory-special-hud__milestones::after { content: ""; position: absolute; inset: 50% 5% auto; height: var(--shell-milestones-rail-height); border-radius: 999px; transform: translateY(-50%); }
 .memory-special-hud__milestones::before { background: rgb(185 213 255 / 26%); }
-.memory-special-hud__milestones::after { background: linear-gradient(90deg, #36d9e7, #79f2ff); transform: translateY(-50%) scaleX(var(--memory-special-progress, 0)); transform-origin: left; transition: transform 260ms ease-out; }
-.memory-special-hud__milestones > span { position: absolute; z-index: 1; top: 2px; left: var(--memory-milestone-position); display: grid; width: 15px; height: 15px; place-items: center; border: 1px solid rgb(185 213 255 / 38%); border-radius: 50%; background: #182942; color: #b9d5ff; font-size: .5rem; transform: translateX(-50%); }
+.memory-special-hud__milestones::after { background: linear-gradient(90deg, #36d9e7, #79f2ff); transform: translateY(-50%) scaleX(var(--memory-special-progress, 0)); transform-origin: left; transition: transform var(--shell-motion-milestone-fill) ease-out; }
+.memory-special-hud__milestones > span { position: absolute; z-index: 1; top: 2px; left: var(--memory-milestone-position); display: grid; width: var(--shell-milestones-marker-size); height: var(--shell-milestones-marker-size); place-items: center; border: 1px solid rgb(185 213 255 / 38%); border-radius: 50%; background: #182942; color: #b9d5ff; font-size: .5rem; transform: translateX(-50%); }
 .memory-special-hud__milestones > span.is-earned { border-color: #ffd166; background: #a86f00; color: #fff8dd; transform: translateX(-50%) scale(1.08); }
 .memory-special-hud__milestones > span.is-next { border-color: #7ceeff; color: #7ceeff; }
 
@@ -327,14 +327,14 @@
   }
 
   #game-title.game-hud {
-    min-height: 30px;
-    padding: 0 104px;
+    min-height: var(--shell-hud-mobile-min-height);
+    padding: 0 var(--shell-hud-mobile-side-padding);
     margin-bottom: 6px;
   }
 
   .memory-special-hud {
-    width: min(220px, calc(100vw - 96px));
-    min-height: 19px;
+    width: min(var(--shell-milestones-mobile-width), calc(100vw - 96px));
+    min-height: var(--shell-milestones-track-height);
   }
 
   #game-title.game-hud .game-stats {
@@ -358,8 +358,8 @@
   }
 
   #game-title.game-hud {
-    min-height: 34px;
-    padding: 0 74px;
+    min-height: var(--shell-hud-min-height);
+    padding: 0 var(--shell-hud-side-padding);
     margin-bottom: 4px;
   }
 
@@ -631,7 +631,7 @@
 
 /* Cụm chỉ số theo từng màn chơi */
 #game-title.game-hud .game-stats .stat-card {
-  min-height: 34px;
+  min-height: var(--shell-hud-min-height);
   padding: 3px 6px;
   box-sizing: border-box;
   border: 1px solid rgb(36 59 100 / 8%);
@@ -681,7 +681,7 @@
 
 @media screen and (width <= 600px) {
   #game-title.game-hud .game-stats .stat-card {
-    min-height: 30px;
+    min-height: var(--shell-hud-mobile-min-height);
     padding: 2px 4px;
     border-radius: 9px;
     font-size: 0.68rem;

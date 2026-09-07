@@ -159,6 +159,14 @@ Override không thuộc schema phải gây lỗi trong development. Production d
 
 ### Phase 2 — Token và schema cấu hình chung
 
+**Trạng thái: hoàn tất ngày 2026-09-07.**
+
+- `js/gameShell/gameShellConfig.js` là nguồn schema/defaults/normalize/allowlist; token CSS sinh tự động, không có dependency runtime mới.
+- Đã chuyển nhóm width/gap/height/radius/safe-area/layer/motion và board spacing responsive; giữ nguyên selector và hình học. Media query/thuật toán layout cũ chưa di chuyển thuộc Phase 3/7/8.
+- `npm run check`, build và 20/20 UI tests đạt (geometry, audit baseline, CSS override theo root trên bốn viewport). Bundle CSS+JS gzip tăng khoảng 1.04 kB so với baseline, dưới 5 kB; bao gồm phần victory task khác commit độc lập.
+- Chi tiết hợp đồng, giới hạn override hiện tại, kiểm chứng và cách chạy server test riêng: `GAME_SHELL_PHASE2.md`.
+- Bước tiếp theo: Phase 3. Vẫn ưu tiên mobile dọc; chưa triển khai Triple Connect.
+
 **Thực hiện**
 
 - Tách token width, gap, height, radius, breakpoint, safe-area, z-index và motion.
