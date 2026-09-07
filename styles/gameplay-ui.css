@@ -78,6 +78,11 @@
   animation: fadein 0.4s ease;
 }
 
+:root {
+  --game-content-max-width: 700px;
+  --game-layout-gap: 10px;
+}
+
 .hint-timer-indicator {
   display: inline-flex;
   align-items: center;

@@ -10,6 +10,8 @@ const MOBILE_BREAKPOINT = 600;
 const MAX_TILE_SIZE = 180;
 const MIN_TILE_SIZE = 36;
 const COORDINATE_GUTTER_PX = 10;
+const DEFAULT_CONTENT_MAX_WIDTH_PX = 700;
+const BOARD_BOTTOM_INSET_PX = 8;
 let activeLayout = null;
 let resizeFrame = null;
 let renderedCoordinateShape = "";
@@ -50,26 +52,34 @@ function updateGridLayout() {
 
   const gridContainer = document.getElementById("grid-container");
   if (!gridContainer) return;
+  const boardFrame = document.getElementById("grid-board-frame");
+  if (!boardFrame) return;
 
   const isPortraitMobile = window.innerWidth <= MOBILE_BREAKPOINT;
-  const isCompactViewport = isPortraitMobile || window.innerHeight <= 500;
+  const isNarrowMobile = window.innerWidth <= 420;
   const columns = isPortraitMobile
     ? activeLayout.mobileColumns
     : activeLayout.columns;
   const rows = Math.ceil(activeLayout.tileCount / columns);
   const showCoordinates = Boolean(gameState.settings.boardCoordinates);
-  const gap = isCompactViewport ? 1 : 3;
-  const padding = isCompactViewport ? 2 : 6;
-  const headerBottom =
-    document.getElementById("game-title")?.getBoundingClientRect().bottom || 0;
+  const gap = isNarrowMobile ? 4 : 6;
+  const padding = isNarrowMobile ? 6 : 8;
+  const gameContainer = document.getElementById("game-container");
+  const contentMaxWidth = Number.parseFloat(
+    gameContainer ? getComputedStyle(gameContainer).getPropertyValue("--game-content-max-width") : "",
+  ) || DEFAULT_CONTENT_MAX_WIDTH_PX;
   const availableWidth = Math.max(
     240,
-    (isCompactViewport ? window.innerWidth - 20 : window.innerWidth * 0.9)
-      - (showCoordinates ? COORDINATE_GUTTER_PX : 0),
+    Math.min(
+      contentMaxWidth,
+      (isPortraitMobile ? window.innerWidth - 20 : window.innerWidth * 0.9)
+        - (showCoordinates ? COORDINATE_GUTTER_PX : 0),
+    ),
   );
+  const boardTop = boardFrame.getBoundingClientRect().top;
   const availableHeight = Math.max(
     180,
-    window.innerHeight - headerBottom - 32
+    window.innerHeight - boardTop - BOARD_BOTTOM_INSET_PX
       - (showCoordinates ? COORDINATE_GUTTER_PX : 0),
   );
   const widthPerTile =
@@ -81,7 +91,6 @@ function updateGridLayout() {
     Math.floor(Math.min(widthPerTile, heightPerTile, MAX_TILE_SIZE)),
   );
   const boardWidth = tileSize * columns + gap * (columns - 1) + padding * 2;
-  const boardFrame = document.getElementById("grid-board-frame");
   const layoutVariables = [
     ["--grid-columns", columns],
     ["--grid-rows", rows],

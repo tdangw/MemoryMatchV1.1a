@@ -55,8 +55,9 @@ Thử thách bắt đầu với 60 giây. Khi qua màn, thời gian còn lại �
   - Điểm chuyển mobile: 600 px.
   - Kích thước thẻ tối thiểu: 36 px.
   - Kích thước thẻ tối đa: 180 px.
-  - Khoảng cách thẻ: 1 px ở màn hình gọn, 3 px ở màn hình lớn.
-- HUD nhận chiều rộng từ bàn; thanh thời gian 3px được tích hợp trực tiếp dưới HUD và dùng chung kiểu hiển thị với Link Connect.
+  - Khoảng cách thẻ: 4 px ở màn hình hẹp, 6 px ở màn hình lớn.
+- HUD nhận chiều rộng từ bàn; toàn bộ cụm đầu màn dùng cùng chiều rộng tối đa 700px và nhịp dọc 10px với Link Connect.
+- Bàn dùng cùng khoảng cách thẻ 6px, padding 8px; trên màn hình hẹp dùng 4px và 6px. Chiều cao thẻ được tính từ vị trí thật của board để không tràn đáy.
 - Tùy chọn tọa độ bàn thêm nhãn cột/hàng nhưng không thay đổi luật ghép.
 
 ## 4. Điểm, sao và Xu
@@ -249,7 +250,7 @@ Ba luồng phải được hiểu tách biệt:
 
 - HUD tiến trình trên cùng hiển thị Moves, Miss, Combo, sao màn, Điểm, số cặp và Gợi ý.
 - HUD menu hiển thị level, timer, tổng sao; thanh thời gian 3px nằm liền dưới HUD, thụt hai mép 6px giống Link Connect và không chặn thao tác với thanh mốc.
-- Thanh mốc cách HUD và bàn theo cùng nhịp dọc của Link Connect; rê chuột hoặc nhấn giữ từng mốc để xem phần thưởng.
+- Thanh mốc cách HUD và bàn theo cùng nhịp dọc 10px của Link Connect; rê chuột hoặc nhấn giữ từng mốc để xem phần thưởng.
 - Thanh thời gian đổi màu theo tỷ lệ còn lại:
   - Bình thường từ 70% trở lên.
   - Cảnh báo từ 30% đến dưới 70%.

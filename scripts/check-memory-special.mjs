@@ -40,6 +40,9 @@ const hudCss = readFileSync(new URL("../styles/hud.css", import.meta.url), "utf8
 const gameplayUiCss = readFileSync(new URL("../styles/gameplay-ui.css", import.meta.url), "utf8");
 const tooltipJs = readFileSync(new URL("../js/tooltips.js", import.meta.url), "utf8");
 const indexHtml = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+const gridJs = readFileSync(new URL("../js/grid.js", import.meta.url), "utf8");
+const baseCss = readFileSync(new URL("../style.css", import.meta.url), "utf8");
+const linkCss = readFileSync(new URL("../styles/link-connect.css", import.meta.url), "utf8");
 assert.doesNotMatch(
   hudCss,
   /\.game-quick-action\s*\{[^}]*position:\s*relative/s,
@@ -52,8 +55,11 @@ assert.match(
   /\.game-hud\.has-timer-progress::after\s*\{[^}]*height:\s*3px/s,
   "games must share the compact 3px HUD timer bar",
 );
-assert.match(hudCss, /\.memory-special-hud\s*\{[^}]*margin:\s*4px auto 0/s, "Memory milestones must clear the HUD timer");
-assert.match(hudCss, /#grid-board-frame\s*\{[^}]*margin-top:\s*10px/s, "Memory board must keep the same post-milestone gap as Link");
+assert.match(hudCss, /\.memory-special-hud\s*\{[^}]*margin:\s*-6px auto 0/s, "Memory milestones must use the same grid-gap compensation as Link");
 assert.match(tooltipJs, /\.memory-special-hud__milestones span/, "Memory milestone rewards must be reachable by tooltip");
+assert.match(baseCss, /#game-container\s*\{[^}]*gap:\s*var\(--game-layout-gap/s, "Memory must use the shared HUD/board row gap");
+assert.match(linkCss, /gap:\s*var\(--game-layout-gap/s, "Link must use the shared HUD/board row gap");
+assert.match(gridJs, /const gap = isNarrowMobile \? 4 : 6;/, "Memory card gap must match Link");
+assert.match(gridJs, /const padding = isNarrowMobile \? 6 : 8;/, "Memory board padding must match Link");
 
 console.log("Memory special rewards and inventory checks passed.");

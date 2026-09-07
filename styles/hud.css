@@ -254,8 +254,7 @@
   align-items: center;
   width: min(260px, calc(100vw - 28px));
   min-height: 19px;
-  /* Link Connect có grid gap 10px và margin -6px: khoảng cách hiệu dụng 4px. */
-  margin: 4px auto 0;
+  margin: -6px auto 0;
   padding: 0;
   box-sizing: border-box;
   border: 1px solid rgb(185 213 255 / 24%);
@@ -296,11 +295,6 @@
 .memory-special-hud__milestones > span { position: absolute; z-index: 1; top: 2px; left: var(--memory-milestone-position); display: grid; width: 15px; height: 15px; place-items: center; border: 1px solid rgb(185 213 255 / 38%); border-radius: 50%; background: #182942; color: #b9d5ff; font-size: .5rem; transform: translateX(-50%); }
 .memory-special-hud__milestones > span.is-earned { border-color: #ffd166; background: #a86f00; color: #fff8dd; transform: translateX(-50%) scale(1.08); }
 .memory-special-hud__milestones > span.is-next { border-color: #7ceeff; color: #7ceeff; }
-
-/* Giữ nhịp 10px từ thanh mốc tới bàn giống layout Link Connect. */
-#grid-board-frame {
-  margin-top: 10px;
-}
 
 /* Thanh HUD dùng cùng nền xanh với menu chính. */
 #game-title.game-hud .game-stats .stat-card {
