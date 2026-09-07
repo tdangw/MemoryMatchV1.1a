@@ -760,37 +760,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-.link-game-hud.game-hud::after {
-  content: "";
-  position: absolute;
-  right: 6px;
-  bottom: -8px;
-  left: 6px;
-  height: 3px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #8fe9ff, #b9b0ff);
-  box-shadow: 0 0 5px rgb(119 222 255 / 62%);
-  opacity: 0;
-  transform: scaleX(var(--link-timer-progress, 0));
-  transform-origin: left center;
-  transition: opacity 160ms ease;
-  will-change: transform;
-}
-
-.link-game-hud.game-hud.has-timer-progress::after { opacity: 1; }
-.link-game-hud.game-hud.is-timer-warning::after {
-  background: linear-gradient(90deg, #f2bd3d, #ffd166);
-  box-shadow: 0 0 6px rgb(255 209 102 / 68%);
-}
-.link-game-hud.game-hud.is-timer-critical::after {
-  background: linear-gradient(90deg, #e04f5f, #ff8995);
-  box-shadow: 0 0 6px rgb(255 107 124 / 72%);
-}
-.link-game-hud.game-hud.is-timer-endless::after {
-  background: linear-gradient(90deg, #7c8da7, #b9d5ff);
-  box-shadow: none;
-}
-
 .link-game-hud .stat-label { color: #c7ddff; font-size: 0.5rem; font-weight: 600; }
 .link-game-hud .stat-score,
 .link-game-hud .stat-score .stat-label { color: #ffe09a; }

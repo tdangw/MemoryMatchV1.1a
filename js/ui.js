@@ -25,8 +25,7 @@ const levelElement = document.getElementById("level");
 const hintElement = document.getElementById("hint");
 const timerElement = document.getElementById("timer-value");
 const timerContainer = document.getElementById("timer");
-const memoryTimeHudElement = document.getElementById("memory-time-hud");
-const memoryTimeProgressElement = document.getElementById("memory-time-progress");
+const gameHudElement = document.getElementById("game-title");
 const memoryCoinHudElement = document.getElementById("memory-game-coins");
 const memoryCoinElement = document.getElementById("memory-coin-balance");
 let memoryTimeAnimationFrame = null;
@@ -105,16 +104,14 @@ export function updateMemorySpecialProgress(progress = gameState.specialProgress
 export function updateMemoryAssistInventoryDisplay() {
   const timeCount = getMemoryItemTotal("time");
   const previewCount = getMemoryItemTotal("preview");
-  updateAssistButton("btn-buy-time", "memory-time-item-count", "Kho thời gian", timeCount);
-  updateAssistButton("btn-preview-cards", "memory-preview-item-count", "Kho xem trước", previewCount);
+  updateAssistButton("btn-buy-time", "Thời gian", timeCount);
+  updateAssistButton("btn-preview-cards", "Xem trước", previewCount);
 }
 
-function updateAssistButton(buttonId, countId, label, count) {
+function updateAssistButton(buttonId, label, count) {
   const button = document.getElementById(buttonId);
-  const value = document.getElementById(countId);
-  if (value) value.textContent = String(count);
   if (button) {
-    const description = `${label}: ${count} vật phẩm`;
+    const description = `${label} · Đang có: ${count}`;
     button.setAttribute("aria-label", description);
     button.dataset.tooltip = description;
   }
@@ -242,12 +239,13 @@ function updateMemoryTimeProgressFrame(timestamp = performance.now()) {
 }
 
 function renderMemoryTimeProgress(remainingMs, state) {
-  if (!memoryTimeHudElement || !memoryTimeProgressElement) return;
+  if (!gameHudElement) return;
   const ratio = state.endless ? 1 : Math.max(0, Math.min(1, remainingMs / state.timeLimitMs));
-  memoryTimeProgressElement.style.transform = `scaleX(${ratio.toFixed(4)})`;
-  memoryTimeHudElement.classList.toggle("is-warning", !state.endless && ratio < 0.7 && ratio >= 0.3);
-  memoryTimeHudElement.classList.toggle("is-critical", !state.endless && ratio < 0.3);
-  memoryTimeHudElement.classList.toggle("is-endless", state.endless);
+  gameHudElement.style.setProperty("--game-timer-progress", ratio.toFixed(4));
+  gameHudElement.classList.add("has-timer-progress");
+  gameHudElement.classList.toggle("is-timer-warning", !state.endless && ratio < 0.7 && ratio >= 0.3);
+  gameHudElement.classList.toggle("is-timer-critical", !state.endless && ratio < 0.3);
+  gameHudElement.classList.toggle("is-timer-endless", state.endless);
 }
 
 export function showBonusOverlay(message) {

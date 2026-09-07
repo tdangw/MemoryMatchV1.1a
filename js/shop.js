@@ -66,7 +66,7 @@ export function openQuickAssistOverlay(kind) {
     const label = document.createElement("strong");
     label.textContent = item.title;
     const quantity = document.createElement("span");
-    quantity.textContent = `Có ${count}`;
+    quantity.textContent = `Đang có: ${count}`;
     button.append(createIcon(item.icon), label, quantity);
     button.addEventListener("click", () => {
       if (!useMemoryAssistItem(item, roundId)) return;

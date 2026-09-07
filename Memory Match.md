@@ -56,7 +56,7 @@ Thử thách bắt đầu với 60 giây. Khi qua màn, thời gian còn lại �
   - Kích thước thẻ tối thiểu: 36 px.
   - Kích thước thẻ tối đa: 180 px.
   - Khoảng cách thẻ: 1 px ở màn hình gọn, 3 px ở màn hình lớn.
-- HUD, thanh thời gian và thanh năng lượng nhận cùng chiều rộng tính từ bàn.
+- HUD nhận chiều rộng từ bàn; thanh thời gian 3px được tích hợp trực tiếp dưới HUD và dùng chung kiểu hiển thị với Link Connect.
 - Tùy chọn tọa độ bàn thêm nhãn cột/hàng nhưng không thay đổi luật ghép.
 
 ## 4. Điểm, sao và Xu
@@ -159,6 +159,7 @@ Combo chỉ nối tiếp nếu cặp tiếp theo được ghép đúng trong c�
 - Mua gói Thời gian chỉ cộng vào kho.
 - Nút Thời gian trên HUD hiển thị tổng số gói và cho chọn loại để dùng.
 - Nút kho Thời gian được ẩn trong Vô tận.
+- Hai nút hỗ trợ nhanh chỉ hiển thị biểu tượng; số lượng nằm trong tooltip và từng lựa chọn trong kho theo mẫu `Đang có: x`.
 - Khi dùng, thời gian được cộng ngay vào đồng hồ và phiên hiện tại được lưu cùng số lượng kho mới.
 - Giới hạn thử nghiệm dùng chung cho mỗi loại vật phẩm và số Gợi ý là 999.
 
@@ -247,7 +248,7 @@ Ba luồng phải được hiểu tách biệt:
 ## 12. HUD và hiệu ứng
 
 - HUD tiến trình trên cùng hiển thị Moves, Miss, Combo, sao màn, Điểm, số cặp và Gợi ý.
-- HUD menu hiển thị level, timer, tổng sao; thanh thời gian nằm ngay dưới và đổi màu theo tỷ lệ còn lại:
+- HUD menu hiển thị level, timer, tổng sao; thanh thời gian 3px nằm liền dưới HUD, thụt hai mép 6px giống Link Connect và đổi màu theo tỷ lệ còn lại:
   - Bình thường từ 70% trở lên.
   - Cảnh báo từ 30% đến dưới 70%.
   - Nguy cấp dưới 30%.

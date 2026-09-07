@@ -101,9 +101,6 @@ function updateGridLayout() {
     .getElementById("game-progress-hud")
     ?.style.setProperty("--board-width", `${boardWidth + (showCoordinates ? COORDINATE_GUTTER_PX : 0)}px`);
   document
-    .getElementById("memory-time-hud")
-    ?.style.setProperty("--board-width", `${boardWidth + (showCoordinates ? COORDINATE_GUTTER_PX : 0)}px`);
-  document
     .getElementById("memory-special-hud")
     ?.style.setProperty("--board-width", `${boardWidth + (showCoordinates ? COORDINATE_GUTTER_PX : 0)}px`);
   boardFrame?.classList.toggle("is-coordinate-visible", showCoordinates);

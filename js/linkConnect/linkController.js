@@ -1032,7 +1032,7 @@ function renderLinkTimeProgress(remainingMs, state, hud = getLinkHudElements()) 
   const critical = countdown && progress < 0.3;
   const gameHud = hud.gameHud;
   if (!gameHud) return;
-  gameHud.style.setProperty("--link-timer-progress", String(progress));
+  gameHud.style.setProperty("--game-timer-progress", String(progress));
   const visualTone = state.endless ? "endless" : critical ? "critical" : warning ? "warning" : "normal";
   if (state.hudElement === gameHud && state.visualTone === visualTone) return;
   gameHud.classList.toggle("has-timer-progress", countdown || state.endless);

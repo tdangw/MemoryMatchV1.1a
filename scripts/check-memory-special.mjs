@@ -37,10 +37,19 @@ assert.equal(changeMemoryItemCount("preview4", -1), true);
 assert.equal(gameState.progress.memoryMatch.items.preview4, 1);
 
 const hudCss = readFileSync(new URL("../styles/hud.css", import.meta.url), "utf8");
+const gameplayUiCss = readFileSync(new URL("../styles/gameplay-ui.css", import.meta.url), "utf8");
+const indexHtml = readFileSync(new URL("../index.html", import.meta.url), "utf8");
 assert.doesNotMatch(
   hudCss,
   /\.game-quick-action\s*\{[^}]*position:\s*relative/s,
   "inventory badges must not override the absolute HUD tool positions",
+);
+assert.doesNotMatch(indexHtml, /memory-(?:time|preview)-item-count/, "quick tools must not show external inventory badges");
+assert.doesNotMatch(indexHtml, /id="memory-time-(?:hud|progress)"/, "Memory timer must be integrated into the main HUD");
+assert.match(
+  gameplayUiCss,
+  /\.game-hud\.has-timer-progress::after\s*\{[^}]*height:\s*3px/s,
+  "games must share the compact 3px HUD timer bar",
 );
 
 console.log("Memory special rewards and inventory checks passed.");

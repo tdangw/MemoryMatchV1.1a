@@ -247,36 +247,6 @@
   z-index: 6000;
 }
 
-/* Thanh thời gian cùng bề rộng bàn, đặt ngay dưới HUD chính của Memory Match. */
-#memory-time-hud {
-  width: min(var(--board-width, 100%), calc(100vw - 12px));
-  height: 7px;
-  margin: -3px auto 5px;
-  overflow: hidden;
-  box-sizing: border-box;
-  border: 1px solid rgb(185 213 255 / 34%);
-  border-radius: 999px;
-  background: rgb(4 35 61 / 74%);
-  box-shadow: inset 0 1px 2px rgb(0 0 0 / 38%);
-}
-
-#memory-time-progress {
-  display: block;
-  width: 100%;
-  height: 100%;
-  transform: scaleX(1);
-  transform-origin: left center;
-  will-change: transform;
-  border-radius: inherit;
-  background: linear-gradient(90deg, #36d9e7, #79f2ff);
-  box-shadow: 0 0 6px rgb(80 231 255 / 72%);
-  transition: background 180ms ease, box-shadow 180ms ease;
-}
-
-#memory-time-hud.is-warning #memory-time-progress { background: linear-gradient(90deg, #f2bd3d, #ffd166); box-shadow: 0 0 6px rgb(255 209 102 / 68%); }
-#memory-time-hud.is-critical #memory-time-progress { background: linear-gradient(90deg, #e04f5f, #ff8995); box-shadow: 0 0 6px rgb(255 107 124 / 72%); }
-#memory-time-hud.is-endless #memory-time-progress { background: linear-gradient(90deg, #7c8da7, #b9d5ff); box-shadow: none; }
-
 .memory-special-hud {
   position: relative;
   display: flex;
@@ -325,21 +295,6 @@
 .memory-special-hud__milestones > span { position: absolute; z-index: 1; top: 2px; left: var(--memory-milestone-position); display: grid; width: 15px; height: 15px; place-items: center; border: 1px solid rgb(185 213 255 / 38%); border-radius: 50%; background: #182942; color: #b9d5ff; font-size: .5rem; transform: translateX(-50%); }
 .memory-special-hud__milestones > span.is-earned { border-color: #ffd166; background: #a86f00; color: #fff8dd; transform: translateX(-50%) scale(1.08); }
 .memory-special-hud__milestones > span.is-next { border-color: #7ceeff; color: #7ceeff; }
-
-.game-quick-action > strong {
-  position: absolute;
-  right: -4px;
-  bottom: -4px;
-  display: grid;
-  min-width: 15px;
-  height: 15px;
-  padding: 0 3px;
-  place-items: center;
-  border-radius: 999px;
-  background: #f2bf5b;
-  color: #17243a;
-  font: 800 .55rem/1 "Segoe UI", sans-serif;
-}
 
 /* Thanh HUD dùng cùng nền xanh với menu chính. */
 #game-title.game-hud .game-stats .stat-card {

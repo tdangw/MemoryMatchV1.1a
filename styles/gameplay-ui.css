@@ -163,6 +163,38 @@
   height: 16px;
 }
 
+/* Thanh thời gian dùng chung cho HUD của các trò chơi. */
+.game-hud.has-timer-progress::after {
+  content: "";
+  position: absolute;
+  right: 6px;
+  bottom: -8px;
+  left: 6px;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #8fe9ff, #b9b0ff);
+  box-shadow: 0 0 5px rgb(119 222 255 / 62%);
+  opacity: 1;
+  transform: scaleX(var(--game-timer-progress, 0));
+  transform-origin: left center;
+  will-change: transform;
+}
+
+.game-hud.is-timer-warning::after {
+  background: linear-gradient(90deg, #f2bd3d, #ffd166);
+  box-shadow: 0 0 6px rgb(255 209 102 / 68%);
+}
+
+.game-hud.is-timer-critical::after {
+  background: linear-gradient(90deg, #e04f5f, #ff8995);
+  box-shadow: 0 0 6px rgb(255 107 124 / 72%);
+}
+
+.game-hud.is-timer-endless::after {
+  background: linear-gradient(90deg, #7c8da7, #b9d5ff);
+  box-shadow: none;
+}
+
 .game-hint-fab:hover,
 .game-hint-fab:focus-visible {
   background: #ffd166;
