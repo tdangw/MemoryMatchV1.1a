@@ -243,7 +243,8 @@ function updateMemoryTimeProgressFrame(timestamp = performance.now()) {
   if (!memoryTimeProgressState?.running || memoryTimeProgressState.endless) return;
   const elapsed = Math.max(0, timestamp - (memoryTimeProgressState.lastFrameAt ?? timestamp));
   memoryTimeProgressState.lastFrameAt = timestamp;
-  if (!gameState.isPaused && !gameState.isLocked) {
+  // Giữ timer bar đồng bộ với đồng hồ: animation xử lý thẻ không phải trạng thái pause.
+  if (!gameState.isPaused) {
     memoryTimeProgressState.remainingMs = Math.max(0, memoryTimeProgressState.remainingMs - elapsed);
   }
   renderMemoryTimeProgress(memoryTimeProgressState.remainingMs, memoryTimeProgressState);

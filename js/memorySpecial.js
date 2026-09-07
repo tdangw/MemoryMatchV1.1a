@@ -21,36 +21,48 @@ import { GAMEPLAY_LIMITS, GAMEPLAY_TIMING } from "./gameplayTuning.js";
 
 export function handleMemorySpecialMatch(source, roundId = gameState.roundId) {
   if (!source || gameState.roundId !== roundId) return;
-  const dropsEnergy = shouldDropMemoryEnergy(gameState.specialNoEnergyDropStreak);
+  const target = GAME_CONFIG.special.progressTarget;
+  const hasCollectionCapacity = gameState.specialProgress + gameState.pendingEnergyCollections < target;
+  const dropsEnergy = hasCollectionCapacity
+    && shouldDropMemoryEnergy(gameState.specialNoEnergyDropStreak);
   if (!dropsEnergy) {
-    gameState.specialNoEnergyDropStreak += 1;
-    persistMemoryRewards();
+    if (hasCollectionCapacity) {
+      gameState.specialNoEnergyDropStreak += 1;
+      persistMemoryRewards();
+    }
   } else {
     gameState.specialNoEnergyDropStreak = 0;
-    const target = GAME_CONFIG.special.progressTarget;
-    gameState.specialProgress = Math.min(target, gameState.specialProgress + 1);
-    const reachedProgress = gameState.specialProgress;
-    updateMemorySpecialProgress(reachedProgress);
+    gameState.pendingEnergyCollections += 1;
     persistMemoryRewards();
     playLootDrop(source, {
       icon: "energy",
       tier: "energy",
       target: document.getElementById("memory-special-milestones"),
+      onCollected: () => collectMemoryEnergy(source, roundId),
     });
-    resolveMemoryMilestoneRewards(reachedProgress).forEach((reward, index) => {
-      setTimeout(() => grantMemoryReward(reward, source, roundId), index * 130);
-    });
-    if (reachedProgress >= target) {
-      gameState.specialProgress = 0;
-      persistMemoryRewards();
-      setTimeout(() => {
-        if (gameState.roundId === roundId) updateMemorySpecialProgress(0);
-      }, 1200);
-    }
   }
 
   const supportReward = getMemorySupportDrop();
   if (supportReward) setTimeout(() => grantMemoryReward(supportReward, source, roundId), 180);
+}
+
+function collectMemoryEnergy(source, roundId) {
+  if (gameState.roundId !== roundId) return;
+  const target = GAME_CONFIG.special.progressTarget;
+  gameState.pendingEnergyCollections = Math.max(0, gameState.pendingEnergyCollections - 1);
+  gameState.specialProgress = Math.min(target, gameState.specialProgress + 1);
+  const reachedProgress = gameState.specialProgress;
+  updateMemorySpecialProgress(reachedProgress);
+  persistMemoryRewards();
+  resolveMemoryMilestoneRewards(reachedProgress).forEach((reward, index) => {
+    setTimeout(() => grantMemoryReward(reward, source, roundId), index * 130);
+  });
+  if (reachedProgress < target) return;
+  gameState.specialProgress = 0;
+  persistMemoryRewards();
+  setTimeout(() => {
+    if (gameState.roundId === roundId) updateMemorySpecialProgress(0);
+  }, 1200);
 }
 
 function grantMemoryReward(reward, source, roundId) {

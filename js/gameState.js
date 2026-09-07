@@ -20,6 +20,7 @@ export const gameState = {
   combo: 0,
   specialProgress: 0,
   specialNoEnergyDropStreak: 0,
+  pendingEnergyCollections: 0,
   matchedPairs: 0,
   totalPairs: GAME_CONFIG.modes.easy.tileCount / 2,
   isLocked: false,
@@ -181,6 +182,7 @@ function normalizeRange(value, fallback, minimum, maximum) {
 // Mỗi bàn chơi có mã riêng để timeout của bàn cũ không thể sửa UI bàn mới.
 export function beginRound() {
   gameState.roundId += 1;
+  gameState.pendingEnergyCollections = 0;
   gameState.isLocked = true;
   gameState.isPaused = false;
   gameState._timeRunningOutPlayed = false;
@@ -190,6 +192,7 @@ export function beginRound() {
 
 export function invalidateRound() {
   gameState.roundId += 1;
+  gameState.pendingEnergyCollections = 0;
   gameState.isLocked = true;
   gameState._timeRunningOutPlayed = false;
   gameState.luckyRewards.clear();
@@ -221,6 +224,7 @@ export function resetGame() {
   gameState.combo = 0;
   gameState.specialProgress = 0;
   gameState.specialNoEnergyDropStreak = 0;
+  gameState.pendingEnergyCollections = 0;
   gameState.matchedPairs = 0;
   gameState.totalPairs = GAME_CONFIG.modes.easy.tileCount / 2;
   gameState.remainingTime = remainingTime;

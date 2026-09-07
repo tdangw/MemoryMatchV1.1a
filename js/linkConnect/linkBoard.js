@@ -235,6 +235,12 @@ export function unlockAllFrozenLinkPairs(board, options) {
   return unlockFrozenLinkPairs(board, Number.POSITIVE_INFINITY, options);
 }
 
+export function unlockAllFrozenLinkPairsAndEnsurePlayable(board, options) {
+  const unlockedPairs = unlockAllFrozenLinkPairs(board, options);
+  const shuffled = unlockedPairs > 0 ? ensurePlayableBoard(board) : false;
+  return { unlockedPairs, shuffled };
+}
+
 export function makeRandomLinkPairSpecial(board, random = Math.random) {
   const pairs = getLinkPairs(board).filter((pair) => !pair.positions.every((position) => (
     getLinkBoardTile(board, position)?.special

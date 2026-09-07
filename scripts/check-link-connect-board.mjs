@@ -9,6 +9,7 @@ import {
   removeLinkBoardPair,
   removeRandomLinkPair,
   unlockAllFrozenLinkPairs,
+  unlockAllFrozenLinkPairsAndEnsurePlayable,
   unlockFrozenLinkPairs,
 } from "../js/linkConnect/linkBoard.js";
 import { hasAvailableConnection } from "../js/linkConnect/pathfinder.js";
@@ -99,6 +100,31 @@ const frozenOnlyBoard = {
 assert.equal(hasOnlyFrozenLinkTiles(frozenOnlyBoard), true);
 assert.equal(unlockAllFrozenLinkPairs(frozenOnlyBoard), 2);
 assert.equal(hasOnlyFrozenLinkTiles(frozenOnlyBoard), false);
+
+const blockedFrozenIds = ["a", "b", "c", "d", "b", "a", "e", "f", "c", "d", "f", "e"];
+const blockedFrozenBoard = {
+  rows: 3,
+  columns: 4,
+  grid: [
+    Array(6).fill(null),
+    ...Array.from({ length: 3 }, (_, row) => [
+      null,
+      ...blockedFrozenIds.slice(row * 4, row * 4 + 4).map((id, column) => ({
+        id,
+        instanceId: `blocked-${row}-${column}`,
+        frozen: true,
+      })),
+      null,
+    ]),
+    Array(6).fill(null),
+  ],
+};
+assert.equal(hasAvailableConnection(blockedFrozenBoard.grid), false);
+assert.deepEqual(
+  unlockAllFrozenLinkPairsAndEnsurePlayable(blockedFrozenBoard),
+  { unlockedPairs: 6, shuffled: true },
+);
+assert.equal(hasAvailableConnection(blockedFrozenBoard.grid), true);
 
 let challengeBoard;
 try {

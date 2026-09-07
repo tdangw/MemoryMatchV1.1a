@@ -153,7 +153,8 @@ function startCountdown(roundId = gameState.roundId) {
   syncDefaultMusic(gameState.settings);
   countdownInterval = setInterval(() => {
     if (gameState.roundId !== roundId) return stopCountdown();
-    if (gameState.isPaused || gameState.isLocked) return;
+    // Khóa thao tác chỉ bảo vệ lượt chọn/hiệu ứng; đồng hồ chỉ dừng khi game thật sự pause.
+    if (gameState.isPaused) return;
 
     const direction = getTimerDirection(gameState.settings.mode);
     gameState.remainingTime += direction === "up" ? 1 : -1;

@@ -55,7 +55,7 @@ import {
   removeRandomLinkPair,
   shuffleLinkBoard,
   unlockFrozenLinkPairs,
-  unlockAllFrozenLinkPairs,
+  unlockAllFrozenLinkPairsAndEnsurePlayable,
 } from "./linkBoard.js";
 import { findAvailableConnections, findConnectionPath } from "./pathfinder.js";
 import { consumeLinkItem, getLinkItemCount, grantLinkItem, LINK_ITEMS } from "./linkItems.js";
@@ -541,11 +541,11 @@ function handleLinkTileClick(position) {
   linkGameState.score += matchPoints;
   drawLinkPath(path, linkGameState.board);
   if (isSpecialMatch && shouldDropLinkEnergy()) {
-    const energyProgress = receiveLinkEnergy(roundId, board);
+    const energyProgress = reserveLinkEnergy(roundId, board);
     playLinkEnergyFlight(selectedPosition, position, {
       targetProgress: energyProgress,
       progressTarget: LINK_CONNECT_CONFIG.special.progressTarget,
-      onArrive: () => queueLinkEnergyMilestone(energyProgress, roundId, board),
+      onArrive: () => collectLinkEnergy(roundId, board),
     });
   }
   const matchedTiles = playLinkMatchExit(selectedPosition, position);
@@ -804,7 +804,8 @@ function startCountdown(roundId) {
   startLinkTimeProgress(roundId);
   syncDefaultMusic(gameState.settings);
   countdownInterval = setInterval(() => {
-    if (linkGameState.roundId !== roundId || linkGameState.isLocked || linkGameState.isPaused) return;
+    // isLocked chỉ khóa input trong lúc board đổi trạng thái; không được làm dừng đồng hồ.
+    if (linkGameState.roundId !== roundId || linkGameState.isPaused) return;
     if (linkGameState.freezeSeconds > 0) {
       linkGameState.freezeSeconds -= 1;
       return;
@@ -1012,7 +1013,7 @@ function updateLinkTimeProgressFrame(timestamp) {
   if (!state?.running || state.roundId !== linkGameState.roundId) return;
   const elapsed = Math.max(0, timestamp - (state.lastFrameAt ?? timestamp));
   state.lastFrameAt = timestamp;
-  if (!linkGameState.isLocked && !linkGameState.isPaused && linkGameState.freezeSeconds <= 0) {
+  if (!linkGameState.isPaused && linkGameState.freezeSeconds <= 0) {
     state.remainingMs = Math.max(0, state.remainingMs - elapsed);
   }
   renderLinkTimeProgress(state.remainingMs, state);
@@ -1104,7 +1105,10 @@ function updateLinkSpecialMilestones(hud = getLinkHudElements()) {
 
 function shouldDropLinkEnergy() {
   const energy = LINK_CONNECT_CONFIG.special.energyDrop;
-  if (linkGameState.specialProgress >= LINK_CONNECT_CONFIG.special.progressTarget) return false;
+  if (
+    linkGameState.specialProgress + linkGameState.pendingEnergyCollections
+      >= LINK_CONNECT_CONFIG.special.progressTarget
+  ) return false;
   if (linkGameState.specialNoEnergyDropStreak >= energy.guaranteeAfterMisses) {
     linkGameState.specialNoEnergyDropStreak = 0;
     return true;
@@ -1118,12 +1122,24 @@ function shouldDropLinkEnergy() {
   return false;
 }
 
-function receiveLinkEnergy(roundId, board) {
+function reserveLinkEnergy(roundId, board) {
   if (linkGameState.roundId !== roundId || linkGameState.board !== board) return 0;
-  linkGameState.specialProgress += 1;
+  linkGameState.pendingEnergyCollections += 1;
+  persistLinkRunProgress();
+  return linkGameState.specialProgress + linkGameState.pendingEnergyCollections;
+}
+
+function collectLinkEnergy(roundId, board) {
+  if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
+  linkGameState.pendingEnergyCollections = Math.max(0, linkGameState.pendingEnergyCollections - 1);
+  linkGameState.specialProgress = Math.min(
+    LINK_CONNECT_CONFIG.special.progressTarget,
+    linkGameState.specialProgress + 1,
+  );
+  const reachedProgress = linkGameState.specialProgress;
   persistLinkRunProgress();
   updateLinkHud();
-  return linkGameState.specialProgress;
+  queueLinkEnergyMilestone(reachedProgress, roundId, board);
 }
 
 function queueLinkEnergyMilestone(progress, roundId, board) {
@@ -1271,11 +1287,18 @@ function grantAndAnimateLinkItem(itemId, anchor, { delayMs = 0 } = {}) {
 function recoverBlockedLinkBoard(board) {
   if (findAvailableConnections(board.grid).length) return false;
   if (hasOnlyFrozenLinkTiles(board)) {
-    const thawedPairs = unlockAllFrozenLinkPairs(board, { onUnlock: rememberFrozenPairForTransform });
-    if (!thawedPairs) return false;
-    renderLinkBoard(board, { onTileClick: handleLinkTileClick });
+    const { unlockedPairs, shuffled } = unlockAllFrozenLinkPairsAndEnsurePlayable(board, {
+      onUnlock: rememberFrozenPairForTransform,
+    });
+    if (!unlockedPairs) return false;
+    if (shuffled) renderLinkBoardShuffle(board, { onTileClick: handleLinkTileClick });
+    else renderLinkBoard(board, { onTileClick: handleLinkTileClick });
     playPendingBoardTransforms();
-    showAppToast(`Đã mở toàn bộ ${thawedPairs} cặp băng còn lại.`);
+    showAppToast(
+      shuffled
+        ? `Đã mở toàn bộ ${unlockedPairs} cặp băng và xáo lại bàn.`
+        : `Đã mở toàn bộ ${unlockedPairs} cặp băng còn lại.`,
+    );
     return true;
   }
   if (ensurePlayableBoard(board)) {
