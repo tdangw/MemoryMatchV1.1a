@@ -9,7 +9,7 @@ export const GAME_CONFIG = Object.freeze({
     easy: Object.freeze({
       tileCount: 12,
       columns: 4,
-      mobileColumns: 3,
+      mobileColumns: 4,
       timeSeconds: 60,
       coinReward: Object.freeze({ base: 30, speedMultiplier: 0.35 }),
     }),
@@ -108,7 +108,7 @@ export const GAME_CONFIG = Object.freeze({
 });
 
 const CHALLENGE_LAYOUTS = Object.freeze([
-  Object.freeze({ untilLevel: 3, tileCount: 12, columns: 4, mobileColumns: 3 }),
+  Object.freeze({ untilLevel: 3, tileCount: 12, columns: 4, mobileColumns: 4 }),
   Object.freeze({ untilLevel: 6, tileCount: 16, columns: 4, mobileColumns: 4 }),
   Object.freeze({ untilLevel: 9, tileCount: 20, columns: 4, mobileColumns: 4 }),
   Object.freeze({

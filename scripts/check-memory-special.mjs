@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import {
   getMemoryPreviewDropValue,
   getMemorySupportDrop,
+  getChallengeLayout,
+  getModeLayout,
   resolveMemoryMilestoneRewards,
   shouldDropMemoryEnergy,
 } from "../js/config.js";
@@ -22,6 +24,8 @@ assert.equal(getMemorySupportDrop(() => 0)?.type, "preview-auto");
 assert.equal(getComboWindowMs(8), 15000);
 assert.equal(getComboWindowMs(15), 20000);
 assert.equal(getComboWindowMs(16), 30000);
+assert.equal(getModeLayout("easy").mobileColumns, 4, "easy mobile board must be 4x3");
+assert.equal(getChallengeLayout(1).mobileColumns, 4, "early challenge mobile board must be 4x3");
 
 hydrateGameState({ progress: { memoryMatch: { items: { preview4: 2, time30: 3, previewAll: -4 } } } });
 assert.equal(getMemoryItemCount("preview4"), 2);

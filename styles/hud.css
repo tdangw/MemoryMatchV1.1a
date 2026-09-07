@@ -279,33 +279,44 @@
 
 .memory-special-hud {
   position: relative;
-  display: grid;
-  grid-template-columns: max-content minmax(0, 1fr);
+  display: flex;
+  justify-content: center;
   align-items: center;
-  gap: 7px;
-  width: min(var(--board-width, 100%), calc(100vw - 12px));
+  width: min(260px, calc(100vw - 28px));
   min-height: 19px;
-  margin: -2px auto 4px;
-  box-sizing: border-box;
-}
-.memory-special-hud__coins {
-  display: inline-flex;
-  min-width: 0;
-  align-items: center;
-  gap: 3px;
-  color: #ffd25f;
-  font: 800 .7rem/1 "Segoe UI", sans-serif;
-  white-space: nowrap;
-}
-.memory-special-hud__coins .ui-icon { width: 18px; height: 18px; }
-.memory-special-hud__milestones {
-  position: relative;
-  min-width: 0;
-  height: 19px;
+  margin: -6px auto 0;
+  padding: 0;
   box-sizing: border-box;
   border: 1px solid rgb(185 213 255 / 24%);
   border-radius: 9px;
   background: rgb(106 151 211 / 45%);
+}
+.memory-special-hud__coins {
+  position: absolute;
+  top: 50%;
+  right: calc(100% + 7px);
+  display: inline-flex;
+  min-height: 22px;
+  align-items: center;
+  gap: 3px;
+  border: 0;
+  background: transparent;
+  color: #ffd25f;
+  box-shadow: none;
+  font-size: .7rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+  transform: translateY(-50%);
+}
+.memory-special-hud__coins .ui-icon { width: 18px; height: 18px; }
+.memory-special-hud__milestones {
+  position: relative;
+  display: block;
+  flex: 1;
+  min-width: 0;
+  height: 19px;
 }
 .memory-special-hud__milestones::before,
 .memory-special-hud__milestones::after { content: ""; position: absolute; inset: 50% 5% auto; height: 2px; border-radius: 999px; transform: translateY(-50%); }
@@ -363,8 +374,13 @@
 
   #game-title.game-hud {
     min-height: 30px;
-    padding: 0 74px;
+    padding: 0 104px;
     margin-bottom: 6px;
+  }
+
+  .memory-special-hud {
+    width: min(220px, calc(100vw - 96px));
+    min-height: 19px;
   }
 
   #game-title.game-hud .game-stats {
@@ -641,7 +657,7 @@
 
 @media screen and (width <= 600px) {
   #game-title.game-hud .game-stats {
-    gap: 7px;
+    gap: 4px;
   }
 
   #game-title.game-hud .game-stats .info {

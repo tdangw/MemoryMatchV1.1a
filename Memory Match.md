@@ -21,7 +21,7 @@ Tài liệu này là nguồn theo dõi luật chơi, cân bằng và cấu hình
 
 | Chế độ | Số thẻ | Số cặp | Cột desktop | Cột mobile | Thời gian gốc | Thưởng Xu cuối màn |
 | --- | ---: | ---: | ---: | ---: | ---: | --- |
-| Dễ | 12 | 6 | 4 | 3 | 60 giây | `30 + floor(thời gian còn lại × 0,35)` |
+| Dễ | 12 | 6 | 4 | 4 | 60 giây | `30 + floor(thời gian còn lại × 0,35)` |
 | Trung bình | 24 | 12 | 6 | 4 | 90 giây | `50 + floor(thời gian còn lại × 0,50)` |
 | Khó | 36 | 18 | 6 | 6 | 120 giây | `70 + floor(thời gian còn lại × 0,65)` |
 | Siêu khó | 60 | 30 | 6 | 6 | 180 giây | `90 + floor(thời gian còn lại × 0,80)` |
@@ -34,7 +34,7 @@ Với Dễ, Trung bình, Khó và Siêu khó, mỗi level sau được cộng `2
 
 | Level | Số thẻ | Số cặp | Cột desktop | Cột mobile |
 | --- | ---: | ---: | ---: | ---: |
-| 1–3 | 12 | 6 | 4 | 3 |
+| 1–3 | 12 | 6 | 4 | 4 |
 | 4–6 | 16 | 8 | 4 | 4 |
 | 7–9 | 20 | 10 | 4 | 4 |
 | 10–12 | 24 | 12 | 6 | 4 |
