@@ -65,4 +65,4 @@ npm run android:apk
 - Hiện không có thư mục `source-assets/`. Khi tạo hoặc xuất lại ảnh, lưu bản nguồn ngoài `public/assets/`; chỉ asset runtime đã chuẩn bị mới được đưa vào bản web.
 - `vite.config.js`: cấu hình web JavaScript thuần.
 
-Mỗi game có sáu mode và giữ session độc lập theo mode. `js/gameCatalog.js` là catalog chung cho selector và namespace tiến trình. Xem trạng thái sản phẩm trong `CONTEXT.md`, kiến trúc module trong `ARCHITECTURE.md`, và thiết kế chi tiết trong `Link Connect.md`/`Triple Connect.md`.
+Mỗi game có sáu mode và giữ session độc lập theo mode. `js/gameCatalog.js` là catalog chung cho selector và namespace tiến trình. Xem trạng thái sản phẩm trong `CONTEXT.md`, kiến trúc module trong `ARCHITECTURE.md`, và thiết kế chi tiết trong `Memory Match.md`/`Link Connect.md`/`Triple Connect.md`.
