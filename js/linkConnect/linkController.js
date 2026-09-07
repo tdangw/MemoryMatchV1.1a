@@ -2,7 +2,7 @@ import { createIcon } from "../icons.js";
 import { openAppModal, showAppToast } from "../modal.js";
 import { pauseBackgroundMusic, sounds, syncDefaultMusic } from "../sound.js";
 import { getEquippedThemeId } from "../appearance.js";
-import { GAMEPLAY_TIMING } from "../gameplayTuning.js";
+import { GAMEPLAY_TIMING, shouldShowVictoryCelebration } from "../gameplayTuning.js";
 import {
   animateCoinCounter,
   calculateMatchCoinReward,
@@ -96,6 +96,10 @@ import {
 } from "./linkRenderer.js";
 import { beginLinkRound, linkGameState, resetLinkGame } from "./linkState.js";
 import { resolveSessionTiming } from "../sessionTiming.js";
+import {
+  canShowFullVictoryCelebration,
+  showFullVictoryCelebration,
+} from "victory-presentation";
 
 let countdownInterval;
 let linkTimeAnimationFrame = null;
@@ -762,7 +766,7 @@ function completeLinkLevel() {
     showAppToast("Không thể lưu kết quả lúc này. Tiến trình vẫn được giữ trong lượt chơi.");
   }
   updateLinkHud();
-  showLevelSummaryOverlay({
+  const completion = {
     fireworksContainerId: "link-connect-container",
     level: linkGameState.level,
     remainingTime: linkGameState.remainingTime,
@@ -773,10 +777,19 @@ function completeLinkLevel() {
     stars,
     timeBonus,
     luckyAwards: linkGameState.luckyAwards,
-    settings: { mode: linkGameState.mode },
+    settings: { ...gameState.settings, mode: linkGameState.mode },
     onMenu: returnToLinkMenu,
     onNext: () => startLinkLevel({ mode: linkGameState.mode, level: linkGameState.level + 1 }),
-  });
+  };
+  if (canShowFullVictoryCelebration && shouldShowVictoryCelebration(linkGameState.level)) {
+    showLevelSummaryOverlay({
+      ...completion,
+      isVictoryCelebration: true,
+      onCelebrate: () => showFullVictoryCelebration(completion),
+    });
+  } else {
+    showLevelSummaryOverlay(completion);
+  }
 }
 
 function applyLinkLuckyReward(reward, anchor) {

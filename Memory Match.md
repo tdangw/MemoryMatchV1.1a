@@ -45,6 +45,8 @@ Với Dễ, Trung bình, Khó và Siêu khó, mỗi level sau được cộng `2
 
 Thử thách bắt đầu với 60 giây. Khi qua màn, thời gian còn lại được giữ và cộng thêm 10 giây cho màn kế tiếp.
 
+Số cặp tăng sau mỗi 3 level: ban đầu tăng 2 cặp mỗi bậc (6 → 8 → 10 → 12), sau đó tăng 3 cặp mỗi bậc (15 → 18 → 21 → 24). Từ level 22 trở đi giữ tối đa 24 cặp.
+
 ## 3. Bắt đầu màn và bố cục thích ứng
 
 - Mỗi màn chọn ngẫu nhiên số hình cần thiết từ chủ đề đang trang bị, nhân đôi từng hình rồi xáo danh sách.
@@ -186,7 +188,7 @@ Thẻ nằm trong thư mục `special/` của chủ đề được đánh dấu 
 - Tỷ lệ hiện tại: **100%** để kiểm thử hiệu ứng.
 - Cấu hình vẫn giữ bảo hiểm: sau 9 lần liên tiếp không rơi, lần thứ 10 chắc chắn rơi.
 - Năng lượng là tiến trình nội bộ, không phải vật phẩm trong kho.
-- Tiến trình được cộng ngay khi vật phẩm xuất hiện trên bàn; icon sau đó bay tới thanh 10 mốc.
+- Tiến trình chỉ được cộng và làm sáng mốc khi icon năng lượng bay tới thanh 10 mốc.
 - Qua level, thua rồi Chơi lại và quay Menu rồi Tiếp tục vẫn giữ tiến trình.
 - Chọn Chơi mới reset tiến trình và chuỗi không-rơi.
 - Đạt mốc 10 nhận thưởng, hiển thị đầy thanh trong thời gian ngắn rồi trở về mốc 0 để bắt đầu vòng mới.
@@ -260,7 +262,7 @@ Ba luồng phải được hiểu tách biệt:
 - Điểm hiện cạnh cặp vừa ghép; hiệu ứng combo hiện ở vùng trên của bàn để dễ quan sát.
 - Vật phẩm rơi dùng Web Animations với `transform/opacity`, được giữ ngắn trên bàn rồi bay thẳng đến đúng công cụ/HUD và tự xóa.
 - Hiệu ứng tôn trọng `prefers-reduced-motion`; dữ liệu phần thưởng không phụ thuộc vào việc hoạt ảnh có chạy hay không.
-- Thanh thời gian dùng `requestAnimationFrame` chỉ để nội suy `transform`; đồng hồ gameplay vẫn cập nhật theo giây. Khi pause/lock, nội suy dừng giảm thời gian.
+- Thanh thời gian dùng `requestAnimationFrame` chỉ để nội suy `transform`; đồng hồ gameplay vẫn cập nhật theo giây. Khóa thao tác để bảo vệ thẻ không làm dừng thời gian; chỉ trạng thái pause thực sự mới dừng đồng hồ.
 
 ## 13. Thời lượng và giới hạn dùng chung
 
@@ -278,7 +280,7 @@ Ba luồng phải được hiểu tách biệt:
 | Checkpoint phiên | 5 giây |
 | Đệm sau mua cứu thua | 1.000 ms |
 | Pháo hoa tổng kết | 2.500 ms |
-| Cảnh chiến thắng đặc biệt | Level 100 |
+| Cảnh chiến thắng đặc biệt | Sau khi hoàn thành level 100; mở từ nút `Congratulations!` ở bảng tổng kết |
 | Giới hạn mỗi loại vật phẩm/Gợi ý | 999 |
 
 ## 14. Nguồn cấu hình và module
