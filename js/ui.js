@@ -44,6 +44,8 @@ const totalPairsElement = document.getElementById("total-pairs");
 const totalStarsElement = document.getElementById("total-stars");
 const levelStarsElement = document.getElementById("level-stars");
 const levelStarsFillElement = document.getElementById("level-stars-fill");
+const levelStarsCardElement = levelStarsElement?.closest(".stat-star-progress");
+const scoreCardElement = scoreElement?.closest(".stat-points");
 const memorySpecialHudElement = document.getElementById("memory-special-hud");
 const memorySpecialMilestonesElement = document.getElementById("memory-special-milestones");
 let revealTimerInterval = null;
@@ -72,7 +74,16 @@ export function updateScoreDisplay(score) {
   if (scoreElement) scoreElement.textContent = score;
   const target = getStarScoreTargets(gameState.totalPairs, gameState.settings.mode).three;
   if (levelStarsFillElement) levelStarsFillElement.style.width = `${Math.min(100, Math.round(score / target * 100))}%`;
-  if (levelStarsElement) levelStarsElement.dataset.tooltip = `Mục tiêu: ${target}`;
+  if (levelStarsCardElement) {
+    const label = `Mục tiêu: ${target}`;
+    levelStarsCardElement.dataset.tooltip = label;
+    levelStarsCardElement.setAttribute("aria-label", label);
+  }
+  if (scoreCardElement) {
+    const label = `Tổng điểm: ${gameState.progress.memoryMatch.totalScore}`;
+    scoreCardElement.dataset.tooltip = label;
+    scoreCardElement.setAttribute("aria-label", label);
+  }
 }
 
 export function updateMemorySpecialProgress(progress = gameState.specialProgress) {

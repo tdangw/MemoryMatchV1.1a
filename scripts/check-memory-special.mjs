@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import {
   getMemoryPreviewDropValue,
   getMemorySupportDrop,
@@ -34,5 +35,12 @@ assert.equal(getMemoryItemTotal("time"), 3);
 assert.equal(getMemoryItemId("preview", "all"), "previewAll");
 assert.equal(changeMemoryItemCount("preview4", -1), true);
 assert.equal(gameState.progress.memoryMatch.items.preview4, 1);
+
+const hudCss = readFileSync(new URL("../styles/hud.css", import.meta.url), "utf8");
+assert.doesNotMatch(
+  hudCss,
+  /\.game-quick-action\s*\{[^}]*position:\s*relative/s,
+  "inventory badges must not override the absolute HUD tool positions",
+);
 
 console.log("Memory special rewards and inventory checks passed.");

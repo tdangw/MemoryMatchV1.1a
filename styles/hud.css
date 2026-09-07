@@ -326,7 +326,6 @@
 .memory-special-hud__milestones > span.is-earned { border-color: #ffd166; background: #a86f00; color: #fff8dd; transform: translateX(-50%) scale(1.08); }
 .memory-special-hud__milestones > span.is-next { border-color: #7ceeff; color: #7ceeff; }
 
-.game-quick-action { position: relative; }
 .game-quick-action > strong {
   position: absolute;
   right: -4px;
