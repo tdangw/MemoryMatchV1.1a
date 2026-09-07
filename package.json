@@ -15,6 +15,7 @@
     "deploy:gh-pages": "npm run build:gh-pages && gh-pages -d dist --add",
     "preview": "vite preview",
     "test:ui:geometry": "playwright test tests/ui/game-shell.geometry.spec.js",
+    "test:ui:audit": "playwright test tests/ui/game-shell.audit.spec.js",
     "test:ui:debug": "playwright test tests/ui/game-shell.geometry.spec.js --headed --project=desktop",
     "check": "npm run assets:sync && node scripts/check-js.mjs && node scripts/check-game-core.mjs && node scripts/check-session-timing.mjs && node scripts/check-persistence.mjs && node scripts/check-pwa.mjs && node scripts/check-memory-special.mjs && node scripts/check-link-connect-core.mjs && node scripts/check-link-connect-board.mjs && node scripts/check-appearance-themes.mjs",
     "prebuild:android": "npm run assets:sync",

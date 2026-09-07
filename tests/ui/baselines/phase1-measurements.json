@@ -1,0 +1,486 @@
+{
+  "runtimeCommit": "9e162b65af950b48f7911dd33ff89e0752beb9a2",
+  "status": "preservation-baseline-user-tested",
+  "samples": [
+    {
+      "case": "game-shell.audit-Link-Connect-controlled-Phase-1-audit-desktop",
+      "metrics": {
+        "viewport": {
+          "width": 1024,
+          "height": 900
+        },
+        "regions": [
+          {
+            "selector": "link-game-logo",
+            "x": 162,
+            "y": 14,
+            "width": 700,
+            "height": 45.046875
+          },
+          {
+            "selector": "link-game-progress-hud game-progress-hud",
+            "x": 312.578125,
+            "y": 77.046875,
+            "width": 398.828125,
+            "height": 27
+          },
+          {
+            "selector": "link-game-title",
+            "x": 162,
+            "y": 120.046875,
+            "width": 700,
+            "height": 36
+          },
+          {
+            "selector": "link-special-hud",
+            "x": 382,
+            "y": 168.046875,
+            "width": 260,
+            "height": 21
+          },
+          {
+            "selector": "link-board-frame",
+            "x": 170,
+            "y": 199.046875,
+            "width": 684,
+            "height": 528
+          }
+        ],
+        "shellElementsExcludingBoard": 135,
+        "boardElements": 41,
+        "scheduledSinceMenu": {
+          "timeout": 0,
+          "interval": 1,
+          "frame": 1
+        },
+        "timer": "3px",
+        "animationsRunning": 0,
+        "documentCounters": {
+          "documents": 1,
+          "nodes": 1797,
+          "jsEventListeners": 104
+        }
+      }
+    },
+    {
+      "case": "game-shell.audit-Link-Connect-controlled-Phase-1-audit-landscape",
+      "metrics": {
+        "viewport": {
+          "width": 844,
+          "height": 390
+        },
+        "regions": [
+          {
+            "selector": "link-game-logo",
+            "x": 72,
+            "y": 14,
+            "width": 700,
+            "height": 37.140625
+          },
+          {
+            "selector": "link-game-progress-hud game-progress-hud",
+            "x": 222.578125,
+            "y": 69.140625,
+            "width": 398.828125,
+            "height": 27
+          },
+          {
+            "selector": "link-game-title",
+            "x": 72,
+            "y": 112.140625,
+            "width": 700,
+            "height": 36
+          },
+          {
+            "selector": "link-special-hud",
+            "x": 292,
+            "y": 160.140625,
+            "width": 260,
+            "height": 21
+          },
+          {
+            "selector": "link-board-frame",
+            "x": 291.421875,
+            "y": 191.140625,
+            "width": 261.140625,
+            "height": 198.84375
+          }
+        ],
+        "shellElementsExcludingBoard": 135,
+        "boardElements": 41,
+        "scheduledSinceMenu": {
+          "timeout": 0,
+          "interval": 1,
+          "frame": 1
+        },
+        "timer": "3px",
+        "animationsRunning": 0,
+        "documentCounters": {
+          "documents": 1,
+          "nodes": 1797,
+          "jsEventListeners": 104
+        }
+      }
+    },
+    {
+      "case": "game-shell.audit-Link-Connect-controlled-Phase-1-audit-mobile-narrow",
+      "metrics": {
+        "viewport": {
+          "width": 320,
+          "height": 568
+        },
+        "regions": [
+          {
+            "selector": "link-game-logo",
+            "x": 6,
+            "y": 14,
+            "width": 308,
+            "height": 31.671875
+          },
+          {
+            "selector": "link-game-progress-hud game-progress-hud",
+            "x": 6,
+            "y": 60.671875,
+            "width": 308,
+            "height": 31
+          },
+          {
+            "selector": "link-game-title",
+            "x": 6,
+            "y": 104.671875,
+            "width": 308,
+            "height": 68
+          },
+          {
+            "selector": "link-special-hud",
+            "x": 50,
+            "y": 181.671875,
+            "width": 220,
+            "height": 21
+          },
+          {
+            "selector": "link-board-frame",
+            "x": 10,
+            "y": 211.671875,
+            "width": 300,
+            "height": 233.5
+          }
+        ],
+        "shellElementsExcludingBoard": 135,
+        "boardElements": 41,
+        "scheduledSinceMenu": {
+          "timeout": 0,
+          "interval": 1,
+          "frame": 1
+        },
+        "timer": "3px",
+        "animationsRunning": 0,
+        "documentCounters": {
+          "documents": 1,
+          "nodes": 1797,
+          "jsEventListeners": 104
+        }
+      }
+    },
+    {
+      "case": "game-shell.audit-Link-Connect-controlled-Phase-1-audit-mobile",
+      "metrics": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "regions": [
+          {
+            "selector": "link-game-logo",
+            "x": 6,
+            "y": 14,
+            "width": 378,
+            "height": 38.59375
+          },
+          {
+            "selector": "link-game-progress-hud game-progress-hud",
+            "x": 27.515625,
+            "y": 67.59375,
+            "width": 334.96875,
+            "height": 31
+          },
+          {
+            "selector": "link-game-title",
+            "x": 6,
+            "y": 111.59375,
+            "width": 378,
+            "height": 32
+          },
+          {
+            "selector": "link-special-hud",
+            "x": 85,
+            "y": 152.59375,
+            "width": 220,
+            "height": 21
+          },
+          {
+            "selector": "link-board-frame",
+            "x": 10,
+            "y": 182.59375,
+            "width": 370,
+            "height": 286
+          }
+        ],
+        "shellElementsExcludingBoard": 135,
+        "boardElements": 41,
+        "scheduledSinceMenu": {
+          "timeout": 0,
+          "interval": 1,
+          "frame": 1
+        },
+        "timer": "3px",
+        "animationsRunning": 0,
+        "documentCounters": {
+          "documents": 1,
+          "nodes": 1797,
+          "jsEventListeners": 104
+        }
+      }
+    },
+    {
+      "case": "game-shell.audit-Memory-Match-controlled-Phase-1-audit-desktop",
+      "metrics": {
+        "viewport": {
+          "width": 1024,
+          "height": 900
+        },
+        "regions": [
+          {
+            "selector": "game-logo",
+            "x": 45.59375,
+            "y": 22,
+            "width": 932.796875,
+            "height": 45.046875
+          },
+          {
+            "selector": "game-progress-hud",
+            "x": 312.578125,
+            "y": 85.046875,
+            "width": 398.828125,
+            "height": 27
+          },
+          {
+            "selector": "game-title",
+            "x": 162.984375,
+            "y": 128.046875,
+            "width": 698,
+            "height": 34
+          },
+          {
+            "selector": "memory-special-hud",
+            "x": 381.984375,
+            "y": 174.046875,
+            "width": 260,
+            "height": 21
+          },
+          {
+            "selector": "grid-board-frame",
+            "x": 162.984375,
+            "y": 205.046875,
+            "width": 698,
+            "height": 526
+          }
+        ],
+        "shellElementsExcludingBoard": 119,
+        "boardElements": 29,
+        "scheduledSinceMenu": {
+          "timeout": 0,
+          "interval": 1,
+          "frame": 1
+        },
+        "timer": "3px",
+        "animationsRunning": 0,
+        "documentCounters": {
+          "documents": 1,
+          "nodes": 1145,
+          "jsEventListeners": 96
+        }
+      }
+    },
+    {
+      "case": "game-shell.audit-Memory-Match-controlled-Phase-1-audit-landscape",
+      "metrics": {
+        "viewport": {
+          "width": 844,
+          "height": 390
+        },
+        "regions": [
+          {
+            "selector": "game-logo",
+            "x": 6,
+            "y": 4,
+            "width": 832,
+            "height": 23.75
+          },
+          {
+            "selector": "game-progress-hud",
+            "x": 222.578125,
+            "y": 40.75,
+            "width": 398.828125,
+            "height": 27
+          },
+          {
+            "selector": "game-title",
+            "x": 275,
+            "y": 83.75,
+            "width": 294,
+            "height": 34
+          },
+          {
+            "selector": "memory-special-hud",
+            "x": 292,
+            "y": 125.75,
+            "width": 260,
+            "height": 21
+          },
+          {
+            "selector": "grid-board-frame",
+            "x": 275,
+            "y": 156.75,
+            "width": 294,
+            "height": 223
+          }
+        ],
+        "shellElementsExcludingBoard": 119,
+        "boardElements": 29,
+        "scheduledSinceMenu": {
+          "timeout": 0,
+          "interval": 1,
+          "frame": 1
+        },
+        "timer": "3px",
+        "animationsRunning": 0,
+        "documentCounters": {
+          "documents": 1,
+          "nodes": 1145,
+          "jsEventListeners": 96
+        }
+      }
+    },
+    {
+      "case": "game-shell.audit-Memory-Match-controlled-Phase-1-audit-mobile-narrow",
+      "metrics": {
+        "viewport": {
+          "width": 320,
+          "height": 568
+        },
+        "regions": [
+          {
+            "selector": "game-logo",
+            "x": 4,
+            "y": 6,
+            "width": 312,
+            "height": 31.671875
+          },
+          {
+            "selector": "game-progress-hud",
+            "x": 6,
+            "y": 53.671875,
+            "width": 308,
+            "height": 29
+          },
+          {
+            "selector": "game-title",
+            "x": 10,
+            "y": 96.671875,
+            "width": 300,
+            "height": 30
+          },
+          {
+            "selector": "memory-special-hud",
+            "x": 50,
+            "y": 136.671875,
+            "width": 220,
+            "height": 21
+          },
+          {
+            "selector": "grid-board-frame",
+            "x": 10,
+            "y": 167.671875,
+            "width": 300,
+            "height": 227
+          }
+        ],
+        "shellElementsExcludingBoard": 119,
+        "boardElements": 29,
+        "scheduledSinceMenu": {
+          "timeout": 0,
+          "interval": 1,
+          "frame": 1
+        },
+        "timer": "3px",
+        "animationsRunning": 0,
+        "documentCounters": {
+          "documents": 1,
+          "nodes": 1145,
+          "jsEventListeners": 96
+        }
+      }
+    },
+    {
+      "case": "game-shell.audit-Memory-Match-controlled-Phase-1-audit-mobile",
+      "metrics": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "regions": [
+          {
+            "selector": "game-logo",
+            "x": 4,
+            "y": 6,
+            "width": 382,
+            "height": 38.59375
+          },
+          {
+            "selector": "game-progress-hud",
+            "x": 27.515625,
+            "y": 60.59375,
+            "width": 334.96875,
+            "height": 29
+          },
+          {
+            "selector": "game-title",
+            "x": 11,
+            "y": 103.59375,
+            "width": 368,
+            "height": 30
+          },
+          {
+            "selector": "memory-special-hud",
+            "x": 85,
+            "y": 143.59375,
+            "width": 220,
+            "height": 21
+          },
+          {
+            "selector": "grid-board-frame",
+            "x": 11,
+            "y": 174.59375,
+            "width": 368,
+            "height": 278
+          }
+        ],
+        "shellElementsExcludingBoard": 119,
+        "boardElements": 29,
+        "scheduledSinceMenu": {
+          "timeout": 0,
+          "interval": 1,
+          "frame": 1
+        },
+        "timer": "3px",
+        "animationsRunning": 0,
+        "documentCounters": {
+          "documents": 1,
+          "nodes": 1145,
+          "jsEventListeners": 96
+        }
+      }
+    }
+  ]
+}

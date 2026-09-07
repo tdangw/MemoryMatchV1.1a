@@ -18,6 +18,8 @@ Vite ──→ dist ──→ Web/PWA hoặc Capacitor Android
 
 Kế hoạch chuẩn hóa shell/HUD/layout dùng chung trước khi thêm game mới nằm trong `GAME_SHELL_PLAN.md`.
 
+Khảo sát ownership hiện tại, hợp đồng đích và danh sách xóa theo phase nằm trong `GAME_SHELL_PHASE1.md`. Phase 1 đã chốt giữ nguyên giao diện theo chơi thử của người dùng; kiến trúc Shell sẽ tích hợp theo từng phase.
+
 - Ứng dụng dùng HTML/CSS và JavaScript ES modules, không có framework UI.
 - `js/main.js` là entry point duy nhất; module chức năng không tự bootstrap ứng dụng.
 - Các controller phụ thuộc module dùng chung, nhưng không import lẫn nhau. Callback `configure*` nối các luồng cần điều hướng chéo.

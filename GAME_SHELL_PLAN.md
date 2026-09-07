@@ -6,6 +6,8 @@
 
 Link Connect là mốc tham chiếu hình học ban đầu vì bố cục hiện tại gọn và ổn định hơn. Mốc tham chiếu không ngăn từng game tùy chỉnh hợp lệ qua config.
 
+Ưu tiên được người dùng chốt ngày 2026-09-07: **mobile màn hình dọc là bố cục chính**. Khi xoay ngang, thu gọn các nút tính năng cho vừa không gian, không chồng lên chỉ số và vẫn truy cập đủ chức năng. Có thể gom nút vào menu công cụ khi cần; không ép toolbar ngang rộng như desktop hoặc thu nhỏ vùng chạm chỉ để giữ mọi nút cùng hiện. Quy tắc này đi qua cấu hình responsive chung, không đổi luật chơi.
+
 ### Ngoài phạm vi
 
 - Không thêm gameplay Triple Connect.
@@ -109,7 +111,7 @@ Override không thuộc schema phải gây lỗi trong development. Production d
 - `npm run test:ui:geometry`: 8/8 kiểm tra đạt trên bốn viewport cho Memory Match và Link Connect.
 - `npm run check` và `npm run build`: đạt; Playwright không nằm trong bundle production.
 - `npm audit --omit=dev`: 0 lỗ hổng production. Còn 12 cảnh báo mức vừa chỉ trong dependency phát triển của Firebase/Capacitor; không chạy sửa tự động vì npm đề xuất thay đổi có nguy cơ breaking.
-- Bước tiếp theo trong task mới: bắt đầu Phase 1; chưa triển khai Triple Connect.
+- Bước tiếp theo được theo dõi tại trạng thái Phase 1 bên dưới; chưa triển khai Triple Connect.
 
 **Thực hiện**
 
@@ -134,6 +136,13 @@ Override không thuộc schema phải gây lỗi trong development. Production d
 
 ### Phase 1 — Khảo sát ownership và đóng băng hành vi
 
+**Trạng thái: hoàn tất ngày 2026-09-07, người dùng xác nhận tiếp tục Phase 2.**
+
+- Ownership và hợp đồng: `GAME_SHELL_PHASE1.md`; số đo: `tests/ui/baselines/phase1-measurements.json`.
+- Người dùng chơi thử thấy giao diện ổn, chưa thấy chồng nút. Giữ nguyên giao diện hiện tại làm baseline bảo toàn; ảnh mô phỏng không được xem là lỗi đã xác nhận trên thiết bị thật.
+- Ưu tiên mobile dọc; khi ngang có thể thu gọn nút cho phù hợp ở phase layout/HUD. Không ép mở rộng toolbar hoặc đổi style trong Phase 2.
+- Check, build và geometry/audit được chạy lại trên runtime `9e162b6`; không có thay đổi gameplay trong commit Phase 1.
+- Ảnh kiểm soát dùng để so sánh trước/sau; golden visual phát hành vẫn thuộc Phase 9. Đã đủ gate bắt đầu Phase 2, chưa triển khai Triple Connect.
 **Thực hiện**
 
 - Lập bản đồ DOM/CSS/controller của hai shell hiện tại.
@@ -278,6 +287,7 @@ Override không thuộc schema phải gây lỗi trong development. Production d
 ## 7. Chiến lược commit và hoàn tác
 
 1. `test: add opt-in game shell geometry checks`
+   - Phase 1: `docs: map game shell ownership and capture review candidates` (ghi rõ gate còn mở nếu đang chờ duyệt).
 2. `refactor: centralize game shell tokens and config`
 3. `refactor: add shared game shell layout engine`
 4. `refactor: add game shell lifecycle and DOM contract`
