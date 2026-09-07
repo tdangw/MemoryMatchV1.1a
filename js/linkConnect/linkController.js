@@ -77,6 +77,7 @@ import {
 import {
   clearLinkPath,
   clearLinkTransientEffects,
+  stopLinkBoardLayout,
   clearLinkMatchedPair,
   clearLinkTileSelection,
   clearLinkTileHints,
@@ -284,6 +285,7 @@ export function continueLinkSession(session) {
 
 export function returnToLinkMenu() {
   stopCountdown();
+  stopLinkBoardLayout();
   if (isLinkGameVisible()) persistLinkRunProgress();
   clearGameplayRewardPopups();
   resetLinkGame();

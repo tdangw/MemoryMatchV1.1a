@@ -65,6 +65,9 @@ for (const [id, title, root, board] of [
     await page.addStyleTag({ content: "*, *::before, *::after { animation: none !important; transition: none !important; caret-color: transparent !important; }" });
     const metrics = await page.evaluate(({ root, board }) => {
       const shell = document.querySelector(root);
+      const grid = shell.querySelector(".link-board, #grid-container");
+      const gridStyle = getComputedStyle(grid);
+      const number = name => Number.parseFloat(gridStyle.getPropertyValue(name)) || 0;
       const rect = element => {
         const { x, y, width, height } = element.getBoundingClientRect();
         return { x, y, width, height };
@@ -76,6 +79,13 @@ for (const [id, title, root, board] of [
         boardElements: document.querySelector(board).querySelectorAll("*").length + 1,
         scheduledSinceMenu: window.auditPending(),
         timer: getComputedStyle(shell.querySelector(".game-hud"), "::after").height,
+        gridFit: {
+          columns: number("--link-columns") || number("--grid-columns"),
+          rows: number("--link-rows") || number("--grid-rows"),
+          gap: number("gap"),
+          insetsX: number("padding-left") + number("padding-right") + number("border-left-width") + number("border-right-width"),
+          insetsY: number("padding-top") + number("padding-bottom") + number("border-top-width") + number("border-bottom-width"),
+        },
         animationsRunning: document.getAnimations().filter(animation => animation.playState === "running").length,
       };
     }, { root, board });
@@ -86,6 +96,15 @@ for (const [id, title, root, board] of [
     expect(metrics.regions.map(region => region.selector)).toEqual(baseline.metrics.regions.map(region => region.selector));
     metrics.regions.forEach((region, index) => {
       for (const dimension of ["x", "y", "width", "height"]) {
+        if (id === "link" && region.selector === "link-board-frame" && dimension === "height") {
+          // Phase 3 fits the actual tiles to the frame; legacy CSS clamped only
+          // its width, leaving the old grid 8–16px wider than the frame.
+          const fit = metrics.gridFit;
+          const tile = (region.width - fit.insetsX - fit.gap * (fit.columns - 1)) / fit.columns;
+          const fittedHeight = tile * fit.rows + fit.gap * (fit.rows - 1) + fit.insetsY;
+          expect(Math.abs(region.height - fittedHeight)).toBeLessThanOrEqual(1);
+          continue;
+        }
         expect(Math.abs(region[dimension] - baseline.metrics.regions[index][dimension]),
           `${region.selector}.${dimension} must stay within 1px`).toBeLessThanOrEqual(1);
       }

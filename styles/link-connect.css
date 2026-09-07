@@ -3,7 +3,6 @@
   --link-panel: rgb(7 23 49 / 72%);
   --link-line: rgb(146 219 255 / 18%);
   --link-content-max-width: var(--shell-layout-content-max-width);
-  --link-board-safe-inset: clamp(4px, 1vw, 8px);
   min-height: 100dvh;
   display: grid;
   grid-template-rows: auto auto auto auto minmax(0, 1fr);
@@ -80,7 +79,7 @@
 .link-board-frame {
   position: relative;
   width: min(var(--link-content-max-width), 100%);
-  max-width: calc(100% - var(--link-board-safe-inset) * 2);
+  max-width: 100%;
   min-width: 0;
   /* Bàn nhỏ phải bắt đầu ngay sau HUD; căn giữa trong vùng trống sẽ khiến
      nó bị dồn xuống thấp trên màn hình dọc. */

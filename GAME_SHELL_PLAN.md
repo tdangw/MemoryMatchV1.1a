@@ -183,6 +183,12 @@ Override không thuộc schema phải gây lỗi trong development. Production d
 
 ### Phase 3 — Layout engine dùng chung
 
+**Trạng thái: hoàn tất ngày 2026-09-07.**
+
+- Hai board dùng chung phép đo/fit, adapter giữ tile và đường nối riêng. Cleanup bộ đo khi về Menu; không còn listener resize riêng của hai board.
+- Check/build và 108/108 UI tests đạt; bundle CSS+JS 110.91 kB gzip, dưới ngân sách. HUD giữ baseline; sửa riêng hình học ô Link để vừa khung đã clamp. Chi tiết trong `GAME_SHELL_PHASE3.md`.
+- Bước tiếp theo: Phase 4 — DOM và lifecycle. Chưa triển khai Triple Connect.
+
 **Thực hiện**
 
 - Một phép đo cho title → progress HUD → menu HUD → milestones → board.

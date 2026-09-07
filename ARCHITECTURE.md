@@ -20,7 +20,9 @@ Kế hoạch chuẩn hóa shell/HUD/layout dùng chung trước khi thêm game m
 
 Khảo sát ownership hiện tại, hợp đồng đích và danh sách xóa theo phase nằm trong `GAME_SHELL_PHASE1.md`. Phase 1 đã chốt giữ nguyên giao diện theo chơi thử của người dùng; kiến trúc Shell sẽ tích hợp theo từng phase.
 
-Phase 2 đã tích hợp `js/gameShell/gameShellConfig.js`: schema/defaults và normalize UI override thuần, không phụ thuộc DOM/state/gameplay. `scripts/generate-game-shell-tokens.mjs` sinh `styles/game-shell/tokens.css` dùng cho hai shell hiện tại; sửa nguồn JS rồi chạy `npm run shell:sync`, không sửa CSS sinh bằng tay. Layout/controller riêng vẫn giữ nguyên tới các phase di chuyển. Chi tiết giới hạn adapter và kiểm chứng nằm trong `GAME_SHELL_PHASE2.md`.
+Phase 2 đã tích hợp `js/gameShell/gameShellConfig.js`: schema/defaults và normalize UI override thuần, không phụ thuộc DOM/state/gameplay. `scripts/generate-game-shell-tokens.mjs` sinh `styles/game-shell/tokens.css` dùng cho hai shell hiện tại; sửa nguồn JS rồi chạy `npm run shell:sync`, không sửa CSS sinh bằng tay. Chi tiết nằm trong `GAME_SHELL_PHASE2.md`.
+
+Phase 3 nối cả hai board vào `js/gameShell/gameShellLayout.js`: hàm fit thuần và kết nối đo viewport/safe area theo một RAF, một ResizeObserver cho shell hiện hành. Các adapter trong `grid.js`/`linkRenderer.js` cung cấp shape, cấu hình trình bày và chỉ ghi kết quả fit; renderer giữ quyền sở hữu tile/path. Controller hủy kết nối khi về Menu. Layout không import gameplay và không đăng ký tài nguyên lúc import; lifecycle toàn ứng dụng thuộc Phase 4. Chi tiết và giới hạn kiểm chứng nằm trong `GAME_SHELL_PHASE3.md`.
 
 - Ứng dụng dùng HTML/CSS và JavaScript ES modules, không có framework UI.
 - `js/main.js` là entry point duy nhất; module chức năng không tự bootstrap ứng dụng.

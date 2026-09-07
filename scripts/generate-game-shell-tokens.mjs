@@ -12,6 +12,9 @@ ${vars}
 }
 
 .game-shell-tokens {
+  --shell-viewport-safe-left: env(safe-area-inset-left, 0px);
+  --shell-viewport-safe-right: env(safe-area-inset-right, 0px);
+  --shell-viewport-safe-bottom: env(safe-area-inset-bottom, 0px);
   --shell-safe-top: max(var(--shell-safe-area-top), env(safe-area-inset-top));
   --shell-safe-bottom: max(var(--shell-safe-area-bottom), env(safe-area-inset-bottom));
   --shell-active-board-gap: var(--shell-board-gap);

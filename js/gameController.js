@@ -16,7 +16,7 @@ import {
   isChallengeMode,
   isEndlessMode,
 } from "./config.js";
-import { createGrid } from "./grid.js";
+import { createGrid, stopGridLayout } from "./grid.js";
 import {
   updateLevelDisplay,
   updateScoreDisplay,
@@ -315,6 +315,7 @@ export function nextLevel() {
 
 export function returnToMainMenu() {
   stopCountdown();
+  stopGridLayout();
   persistMemorySession();
   isAutoPaused = false;
   document.body.classList.remove("game-is-paused");

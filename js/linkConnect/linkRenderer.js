@@ -4,6 +4,7 @@ import { createIcon } from "../icons.js";
 import { getLinkItemDefinition } from "./linkItems.js";
 import { calculateMotionDelta, prefersReducedMotion, readCssTimeMs } from "../motion.js";
 import { LINK_CONNECT_TIMING } from "./linkConfig.js";
+import { connectGameShellLayout } from "../gameShell/gameShellLayout.js";
 import {
   measureLinkRender,
   recordLinkLayoutPass,
@@ -15,10 +16,9 @@ const ELECTRIC_JITTER_PERCENT = 0.65;
 const ELECTRIC_SEGMENT_LENGTH_PERCENT = 7;
 const OUTER_ROUTE_INSET_PERCENT = 1.5;
 const assetUrl = (path) => `${import.meta.env.BASE_URL}${path}`;
-let layoutFrame;
-let layoutObserver;
+let linkLayout = null;
+let linkLayoutShape = null;
 let boardInteractionTimer;
-let observedGame;
 let renderedBoardShape = "";
 let renderedBoardContainer = null;
 const boardCellsByPosition = new Map();
@@ -26,15 +26,6 @@ const tileElementsByKey = new Map();
 const tileMotionAnimations = new WeakMap();
 const activeTileMotionAnimations = new Set();
 const transientEffectTimers = new Set();
-
-window.addEventListener("resize", () => {
-  scheduleLinkBoardLayout();
-});
-
-function scheduleLinkBoardLayout() {
-  cancelAnimationFrame(layoutFrame);
-  layoutFrame = requestAnimationFrame(updateLinkBoardLayout);
-}
 
 export function renderLinkBoard(board, { onTileClick } = {}) {
   return measureLinkRender("board patch", () => patchLinkBoard(board, onTileClick));
@@ -150,7 +141,8 @@ function patchLinkBoard(board, onTileClick) {
   if (!container) return;
   const rows = board.grid.length - 2;
   const shape = `${board.columns}x${rows}`;
-  observeLinkBoardLayout(document.getElementById("link-connect-container"));
+  linkLayoutShape = { columns: board.columns, rows };
+  if (!linkLayout?.active) mountLinkBoardLayout();
   container.style.setProperty("--link-columns", String(board.columns));
   container.style.setProperty("--link-rows", String(rows));
   const boardRebuilt = renderedBoardContainer !== container || renderedBoardShape !== shape;
@@ -201,7 +193,7 @@ function patchLinkBoard(board, onTileClick) {
     updatedTiles,
     createdTiles,
   });
-  if (boardRebuilt) scheduleLinkBoardLayout();
+  if (boardRebuilt) linkLayout.schedule();
 }
 
 function createLinkBoardCells(container, columns, rows) {
@@ -1066,73 +1058,31 @@ function readBoardGap(boardElement) {
   return Number.parseFloat(getComputedStyle(boardElement).gap) || 0;
 }
 
-function observeLinkBoardLayout(game) {
-  if (!game || observedGame === game || typeof ResizeObserver === "undefined") return;
-  layoutObserver?.disconnect();
-  layoutObserver = new ResizeObserver(scheduleLinkBoardLayout);
-  layoutObserver.observe(game);
-  observedGame = game;
-}
+// Route gutter is presentation config, separate from pathfinder's boundary cells.
+const LINK_SHELL_UI = { layout: { edgeInsetMin: 4, edgeInsetMax: 8, edgeInsetRatio: 0.01 } };
 
-function updateLinkBoardLayout() {
-  recordLinkLayoutPass();
-  const game = document.getElementById("link-connect-container");
-  const board = document.getElementById("link-board");
+function mountLinkBoardLayout() {
+  const root = document.getElementById("link-connect-container");
   const frame = document.getElementById("link-board-frame");
-  if (!game || !board || !frame || game.hidden) return;
-
-  const columns = Number.parseInt(board.style.getPropertyValue("--link-columns"), 10);
-  const rows = Number.parseInt(board.style.getPropertyValue("--link-rows"), 10);
-  if (!columns || !rows) return;
-
-  const boardStyles = getComputedStyle(board);
-  const gameStyles = getComputedStyle(game);
-  const gap = readBoardGap(board);
-  const boardHorizontalInsets = readHorizontalInsets(boardStyles);
-  const boardVerticalInsets = readVerticalInsets(boardStyles);
-  const gameVerticalPadding = (Number.parseFloat(gameStyles.paddingTop) || 0)
-    + (Number.parseFloat(gameStyles.paddingBottom) || 0);
-  const boardSafeInset = Number.parseFloat(gameStyles.getPropertyValue("--link-board-safe-inset")) || 0;
-  const gameGap = Number.parseFloat(gameStyles.rowGap) || 0;
-  const chromeHeight = [
-    ".link-game-name",
-    ".link-game-progress-hud",
-    ".link-game-hud",
-    ".link-special-hud",
-  ].reduce((total, selector) => total + (game.querySelector(selector)?.getBoundingClientRect().height || 0), 0);
-  const horizontalGamePadding = (Number.parseFloat(gameStyles.paddingLeft) || 0)
-    + (Number.parseFloat(gameStyles.paddingRight) || 0);
-  const maxBoardWidth = Number.parseFloat(gameStyles.getPropertyValue("--link-content-max-width")) || Infinity;
-  const availableWidth = Math.min(
-    maxBoardWidth,
-    Math.max(0, game.clientWidth - horizontalGamePadding - boardSafeInset * 2),
-  );
-  const gridGapCount = Math.max(0, game.children.length - 1);
-  const availableHeight = Math.max(
-    0,
-    game.clientHeight - gameVerticalPadding - chromeHeight - gameGap * gridGapCount,
-  );
-  const tileByWidth = (availableWidth - boardHorizontalInsets - gap * (columns - 1)) / columns;
-  const tileByHeight = (availableHeight - boardVerticalInsets - gap * (rows - 1)) / rows;
-  const tileSize = Math.min(tileByWidth, tileByHeight);
-  if (!Number.isFinite(tileSize) || tileSize <= 0) return;
-  const fittedTileSize = Math.floor(tileSize * 1000) / 1000;
-  const boardWidth = fittedTileSize * columns + gap * (columns - 1) + boardHorizontalInsets;
-
-  board.style.setProperty("--link-tile-size", `${fittedTileSize}px`);
-  frame.style.width = `${boardWidth}px`;
+  const board = document.getElementById("link-board");
+  linkLayout = connectGameShellLayout({
+    root, frame, board,
+    chrome: [".link-game-name", ".link-game-progress-hud", ".link-game-hud", ".link-special-hud"].map(selector => root.querySelector(selector)),
+    ui: LINK_SHELL_UI,
+    getShape: () => linkLayoutShape,
+    onMeasure: recordLinkLayoutPass,
+    apply: ({ tileSize, boardWidth, boardHeight, gap, padding }) => {
+      board.style.setProperty("--link-tile-size", `${tileSize}px`);
+      board.style.gap = `${gap}px`;
+      board.style.padding = `${padding}px`;
+      frame.style.width = `${boardWidth}px`;
+      frame.style.visibility = tileSize > 0 ? "" : "hidden";
+    },
+  });
 }
 
-function readHorizontalInsets(styles) {
-  return (Number.parseFloat(styles.paddingLeft) || 0)
-    + (Number.parseFloat(styles.paddingRight) || 0)
-    + (Number.parseFloat(styles.borderLeftWidth) || 0)
-    + (Number.parseFloat(styles.borderRightWidth) || 0);
-}
-
-function readVerticalInsets(styles) {
-  return (Number.parseFloat(styles.paddingTop) || 0)
-    + (Number.parseFloat(styles.paddingBottom) || 0)
-    + (Number.parseFloat(styles.borderTopWidth) || 0)
-    + (Number.parseFloat(styles.borderBottomWidth) || 0);
+export function stopLinkBoardLayout() {
+  linkLayout?.destroy();
+  linkLayout = null;
+  linkLayoutShape = null;
 }

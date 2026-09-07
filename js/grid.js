@@ -5,16 +5,16 @@ import { getCardBackClass } from "./appearance.js";
 import { initLogic } from "./logic.js";
 import { getEquippedThemeId } from "./appearance.js";
 import { getThemeCards } from "./themeCatalog.js";
-import { GAME_SHELL_DEFAULTS } from "./gameShell/gameShellConfig.js";
+import { connectGameShellLayout } from "./gameShell/gameShellLayout.js";
 
-const MAX_TILE_SIZE = 180;
-const MIN_TILE_SIZE = 36;
-const COORDINATE_GUTTER_PX = 10;
-const BOARD_BOTTOM_INSET_PX = 8;
+// Named presentation overrides retain Memory's existing width/rounding conventions.
+const MEMORY_SHELL_UI = { layout: {
+  widthRatio: 0.9, mobileSideInset: 10, bottomInset: 8,
+  maxTileSize: 180, tilePrecision: 1, coordinateGutter: 10,
+} };
 let activeLayout = null;
-let resizeFrame = null;
+let memoryLayout = null;
 let renderedCoordinateShape = "";
-
 function updateCoordinateLabels(columns, rows, visible) {
   const columnLabels = document.getElementById("grid-coordinate-columns");
   const rowLabels = document.getElementById("grid-coordinate-rows");
@@ -46,86 +46,49 @@ function updateCoordinateLabels(columns, rows, visible) {
   );
 }
 
-function updateGridLayout() {
-  if (!activeLayout) return;
-
-  const gridContainer = document.getElementById("grid-container");
-  if (!gridContainer) return;
-  const boardFrame = document.getElementById("grid-board-frame");
-  if (!boardFrame) return;
-
-  const isPortraitMobile = window.innerWidth <= GAME_SHELL_DEFAULTS.breakpoints.mobile;
-  const isNarrowMobile = window.innerWidth <= GAME_SHELL_DEFAULTS.breakpoints.narrow;
-  const columns = isPortraitMobile
-    ? activeLayout.mobileColumns
-    : activeLayout.columns;
-  const rows = Math.ceil(activeLayout.tileCount / columns);
-  const showCoordinates = Boolean(gameState.settings.boardCoordinates);
-  const gap = isNarrowMobile ? GAME_SHELL_DEFAULTS.board.narrowGap : GAME_SHELL_DEFAULTS.board.gap;
-  const padding = isNarrowMobile ? GAME_SHELL_DEFAULTS.board.narrowPadding : GAME_SHELL_DEFAULTS.board.padding;
-  const gameContainer = document.getElementById("game-container");
-  const contentMaxWidth = Number.parseFloat(
-    gameContainer ? getComputedStyle(gameContainer).getPropertyValue("--shell-layout-content-max-width") : "",
-  ) || GAME_SHELL_DEFAULTS.layout.contentMaxWidth;
-  const availableWidth = Math.max(
-    240,
-    Math.min(
-      contentMaxWidth,
-      (isPortraitMobile ? window.innerWidth - 20 : window.innerWidth * 0.9)
-        - (showCoordinates ? COORDINATE_GUTTER_PX : 0),
-    ),
-  );
-  const boardTop = boardFrame.getBoundingClientRect().top;
-  const availableHeight = Math.max(
-    180,
-    window.innerHeight - boardTop - BOARD_BOTTOM_INSET_PX
-      - (showCoordinates ? COORDINATE_GUTTER_PX : 0),
-  );
-  const widthPerTile =
-    (availableWidth - padding * 2 - gap * (columns - 1)) / columns;
-  const heightPerTile =
-    (availableHeight - padding * 2 - gap * (rows - 1)) / rows;
-  const tileSize = Math.max(
-    MIN_TILE_SIZE,
-    Math.floor(Math.min(widthPerTile, heightPerTile, MAX_TILE_SIZE)),
-  );
-  const boardWidth = tileSize * columns + gap * (columns - 1) + padding * 2;
-  const layoutVariables = [
-    ["--grid-columns", columns],
-    ["--grid-rows", rows],
-    ["--grid-gap", `${gap}px`],
-    ["--grid-padding", `${padding}px`],
-    ["--tile-size", `${tileSize}px`],
-  ];
-
-  layoutVariables.forEach(([name, value]) => {
-    gridContainer.style.setProperty(name, value);
-    boardFrame?.style.setProperty(name, value);
+function mountMemoryLayout() {
+  const root = document.getElementById("game-container");
+  const frame = document.getElementById("grid-board-frame");
+  const board = document.getElementById("grid-container");
+  const chrome = ["game-logo", "game-progress-hud", "game-title", "memory-special-hud"]
+    .map(id => document.getElementById(id));
+  let shape;
+  memoryLayout = connectGameShellLayout({
+    root, frame, board, chrome, ui: MEMORY_SHELL_UI,
+    getShape: (viewport, config) => {
+      if (!activeLayout) return null;
+      const columns = viewport.width <= config.breakpoints.mobile ? activeLayout.mobileColumns : activeLayout.columns;
+      shape = { columns, rows: Math.ceil(activeLayout.tileCount / columns), coordinates: Boolean(gameState.settings.boardCoordinates) };
+      return shape;
+    },
+    apply: ({ tileSize, boardWidth, boardHeight, gap, padding }) => {
+      const gutter = shape.coordinates ? MEMORY_SHELL_UI.layout.coordinateGutter : 0;
+      for (const [name, value] of [
+        ["--grid-columns", shape.columns], ["--grid-rows", shape.rows],
+        ["--grid-gap", `${gap}px`], ["--grid-padding", `${padding}px`], ["--tile-size", `${tileSize}px`],
+      ]) {
+        board.style.setProperty(name, value);
+        frame.style.setProperty(name, value);
+      }
+      frame.style.visibility = tileSize > 0 ? "" : "hidden";
+      for (const element of chrome.slice(1)) element.style.setProperty("--board-width", `${boardWidth + gutter}px`);
+      frame.style.setProperty("--coordinate-gutter", `${gutter}px`);
+      frame.classList.toggle("is-coordinate-visible", shape.coordinates);
+      updateCoordinateLabels(shape.columns, shape.rows, shape.coordinates);
+    },
   });
-  document
-    .getElementById("game-title")
-    ?.style.setProperty("--board-width", `${boardWidth + (showCoordinates ? COORDINATE_GUTTER_PX : 0)}px`);
-  document
-    .getElementById("game-progress-hud")
-    ?.style.setProperty("--board-width", `${boardWidth + (showCoordinates ? COORDINATE_GUTTER_PX : 0)}px`);
-  document
-    .getElementById("memory-special-hud")
-    ?.style.setProperty("--board-width", `${boardWidth + (showCoordinates ? COORDINATE_GUTTER_PX : 0)}px`);
-  boardFrame?.classList.toggle("is-coordinate-visible", showCoordinates);
-  boardFrame?.style.setProperty("--coordinate-gutter", showCoordinates ? `${COORDINATE_GUTTER_PX}px` : "0px");
-  updateCoordinateLabels(columns, rows, showCoordinates);
+}
+
+export function stopGridLayout() {
+  memoryLayout?.destroy();
+  memoryLayout = null;
+  activeLayout = null;
 }
 
 export function setBoardCoordinatesVisible(visible) {
   gameState.settings.boardCoordinates = Boolean(visible);
-  updateGridLayout();
+  memoryLayout?.schedule();
 }
-
-window.addEventListener("resize", () => {
-  cancelAnimationFrame(resizeFrame);
-  resizeFrame = requestAnimationFrame(updateGridLayout);
-});
-
 /**
  * Tạo lưới theo chế độ; level chỉ quyết định tiến trình và phần thưởng.
  * Mỗi lần tạo màn sẽ chọn ngẫu nhiên ảnh từ kho chung của chủ đề.
@@ -165,8 +128,7 @@ export function createGrid(
   activeLayout = { tileCount, columns, mobileColumns };
   gridContainer.classList.add("is-locked");
   gameState.isLocked = true;
-  updateGridLayout();
-  requestAnimationFrame(updateGridLayout);
+  mountMemoryLayout();
 
   const tiles = document.createDocumentFragment();
   cards.forEach((cardData, idx) => {

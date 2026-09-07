@@ -10,7 +10,16 @@ function freeze(value) {
 }
 
 export const GAME_SHELL_SCHEMA = freeze({
-  layout: { contentMaxWidth: px(700, 1), gap: px(10) },
+  layout: {
+    contentMaxWidth: px(700, 1), gap: px(10), bottomInset: px(0),
+    widthRatio: { value: 1, unit: "", min: 0.01, max: 1 },
+    mobileWidthRatio: { value: 1, unit: "", min: 0.01, max: 1 },
+    sideInset: px(0), mobileSideInset: px(0),
+    maxTileSize: px(10000, 1), coordinateGutter: px(0),
+    tilePrecision: { value: 1000, unit: "", min: 1, max: 1000, integer: true },
+    edgeInsetMin: px(0), edgeInsetMax: px(0),
+    edgeInsetRatio: { value: 0, unit: "", min: 0, max: 1 },
+  },
   breakpoints: { mobile: px(600, 1), narrow: px(420, 1), landscapeHeight: px(500, 1) },
   board: { gap: px(6), narrowGap: px(4), padding: px(8), narrowPadding: px(6) },
   hud: {
@@ -62,7 +71,8 @@ export function normalizeGameShellConfig(overrides = {}, {
       const rule = GAME_SHELL_SCHEMA[group][name];
       if (!Object.hasOwn(GAME_SHELL_SCHEMA[group], name)
         || typeof value !== "number" || !Number.isFinite(value)
-        || value < rule.min || (group === "layers" && !Number.isInteger(value))) {
+        || value < rule.min || value > (rule.max ?? Infinity)
+        || ((group === "layers" || rule.integer) && !Number.isInteger(value))) {
         reject(`${group}.${name}`);
         continue;
       }
@@ -72,6 +82,10 @@ export function normalizeGameShellConfig(overrides = {}, {
   if (result.breakpoints.narrow > result.breakpoints.mobile) {
     reject("breakpoints.narrow");
     result.breakpoints.narrow = Math.min(GAME_SHELL_DEFAULTS.breakpoints.narrow, result.breakpoints.mobile);
+  }
+  if (result.layout.edgeInsetMin > result.layout.edgeInsetMax) {
+    reject("layout.edgeInsetMin");
+    result.layout.edgeInsetMin = result.layout.edgeInsetMax;
   }
   return freeze(result);
 }
