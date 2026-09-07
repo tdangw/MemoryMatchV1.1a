@@ -279,28 +279,34 @@
 
 .memory-special-hud {
   position: relative;
-  display: flex;
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
   align-items: center;
-  width: min(var(--board-width, 260px), calc(100vw - 120px));
+  gap: 7px;
+  width: min(var(--board-width, 100%), calc(100vw - 12px));
   min-height: 19px;
   margin: -2px auto 4px;
-  border: 1px solid rgb(185 213 255 / 24%);
-  border-radius: 9px;
-  background: rgb(106 151 211 / 45%);
+  box-sizing: border-box;
 }
 .memory-special-hud__coins {
-  position: absolute;
-  top: 50%;
-  right: calc(100% + 7px);
   display: inline-flex;
+  min-width: 0;
   align-items: center;
   gap: 3px;
   color: #ffd25f;
   font: 800 .7rem/1 "Segoe UI", sans-serif;
-  transform: translateY(-50%);
+  white-space: nowrap;
 }
 .memory-special-hud__coins .ui-icon { width: 18px; height: 18px; }
-.memory-special-hud__milestones { position: relative; flex: 1; height: 19px; }
+.memory-special-hud__milestones {
+  position: relative;
+  min-width: 0;
+  height: 19px;
+  box-sizing: border-box;
+  border: 1px solid rgb(185 213 255 / 24%);
+  border-radius: 9px;
+  background: rgb(106 151 211 / 45%);
+}
 .memory-special-hud__milestones::before,
 .memory-special-hud__milestones::after { content: ""; position: absolute; inset: 50% 5% auto; height: 2px; border-radius: 999px; transform: translateY(-50%); }
 .memory-special-hud__milestones::before { background: rgb(185 213 255 / 26%); }
@@ -357,7 +363,7 @@
 
   #game-title.game-hud {
     min-height: 30px;
-    padding: 0 64px;
+    padding: 0 74px;
     margin-bottom: 6px;
   }
 
