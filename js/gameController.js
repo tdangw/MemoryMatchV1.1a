@@ -56,7 +56,7 @@ import { TIME_UP_PURCHASES } from "./shopCatalog.js";
 import { resolveSessionTiming } from "./sessionTiming.js";
 import { clearLootEffects } from "./lootEffects.js";
 import { saveMemorySession, stageMemorySession } from "./memorySession.js";
-import { getMemoryShell } from "./gameShell/legacyShellAdapters.js";
+import { getMemoryShell } from "./memoryMatch/memoryShell.js";
 import { clearTooltip } from "./tooltips.js";
 
 let countdownInterval;

@@ -7,7 +7,7 @@ import { initLogic } from "./logic.js";
 import { getEquippedThemeId } from "./appearance.js";
 import { getThemeCards } from "./themeCatalog.js";
 import { connectGameShellLayout } from "./gameShell/gameShellLayout.js";
-import { getMemoryShell } from "./gameShell/legacyShellAdapters.js";
+import { getMemoryShell } from "./memoryMatch/memoryShell.js";
 
 // Named presentation overrides retain Memory's existing width/rounding conventions.
 const MEMORY_SHELL_UI = { layout: {

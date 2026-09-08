@@ -1,5 +1,5 @@
 import { presentEffect, flyToTarget, pulseTarget } from "./gameShell/gameShellEffects.js";
-import { getMemoryHud } from "./gameShell/legacyHudAdapters.js";
+import { getMemoryHud } from "./memoryMatch/memoryShell.js";
 import { setHudText, renderHudTimer } from "./gameShell/gameShellHud.js";
 import { shellTimeout as setTimeout, clearShellTimeout as clearTimeout, shellInterval as setInterval, clearShellInterval as clearInterval, shellFrame as requestAnimationFrame, cancelShellFrame as cancelAnimationFrame } from "./gameShell/gameShellLifecycle.js";
 // ui.js
@@ -244,7 +244,6 @@ export function showGameplayRewardPopup({
 export function clearGameplayRewardPopups() {
   clearRevealTimer(false);
   document.querySelectorAll(".level-reward-overlay, .fly-icon").forEach(element => element.remove());
-  document.querySelectorAll(".highlight-effect, .highlight-negative").forEach(element => element.classList.remove("highlight-effect", "highlight-negative"));
   rewardPopupQueue.length = 0;
   rewardPopupActive = false;
   clearTimeout(rewardPopupDismissTimer);

@@ -1,28 +1,8 @@
 import { createGameShellHud } from "./gameShellHud.js";
 import { formatClockTime } from "../uiCatalog.js";
 
-// ID adapters are removed with legacy markup in Phases 7–8.
-let memory;
+// Link adapter is removed with legacy markup in Phase 8.
 const link = new WeakMap();
-export function getMemoryHud() {
-  if (memory) return memory;
-  const find = id => document.getElementById(id);
-  const ids = { score: "score", level: "level", hint: "hint", moves: "moves", misses: "misses", combo: "combo", matchedPairs: "matched-pairs", totalPairs: "total-pairs", totalStars: "total-stars", timer: "timer-value" };
-  const stats = Object.fromEntries(Object.entries(ids).map(([key, id]) => [key, { element: find(id) }]));
-  stats.combo.format = value => value > 1 ? `x${value}` : "0";
-  stats.timer.format = formatClockTime;
-  const assist = (id, label) => ({ element: find(id), format: count => `${label} · Đang có: ${count}` });
-  return memory = createGameShellHud({ stats,
-    stars: { element: find("level-stars"), fill: find("level-stars-fill"), card: find("level-stars")?.closest(".stat-star-progress"), scoreCard: find("score")?.closest(".stat-points") },
-    coins: { element: find("memory-game-coins"), balance: find("memory-coin-balance") },
-    tools: {
-      time: assist("btn-buy-time", "Thời gian"), preview: assist("btn-preview-cards", "Xem trước"),
-      hint: { element: find("btn-hint"), tooltip: "Lật 2 thẻ để bạn ghi nhớ." },
-    },
-    milestones: { track: find("memory-special-hud"), markers: [...document.querySelectorAll("[data-memory-special-milestone]")], format: (progress, target) => `Năng lượng ${progress}/${target}` },
-  });
-}
-
 export function getLinkHud(hud) {
   if (!hud.root) return createGameShellHud();
   if (link.has(hud.root)) return link.get(hud.root);

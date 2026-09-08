@@ -266,6 +266,8 @@ Override không thuộc schema phải gây lỗi trong development. Production d
 
 ### Phase 7 — Di chuyển Memory Match
 
+**Trạng thái:** đã triển khai module giao diện/HUD Memory và xóa nhánh adapter legacy tương ứng. Đã sửa lỗi thiếu cấu hình canvas Link từ Phase 6; kiểm chứng và gate thủ công trong `GAME_SHELL_PHASE7.md`.
+
 **Thực hiện**
 
 - Memory dùng Game Shell, HUD/layout/effect adapter chung.

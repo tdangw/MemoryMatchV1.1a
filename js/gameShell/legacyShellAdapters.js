@@ -1,13 +1,7 @@
 import { createGameShell } from "./gameShell.js";
 
-// Temporary ID bindings: remove Memory's in Phase 7 and Link's in Phase 8.
+// Temporary Link ID bindings: remove in Phase 8.
 const adapters = new Map();
-export function getMemoryShell() {
-  return getShell("memory", "#game-container", "Memory Match", "flex", {
-    title: "#game-logo", progress: "#game-progress-hud", hud: "#game-title",
-    milestones: "#memory-special-hud", frame: "#grid-board-frame", board: "#grid-container",
-  });
-}
 export function getLinkShell() {
   return getShell("link", "#link-connect-container", "Link Connect", "", {
     title: "#link-game-logo", progress: ".link-game-progress-hud", hud: "#link-game-title",

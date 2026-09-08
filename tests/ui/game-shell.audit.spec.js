@@ -55,6 +55,13 @@ for (const [id, title, root, board] of [
     await page.mouse.move(0, 0);
     await page.evaluate(() => document.activeElement?.blur());
     // Advance virtual time, not wall time; settle preview, popup and layout callbacks.
+    // Compare markup migration separately from the new fullscreen feature.
+    if (process.env.GAME_SHELL_AUDIT_WITHOUT_FULLSCREEN === "1") {
+      await page.evaluate(() => {
+        document.querySelectorAll(".shell-fullscreen-button, .shell-fullscreen-status").forEach(node => node.remove());
+        document.querySelectorAll(".shell-fullscreen-title").forEach(node => node.classList.remove("shell-fullscreen-title"));
+      });
+    }
     await page.clock.runFor(15000);
     await expect(page.locator(".level-reward-overlay")).toHaveCount(0);
     await expect(page.locator(`${root} .is-locked`)).toHaveCount(0);

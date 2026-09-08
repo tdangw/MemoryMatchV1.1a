@@ -449,6 +449,16 @@ export function playLinkItemRewardFlight(source, itemId, { delayMs = 0 } = {}) {
   return delayMs > 0 ? scheduleTransientEffect(launch, delayMs) : launch();
 }
 
+const FRAGMENT_LAYOUTS = Object.freeze({
+  split2: Object.freeze({ columns: 2, rows: 1 }),
+  split4: Object.freeze({ columns: 2, rows: 2 }),
+  split8: Object.freeze({ columns: 4, rows: 2 }),
+  triangles: Object.freeze({ columns: 2, rows: 2, triangular: true }),
+  crumble: Object.freeze({ columns: 6, rows: 6 }),
+  pixel: Object.freeze({ columns: 5, rows: 5 }),
+});
+const CANVAS_EXIT_EFFECTS = new Set(["finedust", ...Object.keys(FRAGMENT_LAYOUTS)]);
+
 function playLinkCardExitEffects(tiles, exitId) {
   if (!CANVAS_EXIT_EFFECTS.has(exitId) || prefersReducedMotion()) return;
   const frame = document.getElementById("link-board-frame");

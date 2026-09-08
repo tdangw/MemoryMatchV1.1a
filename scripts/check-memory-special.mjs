@@ -40,7 +40,7 @@ assert.equal(gameState.progress.memoryMatch.items.preview4, 1);
 const hudCss = readFileSync(new URL("../styles/hud.css", import.meta.url), "utf8");
 const gameplayUiCss = readFileSync(new URL("../styles/gameplay-ui.css", import.meta.url), "utf8");
 const tooltipJs = readFileSync(new URL("../js/tooltips.js", import.meta.url), "utf8");
-const indexHtml = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+const indexHtml = readFileSync(new URL("../js/memoryMatch/memoryShellDom.js", import.meta.url), "utf8");
 const baseCss = readFileSync(new URL("../style.css", import.meta.url), "utf8");
 const linkCss = readFileSync(new URL("../styles/link-connect.css", import.meta.url), "utf8");
 assert.doesNotMatch(

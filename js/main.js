@@ -1,3 +1,4 @@
+import "./memoryMatch/memoryShellDom.js";
 import {
   applyEffectsSettings,
   enableButtonClickSounds,
