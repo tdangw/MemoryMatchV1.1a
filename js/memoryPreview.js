@@ -1,3 +1,4 @@
+import { shellTimeout as setTimeout } from "./gameShell/gameShellLifecycle.js";
 import { gameState } from "./gameState.js";
 import { GAMEPLAY_TIMING } from "./gameplayTuning.js";
 import { showRevealTimerInHud } from "./ui.js";

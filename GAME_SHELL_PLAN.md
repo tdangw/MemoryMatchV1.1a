@@ -205,6 +205,13 @@ Override không thuộc schema phải gây lỗi trong development. Production d
 
 ### Phase 4 — Game Shell DOM và lifecycle
 
+**Trạng thái: hoàn tất ngày 2026-09-08.**
+
+- Shell có semantic regions, refs ổn định và mount/update/unmount; scope sở hữu tài nguyên/callback theo round, modal có cleanup riêng. Adapter ID cũ có kiểm tra và lịch xóa ở Phase 7–8.
+- 128/128 UI đạt, sau hai sửa cleanup cuối chạy lại 28/28 lifecycle/cleanup (136 trường hợp riêng biệt tổng cộng). Check/build đạt; số node/listener về baseline sau 20 lượt.
+- Bundle so cùng danh sách asset gốc: 112.73 kB gzip, tăng 4.72 kB so baseline, trong ngân sách. Workspace có thêm asset thuộc công việc khác; xem cách tách số đo và báo cáo tại `GAME_SHELL_PHASE4.md`.
+- Bước tiếp theo: Phase 5 — HUD component dùng chung. Chưa triển khai Triple Connect.
+
 **Thực hiện**
 
 - Tạo cấu trúc semantic chung và trả reference để controller không query DOM lặp lại.

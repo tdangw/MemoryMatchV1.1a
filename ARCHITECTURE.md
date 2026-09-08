@@ -24,6 +24,8 @@ Phase 2 đã tích hợp `js/gameShell/gameShellConfig.js`: schema/defaults và 
 
 Phase 3 nối cả hai board vào `js/gameShell/gameShellLayout.js`: hàm fit thuần và kết nối đo viewport/safe area theo một RAF, một ResizeObserver cho shell hiện hành. Các adapter trong `grid.js`/`linkRenderer.js` cung cấp shape, cấu hình trình bày và chỉ ghi kết quả fit; renderer giữ quyền sở hữu tile/path. Controller hủy kết nối khi về Menu. Layout không import gameplay và không đăng ký tài nguyên lúc import; lifecycle toàn ứng dụng thuộc Phase 4. Chi tiết và giới hạn kiểm chứng nằm trong `GAME_SHELL_PHASE3.md`.
 
+Phase 4 tích hợp `gameShell.js` và `gameShellLifecycle.js`: shell trả reference ổn định cho sáu vùng semantic, API mount/update/unmount; mỗi lượt chơi sở hữu registry tài nguyên và callback guard. Controller/selector hủy scope khi đổi round/game; modal trong game có scope con và không gọi callback đóng của round cũ. `legacyShellAdapters.js` nối ID hiện có tới contract, xóa ở Phase 7–8. HUD con và motion strategy tiếp tục thuộc Phase 5–6. Chi tiết nằm trong `GAME_SHELL_PHASE4.md`.
+
 - Ứng dụng dùng HTML/CSS và JavaScript ES modules, không có framework UI.
 - `js/main.js` là entry point duy nhất; module chức năng không tự bootstrap ứng dụng.
 - Các controller phụ thuộc module dùng chung, nhưng không import lẫn nhau. Callback `configure*` nối các luồng cần điều hướng chéo.
@@ -103,6 +105,7 @@ Phase 3 nối cả hai board vào `js/gameShell/gameShellLayout.js`: hàm fit th
 
 - Controller dừng timer cũ trước khi tạo level hoặc rời màn.
 - Timeout, animation callback và reward chain không được tác động một round/board mới.
+- Scheduler tương thích của Game Shell đăng ký timer/RAF vào scope hiện hành; module ngoài màn chơi dùng scheduler trình duyệt. Listener toàn ứng dụng vẫn là singleton. Modal bị thay cùng ID hoặc hủy theo scope phải dọn listener, node và lịch đóng; không gọi callback tiếp tục của game cũ.
 - Khi tab bị ẩn, timer gameplay tạm dừng và âm thanh dừng. Khi quay lại, chỉ khôi phục trạng thái vốn đang chạy.
 - Controller checkpoint thời gian theo nhịp cấu hình và khi trang bị ẩn/rời; `sessionTiming.js` là nguồn luật duy nhất để phân biệt màn mới, chơi lại và khôi phục.
 - Dữ liệu gameplay được cập nhật trước UI; hiệu ứng chỉ biểu diễn kết quả, không phải nguồn sự thật.

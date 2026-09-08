@@ -1,3 +1,5 @@
+import { shellTimeout as setTimeout, clearShellTimeout as clearTimeout, shellFrame as requestAnimationFrame } from "./gameShell/gameShellLifecycle.js";
+
 const TOOLTIP_DELAY_MS = 450;
 const TOOLTIP_HIDE_MS = 3000;
 const VIEWPORT_GAP = 8;
@@ -122,6 +124,19 @@ function hideTooltip() {
   setTimeout(() => {
     if (!tooltip.classList.contains("is-visible")) tooltip.hidden = true;
   }, 120);
+}
+
+export function clearTooltip() {
+  clearTimeout(hideTimer);
+  clearTimeout(pressTimer);
+  activeAnchor?.removeAttribute("aria-describedby");
+  activeAnchor = pressAnchor = suppressClickFor = null;
+  // Keep the singleton DOM node; callbacks from the disposed round cannot show it.
+  if (tooltip) {
+    tooltip.classList.remove("is-visible");
+    tooltip.hidden = true;
+    tooltip.textContent = "";
+  }
 }
 
 function positionTooltip(anchor, element) {

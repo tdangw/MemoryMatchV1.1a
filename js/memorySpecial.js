@@ -1,3 +1,4 @@
+import { shellTimeout as setTimeout } from "./gameShell/gameShellLifecycle.js";
 import {
   GAME_CONFIG,
   getMemorySupportDrop,

@@ -1,3 +1,4 @@
+import { shellTimeout as setTimeout, shellFrame as requestAnimationFrame, cancelShellFrame as cancelAnimationFrame } from "./gameShell/gameShellLifecycle.js";
 import { createIcon } from "./icons.js";
 import { GAMEPLAY_TIMING } from "./gameplayTuning.js";
 import { prefersReducedMotion } from "./motion.js";

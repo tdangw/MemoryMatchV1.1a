@@ -1,3 +1,4 @@
+import { shellTimeout as setTimeout, clearShellTimeout as clearTimeout } from "./gameShell/gameShellLifecycle.js";
 // logic.js - Xử lý logic của trò chơi
 // chức năng của logic.js là xử lý logic của trò chơi, bao gồm việc xử lý sự kiện khi người chơi nhấp vào ô, kiểm tra xem hai ô có khớp nhau hay không, và kiểm tra xem người chơi đã hoàn thành cấp độ hay chưa. Nó cũng bao gồm các chức năng để khởi tạo logic và xử lý âm thanh khi người chơi tương tác với trò chơi.
 

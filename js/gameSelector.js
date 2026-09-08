@@ -1,4 +1,5 @@
 import { createIcon } from "./icons.js";
+import { unmountActiveGameShell } from "./gameShell/gameShell.js";
 import { createMainMenu, showGameInfoModal } from "./mainmenu.js";
 import { showSettingsPanel } from "./settings.js";
 import { openAppModal } from "./modal.js";
@@ -33,6 +34,7 @@ export function configureGameSelector({
 }
 
 export function showGameSelector() {
+  unmountActiveGameShell();
   activeGameId = null;
   document.documentElement.dataset.activeGame = "selector";
   document.getElementById("menu-container")?.remove();
@@ -59,6 +61,7 @@ export function showGameSelector() {
 }
 
 export function openGameMenu(gameId) {
+  unmountActiveGameShell();
   activeGameId = gameId;
   document.documentElement.dataset.activeGame = gameId;
   document.getElementById("menu-container")?.remove();

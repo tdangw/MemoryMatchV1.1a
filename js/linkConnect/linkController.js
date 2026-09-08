@@ -1,4 +1,9 @@
+import { shellTimeout as setTimeout, clearShellTimeout as clearTimeout, shellInterval as setInterval, clearShellInterval as clearInterval, shellFrame as requestAnimationFrame, cancelShellFrame as cancelAnimationFrame } from "../gameShell/gameShellLifecycle.js";
 import { createIcon } from "../icons.js";
+import { getLinkShell } from "../gameShell/legacyShellAdapters.js";
+import { unmountActiveGameShell } from "../gameShell/gameShell.js";
+import { clearTooltip } from "../tooltips.js";
+import { clearLootEffects } from "../lootEffects.js";
 import { openAppModal, showAppToast } from "../modal.js";
 import { pauseBackgroundMusic, sounds, syncDefaultMusic } from "../sound.js";
 import { getEquippedThemeId } from "../appearance.js";
@@ -206,6 +211,7 @@ export function startLinkLevel({
   timeLimit,
   levelStartTime,
 } = {}) {
+  unmountActiveGameShell();
   stopCountdown();
   clearGameplayRewardPopups();
   clearLinkTransientEffects();
@@ -284,6 +290,7 @@ export function continueLinkSession(session) {
 }
 
 export function returnToLinkMenu() {
+  getLinkShell().unmount();
   stopCountdown();
   stopLinkBoardLayout();
   if (isLinkGameVisible()) persistLinkRunProgress();
@@ -363,6 +370,19 @@ function showLinkGame() {
   document.getElementById("menu-container")?.remove();
   document.getElementById("game-container")?.style.setProperty("display", "none");
   container.removeAttribute("hidden");
+  getLinkShell().mount({ cleanup: () => {
+    stopCountdown();
+    stopLinkBoardLayout();
+    persistLinkRunProgress();
+    linkGameState.roundId += 1;
+    clearGameplayRewardPopups();
+    clearLinkPath();
+    clearLinkTileHints();
+    clearLinkTransientEffects();
+    clearLootEffects();
+    clearTooltip();
+    closeLinkToolsMenu();
+  } });
 }
 
 function configureLinkItemActions(container) {
@@ -1463,12 +1483,14 @@ function pauseLinkForBackground() {
   if (linkGameState.isPaused) return;
   isLinkAutoPaused = true;
   linkGameState.isPaused = true;
+  getLinkShell().update({ paused: true });
 }
 
 function resumeLinkFromBackground() {
   if (!isLinkAutoPaused) return;
   isLinkAutoPaused = false;
   linkGameState.isPaused = false;
+  getLinkShell().update({ paused: false });
   syncLinkTimeProgress();
 }
 

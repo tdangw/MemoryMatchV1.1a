@@ -1,0 +1,56 @@
+import assert from "node:assert/strict";
+import { createGameShellLifecycle, activateGameScope, getActiveGameScope, shellTimeout, clearShellTimeout } from "../js/gameShell/gameShellLifecycle.js";
+
+const timers = new Map();
+let serial = 0;
+const original = { setTimeout, clearTimeout, setInterval, clearInterval, requestAnimationFrame: globalThis.requestAnimationFrame, cancelAnimationFrame: globalThis.cancelAnimationFrame };
+for (const name of ["setTimeout", "setInterval", "requestAnimationFrame"]) globalThis[name] = callback => { timers.set(++serial, callback); return serial; };
+for (const name of ["clearTimeout", "clearInterval", "cancelAnimationFrame"]) globalThis[name] = handle => timers.delete(handle);
+try {
+  const scope = createGameShellLifecycle();
+  activateGameScope(scope);
+  let calls = 0;
+  const target = new EventTarget();
+  scope.listen(target, "probe", () => calls++);
+  target.dispatchEvent(new Event("probe"));
+  assert.equal(calls, 1);
+  const stale = scope.guard(() => calls++);
+  const handle = shellTimeout(() => calls++, 1);
+  clearShellTimeout(handle);
+  assert.equal(scope.diagnostics().timeout, 0);
+  scope.timeout(() => calls++, 1);
+  scope.interval(() => calls++, 1);
+  scope.frame(() => calls++);
+  const queued = [...timers.values()];
+  let removed = 0;
+  scope.own(() => removed++, "node");
+  let cancelled = 0;
+  scope.animation({ cancel() { cancelled++; }, finished: new Promise(() => {}) });
+  scope.dispose();
+  scope.dispose();
+  queued.forEach(callback => callback());
+  stale();
+  target.dispatchEvent(new Event("probe"));
+  assert.equal(calls, 1, "Already queued callbacks must be inert after disposal");
+  assert.equal(removed, 1);
+  assert.equal(cancelled, 1);
+  assert.equal(timers.size, 0);
+  assert.equal(getActiveGameScope(), null);
+  assert.ok(Object.entries(scope.diagnostics()).every(([key, value]) => key === "active" ? value === false : value === 0));
+  scope.timeout(() => calls++, 1);
+  assert.equal(timers.size, 0, "Dead scopes cannot schedule follow-up work");
+  const first = createGameShellLifecycle();
+  activateGameScope(first);
+  const next = createGameShellLifecycle();
+  activateGameScope(next);
+  assert.equal(first.active, false);
+  const once = next.timeout(() => calls++, 1);
+  const invoke = timers.get(once);
+  timers.delete(once);
+  invoke();
+  assert.equal(next.diagnostics().timeout, 0, "Completed work must release its registry entry");
+  next.dispose();
+} finally {
+  Object.assign(globalThis, original);
+}
+console.log("Game Shell lifecycle cancellation, stale callbacks, ownership and idempotent cleanup passed.");

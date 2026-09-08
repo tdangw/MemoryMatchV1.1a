@@ -1,3 +1,4 @@
+import { shellTimeout as setTimeout, shellInterval as setInterval, clearShellInterval as clearInterval } from "./gameShell/gameShellLifecycle.js";
 import {
   isBackgroundMusicPlaying,
   pauseBackgroundMusic,
@@ -55,6 +56,8 @@ import { TIME_UP_PURCHASES } from "./shopCatalog.js";
 import { resolveSessionTiming } from "./sessionTiming.js";
 import { clearLootEffects } from "./lootEffects.js";
 import { saveMemorySession, stageMemorySession } from "./memorySession.js";
+import { getMemoryShell } from "./gameShell/legacyShellAdapters.js";
+import { clearTooltip } from "./tooltips.js";
 
 let countdownInterval;
 let isAutoPaused = false;
@@ -82,6 +85,16 @@ export function restartMemoryLevel() {
 }
 
 export function initializeLevel(level, { reason = "new", session = null } = {}) {
+  getMemoryShell().mount({ cleanup: () => {
+    stopCountdown();
+    stopGridLayout();
+    if (isGameVisible()) persistMemorySession();
+    invalidateRound();
+    resetLogicRuntime();
+    clearLootEffects();
+    clearGameplayRewardPopups();
+    clearTooltip();
+  } });
   stopCountdown();
   resetLogicRuntime();
   clearLootEffects();
@@ -90,7 +103,7 @@ export function initializeLevel(level, { reason = "new", session = null } = {}) 
   isAutoPaused = false;
   document.getElementById("menu-container")?.remove();
   document.body.classList.remove("game-is-paused");
-  const gameContainer = document.getElementById("game-container");
+  const gameContainer = getMemoryShell().refs.root;
   if (gameContainer) gameContainer.style.display = "flex";
 
   const mode = gameState.settings.mode || "easy";
@@ -189,6 +202,7 @@ function pauseForBackground() {
   persistMemorySession();
   isAutoPaused = true;
   gameState.isPaused = true;
+  getMemoryShell().update({ paused: true });
   document.body.classList.add("game-is-paused");
 }
 
@@ -196,6 +210,7 @@ function resumeFromBackground() {
   if (isAutoPaused) {
     isAutoPaused = false;
     gameState.isPaused = false;
+    getMemoryShell().update({ paused: false });
     document.body.classList.remove("game-is-paused");
     syncMemoryTimeProgress({ remainingSeconds: gameState.remainingTime, timeLimit: gameState.timeLimit });
   }
@@ -314,6 +329,7 @@ export function nextLevel() {
 }
 
 export function returnToMainMenu() {
+  getMemoryShell().unmount();
   stopCountdown();
   stopGridLayout();
   persistMemorySession();

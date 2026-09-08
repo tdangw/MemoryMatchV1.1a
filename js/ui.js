@@ -1,3 +1,4 @@
+import { shellTimeout as setTimeout, clearShellTimeout as clearTimeout, shellInterval as setInterval, clearShellInterval as clearInterval, shellFrame as requestAnimationFrame, cancelShellFrame as cancelAnimationFrame } from "./gameShell/gameShellLifecycle.js";
 // ui.js
 import { gameState } from "./gameState.js";
 import { GAMEPLAY_TIMING, getComboPresentation } from "./gameplayTuning.js";
@@ -19,6 +20,7 @@ import {
   playCoinRewardFlight,
 } from "./coinRewards.js";
 import { getMemoryItemTotal } from "./memoryItems.js";
+import { getActiveGameScope } from "./gameShell/gameShellLifecycle.js";
 
 const scoreElement = document.getElementById("score");
 const levelElement = document.getElementById("level");
@@ -324,6 +326,9 @@ export function showGameplayRewardPopup({
 }
 
 export function clearGameplayRewardPopups() {
+  clearRevealTimer(false);
+  document.querySelectorAll(".level-reward-overlay, .fly-icon").forEach(element => element.remove());
+  document.querySelectorAll(".highlight-effect, .highlight-negative").forEach(element => element.classList.remove("highlight-effect", "highlight-negative"));
   rewardPopupQueue.length = 0;
   rewardPopupActive = false;
   clearTimeout(rewardPopupDismissTimer);
@@ -438,10 +443,11 @@ export function showLevelRewardOverlay({
 
 export function showLevelSummaryOverlay(completion) {
   gameState.isPaused = true;
+  const scope = getActiveGameScope();
   showSummaryFireworks({
     durationMs: GAMEPLAY_TIMING.victoryFireworksDurationMs,
     containerId: completion.fireworksContainerId,
-  }).finally(() => openLevelSummaryOverlay(completion));
+  }).finally(() => { if (!scope || scope.active) openLevelSummaryOverlay(completion); });
 }
 
 function openLevelSummaryOverlay({
@@ -604,7 +610,7 @@ function animateSummaryNumber(element, target, {
     return;
   }
 
-  window.setTimeout(() => {
+  setTimeout(() => {
     if (!element.isConnected) return;
     const startedAt = performance.now();
     const tick = (now) => {
@@ -612,9 +618,9 @@ function animateSummaryNumber(element, target, {
       const progress = Math.min(1, (now - startedAt) / durationMs);
       const easedProgress = 1 - (1 - progress) ** 3;
       render(Math.round(total * easedProgress));
-      if (progress < 1) window.requestAnimationFrame(tick);
+      if (progress < 1) requestAnimationFrame(tick);
     };
-    window.requestAnimationFrame(tick);
+    requestAnimationFrame(tick);
   }, delayMs);
 }
 

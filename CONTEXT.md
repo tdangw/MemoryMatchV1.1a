@@ -48,7 +48,7 @@ Tài liệu này chỉ ghi trạng thái sản phẩm và các quy tắc đang c
 
 ## Phần còn cần kiểm tra
 
-- Game Shell: Phase 1–3 đã hoàn tất; bước tiếp theo là Phase 4 (DOM và lifecycle). Hai game dùng chung `js/gameShell/gameShellLayout.js`, board fit viewport/safe area và dọn bộ đo khi về Menu; 108/108 UI tests, check/build đạt. Mobile dọc là ưu tiên; HUD giữ baseline, bàn Link sửa ô tràn trong khung cũ. Ngang vẫn có thể thu gọn nút ở phase HUD. Chi tiết trong `GAME_SHELL_PHASE3.md`.
+- Game Shell: Phase 1–4 đã hoàn tất; bước tiếp theo là Phase 5 (HUD component dùng chung). Hai game dùng chung layout, contract DOM và scope tài nguyên theo round; đổi game/chơi lại hủy callback, timer, modal và hiệu ứng cũ. 136 trường hợp UI, check/build đạt; node/listener về baseline sau 20 lượt. Mobile dọc vẫn ưu tiên, HUD giữ hình học hiện có. Chi tiết trong `GAME_SHELL_PHASE4.md`.
 
 1. Rà trực quan từng hiệu ứng đường nối và xóa thẻ trong Bộ sưu tập trước khi coi là đạt chất lượng phát hành.
 2. Kiểm thử Link Connect trên thiết bị mobile hẹp, bàn 6 cột và level cao với mọi kiểu dịch chuyển.

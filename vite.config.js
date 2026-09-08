@@ -14,6 +14,9 @@ export default defineConfig(({ mode }) => {
       },
     },
     server: {
+      // Opt-in UI runs need a stable module graph while other tasks update assets.
+      hmr: process.env.GAME_SHELL_TEST_PORT ? false : undefined,
+      watch: process.env.GAME_SHELL_TEST_PORT ? null : undefined,
       host: '0.0.0.0',
       port: 4173,
       strictPort: true,

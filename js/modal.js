@@ -1,5 +1,8 @@
 import { createIcon } from "./icons.js";
 import { UI_TIMING } from "./uiCatalog.js";
+import { createGameShellLifecycle, getActiveGameScope } from "./gameShell/gameShellLifecycle.js";
+
+const modals = new Map();
 
 export function openAppModal({
   id,
@@ -14,7 +17,12 @@ export function openAppModal({
   closeOnEscape = true,
   onClose,
 }) {
-  if (id) document.getElementById(id)?.remove();
+  if (id) {
+    modals.get(id)?.();
+    document.getElementById(id)?.remove();
+  }
+  const lifecycle = createGameShellLifecycle();
+  const owner = getActiveGameScope();
 
   const overlay = document.createElement("div");
   overlay.className = "app-modal-overlay";
@@ -35,14 +43,26 @@ export function openAppModal({
   header.appendChild(heading);
 
   let closed = false;
+  let destroyed = false;
+  let releaseOwner;
+  const destroy = () => {
+    if (destroyed) return;
+    destroyed = closed = true;
+    lifecycle.dispose();
+    releaseOwner?.forget();
+    overlay.remove();
+    if (id && modals.get(id) === destroy) modals.delete(id);
+  };
+  releaseOwner = owner?.own(destroy, "node");
+  if (id) modals.set(id, destroy);
   const close = () => {
     if (closed) return;
     closed = true;
-    document.removeEventListener("keydown", handleKeydown);
+    removeKeydown();
     overlay.classList.add("is-closing");
-    setTimeout(() => {
-      onClose?.();
-      overlay.remove();
+    lifecycle.timeout(() => {
+      destroy();
+      if (!owner || owner.active) onClose?.();
     }, UI_TIMING.modalCloseMs);
   };
 
@@ -52,7 +72,7 @@ export function openAppModal({
     closeButton.type = "button";
     closeButton.setAttribute("aria-label", "Đóng");
     closeButton.textContent = "×";
-    closeButton.addEventListener("click", close);
+    lifecycle.listen(closeButton, "click", close);
     header.appendChild(closeButton);
   }
 
@@ -73,7 +93,7 @@ export function openAppModal({
       button.className = `app-button app-button--${variant}`;
       if (icon) button.appendChild(createIcon(icon));
       button.appendChild(document.createTextNode(label));
-      button.addEventListener("click", () => onClick?.(close) ?? close());
+      lifecycle.listen(button, "click", () => onClick?.(close) ?? close());
       footer.appendChild(button);
     });
     panel.appendChild(footer);
@@ -86,14 +106,14 @@ export function openAppModal({
     if (event.key === "Escape" && dismissible && closeOnEscape) close();
   }
 
-  document.addEventListener("keydown", handleKeydown);
+  const removeKeydown = lifecycle.listen(document, "keydown", handleKeydown);
   if (closeOnBackdrop && dismissible) {
-    overlay.addEventListener("click", (event) => {
+    lifecycle.listen(overlay, "click", (event) => {
       if (event.target === overlay) close();
     });
   }
 
-  return { overlay, panel, body, close };
+  return { overlay, panel, body, close, destroy };
 }
 
 export function showAppToast(message, { tone = "info", duration = 1600 } = {}) {

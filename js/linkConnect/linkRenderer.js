@@ -1,3 +1,4 @@
+import { shellTimeout as setTimeout, clearShellTimeout as clearTimeout, shellFrame as requestAnimationFrame } from "../gameShell/gameShellLifecycle.js";
 import { getActiveLinkConnectionEffect } from "./linkEffects.js";
 import { gameState } from "../gameState.js";
 import { createIcon } from "../icons.js";
@@ -5,6 +6,8 @@ import { getLinkItemDefinition } from "./linkItems.js";
 import { calculateMotionDelta, prefersReducedMotion, readCssTimeMs } from "../motion.js";
 import { LINK_CONNECT_TIMING } from "./linkConfig.js";
 import { connectGameShellLayout } from "../gameShell/gameShellLayout.js";
+import { getLinkShell } from "../gameShell/legacyShellAdapters.js";
+import { getActiveGameScope } from "../gameShell/gameShellLifecycle.js";
 import {
   measureLinkRender,
   recordLinkLayoutPass,
@@ -126,6 +129,7 @@ function animateLinkTileMotion(element, deltaX, deltaY, index, settings) {
     delay: stagger,
     easing: settings.shuffle ? "cubic-bezier(.16,.74,.2,1)" : "cubic-bezier(.18,.72,.2,1)",
   });
+  getActiveGameScope()?.animation(animation);
   tileMotionAnimations.set(element, animation);
   activeTileMotionAnimations.add(animation);
   const clearAnimation = () => {
@@ -168,6 +172,7 @@ function patchLinkBoard(board, onTileClick) {
     if (desiredTiles.has(key)) return;
     const previousCell = element.parentElement;
     if (previousCell) changedCells.add(previousCell);
+    element.querySelectorAll("img").forEach(image => image.removeAttribute("src"));
     element.remove();
     tileElementsByKey.delete(key);
   });
@@ -211,6 +216,7 @@ function createLinkBoardCells(container, columns, rows) {
       fragment.append(cell);
     }
   }
+  container.querySelectorAll("img").forEach(image => image.removeAttribute("src"));
   container.replaceChildren(fragment);
   renderedBoardContainer = container;
   renderedBoardShape = `${columns}x${rows}`;
@@ -1062,12 +1068,10 @@ function readBoardGap(boardElement) {
 const LINK_SHELL_UI = { layout: { edgeInsetMin: 4, edgeInsetMax: 8, edgeInsetRatio: 0.01 } };
 
 function mountLinkBoardLayout() {
-  const root = document.getElementById("link-connect-container");
-  const frame = document.getElementById("link-board-frame");
-  const board = document.getElementById("link-board");
+  const { root, frame, board, title, progress, hud, milestones } = getLinkShell().refs;
   linkLayout = connectGameShellLayout({
     root, frame, board,
-    chrome: [".link-game-name", ".link-game-progress-hud", ".link-game-hud", ".link-special-hud"].map(selector => root.querySelector(selector)),
+    chrome: [title, progress, hud, milestones],
     ui: LINK_SHELL_UI,
     getShape: () => linkLayoutShape,
     onMeasure: recordLinkLayoutPass,

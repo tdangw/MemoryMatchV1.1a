@@ -1,3 +1,4 @@
+import { shellTimeout as setTimeout } from "./gameShell/gameShellLifecycle.js";
 import { shuffleArray } from "./utils.js";
 import { GAME_CONFIG, getLuckyReward, isChallengeMode } from "./config.js";
 import { gameState, setLuckyRewards } from "./gameState.js";
@@ -6,6 +7,7 @@ import { initLogic } from "./logic.js";
 import { getEquippedThemeId } from "./appearance.js";
 import { getThemeCards } from "./themeCatalog.js";
 import { connectGameShellLayout } from "./gameShell/gameShellLayout.js";
+import { getMemoryShell } from "./gameShell/legacyShellAdapters.js";
 
 // Named presentation overrides retain Memory's existing width/rounding conventions.
 const MEMORY_SHELL_UI = { layout: {
@@ -47,11 +49,8 @@ function updateCoordinateLabels(columns, rows, visible) {
 }
 
 function mountMemoryLayout() {
-  const root = document.getElementById("game-container");
-  const frame = document.getElementById("grid-board-frame");
-  const board = document.getElementById("grid-container");
-  const chrome = ["game-logo", "game-progress-hud", "game-title", "memory-special-hud"]
-    .map(id => document.getElementById(id));
+  const { root, frame, board, title, progress, hud, milestones } = getMemoryShell().refs;
+  const chrome = [title, progress, hud, milestones];
   let shape;
   memoryLayout = connectGameShellLayout({
     root, frame, board, chrome, ui: MEMORY_SHELL_UI,
@@ -151,6 +150,7 @@ export function createGrid(
     tile.appendChild(img);
     tiles.appendChild(tile);
   });
+  gridContainer.querySelectorAll("img").forEach(image => image.removeAttribute("src"));
   gridContainer.replaceChildren(tiles);
 
   // ✅ Preview ảnh trước khi bắt đầu
