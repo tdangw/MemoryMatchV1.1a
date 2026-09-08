@@ -24,7 +24,7 @@ Tài liệu này chỉ ghi trạng thái sản phẩm và các quy tắc đang c
 - Dễ/Trung bình/Khó/Siêu khó dùng bàn cố định; Thử thách tăng kích thước theo level; Vô tận đếm thời gian xuôi.
 - Ô may mắn của Thử thách có thể thưởng thời gian, Gợi ý hoặc Xu.
 - Cặp đặc biệt có thể rơi năng lượng và hỗ trợ. Năng lượng chạy vòng 10 mốc riêng của Memory Match; tỷ lệ đang là 100% để kiểm thử. Gói Xem trước rơi ra tự dùng và được phân biệt bằng màu, không hiện nhãn số trên vật phẩm.
-- Kho Memory Match lưu riêng các gói Xem trước 4/8/12/tất cả và Thời gian 10/30/45/60 giây. Mua trong cửa hàng chỉ thêm vào kho; hai nút HUD mở kho để dùng. Gợi ý giữ luồng sử dụng hiện tại.
+- Kho Memory Match lưu riêng các gói Xem trước 4/8/12/tất cả và Thời gian 10/30/45/60 giây. Mua trong cửa hàng chỉ thêm vào kho; hai nút HUD mở kho để dùng. Gợi ý giữ luồng sử dụng hiện tại. Cửa hàng mở tab Vật phẩm mặc định: tám gói kho Memory được bán cả ở menu và trong game; Gợi ý theo ván chỉ bán trong game. Link Connect bán đủ bốn vật phẩm ở cả hai nơi. Đã kiểm tra bốn luồng mua, trừ Xu, cộng kho và tải lại bằng `tests/ui/shop-inventory.spec.js`.
 - Hoàn thành màn 100 chạy cảnh chiến thắng cuối; thời lượng và trình tự hiệu ứng lấy từ `js/gameplayTuning.js` và `js/victoryCelebration.js`.
 - Cấu hình và công thức chính nằm trong `js/config.js`; luồng chơi nằm trong `js/gameController.js`, `js/logic.js` và `js/grid.js`.
 

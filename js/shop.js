@@ -160,7 +160,8 @@ export function openShopOverlay({ fromMenu = false, gameId = "memory-match", lin
     tabs.append(itemsTab, pathEffectsTab, exitEffectsTab, themesTab);
     renderLinkItems(grid, roundId, modal);
   } else {
-    const appearanceTab = createTab("Ngoại hình", true, () =>
+    const itemsTab = createTab("Vật phẩm", true, () => renderMemoryItems(grid, roundId, modal));
+    const appearanceTab = createTab("Ngoại hình", false, () =>
       renderAppearance(grid, roundId, modal),
     );
     const flipEffectsTab = createTab("Hiệu ứng lật", false, () =>
@@ -169,8 +170,8 @@ export function openShopOverlay({ fromMenu = false, gameId = "memory-match", lin
     const themesTab = createTab("Chủ đề", false, () =>
       renderThemes(grid, roundId, modal, gameId),
     );
-    tabs.append(appearanceTab, flipEffectsTab, themesTab);
-    renderAppearance(grid, roundId, modal);
+    tabs.append(itemsTab, appearanceTab, flipEffectsTab, themesTab);
+    renderMemoryItems(grid, roundId, modal);
   }
 }
 
@@ -215,16 +216,35 @@ function renderLinkEffectShop(grid, title, equippedKey, ownedKey, effects, round
   grid.append(group);
 }
 
+function renderMemoryItems(grid, roundId, modal) {
+  const fromMenu = modal.overlay.dataset.fromMenu === "true";
+  const items = SHOP_ITEMS.filter(item => !fromMenu || item.type !== "hint");
+  renderInventoryItems(grid, roundId, modal, items, "Vật phẩm Memory Match", item => {
+    if (item.type === "hint") return `${gameState.hints} lượt trong ván này`;
+    const id = item.type === "time"
+      ? getMemoryItemId("time", item.value)
+      : getMemoryItemId("preview", item.type === "reveal-all" ? "all" : item.value);
+    return getMemoryItemCount(id);
+  }, () => renderMemoryItems(grid, roundId, modal));
+}
+
 function renderLinkItems(grid, roundId, modal) {
+  renderInventoryItems(grid, roundId, modal,
+    LINK_ITEMS.map(item => ({ ...item, type: "link-item" })),
+    "Vật phẩm Link Connect", item => getLinkItemCount(item.id),
+    () => renderLinkItems(grid, roundId, modal));
+}
+
+function renderInventoryItems(grid, roundId, modal, items, title, getCount, refresh) {
   grid.className = "shop-item-grid shop-item-grid--appearance";
   grid.replaceChildren();
   const group = document.createElement("section");
   group.className = "appearance-group";
   const heading = document.createElement("h3");
-  heading.textContent = "Vật phẩm Link Connect";
+  heading.textContent = title;
   const choices = document.createElement("div");
   choices.className = "appearance-choice-grid";
-  LINK_ITEMS.forEach((item) => {
+  items.forEach((item) => {
     const card = document.createElement("article");
     card.className = "appearance-choice";
     const preview = document.createElement("div");
@@ -233,16 +253,16 @@ function renderLinkItems(grid, roundId, modal) {
     const name = document.createElement("strong");
     name.textContent = item.title;
     const count = document.createElement("small");
-    count.textContent = `Đang có: ${getLinkItemCount(item.id)}`;
+    count.textContent = `Đang có: ${getCount(item)}`;
     const button = document.createElement("button");
     button.type = "button";
     button.className = "app-button app-button--purchase shop-buy-button";
     button.append(document.createTextNode(String(item.price)), createIcon("coin"));
     button.onclick = () => openPurchaseConfirmation(
-      { ...item, type: "link-item" },
+      { ...item, price: getShopItemPrice(item) },
       roundId,
       modal,
-      () => renderLinkItems(grid, roundId, modal),
+      refresh,
     );
     card.append(preview, name, count, button);
     choices.append(card);
