@@ -14,7 +14,9 @@ const {
 export const gameState = {
   currentLevel: 1,
   score: defaultScore,
-  hints: defaultHints, // Gắn theo biến gốc
+  // Compatibility alias: gameplay and HUD always use the persistent inventory.
+  get hints() { return this.progress.memoryMatch.items.hint; },
+  set hints(value) { this.progress.memoryMatch.items.hint = normalizeItemCount(value); },
   moves: 0,
   misses: 0,
   combo: 0,
@@ -35,7 +37,7 @@ export const gameState = {
       totalStars: 0,
       totalScore: 0,
       bestByLevel: {},
-      items: { preview4: 0, preview8: 0, preview12: 0, previewAll: 0, time10: 0, time30: 0, time45: 0, time60: 0 },
+      items: { hint: defaultHints, preview4: 0, preview8: 0, preview12: 0, previewAll: 0, time10: 0, time30: 0, time45: 0, time60: 0 },
     },
     linkConnect: {
       totalStars: 0,
@@ -68,12 +70,19 @@ export function hydrateGameState({
 } = {}) {
   gameState.coins = Number.isFinite(coins) ? Math.max(0, Math.floor(coins)) : 0;
   const memoryMatch = progress?.memoryMatch || {};
+  const memorySessions = normalizeSessions(memoryMatch.sessionsByMode, memoryMatch.activeSession);
+  const legacyHints = Object.values(memorySessions).flatMap(session => Number.isFinite(session.hints) ? [session.hints] : []);
+  // An explicit inventory count (including zero) is the migration marker.
+  const hintCount = Object.hasOwn(memoryMatch.items || {}, "hint")
+    ? normalizeItemCount(memoryMatch.items.hint)
+    : legacyHints.length ? Math.max(...legacyHints) : defaultHints;
+  for (const session of Object.values(memorySessions)) delete session.hints;
   gameState.progress.memoryMatch = {
     totalStars: normalizeNonNegativeInteger(memoryMatch.totalStars),
     totalScore: normalizeNonNegativeInteger(memoryMatch.totalScore),
     bestByLevel: normalizeBestByLevel(memoryMatch.bestByLevel),
-    sessionsByMode: normalizeSessions(memoryMatch.sessionsByMode, memoryMatch.activeSession),
-    items: normalizeMemoryItems(memoryMatch.items),
+    sessionsByMode: memorySessions,
+    items: { ...normalizeMemoryItems(memoryMatch.items), hint: hintCount },
   };
   const linkConnect = progress?.linkConnect || {};
   const linkItems = linkConnect.items || {};
@@ -218,7 +227,6 @@ export function resetGame() {
   invalidateRound();
   gameState.currentLevel = 1;
   gameState.score = defaultScore;
-  gameState.hints = defaultHints; // Lấy từ giá trị mặc định
   gameState.moves = 0;
   gameState.misses = 0;
   gameState.combo = 0;

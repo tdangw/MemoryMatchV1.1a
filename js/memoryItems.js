@@ -2,6 +2,7 @@ import { gameState } from "./gameState.js";
 import { GAMEPLAY_LIMITS } from "./gameplayTuning.js";
 
 export const MEMORY_ITEMS = Object.freeze([
+  Object.freeze({ id: "hint", type: "hint", value: 1, title: "Gợi ý", icon: "search", tier: "blue" }),
   Object.freeze({ id: "preview4", type: "preview", value: 4, title: "Xem trước 4 thẻ", icon: "eye", tier: "teal" }),
   Object.freeze({ id: "preview8", type: "preview", value: 8, title: "Xem trước 8 thẻ", icon: "eye", tier: "blue" }),
   Object.freeze({ id: "preview12", type: "preview", value: 12, title: "Xem trước 12 thẻ", icon: "eye", tier: "purple" }),

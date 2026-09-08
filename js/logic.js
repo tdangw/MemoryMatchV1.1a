@@ -404,6 +404,10 @@ function awardLuckyRewardValue(reward, tileElement) {
     const before = gameState.hints;
     gameState.hints = Math.min(GAMEPLAY_LIMITS.itemCount, gameState.hints + reward.value);
     if (gameState.hints > before) {
+      if (!savePersistentGameData({ progress: gameState.progress })) {
+        gameState.hints = before;
+        return;
+      }
       tileElement?.classList.add("lucky-reward");
       recordLuckyAward(reward);
       updateHintDisplay(gameState.hints);

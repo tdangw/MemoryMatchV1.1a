@@ -121,7 +121,7 @@ assert.equal(gameState.settings.musicVolume, 0);
 assert.deepEqual(gameState.progress.memoryMatch.sessionsByMode.challenge, {
   mode: "challenge",
   level: 2,
-  hints: 4,
 });
+assert.equal(gameState.progress.memoryMatch.items.hint, 4);
 
 console.log("Shared game catalog checks passed.");

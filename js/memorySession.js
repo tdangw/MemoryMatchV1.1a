@@ -8,7 +8,6 @@ export function getMemorySessionSnapshot(overrides = {}) {
     remainingTime: gameState.remainingTime,
     timeLimit: gameState.timeLimit,
     levelStartTime: gameState.levelStartTime,
-    hints: gameState.hints,
     specialProgress: gameState.specialProgress,
     specialNoEnergyDropStreak: gameState.specialNoEnergyDropStreak,
     ...overrides,

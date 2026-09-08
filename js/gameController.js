@@ -119,9 +119,7 @@ export function initializeLevel(level, { reason = "new", session = null } = {}) 
   gameState.timeLimit = timing.timeLimit;
   gameState.levelStartTime = timing.levelStartTime;
   sessionCheckpointTicks = 0;
-  gameState.hints = reason === "resume" && Number.isFinite(session?.hints)
-    ? Math.max(0, Math.floor(session.hints))
-    : gameState.hints + hintBonus;
+  gameState.hints += hintBonus;
   if (reason === "resume") {
     gameState.specialProgress = Math.max(0, Math.floor(session?.specialProgress || 0))
       % GAME_CONFIG.special.progressTarget;
@@ -386,7 +384,10 @@ export function handleHintClick() {
   if (!pair) return showBonusOverlay("Hiện không có cặp thẻ phù hợp để gợi ý.");
 
   gameState.hints -= 1;
-  persistMemorySession();
+  if (!persistMemorySession()) {
+    gameState.hints += 1;
+    return showBonusOverlay("Không thể lưu lượt gợi ý. Hãy thử lại.");
+  }
   updateHintDisplay(gameState.hints);
   revealHintPair(pair.slice(0, 2), gameState.roundId);
   showBonusOverlay("Đã lật 2 thẻ trong vài giây.");

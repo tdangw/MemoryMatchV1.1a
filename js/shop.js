@@ -217,10 +217,9 @@ function renderLinkEffectShop(grid, title, equippedKey, ownedKey, effects, round
 }
 
 function renderMemoryItems(grid, roundId, modal) {
-  const fromMenu = modal.overlay.dataset.fromMenu === "true";
-  const items = SHOP_ITEMS.filter(item => !fromMenu || item.type !== "hint");
+  const items = SHOP_ITEMS;
   renderInventoryItems(grid, roundId, modal, items, "Vật phẩm Memory Match", item => {
-    if (item.type === "hint") return `${gameState.hints} lượt trong ván này`;
+    if (item.type === "hint") return gameState.hints;
     const id = item.type === "time"
       ? getMemoryItemId("time", item.value)
       : getMemoryItemId("preview", item.type === "reveal-all" ? "all" : item.value);
@@ -577,23 +576,17 @@ function handleBuyItem(item, roundId, fromMenu = false) {
 
   if (item.type === "hint") {
     const previousHints = gameState.hints;
-    const sessions = (gameState.progress.memoryMatch.sessionsByMode ||= {});
-    const mode = gameState.settings.mode;
-    const previousSession = sessions[mode] ? { ...sessions[mode] } : null;
     gameState.hints = Math.min(GAMEPLAY_LIMITS.itemCount, gameState.hints + item.value);
-    stageMemorySession({ hints: gameState.hints });
     if (!savePersistentGameData({ coins: gameState.coins, progress: gameState.progress })) {
       gameState.coins = previousCoins;
       gameState.hints = previousHints;
-      if (previousSession) sessions[mode] = previousSession;
-      else delete sessions[mode];
       showShopMessage("Không thể lưu giao dịch. Xu và hỗ trợ chưa thay đổi.", "error");
       return false;
     }
     updateCoinDisplay(gameState.coins);
     const grantedHints = gameState.hints - previousHints;
     updateHintDisplay(gameState.hints);
-    animateIconToTarget("search", "#hint");
+    if (!fromMenu) animateIconToTarget("search", "#hint");
     showShopMessage(`Đã mua +${grantedHints} gợi ý`);
     return true;
   }
