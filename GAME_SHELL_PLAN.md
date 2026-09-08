@@ -283,6 +283,8 @@ Override không thuộc schema phải gây lỗi trong development. Production d
 
 ### Phase 8 — Di chuyển Link Connect
 
+**Trạng thái:** đã chuyển markup/HUD/control Link sang module riêng dùng core, xóa hai adapter legacy. Kiểm chứng và gate thủ công trước Phase 9 trong `GAME_SHELL_PHASE8.md`.
+
 **Thực hiện**
 
 - Link dùng Game Shell/HUD/layout/effect contracts.

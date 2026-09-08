@@ -8,7 +8,7 @@ import { getLinkItemDefinition } from "./linkItems.js";
 import { calculateMotionDelta, prefersReducedMotion, readCssTimeMs } from "../motion.js";
 import { LINK_CONNECT_TIMING } from "./linkConfig.js";
 import { connectGameShellLayout } from "../gameShell/gameShellLayout.js";
-import { getLinkShell } from "../gameShell/legacyShellAdapters.js";
+import { getLinkShell } from "./linkShell.js";
 import {
   measureLinkRender,
   recordLinkLayoutPass,

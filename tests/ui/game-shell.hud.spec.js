@@ -12,7 +12,7 @@ test("HUD patches stay local, skip repeated writes and share timer states", asyn
     const result = await page.evaluate(async id => {
       const { createGameShellHud, renderHudTimer } = await import("/js/gameShell/gameShellHud.js");
       const { getMemoryShell } = await import("/js/memoryMatch/memoryShell.js");
-      const { getLinkShell } = await import("/js/gameShell/legacyShellAdapters.js");
+      const { getLinkShell } = await import("/js/linkConnect/linkShell.js");
       const shell = id === "memory-match" ? getMemoryShell() : getLinkShell();
       const boardNodes = [...shell.refs.board.querySelectorAll("*")];
       const stat = shell.refs.progress.querySelector(".stat-moves > span:last-child");

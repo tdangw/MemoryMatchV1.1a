@@ -37,7 +37,7 @@ test("DOM contract, stable refs and 20 mounts return to resource baseline", asyn
     await start(page, i % 2 ? "link-connect" : "memory-match");
     const contract = await page.evaluate(async () => {
       const { getMemoryShell } = await import("/js/memoryMatch/memoryShell.js");
-      const { getLinkShell } = await import("/js/gameShell/legacyShellAdapters.js");
+      const { getLinkShell } = await import("/js/linkConnect/linkShell.js");
       const shell = document.documentElement.dataset.activeGame === "memory-match" ? getMemoryShell() : getLinkShell();
       const { root, ...refs } = shell.refs;
       window.lastScope = shell.scope;
@@ -115,7 +115,7 @@ test("restarting a playing round cancels its timer and preserves shell nodes", a
     await page.clock.runFor(15000);
     const result = await page.evaluate(async id => {
       const { getMemoryShell } = await import("/js/memoryMatch/memoryShell.js");
-      const { getLinkShell } = await import("/js/gameShell/legacyShellAdapters.js");
+      const { getLinkShell } = await import("/js/linkConnect/linkShell.js");
       const shell = id === "memory-match" ? getMemoryShell() : getLinkShell();
       const previous = shell.scope;
       const refs = shell.refs;
