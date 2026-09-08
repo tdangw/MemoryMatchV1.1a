@@ -28,6 +28,8 @@ Phase 4 tích hợp `gameShell.js` và `gameShellLifecycle.js`: shell trả refe
 
 Phase 5 tích hợp `gameShellHud.js`: patch stats, sao/điểm, Xu, tools, mốc và timer qua reference; so giá trị DOM trước khi ghi, không import state/gameplay. `legacyHudAdapters.js` khai báo reference, formatter và tooltip riêng cho mỗi trò; controller giữ công thức điểm, thưởng và đồng hồ. Tooltip HUD đọc `data-tooltip`, hỗ trợ focus qua `data-hud-info`. Hai trò dùng chung custom property timer, năng lượng và combo. Kiểm tra có chọn lọc và gate thủ công nằm trong `GAME_SHELL_PHASE5.md`.
 
+Phase 6: `gameShellEffects.js` cung cấp registry theo scope, giới hạn theo loại, cleanup và animation transform/opacity. `lootEffects.js` dùng quỹ đạo chung qua preset Memory/Link; adapter Link chỉ truyền nguồn, đích, icon, timing và callback. Xu/điểm/combo, highlight, item collect và FLIP nối registry; canvas vẫn ở renderer riêng với lifecycle chung. Luật thưởng ở game. Chi tiết và gate thủ công: `GAME_SHELL_PHASE6.md`.
+
 - Ứng dụng dùng HTML/CSS và JavaScript ES modules, không có framework UI.
 - `js/main.js` là entry point duy nhất; module chức năng không tự bootstrap ứng dụng.
 - Các controller phụ thuộc module dùng chung, nhưng không import lẫn nhau. Callback `configure*` nối các luồng cần điều hướng chéo.

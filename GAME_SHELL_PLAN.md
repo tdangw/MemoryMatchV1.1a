@@ -248,6 +248,8 @@ Override không thuộc schema phải gây lỗi trong development. Production d
 
 ### Phase 6 — Motion và hiệu ứng dùng chung
 
+**Trạng thái:** đã triển khai registry/API và adapter hiệu ứng, 6 ca liên quan và build đạt. Chờ kiểm tra cảm nhận/chuyển trò/giảm chuyển động trên điện thoại trước Phase 7; xem `GAME_SHELL_PHASE6.md`.
+
 **Thực hiện**
 
 - Chuẩn hóa API loot, coin, score/combo, item collect, target highlight và FLIP.

@@ -1,3 +1,4 @@
+import { presentEffect, flyToTarget, pulseTarget } from "./gameShell/gameShellEffects.js";
 import { getMemoryHud } from "./gameShell/legacyHudAdapters.js";
 import { setHudText, renderHudTimer } from "./gameShell/gameShellHud.js";
 import { shellTimeout as setTimeout, clearShellTimeout as clearTimeout, shellInterval as setInterval, clearShellInterval as clearInterval, shellFrame as requestAnimationFrame, cancelShellFrame as cancelAnimationFrame } from "./gameShell/gameShellLifecycle.js";
@@ -661,9 +662,7 @@ function showGameplayFloatEffect(tileElement, text, className, iconName) {
   effect.style.left = `${rect.left + rect.width / 2}px`;
   effect.style.top = `${rect.top + rect.height / 2}px`;
   effect.style.setProperty("--gameplay-feedback-duration", `${GAMEPLAY_TIMING.scoreEffectDurationMs}ms`);
-  document.body.appendChild(effect);
-
-  setTimeout(() => effect.remove(), GAMEPLAY_TIMING.scoreEffectDurationMs);
+  presentEffect(effect, { type: "score", duration: GAMEPLAY_TIMING.scoreEffectDurationMs });
 }
 
 export function showComboEffect(tileElement, combo) {
@@ -687,8 +686,7 @@ export function showComboEffect(tileElement, combo) {
   effect.style.top = `${upperBoardY}px`;
   effect.style.setProperty("--gameplay-feedback-duration", `${GAMEPLAY_TIMING.scoreEffectDurationMs}ms`);
 
-  document.body.appendChild(effect);
-  setTimeout(() => effect.remove(), GAMEPLAY_TIMING.scoreEffectDurationMs);
+  presentEffect(effect, { type: "combo", duration: GAMEPLAY_TIMING.scoreEffectDurationMs });
 }
 
 // Shop
@@ -707,34 +705,17 @@ export function animateIconToTarget(iconName, targetSelector) {
 
   const startX = window.innerWidth / 2;
   const startY = window.innerHeight / 2;
-  const targetRect = target.getBoundingClientRect();
-
   icon.style.left = `${startX}px`;
   icon.style.top = `${startY}px`;
 
-  setTimeout(() => {
-    icon.style.left = `${targetRect.left + targetRect.width / 2}px`;
-    icon.style.top = `${targetRect.top}px`;
-    icon.style.transform = "scale(0.6)";
-    icon.style.opacity = "0";
-  }, 20);
-
-  setTimeout(() => {
-    icon.remove();
-    highlightTarget(targetSelector); // ✨ gọi hiệu ứng sáng
-  }, 800);
+  icon.style.position = "fixed";
+  icon.style.pointerEvents = "none";
+  icon.style.zIndex = "10000";
+  flyToTarget(icon, target, { onFinish: () => pulseTarget(target) });
 }
 export function highlightTarget(selector, isNegative = false) {
-  const el = document.querySelector(selector);
-  if (!el) return;
-
-  el.classList.add("highlight-effect");
-  if (isNegative) el.classList.add("highlight-negative");
-
-  setTimeout(() => {
-    el.classList.remove("highlight-effect");
-    if (isNegative) el.classList.remove("highlight-negative");
-  }, 1000);
+  const element = document.querySelector(selector);
+  if (element) pulseTarget(element, isNegative);
 }
 
 // Tạm thay đồng hồ màn chơi bằng đếm ngược hiệu ứng xem trước.

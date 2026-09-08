@@ -1,8 +1,13 @@
 import { createIcon } from "./icons.js";
 import { prefersReducedMotion } from "./motion.js";
-import { createGameShellLifecycle, getActiveGameScope } from "./gameShell/gameShellLifecycle.js";
+import { trackEffect } from "./gameShell/gameShellEffects.js";
 
 const activeLoot = new Map();
+export const LOOT_PRESETS = Object.freeze({
+  memory: Object.freeze({ dropMs: 900, flightMs: 850, spread: 1 }),
+  linkEnergy: Object.freeze({ dropMs: 1100, flightMs: 1050, spread: 1.2 }),
+  linkItem: Object.freeze({ dropMs: 620, flightMs: 820, spread: .8 }),
+});
 
 export function playLootDrop(source, {
   icon = "energy",
@@ -11,19 +16,29 @@ export function playLootDrop(source, {
   holdMs = 900,
   onSettled,
   onCollected,
+  preset = "memory",
+  timing = {},
 } = {}) {
-  if (!source) return null;
+  const base = LOOT_PRESETS[preset];
+  if (!base) throw new TypeError(`Unknown loot preset: ${preset}`);
+  for (const [key, value] of Object.entries(timing)) {
+    if (!["dropMs", "flightMs"].includes(key) || !Number.isFinite(value) || value < 0 || value > 10000) throw new TypeError(`Invalid loot timing: ${key}`);
+  }
+  const strategy = { ...base, ...timing };
+  if (!source) { onSettled?.(); onCollected?.(); return null; }
   if (prefersReducedMotion()) {
     onSettled?.();
     onCollected?.();
     return null;
   }
+  const entry = trackEffect(preset === "linkItem" ? "item" : "loot", () => removeLoot(element));
+  if (!entry) { onSettled?.(); onCollected?.(); return null; }
   const sourceRect = (source.closest?.(".tile, .link-board__cell") || source).getBoundingClientRect();
   const startX = sourceRect.left + sourceRect.width / 2;
   const startY = sourceRect.top + sourceRect.height / 2;
   const inset = 18;
   const direction = Math.random() < 0.5 ? -1 : 1;
-  const landX = clamp(startX + direction * (20 + Math.random() * 34), inset, innerWidth - inset) - startX;
+  const landX = clamp(startX + direction * (20 + Math.random() * 34) * strategy.spread, inset, innerWidth - inset) - startX;
   const landY = clamp(startY + 20 + Math.random() * 28, inset, innerHeight - inset) - startY;
   const apexX = landX * (0.45 + Math.random() * 0.25);
   const apexY = Math.min(-24, landY - 42 - Math.random() * 24);
@@ -34,9 +49,8 @@ export function playLootDrop(source, {
   element.style.left = `${startX}px`;
   element.style.top = `${startY}px`;
   document.body.append(element);
-  const lifecycle = createGameShellLifecycle();
-  const releaseOwner = getActiveGameScope()?.own(() => removeLoot(element), "node");
-  activeLoot.set(element, { lifecycle, releaseOwner });
+  const lifecycle = entry.scope;
+  activeLoot.set(element, { lifecycle, entry });
 
   const drop = element.animate([
     { opacity: 0, transform: "translate(0,0) scale(.55) rotate(-12deg)" },
@@ -44,17 +58,17 @@ export function playLootDrop(source, {
     { opacity: 1, transform: `translate(${landX}px,${landY}px) scale(1.04,.92) rotate(10deg)`, offset: .76 },
     { opacity: 1, transform: `translate(${landX}px,${landY - 7}px) scale(.98,1.03) rotate(6deg)`, offset: .88 },
     { opacity: 1, transform: `translate(${landX}px,${landY}px) scale(1) rotate(7deg)` },
-  ], { duration: 900, easing: "linear", fill: "forwards" });
+  ], { duration: strategy.dropMs, easing: "linear", fill: "forwards" });
   lifecycle.animation(drop);
   drop.finished.then(lifecycle.guard(() => {
     if (!element.isConnected) return;
     onSettled?.();
-    lifecycle.timeout(() => collectLoot(element, { startX, startY, landX, landY, target, onCollected }), holdMs);
+    lifecycle.timeout(() => collectLoot(element, { startX, startY, landX, landY, target, onCollected, flightMs: strategy.flightMs }), holdMs);
   }), () => {});
   return element;
 }
 
-function collectLoot(element, { startX, startY, landX, landY, target, onCollected }) {
+function collectLoot(element, { startX, startY, landX, landY, target, onCollected, flightMs }) {
   const lifecycle = activeLoot.get(element)?.lifecycle;
   if (!element.isConnected || !lifecycle?.active) return;
   const targetRect = target?.getClientRects?.().length ? target.getBoundingClientRect() : null;
@@ -64,7 +78,7 @@ function collectLoot(element, { startX, startY, landX, landY, target, onCollecte
     { opacity: 1, transform: `translate(${landX}px,${landY}px) scale(1)` },
     { opacity: 1, transform: `translate(${landX}px,${landY}px) scale(1.08)`, offset: .16 },
     { opacity: 0, transform: `translate(${endX}px,${endY}px) scale(.48)` },
-  ], { duration: targetRect ? 850 : 360, easing: "cubic-bezier(.32,.62,.38,1)", fill: "forwards" });
+  ], { duration: targetRect ? flightMs : 360, easing: "cubic-bezier(.32,.62,.38,1)", fill: "forwards" });
   lifecycle.animation(animation);
   animation.finished.then(lifecycle.guard(() => {
     onCollected?.();
@@ -78,7 +92,8 @@ export function clearLootEffects() {
 
 function removeLoot(element) {
   const owned = activeLoot.get(element);
-  owned?.releaseOwner?.forget();
+  activeLoot.delete(element);
+  owned?.entry.dispose();
   owned?.lifecycle.dispose();
   // Finished animations with fill:forwards still own a visual effect during hold.
   element.getAnimations().forEach(animation => animation.cancel());

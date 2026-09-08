@@ -1,3 +1,5 @@
+import { animateShellEffect, presentEffect } from "../gameShell/gameShellEffects.js";
+import { playLootDrop } from "../lootEffects.js";
 import { shellTimeout as setTimeout, clearShellTimeout as clearTimeout, shellFrame as requestAnimationFrame } from "../gameShell/gameShellLifecycle.js";
 import { getActiveLinkConnectionEffect } from "./linkEffects.js";
 import { gameState } from "../gameState.js";
@@ -7,7 +9,6 @@ import { calculateMotionDelta, prefersReducedMotion, readCssTimeMs } from "../mo
 import { LINK_CONNECT_TIMING } from "./linkConfig.js";
 import { connectGameShellLayout } from "../gameShell/gameShellLayout.js";
 import { getLinkShell } from "../gameShell/legacyShellAdapters.js";
-import { getActiveGameScope } from "../gameShell/gameShellLifecycle.js";
 import {
   measureLinkRender,
   recordLinkLayoutPass,
@@ -124,12 +125,12 @@ function animateLinkTileMotion(element, deltaX, deltaY, index, settings) {
     });
     return;
   }
-  const animation = element.animate(keyframes, {
+  const animation = animateShellEffect(element, keyframes, {
     duration: settings.duration,
     delay: stagger,
     easing: settings.shuffle ? "cubic-bezier(.16,.74,.2,1)" : "cubic-bezier(.18,.72,.2,1)",
   });
-  getActiveGameScope()?.animation(animation);
+  if (!animation) return;
   tileMotionAnimations.set(element, animation);
   activeTileMotionAnimations.add(animation);
   const clearAnimation = () => {
@@ -424,164 +425,29 @@ export function playLinkEnergyFlight(start, end, {
   targetProgress = 1,
   progressTarget = 10,
 } = {}) {
-  if (prefersReducedMotion()) {
-    onArrive?.();
-    return null;
-  }
-  const sourceTile = getLinkTileButton(end) || getLinkTileButton(start);
-  const target = document.querySelector(".link-special-hud__milestones");
-  if (!sourceTile || !target) {
-    onArrive?.();
-    return null;
-  }
-  const sourceRect = sourceTile.getBoundingClientRect();
-  const effect = document.createElement("span");
-  effect.className = "link-energy-flight";
-  effect.setAttribute("aria-hidden", "true");
-  effect.append(createIcon("energy"));
-  const startX = sourceRect.left + sourceRect.width / 2;
-  const startY = sourceRect.top + sourceRect.height / 2;
-  const safeInset = 18;
-  const viewportWidth = document.documentElement.clientWidth;
-  const viewportHeight = document.documentElement.clientHeight;
-  const dropDistance = sourceRect.width * (.55 + Math.random() * .55);
-  const leftRoom = startX - safeInset;
-  const rightRoom = viewportWidth - safeInset - startX;
-  const direction = leftRoom < dropDistance ? 1
-    : rightRoom < dropDistance ? -1
-      : Math.random() < .5 ? -1 : 1;
-  const landingX = clamp(startX + direction * dropDistance, safeInset, viewportWidth - safeInset) - startX;
-  const desiredLandingY = Math.max(20, sourceRect.height * (.34 + Math.random() * .16));
-  const landingY = clamp(startY + desiredLandingY, safeInset, viewportHeight - safeInset) - startY;
-  const apexX = landingX * (.45 + Math.random() * .18);
-  const desiredApexY = -sourceRect.height * (.68 + Math.random() * .38);
-  const apexY = clamp(startY + desiredApexY, safeInset, viewportHeight - safeInset) - startY;
-  effect.style.left = `${startX}px`;
-  effect.style.top = `${startY}px`;
-  effect.style.setProperty("--link-energy-apex-x", `${Math.round(apexX)}px`);
-  effect.style.setProperty("--link-energy-apex-y", `${Math.round(apexY)}px`);
-  effect.style.setProperty("--link-energy-land-x", `${Math.round(landingX)}px`);
-  effect.style.setProperty("--link-energy-land-y", `${Math.round(landingY)}px`);
-  effect.style.setProperty("--link-energy-bounce-y", `${Math.round(landingY - Math.max(6, sourceRect.height * .08))}px`);
-  const game = document.getElementById("link-connect-container");
-  const styles = game ? getComputedStyle(game) : null;
-  const burstDuration = styles?.getPropertyValue("--link-energy-burst-duration").trim()
-    || `${LINK_CONNECT_TIMING.energyBurstMs}ms`;
-  const holdDuration = styles?.getPropertyValue("--link-energy-hold-duration").trim()
-    || `${LINK_CONNECT_TIMING.energyHoldMs}ms`;
-  const flightDuration = styles?.getPropertyValue("--link-energy-flight-duration").trim()
-    || `${LINK_CONNECT_TIMING.energyFlightMs}ms`;
-  effect.style.setProperty("--link-energy-burst-duration", burstDuration);
-  effect.style.setProperty("--link-energy-flight-duration", flightDuration);
-  document.body.append(effect);
-  let settled = false;
-  const finish = () => {
-    if (settled) return;
-    settled = true;
-    effect.remove();
-    onArrive?.();
+  const source = getLinkTileButton(end) || getLinkTileButton(start);
+  const track = document.querySelector(".link-special-hud__milestones");
+  const ratio = clamp((targetProgress - 1) / Math.max(1, progressTarget - 1), 0, 1);
+  const target = track && {
+    getClientRects: () => track.getClientRects(),
+    getBoundingClientRect: () => {
+      const rect = track.getBoundingClientRect();
+      return { left: rect.left + rect.width * (.05 + ratio * .9), top: rect.top, width: 0, height: rect.height };
+    },
   };
-  effect.addEventListener("animationend", (event) => {
-    if (event.animationName === "link-energy-fly-to-hud") finish();
-  });
-  const collectDelayMs = readCssTimeMs(burstDuration, LINK_CONNECT_TIMING.energyBurstMs)
-    + readCssTimeMs(holdDuration, LINK_CONNECT_TIMING.energyHoldMs);
-  scheduleTransientEffect(() => {
-    if (!effect.isConnected) return;
-    const currentTarget = document.querySelector(".link-special-hud__milestones");
-    if (!currentTarget) return finish();
-    const targetRect = currentTarget.getBoundingClientRect();
-    const targetRatio = clamp((targetProgress - 1) / Math.max(1, progressTarget - 1), 0, 1);
-    const targetX = targetRect.left + targetRect.width * (0.05 + targetRatio * 0.9);
-    effect.style.setProperty("--link-energy-flight-x", `${Math.round(targetX - startX)}px`);
-    effect.style.setProperty("--link-energy-flight-y", `${Math.round(targetRect.top + targetRect.height / 2 - startY)}px`);
-    effect.classList.add("is-collecting");
-  }, collectDelayMs);
-  scheduleTransientEffect(
-    finish,
-    collectDelayMs + readCssTimeMs(flightDuration, LINK_CONNECT_TIMING.energyFlightMs) + 350,
-  );
-  return effect;
+  return playLootDrop(source, { target, preset: "linkEnergy", holdMs: LINK_CONNECT_TIMING.energyHoldMs, timing: { dropMs: LINK_CONNECT_TIMING.energyBurstMs, flightMs: LINK_CONNECT_TIMING.energyFlightMs }, onCollected: onArrive });
 }
 
 export function playLinkItemRewardFlight(source, itemId, { delayMs = 0 } = {}) {
   const item = getLinkItemDefinition(itemId);
-  if (!source || !item || prefersReducedMotion()) return null;
+  if (!source || !item) return null;
   const launch = () => {
-    if (!source.isConnected) return;
-    const sourceRect = source.getBoundingClientRect();
-    const startX = sourceRect.left + sourceRect.width / 2;
-    const startY = sourceRect.top + sourceRect.height / 2;
-    const viewportWidth = document.documentElement.clientWidth;
-    const direction = Math.random() < 0.5 ? -1 : 1;
-    const desiredBurstX = direction * (24 + Math.random() * 20);
-    const burstX = clamp(startX + desiredBurstX, 18, viewportWidth - 18) - startX;
-    const burstDistanceY = 18 + Math.random() * 18;
-    const burstY = startY - burstDistanceY * 1.18 < 18 ? burstDistanceY : -burstDistanceY;
-    const effect = document.createElement("span");
-    effect.className = `link-item-reward-flight link-item-reward-flight--${itemId}`;
-    effect.setAttribute("aria-hidden", "true");
-    effect.append(createIcon(item.icon));
-    effect.style.left = `${startX}px`;
-    effect.style.top = `${startY}px`;
-    effect.style.setProperty("--link-item-reward-burst-x", `${Math.round(burstX)}px`);
-    effect.style.setProperty("--link-item-reward-burst-y", `${Math.round(burstY)}px`);
-    effect.style.setProperty("--link-item-reward-apex-x", `${Math.round(burstX * 0.72)}px`);
-    effect.style.setProperty("--link-item-reward-apex-y", `${Math.round(burstY * 1.18)}px`);
-    const game = document.getElementById("link-connect-container");
-    const styles = game ? getComputedStyle(game) : null;
-    const burstDuration = styles?.getPropertyValue("--link-item-reward-burst-duration").trim()
-      || `${LINK_CONNECT_TIMING.itemRewardBurstMs}ms`;
-    const holdDuration = styles?.getPropertyValue("--link-item-reward-hold-duration").trim()
-      || `${LINK_CONNECT_TIMING.itemRewardHoldMs}ms`;
-    const flightDuration = styles?.getPropertyValue("--link-item-reward-flight-duration").trim()
-      || `${LINK_CONNECT_TIMING.itemRewardFlightMs}ms`;
-    effect.style.setProperty("--link-item-reward-burst-duration", burstDuration);
-    effect.style.setProperty("--link-item-reward-flight-duration", flightDuration);
-    document.body.append(effect);
-    let settled = false;
-    const finish = () => {
-      if (settled) return;
-      settled = true;
-      effect.remove();
-    };
-    effect.addEventListener("animationend", (event) => {
-      if (event.animationName === "link-item-reward-collect") finish();
-    });
-    const collectDelayMs = readCssTimeMs(burstDuration, LINK_CONNECT_TIMING.itemRewardBurstMs)
-      + readCssTimeMs(holdDuration, LINK_CONNECT_TIMING.itemRewardHoldMs);
-    scheduleTransientEffect(() => {
-      if (!effect.isConnected) return;
-      const itemTarget = document.querySelector(`#link-item-actions [data-item="${itemId}"] .ui-icon`);
-      const target = itemTarget?.getClientRects().length
-        ? itemTarget
-        : document.querySelector("#link-tools-toggle .ui-icon");
-      if (!target) return finish();
-      const targetRect = target.getBoundingClientRect();
-      effect.style.setProperty("--link-item-reward-flight-x", `${Math.round(targetRect.left + targetRect.width / 2 - startX)}px`);
-      effect.style.setProperty("--link-item-reward-flight-y", `${Math.round(targetRect.top + targetRect.height / 2 - startY)}px`);
-      effect.classList.add("is-collecting");
-    }, collectDelayMs);
-    scheduleTransientEffect(
-      finish,
-      collectDelayMs + readCssTimeMs(flightDuration, LINK_CONNECT_TIMING.itemRewardFlightMs) + 300,
-    );
+    if (!source.isConnected) return null;
+    const target = document.querySelector(`[data-item="${itemId}"]`) || document.getElementById("link-tools-toggle");
+    return playLootDrop(source, { target, icon: item.icon, preset: "linkItem", tier: "blue", holdMs: LINK_CONNECT_TIMING.itemRewardHoldMs, timing: { dropMs: LINK_CONNECT_TIMING.itemRewardBurstMs, flightMs: LINK_CONNECT_TIMING.itemRewardFlightMs } });
   };
-  if (delayMs > 0) return scheduleTransientEffect(launch, delayMs);
-  launch();
-  return null;
+  return delayMs > 0 ? scheduleTransientEffect(launch, delayMs) : launch();
 }
-
-const FRAGMENT_LAYOUTS = Object.freeze({
-  split2: Object.freeze({ columns: 2, rows: 1 }),
-  split4: Object.freeze({ columns: 2, rows: 2 }),
-  split8: Object.freeze({ columns: 4, rows: 2 }),
-  triangles: Object.freeze({ columns: 2, rows: 2, triangular: true }),
-  crumble: Object.freeze({ columns: 6, rows: 6 }),
-  pixel: Object.freeze({ columns: 5, rows: 5 }),
-});
-
-const CANVAS_EXIT_EFFECTS = new Set(["finedust", ...Object.keys(FRAGMENT_LAYOUTS)]);
 
 function playLinkCardExitEffects(tiles, exitId) {
   if (!CANVAS_EXIT_EFFECTS.has(exitId) || prefersReducedMotion()) return;
@@ -612,7 +478,10 @@ function playLinkCardExitEffects(tiles, exitId) {
   const context = canvas.getContext("2d");
   if (!context) return;
   context.scale(density, density);
-  frame.append(canvas);
+  if (!presentEffect(canvas, { type: "canvas", duration: Math.max(...cards.map(({ timing }) => timing.delayMs + timing.durationMs)) + 100, parent: frame })) {
+    tiles.forEach(tile => tile.classList.remove("has-canvas-exit"));
+    return;
+  }
   const startedAt = performance.now();
   const draw = (now) => {
     const elapsed = now - startedAt;
@@ -771,7 +640,7 @@ export function playLinkThunderStrike(positions, colorId = "yellow") {
     targets.forEach((target) => drawThunderBolt(context, target, palette, progress));
     if (progress < 1 && effect.isConnected) requestAnimationFrame(draw);
   };
-  frame.append(effect);
+  if (!presentEffect(effect, { type: "canvas", duration: duration + 100, parent: frame })) return null;
   requestAnimationFrame(draw);
   return effect;
 }

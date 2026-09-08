@@ -59,3 +59,5 @@ Tài liệu này chỉ ghi trạng thái sản phẩm và các quy tắc đang c
 
 - Link Connect chưa có đá, cổng không gian, Adventure 100 bàn riêng, Time Rush, Zen Mode hoặc Fever.
 - Danh sách và tình trạng asset chủ đề được theo dõi riêng trong `themes.md`.
+
+- Game Shell Phase 6 đã triển khai registry hiệu ứng có giới hạn, loot/collect dùng chung, FLIP và canvas gắn cleanup; 6 ca liên quan, cú pháp và build đạt. Còn kiểm tra thủ công cảm nhận đường bay, đổi trò giữa hiệu ứng và reduced motion trên điện thoại trước Phase 7. Xem `GAME_SHELL_PHASE6.md`.

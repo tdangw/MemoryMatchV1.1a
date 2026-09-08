@@ -1,3 +1,4 @@
+import { trackEffect } from "./gameShell/gameShellEffects.js";
 import { shellTimeout as setTimeout, shellFrame as requestAnimationFrame, cancelShellFrame as cancelAnimationFrame } from "./gameShell/gameShellLifecycle.js";
 import { createIcon } from "./icons.js";
 import { GAMEPLAY_TIMING } from "./gameplayTuning.js";
@@ -11,6 +12,7 @@ export const MATCH_COIN_REWARD = Object.freeze({
 const counterAnimations = new WeakMap();
 const activeCoinCounters = new Set();
 const activeCoinEffects = new Set();
+const effectEntries = new WeakMap();
 
 export function calculateMatchCoinReward(combo = 1) {
   return MATCH_COIN_REWARD.base
@@ -36,8 +38,11 @@ export function playCoinRewardFlight(source, target, amount) {
   const staggerMs = GAMEPLAY_TIMING.coinRewardStaggerMs;
   const durationVarianceMs = 140;
   const fragment = document.createDocumentFragment();
-  const effects = Array.from({ length: coinCount }, (_, index) => {
+  const effects = Array.from({ length: Math.min(coinCount, 32) }, (_, index) => {
     const effect = document.createElement("span");
+    const entry = trackEffect("coin", () => removeCoinEffect(effect));
+    if (!entry) return null;
+    effectEntries.set(effect, entry);
     effect.className = "game-coin-reward-flight";
     effect.setAttribute("aria-hidden", "true");
     effect.append(createIcon("coin"));
@@ -74,13 +79,13 @@ export function playCoinRewardFlight(source, target, amount) {
     activeCoinEffects.add(effect);
     fragment.append(effect);
     return effect;
-  });
+  }).filter(Boolean);
   document.body.append(fragment);
-  const finalArrivalDelay = durationMs + Math.max(0, coinCount - 1) * staggerMs;
+  const finalArrivalDelay = durationMs + Math.max(0, effects.length - 1) * staggerMs;
   setTimeout(() => showCoinGainLabel(target, coinCount), finalArrivalDelay);
   setTimeout(
     () => effects.forEach(removeCoinEffect),
-    durationMs + durationVarianceMs + Math.max(0, coinCount - 1) * staggerMs + 300,
+    durationMs + durationVarianceMs + Math.max(0, effects.length - 1) * staggerMs + 300,
   );
   return effects;
 }
@@ -138,6 +143,9 @@ function showCoinGainLabel(target, amount) {
   if (!target?.isConnected) return;
   const rect = target.getBoundingClientRect();
   const label = document.createElement("span");
+  const entry = trackEffect("score", () => removeCoinEffect(label));
+  if (!entry) return;
+  effectEntries.set(label, entry);
   label.className = "game-coin-gain-label";
   label.setAttribute("aria-hidden", "true");
   label.textContent = `+${amount} Xu`;
@@ -157,11 +165,14 @@ export function clearCoinRewardEffects() {
     counter.closest?.(".game-coin-hud")?.classList.remove("is-gaining");
   });
   activeCoinCounters.clear();
-  activeCoinEffects.forEach((effect) => effect.remove());
+  activeCoinEffects.forEach(removeCoinEffect);
   activeCoinEffects.clear();
 }
 
 function removeCoinEffect(effect) {
+  const entry = effectEntries.get(effect);
+  effectEntries.delete(effect);
+  entry?.dispose();
   effect.remove();
   activeCoinEffects.delete(effect);
 }
