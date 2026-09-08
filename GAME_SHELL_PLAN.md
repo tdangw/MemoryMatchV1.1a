@@ -85,6 +85,8 @@ Override không thuộc schema phải gây lỗi trong development. Production d
 
 ## 5. Quy trình bắt buộc cho mọi phase
 
+**Điều chỉnh theo yêu cầu người dùng ngày 2026-09-08:** từ Phase 5, chỉ đọc dữ liệu liên quan và kiểm thử đúng phạm vi thay đổi. Tái sử dụng baseline đã có; không lặp full suite, build hoặc audit nếu không có thay đổi/lỗi mới cần kiểm chứng. Các bước trải nghiệm trên thiết bị có thể bàn giao bằng checklist thủ công và ghi rõ gate còn chờ. Quy tắc này thay các yêu cầu chạy lặp mặc định bên dưới.
+
 ### Trước khi sửa
 
 1. Worktree sạch; ghi commit gốc.
@@ -227,6 +229,8 @@ Override không thuộc schema phải gây lỗi trong development. Production d
 - Adapter ID cũ phải có test và phase xóa cụ thể.
 
 ### Phase 5 — HUD component dùng chung
+
+**Trạng thái:** triển khai và kiểm tra tự động đạt (16/16 ca liên quan, check/build). Còn xác nhận thủ công trên điện thoại, pause/resume và nhấn giữ trước Phase 6; xem `GAME_SHELL_PHASE5.md`. Chưa triển khai Triple Connect.
 
 **Thực hiện**
 

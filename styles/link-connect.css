@@ -714,7 +714,7 @@
 
 .link-game-progress-hud .stat-combo.is-combo-window-active::after {
   opacity: 1;
-  animation: link-combo-window-drain var(--link-combo-window-duration, 5000ms) linear forwards;
+  animation: link-combo-window-drain var(--combo-window-duration, 5000ms) linear forwards;
 }
 .link-game-progress-hud .stat-points,
 .link-game-progress-hud .stat-points .stat-label,
@@ -989,7 +989,7 @@
 .link-special-hud__milestones::before,
 .link-special-hud__milestones::after { content: ""; position: absolute; inset: 50% 5% auto; height: var(--shell-milestones-rail-height); border-radius: 999px; transform: translateY(-50%); }
 .link-special-hud__milestones::before { background: rgb(185 213 255 / 26%); }
-.link-special-hud__milestones::after { background: linear-gradient(90deg, #36d9e7, #79f2ff); box-shadow: 0 0 6px rgb(80 231 255 / 72%); transform: translateY(-50%) scaleX(var(--link-special-progress, 0)); transform-origin: left center; transition: transform var(--shell-motion-milestone-fill) ease-out; }
+.link-special-hud__milestones::after { background: linear-gradient(90deg, #36d9e7, #79f2ff); box-shadow: 0 0 6px rgb(80 231 255 / 72%); transform: translateY(-50%) scaleX(var(--shell-energy-progress, 0)); transform-origin: left center; transition: transform var(--shell-motion-milestone-fill) ease-out; }
 .link-special-hud__milestones span { position: absolute; z-index: 1; top: 2px; left: var(--link-milestone-position); display: grid; width: var(--shell-milestones-marker-size); height: var(--shell-milestones-marker-size); place-items: center; border: 1px solid rgb(185 213 255 / 38%); border-radius: 50%; background: #182942; color: #b9d5ff; font-size: 0.5rem; transform: translateX(-50%); transition: background var(--shell-motion-milestone-state) ease, border-color var(--shell-motion-milestone-state) ease, color var(--shell-motion-milestone-state) ease, transform var(--shell-motion-milestone-state) ease; }
 .link-special-hud__milestones span.is-earned { transform: translateX(-50%) scale(1.08); }
 .link-special-hud__milestones span.is-earned { border-color: #ffd166; background: #a86f00; color: #fff8dd; }

@@ -1,3 +1,5 @@
+import { getMemoryHud } from "./gameShell/legacyHudAdapters.js";
+import { setHudText, renderHudTimer } from "./gameShell/gameShellHud.js";
 import { shellTimeout as setTimeout, clearShellTimeout as clearTimeout, shellInterval as setInterval, clearShellInterval as clearInterval, shellFrame as requestAnimationFrame, cancelShellFrame as cancelAnimationFrame } from "./gameShell/gameShellLifecycle.js";
 // ui.js
 import { gameState } from "./gameState.js";
@@ -23,8 +25,6 @@ import { getMemoryItemTotal } from "./memoryItems.js";
 import { getActiveGameScope } from "./gameShell/gameShellLifecycle.js";
 
 const scoreElement = document.getElementById("score");
-const levelElement = document.getElementById("level");
-const hintElement = document.getElementById("hint");
 const timerElement = document.getElementById("timer-value");
 const timerContainer = document.getElementById("timer");
 const gameHudElement = document.getElementById("game-title");
@@ -37,32 +37,12 @@ let rewardPopupActive = false;
 let rewardPopupOverlay = null;
 let rewardPopupDismissTimer;
 let rewardPopupRemoveTimer;
-const movesElement = document.getElementById("moves");
-const missesElement = document.getElementById("misses");
-const comboElement = document.getElementById("combo");
-const matchedPairsElement = document.getElementById("matched-pairs");
-const totalPairsElement = document.getElementById("total-pairs");
-const totalStarsElement = document.getElementById("total-stars");
-const levelStarsElement = document.getElementById("level-stars");
-const levelStarsFillElement = document.getElementById("level-stars-fill");
-const levelStarsCardElement = levelStarsElement?.closest(".stat-star-progress");
-const scoreCardElement = scoreElement?.closest(".stat-points");
-const memorySpecialHudElement = document.getElementById("memory-special-hud");
-const memorySpecialMilestonesElement = document.getElementById("memory-special-milestones");
 let revealTimerInterval = null;
 let revealTimerRoundId = null;
 
 export function updateCoinDisplay(coins) {
-  const coinElement = document.getElementById("coin-balance");
-  if (coinElement) coinElement.textContent = String(coins);
-  if (!isCoinCounterAnimating(memoryCoinElement) && memoryCoinElement) {
-    memoryCoinElement.textContent = String(coins);
-  }
-  if (memoryCoinHudElement) {
-    const label = `Xu: ${coins}`;
-    memoryCoinHudElement.setAttribute("aria-label", label);
-    memoryCoinHudElement.dataset.tooltip = label;
-  }
+  setHudText(document.getElementById("coin-balance"), coins);
+  getMemoryHud().coins(coins, { animating: isCoinCounterAnimating(memoryCoinElement) });
 }
 
 export function showMemoryCoinReward(tileElement, previousCoins, nextCoins, amount) {
@@ -72,39 +52,14 @@ export function showMemoryCoinReward(tileElement, previousCoins, nextCoins, amou
 }
 
 export function updateScoreDisplay(score) {
-  if (scoreElement) scoreElement.textContent = score;
-  const target = getStarScoreTargets(gameState.totalPairs, gameState.settings.mode).three;
-  if (levelStarsFillElement) levelStarsFillElement.style.width = `${Math.min(100, Math.round(score / target * 100))}%`;
-  if (levelStarsCardElement) {
-    const label = `Mục tiêu: ${target}`;
-    levelStarsCardElement.dataset.tooltip = label;
-    levelStarsCardElement.setAttribute("aria-label", label);
-  }
-  if (scoreCardElement) {
-    const label = `Tổng điểm: ${gameState.progress.memoryMatch.totalScore}`;
-    scoreCardElement.dataset.tooltip = label;
-    scoreCardElement.setAttribute("aria-label", label);
-  }
+  getMemoryHud().stats({ score });
+  getMemoryHud().stars({ score, target: getStarScoreTargets(gameState.totalPairs, gameState.settings.mode).three, totalScore: gameState.progress.memoryMatch.totalScore });
 }
 
 export function updateMemorySpecialProgress(progress = gameState.specialProgress) {
-  if (!memorySpecialHudElement || !memorySpecialMilestonesElement) return;
   const target = GAME_CONFIG.special.progressTarget;
-  const normalized = Math.max(0, Math.min(target, Math.floor(Number(progress) || 0)));
-  memorySpecialHudElement.style.setProperty(
-    "--memory-special-progress",
-    String(normalized > 0 ? (normalized - 1) / Math.max(1, target - 1) : 0),
-  );
-  memorySpecialHudElement.dataset.tooltip = `Năng lượng ${normalized}/${target}`;
-  memorySpecialMilestonesElement.querySelectorAll("[data-memory-special-milestone]").forEach((milestone) => {
-    const value = Number(milestone.dataset.memorySpecialMilestone);
-    const rewardDescription = describeMemoryMilestoneRewards(GAME_CONFIG.special.milestones[value - 1]);
-    const label = `Mốc ${value}: ${rewardDescription}`;
-    milestone.dataset.tooltip = label;
-    milestone.setAttribute("aria-label", label);
-    milestone.classList.toggle("is-earned", value <= normalized);
-    milestone.classList.toggle("is-next", value === normalized + 1);
-  });
+  getMemoryHud().milestones({ progress: Math.max(0, Math.min(target, Math.floor(Number(progress) || 0))), target,
+    descriptions: GAME_CONFIG.special.milestones.map(describeMemoryMilestoneRewards) });
 }
 
 function describeMemoryMilestoneRewards(rewards = []) {
@@ -121,68 +76,34 @@ function describeMemoryMilestoneRewards(rewards = []) {
 }
 
 export function updateMemoryAssistInventoryDisplay() {
-  const timeCount = getMemoryItemTotal("time");
-  const previewCount = getMemoryItemTotal("preview");
-  updateAssistButton("btn-buy-time", "Thời gian", timeCount);
-  updateAssistButton("btn-preview-cards", "Xem trước", previewCount);
+  getMemoryHud().tool("time", { count: getMemoryItemTotal("time") });
+  getMemoryHud().tool("preview", { count: getMemoryItemTotal("preview") });
 }
 
-function updateAssistButton(buttonId, label, count) {
-  const button = document.getElementById(buttonId);
-  if (button) {
-    const description = `${label} · Đang có: ${count}`;
-    button.setAttribute("aria-label", description);
-    button.dataset.tooltip = description;
-  }
-}
 
-export function updateLevelStarsDisplay(stars) {
-  if (!levelStarsElement) return;
-  const earnedStars = Math.max(0, Math.min(3, Number(stars) || 0));
-  levelStarsElement.setAttribute("aria-label", `${earnedStars} trên 3 sao`);
-  levelStarsElement.querySelectorAll(".star-progress__milestone").forEach((star, index) => {
-    star.classList.toggle("is-earned", index < earnedStars);
-  });
-}
 
-export function updateTotalStarsDisplay(stars) {
-  if (totalStarsElement) totalStarsElement.textContent = String(stars);
-}
+export function updateLevelStarsDisplay(stars) { getMemoryHud().stars({ earned: stars }); }
 
-export function updateLevelDisplay(level) {
-  if (levelElement) levelElement.textContent = level;
-}
+export function updateTotalStarsDisplay(stars) { getMemoryHud().stats({ totalStars: stars }); }
 
-export function updateHintDisplay(hints) {
-  if (hintElement) hintElement.textContent = `${hints}`;
-}
+export function updateLevelDisplay(level) { getMemoryHud().stats({ level: level }); }
 
-export function updateMovesDisplay(moves) {
-  if (movesElement) movesElement.textContent = moves;
-}
+export function updateHintDisplay(hints) { getMemoryHud().stats({ hint: hints }); }
 
-export function updateMissesDisplay(misses) {
-  if (missesElement) missesElement.textContent = misses;
-}
+export function updateMovesDisplay(moves) { getMemoryHud().stats({ moves: moves }); }
 
-export function updateComboDisplay(combo) {
-  if (comboElement) comboElement.textContent = combo > 1 ? `x${combo}` : "0";
-}
+export function updateMissesDisplay(misses) { getMemoryHud().stats({ misses: misses }); }
 
-export function updatePairProgressDisplay(
-  matchedPairs,
-  totalPairs = gameState.totalPairs,
-) {
-  if (matchedPairsElement) matchedPairsElement.textContent = matchedPairs;
-  if (totalPairsElement) totalPairsElement.textContent = totalPairs;
-}
+export function updateComboDisplay(combo) { getMemoryHud().stats({ combo: combo }); }
+
+export function updatePairProgressDisplay(matchedPairs, totalPairs = gameState.totalPairs) { getMemoryHud().stats({ matchedPairs, totalPairs }); }
 
 export function updateTimerDisplay(seconds) {
   if (!timerElement) return;
 
   if (revealTimerInterval !== null) return;
 
-  timerElement.textContent = formatClockTime(seconds);
+  getMemoryHud().stats({ timer: seconds });
 
   // 🔴 Cảnh báo khi còn <= 10s
   if (getTimerDirection(gameState.settings.mode) === "down" && seconds <= 10) {
@@ -259,13 +180,7 @@ function updateMemoryTimeProgressFrame(timestamp = performance.now()) {
 }
 
 function renderMemoryTimeProgress(remainingMs, state) {
-  if (!gameHudElement) return;
-  const ratio = state.endless ? 1 : Math.max(0, Math.min(1, remainingMs / state.timeLimitMs));
-  gameHudElement.style.setProperty("--game-timer-progress", ratio.toFixed(4));
-  gameHudElement.classList.add("has-timer-progress");
-  gameHudElement.classList.toggle("is-timer-warning", !state.endless && ratio < 0.7 && ratio >= 0.3);
-  gameHudElement.classList.toggle("is-timer-critical", !state.endless && ratio < 0.3);
-  gameHudElement.classList.toggle("is-timer-endless", state.endless);
+  renderHudTimer(gameHudElement, { progress: state.endless ? 1 : Number(Math.max(0, Math.min(1, remainingMs / state.timeLimitMs)).toFixed(4)), endless: state.endless });
 }
 
 export function showBonusOverlay(message) {

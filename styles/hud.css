@@ -291,7 +291,7 @@
 .memory-special-hud__milestones::before,
 .memory-special-hud__milestones::after { content: ""; position: absolute; inset: 50% 5% auto; height: var(--shell-milestones-rail-height); border-radius: 999px; transform: translateY(-50%); }
 .memory-special-hud__milestones::before { background: rgb(185 213 255 / 26%); }
-.memory-special-hud__milestones::after { background: linear-gradient(90deg, #36d9e7, #79f2ff); transform: translateY(-50%) scaleX(var(--memory-special-progress, 0)); transform-origin: left; transition: transform var(--shell-motion-milestone-fill) ease-out; }
+.memory-special-hud__milestones::after { background: linear-gradient(90deg, #36d9e7, #79f2ff); transform: translateY(-50%) scaleX(var(--shell-energy-progress, 0)); transform-origin: left; transition: transform var(--shell-motion-milestone-fill) ease-out; }
 .memory-special-hud__milestones > span { position: absolute; z-index: 1; top: 2px; left: var(--memory-milestone-position); display: grid; width: var(--shell-milestones-marker-size); height: var(--shell-milestones-marker-size); place-items: center; border: 1px solid rgb(185 213 255 / 38%); border-radius: 50%; background: #182942; color: #b9d5ff; font-size: .5rem; transform: translateX(-50%); }
 .memory-special-hud__milestones > span.is-earned { border-color: #ffd166; background: #a86f00; color: #fff8dd; transform: translateX(-50%) scale(1.08); }
 .memory-special-hud__milestones > span.is-next { border-color: #7ceeff; color: #7ceeff; }

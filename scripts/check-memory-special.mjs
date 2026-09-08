@@ -56,7 +56,8 @@ assert.match(
   "games must share the compact 3px HUD timer bar",
 );
 assert.match(hudCss, /\.memory-special-hud\s*\{[^}]*margin:\s*-6px auto 0/s, "Memory milestones must use the same grid-gap compensation as Link");
-assert.match(tooltipJs, /\.memory-special-hud__milestones span/, "Memory milestone rewards must be reachable by tooltip");
+assert.match(tooltipJs, /\[data-tooltip\]/, "HUD definitions must be reachable by tooltip");
+assert.match(tooltipJs, /\[data-hud-info\]/, "HUD informational targets must support touch explanation");
 assert.equal(GAME_SHELL_DEFAULTS.hud.timerHeight, 3, "timer bar remains 3px");
 assert.match(baseCss, /#game-container\s*\{[^}]*gap:\s*var\(--shell-layout-gap/s, "Memory must use the shared HUD/board row gap");
 assert.match(linkCss, /gap:\s*var\(--shell-layout-gap/s, "Link must use the shared HUD/board row gap");

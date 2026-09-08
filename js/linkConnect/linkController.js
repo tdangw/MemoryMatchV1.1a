@@ -1,3 +1,5 @@
+import { getLinkHud } from "../gameShell/legacyHudAdapters.js";
+import { setHudText, renderHudTimer } from "../gameShell/gameShellHud.js";
 import { shellTimeout as setTimeout, clearShellTimeout as clearTimeout, shellInterval as setInterval, clearShellInterval as clearInterval, shellFrame as requestAnimationFrame, cancelShellFrame as cancelAnimationFrame } from "../gameShell/gameShellLifecycle.js";
 import { createIcon } from "../icons.js";
 import { getLinkShell } from "../gameShell/legacyShellAdapters.js";
@@ -21,7 +23,6 @@ import { GAME_MODES } from "../gameCatalog.js";
 import { TIME_UP_PURCHASES } from "../shopCatalog.js";
 import {
   createThemeSummary,
-  formatClockTime,
   UI_TIMING,
 } from "../uiCatalog.js";
 import {
@@ -956,27 +957,18 @@ function handleLinkTimeUp() {
 
 function updateLinkHud() {
   const hud = getLinkHudElements();
-  setHudText(hud.level, linkGameState.level);
-  setHudText(hud.moves, linkGameState.moves);
-  setHudText(hud.misses, linkGameState.misses);
-  setHudText(hud.combo, linkGameState.combo);
-  setHudText(hud.score, linkGameState.score);
-  setHudText(hud.matchedPairs, linkGameState.matchedPairs);
-  setHudText(hud.totalPairs, linkGameState.totalPairs);
-  setHudText(hud.hint, getLinkItemCount("hint"));
+  const component = getLinkHud(hud);
+  component.stats({ level: linkGameState.level, moves: linkGameState.moves, misses: linkGameState.misses, combo: linkGameState.combo, score: linkGameState.score, matchedPairs: linkGameState.matchedPairs, totalPairs: linkGameState.totalPairs, hint: getLinkItemCount("hint") });
   updateLinkCoinHud(hud);
   updateLinkTimerHud(hud);
   updateLinkStarsHud(hud);
   updateLinkSpecialMilestones(hud);
-  hud.itemCounts.forEach((element) => {
-    setHudText(element, getLinkItemCount(element.dataset.itemCount));
-  });
-  hud.freezeButton?.classList.toggle("is-disabled", isLinkEndlessMode(linkGameState.mode));
-  hud.freezeButton?.setAttribute("aria-disabled", String(isLinkEndlessMode(linkGameState.mode)));
+  hud.itemCounts.forEach(element => component.tool(element.dataset.itemCount, { count: getLinkItemCount(element.dataset.itemCount) }));
+  component.tool("freeze", { disabled: isLinkEndlessMode(linkGameState.mode) });
 }
 
 function updateLinkTimerHud(hud = getLinkHudElements()) {
-  setHudText(hud.timer, formatClockTime(linkGameState.remainingTime));
+  getLinkHud(hud).stats({ timer: linkGameState.remainingTime });
   if (!linkTimeProgressState || linkTimeProgressState.roundId !== linkGameState.roundId) {
     setLinkTimeProgress(false, linkGameState.roundId, hud);
     return;
@@ -985,12 +977,7 @@ function updateLinkTimerHud(hud = getLinkHudElements()) {
 }
 
 function updateLinkCoinHud(hud = getLinkHudElements()) {
-  if (isCoinCounterAnimating(hud.coinBalance)) return;
-  setHudText(hud.coinBalance, gameState.coins);
-  if (!hud.coins) return;
-  const label = `Xu: ${gameState.coins}`;
-  hud.coins.setAttribute("aria-label", label);
-  hud.coins.dataset.tooltip = label;
+  if (!isCoinCounterAnimating(hud.coinBalance)) getLinkHud(hud).coins(gameState.coins);
 }
 
 function awardLinkCoins(amount, anchor, { animate = true, persist = true } = {}) {
@@ -1020,8 +1007,6 @@ function setLinkTimeProgress(running, roundId = linkGameState.roundId, hud = get
       * GAMEPLAY_TIMING.secondMs,
     remainingMs: Math.max(0, Number(linkGameState.remainingTime || 0)) * GAMEPLAY_TIMING.secondMs,
     lastFrameAt: null,
-    visualTone: null,
-    hudElement: null,
   };
   renderLinkTimeProgress(linkTimeProgressState.remainingMs, linkTimeProgressState, hud);
   if (!linkTimeProgressState.running) return;
@@ -1061,22 +1046,8 @@ function updateLinkTimeProgressFrame(timestamp) {
 }
 
 function renderLinkTimeProgress(remainingMs, state, hud = getLinkHudElements()) {
-  const countdown = !state.endless && state.timeLimitMs > 0;
-  const progress = state.endless ? 1
-    : countdown ? Math.max(0, Math.min(1, remainingMs / state.timeLimitMs)) : 0;
-  const warning = countdown && progress < 0.7 && progress >= 0.3;
-  const critical = countdown && progress < 0.3;
-  const gameHud = hud.gameHud;
-  if (!gameHud) return;
-  gameHud.style.setProperty("--game-timer-progress", String(progress));
-  const visualTone = state.endless ? "endless" : critical ? "critical" : warning ? "warning" : "normal";
-  if (state.hudElement === gameHud && state.visualTone === visualTone) return;
-  gameHud.classList.toggle("has-timer-progress", countdown || state.endless);
-  gameHud.classList.toggle("is-timer-warning", warning);
-  gameHud.classList.toggle("is-timer-critical", critical);
-  gameHud.classList.toggle("is-timer-endless", state.endless);
-  state.hudElement = gameHud;
-  state.visualTone = visualTone;
+  const countdown = state.timeLimitMs > 0 && !state.endless;
+  renderHudTimer(hud.gameHud, { progress: state.endless ? 1 : countdown ? remainingMs / state.timeLimitMs : 0, visible: countdown || state.endless, endless: state.endless });
 }
 
 function stopLinkTimeProgress() {
@@ -1086,56 +1057,15 @@ function stopLinkTimeProgress() {
 }
 
 function updateLinkStarsHud(hud = getLinkHudElements()) {
-  const stars = calculateLinkStarRating(
-    linkGameState.score,
-    linkGameState.totalPairs,
-    linkGameState.mode,
-  );
-  const target = getLinkStarScoreTargets(linkGameState.totalPairs, linkGameState.mode).three;
-  const levelStars = hud.levelStars;
-  if (levelStars) {
-    levelStars.setAttribute("aria-label", `${stars} trên 3 sao`);
-    levelStars.querySelectorAll(".star-progress__milestone").forEach((star, index) => {
-      star.classList.toggle("is-earned", index < stars);
-    });
-  }
-  const fill = hud.starsFill;
-  if (fill) fill.style.width = `${Math.min(100, Math.round(linkGameState.score / target * 100))}%`;
-  if (hud.starProgressCard) {
-    hud.starProgressCard.dataset.tooltip = `Mục tiêu: ${target}`;
-  }
-  setHudText(hud.totalStars, gameState.progress.linkConnect.totalStars);
-  if (hud.scoreCard) {
-    hud.scoreCard.dataset.tooltip = `Tổng điểm: ${gameState.progress.linkConnect.totalScore}`;
-  }
+  const component = getLinkHud(hud);
+  component.stars({ earned: calculateLinkStarRating(linkGameState.score, linkGameState.totalPairs, linkGameState.mode), score: linkGameState.score,
+    target: getLinkStarScoreTargets(linkGameState.totalPairs, linkGameState.mode).three, totalScore: gameState.progress.linkConnect.totalScore });
+  component.stats({ totalStars: gameState.progress.linkConnect.totalStars });
 }
 
 function updateLinkSpecialMilestones(hud = getLinkHudElements()) {
-  const progress = linkGameState.specialProgress;
-  const { milestones, specialTrack: track } = hud;
-  const target = LINK_CONNECT_CONFIG.special.progressTarget;
-  track?.style.setProperty(
-    "--link-special-progress",
-    // Điểm đầu thanh là mốc 1: vừa đạt 1 chỉ sáng marker, không tô sang mốc 2.
-    String(Math.max(0, Math.min(1, (progress - 1) / Math.max(1, target - 1)))),
-  );
-  if (track) {
-    track.dataset.tooltip = `Năng lượng: ${progress}/${target}`;
-    track.setAttribute("aria-label", track.dataset.tooltip);
-  }
-  let nextMarked = false;
-  milestones.forEach((marker) => {
-    const milestone = Number(marker.dataset.linkSpecialMilestone);
-    const reward = linkGameState.specialMilestoneRewards[milestone]
-      || getLinkSpecialMilestoneTooltip(milestone);
-    marker.dataset.tooltip = `Mốc ${milestone}: ${reward}`;
-    marker.setAttribute("aria-label", marker.dataset.tooltip);
-    const earned = milestone <= progress;
-    marker.classList.toggle("is-earned", earned);
-    const isNext = !earned && !nextMarked;
-    marker.classList.toggle("is-next", isNext);
-    if (isNext) nextMarked = true;
-  });
+  getLinkHud(hud).milestones({ progress: linkGameState.specialProgress, target: LINK_CONNECT_CONFIG.special.progressTarget,
+    descriptions: hud.milestones.map((_, index) => linkGameState.specialMilestoneRewards[index + 1] || getLinkSpecialMilestoneTooltip(index + 1)) });
 }
 
 function shouldDropLinkEnergy() {
@@ -1514,7 +1444,7 @@ function startLinkComboWindow(durationMs, matchedAt, roundId, board) {
   clearTimeout(comboExpiryTimer);
   const card = getLinkHudElements().comboCard;
   if (card) {
-    card.style.setProperty("--link-combo-window-duration", `${durationMs}ms`);
+    card.style.setProperty("--combo-window-duration", `${durationMs}ms`);
     card.classList.remove("is-combo-window-active");
     // Khởi động lại vạch thời gian từ đầu cho mỗi cặp ghép đúng.
     void card.offsetWidth;
@@ -1588,11 +1518,7 @@ function getLinkHudElements() {
   return linkHudElements;
 }
 
-function setHudText(element, value) {
-  if (!element) return;
-  const text = String(value);
-  if (element.textContent !== text) element.textContent = text;
-}
+
 
 function samePosition(left, right) {
   return left.row === right.row && left.column === right.column;
