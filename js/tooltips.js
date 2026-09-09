@@ -1,11 +1,12 @@
 import { formatItemNameFromSrc } from "./itemNameFormatter.js";
+import { gameState } from "./gameState.js";
 
 import { shellTimeout as setTimeout, clearShellTimeout as clearTimeout, shellFrame as requestAnimationFrame } from "./gameShell/gameShellLifecycle.js";
 
 const TOOLTIP_DELAY_MS = 450;
-const TOOLTIP_HIDE_MS = 3000;
+const TOOLTIP_HIDE_MS = 2200;
 const VIEWPORT_GAP = 8;
-const TOOLTIP_GAP = 10;
+const TOOLTIP_GAP = 4;
 // Delay trước khi hiện tooltip khi chuột dừng trên thẻ game (tránh hiện khi lia nhanh).
 const TILE_HOVER_DELAY_MS = 450;
 
@@ -22,7 +23,7 @@ let tileHoverTimer;
 function getTooltipText(element) {
   if (!element) return "";
   // Thẻ game được xử lý trước — tên ảnh ưu tiên hơn mọi dataset.tooltip chức năng.
-  if (element.matches(".link-tile, .tile")) return getTileName(element);
+  if (element.matches(".link-tile, .tile")) return gameState.settings.cardDescriptions ? getTileName(element) : "";
   if (element.dataset.tooltip) return element.dataset.tooltip;
   if (element.matches(".link-tile.is-frozen")) return "Thẻ đang bị khóa.";
   if (element.matches("#toggle-meteor-effects")) return "Bật hoặc tắt hiệu ứng nền.";
@@ -198,7 +199,11 @@ document.addEventListener("pointerout", (event) => {
 
 document.addEventListener("focusin", (event) => {
   const anchor = getAnchor(event.target);
-  if (anchor) showTooltip(anchor);
+  // Chỉ hiển thị khi điều hướng bằng bàn phím. Focus phát sinh sau một cú chạm
+  // không được phép bật tooltip che bàn chơi.
+  if (anchor && anchor.matches(":focus-visible")) {
+    showTooltip(anchor, { autoHide: anchor.matches(".tile, .link-tile") });
+  }
 });
 
 document.addEventListener("focusout", (event) => {

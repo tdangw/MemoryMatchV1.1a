@@ -55,6 +55,7 @@ export const gameState = {
     musicVolume: 0.35,
     meteorEffects: true,
     boardCoordinates: false,
+    cardDescriptions: true,
   },
   fromDefeat: false, // ➕ biến cờ xác định đang gọi từ trạng thái "thua"
   luckyRewards: new Map(),
@@ -175,6 +176,7 @@ function normalizeSettings(value, fallback) {
     musicVolume: normalizeRange(source.musicVolume, fallback.musicVolume, 0, 1),
     meteorEffects: typeof source.meteorEffects === "boolean" ? source.meteorEffects : fallback.meteorEffects,
     boardCoordinates: typeof source.boardCoordinates === "boolean" ? source.boardCoordinates : fallback.boardCoordinates,
+    cardDescriptions: typeof source.cardDescriptions === "boolean" ? source.cardDescriptions : fallback.cardDescriptions,
   };
 }
 

@@ -44,7 +44,7 @@ export function getLinkShell() {
         </div>
         <div class="game-stats" aria-label="Thông tin màn chơi">
           <span class="info stat-card stat-level"><span class="stat-label">LV</span><span id="link-level-label">1</span></span>
-          <span class="info stat-card stat-timer"><span data-link-icon="timer"></span><span id="link-timer">00:00</span></span>
+          <span class="info stat-card stat-timer"><span class="link-timer-icon" data-link-icon="timer"></span><span id="link-timer">00:00</span></span>
           <span class="info stat-card stat-score"><span data-link-icon="star"></span><span id="link-total-stars">0</span></span>
         </div>
         <button id="link-tools-toggle" class="link-tools-toggle" type="button" aria-label="Mở công cụ hỗ trợ" aria-controls="link-tools-menu" aria-expanded="false"></button>
@@ -172,6 +172,7 @@ export function getLinkHudElements() {
     coins: find("#link-special-coins"),
     coinBalance: find("#link-coin-balance"),
     timer: find("#link-timer"),
+    timerCard: find(".stat-timer"),
     gameHud: find("#link-game-title"),
     levelStars: find("#link-level-stars"),
     starProgressCard: find(".stat-star-progress"),

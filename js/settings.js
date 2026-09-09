@@ -5,6 +5,7 @@ import { saveSetting } from "./persistence.js";
 import { APP_VERSION } from "./appMeta.js";
 import { setMeteorEffectsEnabled } from "./backgroundEffects.js";
 import { setBoardCoordinatesVisible } from "./grid.js";
+import { clearTooltip } from "./tooltips.js";
 
 const settingsContainer = document.getElementById("settings-container");
 const settingsHome = settingsContainer?.parentElement;
@@ -12,6 +13,7 @@ const soundToggle = document.getElementById("toggle-sound");
 const musicToggle = document.getElementById("toggle-music");
 const meteorEffectsToggle = document.getElementById("toggle-meteor-effects");
 const boardCoordinatesToggle = document.getElementById("toggle-board-coordinates");
+const cardDescriptionsToggle = document.getElementById("toggle-card-descriptions");
 const soundVolume = document.getElementById("sound-volume");
 const musicVolume = document.getElementById("music-volume");
 const soundVolumeValue = document.getElementById("sound-volume-value");
@@ -40,6 +42,7 @@ function syncSettingsControls() {
   if (musicToggle) musicToggle.checked = settings.music;
   if (meteorEffectsToggle) meteorEffectsToggle.checked = settings.meteorEffects;
   if (boardCoordinatesToggle) boardCoordinatesToggle.checked = settings.boardCoordinates;
+  if (cardDescriptionsToggle) cardDescriptionsToggle.checked = settings.cardDescriptions;
   if (soundVolume) soundVolume.value = Math.round(settings.soundVolume * 100);
   if (musicVolume) musicVolume.value = Math.round(settings.musicVolume * 100);
   if (soundVolume) soundVolume.disabled = !settings.sound;
@@ -76,6 +79,13 @@ function bindSettingsControls() {
     boardCoordinatesToggle.onchange = () => {
       saveGameSetting("boardCoordinates", boardCoordinatesToggle.checked);
       setBoardCoordinatesVisible(boardCoordinatesToggle.checked);
+    };
+  }
+
+  if (cardDescriptionsToggle) {
+    cardDescriptionsToggle.onchange = () => {
+      saveGameSetting("cardDescriptions", cardDescriptionsToggle.checked);
+      if (!cardDescriptionsToggle.checked) clearTooltip();
     };
   }
 

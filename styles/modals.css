@@ -622,6 +622,11 @@
   color: #f5f7fb;
 }
 
+/* Khung Cài đặt giữ nguyên chiều cao; các lựa chọn mới sẽ cuộn trong phần nội dung. */
+#settings-modal .app-modal {
+  height: min(560px, calc(100dvh - 32px));
+}
+
 #settings-modal .app-modal__header,
 #info-modal .app-modal__header {
   border-bottom-color: rgb(255 255 255 / 11%);
@@ -648,6 +653,24 @@
 #settings-modal .app-modal__body,
 #info-modal .app-modal__body {
   color: rgb(245 247 251 / 86%);
+}
+
+#settings-modal .app-modal__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+#settings-modal .app-modal__body::-webkit-scrollbar {
+  display: none;
+}
+
+@media screen and (width <= 600px) {
+  #settings-modal .app-modal {
+    height: min(560px, calc(100dvh - 20px));
+  }
 }
 
 #info-modal .app-modal__note {

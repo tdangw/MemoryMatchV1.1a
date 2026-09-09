@@ -9,6 +9,7 @@ const LEGACY_STORAGE_KEYS = Object.freeze({
   musicVolume: "musicVolume",
   meteorEffects: "meteorEffects",
   boardCoordinates: "boardCoordinates",
+  cardDescriptions: "cardDescriptions",
   appearance: "appearance",
   progress: "progress",
 });
@@ -19,6 +20,7 @@ const SETTINGS_KEYS = new Set([
   "musicVolume",
   "meteorEffects",
   "boardCoordinates",
+  "cardDescriptions",
 ]);
 
 let knownRevision = 0;
@@ -182,6 +184,7 @@ function loadLegacyGameData() {
       musicVolume: normalizeFiniteNumber(readStorageItem(LEGACY_STORAGE_KEYS.musicVolume), 0.35),
       meteorEffects: readStorageItem(LEGACY_STORAGE_KEYS.meteorEffects) !== "false",
       boardCoordinates: readStorageItem(LEGACY_STORAGE_KEYS.boardCoordinates) === "true",
+      cardDescriptions: readStorageItem(LEGACY_STORAGE_KEYS.cardDescriptions) !== "false",
     },
   };
 }

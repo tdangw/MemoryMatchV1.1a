@@ -627,6 +627,7 @@ function finishLinkThunder(board, roundId) {
 
 function useLinkFreeze() {
   linkGameState.freezeSeconds += 10;
+  pauseLinkTimeProgressForFreeze();
   showAppToast("Đồng hồ đã đóng băng trong 10 giây.");
 }
 
@@ -711,6 +712,8 @@ function startCountdown(roundId) {
     if (linkGameState.roundId !== roundId || linkGameState.isPaused) return;
     if (linkGameState.freezeSeconds > 0) {
       linkGameState.freezeSeconds -= 1;
+      if (linkGameState.freezeSeconds === 0) resumeLinkTimeProgressAfterFreeze();
+      updateLinkTimerHud();
       return;
     }
     linkGameState.remainingTime += getLinkTimerDirection(linkGameState.mode) === "up" ? 1 : -1;
@@ -835,11 +838,16 @@ function updateLinkHud() {
 
 function updateLinkTimerHud(hud = getLinkHudElements()) {
   getLinkHud(hud).stats({ timer: linkGameState.remainingTime });
+  syncLinkTimerFreezeState(hud);
   if (!linkTimeProgressState || linkTimeProgressState.roundId !== linkGameState.roundId) {
     setLinkTimeProgress(false, linkGameState.roundId, hud);
     return;
   }
   renderLinkTimeProgress(linkTimeProgressState.remainingMs, linkTimeProgressState, hud);
+}
+
+function syncLinkTimerFreezeState(hud = getLinkHudElements()) {
+  hud.timerCard?.classList.toggle("is-time-frozen", linkGameState.freezeSeconds > 0);
 }
 
 function updateLinkCoinHud(hud = getLinkHudElements()) {
@@ -897,6 +905,11 @@ function syncLinkTimeProgress() {
 function updateLinkTimeProgressFrame(timestamp) {
   const state = linkTimeProgressState;
   if (!state?.running || state.roundId !== linkGameState.roundId) return;
+  // Freeze giữ nguyên thanh thời gian và không để requestAnimationFrame chạy nền.
+  if (linkGameState.freezeSeconds > 0) {
+    linkTimeAnimationFrame = null;
+    return;
+  }
   const elapsed = Math.max(0, timestamp - (state.lastFrameAt ?? timestamp));
   state.lastFrameAt = timestamp;
   if (!linkGameState.isPaused && linkGameState.freezeSeconds <= 0) {
@@ -909,6 +922,18 @@ function updateLinkTimeProgressFrame(timestamp) {
     linkTimeAnimationFrame = null;
     state.running = false;
   }
+}
+
+function pauseLinkTimeProgressForFreeze() {
+  if (linkTimeAnimationFrame !== null) cancelAnimationFrame(linkTimeAnimationFrame);
+  linkTimeAnimationFrame = null;
+}
+
+function resumeLinkTimeProgressAfterFreeze() {
+  const state = linkTimeProgressState;
+  if (!state?.running || state.roundId !== linkGameState.roundId || linkGameState.isPaused || linkTimeAnimationFrame !== null) return;
+  state.lastFrameAt = performance.now();
+  linkTimeAnimationFrame = requestAnimationFrame(updateLinkTimeProgressFrame);
 }
 
 function renderLinkTimeProgress(remainingMs, state, hud = getLinkHudElements()) {
