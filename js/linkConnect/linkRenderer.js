@@ -942,15 +942,11 @@ function readBoardGap(boardElement) {
   return Number.parseFloat(getComputedStyle(boardElement).gap) || 0;
 }
 
-// Route gutter is presentation config, separate from pathfinder's boundary cells.
-const LINK_SHELL_UI = { layout: { edgeInsetMin: 4, edgeInsetMax: 8, edgeInsetRatio: 0.01 } };
-
 function mountLinkBoardLayout() {
   const { root, frame, board, title, progress, hud, milestones } = getLinkShell().refs;
   linkLayout = connectGameShellLayout({
     root, frame, board,
     chrome: [title, progress, hud, milestones],
-    ui: LINK_SHELL_UI,
     getShape: () => linkLayoutShape,
     onMeasure: recordLinkLayoutPass,
     apply: ({ tileSize, boardWidth, boardHeight, gap, padding }) => {

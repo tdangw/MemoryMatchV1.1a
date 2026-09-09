@@ -3,12 +3,6 @@
   --link-panel: rgb(7 23 49 / 72%);
   --link-line: rgb(146 219 255 / 18%);
   --link-content-max-width: var(--shell-layout-content-max-width);
-  min-height: 100dvh;
-  display: grid;
-  grid-template-rows: auto auto auto auto minmax(0, 1fr);
-  gap: var(--shell-layout-gap);
-  padding: var(--shell-safe-top) 14px var(--shell-safe-bottom);
-  box-sizing: border-box;
   color: var(--link-ink);
   background:
     radial-gradient(circle at 50% -14%, rgb(82 182 255 / 20%), transparent 38%),
@@ -87,7 +81,6 @@
   margin: 0 auto;
   box-sizing: border-box;
 }
-
 
 .link-board {
   --link-columns: 4;
@@ -562,7 +555,6 @@
 @keyframes link-tile-source-hide { 0%, 7% { opacity: 1; } 12%, 100% { opacity: 0; } }
 
 @media screen and (width <= 420px) {
-  .link-connect-game { gap: 9px; padding-inline: 9px; }
   .link-board { border-radius: 14px; }
   .link-tile { border-radius: 8px; }
 }
@@ -583,16 +575,6 @@
 
 /* Link Connect dùng cùng nhịp bố cục HUD với Memory Match: tên game, tiến trình,
    rồi đến thanh tác vụ. Các lớp riêng tránh làm thay đổi HUD của trò còn lại. */
-.link-game-name.game-name {
-  display: block;
-  width: 100%;
-  margin: 0 0 8px;
-  color: #ffd166;
-  font: 900 clamp(2rem, 4vw, 2.8rem)/1.1 "Trebuchet MS", "Segoe UI", sans-serif;
-  letter-spacing: 0.8px;
-  text-align: center;
-  text-shadow: 0 3px 0 #7a451c, 0 0 14px rgb(255 209 102 / 32%);
-}
 
 .link-game-progress-hud.game-progress-hud {
   width: fit-content;
@@ -895,7 +877,7 @@
 .link-special-hud__milestones span.is-next { border-color: #7ceeff; color: #7ceeff; box-shadow: 0 0 0 2px rgb(124 238 255 / 16%); }
 
 @media screen and (width <= 600px) {
-  .link-game-name.game-name { margin-bottom: 6px; font-size: clamp(1.7rem, 9vw, 2.2rem); }
+
   .link-game-progress-hud.game-progress-hud { gap: 4px; margin-bottom: 4px; padding: 2px 5px; }
   .link-game-progress-hud .info { min-height: 24px; padding: 2px 4px; font-size: 0.66rem; }
   .link-game-progress-hud .info.stat-star-progress { min-height: 24px; padding: 3px 4px; }

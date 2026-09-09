@@ -8,7 +8,7 @@ for (const [id, title, root, board] of [
   ["memory", "Memory Match", "#game-container", "#grid-board-frame"],
   ["link", "Link Connect", "#link-connect-container", "#link-board-frame"],
 ]) {
-  test(`${title}: controlled Phase 1 audit`, async ({ page }, testInfo) => {
+  test(`${title}: controlled shared shell audit`, async ({ page }, testInfo) => {
     await page.clock.install({ time: new Date("2026-09-07T00:00:00Z") });
     await page.clock.pauseAt(new Date("2026-09-07T00:00:01Z"));
     await page.addInitScript(() => {
@@ -55,13 +55,6 @@ for (const [id, title, root, board] of [
     await page.mouse.move(0, 0);
     await page.evaluate(() => document.activeElement?.blur());
     // Advance virtual time, not wall time; settle preview, popup and layout callbacks.
-    // Compare markup migration separately from the new fullscreen feature.
-    if (process.env.GAME_SHELL_AUDIT_WITHOUT_FULLSCREEN === "1") {
-      await page.evaluate(() => {
-        document.querySelectorAll(".shell-fullscreen-button, .shell-fullscreen-status").forEach(node => node.remove());
-        document.querySelectorAll(".shell-fullscreen-title").forEach(node => node.classList.remove("shell-fullscreen-title"));
-      });
-    }
     await page.clock.runFor(15000);
     await expect(page.locator(".level-reward-overlay")).toHaveCount(0);
     await expect(page.locator(`${root} .is-locked`)).toHaveCount(0);
@@ -110,6 +103,7 @@ for (const [id, title, root, board] of [
           insetsX: number("padding-left") + number("padding-right") + number("border-left-width") + number("border-right-width"),
           insetsY: number("padding-top") + number("padding-bottom") + number("border-top-width") + number("border-bottom-width"),
         },
+        fullscreenElements: shell.querySelectorAll(".shell-fullscreen-button, .shell-fullscreen-button *, .shell-fullscreen-status").length,
         animationsRunning: document.getAnimations().filter(animation => animation.playState === "running").length,
       };
     }, { root, board });
@@ -118,29 +112,16 @@ for (const [id, title, root, board] of [
       `game-shell.audit-${title.replaceAll(" ", "-")}-controlled-Phase-1-audit-${testInfo.project.name}`);
     expect(baseline, "Every viewport/game must have a preservation baseline").toBeTruthy();
     expect(metrics.regions.map(region => region.selector)).toEqual(baseline.metrics.regions.map(region => region.selector));
-    metrics.regions.forEach((region, index) => {
-      for (const dimension of ["x", "y", "width", "height"]) {
-        if (id === "memory" && testInfo.project.name === "landscape" && region.selector === "game-title" && ["x", "width"].includes(dimension)) {
-          // Phase 9 intentionally gives short boards enough toolbar space.
-          const width = Math.max(baseline.metrics.regions[index].width, Math.min(390, metrics.viewport.width - 12));
-          const expected = dimension === "width" ? width : (metrics.viewport.width - width) / 2;
-          expect(Math.abs(region[dimension] - expected)).toBeLessThanOrEqual(1);
-          continue;
-        }
-        if (id === "link" && region.selector === "link-board-frame" && dimension === "height") {
-          // Phase 3 fits the actual tiles to the frame; legacy CSS clamped only
-          // its width, leaving the old grid 8–16px wider than the frame.
-          const fit = metrics.gridFit;
-          const tile = (region.width - fit.insetsX - fit.gap * (fit.columns - 1)) / fit.columns;
-          const fittedHeight = tile * fit.rows + fit.gap * (fit.rows - 1) + fit.insetsY;
-          expect(Math.abs(region.height - fittedHeight)).toBeLessThanOrEqual(1);
-          continue;
-        }
-        expect(Math.abs(region[dimension] - baseline.metrics.regions[index][dimension]),
-          `${region.selector}.${dimension} must stay within 1px`).toBeLessThanOrEqual(1);
-      }
-    });
-    expect(metrics.shellElementsExcludingBoard).toBe(baseline.metrics.shellElementsExcludingBoard);
+    // The user intentionally unified the frame with Link Connect. Keep Phase 1
+    // DOM budgets, but validate the new geometry and fullscreen in current snapshots.
+    for (const region of metrics.regions) {
+      expect(region.x).toBeGreaterThanOrEqual(-1);
+      expect(region.x + region.width).toBeLessThanOrEqual(metrics.viewport.width + 1);
+      expect(region.y).toBeGreaterThanOrEqual(-1);
+      expect(region.y + region.height).toBeLessThanOrEqual(metrics.viewport.height + 1);
+    }
+    expect(metrics.fullscreenElements).toBe(5);
+    expect(metrics.shellElementsExcludingBoard - metrics.fullscreenElements).toBe(baseline.metrics.shellElementsExcludingBoard);
     expect(metrics.boardElements).toBe(baseline.metrics.boardElements);
     const cdp = await page.context().newCDPSession(page);
     await cdp.send("HeapProfiler.collectGarbage");

@@ -7,6 +7,7 @@ const regionNames = ["title", "progress", "hud", "milestones", "frame", "board"]
 /** Adopt existing regions or create empty semantic slots for a new adapter. */
 export function createGameShell({ root = document.createElement("section"), regions = {}, title = "", display = "" } = {}) {
   const refs = { root };
+  root.classList.add("game-shell-root", "game-shell-tokens");
   root.setAttribute("role", "region");
   root.setAttribute("aria-label", title);
   for (const name of regionNames) {

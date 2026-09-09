@@ -1,34 +1,9 @@
-/* Tên game độc lập phía trên HUD */
-#game-logo.game-name {
-  display: block !important;
-  width: 100%;
-  margin: 0 0 8px;
-  padding: 0;
-  box-sizing: border-box;
-  font-size: clamp(2rem, 4vw, 2.8rem);
-  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
-  font-weight: 900;
-  line-height: 1.1;
-  letter-spacing: 0.8px;
-  white-space: nowrap;
-  text-align: center;
-  color: #ffd166;
-  background: none;
-  -webkit-text-fill-color: currentcolor;
-  text-shadow:
-    0 3px 0 #7a451c,
-    0 0 14px rgb(255 209 102 / 32%);
-  animation: none;
-  position: relative;
-  z-index: 1300;
-}
-
 /* HUD: menu bên trái, chỉ số ở chính giữa */
 #game-title.game-hud {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: min(var(--board-width, 100%), calc(100vw - 12px));
+  width: min(var(--board-width, 100%), calc(200vw - 12px));
   min-height: var(--shell-hud-min-height);
   max-width: none;
   padding: 0 var(--shell-hud-side-padding);
@@ -89,7 +64,10 @@
 .game-progress-hud .stat-combo .stat-label {
   color: #ffd889;
 }
-.game-progress-hud .stat-combo { position: relative; overflow: hidden; }
+.game-progress-hud .stat-combo {
+  position: relative;
+  overflow: hidden;
+}
 .game-progress-hud .stat-combo::after {
   content: "";
   position: absolute;
@@ -105,9 +83,17 @@
 }
 .game-progress-hud .stat-combo.is-combo-window-active::after {
   opacity: 1;
-  animation: combo-window-drain var(--combo-window-duration, 15000ms) linear forwards;
+  animation: combo-window-drain var(--combo-window-duration, 15000ms) linear
+    forwards;
 }
-@keyframes combo-window-drain { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+@keyframes combo-window-drain {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
 .game-progress-hud .stat-points,
 .game-progress-hud .stat-points .stat-label {
   color: #f2bf5b;
@@ -153,7 +139,10 @@
   line-height: 1;
   text-shadow: 0 1px 1px rgb(0 0 0 / 42%);
   transform: translateX(-50%);
-  transition: color var(--shell-motion-star) ease-out, filter var(--shell-motion-star) ease-out, transform var(--shell-motion-star) ease-out;
+  transition:
+    color var(--shell-motion-star) ease-out,
+    filter var(--shell-motion-star) ease-out,
+    transform var(--shell-motion-star) ease-out;
 }
 
 .star-progress__milestone:nth-child(1) {
@@ -273,14 +262,17 @@
   background: transparent;
   color: #ffd25f;
   box-shadow: none;
-  font-size: .7rem;
+  font-size: 0.7rem;
   font-variant-numeric: tabular-nums;
   font-weight: 800;
   line-height: 1;
   white-space: nowrap;
   transform: translateY(-50%);
 }
-.memory-special-hud__coins .ui-icon { width: 18px; height: 18px; }
+.memory-special-hud__coins .ui-icon {
+  width: 18px;
+  height: 18px;
+}
 .memory-special-hud__milestones {
   position: relative;
   display: block;
@@ -289,12 +281,49 @@
   height: var(--shell-milestones-track-height);
 }
 .memory-special-hud__milestones::before,
-.memory-special-hud__milestones::after { content: ""; position: absolute; inset: 50% 5% auto; height: var(--shell-milestones-rail-height); border-radius: 999px; transform: translateY(-50%); }
-.memory-special-hud__milestones::before { background: rgb(185 213 255 / 26%); }
-.memory-special-hud__milestones::after { background: linear-gradient(90deg, #36d9e7, #79f2ff); transform: translateY(-50%) scaleX(var(--shell-energy-progress, 0)); transform-origin: left; transition: transform var(--shell-motion-milestone-fill) ease-out; }
-.memory-special-hud__milestones > span { position: absolute; z-index: 1; top: 2px; left: var(--memory-milestone-position); display: grid; width: var(--shell-milestones-marker-size); height: var(--shell-milestones-marker-size); place-items: center; border: 1px solid rgb(185 213 255 / 38%); border-radius: 50%; background: #182942; color: #b9d5ff; font-size: .5rem; transform: translateX(-50%); }
-.memory-special-hud__milestones > span.is-earned { border-color: #ffd166; background: #a86f00; color: #fff8dd; transform: translateX(-50%) scale(1.08); }
-.memory-special-hud__milestones > span.is-next { border-color: #7ceeff; color: #7ceeff; }
+.memory-special-hud__milestones::after {
+  content: "";
+  position: absolute;
+  inset: 50% 5% auto;
+  height: var(--shell-milestones-rail-height);
+  border-radius: 999px;
+  transform: translateY(-50%);
+}
+.memory-special-hud__milestones::before {
+  background: rgb(185 213 255 / 26%);
+}
+.memory-special-hud__milestones::after {
+  background: linear-gradient(90deg, #36d9e7, #79f2ff);
+  transform: translateY(-50%) scaleX(var(--shell-energy-progress, 0));
+  transform-origin: left;
+  transition: transform var(--shell-motion-milestone-fill) ease-out;
+}
+.memory-special-hud__milestones > span {
+  position: absolute;
+  z-index: 1;
+  top: 2px;
+  left: var(--memory-milestone-position);
+  display: grid;
+  width: var(--shell-milestones-marker-size);
+  height: var(--shell-milestones-marker-size);
+  place-items: center;
+  border: 1px solid rgb(185 213 255 / 38%);
+  border-radius: 50%;
+  background: #182942;
+  color: #b9d5ff;
+  font-size: 0.5rem;
+  transform: translateX(-50%);
+}
+.memory-special-hud__milestones > span.is-earned {
+  border-color: #ffd166;
+  background: #a86f00;
+  color: #fff8dd;
+  transform: translateX(-50%) scale(1.08);
+}
+.memory-special-hud__milestones > span.is-next {
+  border-color: #7ceeff;
+  color: #7ceeff;
+}
 
 /* Thanh HUD dùng cùng nền xanh với menu chính. */
 #game-title.game-hud .game-stats .stat-card {
@@ -321,11 +350,6 @@
 }
 
 @media screen and (width <= 600px) {
-  #game-logo.game-name {
-    margin-bottom: 6px;
-    font-size: clamp(1.7rem, 9vw, 2.2rem);
-  }
-
   #game-title.game-hud {
     min-height: var(--shell-hud-mobile-min-height);
     padding: 0 var(--shell-hud-mobile-side-padding);
@@ -351,12 +375,6 @@
 }
 
 @media screen and (orientation: landscape) and (height <= 500px) {
-  #game-logo.game-name {
-    display: block !important;
-    margin-bottom: 3px;
-    font-size: 1.35rem;
-  }
-
   #game-title.game-hud {
     min-height: var(--shell-hud-min-height);
     padding: 0 var(--shell-hud-side-padding);

@@ -19,12 +19,21 @@ ${vars}
   --shell-safe-bottom: max(var(--shell-safe-area-bottom), env(safe-area-inset-bottom));
   --shell-active-board-gap: var(--shell-board-gap);
   --shell-active-board-padding: var(--shell-board-padding);
+  --shell-active-side-padding: var(--shell-frame-side-padding);
+  --shell-active-frame-gap: var(--shell-layout-gap);
+  --shell-active-title-margin: var(--shell-title-margin-bottom);
+}
+
+@media screen and (width <= ${GAME_SHELL_DEFAULTS.breakpoints.mobile}px) {
+  .game-shell-tokens { --shell-active-title-margin: var(--shell-title-mobile-margin-bottom); }
 }
 
 @media screen and (width <= ${GAME_SHELL_DEFAULTS.breakpoints.narrow}px) {
   .game-shell-tokens {
     --shell-active-board-gap: var(--shell-board-narrow-gap);
     --shell-active-board-padding: var(--shell-board-narrow-padding);
+    --shell-active-side-padding: var(--shell-frame-narrow-side-padding);
+    --shell-active-frame-gap: var(--shell-frame-narrow-gap);
   }
 }
 `;

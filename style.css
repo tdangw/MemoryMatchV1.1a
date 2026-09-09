@@ -60,34 +60,6 @@ svg {
   overscroll-behavior: none;
 }
 
-/* === Game Container === */
-#game-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--shell-layout-gap);
-  padding: 20px;
-  border-radius: 20px;
-  box-shadow: 0 0 20px rgb(0 0 0 / 0%);
-  margin-top: 2px;
-  width: 100%;
-  max-width: 95vw;
-  box-sizing: border-box;
-  background: transparent;
-  background-image: none;
-  position: relative; /* Để có thể đặt các phần tử con bên trong */
-  overflow: visible;
-  touch-action: manipulation;
-  z-index: 1000; /* Để đảm bảo nó nằm trên các phần tử khác */
-}
-
-/* Tên game */
-#game-logo {
-  font-size: 2.4rem; /* Kích thước font chữ logo trong game */
-  font-weight: 900;
-  letter-spacing: 1px;
-}
-
 /* === Game Header === */
 #game-title {
   display: flex;
@@ -421,10 +393,6 @@ body.meteor-effects-disabled .shooting-star {
 }
 
 @media screen and (width <= 480px) {
-  #game-container {
-    max-width: 100vw;
-    padding: 4px;
-  }
 
   #game-title.game-header {
     padding: 8px 10px;

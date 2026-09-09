@@ -9,10 +9,9 @@ import { getThemeCards } from "./themeCatalog.js";
 import { connectGameShellLayout } from "./gameShell/gameShellLayout.js";
 import { getMemoryShell } from "./memoryMatch/memoryShell.js";
 
-// Named presentation overrides retain Memory's existing width/rounding conventions.
+// Only coordinate labels need a game-specific presentation override.
 const MEMORY_SHELL_UI = { layout: {
-  widthRatio: 0.9, mobileSideInset: 10, bottomInset: 8,
-  maxTileSize: 180, tilePrecision: 1, coordinateGutter: 10,
+  coordinateGutter: 10,
 } };
 let activeLayout = null;
 let memoryLayout = null;

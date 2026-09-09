@@ -1,0 +1,100 @@
+/* Shared frame and title; game styles own only gameplay-specific regions. */
+.game-shell-root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: calc(var(--shell-layout-content-max-width) + 2 * var(--shell-active-side-padding));
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: var(--shell-safe-top) max(var(--shell-active-side-padding), var(--shell-viewport-safe-right)) var(--shell-safe-bottom) max(var(--shell-active-side-padding), var(--shell-viewport-safe-left));
+  gap: var(--shell-active-frame-gap);
+}
+.game-shell-root[hidden] { display: none; }
+.game-shell-root > [data-shell-region] { flex-shrink: 0; }
+.game-shell-root [data-shell-region="title"] {
+  display: block;
+  width: 100%;
+  position: relative;
+  box-sizing: border-box;
+  min-height: var(--shell-title-min-height);
+  margin: 0 0 var(--shell-active-title-margin);
+  padding: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  color: #ffd166;
+  background: none;
+  -webkit-text-fill-color: currentcolor;
+  font: 900 clamp(var(--shell-title-font-min), var(--shell-title-font-fluid), var(--shell-title-font-max)) / var(--shell-title-line-height) "Trebuchet MS", "Segoe UI", sans-serif;
+  letter-spacing: var(--shell-title-letter-spacing);
+  text-align: center;
+  text-shadow: 0 3px 0 #7a451c, 0 0 14px rgb(255 209 102 / 32%);
+  animation: none;
+  z-index: var(--shell-layers-hud);
+}
+.game-shell-root [data-shell-region="title"].shell-fullscreen-title {
+  padding-inline: calc(var(--shell-fullscreen-size) + var(--shell-fullscreen-title-gap));
+}
+
+.shell-fullscreen-button {
+  /* The title now has identical geometry in every game. */
+  position: absolute;
+  inset-inline-end: 0;
+  top: 0;
+  display: grid;
+  place-items: center;
+  width: var(--shell-fullscreen-size);
+  height: var(--shell-fullscreen-size);
+  padding: 0;
+  border: 1px solid rgb(146 219 255 / 30%);
+  border-radius: var(--shell-fullscreen-radius);
+  color: #eff8ff;
+  background: rgb(7 23 49 / 85%);
+  cursor: pointer;
+  touch-action: manipulation;
+  /* Global button transitions must not animate shell geometry on config changes. */
+  transition: none;
+}
+.shell-fullscreen-button svg {
+  width: var(--shell-fullscreen-icon-size);
+  height: var(--shell-fullscreen-icon-size);
+}
+.shell-fullscreen-button:focus-visible {
+  outline: 2px solid #ffd166;
+  outline-offset: 2px;
+}
+.shell-fullscreen-button:disabled {
+  opacity: 0.6;
+}
+.shell-fullscreen-contract,
+.shell-fullscreen-button[aria-pressed="true"] .shell-fullscreen-expand {
+  display: none;
+}
+.shell-fullscreen-button[aria-pressed="true"] .shell-fullscreen-contract {
+  display: initial;
+}
+.shell-fullscreen-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Fallback keeps the clock, pair progress, combo and all playable controls. */
+.shell-focus-mode .stat-moves,
+.shell-focus-mode .stat-misses,
+.shell-focus-mode .stat-points,
+.shell-focus-mode .stat-star-progress {
+  display: none;
+}
+.game-shell-root.shell-focus-mode [data-shell-region="title"] {
+  font-size: var(--shell-fullscreen-focus-font-size);
+  line-height: var(--shell-title-min-height);
+  text-shadow: none;
+}
