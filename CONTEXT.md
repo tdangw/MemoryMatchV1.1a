@@ -2,6 +2,8 @@
 
 Tài liệu này chỉ ghi trạng thái sản phẩm và các quy tắc đang có hiệu lực. Chi tiết kiến trúc nằm trong `ARCHITECTURE.md`; cách chạy/build nằm trong `README.md`; thiết kế từng trò nằm trong tài liệu cùng tên.
 
+Đây là tài liệu duy nhất bắt buộc đọc khi bắt đầu chat mới. Chỉ mở tài liệu kiến trúc, Game Shell hoặc tài liệu từng trò khi công việc mới thực sự liên quan, để tránh nạp lại lịch sử không cần thiết.
+
 ## Sản phẩm
 
 - Game viết bằng JavaScript ES modules, chạy trên web/PWA và có thể đóng gói Android bằng Capacitor.

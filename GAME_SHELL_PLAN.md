@@ -347,11 +347,10 @@ Dừng phase và hỏi trước khi:
 
 ## 9. Cách bắt đầu ở chat mới
 
-Chat mới đọc theo thứ tự:
+Chat mới chỉ cần đọc `CONTEXT.md` để biết trạng thái sản phẩm, thay đổi đang dở và rủi ro hiện tại. Sau đó chỉ đọc tài liệu đúng phạm vi công việc:
 
-1. `CONTEXT.md`
-2. `ARCHITECTURE.md`
-3. `GAME_SHELL_PLAN.md`
-4. `Memory Match.md` và `Link Connect.md` khi tới phase tương ứng
+- Đọc `Memory Match.md` hoặc `Link Connect.md` khi sửa luật/tính năng của trò tương ứng.
+- Đọc `ARCHITECTURE.md` khi thay đổi ranh giới module, lifecycle, lưu dữ liệu hoặc build.
+- Chỉ đọc `GAME_SHELL_PLAN.md`, tài liệu từng phase và `ADD_GAME.md` khi sửa Game Shell hoặc tích hợp một trò mới.
 
 Không còn phase Game Shell chưa hoàn tất. Kiểm tra worktree trước khi sửa, chọn công việc mới theo yêu cầu người dùng và không tự động triển khai Triple Connect. Worktree tại lần bàn giao 2026-09-09 còn các nhóm thay đổi riêng về Challenge/timing, fullscreen, tooltip và ảnh chủ đề; không xóa hoặc gộp khi chưa rà đúng phạm vi.
