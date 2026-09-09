@@ -1,9 +1,13 @@
+import { formatItemNameFromSrc } from "./itemNameFormatter.js";
+
 import { shellTimeout as setTimeout, clearShellTimeout as clearTimeout, shellFrame as requestAnimationFrame } from "./gameShell/gameShellLifecycle.js";
 
 const TOOLTIP_DELAY_MS = 450;
 const TOOLTIP_HIDE_MS = 3000;
 const VIEWPORT_GAP = 8;
 const TOOLTIP_GAP = 10;
+// Delay trước khi hiện tooltip khi chuột dừng trên thẻ game (tránh hiện khi lia nhanh).
+const TILE_HOVER_DELAY_MS = 450;
 
 const INFO_ONLY_SELECTOR = "[data-hud-info], .link-tile.is-frozen";
 
@@ -13,9 +17,12 @@ let hideTimer;
 let pressTimer;
 let pressAnchor;
 let suppressClickFor;
+let tileHoverTimer;
 
 function getTooltipText(element) {
   if (!element) return "";
+  // Thẻ game được xử lý trước — tên ảnh ưu tiên hơn mọi dataset.tooltip chức năng.
+  if (element.matches(".link-tile, .tile")) return getTileName(element);
   if (element.dataset.tooltip) return element.dataset.tooltip;
   if (element.matches(".link-tile.is-frozen")) return "Thẻ đang bị khóa.";
   if (element.matches("#toggle-meteor-effects")) return "Bật hoặc tắt hiệu ứng nền.";
@@ -51,6 +58,25 @@ function getCatalogTooltip(element) {
   return "Xem lựa chọn này.";
 }
 
+function getTileName(element) {
+  // Memory Match: Chỉ hiện tên khi thẻ đang ngửa (img không có class 'hidden') hoặc đã ghép (class 'matched').
+  // Kiểm tra này ngăn người chơi xem tên thẻ úp để gian lận.
+  if (element.matches(".tile")) {
+    const img = element.querySelector("img");
+    if (!img || (img.classList.contains("hidden") && !element.classList.contains("matched"))) return "";
+    return formatItemNameFromSrc(img.src, img.alt);
+  }
+  // Link Connect: Mọi thẻ đều ngửa, hiện tên + trạng thái khóa nếu có.
+  if (element.matches(".link-tile")) {
+    const img = element.querySelector("img:not(.link-tile__frost-overlay)");
+    if (!img?.src) return "";
+    const name = formatItemNameFromSrc(img.src, img.alt);
+    if (!name) return "";
+    return element.classList.contains("is-frozen") ? `${name} (Đang bị khóa)` : name;
+  }
+  return "";
+}
+
 function getDisabledButtonTooltip(element) {
   const label = element.textContent.trim();
   if (label === "Chờ ảnh") return "Chủ đề này đang được hoàn thiện.";
@@ -60,7 +86,7 @@ function getDisabledButtonTooltip(element) {
 
 function getAnchor(target) {
   const candidate = target instanceof Element
-    ? target.closest("[data-tooltip], .link-tile.is-frozen, #toggle-meteor-effects, #toggle-board-coordinates, #version-info, .app-modal__close, .shop-tab, .appearance-choice, .theme-choice, .shop-buy-button:disabled")
+    ? target.closest("[data-tooltip], .link-tile, .tile, #toggle-meteor-effects, #toggle-board-coordinates, #version-info, .app-modal__close, .shop-tab, .appearance-choice, .theme-choice, .shop-buy-button:disabled")
     : null;
   return candidate && getTooltipText(candidate) ? candidate : null;
 }
@@ -153,12 +179,20 @@ function isCatalogAnchor(anchor) {
 document.addEventListener("pointerover", (event) => {
   if (event.pointerType !== "mouse") return;
   const anchor = getAnchor(event.target);
-  if (anchor) showTooltip(anchor);
+  if (!anchor) return;
+  // Thẻ game: Hiện sau khi chuột dừng lại để tránh bật tooltip khi lia nhanh qua bàn.
+  if (anchor.matches(".tile, .link-tile")) {
+    clearTimeout(tileHoverTimer);
+    tileHoverTimer = setTimeout(() => showTooltip(anchor, { autoHide: true }), TILE_HOVER_DELAY_MS);
+  } else {
+    showTooltip(anchor);
+  }
 });
 
 document.addEventListener("pointerout", (event) => {
   if (event.pointerType !== "mouse") return;
   const anchor = getAnchor(event.target);
+  if (anchor?.matches(".tile, .link-tile")) clearTimeout(tileHoverTimer);
   if (anchor && !anchor.contains(event.relatedTarget)) hideTooltip();
 });
 

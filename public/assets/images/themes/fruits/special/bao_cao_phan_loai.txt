@@ -1,0 +1,51 @@
+===========================================
+         BÁO CÁO PHÂN LOẠI FILE
+ Thời gian thực hiện: 2026-09-08 12:14:50
+ Thư mục nguồn      : C:\Users\Dang\MyProject\MemoryMatchV1.1a\public\assets\images\themes\fruits\special
+ Thư mục đích       : C:\Users\Dang\MyProject\MemoryMatchV1.1a\public\assets\images\themes\fruits\special\vegetables
+===========================================
+
+1. DANH SÁCH FILE ĐÃ DI CHUYỂN (15 file):
+-------------------------------------------
+  1. beetroot.webp
+  2. bitter_melon.webp
+  3. chayote.webp
+  4. eggplant.webp
+  5. fresh_walnut.webp
+  6. garlic.webp
+  7. ginkgo_nut.webp
+  8. indian_almond.webp
+  9. macadamia_nut.webp
+  10. okra.webp
+  11. peanut.webp
+  12. pistachio.webp
+  13. pumpkin.webp
+  14. sweet_corn.webp
+  15. winter_melon.webp
+
+📋 Dòng sao chép nhanh:
+beetroot.webp, bitter_melon.webp, chayote.webp, eggplant.webp, fresh_walnut.webp, garlic.webp, ginkgo_nut.webp, indian_almond.webp, macadamia_nut.webp, okra.webp, peanut.webp, pistachio.webp, pumpkin.webp, sweet_corn.webp, winter_melon.webp
+
+2. DANH SÁCH FILE CÒN LẠI TRONG THƯ MỤC NGUỒN (18 file):
+-------------------------------------------
+  1. abiu.webp
+  2. bao_cao_phan_loai.txt
+  3. barbados_cherry.webp
+  4. black_olive.webp
+  5. breadnut.webp
+  6. buddhas_hand.webp
+  7. calabash.webp
+  8. cashew_apple.webp
+  9. cupuacu.webp
+  10. guarana.webp
+  11. hala_fruit.webp
+  12. kiwano.webp
+  13. lotus_pod.webp
+  14. nipa_palm_fruit.webp
+  15. palmyra_fruit.webp
+  16. surinam_cherry.webp
+  17. velvet_tamarind.webp
+  18. water_chestnut.webp
+
+📋 Dòng sao chép nhanh:
+abiu.webp, bao_cao_phan_loai.txt, barbados_cherry.webp, black_olive.webp, breadnut.webp, buddhas_hand.webp, calabash.webp, cashew_apple.webp, cupuacu.webp, guarana.webp, hala_fruit.webp, kiwano.webp, lotus_pod.webp, nipa_palm_fruit.webp, palmyra_fruit.webp, surinam_cherry.webp, velvet_tamarind.webp, water_chestnut.webp

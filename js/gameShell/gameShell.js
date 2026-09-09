@@ -1,4 +1,5 @@
 import { activateGameScope, createGameShellLifecycle } from "./gameShellLifecycle.js";
+import { mountGameFullscreen } from "./gameFullscreen.js";
 
 let activeShell = null;
 const regionNames = ["title", "progress", "hud", "milestones", "frame", "board"];
@@ -32,6 +33,7 @@ export function createGameShell({ root = document.createElement("section"), regi
       activeShell = shell;
       root.hidden = false;
       root.style.display = display;
+      mountGameFullscreen(refs, scope);
       if (cleanup) scope.own(cleanup);
       return scope;
     },

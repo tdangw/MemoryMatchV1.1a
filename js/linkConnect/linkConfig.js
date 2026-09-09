@@ -168,14 +168,16 @@ export function getLinkThunderResolveDelay() {
 }
 
 const CHALLENGE_LAYOUTS = Object.freeze([
-  Object.freeze({ untilLevel: 3, tileCount: 12, columns: 4 }),
-  Object.freeze({ untilLevel: 6, tileCount: 16, columns: 4 }),
-  Object.freeze({ untilLevel: 9, tileCount: 20, columns: 4 }),
-  Object.freeze({ untilLevel: 12, tileCount: 24, columns: 6 }),
-  Object.freeze({ untilLevel: 15, tileCount: 30, columns: 6 }),
-  Object.freeze({ untilLevel: 18, tileCount: 36, columns: 6 }),
-  Object.freeze({ untilLevel: 21, tileCount: 42, columns: 6 }),
-  Object.freeze({ untilLevel: Infinity, tileCount: 48, columns: 6 }),
+  Object.freeze({ untilLevel: 1, tileCount: 12, columns: 4 }),
+  Object.freeze({ untilLevel: 2, tileCount: 16, columns: 4 }),
+  Object.freeze({ untilLevel: 3, tileCount: 20, columns: 4 }),
+  Object.freeze({ untilLevel: 4, tileCount: 24, columns: 4 }),
+  Object.freeze({ untilLevel: 5, tileCount: 30, columns: 6 }),
+  Object.freeze({ untilLevel: 6, tileCount: 36, columns: 6 }),
+  Object.freeze({ untilLevel: 7, tileCount: 42, columns: 6 }),
+  Object.freeze({ untilLevel: 8, tileCount: 48, columns: 6 }),
+  Object.freeze({ untilLevel: 9, tileCount: 54, columns: 6 }),
+  Object.freeze({ untilLevel: Infinity, tileCount: 60, columns: 6 }),
 ]);
 
 export function getLinkModeLayout(mode = "easy") {

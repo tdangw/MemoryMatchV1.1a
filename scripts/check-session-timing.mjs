@@ -17,6 +17,11 @@ assert.deepEqual(resolveSessionTiming({
   session: { remainingTime: 23, timeLimit: 60, levelStartTime: 55 },
 }), { remainingTime: 55, timeLimit: 55, levelStartTime: 55 });
 assert.deepEqual(resolveSessionTiming({
+  reason: "restart",
+  newTime: 60,
+  session: { remainingTime: 0, timeLimit: 5, levelStartTime: 5 },
+}), { remainingTime: 60, timeLimit: 60, levelStartTime: 60 });
+assert.deepEqual(resolveSessionTiming({
   reason: "advance",
   newTime: 60,
   currentRemaining: 19,

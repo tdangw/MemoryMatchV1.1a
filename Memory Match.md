@@ -34,18 +34,28 @@ Với Dễ, Trung bình, Khó và Siêu khó, mỗi level sau được cộng `2
 
 | Level | Số thẻ | Số cặp | Cột desktop | Cột mobile |
 | --- | ---: | ---: | ---: | ---: |
-| 1–3 | 12 | 6 | 4 | 4 |
-| 4–6 | 16 | 8 | 4 | 4 |
-| 7–9 | 20 | 10 | 4 | 4 |
-| 10–12 | 24 | 12 | 6 | 4 |
-| 13–15 | 30 | 15 | 6 | 5 |
-| 16–18 | 36 | 18 | 6 | 6 |
-| 19–21 | 42 | 21 | 6 | 6 |
-| Từ 22 | 48 | 24 | 6 | 6 |
+| 1–2 | 12 | 6 | 4 | 4 |
+| 3–4 | 16 | 8 | 4 | 4 |
+| 5–6 | 20 | 10 | 4 | 4 |
+| 7–8 | 24 | 12 | 4 | 4 |
+| 9–10 | 30 | 15 | 6 | 6 |
+| 11–12 | 36 | 18 | 6 | 6 |
+| 13–14 | 42 | 21 | 6 | 6 |
+| 15–16 | 48 | 24 | 6 | 6 |
+| 17–18 | 54 | 27 | 6 | 6 |
+| Từ 19 | 60 | 30 | 6 | 6 |
 
 Thử thách bắt đầu với 60 giây. Khi qua màn, thời gian còn lại được giữ và cộng thêm 10 giây cho màn kế tiếp.
 
-Số cặp tăng sau mỗi 3 level: ban đầu tăng 2 cặp mỗi bậc (6 → 8 → 10 → 12), sau đó tăng 3 cặp mỗi bậc (15 → 18 → 21 → 24). Từ level 22 trở đi giữ tối đa 24 cặp.
+Giữ mỗi kích thước 2 level để làm quen vị trí: 4×3 → 4×4 → 4×5 → 4×6 → 6×5 → 6×6 → 6×7 → 6×8 → 6×9 → 6×10 (cột × hàng). Từ level 19 giữ tối đa 30 cặp. Cột desktop/mobile giống nhau trong Thử thách để việc resize/fullscreen không đổi vị trí ghi nhớ. Các chế độ cố định giữ cấu hình cũ. Luật thời gian, combo và thưởng giữ nguyên; cần đánh giá thời gian hoàn thành, tỷ lệ thua và lượng hỗ trợ ở nhịp mới trước khi chốt cân bằng phát hành.
+
+### Toàn màn hình và tập trung
+
+- Nút góc phải hàng tên game bật/tắt toàn màn hình theo thao tác người chơi, giữ qua level; không tự bật khi tải game.
+- Khi không hỗ trợ hoặc yêu cầu bị từ chối, dùng chế độ tập trung: ẩn Moves, Miss, Điểm và thanh sao phụ; giữ đồng hồ, cặp, combo và công cụ. Nhấn lại nút hoặc Escape để thoát chế độ tập trung.
+- Fullscreen bao gồm cả trang để popup/công cụ vẫn hiển thị. Dùng lại bộ tính bố cục game shell, không tạo lại bàn khi chuyển trạng thái; nút và sự kiện được dọn khi rời shell.
+- Lưới 6×10 ưu tiên màn hình dọc. Màn ngang thấp vẫn vừa khung nhưng thẻ nhỏ; không tự đổi số hàng/cột giữa ván để bảo toàn vị trí ghi nhớ.
+- Phiên lưu hiện chỉ giữ level/tài nguyên/thời gian, không lưu từng vị trí thẻ. Khi tiếp tục sau cập nhật, bàn được tạo theo bảng mới tại level đã lưu; giờ và tiến trình không bị reset. Nên dùng Chơi mới khi đánh giá nhịp cân bằng mới.
 
 ## 3. Bắt đầu màn và bố cục thích ứng
 

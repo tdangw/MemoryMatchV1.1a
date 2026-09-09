@@ -65,7 +65,7 @@ const blockedGrid = [
 assert.equal(findConnectionPath(blockedGrid, { row: 1, column: 1 }, { row: 1, column: 3 }), null);
 
 assert.equal(getLinkModeLayout("hard").tileCount, 36);
-assert.equal(getLinkChallengeLayout(10).tileCount, 24);
+assert.equal(getLinkChallengeLayout(10).tileCount, 60);
 assert.equal(getLinkTimerDirection("endless"), "up");
 assert.equal(calculateLinkMatchPoints(3), 16);
 assert.equal(calculateLinkMatchPoints(3, { special: true }), 24);

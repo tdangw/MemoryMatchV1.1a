@@ -44,7 +44,7 @@ export const GAME_CONFIG = Object.freeze({
     challenge: Object.freeze({
       tileCount: 12,
       columns: 4,
-      mobileColumns: 3,
+      mobileColumns: 4,
       timeSeconds: 60,
       coinReward: Object.freeze({ base: 30, speedMultiplier: 0.35 }),
     }),
@@ -108,39 +108,41 @@ export const GAME_CONFIG = Object.freeze({
 });
 
 const CHALLENGE_LAYOUTS = Object.freeze([
-  Object.freeze({ untilLevel: 3, tileCount: 12, columns: 4, mobileColumns: 4 }),
-  Object.freeze({ untilLevel: 6, tileCount: 16, columns: 4, mobileColumns: 4 }),
-  Object.freeze({ untilLevel: 9, tileCount: 20, columns: 4, mobileColumns: 4 }),
+  Object.freeze({ untilLevel: 2, tileCount: 12, columns: 4, mobileColumns: 4 }),
+  Object.freeze({ untilLevel: 4, tileCount: 16, columns: 4, mobileColumns: 4 }),
+  Object.freeze({ untilLevel: 6, tileCount: 20, columns: 4, mobileColumns: 4 }),
   Object.freeze({
-    untilLevel: 12,
+    untilLevel: 8,
     tileCount: 24,
-    columns: 6,
+    columns: 4,
     mobileColumns: 4,
   }),
   Object.freeze({
-    untilLevel: 15,
+    untilLevel: 10,
     tileCount: 30,
     columns: 6,
-    mobileColumns: 5,
+    mobileColumns: 6,
   }),
   Object.freeze({
-    untilLevel: 18,
+    untilLevel: 12,
     tileCount: 36,
     columns: 6,
     mobileColumns: 6,
   }),
   Object.freeze({
-    untilLevel: 21,
+    untilLevel: 14,
     tileCount: 42,
     columns: 6,
     mobileColumns: 6,
   }),
   Object.freeze({
-    untilLevel: Infinity,
+    untilLevel: 16,
     tileCount: 48,
     columns: 6,
     mobileColumns: 6,
   }),
+  Object.freeze({ untilLevel: 18, tileCount: 54, columns: 6, mobileColumns: 6 }),
+  Object.freeze({ untilLevel: Infinity, tileCount: 60, columns: 6, mobileColumns: 6 }),
 ]);
 
 export function getModeLayout(mode = "easy") {

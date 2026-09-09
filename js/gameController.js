@@ -247,11 +247,10 @@ function handleTimeUp() {
 
     gameState.remainingTime = seconds;
     gameState.timeLimit = seconds;
-    gameState.levelStartTime = seconds;
     stageMemorySession({
       remainingTime: seconds,
       timeLimit: seconds,
-      levelStartTime: seconds,
+      levelStartTime: gameState.levelStartTime,
     });
     if (!savePersistentGameData({ coins: gameState.coins, progress: gameState.progress })) {
       gameState.coins = previousCoins;

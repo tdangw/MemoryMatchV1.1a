@@ -46,16 +46,26 @@ Sau mỗi cặp ghép, Link Connect áp dụng quy tắc bàn cờ của cả m�
 
 | Level | Số thẻ | Số cặp | Số cột |
 | --- | ---: | ---: | ---: |
-| 1–3 | 12 | 6 | 4 |
-| 4–6 | 16 | 8 | 4 |
-| 7–9 | 20 | 10 | 4 |
-| 10–12 | 24 | 12 | 6 |
-| 13–15 | 30 | 15 | 6 |
-| 16–18 | 36 | 18 | 6 |
-| 19–21 | 42 | 21 | 6 |
-| Từ 22 | 48 | 24 | 6 |
+| 1 | 12 | 6 | 4 |
+| 2 | 16 | 8 | 4 |
+| 3 | 20 | 10 | 4 |
+| 4 | 24 | 12 | 4 |
+| 5 | 30 | 15 | 6 |
+| 6 | 36 | 18 | 6 |
+| 7 | 42 | 21 | 6 |
+| 8 | 48 | 24 | 6 |
+| 9 | 54 | 27 | 6 |
+| Từ 10 | 60 | 30 | 6 |
 
-Số cặp tăng sau mỗi 3 level: ban đầu tăng 2 cặp mỗi bậc (6 → 8 → 10 → 12), sau đó tăng 3 cặp mỗi bậc (15 → 18 → 21 → 24). Từ level 22 trở đi giữ tối đa 24 cặp. Thời gian chuẩn của một màn Thử thách là `60 + (level - 1) × 10` giây.
+Thử thách tăng một bậc mỗi level: 4×3 → 4×4 → 4×5 → 4×6 → 6×5 → 6×6 → 6×7 → 6×8 → 6×9 → 6×10 (cột × hàng). Bỏ bậc 6×4 vì trùng 12 cặp với 4×6 nhưng làm bàn thấp xuống. Từ level 10 giữ tối đa 30 cặp. Số cặp không đổi theo thiết bị hoặc fullscreen. Các chế độ cố định giữ cấu hình cũ. Thời gian chuẩn vẫn là `60 + (level - 1) × 10` giây; nhịp mới cần tiếp tục đánh giá bằng tỷ lệ hoàn thành và lượng hỗ trợ sử dụng, chưa được coi là cân bằng phát hành đã kiểm chứng.
+
+### Toàn màn hình và tập trung
+
+- Nút góc phải hàng tên game bật/tắt toàn màn hình bằng thao tác chủ động; không tự bật khi tải trang. Trạng thái fullscreen giữ qua các level, toàn bộ trang được mở để popup và công cụ vẫn hoạt động.
+- Trình duyệt không hỗ trợ hoặc từ chối fullscreen dùng chế độ tập trung: ẩn Moves, Miss, Điểm và thanh sao phụ; giữ đồng hồ, cặp, combo và công cụ. Nhấn lại nút hoặc Escape để thoát chế độ tập trung.
+- Game shell tính lại kích thước theo vùng nhìn thấy, không tạo lại bàn hoặc đổi số cặp. Điều khiển và sự kiện được dọn theo vòng đời shell, không thêm vòng lặp đo bố cục.
+- Lưới 6×10 ưu tiên màn hình dọc; màn ngang thấp vẫn vừa khung nhưng thẻ nhỏ. Không thay đổi ma trận đường nối giữa ván khi resize.
+- Phiên cũ tiếp tục bằng level/tài nguyên/thời gian đã lưu và tạo bàn theo bảng mới, không reset tiến trình. Dùng Chơi mới để đánh giá trọn nhịp cân bằng mới.
 
 ### Các kiểu dịch chuyển thẻ — Gravity Shifts
 

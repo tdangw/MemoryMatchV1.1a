@@ -19,10 +19,13 @@ export function resolveSessionTiming({
     return { remainingTime: initial, timeLimit: initial, levelStartTime: initial };
   }
   if (reason === "restart") {
-    const initial = finiteTime(
+    const rawInitial = finiteTime(
       restartTime ?? session?.levelStartTime,
       finiteTime(session?.timeLimit, fallback),
     );
+    const initial = !carryOnAdvance && rawInitial <= 5 && fallback > 5
+      ? fallback
+      : rawInitial;
     return { remainingTime: initial, timeLimit: initial, levelStartTime: initial };
   }
   if (reason === "resume") {

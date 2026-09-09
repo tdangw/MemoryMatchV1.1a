@@ -756,7 +756,6 @@ function handleLinkTimeUp() {
     }
     linkGameState.remainingTime = seconds;
     linkGameState.timeLimit = seconds;
-    linkGameState.levelStartTime = seconds;
     stageActiveSession("link-connect", {
       mode: linkGameState.mode,
       level: linkGameState.level,
@@ -765,7 +764,7 @@ function handleLinkTimeUp() {
       specialNoEnergyDropStreak: linkGameState.specialNoEnergyDropStreak,
       remainingTime: seconds,
       timeLimit: seconds,
-      levelStartTime: seconds,
+      levelStartTime: linkGameState.levelStartTime,
     });
     if (!savePersistentGameData({ coins: gameState.coins, progress: gameState.progress })) {
       gameState.coins = previousCoins;
