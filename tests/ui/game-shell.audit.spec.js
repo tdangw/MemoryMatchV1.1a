@@ -70,6 +70,23 @@ for (const [id, title, root, board] of [
       await Promise.all([...document.images].map(img => img.decode().catch(() => {})));
     });
     await page.addStyleTag({ content: "*, *::before, *::after { animation: none !important; transition: none !important; caret-color: transparent !important; }" });
+    const contract = await page.evaluate(() => {
+      const ids = [...document.querySelectorAll("[id]")].map(node => node.id);
+      const brokenControls = [...document.querySelectorAll("[aria-controls]")].flatMap(node =>
+        node.getAttribute("aria-controls").split(/\s+/).filter(id => !document.getElementById(id)));
+      return { duplicateIds: ids.filter((id, index) => ids.indexOf(id) !== index), brokenControls };
+    });
+    expect(contract).toEqual({ duplicateIds: [], brokenControls: [] });
+    if (id === "memory") {
+      const overlaps = await page.evaluate(() => {
+        const controls = [...document.querySelectorAll("#game-title .game-menu-toggle, #game-title .game-quick-action, #game-title .game-hint-fab, #game-title .game-stats .stat-card")]
+          .map(node => ({ name: node.id || node.className, rect: node.getBoundingClientRect() })).filter(({ rect }) => rect.width && rect.height);
+        return controls.flatMap((a, index) => controls.slice(index + 1).filter(b =>
+          Math.min(a.rect.right, b.rect.right) - Math.max(a.rect.left, b.rect.left) > 1 &&
+          Math.min(a.rect.bottom, b.rect.bottom) - Math.max(a.rect.top, b.rect.top) > 1).map(b => `${a.name} / ${b.name}`));
+      });
+      expect(overlaps, "Inventory tools must not overlap stats").toEqual([]);
+    }
     const metrics = await page.evaluate(({ root, board }) => {
       const shell = document.querySelector(root);
       const grid = shell.querySelector(".link-board, #grid-container");
@@ -103,6 +120,13 @@ for (const [id, title, root, board] of [
     expect(metrics.regions.map(region => region.selector)).toEqual(baseline.metrics.regions.map(region => region.selector));
     metrics.regions.forEach((region, index) => {
       for (const dimension of ["x", "y", "width", "height"]) {
+        if (id === "memory" && testInfo.project.name === "landscape" && region.selector === "game-title" && ["x", "width"].includes(dimension)) {
+          // Phase 9 intentionally gives short boards enough toolbar space.
+          const width = Math.max(baseline.metrics.regions[index].width, Math.min(390, metrics.viewport.width - 12));
+          const expected = dimension === "width" ? width : (metrics.viewport.width - width) / 2;
+          expect(Math.abs(region[dimension] - expected)).toBeLessThanOrEqual(1);
+          continue;
+        }
         if (id === "link" && region.selector === "link-board-frame" && dimension === "height") {
           // Phase 3 fits the actual tiles to the frame; legacy CSS clamped only
           // its width, leaving the old grid 8–16px wider than the frame.
@@ -125,5 +149,8 @@ for (const [id, title, root, board] of [
     await writeFile(testInfo.outputPath(`${id}.json`), JSON.stringify(metrics, null, 2));
     const first = await page.screenshot({ path: testInfo.outputPath(`${id}-candidate.png`) });
     expect(await page.screenshot()).toEqual(first);
+    if (process.env.GAME_SHELL_VISUAL_CANDIDATES === "1") {
+      await expect(page).toHaveScreenshot(`${id}.png`, { maxDiffPixels: 0, animations: "disabled" });
+    }
   });
 }

@@ -48,7 +48,7 @@ Tài liệu này chỉ ghi trạng thái sản phẩm và các quy tắc đang c
 
 ## Phần còn cần kiểm tra
 
-- Game Shell: Phase 1–4 đã hoàn tất. Phase 5 đã triển khai HUD dùng chung, bỏ DOM write trùng và chuyển tooltip HUD sang definition; 16/16 ca liên quan, check/build đạt. Còn kiểm tra thủ công mobile dọc/ngang, pause/resume và nhấn giữ trước Phase 6; xem `GAME_SHELL_PHASE5.md`. Giữ hình học hiện có, ưu tiên mobile dọc. Chưa triển khai Triple Connect.
+- Game Shell: Phase 1–9 đã triển khai; hai trò dùng core chung, không còn adapter legacy. Phase 9 có check contract, bộ ảnh chờ duyệt bốn viewport và bản sửa nút kho chồng chỉ số ở Memory ngang. 8 ca visual/geometry, 5 ca hiệu ứng và check/build đạt; chưa khóa phát hành trước duyệt ảnh và chơi thử mobile thật. Xem `GAME_SHELL_PHASE9.md` và `ADD_GAME.md`. Chưa triển khai Triple Connect.
 
 1. Rà trực quan từng hiệu ứng đường nối và xóa thẻ trong Bộ sưu tập trước khi coi là đạt chất lượng phát hành.
 2. Kiểm thử Link Connect trên thiết bị mobile hẹp, bàn 6 cột và level cao với mọi kiểu dịch chuyển.
@@ -65,3 +65,5 @@ Tài liệu này chỉ ghi trạng thái sản phẩm và các quy tắc đang c
 - Game Shell Phase 7: Memory đã chuyển markup/HUD sang `js/memoryMatch/`, dùng core chung; legacy adapters chỉ còn Link. Đã khôi phục hai hằng cấu hình canvas Link bị thiếu từ Phase 6. Chờ xác nhận thủ công trước Phase 8 theo `GAME_SHELL_PHASE7.md`; baseline bố cục tách riêng nút fullscreen đang phát triển.
 
 - Game Shell Phase 8: Link đã chuyển markup/HUD/control sang `js/linkConnect/linkShell.js`; hai adapter legacy đã xóa. Nút theo scope từng lượt, không cộng dồn listener sau Chơi lại. Còn gate thủ công trước Phase 9 theo `GAME_SHELL_PHASE8.md`; chưa triển khai Triple Connect.
+
+- Game Shell Phase 9 đã dọn effect/CSS/import chết, thêm check contract và ảnh chờ duyệt bốn viewport; hướng dẫn thêm trò: `ADD_GAME.md`. Chưa khóa phát hành: đã sửa nút kho chồng LV/tổng sao ở Memory ngang bằng chiều rộng toolbar tối thiểu có cấu hình; còn duyệt ảnh và kiểm tra điện thoại thật. Xem `GAME_SHELL_PHASE9.md`; chưa triển khai Triple Connect.

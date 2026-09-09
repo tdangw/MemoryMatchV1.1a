@@ -26,7 +26,7 @@ export const GAME_SHELL_SCHEMA = freeze({
     minHeight: px(34), mobileMinHeight: px(30), radius: px(9),
     sidePadding: px(74), mobileSidePadding: px(104),
     timerHeight: px(3), timerInset: px(6), timerOffset: px(8),
-    menuOffset: px(6),
+    menuOffset: px(6), landscapeMinWidth: px(390),
   },
   milestones: { width: px(260, 1), mobileWidth: px(220, 1), trackHeight: px(19), markerSize: px(15), railHeight: px(2) },
   safeArea: { top: px(14), bottom: px(16) },

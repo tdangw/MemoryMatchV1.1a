@@ -216,12 +216,6 @@ export function applyLinkTimingStyles(container, timing) {
   container.style.setProperty("--link-thunder-strike-duration", `${timing.thunderStrikeMs}ms`);
   container.style.setProperty("--link-special-transform-duration", `${timing.specialPairTransformMs}ms`);
   container.style.setProperty("--link-frozen-unlock-duration", `${timing.frozenPairUnlockMs}ms`);
-  container.style.setProperty("--link-energy-burst-duration", `${timing.energyBurstMs}ms`);
-  container.style.setProperty("--link-energy-hold-duration", `${timing.energyHoldMs}ms`);
-  container.style.setProperty("--link-energy-flight-duration", `${timing.energyFlightMs}ms`);
-  container.style.setProperty("--link-item-reward-burst-duration", `${timing.itemRewardBurstMs}ms`);
-  container.style.setProperty("--link-item-reward-hold-duration", `${timing.itemRewardHoldMs}ms`);
-  container.style.setProperty("--link-item-reward-flight-duration", `${timing.itemRewardFlightMs}ms`);
   container.style.setProperty("--link-board-shift-duration", `${timing.boardShiftMs}ms`);
   container.style.setProperty("--link-board-shuffle-duration", `${timing.boardShuffleMs}ms`);
   container.style.setProperty("--link-board-shuffle-stagger", `${timing.boardShuffleStaggerMs}ms`);

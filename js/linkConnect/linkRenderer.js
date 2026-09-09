@@ -3,7 +3,6 @@ import { playLootDrop } from "../lootEffects.js";
 import { shellTimeout as setTimeout, clearShellTimeout as clearTimeout, shellFrame as requestAnimationFrame } from "../gameShell/gameShellLifecycle.js";
 import { getActiveLinkConnectionEffect } from "./linkEffects.js";
 import { gameState } from "../gameState.js";
-import { createIcon } from "../icons.js";
 import { getLinkItemDefinition } from "./linkItems.js";
 import { calculateMotionDelta, prefersReducedMotion, readCssTimeMs } from "../motion.js";
 import { LINK_CONNECT_TIMING } from "./linkConfig.js";
@@ -664,7 +663,7 @@ export function clearLinkTransientEffects() {
   activeTileMotionAnimations.clear();
   document.getElementById("link-board")?.classList.remove("is-moving", "is-shuffling");
   document.querySelectorAll(
-    ".link-energy-flight, .link-item-reward-flight, .link-card-exit-effect, .link-thunder-strike",
+    ".link-card-exit-effect, .link-thunder-strike",
   ).forEach((effect) => effect.remove());
   tileElementsByKey.forEach((tile) => {
     tile.style.removeProperty("transition");

@@ -791,3 +791,10 @@
 #game-title.game-hud .stat-timer.is-previewing .ui-icon--eye {
   color: #b9e5ff;
 }
+
+/* A short landscape board must not squeeze inventory tools onto the stats. */
+@media screen and (orientation: landscape) and (height <= 500px) {
+  #game-title.game-hud {
+    min-width: min(var(--shell-hud-landscape-min-width), calc(100vw - 12px));
+  }
+}

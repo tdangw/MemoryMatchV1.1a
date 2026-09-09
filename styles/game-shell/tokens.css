@@ -29,6 +29,7 @@
   --shell-hud-timer-inset: 6px;
   --shell-hud-timer-offset: 8px;
   --shell-hud-menu-offset: 6px;
+  --shell-hud-landscape-min-width: 390px;
   --shell-milestones-width: 260px;
   --shell-milestones-mobile-width: 220px;
   --shell-milestones-track-height: 19px;

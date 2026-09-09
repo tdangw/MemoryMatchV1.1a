@@ -88,7 +88,7 @@ function schedule(scope, kind, callback, delay, args = []) {
   return handle;
 }
 
-// Compatibility scheduling for existing presenters, including menu use without a shell.
+// App scheduling: game work belongs to the active round; menu work may have no shell.
 export const shellTimeout = (callback, delay, ...args) => schedule(activeScope, "timeout", callback, delay, args);
 export const shellInterval = (callback, delay, ...args) => schedule(activeScope, "interval", callback, delay, args);
 export const shellFrame = callback => schedule(activeScope, "frame", callback);

@@ -301,6 +301,8 @@ Override không thuộc schema phải gây lỗi trong development. Production d
 
 ### Phase 9 — Xóa tương thích tạm và khóa contract
 
+**Trạng thái:** đã dọn phần không còn dùng, bổ sung check contract; 8 ca visual/geometry, 5 ca hiệu ứng và check/build đạt. Bộ ảnh chờ duyệt; xem `GAME_SHELL_PHASE9.md`. Chưa khóa phát hành: đã sửa chồng nút kho trên HUD Memory ngang; còn duyệt ảnh và chơi thử mobile thật.
+
 **Thực hiện**
 
 - Xóa selector, helper, markup, token và adapter tạm không còn người dùng.
