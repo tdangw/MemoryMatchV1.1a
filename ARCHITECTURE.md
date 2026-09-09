@@ -16,19 +16,9 @@ js/main.js ── cấu hình callback giữa menu, controller và UI
 Vite ──→ dist ──→ Web/PWA hoặc Capacitor Android
 ```
 
-Kế hoạch chuẩn hóa shell/HUD/layout dùng chung trước khi thêm game mới nằm trong `GAME_SHELL_PLAN.md`.
+Game Shell đã hoàn tất Phase 1–9 ngày 2026-09-09. `js/gameShell/` sở hữu config, sáu vùng semantic, HUD patch, phép đo layout, lifecycle và registry hiệu ứng. `memoryMatch/memoryShell.js` và `linkConnect/linkShell.js` nối từng trò vào contract; controller và renderer riêng vẫn sở hữu luật, tile và đường nối. Không còn adapter legacy. Lịch sử quyết định và kiểm chứng nằm trong `GAME_SHELL_PLAN.md` cùng `GAME_SHELL_PHASE1.md` đến `GAME_SHELL_PHASE9.md`.
 
-Khảo sát ownership hiện tại, hợp đồng đích và danh sách xóa theo phase nằm trong `GAME_SHELL_PHASE1.md`. Phase 1 đã chốt giữ nguyên giao diện theo chơi thử của người dùng; kiến trúc Shell sẽ tích hợp theo từng phase.
-
-Phase 2 đã tích hợp `js/gameShell/gameShellConfig.js`: schema/defaults và normalize UI override thuần, không phụ thuộc DOM/state/gameplay. `scripts/generate-game-shell-tokens.mjs` sinh `styles/game-shell/tokens.css` dùng cho hai shell hiện tại; sửa nguồn JS rồi chạy `npm run shell:sync`, không sửa CSS sinh bằng tay. Chi tiết nằm trong `GAME_SHELL_PHASE2.md`.
-
-Phase 3 nối cả hai board vào `js/gameShell/gameShellLayout.js`: hàm fit thuần và kết nối đo viewport/safe area theo một RAF, một ResizeObserver cho shell hiện hành. Các adapter trong `grid.js`/`linkRenderer.js` cung cấp shape, cấu hình trình bày và chỉ ghi kết quả fit; renderer giữ quyền sở hữu tile/path. Controller hủy kết nối khi về Menu. Layout không import gameplay và không đăng ký tài nguyên lúc import; lifecycle toàn ứng dụng thuộc Phase 4. Chi tiết và giới hạn kiểm chứng nằm trong `GAME_SHELL_PHASE3.md`.
-
-Phase 4 tích hợp `gameShell.js` và `gameShellLifecycle.js`: shell trả reference ổn định cho sáu vùng semantic, API mount/update/unmount; mỗi lượt chơi sở hữu registry tài nguyên và callback guard. Controller/selector hủy scope khi đổi round/game; modal trong game có scope con và không gọi callback đóng của round cũ. `legacyShellAdapters.js` nối ID hiện có tới contract, xóa ở Phase 7–8. HUD con thuộc Phase 5; motion strategy thuộc Phase 6. Chi tiết nằm trong `GAME_SHELL_PHASE4.md`.
-
-Phase 5 tích hợp `gameShellHud.js`: patch stats, sao/điểm, Xu, tools, mốc và timer qua reference; so giá trị DOM trước khi ghi, không import state/gameplay. `legacyHudAdapters.js` khai báo reference, formatter và tooltip riêng cho mỗi trò; controller giữ công thức điểm, thưởng và đồng hồ. Tooltip HUD đọc `data-tooltip`, hỗ trợ focus qua `data-hud-info`. Hai trò dùng chung custom property timer, năng lượng và combo. Kiểm tra có chọn lọc và gate thủ công nằm trong `GAME_SHELL_PHASE5.md`.
-
-Phase 6: `gameShellEffects.js` cung cấp registry theo scope, giới hạn theo loại, cleanup và animation transform/opacity. `lootEffects.js` dùng quỹ đạo chung qua preset Memory/Link; adapter Link chỉ truyền nguồn, đích, icon, timing và callback. Xu/điểm/combo, highlight, item collect và FLIP nối registry; canvas vẫn ở renderer riêng với lifecycle chung. Luật thưởng ở game. Chi tiết và gate thủ công: `GAME_SHELL_PHASE6.md`.
+`scripts/generate-game-shell-tokens.mjs` sinh `styles/game-shell/tokens.css` từ cấu hình dùng chung; sửa nguồn JavaScript rồi chạy `npm run shell:sync`, không sửa file sinh bằng tay. `ADD_GAME.md` là checklist để tích hợp trò tiếp theo; tài liệu này không cho phép tự động triển khai Triple Connect.
 
 - Ứng dụng dùng HTML/CSS và JavaScript ES modules, không có framework UI.
 - `js/main.js` là entry point duy nhất; module chức năng không tự bootstrap ứng dụng.
@@ -51,6 +41,7 @@ Phase 6: `gameShellEffects.js` cung cấp registry theo scope, giới hạn theo
 | `motion.js` | Tiện ích thời lượng CSS, tùy chọn giảm chuyển động và phép tính FLIP dùng chung. |
 | `coinRewards.js` | Quy tắc Xu theo cặp và hoạt ảnh bộ đếm/thu thập dùng chung. |
 | `lootEffects.js` | Hiệu ứng vật phẩm rơi và bay tới HUD dùng chung, không chứa luật thưởng. |
+| `gameShell/*` | Contract shell, config, HUD patch, layout, lifecycle và registry hiệu ứng dùng chung. Không chứa luật game. |
 | `ui.js`, `modal.js`, `uiCatalog.js` | HUD, popup gameplay, modal, toast, copy và thời lượng UI chung. |
 | `gameSelector.js`, `mainmenu.js`, `gameMenu.js` | Chọn trò, menu chính và menu trong màn. |
 | `shop.js`, `shopCatalog.js` | Giao diện mua và catalog/giá sản phẩm. |
@@ -123,6 +114,8 @@ Phase 6: `gameShellEffects.js` cung cấp registry theo scope, giới hạn theo
 - Service worker/PWA nằm trong `js/pwa.js` và `public/sw.js`; Capacitor dùng cùng đầu ra web qua profile Android.
 - Service worker chỉ cache phản hồi đầy đủ HTTP `200` và bỏ qua request `Range` để không làm lỗi audio tải từng đoạn.
 - Service worker gộp yêu cầu cùng URL và giới hạn số lượt tải tài nguyên đồng thời; catalog chủ đề không tạo hoặc giải mã toàn bộ ảnh.
+- Production build dùng để phát hiện lỗi đóng gói và đo kích thước gzip tại mốc lớn hoặc trước phát hành. Trong phát triển thường ngày, chạy check/test đúng phạm vi thay đổi; không lặp build hoặc toàn bộ UI suite nếu thay đổi không chạm đường build.
+- `dist/`, báo cáo Playwright, `node_modules/` và manifest sinh là đầu ra có thể tái tạo và đã được Git ignore.
 
 ## 7. Nguồn cấu hình
 
@@ -140,8 +133,8 @@ Không sao chép các con số cấu hình sang controller, renderer hoặc tài
 
 Gợi ý Memory dùng `progress.memoryMatch.items.hint`; `gameState.hints` là getter/setter tương thích để HUD, thưởng và thao tác cùng đọc/ghi một kho. Hydration nhập giá trị cao nhất từ các session cũ khi chưa có key kho; giá trị 0 là dữ liệu hợp lệ, không cấp lại. Session mới không ghi Gợi ý và resume không áp số cũ. Kho Link (`progress.linkConnect.items.hint`) giữ nguyên, độc lập với Memory. Cả hai shop cho mua ở menu và trong game.
 
-Phase 7: `memoryMatch/memoryShellDom.js` sở hữu markup Memory, được import đầu tiên trong `main.js`; `memoryShell.js` nối vùng semantic/HUD với core chung. Legacy adapters chỉ còn Link. ID Memory vẫn là hook gameplay/CSS đang dùng. `index.html` giữ settings/audio, không còn bản markup Memory trùng. Xem `GAME_SHELL_PHASE7.md`.
+Phase 7: `memoryMatch/memoryShellDom.js` sở hữu markup Memory, được import đầu tiên trong `main.js`; `memoryShell.js` nối vùng semantic/HUD với core chung. ID Memory vẫn là hook gameplay/CSS đang dùng. `index.html` giữ settings/audio, không còn bản markup Memory trùng. Xem `GAME_SHELL_PHASE7.md`.
 
 Phase 8: `linkConnect/linkShell.js` sở hữu markup/vùng semantic/HUD/timing presentation của Link. Controller mount shell và cung cấp callback cho `bindLinkControls`; listener gắn scope theo lượt, node dựng một lần. Hai adapter legacy đã xóa. Renderer vẫn quản lý tile/path/shift/băng/hiệu ứng; shell không sở hữu board gameplay. Xem `GAME_SHELL_PHASE8.md`.
 
-Phase 9 thêm `check-game-shell-contract.mjs` vào check, dọn CSS/selector/timing effect Link không còn consumer. `playwright.visual.config.js` so tám ảnh chờ duyệt, chưa thay baseline Phase 1 và tách fullscreen khỏi phép đo. `ADD_GAME.md` mô tả ownership và quy trình thêm trò. Toolbar Memory ngang dùng token `hud.landscapeMinWidth` để tránh nút kho đè chỉ số; audit kiểm cả giao nhau của các nút con. Gate phát hành và bản sửa được ghi trong `GAME_SHELL_PHASE9.md`.
+Phase 9 thêm `check-game-shell-contract.mjs` vào check, dọn CSS/selector/timing effect Link không còn consumer. `playwright.visual.config.js` so tám ảnh chờ duyệt và tách fullscreen đang phát triển riêng khỏi phép đo. Toolbar Memory ngang dùng token `hud.landscapeMinWidth` để tránh nút kho đè chỉ số; audit kiểm cả giao nhau của các nút con. Audit chốt ngày 2026-09-09 đạt 8/8 ca ở bốn viewport, check và build đạt. Game Shell đã hoàn thành; kiểm tra thiết bị thật thuộc QA phát hành.

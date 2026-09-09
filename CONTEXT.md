@@ -46,24 +46,22 @@ Tài liệu này chỉ ghi trạng thái sản phẩm và các quy tắc đang c
 - Thời gian phiên được checkpoint mỗi 5 giây và khi ẩn/rời trang. Thanh thời gian dùng `transform`, dừng theo trạng thái pause/lock; hiệu ứng vật phẩm rơi dùng Web Animations và không dựng lại board.
 - Catalog chỉ giữ metadata đường dẫn. Trình duyệt chỉ giải mã ảnh của bàn hiện tại; service worker gộp URL trùng và giới hạn 6 yêu cầu tài nguyên đang tải.
 
-## Phần còn cần kiểm tra
+## Trạng thái Game Shell
 
-- Game Shell: Phase 1–9 đã triển khai; hai trò dùng core chung, không còn adapter legacy. Phase 9 có check contract, bộ ảnh chờ duyệt bốn viewport và bản sửa nút kho chồng chỉ số ở Memory ngang. 8 ca visual/geometry, 5 ca hiệu ứng và check/build đạt; chưa khóa phát hành trước duyệt ảnh và chơi thử mobile thật. Xem `GAME_SHELL_PHASE9.md` và `ADD_GAME.md`. Chưa triển khai Triple Connect.
+- **Hoàn tất Phase 1–9 ngày 2026-09-09.** Memory Match và Link Connect dùng core shell/HUD/layout/lifecycle/effect chung, không còn adapter legacy. Không có phase Game Shell tiếp theo và chưa triển khai Triple Connect.
+- Audit chốt mốc đạt: `npm run check`; production build; 8/8 ca audit cho hai trò trên desktop, mobile dọc, mobile hẹp và mobile ngang; ca hồi quy vật phẩm Xem trước đạt. Build hiện tại: JavaScript 84,67 kB gzip, CSS 30,56 kB gzip, HTML 1,05 kB gzip.
+- Audit không thấy ID trùng, `aria-controls` hỏng, chồng nút kho/chỉ số, animation còn chạy sau khi ổn định hoặc timer/RAF bất thường. Khi game đang chạy, mỗi shell còn đúng một interval đồng hồ và một RAF thanh thời gian.
+- Người dùng đã xác nhận giao diện tạm ổn và chốt Game Shell hoàn thành. Chơi thử trên điện thoại thật, fullscreen/orientation và cảm nhận hiệu ứng là QA trước phát hành, không phải phase triển khai còn thiếu.
+- Không cần chạy production build sau mọi thay đổi. Dùng kiểm tra đúng phạm vi; chỉ chạy build khi chốt mốc lớn, đổi cấu hình đóng gói/tài nguyên hoặc chuẩn bị phát hành. Xem `GAME_SHELL_PLAN.md` và `ADD_GAME.md`.
 
-1. Rà trực quan từng hiệu ứng đường nối và xóa thẻ trong Bộ sưu tập trước khi coi là đạt chất lượng phát hành.
-2. Kiểm thử Link Connect trên thiết bị mobile hẹp, bàn 6 cột và level cao với mọi kiểu dịch chuyển.
-3. Một số selector giao diện cũ vẫn chồng lấn giữa các file CSS; không xóa hàng loạt trước khi kiểm thử hiển thị.
-4. Cần bổ sung bộ E2E trình duyệt thật cho toàn bộ luồng DOM hoàn thành màn và chuyển game giữa lúc preview/hiệu ứng đang chạy.
+## Bàn giao và rủi ro hiện tại
+
+- Tại thời điểm bàn giao, worktree có thay đổi của các công việc khác: Challenge/timing, fullscreen, tooltip tên thẻ, tài liệu gameplay và một đợt đổi/thêm/xóa ảnh chủ đề. Có 95 file chưa theo dõi, trong đó 89 file WebP. Không reset, xóa hoặc gộp chúng vào commit khác trước khi xác định chủ sở hữu và kiểm tra riêng.
+- `dist/`, `test-results/`, `playwright-report/`, `node_modules/` và manifest sinh trong `js/generated/` đã được ignore đúng. Đây là đầu ra có thể tạo lại, không phải mã nguồn cần commit.
+- `public/assets/` hiện khoảng 15,6 MB với 1.832 ảnh trong manifest. Ảnh không bị tải/giải mã toàn bộ khi mở game, nhưng toàn bộ vẫn được chép vào gói build; dung lượng Android/hosting cần được theo dõi khi tiếp tục thêm chủ đề.
+- Cần rà trực quan từng hiệu ứng Link Connect và chơi level cao/bàn 6 cột trên thiết bị thật trước một bản phát hành công khai.
 
 ## Ngoài phạm vi hiện tại
 
 - Link Connect chưa có đá, cổng không gian, Adventure 100 bàn riêng, Time Rush, Zen Mode hoặc Fever.
 - Danh sách và tình trạng asset chủ đề được theo dõi riêng trong `themes.md`.
-
-- Game Shell Phase 6 đã triển khai registry hiệu ứng có giới hạn, loot/collect dùng chung, FLIP và canvas gắn cleanup; 6 ca liên quan, cú pháp và build đạt. Còn kiểm tra thủ công cảm nhận đường bay, đổi trò giữa hiệu ứng và reduced motion trên điện thoại trước Phase 7. Xem `GAME_SHELL_PHASE6.md`.
-
-- Game Shell Phase 7: Memory đã chuyển markup/HUD sang `js/memoryMatch/`, dùng core chung; legacy adapters chỉ còn Link. Đã khôi phục hai hằng cấu hình canvas Link bị thiếu từ Phase 6. Chờ xác nhận thủ công trước Phase 8 theo `GAME_SHELL_PHASE7.md`; baseline bố cục tách riêng nút fullscreen đang phát triển.
-
-- Game Shell Phase 8: Link đã chuyển markup/HUD/control sang `js/linkConnect/linkShell.js`; hai adapter legacy đã xóa. Nút theo scope từng lượt, không cộng dồn listener sau Chơi lại. Còn gate thủ công trước Phase 9 theo `GAME_SHELL_PHASE8.md`; chưa triển khai Triple Connect.
-
-- Game Shell Phase 9 đã dọn effect/CSS/import chết, thêm check contract và ảnh chờ duyệt bốn viewport; hướng dẫn thêm trò: `ADD_GAME.md`. Chưa khóa phát hành: đã sửa nút kho chồng LV/tổng sao ở Memory ngang bằng chiều rộng toolbar tối thiểu có cấu hình; còn duyệt ảnh và kiểm tra điện thoại thật. Xem `GAME_SHELL_PHASE9.md`; chưa triển khai Triple Connect.

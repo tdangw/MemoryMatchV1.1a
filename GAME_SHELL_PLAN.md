@@ -1,5 +1,7 @@
 # Kế hoạch chuẩn hóa Game Shell dùng chung
 
+**Trạng thái cuối: hoàn tất Phase 1–9 ngày 2026-09-09.** Không còn phase Game Shell tiếp theo. Triple Connect chưa được triển khai.
+
 ## 1. Mục tiêu và phạm vi đã chốt
 
 Đợt này xây hạ tầng giao diện/gameplay dùng chung đủ ổn định cho **Memory Match**, **Link Connect**, **Triple Connect** và các game 4–5 trong tương lai. Chỉ chuyển hai game hiện có sang hạ tầng mới; chưa triển khai Triple Connect và không thay đổi luật, kinh tế hoặc dữ liệu người chơi.
@@ -85,7 +87,7 @@ Override không thuộc schema phải gây lỗi trong development. Production d
 
 ## 5. Quy trình bắt buộc cho mọi phase
 
-**Điều chỉnh theo yêu cầu người dùng ngày 2026-09-08:** từ Phase 5, chỉ đọc dữ liệu liên quan và kiểm thử đúng phạm vi thay đổi. Tái sử dụng baseline đã có; không lặp full suite, build hoặc audit nếu không có thay đổi/lỗi mới cần kiểm chứng. Các bước trải nghiệm trên thiết bị có thể bàn giao bằng checklist thủ công và ghi rõ gate còn chờ. Quy tắc này thay các yêu cầu chạy lặp mặc định bên dưới.
+**Điều chỉnh theo yêu cầu người dùng ngày 2026-09-08:** từ Phase 5, chỉ đọc dữ liệu liên quan và kiểm thử đúng phạm vi thay đổi. Tái sử dụng baseline đã có; không lặp full suite, build hoặc audit nếu không có thay đổi/lỗi mới cần kiểm chứng. Production build chỉ cần ở mốc lớn, khi đổi đường build/tài nguyên hoặc trước phát hành. Các bước trải nghiệm trên thiết bị có thể bàn giao bằng checklist thủ công. Quy tắc này thay các yêu cầu chạy lặp mặc định bên dưới.
 
 ### Trước khi sửa
 
@@ -230,7 +232,7 @@ Override không thuộc schema phải gây lỗi trong development. Production d
 
 ### Phase 5 — HUD component dùng chung
 
-**Trạng thái:** triển khai và kiểm tra tự động đạt (16/16 ca liên quan, check/build). Còn xác nhận thủ công trên điện thoại, pause/resume và nhấn giữ trước Phase 6; xem `GAME_SHELL_PHASE5.md`. Chưa triển khai Triple Connect.
+**Trạng thái:** hoàn tất; kết quả và gate lịch sử nằm trong `GAME_SHELL_PHASE5.md`.
 
 **Thực hiện**
 
@@ -248,7 +250,7 @@ Override không thuộc schema phải gây lỗi trong development. Production d
 
 ### Phase 6 — Motion và hiệu ứng dùng chung
 
-**Trạng thái:** đã triển khai registry/API và adapter hiệu ứng, 6 ca liên quan và build đạt. Chờ kiểm tra cảm nhận/chuyển trò/giảm chuyển động trên điện thoại trước Phase 7; xem `GAME_SHELL_PHASE6.md`.
+**Trạng thái:** hoàn tất; registry/API, cleanup và các ca hiệu ứng liên quan đạt. Xem `GAME_SHELL_PHASE6.md`.
 
 **Thực hiện**
 
@@ -266,7 +268,7 @@ Override không thuộc schema phải gây lỗi trong development. Production d
 
 ### Phase 7 — Di chuyển Memory Match
 
-**Trạng thái:** đã triển khai module giao diện/HUD Memory và xóa nhánh adapter legacy tương ứng. Đã sửa lỗi thiếu cấu hình canvas Link từ Phase 6; kiểm chứng và gate thủ công trong `GAME_SHELL_PHASE7.md`.
+**Trạng thái:** hoàn tất; Memory đã dùng shell/HUD chung và nhánh adapter legacy tương ứng đã xóa. Xem `GAME_SHELL_PHASE7.md`.
 
 **Thực hiện**
 
@@ -283,7 +285,7 @@ Override không thuộc schema phải gây lỗi trong development. Production d
 
 ### Phase 8 — Di chuyển Link Connect
 
-**Trạng thái:** đã chuyển markup/HUD/control Link sang module riêng dùng core, xóa hai adapter legacy. Kiểm chứng và gate thủ công trước Phase 9 trong `GAME_SHELL_PHASE8.md`.
+**Trạng thái:** hoàn tất; Link đã dùng core chung và hai adapter legacy đã xóa. Xem `GAME_SHELL_PHASE8.md`.
 
 **Thực hiện**
 
@@ -301,7 +303,7 @@ Override không thuộc schema phải gây lỗi trong development. Production d
 
 ### Phase 9 — Xóa tương thích tạm và khóa contract
 
-**Trạng thái:** đã dọn phần không còn dùng, bổ sung check contract; 8 ca visual/geometry, 5 ca hiệu ứng và check/build đạt. Bộ ảnh chờ duyệt; xem `GAME_SHELL_PHASE9.md`. Chưa khóa phát hành: đã sửa chồng nút kho trên HUD Memory ngang; còn duyệt ảnh và chơi thử mobile thật.
+**Trạng thái:** hoàn tất ngày 2026-09-09. Check và production build đạt; audit chốt đạt 8/8 ca cho hai trò trên bốn viewport; lỗi vật phẩm Xem trước đã có ca hồi quy riêng. Người dùng xác nhận giao diện và chốt Game Shell hoàn thành. Xem `GAME_SHELL_PHASE9.md`.
 
 **Thực hiện**
 
@@ -313,9 +315,9 @@ Override không thuộc schema phải gây lỗi trong development. Production d
 **Gate cuối**
 
 - `npm run check`, geometry, visual tests và production build đạt.
-- Worktree sạch; không TODO tạm, code chết hoặc compatibility layer vô chủ.
+- Phạm vi Game Shell không còn TODO tạm, code chết hoặc compatibility layer vô chủ. Các thay đổi ngoài phạm vi phải được phân loại riêng, không reset để làm sạch giả tạo.
 - Bundle, DOM, layout pass và cleanup đạt ngân sách.
-- Chơi thử trên ít nhất một mobile thật trước khi khóa phiên bản.
+- Chơi thử trên ít nhất một mobile thật trước bản phát hành công khai; đây là QA phát hành, không mở thêm phase Game Shell.
 
 ## 7. Chiến lược commit và hoàn tác
 
@@ -352,4 +354,4 @@ Chat mới đọc theo thứ tự:
 3. `GAME_SHELL_PLAN.md`
 4. `Memory Match.md` và `Link Connect.md` khi tới phase tương ứng
 
-Sau đó bắt đầu từ phase chưa hoàn tất gần nhất, kiểm tra commit/worktree trước khi sửa và không tự động triển khai Triple Connect.
+Không còn phase Game Shell chưa hoàn tất. Kiểm tra worktree trước khi sửa, chọn công việc mới theo yêu cầu người dùng và không tự động triển khai Triple Connect. Worktree tại lần bàn giao 2026-09-09 còn các nhóm thay đổi riêng về Challenge/timing, fullscreen, tooltip và ảnh chủ đề; không xóa hoặc gộp khi chưa rà đúng phạm vi.

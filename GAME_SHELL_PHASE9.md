@@ -18,10 +18,12 @@ Hướng dẫn tích hợp trò mới: `ADD_GAME.md`. Chưa triển khai Triple 
 
 Khi xem ảnh 844×390, nút Thời gian/Xem trước chồng một phần lên LV/tổng sao trong baseline cũ. Đã thêm token `hud.landscapeMinWidth` 390px, chỉ áp dụng cho toolbar Memory ở màn ngang thấp, giới hạn bởi viewport. Board và các vùng còn lại giữ nguyên. Audit có kiểm giao nhau giữa nút và chỉ số, đồng thời ghi rõ ngoại lệ chiều rộng/vị trí toolbar thay vì sửa baseline Phase 1. Chỉ ảnh chờ duyệt Memory landscape được cập nhật theo thay đổi có lý do này.
 
-## Gate phát hành chưa khóa
+## Kết luận và bàn giao ngày 2026-09-09
 
-- Cần người dùng xem bộ ảnh chờ duyệt và chơi thử ít nhất một điện thoại thật, gồm fullscreen, orientation, thưởng/kho và chuyển trò.
-- Workspace còn thay đổi fullscreen, Challenge, thời gian, tooltip và ảnh của công việc riêng; không tự gộp hoặc xóa để làm sạch worktree.
-- Số liệu bundle của workspace bao gồm những thay đổi riêng đó; không coi đây là đo riêng phần Game Shell hoặc chứng nhận ngân sách bản phát hành cuối.
+- Người dùng xác nhận giao diện và chốt Game Shell hoàn thành. `npm run check` và production build đạt; audit hiện tại đạt 8/8 ca cho Memory/Link trên desktop, mobile dọc, mobile hẹp và mobile ngang.
+- Build hiện tại: HTML 1,05 kB gzip, CSS 30,56 kB gzip và JavaScript 84,67 kB gzip. Audit ổn định không có ID trùng, `aria-controls` hỏng, chồng nút/chỉ số hoặc animation tồn dư; một interval và một RAF còn lại ở mỗi game là đồng hồ/thanh thời gian đang chạy.
+- Lỗi vật phẩm Xem trước Memory được sửa sau Phase 9: hiệu ứng chạy sau khi modal đóng và game bỏ pause; ca hồi quy tập trung đạt.
+- Chơi thử điện thoại thật, fullscreen/orientation và cảm nhận hiệu ứng vẫn nên thực hiện trước phát hành công khai. Đây là QA phát hành, không phải phase Game Shell còn thiếu.
+- Workspace còn thay đổi fullscreen, Challenge, thời gian, tooltip và ảnh của công việc riêng; không tự gộp, reset hoặc xóa để làm sạch worktree. Số liệu bundle bao gồm những thay đổi này.
 
-Phase 9 hoàn tất phần triển khai khi check/visual/build đạt; chưa tuyên bố bản phát hành đã được khóa nếu các gate trên chưa xác nhận.
+Phase 9 và toàn bộ kế hoạch Game Shell đã hoàn tất. Chat mới phải chọn một công việc mới; không tiếp tục sang Phase 10 và không tự động triển khai Triple Connect.
