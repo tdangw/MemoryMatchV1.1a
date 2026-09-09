@@ -38,6 +38,7 @@ export function openQuickAssistOverlay(kind) {
   const isTime = kind === "time";
   const items = MEMORY_ITEMS.filter((item) => item.type === kind);
   if (!items.length) return;
+  let pendingPreviewItem = null;
 
   gameState.isPaused = true;
   const content = document.createElement("div");
@@ -53,7 +54,14 @@ export function openQuickAssistOverlay(kind) {
     content,
     size: "small",
     onClose: () => {
-      if (gameState.roundId === roundId) gameState.isPaused = false;
+      if (gameState.roundId !== roundId) return;
+      gameState.isPaused = false;
+
+      if (pendingPreviewItem) {
+        const item = pendingPreviewItem;
+        pendingPreviewItem = null;
+        revealMemoryTiles(item.value, GAMEPLAY_TIMING.shopRevealDurationMs, roundId);
+      }
     },
   });
 
@@ -70,10 +78,8 @@ export function openQuickAssistOverlay(kind) {
     button.append(createIcon(item.icon), label, quantity);
     button.addEventListener("click", () => {
       if (!useMemoryAssistItem(item, roundId)) return;
+      if (item.type === "preview") pendingPreviewItem = item;
       modal.close();
-      if (item.type === "preview") {
-        requestAnimationFrame(() => revealMemoryTiles(item.value, GAMEPLAY_TIMING.shopRevealDurationMs, roundId));
-      }
     });
     choices.append(button);
   });
