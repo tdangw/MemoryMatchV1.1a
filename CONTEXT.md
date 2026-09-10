@@ -51,8 +51,9 @@ Tài liệu này chỉ ghi trạng thái sản phẩm và các quy tắc đang c
 ## Trạng thái Game Shell
 
 - **Hoàn tất Phase 1–9 ngày 2026-09-09.** Memory Match và Link Connect dùng core shell/HUD/layout/lifecycle/effect chung, không còn adapter legacy. Không có phase Game Shell tiếp theo và chưa triển khai Triple Connect.
-- Audit chốt mốc đạt: `npm run check`; production build; 8/8 ca audit cho hai trò trên desktop, mobile dọc, mobile hẹp và mobile ngang; ca hồi quy vật phẩm Xem trước đạt. Build hiện tại: JavaScript 84,67 kB gzip, CSS 30,56 kB gzip, HTML 1,05 kB gzip.
-- Audit không thấy ID trùng, `aria-controls` hỏng, chồng nút kho/chỉ số, animation còn chạy sau khi ổn định hoặc timer/RAF bất thường. Khi game đang chạy, mỗi shell còn đúng một interval đồng hồ và một RAF thanh thời gian.
+- **Pre-Triple baseline, 2026-09-10:** invariant shell hiển thị ↔ scope active được kiểm tra trực tiếp; restart Link không tăng `roundId` hai lần; Memory và Link dùng cùng token gap theo computed style. Lifecycle 40 mount theo hai batch và 100 lượt đổi game đều giải phóng resource về 0 ở bốn viewport.
+- Gate đã đạt: `npm run check`; web/Android build; lifecycle 28/28 trên bốn viewport; cleanup/effect/fullscreen/presentation đa viewport; visual baseline hiện hành đã được chấp nhận và cập nhật. Build web: JavaScript 84,94 kB gzip, CSS 30,85 kB gzip, HTML 1,11 kB gzip; tăng lần lượt 0,17 kB và 0,21 kB gzip, trong ngân sách.
+- Audit không thấy ID trùng, `aria-controls` hỏng, animation còn chạy sau khi ổn định hoặc timer/RAF bất thường. Khi game đang chạy, mỗi shell còn đúng một interval đồng hồ và một RAF thanh thời gian. Assertion chồng nút kho/chỉ số ở Memory mobile hẹp vẫn báo trong browser automation nhưng người dùng đã xác nhận thiết bị thật đạt; không sửa UI hay nới assertion trong baseline này.
 - Người dùng đã xác nhận giao diện tạm ổn và chốt Game Shell hoàn thành. Chơi thử trên điện thoại thật, fullscreen/orientation và cảm nhận hiệu ứng là QA trước phát hành, không phải phase triển khai còn thiếu.
 - Không cần chạy production build sau mọi thay đổi. Dùng kiểm tra đúng phạm vi; chỉ chạy build khi chốt mốc lớn, đổi cấu hình đóng gói/tài nguyên hoặc chuẩn bị phát hành. Xem `GAME_SHELL_PLAN.md` và `ADD_GAME.md`.
 
