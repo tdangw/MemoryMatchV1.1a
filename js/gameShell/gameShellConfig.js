@@ -20,7 +20,7 @@ export const GAME_SHELL_SCHEMA = freeze({
     edgeInsetMin: px(4), edgeInsetMax: px(8),
     edgeInsetRatio: { value: 0.01, unit: "", min: 0, max: 1 },
   },
-  breakpoints: { mobile: px(600, 1), narrow: px(420, 1), landscapeHeight: px(500, 1) },
+  breakpoints: { mobile: px(600, 1), narrow: px(420, 1), landscapeHeight: px(600, 1) },
   board: { gap: px(6), narrowGap: px(4), padding: px(8), narrowPadding: px(6) },
   frame: { sidePadding: px(14), narrowSidePadding: px(9), narrowGap: px(9) },
   title: {
@@ -33,7 +33,7 @@ export const GAME_SHELL_SCHEMA = freeze({
     minHeight: px(34), mobileMinHeight: px(30), radius: px(9),
     sidePadding: px(74), mobileSidePadding: px(104),
     timerHeight: px(3), timerInset: px(6), timerOffset: px(8),
-    menuOffset: px(6), landscapeMinWidth: px(390),
+    menuOffset: px(6), landscapeMinWidth: px(390), compactLandscapeWidthRatio: { value: 0.8, unit: "", min: 0.01, max: 1 },
   },
   milestones: { width: px(260, 1), mobileWidth: px(220, 1), trackHeight: px(19), markerSize: px(15), railHeight: px(2) },
   safeArea: { top: px(14), bottom: px(16) },

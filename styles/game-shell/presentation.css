@@ -15,6 +15,14 @@
 }
 .game-shell-root[hidden] { display: none; }
 .game-shell-root > [data-shell-region] { flex-shrink: 0; }
+.game-shell-root { --shell-hud-used-width: 100%; }
+.game-shell-root.shell-compact-landscape > [data-shell-region="title"],
+.game-shell-root.shell-compact-landscape > [data-shell-region="progress"],
+.game-shell-root.shell-compact-landscape > [data-shell-region="milestones"] { display: none; }
+.game-shell-root.shell-compact-landscape > [data-shell-region="hud"] {
+  min-width: 0 !important;
+  width: min(calc(var(--shell-hud-used-width) * var(--shell-hud-compact-landscape-width-ratio)), calc(100vw - var(--shell-viewport-safe-left) - var(--shell-viewport-safe-right))) !important;
+}
 .game-shell-root [data-shell-region="title"] {
   display: block;
   width: 100%;

@@ -15,7 +15,7 @@
   --shell-layout-edge-inset-ratio: 0.01;
   --shell-breakpoints-mobile: 600px;
   --shell-breakpoints-narrow: 420px;
-  --shell-breakpoints-landscape-height: 500px;
+  --shell-breakpoints-landscape-height: 600px;
   --shell-board-gap: 6px;
   --shell-board-narrow-gap: 4px;
   --shell-board-padding: 8px;
@@ -46,6 +46,7 @@
   --shell-hud-timer-offset: 8px;
   --shell-hud-menu-offset: 6px;
   --shell-hud-landscape-min-width: 390px;
+  --shell-hud-compact-landscape-width-ratio: 0.8;
   --shell-milestones-width: 260px;
   --shell-milestones-mobile-width: 220px;
   --shell-milestones-track-height: 19px;

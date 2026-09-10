@@ -1,5 +1,6 @@
 /* HUD: menu bên trái, chỉ số ở chính giữa */
 #game-title.game-hud {
+  --shell-hud-used-width: min(var(--board-width, 100%), calc(200vw - 12px));
   display: flex;
   align-items: center;
   justify-content: center;

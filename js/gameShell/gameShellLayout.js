@@ -69,6 +69,15 @@ export function connectGameShellLayout({ root, frame, board, chrome, getShape, a
     };
     const shape = getShape(visible, config);
     if (!shape) return;
+    const compactLandscape = visible.width > visible.height
+      && visible.height <= config.breakpoints.landscapeHeight;
+    const compactLandscapeChanged = root.classList.contains("shell-compact-landscape") !== compactLandscape;
+    root.classList.toggle("shell-compact-landscape", compactLandscape);
+    if (compactLandscapeChanged) {
+      // CSS hides chrome and changes HUD width; measure its settled geometry next frame.
+      schedule();
+      return;
+    }
     // All layout reads are in this block. apply() is a write-only board adapter.
     const rootRect = root.getBoundingClientRect();
     const boardTop = frame.getBoundingClientRect().top;

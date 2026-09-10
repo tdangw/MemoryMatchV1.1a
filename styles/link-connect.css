@@ -703,6 +703,7 @@
 .link-game-progress-hud .stat-progress { color: #f2bf5b; }
 
 .link-game-hud.game-hud {
+  --shell-hud-used-width: min(var(--shell-layout-content-max-width), calc(100vw - 12px));
   position: relative;
   display: flex;
   align-items: center;
