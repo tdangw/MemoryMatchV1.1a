@@ -41,44 +41,50 @@ async function start(page, id) {
   }, id), { message: `Expected active ${id} shell and lifecycle scope to match.` }).toBe(true);
 }
 
-test("DOM contract, stable refs and 20 mounts return to resource baseline", async ({ page }) => {
+test("DOM contract, stable refs and repeated 20-mount batches return to resource baseline", async ({ page }) => {
   test.setTimeout(60000);
   const cdp = await page.context().newCDPSession(page);
   const counters = async () => {
     // Detached images may stay alive until their in-flight requests settle.
     await page.waitForLoadState("networkidle");
     await cdp.send("HeapProfiler.collectGarbage");
+    await cdp.send("HeapProfiler.collectGarbage");
     return cdp.send("Memory.getDOMCounters");
   };
   const exit = () => page.evaluate(async () => (await import("/js/gameSelector.js")).showGameSelector());
-  for (const id of ["memory-match", "link-connect"]) { await start(page, id); await exit(); }
+  const runCycles = async (offset) => {
+    for (let i = 0; i < 20; i++) {
+      await start(page, (i + offset) % 2 ? "link-connect" : "memory-match");
+      const contract = await page.evaluate(async () => {
+        const { getMemoryShell } = await import("/js/memoryMatch/memoryShell.js");
+        const { getLinkShell } = await import("/js/linkConnect/linkShell.js");
+        const shell = document.documentElement.dataset.activeGame === "memory-match" ? getMemoryShell() : getLinkShell();
+        const { root, ...refs } = shell.refs;
+        window.lastScope = shell.scope;
+        window.savedShellRefs ??= new Map();
+        const previous = window.savedShellRefs.get(root.id);
+        window.savedShellRefs.set(root.id, shell.refs);
+        shell.update({ paused: true });
+        const paused = root.dataset.shellPaused;
+        shell.update({ paused: false });
+        return { same: !previous || previous === shell.refs, names: Object.keys(refs), contained: Object.values(refs).every(element => root.contains(element)), role: root.getAttribute("role"), paused };
+      });
+      expect(contract).toEqual({ same: true, names: ["title", "progress", "hud", "milestones", "frame", "board"], contained: true, role: "region", paused: "true" });
+      await exit();
+      const clean = await page.evaluate(async () => {
+        const { getActiveGameScope } = await import("/js/gameShell/gameShellLifecycle.js");
+        return { active: getActiveGameScope(), resources: window.lastScope.diagnostics(), visible: document.querySelectorAll('[data-shell-region="board"]').length };
+      });
+      expect(clean.active).toBeNull();
+      expect(Object.values(clean.resources)).not.toContain(true);
+      expect(Object.entries(clean.resources).filter(([key]) => key !== "active").every(([, value]) => value === 0)).toBe(true);
+      await page.evaluate(() => { delete window.lastScope; });
+    }
+  };
+  await runCycles(0);
   const baseline = await counters();
-  for (let i = 0; i < 20; i++) {
-    await start(page, i % 2 ? "link-connect" : "memory-match");
-    const contract = await page.evaluate(async () => {
-      const { getMemoryShell } = await import("/js/memoryMatch/memoryShell.js");
-      const { getLinkShell } = await import("/js/linkConnect/linkShell.js");
-      const shell = document.documentElement.dataset.activeGame === "memory-match" ? getMemoryShell() : getLinkShell();
-      const { root, ...refs } = shell.refs;
-      window.lastScope = shell.scope;
-      window.savedShellRefs ??= new Map();
-      const previous = window.savedShellRefs.get(root.id);
-      window.savedShellRefs.set(root.id, shell.refs);
-      shell.update({ paused: true });
-      const paused = root.dataset.shellPaused;
-      shell.update({ paused: false });
-      return { same: !previous || previous === shell.refs, names: Object.keys(refs), contained: Object.values(refs).every(element => root.contains(element)), role: root.getAttribute("role"), paused };
-    });
-    expect(contract).toEqual({ same: true, names: ["title", "progress", "hud", "milestones", "frame", "board"], contained: true, role: "region", paused: "true" });
-    await exit();
-    const clean = await page.evaluate(async () => {
-      const { getActiveGameScope } = await import("/js/gameShell/gameShellLifecycle.js");
-      return { active: getActiveGameScope(), resources: window.lastScope.diagnostics(), visible: document.querySelectorAll('[data-shell-region="board"]').length };
-    });
-    expect(clean.active).toBeNull();
-    expect(Object.values(clean.resources)).not.toContain(true);
-    expect(Object.entries(clean.resources).filter(([key]) => key !== "active").every(([, value]) => value === 0)).toBe(true);
-  }
+  await runCycles(20);
+  await page.evaluate(() => { delete window.savedShellRefs; });
   const after = await counters();
   expect(after.jsEventListeners).toBeLessThanOrEqual(baseline.jsEventListeners);
   expect(after.nodes).toBeLessThanOrEqual(baseline.nodes);
