@@ -41,8 +41,8 @@ const hudCss = readFileSync(new URL("../styles/hud.css", import.meta.url), "utf8
 const gameplayUiCss = readFileSync(new URL("../styles/gameplay-ui.css", import.meta.url), "utf8");
 const tooltipJs = readFileSync(new URL("../js/tooltips.js", import.meta.url), "utf8");
 const indexHtml = readFileSync(new URL("../js/memoryMatch/memoryShellDom.js", import.meta.url), "utf8");
-const baseCss = readFileSync(new URL("../style.css", import.meta.url), "utf8");
-const linkCss = readFileSync(new URL("../styles/link-connect.css", import.meta.url), "utf8");
+const shellPresentationCss = readFileSync(new URL("../styles/game-shell/presentation.css", import.meta.url), "utf8");
+const shellTokensCss = readFileSync(new URL("../styles/game-shell/tokens.css", import.meta.url), "utf8");
 assert.doesNotMatch(
   hudCss,
   /\.game-quick-action\s*\{[^}]*position:\s*relative/s,
@@ -59,8 +59,9 @@ assert.match(hudCss, /\.memory-special-hud\s*\{[^}]*margin:\s*-6px auto 0/s, "Me
 assert.match(tooltipJs, /\[data-tooltip\]/, "HUD definitions must be reachable by tooltip");
 assert.match(tooltipJs, /\[data-hud-info\]/, "HUD informational targets must support touch explanation");
 assert.equal(GAME_SHELL_DEFAULTS.hud.timerHeight, 3, "timer bar remains 3px");
-assert.match(baseCss, /#game-container\s*\{[^}]*gap:\s*var\(--shell-layout-gap/s, "Memory must use the shared HUD/board row gap");
-assert.match(linkCss, /gap:\s*var\(--shell-layout-gap/s, "Link must use the shared HUD/board row gap");
+assert.match(shellPresentationCss, /\.game-shell-root\s*\{[^}]*gap:\s*var\(--shell-active-frame-gap\)/s, "Memory and Link must read the shared shell row gap");
+assert.match(shellTokensCss, /--shell-active-frame-gap:\s*var\(--shell-layout-gap\)/, "Default shell row gap must come from the layout token");
+assert.match(shellTokensCss, /--shell-active-frame-gap:\s*var\(--shell-frame-narrow-gap\)/, "Narrow shell row gap must come from the shared frame token");
 assert.deepEqual(GAME_SHELL_DEFAULTS.board, { gap: 6, narrowGap: 4, padding: 8, narrowPadding: 6 });
 
 console.log("Memory special rewards and inventory checks passed.");

@@ -153,3 +153,23 @@ test("visualViewport fallback and safe-area budget", async ({ page }) => {
   const result = await assertFit(page, games[0]);
   expect(result.frame.bottom).toBeLessThanOrEqual(result.viewport.height - 32 + 1);
 });
+
+test("Memory and Link resolve the shared shell gap from the same token", async ({ page }) => {
+  const gaps = [];
+  for (const game of games) {
+    await start(page, game, "easy");
+    gaps.push(await page.evaluate(rootSelector => {
+      const style = getComputedStyle(document.querySelector(rootSelector));
+      return {
+        resolved: Number.parseFloat(style.gap),
+        token: Number.parseFloat(style.getPropertyValue("--shell-active-frame-gap")),
+      };
+    }, game.root));
+    await page.evaluate(async id => {
+      if (id === "memory-match") (await import("/js/gameController.js")).returnToMainMenu();
+      else (await import("/js/linkConnect/linkController.js")).returnToLinkMenu();
+    }, game.id);
+  }
+  expect(gaps.every(({ resolved, token }) => resolved === token)).toBe(true);
+  expect(gaps[0].resolved).toBe(gaps[1].resolved);
+});

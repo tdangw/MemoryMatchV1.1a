@@ -19,6 +19,26 @@ async function start(page, id) {
     else (await import("/js/linkConnect/linkController.js")).startLinkLevel({ mode: "easy" });
   }, id);
   await expect(page.locator('[data-shell-region="board"]:visible')).toHaveCount(1);
+  await expect.poll(() => page.evaluate(async id => {
+    const { getMemoryShell } = await import("/js/memoryMatch/memoryShell.js");
+    const { getLinkShell } = await import("/js/linkConnect/linkShell.js");
+    const { getActiveGameScope } = await import("/js/gameShell/gameShellLifecycle.js");
+    const { getGameShellDiagnostics } = await import("/js/gameShell/gameShell.js");
+    const shell = id === "memory-match" ? getMemoryShell() : getLinkShell();
+    const { root } = shell.refs;
+    const activeScope = getActiveGameScope();
+    const diagnostics = getGameShellDiagnostics();
+    const activeShell = diagnostics.activeShell;
+    return document.documentElement.dataset.activeGame === id
+      && !root.hidden
+      && getComputedStyle(root).display !== "none"
+      && Boolean(shell.scope)
+      && shell.scope.active === true
+      && shell.scope === activeScope
+      && Boolean(activeShell)
+      && activeShell.root === root
+      && activeShell.scope === activeScope;
+  }, id), { message: `Expected active ${id} shell and lifecycle scope to match.` }).toBe(true);
 }
 
 test("DOM contract, stable refs and 20 mounts return to resource baseline", async ({ page }) => {
@@ -152,4 +172,55 @@ test("new shell creates semantic slots without rebuilding the board on update", 
     return result;
   });
   expect(result).toEqual({ count: 6, same: true, title: "Test" });
+});
+
+test("disposing an active scope cannot leave its shell visible", async ({ page }) => {
+  const result = await page.evaluate(async () => {
+    const { createGameShell, getGameShellDiagnostics } = await import("/js/gameShell/gameShell.js");
+    const { createGameShellLifecycle, activateGameScope } = await import("/js/gameShell/gameShellLifecycle.js");
+    const shell = createGameShell({ title: "Ownership" });
+    document.body.append(shell.refs.root);
+    shell.mount();
+    activateGameScope(createGameShellLifecycle());
+    const diagnostics = getGameShellDiagnostics();
+    const result = {
+      hidden: shell.refs.root.hidden,
+      display: shell.refs.root.style.display,
+      active: shell.scope.active,
+      activeShell: diagnostics.activeShell,
+    };
+    shell.refs.root.remove();
+    return result;
+  });
+  expect(result).toEqual({ hidden: true, display: "none", active: false, activeShell: null });
+});
+
+test("100 Memory and Link switches leave no active scope or owned resources", async ({ page }) => {
+  test.setTimeout(60000);
+  const exit = () => page.evaluate(async () => (await import("/js/gameSelector.js")).showGameSelector());
+  for (let index = 0; index < 100; index += 1) {
+    const id = index % 2 ? "link-connect" : "memory-match";
+    await start(page, id);
+    const mounted = await page.evaluate(async id => {
+      const { getMemoryShell } = await import("/js/memoryMatch/memoryShell.js");
+      const { getLinkShell } = await import("/js/linkConnect/linkShell.js");
+      const shell = id === "memory-match" ? getMemoryShell() : getLinkShell();
+      window.stressScope = shell.scope;
+      return shell.scope.diagnostics().active;
+    }, id);
+    expect(mounted).toBe(true);
+    await exit();
+    const released = await page.evaluate(async () => {
+      const { getActiveGameScope } = await import("/js/gameShell/gameShellLifecycle.js");
+      const diagnostics = window.stressScope.diagnostics();
+      return {
+        activeScope: getActiveGameScope(),
+        inactive: diagnostics.active === false,
+        resourcesReleased: Object.entries(diagnostics)
+          .filter(([key]) => key !== "active")
+          .every(([, value]) => value === 0),
+      };
+    });
+    expect(released).toEqual({ activeScope: null, inactive: true, resourcesReleased: true });
+  }
 });

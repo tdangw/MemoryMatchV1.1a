@@ -1,4 +1,4 @@
-import { activateGameScope, createGameShellLifecycle } from "./gameShellLifecycle.js";
+import { activateGameScope, createGameShellLifecycle, getActiveGameScope } from "./gameShellLifecycle.js";
 import { mountGameFullscreen } from "./gameFullscreen.js";
 
 let activeShell = null;
@@ -24,34 +24,59 @@ export function createGameShell({ root = document.createElement("section"), regi
   refs.board.setAttribute("aria-label", `Bàn ${title}`);
   Object.freeze(refs);
   let scope = null;
+  const hideRoot = () => {
+    root.hidden = true;
+    root.style.display = "none";
+    delete root.dataset.shellPaused;
+  };
+  const releaseMount = mountedScope => {
+    if (scope !== mountedScope) return;
+    hideRoot();
+    if (activeShell === shell) activeShell = null;
+  };
+  const assertVisibleScope = action => {
+    const visible = !root.hidden && root.style.display !== "none";
+    if (!visible || scope?.active && getActiveGameScope() === scope) return;
+    const message = `[GameShell] Invariant violation during ${action}: visible shell requires its active scope.`;
+    if (import.meta.env?.DEV) throw new Error(message);
+    console.error(message);
+  };
   const shell = {
     refs,
     get scope() { return scope; },
     mount({ cleanup } = {}) {
       activeShell?.unmount();
-      scope = createGameShellLifecycle();
-      activateGameScope(scope);
+      const nextScope = createGameShellLifecycle();
+      scope = nextScope;
+      nextScope.own(() => releaseMount(nextScope), "cleanup");
+      activateGameScope(nextScope);
       activeShell = shell;
       root.hidden = false;
       root.style.display = display;
-      mountGameFullscreen(refs, scope);
-      if (cleanup) scope.own(cleanup);
-      return scope;
+      mountGameFullscreen(refs, nextScope);
+      if (cleanup) nextScope.own(cleanup);
+      assertVisibleScope("mount");
+      return nextScope;
     },
     update({ paused = false } = {}) {
-      if (!scope?.active) return;
+      assertVisibleScope("update");
+      if (!scope?.active || getActiveGameScope() !== scope) return;
       root.dataset.shellPaused = String(paused);
     },
     unmount() {
-      if (!scope?.active) return;
-      scope.dispose();
-      root.hidden = true;
-      root.style.display = "none";
-      delete root.dataset.shellPaused;
-      if (activeShell === shell) activeShell = null;
+      if (scope?.active) scope.dispose();
+      else releaseMount(scope);
     },
   };
   return shell;
 }
 
 export function unmountActiveGameShell() { activeShell?.unmount(); }
+
+/** Test-only snapshot: the active shell and lifecycle must always identify the same mount. */
+export function getGameShellDiagnostics() {
+  return {
+    activeShell: activeShell ? { root: activeShell.refs.root, scope: activeShell.scope } : null,
+    activeScope: getActiveGameScope(),
+  };
+}

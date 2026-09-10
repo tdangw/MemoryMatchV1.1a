@@ -314,7 +314,6 @@ function showLinkGame() {
     stopCountdown();
     stopLinkBoardLayout();
     persistLinkRunProgress();
-    linkGameState.roundId += 1;
     clearGameplayRewardPopups();
     clearLinkPath();
     clearLinkTileHints();
