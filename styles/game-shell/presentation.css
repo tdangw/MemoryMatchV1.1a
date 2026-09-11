@@ -23,6 +23,21 @@
   min-width: 0 !important;
   width: min(calc(var(--shell-hud-used-width) * var(--shell-hud-compact-landscape-width-ratio)), calc(100vw - var(--shell-viewport-safe-left) - var(--shell-viewport-safe-right))) !important;
 }
+
+/* Desktop landscape uses its spare width without opting into the mobile compact
+ * contract: all HUD regions remain visible and each game keeps its board shape. */
+@media screen and (orientation: landscape) and (min-width: 900px) and (min-height: 601px) {
+  .game-shell-root {
+    max-width: min(1180px, 100%);
+  }
+
+  .game-shell-root > [data-shell-region="progress"],
+  .game-shell-root > [data-shell-region="hud"],
+  .game-shell-root > [data-shell-region="milestones"],
+  .game-shell-root > [data-shell-region="frame"] {
+    width: min(100%, 980px) !important;
+  }
+}
 .game-shell-root [data-shell-region="title"] {
   display: block;
   width: 100%;
