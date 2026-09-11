@@ -384,6 +384,7 @@ function handleLinkTileClick(position) {
   if (linkGameState.isLocked || linkGameState.isPaused) return;
   const tile = getLinkBoardTile(linkGameState.board, position);
   if (!tile || tile.frozen) return;
+  clearLinkTileHints();
   if (!selectedPosition) {
     selectedPosition = position;
     setLinkTileSelected(position, true);
@@ -526,6 +527,7 @@ function useLinkHint(connection) {
   linkGameState.isLocked = true;
   const roundId = linkGameState.roundId;
   const board = linkGameState.board;
+  clearLinkTileHints();
   setLinkTileHinted(connection.start, true);
   setLinkTileHinted(connection.end, true);
   drawLinkPath(connection.path, linkGameState.board);
@@ -533,7 +535,6 @@ function useLinkHint(connection) {
   setTimeout(() => {
     if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
     clearLinkPath();
-    clearLinkTileHints();
     unlockLinkBoard();
   }, LINK_CONNECT_TIMING.hintPreviewMs);
 }
