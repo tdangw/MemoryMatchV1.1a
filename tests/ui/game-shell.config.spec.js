@@ -24,6 +24,6 @@ test("UI overrides resolve on their own root and preserve sibling defaults", asy
   const narrow = page.viewportSize().width <= 420;
   expect(result).toEqual([
     { safeTop: "27px", gap: narrow ? "9px" : "12px", radius: "13px" },
-    { safeTop: "14px", gap: narrow ? "4px" : "6px", radius: "9px" },
+    { safeTop: "14px", gap: narrow ? "4px" : "5px", radius: "9px" },
   ]);
 });

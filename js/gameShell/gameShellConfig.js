@@ -21,7 +21,7 @@ export const GAME_SHELL_SCHEMA = freeze({
     edgeInsetRatio: { value: 0.01, unit: "", min: 0, max: 1 },
   },
   breakpoints: { mobile: px(600, 1), narrow: px(420, 1), landscapeHeight: px(600, 1) },
-  board: { gap: px(6), narrowGap: px(4), padding: px(8), narrowPadding: px(6) },
+  board: { gap: px(5), narrowGap: px(4), padding: px(8), narrowPadding: px(6) },
   frame: { sidePadding: px(14), narrowSidePadding: px(9), narrowGap: px(9) },
   title: {
     minHeight: px(44), marginBottom: px(8), mobileMarginBottom: px(6),

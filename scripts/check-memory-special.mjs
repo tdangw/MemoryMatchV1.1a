@@ -62,6 +62,6 @@ assert.equal(GAME_SHELL_DEFAULTS.hud.timerHeight, 3, "timer bar remains 3px");
 assert.match(shellPresentationCss, /\.game-shell-root\s*\{[^}]*gap:\s*var\(--shell-active-frame-gap\)/s, "Memory and Link must read the shared shell row gap");
 assert.match(shellTokensCss, /--shell-active-frame-gap:\s*var\(--shell-layout-gap\)/, "Default shell row gap must come from the layout token");
 assert.match(shellTokensCss, /--shell-active-frame-gap:\s*var\(--shell-frame-narrow-gap\)/, "Narrow shell row gap must come from the shared frame token");
-assert.deepEqual(GAME_SHELL_DEFAULTS.board, { gap: 6, narrowGap: 4, padding: 8, narrowPadding: 6 });
+assert.deepEqual(GAME_SHELL_DEFAULTS.board, { gap: 5, narrowGap: 4, padding: 8, narrowPadding: 6 });
 
 console.log("Memory special rewards and inventory checks passed.");
