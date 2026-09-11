@@ -414,7 +414,7 @@
   }
 
   .app-modal {
-    max-height: calc(100dvh - max(16px, env(safe-area-inset-top) + env(safe-area-inset-bottom)));
+    max-height: calc(100dvh - 16px);
   }
 
   .app-modal__body {
@@ -682,6 +682,30 @@
 
 #settings-modal .app-modal__body::-webkit-scrollbar {
   display: none;
+}
+
+/* Ở landscape thấp, phần chọn chế độ và cài đặt có thể dài hơn viewport.
+ * Giữ panel trong màn hình; chỉ phần nội dung bên trong được phép cuộn. */
+@media screen and (orientation: landscape) and (height <= 600px) {
+  #difficulty-modal .app-modal,
+  #settings-modal .app-modal {
+    height: calc(100dvh - 16px);
+    max-height: calc(100dvh - 16px);
+  }
+
+  #difficulty-modal .app-modal__header,
+  #difficulty-modal .app-modal__footer,
+  #settings-modal .app-modal__header,
+  #settings-modal .app-modal__footer {
+    flex: 0 0 auto;
+  }
+
+  #difficulty-modal .app-modal__body,
+  #settings-modal .app-modal__body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
 }
 
 @media screen and (width <= 600px) {
