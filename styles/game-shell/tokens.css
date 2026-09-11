@@ -9,6 +9,7 @@
   --shell-layout-mobile-side-inset: 0px;
   --shell-layout-max-tile-size: 10000px;
   --shell-layout-coordinate-gutter: 0px;
+  --shell-layout-compact-landscape-max-rows: 6;
   --shell-layout-tile-precision: 1000;
   --shell-layout-edge-inset-min: 4px;
   --shell-layout-edge-inset-max: 8px;
@@ -46,7 +47,7 @@
   --shell-hud-timer-offset: 8px;
   --shell-hud-menu-offset: 6px;
   --shell-hud-landscape-min-width: 390px;
-  --shell-hud-compact-landscape-width-ratio: 0.8;
+  --shell-hud-compact-landscape-width-ratio: 0.9;
   --shell-milestones-width: 260px;
   --shell-milestones-mobile-width: 220px;
   --shell-milestones-track-height: 19px;

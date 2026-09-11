@@ -391,6 +391,13 @@
   }
 }
 
+@media screen and (orientation: landscape) and (height <= 600px) {
+  .game-actions-menu {
+    max-height: calc(100dvh - 64px - env(safe-area-inset-bottom, 0px));
+    overscroll-behavior: contain;
+  }
+}
+
 .game-stats {
   display: flex;
   align-items: center;

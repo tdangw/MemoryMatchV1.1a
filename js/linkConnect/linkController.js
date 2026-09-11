@@ -3,6 +3,8 @@ import { setHudText, renderHudTimer } from "../gameShell/gameShellHud.js";
 import { shellTimeout as setTimeout, clearShellTimeout as clearTimeout, shellInterval as setInterval, clearShellInterval as clearInterval, shellFrame as requestAnimationFrame, cancelShellFrame as cancelAnimationFrame } from "../gameShell/gameShellLifecycle.js";
 import { createIcon } from "../icons.js";
 import { unmountActiveGameShell } from "../gameShell/gameShell.js";
+import { GAME_SHELL_DEFAULTS } from "../gameShell/gameShellConfig.js";
+import { getCompactLandscapeColumns } from "../gameShell/gameShellLayout.js";
 import { clearTooltip } from "../tooltips.js";
 import { clearLootEffects } from "../lootEffects.js";
 import { openAppModal, showAppToast } from "../modal.js";
@@ -54,10 +56,12 @@ import {
   createLinkBoard,
   applyLinkGravityShift,
   ensurePlayableBoard,
+  findLinkBoardTilePosition,
   getLinkBoardTile,
   hasOnlyFrozenLinkTiles,
   removeLinkBoardPair,
   removeRandomLinkPair,
+  reflowLinkBoard,
   shuffleLinkBoard,
   unlockFrozenLinkPairs,
   unlockAllFrozenLinkPairsAndEnsurePlayable,
@@ -112,6 +116,7 @@ let linkTimeAnimationFrame = null;
 let linkTimeProgressState = null;
 let comboExpiryTimer;
 let selectedPosition = null;
+let pendingCompactLayout = null;
 let linkTimeWarningPlayed = false;
 let linkSessionCheckpointTicks = 0;
 let isLinkAutoPaused = false;
@@ -217,9 +222,10 @@ export function startLinkLevel({
   clearLinkPath();
   clearLinkTileHints();
   selectedPosition = null;
+  pendingCompactLayout = null;
   linkTimeWarningPlayed = false;
   const modeLayout = getLinkModeLayout(mode);
-  const layout = isLinkChallengeMode(mode) ? getLinkChallengeLayout(level) : modeLayout;
+  const layout = getLinkBoardLayoutForViewport(isLinkChallengeMode(mode) ? getLinkChallengeLayout(level) : modeLayout);
   const board = createLinkBoard({
     layout,
     themeId: getEquippedThemeId(gameState.appearance, "link-connect"),
@@ -265,7 +271,7 @@ export function startLinkLevel({
     if (hintBonus > 0) grantLinkItem("hint", hintBonus);
   }
   showLinkGame();
-  renderLinkBoard(board, { onTileClick: handleLinkTileClick });
+  renderLinkBoard(board, { onTileClick: handleLinkTileClick, onCompactLandscapeChange: handleLinkCompactLandscapeChange });
   updateLinkHud();
   linkGameState.isLocked = true;
   showLevelRewardOverlay({
@@ -277,7 +283,7 @@ export function startLinkLevel({
     assistText: `Gợi ý: ${getLinkItemCount("hint")}`,
     onComplete: () => {
       if (linkGameState.roundId !== roundId) return;
-      linkGameState.isLocked = false;
+      unlockLinkBoard();
       startCountdown(roundId);
     },
   });
@@ -296,6 +302,7 @@ export function returnToLinkMenu() {
   clearGameplayRewardPopups();
   resetLinkGame();
   selectedPosition = null;
+  pendingCompactLayout = null;
   clearLinkPath();
   clearLinkTileHints();
   clearLinkTransientEffects();
@@ -408,7 +415,7 @@ function handleLinkTileClick(position) {
       wrongTiles.forEach((tileElement) => tileElement.classList.remove("is-wrong"));
       clearLinkTileSelection();
       selectedPosition = null;
-      linkGameState.isLocked = false;
+      unlockLinkBoard();
     }, LINK_CONNECT_TIMING.mismatchFeedbackMs);
     return;
   }
@@ -474,7 +481,7 @@ function handleLinkTileClick(position) {
         processPendingSpecialMilestones(roundId, board);
         return;
       }
-      linkGameState.isLocked = false;
+      unlockLinkBoard();
     };
     if (premiumReward.triggerPairBreak && linkGameState.matchedPairs < linkGameState.totalPairs) {
       playAutomaticPairBreak(roundId, board, finishResolution, { scoreMode: "combo" });
@@ -527,7 +534,7 @@ function useLinkHint(connection) {
     if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
     clearLinkPath();
     clearLinkTileHints();
-    linkGameState.isLocked = false;
+    unlockLinkBoard();
   }, LINK_CONNECT_TIMING.hintPreviewMs);
 }
 
@@ -543,7 +550,7 @@ function useLinkReshuffle() {
   showAppToast("Đã xáo lại các thẻ còn lại.");
   setTimeout(() => {
     if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
-    linkGameState.isLocked = false;
+    unlockLinkBoard();
   }, settleMs);
 }
 
@@ -621,13 +628,64 @@ function finishLinkThunder(board, roundId) {
   const boardShifted = applyLinkGravityShift(board, linkGameState.gravityShift);
   if (boardShifted) renderLinkBoardShift(board, { onTileClick: handleLinkTileClick });
   recoverBlockedLinkBoard(board);
-  linkGameState.isLocked = false;
+  unlockLinkBoard();
 }
 
 function useLinkFreeze() {
   linkGameState.freezeSeconds += 10;
   pauseLinkTimeProgressForFreeze();
   showAppToast("Đồng hồ đã đóng băng trong 10 giây.");
+}
+
+function getLinkBoardLayoutForViewport(layout) {
+  const viewport = window.visualViewport;
+  const width = viewport?.width ?? window.innerWidth;
+  const height = viewport?.height ?? window.innerHeight;
+  if (width <= height || height > GAME_SHELL_DEFAULTS.breakpoints.landscapeHeight) return layout;
+  return {
+    ...layout,
+    baseColumns: layout.columns,
+    columns: getCompactLandscapeColumns({
+      tileCount: layout.tileCount,
+      columns: layout.columns,
+      maxRows: GAME_SHELL_DEFAULTS.layout.compactLandscapeMaxRows,
+    }),
+  };
+}
+
+function handleLinkCompactLandscapeChange({ compact, config }) {
+  pendingCompactLayout = { compact, maxRows: config.layout.compactLandscapeMaxRows };
+  applyPendingLinkCompactLayout();
+}
+
+function applyPendingLinkCompactLayout() {
+  if (!pendingCompactLayout || linkGameState.isLocked || !linkGameState.board) return false;
+  const board = linkGameState.board;
+  const columns = pendingCompactLayout.compact
+    ? getCompactLandscapeColumns({
+      tileCount: board.capacity,
+      columns: board.baseColumns,
+      maxRows: pendingCompactLayout.maxRows,
+    })
+    : board.baseColumns;
+  const selectedTileId = selectedPosition
+    ? getLinkBoardTile(board, selectedPosition)?.instanceId
+    : null;
+  if (!reflowLinkBoard(board, columns)) {
+    pendingCompactLayout = null;
+    return false;
+  }
+  clearLinkTileSelection();
+  renderLinkBoard(board, { onTileClick: handleLinkTileClick });
+  selectedPosition = findLinkBoardTilePosition(board, selectedTileId);
+  if (selectedPosition) setLinkTileSelected(selectedPosition, true);
+  pendingCompactLayout = null;
+  return true;
+}
+
+function unlockLinkBoard() {
+  linkGameState.isLocked = false;
+  applyPendingLinkCompactLayout();
 }
 
 function completeLinkLevel() {
@@ -779,7 +837,7 @@ function handleLinkTimeUp() {
     actionSelected = true;
     syncLinkTimeProgress();
     linkTimeWarningPlayed = false;
-    linkGameState.isLocked = false;
+    unlockLinkBoard();
     updateLinkTimerHud();
     close();
     showAppToast(`Đã mua +${seconds}s với ${price} Xu.`);
@@ -1035,7 +1093,7 @@ function processPendingSpecialMilestones(roundId, board) {
   if (linkGameState.isResolvingSpecialMilestone || linkGameState.roundId !== roundId || linkGameState.board !== board) return;
   const progress = linkGameState.pendingSpecialMilestones.shift();
   if (!progress) {
-    linkGameState.isLocked = false;
+    unlockLinkBoard();
     return;
   }
   linkGameState.isResolvingSpecialMilestone = true;

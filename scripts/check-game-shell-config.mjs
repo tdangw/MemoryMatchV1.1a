@@ -33,5 +33,6 @@ const css = getGameShellCssVariables({ motion: { star: 0 }, layers: { hud: 7 } }
 assert.equal(css["--shell-motion-star"], "0ms");
 assert.equal(css["--shell-layers-hud"], "7");
 assert.equal(css["--shell-layout-content-max-width"], "700px");
-assert.equal(css["--shell-hud-compact-landscape-width-ratio"], "0.8");
+assert.equal(css["--shell-layout-compact-landscape-max-rows"], "6");
+assert.equal(css["--shell-hud-compact-landscape-width-ratio"], "0.9");
 console.log("Game Shell defaults, overrides, validation and production fallback passed.");

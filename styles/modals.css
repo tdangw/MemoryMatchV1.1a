@@ -408,6 +408,23 @@
   }
 }
 
+@media screen and (orientation: landscape) and (height <= 600px) {
+  .app-modal-overlay {
+    padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+  }
+
+  .app-modal {
+    max-height: calc(100dvh - max(16px, env(safe-area-inset-top) + env(safe-area-inset-bottom)));
+  }
+
+  .app-modal__body {
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+  }
+
+  .app-modal__body::-webkit-scrollbar { display: none; }
+}
+
 /* Popup thông tin đầu màn */
 .reward-container.app-modal {
   padding: 24px;

@@ -836,6 +836,17 @@
   box-shadow: 0 12px 30px rgb(0 0 0 / 35%);
 }
 
+@media screen and (orientation: landscape) and (height <= 600px) {
+  .link-tools-menu {
+    max-height: calc(100dvh - 64px - env(safe-area-inset-bottom, 0px));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+  }
+
+  .link-tools-menu::-webkit-scrollbar { display: none; }
+}
+
 .link-tool-list { display: grid; gap: 2px; }
 
 .link-tool-list .link-connect-game__item {

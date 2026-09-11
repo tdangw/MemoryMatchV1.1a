@@ -21,6 +21,7 @@ const OUTER_ROUTE_INSET_PERCENT = 1.5;
 const assetUrl = (path) => `${import.meta.env.BASE_URL}${path}`;
 let linkLayout = null;
 let linkLayoutShape = null;
+let onCompactLandscapeChange = null;
 let boardInteractionTimer;
 let renderedBoardShape = "";
 let renderedBoardContainer = null;
@@ -30,7 +31,8 @@ const tileMotionAnimations = new WeakMap();
 const activeTileMotionAnimations = new Set();
 const transientEffectTimers = new Set();
 
-export function renderLinkBoard(board, { onTileClick } = {}) {
+export function renderLinkBoard(board, { onTileClick, onCompactLandscapeChange: onChange } = {}) {
+  if (onChange) onCompactLandscapeChange = onChange;
   return measureLinkRender("board patch", () => patchLinkBoard(board, onTileClick));
 }
 
@@ -204,7 +206,6 @@ function patchLinkBoard(board, onTileClick) {
 function createLinkBoardCells(container, columns, rows) {
   const fragment = document.createDocumentFragment();
   boardCellsByPosition.clear();
-  tileElementsByKey.clear();
   for (let row = 1; row <= rows; row += 1) {
     for (let column = 1; column <= columns; column += 1) {
       const cell = document.createElement("div");
@@ -216,7 +217,6 @@ function createLinkBoardCells(container, columns, rows) {
       fragment.append(cell);
     }
   }
-  container.querySelectorAll("img").forEach(image => image.removeAttribute("src"));
   container.replaceChildren(fragment);
   renderedBoardContainer = container;
   renderedBoardShape = `${columns}x${rows}`;
@@ -947,6 +947,7 @@ function mountLinkBoardLayout() {
   linkLayout = connectGameShellLayout({
     root, frame, board,
     chrome: [title, progress, hud, milestones],
+    onCompactLandscapeChange: change => onCompactLandscapeChange?.(change),
     getShape: () => linkLayoutShape,
     onMeasure: recordLinkLayoutPass,
     apply: ({ tileSize, boardWidth, boardHeight, gap, padding }) => {
@@ -963,4 +964,9 @@ export function stopLinkBoardLayout() {
   linkLayout?.destroy();
   linkLayout = null;
   linkLayoutShape = null;
+  onCompactLandscapeChange = null;
+  boardCellsByPosition.clear();
+  tileElementsByKey.clear();
+  renderedBoardContainer = null;
+  renderedBoardShape = "";
 }

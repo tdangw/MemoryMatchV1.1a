@@ -6,7 +6,7 @@ import { getCardBackClass } from "./appearance.js";
 import { initLogic } from "./logic.js";
 import { getEquippedThemeId } from "./appearance.js";
 import { getThemeCards } from "./themeCatalog.js";
-import { connectGameShellLayout } from "./gameShell/gameShellLayout.js";
+import { connectGameShellLayout, getCompactLandscapeColumns } from "./gameShell/gameShellLayout.js";
 import { getMemoryShell } from "./memoryMatch/memoryShell.js";
 
 // Only coordinate labels need a game-specific presentation override.
@@ -55,7 +55,15 @@ function mountMemoryLayout() {
     root, frame, board, chrome, ui: MEMORY_SHELL_UI,
     getShape: (viewport, config) => {
       if (!activeLayout) return null;
-      const columns = viewport.width <= config.breakpoints.mobile ? activeLayout.mobileColumns : activeLayout.columns;
+      const compactLandscape = viewport.width > viewport.height
+        && viewport.height <= config.breakpoints.landscapeHeight;
+      const columns = compactLandscape
+        ? getCompactLandscapeColumns({
+          tileCount: activeLayout.tileCount,
+          columns: activeLayout.columns,
+          maxRows: config.layout.compactLandscapeMaxRows,
+        })
+        : viewport.width <= config.breakpoints.mobile ? activeLayout.mobileColumns : activeLayout.columns;
       shape = { columns, rows: Math.ceil(activeLayout.tileCount / columns), coordinates: Boolean(gameState.settings.boardCoordinates) };
       return shape;
     },

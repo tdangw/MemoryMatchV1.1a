@@ -11,7 +11,7 @@ export function mountGameFullscreen({ root, title }, scope) {
   status.className = "shell-fullscreen-status";
   status.setAttribute("role", "status");
   title.classList.add("shell-fullscreen-title");
-  title.append(button, status);
+  root.append(button, status);
   let busy = false;
 
   function update() {

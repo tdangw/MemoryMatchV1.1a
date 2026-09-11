@@ -25,6 +25,17 @@ export function calculateBoardLayout({ width, height, columns, rows, gap, paddin
   };
 }
 
+/** Choose a full, landscape-friendly grid without exceeding the configured row budget. */
+export function getCompactLandscapeColumns({ tileCount, columns, maxRows }) {
+  if (![tileCount, columns, maxRows].every(Number.isInteger)
+    || Math.min(tileCount, columns, maxRows) < 1) return null;
+  const minimum = Math.max(columns, Math.ceil(Math.sqrt(tileCount)), Math.ceil(tileCount / maxRows));
+  for (let candidate = minimum; candidate <= tileCount; candidate += 1) {
+    if (tileCount % candidate === 0) return candidate;
+  }
+  return tileCount;
+}
+
 let activeConnection = null;
 const diagnostics = { passes: 0, writes: 0, mounts: 0, maxPassesPerFrame: 0 };
 let previousFrame = -1;
@@ -37,7 +48,7 @@ export function getGameShellLayoutDiagnostics() {
 }
 
 /** One live shell, one observer, one queued frame. No game IDs or gameplay imports. */
-export function connectGameShellLayout({ root, frame, board, chrome, getShape, apply, ui = {}, onMeasure = () => {} }) {
+export function connectGameShellLayout({ root, frame, board, chrome, getShape, apply, ui = {}, onMeasure = () => {}, onCompactLandscapeChange = () => {} }) {
   const config = normalizeGameShellConfig(ui);
   activeConnection?.destroy();
   let alive = true;
@@ -75,6 +86,7 @@ export function connectGameShellLayout({ root, frame, board, chrome, getShape, a
     root.classList.toggle("shell-compact-landscape", compactLandscape);
     if (compactLandscapeChanged) {
       // CSS hides chrome and changes HUD width; measure its settled geometry next frame.
+      onCompactLandscapeChange({ compact: compactLandscape, config, viewport: visible });
       schedule();
       return;
     }

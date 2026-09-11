@@ -48,10 +48,10 @@
 }
 
 .shell-fullscreen-button {
-  /* The title now has identical geometry in every game. */
+  /* Owned by the shell, so compact mode can hide the title without hiding exit. */
   position: absolute;
-  inset-inline-end: 0;
-  top: 0;
+  inset-inline-end: max(var(--shell-active-side-padding), var(--shell-viewport-safe-right));
+  top: var(--shell-safe-top);
   display: grid;
   place-items: center;
   width: var(--shell-fullscreen-size);

@@ -25,6 +25,8 @@ export function createLinkBoard({
   const board = {
     columns: layout.columns,
     rows: layout.tileCount / layout.columns,
+    baseColumns: layout.baseColumns ?? layout.columns,
+    capacity: layout.tileCount,
     grid: null,
   };
   board.grid = createPaddedGrid(board.rows, board.columns, tiles);
@@ -32,6 +34,26 @@ export function createLinkBoard({
   freezeRandomPairs(board);
   ensurePlayableBoard(board);
   return board;
+}
+
+/** Repack existing tile instances for a new visual topology without starting a new round. */
+export function reflowLinkBoard(board, columns) {
+  if (!board || !Number.isInteger(columns) || columns < 1) return false;
+  const capacity = Number.isInteger(board.capacity) ? board.capacity : board.rows * board.columns;
+  if (capacity < 1 || capacity % columns !== 0 || board.columns === columns) return false;
+  const tiles = getInteriorTiles(board);
+  board.columns = columns;
+  board.rows = capacity / columns;
+  board.grid = createPaddedGrid(board.rows, board.columns, tiles);
+  ensurePlayableBoard(board);
+  return true;
+}
+
+export function findLinkBoardTilePosition(board, instanceId) {
+  if (!board || !instanceId) return null;
+  return getInteriorPositions(board).find(position => (
+    getLinkBoardTile(board, position)?.instanceId === instanceId
+  )) || null;
 }
 
 export function getLinkBoardTile(board, position) {
