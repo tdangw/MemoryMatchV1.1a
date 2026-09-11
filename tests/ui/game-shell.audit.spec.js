@@ -111,7 +111,10 @@ for (const [id, title, root, board] of [
     const baseline = preservationBaseline.samples.find(sample => sample.case ===
       `game-shell.audit-${title.replaceAll(" ", "-")}-controlled-Phase-1-audit-${testInfo.project.name}`);
     expect(baseline, "Every viewport/game must have a preservation baseline").toBeTruthy();
-    expect(metrics.regions.map(region => region.selector)).toEqual(baseline.metrics.regions.map(region => region.selector));
+    const shellOwnedRegions = metrics.regions
+      .map(region => region.selector)
+      .filter(selector => !["shell-fullscreen-button", "shell-fullscreen-status"].includes(selector));
+    expect(shellOwnedRegions).toEqual(baseline.metrics.regions.map(region => region.selector));
     // The user intentionally unified the frame with Link Connect. Keep Phase 1
     // DOM budgets, but validate the new geometry and fullscreen in current snapshots.
     for (const region of metrics.regions) {
