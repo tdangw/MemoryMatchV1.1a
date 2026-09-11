@@ -269,3 +269,50 @@
   }
 }
 
+@media screen and (orientation: landscape) and (height <= 600px) {
+  .menu-overlay {
+    padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+  }
+
+  .menu-wrapper {
+    width: min(640px, calc(100vw - 16px));
+    max-height: calc(100dvh - max(16px, env(safe-area-inset-top) + env(safe-area-inset-bottom)));
+    padding: 14px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+  }
+
+  .menu-wrapper::-webkit-scrollbar { display: none; }
+
+  .menu-wrapper > .game-title {
+    margin-bottom: 6px;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+  }
+
+  .menu-description {
+    margin: 0 0 10px;
+    font-size: 0.82rem;
+  }
+
+  .menu-wrapper .menu-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .menu-wrapper .menu-item {
+    min-height: 44px;
+    grid-template-columns: 34px minmax(0, 1fr);
+    gap: 8px;
+    padding: 6px 10px 6px 7px;
+    font-size: 0.9rem;
+  }
+
+  .menu-wrapper .menu-item .ui-icon {
+    width: 17px;
+    height: 17px;
+    padding: 6px;
+    border-radius: 8px;
+  }
+}
+
