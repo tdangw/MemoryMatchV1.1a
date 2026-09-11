@@ -642,7 +642,7 @@ function getLinkBoardLayoutForViewport(layout) {
   const viewport = window.visualViewport;
   const width = viewport?.width ?? window.innerWidth;
   const height = viewport?.height ?? window.innerHeight;
-  if (width <= height || height > GAME_SHELL_DEFAULTS.breakpoints.landscapeHeight) return layout;
+  if (width <= height) return layout;
   return {
     ...layout,
     baseColumns: layout.columns,
@@ -654,15 +654,15 @@ function getLinkBoardLayoutForViewport(layout) {
   };
 }
 
-function handleLinkCompactLandscapeChange({ compact, config }) {
-  pendingCompactLayout = { compact, maxRows: config.layout.compactLandscapeMaxRows };
+function handleLinkCompactLandscapeChange({ landscape, config }) {
+  pendingCompactLayout = { landscape, maxRows: config.layout.compactLandscapeMaxRows };
   applyPendingLinkCompactLayout();
 }
 
 function applyPendingLinkCompactLayout() {
   if (!pendingCompactLayout || linkGameState.isLocked || !linkGameState.board) return false;
   const board = linkGameState.board;
-  const columns = pendingCompactLayout.compact
+  const columns = pendingCompactLayout.landscape
     ? getCompactLandscapeColumns({
       tileCount: board.capacity,
       columns: board.baseColumns,

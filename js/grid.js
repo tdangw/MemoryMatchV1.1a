@@ -55,9 +55,8 @@ function mountMemoryLayout() {
     root, frame, board, chrome, ui: MEMORY_SHELL_UI,
     getShape: (viewport, config) => {
       if (!activeLayout) return null;
-      const compactLandscape = viewport.width > viewport.height
-        && viewport.height <= config.breakpoints.landscapeHeight;
-      const columns = compactLandscape
+      const landscape = viewport.width > viewport.height;
+      const columns = landscape
         ? getCompactLandscapeColumns({
           tileCount: activeLayout.tileCount,
           columns: activeLayout.columns,

@@ -56,6 +56,7 @@ export function connectGameShellLayout({ root, frame, board, chrome, getShape, a
   let signature = "";
   let assetPasses = 0;
   let assetPending = false;
+  let landscape = null;
   const viewport = window.visualViewport;
   const listeners = [];
   const listen = (target, type, callback, options) => {
@@ -80,13 +81,16 @@ export function connectGameShellLayout({ root, frame, board, chrome, getShape, a
     };
     const shape = getShape(visible, config);
     if (!shape) return;
-    const compactLandscape = visible.width > visible.height
+    const nextLandscape = visible.width > visible.height;
+    const compactLandscape = nextLandscape
       && visible.height <= config.breakpoints.landscapeHeight;
     const compactLandscapeChanged = root.classList.contains("shell-compact-landscape") !== compactLandscape;
+    const landscapeChanged = landscape !== nextLandscape;
+    landscape = nextLandscape;
     root.classList.toggle("shell-compact-landscape", compactLandscape);
-    if (compactLandscapeChanged) {
+    if (compactLandscapeChanged || landscapeChanged) {
       // CSS hides chrome and changes HUD width; measure its settled geometry next frame.
-      onCompactLandscapeChange({ compact: compactLandscape, config, viewport: visible });
+      onCompactLandscapeChange({ compact: compactLandscape, landscape: nextLandscape, config, viewport: visible });
       schedule();
       return;
     }
