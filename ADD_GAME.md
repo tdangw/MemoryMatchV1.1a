@@ -27,7 +27,7 @@ Tài liệu này hướng dẫn tích hợp, không triển khai Triple Connect.
 
 - Chạy `npm run check`: có kiểm import, ownership, vùng semantic, token/layout/lifecycle, migration và luật trò hiện có. Thêm kiểm thử luật trò mới độc lập khỏi DOM.
 - Kiểm UI có chọn lọc: node stable sau patch; không đổi board khi cập nhật HUD; mount/unmount lặp, callback cũ bị chặn, dùng/mua kho, normal/reduced motion và giới hạn hiệu ứng.
-- Kiểm bốn viewport desktop/mobile/mobile-narrow/landscape, bàn nhỏ/lớn, orientation, modal và fullscreen. Không coi baseline không có fullscreen là xác nhận cho fullscreen.
+- Kiểm hai chuẩn mobile của dự án ở cả hai chiều: `360x640`/`640x360` và `411x914`/`914x411`, cùng desktop khi thay đổi có tác động desktop; bàn nhỏ/lớn, orientation, modal và fullscreen. Không thêm profile thiết bị quá nhỏ nếu không có lỗi cụ thể cần tái hiện. Không coi baseline không có fullscreen là xác nhận cho fullscreen.
 - Chạy `npm run test:ui:visual` để so ảnh hiện có. Các file trong `tests/ui/visual-candidates` là bộ chờ duyệt, chưa phải phê duyệt phát hành. Không dùng `--update-snapshots` để che lỗi; phải xem diff và ghi rõ lý do thay đổi trước khi cập nhật.
 - Nếu cần tạo/cập nhật ảnh đã được phép: `npx playwright test --config=playwright.visual.config.js --update-snapshots`. Snapshot hiện tại tách fullscreen khỏi baseline; khi duyệt tích hợp fullscreen phải tạo baseline riêng hoặc cập nhật có chủ đích.
 - Build một lần sau thay đổi cuối. Ghi ngân sách bundle/DOM/layout và những tính năng ngoài phạm vi có trong workspace. Không tự xóa công việc khác để làm worktree sạch.

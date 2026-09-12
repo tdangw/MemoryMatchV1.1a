@@ -9,10 +9,10 @@ Trò chơi dùng chung hệ thống Xu, chủ đề ảnh, Bộ sưu tập hiệ
 ### Quyết định đã chốt
 
 - Màn hình mobile dọc: HUD ở trên, bàn nhiều lớp ở giữa, khay ngang dưới bàn.
-- Khay có 10 ô; 7 ô mở sẵn, 3 ô khóa. Mở rộng khay mở tạm cả 3 ô trong đúng ván hiện tại; chơi lại, bắt đầu ván mới hoặc sang màn sẽ trở về 7 ô.
+- Khay có cố định 7 ô trong phiên bản đầu. Chưa hiển thị ô khóa, chưa có trạng thái 10 ô và chưa triển khai vật phẩm Mở rộng khay; chỉ xem xét lại sau khi gameplay 7 ô, solver và hiệu suất đã ổn định bằng dữ liệu chơi thử.
 - Chỉ thẻ lộ hoàn toàn trên lớp cao nhất mới có thể chọn. Các lớp sau được lệch nhẹ để người chơi nhìn được thẻ bên dưới.
 - Khay luôn tự dồn trái và tự nhóm các thẻ cùng loại. Khi đủ đúng 3 thẻ, game ưu tiên xóa bộ ba trước khi xét khay đầy.
-- Điều kiện thắng: xóa sạch board. Điều kiện thua: cả 7 ô mở sẵn đều đầy và không có bộ ba nào vừa hoàn thành.
+- Điều kiện thắng: xóa sạch board. Điều kiện thua: sau khi ưu tiên giải quyết mọi bộ ba vừa hình thành, khay vẫn có đủ 7 thẻ và không có bộ ba có thể xóa ngay.
 - Vô tận đếm thời gian xuôi, chơi thư giãn và qua level liên tiếp. Các mode khác đếm ngược theo mốc thời gian chung hiện có.
 
 ## 2. Vòng lặp gameplay
@@ -28,8 +28,17 @@ Trò chơi dùng chung hệ thống Xu, chủ đề ảnh, Bộ sưu tập hiệ
 
 - Thẻ đầu của một loại bắt đầu chuỗi, không tạo combo.
 - Chỉ khi hoàn tất nguyên một bộ ba liên tiếp mới tăng combo và cộng điểm.
-- Nếu đang gom một loại mà người chơi chọn loại khác trước khi đủ ba, đó là một **Miss**, combo về 0; thẻ mới vẫn vào khay và được tự nhóm.
-- Ví dụ: `A-A-A → B-B-B` tạo combo 2. `A-A-A → B-B-A` tính Miss ở A; nhóm B vẫn ở khay để hoàn thành sau.
+- Luật Miss dùng `streakType` và `streakCount` độc lập với thứ tự hiển thị sau khi khay tự nhóm. Nếu `streakCount` đang là 1 hoặc 2 mà người chơi chọn loại khác, ghi đúng một **Miss**, combo về 0, rồi thẻ mới bắt đầu chuỗi mới.
+- Hoàn tất bộ ba đặt chuỗi về rỗng sau khi cộng match/combo/điểm. Bộ ba hình thành từ các thẻ đã có trong khay vẫn resolve bình thường, nhưng không được suy luận Miss từ vị trí nhóm trên giao diện.
+- Bảng ví dụ chuẩn:
+
+| Chuỗi chọn | Kết quả |
+| --- | --- |
+| `A-A-A` | Hoàn tất một bộ ba; không Miss; tăng combo một lần; reset chuỗi. |
+| `A-B-A` | Lượt `B` tạo một Miss và bắt đầu chuỗi B; lượt `A` tạo thêm một Miss và bắt đầu chuỗi A. Các thẻ vẫn được nhóm trong khay. |
+| `A-A-B` | Lượt `B` tạo đúng một Miss, combo về 0 và bắt đầu chuỗi B. |
+| `A-A-B-B-A` | `B` đầu tiên tạo một Miss; `B` thứ hai tiếp tục chuỗi B; `A` cuối tạo một Miss mới. Nhóm A/B trong khay không thay đổi cách đếm. |
+| `A-A-A → B-B-B` | Hai bộ ba hoàn tất liên tiếp; combo đạt 2 nếu không có lượt khác chen giữa. |
 - Mỗi bộ ba là một match. Điểm dùng công thức Link Connect: `10 + (combo − 1) × 3` khi hoàn tất bộ ba. Sao xét trên tổng số bộ ba đã xóa; mốc cụ thể sẽ tinh chỉnh sau khi thử bàn nhiều lớp.
 
 ## 3. Board nhiều lớp và tính khả thi
@@ -38,7 +47,7 @@ Trò chơi dùng chung hệ thống Xu, chủ đề ảnh, Bộ sưu tập hiệ
 
 - Board là các vị trí cố định, xếp thành 2–5 lớp. Lớp sau lệch nhỏ theo trục X/Y và nằm dưới lớp trước.
 - Một thẻ chỉ tương tác được nếu không bị thẻ nào phủ lên vùng chọn của nó. Thẻ bị che vẫn lộ đủ ảnh/viền để người chơi lập kế hoạch, nhưng không nhận chạm.
-- Thẻ được Hoàn tác trở về đúng vị trí/lớp lúc rời board; nếu ô đó bị che, thẻ được đặt lên trên cùng tại vị trí ấy để vẫn có thể chọn lại.
+- Hoàn tác phục hồi snapshot chính xác của lượt chọn gần nhất: tile, slot, layer, quan hệ che phủ, khay, chuỗi Miss/combo và các giá trị lượt liên quan. Không tự nâng thẻ lên lớp trên. Nếu snapshot không còn phục hồi hợp lệ thì từ chối thao tác và không trừ vật phẩm. Xáo thẻ luôn xóa lịch sử Hoàn tác.
 
 ### Sinh màn có lời giải — yêu cầu bắt buộc
 
@@ -77,7 +86,9 @@ Mốc thời gian ban đầu đồng bộ với hai game và chỉ được đi�
 1. **HUD tiến trình trên:** Moves, Miss, Combo, thanh 3 sao, Điểm, tiến trình bộ ba `1 / 12`, Gợi ý.
 2. **Thanh thao tác:** Menu, Level, Thời gian, tổng sao, nút Công cụ.
 3. **Board nhiều lớp:** tự co theo chiều cao còn lại, không tràn vùng chơi mobile.
-4. **Khay ngang:** 10 vị trí ở dưới board; 7 ô hoạt động, 3 ô khóa có biểu tượng mở rộng.
+4. **Khay ngang:** 7 vị trí hoạt động cố định ở dưới board; không hiển thị ba ô khóa hoặc affordance mở rộng trong phiên bản đầu.
+
+Trong vertical slice trước Gate 7B, chưa có Gợi ý hoặc vật phẩm thật thì phải ẩn bộ đếm Gợi ý và nút Công cụ; không dựng nút giả, tồn kho giả hoặc hành vi tạm chỉ để giống mockup.
 
 Màu, typography, icon, modal, popup đầu màn/tổng kết/hết giờ và timer bar dùng đúng hệ component hiện có. Popup giới thiệu riêng xuất hiện tại level đầu của mỗi độ khó để giải thích: chỉ chọn thẻ lộ hoàn toàn, gom đủ ba để xóa, và khay đầy sẽ thua.
 
@@ -96,8 +107,9 @@ Các vật phẩm của Triple Connect có tồn kho, cân bằng giá và contr
 | Hoàn tác | Trả thẻ chọn gần nhất từ khay về board; dùng nhiều lần theo số lượng sở hữu. | Không phải xóa vĩnh viễn thẻ. |
 | Gợi ý | Ưu tiên chỉ thẻ lộ trùng với thẻ trong khay; nếu khay có đúng một thẻ lẻ, chỉ hai thẻ còn lại của bộ ba. | Không tự chọn hoặc tự xóa. |
 | Xáo thẻ | Xáo mọi thẻ còn lại trên mọi lớp, sau khi solver xác nhận board mới. | Xóa lịch sử Hoàn tác. |
-| Mở rộng khay | Mở tạm ba ô khóa cho hết ván. | Không lưu sang ván/màn tiếp theo. |
 | Thêm thời gian | Dùng cơ chế mua/thêm thời gian chung. | Không dùng trong Vô tận. |
+
+Vật phẩm Mở rộng khay được hoãn hoàn toàn. Không tạo ID, inventory, nút khóa hoặc field save tạm cho vật phẩm này trước khi có quyết định sản phẩm mới.
 
 Trong Thử thách, thẻ may mắn có thể thưởng `+thời gian`, `+gợi ý` hoặc `+Xu`; được thể hiện như một thẻ trong bộ ba và dùng popup phần thưởng chung.
 
@@ -110,11 +122,14 @@ Thẻ đặc biệt, thẻ đóng băng và các luật độ khó bổ sung đ�
 ```text
 js/tripleConnect/
 ├── tripleConfig.js       # mode, layer, scoring, thời lượng và tuning riêng
+├── tripleRules.js        # luật/reducer thuần dùng chung cho runtime và solver
 ├── tripleState.js        # trạng thái round độc lập, roundId và khay
-├── tripleBoard.js        # slot/layer, lộ thẻ, generator và solver
+├── tripleBoard.js        # slot/layer, cover graph và generator
+├── tripleSolver.js       # xác minh lời giải, budget và fallback corpus
 ├── tripleRenderer.js     # board lớp, khay, line ba thẻ và animation
-├── tripleItems.js        # tồn kho/hiệu ứng vật phẩm riêng
-└── tripleController.js   # vòng đời màn, timer, HUD, win/lose và session
+├── tripleShell.js        # mount/unmount Game Shell và vùng board composite
+├── tripleController.js   # vòng đời màn, timer, HUD, win/lose và session
+└── tripleItems.js        # chỉ tạo tại Gate 7B khi có vật phẩm thật
 ```
 
 ### Thành phần tái sử dụng
@@ -127,7 +142,7 @@ js/tripleConnect/
 ### Nguyên tắc chống lỗi chéo
 
 - Không import hoặc ghi trực tiếp `gameState`/`linkGameState` để làm state Triple; Triple có `tripleGameState` và `roundId` riêng.
-- Session, item inventory và level progress có namespace `triple-connect` riêng trong `localStorage`.
+- `triple-connect` chỉ là ID catalog/registry; key dữ liệu JavaScript là `tripleConnect`. Từ Gate 6, progress/session nằm dưới `progress.tripleConnect` và `progress.tripleConnect.sessionsByMode`; inventory chỉ được thêm tại Gate 7B sau khi contract kinh tế được duyệt. Không tạo localStorage key song song riêng cho Triple.
 - Component dùng chung chỉ nhận dữ liệu qua tham số/callback; không chứa nhánh logic Triple trong Memory hoặc Link controller.
 - Kiểm tra tĩnh và test board/solver Triple được thêm vào `npm run check` trước khi mở game trong menu chính.
 
@@ -135,7 +150,7 @@ js/tripleConnect/
 
 ### Giai đoạn 1 — Vertical slice lõi
 
-1. Thêm game Triple Connect vào màn chọn game, navigation, session namespace và theme dùng chung.
+1. Đăng ký Triple Connect ở trạng thái chưa phát hành và tạo đường mở development có kiểm soát; chưa hiển thị trong màn chọn game và chưa thêm session namespace trước gate persistence.
 2. Làm `tripleState`, board 2 lớp 12 thẻ và renderer board/khay dọc mobile.
 3. Cài luật chọn thẻ lộ, bay xuống khay, tự nhóm, bộ ba, Miss/combo/điểm và win/lose.
 4. Adapter line/xóa ba thẻ với hiệu ứng đang trang bị.
@@ -145,12 +160,12 @@ js/tripleConnect/
 
 1. Tái dùng HUD, timer, sao, popup đầu màn/tổng kết/hết giờ, pause và âm thanh.
 2. Hoàn thiện responsive: board/khay không tràn màn hẹp, animation không che HUD.
-3. Thêm sáu mode và cấu hình bảng ở mục 4.
-4. Thêm Thử thách, thẻ may mắn và Vô tận theo luật đã chốt.
+3. Mở lần lượt `normal`, `hard`, `superHard`, mỗi mode phải qua solver và kiểm thử hiệu suất riêng.
+4. Thêm Vô tận sau khi các mode cố định đã ổn định. Thử thách và thẻ may mắn chỉ được triển khai sau khi Gate 8 khóa đủ thông số sản phẩm.
 
 ### Giai đoạn 3 — Vật phẩm và cân bằng
 
-1. Hoàn tác, Gợi ý, Xáo thẻ, Mở rộng khay và Thêm thời gian.
+1. Hoàn tác, Gợi ý, Xáo thẻ và Thêm thời gian. Mở rộng khay tiếp tục nằm ngoài phạm vi.
 2. Nối Shop/collection, giá Xu, tồn kho và UI Công cụ.
 3. Cân bằng mốc sao, phần thưởng Xu, thời gian, mật độ lớp và tần suất thẻ may mắn bằng test thực tế.
 
@@ -158,6 +173,7 @@ js/tripleConnect/
 
 1. Thiết kế bộ ba thẻ đặc biệt và thẻ băng riêng cho Triple Connect.
 2. Chỉ thêm biến thể lớp/luật khi solver, animation và bàn 5 lớp đã được kiểm thử ổn định.
+3. Chỉ đánh giá lại khay 10 ô/Mở rộng khay sau khi bản 7 ô có số liệu cân bằng, solver và thiết bị thật ổn định; không giữ code dự phòng trong runtime hiện tại.
 
 ## 9. Quyết định để lại cho giai đoạn cân bằng
 

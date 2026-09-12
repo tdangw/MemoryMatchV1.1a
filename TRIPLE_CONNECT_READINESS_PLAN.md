@@ -2,15 +2,19 @@
 
 Ngày đánh giá: 2026-09-09
 
+> Tài liệu này giữ kết quả đánh giá và rủi ro lịch sử tại ngày 2026-09-09. Gate 0 đã hoàn tất tại `3f89ff7`. Nguồn gate triển khai hiện hành là `TASK_TRIPLE_CONNECT_IMPLEMENTATION_PLAN.md`; nếu trạng thái, số gate, phạm vi hoặc quyết định khác nhau thì task plan hiện hành được ưu tiên.
+
 ## 1. Kết luận điều hành
 
-**Trạng thái: GO có điều kiện.** Kiến trúc Game Shell, catalog, session và renderer hiện tại đủ nền tảng để thêm game thứ ba, nhưng chưa nên bắt đầu nối Triple Connect vào menu chính cho đến khi Gate 0 hoàn tất.
+**Trạng thái hiện tại: Gate 0 đã hoàn tất; được bắt đầu Gate 1.** Triple vẫn phải giữ trạng thái chưa phát hành cho tới gate phát hành trong task plan hiện hành.
+
+Danh sách điều kiện bên dưới là snapshot lịch sử dùng để giải thích Gate 0, không phải việc cần thực hiện lại:
 
 Các điều kiện bắt buộc trước khi triển khai:
 
 1. Khôi phục baseline `npm run check` về xanh.
 2. Sửa hai lỗi lifecycle hiện hữu và chạy lại test mount/restart.
-3. Chốt ba quy tắc còn có thể hiểu khác nhau: ngưỡng thua khi khay đã mở rộng, quy tắc Miss theo “chuỗi đang gom”, và hành vi Hoàn tác khi vị trí cũ bị che.
+3. Áp dụng các quyết định đã chốt: khay cố định 7 ô và chưa có Mở rộng khay; Miss dùng `streakType`/`streakCount`; Hoàn tác phục hồi snapshot chính xác và không tự nâng layer.
 4. Chốt ngân sách hiệu suất và bộ dữ liệu seed để benchmark solver.
 
 Không nên sao chép `linkController.js` hoặc `linkRenderer.js`. Hai module này đã lớn; Triple cần state/controller/board/renderer riêng và chỉ dùng các hợp đồng chung ổn định.
@@ -26,7 +30,7 @@ Không nên sao chép `linkController.js` hoặc `linkRenderer.js`. Hai module n
 - `public/assets`: khoảng **15,61 MB**, 1.851 file; manifest hiện lập chỉ mục 1.832 ảnh theme.
 - Worktree sạch sau các phép kiểm tra.
 
-### Chất lượng hiện tại
+### Chất lượng tại thời điểm đánh giá 2026-09-09
 
 - `npm run check`: **không đạt** tại `check-memory-special.mjs`; `style.css` thiếu khai báo `gap: var(--shell-layout-gap)` mà contract đang yêu cầu.
 - Các bước đã qua trước điểm dừng: cú pháp JS, catalog chung, migration tồn kho Hint, session timing, persistence/transaction và PWA.
@@ -81,18 +85,18 @@ Registry chỉ chứa callback điều hướng và metadata. Luật chơi, snap
 | High | Lifecycle hiện chưa ổn định | timer/callback cũ sửa round mới, leak sau đổi game | sửa Gate 0; mọi async qua shell scope/`roundId`; test mount/restart/switch 20 lần |
 | High | Tích hợp persistence làm mất hoặc ghi sai dữ liệu hai game cũ | mất tiến trình/tồn kho | thêm namespace `tripleConnect`; migration tương thích ngược; round-trip fixtures; rollback transaction |
 | High | Logic selector/shop/appearance hai nhánh mặc định sai game | mở sai menu, sai kho/theme | adapter registry và mapping catalog; không dùng `else => Memory/Link` |
-| High | Board nhiều lớp gây overlap/touch sai trên mobile | chọn nhầm thẻ, không chơi được | geometry thuần; hit target theo slot; kiểm 320x568, 390x844, landscape, safe area và thiết bị thật |
+| High | Board nhiều lớp gây overlap/touch sai trên mobile | chọn nhầm thẻ, không chơi được | geometry thuần; hit target theo slot; kiểm hai chuẩn `360x640`/`411x914` và chiều xoay tương ứng, safe area và thiết bị thật |
 | High | Race khi thẻ bay vào khay, nhóm/xóa ba và người dùng tap nhanh | duplicate/remove sai, thua giả | transaction lượt; khóa ngắn theo phase; kiểm `roundId`; ưu tiên resolve bộ ba trước overflow |
 | Medium | 60 ảnh DOM cùng shadow/animation và effect ba thẻ | drop frame, layout thrash | keyed patch; transform/opacity; đọc geometry theo batch; không dựng lại board khi HUD đổi; reduced motion |
 | Medium | Undo đưa thẻ lên trên làm thay đổi đồ thị che phủ | phá lời giải hoặc tạo exploit | chốt luật; ưu tiên khôi phục snapshot layer chính xác hoặc solver kiểm lại trạng thái |
 | Medium | Bundle đầu vào tăng vì import tĩnh game thứ ba | chậm tải lần đầu | dynamic import adapter Triple; CSS scope riêng; đo gzip ở mỗi gate |
 | Medium | 1.832 ảnh theme được index/copy | build và storage tăng | không nhân bản asset; chỉ tham chiếu manifest chung; lazy-load ảnh theo màn |
 
-## 5. Ba quyết định sản phẩm cần chốt trước khi viết luật
+## 5. Quyết định sản phẩm đã chốt trước khi viết luật
 
-1. **Khay mở rộng:** đề xuất ngưỡng thua là số ô đang hoạt động (7 bình thường, 10 sau khi mở rộng), sau khi ưu tiên resolve bộ ba. Nếu vẫn thua ở 7 thì vật phẩm mở rộng không có tác dụng thực tế.
-2. **Miss:** đề xuất lưu `streakType` và `streakCount` độc lập với việc tự nhóm khay. Chọn loại khác khi `streakCount` là 1 hoặc 2 tạo đúng một Miss rồi bắt đầu chuỗi mới; hoàn tất bộ ba đặt chuỗi về rỗng. Cần bổ sung bảng ví dụ cho `A-B-A`, `A-A-B-B-A`, và bộ ba hình thành từ thẻ đã có trong khay.
-3. **Hoàn tác:** đề xuất trả tile về đúng slot/layer và tính lại exposed state, không tự nâng lên trên cùng. Nếu slot không thể phục hồi hợp lệ thì từ chối Undo và không trừ vật phẩm. Cách “đặt lên trên” phải được solver coi là một phép đổi board nếu vẫn giữ.
+1. **Khay:** cố định 7 ô. Chưa có ba ô khóa, trạng thái 10 ô, vật phẩm Mở rộng khay hoặc field save dự phòng. Sau khi ưu tiên resolve bộ ba, đủ 7 thẻ còn lại trong khay là thua.
+2. **Miss:** lưu `streakType` và `streakCount` độc lập với việc tự nhóm khay. Chọn loại khác khi `streakCount` là 1 hoặc 2 tạo đúng một Miss rồi bắt đầu chuỗi mới; hoàn tất bộ ba đặt chuỗi về rỗng. Bảng ví dụ chuẩn nằm trong `Triple Connect.md`.
+3. **Hoàn tác:** phục hồi snapshot chính xác của lượt trước, gồm tile/slot/layer, cover graph, khay và trạng thái chuỗi liên quan; không tự nâng layer. Nếu snapshot không thể phục hồi hợp lệ thì từ chối và không trừ vật phẩm. Shuffle xóa lịch sử Undo.
 
 Các giá/mốc sao/tần suất lucky card có thể để sau vertical slice vì là tuning, không chặn kiến trúc lõi.
 
@@ -118,11 +122,13 @@ Các giá/mốc sao/tần suất lucky card có thể để sau vertical slice v
 
 ## 7. Kế hoạch triển khai theo gate
 
+> **Phần 7 là snapshot lịch sử, không dùng từng heading bên dưới làm prompt triển khai.** Số gate và ranh giới owner đã được thay thế bởi `TASK_TRIPLE_CONNECT_IMPLEMENTATION_PLAN.md`. Khi giao Terra, chỉ giao đúng một gate/sub-gate từ task plan hiện hành; nội dung phần này chỉ dùng để truy vết vì sao các rủi ro ban đầu được đặt ra.
+
 ### Gate 0 — Ổn định baseline
 
 1. Sửa contract gap Memory hoặc cập nhật contract nếu thay đổi CSS là chủ đích.
 2. Chẩn đoán và sửa pause/scope lifecycle; xác nhận mount/unmount/restart/switch.
-3. Chạy toàn bộ `npm run check`, audit, lifecycle, layout và visual hiện hữu ở bốn viewport.
+3. Sửa test geometry đang dùng sai `.game-shell` thay vì `.game-shell-root`, cập nhật layout assertion để hiểu compact regions bị ẩn, đồng bộ media query landscape `500px` còn sót với nguồn cấu hình `600px`, rồi chạy check/audit/lifecycle/layout/visual trên hai chuẩn thiết bị đã chốt.
 4. Lưu số đo build/DOM/heap hiện tại làm baseline.
 
 **Hoàn tất khi:** check xanh, test hiện hữu xanh, build web xanh và không có diff visual ngoài thay đổi đã duyệt.
@@ -177,10 +183,10 @@ Các giá/mốc sao/tần suất lucky card có thể để sau vertical slice v
 
 ### Gate 6 — Vật phẩm
 
-Thứ tự giảm rủi ro: Gợi ý -> Mở rộng khay -> Thêm thời gian -> Hoàn tác -> Xáo thẻ.
+Thứ tự giảm rủi ro: Gợi ý -> Thêm thời gian -> Hoàn tác -> Xáo thẻ. Mở rộng khay nằm ngoài phạm vi.
 
 1. Mỗi vật phẩm có command thuần, inventory transaction và test không trừ khi hành động thất bại.
-2. Hint chỉ đọc state; Expand là flag của round; Time không xuất hiện ở Endless.
+2. Hint chỉ đọc state; Time không xuất hiện ở Endless; không tạo flag/ID/UI/save field cho Mở rộng khay.
 3. Undo tuân theo quyết định ở mục 5 và có history giới hạn.
 4. Shuffle giữ multiset tile, xóa undo history, chạy solver và rollback nguyên trạng nếu không tạo được board hợp lệ.
 
@@ -202,19 +208,20 @@ Thứ tự giảm rủi ro: Gợi ý -> Mở rộng khay -> Thêm thời gian ->
 - Solver: deterministic seed, unsolvable input, timeout, duplicate states, shuffle, 60 thẻ.
 - Lifecycle: new/continue/replay/next/exit/switch/reload/background/resume, callback round cũ.
 - Persistence: dữ liệu V1.1a cũ, field thiếu/sai kiểu/âm/quá giới hạn, quota, tab conflict.
-- UI: 1024x900, 390x844, 320x568, 844x390; reduced motion; fullscreen; safe area; touch spam.
+- UI: hai chuẩn mobile đã chốt `360x640` và `411x914` ở portrait, cùng chiều xoay tương ứng `640x360` và `914x411`; reduced motion; fullscreen; safe area; touch spam. Không thêm profile thiết bị quá nhỏ ngoài hai chuẩn này nếu không có lỗi thực tế yêu cầu tái hiện.
 - Performance: tap/reducer/exposure/patch/solver/heap/bundle trên development và production.
 - Tích hợp: shop/collection/theme/effect/sound/Xu của cả ba game; Memory và Link regression.
 
 ## 9. Phạm vi hoãn
 
 - Thẻ đặc biệt và thẻ băng cho Triple.
+- Khay 10 ô và vật phẩm Mở rộng khay.
 - Biến thể luật/layer ngoài cấu hình đã duyệt.
 - Tối ưu native riêng nếu benchmark web chưa chứng minh nhu cầu.
 - Điều chỉnh giá/mốc sao/tần suất lucky trước khi có playtest.
 
 ## 10. Thứ tự thực hiện khuyến nghị
 
-`Gate 0 -> quyết định sản phẩm -> Gate 1 -> Gate 2 -> Gate 3 -> review vertical slice -> Gate 4 -> Gate 5 -> Gate 6 -> Gate 7`.
+Thứ tự cũ trong tài liệu đánh giá này được thay bằng thứ tự tại `TASK_TRIPLE_CONNECT_IMPLEMENTATION_PLAN.md`: `Gate 0 -> Gate 1 -> Gate 2 -> Gate 3 -> Gate 4 -> Gate 5 -> Gate 6 -> Gate 7A -> Gate 8 -> Gate 7B/7C`.
 
-Không mở game trong selector đại trà trước khi Gate 3 và Gate 4 cùng đạt. Không triển khai bàn 60 thẻ hoặc Shuffle trước khi solver có telemetry, timeout và corpus benchmark.
+Không mở game trong selector đại trà trước Gate 7C của task plan hiện hành và chưa có phê duyệt phát hành. Không triển khai bàn 60 thẻ hoặc Shuffle trước khi solver có telemetry, timeout và corpus benchmark.
