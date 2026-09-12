@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { GAME_SHELL_DEFAULTS as defaults, normalizeGameShellConfig as normalize, getGameShellCssVariables } from "../js/gameShell/gameShellConfig.js";
 
 assert.deepEqual(normalize(), defaults);
@@ -35,4 +36,11 @@ assert.equal(css["--shell-layers-hud"], "7");
 assert.equal(css["--shell-layout-content-max-width"], "700px");
 assert.equal(css["--shell-layout-compact-landscape-max-rows"], "6");
 assert.equal(css["--shell-hud-compact-landscape-width-ratio"], "0.9");
+for (const file of ["styles/hud.css", "styles/gameplay-ui.css"]) {
+  const source = readFileSync(file, "utf8");
+  assert.doesNotMatch(source, /orientation: landscape\) and \(height <= 500px\)/,
+    `${file}: compact landscape must use the shared 600px threshold`);
+  assert.match(source, /orientation: landscape\) and \(height <= 600px\)/,
+    `${file}: compact landscape rules must match the shared threshold`);
+}
 console.log("Game Shell defaults, overrides, validation and production fallback passed.");

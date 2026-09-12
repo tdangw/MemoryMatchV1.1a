@@ -41,7 +41,7 @@ async function start(page, id) {
   }, id), { message: `Expected active ${id} shell and lifecycle scope to match.` }).toBe(true);
 }
 
-test("DOM contract, stable refs and repeated 20-mount batches return to resource baseline", async ({ page }) => {
+test("DOM contract, stable refs and repeated 20-mount batches return to resource baseline", async ({ page }, testInfo) => {
   test.setTimeout(60000);
   const cdp = await page.context().newCDPSession(page);
   const counters = async () => {
@@ -49,7 +49,10 @@ test("DOM contract, stable refs and repeated 20-mount batches return to resource
     await page.waitForLoadState("networkidle");
     await cdp.send("HeapProfiler.collectGarbage");
     await cdp.send("HeapProfiler.collectGarbage");
-    return cdp.send("Memory.getDOMCounters");
+    return {
+      dom: await cdp.send("Memory.getDOMCounters"),
+      heap: await cdp.send("Runtime.getHeapUsage"),
+    };
   };
   const exit = () => page.evaluate(async () => (await import("/js/gameSelector.js")).showGameSelector());
   const runCycles = async (offset) => {
@@ -86,8 +89,13 @@ test("DOM contract, stable refs and repeated 20-mount batches return to resource
   await runCycles(20);
   await page.evaluate(() => { delete window.savedShellRefs; });
   const after = await counters();
-  expect(after.jsEventListeners).toBeLessThanOrEqual(baseline.jsEventListeners);
-  expect(after.nodes).toBeLessThanOrEqual(baseline.nodes);
+  expect(after.dom.jsEventListeners).toBeLessThanOrEqual(baseline.dom.jsEventListeners);
+  expect(after.dom.nodes).toBeLessThanOrEqual(baseline.dom.nodes);
+  expect(after.heap.usedSize).toBeLessThanOrEqual(baseline.heap.usedSize + 1024 * 1024);
+  await testInfo.attach("gate-0-resource-baseline.json", {
+    body: JSON.stringify({ baseline, after }, null, 2),
+    contentType: "application/json",
+  });
   expect(await page.locator('[id]').evaluateAll(elements => elements.map(e => e.id).filter((id, i, all) => all.indexOf(id) !== i))).toEqual([]);
   await cdp.detach();
 });

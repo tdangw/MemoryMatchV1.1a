@@ -42,6 +42,9 @@ async function settle(page) {
 async function assertFit(page, game) {
   const result = await page.evaluate(async game => {
     const root = document.querySelector(game.root);
+    if (!root?.classList.contains("game-shell-root")) {
+      throw new Error(`Missing required Game Shell root: ${game.root}`);
+    }
     const rect = element => {
       const { left, right, top, bottom, width, height } = element.getBoundingClientRect();
       return { left, right, top, bottom, width, height };
@@ -52,10 +55,20 @@ async function assertFit(page, game) {
     const hud = root.querySelector(".game-hud");
     const progress = root.querySelector(".game-progress-hud");
     const milestones = root.querySelector(".memory-special-hud, .link-special-hud");
+    const title = root.querySelector('[data-shell-region="title"]');
+    if (!frame || !board || !hud || !progress || !milestones || !title) {
+      throw new Error(`Missing required shell region for ${game.id}`);
+    }
     const timer = getComputedStyle(hud, "::after");
     const metrics = (await import("/js/gameShell/gameShellLayout.js")).getGameShellLayoutDiagnostics();
     return {
       frame: rect(frame), board: rect(board), hud: rect(hud), progress: rect(progress), milestones: rect(milestones),
+      compactLandscape: root.classList.contains("shell-compact-landscape"),
+      display: {
+        title: getComputedStyle(title).display,
+        progress: getComputedStyle(progress).display,
+        milestones: getComputedStyle(milestones).display,
+      },
       timerBottom: hud.getBoundingClientRect().bottom - (parseFloat(timer.bottom) || 0),
       tiles: [...board.querySelectorAll(game.tile)].map(rect),
       viewport: { width: viewport?.width ?? innerWidth, height: viewport?.height ?? innerHeight, left: viewport?.offsetLeft ?? 0, top: viewport?.offsetTop ?? 0 },
@@ -63,9 +76,17 @@ async function assertFit(page, game) {
     };
   }, game);
   expect(result.frame.width).toBeGreaterThan(0);
-  expect(result.progress.bottom).toBeLessThanOrEqual(result.hud.top + 1);
-  expect(result.timerBottom).toBeLessThanOrEqual(result.milestones.top + 1);
-  expect(result.milestones.bottom).toBeLessThanOrEqual(result.frame.top + 1);
+  if (result.compactLandscape) {
+    expect(result.display).toEqual({ title: "none", progress: "none", milestones: "none" });
+    expect(result.hud.bottom).toBeLessThanOrEqual(result.frame.top + 1);
+  } else {
+    expect(result.display.title).not.toBe("none");
+    expect(result.display.progress).not.toBe("none");
+    expect(result.display.milestones).not.toBe("none");
+    expect(result.progress.bottom).toBeLessThanOrEqual(result.hud.top + 1);
+    expect(result.timerBottom).toBeLessThanOrEqual(result.milestones.top + 1);
+    expect(result.milestones.bottom).toBeLessThanOrEqual(result.frame.top + 1);
+  }
   for (const bounds of [result.frame, result.board, ...result.tiles]) {
     expect(bounds.left).toBeGreaterThanOrEqual(result.viewport.left - 1);
     expect(bounds.right).toBeLessThanOrEqual(result.viewport.left + result.viewport.width + 1);

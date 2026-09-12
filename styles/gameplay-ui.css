@@ -602,7 +602,7 @@
   }
 }
 
-@media screen and (orientation: landscape) and (height <= 500px) {
+@media screen and (orientation: landscape) and (height <= 600px) {
 
   #game-title.game-header {
     max-width: none;
@@ -636,4 +636,3 @@
     font-size: 11px;
   }
 }
-

@@ -375,7 +375,7 @@
   }
 }
 
-@media screen and (orientation: landscape) and (height <= 500px) {
+@media screen and (orientation: landscape) and (height <= 600px) {
   #game-title.game-hud {
     min-height: var(--shell-hud-min-height);
     padding: 0 var(--shell-hud-side-padding);
@@ -562,7 +562,7 @@
   }
 }
 
-@media screen and (orientation: landscape) and (height <= 500px) {
+@media screen and (orientation: landscape) and (height <= 600px) {
   #game-title.game-header {
     padding: 5px 8px;
     margin-bottom: 5px;
@@ -819,7 +819,7 @@
 }
 
 /* A short landscape board must not squeeze inventory tools onto the stats. */
-@media screen and (orientation: landscape) and (height <= 500px) {
+@media screen and (orientation: landscape) and (height <= 600px) {
   #game-title.game-hud {
     min-width: min(var(--shell-hud-landscape-min-width), calc(100vw - 12px));
   }

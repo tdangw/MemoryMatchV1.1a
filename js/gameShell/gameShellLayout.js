@@ -51,8 +51,12 @@ export function getGameShellLayoutDiagnostics() {
 export function connectGameShellLayout({ root, frame, board, chrome, getShape, apply, ui = {}, onMeasure = () => {}, onCompactLandscapeChange = () => {} }) {
   const config = normalizeGameShellConfig(ui);
   activeConnection?.destroy();
+  diagnostics.maxPassesPerFrame = 0;
+  previousFrame = -1;
+  passesInFrame = 0;
   let alive = true;
   let pending = null;
+  let lastMeasurementTimestamp = null;
   let signature = "";
   let assetPasses = 0;
   let assetPending = false;
@@ -73,6 +77,13 @@ export function connectGameShellLayout({ root, frame, board, chrome, getShape, a
   function measureAndApply(timestamp) {
     pending = null;
     if (!alive || document.hidden || !root.isConnected || root.hidden || root.style.display === "none") return;
+    if (lastMeasurementTimestamp === timestamp) {
+      // A ResizeObserver callback can arrive in the same visual frame as the first
+      // layout write. Defer it so every pass measures stable post-CSS geometry.
+      schedule();
+      return;
+    }
+    lastMeasurementTimestamp = timestamp;
     if (assetPending) { assetPasses += 1; assetPending = false; }
     const visible = {
       width: viewport?.width ?? window.innerWidth,

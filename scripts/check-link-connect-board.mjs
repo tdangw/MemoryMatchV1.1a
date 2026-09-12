@@ -8,6 +8,7 @@ import {
   makeRandomLinkPairSpecial,
   removeLinkBoardPair,
   removeRandomLinkPair,
+  reflowLinkBoard,
   unlockAllFrozenLinkPairs,
   unlockAllFrozenLinkPairsAndEnsurePlayable,
   unlockFrozenLinkPairs,
@@ -65,6 +66,32 @@ const emptyPositionsAfterShuffle = board.grid.flatMap((row, rowIndex) => row.fla
     : []
 ))).sort();
 assert.deepEqual(emptyPositionsAfterShuffle, emptyPositionsBeforeShuffle);
+
+const reflowBoard = {
+  capacity: 12,
+  rows: 3,
+  columns: 4,
+  grid: [
+    Array(6).fill(null),
+    ...Array.from({ length: 3 }, (_, row) => [
+      null,
+      ...["a", "b", "c", "d", "b", "a", "e", "f", "c", "d", "f", "e"].slice(row * 4, row * 4 + 4).map((id, column) => ({
+        id,
+        instanceId: `reflow-${row}-${column}`,
+        frozen: false,
+      })),
+      null,
+    ]),
+    Array(6).fill(null),
+  ],
+};
+const reflowOrder = getRemainingLinkTiles(reflowBoard).map(tile => tile.instanceId);
+assert.equal(hasAvailableConnection(reflowBoard.grid), false);
+assert.equal(reflowLinkBoard(reflowBoard, 3), true);
+assert.deepEqual(getRemainingLinkTiles(reflowBoard).map(tile => tile.instanceId), reflowOrder,
+  "Topology reflow must not shuffle a running board.");
+assert.equal(reflowBoard.columns, 3);
+assert.equal(reflowBoard.rows, 4);
 
 const specialBoard = createLinkBoard({
   layout: { tileCount: 12, columns: 4 },
