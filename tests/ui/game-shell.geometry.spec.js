@@ -46,10 +46,17 @@ for (const game of [
       const timerStyle = hud ? getComputedStyle(hud, "::after") : null;
       return {
         viewport: { width: document.documentElement.clientWidth, height: document.documentElement.clientHeight },
+        compactLandscape: document.querySelector(".game-shell")?.classList.contains("shell-compact-landscape") ?? false,
         progress: rect(selectors.progress),
         hud: rect(selectors.hud),
         milestones: rect(selectors.milestones),
         board: rect(selectors.board),
+        progressDisplay: document.querySelector(selectors.progress)
+          ? getComputedStyle(document.querySelector(selectors.progress)).display
+          : null,
+        milestonesDisplay: document.querySelector(selectors.milestones)
+          ? getComputedStyle(document.querySelector(selectors.milestones)).display
+          : null,
         timerHeight: Number.parseFloat(timerStyle?.height || "0"),
         timerBottom: hud && timerStyle
           ? hud.getBoundingClientRect().bottom - Number.parseFloat(timerStyle.bottom || "0")
@@ -62,9 +69,14 @@ for (const game of [
     expect(geometry.milestones).not.toBeNull();
     expect(geometry.board).not.toBeNull();
     expect(geometry.timerHeight).toBeCloseTo(3, 5);
-    expect(geometry.progress.bottom).toBeLessThanOrEqual(geometry.hud.top + GEOMETRY_TOLERANCE_PX);
-    expect(geometry.timerBottom).toBeLessThanOrEqual(geometry.milestones.top + GEOMETRY_TOLERANCE_PX);
-    expect(geometry.milestones.bottom).toBeLessThanOrEqual(geometry.board.top + GEOMETRY_TOLERANCE_PX);
+    if (geometry.compactLandscape) {
+      expect(geometry.progressDisplay).toBe("none");
+      expect(geometry.milestonesDisplay).toBe("none");
+      expect(geometry.hud.bottom).toBeLessThanOrEqual(geometry.board.top + GEOMETRY_TOLERANCE_PX);
+    } else {
+      expect(geometry.progress.bottom).toBeLessThanOrEqual(geometry.hud.top + GEOMETRY_TOLERANCE_PX);
+      expect(geometry.milestones.bottom).toBeLessThanOrEqual(geometry.board.top + GEOMETRY_TOLERANCE_PX);
+    }
     expect(geometry.board.left).toBeGreaterThanOrEqual(-GEOMETRY_TOLERANCE_PX);
     expect(geometry.board.right).toBeLessThanOrEqual(geometry.viewport.width + GEOMETRY_TOLERANCE_PX);
     expect(geometry.board.bottom).toBeLessThanOrEqual(geometry.viewport.height + GEOMETRY_TOLERANCE_PX);
