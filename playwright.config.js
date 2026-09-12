@@ -32,9 +32,11 @@ export default defineConfig({
   },
   projects: Object.entries(viewports).map(([name, viewport]) => ({ name, use: { viewport } })),
   webServer: {
-    command: `npm run dev -- --host 127.0.0.1 --port ${testPort} --strictPort`,
+    command: `node ./node_modules/vite/bin/vite.js --host 127.0.0.1 --port ${testPort} --strictPort`,
     url: baseURL,
-    reuseExistingServer: !process.env.GAME_SHELL_TEST_PORT,
+    // Every test run owns a fresh Vite process. Reusing a developer server lets
+    // stale assets or a previous failed run leak into Gate verification.
+    reuseExistingServer: false,
     timeout: 30000,
     stdout: "ignore",
     stderr: "pipe",

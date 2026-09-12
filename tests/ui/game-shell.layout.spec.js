@@ -117,10 +117,16 @@ for (const game of games) {
     await start(page, game, "challenge", game.id === "memory-match", 100);
     const originalTiles = await page.locator(`${game.board} ${game.tile}`).elementHandles();
     await assertFit(page, game);
-    await page.setViewportSize({ width: 844, height: 390 });
+    await page.setViewportSize({ width: 640, height: 360 });
     await settle(page);
     await assertFit(page, game);
-    await page.setViewportSize({ width: 320, height: 568 });
+    await page.setViewportSize({ width: 360, height: 640 });
+    await settle(page);
+    await assertFit(page, game);
+    await page.setViewportSize({ width: 914, height: 411 });
+    await settle(page);
+    await assertFit(page, game);
+    await page.setViewportSize({ width: 411, height: 914 });
     await settle(page);
     await assertFit(page, game);
     await page.evaluate(() => { for (let i = 0; i < 50; i++) window.dispatchEvent(new Event("resize")); });

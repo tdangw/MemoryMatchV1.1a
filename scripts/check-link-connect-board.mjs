@@ -75,7 +75,7 @@ const reflowBoard = {
     Array(6).fill(null),
     ...Array.from({ length: 3 }, (_, row) => [
       null,
-      ...["a", "b", "c", "d", "b", "a", "e", "f", "c", "d", "f", "e"].slice(row * 4, row * 4 + 4).map((id, column) => ({
+      ...["c", "f", "b", "a", "b", "e", "f", "a", "d", "d", "e", "c"].slice(row * 4, row * 4 + 4).map((id, column) => ({
         id,
         instanceId: `reflow-${row}-${column}`,
         frozen: false,
@@ -86,12 +86,40 @@ const reflowBoard = {
   ],
 };
 const reflowOrder = getRemainingLinkTiles(reflowBoard).map(tile => tile.instanceId);
-assert.equal(hasAvailableConnection(reflowBoard.grid), false);
-assert.equal(reflowLinkBoard(reflowBoard, 3), true);
-assert.deepEqual(getRemainingLinkTiles(reflowBoard).map(tile => tile.instanceId), reflowOrder,
+const reflowGrid = reflowBoard.grid;
+assert.equal(hasAvailableConnection(reflowBoard.grid), true);
+assert.equal(reflowLinkBoard(reflowBoard, 3), false);
+assert.equal(reflowBoard.grid, reflowGrid, "Rejected topology must leave the running board untouched.");
+assert.deepEqual(getRemainingLinkTiles(reflowBoard).map(tile => tile.instanceId), reflowOrder);
+assert.equal(reflowBoard.columns, 4);
+assert.equal(reflowBoard.rows, 3);
+
+const playableReflowBoard = {
+  capacity: 12,
+  rows: 3,
+  columns: 4,
+  grid: [
+    Array(6).fill(null),
+    ...Array.from({ length: 3 }, (_, row) => [
+      null,
+      ...["f", "d", "a", "d", "e", "e", "b", "b", "a", "c", "f", "c"].slice(row * 4, row * 4 + 4).map((id, column) => ({
+        id,
+        instanceId: `playable-reflow-${row}-${column}`,
+        frozen: false,
+      })),
+      null,
+    ]),
+    Array(6).fill(null),
+  ],
+};
+const playableReflowOrder = getRemainingLinkTiles(playableReflowBoard).map(tile => tile.instanceId);
+assert.equal(hasAvailableConnection(playableReflowBoard.grid), true);
+assert.equal(reflowLinkBoard(playableReflowBoard, 3), true);
+assert.equal(hasAvailableConnection(playableReflowBoard.grid), true);
+assert.deepEqual(getRemainingLinkTiles(playableReflowBoard).map(tile => tile.instanceId), playableReflowOrder,
   "Topology reflow must not shuffle a running board.");
-assert.equal(reflowBoard.columns, 3);
-assert.equal(reflowBoard.rows, 4);
+assert.equal(playableReflowBoard.columns, 3);
+assert.equal(playableReflowBoard.rows, 4);
 
 const specialBoard = createLinkBoard({
   layout: { tileCount: 12, columns: 4 },

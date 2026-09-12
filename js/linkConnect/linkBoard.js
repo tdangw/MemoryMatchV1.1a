@@ -36,15 +36,18 @@ export function createLinkBoard({
   return board;
 }
 
-/** Repack existing tile instances for a new visual topology without changing gameplay state. */
+/** Repack only when the new topology preserves an available move. */
 export function reflowLinkBoard(board, columns) {
   if (!board || !Number.isInteger(columns) || columns < 1) return false;
   const capacity = Number.isInteger(board.capacity) ? board.capacity : board.rows * board.columns;
   if (capacity < 1 || capacity % columns !== 0 || board.columns === columns) return false;
   const tiles = getInteriorTiles(board);
+  const rows = capacity / columns;
+  const grid = createPaddedGrid(rows, columns, tiles);
+  if (!hasAvailableConnection(grid)) return false;
   board.columns = columns;
-  board.rows = capacity / columns;
-  board.grid = createPaddedGrid(board.rows, board.columns, tiles);
+  board.rows = rows;
+  board.grid = grid;
   return true;
 }
 
