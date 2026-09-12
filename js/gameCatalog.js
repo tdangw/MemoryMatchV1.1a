@@ -15,6 +15,13 @@ export const GAME_DEFINITIONS = Object.freeze([
     description: "Thử thách rèn luyện quan sát.",
     icon: "puzzle",
   }),
+  Object.freeze({
+    id: "triple-connect",
+    title: "Triple Connect",
+    description: "Thử thách ghép bộ ba nhiều lớp.",
+    icon: "puzzle",
+    released: false,
+  }),
 ]);
 
 export const GAME_MODES = Object.freeze([

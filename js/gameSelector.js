@@ -8,10 +8,10 @@ import { gameState } from "./gameState.js";
 import { getEquippedThemeId } from "./appearance.js";
 import { getTheme } from "./themeCatalog.js";
 import {
-  GAME_DEFINITIONS,
   getGameModeIcon,
   getGameModeLabel,
 } from "./gameCatalog.js";
+import { getGameNavigation, getReleasedGames, registerGameNavigation } from "./gameRegistry.js";
 import { createThemeSummary, UI_TIMING } from "./uiCatalog.js";
 import { LINK_CONNECT_HELP_CONTENT } from "./linkConnect/linkConfig.js";
 
@@ -49,7 +49,7 @@ export function showGameSelector() {
   );
   const choices = document.createElement("div");
   choices.className = "game-selector__choices";
-  GAME_DEFINITIONS.forEach((game) => {
+  getReleasedGames().forEach((game) => {
     choices.append(createGameChoice({
       ...game,
       onClick: () => openGameMenu(game.id),
@@ -61,16 +61,15 @@ export function showGameSelector() {
 }
 
 export function openGameMenu(gameId) {
+  const navigation = getGameNavigation(gameId);
+  if (!navigation) return false;
   unmountActiveGameShell();
   activeGameId = gameId;
   document.documentElement.dataset.activeGame = gameId;
   document.getElementById("menu-container")?.remove();
 
-  if (gameId === "memory-match") {
-    createMainMenu();
-    return;
-  }
-  createLinkConnectMenu();
+  navigation.openMenu();
+  return true;
 }
 
 export function createActiveGameMenu() {
@@ -258,3 +257,6 @@ function createMenuItem({ icon, text, detail, onClick, disabled = false }) {
   }
   return item;
 }
+
+registerGameNavigation("memory-match", createMainMenu);
+registerGameNavigation("link-connect", createLinkConnectMenu);
