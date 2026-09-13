@@ -38,6 +38,7 @@ test("Triple menu starts a visible playable board", async ({ page }) => {
   await page.goto("/");
   await page.locator(".game-selector__choice").filter({ hasText: "Triple Connect" }).click();
   await page.locator("#menu-container.triple-connect-menu .menu-item").filter({ hasText: "Bắt đầu" }).click();
+  await page.locator("#triple-difficulty-modal .difficulty-option").filter({ hasText: "Dễ" }).click();
   await expect(page.locator("#triple-connect-container")).toBeVisible();
   await expect(page.locator(".triple-connect__board .triple-connect__tile")).toHaveCount(12);
 });
