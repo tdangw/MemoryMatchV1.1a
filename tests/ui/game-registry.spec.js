@@ -2,12 +2,13 @@ import { expect, test } from "@playwright/test";
 
 test("registry exposes only released games in the selector", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator(".game-selector__choice")).toHaveCount(2);
+  await expect(page.locator(".game-selector__choice")).toHaveCount(3);
   await expect(page.locator(".game-selector__choice")).toHaveText([
     /Memory Match/,
     /Link Connect/,
+    /Triple Connect/,
   ]);
-  await expect(page.locator(".game-selector")).not.toContainText("Triple Connect");
+  await expect(page.locator(".game-selector")).toContainText("Triple Connect");
 });
 
 test("released game adapters still open their matching menus", async ({ page }) => {
@@ -25,15 +26,20 @@ test("released game adapters still open their matching menus", async ({ page }) 
   );
   expect(linkOpened).toBe(true);
   await expect(page.locator("#menu-container.link-connect-menu")).toHaveCount(1);
+
+  const tripleOpened = await page.evaluate(async () =>
+    (await import("/js/gameSelector.js")).openGameMenu("triple-connect"),
+  );
+  expect(tripleOpened).toBe(true);
+  await expect(page.locator("#menu-container.triple-connect-menu")).toHaveCount(1);
 });
 
-test("unreleased and unknown game IDs are rejected without a fallback menu", async ({ page }) => {
+test("unknown game IDs are rejected without a fallback menu", async ({ page }) => {
   await page.goto("/");
 
   const result = await page.evaluate(async () => {
     const { openGameMenu } = await import("/js/gameSelector.js");
     return {
-      triple: openGameMenu("triple-connect"),
       unknown: openGameMenu("unknown-game"),
       activeGame: document.documentElement.dataset.activeGame || null,
       selectorPresent: Boolean(document.querySelector(".game-selector")),
@@ -42,7 +48,6 @@ test("unreleased and unknown game IDs are rejected without a fallback menu", asy
   });
 
   expect(result).toEqual({
-    triple: false,
     unknown: false,
     activeGame: "selector",
     selectorPresent: true,

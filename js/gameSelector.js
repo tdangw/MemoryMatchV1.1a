@@ -20,17 +20,20 @@ let onStartLinkConnect = () => {};
 let onOpenLinkCollection = () => {};
 let onOpenLinkShop = () => {};
 let onContinueLinkConnect = () => {};
+let onStartTripleConnect = () => {};
 
 export function configureGameSelector({
   startLinkConnect,
   openLinkCollection,
   openLinkShop,
   continueLinkConnect,
+  startTripleConnect,
 } = {}) {
   onStartLinkConnect = startLinkConnect || onStartLinkConnect;
   onOpenLinkCollection = openLinkCollection || onOpenLinkCollection;
   onOpenLinkShop = openLinkShop || onOpenLinkShop;
   onContinueLinkConnect = continueLinkConnect || onContinueLinkConnect;
+  onStartTripleConnect = startTripleConnect || onStartTripleConnect;
 }
 
 export function showGameSelector() {
@@ -142,6 +145,21 @@ function createLinkConnectMenu() {
       text: "Home",
       onClick: showGameSelector,
     }),
+  );
+  wrapper.append(menuList);
+  overlay.append(wrapper);
+  document.body.append(overlay);
+}
+
+function createTripleConnectMenu() {
+  const overlay = createMenuOverlay("triple-connect-menu");
+  const wrapper = createMenuWrapper("Triple Connect", "Ghép ba thẻ lộ để dọn sạch bàn chơi.");
+  const menuList = document.createElement("ul");
+  menuList.className = "menu-list";
+  menuList.append(
+    createMenuItem({ icon: "play", text: "Bắt đầu", onClick: onStartTripleConnect }),
+    createMenuItem({ icon: "book", text: "Hướng dẫn", onClick: () => showGameInfoModal("Cách chơi Triple Connect", "<p>Chọn các thẻ đang lộ để ghép bộ ba. Khay có tối đa 7 ô.</p>", "book") }),
+    createMenuItem({ icon: "home", text: "Home", onClick: showGameSelector }),
   );
   wrapper.append(menuList);
   overlay.append(wrapper);
@@ -260,3 +278,4 @@ function createMenuItem({ icon, text, detail, onClick, disabled = false }) {
 
 registerGameNavigation("memory-match", createMainMenu);
 registerGameNavigation("link-connect", createLinkConnectMenu);
+registerGameNavigation("triple-connect", createTripleConnectMenu);

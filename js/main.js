@@ -41,6 +41,7 @@ import {
 } from "./gameController.js";
 import { registerProgressiveWebApp } from "./pwa.js";
 import { initializeMeteorEffects } from "./backgroundEffects.js";
+import { startTripleConnectRound } from "./tripleConnect/tripleController.js";
 
 document.documentElement.dataset.buildTarget =
   import.meta.env.MODE === "android" ? "android" : "web";
@@ -66,6 +67,7 @@ configureGameSelector({
   continueLinkConnect: (session) => continueLinkSession(session),
   openLinkCollection: (onClose) => showCollectionModal({ gameId: "link-connect", onClose }),
   openLinkShop: () => openShopOverlay({ fromMenu: true, gameId: "link-connect" }),
+  startTripleConnect: () => startTripleConnectRound({ seed: `triple-${Date.now()}` }),
 });
 configureLinkController({
   showMenu: () => openGameMenu("link-connect"),
@@ -127,17 +129,7 @@ document.addEventListener(
 
 window.onload = () => {
   showGameSelector();
-  if (import.meta.env.DEV) installTripleDevelopmentLauncher();
 };
-
-async function installTripleDevelopmentLauncher() {
-  const { startTripleConnectDevelopmentRound } = await import("./tripleConnect/tripleController.js");
-  const launcher = document.createElement("div");
-  launcher.id = "triple-development-launcher";
-  launcher.innerHTML = `<label>Triple dev <select><option value="easy">Easy</option><option value="normal">Normal</option><option value="hard">Hard</option><option value="superHard">SuperHard</option><option value="endless">Endless</option></select></label><button type="button">Mở Triple test</button>`;
-  launcher.querySelector("button").onclick = () => startTripleConnectDevelopmentRound({ mode: launcher.querySelector("select").value, seed: `manual-${Date.now()}` });
-  document.body.append(launcher);
-}
 
 document
   .getElementById("btn-game-settings")

@@ -4,7 +4,7 @@ for (const viewport of [{ width: 360, height: 640 }, { width: 411, height: 914 }
   test(`Triple development slice keeps one keyed board at ${viewport.width}x${viewport.height}`, async ({ page }) => {
     await page.setViewportSize(viewport);
     await page.goto("/");
-    await expect(page.locator(".game-selector__choice")).toHaveCount(2);
+    await expect(page.locator(".game-selector__choice")).toHaveCount(3);
     await page.evaluate(async () => (await import("/js/tripleConnect/tripleController.js")).startTripleConnectDevelopmentRound({ seed: "ui" }));
     await expect(page.locator("#triple-connect-container")).toBeVisible();
     await expect(page.locator(".triple-connect__board .triple-connect__tile")).toHaveCount(12);

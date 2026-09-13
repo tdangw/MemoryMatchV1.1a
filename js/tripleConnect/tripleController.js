@@ -20,6 +20,10 @@ let remainingTime = 0;
 
 export function startTripleConnectDevelopmentRound({ seed = "triple-dev", mode = "easy" } = {}) {
   if (!development) throw new Error("Triple Connect development hook is unavailable in production.");
+  return startTripleConnectRound({ seed, mode });
+}
+
+export function startTripleConnectRound({ seed = "triple-round", mode = "easy" } = {}) {
   const generators = { easy: generateEasyTripleBoard, normal: generateNormalTripleBoard, hard: generateHardTripleBoard, superHard: generateSuperHardTripleBoard, endless: generateEndlessTripleBoard };
   const generate = generators[mode];
   if (!generate) throw new TypeError(`Unsupported Triple development mode: ${mode}`);
@@ -43,6 +47,7 @@ export function continueTripleConnectDevelopmentRound({ mode = "easy" } = {}) {
 }
 
 function mountTripleDevelopmentRound(generated) {
+  document.getElementById("menu-container")?.remove();
   const shell = getTripleShell();
   const scope = shell.mount();
   presenting = false;

@@ -21,7 +21,7 @@ export const GAME_DEFINITIONS = Object.freeze([
     title: "Triple Connect",
     description: "Thử thách ghép bộ ba nhiều lớp.",
     icon: "puzzle",
-    released: false,
+    released: true,
   }),
 ]);
 
