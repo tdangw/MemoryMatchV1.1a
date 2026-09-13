@@ -1,0 +1,12 @@
+.triple-connect-game { width: min(100%, 700px); min-height: 100dvh; display: grid; grid-template-rows: auto auto auto 1fr; gap: 8px; box-sizing: border-box; padding: 10px; }
+.triple-connect__title,.triple-connect__progress,.triple-connect__hud { background:#fff; border-radius:10px; padding:8px; text-align:center; }
+.triple-connect__progress { display:flex; justify-content:center; gap:10px; flex-wrap:wrap; }
+.triple-connect__milestones { display:none; }
+.triple-connect__frame { min-height:0; display:grid; }
+.triple-connect__surface { min-height:0; display:grid; grid-template-rows:1fr auto; gap:10px; }
+.triple-connect__board { position:relative; min-height:260px; border-radius:12px; background:rgb(255 255 255 / .82); overflow:hidden; }
+.triple-connect__tile { min-width:44px; min-height:44px; border:1px solid #496; border-radius:8px; background:#eaffee; }
+.triple-connect__board .triple-connect__tile { position:absolute; width:20%; aspect-ratio:1; left:calc(var(--x) * 100%); top:calc(var(--y) * 100%); transform:translate(-0%, -0%); }
+.triple-connect__tile:disabled { opacity:.55; pointer-events:none; }
+.triple-connect__tray { min-height:48px; display:flex; gap:4px; align-items:center; overflow:hidden; }
+.triple-connect__tray .triple-connect__tile { flex:0 1 14.28%; }
