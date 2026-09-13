@@ -60,11 +60,11 @@ function generateBoard({ seed, maxAttempts = TRIPLE_EASY_GENERATOR_BUDGET.maxAtt
       seed: `${normalizedSeed}:${attempt}`,
       layout, config,
     });
-    const solved = solveTripleBoard({ board: candidate.board, preferredWitness: candidate.witness, ...solverOptions });
+    const solved = solveTripleBoard({ board: candidate.board, preferredWitness: candidate.witness, now: () => 0, ...solverOptions });
     if (solved.status === "solved") return freezeGeneratedBoard({ ...candidate, witness: solved.witness, source: "generated" });
   }
   const fallback = buildSolutionFirstBoard({ seed: TRIPLE_EASY_FALLBACK_SEED, layout, config });
-  const solvedFallback = solveTripleBoard({ board: fallback.board, preferredWitness: fallback.witness, ...solverOptions });
+  const solvedFallback = solveTripleBoard({ board: fallback.board, preferredWitness: fallback.witness, now: () => 0, ...solverOptions });
   if (solvedFallback.status !== "solved") {
     throw new Error(`Triple fallback corpus failed solver validation: ${solvedFallback.status}`);
   }

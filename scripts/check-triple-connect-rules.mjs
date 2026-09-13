@@ -111,6 +111,7 @@ let win = makeState({ a: 3 });
 for (const tileId of ["a-1", "a-2", "a-3"]) win = select(win, tileId).nextState;
 assert.equal(win.status, "won");
 assert.equal(win.tray.length, 0);
+assert.equal(reduceTripleCommand(win, { type: "undo" }).result.reason, "round-not-playing");
 assert.deepEqual(getTripleHintTileIds(grouped), ["a-3", "b-2"]);
 
 const persisted = serializeTripleRoundState(matched.nextState);

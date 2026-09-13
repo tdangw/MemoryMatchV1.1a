@@ -48,7 +48,7 @@ function mountTripleDevelopmentRound(generated) {
   presenting = false;
   renderer ||= createTripleRenderer(shell);
   const render = (roundState) => {
-    renderer.render(roundState, currentLayout, { hint: getTripleItemCount("hint"), time: getTripleItemCount("time") });
+    renderer.render(roundState, currentLayout, { hint: getTripleItemCount("hint"), time: getTripleItemCount("time"), undo: getTripleItemCount("undo") });
     updateTimer(shell);
   };
   render(state);
@@ -80,6 +80,14 @@ function mountTripleDevelopmentRound(generated) {
   scope.listen(timeButton, "click", () => {
     if (presenting || state.status !== "playing" || currentMode === "endless" || !consumeTripleItem("time")) return;
     remainingTime += 1;
+    render(state);
+    saveSession();
+  });
+  scope.listen(shell.refs.root.querySelector('[data-triple-item="undo"]'), "click", () => {
+    if (presenting || state.status !== "playing") return;
+    const transition = reduceTripleCommand(state, { type: "undo" });
+    if (!transition.result.ok || !consumeTripleItem("undo")) return;
+    state = transition.nextState;
     render(state);
     saveSession();
   });

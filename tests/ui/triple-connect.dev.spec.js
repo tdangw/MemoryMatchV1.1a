@@ -56,3 +56,17 @@ test("Triple timers count down normally and up in Endless", async ({ page }) => 
   });
   await expect(page.locator("[data-triple-timer]")).toHaveText("00:01", { timeout: 2500 });
 });
+
+test("Triple Undo restores the exact last stable selection", async ({ page }) => {
+  await page.goto("/");
+  await page.evaluate(async () => {
+    const controller = await import("/js/tripleConnect/tripleController.js");
+    const { grantTripleItem } = await import("/js/tripleConnect/tripleItems.js");
+    controller.startTripleConnectDevelopmentRound({ seed: "undo" });
+    grantTripleItem("undo");
+    document.querySelector(".triple-connect__board .triple-connect__tile:not(:disabled)").click();
+  });
+  await expect(page.locator(".triple-connect__tray .triple-connect__tile")).toHaveCount(1);
+  await page.evaluate(() => document.querySelector('[data-triple-item="undo"]').click());
+  await expect(page.locator(".triple-connect__tray .triple-connect__tile")).toHaveCount(0);
+});
