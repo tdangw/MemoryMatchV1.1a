@@ -128,6 +128,34 @@ export function restoreTripleStateSnapshot(snapshot, undoHistory) {
   return freezeState(state);
 }
 
+export function serializeTripleRoundState(state) {
+  const snapshot = createTripleStateSnapshot(state);
+  return {
+    version: 1,
+    roundId: snapshot.roundId,
+    status: snapshot.status,
+    tiles: Object.values(snapshot.tiles),
+    layers: snapshot.layers,
+    coverGraph: snapshot.coverGraph,
+    tray: snapshot.tray,
+    streakType: snapshot.streakType,
+    streakCount: snapshot.streakCount,
+    combo: snapshot.combo,
+    misses: snapshot.misses,
+    moves: snapshot.moves,
+    score: snapshot.score,
+    matchedTriples: snapshot.matchedTriples,
+    initialTileCount: snapshot.initialTileCount,
+  };
+}
+
+export function restoreSerializedTripleRoundState(snapshot) {
+  if (!snapshot || snapshot.version !== 1 || !Array.isArray(snapshot.tiles)) throw new TypeError("Triple snapshot is invalid.");
+  const tiles = Object.fromEntries(snapshot.tiles.map(tile => [tile?.id, tile]));
+  if (Object.keys(tiles).length !== snapshot.tiles.length) throw new TypeError("Triple snapshot has duplicate tiles.");
+  return restoreTripleStateSnapshot({ ...snapshot, tiles }, []);
+}
+
 function normalizeTiles(tiles) {
   if (!Array.isArray(tiles)) throw new TypeError("Triple round requires a tile array.");
   const result = {};

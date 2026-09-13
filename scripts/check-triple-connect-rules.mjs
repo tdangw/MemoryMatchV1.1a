@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import { calculateTripleMatchScore, TRIPLE_EASY_CONFIG, TRIPLE_RULES } from "../js/tripleConnect/tripleConfig.js";
 import { reduceTripleCommand } from "../js/tripleConnect/tripleRules.js";
-import { createTripleRoundState, getExposedTileIds } from "../js/tripleConnect/tripleState.js";
+import { createTripleRoundState, getExposedTileIds, restoreSerializedTripleRoundState, serializeTripleRoundState } from "../js/tripleConnect/tripleState.js";
+import { gameState, hydrateGameState } from "../js/gameState.js";
 
 function makeState(typeCounts, coverGraph = {}) {
   const tiles = [];
@@ -104,5 +105,12 @@ let win = makeState({ a: 3 });
 for (const tileId of ["a-1", "a-2", "a-3"]) win = select(win, tileId).nextState;
 assert.equal(win.status, "won");
 assert.equal(win.tray.length, 0);
+
+const persisted = serializeTripleRoundState(matched.nextState);
+assert.equal(Object.hasOwn(persisted, "undoHistory"), false);
+assert.deepEqual(restoreSerializedTripleRoundState(persisted), restoreSerializedTripleRoundState(persisted));
+assert.throws(() => restoreSerializedTripleRoundState({ ...persisted, tiles: persisted.tiles.slice(1) }));
+hydrateGameState({ progress: { tripleConnect: { sessionsByMode: { easy: { mode: "easy", level: 1, snapshot: { ...persisted, tray: ["missing"] } } } } } });
+assert.deepEqual(gameState.progress.tripleConnect.sessionsByMode, {}, "Invalid Triple saves must not reach runtime state.");
 
 console.log("Triple Connect pure rules and state contracts passed.");

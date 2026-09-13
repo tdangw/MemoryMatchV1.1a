@@ -1,9 +1,10 @@
 import { generateEasyTripleBoard } from "./tripleBoard.js";
 import { reduceTripleCommand } from "./tripleRules.js";
-import { createTripleRoundState } from "./tripleState.js";
+import { createTripleRoundState, restoreSerializedTripleRoundState, serializeTripleRoundState } from "./tripleState.js";
 import { createTripleRenderer } from "./tripleRenderer.js";
 import { getTripleShell } from "./tripleShell.js";
 import { presentTripleTransition } from "./triplePresentation.js";
+import { getActiveSession, saveActiveSession } from "../sessionProgress.js";
 
 const development = import.meta.env?.DEV === true;
 let state = null;
@@ -14,6 +15,18 @@ export function startTripleConnectDevelopmentRound({ seed = "triple-dev" } = {})
   if (!development) throw new Error("Triple Connect development hook is unavailable in production.");
   const generated = generateEasyTripleBoard({ seed });
   state = createTripleRoundState(generated.board);
+  return mountTripleDevelopmentRound(generated);
+}
+
+export function continueTripleConnectDevelopmentRound() {
+  if (!development) throw new Error("Triple Connect development hook is unavailable in production.");
+  const session = getActiveSession("triple-connect", "easy");
+  if (!session?.snapshot) return null;
+  state = restoreSerializedTripleRoundState(session.snapshot);
+  return mountTripleDevelopmentRound({ seed: "restored", board: null, witness: [] });
+}
+
+function mountTripleDevelopmentRound(generated) {
   const shell = getTripleShell();
   const scope = shell.mount();
   presenting = false;
@@ -28,7 +41,11 @@ export function startTripleConnectDevelopmentRound({ seed = "triple-dev" } = {})
     state = transition.nextState;
     presenting = transition.events.some(event => event.type === "triple-resolved");
     presentTripleTransition({ shell, scope, previous, next: state, events: transition.events, render: renderer.render })
-      .finally(() => { if (scope.active) presenting = false; });
+      .finally(() => {
+        if (!scope.active) return;
+        presenting = false;
+        saveActiveSession("triple-connect", { mode: "easy", level: 1, snapshot: serializeTripleRoundState(state) });
+      });
   });
   return { generated, getState: () => state, shell };
 }

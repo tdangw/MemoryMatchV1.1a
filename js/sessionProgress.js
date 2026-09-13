@@ -31,6 +31,14 @@ export function stageActiveSession(gameId, session) {
   const key = getGameProgressKey(gameId);
   if (!key || !session?.mode) return false;
   gameState.progress[key].sessionsByMode ||= {};
+  if (gameId === "triple-connect" && session.snapshot) {
+    gameState.progress[key].sessionsByMode[session.mode] = {
+      mode: session.mode,
+      level: Math.max(1, Math.floor(session.level || 1)),
+      snapshot: session.snapshot,
+    };
+    return true;
+  }
   gameState.progress[key].sessionsByMode[session.mode] = {
     mode: session.mode,
     level: Math.max(1, Math.floor(session.level || 1)),

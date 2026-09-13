@@ -3,6 +3,7 @@ import { GAME_CONFIG } from "./config.js";
 import { normalizeAppearance } from "./appearance.js";
 import { GAMEPLAY_LIMITS } from "./gameplayTuning.js";
 import { GAME_MODES } from "./gameCatalog.js";
+import { restoreSerializedTripleRoundState, serializeTripleRoundState } from "./tripleConnect/tripleState.js";
 
 const GAME_MODE_IDS = new Set(GAME_MODES.map(({ id }) => id));
 
@@ -44,6 +45,12 @@ export const gameState = {
       totalScore: 0,
       bestByLevel: {},
       items: { hint: 0, reshuffle: 0, thunder: 0, freeze: 0 },
+    },
+    tripleConnect: {
+      totalStars: 0,
+      totalScore: 0,
+      bestByLevel: {},
+      sessionsByMode: {},
     },
   },
   appearance: normalizeAppearance(),
@@ -98,6 +105,13 @@ export function hydrateGameState({
       freeze: normalizeItemCount(linkItems.freeze),
     },
     sessionsByMode: normalizeSessions(linkConnect.sessionsByMode, linkConnect.activeSession),
+  };
+  const tripleConnect = progress?.tripleConnect || {};
+  gameState.progress.tripleConnect = {
+    totalStars: normalizeNonNegativeInteger(tripleConnect.totalStars),
+    totalScore: normalizeNonNegativeInteger(tripleConnect.totalScore),
+    bestByLevel: normalizeBestByLevel(tripleConnect.bestByLevel),
+    sessionsByMode: normalizeTripleSessions(tripleConnect.sessionsByMode),
   };
   gameState.settings = normalizeSettings(settings, gameState.settings);
   gameState.appearance = normalizeAppearance(appearance);
@@ -178,6 +192,17 @@ function normalizeSettings(value, fallback) {
     boardCoordinates: typeof source.boardCoordinates === "boolean" ? source.boardCoordinates : fallback.boardCoordinates,
     cardDescriptions: typeof source.cardDescriptions === "boolean" ? source.cardDescriptions : fallback.cardDescriptions,
   };
+}
+
+function normalizeTripleSessions(sessions) {
+  const source = sessions && typeof sessions === "object" ? sessions : {};
+  return Object.fromEntries(Object.entries(source).flatMap(([mode, session]) => {
+    if (!GAME_MODE_IDS.has(mode) || !session || typeof session !== "object") return [];
+    try {
+      const snapshot = serializeTripleRoundState(restoreSerializedTripleRoundState(session.snapshot));
+      return [[mode, { mode, level: Math.max(1, normalizeNonNegativeInteger(session.level) || 1), snapshot }]];
+    } catch { return []; }
+  }));
 }
 
 function normalizeNonNegativeInteger(value) {
