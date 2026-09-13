@@ -54,10 +54,12 @@ export function assertTripleStateInvariant(state) {
 
   const locations = { board: 0, tray: 0, removed: 0 };
   const types = new Map();
+  const slotIds = new Set();
   for (const [tileId, tile] of Object.entries(tiles)) {
-    if (!tile || tile.id !== tileId || !tile.type || !LOCATIONS.has(tile.location)) {
+    if (!tile || tile.id !== tileId || !tile.type || !tile.slotId || slotIds.has(tile.slotId) || !LOCATIONS.has(tile.location)) {
       throw new TypeError("Triple state contains an invalid tile.");
     }
+    slotIds.add(tile.slotId);
     locations[tile.location] += 1;
     types.set(tile.type, (types.get(tile.type) || 0) + 1);
     if ((tile.location === "tray") !== trayIds.has(tile.id)) {
