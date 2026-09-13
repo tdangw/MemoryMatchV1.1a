@@ -52,6 +52,12 @@ const normalSlots = (layer, count, y) => Array.from({ length: count }, (_, index
 export const TRIPLE_NORMAL_LAYOUT = Object.freeze({ id: "normal-24-v1", tileWidth: .2, tileHeight: .22, overlapEpsilon: .000001,
   slots: Object.freeze([...normalSlots(0, 12, .08), ...normalSlots(1, 8, .18), ...normalSlots(2, 4, .3)]),
 });
+export const TRIPLE_HARD_CONFIG = Object.freeze({ mode: "hard", tileCount: 36, layerCount: 4, timeSeconds: 120 });
+export const TRIPLE_HARD_SOLVER_BUDGET = Object.freeze({ maxNodes: 50000, maxMemo: 20000, deadlineMs: 100 });
+const hardSlots = (layer, count, y) => Array.from({ length: count }, (_, index) => Object.freeze({ id: `hard-${layer}-${index + 1}`, layer, x: .03 + (index % 6) * .16, y: y + Math.floor(index / 6) * .18 }));
+export const TRIPLE_HARD_LAYOUT = Object.freeze({ id: "hard-36-v1", tileWidth: .15, tileHeight: .17, overlapEpsilon: .000001,
+  slots: Object.freeze([...hardSlots(0, 18, .05), ...hardSlots(1, 9, .14), ...hardSlots(2, 6, .25), ...hardSlots(3, 3, .36)]),
+});
 
 export function calculateTripleMatchScore(combo) {
   const normalizedCombo = Math.max(1, Math.floor(Number(combo) || 0));

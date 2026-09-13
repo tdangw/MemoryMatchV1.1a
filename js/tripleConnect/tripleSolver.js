@@ -8,6 +8,7 @@ export function solveTripleBoard({
   maxMemo = TRIPLE_EASY_SOLVER_BUDGET.maxMemo,
   deadlineMs = TRIPLE_EASY_SOLVER_BUDGET.deadlineMs,
   now = defaultNow,
+  preferredWitness = [],
 } = {}) {
   const limits = validateLimits({ maxNodes, maxMemo, deadlineMs, now });
   let initialState;
@@ -21,7 +22,7 @@ export function solveTripleBoard({
   let nodes = 0;
   let timedOut = false;
 
-  function search(state) {
+  function search(state, depth = 0) {
     if (limits.now() > deadline || nodes >= limits.maxNodes) {
       timedOut = true;
       return null;
@@ -32,11 +33,11 @@ export function solveTripleBoard({
     const key = createTripleSolverKey(state);
     if (memo.has(key)) return null;
     if (memo.size < limits.maxMemo) memo.add(key);
-    for (const tileId of orderMoves(state)) {
+    for (const tileId of orderMoves(state, preferredWitness[depth]?.tileId)) {
       const command = Object.freeze({ type: "select-tile", tileId });
       const transition = reduceTripleCommand(state, command);
       if (!transition.result.ok) continue;
-      const suffix = search(transition.nextState);
+      const suffix = search(transition.nextState, depth + 1);
       if (suffix) return [command, ...suffix];
       if (timedOut) return null;
     }
@@ -53,7 +54,7 @@ export function createTripleSolverKey(state) {
   return `${Object.keys(state.tiles).sort().map(id => `${id}:${state.tiles[id].location}`).join("|")};${state.tray.join(",")}`;
 }
 
-function orderMoves(state) {
+function orderMoves(state, preferredTileId) {
   const trayTypeCounts = state.tray.reduce((counts, tileId) => {
     const type = state.tiles[tileId].type;
     counts.set(type, (counts.get(type) || 0) + 1);
@@ -62,7 +63,7 @@ function orderMoves(state) {
   return getExposedTileIds(state).sort((left, right) => {
     const leftCount = trayTypeCounts.get(state.tiles[left].type) || 0;
     const rightCount = trayTypeCounts.get(state.tiles[right].type) || 0;
-    return rightCount - leftCount || left.localeCompare(right);
+    return Number(right === preferredTileId) - Number(left === preferredTileId) || rightCount - leftCount || left.localeCompare(right);
   });
 }
 

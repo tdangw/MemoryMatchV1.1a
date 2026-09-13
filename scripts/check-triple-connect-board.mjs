@@ -5,6 +5,7 @@ import {
   createTripleCoverGraph,
   generateEasyTripleBoard,
   generateNormalTripleBoard,
+  generateHardTripleBoard,
   getEasyTripleLayout,
   replayTripleWitness,
 } from "../js/tripleConnect/tripleBoard.js";
@@ -91,5 +92,17 @@ for (let index = 0; index < 100; index += 1) {
 normalTimings.sort((left, right) => left - right);
 const normalP95 = normalTimings[Math.ceil(normalTimings.length * .95) - 1];
 assert.ok(normalP95 <= 100, `Normal generator + solver p95 ${normalP95.toFixed(2)} ms exceeded 100 ms.`);
+
+const hardTimings = [];
+for (let index = 0; index < 30; index += 1) {
+  const startedAt = performance.now();
+  const hard = generateHardTripleBoard({ seed: `hard-${index}` });
+  hardTimings.push(performance.now() - startedAt);
+  assert.equal(hard.board.tiles.length, 36);
+  assert.equal(replayTripleWitness(hard.board, hard.witness).ok, true);
+}
+hardTimings.sort((left, right) => left - right);
+const hardP95 = hardTimings[Math.ceil(hardTimings.length * .95) - 1];
+assert.ok(hardP95 <= 100, `Hard generator + solver p95 ${hardP95.toFixed(2)} ms exceeded 100 ms.`);
 
 console.log(`Triple Connect Easy board and solver contracts passed (p95 ${p95.toFixed(2)} ms).`);
