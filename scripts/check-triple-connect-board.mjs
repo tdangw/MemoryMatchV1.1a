@@ -4,6 +4,7 @@ import { performance } from "node:perf_hooks";
 import {
   createTripleCoverGraph,
   generateEasyTripleBoard,
+  generateNormalTripleBoard,
   getEasyTripleLayout,
   replayTripleWitness,
 } from "../js/tripleConnect/tripleBoard.js";
@@ -78,5 +79,17 @@ const coreSources = await Promise.all([
   readFile(new URL("../js/tripleConnect/tripleSolver.js", import.meta.url), "utf8"),
 ]);
 assert.equal(coreSources.some(source => source.includes("Math.random")), false, "Triple core randomness must be seeded.");
+
+const normalTimings = [];
+for (let index = 0; index < 100; index += 1) {
+  const startedAt = performance.now();
+  const normal = generateNormalTripleBoard({ seed: `normal-${index}` });
+  normalTimings.push(performance.now() - startedAt);
+  assert.equal(normal.board.tiles.length, 24);
+  assert.equal(replayTripleWitness(normal.board, normal.witness).ok, true);
+}
+normalTimings.sort((left, right) => left - right);
+const normalP95 = normalTimings[Math.ceil(normalTimings.length * .95) - 1];
+assert.ok(normalP95 <= 100, `Normal generator + solver p95 ${normalP95.toFixed(2)} ms exceeded 100 ms.`);
 
 console.log(`Triple Connect Easy board and solver contracts passed (p95 ${p95.toFixed(2)} ms).`);

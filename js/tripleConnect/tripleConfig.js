@@ -45,6 +45,14 @@ export const TRIPLE_EASY_GENERATOR_BUDGET = Object.freeze({
 
 export const TRIPLE_EASY_FALLBACK_SEED = "triple-easy-v1-fallback";
 
+export const TRIPLE_NORMAL_CONFIG = Object.freeze({ mode: "normal", tileCount: 24, layerCount: 3, timeSeconds: 90 });
+const normalSlots = (layer, count, y) => Array.from({ length: count }, (_, index) => Object.freeze({
+  id: `normal-${layer}-${index + 1}`, layer, x: .04 + (index % 4) * .24, y: y + Math.floor(index / 4) * .23,
+}));
+export const TRIPLE_NORMAL_LAYOUT = Object.freeze({ id: "normal-24-v1", tileWidth: .2, tileHeight: .22, overlapEpsilon: .000001,
+  slots: Object.freeze([...normalSlots(0, 12, .08), ...normalSlots(1, 8, .18), ...normalSlots(2, 4, .3)]),
+});
+
 export function calculateTripleMatchScore(combo) {
   const normalizedCombo = Math.max(1, Math.floor(Number(combo) || 0));
   return TRIPLE_RULES.baseMatchScore + (normalizedCombo - 1) * TRIPLE_RULES.comboScoreStep;

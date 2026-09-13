@@ -3,6 +3,8 @@ import {
   TRIPLE_EASY_FALLBACK_SEED,
   TRIPLE_EASY_GENERATOR_BUDGET,
   TRIPLE_EASY_LAYOUT,
+  TRIPLE_NORMAL_CONFIG,
+  TRIPLE_NORMAL_LAYOUT,
 } from "./tripleConfig.js";
 import { reduceTripleCommand } from "./tripleRules.js";
 import { createTripleRoundState } from "./tripleState.js";
@@ -10,6 +12,10 @@ import { solveTripleBoard } from "./tripleSolver.js";
 
 export function getEasyTripleLayout() {
   return TRIPLE_EASY_LAYOUT;
+}
+export function getNormalTripleLayout() { return TRIPLE_NORMAL_LAYOUT; }
+export function generateNormalTripleBoard({ seed, solverOptions } = {}) {
+  return generateBoard({ seed, layout: TRIPLE_NORMAL_LAYOUT, config: TRIPLE_NORMAL_CONFIG, solverOptions });
 }
 
 export function createTripleCoverGraph(layout = TRIPLE_EASY_LAYOUT) {
@@ -28,17 +34,20 @@ export function generateEasyTripleBoard({
   maxAttempts = TRIPLE_EASY_GENERATOR_BUDGET.maxAttempts,
   solverOptions,
 } = {}) {
+  return generateBoard({ seed, maxAttempts, solverOptions, layout: TRIPLE_EASY_LAYOUT, config: TRIPLE_EASY_CONFIG });
+}
+function generateBoard({ seed, maxAttempts = TRIPLE_EASY_GENERATOR_BUDGET.maxAttempts, solverOptions, layout, config }) {
   const normalizedSeed = normalizeSeed(seed);
   const attempts = normalizeAttemptCount(maxAttempts);
   for (let attempt = 0; attempt < attempts; attempt += 1) {
     const candidate = buildSolutionFirstBoard({
       seed: `${normalizedSeed}:${attempt}`,
-      layout: TRIPLE_EASY_LAYOUT,
+      layout, config,
     });
     const solved = solveTripleBoard({ board: candidate.board, ...solverOptions });
     if (solved.status === "solved") return freezeGeneratedBoard({ ...candidate, witness: solved.witness, source: "generated" });
   }
-  const fallback = buildSolutionFirstBoard({ seed: TRIPLE_EASY_FALLBACK_SEED, layout: TRIPLE_EASY_LAYOUT });
+  const fallback = buildSolutionFirstBoard({ seed: TRIPLE_EASY_FALLBACK_SEED, layout, config });
   const solvedFallback = solveTripleBoard({ board: fallback.board, ...solverOptions });
   if (solvedFallback.status !== "solved") {
     throw new Error(`Triple fallback corpus failed solver validation: ${solvedFallback.status}`);
@@ -61,11 +70,11 @@ export function replayTripleWitness(board, witness) {
   return { ok: state.status === "won", reason: state.status, state };
 }
 
-function buildSolutionFirstBoard({ seed, layout }) {
+function buildSolutionFirstBoard({ seed, layout, config }) {
   const random = createSeededRng(seed);
   const coverGraphBySlot = createTripleCoverGraph(layout);
   const witnessSlots = createWitnessSlots(layout, random);
-  const typeOrder = shuffle(Array.from({ length: TRIPLE_EASY_CONFIG.tileCount / 3 }, (_, index) => `triple-${index + 1}`), random);
+  const typeOrder = shuffle(Array.from({ length: config.tileCount / 3 }, (_, index) => `triple-${index + 1}`), random);
   const tilesBySlot = new Map();
   witnessSlots.forEach((slot, index) => {
     const type = typeOrder[Math.floor(index / 3)];
