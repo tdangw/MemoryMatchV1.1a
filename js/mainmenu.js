@@ -345,8 +345,11 @@ export function showCollectionModal({
   const modal = openAppModal({
     id: "collection-modal",
     icon: "collection",
-    title:
-      gameId === "link-connect" ? "Bộ sưu tập · Link Connect" : "Bộ sưu tập",
+    title: gameId === "link-connect"
+      ? "Bộ sưu tập · Link Connect"
+      : gameId === "triple-connect"
+        ? "Bộ sưu tập · Triple Connect"
+        : "Bộ sưu tập",
     content,
     size: "large",
     onClose: () => {

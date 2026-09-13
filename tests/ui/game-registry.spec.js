@@ -34,6 +34,14 @@ test("released game adapters still open their matching menus", async ({ page }) 
   await expect(page.locator("#menu-container.triple-connect-menu")).toHaveCount(1);
 });
 
+test("Triple menu starts a visible playable board", async ({ page }) => {
+  await page.goto("/");
+  await page.locator(".game-selector__choice").filter({ hasText: "Triple Connect" }).click();
+  await page.locator("#menu-container.triple-connect-menu .menu-item").filter({ hasText: "Bắt đầu" }).click();
+  await expect(page.locator("#triple-connect-container")).toBeVisible();
+  await expect(page.locator(".triple-connect__board .triple-connect__tile")).toHaveCount(12);
+});
+
 test("unknown game IDs are rejected without a fallback menu", async ({ page }) => {
   await page.goto("/");
 

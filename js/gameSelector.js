@@ -8,6 +8,7 @@ import { gameState } from "./gameState.js";
 import { getEquippedThemeId } from "./appearance.js";
 import { getTheme } from "./themeCatalog.js";
 import {
+  GAME_MODES,
   getGameModeIcon,
   getGameModeLabel,
 } from "./gameCatalog.js";
@@ -21,6 +22,7 @@ let onOpenLinkCollection = () => {};
 let onOpenLinkShop = () => {};
 let onContinueLinkConnect = () => {};
 let onStartTripleConnect = () => {};
+let onOpenTripleCollection = () => {};
 
 export function configureGameSelector({
   startLinkConnect,
@@ -28,12 +30,14 @@ export function configureGameSelector({
   openLinkShop,
   continueLinkConnect,
   startTripleConnect,
+  openTripleCollection,
 } = {}) {
   onStartLinkConnect = startLinkConnect || onStartLinkConnect;
   onOpenLinkCollection = openLinkCollection || onOpenLinkCollection;
   onOpenLinkShop = openLinkShop || onOpenLinkShop;
   onContinueLinkConnect = continueLinkConnect || onContinueLinkConnect;
   onStartTripleConnect = startTripleConnect || onStartTripleConnect;
+  onOpenTripleCollection = openTripleCollection || onOpenTripleCollection;
 }
 
 export function showGameSelector() {
@@ -157,13 +161,28 @@ function createTripleConnectMenu() {
   const menuList = document.createElement("ul");
   menuList.className = "menu-list";
   menuList.append(
-    createMenuItem({ icon: "play", text: "Bắt đầu", onClick: onStartTripleConnect }),
+    createMenuItem({ icon: "play", text: "Bắt đầu", onClick: showTripleDifficultyOverlay }),
+    createMenuItem({ icon: "collection", text: "Bộ sưu tập", onClick: onOpenTripleCollection }),
     createMenuItem({ icon: "book", text: "Hướng dẫn", onClick: () => showGameInfoModal("Cách chơi Triple Connect", "<p>Chọn các thẻ đang lộ để ghép bộ ba. Khay có tối đa 7 ô.</p>", "book") }),
     createMenuItem({ icon: "home", text: "Home", onClick: showGameSelector }),
   );
   wrapper.append(menuList);
   overlay.append(wrapper);
   document.body.append(overlay);
+}
+
+function showTripleDifficultyOverlay() {
+  const options = document.createElement("div");
+  options.className = "difficulty-options";
+  const modal = openAppModal({ id: "triple-difficulty-modal", icon: "play", title: "Chọn chế độ Triple Connect", content: options });
+  GAME_MODES.filter(({ id }) => id !== "challenge").forEach(({ id, label, icon }) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "difficulty-option";
+    button.append(createIcon(icon), document.createTextNode(label));
+    button.onclick = () => { modal.close(); onStartTripleConnect(id); };
+    options.append(button);
+  });
 }
 
 function showLinkSessionPicker(onContinue) {

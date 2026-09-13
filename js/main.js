@@ -67,7 +67,8 @@ configureGameSelector({
   continueLinkConnect: (session) => continueLinkSession(session),
   openLinkCollection: (onClose) => showCollectionModal({ gameId: "link-connect", onClose }),
   openLinkShop: () => openShopOverlay({ fromMenu: true, gameId: "link-connect" }),
-  startTripleConnect: () => startTripleConnectRound({ seed: `triple-${Date.now()}` }),
+  startTripleConnect: (mode) => startTripleConnectRound({ mode, seed: `triple-${mode}-${Date.now()}` }),
+  openTripleCollection: (onClose) => showCollectionModal({ gameId: "triple-connect", onClose }),
 });
 configureLinkController({
   showMenu: () => openGameMenu("link-connect"),
