@@ -7,6 +7,8 @@ import { presentTripleTransition } from "./triplePresentation.js";
 import { getActiveSession, saveActiveSession } from "../sessionProgress.js";
 import { consumeTripleItem, getTripleItemCount } from "./tripleItems.js";
 import { getTripleHintTileIds } from "./tripleHint.js";
+import { endTripleRound } from "./tripleState.js";
+import { getTripleModeConfig } from "./tripleConfig.js";
 
 const development = import.meta.env?.DEV === true;
 let state = null;
@@ -14,6 +16,7 @@ let renderer = null;
 let presenting = false;
 let currentMode = "easy";
 let currentLayout = null;
+let remainingTime = 0;
 
 export function startTripleConnectDevelopmentRound({ seed = "triple-dev", mode = "easy" } = {}) {
   if (!development) throw new Error("Triple Connect development hook is unavailable in production.");
@@ -24,6 +27,7 @@ export function startTripleConnectDevelopmentRound({ seed = "triple-dev", mode =
   state = createTripleRoundState(generated.board);
   currentMode = mode;
   currentLayout = getTripleLayout(generated.layoutId);
+  remainingTime = getTripleModeConfig(mode).timeSeconds;
   return mountTripleDevelopmentRound(generated);
 }
 
@@ -34,6 +38,7 @@ export function continueTripleConnectDevelopmentRound({ mode = "easy" } = {}) {
   state = restoreSerializedTripleRoundState(session.snapshot);
   currentMode = mode;
   currentLayout = getTripleLayout(session.layoutId || inferLayoutId(state));
+  remainingTime = Number.isInteger(session.remainingTime) ? session.remainingTime : getTripleModeConfig(mode).timeSeconds;
   return mountTripleDevelopmentRound({ seed: "restored", board: null, witness: [] });
 }
 
@@ -42,7 +47,10 @@ function mountTripleDevelopmentRound(generated) {
   const scope = shell.mount();
   presenting = false;
   renderer ||= createTripleRenderer(shell);
-  const render = (roundState) => renderer.render(roundState, currentLayout, { hint: getTripleItemCount("hint") });
+  const render = (roundState) => {
+    renderer.render(roundState, currentLayout, { hint: getTripleItemCount("hint"), time: getTripleItemCount("time") });
+    updateTimer(shell);
+  };
   render(state);
   scope.listen(shell.refs.board, "click", event => {
     const tileId = event.target.closest("[data-tile-id]")?.dataset.tileId;
@@ -56,7 +64,7 @@ function mountTripleDevelopmentRound(generated) {
       .finally(() => {
         if (!scope.active) return;
         presenting = false;
-        saveActiveSession("triple-connect", { mode: currentMode, level: 1, layoutId: currentLayout.id, snapshot: serializeTripleRoundState(state) });
+        saveSession();
       });
   });
   scope.listen(shell.refs.root.querySelector('[data-triple-item="hint"]'), "click", () => {
@@ -67,7 +75,56 @@ function mountTripleDevelopmentRound(generated) {
     render(state);
     scope.timeout(() => tileIds.forEach((tileId) => renderer.nodes.get(tileId)?.classList.remove("is-hinted")), 900);
   });
+  const timeButton = shell.refs.root.querySelector('[data-triple-item="time"]');
+  timeButton.hidden = currentMode === "endless";
+  scope.listen(timeButton, "click", () => {
+    if (presenting || state.status !== "playing" || currentMode === "endless" || !consumeTripleItem("time")) return;
+    remainingTime += 1;
+    render(state);
+    saveSession();
+  });
+  let checkpointSeconds = 0;
+  scope.interval(() => {
+    if (state.status !== "playing") return;
+    if (currentMode === "endless") {
+      remainingTime += 1;
+    } else {
+      remainingTime = Math.max(0, remainingTime - 1);
+    }
+    updateTimer(shell);
+    checkpointSeconds += 1;
+    if (currentMode !== "endless" && remainingTime === 0) {
+        state = endTripleRound(state);
+        render(state);
+        saveSession();
+    } else if (checkpointSeconds >= 10) {
+      checkpointSeconds = 0;
+      saveSession();
+    }
+  }, 1000);
   return { generated, getState: () => state, shell };
+}
+
+function saveSession() {
+  saveActiveSession("triple-connect", {
+    mode: currentMode,
+    level: 1,
+    layoutId: currentLayout.id,
+    remainingTime,
+    snapshot: serializeTripleRoundState(state),
+  });
+}
+
+function updateTimer(shell) {
+  const target = shell.refs.root.querySelector("[data-triple-timer]");
+  if (!target) return;
+  target.textContent = formatTime(remainingTime);
+  shell.refs.root.dataset.tripleExpired = String(state.status === "lost" && remainingTime === 0);
+}
+
+function formatTime(seconds) {
+  const value = Math.max(0, Math.floor(seconds));
+  return `${String(Math.floor(value / 60)).padStart(2, "0")}:${String(value % 60).padStart(2, "0")}`;
 }
 
 function inferLayoutId(roundState) {

@@ -219,6 +219,7 @@ function normalizeTripleSessions(sessions) {
         mode,
         level: Math.max(1, normalizeNonNegativeInteger(session.level) || 1),
         ...(typeof session.layoutId === "string" ? { layoutId: session.layoutId } : {}),
+        ...(Number.isFinite(session.remainingTime) ? { remainingTime: Math.max(0, Math.floor(session.remainingTime)) } : {}),
         snapshot,
       }]];
     } catch { return []; }

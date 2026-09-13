@@ -42,3 +42,17 @@ test("Triple Hint consumes one persisted hint only after identifying playable ti
   await expect(hint).toContainText("2");
   await expect(page.locator(".triple-connect__tile.is-hinted")).toHaveCount(2);
 });
+
+test("Triple timers count down normally and up in Endless", async ({ page }) => {
+  await page.goto("/");
+  await page.evaluate(async () => {
+    const controller = await import("/js/tripleConnect/tripleController.js");
+    controller.startTripleConnectDevelopmentRound({ seed: "timer", mode: "easy" });
+  });
+  await expect(page.locator("[data-triple-timer]")).toHaveText("00:59", { timeout: 2500 });
+  await page.evaluate(async () => {
+    const controller = await import("/js/tripleConnect/tripleController.js");
+    controller.startTripleConnectDevelopmentRound({ seed: "endless-timer", mode: "endless" });
+  });
+  await expect(page.locator("[data-triple-timer]")).toHaveText("00:01", { timeout: 2500 });
+});

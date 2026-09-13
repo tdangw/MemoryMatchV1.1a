@@ -27,6 +27,12 @@ export function createTripleRoundState({ roundId = 1, tiles, coverGraph = {} } =
   return freezeState(state);
 }
 
+export function endTripleRound(state) {
+  assertTripleStateInvariant(state);
+  if (state.status !== "playing") return state;
+  return freezeState({ ...state, status: "lost", undoHistory: [] });
+}
+
 export function getExposedTileIds(state) {
   assertTripleStateInvariant(state);
   return Object.values(state.tiles)
