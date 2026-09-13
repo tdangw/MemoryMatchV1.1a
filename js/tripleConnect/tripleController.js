@@ -1,4 +1,4 @@
-import { generateEasyTripleBoard } from "./tripleBoard.js";
+import { generateEasyTripleBoard, generateEndlessTripleBoard, generateHardTripleBoard, generateNormalTripleBoard, generateSuperHardTripleBoard } from "./tripleBoard.js";
 import { reduceTripleCommand } from "./tripleRules.js";
 import { createTripleRoundState, restoreSerializedTripleRoundState, serializeTripleRoundState } from "./tripleState.js";
 import { createTripleRenderer } from "./tripleRenderer.js";
@@ -11,9 +11,12 @@ let state = null;
 let renderer = null;
 let presenting = false;
 
-export function startTripleConnectDevelopmentRound({ seed = "triple-dev" } = {}) {
+export function startTripleConnectDevelopmentRound({ seed = "triple-dev", mode = "easy" } = {}) {
   if (!development) throw new Error("Triple Connect development hook is unavailable in production.");
-  const generated = generateEasyTripleBoard({ seed });
+  const generators = { easy: generateEasyTripleBoard, normal: generateNormalTripleBoard, hard: generateHardTripleBoard, superHard: generateSuperHardTripleBoard, endless: generateEndlessTripleBoard };
+  const generate = generators[mode];
+  if (!generate) throw new TypeError(`Unsupported Triple development mode: ${mode}`);
+  const generated = generate({ seed });
   state = createTripleRoundState(generated.board);
   return mountTripleDevelopmentRound(generated);
 }

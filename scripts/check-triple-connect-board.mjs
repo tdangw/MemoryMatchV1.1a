@@ -6,10 +6,13 @@ import {
   generateEasyTripleBoard,
   generateNormalTripleBoard,
   generateHardTripleBoard,
+  generateSuperHardTripleBoard,
+  generateEndlessTripleBoard,
   getEasyTripleLayout,
   replayTripleWitness,
 } from "../js/tripleConnect/tripleBoard.js";
 import { TRIPLE_EASY_CONFIG, TRIPLE_EASY_FALLBACK_SEED } from "../js/tripleConnect/tripleConfig.js";
+import { TRIPLE_ENDLESS_CONFIG } from "../js/tripleConnect/tripleConfig.js";
 import { reduceTripleCommand } from "../js/tripleConnect/tripleRules.js";
 import { createTripleRoundState } from "../js/tripleConnect/tripleState.js";
 import { createTripleSolverKey, solveTripleBoard } from "../js/tripleConnect/tripleSolver.js";
@@ -104,5 +107,22 @@ for (let index = 0; index < 30; index += 1) {
 hardTimings.sort((left, right) => left - right);
 const hardP95 = hardTimings[Math.ceil(hardTimings.length * .95) - 1];
 assert.ok(hardP95 <= 100, `Hard generator + solver p95 ${hardP95.toFixed(2)} ms exceeded 100 ms.`);
+
+const superHardTimings = [];
+for (let index = 0; index < 20; index += 1) {
+  const startedAt = performance.now();
+  const superHard = generateSuperHardTripleBoard({ seed: `super-hard-${index}` });
+  superHardTimings.push(performance.now() - startedAt);
+  assert.equal(superHard.board.tiles.length, 60);
+  assert.equal(replayTripleWitness(superHard.board, superHard.witness).ok, true);
+}
+superHardTimings.sort((left, right) => left - right);
+const superHardP95 = superHardTimings[Math.ceil(superHardTimings.length * .95) - 1];
+assert.ok(superHardP95 <= 300, `SuperHard generator + solver p95 ${superHardP95.toFixed(2)} ms exceeded 300 ms.`);
+
+const endless = generateEndlessTripleBoard({ seed: "endless" });
+assert.equal(TRIPLE_ENDLESS_CONFIG.timeSeconds, 0);
+assert.equal(endless.board.tiles.length, 60);
+assert.equal(replayTripleWitness(endless.board, endless.witness).ok, true);
 
 console.log(`Triple Connect Easy board and solver contracts passed (p95 ${p95.toFixed(2)} ms).`);

@@ -8,6 +8,10 @@ import {
   TRIPLE_HARD_CONFIG,
   TRIPLE_HARD_LAYOUT,
   TRIPLE_HARD_SOLVER_BUDGET,
+  TRIPLE_SUPER_HARD_CONFIG,
+  TRIPLE_SUPER_HARD_LAYOUT,
+  TRIPLE_SUPER_HARD_SOLVER_BUDGET,
+  TRIPLE_ENDLESS_CONFIG,
 } from "./tripleConfig.js";
 import { reduceTripleCommand } from "./tripleRules.js";
 import { createTripleRoundState } from "./tripleState.js";
@@ -21,6 +25,8 @@ export function generateNormalTripleBoard({ seed, solverOptions } = {}) {
   return generateBoard({ seed, layout: TRIPLE_NORMAL_LAYOUT, config: TRIPLE_NORMAL_CONFIG, solverOptions });
 }
 export function generateHardTripleBoard({ seed, solverOptions } = {}) { return generateBoard({ seed, maxAttempts: 1, layout: TRIPLE_HARD_LAYOUT, config: TRIPLE_HARD_CONFIG, solverOptions: { ...TRIPLE_HARD_SOLVER_BUDGET, ...solverOptions } }); }
+export function generateSuperHardTripleBoard({ seed, solverOptions } = {}) { return generateBoard({ seed, maxAttempts: 1, layout: TRIPLE_SUPER_HARD_LAYOUT, config: TRIPLE_SUPER_HARD_CONFIG, solverOptions: { ...TRIPLE_SUPER_HARD_SOLVER_BUDGET, ...solverOptions } }); }
+export function generateEndlessTripleBoard({ seed, solverOptions } = {}) { return generateBoard({ seed, maxAttempts: 1, layout: TRIPLE_SUPER_HARD_LAYOUT, config: TRIPLE_ENDLESS_CONFIG, solverOptions: { ...TRIPLE_SUPER_HARD_SOLVER_BUDGET, ...solverOptions } }); }
 
 export function createTripleCoverGraph(layout = TRIPLE_EASY_LAYOUT) {
   validateLayout(layout);
