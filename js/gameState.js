@@ -4,6 +4,7 @@ import { normalizeAppearance } from "./appearance.js";
 import { GAMEPLAY_LIMITS } from "./gameplayTuning.js";
 import { GAME_MODES } from "./gameCatalog.js";
 import { restoreSerializedTripleRoundState, serializeTripleRoundState } from "./tripleConnect/tripleState.js";
+import { TRIPLE_PRODUCT_DECISIONS } from "./tripleConnect/tripleConfig.js";
 
 const GAME_MODE_IDS = new Set(GAME_MODES.map(({ id }) => id));
 
@@ -50,6 +51,7 @@ export const gameState = {
       totalStars: 0,
       totalScore: 0,
       bestByLevel: {},
+      items: { hint: TRIPLE_PRODUCT_DECISIONS.initialItems.hint, time: 0, undo: 0, shuffle: 0 },
       sessionsByMode: {},
     },
   },
@@ -111,6 +113,7 @@ export function hydrateGameState({
     totalStars: normalizeNonNegativeInteger(tripleConnect.totalStars),
     totalScore: normalizeNonNegativeInteger(tripleConnect.totalScore),
     bestByLevel: normalizeBestByLevel(tripleConnect.bestByLevel),
+    items: normalizeTripleItems(tripleConnect.items),
     sessionsByMode: normalizeTripleSessions(tripleConnect.sessionsByMode),
   };
   gameState.settings = normalizeSettings(settings, gameState.settings);
@@ -194,13 +197,30 @@ function normalizeSettings(value, fallback) {
   };
 }
 
+function normalizeTripleItems(items = {}) {
+  const source = items && typeof items === "object" ? items : {};
+  return {
+    hint: Object.hasOwn(source, "hint")
+      ? normalizeItemCount(source.hint)
+      : TRIPLE_PRODUCT_DECISIONS.initialItems.hint,
+    time: normalizeItemCount(source.time),
+    undo: normalizeItemCount(source.undo),
+    shuffle: normalizeItemCount(source.shuffle),
+  };
+}
+
 function normalizeTripleSessions(sessions) {
   const source = sessions && typeof sessions === "object" ? sessions : {};
   return Object.fromEntries(Object.entries(source).flatMap(([mode, session]) => {
     if (!GAME_MODE_IDS.has(mode) || !session || typeof session !== "object") return [];
     try {
       const snapshot = serializeTripleRoundState(restoreSerializedTripleRoundState(session.snapshot));
-      return [[mode, { mode, level: Math.max(1, normalizeNonNegativeInteger(session.level) || 1), snapshot }]];
+      return [[mode, {
+        mode,
+        level: Math.max(1, normalizeNonNegativeInteger(session.level) || 1),
+        ...(typeof session.layoutId === "string" ? { layoutId: session.layoutId } : {}),
+        snapshot,
+      }]];
     } catch { return []; }
   }));
 }

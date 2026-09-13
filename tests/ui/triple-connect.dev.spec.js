@@ -18,3 +18,27 @@ for (const viewport of [{ width: 360, height: 640 }, { width: 411, height: 914 }
     expect(state.tray).toHaveLength(1);
   });
 }
+
+for (const [mode, tileCount] of [["normal", 24], ["hard", 36], ["superHard", 60], ["endless", 60]]) {
+  test(`Triple ${mode} development round uses its own board layout`, async ({ page }) => {
+    await page.goto("/");
+    await page.evaluate(async ({ selectedMode }) => {
+      const controller = await import("/js/tripleConnect/tripleController.js");
+      controller.startTripleConnectDevelopmentRound({ mode: selectedMode, seed: `layout-${selectedMode}` });
+    }, { selectedMode: mode });
+    await expect(page.locator(".triple-connect__board .triple-connect__tile")).toHaveCount(tileCount);
+  });
+}
+
+test("Triple Hint consumes one persisted hint only after identifying playable tiles", async ({ page }) => {
+  await page.goto("/");
+  await page.evaluate(async () => {
+    const controller = await import("/js/tripleConnect/tripleController.js");
+    controller.startTripleConnectDevelopmentRound({ seed: "hint" });
+  });
+  const hint = page.locator('[data-triple-item="hint"]');
+  await expect(hint).toContainText("3");
+  await hint.click();
+  await expect(hint).toContainText("2");
+  await expect(page.locator(".triple-connect__tile.is-hinted")).toHaveCount(2);
+});

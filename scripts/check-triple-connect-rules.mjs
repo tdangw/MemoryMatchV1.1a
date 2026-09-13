@@ -1,8 +1,11 @@
 import assert from "node:assert/strict";
 import { calculateTripleMatchScore, TRIPLE_EASY_CONFIG, TRIPLE_RULES } from "../js/tripleConnect/tripleConfig.js";
+import { TRIPLE_PRODUCT_DECISIONS } from "../js/tripleConnect/tripleConfig.js";
 import { reduceTripleCommand } from "../js/tripleConnect/tripleRules.js";
 import { createTripleRoundState, getExposedTileIds, restoreSerializedTripleRoundState, serializeTripleRoundState } from "../js/tripleConnect/tripleState.js";
 import { gameState, hydrateGameState } from "../js/gameState.js";
+import { getTripleHintTileIds } from "../js/tripleConnect/tripleHint.js";
+import { consumeTripleItem, getTripleItemCount } from "../js/tripleConnect/tripleItems.js";
 
 function makeState(typeCounts, coverGraph = {}) {
   const tiles = [];
@@ -24,6 +27,9 @@ assert.deepEqual(TRIPLE_EASY_CONFIG, { mode: "easy", tileCount: 12, layerCount: 
 assert.equal(TRIPLE_RULES.trayCapacity, 7);
 assert.equal(calculateTripleMatchScore(1), 10);
 assert.equal(calculateTripleMatchScore(2), 13);
+assert.deepEqual(TRIPLE_PRODUCT_DECISIONS.initialItems, { hint: 3 });
+assert.deepEqual(TRIPLE_PRODUCT_DECISIONS.itemPrices, { hint: 8, timePerSecond: 2, undo: 15, shuffle: 15 });
+assert.equal(TRIPLE_PRODUCT_DECISIONS.excludedItems.includes("tray-expand"), true);
 
 const covered = makeState(
   { a: 3, b: 3, c: 3, d: 3 },
@@ -105,6 +111,7 @@ let win = makeState({ a: 3 });
 for (const tileId of ["a-1", "a-2", "a-3"]) win = select(win, tileId).nextState;
 assert.equal(win.status, "won");
 assert.equal(win.tray.length, 0);
+assert.deepEqual(getTripleHintTileIds(grouped), ["a-3", "b-2"]);
 
 const persisted = serializeTripleRoundState(matched.nextState);
 assert.equal(Object.hasOwn(persisted, "undoHistory"), false);
@@ -112,5 +119,9 @@ assert.deepEqual(restoreSerializedTripleRoundState(persisted), restoreSerialized
 assert.throws(() => restoreSerializedTripleRoundState({ ...persisted, tiles: persisted.tiles.slice(1) }));
 hydrateGameState({ progress: { tripleConnect: { sessionsByMode: { easy: { mode: "easy", level: 1, snapshot: { ...persisted, tray: ["missing"] } } } } } });
 assert.deepEqual(gameState.progress.tripleConnect.sessionsByMode, {}, "Invalid Triple saves must not reach runtime state.");
+assert.equal(getTripleItemCount("hint"), 3, "Triple defaults must grant the approved initial Hint inventory.");
+assert.equal(consumeTripleItem("unknown"), false);
+assert.equal(consumeTripleItem("hint"), false, "A failed persistence transaction must not consume a Hint.");
+assert.equal(getTripleItemCount("hint"), 3);
 
 console.log("Triple Connect pure rules and state contracts passed.");

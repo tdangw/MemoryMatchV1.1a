@@ -65,6 +65,15 @@ export const TRIPLE_SUPER_HARD_LAYOUT = Object.freeze({ id: "super-hard-60-v1", 
   slots: Object.freeze([...superHardSlots(0, 24, .03), ...superHardSlots(1, 15, .1), ...superHardSlots(2, 9, .19), ...superHardSlots(3, 6, .28), ...superHardSlots(4, 6, .37)]),
 });
 export const TRIPLE_ENDLESS_CONFIG = Object.freeze({ mode: "endless", tileCount: 60, layerCount: 5, timeSeconds: 0 });
+export const TRIPLE_PRODUCT_DECISIONS = Object.freeze({
+  trayCapacity: 7,
+  initialItems: Object.freeze({ hint: 3 }),
+  itemPrices: Object.freeze({ hint: 8, timePerSecond: 2, undo: 15, shuffle: 15 }),
+  starPointsPerTriple: Object.freeze({ one: 12, two: 18, three: 25 }),
+  endlessStarPointsPerTriple: Object.freeze({ one: 10, two: 15, three: 20 }),
+  lucky: Object.freeze({ enabled: true, challengeOnly: true, count: Object.freeze({ min: 1, max: 3 }), rewards: Object.freeze(["coins", "time", "hint"]) }),
+  excludedItems: Object.freeze(["thunder", "freeze", "tray-expand"]),
+});
 
 export function calculateTripleMatchScore(combo) {
   const normalizedCombo = Math.max(1, Math.floor(Number(combo) || 0));

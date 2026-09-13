@@ -21,6 +21,12 @@ export function getEasyTripleLayout() {
   return TRIPLE_EASY_LAYOUT;
 }
 export function getNormalTripleLayout() { return TRIPLE_NORMAL_LAYOUT; }
+export function getTripleLayout(layoutId) {
+  const layouts = [TRIPLE_EASY_LAYOUT, TRIPLE_NORMAL_LAYOUT, TRIPLE_HARD_LAYOUT, TRIPLE_SUPER_HARD_LAYOUT];
+  const layout = layouts.find((candidate) => candidate.id === layoutId);
+  if (!layout) throw new TypeError(`Unsupported Triple layout: ${layoutId}`);
+  return layout;
+}
 export function generateNormalTripleBoard({ seed, solverOptions } = {}) {
   return generateBoard({ seed, layout: TRIPLE_NORMAL_LAYOUT, config: TRIPLE_NORMAL_CONFIG, solverOptions });
 }
