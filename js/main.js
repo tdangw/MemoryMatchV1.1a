@@ -127,7 +127,17 @@ document.addEventListener(
 
 window.onload = () => {
   showGameSelector();
+  if (import.meta.env.DEV) installTripleDevelopmentLauncher();
 };
+
+async function installTripleDevelopmentLauncher() {
+  const { startTripleConnectDevelopmentRound } = await import("./tripleConnect/tripleController.js");
+  const launcher = document.createElement("div");
+  launcher.id = "triple-development-launcher";
+  launcher.innerHTML = `<label>Triple dev <select><option value="easy">Easy</option><option value="normal">Normal</option><option value="hard">Hard</option><option value="superHard">SuperHard</option><option value="endless">Endless</option></select></label><button type="button">Mở Triple test</button>`;
+  launcher.querySelector("button").onclick = () => startTripleConnectDevelopmentRound({ mode: launcher.querySelector("select").value, seed: `manual-${Date.now()}` });
+  document.body.append(launcher);
+}
 
 document
   .getElementById("btn-game-settings")
