@@ -183,20 +183,28 @@ function presentCommittedRewards(shell, source, rewards = []) {
 }
 
 function presentTrayFlight({ shell, scope, selected, render, next }) {
+  const surface = shell.refs.board;
+  const surfaceRect = surface.getBoundingClientRect();
   const source = shell.refs.root.querySelector(`[data-tile-id="${selected.tileId}"]`);
   const sourceRect = source?.getBoundingClientRect();
+  if (!sourceRect) {
+    render(next);
+    return Promise.resolve();
+  }
   const priorTrayRects = new Map([...shell.refs.root.querySelectorAll(".triple-connect__tray .triple-connect__tile")]
     .map((node) => [node.dataset.tileId, node.getBoundingClientRect()]));
   render(next);
-  const target = shell.refs.root.querySelector(`[data-tile-id="${selected.tileId}"]`);
-  const targetRect = target?.getBoundingClientRect();
-  if (!sourceRect || !targetRect || prefersReducedMotion()) {
+  const target = shell.refs.root.querySelector(`.triple-connect__tray [data-tile-id="${selected.tileId}"]`)
+    || shell.refs.root.querySelector(`[data-tile-id="${selected.tileId}"]`);
+  if (!target || prefersReducedMotion()) {
     target?.classList.add("is-tray-arrived");
     scope.timeout(() => target?.classList.remove("is-tray-arrived"), 90);
     return Promise.resolve();
   }
+  void target.offsetWidth;
+  const targetRect = target.getBoundingClientRect();
   for (const [tileId, before] of priorTrayRects) {
-    const trayTile = shell.refs.root.querySelector(`[data-tile-id="${tileId}"]`);
+    const trayTile = shell.refs.root.querySelector(`.triple-connect__tray [data-tile-id="${tileId}"]`);
     const after = trayTile?.getBoundingClientRect();
     if (!after) continue;
     const shiftX = before.left - after.left;
@@ -206,14 +214,24 @@ function presentTrayFlight({ shell, scope, selected, render, next }) {
       { transform: `translate(${shiftX}px, ${shiftY}px)` }, { transform: "translate(0, 0)" },
     ], { duration: 210, easing: "cubic-bezier(.2,.8,.2,1)" }));
   }
-  const ghost = createGhost(source, shell.refs.board.getBoundingClientRect());
-  ghost.classList.add("triple-connect__tray-flight");
-  shell.refs.board.append(ghost);
+  const ghost = source.cloneNode(true);
+  ghost.classList.add("triple-connect__ghost", "triple-connect__tray-flight");
+  Object.assign(ghost.style, {
+    left: `${sourceRect.left - surfaceRect.left}px`,
+    top: `${sourceRect.top - surfaceRect.top}px`,
+    width: `${sourceRect.width}px`,
+    height: `${sourceRect.height}px`,
+  });
+  surface.append(ghost);
   target.style.opacity = "0";
+  const dx = targetRect.left - sourceRect.left;
+  const dy = targetRect.top - sourceRect.top;
+  const scaleX = sourceRect.width ? targetRect.width / sourceRect.width : 1;
+  const scaleY = sourceRect.height ? targetRect.height / sourceRect.height : 1;
   const animation = ghost.animate([
     { transform: "translate(0, 0) scale(1)", opacity: 1 },
-    { transform: `translate(${targetRect.left - sourceRect.left}px, ${targetRect.top - sourceRect.top}px) scale(.86)`, opacity: 0.15 },
-  ], { duration: 210, easing: "cubic-bezier(.2,.8,.2,1)", fill: "both" });
+    { transform: `translate(${dx}px, ${dy}px) scale(${scaleX}, ${scaleY})`, opacity: 0.9 },
+  ], { duration: 220, easing: "cubic-bezier(.2,.8,.2,1)", fill: "both" });
   scope.animation(animation);
   const cleanup = () => { ghost.remove(); target.style.removeProperty("opacity"); };
   const release = scope.own(cleanup, "node");
