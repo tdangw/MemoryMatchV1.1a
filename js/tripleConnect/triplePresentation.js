@@ -22,7 +22,7 @@ function presentResolvedTriple({ shell, scope, match, effects, render, next }) {
   if (sourceNodes.length !== 3) { render(next); return Promise.resolve(); }
   const ghosts = sourceNodes.map((source) => createGhost(source, surfaceRect));
   render(next);
-  line.className.baseVal = `triple-connect__line ${effects.path?.className || ""}`;
+  line.className.baseVal = `triple-connect__line link-path-overlay ${effects.path?.className || "link-path-overlay--default"}`;
   ghosts.forEach((ghost) => surface.append(ghost));
   const cleanup = () => {
     line.replaceChildren();
@@ -141,6 +141,26 @@ function getExitFrames(exitId) {
     { opacity: 1, transform: "translateY(0)" },
     { opacity: 0, transform: "translateY(24px) scale(.88)" },
   ];
+  if (exitId === "dissolve") return [
+    { opacity: 1, filter: "blur(0px)" },
+    { opacity: 0, filter: "blur(6px) brightness(1.4)", transform: "scale(1.08)" },
+  ];
+  if (exitId === "freeze") return [
+    { opacity: 1, filter: "brightness(1) hue-rotate(0deg)" },
+    { opacity: 0, filter: "brightness(2) hue-rotate(180deg)", transform: "scale(0.85)" },
+  ];
+  if (exitId === "bubble") return [
+    { opacity: 1, transform: "translateY(0) scale(1)" },
+    { opacity: 0, transform: "translateY(-22px) scale(1.15)" },
+  ];
+  if (["slice", "collide", "electric-shock"].includes(exitId)) return [
+    { opacity: 1, transform: "scale(1) rotate(0deg)" },
+    { opacity: 0, transform: "scale(0.65) rotate(-15deg)" },
+  ];
+  if (["split4", "split2", "split8", "triangles", "pixel", "origami"].includes(exitId)) return [
+    { opacity: 1, transform: "scale(1)" },
+    { opacity: 0, transform: "scale(0.2)" },
+  ];
   return [{ opacity: 1, transform: "scale(1)" }, { opacity: 0, transform: "scale(.78)" }];
 }
 
@@ -172,7 +192,10 @@ function presentCommittedRewards(shell, source, rewards = []) {
   const root = shell.refs.root;
   const coins = rewards.filter((reward) => reward.type === "coins")
     .reduce((total, reward) => total + reward.amount, 0);
-  if (coins > 0) playCoinRewardFlight(source, root.querySelector(".stat-points"), coins);
+  const coinTarget = root.querySelector(".triple-connect__milestone-coins")
+    || root.querySelector("[data-triple-milestone-coins]")
+    || root.querySelector(".stat-points");
+  if (coins > 0) playCoinRewardFlight(source, coinTarget, coins);
   for (const reward of rewards.filter((candidate) => candidate.type !== "coins")) {
     const itemId = reward.type === "time" ? "time" : reward.type;
     playLootDrop(source, {
