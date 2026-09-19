@@ -26,6 +26,7 @@ export default defineConfig({
   use: {
     baseURL,
     browserName: "chromium",
+    channel: process.env.PLAYWRIGHT_CHANNEL || "chrome",
     headless: true,
     locale: "vi-VN",
     reducedMotion: "reduce",

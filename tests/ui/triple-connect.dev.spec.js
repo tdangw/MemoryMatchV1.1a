@@ -36,6 +36,7 @@ test("Triple Hint consumes one persisted hint only after identifying playable ti
     const controller = await import("/js/tripleConnect/tripleController.js");
     controller.startTripleConnectDevelopmentRound({ seed: "hint" });
   });
+  await page.locator("#triple-tools-toggle").click();
   const hint = page.locator('[data-triple-item="hint"]');
   await expect(hint).toContainText("3");
   await hint.click();
