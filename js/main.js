@@ -27,10 +27,17 @@ import {
 } from "./linkConnect/linkController.js";
 import { configureSettings, showSettingsPanel } from "./settings.js";
 import { openQuickAssistOverlay, openShopOverlay } from "./shop.js";
-import { showResetConfirmationOverlay, showReturnToMenuOverlay, updateMemoryAssistInventoryDisplay } from "./ui.js";
+import {
+  showResetConfirmationOverlay,
+  showReturnToMenuOverlay,
+  updateMemoryAssistInventoryDisplay,
+} from "./ui.js";
 import { showAppToast } from "./modal.js";
 import { gameState, hydrateGameState } from "./gameState.js";
-import { loadPersistentGameData, subscribeToExternalSave } from "./persistence.js";
+import {
+  loadPersistentGameData,
+  subscribeToExternalSave,
+} from "./persistence.js";
 import {
   configureGameController,
   handleHintClick,
@@ -41,7 +48,16 @@ import {
 } from "./gameController.js";
 import { registerProgressiveWebApp } from "./pwa.js";
 import { initializeMeteorEffects } from "./backgroundEffects.js";
-import { startTripleConnectRound } from "./tripleConnect/tripleController.js";
+import {
+  configureTripleConnectController,
+  continueTripleConnectSession,
+  isValidTripleConnectSession,
+  startTripleConnectRound,
+} from "./tripleConnect/tripleController.js";
+import {
+  TRIPLE_CONNECT_HELP_CONTENT,
+  TRIPLE_CONNECT_INFO_CONTENT,
+} from "./tripleConnect/tripleCopy.js";
 
 document.documentElement.dataset.buildTarget =
   import.meta.env.MODE === "android" ? "android" : "web";
@@ -65,10 +81,40 @@ configureSettings({ onCloseMenu: createActiveGameMenu });
 configureGameSelector({
   startLinkConnect: showLinkDifficultyOverlay,
   continueLinkConnect: (session) => continueLinkSession(session),
-  openLinkCollection: (onClose) => showCollectionModal({ gameId: "link-connect", onClose }),
-  openLinkShop: () => openShopOverlay({ fromMenu: true, gameId: "link-connect" }),
-  startTripleConnect: (mode) => startTripleConnectRound({ mode, seed: `triple-${mode}-${Date.now()}` }),
-  openTripleCollection: (onClose) => showCollectionModal({ gameId: "triple-connect", onClose }),
+  openLinkCollection: (onClose) =>
+    showCollectionModal({ gameId: "link-connect", onClose }),
+  openLinkShop: () =>
+    openShopOverlay({ fromMenu: true, gameId: "link-connect" }),
+  startTripleConnect: (mode) => startTripleConnectRound({ mode }),
+  continueTripleConnect: (session) => continueTripleConnectSession(session),
+  validateTripleSession: isValidTripleConnectSession,
+  openTripleCollection: (onClose) =>
+    showCollectionModal({ gameId: "triple-connect", onClose }),
+  openTripleShop: () =>
+    openShopOverlay({ fromMenu: true, gameId: "triple-connect" }),
+});
+configureTripleConnectController({
+  showMenu: () => openGameMenu("triple-connect"),
+  showCollection: (onClose) =>
+    showCollectionModal({ fromGame: true, gameId: "triple-connect", onClose }),
+  showShop: (onClose) =>
+    openShopOverlay({ fromMenu: false, gameId: "triple-connect", onClose }),
+  showSettings: (onClose) => showSettingsPanel(true, onClose),
+  showHelp: (onClose) =>
+    showGameInfoModal(
+      "Cách chơi Triple Connect",
+      TRIPLE_CONNECT_HELP_CONTENT,
+      "book",
+      onClose,
+    ),
+  showInfo: (onClose) =>
+    showGameInfoModal(
+      "Giới thiệu Triple Connect",
+      TRIPLE_CONNECT_INFO_CONTENT,
+      "info",
+      onClose,
+    ),
+  showReset: () => showResetConfirmationOverlay({}),
 });
 configureLinkController({
   showMenu: () => openGameMenu("link-connect"),
@@ -79,12 +125,13 @@ configureLinkController({
       onClose,
     });
   },
-  showShop: (onClose) => openShopOverlay({
-    fromMenu: false,
-    gameId: "link-connect",
-    linkConnect: true,
-    onClose,
-  }),
+  showShop: (onClose) =>
+    openShopOverlay({
+      fromMenu: false,
+      gameId: "link-connect",
+      linkConnect: true,
+      onClose,
+    }),
   showSettings: (onClose) => showSettingsPanel(true, onClose),
   showReset: (onClose) => showResetConfirmationOverlay({ onClose }),
 });
@@ -93,13 +140,20 @@ enableButtonClickSounds(() => gameState.settings);
 decorateIcons();
 
 subscribeToExternalSave(({ data, accept }) => {
-  const memoryGameVisible = document.getElementById("game-container")?.style.display === "flex";
-  const linkGameVisible = document.getElementById("link-connect-container")?.hasAttribute("hidden") === false;
+  const memoryGameVisible =
+    document.getElementById("game-container")?.style.display === "flex";
+  const linkGameVisible =
+    document
+      .getElementById("link-connect-container")
+      ?.hasAttribute("hidden") === false;
   if (memoryGameVisible || linkGameVisible) {
-    showAppToast("Dữ liệu vừa thay đổi ở tab khác. Hãy tải lại trước khi tiếp tục chơi.", {
-      tone: "warning",
-      duration: 5000,
-    });
+    showAppToast(
+      "Dữ liệu vừa thay đổi ở tab khác. Hãy tải lại trước khi tiếp tục chơi.",
+      {
+        tone: "warning",
+        duration: 5000,
+      },
+    );
     return;
   }
   accept();
@@ -139,21 +193,19 @@ document
   .getElementById("btn-game-collection")
   ?.addEventListener("click", () => showCollectionModal({ fromGame: true }));
 document.getElementById("btn-shop")?.addEventListener("click", openShopOverlay);
-document
-  .getElementById("btn-game-help")
-  ?.addEventListener("click", () =>
-    showGameInfoModal(
-      "Cách chơi",
-      `<ul class="app-feature-list">
+document.getElementById("btn-game-help")?.addEventListener("click", () =>
+  showGameInfoModal(
+    "Cách chơi",
+    `<ul class="app-feature-list">
         <li>Lật hai thẻ để tìm cặp hình giống nhau.</li>
         <li>Ghép hết các cặp trước khi thời gian kết thúc.</li>
         <li>Ghép đúng liên tiếp để tạo Combo và nhận thêm thời gian.</li>
         <li>Ghép thẻ đặc biệt để thu thập năng lượng và nhận hỗ trợ.</li>
         <li>Vật phẩm Thời gian và Xem trước mua ở cửa hàng sẽ được cất vào kho trên HUD.</li>
       </ul>`,
-      "book",
-    ),
-  );
+    "book",
+  ),
+);
 document
   .getElementById("btn-game-info")
   ?.addEventListener("click", () =>

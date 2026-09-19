@@ -10,13 +10,18 @@ export function solveTripleBoard({
   now = defaultNow,
   preferredWitness = [],
 } = {}) {
-  const limits = validateLimits({ maxNodes, maxMemo, deadlineMs, now });
   let initialState;
   try {
     initialState = createTripleRoundState(board);
   } catch (error) {
     return Object.freeze({ status: "invalid", reason: error.message, witness: Object.freeze([]), nodes: 0 });
   }
+  return solveTripleState({ initialState, maxNodes, maxMemo, deadlineMs, now, preferredWitness });
+}
+
+export function solveTripleState({ initialState, maxNodes = TRIPLE_EASY_SOLVER_BUDGET.maxNodes, maxMemo = TRIPLE_EASY_SOLVER_BUDGET.maxMemo, deadlineMs = TRIPLE_EASY_SOLVER_BUDGET.deadlineMs, now = defaultNow, preferredWitness = [] } = {}) {
+  const limits = validateLimits({ maxNodes, maxMemo, deadlineMs, now });
+  if (!initialState) return Object.freeze({ status: "invalid", reason: "missing-state", witness: Object.freeze([]), nodes: 0 });
   const deadline = limits.now() + limits.deadlineMs;
   const memo = new Set();
   let nodes = 0;

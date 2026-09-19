@@ -7,6 +7,7 @@ test("Triple development checkpoint restores after reload without undo history",
     const run = startTripleConnectDevelopmentRound({ seed: "persist" });
     for (const command of run.generated.witness) {
       document.querySelector(`[data-tile-id="${command.tileId}"]`)?.click();
+      await new Promise((resolve) => setTimeout(resolve, 280));
       if (run.getState().matchedTriples) break;
     }
     return { matched: run.getState().matchedTriples, score: run.getState().score };

@@ -66,15 +66,28 @@ Không được:
 - thêm abstraction “để dành” khi chưa có ít nhất hai nhu cầu thực sự giống nhau;
 - để TODO, code chết, listener, timer hoặc asset thử nghiệm mà không nêu và được chấp thuận.
 
-## 5. Tách biệt công việc và tránh xung đột
+## 5. Tách biệt công việc, tiếp tục đến hết gate và tránh xung đột
 
-- Mỗi lượt triển khai chỉ có một mục tiêu và một gate rõ ràng.
+- Mỗi lượt triển khai chỉ có một mục tiêu và một gate rõ ràng. **Một lượt được phép và phải gồm nhiều lần đọc, sửa, chạy lệnh, chờ tiến trình, chẩn đoán và chạy lại test cho đến khi toàn bộ gate đạt Definition of Done; không được hiểu là mỗi lượt chỉ làm một hàm, một file, một test hoặc một bước trung gian.**
 - Không trộn sửa baseline, dọn CSS, viết lại effect và thêm Triple Connect trong cùng một thay đổi nếu chưa được yêu cầu rõ.
 - Trước và sau khi sửa, kiểm tra trạng thái/diff; mọi thay đổi có sẵn được coi là của người dùng.
 - Không hoàn nguyên, format hàng loạt hoặc “dọn tiện” file ngoài phạm vi.
 - Nếu hai task cùng sửa một owner/module, thực hiện tuần tự hoặc chia ranh giới file/API rõ ràng trước khi bắt đầu.
 - Refactor cấu trúc và thay đổi hành vi nên ở các gate riêng để dễ review và rollback.
 - Implementation và đánh giá sau implementation là hai bước riêng: reviewer phải đọc diff và chạy lại bằng chứng, không chỉ tin báo cáo của agent viết code.
+
+### Quy tắc tiếp tục và điều kiện kết thúc lượt
+
+- Khi người dùng yêu cầu thực hiện một task/gate, agent phải tiếp tục tự chủ cho tới khi **toàn bộ acceptance criteria của task/gate đó đạt** hoặc gặp blocker thực sự. Không cần người dùng nhắn “tiếp tục” sau từng bước nội bộ.
+- Kết quả trung gian chỉ được gửi ở commentary. Không gửi final nếu vẫn còn hành động an toàn, đã được cho phép và nằm trong phạm vi mà agent có thể tự thực hiện.
+- Không kết thúc lượt bằng các câu như “bước tiếp theo là…”, “cần chạy tiếp…”, “chưa có kết quả đầy đủ…” hoặc “có thể tiếp tục…” nếu chính agent có thể thực hiện bước đó ngay trong lượt hiện tại.
+- Nếu lệnh/test trả session đang chạy hoặc mới có output một phần, phải tiếp tục chờ/poll bằng cơ chế của tool cho tới khi process kết thúc. Một profile pass không đại diện cho toàn bộ matrix; chỉ báo pass sau khi mọi profile bắt buộc đã có kết quả cuối.
+- Nếu test, lint, type-check hoặc build fail, phải đọc lỗi, xác định nguyên nhân, sửa trong đúng phạm vi và chạy lại kiểm tra liên quan. Test fail là tín hiệu để tiếp tục chẩn đoán, không phải lý do tự động kết thúc lượt.
+- Tool timeout, output bị cắt, process còn chạy hoặc một lần gọi lệnh thất bại do cú pháp/path không phải blocker. Agent phải dùng session hiện có, đọc output tiếp, thu hẹp lệnh hoặc chạy lại cách an toàn phù hợp.
+- Không dừng chỉ để tiết kiệm token, thời gian hoặc số tool call. Dùng progressive discovery, kết quả đã ghi và test mục tiêu để làm việc hiệu quả; khi context được compact, tiếp tục từ trạng thái hiện tại thay vì bắt đầu lại.
+- Chỉ được kết thúc khi chưa hoàn thành nếu có blocker thật thuộc một trong các nhóm: thiếu quyết định sản phẩm làm thay đổi đáng kể behavior/schema/API; cần quyền hoặc thao tác phá hủy chưa được phép; tài nguyên/dịch vụ bên ngoài bắt buộc không khả dụng; tài liệu và code xung đột mà thứ tự ưu tiên không giải quyết được; hoặc lỗi môi trường lặp lại sau khi đã thử các phương án an toàn hợp lý.
+- Khi bị blocker, báo đúng một lần với bằng chứng cụ thể: điều đã hoàn thành, lệnh/lỗi liên quan, phần còn lại, vì sao không thể tiếp tục và quyết định tối thiểu cần từ người dùng. Không dùng blocker giả cho việc khó, lâu hoặc còn nhiều bước.
+- Ngoại lệ: nếu người dùng chỉ yêu cầu đánh giá, giải thích, review, báo trạng thái hoặc chủ động yêu cầu dừng, agent trả đúng phạm vi đó và không tự triển khai thêm.
 
 Khi các kế hoạch hiện tại được dùng, thứ tự mặc định là:
 
@@ -217,6 +230,7 @@ Review độc lập phải đối chiếu implementation với task plan và acc
 
 ## 15. Checklist bắt buộc trước khi kết thúc
 
+- [ ] Toàn bộ task/gate được giao đã đạt acceptance criteria; không còn bước trong phạm vi mà agent đang để lại cho lượt “tiếp tục” sau.
 - [ ] Đã đủ ngữ cảnh cho mọi quyết định ảnh hưởng kết quả.
 - [ ] Đã giữ task trong đúng phạm vi và không ghi đè thay đổi của người dùng.
 - [ ] Giải pháp xử lý nguyên nhân gốc, không phải bản vá tạm.

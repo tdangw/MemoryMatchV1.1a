@@ -11,12 +11,17 @@ const DEFAULT_APPEARANCE = Object.freeze({
   flipEffect: "bounce",
   linkPathEffect: "default",
   linkExitEffect: "default",
-  themes: Object.freeze({ memoryMatch: "default", linkConnect: "default" }),
+  themes: Object.freeze({ memoryMatch: "default", linkConnect: "default", tripleConnect: "default" }),
   ownedCardBacks: ["classic"],
   ownedFlipEffects: ["bounce"],
   ownedLinkPathEffects: ["default"],
   ownedLinkExitEffects: ["default"],
   ownedThemes: ["default"],
+  ownedTripleThemes: ["default"],
+  triplePathEffect: "default",
+  tripleExitEffect: "default",
+  ownedTriplePathEffects: ["default"],
+  ownedTripleExitEffects: ["default"],
 });
 
 export const CARD_BACKS = Object.freeze([
@@ -132,7 +137,12 @@ export function normalizeAppearance(value = {}) {
   const linkPathEffect = knownId(LINK_PATH_EFFECTS, migrateLinkPathEffectId(value.linkPathEffect), DEFAULT_APPEARANCE.linkPathEffect);
   const linkExitEffect = knownId(LINK_EXIT_EFFECTS, migrateLinkExitEffectId(value.linkExitEffect), DEFAULT_APPEARANCE.linkExitEffect);
   const ownedThemes = normalizeOwnedThemes(value);
-  const themes = normalizeEquippedThemes(value, ownedThemes);
+  const ownedTripleThemes = ownedIds(THEMES, value.ownedTripleThemes, "default");
+  const themes = normalizeEquippedThemes(value, ownedThemes, ownedTripleThemes);
+  const ownedTriplePathEffects = ownedIds(LINK_PATH_EFFECTS, value.ownedTriplePathEffects, "default");
+  const ownedTripleExitEffects = ownedIds(LINK_EXIT_EFFECTS, value.ownedTripleExitEffects, "default");
+  const triplePathEffect = knownId(LINK_PATH_EFFECTS, migrateLinkPathEffectId(value.triplePathEffect), "default");
+  const tripleExitEffect = knownId(LINK_EXIT_EFFECTS, migrateLinkExitEffectId(value.tripleExitEffect), "default");
   return {
     cardBack: ownedCardBacks.includes(cardBack)
       ? cardBack
@@ -152,6 +162,11 @@ export function normalizeAppearance(value = {}) {
     ownedLinkPathEffects,
     ownedLinkExitEffects,
     ownedThemes,
+    ownedTripleThemes,
+    triplePathEffect: ownedTriplePathEffects.includes(triplePathEffect) ? triplePathEffect : "default",
+    tripleExitEffect: ownedTripleExitEffects.includes(tripleExitEffect) ? tripleExitEffect : "default",
+    ownedTriplePathEffects,
+    ownedTripleExitEffects,
   };
 }
 
@@ -163,21 +178,23 @@ export function getEquippedThemeId(appearance, gameId = "memory-match") {
 export function equipTheme(appearance, gameId, themeId) {
   const key = getThemeKey(gameId);
   const requestedTheme = getUsableTheme(themeId).id;
-  if (!getOwnedThemeIds(appearance).includes(requestedTheme)) return false;
+  if (!getOwnedThemeIds(appearance, gameId).includes(requestedTheme)) return false;
   appearance.themes = { ...appearance.themes, [key]: requestedTheme };
   return true;
 }
 
 export function getOwnedThemeIds(appearance, gameId = "memory-match") {
+  if (gameId === "triple-connect" || gameId === "tripleConnect") return appearance?.ownedTripleThemes || DEFAULT_APPEARANCE.ownedTripleThemes;
   return appearance?.ownedThemes || DEFAULT_APPEARANCE.ownedThemes;
 }
 
 export function ownTheme(appearance, gameId, themeId) {
   const requestedTheme = getUsableTheme(themeId).id;
   if (!THEMES.some((theme) => theme.id === requestedTheme)) return false;
-  const ownedThemes = getOwnedThemeIds(appearance);
+  const ownedThemes = getOwnedThemeIds(appearance, gameId);
   if (ownedThemes.includes(requestedTheme)) return false;
-  appearance.ownedThemes = [...ownedThemes, requestedTheme];
+  if (gameId === "triple-connect" || gameId === "tripleConnect") appearance.ownedTripleThemes = [...ownedThemes, requestedTheme];
+  else appearance.ownedThemes = [...ownedThemes, requestedTheme];
   return true;
 }
 
@@ -195,12 +212,13 @@ function normalizeOwnedThemes(value) {
   ).filter((id) => getTheme(id).id === id);
 }
 
-function normalizeEquippedThemes(value, ownedThemes) {
+function normalizeEquippedThemes(value, ownedThemes, ownedTripleThemes) {
   const savedThemes = value.themes && typeof value.themes === "object" ? value.themes : {};
   const legacyTheme = value.theme;
   return {
     memoryMatch: normalizeEquippedTheme(savedThemes.memoryMatch ?? legacyTheme, ownedThemes, "memoryMatch"),
     linkConnect: normalizeEquippedTheme(savedThemes.linkConnect, ownedThemes, "linkConnect"),
+    tripleConnect: normalizeEquippedTheme(savedThemes.tripleConnect, ownedTripleThemes, "tripleConnect"),
   };
 }
 
@@ -210,9 +228,9 @@ function normalizeEquippedTheme(requestedTheme, ownedThemes, gameKey) {
 }
 
 function getThemeKey(gameId) {
-  return gameId === "link-connect" || gameId === "linkConnect"
-    ? "linkConnect"
-    : "memoryMatch";
+  if (gameId === "link-connect" || gameId === "linkConnect") return "linkConnect";
+  if (gameId === "triple-connect" || gameId === "tripleConnect") return "tripleConnect";
+  return "memoryMatch";
 }
 
 export function getCardBackClass(id) {

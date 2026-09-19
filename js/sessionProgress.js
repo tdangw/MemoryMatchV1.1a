@@ -19,7 +19,9 @@ export function saveActiveSession(gameId, session) {
   const key = getGameProgressKey(gameId);
   if (!key || !session?.mode) return false;
   const sessions = (gameState.progress[key].sessionsByMode ||= {});
-  const previous = sessions[session.mode] ? { ...sessions[session.mode] } : null;
+  const previous = sessions[session.mode]
+    ? { ...sessions[session.mode] }
+    : null;
   if (!stageActiveSession(gameId, session)) return false;
   if (saveProgress(gameState.progress)) return true;
   if (previous) sessions[session.mode] = previous;
@@ -35,8 +37,15 @@ export function stageActiveSession(gameId, session) {
     gameState.progress[key].sessionsByMode[session.mode] = {
       mode: session.mode,
       level: Math.max(1, Math.floor(session.level || 1)),
-      ...(typeof session.layoutId === "string" ? { layoutId: session.layoutId } : {}),
-      ...(Number.isFinite(session.remainingTime) ? { remainingTime: Math.max(0, Math.floor(session.remainingTime)) } : {}),
+      ...(typeof session.seed === "string" && session.seed
+        ? { seed: session.seed }
+        : {}),
+      ...(typeof session.layoutId === "string"
+        ? { layoutId: session.layoutId }
+        : {}),
+      ...(Number.isFinite(session.remainingTime)
+        ? { remainingTime: Math.max(0, Math.floor(session.remainingTime)) }
+        : {}),
       snapshot: session.snapshot,
     };
     return true;
@@ -44,12 +53,19 @@ export function stageActiveSession(gameId, session) {
   gameState.progress[key].sessionsByMode[session.mode] = {
     mode: session.mode,
     level: Math.max(1, Math.floor(session.level || 1)),
-    ...(typeof session.gravityShift === "string" ? { gravityShift: session.gravityShift } : {}),
+    ...(typeof session.gravityShift === "string"
+      ? { gravityShift: session.gravityShift }
+      : {}),
     ...(Number.isFinite(session.specialProgress)
       ? { specialProgress: Math.max(0, Math.floor(session.specialProgress)) }
       : {}),
     ...(Number.isFinite(session.specialNoEnergyDropStreak)
-      ? { specialNoEnergyDropStreak: Math.max(0, Math.floor(session.specialNoEnergyDropStreak)) }
+      ? {
+          specialNoEnergyDropStreak: Math.max(
+            0,
+            Math.floor(session.specialNoEnergyDropStreak),
+          ),
+        }
       : {}),
     ...(Number.isFinite(session.remainingTime)
       ? { remainingTime: Math.max(0, Math.floor(session.remainingTime)) }

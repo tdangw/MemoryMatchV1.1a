@@ -43,6 +43,42 @@ test("Triple menu starts a visible playable board", async ({ page }) => {
   await expect(page.locator(".triple-connect__board .triple-connect__tile")).toHaveCount(12);
 });
 
+test("switching all released games after a production Triple start keeps one active shell", async ({ page }) => {
+  await page.goto("/");
+  await page.locator(".game-selector__choice").filter({ hasText: "Triple Connect" }).click();
+  await page.locator("#menu-container.triple-connect-menu .menu-item").filter({ hasText: "Bắt đầu" }).click();
+  await page.locator("#triple-difficulty-modal .difficulty-option").filter({ hasText: "Dễ" }).click();
+  await expect(page.locator("#triple-connect-container")).toBeVisible();
+
+  const result = await page.evaluate(async () => {
+    const { openGameMenu, showGameSelector } = await import("/js/gameSelector.js");
+    const { getTripleShell } = await import("/js/tripleConnect/tripleShell.js");
+    const { getGameShellDiagnostics } = await import("/js/gameShell/gameShell.js");
+    const tripleRoot = getTripleShell().refs.root;
+    const menuResults = [
+      openGameMenu("memory-match"),
+      openGameMenu("link-connect"),
+      openGameMenu("triple-connect"),
+    ];
+    showGameSelector();
+    return {
+      menuResults,
+      activeShell: getGameShellDiagnostics().activeShell,
+      visibleBoards: [...document.querySelectorAll('[data-shell-region="board"]')]
+        .filter(node => node.getClientRects().length > 0).length,
+      tripleRoots: document.querySelectorAll("#triple-connect-container").length,
+      tripleRootHidden: tripleRoot.hidden,
+    };
+  });
+
+  expect(result.menuResults).toEqual([true, true, true]);
+  expect(result.activeShell).toBeNull();
+  expect(result.visibleBoards).toBe(0);
+  expect(result.tripleRoots).toBe(1);
+  expect(result.tripleRootHidden).toBe(true);
+  await expect(page.locator(".game-selector__choice")).toHaveCount(3);
+});
+
 test("unknown game IDs are rejected without a fallback menu", async ({ page }) => {
   await page.goto("/");
 

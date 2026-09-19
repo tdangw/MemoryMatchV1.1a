@@ -1,11 +1,12 @@
 import assert from "node:assert/strict";
-import { calculateTripleMatchScore, TRIPLE_EASY_CONFIG, TRIPLE_RULES } from "../js/tripleConnect/tripleConfig.js";
+import { calculateTripleCoinReward, calculateTripleMatchScore, getTripleStarProgress, TRIPLE_EASY_CONFIG, TRIPLE_RULES } from "../js/tripleConnect/tripleConfig.js";
 import { TRIPLE_PRODUCT_DECISIONS } from "../js/tripleConnect/tripleConfig.js";
 import { reduceTripleCommand } from "../js/tripleConnect/tripleRules.js";
-import { createTripleRoundState, getExposedTileIds, restoreSerializedTripleRoundState, serializeTripleRoundState } from "../js/tripleConnect/tripleState.js";
+import { claimTripleMilestoneTiles, createTripleRoundState, getExposedTileIds, restoreSerializedTripleRoundState, serializeTripleRoundState } from "../js/tripleConnect/tripleState.js";
 import { gameState, hydrateGameState } from "../js/gameState.js";
 import { getTripleHintTileIds } from "../js/tripleConnect/tripleHint.js";
 import { consumeTripleItem, getTripleItemCount } from "../js/tripleConnect/tripleItems.js";
+import { resolveTripleMilestoneProgress } from "../js/tripleConnect/tripleMilestones.js";
 
 function makeState(typeCounts, coverGraph = {}) {
   const tiles = [];
@@ -27,9 +28,39 @@ assert.deepEqual(TRIPLE_EASY_CONFIG, { mode: "easy", tileCount: 12, layerCount: 
 assert.equal(TRIPLE_RULES.trayCapacity, 7);
 assert.equal(calculateTripleMatchScore(1), 10);
 assert.equal(calculateTripleMatchScore(2), 13);
+assert.deepEqual(getTripleStarProgress({ mode: "easy", score: 11 }).stars, 0);
+assert.deepEqual(getTripleStarProgress({ mode: "easy", score: 12 }).stars, 1);
+assert.deepEqual(getTripleStarProgress({ mode: "easy", score: 18 }).stars, 2);
+assert.deepEqual(getTripleStarProgress({ mode: "easy", score: 25 }).stars, 3);
+assert.deepEqual(getTripleStarProgress({ mode: "endless", score: 9 }).stars, 0);
+assert.deepEqual(getTripleStarProgress({ mode: "endless", score: 10 }).stars, 1);
+assert.deepEqual(getTripleStarProgress({ mode: "endless", score: 15 }).stars, 2);
+assert.deepEqual(getTripleStarProgress({ mode: "endless", score: 20 }).stars, 3);
+assert.equal(calculateTripleCoinReward({ mode: "easy", level: 1, stars: 3, maxCombo: 9 }), 13);
+assert.equal(calculateTripleCoinReward({ mode: "challenge", level: 3, stars: 2, maxCombo: 1 }), 10);
+assert.equal(calculateTripleCoinReward({ mode: "endless", level: 8, stars: 1, maxCombo: 5 }), 14);
 assert.deepEqual(TRIPLE_PRODUCT_DECISIONS.initialItems, { hint: 3 });
 assert.deepEqual(TRIPLE_PRODUCT_DECISIONS.itemPrices, { hint: 8, timePerSecond: 2, undo: 15, shuffle: 15 });
 assert.equal(TRIPLE_PRODUCT_DECISIONS.excludedItems.includes("tray-expand"), true);
+let milestone = { progress: 0, cycleId: 0, claimedIds: [] };
+for (let index = 0; index < 3; index += 1) milestone = resolveTripleMilestoneProgress({ milestones: milestone, tileIds: [`m-${index}`], mode: "easy" }).next;
+assert.equal(milestone.progress, 3);
+assert.deepEqual(milestone.claimedIds, ["0:1"]);
+assert.deepEqual(resolveTripleMilestoneProgress({ milestones: { progress: 5, cycleId: 0, claimedIds: [] }, tileIds: ["x"], mode: "endless" }).rewards[0].reward, { coins: 2 });
+assert.deepEqual(TRIPLE_PRODUCT_DECISIONS.milestones.itemFallbackCoins, { hint: 4, undo: 8, shuffle: 8 });
+let rollover = { progress: 29, cycleId: 4, claimedIds: ["4:10"] };
+rollover = resolveTripleMilestoneProgress({ milestones: rollover, tileIds: ["last"], mode: "easy" }).next;
+assert.deepEqual(rollover, { progress: 0, cycleId: 5, claimedIds: [] });
+let twentyCycles = { progress: 0, cycleId: 0, claimedIds: [] };
+const allClaims = [];
+for (let index = 0; index < 600; index += 1) {
+  const resolved = resolveTripleMilestoneProgress({ milestones: twentyCycles, tileIds: [`cycle-${index}`], mode: "easy" });
+  twentyCycles = resolved.next;
+  allClaims.push(...resolved.rewards.map((reward) => reward.claimId));
+}
+assert.equal(twentyCycles.cycleId, 20);
+assert.equal(twentyCycles.progress, 0);
+assert.equal(new Set(allClaims).size, 200, "Every milestone must be granted once in each cycle.");
 
 const covered = makeState(
   { a: 3, b: 3, c: 3, d: 3 },
@@ -68,12 +99,16 @@ assert.equal(matched.events.at(-1).type, "triple-resolved");
 
 let combo = makeState({ a: 3, b: 3, c: 3, d: 3 });
 for (const tileId of ["a-1", "a-2", "a-3", "b-1", "b-2", "b-3"]) combo = select(combo, tileId).nextState;
-assert.deepEqual({ combo: combo.combo, matchedTriples: combo.matchedTriples, score: combo.score, misses: combo.misses }, {
+assert.deepEqual({ combo: combo.combo, maxCombo: combo.maxCombo, matchedTriples: combo.matchedTriples, score: combo.score, misses: combo.misses }, {
   combo: 2,
+  maxCombo: 2,
   matchedTriples: 2,
   score: 23,
   misses: 0,
 });
+combo = select(combo, "c-1").nextState;
+combo = select(combo, "d-1").nextState;
+assert.deepEqual({ combo: combo.combo, maxCombo: combo.maxCombo }, { combo: 0, maxCombo: 2 });
 
 const replayCommands = ["a-1", "b-1", "a-2", "c-1", "a-3"];
 const replay = () => replayCommands.reduce(
@@ -106,6 +141,9 @@ assert.deepEqual(
 assert.equal(undo.nextState.tiles["a-3"].location, "board");
 assert.equal(undo.nextState.undoHistory.length, matched.nextState.undoHistory.length - 1);
 assert.equal(reduceTripleCommand(makeState({ a: 3, b: 3, c: 3, d: 3 }), { type: "undo" }).result.reason, "undo-empty");
+const milestoneMatched = claimTripleMilestoneTiles(matched.nextState, ["a-1", "a-2", "a-3"]);
+const milestoneUndo = reduceTripleCommand(milestoneMatched, { type: "undo" });
+assert.deepEqual(milestoneUndo.nextState.milestoneTileIds, ["a-1", "a-2", "a-3"], "Undo must retain the durable milestone attribution ledger.");
 
 let win = makeState({ a: 3 });
 for (const tileId of ["a-1", "a-2", "a-3"]) win = select(win, tileId).nextState;
@@ -117,6 +155,7 @@ assert.deepEqual(getTripleHintTileIds(grouped), ["a-3", "b-2"]);
 const persisted = serializeTripleRoundState(matched.nextState);
 assert.equal(Object.hasOwn(persisted, "undoHistory"), false);
 assert.deepEqual(restoreSerializedTripleRoundState(persisted), restoreSerializedTripleRoundState(persisted));
+assert.equal(restoreSerializedTripleRoundState({ ...persisted, maxCombo: undefined }).maxCombo, matched.nextState.combo);
 assert.throws(() => restoreSerializedTripleRoundState({ ...persisted, tiles: persisted.tiles.slice(1) }));
 hydrateGameState({ progress: { tripleConnect: { sessionsByMode: { easy: { mode: "easy", level: 1, snapshot: { ...persisted, tray: ["missing"] } } } } } });
 assert.deepEqual(gameState.progress.tripleConnect.sessionsByMode, {}, "Invalid Triple saves must not reach runtime state.");

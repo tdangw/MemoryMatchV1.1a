@@ -26,6 +26,12 @@ import {
   getMemoryItemId,
 } from "./memoryItems.js";
 import { revealMemoryTiles } from "./memoryPreview.js";
+import { TRIPLE_ITEMS, getTripleItemCount } from "./tripleConnect/tripleItems.js";
+import {
+  purchaseTripleEffect,
+  purchaseTripleItem,
+  purchaseTripleTheme,
+} from "./tripleConnect/tripleTransactions.js";
 
 export function openQuickAssistOverlay(kind) {
   if (gameState.isLocked || gameState.isPaused) return;
@@ -115,10 +121,11 @@ function useMemoryAssistItem(item, roundId) {
 }
 
 export function openShopOverlay({ fromMenu = false, gameId = "memory-match", linkConnect = false, onClose = () => {} } = {}) {
-  if (!fromMenu && !linkConnect && (gameState.isLocked || gameState.isPaused)) return;
+  const tripleConnect = gameId === "triple-connect";
+  if (!fromMenu && !linkConnect && !tripleConnect && (gameState.isLocked || gameState.isPaused)) return;
 
   const roundId = gameState.roundId;
-  if (!fromMenu && !linkConnect) gameState.isPaused = true;
+  if (!fromMenu && !linkConnect && !tripleConnect) gameState.isPaused = true;
 
   const content = document.createElement("div");
   content.className = "shop-content";
@@ -136,7 +143,7 @@ export function openShopOverlay({ fromMenu = false, gameId = "memory-match", lin
     content,
     size: "large",
     onClose: () => {
-      if (!fromMenu && !linkConnect && gameState.roundId === roundId) gameState.isPaused = false;
+      if (!fromMenu && !linkConnect && !tripleConnect && gameState.roundId === roundId) gameState.isPaused = false;
       onClose();
     },
   });
@@ -165,6 +172,17 @@ export function openShopOverlay({ fromMenu = false, gameId = "memory-match", lin
     const themesTab = createTab("Chủ đề", false, () => renderThemes(grid, roundId, modal, gameId));
     tabs.append(itemsTab, pathEffectsTab, exitEffectsTab, themesTab);
     renderLinkItems(grid, roundId, modal);
+  } else if (tripleConnect) {
+    const itemsTab = createTab("Vật phẩm", true, () => renderTripleItems(grid, roundId, modal));
+    const pathEffectsTab = createTab("Đường nối", false, () =>
+      renderTripleEffectShop(grid, "Hiệu ứng đường nối", "path", "ownedTriplePathEffects", LINK_PATH_EFFECTS, roundId, modal),
+    );
+    const exitEffectsTab = createTab("Xóa thẻ", false, () =>
+      renderTripleEffectShop(grid, "Hiệu ứng xóa thẻ", "exit", "ownedTripleExitEffects", LINK_EXIT_EFFECTS, roundId, modal),
+    );
+    const themesTab = createTab("Chủ đề", false, () => renderThemes(grid, roundId, modal, gameId));
+    tabs.append(itemsTab, pathEffectsTab, exitEffectsTab, themesTab);
+    renderTripleItems(grid, roundId, modal);
   } else {
     const itemsTab = createTab("Vật phẩm", true, () => renderMemoryItems(grid, roundId, modal));
     const appearanceTab = createTab("Ngoại hình", false, () =>
@@ -238,6 +256,59 @@ function renderLinkItems(grid, roundId, modal) {
     LINK_ITEMS.map(item => ({ ...item, type: "link-item" })),
     "Vật phẩm Link Connect", item => getLinkItemCount(item.id),
     () => renderLinkItems(grid, roundId, modal));
+}
+
+function renderTripleItems(grid, roundId, modal) {
+  renderInventoryItems(
+    grid,
+    roundId,
+    modal,
+    TRIPLE_ITEMS.map((item) => ({ ...item, type: "triple-item" })),
+    "Vật phẩm Triple Connect",
+    (item) => getTripleItemCount(item.id),
+    () => renderTripleItems(grid, roundId, modal),
+  );
+}
+
+function renderTripleEffectShop(grid, title, kind, ownedKey, effects, roundId, modal) {
+  grid.className = "shop-item-grid shop-item-grid--appearance";
+  grid.replaceChildren();
+  const group = document.createElement("section");
+  group.className = "appearance-group";
+  const heading = document.createElement("h3");
+  heading.textContent = title;
+  const choices = document.createElement("div");
+  choices.className = "appearance-choice-grid";
+  effects.forEach((item) => {
+    const owned = gameState.appearance[ownedKey].includes(item.id);
+    const card = document.createElement("article");
+    card.className = "appearance-choice";
+    const preview = document.createElement("div");
+    preview.className = `link-effect-preview ${item.className}`;
+    preview.append(createIcon(item.icon));
+    const name = document.createElement("strong");
+    name.textContent = item.title;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "app-button app-button--purchase shop-buy-button";
+    if (owned) {
+      button.classList.add("appearance-action--equipped");
+      button.textContent = "Đã sở hữu";
+      button.disabled = true;
+    } else {
+      button.append(document.createTextNode(String(item.price)), createIcon("coin"));
+      button.onclick = () => openPurchaseConfirmation(
+        { ...item, type: "triple-effect", effectKind: kind },
+        roundId,
+        modal,
+        () => renderTripleEffectShop(grid, title, kind, ownedKey, effects, roundId, modal),
+      );
+    }
+    card.append(preview, name, button);
+    choices.append(card);
+  });
+  group.append(heading, choices);
+  grid.append(group);
 }
 
 function renderInventoryItems(grid, roundId, modal, items, title, getCount, refresh) {
@@ -358,7 +429,7 @@ function renderThemes(grid, roundId, modal, gameId) {
       button.append(document.createTextNode(String(theme.price)), createIcon("coin"));
       button.onclick = () =>
         openPurchaseConfirmation(
-          { ...theme, type: "theme", gameId },
+          { ...theme, type: gameId === "triple-connect" ? "triple-theme" : "theme", gameId },
           roundId,
           modal,
           () => renderThemes(grid, roundId, modal, gameId),
@@ -474,7 +545,36 @@ function openPurchaseConfirmation(item, roundId, shopModal, onPurchase) {
 
 // Mua vật phẩm
 function handleBuyItem(item, roundId, fromMenu = false) {
-  if (item.type !== "link-item" && (gameState.roundId !== roundId || (!fromMenu && gameState.isLocked))) return false;
+  const tripleType = item.type === "triple-item" || item.type === "triple-theme" || item.type === "triple-effect";
+  if (item.type !== "link-item" && !tripleType && (gameState.roundId !== roundId || (!fromMenu && gameState.isLocked))) return false;
+
+  if (item.type === "triple-item") {
+    if (!purchaseTripleItem(item.id)) {
+      showShopMessage(gameState.coins < item.price ? "Bạn không đủ Xu để mua vật phẩm này." : "Không thể mua vật phẩm này.", gameState.coins < item.price ? "error" : "info");
+      return false;
+    }
+    updateCoinDisplay(gameState.coins);
+    showShopMessage(`Đã mua ${item.title}`);
+    return true;
+  }
+  if (item.type === "triple-theme") {
+    if (!purchaseTripleTheme(item.id, item.price)) {
+      showShopMessage("Không thể mua chủ đề này.", "error");
+      return false;
+    }
+    updateCoinDisplay(gameState.coins);
+    showShopMessage(`Đã mua chủ đề ${item.title}`);
+    return true;
+  }
+  if (item.type === "triple-effect") {
+    if (!purchaseTripleEffect(item.effectKind, item.id, item.price)) {
+      showShopMessage("Không thể mua hiệu ứng này.", "error");
+      return false;
+    }
+    updateCoinDisplay(gameState.coins);
+    showShopMessage(`Đã mua ${item.title}`);
+    return true;
+  }
 
   if (item.type === "appearance" || item.type === "link-effect") {
     const ownedKey =

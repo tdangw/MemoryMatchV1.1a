@@ -75,7 +75,7 @@ export function createGameShellHud({ stats = {}, stars = {}, coins = {}, tools =
       let nextMarked = false;
       markers.forEach((marker, index) => {
         setHudTooltip(marker, `Mốc ${index + 1}: ${descriptions[index]}`);
-        const earned = index + 1 <= progress;
+        const earned = (index + 1) * (milestones.step || 1) <= progress;
         flag(marker, "is-earned", earned);
         flag(marker, "is-next", !earned && !nextMarked);
         if (!earned) nextMarked = true;

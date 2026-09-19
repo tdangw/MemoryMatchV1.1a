@@ -1,6 +1,7 @@
 import { calculateTripleMatchScore, TRIPLE_RULES } from "./tripleConfig.js";
 import {
   assertTripleStateInvariant,
+  claimTripleMilestoneTiles,
   createTripleStateSnapshot,
   isTripleTileExposed,
   restoreTripleStateSnapshot,
@@ -29,6 +30,7 @@ function selectTile(state, tileId) {
   let streakCount = state.streakCount;
   let misses = state.misses;
   let combo = state.combo;
+  let maxCombo = state.maxCombo;
   let score = state.score;
   let matchedTriples = state.matchedTriples;
   const events = [{ type: "tile-selected", tileId }];
@@ -49,12 +51,17 @@ function selectTile(state, tileId) {
     matchingIds.forEach(id => { tiles[id] = { ...tiles[id], location: "removed" }; });
     tray = tray.filter(id => !matchingIds.includes(id));
     combo += 1;
+    maxCombo = Math.max(maxCombo, combo);
     const points = calculateTripleMatchScore(combo);
     score += points;
     matchedTriples += 1;
     streakType = null;
     streakCount = 0;
     events.push({ type: "triple-resolved", tileIds: matchingIds, points, combo });
+    const luckyRewards = matchingIds
+      .map((id) => tiles[id].lucky)
+      .filter((lucky) => lucky && !state.claimedLuckyIds.includes(lucky.id));
+    if (luckyRewards.length) events.push({ type: "lucky-resolved", rewards: luckyRewards });
   }
 
   let status = "playing";
@@ -72,6 +79,7 @@ function selectTile(state, tileId) {
     streakType,
     streakCount,
     combo,
+    maxCombo,
     misses,
     moves: state.moves + 1,
     score,
@@ -85,7 +93,10 @@ function undoSelection(state) {
   if (state.status !== "playing") return reject(state, "round-not-playing");
   if (!state.undoHistory.length) return reject(state, "undo-empty");
   const history = state.undoHistory.slice(0, -1);
-  const nextState = restoreTripleStateSnapshot(state.undoHistory.at(-1), history);
+  // Milestone attribution is a durable round ledger, not a reversible board move.
+  // Restoring an older board snapshot must not make the same tiles earn progress twice.
+  const restored = restoreTripleStateSnapshot(state.undoHistory.at(-1), history);
+  const nextState = claimTripleMilestoneTiles(restored, state.milestoneTileIds);
   return {
     nextState,
     events: Object.freeze([{ type: "undo-restored" }]),
@@ -127,10 +138,13 @@ function freezeNextState(previous, changes) {
     streakType: changes.streakType,
     streakCount: changes.streakCount,
     combo: changes.combo,
+    maxCombo: changes.maxCombo,
     misses: changes.misses,
     moves: changes.moves,
     score: changes.score,
     matchedTriples: changes.matchedTriples,
+    claimedLuckyIds: changes.claimedLuckyIds ?? previous.claimedLuckyIds,
+    milestoneTileIds: changes.milestoneTileIds ?? previous.milestoneTileIds,
     initialTileCount: previous.initialTileCount,
   }, changes.undoHistory);
 }

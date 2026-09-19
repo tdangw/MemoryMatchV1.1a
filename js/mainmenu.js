@@ -24,6 +24,7 @@ import {
   getOwnedThemeIds,
 } from "./appearance.js";
 import { LINK_EXIT_EFFECTS, LINK_PATH_EFFECTS } from "./linkConnect/linkEffects.js";
+import { equipTripleEffect, equipTripleTheme } from "./tripleConnect/tripleTransactions.js";
 import {
   GAME_MODES,
   getGameModeIcon,
@@ -422,8 +423,13 @@ export function showCollectionModal({
         button.classList.add("appearance-action--equip");
         button.textContent = "Trang bị";
         button.onclick = () => {
-          equipTheme(gameState.appearance, gameId, theme.id);
-          saveAppearance(gameState.appearance);
+          const saved = gameId === "triple-connect"
+            ? equipTripleTheme(theme.id)
+            : equipTheme(gameState.appearance, gameId, theme.id) && saveAppearance(gameState.appearance);
+          if (!saved) {
+            showAppToast("Không thể lưu thay đổi chủ đề.", { tone: "error" });
+            return;
+          }
           renderThemes();
           if (fromGame) showThemeChangeNotice();
           else
@@ -489,6 +495,59 @@ export function showCollectionModal({
     );
     const exitTab = createCollectionTab("Xóa thẻ", false, () =>
       renderLinkEffects("Hiệu ứng xóa thẻ", "linkExitEffect", "ownedLinkExitEffects", LINK_EXIT_EFFECTS),
+    );
+    tabs.append(themesTab, pathTab, exitTab);
+    renderThemes();
+  } else if (gameId === "triple-connect") {
+    const renderTripleEffects = (title, kind, ownedKey, equippedKey, effects) => {
+      grid.className = "shop-item-grid shop-item-grid--appearance";
+      grid.replaceChildren();
+      const group = document.createElement("section");
+      group.className = "appearance-group";
+      const heading = document.createElement("h3");
+      heading.textContent = title;
+      const choices = document.createElement("div");
+      choices.className = "appearance-choice-grid";
+      effects.filter((item) => gameState.appearance[ownedKey].includes(item.id)).forEach((item) => {
+        const equipped = gameState.appearance[equippedKey] === item.id;
+        const card = document.createElement("article");
+        card.className = `appearance-choice${equipped ? " is-equipped" : ""}`;
+        const preview = document.createElement("div");
+        preview.className = `link-effect-preview ${item.className}`;
+        preview.append(createIcon(item.icon));
+        const name = document.createElement("strong");
+        name.textContent = item.title;
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "app-button app-button--purchase shop-buy-button";
+        if (equipped) {
+          button.classList.add("appearance-action--equipped");
+          button.textContent = "Đang dùng";
+          button.disabled = true;
+        } else {
+          button.classList.add("appearance-action--equip");
+          button.textContent = "Trang bị";
+          button.onclick = () => {
+            if (!equipTripleEffect(kind, item.id)) {
+              showAppToast("Không thể lưu thay đổi hiệu ứng.", { tone: "error" });
+              return;
+            }
+            renderTripleEffects(title, kind, ownedKey, equippedKey, effects);
+            showAppToast(`Đã trang bị ${item.title}.`, { tone: "info" });
+          };
+        }
+        card.append(preview, name, button);
+        choices.append(card);
+      });
+      group.append(heading, choices);
+      grid.append(group);
+    };
+    const themesTab = createCollectionTab("Chủ đề", true, renderThemes);
+    const pathTab = createCollectionTab("Đường nối", false, () =>
+      renderTripleEffects("Hiệu ứng đường nối", "path", "ownedTriplePathEffects", "triplePathEffect", LINK_PATH_EFFECTS),
+    );
+    const exitTab = createCollectionTab("Xóa thẻ", false, () =>
+      renderTripleEffects("Hiệu ứng xóa thẻ", "exit", "ownedTripleExitEffects", "tripleExitEffect", LINK_EXIT_EFFECTS),
     );
     tabs.append(themesTab, pathTab, exitTab);
     renderThemes();
@@ -591,7 +650,7 @@ function applyCollectionCardBack() {
   });
 }
 
-export function showGameInfoModal(title, message, icon = "info") {
+export function showGameInfoModal(title, message, icon = "info", onClose = () => {}) {
   gameState.isPaused = true;
   openAppModal({
     id: "info-modal",
@@ -600,6 +659,7 @@ export function showGameInfoModal(title, message, icon = "info") {
     content: message,
     onClose: () => {
       gameState.isPaused = false;
+      onClose();
     },
   });
 }

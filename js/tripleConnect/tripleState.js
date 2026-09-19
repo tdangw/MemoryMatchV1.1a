@@ -16,10 +16,13 @@ export function createTripleRoundState({ roundId = 1, tiles, coverGraph = {} } =
     streakType: null,
     streakCount: 0,
     combo: 0,
+    maxCombo: 0,
     misses: 0,
     moves: 0,
     score: 0,
     matchedTriples: 0,
+    claimedLuckyIds: [],
+    milestoneTileIds: [],
     undoHistory: [],
     initialTileCount: Object.keys(normalizedTiles).length,
   };
@@ -87,11 +90,20 @@ export function assertTripleStateInvariant(state) {
     || (state.streakType !== null && typeof state.streakType !== "string")) {
     throw new TypeError("Triple streak is invalid.");
   }
-  if ([state.combo, state.misses, state.moves, state.score, state.matchedTriples].some(value => !Number.isInteger(value) || value < 0)) {
+  if ([state.combo, state.maxCombo, state.misses, state.moves, state.score, state.matchedTriples].some(value => !Number.isInteger(value) || value < 0)
+    || state.maxCombo < state.combo) {
     throw new TypeError("Triple counters are invalid.");
   }
   if (!Array.isArray(state.undoHistory) || state.undoHistory.length > state.initialTileCount) {
     throw new TypeError("Triple undo history is invalid.");
+  }
+  if (!Array.isArray(state.claimedLuckyIds) || new Set(state.claimedLuckyIds).size !== state.claimedLuckyIds.length
+    || state.claimedLuckyIds.some((id) => typeof id !== "string" || !id)) {
+    throw new TypeError("Triple Lucky claim ledger is invalid.");
+  }
+  if (!Array.isArray(state.milestoneTileIds) || new Set(state.milestoneTileIds).size !== state.milestoneTileIds.length
+    || state.milestoneTileIds.some((id) => !tiles[id])) {
+    throw new TypeError("Triple milestone tile ledger is invalid.");
   }
   if (!state.coverGraph || !state.layers) throw new TypeError("Triple board state is incomplete.");
   for (const tileId of tileIds) {
@@ -120,16 +132,26 @@ export function createTripleStateSnapshot(state) {
     streakType: state.streakType,
     streakCount: state.streakCount,
     combo: state.combo,
+    maxCombo: state.maxCombo,
     misses: state.misses,
     moves: state.moves,
     score: state.score,
     matchedTriples: state.matchedTriples,
+    claimedLuckyIds: state.claimedLuckyIds,
+    milestoneTileIds: state.milestoneTileIds,
     initialTileCount: state.initialTileCount,
   });
 }
 
 export function restoreTripleStateSnapshot(snapshot, undoHistory) {
-  const state = { ...snapshot, undoHistory };
+  const state = {
+    ...snapshot,
+    // Snapshot v1 trước Completion 5 chưa có maxCombo; combo hiện tại là
+    // giá trị tốt nhất còn có thể khôi phục mà không làm hỏng phiên đang dở.
+    maxCombo: Number.isInteger(snapshot.maxCombo) ? snapshot.maxCombo : Math.max(0, snapshot.combo || 0),
+    milestoneTileIds: snapshot.milestoneTileIds || [],
+    undoHistory,
+  };
   assertTripleStateInvariant(state);
   return freezeState(state);
 }
@@ -147,11 +169,14 @@ export function serializeTripleRoundState(state) {
     streakType: snapshot.streakType,
     streakCount: snapshot.streakCount,
     combo: snapshot.combo,
+    maxCombo: snapshot.maxCombo,
     misses: snapshot.misses,
     moves: snapshot.moves,
     score: snapshot.score,
     matchedTriples: snapshot.matchedTriples,
     initialTileCount: snapshot.initialTileCount,
+    claimedLuckyIds: snapshot.claimedLuckyIds,
+    milestoneTileIds: snapshot.milestoneTileIds,
   };
 }
 
@@ -159,7 +184,7 @@ export function restoreSerializedTripleRoundState(snapshot) {
   if (!snapshot || snapshot.version !== 1 || !Array.isArray(snapshot.tiles)) throw new TypeError("Triple snapshot is invalid.");
   const tiles = Object.fromEntries(snapshot.tiles.map(tile => [tile?.id, tile]));
   if (Object.keys(tiles).length !== snapshot.tiles.length) throw new TypeError("Triple snapshot has duplicate tiles.");
-  return restoreTripleStateSnapshot({ ...snapshot, tiles }, []);
+  return restoreTripleStateSnapshot({ ...snapshot, claimedLuckyIds: snapshot.claimedLuckyIds || [], milestoneTileIds: snapshot.milestoneTileIds || [], tiles }, []);
 }
 
 function normalizeTiles(tiles) {
@@ -175,6 +200,7 @@ function normalizeTiles(tiles) {
       slotId: String(source.slotId || id),
       layer: normalizeLayer(source.layer),
       location: "board",
+      lucky: normalizeLucky(source.lucky),
     });
   }
   return Object.freeze(result);
@@ -233,6 +259,7 @@ function freezeSnapshot(snapshot) {
     layers: cloneRecordOfArrays(snapshot.layers),
     coverGraph: cloneRecordOfArrays(snapshot.coverGraph),
     tray: [...snapshot.tray],
+    milestoneTileIds: [...(snapshot.milestoneTileIds || [])],
   });
 }
 
@@ -244,7 +271,43 @@ function freezeState(state) {
     coverGraph: cloneRecordOfArrays(state.coverGraph),
     tray: [...state.tray],
     undoHistory: [...state.undoHistory],
+    claimedLuckyIds: [...state.claimedLuckyIds],
+    milestoneTileIds: [...state.milestoneTileIds],
   });
+}
+
+export function claimTripleLuckyRewards(state, luckyIds) {
+  assertTripleStateInvariant(state);
+  const additions = [...new Set(luckyIds || [])].filter((id) =>
+    typeof id === "string" && !state.claimedLuckyIds.includes(id),
+  );
+  if (!additions.length) return state;
+  return restoreTripleStateSnapshot({
+    ...createTripleStateSnapshot(state),
+    claimedLuckyIds: [...state.claimedLuckyIds, ...additions],
+  }, []);
+}
+
+export function claimTripleMilestoneTiles(state, tileIds) {
+  assertTripleStateInvariant(state);
+  const additions = [...new Set(tileIds || [])].filter((id) =>
+    typeof id === "string" && state.tiles[id] && !state.milestoneTileIds.includes(id),
+  );
+  if (!additions.length) return state;
+  return restoreTripleStateSnapshot({
+    ...createTripleStateSnapshot(state),
+    milestoneTileIds: [...state.milestoneTileIds, ...additions],
+  }, state.undoHistory);
+}
+
+function normalizeLucky(value) {
+  if (!value) return null;
+  const id = String(value.id || "");
+  const type = value.reward?.type;
+  const amount = value.reward?.amount;
+  if (!id || !["coins", "time", "hint"].includes(type) || !Number.isInteger(amount) || amount < 1)
+    throw new TypeError("Triple Lucky metadata is invalid.");
+  return Object.freeze({ id, reward: Object.freeze({ type, amount }) });
 }
 
 function cloneTiles(tiles) {

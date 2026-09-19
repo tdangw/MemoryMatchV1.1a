@@ -124,12 +124,17 @@ assert.deepEqual(
     flipEffect: "bounce",
     linkPathEffect: "hydro",
     linkExitEffect: "ghost",
-    themes: { memoryMatch: "default", linkConnect: "default" },
+    themes: { memoryMatch: "default", linkConnect: "default", tripleConnect: "default" },
     ownedCardBacks: ["classic"],
     ownedFlipEffects: ["bounce"],
     ownedLinkPathEffects: ["default", "hydro", "meteor"],
     ownedLinkExitEffects: ["default", "ghost", "split8"],
     ownedThemes: ["default"],
+    ownedTripleThemes: ["default"],
+    triplePathEffect: "default",
+    tripleExitEffect: "default",
+    ownedTriplePathEffects: ["default"],
+    ownedTripleExitEffects: ["default"],
   },
 );
 

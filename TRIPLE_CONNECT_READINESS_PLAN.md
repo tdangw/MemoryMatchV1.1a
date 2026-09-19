@@ -6,7 +6,7 @@ Ngày đánh giá: 2026-09-09
 
 ## 1. Kết luận điều hành
 
-**Trạng thái hiện tại: Gate 0 đã hoàn tất; được bắt đầu Gate 1.** Triple vẫn phải giữ trạng thái chưa phát hành cho tới gate phát hành trong task plan hiện hành.
+**Trạng thái hiện tại:** Triple đã có vertical slice và được giữ trong selector/menu để người dùng chơi thử tích hợp. Điều này không đồng nghĩa game đã qua QA đóng gói/phân phối PWA/APK.
 
 Danh sách điều kiện bên dưới là snapshot lịch sử dùng để giải thích Gate 0, không phải việc cần thực hiện lại:
 
@@ -224,4 +224,4 @@ Thứ tự giảm rủi ro: Gợi ý -> Thêm thời gian -> Hoàn tác -> Xáo 
 
 Thứ tự cũ trong tài liệu đánh giá này được thay bằng thứ tự tại `TASK_TRIPLE_CONNECT_IMPLEMENTATION_PLAN.md`: `Gate 0 -> Gate 1 -> Gate 2 -> Gate 3 -> Gate 4 -> Gate 5 -> Gate 6 -> Gate 7A -> Gate 8 -> Gate 7B/7C`.
 
-Không mở game trong selector đại trà trước Gate 7C của task plan hiện hành và chưa có phê duyệt phát hành. Không triển khai bàn 60 thẻ hoặc Shuffle trước khi solver có telemetry, timeout và corpus benchmark.
+Giữ Triple trong selector/menu để kiểm thử thực tế theo yêu cầu người dùng. Chỉ việc đóng gói/phân phối bản hoàn chỉnh phải chờ Completion 6 và xác nhận cuối. Không triển khai Shuffle trước khi solver có telemetry, timeout và corpus benchmark.

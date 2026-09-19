@@ -3,15 +3,29 @@ import {
   TRIPLE_EASY_FALLBACK_SEED,
   TRIPLE_EASY_GENERATOR_BUDGET,
   TRIPLE_EASY_LAYOUT,
+  TRIPLE_EASY_LAYOUT_V2,
+  TRIPLE_EASY_LAYOUT_V1,
   TRIPLE_NORMAL_CONFIG,
   TRIPLE_NORMAL_LAYOUT,
+  TRIPLE_NORMAL_LAYOUT_V2,
+  TRIPLE_NORMAL_LAYOUT_V1,
   TRIPLE_HARD_CONFIG,
   TRIPLE_HARD_LAYOUT,
+  TRIPLE_HARD_LAYOUT_V2,
+  TRIPLE_HARD_LAYOUT_V1,
   TRIPLE_HARD_SOLVER_BUDGET,
   TRIPLE_SUPER_HARD_CONFIG,
   TRIPLE_SUPER_HARD_LAYOUT,
+  TRIPLE_SUPER_HARD_LAYOUT_V2,
+  TRIPLE_SUPER_HARD_LAYOUT_V1,
   TRIPLE_SUPER_HARD_SOLVER_BUDGET,
   TRIPLE_ENDLESS_CONFIG,
+  TRIPLE_CHALLENGE_18_LAYOUT,
+  TRIPLE_CHALLENGE_30_LAYOUT,
+  TRIPLE_CHALLENGE_42_LAYOUT,
+  TRIPLE_CHALLENGE_48_LAYOUT,
+  getTripleChallengeStage,
+  TRIPLE_LUCKY_REWARDS,
 } from "./tripleConfig.js";
 import { reduceTripleCommand } from "./tripleRules.js";
 import { createTripleRoundState } from "./tripleState.js";
@@ -20,29 +34,101 @@ import { solveTripleBoard } from "./tripleSolver.js";
 export function getEasyTripleLayout() {
   return TRIPLE_EASY_LAYOUT;
 }
-export function getNormalTripleLayout() { return TRIPLE_NORMAL_LAYOUT; }
+export function getNormalTripleLayout() {
+  return TRIPLE_NORMAL_LAYOUT;
+}
 export function getTripleLayout(layoutId) {
-  const layouts = [TRIPLE_EASY_LAYOUT, TRIPLE_NORMAL_LAYOUT, TRIPLE_HARD_LAYOUT, TRIPLE_SUPER_HARD_LAYOUT];
+  const layouts = [
+    TRIPLE_EASY_LAYOUT,
+    TRIPLE_NORMAL_LAYOUT,
+    TRIPLE_HARD_LAYOUT,
+    TRIPLE_SUPER_HARD_LAYOUT,
+    TRIPLE_EASY_LAYOUT_V2,
+    TRIPLE_NORMAL_LAYOUT_V2,
+    TRIPLE_HARD_LAYOUT_V2,
+    TRIPLE_SUPER_HARD_LAYOUT_V2,
+    TRIPLE_CHALLENGE_18_LAYOUT,
+    TRIPLE_CHALLENGE_30_LAYOUT,
+    TRIPLE_CHALLENGE_42_LAYOUT,
+    TRIPLE_CHALLENGE_48_LAYOUT,
+    TRIPLE_EASY_LAYOUT_V1,
+    TRIPLE_NORMAL_LAYOUT_V1,
+    TRIPLE_HARD_LAYOUT_V1,
+    TRIPLE_SUPER_HARD_LAYOUT_V1,
+  ];
   const layout = layouts.find((candidate) => candidate.id === layoutId);
   if (!layout) throw new TypeError(`Unsupported Triple layout: ${layoutId}`);
   return layout;
 }
 export function generateNormalTripleBoard({ seed, solverOptions } = {}) {
-  return generateBoard({ seed, layout: TRIPLE_NORMAL_LAYOUT, config: TRIPLE_NORMAL_CONFIG, solverOptions });
+  return generateBoard({
+    seed,
+    layout: TRIPLE_NORMAL_LAYOUT,
+    config: TRIPLE_NORMAL_CONFIG,
+    solverOptions,
+  });
 }
-export function generateHardTripleBoard({ seed, solverOptions } = {}) { return generateBoard({ seed, maxAttempts: 1, layout: TRIPLE_HARD_LAYOUT, config: TRIPLE_HARD_CONFIG, solverOptions: { ...TRIPLE_HARD_SOLVER_BUDGET, ...solverOptions } }); }
-export function generateSuperHardTripleBoard({ seed, solverOptions } = {}) { return generateBoard({ seed, maxAttempts: 1, layout: TRIPLE_SUPER_HARD_LAYOUT, config: TRIPLE_SUPER_HARD_CONFIG, solverOptions: { ...TRIPLE_SUPER_HARD_SOLVER_BUDGET, ...solverOptions } }); }
-export function generateEndlessTripleBoard({ seed, solverOptions } = {}) { return generateBoard({ seed, maxAttempts: 1, layout: TRIPLE_SUPER_HARD_LAYOUT, config: TRIPLE_ENDLESS_CONFIG, solverOptions: { ...TRIPLE_SUPER_HARD_SOLVER_BUDGET, ...solverOptions } }); }
+export function generateHardTripleBoard({ seed, solverOptions } = {}) {
+  return generateBoard({
+    seed,
+    maxAttempts: 1,
+    layout: TRIPLE_HARD_LAYOUT,
+    config: TRIPLE_HARD_CONFIG,
+    solverOptions: { ...TRIPLE_HARD_SOLVER_BUDGET, ...solverOptions },
+  });
+}
+export function generateSuperHardTripleBoard({ seed, solverOptions } = {}) {
+  return generateBoard({
+    seed,
+    maxAttempts: 1,
+    layout: TRIPLE_SUPER_HARD_LAYOUT,
+    config: TRIPLE_SUPER_HARD_CONFIG,
+    solverOptions: { ...TRIPLE_SUPER_HARD_SOLVER_BUDGET, ...solverOptions },
+  });
+}
+export function generateEndlessTripleBoard({ seed, solverOptions } = {}) {
+  return generateBoard({
+    seed,
+    maxAttempts: 1,
+    layout: TRIPLE_SUPER_HARD_LAYOUT,
+    config: TRIPLE_ENDLESS_CONFIG,
+    solverOptions: { ...TRIPLE_SUPER_HARD_SOLVER_BUDGET, ...solverOptions },
+  });
+}
+
+export function generateChallengeTripleBoard({ seed, level = 1, solverOptions, luckyCount } = {}) {
+  const stage = getTripleChallengeStage(level);
+  const generated = generateBoard({
+    seed,
+    maxAttempts: 1,
+    fallbackSeed: `triple-challenge-${stage.tileCount}-fallback`,
+    layout: getTripleLayout(stage.layoutId),
+    config: stage,
+    solverOptions: { ...stage.solverBudget, ...solverOptions },
+  });
+  return decorateChallengeLuckies(generated, `${seed || stage.layoutId}:lucky`, luckyCount);
+}
 
 export function createTripleCoverGraph(layout = TRIPLE_EASY_LAYOUT) {
-  validateLayout(layout);
-  const graph = Object.fromEntries(layout.slots.map(slot => [slot.id, []]));
+  validateTripleLayout(layout);
+  const graph = Object.fromEntries(layout.slots.map((slot) => [slot.id, []]));
   for (const lower of layout.slots) {
     for (const higher of layout.slots) {
-      if (higher.layer > lower.layer && rectanglesOverlap(lower, higher, layout)) graph[lower.id].push(higher.id);
+      if (
+        higher.layer > lower.layer &&
+        rectanglesOverlap(lower, higher, layout)
+      )
+        graph[lower.id].push(higher.id);
     }
   }
-  return Object.freeze(Object.fromEntries(Object.entries(graph).map(([slotId, blockers]) => [slotId, Object.freeze(blockers)])));
+  return Object.freeze(
+    Object.fromEntries(
+      Object.entries(graph).map(([slotId, blockers]) => [
+        slotId,
+        Object.freeze(blockers),
+      ]),
+    ),
+  );
 }
 
 export function generateEasyTripleBoard({
@@ -50,25 +136,64 @@ export function generateEasyTripleBoard({
   maxAttempts = TRIPLE_EASY_GENERATOR_BUDGET.maxAttempts,
   solverOptions,
 } = {}) {
-  return generateBoard({ seed, maxAttempts, solverOptions, layout: TRIPLE_EASY_LAYOUT, config: TRIPLE_EASY_CONFIG });
+  return generateBoard({
+    seed,
+    maxAttempts,
+    solverOptions,
+    layout: TRIPLE_EASY_LAYOUT,
+    config: TRIPLE_EASY_CONFIG,
+  });
 }
-function generateBoard({ seed, maxAttempts = TRIPLE_EASY_GENERATOR_BUDGET.maxAttempts, solverOptions, layout, config }) {
+function generateBoard({
+  seed,
+  maxAttempts = TRIPLE_EASY_GENERATOR_BUDGET.maxAttempts,
+  fallbackSeed = TRIPLE_EASY_FALLBACK_SEED,
+  solverOptions,
+  layout,
+  config,
+}) {
   const normalizedSeed = normalizeSeed(seed);
   const attempts = normalizeAttemptCount(maxAttempts);
   for (let attempt = 0; attempt < attempts; attempt += 1) {
     const candidate = buildSolutionFirstBoard({
       seed: `${normalizedSeed}:${attempt}`,
-      layout, config,
+      layout,
+      config,
     });
-    const solved = solveTripleBoard({ board: candidate.board, preferredWitness: candidate.witness, now: () => 0, ...solverOptions });
-    if (solved.status === "solved") return freezeGeneratedBoard({ ...candidate, witness: solved.witness, source: "generated" });
+    const solved = solveTripleBoard({
+      board: candidate.board,
+      preferredWitness: candidate.witness,
+      now: () => 0,
+      ...solverOptions,
+    });
+    if (solved.status === "solved")
+      return freezeGeneratedBoard({
+        ...candidate,
+        witness: solved.witness,
+        source: "generated",
+      });
   }
-  const fallback = buildSolutionFirstBoard({ seed: TRIPLE_EASY_FALLBACK_SEED, layout, config });
-  const solvedFallback = solveTripleBoard({ board: fallback.board, preferredWitness: fallback.witness, now: () => 0, ...solverOptions });
+  const fallback = buildSolutionFirstBoard({
+    seed: fallbackSeed,
+    layout,
+    config,
+  });
+  const solvedFallback = solveTripleBoard({
+    board: fallback.board,
+    preferredWitness: fallback.witness,
+    now: () => 0,
+    ...solverOptions,
+  });
   if (solvedFallback.status !== "solved") {
-    throw new Error(`Triple fallback corpus failed solver validation: ${solvedFallback.status}`);
+    throw new Error(
+      `Triple fallback corpus failed solver validation: ${solvedFallback.status}`,
+    );
   }
-  return freezeGeneratedBoard({ ...fallback, witness: solvedFallback.witness, source: "fallback" });
+  return freezeGeneratedBoard({
+    ...fallback,
+    witness: solvedFallback.witness,
+    source: "fallback",
+  });
 }
 
 export function replayTripleWitness(board, witness) {
@@ -80,7 +205,8 @@ export function replayTripleWitness(board, witness) {
   }
   for (const command of witness || []) {
     const transition = reduceTripleCommand(state, command);
-    if (!transition.result.ok) return { ok: false, reason: transition.result.reason, state };
+    if (!transition.result.ok)
+      return { ok: false, reason: transition.result.reason, state };
     state = transition.nextState;
   }
   return { ok: state.status === "won", reason: state.status, state };
@@ -90,7 +216,13 @@ function buildSolutionFirstBoard({ seed, layout, config }) {
   const random = createSeededRng(seed);
   const coverGraphBySlot = createTripleCoverGraph(layout);
   const witnessSlots = createWitnessSlots(layout, random);
-  const typeOrder = shuffle(Array.from({ length: config.tileCount / 3 }, (_, index) => `triple-${index + 1}`), random);
+  const typeOrder = shuffle(
+    Array.from(
+      { length: config.tileCount / 3 },
+      (_, index) => `triple-${index + 1}`,
+    ),
+    random,
+  );
   const tilesBySlot = new Map();
   witnessSlots.forEach((slot, index) => {
     const type = typeOrder[Math.floor(index / 3)];
@@ -101,16 +233,27 @@ function buildSolutionFirstBoard({ seed, layout, config }) {
       layer: slot.layer,
     });
   });
-  const tiles = layout.slots.map(slot => tilesBySlot.get(slot.id));
-  const tileIdBySlot = Object.fromEntries(tiles.map(tile => [tile.slotId, tile.id]));
-  const coverGraph = Object.fromEntries(Object.entries(coverGraphBySlot).map(([slotId, blockers]) => [
-    tileIdBySlot[slotId],
-    blockers.map(blockerId => tileIdBySlot[blockerId]),
-  ]));
-  const witness = witnessSlots.map(slot => Object.freeze({ type: "select-tile", tileId: tileIdBySlot[slot.id] }));
-  const board = Object.freeze({ roundId: 1, tiles: Object.freeze(tiles), coverGraph: Object.freeze(coverGraph) });
+  const tiles = layout.slots.map((slot) => tilesBySlot.get(slot.id));
+  const tileIdBySlot = Object.fromEntries(
+    tiles.map((tile) => [tile.slotId, tile.id]),
+  );
+  const coverGraph = Object.fromEntries(
+    Object.entries(coverGraphBySlot).map(([slotId, blockers]) => [
+      tileIdBySlot[slotId],
+      blockers.map((blockerId) => tileIdBySlot[blockerId]),
+    ]),
+  );
+  const witness = witnessSlots.map((slot) =>
+    Object.freeze({ type: "select-tile", tileId: tileIdBySlot[slot.id] }),
+  );
+  const board = Object.freeze({
+    roundId: 1,
+    tiles: Object.freeze(tiles),
+    coverGraph: Object.freeze(coverGraph),
+  });
   const replay = replayTripleWitness(board, witness);
-  if (!replay.ok) throw new Error(`Solution-first witness is invalid: ${replay.reason}`);
+  if (!replay.ok)
+    throw new Error(`Solution-first witness is invalid: ${replay.reason}`);
   return Object.freeze({ seed, layoutId: layout.id, board, witness });
 }
 
@@ -123,25 +266,138 @@ function createWitnessSlots(layout, random) {
   }
   return [...layers.keys()]
     .sort((left, right) => right - left)
-    .flatMap(layer => shuffle(layers.get(layer), random));
+    .flatMap((layer) => shuffle(layers.get(layer), random));
 }
 
 function rectanglesOverlap(first, second, layout) {
   const epsilon = layout.overlapEpsilon;
-  return Math.min(first.x + layout.tileWidth, second.x + layout.tileWidth) - Math.max(first.x, second.x) > epsilon
-    && Math.min(first.y + layout.tileHeight, second.y + layout.tileHeight) - Math.max(first.y, second.y) > epsilon;
+  return (
+    Math.min(first.x + layout.tileWidth, second.x + layout.tileWidth) -
+      Math.max(first.x, second.x) >
+      epsilon &&
+    Math.min(first.y + layout.tileHeight, second.y + layout.tileHeight) -
+      Math.max(first.y, second.y) >
+      epsilon
+  );
 }
 
-function validateLayout(layout) {
-  if (!layout || !Array.isArray(layout.slots) || !layout.slots.length || layout.tileWidth <= 0 || layout.tileHeight <= 0) {
+export function validateTripleLayout(layout) {
+  if (
+    !layout ||
+    !Array.isArray(layout.slots) ||
+    !layout.slots.length ||
+    layout.tileWidth <= 0 ||
+    layout.tileHeight <= 0
+  ) {
     throw new TypeError("Triple layout is invalid.");
   }
   const slotIds = new Set();
+  const slotsByLayer = new Map();
   for (const slot of layout.slots) {
-    if (!slot?.id || slotIds.has(slot.id) || !Number.isInteger(slot.layer) || slot.layer < 0
-      || !Number.isFinite(slot.x) || !Number.isFinite(slot.y)) throw new TypeError("Triple layout slot is invalid.");
+    if (
+      !slot?.id ||
+      slotIds.has(slot.id) ||
+      !Number.isInteger(slot.layer) ||
+      slot.layer < 0 ||
+      !Number.isFinite(slot.x) ||
+      !Number.isFinite(slot.y)
+    )
+      throw new TypeError("Triple layout slot is invalid.");
     slotIds.add(slot.id);
+    const layerSlots = slotsByLayer.get(slot.layer) || [];
+    layerSlots.push(slot);
+    slotsByLayer.set(slot.layer, layerSlots);
+    if (
+      layout.coordinateUnit === "half-card" &&
+      (slot.x < 0 ||
+        slot.y < 0 ||
+        slot.x + layout.tileWidth > layout.gridWidth ||
+        slot.y + layout.tileHeight > layout.gridHeight)
+    ) {
+      throw new TypeError("Triple layout slot is outside its template bounds.");
+    }
   }
+  if (layout.coordinateUnit !== "half-card") return;
+  if (
+    !Number.isInteger(layout.gridWidth) ||
+    !Number.isInteger(layout.gridHeight) ||
+    !Array.isArray(layout.layerCounts)
+  ) {
+    throw new TypeError("Triple template geometry is invalid.");
+  }
+  const sortedLayers = [...slotsByLayer.keys()].sort(
+    (left, right) => left - right,
+  );
+  if (
+    sortedLayers.length !== layout.layerCounts.length ||
+    sortedLayers.some((layer, index) => layer !== index)
+  ) {
+    throw new TypeError("Triple template layers must be contiguous.");
+  }
+  for (const [layer, slots] of slotsByLayer) {
+    if (slots.length !== layout.layerCounts[layer])
+      throw new TypeError("Triple template layer count is invalid.");
+    for (let index = 0; index < slots.length; index += 1) {
+      for (
+        let otherIndex = index + 1;
+        otherIndex < slots.length;
+        otherIndex += 1
+      ) {
+        if (rectanglesOverlap(slots[index], slots[otherIndex], layout))
+          throw new TypeError("Triple template has a same-layer collision.");
+      }
+    }
+  }
+  for (const [layer, slots] of slotsByLayer) {
+    if (layer === 0) continue;
+    const lowerSlots = layout.slots.filter((slot) => slot.layer < layer);
+    for (const slot of slots) {
+      if (!lowerSlots.some((lower) => rectanglesOverlap(lower, slot, layout)))
+        throw new TypeError("Triple template has a non-blocking upper tile.");
+    }
+  }
+  for (const slot of layout.slots) {
+    const blockers = layout.slots.filter(
+      (other) =>
+        other.layer > slot.layer && rectanglesOverlap(slot, other, layout),
+    );
+    if (!hasVisibleArea(slot, blockers, layout))
+      throw new TypeError("Triple template fully covers a lower tile.");
+  }
+}
+
+function hasVisibleArea(slot, blockers, layout) {
+  if (!blockers.length) return true;
+  const xEdges = new Set([slot.x, slot.x + layout.tileWidth]);
+  const yEdges = new Set([slot.y, slot.y + layout.tileHeight]);
+  for (const blocker of blockers) {
+    xEdges.add(Math.max(slot.x, blocker.x));
+    xEdges.add(
+      Math.min(slot.x + layout.tileWidth, blocker.x + layout.tileWidth),
+    );
+    yEdges.add(Math.max(slot.y, blocker.y));
+    yEdges.add(
+      Math.min(slot.y + layout.tileHeight, blocker.y + layout.tileHeight),
+    );
+  }
+  const xs = [...xEdges].sort((left, right) => left - right);
+  const ys = [...yEdges].sort((left, right) => left - right);
+  for (let xIndex = 0; xIndex < xs.length - 1; xIndex += 1)
+    for (let yIndex = 0; yIndex < ys.length - 1; yIndex += 1) {
+      const x = (xs[xIndex] + xs[xIndex + 1]) / 2;
+      const y = (ys[yIndex] + ys[yIndex + 1]) / 2;
+      if (
+        !blockers.some(
+          (blocker) =>
+            x > blocker.x &&
+            x < blocker.x + layout.tileWidth &&
+            y > blocker.y &&
+            y < blocker.y + layout.tileHeight,
+        )
+      )
+        return true;
+    }
+  return false;
 }
 
 function normalizeSeed(seed) {
@@ -152,7 +408,8 @@ function normalizeSeed(seed) {
 
 function normalizeAttemptCount(value) {
   const number = Number(value);
-  if (!Number.isInteger(number) || number < 0) throw new TypeError("maxAttempts must be a non-negative integer.");
+  if (!Number.isInteger(number) || number < 0)
+    throw new TypeError("maxAttempts must be a non-negative integer.");
   return number;
 }
 
@@ -164,6 +421,29 @@ function createSeededRng(seed) {
     value ^= value << 5;
     return (value >>> 0) / 4294967296;
   };
+}
+
+function decorateChallengeLuckies(generated, seed, requestedCount) {
+  const rng = createSeededRng(seed);
+  const groups = new Map();
+  for (const tile of generated.board.tiles) (groups.get(tile.type) || groups.set(tile.type, []).get(tile.type)).push(tile);
+  const count = Number.isInteger(requestedCount)
+    ? Math.max(1, Math.min(3, requestedCount, groups.size))
+    : 1 + Math.floor(rng() * Math.min(3, groups.size));
+  const selectedGroups = shuffle([...groups.values()], rng).slice(0, count);
+  const tiles = generated.board.tiles.map((tile) => tile);
+  for (const group of selectedGroups) {
+    const tile = group[Math.floor(rng() * group.length)];
+    const index = tiles.findIndex((candidate) => candidate.id === tile.id);
+    tiles[index] = Object.freeze({
+      ...tile,
+      lucky: Object.freeze({ id: `lucky-${tile.id}`, reward: TRIPLE_LUCKY_REWARDS[Math.floor(rng() * TRIPLE_LUCKY_REWARDS.length)] }),
+    });
+  }
+  return freezeGeneratedBoard({
+    ...generated,
+    board: Object.freeze({ ...generated.board, tiles: Object.freeze(tiles) }),
+  });
 }
 
 function hashSeed(seed) {
@@ -179,7 +459,10 @@ function shuffle(values, random) {
   const shuffled = [...values];
   for (let index = shuffled.length - 1; index > 0; index -= 1) {
     const swapIndex = Math.floor(random() * (index + 1));
-    [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
+    [shuffled[index], shuffled[swapIndex]] = [
+      shuffled[swapIndex],
+      shuffled[index],
+    ];
   }
   return shuffled;
 }

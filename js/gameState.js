@@ -53,6 +53,7 @@ export const gameState = {
       bestByLevel: {},
       items: { hint: TRIPLE_PRODUCT_DECISIONS.initialItems.hint, time: 0, undo: 0, shuffle: 0 },
       sessionsByMode: {},
+      milestones: { progress: 0, cycleId: 0, claimedIds: [] },
     },
   },
   appearance: normalizeAppearance(),
@@ -115,6 +116,7 @@ export function hydrateGameState({
     bestByLevel: normalizeBestByLevel(tripleConnect.bestByLevel),
     items: normalizeTripleItems(tripleConnect.items),
     sessionsByMode: normalizeTripleSessions(tripleConnect.sessionsByMode),
+    milestones: normalizeTripleMilestones(tripleConnect.milestones),
   };
   gameState.settings = normalizeSettings(settings, gameState.settings);
   gameState.appearance = normalizeAppearance(appearance);
@@ -197,6 +199,19 @@ function normalizeSettings(value, fallback) {
   };
 }
 
+function normalizeTripleMilestones(value = {}) {
+  const source = value && typeof value === "object" && !Array.isArray(value) ? value : {};
+  return {
+    // A completed cycle is committed immediately with progress reset to zero.
+    // Normalize malformed legacy values the same way so a save cannot get stuck at 30.
+    progress: normalizeNonNegativeInteger(source.progress) % 30,
+    cycleId: normalizeNonNegativeInteger(source.cycleId),
+    claimedIds: Array.isArray(source.claimedIds)
+      ? [...new Set(source.claimedIds.filter((id) => typeof id === "string" && id))]
+      : [],
+  };
+}
+
 function normalizeTripleItems(items = {}) {
   const source = items && typeof items === "object" ? items : {};
   return {
@@ -214,7 +229,9 @@ function normalizeTripleSessions(sessions) {
   return Object.fromEntries(Object.entries(source).flatMap(([mode, session]) => {
     if (!GAME_MODE_IDS.has(mode) || !session || typeof session !== "object") return [];
     try {
-      const snapshot = serializeTripleRoundState(restoreSerializedTripleRoundState(session.snapshot));
+      const restored = restoreSerializedTripleRoundState(session.snapshot);
+      if (restored.status !== "playing") return [];
+      const snapshot = serializeTripleRoundState(restored);
       return [[mode, {
         mode,
         level: Math.max(1, normalizeNonNegativeInteger(session.level) || 1),
@@ -311,6 +328,18 @@ export function recordMemoryMatchResult({ mode, level, score, stars }) {
 
 export function recordLinkConnectResult({ mode, level, score, stars }) {
   const progress = gameState.progress.linkConnect;
+  const key = `${mode}:${level}`;
+  const previous = progress.bestByLevel[key] || { score: 0, stars: 0 };
+  const nextScore = Math.max(previous.score || 0, score);
+  const nextStars = Math.max(previous.stars || 0, stars);
+  progress.totalScore += nextScore - (previous.score || 0);
+  progress.totalStars += nextStars - (previous.stars || 0);
+  progress.bestByLevel[key] = { score: nextScore, stars: nextStars };
+  return { totalStars: progress.totalStars, isNewBest: score > (previous.score || 0) || stars > (previous.stars || 0) };
+}
+
+export function recordTripleConnectResult({ mode, level, score, stars }) {
+  const progress = gameState.progress.tripleConnect;
   const key = `${mode}:${level}`;
   const previous = progress.bestByLevel[key] || { score: 0, stars: 0 };
   const nextScore = Math.max(previous.score || 0, score);

@@ -10,6 +10,10 @@ const viewports = {
 const testPort = Number(process.env.GAME_SHELL_TEST_PORT || 4173);
 if (!Number.isInteger(testPort) || testPort < 1024 || testPort > 65535) throw new Error("Invalid GAME_SHELL_TEST_PORT");
 const baseURL = `http://127.0.0.1:${testPort}`;
+const productionPreview = process.env.GAME_SHELL_TEST_SERVER === "preview";
+const serverCommand = productionPreview
+  ? `node ./node_modules/vite/bin/vite.js preview --host 127.0.0.1 --port ${testPort} --strictPort`
+  : `node ./node_modules/vite/bin/vite.js --host 127.0.0.1 --port ${testPort} --strictPort`;
 
 export default defineConfig({
   testDir: "./tests/ui",
@@ -32,7 +36,7 @@ export default defineConfig({
   },
   projects: Object.entries(viewports).map(([name, viewport]) => ({ name, use: { viewport } })),
   webServer: {
-    command: `node ./node_modules/vite/bin/vite.js --host 127.0.0.1 --port ${testPort} --strictPort`,
+    command: serverCommand,
     url: baseURL,
     // Every test run owns a fresh Vite process. Reusing a developer server lets
     // stale assets or a previous failed run leak into Gate verification.
