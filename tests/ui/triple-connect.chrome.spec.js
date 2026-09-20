@@ -12,11 +12,11 @@ test("Triple start picker shares theme flow and catalog labels", async ({ page }
   await expect(picker.locator(".difficulty-content > .difficulty-theme")).toBeVisible();
   await expect(picker.locator(".difficulty-theme")).toContainText("Chủ đề đang dùng");
   await expect(picker.locator(".difficulty-option")).toHaveText([
-    "Dễ12 thẻ · 2 lớp · 1 phút",
-    "Trung bình24 thẻ · 3 lớp · 2 phút",
-    "Khó36 thẻ · 4 lớp · 2 phút",
-    "Siêu khó60 thẻ · 5 lớp · 3 phút",
-    "Vô tận60 thẻ · 5 lớp · không giới hạn thời gian",
+    "Dễ18 thẻ · 2 lớp · 75 giây",
+    "Trung bình36 thẻ · 3 lớp · 105 giây",
+    "Khó54 thẻ · 4 lớp · 150 giây",
+    "Siêu khó75 thẻ · 5 lớp · 210 giây",
+    "Vô tận75 thẻ · 5 lớp · không giới hạn thời gian",
     "Thử tháchMàn thử thách với số thẻ, lớp và thời gian riêng",
   ]);
   await picker.getByRole("button", { name: "Đổi" }).click();
@@ -24,11 +24,11 @@ test("Triple start picker shares theme flow and catalog labels", async ({ page }
   await page.locator("#collection-modal").getByRole("button", { name: "Đóng" }).click();
   await expect(page.locator("#triple-difficulty-modal .difficulty-theme")).toBeVisible();
   await expect(page.locator("#triple-difficulty-modal .difficulty-option")).toHaveText([
-    "Dễ12 thẻ · 2 lớp · 1 phút",
-    "Trung bình24 thẻ · 3 lớp · 2 phút",
-    "Khó36 thẻ · 4 lớp · 2 phút",
-    "Siêu khó60 thẻ · 5 lớp · 3 phút",
-    "Vô tận60 thẻ · 5 lớp · không giới hạn thời gian",
+    "Dễ18 thẻ · 2 lớp · 75 giây",
+    "Trung bình36 thẻ · 3 lớp · 105 giây",
+    "Khó54 thẻ · 4 lớp · 150 giây",
+    "Siêu khó75 thẻ · 5 lớp · 210 giây",
+    "Vô tận75 thẻ · 5 lớp · không giới hạn thời gian",
     "Thử tháchMàn thử thách với số thẻ, lớp và thời gian riêng",
   ]);
 });
@@ -84,7 +84,7 @@ test("Triple menu, start modal and timer follow the shared round contract", asyn
   await page.getByText("Bắt đầu", { exact: true }).click();
   await page.getByRole("button", { name: "Dễ" }).click();
   const start = page.locator("#triple-round-start-modal");
-  await expect(start).toContainText(/12 thẻ.*2 lớp.*Chủ đề.*khay đầy 7 ô/s);
+  await expect(start).toContainText(/18 thẻ.*2 lớp.*Chủ đề.*khay đầy 7 ô/s);
   const timer = page.locator("[data-triple-timer]");
   const before = await timer.textContent();
   await page.waitForTimeout(1100);
@@ -120,4 +120,26 @@ test("Triple Continue resumes without replaying the start modal", async ({ page 
     continueTripleConnectSession(getActiveSession("triple-connect", "easy"));
   });
   await expect(page.locator("#triple-round-start-modal")).toHaveCount(0);
+});
+
+test("Triple timer pauses in the background and resumes from the same timestamp", async ({ page }) => {
+  await page.clock.install();
+  await page.getByText("Bắt đầu", { exact: true }).click();
+  await page.getByRole("button", { name: "Dễ" }).click();
+  await page.locator("#triple-round-start-modal").getByRole("button", { name: "Bắt đầu" }).click();
+  const timer = page.locator("[data-triple-timer]");
+  await page.clock.fastForward(1100);
+  await expect(timer).toHaveText("01:14");
+  await page.evaluate(() => {
+    Object.defineProperty(document, "hidden", { configurable: true, value: true });
+    document.dispatchEvent(new Event("visibilitychange"));
+  });
+  await page.clock.fastForward(3000);
+  await expect(timer).toHaveText("01:14");
+  await page.evaluate(() => {
+    Object.defineProperty(document, "hidden", { configurable: true, value: false });
+    document.dispatchEvent(new Event("visibilitychange"));
+  });
+  await page.clock.fastForward(1000);
+  await expect(timer).toHaveText("01:13");
 });

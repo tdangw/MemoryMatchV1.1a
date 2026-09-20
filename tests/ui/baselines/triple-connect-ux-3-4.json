@@ -1,0 +1,20 @@
+{
+  "status": "reviewed-stable-baseline",
+  "scope": "Triple Connect Continuation 3-4",
+  "viewports": [
+    { "width": 360, "height": 640 },
+    { "width": 640, "height": 360 },
+    { "width": 411, "height": 914 },
+    { "width": 914, "height": 411 },
+    { "width": 1440, "height": 900 }
+  ],
+  "visualTopology": {
+    "boardMinWidth": 300,
+    "tileMinSize": 24,
+    "squareTolerancePx": 2,
+    "traySlotCount": 7,
+    "traySizeTolerancePx": 2,
+    "trayStabilityTolerancePx": 1,
+    "imageObjectFit": "contain"
+  }
+}

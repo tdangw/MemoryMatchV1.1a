@@ -89,12 +89,12 @@ Không được:
 - Khi bị blocker, báo đúng một lần với bằng chứng cụ thể: điều đã hoàn thành, lệnh/lỗi liên quan, phần còn lại, vì sao không thể tiếp tục và quyết định tối thiểu cần từ người dùng. Không dùng blocker giả cho việc khó, lâu hoặc còn nhiều bước.
 - Ngoại lệ: nếu người dùng chỉ yêu cầu đánh giá, giải thích, review, báo trạng thái hoặc chủ động yêu cầu dừng, agent trả đúng phạm vi đó và không tự triển khai thêm.
 
-Khi các kế hoạch hiện tại được dùng, thứ tự mặc định là:
+Hai kế hoạch còn hoạt động và phải tách biệt là:
 
-1. `TASK_FIX_PRE_TRIPLE_BASELINE.md`.
-2. `TASK_CSS_DEDUP_EFFECTS_V2_PLAN.md` theo từng gate, không gộp toàn bộ.
-3. Đánh giá lại các acceptance gate.
-4. Chỉ bắt đầu Triple Connect theo `TRIPLE_CONNECT_READINESS_PLAN.md` khi baseline đã xanh.
+1. `TASK_TRIPLE_CONNECT_IMPLEMENTATION_PLAN.md` cho hoàn thiện gameplay/UI Triple.
+2. `TASK_CSS_DEDUP_EFFECTS_V2_PLAN.md` cho CSS ownership toàn ứng dụng và Effect V2 dùng chung, trọng tâm Link Connect.
+
+Task CSS/effect chưa hoàn tất và không được coi là đã nhập toàn bộ vào kế hoạch Triple. Có thể làm Triple Continuation 0–4 trước, nhưng phải hoàn tất CSS/effect V2 trước Triple Continuation 5 để tránh viết hai effect runtime hoặc sửa chéo `triplePresentation.js`, `linkRenderer.js`, effect catalog và CSS dùng chung. Các kế hoạch baseline, compact landscape, readiness và Game Shell phase cũ đã hoàn tất và bị xóa; không khôi phục chúng từ Git history làm nguồn thực thi.
 
 ## 6. Kiến trúc và khả năng mở rộng
 

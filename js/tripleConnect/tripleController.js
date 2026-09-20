@@ -733,7 +733,7 @@ function commitTripleTerminalResult() {
   const stars = won
     ? getTripleStarProgress({ mode: currentMode, score: state.score }).stars
     : 0;
-  const reward = won ? calculateTripleCoinReward({ mode: currentMode, level: currentLevel, stars, maxCombo: state.maxCombo }) : 0;
+  const reward = won ? calculateTripleCoinReward({ mode: currentMode, matchedTriples: state.matchedTriples, stars, maxCombo: state.maxCombo }) : 0;
   if (won) {
     gameState.coins += reward;
     recordTripleConnectResult({ mode: currentMode, level: currentLevel, score: state.score, stars });

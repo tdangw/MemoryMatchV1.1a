@@ -16,7 +16,7 @@ js/main.js ── cấu hình callback giữa menu, controller và UI
 Vite ──→ dist ──→ Web/PWA hoặc Capacitor Android
 ```
 
-Game Shell đã hoàn tất Phase 1–9 ngày 2026-09-09. `js/gameShell/` sở hữu config, sáu vùng semantic, HUD patch, phép đo layout, lifecycle và registry hiệu ứng. `memoryMatch/memoryShell.js` và `linkConnect/linkShell.js` nối từng trò vào contract; controller và renderer riêng vẫn sở hữu luật, tile và đường nối. Không còn adapter legacy. Lịch sử quyết định và kiểm chứng nằm trong `GAME_SHELL_PLAN.md` cùng `GAME_SHELL_PHASE1.md` đến `GAME_SHELL_PHASE9.md`.
+Game Shell đã ổn định. `js/gameShell/` sở hữu config, sáu vùng semantic, HUD patch, phép đo layout, lifecycle và registry hiệu ứng. Shell của từng game nối vào contract chung; controller và renderer riêng vẫn sở hữu luật, tile và đường nối. Không còn adapter legacy. Contract đang hoạt động được kiểm bằng `scripts/check-game-shell-contract.mjs` và UI audit; tài liệu phase lịch sử đã được xóa để tránh dùng nhầm làm kế hoạch hiện hành.
 
 `scripts/generate-game-shell-tokens.mjs` sinh `styles/game-shell/tokens.css` từ cấu hình dùng chung; sửa nguồn JavaScript rồi chạy `npm run shell:sync`, không sửa file sinh bằng tay. `ADD_GAME.md` là checklist để tích hợp trò tiếp theo; tài liệu này không cho phép tự động triển khai Triple Connect.
 
@@ -133,8 +133,8 @@ Không sao chép các con số cấu hình sang controller, renderer hoặc tài
 
 Gợi ý Memory dùng `progress.memoryMatch.items.hint`; `gameState.hints` là getter/setter tương thích để HUD, thưởng và thao tác cùng đọc/ghi một kho. Hydration nhập giá trị cao nhất từ các session cũ khi chưa có key kho; giá trị 0 là dữ liệu hợp lệ, không cấp lại. Session mới không ghi Gợi ý và resume không áp số cũ. Kho Link (`progress.linkConnect.items.hint`) giữ nguyên, độc lập với Memory. Cả hai shop cho mua ở menu và trong game.
 
-Phase 7: `memoryMatch/memoryShellDom.js` sở hữu markup Memory, được import đầu tiên trong `main.js`; `memoryShell.js` nối vùng semantic/HUD với core chung. ID Memory vẫn là hook gameplay/CSS đang dùng. `index.html` giữ settings/audio, không còn bản markup Memory trùng. Xem `GAME_SHELL_PHASE7.md`.
+`memoryMatch/memoryShellDom.js` sở hữu markup Memory, được import đầu tiên trong `main.js`; `memoryShell.js` nối vùng semantic/HUD với core chung. ID Memory vẫn là hook gameplay/CSS đang dùng. `index.html` giữ settings/audio, không còn bản markup Memory trùng.
 
-Phase 8: `linkConnect/linkShell.js` sở hữu markup/vùng semantic/HUD/timing presentation của Link. Controller mount shell và cung cấp callback cho `bindLinkControls`; listener gắn scope theo lượt, node dựng một lần. Hai adapter legacy đã xóa. Renderer vẫn quản lý tile/path/shift/băng/hiệu ứng; shell không sở hữu board gameplay. Xem `GAME_SHELL_PHASE8.md`.
+`linkConnect/linkShell.js` sở hữu markup/vùng semantic/HUD/timing presentation của Link. Controller mount shell và cung cấp callback cho `bindLinkControls`; listener gắn scope theo lượt, node dựng một lần. Hai adapter legacy đã xóa. Renderer vẫn quản lý tile/path/shift/băng/hiệu ứng; shell không sở hữu board gameplay.
 
-Phase 9 thêm `check-game-shell-contract.mjs` vào check, dọn CSS/selector/timing effect Link không còn consumer. `playwright.visual.config.js` so tám ảnh chờ duyệt và tách fullscreen đang phát triển riêng khỏi phép đo. Toolbar Memory ngang dùng token `hud.landscapeMinWidth` để tránh nút kho đè chỉ số; audit kiểm cả giao nhau của các nút con. Audit chốt ngày 2026-09-09 đạt 8/8 ca ở bốn viewport, check và build đạt. Game Shell đã hoàn thành; kiểm tra thiết bị thật thuộc QA phát hành.
+`check-game-shell-contract.mjs` khóa import/ownership và contract sáu vùng semantic. UI audit kiểm ID trùng, `aria-controls`, geometry toolbar và tương tác giữa các nút con. Toolbar Memory ngang dùng token `hud.landscapeMinWidth`; thay đổi shared shell phải chạy lại contract và audit liên quan.

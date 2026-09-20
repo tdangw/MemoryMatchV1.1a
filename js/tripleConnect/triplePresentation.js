@@ -224,7 +224,6 @@ function presentTrayFlight({ shell, scope, selected, render, next }) {
     scope.timeout(() => target?.classList.remove("is-tray-arrived"), 90);
     return Promise.resolve();
   }
-  void target.offsetWidth;
   const targetRect = target.getBoundingClientRect();
   for (const [tileId, before] of priorTrayRects) {
     const trayTile = shell.refs.root.querySelector(`.triple-connect__tray [data-tile-id="${tileId}"]`);

@@ -27,7 +27,7 @@ test("Triple milestone HUD has the shared accessible track in every viewport", a
     await expect(region).toBeHidden();
   } else {
     await expect(region).toBeVisible();
-    await expect(region.locator("[data-triple-milestone]")).toHaveCount(10);
+    await expect(region.locator("[data-triple-milestone]")).toHaveCount(15);
     await expect(region.locator('[data-triple-milestone="1"]')).toHaveAttribute("aria-label", /Mốc 1: Mốc 3/);
     const bounds = await region.boundingBox();
     const viewport = page.viewportSize();
@@ -63,6 +63,37 @@ test("Triple commits the third resolved set as one durable milestone transaction
     return { restored: Boolean(run), milestones: gameState.progress.tripleConnect.milestones, ledger: run?.getState().milestoneTileIds };
   });
   expect(restored).toEqual({ restored: true, milestones: committed.milestones, ledger: committed.ledger });
+});
+
+test("Triple milestone coins fly to the milestone coin HUD, not the global counter", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await startRound(page, "milestone-coin-target");
+  await page.evaluate(async () => {
+    const { gameState } = await import("/js/gameState.js");
+    gameState.progress.tripleConnect.milestones = { progress: 2, cycleId: 0, claimedIds: [] };
+  });
+  await resolveWitnessCommands(page, 3);
+  await expect(page.locator(".game-coin-reward-flight").first()).toBeVisible();
+  const flights = await page.evaluate(() => {
+    const target = document.querySelector(".triple-connect__milestone-coins .ui-icon")?.getBoundingClientRect();
+    return [...document.querySelectorAll(".game-coin-reward-flight")].map((effect) => {
+      const startX = Number.parseFloat(effect.style.left);
+      const startY = Number.parseFloat(effect.style.top);
+      const flightX = Number.parseFloat(effect.style.getPropertyValue("--game-coin-flight-x"));
+      const flightY = Number.parseFloat(effect.style.getPropertyValue("--game-coin-flight-y"));
+      return {
+        landingX: startX + flightX,
+        landingY: startY + flightY,
+        targetX: target.left + target.width / 2,
+        targetY: target.top + target.height / 2,
+      };
+    });
+  });
+  expect(flights).toHaveLength(2);
+  for (const flight of flights) {
+    expect(Math.abs(flight.landingX - flight.targetX)).toBeLessThanOrEqual(1);
+    expect(Math.abs(flight.landingY - flight.targetY)).toBeLessThanOrEqual(1);
+  }
 });
 
 test("Triple milestone persistence failure restores board, inventory, timer, and ledger", async ({ page }) => {

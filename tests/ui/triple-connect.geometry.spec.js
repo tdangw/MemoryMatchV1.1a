@@ -1,18 +1,19 @@
 import { expect, test } from "@playwright/test";
+import { readFileSync } from "node:fs";
 
-const viewports = [
-  { width: 360, height: 640 },
-  { width: 640, height: 360 },
-  { width: 411, height: 914 },
-  { width: 914, height: 411 },
-  { width: 1440, height: 900 },
-];
+const stableBaseline = JSON.parse(readFileSync(
+  new URL("./baselines/triple-connect-ux-3-4.json", import.meta.url),
+  "utf8",
+));
+
+const viewports = stableBaseline.viewports;
+const topology = stableBaseline.visualTopology;
 
 const modes = [
-  ["easy", 12],
-  ["normal", 24],
-  ["hard", 36],
-  ["superHard", 60],
+  ["easy", 18],
+  ["normal", 36],
+  ["hard", 54],
+  ["superHard", 75],
 ];
 
 for (const viewport of viewports) {
@@ -54,6 +55,7 @@ for (const viewport of viewports) {
               disabled: node.disabled,
               opacity: Number(getComputedStyle(node).opacity),
               objectFit: getComputedStyle(node.querySelector("img")).objectFit,
+              padding: getComputedStyle(node).padding,
               imageSource: node.querySelector("img")?.src || "",
             })),
             trayColumns:
@@ -72,12 +74,13 @@ for (const viewport of viewports) {
       expect(geometry.boardTiles).toHaveLength(expectedTileCount);
       expect(geometry.boardTiles.some((tile) => tile.disabled)).toBe(true);
       expect(geometry.boardTiles.filter((tile) => tile.disabled).every((tile) => tile.opacity < 1)).toBe(true);
-      expect(geometry.boardTiles.every((tile) => tile.objectFit === "contain")).toBe(true);
-      expect(geometry.board.width).toBeGreaterThan(300);
+      expect(geometry.boardTiles.every((tile) => tile.objectFit === topology.imageObjectFit)).toBe(true);
+      expect(geometry.boardTiles.every((tile) => tile.padding === "0px")).toBe(true);
+      expect(geometry.board.width).toBeGreaterThan(topology.boardMinWidth);
       expect(
         Math.abs(geometry.tray.width - geometry.board.width),
-      ).toBeLessThanOrEqual(2);
-      expect(geometry.trayColumns).toBe(7);
+      ).toBeLessThanOrEqual(topology.traySizeTolerancePx);
+      expect(geometry.trayColumns).toBe(topology.traySlotCount);
       expect(geometry.boardAndTraySeparated).toBe(true);
       expect(geometry.root.top).toBeGreaterThanOrEqual(-1);
       expect(geometry.root.bottom).toBeLessThanOrEqual(viewport.height + 1);
@@ -87,8 +90,8 @@ for (const viewport of viewports) {
           geometry.boardTiles[0].rect.width -
             geometry.boardTiles[0].rect.height,
         ),
-      ).toBeLessThanOrEqual(2);
-      expect(geometry.boardTiles[0].rect.width).toBeGreaterThanOrEqual(24);
+      ).toBeLessThanOrEqual(topology.squareTolerancePx);
+      expect(geometry.boardTiles[0].rect.width).toBeGreaterThanOrEqual(topology.tileMinSize);
       for (const tile of geometry.boardTiles) {
         expect(tile.rect.left).toBeGreaterThanOrEqual(geometry.board.left - 1);
         expect(tile.rect.right).toBeLessThanOrEqual(geometry.board.right + 1);
@@ -116,13 +119,18 @@ test("Triple tray owns seven stable slots through selection and regroup", async 
         .find((node) => node.dataset.tileId !== run.getState().tray.at(-1));
       if (!tile) break;
       tile.click();
-      await new Promise((resolve) => setTimeout(resolve, 240));
+      await new Promise((resolve) => requestAnimationFrame(resolve));
       snapshots.push({ tray: rect(tray), slots: [...tray.children].map(rect) });
     }
     return [
       snapshots,
       [...document.querySelectorAll(".triple-connect__tray .triple-connect__tile")]
-        .map((node) => rect(node)),
+        .map((node) => ({
+          rect: rect(node),
+          opacity: Number(getComputedStyle(node).opacity),
+          filter: getComputedStyle(node).filter,
+          padding: getComputedStyle(node).padding,
+        })),
     ];
   });
 
@@ -130,15 +138,16 @@ test("Triple tray owns seven stable slots through selection and regroup", async 
   expect(snapshots).not.toHaveLength(0);
   expect(snapshots.every(({ slots }) => slots.length === 7)).toBe(true);
   for (const snapshot of snapshots) {
-    expect(snapshot.tray.height).toBeCloseTo(snapshots[0].tray.height, 1);
-    expect(snapshot.tray.width).toBeCloseTo(snapshots[0].tray.width, 1);
+    expect(snapshot.tray.height).toBeCloseTo(snapshots[0].tray.height, topology.trayStabilityTolerancePx);
+    expect(snapshot.tray.width).toBeCloseTo(snapshots[0].tray.width, topology.trayStabilityTolerancePx);
     expect(snapshot.slots.map((slot) => [slot.width, slot.height])).toEqual(
       snapshots[0].slots.map((slot) => [slot.width, slot.height]),
     );
   }
   expect(trayTiles.length).toBeGreaterThan(0);
-  expect(trayTiles[0].width).toBeGreaterThan(0);
-  expect(trayTiles[0].height).toBeGreaterThan(0);
+  expect(trayTiles[0].rect.width).toBeGreaterThan(0);
+  expect(trayTiles[0].rect.height).toBeGreaterThan(0);
+  expect(trayTiles.every((tile) => tile.opacity === 1 && tile.filter === "none" && tile.padding === "0px")).toBe(true);
 });
 
 test("Triple image errors fall back without changing board topology", async ({

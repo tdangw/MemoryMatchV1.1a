@@ -1,6 +1,6 @@
 # Memory Match Adventure — JavaScript thuần
 
-Kế hoạch hạ tầng giao diện dùng chung cho các game: [`GAME_SHELL_PLAN.md`](GAME_SHELL_PLAN.md).
+Kiến trúc giao diện dùng chung: [`ARCHITECTURE.md`](ARCHITECTURE.md). Hai kế hoạch đang hoạt động là [`TASK_TRIPLE_CONNECT_IMPLEMENTATION_PLAN.md`](TASK_TRIPLE_CONNECT_IMPLEMENTATION_PLAN.md) cho Triple và [`TASK_CSS_DEDUP_EFFECTS_V2_PLAN.md`](TASK_CSS_DEDUP_EFFECTS_V2_PLAN.md) cho CSS/effect dùng chung.
 
 Phiên bản hiển thị trong ứng dụng: **V1.1a**.
 

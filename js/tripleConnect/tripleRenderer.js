@@ -99,6 +99,11 @@ export function createTripleRenderer(shell) {
       frame,
       board: surface,
       chrome: [title, progress, hud, milestones],
+      // Triple positions cards absolutely in half-card coordinates; it does
+      // not consume the shared grid gap or padding that CSS-grid boards use.
+      ui: {
+        board: { gap: 0, narrowGap: 0, padding: 0, narrowPadding: 0 },
+      },
       getShape: () => {
         const geometry = getLayoutGeometry(activeLayout);
         return {

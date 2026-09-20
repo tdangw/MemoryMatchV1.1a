@@ -68,7 +68,7 @@ test("Triple Time commits inventory, timer, and session in one transaction", asy
   await page.locator("#triple-tools-toggle").click();
   await expect(page.locator("#triple-tools-menu")).toBeVisible();
   await page.locator('[data-triple-item="time"]').click();
-  await expect(page.locator("[data-triple-timer]")).toHaveText("01:01");
+  await expect(page.locator("[data-triple-timer]")).toHaveText("01:16");
   await expect(page.locator('[data-triple-item-count="time"]')).toHaveText("0");
   const saved = await page.evaluate(async () =>
     (await import("/js/sessionProgress.js")).getActiveSession(
@@ -76,7 +76,7 @@ test("Triple Time commits inventory, timer, and session in one transaction", asy
       "easy",
     ),
   );
-  expect(saved.remainingTime).toBe(61);
+  expect(saved.remainingTime).toBe(76);
 });
 
 test("Triple Time is not available in Endless", async ({ page }) => {
@@ -127,7 +127,7 @@ test("Triple Time restores its committed inventory and timer after reload", asyn
       count: getTripleItemCount("time"),
     };
   });
-  expect(restored).toEqual({ restored: true, timer: "01:01", count: 0 });
+  expect(restored).toEqual({ restored: true, timer: "01:16", count: 0 });
 });
 
 test("Triple Time rolls back coin, inventory, timer, and session when persistence fails", async ({

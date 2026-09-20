@@ -6,31 +6,31 @@ export const TRIPLE_RULES = Object.freeze({
 });
 export const TRIPLE_EASY_CONFIG = Object.freeze({
   mode: "easy",
-  tileCount: 12,
+  tileCount: 18,
   layerCount: 2,
-  timeSeconds: 60,
+  timeSeconds: 75,
 });
 export const TRIPLE_NORMAL_CONFIG = Object.freeze({
   mode: "normal",
-  tileCount: 24,
+  tileCount: 36,
   layerCount: 3,
-  timeSeconds: 90,
+  timeSeconds: 105,
 });
 export const TRIPLE_HARD_CONFIG = Object.freeze({
   mode: "hard",
-  tileCount: 36,
+  tileCount: 54,
   layerCount: 4,
-  timeSeconds: 120,
+  timeSeconds: 150,
 });
 export const TRIPLE_SUPER_HARD_CONFIG = Object.freeze({
   mode: "superHard",
-  tileCount: 60,
+  tileCount: 75,
   layerCount: 5,
-  timeSeconds: 180,
+  timeSeconds: 210,
 });
 export const TRIPLE_ENDLESS_CONFIG = Object.freeze({
   mode: "endless",
-  tileCount: 60,
+  tileCount: 75,
   layerCount: 5,
   timeSeconds: 0,
 });
@@ -268,14 +268,14 @@ export const TRIPLE_SUPER_HARD_LAYOUT_V2 = defineTemplate({
 // v3 dùng silhouette có chủ ý thay cho các cụm cột lặp. Tất cả tọa độ vẫn
 // theo nửa thẻ, cùng kích thước tile trong một board và cover graph được
 // suy ra hoàn toàn từ hình học template.
-export const TRIPLE_EASY_LAYOUT = defineTemplate({
+export const TRIPLE_EASY_LAYOUT_V3 = defineTemplate({
   id: "easy-12-v3", gridWidth: 10, gridHeight: 8,
   layerMasks: [
     { layer: 0, rows: [{ y: 1, xs: [2, 4, 6] }, { y: 3, xs: [1, 3, 5, 7] }, { y: 5, xs: [2] }] },
     { layer: 1, rows: [{ y: 2, xs: [2, 4, 6] }, { y: 4, xs: [4] }] },
   ],
 });
-export const TRIPLE_NORMAL_LAYOUT = defineTemplate({
+export const TRIPLE_NORMAL_LAYOUT_V3 = defineTemplate({
   id: "normal-24-v3", gridWidth: 12, gridHeight: 10,
   layerMasks: [
     { layer: 0, rows: [{ y: 1, xs: [3, 5] }, { y: 3, xs: [1, 3, 5, 7, 9] }, { y: 5, xs: [3, 5] }, { y: 7, xs: [3, 5, 7] }] },
@@ -283,7 +283,7 @@ export const TRIPLE_NORMAL_LAYOUT = defineTemplate({
     { layer: 2, rows: [{ y: 2, xs: [3, 7] }, { y: 6, xs: [3, 7] }] },
   ],
 });
-export const TRIPLE_HARD_LAYOUT = defineTemplate({
+export const TRIPLE_HARD_LAYOUT_V3 = defineTemplate({
   id: "hard-36-v3", gridWidth: 14, gridHeight: 12,
   layerMasks: [
     { layer: 0, rows: [{ y: 1, xs: [3, 5, 7, 9] }, { y: 3, xs: [1, 3, 5, 7, 9, 11] }, { y: 5, xs: [1, 3, 5, 7, 9, 11] }, { y: 7, xs: [5, 7] }] },
@@ -292,7 +292,7 @@ export const TRIPLE_HARD_LAYOUT = defineTemplate({
     { layer: 3, rows: [{ y: 3, xs: [4, 8, 12] }] },
   ],
 });
-export const TRIPLE_SUPER_HARD_LAYOUT = defineTemplate({
+export const TRIPLE_SUPER_HARD_LAYOUT_V3 = defineTemplate({
   id: "super-hard-60-v3", gridWidth: 14, gridHeight: 12,
   layerMasks: [
     { layer: 0, rows: [{ y: 1, xs: [1, 3, 5, 7, 9, 11] }, { y: 3, xs: [1, 5, 9] }, { y: 5, xs: [3, 7, 11] }, { y: 7, xs: [1, 3, 5, 7, 9, 11] }, { y: 9, xs: [1, 3, 5, 7, 9, 11] }] },
@@ -300,6 +300,43 @@ export const TRIPLE_SUPER_HARD_LAYOUT = defineTemplate({
     { layer: 2, rows: [{ y: 1, xs: [2, 6, 10] }, { y: 5, xs: [2, 6, 10] }, { y: 9, xs: [2, 6, 10] }] },
     { layer: 3, rows: [{ y: 2, xs: [2, 6, 10] }, { y: 6, xs: [2, 6, 10] }, { y: 10, xs: [2, 6, 10] }] },
     { layer: 4, rows: [{ y: 3, xs: [2, 6, 10] }] },
+  ],
+});
+
+// v4 replaces the active boards. The v3 templates remain above exclusively
+// for restoring sessions that were saved before the new geometry shipped.
+export const TRIPLE_EASY_LAYOUT = defineTemplate({
+  id: "easy-18-v4", gridWidth: 10, gridHeight: 10,
+  layerMasks: [
+    { layer: 0, rows: [{ y: 0, xs: [2, 4] }, { y: 2, xs: [0, 2, 4, 6] }, { y: 5, xs: [0, 2, 4, 6] }, { y: 8, xs: [2, 4] }] },
+    { layer: 1, rows: [{ y: 1, xs: [1, 3, 5] }, { y: 6, xs: [1, 3, 5] }] },
+  ],
+});
+export const TRIPLE_NORMAL_LAYOUT = defineTemplate({
+  id: "normal-36-v4", gridWidth: 12, gridHeight: 12,
+  layerMasks: [
+    { layer: 0, rows: [{ y: 0, xs: [2, 4, 6, 8] }, { y: 4, xs: [0, 2, 4, 6, 8, 10] }, { y: 8, xs: [0, 2, 4, 6, 8, 10] }, { y: 10, xs: [4, 6] }] },
+    { layer: 1, rows: [{ y: 1, xs: [1, 3, 5, 7] }, { y: 5, xs: [1, 3, 5, 7] }, { y: 9, xs: [1, 3, 5, 7] }] },
+    { layer: 2, rows: [{ y: 2, xs: [2, 6] }, { y: 6, xs: [2, 6] }, { y: 10, xs: [1, 7] }] },
+  ],
+});
+export const TRIPLE_HARD_LAYOUT = defineTemplate({
+  id: "hard-54-v4", gridWidth: 14, gridHeight: 14,
+  layerMasks: [
+    { layer: 0, rows: [{ y: 0, xs: [2, 4, 6, 8] }, { y: 3, xs: [0, 2, 4, 6, 8, 10, 12] }, { y: 7, xs: [0, 2, 4, 6, 8, 10, 12] }, { y: 11, xs: [2, 4, 6, 8, 10, 12] }] },
+    { layer: 1, rows: [{ y: 1, xs: [1, 3, 5, 7, 9] }, { y: 4, xs: [1, 3, 5, 7, 9] }, { y: 8, xs: [1, 3, 5, 7, 9] }] },
+    { layer: 2, rows: [{ y: 0, xs: [1, 5, 9] }, { y: 6, xs: [1, 5, 9] }, { y: 10, xs: [1, 5, 9] }] },
+    { layer: 3, rows: [{ y: 3, xs: [1, 5, 9] }, { y: 9, xs: [1, 5, 9] }] },
+  ],
+});
+export const TRIPLE_SUPER_HARD_LAYOUT = defineTemplate({
+  id: "super-hard-75-v4", gridWidth: 14, gridHeight: 16,
+  layerMasks: [
+    { layer: 0, rows: [{ y: 0, xs: [0, 4, 6, 10] }, { y: 3, xs: [0, 2, 4, 6, 8, 10] }, { y: 7, xs: [0, 2, 4, 6, 8, 10, 12] }, { y: 11, xs: [0, 2, 4, 6, 8, 10, 12] }, { y: 14, xs: [0, 2, 4, 6, 8, 10] }] },
+    { layer: 1, rows: [{ y: 1, xs: [1, 3, 5, 7, 9, 11] }, { y: 4, xs: [1, 3, 5, 7, 9, 11] }, { y: 8, xs: [1, 3, 5, 7, 9, 11] }] },
+    { layer: 2, rows: [{ y: 0, xs: [1, 5, 9] }, { y: 5, xs: [1, 5, 9] }, { y: 9, xs: [1, 5, 9] }, { y: 12, xs: [1, 5, 9] }, { y: 14, xs: [1, 5, 9] }] },
+    { layer: 3, rows: [{ y: 4, xs: [2, 6, 10] }, { y: 8, xs: [2, 6, 10] }, { y: 13, xs: [2, 6, 10] }] },
+    { layer: 4, rows: [{ y: 7, xs: [3, 7, 11] }] },
   ],
 });
 
@@ -323,6 +360,14 @@ export const TRIPLE_CHALLENGE_18_LAYOUT = defineTemplate({
         { y: 5, xs: [2, 4, 6] },
       ],
     },
+  ],
+});
+
+export const TRIPLE_CHALLENGE_24_LAYOUT = defineTemplate({
+  id: "challenge-24-v2", gridWidth: 12, gridHeight: 12,
+  layerMasks: [
+    { layer: 0, rows: [{ y: 0, xs: [4, 6] }, { y: 2, xs: [2, 4, 6, 8] }, { y: 5, xs: [0, 2, 4, 6, 8, 10] }, { y: 8, xs: [2, 4, 6, 8] }] },
+    { layer: 1, rows: [{ y: 1, xs: [3, 5, 7] }, { y: 4, xs: [1, 3, 5, 7, 9] }] },
   ],
 });
 
@@ -356,36 +401,20 @@ export const TRIPLE_CHALLENGE_42_LAYOUT = defineTemplate({
   gridWidth: 14,
   gridHeight: 11,
   layerMasks: [
-    {
-      layer: 0,
-      rows: [
-        { y: 1, xs: [1, 3, 5, 7, 9, 11] },
-        { y: 3, xs: [1, 3, 5, 7, 9, 11] },
-        { y: 5, xs: [1, 3, 5, 7, 9, 11] },
-        { y: 8, xs: [1, 3, 5, 7, 9, 11] },
-      ],
-    },
-    {
-      layer: 1,
-      rows: [
-        { y: 0, xs: [1, 5, 9] },
-        { y: 2, xs: [3, 7, 11] },
-        { y: 6, xs: [1, 5, 9] },
-      ],
-    },
-    {
-      layer: 2,
-      rows: [
-        { y: 0, xs: [2, 6, 10] },
-        { y: 3, xs: [2, 6, 10] },
-      ],
-    },
-    {
-      layer: 3,
-      rows: [
-        { y: 1, xs: [2, 6, 10] },
-      ],
-    },
+    { layer: 0, rows: [{ y: 1, xs: [1, 3, 5, 7, 9, 11] }, { y: 3, xs: [1, 3, 5, 7, 9, 11] }, { y: 5, xs: [1, 3, 5, 7, 9, 11] }, { y: 8, xs: [1, 3, 5, 7, 9, 11] }] },
+    { layer: 1, rows: [{ y: 0, xs: [1, 5, 9] }, { y: 2, xs: [3, 7, 11] }, { y: 6, xs: [1, 5, 9] }] },
+    { layer: 2, rows: [{ y: 0, xs: [2, 6, 10] }, { y: 3, xs: [2, 6, 10] }] },
+    { layer: 3, rows: [{ y: 1, xs: [2, 6, 10] }] },
+  ],
+});
+
+export const TRIPLE_CHALLENGE_60_LAYOUT = defineTemplate({
+  id: "challenge-60-v2", gridWidth: 14, gridHeight: 16,
+  layerMasks: [
+    { layer: 0, rows: [{ y: 0, xs: [0, 2, 4, 6, 8, 10] }, { y: 3, xs: [0, 2, 4, 6, 8, 10] }, { y: 7, xs: [0, 2, 4, 6, 8, 10] }, { y: 11, xs: [0, 2, 4, 6, 8, 10] }, { y: 14, xs: [0, 2, 4] }] },
+    { layer: 1, rows: [{ y: 1, xs: [1, 3, 5, 7, 9] }, { y: 4, xs: [1, 3, 5, 7, 9] }, { y: 8, xs: [1, 3, 5, 7, 9] }] },
+    { layer: 2, rows: [{ y: 0, xs: [1, 5, 9] }, { y: 5, xs: [1, 5, 9] }, { y: 9, xs: [1, 5, 9] }, { y: 13, xs: [1, 3, 5] }] },
+    { layer: 3, rows: [{ y: 4, xs: [2, 6, 10] }, { y: 10, xs: [2, 6, 10] }] },
   ],
 });
 
@@ -431,13 +460,13 @@ export const TRIPLE_CHALLENGE_48_LAYOUT = defineTemplate({
 });
 
 export const TRIPLE_CHALLENGE_STAGES = Object.freeze([
-  Object.freeze({ level: 1, tileCount: 12, layerCount: 2, layoutId: "easy-12-v3", timeSeconds: 60, solverBudget: Object.freeze({ maxNodes: 5000, maxMemo: 2000, deadlineMs: 20 }) }),
-  Object.freeze({ level: 2, tileCount: 18, layerCount: 2, layoutId: "challenge-18-v1", timeSeconds: 70, solverBudget: Object.freeze({ maxNodes: 5000, maxMemo: 2000, deadlineMs: 20 }) }),
-  Object.freeze({ level: 3, tileCount: 24, layerCount: 3, layoutId: "normal-24-v3", timeSeconds: 80, solverBudget: Object.freeze({ maxNodes: 10000, maxMemo: 4000, deadlineMs: 40 }) }),
-  Object.freeze({ level: 4, tileCount: 30, layerCount: 3, layoutId: "challenge-30-v1", timeSeconds: 90, solverBudget: Object.freeze({ maxNodes: 20000, maxMemo: 8000, deadlineMs: 60 }) }),
-  Object.freeze({ level: 5, tileCount: 36, layerCount: 4, layoutId: "hard-36-v2", timeSeconds: 100, solverBudget: Object.freeze({ maxNodes: 50000, maxMemo: 20000, deadlineMs: 100 }) }),
-  Object.freeze({ level: 6, tileCount: 42, layerCount: 4, layoutId: "challenge-42-v1", timeSeconds: 110, solverBudget: Object.freeze({ maxNodes: 75000, maxMemo: 30000, deadlineMs: 180 }) }),
-  Object.freeze({ level: 7, tileCount: 48, layerCount: 5, layoutId: "challenge-48-v1", timeSeconds: 120, solverBudget: Object.freeze({ maxNodes: 100000, maxMemo: 40000, deadlineMs: 300 }) }),
+  Object.freeze({ level: 1, tileCount: 18, layerCount: 2, layoutId: "easy-18-v4", timeSeconds: 75, solverBudget: Object.freeze({ maxNodes: 5000, maxMemo: 2000, deadlineMs: 20 }) }),
+  Object.freeze({ level: 2, tileCount: 24, layerCount: 2, layoutId: "challenge-24-v2", timeSeconds: 85, solverBudget: Object.freeze({ maxNodes: 8000, maxMemo: 3000, deadlineMs: 30 }) }),
+  Object.freeze({ level: 3, tileCount: 36, layerCount: 3, layoutId: "normal-36-v4", timeSeconds: 105, solverBudget: Object.freeze({ maxNodes: 15000, maxMemo: 6000, deadlineMs: 50 }) }),
+  Object.freeze({ level: 4, tileCount: 42, layerCount: 4, layoutId: "challenge-42-v1", timeSeconds: 120, solverBudget: Object.freeze({ maxNodes: 30000, maxMemo: 12000, deadlineMs: 80 }) }),
+  Object.freeze({ level: 5, tileCount: 54, layerCount: 4, layoutId: "hard-54-v4", timeSeconds: 150, solverBudget: Object.freeze({ maxNodes: 75000, maxMemo: 30000, deadlineMs: 150 }) }),
+  Object.freeze({ level: 6, tileCount: 60, layerCount: 4, layoutId: "challenge-60-v2", timeSeconds: 175, solverBudget: Object.freeze({ maxNodes: 100000, maxMemo: 40000, deadlineMs: 250 }) }),
+  Object.freeze({ level: 7, tileCount: 75, layerCount: 5, layoutId: "super-hard-75-v4", timeSeconds: 210, solverBudget: Object.freeze({ maxNodes: 150000, maxMemo: 60000, deadlineMs: 400 }) }),
 ]);
 
 export const TRIPLE_EASY_SOLVER_BUDGET = Object.freeze({
@@ -453,9 +482,9 @@ export const TRIPLE_HARD_SOLVER_BUDGET = Object.freeze({
   deadlineMs: 100,
 });
 export const TRIPLE_SUPER_HARD_SOLVER_BUDGET = Object.freeze({
-  maxNodes: 100000,
-  maxMemo: 40000,
-  deadlineMs: 300,
+  maxNodes: 150000,
+  maxMemo: 60000,
+  deadlineMs: 400,
 });
 export function getTripleModeConfig(mode) {
   const config = [
@@ -493,7 +522,7 @@ export const TRIPLE_PRODUCT_DECISIONS = Object.freeze({
   endlessStarPointsPerTriple: Object.freeze({ one: 10, two: 15, three: 20 }),
   excludedItems: Object.freeze(["thunder", "freeze", "tray-expand"]),
   milestones: Object.freeze({
-    target: 30,
+    target: 45,
     step: 3,
     rewards: Object.freeze([
       Object.freeze({ coins: 2 }),
@@ -506,6 +535,11 @@ export const TRIPLE_PRODUCT_DECISIONS = Object.freeze({
       Object.freeze({ hint: 1 }),
       Object.freeze({ shuffle: 1 }),
       Object.freeze({ coins: 10, hint: 1 }),
+      Object.freeze({ coins: 3 }),
+      Object.freeze({ hint: 1 }),
+      Object.freeze({ coins: 5 }),
+      Object.freeze({ undo: 1 }),
+      Object.freeze({ coins: 15, hint: 1 }),
     ]),
     itemFallbackCoins: Object.freeze({ hint: 4, undo: 8, shuffle: 8 }),
   }),
@@ -549,9 +583,19 @@ export function getTripleStarProgress({ mode, score }) {
   });
 }
 
-export function calculateTripleCoinReward({ mode, level, stars, maxCombo }) {
+const TRIPLE_MODE_COIN_RATE = Object.freeze({
+  easy: Object.freeze({ perTriple: 0.5, base: 2 }),
+  normal: Object.freeze({ perTriple: 0.5, base: 3 }),
+  hard: Object.freeze({ perTriple: 0.6, base: 4 }),
+  superHard: Object.freeze({ perTriple: 0.7, base: 5 }),
+  endless: Object.freeze({ perTriple: 0.6, base: 3 }),
+  challenge: Object.freeze({ perTriple: 0.5, base: 3 }),
+});
+
+export function calculateTripleCoinReward({ mode, matchedTriples, stars, maxCombo }) {
+  const rate = TRIPLE_MODE_COIN_RATE[mode] || TRIPLE_MODE_COIN_RATE.easy;
+  const triples = Math.max(0, Math.floor(Number(matchedTriples) || 0));
   const starBonus = Math.max(0, Math.min(3, Math.floor(stars || 0))) * 2;
-  const comboBonus = Math.max(0, Math.min(3, Math.floor(maxCombo || 0)));
-  if (mode === "endless") return 5 + starBonus + Math.min(5, Math.floor(Math.max(1, level) / 2)) + comboBonus;
-  return (mode === "challenge" ? 5 : 4) + starBonus + comboBonus;
+  const comboBonus = Math.max(0, Math.min(5, Math.floor(maxCombo || 0)));
+  return Math.round(rate.base + triples * rate.perTriple + starBonus + comboBonus);
 }

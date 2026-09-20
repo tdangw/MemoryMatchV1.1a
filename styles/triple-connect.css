@@ -190,6 +190,8 @@
   min-height: 160px;
   grid-template-rows: auto auto;
   gap: 4px;
+  --triple-tray-height: 46px;
+  --triple-tray-slot-size: 38px;
 }
 .game-shell-root.shell-compact-landscape .triple-connect__board {
   min-height: 0;
@@ -237,7 +239,7 @@
 .triple-connect__tile img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: inherit;
   pointer-events: none;
 }

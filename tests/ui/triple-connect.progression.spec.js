@@ -7,12 +7,20 @@ async function winActiveTripleRound(page, clock = null) {
   await expect(page.locator("#triple-round-summary-modal")).toBeVisible();
 }
 
-async function playTripleWitness(page, clock = null) {
-  const witness = await page.evaluate(() => window.__tripleRun.generated.witness);
+async function playTripleWitness(page, clock = null, count = Infinity) {
+  const witness = await page.evaluate(
+    (limit) => window.__tripleRun.generated.witness.slice(0, limit),
+    count,
+  );
   for (const command of witness) {
     await page.locator(`[data-tile-id="${command.tileId}"]`).click();
     if (clock) await clock.fastForward(300);
-    else await page.waitForTimeout(300);
+    await page.waitForFunction(
+      () =>
+        !document.querySelector(
+          ".triple-connect__tray-flight, .triple-connect__ghost",
+        ),
+    );
   }
 }
 
@@ -39,7 +47,7 @@ test("Triple saves a validated level session and exposes it through Continue", a
     mode: "normal",
     level: 3,
     seed: "triple-normal-level-3:0",
-    layoutId: "normal-24-v3",
+    layoutId: "normal-36-v4",
   });
   await page.reload();
   await page.evaluate(async () =>
@@ -113,7 +121,7 @@ test("Triple win settles once, clears Continue, and Next starts the following le
   expect(nextSession).toMatchObject({
     mode: "easy",
     level: 2,
-    layoutId: "easy-12-v3",
+    layoutId: "easy-18-v4",
   });
 });
 
@@ -137,36 +145,48 @@ test("Triple completion grants the approved reward from the highest combo exactl
     };
   });
   expect(result).toEqual({
-    coins: 15,
+    coins: 18,
     totalStars: 3,
-    best: { score: 58, stars: 3 },
+    best: { score: 105, stars: 3 },
   });
-  await expect(page.locator("#triple-round-summary-modal")).toContainText("Thưởng hoàn thành: 13 Xu");
+  await expect(page.locator("#triple-round-summary-modal")).toContainText("Thưởng hoàn thành: 16 Xu");
 });
 
-test("Triple terminal transaction rolls back coins, progress, and session when persistence fails", async ({
+test("Triple match transaction rolls back state, progress, and session when persistence fails", async ({
   page,
 }) => {
   await page.goto("/");
-  const before = await page.evaluate(async () => {
+  await page.evaluate(async () => {
     const { startTripleConnectRound } = await import(
       "/js/tripleConnect/tripleController.js"
     );
-    const { gameState } = await import("/js/gameState.js");
     window.__tripleRun = startTripleConnectRound({ mode: "easy", level: 1, skipIntro: true });
+  });
+  await playTripleWitness(page, null, 2);
+  const before = await page.evaluate(async () => {
+    const { gameState } = await import("/js/gameState.js");
     const prototype = Object.getPrototypeOf(localStorage);
     window.__tripleStorageSetItem = prototype.setItem;
     prototype.setItem = () => { throw new Error("terminal persistence failure"); };
     return structuredClone({
+      state: window.__tripleRun.getState(),
       coins: gameState.coins,
       progress: gameState.progress.tripleConnect,
     });
   });
-  await playTripleWitness(page);
-  await expect(page.locator("#triple-terminal-save-failed-modal")).toBeVisible();
+  const finalTileId = await page.evaluate(
+    () => window.__tripleRun.generated.witness[2].tileId,
+  );
+  await page
+    .locator(`.triple-connect__board [data-tile-id="${finalTileId}"]`)
+    .click();
   const after = await page.evaluate(async () => {
     const { gameState } = await import("/js/gameState.js");
-    return structuredClone({ coins: gameState.coins, progress: gameState.progress.tripleConnect });
+    return structuredClone({
+      state: window.__tripleRun.getState(),
+      coins: gameState.coins,
+      progress: gameState.progress.tripleConnect,
+    });
   });
   expect(after).toEqual(before);
   await page.evaluate(() => {
@@ -211,6 +231,39 @@ test("Triple applies equipped effects and plays the shared match sound", async (
   await expect(page.locator(".triple-connect__ghost")).toHaveCount(0);
 });
 
+test("Triple preserves representative Link path and exit effect IDs through its adapter", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto("/");
+  for (const [pathId, exitId] of [
+    ["electric", "burn"],
+    ["magic", "portal"],
+    ["matrix", "freeze"],
+    ["meteor", "electric-shock"],
+  ]) {
+    const witness = await page.evaluate(async ({ pathId: selectedPath, exitId: selectedExit }) => {
+      const { gameState } = await import("/js/gameState.js");
+      const { startTripleConnectRound } = await import("/js/tripleConnect/tripleController.js");
+      gameState.appearance.triplePathEffect = selectedPath;
+      gameState.appearance.tripleExitEffect = selectedExit;
+      return startTripleConnectRound({ mode: "easy", seed: `adapter-${selectedPath}-${selectedExit}`, skipIntro: true }).generated.witness.slice(0, 3);
+    }, { pathId, exitId });
+    for (const command of witness.slice(0, 2)) {
+      await page.locator(`[data-tile-id="${command.tileId}"]`).click();
+      const flight = page.locator(".triple-connect__tray-flight");
+      await flight.waitFor({ state: "visible" });
+      await flight.waitFor({ state: "detached" });
+    }
+    await page.locator(`[data-tile-id="${witness[2].tileId}"]`).click();
+    await expect(page.locator(".triple-connect__line")).toHaveClass(
+      new RegExp(`link-path-overlay--${pathId}`),
+    );
+    await expect(page.locator(".triple-connect__ghost").first()).toHaveClass(
+      new RegExp(`triple-connect__exit--${exitId}`),
+    );
+    await expect(page.locator(".triple-connect__ghost")).toHaveCount(0);
+  }
+});
+
 test("Triple Endless advances without resetting accumulated elapsed time", async ({
   page,
 }) => {
@@ -236,9 +289,10 @@ test("Triple Endless advances without resetting accumulated elapsed time", async
   expect(session.remainingTime).toBeGreaterThanOrEqual(5);
 });
 
-test("Triple Challenge advances deterministically through its staged timer and ends at 48 tiles", async ({
+test("Triple Challenge advances deterministically through its staged timer and ends at 75 tiles", async ({
   page,
 }) => {
+  test.setTimeout(60_000);
   await page.goto("/");
   await page.evaluate(async () => {
     const { startTripleConnectRound } = await import(
@@ -246,16 +300,16 @@ test("Triple Challenge advances deterministically through its staged timer and e
     );
     window.__tripleRun = startTripleConnectRound({ mode: "challenge", level: 1, seed: "challenge-level-1", skipIntro: true });
   });
-  await expect(page.locator("[data-triple-timer]")).toHaveText("01:00");
+  await expect(page.locator("[data-triple-timer]")).toHaveText("01:15");
   await winActiveTripleRound(page);
   await page.getByRole("button", { name: "Màn tiếp theo" }).click();
   await expect(page.locator("[data-triple-level]")).toHaveText("2");
-  await expect(page.locator("[data-triple-timer]")).toHaveText("01:10");
+  await expect(page.locator("[data-triple-timer]")).toHaveText("01:25");
   await page.locator("#triple-round-start-modal").getByRole("button", { name: "Bắt đầu" }).click();
   const levelTwo = await page.evaluate(async () =>
     (await import("/js/sessionProgress.js")).getActiveSession("triple-connect", "challenge"),
   );
-  expect(levelTwo).toMatchObject({ mode: "challenge", level: 2, layoutId: "challenge-18-v1", remainingTime: 70 });
+  expect(levelTwo).toMatchObject({ mode: "challenge", level: 2, layoutId: "challenge-24-v2", remainingTime: 85 });
 
   await page.evaluate(async () => {
     const { startTripleConnectRound } = await import(
@@ -263,7 +317,7 @@ test("Triple Challenge advances deterministically through its staged timer and e
     );
     window.__tripleRun = startTripleConnectRound({ mode: "challenge", level: 7, seed: "challenge-level-7", skipIntro: true });
   });
-  await expect(page.locator("[data-triple-timer]")).toHaveText("02:00");
+  await expect(page.locator("[data-triple-timer]")).toHaveText("03:30");
   await winActiveTripleRound(page);
   await expect(page.getByRole("button", { name: "Màn tiếp theo" })).toHaveCount(0);
 });
@@ -279,7 +333,7 @@ test("Triple time-up clears the session and opens one loss modal", async ({
     );
     window.__tripleRun = startTripleConnectRound({ mode: "easy", skipIntro: true });
   });
-  await advanceSeconds(page.clock, 60);
+  await advanceSeconds(page.clock, 75);
   await expect(page.locator("#triple-round-summary-modal")).toBeVisible();
   await expect(page.locator("#triple-round-summary-modal")).toHaveCount(1);
   const terminal = await page.evaluate(async () =>

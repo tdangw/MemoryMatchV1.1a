@@ -1,14 +1,16 @@
 # TASK
 
+> **Trạng thái 2026-09-20:** task này chưa được thực hiện và vẫn là kế hoạch active riêng. Triple Connect đã có gameplay và adapter hiệu ứng tạm; task này không thêm game mới mà xây CSS ownership/Effect V2 dùng chung rồi thay adapter tạm bằng runtime đã kiểm chứng. Không gộp task này vào một gate Triple hoặc chạy song song khi hai task cùng sửa effect/CSS owner.
+
 ## Goal
 
-Rà soát và tổ chức lại CSS/JavaScript bị trùng hoặc sai ownership, sau đó thiết kế lại hệ thống **hiệu ứng nối** và **hiệu ứng xóa thẻ V2** với chất lượng thị giác cao, vòng đời an toàn và hiệu suất ổn định trước khi tích hợp Triple Connect.
+Rà soát và tổ chức lại CSS/JavaScript bị trùng hoặc sai ownership, sau đó thiết kế lại hệ thống **hiệu ứng nối** và **hiệu ứng xóa thẻ V2** với chất lượng thị giác cao, vòng đời an toàn và hiệu suất ổn định để Link Connect và Triple Connect dùng chung qua adapter.
 
 Phạm vi theo game:
 
 - **Memory Match:** dọn CSS legacy, namespace animation lật/xuất hiện và feedback; không có hiệu ứng nối. Không thay đổi luật ghép cặp.
 - **Link Connect:** là game đang sở hữu 21 hiệu ứng nối và 21 hiệu ứng xóa thử nghiệm; đây là đối tượng chính của việc viết lại V2.
-- **Triple Connect:** chưa triển khai gameplay trong task này; chỉ định nghĩa adapter để sau này dùng chung effect ID/ownership và phát hiệu ứng trên ba thẻ trong khay.
+- **Triple Connect:** gameplay đã tồn tại; giữ luật/state hiện tại, thay adapter hiệu ứng tạm bằng adapter ba target dùng runtime V2 sau khi Link rollout pass.
 - **Game Shell/UI chung:** sở hữu runtime lifecycle, quality tier, effect registry, token và primitive dùng chung.
 - **Victory presentation:** là cảnh độc lập, không gộp vào gameplay effects; chỉ kiểm tra lại phạm vi CSS và cơ chế tải động.
 
@@ -70,21 +72,14 @@ Kết quả cần đạt:
 - Effect timing ↔ controller resolve: thời gian gameplay phụ thuộc max delay cấu hình chung thay vì timeline effect đã xác nhận.
 - Reduced motion ↔ canvas/CSS: hai backend không giảm chuyển động theo cùng một chính sách.
 - Catalog ↔ tests: test đang khóa cứng đúng 21/21 effect nhưng chưa kiểm mỗi effect render/cleanup đúng.
-- Shared appearance ↔ Triple tương lai: save hiện có `linkPathEffect`/`linkExitEffect`; cần giữ key cũ nhưng runtime V2 phải nhận adapter target count 2 hoặc 3.
+- Shared appearance ↔ Triple: giữ key Link cũ và key Triple hiện hành; runtime V2 nhận adapter target count 2 hoặc 3 mà không trộn ownership save giữa hai game.
 - File ownership ↔ cascade: shop/modal/HUD rule bị phân tán và đúng nhờ load order.
 - Generated/source CSS ↔ editable CSS: token và victory source không được phân biệt rõ trong audit đơn giản.
 - Timer freeze state ↔ CSS animation: thay đổi đang có trong worktree khởi động lại animation bằng `offsetWidth` cưỡng bức layout và dùng thời lượng CSS theo `freezeSeconds`; khi pause/background/tick bị trễ, lớp băng có thể không còn đồng bộ với state countdown.
 
-### Cảnh báo trạng thái worktree trong lúc audit
+### Trạng thái cần xác nhận lại trước Gate A
 
-Trong lúc lập kế hoạch, worktree xuất hiện thay đổi ngoài task này ở 10 file: `index.html`, `gameState.js`, `linkController.js`, `linkShell.js`, `persistence.js`, `settings.js`, `tooltips.js`, `link-connect.css`, `modals.css`, `tooltips.css` (khoảng 129 dòng thêm/10 dòng xóa). Các thay đổi được giữ nguyên, không bị ghi đè.
-
-Phần Link mới thêm hiệu ứng đóng băng icon đồng hồ. Trước khi bắt đầu Gate A phải:
-
-- chốt snapshot/commit nguồn đang đánh giá;
-- chạy lại inventory và baseline sau khi các thay đổi song song kết thúc;
-- thay cơ chế restart animation bằng state-driven progress hoặc WAAPI handle, tránh `void element.offsetWidth` gây forced synchronous layout;
-- kiểm pause/background/reuse Freeze để đảm bảo lớp băng kết thúc đúng lúc `freezeSeconds` về 0.
+Số file/dòng/bundle và danh sách worktree trong bản audit ban đầu chỉ là số liệu lịch sử. Trước Gate A phải đọc `git status`, chạy lại inventory/baseline trên code hiện tại và không ghi đè thay đổi Triple đang dở. Hiệu ứng băng icon đồng hồ phải dùng state/WAAPI handle, không restart bằng `offsetWidth`; pause/background/reuse Freeze phải kết thúc đồng bộ với `freezeSeconds`.
 
 ## Files to inspect
 
@@ -309,7 +304,7 @@ Quy tắc multi-target:
    - mọi effect có renderer family;
    - reduced preset tồn tại;
    - duration nằm trong giới hạn;
-   - target count 2 được hỗ trợ; target count 3 được khai báo trước khi Triple bật.
+   - target count 2 được hỗ trợ; target count 3 được khai báo trước khi rollout V2 vào Triple.
 4. Controller dùng timeline chuẩn từ catalog/runtime, không đọc duration từ CSS rải rác.
 5. Không đổi `appearance.linkPathEffect`, `appearance.linkExitEffect`, `ownedLinkPathEffects`, `ownedLinkExitEffects` hoặc giá trị ID đã lưu.
 
@@ -355,10 +350,10 @@ Quy tắc multi-target:
 - V2 mặc định sau khi toàn bộ catalog/test/perf xanh.
 - Xóa V1 code/CSS chỉ trong commit riêng sau khi không còn reference và save cũ đã được thử.
 
-#### Gate G — Triple readiness
+#### Gate G — Triple adapter rollout
 
-- Kiểm adapter ba target bằng fixture khay giả lập; chưa cần gameplay Triple.
-- Chỉ cho Triple dùng V2, không sao chép Link renderer/CSS.
+- Kiểm adapter ba target bằng fixture và round Triple thật; line đi qua đúng ba tâm thẻ trong khay và group-aware effect dùng một budget theo match.
+- Chỉ chuyển Triple sang V2 sau khi Link rollout pass; không sao chép Link renderer/CSS và không giữ hai production runtime song song.
 
 ## Edge cases
 
@@ -373,7 +368,7 @@ Quy tắc multi-target:
 - Scope bị dispose giữa `requestAnimationFrame` và draw.
 - Effect bị hủy hai lần hoặc hoàn tất đồng thời với restart.
 - Low tier không có particle nhưng callback gameplay vẫn chạy đúng một lần.
-- Filter/SVG mask không hỗ trợ đầy đủ trên Android WebView mục tiêu.
+- Filter/SVG mask không hỗ trợ đầy đủ trên browser mobile mục tiêu.
 - Path length bằng 0 hoặc có hai điểm trùng nhau.
 - Triple có ba thẻ với khoảng cách không đều trong khay.
 - `collide`/`blackhole`/`implode` có target count khác preset hỗ trợ.
@@ -436,16 +431,16 @@ Quy tắc multi-target:
 
 - **Performance/leak**
   - Trace 100 match default và ba effect nặng nhất trên desktop/mobile emulation.
-  - Android WebView thật: medium tier, board lớn, thunder và chuyển orientation.
+  - Hai chuẩn mobile web đã chốt: medium tier, board lớn, thunder và chuyển orientation.
   - Ghi p50/p95 setup/frame, dropped frames, canvas/node count, heap sau GC.
   - Mount/unmount/restart 20 và 100 vòng; diagnostics về 0.
 
 - **Regression suite**
   - `npm run check`.
   - Toàn bộ game-shell lifecycle/cleanup/effects/layout/audit/presentation tests.
-  - Memory/Link UI tests ở desktop, mobile, mobile-narrow, landscape.
+  - Memory/Link/Triple UI tests ở desktop và đúng hai chuẩn mobile đã chốt ở portrait/landscape; không chạy `mobile-narrow 320×568` nếu không có lỗi thật cần tái hiện.
   - `npm run test:ui:visual`.
-  - `npm run build` và Android build/sync ở gate phát hành.
+  - `npm run build`; Android build/sync không thuộc task web hiện tại.
 
 ## Acceptance criteria
 
@@ -465,13 +460,13 @@ Quy tắc multi-target:
 - [ ] Không allocation trong RAF draw loop theo profile.
 - [ ] Connection setup p95 <= 3 ms và exit setup đạt budget.
 - [ ] Frame effect p95 <= 8 ms; không long task > 50 ms trong scenario chuẩn.
-- [ ] 60 FPS trên desktop và thiết bị Android mục tiêu với medium tier; low tier giữ trải nghiệm ổn định trên máy yếu.
+- [ ] 60 FPS trên desktop và hai chuẩn mobile web mục tiêu với medium tier; low tier giữ trải nghiệm ổn định trên máy yếu.
 - [ ] Sau 100 match/mount cycle, heap/node/listener không tăng đơn điệu sau GC.
 - [ ] Không tăng persistence hoặc Firebase write do effect.
 - [ ] Save V1.1a cũ đọc đúng; không đổi schema/key/ID.
 - [ ] CSS/JS gzip nằm trong ngân sách.
-- [ ] Full check, UI, visual, production build và Android smoke test đều pass.
-- [ ] Chỉ sau khi Link V2 đạt toàn bộ tiêu chí mới cho Triple Connect sử dụng adapter chung.
+- [ ] Full check, UI, visual và production web build đều pass; không chạy đóng gói Android trong task này.
+- [ ] Chỉ sau khi Link V2 đạt toàn bộ tiêu chí mới thay adapter tạm của Triple bằng adapter chung.
 
 ## Do not do
 

@@ -24,7 +24,7 @@ function select(state, tileId) {
   return transition;
 }
 
-assert.deepEqual(TRIPLE_EASY_CONFIG, { mode: "easy", tileCount: 12, layerCount: 2, timeSeconds: 60 });
+assert.deepEqual(TRIPLE_EASY_CONFIG, { mode: "easy", tileCount: 18, layerCount: 2, timeSeconds: 75 });
 assert.equal(TRIPLE_RULES.trayCapacity, 7);
 assert.equal(calculateTripleMatchScore(1), 10);
 assert.equal(calculateTripleMatchScore(2), 13);
@@ -36,9 +36,9 @@ assert.deepEqual(getTripleStarProgress({ mode: "endless", score: 9 }).stars, 0);
 assert.deepEqual(getTripleStarProgress({ mode: "endless", score: 10 }).stars, 1);
 assert.deepEqual(getTripleStarProgress({ mode: "endless", score: 15 }).stars, 2);
 assert.deepEqual(getTripleStarProgress({ mode: "endless", score: 20 }).stars, 3);
-assert.equal(calculateTripleCoinReward({ mode: "easy", level: 1, stars: 3, maxCombo: 9 }), 13);
-assert.equal(calculateTripleCoinReward({ mode: "challenge", level: 3, stars: 2, maxCombo: 1 }), 10);
-assert.equal(calculateTripleCoinReward({ mode: "endless", level: 8, stars: 1, maxCombo: 5 }), 14);
+assert.equal(calculateTripleCoinReward({ mode: "easy", matchedTriples: 6, stars: 3, maxCombo: 9 }), 16);
+assert.equal(calculateTripleCoinReward({ mode: "challenge", matchedTriples: 3, stars: 2, maxCombo: 1 }), 10);
+assert.equal(calculateTripleCoinReward({ mode: "endless", matchedTriples: 25, stars: 1, maxCombo: 5 }), 25);
 assert.deepEqual(TRIPLE_PRODUCT_DECISIONS.initialItems, { hint: 3 });
 assert.deepEqual(TRIPLE_PRODUCT_DECISIONS.itemPrices, { hint: 8, timePerSecond: 2, undo: 15, shuffle: 15 });
 assert.equal(TRIPLE_PRODUCT_DECISIONS.excludedItems.includes("tray-expand"), true);
@@ -48,19 +48,19 @@ assert.equal(milestone.progress, 3);
 assert.deepEqual(milestone.claimedIds, ["0:1"]);
 assert.deepEqual(resolveTripleMilestoneProgress({ milestones: { progress: 5, cycleId: 0, claimedIds: [] }, tileIds: ["x"], mode: "endless" }).rewards[0].reward, { coins: 2 });
 assert.deepEqual(TRIPLE_PRODUCT_DECISIONS.milestones.itemFallbackCoins, { hint: 4, undo: 8, shuffle: 8 });
-let rollover = { progress: 29, cycleId: 4, claimedIds: ["4:10"] };
+let rollover = { progress: 44, cycleId: 4, claimedIds: ["4:15"] };
 rollover = resolveTripleMilestoneProgress({ milestones: rollover, tileIds: ["last"], mode: "easy" }).next;
 assert.deepEqual(rollover, { progress: 0, cycleId: 5, claimedIds: [] });
 let twentyCycles = { progress: 0, cycleId: 0, claimedIds: [] };
 const allClaims = [];
-for (let index = 0; index < 600; index += 1) {
+for (let index = 0; index < 900; index += 1) {
   const resolved = resolveTripleMilestoneProgress({ milestones: twentyCycles, tileIds: [`cycle-${index}`], mode: "easy" });
   twentyCycles = resolved.next;
   allClaims.push(...resolved.rewards.map((reward) => reward.claimId));
 }
 assert.equal(twentyCycles.cycleId, 20);
 assert.equal(twentyCycles.progress, 0);
-assert.equal(new Set(allClaims).size, 200, "Every milestone must be granted once in each cycle.");
+assert.equal(new Set(allClaims).size, 300, "Every milestone must be granted once in each cycle.");
 
 const covered = makeState(
   { a: 3, b: 3, c: 3, d: 3 },

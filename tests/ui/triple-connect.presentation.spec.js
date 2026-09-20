@@ -1,5 +1,59 @@
 import { expect, test } from "@playwright/test";
 
+function parseTrayFlight(transform) {
+  const match = String(transform).match(
+    /translate\(([-\d.]+)px,\s*([-\d.]+)px\) scale\(([-\d.]+),\s*([-\d.]+)\)/,
+  );
+  if (!match) throw new Error(`Unexpected tray-flight transform: ${transform}`);
+  return match.slice(1).map(Number);
+}
+
+test("Triple tray flight uses one surface coordinate space and scales to its slot", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto("/");
+  const flight = await page.evaluate(async () => {
+    const { startTripleConnectDevelopmentRound } = await import("/js/tripleConnect/tripleController.js");
+    startTripleConnectDevelopmentRound({ seed: "tray-flight-geometry" });
+    const surface = document.querySelector(".triple-connect__surface");
+    const source = document.querySelector(".triple-connect__board .triple-connect__tile:not(:disabled)");
+    const sourceRect = source.getBoundingClientRect();
+    const surfaceRect = surface.getBoundingClientRect();
+    source.click();
+    const target = document.querySelector(".triple-connect__tray .triple-connect__tile");
+    const ghost = document.querySelector(".triple-connect__tray-flight");
+    const targetRect = target.getBoundingClientRect();
+    const animation = ghost.getAnimations()[0];
+    const keyframes = animation.effect.getKeyframes();
+    await animation.finished.catch(() => {});
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+    return {
+      source: sourceRect.toJSON(),
+      surface: surfaceRect.toJSON(),
+      target: targetRect.toJSON(),
+      ghost: {
+        left: Number.parseFloat(ghost.style.left),
+        top: Number.parseFloat(ghost.style.top),
+        width: Number.parseFloat(ghost.style.width),
+        height: Number.parseFloat(ghost.style.height),
+      },
+      finalTransform: keyframes.at(-1).transform,
+      targetOpacityAfter: target.style.opacity,
+      ghostCountAfter: document.querySelectorAll(".triple-connect__tray-flight").length,
+    };
+  });
+  const [dx, dy, scaleX, scaleY] = parseTrayFlight(flight.finalTransform);
+  expect(flight.ghost.left).toBeCloseTo(flight.source.left - flight.surface.left, 2);
+  expect(flight.ghost.top).toBeCloseTo(flight.source.top - flight.surface.top, 2);
+  expect(flight.ghost.width).toBeCloseTo(flight.source.width, 2);
+  expect(flight.ghost.height).toBeCloseTo(flight.source.height, 2);
+  expect(dx).toBeCloseTo(flight.target.left - flight.source.left, 2);
+  expect(dy).toBeCloseTo(flight.target.top - flight.source.top, 2);
+  expect(scaleX).toBeCloseTo(flight.target.width / flight.source.width, 2);
+  expect(scaleY).toBeCloseTo(flight.target.height / flight.source.height, 2);
+  expect(flight.targetOpacityAfter).toBe("");
+  expect(flight.ghostCountAfter).toBe(0);
+});
+
 test("Triple match commits before presentation and unmount cancels ghosts", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
@@ -23,19 +77,47 @@ test("Triple match commits before presentation and unmount cancels ghosts", asyn
 });
 
 test("Triple reduced motion settles to the same committed match without ghosts", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
-  const matched = await page.evaluate(async () => {
+  const result = await page.evaluate(async () => {
     const { startTripleConnectDevelopmentRound } = await import("/js/tripleConnect/tripleController.js");
     const run = startTripleConnectDevelopmentRound({ seed: "reduced" });
     for (const command of run.generated.witness) {
       document.querySelector(`[data-tile-id="${command.tileId}"]`)?.click();
-      await new Promise((resolve) => setTimeout(resolve, 240));
+      await new Promise((resolve) => requestAnimationFrame(resolve));
       if (run.getState().matchedTriples) break;
     }
     return run.getState().matchedTriples;
   });
-  expect(matched).toBe(1);
+  expect(result).toBe(1);
   await expect(page.locator(".triple-connect__ghost, .triple-connect__line polyline")).toHaveCount(0);
+});
+
+test("Triple reduced-motion tray feedback cleans up within the 100 ms budget", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  const elapsed = await page.evaluate(async () => {
+    const { startTripleConnectDevelopmentRound } = await import("/js/tripleConnect/tripleController.js");
+    startTripleConnectDevelopmentRound({ seed: "reduced-tray-budget" });
+    const source = document.querySelector(".triple-connect__board .triple-connect__tile:not(:disabled)");
+    const startedAt = performance.now();
+    source.click();
+    await new Promise((resolve, reject) => {
+      const deadline = window.setTimeout(() => reject(new Error("tray feedback did not settle")), 200);
+      const check = () => {
+        if (!document.querySelector(".triple-connect__tray .is-tray-arrived")) {
+          window.clearTimeout(deadline);
+          resolve();
+          return;
+        }
+        requestAnimationFrame(check);
+      };
+      requestAnimationFrame(check);
+    });
+    return performance.now() - startedAt;
+  });
+  expect(elapsed).toBeLessThanOrEqual(110);
+  await expect(page.locator(".triple-connect__tray-flight, .triple-connect__ghost")).toHaveCount(0);
 });
 
 test("Triple ignores a second tap while a tray flight is presenting", async ({ page }) => {
