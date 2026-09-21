@@ -152,7 +152,7 @@
 }
 
 /* Hiệu ứng shimmer lung linh */
-@keyframes shimmer {
+@keyframes memory-lucky-shimmer {
   0% {
     box-shadow: 0 0 10px 3px rgb(255 215 0 / 60%);
     transform: scale(1);
@@ -255,7 +255,7 @@
   animation: hideFadeScale 180ms ease-in forwards;
 }
 
-@keyframes slideUp {
+@keyframes memory-card-enter-up {
   0% {
     transform: translateY(20px);
     opacity: 0;
@@ -268,7 +268,7 @@
 }
 
 .tile img.appear-slide-up {
-  animation: slideUp 0.4s ease;
+  animation: memory-card-enter-up 0.4s ease;
 }
 
 @keyframes flipY {

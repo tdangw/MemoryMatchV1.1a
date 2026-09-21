@@ -117,16 +117,6 @@ button {
   }
 }
 
-@keyframes fadein {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
 @keyframes fadeOut {
   from {
     opacity: 1;
@@ -161,7 +151,7 @@ button {
   }
 }
 
-@keyframes slideUp {
+@keyframes app-feedback-exit-up {
   from {
     opacity: 1;
     transform: translateY(0);
@@ -333,7 +323,7 @@ body.meteor-effects-disabled .shooting-star {
   }
 }
 
-.bonus-overlay {
+.legacy-bonus-toast {
   position: fixed;
   top: 40%;
   left: 50%;
@@ -429,45 +419,6 @@ body.meteor-effects-disabled .shooting-star {
   #grid-container {
     max-width: 100%;
   }
-}
-
-.shop-item-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  max-height: 60vh;
-  overflow-y: auto;
-  margin-bottom: 16px;
-}
-
-.shop-item {
-  background: #da9f9f;
-  border-radius: 10px;
-  padding: 10px;
-  box-shadow: 0 2px 6px rgb(0 0 0 / 10%);
-  text-align: center;
-}
-
-.shop-item-title {
-  font-weight: bold;
-  font-size: 14px;
-  margin-bottom: 8px;
-}
-
-.shop-buy-button {
-  background: #222;
-  color: #ffd700;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: all 0.3s ease;
-}
-
-.shop-buy-button:hover {
-  background: #000;
-  transform: scale(1.2);
 }
 
 @keyframes popScale {

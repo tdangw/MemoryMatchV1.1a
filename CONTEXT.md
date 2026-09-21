@@ -7,7 +7,7 @@
 - Ứng dụng JavaScript ES modules, lưu dữ liệu trên thiết bị bằng `localStorage`; Firebase chỉ dùng Hosting.
 - Ba game có trong runtime/menu: Memory Match, Link Connect và Triple Connect.
 - Memory Match và Link Connect đang ổn định trên Game Shell chung.
-- Triple Connect chơi được nhưng chưa đạt Web Acceptance; kế hoạch gameplay/UI đang hoạt động là `TASK_TRIPLE_CONNECT_IMPLEMENTATION_PLAN.md`.
+- Triple Connect đã hoàn tất Continuation 0–7 và đạt Web Acceptance kỹ thuật trên desktop, hai portrait và hai landscape; `TASK_TRIPLE_CONNECT_IMPLEMENTATION_PLAN.md` là hồ sơ hoàn thành, không phải gate đang mở.
 - `TASK_CSS_DEDUP_EFFECTS_V2_PLAN.md` vẫn là task active riêng và chưa hoàn tất; task này sở hữu CSS dedup toàn ứng dụng và Effect V2 dùng chung, không được coi là đã nhập hết vào kế hoạch Triple.
 - Mục tiêu hiện tại là hoàn thiện trải nghiệm web desktop/mobile. PWA/APK/Android/signing/store QA chỉ bắt đầu bằng task riêng sau khi người dùng xác nhận web ổn định.
 
@@ -25,7 +25,7 @@
 - Contract mới: Easy/Normal/Hard/Super Hard/Endless dùng 18/36/54/75/75 thẻ; Challenge `18/24/36/42/54/60/75`; khay cố định 7 ô.
 - Layout active là V4; V1/V2/V3 phải tiếp tục đọc được cho save cũ.
 - Milestone có 15 mốc, target 45. Lucky chỉ có trong Challenge, 1–3 tile mỗi board.
-- Các phần cần hoàn thiện: silhouette/cover graph/UI witness V4, ảnh `contain`, responsive, menu/HUD/popup/timer, tray flight, exit effect chất lượng, milestone/economy và lifecycle/performance review.
+- Layout V4, ảnh `contain`, responsive, menu/HUD/popup/timer, tray flight, Effect V2, milestone/economy và lifecycle/performance đã qua target suite, shared regression và production web acceptance.
 - Không dùng `mobile-narrow 320×568`. Matrix Triple chỉ gồm 360×640, 411×914, hai chiều xoay tương ứng và desktop landscape hiện có, trừ khi người dùng cung cấp lỗi thật ở kích thước khác.
 
 ## Tài liệu giữ lại
@@ -35,7 +35,7 @@
 - `README.md`: cách chạy/build.
 - `ADD_GAME.md`: checklist tích hợp game.
 - `Memory Match.md`, `Link Connect.md`, `Triple Connect.md`: luật/thiết kế từng game.
-- `TASK_TRIPLE_CONNECT_IMPLEMENTATION_PLAN.md`: kế hoạch active cho gameplay/UI Triple.
+- `TASK_TRIPLE_CONNECT_IMPLEMENTATION_PLAN.md`: hồ sơ triển khai và acceptance đã hoàn tất của Triple.
 - `TASK_CSS_DEDUP_EFFECTS_V2_PLAN.md`: kế hoạch active riêng cho CSS ownership và Effect V2.
 - `themes.md`: catalog/chất lượng asset chủ đề.
 

@@ -1,62 +1,138 @@
 import { playCoinRewardFlight } from "../coinRewards.js";
 import { playLootDrop } from "../lootEffects.js";
+import { clearTripleEffects, presentTripleConnection, presentTripleExit } from "./tripleEffectAdapter.js";
+import { showComboEffect, showScoreEffectAt } from "../ui.js";
 
-const MATCH_DURATION_MS = 240;
-const EXIT_DURATION_MS = 220;
+const MATCH_DURATION_MS = 300;
+const TRAY_FLIGHT_DURATION_MS = 300;
+const MATCH_TRAY_HOLD_MS = 180;
+const TRAY_COMPACTION_DURATION_MS = 210;
 
-export function presentTripleTransition({ shell, scope, next, events, effects = {}, render }) {
+export function presentTripleTransition({ shell, scope, previous, next, events, effects = {}, render }) {
   const match = events.find((event) => event.type === "triple-resolved");
   const selected = events.find((event) => event.type === "tile-selected");
   if (!scope.active) { render(next); return Promise.resolve(); }
   if (!match && selected) return presentTrayFlight({ shell, scope, selected, render, next });
   if (!match) { render(next); return Promise.resolve(); }
-  return presentResolvedTriple({ shell, scope, match, effects, render, next });
+  return presentResolvedTriple({ shell, scope, previous, next, match, selected, effects, render });
 }
 
-function presentResolvedTriple({ shell, scope, match, effects, render, next }) {
+function presentResolvedTriple({ shell, scope, previous, next, match, selected, effects, render }) {
+  if (prefersReducedMotion()) {
+    return presentResolvedTripleExit({ shell, scope, match, effects, render, next });
+  }
+  const preview = createMatchTrayPreview(previous, next, match);
+  return presentTrayFlight({ shell, scope, selected, render, next: preview })
+    .then(() => delay(scope, MATCH_TRAY_HOLD_MS))
+    .then(() => presentResolvedTripleExit({ shell, scope, match, effects, render, next }));
+}
+
+function presentResolvedTripleExit({ shell, scope, match, effects, render, next }) {
   const root = shell.refs.root;
   const surface = shell.refs.board;
   const line = root.querySelector(".triple-connect__line");
   const surfaceRect = surface.getBoundingClientRect();
   const sourceNodes = match.tileIds.map((id) => root.querySelector(`[data-tile-id="${id}"]`)).filter(Boolean);
   if (sourceNodes.length !== 3) { render(next); return Promise.resolve(); }
+  if (prefersReducedMotion()) {
+    render(next);
+    return Promise.resolve();
+  }
   const ghosts = sourceNodes.map((source) => createGhost(source, surfaceRect));
-  render(next);
-  line.className.baseVal = `triple-connect__line link-path-overlay ${effects.path?.className || "link-path-overlay--default"}`;
+  // Capture feedback from the real tiles while their board rectangles still
+  // exist. The committed render removes them before the exit ghosts begin.
+  showMatchFeedback(sourceNodes, match);
   ghosts.forEach((ghost) => surface.append(ghost));
+  sourceNodes.forEach((source) => source.classList.add("is-match-exiting"));
+  const startVisualFeedback = scope.guard(() => {
+    presentTripleConnection({ surface: line, targets: ghosts, effectId: effects.path?.id });
+    presentTripleExit({ surface, targets: ghosts, effectId: effects.exit?.id });
+  });
   const cleanup = () => {
-    line.replaceChildren();
+    clearTripleEffects(line);
     ghosts.forEach((ghost) => ghost.remove());
-    root.querySelectorAll(".triple-connect__match-score").forEach((node) => node.remove());
+    sourceNodes.forEach((source) => source.classList.remove("is-match-exiting"));
   };
   const release = scope.own(cleanup, "node");
-  if (prefersReducedMotion()) {
-    showMatchScore({ shell, scope, ghosts, match, duration: 90 });
-    return new Promise((resolve) => {
-      scope.timeout(() => {
-        presentMilestoneSequence({ shell, scope, source: ghosts[1] || ghosts[0], milestones: effects.milestones })
-          .then(() => presentCommittedRewards(shell, ghosts[1] || ghosts[0], effects.rewards));
-        cleanup();
-        release.forget();
-        resolve();
-      }, 90);
-    });
-  }
-  drawTripleLine(line, ghosts);
   const lineAnimation = line.animate(
     [{ opacity: 0 }, { opacity: 1, offset: 0.25 }, { opacity: 1, offset: 0.62 }, { opacity: 0 }],
     { duration: MATCH_DURATION_MS, easing: "ease-out", fill: "both" },
   );
   scope.animation(lineAnimation);
-  const exits = ghosts.map((ghost) => playTripleExitEffect(scope, ghost, effects.exit?.id));
-  showMatchScore({ shell, scope, ghosts, match, duration: EXIT_DURATION_MS });
-  return Promise.all([lineAnimation.finished.catch(() => {}), ...exits.map((animation) => animation.finished.catch(() => {}))])
+  // The committed board/tray patch is the input response. Build the optional
+  // line/exit/score visuals after the click task so they cannot delay it.
+  queueMicrotask(startVisualFeedback);
+  return Promise.all([lineAnimation.finished.catch(() => {})])
+    .then(() => {
+      const priorTrayRects = captureTrayRects(root);
+      render(next);
+      return animateTrayCompaction({ root, scope, priorTrayRects });
+    })
     .then(() => presentMilestoneSequence({ shell, scope, source: ghosts[1] || ghosts[0], milestones: effects.milestones }))
     .then(() => {
       presentCommittedRewards(shell, ghosts[1] || ghosts[0], effects.rewards);
       cleanup();
       release.forget();
     });
+}
+
+function createMatchTrayPreview(previous, next, match) {
+  const matchIds = new Set(match.tileIds);
+  const tiles = Object.fromEntries(Object.entries(next.tiles).map(([id, tile]) => [
+    id,
+    matchIds.has(id) ? { ...tile, location: "tray" } : tile,
+  ]));
+  const tray = [];
+  let insertedMatch = false;
+  for (const tileId of previous.tray) {
+    if (!matchIds.has(tileId)) {
+      tray.push(tileId);
+      continue;
+    }
+    if (!insertedMatch) {
+      tray.push(...match.tileIds);
+      insertedMatch = true;
+    }
+  }
+  if (!insertedMatch) tray.push(...match.tileIds);
+  return {
+    ...next,
+    status: "playing",
+    tiles,
+    tray,
+    combo: previous.combo,
+    maxCombo: previous.maxCombo,
+    score: previous.score,
+    matchedTriples: previous.matchedTriples,
+  };
+}
+
+function delay(scope, duration) {
+  return new Promise((resolve) => scope.timeout(resolve, duration));
+}
+
+function captureTrayRects(root) {
+  return new Map([...root.querySelectorAll(".triple-connect__tray .triple-connect__tile")]
+    .map((node) => [node.dataset.tileId, node.getBoundingClientRect()]));
+}
+
+function animateTrayCompaction({ root, scope, priorTrayRects }) {
+  const animations = [];
+  for (const [tileId, before] of priorTrayRects) {
+    const tile = root.querySelector(`.triple-connect__tray [data-tile-id="${tileId}"]`);
+    const after = tile?.getBoundingClientRect();
+    if (!after) continue;
+    const shiftX = before.left - after.left;
+    const shiftY = before.top - after.top;
+    if (!shiftX && !shiftY) continue;
+    const animation = tile.animate([
+      { transform: `translate(${shiftX}px, ${shiftY}px)` },
+      { transform: "translate(0, 0)" },
+    ], { duration: TRAY_COMPACTION_DURATION_MS, easing: "cubic-bezier(.2,.8,.2,1)" });
+    scope.animation(animation);
+    animations.push(animation.finished.catch(() => {}));
+  }
+  return Promise.all(animations);
 }
 
 function presentMilestoneSequence({ shell, scope, source, milestones = [] }) {
@@ -103,88 +179,18 @@ function createGhost(source, surfaceRect) {
   return ghost;
 }
 
-function drawTripleLine(line, ghosts) {
-  const base = line.getBoundingClientRect();
-  const points = ghosts.map((ghost) => {
-    const rect = ghost.getBoundingClientRect();
-    return `${rect.left + rect.width / 2 - base.left},${rect.top + rect.height / 2 - base.top}`;
-  }).join(" ");
-  const createPolyline = (className) => {
-    const node = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
-    node.setAttribute("class", className);
-    node.setAttribute("points", points);
-    node.setAttribute("pathLength", "1");
-    return node;
-  };
-  line.replaceChildren(createPolyline("link-path-overlay__glow"), createPolyline("link-path-overlay__beam"));
-}
-
-function playTripleExitEffect(scope, ghost, exitId = "default") {
-  ghost.classList.add("is-removing", `triple-connect__exit--${exitId}`);
-  const animation = ghost.animate(getExitFrames(exitId), {
-    duration: EXIT_DURATION_MS, easing: "cubic-bezier(.2,.75,.25,1)", fill: "both",
-  });
-  scope.animation(animation);
-  return animation;
-}
-
-function getExitFrames(exitId) {
-  if (["burn", "finedust", "crumble"].includes(exitId)) return [
-    { opacity: 1, filter: "saturate(1) brightness(1)", transform: "scale(1)" },
-    { opacity: 0, filter: "saturate(.2) brightness(1.8)", transform: "translateY(-9px) scale(.72)" },
-  ];
-  if (["portal", "blackhole", "implode"].includes(exitId)) return [
-    { opacity: 1, transform: "scale(1) rotate(0deg)" },
-    { opacity: 0, transform: "scale(.08) rotate(160deg)" },
-  ];
-  if (["gravity", "ghost"].includes(exitId)) return [
-    { opacity: 1, transform: "translateY(0)" },
-    { opacity: 0, transform: "translateY(24px) scale(.88)" },
-  ];
-  if (exitId === "dissolve") return [
-    { opacity: 1, filter: "blur(0px)" },
-    { opacity: 0, filter: "blur(6px) brightness(1.4)", transform: "scale(1.08)" },
-  ];
-  if (exitId === "freeze") return [
-    { opacity: 1, filter: "brightness(1) hue-rotate(0deg)" },
-    { opacity: 0, filter: "brightness(2) hue-rotate(180deg)", transform: "scale(0.85)" },
-  ];
-  if (exitId === "bubble") return [
-    { opacity: 1, transform: "translateY(0) scale(1)" },
-    { opacity: 0, transform: "translateY(-22px) scale(1.15)" },
-  ];
-  if (["slice", "collide", "electric-shock"].includes(exitId)) return [
-    { opacity: 1, transform: "scale(1) rotate(0deg)" },
-    { opacity: 0, transform: "scale(0.65) rotate(-15deg)" },
-  ];
-  if (["split4", "split2", "split8", "triangles", "pixel", "origami"].includes(exitId)) return [
-    { opacity: 1, transform: "scale(1)" },
-    { opacity: 0, transform: "scale(0.2)" },
-  ];
-  return [{ opacity: 1, transform: "scale(1)" }, { opacity: 0, transform: "scale(.78)" }];
-}
-
-function showMatchScore({ shell, scope, ghosts, match, duration }) {
-  const surface = shell.refs.board;
-  const surfaceRect = surface.getBoundingClientRect();
-  const rect = (ghosts[1] || ghosts[0]).getBoundingClientRect();
-  const label = document.createElement("span");
-  label.className = "triple-connect__match-score";
-  label.textContent = `+${match.points}${match.combo > 1 ? ` · Combo x${match.combo}` : ""}`;
-  label.style.left = `${rect.left + rect.width / 2 - surfaceRect.left}px`;
-  label.style.top = `${rect.top + rect.height / 2 - surfaceRect.top}px`;
-  surface.append(label);
-  const remove = () => label.remove();
-  const release = scope.own(remove, "node");
-  const settle = () => { remove(); release.forget(); };
-  if (prefersReducedMotion()) { scope.timeout(settle, duration); return; }
-  const animation = label.animate([
-    { opacity: 0, transform: "translate(-50%, -20%) scale(.85)" },
-    { opacity: 1, transform: "translate(-50%, -80%) scale(1)" },
-    { opacity: 0, transform: "translate(-50%, -135%) scale(.94)" },
-  ], { duration, easing: "ease-out", fill: "both" });
-  scope.animation(animation);
-  animation.finished.catch(() => {}).then(settle);
+function showMatchFeedback(tiles, match) {
+  const rects = tiles.map((tile) => tile.getBoundingClientRect());
+  const anchor = tiles[1] || tiles[0];
+  const center = rects.reduce(
+    (total, rect) => ({
+      x: total.x + rect.left + rect.width / 2,
+      y: total.y + rect.top + rect.height / 2,
+    }),
+    { x: 0, y: 0 },
+  );
+  showScoreEffectAt({ x: center.x / rects.length, y: center.y / rects.length }, match.points);
+  showComboEffect(anchor, match.combo);
 }
 
 function presentCommittedRewards(shell, source, rewards = []) {
@@ -243,21 +249,36 @@ function presentTrayFlight({ shell, scope, selected, render, next }) {
     top: `${sourceRect.top - surfaceRect.top}px`,
     width: `${sourceRect.width}px`,
     height: `${sourceRect.height}px`,
+    transformOrigin: "top left",
   });
   surface.append(ghost);
-  target.style.opacity = "0";
+  target.classList.add("is-tray-flight-target");
   const dx = targetRect.left - sourceRect.left;
   const dy = targetRect.top - sourceRect.top;
   const scaleX = sourceRect.width ? targetRect.width / sourceRect.width : 1;
   const scaleY = sourceRect.height ? targetRect.height / sourceRect.height : 1;
+  const lift = Math.min(34, Math.max(12, Math.abs(dy) * 0.16));
   const animation = ghost.animate([
     { transform: "translate(0, 0) scale(1)", opacity: 1 },
-    { transform: `translate(${dx}px, ${dy}px) scale(${scaleX}, ${scaleY})`, opacity: 0.9 },
-  ], { duration: 220, easing: "cubic-bezier(.2,.8,.2,1)", fill: "both" });
+    {
+      offset: 0.58,
+      transform: `translate(${dx * 0.54}px, ${dy * 0.48 - lift}px) scale(${1 + (scaleX - 1) * 0.54}, ${1 + (scaleY - 1) * 0.54})`,
+      opacity: 1,
+    },
+    { transform: `translate(${dx}px, ${dy}px) scale(${scaleX}, ${scaleY})`, opacity: 0.36 },
+  ], { duration: TRAY_FLIGHT_DURATION_MS, easing: "cubic-bezier(.18,.82,.22,1)", fill: "both" });
   scope.animation(animation);
-  const cleanup = () => { ghost.remove(); target.style.removeProperty("opacity"); };
+  const cleanup = () => {
+    ghost.remove();
+    target.classList.remove("is-tray-flight-target");
+  };
   const release = scope.own(cleanup, "node");
-  return animation.finished.catch(() => {}).then(() => { cleanup(); release.forget(); });
+  return animation.finished.catch(() => {}).then(() => {
+    target.classList.add("is-tray-arrived");
+    scope.timeout(() => target.classList.remove("is-tray-arrived"), 180);
+    cleanup();
+    release.forget();
+  });
 }
 
 function prefersReducedMotion() {

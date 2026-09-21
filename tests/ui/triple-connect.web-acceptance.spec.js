@@ -23,19 +23,23 @@ test("production Triple Connect keeps interaction, DOM, long-task and heap budge
   });
   await page.goto("/");
   const cdp = await page.context().newCDPSession(page);
+
+  await page.locator(".game-selector__choice").filter({ hasText: "Triple Connect" }).click();
+  await page.getByText("Bắt đầu", { exact: true }).click();
+  await page.getByRole("button", { name: "Siêu khó" }).click();
+  const intro = page.locator("#triple-round-start-modal");
+  await intro.waitFor({ state: "visible" });
+  await expect(intro).toHaveCount(0, { timeout: 4000 });
+  await page.evaluate(async () => {
+    await Promise.all([...document.images].map((image) => image.decode().catch(() => {})));
+  });
+  // Baseline after the Triple bundle, theme assets and initial board are warm;
+  // the delta below measures interaction churn and cleanup, not module loading.
   await cdp.send("HeapProfiler.collectGarbage");
   const before = {
     dom: await cdp.send("Memory.getDOMCounters"),
     heap: await cdp.send("Runtime.getHeapUsage"),
   };
-
-  await page.locator(".game-selector__choice").filter({ hasText: "Triple Connect" }).click();
-  await page.getByText("Bắt đầu", { exact: true }).click();
-  await page.getByRole("button", { name: "Siêu khó" }).click();
-  await page.locator("#triple-round-start-modal").getByRole("button", { name: "Bắt đầu" }).click();
-  await page.evaluate(async () => {
-    await Promise.all([...document.images].map((image) => image.decode().catch(() => {})));
-  });
   const feedback = [];
   const patches = [];
   const longTasks = [];
@@ -45,14 +49,36 @@ test("production Triple Connect keeps interaction, DOM, long-task and heap budge
       window.__tripleLongTasks = [];
     });
     const sample = await page.evaluate(async () => {
-      const tile = document.querySelector(".triple-connect__board .triple-connect__tile:not(:disabled)");
-      if (!tile) throw new Error("Expected an exposed Triple tile for production interaction measurement.");
+      const exposed = [...document.querySelectorAll(
+        ".triple-connect__board .triple-connect__tile:not(:disabled)",
+      )];
+      let matchType = window.__tripleAcceptanceType;
+      let tile = matchType
+        ? exposed.find((candidate) => candidate.querySelector("img")?.currentSrc === matchType)
+        : null;
+      if (!tile) {
+        const groups = new Map();
+        for (const candidate of exposed) {
+          const source = candidate.querySelector("img")?.currentSrc;
+          if (!source) continue;
+          if (!groups.has(source)) groups.set(source, []);
+          groups.get(source).push(candidate);
+        }
+        const playable = [...groups.entries()].find(([, candidates]) => candidates.length >= 3);
+        if (!playable) throw new Error("Expected an exposed Triple set for production interaction measurement.");
+        [matchType, [tile]] = playable;
+        window.__tripleAcceptanceType = matchType;
+      }
       const trayBefore = document.querySelectorAll(".triple-connect__tray .triple-connect__tile").length;
+      const matchingTrayTiles = [...document.querySelectorAll(".triple-connect__tray .triple-connect__tile img")]
+        .filter((image) => image.currentSrc === matchType).length;
       const start = performance.now();
       tile.click();
       const patchAt = performance.now();
       const trayAfter = document.querySelectorAll(".triple-connect__tray .triple-connect__tile").length;
-      if (trayAfter !== trayBefore + 1) throw new Error("Triple tile selection did not patch the tray synchronously.");
+      const expectedTrayCount = matchingTrayTiles === 2 ? trayBefore - 2 : trayBefore + 1;
+      if (trayAfter !== expectedTrayCount) throw new Error("Triple tile selection did not patch the tray synchronously.");
+      if (matchingTrayTiles === 2) window.__tripleAcceptanceType = null;
       await new Promise((resolve) => requestAnimationFrame(resolve));
       return {
         feedback: performance.now() - start,
@@ -63,10 +89,9 @@ test("production Triple Connect keeps interaction, DOM, long-task and heap budge
     feedback.push(sample.feedback);
     patches.push(sample.patch);
     longTasks.push(...sample.longTasks);
-    if (index === 19) break;
-    await page.locator("#triple-actions-menu-toggle").click();
-    await page.locator("#triple-actions-menu").getByRole("button", { name: "Chơi lại" }).click();
-    await page.locator("#triple-round-start-modal").getByRole("button", { name: "Bắt đầu" }).click();
+    await page.waitForFunction(() =>
+      !document.querySelector(".triple-connect__tray-flight, .triple-connect__ghost"),
+    );
   }
   const measured = await page.evaluate(({ feedback, patches, longTasks }) => ({
     feedback,
@@ -102,6 +127,10 @@ test("production Triple Connect keeps interaction, DOM, long-task and heap budge
     domDelta: {
       nodes: after.dom.nodes - before.dom.nodes,
       listeners: after.dom.jsEventListeners - before.dom.jsEventListeners,
+    },
+    samples: {
+      feedbackMs: measured.feedback,
+      domPatchMs: measured.patches,
     },
   };
   await testInfo.attach("triple-production-web-metrics.json", {

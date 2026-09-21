@@ -36,16 +36,20 @@ import {
 } from "../js/tripleConnect/tripleSolver.js";
 
 const layout = getEasyTripleLayout();
-assert.equal(layout.id, "easy-18-v4");
+assert.equal(layout.id, "easy-27-v5");
 assert.equal(layout.slots.length, TRIPLE_EASY_CONFIG.tileCount);
 assert.deepEqual(
   layout.slots.reduce((counts, slot) => {
     counts[slot.layer] = (counts[slot.layer] || 0) + 1;
     return counts;
   }, {}),
-  { 0: 12, 1: 6 },
+  { 0: 12, 1: 9, 2: 6 },
 );
 for (const [layoutId, expectedCounts] of Object.entries({
+  "easy-27-v5": [12, 9, 6],
+  "normal-45-v5": [18, 12, 9, 6],
+  "hard-63-v5": [24, 15, 12, 6, 6],
+  "super-hard-96-v5": [30, 21, 18, 12, 9, 6],
   "easy-18-v4": [12, 6],
   "normal-36-v4": [18, 12, 6],
   "hard-54-v4": [24, 15, 9, 6],
@@ -76,7 +80,7 @@ for (const layoutId of [
 }
 
 const coverGraph = createTripleCoverGraph(layout);
-assert.equal(Object.keys(coverGraph).length, 18);
+assert.equal(Object.keys(coverGraph).length, 27);
 assert.ok(
   Object.values(coverGraph).flat().length > 0,
   "Easy template must include useful blockers.",
@@ -102,9 +106,9 @@ assert.deepEqual(
   "A seed must generate the identical board and witness.",
 );
 assert.equal(first.layoutId, layout.id);
-assert.equal(first.board.tiles.length, 18);
-assert.equal(new Set(first.board.tiles.map((tile) => tile.id)).size, 18);
-assert.equal(new Set(first.board.tiles.map((tile) => tile.slotId)).size, 18);
+assert.equal(first.board.tiles.length, 27);
+assert.equal(new Set(first.board.tiles.map((tile) => tile.id)).size, 27);
+assert.equal(new Set(first.board.tiles.map((tile) => tile.slotId)).size, 27);
 assert.deepEqual(replayTripleWitness(first.board, first.witness).ok, true);
 const solved = solveTripleBoard({ board: first.board });
 assert.equal(solved.status, "solved");
@@ -184,7 +188,7 @@ for (let index = 0; index < 100; index += 1) {
   const startedAt = performance.now();
   const normal = generateNormalTripleBoard({ seed: `normal-${index}` });
   normalTimings.push(performance.now() - startedAt);
-  assert.equal(normal.board.tiles.length, 36);
+  assert.equal(normal.board.tiles.length, 45);
   assert.equal(replayTripleWitness(normal.board, normal.witness).ok, true);
 }
 normalTimings.sort((left, right) => left - right);
@@ -199,7 +203,7 @@ for (let index = 0; index < 30; index += 1) {
   const startedAt = performance.now();
   const hard = generateHardTripleBoard({ seed: `hard-${index}` });
   hardTimings.push(performance.now() - startedAt);
-  assert.equal(hard.board.tiles.length, 54);
+  assert.equal(hard.board.tiles.length, 63);
   assert.equal(replayTripleWitness(hard.board, hard.witness).ok, true);
 }
 hardTimings.sort((left, right) => left - right);
@@ -216,7 +220,7 @@ for (let index = 0; index < 20; index += 1) {
     seed: `super-hard-${index}`,
   });
   superHardTimings.push(performance.now() - startedAt);
-  assert.equal(superHard.board.tiles.length, 75);
+  assert.equal(superHard.board.tiles.length, 96);
   assert.equal(
     replayTripleWitness(superHard.board, superHard.witness).ok,
     true,
@@ -232,7 +236,7 @@ assert.ok(
 
 const endless = generateEndlessTripleBoard({ seed: "endless" });
 assert.equal(TRIPLE_ENDLESS_CONFIG.timeSeconds, 0);
-assert.equal(endless.board.tiles.length, 75);
+assert.equal(endless.board.tiles.length, 96);
 assert.equal(replayTripleWitness(endless.board, endless.witness).ok, true);
 
 for (const stage of TRIPLE_CHALLENGE_STAGES) {

@@ -10,10 +10,10 @@ const viewports = stableBaseline.viewports;
 const topology = stableBaseline.visualTopology;
 
 const modes = [
-  ["easy", 18],
-  ["normal", 36],
-  ["hard", 54],
-  ["superHard", 75],
+  ["easy", 27],
+  ["normal", 45],
+  ["hard", 63],
+  ["superHard", 96],
 ];
 
 for (const viewport of viewports) {
@@ -54,6 +54,8 @@ for (const viewport of viewports) {
               rect: rect(node),
               disabled: node.disabled,
               opacity: Number(getComputedStyle(node).opacity),
+              coverDepth: Number(node.dataset.tripleCoverDepth),
+              exposed: node.classList.contains("is-exposed"),
               objectFit: getComputedStyle(node.querySelector("img")).objectFit,
               padding: getComputedStyle(node).padding,
               imageSource: node.querySelector("img")?.src || "",
@@ -74,6 +76,12 @@ for (const viewport of viewports) {
       expect(geometry.boardTiles).toHaveLength(expectedTileCount);
       expect(geometry.boardTiles.some((tile) => tile.disabled)).toBe(true);
       expect(geometry.boardTiles.filter((tile) => tile.disabled).every((tile) => tile.opacity < 1)).toBe(true);
+      const exposedTiles = geometry.boardTiles.filter((tile) => tile.exposed);
+      const occludedTiles = geometry.boardTiles.filter((tile) => tile.coverDepth > 0);
+      expect(exposedTiles.length).toBeGreaterThan(0);
+      expect(occludedTiles.length).toBeGreaterThan(0);
+      expect(exposedTiles.every((tile) => tile.coverDepth === 0 && !tile.disabled && tile.opacity === 1)).toBe(true);
+      expect(occludedTiles.every((tile) => !tile.exposed && tile.disabled && tile.opacity <= 0.42)).toBe(true);
       expect(geometry.boardTiles.every((tile) => tile.objectFit === topology.imageObjectFit)).toBe(true);
       expect(geometry.boardTiles.every((tile) => tile.padding === "0px")).toBe(true);
       expect(geometry.board.width).toBeGreaterThan(topology.boardMinWidth);
@@ -84,6 +92,8 @@ for (const viewport of viewports) {
       expect(geometry.boardAndTraySeparated).toBe(true);
       expect(geometry.root.top).toBeGreaterThanOrEqual(-1);
       expect(geometry.root.bottom).toBeLessThanOrEqual(viewport.height + 1);
+      expect(geometry.tray.top).toBeGreaterThanOrEqual(-1);
+      expect(geometry.tray.bottom).toBeLessThanOrEqual(viewport.height + 1);
       expect(geometry.layout.coordinateUnit).toBe("half-card");
       expect(
         Math.abs(

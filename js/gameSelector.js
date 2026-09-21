@@ -22,7 +22,6 @@ import { LINK_CONNECT_HELP_CONTENT } from "./linkConnect/linkConfig.js";
 import {
   TRIPLE_CONNECT_HELP_CONTENT,
   TRIPLE_CONNECT_INFO_CONTENT,
-  getTripleModeDescription,
 } from "./tripleConnect/tripleCopy.js";
 
 let activeGameId = null;
@@ -299,9 +298,7 @@ function showTripleDifficultyOverlay() {
       const button = document.createElement("button");
       button.type = "button";
       button.className = "difficulty-option";
-      const detail = document.createElement("small");
-      detail.textContent = getTripleModeDescription(id);
-      button.append(createIcon(icon), document.createTextNode(label), detail);
+      button.append(createIcon(icon), document.createTextNode(label));
       button.onclick = () => {
         modal.close();
         setTimeout(() => onStartTripleConnect(id), UI_TIMING.modalCloseMs);

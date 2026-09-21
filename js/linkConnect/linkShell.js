@@ -17,7 +17,7 @@ export function getLinkShell() {
       <div class="link-game-progress-hud game-progress-hud" data-shell-region="progress" aria-label="Tiến trình màn chơi">
         <span class="info stat-card stat-moves"><span class="stat-label">MOVES</span><span id="link-moves">0</span></span>
         <span class="info stat-card stat-misses"><span class="stat-label">MISS</span><span id="link-misses">0</span></span>
-        <span class="info stat-card stat-combo"><span class="stat-label">COMBO</span><span id="link-combo">0</span></span>
+        <span class="info stat-card stat-combo"><span class="stat-label">COMBO</span><span id="link-combo">0</span><span class="combo-window-progress" aria-hidden="true"></span></span>
         <span class="info stat-card stat-star-progress" aria-label="Tiến trình sao màn hiện tại">
           <span id="link-level-stars" class="star-progress__stars" role="img" aria-label="0 trên 3 sao">
             <span class="star-progress__milestone" aria-hidden="true">★</span>

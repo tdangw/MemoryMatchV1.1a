@@ -7,7 +7,7 @@ for (const viewport of [{ width: 360, height: 640 }, { width: 411, height: 914 }
     await expect(page.locator(".game-selector__choice")).toHaveCount(3);
     await page.evaluate(async () => (await import("/js/tripleConnect/tripleController.js")).startTripleConnectDevelopmentRound({ seed: "ui" }));
     await expect(page.locator("#triple-connect-container")).toBeVisible();
-    await expect(page.locator(".triple-connect__board .triple-connect__tile")).toHaveCount(18);
+    await expect(page.locator(".triple-connect__board .triple-connect__tile")).toHaveCount(27);
     const state = await page.evaluate(async () => {
       const controller = await import("/js/tripleConnect/tripleController.js");
       const run = controller.startTripleConnectDevelopmentRound({ seed: "interaction" });
@@ -19,7 +19,7 @@ for (const viewport of [{ width: 360, height: 640 }, { width: 411, height: 914 }
   });
 }
 
-for (const [mode, tileCount] of [["normal", 36], ["hard", 54], ["superHard", 75], ["endless", 75]]) {
+for (const [mode, tileCount] of [["normal", 45], ["hard", 63], ["superHard", 96], ["endless", 96]]) {
   test(`Triple ${mode} development round uses its own board layout`, async ({ page }) => {
     await page.goto("/");
     await page.evaluate(async ({ selectedMode }) => {
@@ -50,7 +50,7 @@ test("Triple timers count down normally and up in Endless", async ({ page }) => 
     const controller = await import("/js/tripleConnect/tripleController.js");
     controller.startTripleConnectDevelopmentRound({ seed: "timer", mode: "easy" });
   });
-  await expect(page.locator("[data-triple-timer]")).toHaveText("01:14", { timeout: 2500 });
+  await expect(page.locator("[data-triple-timer]")).toHaveText("01:32", { timeout: 2500 });
   await page.evaluate(async () => {
     const controller = await import("/js/tripleConnect/tripleController.js");
     controller.startTripleConnectDevelopmentRound({ seed: "endless-timer", mode: "endless" });

@@ -24,7 +24,7 @@ function select(state, tileId) {
   return transition;
 }
 
-assert.deepEqual(TRIPLE_EASY_CONFIG, { mode: "easy", tileCount: 18, layerCount: 2, timeSeconds: 75 });
+assert.deepEqual(TRIPLE_EASY_CONFIG, { mode: "easy", tileCount: 27, layerCount: 3, timeSeconds: 93 });
 assert.equal(TRIPLE_RULES.trayCapacity, 7);
 assert.equal(calculateTripleMatchScore(1), 10);
 assert.equal(calculateTripleMatchScore(2), 13);

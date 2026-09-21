@@ -300,6 +300,9 @@ export function showLevelRewardOverlay({
   totalPairs = gameState.totalPairs,
   remainingTime = gameState.remainingTime,
   assistText = `Gợi ý: ${gameState.hints}`,
+  targetText = `Mục tiêu: ${totalPairs} cặp`,
+  overlayId,
+  scope,
   onComplete = () => {},
 } = {}) {
   // 🔄 Xoá overlay cũ nếu còn
@@ -309,6 +312,7 @@ export function showLevelRewardOverlay({
   // Nền overlay mờ
   const overlay = document.createElement("div");
   overlay.className = "level-reward-overlay app-modal-overlay fade-in";
+  if (overlayId) overlay.id = overlayId;
 
   // Layout trực tiếp, không bọc trong .modal
   const container = document.createElement("div");
@@ -331,7 +335,7 @@ export function showLevelRewardOverlay({
 
   container.append(rewardTitle, subtitle);
   const lines = [
-    createRewardLine("reward-points", "trophy", `Mục tiêu: ${totalPairs} cặp`),
+    createRewardLine("reward-points", "trophy", targetText),
     createRewardLine("reward-time", "timer", formatClockTime(remainingTime)),
     createRewardLine("reward-hints", "search", assistText),
   ];
@@ -347,13 +351,19 @@ export function showLevelRewardOverlay({
   }
 
   // Tự động ẩn overlay
-  setTimeout(() => {
+  const schedule = scope?.timeout?.bind(scope) || setTimeout;
+  const removeOverlay = () => overlay.remove();
+  const release = scope?.own?.(removeOverlay, "node");
+  schedule(() => {
     overlay.classList.replace("fade-in", "fade-out");
-    setTimeout(() => {
+    schedule(() => {
       overlay.remove();
+      release?.forget();
       onComplete();
     }, 400);
   }, GAMEPLAY_TIMING.levelIntroDurationMs);
+
+  return { overlay, destroy: removeOverlay };
 }
 
 export function showLevelSummaryOverlay(completion) {
@@ -377,6 +387,7 @@ function openLevelSummaryOverlay({
   luckyAwards = [],
   settings = {},
   onNext,
+  nextLabel = "Next Level",
   onMenu,
   isVictoryCelebration = false,
   onCelebrate,
@@ -480,7 +491,7 @@ function openLevelSummaryOverlay({
         },
       },
       {
-        label: "Next Level",
+        label: nextLabel,
         icon: "arrow-right",
         variant: "primary",
         onClick: (close) => {
@@ -623,6 +634,18 @@ export function showScoreEffect(tileElement, points) {
   showGameplayFloatEffect(tileElement, `+${points} điểm`, "tile-score-effect");
 }
 
+export function showScoreEffectAt({ x, y } = {}, points) {
+  if (!Number.isFinite(x) || !Number.isFinite(y) || points <= 0 || prefersReducedMotion()) return;
+  const effect = document.createElement("div");
+  effect.className = "tile-score-effect";
+  effect.textContent = `+${points} điểm`;
+  effect.setAttribute("aria-hidden", "true");
+  effect.style.left = `${x}px`;
+  effect.style.top = `${y}px`;
+  effect.style.setProperty("--gameplay-feedback-duration", `${GAMEPLAY_TIMING.scoreEffectDurationMs}ms`);
+  presentEffect(effect, { type: "score", duration: GAMEPLAY_TIMING.scoreEffectDurationMs });
+}
+
 export function showGameplayRewardEffect(tileElement, { type, value } = {}) {
   if (!tileElement || !Number.isFinite(value) || value <= 0) return;
   const presentations = {
@@ -674,7 +697,7 @@ export function showComboEffect(tileElement, combo) {
   effect.className = `tile-combo-effect tile-combo-effect--${presentation.id}`;
   effect.textContent = `${presentation.label}  x${combo}`;
 
-  const board = tileElement.closest("#grid-board-frame, #link-board-frame");
+  const board = tileElement.closest("#grid-board-frame, #link-board-frame, .triple-connect__surface");
   const rect = (board || tileElement).getBoundingClientRect();
   const centerX = rect.left + rect.width / 2;
   const upperBoardY = board

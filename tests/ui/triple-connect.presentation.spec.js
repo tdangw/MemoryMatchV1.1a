@@ -37,6 +37,7 @@ test("Triple tray flight uses one surface coordinate space and scales to its slo
         height: Number.parseFloat(ghost.style.height),
       },
       finalTransform: keyframes.at(-1).transform,
+      transformOrigin: ghost.style.transformOrigin,
       targetOpacityAfter: target.style.opacity,
       ghostCountAfter: document.querySelectorAll(".triple-connect__tray-flight").length,
     };
@@ -46,6 +47,7 @@ test("Triple tray flight uses one surface coordinate space and scales to its slo
   expect(flight.ghost.top).toBeCloseTo(flight.source.top - flight.surface.top, 2);
   expect(flight.ghost.width).toBeCloseTo(flight.source.width, 2);
   expect(flight.ghost.height).toBeCloseTo(flight.source.height, 2);
+  expect(flight.transformOrigin).toBe("left top");
   expect(dx).toBeCloseTo(flight.target.left - flight.source.left, 2);
   expect(dy).toBeCloseTo(flight.target.top - flight.source.top, 2);
   expect(scaleX).toBeCloseTo(flight.target.width / flight.source.width, 2);
@@ -54,7 +56,7 @@ test("Triple tray flight uses one surface coordinate space and scales to its slo
   expect(flight.ghostCountAfter).toBe(0);
 });
 
-test("Triple match commits before presentation and unmount cancels ghosts", async ({ page }) => {
+test("Triple match commits before presentation and unmount cancels the tray preview", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
   const result = await page.evaluate(async () => {
@@ -70,10 +72,88 @@ test("Triple match commits before presentation and unmount cancels ghosts", asyn
     return { matched: run.getState().matchedTriples, shell: run.shell.refs.root.id };
   });
   expect(result.matched).toBe(1);
-  await expect(page.locator(".triple-connect__line polyline")).toHaveCount(2);
+  await expect(page.locator(".triple-connect__tray [data-tile-id]")).toHaveCount(3);
   await page.evaluate(async () => (await import("/js/gameShell/gameShell.js")).unmountActiveGameShell());
   await expect(page.locator(".triple-connect__ghost")).toHaveCount(0);
   await expect(page.locator(".triple-connect__line polyline")).toHaveCount(0);
+});
+
+test("Triple score feedback is anchored to the tile removed by the match", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto("/");
+  const feedback = await page.evaluate(async () => {
+    const { startTripleConnectDevelopmentRound } = await import("/js/tripleConnect/tripleController.js");
+    const run = startTripleConnectDevelopmentRound({ seed: "score-anchor" });
+    for (const command of run.generated.witness) {
+      const tile = document.querySelector(`[data-tile-id="${command.tileId}"]`);
+      const matchedBefore = run.getState().matchedTriples;
+      tile?.click();
+      if (run.getState().matchedTriples === matchedBefore) {
+        await new Promise((resolve) => setTimeout(resolve, 340));
+        continue;
+      }
+      await new Promise((resolve) => setTimeout(resolve, 520));
+      const score = document.querySelector(".tile-score-effect");
+      const surface = document.querySelector(".triple-connect__surface")?.getBoundingClientRect();
+      const ghosts = [...document.querySelectorAll(".triple-connect__ghost")];
+      if (!score || !surface || ghosts.length !== 3) return null;
+      return {
+        score: {
+          left: Number.parseFloat(score.style.left),
+          top: Number.parseFloat(score.style.top),
+        },
+        anchor: ghosts.reduce(
+          (total, ghost) => ({
+            x: total.x + surface.left + Number.parseFloat(ghost.style.left) + Number.parseFloat(ghost.style.width) / 2,
+            y: total.y + surface.top + Number.parseFloat(ghost.style.top) + Number.parseFloat(ghost.style.height) / 2,
+          }),
+          { x: 0, y: 0 },
+        ),
+        count: ghosts.length,
+      };
+    }
+    return null;
+  });
+  expect(feedback).not.toBeNull();
+  expect(feedback.count).toBe(3);
+  expect(feedback.score.left).toBeCloseTo(feedback.anchor.x / feedback.count, 1);
+  expect(feedback.score.top).toBeCloseTo(feedback.anchor.y / feedback.count, 1);
+});
+
+test("Triple shows the complete tray match before exit and compaction", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto("/");
+  const timeline = await page.evaluate(async () => {
+    const { startTripleConnectDevelopmentRound } = await import("/js/tripleConnect/tripleController.js");
+    const run = startTripleConnectDevelopmentRound({ seed: "tray-match-timeline" });
+    const matchIds = run.generated.witness.slice(0, 3).map((command) => command.tileId);
+    for (const tileId of matchIds.slice(0, 2)) {
+      document.querySelector(`[data-tile-id="${tileId}"]`)?.click();
+      await new Promise((resolve) => setTimeout(resolve, 340));
+    }
+    document.querySelector(`[data-tile-id="${matchIds[2]}"]`)?.click();
+    await new Promise((resolve) => setTimeout(resolve, 340));
+    const trayBeforeExit = [...document.querySelectorAll(".triple-connect__tray [data-tile-id]")]
+      .map((tile) => tile.dataset.tileId);
+    const scoreBeforeExit = Boolean(document.querySelector(".tile-score-effect"));
+    await new Promise((resolve) => setTimeout(resolve, 220));
+    const exitStarted = {
+      score: Boolean(document.querySelector(".tile-score-effect")),
+      ghosts: document.querySelectorAll(".triple-connect__ghost").length,
+    };
+    await new Promise((resolve) => setTimeout(resolve, 420));
+    return {
+      matchIds,
+      trayBeforeExit,
+      scoreBeforeExit,
+      exitStarted,
+      trayAfterExit: document.querySelectorAll(".triple-connect__tray [data-tile-id]").length,
+    };
+  });
+  expect(timeline.trayBeforeExit).toEqual(expect.arrayContaining(timeline.matchIds));
+  expect(timeline.scoreBeforeExit).toBe(false);
+  expect(timeline.exitStarted).toEqual({ score: true, ghosts: 3 });
+  expect(timeline.trayAfterExit).toBe(0);
 });
 
 test("Triple reduced motion settles to the same committed match without ghosts", async ({ page }) => {
@@ -133,7 +213,7 @@ test("Triple ignores a second tap while a tray flight is presenting", async ({ p
       moves: run.getState().moves,
       misses: run.getState().misses,
     };
-    await new Promise((resolve) => setTimeout(resolve, 260));
+    await new Promise((resolve) => setTimeout(resolve, 340));
     tiles[1].click();
     return {
       duringFlight,

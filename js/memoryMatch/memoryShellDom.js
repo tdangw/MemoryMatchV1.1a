@@ -6,7 +6,7 @@ template.innerHTML = `<div id="game-container" class="game-shell-tokens" style="
       <div id="game-progress-hud" data-shell-region="progress" class="game-progress-hud" aria-label="Tiến trình màn chơi">
         <span class="info stat-card stat-moves"><span class="stat-label">MOVES</span><span id="moves">0</span></span>
         <span class="info stat-card stat-misses"><span class="stat-label">MISS</span><span id="misses">0</span></span>
-        <span class="info stat-card stat-combo"><span class="stat-label">COMBO</span><span id="combo">0</span></span>
+        <span class="info stat-card stat-combo"><span class="stat-label">COMBO</span><span id="combo">0</span><span class="combo-window-progress" aria-hidden="true"></span></span>
         <span class="info stat-card stat-star-progress" aria-label="Tiến trình sao màn hiện tại">
           <span id="level-stars" class="star-progress__stars" role="img" aria-label="0 trên 3 sao">
             <span class="star-progress__milestone" aria-hidden="true">★</span>

@@ -1,12 +1,12 @@
 import { animateShellEffect, presentEffect } from "../gameShell/gameShellEffects.js";
 import { playLootDrop } from "../lootEffects.js";
 import { shellTimeout as setTimeout, clearShellTimeout as clearTimeout, shellFrame as requestAnimationFrame } from "../gameShell/gameShellLifecycle.js";
-import { getActiveLinkConnectionEffect } from "./linkEffects.js";
 import { gameState } from "../gameState.js";
 import { getLinkItemDefinition } from "./linkItems.js";
 import { calculateMotionDelta, prefersReducedMotion, readCssTimeMs } from "../motion.js";
 import { LINK_CONNECT_TIMING } from "./linkConfig.js";
 import { connectGameShellLayout } from "../gameShell/gameShellLayout.js";
+import { clearLinkEffectSurfaces, presentLinkConnection, presentLinkExit } from "./linkEffectAdapter.js";
 import { getLinkShell } from "./linkShell.js";
 import {
   measureLinkRender,
@@ -14,9 +14,6 @@ import {
   recordLinkPatch,
 } from "./linkPerformance.js";
 
-const PATH_VIEWBOX = "0 0 100 100";
-const ELECTRIC_JITTER_PERCENT = 0.65;
-const ELECTRIC_SEGMENT_LENGTH_PERCENT = 7;
 const OUTER_ROUTE_INSET_PERCENT = 1.5;
 const assetUrl = (path) => `${import.meta.env.BASE_URL}${path}`;
 let linkLayout = null;
@@ -407,15 +404,12 @@ export function playLinkMismatch(start, end) {
 }
 
 export function playLinkMatchExit(start, end) {
-  const effect = getActiveLinkConnectionEffect(gameState.appearance);
   const tiles = [start, end].flatMap((position) => {
     const tile = getLinkTileButton(position);
     if (!tile) return [];
-    tile.classList.add("is-removing", effect.exitClass);
     return [tile];
   });
-  playLinkCardExitEffects(tiles, effect.exitId);
-  return tiles;
+  return presentLinkExit({ frame: document.getElementById("link-board-frame"), tiles, appearance: gameState.appearance });
 }
 
 // Năng lượng chỉ là hiệu ứng tạm trên lớp phủ; không tạo hay lưu vật phẩm.
@@ -446,161 +440,6 @@ export function playLinkItemRewardFlight(source, itemId, { delayMs = 0 } = {}) {
     return playLootDrop(source, { target, icon: item.icon, preset: "linkItem", tier: "blue", holdMs: LINK_CONNECT_TIMING.itemRewardHoldMs, timing: { dropMs: LINK_CONNECT_TIMING.itemRewardBurstMs, flightMs: LINK_CONNECT_TIMING.itemRewardFlightMs } });
   };
   return delayMs > 0 ? scheduleTransientEffect(launch, delayMs) : launch();
-}
-
-const FRAGMENT_LAYOUTS = Object.freeze({
-  split2: Object.freeze({ columns: 2, rows: 1 }),
-  split4: Object.freeze({ columns: 2, rows: 2 }),
-  split8: Object.freeze({ columns: 4, rows: 2 }),
-  triangles: Object.freeze({ columns: 2, rows: 2, triangular: true }),
-  crumble: Object.freeze({ columns: 6, rows: 6 }),
-  pixel: Object.freeze({ columns: 5, rows: 5 }),
-});
-const CANVAS_EXIT_EFFECTS = new Set(["finedust", ...Object.keys(FRAGMENT_LAYOUTS)]);
-
-function playLinkCardExitEffects(tiles, exitId) {
-  if (!CANVAS_EXIT_EFFECTS.has(exitId) || prefersReducedMotion()) return;
-  const frame = document.getElementById("link-board-frame");
-  if (!frame) return;
-  const frameRect = frame.getBoundingClientRect();
-  const density = Math.min(window.devicePixelRatio || 1, 2);
-  const cards = tiles.flatMap((tile) => {
-    const source = tile.querySelector("img:not(.link-tile__frost-overlay)");
-    if (!source?.complete || !source.naturalWidth) return [];
-    const tileRect = tile.getBoundingClientRect();
-    const bounds = {
-      x: tileRect.left - frameRect.left,
-      y: tileRect.top - frameRect.top,
-      width: tileRect.width,
-      height: tileRect.height,
-    };
-    tile.classList.add("has-canvas-exit");
-    return [{ source, bounds, fragments: createCardExitFragments(bounds, exitId), timing: readExitEffectTiming(tile) }];
-  });
-  if (!cards.length) return;
-  const canvas = document.createElement("canvas");
-  canvas.className = "link-card-exit-effect";
-  canvas.width = Math.round(frameRect.width * density);
-  canvas.height = Math.round(frameRect.height * density);
-  canvas.style.width = `${frameRect.width}px`;
-  canvas.style.height = `${frameRect.height}px`;
-  const context = canvas.getContext("2d");
-  if (!context) return;
-  context.scale(density, density);
-  if (!presentEffect(canvas, { type: "canvas", duration: Math.max(...cards.map(({ timing }) => timing.delayMs + timing.durationMs)) + 100, parent: frame })) {
-    tiles.forEach(tile => tile.classList.remove("has-canvas-exit"));
-    return;
-  }
-  const startedAt = performance.now();
-  const draw = (now) => {
-    const elapsed = now - startedAt;
-    context.clearRect(0, 0, frameRect.width, frameRect.height);
-    cards.forEach(({ source, bounds, fragments, timing }) => {
-      if (elapsed < timing.delayMs) return;
-      const progress = Math.min((elapsed - timing.delayMs) / timing.durationMs, 1);
-      renderCardExitEffect(context, source, fragments, bounds, exitId, progress);
-    });
-    const duration = Math.max(...cards.map(({ timing }) => timing.delayMs + timing.durationMs));
-    if (elapsed < duration && canvas.isConnected) requestAnimationFrame(draw);
-    else canvas.remove();
-  };
-  requestAnimationFrame(draw);
-}
-
-function createCardExitFragments(bounds, exitId) {
-  const layout = FRAGMENT_LAYOUTS[exitId];
-  if (layout) {
-    return Array.from({ length: layout.columns * layout.rows }, (_, index) => {
-      const column = index % layout.columns;
-      const row = Math.floor(index / layout.columns);
-      return {
-        x: bounds.x + (column * bounds.width) / layout.columns,
-        y: bounds.y + (row * bounds.height) / layout.rows,
-        width: bounds.width / layout.columns,
-        height: bounds.height / layout.rows,
-        column,
-        row,
-        columns: layout.columns,
-        rows: layout.rows,
-        triangle: layout.triangular && index % 2 === 1,
-        velocityX: (column - (layout.columns - 1) / 2) * 3.4 + randomFragmentOffset(1.8),
-        velocityY: (row - (layout.rows - 1) / 2) * 3.4 + randomFragmentOffset(1.8),
-        rotation: randomFragmentOffset(0.24),
-      };
-    });
-  }
-  const particleCount = isCoarsePointer() ? 42 : 60;
-  return Array.from({ length: particleCount }, () => ({
-    x: bounds.x + Math.random() * bounds.width,
-    y: bounds.y + Math.random() * bounds.height,
-    size: 1.4 + Math.random() * 3.2,
-    velocityX: randomFragmentOffset(3.6),
-    velocityY: -1.6 - Math.random() * 3.8,
-  }));
-}
-
-function renderCardExitEffect(context, image, fragments, bounds, exitId, progress) {
-  context.save();
-  if (exitId === "finedust") {
-    context.fillStyle = "#d7f6ff";
-    context.shadowBlur = 5;
-    context.shadowColor = context.fillStyle;
-    fragments.forEach((fragment) => {
-      context.globalAlpha = Math.max(0, 1 - progress);
-      context.beginPath();
-      context.arc(fragment.x + fragment.velocityX * progress * 16, fragment.y + fragment.velocityY * progress * 20, Math.max(.5, fragment.size * (1 - progress * .55)), 0, Math.PI * 2);
-      context.fill();
-    });
-  } else {
-    fragments.forEach((fragment) => drawImageFragment(context, image, fragment, progress));
-  }
-  context.restore();
-}
-
-function drawImageFragment(context, image, fragment, progress) {
-  const x = fragment.x + fragment.velocityX * progress * 15;
-  const y = fragment.y + fragment.velocityY * progress * 15 + (fragment.rows >= 6 ? progress * progress * 38 : 0);
-  context.save();
-  context.globalAlpha = Math.max(0, 1 - progress * 1.14);
-  context.translate(x + fragment.width / 2, y + fragment.height / 2);
-  context.rotate(fragment.rotation * progress * 12);
-  if (fragment.triangle) {
-    context.beginPath();
-    context.moveTo(-fragment.width / 2, -fragment.height / 2);
-    context.lineTo(fragment.width / 2, -fragment.height / 2);
-    context.lineTo(-fragment.width / 2, fragment.height / 2);
-    context.closePath();
-    context.clip();
-  }
-  context.drawImage(
-    image,
-    (fragment.column * image.naturalWidth) / fragment.columns,
-    (fragment.row * image.naturalHeight) / fragment.rows,
-    image.naturalWidth / fragment.columns,
-    image.naturalHeight / fragment.rows,
-    -fragment.width / 2,
-    -fragment.height / 2,
-    fragment.width,
-    fragment.height,
-  );
-  context.restore();
-}
-
-function readExitEffectTiming(tile) {
-  const style = getComputedStyle(tile);
-  return {
-    delayMs: Number.parseFloat(style.getPropertyValue("--link-tile-exit-delay")) || 0,
-    durationMs: Number.parseFloat(style.getPropertyValue("--link-tile-exit-duration"))
-      || LINK_CONNECT_TIMING.tileExitAnimationMs,
-  };
-}
-
-function isCoarsePointer() {
-  return window.matchMedia?.("(hover: none) and (pointer: coarse)").matches;
-}
-
-function randomFragmentOffset(range) {
-  return (Math.random() * 2 - 1) * range;
 }
 
 const THUNDER_COLORS = Object.freeze({
@@ -657,6 +496,7 @@ export function playLinkThunderStrike(positions, colorId = "yellow") {
 export function clearLinkTransientEffects() {
   clearTimeout(boardInteractionTimer);
   boardInteractionTimer = undefined;
+  clearLinkEffectSurfaces(document.getElementById("link-path-overlay"));
   transientEffectTimers.forEach((timer) => clearTimeout(timer));
   transientEffectTimers.clear();
   activeTileMotionAnimations.forEach((animation) => animation.cancel());
@@ -668,6 +508,12 @@ export function clearLinkTransientEffects() {
   tileElementsByKey.forEach((tile) => {
     tile.style.removeProperty("transition");
     tile.style.removeProperty("transform");
+    tile.style.removeProperty("--link-exit-pull-x");
+    tile.style.removeProperty("--link-exit-pull-y");
+    tile.style.removeProperty("--link-exit-collide-x");
+    tile.style.removeProperty("--link-exit-collide-y");
+    tile.classList.remove("is-removing", "has-canvas-exit");
+    [...tile.classList].filter(name => name.startsWith("link-tile--")).forEach(name => tile.classList.remove(name));
     tile.classList.remove("is-becoming-special", "is-unlocking-frozen");
     tile.querySelectorAll(".link-tile__special-burst, .link-tile__frost-wipe").forEach((effect) => effect.remove());
   });
@@ -770,39 +616,13 @@ export function drawLinkPath(path, board) {
   if (!svg || !boardElement || !path) return;
   const points = path.map((position) => toPercentPoint(position, board, boardElement));
   if (points.some((point) => !point)) return;
-  const effect = getActiveLinkConnectionEffect(gameState.appearance);
-  const renderedPoints = ["electric", "spiral"].includes(effect.pathId)
-    ? createElectricPoints(points, effect.pathId === "spiral" ? 1.3 : 1)
-    : points;
-  const serializedPoints = renderedPoints.map(({ x, y }) => `${x},${y}`).join(" ");
-  const pathData = `M ${renderedPoints.map(({ x, y }) => `${x} ${y}`).join(" L ")}`;
-  svg.setAttribute("viewBox", PATH_VIEWBOX);
-  svg.setAttribute("preserveAspectRatio", "none");
-  svg.setAttribute("class", `link-path-overlay ${effect.pathClass}`);
-  svg.replaceChildren();
-  const motionPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  const motionPathId = `link-motion-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-  motionPath.setAttribute("id", motionPathId);
-  motionPath.setAttribute("d", pathData);
-  motionPath.classList.add("link-path-overlay__motion-path");
-  const glow = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
-  glow.setAttribute("points", serializedPoints);
-  glow.setAttribute("pathLength", "1");
-  glow.classList.add("link-path-overlay__glow");
-  const polyline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
-  polyline.setAttribute("points", serializedPoints);
-  polyline.setAttribute("pathLength", "1");
-  polyline.classList.add("link-path-overlay__beam");
-  svg.append(motionPath, glow, polyline);
-  appendLinkPathDecoration(svg, effect.pathId, motionPathId, renderedPoints.at(-1));
-  svg.classList.add("is-visible");
+  presentLinkConnection({ surface: svg, points, appearance: gameState.appearance, seed: path.length * 2654435761 });
 }
 
 export function clearLinkPath() {
   const svg = document.getElementById("link-path-overlay");
   if (!svg) return;
-  svg.replaceChildren();
-  svg.classList.remove("is-visible");
+  clearLinkEffectSurfaces(svg);
 }
 
 function getLinkTileButton(position) {
@@ -866,76 +686,6 @@ function scheduleTransientEffect(callback, delayMs) {
   }, Math.max(0, Number(delayMs) || 0));
   transientEffectTimers.add(timer);
   return timer;
-}
-
-function createElectricPoints(points, intensity = 1) {
-  return points.flatMap((point, index) => {
-    if (index === points.length - 1) return [point];
-    const next = points[index + 1];
-    const horizontal = Math.abs(next.x - point.x) >= Math.abs(next.y - point.y);
-    const distance = horizontal ? Math.abs(next.x - point.x) : Math.abs(next.y - point.y);
-    const steps = Math.max(2, Math.round(distance / ELECTRIC_SEGMENT_LENGTH_PERCENT));
-    const segmentPoints = index === 0 ? [point] : [];
-    for (let step = 1; step < steps; step += 1) {
-      const progress = step / steps;
-      const jitter = (Math.random() * 2 - 1) * ELECTRIC_JITTER_PERCENT * intensity;
-      segmentPoints.push(horizontal
-        ? { x: interpolate(point.x, next.x, progress), y: point.y + jitter }
-        : { x: point.x + jitter, y: interpolate(point.y, next.y, progress) });
-    }
-    segmentPoints.push(next);
-    return segmentPoints;
-  });
-}
-
-function appendLinkPathDecoration(svg, pathId, motionPathId, destination) {
-  if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
-  if (pathId === "magic") {
-    appendMovingPathNode(svg, motionPathId, "link-path-overlay__spark", 3, .14);
-  } else if (pathId === "fire") {
-    appendMovingPathNode(svg, motionPathId, "link-path-overlay__ember", 2, .18);
-  } else if (pathId === "cyber") {
-    appendMovingPathNode(svg, motionPathId, "link-path-overlay__packet", 3, .16);
-  } else if (pathId === "sonic") {
-    appendMovingPathNode(svg, motionPathId, "link-path-overlay__pulse", 2, .24);
-  } else if (pathId === "matrix") {
-    appendMovingPathNode(svg, motionPathId, "link-path-overlay__arrow", 3, .16, "polygon");
-  } else if (pathId === "bullet" || pathId === "meteor") {
-    appendMovingPathNode(svg, motionPathId, "link-path-overlay__firework", 3, .12);
-    if (destination && pathId === "meteor") appendFireworkBurst(svg, destination);
-  }
-}
-
-function appendMovingPathNode(svg, motionPathId, className, count, delay, tagName = "circle") {
-  for (let index = 0; index < count; index += 1) {
-    const node = document.createElementNS("http://www.w3.org/2000/svg", tagName);
-    node.classList.add(className);
-    if (tagName === "polygon") node.setAttribute("points", "-1.8,-1.35 2.2,0 -1.8,1.35 -.55,0");
-    else node.setAttribute("r", "1.15");
-    const motion = document.createElementNS("http://www.w3.org/2000/svg", "animateMotion");
-    motion.setAttribute("dur", "620ms");
-    motion.setAttribute("begin", `${index * delay}s`);
-    motion.setAttribute("repeatCount", "indefinite");
-    motion.setAttribute("rotate", tagName === "polygon" ? "auto" : "0");
-    const pathRef = document.createElementNS("http://www.w3.org/2000/svg", "mpath");
-    pathRef.setAttribute("href", `#${motionPathId}`);
-    motion.append(pathRef);
-    node.append(motion);
-    svg.append(node);
-  }
-}
-
-function appendFireworkBurst(svg, destination) {
-  const burst = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-  burst.setAttribute("cx", destination.x);
-  burst.setAttribute("cy", destination.y);
-  burst.setAttribute("r", "2.2");
-  burst.classList.add("link-path-overlay__firework-burst");
-  svg.append(burst);
-}
-
-function interpolate(start, end, progress) {
-  return start + (end - start) * progress;
 }
 
 function readBoardGap(boardElement) {

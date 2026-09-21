@@ -1,4 +1,4 @@
-import { trackEffect } from "./gameShell/gameShellEffects.js";
+import { getEffectRegistry, trackEffect } from "./gameShell/gameShellEffects.js";
 import { shellTimeout as setTimeout, shellFrame as requestAnimationFrame, cancelShellFrame as cancelAnimationFrame } from "./gameShell/gameShellLifecycle.js";
 import { createIcon } from "./icons.js";
 import { GAMEPLAY_TIMING } from "./gameplayTuning.js";
@@ -13,6 +13,7 @@ const counterAnimations = new WeakMap();
 const activeCoinCounters = new Set();
 const activeCoinEffects = new Set();
 const effectEntries = new WeakMap();
+const counterPulseEntries = new WeakMap();
 
 export function calculateMatchCoinReward(combo = 1) {
   return MATCH_COIN_REWARD.base
@@ -107,10 +108,7 @@ export function animateCoinCounter(container, counter, previousCoins, nextCoins)
   }
   const duration = GAMEPLAY_TIMING.coinCounterAnimationMs;
   const startedAt = performance.now();
-  container.style.setProperty("--game-coin-counter-duration", `${duration}ms`);
-  container.classList.remove("is-gaining");
-  void container.offsetWidth;
-  container.classList.add("is-gaining");
+  playCoinCounterPulse(container, counter, duration);
   const updateFrame = (timestamp) => {
     if (!counter.isConnected) {
       counterAnimations.delete(counter);
@@ -133,6 +131,27 @@ export function animateCoinCounter(container, counter, previousCoins, nextCoins)
   };
   activeCoinCounters.add(counter);
   counterAnimations.set(counter, requestAnimationFrame(updateFrame));
+}
+
+function playCoinCounterPulse(container, counter, duration) {
+  for (const element of [container.querySelector(".ui-icon"), counter]) {
+    if (!element) continue;
+    counterPulseEntries.get(element)?.dispose();
+    const isIcon = element !== counter;
+    let animation;
+    const entry = getEffectRegistry().track("highlight", () => {
+      animation?.cancel();
+      if (counterPulseEntries.get(element) === entry) counterPulseEntries.delete(element);
+    });
+    if (!entry) continue;
+    animation = element.animate(isIcon
+      ? [{ transform: "scale(1)", opacity: 1 }, { transform: "scale(1.2) rotate(-8deg)", opacity: .8, offset: .42 }, { transform: "scale(1)", opacity: 1 }]
+      : [{ transform: "translateY(0) scale(1)" }, { transform: "translateY(-2px) scale(1.16)", offset: .42 }, { transform: "translateY(0) scale(1)" }],
+    { duration, easing: "ease-out" });
+    entry.scope.animation(animation);
+    counterPulseEntries.set(element, entry);
+    animation.finished.then(() => entry.dispose(), () => entry.dispose());
+  }
 }
 
 export function isCoinCounterAnimating(counter) {
@@ -162,7 +181,6 @@ export function clearCoinRewardEffects() {
     const frame = counterAnimations.get(counter);
     if (frame) cancelAnimationFrame(frame);
     counterAnimations.delete(counter);
-    counter.closest?.(".game-coin-hud")?.classList.remove("is-gaining");
   });
   activeCoinCounters.clear();
   activeCoinEffects.forEach(removeCoinEffect);

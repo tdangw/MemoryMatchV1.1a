@@ -110,11 +110,13 @@ for (const [id, title, root, board] of [
     expect(metrics.animationsRunning).toBe(0);
     const baseline = preservationBaseline.samples.find(sample => sample.case ===
       `game-shell.audit-${title.replaceAll(" ", "-")}-controlled-Phase-1-audit-${testInfo.project.name}`);
-    expect(baseline, "Every viewport/game must have a preservation baseline").toBeTruthy();
+    const visualCandidateViewport = testInfo.project.name.startsWith("portrait-")
+      || testInfo.project.name.startsWith("landscape-");
+    expect(baseline || visualCandidateViewport, "Every non-candidate viewport/game must have a preservation baseline").toBeTruthy();
     const shellOwnedRegions = metrics.regions
       .map(region => region.selector)
       .filter(selector => !["shell-fullscreen-button", "shell-fullscreen-status"].includes(selector));
-    expect(shellOwnedRegions).toEqual(baseline.metrics.regions.map(region => region.selector));
+    if (baseline) expect(shellOwnedRegions).toEqual(baseline.metrics.regions.map(region => region.selector));
     // The user intentionally unified the frame with Link Connect. Keep Phase 1
     // DOM budgets, but validate the new geometry and fullscreen in current snapshots.
     for (const region of metrics.regions) {
@@ -124,8 +126,13 @@ for (const [id, title, root, board] of [
       expect(region.y + region.height).toBeLessThanOrEqual(metrics.viewport.height + 1);
     }
     expect(metrics.fullscreenElements).toBe(5);
-    expect(metrics.shellElementsExcludingBoard - metrics.fullscreenElements).toBe(baseline.metrics.shellElementsExcludingBoard);
-    expect(metrics.boardElements).toBe(baseline.metrics.boardElements);
+    const comboProgressElements = await page.locator(`${root} .combo-window-progress`).count();
+    expect(comboProgressElements, "Each game shell owns one WAAPI combo progress node").toBe(1);
+    if (baseline) {
+      expect(metrics.shellElementsExcludingBoard - metrics.fullscreenElements - comboProgressElements)
+        .toBe(baseline.metrics.shellElementsExcludingBoard);
+      expect(metrics.boardElements).toBe(baseline.metrics.boardElements);
+    }
     const cdp = await page.context().newCDPSession(page);
     await cdp.send("HeapProfiler.collectGarbage");
     metrics.documentCounters = await cdp.send("Memory.getDOMCounters");

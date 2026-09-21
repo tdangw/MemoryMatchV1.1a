@@ -47,6 +47,7 @@ import {
   showFullVictoryCelebration,
 } from "victory-presentation";
 import { handleMemorySpecialMatch } from "./memorySpecial.js";
+import { clearComboWindow, playComboWindow } from "./gameShell/comboWindowPresentation.js";
 
 let selectedTiles = [];
 let levelCompleteActions = { onNext: () => {}, onMenu: () => {} };
@@ -292,10 +293,7 @@ function startComboWindow(durationMs, matchedAt, roundId) {
   clearTimeout(comboExpiryTimer);
   const card = document.getElementById("combo")?.closest(".stat-combo");
   if (card) {
-    card.style.setProperty("--combo-window-duration", `${durationMs}ms`);
-    card.classList.remove("is-combo-window-active");
-    void card.offsetWidth;
-    card.classList.add("is-combo-window-active");
+    playComboWindow(card, durationMs);
   }
   comboExpiryTimer = setTimeout(() => {
     if (gameState.roundId !== roundId || lastMatchAt !== matchedAt) return;
@@ -309,7 +307,7 @@ function startComboWindow(durationMs, matchedAt, roundId) {
 function stopComboWindow() {
   clearTimeout(comboExpiryTimer);
   comboExpiryTimer = undefined;
-  document.getElementById("combo")?.closest(".stat-combo")?.classList.remove("is-combo-window-active");
+  clearComboWindow(document.getElementById("combo")?.closest(".stat-combo"));
 }
 
 /**

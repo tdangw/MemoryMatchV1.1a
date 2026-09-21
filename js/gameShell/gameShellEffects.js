@@ -1,7 +1,7 @@
 import { createGameShellLifecycle, getActiveGameScope } from "./gameShellLifecycle.js";
 import { prefersReducedMotion } from "../motion.js";
 
-export const EFFECT_LIMITS = Object.freeze({ loot: 16, coin: 32, score: 12, combo: 2, item: 12, highlight: 8, flip: 256, canvas: 4 });
+export const EFFECT_LIMITS = Object.freeze({ loot: 16, coin: 32, score: 12, combo: 2, item: 12, highlight: 8, flip: 256, canvas: 4, connection: 1 });
 const registries = new WeakMap();
 let menuRegistry;
 
@@ -13,9 +13,9 @@ export function createEffectRegistry(owner = null, limits = {}) {
   const caps = { ...EFFECT_LIMITS, ...limits };
   const entries = new Set();
   return {
-    track(type, cleanup) {
+    track(type, cleanup, { allowReducedMotion = false } = {}) {
       if (!(type in caps)) throw new TypeError(`Unknown effect: ${type}`);
-      if (owner && !owner.active || prefersReducedMotion() || [...entries].filter(entry => entry.type === type).length >= caps[type]) return null;
+      if (owner && !owner.active || (!allowReducedMotion && prefersReducedMotion()) || [...entries].filter(entry => entry.type === type).length >= caps[type]) return null;
       const scope = createGameShellLifecycle();
       let releaseOwner;
       const entry = { type, scope, dispose() {
@@ -59,6 +59,7 @@ export function animateShellEffect(element, keyframes, options, { type = "flip",
   if (!entry) { if (remove) element.remove(); onFinish?.(); return null; }
   animation = element.animate(keyframes, options);
   entry.scope.animation(animation);
+  animation.addEventListener("cancel", () => entry.dispose(), { once: true });
   animation.finished.then(entry.scope.guard(() => { entry.dispose(); onFinish?.(); }), () => entry.dispose());
   return animation;
 }

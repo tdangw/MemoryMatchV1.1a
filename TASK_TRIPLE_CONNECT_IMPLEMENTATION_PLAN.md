@@ -1,5 +1,7 @@
 # TASK — Hoàn thiện Triple Connect trên web
 
+**Trạng thái:** Hoàn tất Continuation 0–7 và Web Acceptance kỹ thuật ngày 20/09/2026. Chưa chuyển sang PWA/APK/Android; người dùng tiếp tục nghiệm thu trải nghiệm web trước khi mở task đóng gói riêng.
+
 ## Trạng thái và nguồn sự thật
 
 Triple Connect đã có lõi gameplay, xuất hiện trong menu và chơi được. Kế hoạch implementation nền được xem là hoàn thành; task hiện tại chỉ hoàn thiện layout, giao diện, hiệu ứng, persistence liên quan và trải nghiệm web.
@@ -150,12 +152,14 @@ Continuation 0–4 có thể tiếp tục độc lập. Trước Continuation 5,
 
 ### Continuation 3 — Menu, picker, HUD, popup và timer
 
-1. Chỉ bổ sung phần còn thiếu sau review code: Cài đặt, Thông tin, Hướng dẫn, theme, mô tả mode, action/tools menu, popup đầu/cuối màn.
+1. Chỉ bổ sung phần còn thiếu sau review code: Cài đặt, Thông tin, Hướng dẫn, theme, nhãn/icon mode, action/tools menu, popup đầu/cuối màn. Picker mode dùng cùng cấu trúc gọn của Memory/Link; thông số kỹ thuật chi tiết không đặt trong từng nút mode.
 2. Dùng component/token chung qua Triple adapter; không sao chép markup/CSS/handler nếu shared owner đã hỗ trợ.
 3. Timer số cập nhật theo giây; timer bar nội suy timestamp bằng đúng một RAF có owner/cleanup. Timer/input chỉ chạy sau Bắt đầu; pause/background/resume/purchase rebase đúng.
 4. Continue không phát lại popup đầu của round đang dở. Popup cuối chờ transaction + presentation settle, phân biệt win/time-up/tray-full và mở đúng một lần.
 
 **Pass:** parity UI không còn mục thiếu, timer mượt, theme/HUD/popup đồng bộ và không còn timer/RAF/modal stale sau restart/switch.
+
+**Hậu kiểm UI 20/09/2026:** Triple dùng picker mode gọn, intro đầu màn và popup thắng từ shared UI; HUD có nền/token cùng Link; điểm/combo dùng shared feedback runtime. Loss popup vẫn giữ nội dung riêng theo hai nguyên nhân hết giờ/đầy khay.
 
 ### Continuation 4 — Khay và tray flight
 
@@ -225,18 +229,18 @@ Continuation 0–4 có thể tiếp tục độc lập. Trước Continuation 5,
 
 ## Acceptance criteria
 
-- [ ] Chỉ một contract 18/36/54/75, Challenge 7 stage và milestone 15/45 còn hoạt động.
-- [ ] Layout V4 có silhouette nhiều lớp, half-card offset, cover graph đúng và UI witness hoàn thành.
-- [ ] V1/V2/V3 Continue đúng; không diễn giải save cũ bằng V4.
-- [ ] Ảnh dùng `contain`, không crop; board/tray fit đúng matrix viewport.
-- [ ] Khay 7 ô không co giãn; flight/regroup đúng slot và cleanup.
-- [ ] Menu/picker/theme/HUD/timer/popup đầu-cuối đầy đủ và đồng bộ.
-- [ ] Effect adapter tạo khác biệt thị giác thật, timeline hữu hạn và không leak.
-- [ ] Lucky, milestone, Xu/item transaction commit/rollback đúng một lần.
-- [ ] Không callback/listener/timer/RAF/worker/node stale sau restart/switch/orientation.
-- [ ] Memory Match và Link Connect không regression.
-- [ ] Check, build, test mục tiêu, số đo và web playtest đều pass.
-- [ ] Không chạy đóng gói trước Web Acceptance và yêu cầu riêng của người dùng.
+- [x] Chỉ một contract 18/36/54/75, Challenge 7 stage và milestone 15/45 còn hoạt động.
+- [x] Layout V4 có silhouette nhiều lớp, half-card offset, cover graph đúng và UI witness hoàn thành.
+- [x] V1/V2/V3 Continue đúng; không diễn giải save cũ bằng V4.
+- [x] Ảnh dùng `contain`, không crop; board/tray fit đúng matrix viewport.
+- [x] Khay 7 ô không co giãn; flight/regroup đúng slot và cleanup.
+- [x] Menu/picker/theme/HUD/timer/popup đầu-cuối đầy đủ và đồng bộ.
+- [x] Effect adapter tạo khác biệt thị giác thật, timeline hữu hạn và không leak.
+- [x] Lucky, milestone, Xu/item transaction commit/rollback đúng một lần.
+- [x] Không callback/listener/timer/RAF/worker/node stale sau restart/switch/orientation.
+- [x] Memory Match và Link Connect không regression.
+- [x] Check, build, test mục tiêu, số đo và web playtest đều pass.
+- [x] Không chạy đóng gói trước Web Acceptance và yêu cầu riêng của người dùng.
 
 ## Do not do
 

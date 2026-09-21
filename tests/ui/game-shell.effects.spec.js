@@ -118,3 +118,46 @@ test("Link reward adapters use shared loot and item budgets", async ({ page }) =
   expect(result.nodes).toBe(0);
   expect(Object.values(result.after).every(count => count === 0)).toBe(true);
 });
+
+test("combo presentation restarts without forced layout and releases its owner entry", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await ready(page);
+  const result = await page.evaluate(async () => {
+    (await import("/js/gameSelector.js")).openGameMenu("link-connect");
+    (await import("/js/linkConnect/linkController.js")).startLinkLevel({ mode: "easy" });
+    const { getEffectRegistry } = await import("/js/gameShell/gameShellEffects.js");
+    const { clearComboWindow, playComboWindow } = await import("/js/gameShell/comboWindowPresentation.js");
+    const card = document.querySelector("#link-connect-container .stat-combo");
+    for (let index = 0; index < 20; index++) playComboWindow(card, 10000);
+    const active = getEffectRegistry().diagnostics();
+    const bar = card.querySelector(".combo-window-progress");
+    clearComboWindow(card);
+    return { active, after: getEffectRegistry().diagnostics(), animations: bar.getAnimations().length, opacity: bar.style.opacity };
+  });
+  expect(result.active.combo).toBeLessThanOrEqual(1);
+  expect(result.after.combo).toBe(0);
+  expect(result.animations).toBe(0);
+  expect(result.opacity).toBe("0");
+});
+
+test("coin counter pulse restarts through owned compositor animations", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await ready(page);
+  const result = await page.evaluate(async () => {
+    (await import("/js/gameSelector.js")).openGameMenu("link-connect");
+    (await import("/js/linkConnect/linkController.js")).startLinkLevel({ mode: "easy" });
+    const { animateCoinCounter } = await import("/js/coinRewards.js");
+    const { getEffectRegistry } = await import("/js/gameShell/gameShellEffects.js");
+    const container = document.querySelector("#link-special-coins");
+    const counter = document.querySelector("#link-coin-balance");
+    for (let value = 1; value <= 20; value++) animateCoinCounter(container, counter, value - 1, value);
+    const active = getEffectRegistry().diagnostics();
+    const animations = [...container.querySelectorAll(".ui-icon, strong")].flatMap(node => node.getAnimations());
+    animations.forEach(animation => animation.finish());
+    await Promise.resolve();
+    return { active, after: getEffectRegistry().diagnostics(), legacy: container.classList.contains("is-gaining") };
+  });
+  expect(result.active.highlight).toBeLessThanOrEqual(2);
+  expect(result.after.highlight).toBe(0);
+  expect(result.legacy).toBe(false);
+});

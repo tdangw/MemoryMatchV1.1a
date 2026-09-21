@@ -2,9 +2,12 @@ import { expect, test } from "@playwright/test";
 
 async function winActiveTripleRound(page, clock = null) {
   const start = page.locator("#triple-round-start-modal");
-  if (await start.count()) await start.getByRole("button", { name: "Bắt đầu" }).click();
+  if (await start.count()) {
+    if (clock) await clock.fastForward(2500);
+    else await expect(start).toHaveCount(0, { timeout: 4000 });
+  }
   await playTripleWitness(page, clock);
-  await expect(page.locator("#triple-round-summary-modal")).toBeVisible();
+  await expect(page.locator("#level-summary-modal")).toBeVisible({ timeout: 8000 });
 }
 
 async function playTripleWitness(page, clock = null, count = Infinity) {
@@ -47,7 +50,7 @@ test("Triple saves a validated level session and exposes it through Continue", a
     mode: "normal",
     level: 3,
     seed: "triple-normal-level-3:0",
-    layoutId: "normal-36-v4",
+    layoutId: "normal-45-v5",
   });
   await page.reload();
   await page.evaluate(async () =>
@@ -89,6 +92,52 @@ test("Triple hides malformed sessions instead of offering a broken Continue path
   ).not.toContainText("Tiếp tục");
 });
 
+test("Triple restores a saved V4 layout without upgrading its board geometry", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.evaluate(async () => {
+    const { createTripleCoverGraph, getTripleLayout } = await import(
+      "/js/tripleConnect/tripleBoard.js"
+    );
+    const { createTripleRoundState, serializeTripleRoundState } = await import(
+      "/js/tripleConnect/tripleState.js"
+    );
+    const { continueTripleConnectSession } = await import(
+      "/js/tripleConnect/tripleController.js"
+    );
+    const layout = getTripleLayout("easy-18-v4");
+    const tileIdBySlot = Object.fromEntries(
+      layout.slots.map((slot) => [slot.id, `legacy-${slot.id}`]),
+    );
+    const coverGraph = Object.fromEntries(
+      Object.entries(createTripleCoverGraph(layout)).map(([slotId, blockers]) => [
+        tileIdBySlot[slotId],
+        blockers.map((blockerId) => tileIdBySlot[blockerId]),
+      ]),
+    );
+    const board = {
+      roundId: 1,
+      coverGraph,
+      tiles: layout.slots.map((slot, index) => ({
+        id: tileIdBySlot[slot.id],
+        type: `legacy-${Math.floor(index / 3) + 1}`,
+        slotId: slot.id,
+        layer: slot.layer,
+      })),
+    };
+    continueTripleConnectSession({
+      mode: "easy",
+      level: 1,
+      layoutId: layout.id,
+      remainingTime: 70,
+      seed: "saved-v4",
+      snapshot: serializeTripleRoundState(createTripleRoundState(board)),
+    });
+  });
+  await expect(page.locator(".triple-connect__board .triple-connect__tile")).toHaveCount(18);
+});
+
 test("Triple win settles once, clears Continue, and Next starts the following level", async ({
   page,
 }) => {
@@ -111,7 +160,7 @@ test("Triple win settles once, clears Continue, and Next starts the following le
   await page.getByRole("button", { name: "Màn tiếp theo" }).click();
   await expect(page.locator("[data-triple-total-stars]")).toHaveText("3");
   await expect(page.locator("[data-triple-level]")).toHaveText("2");
-  await page.locator("#triple-round-start-modal").getByRole("button", { name: "Bắt đầu" }).click();
+  await expect(page.locator("#triple-round-start-modal")).toHaveCount(0, { timeout: 4000 });
   const nextSession = await page.evaluate(async () =>
     (await import("/js/sessionProgress.js")).getActiveSession(
       "triple-connect",
@@ -121,7 +170,7 @@ test("Triple win settles once, clears Continue, and Next starts the following le
   expect(nextSession).toMatchObject({
     mode: "easy",
     level: 2,
-    layoutId: "easy-18-v4",
+    layoutId: "easy-27-v5",
   });
 });
 
@@ -145,11 +194,11 @@ test("Triple completion grants the approved reward from the highest combo exactl
     };
   });
   expect(result).toEqual({
-    coins: 18,
+    coins: 20,
     totalStars: 3,
-    best: { score: 105, stars: 3 },
+    best: { score: 198, stars: 3 },
   });
-  await expect(page.locator("#triple-round-summary-modal")).toContainText("Thưởng hoàn thành: 16 Xu");
+  await expect(page.locator("#level-summary-modal")).toContainText(/XU NHẬN\s*\+18/);
 });
 
 test("Triple match transaction rolls back state, progress, and session when persistence fails", async ({
@@ -210,6 +259,7 @@ test("Triple applies equipped effects and plays the shared match sound", async (
     const run = startTripleConnectRound({ mode: "easy", level: 1, skipIntro: true });
     for (const command of run.generated.witness) {
       document.querySelector(`[data-tile-id="${command.tileId}"]`)?.click();
+      await Promise.resolve();
       if (document.querySelector(".triple-connect__line polyline")) break;
       await new Promise((resolve) => setTimeout(resolve, 280));
     }
@@ -278,7 +328,9 @@ test("Triple Endless advances without resetting accumulated elapsed time", async
   await advanceSeconds(page.clock, 5);
   await winActiveTripleRound(page, page.clock);
   await page.getByRole("button", { name: "Tiếp tục" }).click();
-  await page.locator("#triple-round-start-modal").getByRole("button", { name: "Bắt đầu" }).click();
+  await expect(page.locator("[data-triple-level]")).toHaveText("5");
+  await page.clock.fastForward(2500);
+  await expect(page.locator("#triple-round-start-modal")).toHaveCount(0);
   const session = await page.evaluate(async () =>
     (await import("/js/sessionProgress.js")).getActiveSession(
       "triple-connect",
@@ -305,7 +357,7 @@ test("Triple Challenge advances deterministically through its staged timer and e
   await page.getByRole("button", { name: "Màn tiếp theo" }).click();
   await expect(page.locator("[data-triple-level]")).toHaveText("2");
   await expect(page.locator("[data-triple-timer]")).toHaveText("01:25");
-  await page.locator("#triple-round-start-modal").getByRole("button", { name: "Bắt đầu" }).click();
+  await expect(page.locator("#triple-round-start-modal")).toHaveCount(0, { timeout: 4000 });
   const levelTwo = await page.evaluate(async () =>
     (await import("/js/sessionProgress.js")).getActiveSession("triple-connect", "challenge"),
   );

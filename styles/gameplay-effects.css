@@ -117,14 +117,6 @@
   stroke-width: 2.8;
 }
 
-.game-coin-hud.is-gaining .ui-icon {
-  animation: game-coin-target-pop var(--game-coin-counter-duration, 520ms) ease-out;
-}
-
-.game-coin-hud.is-gaining strong {
-  animation: game-coin-count-pop var(--game-coin-counter-duration, 520ms) ease-out;
-}
-
 .game-coin-gain-label {
   position: fixed;
   z-index: 32024;
@@ -169,16 +161,6 @@
   52% { opacity: 1; transform: translate(var(--game-coin-land-x), var(--game-coin-land-y)) scale(1) rotate(var(--game-coin-land-rotation, 0deg)); }
   64% { opacity: 1; transform: translate(var(--game-coin-land-x), var(--game-coin-land-y)) scale(1.04) rotate(var(--game-coin-land-rotation, 0deg)); }
   100% { opacity: 0; transform: translate(var(--game-coin-flight-x), var(--game-coin-flight-y)) scale(.42); }
-}
-
-@keyframes game-coin-target-pop {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  42% { transform: scale(1.2) rotate(-8deg); opacity: .8; }
-}
-
-@keyframes game-coin-count-pop {
-  0%, 100% { transform: translateY(0) scale(1); }
-  42% { transform: translateY(-2px) scale(1.16); }
 }
 
 @keyframes game-coin-gain-label {

@@ -40,7 +40,7 @@ test("Triple menu starts a visible playable board", async ({ page }) => {
   await page.locator("#menu-container.triple-connect-menu .menu-item").filter({ hasText: "Bắt đầu" }).click();
   await page.locator("#triple-difficulty-modal .difficulty-option").filter({ hasText: "Dễ" }).click();
   await expect(page.locator("#triple-connect-container")).toBeVisible();
-  await expect(page.locator(".triple-connect__board .triple-connect__tile")).toHaveCount(12);
+  await expect(page.locator(".triple-connect__board .triple-connect__tile")).toHaveCount(27);
 });
 
 test("switching all released games after a production Triple start keeps one active shell", async ({ page }) => {

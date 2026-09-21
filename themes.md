@@ -282,6 +282,11 @@ Roadmap V2 chuẩn hóa **25 chủ đề ảnh**:
 - **49–72:** bun cha, hu tieu, wonton noodle soup, mi quang, banh beo, banh bot loc, banh khot, crab noodle soup, pork rib congee, yangzhou fried rice, thai hot pot, vietnamese beef stew, peking duck, shrimp tempura, takoyaki balls, gyoza dumplings, yakitori skewers, tonkatsu cutlet, pad thai, tom yum soup, indian curry, chicken tikka masala, garlic naan, samosa pastry.
 - **73–96:** crispy hard taco, cheese nachos, chicken quesadilla, meat empanada, german bratwurst, french onion soup, quiche lorraine, mushroom risotto, pesto pasta, cheese ravioli, creamy mushroom soup, focaccia bread, bbq pork char siu bun, crystal shrimp dumpling, fruit tart, tiramisu slice, panna cotta, chocolate churros, caramel pudding, fried mozzarella sticks, calamari rings, pan-seared salmon, garlic butter grilled shrimp, seared scallops.
 - **97–120:** macaron cookies, chocolate eclair, cheese souffle, strawberry crepe, mille-feuille pastry, goulash stew, borscht soup, shepherd's pie, fish and chips, beef pot pie, grilled chorizo sausage, seafood paella, yakisoba noodles, unadon eel bowl, japanese curry rice, okonomiyaki pancake, crab cakes, chicken satay skewers, laksa noodle soup, salted egg custard bun, strawberry waffle, baked cauliflower gratin, garlic toast, sunny-side up eggs with sausage.
+  121–128: hot pot, mango sticky rice, green tea mochi, baked potato, chicken wings, greek salad, beef slider, lobster roll 1.
+  129–136: lobster roll 2, fish taco, pulled pork sandwich, deviled eggs, onion rings, garlic bread, baked ziti, clam chowder.
+  137–144: caprese salad, bruschetta, beef burrito, chicken fajitas, steak tartare, carpaccio, beef stroganoff, shepherd pie.
+  145–152: baked mac and cheese, chicken nuggets, waffle fries, loaded nachos, meatball sub, egg salad sandwich, BLT sandwich, pork bao.
+  153–160: beef wrap, chicken quesadilla roll, turkey club, roast beef sandwich, pulled chicken slider, tuna melt, BLT wrap, breakfast burrito.
 
 ---
 
@@ -309,6 +314,11 @@ Roadmap V2 chuẩn hóa **25 chủ đề ảnh**:
 - **49–72:** flat white, affogato, green tea, jasmine tea, chamomile tea, peppermint tea, hibiscus tea, honey lemon tea, taro milk tea, matcha milk tea, chocolate milk tea, oolong tea, earl grey tea, darjeeling tea, tonic water, ginger ale, root beer, cola, mineral water, electrolyte drink, sugarcane juice, herbal ginseng tea, brown rice tea, black bean tea.
 - **73–96:** sweet corn milk, black sesame milk, iced chocolate cocoa, iced milk coffee, vietnamese egg coffee, coconut coffee, espresso tonic, pineapple juice, grapefruit juice, dragon fruit juice, celery juice, beetroot juice, blueberry smoothie, raspberry smoothie, passion fruit smoothie, mango lassi, strawberry lassi, kefir, kvass, ginger kombucha, lemongrass peach tea, lychee tea, cinnamon apple tea, salted plum tea.
 - **97–120:** rooibos tea, pu-erh tea, masala chai, yuzu citrus tea, rosemary tea, pomelo green tea, butterfly pea flower tea, oat tea, reishi mushroom tea, boza, tepache, switchel, fruit shrub vinegar drink, aloe vera juice, pennywort juice, arrowroot drink, fresh sugarcane juice, cucumber soda, mint soda, daisy soda, hazelnut milk, cashew milk, pumpkin seed milk, mung bean milk.
+  121–128: winter melon tea, artichoke tea, barley tea, corn silk tea, lotus seed milk, red bean milk, cantaloupe juice, honeydew juice.
+  129–136: papaya smoothie, sapodilla smoothie, soursop smoothie, starfruit juice, guava leaf tea, pandan herbal tea, winter melon juice, longan lotus water.
+  137–144: kumquat honey tea, salted lime soda, preserved plum drink, tamarind juice, roselle tea, mulberry juice, jackfruit smoothie, avocado coffee.
+  145–152: sweet potato milk, black bean milk, lotus root drink, water chestnut juice, winter melon lemonade, pennywort coconut juice, Gotu Kola drink, dried longan tea.
+  153–160: chrysanthemum tea, bitter melon juice, star apple juice, custard apple smoothie, dragon fruit smoothie, mangosteen juice, lychee juice, longan juice.
 
 ---
 

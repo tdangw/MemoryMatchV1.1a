@@ -69,8 +69,7 @@
   position: relative;
   overflow: hidden;
 }
-.game-progress-hud .stat-combo::after {
-  content: "";
+.game-progress-hud .stat-combo .combo-window-progress {
   position: absolute;
   right: 3px;
   bottom: 1px;
@@ -81,19 +80,6 @@
   opacity: 0;
   transform: scaleX(0);
   transform-origin: left center;
-}
-.game-progress-hud .stat-combo.is-combo-window-active::after {
-  opacity: 1;
-  animation: combo-window-drain var(--combo-window-duration, 15000ms) linear
-    forwards;
-}
-@keyframes combo-window-drain {
-  from {
-    transform: scaleX(1);
-  }
-  to {
-    transform: scaleX(0);
-  }
 }
 .game-progress-hud .stat-points,
 .game-progress-hud .stat-points .stat-label {

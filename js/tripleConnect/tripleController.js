@@ -50,6 +50,7 @@ import { getGameModeLabel } from "../gameCatalog.js";
 import { getTheme } from "../themeCatalog.js";
 import { playCoinRewardFlight } from "../coinRewards.js";
 import { resolveTripleMilestoneProgress } from "./tripleMilestones.js";
+import { showLevelRewardOverlay, showLevelSummaryOverlay } from "../ui.js";
 
 const development = import.meta.env?.DEV === true;
 let state = null;
@@ -195,6 +196,7 @@ function mountTripleDevelopmentRound(generated, { skipIntro = false } = {}) {
   const shell = getTripleShell();
   const scope = shell.mount();
   presenting = false;
+  shell.refs.root.dataset.triplePresenting = "false";
   terminalSettled = false;
   terminalReason = null;
   roundLuckyRewards = [];
@@ -360,6 +362,7 @@ function mountTripleDevelopmentRound(generated, { skipIntro = false } = {}) {
     presenting = transition.events.some(
       (event) => event.type === "tile-selected",
     );
+    shell.refs.root.dataset.triplePresenting = String(presenting);
     presentTripleTransition({
       shell,
       scope,
@@ -376,6 +379,7 @@ function mountTripleDevelopmentRound(generated, { skipIntro = false } = {}) {
     }).finally(() => {
       if (!scope.active) return;
       presenting = false;
+      shell.refs.root.dataset.triplePresenting = "false";
       saveSession();
       settleTerminalRound(shell);
     });
@@ -475,40 +479,24 @@ function mountTripleDevelopmentRound(generated, { skipIntro = false } = {}) {
 function showTripleStartModal({ shell, scope, generation, render }) {
   const theme = getTheme(getEquippedThemeId(gameState.appearance, "triple-connect"));
   const totalTiles = Object.keys(state.tiles).length;
-  const time = currentMode === "endless" ? "Không giới hạn" : `${remainingTime} giây`;
-  const modal = openAppModal({
-    id: "triple-round-start-modal",
-    icon: "play",
-    title: `Sẵn sàng · ${getGameModeLabel(currentMode)}`,
-    dismissible: false,
-    closeOnBackdrop: false,
-    content: `<div class="triple-round-intro"><p><strong>Màn ${currentLevel}</strong></p><p>${totalTiles} thẻ · ${currentLayout.layerCounts.length} lớp · ${time}</p><p>Chủ đề: <strong>${theme.title}</strong></p><p>Chọn thẻ đang lộ để ghép bộ ba; khay đầy 7 ô sẽ kết thúc ván.</p><p class="app-modal__note">Mỗi bộ ba hợp lệ tăng 1 tiến trình; nhận thưởng tại các mốc trên HUD.</p></div>`,
-    actions: [
-      {
-        label: "Menu",
-        icon: "home",
-        variant: "secondary",
-        onClick: (close) => {
-          close();
-          if (generation === roundGeneration && scope.active) returnTripleToMenu();
-        },
-      },
-      {
-        label: "Bắt đầu",
-        icon: "play",
-        variant: "primary",
-        onClick: (close) => {
-          close();
-          if (generation !== roundGeneration || !scope.active) return;
-          modalPaused = false;
-          roundStarted = true;
-          saveSession();
-          startTripleTimer(scope, shell, render);
-        },
-      },
-    ],
+  showLevelRewardOverlay({
+    level: currentLevel,
+    mode: currentMode,
+    themeId: theme.id,
+    totalPairs: Math.floor(totalTiles / 3),
+    remainingTime,
+    targetText: `Mục tiêu: ${Math.floor(totalTiles / 3)} bộ ba`,
+    assistText: `Khay: ${TRIPLE_PRODUCT_DECISIONS.trayCapacity} ô`,
+    overlayId: "triple-round-start-modal",
+    scope,
+    onComplete: () => {
+      if (generation !== roundGeneration || !scope.active) return;
+      modalPaused = false;
+      roundStarted = true;
+      saveSession();
+      startTripleTimer(scope, shell, render);
+    },
   });
-  scope.own(() => modal.destroy(), "node");
 }
 
 function startTripleTimer(scope, shell, render) {
@@ -708,6 +696,29 @@ function settleTerminalRound(shell) {
         : []),
     ],
   });
+  if (won) {
+    showLevelSummaryOverlay({
+      fireworksContainerId: "triple-connect-container",
+      level: currentLevel,
+      remainingTime,
+      moves: state.moves,
+      misses: state.misses,
+      coinsEarned: settlement.reward,
+      score: state.score,
+      stars: settlement.stars,
+      timeBonus: 0,
+      luckyAwards: roundLuckyRewards,
+      settings: { ...gameState.settings, mode: currentMode },
+      onMenu: returnTripleToMenu,
+      onNext: canAdvance
+        ? startNextTripleLevel
+        : () => startTripleConnectRound({ mode: currentMode, level: currentLevel }),
+      nextLabel: canAdvance
+        ? currentMode === "endless" ? "Tiếp tục" : "Màn tiếp theo"
+        : "Chơi lại",
+    });
+    return;
+  }
   const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
   if (settlement.reward > 0 && !reduced) {
     const generation = roundGeneration;

@@ -1,0 +1,27 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { validateEffectV2Catalog, getEffectV2Exit, getEffectV2Path } from "../js/effects/effectCatalog.js";
+import { normalizePath, targetCentroid } from "../js/effects/effectGeometry.js";
+import { particleBudget, resolveEffectQuality } from "../js/effects/effectQuality.js";
+import { createParticlePool } from "../js/effects/particlePool.js";
+
+assert.equal(validateEffectV2Catalog(), true);
+assert.equal(getEffectV2Path("storm").id, "electric");
+assert.equal(getEffectV2Exit("unknown").id, "default");
+assert.deepEqual(normalizePath([{ x: 1, y: 2 }, { x: 1, y: 2 }, { x: 4, y: 2 }]), [{ x: 1, y: 2 }, { x: 4, y: 2 }]);
+assert.deepEqual(targetCentroid([{ left: 0, top: 0, width: 10, height: 10 }, { left: 10, top: 0, width: 10, height: 10 }]), { x: 10, y: 5 });
+assert.equal(resolveEffectQuality({ reducedMotion: true }), "reduced");
+assert.equal(particleBudget("high", 1), 48);
+assert.equal(particleBudget("low", 2), 6);
+const pool = createParticlePool(12);
+const first = pool.acquire(8);
+const second = pool.acquire(8);
+assert.equal(second.size, 4);
+pool.release(second);
+pool.release(first);
+assert.equal(pool.active, 0);
+const exitEngineSource = readFileSync(new URL("../js/effects/exitEngine.js", import.meta.url), "utf8");
+const rafDrawSource = exitEngineSource.match(/const draw = now => \{([\s\S]*?)\n  \};/);
+assert.ok(rafDrawSource, "Exit engine must own one bounded RAF draw loop");
+assert.equal(rafDrawSource[1].includes(".forEach("), false, "RAF draw loop must not allocate iterator callbacks");
+console.log("Effect V2 catalog, geometry, quality and pool checks passed.");

@@ -24,7 +24,16 @@ import {
   configureLinkController,
   continueLinkSession,
   showLinkDifficultyOverlay,
+  startLinkLevel,
 } from "./linkConnect/linkController.js";
+import {
+  clearConnectionV2,
+  renderConnectionV2,
+} from "./effects/connectionEngine.js";
+import {
+  clearCanvasExit,
+  playCanvasExit,
+} from "./effects/exitEngine.js";
 import { configureSettings, showSettingsPanel } from "./settings.js";
 import { openQuickAssistOverlay, openShopOverlay } from "./shop.js";
 import {
@@ -185,6 +194,20 @@ document.addEventListener(
 window.onload = () => {
   showGameSelector();
 };
+
+if (new URLSearchParams(window.location.search).has("effect-performance")) {
+  Object.defineProperty(window, "__effectV2Performance", {
+    configurable: true,
+    value: Object.freeze({
+      openGameMenu,
+      startLinkLevel,
+      renderConnectionV2,
+      clearConnectionV2,
+      playCanvasExit,
+      clearCanvasExit,
+    }),
+  });
+}
 
 document
   .getElementById("btn-game-settings")

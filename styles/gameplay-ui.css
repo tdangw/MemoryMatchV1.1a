@@ -1,3 +1,13 @@
+@keyframes app-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
 .highlight-tile {
   position: relative;
   z-index: 2;
@@ -31,7 +41,7 @@
   border-radius: 8px;
   box-shadow: 0 0 12px rgb(255 0 0 / 40%);
   z-index: 10010;
-  animation: fadein 0.4s ease;
+  animation: app-fade-in 0.4s ease;
 }
 
 .hint-timer-indicator {
@@ -46,7 +56,7 @@
   font-weight: bold;
   border-radius: 8px;
   box-shadow: 0 0 6px rgb(255 0 0 / 20%);
-  animation: fadein 0.3s ease;
+  animation: app-fade-in 0.3s ease;
 }
 
 .game-hint-fab {
@@ -316,7 +326,7 @@
   box-shadow: 0 0 20px rgb(255 255 255 / 50%);
   animation:
     pop-in 0.5s ease,
-    shimmer 3s infinite;
+    app-loading-shimmer 3s infinite;
   z-index: 9999;
 }
 
@@ -343,7 +353,7 @@
   }
 }
 
-@keyframes shimmer {
+@keyframes app-loading-shimmer {
   0% {
     background-position: 0% 50%;
   }
@@ -378,10 +388,10 @@
   border-radius: 20px;
   color: #fff;
   box-shadow: 0 0 30px rgb(0 136 255 / 70%);
-  animation: pop 0.6s ease;
+  animation: app-level-intro-enter 0.6s ease;
 }
 
-@keyframes pop {
+@keyframes app-level-intro-enter {
   0% {
     transform: scale(0.5);
     opacity: 0;
@@ -430,7 +440,7 @@
   }
 }
 
-.bonus-overlay {
+.gameplay-bonus-backdrop {
   position: fixed;
   top: 0;
   left: 0;
@@ -446,7 +456,7 @@
   pointer-events: none;
 }
 
-.bonus-overlay.active {
+.gameplay-bonus-backdrop.active {
   opacity: 1;
   pointer-events: all;
 }
@@ -510,7 +520,7 @@
   justify-content: center;
   align-items: center;
   z-index: 9999;
-  animation: fadein 0.3s ease;
+  animation: app-fade-in 0.3s ease;
 }
 
 .reward-container.direct-layout {
@@ -520,7 +530,7 @@
   color: white;
   text-align: center;
   box-shadow: 0 0 30px rgb(0 136 255 / 60%);
-  animation: pop 0.5s ease;
+  animation: app-dialog-pop-enter 0.5s ease;
 }
 
 .reward-title.glow {
@@ -531,7 +541,7 @@
     0 0 20px #007fff;
 }
 
-@keyframes pop {
+@keyframes app-dialog-pop-enter {
   0% {
     transform: scale(0.8);
     opacity: 0;
@@ -554,7 +564,7 @@
   justify-content: center;
   align-items: center;
   z-index: 9999;
-  animation: fadein 0.3s ease;
+  animation: app-fade-in 0.3s ease;
 }
 
 .reset-box {
@@ -564,7 +574,7 @@
   text-align: center;
   box-shadow: 0 0 20px rgb(255 0 0 / 40%);
   color: #600;
-  animation: pop 0.5s ease;
+  animation: app-dialog-pop-enter 0.5s ease;
 }
 
 @keyframes fly-up-fade {

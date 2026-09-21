@@ -162,7 +162,7 @@ js/tripleConnect/
 ### Giai đoạn 1 — Vertical slice lõi
 
 1. Đăng ký Triple Connect qua registry. Sau khi có vertical slice chơi được, giữ game trong màn chọn để người dùng kiểm thử trực tiếp; development hook chỉ dùng cho seed/fixture đặc biệt và không thay thế luồng menu thật.
-2. Làm `tripleState`, board 2 lớp 12 thẻ và renderer board/khay dọc mobile.
+2. Làm `tripleState`, board Easy 2 lớp 18 thẻ và renderer board/khay dọc mobile.
 3. Cài luật chọn thẻ lộ, bay xuống khay, tự nhóm, bộ ba, Miss/combo/điểm và win/lose.
 4. Adapter line/xóa ba thẻ với hiệu ứng đang trang bị.
 5. Tạo generator solution-first và solver; thêm kiểm thử cases board/khoang khay.

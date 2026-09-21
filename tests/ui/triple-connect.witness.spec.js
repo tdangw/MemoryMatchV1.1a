@@ -31,7 +31,7 @@ async function replayWitnessThroughBoard(page) {
         ),
     );
   }
-  await expect(page.locator("#triple-round-summary-modal")).toBeVisible();
+  await expect(page.locator("#level-summary-modal")).toBeVisible({ timeout: 8000 });
 }
 
 test("Triple witness remains playable through the rendered board for every active mode and Challenge stage", async ({

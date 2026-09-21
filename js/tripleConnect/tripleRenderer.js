@@ -23,6 +23,7 @@ export function createTripleRenderer(shell) {
     activeLayout = layout;
     const geometry = getLayoutGeometry(layout);
     const slots = new Map(layout.slots.map((slot) => [slot.id, slot]));
+    const coverDepths = getCoverDepths(state);
     const live = new Set();
     for (const tile of Object.values(state.tiles)) {
       if (tile.location === "removed") continue;
@@ -39,40 +40,50 @@ export function createTripleRenderer(shell) {
         node.append(image);
         nodes.set(tile.id, node);
       }
-      const image = node.querySelector("img");
+      const image = node.firstElementChild;
       if (image && image.dataset.themeId !== themeId) {
         image.dataset.themeId = themeId;
         setTileImageSource(image, tile.type, themeId);
       }
-      const exposed =
-        tile.location === "board" &&
-        state.coverGraph[tile.id].every(
-          (id) => state.tiles[id].location !== "board",
-        );
-      node.disabled = !exposed;
-      node.setAttribute("aria-disabled", String(!exposed));
-      node.classList.toggle("is-lucky", Boolean(tile.lucky));
-      node.setAttribute("aria-label", tile.lucky ? "Thẻ may mắn" : "Thẻ");
-      node.classList.toggle(
-        "is-occluded",
-        tile.location === "board" && !exposed,
-      );
+      const coverDepth = tile.location === "board" ? coverDepths.get(tile.id) || 0 : 0;
+      const exposed = tile.location === "board" && coverDepth === 0;
+      const disabled = !exposed;
+      if (node.disabled !== disabled) node.disabled = disabled;
+      const ariaDisabled = String(disabled);
+      if (node.getAttribute("aria-disabled") !== ariaDisabled)
+        node.setAttribute("aria-disabled", ariaDisabled);
+      const lucky = Boolean(tile.lucky);
+      if (node.classList.contains("is-lucky") !== lucky)
+        node.classList.toggle("is-lucky", lucky);
+      const label = lucky ? "Thẻ may mắn" : "Thẻ";
+      if (node.getAttribute("aria-label") !== label)
+        node.setAttribute("aria-label", label);
+      const occluded = tile.location === "board" && !exposed;
+      if (node.classList.contains("is-occluded") !== occluded)
+        node.classList.toggle("is-occluded", occluded);
+      if (node.classList.contains("is-exposed") !== exposed)
+        node.classList.toggle("is-exposed", exposed);
+      node.dataset.tripleCoverDepth = String(Math.min(4, coverDepth));
       if (tile.location === "tray") {
         const trayIndex = state.tray.indexOf(tile.id);
         const traySlot = traySlots[trayIndex];
         if (!traySlot) throw new Error("Triple tile is missing a tray slot.");
-        traySlot.append(node);
+        if (node.parentElement !== traySlot) traySlot.append(node);
       }
       else {
         const slot = slots.get(tile.slotId);
         if (!slot)
           throw new Error(`Missing Triple layout slot: ${tile.slotId}`);
-        node.style.setProperty("--x", String(geometry.x(slot.x)));
-        node.style.setProperty("--y", String(geometry.y(slot.y)));
-        node.style.setProperty("--tile-width", String(geometry.tileWidth));
-        node.style.setProperty("--tile-height", String(geometry.tileHeight));
-        node.style.zIndex = String(tile.layer + 1);
-        board.append(node);
+        const geometryKey = `${layout.id}:${tile.slotId}`;
+        if (node.dataset.tripleGeometry !== geometryKey) {
+          node.dataset.tripleGeometry = geometryKey;
+          node.style.setProperty("--x", String(geometry.x(slot.x)));
+          node.style.setProperty("--y", String(geometry.y(slot.y)));
+          node.style.setProperty("--tile-width", String(geometry.tileWidth));
+          node.style.setProperty("--tile-height", String(geometry.tileHeight));
+          node.style.zIndex = String(tile.layer + 1);
+        }
+        if (node.parentElement !== board) board.append(node);
       }
     }
     for (const [id, node] of nodes)
@@ -114,6 +125,9 @@ export function createTripleRenderer(shell) {
       },
       apply: ({ tileSize, boardHeight }) => {
         const geometry = getLayoutGeometry(activeLayout);
+        if (geometry.gridHeight >= 20)
+          shellRoot.dataset.tripleLayoutDensity = "tall";
+        else delete shellRoot.dataset.tripleLayoutDensity;
         surface.style.width = "100%";
         surface.style.height = `${boardHeight}px`;
         board.style.width = "100%";
@@ -135,6 +149,24 @@ export function createTripleRenderer(shell) {
     }, "triple-board-layout");
   }
   return { render, mountLayout, nodes, traySlots };
+}
+
+function getCoverDepths(state) {
+  const depths = new Map();
+  const visiting = new Set();
+  const visit = (tileId) => {
+    if (depths.has(tileId)) return depths.get(tileId);
+    if (visiting.has(tileId)) return 0;
+    visiting.add(tileId);
+    const blockers = state.coverGraph[tileId]
+      .filter((blockerId) => state.tiles[blockerId].location === "board");
+    const depth = blockers.length ? 1 + Math.max(...blockers.map(visit)) : 0;
+    visiting.delete(tileId);
+    depths.set(tileId, depth);
+    return depth;
+  };
+  Object.keys(state.tiles).forEach(visit);
+  return depths;
 }
 
 function getLayoutGeometry(layout) {

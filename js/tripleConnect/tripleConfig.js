@@ -6,32 +6,32 @@ export const TRIPLE_RULES = Object.freeze({
 });
 export const TRIPLE_EASY_CONFIG = Object.freeze({
   mode: "easy",
-  tileCount: 18,
-  layerCount: 2,
-  timeSeconds: 75,
+  tileCount: 27,
+  layerCount: 3,
+  timeSeconds: 93,
 });
 export const TRIPLE_NORMAL_CONFIG = Object.freeze({
   mode: "normal",
-  tileCount: 36,
-  layerCount: 3,
-  timeSeconds: 105,
+  tileCount: 45,
+  layerCount: 4,
+  timeSeconds: 133,
 });
 export const TRIPLE_HARD_CONFIG = Object.freeze({
   mode: "hard",
-  tileCount: 54,
-  layerCount: 4,
-  timeSeconds: 150,
+  tileCount: 63,
+  layerCount: 5,
+  timeSeconds: 178,
 });
 export const TRIPLE_SUPER_HARD_CONFIG = Object.freeze({
   mode: "superHard",
-  tileCount: 75,
-  layerCount: 5,
-  timeSeconds: 210,
+  tileCount: 96,
+  layerCount: 6,
+  timeSeconds: 262,
 });
 export const TRIPLE_ENDLESS_CONFIG = Object.freeze({
   mode: "endless",
-  tileCount: 75,
-  layerCount: 5,
+  tileCount: 96,
+  layerCount: 6,
   timeSeconds: 0,
 });
 export const TRIPLE_CHALLENGE_CONFIG = Object.freeze({
@@ -303,16 +303,15 @@ export const TRIPLE_SUPER_HARD_LAYOUT_V3 = defineTemplate({
   ],
 });
 
-// v4 replaces the active boards. The v3 templates remain above exclusively
-// for restoring sessions that were saved before the new geometry shipped.
-export const TRIPLE_EASY_LAYOUT = defineTemplate({
+// V4 remains addressable by ID so Continue never reinterprets saved positions.
+export const TRIPLE_EASY_LAYOUT_V4 = defineTemplate({
   id: "easy-18-v4", gridWidth: 10, gridHeight: 10,
   layerMasks: [
     { layer: 0, rows: [{ y: 0, xs: [2, 4] }, { y: 2, xs: [0, 2, 4, 6] }, { y: 5, xs: [0, 2, 4, 6] }, { y: 8, xs: [2, 4] }] },
     { layer: 1, rows: [{ y: 1, xs: [1, 3, 5] }, { y: 6, xs: [1, 3, 5] }] },
   ],
 });
-export const TRIPLE_NORMAL_LAYOUT = defineTemplate({
+export const TRIPLE_NORMAL_LAYOUT_V4 = defineTemplate({
   id: "normal-36-v4", gridWidth: 12, gridHeight: 12,
   layerMasks: [
     { layer: 0, rows: [{ y: 0, xs: [2, 4, 6, 8] }, { y: 4, xs: [0, 2, 4, 6, 8, 10] }, { y: 8, xs: [0, 2, 4, 6, 8, 10] }, { y: 10, xs: [4, 6] }] },
@@ -320,7 +319,7 @@ export const TRIPLE_NORMAL_LAYOUT = defineTemplate({
     { layer: 2, rows: [{ y: 2, xs: [2, 6] }, { y: 6, xs: [2, 6] }, { y: 10, xs: [1, 7] }] },
   ],
 });
-export const TRIPLE_HARD_LAYOUT = defineTemplate({
+export const TRIPLE_HARD_LAYOUT_V4 = defineTemplate({
   id: "hard-54-v4", gridWidth: 14, gridHeight: 14,
   layerMasks: [
     { layer: 0, rows: [{ y: 0, xs: [2, 4, 6, 8] }, { y: 3, xs: [0, 2, 4, 6, 8, 10, 12] }, { y: 7, xs: [0, 2, 4, 6, 8, 10, 12] }, { y: 11, xs: [2, 4, 6, 8, 10, 12] }] },
@@ -329,7 +328,7 @@ export const TRIPLE_HARD_LAYOUT = defineTemplate({
     { layer: 3, rows: [{ y: 3, xs: [1, 5, 9] }, { y: 9, xs: [1, 5, 9] }] },
   ],
 });
-export const TRIPLE_SUPER_HARD_LAYOUT = defineTemplate({
+export const TRIPLE_SUPER_HARD_LAYOUT_V4 = defineTemplate({
   id: "super-hard-75-v4", gridWidth: 14, gridHeight: 16,
   layerMasks: [
     { layer: 0, rows: [{ y: 0, xs: [0, 4, 6, 10] }, { y: 3, xs: [0, 2, 4, 6, 8, 10] }, { y: 7, xs: [0, 2, 4, 6, 8, 10, 12] }, { y: 11, xs: [0, 2, 4, 6, 8, 10, 12] }, { y: 14, xs: [0, 2, 4, 6, 8, 10] }] },
@@ -337,6 +336,47 @@ export const TRIPLE_SUPER_HARD_LAYOUT = defineTemplate({
     { layer: 2, rows: [{ y: 0, xs: [1, 5, 9] }, { y: 5, xs: [1, 5, 9] }, { y: 9, xs: [1, 5, 9] }, { y: 12, xs: [1, 5, 9] }, { y: 14, xs: [1, 5, 9] }] },
     { layer: 3, rows: [{ y: 4, xs: [2, 6, 10] }, { y: 8, xs: [2, 6, 10] }, { y: 13, xs: [2, 6, 10] }] },
     { layer: 4, rows: [{ y: 7, xs: [3, 7, 11] }] },
+  ],
+});
+
+// V5 adds one layer to every standard mode.  The masks deliberately retain
+// staggered silhouettes rather than turning the boards into regular grids.
+export const TRIPLE_EASY_LAYOUT = defineTemplate({
+  id: "easy-27-v5", gridWidth: 10, gridHeight: 11,
+  layerMasks: [
+    { layer: 0, rows: [{ y: 0, xs: [2, 4] }, { y: 3, xs: [0, 2, 4, 6] }, { y: 6, xs: [0, 2, 4, 6] }, { y: 9, xs: [2, 4] }] },
+    { layer: 1, rows: [{ y: 1, xs: [1, 3, 5] }, { y: 4, xs: [1, 3, 5] }, { y: 7, xs: [1, 3, 5] }] },
+    { layer: 2, rows: [{ y: 1, xs: [0, 4] }, { y: 4, xs: [0, 4] }, { y: 7, xs: [0, 4] }] },
+  ],
+});
+export const TRIPLE_NORMAL_LAYOUT = defineTemplate({
+  id: "normal-45-v5", gridWidth: 12, gridHeight: 13,
+  layerMasks: [
+    { layer: 0, rows: [{ y: 0, xs: [2, 4, 6, 8] }, { y: 4, xs: [0, 2, 4, 6, 8, 10] }, { y: 8, xs: [0, 2, 4, 6, 8, 10] }, { y: 11, xs: [4, 6] }] },
+    { layer: 1, rows: [{ y: 1, xs: [1, 3, 5, 7] }, { y: 5, xs: [1, 3, 5, 7] }, { y: 9, xs: [1, 3, 5, 7] }] },
+    { layer: 2, rows: [{ y: 2, xs: [2, 4, 6] }, { y: 6, xs: [2, 6, 8] }, { y: 10, xs: [1, 5, 8] }] },
+    { layer: 3, rows: [{ y: 3, xs: [3, 7] }, { y: 7, xs: [3, 7] }, { y: 11, xs: [2, 8] }] },
+  ],
+});
+export const TRIPLE_HARD_LAYOUT = defineTemplate({
+  id: "hard-63-v5", gridWidth: 14, gridHeight: 15,
+  layerMasks: [
+    { layer: 0, rows: [{ y: 0, xs: [2, 4, 6, 8] }, { y: 3, xs: [0, 2, 4, 6, 8, 10, 12] }, { y: 7, xs: [0, 2, 4, 6, 8, 10, 12] }, { y: 11, xs: [2, 4, 6, 8, 10, 12] }] },
+    { layer: 1, rows: [{ y: 1, xs: [1, 3, 5, 7, 9] }, { y: 4, xs: [0, 2, 5, 7, 10] }, { y: 8, xs: [1, 3, 5, 7, 9] }] },
+    { layer: 2, rows: [{ y: 0, xs: [0, 5, 9] }, { y: 5, xs: [1, 5, 9] }, { y: 9, xs: [0, 4, 8] }, { y: 12, xs: [3, 7, 11] }] },
+    { layer: 3, rows: [{ y: 2, xs: [1, 4, 8] }, { y: 9, xs: [1, 5, 9] }] },
+    { layer: 4, rows: [{ y: 6, xs: [1, 5, 9] }, { y: 13, xs: [3, 7, 11] }] },
+  ],
+});
+export const TRIPLE_SUPER_HARD_LAYOUT = defineTemplate({
+  id: "super-hard-96-v5", gridWidth: 14, gridHeight: 20,
+  layerMasks: [
+    { layer: 0, rows: [{ y: 0, xs: [0, 4, 6, 10] }, { y: 3, xs: [0, 2, 4, 6, 8, 12] }, { y: 7, xs: [0, 2, 4, 6, 8, 10, 12] }, { y: 11, xs: [0, 2, 4, 6, 8, 10, 12] }, { y: 15, xs: [0, 2, 4, 6, 8, 10] }] },
+    { layer: 1, rows: [{ y: 1, xs: [1, 3, 5, 7, 9, 11] }, { y: 4, xs: [0, 2, 5, 7, 9, 12] }, { y: 8, xs: [1, 5, 9] }, { y: 12, xs: [1, 3, 5] }, { y: 16, xs: [1, 5, 9] }] },
+    { layer: 2, rows: [{ y: 0, xs: [1, 5, 9] }, { y: 5, xs: [0, 4, 8] }, { y: 9, xs: [0, 4, 8] }, { y: 12, xs: [0, 4, 8] }, { y: 16, xs: [0, 4, 8] }, { y: 17, xs: [2, 6, 10] }] },
+    { layer: 3, rows: [{ y: 3, xs: [1, 5, 10] }, { y: 6, xs: [1, 5, 9] }, { y: 10, xs: [1, 5, 9] }, { y: 14, xs: [1, 5, 9] }] },
+    { layer: 4, rows: [{ y: 5, xs: [3, 7, 11] }, { y: 9, xs: [1, 5, 9] }, { y: 13, xs: [1, 5, 9] }] },
+    { layer: 5, rows: [{ y: 8, xs: [0, 4, 8] }, { y: 18, xs: [1, 5, 9] }] },
   ],
 });
 
@@ -472,7 +512,7 @@ export const TRIPLE_CHALLENGE_STAGES = Object.freeze([
 export const TRIPLE_EASY_SOLVER_BUDGET = Object.freeze({
   maxNodes: 5000,
   maxMemo: 2000,
-  deadlineMs: 20,
+  deadlineMs: 30,
 });
 export const TRIPLE_EASY_GENERATOR_BUDGET = Object.freeze({ maxAttempts: 12 });
 export const TRIPLE_EASY_FALLBACK_SEED = "triple-easy-v2-fallback";

@@ -105,6 +105,7 @@ import {
   setLinkTileHinted,
 } from "./linkRenderer.js";
 import { beginLinkRound, linkGameState, resetLinkGame } from "./linkState.js";
+import { clearComboWindow, playComboWindow } from "../gameShell/comboWindowPresentation.js";
 import { resolveSessionTiming } from "../sessionTiming.js";
 import {
   canShowFullVictoryCelebration,
@@ -1393,11 +1394,7 @@ function startLinkComboWindow(durationMs, matchedAt, roundId, board) {
   clearTimeout(comboExpiryTimer);
   const card = getLinkHudElements().comboCard;
   if (card) {
-    card.style.setProperty("--combo-window-duration", `${durationMs}ms`);
-    card.classList.remove("is-combo-window-active");
-    // Khởi động lại vạch thời gian từ đầu cho mỗi cặp ghép đúng.
-    void card.offsetWidth;
-    card.classList.add("is-combo-window-active");
+    playComboWindow(card, durationMs);
   }
   comboExpiryTimer = setTimeout(() => {
     if (linkGameState.roundId !== roundId
@@ -1413,7 +1410,7 @@ function startLinkComboWindow(durationMs, matchedAt, roundId, board) {
 function stopLinkComboWindow() {
   clearTimeout(comboExpiryTimer);
   comboExpiryTimer = undefined;
-  getLinkHudElements().comboCard?.classList.remove("is-combo-window-active");
+  clearComboWindow(getLinkHudElements().comboCard);
 }
 
 function samePosition(left, right) {

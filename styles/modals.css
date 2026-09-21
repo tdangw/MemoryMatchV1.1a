@@ -275,31 +275,6 @@
   color: #243b64;
 }
 
-.shop-item-grid {
-  grid-template-columns: 1fr;
-  max-height: none;
-  margin: 0;
-}
-
-.shop-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 12px;
-  background: rgb(255 255 255 / 62%);
-  border: 1px solid rgb(36 59 100 / 12%);
-}
-
-.shop-item-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0;
-  color: #25324a;
-  text-align: left;
-}
-
 .game-stats .info > [data-icon],
 #settings-container .label > [data-icon],
 #settings-container h3 > [data-icon] {
@@ -462,7 +437,9 @@
 }
 
 /* Chọn chế độ chơi dùng cùng hệ màu với menu chính. */
-#difficulty-modal .app-modal {
+#difficulty-modal .app-modal,
+#triple-difficulty-modal .app-modal,
+#triple-session-picker-modal .app-modal {
   width: min(370px, calc(100vw - 36px));
   border-color: rgb(255 255 255 / 16%);
   border-radius: 24px;
@@ -476,24 +453,34 @@
   width: min(370px, calc(100vw - 36px));
 }
 
-#difficulty-modal .app-modal__header {
+#difficulty-modal .app-modal__header,
+#triple-difficulty-modal .app-modal__header,
+#triple-session-picker-modal .app-modal__header {
   border-bottom-color: rgb(255 255 255 / 11%);
 }
 
-#difficulty-modal .app-modal__title {
+#difficulty-modal .app-modal__title,
+#triple-difficulty-modal .app-modal__title,
+#triple-session-picker-modal .app-modal__title {
   color: #f2bf5b;
 }
 
-#difficulty-modal .app-modal__title .ui-icon {
+#difficulty-modal .app-modal__title .ui-icon,
+#triple-difficulty-modal .app-modal__title .ui-icon,
+#triple-session-picker-modal .app-modal__title .ui-icon {
   color: #f2bf5b;
 }
 
-#difficulty-modal .app-modal__close {
+#difficulty-modal .app-modal__close,
+#triple-difficulty-modal .app-modal__close,
+#triple-session-picker-modal .app-modal__close {
   background: rgb(255 255 255 / 9%);
   color: #f5f7fb;
 }
 
-#difficulty-modal .app-modal__body {
+#difficulty-modal .app-modal__body,
+#triple-difficulty-modal .app-modal__body,
+#triple-session-picker-modal .app-modal__body {
   display: grid;
   min-height: 0;
   gap: 14px;
@@ -694,6 +681,8 @@
  * Giữ panel trong màn hình; chỉ phần nội dung bên trong được phép cuộn. */
 @media screen and (orientation: landscape) and (height <= 600px) {
   #difficulty-modal .app-modal,
+  #triple-difficulty-modal .app-modal,
+  #triple-session-picker-modal .app-modal,
   #settings-modal .app-modal {
     height: calc(100dvh - 16px);
     max-height: calc(100dvh - 16px);
@@ -701,12 +690,18 @@
 
   #difficulty-modal .app-modal__header,
   #difficulty-modal .app-modal__footer,
+  #triple-difficulty-modal .app-modal__header,
+  #triple-difficulty-modal .app-modal__footer,
+  #triple-session-picker-modal .app-modal__header,
+  #triple-session-picker-modal .app-modal__footer,
   #settings-modal .app-modal__header,
   #settings-modal .app-modal__footer {
     flex: 0 0 auto;
   }
 
   #difficulty-modal .app-modal__body,
+  #triple-difficulty-modal .app-modal__body,
+  #triple-session-picker-modal .app-modal__body,
   #settings-modal .app-modal__body {
     flex: 1 1 auto;
     min-height: 0;
