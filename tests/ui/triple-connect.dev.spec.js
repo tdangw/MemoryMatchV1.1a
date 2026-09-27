@@ -88,3 +88,19 @@ test("Triple Undo restores the exact last stable selection", async ({ page }) =>
   await page.evaluate(() => document.querySelector('[data-triple-item="undo"]').click());
   await expect(page.locator(".triple-connect__tray .triple-connect__tile")).toHaveCount(0);
 });
+
+test("Triple clears completed line animations before the next resolved triple", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto("/");
+  const result = await page.evaluate(async () => {
+    const { startTripleConnectDevelopmentRound } = await import("/js/tripleConnect/tripleController.js");
+    const run = startTripleConnectDevelopmentRound({ seed: "exit-cleanup" });
+    for (const command of run.generated.witness.slice(0, 6)) {
+      document.querySelector(`[data-tile-id="${command.tileId}"]`)?.click();
+      await new Promise((resolve) => setTimeout(resolve, 1200));
+    }
+    const line = document.querySelector(".triple-connect__line");
+    return { matched: run.getState().matchedTriples, animations: line.getAnimations().length, visible: line.classList.contains("is-visible") };
+  });
+  expect(result).toEqual({ matched: 2, animations: 0, visible: false });
+});

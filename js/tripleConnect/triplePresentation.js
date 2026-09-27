@@ -48,13 +48,16 @@ function presentResolvedTripleExit({ shell, scope, match, effects, render, next 
     presentTripleConnection({ surface: line, targets: ghosts, effectId: effects.path?.id });
     presentTripleExit({ surface, targets: ghosts, effectId: effects.exit?.id });
   });
+  let lineAnimation = null;
   const cleanup = () => {
+    lineAnimation?.cancel();
+    lineAnimation = null;
     clearTripleEffects(line);
     ghosts.forEach((ghost) => ghost.remove());
     sourceNodes.forEach((source) => source.classList.remove("is-match-exiting"));
   };
   const release = scope.own(cleanup, "node");
-  const lineAnimation = line.animate(
+  lineAnimation = line.animate(
     [{ opacity: 0 }, { opacity: 1, offset: 0.25 }, { opacity: 1, offset: 0.62 }, { opacity: 0 }],
     { duration: MATCH_DURATION_MS, easing: "ease-out", fill: "both" },
   );
