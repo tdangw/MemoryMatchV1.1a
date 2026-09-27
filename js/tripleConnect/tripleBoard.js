@@ -237,10 +237,7 @@ function buildSolutionFirstBoard({ seed, layout, config }) {
   const random = createSeededRng(seed);
   const coverGraphBySlot = createTripleCoverGraph(layout);
   const pilePlan = createPilePlan(layout, config, random);
-  const witnessSlots = [
-    ...createWitnessSlots(layout, random),
-    ...pilePlan.stackSlots.flatMap((slot) => Array.from({ length: slot.depth }, () => slot)),
-  ];
+  const witnessSlots = createWitnessSlots(layout, random, pilePlan.stackSlots);
   if (witnessSlots.length !== config.tileCount || config.tileCount % 3 !== 0)
     throw new TypeError("Triple pile configuration does not match its tile count.");
   const typeOrder = shuffle(
@@ -320,16 +317,35 @@ function createPilePlan(layout, config, random) {
   return { depthBySlot, stackSlots: [] };
 }
 
-function createWitnessSlots(layout, random) {
+function createWitnessSlots(layout, random, stackSlots = []) {
   const layers = new Map();
   for (const slot of layout.slots) {
     const layerSlots = layers.get(slot.layer) || [];
     layerSlots.push(slot);
     layers.set(slot.layer, layerSlots);
   }
-  return [...layers.keys()]
+  const boardSlots = [...layers.keys()]
     .sort((left, right) => right - left)
     .flatMap((layer) => shuffle(layers.get(layer), random));
+  const stackCards = stackSlots.flatMap((slot) => Array.from({ length: slot.depth }, () => slot));
+  if (!stackCards.length) return boardSlots;
+  const groupCount = (boardSlots.length + stackCards.length) / 3;
+  if (!Number.isInteger(groupCount) || stackCards.length > groupCount)
+    throw new TypeError("Triple corner stacks cannot be distributed across witness groups.");
+  const groupsWithStack = new Set(shuffle(Array.from({ length: groupCount }, (_, index) => index), random).slice(0, stackCards.length));
+  const result = [];
+  let boardIndex = 0;
+  let stackIndex = 0;
+  for (let group = 0; group < groupCount; group += 1) {
+    const stackCard = groupsWithStack.has(group) ? stackCards[stackIndex++] : null;
+    if (stackCard) result.push(stackCard);
+    const boardCount = 3 - Number(Boolean(stackCard));
+    result.push(...boardSlots.slice(boardIndex, boardIndex + boardCount));
+    boardIndex += boardCount;
+  }
+  if (boardIndex !== boardSlots.length || stackIndex !== stackCards.length)
+    throw new TypeError("Triple corner stack witness distribution is incomplete.");
+  return result;
 }
 
 function rectanglesOverlap(first, second, layout) {

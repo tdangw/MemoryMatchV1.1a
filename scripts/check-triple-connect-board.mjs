@@ -211,6 +211,7 @@ for (let index = 0; index < 20; index += 1) {
   normalTimings.push(performance.now() - startedAt);
   assert.equal(normal.board.tiles.length, 54);
   assert.deepEqual(Object.values(normal.board.cornerStacks).map((pile) => pile.tileIds.length), [9]);
+  assert.ok(Object.values(normal.board.cornerStacks).every((pile) => new Set(pile.tileIds.map((id) => normal.board.tiles.find((tile) => tile.id === id).type)).size === pile.tileIds.length), "A corner stack must reveal a varied sequence of card types.");
   assert.equal(replayTripleWitness(normal.board, normal.witness).ok, true);
 }
 normalTimings.sort((left, right) => left - right);
@@ -227,6 +228,7 @@ for (let index = 0; index < 10; index += 1) {
   hardTimings.push(performance.now() - startedAt);
   assert.equal(hard.board.tiles.length, 78);
   assert.deepEqual(Object.values(hard.board.cornerStacks).map((pile) => pile.tileIds.length).sort(), [7, 8]);
+  assert.ok(Object.values(hard.board.cornerStacks).every((pile) => new Set(pile.tileIds.map((id) => hard.board.tiles.find((tile) => tile.id === id).type)).size === pile.tileIds.length), "Hard corner stacks must not repeat a type.");
   assert.equal(replayTripleWitness(hard.board, hard.witness).ok, true);
 }
 hardTimings.sort((left, right) => left - right);
