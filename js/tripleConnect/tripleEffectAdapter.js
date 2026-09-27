@@ -1,11 +1,11 @@
 import { clearConnectionV2, renderConnectionV2 } from "../effects/connectionEngine.js";
-import { getEffectV2Exit } from "../effects/effectCatalog.js";
+import { getEffectV2Exit, getEffectV2Path } from "../effects/effectCatalog.js";
 import { clearCanvasExit, playCanvasExit } from "../effects/exitEngine.js";
 
 export function presentTripleConnection({ surface, targets, effectId }) {
   const bounds = surface.parentElement.getBoundingClientRect();
   const points = targets.map(target => { const rect = target.getBoundingClientRect(); return { x: ((rect.left + rect.width / 2 - bounds.left) / bounds.width) * 100, y: ((rect.top + rect.height / 2 - bounds.top) / bounds.height) * 100 }; });
-  const rendered = renderConnectionV2({ surface, points, effect: { id: effectId || "default" }, seed: targets.length * 2654435761 });
+  const rendered = renderConnectionV2({ surface, points, effect: getEffectV2Path(effectId || "default"), seed: targets.length * 2654435761 });
   surface.classList.add("triple-connect__line");
   return rendered;
 }

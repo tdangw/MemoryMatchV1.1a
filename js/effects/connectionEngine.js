@@ -46,9 +46,9 @@ function seededJitter(points, seed) {
   });
 }
 
-function appendDecoration(parent, effectId, point) {
-  if (!point || ["default", "laser", "rainbow"].includes(effectId)) return;
-  const node = svgNode(effectId === "chains" ? "rect" : "circle", `effect-v2-connection__impact effect-v2-connection__impact--${effectId}`);
+function appendDecoration(parent, family, effectId, point) {
+  if (!point || ["tracer", "dual-stroke", "gradient"].includes(family)) return;
+  const node = svgNode(["packets", "links"].includes(family) ? "rect" : "circle", `effect-v2-connection__impact effect-v2-connection__impact--${family}`);
   node.setAttribute("cx", point.x);
   node.setAttribute("cy", point.y);
   if (node.tagName === "rect") {
@@ -56,15 +56,34 @@ function appendDecoration(parent, effectId, point) {
     node.setAttribute("y", point.y - 1.8);
     node.setAttribute("width", "3.6");
     node.setAttribute("height", "3.6");
-  } else node.setAttribute("r", effectId === "kame" ? "3" : "1.8");
+  } else node.setAttribute("r", family === "charge" ? "3" : family === "rings" ? "2.5" : "1.8");
   parent.append(node);
+}
+
+function renderFamilyPath(points, family, seed) {
+  if (family === "jagged") return seededJitter(points, seed);
+  if (["helix", "wave", "wavelets", "ribbon"].includes(family)) {
+    return points.flatMap((point, index) => {
+      const end = points[index + 1];
+      if (!end) return [point];
+      const steps = Math.min(8, Math.max(2, Math.ceil(Math.hypot(end.x - point.x, end.y - point.y) / 12)));
+      return Array.from({ length: steps }, (_, step) => {
+        if (!step) return point;
+        const progress = step / steps;
+        const amplitude = family === "ribbon" ? 1.2 : family === "helix" ? 1.8 : 1;
+        const offset = Math.sin(progress * Math.PI * (family === "helix" ? 4 : 2)) * amplitude;
+        return { x: point.x + (end.x - point.x) * progress + (end.y - point.y) * offset / 20, y: point.y + (end.y - point.y) * progress - (end.x - point.x) * offset / 20 };
+      });
+    });
+  }
+  return points;
 }
 
 export function renderConnectionV2({ surface, points, effect, seed = 1 }) {
   if (!surface || !effect) return false;
   const normalized = normalizePath(points);
-  const rendered = ["electric", "spiral", "plasma"].includes(effect.id)
-    ? seededJitter(normalized, seed) : normalized;
+  const family = effect.family || "tracer";
+  const rendered = renderFamilyPath(normalized, family, seed);
   const serialized = rendered.map(point => `${point.x},${point.y}`).join(" ");
   const nodes = ensureSurface(surface);
   surface.setAttribute("viewBox", "0 0 100 100");
@@ -73,12 +92,12 @@ export function renderConnectionV2({ surface, points, effect, seed = 1 }) {
   nodes.glow.setAttribute("points", serialized);
   nodes.beam.setAttribute("points", serialized);
   nodes.decoration.replaceChildren();
-  appendDecoration(nodes.decoration, effect.id, rendered.at(-1));
+  appendDecoration(nodes.decoration, family, effect.id, rendered.at(-1));
   surface.classList.add("is-visible");
   surface.__effectV2ConnectionHandle?.dispose();
   surface.__effectV2ConnectionHandle = createEffectRuntime().run({
     type: "connection",
-    duration: effect.id === "bullet" ? 180 : 320,
+    duration: effect.duration || (effect.id === "bullet" ? 180 : 320),
   });
   return true;
 }

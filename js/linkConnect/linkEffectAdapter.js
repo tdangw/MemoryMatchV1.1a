@@ -1,10 +1,11 @@
 import { clearConnectionV2, renderConnectionV2 } from "../effects/connectionEngine.js";
 import { clearCanvasExit, playCanvasExit } from "../effects/exitEngine.js";
+import { getEffectV2Path } from "../effects/effectCatalog.js";
 import { getActiveLinkConnectionEffect } from "./linkEffects.js";
 
 export function presentLinkConnection({ surface, points, appearance, seed }) {
   const effect = getActiveLinkConnectionEffect(appearance);
-  return renderConnectionV2({ surface, points, effect: { id: effect.pathId }, seed });
+  return renderConnectionV2({ surface, points, effect: getEffectV2Path(effect.pathId), seed });
 }
 
 export function presentLinkExit({ frame, tiles, appearance }) {
