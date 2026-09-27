@@ -13,6 +13,8 @@ import {
   createTripleRoundState,
   claimTripleLuckyRewards,
   claimTripleMilestoneTiles,
+  createTripleStateSnapshot,
+  restoreTripleStateSnapshot,
   restoreSerializedTripleRoundState,
   serializeTripleRoundState,
 } from "./tripleState.js";
@@ -36,8 +38,8 @@ import {
 } from "./tripleConfig.js";
 import { shuffleTripleBoardState } from "./tripleShuffle.js";
 import { getEquippedThemeId } from "../appearance.js";
-import { gameState, recordTripleConnectResult } from "../gameState.js";
-import { openAppModal } from "../modal.js";
+import { gameState, recordTripleConnectResult, commitThemeSelectionHistory } from "../gameState.js";
+import { openAppModal, showAppToast } from "../modal.js";
 import { unmountActiveGameShell } from "../gameShell/gameShell.js";
 import { commitTripleRewardTransaction, consumeTripleItemWithSession } from "./tripleTransactions.js";
 import { renderHudTimer } from "../gameShell/gameShellHud.js";
@@ -47,7 +49,7 @@ import { calculateTripleCoinReward } from "./tripleConfig.js";
 import { getLinkExitEffect, getLinkPathEffect } from "../linkConnect/linkEffects.js";
 import { sounds } from "../sound.js";
 import { getGameModeLabel } from "../gameCatalog.js";
-import { getTheme } from "../themeCatalog.js";
+import { getTheme, getThemeSelectionEligibility, selectThemeCards } from "../themeCatalog.js";
 import { playCoinRewardFlight } from "../coinRewards.js";
 import { resolveTripleMilestoneProgress } from "./tripleMilestones.js";
 import { showLevelRewardOverlay, showLevelSummaryOverlay } from "../ui.js";
@@ -59,6 +61,7 @@ let presenting = false;
 let currentMode = "easy";
 let currentLayout = null;
 let currentSeed = null;
+let currentAssetPathsByType = {};
 let remainingTime = 0;
 let currentLevel = 1;
 let terminalSettled = false;
@@ -69,6 +72,7 @@ let roundGeneration = 0;
 let terminalReason = null;
 let roundLuckyRewards = [];
 let roundMilestoneRewards = [];
+let roundSeedNonce = 0;
 let rebaseTripleTimer = () => {};
 let navigation = {
   showMenu: null,
@@ -115,11 +119,32 @@ export function startTripleConnectRound({
     throw new TypeError(`Unsupported Triple development mode: ${mode}`);
   const normalizedLevel = normalizeLevel(level);
   if (mode === "challenge") getTripleChallengeStage(normalizedLevel);
+  const roundSeed = seed || createRoundSeed(mode, normalizedLevel);
   const generated = generate({
-    seed: seed || createRoundSeed(mode, normalizedLevel),
+    seed: roundSeed,
     level: normalizedLevel,
   });
-  state = createTripleRoundState(generated.board);
+  const themeId = getTheme(getEquippedThemeId(gameState.appearance, "triple-connect")).id;
+  const typeIds = [...new Set(generated.board.tiles.map((tile) => tile.type))].sort();
+  const theme = getTheme(themeId);
+  const eligibility = getThemeSelectionEligibility(themeId, typeIds.length);
+  if (!eligibility.ok) {
+    showAppToast("Chủ đề này chưa sẵn sàng cho chế độ đã chọn. Hãy chọn chủ đề khác hoặc chế độ khác.");
+    return null;
+  }
+  const selectedAssets = theme.kind === "image"
+    ? selectThemeCards(themeId, typeIds.length, {
+      // Explicit seeds are fixture/development inputs and must reproduce both
+      // geometry and visual assignment regardless of prior play history.
+      history: seed === undefined ? gameState.progress.themeSelectionHistory[themeId] : [],
+      random: createSeededRandom(`${generated.seed}:assets`),
+    })
+    : [];
+  if (theme.kind === "image" && selectedAssets.length !== typeIds.length) {
+    throw new RangeError(`Chủ đề ${theme.title} không đủ ${typeIds.length} ảnh khác nhau cho mode này.`);
+  }
+  currentAssetPathsByType = Object.fromEntries(typeIds.map((type, index) => [type, selectedAssets[index]?.path]).filter(([, path]) => path));
+  state = createTripleRoundState({ ...generated.board, assetPathsByType: currentAssetPathsByType, trayCapacity: getEffectiveTripleTrayCapacity() });
   currentMode = mode;
   currentLevel = normalizedLevel;
   currentLayout = getTripleLayout(generated.layoutId);
@@ -128,7 +153,12 @@ export function startTripleConnectRound({
     mode === "endless" && Number.isInteger(elapsedTime) && elapsedTime >= 0
       ? elapsedTime
       : getTripleLevelTime(mode, normalizedLevel);
-  return mountTripleDevelopmentRound(generated, { skipIntro });
+  const mounted = mountTripleDevelopmentRound(generated, { skipIntro });
+  if (selectedAssets.length) {
+    commitThemeSelectionHistory(themeId, selectedAssets);
+    saveSession();
+  }
+  return mounted;
 }
 
 export function continueTripleConnectDevelopmentRound({ mode = "easy" } = {}) {
@@ -142,7 +172,7 @@ export function continueTripleConnectDevelopmentRound({ mode = "easy" } = {}) {
 export function continueTripleConnectSession(session) {
   if (!isValidTripleConnectSession(session)) return null;
   try {
-    state = restoreSerializedTripleRoundState(session.snapshot);
+    state = restoreSerializedTripleRoundState(session.snapshot, { trayCapacity: getEffectiveTripleTrayCapacity() });
     const layout = getTripleLayout(session.layoutId || inferLayoutId(state));
     currentMode = session.mode;
     currentLevel = normalizeLevel(session.level);
@@ -151,6 +181,7 @@ export function continueTripleConnectSession(session) {
       typeof session.seed === "string" && session.seed
         ? session.seed
         : createRoundSeed(currentMode, currentLevel);
+    currentAssetPathsByType = { ...(state.assetPathsByType || {}) };
     remainingTime = Number.isInteger(session.remainingTime)
       ? session.remainingTime
       : getTripleLevelTime(currentMode, currentLevel);
@@ -180,7 +211,7 @@ export function isValidTripleConnectSession(session) {
     }
   }
   try {
-    const roundState = restoreSerializedTripleRoundState(session.snapshot);
+    const roundState = restoreSerializedTripleRoundState(session.snapshot, { trayCapacity: getEffectiveTripleTrayCapacity() });
     if (roundState.status !== "playing") return false;
     return isCompatibleTripleSession(
       roundState,
@@ -249,6 +280,16 @@ function mountTripleDevelopmentRound(generated, { skipIntro = false } = {}) {
     });
     updateTimer(shell);
   };
+  scope.listen(document, "triple-tray-expansion-purchased", () => {
+    if (!state || state.status !== "playing") return;
+    const trayCapacity = getEffectiveTripleTrayCapacity();
+    if (state.trayCapacity === trayCapacity) return;
+    state = restoreTripleStateSnapshot({
+      ...createTripleStateSnapshot(state),
+      trayCapacity,
+    }, state.undoHistory);
+    render(state);
+  });
   render(state);
   const toolsToggle = shell.refs.root.querySelector("#triple-tools-toggle");
   const toolsMenu = shell.refs.root.querySelector("#triple-tools-menu");
@@ -486,7 +527,7 @@ function showTripleStartModal({ shell, scope, generation, render }) {
     totalPairs: Math.floor(totalTiles / 3),
     remainingTime,
     targetText: `Mục tiêu: ${Math.floor(totalTiles / 3)} bộ ba`,
-    assistText: `Khay: ${TRIPLE_PRODUCT_DECISIONS.trayCapacity} ô`,
+    assistText: `Khay: ${state.trayCapacity} ô`,
     overlayId: "triple-round-start-modal",
     scope,
     onComplete: () => {
@@ -592,18 +633,21 @@ function createSession(roundState, sessionRemainingTime) {
 
 function isCompatibleTripleSession(roundState, layout) {
   const slotsById = new Map(layout.slots.map((slot) => [slot.id, slot]));
-  const tileIdBySlot = new Map(
-    Object.values(roundState.tiles).map((tile) => [tile.slotId, tile.id]),
-  );
-  if (tileIdBySlot.size !== Object.keys(roundState.tiles).length) return false;
+  const tileIdsBySlot = new Map();
+  Object.values(roundState.tiles).forEach((tile) => {
+    const ids = tileIdsBySlot.get(tile.slotId) || [];
+    ids.push(tile.id);
+    tileIdsBySlot.set(tile.slotId, ids);
+  });
   for (const tile of Object.values(roundState.tiles)) {
     const slot = slotsById.get(tile.slotId);
-    if (!slot || slot.layer !== tile.layer) return false;
+    if (!slot && !String(tile.slotId).startsWith("corner-stack-")) return false;
+    if (slot && slot.layer !== tile.layer) return false;
   }
   const expectedBySlot = createTripleCoverGraph(layout);
   return Object.values(roundState.tiles).every((tile) => {
     const expected = (expectedBySlot[tile.slotId] || [])
-      .map((slotId) => tileIdBySlot.get(slotId))
+      .flatMap((slotId) => tileIdsBySlot.get(slotId) || [])
       .sort();
     const actual = [...roundState.coverGraph[tile.id]].sort();
     return (
@@ -873,7 +917,26 @@ function commitTripleResolutionRewards({ luckyEvent, matchEvent }) {
 }
 
 function createRoundSeed(mode, level) {
-  return `triple-${mode}-level-${level}`;
+  const entropy = globalThis.crypto?.randomUUID?.()
+    || `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+  roundSeedNonce += 1;
+  return `triple-${mode}-level-${level}-${roundSeedNonce}-${entropy}`;
+}
+
+function getEffectiveTripleTrayCapacity() {
+  const expansion = TRIPLE_PRODUCT_DECISIONS.trayExpansion;
+  return expansion.baseCapacity + (gameState.progress.tripleConnect.trayExpansionOwned ? expansion.bonusCapacity : 0);
+}
+
+function createSeededRandom(seed) {
+  let value = 2166136261;
+  for (const character of String(seed)) value = Math.imul(value ^ character.codePointAt(0), 16777619) >>> 0;
+  return () => {
+    value ^= value << 13;
+    value ^= value >>> 17;
+    value ^= value << 5;
+    return (value >>> 0) / 4294967296;
+  };
 }
 
 function getTripleModeConfigSafe(mode) {

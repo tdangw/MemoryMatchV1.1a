@@ -4,6 +4,7 @@ export const TRIPLE_RULES = Object.freeze({
   baseMatchScore: 10,
   comboScoreStep: 3,
 });
+export const TRIPLE_CORNER_STACK_CORNERS = Object.freeze(["top-left", "top-right", "bottom-left", "bottom-right"]);
 export const TRIPLE_EASY_CONFIG = Object.freeze({
   mode: "easy",
   tileCount: 27,
@@ -12,25 +13,33 @@ export const TRIPLE_EASY_CONFIG = Object.freeze({
 });
 export const TRIPLE_NORMAL_CONFIG = Object.freeze({
   mode: "normal",
-  tileCount: 45,
+  tileCount: 54,
+  baseTileCount: 45,
+  cornerStackSizes: Object.freeze([9]),
   layerCount: 4,
   timeSeconds: 133,
 });
 export const TRIPLE_HARD_CONFIG = Object.freeze({
   mode: "hard",
-  tileCount: 63,
+  tileCount: 78,
+  baseTileCount: 63,
+  cornerStackSizes: Object.freeze([7, 8]),
   layerCount: 5,
   timeSeconds: 178,
 });
 export const TRIPLE_SUPER_HARD_CONFIG = Object.freeze({
   mode: "superHard",
-  tileCount: 96,
+  tileCount: 120,
+  baseTileCount: 96,
+  cornerStackSizes: Object.freeze([6, 6, 6, 6]),
   layerCount: 6,
   timeSeconds: 262,
 });
 export const TRIPLE_ENDLESS_CONFIG = Object.freeze({
   mode: "endless",
-  tileCount: 96,
+  tileCount: 120,
+  baseTileCount: 96,
+  cornerStackSizes: Object.freeze([6, 6, 6, 6]),
   layerCount: 6,
   timeSeconds: 0,
 });
@@ -500,13 +509,13 @@ export const TRIPLE_CHALLENGE_48_LAYOUT = defineTemplate({
 });
 
 export const TRIPLE_CHALLENGE_STAGES = Object.freeze([
-  Object.freeze({ level: 1, tileCount: 18, layerCount: 2, layoutId: "easy-18-v4", timeSeconds: 75, solverBudget: Object.freeze({ maxNodes: 5000, maxMemo: 2000, deadlineMs: 20 }) }),
-  Object.freeze({ level: 2, tileCount: 24, layerCount: 2, layoutId: "challenge-24-v2", timeSeconds: 85, solverBudget: Object.freeze({ maxNodes: 8000, maxMemo: 3000, deadlineMs: 30 }) }),
-  Object.freeze({ level: 3, tileCount: 36, layerCount: 3, layoutId: "normal-36-v4", timeSeconds: 105, solverBudget: Object.freeze({ maxNodes: 15000, maxMemo: 6000, deadlineMs: 50 }) }),
-  Object.freeze({ level: 4, tileCount: 42, layerCount: 4, layoutId: "challenge-42-v1", timeSeconds: 120, solverBudget: Object.freeze({ maxNodes: 30000, maxMemo: 12000, deadlineMs: 80 }) }),
-  Object.freeze({ level: 5, tileCount: 54, layerCount: 4, layoutId: "hard-54-v4", timeSeconds: 150, solverBudget: Object.freeze({ maxNodes: 75000, maxMemo: 30000, deadlineMs: 150 }) }),
-  Object.freeze({ level: 6, tileCount: 60, layerCount: 4, layoutId: "challenge-60-v2", timeSeconds: 175, solverBudget: Object.freeze({ maxNodes: 100000, maxMemo: 40000, deadlineMs: 250 }) }),
-  Object.freeze({ level: 7, tileCount: 75, layerCount: 5, layoutId: "super-hard-75-v4", timeSeconds: 210, solverBudget: Object.freeze({ maxNodes: 150000, maxMemo: 60000, deadlineMs: 400 }) }),
+  Object.freeze({ level: 1, tileCount: 18, baseTileCount: 18, cornerStackSizes: Object.freeze([]), layerCount: 2, layoutId: "easy-18-v4", timeSeconds: 75, solverBudget: Object.freeze({ maxNodes: 5000, maxMemo: 2000, deadlineMs: 20 }) }),
+  Object.freeze({ level: 2, tileCount: 27, baseTileCount: 24, cornerStackSizes: Object.freeze([3]), layerCount: 2, layoutId: "challenge-24-v2", timeSeconds: 85, solverBudget: Object.freeze({ maxNodes: 8000, maxMemo: 3000, deadlineMs: 30 }) }),
+  Object.freeze({ level: 3, tileCount: 42, baseTileCount: 36, cornerStackSizes: Object.freeze([6]), layerCount: 3, layoutId: "normal-36-v4", timeSeconds: 105, solverBudget: Object.freeze({ maxNodes: 15000, maxMemo: 6000, deadlineMs: 50 }) }),
+  Object.freeze({ level: 4, tileCount: 51, baseTileCount: 42, cornerStackSizes: Object.freeze([4, 5]), layerCount: 4, layoutId: "challenge-42-v1", timeSeconds: 120, solverBudget: Object.freeze({ maxNodes: 30000, maxMemo: 12000, deadlineMs: 80 }) }),
+  Object.freeze({ level: 5, tileCount: 66, baseTileCount: 54, cornerStackSizes: Object.freeze([6, 6]), layerCount: 4, layoutId: "hard-54-v4", timeSeconds: 150, solverBudget: Object.freeze({ maxNodes: 75000, maxMemo: 30000, deadlineMs: 150 }) }),
+  Object.freeze({ level: 6, tileCount: 75, baseTileCount: 60, cornerStackSizes: Object.freeze([5, 5, 5]), layerCount: 4, layoutId: "challenge-60-v2", timeSeconds: 175, solverBudget: Object.freeze({ maxNodes: 100000, maxMemo: 40000, deadlineMs: 250 }) }),
+  Object.freeze({ level: 7, tileCount: 93, baseTileCount: 75, cornerStackSizes: Object.freeze([4, 4, 5, 5]), layerCount: 5, layoutId: "super-hard-75-v4", timeSeconds: 210, solverBudget: Object.freeze({ maxNodes: 150000, maxMemo: 60000, deadlineMs: 400 }) }),
 ]);
 
 export const TRIPLE_EASY_SOLVER_BUDGET = Object.freeze({
@@ -551,6 +560,7 @@ export function isTripleChallengeComplete(level) {
 }
 export const TRIPLE_PRODUCT_DECISIONS = Object.freeze({
   trayCapacity: 7,
+  trayExpansion: Object.freeze({ baseCapacity: 7, bonusCapacity: 3, experimentalPrice: 1, releasePrice: 3000 }),
   initialItems: Object.freeze({ hint: 3 }),
   itemPrices: Object.freeze({
     hint: 8,
@@ -560,29 +570,30 @@ export const TRIPLE_PRODUCT_DECISIONS = Object.freeze({
   }),
   starPointsPerTriple: Object.freeze({ one: 12, two: 18, three: 25 }),
   endlessStarPointsPerTriple: Object.freeze({ one: 10, two: 15, three: 20 }),
-  excludedItems: Object.freeze(["thunder", "freeze", "tray-expand"]),
+  excludedItems: Object.freeze(["thunder", "freeze"]),
   milestones: Object.freeze({
-    target: 45,
+    version: 2,
+    target: 30,
     step: 3,
     rewards: Object.freeze([
       Object.freeze({ coins: 2 }),
+      Object.freeze({ hint: 1 }),
+      Object.freeze({ coins: 3, hint: 1 }),
       Object.freeze({ time: 2, endlessCoins: 2 }),
-      Object.freeze({ hint: 1 }),
-      Object.freeze({ coins: 3 }),
       Object.freeze({ undo: 1 }),
-      Object.freeze({ time: 3, endlessCoins: 3 }),
-      Object.freeze({ coins: 5 }),
-      Object.freeze({ hint: 1 }),
+      Object.freeze({ coins: 5, hint: 1 }),
       Object.freeze({ shuffle: 1 }),
-      Object.freeze({ coins: 10, hint: 1 }),
-      Object.freeze({ coins: 3 }),
-      Object.freeze({ hint: 1 }),
-      Object.freeze({ coins: 5 }),
-      Object.freeze({ undo: 1 }),
-      Object.freeze({ coins: 15, hint: 1 }),
+      Object.freeze({ time: 3, hint: 1, endlessCoins: 3 }),
+      Object.freeze({ coins: 8 }),
+      Object.freeze({ coins: 25, hint: 1, undo: 1 }),
     ]),
     itemFallbackCoins: Object.freeze({ hint: 4, undo: 8, shuffle: 8 }),
   }),
+});
+
+export const TRIPLE_LEGACY_MILESTONE_CONTRACT = Object.freeze({
+  target: 45,
+  step: 3,
 });
 
 export function getTripleMilestoneReward(index, mode) {

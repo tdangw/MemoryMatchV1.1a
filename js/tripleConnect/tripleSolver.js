@@ -56,7 +56,11 @@ export function solveTripleState({ initialState, maxNodes = TRIPLE_EASY_SOLVER_B
 }
 
 export function createTripleSolverKey(state) {
-  return `${Object.keys(state.tiles).sort().map(id => `${id}:${state.tiles[id].location}`).join("|")};${state.tray.join(",")}`;
+  const stackTops = Object.entries(state.cornerStacks || {})
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([stackId, stack]) => `${stackId}:${[...stack.tileIds].reverse().find((id) => state.tiles[id].location === "board") || "-"}`)
+    .join("|");
+  return `${Object.keys(state.tiles).sort().map(id => `${id}:${state.tiles[id].location}`).join("|")};${state.tray.join(",")};${stackTops}`;
 }
 
 function orderMoves(state, preferredTileId) {

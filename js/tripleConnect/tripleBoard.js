@@ -36,6 +36,7 @@ import {
   TRIPLE_CHALLENGE_48_LAYOUT,
   getTripleChallengeStage,
   TRIPLE_LUCKY_REWARDS,
+  TRIPLE_CORNER_STACK_CORNERS,
 } from "./tripleConfig.js";
 import { reduceTripleCommand } from "./tripleRules.js";
 import { createTripleRoundState } from "./tripleState.js";
@@ -235,7 +236,13 @@ export function replayTripleWitness(board, witness) {
 function buildSolutionFirstBoard({ seed, layout, config }) {
   const random = createSeededRng(seed);
   const coverGraphBySlot = createTripleCoverGraph(layout);
-  const witnessSlots = createWitnessSlots(layout, random);
+  const pilePlan = createPilePlan(layout, config, random);
+  const witnessSlots = [
+    ...createWitnessSlots(layout, random),
+    ...pilePlan.stackSlots.flatMap((slot) => Array.from({ length: slot.depth }, () => slot)),
+  ];
+  if (witnessSlots.length !== config.tileCount || config.tileCount % 3 !== 0)
+    throw new TypeError("Triple pile configuration does not match its tile count.");
   const typeOrder = shuffle(
     Array.from(
       { length: config.tileCount / 3 },
@@ -243,38 +250,74 @@ function buildSolutionFirstBoard({ seed, layout, config }) {
     ),
     random,
   );
-  const tilesBySlot = new Map();
+  const tiles = [];
+  const tileIdsBySlot = new Map();
   witnessSlots.forEach((slot, index) => {
     const type = typeOrder[Math.floor(index / 3)];
-    tilesBySlot.set(slot.id, {
-      id: `tile-${slot.id}`,
+    const tile = {
+      id: (pilePlan.depthBySlot.get(slot.id) || 1) > 1
+        ? `tile-${slot.id}-${index + 1}`
+        : `tile-${slot.id}`,
       type,
       slotId: slot.id,
       layer: slot.layer,
-    });
+    };
+    tiles.push(tile);
+    const tileIdsAtSlot = tileIdsBySlot.get(slot.id) || [];
+    tileIdsAtSlot.push(tile.id);
+    tileIdsBySlot.set(slot.id, tileIdsAtSlot);
   });
-  const tiles = layout.slots.map((slot) => tilesBySlot.get(slot.id));
-  const tileIdBySlot = Object.fromEntries(
-    tiles.map((tile) => [tile.slotId, tile.id]),
+  const cornerStacks = Object.fromEntries(
+    [...pilePlan.depthBySlot.entries()]
+      .filter(([, depth]) => depth > 1)
+      .map(([slotId]) => [`stack-${slotId}`, Object.freeze({
+        anchorSlotId: slotId,
+        // Witness visits a pile from top to bottom; stored state is bottom to top.
+        tileIds: Object.freeze([...tileIdsBySlot.get(slotId)].reverse()),
+      })]),
   );
   const coverGraph = Object.fromEntries(
-    Object.entries(coverGraphBySlot).map(([slotId, blockers]) => [
-      tileIdBySlot[slotId],
-      blockers.map((blockerId) => tileIdBySlot[blockerId]),
+    tiles.map((tile) => [
+      tile.id,
+      (coverGraphBySlot[tile.slotId] || []).flatMap((blockerSlotId) => tileIdsBySlot.get(blockerSlotId)),
     ]),
   );
-  const witness = witnessSlots.map((slot) =>
-    Object.freeze({ type: "select-tile", tileId: tileIdBySlot[slot.id] }),
+  const witness = tiles.map((tile) =>
+    Object.freeze({ type: "select-tile", tileId: tile.id }),
   );
   const board = Object.freeze({
     roundId: 1,
     tiles: Object.freeze(tiles),
     coverGraph: Object.freeze(coverGraph),
+    cornerStacks: Object.freeze(cornerStacks),
   });
   const replay = replayTripleWitness(board, witness);
   if (!replay.ok)
     throw new Error(`Solution-first witness is invalid: ${replay.reason}`);
   return Object.freeze({ seed, layoutId: layout.id, board, witness });
+}
+
+function createPilePlan(layout, config, random) {
+  // Transitional normalization keeps the solution-first contract valid while
+  // corner-anchor topology is materialized below.
+  if (Array.isArray(config.cornerStackSizes)) {
+    const stackSlots = config.cornerStackSizes.map((depth, index) => ({
+      id: `corner-stack-${TRIPLE_CORNER_STACK_CORNERS[index]}`,
+      layer: 0,
+      corner: TRIPLE_CORNER_STACK_CORNERS[index],
+      depth,
+    }));
+    return { depthBySlot: new Map(stackSlots.map((slot) => [slot.id, slot.depth])), stackSlots };
+  }
+  const requested = config.pilePlan || {};
+  const depth2 = Number(requested.depth2 || 0);
+  const depth3 = Number(requested.depth3 || 0);
+  if (![depth2, depth3].every((value) => Number.isInteger(value) && value >= 0)
+    || depth2 + depth3 > layout.slots.length) throw new TypeError("Triple pile plan is invalid.");
+  const selectedSlots = shuffle(layout.slots, random).slice(0, depth2 + depth3);
+  const depthBySlot = new Map();
+  selectedSlots.forEach((slot, index) => depthBySlot.set(slot.id, index < depth3 ? 3 : 2));
+  return { depthBySlot, stackSlots: [] };
 }
 
 function createWitnessSlots(layout, random) {

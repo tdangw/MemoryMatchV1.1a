@@ -68,7 +68,7 @@ function selectTile(state, tileId) {
   if (countTilesAt(tiles, "board") === 0 && tray.length === 0) {
     status = "won";
     events.push({ type: "round-won" });
-  } else if (tray.length === TRIPLE_RULES.trayCapacity || countTilesAt(tiles, "board") === 0) {
+  } else if (tray.length === state.trayCapacity || countTilesAt(tiles, "board") === 0) {
     status = "lost";
     events.push({ type: "round-lost" });
   }
@@ -134,6 +134,9 @@ function freezeNextState(previous, changes) {
     tiles: changes.tiles,
     layers: previous.layers,
     coverGraph: previous.coverGraph,
+    cornerStacks: previous.cornerStacks,
+    assetPathsByType: previous.assetPathsByType,
+    trayCapacity: previous.trayCapacity,
     tray: changes.tray,
     streakType: changes.streakType,
     streakCount: changes.streakCount,

@@ -97,6 +97,7 @@ function createMatchTrayPreview(previous, next, match) {
   if (!insertedMatch) tray.push(...match.tileIds);
   return {
     ...next,
+    presentationPreview: true,
     status: "playing",
     tiles,
     tray,

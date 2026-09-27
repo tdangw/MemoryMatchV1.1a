@@ -79,6 +79,9 @@ export function stageActiveSession(gameId, session) {
     ...(Number.isFinite(session.hints)
       ? { hints: Math.max(0, Math.floor(session.hints)) }
       : {}),
+    ...(Array.isArray(session.assetPaths)
+      ? { assetPaths: [...new Set(session.assetPaths.filter((path) => typeof path === "string" && path))] }
+      : {}),
   };
   return true;
 }

@@ -5,6 +5,9 @@ import { GAMEPLAY_LIMITS } from "./gameplayTuning.js";
 import { GAME_MODES } from "./gameCatalog.js";
 import { restoreSerializedTripleRoundState, serializeTripleRoundState } from "./tripleConnect/tripleState.js";
 import { TRIPLE_PRODUCT_DECISIONS } from "./tripleConnect/tripleConfig.js";
+import { normalizeTripleMilestones } from "./tripleConnect/tripleMilestones.js";
+import { THEME_ASSET_MANIFEST } from "./generated/themeAssetManifest.js";
+import { appendThemeSelectionHistory, normalizeThemeSelectionHistory } from "./themeSelection.js";
 
 const GAME_MODE_IDS = new Set(GAME_MODES.map(({ id }) => id));
 
@@ -35,6 +38,7 @@ export const gameState = {
   levelStartTime: remainingTime,
   coins: 0,
   progress: {
+    themeSelectionHistory: {},
     memoryMatch: {
       totalStars: 0,
       totalScore: 0,
@@ -52,8 +56,9 @@ export const gameState = {
       totalScore: 0,
       bestByLevel: {},
       items: { hint: TRIPLE_PRODUCT_DECISIONS.initialItems.hint, time: 0, undo: 0, shuffle: 0 },
+      trayExpansionOwned: false,
       sessionsByMode: {},
-      milestones: { progress: 0, cycleId: 0, claimedIds: [] },
+      milestones: { version: TRIPLE_PRODUCT_DECISIONS.milestones.version, progress: 0, cycleId: 0, claimedIds: [] },
     },
   },
   appearance: normalizeAppearance(),
@@ -81,6 +86,10 @@ export function hydrateGameState({
 } = {}) {
   gameState.coins = Number.isFinite(coins) ? Math.max(0, Math.floor(coins)) : 0;
   const memoryMatch = progress?.memoryMatch || {};
+  gameState.progress.themeSelectionHistory = normalizeThemeSelectionHistory(
+    progress?.themeSelectionHistory,
+    THEME_ASSET_MANIFEST,
+  );
   const memorySessions = normalizeSessions(memoryMatch.sessionsByMode, memoryMatch.activeSession);
   const legacyHints = Object.values(memorySessions).flatMap(session => Number.isFinite(session.hints) ? [session.hints] : []);
   // An explicit inventory count (including zero) is the migration marker.
@@ -110,16 +119,32 @@ export function hydrateGameState({
     sessionsByMode: normalizeSessions(linkConnect.sessionsByMode, linkConnect.activeSession),
   };
   const tripleConnect = progress?.tripleConnect || {};
+  const trayExpansionOwned = tripleConnect.trayExpansionOwned === true;
   gameState.progress.tripleConnect = {
     totalStars: normalizeNonNegativeInteger(tripleConnect.totalStars),
     totalScore: normalizeNonNegativeInteger(tripleConnect.totalScore),
     bestByLevel: normalizeBestByLevel(tripleConnect.bestByLevel),
     items: normalizeTripleItems(tripleConnect.items),
-    sessionsByMode: normalizeTripleSessions(tripleConnect.sessionsByMode),
+    trayExpansionOwned,
+    sessionsByMode: normalizeTripleSessions(
+      tripleConnect.sessionsByMode,
+      trayExpansionOwned
+        ? TRIPLE_PRODUCT_DECISIONS.trayExpansion.baseCapacity + TRIPLE_PRODUCT_DECISIONS.trayExpansion.bonusCapacity
+        : TRIPLE_PRODUCT_DECISIONS.trayExpansion.baseCapacity,
+    ),
     milestones: normalizeTripleMilestones(tripleConnect.milestones),
   };
   gameState.settings = normalizeSettings(settings, gameState.settings);
   gameState.appearance = normalizeAppearance(appearance);
+}
+
+export function commitThemeSelectionHistory(themeId, assets) {
+  gameState.progress.themeSelectionHistory = appendThemeSelectionHistory(
+    gameState.progress.themeSelectionHistory,
+    themeId,
+    assets,
+  );
+  return gameState.progress.themeSelectionHistory;
 }
 
 function normalizeMemoryItems(items = {}) {
@@ -158,6 +183,9 @@ function normalizeActiveSession(session) {
       : {}),
     ...(Number.isFinite(session.hints)
       ? { hints: Math.min(GAMEPLAY_LIMITS.itemCount, Math.max(0, Math.floor(session.hints))) }
+      : {}),
+    ...(Array.isArray(session.assetPaths)
+      ? { assetPaths: normalizeAssetPaths(session.assetPaths) }
       : {}),
   };
 }
@@ -199,19 +227,6 @@ function normalizeSettings(value, fallback) {
   };
 }
 
-function normalizeTripleMilestones(value = {}) {
-  const source = value && typeof value === "object" && !Array.isArray(value) ? value : {};
-  return {
-    // A completed cycle is committed immediately with progress reset to zero.
-    // Normalize malformed legacy values the same way so a save cannot get stuck at 30.
-    progress: normalizeNonNegativeInteger(source.progress) % 30,
-    cycleId: normalizeNonNegativeInteger(source.cycleId),
-    claimedIds: Array.isArray(source.claimedIds)
-      ? [...new Set(source.claimedIds.filter((id) => typeof id === "string" && id))]
-      : [],
-  };
-}
-
 function normalizeTripleItems(items = {}) {
   const source = items && typeof items === "object" ? items : {};
   return {
@@ -224,17 +239,18 @@ function normalizeTripleItems(items = {}) {
   };
 }
 
-function normalizeTripleSessions(sessions) {
+function normalizeTripleSessions(sessions, trayCapacity = TRIPLE_PRODUCT_DECISIONS.trayExpansion.baseCapacity) {
   const source = sessions && typeof sessions === "object" ? sessions : {};
   return Object.fromEntries(Object.entries(source).flatMap(([mode, session]) => {
     if (!GAME_MODE_IDS.has(mode) || !session || typeof session !== "object") return [];
     try {
-      const restored = restoreSerializedTripleRoundState(session.snapshot);
+      const restored = restoreSerializedTripleRoundState(session.snapshot, { trayCapacity });
       if (restored.status !== "playing") return [];
       const snapshot = serializeTripleRoundState(restored);
       return [[mode, {
         mode,
         level: Math.max(1, normalizeNonNegativeInteger(session.level) || 1),
+        ...(typeof session.seed === "string" && session.seed ? { seed: session.seed } : {}),
         ...(typeof session.layoutId === "string" ? { layoutId: session.layoutId } : {}),
         ...(Number.isFinite(session.remainingTime) ? { remainingTime: Math.max(0, Math.floor(session.remainingTime)) } : {}),
         snapshot,
@@ -246,6 +262,10 @@ function normalizeTripleSessions(sessions) {
 function normalizeNonNegativeInteger(value) {
   const number = Number(value);
   return Number.isFinite(number) ? Math.max(0, Math.floor(number)) : 0;
+}
+
+function normalizeAssetPaths(value) {
+  return [...new Set(value.filter((path) => typeof path === "string" && path))];
 }
 
 function normalizeRange(value, fallback, minimum, maximum) {

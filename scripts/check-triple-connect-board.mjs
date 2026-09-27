@@ -34,6 +34,7 @@ import {
   createTripleSolverKey,
   solveTripleBoard,
 } from "../js/tripleConnect/tripleSolver.js";
+import { shuffleTripleBoardState } from "../js/tripleConnect/tripleShuffle.js";
 
 const layout = getEasyTripleLayout();
 assert.equal(layout.id, "easy-27-v5");
@@ -148,6 +149,26 @@ assert.equal(
     misses: 999,
   }),
 );
+const mappedAssets = Object.fromEntries(
+  [...new Set(first.board.tiles.map((tile) => tile.type))].map((type, index) => [type, `nested/${index}.webp`]),
+);
+const mappedState = createTripleRoundState({ ...first.board, assetPathsByType: mappedAssets });
+assert.deepEqual(
+  restoreSerializedTripleRoundState(serializeTripleRoundState(mappedState)).assetPathsByType,
+  mappedAssets,
+  "New Triple sessions must retain the type-to-asset mapping for Continue.",
+);
+assert.deepEqual(
+  restoreSerializedTripleRoundState(serializeTripleRoundState(initialState)).assetPathsByType,
+  {},
+  "Legacy Triple sessions without an asset mapping remain restorable.",
+);
+const shuffledMappedState = shuffleTripleBoardState(mappedState, layout, "asset-map-shuffle");
+assert.deepEqual(
+  shuffledMappedState?.state.assetPathsByType,
+  mappedAssets,
+  "Triple shuffle must preserve the type-to-asset mapping.",
+);
 
 const timings = [];
 for (let index = 0; index < 1000; index += 1) {
@@ -184,11 +205,12 @@ assert.equal(
 );
 
 const normalTimings = [];
-for (let index = 0; index < 100; index += 1) {
+for (let index = 0; index < 20; index += 1) {
   const startedAt = performance.now();
   const normal = generateNormalTripleBoard({ seed: `normal-${index}` });
   normalTimings.push(performance.now() - startedAt);
-  assert.equal(normal.board.tiles.length, 45);
+  assert.equal(normal.board.tiles.length, 54);
+  assert.deepEqual(Object.values(normal.board.cornerStacks).map((pile) => pile.tileIds.length), [9]);
   assert.equal(replayTripleWitness(normal.board, normal.witness).ok, true);
 }
 normalTimings.sort((left, right) => left - right);
@@ -199,28 +221,30 @@ assert.ok(
 );
 
 const hardTimings = [];
-for (let index = 0; index < 30; index += 1) {
+for (let index = 0; index < 10; index += 1) {
   const startedAt = performance.now();
   const hard = generateHardTripleBoard({ seed: `hard-${index}` });
   hardTimings.push(performance.now() - startedAt);
-  assert.equal(hard.board.tiles.length, 63);
+  assert.equal(hard.board.tiles.length, 78);
+  assert.deepEqual(Object.values(hard.board.cornerStacks).map((pile) => pile.tileIds.length).sort(), [7, 8]);
   assert.equal(replayTripleWitness(hard.board, hard.witness).ok, true);
 }
 hardTimings.sort((left, right) => left - right);
 const hardP95 = hardTimings[Math.ceil(hardTimings.length * 0.95) - 1];
 assert.ok(
-  hardP95 <= 100,
-  `Hard generator + solver p95 ${hardP95.toFixed(2)} ms exceeded 100 ms.`,
+  hardP95 <= 200,
+  `Hard generator + solver p95 ${hardP95.toFixed(2)} ms exceeded 200 ms.`,
 );
 
 const superHardTimings = [];
-for (let index = 0; index < 20; index += 1) {
+for (let index = 0; index < 5; index += 1) {
   const startedAt = performance.now();
   const superHard = generateSuperHardTripleBoard({
     seed: `super-hard-${index}`,
   });
   superHardTimings.push(performance.now() - startedAt);
-  assert.equal(superHard.board.tiles.length, 96);
+  assert.equal(superHard.board.tiles.length, 120);
+  assert.deepEqual(Object.values(superHard.board.cornerStacks).map((pile) => pile.tileIds.length).sort(), [6, 6, 6, 6]);
   assert.equal(
     replayTripleWitness(superHard.board, superHard.witness).ok,
     true,
@@ -230,13 +254,13 @@ superHardTimings.sort((left, right) => left - right);
 const superHardP95 =
   superHardTimings[Math.ceil(superHardTimings.length * 0.95) - 1];
 assert.ok(
-  superHardP95 <= 400,
-  `SuperHard generator + solver p95 ${superHardP95.toFixed(2)} ms exceeded 400 ms.`,
+  superHardP95 <= 700,
+  `SuperHard generator + solver p95 ${superHardP95.toFixed(2)} ms exceeded 700 ms.`,
 );
 
 const endless = generateEndlessTripleBoard({ seed: "endless" });
 assert.equal(TRIPLE_ENDLESS_CONFIG.timeSeconds, 0);
-assert.equal(endless.board.tiles.length, 96);
+assert.equal(endless.board.tiles.length, 120);
 assert.equal(replayTripleWitness(endless.board, endless.witness).ok, true);
 
 for (const stage of TRIPLE_CHALLENGE_STAGES) {

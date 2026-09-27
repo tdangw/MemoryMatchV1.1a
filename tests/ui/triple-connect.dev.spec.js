@@ -19,16 +19,33 @@ for (const viewport of [{ width: 360, height: 640 }, { width: 411, height: 914 }
   });
 }
 
-for (const [mode, tileCount] of [["normal", 45], ["hard", 63], ["superHard", 96], ["endless", 96]]) {
+for (const [mode, visibleTileCount, totalTileCount] of [["normal", 46, 54], ["hard", 65, 78], ["superHard", 100, 120], ["endless", 100, 120]]) {
   test(`Triple ${mode} development round uses its own board layout`, async ({ page }) => {
     await page.goto("/");
-    await page.evaluate(async ({ selectedMode }) => {
+    const state = await page.evaluate(async ({ selectedMode }) => {
       const controller = await import("/js/tripleConnect/tripleController.js");
-      controller.startTripleConnectDevelopmentRound({ mode: selectedMode, seed: `layout-${selectedMode}` });
+      return controller.startTripleConnectDevelopmentRound({ mode: selectedMode, seed: `layout-${selectedMode}` }).getState();
     }, { selectedMode: mode });
-    await expect(page.locator(".triple-connect__board .triple-connect__tile")).toHaveCount(tileCount);
+    await expect(page.locator(".triple-connect__board .triple-connect__tile")).toHaveCount(visibleTileCount);
+    expect(Object.keys(state.tiles)).toHaveLength(totalTileCount);
   });
 }
+
+test("Triple hidden pile keeps hidden identities out of DOM and reveals its next card", async ({ page }) => {
+  await page.goto("/");
+  const pile = await page.evaluate(async () => {
+    const { startTripleConnectDevelopmentRound } = await import("/js/tripleConnect/tripleController.js");
+    const { getExposedTileIds } = await import("/js/tripleConnect/tripleState.js");
+    const run = startTripleConnectDevelopmentRound({ mode: "normal", seed: "hidden-pile" });
+    const exposed = new Set(getExposedTileIds(run.getState()));
+    const entry = Object.entries(run.getState().cornerStacks).find(([, value]) => exposed.has(value.tileIds.at(-1)));
+    return { pileId: entry[0], hiddenId: entry[1].tileIds[0], nextId: entry[1].tileIds.at(-2), topId: entry[1].tileIds.at(-1), total: Object.keys(run.getState().tiles).length };
+  });
+  expect(pile.total).toBe(54);
+  await expect(page.locator(`[data-tile-id="${pile.hiddenId}"]`)).toHaveCount(0);
+  await page.locator(`[data-tile-id="${pile.topId}"]`).click();
+  await expect(page.locator(`[data-tile-id="${pile.nextId}"]`)).toHaveCount(1);
+});
 
 test("Triple Hint consumes one persisted hint only after identifying playable tiles", async ({ page }) => {
   await page.goto("/");

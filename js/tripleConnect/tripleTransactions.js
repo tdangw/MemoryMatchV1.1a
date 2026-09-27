@@ -70,6 +70,21 @@ export function purchaseTripleItem(itemId) {
   return true;
 }
 
+export function purchaseTripleTrayExpansion() {
+  const profile = gameState.progress.tripleConnect;
+  const price = TRIPLE_PRODUCT_DECISIONS.trayExpansion.releasePrice;
+  if (profile.trayExpansionOwned || gameState.coins < price) return false;
+  const rollback = createRollbackPoint();
+  gameState.coins -= price;
+  profile.trayExpansionOwned = true;
+  if (!savePersistentGameData({ coins: gameState.coins, progress: gameState.progress })) {
+    restoreRollbackPoint(rollback);
+    return false;
+  }
+  globalThis.document?.dispatchEvent(new CustomEvent("triple-tray-expansion-purchased"));
+  return true;
+}
+
 export function purchaseTripleTheme(themeId, price) {
   const theme = THEMES.find((candidate) => candidate.id === themeId);
   if (!theme || theme.price !== price) return false;
@@ -129,6 +144,7 @@ function createRollbackPoint() {
     items: { ...gameState.progress.tripleConnect.items },
     sessionsByMode: { ...gameState.progress.tripleConnect.sessionsByMode },
     milestones: structuredClone(gameState.progress.tripleConnect.milestones),
+    trayExpansionOwned: gameState.progress.tripleConnect.trayExpansionOwned,
     appearance: structuredClone(gameState.appearance),
   };
 }
@@ -138,5 +154,6 @@ function restoreRollbackPoint(rollback) {
   gameState.progress.tripleConnect.items = rollback.items;
   gameState.progress.tripleConnect.sessionsByMode = rollback.sessionsByMode;
   gameState.progress.tripleConnect.milestones = rollback.milestones;
+  gameState.progress.tripleConnect.trayExpansionOwned = rollback.trayExpansionOwned;
   gameState.appearance = rollback.appearance;
 }

@@ -331,6 +331,27 @@
   pointer-events: none;
   text-shadow: 0 1px 2px rgb(0 0 0 / 65%);
 }
+
+.triple-connect__board .triple-connect__tile.is-corner-stack::before {
+  content: none;
+}
+
+.triple-connect__board .triple-connect__tile.is-corner-stack {
+  box-shadow: -3px 3px 0 #173653, -6px 6px 0 #12304b, -9px 9px 0 #0e2a43;
+}
+
+.triple-connect__board .triple-connect__tile.is-corner-stack-revealed {
+  animation: triple-pile-reveal 150ms ease-out both;
+}
+
+@keyframes triple-pile-reveal {
+  from { opacity: 0; transform: translateY(5%) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .triple-connect__board .triple-connect__tile.is-corner-stack-revealed { animation: none; }
+}
 .triple-connect__tray {
   width: 100%;
   box-sizing: border-box;
@@ -343,6 +364,10 @@
   border-radius: 13px;
   background: rgb(4 20 44 / 68%);
   overflow: hidden;
+}
+.triple-connect__tray[data-triple-tray-capacity="10"] { grid-template-columns: repeat(10, minmax(0, 1fr)); }
+@media (max-width: 520px) and (orientation: portrait) {
+  .triple-connect__tray[data-triple-tray-capacity="10"] { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 }
 .triple-connect__tray-slot {
   min-width: 0;

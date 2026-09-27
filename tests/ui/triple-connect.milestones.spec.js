@@ -6,7 +6,7 @@ async function startRound(page, seed) {
     const { gameState } = await import("/js/gameState.js");
     const { startTripleConnectRound } = await import("/js/tripleConnect/tripleController.js");
     gameState.coins = 0;
-    gameState.progress.tripleConnect.milestones = { progress: 0, cycleId: 0, claimedIds: [] };
+    gameState.progress.tripleConnect.milestones = { version: 2, progress: 0, cycleId: 0, claimedIds: [] };
     window.__tripleMilestoneRun = startTripleConnectRound({ mode: "easy", seed: roundSeed, skipIntro: true });
   }, { roundSeed: seed });
 }
@@ -27,7 +27,7 @@ test("Triple milestone HUD has the shared accessible track in every viewport", a
     await expect(region).toBeHidden();
   } else {
     await expect(region).toBeVisible();
-    await expect(region.locator("[data-triple-milestone]")).toHaveCount(15);
+    await expect(region.locator("[data-triple-milestone]")).toHaveCount(10);
     await expect(region.locator('[data-triple-milestone="1"]')).toHaveAttribute("aria-label", /Mốc 1: Mốc 3/);
     const bounds = await region.boundingBox();
     const viewport = page.viewportSize();
@@ -51,7 +51,7 @@ test("Triple commits the third resolved set as one durable milestone transaction
     };
   });
   expect(committed.coins).toBe(2);
-  expect(committed.milestones).toEqual({ progress: 3, cycleId: 0, claimedIds: ["0:1"] });
+  expect(committed.milestones).toEqual({ version: 2, progress: 3, cycleId: 0, claimedIds: ["0:1"] });
   expect(committed.ledger).toHaveLength(9);
   expect(committed.saved.snapshot.milestoneTileIds).toEqual(committed.ledger);
   await page.reload();
@@ -70,7 +70,7 @@ test("Triple milestone coins fly to the milestone coin HUD, not the global count
   await startRound(page, "milestone-coin-target");
   await page.evaluate(async () => {
     const { gameState } = await import("/js/gameState.js");
-    gameState.progress.tripleConnect.milestones = { progress: 2, cycleId: 0, claimedIds: [] };
+    gameState.progress.tripleConnect.milestones = { version: 2, progress: 2, cycleId: 0, claimedIds: [] };
   });
   await resolveWitnessCommands(page, 3);
   await expect(page.locator(".game-coin-reward-flight").first()).toBeVisible();
@@ -148,7 +148,7 @@ test("Triple converts full milestone item inventory with the approved fallback v
     gameState.progress.tripleConnect.items = { hint: GAMEPLAY_LIMITS.itemCount, time: 0, undo: GAMEPLAY_LIMITS.itemCount, shuffle: GAMEPLAY_LIMITS.itemCount };
     const grants = commitTripleRewardTransaction({
       session: getActiveSession("triple-connect", "easy"),
-      milestones: { progress: 9, cycleId: 0, claimedIds: ["0:1", "0:2", "0:3"] },
+      milestones: { version: 2, progress: 9, cycleId: 0, claimedIds: ["0:1", "0:2", "0:3"] },
       rewards: [
         { type: "hint", amount: 1, source: "milestone" },
         { type: "undo", amount: 1, source: "milestone" },
@@ -159,7 +159,7 @@ test("Triple converts full milestone item inventory with the approved fallback v
   });
   expect(result.coins).toBe(20);
   expect(result.items).toEqual({ hint: 999, time: 0, undo: 999, shuffle: 999 });
-  expect(result.milestones).toEqual({ progress: 9, cycleId: 0, claimedIds: ["0:1", "0:2", "0:3"] });
+  expect(result.milestones).toEqual({ version: 2, progress: 9, cycleId: 0, claimedIds: ["0:1", "0:2", "0:3"] });
   expect(result.grants).toEqual([
     { type: "coins", amount: 4, source: "milestone" },
     { type: "coins", amount: 8, source: "milestone" },

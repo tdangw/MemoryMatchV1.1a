@@ -1,5 +1,6 @@
 import { getTheme } from "../themeCatalog.js";
 import { connectGameShellLayout } from "../gameShell/gameShellLayout.js";
+import { getExposedTileIds, getTriplePileDepth, getTripleVisibleTileIds } from "./tripleState.js";
 
 const LEGACY_GRID_UNITS = 100;
 const TRAY_LOGICAL_ROWS = 3;
@@ -9,7 +10,7 @@ export function createTripleRenderer(shell) {
   const board = root.querySelector(".triple-connect__board");
   const tray = root.querySelector(".triple-connect__tray");
   const nodes = new Map();
-  const traySlots = Array.from({ length: 7 }, (_, index) => {
+  const traySlots = Array.from({ length: 10 }, (_, index) => {
     const slot = document.createElement("div");
     slot.className = "triple-connect__tray-slot";
     slot.dataset.tripleTraySlot = String(index);
@@ -20,13 +21,18 @@ export function createTripleRenderer(shell) {
   let activeLayout = null;
 
   function render(state, layout, themeId = "default") {
+    tray.dataset.tripleTrayCapacity = String(state.trayCapacity);
+    tray.setAttribute("aria-label", `Khay ${state.trayCapacity} ô`);
+    traySlots.forEach((slot, index) => { slot.hidden = index >= state.trayCapacity; });
     activeLayout = layout;
     const geometry = getLayoutGeometry(layout);
     const slots = new Map(layout.slots.map((slot) => [slot.id, slot]));
     const coverDepths = getCoverDepths(state);
+    const exposedTileIds = new Set(getExposedTileIds(state));
+    const visibleTileIds = new Set(getTripleVisibleTileIds(state));
     const live = new Set();
     for (const tile of Object.values(state.tiles)) {
-      if (tile.location === "removed") continue;
+      if (!visibleTileIds.has(tile.id)) continue;
       live.add(tile.id);
       let node = nodes.get(tile.id);
       if (!node) {
@@ -38,15 +44,19 @@ export function createTripleRenderer(shell) {
         image.alt = "";
         image.draggable = false;
         node.append(image);
+        if (tile.location === "board" && getTriplePileDepth(state, tile.id) > 1)
+          node.classList.add("is-corner-stack-revealed");
         nodes.set(tile.id, node);
       }
       const image = node.firstElementChild;
-      if (image && image.dataset.themeId !== themeId) {
-        image.dataset.themeId = themeId;
-        setTileImageSource(image, tile.type, themeId);
+      const assetPath = state.assetPathsByType?.[tile.type] || "";
+      const imageKey = `${themeId}:${assetPath}`;
+      if (image && image.dataset.themeId !== imageKey) {
+        image.dataset.themeId = imageKey;
+        setTileImageSource(image, tile.type, themeId, assetPath);
       }
       const coverDepth = tile.location === "board" ? coverDepths.get(tile.id) || 0 : 0;
-      const exposed = tile.location === "board" && coverDepth === 0;
+      const exposed = tile.location === "board" && exposedTileIds.has(tile.id);
       const disabled = !exposed;
       if (node.disabled !== disabled) node.disabled = disabled;
       const ariaDisabled = String(disabled);
@@ -64,6 +74,8 @@ export function createTripleRenderer(shell) {
       if (node.classList.contains("is-exposed") !== exposed)
         node.classList.toggle("is-exposed", exposed);
       node.dataset.tripleCoverDepth = String(Math.min(4, coverDepth));
+      const pileDepth = tile.location === "board" ? getTriplePileDepth(state, tile.id) : 1;
+      node.classList.toggle("is-corner-stack", pileDepth > 1);
       if (tile.location === "tray") {
         const trayIndex = state.tray.indexOf(tile.id);
         const traySlot = traySlots[trayIndex];
@@ -71,7 +83,7 @@ export function createTripleRenderer(shell) {
         if (node.parentElement !== traySlot) traySlot.append(node);
       }
       else {
-        const slot = slots.get(tile.slotId);
+        const slot = slots.get(tile.slotId) || getCornerStackSlot(tile.slotId, geometry);
         if (!slot)
           throw new Error(`Missing Triple layout slot: ${tile.slotId}`);
         const geometryKey = `${layout.id}:${tile.slotId}`;
@@ -151,6 +163,14 @@ export function createTripleRenderer(shell) {
   return { render, mountLayout, nodes, traySlots };
 }
 
+function getCornerStackSlot(slotId, geometry) {
+  const corner = String(slotId).replace("corner-stack-", "");
+  if (!/[a-z-]+/.test(corner)) return null;
+  const x = corner.endsWith("right") ? geometry.gridWidth - geometry.tileWidth : 0;
+  const y = corner.startsWith("bottom") ? geometry.gridHeight - geometry.tileHeight : 0;
+  return { x, y, layer: 0 };
+}
+
 function getCoverDepths(state) {
   const depths = new Map();
   const visiting = new Set();
@@ -190,25 +210,24 @@ function getLayoutGeometry(layout) {
   };
 }
 
-function getTileImageSource(type, themeId) {
+function getTileImageSource(type, themeId, assetPath = "") {
   const theme = getTheme(themeId);
   const asset =
     theme.kind === "image"
-      ? theme.assets[
-          Math.max(0, Number(type.match(/\d+$/)?.[0] || 1) - 1) %
-            theme.assets.length
-        ]
+      ? assetPath
+        ? theme.assets.find((candidate) => candidate.path === assetPath)
+        : theme.assets[Math.max(0, Number(type.match(/\d+$/)?.[0] || 1) - 1) % theme.assets.length]
       : null;
   return asset
     ? `${import.meta.env.BASE_URL}assets/images/themes/${theme.assetFolder}/${asset.path}`
     : createTileFallback(type);
 }
-function setTileImageSource(image, type, themeId) {
+function setTileImageSource(image, type, themeId, assetPath) {
   image.onerror = () => {
     image.onerror = null;
     image.src = createTileFallback(type);
   };
-  image.src = getTileImageSource(type, themeId);
+  image.src = getTileImageSource(type, themeId, assetPath);
 }
 function createTileFallback(type) {
   const label = String(type).match(/\d+$/)?.[0] || "?";

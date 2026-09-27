@@ -6,7 +6,7 @@ import { claimTripleMilestoneTiles, createTripleRoundState, getExposedTileIds, r
 import { gameState, hydrateGameState } from "../js/gameState.js";
 import { getTripleHintTileIds } from "../js/tripleConnect/tripleHint.js";
 import { consumeTripleItem, getTripleItemCount } from "../js/tripleConnect/tripleItems.js";
-import { resolveTripleMilestoneProgress } from "../js/tripleConnect/tripleMilestones.js";
+import { normalizeTripleMilestones, resolveTripleMilestoneProgress } from "../js/tripleConnect/tripleMilestones.js";
 
 function makeState(typeCounts, coverGraph = {}) {
   const tiles = [];
@@ -41,26 +41,37 @@ assert.equal(calculateTripleCoinReward({ mode: "challenge", matchedTriples: 3, s
 assert.equal(calculateTripleCoinReward({ mode: "endless", matchedTriples: 25, stars: 1, maxCombo: 5 }), 25);
 assert.deepEqual(TRIPLE_PRODUCT_DECISIONS.initialItems, { hint: 3 });
 assert.deepEqual(TRIPLE_PRODUCT_DECISIONS.itemPrices, { hint: 8, timePerSecond: 2, undo: 15, shuffle: 15 });
-assert.equal(TRIPLE_PRODUCT_DECISIONS.excludedItems.includes("tray-expand"), true);
-let milestone = { progress: 0, cycleId: 0, claimedIds: [] };
+assert.equal(TRIPLE_PRODUCT_DECISIONS.trayExpansion.releasePrice, 3000);
+assert.deepEqual(TRIPLE_PRODUCT_DECISIONS.trayExpansion, { baseCapacity: 7, bonusCapacity: 3, experimentalPrice: 1, releasePrice: 3000 });
+assert.deepEqual(TRIPLE_PRODUCT_DECISIONS.milestones.rewards, [
+  { coins: 2 }, { hint: 1 }, { coins: 3, hint: 1 }, { time: 2, endlessCoins: 2 }, { undo: 1 },
+  { coins: 5, hint: 1 }, { shuffle: 1 }, { time: 3, hint: 1, endlessCoins: 3 }, { coins: 8 }, { coins: 25, hint: 1, undo: 1 },
+]);
+let milestone = { version: 2, progress: 0, cycleId: 0, claimedIds: [] };
 for (let index = 0; index < 3; index += 1) milestone = resolveTripleMilestoneProgress({ milestones: milestone, tileIds: [`m-${index}`], mode: "easy" }).next;
 assert.equal(milestone.progress, 3);
 assert.deepEqual(milestone.claimedIds, ["0:1"]);
-assert.deepEqual(resolveTripleMilestoneProgress({ milestones: { progress: 5, cycleId: 0, claimedIds: [] }, tileIds: ["x"], mode: "endless" }).rewards[0].reward, { coins: 2 });
+assert.deepEqual(resolveTripleMilestoneProgress({ milestones: { version: 2, progress: 11, cycleId: 0, claimedIds: [] }, tileIds: ["x"], mode: "endless" }).rewards[0].reward, { coins: 2 });
 assert.deepEqual(TRIPLE_PRODUCT_DECISIONS.milestones.itemFallbackCoins, { hint: 4, undo: 8, shuffle: 8 });
-let rollover = { progress: 44, cycleId: 4, claimedIds: ["4:15"] };
+let rollover = { version: 2, progress: 29, cycleId: 4, claimedIds: ["4:1", "4:2", "4:3", "4:4", "4:5", "4:6", "4:7", "4:8", "4:9"] };
 rollover = resolveTripleMilestoneProgress({ milestones: rollover, tileIds: ["last"], mode: "easy" }).next;
-assert.deepEqual(rollover, { progress: 0, cycleId: 5, claimedIds: [] });
-let twentyCycles = { progress: 0, cycleId: 0, claimedIds: [] };
+assert.deepEqual(rollover, { version: 2, progress: 0, cycleId: 5, claimedIds: [] });
+let twentyCycles = { version: 2, progress: 0, cycleId: 0, claimedIds: [] };
 const allClaims = [];
-for (let index = 0; index < 900; index += 1) {
+for (let index = 0; index < 600; index += 1) {
   const resolved = resolveTripleMilestoneProgress({ milestones: twentyCycles, tileIds: [`cycle-${index}`], mode: "easy" });
   twentyCycles = resolved.next;
   allClaims.push(...resolved.rewards.map((reward) => reward.claimId));
 }
 assert.equal(twentyCycles.cycleId, 20);
 assert.equal(twentyCycles.progress, 0);
-assert.equal(new Set(allClaims).size, 300, "Every milestone must be granted once in each cycle.");
+assert.equal(new Set(allClaims).size, 200, "Every milestone must be granted once in each cycle.");
+assert.deepEqual(normalizeTripleMilestones({ progress: 0, cycleId: 3, claimedIds: [] }), { version: 2, progress: 0, cycleId: 3, claimedIds: [] });
+assert.deepEqual(normalizeTripleMilestones({ progress: 1, cycleId: 3 }), { version: 2, progress: 0, cycleId: 3, claimedIds: [] });
+assert.deepEqual(normalizeTripleMilestones({ progress: 29, cycleId: 3 }), { version: 2, progress: 19, cycleId: 3, claimedIds: ["3:1", "3:2", "3:3", "3:4", "3:5", "3:6"] });
+assert.deepEqual(normalizeTripleMilestones({ progress: 30, cycleId: 3 }), { version: 2, progress: 20, cycleId: 3, claimedIds: ["3:1", "3:2", "3:3", "3:4", "3:5", "3:6"] });
+assert.deepEqual(normalizeTripleMilestones({ progress: 44, cycleId: 3 }), { version: 2, progress: 29, cycleId: 3, claimedIds: ["3:1", "3:2", "3:3", "3:4", "3:5", "3:6", "3:7", "3:8", "3:9"] });
+assert.deepEqual(normalizeTripleMilestones({ version: 2, progress: "bad", cycleId: -1, claimedIds: ["bad"] }), { version: 2, progress: 0, cycleId: 0, claimedIds: [] });
 
 const covered = makeState(
   { a: 3, b: 3, c: 3, d: 3 },
@@ -71,6 +82,26 @@ const blocked = reduceTripleCommand(covered, { type: "select-tile", tileId: "a-1
 assert.equal(blocked.result.reason, "tile-covered");
 assert.equal(blocked.nextState, covered);
 assert.equal(reduceTripleCommand(covered, { type: "select-tile", tileId: "missing" }).result.reason, "unknown-tile");
+
+const piled = createTripleRoundState({
+  roundId: 8,
+  tiles: [
+    { id: "pile-bottom", type: "a", slotId: "pile-slot", layer: 0 },
+    { id: "pile-top", type: "a", slotId: "pile-slot", layer: 0 },
+    { id: "a-3", type: "a", slotId: "a-slot", layer: 0 },
+  ],
+  coverGraph: { "pile-bottom": [], "pile-top": [], "a-3": [] },
+  cornerStacks: { stack: { anchorSlotId: "pile-slot", tileIds: ["pile-bottom", "pile-top"] } },
+});
+assert.deepEqual(getExposedTileIds(piled).sort(), ["a-3", "pile-top"]);
+assert.equal(reduceTripleCommand(piled, { type: "select-tile", tileId: "pile-bottom" }).result.reason, "tile-covered");
+const pileRevealed = select(piled, "pile-top").nextState;
+assert.equal(getExposedTileIds(pileRevealed).includes("pile-bottom"), true, "Selecting a pile top must reveal the next card.");
+const pileUndone = reduceTripleCommand(pileRevealed, { type: "undo" }).nextState;
+assert.equal(getExposedTileIds(pileUndone).includes("pile-top"), true, "Undo must restore the previous pile top.");
+const pileSnapshot = serializeTripleRoundState(pileRevealed);
+assert.equal(pileSnapshot.version, 3);
+assert.deepEqual(restoreSerializedTripleRoundState(pileSnapshot).cornerStacks, pileRevealed.cornerStacks, "Corner-stack order must survive Continue serialization.");
 
 let grouped = makeState({ a: 3, b: 3, c: 3, d: 3 });
 const original = grouped;
@@ -131,6 +162,21 @@ assert.equal(loss.tray.length, 7);
 assert.equal(reduceTripleCommand(loss, { type: "select-tile", tileId: "a-2" }).result.reason, "round-not-playing");
 assert.equal(reduceTripleCommand(loss, { type: "undo" }).result.reason, "round-not-playing");
 
+let expanded = createTripleRoundState({
+  roundId: 9,
+  trayCapacity: 10,
+  tiles: Array.from({ length: 33 }, (_, index) => ({
+    id: `expanded-${index + 1}`,
+    type: `type-${Math.floor(index / 3) + 1}`,
+    slotId: `expanded-slot-${index + 1}`,
+    layer: 0,
+  })),
+  coverGraph: {},
+});
+for (let index = 1; index <= 28; index += 3) expanded = select(expanded, `expanded-${index}`).nextState;
+assert.equal(expanded.status, "lost", "An expanded tray loses only after its tenth unmatched tile.");
+assert.equal(expanded.tray.length, 10);
+
 const undo = reduceTripleCommand(matched.nextState, { type: "undo" });
 assert.equal(undo.result.ok, true);
 assert.deepEqual(undo.nextState.tray, ["a-1", "a-2", "b-1"]);
@@ -154,14 +200,36 @@ assert.deepEqual(getTripleHintTileIds(grouped), ["a-3", "b-2"]);
 
 const persisted = serializeTripleRoundState(matched.nextState);
 assert.equal(Object.hasOwn(persisted, "undoHistory"), false);
+assert.equal(Object.hasOwn(persisted, "trayCapacity"), false, "Capacity is profile-derived, not saved in a round snapshot.");
 assert.deepEqual(restoreSerializedTripleRoundState(persisted), restoreSerializedTripleRoundState(persisted));
 assert.equal(restoreSerializedTripleRoundState({ ...persisted, maxCombo: undefined }).maxCombo, matched.nextState.combo);
+assert.doesNotThrow(() => restoreSerializedTripleRoundState({ ...persisted, version: 1, cornerStacks: undefined }), "Legacy v1 snapshots must still restore.");
 assert.throws(() => restoreSerializedTripleRoundState({ ...persisted, tiles: persisted.tiles.slice(1) }));
+assert.equal(restoreSerializedTripleRoundState(persisted, { trayCapacity: 10 }).trayCapacity, 10);
+assert.equal(restoreSerializedTripleRoundState(persisted).trayCapacity, 7);
+const expandedSession = serializeTripleRoundState(createTripleRoundState({
+  roundId: 10,
+  trayCapacity: 10,
+  tiles: Array.from({ length: 33 }, (_, index) => ({
+    id: `session-${index + 1}`,
+    type: `session-type-${Math.floor(index / 3) + 1}`,
+    slotId: `session-slot-${index + 1}`,
+    layer: 0,
+  })),
+  coverGraph: {},
+}));
+// A valid persisted expanded session can contain up to ten unmatched types.
+let expandedSessionState = restoreSerializedTripleRoundState(expandedSession, { trayCapacity: 10 });
+for (let index = 1; index <= 22; index += 3) expandedSessionState = select(expandedSessionState, `session-${index}`).nextState;
+const persistedExpandedSession = serializeTripleRoundState(expandedSessionState);
+hydrateGameState({ progress: { tripleConnect: { trayExpansionOwned: true, sessionsByMode: { easy: { mode: "easy", level: 1, remainingTime: 20, snapshot: persistedExpandedSession } } } } });
+assert.equal(gameState.progress.tripleConnect.sessionsByMode.easy.snapshot.tray.length, 8, "Owned expansion must preserve a session with more than seven tray tiles.");
 hydrateGameState({ progress: { tripleConnect: { sessionsByMode: { easy: { mode: "easy", level: 1, snapshot: { ...persisted, tray: ["missing"] } } } } } });
 assert.deepEqual(gameState.progress.tripleConnect.sessionsByMode, {}, "Invalid Triple saves must not reach runtime state.");
 assert.equal(getTripleItemCount("hint"), 3, "Triple defaults must grant the approved initial Hint inventory.");
 assert.equal(consumeTripleItem("unknown"), false);
 assert.equal(consumeTripleItem("hint"), false, "A failed persistence transaction must not consume a Hint.");
 assert.equal(getTripleItemCount("hint"), 3);
+assert.equal(gameState.progress.tripleConnect.trayExpansionOwned, false, "Old profiles default to the base tray entitlement.");
 
 console.log("Triple Connect pure rules and state contracts passed.");

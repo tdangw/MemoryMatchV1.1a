@@ -30,8 +30,10 @@ import { TRIPLE_ITEMS, getTripleItemCount } from "./tripleConnect/tripleItems.js
 import {
   purchaseTripleEffect,
   purchaseTripleItem,
+  purchaseTripleTrayExpansion,
   purchaseTripleTheme,
 } from "./tripleConnect/tripleTransactions.js";
+import { TRIPLE_PRODUCT_DECISIONS } from "./tripleConnect/tripleConfig.js";
 
 export function openQuickAssistOverlay(kind) {
   if (gameState.isLocked || gameState.isPaused) return;
@@ -268,6 +270,42 @@ function renderTripleItems(grid, roundId, modal) {
     (item) => getTripleItemCount(item.id),
     () => renderTripleItems(grid, roundId, modal),
   );
+  const expansion = TRIPLE_PRODUCT_DECISIONS.trayExpansion;
+  const group = document.createElement("section");
+  group.className = "appearance-group";
+  const heading = document.createElement("h3");
+  heading.textContent = "Nâng cấp vĩnh viễn";
+  const choices = document.createElement("div");
+  choices.className = "appearance-choice-grid";
+  const card = document.createElement("article");
+  card.className = "appearance-choice";
+  const preview = document.createElement("div");
+  preview.className = "appearance-preview theme-preview";
+  preview.append(createIcon("collection"));
+  const name = document.createElement("strong");
+  name.textContent = "Mở rộng khay";
+  const description = document.createElement("small");
+  description.textContent = `${expansion.baseCapacity} → ${expansion.baseCapacity + expansion.bonusCapacity} ô · dùng cho mọi chế độ`;
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "app-button app-button--purchase shop-buy-button";
+  if (gameState.progress.tripleConnect.trayExpansionOwned) {
+    button.classList.add("appearance-action--equipped");
+    button.textContent = "Đã sở hữu";
+    button.disabled = true;
+  } else {
+    button.append(document.createTextNode(String(expansion.releasePrice)), createIcon("coin"));
+    button.onclick = () => openPurchaseConfirmation(
+      { id: "tray-expansion", type: "triple-tray-expansion", title: "Mở rộng khay vĩnh viễn", price: expansion.releasePrice },
+      roundId,
+      modal,
+      () => renderTripleItems(grid, roundId, modal),
+    );
+  }
+  card.append(preview, name, description, button);
+  choices.append(card);
+  group.append(heading, choices);
+  grid.append(group);
 }
 
 function renderTripleEffectShop(grid, title, kind, ownedKey, effects, roundId, modal) {
@@ -545,7 +583,7 @@ function openPurchaseConfirmation(item, roundId, shopModal, onPurchase) {
 
 // Mua vật phẩm
 function handleBuyItem(item, roundId, fromMenu = false) {
-  const tripleType = item.type === "triple-item" || item.type === "triple-theme" || item.type === "triple-effect";
+  const tripleType = item.type === "triple-item" || item.type === "triple-theme" || item.type === "triple-effect" || item.type === "triple-tray-expansion";
   if (item.type !== "link-item" && !tripleType && (gameState.roundId !== roundId || (!fromMenu && gameState.isLocked))) return false;
 
   if (item.type === "triple-item") {
@@ -573,6 +611,15 @@ function handleBuyItem(item, roundId, fromMenu = false) {
     }
     updateCoinDisplay(gameState.coins);
     showShopMessage(`Đã mua ${item.title}`);
+    return true;
+  }
+  if (item.type === "triple-tray-expansion") {
+    if (!purchaseTripleTrayExpansion()) {
+      showShopMessage(gameState.progress.tripleConnect.trayExpansionOwned ? "Bạn đã sở hữu nâng cấp này." : "Không thể lưu giao dịch. Xu và nâng cấp chưa thay đổi.", "error");
+      return false;
+    }
+    updateCoinDisplay(gameState.coins);
+    showShopMessage("Khay đã mở rộng lên 10 ô cho mọi chế độ Triple Connect.");
     return true;
   }
 

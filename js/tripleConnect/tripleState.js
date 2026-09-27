@@ -3,15 +3,19 @@ import { TRIPLE_RULES } from "./tripleConfig.js";
 const STATUSES = new Set(["playing", "won", "lost", "disposed"]);
 const LOCATIONS = new Set(["board", "tray", "removed"]);
 
-export function createTripleRoundState({ roundId = 1, tiles, coverGraph = {} } = {}) {
+export function createTripleRoundState({ roundId = 1, tiles, coverGraph = {}, cornerStacks = {}, assetPathsByType = {}, trayCapacity = TRIPLE_RULES.trayCapacity } = {}) {
   const normalizedTiles = normalizeTiles(tiles);
   const normalizedCoverGraph = normalizeCoverGraph(coverGraph, normalizedTiles);
+  const normalizedPiles = normalizePiles(cornerStacks, normalizedTiles);
   const state = {
     roundId: normalizeRoundId(roundId),
     status: "playing",
     tiles: normalizedTiles,
     layers: collectLayers(normalizedTiles),
     coverGraph: normalizedCoverGraph,
+    cornerStacks: normalizedPiles,
+    assetPathsByType: normalizeAssetPathsByType(assetPathsByType, normalizedTiles),
+    trayCapacity: normalizeTrayCapacity(trayCapacity),
     tray: [],
     streakType: null,
     streakCount: 0,
@@ -38,13 +42,35 @@ export function endTripleRound(state) {
 
 export function getExposedTileIds(state) {
   assertTripleStateInvariant(state);
+  const pileByTileId = createPileIndex(state.cornerStacks);
   return Object.values(state.tiles)
-    .filter(tile => tile.location === "board" && state.coverGraph[tile.id].every(blockerId => state.tiles[blockerId].location !== "board"))
+    .filter(tile => isTripleTileExposedUnchecked(state, tile.id, pileByTileId))
     .map(tile => tile.id);
 }
 
 export function isTripleTileExposed(state, tileId) {
-  return getExposedTileIds(state).includes(tileId);
+  assertTripleStateInvariant(state);
+  return isTripleTileExposedUnchecked(state, tileId, createPileIndex(state.cornerStacks));
+}
+
+export function isTripleTileVisible(state, tileId) {
+  assertTripleStateInvariant(state);
+  const tile = state.tiles[tileId];
+  return Boolean(tile && (tile.location === "tray" || (tile.location === "board" && isPileTopTile(state, tileId, createPileIndex(state.cornerStacks)))));
+}
+
+export function getTripleVisibleTileIds(state) {
+  assertTripleStateInvariant(state);
+  const pileByTileId = createPileIndex(state.cornerStacks);
+  return Object.values(state.tiles)
+    .filter((tile) => tile.location === "tray" || (tile.location === "board" && isPileTopTile(state, tile.id, pileByTileId)))
+    .map((tile) => tile.id);
+}
+
+export function getTriplePileDepth(state, tileId) {
+  assertTripleStateInvariant(state);
+  const pile = createPileIndex(state.cornerStacks).get(tileId);
+  return pile ? pile.tileIds.filter((id) => state.tiles[id].location === "board").length : 1;
 }
 
 export function assertTripleStateInvariant(state) {
@@ -55,7 +81,7 @@ export function assertTripleStateInvariant(state) {
     throw new TypeError("Triple state tile count must be a positive multiple of three.");
   }
   if (state.initialTileCount !== tileIds.length) throw new TypeError("Triple state initial tile count changed.");
-  if (!Array.isArray(state.tray) || state.tray.length > TRIPLE_RULES.trayCapacity) {
+  if (!Array.isArray(state.tray) || state.tray.length > normalizeTrayCapacity(state.trayCapacity)) {
     throw new TypeError("Triple state tray is invalid.");
   }
   const trayIds = new Set(state.tray);
@@ -63,12 +89,18 @@ export function assertTripleStateInvariant(state) {
 
   const locations = { board: 0, tray: 0, removed: 0 };
   const types = new Map();
-  const slotIds = new Set();
+  const hasPiles = Object.keys(state.cornerStacks || {}).length > 0;
+  const slotIds = hasPiles ? new Map() : new Set();
   for (const [tileId, tile] of Object.entries(tiles)) {
-    if (!tile || tile.id !== tileId || !tile.type || !tile.slotId || slotIds.has(tile.slotId) || !LOCATIONS.has(tile.location)) {
+    if (!tile || tile.id !== tileId || !tile.type || !tile.slotId || !LOCATIONS.has(tile.location)
+      || (!hasPiles && slotIds.has(tile.slotId))) {
       throw new TypeError("Triple state contains an invalid tile.");
     }
-    slotIds.add(tile.slotId);
+    if (hasPiles) {
+      const tilesAtSlot = slotIds.get(tile.slotId) || [];
+      tilesAtSlot.push(tileId);
+      slotIds.set(tile.slotId, tilesAtSlot);
+    } else slotIds.add(tile.slotId);
     locations[tile.location] += 1;
     types.set(tile.type, (types.get(tile.type) || 0) + 1);
     if ((tile.location === "tray") !== trayIds.has(tile.id)) {
@@ -81,7 +113,7 @@ export function assertTripleStateInvariant(state) {
   if ([...types.values()].some(count => count % TRIPLE_RULES.matchSize !== 0)) {
     throw new TypeError("Triple tile types must occur in complete triples.");
   }
-  if (Object.values(tiles).some(tile => tile.location === "tray" && countTrayType(state.tray, tiles, tile.type) >= TRIPLE_RULES.matchSize)) {
+  if (!state.presentationPreview && Object.values(tiles).some(tile => tile.location === "tray" && countTrayType(state.tray, tiles, tile.type) >= TRIPLE_RULES.matchSize)) {
     throw new TypeError("Stable triple tray cannot retain a completed triple.");
   }
   if (!isCanonicalTray(state.tray, tiles)) throw new TypeError("Triple tray order is not canonical.");
@@ -106,6 +138,11 @@ export function assertTripleStateInvariant(state) {
     throw new TypeError("Triple milestone tile ledger is invalid.");
   }
   if (!state.coverGraph || !state.layers) throw new TypeError("Triple board state is incomplete.");
+  if (hasPiles) assertPilesInvariant(state.cornerStacks, tiles, slotIds);
+  if (!state.assetPathsByType || typeof state.assetPathsByType !== "object"
+    || Object.entries(state.assetPathsByType).some(([type, path]) => !types.has(type) || typeof path !== "string" || !path)) {
+    throw new TypeError("Triple asset mapping is invalid.");
+  }
   for (const tileId of tileIds) {
     const blockers = state.coverGraph[tileId];
     if (!Array.isArray(blockers) || blockers.some(blockerId => !tiles[blockerId] || blockerId === tileId)) {
@@ -128,6 +165,9 @@ export function createTripleStateSnapshot(state) {
     tiles: state.tiles,
     layers: state.layers,
     coverGraph: state.coverGraph,
+    cornerStacks: state.cornerStacks,
+    assetPathsByType: state.assetPathsByType,
+    trayCapacity: state.trayCapacity,
     tray: state.tray,
     streakType: state.streakType,
     streakCount: state.streakCount,
@@ -150,6 +190,8 @@ export function restoreTripleStateSnapshot(snapshot, undoHistory) {
     // giá trị tốt nhất còn có thể khôi phục mà không làm hỏng phiên đang dở.
     maxCombo: Number.isInteger(snapshot.maxCombo) ? snapshot.maxCombo : Math.max(0, snapshot.combo || 0),
     milestoneTileIds: snapshot.milestoneTileIds || [],
+    cornerStacks: snapshot.cornerStacks || {},
+    trayCapacity: normalizeTrayCapacity(snapshot.trayCapacity),
     undoHistory,
   };
   assertTripleStateInvariant(state);
@@ -159,12 +201,14 @@ export function restoreTripleStateSnapshot(snapshot, undoHistory) {
 export function serializeTripleRoundState(state) {
   const snapshot = createTripleStateSnapshot(state);
   return {
-    version: 1,
+    version: 3,
     roundId: snapshot.roundId,
     status: snapshot.status,
     tiles: Object.values(snapshot.tiles),
     layers: snapshot.layers,
     coverGraph: snapshot.coverGraph,
+    cornerStacks: snapshot.cornerStacks,
+    assetPathsByType: snapshot.assetPathsByType,
     tray: snapshot.tray,
     streakType: snapshot.streakType,
     streakCount: snapshot.streakCount,
@@ -180,11 +224,13 @@ export function serializeTripleRoundState(state) {
   };
 }
 
-export function restoreSerializedTripleRoundState(snapshot) {
-  if (!snapshot || snapshot.version !== 1 || !Array.isArray(snapshot.tiles)) throw new TypeError("Triple snapshot is invalid.");
+export function restoreSerializedTripleRoundState(snapshot, { trayCapacity = TRIPLE_RULES.trayCapacity } = {}) {
+  if (!snapshot || ![1, 3].includes(snapshot.version) || !Array.isArray(snapshot.tiles)) throw new TypeError("Triple snapshot is invalid.");
   const tiles = Object.fromEntries(snapshot.tiles.map(tile => [tile?.id, tile]));
   if (Object.keys(tiles).length !== snapshot.tiles.length) throw new TypeError("Triple snapshot has duplicate tiles.");
-  return restoreTripleStateSnapshot({ ...snapshot, claimedLuckyIds: snapshot.claimedLuckyIds || [], milestoneTileIds: snapshot.milestoneTileIds || [], tiles }, []);
+  // Capacity is derived from the profile entitlement when a session is restored,
+  // rather than stored in a round snapshot that can become stale after purchase.
+  return restoreTripleStateSnapshot({ ...snapshot, trayCapacity, claimedLuckyIds: snapshot.claimedLuckyIds || [], milestoneTileIds: snapshot.milestoneTileIds || [], assetPathsByType: snapshot.assetPathsByType || {}, cornerStacks: snapshot.cornerStacks || {}, tiles }, []);
 }
 
 function normalizeTiles(tiles) {
@@ -218,6 +264,55 @@ function normalizeCoverGraph(coverGraph, tiles) {
   return Object.freeze(result);
 }
 
+function normalizePiles(piles, tiles) {
+  const source = piles && typeof piles === "object" && !Array.isArray(piles) ? piles : {};
+  const normalized = {};
+  for (const [pileId, value] of Object.entries(source)) {
+    const anchorSlotId = String(value?.anchorSlotId || "");
+    const tileIds = Array.isArray(value?.tileIds) ? value.tileIds.map(String) : [];
+    if (!pileId || !anchorSlotId || tileIds.length < 2 || new Set(tileIds).size !== tileIds.length
+      || tileIds.some((tileId) => !tiles[tileId] || tiles[tileId].slotId !== anchorSlotId)) {
+      throw new TypeError("Triple pile metadata is invalid.");
+    }
+    normalized[pileId] = Object.freeze({ anchorSlotId, tileIds: Object.freeze(tileIds) });
+  }
+  return Object.freeze(normalized);
+}
+
+function assertPilesInvariant(piles, tiles, slotIds) {
+  if (!piles || typeof piles !== "object") throw new TypeError("Triple piles are invalid.");
+  const pileByTileId = new Map();
+  for (const [pileId, pile] of Object.entries(piles)) {
+    if (!pile || pile.anchorSlotId === "" || !Array.isArray(pile.tileIds) || pile.tileIds.length < 2
+      || new Set(pile.tileIds).size !== pile.tileIds.length) throw new TypeError("Triple pile is invalid.");
+    for (const tileId of pile.tileIds) {
+      if (!tiles[tileId] || tiles[tileId].slotId !== pile.anchorSlotId || pileByTileId.has(tileId))
+        throw new TypeError("Triple pile membership is invalid.");
+      pileByTileId.set(tileId, pileId);
+    }
+  }
+  for (const [slotId, tileIds] of slotIds) {
+    if (tileIds.length === 1) {
+      if (pileByTileId.has(tileIds[0])) throw new TypeError("Triple pile cannot contain a single tile.");
+      continue;
+    }
+    const pileId = pileByTileId.get(tileIds[0]);
+    const pile = pileId ? piles[pileId] : null;
+    if (!pile || pile.anchorSlotId !== slotId || pile.tileIds.length !== tileIds.length
+      || tileIds.some((tileId) => pileByTileId.get(tileId) !== pileId)) {
+      throw new TypeError("Triple tiles sharing an anchor require one pile.");
+    }
+  }
+}
+
+function normalizeAssetPathsByType(value, tiles) {
+  const source = value && typeof value === "object" && !Array.isArray(value) ? value : {};
+  const types = new Set(Object.values(tiles).map((tile) => tile.type));
+  return Object.freeze(Object.fromEntries(Object.entries(source).flatMap(([type, path]) => (
+    types.has(type) && typeof path === "string" && path ? [[type, path]] : []
+  ))));
+}
+
 function collectLayers(tiles) {
   const layers = {};
   for (const tile of Object.values(tiles)) (layers[tile.layer] ||= []).push(tile.id);
@@ -234,6 +329,13 @@ function normalizeLayer(layer) {
   const value = Number(layer ?? 0);
   if (!Number.isInteger(value) || value < 0) throw new TypeError("Triple tile layer must be a non-negative integer.");
   return value;
+}
+
+function normalizeTrayCapacity(value) {
+  const capacity = Number(value ?? TRIPLE_RULES.trayCapacity);
+  if (!Number.isInteger(capacity) || ![TRIPLE_RULES.trayCapacity, TRIPLE_RULES.trayCapacity + 3].includes(capacity))
+    throw new TypeError("Triple tray capacity is invalid.");
+  return capacity;
 }
 
 function countTrayType(tray, tiles, type) {
@@ -258,6 +360,8 @@ function freezeSnapshot(snapshot) {
     tiles: cloneTiles(snapshot.tiles),
     layers: cloneRecordOfArrays(snapshot.layers),
     coverGraph: cloneRecordOfArrays(snapshot.coverGraph),
+    cornerStacks: clonePiles(snapshot.cornerStacks),
+    assetPathsByType: { ...(snapshot.assetPathsByType || {}) },
     tray: [...snapshot.tray],
     milestoneTileIds: [...(snapshot.milestoneTileIds || [])],
   });
@@ -269,6 +373,8 @@ function freezeState(state) {
     tiles: cloneTiles(state.tiles),
     layers: cloneRecordOfArrays(state.layers),
     coverGraph: cloneRecordOfArrays(state.coverGraph),
+    cornerStacks: clonePiles(state.cornerStacks),
+    assetPathsByType: { ...(state.assetPathsByType || {}) },
     tray: [...state.tray],
     undoHistory: [...state.undoHistory],
     claimedLuckyIds: [...state.claimedLuckyIds],
@@ -316,6 +422,31 @@ function cloneTiles(tiles) {
 
 function cloneRecordOfArrays(record) {
   return Object.fromEntries(Object.entries(record).map(([key, value]) => [key, [...value]]));
+}
+
+function clonePiles(piles) {
+  return Object.fromEntries(Object.entries(piles || {}).map(([id, pile]) => [id, {
+    anchorSlotId: pile.anchorSlotId,
+    tileIds: [...pile.tileIds],
+  }]));
+}
+
+function isTripleTileExposedUnchecked(state, tileId, pileByTileId) {
+  const tile = state.tiles[tileId];
+  return Boolean(tile && tile.location === "board" && isPileTopTile(state, tileId, pileByTileId)
+    && state.coverGraph[tileId].every((blockerId) => state.tiles[blockerId].location !== "board"));
+}
+
+function isPileTopTile(state, tileId, pileByTileId) {
+  const pile = pileByTileId.get(tileId);
+  if (!pile) return true;
+  return [...pile.tileIds].reverse().find((id) => state.tiles[id].location === "board") === tileId;
+}
+
+function createPileIndex(piles) {
+  const index = new Map();
+  Object.values(piles).forEach((pile) => pile.tileIds.forEach((tileId) => index.set(tileId, pile)));
+  return index;
 }
 
 function deepFreeze(value) {
