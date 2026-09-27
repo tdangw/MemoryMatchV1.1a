@@ -358,8 +358,8 @@
   height: var(--triple-tray-height);
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 2px;
-  padding: 3px;
+  gap: 0;
+  padding: 2px;
   border: 1px solid rgb(102 229 255 / 25%);
   border-radius: 13px;
   background: rgb(4 20 44 / 68%);
@@ -367,7 +367,12 @@
 }
 .triple-connect__tray[data-triple-tray-capacity="10"] { grid-template-columns: repeat(10, minmax(0, 1fr)); }
 @media (max-width: 520px) and (orientation: portrait) {
-  .triple-connect__tray[data-triple-tray-capacity="10"] { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .triple-connect__tray[data-triple-tray-capacity="10"] {
+    --triple-tray-height: 88px;
+    --triple-tray-slot-size: 40px;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+  }
 }
 .triple-connect__tray-slot {
   min-width: 0;

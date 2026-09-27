@@ -66,11 +66,18 @@ test("Triple tray expansion persists once and applies immediately to the active 
   expect(purchased).toEqual({ bought: true, capacity: 10, owned: true });
   await expect(page.locator(".triple-connect__tray")).toHaveAttribute("data-triple-tray-capacity", "10");
   await expect(page.locator(".triple-connect__tray-slot:not([hidden])")).toHaveCount(10);
-  const rows = await page.locator(".triple-connect__tray-slot:not([hidden])").evaluateAll((slots) =>
-    new Set(slots.map((slot) => Math.round(slot.getBoundingClientRect().top))).size,
-  );
+  const trayMetrics = await page.locator(".triple-connect__tray-slot:not([hidden])").evaluateAll((slots) => {
+    const rects = slots.map((slot) => slot.getBoundingClientRect());
+    return {
+      rows: new Set(rects.map((rect) => Math.round(rect.top))).size,
+      heights: rects.map((rect) => Math.round(rect.height)),
+    };
+  });
   const viewport = page.viewportSize();
-  expect(rows).toBe(viewport.width <= 520 && viewport.height > viewport.width ? 2 : 1);
+  const portraitGrid = viewport.width <= 520 && viewport.height > viewport.width;
+  expect(trayMetrics.rows).toBe(portraitGrid ? 2 : 1);
+  expect(new Set(trayMetrics.heights).size).toBe(1);
+  if (portraitGrid) expect(trayMetrics.heights[0]).toBeGreaterThanOrEqual(40);
   await page.reload();
   const restored = await page.evaluate(async () => {
     const controller = await import("/js/tripleConnect/tripleController.js");
