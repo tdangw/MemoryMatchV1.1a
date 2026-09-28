@@ -12,7 +12,7 @@
     "boardMinWidth": 300,
     "tileMinSize": 24,
     "squareTolerancePx": 2,
-    "traySlotCount": 7,
+    "traySlotCount": 10,
     "traySizeTolerancePx": 2,
     "trayStabilityTolerancePx": 1,
     "imageObjectFit": "contain"

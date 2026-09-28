@@ -58,7 +58,9 @@ test("Triple Hint consumes one persisted hint only after identifying playable ti
   await expect(hint).toContainText("3");
   await hint.click();
   await expect(hint).toContainText("2");
-  await expect(page.locator(".triple-connect__tile.is-hinted")).toHaveCount(2);
+  await expect(page.locator(".triple-connect__tile.is-hinted")).toHaveCount(3);
+  await page.waitForTimeout(1200);
+  await expect(page.locator(".triple-connect__tile.is-hinted")).toHaveCount(3);
 });
 
 test("Triple timers count down normally and up in Endless", async ({ page }) => {

@@ -1,11 +1,14 @@
 import { getTheme } from "../themeCatalog.js";
 import { connectGameShellLayout } from "../gameShell/gameShellLayout.js";
+import { TRIPLE_PRODUCT_DECISIONS } from "./tripleConfig.js";
 import { createTripleBoardView } from "./tripleState.js";
 
 const LEGACY_GRID_UNITS = 100;
 const TRAY_LOGICAL_ROWS = 3;
+const TRAY_VISIBLE_SLOT_COUNT = TRIPLE_PRODUCT_DECISIONS.trayExpansion.baseCapacity
+  + TRIPLE_PRODUCT_DECISIONS.trayExpansion.bonusCapacity;
 
-export function createTripleRenderer(shell) {
+export function createTripleRenderer(shell, { onLockedTraySlotClick } = {}) {
   const root = shell.refs.root;
   const board = root.querySelector(".triple-connect__board");
   const tray = root.querySelector(".triple-connect__tray");
@@ -15,19 +18,52 @@ export function createTripleRenderer(shell) {
     const slot = document.createElement("div");
     slot.className = "triple-connect__tray-slot";
     slot.dataset.tripleTraySlot = String(index);
+    const unlockButton = document.createElement("button");
+    unlockButton.type = "button";
+    unlockButton.className = "triple-connect__tray-unlock";
+    unlockButton.dataset.tripleTrayUnlock = "true";
+    unlockButton.hidden = true;
+    unlockButton.onclick = () => onLockedTraySlotClick?.();
+    slot.append(unlockButton);
     tray.append(slot);
     return slot;
   };
-  const reconcileTraySlots = (capacity) => {
-    while (traySlots.length < capacity) traySlots.push(createTraySlot(traySlots.length));
-    while (traySlots.length > capacity) traySlots.pop().remove();
+  const reconcileTraySlots = (activeCapacity) => {
+    while (traySlots.length < TRAY_VISIBLE_SLOT_COUNT)
+      traySlots.push(createTraySlot(traySlots.length));
+    while (traySlots.length > TRAY_VISIBLE_SLOT_COUNT) traySlots.pop().remove();
+    traySlots.forEach((slot, index) => {
+      const locked = index >= activeCapacity;
+      const unlockButton = slot.querySelector("[data-triple-tray-unlock]");
+      slot.classList.toggle("is-locked", locked);
+      if (locked) {
+        slot.dataset.tripleTrayLocked = "true";
+        slot.title = "Ô khay chưa mở khóa";
+        unlockButton.hidden = false;
+        unlockButton.setAttribute(
+          "aria-label",
+          `Mở rộng khay với ${TRIPLE_PRODUCT_DECISIONS.trayExpansion.releasePrice} Xu`,
+        );
+      } else {
+        delete slot.dataset.tripleTrayLocked;
+        slot.removeAttribute("title");
+        unlockButton.hidden = true;
+        unlockButton.removeAttribute("aria-label");
+      }
+    });
   };
   let layoutConnection = null;
   let activeLayout = null;
 
   function render(state, layout, themeId = "default") {
     tray.dataset.tripleTrayCapacity = String(state.trayCapacity);
-    tray.setAttribute("aria-label", `Khay ${state.trayCapacity} ô`);
+    const lockedCount = TRAY_VISIBLE_SLOT_COUNT - state.trayCapacity;
+    tray.setAttribute(
+      "aria-label",
+      lockedCount > 0
+        ? `Khay ${TRAY_VISIBLE_SLOT_COUNT} ô, ${lockedCount} ô đang khóa`
+        : `Khay ${TRAY_VISIBLE_SLOT_COUNT} ô`,
+    );
     reconcileTraySlots(state.trayCapacity);
     activeLayout = layout;
     const geometry = getLayoutGeometry(layout);

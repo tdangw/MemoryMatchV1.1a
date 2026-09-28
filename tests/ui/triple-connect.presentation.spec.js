@@ -56,7 +56,7 @@ test("Triple tray flight uses one surface coordinate space and scales to its slo
   expect(flight.ghostCountAfter).toBe(0);
 });
 
-test("Triple match commits before presentation and unmount cancels the tray preview", async ({ page }) => {
+test("Triple match commits before presentation and unmount cancels removal feedback", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
   const witness = await page.evaluate(async () => {
@@ -72,6 +72,7 @@ test("Triple match commits before presentation and unmount cancels the tray prev
   }
   await expect.poll(() => page.evaluate(() => globalThis.__triplePresentationRun.getState().matchedTriples)).toBe(1);
   await expect(page.locator(".triple-connect__tray [data-tile-id]")).toHaveCount(3);
+  await expect(page.locator(".triple-connect__ghost.is-removing")).toHaveCount(3);
   await page.evaluate(async () => (await import("/js/gameShell/gameShell.js")).unmountActiveGameShell());
   await expect(page.locator(".triple-connect__ghost")).toHaveCount(0);
   await expect(page.locator(".triple-connect__line polyline")).toHaveCount(0);
@@ -99,7 +100,7 @@ test("Triple commits score state before its presentation lifecycle completes", a
   expect(committed.score).toBeGreaterThan(0);
 });
 
-test("Triple shows the complete tray match before exit and compaction", async ({ page }) => {
+test("Triple commits a match immediately while its removal effect plays", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
   const timeline = await page.evaluate(async () => {
@@ -126,41 +127,94 @@ test("Triple shows the complete tray match before exit and compaction", async ({
       );
     }
     document.querySelector(`[data-tile-id="${matchIds[2]}"]`)?.click();
+    const beforeArrival = {
+      flight: document.querySelectorAll(".triple-connect__tray-flight").length,
+      removing: document.querySelectorAll(".triple-connect__ghost.is-removing").length,
+      score: Boolean(document.querySelector(".tile-score-effect")),
+    };
     await waitFor(
-      () => {
-        const trayIds = [...document.querySelectorAll(".triple-connect__tray [data-tile-id]")]
-          .map((tile) => tile.dataset.tileId);
-        return matchIds.every((tileId) => trayIds.includes(tileId));
-      },
-      "complete tray match did not render",
+      () => document.querySelectorAll(".triple-connect__ghost.is-removing").length === 3,
+      "removal feedback did not start",
     );
-    const trayBeforeExit = [...document.querySelectorAll(".triple-connect__tray [data-tile-id]")]
-      .map((tile) => tile.dataset.tileId);
-    const scoreBeforeExit = Boolean(document.querySelector(".tile-score-effect"));
-    await waitFor(
-      () => Boolean(document.querySelector(".tile-score-effect")),
-      "exit feedback did not start",
-    );
-    const exitStarted = {
+    const removalStarted = {
       score: Boolean(document.querySelector(".tile-score-effect")),
       ghosts: document.querySelectorAll(".triple-connect__ghost").length,
+      removing: document.querySelectorAll(".triple-connect__ghost.is-removing").length,
+      tray: document.querySelectorAll(".triple-connect__tray [data-tile-id]").length,
     };
-    await waitFor(
-      () => document.querySelectorAll(".triple-connect__tray [data-tile-id]").length === 0,
-      "tray compaction did not finish",
-    );
     return {
-      matchIds,
-      trayBeforeExit,
-      scoreBeforeExit,
-      exitStarted,
-      trayAfterExit: document.querySelectorAll(".triple-connect__tray [data-tile-id]").length,
+      beforeArrival,
+      removalStarted,
     };
   });
-  expect(timeline.trayBeforeExit).toEqual(expect.arrayContaining(timeline.matchIds));
-  expect(timeline.scoreBeforeExit).toBe(false);
-  expect(timeline.exitStarted).toEqual({ score: true, ghosts: 3 });
-  expect(timeline.trayAfterExit).toBe(0);
+  expect(timeline.beforeArrival).toEqual({ flight: 1, removing: 0, score: false });
+  expect(timeline.removalStarted).toEqual({ score: true, ghosts: 3, removing: 3, tray: 3 });
+});
+
+test("Triple flies the third matching card beside its pair, not to the tray end", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto("/");
+  const landing = await page.evaluate(async () => {
+    const waitForIdle = () => new Promise((resolve, reject) => {
+      const deadline = window.setTimeout(() => reject(new Error("tray flight did not settle")), 2000);
+      const check = () => {
+        if (document.querySelector('[data-triple-presenting="false"]')) {
+          window.clearTimeout(deadline);
+          resolve();
+          return;
+        }
+        requestAnimationFrame(check);
+      };
+      requestAnimationFrame(check);
+    });
+    const { startTripleConnectDevelopmentRound } = await import("/js/tripleConnect/tripleController.js");
+    const run = startTripleConnectDevelopmentRound({ seed: "tray-match-insert" });
+    const matchIds = run.generated.witness.slice(0, 3).map(({ tileId }) => tileId);
+    document.querySelector(`[data-tile-id="${matchIds[0]}"]`)?.click();
+    await waitForIdle();
+    const other = [...document.querySelectorAll(".triple-connect__board .triple-connect__tile:not(:disabled)")]
+      .find((tile) => !matchIds.includes(tile.dataset.tileId));
+    const otherId = other?.dataset.tileId;
+    other?.click();
+    await waitForIdle();
+    document.querySelector(`[data-tile-id="${matchIds[1]}"]`)?.click();
+    await waitForIdle();
+    document.querySelector(`[data-tile-id="${matchIds[2]}"]`)?.click();
+    await new Promise((resolve, reject) => {
+      const deadline = window.setTimeout(() => reject(new Error("match feedback did not begin")), 2000);
+      const check = () => {
+        if (document.querySelectorAll(".triple-connect__ghost.is-removing").length === 3) {
+          window.clearTimeout(deadline);
+          resolve();
+          return;
+        }
+        requestAnimationFrame(check);
+      };
+      requestAnimationFrame(check);
+    });
+    const surface = document.querySelector(".triple-connect__surface").getBoundingClientRect();
+    const slot = document.querySelectorAll(".triple-connect__tray-slot")[2].getBoundingClientRect();
+    const selected = document.querySelector(`.triple-connect__ghost[data-tile-id="${matchIds[2]}"]`);
+    return {
+      left: Number.parseFloat(selected.style.left),
+      top: Number.parseFloat(selected.style.top),
+      width: Number.parseFloat(selected.style.width),
+      height: Number.parseFloat(selected.style.height),
+      otherSlot: document.querySelector(`[data-tile-id="${otherId}"]`)
+        ?.closest("[data-triple-tray-slot]")?.dataset.tripleTraySlot,
+      expected: {
+        left: slot.left - surface.left,
+        top: slot.top - surface.top,
+        width: slot.width,
+        height: slot.height,
+      },
+    };
+  });
+  expect(landing.left).toBeCloseTo(landing.expected.left, 1);
+  expect(landing.top).toBeCloseTo(landing.expected.top, 1);
+  expect(landing.width).toBeCloseTo(landing.expected.width, 1);
+  expect(landing.height).toBeCloseTo(landing.expected.height, 1);
+  expect(landing.otherSlot).toBe("3");
 });
 
 test("Triple reduced motion settles to the same committed match without ghosts", async ({ page }) => {
@@ -207,7 +261,7 @@ test("Triple reduced-motion tray feedback cleans up within the 100 ms budget", a
   await expect(page.locator(".triple-connect__tray-flight, .triple-connect__ghost")).toHaveCount(0);
 });
 
-test("Triple ignores a second tap while a tray flight is presenting", async ({ page }) => {
+test("Triple accepts a second tap while a tray flight is presenting", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
   const result = await page.evaluate(async () => {
@@ -230,7 +284,7 @@ test("Triple ignores a second tap while a tray flight is presenting", async ({ p
       },
     };
   });
-  expect(result.duringFlight).toEqual({ moves: 1, misses: 0 });
+  expect(result.duringFlight).toEqual({ moves: 2, misses: 0 });
   expect(result.afterFlight.moves).toBe(2);
 });
 

@@ -33,6 +33,7 @@ import { endTripleRound } from "./tripleState.js";
 import {
   getTripleChallengeStage,
   getTripleModeConfig,
+  getTripleCompletionScore,
   getTripleStarProgress,
   TRIPLE_PRODUCT_DECISIONS,
   isTripleChallengeComplete,
@@ -54,11 +55,14 @@ import { getTheme, getThemeSelectionEligibility, selectThemeCards } from "../the
 import { playCoinRewardFlight } from "../coinRewards.js";
 import { resolveTripleMilestoneProgress } from "./tripleMilestones.js";
 import { openTimeUpModal, showLevelRewardOverlay, showLevelSummaryOverlay } from "../ui.js";
+import { openTripleTrayExpansionPurchase } from "../shop.js";
 
 const development = import.meta.env?.DEV === true;
 let state = null;
 let renderer = null;
-let presenting = false;
+let presentationCount = 0;
+let boardPresentationRevision = 0;
+let hintedTileIds = new Set();
 let currentMode = "easy";
 let currentLayout = null;
 let currentSeed = null;
@@ -225,7 +229,9 @@ function mountTripleDevelopmentRound(generated, { skipIntro = false } = {}) {
   document.getElementById("menu-container")?.remove();
   const shell = getTripleShell();
   const scope = shell.mount();
-  presenting = false;
+  presentationCount = 0;
+  boardPresentationRevision = 0;
+  hintedTileIds = new Set();
   shell.refs.root.dataset.triplePresenting = "false";
   terminalSettled = false;
   terminalReason = null;
@@ -235,15 +241,22 @@ function mountTripleDevelopmentRound(generated, { skipIntro = false } = {}) {
   backgroundPaused = false;
   const generation = ++roundGeneration;
   roundStarted = !generated.board || skipIntro;
-  renderer ||= createTripleRenderer(shell);
+  renderer ||= createTripleRenderer(shell, {
+    onLockedTraySlotClick: () => openTripleTrayExpansionPurchase(),
+  });
   renderer.mountLayout(scope, currentLayout);
   const hud = getTripleHud(getTripleHudElements());
-  const render = (roundState) => {
+  const render = (roundState, { boardState = roundState } = {}) => {
     renderer.render(
-      roundState,
+      boardState,
       currentLayout,
       getEquippedThemeId(gameState.appearance, "triple-connect"),
     );
+    // Hint borders are presentation state with a deliberate, stable lifetime:
+    // they remain until a new hint or a board-transforming tool replaces them.
+    renderer.nodes.forEach((node, tileId) => {
+      node.classList.toggle("is-hinted", hintedTileIds.has(tileId));
+    });
     const totalTriples = Math.max(1, Object.keys(roundState.tiles).length / 3);
     const starProgress = getTripleStarProgress({
       mode: currentMode,
@@ -285,6 +298,7 @@ function mountTripleDevelopmentRound(generated, { skipIntro = false } = {}) {
     if (!state || state.status !== "playing") return;
     const trayCapacity = getEffectiveTripleTrayCapacity();
     if (state.trayCapacity === trayCapacity) return;
+    boardPresentationRevision += 1;
     state = restoreTripleStateSnapshot({
       ...createTripleStateSnapshot(state),
       trayCapacity,
@@ -383,7 +397,7 @@ function mountTripleDevelopmentRound(generated, { skipIntro = false } = {}) {
   scope.own(closeMenus, "triple-hud-menu-cleanup");
   scope.listen(shell.refs.board, "click", (event) => {
     const tileId = event.target.closest("[data-tile-id]")?.dataset.tileId;
-    if (!tileId || presenting || !roundStarted) return;
+    if (!tileId || !roundStarted) return;
     const transition = reduceTripleCommand(state, {
       type: "select-tile",
       tileId,
@@ -391,6 +405,7 @@ function mountTripleDevelopmentRound(generated, { skipIntro = false } = {}) {
     if (!transition.result.ok) return;
     const previous = state;
     state = transition.nextState;
+    const presentationRevision = ++boardPresentationRevision;
     const matchEvent = transition.events.find((event) => event.type === "triple-resolved");
     const luckyEvent = transition.events.find((event) => event.type === "lucky-resolved");
     const rewards = commitTripleResolutionRewards({ luckyEvent, matchEvent });
@@ -401,10 +416,11 @@ function mountTripleDevelopmentRound(generated, { skipIntro = false } = {}) {
     }
     roundLuckyRewards.push(...rewards.lucky);
     roundMilestoneRewards.push(...rewards.milestones);
-    presenting = transition.events.some(
-      (event) => event.type === "tile-selected",
-    );
-    shell.refs.root.dataset.triplePresenting = String(presenting);
+    const hasPresentation = transition.events.some((event) => event.type === "tile-selected");
+    if (hasPresentation) {
+      presentationCount += 1;
+      shell.refs.root.dataset.triplePresenting = "true";
+    }
     presentTripleTransition({
       shell,
       scope,
@@ -418,10 +434,11 @@ function mountTripleDevelopmentRound(generated, { skipIntro = false } = {}) {
         milestones: rewards.milestoneEvents,
       },
       render,
+      isCurrent: () => presentationRevision === boardPresentationRevision,
     }).finally(() => {
       if (!scope.active) return;
-      presenting = false;
-      shell.refs.root.dataset.triplePresenting = "false";
+      if (hasPresentation) presentationCount = Math.max(0, presentationCount - 1);
+      shell.refs.root.dataset.triplePresenting = String(presentationCount > 0);
       saveSession();
       settleTerminalRound(shell);
     });
@@ -431,27 +448,17 @@ function mountTripleDevelopmentRound(generated, { skipIntro = false } = {}) {
     shell.refs.root.querySelector('[data-triple-item="hint"]'),
     "click",
     () => {
-      if (presenting || state.status !== "playing") return;
+      if (state.status !== "playing") return;
       const tileIds = getTripleHintTileIds(state);
       if (!tileIds.length || !consumeTripleItem("hint")) return;
-      tileIds.forEach((tileId) =>
-        renderer.nodes.get(tileId)?.classList.add("is-hinted"),
-      );
+      hintedTileIds = new Set(tileIds);
       render(state);
-      scope.timeout(
-        () =>
-          tileIds.forEach((tileId) =>
-            renderer.nodes.get(tileId)?.classList.remove("is-hinted"),
-          ),
-        900,
-      );
     },
   );
   const timeButton = shell.refs.root.querySelector('[data-triple-item="time"]');
   timeButton.hidden = currentMode === "endless";
   scope.listen(timeButton, "click", () => {
     if (
-      presenting ||
       state.status !== "playing" ||
       currentMode === "endless" ||
       getTripleItemCount("time") < 1
@@ -473,10 +480,12 @@ function mountTripleDevelopmentRound(generated, { skipIntro = false } = {}) {
     shell.refs.root.querySelector('[data-triple-item="undo"]'),
     "click",
     () => {
-      if (presenting || state.status !== "playing") return;
+      if (state.status !== "playing") return;
       const transition = reduceTripleCommand(state, { type: "undo" });
       if (!transition.result.ok || !consumeTripleItem("undo")) return;
       state = transition.nextState;
+      boardPresentationRevision += 1;
+      hintedTileIds.clear();
       render(state);
       saveSession();
     },
@@ -486,7 +495,6 @@ function mountTripleDevelopmentRound(generated, { skipIntro = false } = {}) {
     "click",
     () => {
       if (
-        presenting ||
         state.status !== "playing" ||
         getTripleItemCount("shuffle") < 1
       )
@@ -506,6 +514,8 @@ function mountTripleDevelopmentRound(generated, { skipIntro = false } = {}) {
       )
         return;
       state = result.state;
+      boardPresentationRevision += 1;
+      hintedTileIds.clear();
       render(state);
     },
   );
@@ -662,7 +672,7 @@ function settleTerminalRound(shell) {
   if (terminalSettled || state.status === "playing" || !shell.scope?.active)
     return;
   terminalSettled = true;
-  presenting = true;
+  presentationCount = 0;
   const settlement = commitTripleTerminalResult();
   if (!settlement) {
     openAppModal({
@@ -689,7 +699,18 @@ function settleTerminalRound(shell) {
     return;
   }
   getTripleHud(getTripleHudElements()).stats({
+    score: state.score,
     totalStars: gameState.progress.tripleConnect.totalStars,
+  });
+  getTripleHud(getTripleHudElements()).stars({
+    earned: settlement.stars,
+    score: state.score,
+    target: getTripleStarProgress({
+      mode: currentMode,
+      score: state.score,
+      initialTileCount: state.initialTileCount,
+    }).thresholds.three,
+    totalScore: state.score,
   });
   const won = state.status === "won";
   const canAdvance = won && !(currentMode === "challenge" && isTripleChallengeComplete(currentLevel));
@@ -757,7 +778,7 @@ function settleTerminalRound(shell) {
       coinsEarned: settlement.reward,
       score: state.score,
       stars: settlement.stars,
-      timeBonus: 0,
+      timeBonus: settlement.timeBonus,
       luckyAwards: roundLuckyRewards,
       settings: { ...gameState.settings, mode: currentMode },
       onMenu: returnTripleToMenu,
@@ -792,20 +813,34 @@ function commitTripleTerminalResult() {
     progress: structuredClone(gameState.progress.tripleConnect),
   };
   const won = state.status === "won";
+  const completion = getTripleCompletionScore({
+    mode: currentMode,
+    score: state.score,
+    remainingTime,
+  });
   const stars = won
     ? getTripleStarProgress({
       mode: currentMode,
-      score: state.score + (currentMode === "endless" ? 0 : Math.floor(Math.max(0, remainingTime))),
+      score: completion.score,
       initialTileCount: state.initialTileCount,
     }).stars
     : 0;
   const reward = won ? calculateTripleCoinReward({ mode: currentMode, matchedTriples: state.matchedTriples, stars, maxCombo: state.maxCombo }) : 0;
+  const settledState = won && completion.timeBonus > 0
+    ? restoreTripleStateSnapshot({
+      ...createTripleStateSnapshot(state),
+      score: completion.score,
+    }, state.undoHistory)
+    : state;
   if (won) {
     gameState.coins += reward;
-    recordTripleConnectResult({ mode: currentMode, level: currentLevel, score: state.score, stars });
+    recordTripleConnectResult({ mode: currentMode, level: currentLevel, score: completion.score, stars });
   }
   delete gameState.progress.tripleConnect.sessionsByMode[currentMode];
-  if (savePersistentGameData({ coins: gameState.coins, progress: gameState.progress })) return { reward, stars };
+  if (savePersistentGameData({ coins: gameState.coins, progress: gameState.progress })) {
+    state = settledState;
+    return { reward, stars, timeBonus: completion.timeBonus };
+  }
   gameState.coins = rollback.coins;
   gameState.progress.tripleConnect = rollback.progress;
   return false;

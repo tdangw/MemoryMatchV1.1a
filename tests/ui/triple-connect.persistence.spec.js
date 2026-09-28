@@ -66,7 +66,7 @@ test("Triple tray expansion persists once and applies immediately to the active 
   expect(purchased).toEqual({ bought: true, capacity: 10, owned: true });
   await expect(page.locator(".triple-connect__tray")).toHaveAttribute("data-triple-tray-capacity", "10");
   await expect(page.locator(".triple-connect__tray-slot")).toHaveCount(10);
-  await expect(page.locator(".triple-connect__tray-slot[hidden]")).toHaveCount(0);
+  await expect(page.locator('[data-triple-tray-locked="true"]')).toHaveCount(0);
   const trayMetrics = await page.locator(".triple-connect__tray-slot").evaluateAll((slots) => {
     const rects = slots.map((slot) => slot.getBoundingClientRect());
     return {
@@ -74,11 +74,8 @@ test("Triple tray expansion persists once and applies immediately to the active 
       heights: rects.map((rect) => Math.round(rect.height)),
     };
   });
-  const viewport = page.viewportSize();
-  const portraitGrid = viewport.width <= 520 && viewport.height > viewport.width;
-  expect(trayMetrics.rows).toBe(portraitGrid ? 2 : 1);
+  expect(trayMetrics.rows).toBe(1);
   expect(new Set(trayMetrics.heights).size).toBe(1);
-  if (portraitGrid) expect(trayMetrics.heights[0]).toBeGreaterThanOrEqual(40);
   await page.reload();
   const restored = await page.evaluate(async () => {
     const controller = await import("/js/tripleConnect/tripleController.js");
@@ -122,4 +119,30 @@ test("Triple tray expansion is one-time and rolls back when persistence fails", 
     failed: false,
     afterFailure: { coins: 3000, owned: false },
   });
+});
+
+test("Triple opens the tray expansion purchase directly from a locked slot", async ({ page }) => {
+  await page.goto("/");
+  await page.evaluate(async () => {
+    const { gameState } = await import("/js/gameState.js");
+    const { startTripleConnectDevelopmentRound } = await import(
+      "/js/tripleConnect/tripleController.js"
+    );
+    gameState.coins = 3000;
+    startTripleConnectDevelopmentRound({ seed: "tray-direct-purchase" });
+  });
+
+  const unlock = page.locator('[data-triple-tray-unlock="true"]:visible').first();
+  await expect(unlock).toHaveAccessibleName("Mở rộng khay với 3000 Xu");
+  await unlock.click();
+  await expect(page.locator("#shop-confirm-modal")).toContainText(
+    "Mở rộng khay vĩnh viễn",
+  );
+  await page.getByRole("button", { name: "Mua ngay" }).click();
+  await expect(page.locator("#shop-confirm-modal")).toHaveCount(0);
+  await expect(page.locator(".triple-connect__tray")).toHaveAttribute(
+    "data-triple-tray-capacity",
+    "10",
+  );
+  await expect(page.locator('[data-triple-tray-locked="true"]')).toHaveCount(0);
 });

@@ -132,7 +132,7 @@ for (const viewport of viewports) {
   });
 }
 
-test("Triple tray owns seven stable slots through selection and regroup", async ({ page }) => {
+test("Triple tray owns ten stable visual slots with three locked by default", async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 640 });
   await page.goto("/");
   const trayGeometry = await page.evaluate(async () => {
@@ -160,12 +160,19 @@ test("Triple tray owns seven stable slots through selection and regroup", async 
           filter: getComputedStyle(node).filter,
           padding: getComputedStyle(node).padding,
         })),
+      {
+        capacity: tray.dataset.tripleTrayCapacity,
+        label: tray.getAttribute("aria-label"),
+        locked: tray.querySelectorAll('[data-triple-tray-locked="true"]').length,
+      },
     ];
   });
 
-  const [snapshots, trayTiles] = trayGeometry;
+  const [snapshots, trayTiles, trayState] = trayGeometry;
   expect(snapshots).not.toHaveLength(0);
-  expect(snapshots.every(({ slots }) => slots.length === 7)).toBe(true);
+  expect(snapshots.every(({ slots }) => slots.length === 10)).toBe(true);
+  expect(snapshots.every(({ slots }) => new Set(slots.map((slot) => Math.round(slot.top))).size === 1)).toBe(true);
+  expect(trayState).toEqual({ capacity: "7", label: "Khay 10 ô, 3 ô đang khóa", locked: 3 });
   for (const snapshot of snapshots) {
     expect(snapshot.tray.height).toBeCloseTo(snapshots[0].tray.height, topology.trayStabilityTolerancePx);
     expect(snapshot.tray.width).toBeCloseTo(snapshots[0].tray.width, topology.trayStabilityTolerancePx);

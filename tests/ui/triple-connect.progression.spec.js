@@ -148,11 +148,18 @@ test("Triple completion grants the approved reward from the highest combo exactl
     };
   });
   expect(result).toEqual({
-    coins: 20,
+    coins: 23,
     totalStars: 3,
-    best: { score: 198, stars: 3 },
+    best: expect.objectContaining({ stars: 3 }),
   });
-  await expect(page.locator("#level-summary-modal")).toContainText(/XU NHẬN\s*\+18/);
+  expect(result.best.score).toBeGreaterThan(198);
+  const summary = page.locator("#level-summary-modal");
+  await expect(summary).toContainText(/XU NHẬN\s*\+18/);
+  await expect(summary).toContainText(`${result.best.score} ĐIỂM`);
+  await expect(summary).toContainText("THƯỞNG THỜI GIAN");
+  await expect(
+    page.getByLabel(`Tổng điểm: ${result.best.score}`),
+  ).toBeVisible();
 });
 
 test("Triple match transaction rolls back state, progress, and session when persistence fails", async ({
@@ -315,7 +322,7 @@ test("Triple Challenge advances deterministically through its staged timer and e
   const levelTwo = await page.evaluate(async () =>
     (await import("/js/sessionProgress.js")).getActiveSession("triple-connect", "challenge"),
   );
-  expect(levelTwo).toMatchObject({ mode: "challenge", level: 2, layoutId: "challenge-24-v2", remainingTime: 85 });
+  expect(levelTwo).toMatchObject({ mode: "challenge", level: 2, layoutId: "challenge-2", remainingTime: 85 });
 
   await page.evaluate(async () => {
     const { startTripleConnectRound } = await import(

@@ -5,29 +5,27 @@ import { showComboEffect, showScoreEffectAt } from "../ui.js";
 
 const MATCH_DURATION_MS = 300;
 const TRAY_FLIGHT_DURATION_MS = 300;
-const MATCH_TRAY_HOLD_MS = 180;
 const TRAY_COMPACTION_DURATION_MS = 210;
+const REDUCED_TRAY_ARRIVAL_MS = 60;
+let activeMatchCleanup = null;
 
-export function presentTripleTransition({ shell, scope, previous, next, events, effects = {}, render }) {
+export function presentTripleTransition({ shell, scope, previous, next, events, effects = {}, render, isCurrent = () => true }) {
   const match = events.find((event) => event.type === "triple-resolved");
   const selected = events.find((event) => event.type === "tile-selected");
   if (!scope.active) { render(next); return Promise.resolve(); }
   if (!match && selected) return presentTrayFlight({ shell, scope, selected, render, next });
   if (!match) { render(next); return Promise.resolve(); }
-  return presentResolvedTriple({ shell, scope, previous, next, match, selected, effects, render });
+  return presentResolvedTriple({ shell, scope, previous, next, match, selected, effects, render, isCurrent });
 }
 
-function presentResolvedTriple({ shell, scope, previous, next, match, selected, effects, render }) {
-  if (prefersReducedMotion()) {
-    return presentResolvedTripleExit({ shell, scope, match, effects, render, next });
-  }
-  const preview = createMatchTrayPreview(previous, next, match);
-  return presentTrayFlight({ shell, scope, selected, render, next: preview })
-    .then(() => delay(scope, MATCH_TRAY_HOLD_MS))
-    .then(() => presentResolvedTripleExit({ shell, scope, match, effects, render, next }));
+function presentResolvedTriple({ shell, scope, previous, next, match, selected, effects, render, isCurrent }) {
+  // The rule state is committed already. Preserve the visual sequence with
+  // ghosts: the selected card reaches the tray before the three-card exit,
+  // while the live board stays available for the next input.
+  return presentResolvedTripleExit({ shell, scope, previous, match, selected, effects, render, next, isCurrent });
 }
 
-function presentResolvedTripleExit({ shell, scope, match, effects, render, next }) {
+function presentResolvedTripleExit({ shell, scope, previous, match, selected, effects, render, next, isCurrent }) {
   const root = shell.refs.root;
   const surface = shell.refs.board;
   const line = root.querySelector(".triple-connect__line");
@@ -35,6 +33,8 @@ function presentResolvedTripleExit({ shell, scope, match, effects, render, next 
   // painted but before its promise chain reached cleanup. Reset that surface
   // before taking the next visual snapshot so old paths can never ghost into
   // a later match.
+  activeMatchCleanup?.();
+  activeMatchCleanup = null;
   clearTripleEffects(line);
   const surfaceRect = surface.getBoundingClientRect();
   const sourceNodes = match.tileIds.map((id) => root.querySelector(`[data-tile-id="${id}"]`)).filter(Boolean);
@@ -44,42 +44,62 @@ function presentResolvedTripleExit({ shell, scope, match, effects, render, next 
     return Promise.resolve();
   }
   const ghosts = sourceNodes.map((source) => createGhost(source, surfaceRect));
-  // Capture feedback from the real tiles while their board rectangles still
-  // exist. The committed render removes them before the exit ghosts begin.
-  showMatchFeedback(sourceNodes, match);
   ghosts.forEach((ghost) => surface.append(ghost));
   sourceNodes.forEach((source) => source.classList.add("is-match-exiting"));
-  const startVisualFeedback = scope.guard(() => {
-    presentTripleConnection({ surface: line, targets: ghosts, effectId: effects.path?.id });
-    presentTripleExit({ surface, targets: ghosts, effectId: effects.exit?.id });
+  const visualPreview = createMatchTrayPreview(previous, next, match);
+  // Keep the resolved group in the tray for the visual sequence, but feed the
+  // HUD from the committed state so score and game rules never wait on it.
+  render(next, { boardState: visualPreview });
+  const priorTrayRects = captureTrayRects(root);
+  const selectedGhost = ghosts[sourceNodes.findIndex((node) => node.dataset.tileId === selected?.tileId)];
+  const targetSlot = root.querySelectorAll(".triple-connect__tray-slot")[
+    getResolvedTrayTargetIndex(previous, selected?.tileId)
+  ];
+  const trayFlight = presentResolvedTrayFlight({
+    scope,
+    ghost: selectedGhost,
+    targetRect: targetSlot?.getBoundingClientRect(),
   });
   let lineAnimation = null;
+  let superseded = false;
   const cleanup = () => {
+    superseded = true;
     lineAnimation?.cancel();
     lineAnimation = null;
     line?.getAnimations({ subtree: true }).forEach((animation) => animation.cancel());
     line?.style.removeProperty("opacity");
-    clearTripleEffects(line);
+    if (activeMatchCleanup === cleanup) {
+      clearTripleEffects(line);
+      activeMatchCleanup = null;
+    }
     ghosts.forEach((ghost) => ghost.remove());
     sourceNodes.forEach((source) => source.classList.remove("is-match-exiting"));
   };
+  activeMatchCleanup = cleanup;
   const release = scope.own(cleanup, "node");
-  lineAnimation = line.animate(
-    [{ opacity: 0 }, { opacity: 1, offset: 0.25 }, { opacity: 1, offset: 0.62 }, { opacity: 0 }],
-    { duration: MATCH_DURATION_MS, easing: "ease-out", fill: "both" },
-  );
-  scope.animation(lineAnimation);
-  // The committed board/tray patch is the input response. Build the optional
-  // line/exit/score visuals after the click task so they cannot delay it.
-  queueMicrotask(startVisualFeedback);
-  return Promise.all([lineAnimation.finished.catch(() => {})])
+  return trayFlight
     .then(() => {
-      const priorTrayRects = captureTrayRects(root);
-      render(next);
-      return animateTrayCompaction({ root, scope, priorTrayRects });
+      if (superseded) return false;
+      showMatchFeedback(ghosts, match);
+      presentTripleConnection({ surface: line, targets: ghosts, effectId: effects.path?.id });
+      presentTripleExit({ surface, targets: ghosts, effectId: effects.exit?.id });
+      lineAnimation = line.animate(
+        [{ opacity: 0 }, { opacity: 1, offset: 0.25 }, { opacity: 1, offset: 0.62 }, { opacity: 0 }],
+        { duration: MATCH_DURATION_MS, easing: "ease-out", fill: "both" },
+      );
+      scope.animation(lineAnimation);
+      return lineAnimation.finished.catch(() => {}).then(() => true);
     })
-    .then(() => presentMilestoneSequence({ shell, scope, source: ghosts[1] || ghosts[0], milestones: effects.milestones }))
     .then(() => {
+      if (superseded || !isCurrent()) return false;
+      render(next);
+      return animateTrayCompaction({ root, scope, priorTrayRects }).then(() => true);
+    })
+    .then((ready) => (ready && !superseded
+      ? presentMilestoneSequence({ shell, scope, source: ghosts[1] || ghosts[0], milestones: effects.milestones })
+      : false))
+    .then(() => {
+      if (superseded) return;
       presentCommittedRewards(shell, ghosts[1] || ghosts[0], effects.rewards);
       cleanup();
       release.forget();
@@ -118,8 +138,49 @@ function createMatchTrayPreview(previous, next, match) {
   };
 }
 
-function delay(scope, duration) {
-  return new Promise((resolve) => scope.timeout(resolve, duration));
+function getResolvedTrayTargetIndex(previous, selectedTileId) {
+  const selectedType = previous.tiles[selectedTileId]?.type;
+  if (!selectedType) return previous.tray.length;
+  return previous.tray.reduce(
+    (lastIndex, tileId, index) => (previous.tiles[tileId]?.type === selectedType ? index : lastIndex),
+    -1,
+  ) + 1;
+}
+
+function presentResolvedTrayFlight({ scope, ghost, targetRect }) {
+  if (!ghost || !targetRect || prefersReducedMotion()) return Promise.resolve();
+  const sourceRect = ghost.getBoundingClientRect();
+  const dx = targetRect.left - sourceRect.left;
+  const dy = targetRect.top - sourceRect.top;
+  const scaleX = sourceRect.width ? targetRect.width / sourceRect.width : 1;
+  const scaleY = sourceRect.height ? targetRect.height / sourceRect.height : 1;
+  const lift = Math.min(34, Math.max(12, Math.abs(dy) * 0.16));
+  const finalTransform = `translate(${dx}px, ${dy}px) scale(${scaleX}, ${scaleY})`;
+  ghost.classList.add("triple-connect__tray-flight");
+  ghost.style.transformOrigin = "top left";
+  const animation = ghost.animate([
+    { transform: "translate(0, 0) scale(1)", opacity: 1 },
+    {
+      offset: 0.58,
+      transform: `translate(${dx * 0.54}px, ${dy * 0.48 - lift}px) scale(${1 + (scaleX - 1) * 0.54}, ${1 + (scaleY - 1) * 0.54})`,
+      opacity: 1,
+    },
+    { transform: finalTransform, opacity: 1 },
+  ], { duration: TRAY_FLIGHT_DURATION_MS, easing: "cubic-bezier(.18,.82,.22,1)", fill: "both" });
+  scope.animation(animation);
+  return animation.finished.catch(() => {}).then(() => {
+    // A finished Web Animation with fill: both continues to composite its
+    // transform. Commit the landing geometry, then cancel the flight before
+    // the removal effect starts. This gives every ghost one transform owner
+    // and prevents the flown card from being blurred or jumping backward.
+    ghost.style.left = `${Number.parseFloat(ghost.style.left) + dx}px`;
+    ghost.style.top = `${Number.parseFloat(ghost.style.top) + dy}px`;
+    ghost.style.width = `${targetRect.width}px`;
+    ghost.style.height = `${targetRect.height}px`;
+    ghost.style.removeProperty("transform");
+    animation.cancel();
+    ghost.classList.remove("triple-connect__tray-flight");
+  });
 }
 
 function captureTrayRects(root) {
@@ -200,7 +261,12 @@ function showMatchFeedback(tiles, match) {
     }),
     { x: 0, y: 0 },
   );
-  showScoreEffectAt({ x: center.x / rects.length, y: center.y / rects.length }, match.points);
+  showScoreEffectAt({
+    x: center.x / rects.length,
+    // Place the label just above the top tray card, rather than high above
+    // the average of the old board and tray positions.
+    y: Math.min(...rects.map((rect) => rect.top)) - 8,
+  }, match.points);
   showComboEffect(anchor, match.combo);
 }
 
@@ -238,7 +304,7 @@ function presentTrayFlight({ shell, scope, selected, render, next }) {
     || shell.refs.root.querySelector(`[data-tile-id="${selected.tileId}"]`);
   if (!target || prefersReducedMotion()) {
     target?.classList.add("is-tray-arrived");
-    scope.timeout(() => target?.classList.remove("is-tray-arrived"), 90);
+    scope.timeout(() => target?.classList.remove("is-tray-arrived"), REDUCED_TRAY_ARRIVAL_MS);
     return Promise.resolve();
   }
   const targetRect = target.getBoundingClientRect();

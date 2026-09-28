@@ -663,6 +663,31 @@ function renderAppearanceGroup(grid, title, type, items, roundId, modal) {
   grid.append(group);
 }
 
+export function openTripleTrayExpansionPurchase({ onPurchase } = {}) {
+  if (gameState.progress.tripleConnect.trayExpansionOwned) {
+    showShopMessage("Bạn đã sở hữu nâng cấp này.", "info");
+    return false;
+  }
+  const existingConfirmation = document.querySelector("#shop-confirm-modal");
+  if (existingConfirmation) {
+    existingConfirmation.querySelector(".app-button--primary")?.focus();
+    return false;
+  }
+  const expansion = TRIPLE_PRODUCT_DECISIONS.trayExpansion;
+  openPurchaseConfirmation(
+    {
+      id: "tray-expansion",
+      type: "triple-tray-expansion",
+      title: "Mở rộng khay vĩnh viễn",
+      price: expansion.releasePrice,
+    },
+    gameState.roundId,
+    null,
+    onPurchase,
+  );
+  return true;
+}
+
 function openPurchaseConfirmation(item, roundId, shopModal, onPurchase) {
   let isSubmitting = false;
   const content = document.createElement("div");
@@ -700,7 +725,7 @@ function openPurchaseConfirmation(item, roundId, shopModal, onPurchase) {
             !handleBuyItem(
               item,
               roundId,
-              shopModal.overlay.dataset.fromMenu === "true",
+              shopModal?.overlay?.dataset.fromMenu === "true",
             )
           ) {
             isSubmitting = false;
@@ -766,6 +791,8 @@ function handleBuyItem(item, roundId, fromMenu = false) {
       showShopMessage(
         gameState.progress.tripleConnect.trayExpansionOwned
           ? "Bạn đã sở hữu nâng cấp này."
+          : gameState.coins < item.price
+            ? "Bạn không đủ Xu để mở rộng khay."
           : "Không thể lưu giao dịch. Xu và nâng cấp chưa thay đổi.",
         "error",
       );

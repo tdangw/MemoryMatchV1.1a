@@ -390,7 +390,7 @@
   box-sizing: border-box;
   height: var(--triple-tray-height);
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-columns: repeat(10, minmax(0, 1fr));
   gap: 1px;
   padding: 3px;
   position: relative;
@@ -452,13 +452,10 @@
   text-shadow: 0 1px 2px rgb(0 4 18 / 88%), 0 0 6px rgb(89 197 255 / 62%);
   transform: translateY(-.5px);
 }
-.triple-connect__tray[data-triple-tray-capacity="10"] { grid-template-columns: repeat(10, minmax(0, 1fr)); }
 @media (max-width: 520px) and (orientation: portrait) {
-  .triple-connect__tray[data-triple-tray-capacity="10"] {
-    --triple-tray-height: 128px;
-    --triple-tray-slot-size: 61px;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    grid-template-rows: repeat(2, minmax(0, 1fr));
+  .triple-connect__tray {
+    --triple-tray-height: clamp(36px, 11vw, 44px);
+    --triple-tray-slot-size: clamp(24px, 8vw, 34px);
   }
 }
 .triple-connect__tray-slot {
@@ -473,6 +470,54 @@
     inset 0 2px 4px rgb(0 0 0 / 82%),
     inset 0 -1px 1px rgb(144 225 255 / 16%),
     0 1px 1px rgb(213 249 255 / 16%);
+}
+.triple-connect__tray-slot.is-locked {
+  position: relative;
+  border-color: rgb(126 145 174 / 24%);
+  background:
+    repeating-linear-gradient(135deg, rgb(116 135 166 / 8%) 0 4px, transparent 4px 8px),
+    linear-gradient(145deg, #07101f, #020611);
+  box-shadow:
+    inset 0 2px 4px rgb(0 0 0 / 88%),
+    inset 0 0 0 1px rgb(167 188 218 / 5%);
+}
+.triple-connect__tray-slot.is-locked::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: clamp(7px, 2vw, 10px);
+  height: clamp(6px, 1.7vw, 9px);
+  border: 2px solid rgb(155 174 204 / 48%);
+  border-bottom: 0;
+  border-radius: 7px 7px 0 0;
+  transform: translate(-50%, -78%);
+}
+.triple-connect__tray-slot.is-locked::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: clamp(13px, 3.4vw, 18px);
+  height: clamp(10px, 2.8vw, 15px);
+  border-radius: 4px;
+  background: rgb(93 111 140 / 72%);
+  box-shadow: inset 0 1px rgb(205 220 241 / 18%), 0 2px 4px rgb(0 0 0 / 35%);
+  transform: translate(-50%, -5%);
+}
+.triple-connect__tray-unlock {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border: 0;
+  border-radius: inherit;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.triple-connect__tray-unlock:focus-visible {
+  outline: 2px solid #8ee7ff;
+  outline-offset: 2px;
 }
 .triple-connect__tray .triple-connect__tile {
   width: min(var(--triple-tray-slot-size), calc(100% + 12px));
