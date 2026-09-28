@@ -444,6 +444,24 @@
 .link-path-overlay--meteor .link-path-overlay__glow { stroke: #f06b36; opacity: .58; }
 .link-path-overlay--poison .link-path-overlay__beam { stroke: #d0ffa5; stroke-width: 1.75; stroke-dasharray: .025 .05; filter: drop-shadow(0 0 5px #72d73e); }
 .link-path-overlay--poison .link-path-overlay__glow { stroke: #42a44a; opacity: .58; }
+.effect-v2-connection__decorations { pointer-events: none; }
+.effect-v2-connection__decoration { fill: #e8ffff; opacity: .92; transform-box: fill-box; transform-origin: center; animation: effect-v2-decoration-pop 260ms ease-out both; }
+.effect-v2-connection__decoration--jagged { fill: #91ffff; }
+.effect-v2-connection__decoration--sparks { fill: #ffbf65; }
+.effect-v2-connection__decoration--symbols { fill: #deb5ff; stroke: #fff3ff; stroke-width: .3; }
+.effect-v2-connection__decoration--packets { fill: #57efff; }
+.effect-v2-connection__decoration--wave,
+.effect-v2-connection__decoration--rings,
+.effect-v2-connection__decoration--wavelets { fill: none; stroke: #9ceeff; stroke-width: .55; }
+.effect-v2-connection__decoration--helix { fill: #d3a3ff; }
+.effect-v2-connection__decoration--motes { fill: #ffe9a1; }
+.effect-v2-connection__decoration--ribbon { fill: #c873a1; }
+.effect-v2-connection__decoration--dash { fill: #dfff91; }
+.effect-v2-connection__decoration--projectile { fill: #fff0aa; }
+.effect-v2-connection__decoration--charge { fill: #bdf8ff; stroke: #5ecbff; stroke-width: .55; }
+.effect-v2-connection__decoration--links { fill: #ffe28c; stroke: #c38526; stroke-width: .4; }
+.effect-v2-connection__decoration--droplets { fill: #b9ff9d; }
+@keyframes effect-v2-decoration-pop { from { opacity: 0; transform: scale(.35); } 50% { opacity: 1; } to { opacity: 0; transform: scale(1.7); } }
 
 @keyframes link-electric-trace {
   0% { stroke-dashoffset: 1; opacity: 0; }
@@ -570,6 +588,7 @@
 @media (prefers-reduced-motion: reduce) {
   .link-path-overlay__beam,
   .link-path-overlay__glow,
+  .effect-v2-connection__decoration,
   :is(.link-tile, .triple-connect__ghost).is-removing,
   :is(.link-tile, .triple-connect__ghost).is-removing > img:not(.link-tile__frost-overlay) {
     animation: none !important;

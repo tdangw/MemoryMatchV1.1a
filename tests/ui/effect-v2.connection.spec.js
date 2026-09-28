@@ -39,6 +39,93 @@ test("Link V2 connection surface reuses its SVG nodes and clears without stale d
   expect(result.points).toEqual([null, null]);
 });
 
+test("Link V2 connection restarts pooled line animations on every draw", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto("/");
+  const result = await page.evaluate(async () => {
+    (await import("/js/gameSelector.js")).openGameMenu("link-connect");
+    const controller = await import("/js/linkConnect/linkController.js");
+    const { linkGameState } = await import("/js/linkConnect/linkState.js");
+    const { findAvailableConnections } = await import("/js/linkConnect/pathfinder.js");
+    const { drawLinkPath, clearLinkPath } = await import("/js/linkConnect/linkRenderer.js");
+    controller.startLinkLevel({ mode: "easy" });
+    const path = findAvailableConnections(linkGameState.board.grid)[0].path;
+    const surface = document.querySelector("#link-path-overlay");
+    drawLinkPath(path, linkGameState.board);
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+    const nodes = [...surface.querySelectorAll("polyline")];
+    clearLinkPath();
+    drawLinkPath(path, linkGameState.board);
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+    const animations = nodes.flatMap((node) => node.getAnimations({ subtree: false }));
+    return {
+      reused: nodes.every((node) => node.isConnected),
+      animationCount: animations.length,
+      allRunning: animations.every((animation) => animation.playState === "running"),
+      allRestarted: animations.every((animation) => Number(animation.currentTime) < 32),
+    };
+  });
+  expect(result.reused).toBe(true);
+  expect(result.animationCount).toBe(2);
+  expect(result.allRunning).toBe(true);
+  expect(result.allRestarted).toBe(true);
+});
+
+test("Link V2 connection keeps catalog decorations bounded in its persistent SVG pool", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto("/");
+  const signatures = await page.evaluate(async () => {
+    const { renderConnectionV2, clearConnectionV2 } = await import("/js/effects/connectionEngine.js");
+    const { EFFECT_V2_PATHS } = await import("/js/effects/effectCatalog.js");
+    const surface = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    document.body.append(surface);
+    const entries = EFFECT_V2_PATHS.map((effect) => {
+      renderConnectionV2({ surface, points: [{ x: 5, y: 5 }, { x: 45, y: 35 }, { x: 90, y: 80 }], effect, seed: 7 });
+      const decorations = [...surface.querySelectorAll("[data-effect-decoration]")]
+        .filter((node) => node.getAttribute("display") !== "none");
+      return { id: effect.id, family: effect.family, count: decorations.length, signature: decorations.map((node) => node.getAttribute("class")).join("|") };
+    });
+    clearConnectionV2(surface);
+    surface.remove();
+    return entries;
+  });
+  expect(signatures).toHaveLength(21);
+  expect(new Set(signatures.map((entry) => entry.family)).size).toBeGreaterThanOrEqual(17);
+  expect(new Set(signatures.map((entry) => `${entry.count}:${entry.signature}`)).size).toBeGreaterThanOrEqual(17);
+});
+
+test("Triple V2 connection owns one handle and releases it after presentation cleanup", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto("/");
+  const result = await page.evaluate(async () => {
+    const { presentTripleConnection, clearTripleEffects } = await import("/js/tripleConnect/tripleEffectAdapter.js");
+    const { getEffectRegistry } = await import("/js/gameShell/gameShellEffects.js");
+    const frame = document.createElement("div");
+    const surface = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    frame.append(surface);
+    document.body.append(frame);
+    frame.getBoundingClientRect = () => ({ left: 0, top: 0, width: 100, height: 100 });
+    const targets = [10, 45, 80].map((left) => {
+      const tile = document.createElement("div");
+      tile.getBoundingClientRect = () => ({ left, top: 40, width: 10, height: 10 });
+      frame.append(tile);
+      return tile;
+    });
+    const rendered = presentTripleConnection({ surface, targets, effectId: "electric" });
+    const before = getEffectRegistry().diagnostics().connection;
+    clearTripleEffects(surface);
+    const after = getEffectRegistry().diagnostics().connection;
+    const details = { rendered, before, after, visible: surface.classList.contains("is-visible"), children: surface.children.length };
+    frame.remove();
+    return details;
+  });
+  expect(result.rendered).toBe(true);
+  expect(result.before).toBe(1);
+  expect(result.after).toBe(0);
+  expect(result.visible).toBe(false);
+  expect(result.children).toBe(0);
+});
+
 test("Link V2 connection handle is disposed when switching games", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
