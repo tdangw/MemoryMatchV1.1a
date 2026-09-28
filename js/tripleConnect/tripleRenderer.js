@@ -179,11 +179,7 @@ function getCornerStackSlot(slotId, layout, geometry) {
   if (!/[a-z-]+/.test(corner)) return null;
   const configuredAnchor = layout.cornerStackAnchors?.[corner];
   if (configuredAnchor) return { ...configuredAnchor, layer: 0 };
-  // V5 and earlier saved sessions did not store stack anchors in the layout.
-  // Retain this fallback strictly for their restoration path.
-  const x = corner.endsWith("right") ? geometry.gridWidth - geometry.tileWidth : 0;
-  const y = corner.startsWith("bottom") ? geometry.gridHeight - geometry.tileHeight : 0;
-  return { x, y, layer: 0 };
+  return null;
 }
 
 function getCoverDepths(state) {

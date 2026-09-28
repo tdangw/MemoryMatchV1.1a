@@ -3,46 +3,17 @@ import {
   TRIPLE_EASY_FALLBACK_SEED,
   TRIPLE_EASY_GENERATOR_BUDGET,
   TRIPLE_EASY_LAYOUT,
-  TRIPLE_EASY_LAYOUT_V4,
-  TRIPLE_EASY_LAYOUT_V3,
-  TRIPLE_EASY_LAYOUT_V2,
-  TRIPLE_EASY_LAYOUT_V1,
   TRIPLE_NORMAL_CONFIG,
   TRIPLE_NORMAL_LAYOUT,
-  TRIPLE_NORMAL_LAYOUT_V6,
-  TRIPLE_NORMAL_LAYOUT_V4,
-  TRIPLE_NORMAL_LAYOUT_V3,
-  TRIPLE_NORMAL_LAYOUT_V2,
-  TRIPLE_NORMAL_LAYOUT_V1,
   TRIPLE_HARD_CONFIG,
   TRIPLE_HARD_LAYOUT,
-  TRIPLE_HARD_LAYOUT_V6,
-  TRIPLE_HARD_LAYOUT_V4,
-  TRIPLE_HARD_LAYOUT_V3,
-  TRIPLE_HARD_LAYOUT_V2,
-  TRIPLE_HARD_LAYOUT_V1,
   TRIPLE_HARD_SOLVER_BUDGET,
   TRIPLE_SUPER_HARD_CONFIG,
   TRIPLE_SUPER_HARD_LAYOUT,
-  TRIPLE_SUPER_HARD_LAYOUT_V6,
-  TRIPLE_SUPER_HARD_LAYOUT_V4,
-  TRIPLE_SUPER_HARD_LAYOUT_V3,
-  TRIPLE_SUPER_HARD_LAYOUT_V2,
-  TRIPLE_SUPER_HARD_LAYOUT_V1,
   TRIPLE_SUPER_HARD_SOLVER_BUDGET,
   TRIPLE_ENDLESS_CONFIG,
-  TRIPLE_CHALLENGE_18_LAYOUT,
-  TRIPLE_CHALLENGE_24_LAYOUT,
-  TRIPLE_CHALLENGE_30_LAYOUT,
-  TRIPLE_CHALLENGE_42_LAYOUT,
-  TRIPLE_CHALLENGE_60_LAYOUT,
-  TRIPLE_CHALLENGE_48_LAYOUT,
-  TRIPLE_CHALLENGE_24_LAYOUT_V3,
-  TRIPLE_CHALLENGE_36_LAYOUT_V5,
-  TRIPLE_CHALLENGE_42_LAYOUT_V2,
-  TRIPLE_CHALLENGE_54_LAYOUT_V5,
-  TRIPLE_CHALLENGE_60_LAYOUT_V3,
-  TRIPLE_CHALLENGE_75_LAYOUT_V5,
+  TRIPLE_ENDLESS_LAYOUT,
+  TRIPLE_CHALLENGE_LAYOUTS,
   getTripleChallengeStage,
   TRIPLE_LUCKY_REWARDS,
   TRIPLE_CORNER_STACK_CORNERS,
@@ -55,45 +26,16 @@ export function getEasyTripleLayout() {
   return TRIPLE_EASY_LAYOUT;
 }
 export function getNormalTripleLayout() {
-  return TRIPLE_NORMAL_LAYOUT_V6;
+  return TRIPLE_NORMAL_LAYOUT;
 }
 export function getTripleLayout(layoutId) {
   const layouts = [
     TRIPLE_EASY_LAYOUT,
-    TRIPLE_NORMAL_LAYOUT_V6,
-    TRIPLE_HARD_LAYOUT_V6,
-    TRIPLE_SUPER_HARD_LAYOUT_V6,
     TRIPLE_NORMAL_LAYOUT,
     TRIPLE_HARD_LAYOUT,
     TRIPLE_SUPER_HARD_LAYOUT,
-    TRIPLE_EASY_LAYOUT_V4,
-    TRIPLE_NORMAL_LAYOUT_V4,
-    TRIPLE_HARD_LAYOUT_V4,
-    TRIPLE_SUPER_HARD_LAYOUT_V4,
-    TRIPLE_EASY_LAYOUT_V3,
-    TRIPLE_NORMAL_LAYOUT_V3,
-    TRIPLE_HARD_LAYOUT_V3,
-    TRIPLE_SUPER_HARD_LAYOUT_V3,
-    TRIPLE_EASY_LAYOUT_V2,
-    TRIPLE_NORMAL_LAYOUT_V2,
-    TRIPLE_HARD_LAYOUT_V2,
-    TRIPLE_SUPER_HARD_LAYOUT_V2,
-    TRIPLE_CHALLENGE_18_LAYOUT,
-    TRIPLE_CHALLENGE_24_LAYOUT,
-    TRIPLE_CHALLENGE_30_LAYOUT,
-    TRIPLE_CHALLENGE_42_LAYOUT,
-    TRIPLE_CHALLENGE_60_LAYOUT,
-    TRIPLE_CHALLENGE_48_LAYOUT,
-    TRIPLE_CHALLENGE_24_LAYOUT_V3,
-    TRIPLE_CHALLENGE_36_LAYOUT_V5,
-    TRIPLE_CHALLENGE_42_LAYOUT_V2,
-    TRIPLE_CHALLENGE_54_LAYOUT_V5,
-    TRIPLE_CHALLENGE_60_LAYOUT_V3,
-    TRIPLE_CHALLENGE_75_LAYOUT_V5,
-    TRIPLE_EASY_LAYOUT_V1,
-    TRIPLE_NORMAL_LAYOUT_V1,
-    TRIPLE_HARD_LAYOUT_V1,
-    TRIPLE_SUPER_HARD_LAYOUT_V1,
+    TRIPLE_ENDLESS_LAYOUT,
+    ...TRIPLE_CHALLENGE_LAYOUTS,
   ];
   const layout = layouts.find((candidate) => candidate.id === layoutId);
   if (!layout) throw new TypeError(`Unsupported Triple layout: ${layoutId}`);
@@ -102,7 +44,7 @@ export function getTripleLayout(layoutId) {
 export function generateNormalTripleBoard({ seed, solverOptions } = {}) {
   return generateBoard({
     seed,
-    layout: TRIPLE_NORMAL_LAYOUT_V6,
+    layout: TRIPLE_NORMAL_LAYOUT,
     config: TRIPLE_NORMAL_CONFIG,
     solverOptions,
   });
@@ -111,7 +53,7 @@ export function generateHardTripleBoard({ seed, solverOptions } = {}) {
   return generateBoard({
     seed,
     maxAttempts: 1,
-    layout: TRIPLE_HARD_LAYOUT_V6,
+    layout: TRIPLE_HARD_LAYOUT,
     config: TRIPLE_HARD_CONFIG,
     solverOptions: { ...TRIPLE_HARD_SOLVER_BUDGET, ...solverOptions },
   });
@@ -120,7 +62,7 @@ export function generateSuperHardTripleBoard({ seed, solverOptions } = {}) {
   return generateBoard({
     seed,
     maxAttempts: 1,
-    layout: TRIPLE_SUPER_HARD_LAYOUT_V6,
+    layout: TRIPLE_SUPER_HARD_LAYOUT,
     config: TRIPLE_SUPER_HARD_CONFIG,
     solverOptions: { ...TRIPLE_SUPER_HARD_SOLVER_BUDGET, ...solverOptions },
   });
@@ -129,7 +71,7 @@ export function generateEndlessTripleBoard({ seed, solverOptions } = {}) {
   return generateBoard({
     seed,
     maxAttempts: 1,
-    layout: TRIPLE_SUPER_HARD_LAYOUT_V6,
+    layout: TRIPLE_ENDLESS_LAYOUT,
     config: TRIPLE_ENDLESS_CONFIG,
     solverOptions: { ...TRIPLE_SUPER_HARD_SOLVER_BUDGET, ...solverOptions },
   });
@@ -254,8 +196,8 @@ export function replayTripleWitness(board, witness) {
 function buildSolutionFirstBoard({ seed, layout, config }) {
   const random = createSeededRng(seed);
   const coverGraphBySlot = createTripleCoverGraph(layout);
-  const pilePlan = createPilePlan(layout, config, random);
-  const witnessSlots = createWitnessSlots(layout, random, pilePlan.stackSlots);
+  const stackPlan = createCornerStackPlan(layout, config);
+  const witnessSlots = createWitnessSlots(layout, random, stackPlan.stackSlots);
   if (witnessSlots.length !== config.tileCount || config.tileCount % 3 !== 0)
     throw new TypeError("Triple pile configuration does not match its tile count.");
   const typeOrder = shuffle(
@@ -270,7 +212,7 @@ function buildSolutionFirstBoard({ seed, layout, config }) {
   witnessSlots.forEach((slot, index) => {
     const type = typeOrder[Math.floor(index / 3)];
     const tile = {
-      id: (pilePlan.depthBySlot.get(slot.id) || 1) > 1
+      id: (stackPlan.depthBySlot.get(slot.id) || 1) > 1
         ? `tile-${slot.id}-${index + 1}`
         : `tile-${slot.id}`,
       type,
@@ -283,7 +225,7 @@ function buildSolutionFirstBoard({ seed, layout, config }) {
     tileIdsBySlot.set(slot.id, tileIdsAtSlot);
   });
   const cornerStacks = Object.fromEntries(
-    [...pilePlan.depthBySlot.entries()]
+    [...stackPlan.depthBySlot.entries()]
       .filter(([, depth]) => depth > 1)
       .map(([slotId]) => [`stack-${slotId}`, Object.freeze({
         anchorSlotId: slotId,
@@ -312,27 +254,21 @@ function buildSolutionFirstBoard({ seed, layout, config }) {
   return Object.freeze({ seed, layoutId: layout.id, board, witness });
 }
 
-function createPilePlan(layout, config, random) {
-  // Transitional normalization keeps the solution-first contract valid while
-  // corner-anchor topology is materialized below.
-  if (Array.isArray(config.cornerStackSizes)) {
-    const stackSlots = config.cornerStackSizes.map((depth, index) => ({
-      id: `corner-stack-${TRIPLE_CORNER_STACK_CORNERS[index]}`,
-      layer: 0,
-      corner: TRIPLE_CORNER_STACK_CORNERS[index],
-      depth,
-    }));
-    return { depthBySlot: new Map(stackSlots.map((slot) => [slot.id, slot.depth])), stackSlots };
+function createCornerStackPlan(layout, config) {
+  if (!Array.isArray(config.cornerStackSizes)) {
+    if (config.tileCount === layout.slots.length)
+      return { depthBySlot: new Map(), stackSlots: [] };
+    throw new TypeError("Triple pile configuration must use corner stacks.");
   }
-  const requested = config.pilePlan || {};
-  const depth2 = Number(requested.depth2 || 0);
-  const depth3 = Number(requested.depth3 || 0);
-  if (![depth2, depth3].every((value) => Number.isInteger(value) && value >= 0)
-    || depth2 + depth3 > layout.slots.length) throw new TypeError("Triple pile plan is invalid.");
-  const selectedSlots = shuffle(layout.slots, random).slice(0, depth2 + depth3);
-  const depthBySlot = new Map();
-  selectedSlots.forEach((slot, index) => depthBySlot.set(slot.id, index < depth3 ? 3 : 2));
-  return { depthBySlot, stackSlots: [] };
+  const stackSlots = config.cornerStackSizes.map((depth, index) => ({
+    id: `corner-stack-${TRIPLE_CORNER_STACK_CORNERS[index]}`,
+    layer: 0,
+    corner: TRIPLE_CORNER_STACK_CORNERS[index],
+    depth,
+  }));
+  if (!stackSlots.every(({ depth, corner }) => Number.isInteger(depth) && depth > 0 && layout.cornerStackAnchors?.[corner]))
+    throw new TypeError("Triple corner stack configuration is invalid.");
+  return { depthBySlot: new Map(stackSlots.map((slot) => [slot.id, slot.depth])), stackSlots };
 }
 
 function createWitnessSlots(layout, random, stackSlots = []) {
@@ -414,7 +350,6 @@ export function validateTripleLayout(layout) {
       throw new TypeError("Triple layout slot is outside its template bounds.");
     }
   }
-  if (layout.coordinateUnit !== "half-card") return;
   if (
     !Number.isInteger(layout.gridWidth) ||
     !Number.isInteger(layout.gridHeight) ||

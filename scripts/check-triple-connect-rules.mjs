@@ -66,11 +66,7 @@ for (let index = 0; index < 600; index += 1) {
 assert.equal(twentyCycles.cycleId, 20);
 assert.equal(twentyCycles.progress, 0);
 assert.equal(new Set(allClaims).size, 200, "Every milestone must be granted once in each cycle.");
-assert.deepEqual(normalizeTripleMilestones({ progress: 0, cycleId: 3, claimedIds: [] }), { version: 2, progress: 0, cycleId: 3, claimedIds: [] });
-assert.deepEqual(normalizeTripleMilestones({ progress: 1, cycleId: 3 }), { version: 2, progress: 0, cycleId: 3, claimedIds: [] });
-assert.deepEqual(normalizeTripleMilestones({ progress: 29, cycleId: 3 }), { version: 2, progress: 19, cycleId: 3, claimedIds: ["3:1", "3:2", "3:3", "3:4", "3:5", "3:6"] });
-assert.deepEqual(normalizeTripleMilestones({ progress: 30, cycleId: 3 }), { version: 2, progress: 20, cycleId: 3, claimedIds: ["3:1", "3:2", "3:3", "3:4", "3:5", "3:6"] });
-assert.deepEqual(normalizeTripleMilestones({ progress: 44, cycleId: 3 }), { version: 2, progress: 29, cycleId: 3, claimedIds: ["3:1", "3:2", "3:3", "3:4", "3:5", "3:6", "3:7", "3:8", "3:9"] });
+assert.deepEqual(normalizeTripleMilestones({ progress: 44, cycleId: 3 }), { version: 2, progress: 0, cycleId: 0, claimedIds: [] }, "A prior milestone contract resets instead of migrating.");
 assert.deepEqual(normalizeTripleMilestones({ version: 2, progress: "bad", cycleId: -1, claimedIds: ["bad"] }), { version: 2, progress: 0, cycleId: 0, claimedIds: [] });
 
 const covered = makeState(
@@ -100,7 +96,7 @@ assert.equal(getExposedTileIds(pileRevealed).includes("pile-bottom"), true, "Sel
 const pileUndone = reduceTripleCommand(pileRevealed, { type: "undo" }).nextState;
 assert.equal(getExposedTileIds(pileUndone).includes("pile-top"), true, "Undo must restore the previous pile top.");
 const pileSnapshot = serializeTripleRoundState(pileRevealed);
-assert.equal(pileSnapshot.version, 3);
+assert.equal(Object.hasOwn(pileSnapshot, "version"), false);
 assert.deepEqual(restoreSerializedTripleRoundState(pileSnapshot).cornerStacks, pileRevealed.cornerStacks, "Corner-stack order must survive Continue serialization.");
 
 let grouped = makeState({ a: 3, b: 3, c: 3, d: 3 });
@@ -202,8 +198,8 @@ const persisted = serializeTripleRoundState(matched.nextState);
 assert.equal(Object.hasOwn(persisted, "undoHistory"), false);
 assert.equal(Object.hasOwn(persisted, "trayCapacity"), false, "Capacity is profile-derived, not saved in a round snapshot.");
 assert.deepEqual(restoreSerializedTripleRoundState(persisted), restoreSerializedTripleRoundState(persisted));
-assert.equal(restoreSerializedTripleRoundState({ ...persisted, maxCombo: undefined }).maxCombo, matched.nextState.combo);
-assert.doesNotThrow(() => restoreSerializedTripleRoundState({ ...persisted, version: 1, cornerStacks: undefined }), "Legacy v1 snapshots must still restore.");
+assert.throws(() => restoreSerializedTripleRoundState({ ...persisted, maxCombo: undefined }));
+assert.throws(() => restoreSerializedTripleRoundState({ ...persisted, cornerStacks: undefined }), "Incomplete snapshots must reset at the session boundary.");
 assert.throws(() => restoreSerializedTripleRoundState({ ...persisted, tiles: persisted.tiles.slice(1) }));
 assert.equal(restoreSerializedTripleRoundState(persisted, { trayCapacity: 10 }).trayCapacity, 10);
 assert.equal(restoreSerializedTripleRoundState(persisted).trayCapacity, 7);

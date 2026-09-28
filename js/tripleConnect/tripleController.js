@@ -173,7 +173,7 @@ export function continueTripleConnectSession(session) {
   if (!isValidTripleConnectSession(session)) return null;
   try {
     state = restoreSerializedTripleRoundState(session.snapshot, { trayCapacity: getEffectiveTripleTrayCapacity() });
-    const layout = getTripleLayout(session.layoutId || inferLayoutId(state));
+    const layout = getTripleLayout(session.layoutId);
     currentMode = session.mode;
     currentLevel = normalizeLevel(session.level);
     currentLayout = layout;
@@ -198,6 +198,7 @@ export function continueTripleConnectSession(session) {
 export function isValidTripleConnectSession(session) {
   if (
     !session?.snapshot ||
+    typeof session.layoutId !== "string" ||
     !getTripleModeConfigSafe(session.mode) ||
     !Number.isInteger(session.remainingTime) ||
     session.remainingTime < 0
@@ -215,7 +216,7 @@ export function isValidTripleConnectSession(session) {
     if (roundState.status !== "playing") return false;
     return isCompatibleTripleSession(
       roundState,
-      getTripleLayout(session.layoutId || inferLayoutId(roundState)),
+      getTripleLayout(session.layoutId),
     );
   } catch {
     return false;
@@ -866,14 +867,6 @@ function updateTimer(shell, visualRemainingTime = remainingTime) {
   shell.refs.root.dataset.tripleExpired = String(
     state.status === "lost" && remainingTime === 0,
   );
-}
-
-function inferLayoutId(roundState) {
-  const count = Object.keys(roundState.tiles).length;
-  if (count === 12) return "easy-12-v1";
-  if (count === 24) return "normal-24-v1";
-  if (count === 36) return "hard-36-v1";
-  return "super-hard-60-v1";
 }
 
 function normalizeLevel(level) {

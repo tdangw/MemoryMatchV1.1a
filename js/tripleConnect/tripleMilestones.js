@@ -1,26 +1,17 @@
-import { getTripleMilestoneReward, TRIPLE_LEGACY_MILESTONE_CONTRACT, TRIPLE_PRODUCT_DECISIONS } from "./tripleConfig.js";
+import { getTripleMilestoneReward, TRIPLE_PRODUCT_DECISIONS } from "./tripleConfig.js";
 
 export function normalizeTripleMilestones(value = {}) {
   const source = value && typeof value === "object" && !Array.isArray(value) ? value : {};
   const { milestones } = TRIPLE_PRODUCT_DECISIONS;
+  if (source.version !== milestones.version)
+    return Object.freeze({ version: milestones.version, progress: 0, cycleId: 0, claimedIds: [] });
   const cycleId = normalizeNonNegativeInteger(source.cycleId);
-  if (source.version === milestones.version) {
-    return Object.freeze({
-      version: milestones.version,
-      progress: Math.min(milestones.target - 1, normalizeNonNegativeInteger(source.progress)),
-      cycleId,
-      claimedIds: normalizeClaimIds(source.claimedIds, cycleId),
-    });
-  }
-  const legacyProgress = Math.min(TRIPLE_LEGACY_MILESTONE_CONTRACT.target - 1, normalizeNonNegativeInteger(source.progress));
-  const progress = Math.floor(legacyProgress * milestones.target / TRIPLE_LEGACY_MILESTONE_CONTRACT.target);
-  // Every new milestone already passed by the old progress is marked claimed.
-  // This migration intentionally grants nothing retroactively.
-  const claimedIds = Array.from(
-    { length: Math.floor(progress / milestones.step) },
-    (_, index) => `${cycleId}:${index + 1}`,
-  );
-  return Object.freeze({ version: milestones.version, progress, cycleId, claimedIds });
+  return Object.freeze({
+    version: milestones.version,
+    progress: Math.min(milestones.target - 1, normalizeNonNegativeInteger(source.progress)),
+    cycleId,
+    claimedIds: normalizeClaimIds(source.claimedIds, cycleId),
+  });
 }
 
 export function resolveTripleMilestoneProgress({ milestones, tileIds, mode }) {

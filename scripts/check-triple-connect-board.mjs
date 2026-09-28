@@ -37,7 +37,7 @@ import {
 import { shuffleTripleBoardState } from "../js/tripleConnect/tripleShuffle.js";
 
 const layout = getEasyTripleLayout();
-assert.equal(layout.id, "easy-27-v5");
+assert.equal(layout.id, "easy");
 assert.equal(layout.slots.length, TRIPLE_EASY_CONFIG.tileCount);
 assert.deepEqual(
   layout.slots.reduce((counts, slot) => {
@@ -47,38 +47,14 @@ assert.deepEqual(
   { 0: 12, 1: 9, 2: 6 },
 );
 for (const [layoutId, expectedCounts] of Object.entries({
-  "easy-27-v5": [12, 9, 6],
-  "normal-45-v5": [18, 12, 9, 6],
-  "hard-63-v5": [24, 15, 12, 6, 6],
-  "super-hard-96-v5": [30, 21, 18, 12, 9, 6],
-  "easy-18-v4": [12, 6],
-  "normal-36-v4": [18, 12, 6],
-  "hard-54-v4": [24, 15, 9, 6],
-  "super-hard-75-v4": [30, 18, 15, 9, 3],
+  easy: [12, 9, 6], normal: [18, 12, 9, 6], hard: [24, 15, 12, 6, 6], "super-hard": [30, 21, 18, 12, 9, 6], endless: [30, 21, 18, 12, 9, 6],
 })) {
   const template = getTripleLayout(layoutId);
   assert.equal(template.coordinateUnit, "half-card");
   assert.deepEqual(template.layerCounts, expectedCounts);
   assert.doesNotThrow(() => validateTripleLayout(template));
 }
-for (const layoutId of [
-  "easy-12-v1",
-  "normal-24-v1",
-  "hard-36-v1",
-  "super-hard-60-v1",
-  "easy-12-v2",
-  "normal-24-v2",
-  "hard-36-v2",
-  "super-hard-60-v2",
-  "easy-12-v3",
-  "normal-24-v3",
-  "hard-36-v3",
-  "super-hard-60-v3",
-]) {
-  const legacyLayout = getTripleLayout(layoutId);
-  assert.equal(legacyLayout.id, layoutId);
-  assert.doesNotThrow(() => validateTripleLayout(legacyLayout));
-}
+assert.throws(() => getTripleLayout("easy-12-v1"), /Unsupported Triple layout/);
 
 const coverGraph = createTripleCoverGraph(layout);
 assert.equal(Object.keys(coverGraph).length, 27);

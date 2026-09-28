@@ -216,11 +216,6 @@ export function createTripleStateSnapshot(state) {
 export function restoreTripleStateSnapshot(snapshot, undoHistory) {
   const state = {
     ...snapshot,
-    // Snapshot v1 trước Completion 5 chưa có maxCombo; combo hiện tại là
-    // giá trị tốt nhất còn có thể khôi phục mà không làm hỏng phiên đang dở.
-    maxCombo: Number.isInteger(snapshot.maxCombo) ? snapshot.maxCombo : Math.max(0, snapshot.combo || 0),
-    milestoneTileIds: snapshot.milestoneTileIds || [],
-    cornerStacks: snapshot.cornerStacks || {},
     trayCapacity: normalizeTrayCapacity(snapshot.trayCapacity),
     undoHistory,
   };
@@ -231,7 +226,6 @@ export function restoreTripleStateSnapshot(snapshot, undoHistory) {
 export function serializeTripleRoundState(state) {
   const snapshot = createTripleStateSnapshot(state);
   return {
-    version: 3,
     roundId: snapshot.roundId,
     status: snapshot.status,
     tiles: Object.values(snapshot.tiles),
@@ -255,12 +249,12 @@ export function serializeTripleRoundState(state) {
 }
 
 export function restoreSerializedTripleRoundState(snapshot, { trayCapacity = TRIPLE_RULES.trayCapacity } = {}) {
-  if (!snapshot || ![1, 3].includes(snapshot.version) || !Array.isArray(snapshot.tiles)) throw new TypeError("Triple snapshot is invalid.");
+  if (!snapshot || !Array.isArray(snapshot.tiles) || !snapshot.cornerStacks || typeof snapshot.cornerStacks !== "object") throw new TypeError("Triple snapshot is invalid.");
   const tiles = Object.fromEntries(snapshot.tiles.map(tile => [tile?.id, tile]));
   if (Object.keys(tiles).length !== snapshot.tiles.length) throw new TypeError("Triple snapshot has duplicate tiles.");
   // Capacity is derived from the profile entitlement when a session is restored,
   // rather than stored in a round snapshot that can become stale after purchase.
-  return restoreTripleStateSnapshot({ ...snapshot, trayCapacity, claimedLuckyIds: snapshot.claimedLuckyIds || [], milestoneTileIds: snapshot.milestoneTileIds || [], assetPathsByType: snapshot.assetPathsByType || {}, cornerStacks: snapshot.cornerStacks || {}, tiles }, []);
+  return restoreTripleStateSnapshot({ ...snapshot, trayCapacity, tiles }, []);
 }
 
 function normalizeTiles(tiles) {
