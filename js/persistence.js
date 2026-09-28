@@ -1,44 +1,22 @@
-export const SAVE_SCHEMA_VERSION = 1;
+export const SAVE_FORMAT_VERSION = 1;
 
 const ROOT_STORAGE_KEY = "memoryMatchSave";
-const LEGACY_STORAGE_KEYS = Object.freeze({
-  coins: "coins",
-  sound: "sound",
-  music: "music",
-  soundVolume: "soundVolume",
-  musicVolume: "musicVolume",
-  meteorEffects: "meteorEffects",
-  boardCoordinates: "boardCoordinates",
-  cardDescriptions: "cardDescriptions",
-  appearance: "appearance",
-  progress: "progress",
-});
 const SETTINGS_KEYS = new Set([
-  "sound",
-  "music",
-  "soundVolume",
-  "musicVolume",
-  "meteorEffects",
-  "boardCoordinates",
-  "cardDescriptions",
+  "sound", "music", "soundVolume", "musicVolume", "meteorEffects",
+  "boardCoordinates", "cardDescriptions",
 ]);
 
 let knownRevision = 0;
 let lastPersistenceError = null;
-let hasUnsupportedSchema = false;
 
 export function loadPersistentGameData() {
   const stored = readEnvelope();
-  if (stored) {
-    knownRevision = stored.revision;
-    return stored.data;
+  if (!stored) {
+    knownRevision = 0;
+    return createDefaultPayload();
   }
-
-  const legacyData = loadLegacyGameData();
-  if (!hasUnsupportedSchema) {
-    writeEnvelope(createEnvelope(legacyData, 1), { allowNewerRevision: true });
-  }
-  return legacyData;
+  knownRevision = stored.revision;
+  return stored.data;
 }
 
 export function savePersistentGameData({ coins, appearance, progress, settings } = {}) {
@@ -50,38 +28,25 @@ export function savePersistentGameData({ coins, appearance, progress, settings }
   return updateEnvelope(patch);
 }
 
-export function saveProgress(progress) {
-  return savePersistentGameData({ progress });
-}
-
-export function saveCoins(coins) {
-  return savePersistentGameData({ coins });
-}
-
-export function saveAppearance(appearance) {
-  return savePersistentGameData({ appearance });
-}
+export const saveProgress = progress => savePersistentGameData({ progress });
+export const saveCoins = coins => savePersistentGameData({ coins });
+export const saveAppearance = appearance => savePersistentGameData({ appearance });
 
 export function saveSetting(key, value) {
   if (!SETTINGS_KEYS.has(key)) return false;
-  const current = readEnvelope()?.data || loadLegacyGameData();
+  const current = readEnvelope()?.data || createDefaultPayload();
   return savePersistentGameData({ settings: { ...current.settings, [key]: value } });
 }
 
 export function clearPersistentGameData() {
-  let success = removeStorageItem(ROOT_STORAGE_KEY);
-  Object.values(LEGACY_STORAGE_KEYS).forEach((key) => {
-    success = removeStorageItem(key) && success;
-  });
-  if (success) {
-    knownRevision = 0;
-    lastPersistenceError = null;
-  }
-  return success;
+  if (!removeStorageItem(ROOT_STORAGE_KEY)) return false;
+  knownRevision = 0;
+  lastPersistenceError = null;
+  return true;
 }
 
 export function getPersistenceStatus() {
-  return { schemaVersion: SAVE_SCHEMA_VERSION, revision: knownRevision, error: lastPersistenceError };
+  return { formatVersion: SAVE_FORMAT_VERSION, revision: knownRevision, error: lastPersistenceError };
 }
 
 export function subscribeToExternalSave(listener) {
@@ -104,11 +69,7 @@ export function subscribeToExternalSave(listener) {
 }
 
 function updateEnvelope(patch) {
-  if (hasUnsupportedSchema) {
-    reportPersistenceError("schema", new Error("Không thể ghi đè bản lưu thuộc phiên bản mới hơn."));
-    return false;
-  }
-  const current = readEnvelope() || createEnvelope(loadLegacyGameData(), 0);
+  const current = readEnvelope() || createEnvelope(createDefaultPayload(), 0);
   if (current.revision > knownRevision) {
     reportPersistenceError("conflict", new Error("Dữ liệu đã được cập nhật ở tab khác."));
     return false;
@@ -116,9 +77,13 @@ function updateEnvelope(patch) {
   return writeEnvelope(createEnvelope({ ...current.data, ...patch }, current.revision + 1));
 }
 
+function createDefaultPayload() {
+  return { coins: 0, appearance: {}, progress: {}, settings: {} };
+}
+
 function createEnvelope(data, revision) {
   return {
-    schemaVersion: SAVE_SCHEMA_VERSION,
+    formatVersion: SAVE_FORMAT_VERSION,
     revision: normalizeNonNegativeInteger(revision),
     updatedAt: Date.now(),
     data: {
@@ -138,8 +103,10 @@ function readEnvelope() {
 function parseEnvelope(serialized) {
   try {
     const parsed = JSON.parse(serialized);
-    if (!isRecord(parsed) || !isRecord(parsed.data)) return null;
-    if (parsed.schemaVersion !== SAVE_SCHEMA_VERSION) return migrateEnvelope(parsed);
+    if (!isCurrentEnvelope(parsed)) {
+      reportPersistenceError("format", new Error("Bản lưu không đúng định dạng hiện hành."));
+      return null;
+    }
     return createEnvelope(parsed.data, parsed.revision);
   } catch (error) {
     reportPersistenceError("parse", error);
@@ -147,17 +114,19 @@ function parseEnvelope(serialized) {
   }
 }
 
-function migrateEnvelope(envelope) {
-  if (envelope.schemaVersion == null && isRecord(envelope.data)) {
-    return createEnvelope(envelope.data, envelope.revision);
-  }
-  hasUnsupportedSchema = true;
-  reportPersistenceError("schema", new Error(`Schema ${envelope.schemaVersion} chưa được hỗ trợ.`));
-  return null;
+function isCurrentEnvelope(value) {
+  return isRecord(value)
+    && value.formatVersion === SAVE_FORMAT_VERSION
+    && Number.isFinite(value.revision)
+    && isRecord(value.data)
+    && Number.isFinite(value.data.coins)
+    && isRecord(value.data.appearance)
+    && isRecord(value.data.progress)
+    && isRecord(value.data.settings);
 }
 
-function writeEnvelope(envelope, { allowNewerRevision = false } = {}) {
-  if (!allowNewerRevision && envelope.revision <= knownRevision) {
+function writeEnvelope(envelope) {
+  if (envelope.revision <= knownRevision) {
     reportPersistenceError("conflict", new Error("Revision bản lưu không tăng."));
     return false;
   }
@@ -172,52 +141,14 @@ function writeEnvelope(envelope, { allowNewerRevision = false } = {}) {
   }
 }
 
-function loadLegacyGameData() {
-  return {
-    coins: normalizeNonNegativeInteger(readStorageItem(LEGACY_STORAGE_KEYS.coins)),
-    appearance: parseLegacyJson(LEGACY_STORAGE_KEYS.appearance),
-    progress: parseLegacyJson(LEGACY_STORAGE_KEYS.progress),
-    settings: {
-      sound: readStorageItem(LEGACY_STORAGE_KEYS.sound) !== "false",
-      music: readStorageItem(LEGACY_STORAGE_KEYS.music) !== "false",
-      soundVolume: normalizeFiniteNumber(readStorageItem(LEGACY_STORAGE_KEYS.soundVolume), 0.4),
-      musicVolume: normalizeFiniteNumber(readStorageItem(LEGACY_STORAGE_KEYS.musicVolume), 0.35),
-      meteorEffects: readStorageItem(LEGACY_STORAGE_KEYS.meteorEffects) !== "false",
-      boardCoordinates: readStorageItem(LEGACY_STORAGE_KEYS.boardCoordinates) === "true",
-      cardDescriptions: readStorageItem(LEGACY_STORAGE_KEYS.cardDescriptions) !== "false",
-    },
-  };
-}
-
-function parseLegacyJson(key) {
-  const value = readStorageItem(key);
-  if (!value) return {};
-  try {
-    const parsed = JSON.parse(value);
-    return isRecord(parsed) ? parsed : {};
-  } catch (error) {
-    reportPersistenceError("parse", error);
-    return {};
-  }
-}
-
 function readStorageItem(key) {
-  try {
-    return localStorage.getItem(key);
-  } catch (error) {
-    reportPersistenceError("read", error);
-    return null;
-  }
+  try { return localStorage.getItem(key); }
+  catch (error) { reportPersistenceError("read", error); return null; }
 }
 
 function removeStorageItem(key) {
-  try {
-    localStorage.removeItem(key);
-    return true;
-  } catch (error) {
-    reportPersistenceError("remove", error);
-    return false;
-  }
+  try { localStorage.removeItem(key); return true; }
+  catch (error) { reportPersistenceError("remove", error); return false; }
 }
 
 function reportPersistenceError(type, error) {
@@ -228,11 +159,6 @@ function reportPersistenceError(type, error) {
 function normalizeNonNegativeInteger(value) {
   const number = Number(value);
   return Number.isFinite(number) ? Math.max(0, Math.floor(number)) : 0;
-}
-
-function normalizeFiniteNumber(value, fallback) {
-  const number = Number(value);
-  return Number.isFinite(number) ? number : fallback;
 }
 
 function isRecord(value) {

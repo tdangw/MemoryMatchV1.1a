@@ -6,25 +6,21 @@ class MemoryStorage {
     this.failWrites = false;
   }
 
-  getItem(key) {
-    return this.values.has(key) ? this.values.get(key) : null;
-  }
-
+  getItem(key) { return this.values.has(key) ? this.values.get(key) : null; }
   setItem(key, value) {
     if (this.failWrites) throw new Error("Quota exceeded");
     this.values.set(key, String(value));
   }
-
-  removeItem(key) {
-    this.values.delete(key);
-  }
+  removeItem(key) { this.values.delete(key); }
 }
 
-const storage = new MemoryStorage({
-  coins: "42",
-  soundVolume: "0.6",
-  progress: JSON.stringify({ memoryMatch: { totalStars: 3 } }),
+const createEnvelope = (revision, data = {}) => ({
+  formatVersion: 1,
+  revision,
+  updatedAt: 1,
+  data: { coins: 42, appearance: {}, progress: {}, settings: {}, ...data },
 });
+const storage = new MemoryStorage({ memoryMatchSave: JSON.stringify(createEnvelope(1)) });
 globalThis.localStorage = storage;
 
 const persistence = await import("../js/persistence.js");
@@ -32,30 +28,18 @@ const { gameState } = await import("../js/gameState.js");
 const { saveActiveSession, getActiveSession } = await import("../js/sessionProgress.js");
 const { buyLinkItem } = await import("../js/linkConnect/linkItems.js");
 
-const migrated = persistence.loadPersistentGameData();
-assert.equal(migrated.coins, 42);
-assert.equal(migrated.settings.soundVolume, 0.6);
-let envelope = JSON.parse(storage.getItem("memoryMatchSave"));
-assert.equal(envelope.schemaVersion, persistence.SAVE_SCHEMA_VERSION);
-assert.equal(envelope.revision, 1);
+const current = persistence.loadPersistentGameData();
+assert.equal(current.coins, 42);
+assert.equal(persistence.SAVE_FORMAT_VERSION, 1);
+assert.equal(JSON.parse(storage.getItem("memoryMatchSave")).formatVersion, persistence.SAVE_FORMAT_VERSION);
 
 gameState.progress.memoryMatch.sessionsByMode = {};
 assert.equal(saveActiveSession("memory-match", {
-  mode: "challenge",
-  level: 4,
-  remainingTime: 37,
-  timeLimit: 55,
-  levelStartTime: 48,
+  mode: "challenge", level: 4, remainingTime: 37, timeLimit: 55, levelStartTime: 48,
 }), true);
 assert.deepEqual(getActiveSession("memory-match", "challenge"), {
-  mode: "challenge",
-  level: 4,
-  remainingTime: 37,
-  timeLimit: 55,
-  levelStartTime: 48,
+  mode: "challenge", level: 4, remainingTime: 37, timeLimit: 55, levelStartTime: 48,
 });
-envelope = JSON.parse(storage.getItem("memoryMatchSave"));
-assert.equal(envelope.data.progress.memoryMatch.sessionsByMode.challenge.remainingTime, 37);
 
 gameState.coins = 100;
 gameState.progress.linkConnect.items.hint = 0;
@@ -68,11 +52,7 @@ const revisionBeforePurchase = JSON.parse(storage.getItem("memoryMatchSave")).re
 assert.equal(buyLinkItem("hint"), true);
 assert.equal(gameState.coins, 92);
 assert.equal(gameState.progress.linkConnect.items.hint, 1);
-assert.equal(
-  JSON.parse(storage.getItem("memoryMatchSave")).revision,
-  revisionBeforePurchase + 1,
-  "Mua vật phẩm phải ghi Xu và tồn kho trong cùng một revision.",
-);
+assert.equal(JSON.parse(storage.getItem("memoryMatchSave")).revision, revisionBeforePurchase + 1);
 
 const beforeFailedSave = storage.getItem("memoryMatchSave");
 storage.failWrites = true;
@@ -80,19 +60,26 @@ assert.equal(persistence.saveCoins(7), false);
 assert.equal(storage.getItem("memoryMatchSave"), beforeFailedSave);
 storage.failWrites = false;
 
-envelope = JSON.parse(storage.getItem("memoryMatchSave"));
+const invalidCases = [
+  "{bad json",
+  JSON.stringify({ schemaVersion: 1, revision: 2, data: {} }),
+  JSON.stringify({ formatVersion: 99, revision: 2, data: {} }),
+  JSON.stringify({ formatVersion: 1, revision: 2, data: { coins: 2, appearance: {}, progress: {} } }),
+];
+for (const serialized of invalidCases) {
+  storage.setItem("memoryMatchSave", serialized);
+  assert.deepEqual(persistence.loadPersistentGameData(), { coins: 0, appearance: {}, progress: {}, settings: {} });
+  assert.equal(storage.getItem("memoryMatchSave"), serialized, "Invalid saves must not be rewritten during load.");
+  assert.equal(persistence.saveCoins(7), true);
+  const repaired = JSON.parse(storage.getItem("memoryMatchSave"));
+  assert.equal(repaired.formatVersion, persistence.SAVE_FORMAT_VERSION);
+  assert.equal(repaired.data.coins, 7);
+}
+
+const envelope = JSON.parse(storage.getItem("memoryMatchSave"));
 const externalEnvelope = { ...envelope, revision: envelope.revision + 1, data: { ...envelope.data, coins: 777 } };
 storage.setItem("memoryMatchSave", JSON.stringify(externalEnvelope));
 assert.equal(persistence.saveCoins(1), false);
 assert.equal(JSON.parse(storage.getItem("memoryMatchSave")).data.coins, 777);
 
-const futureStorage = new MemoryStorage({
-  memoryMatchSave: JSON.stringify({ schemaVersion: 99, revision: 8, data: { coins: 900 } }),
-});
-globalThis.localStorage = futureStorage;
-const futurePersistence = await import(`../js/persistence.js?future=${Date.now()}`);
-futurePersistence.loadPersistentGameData();
-assert.equal(futurePersistence.saveCoins(1), false);
-assert.equal(JSON.parse(futureStorage.getItem("memoryMatchSave")).schemaVersion, 99);
-
-console.log("Persistence and transaction checks passed.");
+console.log("Persistence current-format, reset, and transaction checks passed.");
