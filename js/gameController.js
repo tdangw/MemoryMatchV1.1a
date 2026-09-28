@@ -130,13 +130,13 @@ export function initializeLevel(level, { reason = "new", session = null } = {}) 
   const timing = resolveMemoryLevelTiming({ mode, level, modeLayout, reason, session });
   const roundId = beginRound();
   const hintBonus = reason === "new" || reason === "advance"
-    ? getLevelHintBonus(level, gameState.hints)
+    ? getLevelHintBonus(level, gameState.progress.memoryMatch.items.hint)
     : 0;
   gameState.remainingTime = timing.remainingTime;
   gameState.timeLimit = timing.timeLimit;
   gameState.levelStartTime = timing.levelStartTime;
   sessionCheckpointTicks = 0;
-  gameState.hints += hintBonus;
+  gameState.progress.memoryMatch.items.hint += hintBonus;
   if (reason === "resume") {
     gameState.specialProgress = Math.max(0, Math.floor(session?.specialProgress || 0))
       % GAME_CONFIG.special.progressTarget;
@@ -171,7 +171,7 @@ export function initializeLevel(level, { reason = "new", session = null } = {}) 
   updateTotalStarsDisplay(gameState.progress.memoryMatch.totalStars);
   updateCoinDisplay(gameState.coins);
   updateMemorySpecialProgress(gameState.specialProgress);
-  updateHintDisplay(gameState.hints);
+  updateHintDisplay(gameState.progress.memoryMatch.items.hint);
   updateMovesDisplay(gameState.moves);
   updateMissesDisplay(gameState.misses);
   updateComboDisplay(gameState.combo);
@@ -387,7 +387,7 @@ function persistMemorySession() {
 
 export function handleHintClick() {
   if (gameState.isLocked || gameState.isPaused) return;
-  if (gameState.hints <= 0) return showBonusOverlay("Bạn đã hết lượt gợi ý.");
+  if (gameState.progress.memoryMatch.items.hint <= 0) return showBonusOverlay("Bạn đã hết lượt gợi ý.");
   if (document.querySelector(".tile.selected")) {
     showBonusOverlay("Hãy hoàn thành lượt chọn hiện tại trước khi dùng gợi ý.");
     return;
@@ -408,12 +408,12 @@ export function handleHintClick() {
     availablePairs[Math.floor(Math.random() * availablePairs.length)];
   if (!pair) return showBonusOverlay("Hiện không có cặp thẻ phù hợp để gợi ý.");
 
-  gameState.hints -= 1;
+  gameState.progress.memoryMatch.items.hint -= 1;
   if (!persistMemorySession()) {
-    gameState.hints += 1;
+    gameState.progress.memoryMatch.items.hint += 1;
     return showBonusOverlay("Không thể lưu lượt gợi ý. Hãy thử lại.");
   }
-  updateHintDisplay(gameState.hints);
+  updateHintDisplay(gameState.progress.memoryMatch.items.hint);
   revealHintPair(pair.slice(0, 2), gameState.roundId);
   showBonusOverlay("Đã lật 2 thẻ trong vài giây.");
 }

@@ -299,7 +299,7 @@ export function showLevelRewardOverlay({
   themeId = getEquippedThemeId(gameState.appearance),
   totalPairs = gameState.totalPairs,
   remainingTime = gameState.remainingTime,
-  assistText = `Gợi ý: ${gameState.hints}`,
+  assistText = `Gợi ý: ${gameState.progress.memoryMatch.items.hint}`,
   targetText = `Mục tiêu: ${totalPairs} cặp`,
   overlayId,
   scope,

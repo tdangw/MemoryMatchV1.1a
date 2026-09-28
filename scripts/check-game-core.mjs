@@ -122,6 +122,6 @@ assert.deepEqual(gameState.progress.memoryMatch.sessionsByMode.challenge, {
   mode: "challenge",
   level: 2,
 });
-assert.equal(gameState.progress.memoryMatch.items.hint, 4);
+assert.equal(gameState.progress.memoryMatch.items.hint, 0, "Sessions do not migrate inventory into the current save contract.");
 
 console.log("Shared game catalog checks passed.");

@@ -89,9 +89,9 @@ function grantMemoryReward(reward, source, roundId) {
   }
 
   if (reward.type === "hint") {
-    gameState.hints = Math.min(GAMEPLAY_LIMITS.itemCount, gameState.hints + reward.value);
+    gameState.progress.memoryMatch.items.hint = Math.min(GAMEPLAY_LIMITS.itemCount, gameState.progress.memoryMatch.items.hint + reward.value);
     persistMemoryRewards();
-    updateHintDisplay(gameState.hints);
+    updateHintDisplay(gameState.progress.memoryMatch.items.hint);
     playLootDrop(source, {
       icon: "search",
       tier: "blue",

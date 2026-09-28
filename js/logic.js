@@ -399,20 +399,20 @@ function awardLuckyRewardValue(reward, tileElement) {
   }
 
   if (reward.type === "hints") {
-    const before = gameState.hints;
-    gameState.hints = Math.min(GAMEPLAY_LIMITS.itemCount, gameState.hints + reward.value);
-    if (gameState.hints > before) {
+    const before = gameState.progress.memoryMatch.items.hint;
+    gameState.progress.memoryMatch.items.hint = Math.min(GAMEPLAY_LIMITS.itemCount, before + reward.value);
+    if (gameState.progress.memoryMatch.items.hint > before) {
       if (!savePersistentGameData({ progress: gameState.progress })) {
-        gameState.hints = before;
+        gameState.progress.memoryMatch.items.hint = before;
         return;
       }
       tileElement?.classList.add("lucky-reward");
       recordLuckyAward(reward);
-      updateHintDisplay(gameState.hints);
+      updateHintDisplay(gameState.progress.memoryMatch.items.hint);
       highlightTarget("#hint");
       showLuckyRewardPopup({
         ...reward,
-        value: gameState.hints - before,
+        value: gameState.progress.memoryMatch.items.hint - before,
       });
       return;
     }

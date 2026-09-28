@@ -16,8 +16,15 @@ import { SHOP_ITEMS, getShopItemPrice } from "./shopCatalog.js";
 import { getOwnedThemeIds, ownTheme } from "./appearance.js";
 import { GAMEPLAY_LIMITS, GAMEPLAY_TIMING } from "./gameplayTuning.js";
 import { THEMES, getTheme, isThemePlayable } from "./themeCatalog.js";
-import { buyLinkItem, getLinkItemCount, LINK_ITEMS } from "./linkConnect/linkItems.js";
-import { LINK_EXIT_EFFECTS, LINK_PATH_EFFECTS } from "./linkConnect/linkEffects.js";
+import {
+  buyLinkItem,
+  getLinkItemCount,
+  LINK_ITEMS,
+} from "./linkConnect/linkItems.js";
+import {
+  LINK_EXIT_EFFECTS,
+  LINK_PATH_EFFECTS,
+} from "./linkConnect/linkEffects.js";
 import { stageMemorySession } from "./memorySession.js";
 import {
   MEMORY_ITEMS,
@@ -26,7 +33,10 @@ import {
   getMemoryItemId,
 } from "./memoryItems.js";
 import { revealMemoryTiles } from "./memoryPreview.js";
-import { TRIPLE_ITEMS, getTripleItemCount } from "./tripleConnect/tripleItems.js";
+import {
+  TRIPLE_ITEMS,
+  getTripleItemCount,
+} from "./tripleConnect/tripleItems.js";
 import {
   purchaseTripleEffect,
   purchaseTripleItem,
@@ -38,7 +48,10 @@ import { TRIPLE_PRODUCT_DECISIONS } from "./tripleConnect/tripleConfig.js";
 export function openQuickAssistOverlay(kind) {
   if (gameState.isLocked || gameState.isPaused) return;
   if (document.querySelector(".tile.selected")) {
-    showShopMessage("Hãy hoàn thành lượt chọn hiện tại trước khi dùng vật phẩm.", "info");
+    showShopMessage(
+      "Hãy hoàn thành lượt chọn hiện tại trước khi dùng vật phẩm.",
+      "info",
+    );
     return;
   }
 
@@ -68,7 +81,11 @@ export function openQuickAssistOverlay(kind) {
       if (pendingPreviewItem) {
         const item = pendingPreviewItem;
         pendingPreviewItem = null;
-        revealMemoryTiles(item.value, GAMEPLAY_TIMING.shopRevealDurationMs, roundId);
+        revealMemoryTiles(
+          item.value,
+          GAMEPLAY_TIMING.shopRevealDurationMs,
+          roundId,
+        );
       }
     },
   });
@@ -94,7 +111,8 @@ export function openQuickAssistOverlay(kind) {
 }
 
 function useMemoryAssistItem(item, roundId) {
-  if (gameState.roundId !== roundId || getMemoryItemCount(item.id) <= 0) return false;
+  if (gameState.roundId !== roundId || getMemoryItemCount(item.id) <= 0)
+    return false;
   const previousItems = { ...gameState.progress.memoryMatch.items };
   const previousTime = gameState.remainingTime;
   const sessions = (gameState.progress.memoryMatch.sessionsByMode ||= {});
@@ -116,15 +134,29 @@ function useMemoryAssistItem(item, roundId) {
   updateMemoryAssistInventoryDisplay();
   if (item.type === "time") {
     updateTimerDisplay(gameState.remainingTime);
-    syncMemoryTimeProgress({ remainingSeconds: gameState.remainingTime, timeLimit: gameState.timeLimit });
+    syncMemoryTimeProgress({
+      remainingSeconds: gameState.remainingTime,
+      timeLimit: gameState.timeLimit,
+    });
     animateIconToTarget("timer", "#timer");
   }
   return true;
 }
 
-export function openShopOverlay({ fromMenu = false, gameId = "memory-match", linkConnect = false, onClose = () => {} } = {}) {
+export function openShopOverlay({
+  fromMenu = false,
+  gameId = "memory-match",
+  linkConnect = false,
+  onClose = () => {},
+} = {}) {
   const tripleConnect = gameId === "triple-connect";
-  if (!fromMenu && !linkConnect && !tripleConnect && (gameState.isLocked || gameState.isPaused)) return;
+  if (
+    !fromMenu &&
+    !linkConnect &&
+    !tripleConnect &&
+    (gameState.isLocked || gameState.isPaused)
+  )
+    return;
 
   const roundId = gameState.roundId;
   if (!fromMenu && !linkConnect && !tripleConnect) gameState.isPaused = true;
@@ -145,7 +177,13 @@ export function openShopOverlay({ fromMenu = false, gameId = "memory-match", lin
     content,
     size: "large",
     onClose: () => {
-      if (!fromMenu && !linkConnect && !tripleConnect && gameState.roundId === roundId) gameState.isPaused = false;
+      if (
+        !fromMenu &&
+        !linkConnect &&
+        !tripleConnect &&
+        gameState.roundId === roundId
+      )
+        gameState.isPaused = false;
       onClose();
     },
   });
@@ -164,29 +202,71 @@ export function openShopOverlay({ fromMenu = false, gameId = "memory-match", lin
     .insertBefore(wallet, closeButton);
 
   if (gameId === "link-connect") {
-    const itemsTab = createTab("Vật phẩm", true, () => renderLinkItems(grid, roundId, modal));
+    const itemsTab = createTab("Vật phẩm", true, () =>
+      renderLinkItems(grid, roundId, modal),
+    );
     const pathEffectsTab = createTab("Đường nối", false, () =>
-      renderLinkEffectShop(grid, "Hiệu ứng đường nối", "linkPathEffect", "ownedLinkPathEffects", LINK_PATH_EFFECTS, roundId, modal),
+      renderLinkEffectShop(
+        grid,
+        "Hiệu ứng đường nối",
+        "linkPathEffect",
+        "ownedLinkPathEffects",
+        LINK_PATH_EFFECTS,
+        roundId,
+        modal,
+      ),
     );
     const exitEffectsTab = createTab("Xóa thẻ", false, () =>
-      renderLinkEffectShop(grid, "Hiệu ứng xóa thẻ", "linkExitEffect", "ownedLinkExitEffects", LINK_EXIT_EFFECTS, roundId, modal),
+      renderLinkEffectShop(
+        grid,
+        "Hiệu ứng xóa thẻ",
+        "linkExitEffect",
+        "ownedLinkExitEffects",
+        LINK_EXIT_EFFECTS,
+        roundId,
+        modal,
+      ),
     );
-    const themesTab = createTab("Chủ đề", false, () => renderThemes(grid, roundId, modal, gameId));
+    const themesTab = createTab("Chủ đề", false, () =>
+      renderThemes(grid, roundId, modal, gameId),
+    );
     tabs.append(itemsTab, pathEffectsTab, exitEffectsTab, themesTab);
     renderLinkItems(grid, roundId, modal);
   } else if (tripleConnect) {
-    const itemsTab = createTab("Vật phẩm", true, () => renderTripleItems(grid, roundId, modal));
+    const itemsTab = createTab("Vật phẩm", true, () =>
+      renderTripleItems(grid, roundId, modal),
+    );
     const pathEffectsTab = createTab("Đường nối", false, () =>
-      renderTripleEffectShop(grid, "Hiệu ứng đường nối", "path", "ownedTriplePathEffects", LINK_PATH_EFFECTS, roundId, modal),
+      renderTripleEffectShop(
+        grid,
+        "Hiệu ứng đường nối",
+        "path",
+        "ownedTriplePathEffects",
+        LINK_PATH_EFFECTS,
+        roundId,
+        modal,
+      ),
     );
     const exitEffectsTab = createTab("Xóa thẻ", false, () =>
-      renderTripleEffectShop(grid, "Hiệu ứng xóa thẻ", "exit", "ownedTripleExitEffects", LINK_EXIT_EFFECTS, roundId, modal),
+      renderTripleEffectShop(
+        grid,
+        "Hiệu ứng xóa thẻ",
+        "exit",
+        "ownedTripleExitEffects",
+        LINK_EXIT_EFFECTS,
+        roundId,
+        modal,
+      ),
     );
-    const themesTab = createTab("Chủ đề", false, () => renderThemes(grid, roundId, modal, gameId));
+    const themesTab = createTab("Chủ đề", false, () =>
+      renderThemes(grid, roundId, modal, gameId),
+    );
     tabs.append(itemsTab, pathEffectsTab, exitEffectsTab, themesTab);
     renderTripleItems(grid, roundId, modal);
   } else {
-    const itemsTab = createTab("Vật phẩm", true, () => renderMemoryItems(grid, roundId, modal));
+    const itemsTab = createTab("Vật phẩm", true, () =>
+      renderMemoryItems(grid, roundId, modal),
+    );
     const appearanceTab = createTab("Ngoại hình", false, () =>
       renderAppearance(grid, roundId, modal),
     );
@@ -201,7 +281,15 @@ export function openShopOverlay({ fromMenu = false, gameId = "memory-match", lin
   }
 }
 
-function renderLinkEffectShop(grid, title, equippedKey, ownedKey, effects, roundId, modal) {
+function renderLinkEffectShop(
+  grid,
+  title,
+  equippedKey,
+  ownedKey,
+  effects,
+  roundId,
+  modal,
+) {
   grid.className = "shop-item-grid shop-item-grid--appearance";
   grid.replaceChildren();
   const group = document.createElement("section");
@@ -227,13 +315,26 @@ function renderLinkEffectShop(grid, title, equippedKey, ownedKey, effects, round
       button.textContent = "Đã sở hữu";
       button.disabled = true;
     } else {
-      button.append(document.createTextNode(String(item.price)), createIcon("coin"));
-      button.onclick = () => openPurchaseConfirmation(
-        { ...item, type: "link-effect", equippedKey, ownedKey },
-        roundId,
-        modal,
-        () => renderLinkEffectShop(grid, title, equippedKey, ownedKey, effects, roundId, modal),
+      button.append(
+        document.createTextNode(String(item.price)),
+        createIcon("coin"),
       );
+      button.onclick = () =>
+        openPurchaseConfirmation(
+          { ...item, type: "link-effect", equippedKey, ownedKey },
+          roundId,
+          modal,
+          () =>
+            renderLinkEffectShop(
+              grid,
+              title,
+              equippedKey,
+              ownedKey,
+              effects,
+              roundId,
+              modal,
+            ),
+        );
     }
     card.append(preview, name, button);
     choices.append(card);
@@ -244,20 +345,37 @@ function renderLinkEffectShop(grid, title, equippedKey, ownedKey, effects, round
 
 function renderMemoryItems(grid, roundId, modal) {
   const items = SHOP_ITEMS;
-  renderInventoryItems(grid, roundId, modal, items, "Vật phẩm Memory Match", item => {
-    if (item.type === "hint") return gameState.hints;
-    const id = item.type === "time"
-      ? getMemoryItemId("time", item.value)
-      : getMemoryItemId("preview", item.type === "reveal-all" ? "all" : item.value);
-    return getMemoryItemCount(id);
-  }, () => renderMemoryItems(grid, roundId, modal));
+  renderInventoryItems(
+    grid,
+    roundId,
+    modal,
+    items,
+    "Vật phẩm Memory Match",
+    (item) => {
+      if (item.type === "hint") return gameState.progress.memoryMatch.items.hint;
+      const id =
+        item.type === "time"
+          ? getMemoryItemId("time", item.value)
+          : getMemoryItemId(
+              "preview",
+              item.type === "reveal-all" ? "all" : item.value,
+            );
+      return getMemoryItemCount(id);
+    },
+    () => renderMemoryItems(grid, roundId, modal),
+  );
 }
 
 function renderLinkItems(grid, roundId, modal) {
-  renderInventoryItems(grid, roundId, modal,
-    LINK_ITEMS.map(item => ({ ...item, type: "link-item" })),
-    "Vật phẩm Link Connect", item => getLinkItemCount(item.id),
-    () => renderLinkItems(grid, roundId, modal));
+  renderInventoryItems(
+    grid,
+    roundId,
+    modal,
+    LINK_ITEMS.map((item) => ({ ...item, type: "link-item" })),
+    "Vật phẩm Link Connect",
+    (item) => getLinkItemCount(item.id),
+    () => renderLinkItems(grid, roundId, modal),
+  );
 }
 
 function renderTripleItems(grid, roundId, modal) {
@@ -285,7 +403,7 @@ function renderTripleItems(grid, roundId, modal) {
   const name = document.createElement("strong");
   name.textContent = "Mở rộng khay";
   const description = document.createElement("small");
-  description.textContent = `${expansion.baseCapacity} → ${expansion.baseCapacity + expansion.bonusCapacity} ô · dùng cho mọi chế độ`;
+  description.textContent = `${expansion.baseCapacity} → ${expansion.baseCapacity + expansion.bonusCapacity} ô`;
   const button = document.createElement("button");
   button.type = "button";
   button.className = "app-button app-button--purchase shop-buy-button";
@@ -294,13 +412,22 @@ function renderTripleItems(grid, roundId, modal) {
     button.textContent = "Đã sở hữu";
     button.disabled = true;
   } else {
-    button.append(document.createTextNode(String(expansion.releasePrice)), createIcon("coin"));
-    button.onclick = () => openPurchaseConfirmation(
-      { id: "tray-expansion", type: "triple-tray-expansion", title: "Mở rộng khay vĩnh viễn", price: expansion.releasePrice },
-      roundId,
-      modal,
-      () => renderTripleItems(grid, roundId, modal),
+    button.append(
+      document.createTextNode(String(expansion.releasePrice)),
+      createIcon("coin"),
     );
+    button.onclick = () =>
+      openPurchaseConfirmation(
+        {
+          id: "tray-expansion",
+          type: "triple-tray-expansion",
+          title: "Mở rộng khay vĩnh viễn",
+          price: expansion.releasePrice,
+        },
+        roundId,
+        modal,
+        () => renderTripleItems(grid, roundId, modal),
+      );
   }
   card.append(preview, name, description, button);
   choices.append(card);
@@ -308,7 +435,15 @@ function renderTripleItems(grid, roundId, modal) {
   grid.append(group);
 }
 
-function renderTripleEffectShop(grid, title, kind, ownedKey, effects, roundId, modal) {
+function renderTripleEffectShop(
+  grid,
+  title,
+  kind,
+  ownedKey,
+  effects,
+  roundId,
+  modal,
+) {
   grid.className = "shop-item-grid shop-item-grid--appearance";
   grid.replaceChildren();
   const group = document.createElement("section");
@@ -334,13 +469,26 @@ function renderTripleEffectShop(grid, title, kind, ownedKey, effects, roundId, m
       button.textContent = "Đã sở hữu";
       button.disabled = true;
     } else {
-      button.append(document.createTextNode(String(item.price)), createIcon("coin"));
-      button.onclick = () => openPurchaseConfirmation(
-        { ...item, type: "triple-effect", effectKind: kind },
-        roundId,
-        modal,
-        () => renderTripleEffectShop(grid, title, kind, ownedKey, effects, roundId, modal),
+      button.append(
+        document.createTextNode(String(item.price)),
+        createIcon("coin"),
       );
+      button.onclick = () =>
+        openPurchaseConfirmation(
+          { ...item, type: "triple-effect", effectKind: kind },
+          roundId,
+          modal,
+          () =>
+            renderTripleEffectShop(
+              grid,
+              title,
+              kind,
+              ownedKey,
+              effects,
+              roundId,
+              modal,
+            ),
+        );
     }
     card.append(preview, name, button);
     choices.append(card);
@@ -349,7 +497,15 @@ function renderTripleEffectShop(grid, title, kind, ownedKey, effects, roundId, m
   grid.append(group);
 }
 
-function renderInventoryItems(grid, roundId, modal, items, title, getCount, refresh) {
+function renderInventoryItems(
+  grid,
+  roundId,
+  modal,
+  items,
+  title,
+  getCount,
+  refresh,
+) {
   grid.className = "shop-item-grid shop-item-grid--appearance";
   grid.replaceChildren();
   const group = document.createElement("section");
@@ -371,13 +527,17 @@ function renderInventoryItems(grid, roundId, modal, items, title, getCount, refr
     const button = document.createElement("button");
     button.type = "button";
     button.className = "app-button app-button--purchase shop-buy-button";
-    button.append(document.createTextNode(String(item.price)), createIcon("coin"));
-    button.onclick = () => openPurchaseConfirmation(
-      { ...item, price: getShopItemPrice(item) },
-      roundId,
-      modal,
-      refresh,
+    button.append(
+      document.createTextNode(String(item.price)),
+      createIcon("coin"),
     );
+    button.onclick = () =>
+      openPurchaseConfirmation(
+        { ...item, price: getShopItemPrice(item) },
+        roundId,
+        modal,
+        refresh,
+      );
     card.append(preview, name, count, button);
     choices.append(card);
   });
@@ -440,7 +600,9 @@ function renderThemes(grid, roundId, modal, gameId) {
   choices.className = "theme-choice-grid";
 
   THEMES.forEach((theme) => {
-    const owned = getOwnedThemeIds(gameState.appearance, gameId).includes(theme.id);
+    const owned = getOwnedThemeIds(gameState.appearance, gameId).includes(
+      theme.id,
+    );
     const playable = isThemePlayable(theme);
     const card = document.createElement("article");
     card.className = "theme-choice";
@@ -464,10 +626,17 @@ function renderThemes(grid, roundId, modal, gameId) {
       button.textContent = "Chờ ảnh";
       button.disabled = true;
     } else {
-      button.append(document.createTextNode(String(theme.price)), createIcon("coin"));
+      button.append(
+        document.createTextNode(String(theme.price)),
+        createIcon("coin"),
+      );
       button.onclick = () =>
         openPurchaseConfirmation(
-          { ...theme, type: gameId === "triple-connect" ? "triple-theme" : "theme", gameId },
+          {
+            ...theme,
+            type: gameId === "triple-connect" ? "triple-theme" : "theme",
+            gameId,
+          },
           roundId,
           modal,
           () => renderThemes(grid, roundId, modal, gameId),
@@ -568,7 +737,13 @@ function openPurchaseConfirmation(item, roundId, shopModal, onPurchase) {
         onClick: (closeConfirmation) => {
           if (isSubmitting) return true;
           isSubmitting = true;
-          if (!handleBuyItem(item, roundId, shopModal.overlay.dataset.fromMenu === "true")) {
+          if (
+            !handleBuyItem(
+              item,
+              roundId,
+              shopModal.overlay.dataset.fromMenu === "true",
+            )
+          ) {
             isSubmitting = false;
             return true;
           }
@@ -583,12 +758,26 @@ function openPurchaseConfirmation(item, roundId, shopModal, onPurchase) {
 
 // Mua vật phẩm
 function handleBuyItem(item, roundId, fromMenu = false) {
-  const tripleType = item.type === "triple-item" || item.type === "triple-theme" || item.type === "triple-effect" || item.type === "triple-tray-expansion";
-  if (item.type !== "link-item" && !tripleType && (gameState.roundId !== roundId || (!fromMenu && gameState.isLocked))) return false;
+  const tripleType =
+    item.type === "triple-item" ||
+    item.type === "triple-theme" ||
+    item.type === "triple-effect" ||
+    item.type === "triple-tray-expansion";
+  if (
+    item.type !== "link-item" &&
+    !tripleType &&
+    (gameState.roundId !== roundId || (!fromMenu && gameState.isLocked))
+  )
+    return false;
 
   if (item.type === "triple-item") {
     if (!purchaseTripleItem(item.id)) {
-      showShopMessage(gameState.coins < item.price ? "Bạn không đủ Xu để mua vật phẩm này." : "Không thể mua vật phẩm này.", gameState.coins < item.price ? "error" : "info");
+      showShopMessage(
+        gameState.coins < item.price
+          ? "Bạn không đủ Xu để mua vật phẩm này."
+          : "Không thể mua vật phẩm này.",
+        gameState.coins < item.price ? "error" : "info",
+      );
       return false;
     }
     updateCoinDisplay(gameState.coins);
@@ -615,7 +804,12 @@ function handleBuyItem(item, roundId, fromMenu = false) {
   }
   if (item.type === "triple-tray-expansion") {
     if (!purchaseTripleTrayExpansion()) {
-      showShopMessage(gameState.progress.tripleConnect.trayExpansionOwned ? "Bạn đã sở hữu nâng cấp này." : "Không thể lưu giao dịch. Xu và nâng cấp chưa thay đổi.", "error");
+      showShopMessage(
+        gameState.progress.tripleConnect.trayExpansionOwned
+          ? "Bạn đã sở hữu nâng cấp này."
+          : "Không thể lưu giao dịch. Xu và nâng cấp chưa thay đổi.",
+        "error",
+      );
       return false;
     }
     updateCoinDisplay(gameState.coins);
@@ -625,25 +819,39 @@ function handleBuyItem(item, roundId, fromMenu = false) {
 
   if (item.type === "appearance" || item.type === "link-effect") {
     const ownedKey =
-      item.type === "link-effect" ? item.ownedKey : item.appearanceType === "cardBack"
-        ? "ownedCardBacks"
-        : "ownedFlipEffects";
+      item.type === "link-effect"
+        ? item.ownedKey
+        : item.appearanceType === "cardBack"
+          ? "ownedCardBacks"
+          : "ownedFlipEffects";
     if (gameState.appearance[ownedKey].includes(item.id)) {
       showShopMessage("Bạn đã sở hữu vật phẩm này.", "info");
       return false;
     }
   }
-  if (item.type === "theme" && getOwnedThemeIds(gameState.appearance, item.gameId).includes(item.id)) {
+  if (
+    item.type === "theme" &&
+    getOwnedThemeIds(gameState.appearance, item.gameId).includes(item.id)
+  ) {
     showShopMessage("Bạn đã sở hữu chủ đề này.", "info");
     return false;
   }
 
-  if (item.type === "link-item" && getLinkItemCount(item.id) >= GAMEPLAY_LIMITS.itemCount) {
-    showShopMessage(`Bạn đã đạt giới hạn ${GAMEPLAY_LIMITS.itemCount} vật phẩm này.`, "info");
+  if (
+    item.type === "link-item" &&
+    getLinkItemCount(item.id) >= GAMEPLAY_LIMITS.itemCount
+  ) {
+    showShopMessage(
+      `Bạn đã đạt giới hạn ${GAMEPLAY_LIMITS.itemCount} vật phẩm này.`,
+      "info",
+    );
     return false;
   }
-  if (item.type === "hint" && gameState.hints >= GAMEPLAY_LIMITS.itemCount) {
-    showShopMessage(`Bạn đã đạt giới hạn ${GAMEPLAY_LIMITS.itemCount} lượt gợi ý.`, "info");
+  if (item.type === "hint" && gameState.progress.memoryMatch.items.hint >= GAMEPLAY_LIMITS.itemCount) {
+    showShopMessage(
+      `Bạn đã đạt giới hạn ${GAMEPLAY_LIMITS.itemCount} lượt gợi ý.`,
+      "info",
+    );
     return false;
   }
 
@@ -654,7 +862,10 @@ function handleBuyItem(item, roundId, fromMenu = false) {
 
   if (item.type === "link-item") {
     if (!buyLinkItem(item.id)) {
-      showShopMessage("Không thể lưu giao dịch. Xu và vật phẩm chưa thay đổi.", "error");
+      showShopMessage(
+        "Không thể lưu giao dịch. Xu và vật phẩm chưa thay đổi.",
+        "error",
+      );
       return false;
     }
     updateCoinDisplay(gameState.coins);
@@ -670,15 +881,27 @@ function handleBuyItem(item, roundId, fromMenu = false) {
 
   if (item.type === "appearance" || item.type === "link-effect") {
     const ownedKey =
-      item.type === "link-effect" ? item.ownedKey : item.appearanceType === "cardBack"
-        ? "ownedCardBacks"
-        : "ownedFlipEffects";
+      item.type === "link-effect"
+        ? item.ownedKey
+        : item.appearanceType === "cardBack"
+          ? "ownedCardBacks"
+          : "ownedFlipEffects";
     if (!gameState.appearance[ownedKey].includes(item.id))
       gameState.appearance[ownedKey].push(item.id);
-    if (!savePersistentGameData({ coins: gameState.coins, appearance: gameState.appearance })) {
+    if (
+      !savePersistentGameData({
+        coins: gameState.coins,
+        appearance: gameState.appearance,
+      })
+    ) {
       gameState.coins = previousCoins;
-      gameState.appearance[ownedKey] = gameState.appearance[ownedKey].filter((id) => id !== item.id);
-      showShopMessage("Không thể lưu giao dịch. Xu và vật phẩm chưa thay đổi.", "error");
+      gameState.appearance[ownedKey] = gameState.appearance[ownedKey].filter(
+        (id) => id !== item.id,
+      );
+      showShopMessage(
+        "Không thể lưu giao dịch. Xu và vật phẩm chưa thay đổi.",
+        "error",
+      );
       return false;
     }
     updateCoinDisplay(gameState.coins);
@@ -689,11 +912,21 @@ function handleBuyItem(item, roundId, fromMenu = false) {
   if (item.type === "theme") {
     ownTheme(gameState.appearance, item.gameId, item.id);
     const theme = getTheme(item.id);
-    if (!savePersistentGameData({ coins: gameState.coins, appearance: gameState.appearance })) {
+    if (
+      !savePersistentGameData({
+        coins: gameState.coins,
+        appearance: gameState.appearance,
+      })
+    ) {
       gameState.coins = previousCoins;
-      gameState.appearance.ownedThemes = getOwnedThemeIds(gameState.appearance, item.gameId)
-        .filter((id) => id !== item.id);
-      showShopMessage("Không thể lưu giao dịch. Xu và chủ đề chưa thay đổi.", "error");
+      gameState.appearance.ownedThemes = getOwnedThemeIds(
+        gameState.appearance,
+        item.gameId,
+      ).filter((id) => id !== item.id);
+      showShopMessage(
+        "Không thể lưu giao dịch. Xu và chủ đề chưa thay đổi.",
+        "error",
+      );
       return false;
     }
     updateCoinDisplay(gameState.coins);
@@ -705,20 +938,36 @@ function handleBuyItem(item, roundId, fromMenu = false) {
     return true;
   }
 
-  if (item.type === "time" || item.type === "reveal-random" || item.type === "reveal-all") {
-    const memoryItemId = item.type === "time"
-      ? getMemoryItemId("time", item.value)
-      : getMemoryItemId("preview", item.type === "reveal-all" ? "all" : item.value);
+  if (
+    item.type === "time" ||
+    item.type === "reveal-random" ||
+    item.type === "reveal-all"
+  ) {
+    const memoryItemId =
+      item.type === "time"
+        ? getMemoryItemId("time", item.value)
+        : getMemoryItemId(
+            "preview",
+            item.type === "reveal-all" ? "all" : item.value,
+          );
     const previousItems = { ...gameState.progress.memoryMatch.items };
     if (!changeMemoryItemCount(memoryItemId, 1)) {
       gameState.coins = previousCoins;
       showShopMessage("Kho vật phẩm này đã đầy.", "info");
       return false;
     }
-    if (!savePersistentGameData({ coins: gameState.coins, progress: gameState.progress })) {
+    if (
+      !savePersistentGameData({
+        coins: gameState.coins,
+        progress: gameState.progress,
+      })
+    ) {
       gameState.coins = previousCoins;
       gameState.progress.memoryMatch.items = previousItems;
-      showShopMessage("Không thể lưu giao dịch. Xu và vật phẩm chưa thay đổi.", "error");
+      showShopMessage(
+        "Không thể lưu giao dịch. Xu và vật phẩm chưa thay đổi.",
+        "error",
+      );
       return false;
     }
     updateCoinDisplay(gameState.coins);
@@ -728,17 +977,28 @@ function handleBuyItem(item, roundId, fromMenu = false) {
   }
 
   if (item.type === "hint") {
-    const previousHints = gameState.hints;
-    gameState.hints = Math.min(GAMEPLAY_LIMITS.itemCount, gameState.hints + item.value);
-    if (!savePersistentGameData({ coins: gameState.coins, progress: gameState.progress })) {
+    const previousHints = gameState.progress.memoryMatch.items.hint;
+    gameState.progress.memoryMatch.items.hint = Math.min(
+      GAMEPLAY_LIMITS.itemCount,
+      gameState.progress.memoryMatch.items.hint + item.value,
+    );
+    if (
+      !savePersistentGameData({
+        coins: gameState.coins,
+        progress: gameState.progress,
+      })
+    ) {
       gameState.coins = previousCoins;
-      gameState.hints = previousHints;
-      showShopMessage("Không thể lưu giao dịch. Xu và hỗ trợ chưa thay đổi.", "error");
+      gameState.progress.memoryMatch.items.hint = previousHints;
+      showShopMessage(
+        "Không thể lưu giao dịch. Xu và hỗ trợ chưa thay đổi.",
+        "error",
+      );
       return false;
     }
     updateCoinDisplay(gameState.coins);
-    const grantedHints = gameState.hints - previousHints;
-    updateHintDisplay(gameState.hints);
+    const grantedHints = gameState.progress.memoryMatch.items.hint - previousHints;
+    updateHintDisplay(gameState.progress.memoryMatch.items.hint);
     if (!fromMenu) animateIconToTarget("search", "#hint");
     showShopMessage(`Đã mua +${grantedHints} gợi ý`);
     return true;

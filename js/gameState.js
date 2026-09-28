@@ -20,9 +20,6 @@ const {
 export const gameState = {
   currentLevel: 1,
   score: defaultScore,
-  // Compatibility alias: gameplay and HUD always use the persistent inventory.
-  get hints() { return this.progress.memoryMatch.items.hint; },
-  set hints(value) { this.progress.memoryMatch.items.hint = normalizeItemCount(value); },
   moves: 0,
   misses: 0,
   combo: 0,
