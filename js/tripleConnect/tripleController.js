@@ -250,6 +250,7 @@ function mountTripleDevelopmentRound(generated, { skipIntro = false } = {}) {
     const starProgress = getTripleStarProgress({
       mode: currentMode,
       score: roundState.score,
+      initialTileCount: roundState.initialTileCount,
     });
     hud.stats({
       level: currentLevel,
@@ -788,7 +789,11 @@ function commitTripleTerminalResult() {
   };
   const won = state.status === "won";
   const stars = won
-    ? getTripleStarProgress({ mode: currentMode, score: state.score }).stars
+    ? getTripleStarProgress({
+      mode: currentMode,
+      score: state.score + (currentMode === "endless" ? 0 : Math.floor(Math.max(0, remainingTime))),
+      initialTileCount: state.initialTileCount,
+    }).stars
     : 0;
   const reward = won ? calculateTripleCoinReward({ mode: currentMode, matchedTriples: state.matchedTriples, stars, maxCombo: state.maxCombo }) : 0;
   if (won) {
