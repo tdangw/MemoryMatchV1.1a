@@ -4,6 +4,7 @@ import { normalizeAppearance } from "./appearance.js";
 import { GAMEPLAY_LIMITS } from "./gameplayTuning.js";
 import { GAME_MODES } from "./gameCatalog.js";
 import { restoreSerializedTripleRoundState, serializeTripleRoundState } from "./tripleConnect/tripleState.js";
+import { getTripleLayout } from "./tripleConnect/tripleBoard.js";
 import { TRIPLE_PRODUCT_DECISIONS } from "./tripleConnect/tripleConfig.js";
 import { normalizeTripleMilestones } from "./tripleConnect/tripleMilestones.js";
 import { THEME_ASSET_MANIFEST } from "./generated/themeAssetManifest.js";
@@ -90,19 +91,13 @@ export function hydrateGameState({
     progress?.themeSelectionHistory,
     THEME_ASSET_MANIFEST,
   );
-  const memorySessions = normalizeSessions(memoryMatch.sessionsByMode, memoryMatch.activeSession);
-  const legacyHints = Object.values(memorySessions).flatMap(session => Number.isFinite(session.hints) ? [session.hints] : []);
-  // An explicit inventory count (including zero) is the migration marker.
-  const hintCount = Object.hasOwn(memoryMatch.items || {}, "hint")
-    ? normalizeItemCount(memoryMatch.items.hint)
-    : legacyHints.length ? Math.max(...legacyHints) : defaultHints;
-  for (const session of Object.values(memorySessions)) delete session.hints;
+  const memorySessions = normalizeSessions(memoryMatch.sessionsByMode);
   gameState.progress.memoryMatch = {
     totalStars: normalizeNonNegativeInteger(memoryMatch.totalStars),
     totalScore: normalizeNonNegativeInteger(memoryMatch.totalScore),
     bestByLevel: normalizeBestByLevel(memoryMatch.bestByLevel),
     sessionsByMode: memorySessions,
-    items: { ...normalizeMemoryItems(memoryMatch.items), hint: hintCount },
+    items: normalizeMemoryItems(memoryMatch.items),
   };
   const linkConnect = progress?.linkConnect || {};
   const linkItems = linkConnect.items || {};
@@ -116,7 +111,7 @@ export function hydrateGameState({
       thunder: normalizeItemCount(linkItems.thunder),
       freeze: normalizeItemCount(linkItems.freeze),
     },
-    sessionsByMode: normalizeSessions(linkConnect.sessionsByMode, linkConnect.activeSession),
+    sessionsByMode: normalizeSessions(linkConnect.sessionsByMode),
   };
   const tripleConnect = progress?.tripleConnect || {};
   const trayExpansionOwned = tripleConnect.trayExpansionOwned === true;
@@ -149,7 +144,7 @@ export function commitThemeSelectionHistory(themeId, assets) {
 
 function normalizeMemoryItems(items = {}) {
   return Object.fromEntries(
-    ["preview4", "preview8", "preview12", "previewAll", "time10", "time30", "time45", "time60"]
+    ["hint", "preview4", "preview8", "preview12", "previewAll", "time10", "time30", "time45", "time60"]
       .map((id) => [id, normalizeItemCount(items?.[id])]),
   );
 }
@@ -181,24 +176,19 @@ function normalizeActiveSession(session) {
     ...(Number.isFinite(session.levelStartTime)
       ? { levelStartTime: Math.max(0, Math.floor(session.levelStartTime)) }
       : {}),
-    ...(Number.isFinite(session.hints)
-      ? { hints: Math.min(GAMEPLAY_LIMITS.itemCount, Math.max(0, Math.floor(session.hints))) }
-      : {}),
     ...(Array.isArray(session.assetPaths)
       ? { assetPaths: normalizeAssetPaths(session.assetPaths) }
       : {}),
   };
 }
 
-function normalizeSessions(sessions, legacySession) {
+function normalizeSessions(sessions) {
   const source = sessions && typeof sessions === "object" ? sessions : {};
   const normalized = Object.fromEntries(
     Object.entries(source)
       .map(([mode, session]) => [mode, normalizeActiveSession(session)])
       .filter(([, session]) => session),
   );
-  const legacy = normalizeActiveSession(legacySession);
-  if (legacy && !normalized[legacy.mode]) normalized[legacy.mode] = legacy;
   return normalized;
 }
 
@@ -244,6 +234,8 @@ function normalizeTripleSessions(sessions, trayCapacity = TRIPLE_PRODUCT_DECISIO
   return Object.fromEntries(Object.entries(source).flatMap(([mode, session]) => {
     if (!GAME_MODE_IDS.has(mode) || !session || typeof session !== "object") return [];
     try {
+      if (typeof session.layoutId !== "string" || !session.layoutId) return [];
+      getTripleLayout(session.layoutId);
       const restored = restoreSerializedTripleRoundState(session.snapshot, { trayCapacity });
       if (restored.status !== "playing") return [];
       const snapshot = serializeTripleRoundState(restored);
@@ -251,7 +243,7 @@ function normalizeTripleSessions(sessions, trayCapacity = TRIPLE_PRODUCT_DECISIO
         mode,
         level: Math.max(1, normalizeNonNegativeInteger(session.level) || 1),
         ...(typeof session.seed === "string" && session.seed ? { seed: session.seed } : {}),
-        ...(typeof session.layoutId === "string" ? { layoutId: session.layoutId } : {}),
+        layoutId: session.layoutId,
         ...(Number.isFinite(session.remainingTime) ? { remainingTime: Math.max(0, Math.floor(session.remainingTime)) } : {}),
         snapshot,
       }]];

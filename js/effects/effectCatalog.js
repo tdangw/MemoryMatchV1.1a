@@ -1,9 +1,4 @@
-import {
-  LINK_EXIT_EFFECTS,
-  LINK_PATH_EFFECTS,
-  migrateLinkExitEffectId,
-  migrateLinkPathEffectId,
-} from "../linkConnect/linkEffects.js";
+import { LINK_EXIT_EFFECTS, LINK_PATH_EFFECTS } from "../linkConnect/linkEffects.js";
 
 const PATH_FAMILIES = Object.freeze({
   default: "tracer", electric: "jagged", laser: "dual-stroke", fire: "sparks", magic: "symbols",
@@ -38,13 +33,12 @@ export const EFFECT_V2_EXITS = Object.freeze(LINK_EXIT_EFFECTS.map(effect => mak
   effect.id === "collide" ? [2] : [2, 3],
 )));
 
-function resolve(entries, id, migrate) {
-  const migratedId = migrate(id);
-  return entries.find(entry => entry.id === migratedId) || entries[0];
+function resolve(entries, id) {
+  return entries.find(entry => entry.id === id) || entries[0];
 }
 
-export const getEffectV2Path = id => resolve(EFFECT_V2_PATHS, id, migrateLinkPathEffectId);
-export const getEffectV2Exit = id => resolve(EFFECT_V2_EXITS, id, migrateLinkExitEffectId);
+export const getEffectV2Path = id => resolve(EFFECT_V2_PATHS, id);
+export const getEffectV2Exit = id => resolve(EFFECT_V2_EXITS, id);
 
 export function validateEffectV2Catalog() {
   for (const [label, entries, expected] of [["path", EFFECT_V2_PATHS, 21], ["exit", EFFECT_V2_EXITS, 21]]) {

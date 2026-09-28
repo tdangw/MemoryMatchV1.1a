@@ -6,7 +6,7 @@ import { particleBudget, resolveEffectQuality } from "../js/effects/effectQualit
 import { createParticlePool } from "../js/effects/particlePool.js";
 
 assert.equal(validateEffectV2Catalog(), true);
-assert.equal(getEffectV2Path("storm").id, "electric");
+assert.equal(getEffectV2Path("storm").id, "default");
 assert.equal(getEffectV2Exit("unknown").id, "default");
 assert.equal(getEffectV2Path("electric").family, "jagged");
 assert.equal(getEffectV2Path("kame").family, "charge");

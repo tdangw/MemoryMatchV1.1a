@@ -1,10 +1,5 @@
 import { THEMES, getTheme, getUsableTheme } from "./themeCatalog.js";
-import {
-  LINK_EXIT_EFFECTS,
-  LINK_PATH_EFFECTS,
-  migrateLinkExitEffectId,
-  migrateLinkPathEffectId,
-} from "./linkConnect/linkEffects.js";
+import { LINK_EXIT_EFFECTS, LINK_PATH_EFFECTS } from "./linkConnect/linkEffects.js";
 
 const DEFAULT_APPEARANCE = Object.freeze({
   cardBack: "classic",
@@ -97,10 +92,6 @@ function ownedIds(items, value, defaultId) {
   return [...new Set([defaultId, ...ids])];
 }
 
-function migratedOwnedIds(items, value, defaultId, migrateId) {
-  return ownedIds(items, Array.isArray(value) ? value.map(migrateId) : value, defaultId);
-}
-
 export function normalizeAppearance(value = {}) {
   const ownedCardBacks = ownedIds(
     CARD_BACKS,
@@ -112,17 +103,15 @@ export function normalizeAppearance(value = {}) {
     value.ownedFlipEffects,
     DEFAULT_APPEARANCE.flipEffect,
   );
-  const ownedLinkPathEffects = migratedOwnedIds(
+  const ownedLinkPathEffects = ownedIds(
     LINK_PATH_EFFECTS,
     value.ownedLinkPathEffects,
     DEFAULT_APPEARANCE.linkPathEffect,
-    migrateLinkPathEffectId,
   );
-  const ownedLinkExitEffects = migratedOwnedIds(
+  const ownedLinkExitEffects = ownedIds(
     LINK_EXIT_EFFECTS,
     value.ownedLinkExitEffects,
     DEFAULT_APPEARANCE.linkExitEffect,
-    migrateLinkExitEffectId,
   );
   const cardBack = knownId(
     CARD_BACKS,
@@ -134,15 +123,15 @@ export function normalizeAppearance(value = {}) {
     value.flipEffect,
     DEFAULT_APPEARANCE.flipEffect,
   );
-  const linkPathEffect = knownId(LINK_PATH_EFFECTS, migrateLinkPathEffectId(value.linkPathEffect), DEFAULT_APPEARANCE.linkPathEffect);
-  const linkExitEffect = knownId(LINK_EXIT_EFFECTS, migrateLinkExitEffectId(value.linkExitEffect), DEFAULT_APPEARANCE.linkExitEffect);
+  const linkPathEffect = knownId(LINK_PATH_EFFECTS, value.linkPathEffect, DEFAULT_APPEARANCE.linkPathEffect);
+  const linkExitEffect = knownId(LINK_EXIT_EFFECTS, value.linkExitEffect, DEFAULT_APPEARANCE.linkExitEffect);
   const ownedThemes = normalizeOwnedThemes(value);
   const ownedTripleThemes = ownedIds(THEMES, value.ownedTripleThemes, "default");
   const themes = normalizeEquippedThemes(value, ownedThemes, ownedTripleThemes);
   const ownedTriplePathEffects = ownedIds(LINK_PATH_EFFECTS, value.ownedTriplePathEffects, "default");
   const ownedTripleExitEffects = ownedIds(LINK_EXIT_EFFECTS, value.ownedTripleExitEffects, "default");
-  const triplePathEffect = knownId(LINK_PATH_EFFECTS, migrateLinkPathEffectId(value.triplePathEffect), "default");
-  const tripleExitEffect = knownId(LINK_EXIT_EFFECTS, migrateLinkExitEffectId(value.tripleExitEffect), "default");
+  const triplePathEffect = knownId(LINK_PATH_EFFECTS, value.triplePathEffect, "default");
+  const tripleExitEffect = knownId(LINK_EXIT_EFFECTS, value.tripleExitEffect, "default");
   return {
     cardBack: ownedCardBacks.includes(cardBack)
       ? cardBack
@@ -199,12 +188,7 @@ export function ownTheme(appearance, gameId, themeId) {
 }
 
 function normalizeOwnedThemes(value) {
-  const splitOwnership = value.ownedThemesByGame && typeof value.ownedThemesByGame === "object"
-    ? Object.values(value.ownedThemesByGame).flatMap((themes) => Array.isArray(themes) ? themes : [])
-    : [];
-  const savedThemes = Array.isArray(value.ownedThemes)
-    ? value.ownedThemes
-    : splitOwnership;
+  const savedThemes = Array.isArray(value.ownedThemes) ? value.ownedThemes : [];
   return ownedIds(
     THEMES,
     savedThemes,
@@ -214,9 +198,8 @@ function normalizeOwnedThemes(value) {
 
 function normalizeEquippedThemes(value, ownedThemes, ownedTripleThemes) {
   const savedThemes = value.themes && typeof value.themes === "object" ? value.themes : {};
-  const legacyTheme = value.theme;
   return {
-    memoryMatch: normalizeEquippedTheme(savedThemes.memoryMatch ?? legacyTheme, ownedThemes, "memoryMatch"),
+    memoryMatch: normalizeEquippedTheme(savedThemes.memoryMatch, ownedThemes, "memoryMatch"),
     linkConnect: normalizeEquippedTheme(savedThemes.linkConnect, ownedThemes, "linkConnect"),
     tripleConnect: normalizeEquippedTheme(savedThemes.tripleConnect, ownedTripleThemes, "tripleConnect"),
   };

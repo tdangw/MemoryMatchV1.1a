@@ -21,13 +21,6 @@ const COMPUTER_SYMBOLS = Object.freeze([
   "±", "∞", "√", "∑", "∏", "∫",
 ]);
 
-const LEGACY_THEME_IDS = Object.freeze({
-  food: "foods",
-  "antiques-spy": "historical-artifacts",
-  animals: "animals-land",
-  plants: "trees",
-});
-
 const IMAGE_THEME_DEFINITIONS = Object.freeze([
   { id: "default", title: "Mặc định", price: 0, icon: "images" },
   { id: "animals-land", title: "Động vật trên cạn", price: 1, icon: "paw" },
@@ -75,8 +68,7 @@ export const THEMES = Object.freeze([
 ]);
 
 export function getTheme(id) {
-  const resolvedId = LEGACY_THEME_IDS[id] || id;
-  return THEMES.find((theme) => theme.id === resolvedId) || THEMES[0];
+  return THEMES.find((theme) => theme.id === id) || THEMES[0];
 }
 
 export function getUsableTheme(id) {

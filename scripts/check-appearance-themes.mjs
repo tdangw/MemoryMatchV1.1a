@@ -8,7 +8,7 @@ import {
 } from "../js/appearance.js";
 
 const migrated = normalizeAppearance({
-  theme: "animals-land",
+  themes: { memoryMatch: "animals-land" },
   ownedThemes: ["default", "animals-land"],
 });
 assert.equal(getEquippedThemeId(migrated, "memory-match"), "animals-land");
@@ -18,12 +18,7 @@ assert.equal(getEquippedThemeId(migrated, "memory-match"), "animals-land");
 assert.equal(getEquippedThemeId(migrated, "link-connect"), "animals-land");
 assert.equal(ownTheme(migrated, "link-connect", "animals-land"), false);
 
-const splitOwnership = normalizeAppearance({
-  ownedThemesByGame: {
-    memoryMatch: ["default", "animals-land"],
-    linkConnect: ["default", "drinks"],
-  },
-});
-assert.deepEqual(getOwnedThemeIds(splitOwnership).sort(), ["animals-land", "default", "drinks"]);
+const currentOwnership = normalizeAppearance({ ownedThemes: ["default", "animals-land", "drinks"] });
+assert.deepEqual(getOwnedThemeIds(currentOwnership).sort(), ["animals-land", "default", "drinks"]);
 
 console.log("Appearance theme checks passed.");

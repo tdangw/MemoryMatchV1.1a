@@ -54,17 +54,12 @@ export const LINK_EXIT_EFFECTS = Object.freeze([
   effect("ghost", "Hồn bay", "moon", "link-tile--ghost"),
 ]);
 
-const PATH_EFFECT_MIGRATIONS = Object.freeze({ storm: "electric", "laser-ice": "hydro", fireworks: "meteor" });
-const EXIT_EFFECT_MIGRATIONS = Object.freeze({});
-
-export function migrateLinkPathEffectId(id) { return PATH_EFFECT_MIGRATIONS[id] || id; }
-export function migrateLinkExitEffectId(id) { return EXIT_EFFECT_MIGRATIONS[id] || id; }
 export function getLinkPathEffect(id) { return LINK_PATH_EFFECTS.find((item) => item.id === id) || LINK_PATH_EFFECTS[0]; }
 export function getLinkExitEffect(id) { return LINK_EXIT_EFFECTS.find((item) => item.id === id) || LINK_EXIT_EFFECTS[0]; }
 
 export function getActiveLinkConnectionEffect(appearance) {
-  const pathEffect = getLinkPathEffect(migrateLinkPathEffectId(appearance?.linkPathEffect));
-  const exitEffect = getLinkExitEffect(migrateLinkExitEffectId(appearance?.linkExitEffect));
+  const pathEffect = getLinkPathEffect(appearance?.linkPathEffect);
+  const exitEffect = getLinkExitEffect(appearance?.linkExitEffect);
   return {
     pathId: pathEffect.id,
     pathClass: pathEffect.className,
