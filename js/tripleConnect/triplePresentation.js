@@ -31,6 +31,11 @@ function presentResolvedTripleExit({ shell, scope, match, effects, render, next 
   const root = shell.refs.root;
   const surface = shell.refs.board;
   const line = root.querySelector(".triple-connect__line");
+  // A previous match may have been interrupted after its connection SVG was
+  // painted but before its promise chain reached cleanup. Reset that surface
+  // before taking the next visual snapshot so old paths can never ghost into
+  // a later match.
+  clearTripleEffects(line);
   const surfaceRect = surface.getBoundingClientRect();
   const sourceNodes = match.tileIds.map((id) => root.querySelector(`[data-tile-id="${id}"]`)).filter(Boolean);
   if (sourceNodes.length !== 3) { render(next); return Promise.resolve(); }
@@ -52,6 +57,8 @@ function presentResolvedTripleExit({ shell, scope, match, effects, render, next 
   const cleanup = () => {
     lineAnimation?.cancel();
     lineAnimation = null;
+    line?.getAnimations({ subtree: true }).forEach((animation) => animation.cancel());
+    line?.style.removeProperty("opacity");
     clearTripleEffects(line);
     ghosts.forEach((ghost) => ghost.remove());
     sourceNodes.forEach((source) => source.classList.remove("is-match-exiting"));

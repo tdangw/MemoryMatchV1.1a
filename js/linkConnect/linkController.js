@@ -17,9 +17,9 @@ import {
   isCoinCounterAnimating,
   playCoinRewardFlight,
 } from "../coinRewards.js";
-import { gameState, increaseCoins, recordLinkConnectResult, spendCoins } from "../gameState.js";
+import { gameState, increaseCoins, recordLinkConnectResult, spendCoins, commitThemeSelectionHistory } from "../gameState.js";
 import { saveCoins, savePersistentGameData } from "../persistence.js";
-import { getTheme } from "../themeCatalog.js";
+import { getTheme, getThemeSelectionEligibility } from "../themeCatalog.js";
 import { GAME_MODES } from "../gameCatalog.js";
 import { TIME_UP_PURCHASES } from "../shopCatalog.js";
 import {
@@ -120,6 +120,7 @@ let selectedPosition = null;
 let pendingCompactLayout = null;
 let linkTimeWarningPlayed = false;
 let linkSessionCheckpointTicks = 0;
+let activeAssetPaths = [];
 let isLinkAutoPaused = false;
 let navigation = {
   showMenu: () => {},
@@ -215,7 +216,16 @@ export function startLinkLevel({
   remainingTime,
   timeLimit,
   levelStartTime,
+  assetPaths,
 } = {}) {
+  const modeLayout = getLinkModeLayout(mode);
+  const layout = getLinkBoardLayoutForViewport(isLinkChallengeMode(mode) ? getLinkChallengeLayout(level) : modeLayout);
+  const themeId = getTheme(getEquippedThemeId(gameState.appearance, "link-connect")).id;
+  const eligibility = getThemeSelectionEligibility(themeId, layout.tileCount / 2);
+  if (!eligibility.ok) {
+    showAppToast(`Chủ đề ${eligibility.theme.title} cần ${eligibility.required} ảnh khác nhau; hiện có ${eligibility.available}. Hãy chọn chủ đề khác.`);
+    return null;
+  }
   unmountActiveGameShell();
   stopCountdown();
   clearGameplayRewardPopups();
@@ -225,14 +235,15 @@ export function startLinkLevel({
   selectedPosition = null;
   pendingCompactLayout = null;
   linkTimeWarningPlayed = false;
-  const modeLayout = getLinkModeLayout(mode);
-  const layout = getLinkBoardLayoutForViewport(isLinkChallengeMode(mode) ? getLinkChallengeLayout(level) : modeLayout);
   const board = createLinkBoard({
     layout,
-    themeId: getEquippedThemeId(gameState.appearance, "link-connect"),
+    themeId,
     level,
     mode,
+    assetPaths: resume ? assetPaths : undefined,
+    history: resume ? undefined : gameState.progress.themeSelectionHistory[themeId],
   });
+  activeAssetPaths = board.selectedAssetPaths;
   if (level === 1 && !resume && !restart) {
     linkGameState.specialProgress = 0;
     linkGameState.specialNoEnergyDropStreak = 0;
@@ -266,13 +277,14 @@ export function startLinkLevel({
   linkGameState.timeLimit = timing.timeLimit;
   linkGameState.levelStartTime = timing.levelStartTime;
   linkSessionCheckpointTicks = 0;
-  persistLinkRunProgress();
   if (!resume && !restart) {
     const hintBonus = getLinkLevelHintBonus(level, getLinkItemCount("hint"));
     if (hintBonus > 0) grantLinkItem("hint", hintBonus);
   }
   showLinkGame();
   renderLinkBoard(board, { onTileClick: handleLinkTileClick, onCompactLandscapeChange: handleLinkCompactLandscapeChange });
+  if (!resume && activeAssetPaths.length) commitThemeSelectionHistory(themeId, activeAssetPaths);
+  persistLinkRunProgress();
   updateLinkHud();
   linkGameState.isLocked = true;
   showLevelRewardOverlay({
@@ -1327,6 +1339,7 @@ function persistLinkRunProgress() {
     remainingTime: linkGameState.remainingTime,
     timeLimit: linkGameState.timeLimit,
     levelStartTime: linkGameState.levelStartTime,
+    ...(activeAssetPaths.length ? { assetPaths: activeAssetPaths } : {}),
   });
 }
 

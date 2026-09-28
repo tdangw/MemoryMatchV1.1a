@@ -11,9 +11,9 @@ const topology = stableBaseline.visualTopology;
 
 const modes = [
   ["easy", 27],
-  ["normal", 45],
-  ["hard", 63],
-  ["superHard", 96],
+  ["normal", 46],
+  ["hard", 65],
+  ["superHard", 100],
 ];
 
 for (const viewport of viewports) {
@@ -64,6 +64,22 @@ for (const viewport of viewports) {
               getComputedStyle(tray).gridTemplateColumns.split(" ").length,
             boardAndTraySeparated: board.getBoundingClientRect().bottom <=
               tray.getBoundingClientRect().top,
+            cornerStacks: Object.values(run.getState().cornerStacks).map((pile, index) => {
+              const tileId = pile.tileIds.at(-1);
+              const node = board.querySelector(`[data-tile-id="${tileId}"]`);
+              const tileRect = node?.getBoundingClientRect();
+              const hit = tileRect && document.elementFromPoint(
+                tileRect.left + tileRect.width / 2,
+                tileRect.top + tileRect.height / 2,
+              );
+              if (index === 0) node?.click();
+              return {
+                tileId,
+                rendered: Boolean(node),
+                hitTargetId: hit?.closest("[data-tile-id]")?.dataset.tileId || null,
+                movedOffBoard: index === 0 && run.getState().tiles[tileId].location !== "board",
+              };
+            }),
             layout,
           };
         },
@@ -90,6 +106,9 @@ for (const viewport of viewports) {
       ).toBeLessThanOrEqual(topology.traySizeTolerancePx);
       expect(geometry.trayColumns).toBe(topology.traySlotCount);
       expect(geometry.boardAndTraySeparated).toBe(true);
+      expect(geometry.cornerStacks.every((stack) => stack.rendered)).toBe(true);
+      expect(geometry.cornerStacks.every((stack) => stack.hitTargetId === stack.tileId)).toBe(true);
+      expect(geometry.cornerStacks.length === 0 || geometry.cornerStacks[0].movedOffBoard).toBe(true);
       expect(geometry.root.top).toBeGreaterThanOrEqual(-1);
       expect(geometry.root.bottom).toBeLessThanOrEqual(viewport.height + 1);
       expect(geometry.tray.top).toBeGreaterThanOrEqual(-1);
@@ -158,6 +177,43 @@ test("Triple tray owns seven stable slots through selection and regroup", async 
   expect(trayTiles[0].rect.width).toBeGreaterThan(0);
   expect(trayTiles[0].rect.height).toBeGreaterThan(0);
   expect(trayTiles.every((tile) => tile.opacity === 1 && tile.filter === "none" && tile.padding === "0px")).toBe(true);
+});
+
+test("Triple milestone HUD uses the shared ten-marker geometry", async ({ page }) => {
+  await page.setViewportSize({ width: 914, height: 900 });
+  await page.goto("/");
+  const milestones = await page.evaluate(async () => {
+    const { startTripleConnectDevelopmentRound } = await import(
+      "/js/tripleConnect/tripleController.js"
+    );
+    startTripleConnectDevelopmentRound({ seed: "triple-milestone-geometry" });
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    const root = document.querySelector("#triple-connect-container");
+    const hud = root.querySelector(".triple-connect__milestones");
+    const coins = root.querySelector(".triple-connect__milestone-coins");
+    const track = root.querySelector(".triple-connect__milestone-track");
+    const rect = (node) => node.getBoundingClientRect().toJSON();
+    return {
+      hud: rect(hud),
+      coins: rect(coins),
+      track: rect(track),
+      markers: [...track.querySelectorAll("span")].map((marker) => rect(marker)),
+      hudBackground: getComputedStyle(hud).backgroundColor,
+    };
+  });
+
+  expect(milestones.markers).toHaveLength(10);
+  expect(milestones.hud.width).toBeCloseTo(260, 0);
+  expect(milestones.coins.right).toBeLessThanOrEqual(milestones.hud.left - 6);
+  expect(milestones.markers[0].x).toBeCloseTo(
+    milestones.track.left + milestones.track.width * 0.05 - milestones.markers[0].width / 2,
+    0,
+  );
+  expect(milestones.markers.at(-1).x).toBeCloseTo(
+    milestones.track.left + milestones.track.width * 0.95 - milestones.markers.at(-1).width / 2,
+    0,
+  );
+  expect(milestones.hudBackground).not.toBe("rgba(0, 0, 0, 0)");
 });
 
 test("Triple image errors fall back without changing board topology", async ({

@@ -49,6 +49,8 @@ function applyGroupExitVectors(targets, effectId) {
 }
 
 export function clearTripleEffects(surface) {
+  surface?.getAnimations({ subtree: true }).forEach((animation) => animation.cancel());
+  surface?.style.removeProperty("opacity");
   clearConnectionV2(surface);
   clearCanvasExit();
   surface?.replaceChildren();

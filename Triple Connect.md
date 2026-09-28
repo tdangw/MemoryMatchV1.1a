@@ -9,7 +9,7 @@ Trò chơi dùng chung hệ thống Xu, chủ đề ảnh, Bộ sưu tập hiệ
 ### Quyết định đã chốt
 
 - Màn hình mobile dọc: HUD ở trên, bàn nhiều lớp ở giữa, khay ngang dưới bàn.
-- Khay có cố định 7 ô trong phiên bản đầu. Chưa hiển thị ô khóa, chưa có trạng thái 10 ô và chưa triển khai vật phẩm Mở rộng khay; chỉ xem xét lại sau khi gameplay 7 ô, solver và hiệu suất đã ổn định bằng dữ liệu chơi thử.
+- Khay cơ bản có 7 ô. Quyền Mở rộng khay mua một lần với 3.000 Xu nâng capacity lên 10; entitlement lưu ở profile, áp dụng ngay cho round đang chơi và rollback nếu persistence thất bại.
 - Chỉ thẻ không còn bị bất kỳ thẻ lớp cao nào giao phủ mới có thể chọn. Các lớp được lệch theo bước nửa thẻ để người chơi nhìn được thẻ bên dưới; không bắt buộc dọn sạch toàn bộ một layer trước khi mở tile đã hết blocker.
 - Khay luôn tự dồn trái và tự nhóm các thẻ cùng loại. Khi đủ đúng 3 thẻ, game ưu tiên xóa bộ ba trước khi xét khay đầy.
 - Điều kiện thắng: xóa sạch board. Điều kiện thua: sau khi ưu tiên giải quyết mọi bộ ba vừa hình thành, khay vẫn có đủ 7 thẻ và không có bộ ba có thể xóa ngay.
@@ -45,10 +45,11 @@ Trò chơi dùng chung hệ thống Xu, chủ đề ảnh, Bộ sưu tập hiệ
 
 ### Trình bày
 
-- Board là catalog template có 2–5 lớp, dùng tọa độ logic theo bước nửa thẻ. Mỗi lớp có một mask hình học riêng như khung vuông/chữ nhật, kim cương/vòng, dấu cộng hoặc tam giác; không xếp thành các cột thẻ giống nhau.
+- Board active có 3–6 lớp, dùng tọa độ logic theo bước nửa thẻ. Mỗi lớp có mask hình học riêng; không xếp thành các cột thẻ giống nhau.
 - Các lớp căn giữa trên cùng một board và xen kẽ theo từng cặp: Layer 2 đặt vào khe của Layer 1, Layer 3 đặt vào khe của Layer 2, Layer 4 đặt vào khe của Layer 3 và Layer 5 đặt vào khe của Layer 4. Bước tọa độ là nửa chiều rộng/nửa chiều cao thẻ để tạo cảm giác chồng lớp nhưng vẫn thấy ảnh/viền phía sau.
 - Layer 1 có thể phủ gần toàn board nhưng phải tạo silhouette đẹp. Số lượng/footprint không bắt buộc giảm đều: Layer 4 có thể nhiều thẻ hoặc có cụm lớn hơn Layer 3 miễn các tile cùng layer không chồng nhau; Layer 5 nên nhỏ hơn để giữ chiều sâu thị giác. Kích thước từng card trong cùng layout vẫn nhất quán, “lớn hơn” chỉ nói về cụm/mask.
-- Phân bố tham chiếu ban đầu: Dễ `8 + 4`; Trung bình `12 + 8 + 4`; Khó `18 + 9 + 6 + 3`; Siêu khó/Vô tận `24 + 15 + 9 + 9 + 3`. Đây là ngân sách slot theo thứ tự lớp thấp đến cao, có thể tinh chỉnh sau visual review nhưng phải giữ đúng tổng thẻ/số lớp và solver phải xác nhận lại.
+- Base layout active V5 có `27/45/63/96` slot cho Dễ/Trung bình/Khó/Siêu khó-Vô tận. Round có xấp dùng topology V6, dời toàn bộ base layout vào lane giữa và đặt xấp ở góc trong vùng loại trừ riêng; không base card nào được chạm footprint xấp.
+- Hidden Piles: Trung bình có một xấp 9 thẻ ở góc trên trái; Khó có hai xấp 7 và 8 thẻ ở hai góc trên; Siêu khó/Vô tận có bốn xấp 6 thẻ ở bốn góc. Chỉ top card tồn tại trong DOM/a11y; thẻ sâu được reveal tuần tự.
 - Một thẻ chỉ tương tác được nếu không còn thẻ lớp cao nào giao lên vùng của nó trong cover graph. Tile bị che mờ tĩnh, không focus/không nhận chạm; tile dưới đã hết blocker được sáng và chọn ngay, không cần chờ dọn sạch cả layer.
 - Ảnh trên thẻ phải hiện trọn nội dung (`contain` về mặt trình bày), không bị crop do tỷ lệ card hoặc bị ép theo từng trục. Board co bằng một tỷ lệ đồng nhất và căn giữa trên mobile/desktop; resize không thay slot, layer hoặc cover graph.
 - Hoàn tác phục hồi snapshot chính xác của lượt chọn gần nhất: tile, slot, layer, quan hệ che phủ, khay, chuỗi Miss/combo và các giá trị lượt liên quan. Không tự nâng thẻ lên lớp trên. Nếu snapshot không còn phục hồi hợp lệ thì từ chối thao tác và không trừ vật phẩm. Xáo thẻ luôn xóa lịch sử Hoàn tác.
@@ -74,12 +75,12 @@ Cách này tốt hơn việc chỉ tạo một chuỗi mẫu vì vẫn cho phép
 
 | Chế độ | Thẻ | Bộ ba | Lớp | Thời gian | Ghi chú |
 | --- | ---: | ---: | ---: | --- | --- |
-| Dễ | 12 | 4 | 2 | 60 giây | Nhịp làm quen. |
-| Trung bình | 24 | 8 | 3 | 90 giây | Tăng loại hình và lớp. |
-| Khó | 36 | 12 | 4 | 120 giây | Cần theo dõi thẻ bị che. |
-| Siêu khó | 60 | 20 | 5 | 180 giây | Board dày và khay dễ bị áp lực. |
-| Vô tận | 60 | 20 | 5 | Đếm xuôi | Clear board để sang level tiếp; thưởng Xu cố định, không mua/thêm thời gian. |
-| Thử thách | 12 → 48 | 4 → 16 | 2 → 5 | 60 giây + thời gian cấp | Tăng theo dãy `12, 18, 24, 30, 36, 42, 48`; có thẻ may mắn. |
+| Dễ | 27 | 9 | 3 | 93 giây | Không có xấp góc. |
+| Trung bình | 54 | 18 | 4 | 133 giây | Base 45 + một xấp 9. |
+| Khó | 78 | 26 | 5 | 178 giây | Base 63 + hai xấp 7/8. |
+| Siêu khó | 120 | 40 | 6 | 262 giây | Base 96 + bốn xấp 6. |
+| Vô tận | 120 | 40 | 6 | Đếm xuôi | Cùng topology Siêu khó; qua level liên tiếp. |
+| Thử thách | 18 → 93 | 6 → 31 | 2 → 5 | 75 → 210 giây | Tổng thẻ theo stage `18, 27, 42, 51, 66, 75, 93`; có thẻ may mắn. |
 
 Mốc thời gian ban đầu đồng bộ với hai game và chỉ được điều chỉnh sau khi có dữ liệu thử nghiệm thực tế.
 
@@ -117,10 +118,9 @@ Các vật phẩm của Triple Connect có tồn kho, cân bằng giá và contr
 | --- | --- | --- |
 | Hoàn tác | Trả thẻ chọn gần nhất từ khay về board; dùng nhiều lần theo số lượng sở hữu. | Không phải xóa vĩnh viễn thẻ. |
 | Gợi ý | Ưu tiên chỉ thẻ lộ trùng với thẻ trong khay; nếu khay có đúng một thẻ lẻ, chỉ hai thẻ còn lại của bộ ba. | Không tự chọn hoặc tự xóa. |
-| Xáo thẻ | Xáo mọi thẻ còn lại trên mọi lớp, sau khi solver xác nhận board mới. | Xóa lịch sử Hoàn tác. |
+| Xáo thẻ | Xáo mọi thẻ còn lại trên mọi lớp/xấp, sau khi solver xác nhận board mới. | Xóa lịch sử Hoàn tác. |
 | Thêm thời gian | Dùng cơ chế mua/thêm thời gian chung. | Không dùng trong Vô tận. |
-
-Vật phẩm Mở rộng khay được hoãn hoàn toàn. Không tạo ID, inventory, nút khóa hoặc field save tạm cho vật phẩm này trước khi có quyết định sản phẩm mới.
+| Mở rộng khay | Quyền mua một lần, tăng 7 → 10 ô. | Giá 3.000 Xu; mobile dọc hiển thị 5×2. |
 
 Trong Thử thách, thẻ may mắn có thể thưởng `+thời gian`, `+gợi ý` hoặc `+Xu`; được thể hiện như một thẻ trong bộ ba và dùng popup phần thưởng chung.
 
@@ -157,41 +157,17 @@ js/tripleConnect/
 - Component dùng chung chỉ nhận dữ liệu qua tham số/callback; không chứa nhánh logic Triple trong Memory hoặc Link controller.
 - Kiểm tra tĩnh và test board/solver Triple được thêm vào `npm run check` trước khi mở game trong menu chính.
 
-## 8. Lộ trình triển khai
+## 8. Trạng thái triển khai
 
-### Giai đoạn 1 — Vertical slice lõi
-
-1. Đăng ký Triple Connect qua registry. Sau khi có vertical slice chơi được, giữ game trong màn chọn để người dùng kiểm thử trực tiếp; development hook chỉ dùng cho seed/fixture đặc biệt và không thay thế luồng menu thật.
-2. Làm `tripleState`, board Easy 2 lớp 18 thẻ và renderer board/khay dọc mobile.
-3. Cài luật chọn thẻ lộ, bay xuống khay, tự nhóm, bộ ba, Miss/combo/điểm và win/lose.
-4. Adapter line/xóa ba thẻ với hiệu ứng đang trang bị.
-5. Tạo generator solution-first và solver; thêm kiểm thử cases board/khoang khay.
-
-### Giai đoạn 2 — Đồng bộ trải nghiệm
-
-1. Tái dùng HUD, timer, sao, popup đầu màn/tổng kết/hết giờ, pause và âm thanh.
-2. Hoàn thiện responsive: board/khay không tràn màn hẹp, animation không che HUD.
-3. Mở lần lượt `normal`, `hard`, `superHard`, mỗi mode phải qua solver và kiểm thử hiệu suất riêng.
-4. Thêm Vô tận sau khi các mode cố định đã ổn định. Thử thách và thẻ may mắn chỉ được triển khai sau khi Gate 8 khóa đủ thông số sản phẩm.
-
-### Giai đoạn 3 — Vật phẩm và cân bằng
-
-1. Hoàn tác, Gợi ý, Xáo thẻ và Thêm thời gian. Mở rộng khay tiếp tục nằm ngoài phạm vi.
-2. Nối Shop/collection, giá Xu, tồn kho và UI Công cụ.
-3. Cân bằng mốc sao, phần thưởng Xu, thời gian, mật độ lớp và tần suất thẻ may mắn bằng test thực tế.
-
-### Giai đoạn 4 — Mở rộng có kiểm soát
-
-1. Thiết kế bộ ba thẻ đặc biệt và thẻ băng riêng cho Triple Connect.
-2. Chỉ thêm biến thể lớp/luật khi solver, animation và bàn 5 lớp đã được kiểm thử ổn định.
-3. Chỉ đánh giá lại khay 10 ô/Mở rộng khay sau khi bản 7 ô có số liệu cân bằng, solver và thiết bị thật ổn định; không giữ code dự phòng trong runtime hiện tại.
+- Core gameplay, sáu mode, Challenge/Lucky, item, solver, session, responsive, Hidden Piles, khay 7/10 và milestone 10/30 đã có trong runtime.
+- Round mới dùng topology corner-safe V6; layout V1–V5 tiếp tục là compatibility corpus cho save cũ.
+- Effect V2 runtime dùng adapter chung cho Link/Triple và đã có cleanup/reduced-motion/performance test. Visual fidelity từng line effect là phase riêng, không ảnh hưởng kết quả gameplay.
+- Công việc active nằm trong `TASK_RUNTIME_CLOSURE_AND_SIMPLIFICATION_PLAN.md`: đóng stale regression, hoàn tất generated-theme history/snapshot và giảm test matrix trùng lặp.
 
 ## 9. Trạng thái quyết định sản phẩm
 
-Đã được người dùng duyệt: 3 Gợi ý khởi đầu; giá Gợi ý 8 Xu, Thêm thời gian 2 Xu/giây, Hoàn tác/Xáo thẻ 15 Xu; mốc sao `12/18/25` và Endless `10/15/20`; Lucky chỉ có ở Challenge, 1–3 thẻ mỗi board, thưởng thuộc một trong ba loại Xu/thời gian/Gợi ý.
+Đã được triển khai: 3 Gợi ý khởi đầu; giá Gợi ý 8 Xu, Thêm thời gian 2 Xu/giây, Hoàn tác/Xáo thẻ 15 Xu; mốc sao `12/18/25` và Endless `10/15/20`; Lucky chỉ có ở Challenge; Mở rộng khay giá 3.000 Xu; milestone version 2 gồm 10 mốc mỗi 3 bộ ba, target 30.
 
-Còn phải chốt trước khi triển khai Lucky: phân bố 1–3 thẻ theo board/layer, giá trị cụ thể của từng loại thưởng, fallback khi Gợi ý đầy và quan hệ với Undo/Shuffle để không nhận thưởng lặp. Phương án đề xuất nằm trong addendum của `TASK_TRIPLE_CONNECT_IMPLEMENTATION_PLAN.md` và chưa phải production contract cho tới khi người dùng xác nhận.
-
-Trước khi nối phần thưởng Xu cuối màn/Endless, phải có công thức đã được duyệt và ghi vào tài liệu/config; không mặc định sao chép Memory hoặc Link.
+Phân bố Lucky, bảng reward milestone, fallback khi inventory đầy và phần thưởng cuối màn/Endless phải lấy từ `tripleConfig.js` cùng module transaction tương ứng; tài liệu này không sao chép bảng số chi tiết để tránh lệch nguồn sự thật.
 
 Mọi tuning sản phẩm phải nằm tập trung trong `tripleConfig.js`/catalog, không rải hằng số vào renderer hoặc controller.

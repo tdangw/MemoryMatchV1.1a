@@ -28,7 +28,7 @@ test("Triple milestone HUD has the shared accessible track in every viewport", a
   } else {
     await expect(region).toBeVisible();
     await expect(region.locator("[data-triple-milestone]")).toHaveCount(10);
-    await expect(region.locator('[data-triple-milestone="1"]')).toHaveAttribute("aria-label", /Mốc 1: Mốc 3/);
+    await expect(region.locator('[data-triple-milestone="1"]')).toHaveAttribute("aria-label", "Bộ 3 thẻ: +2 Xu");
     const bounds = await region.boundingBox();
     const viewport = page.viewportSize();
     expect(bounds?.x || 0).toBeGreaterThanOrEqual(0);

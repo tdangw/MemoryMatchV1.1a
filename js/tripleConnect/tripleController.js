@@ -275,8 +275,9 @@ function mountTripleDevelopmentRound(generated, { skipIntro = false } = {}) {
     hud.milestones({
       progress: milestones.progress,
       target: TRIPLE_PRODUCT_DECISIONS.milestones.target,
-      descriptions: TRIPLE_PRODUCT_DECISIONS.milestones.rewards.map((reward, index) =>
-        `Mốc ${(index + 1) * 3}: ${Object.entries(reward).filter(([key]) => key !== "endlessCoins").map(([key, value]) => `+${value} ${key === "coins" ? "Xu" : key === "time" ? "giây" : key === "hint" ? "Gợi ý" : key === "undo" ? "Hoàn tác" : "Xáo trộn"}`).join(" · ")}`),
+      labels: TRIPLE_PRODUCT_DECISIONS.milestones.rewards.map((_, index) => `Bộ ${(index + 1) * 3} thẻ`),
+      descriptions: TRIPLE_PRODUCT_DECISIONS.milestones.rewards.map((reward) =>
+        Object.entries(reward).filter(([key]) => key !== "endlessCoins").map(([key, value]) => `+${value} ${key === "coins" ? "Xu" : key === "time" ? "giây" : key === "hint" ? "Gợi ý" : key === "undo" ? "Hoàn tác" : "Xáo trộn"}`).join(" · ")),
     });
     updateTimer(shell);
   };

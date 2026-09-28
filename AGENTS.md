@@ -68,7 +68,10 @@ Không được:
 
 ## 5. Tách biệt công việc, tiếp tục đến hết gate và tránh xung đột
 
-- Mỗi lượt triển khai chỉ có một mục tiêu và một gate rõ ràng. **Một lượt được phép và phải gồm nhiều lần đọc, sửa, chạy lệnh, chờ tiến trình, chẩn đoán và chạy lại test cho đến khi toàn bộ gate đạt Definition of Done; không được hiểu là mỗi lượt chỉ làm một hàm, một file, một test hoặc một bước trung gian.**
+- Mỗi lượt triển khai phải có một task hoặc mục tiêu rõ ràng. Một task có thể gồm nhiều gate; gate chỉ là checkpoint nội bộ để kiểm soát phạm vi, review và rollback, **không phải điều kiện mặc định để kết thúc lượt**.
+- Khi người dùng giao toàn bộ task hoặc dẫn tới một file kế hoạch mà không giới hạn gate, phạm vi được giao là **toàn bộ các gate chưa hoàn thành trong kế hoạch đó**. Agent phải thực hiện tuần tự từ gate hiện tại đến gate cuối, gồm mọi lần đọc, sửa, chạy lệnh, chờ tiến trình, chẩn đoán và chạy lại test cần thiết. Không được hiểu một lượt chỉ làm một gate, một hàm, một file, một test hoặc một bước trung gian.
+- Sau khi một gate pass, agent phải tự động ghi nhận kết quả ở commentary rồi bắt đầu gate kế tiếp ngay trong cùng lượt. Không hỏi “có tiếp tục không”, không chờ người dùng nhắn “tiếp tục”, và không gửi final chỉ vì vừa hoàn thành một gate.
+- Chỉ dừng ở ranh giới gate khi người dùng ghi rõ chỉ thực hiện gate đó, chủ động yêu cầu dừng, hoặc gate kế tiếp gặp blocker thực sự thuộc danh sách bên dưới và cần quyết định/quyền mới từ người dùng.
 - Không trộn sửa baseline, dọn CSS, viết lại effect và thêm Triple Connect trong cùng một thay đổi nếu chưa được yêu cầu rõ.
 - Trước và sau khi sửa, kiểm tra trạng thái/diff; mọi thay đổi có sẵn được coi là của người dùng.
 - Không hoàn nguyên, format hàng loạt hoặc “dọn tiện” file ngoài phạm vi.
@@ -79,6 +82,7 @@ Không được:
 ### Quy tắc tiếp tục và điều kiện kết thúc lượt
 
 - Khi người dùng yêu cầu thực hiện một task/gate, agent phải tiếp tục tự chủ cho tới khi **toàn bộ acceptance criteria của task/gate đó đạt** hoặc gặp blocker thực sự. Không cần người dùng nhắn “tiếp tục” sau từng bước nội bộ.
+- Nếu yêu cầu là toàn bộ task, “hoàn thành” nghĩa là mọi gate thuộc task đã pass; pass Gate 0, Gate 1 hoặc bất kỳ gate trung gian nào chỉ là tiến độ, không phải kết quả cuối. Nếu yêu cầu chỉ đích danh một gate, agent hoàn thành đầy đủ gate đó rồi mới được kết thúc.
 - Kết quả trung gian chỉ được gửi ở commentary. Không gửi final nếu vẫn còn hành động an toàn, đã được cho phép và nằm trong phạm vi mà agent có thể tự thực hiện.
 - Không kết thúc lượt bằng các câu như “bước tiếp theo là…”, “cần chạy tiếp…”, “chưa có kết quả đầy đủ…” hoặc “có thể tiếp tục…” nếu chính agent có thể thực hiện bước đó ngay trong lượt hiện tại.
 - Nếu lệnh/test trả session đang chạy hoặc mới có output một phần, phải tiếp tục chờ/poll bằng cơ chế của tool cho tới khi process kết thúc. Một profile pass không đại diện cho toàn bộ matrix; chỉ báo pass sau khi mọi profile bắt buộc đã có kết quả cuối.
@@ -89,7 +93,7 @@ Không được:
 - Khi bị blocker, báo đúng một lần với bằng chứng cụ thể: điều đã hoàn thành, lệnh/lỗi liên quan, phần còn lại, vì sao không thể tiếp tục và quyết định tối thiểu cần từ người dùng. Không dùng blocker giả cho việc khó, lâu hoặc còn nhiều bước.
 - Ngoại lệ: nếu người dùng chỉ yêu cầu đánh giá, giải thích, review, báo trạng thái hoặc chủ động yêu cầu dừng, agent trả đúng phạm vi đó và không tự triển khai thêm.
 
-`TASK_TRIPLE_CONNECT_IMPLEMENTATION_PLAN.md` đã hoàn tất Continuation 0–7 và chỉ còn là hồ sơ acceptance; không chạy lại các gate nếu không có regression hoặc yêu cầu mới. `TASK_CSS_DEDUP_EFFECTS_V2_PLAN.md` vẫn là kế hoạch active riêng cho CSS ownership toàn ứng dụng và Effect V2 dùng chung. Các kế hoạch baseline, compact landscape, readiness và Game Shell phase cũ đã hoàn tất và bị xóa; không khôi phục chúng từ Git history làm nguồn thực thi.
+`TASK_RUNTIME_CLOSURE_AND_SIMPLIFICATION_PLAN.md` là kế hoạch active duy nhất. Các kế hoạch Triple, Theme Selection, Hidden Piles, Tray Expansion, Milestone và Effect V2 cũ đã hoàn tất hoặc được hợp nhất rồi xóa; không khôi phục chúng từ Git history làm nguồn thực thi. Visual polish Effect V2 chỉ được coi là hoàn tất khi gate visual riêng trong kế hoạch active có bằng chứng hình ảnh và hiệu suất.
 
 ## 6. Kiến trúc và khả năng mở rộng
 

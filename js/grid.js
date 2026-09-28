@@ -100,12 +100,13 @@ export function setBoardCoordinatesVisible(visible) {
  */
 export function createGrid(
   { tileCount, columns, mobileColumns },
-  { roundId, onPreviewComplete, previewDurationMs = GAME_CONFIG.previewDurationMs } = {},
+  { roundId, onPreviewComplete, previewDurationMs = GAME_CONFIG.previewDurationMs, assetPaths, history } = {},
 ) {
   const totalTiles = tileCount;
   const numberOfPairs = Math.floor(totalTiles / 2);
 
-  const selectedCards = getThemeCards(getEquippedThemeId(gameState.appearance), numberOfPairs);
+  const selectedCards = getThemeCards(getEquippedThemeId(gameState.appearance), numberOfPairs, { assetPaths, history });
+  if (selectedCards.length !== numberOfPairs) throw new Error("Chủ đề không có đủ ảnh cho bàn Memory Match.");
   let cards = [];
   selectedCards.forEach((card) => {
     cards.push(card, card);
@@ -128,7 +129,7 @@ export function createGrid(
 
   // Chuẩn bị DOM
   const gridContainer = document.getElementById("grid-container");
-  if (!gridContainer) return;
+  if (!gridContainer) return null;
 
   activeLayout = { tileCount, columns, mobileColumns };
   gridContainer.classList.add("is-locked");
@@ -164,6 +165,7 @@ export function createGrid(
     if (gameState.roundId === roundId)
       revealAndHideTiles(roundId, onPreviewComplete, previewDurationMs);
   }, 0);
+  return selectedCards;
 }
 
 /**

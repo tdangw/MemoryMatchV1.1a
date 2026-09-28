@@ -65,8 +65,9 @@ test("Triple tray expansion persists once and applies immediately to the active 
   });
   expect(purchased).toEqual({ bought: true, capacity: 10, owned: true });
   await expect(page.locator(".triple-connect__tray")).toHaveAttribute("data-triple-tray-capacity", "10");
-  await expect(page.locator(".triple-connect__tray-slot:not([hidden])")).toHaveCount(10);
-  const trayMetrics = await page.locator(".triple-connect__tray-slot:not([hidden])").evaluateAll((slots) => {
+  await expect(page.locator(".triple-connect__tray-slot")).toHaveCount(10);
+  await expect(page.locator(".triple-connect__tray-slot[hidden]")).toHaveCount(0);
+  const trayMetrics = await page.locator(".triple-connect__tray-slot").evaluateAll((slots) => {
     const rects = slots.map((slot) => slot.getBoundingClientRect());
     return {
       rows: new Set(rects.map((rect) => Math.round(rect.top))).size,

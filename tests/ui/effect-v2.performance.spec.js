@@ -17,7 +17,10 @@ test("Effect V2 production performance budget", async ({ page }, testInfo) => {
     const tiles = allTiles.slice(0, 2); const third = allTiles[2];
     const samples = Object.fromEntries(effectIds.map(id => [id, { exit2: [], exit3: [], frame: [] }]));
     const connectionSamples=[]; const long=[]; const observer = new PerformanceObserver(list => list.getEntries().forEach(entry => long.push(entry.duration))); observer.observe({ type: "longtask", buffered: true });
-    for (let i=0;i<10;i++) { renderConnectionV2({surface,points:[{x:0,y:0},{x:20,y:20}],effect:{id:"default"},seed:i}); clearConnectionV2(surface); }
+    for (let i=0;i<10;i++) {
+      renderConnectionV2({surface,points:[{x:0,y:0},{x:20,y:20}],effect:{id:"default"},seed:i}); clearConnectionV2(surface);
+      await new Promise(requestAnimationFrame);
+    }
     for (const effectId of effectIds) {
       playCanvasExit({frame,tiles,exitId:effectId,quality:"medium"}); await new Promise(requestAnimationFrame); clearCanvasExit();
       playCanvasExit({frame,tiles:[...tiles,third],exitId:effectId,quality:"medium"}); await new Promise(requestAnimationFrame); clearCanvasExit();
@@ -28,6 +31,10 @@ test("Effect V2 production performance budget", async ({ page }, testInfo) => {
       const effectId=effectIds[i%effectIds.length]; const effectSamples=samples[effectId]; const diagnostics={recordFrame(value) { if (effectSamples.frame.length < 1024) effectSamples.frame.push(value); }};
       let t=performance.now(); playCanvasExit({frame,tiles,exitId:effectId,quality:"medium",diagnostics}); effectSamples.exit2.push(performance.now()-t); await new Promise(requestAnimationFrame); clearCanvasExit();
       t=performance.now(); playCanvasExit({frame,tiles:[...tiles,third],exitId:effectId,quality:"medium",diagnostics}); effectSamples.exit3.push(performance.now()-t); await new Promise(requestAnimationFrame); clearCanvasExit();
+      // Production matches arrive on separate frames. Yield periodically so
+      // this lifecycle soak does not manufacture one artificial long task by
+      // performing one hundred independent matches in a single JS task.
+      if ((i + 1) % 10 === 0) await new Promise(requestAnimationFrame);
     }
     observer.disconnect(); const stat = values => { const sorted=[...values].sort((a,b)=>a-b); return {count:sorted.length,p50:sorted[Math.floor(sorted.length*.5)]||0,p95:sorted[Math.ceil(sorted.length*.95)-1]||0,max:sorted.at(-1)||0}; };
     const effects=Object.fromEntries(effectIds.map(id => [id, {renderPath:id === "default" ? "css" : "canvas",exit2:stat(samples[id].exit2),exit3:stat(samples[id].exit3),frame:stat(samples[id].frame)}]));

@@ -9,12 +9,14 @@ import {
   TRIPLE_EASY_LAYOUT_V1,
   TRIPLE_NORMAL_CONFIG,
   TRIPLE_NORMAL_LAYOUT,
+  TRIPLE_NORMAL_LAYOUT_V6,
   TRIPLE_NORMAL_LAYOUT_V4,
   TRIPLE_NORMAL_LAYOUT_V3,
   TRIPLE_NORMAL_LAYOUT_V2,
   TRIPLE_NORMAL_LAYOUT_V1,
   TRIPLE_HARD_CONFIG,
   TRIPLE_HARD_LAYOUT,
+  TRIPLE_HARD_LAYOUT_V6,
   TRIPLE_HARD_LAYOUT_V4,
   TRIPLE_HARD_LAYOUT_V3,
   TRIPLE_HARD_LAYOUT_V2,
@@ -22,6 +24,7 @@ import {
   TRIPLE_HARD_SOLVER_BUDGET,
   TRIPLE_SUPER_HARD_CONFIG,
   TRIPLE_SUPER_HARD_LAYOUT,
+  TRIPLE_SUPER_HARD_LAYOUT_V6,
   TRIPLE_SUPER_HARD_LAYOUT_V4,
   TRIPLE_SUPER_HARD_LAYOUT_V3,
   TRIPLE_SUPER_HARD_LAYOUT_V2,
@@ -34,6 +37,12 @@ import {
   TRIPLE_CHALLENGE_42_LAYOUT,
   TRIPLE_CHALLENGE_60_LAYOUT,
   TRIPLE_CHALLENGE_48_LAYOUT,
+  TRIPLE_CHALLENGE_24_LAYOUT_V3,
+  TRIPLE_CHALLENGE_36_LAYOUT_V5,
+  TRIPLE_CHALLENGE_42_LAYOUT_V2,
+  TRIPLE_CHALLENGE_54_LAYOUT_V5,
+  TRIPLE_CHALLENGE_60_LAYOUT_V3,
+  TRIPLE_CHALLENGE_75_LAYOUT_V5,
   getTripleChallengeStage,
   TRIPLE_LUCKY_REWARDS,
   TRIPLE_CORNER_STACK_CORNERS,
@@ -46,11 +55,14 @@ export function getEasyTripleLayout() {
   return TRIPLE_EASY_LAYOUT;
 }
 export function getNormalTripleLayout() {
-  return TRIPLE_NORMAL_LAYOUT;
+  return TRIPLE_NORMAL_LAYOUT_V6;
 }
 export function getTripleLayout(layoutId) {
   const layouts = [
     TRIPLE_EASY_LAYOUT,
+    TRIPLE_NORMAL_LAYOUT_V6,
+    TRIPLE_HARD_LAYOUT_V6,
+    TRIPLE_SUPER_HARD_LAYOUT_V6,
     TRIPLE_NORMAL_LAYOUT,
     TRIPLE_HARD_LAYOUT,
     TRIPLE_SUPER_HARD_LAYOUT,
@@ -72,6 +84,12 @@ export function getTripleLayout(layoutId) {
     TRIPLE_CHALLENGE_42_LAYOUT,
     TRIPLE_CHALLENGE_60_LAYOUT,
     TRIPLE_CHALLENGE_48_LAYOUT,
+    TRIPLE_CHALLENGE_24_LAYOUT_V3,
+    TRIPLE_CHALLENGE_36_LAYOUT_V5,
+    TRIPLE_CHALLENGE_42_LAYOUT_V2,
+    TRIPLE_CHALLENGE_54_LAYOUT_V5,
+    TRIPLE_CHALLENGE_60_LAYOUT_V3,
+    TRIPLE_CHALLENGE_75_LAYOUT_V5,
     TRIPLE_EASY_LAYOUT_V1,
     TRIPLE_NORMAL_LAYOUT_V1,
     TRIPLE_HARD_LAYOUT_V1,
@@ -84,7 +102,7 @@ export function getTripleLayout(layoutId) {
 export function generateNormalTripleBoard({ seed, solverOptions } = {}) {
   return generateBoard({
     seed,
-    layout: TRIPLE_NORMAL_LAYOUT,
+    layout: TRIPLE_NORMAL_LAYOUT_V6,
     config: TRIPLE_NORMAL_CONFIG,
     solverOptions,
   });
@@ -93,7 +111,7 @@ export function generateHardTripleBoard({ seed, solverOptions } = {}) {
   return generateBoard({
     seed,
     maxAttempts: 1,
-    layout: TRIPLE_HARD_LAYOUT,
+    layout: TRIPLE_HARD_LAYOUT_V6,
     config: TRIPLE_HARD_CONFIG,
     solverOptions: { ...TRIPLE_HARD_SOLVER_BUDGET, ...solverOptions },
   });
@@ -102,7 +120,7 @@ export function generateSuperHardTripleBoard({ seed, solverOptions } = {}) {
   return generateBoard({
     seed,
     maxAttempts: 1,
-    layout: TRIPLE_SUPER_HARD_LAYOUT,
+    layout: TRIPLE_SUPER_HARD_LAYOUT_V6,
     config: TRIPLE_SUPER_HARD_CONFIG,
     solverOptions: { ...TRIPLE_SUPER_HARD_SOLVER_BUDGET, ...solverOptions },
   });
@@ -111,7 +129,7 @@ export function generateEndlessTripleBoard({ seed, solverOptions } = {}) {
   return generateBoard({
     seed,
     maxAttempts: 1,
-    layout: TRIPLE_SUPER_HARD_LAYOUT,
+    layout: TRIPLE_SUPER_HARD_LAYOUT_V6,
     config: TRIPLE_ENDLESS_CONFIG,
     solverOptions: { ...TRIPLE_SUPER_HARD_SOLVER_BUDGET, ...solverOptions },
   });
@@ -184,7 +202,7 @@ function generateBoard({
     const solved = solveTripleBoard({
       board: candidate.board,
       preferredWitness: candidate.witness,
-      now: () => 0,
+      now: createDeterministicSolverClock(),
       ...solverOptions,
     });
     if (solved.status === "solved")
@@ -202,7 +220,7 @@ function generateBoard({
   const solvedFallback = solveTripleBoard({
     board: fallback.board,
     preferredWitness: fallback.witness,
-    now: () => 0,
+    now: createDeterministicSolverClock(),
     ...solverOptions,
   });
   if (solvedFallback.status !== "solved") {
@@ -404,6 +422,7 @@ export function validateTripleLayout(layout) {
   ) {
     throw new TypeError("Triple template geometry is invalid.");
   }
+  validateCornerStackAnchors(layout);
   const sortedLayers = [...slotsByLayer.keys()].sort(
     (left, right) => left - right,
   );
@@ -445,6 +464,32 @@ export function validateTripleLayout(layout) {
   }
 }
 
+function validateCornerStackAnchors(layout) {
+  const anchors = layout.cornerStackAnchors;
+  if (!anchors) return;
+  const padding = Number(layout.cornerStackExclusionPadding);
+  if (!Number.isFinite(padding) || padding < 0)
+    throw new TypeError("Triple corner stack exclusion padding is invalid.");
+  for (const anchor of Object.values(anchors)) {
+    if (!Number.isFinite(anchor?.x) || !Number.isFinite(anchor?.y)
+      || anchor.x < 0 || anchor.y < 0
+      || anchor.x + layout.tileWidth > layout.gridWidth
+      || anchor.y + layout.tileHeight > layout.gridHeight) {
+      throw new TypeError("Triple corner stack anchor is outside its template bounds.");
+    }
+    const zoneLeft = Math.max(0, anchor.x - padding);
+    const zoneTop = Math.max(0, anchor.y - padding);
+    const zoneRight = Math.min(layout.gridWidth, anchor.x + layout.tileWidth + padding);
+    const zoneBottom = Math.min(layout.gridHeight, anchor.y + layout.tileHeight + padding);
+    for (const slot of layout.slots) {
+      const overlaps = Math.min(slot.x + layout.tileWidth, zoneRight) - Math.max(slot.x, zoneLeft) > layout.overlapEpsilon
+        && Math.min(slot.y + layout.tileHeight, zoneBottom) - Math.max(slot.y, zoneTop) > layout.overlapEpsilon;
+      if (overlaps)
+        throw new TypeError("Triple layout slot collides with a corner stack exclusion zone.");
+    }
+  }
+}
+
 function hasVisibleArea(slot, blockers, layout) {
   if (!blockers.length) return true;
   const xEdges = new Set([slot.x, slot.x + layout.tileWidth]);
@@ -483,6 +528,13 @@ function normalizeSeed(seed) {
   if (typeof seed === "string" && seed) return seed;
   if (Number.isFinite(seed)) return String(seed);
   return "triple-easy-default";
+}
+
+function createDeterministicSolverClock() {
+  let elapsed = 0;
+  // Generation validates a seed-bound witness. A monotonic logical clock keeps
+  // retries reproducible while preserving the solver's deadline semantics.
+  return () => (elapsed += 0.01);
 }
 
 function normalizeAttemptCount(value) {

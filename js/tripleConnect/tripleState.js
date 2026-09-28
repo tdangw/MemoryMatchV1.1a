@@ -41,36 +41,66 @@ export function endTripleRound(state) {
 }
 
 export function getExposedTileIds(state) {
-  assertTripleStateInvariant(state);
-  const pileByTileId = createPileIndex(state.cornerStacks);
-  return Object.values(state.tiles)
-    .filter(tile => isTripleTileExposedUnchecked(state, tile.id, pileByTileId))
-    .map(tile => tile.id);
+  return [...createTripleBoardView(state).exposedTileIds];
+}
+
+/** Internal solver path: reducer-created states have already crossed validation. */
+export function getExposedTileIdsFromTrustedState(state) {
+  return [...createTripleBoardView(state, false).exposedTileIds];
 }
 
 export function isTripleTileExposed(state, tileId) {
-  assertTripleStateInvariant(state);
-  return isTripleTileExposedUnchecked(state, tileId, createPileIndex(state.cornerStacks));
+  return createTripleBoardView(state).exposedTileIds.has(tileId);
 }
 
 export function isTripleTileVisible(state, tileId) {
-  assertTripleStateInvariant(state);
-  const tile = state.tiles[tileId];
-  return Boolean(tile && (tile.location === "tray" || (tile.location === "board" && isPileTopTile(state, tileId, createPileIndex(state.cornerStacks)))));
+  return createTripleBoardView(state).visibleTileIds.has(tileId);
 }
 
 export function getTripleVisibleTileIds(state) {
-  assertTripleStateInvariant(state);
-  const pileByTileId = createPileIndex(state.cornerStacks);
-  return Object.values(state.tiles)
-    .filter((tile) => tile.location === "tray" || (tile.location === "board" && isPileTopTile(state, tile.id, pileByTileId)))
-    .map((tile) => tile.id);
+  return [...createTripleBoardView(state).visibleTileIds];
 }
 
 export function getTriplePileDepth(state, tileId) {
-  assertTripleStateInvariant(state);
-  const pile = createPileIndex(state.cornerStacks).get(tileId);
-  return pile ? pile.tileIds.filter((id) => state.tiles[id].location === "board").length : 1;
+  const view = createTripleBoardView(state);
+  const pileId = view.pileByTileId.get(tileId);
+  return pileId ? view.remainingDepthByPileId.get(pileId) : 1;
+}
+
+/** Derives pile visibility once per state boundary for render and UI consumers. */
+export function createTripleBoardView(state, validate = true) {
+  if (validate) assertTripleStateInvariant(state);
+  const pileByTileId = new Map();
+  const topByPileId = new Map();
+  const remainingDepthByPileId = new Map();
+  for (const [pileId, pile] of Object.entries(state.cornerStacks)) {
+    let topTileId = null;
+    let remainingDepth = 0;
+    for (let index = pile.tileIds.length - 1; index >= 0; index -= 1) {
+      const tileId = pile.tileIds[index];
+      pileByTileId.set(tileId, pileId);
+      if (state.tiles[tileId].location === "board") {
+        remainingDepth += 1;
+        if (!topTileId) topTileId = tileId;
+      }
+    }
+    topByPileId.set(pileId, topTileId);
+    remainingDepthByPileId.set(pileId, remainingDepth);
+  }
+  const visibleTileIds = new Set();
+  const exposedTileIds = new Set();
+  for (const tile of Object.values(state.tiles)) {
+    const pileId = pileByTileId.get(tile.id);
+    const visible = tile.location === "tray"
+      || (tile.location === "board" && (!pileId || topByPileId.get(pileId) === tile.id));
+    if (!visible) continue;
+    visibleTileIds.add(tile.id);
+    if (tile.location === "board"
+      && state.coverGraph[tile.id].every((blockerId) => state.tiles[blockerId].location !== "board")) {
+      exposedTileIds.add(tile.id);
+    }
+  }
+  return { pileByTileId, topByPileId, remainingDepthByPileId, visibleTileIds, exposedTileIds };
 }
 
 export function assertTripleStateInvariant(state) {
@@ -429,24 +459,6 @@ function clonePiles(piles) {
     anchorSlotId: pile.anchorSlotId,
     tileIds: [...pile.tileIds],
   }]));
-}
-
-function isTripleTileExposedUnchecked(state, tileId, pileByTileId) {
-  const tile = state.tiles[tileId];
-  return Boolean(tile && tile.location === "board" && isPileTopTile(state, tileId, pileByTileId)
-    && state.coverGraph[tileId].every((blockerId) => state.tiles[blockerId].location !== "board"));
-}
-
-function isPileTopTile(state, tileId, pileByTileId) {
-  const pile = pileByTileId.get(tileId);
-  if (!pile) return true;
-  return [...pile.tileIds].reverse().find((id) => state.tiles[id].location === "board") === tileId;
-}
-
-function createPileIndex(piles) {
-  const index = new Map();
-  Object.values(piles).forEach((pile) => pile.tileIds.forEach((tileId) => index.set(tileId, pile)));
-  return index;
 }
 
 function deepFreeze(value) {

@@ -111,7 +111,14 @@ assert.equal(first.board.tiles.length, 27);
 assert.equal(new Set(first.board.tiles.map((tile) => tile.id)).size, 27);
 assert.equal(new Set(first.board.tiles.map((tile) => tile.slotId)).size, 27);
 assert.deepEqual(replayTripleWitness(first.board, first.witness).ok, true);
-const solved = solveTripleBoard({ board: first.board });
+let solveClock = 0;
+const solved = solveTripleBoard({
+  board: first.board,
+  deadlineMs: 1000,
+  // A monotonic test clock keeps this contract deterministic without
+  // disabling the solver deadline as `now: () => 0` would do.
+  now: () => (solveClock += 0.1),
+});
 assert.equal(solved.status, "solved");
 assert.deepEqual(replayTripleWitness(first.board, solved.witness).ok, true);
 
@@ -163,7 +170,11 @@ assert.deepEqual(
   {},
   "Legacy Triple sessions without an asset mapping remain restorable.",
 );
-const shuffledMappedState = shuffleTripleBoardState(mappedState, layout, "asset-map-shuffle");
+let shuffleClock = 0;
+const shuffledMappedState = shuffleTripleBoardState(mappedState, layout, "asset-map-shuffle", {
+  deadlineMs: 1000,
+  now: () => (shuffleClock += 0.1),
+});
 assert.deepEqual(
   shuffledMappedState?.state.assetPathsByType,
   mappedAssets,

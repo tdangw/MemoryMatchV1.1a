@@ -11,9 +11,11 @@ export function createLinkBoard({
   mode = "easy",
   cardProvider = getThemeCards,
   random = Math.random,
+  assetPaths,
+  history,
 }) {
   const pairCount = layout.tileCount / 2;
-  const cards = cardProvider(themeId, pairCount);
+  const cards = cardProvider(themeId, pairCount, { assetPaths, history, random });
   if (cards.length !== pairCount) {
     throw new Error("Chủ đề không có đủ ảnh cho bàn Link Connect.");
   }
@@ -27,6 +29,7 @@ export function createLinkBoard({
     rows: layout.tileCount / layout.columns,
     baseColumns: layout.baseColumns ?? layout.columns,
     capacity: layout.tileCount,
+    selectedAssetPaths: cards.map((card) => card.assetPath).filter(Boolean),
     grid: null,
   };
   board.grid = createPaddedGrid(board.rows, board.columns, tiles);

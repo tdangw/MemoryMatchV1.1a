@@ -1,6 +1,6 @@
 import { TRIPLE_EASY_SOLVER_BUDGET } from "./tripleConfig.js";
 import { reduceTripleCommand } from "./tripleRules.js";
-import { createTripleRoundState, getExposedTileIds } from "./tripleState.js";
+import { createTripleRoundState, getExposedTileIdsFromTrustedState } from "./tripleState.js";
 
 export function solveTripleBoard({
   board,
@@ -69,7 +69,7 @@ function orderMoves(state, preferredTileId) {
     counts.set(type, (counts.get(type) || 0) + 1);
     return counts;
   }, new Map());
-  return getExposedTileIds(state).sort((left, right) => {
+  return getExposedTileIdsFromTrustedState(state).sort((left, right) => {
     const leftCount = trayTypeCounts.get(state.tiles[left].type) || 0;
     const rightCount = trayTypeCounts.get(state.tiles[right].type) || 0;
     return Number(right === preferredTileId) - Number(left === preferredTileId) || rightCount - leftCount || left.localeCompare(right);

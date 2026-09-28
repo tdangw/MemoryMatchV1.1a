@@ -389,6 +389,60 @@ export const TRIPLE_SUPER_HARD_LAYOUT = defineTemplate({
   ],
 });
 
+function defineCornerSafeTopology(layout, id, corners) {
+  // Reserve horizontal side lanes rather than adding vertical rows. This keeps
+  // compact landscape boards inside their existing height budget while still
+  // giving every corner stack a full-card, non-overlapping hit area.
+  // A half-card visual inset keeps stacks off the hard board edge. The lane
+  // leaves a small, deliberate gap to the nearest board card instead of the
+  // previous oversized moat, so all four stacks read as part of the layout.
+  const safeInset = 3;
+  const cornerAnchorInset = .75;
+  const leftInset = corners.some((corner) => corner.endsWith("left")) ? safeInset : 0;
+  const rightInset = corners.some((corner) => corner.endsWith("right")) ? safeInset : 0;
+  const gridWidth = layout.gridWidth + leftInset + rightInset;
+  const gridHeight = layout.gridHeight;
+  const anchors = Object.fromEntries(corners.map((corner) => [corner, Object.freeze({
+    x: corner.endsWith("right")
+      ? gridWidth - HALF_CARD_WIDTH - cornerAnchorInset
+      : cornerAnchorInset,
+    y: corner.startsWith("bottom")
+      ? gridHeight - HALF_CARD_HEIGHT - cornerAnchorInset
+      : cornerAnchorInset,
+  })]));
+  return Object.freeze({
+    ...layout,
+    id,
+    gridWidth,
+    gridHeight,
+    cornerStackAnchors: Object.freeze(anchors),
+    cornerStackExclusionPadding: .2,
+    slots: Object.freeze(layout.slots.map((slot) => Object.freeze({
+      ...slot,
+      x: slot.x + leftInset,
+      y: slot.y,
+    }))),
+  });
+}
+
+// V6 reserves a real interaction moat around corner stacks. V5 remains the
+// restore corpus for existing sessions; all new pile-aware rounds use V6.
+export const TRIPLE_NORMAL_LAYOUT_V6 = defineCornerSafeTopology(
+  TRIPLE_NORMAL_LAYOUT,
+  "normal-45-v6",
+  ["top-left"],
+);
+export const TRIPLE_HARD_LAYOUT_V6 = defineCornerSafeTopology(
+  TRIPLE_HARD_LAYOUT,
+  "hard-63-v6",
+  ["top-left", "top-right"],
+);
+export const TRIPLE_SUPER_HARD_LAYOUT_V6 = defineCornerSafeTopology(
+  TRIPLE_SUPER_HARD_LAYOUT,
+  "super-hard-96-v6",
+  TRIPLE_CORNER_STACK_CORNERS,
+);
+
 export const TRIPLE_CHALLENGE_18_LAYOUT = defineTemplate({
   id: "challenge-18-v1",
   gridWidth: 12,
@@ -508,14 +562,47 @@ export const TRIPLE_CHALLENGE_48_LAYOUT = defineTemplate({
   ],
 });
 
+// Challenge rounds that contain piles receive the same protected corner
+// topology as the main modes.  Their prior layout IDs remain restore-only.
+export const TRIPLE_CHALLENGE_24_LAYOUT_V3 = defineCornerSafeTopology(
+  TRIPLE_CHALLENGE_24_LAYOUT,
+  "challenge-24-v3",
+  ["top-left"],
+);
+export const TRIPLE_CHALLENGE_36_LAYOUT_V5 = defineCornerSafeTopology(
+  TRIPLE_NORMAL_LAYOUT_V4,
+  "normal-36-v5",
+  ["top-left"],
+);
+export const TRIPLE_CHALLENGE_42_LAYOUT_V2 = defineCornerSafeTopology(
+  TRIPLE_CHALLENGE_42_LAYOUT,
+  "challenge-42-v2",
+  ["top-left", "top-right"],
+);
+export const TRIPLE_CHALLENGE_54_LAYOUT_V5 = defineCornerSafeTopology(
+  TRIPLE_HARD_LAYOUT_V4,
+  "hard-54-v5",
+  ["top-left", "top-right"],
+);
+export const TRIPLE_CHALLENGE_60_LAYOUT_V3 = defineCornerSafeTopology(
+  TRIPLE_CHALLENGE_60_LAYOUT,
+  "challenge-60-v3",
+  ["top-left", "top-right", "bottom-left"],
+);
+export const TRIPLE_CHALLENGE_75_LAYOUT_V5 = defineCornerSafeTopology(
+  TRIPLE_SUPER_HARD_LAYOUT_V4,
+  "super-hard-75-v5",
+  TRIPLE_CORNER_STACK_CORNERS,
+);
+
 export const TRIPLE_CHALLENGE_STAGES = Object.freeze([
   Object.freeze({ level: 1, tileCount: 18, baseTileCount: 18, cornerStackSizes: Object.freeze([]), layerCount: 2, layoutId: "easy-18-v4", timeSeconds: 75, solverBudget: Object.freeze({ maxNodes: 5000, maxMemo: 2000, deadlineMs: 20 }) }),
-  Object.freeze({ level: 2, tileCount: 27, baseTileCount: 24, cornerStackSizes: Object.freeze([3]), layerCount: 2, layoutId: "challenge-24-v2", timeSeconds: 85, solverBudget: Object.freeze({ maxNodes: 8000, maxMemo: 3000, deadlineMs: 30 }) }),
-  Object.freeze({ level: 3, tileCount: 42, baseTileCount: 36, cornerStackSizes: Object.freeze([6]), layerCount: 3, layoutId: "normal-36-v4", timeSeconds: 105, solverBudget: Object.freeze({ maxNodes: 15000, maxMemo: 6000, deadlineMs: 50 }) }),
-  Object.freeze({ level: 4, tileCount: 51, baseTileCount: 42, cornerStackSizes: Object.freeze([4, 5]), layerCount: 4, layoutId: "challenge-42-v1", timeSeconds: 120, solverBudget: Object.freeze({ maxNodes: 30000, maxMemo: 12000, deadlineMs: 80 }) }),
-  Object.freeze({ level: 5, tileCount: 66, baseTileCount: 54, cornerStackSizes: Object.freeze([6, 6]), layerCount: 4, layoutId: "hard-54-v4", timeSeconds: 150, solverBudget: Object.freeze({ maxNodes: 75000, maxMemo: 30000, deadlineMs: 150 }) }),
-  Object.freeze({ level: 6, tileCount: 75, baseTileCount: 60, cornerStackSizes: Object.freeze([5, 5, 5]), layerCount: 4, layoutId: "challenge-60-v2", timeSeconds: 175, solverBudget: Object.freeze({ maxNodes: 100000, maxMemo: 40000, deadlineMs: 250 }) }),
-  Object.freeze({ level: 7, tileCount: 93, baseTileCount: 75, cornerStackSizes: Object.freeze([4, 4, 5, 5]), layerCount: 5, layoutId: "super-hard-75-v4", timeSeconds: 210, solverBudget: Object.freeze({ maxNodes: 150000, maxMemo: 60000, deadlineMs: 400 }) }),
+  Object.freeze({ level: 2, tileCount: 27, baseTileCount: 24, cornerStackSizes: Object.freeze([3]), layerCount: 2, layoutId: "challenge-24-v3", timeSeconds: 85, solverBudget: Object.freeze({ maxNodes: 8000, maxMemo: 3000, deadlineMs: 30 }) }),
+  Object.freeze({ level: 3, tileCount: 42, baseTileCount: 36, cornerStackSizes: Object.freeze([6]), layerCount: 3, layoutId: "normal-36-v5", timeSeconds: 105, solverBudget: Object.freeze({ maxNodes: 15000, maxMemo: 6000, deadlineMs: 50 }) }),
+  Object.freeze({ level: 4, tileCount: 51, baseTileCount: 42, cornerStackSizes: Object.freeze([4, 5]), layerCount: 4, layoutId: "challenge-42-v2", timeSeconds: 120, solverBudget: Object.freeze({ maxNodes: 30000, maxMemo: 12000, deadlineMs: 80 }) }),
+  Object.freeze({ level: 5, tileCount: 66, baseTileCount: 54, cornerStackSizes: Object.freeze([6, 6]), layerCount: 4, layoutId: "hard-54-v5", timeSeconds: 150, solverBudget: Object.freeze({ maxNodes: 75000, maxMemo: 30000, deadlineMs: 150 }) }),
+  Object.freeze({ level: 6, tileCount: 75, baseTileCount: 60, cornerStackSizes: Object.freeze([5, 5, 5]), layerCount: 4, layoutId: "challenge-60-v3", timeSeconds: 175, solverBudget: Object.freeze({ maxNodes: 100000, maxMemo: 40000, deadlineMs: 250 }) }),
+  Object.freeze({ level: 7, tileCount: 93, baseTileCount: 75, cornerStackSizes: Object.freeze([4, 4, 5, 5]), layerCount: 5, layoutId: "super-hard-75-v5", timeSeconds: 210, solverBudget: Object.freeze({ maxNodes: 150000, maxMemo: 60000, deadlineMs: 400 }) }),
 ]);
 
 export const TRIPLE_EASY_SOLVER_BUDGET = Object.freeze({

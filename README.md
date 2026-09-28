@@ -1,6 +1,6 @@
 # Memory Match Adventure — JavaScript thuần
 
-Kiến trúc giao diện dùng chung: [`ARCHITECTURE.md`](ARCHITECTURE.md). Hai kế hoạch đang hoạt động là [`TASK_TRIPLE_CONNECT_IMPLEMENTATION_PLAN.md`](TASK_TRIPLE_CONNECT_IMPLEMENTATION_PLAN.md) cho Triple và [`TASK_CSS_DEDUP_EFFECTS_V2_PLAN.md`](TASK_CSS_DEDUP_EFFECTS_V2_PLAN.md) cho CSS/effect dùng chung.
+Kiến trúc giao diện dùng chung: [`ARCHITECTURE.md`](ARCHITECTURE.md). Trạng thái mới nhất nằm trong [`CONTEXT.md`](CONTEXT.md); kế hoạch đang hoạt động duy nhất là [`TASK_RUNTIME_CLOSURE_AND_SIMPLIFICATION_PLAN.md`](TASK_RUNTIME_CLOSURE_AND_SIMPLIFICATION_PLAN.md).
 
 Phiên bản hiển thị trong ứng dụng: **V1.1a**.
 

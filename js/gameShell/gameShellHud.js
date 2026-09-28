@@ -69,12 +69,12 @@ export function createGameShellHud({ stats = {}, stars = {}, coins = {}, tools =
         setHudAttribute(tool.element, "aria-disabled", disabled);
       }
     },
-    milestones({ progress, target, descriptions = [] }) {
+    milestones({ progress, target, descriptions = [], labels = [] }) {
       style(milestones.track, "--shell-energy-progress", String(Math.max(0, Math.min(1, (progress - 1) / Math.max(1, target - 1)))));
       setHudTooltip(milestones.label || milestones.track, milestones.format ? milestones.format(progress, target) : `Năng lượng: ${progress}/${target}`);
       let nextMarked = false;
       markers.forEach((marker, index) => {
-        setHudTooltip(marker, `Mốc ${index + 1}: ${descriptions[index]}`);
+        setHudTooltip(marker, `${labels[index] || `Mốc ${index + 1}`}: ${descriptions[index] || "Phần thưởng"}`);
         const earned = (index + 1) * (milestones.step || 1) <= progress;
         flag(marker, "is-earned", earned);
         flag(marker, "is-next", !earned && !nextMarked);

@@ -47,9 +47,12 @@ import {
   invalidateRound,
   resetGame,
   spendCoins,
+  commitThemeSelectionHistory,
 } from "./gameState.js";
 import { savePersistentGameData } from "./persistence.js";
 import { getActiveSession } from "./sessionProgress.js";
+import { getTheme, getThemeSelectionEligibility } from "./themeCatalog.js";
+import { showAppToast } from "./modal.js";
 import { configureLogic, resetLogicRuntime } from "./logic.js";
 import { GAMEPLAY_TIMING } from "./gameplayTuning.js";
 import { TIME_UP_PURCHASES } from "./shopCatalog.js";
@@ -63,6 +66,7 @@ let countdownInterval;
 let isAutoPaused = false;
 let shouldResumeMusic = false;
 let sessionCheckpointTicks = 0;
+let activeAssetPaths = [];
 let navigation = { showDifficulty: () => {}, createMenu: () => {} };
 
 export function configureGameController(actions) {
@@ -85,6 +89,19 @@ export function restartMemoryLevel() {
 }
 
 export function initializeLevel(level, { reason = "new", session = null } = {}) {
+  const requestedMode = gameState.settings.mode || "easy";
+  const requestedModeLayout = getModeLayout(requestedMode);
+  const requestedLayout = isChallengeMode(requestedMode)
+    ? getChallengeLayout(level)
+    : requestedModeLayout;
+  const eligibility = getThemeSelectionEligibility(
+    getTheme(gameState.appearance.themes.memoryMatch).id,
+    requestedLayout.tileCount / 2,
+  );
+  if (!eligibility.ok) {
+    showAppToast(`Chủ đề ${eligibility.theme.title} cần ${eligibility.required} ảnh khác nhau; hiện có ${eligibility.available}. Hãy chọn chủ đề khác.`);
+    return null;
+  }
   getMemoryShell().mount({ cleanup: () => {
     stopCountdown();
     stopGridLayout();
@@ -128,9 +145,18 @@ export function initializeLevel(level, { reason = "new", session = null } = {}) 
       Math.max(0, Math.floor(session?.specialNoEnergyDropStreak || 0)),
     );
   }
-  persistMemorySession();
   const previewDurationMs = getPreviewDurationMs(mode);
-  createGrid(layout, { roundId, onPreviewComplete: startCountdown, previewDurationMs });
+  const themeId = getTheme(gameState.appearance.themes.memoryMatch).id;
+  const selectedCards = createGrid(layout, {
+    roundId,
+    onPreviewComplete: startCountdown,
+    previewDurationMs,
+    assetPaths: reason === "resume" ? session?.assetPaths : undefined,
+    history: reason === "resume" ? undefined : gameState.progress.themeSelectionHistory[themeId],
+  });
+  activeAssetPaths = selectedCards?.map((card) => card.assetPath).filter(Boolean) || [];
+  if (reason !== "resume" && activeAssetPaths.length) commitThemeSelectionHistory(themeId, activeAssetPaths);
+  persistMemorySession();
 
   gameState.moves = 0;
   gameState.misses = 0;
@@ -356,7 +382,7 @@ function resolveMemoryLevelTiming({ mode, level, modeLayout, reason, session }) 
 
 function persistMemorySession() {
   if (!gameState.settings.mode || gameState.currentLevel < 1) return false;
-  return saveMemorySession();
+  return saveMemorySession(activeAssetPaths.length ? { assetPaths: activeAssetPaths } : {});
 }
 
 export function handleHintClick() {

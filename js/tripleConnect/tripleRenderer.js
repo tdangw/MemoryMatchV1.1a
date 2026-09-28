@@ -1,6 +1,6 @@
 import { getTheme } from "../themeCatalog.js";
 import { connectGameShellLayout } from "../gameShell/gameShellLayout.js";
-import { getExposedTileIds, getTriplePileDepth, getTripleVisibleTileIds } from "./tripleState.js";
+import { createTripleBoardView } from "./tripleState.js";
 
 const LEGACY_GRID_UNITS = 100;
 const TRAY_LOGICAL_ROWS = 3;
@@ -10,29 +10,33 @@ export function createTripleRenderer(shell) {
   const board = root.querySelector(".triple-connect__board");
   const tray = root.querySelector(".triple-connect__tray");
   const nodes = new Map();
-  const traySlots = Array.from({ length: 10 }, (_, index) => {
+  const traySlots = [];
+  const createTraySlot = (index) => {
     const slot = document.createElement("div");
     slot.className = "triple-connect__tray-slot";
     slot.dataset.tripleTraySlot = String(index);
     tray.append(slot);
     return slot;
-  });
+  };
+  const reconcileTraySlots = (capacity) => {
+    while (traySlots.length < capacity) traySlots.push(createTraySlot(traySlots.length));
+    while (traySlots.length > capacity) traySlots.pop().remove();
+  };
   let layoutConnection = null;
   let activeLayout = null;
 
   function render(state, layout, themeId = "default") {
     tray.dataset.tripleTrayCapacity = String(state.trayCapacity);
     tray.setAttribute("aria-label", `Khay ${state.trayCapacity} ô`);
-    traySlots.forEach((slot, index) => { slot.hidden = index >= state.trayCapacity; });
+    reconcileTraySlots(state.trayCapacity);
     activeLayout = layout;
     const geometry = getLayoutGeometry(layout);
     const slots = new Map(layout.slots.map((slot) => [slot.id, slot]));
     const coverDepths = getCoverDepths(state);
-    const exposedTileIds = new Set(getExposedTileIds(state));
-    const visibleTileIds = new Set(getTripleVisibleTileIds(state));
+    const boardView = createTripleBoardView(state);
     const live = new Set();
     for (const tile of Object.values(state.tiles)) {
-      if (!visibleTileIds.has(tile.id)) continue;
+      if (!boardView.visibleTileIds.has(tile.id)) continue;
       live.add(tile.id);
       let node = nodes.get(tile.id);
       if (!node) {
@@ -44,7 +48,7 @@ export function createTripleRenderer(shell) {
         image.alt = "";
         image.draggable = false;
         node.append(image);
-        if (tile.location === "board" && getTriplePileDepth(state, tile.id) > 1)
+        if (tile.location === "board" && boardView.remainingDepthByPileId.get(boardView.pileByTileId.get(tile.id)) > 1)
           node.classList.add("is-corner-stack-revealed");
         nodes.set(tile.id, node);
       }
@@ -56,7 +60,7 @@ export function createTripleRenderer(shell) {
         setTileImageSource(image, tile.type, themeId, assetPath);
       }
       const coverDepth = tile.location === "board" ? coverDepths.get(tile.id) || 0 : 0;
-      const exposed = tile.location === "board" && exposedTileIds.has(tile.id);
+      const exposed = tile.location === "board" && boardView.exposedTileIds.has(tile.id);
       const disabled = !exposed;
       if (node.disabled !== disabled) node.disabled = disabled;
       const ariaDisabled = String(disabled);
@@ -74,7 +78,10 @@ export function createTripleRenderer(shell) {
       if (node.classList.contains("is-exposed") !== exposed)
         node.classList.toggle("is-exposed", exposed);
       node.dataset.tripleCoverDepth = String(Math.min(4, coverDepth));
-      const pileDepth = tile.location === "board" ? getTriplePileDepth(state, tile.id) : 1;
+      const pileId = boardView.pileByTileId.get(tile.id);
+      const pileDepth = tile.location === "board" && pileId
+        ? boardView.remainingDepthByPileId.get(pileId)
+        : 1;
       node.classList.toggle("is-corner-stack", pileDepth > 1);
       if (tile.location === "tray") {
         const trayIndex = state.tray.indexOf(tile.id);
@@ -83,7 +90,7 @@ export function createTripleRenderer(shell) {
         if (node.parentElement !== traySlot) traySlot.append(node);
       }
       else {
-        const slot = slots.get(tile.slotId) || getCornerStackSlot(tile.slotId, geometry);
+        const slot = slots.get(tile.slotId) || getCornerStackSlot(tile.slotId, layout, geometry);
         if (!slot)
           throw new Error(`Missing Triple layout slot: ${tile.slotId}`);
         const geometryKey = `${layout.id}:${tile.slotId}`;
@@ -127,11 +134,15 @@ export function createTripleRenderer(shell) {
       ui: {
         board: { gap: 0, narrowGap: 0, padding: 0, narrowPadding: 0 },
       },
-      getShape: () => {
+      getShape: (visible) => {
         const geometry = getLayoutGeometry(activeLayout);
         return {
           columns: geometry.gridWidth,
-          rows: geometry.gridHeight + TRAY_LOGICAL_ROWS,
+          // The portrait tray and divider are fixed-height chrome, not board
+          // cells. Reserve two additional logical rows so the measured board
+          // plus tray fits the viewport instead of overflowing at the bottom.
+          rows: geometry.gridHeight + TRAY_LOGICAL_ROWS
+            + (visible.height >= visible.width ? 2 : 1),
           coordinates: false,
         };
       },
@@ -163,9 +174,13 @@ export function createTripleRenderer(shell) {
   return { render, mountLayout, nodes, traySlots };
 }
 
-function getCornerStackSlot(slotId, geometry) {
+function getCornerStackSlot(slotId, layout, geometry) {
   const corner = String(slotId).replace("corner-stack-", "");
   if (!/[a-z-]+/.test(corner)) return null;
+  const configuredAnchor = layout.cornerStackAnchors?.[corner];
+  if (configuredAnchor) return { ...configuredAnchor, layer: 0 };
+  // V5 and earlier saved sessions did not store stack anchors in the layout.
+  // Retain this fallback strictly for their restoration path.
   const x = corner.endsWith("right") ? geometry.gridWidth - geometry.tileWidth : 0;
   const y = corner.startsWith("bottom") ? geometry.gridHeight - geometry.tileHeight : 0;
   return { x, y, layer: 0 };

@@ -1,5 +1,6 @@
 import { THEME_ASSET_MANIFEST } from "./generated/themeAssetManifest.js";
 import { shuffleArray } from "./utils.js";
+import { selectThemeAssets } from "./themeSelection.js";
 
 const ALPHABET_VALUES = Object.freeze([
   ..."ABCDEFGHIJKLMNOPQRSTUVWXYZ",
@@ -26,8 +27,6 @@ const LEGACY_THEME_IDS = Object.freeze({
   animals: "animals-land",
   plants: "trees",
 });
-
-const MINIMUM_PLAYABLE_IMAGE_COUNT = 30;
 
 const IMAGE_THEME_DEFINITIONS = Object.freeze([
   { id: "default", title: "Mặc định", price: 0, icon: "images" },
@@ -86,18 +85,30 @@ export function getUsableTheme(id) {
 }
 
 export function isThemePlayable(theme) {
-  return theme.kind === "generated" || (theme.kind === "image" && theme.assets.length >= MINIMUM_PLAYABLE_IMAGE_COUNT);
+  return theme.kind === "generated" || (theme.kind === "image" && theme.assets.length > 0);
 }
 
-export function getThemeCards(themeId, pairCount) {
+export function getThemeSelectionEligibility(themeId, count) {
+  if (!Number.isInteger(count) || count < 1) throw new TypeError("Theme selection count must be a positive integer.");
   const theme = getUsableTheme(themeId);
-  const values = pickThemeValues(theme, pairCount);
+  const available = theme.kind === "image" ? theme.assets.length : getGeneratedValues(theme).length;
+  return Object.freeze({ theme, required: count, available, ok: available >= count });
+}
+
+export function getThemeCards(themeId, pairCount, { assetPaths, history, random } = {}) {
+  const theme = getUsableTheme(themeId);
+  const restoredValues = assetPaths ? getAssetsByPath(theme, assetPaths) : null;
+  const values = restoredValues?.length === pairCount
+    ? restoredValues
+    : pickThemeValues(theme, pairCount, { history, random });
+  if (values.length !== pairCount) return [];
   return values.map((value) => {
     if (theme.kind === "image") {
       return {
-        id: `${theme.id}-${assetIdFromFile(value.path)}`,
+        id: `${theme.id}-${value.path}`,
         alt: `${theme.title}: ${humanizeAssetId(assetIdFromFile(value.path))}`,
         src: `${import.meta.env.BASE_URL}assets/images/themes/${theme.assetFolder}/${value.path}`,
+        assetPath: value.path,
         special: value.special === true,
       };
     }
@@ -106,20 +117,38 @@ export function getThemeCards(themeId, pairCount) {
       id: `${theme.id}-${label}`,
       alt: `${theme.title}: ${label}`,
       src: createGeneratedCardImage(label, theme),
+      assetPath: null,
       special: false,
     };
   });
 }
 
-function pickThemeValues(theme, pairCount) {
+export function selectThemeCards(themeId, count, { history, random } = {}) {
+  const theme = getUsableTheme(themeId);
+  if (theme.kind !== "image") return getThemeCards(theme.id, count);
+  return selectThemeAssets({ assets: theme.assets, count, history, random });
+}
+
+function pickThemeValues(theme, pairCount, { history, random } = {}) {
   let values;
-  if (theme.kind === "image") values = [...theme.assets];
-  else if (theme.generator === "alphabet") values = [...ALPHABET_VALUES];
-  else if (theme.generator === "numbers-2") values = [...TWO_DIGIT_VALUES];
-  else if (theme.generator === "numbers-3") values = Array.from({ length: 900 }, (_, index) => index + 100);
-  else values = [...COMPUTER_SYMBOLS];
+  if (theme.kind === "image") return selectThemeAssets({ assets: theme.assets, count: pairCount, history, random });
+  values = getGeneratedValues(theme);
   shuffleArray(values);
   return values.slice(0, pairCount);
+}
+
+function getAssetsByPath(theme, assetPaths) {
+  if (theme.kind !== "image" || !Array.isArray(assetPaths)) return [];
+  const byPath = new Map(theme.assets.map((asset) => [asset.path, asset]));
+  const values = assetPaths.map((path) => byPath.get(path)).filter(Boolean);
+  return new Set(values.map((asset) => asset.path)).size === values.length ? values : [];
+}
+
+function getGeneratedValues(theme) {
+  if (theme.generator === "alphabet") return [...ALPHABET_VALUES];
+  if (theme.generator === "numbers-2") return [...TWO_DIGIT_VALUES];
+  if (theme.generator === "numbers-3") return Array.from({ length: 900 }, (_, index) => index + 100);
+  return [...COMPUTER_SYMBOLS];
 }
 
 function humanizeAssetId(id) {
