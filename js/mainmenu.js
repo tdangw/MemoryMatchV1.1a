@@ -9,6 +9,7 @@ import { APP_VERSION } from "./appMeta.js";
 import { THEMES, getTheme, isThemePlayable } from "./themeCatalog.js";
 import { saveAppearance } from "./persistence.js";
 import { openShopOverlay } from "./shop.js";
+import { mountCatalogTabs } from "./catalogPreferences.js";
 import {
   clearActiveSession,
   getActiveSession,
@@ -489,15 +490,11 @@ export function showCollectionModal({
       group.append(heading, choices);
       grid.append(group);
     };
-    const themesTab = createCollectionTab("Chủ đề", true, renderThemes);
-    const pathTab = createCollectionTab("Đường nối", false, () =>
-      renderLinkEffects("Hiệu ứng đường nối", "linkPathEffect", "ownedLinkPathEffects", LINK_PATH_EFFECTS),
-    );
-    const exitTab = createCollectionTab("Xóa thẻ", false, () =>
-      renderLinkEffects("Hiệu ứng xóa thẻ", "linkExitEffect", "ownedLinkExitEffects", LINK_EXIT_EFFECTS),
-    );
-    tabs.append(themesTab, pathTab, exitTab);
-    renderThemes();
+    mountCatalogTabs({ gameId, surface: "collection", tablist: tabs, panel: grid, tabs: [
+      { id: "themes", label: "Chủ đề", render: renderThemes },
+      { id: "path", label: "Đường nối", render: () => renderLinkEffects("Hiệu ứng đường nối", "linkPathEffect", "ownedLinkPathEffects", LINK_PATH_EFFECTS) },
+      { id: "exit", label: "Xóa thẻ", render: () => renderLinkEffects("Hiệu ứng xóa thẻ", "linkExitEffect", "ownedLinkExitEffects", LINK_EXIT_EFFECTS) },
+    ] });
   } else if (gameId === "triple-connect") {
     const renderTripleEffects = (title, kind, ownedKey, equippedKey, effects) => {
       grid.className = "shop-item-grid shop-item-grid--appearance";
@@ -542,49 +539,19 @@ export function showCollectionModal({
       group.append(heading, choices);
       grid.append(group);
     };
-    const themesTab = createCollectionTab("Chủ đề", true, renderThemes);
-    const pathTab = createCollectionTab("Đường nối", false, () =>
-      renderTripleEffects("Hiệu ứng đường nối", "path", "ownedTriplePathEffects", "triplePathEffect", LINK_PATH_EFFECTS),
-    );
-    const exitTab = createCollectionTab("Xóa thẻ", false, () =>
-      renderTripleEffects("Hiệu ứng xóa thẻ", "exit", "ownedTripleExitEffects", "tripleExitEffect", LINK_EXIT_EFFECTS),
-    );
-    tabs.append(themesTab, pathTab, exitTab);
-    renderThemes();
+    mountCatalogTabs({ gameId, surface: "collection", tablist: tabs, panel: grid, tabs: [
+      { id: "themes", label: "Chủ đề", render: renderThemes },
+      { id: "path", label: "Đường nối", render: () => renderTripleEffects("Hiệu ứng đường nối", "path", "ownedTriplePathEffects", "triplePathEffect", LINK_PATH_EFFECTS) },
+      { id: "exit", label: "Xóa thẻ", render: () => renderTripleEffects("Hiệu ứng xóa thẻ", "exit", "ownedTripleExitEffects", "tripleExitEffect", LINK_EXIT_EFFECTS) },
+    ] });
   } else {
-    const appearanceTab = createCollectionTab(
-      "Ngoại hình",
-      true,
-      renderAppearance,
-    );
-    const flipEffectsTab = createCollectionTab(
-      "Hiệu ứng lật",
-      false,
-      renderFlipEffects,
-    );
-    const themesTab = createCollectionTab("Chủ đề", false, renderThemes);
-    tabs.append(appearanceTab, flipEffectsTab, themesTab);
-    renderAppearance();
+    mountCatalogTabs({ gameId, surface: "collection", tablist: tabs, panel: grid, tabs: [
+      { id: "appearance", label: "Ngoại hình", render: renderAppearance },
+      { id: "flip", label: "Hiệu ứng lật", render: renderFlipEffects },
+      { id: "themes", label: "Chủ đề", render: renderThemes },
+    ] });
   }
   return modal;
-}
-
-function createCollectionTab(label, selected, onSelect) {
-  const tab = document.createElement("button");
-  tab.type = "button";
-  tab.className = "shop-tab";
-  tab.textContent = label;
-  tab.setAttribute("role", "tab");
-  tab.setAttribute("aria-selected", String(selected));
-  tab.onclick = () => {
-    tab.parentElement.querySelectorAll(".shop-tab").forEach((button) => {
-      button.classList.toggle("is-active", button === tab);
-      button.setAttribute("aria-selected", String(button === tab));
-    });
-    onSelect();
-  };
-  if (selected) tab.classList.add("is-active");
-  return tab;
 }
 
 function renderCollectionAppearanceGroup(grid, title, type, items) {

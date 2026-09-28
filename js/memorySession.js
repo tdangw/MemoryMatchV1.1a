@@ -1,5 +1,5 @@
 import { gameState } from "./gameState.js";
-import { saveActiveSession, stageActiveSession } from "./sessionProgress.js";
+import { commitThemeSession, saveActiveSession, stageActiveSession } from "./sessionProgress.js";
 
 export function getMemorySessionSnapshot(overrides = {}) {
   return {
@@ -20,4 +20,8 @@ export function stageMemorySession(overrides) {
 
 export function saveMemorySession(overrides) {
   return saveActiveSession("memory-match", getMemorySessionSnapshot(overrides));
+}
+
+export function commitMemoryThemeSession(themeId, selectionIds) {
+  return commitThemeSession("memory-match", getMemorySessionSnapshot({ assetPaths: selectionIds }), themeId, selectionIds);
 }

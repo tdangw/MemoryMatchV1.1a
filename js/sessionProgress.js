@@ -1,6 +1,7 @@
 import { gameState } from "./gameState.js";
 import { saveProgress } from "./persistence.js";
 import { GAME_MODES, getGameProgressKey } from "./gameCatalog.js";
+import { appendThemeSelectionHistory } from "./themeSelection.js";
 
 export function getActiveSession(gameId, mode) {
   const key = getGameProgressKey(gameId);
@@ -26,6 +27,27 @@ export function saveActiveSession(gameId, session) {
   if (saveProgress(gameState.progress)) return true;
   if (previous) sessions[session.mode] = previous;
   else delete sessions[session.mode];
+  return false;
+}
+
+/**
+ * A newly selected board has one durability boundary: its session and the
+ * anti-repeat history either both persist or both remain untouched in RAM.
+ */
+export function commitThemeSession(gameId, session, themeId, selections) {
+  const key = getGameProgressKey(gameId);
+  if (!key || !session?.mode || !themeId || !Array.isArray(selections) || !selections.length) return false;
+  const previousSessions = { ...(gameState.progress[key].sessionsByMode || {}) };
+  const previousHistory = gameState.progress.themeSelectionHistory;
+  if (!stageActiveSession(gameId, session)) return false;
+  gameState.progress.themeSelectionHistory = appendThemeSelectionHistory(
+    previousHistory,
+    themeId,
+    selections,
+  );
+  if (saveProgress(gameState.progress)) return true;
+  gameState.progress[key].sessionsByMode = previousSessions;
+  gameState.progress.themeSelectionHistory = previousHistory;
   return false;
 }
 

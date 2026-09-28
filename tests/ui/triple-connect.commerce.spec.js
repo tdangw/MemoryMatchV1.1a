@@ -101,7 +101,13 @@ test("Triple shop and collection expose only Triple capabilities", async ({ page
     openShopOverlay({ fromMenu: true, gameId: "triple-connect" });
   });
   await expect(page.locator("#shop-modal .shop-tab")).toHaveText(["Vật phẩm", "Đường nối", "Xóa thẻ", "Chủ đề"]);
-  await expect(page.locator("#shop-modal .appearance-choice strong")).toHaveText(["Gợi ý", "+1 giây", "Hoàn tác", "Xáo trộn"]);
+  await expect(page.locator("#shop-modal .appearance-choice strong")).toHaveText([
+    "Gợi ý",
+    "+1 giây",
+    "Hoàn tác",
+    "Xáo trộn",
+    "Mở rộng khay",
+  ]);
   await expect(page.locator("#shop-modal")).not.toContainText("Đóng băng");
   await expect(page.locator("#shop-modal")).not.toContainText("Mặt lưng");
   await page.locator("#shop-modal .app-modal__close").click();

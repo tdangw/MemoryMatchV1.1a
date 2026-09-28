@@ -19,7 +19,7 @@ export const GAME_DEFINITIONS = Object.freeze([
     id: "triple-connect",
     progressKey: "tripleConnect",
     title: "Triple Connect",
-    description: "Thử thách ghép bộ ba nhiều lớp.",
+    description: "Thử thách rèn luyện quan sát.",
     icon: "puzzle",
     released: true,
   }),

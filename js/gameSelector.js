@@ -178,7 +178,7 @@ function createTripleConnectMenu() {
   const overlay = createMenuOverlay("triple-connect-menu");
   const wrapper = createMenuWrapper(
     "Triple Connect",
-    "Ghép ba thẻ lộ để dọn sạch bàn chơi.",
+    "Thử thách rèn luyện quan sát.",
   );
   const menuList = document.createElement("ul");
   menuList.className = "menu-list";

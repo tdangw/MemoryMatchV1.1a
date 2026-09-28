@@ -17,7 +17,7 @@ import {
   isCoinCounterAnimating,
   playCoinRewardFlight,
 } from "../coinRewards.js";
-import { gameState, increaseCoins, recordLinkConnectResult, spendCoins, commitThemeSelectionHistory } from "../gameState.js";
+import { gameState, increaseCoins, recordLinkConnectResult, spendCoins } from "../gameState.js";
 import { saveCoins, savePersistentGameData } from "../persistence.js";
 import { getTheme, getThemeSelectionEligibility } from "../themeCatalog.js";
 import { GAME_MODES } from "../gameCatalog.js";
@@ -69,6 +69,7 @@ import {
 import { findAvailableConnections, findConnectionPath } from "./pathfinder.js";
 import { consumeLinkItem, getLinkItemCount, grantLinkItem } from "./linkItems.js";
 import {
+  commitThemeSession,
   clearActiveSession,
   getActiveSession,
   saveActiveSession,
@@ -283,8 +284,8 @@ export function startLinkLevel({
   }
   showLinkGame();
   renderLinkBoard(board, { onTileClick: handleLinkTileClick, onCompactLandscapeChange: handleLinkCompactLandscapeChange });
-  if (!resume && activeAssetPaths.length) commitThemeSelectionHistory(themeId, activeAssetPaths);
-  persistLinkRunProgress();
+  if (!resume && activeAssetPaths.length) commitThemeSession("link-connect", createLinkSession(), themeId, activeAssetPaths);
+  else persistLinkRunProgress();
   updateLinkHud();
   linkGameState.isLocked = true;
   showLevelRewardOverlay({
@@ -1330,7 +1331,11 @@ function randomInteger(minimum, maximum) {
 }
 
 function persistLinkRunProgress() {
-  saveActiveSession("link-connect", {
+  saveActiveSession("link-connect", createLinkSession());
+}
+
+function createLinkSession() {
+  return {
     mode: linkGameState.mode,
     level: linkGameState.level,
     gravityShift: linkGameState.gravityShift,
@@ -1340,7 +1345,7 @@ function persistLinkRunProgress() {
     timeLimit: linkGameState.timeLimit,
     levelStartTime: linkGameState.levelStartTime,
     ...(activeAssetPaths.length ? { assetPaths: activeAssetPaths } : {}),
-  });
+  };
 }
 
 function resolveLinkLevelTiming({

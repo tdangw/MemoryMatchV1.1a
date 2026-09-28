@@ -20,6 +20,8 @@
     "test:ui:audit": "playwright test tests/ui/game-shell.audit.spec.js",
     "test:ui:lifecycle": "playwright test tests/ui/game-shell.lifecycle.spec.js tests/ui/game-shell.cleanup.spec.js",
     "test:ui:layout": "playwright test tests/ui/game-shell.layout.spec.js",
+    "test:ui:smoke": "playwright test tests/ui/catalog-preferences.spec.js tests/ui/theme-selection.spec.js tests/ui/triple-connect.progression.spec.js --project=desktop",
+    "test:ui:release": "playwright test",
     "test:ui:debug": "playwright test tests/ui/game-shell.geometry.spec.js --headed --project=desktop",
     "check": "npm run assets:sync && node scripts/check-js.mjs && node scripts/check-css-ownership.mjs && node scripts/check-effect-v2.mjs && node scripts/check-game-core.mjs && node scripts/check-game-registry.mjs && node scripts/check-theme-selection.mjs && node scripts/check-triple-connect-rules.mjs && node scripts/check-triple-connect-board.mjs && node scripts/check-hint-inventory.mjs && node scripts/check-session-timing.mjs && node scripts/check-persistence.mjs && node scripts/check-pwa.mjs && node scripts/check-memory-special.mjs && node scripts/check-link-connect-core.mjs && node scripts/check-link-connect-board.mjs && node scripts/check-appearance-themes.mjs && node scripts/check-game-shell-config.mjs && node scripts/check-game-shell-layout.mjs && node scripts/check-game-shell-lifecycle.mjs && node scripts/check-game-shell-contract.mjs && node scripts/generate-game-shell-tokens.mjs --check",
     "prebuild:android": "npm run assets:sync",

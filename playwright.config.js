@@ -6,6 +6,7 @@ const viewports = {
   "mobile-narrow": { width: 320, height: 568 },
   landscape: { width: 844, height: 390 },
 };
+const responsiveTestPattern = /(?:challenge-fullscreen|game-shell\.(?:geometry|layout|presentation)|triple-connect\.(?:chrome|geometry|presentation|witness))\.spec\.js$/;
 
 const testPort = Number(process.env.GAME_SHELL_TEST_PORT || 4173);
 if (!Number.isInteger(testPort) || testPort < 1024 || testPort > 65535) throw new Error("Invalid GAME_SHELL_TEST_PORT");
@@ -35,7 +36,14 @@ export default defineConfig({
     trace: "retain-on-failure",
     video: "off",
   },
-  projects: Object.entries(viewports).map(([name, viewport]) => ({ name, use: { viewport } })),
+  projects: Object.entries(viewports).map(([name, viewport]) => ({
+    name,
+    use: { viewport },
+    // State, persistence, economy and effect contracts are viewport-invariant.
+    // Their owner is desktop; the three mobile profiles retain only responsive
+    // geometry, presentation, overflow and playable-witness coverage.
+    ...(name === "desktop" ? {} : { testMatch: responsiveTestPattern }),
+  })),
   webServer: {
     command: serverCommand,
     url: baseURL,

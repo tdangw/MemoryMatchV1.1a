@@ -25,7 +25,7 @@ globalThis.localStorage = storage;
 
 const persistence = await import("../js/persistence.js");
 const { gameState } = await import("../js/gameState.js");
-const { saveActiveSession, getActiveSession } = await import("../js/sessionProgress.js");
+const { commitThemeSession, saveActiveSession, getActiveSession } = await import("../js/sessionProgress.js");
 const { buyLinkItem } = await import("../js/linkConnect/linkItems.js");
 
 const current = persistence.loadPersistentGameData();
@@ -40,6 +40,20 @@ assert.equal(saveActiveSession("memory-match", {
 assert.deepEqual(getActiveSession("memory-match", "challenge"), {
   mode: "challenge", level: 4, remainingTime: 37, timeLimit: 55, levelStartTime: 48,
 });
+
+gameState.progress.themeSelectionHistory = { alphabet: [["generated:alphabet:A"]] };
+const beforeThemeCommit = structuredClone(gameState.progress);
+storage.failWrites = true;
+assert.equal(commitThemeSession("memory-match", {
+  mode: "easy", level: 1, assetPaths: ["generated:alphabet:B"],
+}, "alphabet", ["generated:alphabet:B"]), false);
+assert.deepEqual(gameState.progress, beforeThemeCommit, "Failed board persistence must roll back session and history together.");
+storage.failWrites = false;
+assert.equal(commitThemeSession("memory-match", {
+  mode: "easy", level: 1, assetPaths: ["generated:alphabet:B"],
+}, "alphabet", ["generated:alphabet:B"]), true);
+assert.deepEqual(gameState.progress.themeSelectionHistory.alphabet[0], ["generated:alphabet:B"]);
+assert.deepEqual(getActiveSession("memory-match", "easy").assetPaths, ["generated:alphabet:B"]);
 
 gameState.coins = 100;
 gameState.progress.linkConnect.items.hint = 0;

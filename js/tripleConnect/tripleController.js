@@ -23,6 +23,7 @@ import { getTripleShell } from "./tripleShell.js";
 import { getTripleHud, getTripleHudElements } from "./tripleShell.js";
 import { presentTripleTransition } from "./triplePresentation.js";
 import {
+  commitThemeSession,
   getActiveSession,
   saveActiveSession,
 } from "../sessionProgress.js";
@@ -38,7 +39,7 @@ import {
 } from "./tripleConfig.js";
 import { shuffleTripleBoardState } from "./tripleShuffle.js";
 import { getEquippedThemeId } from "../appearance.js";
-import { gameState, recordTripleConnectResult, commitThemeSelectionHistory } from "../gameState.js";
+import { gameState, recordTripleConnectResult } from "../gameState.js";
 import { openAppModal, showAppToast } from "../modal.js";
 import { unmountActiveGameShell } from "../gameShell/gameShell.js";
 import { commitTripleRewardTransaction, consumeTripleItemWithSession } from "./tripleTransactions.js";
@@ -52,7 +53,7 @@ import { getGameModeLabel } from "../gameCatalog.js";
 import { getTheme, getThemeSelectionEligibility, selectThemeCards } from "../themeCatalog.js";
 import { playCoinRewardFlight } from "../coinRewards.js";
 import { resolveTripleMilestoneProgress } from "./tripleMilestones.js";
-import { showLevelRewardOverlay, showLevelSummaryOverlay } from "../ui.js";
+import { openTimeUpModal, showLevelRewardOverlay, showLevelSummaryOverlay } from "../ui.js";
 
 const development = import.meta.env?.DEV === true;
 let state = null;
@@ -132,15 +133,13 @@ export function startTripleConnectRound({
     showAppToast("Chủ đề này chưa sẵn sàng cho chế độ đã chọn. Hãy chọn chủ đề khác hoặc chế độ khác.");
     return null;
   }
-  const selectedAssets = theme.kind === "image"
-    ? selectThemeCards(themeId, typeIds.length, {
+  const selectedAssets = selectThemeCards(themeId, typeIds.length, {
       // Explicit seeds are fixture/development inputs and must reproduce both
       // geometry and visual assignment regardless of prior play history.
       history: seed === undefined ? gameState.progress.themeSelectionHistory[themeId] : [],
       random: createSeededRandom(`${generated.seed}:assets`),
-    })
-    : [];
-  if (theme.kind === "image" && selectedAssets.length !== typeIds.length) {
+    });
+  if (selectedAssets.length !== typeIds.length) {
     throw new RangeError(`Chủ đề ${theme.title} không đủ ${typeIds.length} ảnh khác nhau cho mode này.`);
   }
   currentAssetPathsByType = Object.fromEntries(typeIds.map((type, index) => [type, selectedAssets[index]?.path]).filter(([, path]) => path));
@@ -155,8 +154,7 @@ export function startTripleConnectRound({
       : getTripleLevelTime(mode, normalizedLevel);
   const mounted = mountTripleDevelopmentRound(generated, { skipIntro });
   if (selectedAssets.length) {
-    commitThemeSelectionHistory(themeId, selectedAssets);
-    saveSession();
+    commitThemeSession("triple-connect", createSession(state, remainingTime), themeId, selectedAssets);
   }
   return mounted;
 }
@@ -529,8 +527,8 @@ function showTripleStartModal({ shell, scope, generation, render }) {
     themeId: theme.id,
     totalPairs: Math.floor(totalTiles / 3),
     remainingTime,
-    targetText: `Mục tiêu: ${Math.floor(totalTiles / 3)} bộ ba`,
-    assistText: `Khay: ${state.trayCapacity} ô`,
+    targetText: `Mục tiêu: ${Math.floor(totalTiles / 3)} bộ thẻ`,
+    assistText: `Gợi ý: ${getTripleItemCount("hint")}`,
     overlayId: "triple-round-start-modal",
     scope,
     onComplete: () => {
@@ -695,54 +693,60 @@ function settleTerminalRound(shell) {
   });
   const won = state.status === "won";
   const canAdvance = won && !(currentMode === "challenge" && isTripleChallengeComplete(currentLevel));
-  const reason = won ? "won" : terminalReason === "time" ? "time" : "tray";
   const summary = createTripleSummary({
     settlement,
-    reason,
     luckyRewards: roundLuckyRewards.length ? roundLuckyRewards : getClaimedLuckyRewards(),
     milestoneRewards: roundMilestoneRewards,
   });
-  const openSummary = () => openAppModal({
+  const actions = [
+    {
+      label: "Menu",
+      icon: "home",
+      variant: "secondary",
+      onClick: (close) => {
+        close();
+        returnTripleToMenu();
+      },
+    },
+    {
+      label: "Chơi lại",
+      icon: "restart",
+      variant: "secondary",
+      onClick: (close) => {
+        close();
+        startTripleConnectRound({ mode: currentMode, level: currentLevel });
+      },
+    },
+    ...(canAdvance
+      ? [{
+        label: currentMode === "endless" ? "Tiếp tục" : "Màn tiếp theo",
+        icon: "arrow-right",
+        variant: "primary",
+        onClick: (close) => {
+          close();
+          startNextTripleLevel();
+        },
+      }]
+      : []),
+  ];
+  const openSummary = () => {
+    if (!won) {
+      return openTimeUpModal({
+        title: "Bạn đã thua",
+        icon: "warning",
+        actions,
+      });
+    }
+    return openAppModal({
     id: "triple-round-summary-modal",
     icon: won ? "trophy" : "warning",
     title: summary.title,
     content: summary.content,
     dismissible: false,
     closeOnBackdrop: false,
-    actions: [
-      {
-        label: "Menu",
-        icon: "home",
-        variant: "secondary",
-        onClick: (close) => {
-          close();
-          returnTripleToMenu();
-        },
-      },
-      {
-        label: "Chơi lại",
-        icon: "restart",
-        variant: "secondary",
-        onClick: (close) => {
-          close();
-          startTripleConnectRound({ mode: currentMode, level: currentLevel });
-        },
-      },
-      ...(canAdvance
-        ? [
-            {
-              label: currentMode === "endless" ? "Tiếp tục" : "Màn tiếp theo",
-              icon: "arrow-right",
-              variant: "primary",
-              onClick: (close) => {
-                close();
-                startNextTripleLevel();
-              },
-            },
-          ]
-        : []),
-    ],
+    actions,
   });
+  };
   if (won) {
     showLevelSummaryOverlay({
       fireworksContainerId: "triple-connect-container",
@@ -807,13 +811,8 @@ function commitTripleTerminalResult() {
   return false;
 }
 
-function createTripleSummary({ settlement, reason, luckyRewards, milestoneRewards }) {
-  const won = reason === "won";
-  const title = won
-    ? `Hoàn thành Màn ${currentLevel}`
-    : reason === "time"
-      ? "Hết giờ"
-      : "Khay đã đầy";
+function createTripleSummary({ settlement, luckyRewards, milestoneRewards }) {
+  const title = `Hoàn thành Màn ${currentLevel}`;
   const earnedLucky = luckyRewards.length
     ? `<li>Lucky: ${luckyRewards.map(formatTripleReward).join(", ")}</li>`
     : "";
@@ -823,11 +822,7 @@ function createTripleSummary({ settlement, reason, luckyRewards, milestoneReward
   const earnedMilestones = milestoneRewards.length
     ? `<li>Mốc Triple: ${milestoneRewards.map(formatTripleReward).join(", ")}</li>`
     : "";
-  const outcome = won
-    ? "Bạn đã dọn sạch bàn chơi."
-    : reason === "time"
-      ? "Đồng hồ đã về 0."
-      : "Khay đã đủ 7 thẻ chưa thể ghép.";
+  const outcome = "Bạn đã dọn sạch bàn chơi.";
   return {
     title,
     content: `<div class="triple-round-summary"><p>${outcome}</p><p><strong>${getGameModeLabel(currentMode)} · Màn ${currentLevel}</strong></p><dl><div><dt>Sao</dt><dd>${settlement.stars}/3</dd></div><div><dt>Điểm</dt><dd>${state.score}</dd></div><div><dt>Combo cao nhất</dt><dd>x${state.maxCombo}</dd></div></dl><ul>${terminalReward}${earnedLucky}${earnedMilestones}</ul></div>`,

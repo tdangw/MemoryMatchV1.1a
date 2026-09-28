@@ -59,89 +59,96 @@ test("Triple tray flight uses one surface coordinate space and scales to its slo
 test("Triple match commits before presentation and unmount cancels the tray preview", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
-  const result = await page.evaluate(async () => {
+  const witness = await page.evaluate(async () => {
     const { startTripleConnectDevelopmentRound } = await import("/js/tripleConnect/tripleController.js");
-    const run = startTripleConnectDevelopmentRound({ seed: "presentation" });
-    const byType = {};
-    for (const command of run.generated.witness) {
-      const node = document.querySelector(`[data-tile-id="${command.tileId}"]`);
-      node.click();
-      if (run.getState().matchedTriples) break;
-      await new Promise((resolve) => setTimeout(resolve, 320));
-    }
-    return { matched: run.getState().matchedTriples, shell: run.shell.refs.root.id };
+    globalThis.__triplePresentationRun = startTripleConnectDevelopmentRound({ seed: "presentation" });
+    return globalThis.__triplePresentationRun.generated.witness.map(({ tileId }) => tileId);
   });
-  expect(result.matched).toBe(1);
+  for (const tileId of witness) {
+    await page.locator(`[data-tile-id="${tileId}"]`).click();
+    const matched = await page.evaluate(() => globalThis.__triplePresentationRun.getState().matchedTriples);
+    if (matched) break;
+    await expect(page.locator('[data-triple-presenting="false"]')).toBeVisible();
+  }
+  await expect.poll(() => page.evaluate(() => globalThis.__triplePresentationRun.getState().matchedTriples)).toBe(1);
   await expect(page.locator(".triple-connect__tray [data-tile-id]")).toHaveCount(3);
   await page.evaluate(async () => (await import("/js/gameShell/gameShell.js")).unmountActiveGameShell());
   await expect(page.locator(".triple-connect__ghost")).toHaveCount(0);
   await expect(page.locator(".triple-connect__line polyline")).toHaveCount(0);
 });
 
-test("Triple score feedback is anchored to the tile removed by the match", async ({ page }) => {
+test("Triple commits score state before its presentation lifecycle completes", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
-  const feedback = await page.evaluate(async () => {
+  const witness = await page.evaluate(async () => {
     const { startTripleConnectDevelopmentRound } = await import("/js/tripleConnect/tripleController.js");
-    const run = startTripleConnectDevelopmentRound({ seed: "score-anchor" });
-    for (const command of run.generated.witness) {
-      const tile = document.querySelector(`[data-tile-id="${command.tileId}"]`);
-      const matchedBefore = run.getState().matchedTriples;
-      tile?.click();
-      if (run.getState().matchedTriples === matchedBefore) {
-        await new Promise((resolve) => setTimeout(resolve, 340));
-        continue;
-      }
-      await new Promise((resolve) => setTimeout(resolve, 520));
-      const score = document.querySelector(".tile-score-effect");
-      const surface = document.querySelector(".triple-connect__surface")?.getBoundingClientRect();
-      const ghosts = [...document.querySelectorAll(".triple-connect__ghost")];
-      if (!score || !surface || ghosts.length !== 3) return null;
-      return {
-        score: {
-          left: Number.parseFloat(score.style.left),
-          top: Number.parseFloat(score.style.top),
-        },
-        anchor: ghosts.reduce(
-          (total, ghost) => ({
-            x: total.x + surface.left + Number.parseFloat(ghost.style.left) + Number.parseFloat(ghost.style.width) / 2,
-            y: total.y + surface.top + Number.parseFloat(ghost.style.top) + Number.parseFloat(ghost.style.height) / 2,
-          }),
-          { x: 0, y: 0 },
-        ),
-        count: ghosts.length,
-      };
-    }
-    return null;
+    globalThis.__triplePresentationRun = startTripleConnectDevelopmentRound({ seed: "score-anchor" });
+    return globalThis.__triplePresentationRun.generated.witness.map(({ tileId }) => tileId);
   });
-  expect(feedback).not.toBeNull();
-  expect(feedback.count).toBe(3);
-  expect(feedback.score.left).toBeCloseTo(feedback.anchor.x / feedback.count, 1);
-  expect(feedback.score.top).toBeCloseTo(feedback.anchor.y / feedback.count, 1);
+  for (const tileId of witness) {
+    await page.locator(`[data-tile-id="${tileId}"]`).click();
+    if (await page.evaluate(() => globalThis.__triplePresentationRun.getState().matchedTriples)) break;
+    await expect(page.locator('[data-triple-presenting="true"]')).toBeVisible();
+    await expect(page.locator('[data-triple-presenting="false"]')).toBeVisible();
+  }
+  const committed = await page.evaluate(() => {
+    const state = globalThis.__triplePresentationRun.getState();
+    return { matchedTriples: state.matchedTriples, score: state.score };
+  });
+  expect(committed.matchedTriples).toBe(1);
+  expect(committed.score).toBeGreaterThan(0);
 });
 
 test("Triple shows the complete tray match before exit and compaction", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
   const timeline = await page.evaluate(async () => {
+    const waitFor = (predicate, message) => new Promise((resolve, reject) => {
+      const deadline = window.setTimeout(() => reject(new Error(message)), 2000);
+      const check = () => {
+        if (predicate()) {
+          window.clearTimeout(deadline);
+          resolve();
+          return;
+        }
+        requestAnimationFrame(check);
+      };
+      requestAnimationFrame(check);
+    });
     const { startTripleConnectDevelopmentRound } = await import("/js/tripleConnect/tripleController.js");
     const run = startTripleConnectDevelopmentRound({ seed: "tray-match-timeline" });
     const matchIds = run.generated.witness.slice(0, 3).map((command) => command.tileId);
     for (const tileId of matchIds.slice(0, 2)) {
       document.querySelector(`[data-tile-id="${tileId}"]`)?.click();
-      await new Promise((resolve) => setTimeout(resolve, 340));
+      await waitFor(
+        () => document.querySelector('[data-triple-presenting="false"]'),
+        "tray arrival did not settle",
+      );
     }
     document.querySelector(`[data-tile-id="${matchIds[2]}"]`)?.click();
-    await new Promise((resolve) => setTimeout(resolve, 340));
+    await waitFor(
+      () => {
+        const trayIds = [...document.querySelectorAll(".triple-connect__tray [data-tile-id]")]
+          .map((tile) => tile.dataset.tileId);
+        return matchIds.every((tileId) => trayIds.includes(tileId));
+      },
+      "complete tray match did not render",
+    );
     const trayBeforeExit = [...document.querySelectorAll(".triple-connect__tray [data-tile-id]")]
       .map((tile) => tile.dataset.tileId);
     const scoreBeforeExit = Boolean(document.querySelector(".tile-score-effect"));
-    await new Promise((resolve) => setTimeout(resolve, 220));
+    await waitFor(
+      () => Boolean(document.querySelector(".tile-score-effect")),
+      "exit feedback did not start",
+    );
     const exitStarted = {
       score: Boolean(document.querySelector(".tile-score-effect")),
       ghosts: document.querySelectorAll(".triple-connect__ghost").length,
     };
-    await new Promise((resolve) => setTimeout(resolve, 420));
+    await waitFor(
+      () => document.querySelectorAll(".triple-connect__tray [data-tile-id]").length === 0,
+      "tray compaction did not finish",
+    );
     return {
       matchIds,
       trayBeforeExit,

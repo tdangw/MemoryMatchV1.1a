@@ -7,7 +7,7 @@ import { restoreSerializedTripleRoundState, serializeTripleRoundState } from "./
 import { getTripleLayout } from "./tripleConnect/tripleBoard.js";
 import { TRIPLE_PRODUCT_DECISIONS } from "./tripleConnect/tripleConfig.js";
 import { normalizeTripleMilestones } from "./tripleConnect/tripleMilestones.js";
-import { THEME_ASSET_MANIFEST } from "./generated/themeAssetManifest.js";
+import { getThemeSelectionManifest } from "./themeCatalog.js";
 import { appendThemeSelectionHistory, normalizeThemeSelectionHistory } from "./themeSelection.js";
 
 const GAME_MODE_IDS = new Set(GAME_MODES.map(({ id }) => id));
@@ -69,6 +69,7 @@ export const gameState = {
     meteorEffects: true,
     boardCoordinates: false,
     cardDescriptions: true,
+    catalogTabs: {},
   },
   fromDefeat: false, // ➕ biến cờ xác định đang gọi từ trạng thái "thua"
   luckyRewards: new Map(),
@@ -86,7 +87,7 @@ export function hydrateGameState({
   const memoryMatch = progress?.memoryMatch || {};
   gameState.progress.themeSelectionHistory = normalizeThemeSelectionHistory(
     progress?.themeSelectionHistory,
-    THEME_ASSET_MANIFEST,
+    getThemeSelectionManifest(),
   );
   const memorySessions = normalizeSessions(memoryMatch.sessionsByMode);
   gameState.progress.memoryMatch = {
@@ -211,7 +212,15 @@ function normalizeSettings(value, fallback) {
     meteorEffects: typeof source.meteorEffects === "boolean" ? source.meteorEffects : fallback.meteorEffects,
     boardCoordinates: typeof source.boardCoordinates === "boolean" ? source.boardCoordinates : fallback.boardCoordinates,
     cardDescriptions: typeof source.cardDescriptions === "boolean" ? source.cardDescriptions : fallback.cardDescriptions,
+    catalogTabs: normalizeCatalogTabs(source.catalogTabs),
   };
+}
+
+function normalizeCatalogTabs(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  return Object.fromEntries(Object.entries(value)
+    .filter(([key, tab]) => /^(memory-match|link-connect|triple-connect):(shop|collection)$/.test(key)
+      && ["items", "appearance", "flip", "themes", "path", "exit"].includes(tab)));
 }
 
 function normalizeTripleItems(items = {}) {

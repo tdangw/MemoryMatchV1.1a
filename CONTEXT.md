@@ -5,11 +5,12 @@
 ## Sản phẩm
 
 - Ứng dụng JavaScript ES modules, lưu dữ liệu trên thiết bị bằng `localStorage`; Firebase chỉ dùng Hosting.
+- Sản phẩm chưa phát hành. Chính sách active là một root save format hiện hành, không migration chain; save development cũ thiếu/sai version hoặc hỏng được reset về mặc định an toàn.
 - Ba game có trong runtime/menu: Memory Match, Link Connect và Triple Connect.
 - Memory Match, Link Connect và Triple Connect dùng Game Shell chung; state/session gameplay vẫn tách theo game và mode.
-- Kế hoạch active duy nhất là `TASK_RUNTIME_CLOSURE_AND_SIMPLIFICATION_PLAN.md`.
-- Hidden Piles, Tray Expansion, Milestone 10/30 và Effect V2 runtime đã được triển khai; visual polish 21 line effect vẫn deferred.
-- Review gần nhất: `npm run check` pass, production build pass, target Playwright 284/312 pass. 24 fail là contract test cũ; 4 fail là presentation test dùng fixed wait/direct DOM click. Không coi full regression đã pass cho tới khi kế hoạch active đóng các lỗi này.
+- Runtime Closure đã hoàn tất. Không còn kế hoạch runtime active; visual polish 21 line effect là hạng mục mỹ thuật tách riêng theo quyết định sản phẩm.
+- Hidden Piles, Tray Expansion, Milestone 10/30 và Effect V2 runtime đã được triển khai.
+- Review gần nhất: `npm run check` pass, production build pass, smoke UI pass và release matrix 368 case đã chạy sau khi đóng các contract test stale.
 - Mục tiêu hiện tại là hoàn thiện trải nghiệm web desktop/mobile. PWA/APK/Android/signing/store QA chỉ bắt đầu bằng task riêng sau khi người dùng xác nhận web ổn định.
 
 ## Contract dùng chung
@@ -24,19 +25,24 @@
 ## Triple Connect hiện tại
 
 - Tổng thẻ active: Easy 27, Normal 54, Hard 78, Super Hard/Endless 120.
-- Base layout V5: 27/45/63/96 slot. Round có xấp dùng topology V6 để dành lane riêng cho xấp góc; V1–V5 vẫn phải đọc được cho save cũ.
+- Layout, snapshot và milestone Triple chỉ dùng contract hiện hành; không có yêu cầu đọc save Triple development cũ.
 - Xấp góc: Normal `9`; Hard `7 + 8`; Super Hard/Endless `6 × 4`. Thẻ ẩn không nằm trong DOM/a11y cho tới khi thành top.
 - Khay cơ bản 7 ô; entitlement Mở rộng khay thêm 3 ô, giá release 3.000 Xu. Renderer tạo đúng 7 hoặc 10 node; mobile dọc dùng 5×2 khi có 10 ô.
 - Milestone version 2 có 10 mốc, step 3, target 30. Lucky chỉ có trong Challenge.
 - Challenge level 1–7 có tổng thẻ `18/27/42/51/66/75/93`; stage có xấp cũng dùng topology corner-safe mới.
 - Profile responsive bắt buộc khi thay layout/presentation: desktop 1024×900, mobile 390×844, mobile hẹp 320×568 và landscape 844×390; geometry test còn có các viewport gameplay cụ thể.
-- Effect V2 runtime đã có pool/cleanup/reduced-motion cho Link 2-target và Triple 3-target. Chất lượng hình ảnh từng line effect chưa phải acceptance đã hoàn tất.
+- Effect V2 runtime có pool/cleanup/reduced-motion cho Link 2-target và Triple 3-target. Chất lượng hình ảnh từng line effect là task mỹ thuật riêng.
+- Triple tính mục tiêu sao theo số bộ thẻ và chỉ cộng time bonus một lần khi kết thúc màn timed.
 
 ## Theme selection hiện tại
 
 - Image theme dùng manifest đệ quy, chọn weighted without replacement và lưu tối đa ba board gần nhất theo theme.
-- Memory/Link snapshot asset path; Triple snapshot type → asset path; Continue giữ mapping, round production mới có seed mới.
-- Thiếu sót active: generated theme chưa có stable selection ID/history/snapshot tương đương image theme; transaction history + session khi save fail chưa có bằng chứng rollback đầy đủ.
+- Image selection dùng asset path; generated selection dùng stable ID. Memory/Link snapshot selection; Triple snapshot type → selection; Continue giữ mapping, round production mới có seed mới.
+- Theme history và session commit/rollback atomically trên cả ba game.
+
+## Điều hướng catalog hiện tại
+
+- Cửa hàng và Bộ sưu tập lưu stable tab ID riêng theo `(gameId, shop/collection)`, khôi phục qua reopen/reload và fallback an toàn khi capability không còn.
 
 ## Tài liệu giữ lại
 
@@ -45,10 +51,9 @@
 - `README.md`: cách chạy/build.
 - `ADD_GAME.md`: checklist tích hợp game.
 - `Memory Match.md`, `Link Connect.md`, `Triple Connect.md`: luật/thiết kế từng game.
-- `TASK_RUNTIME_CLOSURE_AND_SIMPLIFICATION_PLAN.md`: kế hoạch active duy nhất, gồm regression closure, generated theme, transaction và thu gọn test matrix.
 - `themes.md`: catalog/chất lượng asset chủ đề.
 
-Các kế hoạch Triple/Effect/Theme cũ đã được hợp nhất hoặc hoàn tất và bị xóa. Không khôi phục chúng từ Git history làm nguồn triển khai; dùng code/config, tài liệu bền vững và kế hoạch active ở trên.
+Các kế hoạch Triple/Effect/Theme và Runtime Closure cũ đã được hợp nhất hoặc hoàn tất và bị xóa. Không khôi phục chúng từ Git history làm nguồn triển khai; dùng code/config và tài liệu bền vững ở trên.
 
 ## Quy tắc bàn giao
 

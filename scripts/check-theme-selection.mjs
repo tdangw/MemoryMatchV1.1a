@@ -5,7 +5,7 @@ import {
   normalizeThemeSelectionHistory,
   selectThemeAssets,
 } from "../js/themeSelection.js";
-import { getThemeSelectionEligibility } from "../js/themeCatalog.js";
+import { getThemeCards, getThemeSelectionAssets, getThemeSelectionEligibility } from "../js/themeCatalog.js";
 
 const assets = Object.freeze(Array.from({ length: 8 }, (_, index) => ({ path: `nested/${index}.webp` })));
 const sequence = [0, 0.15, 0.3, 0.45, 0.6, 0.75, 0.9, 1];
@@ -55,5 +55,13 @@ assert.equal(getThemeSelectionEligibility("default", 1).ok, true);
 const insufficient = getThemeSelectionEligibility("default", 99999);
 assert.equal(insufficient.ok, false);
 assert.equal(insufficient.required, 99999);
+
+const generatedPool = getThemeSelectionAssets("alphabet");
+const generatedIds = selectThemeAssets({ assets: generatedPool, count: 4, random: () => .4 }).map(({ path }) => path);
+assert.equal(new Set(generatedIds).size, 4, "Generated selections must be genuinely distinct.");
+assert.ok(generatedIds.every((id) => id.startsWith("generated:alphabet:")));
+const restoredGenerated = getThemeCards("alphabet", 4, { assetPaths: generatedIds });
+assert.deepEqual(restoredGenerated.map(({ assetPath }) => assetPath), generatedIds);
+assert.ok(restoredGenerated.every(({ src }) => src.startsWith("data:image/svg+xml")));
 
 console.log("Shared theme selection checks passed.");

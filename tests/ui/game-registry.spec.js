@@ -9,6 +9,8 @@ test("registry exposes only released games in the selector", async ({ page }) =>
     /Triple Connect/,
   ]);
   await expect(page.locator(".game-selector")).toContainText("Triple Connect");
+  await expect(page.locator(".game-selector__choice").filter({ hasText: "Triple Connect" }))
+    .toContainText("Thử thách rèn luyện quan sát.");
 });
 
 test("released game adapters still open their matching menus", async ({ page }) => {
@@ -32,6 +34,8 @@ test("released game adapters still open their matching menus", async ({ page }) 
   );
   expect(tripleOpened).toBe(true);
   await expect(page.locator("#menu-container.triple-connect-menu")).toHaveCount(1);
+  await expect(page.locator("#menu-container.triple-connect-menu"))
+    .toContainText("Thử thách rèn luyện quan sát.");
 });
 
 test("Triple menu starts a visible playable board", async ({ page }) => {

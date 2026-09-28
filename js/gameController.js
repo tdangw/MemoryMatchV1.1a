@@ -47,7 +47,6 @@ import {
   invalidateRound,
   resetGame,
   spendCoins,
-  commitThemeSelectionHistory,
 } from "./gameState.js";
 import { savePersistentGameData } from "./persistence.js";
 import { getActiveSession } from "./sessionProgress.js";
@@ -58,7 +57,7 @@ import { GAMEPLAY_TIMING } from "./gameplayTuning.js";
 import { TIME_UP_PURCHASES } from "./shopCatalog.js";
 import { resolveSessionTiming } from "./sessionTiming.js";
 import { clearLootEffects } from "./lootEffects.js";
-import { saveMemorySession, stageMemorySession } from "./memorySession.js";
+import { commitMemoryThemeSession, saveMemorySession, stageMemorySession } from "./memorySession.js";
 import { getMemoryShell } from "./memoryMatch/memoryShell.js";
 import { clearTooltip } from "./tooltips.js";
 
@@ -155,8 +154,8 @@ export function initializeLevel(level, { reason = "new", session = null } = {}) 
     history: reason === "resume" ? undefined : gameState.progress.themeSelectionHistory[themeId],
   });
   activeAssetPaths = selectedCards?.map((card) => card.assetPath).filter(Boolean) || [];
-  if (reason !== "resume" && activeAssetPaths.length) commitThemeSelectionHistory(themeId, activeAssetPaths);
-  persistMemorySession();
+  if (reason !== "resume" && activeAssetPaths.length) commitMemoryThemeSession(themeId, activeAssetPaths);
+  else persistMemorySession();
 
   gameState.moves = 0;
   gameState.misses = 0;

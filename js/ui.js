@@ -195,14 +195,16 @@ export function showBonusOverlay(message) {
 
 // Popup hết giờ dùng chung để hai trò luôn có cùng cấu trúc và hiệu ứng.
 export function openTimeUpModal({
+  title = "Hết giờ",
+  icon = "timer",
   content = UI_COPY.timeUpPrompt,
   actions = [],
   onClose,
 } = {}) {
   const modal = openAppModal({
     id: "time-up-modal",
-    icon: "timer",
-    title: "Hết giờ",
+    icon,
+    title,
     content,
     closeOnBackdrop: false,
     closeOnEscape: false,

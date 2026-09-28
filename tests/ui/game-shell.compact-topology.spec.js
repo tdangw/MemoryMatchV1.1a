@@ -36,7 +36,7 @@ for (const game of games) {
         const { linkGameState } = await import("/js/linkConnect/linkState.js");
         return !linkGameState.isLocked;
       });
-      await board.locator(game.tile).first().click();
+      await board.locator(`${game.tile}:not([disabled])`).first().click();
       await expect(board.locator(`${game.tile}.is-selected`)).toHaveCount(1);
     }
     await page.setViewportSize({ width: 390, height: 844 });

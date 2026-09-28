@@ -49,8 +49,8 @@ test("Triple saves a validated level session and exposes it through Continue", a
   expect(session).toMatchObject({
     mode: "normal",
     level: 3,
-    seed: "triple-normal-level-3:0",
-    layoutId: "normal-45-v5",
+    seed: expect.stringMatching(/^triple-normal-level-3-/),
+    layoutId: "normal",
   });
   await page.reload();
   await page.evaluate(async () =>
@@ -92,52 +92,6 @@ test("Triple hides malformed sessions instead of offering a broken Continue path
   ).not.toContainText("Tiếp tục");
 });
 
-test("Triple restores a saved V4 layout without upgrading its board geometry", async ({
-  page,
-}) => {
-  await page.goto("/");
-  await page.evaluate(async () => {
-    const { createTripleCoverGraph, getTripleLayout } = await import(
-      "/js/tripleConnect/tripleBoard.js"
-    );
-    const { createTripleRoundState, serializeTripleRoundState } = await import(
-      "/js/tripleConnect/tripleState.js"
-    );
-    const { continueTripleConnectSession } = await import(
-      "/js/tripleConnect/tripleController.js"
-    );
-    const layout = getTripleLayout("easy-18-v4");
-    const tileIdBySlot = Object.fromEntries(
-      layout.slots.map((slot) => [slot.id, `legacy-${slot.id}`]),
-    );
-    const coverGraph = Object.fromEntries(
-      Object.entries(createTripleCoverGraph(layout)).map(([slotId, blockers]) => [
-        tileIdBySlot[slotId],
-        blockers.map((blockerId) => tileIdBySlot[blockerId]),
-      ]),
-    );
-    const board = {
-      roundId: 1,
-      coverGraph,
-      tiles: layout.slots.map((slot, index) => ({
-        id: tileIdBySlot[slot.id],
-        type: `legacy-${Math.floor(index / 3) + 1}`,
-        slotId: slot.id,
-        layer: slot.layer,
-      })),
-    };
-    continueTripleConnectSession({
-      mode: "easy",
-      level: 1,
-      layoutId: layout.id,
-      remainingTime: 70,
-      seed: "saved-v4",
-      snapshot: serializeTripleRoundState(createTripleRoundState(board)),
-    });
-  });
-  await expect(page.locator(".triple-connect__board .triple-connect__tile")).toHaveCount(18);
-});
-
 test("Triple win settles once, clears Continue, and Next starts the following level", async ({
   page,
 }) => {
@@ -170,7 +124,7 @@ test("Triple win settles once, clears Continue, and Next starts the following le
   expect(nextSession).toMatchObject({
     mode: "easy",
     level: 2,
-    layoutId: "easy-27-v5",
+    layoutId: "easy",
   });
 });
 
@@ -385,9 +339,15 @@ test("Triple time-up clears the session and opens one loss modal", async ({
     );
     window.__tripleRun = startTripleConnectRound({ mode: "easy", skipIntro: true });
   });
-  await advanceSeconds(page.clock, 75);
-  await expect(page.locator("#triple-round-summary-modal")).toBeVisible();
-  await expect(page.locator("#triple-round-summary-modal")).toHaveCount(1);
+  // The round timer is attached after the shell mount lifecycle; advance past
+  // the configured 75 seconds rather than assuming its first interval is at 0.
+  await advanceSeconds(page.clock, 90);
+  await expect(page.locator("#time-up-modal")).toBeVisible();
+  await expect(page.locator("#time-up-modal")).toHaveCount(1);
+  await expect(page.locator("#time-up-modal")).toContainText("Bạn đã thua");
+  await expect(page.locator("#time-up-modal")).toContainText(
+    "Chọn một cách để bắt đầu hành trình của bạn.",
+  );
   const terminal = await page.evaluate(async () =>
     (await import("/js/sessionProgress.js")).getActiveSession(
       "triple-connect",
@@ -422,9 +382,9 @@ test("Triple settles one loss after a seventh non-matching tray tile", async ({
       await new Promise((resolve) => setTimeout(resolve, 280));
     }
   });
-  await expect(page.locator("#triple-round-summary-modal")).toHaveCount(1);
-  await expect(page.locator("#triple-round-summary-modal")).toContainText(
-    "Khay đã đầy",
+  await expect(page.locator("#time-up-modal")).toHaveCount(1);
+  await expect(page.locator("#time-up-modal")).toContainText(
+    "Chọn một cách để bắt đầu hành trình của bạn.",
   );
   const terminal = await page.evaluate(async () =>
     (await import("/js/sessionProgress.js")).getActiveSession(

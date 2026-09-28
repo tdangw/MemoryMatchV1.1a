@@ -77,3 +77,40 @@ test("Triple production rounds receive fresh seeds while explicit fixture seeds 
   expect(result.fixtureSeeds[0]).toMatch(/^stable-visual-fixture/);
   expect(result.fixtureMaps[0]).toEqual(result.fixtureMaps[1]);
 });
+
+test("generated themes persist stable selection IDs for Memory, Link, and Triple", async ({ page }) => {
+  await page.goto("/");
+  const result = await page.evaluate(async () => {
+    const { gameState } = await import("/js/gameState.js");
+    const { startNewMemoryRun } = await import("/js/gameController.js");
+    const { startLinkLevel } = await import("/js/linkConnect/linkController.js");
+    const { startTripleConnectDevelopmentRound } = await import("/js/tripleConnect/tripleController.js");
+    const themes = ["alphabet", "numbers-2", "numbers-3", "computer-symbols"];
+    const results = [];
+    for (const theme of themes) {
+      gameState.appearance.themes.memoryMatch = theme;
+      gameState.appearance.themes.linkConnect = theme;
+      gameState.appearance.themes.tripleConnect = theme;
+      gameState.settings.mode = "easy";
+      startNewMemoryRun();
+      startLinkLevel({ mode: "easy" });
+      startTripleConnectDevelopmentRound({ mode: "easy", seed: `generated-${theme}` });
+      results.push({
+        theme,
+        memory: gameState.progress.memoryMatch.sessionsByMode.easy.assetPaths,
+        link: gameState.progress.linkConnect.sessionsByMode.easy.assetPaths,
+        triple: Object.values(gameState.progress.tripleConnect.sessionsByMode.easy.snapshot.assetPathsByType),
+        history: gameState.progress.themeSelectionHistory[theme],
+      });
+    }
+    return results;
+  });
+  for (const entry of result) {
+    const prefix = `generated:${entry.theme}:`;
+    expect(entry.memory).toHaveLength(6);
+    expect(entry.link).toHaveLength(6);
+    expect(entry.triple).toHaveLength(9);
+    expect(entry.history).toHaveLength(3);
+    expect([...entry.memory, ...entry.link, ...entry.triple].every((id) => id.startsWith(prefix))).toBe(true);
+  }
+});

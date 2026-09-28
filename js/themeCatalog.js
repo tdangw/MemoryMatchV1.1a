@@ -1,5 +1,4 @@
 import { THEME_ASSET_MANIFEST } from "./generated/themeAssetManifest.js";
-import { shuffleArray } from "./utils.js";
 import { selectThemeAssets } from "./themeSelection.js";
 
 const ALPHABET_VALUES = Object.freeze([
@@ -83,13 +82,13 @@ export function isThemePlayable(theme) {
 export function getThemeSelectionEligibility(themeId, count) {
   if (!Number.isInteger(count) || count < 1) throw new TypeError("Theme selection count must be a positive integer.");
   const theme = getUsableTheme(themeId);
-  const available = theme.kind === "image" ? theme.assets.length : getGeneratedValues(theme).length;
+  const available = getThemeSelectionAssets(theme).length;
   return Object.freeze({ theme, required: count, available, ok: available >= count });
 }
 
 export function getThemeCards(themeId, pairCount, { assetPaths, history, random } = {}) {
   const theme = getUsableTheme(themeId);
-  const restoredValues = assetPaths ? getAssetsByPath(theme, assetPaths) : null;
+  const restoredValues = assetPaths ? getSelectionAssetsById(theme, assetPaths) : null;
   const values = restoredValues?.length === pairCount
     ? restoredValues
     : pickThemeValues(theme, pairCount, { history, random });
@@ -104,12 +103,12 @@ export function getThemeCards(themeId, pairCount, { assetPaths, history, random 
         special: value.special === true,
       };
     }
-    const label = String(value);
+    const label = String(value.value);
     return {
       id: `${theme.id}-${label}`,
       alt: `${theme.title}: ${label}`,
       src: createGeneratedCardImage(label, theme),
-      assetPath: null,
+      assetPath: value.path,
       special: false,
     };
   });
@@ -117,21 +116,33 @@ export function getThemeCards(themeId, pairCount, { assetPaths, history, random 
 
 export function selectThemeCards(themeId, count, { history, random } = {}) {
   const theme = getUsableTheme(themeId);
-  if (theme.kind !== "image") return getThemeCards(theme.id, count);
-  return selectThemeAssets({ assets: theme.assets, count, history, random });
+  return selectThemeAssets({ assets: getThemeSelectionAssets(theme), count, history, random });
 }
 
 function pickThemeValues(theme, pairCount, { history, random } = {}) {
-  let values;
-  if (theme.kind === "image") return selectThemeAssets({ assets: theme.assets, count: pairCount, history, random });
-  values = getGeneratedValues(theme);
-  shuffleArray(values);
-  return values.slice(0, pairCount);
+  return selectThemeAssets({ assets: getThemeSelectionAssets(theme), count: pairCount, history, random });
 }
 
-function getAssetsByPath(theme, assetPaths) {
-  if (theme.kind !== "image" || !Array.isArray(assetPaths)) return [];
-  const byPath = new Map(theme.assets.map((asset) => [asset.path, asset]));
+export function getThemeSelectionAssets(themeOrId) {
+  const theme = typeof themeOrId === "string" ? getUsableTheme(themeOrId) : themeOrId;
+  if (theme.kind === "image") return theme.assets;
+  return Object.freeze(getGeneratedValues(theme).map((value) => Object.freeze({
+    path: getGeneratedSelectionId(theme.id, value),
+    value: String(value),
+  })));
+}
+
+export function getThemeSelectionManifest() {
+  return Object.fromEntries(THEMES.map((theme) => [theme.id, getThemeSelectionAssets(theme)]));
+}
+
+export function getGeneratedSelectionId(themeId, value) {
+  return `generated:${themeId}:${encodeURIComponent(String(value))}`;
+}
+
+function getSelectionAssetsById(theme, assetPaths) {
+  if (!Array.isArray(assetPaths)) return [];
+  const byPath = new Map(getThemeSelectionAssets(theme).map((asset) => [asset.path, asset]));
   const values = assetPaths.map((path) => byPath.get(path)).filter(Boolean);
   return new Set(values.map((asset) => asset.path)).size === values.length ? values : [];
 }

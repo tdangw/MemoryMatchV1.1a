@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("hint inventories survive new games, mode changes, restarts and old resumes", async ({ page }) => {
+test("hint inventories survive new games, mode changes, restarts and current resumes", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const result = await page.evaluate(async () => {
@@ -9,7 +9,7 @@ test("hint inventories survive new games, mode changes, restarts and old resumes
     const link = await import("/js/linkConnect/linkController.js");
     const { consumeLinkItem } = await import("/js/linkConnect/linkItems.js");
     const { openGameMenu } = await import("/js/gameSelector.js");
-    gameState.hints = 20;
+    gameState.progress.memoryMatch.items.hint = 20;
     gameState.progress.linkConnect.items.hint = 14;
     openGameMenu("memory-match");
     const counts = [];
@@ -17,16 +17,16 @@ test("hint inventories survive new games, mode changes, restarts and old resumes
       resetGame();
       gameState.settings.mode = mode;
       memory.startNewMemoryRun();
-      counts.push(gameState.hints);
+      counts.push(gameState.progress.memoryMatch.items.hint);
       memory.restartMemoryLevel();
-      counts.push(gameState.hints);
+      counts.push(gameState.progress.memoryMatch.items.hint);
     }
-    memory.continueMemorySession({ mode: "easy", level: 1, remainingTime: 60, hints: 99 });
-    counts.push(gameState.hints);
+    memory.continueMemorySession({ mode: "easy", level: 1, remainingTime: 60 });
+    counts.push(gameState.progress.memoryMatch.items.hint);
     gameState.isLocked = false;
     gameState.isPaused = false;
     memory.handleHintClick();
-    counts.push(gameState.hints);
+    counts.push(gameState.progress.memoryMatch.items.hint);
     memory.returnToMainMenu();
     openGameMenu("link-connect");
     const linkCounts = [];
@@ -48,7 +48,7 @@ test("hint inventories survive new games, mode changes, restarts and old resumes
   await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const saved = await page.evaluate(async () => {
     const { gameState } = await import("/js/gameState.js");
-    return [gameState.hints, gameState.progress.linkConnect.items.hint];
+    return [gameState.progress.memoryMatch.items.hint, gameState.progress.linkConnect.items.hint];
   });
   expect(saved).toEqual([19, 13]);
 });

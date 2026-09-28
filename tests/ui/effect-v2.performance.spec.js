@@ -16,7 +16,7 @@ test("Effect V2 production performance budget", async ({ page }, testInfo) => {
     const allTiles = [...frame.querySelectorAll(".link-tile")];
     const tiles = allTiles.slice(0, 2); const third = allTiles[2];
     const samples = Object.fromEntries(effectIds.map(id => [id, { exit2: [], exit3: [], frame: [] }]));
-    const connectionSamples=[]; const long=[]; const observer = new PerformanceObserver(list => list.getEntries().forEach(entry => long.push(entry.duration))); observer.observe({ type: "longtask", buffered: true });
+    const connectionSamples=[]; const long=[]; const observer = new PerformanceObserver(list => list.getEntries().forEach(entry => long.push(entry.duration))); observer.observe({ type: "longtask" });
     for (let i=0;i<10;i++) {
       renderConnectionV2({surface,points:[{x:0,y:0},{x:20,y:20}],effect:{id:"default"},seed:i}); clearConnectionV2(surface);
       await new Promise(requestAnimationFrame);

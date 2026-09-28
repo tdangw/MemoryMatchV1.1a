@@ -11,6 +11,7 @@ import {
 import { openAppModal } from "./modal.js";
 import { createIcon } from "./icons.js";
 import { savePersistentGameData } from "./persistence.js";
+import { mountCatalogTabs } from "./catalogPreferences.js";
 import { CARD_BACKS, FLIP_EFFECTS } from "./appearance.js";
 import { SHOP_ITEMS, getShopItemPrice } from "./shopCatalog.js";
 import { getOwnedThemeIds, ownTheme } from "./appearance.js";
@@ -202,11 +203,9 @@ export function openShopOverlay({
     .insertBefore(wallet, closeButton);
 
   if (gameId === "link-connect") {
-    const itemsTab = createTab("Vật phẩm", true, () =>
-      renderLinkItems(grid, roundId, modal),
-    );
-    const pathEffectsTab = createTab("Đường nối", false, () =>
-      renderLinkEffectShop(
+    mountCatalogTabs({ gameId, surface: "shop", tablist: tabs, panel: grid, tabs: [
+      { id: "items", label: "Vật phẩm", render: () => renderLinkItems(grid, roundId, modal) },
+      { id: "path", label: "Đường nối", render: () => renderLinkEffectShop(
         grid,
         "Hiệu ứng đường nối",
         "linkPathEffect",
@@ -214,10 +213,8 @@ export function openShopOverlay({
         LINK_PATH_EFFECTS,
         roundId,
         modal,
-      ),
-    );
-    const exitEffectsTab = createTab("Xóa thẻ", false, () =>
-      renderLinkEffectShop(
+      ) },
+      { id: "exit", label: "Xóa thẻ", render: () => renderLinkEffectShop(
         grid,
         "Hiệu ứng xóa thẻ",
         "linkExitEffect",
@@ -225,19 +222,13 @@ export function openShopOverlay({
         LINK_EXIT_EFFECTS,
         roundId,
         modal,
-      ),
-    );
-    const themesTab = createTab("Chủ đề", false, () =>
-      renderThemes(grid, roundId, modal, gameId),
-    );
-    tabs.append(itemsTab, pathEffectsTab, exitEffectsTab, themesTab);
-    renderLinkItems(grid, roundId, modal);
+      ) },
+      { id: "themes", label: "Chủ đề", render: () => renderThemes(grid, roundId, modal, gameId) },
+    ] });
   } else if (tripleConnect) {
-    const itemsTab = createTab("Vật phẩm", true, () =>
-      renderTripleItems(grid, roundId, modal),
-    );
-    const pathEffectsTab = createTab("Đường nối", false, () =>
-      renderTripleEffectShop(
+    mountCatalogTabs({ gameId, surface: "shop", tablist: tabs, panel: grid, tabs: [
+      { id: "items", label: "Vật phẩm", render: () => renderTripleItems(grid, roundId, modal) },
+      { id: "path", label: "Đường nối", render: () => renderTripleEffectShop(
         grid,
         "Hiệu ứng đường nối",
         "path",
@@ -245,10 +236,8 @@ export function openShopOverlay({
         LINK_PATH_EFFECTS,
         roundId,
         modal,
-      ),
-    );
-    const exitEffectsTab = createTab("Xóa thẻ", false, () =>
-      renderTripleEffectShop(
+      ) },
+      { id: "exit", label: "Xóa thẻ", render: () => renderTripleEffectShop(
         grid,
         "Hiệu ứng xóa thẻ",
         "exit",
@@ -256,28 +245,16 @@ export function openShopOverlay({
         LINK_EXIT_EFFECTS,
         roundId,
         modal,
-      ),
-    );
-    const themesTab = createTab("Chủ đề", false, () =>
-      renderThemes(grid, roundId, modal, gameId),
-    );
-    tabs.append(itemsTab, pathEffectsTab, exitEffectsTab, themesTab);
-    renderTripleItems(grid, roundId, modal);
+      ) },
+      { id: "themes", label: "Chủ đề", render: () => renderThemes(grid, roundId, modal, gameId) },
+    ] });
   } else {
-    const itemsTab = createTab("Vật phẩm", true, () =>
-      renderMemoryItems(grid, roundId, modal),
-    );
-    const appearanceTab = createTab("Ngoại hình", false, () =>
-      renderAppearance(grid, roundId, modal),
-    );
-    const flipEffectsTab = createTab("Hiệu ứng lật", false, () =>
-      renderFlipEffects(grid, roundId, modal),
-    );
-    const themesTab = createTab("Chủ đề", false, () =>
-      renderThemes(grid, roundId, modal, gameId),
-    );
-    tabs.append(itemsTab, appearanceTab, flipEffectsTab, themesTab);
-    renderMemoryItems(grid, roundId, modal);
+    mountCatalogTabs({ gameId, surface: "shop", tablist: tabs, panel: grid, tabs: [
+      { id: "items", label: "Vật phẩm", render: () => renderMemoryItems(grid, roundId, modal) },
+      { id: "appearance", label: "Ngoại hình", render: () => renderAppearance(grid, roundId, modal) },
+      { id: "flip", label: "Hiệu ứng lật", render: () => renderFlipEffects(grid, roundId, modal) },
+      { id: "themes", label: "Chủ đề", render: () => renderThemes(grid, roundId, modal, gameId) },
+    ] });
   }
 }
 
@@ -543,24 +520,6 @@ function renderInventoryItems(
   });
   group.append(heading, choices);
   grid.append(group);
-}
-
-function createTab(label, selected, onSelect) {
-  const tab = document.createElement("button");
-  tab.type = "button";
-  tab.className = "shop-tab";
-  tab.textContent = label;
-  tab.setAttribute("role", "tab");
-  tab.setAttribute("aria-selected", String(selected));
-  tab.onclick = () => {
-    tab.parentElement.querySelectorAll(".shop-tab").forEach((button) => {
-      button.classList.toggle("is-active", button === tab);
-      button.setAttribute("aria-selected", String(button === tab));
-    });
-    onSelect();
-  };
-  if (selected) tab.classList.add("is-active");
-  return tab;
 }
 
 function renderAppearance(grid, roundId, modal) {

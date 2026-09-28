@@ -140,7 +140,7 @@ test("Triple menu, start modal and timer follow the shared round contract", asyn
   await page.getByText("Bắt đầu", { exact: true }).click();
   await page.getByRole("button", { name: "Dễ" }).click();
   const start = page.locator("#triple-round-start-modal");
-  await expect(start).toContainText(/Màn 1.*Dễ.*Chủ đề.*Mục tiêu: 9 bộ ba.*Khay: 7 ô/s);
+  await expect(start).toContainText(/Màn 1.*Dễ.*Chủ đề.*Mục tiêu: 9 bộ thẻ.*Gợi ý: 3/s);
   const timer = page.locator("[data-triple-timer]");
   const before = await timer.textContent();
   await page.waitForTimeout(1100);
