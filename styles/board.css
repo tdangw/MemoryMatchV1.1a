@@ -140,15 +140,8 @@
 
 /* TILE khi hover */
 .tile:not(.matched):not(.wrong):hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 12px rgb(0 0 0 / 30%);
-  background: linear-gradient(135deg, #c2e9fb, #a1c4fd);
-  background-size: 200% 200%;
-  background-position: 0% 50%;
-  animation: glow 0.5s ease-in-out infinite alternate;
-  transition: all 0.3s ease;
-  z-index: 2; /* Đảm bảo tile nổi lên trên các tile khác */
-  border: 3px solid #f00;
+  border-color: #ff4d4d;
+  z-index: 2;
 }
 
 /* Hiệu ứng shimmer lung linh */

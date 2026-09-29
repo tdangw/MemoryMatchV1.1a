@@ -39,7 +39,6 @@ export function getLinkShell() {
           <button class="game-action-item" type="button" data-action="shop">Cửa hàng</button>
           <button class="game-action-item" type="button" data-action="collection">Bộ sưu tập</button>
           <button class="game-action-item" type="button" data-action="help">Hướng dẫn</button>
-          <button class="game-action-item" type="button" data-action="info">Thông tin</button>
           <button class="game-action-item" type="button" data-action="reset">Xóa dữ liệu</button>
         </div>
         <div class="game-stats" aria-label="Thông tin màn chơi">
@@ -86,7 +85,6 @@ function decorateShell(container) {
     collection: "collection",
     shop: "shop",
     help: "book",
-    info: "info",
     reset: "wand",
   };
   actions?.querySelectorAll("button[data-action]").forEach((button) => {

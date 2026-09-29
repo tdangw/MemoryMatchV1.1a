@@ -92,14 +92,10 @@
   gap: var(--shell-active-board-gap);
   padding: var(--shell-active-board-padding);
   box-sizing: border-box;
-  border: 1px solid rgb(102 229 255 / 25%);
+  border: 1px solid rgb(132 226 255 / 34%);
   border-radius: 19px;
-  background:
-    linear-gradient(rgb(124 225 255 / 4%) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(124 225 255 / 4%) 1px, transparent 1px),
-    rgb(4 20 44 / 68%);
-  background-size: 18px 18px;
-  box-shadow: inset 0 1px rgb(255 255 255 / 8%), 0 16px 36px rgb(0 0 0 / 20%);
+  background: rgb(5 22 49 / 92%);
+  box-shadow: inset 0 1px rgb(222 249 255 / 12%), 0 12px 28px rgb(0 0 0 / 18%);
 }
 
 .link-board.is-moving,
@@ -356,6 +352,10 @@
   animation: link-tile-image-dissolve var(--link-tile-exit-duration, 220ms) ease-in var(--link-tile-exit-delay, 0ms) both;
 }
 
+:is(.link-tile, .triple-connect__ghost).is-removing.link-tile--dissolve {
+  animation-name: link-tile-dissolve-ash;
+}
+
 .link-thunder-strike {
   position: absolute;
   z-index: 4;
@@ -580,7 +580,15 @@
 
 @keyframes link-tile-image-dissolve {
   0% { transform: scale(1); }
-  100% { transform: scale(1.18); filter: saturate(1.18); }
+  42% { transform: scale(1.035); filter: saturate(1.1) brightness(1.06); }
+  100% { transform: translateY(-9%) scale(.76); filter: saturate(.7) brightness(1.18); }
+}
+
+@keyframes link-tile-dissolve-ash {
+  0%, 14% { opacity: 1; transform: scale(1); }
+  42% { opacity: .94; transform: scale(1.035); }
+  76% { opacity: .4; transform: translateY(-5%) scale(.9); }
+  100% { opacity: 0; transform: translateY(-12%) scale(.72); }
 }
 
 :is(.link-tile, .triple-connect__ghost).is-removing.link-tile--slice { animation-name: link-tile-slice; }
@@ -595,10 +603,170 @@
 :is(.link-tile, .triple-connect__ghost).is-removing.link-tile--bubble { animation-name: link-tile-bubble-out; }
 :is(.link-tile, .triple-connect__ghost).is-removing.link-tile--origami { animation-name: link-tile-origami-out; }
 :is(.link-tile, .triple-connect__ghost).is-removing.link-tile--electric-shock { animation-name: link-tile-electric-shock; }
+
+/* Electric Shock: a short charge-up, two sharp jolts, then a clean resolve.
+   The visual stays at the edge so it never competes with the card artwork. */
+:is(.link-tile, .triple-connect__ghost).is-removing.link-tile--electric-shock::before {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 4;
+  inset: -3px;
+  border-radius: inherit;
+  border: 2px solid rgb(255 229 74 / 96%);
+  box-shadow: 0 0 4px rgb(255 223 66 / 92%), 0 0 9px rgb(91 233 255 / 58%);
+  animation: link-tile-electric-outline var(--link-tile-exit-duration, 220ms) steps(1, end) var(--link-tile-exit-delay, 0ms) both;
+}
 :is(.link-tile, .triple-connect__ghost).is-removing.link-tile--ghost { animation-name: link-tile-ghost-out; }
+
+:is(.link-tile, .triple-connect__ghost).is-removing.link-tile--portal::after {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  inset: 4%;
+  border: 1px solid rgb(150 121 255 / 88%);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, rgb(9 7 38 / 92%) 0 24%, rgb(60 34 146 / 58%) 31%, transparent 62%),
+    conic-gradient(from 18deg, transparent 0 12%, rgb(108 223 255 / 72%) 22%, transparent 34%, rgb(168 107 255 / 78%) 49%, transparent 61%, rgb(89 189 255 / 64%) 76%, transparent 88%);
+  opacity: 0;
+  pointer-events: none;
+  animation: link-tile-portal-ring var(--link-tile-exit-duration, 220ms) ease-out var(--link-tile-exit-delay, 0ms) both;
+}
+
+:is(.link-tile, .triple-connect__ghost).is-removing.link-tile--portal::before {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset: -15%;
+  border: 1px solid rgb(109 225 255 / 64%);
+  border-radius: 50%;
+  background: conic-gradient(from 210deg, transparent 0 8%, rgb(138 104 255 / 76%) 18%, transparent 31%, rgb(89 225 255 / 78%) 46%, transparent 59%, rgb(184 119 255 / 72%) 75%, transparent 88%);
+  opacity: 0;
+  pointer-events: none;
+  animation: link-tile-portal-outer var(--link-tile-exit-duration, 220ms) linear var(--link-tile-exit-delay, 0ms) both;
+}
+
+:is(.link-tile, .triple-connect__ghost).is-removing.link-tile--dissolve::after {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  border-radius: inherit;
+  background-image:
+    radial-gradient(circle at 16% 22%, rgb(255 244 209 / 92%) 0 2px, transparent 2.8px),
+    radial-gradient(circle at 72% 18%, rgb(255 190 120 / 82%) 0 2px, transparent 3px),
+    radial-gradient(circle at 42% 68%, rgb(222 234 255 / 80%) 0 1.8px, transparent 2.7px),
+    radial-gradient(circle at 84% 76%, rgb(255 218 164 / 76%) 0 2px, transparent 3px),
+    radial-gradient(circle at 29% 52%, rgb(244 249 255 / 76%) 0 1.7px, transparent 2.6px),
+    radial-gradient(circle at 63% 46%, rgb(255 200 139 / 72%) 0 1.8px, transparent 2.7px);
+  opacity: 0;
+  pointer-events: none;
+  animation: link-tile-dissolve-specks var(--link-tile-exit-duration, 220ms) ease-out var(--link-tile-exit-delay, 0ms) both;
+}
+
+:is(.link-tile, .triple-connect__ghost).is-removing.link-tile--dissolve::before {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(160deg, rgb(248 246 235 / 0%) 18%, rgb(255 216 162 / 42%) 52%, rgb(92 118 152 / 0%) 84%);
+  opacity: 0;
+  pointer-events: none;
+  animation: link-tile-dissolve-veil var(--link-tile-exit-duration, 220ms) ease-out var(--link-tile-exit-delay, 0ms) both;
+}
+
+:is(.link-tile, .triple-connect__ghost).is-removing.link-tile--blackhole::after,
+:is(.link-tile, .triple-connect__ghost).is-removing.link-tile--implode::after {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  inset: 17%;
+  border: 1px solid rgb(127 95 255 / 68%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(2 5 25 / 94%) 0 24%, rgb(38 19 94 / 72%) 30%, rgb(129 84 255 / 18%) 58%, transparent 70%);
+  opacity: 0;
+  pointer-events: none;
+  animation: link-tile-singularity var(--link-tile-exit-duration, 220ms) ease-in var(--link-tile-exit-delay, 0ms) both;
+}
+
+:is(.link-tile, .triple-connect__ghost).is-removing.link-tile--burn::after {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  inset: -18% 5% 0;
+  border-radius: 50% 50% 42% 42%;
+  background: radial-gradient(ellipse at 50% 82%, rgb(255 236 172 / 88%) 0 10%, rgb(255 121 45 / 74%) 26%, rgb(211 48 29 / 42%) 47%, transparent 70%);
+  opacity: 0;
+  pointer-events: none;
+  animation: link-tile-burn-flame var(--link-tile-exit-duration, 220ms) ease-out var(--link-tile-exit-delay, 0ms) both;
+}
+
+:is(.link-tile, .triple-connect__ghost).is-removing.link-tile--burn::before {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(circle at 50% 76%, rgb(255 234 172 / 92%) 0 12%, rgb(255 110 45 / 82%) 35%, rgb(213 39 28 / 72%) 66%, rgb(103 14 21 / 28%) 100%),
+    linear-gradient(160deg, rgb(255 87 38 / 44%), rgb(120 12 21 / 38%));
+  opacity: 0;
+  pointer-events: none;
+  animation: link-tile-burn-ember var(--link-tile-exit-duration, 220ms) ease-in-out var(--link-tile-exit-delay, 0ms) both;
+}
+
+:is(.link-tile, .triple-connect__ghost).is-removing.link-tile--freeze::after {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  border: 3px solid rgb(104 221 255 / 94%);
+  border-radius: inherit;
+  background:
+    linear-gradient(132deg, transparent 0 35%, rgb(228 255 255 / 78%) 36% 38%, transparent 39% 60%, rgb(135 225 255 / 64%) 61% 63%, transparent 64%),
+    linear-gradient(42deg, transparent 0 42%, rgb(234 255 255 / 62%) 43% 45%, transparent 46%),
+    linear-gradient(145deg, rgb(39 160 217 / 96%), rgb(6 104 174 / 96%));
+  opacity: 0;
+  pointer-events: none;
+  animation: link-tile-freeze-veil var(--link-tile-exit-duration, 220ms) ease-in-out var(--link-tile-exit-delay, 0ms) both;
+}
+
+:is(.link-tile, .triple-connect__ghost).is-removing.link-tile--freeze::before {
+  content: "❄";
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #e9fdff;
+  font-size: clamp(26px, 42%, 52px);
+  line-height: 1;
+  text-shadow: 0 0 8px rgb(214 252 255 / 74%);
+  opacity: 0;
+  pointer-events: none;
+  animation: link-tile-freeze-snowflake var(--link-tile-exit-duration, 220ms) ease-out var(--link-tile-exit-delay, 0ms) both;
+}
 
 :is(.link-tile, .triple-connect__ghost).is-removing.has-canvas-exit {
   animation: none;
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+:is(.link-tile, .triple-connect__ghost).is-removing.has-canvas-exit.link-tile--blackhole::after,
+:is(.link-tile, .triple-connect__ghost).is-removing.has-canvas-exit.link-tile--portal::before,
+:is(.link-tile, .triple-connect__ghost).is-removing.has-canvas-exit.link-tile--portal::after {
+  animation: none;
+  opacity: 0;
+}
+
+:is(.link-tile, .triple-connect__ghost).is-removing.link-tile--gravity {
+  /* Một quỹ đạo duy nhất: không reset easing ở mốc giữa nên rơi tự nhiên. */
+  animation-timing-function: cubic-bezier(.55, .05, .92, .42);
 }
 
 :is(.link-tile, .triple-connect__ghost).is-removing.has-canvas-exit > img:not(.link-tile__frost-overlay) {
@@ -613,17 +781,38 @@
 }
 
 @keyframes link-tile-slice { 0% { opacity: 1; clip-path: inset(0); } 42% { opacity: 1; transform: skewX(-8deg); } 100% { opacity: 0; transform: translateX(22%) skewX(20deg); clip-path: inset(0 48% 0 0); } }
-@keyframes link-tile-gravity { 0%, 20% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(130%) rotate(14deg); } }
-@keyframes link-tile-collide { 0% { opacity: 1; transform: translate(0, 0) scale(1); } 35% { transform: translate(var(--link-exit-collide-x, 0), var(--link-exit-collide-y, 0)) scale(.84); } 58% { transform: translate(var(--link-exit-collide-x, 0), var(--link-exit-collide-y, 0)) scale(1.1); filter: brightness(1.5); } 100% { opacity: 0; transform: translate(var(--link-exit-collide-x, 0), var(--link-exit-collide-y, 0)) scale(.26) rotate(14deg); } }
-@keyframes link-tile-portal { 0%, 24% { opacity: 1; transform: scale(1); } 62% { opacity: .78; transform: scale(.58) rotate(94deg); filter: saturate(1.28) brightness(1.35); } 100% { opacity: 0; transform: scale(.06) rotate(180deg); filter: brightness(.8); } }
-@keyframes link-tile-blackhole { 0% { opacity: 1; transform: scale(1) rotate(0); filter: saturate(1); } 46% { opacity: .84; transform: translate(var(--link-exit-pull-x, 0), var(--link-exit-pull-y, 0)) scale(.56) rotate(-42deg); filter: saturate(.5) brightness(.62); } 100% { opacity: 0; transform: translate(var(--link-exit-pull-x, 0), var(--link-exit-pull-y, 0)) scale(.03) rotate(-120deg); filter: brightness(.15); } }
-@keyframes link-tile-implode { 0%, 35% { opacity: 1; transform: scale(1); } 58% { opacity: .9; transform: scale(.86); } 100% { opacity: 0; transform: scale(.02); filter: brightness(1.8); } }
-@keyframes link-tile-freeze-break { 0%, 30% { opacity: 1; filter: saturate(.65) brightness(1.2); } 54% { transform: scale(1.08); filter: brightness(1.8); } 100% { opacity: 0; transform: scale(.5); filter: brightness(2.2); } }
-@keyframes link-tile-burn { 0%, 20% { opacity: 1; transform: translateY(0) scale(1); filter: brightness(1); } 48% { opacity: 1; transform: translateY(-4%) scale(1.04); filter: sepia(.55) saturate(1.8) brightness(1.5); } 100% { opacity: 0; transform: translateY(-24%) scale(.72); filter: sepia(1) saturate(2) brightness(1.75); } }
-@keyframes link-tile-pixel-out { 0% { opacity: 1; transform: translate(0); } 25% { transform: translate(4%, -2%); filter: hue-rotate(55deg) contrast(1.55); } 55% { transform: translate(-6%, 3%); } 100% { opacity: 0; transform: scale(.74); filter: contrast(1.35); } }
+@keyframes link-tile-gravity { 0% { opacity: 1; transform: translate3d(0, 0, 0) rotate(-1deg); } 100% { opacity: 0; transform: translate3d(0, 142%, 0) rotate(9deg); } }
+@keyframes link-tile-collide { 0% { opacity: 1; transform: translate(0, 0) scale(1); } 46% { opacity: 1; transform: translate(var(--link-exit-collide-x, 0), var(--link-exit-collide-y, 0)) scale(.72); } 59% { opacity: 1; transform: translate(var(--link-exit-collide-x, 0), var(--link-exit-collide-y, 0)) scale(1.22); } 71% { opacity: .82; transform: translate(var(--link-exit-collide-x, 0), var(--link-exit-collide-y, 0)) scale(.54) rotate(-9deg); } 100% { opacity: 0; transform: translate(var(--link-exit-collide-x, 0), var(--link-exit-collide-y, 0)) scale(.08) rotate(18deg); } }
+@keyframes link-tile-portal { 0% { opacity: 1; transform: scale(1) rotate(0); } 42% { opacity: .92; transform: scale(.74) rotate(132deg); } 74% { opacity: .52; transform: scale(.32) rotate(284deg); } 100% { opacity: 0; transform: scale(.025) rotate(440deg); } }
+@keyframes link-tile-portal-ring { 0% { opacity: 0; transform: scale(.42) rotate(0); } 18% { opacity: .94; transform: scale(1.04) rotate(86deg); } 60% { opacity: .72; transform: scale(1.3) rotate(276deg); } 100% { opacity: 0; transform: scale(.3) rotate(510deg); } }
+@keyframes link-tile-portal-outer { 0% { opacity: 0; transform: scale(.48) rotate(0); } 15% { opacity: .78; transform: scale(1.06) rotate(-70deg); } 63% { opacity: .64; transform: scale(1.42) rotate(-310deg); } 100% { opacity: 0; transform: scale(.22) rotate(-590deg); } }
+@keyframes link-tile-blackhole { 0%, 16% { opacity: 1; transform: scale(1) rotate(0); } 52% { opacity: .86; transform: translate(var(--link-exit-pull-x, 0), var(--link-exit-pull-y, 0)) scale(.52) rotate(-42deg); } 100% { opacity: 0; transform: translate(var(--link-exit-pull-x, 0), var(--link-exit-pull-y, 0)) scale(.03) rotate(-120deg); } }
+@keyframes link-tile-implode { 0%, 26% { opacity: 1; transform: scale(1); } 61% { opacity: .92; transform: scale(.72); } 100% { opacity: 0; transform: scale(.02); } }
+@keyframes link-tile-freeze-break { 0%, 24% { opacity: 1; transform: scale(1); } 68% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1); } }
+@keyframes link-tile-freeze-veil { 0%, 18% { opacity: 0; transform: scale(.94); } 38% { opacity: .92; transform: scale(1); } 72% { opacity: .76; transform: scale(1.025); } 100% { opacity: 0; transform: scale(1.08); } }
+@keyframes link-tile-freeze-snowflake { 0%, 16% { opacity: 0; transform: scale(.45) rotate(-35deg); } 38% { opacity: 1; transform: scale(1.08) rotate(0); } 74% { opacity: .84; transform: scale(1) rotate(24deg); } 100% { opacity: 0; transform: scale(.66) rotate(55deg); } }
+@keyframes link-tile-dissolve-specks { 0%, 22% { opacity: 0; transform: translateY(0) scale(.76); } 50% { opacity: .9; transform: translateY(-12%) scale(1); } 100% { opacity: 0; transform: translateY(-48%) scale(1.22); } }
+@keyframes link-tile-dissolve-veil { 0%, 18% { opacity: 0; transform: translateY(14%); } 46% { opacity: .72; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-44%); } }
+@keyframes link-tile-burn { 0%, 16% { opacity: 1; transform: translateY(0) scale(1); } 58% { opacity: .94; transform: translateY(-5%) scale(.98); } 100% { opacity: 0; transform: translateY(-30%) scale(.72); } }
+@keyframes link-tile-pixel-out { 0% { opacity: 1; transform: translate(0); } 38% { opacity: .9; transform: translate(2%, -2%) scale(.96); } 100% { opacity: 0; transform: scale(.72); } }
+@keyframes link-tile-singularity { 0%, 22% { opacity: 0; transform: scale(.25) rotate(0); } 54% { opacity: .84; transform: scale(1.12) rotate(70deg); } 100% { opacity: 0; transform: scale(.3) rotate(160deg); } }
+@keyframes link-tile-burn-flame { 0%, 16% { opacity: 0; transform: translateY(18%) scale(.56); } 42% { opacity: .9; transform: translateY(-2%) scale(1); } 100% { opacity: 0; transform: translateY(-38%) scale(1.34); } }
+@keyframes link-tile-burn-ember { 0%, 14% { opacity: 0; transform: scale(.96); } 38% { opacity: .88; transform: scale(1.02); } 68% { opacity: .76; transform: scale(1.04); } 100% { opacity: 0; transform: scale(1.08); } }
 @keyframes link-tile-bubble-out { 0% { opacity: 1; transform: scale(1); } 56% { opacity: .92; transform: scale(1.22); filter: brightness(1.35); } 100% { opacity: 0; transform: scale(1.46); filter: brightness(1.15); } }
 @keyframes link-tile-origami-out { 0% { opacity: 1; transform: perspective(160px) rotateY(0); } 100% { opacity: 0; transform: perspective(160px) rotateY(82deg) rotateZ(14deg); } }
-@keyframes link-tile-electric-shock { 0%, 25% { opacity: 1; filter: brightness(1); } 42% { transform: translateX(4%); filter: brightness(2.1) saturate(1.7); } 64% { transform: translateX(-4%); } 100% { opacity: 0; transform: scale(1.14); filter: brightness(2.8); } }
+@keyframes link-tile-electric-shock {
+  0%, 16% { opacity: 1; transform: translate3d(0, 0, 0); filter: brightness(1) saturate(1); }
+  21% { transform: translate3d(-3%, 1%, 0); filter: brightness(1.65) saturate(1.45); }
+  26% { transform: translate3d(3%, -2%, 0); filter: brightness(2.1) saturate(1.75); }
+  31% { transform: translate3d(-2%, 2%, 0); filter: brightness(1.48) saturate(1.3); }
+  36% { transform: translate3d(0, 0, 0); filter: brightness(1.12) saturate(1.1); }
+  43% { transform: translate3d(2%, -2%, 0); filter: brightness(2.3) saturate(1.85); }
+  49% { transform: translate3d(-3%, 2%, 0); filter: brightness(1.72) saturate(1.5); }
+  55% { transform: translate3d(0, 0, 0); filter: brightness(1.18) saturate(1.12); }
+  69% { opacity: .94; transform: translate3d(0, 0, 0) scale(1); filter: brightness(1.32) saturate(1.2); }
+  100% { opacity: 0; transform: translate3d(0, -8%, 0) scale(.86); filter: brightness(1.05) saturate(.8); }
+}
+@keyframes link-tile-electric-outline { 0%, 17%, 37%, 58%, 100% { opacity: 0; } 21%, 27%, 43%, 50% { opacity: 1; } }
 @keyframes link-tile-ghost-out { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-78%) scale(.78); filter: saturate(.45); } }
 @keyframes link-tile-source-hide { 0%, 7% { opacity: 1; } 12%, 100% { opacity: 0; } }
 

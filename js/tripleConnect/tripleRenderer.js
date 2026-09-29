@@ -1,12 +1,13 @@
 import { getTheme } from "../themeCatalog.js";
 import { connectGameShellLayout } from "../gameShell/gameShellLayout.js";
 import { TRIPLE_PRODUCT_DECISIONS } from "./tripleConfig.js";
-import { createTripleBoardView } from "./tripleState.js";
+import { createTripleBoardViewFromTrustedState } from "./tripleState.js";
 
 const LEGACY_GRID_UNITS = 100;
 const TRAY_LOGICAL_ROWS = 3;
 const TRAY_VISIBLE_SLOT_COUNT = TRIPLE_PRODUCT_DECISIONS.trayExpansion.baseCapacity
   + TRIPLE_PRODUCT_DECISIONS.trayExpansion.bonusCapacity;
+const layoutTopologyCache = new WeakMap();
 
 export function createTripleRenderer(shell, { onLockedTraySlotClick } = {}) {
   const root = shell.refs.root;
@@ -14,6 +15,7 @@ export function createTripleRenderer(shell, { onLockedTraySlotClick } = {}) {
   const tray = root.querySelector(".triple-connect__tray");
   const nodes = new Map();
   const traySlots = [];
+  const trayUnlockButtons = new WeakMap();
   const createTraySlot = (index) => {
     const slot = document.createElement("div");
     slot.className = "triple-connect__tray-slot";
@@ -25,6 +27,7 @@ export function createTripleRenderer(shell, { onLockedTraySlotClick } = {}) {
     unlockButton.hidden = true;
     unlockButton.onclick = () => onLockedTraySlotClick?.();
     slot.append(unlockButton);
+    trayUnlockButtons.set(slot, unlockButton);
     tray.append(slot);
     return slot;
   };
@@ -34,7 +37,7 @@ export function createTripleRenderer(shell, { onLockedTraySlotClick } = {}) {
     while (traySlots.length > TRAY_VISIBLE_SLOT_COUNT) traySlots.pop().remove();
     traySlots.forEach((slot, index) => {
       const locked = index >= activeCapacity;
-      const unlockButton = slot.querySelector("[data-triple-tray-unlock]");
+      const unlockButton = trayUnlockButtons.get(slot);
       slot.classList.toggle("is-locked", locked);
       if (locked) {
         slot.dataset.tripleTrayLocked = "true";
@@ -54,6 +57,7 @@ export function createTripleRenderer(shell, { onLockedTraySlotClick } = {}) {
   };
   let layoutConnection = null;
   let activeLayout = null;
+  const coverDepthCache = new WeakMap();
 
   function render(state, layout, themeId = "default") {
     tray.dataset.tripleTrayCapacity = String(state.trayCapacity);
@@ -66,10 +70,9 @@ export function createTripleRenderer(shell, { onLockedTraySlotClick } = {}) {
     );
     reconcileTraySlots(state.trayCapacity);
     activeLayout = layout;
-    const geometry = getLayoutGeometry(layout);
-    const slots = new Map(layout.slots.map((slot) => [slot.id, slot]));
-    const coverDepths = getCoverDepths(state);
-    const boardView = createTripleBoardView(state);
+    const { geometry, slots } = getLayoutTopology(layout);
+    const coverDepths = getCoverDepths(state, coverDepthCache);
+    const boardView = createTripleBoardViewFromTrustedState(state);
     const live = new Set();
     for (const tile of Object.values(state.tiles)) {
       if (!boardView.visibleTileIds.has(tile.id)) continue;
@@ -218,7 +221,9 @@ function getCornerStackSlot(slotId, layout, geometry) {
   return null;
 }
 
-function getCoverDepths(state) {
+function getCoverDepths(state, cache) {
+  const cached = cache?.get(state);
+  if (cached) return cached;
   const depths = new Map();
   const visiting = new Set();
   const visit = (tileId) => {
@@ -233,6 +238,7 @@ function getCoverDepths(state) {
     return depth;
   };
   Object.keys(state.tiles).forEach(visit);
+  cache?.set(state, depths);
   return depths;
 }
 
@@ -255,6 +261,17 @@ function getLayoutGeometry(layout) {
     x: (value) => value * LEGACY_GRID_UNITS,
     y: (value) => value * LEGACY_GRID_UNITS,
   };
+}
+
+function getLayoutTopology(layout) {
+  const cached = layoutTopologyCache.get(layout);
+  if (cached) return cached;
+  const topology = Object.freeze({
+    geometry: getLayoutGeometry(layout),
+    slots: new Map(layout.slots.map((slot) => [slot.id, slot])),
+  });
+  layoutTopologyCache.set(layout, topology);
+  return topology;
 }
 
 function getTileImageSource(type, themeId, assetPath = "") {

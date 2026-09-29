@@ -2,13 +2,18 @@ import { calculateTripleMatchScore, TRIPLE_RULES } from "./tripleConfig.js";
 import {
   assertTripleStateInvariant,
   claimTripleMilestoneTiles,
-  createTripleStateSnapshot,
-  isTripleTileExposed,
+  createTripleStateSnapshotFromTrustedState,
+  createTripleBoardViewFromTrustedState,
   restoreTripleStateSnapshot,
 } from "./tripleState.js";
 
 export function reduceTripleCommand(state, command) {
   assertTripleStateInvariant(state);
+  return reduceTrustedTripleCommand(state, command);
+}
+
+/** Controller path for immutable states already validated at creation/restore boundaries. */
+export function reduceTrustedTripleCommand(state, command) {
   if (!command || typeof command.type !== "string") return reject(state, "invalid-command");
   if (command.type === "select-tile") return selectTile(state, command.tileId);
   if (command.type === "undo") return undoSelection(state);
@@ -20,9 +25,10 @@ function selectTile(state, tileId) {
   const tile = state.tiles[tileId];
   if (!tile) return reject(state, "unknown-tile");
   if (tile.location !== "board") return reject(state, "tile-not-on-board");
-  if (!isTripleTileExposed(state, tileId)) return reject(state, "tile-covered");
+  if (!createTripleBoardViewFromTrustedState(state).exposedTileIds.has(tileId))
+    return reject(state, "tile-covered");
 
-  const snapshot = createTripleStateSnapshot(state);
+  const snapshot = createTripleStateSnapshotFromTrustedState(state);
   const tiles = cloneTiles(state.tiles);
   tiles[tileId] = { ...tile, location: "tray" };
   let tray = insertCanonical(state.tray, tileId, tiles);

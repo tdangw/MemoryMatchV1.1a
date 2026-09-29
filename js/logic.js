@@ -34,6 +34,7 @@ import {
 import { pauseBackgroundMusic, sounds } from "./sound.js"; // 📦 Tách âm thanh
 import { saveCoins, savePersistentGameData } from "./persistence.js";
 import { getFlipAnimationClass } from "./appearance.js";
+import { clearMemoryTileAnimations, restartMemoryTileAnimation } from "./memoryMatch/tileAnimation.js";
 import {
   GAMEPLAY_LIMITS,
   GAMEPLAY_TIMING,
@@ -63,7 +64,6 @@ const REVEAL_ANIMATION_CLASSES = [
   "appear-zoom-rotate",
   "appear-blur-in",
 ];
-const tileAnimationTimers = new WeakMap();
 
 export function configureLogic(actions) {
   levelCompleteActions = { ...levelCompleteActions, ...actions };
@@ -75,6 +75,7 @@ export function resetLogicRuntime() {
   selectedTiles = [];
   lastMatchAt = 0;
   stopComboWindow();
+  clearMemoryTileAnimations();
 }
 
 function setInteractionLocked(locked, roundId = gameState.roundId) {
@@ -86,35 +87,27 @@ function setInteractionLocked(locked, roundId = gameState.roundId) {
 }
 
 function revealTile(img) {
-  clearTimeout(tileAnimationTimers.get(img));
   const animationClass = getFlipAnimationClass(gameState.appearance.flipEffect);
-  img.classList.remove("hidden", ...REVEAL_ANIMATION_CLASSES);
-  void img.offsetWidth;
-  img.classList.add(animationClass);
-  const timer = setTimeout(
-    () => {
-      img.classList.remove(animationClass);
-      tileAnimationTimers.delete(img);
-    },
-    GAMEPLAY_TIMING.tileRevealAnimationMs,
-  );
-  tileAnimationTimers.set(img, timer);
+  img.classList.remove("hidden");
+  restartMemoryTileAnimation(img, {
+    remove: REVEAL_ANIMATION_CLASSES,
+    animationClass,
+    durationMs: GAMEPLAY_TIMING.tileRevealAnimationMs,
+  });
 }
 
 function hideTile(img, roundId, onHidden) {
   if (!img) return onHidden?.();
 
-  clearTimeout(tileAnimationTimers.get(img));
-  img.classList.remove(...REVEAL_ANIMATION_CLASSES, "hide-fade-scale");
-  void img.offsetWidth;
-  img.classList.add("hide-fade-scale");
-  const timer = setTimeout(() => {
-    if (gameState.roundId === roundId) img.classList.add("hidden");
-    img.classList.remove("hide-fade-scale");
-    tileAnimationTimers.delete(img);
-    onHidden?.();
-  }, GAMEPLAY_TIMING.tileHideAnimationMs);
-  tileAnimationTimers.set(img, timer);
+  restartMemoryTileAnimation(img, {
+    remove: [...REVEAL_ANIMATION_CLASSES, "hide-fade-scale"],
+    animationClass: "hide-fade-scale",
+    durationMs: GAMEPLAY_TIMING.tileHideAnimationMs,
+    onFinish: () => {
+      if (gameState.roundId === roundId) img.classList.add("hidden");
+      onHidden?.();
+    },
+  });
 }
 
 function resolvePendingMismatch({ immediately = false } = {}) {
@@ -230,8 +223,11 @@ function checkMatch(roundId) {
     const matchCoins = calculateMatchCoinReward(gameState.combo);
     const previousCoins = gameState.coins;
     const totalCoins = increaseCoins(matchCoins);
-    saveCoins(totalCoins);
-    showMemoryCoinReward(second.element, previousCoins, totalCoins, matchCoins);
+    if (!saveCoins(totalCoins)) {
+      gameState.coins = previousCoins;
+      showBonusOverlay("Không thể lưu phần thưởng Xu lúc này.");
+    }
+    else showMemoryCoinReward(second.element, previousCoins, totalCoins, matchCoins);
     highlightTarget("#score");
     updateLevelStarsDisplay(calculateStarProgress(score, gameState.totalPairs, gameState.settings.mode));
     updateComboDisplay(gameState.combo);
@@ -422,10 +418,15 @@ function awardLuckyRewardValue(reward, tileElement) {
     return;
   }
 
+  const previousCoins = gameState.coins;
   const totalCoins = increaseCoins(reward.value);
   tileElement?.classList.add("lucky-reward");
   recordLuckyAward(reward);
-  saveCoins(totalCoins);
+  if (!saveCoins(totalCoins)) {
+    gameState.coins = previousCoins;
+    showBonusOverlay("Không thể lưu phần thưởng Xu lúc này.");
+    return;
+  }
   updateCoinDisplay(totalCoins);
   showLuckyRewardPopup(reward);
 }

@@ -1,5 +1,17 @@
 import { expect, test } from "@playwright/test";
 
+test("Connection cleanup is idempotent before its first render", async ({ page }) => {
+  await page.goto("/");
+  const cleared = await page.evaluate(async () => {
+    const { clearConnectionV2 } = await import("/js/effects/connectionEngine.js");
+    const surface = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    clearConnectionV2(surface);
+    clearConnectionV2(surface);
+    return !surface.classList.contains("is-visible");
+  });
+  expect(cleared).toBe(true);
+});
+
 test("Link V2 connection surface reuses its SVG nodes and clears without stale decorations", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");

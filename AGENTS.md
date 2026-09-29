@@ -93,7 +93,7 @@ Không được:
 - Khi bị blocker, báo đúng một lần với bằng chứng cụ thể: điều đã hoàn thành, lệnh/lỗi liên quan, phần còn lại, vì sao không thể tiếp tục và quyết định tối thiểu cần từ người dùng. Không dùng blocker giả cho việc khó, lâu hoặc còn nhiều bước.
 - Ngoại lệ: nếu người dùng chỉ yêu cầu đánh giá, giải thích, review, báo trạng thái hoặc chủ động yêu cầu dừng, agent trả đúng phạm vi đó và không tự triển khai thêm.
 
-`TASK_RUNTIME_CLOSURE_AND_SIMPLIFICATION_PLAN.md` là kế hoạch active duy nhất. Các kế hoạch Triple, Theme Selection, Hidden Piles, Tray Expansion, Milestone và Effect V2 cũ đã hoàn tất hoặc được hợp nhất rồi xóa; không khôi phục chúng từ Git history làm nguồn thực thi. Visual polish Effect V2 chỉ được coi là hoàn tất khi gate visual riêng trong kế hoạch active có bằng chứng hình ảnh và hiệu suất.
+`TASK_RUNTIME_CLOSURE_AND_SIMPLIFICATION_PLAN.md` là kế hoạch active duy nhất. Các kế hoạch Triple, Theme Selection, Hidden Piles, Tray Expansion, Milestone và Effect V2 cũ đã hoàn tất hoặc được hợp nhất rồi xóa; không khôi phục chúng từ Git history làm nguồn thực thi. Effect V2 được coi là hoàn tất khi runtime, lifecycle, cleanup, reduced-motion và ngân sách hiệu suất đạt. Tinh chỉnh hình ảnh từng hiệu ứng là công việc mỹ thuật tùy chọn, thực hiện riêng khi người dùng yêu cầu và không được dùng làm gate hay phần chưa hoàn tất của kế hoạch runtime.
 
 ## 6. Kiến trúc và khả năng mở rộng
 

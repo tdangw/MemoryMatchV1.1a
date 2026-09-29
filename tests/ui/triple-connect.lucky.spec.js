@@ -5,7 +5,7 @@ test("Challenge Lucky rewards once, clears Undo, and persists its claim ledger",
   const result = await page.evaluate(async () => {
     const { startTripleConnectRound } = await import("/js/tripleConnect/tripleController.js");
     const { getActiveSession } = await import("/js/sessionProgress.js");
-    const run = startTripleConnectRound({ mode: "challenge", level: 1, seed: "lucky-ui", skipIntro: true });
+    const run = await startTripleConnectRound({ mode: "challenge", level: 1, seed: "lucky-ui", skipIntro: true });
     const luckyIds = Object.values(run.getState().tiles).flatMap((tile) => tile.lucky ? [tile.lucky.id] : []);
     const commands = run.generated.witness;
     for (const command of commands) {

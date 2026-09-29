@@ -2,6 +2,9 @@ import { TRIPLE_RULES } from "./tripleConfig.js";
 
 const STATUSES = new Set(["playing", "won", "lost", "disposed"]);
 const LOCATIONS = new Set(["board", "tray", "removed"]);
+// A round state is immutable. Cache its derived board view by identity so the
+// reducer, renderer and HUD share one validated visibility calculation.
+const boardViewCache = new WeakMap();
 
 export function createTripleRoundState({ roundId = 1, tiles, coverGraph = {}, cornerStacks = {}, assetPathsByType = {}, trayCapacity = TRIPLE_RULES.trayCapacity } = {}) {
   const normalizedTiles = normalizeTiles(tiles);
@@ -46,7 +49,7 @@ export function getExposedTileIds(state) {
 
 /** Internal solver path: reducer-created states have already crossed validation. */
 export function getExposedTileIdsFromTrustedState(state) {
-  return [...createTripleBoardView(state, false).exposedTileIds];
+  return [...createTripleBoardViewFromTrustedState(state).exposedTileIds];
 }
 
 export function isTripleTileExposed(state, tileId) {
@@ -68,8 +71,15 @@ export function getTriplePileDepth(state, tileId) {
 }
 
 /** Derives pile visibility once per state boundary for render and UI consumers. */
-export function createTripleBoardView(state, validate = true) {
-  if (validate) assertTripleStateInvariant(state);
+export function createTripleBoardView(state) {
+  assertTripleStateInvariant(state);
+  return createTripleBoardViewFromTrustedState(state);
+}
+
+/** Internal runtime path for immutable state produced by validated boundaries. */
+export function createTripleBoardViewFromTrustedState(state) {
+  const cached = boardViewCache.get(state);
+  if (cached) return cached;
   const pileByTileId = new Map();
   const topByPileId = new Map();
   const remainingDepthByPileId = new Map();
@@ -100,7 +110,15 @@ export function createTripleBoardView(state, validate = true) {
       exposedTileIds.add(tile.id);
     }
   }
-  return { pileByTileId, topByPileId, remainingDepthByPileId, visibleTileIds, exposedTileIds };
+  const view = Object.freeze({
+    pileByTileId,
+    topByPileId,
+    remainingDepthByPileId,
+    visibleTileIds,
+    exposedTileIds,
+  });
+  boardViewCache.set(state, view);
+  return view;
 }
 
 export function assertTripleStateInvariant(state) {
@@ -116,6 +134,9 @@ export function assertTripleStateInvariant(state) {
   }
   const trayIds = new Set(state.tray);
   if (trayIds.size !== state.tray.length) throw new TypeError("Triple state tray contains duplicate tile IDs.");
+  if (state.tray.some((tileId) => !tiles[tileId])) {
+    throw new TypeError("Triple state tray contains an unknown tile ID.");
+  }
 
   const locations = { board: 0, tray: 0, removed: 0 };
   const types = new Map();
@@ -189,6 +210,11 @@ export function assertTripleStateInvariant(state) {
 
 export function createTripleStateSnapshot(state) {
   assertTripleStateInvariant(state);
+  return createTripleStateSnapshotFromTrustedState(state);
+}
+
+/** Reducer-only snapshot: the caller has already validated this immutable state. */
+export function createTripleStateSnapshotFromTrustedState(state) {
   return freezeSnapshot({
     roundId: state.roundId,
     status: state.status,

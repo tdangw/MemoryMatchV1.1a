@@ -16,15 +16,17 @@ async function start(page, id) {
     gameState.settings.mode = "easy";
     (await import("/js/gameSelector.js")).openGameMenu(id);
     if (id === "memory-match") (await import("/js/gameController.js")).startNewMemoryRun();
-    else (await import("/js/linkConnect/linkController.js")).startLinkLevel({ mode: "easy" });
+    else if (id === "link-connect") (await import("/js/linkConnect/linkController.js")).startLinkLevel({ mode: "easy" });
+    else await (await import("/js/tripleConnect/tripleController.js")).startTripleConnectRound({ mode: "easy", skipIntro: true });
   }, id);
   await expect(page.locator('[data-shell-region="board"]:visible')).toHaveCount(1);
   await expect.poll(() => page.evaluate(async id => {
     const { getMemoryShell } = await import("/js/memoryMatch/memoryShell.js");
     const { getLinkShell } = await import("/js/linkConnect/linkShell.js");
+    const { getTripleShell } = await import("/js/tripleConnect/tripleShell.js");
     const { getActiveGameScope } = await import("/js/gameShell/gameShellLifecycle.js");
     const { getGameShellDiagnostics } = await import("/js/gameShell/gameShell.js");
-    const shell = id === "memory-match" ? getMemoryShell() : getLinkShell();
+    const shell = id === "memory-match" ? getMemoryShell() : id === "link-connect" ? getLinkShell() : getTripleShell();
     const { root } = shell.refs;
     const activeScope = getActiveGameScope();
     const diagnostics = getGameShellDiagnostics();
@@ -209,16 +211,17 @@ test("disposing an active scope cannot leave its shell visible", async ({ page }
   expect(result).toEqual({ hidden: true, display: "none", active: false, activeShell: null });
 });
 
-test("100 Memory and Link switches leave no active scope or owned resources", async ({ page }) => {
+test("100 Memory, Link and Triple switches leave no active scope or owned resources", async ({ page }) => {
   test.setTimeout(60000);
   const exit = () => page.evaluate(async () => (await import("/js/gameSelector.js")).showGameSelector());
   for (let index = 0; index < 100; index += 1) {
-    const id = index % 2 ? "link-connect" : "memory-match";
+    const id = ["memory-match", "link-connect", "triple-connect"][index % 3];
     await start(page, id);
     const mounted = await page.evaluate(async id => {
       const { getMemoryShell } = await import("/js/memoryMatch/memoryShell.js");
       const { getLinkShell } = await import("/js/linkConnect/linkShell.js");
-      const shell = id === "memory-match" ? getMemoryShell() : getLinkShell();
+      const { getTripleShell } = await import("/js/tripleConnect/tripleShell.js");
+      const shell = id === "memory-match" ? getMemoryShell() : id === "link-connect" ? getLinkShell() : getTripleShell();
       window.stressScope = shell.scope;
       return shell.scope.diagnostics().active;
     }, id);
@@ -237,4 +240,32 @@ test("100 Memory and Link switches leave no active scope or owned resources", as
     });
     expect(released).toEqual({ activeScope: null, inactive: true, resourcesReleased: true });
   }
+});
+
+test("render-performance harness records comparable warm start and idle metrics", async ({ page }, testInfo) => {
+  test.setTimeout(60_000);
+  const samples = [];
+  for (const id of ["memory-match", "link-connect", "triple-connect"]) {
+    const startedAt = await page.evaluate(() => performance.now());
+    await start(page, id);
+    const boardReady = await page.evaluate((startAt) => performance.now() - startAt, startedAt);
+    // Do not charge first paint, image decode, and layout settling to idle.
+    await page.waitForTimeout(300);
+    const frames = await page.evaluate(async () => {
+      const values = []; let previous = performance.now();
+      for (let index = 0; index < 20; index += 1) {
+        await new Promise(requestAnimationFrame);
+        const now = performance.now(); values.push(now - previous); previous = now;
+      }
+      return values.sort((left, right) => left - right);
+    });
+    samples.push({ id, boardReady, idleFrameP95: frames[Math.ceil(frames.length * .95) - 1] });
+    await page.evaluate(async () => (await import("/js/gameSelector.js")).showGameSelector());
+  }
+  await testInfo.attach("render-performance-warm.json", {
+    body: JSON.stringify({ viewport: testInfo.project.use.viewport, samples }, null, 2),
+    contentType: "application/json",
+  });
+  expect(samples.every((sample) => Number.isFinite(sample.boardReady) && sample.boardReady >= 0)).toBe(true);
+  expect(samples.every((sample) => Number.isFinite(sample.idleFrameP95) && sample.idleFrameP95 <= 25)).toBe(true);
 });

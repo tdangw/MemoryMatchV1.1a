@@ -5,7 +5,6 @@ test.beforeEach(async ({ page }) => {
   await page.goto("/");
   await page.locator(".game-selector__choice").filter({ hasText: "Triple Connect" }).click();
 });
-
 async function finishTripleIntro(page, clock = null) {
   const intro = page.locator("#triple-round-start-modal");
   if (!(await intro.count())) return;
@@ -51,11 +50,10 @@ test("Triple start picker shares theme flow and catalog labels", async ({ page }
     "Thử thách",
   ]);
 });
-
 test("Triple continue picker preserves session choice and labels", async ({ page }) => {
   await page.evaluate(async () => {
     const { startTripleConnectRound } = await import("/js/tripleConnect/tripleController.js");
-    startTripleConnectRound({ mode: "normal", level: 3, seed: "chrome-session" });
+    await startTripleConnectRound({ mode: "normal", level: 3, seed: "chrome-session" });
   });
   await finishTripleIntro(page);
   await page.evaluate(async () => {
@@ -76,7 +74,6 @@ test("Triple continue picker preserves session choice and labels", async ({ page
   await page.locator("#collection-modal").getByRole("button", { name: "Đóng" }).click();
   await expect(page.locator("#triple-session-picker-modal .difficulty-option")).toHaveText(["Trung bình - Level 3"]);
 });
-
 test("Triple HUD uses the shared contract and mutually exclusive menus", async ({ page }) => {
   await page.getByText("Bắt đầu", { exact: true }).click();
   await page.getByRole("button", { name: "Dễ" }).click();
@@ -109,7 +106,7 @@ test("Triple uses the shared score and combo feedback", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.evaluate(async () => {
     const { startTripleConnectRound } = await import("/js/tripleConnect/tripleController.js");
-    window.__tripleFeedbackRun = startTripleConnectRound({
+    window.__tripleFeedbackRun = await startTripleConnectRound({
       mode: "easy",
       seed: "shared-score-combo",
       skipIntro: true,
@@ -150,7 +147,7 @@ test("Triple menu, start modal and timer follow the shared round contract", asyn
   const progressBefore = Number(await timerProgress.evaluate((node) =>
     getComputedStyle(node).getPropertyValue("--game-timer-progress"),
   ));
-  await page.waitForTimeout(150);
+  await page.waitForTimeout(300);
   const progressAfter = Number(await timerProgress.evaluate((node) =>
     getComputedStyle(node).getPropertyValue("--game-timer-progress"),
   ));
@@ -166,7 +163,7 @@ test("Triple menu, start modal and timer follow the shared round contract", asyn
 test("Triple Continue resumes without replaying the start modal", async ({ page }) => {
   await page.evaluate(async () => {
     const { startTripleConnectRound } = await import("/js/tripleConnect/tripleController.js");
-    startTripleConnectRound({ mode: "easy", seed: "continue-no-intro" });
+    await startTripleConnectRound({ mode: "easy", seed: "continue-no-intro" });
   });
   await finishTripleIntro(page);
   await page.evaluate(async () => {
@@ -197,4 +194,16 @@ test("Triple timer pauses in the background and resumes from the same timestamp"
   });
   await page.clock.fastForward(1000);
   await expect(timer).toHaveText("01:31");
+  await page.evaluate(() => {
+    Object.defineProperty(document, "hidden", { configurable: true, value: true });
+    document.dispatchEvent(new Event("visibilitychange"));
+  });
+  await page.clock.fastForward(2500);
+  await expect(timer).toHaveText("01:31");
+  await page.evaluate(() => {
+    Object.defineProperty(document, "hidden", { configurable: true, value: false });
+    document.dispatchEvent(new Event("visibilitychange"));
+  });
+  await page.clock.fastForward(1000);
+  await expect(timer).toHaveText("01:30");
 });

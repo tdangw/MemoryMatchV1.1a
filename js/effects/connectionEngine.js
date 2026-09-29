@@ -64,7 +64,7 @@ function ensureSurface(surface) {
 }
 
 function hideMatrixDigits(nodes) {
-  nodes.matrixDigitNodes?.forEach((node) => node.setAttribute("display", "none"));
+  nodes?.matrixDigitNodes?.forEach((node) => node.setAttribute("display", "none"));
 }
 
 function samplePolyline(points, count) {
@@ -93,7 +93,7 @@ function samplePolyline(points, count) {
 }
 
 function hideChainLinks(nodes) {
-  nodes.chainLinkNodes?.forEach((node) => node.setAttribute("display", "none"));
+  nodes?.chainLinkNodes?.forEach((node) => node.setAttribute("display", "none"));
 }
 
 function stopRouteTravelers(nodes) {

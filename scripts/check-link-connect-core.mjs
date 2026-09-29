@@ -104,6 +104,14 @@ assert.equal(LINK_PATH_EFFECTS[0].id, "default");
 assert.equal(LINK_PATH_EFFECTS[0].price, 0);
 assert.equal(LINK_EXIT_EFFECTS[0].id, "default");
 assert.equal(LINK_EXIT_EFFECTS[0].price, 0);
+assert.deepEqual(
+  LINK_PATH_EFFECTS.map(({ id, title }) => [id, title]),
+  [["default", "Default"], ["electric", "Electric"], ["laser", "Laser"], ["fire", "Fire"], ["magic", "Magic"], ["cyber", "Cyber"], ["rainbow", "Rainbow"], ["hydro", "Hydro"], ["plasma", "Plasma"], ["holy", "Holy"], ["shadow", "Shadow"], ["spiral", "Spiral"], ["dashed", "Dashed"], ["bullet", "Bullet"], ["kame", "Kame"], ["halo", "Halo"], ["matrix", "Matrix"], ["sonic", "Sonic"], ["chains", "Chains"], ["meteor", "Meteor"], ["poison", "Poison"]],
+);
+assert.deepEqual(
+  LINK_EXIT_EFFECTS.map(({ id, title }) => [id, title]),
+  [["default", "Default"], ["dissolve", "Dissolve"], ["finedust", "Fine Dust"], ["split4", "Split 4"], ["split2", "Split 2"], ["split8", "Split 8"], ["triangles", "Triangles"], ["crumble", "Crumble"], ["gravity", "Gravity"], ["collide", "Collide"], ["portal", "Portal"], ["blackhole", "Black Hole"], ["freeze", "Freeze"], ["burn", "Burn"], ["pixel", "Pixel"], ["implode", "Implode"], ["slice", "Slice"], ["bubble", "Bubble"], ["origami", "Origami"], ["electric-shock", "Electric Shock"], ["ghost", "Ghost"]],
+);
 assert.equal(normalizeAppearance().linkExitEffect, "default");
 linkGameState.isCompleted = true;
 beginLinkRound({ mode: "easy", level: 1 });

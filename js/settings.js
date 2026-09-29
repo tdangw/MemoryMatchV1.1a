@@ -112,14 +112,15 @@ function showVersionInfo() {
   openAppModal({
     id: "version-modal",
     icon: "info",
-    title: `Phiên bản ${APP_VERSION}`,
+    title: "Giới thiệu & phiên bản",
     content: `
+      <p><strong>Memory Match Adventure</strong> gồm ba trò chơi rèn luyện trí nhớ và quan sát.</p>
       <ul class="app-feature-list">
-        <li>Ba mức độ phù hợp với nhiều cách chơi</li>
-        <li>Hình ảnh được thay đổi ngẫu nhiên sau mỗi màn</li>
-        <li>Gợi ý lật nhanh một cặp thẻ khi cần</li>
-        <li>Chơi thuận tiện trên điện thoại và máy tính</li>
+        <li><strong>Memory Match:</strong> ghép các cặp thẻ giống nhau.</li>
+        <li><strong>Link Connect:</strong> nối các cặp thẻ theo đường đi hợp lệ.</li>
+        <li><strong>Triple Connect:</strong> ghép bộ ba trên bàn nhiều lớp.</li>
       </ul>
+      <p class="app-modal__note">Tác giả: Đăng · Phiên bản ${APP_VERSION}</p>
     `,
   });
 }

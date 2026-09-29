@@ -65,7 +65,6 @@ import {
 } from "./tripleConnect/tripleController.js";
 import {
   TRIPLE_CONNECT_HELP_CONTENT,
-  TRIPLE_CONNECT_INFO_CONTENT,
 } from "./tripleConnect/tripleCopy.js";
 
 document.documentElement.dataset.buildTarget =
@@ -94,7 +93,9 @@ configureGameSelector({
     showCollectionModal({ gameId: "link-connect", onClose }),
   openLinkShop: () =>
     openShopOverlay({ fromMenu: true, gameId: "link-connect" }),
-  startTripleConnect: (mode) => startTripleConnectRound({ mode }),
+  startTripleConnect: (mode) => {
+    void startTripleConnectRound({ mode });
+  },
   continueTripleConnect: (session) => continueTripleConnectSession(session),
   validateTripleSession: isValidTripleConnectSession,
   openTripleCollection: (onClose) =>
@@ -114,13 +115,6 @@ configureTripleConnectController({
       "Cách chơi Triple Connect",
       TRIPLE_CONNECT_HELP_CONTENT,
       "book",
-      onClose,
-    ),
-  showInfo: (onClose) =>
-    showGameInfoModal(
-      "Giới thiệu Triple Connect",
-      TRIPLE_CONNECT_INFO_CONTENT,
-      "info",
       onClose,
     ),
   showReset: () => showResetConfirmationOverlay({}),
@@ -229,14 +223,6 @@ document.getElementById("btn-game-help")?.addEventListener("click", () =>
     "book",
   ),
 );
-document
-  .getElementById("btn-game-info")
-  ?.addEventListener("click", () =>
-    showGameInfoModal(
-      "Giới thiệu",
-      "<p><strong>Memory Match</strong> là trò chơi ghép cặp giúp rèn luyện trí nhớ.</p><p>Chúc bạn có những phút giây thư giãn vui vẻ!</p>",
-    ),
-  );
 document
   .getElementById("btn-restart")
   ?.addEventListener("click", restartMemoryLevel);

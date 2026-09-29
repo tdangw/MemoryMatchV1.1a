@@ -56,9 +56,9 @@ test("Triple production rounds receive fresh seeds while explicit fixture seeds 
     const { gameState } = await import("/js/gameState.js");
     const { startTripleConnectRound, startTripleConnectDevelopmentRound } = await import("/js/tripleConnect/tripleController.js");
 
-    startTripleConnectRound({ mode: "easy", skipIntro: true });
+    await startTripleConnectRound({ mode: "easy", skipIntro: true });
     const productionFirst = structuredClone(gameState.progress.tripleConnect.sessionsByMode.easy);
-    startTripleConnectRound({ mode: "easy", skipIntro: true });
+    await startTripleConnectRound({ mode: "easy", skipIntro: true });
     const productionSecond = structuredClone(gameState.progress.tripleConnect.sessionsByMode.easy);
 
     startTripleConnectDevelopmentRound({ mode: "easy", seed: "stable-visual-fixture" });

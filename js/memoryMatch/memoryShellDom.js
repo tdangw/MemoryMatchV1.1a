@@ -38,7 +38,6 @@ template.innerHTML = `<div id="game-container" class="game-shell-tokens" style="
           <button id="btn-shop" class="game-action-item" type="button" data-icon="shop">Cửa hàng</button>
           <button id="btn-game-collection" class="game-action-item" type="button" data-icon="collection">Bộ sưu tập</button>
           <button id="btn-game-help" class="game-action-item" type="button" data-icon="book">Hướng dẫn</button>
-          <button id="btn-game-info" class="game-action-item" type="button" data-icon="info">Thông tin</button>
           <button id="btn-full-reset" class="game-action-item" type="button" data-icon="wand">Xóa dữ liệu</button>
         </div>
 

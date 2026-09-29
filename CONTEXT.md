@@ -1,4 +1,4 @@
-# CONTEXT — Trạng thái hiện tại (2026-09-28)
+# CONTEXT — Trạng thái hiện tại (2026-09-29)
 
 Đọc file này khi bắt đầu task mới. Đây là snapshot điều hướng, không thay thế code/config và không chứa lịch sử triển khai chi tiết.
 
@@ -8,7 +8,7 @@
 - Sản phẩm chưa phát hành. Chính sách active là một root save format hiện hành, không migration chain; save development cũ thiếu/sai version hoặc hỏng được reset về mặc định an toàn.
 - Ba game có trong runtime/menu: Memory Match, Link Connect và Triple Connect.
 - Memory Match, Link Connect và Triple Connect dùng Game Shell chung; state/session gameplay vẫn tách theo game và mode.
-- Runtime Closure đã hoàn tất. Không còn kế hoạch runtime active; visual polish 21 line effect là hạng mục mỹ thuật tách riêng theo quyết định sản phẩm.
+- Runtime Closure và Render Performance Closure đã hoàn tất ở phạm vi runtime: validation boundary Triple, scheduler HUD chung, benchmark/soak ba game và review closure đều có evidence trong `TASK_RUNTIME_CLOSURE_AND_SIMPLIFICATION_PLAN.md`. Không khôi phục kế hoạch runtime cũ từ Git history. Effect V2 runtime đã đạt; tinh chỉnh hình ảnh 21 line effect là việc tùy chọn tách riêng, không phải gate hay nội dung chưa hoàn tất.
 - Hidden Piles, Tray Expansion, Milestone 10/30 và Effect V2 runtime đã được triển khai.
 - Review gần nhất: `npm run check` pass, production build pass, smoke UI pass và release matrix 368 case đã chạy sau khi đóng các contract test stale.
 - Mục tiêu hiện tại là hoàn thiện trải nghiệm web desktop/mobile. PWA/APK/Android/signing/store QA chỉ bắt đầu bằng task riêng sau khi người dùng xác nhận web ổn định.
@@ -31,7 +31,7 @@
 - Milestone version 2 có 10 mốc, step 3, target 30. Lucky chỉ có trong Challenge.
 - Challenge level 1–7 có tổng thẻ `18/27/42/51/66/75/93`; stage có xấp cũng dùng topology corner-safe mới.
 - Profile responsive bắt buộc khi thay layout/presentation: desktop 1024×900, mobile 390×844, mobile hẹp 320×568 và landscape 844×390; geometry test còn có các viewport gameplay cụ thể.
-- Effect V2 runtime có pool/cleanup/reduced-motion cho Link 2-target và Triple 3-target. Chất lượng hình ảnh từng line effect là task mỹ thuật riêng.
+- Effect V2 runtime đã hoàn tất với pool/cleanup/reduced-motion cho Link 2-target và Triple 3-target. Chỉ mở task mỹ thuật cho từng hiệu ứng khi người dùng yêu cầu; không nhắc lại như thiếu sót runtime.
 - Triple tính mục tiêu sao theo số bộ thẻ và chỉ cộng time bonus một lần khi kết thúc màn timed.
 
 ## Theme selection hiện tại
@@ -53,7 +53,7 @@
 - `Memory Match.md`, `Link Connect.md`, `Triple Connect.md`: luật/thiết kế từng game.
 - `themes.md`: catalog/chất lượng asset chủ đề.
 
-Các kế hoạch Triple/Effect/Theme và Runtime Closure cũ đã được hợp nhất hoặc hoàn tất và bị xóa. Không khôi phục chúng từ Git history làm nguồn triển khai; dùng code/config và tài liệu bền vững ở trên.
+Các kế hoạch Triple/Effect/Theme và Runtime Closure cũ đã được hợp nhất hoặc hoàn tất và bị xóa. Không khôi phục chúng từ Git history làm nguồn triển khai. `TASK_RUNTIME_CLOSURE_AND_SIMPLIFICATION_PLAN.md` là kế hoạch active duy nhất cho follow-up hiệu suất F1–F4 và gate visual hoãn; dùng code/config và tài liệu bền vững làm nguồn hiện hành.
 
 ## Quy tắc bàn giao
 

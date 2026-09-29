@@ -109,16 +109,16 @@ export const LINK_CONNECT_CONFIG = Object.freeze({
 });
 
 export const LINK_SPECIAL_MILESTONE_TOOLTIPS = Object.freeze({
-  1: "Phá hủy ngẫu nhiên 1 cặp thường.",
-  2: "Nhận +5 Xu.",
-  3: "Phá hủy ngẫu nhiên 1 cặp thường.",
-  4: "Nhận +2–4 giây.",
-  5: "Nhận ngẫu nhiên 1 Gợi ý hoặc 1 Xáo trộn.",
-  6: "Mở 1 cặp băng; nếu hết băng nhận +5 Xu.",
-  7: "Nhận +2–5 giây và +10 Xu.",
-  8: "Nhận +1 Đóng băng thời gian; Vô tận nhận +1 Xáo trộn.",
-  9: "Phá 1 cặp thường và nhận 1 Gợi ý.",
-  10: "Phá 1 cặp thường, +10 Xu, +1 Xáo trộn, +1 Gợi ý.",
+  1: "Phá ngẫu nhiên 1 cặp thường.",
+  2: "+5 Xu.",
+  3: "Phá ngẫu nhiên 1 cặp thường.",
+  4: "+2–4 giây.",
+  5: "+1 Gợi ý hoặc +1 Xáo trộn ngẫu nhiên.",
+  6: "Mở 1 cặp băng hoặc +5 Xu.",
+  7: "+2–5 giây · +10 Xu.",
+  8: "+1 Đóng băng thời gian; Vô tận: +1 Xáo trộn.",
+  9: "Phá 1 cặp thường · +1 Gợi ý.",
+  10: "Phá 1 cặp thường · +10 Xu · +1 Xáo trộn · +1 Gợi ý.",
 });
 
 export function getLinkSpecialMilestoneTooltip(milestone) {

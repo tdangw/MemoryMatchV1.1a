@@ -30,6 +30,36 @@ body {
   background-size: cover;
 }
 
+html[data-active-game="memory-match"] body {
+  background-image: url("/assets/images/backgrounds/memory-match.webp");
+}
+
+html[data-active-game="link-connect"] body {
+  background-image: url("/assets/images/backgrounds/link-connect.webp");
+}
+
+html[data-active-game="triple-connect"] body {
+  background-image: url("/assets/images/backgrounds/triple-connect.webp");
+}
+
+@media (orientation: portrait) {
+  body {
+    background-image: url("/assets/images/background-main-portrait.webp");
+  }
+
+  html[data-active-game="memory-match"] body {
+    background-image: url("/assets/images/backgrounds/memory-match-portrait-9x20.webp");
+  }
+
+  html[data-active-game="link-connect"] body {
+    background-image: url("/assets/images/backgrounds/link-connect-portrait-9x20.webp");
+  }
+
+  html[data-active-game="triple-connect"] body {
+    background-image: url("/assets/images/backgrounds/triple-connect-portrait-9x20.webp");
+  }
+}
+
 html[data-build-target="android"] body {
   background-attachment: scroll;
 }

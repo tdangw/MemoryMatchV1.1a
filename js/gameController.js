@@ -53,6 +53,7 @@ import { getActiveSession } from "./sessionProgress.js";
 import { getTheme, getThemeSelectionEligibility } from "./themeCatalog.js";
 import { showAppToast } from "./modal.js";
 import { configureLogic, resetLogicRuntime } from "./logic.js";
+import { restartMemoryTileAnimation } from "./memoryMatch/tileAnimation.js";
 import { GAMEPLAY_TIMING } from "./gameplayTuning.js";
 import { TIME_UP_PURCHASES } from "./shopCatalog.js";
 import { resolveSessionTiming } from "./sessionTiming.js";
@@ -285,6 +286,9 @@ function handleTimeUp() {
       showBonusOverlay("Không thể lưu giao dịch. Xu và thời gian chưa thay đổi.");
       return true;
     }
+    // Đồng bộ HUD trước khi đóng modal: nếu không, số Xu cũ có thể lưu lại
+    // đến tận lần nhận thưởng tiếp theo dù giao dịch đã được lưu thành công.
+    updateCoinDisplay(gameState.coins);
     actionSelected = true;
     const roundId = beginRound();
     gameState.isLocked = false;
@@ -425,13 +429,12 @@ function revealHintPair(tiles, roundId) {
   tiles.forEach((tile) => {
     const image = tile.querySelector("img");
     if (image) {
-      image.classList.remove("hidden", "appear-bounce");
-      void image.offsetWidth;
-      image.classList.add("appear-bounce");
-      setTimeout(
-        () => image.classList.remove("appear-bounce"),
-        GAMEPLAY_TIMING.tileRevealAnimationMs,
-      );
+      image.classList.remove("hidden");
+      restartMemoryTileAnimation(image, {
+        remove: ["appear-bounce"],
+        animationClass: "appear-bounce",
+        durationMs: GAMEPLAY_TIMING.tileRevealAnimationMs,
+      });
     }
     tile.classList.add("hint-reveal");
   });
@@ -442,13 +445,14 @@ function revealHintPair(tiles, roundId) {
     tiles.forEach((tile) => {
       const image = tile.querySelector("img");
       if (!tile.classList.contains("matched") && image) {
-        image.classList.remove("appear-bounce", "hide-fade-scale");
-        void image.offsetWidth;
-        image.classList.add("hide-fade-scale");
-        setTimeout(() => {
-          if (gameState.roundId === roundId) image.classList.add("hidden");
-          image.classList.remove("hide-fade-scale");
-        }, GAMEPLAY_TIMING.tileHideAnimationMs);
+        restartMemoryTileAnimation(image, {
+          remove: ["appear-bounce", "hide-fade-scale"],
+          animationClass: "hide-fade-scale",
+          durationMs: GAMEPLAY_TIMING.tileHideAnimationMs,
+          onFinish: () => {
+            if (gameState.roundId === roundId) image.classList.add("hidden");
+          },
+        });
       }
       tile.classList.remove("hint-reveal");
     });

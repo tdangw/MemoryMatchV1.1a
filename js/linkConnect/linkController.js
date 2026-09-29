@@ -1,9 +1,10 @@
 import { getLinkShell, getLinkHud, getLinkHudElements, bindLinkControls, applyLinkTimingStyles } from "./linkShell.js";
 import { setHudText, renderHudTimer } from "../gameShell/gameShellHud.js";
-import { shellTimeout as setTimeout, clearShellTimeout as clearTimeout, shellInterval as setInterval, clearShellInterval as clearInterval, shellFrame as requestAnimationFrame, cancelShellFrame as cancelAnimationFrame } from "../gameShell/gameShellLifecycle.js";
+import { shellTimeout as setTimeout, clearShellTimeout as clearTimeout, shellInterval as setInterval, clearShellInterval as clearInterval } from "../gameShell/gameShellLifecycle.js";
 import { createIcon } from "../icons.js";
 import { unmountActiveGameShell } from "../gameShell/gameShell.js";
 import { GAME_SHELL_DEFAULTS } from "../gameShell/gameShellConfig.js";
+import { createHudTimerScheduler } from "../gameShell/gameTimerProgress.js";
 import { getCompactLandscapeColumns } from "../gameShell/gameShellLayout.js";
 import { clearTooltip } from "../tooltips.js";
 import { clearLootEffects } from "../lootEffects.js";
@@ -78,6 +79,7 @@ import {
 import {
   clearGameplayRewardPopups,
   openTimeUpModal,
+  updateCoinDisplay,
   showComboEffect,
   showLevelRewardOverlay,
   showLevelSummaryOverlay,
@@ -114,7 +116,10 @@ import {
 } from "victory-presentation";
 
 let countdownInterval;
-let linkTimeAnimationFrame = null;
+const linkTimeScheduler = createHudTimerScheduler({
+  schedule: (callback) => setTimeout(callback, 250),
+  cancel: clearTimeout,
+});
 let linkTimeProgressState = null;
 let comboExpiryTimer;
 let selectedPosition = null;
@@ -849,6 +854,8 @@ function handleLinkTimeUp() {
       showAppToast("Không thể lưu giao dịch. Xu và thời gian chưa thay đổi.");
       return true;
     }
+    updateCoinDisplay(gameState.coins);
+    updateLinkCoinHud();
     actionSelected = true;
     syncLinkTimeProgress();
     linkTimeWarningPlayed = false;
@@ -956,8 +963,7 @@ function setLinkTimeProgress(running, roundId = linkGameState.roundId, hud = get
   };
   renderLinkTimeProgress(linkTimeProgressState.remainingMs, linkTimeProgressState, hud);
   if (!linkTimeProgressState.running) return;
-  linkTimeProgressState.lastFrameAt = performance.now();
-  linkTimeAnimationFrame = requestAnimationFrame(updateLinkTimeProgressFrame);
+  linkTimeScheduler.start(updateLinkTimeProgressFrame);
 }
 
 function startLinkTimeProgress(roundId) {
@@ -972,40 +978,39 @@ function syncLinkTimeProgress() {
     * GAMEPLAY_TIMING.secondMs;
   linkTimeProgressState.lastFrameAt = performance.now();
   renderLinkTimeProgress(linkTimeProgressState.remainingMs, linkTimeProgressState);
+  if (linkTimeProgressState.running && !linkGameState.isPaused
+    && linkGameState.freezeSeconds <= 0 && !linkTimeScheduler.active) {
+    linkTimeScheduler.start(updateLinkTimeProgressFrame);
+  }
 }
 
-function updateLinkTimeProgressFrame(timestamp) {
+function updateLinkTimeProgressFrame(elapsed = 0) {
   const state = linkTimeProgressState;
   if (!state?.running || state.roundId !== linkGameState.roundId) return;
   // Freeze giữ nguyên thanh thời gian và không để requestAnimationFrame chạy nền.
   if (linkGameState.freezeSeconds > 0) {
-    linkTimeAnimationFrame = null;
-    return;
+    return false;
   }
-  const elapsed = Math.max(0, timestamp - (state.lastFrameAt ?? timestamp));
-  state.lastFrameAt = timestamp;
   if (!linkGameState.isPaused && linkGameState.freezeSeconds <= 0) {
     state.remainingMs = Math.max(0, state.remainingMs - elapsed);
   }
   renderLinkTimeProgress(state.remainingMs, state);
   if (state.remainingMs > 0) {
-    linkTimeAnimationFrame = requestAnimationFrame(updateLinkTimeProgressFrame);
+    return !linkGameState.isPaused;
   } else {
-    linkTimeAnimationFrame = null;
     state.running = false;
+    return false;
   }
 }
 
 function pauseLinkTimeProgressForFreeze() {
-  if (linkTimeAnimationFrame !== null) cancelAnimationFrame(linkTimeAnimationFrame);
-  linkTimeAnimationFrame = null;
+  linkTimeScheduler.pause();
 }
 
 function resumeLinkTimeProgressAfterFreeze() {
   const state = linkTimeProgressState;
-  if (!state?.running || state.roundId !== linkGameState.roundId || linkGameState.isPaused || linkTimeAnimationFrame !== null) return;
-  state.lastFrameAt = performance.now();
-  linkTimeAnimationFrame = requestAnimationFrame(updateLinkTimeProgressFrame);
+  if (!state?.running || state.roundId !== linkGameState.roundId || linkGameState.isPaused || linkTimeScheduler.active) return;
+  linkTimeScheduler.start(updateLinkTimeProgressFrame);
 }
 
 function renderLinkTimeProgress(remainingMs, state, hud = getLinkHudElements()) {
@@ -1014,8 +1019,7 @@ function renderLinkTimeProgress(remainingMs, state, hud = getLinkHudElements()) 
 }
 
 function stopLinkTimeProgress() {
-  if (linkTimeAnimationFrame !== null) cancelAnimationFrame(linkTimeAnimationFrame);
-  linkTimeAnimationFrame = null;
+  linkTimeScheduler.stop();
   if (linkTimeProgressState) linkTimeProgressState.running = false;
 }
 

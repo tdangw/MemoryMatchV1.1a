@@ -5,7 +5,6 @@ import { showSettingsPanel } from "./settings.js";
 import { gameState, resetGame } from "./gameState.js";
 import { openAppModal, showAppToast } from "./modal.js";
 import { createIcon } from "./icons.js";
-import { APP_VERSION } from "./appMeta.js";
 import { THEMES, getTheme, isThemePlayable } from "./themeCatalog.js";
 import { saveAppearance } from "./persistence.js";
 import { openShopOverlay } from "./shop.js";
@@ -138,18 +137,6 @@ export function createMainMenu() {
       text: "Cài đặt",
       action: () => {
         showSettingsPanel();
-      },
-    },
-    {
-      icon: "info",
-      text: "Thông tin",
-      action: () => {
-        showInfoModal(
-          "Giới thiệu",
-          `<p><strong>Memory Match</strong> là trò chơi ghép cặp giúp rèn luyện trí nhớ.</p>
-           <p>Chúc bạn có những phút giây thư giãn vui vẻ!</p>
-           <p class="app-modal__note">Tác giả: Đăng · Phiên bản ${APP_VERSION}</p>`,
-        );
       },
     },
     {
@@ -589,8 +576,13 @@ function renderCollectionAppearanceGroup(grid, title, type, items) {
         button.classList.add("appearance-action--equip");
         button.textContent = "Trang bị";
         button.onclick = () => {
+          const previousId = gameState.appearance[type];
           gameState.appearance[type] = item.id;
-          saveAppearance(gameState.appearance);
+          if (!saveAppearance(gameState.appearance)) {
+            gameState.appearance[type] = previousId;
+            showAppToast("Không thể lưu thay đổi ngoại hình.", { tone: "error" });
+            return;
+          }
           if (type === "cardBack") applyCollectionCardBack();
           grid.replaceChildren();
           renderCollectionAppearanceGroup(

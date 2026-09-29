@@ -7,7 +7,7 @@ async function startRound(page, seed) {
     const { startTripleConnectRound } = await import("/js/tripleConnect/tripleController.js");
     gameState.coins = 0;
     gameState.progress.tripleConnect.milestones = { version: 2, progress: 0, cycleId: 0, claimedIds: [] };
-    window.__tripleMilestoneRun = startTripleConnectRound({ mode: "easy", seed: roundSeed, skipIntro: true });
+    window.__tripleMilestoneRun = await startTripleConnectRound({ mode: "easy", seed: roundSeed, skipIntro: true });
   }, { roundSeed: seed });
 }
 
@@ -28,7 +28,7 @@ test("Triple milestone HUD has the shared accessible track in every viewport", a
   } else {
     await expect(region).toBeVisible();
     await expect(region.locator("[data-triple-milestone]")).toHaveCount(10);
-    await expect(region.locator('[data-triple-milestone="1"]')).toHaveAttribute("aria-label", "Bộ 3 thẻ: +2 Xu");
+    await expect(region.locator('[data-triple-milestone="1"]')).toHaveAttribute("aria-label", "+2 Xu");
     const bounds = await region.boundingBox();
     const viewport = page.viewportSize();
     expect(bounds?.x || 0).toBeGreaterThanOrEqual(0);

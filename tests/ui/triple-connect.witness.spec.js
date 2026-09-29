@@ -6,7 +6,7 @@ async function startWitnessRound(page, { mode, level = 1, seed }) {
     const { startTripleConnectRound } = await import(
       "/js/tripleConnect/tripleController.js"
     );
-    window.__tripleWitnessRun = startTripleConnectRound({
+    window.__tripleWitnessRun = await startTripleConnectRound({
       ...options,
       skipIntro: true,
     });

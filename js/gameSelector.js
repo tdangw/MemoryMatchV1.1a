@@ -21,8 +21,8 @@ import { createThemeSummary, UI_TIMING } from "./uiCatalog.js";
 import { LINK_CONNECT_HELP_CONTENT } from "./linkConnect/linkConfig.js";
 import {
   TRIPLE_CONNECT_HELP_CONTENT,
-  TRIPLE_CONNECT_INFO_CONTENT,
 } from "./tripleConnect/tripleCopy.js";
+import { cancelPendingTripleGeneration } from "./tripleConnect/tripleController.js";
 
 let activeGameId = null;
 let onStartLinkConnect = () => {};
@@ -58,6 +58,7 @@ export function configureGameSelector({
 }
 
 export function showGameSelector() {
+  cancelPendingTripleGeneration();
   unmountActiveGameShell();
   activeGameId = null;
   document.documentElement.dataset.activeGame = "selector";
@@ -89,6 +90,7 @@ export function showGameSelector() {
 export function openGameMenu(gameId) {
   const navigation = getGameNavigation(gameId);
   if (!navigation) return false;
+  cancelPendingTripleGeneration();
   unmountActiveGameShell();
   activeGameId = gameId;
   document.documentElement.dataset.activeGame = gameId;
@@ -155,15 +157,6 @@ function createLinkConnectMenu() {
       onClick: () => showSettingsPanel(),
     }),
     createMenuItem({
-      icon: "info",
-      text: "Thông tin",
-      onClick: () =>
-        showGameInfoModal(
-          "Giới thiệu",
-          "<p><strong>Link Connect</strong> là trò chơi nối cặp hình giúp rèn luyện khả năng quan sát.</p>",
-        ),
-    }),
-    createMenuItem({
       icon: "home",
       text: "Home",
       onClick: showGameSelector,
@@ -221,12 +214,6 @@ function createTripleConnectMenu() {
       icon: "settings",
       text: "Cài đặt",
       onClick: () => showSettingsPanel(),
-    }),
-    createMenuItem({
-      icon: "info",
-      text: "Thông tin",
-      onClick: () =>
-        showGameInfoModal("Giới thiệu Triple Connect", TRIPLE_CONNECT_INFO_CONTENT),
     }),
     createMenuItem({ icon: "home", text: "Home", onClick: showGameSelector }),
   );

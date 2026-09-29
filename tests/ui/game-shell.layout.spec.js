@@ -16,6 +16,26 @@ test.beforeEach(async ({ page }) => {
   await expect(page.locator(".game-selector__choice").first()).toBeVisible();
 });
 
+test("game backgrounds use portrait assets only in portrait orientation", async ({ page }) => {
+  const portrait = await page.evaluate(() => matchMedia("(orientation: portrait)").matches);
+  const menuBackgroundImage = await page.evaluate(() => {
+    delete document.documentElement.dataset.activeGame;
+    return getComputedStyle(document.body).backgroundImage;
+  });
+  expect(menuBackgroundImage).toContain(
+    portrait ? "background-main-portrait.webp" : "background-main.webp",
+  );
+  for (const gameId of ["memory-match", "link-connect", "triple-connect"]) {
+    const backgroundImage = await page.evaluate((id) => {
+      document.documentElement.dataset.activeGame = id;
+      return getComputedStyle(document.body).backgroundImage;
+    }, gameId);
+    expect(backgroundImage).toContain(
+      portrait ? `${gameId}-portrait-9x20.webp` : `${gameId}.webp`,
+    );
+  }
+});
+
 async function start(page, game, mode, coordinates = false, level = 1) {
   await page.evaluate(async ({ id, mode, coordinates, level }) => {
     const { gameState } = await import("/js/gameState.js");

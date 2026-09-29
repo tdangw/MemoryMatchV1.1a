@@ -6,7 +6,6 @@ import { showComboEffect, showScoreEffectAt } from "../ui.js";
 const MATCH_DURATION_MS = 300;
 const TRAY_FLIGHT_DURATION_MS = 300;
 const TRAY_COMPACTION_DURATION_MS = 210;
-const REDUCED_TRAY_ARRIVAL_MS = 60;
 let activeMatchCleanup = null;
 
 export function presentTripleTransition({ shell, scope, previous, next, events, effects = {}, render, isCurrent = () => true }) {
@@ -213,8 +212,6 @@ function presentMilestoneSequence({ shell, scope, source, milestones = [] }) {
   const track = shell.refs.root.querySelector("[data-triple-milestone-track]");
   const marker = shell.refs.root.querySelector(`[data-triple-milestone="${milestone.milestone}"]`);
   if (prefersReducedMotion()) {
-    marker?.classList.add("is-milestone-pulse");
-    scope.timeout(() => marker?.classList.remove("is-milestone-pulse"), 90);
     return Promise.resolve();
   }
   return new Promise((resolve) => {
@@ -303,8 +300,6 @@ function presentTrayFlight({ shell, scope, selected, render, next }) {
   const target = shell.refs.root.querySelector(`.triple-connect__tray [data-tile-id="${selected.tileId}"]`)
     || shell.refs.root.querySelector(`[data-tile-id="${selected.tileId}"]`);
   if (!target || prefersReducedMotion()) {
-    target?.classList.add("is-tray-arrived");
-    scope.timeout(() => target?.classList.remove("is-tray-arrived"), REDUCED_TRAY_ARRIVAL_MS);
     return Promise.resolve();
   }
   const targetRect = target.getBoundingClientRect();

@@ -43,7 +43,7 @@ test("production Triple Connect keeps interaction, DOM, long-task and heap budge
   const feedback = [];
   const patches = [];
   const longTasks = [];
-  for (let index = 0; index < 20; index += 1) {
+  for (let index = 0; index < 30; index += 1) {
     await page.evaluate(async () => {
       await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
       window.__tripleLongTasks = [];

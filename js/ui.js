@@ -24,6 +24,7 @@ import {
 } from "./coinRewards.js";
 import { getMemoryItemTotal } from "./memoryItems.js";
 import { getActiveGameScope } from "./gameShell/gameShellLifecycle.js";
+import { createHudTimerScheduler } from "./gameShell/gameTimerProgress.js";
 
 const scoreElement = document.getElementById("score");
 const timerElement = document.getElementById("timer-value");
@@ -31,7 +32,7 @@ const timerContainer = document.getElementById("timer");
 const gameHudElement = document.getElementById("game-title");
 const memoryCoinHudElement = document.getElementById("memory-game-coins");
 const memoryCoinElement = document.getElementById("memory-coin-balance");
-let memoryTimeAnimationFrame = null;
+const memoryTimeScheduler = createHudTimerScheduler();
 let memoryTimeProgressState = null;
 const rewardPopupQueue = [];
 let rewardPopupActive = false;
@@ -42,7 +43,9 @@ let revealTimerInterval = null;
 let revealTimerRoundId = null;
 
 export function updateCoinDisplay(coins) {
-  setHudText(document.getElementById("coin-balance"), coins);
+  document
+    .querySelectorAll("#coin-balance, [data-shop-coin-balance]")
+    .forEach((element) => setHudText(element, coins));
   getMemoryHud().coins(coins, { animating: isCoinCounterAnimating(memoryCoinElement) });
 }
 
@@ -134,8 +137,7 @@ export function startMemoryTimeProgress({ remainingSeconds, timeLimit }) {
     renderMemoryTimeProgress(memoryTimeProgressState.remainingMs, memoryTimeProgressState);
     return;
   }
-  memoryTimeProgressState.lastFrameAt = performance.now();
-  updateMemoryTimeProgressFrame();
+  memoryTimeScheduler.start(updateMemoryTimeProgressFrame);
 }
 
 export function syncMemoryTimeProgress({ remainingSeconds, timeLimit }) {
@@ -145,8 +147,7 @@ export function syncMemoryTimeProgress({ remainingSeconds, timeLimit }) {
 }
 
 export function stopMemoryTimeProgress() {
-  if (memoryTimeAnimationFrame !== null) cancelAnimationFrame(memoryTimeAnimationFrame);
-  memoryTimeAnimationFrame = null;
+  memoryTimeScheduler.stop();
   if (!memoryTimeProgressState) return;
   memoryTimeProgressState.running = false;
   renderMemoryTimeProgress(memoryTimeProgressState.remainingMs, memoryTimeProgressState);
@@ -163,20 +164,20 @@ function createMemoryTimeProgressState({ remainingSeconds, timeLimit, running })
   };
 }
 
-function updateMemoryTimeProgressFrame(timestamp = performance.now()) {
+function updateMemoryTimeProgressFrame(elapsed = 0) {
   if (!memoryTimeProgressState?.running || memoryTimeProgressState.endless) return;
-  const elapsed = Math.max(0, timestamp - (memoryTimeProgressState.lastFrameAt ?? timestamp));
-  memoryTimeProgressState.lastFrameAt = timestamp;
   // Giữ timer bar đồng bộ với đồng hồ: animation xử lý thẻ không phải trạng thái pause.
   if (!gameState.isPaused) {
     memoryTimeProgressState.remainingMs = Math.max(0, memoryTimeProgressState.remainingMs - elapsed);
+  } else {
+    return false;
   }
   renderMemoryTimeProgress(memoryTimeProgressState.remainingMs, memoryTimeProgressState);
   if (memoryTimeProgressState.remainingMs > 0) {
-    memoryTimeAnimationFrame = requestAnimationFrame(updateMemoryTimeProgressFrame);
+    return true;
   } else {
-    memoryTimeAnimationFrame = null;
     memoryTimeProgressState.running = false;
+    return false;
   }
 }
 

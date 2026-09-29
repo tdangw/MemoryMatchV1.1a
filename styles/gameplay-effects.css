@@ -26,6 +26,53 @@
   background: linear-gradient(135deg, #ff6b9c, #9a67e7 48%, #5ac8e9);
 }
 
+.card-back--moon-mountain,
+.card-back--moonlit-garden,
+.card-back--starlight-path,
+.card-back--crystal-triad,
+.card-back--lunar-pair,
+.card-back--azure-link,
+.card-back--crystal-trio-light {
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
+.card-back--moon-mountain {
+  background-color: #050505;
+  background-image: url("/assets/images/card-backs/moon-mountain.webp");
+}
+
+.card-back--moonlit-garden {
+  background-color: #050b15;
+  background-image: url("/assets/images/card-backs/moonlit-garden.webp");
+}
+
+.card-back--starlight-path {
+  background-color: #071632;
+  background-image: url("/assets/images/card-backs/starlight-path.webp");
+}
+
+.card-back--crystal-triad {
+  background-color: #17102f;
+  background-image: url("/assets/images/card-backs/crystal-triad.webp");
+}
+
+.card-back--lunar-pair {
+  background-color: #f4f0e7;
+  background-image: url("/assets/images/card-backs/lunar-pair.webp");
+}
+
+.card-back--azure-link {
+  background-color: #e6f2fa;
+  background-image: url("/assets/images/card-backs/azure-link.webp");
+}
+
+.card-back--crystal-trio-light {
+  background-color: #eee8f7;
+  background-image: url("/assets/images/card-backs/crystal-trio-light.webp");
+}
+
 .tile-combo-effect,
 .tile-score-effect {
   position: fixed;

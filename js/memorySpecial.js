@@ -82,7 +82,10 @@ function grantMemoryReward(reward, source, roundId) {
   if (reward.type === "coins") {
     const before = gameState.coins;
     const after = increaseCoins(reward.value);
-    persistMemoryRewards({ coins: after });
+    if (!persistMemoryRewards({ coins: after })) {
+      gameState.coins = before;
+      return;
+    }
     updateCoinDisplay(after);
     showMemoryCoinReward(source, before, after, reward.value);
     return;

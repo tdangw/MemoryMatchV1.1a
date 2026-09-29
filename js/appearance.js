@@ -44,6 +44,48 @@ export const CARD_BACKS = Object.freeze([
     price: 220,
     previewClass: "card-back--candy",
   },
+  {
+    id: "moon-mountain",
+    title: "Nguyệt Sơn",
+    price: 260,
+    previewClass: "card-back--moon-mountain",
+  },
+  {
+    id: "moonlit-garden",
+    title: "Nguyệt Viên",
+    price: 280,
+    previewClass: "card-back--moonlit-garden",
+  },
+  {
+    id: "starlight-path",
+    title: "Tinh Lộ",
+    price: 300,
+    previewClass: "card-back--starlight-path",
+  },
+  {
+    id: "crystal-triad",
+    title: "Tam Tinh",
+    price: 320,
+    previewClass: "card-back--crystal-triad",
+  },
+  {
+    id: "lunar-pair",
+    title: "Song Nguyệt",
+    price: 340,
+    previewClass: "card-back--lunar-pair",
+  },
+  {
+    id: "azure-link",
+    title: "Lam Tuyến",
+    price: 360,
+    previewClass: "card-back--azure-link",
+  },
+  {
+    id: "crystal-trio-light",
+    title: "Tam Quang",
+    price: 380,
+    previewClass: "card-back--crystal-trio-light",
+  },
 ]);
 
 export const FLIP_EFFECTS = Object.freeze([
