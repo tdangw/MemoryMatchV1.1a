@@ -30,7 +30,9 @@ export function playCanvasExit({ frame, tiles, exitId, quality, diagnostics } = 
     if (frameId) cancelShellFrame(frameId);
     frameId = null;
     surface.context.clearRect(0, 0, rect.width, rect.height);
-    tiles.forEach(tile => tile.classList.remove("has-canvas-exit"));
+    // Keep the source image hidden until the match owner removes its tile.
+    // Removing this class when the canvas finishes would restart the base
+    // exit animation at opacity 1 during the resolve gap, producing a flash.
     if (entry === nextEntry) entry = null;
   });
   if (!nextEntry) { tiles.forEach(tile => tile.classList.remove("has-canvas-exit")); return false; }

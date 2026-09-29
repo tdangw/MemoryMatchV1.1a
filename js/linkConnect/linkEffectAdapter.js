@@ -10,7 +10,12 @@ export function presentLinkConnection({ surface, points, appearance, seed }) {
 
 export function presentLinkExit({ frame, tiles, appearance }) {
   const effect = getActiveLinkConnectionEffect(appearance);
-  tiles.forEach(tile => tile.classList.add("is-removing", effect.exitClass));
+  const pathPreset = getEffectV2Path(effect.pathId);
+  tiles.forEach((tile) => {
+    tile.classList.add("is-removing", effect.exitClass);
+    if (pathPreset.impactDelayMs == null) tile.style.removeProperty("--link-tile-exit-delay");
+    else tile.style.setProperty("--link-tile-exit-delay", `${pathPreset.impactDelayMs}ms`);
+  });
   if (["blackhole", "collide"].includes(effect.exitId) && tiles.length === 2) {
     const centers = tiles.map(tile => { const rect = tile.getBoundingClientRect(); return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 }; });
     const center = { x: (centers[0].x + centers[1].x) / 2, y: (centers[0].y + centers[1].y) / 2 };

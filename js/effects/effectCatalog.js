@@ -1,7 +1,7 @@
 import { LINK_EXIT_EFFECTS, LINK_PATH_EFFECTS } from "../linkConnect/linkEffects.js";
 
 const PATH_FAMILIES = Object.freeze({
-  default: "tracer", electric: "jagged", laser: "dual-stroke", fire: "sparks", magic: "symbols",
+  default: "tracer", electric: "jagged", laser: "dual-stroke", fire: "jagged", magic: "symbols",
   cyber: "packets", rainbow: "gradient", hydro: "wave", plasma: "helix", holy: "motes",
   shadow: "ribbon", spiral: "helix", dashed: "dash", bullet: "projectile", kame: "charge",
   halo: "rings", matrix: "symbols", sonic: "wavelets", chains: "links", meteor: "sparks", poison: "droplets",
@@ -13,19 +13,25 @@ const EXIT_FAMILIES = Object.freeze({
   slice: "fragments", bubble: "droplets", origami: "fold", "electric-shock": "shock", ghost: "ghost",
 });
 
-function makeEntry(effect, family, duration, qualityCost, supportsTargetCounts) {
+function makeEntry(effect, family, duration, qualityCost, supportsTargetCounts, impactDelayMs = null) {
   return Object.freeze({
     ...effect,
     family,
     duration,
     qualityCost,
+    impactDelayMs,
     supportsTargetCounts: Object.freeze(supportsTargetCounts),
     reducedPreset: Object.freeze({ duration: 150, family: "reduced-fade" }),
   });
 }
 
 export const EFFECT_V2_PATHS = Object.freeze(LINK_PATH_EFFECTS.map(effect => makeEntry(
-  effect, PATH_FAMILIES[effect.id], effect.id === "bullet" ? 180 : 260, effect.id === "meteor" ? 3 : 1, [2, 3],
+  effect,
+  PATH_FAMILIES[effect.id],
+  effect.id === "bullet" ? 180 : 260,
+  effect.id === "meteor" ? 3 : 1,
+  [2, 3],
+  ["electric", "fire"].includes(effect.id) ? 260 : null,
 )));
 export const EFFECT_V2_EXITS = Object.freeze(LINK_EXIT_EFFECTS.map(effect => makeEntry(
   effect, EXIT_FAMILIES[effect.id], ["blackhole", "collide", "freeze", "pixel"].includes(effect.id) ? 320 : 260,

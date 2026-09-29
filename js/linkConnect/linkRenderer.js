@@ -512,6 +512,7 @@ export function clearLinkTransientEffects() {
     tile.style.removeProperty("--link-exit-pull-y");
     tile.style.removeProperty("--link-exit-collide-x");
     tile.style.removeProperty("--link-exit-collide-y");
+    tile.style.removeProperty("--link-tile-exit-delay");
     tile.classList.remove("is-removing", "has-canvas-exit");
     [...tile.classList].filter(name => name.startsWith("link-tile--")).forEach(name => tile.classList.remove(name));
     tile.classList.remove("is-becoming-special", "is-unlocking-frozen");
