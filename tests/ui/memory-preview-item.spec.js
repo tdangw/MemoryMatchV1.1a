@@ -6,7 +6,7 @@ test("Memory preview item reveals cards after its picker closes", async ({ page 
 
   const hiddenCards = await page.evaluate(async () => {
     (await import("/js/gameSelector.js")).openGameMenu("memory-match");
-    (await import("/js/gameController.js")).startNewMemoryRun(1);
+    await (await import("/js/gameController.js")).startNewMemoryRun(1);
     const { gameState } = await import("/js/gameState.js");
     gameState.progress.memoryMatch.items.preview4 = 1;
     gameState.isLocked = false;

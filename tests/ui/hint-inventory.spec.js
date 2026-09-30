@@ -16,12 +16,12 @@ test("hint inventories survive new games, mode changes, restarts and current res
     for (const mode of ["easy", "hard"]) {
       resetGame();
       gameState.settings.mode = mode;
-      memory.startNewMemoryRun();
+      await memory.startNewMemoryRun();
       counts.push(gameState.progress.memoryMatch.items.hint);
-      memory.restartMemoryLevel();
+      await memory.restartMemoryLevel();
       counts.push(gameState.progress.memoryMatch.items.hint);
     }
-    memory.continueMemorySession({ mode: "easy", level: 1, remainingTime: 60 });
+    await memory.continueMemorySession({ mode: "easy", level: 1, remainingTime: 60 });
     counts.push(gameState.progress.memoryMatch.items.hint);
     gameState.isLocked = false;
     gameState.isPaused = false;
@@ -31,12 +31,12 @@ test("hint inventories survive new games, mode changes, restarts and current res
     openGameMenu("link-connect");
     const linkCounts = [];
     for (const mode of ["easy", "hard"]) {
-      link.startLinkLevel({ mode });
+      await link.startLinkLevel({ mode });
       linkCounts.push(gameState.progress.linkConnect.items.hint);
-      link.startLinkLevel({ mode, restart: true });
+      await link.startLinkLevel({ mode, restart: true });
       linkCounts.push(gameState.progress.linkConnect.items.hint);
     }
-    link.continueLinkSession({ mode: "easy", level: 1, remainingTime: 60 });
+    await link.continueLinkSession({ mode: "easy", level: 1, remainingTime: 60 });
     linkCounts.push(gameState.progress.linkConnect.items.hint);
     consumeLinkItem("hint");
     linkCounts.push(gameState.progress.linkConnect.items.hint);

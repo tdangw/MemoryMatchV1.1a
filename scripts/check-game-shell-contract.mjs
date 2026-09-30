@@ -25,13 +25,16 @@ for (const file of files) {
     assert.doesNotMatch(source, /#["']?(?:grid-container|link-board|game-container|link-connect-container)\b/, `${file}: game-specific selector in shared core`);
   }
 }
-for (const file of ["js/memoryMatch/memoryShellDom.js", "js/linkConnect/linkShell.js"]) {
+for (const file of ["js/memoryMatch/memoryShellDom.js", "js/linkConnect/linkShell.js", "js/tripleConnect/tripleShell.js"]) {
   const source = readFileSync(file, "utf8");
   for (const region of ["title", "progress", "hud", "milestones", "frame", "board"]) {
     assert.equal([...source.matchAll(new RegExp(`data-shell-region="${region}"`, "g"))].length, 1, `${file}: region ${region}`);
   }
   const ids = [...source.matchAll(/\bid="([^"$]+)"/g)].map(match => match[1]);
   assert.equal(new Set(ids).size, ids.length, `${file}: duplicate literal ID`);
+}
+for (const file of ["js/memoryMatch/memoryShell.js", "js/linkConnect/linkShell.js", "js/tripleConnect/tripleShell.js"]) {
+  assert.doesNotMatch(readFileSync(file, "utf8"), /matched-pairs|total-pairs|link-hint|data-triple-total\]|data-triple-stat="(?:matched|hint)"|(?:matchedPairs|totalPairs|matchedTriples|totalTriples):/, `${file}: dead HUD reference`);
 }
 const css = readFileSync("styles/link-connect.css", "utf8");
 assert.doesNotMatch(css, /link-energy-flight|link-item-reward-flight|--link-energy-|--link-item-reward-/);

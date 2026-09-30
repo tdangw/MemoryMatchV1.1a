@@ -1,228 +1,3 @@
-/* HUD: menu bên trái, chỉ số ở chính giữa */
-#game-title.game-hud {
-  --shell-hud-used-width: min(var(--board-width, 100%), calc(200vw - 12px));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: min(var(--board-width, 100%), calc(200vw - 12px));
-  min-height: var(--shell-hud-min-height);
-  max-width: none;
-  padding: 0 var(--shell-hud-side-padding);
-  margin: 0 auto 8px;
-  box-sizing: border-box;
-  border-radius: 9px;
-  background: linear-gradient(100deg, #182942, #243b64);
-  box-shadow: 0 6px 16px rgb(0 0 0 / 28%);
-  position: relative;
-  overflow: visible;
-  z-index: var(--shell-layers-hud);
-}
-
-/* HUD tiến trình: nằm giữa tên game và thanh thao tác. */
-.game-progress-hud {
-  width: fit-content;
-  max-width: calc(100vw - 12px);
-  min-height: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  margin: 0 auto 6px;
-  padding: 0;
-  box-sizing: border-box;
-  border-radius: 0;
-  background: transparent;
-  color: #eff6ff;
-  box-shadow: none;
-}
-
-.game-progress-hud .info {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  min-height: 26px;
-  padding: 2px 6px;
-  box-sizing: border-box;
-  border-radius: 8px;
-  background: rgb(255 255 255 / 10%);
-  font-size: 0.74rem;
-  font-weight: 500;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-
-.game-progress-hud .stat-label {
-  color: #b9d5ff;
-  font-size: 0.5rem;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-}
-
-.game-progress-hud .stat-misses,
-.game-progress-hud .stat-misses .stat-label {
-  color: #ff9da8;
-}
-.game-progress-hud .stat-combo .stat-label {
-  color: #ffd889;
-}
-.game-progress-hud .stat-combo {
-  position: relative;
-  overflow: hidden;
-}
-.game-progress-hud .stat-combo .combo-window-progress {
-  position: absolute;
-  right: 3px;
-  bottom: 1px;
-  left: 3px;
-  height: 2px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #ffd166, #ff9666);
-  opacity: 0;
-  transform: scaleX(0);
-  transform-origin: left center;
-}
-.game-progress-hud .stat-points,
-.game-progress-hud .stat-points .stat-label {
-  color: #f2bf5b;
-}
-
-.game-progress-hud .stat-coins,
-.game-progress-hud .stat-coins strong {
-  color: #ffd25f;
-}
-
-.game-progress-hud .stat-coins .ui-icon {
-  width: 16px;
-  height: 16px;
-  stroke-width: 2.25;
-}
-
-.game-progress-hud .stat-coins strong {
-  font: inherit;
-}
-
-.game-progress-hud .stat-star-progress {
-  display: grid;
-  grid-template-rows: 12px 8px;
-  align-items: end;
-  width: clamp(54px, 16vw, 82px);
-  min-height: 26px;
-  gap: 1px;
-  padding: 3px 4px;
-  box-sizing: border-box;
-}
-
-.star-progress__stars {
-  position: relative;
-  display: block;
-  height: 12px;
-}
-
-.star-progress__milestone {
-  position: absolute;
-  top: -1px;
-  color: #60728b;
-  font-size: 0.72rem;
-  line-height: 1;
-  text-shadow: 0 1px 1px rgb(0 0 0 / 42%);
-  transform: translateX(-50%);
-  transition:
-    color var(--shell-motion-star) ease-out,
-    filter var(--shell-motion-star) ease-out,
-    transform var(--shell-motion-star) ease-out;
-}
-
-.star-progress__milestone:nth-child(1) {
-  left: 48%;
-}
-
-.star-progress__milestone:nth-child(2) {
-  left: 72%;
-}
-
-.star-progress__milestone:nth-child(3) {
-  left: 94%;
-}
-
-.star-progress__milestone.is-earned {
-  color: #ffd166;
-  filter: drop-shadow(0 0 3px rgb(255 209 102 / 72%));
-  transform: translateX(-50%) scale(1.14);
-}
-
-.star-progress__track {
-  position: relative;
-  display: block;
-  height: 8px;
-  overflow: hidden;
-  border: 1px solid rgb(183 248 255 / 58%);
-  border-radius: 999px;
-  background: rgb(4 35 61 / 74%);
-  box-shadow: inset 0 1px 2px rgb(0 0 0 / 38%);
-}
-
-.star-progress__fill {
-  position: absolute;
-  inset: 1px auto 1px 1px;
-  width: 0;
-  height: auto;
-  border-radius: inherit;
-  background: linear-gradient(90deg, #36d9e7, #79f2ff);
-  box-shadow: 0 0 6px rgb(80 231 255 / 72%);
-  transition: width var(--shell-motion-star-fill) ease-out;
-}
-.game-progress-hud .stat-progress .ui-icon {
-  color: #ffd166;
-}
-.game-progress-hud .stat-hints .ui-icon {
-  color: #79c7ff;
-}
-
-@media screen and (width <= 600px) {
-  .game-progress-hud {
-    gap: 4px;
-    margin-bottom: 4px;
-    padding: 2px 5px;
-  }
-
-  .game-progress-hud .info {
-    min-height: 24px;
-    padding: 2px 4px;
-    font-size: 0.66rem;
-  }
-
-  .game-progress-hud .stat-label {
-    font-size: 0.45rem;
-  }
-}
-
-#game-title.game-hud .game-stats {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: nowrap;
-  gap: 6px;
-  width: 100%;
-  margin: 0;
-}
-
-#game-title.game-hud .game-menu-toggle {
-  top: 50%;
-  left: 0;
-  transform: translateY(-50%);
-}
-
-#game-title.game-hud .game-menu-toggle:hover,
-#game-title.game-hud .game-menu-toggle[aria-expanded="true"] {
-  transform: translateY(-50%);
-}
-
-#game-title.game-hud .game-actions-menu {
-  top: calc(100% + var(--shell-hud-menu-offset));
-  left: 8px;
-  z-index: var(--shell-layers-menu);
-}
-
 .memory-special-hud {
   position: relative;
   display: flex;
@@ -230,7 +5,6 @@
   align-items: center;
   width: min(var(--shell-milestones-width), calc(100vw - 28px));
   min-height: var(--shell-milestones-track-height);
-  margin: -6px auto 0;
   padding: 0;
   box-sizing: border-box;
   border: 1px solid rgb(185 213 255 / 24%);
@@ -312,109 +86,17 @@
   color: #7ceeff;
 }
 
-/* Thanh HUD dùng cùng nền xanh với menu chính. */
-#game-title.game-hud .game-stats .stat-card {
-  border-color: rgb(255 255 255 / 10%);
-  background: rgb(255 255 255 / 12%);
-  color: #f5f7fb;
-}
-
-#game-title.game-hud .game-stats .stat-label {
-  color: #b9d5ff;
-}
-
-#game-title.game-hud .game-stats .stat-score,
-#game-title.game-hud .game-stats .stat-score .ui-icon--star {
-  color: #f2bf5b;
-}
-
-#game-title.game-hud .game-stats .stat-timer .ui-icon--timer {
-  color: #c7bfff;
-}
 
 #grid-container {
   z-index: 1001;
 }
 
 @media screen and (width <= 600px) {
-  #game-title.game-hud {
-    min-height: var(--shell-hud-mobile-min-height);
-    padding: 0 var(--shell-hud-mobile-side-padding);
-    margin-bottom: 6px;
-  }
 
   .memory-special-hud {
     width: min(var(--shell-milestones-mobile-width), calc(100vw - 96px));
     min-height: var(--shell-milestones-track-height);
   }
-
-  #game-title.game-hud .game-stats {
-    gap: 4px;
-  }
-
-  #game-title.game-hud .game-menu-toggle {
-    left: 0;
-  }
-
-  #game-title.game-hud .game-actions-menu {
-    left: 6px;
-  }
-}
-
-@media screen and (orientation: landscape) and (height <= 600px) {
-  #game-title.game-hud {
-    min-height: var(--shell-hud-min-height);
-    padding: 0 var(--shell-hud-side-padding);
-    margin-bottom: 4px;
-  }
-
-  #game-title.game-hud .game-menu-toggle {
-    left: 0;
-  }
-
-  #game-title.game-hud .game-actions-menu {
-    left: 4px;
-  }
-}
-
-@media screen and (orientation: landscape) and (height <= 600px) {
-  .game-actions-menu {
-    max-height: calc(100dvh - 64px - env(safe-area-inset-bottom, 0px));
-    overscroll-behavior: contain;
-  }
-}
-
-.game-stats {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 6px;
-  width: 100%;
-}
-
-#game-title .info {
-  margin: 0;
-  padding: 4px 9px;
-  font-size: 14px;
-  line-height: 1.2;
-}
-
-.game-menu-toggle {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  width: 34px;
-  height: 34px;
-  padding: 0;
-  display: grid;
-  place-items: center;
-  border-radius: 9px;
-  background: #2f73b8;
-  color: #fff;
-  font-size: 19px;
-  line-height: 1;
-  z-index: 12002;
 }
 
 .ui-icon {
@@ -450,44 +132,6 @@
   color: #b879e5;
 }
 
-.game-menu-toggle .ui-icon {
-  width: 18px;
-  height: 18px;
-}
-
-.game-menu-toggle:hover,
-.game-menu-toggle[aria-expanded="true"] {
-  background: #245b91;
-  transform: none;
-}
-
-.game-actions-menu {
-  position: absolute;
-  top: 56px;
-  left: 12px;
-  display: grid;
-  gap: 5px;
-  width: min(220px, calc(100% - 24px));
-  padding: 8px;
-  box-sizing: border-box;
-  border: 1px solid rgb(255 255 255 / 45%);
-  border-radius: 12px;
-  background: rgb(16 22 47 / 96%);
-  box-shadow: 0 12px 30px rgb(0 0 0 / 35%);
-  max-height: calc(100dvh - 130px);
-  overflow-y: auto;
-  scrollbar-width: none;
-  z-index: 12001;
-}
-
-.game-actions-menu::-webkit-scrollbar {
-  display: none;
-}
-
-.game-actions-menu[hidden] {
-  display: none;
-}
-
 .game-action-item {
   width: 100%;
   display: flex;
@@ -510,10 +154,6 @@
 }
 
 @media screen and (width <= 600px) {
-  #game-title.game-header {
-    padding: 9px 8px 8px;
-    margin-bottom: 8px;
-  }
 
   #game-logo.header-title {
     padding: 0 42px;
@@ -523,36 +163,9 @@
   .game-header-content {
     gap: 6px;
   }
-
-  .game-stats {
-    gap: 4px;
-  }
-
-  #game-title .info {
-    padding: 3px 6px;
-    font-size: 12px;
-  }
-
-  .game-menu-toggle {
-    top: 8px;
-    left: 8px;
-    width: 30px;
-    height: 30px;
-    font-size: 17px;
-  }
-
-  .game-actions-menu {
-    top: 48px;
-    left: 8px;
-    width: min(210px, calc(100% - 16px));
-  }
 }
 
 @media screen and (orientation: landscape) and (height <= 600px) {
-  #game-title.game-header {
-    padding: 5px 8px;
-    margin-bottom: 5px;
-  }
 
   #game-logo.header-title {
     padding: 0 38px;
@@ -562,171 +175,15 @@
   .game-header-content {
     gap: 3px;
   }
-
-  #game-title .info {
-    padding: 2px 5px;
-    font-size: 10px;
-  }
-
-  .game-menu-toggle {
-    top: 5px;
-    left: 6px;
-    width: 28px;
-    height: 28px;
-    font-size: 16px;
-  }
-
-  .game-actions-menu {
-    top: 39px;
-    left: 6px;
-  }
 }
 
-/* HUD liền mạch, không dùng nền riêng cho từng chỉ số */
-#game-title.game-hud .game-stats {
-  flex-wrap: nowrap;
-  gap: 6px;
-}
-
-#game-title.game-hud .game-stats .info {
-  padding: 3px 2px;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  color: #243b64;
-  box-shadow: none;
-  font-weight: 500;
-}
-
-#game-title.game-hud .game-stats .ui-icon {
-  width: 19px;
-  height: 19px;
-  stroke-width: 2.25;
-  filter: drop-shadow(0 1px 0 rgb(255 255 255 / 90%));
-}
-
-#game-title.game-hud .game-stats .ui-icon--timer {
-  color: #5c4db4;
-}
-#game-title.game-hud .game-stats .ui-icon--trophy {
-  color: #a86f00;
-}
-#game-title.game-hud .game-stats .ui-icon--star {
-  color: #b87800;
-}
-#game-title.game-hud .game-stats .ui-icon--puzzle {
-  color: #287d4c;
-}
-#game-title.game-hud .game-stats .ui-icon--search {
-  color: #176fa8;
-}
-
-@media screen and (width <= 600px) {
-  #game-title.game-hud .game-stats {
-    gap: 4px;
-  }
-
-  #game-title.game-hud .game-stats .info {
-    padding-inline: 1px;
-  }
-
-  #game-title.game-hud .game-stats .ui-icon {
-    width: 16px;
-    height: 16px;
-  }
-}
 
 #settings-container .settings-range:disabled {
   cursor: default;
   opacity: 0.38;
 }
 
-/* Cụm chỉ số theo từng màn chơi */
-#game-title.game-hud .game-stats .stat-card {
-  min-height: var(--shell-hud-min-height);
-  padding: 3px 6px;
-  box-sizing: border-box;
-  border: 1px solid rgb(36 59 100 / 8%);
-  border-radius: 11px;
-  background: rgb(255 255 255 / 52%);
-  color: #243b64;
-  font-size: 0.82rem;
-  font-variant-numeric: tabular-nums;
-  font-weight: 500;
-  box-shadow: none;
-}
 
-#game-title.game-hud .stat-label {
-  color: #4779c5;
-  font-size: 0.56rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-}
-
-#game-title.game-hud .stat-level,
-#game-title.game-hud .stat-moves {
-  background: rgb(232 241 255 / 72%);
-}
-
-#game-title.game-hud .stat-score {
-  background: rgb(255 247 222 / 82%);
-  color: #7b4b10;
-}
-
-#game-title.game-hud .stat-misses {
-  background: rgb(255 235 236 / 78%);
-}
-
-#game-title.game-hud .stat-misses .stat-label {
-  color: #c84f5d;
-}
-
-#game-title.game-hud .stat-timer {
-  background: rgb(231 248 239 / 78%);
-  color: #155f49;
-}
-
-#game-title.game-hud .stat-progress {
-  background: rgb(255 247 222 / 82%);
-  color: #7b4b10;
-}
-
-@media screen and (width <= 600px) {
-  #game-title.game-hud .game-stats .stat-card {
-    min-height: var(--shell-hud-mobile-min-height);
-    padding: 2px 4px;
-    border-radius: 9px;
-    font-size: 0.68rem;
-  }
-
-  #game-title.game-hud .stat-label {
-    font-size: 0.46rem;
-    letter-spacing: 0;
-  }
-}
-
-/* Hoàn thiện tông xanh cho HUD và mục phiên bản trong Cài đặt. */
-#game-title.game-hud .game-stats .stat-card,
-#game-title.game-hud .game-stats .stat-level,
-#game-title.game-hud .game-stats .stat-timer,
-#game-title.game-hud .game-stats .stat-score {
-  border-color: rgb(185 213 255 / 24%);
-  background: rgb(106 151 211 / 45%);
-  color: #f5f7fb;
-}
-
-#game-title.game-hud .game-stats .stat-label {
-  color: #c7ddff;
-}
-
-#game-title.game-hud .game-stats .stat-score,
-#game-title.game-hud .game-stats .stat-score .ui-icon--star {
-  color: #ffe09a;
-}
-
-#game-title.game-hud .game-stats .stat-timer .ui-icon--timer {
-  color: #d9d3ff;
-}
 
 .settings-version-button {
   display: flex;
@@ -777,17 +234,6 @@
   color: rgb(245 247 251 / 86%);
 }
 
-/* LV là nhãn chính của HUD, giữ cùng cỡ với giá trị level. */
-#game-title.game-hud .stat-level .stat-label {
-  font-size: 0.82rem;
-  letter-spacing: 0;
-}
-
-@media screen and (width <= 600px) {
-  #game-title.game-hud .stat-level .stat-label {
-    font-size: 0.68rem;
-  }
-}
 
 .level-summary__stat.summary-coins strong {
   color: #f2bf5b;
@@ -804,9 +250,9 @@
   color: #b9e5ff;
 }
 
-/* A short landscape board must not squeeze inventory tools onto the stats. */
-@media screen and (orientation: landscape) and (height <= 600px) {
-  #game-title.game-hud {
-    min-width: min(var(--shell-hud-landscape-min-width), calc(100vw - 12px));
-  }
-}
+
+/* Memory Match uses the same compact tool drawer as the other two games. */
+.memory-tool-list { display: grid; gap: 2px; }
+.memory-tool-item { display: flex; width: 100%; min-height: 32px; align-items: center; gap: 7px; padding: 5px 7px; border: 0; border-radius: 7px; background: transparent; color: #eff6ff; font: inherit; font-size: .73rem; text-align: left; }
+.memory-tool-item:hover, .memory-tool-item:focus-visible { background: rgb(255 255 255 / 12%); outline: none; }
+.memory-tool-item .ui-icon { width: 16px; height: 16px; color: #9edbff; }

@@ -3,19 +3,23 @@ import { expect, test } from "@playwright/test";
 test("HUD patches stay local, skip repeated writes and share timer states", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator(".game-selector__choice").first()).toBeVisible();
-  for (const id of ["memory-match", "link-connect"]) {
+  for (const id of ["memory-match", "link-connect", "triple-connect"]) {
     await page.evaluate(async id => {
-      (await import("/js/gameSelector.js")).openGameMenu(id);
-      if (id === "memory-match") (await import("/js/gameController.js")).startNewMemoryRun();
-      else (await import("/js/linkConnect/linkController.js")).startLinkLevel({ mode: "easy" });
+      await (await import("/tests/ui/helpers/gameNavigation.js")).openReadyGameMenu(id);
+      if (id === "memory-match") await (await import("/js/gameController.js")).startNewMemoryRun();
+      else if (id === "link-connect") await (await import("/js/linkConnect/linkController.js")).startLinkLevel({ mode: "easy" });
+      else await (await import("/js/tripleConnect/tripleController.js")).startTripleConnectRound({ mode: "easy", seed: "hud-contract", skipIntro: true });
     }, id);
     const result = await page.evaluate(async id => {
       const { createGameShellHud, renderHudTimer } = await import("/js/gameShell/gameShellHud.js");
       const { getMemoryShell } = await import("/js/memoryMatch/memoryShell.js");
       const { getLinkShell } = await import("/js/linkConnect/linkShell.js");
-      const shell = id === "memory-match" ? getMemoryShell() : getLinkShell();
+      const { getTripleShell } = await import("/js/tripleConnect/tripleShell.js");
+      const shell = id === "memory-match" ? getMemoryShell() : id === "link-connect" ? getLinkShell() : getTripleShell();
       const boardNodes = [...shell.refs.board.querySelectorAll("*")];
-      const stat = shell.refs.progress.querySelector(".stat-moves > span:last-child");
+      if (!shell.refs.progress.hidden || shell.refs.progress.children.length || shell.refs.progress.textContent.trim() || getComputedStyle(shell.refs.progress).display !== "none") throw new Error("progress must remain an empty hidden compatibility slot");
+      const stat = shell.refs.hud.querySelector(".stat-moves > span:last-child");
+      if (!stat) throw new Error("Missing live HUD metric");
       const component = createGameShellHud({ stats: { moves: { element: stat } } });
       const observer = new MutationObserver(() => {});
       observer.observe(shell.refs.root, { subtree: true, attributes: true, childList: true, characterData: true });
@@ -43,11 +47,11 @@ test("HUD tooltip uses definition for mouse and keyboard", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   await page.evaluate(async () => {
-    (await import("/js/gameSelector.js")).openGameMenu("memory-match");
-    (await import("/js/gameController.js")).startNewMemoryRun();
+    await (await import("/tests/ui/helpers/gameNavigation.js")).openReadyGameMenu("memory-match");
+    await (await import("/js/gameController.js")).startNewMemoryRun();
     (await import("/js/ui.js")).clearGameplayRewardPopups();
   });
-  const card = page.locator("#game-progress-hud .stat-star-progress");
+  const card = page.locator("#memory-special-hud .stat-star-progress");
   const copy = await card.getAttribute("data-tooltip");
   await card.hover();
   await expect(page.locator("#app-tooltip")).toHaveText(copy);

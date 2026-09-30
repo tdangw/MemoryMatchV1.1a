@@ -1,35 +1,13 @@
-const toggleButton = document.getElementById("btn-actions-menu");
-const actionsMenu = document.getElementById("game-actions-menu");
+import { bindGameHudMenus } from "./gameShell/gameHudMenus.js";
 
-export function closeGameMenu() {
-  if (!toggleButton || !actionsMenu) return;
-  actionsMenu.hidden = true;
-  toggleButton.setAttribute("aria-expanded", "false");
-}
+let activeMenus = null;
+export function closeGameMenu() { activeMenus?.close(); }
 
-function openGameMenu() {
-  if (!toggleButton || !actionsMenu) return;
-  actionsMenu.hidden = false;
-  toggleButton.setAttribute("aria-expanded", "true");
-}
-
-if (toggleButton && actionsMenu) {
-  toggleButton.addEventListener("click", (event) => {
-    event.stopPropagation();
-    if (actionsMenu.hidden) openGameMenu();
-    else closeGameMenu();
-  });
-
-  actionsMenu.addEventListener("click", (event) => {
-    if (event.target.closest(".game-action-item")) closeGameMenu();
-  });
-
-  document.addEventListener("click", (event) => {
-    if (!actionsMenu.hidden && !event.target.closest("#game-title"))
-      closeGameMenu();
-  });
-
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") closeGameMenu();
-  });
+export function bindMemoryMenus(scope, root) {
+  const menus = bindGameHudMenus(scope, [
+    { trigger: root.querySelector("#btn-actions-menu"), panel: root.querySelector("#game-actions-menu") },
+    { trigger: root.querySelector("#memory-tools-toggle"), panel: root.querySelector("#memory-tools-menu") },
+  ]);
+  activeMenus = menus;
+  scope.own(() => { if (activeMenus === menus) activeMenus = null; });
 }

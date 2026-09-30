@@ -10,7 +10,7 @@ test("Effect V2 production performance budget", async ({ page }, testInfo) => {
   const metrics = await page.evaluate(async effectIds => {
     const { openGameMenu, startLinkLevel, renderConnectionV2, clearConnectionV2, playCanvasExit, clearCanvasExit } = window.__effectV2Performance;
     openGameMenu("link-connect");
-    startLinkLevel({ mode: "easy" });
+    await startLinkLevel({ mode: "easy" });
     const frame = document.querySelector("#link-board-frame"); const surface = document.querySelector("#link-path-overlay");
     await Promise.all([...frame.querySelectorAll("img")].map(image => image.decode().catch(() => undefined)));
     const allTiles = [...frame.querySelectorAll(".link-tile")];

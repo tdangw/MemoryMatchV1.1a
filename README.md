@@ -1,6 +1,6 @@
 # Memory Match Adventure — JavaScript thuần
 
-Kiến trúc giao diện dùng chung: [`ARCHITECTURE.md`](ARCHITECTURE.md). Trạng thái mới nhất nằm trong [`CONTEXT.md`](CONTEXT.md); kế hoạch đang hoạt động duy nhất là [`TASK_RUNTIME_CLOSURE_AND_SIMPLIFICATION_PLAN.md`](TASK_RUNTIME_CLOSURE_AND_SIMPLIFICATION_PLAN.md).
+Kiến trúc giao diện dùng chung: [`ARCHITECTURE.md`](ARCHITECTURE.md). Trạng thái mới nhất và kế hoạch active, nếu có, được ghi trong [`CONTEXT.md`](CONTEXT.md).
 
 Phiên bản hiển thị trong ứng dụng: **V1.1a**.
 

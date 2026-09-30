@@ -26,9 +26,9 @@ async function start(page, game, level) {
     if (game === "memory") {
       const { gameState } = await import("/js/gameState.js");
       gameState.settings.mode = "challenge";
-      (await import("/js/gameController.js")).initializeLevel(level);
+      await (await import("/js/gameController.js")).initializeLevel(level);
     } else {
-      (await import("/js/linkConnect/linkController.js")).startLinkLevel({ mode: "challenge", level });
+      await (await import("/js/linkConnect/linkController.js")).startLinkLevel({ mode: "challenge", level });
     }
   }, { game, level });
 }

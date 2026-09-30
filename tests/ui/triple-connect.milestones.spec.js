@@ -58,7 +58,7 @@ test("Triple commits the third resolved set as one durable milestone transaction
   const restored = await page.evaluate(async () => {
     const { continueTripleConnectSession } = await import("/js/tripleConnect/tripleController.js");
     const { getActiveSession } = await import("/js/sessionProgress.js");
-    const run = continueTripleConnectSession(getActiveSession("triple-connect", "easy"));
+    const run = await continueTripleConnectSession(getActiveSession("triple-connect", "easy"));
     const { gameState } = await import("/js/gameState.js");
     return { restored: Boolean(run), milestones: gameState.progress.tripleConnect.milestones, ledger: run?.getState().milestoneTileIds };
   });

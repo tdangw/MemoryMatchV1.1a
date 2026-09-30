@@ -48,6 +48,16 @@
   transform: none;
 }
 
+.menu-wrapper--game-selector > .game-title {
+  margin-bottom: 12px;
+  font-size: clamp(1.45rem, 6.8vw, 2.15rem);
+  letter-spacing: -0.035em;
+}
+
+.menu-wrapper--game-selector > .menu-description {
+  margin: 0 0 18px;
+}
+
 .menu-wrapper > .game-title:hover {
   transform: none;
   text-shadow: 0 2px 14px rgb(242 191 91 / 20%);

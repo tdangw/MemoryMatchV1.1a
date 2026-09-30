@@ -3,6 +3,7 @@ import {
   isBackgroundMusicPlaying,
   pauseBackgroundMusic,
   pauseGameAudio,
+  restoreBackgroundMusic,
   sounds,
   syncDefaultMusic,
 } from "./sound.js";
@@ -17,7 +18,8 @@ import {
   isChallengeMode,
   isEndlessMode,
 } from "./config.js";
-import { createGrid, stopGridLayout } from "./grid.js";
+import { createGrid, stopGridLayout, revealAndHideTiles } from "./grid.js";
+import { createGameShellStartup } from "./gameShell/gameShellStartup.js";
 import {
   updateLevelDisplay,
   updateScoreDisplay,
@@ -30,7 +32,6 @@ import {
   updateMovesDisplay,
   updateMissesDisplay,
   updateComboDisplay,
-  updatePairProgressDisplay,
   updateLevelStarsDisplay,
   updateTotalStarsDisplay,
   updateCoinDisplay,
@@ -60,6 +61,7 @@ import { resolveSessionTiming } from "./sessionTiming.js";
 import { clearLootEffects } from "./lootEffects.js";
 import { commitMemoryThemeSession, saveMemorySession, stageMemorySession } from "./memorySession.js";
 import { getMemoryShell } from "./memoryMatch/memoryShell.js";
+import { bindMemoryMenus } from "./gameMenu.js";
 import { clearTooltip } from "./tooltips.js";
 
 let countdownInterval;
@@ -102,16 +104,22 @@ export function initializeLevel(level, { reason = "new", session = null } = {}) 
     showAppToast(`Chủ đề ${eligibility.theme.title} cần ${eligibility.required} ảnh khác nhau; hiện có ${eligibility.available}. Hãy chọn chủ đề khác.`);
     return null;
   }
-  getMemoryShell().mount({ cleanup: () => {
+  const scope = getMemoryShell().mount({ cleanup: () => {
     stopCountdown();
     stopGridLayout();
-    if (isGameVisible()) persistMemorySession();
+    if (isGameVisible() && scope.startup?.status === 'ready') persistMemorySession();
     invalidateRound();
     resetLogicRuntime();
     clearLootEffects();
     clearGameplayRewardPopups();
     clearTooltip();
   } });
+  bindMemoryMenus(scope, getMemoryShell().refs.root);
+  const startup = createGameShellStartup(scope, getMemoryShell().refs, error => {
+    console.error('Memory startup failed', error);
+    showAppToast('Không thể chuẩn bị bàn chơi. Hãy chơi lại.');
+  });
+  return startup.run(async () => {
   stopCountdown();
   resetLogicRuntime();
   clearLootEffects();
@@ -123,7 +131,7 @@ export function initializeLevel(level, { reason = "new", session = null } = {}) 
   const gameContainer = getMemoryShell().refs.root;
   if (gameContainer) gameContainer.style.display = "flex";
 
-  const mode = gameState.settings.mode || "easy";
+  const mode = requestedMode;
   gameState.currentLevel = level;
   const modeLayout = getModeLayout(mode);
   const layout = isChallengeMode(mode) ? getChallengeLayout(level) : modeLayout;
@@ -136,7 +144,6 @@ export function initializeLevel(level, { reason = "new", session = null } = {}) 
   gameState.timeLimit = timing.timeLimit;
   gameState.levelStartTime = timing.levelStartTime;
   sessionCheckpointTicks = 0;
-  gameState.progress.memoryMatch.items.hint += hintBonus;
   if (reason === "resume") {
     gameState.specialProgress = Math.max(0, Math.floor(session?.specialProgress || 0))
       % GAME_CONFIG.special.progressTarget;
@@ -147,16 +154,22 @@ export function initializeLevel(level, { reason = "new", session = null } = {}) 
   }
   const previewDurationMs = getPreviewDurationMs(mode);
   const themeId = getTheme(gameState.appearance.themes.memoryMatch).id;
-  const selectedCards = createGrid(layout, {
+  const selectedCards = await startup.phase('render', () => createGrid(layout, {
+    startup,
+    deferPreview: true,
     roundId,
     onPreviewComplete: startCountdown,
     previewDurationMs,
     assetPaths: reason === "resume" ? session?.assetPaths : undefined,
     history: reason === "resume" ? undefined : gameState.progress.themeSelectionHistory[themeId],
-  });
+  }));
+  await startup.yield();
+  await startup.phase('images', () => startup.decodeBoard());
+  startup.check();
+  gameState.progress.memoryMatch.items.hint += hintBonus;
   activeAssetPaths = selectedCards?.map((card) => card.assetPath).filter(Boolean) || [];
   if (reason !== "resume" && activeAssetPaths.length) commitMemoryThemeSession(themeId, activeAssetPaths);
-  else persistMemorySession();
+  else persistMemorySession(true);
 
   gameState.moves = 0;
   gameState.misses = 0;
@@ -175,17 +188,19 @@ export function initializeLevel(level, { reason = "new", session = null } = {}) 
   updateMovesDisplay(gameState.moves);
   updateMissesDisplay(gameState.misses);
   updateComboDisplay(gameState.combo);
-  updatePairProgressDisplay(gameState.matchedPairs, gameState.totalPairs);
   updateTimerDisplay(gameState.remainingTime);
   setMemoryTimeProgress({ remainingSeconds: gameState.remainingTime, timeLimit: gameState.timeLimit });
   showLevelRewardOverlay();
   showRevealTimerInHud(previewDurationMs / 1000, roundId);
   document.getElementById("btn-buy-time")?.toggleAttribute("hidden", isEndlessMode(mode));
+  revealAndHideTiles(roundId, startCountdown, previewDurationMs);
+  });
 }
 
 function startCountdown(roundId = gameState.roundId) {
   if (gameState.roundId !== roundId) return;
   stopCountdown();
+  restoreBackgroundMusic(gameState.settings);
   startMemoryTimeProgress({ remainingSeconds: gameState.remainingTime, timeLimit: gameState.timeLimit });
   syncDefaultMusic(gameState.settings);
   countdownInterval = setInterval(() => {
@@ -366,6 +381,7 @@ export function returnToMainMenu() {
     .getElementById("game-container")
     ?.style.setProperty("display", "none");
   navigation.createMenu();
+  restoreBackgroundMusic(gameState.settings);
   syncDefaultMusic(gameState.settings);
 }
 
@@ -383,7 +399,9 @@ function resolveMemoryLevelTiming({ mode, level, modeLayout, reason, session }) 
   });
 }
 
-function persistMemorySession() {
+function persistMemorySession(allowStartup = false) {
+  const startup = getMemoryShell().scope?.startup;
+  if (startup && startup.status !== 'ready' && !allowStartup) return false;
   if (!gameState.settings.mode || gameState.currentLevel < 1) return false;
   return saveMemorySession(activeAssetPaths.length ? { assetPaths: activeAssetPaths } : {});
 }

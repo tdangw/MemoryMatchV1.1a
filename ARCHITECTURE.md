@@ -48,8 +48,9 @@ Game Shell đã ổn định. `js/gameShell/` sở hữu config, sáu vùng sema
 | `appearance.js`, `themeCatalog.js` | Quyền sở hữu/trang bị ngoại hình và dữ liệu chủ đề. |
 | `sound.js`, `backgroundEffects.js` | Âm thanh và hiệu ứng nền theo cài đặt/vòng đời trang. |
 
-### Memory Match
+Game Shell giữ đủ sáu region công khai: `title`, `progress`, `hud`, `milestones`, `frame`, `board`. `progress` là placeholder tương thích rỗng, luôn ẩn; metric thật thuộc `refs.hud`, còn Xu/mốc/sao màn thuộc `refs.milestones`. `gameHudMenus.js` sở hữu trạng thái mở duy nhất, ARIA, Escape/click ngoài và cleanup theo scope mount. `styles/game-shell/hud-unified.css` sở hữu geometry và presentation thanh HUD một hàng; CSS game chỉ giữ trạng thái có ngữ nghĩa và phần board/milestone đặc thù.
 
+### Memory Match
 | Module | Trách nhiệm |
 | --- | --- |
 | `config.js` | Cấu hình mode, điểm, sao, thời gian, preview và phần thưởng may mắn. |

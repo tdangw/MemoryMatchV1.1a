@@ -143,8 +143,15 @@
   opacity: 1;
   transform: scaleX(var(--game-timer-progress, 0));
   transform-origin: left center;
+  transition: transform 250ms linear;
   pointer-events: none;
   will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-hud.has-timer-progress::after {
+    transition: none;
+  }
 }
 
 .game-hud.is-timer-warning::after {
@@ -592,24 +599,6 @@
 .timer-warning {
   color: #f44336;
   font-weight: bold;
-  animation: pulse-red 1s infinite;
-}
-
-@keyframes pulse-red {
-  0% {
-    transform: scale(1);
-    text-shadow: 0 0 0 red;
-  }
-
-  50% {
-    transform: scale(1.1);
-    text-shadow: 0 0 10px red;
-  }
-
-  100% {
-    transform: scale(1);
-    text-shadow: 0 0 0 red;
-  }
 }
 
 @media screen and (orientation: landscape) and (height <= 600px) {

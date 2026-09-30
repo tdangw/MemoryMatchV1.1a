@@ -9,8 +9,8 @@ async function startLargestBoard(page, id) {
   await page.evaluate(async gameId => {
     const { gameState } = await import("/js/gameState.js");
     gameState.settings.mode = "superHard";
-    if (gameId === "memory-match") (await import("/js/gameController.js")).startNewMemoryRun();
-    else (await import("/js/linkConnect/linkController.js")).startLinkLevel({ mode: "superHard" });
+    if (gameId === "memory-match") await (await import("/js/gameController.js")).startNewMemoryRun();
+    else await (await import("/js/linkConnect/linkController.js")).startLinkLevel({ mode: "superHard" });
   }, id);
 }
 

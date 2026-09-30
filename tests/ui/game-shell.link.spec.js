@@ -4,7 +4,7 @@ test("Link shell owns controls once per round and preserves patched tile identit
   await page.goto("/");
   await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const result = await page.evaluate(async () => {
-    (await import("/js/gameSelector.js")).openGameMenu("link-connect");
+    await (await import("/tests/ui/helpers/gameNavigation.js")).openReadyGameMenu("link-connect");
     const controller = await import("/js/linkConnect/linkController.js");
     const { getLinkShell } = await import("/js/linkConnect/linkShell.js");
     const { linkGameState } = await import("/js/linkConnect/linkState.js");
@@ -13,7 +13,7 @@ test("Link shell owns controls once per round and preserves patched tile identit
     let refs;
     const checks = [];
     for (const level of [1, 7, 14, 28, 29]) {
-      controller.startLinkLevel({ mode: "challenge", level });
+      await controller.startLinkLevel({ mode: "challenge", level });
       const shell = getLinkShell();
       refs ||= shell.refs;
       const tiles = [...refs.board.querySelectorAll(".link-tile")];
@@ -41,11 +41,11 @@ test("Link hint keeps its corner markers after the path clears until the next ti
   await page.goto("/");
   await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   await page.evaluate(async () => {
-    (await import("/js/gameSelector.js")).openGameMenu("link-connect");
+    await (await import("/tests/ui/helpers/gameNavigation.js")).openReadyGameMenu("link-connect");
     const controller = await import("/js/linkConnect/linkController.js");
     const { linkGameState } = await import("/js/linkConnect/linkState.js");
     const { gameState } = await import("/js/gameState.js");
-    controller.startLinkLevel({ mode: "easy" });
+    await controller.startLinkLevel({ mode: "easy" });
     gameState.progress.linkConnect.items.hint = 1;
     linkGameState.isLocked = false;
     document.querySelector('[data-item="hint"]').click();

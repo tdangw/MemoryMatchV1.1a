@@ -410,8 +410,8 @@
 .link-path-overlay--laser .link-path-overlay__glow { stroke: #ff3f9d; opacity: .62; }
 .link-path-overlay--rainbow .link-path-overlay__beam { stroke: var(--effect-v2-rainbow-stroke, #fff); stroke-width: 1.42; filter: drop-shadow(0 0 3px rgb(255 255 255 / 52%)); }
 .link-path-overlay--rainbow .link-path-overlay__glow { stroke: var(--effect-v2-rainbow-stroke, #bc8eff); stroke-width: 2.1; opacity: .32; filter: drop-shadow(0 0 4px rgb(128 185 255 / 40%)); }
-.link-path-overlay--fire .link-path-overlay__beam { stroke: #fff0dc; stroke-width: .76; stroke-linejoin: miter; transform-box: fill-box; transform-origin: center; filter: drop-shadow(0 0 1px #fff3d2) drop-shadow(0 0 3px #ff7043) drop-shadow(0 0 6px rgb(225 49 29 / 74%)); animation: link-electric-current-trace var(--effect-v2-connection-impact-delay, 260ms) steps(6, end) both, link-electric-rumble 92ms steps(2, end) 3 alternate; }
-.link-path-overlay--fire .link-path-overlay__glow { stroke: #f0442f; stroke-width: 2.45; stroke-linejoin: miter; transform-box: fill-box; transform-origin: center; opacity: .68; filter: drop-shadow(0 0 3px #f25636) drop-shadow(0 0 7px rgb(196 38 28 / 72%)); animation: link-electric-current-glow var(--effect-v2-connection-impact-delay, 260ms) steps(5, end) both, link-electric-rumble 92ms steps(2, end) 3 alternate; }
+.link-path-overlay--fire .link-path-overlay__beam { stroke: #fff0c8; stroke-width: .92; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: .13 .025; filter: drop-shadow(0 0 2px #ffb13b) drop-shadow(0 0 5px rgb(238 68 27 / 82%)); animation: link-fire-flow var(--effect-v2-connection-impact-delay, 260ms) cubic-bezier(.18,.72,.24,1) both; }
+.link-path-overlay--fire .link-path-overlay__glow { stroke: #ef3d20; stroke-width: 2.7; stroke-linecap: round; stroke-linejoin: round; opacity: .62; filter: drop-shadow(0 0 4px #ff5c2b) drop-shadow(0 0 8px rgb(184 35 21 / 68%)); animation: link-fire-glow var(--effect-v2-connection-impact-delay, 260ms) ease-out both; }
 .link-path-overlay--magic .link-path-overlay__beam { stroke: #f0d7ff; stroke-width: 1.42; stroke-dasharray: .04 .055; filter: drop-shadow(0 0 4px #c98aff); }
 .link-path-overlay--magic .link-path-overlay__glow { stroke: #a66dff; opacity: .58; }
 .link-path-overlay--cyber .link-path-overlay__beam { stroke: #bcfbff; stroke-width: 1.35; stroke-dasharray: .03 .04; filter: drop-shadow(0 0 4px #13d4ee); }
@@ -449,6 +449,8 @@
 .effect-v2-connection__decoration--jagged { fill: #f5ffff; stroke: #42efff; stroke-width: .48; filter: drop-shadow(0 0 3px #42efff) drop-shadow(0 0 6px #0ab7e9); }
 .effect-v2-connection__decoration--jagged.effect-v2-connection__decoration--impact { animation-delay: var(--effect-v2-connection-impact-delay, 260ms); }
 .effect-v2-connection__decoration--fire { fill: #fff0dc; stroke: #f0442f; stroke-width: .48; filter: drop-shadow(0 0 3px #f25636) drop-shadow(0 0 6px #c4261c); }
+.effect-v2-connection__decoration--flame { fill: #ffb13b; stroke: #fff0c8; stroke-width: .32; filter: drop-shadow(0 0 3px #ff5c2b); }
+.effect-v2-connection__decoration--flame.effect-v2-connection__decoration--fire { animation: effect-v2-fire-ember 320ms ease-out var(--effect-v2-decoration-delay, 0ms) both; }
 .effect-v2-connection__decoration--hydro { fill: #d9fbff; stroke: #4ccbf0; stroke-width: .3; filter: drop-shadow(0 0 2px rgb(73 199 240 / 68%)); animation: none; }
 .effect-v2-connection__matrix-digit { fill: #4df28e; font: 700 3px/1 ui-monospace, "Cascadia Code", monospace; letter-spacing: 0; pointer-events: none; filter: drop-shadow(0 0 2px rgb(40 222 105 / 72%)); animation: effect-v2-matrix-scan 380ms steps(2, end) var(--effect-v2-matrix-delay, 0ms) both; }
 .effect-v2-connection__decoration--sparks { fill: #ffbf65; }
@@ -479,6 +481,7 @@
 @keyframes effect-v2-halo-ring { 0% { opacity: 0; transform: scale(.2); } 32% { opacity: .95; } 100% { opacity: 0; transform: scale(2.5); } }
 @keyframes effect-v2-sonic-node { 0% { opacity: 0; transform: scale(.35); } 45% { opacity: 1; transform: scale(1.45); } 100% { opacity: 0; transform: scale(2); } }
 @keyframes effect-v2-poison-drop { 0% { opacity: 0; transform: scale(.35); } 34% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(.55); } }
+@keyframes effect-v2-fire-ember { 0% { opacity: 0; transform: translateY(1px) scale(.45); } 38% { opacity: 1; transform: translateY(-1px) scale(1); } 100% { opacity: 0; transform: translateY(-5px) scale(.35); } }
 @keyframes effect-v2-chain-clink { 0% { opacity: 0; transform: scale(.6); } 34% { opacity: 1; transform: scale(1); } 100% { opacity: .18; transform: scale(1); } }
 
 @keyframes link-electric-trace {
@@ -515,6 +518,20 @@
   0% { transform: translate(-.35px, .2px); }
   50% { transform: translate(.35px, -.2px); }
   100% { transform: translate(0, 0); }
+}
+
+@keyframes link-fire-flow {
+  0% { opacity: 0; stroke-dashoffset: 1; }
+  18% { opacity: 1; }
+  78% { opacity: .96; stroke-dashoffset: 0; }
+  100% { opacity: 0; stroke-dashoffset: -.18; }
+}
+
+@keyframes link-fire-glow {
+  0% { opacity: 0; stroke-dashoffset: 1; }
+  24% { opacity: .62; }
+  74% { opacity: .48; stroke-dashoffset: .02; }
+  100% { opacity: 0; stroke-dashoffset: -.12; }
 }
 
 @keyframes link-dash-flow { 0% { opacity: 0; stroke-dashoffset: 1; } 12% { opacity: 1; } 82% { opacity: .9; stroke-dashoffset: 0; } 100% { opacity: 0; stroke-dashoffset: -.32; } }
@@ -580,8 +597,8 @@
 
 @keyframes link-tile-image-dissolve {
   0% { transform: scale(1); }
-  42% { transform: scale(1.035); filter: saturate(1.1) brightness(1.06); }
-  100% { transform: translateY(-9%) scale(.76); filter: saturate(.7) brightness(1.18); }
+  42% { transform: scale(1.035); filter: saturate(1.1); }
+  100% { transform: translateY(-9%) scale(.76); filter: saturate(.7); }
 }
 
 @keyframes link-tile-dissolve-ash {
@@ -850,182 +867,6 @@
 
 /* Link Connect dùng cùng nhịp bố cục HUD với Memory Match: tên game, tiến trình,
    rồi đến thanh tác vụ. Các lớp riêng tránh làm thay đổi HUD của trò còn lại. */
-
-.link-game-progress-hud.game-progress-hud {
-  width: fit-content;
-  max-width: calc(100vw - 12px);
-  min-height: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  margin: 0 auto 6px;
-  padding: 0;
-  color: #eff6ff;
-}
-
-.link-game-progress-hud .info {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  min-height: 26px;
-  padding: 2px 6px;
-  border: 0;
-  border-radius: 8px;
-  background: rgb(255 255 255 / 10%);
-  color: #eff6ff;
-  font-size: 0.74rem;
-  font-weight: 500;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-
-.link-game-progress-hud .stat-label {
-  color: #b9d5ff;
-  font-size: 0.5rem;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-}
-
-/* Dùng nguyên cấu trúc 3 sao của Memory Match; không để style ô chỉ số chung
-   ghi đè grid hai hàng của thanh tiến trình sao. */
-.link-game-progress-hud .info.stat-star-progress {
-  display: grid;
-  grid-template-rows: 12px 8px;
-  align-items: end;
-  width: clamp(54px, 16vw, 82px);
-  min-height: 26px;
-  gap: 1px;
-  padding: 3px 4px;
-  box-sizing: border-box;
-}
-
-.link-game-progress-hud .stat-star-progress .star-progress__stars {
-  position: relative;
-  display: block;
-  width: 100%;
-  height: 12px;
-}
-
-.link-game-progress-hud .stat-star-progress .star-progress__milestone {
-  position: absolute;
-  top: -1px;
-  color: #60728b;
-  font-size: 0.72rem;
-  line-height: 1;
-  text-shadow: 0 1px 1px rgb(0 0 0 / 42%);
-  transform: translateX(-50%);
-  transition: color var(--shell-motion-star) ease-out, filter var(--shell-motion-star) ease-out, transform var(--shell-motion-star) ease-out;
-}
-
-.link-game-progress-hud .stat-star-progress .star-progress__milestone:nth-child(1) { left: 48%; }
-.link-game-progress-hud .stat-star-progress .star-progress__milestone:nth-child(2) { left: 72%; }
-.link-game-progress-hud .stat-star-progress .star-progress__milestone:nth-child(3) { left: 94%; }
-.link-game-progress-hud .stat-star-progress .star-progress__milestone.is-earned { color: #ffd166; filter: drop-shadow(0 0 3px rgb(255 209 102 / 72%)); transform: translateX(-50%) scale(1.14); }
-
-.link-game-progress-hud .stat-star-progress .star-progress__track {
-  position: relative;
-  display: block;
-  width: 100%;
-  height: 8px;
-  overflow: hidden;
-  border: 1px solid rgb(183 248 255 / 58%);
-  border-radius: 999px;
-  background: rgb(4 35 61 / 74%);
-  box-shadow: inset 0 1px 2px rgb(0 0 0 / 38%);
-}
-
-.link-game-progress-hud .stat-star-progress .star-progress__fill {
-  position: absolute;
-  inset: 1px auto 1px 1px;
-  width: 0;
-  height: auto;
-  border-radius: inherit;
-  background: linear-gradient(90deg, #36d9e7, #79f2ff);
-  box-shadow: 0 0 6px rgb(80 231 255 / 72%);
-  transition: width var(--shell-motion-star-fill) ease-out;
-}
-
-.link-game-progress-hud .stat-misses,
-.link-game-progress-hud .stat-misses .stat-label { color: #ff9da8; }
-.link-game-progress-hud .stat-combo .stat-label { color: #ffd889; }
-.link-game-progress-hud .stat-combo {
-  position: relative;
-  overflow: hidden;
-}
-
-.link-game-progress-hud .stat-combo .combo-window-progress {
-  position: absolute;
-  right: 3px;
-  bottom: 1px;
-  left: 3px;
-  height: 2px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #ffd166, #ff9666);
-  box-shadow: 0 0 5px rgb(255 188 91 / 72%);
-  opacity: 0;
-  transform: scaleX(0);
-  transform-origin: left center;
-}
-
-.link-game-progress-hud .stat-points,
-.link-game-progress-hud .stat-points .stat-label,
-.link-game-progress-hud .stat-progress { color: #f2bf5b; }
-
-.link-game-hud.game-hud {
-  --shell-hud-used-width: min(var(--shell-layout-content-max-width), calc(100vw - 12px));
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: min(var(--shell-layout-content-max-width), calc(100vw - 12px));
-  min-height: var(--shell-hud-min-height);
-  padding: 0 var(--shell-hud-side-padding);
-  margin: 0 auto 8px;
-  box-sizing: border-box;
-  border-radius: var(--shell-hud-radius);
-  background: linear-gradient(100deg, #182942, #243b64);
-  box-shadow: 0 6px 16px rgb(0 0 0 / 28%);
-  overflow: visible;
-  z-index: var(--shell-layers-hud);
-}
-
-.link-game-hud .game-stats {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  width: 100%;
-}
-
-.link-game-hud .stat-card {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  min-height: 28px;
-  padding: 3px 6px;
-  border: 1px solid rgb(185 213 255 / 24%);
-  border-radius: 9px;
-  background: rgb(106 151 211 / 45%);
-  color: #f5f7fb;
-  font-size: 0.76rem;
-  font-variant-numeric: tabular-nums;
-}
-
-.link-game-hud .stat-label { color: #c7ddff; font-size: 0.5rem; font-weight: 600; }
-.link-game-hud .stat-score,
-.link-game-hud .stat-score .stat-label { color: #ffe09a; }
-.link-game-hud .stat-card .ui-icon { width: 19px; height: 19px; stroke-width: 2.25; }
-.link-game-hud .stat-timer .ui-icon { color: #d9d3ff; }
-.link-game-hud .link-timer-icon {
-  position: relative;
-  isolation: isolate;
-  display: grid;
-  width: 19px;
-  height: 19px;
-  overflow: hidden;
-  border-radius: 50%;
-}
 .link-game-hud .stat-timer.is-time-frozen {
   position: relative;
   isolation: isolate;
@@ -1037,9 +878,6 @@
 .link-game-hud .stat-timer.is-time-frozen > * {
   position: relative;
   z-index: 2;
-}
-.link-game-hud .stat-timer.is-time-frozen .link-timer-icon .ui-icon {
-  color: #dbf8ff;
 }
 .link-game-hud .stat-timer.is-time-frozen::before {
   position: absolute;
@@ -1053,68 +891,12 @@
     linear-gradient(145deg, rgb(211 250 255 / 50%), rgb(67 182 232 / 38%)),
     url("/assets/images/ui/frozen-card-overlay.png") center / cover;
 }
-.link-game-hud .stat-score .ui-icon { color: #ffe09a; }
-.link-game-hud .game-menu-toggle { top: 50%; left: 0; transform: translateY(-50%); }
-.link-game-hud .game-menu-toggle:hover,
-.link-game-hud .game-menu-toggle[aria-expanded="true"] { transform: translateY(-50%); }
-.link-game-hud .game-actions-menu { top: calc(100% + var(--shell-hud-menu-offset)); left: 8px; z-index: var(--shell-layers-menu); }
 
 .link-star-total {
   display: inline-flex;
   align-items: center;
   gap: 3px;
   color: #ffe09a;
-}
-
-.link-tools-toggle {
-  position: absolute;
-  top: 50%;
-  right: 0;
-  z-index: 2;
-  display: grid;
-  width: 34px;
-  height: 34px;
-  place-items: center;
-  padding: 0;
-  border: 0;
-  border-radius: 9px;
-  background: #2f73b8;
-  color: #fff;
-  transform: translateY(-50%);
-}
-
-.link-tools-toggle:hover,
-.link-tools-toggle:focus-visible,
-.link-tools-toggle[aria-expanded="true"] {
-  background: #245b91;
-  outline: none;
-}
-
-.link-tools-toggle .ui-icon,
-.link-tools-toggle .ui-icon--wand { width: 19px; height: 19px; color: #d9e8ff !important; stroke-width: 2.25; }
-
-.link-tools-menu {
-  position: absolute;
-  top: calc(100% + var(--shell-hud-menu-offset));
-  right: 0;
-  z-index: var(--shell-layers-menu);
-  width: min(204px, calc(100vw - 18px));
-  padding: 5px;
-  border: 1px solid rgb(255 255 255 / 32%);
-  border-radius: 12px;
-  background: rgb(16 22 47 / 97%);
-  box-shadow: 0 12px 30px rgb(0 0 0 / 35%);
-}
-
-@media screen and (orientation: landscape) and (height <= 600px) {
-  .link-tools-menu {
-    max-height: calc(100dvh - 64px - env(safe-area-inset-bottom, 0px));
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    scrollbar-width: none;
-  }
-
-  .link-tools-menu::-webkit-scrollbar { display: none; }
 }
 
 .link-tool-list { display: grid; gap: 2px; }
@@ -1148,7 +930,6 @@
   align-items: center;
   width: min(var(--shell-milestones-width), calc(100vw - 28px));
   min-height: var(--shell-milestones-track-height);
-  margin: -6px auto 0;
   padding: 0;
   box-sizing: border-box;
   border: 1px solid rgb(185 213 255 / 24%);
@@ -1191,17 +972,6 @@
 .link-special-hud__milestones span.is-next { border-color: #7ceeff; color: #7ceeff; box-shadow: 0 0 0 2px rgb(124 238 255 / 16%); }
 
 @media screen and (width <= 600px) {
-
-  .link-game-progress-hud.game-progress-hud { gap: 4px; margin-bottom: 4px; padding: 2px 5px; }
-  .link-game-progress-hud .info { min-height: 24px; padding: 2px 4px; font-size: 0.66rem; }
-  .link-game-progress-hud .info.stat-star-progress { min-height: 24px; padding: 3px 4px; }
-  .link-game-progress-hud .stat-label { font-size: 0.45rem; }
-  .link-game-hud.game-hud { min-height: var(--shell-hud-mobile-min-height); padding: 0 var(--shell-hud-mobile-side-padding); margin-bottom: 6px; }
-  .link-game-hud .game-stats { gap: 4px; }
-  .link-game-hud .stat-card { min-height: 26px; padding: 2px 4px; font-size: 0.68rem; }
-  .link-game-hud .stat-label { font-size: 0.46rem; }
-  .link-tools-toggle { width: 30px; height: 30px; border-radius: 8px; }
-  .link-tools-toggle .ui-icon { width: 17px; height: 17px; }
   .link-special-hud { width: min(var(--shell-milestones-mobile-width), calc(100vw - 96px)); min-height: var(--shell-milestones-track-height); }
   .link-special-hud__milestones span { width: var(--shell-milestones-marker-size); height: var(--shell-milestones-marker-size); font-size: 0.5rem; }
 }

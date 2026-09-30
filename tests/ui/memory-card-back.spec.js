@@ -78,7 +78,7 @@ test("Nguyệt Sơn can be purchased, equipped, reloaded, and rendered in Memory
   await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   await page.evaluate(async () => {
     (await import("/js/gameSelector.js")).openGameMenu("memory-match");
-    (await import("/js/gameController.js")).startNewMemoryRun(1);
+    await (await import("/js/gameController.js")).startNewMemoryRun(1);
   });
   const tile = page.locator("#grid-container .tile").first();
   await expect(tile).toBeVisible();

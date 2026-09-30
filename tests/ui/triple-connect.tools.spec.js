@@ -25,7 +25,7 @@ test("Triple HUD uses the shared action menu and keeps tools separate", async ({
   await expect(page.locator("#triple-actions-menu")).toBeVisible();
   await expect(
     page.locator("#triple-actions-menu [data-triple-action]"),
-  ).toHaveCount(8);
+  ).toHaveCount(7);
   await expect(page.locator("#triple-tools-menu")).toBeHidden();
   const bounds = await page
     .locator("#triple-actions-menu")
@@ -118,7 +118,7 @@ test("Triple Time restores its committed inventory and timer after reload", asyn
     const { getTripleItemCount } = await import(
       "/js/tripleConnect/tripleItems.js"
     );
-    const run = continueTripleConnectSession(
+    const run = await continueTripleConnectSession(
       getActiveSession("triple-connect", "easy"),
     );
     return {

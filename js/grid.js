@@ -100,7 +100,7 @@ export function setBoardCoordinatesVisible(visible) {
  */
 export function createGrid(
   { tileCount, columns, mobileColumns },
-  { roundId, onPreviewComplete, previewDurationMs = GAME_CONFIG.previewDurationMs, assetPaths, history } = {},
+  { roundId, onPreviewComplete, previewDurationMs = GAME_CONFIG.previewDurationMs, assetPaths, history, deferPreview = false, startup } = {},
 ) {
   const totalTiles = tileCount;
   const numberOfPairs = Math.floor(totalTiles / 2);
@@ -137,12 +137,12 @@ export function createGrid(
   mountMemoryLayout();
 
   const tiles = document.createDocumentFragment();
-  cards.forEach((cardData, idx) => {
+  const cardBackClass = getCardBackClass(gameState.appearance.cardBack);
+  const appendTile = (cardData, idx) => {
     const tileId = `tile-${idx}`;
 
     const tile = document.createElement("div");
-    tile.classList.add("tile");
-    tile.classList.add(getCardBackClass(gameState.appearance.cardBack));
+    tile.className = `tile ${cardBackClass}`;
     tile.id = tileId;
 
     const img = document.createElement("img");
@@ -150,28 +150,34 @@ export function createGrid(
     img.alt = cardData.alt;
     img.decoding = "async";
     img.draggable = false;
-    img.classList.add("hidden");
+    img.className = "hidden";
 
     tile.dataset.imageId = cardData.id;
     tile.dataset.special = String(cardData.special === true);
-    tile.appendChild(img);
+    tile.append(img);
     tiles.appendChild(tile);
-  });
+  };
+  const commit = () => {
+  if (startup) startup.check();
   gridContainer.querySelectorAll("img").forEach(image => image.removeAttribute("src"));
   gridContainer.replaceChildren(tiles);
 
   // ✅ Preview ảnh trước khi bắt đầu
-  setTimeout(() => {
+  if (!deferPreview) setTimeout(() => {
     if (gameState.roundId === roundId)
       revealAndHideTiles(roundId, onPreviewComplete, previewDurationMs);
   }, 0);
   return selectedCards;
+  };
+  if (startup) return startup.batch(cards, appendTile).then(commit);
+  cards.forEach(appendTile);
+  return commit();
 }
 
 /**
  * Hiển thị tất cả ảnh trong 5s rồi ẩn lại nếu chưa matched
  */
-function revealAndHideTiles(roundId, onPreviewComplete, previewDurationMs) {
+export function revealAndHideTiles(roundId, onPreviewComplete, previewDurationMs) {
   if (gameState.roundId !== roundId) return;
 
   const allImgs = document.querySelectorAll(".tile img");

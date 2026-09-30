@@ -162,7 +162,7 @@ js/tripleConnect/
 - Core gameplay, sáu mode, Challenge/Lucky, item, solver, session, responsive, Hidden Piles, khay 7/10 và milestone 10/30 đã có trong runtime.
 - Round mới dùng topology corner-safe V6; layout V1–V5 tiếp tục là compatibility corpus cho save cũ.
 - Effect V2 runtime dùng adapter chung cho Link/Triple và đã có cleanup/reduced-motion/performance test. Visual fidelity từng line effect là phase riêng, không ảnh hưởng kết quả gameplay.
-- Công việc active nằm trong `TASK_RUNTIME_CLOSURE_AND_SIMPLIFICATION_PLAN.md`: core generation/solver đã đạt ngân sách; follow-up F1–F4 còn khóa validation boundary renderer, timer owner dùng chung, benchmark/soak đủ cả ba game và review đóng task. Visual polish Effect V2 là gate hoãn riêng sau performance closure.
+- Runtime closure đã hoàn tất: validation boundary renderer, timer owner dùng chung, benchmark/soak ba game và review đều đã đóng. Hiện không có kế hoạch active cho Triple Connect; visual polish Effect V2 chỉ mở thành task mỹ thuật riêng khi người dùng yêu cầu.
 
 ## 9. Trạng thái quyết định sản phẩm
 

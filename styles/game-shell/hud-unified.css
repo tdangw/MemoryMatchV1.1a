@@ -1,0 +1,223 @@
+/* Geometry and presentation owner for all three HUD adapters. */
+:root {
+  --unified-hud-height: 44px;
+  --unified-hud-radius: 10px;
+  --unified-hud-surface: linear-gradient(100deg, #182942, #243b64);
+  --unified-hud-label: #ffd166;
+  --unified-hud-value: #f5f7fb;
+  --unified-hud-timer-warning: #ff8a80;
+  --unified-hud-divider: rgb(185 213 255 / 22%);
+  --unified-hud-button-surface: #365785;
+  --unified-hud-button-active: #486da1;
+  --unified-hud-button-edge: rgb(185 213 255 / 55%);
+  --unified-hud-tools-surface: #64457d;
+  --unified-hud-tools-active: #80599a;
+  --unified-hud-tools-edge: rgb(222 184 255 / 65%);
+  --unified-hud-tools-icon: #f4e6ff;
+  --unified-hud-cell-padding: 2px;
+  --unified-hud-label-size: clamp(7px, 1.95vw, 9px);
+  --unified-hud-value-size: clamp(9px, 2.6vw, 12px);
+  --unified-hud-milestone-margin: 2px auto 0;
+  --unified-hud-star-offset: 6px;
+}
+.game-shell-root > [data-shell-region="progress"] { display: none; }
+.game-shell-root[data-shell-startup="preparing"] [data-shell-region="board"] { visibility: hidden; pointer-events: none; }
+.game-shell-root[data-shell-startup="preparing"] :is(.memory-tools-toggle, .link-tools-toggle, .triple-tools-toggle) { pointer-events: none; }
+.game-shell-startup-status { position: fixed; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%); padding: 8px 14px; border-radius: 10px; background: #243b64; color: #f5f7fb; white-space: nowrap; z-index: var(--shell-layers-menu); }
+.game-shell-root > [data-shell-region="milestones"] { margin: var(--unified-hud-milestone-margin); }
+.game-shell-root .game-hud {
+  --shell-hud-used-width: min(var(--board-width, var(--shell-layout-content-max-width)), 100%);
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--unified-hud-height) minmax(0, 1fr) var(--unified-hud-height);
+  align-items: stretch;
+  width: var(--shell-hud-used-width);
+  min-width: 0;
+  height: var(--unified-hud-height);
+  min-height: var(--unified-hud-height);
+  padding: 0;
+  margin: 0 auto var(--shell-hud-menu-offset);
+  gap: 0;
+  box-sizing: border-box;
+  border-radius: var(--unified-hud-radius);
+  background: var(--unified-hud-surface);
+  color: var(--unified-hud-value);
+  box-shadow: 0 6px 16px rgb(0 0 0 / 28%);
+  overflow: visible;
+  z-index: var(--shell-layers-hud);
+}
+.game-hud .game-hud__stats {
+  grid-column: 2;
+  grid-row: 1;
+  display: grid;
+  grid-template-columns: minmax(0, .95fr) minmax(0, .85fr) minmax(0, .8fr) minmax(0, 1.6fr) minmax(0, .7fr) minmax(0, 1fr) minmax(0, 1.5fr);
+  align-items: stretch;
+  min-width: 0;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  gap: 0;
+}
+.game-hud__stats-group { display: contents; }
+.game-hud .game-hud__metric {
+  position: relative;
+  display: grid;
+  grid-template-rows: 12px 16px;
+  align-content: center;
+  place-items: center;
+  min-width: 0;
+  min-height: 0;
+  padding: 0 var(--unified-hud-cell-padding);
+  margin: 0;
+  gap: 1px;
+  box-sizing: border-box;
+  border: 0;
+  border-inline-start: 1px solid var(--unified-hud-divider);
+  border-radius: 0;
+  background: transparent;
+  color: var(--unified-hud-value);
+  box-shadow: none;
+  white-space: nowrap;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.game-hud .game-hud__metric .stat-label {
+  color: var(--unified-hud-label);
+  font-size: var(--unified-hud-label-size);
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1;
+  white-space: nowrap;
+}
+.game-hud .game-hud__metric > :not(.stat-label):not(.combo-window-progress) {
+  display: block;
+  min-width: 0;
+  color: var(--unified-hud-value);
+  font-size: var(--unified-hud-value-size);
+  font-weight: 700;
+  line-height: 1;
+}
+.game-hud .stat-stars .stat-label .ui-icon { width: 13px; height: 13px; color: var(--unified-hud-label); }
+.game-hud .game-hud__metric.timer-warning > :not(.stat-label):not(.combo-window-progress) { color: var(--unified-hud-timer-warning); }
+.game-hud .game-menu-toggle,
+.game-hud :is(.memory-tools-toggle, .link-tools-toggle, .triple-tools-toggle) {
+  --unified-hud-control-surface: var(--unified-hud-button-surface);
+  --unified-hud-control-active: var(--unified-hud-button-active);
+  --unified-hud-control-edge: var(--unified-hud-button-edge);
+  grid-row: 1;
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--unified-hud-height);
+  height: var(--unified-hud-height);
+  padding: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: var(--unified-hud-control-surface);
+  color: var(--unified-hud-value);
+  box-shadow: inset 0 0 0 1px var(--unified-hud-control-edge);
+  cursor: pointer;
+  transform: none;
+  transition: none;
+  z-index: 1;
+}
+.game-hud .game-menu-toggle { grid-column: 1; border-radius: var(--unified-hud-radius) 0 0 var(--unified-hud-radius); }
+.game-hud :is(.memory-tools-toggle, .link-tools-toggle, .triple-tools-toggle) {
+  --unified-hud-control-surface: var(--unified-hud-tools-surface);
+  --unified-hud-control-active: var(--unified-hud-tools-active);
+  --unified-hud-control-edge: var(--unified-hud-tools-edge);
+  grid-column: 3;
+  border-inline-start: 1px solid var(--unified-hud-divider);
+  border-radius: 0 var(--unified-hud-radius) var(--unified-hud-radius) 0;
+}
+.game-hud :is(.game-menu-toggle, .memory-tools-toggle, .link-tools-toggle, .triple-tools-toggle) .ui-icon { width: 19px; height: 19px; stroke-width: 2.25; }
+.game-hud :is(.memory-tools-toggle, .link-tools-toggle, .triple-tools-toggle) .ui-icon { color: var(--unified-hud-tools-icon); }
+.game-hud :is(.game-menu-toggle, .memory-tools-toggle, .link-tools-toggle, .triple-tools-toggle):is(:hover, :active, [aria-expanded="true"]) { background: var(--unified-hud-control-active); transform: none; }
+.game-hud :is(button, [data-hud-info]):focus-visible { outline: 2px solid var(--unified-hud-label); outline-offset: -2px; }
+.game-hud .game-actions-menu,
+.game-hud :is(.memory-tools-menu, .link-tools-menu, .triple-tools-menu) {
+  position: absolute;
+  top: calc(100% + var(--shell-hud-menu-offset));
+  display: grid;
+  gap: 5px;
+  width: min(220px, calc(100vw - 32px));
+  max-height: calc(100dvh - 160px - env(safe-area-inset-bottom, 0px));
+  padding: 8px;
+  box-sizing: border-box;
+  border: 1px solid var(--unified-hud-divider);
+  border-radius: 12px;
+  background: rgb(16 22 47 / 98%);
+  box-shadow: 0 12px 30px rgb(0 0 0 / 35%);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  z-index: var(--shell-layers-menu);
+}
+.game-hud .game-actions-menu { left: 0; }
+.game-hud :is(.memory-tools-menu, .link-tools-menu, .triple-tools-menu) { right: 0; }
+.game-hud :is(.game-actions-menu, .memory-tools-menu, .link-tools-menu, .triple-tools-menu)[hidden] { display: none; }
+.game-hud :is(.game-actions-menu, .memory-tools-menu, .link-tools-menu, .triple-tools-menu)::-webkit-scrollbar { display: none; }
+.game-hud .game-hud__metric.stat-combo .combo-window-progress {
+  position: absolute;
+  right: 3px;
+  bottom: 1px;
+  left: 3px;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #ffd166, #ff9666);
+  box-shadow: 0 0 5px rgb(255 188 91 / 72%);
+  opacity: 0;
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+.game-hud__score-value { font-variant-numeric: tabular-nums; }
+/* A compact three-star crest, not three markers spread across the whole rail. */
+.game-milestone-stars {
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 7px);
+  display: grid;
+  grid-template-rows: 12px 7px;
+  width: 66px;
+  gap: 1px;
+  transform: translateY(calc(-50% - var(--unified-hud-star-offset)));
+}
+
+.game-milestone-stars .star-progress__stars {
+  position: relative;
+  display: block;
+  height: 12px;
+}
+
+.game-milestone-stars .star-progress__milestone {
+  position: absolute;
+  top: -1px;
+  color: #60728b;
+  font-size: 0.68rem;
+  line-height: 1;
+  text-shadow: 0 1px 1px rgb(0 0 0 / 42%);
+  transform: translateX(-50%);
+  transition:
+    color var(--shell-motion-star) ease-out,
+    filter var(--shell-motion-star) ease-out,
+    transform var(--shell-motion-star) ease-out;
+}
+
+.game-milestone-stars .star-progress__milestone:nth-child(1) { left: 50%; }
+.game-milestone-stars .star-progress__milestone:nth-child(2) { top: -3px; left: 70%; font-size: 0.82rem; }
+.game-milestone-stars .star-progress__milestone:nth-child(3) { left: 90%; }
+.game-milestone-stars .star-progress__milestone.is-earned { color: #ffd166; filter: drop-shadow(0 0 3px rgb(255 209 102 / 72%)); transform: translateX(-50%) scale(1.08); }
+.game-milestone-stars .star-progress__milestone.is-earned:nth-child(2) { transform: translateX(-50%) scale(1.08); }
+.game-milestone-stars .star-progress__track { position: relative; display: block; height: 7px; overflow: hidden; border: 1px solid rgb(183 248 255 / 58%); border-radius: 999px; background: rgb(4 35 61 / 74%); box-shadow: inset 0 1px 2px rgb(0 0 0 / 38%); }
+.game-milestone-stars .star-progress__fill { position: absolute; inset: 1px auto 1px 1px; width: 0; border-radius: inherit; background: linear-gradient(90deg, #36d9e7, #79f2ff); box-shadow: 0 0 6px rgb(80 231 255 / 72%); transition: width var(--shell-motion-star-fill) ease-out; }
+
+
+@media screen and (width <= 600px) {
+  .game-milestone-stars { width: 56px; left: calc(100% + 5px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .game-milestone-stars .star-progress__milestone,
+  .game-milestone-stars .star-progress__fill { transition: none; }
+}

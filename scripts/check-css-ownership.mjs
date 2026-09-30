@@ -11,6 +11,56 @@ const [legacy, board, gameplay, modals, shop] = await Promise.all([
   readCss("styles/shop.css"),
 ]);
 
+const hudPaths = ["styles/game-shell/hud-unified.css", "styles/hud.css", "styles/link-connect.css", "styles/triple-connect.css"];
+const hudSources = await Promise.all(hudPaths.map(readCss));
+const unifiedPath = hudPaths[0];
+
+// Inspect leaf rules (also inside media queries), not load order or exact
+// selector strings. Aliases and more specific selectors still share an owner.
+function assertHudOwnership(sources) {
+  for (const [path, css] of sources) {
+    const clean = css.replace(/\/\*[\s\S]*?\*\//g, "");
+    for (const [, selector, body] of clean.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+      const declarations = [...body.matchAll(/([\w-]+)\s*:\s*([^;]+)(?:;|$)/g)];
+      // Split groups without splitting :is()/:where() arguments. A state
+      // selector in one group cannot grant ownership to another base selector.
+      const selectors = [];
+      let depth = 0;
+      let start = 0;
+      for (let index = 0; index < selector.length; index++) {
+        if ("([".includes(selector[index])) depth++;
+        else if (")]".includes(selector[index])) depth--;
+        else if (selector[index] === "," && depth === 0) { selectors.push(selector.slice(start, index).trim()); start = index + 1; }
+      }
+      selectors.push(selector.slice(start).trim());
+      for (const entry of selectors) {
+        const hudBase = /#game-title|\.(?:(?:link|triple)-)?game-hud\b|\.game-hud__|\.game-stats\b|\.game-menu-toggle\b|\.game-actions-menu\b|\.(?:memory|link|triple)-tools-(?:toggle|menu)\b/.test(entry);
+        const gameState = /\.is-previewing|\.is-time-frozen/.test(entry);
+        if (path !== unifiedPath && hudBase && !gameState) {
+          assert.equal(declarations.length, 0, `${path}: shared HUD base ${entry} belongs to ${unifiedPath}`);
+        }
+        if (path !== unifiedPath && /^(?:\.memory-special-hud|\.link-special-hud|\.triple-connect-game > \.triple-connect__milestones)$/.test(entry)) {
+          for (const [, property] of declarations) assert(!/^margin(?:-|$)/.test(property), `${path}: milestone spacing belongs to ${unifiedPath}`);
+        }
+      }
+      if (path !== unifiedPath) for (const [, property] of declarations) {
+        assert(!property.startsWith("--unified-hud-"), `${path}: shared HUD token ${property} has multiple owners`);
+      }
+    }
+  }
+}
+const hudEntries = hudPaths.map((path, index) => [path, hudSources[index]]);
+assertHudOwnership(hudEntries);
+assert.doesNotMatch(legacy, /#game-title(?:\s+span)?\s*[,\{]/, "legacy ID rules must not override shared HUD geometry/typography");
+assert.doesNotMatch(modals, /\.game-stats\s+\.info\s*[,\{]/, "modal stylesheet must not own HUD cell display");
+// Negative fixtures verify base aliases, shorthand properties and responsive
+// rules cannot silently become a second owner.
+for (const fixture of [".link-game-hud .stat-card { padding: 8px; }", "@media (width < 600px) { .game-menu-toggle { width: 30px; } }", ":root { --unified-hud-label: red; }", ".link-game-hud .stat-card, .link-game-hud .stat-timer.is-time-frozen { padding: 8px; }"]) {
+  assert.throws(() => assertHudOwnership([...hudEntries, ["fixture.css", fixture]]), /owner|belongs/, `HUD ownership guard missed ${fixture}`);
+}
+assert.match(hudSources[0], /--unified-hud-milestone-margin:\s*[^;]+;/);
+assert.match(hudSources[0], /\[data-shell-region="milestones"\]\s*\{\s*margin:\s*var\(--unified-hud-milestone-margin\)/);
+
 function keyframes(css) {
   return [...css.matchAll(/@keyframes\s+([\w-]+)/g)].map(([, name]) => name);
 }

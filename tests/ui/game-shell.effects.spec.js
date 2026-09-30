@@ -12,8 +12,8 @@ test("effect limits preserve settlement and release nodes on game switch", async
     const result = await page.evaluate(async gameId => {
       const { openGameMenu } = await import("/js/gameSelector.js");
       openGameMenu(gameId);
-      if (gameId === "memory-match") (await import("/js/gameController.js")).startNewMemoryRun();
-      else (await import("/js/linkConnect/linkController.js")).startLinkLevel({ mode: "easy" });
+      if (gameId === "memory-match") await (await import("/js/gameController.js")).startNewMemoryRun();
+      else await (await import("/js/linkConnect/linkController.js")).startLinkLevel({ mode: "easy" });
       const { getEffectRegistry } = await import("/js/gameShell/gameShellEffects.js");
       const { playLootDrop } = await import("/js/lootEffects.js");
       const { playCoinRewardFlight } = await import("/js/coinRewards.js");
@@ -99,7 +99,7 @@ test("Link reward adapters use shared loot and item budgets", async ({ page }) =
   await ready(page);
   const result = await page.evaluate(async () => {
     (await import("/js/gameSelector.js")).openGameMenu("link-connect");
-    (await import("/js/linkConnect/linkController.js")).startLinkLevel({ mode: "easy" });
+    await (await import("/js/linkConnect/linkController.js")).startLinkLevel({ mode: "easy" });
     const { playLinkItemRewardFlight } = await import("/js/linkConnect/linkRenderer.js");
     const { getEffectRegistry } = await import("/js/gameShell/gameShellEffects.js");
     const { clearLootEffects } = await import("/js/lootEffects.js");
@@ -124,7 +124,7 @@ test("combo presentation restarts without forced layout and releases its owner e
   await ready(page);
   const result = await page.evaluate(async () => {
     (await import("/js/gameSelector.js")).openGameMenu("link-connect");
-    (await import("/js/linkConnect/linkController.js")).startLinkLevel({ mode: "easy" });
+    await (await import("/js/linkConnect/linkController.js")).startLinkLevel({ mode: "easy" });
     const { getEffectRegistry } = await import("/js/gameShell/gameShellEffects.js");
     const { clearComboWindow, playComboWindow } = await import("/js/gameShell/comboWindowPresentation.js");
     const card = document.querySelector("#link-connect-container .stat-combo");
@@ -145,7 +145,7 @@ test("coin counter pulse restarts through owned compositor animations", async ({
   await ready(page);
   const result = await page.evaluate(async () => {
     (await import("/js/gameSelector.js")).openGameMenu("link-connect");
-    (await import("/js/linkConnect/linkController.js")).startLinkLevel({ mode: "easy" });
+    await (await import("/js/linkConnect/linkController.js")).startLinkLevel({ mode: "easy" });
     const { animateCoinCounter } = await import("/js/coinRewards.js");
     const { getEffectRegistry } = await import("/js/gameShell/gameShellEffects.js");
     const container = document.querySelector("#link-special-coins");

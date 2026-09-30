@@ -17,7 +17,10 @@ export function createGameShell({ root = document.createElement("section"), regi
     if (!regions[name]) (name === "board" ? refs.frame : root).append(element);
     refs[name] = element;
   }
-  refs.progress.setAttribute("role", "group");
+  // Public compatibility slot only. Gameplay metrics belong to refs.hud;
+  // adapters supply an empty progress region and it never participates in layout.
+  refs.progress.hidden = true;
+  refs.progress.setAttribute("aria-hidden", "true");
   refs.hud.setAttribute("role", "group");
   refs.hud.setAttribute("aria-label", "Thông tin và công cụ màn chơi");
   refs.board.setAttribute("role", "group");

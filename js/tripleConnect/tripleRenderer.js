@@ -59,7 +59,7 @@ export function createTripleRenderer(shell, { onLockedTraySlotClick } = {}) {
   let activeLayout = null;
   const coverDepthCache = new WeakMap();
 
-  function render(state, layout, themeId = "default") {
+  function render(state, layout, themeId = "default", startup) {
     tray.dataset.tripleTrayCapacity = String(state.trayCapacity);
     const lockedCount = TRAY_VISIBLE_SLOT_COUNT - state.trayCapacity;
     tray.setAttribute(
@@ -74,8 +74,8 @@ export function createTripleRenderer(shell, { onLockedTraySlotClick } = {}) {
     const coverDepths = getCoverDepths(state, coverDepthCache);
     const boardView = createTripleBoardViewFromTrustedState(state);
     const live = new Set();
-    for (const tile of Object.values(state.tiles)) {
-      if (!boardView.visibleTileIds.has(tile.id)) continue;
+    const syncTile = tile => {
+      if (!boardView.visibleTileIds.has(tile.id)) return;
       live.add(tile.id);
       let node = nodes.get(tile.id);
       if (!node) {
@@ -84,6 +84,7 @@ export function createTripleRenderer(shell, { onLockedTraySlotClick } = {}) {
         node.className = "triple-connect__tile";
         node.dataset.tileId = tile.id;
         const image = document.createElement("img");
+        image.decoding = "async";
         image.alt = "";
         image.draggable = false;
         node.append(image);
@@ -143,12 +144,18 @@ export function createTripleRenderer(shell, { onLockedTraySlotClick } = {}) {
         }
         if (node.parentElement !== board) board.append(node);
       }
-    }
+    };
+    const commit = () => {
+    if (startup) startup.check();
     for (const [id, node] of nodes)
       if (!live.has(id)) {
         node.remove();
         nodes.delete(id);
       }
+    };
+    if (startup) return startup.batch(Object.values(state.tiles), syncTile).then(commit);
+    Object.values(state.tiles).forEach(syncTile);
+    return commit();
   }
 
   function mountLayout(scope, layout) {

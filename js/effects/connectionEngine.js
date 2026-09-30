@@ -281,6 +281,40 @@ function seededLightning(points, seed, bounds, variant) {
   });
 }
 
+function renderFirePath(points, seed, bounds) {
+  let value = (seed >>> 0) || 1;
+  const next = () => {
+    value = Math.imul(value, 1664525) + 1013904223 >>> 0;
+    return value / 0x1_0000_0000;
+  };
+  const width = Math.max(1, bounds.width);
+  const height = Math.max(1, bounds.height);
+  return points.flatMap((point, index) => {
+    const end = points[index + 1];
+    if (!end) return [point];
+    const pixelDx = (end.x - point.x) * width / 100;
+    const pixelDy = (end.y - point.y) * height / 100;
+    const distance = Math.hypot(pixelDx, pixelDy) || 1;
+    const normalX = -pixelDy / distance;
+    const normalY = pixelDx / distance;
+    const steps = Math.min(18, Math.max(7, Math.ceil(distance / 13)));
+    const phase = next() * Math.PI * 2;
+    return Array.from({ length: steps + 1 }, (_, step) => {
+      if (!step) return point;
+      if (step === steps) return end;
+      const progress = step / steps;
+      const envelope = Math.sin(progress * Math.PI);
+      const wave = Math.sin(progress * Math.PI * 3 + phase) * 2.8;
+      const lick = (next() - .38) * 2.4;
+      const offset = (wave + lick) * envelope;
+      return {
+        x: point.x + (end.x - point.x) * progress + normalX * offset * 100 / width,
+        y: point.y + (end.y - point.y) * progress + normalY * offset * 100 / height,
+      };
+    });
+  });
+}
+
 function renderPlasmaPath(points) {
   return points.flatMap((point, index) => {
     const end = points[index + 1];
@@ -362,7 +396,7 @@ function renderSonicPath(points) {
 }
 
 const DECORATION_COUNTS = Object.freeze({
-  tracer: 1, jagged: 2, "dual-stroke": 0, sparks: 4, symbols: 3,
+  tracer: 1, jagged: 2, flame: 4, "dual-stroke": 0, sparks: 4, symbols: 3,
   packets: 4, gradient: 0, wave: 3, helix: 4, motes: 4, ribbon: 2,
   dash: 3, projectile: 2, charge: 2, rings: 3, links: 4, wavelets: 3,
   droplets: 4,
@@ -404,6 +438,7 @@ function renderDecorations(nodes, points, family, effectId) {
 
 function renderFamilyPath(points, family, seed, bounds, effectId) {
   if (family === "jagged") return seededLightning(points, seed, bounds, effectId);
+  if (family === "flame") return renderFirePath(points, seed, bounds);
   if (effectId === "plasma") return renderPlasmaPath(points);
   if (effectId === "spiral") return renderSpiralPath(points);
   if (effectId === "sonic") return renderSonicPath(points);

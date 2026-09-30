@@ -1,7 +1,7 @@
 import { LINK_EXIT_EFFECTS, LINK_PATH_EFFECTS } from "../linkConnect/linkEffects.js";
 
 const PATH_FAMILIES = Object.freeze({
-  default: "tracer", electric: "jagged", laser: "dual-stroke", fire: "jagged", magic: "symbols",
+  default: "tracer", electric: "jagged", laser: "dual-stroke", fire: "flame", magic: "symbols",
   cyber: "packets", rainbow: "gradient", hydro: "wave", plasma: "helix", holy: "motes",
   shadow: "ribbon", spiral: "helix", dashed: "dash", bullet: "projectile", kame: "charge",
   halo: "rings", matrix: "symbols", sonic: "wavelets", chains: "links", meteor: "sparks", poison: "droplets",

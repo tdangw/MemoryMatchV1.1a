@@ -24,7 +24,7 @@ test("Link V2 connection surface reuses its SVG nodes and clears without stale d
     const { drawLinkPath, clearLinkPath } = await import("/js/linkConnect/linkRenderer.js");
     const { LINK_PATH_EFFECTS } = await import("/js/linkConnect/linkEffects.js");
     const { getEffectRegistry } = await import("/js/gameShell/gameShellEffects.js");
-    controller.startLinkLevel({ mode: "easy" });
+    await controller.startLinkLevel({ mode: "easy" });
     const connection = findAvailableConnections(linkGameState.board.grid)[0];
     const surface = document.querySelector("#link-path-overlay");
     const seen = [];
@@ -64,7 +64,7 @@ test("Link V2 connection restarts pooled line animations on every draw", async (
     const { linkGameState } = await import("/js/linkConnect/linkState.js");
     const { findAvailableConnections } = await import("/js/linkConnect/pathfinder.js");
     const { drawLinkPath, clearLinkPath } = await import("/js/linkConnect/linkRenderer.js");
-    controller.startLinkLevel({ mode: "easy" });
+    await controller.startLinkLevel({ mode: "easy" });
     const path = findAvailableConnections(linkGameState.board.grid)[0].path;
     const surface = document.querySelector("#link-path-overlay");
     drawLinkPath(path, linkGameState.board);
@@ -147,7 +147,7 @@ test("Electric connection renders an organic cyan bolt with bounded pooled nodes
   expect(result.cleared).toBe(true);
 });
 
-test("Fire connection renders a compact red jagged bolt inside the shared SVG pool", async ({ page }) => {
+test("Fire connection uses a flowing flame path distinct from Electric inside the shared SVG pool", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
   const result = await page.evaluate(async () => {
@@ -156,23 +156,32 @@ test("Fire connection renders a compact red jagged bolt inside the shared SVG po
     const surface = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     document.body.append(surface);
     surface.getBoundingClientRect = () => ({ width: 360, height: 440 });
+    const route = [{ x: 8, y: 18 }, { x: 48, y: 18 }, { x: 48, y: 76 }, { x: 90, y: 76 }];
     renderConnectionV2({
       surface,
-      points: [{ x: 8, y: 18 }, { x: 48, y: 18 }, { x: 48, y: 76 }, { x: 90, y: 76 }],
+      points: route,
       effect: getEffectV2Path("fire"),
       seed: 5,
     });
-    const boltPoints = surface.querySelector(".link-path-overlay__beam").getAttribute("points").trim().split(/\s+/);
+    const beam = surface.querySelector(".link-path-overlay__beam");
+    const flamePath = beam.getAttribute("points").trim();
     const sparks = [...surface.querySelectorAll(".effect-v2-connection__decoration--fire")]
       .map(node => Number(node.getAttribute("r")));
+    const fireAnimations = getComputedStyle(beam).animationName;
+    renderConnectionV2({ surface, points: route, effect: getEffectV2Path("electric"), seed: 5 });
+    const electricPath = beam.getAttribute("points").trim();
+    const electricAnimations = getComputedStyle(beam).animationName;
     const children = surface.children.length;
     clearConnectionV2(surface);
     surface.remove();
-    return { boltPoints: boltPoints.length, sparks, children };
+    return { flamePoints: flamePath.split(/\s+/).length, sparks, children, distinctPath: flamePath !== electricPath, fireAnimations, electricAnimations };
   });
-  expect(result.boltPoints).toBeGreaterThan(48);
-  expect(result.sparks).toHaveLength(2);
+  expect(result.flamePoints).toBeGreaterThan(24);
+  expect(result.sparks).toHaveLength(4);
   expect(result.children).toBe(3);
+  expect(result.distinctPath).toBe(true);
+  expect(result.fireAnimations).toContain("link-fire-flow");
+  expect(result.fireAnimations).not.toBe(result.electricAnimations);
 });
 
 test("Rainbow connection draws all seven spectrum colors with one reusable SVG gradient", async ({ page }) => {
@@ -437,7 +446,7 @@ test("Link V2 connection handle is disposed when switching games", async ({ page
     const { findAvailableConnections } = await import("/js/linkConnect/pathfinder.js");
     const { drawLinkPath } = await import("/js/linkConnect/linkRenderer.js");
     const { getEffectRegistry } = await import("/js/gameShell/gameShellEffects.js");
-    controller.startLinkLevel({ mode: "easy" });
+    await controller.startLinkLevel({ mode: "easy" });
     drawLinkPath(findAvailableConnections(linkGameState.board.grid)[0].path, linkGameState.board);
     const registry = getEffectRegistry();
     const before = registry.diagnostics();
@@ -464,7 +473,7 @@ test("Link V2 connection returns to its resource baseline after 100 draw and swi
     let maximum = 0;
     for (let cycle = 0; cycle < 100; cycle++) {
       selector.openGameMenu("link-connect");
-      controller.startLinkLevel({ mode: "easy" });
+      await controller.startLinkLevel({ mode: "easy" });
       drawLinkPath(findAvailableConnections(linkGameState.board.grid)[0].path, linkGameState.board);
       maximum = Math.max(maximum, getEffectRegistry().diagnostics().connection);
       selector.openGameMenu("memory-match");

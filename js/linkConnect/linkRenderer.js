@@ -33,6 +33,11 @@ export function renderLinkBoard(board, { onTileClick, onCompactLandscapeChange: 
   return measureLinkRender("board patch", () => patchLinkBoard(board, onTileClick));
 }
 
+export function renderLinkBoardStartup(board, { onTileClick, onCompactLandscapeChange: onChange }, startup) {
+  if (onChange) onCompactLandscapeChange = onChange;
+  return patchLinkBoard(board, onTileClick, startup);
+}
+
 export function renderLinkBoardShift(board, { onTileClick } = {}) {
   return renderLinkBoardMotion(board, onTileClick, "shift");
 }
@@ -139,7 +144,7 @@ function animateLinkTileMotion(element, deltaX, deltaY, index, settings) {
   animation.addEventListener("cancel", clearAnimation, { once: true });
 }
 
-function patchLinkBoard(board, onTileClick) {
+function patchLinkBoard(board, onTileClick, startup) {
   const container = document.getElementById("link-board");
   if (!container) return;
   const rows = board.grid.length - 2;
@@ -149,20 +154,22 @@ function patchLinkBoard(board, onTileClick) {
   container.style.setProperty("--link-columns", String(board.columns));
   container.style.setProperty("--link-rows", String(rows));
   const boardRebuilt = renderedBoardContainer !== container || renderedBoardShape !== shape;
-  if (boardRebuilt) {
-    createLinkBoardCells(container, board.columns, rows);
-  }
+  const boardFragment = boardRebuilt
+    ? createLinkBoardCells(board.columns, rows)
+    : null;
 
   const desiredTiles = new Map();
-  board.grid.slice(1, -1).forEach((row, rowIndex) => {
-    row.slice(1, -1).forEach((tile, columnIndex) => {
-      if (!tile) return;
+  for (let rowIndex = 1; rowIndex <= rows; rowIndex += 1) {
+    const row = board.grid[rowIndex];
+    for (let columnIndex = 1; columnIndex <= board.columns; columnIndex += 1) {
+      const tile = row[columnIndex];
+      if (!tile) continue;
       desiredTiles.set(tile.instanceId, {
         tile,
-        position: { row: rowIndex + 1, column: columnIndex + 1 },
+        position: { row: rowIndex, column: columnIndex },
       });
-    });
-  });
+    }
+  }
 
   const changedCells = new Set();
   let updatedTiles = 0;
@@ -175,7 +182,7 @@ function patchLinkBoard(board, onTileClick) {
     element.remove();
     tileElementsByKey.delete(key);
   });
-  desiredTiles.forEach(({ tile, position }, key) => {
+  const syncTile = ({ tile, position }, key) => {
     const cell = boardCellsByPosition.get(positionKey(position));
     if (!cell) return;
     let button = tileElementsByKey.get(key);
@@ -188,19 +195,30 @@ function patchLinkBoard(board, onTileClick) {
     if (button.parentElement) changedCells.add(button.parentElement);
     changedCells.add(cell);
     cell.replaceChildren(button);
-  });
+  };
+  const commit = () => {
+  if (startup) startup.check();
   changedCells.forEach((cell) => {
     cell.classList.toggle("is-empty", !cell.firstElementChild);
   });
+  if (boardFragment) {
+    container.replaceChildren(boardFragment);
+    renderedBoardContainer = container;
+    renderedBoardShape = shape;
+  }
   recordLinkPatch({
     changedCells: changedCells.size,
     updatedTiles,
     createdTiles,
   });
   if (boardRebuilt) linkLayout.schedule();
+  };
+  if (startup) return startup.batch([...desiredTiles.entries()], ([key, tile]) => syncTile(tile, key)).then(commit);
+  desiredTiles.forEach(syncTile);
+  return commit();
 }
 
-function createLinkBoardCells(container, columns, rows) {
+function createLinkBoardCells(columns, rows) {
   const fragment = document.createDocumentFragment();
   boardCellsByPosition.clear();
   for (let row = 1; row <= rows; row += 1) {
@@ -214,9 +232,7 @@ function createLinkBoardCells(container, columns, rows) {
       fragment.append(cell);
     }
   }
-  container.replaceChildren(fragment);
-  renderedBoardContainer = container;
-  renderedBoardShape = `${columns}x${rows}`;
+  return fragment;
 }
 
 function createLinkTileElement(tileKey) {
@@ -229,6 +245,7 @@ function createLinkTileElement(tileKey) {
   image.alt = "";
   image.decoding = "async";
   button.append(image);
+  button._linkImage = image;
   button.addEventListener("click", () => {
     const onTileClick = button._onLinkTileClick;
     if (!onTileClick) return;
@@ -273,9 +290,13 @@ function syncLinkTileElement(button, tile, position, onTileClick) {
     ].filter(Boolean).join(" · "),
   );
 
-  const image = button.querySelector("img:not(.link-tile__frost-overlay)");
+  const image = button._linkImage || button.querySelector("img:not(.link-tile__frost-overlay)");
+  button._linkImage = image;
   if (image?.getAttribute("src") !== tile.src) image.src = tile.src;
-  let frostOverlay = button.querySelector(".link-tile__frost-overlay");
+  let frostOverlay = button._linkFrostOverlay?.isConnected
+    ? button._linkFrostOverlay
+    : button.querySelector(".link-tile__frost-overlay");
+  button._linkFrostOverlay = frostOverlay;
   if (tile.frozen && !frostOverlay) {
     frostOverlay = document.createElement("img");
     frostOverlay.className = "link-tile__frost-overlay";
@@ -284,8 +305,10 @@ function syncLinkTileElement(button, tile, position, onTileClick) {
     frostOverlay.decoding = "async";
     frostOverlay.setAttribute("aria-hidden", "true");
     button.append(frostOverlay);
+    button._linkFrostOverlay = frostOverlay;
   } else if (!tile.frozen) {
     frostOverlay?.remove();
+    button._linkFrostOverlay = null;
   }
   return true;
 }

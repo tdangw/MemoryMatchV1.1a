@@ -92,15 +92,13 @@ export function updateTotalStarsDisplay(stars) { getMemoryHud().stats({ totalSta
 
 export function updateLevelDisplay(level) { getMemoryHud().stats({ level: level }); }
 
-export function updateHintDisplay(hints) { getMemoryHud().stats({ hint: hints }); }
+export function updateHintDisplay(hints) { getMemoryHud().tool("hint", { count: hints }); }
 
 export function updateMovesDisplay(moves) { getMemoryHud().stats({ moves: moves }); }
 
 export function updateMissesDisplay(misses) { getMemoryHud().stats({ misses: misses }); }
 
 export function updateComboDisplay(combo) { getMemoryHud().stats({ combo: combo }); }
-
-export function updatePairProgressDisplay(matchedPairs, totalPairs = gameState.totalPairs) { getMemoryHud().stats({ matchedPairs, totalPairs }); }
 
 export function updateTimerDisplay(seconds) {
   if (!timerElement) return;

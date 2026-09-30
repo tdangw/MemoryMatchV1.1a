@@ -44,13 +44,15 @@ import { getEquippedThemeId } from "../appearance.js";
 import { gameState, recordTripleConnectResult } from "../gameState.js";
 import { openAppModal, showAppToast } from "../modal.js";
 import { unmountActiveGameShell } from "../gameShell/gameShell.js";
+import { createGameShellStartup } from "../gameShell/gameShellStartup.js";
+import { bindGameHudMenus } from "../gameShell/gameHudMenus.js";
 import { commitTripleRewardTransaction, consumeTripleItemWithSession } from "./tripleTransactions.js";
 import { renderHudTimer } from "../gameShell/gameShellHud.js";
 import { savePersistentGameData } from "../persistence.js";
 import { stageActiveSession } from "../sessionProgress.js";
 import { calculateTripleCoinReward } from "./tripleConfig.js";
 import { getLinkExitEffect, getLinkPathEffect } from "../linkConnect/linkEffects.js";
-import { sounds } from "../sound.js";
+import { duckBackgroundMusicForVictory, restoreBackgroundMusic, sounds } from "../sound.js";
 import { getGameModeLabel } from "../gameCatalog.js";
 import { getTheme, getThemeSelectionEligibility, selectThemeCards } from "../themeCatalog.js";
 import { playCoinRewardFlight } from "../coinRewards.js";
@@ -112,56 +114,62 @@ export function startTripleConnectDevelopmentRound({
   });
 }
 
-export async function startTripleConnectRound({
-  seed,
-  mode = "easy",
-  level = 1,
-  elapsedTime,
-  skipIntro = false,
-} = {}) {
+export function startTripleConnectRound({ seed, mode = "easy", level = 1, elapsedTime, skipIntro = false } = {}) {
   const normalizedLevel = normalizeLevel(level);
   if (mode === "challenge") getTripleChallengeStage(normalizedLevel);
   const roundSeed = seed || createRoundSeed(mode, normalizedLevel);
   cancelPendingTripleGeneration();
-  let request;
-  try {
-    request = requestTripleGeneration({ mode, seed: roundSeed, level: normalizedLevel });
-  } catch {
-    return startTripleConnectRoundFromGenerated({
-      generated: generateTripleBoard({ mode, seed: roundSeed, level: normalizedLevel }),
-      mode,
-      level: normalizedLevel,
-      elapsedTime,
-      skipIntro,
-      explicitSeed: seed !== undefined,
-    });
-  }
-  pendingGeneration = request;
-  try {
-    const generated = await request.promise;
-    if (pendingGeneration !== request) return null;
-    pendingGeneration = null;
-    return startTripleConnectRoundFromGenerated({
-      generated,
-      mode,
-      level: normalizedLevel,
-      elapsedTime,
-      skipIntro,
-      explicitSeed: seed !== undefined,
-    });
-  } catch (error) {
-    if (pendingGeneration !== request) return null;
-    pendingGeneration = null;
-    if (String(error?.message).includes("cancelled")) return null;
-    return startTripleConnectRoundFromGenerated({
-      generated: generateTripleBoard({ mode, seed: roundSeed, level: normalizedLevel }),
-      mode,
-      level: normalizedLevel,
-      elapsedTime,
-      skipIntro,
-      explicitSeed: seed !== undefined,
-    });
-  }
+  return prepareTripleStartup(async startup => {
+    let generated;
+    let request;
+    try {
+      request = requestTripleGeneration({ mode, seed: roundSeed, level: normalizedLevel });
+      pendingGeneration = request;
+      const release = startup.scope.own(() => {
+        request.cancel();
+        if (pendingGeneration === request) pendingGeneration = null;
+      });
+      try { generated = await startup.phase('generation', () => request.promise); }
+      finally { release.forget(); }
+      startup.check();
+      if (pendingGeneration !== request) return null;
+      pendingGeneration = null;
+    } catch (error) {
+      startup.check();
+      if (String(error.message).includes('cancelled')) return null;
+      pendingGeneration = null;
+      console.warn('Triple worker unavailable; using bounded generation fallback', error);
+      await startup.yield();
+      generated = await startup.phase('generation-fallback', () => generateTripleBoard({ mode, seed: roundSeed, level: normalizedLevel }));
+    }
+    await startup.yield();
+    return startup.phase('prepare', () => startTripleConnectRoundFromGenerated({
+      generated, mode, level: normalizedLevel, elapsedTime, skipIntro,
+      explicitSeed: seed !== undefined, startup,
+    }));
+  });
+}
+
+function prepareTripleStartup(prepare) {
+  const shell = getTripleShell();
+  const scope = shell.mount();
+  const startup = createGameShellStartup(scope, shell.refs, error => {
+    console.error('Triple startup failed', error);
+    showAppToast('Không thể chuẩn bị bàn chơi. Hãy chơi lại.');
+  });
+  roundStarted = false;
+  return startup.run(async () => {
+    const mounted = await prepare(startup);
+    startup.check();
+    if (!mounted) return null;
+    await startup.yield();
+    await startup.phase('render', mounted.renderInitial);
+    await startup.yield();
+    await startup.phase('images', () => startup.decodeBoard());
+    startup.check();
+    mounted.activate();
+    return mounted;
+  });
 }
 
 export function cancelPendingTripleGeneration() {
@@ -184,7 +192,7 @@ function generateTripleBoard({ seed, mode, level }) {
   return generate({ seed, level });
 }
 
-function startTripleConnectRoundFromGenerated({ generated, mode, level, elapsedTime, skipIntro, explicitSeed }) {
+function startTripleConnectRoundFromGenerated({ generated, mode, level, elapsedTime, skipIntro, explicitSeed, startup }) {
   const themeId = getTheme(getEquippedThemeId(gameState.appearance, "triple-connect")).id;
   const typeIds = [...new Set(generated.board.tiles.map((tile) => tile.type))].sort();
   const theme = getTheme(themeId);
@@ -212,7 +220,7 @@ function startTripleConnectRoundFromGenerated({ generated, mode, level, elapsedT
     mode === "endless" && Number.isInteger(elapsedTime) && elapsedTime >= 0
       ? elapsedTime
       : getTripleLevelTime(mode, level);
-  const mounted = mountTripleDevelopmentRound(generated, { skipIntro });
+  const mounted = mountTripleDevelopmentRound(generated, { skipIntro, startup });
   if (selectedAssets.length) {
     commitThemeSession("triple-connect", createSession(state, remainingTime), themeId, selectedAssets);
   }
@@ -228,7 +236,10 @@ export function continueTripleConnectDevelopmentRound({ mode = "easy" } = {}) {
 }
 
 export function continueTripleConnectSession(session) {
-  if (!isValidTripleConnectSession(session)) return null;
+  if (!session) return null;
+  cancelPendingTripleGeneration();
+  return prepareTripleStartup(async startup => {
+  if (!isValidTripleConnectSession(session)) throw new Error('Invalid Triple session.');
   try {
     state = restoreSerializedTripleRoundState(session.snapshot, { trayCapacity: getEffectiveTripleTrayCapacity() });
     const layout = getTripleLayout(session.layoutId);
@@ -250,6 +261,7 @@ export function continueTripleConnectSession(session) {
     seed: "restored",
     board: null,
     witness: [],
+  }, { startup });
   });
 }
 
@@ -281,10 +293,10 @@ export function isValidTripleConnectSession(session) {
   }
 }
 
-function mountTripleDevelopmentRound(generated, { skipIntro = false } = {}) {
+function mountTripleDevelopmentRound(generated, { skipIntro = false, startup } = {}) {
   document.getElementById("menu-container")?.remove();
   const shell = getTripleShell();
-  const scope = shell.mount();
+  const scope = startup ? startup.scope : shell.mount();
   presentationCount = 0;
   boardPresentationRevision = 0;
   hintedTileIds = new Set();
@@ -296,25 +308,26 @@ function mountTripleDevelopmentRound(generated, { skipIntro = false } = {}) {
   modalPaused = false;
   backgroundPaused = false;
   const generation = ++roundGeneration;
-  roundStarted = !generated.board || skipIntro;
+  const startImmediately = !generated.board || skipIntro;
+  roundStarted = startup ? false : startImmediately;
   renderer ||= createTripleRenderer(shell, {
     onLockedTraySlotClick: () => openTripleTrayExpansionPurchase(),
   });
   renderer.mountLayout(scope, currentLayout);
   const hudElements = getTripleHudElements();
   const hud = getTripleHud(hudElements);
-  const render = (roundState, { boardState = roundState } = {}) => {
-    renderer.render(
+  const render = (roundState, { boardState = roundState, startup: renderStartup } = {}) => {
+    const pendingRender = renderer.render(
       boardState,
       currentLayout,
       getEquippedThemeId(gameState.appearance, "triple-connect"),
+      renderStartup,
     );
     // Hint borders are presentation state with a deliberate, stable lifetime:
     // they remain until a new hint or a board-transforming tool replaces them.
     renderer.nodes.forEach((node, tileId) => {
       node.classList.toggle("is-hinted", hintedTileIds.has(tileId));
     });
-    const totalTriples = Math.max(1, Object.keys(roundState.tiles).length / 3);
     const starProgress = getTripleStarProgress({
       mode: currentMode,
       score: roundState.score,
@@ -326,9 +339,6 @@ function mountTripleDevelopmentRound(generated, { skipIntro = false } = {}) {
       misses: roundState.misses,
       combo: roundState.combo,
       score: roundState.score,
-      matchedTriples: roundState.matchedTriples,
-      totalTriples,
-      hint: getTripleItemCount("hint"),
       totalStars: gameState.progress.tripleConnect.totalStars,
     });
     ["hint", "time", "undo", "shuffle"].forEach((itemId) => {
@@ -349,6 +359,7 @@ function mountTripleDevelopmentRound(generated, { skipIntro = false } = {}) {
         Object.entries(reward).filter(([key]) => key !== "endlessCoins").map(([key, value]) => `+${value} ${key === "coins" ? "Xu" : key === "time" ? "giây" : key === "hint" ? "Gợi ý" : key === "undo" ? "Hoàn tác" : "Xáo trộn"}`).join(" · ")),
     });
     updateTimer(shell, remainingTime, hudElements, hud);
+    return pendingRender;
   };
   scope.listen(document, "triple-tray-expansion-purchased", () => {
     if (!state || state.status !== "playing") return;
@@ -361,19 +372,14 @@ function mountTripleDevelopmentRound(generated, { skipIntro = false } = {}) {
     }, state.undoHistory);
     render(state);
   });
-  render(state);
+  if (!startup) render(state);
   const toolsToggle = shell.refs.root.querySelector("#triple-tools-toggle");
   const toolsMenu = shell.refs.root.querySelector("#triple-tools-menu");
   const actionsToggle = shell.refs.root.querySelector(
     "#triple-actions-menu-toggle",
   );
   const actionsMenu = shell.refs.root.querySelector("#triple-actions-menu");
-  const closeMenus = () => {
-    toolsMenu.hidden = true;
-    actionsMenu.hidden = true;
-    toolsToggle.setAttribute("aria-expanded", "false");
-    actionsToggle.setAttribute("aria-expanded", "false");
-  };
+  const menus = bindGameHudMenus(scope, [{ trigger: actionsToggle, panel: actionsMenu }, { trigger: toolsToggle, panel: toolsMenu }]);
   const navigationActions = {
     collection: "showCollection",
     shop: "showShop",
@@ -387,35 +393,10 @@ function mountTripleDevelopmentRound(generated, { skipIntro = false } = {}) {
       navigationKey && typeof navigation[navigationKey] !== "function",
     );
   });
-  scope.listen(toolsToggle, "click", (event) => {
-    event.stopPropagation();
-    toolsMenu.hidden = !toolsMenu.hidden;
-    toolsToggle.setAttribute("aria-expanded", String(!toolsMenu.hidden));
-    actionsMenu.hidden = true;
-    actionsToggle.setAttribute("aria-expanded", "false");
-  });
-  scope.listen(document, "click", (event) => {
-    if (!toolsMenu.hidden && !event.target.closest(".triple-connect__hud")) {
-      toolsMenu.hidden = true;
-      toolsToggle.setAttribute("aria-expanded", "false");
-    }
-    if (!actionsMenu.hidden && !event.target.closest(".triple-connect__hud")) {
-      actionsMenu.hidden = true;
-      actionsToggle.setAttribute("aria-expanded", "false");
-    }
-  });
-  scope.listen(actionsToggle, "click", (event) => {
-    event.stopPropagation();
-    actionsMenu.hidden = !actionsMenu.hidden;
-    actionsToggle.setAttribute("aria-expanded", String(!actionsMenu.hidden));
-    toolsMenu.hidden = true;
-    toolsToggle.setAttribute("aria-expanded", "false");
-  });
   scope.listen(actionsMenu, "click", (event) => {
     const action = event.target.closest("button")?.dataset.tripleAction;
     if (!action) return;
-    actionsMenu.hidden = true;
-    actionsToggle.setAttribute("aria-expanded", "false");
+    menus.close();
     if (action === "menu") return returnTripleToMenu();
     if (action === "restart")
       return void startTripleConnectRound({
@@ -433,9 +414,6 @@ function mountTripleDevelopmentRound(generated, { skipIntro = false } = {}) {
     if (action === "reset" && navigation.showReset)
       return navigation.showReset();
   });
-  scope.listen(document, "keydown", (event) => {
-    if (event.key === "Escape") closeMenus();
-  });
   scope.listen(document, "visibilitychange", () => {
     if (document.hidden) {
       if (state.status !== "playing" || !roundStarted) return;
@@ -447,7 +425,6 @@ function mountTripleDevelopmentRound(generated, { skipIntro = false } = {}) {
       rebaseTripleTimer();
     }
   });
-  scope.own(closeMenus, "triple-hud-menu-cleanup");
   scope.listen(shell.refs.board, "click", (event) => {
     const tileId = event.target.closest("[data-tile-id]")?.dataset.tileId;
     if (!tileId || !roundStarted) return;
@@ -469,6 +446,7 @@ function mountTripleDevelopmentRound(generated, { skipIntro = false } = {}) {
     }
     roundLuckyRewards.push(...rewards.lucky);
     roundMilestoneRewards.push(...rewards.milestones);
+    const roundWon = transition.events.some((event) => event.type === "round-won");
     const hasPresentation = transition.events.some((event) => event.type === "tile-selected");
     if (hasPresentation) {
       presentationCount += 1;
@@ -493,6 +471,10 @@ function mountTripleDevelopmentRound(generated, { skipIntro = false } = {}) {
       if (hasPresentation) presentationCount = Math.max(0, presentationCount - 1);
       shell.refs.root.dataset.triplePresenting = String(presentationCount > 0);
       saveSession();
+      if (roundWon) {
+        duckBackgroundMusicForVictory(gameState.settings);
+        playTripleSound("victory");
+      }
       settleTerminalRound(shell, render);
     });
     playTripleEvents(transition.events);
@@ -572,13 +554,17 @@ function mountTripleDevelopmentRound(generated, { skipIntro = false } = {}) {
       render(state);
     },
   );
-  if (roundStarted) {
-    saveSession();
-    startTripleTimer(scope, shell, render, hudElements, hud);
-  } else {
-    showTripleStartModal({ shell, scope, generation, render, hudElements, hud });
-  }
-  return { generated, getState: () => state, shell };
+  const activate = () => {
+    roundStarted = startImmediately;
+    if (roundStarted) {
+      saveSession();
+      startTripleTimer(scope, shell, render, hudElements, hud);
+    } else {
+      showTripleStartModal({ shell, scope, generation, render, hudElements, hud });
+    }
+  };
+  if (!startup) activate();
+  return { generated, getState: () => state, shell, renderInitial: () => render(state, { startup }), activate };
 }
 
 function showTripleStartModal({ shell, scope, generation, render, hudElements, hud }) {
@@ -605,6 +591,7 @@ function showTripleStartModal({ shell, scope, generation, render, hudElements, h
 }
 
 function startTripleTimer(scope, shell, render, hudElements, hud) {
+  restoreBackgroundMusic(gameState.settings);
   let running = true;
   let checkpointSeconds = 0;
   let businessAccumulatorMs = 0;
@@ -662,8 +649,9 @@ function startTripleTimer(scope, shell, render, hudElements, hud) {
 }
 
 function playTripleEvents(events) {
-  const name = events.some((event) => event.type === "round-won") ? "victory"
-    : events.some((event) => event.type === "round-lost") ? "defeat"
+  // Win audio waits for the final tile presentation, matching Memory and Link.
+  if (events.some((event) => event.type === "round-won")) return;
+  const name = events.some((event) => event.type === "round-lost") ? "defeat"
       : events.some((event) => event.type === "lucky-resolved") ? "bonus"
         : events.some((event) => event.type === "triple-resolved") ? "match"
           : events.some((event) => event.type === "miss") ? "wrong" : "click";

@@ -8,8 +8,8 @@ async function startMemory(page, { clock = false } = {}) {
   await page.evaluate(async () => {
     const { gameState } = await import("/js/gameState.js");
     gameState.settings.sound = gameState.settings.music = false;
-    (await import("/js/gameSelector.js")).openGameMenu("memory-match");
-    (await import("/js/gameController.js")).startNewMemoryRun(7);
+    await (await import("/tests/ui/helpers/gameNavigation.js")).openReadyGameMenu("memory-match");
+    await (await import("/js/gameController.js")).startNewMemoryRun(7);
   });
 }
 
@@ -28,8 +28,8 @@ test("defeat navigation cleanup preserves the session captured before menu reset
 });
 
 test("clearing settled loot cancels its filled animation and pending collection", async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: "no-preference" });
   await startMemory(page);
+  await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.evaluate(async () => {
     window.lootLanded = false;
     window.lootCollected = false;

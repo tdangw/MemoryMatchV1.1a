@@ -81,7 +81,7 @@ export function createMainMenu() {
   wrapper.appendChild(title);
   const description = document.createElement("p");
   description.className = "menu-description";
-  description.textContent = "Thử thách rèn luyện ghi nhớ.";
+  description.textContent = "Mới thấy đó thôi, chớp mắt đã quên!";
   wrapper.appendChild(description);
 
   const menuList = document.createElement("ul");

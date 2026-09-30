@@ -4,6 +4,7 @@ test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => localStorage.clear());
   await page.goto("/");
   await page.locator(".game-selector__choice").filter({ hasText: "Triple Connect" }).click();
+  await expect(page.locator("#menu-container .menu-item").first()).toBeVisible();
 });
 async function finishTripleIntro(page, clock = null) {
   const intro = page.locator("#triple-round-start-modal");
@@ -79,7 +80,7 @@ test("Triple HUD uses the shared contract and mutually exclusive menus", async (
   await page.getByRole("button", { name: "Dễ" }).click();
   await finishTripleIntro(page);
   const shell = page.locator(".triple-connect-game");
-  const progress = page.locator(".triple-game-progress-hud .stat-star-progress");
+  const progress = page.locator(".triple-connect__milestones .stat-star-progress");
   if (await shell.evaluate((node) => node.classList.contains("shell-compact-landscape"))) {
     // Compact landscape uses the shared shell contract: progress chrome is
     // hidden to preserve the board, while level/timer/tools remain in the HUD.
@@ -87,7 +88,7 @@ test("Triple HUD uses the shared contract and mutually exclusive menus", async (
   } else {
     await expect(progress).toBeVisible();
   }
-  await expect(page.locator(".triple-game-hud .stat-score")).toContainText("0");
+  await expect(page.locator(".triple-game-hud .stat-points")).toContainText("0");
   await expect(page.locator(".triple-game-hud .stat-timer")).toContainText(/0[01]:\d{2}/);
   await expect(page.locator(".triple-game-hud")).toHaveCSS(
     "background-image",
@@ -128,8 +129,9 @@ test("Triple uses the shared score and combo feedback", async ({ page }) => {
 });
 
 test("Triple menu, start modal and timer follow the shared round contract", async ({ page }) => {
-  await expect(page.locator("#menu-container .menu-item")).toContainText([
-    "Hướng dẫn", "Cài đặt", "Thông tin", "Home",
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await expect(page.locator("#menu-container .menu-item")).toHaveText([
+    "Bắt đầu", "Bộ sưu tập", "Cửa hàng", "Hướng dẫn", "Cài đặt", "Home",
   ]);
   await page.locator("#menu-container").getByText("Hướng dẫn", { exact: true }).click();
   await expect(page.locator("#info-modal")).toContainText("thẻ bị lớp trên che");
@@ -144,6 +146,10 @@ test("Triple menu, start modal and timer follow the shared round contract", asyn
   await expect(timer).toHaveText(before || "01:00");
   await finishTripleIntro(page);
   const timerProgress = page.locator(".triple-game-hud");
+  const transitionDuration = await timerProgress.evaluate((node) =>
+    getComputedStyle(node, "::after").transitionDuration,
+  );
+  expect(transitionDuration).toBe("0.25s");
   const progressBefore = Number(await timerProgress.evaluate((node) =>
     getComputedStyle(node).getPropertyValue("--game-timer-progress"),
   ));
@@ -156,7 +162,7 @@ test("Triple menu, start modal and timer follow the shared round contract", asyn
   await expect(timer).not.toHaveText(before || "01:00");
   await page.locator("#triple-actions-menu-toggle").click();
   await expect(page.locator("#triple-actions-menu .game-action-item")).toHaveText([
-    "Chơi lại", "Menu", "Cài đặt", "Cửa hàng", "Bộ sưu tập", "Hướng dẫn", "Thông tin", "Xóa dữ liệu",
+    "Chơi lại", "Menu", "Cài đặt", "Cửa hàng", "Bộ sưu tập", "Hướng dẫn", "Xóa dữ liệu",
   ]);
 });
 
@@ -169,7 +175,7 @@ test("Triple Continue resumes without replaying the start modal", async ({ page 
   await page.evaluate(async () => {
     const { getActiveSession } = await import("/js/sessionProgress.js");
     const { continueTripleConnectSession } = await import("/js/tripleConnect/tripleController.js");
-    continueTripleConnectSession(getActiveSession("triple-connect", "easy"));
+    await continueTripleConnectSession(getActiveSession("triple-connect", "easy"));
   });
   await expect(page.locator("#triple-round-start-modal")).toHaveCount(0);
 });

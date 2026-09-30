@@ -43,10 +43,9 @@ async function start(page, game, mode, coordinates = false, level = 1) {
     gameState.settings.music = false;
     gameState.settings.mode = mode;
     gameState.settings.boardCoordinates = coordinates;
-    const { openGameMenu } = await import("/js/gameSelector.js");
-    openGameMenu(id);
-    if (id === "memory-match") (await import("/js/gameController.js")).startNewMemoryRun(level);
-    else (await import("/js/linkConnect/linkController.js")).startLinkLevel({ mode, level });
+    await (await import("/tests/ui/helpers/gameNavigation.js")).openReadyGameMenu(id);
+    if (id === "memory-match") await (await import("/js/gameController.js")).startNewMemoryRun(level);
+    else await (await import("/js/linkConnect/linkController.js")).startLinkLevel({ mode, level });
   }, { id: game.id, mode, coordinates, level });
   await expect(page.locator(`${game.board} ${game.tile}`).first()).toBeVisible();
   await settle(page);
@@ -73,7 +72,7 @@ async function assertFit(page, game) {
     const frame = root.querySelector(game.frame);
     const board = root.querySelector(game.board);
     const hud = root.querySelector(".game-hud");
-    const progress = root.querySelector(".game-progress-hud");
+    const progress = root.querySelector('[data-shell-region="progress"]');
     const milestones = root.querySelector(".memory-special-hud, .link-special-hud");
     const title = root.querySelector('[data-shell-region="title"]');
     if (!frame || !board || !hud || !progress || !milestones || !title) {
@@ -101,9 +100,9 @@ async function assertFit(page, game) {
     expect(result.hud.bottom).toBeLessThanOrEqual(result.frame.top + 1);
   } else {
     expect(result.display.title).not.toBe("none");
-    expect(result.display.progress).not.toBe("none");
+    expect(result.display.progress).toBe("none");
     expect(result.display.milestones).not.toBe("none");
-    expect(result.progress.bottom).toBeLessThanOrEqual(result.hud.top + 1);
+    expect(result.progress.height).toBe(0);
     expect(result.timerBottom).toBeLessThanOrEqual(result.milestones.top + 1);
     expect(result.milestones.bottom).toBeLessThanOrEqual(result.frame.top + 1);
   }
@@ -140,7 +139,7 @@ for (const game of games) {
     await page.setViewportSize({ width: 640, height: 360 });
     await settle(page);
     await assertFit(page, game);
-    await page.setViewportSize({ width: 360, height: 640 });
+    await page.setViewportSize({ width: 412, height: 915 });
     await settle(page);
     await assertFit(page, game);
     await page.setViewportSize({ width: 914, height: 411 });

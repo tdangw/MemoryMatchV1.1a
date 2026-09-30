@@ -282,8 +282,7 @@
   align-items: center;
 }
 
-#settings-container .label,
-.game-stats .info {
+#settings-container .label {
   display: inline-flex;
   align-items: center;
   gap: 4px;

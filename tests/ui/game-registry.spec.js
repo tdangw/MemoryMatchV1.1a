@@ -1,19 +1,31 @@
 import { expect, test } from "@playwright/test";
 
-test("registry exposes only released games in the selector", async ({ page }) => {
+test("registry exposes only released games in the selector", async ({
+  page,
+}) => {
   await page.goto("/");
   await expect(page.locator(".game-selector__choice")).toHaveCount(3);
   await expect(page.locator(".game-selector__choice")).toHaveText([
-    /Memory Match/,
-    /Link Connect/,
-    /Triple Connect/,
+    /Memory Match.*Mới thấy đó thôi, chớp mắt đã quên!/s,
+    /Link Connect.*Ngay trước mắt nhìn, vạn dặm xa xôi!/s,
+    /Triple Connect.*Nhìn tưởng dễ ăn, chớp mắt chịu thua!/s,
   ]);
-  await expect(page.locator(".game-selector")).toContainText("Triple Connect");
-  await expect(page.locator(".game-selector__choice").filter({ hasText: "Triple Connect" }))
-    .toContainText("Thử thách rèn luyện quan sát.");
+  await expect(page.locator(".game-selector")).toContainText(
+    "Memory Match Adventure",
+  );
+  await expect(page.locator(".game-selector")).toContainText(
+    "Trí nhớ là hành trang. Phiêu lưu là lẽ sống.",
+  );
+  await expect(
+    page
+      .locator(".game-selector__choice")
+      .filter({ hasText: "Triple Connect" }),
+  ).toContainText("Nhìn tưởng dễ ăn, chớp mắt chịu thua!");
 });
 
-test("released game adapters still open their matching menus", async ({ page }) => {
+test("released game adapters still open their matching menus", async ({
+  page,
+}) => {
   await page.goto("/");
 
   const memoryOpened = await page.evaluate(async () =>
@@ -21,43 +33,74 @@ test("released game adapters still open their matching menus", async ({ page }) 
   );
   expect(memoryOpened).toBe(true);
   await expect(page.locator("#game-container")).toHaveCount(1);
-  await expect(page.locator("#menu-container.link-connect-menu")).toHaveCount(0);
+  await expect(page.locator("#menu-container.link-connect-menu")).toHaveCount(
+    0,
+  );
 
   const linkOpened = await page.evaluate(async () =>
     (await import("/js/gameSelector.js")).openGameMenu("link-connect"),
   );
   expect(linkOpened).toBe(true);
-  await expect(page.locator("#menu-container.link-connect-menu")).toHaveCount(1);
+  await expect(page.locator("#menu-container.link-connect-menu")).toHaveCount(
+    1,
+  );
 
   const tripleOpened = await page.evaluate(async () =>
     (await import("/js/gameSelector.js")).openGameMenu("triple-connect"),
   );
   expect(tripleOpened).toBe(true);
-  await expect(page.locator("#menu-container.triple-connect-menu")).toHaveCount(1);
-  await expect(page.locator("#menu-container.triple-connect-menu"))
-    .toContainText("Thử thách rèn luyện quan sát.");
+  await expect(page.locator("#menu-container.triple-connect-menu")).toHaveCount(
+    1,
+  );
+  await expect(
+    page.locator("#menu-container.triple-connect-menu"),
+  ).toContainText("Ngay trước mắt nhìn, vạn dặm xa xôi!");
 });
 
 test("Triple menu starts a visible playable board", async ({ page }) => {
   await page.goto("/");
-  await page.locator(".game-selector__choice").filter({ hasText: "Triple Connect" }).click();
-  await page.locator("#menu-container.triple-connect-menu .menu-item").filter({ hasText: "Bắt đầu" }).click();
-  await page.locator("#triple-difficulty-modal .difficulty-option").filter({ hasText: "Dễ" }).click();
+  await page
+    .locator(".game-selector__choice")
+    .filter({ hasText: "Triple Connect" })
+    .click();
+  await page
+    .locator("#menu-container.triple-connect-menu .menu-item")
+    .filter({ hasText: "Bắt đầu" })
+    .click();
+  await page
+    .locator("#triple-difficulty-modal .difficulty-option")
+    .filter({ hasText: "Dễ" })
+    .click();
   await expect(page.locator("#triple-connect-container")).toBeVisible();
-  await expect(page.locator(".triple-connect__board .triple-connect__tile")).toHaveCount(27);
+  await expect(
+    page.locator(".triple-connect__board .triple-connect__tile"),
+  ).toHaveCount(27);
 });
 
-test("switching all released games after a production Triple start keeps one active shell", async ({ page }) => {
+test("switching all released games after a production Triple start keeps one active shell", async ({
+  page,
+}) => {
   await page.goto("/");
-  await page.locator(".game-selector__choice").filter({ hasText: "Triple Connect" }).click();
-  await page.locator("#menu-container.triple-connect-menu .menu-item").filter({ hasText: "Bắt đầu" }).click();
-  await page.locator("#triple-difficulty-modal .difficulty-option").filter({ hasText: "Dễ" }).click();
+  await page
+    .locator(".game-selector__choice")
+    .filter({ hasText: "Triple Connect" })
+    .click();
+  await page
+    .locator("#menu-container.triple-connect-menu .menu-item")
+    .filter({ hasText: "Bắt đầu" })
+    .click();
+  await page
+    .locator("#triple-difficulty-modal .difficulty-option")
+    .filter({ hasText: "Dễ" })
+    .click();
   await expect(page.locator("#triple-connect-container")).toBeVisible();
 
   const result = await page.evaluate(async () => {
-    const { openGameMenu, showGameSelector } = await import("/js/gameSelector.js");
+    const { openGameMenu, showGameSelector } =
+      await import("/js/gameSelector.js");
     const { getTripleShell } = await import("/js/tripleConnect/tripleShell.js");
-    const { getGameShellDiagnostics } = await import("/js/gameShell/gameShell.js");
+    const { getGameShellDiagnostics } =
+      await import("/js/gameShell/gameShell.js");
     const tripleRoot = getTripleShell().refs.root;
     const menuResults = [
       openGameMenu("memory-match"),
@@ -68,9 +111,11 @@ test("switching all released games after a production Triple start keeps one act
     return {
       menuResults,
       activeShell: getGameShellDiagnostics().activeShell,
-      visibleBoards: [...document.querySelectorAll('[data-shell-region="board"]')]
-        .filter(node => node.getClientRects().length > 0).length,
-      tripleRoots: document.querySelectorAll("#triple-connect-container").length,
+      visibleBoards: [
+        ...document.querySelectorAll('[data-shell-region="board"]'),
+      ].filter((node) => node.getClientRects().length > 0).length,
+      tripleRoots: document.querySelectorAll("#triple-connect-container")
+        .length,
       tripleRootHidden: tripleRoot.hidden,
     };
   });
@@ -83,7 +128,9 @@ test("switching all released games after a production Triple start keeps one act
   await expect(page.locator(".game-selector__choice")).toHaveCount(3);
 });
 
-test("unknown game IDs are rejected without a fallback menu", async ({ page }) => {
+test("unknown game IDs are rejected without a fallback menu", async ({
+  page,
+}) => {
   await page.goto("/");
 
   const result = await page.evaluate(async () => {
@@ -92,7 +139,9 @@ test("unknown game IDs are rejected without a fallback menu", async ({ page }) =
       unknown: openGameMenu("unknown-game"),
       activeGame: document.documentElement.dataset.activeGame || null,
       selectorPresent: Boolean(document.querySelector(".game-selector")),
-    linkMenuPresent: Boolean(document.querySelector("#menu-container.link-connect-menu")),
+      linkMenuPresent: Boolean(
+        document.querySelector("#menu-container.link-connect-menu"),
+      ),
     };
   });
 

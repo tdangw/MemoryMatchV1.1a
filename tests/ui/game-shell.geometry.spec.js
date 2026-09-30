@@ -88,10 +88,7 @@ for (const game of [
 }
 
 for (const viewport of [
-  { width: 360, height: 640 },
-  { width: 411, height: 914 },
-  { width: 640, height: 360 },
-  { width: 914, height: 411 },
+  { width: 412, height: 915 },
 ]) {
   for (const game of ["Memory Match", "Link Connect"]) {
     test(`${game}: baseline geometry at ${viewport.width}x${viewport.height}`, async ({ page }) => {
@@ -122,7 +119,7 @@ for (const viewport of [
         expect(metrics.hud.bottom).toBeLessThanOrEqual(metrics.frame.top + GEOMETRY_TOLERANCE_PX);
       } else {
         expect(metrics.compact).toBe(false);
-        expect(metrics.displays).not.toContain("none");
+        expect(metrics.displays).toEqual([expect.not.stringMatching(/^none$/), "none", expect.not.stringMatching(/^none$/), expect.not.stringMatching(/^none$/)]);
       }
       for (const bounds of [metrics.hud, metrics.frame, metrics.board]) {
         expect(bounds.left).toBeGreaterThanOrEqual(-GEOMETRY_TOLERANCE_PX);

@@ -34,17 +34,24 @@ test("runtime performance probe records all three games", async ({ page }, testI
         gameState.settings.music = false;
         gameState.settings.mode = mode;
         openGameMenu(id);
+        let startCommandMs = 0;
+        const commandStartedAt = performance.now();
         if (id === "memory-match") {
-          (await import("/js/gameController.js")).startNewMemoryRun();
+          await (await import("/js/gameController.js")).startNewMemoryRun();
+          startCommandMs = performance.now() - commandStartedAt;
         } else if (id === "link-connect") {
-          (await import("/js/linkConnect/linkController.js")).startLinkLevel({ mode });
+          await (await import("/js/linkConnect/linkController.js")).startLinkLevel({ mode });
+          startCommandMs = performance.now() - commandStartedAt;
         } else {
-          await (await import("/js/tripleConnect/tripleController.js")).startTripleConnectRound({
+          const pending = (await import("/js/tripleConnect/tripleController.js")).startTripleConnectRound({
             mode,
             seed: `runtime-probe-${mode}`,
             skipIntro: true,
           });
+          startCommandMs = performance.now() - commandStartedAt;
+          await pending;
         }
+        const domReadyMs = performance.now() - startedAt;
         await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
         await Promise.all([...document.querySelectorAll('[data-shell-region="board"] img')]
           .map((image) => image.decode().catch(() => undefined)));
@@ -102,6 +109,8 @@ test("runtime performance probe records all three games", async ({ page }, testI
             ? "#link-board .link-tile"
             : ".triple-connect__board .triple-connect__tile";
         return {
+          startCommandMs,
+          domReadyMs,
           boardReadyMs,
           startLongTasks,
           effectLongTasks,
@@ -116,6 +125,9 @@ test("runtime performance probe records all three games", async ({ page }, testI
       profiles.push({
         ...scenario,
         cpuRate,
+        startCommandMs: metrics.startCommandMs,
+        domReadyMs: metrics.domReadyMs,
+        decodeSettleMs: metrics.boardReadyMs - metrics.domReadyMs,
         boardReadyMs: metrics.boardReadyMs,
         startLongestTaskMs: Math.max(0, ...metrics.startLongTasks),
         idleLongestTaskMs: Math.max(0, ...metrics.idleLongTasks),

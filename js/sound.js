@@ -26,6 +26,8 @@ export const MENU_MUSIC_TRACKS = Object.freeze([
 ]);
 
 let selectedMenuTrack = null;
+let victoryMusicDuckActive = false;
+const VICTORY_MUSIC_DUCK_RATIO = 0.2;
 
 const clampVolume = (value, fallback) => {
   const parsed = Number(value);
@@ -49,7 +51,7 @@ export function syncDefaultMusic(settings, shouldPlay = true) {
   }
   if (music.src !== selectedMenuTrack) music.src = selectedMenuTrack;
   music.loop = true;
-  music.volume = clampVolume(settings?.musicVolume, 0.35);
+  music.volume = getBackgroundMusicVolume(settings);
 
   if (!settings?.music) {
     music.pause();
@@ -63,6 +65,23 @@ export function syncDefaultMusic(settings, shouldPlay = true) {
   }
 
   if (shouldPlay) music.play().catch(() => {});
+}
+
+export function duckBackgroundMusicForVictory(settings) {
+  victoryMusicDuckActive = true;
+  const music = document.getElementById("bg-music");
+  if (music) music.volume = getBackgroundMusicVolume(settings);
+}
+
+export function restoreBackgroundMusic(settings) {
+  victoryMusicDuckActive = false;
+  const music = document.getElementById("bg-music");
+  if (music) music.volume = getBackgroundMusicVolume(settings);
+}
+
+function getBackgroundMusicVolume(settings) {
+  const configuredVolume = clampVolume(settings?.musicVolume, 0.35);
+  return configuredVolume * (victoryMusicDuckActive ? VICTORY_MUSIC_DUCK_RATIO : 1);
 }
 
 export function playVictoryFlowerTheme(settings) {

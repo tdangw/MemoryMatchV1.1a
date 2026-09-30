@@ -9,16 +9,16 @@ test("theme selection is shared, snapshots Continue assets, and Triple maps ever
     const { startTripleConnectDevelopmentRound, continueTripleConnectSession } = await import("/js/tripleConnect/tripleController.js");
 
     gameState.settings.mode = "easy";
-    startNewMemoryRun();
+    await startNewMemoryRun();
     const memorySession = structuredClone(gameState.progress.memoryMatch.sessionsByMode.easy);
     const memoryBefore = [...new Set([...document.querySelectorAll(".tile")].map((tile) => tile.dataset.imageId))].sort();
-    continueMemorySession(memorySession);
+    await continueMemorySession(memorySession);
     const memoryAfter = [...new Set([...document.querySelectorAll(".tile")].map((tile) => tile.dataset.imageId))].sort();
 
-    startLinkLevel({ mode: "easy" });
+    await startLinkLevel({ mode: "easy" });
     const linkSession = structuredClone(gameState.progress.linkConnect.sessionsByMode.easy);
     const linkBefore = [...new Set([...document.querySelectorAll(".link-tile img")].map((image) => image.src))];
-    continueLinkSession(linkSession);
+    await continueLinkSession(linkSession);
     const linkAfter = [...new Set([...document.querySelectorAll(".link-tile img")].map((image) => image.src))];
 
     const triple = startTripleConnectDevelopmentRound({ mode: "superHard", seed: "theme-map" });
@@ -28,7 +28,7 @@ test("theme selection is shared, snapshots Continue assets, and Triple maps ever
       counts[tile.type] = (counts[tile.type] || 0) + 1;
       return counts;
     }, {});
-    continueTripleConnectSession(tripleSession);
+    await continueTripleConnectSession(tripleSession);
     const restoredMap = gameState.progress.tripleConnect.sessionsByMode.superHard.snapshot.assetPathsByType;
 
     return {
@@ -92,8 +92,8 @@ test("generated themes persist stable selection IDs for Memory, Link, and Triple
       gameState.appearance.themes.linkConnect = theme;
       gameState.appearance.themes.tripleConnect = theme;
       gameState.settings.mode = "easy";
-      startNewMemoryRun();
-      startLinkLevel({ mode: "easy" });
+      await startNewMemoryRun();
+      await startLinkLevel({ mode: "easy" });
       startTripleConnectDevelopmentRound({ mode: "easy", seed: `generated-${theme}` });
       results.push({
         theme,

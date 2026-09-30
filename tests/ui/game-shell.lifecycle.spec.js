@@ -7,6 +7,11 @@ test.beforeEach(async ({ page }) => {
 });
 
 async function start(page, id) {
+  // Isolate round lifecycle from the separately owned background transition.
+  const reduced = await page.evaluate(() => matchMedia("(prefers-reduced-motion: reduce)").matches);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.evaluate(async id => (await import("/tests/ui/helpers/gameNavigation.js")).openReadyGameMenu(id), id);
+  await page.emulateMedia({ reducedMotion: reduced ? "reduce" : "no-preference" });
   await page.evaluate(async id => {
     // Keep tile decorations/images identical when comparing DOM resource counts.
     let seed = 20260907;
@@ -14,9 +19,8 @@ async function start(page, id) {
     const { gameState } = await import("/js/gameState.js");
     gameState.settings.sound = gameState.settings.music = false;
     gameState.settings.mode = "easy";
-    (await import("/js/gameSelector.js")).openGameMenu(id);
-    if (id === "memory-match") (await import("/js/gameController.js")).startNewMemoryRun();
-    else if (id === "link-connect") (await import("/js/linkConnect/linkController.js")).startLinkLevel({ mode: "easy" });
+    if (id === "memory-match") await (await import("/js/gameController.js")).startNewMemoryRun();
+    else if (id === "link-connect") await (await import("/js/linkConnect/linkController.js")).startLinkLevel({ mode: "easy" });
     else await (await import("/js/tripleConnect/tripleController.js")).startTripleConnectRound({ mode: "easy", skipIntro: true });
   }, id);
   await expect(page.locator('[data-shell-region="board"]:visible')).toHaveCount(1);
@@ -158,8 +162,8 @@ test("restarting a playing round cancels its timer and preserves shell nodes", a
       const running = previous.diagnostics().interval;
       window.staleRoundCalls = 0;
       previous.timeout(() => window.staleRoundCalls++, 1000);
-      if (id === "memory-match") (await import("/js/gameController.js")).restartMemoryLevel();
-      else (await import("/js/linkConnect/linkController.js")).startLinkLevel({ mode: "easy", restart: true });
+      if (id === "memory-match") await (await import("/js/gameController.js")).restartMemoryLevel();
+      else await (await import("/js/linkConnect/linkController.js")).startLinkLevel({ mode: "easy", restart: true });
       return { running, sameRefs: refs === shell.refs, old: previous.diagnostics(), changed: previous !== shell.scope };
     }, id);
     expect(result.running).toBe(1);

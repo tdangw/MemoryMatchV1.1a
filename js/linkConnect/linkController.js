@@ -1,15 +1,16 @@
-import { getLinkShell, getLinkHud, getLinkHudElements, bindLinkControls, applyLinkTimingStyles } from "./linkShell.js";
+import { getLinkShell, getLinkHud, getLinkHudElements, bindLinkControls, closeLinkMenus, applyLinkTimingStyles } from "./linkShell.js";
 import { setHudText, renderHudTimer } from "../gameShell/gameShellHud.js";
 import { shellTimeout as setTimeout, clearShellTimeout as clearTimeout, shellInterval as setInterval, clearShellInterval as clearInterval } from "../gameShell/gameShellLifecycle.js";
 import { createIcon } from "../icons.js";
 import { unmountActiveGameShell } from "../gameShell/gameShell.js";
 import { GAME_SHELL_DEFAULTS } from "../gameShell/gameShellConfig.js";
 import { createHudTimerScheduler } from "../gameShell/gameTimerProgress.js";
+import { createGameShellStartup } from "../gameShell/gameShellStartup.js";
 import { getCompactLandscapeColumns } from "../gameShell/gameShellLayout.js";
 import { clearTooltip } from "../tooltips.js";
 import { clearLootEffects } from "../lootEffects.js";
 import { openAppModal, showAppToast } from "../modal.js";
-import { pauseBackgroundMusic, sounds, syncDefaultMusic } from "../sound.js";
+import { duckBackgroundMusicForVictory, pauseBackgroundMusic, restoreBackgroundMusic, sounds, syncDefaultMusic } from "../sound.js";
 import { getEquippedThemeId } from "../appearance.js";
 import { GAMEPLAY_TIMING, shouldShowVictoryCelebration } from "../gameplayTuning.js";
 import {
@@ -102,6 +103,7 @@ import {
   playLinkSpecialPairTransform,
   playLinkThunderStrike,
   renderLinkBoard,
+  renderLinkBoardStartup,
   renderLinkBoardShift,
   renderLinkBoardShuffle,
   setLinkTileSelected,
@@ -241,14 +243,21 @@ export function startLinkLevel({
   selectedPosition = null;
   pendingCompactLayout = null;
   linkTimeWarningPlayed = false;
-  const board = createLinkBoard({
+  const scope = showLinkGame();
+  const startup = createGameShellStartup(scope, getLinkShell().refs, error => {
+    console.error('Link startup failed', error);
+    showAppToast('Không thể chuẩn bị bàn chơi. Hãy chơi lại.');
+  });
+  linkGameState.isLocked = true;
+  return startup.run(async () => {
+  const board = await startup.phase('prepare', () => createLinkBoard({
     layout,
     themeId,
     level,
     mode,
     assetPaths: resume ? assetPaths : undefined,
     history: resume ? undefined : gameState.progress.themeSelectionHistory[themeId],
-  });
+  }));
   activeAssetPaths = board.selectedAssetPaths;
   if (level === 1 && !resume && !restart) {
     linkGameState.specialProgress = 0;
@@ -287,10 +296,13 @@ export function startLinkLevel({
     const hintBonus = getLinkLevelHintBonus(level, getLinkItemCount("hint"));
     if (hintBonus > 0) grantLinkItem("hint", hintBonus);
   }
-  showLinkGame();
-  renderLinkBoard(board, { onTileClick: handleLinkTileClick, onCompactLandscapeChange: handleLinkCompactLandscapeChange });
+  await startup.yield();
+  await startup.phase('render', () => renderLinkBoardStartup(board, { onTileClick: handleLinkTileClick, onCompactLandscapeChange: handleLinkCompactLandscapeChange }, startup));
+  await startup.yield();
+  await startup.phase('images', () => startup.decodeBoard());
+  startup.check();
   if (!resume && activeAssetPaths.length) commitThemeSession("link-connect", createLinkSession(), themeId, activeAssetPaths);
-  else persistLinkRunProgress();
+  else persistLinkRunProgress(true);
   updateLinkHud();
   linkGameState.isLocked = true;
   showLevelRewardOverlay({
@@ -306,11 +318,12 @@ export function startLinkLevel({
       startCountdown(roundId);
     },
   });
+  });
 }
 
 export function continueLinkSession(session) {
   if (!session) return;
-  startLinkLevel({ ...session, resume: true });
+  return startLinkLevel({ ...session, resume: true });
 }
 
 export function returnToLinkMenu() {
@@ -327,6 +340,7 @@ export function returnToLinkMenu() {
   clearLinkTransientEffects();
   document.getElementById("link-connect-container")?.setAttribute("hidden", "");
   navigation.showMenu();
+  restoreBackgroundMusic(gameState.settings);
   syncDefaultMusic(gameState.settings);
 }
 
@@ -339,16 +353,16 @@ function showLinkGame() {
   const scope = getLinkShell().mount({ cleanup: () => {
     stopCountdown();
     stopLinkBoardLayout();
-    persistLinkRunProgress();
+    if (scope.startup?.status === 'ready') persistLinkRunProgress();
     clearGameplayRewardPopups();
     clearLinkPath();
     clearLinkTileHints();
     clearLinkTransientEffects();
     clearLootEffects();
     clearTooltip();
-    closeLinkToolsMenu();
   } });
   bindLinkControls(scope, { onAction: runLinkGameAction, onItem: useLinkItem });
+  return scope;
 }
 
 function runLinkGameAction(action) {
@@ -526,20 +540,13 @@ function useLinkItem(id) {
     showAppToast("Bạn chưa có vật phẩm này.");
     return;
   }
-  closeLinkToolsMenu();
+  closeLinkMenus();
   playLinkSound("overlay");
   if (id === "hint") useLinkHint(hintConnection);
   else if (id === "reshuffle") useLinkReshuffle();
   else if (id === "thunder") useLinkThunder();
   else if (id === "freeze") useLinkFreeze();
   updateLinkHud();
-}
-
-function closeLinkToolsMenu() {
-  const menu = document.getElementById("link-tools-menu");
-  const toggle = document.getElementById("link-tools-toggle");
-  if (menu) menu.hidden = true;
-  toggle?.setAttribute("aria-expanded", "false");
 }
 
 function useLinkHint(connection) {
@@ -713,7 +720,7 @@ function completeLinkLevel() {
   linkGameState.isCompleted = true;
   stopCountdown();
   linkGameState.isLocked = true;
-  pauseBackgroundMusic();
+  duckBackgroundMusicForVictory(gameState.settings);
   playLinkSound("victory");
   const coinsEarned = calculateLinkCoinReward(linkGameState.mode, linkGameState.remainingTime);
   const timeBonus = calculateLinkCompletionTimeBonus(linkGameState.mode, linkGameState.remainingTime);
@@ -782,6 +789,7 @@ function playLinkSound(name) {
 
 function startCountdown(roundId) {
   stopCountdown();
+  restoreBackgroundMusic(gameState.settings);
   startLinkTimeProgress(roundId);
   syncDefaultMusic(gameState.settings);
   countdownInterval = setInterval(() => {
@@ -906,7 +914,7 @@ function handleLinkTimeUp() {
 function updateLinkHud() {
   const hud = getLinkHudElements();
   const component = getLinkHud(hud);
-  component.stats({ level: linkGameState.level, moves: linkGameState.moves, misses: linkGameState.misses, combo: linkGameState.combo, score: linkGameState.score, matchedPairs: linkGameState.matchedPairs, totalPairs: linkGameState.totalPairs, hint: getLinkItemCount("hint") });
+  component.stats({ level: linkGameState.level, moves: linkGameState.moves, misses: linkGameState.misses, combo: linkGameState.combo, score: linkGameState.score });
   updateLinkCoinHud(hud);
   updateLinkTimerHud(hud);
   updateLinkStarsHud(hud);
@@ -1334,7 +1342,9 @@ function randomInteger(minimum, maximum) {
   return minimum + Math.floor(Math.random() * (maximum - minimum + 1));
 }
 
-function persistLinkRunProgress() {
+function persistLinkRunProgress(allowStartup = false) {
+  const startup = getLinkShell().scope?.startup;
+  if (startup && startup.status !== 'ready' && !allowStartup) return false;
   saveActiveSession("link-connect", createLinkSession());
 }
 

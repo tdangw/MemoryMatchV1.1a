@@ -3,12 +3,12 @@ import { expect, test } from "@playwright/test";
 test("Link match and every canvas exit preset execute without missing definitions", async ({ page }) => {
   const errors = [];
   page.on("pageerror", error => errors.push(error.message));
-  await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
   await expect(page.locator(".game-selector__choice").first()).toBeVisible();
+  await page.evaluate(async () => (await import("/tests/ui/helpers/gameNavigation.js")).openReadyGameMenu("link-connect"));
+  await page.emulateMedia({ reducedMotion: "no-preference" });
   const count = await page.evaluate(async () => {
-    (await import("/js/gameSelector.js")).openGameMenu("link-connect");
-    (await import("/js/linkConnect/linkController.js")).startLinkLevel({ mode: "easy" });
+    await (await import("/js/linkConnect/linkController.js")).startLinkLevel({ mode: "easy" });
     const { gameState } = await import("/js/gameState.js");
     const { linkGameState } = await import("/js/linkConnect/linkState.js");
     const { findAvailableConnections } = await import("/js/linkConnect/pathfinder.js");
@@ -40,23 +40,23 @@ test("Memory owns one stable shell through all modes and Challenge resume", asyn
   await expect(page.locator("#settings-container")).toHaveCount(1);
   await expect(page.locator("#bg-music")).toHaveCount(1);
   const result = await page.evaluate(async () => {
-    const { openGameMenu } = await import("/js/gameSelector.js");
+    const { openReadyGameMenu } = await import("/tests/ui/helpers/gameNavigation.js");
     const { GAME_MODES } = await import("/js/gameCatalog.js");
     const { gameState, resetGame } = await import("/js/gameState.js");
     const controller = await import("/js/gameController.js");
     const { getMemoryShell } = await import("/js/memoryMatch/memoryShell.js");
-    openGameMenu("memory-match");
+    await openReadyGameMenu("memory-match");
     const refs = getMemoryShell().refs;
     const results = [];
     for (const { id } of GAME_MODES) {
       resetGame();
       gameState.settings.mode = id;
-      controller.startNewMemoryRun();
+      await controller.startNewMemoryRun();
       const count = refs.board.querySelectorAll(".tile").length;
-      controller.restartMemoryLevel();
+      await controller.restartMemoryLevel();
       results.push({ mode: id, count, stable: refs === getMemoryShell().refs, roots: document.querySelectorAll("#game-container").length });
     }
-    controller.continueMemorySession({ mode: "challenge", level: 3, remainingTime: 42 });
+    await controller.continueMemorySession({ mode: "challenge", level: 3, remainingTime: 42 });
     controller.returnToMainMenu();
     return results;
   });

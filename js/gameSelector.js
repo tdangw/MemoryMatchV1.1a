@@ -19,10 +19,15 @@ import {
 } from "./gameRegistry.js";
 import { createThemeSummary, UI_TIMING } from "./uiCatalog.js";
 import { LINK_CONNECT_HELP_CONTENT } from "./linkConnect/linkConfig.js";
-import {
-  TRIPLE_CONNECT_HELP_CONTENT,
-} from "./tripleConnect/tripleCopy.js";
+import { TRIPLE_CONNECT_HELP_CONTENT } from "./tripleConnect/tripleCopy.js";
 import { cancelPendingTripleGeneration } from "./tripleConnect/tripleController.js";
+import { restoreBackgroundMusic } from "./sound.js";
+import {
+  cancelGameBackgroundTransition,
+  completeGameBackgroundTransition,
+  prepareGameBackgroundTransition,
+  preloadGameBackground,
+} from "./gameShell/gameBackgroundTransition.js";
 
 let activeGameId = null;
 let onStartLinkConnect = () => {};
@@ -58,6 +63,8 @@ export function configureGameSelector({
 }
 
 export function showGameSelector() {
+  restoreBackgroundMusic(gameState.settings);
+  cancelGameBackgroundTransition();
   cancelPendingTripleGeneration();
   unmountActiveGameShell();
   activeGameId = null;
@@ -69,8 +76,9 @@ export function showGameSelector() {
 
   const overlay = createMenuOverlay("game-selector");
   const wrapper = createMenuWrapper(
-    "Chọn trò chơi",
-    "Chọn cách bạn muốn rèn luyện hôm nay.",
+    "Memory Match Adventure",
+    "Trí nhớ là hành trang. Phiêu lưu là lẽ sống.",
+    { gameSelector: true },
   );
   const choices = document.createElement("div");
   choices.className = "game-selector__choices";
@@ -79,6 +87,7 @@ export function showGameSelector() {
       createGameChoice({
         ...game,
         onClick: () => openGameMenu(game.id),
+        onWarm: () => preloadGameBackground(game.id),
       }),
     );
   });
@@ -90,13 +99,18 @@ export function showGameSelector() {
 export function openGameMenu(gameId) {
   const navigation = getGameNavigation(gameId);
   if (!navigation) return false;
-  cancelPendingTripleGeneration();
-  unmountActiveGameShell();
-  activeGameId = gameId;
-  document.documentElement.dataset.activeGame = gameId;
-  document.getElementById("menu-container")?.remove();
-
-  navigation.openMenu();
+  prepareGameBackgroundTransition(gameId).then((backgroundStatus) => {
+    if (backgroundStatus === "cancelled") return;
+    cancelPendingTripleGeneration();
+    unmountActiveGameShell();
+    restoreBackgroundMusic(gameState.settings);
+    activeGameId = gameId;
+    document.documentElement.dataset.activeGame =
+      backgroundStatus === "ready" ? gameId : "selector";
+    document.getElementById("menu-container")?.remove();
+    if (backgroundStatus === "ready") completeGameBackgroundTransition();
+    navigation.openMenu();
+  });
   return true;
 }
 
@@ -112,7 +126,7 @@ function createLinkConnectMenu() {
   const overlay = createMenuOverlay("link-connect-menu");
   const wrapper = createMenuWrapper(
     "Link Connect",
-    "Thử thách rèn luyện quan sát.",
+    "Ngay trước mắt nhìn, vạn dặm xa xôi!",
   );
   const menuList = document.createElement("ul");
   menuList.className = "menu-list";
@@ -171,7 +185,7 @@ function createTripleConnectMenu() {
   const overlay = createMenuOverlay("triple-connect-menu");
   const wrapper = createMenuWrapper(
     "Triple Connect",
-    "Thử thách rèn luyện quan sát.",
+    "Nhìn tưởng dễ ăn, chớp mắt chịu thua!",
   );
   const menuList = document.createElement("ul");
   menuList.className = "menu-list";
@@ -280,19 +294,17 @@ function showTripleDifficultyOverlay() {
     title: "Chọn chế độ Triple Connect",
     content,
   });
-  GAME_MODES.forEach(
-    ({ id, label, icon }) => {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "difficulty-option";
-      button.append(createIcon(icon), document.createTextNode(label));
-      button.onclick = () => {
-        modal.close();
-        setTimeout(() => onStartTripleConnect(id), UI_TIMING.modalCloseMs);
-      };
-      options.append(button);
-    },
-  );
+  GAME_MODES.forEach(({ id, label, icon }) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "difficulty-option";
+    button.append(createIcon(icon), document.createTextNode(label));
+    button.onclick = () => {
+      modal.close();
+      setTimeout(() => onStartTripleConnect(id), UI_TIMING.modalCloseMs);
+    };
+    options.append(button);
+  });
 }
 
 function createTripleThemeRow(onChange) {
@@ -367,9 +379,15 @@ function createMenuOverlay(variant) {
   return overlay;
 }
 
-function createMenuWrapper(titleText, description) {
+function createMenuWrapper(
+  titleText,
+  description,
+  { gameSelector = false } = {},
+) {
   const wrapper = document.createElement("div");
-  wrapper.className = "menu-wrapper";
+  wrapper.className = gameSelector
+    ? "menu-wrapper menu-wrapper--game-selector"
+    : "menu-wrapper";
   const title = document.createElement("h1");
   title.className = "game-title";
   title.textContent = titleText;
@@ -380,7 +398,7 @@ function createMenuWrapper(titleText, description) {
   return wrapper;
 }
 
-function createGameChoice({ icon, title, description, onClick }) {
+function createGameChoice({ icon, title, description, onClick, onWarm }) {
   const button = document.createElement("button");
   button.type = "button";
   button.className = "game-selector__choice";
@@ -393,6 +411,8 @@ function createGameChoice({ icon, title, description, onClick }) {
   content.append(heading, copy);
   button.append(content, createIcon("arrow-right"));
   button.addEventListener("click", onClick);
+  button.addEventListener("pointerenter", onWarm, { passive: true });
+  button.addEventListener("focus", onWarm);
   return button;
 }
 

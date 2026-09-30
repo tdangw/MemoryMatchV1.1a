@@ -18,7 +18,6 @@ import {
   updateMovesDisplay,
   updateMissesDisplay,
   updateComboDisplay,
-  updatePairProgressDisplay,
   updateLevelStarsDisplay,
   updateTotalStarsDisplay,
   updateCoinDisplay,
@@ -31,7 +30,7 @@ import {
   showMemoryCoinReward,
   showLevelSummaryOverlay,
 } from "./ui.js";
-import { pauseBackgroundMusic, sounds } from "./sound.js"; // 📦 Tách âm thanh
+import { duckBackgroundMusicForVictory, pauseBackgroundMusic, sounds } from "./sound.js"; // 📦 Tách âm thanh
 import { saveCoins, savePersistentGameData } from "./persistence.js";
 import { getFlipAnimationClass } from "./appearance.js";
 import { clearMemoryTileAnimations, restartMemoryTileAnimation } from "./memoryMatch/tileAnimation.js";
@@ -239,7 +238,6 @@ function checkMatch(roundId) {
       highlightTarget("#timer");
     }
     gameState.matchedPairs++;
-    updatePairProgressDisplay(gameState.matchedPairs);
     if (comboTimeBonus > 0) {
       setTimeout(() => showComboEffect(second.element, resolvedCombo), 650);
     }
@@ -341,7 +339,7 @@ export function checkLevelComplete() {
       showBonusOverlay("Không thể lưu kết quả lúc này. Tiến trình vẫn được giữ trong lượt chơi.");
     }
     updateCoinDisplay(totalCoins);
-    pauseBackgroundMusic();
+    duckBackgroundMusicForVictory(gameState.settings);
     if (gameState.settings?.sound) {
       sounds.victory.currentTime = 0;
       sounds.victory.play().catch(() => {});

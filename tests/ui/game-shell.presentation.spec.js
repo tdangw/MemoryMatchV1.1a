@@ -7,12 +7,12 @@ test("both games share frame, title and fullscreen geometry and configurable siz
   const measured = [];
   for (const id of ["memory-match", "link-connect"]) {
     await page.evaluate(async id => {
-      (await import("/js/gameSelector.js")).openGameMenu(id);
+      await (await import("/tests/ui/helpers/gameNavigation.js")).openReadyGameMenu(id);
       const { gameState } = await import("/js/gameState.js");
       gameState.settings.mode = "easy";
       gameState.settings.boardCoordinates = false;
-      if (id === "memory-match") (await import("/js/gameController.js")).startNewMemoryRun();
-      else (await import("/js/linkConnect/linkController.js")).startLinkLevel({ mode: "easy" });
+      if (id === "memory-match") await (await import("/js/gameController.js")).startNewMemoryRun();
+      else await (await import("/js/linkConnect/linkController.js")).startLinkLevel({ mode: "easy" });
     }, id);
     const root = page.locator(".game-shell-root:visible");
     await expect(root).toHaveCount(1);

@@ -16,7 +16,7 @@ test("Triple development checkpoint restores after reload without undo history",
   await page.reload();
   const restored = await page.evaluate(async () => {
     const { continueTripleConnectDevelopmentRound } = await import("/js/tripleConnect/tripleController.js");
-    const run = continueTripleConnectDevelopmentRound();
+    const run = await continueTripleConnectDevelopmentRound();
     return { matched: run?.getState().matchedTriples, score: run?.getState().score, history: run?.getState().undoHistory.length };
   });
   expect(restored).toEqual({ matched: 1, score: 10, history: 0 });
@@ -45,7 +45,7 @@ test("Triple hidden pile Continue restores the revealed top and fixed asset mapp
   const restored = await page.evaluate(async () => {
     const { continueTripleConnectDevelopmentRound } = await import("/js/tripleConnect/tripleController.js");
     const { getExposedTileIds } = await import("/js/tripleConnect/tripleState.js");
-    const run = continueTripleConnectDevelopmentRound({ mode: "normal" });
+    const run = await continueTripleConnectDevelopmentRound({ mode: "normal" });
     return { exposed: getExposedTileIds(run.getState()), cornerStacks: run.getState().cornerStacks, assets: run.getState().assetPathsByType };
   });
   expect(restored.exposed).toContain(before.revealedId);
@@ -79,7 +79,7 @@ test("Triple tray expansion persists once and applies immediately to the active 
   await page.reload();
   const restored = await page.evaluate(async () => {
     const controller = await import("/js/tripleConnect/tripleController.js");
-    const run = controller.continueTripleConnectDevelopmentRound();
+    const run = await controller.continueTripleConnectDevelopmentRound();
     return { capacity: run?.getState().trayCapacity, owned: (await import("/js/gameState.js")).gameState.progress.tripleConnect.trayExpansionOwned };
   });
   expect(restored).toEqual({ capacity: 10, owned: true });

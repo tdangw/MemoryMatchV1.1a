@@ -2,8 +2,7 @@ import { defineConfig } from "@playwright/test";
 
 const viewports = {
   desktop: { width: 1024, height: 900 },
-  mobile: { width: 390, height: 844 },
-  "mobile-narrow": { width: 320, height: 568 },
+  mobile: { width: 412, height: 915 },
   landscape: { width: 844, height: 390 },
 };
 const responsiveTestPattern = /(?:challenge-fullscreen|game-shell\.(?:geometry|layout|presentation)|triple-connect\.(?:chrome|geometry|presentation|witness))\.spec\.js$/;

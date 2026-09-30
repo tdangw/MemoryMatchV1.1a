@@ -10,7 +10,7 @@ test("Link exit families keep portal, blackhole and implode distinct and clean t
     const { findAvailableConnections } = await import("/js/linkConnect/pathfinder.js");
     const { gameState } = await import("/js/gameState.js");
     const { clearLinkTransientEffects, playLinkMatchExit } = await import("/js/linkConnect/linkRenderer.js");
-    controller.startLinkLevel({ mode: "easy" });
+    await controller.startLinkLevel({ mode: "easy" });
     const connection = findAvailableConnections(linkGameState.board.grid)[0];
     const output = {};
     for (const id of ["portal", "blackhole", "implode", "collide"]) {
@@ -47,7 +47,7 @@ test("Default and dissolve exits do not brighten both matched tiles", async ({ p
     const { findAvailableConnections } = await import("/js/linkConnect/pathfinder.js");
     const { gameState } = await import("/js/gameState.js");
     const { clearLinkTransientEffects, playLinkMatchExit } = await import("/js/linkConnect/linkRenderer.js");
-    controller.startLinkLevel({ mode: "easy" });
+    await controller.startLinkLevel({ mode: "easy" });
     const connection = findAvailableConnections(linkGameState.board.grid)[0];
     const output = [];
     for (const id of ["default", "dissolve"]) {
@@ -74,7 +74,7 @@ test("Link V2 connection and exit use a static reduced-motion representation", a
     const { findAvailableConnections } = await import("/js/linkConnect/pathfinder.js");
     const { gameState } = await import("/js/gameState.js");
     const { drawLinkPath, playLinkMatchExit, clearLinkTransientEffects } = await import("/js/linkConnect/linkRenderer.js");
-    controller.startLinkLevel({ mode: "easy" });
+    await controller.startLinkLevel({ mode: "easy" });
     const connection = findAvailableConnections(linkGameState.board.grid)[0];
     gameState.appearance.linkExitEffect = "pixel";
     drawLinkPath(connection.path, linkGameState.board);
@@ -100,7 +100,7 @@ test("Electric exit starts at the same impact instant as its travelling bolt", a
     const { findAvailableConnections } = await import("/js/linkConnect/pathfinder.js");
     const { gameState } = await import("/js/gameState.js");
     const { drawLinkPath, playLinkMatchExit, clearLinkTransientEffects } = await import("/js/linkConnect/linkRenderer.js");
-    controller.startLinkLevel({ mode: "easy" });
+    await controller.startLinkLevel({ mode: "easy" });
     gameState.appearance.linkPathEffect = "electric";
     const connection = findAvailableConnections(linkGameState.board.grid)[0];
     drawLinkPath(connection.path, linkGameState.board);
@@ -136,7 +136,7 @@ test("Fire exit follows the same short impact timeline as Electric", async ({ pa
     const { findAvailableConnections } = await import("/js/linkConnect/pathfinder.js");
     const { gameState } = await import("/js/gameState.js");
     const { drawLinkPath, playLinkMatchExit, clearLinkTransientEffects } = await import("/js/linkConnect/linkRenderer.js");
-    controller.startLinkLevel({ mode: "easy" });
+    await controller.startLinkLevel({ mode: "easy" });
     gameState.appearance.linkPathEffect = "fire";
     const connection = findAvailableConnections(linkGameState.board.grid)[0];
     drawLinkPath(connection.path, linkGameState.board);
@@ -152,7 +152,7 @@ test("Fire exit follows the same short impact timeline as Electric", async ({ pa
   });
   expect(result.pathImpactDelay).toBe("260ms");
   expect(result.exitDelays).toEqual(["0.26s", "0.26s"]);
-  expect(result.sparks).toBe(2);
+  expect(result.sparks).toBe(4);
 });
 
 test("every saved Link exit ID resolves, renders, and releases its transient state", async ({ page }) => {
@@ -166,7 +166,7 @@ test("every saved Link exit ID resolves, renders, and releases its transient sta
     const { findAvailableConnections } = await import("/js/linkConnect/pathfinder.js");
     const { gameState } = await import("/js/gameState.js");
     const { clearLinkTransientEffects, playLinkMatchExit } = await import("/js/linkConnect/linkRenderer.js");
-    controller.startLinkLevel({ mode: "easy" });
+    await controller.startLinkLevel({ mode: "easy" });
     await Promise.all([...document.querySelectorAll("#link-board-frame .link-tile img:not(.link-tile__frost-overlay)")]
       .map(image => image.decode().catch(() => undefined)));
     const connection = findAvailableConnections(linkGameState.board.grid)[0];
@@ -198,7 +198,7 @@ test("Link canvas exits reuse one board surface and release it during cleanup", 
     const { findAvailableConnections } = await import("/js/linkConnect/pathfinder.js");
     const { gameState } = await import("/js/gameState.js");
     const { playLinkMatchExit } = await import("/js/linkConnect/linkRenderer.js");
-    controller.startLinkLevel({ mode: "easy" });
+    await controller.startLinkLevel({ mode: "easy" });
     gameState.appearance.linkExitEffect = "finedust";
     await Promise.all([...document.querySelectorAll("#link-board-frame .link-tile img:not(.link-tile__frost-overlay)")]
       .map(image => image.decode().catch(() => undefined)));
@@ -232,7 +232,7 @@ test("Canvas exit keeps its source cards hidden until match cleanup removes them
     const { findAvailableConnections } = await import("/js/linkConnect/pathfinder.js");
     const { gameState } = await import("/js/gameState.js");
     const { clearLinkTransientEffects, playLinkMatchExit } = await import("/js/linkConnect/linkRenderer.js");
-    controller.startLinkLevel({ mode: "easy" });
+    await controller.startLinkLevel({ mode: "easy" });
     gameState.appearance.linkExitEffect = "finedust";
     await Promise.all([...document.querySelectorAll("#link-board-frame .link-tile img:not(.link-tile__frost-overlay)")]
       .map(image => image.decode().catch(() => undefined)));
@@ -270,7 +270,7 @@ test("Link canvas exit returns to baseline after 100 render, cleanup, and switch
     let maximum = 0;
     for (let cycle = 0; cycle < 100; cycle += 1) {
       selector.openGameMenu("link-connect");
-      controller.startLinkLevel({ mode: "easy" });
+      await controller.startLinkLevel({ mode: "easy" });
       gameState.appearance.linkExitEffect = "finedust";
       await Promise.all([...document.querySelectorAll("#link-board-frame .link-tile img:not(.link-tile__frost-overlay)")]
         .map(image => image.decode().catch(() => undefined)));

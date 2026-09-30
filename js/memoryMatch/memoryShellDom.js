@@ -3,22 +3,7 @@ const template = document.createElement("template");
 template.innerHTML = `<div id="game-container" class="game-shell-tokens" style="display: none;">
       <div id="game-logo" data-shell-region="title" class="game-name">Memory Match</div>
 
-      <div id="game-progress-hud" data-shell-region="progress" class="game-progress-hud" aria-label="Tiến trình màn chơi">
-        <span class="info stat-card stat-moves"><span class="stat-label">MOVES</span><span id="moves">0</span></span>
-        <span class="info stat-card stat-misses"><span class="stat-label">MISS</span><span id="misses">0</span></span>
-        <span class="info stat-card stat-combo"><span class="stat-label">COMBO</span><span id="combo">0</span><span class="combo-window-progress" aria-hidden="true"></span></span>
-        <span class="info stat-card stat-star-progress" aria-label="Tiến trình sao màn hiện tại">
-          <span id="level-stars" class="star-progress__stars" role="img" aria-label="0 trên 3 sao">
-            <span class="star-progress__milestone" aria-hidden="true">★</span>
-            <span class="star-progress__milestone" aria-hidden="true">★</span>
-            <span class="star-progress__milestone" aria-hidden="true">★</span>
-          </span>
-          <span class="star-progress__track"><span id="level-stars-fill" class="star-progress__fill"></span></span>
-        </span>
-        <span class="info stat-card stat-points"><span class="stat-label">ĐIỂM</span><span id="score">0</span></span>
-        <span class="info stat-card stat-progress" id="pair-progress"><span data-icon="trophy"></span><span id="matched-pairs">0</span>/<span id="total-pairs">0</span></span>
-        <span class="info stat-card stat-hints" aria-label="Lượt gợi ý còn lại"><span data-icon="search"></span><span id="hint">0</span></span>
-      </div>
+      <div id="game-progress-hud" data-shell-region="progress" hidden></div>
 
       <div id="game-title" data-shell-region="hud" class="game-hud">
         <button
@@ -41,19 +26,19 @@ template.innerHTML = `<div id="game-container" class="game-shell-tokens" style="
           <button id="btn-full-reset" class="game-action-item" type="button" data-icon="wand">Xóa dữ liệu</button>
         </div>
 
-        <div class="game-quick-actions" aria-label="Hỗ trợ nhanh">
-          <button id="btn-buy-time" class="game-quick-action" type="button" aria-label="Kho thời gian" data-icon="timer"></button>
-          <button id="btn-preview-cards" class="game-quick-action" type="button" aria-label="Kho xem trước" data-icon="eye"></button>
+        <button id="memory-tools-toggle" class="memory-tools-toggle" type="button" aria-label="Mở công cụ hỗ trợ" aria-controls="memory-tools-menu" aria-expanded="false" data-icon="wand"></button>
+        <div id="memory-tools-menu" class="memory-tools-menu" hidden>
+          <div class="memory-tool-list" aria-label="Vật phẩm hỗ trợ">
+            <button id="btn-hint" class="memory-tool-item" type="button" aria-label="Dùng gợi ý" data-icon="search">Gợi ý</button>
+            <button id="btn-buy-time" class="memory-tool-item" type="button" aria-label="Kho thời gian" data-icon="timer">Thời gian</button>
+            <button id="btn-preview-cards" class="memory-tool-item" type="button" aria-label="Kho xem trước" data-icon="eye">Xem trước</button>
+          </div>
         </div>
 
-        <button id="btn-hint" class="game-hint-fab" type="button" aria-label="Dùng gợi ý">
-          <span data-icon="search"></span>
-        </button>
-
-        <div class="game-stats" aria-label="Thông tin màn chơi">
-          <span class="info stat-card stat-level"><span class="stat-label">LV</span><span id="level">1</span></span>
-          <span class="info stat-card stat-timer" id="timer"><span data-icon="timer"></span><span id="timer-value">--:--</span></span>
-          <span class="info stat-card stat-score"><span data-icon="star"></span><span id="total-stars">0</span></span>
+        <div class="game-stats game-hud__stats" aria-label="Thông tin màn chơi">
+          <div class="game-hud__stats-group game-hud__stats-group--left"><span class="info stat-card game-hud__metric stat-moves"><span class="stat-label">MOVES</span><span id="moves">0</span></span><span class="info stat-card game-hud__metric stat-misses"><span class="stat-label">MISS</span><span id="misses">0</span></span></div>
+          <div class="game-hud__stats-group game-hud__stats-group--center"><span class="info stat-card game-hud__metric stat-level"><span class="stat-label">LEVEL</span><span id="level">1</span></span><span class="info stat-card game-hud__metric stat-timer" id="timer"><span class="stat-label">THỜI GIAN</span><span id="timer-value">--:--</span></span><span class="info stat-card game-hud__metric stat-stars"><span class="stat-label"><span data-icon="star"></span></span><span id="total-stars">0</span></span></div>
+          <div class="game-hud__stats-group game-hud__stats-group--right"><span class="info stat-card game-hud__metric stat-combo"><span class="stat-label">COMBO</span><span id="combo">0</span><span class="combo-window-progress" aria-hidden="true"></span></span><span class="info stat-card game-hud__metric stat-points"><span class="stat-label">ĐIỂM</span><span id="score" class="game-hud__score-value">0</span></span></div>
         </div>
       </div>
       <section id="memory-special-hud" data-shell-region="milestones" class="memory-special-hud" aria-label="Tiến trình năng lượng đặc biệt">
@@ -70,6 +55,7 @@ template.innerHTML = `<div id="game-container" class="game-shell-tokens" style="
           <span data-memory-special-milestone="9" style="--memory-milestone-position:85%">9</span>
           <span data-memory-special-milestone="10" style="--memory-milestone-position:95%">10</span>
         </div>
+        <span class="game-milestone-stars stat-star-progress" aria-label="Tiến trình sao màn hiện tại"><span id="level-stars" class="star-progress__stars" role="img" aria-label="0 trên 3 sao"><span class="star-progress__milestone" aria-hidden="true">★</span><span class="star-progress__milestone" aria-hidden="true">★</span><span class="star-progress__milestone" aria-hidden="true">★</span></span><span class="star-progress__track"><span id="level-stars-fill" class="star-progress__fill"></span></span></span>
       </section>
       <div id="grid-board-frame" data-shell-region="frame">
         <div class="grid-coordinate-corner" aria-hidden="true"></div>
