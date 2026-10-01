@@ -77,9 +77,18 @@ export function showGameSelector() {
   const overlay = createMenuOverlay("game-selector");
   const wrapper = createMenuWrapper(
     "Memory Match Adventure",
-    "Trí nhớ là hành trang. Phiêu lưu là lẽ sống.",
+    "Trí nhớ là hành trang. Cuộc phiêu lưu là lẽ sống.",
     { gameSelector: true },
   );
+  const title = wrapper.querySelector(".game-title");
+  const titleLine = document.createElement("span");
+  titleLine.className = "game-selector__title-line";
+  titleLine.textContent = "Memory Match";
+  const adventureLine = document.createElement("span");
+  adventureLine.className = "game-selector__title-line game-selector__title-line--adventure";
+  adventureLine.textContent = "Adventure";
+  title.replaceChildren(titleLine, adventureLine);
+  title.setAttribute("aria-label", "Memory Match Adventure");
   const choices = document.createElement("div");
   choices.className = "game-selector__choices";
   getReleasedGames().forEach((game) => {
@@ -99,18 +108,27 @@ export function showGameSelector() {
 export function openGameMenu(gameId) {
   const navigation = getGameNavigation(gameId);
   if (!navigation) return false;
-  prepareGameBackgroundTransition(gameId).then((backgroundStatus) => {
-    if (backgroundStatus === "cancelled") return;
-    cancelPendingTripleGeneration();
-    unmountActiveGameShell();
-    restoreBackgroundMusic(gameState.settings);
-    activeGameId = gameId;
-    document.documentElement.dataset.activeGame =
-      backgroundStatus === "ready" ? gameId : "selector";
-    document.getElementById("menu-container")?.remove();
-    if (backgroundStatus === "ready") completeGameBackgroundTransition();
-    navigation.openMenu();
-  });
+
+  const backgroundTransition = prepareGameBackgroundTransition(gameId);
+  cancelPendingTripleGeneration();
+  unmountActiveGameShell();
+  restoreBackgroundMusic(gameState.settings);
+  activeGameId = gameId;
+  document.getElementById("menu-container")?.remove();
+  navigation.openMenu();
+
+  void backgroundTransition
+    .then((backgroundStatus) => {
+      if (activeGameId !== gameId || backgroundStatus === "cancelled") return;
+      document.documentElement.dataset.activeGame = gameId;
+      if (backgroundStatus === "ready") completeGameBackgroundTransition();
+    })
+    .catch((error) => {
+      if (activeGameId !== gameId) return;
+      cancelGameBackgroundTransition();
+      document.documentElement.dataset.activeGame = gameId;
+      console.error("Game menu background transition failed", error);
+    });
   return true;
 }
 

@@ -5,6 +5,25 @@ test("registry exposes only released games in the selector", async ({
 }) => {
   await page.goto("/");
   await expect(page.locator(".game-selector__choice")).toHaveCount(3);
+  const selectorTitle = page.locator(".menu-wrapper--game-selector > .game-title");
+  await expect(selectorTitle).toHaveAttribute("aria-label", "Memory Match Adventure");
+  await expect(selectorTitle.locator(".game-selector__title-line")).toHaveText([
+    "Memory Match",
+    "Adventure",
+  ]);
+  await expect(page.locator(".menu-wrapper--game-selector > .menu-description"))
+    .toHaveCSS("font-size", "10px");
+  await expect(page.locator(".game-selector__choice small"))
+    .toHaveCSS("font-size", "10px");
+  const selectorDescription = page.locator(".menu-wrapper--game-selector > .menu-description");
+  for (const width of [412, 1024]) {
+    await page.setViewportSize({ width, height: 900 });
+    const lineCount = await selectorDescription.evaluate((element) => {
+      const style = getComputedStyle(element);
+      return Math.round(element.getBoundingClientRect().height / parseFloat(style.lineHeight));
+    });
+    expect(lineCount, `slogan line count at ${width}px`).toBe(1);
+  }
   await expect(page.locator(".game-selector__choice")).toHaveText([
     /Memory Match.*Mới thấy đó thôi, chớp mắt đã quên!/s,
     /Link Connect.*Ngay trước mắt nhìn, vạn dặm xa xôi!/s,
@@ -14,7 +33,7 @@ test("registry exposes only released games in the selector", async ({
     "Memory Match Adventure",
   );
   await expect(page.locator(".game-selector")).toContainText(
-    "Trí nhớ là hành trang. Phiêu lưu là lẽ sống.",
+    "Trí nhớ là hành trang. Cuộc phiêu lưu là lẽ sống.",
   );
   await expect(
     page
