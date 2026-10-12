@@ -383,7 +383,9 @@ function normalizeLayer(layer) {
 
 function normalizeTrayCapacity(value) {
   const capacity = Number(value ?? TRIPLE_RULES.trayCapacity);
-  if (!Number.isInteger(capacity) || ![TRIPLE_RULES.trayCapacity, TRIPLE_RULES.trayCapacity + 3].includes(capacity))
+  if (!Number.isInteger(capacity)
+    || capacity < TRIPLE_RULES.trayCapacity
+    || capacity > TRIPLE_RULES.trayCapacity + 3)
     throw new TypeError("Triple tray capacity is invalid.");
   return capacity;
 }

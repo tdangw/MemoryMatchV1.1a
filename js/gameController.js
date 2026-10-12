@@ -164,12 +164,8 @@ export function initializeLevel(level, { reason = "new", session = null } = {}) 
     history: reason === "resume" ? undefined : gameState.progress.themeSelectionHistory[themeId],
   }));
   await startup.yield();
-  await startup.phase('images', () => startup.decodeBoard());
-  startup.check();
   gameState.progress.memoryMatch.items.hint += hintBonus;
   activeAssetPaths = selectedCards?.map((card) => card.assetPath).filter(Boolean) || [];
-  if (reason !== "resume" && activeAssetPaths.length) commitMemoryThemeSession(themeId, activeAssetPaths);
-  else persistMemorySession(true);
 
   gameState.moves = 0;
   gameState.misses = 0;
@@ -191,6 +187,10 @@ export function initializeLevel(level, { reason = "new", session = null } = {}) 
   updateTimerDisplay(gameState.remainingTime);
   setMemoryTimeProgress({ remainingSeconds: gameState.remainingTime, timeLimit: gameState.timeLimit });
   showLevelRewardOverlay();
+  await startup.phase('images', () => startup.decodeBoard());
+  startup.check();
+  if (reason !== "resume" && activeAssetPaths.length) commitMemoryThemeSession(themeId, activeAssetPaths);
+  else persistMemorySession(true);
   showRevealTimerInHud(previewDurationMs / 1000, roundId);
   document.getElementById("btn-buy-time")?.toggleAttribute("hidden", isEndlessMode(mode));
   revealAndHideTiles(roundId, startCountdown, previewDurationMs);

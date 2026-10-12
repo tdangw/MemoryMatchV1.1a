@@ -299,12 +299,15 @@ export function startLinkLevel({
   await startup.yield();
   await startup.phase('render', () => renderLinkBoardStartup(board, { onTileClick: handleLinkTileClick, onCompactLandscapeChange: handleLinkCompactLandscapeChange }, startup));
   await startup.yield();
-  await startup.phase('images', () => startup.decodeBoard());
-  startup.check();
-  if (!resume && activeAssetPaths.length) commitThemeSession("link-connect", createLinkSession(), themeId, activeAssetPaths);
-  else persistLinkRunProgress(true);
   updateLinkHud();
   linkGameState.isLocked = true;
+  let introComplete = false;
+  let imagesReady = false;
+  const activateWhenReady = () => {
+    if (!introComplete || !imagesReady || linkGameState.roundId !== roundId) return;
+    unlockLinkBoard();
+    startCountdown(roundId);
+  };
   showLevelRewardOverlay({
     level,
     mode,
@@ -313,11 +316,16 @@ export function startLinkLevel({
     remainingTime: linkGameState.remainingTime,
     assistText: `Gợi ý: ${getLinkItemCount("hint")}`,
     onComplete: () => {
-      if (linkGameState.roundId !== roundId) return;
-      unlockLinkBoard();
-      startCountdown(roundId);
+      introComplete = true;
+      activateWhenReady();
     },
   });
+  await startup.phase('images', () => startup.decodeBoard());
+  startup.check();
+  if (!resume && activeAssetPaths.length) commitThemeSession("link-connect", createLinkSession(), themeId, activeAssetPaths);
+  else persistLinkRunProgress(true);
+  imagesReady = true;
+  activateWhenReady();
   });
 }
 

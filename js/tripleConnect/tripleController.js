@@ -35,6 +35,7 @@ import {
   getTripleChallengeStage,
   getTripleModeConfig,
   getTripleCompletionScore,
+  getTripleTrayCapacity,
   getTripleStarProgress,
   TRIPLE_PRODUCT_DECISIONS,
   isTripleChallengeComplete,
@@ -60,6 +61,9 @@ import { resolveTripleMilestoneProgress } from "./tripleMilestones.js";
 import { openTimeUpModal, showLevelRewardOverlay, showLevelSummaryOverlay } from "../ui.js";
 import { openTripleTrayExpansionPurchase } from "../shop.js";
 import { createHudTimerScheduler } from "../gameShell/gameTimerProgress.js";
+import { getComboWindowMs } from "../gameplayTuning.js";
+import { clearComboWindow as clearComboWindowPresentation, playComboWindow } from "../gameShell/comboWindowPresentation.js";
+import { clearShellTimeout } from "../gameShell/gameShellLifecycle.js";
 
 const development = import.meta.env?.DEV === true;
 let state = null;
@@ -165,9 +169,10 @@ function prepareTripleStartup(prepare) {
     await startup.yield();
     await startup.phase('render', mounted.renderInitial);
     await startup.yield();
+    mounted.activate();
     await startup.phase('images', () => startup.decodeBoard());
     startup.check();
-    mounted.activate();
+    mounted.markStartupReady();
     return mounted;
   });
 }
@@ -310,12 +315,17 @@ function mountTripleDevelopmentRound(generated, { skipIntro = false, startup } =
   const generation = ++roundGeneration;
   const startImmediately = !generated.board || skipIntro;
   roundStarted = startup ? false : startImmediately;
+  let startupReady = !startup;
+  let introComplete = false;
+  let activated = false;
   renderer ||= createTripleRenderer(shell, {
     onLockedTraySlotClick: () => openTripleTrayExpansionPurchase(),
   });
   renderer.mountLayout(scope, currentLayout);
   const hudElements = getTripleHudElements();
   const hud = getTripleHud(hudElements);
+  let comboExpiryTimer;
+  let comboWindowRevision = 0;
   const render = (roundState, { boardState = roundState, startup: renderStartup } = {}) => {
     const pendingRender = renderer.render(
       boardState,
@@ -361,8 +371,36 @@ function mountTripleDevelopmentRound(generated, { skipIntro = false, startup } =
     updateTimer(shell, remainingTime, hudElements, hud);
     return pendingRender;
   };
+  const stopComboWindow = () => {
+    comboWindowRevision += 1;
+    if (comboExpiryTimer !== undefined) clearShellTimeout(comboExpiryTimer);
+    comboExpiryTimer = undefined;
+    clearComboWindowPresentation(hudElements.comboCard);
+  };
+  const startComboWindow = () => {
+    stopComboWindow();
+    const revision = comboWindowRevision;
+    const expectedRoundId = state.roundId;
+    const durationMs = getComboWindowMs(Math.floor(state.initialTileCount / 3));
+    playComboWindow(hudElements.comboCard, durationMs);
+    comboExpiryTimer = scope.timeout(() => {
+      if (revision !== comboWindowRevision || !scope.active
+        || state.roundId !== expectedRoundId || state.status !== "playing") return;
+      comboExpiryTimer = undefined;
+      const transition = reduceTrustedTripleCommand(state, { type: "expire-combo" });
+      if (!transition.result.ok) {
+        stopComboWindow();
+        return;
+      }
+      state = transition.nextState;
+      stopComboWindow();
+      render(state);
+      saveSession();
+    }, durationMs);
+  };
+  scope.own(stopComboWindow, "cleanup");
   scope.listen(document, "triple-tray-expansion-purchased", () => {
-    if (!state || state.status !== "playing") return;
+    if (!state) return;
     const trayCapacity = getEffectiveTripleTrayCapacity();
     if (state.trayCapacity === trayCapacity) return;
     boardPresentationRevision += 1;
@@ -447,6 +485,9 @@ function mountTripleDevelopmentRound(generated, { skipIntro = false, startup } =
     roundLuckyRewards.push(...rewards.lucky);
     roundMilestoneRewards.push(...rewards.milestones);
     const roundWon = transition.events.some((event) => event.type === "round-won");
+    if (state.status !== "playing") stopComboWindow();
+    else if (matchEvent) startComboWindow();
+    else if (transition.events.some((event) => event.type === "miss")) stopComboWindow();
     const hasPresentation = transition.events.some((event) => event.type === "tile-selected");
     if (hasPresentation) {
       presentationCount += 1;
@@ -521,6 +562,8 @@ function mountTripleDevelopmentRound(generated, { skipIntro = false, startup } =
       state = transition.nextState;
       boardPresentationRevision += 1;
       hintedTileIds.clear();
+      if (state.status !== "playing" || state.combo === 0) stopComboWindow();
+      else if (comboExpiryTimer === undefined) startComboWindow();
       render(state);
       saveSession();
     },
@@ -554,20 +597,39 @@ function mountTripleDevelopmentRound(generated, { skipIntro = false, startup } =
       render(state);
     },
   );
+  const beginRound = () => {
+    if (roundStarted || !startupReady || (!startImmediately && !introComplete)) return;
+    roundStarted = true;
+    saveSession();
+    startTripleTimer(scope, shell, render, hudElements, hud);
+    if (state.combo > 0) startComboWindow();
+  };
   const activate = () => {
-    roundStarted = startImmediately;
-    if (roundStarted) {
-      saveSession();
-      startTripleTimer(scope, shell, render, hudElements, hud);
-    } else {
-      showTripleStartModal({ shell, scope, generation, render, hudElements, hud });
-    }
+    if (activated) return;
+    activated = true;
+    if (startImmediately) beginRound();
+    else showTripleStartModal({
+      shell,
+      scope,
+      generation,
+      render,
+      hudElements,
+      hud,
+      onComplete: () => {
+        introComplete = true;
+        beginRound();
+      },
+    });
+  };
+  const markStartupReady = () => {
+    startupReady = true;
+    beginRound();
   };
   if (!startup) activate();
-  return { generated, getState: () => state, shell, renderInitial: () => render(state, { startup }), activate };
+  return { generated, getState: () => state, shell, renderInitial: () => render(state, { startup }), activate, markStartupReady };
 }
 
-function showTripleStartModal({ shell, scope, generation, render, hudElements, hud }) {
+function showTripleStartModal({ shell, scope, generation, render, hudElements, hud, onComplete }) {
   const theme = getTheme(getEquippedThemeId(gameState.appearance, "triple-connect"));
   const totalTiles = Object.keys(state.tiles).length;
   showLevelRewardOverlay({
@@ -583,9 +645,7 @@ function showTripleStartModal({ shell, scope, generation, render, hudElements, h
     onComplete: () => {
       if (generation !== roundGeneration || !scope.active) return;
       modalPaused = false;
-      roundStarted = true;
-      saveSession();
-      startTripleTimer(scope, shell, render, hudElements, hud);
+      onComplete();
     },
   });
 }
@@ -994,8 +1054,7 @@ function createRoundSeed(mode, level) {
 }
 
 function getEffectiveTripleTrayCapacity() {
-  const expansion = TRIPLE_PRODUCT_DECISIONS.trayExpansion;
-  return expansion.baseCapacity + (gameState.progress.tripleConnect.trayExpansionOwned ? expansion.bonusCapacity : 0);
+  return getTripleTrayCapacity(gameState.progress.tripleConnect.trayExpansionSlots);
 }
 
 function createSeededRandom(seed) {

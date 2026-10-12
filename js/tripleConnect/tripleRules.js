@@ -17,7 +17,22 @@ export function reduceTrustedTripleCommand(state, command) {
   if (!command || typeof command.type !== "string") return reject(state, "invalid-command");
   if (command.type === "select-tile") return selectTile(state, command.tileId);
   if (command.type === "undo") return undoSelection(state);
+  if (command.type === "expire-combo") return expireCombo(state);
   return reject(state, "unknown-command");
+}
+
+function expireCombo(state) {
+  if (state.status !== "playing") return reject(state, "round-not-playing");
+  if (state.combo === 0) return reject(state, "combo-inactive");
+  const nextState = restoreTripleStateSnapshot({
+    ...createTripleStateSnapshotFromTrustedState(state),
+    combo: 0,
+  }, state.undoHistory);
+  return {
+    nextState,
+    events: Object.freeze([{ type: "combo-expired" }]),
+    result: Object.freeze({ ok: true, reason: null }),
+  };
 }
 
 function selectTile(state, tileId) {

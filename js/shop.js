@@ -44,7 +44,7 @@ import {
   purchaseTripleTrayExpansion,
   purchaseTripleTheme,
 } from "./tripleConnect/tripleTransactions.js";
-import { TRIPLE_PRODUCT_DECISIONS } from "./tripleConnect/tripleConfig.js";
+import { getTripleTrayCapacity, normalizeTripleTrayExpansionSlots, TRIPLE_PRODUCT_DECISIONS } from "./tripleConnect/tripleConfig.js";
 
 export function openQuickAssistOverlay(kind) {
   if (gameState.isLocked || gameState.isPaused) return;
@@ -368,6 +368,9 @@ function renderTripleItems(grid, roundId, modal) {
     () => renderTripleItems(grid, roundId, modal),
   );
   const expansion = TRIPLE_PRODUCT_DECISIONS.trayExpansion;
+  const expansionSlots = normalizeTripleTrayExpansionSlots(gameState.progress.tripleConnect.trayExpansionSlots);
+  const capacity = getTripleTrayCapacity(expansionSlots);
+  const maximumCapacity = getTripleTrayCapacity(expansion.bonusCapacity);
   const group = document.createElement("section");
   group.className = "appearance-group";
   const heading = document.createElement("h3");
@@ -382,13 +385,13 @@ function renderTripleItems(grid, roundId, modal) {
   const name = document.createElement("strong");
   name.textContent = "Mở rộng khay";
   const description = document.createElement("small");
-  description.textContent = `${expansion.baseCapacity} → ${expansion.baseCapacity + expansion.bonusCapacity} ô`;
+  description.textContent = `${capacity}/${maximumCapacity} ô · Mỗi lần mua thêm 1 ô`;
   const button = document.createElement("button");
   button.type = "button";
   button.className = "app-button app-button--purchase shop-buy-button";
-  if (gameState.progress.tripleConnect.trayExpansionOwned) {
+  if (expansionSlots >= expansion.bonusCapacity) {
     button.classList.add("appearance-action--equipped");
-    button.textContent = "Đã sở hữu";
+    button.textContent = "Đã mở tối đa";
     button.disabled = true;
   } else {
     button.append(
@@ -400,7 +403,7 @@ function renderTripleItems(grid, roundId, modal) {
         {
           id: "tray-expansion",
           type: "triple-tray-expansion",
-          title: "Mở rộng khay vĩnh viễn",
+          title: "Mở thêm 1 ô khay",
           price: expansion.releasePrice,
         },
         roundId,
@@ -666,8 +669,9 @@ function renderAppearanceGroup(grid, title, type, items, roundId, modal) {
 }
 
 export function openTripleTrayExpansionPurchase({ onPurchase } = {}) {
-  if (gameState.progress.tripleConnect.trayExpansionOwned) {
-    showShopMessage("Bạn đã sở hữu nâng cấp này.", "info");
+  const expansion = TRIPLE_PRODUCT_DECISIONS.trayExpansion;
+  if (normalizeTripleTrayExpansionSlots(gameState.progress.tripleConnect.trayExpansionSlots) >= expansion.bonusCapacity) {
+    showShopMessage("Khay đã mở tối đa.", "info");
     return false;
   }
   const existingConfirmation = document.querySelector("#shop-confirm-modal");
@@ -675,12 +679,11 @@ export function openTripleTrayExpansionPurchase({ onPurchase } = {}) {
     existingConfirmation.querySelector(".app-button--primary")?.focus();
     return false;
   }
-  const expansion = TRIPLE_PRODUCT_DECISIONS.trayExpansion;
   openPurchaseConfirmation(
     {
       id: "tray-expansion",
       type: "triple-tray-expansion",
-      title: "Mở rộng khay vĩnh viễn",
+      title: "Mở thêm 1 ô khay",
       price: expansion.releasePrice,
     },
     gameState.roundId,
@@ -791,8 +794,8 @@ function handleBuyItem(item, roundId, fromMenu = false) {
   if (item.type === "triple-tray-expansion") {
     if (!purchaseTripleTrayExpansion()) {
       showShopMessage(
-        gameState.progress.tripleConnect.trayExpansionOwned
-          ? "Bạn đã sở hữu nâng cấp này."
+        normalizeTripleTrayExpansionSlots(gameState.progress.tripleConnect.trayExpansionSlots) >= TRIPLE_PRODUCT_DECISIONS.trayExpansion.bonusCapacity
+          ? "Khay đã mở tối đa."
           : gameState.coins < item.price
             ? "Bạn không đủ Xu để mở rộng khay."
           : "Không thể lưu giao dịch. Xu và nâng cấp chưa thay đổi.",
@@ -801,7 +804,7 @@ function handleBuyItem(item, roundId, fromMenu = false) {
       return false;
     }
     updateCoinDisplay(gameState.coins);
-    showShopMessage("Khay đã mở rộng lên 10 ô cho mọi chế độ Triple Connect.");
+    showShopMessage("Đã mở thêm 1 ô khay cho mọi chế độ Triple Connect.");
     return true;
   }
 

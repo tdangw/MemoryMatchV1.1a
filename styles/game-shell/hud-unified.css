@@ -21,9 +21,8 @@
   --unified-hud-star-offset: 6px;
 }
 .game-shell-root > [data-shell-region="progress"] { display: none; }
-.game-shell-root[data-shell-startup="preparing"] [data-shell-region="board"] { visibility: hidden; pointer-events: none; }
+.game-shell-root[data-shell-startup="preparing"] [data-shell-region="board"] { pointer-events: none; }
 .game-shell-root[data-shell-startup="preparing"] :is(.memory-tools-toggle, .link-tools-toggle, .triple-tools-toggle) { pointer-events: none; }
-.game-shell-startup-status { position: fixed; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%); padding: 8px 14px; border-radius: 10px; background: #243b64; color: #f5f7fb; white-space: nowrap; z-index: var(--shell-layers-menu); }
 .game-shell-root > [data-shell-region="milestones"] { margin: var(--unified-hud-milestone-margin); }
 .game-shell-root .game-hud {
   --shell-hud-used-width: min(var(--board-width, var(--shell-layout-content-max-width)), 100%);

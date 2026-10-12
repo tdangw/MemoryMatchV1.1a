@@ -12,17 +12,11 @@ export function createGameShellStartup(scope, refs, onFailure) {
   let activeDecodes = 0;
   let ready;
   const pending = new Set();
-  const label = document.createElement('div');
-  label.className = 'game-shell-startup-status';
-  label.setAttribute('role', 'status');
-  label.textContent = 'Đang chuẩn bị bàn chơi…';
-  refs.root.append(label);
   refs.root.dataset.shellStartup = status;
   refs.board.setAttribute('aria-busy', 'true');
   const controls = [...refs.hud.querySelectorAll('button:not(.game-menu-toggle):not(.game-action-item)')].map(node => ({ node, disabled: node.disabled }));
   controls.forEach(({ node }) => { node.disabled = true; });
   const finishUI = () => {
-    label.remove();
     refs.board.removeAttribute('aria-busy');
     delete refs.root.dataset.shellStartup;
     controls.forEach(({ node, disabled }) => { node.disabled = disabled; });

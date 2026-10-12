@@ -5,7 +5,7 @@ import { GAMEPLAY_LIMITS } from "./gameplayTuning.js";
 import { GAME_MODES } from "./gameCatalog.js";
 import { restoreSerializedTripleRoundState, serializeTripleRoundState } from "./tripleConnect/tripleState.js";
 import { getTripleLayout } from "./tripleConnect/tripleBoard.js";
-import { TRIPLE_PRODUCT_DECISIONS } from "./tripleConnect/tripleConfig.js";
+import { getTripleTrayCapacity, normalizeTripleTrayExpansionSlots, TRIPLE_PRODUCT_DECISIONS } from "./tripleConnect/tripleConfig.js";
 import { normalizeTripleMilestones } from "./tripleConnect/tripleMilestones.js";
 import { getThemeSelectionManifest } from "./themeCatalog.js";
 import { appendThemeSelectionHistory, normalizeThemeSelectionHistory } from "./themeSelection.js";
@@ -54,6 +54,7 @@ export const gameState = {
       totalScore: 0,
       bestByLevel: {},
       items: { hint: TRIPLE_PRODUCT_DECISIONS.initialItems.hint, time: 0, undo: 0, shuffle: 0 },
+      trayExpansionSlots: 0,
       trayExpansionOwned: false,
       sessionsByMode: {},
       milestones: { version: TRIPLE_PRODUCT_DECISIONS.milestones.version, progress: 0, cycleId: 0, claimedIds: [] },
@@ -112,18 +113,21 @@ export function hydrateGameState({
     sessionsByMode: normalizeSessions(linkConnect.sessionsByMode),
   };
   const tripleConnect = progress?.tripleConnect || {};
-  const trayExpansionOwned = tripleConnect.trayExpansionOwned === true;
+  const trayExpansionSlots = normalizeTripleTrayExpansionSlots(
+    tripleConnect.trayExpansionSlots ?? (tripleConnect.trayExpansionOwned === true
+      ? TRIPLE_PRODUCT_DECISIONS.trayExpansion.bonusCapacity
+      : 0),
+  );
   gameState.progress.tripleConnect = {
     totalStars: normalizeNonNegativeInteger(tripleConnect.totalStars),
     totalScore: normalizeNonNegativeInteger(tripleConnect.totalScore),
     bestByLevel: normalizeBestByLevel(tripleConnect.bestByLevel),
     items: normalizeTripleItems(tripleConnect.items),
-    trayExpansionOwned,
+    trayExpansionSlots,
+    trayExpansionOwned: trayExpansionSlots === TRIPLE_PRODUCT_DECISIONS.trayExpansion.bonusCapacity,
     sessionsByMode: normalizeTripleSessions(
       tripleConnect.sessionsByMode,
-      trayExpansionOwned
-        ? TRIPLE_PRODUCT_DECISIONS.trayExpansion.baseCapacity + TRIPLE_PRODUCT_DECISIONS.trayExpansion.bonusCapacity
-        : TRIPLE_PRODUCT_DECISIONS.trayExpansion.baseCapacity,
+      getTripleTrayCapacity(trayExpansionSlots),
     ),
     milestones: normalizeTripleMilestones(tripleConnect.milestones),
   };

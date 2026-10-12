@@ -128,6 +128,33 @@ test("Triple uses the shared score and combo feedback", async ({ page }) => {
   await expect(page.locator(".tile-combo-effect")).toContainText(/x2/);
 });
 
+test("Triple combo bar counts down and expires the active combo", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.clock.install();
+  await page.evaluate(async () => {
+    const { startTripleConnectRound } = await import("/js/tripleConnect/tripleController.js");
+    window.__tripleComboRun = await startTripleConnectRound({
+      mode: "easy",
+      seed: "combo-window-expiry",
+      skipIntro: true,
+    });
+  });
+  const witness = await page.evaluate(() => window.__tripleComboRun.generated.witness.slice(0, 3));
+  for (const command of witness) await page.locator(`[data-tile-id="${command.tileId}"]`).click();
+
+  const combo = page.locator('#triple-connect-container [data-triple-stat="combo"]');
+  const progress = page.locator("#triple-connect-container .combo-window-progress");
+  await expect(combo).toHaveText("1");
+  await expect(progress).toHaveCount(1);
+  await expect(progress).toHaveCSS("opacity", "1");
+  await page.clock.fastForward(19_000);
+  await expect(combo).toHaveText("1");
+  await page.clock.fastForward(1_100);
+  await expect(combo).toHaveText("0");
+  await expect(progress).toHaveCSS("opacity", "0");
+  await expect(progress).toHaveCount(1);
+});
+
 test("Triple menu, start modal and timer follow the shared round contract", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await expect(page.locator("#menu-container .menu-item")).toHaveText([

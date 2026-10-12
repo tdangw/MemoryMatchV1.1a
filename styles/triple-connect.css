@@ -267,27 +267,14 @@
   padding: 3px;
   position: relative;
   isolation: isolate;
-  border: 2px solid rgb(104 224 255 / 55%);
+  border: 0;
   border-radius: 15px;
-  background:
-    linear-gradient(180deg, rgb(35 70 110 / 96%), rgb(8 25 55 / 98%) 62%, rgb(4 15 37 / 99%));
-  box-shadow:
-    inset 0 2px 0 rgb(213 249 255 / 38%),
-    inset 0 -6px 10px rgb(0 5 22 / 72%),
-    0 4px 0 rgb(6 20 49),
-    0 9px 15px rgb(0 0 0 / 42%),
-    0 0 0 3px rgb(93 107 255 / 26%),
-    0 0 18px rgb(74 216 255 / 18%);
+  background: transparent;
+  box-shadow: none;
   overflow: visible;
 }
 .triple-connect__tray::before {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  inset: 2px;
-  border-radius: 10px;
-  background: linear-gradient(180deg, rgb(1 12 33 / 8%), rgb(0 3 18 / 48%));
-  box-shadow: inset 0 1px 4px rgb(0 0 0 / 65%);
+  content: none;
 }
 .triple-connect__tray-divider {
   position: relative;

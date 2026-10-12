@@ -45,7 +45,7 @@ export function createTripleRenderer(shell, { onLockedTraySlotClick } = {}) {
         unlockButton.hidden = false;
         unlockButton.setAttribute(
           "aria-label",
-          `Mở rộng khay với ${TRIPLE_PRODUCT_DECISIONS.trayExpansion.releasePrice} Xu`,
+          `Mở thêm 1 ô khay với ${TRIPLE_PRODUCT_DECISIONS.trayExpansion.releasePrice} Xu`,
         );
       } else {
         delete slot.dataset.tripleTrayLocked;

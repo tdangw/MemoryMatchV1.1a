@@ -17,6 +17,8 @@
 
 ## Contract dùng chung
 
+- Firebase Hosting dùng chung project `memorymatchv1-1a` với hai site: target `production` → `memorymatchv1-1a`, target `test` → `memorymatchv1-1b`. `npm run deploy` chỉ deploy site production; `npm run deploy:test` chỉ deploy site test. Hai URL có storage trình duyệt riêng vì khác origin.
+
 - Kế hoạch active: `TASK_STARTUP_RESPONSIVENESS_PLAN.md`, áp dụng cả ba game; agent chạy gate tự động, người dùng tự nghiệm thu điện thoại thật. Không thay luật/save/asset catalog.
 
 - Tinh chỉnh HUD ngày 2026-09-30: bỏ animation `pulse-red` phóng to ô timer, giữ cảnh báo màu tĩnh; nút menu hệ thống có nền xanh dương, công cụ gameplay có nền tím và icon sáng, cùng viền inset, không đổi kích thước 44px. Regression HUD/menu/presentation 10/10 ở 412×915; sau khi tách màu nút, presentation 3/3 và check/build pass; API/save không đổi. Chưa kiểm tra trên thiết bị thật.
@@ -33,12 +35,13 @@
 - Tổng thẻ active: Easy 27, Normal 54, Hard 78, Super Hard/Endless 120.
 - Layout, snapshot và milestone Triple chỉ dùng contract hiện hành; không có yêu cầu đọc save Triple development cũ.
 - Xấp góc: Normal `9`; Hard `7 + 8`; Super Hard/Endless `6 × 4`. Thẻ ẩn không nằm trong DOM/a11y cho tới khi thành top.
-- Khay cơ bản 7 ô; entitlement Mở rộng khay thêm 3 ô, giá release 3.000 Xu. Renderer tạo đúng 7 hoặc 10 node; mobile dọc dùng 5×2 khi có 10 ô.
+- Khay cơ bản 7 ô; mỗi lần mua Mở rộng khay thêm 1 ô, giá 3.000 Xu, tối đa 10 ô. Renderer luôn tạo 10 node và khóa các ô chưa mua; mobile dọc dùng 5×2 khi có 10 ô.
 - Milestone version 2 có 10 mốc, step 3, target 30. Lucky chỉ có trong Challenge.
 - Challenge level 1–7 có tổng thẻ `18/27/42/51/66/75/93`; stage có xấp cũng dùng topology corner-safe mới.
 - Baseline nghiệm thu HUD/mobile UI hiện tại là Galaxy S22 Ultra ở viewport CSS 412×915 portrait. Không tạo gate hoặc profile test riêng cho viewport 320/360; kích thước nhỏ hơn một chút dùng responsive fluid và chỉ mở test mới khi có lỗi thực tế trên thiết bị mục tiêu.
 - Effect V2 runtime đã hoàn tất với pool/cleanup/reduced-motion cho Link 2-target và Triple 3-target. Chỉ mở task mỹ thuật cho từng hiệu ứng khi người dùng yêu cầu; không nhắc lại như thiếu sót runtime.
 - Triple tính mục tiêu sao theo số bộ thẻ và chỉ cộng time bonus một lần khi kết thúc màn timed.
+- Combo Triple dùng cùng cửa sổ với Memory/Link theo số bộ ba trong màn (≤8: 15s; 9–15: 20s; ≥16: 30s); ghép ba thẻ khởi động lại, Miss hoặc hết giờ đặt combo hiện tại về 0 nhưng giữ maxCombo.
 
 ## Theme selection hiện tại
 

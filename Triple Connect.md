@@ -9,7 +9,7 @@ Trò chơi dùng chung hệ thống Xu, chủ đề ảnh, Bộ sưu tập hiệ
 ### Quyết định đã chốt
 
 - Màn hình mobile dọc: HUD ở trên, bàn nhiều lớp ở giữa, khay ngang dưới bàn.
-- Khay cơ bản có 7 ô. Quyền Mở rộng khay mua một lần với 3.000 Xu nâng capacity lên 10; entitlement lưu ở profile, áp dụng ngay cho round đang chơi và rollback nếu persistence thất bại.
+- Khay cơ bản có 7 ô. Mỗi lần mua Mở rộng khay với 3.000 Xu mở thêm 1 ô, tối đa 10; tiến trình lưu ở profile, áp dụng ngay cho round đang chơi và rollback nếu persistence thất bại.
 - Chỉ thẻ không còn bị bất kỳ thẻ lớp cao nào giao phủ mới có thể chọn. Các lớp được lệch theo bước nửa thẻ để người chơi nhìn được thẻ bên dưới; không bắt buộc dọn sạch toàn bộ một layer trước khi mở tile đã hết blocker.
 - Khay luôn tự dồn trái và tự nhóm các thẻ cùng loại. Khi đủ đúng 3 thẻ, game ưu tiên xóa bộ ba trước khi xét khay đầy.
 - Điều kiện thắng: xóa sạch board. Điều kiện thua: sau khi ưu tiên giải quyết mọi bộ ba vừa hình thành, khay vẫn có đủ 7 thẻ và không có bộ ba có thể xóa ngay.
@@ -29,6 +29,7 @@ Trò chơi dùng chung hệ thống Xu, chủ đề ảnh, Bộ sưu tập hiệ
 - Thẻ đầu của một loại bắt đầu chuỗi, không tạo combo.
 - Chỉ khi hoàn tất nguyên một bộ ba liên tiếp mới tăng combo và cộng điểm.
 - Luật Miss dùng `streakType` và `streakCount` độc lập với thứ tự hiển thị sau khi khay tự nhóm. Nếu `streakCount` đang là 1 hoặc 2 mà người chơi chọn loại khác, ghi đúng một **Miss**, combo về 0, rồi thẻ mới bắt đầu chuỗi mới.
+- Mỗi bộ ba hoàn tất khởi động lại thanh thời gian combo dùng chung: tối đa 8 bộ ba trong màn là 15 giây, 9–15 bộ ba là 20 giây, từ 16 bộ ba là 30 giây. Nếu hết thời gian, combo hiện tại về 0; Miss cũng xóa combo ngay. Combo cao nhất của màn không bị giảm.
 - Hoàn tất bộ ba đặt chuỗi về rỗng sau khi cộng match/combo/điểm. Bộ ba hình thành từ các thẻ đã có trong khay vẫn resolve bình thường, nhưng không được suy luận Miss từ vị trí nhóm trên giao diện.
 - Bảng ví dụ chuẩn:
 
@@ -39,7 +40,7 @@ Trò chơi dùng chung hệ thống Xu, chủ đề ảnh, Bộ sưu tập hiệ
 | `A-A-B` | Lượt `B` tạo đúng một Miss, combo về 0 và bắt đầu chuỗi B. |
 | `A-A-B-B-A` | `B` đầu tiên tạo một Miss; `B` thứ hai tiếp tục chuỗi B; `A` cuối tạo một Miss mới. Nhóm A/B trong khay không thay đổi cách đếm. |
 | `A-A-A → B-B-B` | Hai bộ ba hoàn tất liên tiếp; combo đạt 2 nếu không có lượt khác chen giữa. |
-- Mỗi bộ ba là một match. Điểm dùng công thức Link Connect: `10 + (combo − 1) × 3` khi hoàn tất bộ ba. Sao xét trên tổng số bộ ba đã xóa; mốc cụ thể sẽ tinh chỉnh sau khi thử bàn nhiều lớp.
+- Mỗi bộ ba là một match, nhận `10 + (combo − 1) × 3` điểm. Khi thắng ở mode có giới hạn thời gian, cộng số giây còn lại một lần trước khi xét sao; Endless không cộng điểm thời gian. Mốc sao là `ceil(số bộ ba × 0,8 × 12/18/25)` cho mode thường hoặc `ceil(số bộ ba × 0,8 × 10/15/20)` cho Endless, tương ứng 1/2/3 sao.
 
 ## 3. Board nhiều lớp và tính khả thi
 
@@ -120,7 +121,7 @@ Các vật phẩm của Triple Connect có tồn kho, cân bằng giá và contr
 | Gợi ý | Ưu tiên chỉ thẻ lộ trùng với thẻ trong khay; nếu khay có đúng một thẻ lẻ, chỉ hai thẻ còn lại của bộ ba. | Không tự chọn hoặc tự xóa. |
 | Xáo thẻ | Xáo mọi thẻ còn lại trên mọi lớp/xấp, sau khi solver xác nhận board mới. | Xóa lịch sử Hoàn tác. |
 | Thêm thời gian | Dùng cơ chế mua/thêm thời gian chung. | Không dùng trong Vô tận. |
-| Mở rộng khay | Quyền mua một lần, tăng 7 → 10 ô. | Giá 3.000 Xu; mobile dọc hiển thị 5×2. |
+| Mở rộng khay | Mỗi lần mua thêm 1 ô, từ 7 đến tối đa 10 ô. | Giá 3.000 Xu mỗi ô; mobile dọc hiển thị 5×2. |
 
 Trong Thử thách, thẻ may mắn có thể thưởng `+thời gian`, `+gợi ý` hoặc `+Xu`; được thể hiện như một thẻ trong bộ ba và dùng popup phần thưởng chung.
 

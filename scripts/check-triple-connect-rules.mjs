@@ -28,6 +28,18 @@ assert.deepEqual(TRIPLE_EASY_CONFIG, { mode: "easy", tileCount: 27, layerCount: 
 assert.equal(TRIPLE_RULES.trayCapacity, 7);
 assert.equal(calculateTripleMatchScore(1), 10);
 assert.equal(calculateTripleMatchScore(2), 13);
+{
+  let state = makeState({ a: 3, b: 3 });
+  for (const tileId of ["a-1", "a-2", "a-3"]) state = select(state, tileId).nextState;
+  const history = state.undoHistory;
+  const expired = reduceTripleCommand(state, { type: "expire-combo" });
+  assert.equal(expired.result.ok, true);
+  assert.equal(expired.nextState.combo, 0);
+  assert.equal(expired.nextState.maxCombo, 1);
+  assert.equal(expired.nextState.score, state.score);
+  assert.deepEqual(expired.nextState.undoHistory, history);
+  assert.equal(reduceTripleCommand(expired.nextState, { type: "expire-combo" }).result.reason, "combo-inactive");
+}
 assert.deepEqual(getTripleStarProgress({ mode: "easy", score: 86, initialTileCount: 27 }).stars, 0);
 assert.deepEqual(getTripleStarProgress({ mode: "easy", score: 87, initialTileCount: 27 }).stars, 1);
 assert.deepEqual(getTripleStarProgress({ mode: "easy", score: 130, initialTileCount: 27 }).stars, 2);
@@ -204,6 +216,8 @@ assert.throws(() => restoreSerializedTripleRoundState({ ...persisted, maxCombo: 
 assert.throws(() => restoreSerializedTripleRoundState({ ...persisted, cornerStacks: undefined }), "Incomplete snapshots must reset at the session boundary.");
 assert.throws(() => restoreSerializedTripleRoundState({ ...persisted, tiles: persisted.tiles.slice(1) }));
 assert.equal(restoreSerializedTripleRoundState(persisted, { trayCapacity: 10 }).trayCapacity, 10);
+assert.equal(restoreSerializedTripleRoundState(persisted, { trayCapacity: 8 }).trayCapacity, 8);
+assert.equal(restoreSerializedTripleRoundState(persisted, { trayCapacity: 9 }).trayCapacity, 9);
 assert.equal(restoreSerializedTripleRoundState(persisted).trayCapacity, 7);
 const expandedSession = serializeTripleRoundState(createTripleRoundState({
   roundId: 10,

@@ -44,6 +44,36 @@ for (const id of ['memory-match', 'link-connect', 'triple-connect']) {
   });
 }
 
+test('the opening popup remains responsive while board images decode in the background', async ({ page }) => {
+  let releaseImages;
+  const imageGate = new Promise(resolve => { releaseImages = resolve; });
+  await page.route('**/assets/images/themes/**', async route => {
+    await imageGate;
+    await route.continue();
+  });
+  await page.goto('/');
+  await expect(page.locator('.game-selector__choice').first()).toBeVisible();
+  await page.evaluate(async () => {
+    await (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('link-connect');
+    const { gameState } = await import('/js/gameState.js');
+    gameState.settings.mode = 'easy';
+    gameState.settings.sound = false;
+    gameState.settings.music = false;
+    window.startupPopupTest = (await import('/js/linkConnect/linkController.js')).startLinkLevel({ mode: 'easy' });
+  });
+  await expect(page.locator('.level-reward-overlay')).toBeVisible();
+  await expect(page.locator('.game-shell-startup-status')).toHaveCount(0);
+  await expect(page.locator('#link-board')).toHaveCSS('visibility', 'visible');
+  await expect(page.locator('#link-board')).toHaveAttribute('aria-busy', 'true');
+  releaseImages();
+  const result = await page.evaluate(async () => {
+    await window.startupPopupTest;
+    const { activeShell } = (await import('/js/gameShell/gameShell.js')).getGameShellDiagnostics();
+    return activeShell.scope.startup.diagnostics();
+  });
+  expect(result.status).toBe('ready');
+});
+
 test('cancel during decode, restart and late results cannot mutate a new mount (30 cycles)', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('.game-selector__choice').first()).toBeVisible();

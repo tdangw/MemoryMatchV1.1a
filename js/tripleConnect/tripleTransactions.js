@@ -6,7 +6,7 @@ import { getTripleItemDefinition } from "./tripleItems.js";
 import { equipTheme, ownTheme } from "../appearance.js";
 import { THEMES } from "../themeCatalog.js";
 import { LINK_EXIT_EFFECTS, LINK_PATH_EFFECTS } from "../linkConnect/linkEffects.js";
-import { TRIPLE_PRODUCT_DECISIONS } from "./tripleConfig.js";
+import { normalizeTripleTrayExpansionSlots, TRIPLE_PRODUCT_DECISIONS } from "./tripleConfig.js";
 
 export function consumeTripleItemWithSession(itemId, session) {
   const item = getTripleItemDefinition(itemId);
@@ -72,11 +72,14 @@ export function purchaseTripleItem(itemId) {
 
 export function purchaseTripleTrayExpansion() {
   const profile = gameState.progress.tripleConnect;
-  const price = TRIPLE_PRODUCT_DECISIONS.trayExpansion.releasePrice;
-  if (profile.trayExpansionOwned || gameState.coins < price) return false;
+  const expansion = TRIPLE_PRODUCT_DECISIONS.trayExpansion;
+  const price = expansion.releasePrice;
+  const currentSlots = normalizeTripleTrayExpansionSlots(profile.trayExpansionSlots);
+  if (currentSlots >= expansion.bonusCapacity || gameState.coins < price) return false;
   const rollback = createRollbackPoint();
   gameState.coins -= price;
-  profile.trayExpansionOwned = true;
+  profile.trayExpansionSlots = currentSlots + 1;
+  profile.trayExpansionOwned = profile.trayExpansionSlots === expansion.bonusCapacity;
   if (!savePersistentGameData({ coins: gameState.coins, progress: gameState.progress })) {
     restoreRollbackPoint(rollback);
     return false;
@@ -144,6 +147,7 @@ function createRollbackPoint() {
     items: { ...gameState.progress.tripleConnect.items },
     sessionsByMode: { ...gameState.progress.tripleConnect.sessionsByMode },
     milestones: structuredClone(gameState.progress.tripleConnect.milestones),
+    trayExpansionSlots: gameState.progress.tripleConnect.trayExpansionSlots,
     trayExpansionOwned: gameState.progress.tripleConnect.trayExpansionOwned,
     appearance: structuredClone(gameState.appearance),
   };
@@ -154,6 +158,7 @@ function restoreRollbackPoint(rollback) {
   gameState.progress.tripleConnect.items = rollback.items;
   gameState.progress.tripleConnect.sessionsByMode = rollback.sessionsByMode;
   gameState.progress.tripleConnect.milestones = rollback.milestones;
+  gameState.progress.tripleConnect.trayExpansionSlots = rollback.trayExpansionSlots;
   gameState.progress.tripleConnect.trayExpansionOwned = rollback.trayExpansionOwned;
   gameState.appearance = rollback.appearance;
 }
