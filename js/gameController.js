@@ -1,3 +1,4 @@
+import { rememberRecentGame } from './recentGame.js';
 import { shellTimeout as setTimeout, shellInterval as setInterval, clearShellInterval as clearInterval } from "./gameShell/gameShellLifecycle.js";
 import {
   isBackgroundMusicPlaying,
@@ -215,6 +216,7 @@ function startCountdown(roundId = gameState.roundId) {
   if (gameState.roundId !== roundId) return;
   stopCountdown();
   resumePlayMetrics("startup");
+  void rememberRecentGame("memory-match");
   restoreBackgroundMusic(gameState.settings);
   startMemoryTimeProgress({ remainingSeconds: gameState.remainingTime, timeLimit: gameState.timeLimit });
   syncDefaultMusic(gameState.settings);

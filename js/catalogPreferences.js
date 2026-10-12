@@ -15,7 +15,7 @@ export async function setCatalogTab(gameId, surface, tabId) {
   if (gameState.settings.catalogTabs?.[key] === tabId) return true;
   const previous = gameState.settings.catalogTabs || {};
   gameState.settings.catalogTabs = { ...previous, [key]: tabId };
-  if ((await savePersistentGameData({ settings: gameState.settings }))) return true;
+  if ((await savePersistentGameData({ settings: { catalogTabs: gameState.settings.catalogTabs } }))) return true;
   gameState.settings.catalogTabs = previous;
   return false;
 }

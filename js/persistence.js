@@ -8,7 +8,7 @@ const ROOT_STORAGE_KEY = "memoryMatchSave";
 const PRIMARY_MARKER_KEY = "memoryMatchChapterBackend";
 const SETTINGS_KEYS = new Set([
   "sound", "music", "soundVolume", "musicVolume", "meteorEffects",
-  "boardCoordinates", "cardDescriptions",
+  "boardCoordinates", "cardDescriptions", "lastPlayedGameId",
 ]);
 let database = null;
 let initialization = null;

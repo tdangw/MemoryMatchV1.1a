@@ -1,3 +1,4 @@
+import { rememberRecentGame } from '../recentGame.js';
 import { getLinkShell, getLinkHud, getLinkHudElements, bindLinkControls, closeLinkMenus, applyLinkTimingStyles } from "./linkShell.js";
 import { setHudText, renderHudTimer } from "../gameShell/gameShellHud.js";
 import { shellTimeout as setTimeout, clearShellTimeout as clearTimeout, shellInterval as setInterval, clearShellInterval as clearInterval } from "../gameShell/gameShellLifecycle.js";
@@ -850,6 +851,7 @@ function playLinkSound(name) {
 
 function startCountdown(roundId) {
   resumePlayMetrics("startup");
+  void rememberRecentGame("link-connect");
   stopCountdown();
   restoreBackgroundMusic(gameState.settings);
   startLinkTimeProgress(roundId);

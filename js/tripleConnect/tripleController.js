@@ -1,3 +1,4 @@
+import { rememberRecentGame } from '../recentGame.js';
 import {
   createTripleCoverGraph,
   generateEasyTripleBoard,
@@ -658,6 +659,7 @@ return runRoundCommand(async () => {
     if (!scope.active || generation !== roundGeneration) return;
     roundStarted = true;
     resumePlayMetrics("startup");
+  void rememberRecentGame("triple-connect");
     startTripleTimer(scope, shell, render, hudElements, hud);
     if (state.combo > 0) startComboWindow();
   };

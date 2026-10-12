@@ -59,14 +59,8 @@ test("Triple saves a validated level session and exposes it through Continue", a
   await expect(
     page.locator("#menu-container.triple-connect-menu"),
   ).toContainText("Tiếp tục");
-  await page
-    .locator("#menu-container.triple-connect-menu .menu-item")
-    .filter({ hasText: "Tiếp tục" })
-    .click();
-  await page
-    .locator("#triple-session-picker-modal .difficulty-option")
-    .filter({ hasText: "Trung bình - Level 3" })
-    .click();
+  await page.locator('[data-resume-mode="normal"]').click();
+  await page.getByRole("button", { name: "Tiếp tục", exact: true }).click();
   await expect(page.locator("[data-triple-total-stars]")).toHaveText("0");
   await expect(page.locator("[data-triple-level]")).toHaveText("3");
 });

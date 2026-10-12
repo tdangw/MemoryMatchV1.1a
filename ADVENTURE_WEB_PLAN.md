@@ -329,7 +329,8 @@ Gate là checkpoint, không mặc định là ranh giới kết thúc lượt. Y
 | 0 | Pass — phạm vi và quyết định sản phẩm đã chốt | Commit a7e4579; baseline check/build pass |
 | 1 | Pass — persistence v2, progression, launch, rewards, timing/run (0fedb86) | check/build pass; 6 browser data/cleanup pass; review độc lập không còn finding |
 | 2 | Pass — home/header/dock/menu ads, gameplay giữ HUD | check/build pass; navigation 3 viewport pass; lifecycle 100 switches pass; review owner pass |
-| 3–8 | Chưa bắt đầu | Không đánh dấu pass bằng kết quả baseline |
+| 3 | Pass — 110 nodes/chapter, mode patch, previews, resume, chest, chapters | check/build pass; map+catalog 7 pass; navigation/data 7 pass; menu/Triple regression 28 pass (caption fixes rerun); independent review settings race fixed + unit |
+| 4–8 | Chưa bắt đầu | Không đánh dấu pass bằng kết quả baseline |
 
 Firebase (2026-10-13): người dùng đã tạo `(default)` ở `asia-southeast1`; CLI xác nhận Firestore Native Standard, `freeTier=true`. Chưa deploy Hosting hoặc thay billing.
 
@@ -357,3 +358,5 @@ Baseline trước sửa (2026-10-13): Chrome headless 412×915, không overflow;
 - Xếp hạng (kiểm tra ngày 2026-10-12): [Firestore order/limit](https://firebase.google.com/docs/firestore/query-data/order-limit-data), [Aggregation count](https://firebase.google.com/docs/firestore/query-data/aggregation-queries), [Firestore pricing/free quota](https://firebase.google.com/docs/firestore/pricing), [App Check và giới hạn bảo vệ](https://firebase.google.com/docs/app-check), [Cloud Functions yêu cầu Blaze](https://firebase.google.com/docs/functions/get-started).
 
 Phase 1 đã triển khai runtime/schema local, chưa cấu hình Auth/rules Firebase, chưa đo FPS hoặc cân bằng gameplay. Kết quả test runtime ghi trong CONTEXT là lịch sử, không đại diện cho tính năng đề xuất.
+
+2026-10-13: Cửa hàng/Bộ sưu tập ở home mặc định Memory Match; sau khi một trò thực sự ready để chơi, nhớ settings.lastPlayedGameId cho lần mở sau. Không có bước chọn trò trung gian. Xu chung, inventory/appearance theo từng trò.

@@ -1,3 +1,5 @@
+import { getRecentGameId } from "./recentGame.js";
+import { configureAdventureMap } from "./adventureMap.js";
 import "./memoryMatch/memoryShellDom.js";
 import { configureAppNavigation, openLocalRankings, refreshAppWallet } from "./appNavigation.js";
 import {
@@ -16,7 +18,6 @@ import {
   showCollectionModal,
 } from "./mainmenu.js";
 import {
-  configureGameSelector,
   createActiveGameMenu,
   openGameMenu,
   showGameSelector,
@@ -25,7 +26,6 @@ import {
   configureLinkController,
   openLinkPanel,
   continueLinkSession,
-  showLinkDifficultyOverlay,
   startLinkLevel,
 } from "./linkConnect/linkController.js";
 import {
@@ -44,7 +44,7 @@ import {
   updateMemoryAssistInventoryDisplay,
 } from "./ui.js";
 import { showAppToast, openAppModal } from "./modal.js";
-import { gameState, hydrateGameState } from "./gameState.js";
+import { gameState, hydrateGameState, resetGame } from "./gameState.js";
 import {
   loadPersistentGameData,
   subscribeToExternalSave,
@@ -99,7 +99,6 @@ configureGameController({
 });
 configureMainMenu({
   startGame: startNewMemoryRun,
-  changeGame: showGameSelector,
   continueGame: continueMemorySession,
 });
 configureSettings({ onCloseMenu: createActiveGameMenu });
@@ -127,32 +126,30 @@ configureAppNavigation({
     if (action === 'settings') return showSettingsPanel();
     const open = id => action === 'shop' ? openShopOverlay({ gameId: id, fromMenu: true, onClose: refreshAppWallet }) : showCollectionModal({ gameId: id, onClose: refreshAppWallet });
     if (gameId) return open(gameId);
-    const content = document.createElement('div');
-    for (const [id, title] of [['memory-match', 'Memory Match'], ['link-connect', 'Link Connect'], ['triple-connect', 'Triple Connect']]) {
-      const button = document.createElement('button');
-      button.type = 'button'; button.className = 'app-button'; button.textContent = title;
-      button.onclick = () => { picker.destroy(); void open(id); };
-      content.append(button);
-    }
-    const picker = openAppModal({ id: 'catalog-game-picker', title: 'Chọn trò chơi', content });
+    return open(getRecentGameId());
   },
 });
-configureGameSelector({
-  startLinkConnect: showLinkDifficultyOverlay,
-  continueLinkConnect: (session) => continueLinkSession(session),
-  openLinkCollection: async (onClose) =>
-    (await showCollectionModal({ gameId: "link-connect", onClose })),
-  openLinkShop: async () =>
-    (await openShopOverlay({ fromMenu: true, gameId: "link-connect" })),
-  startTripleConnect: (mode) => {
-    void startTripleConnectRound({ mode });
+configureAdventureMap({
+  onHome: showGameSelector,
+  adapters: {
+    'memory-match': {
+      description: 'Ghi nhớ vị trí và ghép hết các cặp thẻ trước khi hết giờ.',
+      launch: ({ mode, level }) => { resetGame(); gameState.settings.mode = mode; return startNewMemoryRun(level); },
+      resume: continueMemorySession,
+      collection: onClose => showCollectionModal({ gameId: 'memory-match', onClose }),
+    },
+    'link-connect': {
+      description: 'Quan sát và nối hết các cặp hình bằng đường nối hợp lệ trước khi hết giờ.',
+      launch: options => startLinkLevel(options), resume: continueLinkSession,
+      collection: onClose => showCollectionModal({ gameId: 'link-connect', onClose }),
+    },
+    'triple-connect': {
+      description: 'Tìm bộ ba thẻ giống nhau và tính toán chỗ trống trong khay.',
+      launch: options => startTripleConnectRound(options), resume: continueTripleConnectSession,
+      validateSession: isValidTripleConnectSession,
+      collection: onClose => showCollectionModal({ gameId: 'triple-connect', onClose }),
+    },
   },
-  continueTripleConnect: (session) => continueTripleConnectSession(session),
-  validateTripleSession: isValidTripleConnectSession,
-  openTripleCollection: async (onClose) =>
-    (await showCollectionModal({ gameId: "triple-connect", onClose })),
-  openTripleShop: async () =>
-    (await openShopOverlay({ fromMenu: true, gameId: "triple-connect" })),
 });
 configureTripleConnectController({
   showMenu: () => openGameMenu("triple-connect"),

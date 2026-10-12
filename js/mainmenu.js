@@ -1,19 +1,16 @@
 // Mainmenu.js
-import { decorateAdventureMenu } from "./appNavigation.js";
+import { mountAdventureMap } from "./adventureMap.js";
 
 import { syncDefaultMusic } from "./sound.js";
-import { showSettingsPanel } from "./settings.js";
 import { gameState, resetGame } from "./gameState.js";
 import { openAppModal, showAppToast } from "./modal.js";
 import { createIcon } from "./icons.js";
 import { THEMES, getTheme, isThemePlayable } from "./themeCatalog.js";
 import { saveAppearance } from "./persistence.js";
-import { openShopOverlay } from "./shop.js";
 import { mountCatalogTabs } from "./catalogPreferences.js";
 import {
   clearActiveSession,
   getActiveSession,
-  getActiveSessions,
 } from "./sessionProgress.js";
 import { showThemeChangeNotice } from "./themeChangeNotice.js";
 import {
@@ -28,22 +25,18 @@ import { LINK_EXIT_EFFECTS, LINK_PATH_EFFECTS } from "./linkConnect/linkEffects.
 import { equipTripleEffect, equipTripleTheme } from "./tripleConnect/tripleTransactions.js";
 import {
   GAME_MODES,
-  getGameModeIcon,
   getGameModeLabel,
 } from "./gameCatalog.js";
 import { createThemeSummary, UI_TIMING } from "./uiCatalog.js";
 
 let onStartGame = () => {};
-let onChangeGame = () => {};
 let onContinueGame = () => {};
 
 export function configureMainMenu({
   startGame,
-  changeGame,
   continueGame,
 } = {}) {
   onStartGame = startGame || onStartGame;
-  onChangeGame = changeGame || onChangeGame;
   onContinueGame = continueGame || onContinueGame;
 }
 
@@ -68,97 +61,7 @@ export function showInfoModal(title, message, icon = "info") {
  */
 export function createMainMenu() {
   if (document.getElementById("menu-container")) return;
-
-  const menuOverlay = document.createElement("div");
-  menuOverlay.id = "menu-container";
-  menuOverlay.className = "menu-overlay";
-
-  const wrapper = document.createElement("div");
-  wrapper.className = "menu-wrapper";
-
-  const title = document.createElement("h1");
-  title.className = "game-title";
-  title.textContent = "Memory Match";
-  wrapper.appendChild(title);
-  const description = document.createElement("p");
-  description.className = "menu-description";
-  description.textContent = "Mới thấy đó thôi, chớp mắt đã quên!";
-  wrapper.appendChild(description);
-
-  const menuList = document.createElement("ul");
-  menuList.className = "menu-list";
-
-  const menuItems = [
-    ...(getActiveSessions("memory-match").length
-      ? [
-          {
-            icon: "play",
-            text: "Tiếp tục",
-            action: () => showSessionPicker("memory-match", onContinueGame),
-          },
-        ]
-      : []),
-    {
-      icon: "play",
-      text: "Bắt đầu",
-      action: () => {
-        showDifficultyOverlay();
-      },
-    },
-    {
-      icon: "collection",
-      text: "Bộ sưu tập",
-      action: async () => {
-        (await showCollectionModal());
-      },
-    },
-    {
-      icon: "shop",
-      text: "Cửa hàng",
-      action: async () => (await openShopOverlay({ fromMenu: true })),
-    },
-    {
-      icon: "book",
-      text: "Hướng dẫn",
-      action: () => {
-        showInfoModal(
-          "Cách chơi",
-          `<ul class="app-feature-list">
-            <li>Lật hai thẻ để tìm cặp hình giống nhau.</li>
-            <li>Ghép hết các cặp trước khi thời gian kết thúc.</li>
-            <li>Ghép đúng liên tiếp để tạo Combo và nhận thêm thời gian; mỗi lần ghép sai sẽ làm Combo về 0 và giảm phần thưởng Xu của màn.</li>
-            <li>Dùng gợi ý hoặc vật phẩm trong cửa hàng khi cần.</li>
-          </ul>`,
-          "book",
-        );
-      },
-    },
-    {
-      icon: "settings",
-      text: "Cài đặt",
-      action: () => {
-        showSettingsPanel();
-      },
-    },
-    {
-      icon: "home",
-      text: "Home",
-      action: onChangeGame,
-    },
-  ];
-
-  menuItems.forEach(({ icon, text, action }) => {
-    const li = document.createElement("li");
-    li.className = "menu-item";
-    li.append(createIcon(icon), document.createTextNode(text));
-    li.onclick = action;
-    menuList.appendChild(li);
-  });
-
-  wrapper.appendChild(menuList);
-  menuOverlay.appendChild(wrapper);
-  document.body.appendChild(menuOverlay);
-  decorateAdventureMenu(menuOverlay, { gameId: "memory-match", onHome: onChangeGame });
+  mountAdventureMap("memory-match");
 }
 
 /**
@@ -247,59 +150,6 @@ async function chooseMemoryMode(
     },
     onNew: async () => (await startMode(mode, closeDifficulty)),
   });
-}
-
-function showSessionPicker(gameId, onContinue) {
-  const sessions = getActiveSessions(gameId);
-  const content = document.createElement("div");
-  content.className = "difficulty-content";
-  const theme = getTheme(getEquippedThemeId(gameState.appearance, gameId));
-  const themeRow = document.createElement("div");
-  themeRow.className = "difficulty-theme";
-  themeRow.append(createIcon(theme.icon));
-  const themeText = createThemeSummary(theme.title);
-  const changeTheme = document.createElement("button");
-  changeTheme.type = "button";
-  changeTheme.className = "difficulty-theme__change";
-  changeTheme.textContent = "Đổi";
-  themeRow.append(themeText, changeTheme);
-  const options = document.createElement("div");
-  options.className = "difficulty-options";
-  sessions.forEach((session) => {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "difficulty-option";
-    button.append(
-      createIcon(getGameModeIcon(session.mode)),
-      document.createTextNode(
-        `${getGameModeLabel(session.mode)} - Level ${session.level}`,
-      ),
-    );
-    button.onclick = () => {
-      modal.close();
-      document.getElementById("menu-container")?.remove();
-      setTimeout(() => onContinue(session), UI_TIMING.modalCloseMs);
-    };
-    options.append(button);
-  });
-  content.append(themeRow, options);
-  const modal = openAppModal({
-    id: "difficulty-modal",
-    icon: "play",
-    title: "Tiếp tục hành trình",
-    content,
-  });
-  changeTheme.onclick = () => {
-    modal.close();
-    setTimeout(
-      async () =>
-        (await showCollectionModal({
-          gameId,
-          onClose: () => showSessionPicker(gameId, onContinue),
-        })),
-      UI_TIMING.modalCloseMs,
-    );
-  };
 }
 
 function showSessionChoice({ label, session, onContinue, onNew }) {

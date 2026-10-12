@@ -12,9 +12,8 @@ test("registry exposes only released games in the selector", async ({
     "Adventure",
   ]);
   await expect(page.locator(".menu-wrapper--game-selector > .menu-description"))
-    .toHaveCSS("font-size", "10px");
-  await expect(page.locator(".game-selector__choice small"))
-    .toHaveCSS("font-size", "10px");
+    .toHaveCSS("font-size", "14px");
+  for (const caption of await page.locator(".game-selector__choice small").all()) await expect(caption).toHaveCSS("font-size", "13px");
   const selectorDescription = page.locator(".menu-wrapper--game-selector > .menu-description");
   for (const width of [412, 1024]) {
     await page.setViewportSize({ width, height: 900 });
@@ -73,7 +72,7 @@ test("released game adapters still open their matching menus", async ({
   );
   await expect(
     page.locator("#menu-container.triple-connect-menu"),
-  ).toContainText("Ngay trước mắt nhìn, vạn dặm xa xôi!");
+  ).toContainText("Triple Connect");
 });
 
 test("Triple menu starts a visible playable board", async ({ page }) => {
@@ -82,14 +81,8 @@ test("Triple menu starts a visible playable board", async ({ page }) => {
     .locator(".game-selector__choice")
     .filter({ hasText: "Triple Connect" })
     .click();
-  await page
-    .locator("#menu-container.triple-connect-menu .menu-item")
-    .filter({ hasText: "Bắt đầu" })
-    .click();
-  await page
-    .locator("#triple-difficulty-modal .difficulty-option")
-    .filter({ hasText: "Dễ" })
-    .click();
+  await page.locator('[data-level="1"]').click();
+  await page.getByRole("button", { name: "Chơi", exact: true }).click();
   await expect(page.locator("#triple-connect-container")).toBeVisible();
   await expect(
     page.locator(".triple-connect__board .triple-connect__tile"),
@@ -104,14 +97,8 @@ test("switching all released games after a production Triple start keeps one act
     .locator(".game-selector__choice")
     .filter({ hasText: "Triple Connect" })
     .click();
-  await page
-    .locator("#menu-container.triple-connect-menu .menu-item")
-    .filter({ hasText: "Bắt đầu" })
-    .click();
-  await page
-    .locator("#triple-difficulty-modal .difficulty-option")
-    .filter({ hasText: "Dễ" })
-    .click();
+  await page.locator('[data-level="1"]').click();
+  await page.getByRole("button", { name: "Chơi", exact: true }).click();
   await expect(page.locator("#triple-connect-container")).toBeVisible();
 
   const result = await page.evaluate(async () => {

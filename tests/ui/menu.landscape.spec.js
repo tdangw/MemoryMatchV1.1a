@@ -37,16 +37,16 @@ for (const game of games) {
     await page.addInitScript(() => localStorage.clear());
     await page.goto("/");
     await page.locator(".game-selector__choice").filter({ hasText: game }).click();
-    const wrapper = page.locator("#menu-container .menu-wrapper");
-    const items = wrapper.locator(".menu-item");
+    const wrapper = page.locator("#menu-container .adventure-map-view");
+    const items = page.locator("#menu-container [data-dock-action]");
     await expect(wrapper).toBeVisible();
-    await expect(items).toHaveCount(7);
+    await expect(items).toHaveCount(4);
     const result = await wrapper.evaluate(element => {
       const rect = node => {
         const value = node.getBoundingClientRect();
         return { left: value.left, right: value.right, top: value.top, bottom: value.bottom, width: value.width, height: value.height };
       };
-      return { wrapper: rect(element), items: [...element.querySelectorAll(".menu-item")].map(rect), viewport: { width: innerWidth, height: innerHeight } };
+      return { wrapper: rect(element), items: [...document.querySelectorAll("[data-dock-action]")].map(rect), viewport: { width: innerWidth, height: innerHeight } };
     });
     for (const bounds of [result.wrapper, ...result.items]) {
       expect(bounds.left).toBeGreaterThanOrEqual(-1);
@@ -63,12 +63,13 @@ for (const game of games) {
     await expect(lastSetting).toBeInViewport();
     await page.locator("#settings-modal .app-modal__close").click();
 
-    await items.filter({ hasText: "Bắt đầu" }).click();
-    const difficultyBody = await expectModalBodyScrollsWithinViewport(page, "#difficulty-modal");
+    await expect(page.locator("#settings-modal")).toHaveCount(0);
+    await page.locator('[data-level="1"]').click();
+    const difficultyBody = await expectModalBodyScrollsWithinViewport(page, "#adventure-level-modal");
     await difficultyBody.evaluate(element => {
       element.scrollTop = element.scrollHeight;
     });
-    const lastMode = page.locator("#difficulty-modal .difficulty-option").last();
+    const lastMode = page.locator("#adventure-level-modal .app-modal__footer button").last();
     await expect(lastMode).toBeInViewport();
   });
 }

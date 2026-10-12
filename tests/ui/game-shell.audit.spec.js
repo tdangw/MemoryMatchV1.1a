@@ -50,8 +50,8 @@ for (const [id, title, root, board] of [
       window.auditPending = () => Object.fromEntries(Object.entries(pending).map(([key, handles]) => [key, handles.size]));
     });
     await page.locator(".game-selector__choice").filter({ hasText: title }).click();
-    await page.locator(".menu-item").filter({ hasText: "Bắt đầu" }).click();
-    await page.locator("#difficulty-modal .difficulty-option").filter({ hasText: "Dễ" }).click();
+    await page.locator('[data-level="1"]').click();
+  await page.getByRole("button", { name: "Chơi", exact: true }).click();
     await page.mouse.move(0, 0);
     await page.evaluate(() => document.activeElement?.blur());
     // Advance virtual time, not wall time; settle preview, popup and layout callbacks.

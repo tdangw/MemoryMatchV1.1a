@@ -250,6 +250,7 @@ function normalizeSettings(value, fallback) {
     boardCoordinates: typeof source.boardCoordinates === "boolean" ? source.boardCoordinates : fallback.boardCoordinates,
     cardDescriptions: typeof source.cardDescriptions === "boolean" ? source.cardDescriptions : fallback.cardDescriptions,
     catalogTabs: normalizeCatalogTabs(source.catalogTabs),
+    lastPlayedGameId: ["memory-match", "link-connect", "triple-connect"].includes(source.lastPlayedGameId) ? source.lastPlayedGameId : "memory-match",
   };
 }
 

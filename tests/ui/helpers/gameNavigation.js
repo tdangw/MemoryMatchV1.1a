@@ -4,7 +4,7 @@ export async function openReadyGameMenu(id) {
   const { openGameMenu } = await import("/js/gameSelector.js");
   const previous = document.getElementById("menu-container");
   await new Promise((resolve, reject) => {
-    const ready = () => document.documentElement.dataset.activeGame === id && document.getElementById("menu-container") !== previous && document.querySelector("#menu-container .menu-item");
+    const ready = () => document.documentElement.dataset.activeGame === id && document.getElementById("menu-container") !== previous && document.querySelector('#menu-container[data-map-ready="true"]');
     const observer = new MutationObserver(() => {
       if (!ready()) return;
       observer.disconnect();
