@@ -134,6 +134,9 @@
 .adventure-special-modes { display: flex; justify-content: center; gap: 22px; padding: 6px; background: #0b2033e8; }
 .adventure-special-button { display: flex; align-items: center; gap: 6px; border: 0; background: transparent; color: #b7d8e8; font-size: 12px; }
 .adventure-map-node:focus-visible, .adventure-mode-tab:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+.adventure-map-node:disabled + .adventure-map-stars { color: #9aadb3; opacity: .55; }
+.adventure-touch-layer { position: fixed; inset: 0; pointer-events: none; z-index: 33000; overflow: hidden; }
+.adventure-touch-particle { position: absolute; width: 4px; height: 4px; background: #efd7a0; border-radius: 50%; pointer-events: none; }
 @media (max-height: 500px) and (orientation: landscape) {
   .adventure-page .game-selector__choices { grid-template-columns: repeat(3, 1fr); }
   .adventure-page .game-selector__choice { padding: 10px; min-height: 90px; }

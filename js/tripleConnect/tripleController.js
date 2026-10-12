@@ -1,3 +1,4 @@
+import { showFullVictoryCelebration } from "victory-presentation";
 import { rememberRecentGame } from '../recentGame.js';
 import {
   createTripleCoverGraph,
@@ -916,6 +917,13 @@ async function settleTerminalRound(shell, render) {
   };
   if (won) {
     showLevelSummaryOverlay({
+      completedChapter: settlement.completedChapter,
+      isVictoryCelebration: Boolean(settlement.completedChapter),
+      onCelebrate: () => showFullVictoryCelebration({
+        level: currentLevel, completedChapter: settlement.completedChapter, settings: gameState.settings,
+        onMenu: returnTripleToMenu,
+        onNext: () => startNextTripleLevel(gameState.progress.tripleConnect.adventure.firstLevel),
+      }),
       fireworksContainerId: "triple-connect-container",
       level: currentLevel,
       remainingTime,

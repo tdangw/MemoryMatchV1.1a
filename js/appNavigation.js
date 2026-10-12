@@ -4,6 +4,8 @@ import { getGameDefinition, GAME_DEFINITIONS, getGameModeLabel } from "./gameCat
 import { openAppModal, showAppToast } from "./modal.js";
 import { mountAppPage } from "./appPageLifecycle.js";
 
+import { mountTouchDust } from "./touchDust.js";
+
 const actions = Object.freeze([
   { id: "shop", icon: "shop", label: "Cửa hàng" },
   { id: "collection", icon: "collection", label: "Bộ sưu tập" },
@@ -38,6 +40,7 @@ export function createAppDock(scope, { gameId = null, playing = false, root = nu
 
 export function decorateAdventureMenu(root, { gameId = null, onHome } = {}) {
   const scope = mountAppPage(root);
+  mountTouchDust(root, scope);
   root.classList.add("adventure-page");
   const header = document.createElement("header");
   header.className = "adventure-header";
@@ -83,6 +86,7 @@ export function mountGameplayDock(root, scope) {
   dock.classList.add("adventure-dock--playing");
   root.append(dock);
   scope.own(() => dock.remove(), "node");
+  mountTouchDust(root, scope);
 }
 
 export function refreshAppWallet() {

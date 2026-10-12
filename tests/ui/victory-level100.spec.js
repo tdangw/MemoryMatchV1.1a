@@ -1,96 +1,105 @@
 import { expect, test } from "@playwright/test";
 
-test("Memory Match level 100 opens the flower celebration on mobile web", async ({ page }) => {
-  await page.addInitScript(() => localStorage.clear());
+const games = [
+  { id: "memory-match", key: "memoryMatch" },
+  { id: "link-connect", key: "linkConnect" },
+  { id: "triple-connect", key: "tripleConnect" },
+];
+for (const game of games) {
+  test(`${game.id} opens its chapter celebration only after all 100 wins and continues at 101`, async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.addInitScript(key => {
+      const bestByLevel = Object.fromEntries(Array.from({ length: 99 }, (_, index) => [`easy:${index + 1}`, { score: 0, stars: 0 }]));
+      localStorage.setItem("memoryMatchSave", JSON.stringify({ formatVersion: 1, revision: 1, data: { coins: 0, progress: { [key]: { bestByLevel } }, settings: {}, appearance: {} } }));
+    }, game.key);
+    await page.goto("/");
+    await page.evaluate(async id => {
+      await (await import("/tests/ui/helpers/gameNavigation.js")).openReadyGameMenu(id);
+      const { gameState } = await import("/js/gameState.js");
+      gameState.settings.mode = "easy"; gameState.settings.sound = false; gameState.settings.music = false;
+      if (id === "memory-match") {
+        await (await import("/js/gameController.js")).startNewMemoryRun(100);
+        gameState.matchedPairs = gameState.totalPairs; gameState.remainingTime = 30;
+        await (await import("/js/logic.js")).checkLevelComplete();
+      } else if (id === "link-connect") {
+        await (await import("/js/linkConnect/linkController.js")).startLinkLevel({ mode: "easy", level: 100 });
+        const { linkGameState } = await import("/js/linkConnect/linkState.js");
+        linkGameState.totalPairs = 1; linkGameState.isLocked = false;
+        window.__victoryConnection = (await import("/js/linkConnect/pathfinder.js")).findAvailableConnections(linkGameState.board.grid)[0];
+      } else {
+        window.__victoryTriple = await (await import("/js/tripleConnect/tripleController.js")).startTripleConnectRound({ mode: "easy", level: 100, skipIntro: true });
+      }
+    }, game.id);
+    if (game.id === "link-connect") {
+      const connection = await page.evaluate(() => window.__victoryConnection);
+      for (const position of [connection.start, connection.end]) await page.locator(`.link-board__cell[data-row="${position.row}"][data-column="${position.column}"] .link-tile`).evaluate(tile => tile.click());
+    }
+    if (game.id === "triple-connect") {
+      const witness = await page.evaluate(() => window.__victoryTriple.generated.witness);
+      for (const command of witness) {
+        await page.locator(`[data-tile-id="${command.tileId}"]`).click();
+        await page.waitForFunction(() => !document.querySelector(".triple-connect__tray-flight, .triple-connect__ghost"));
+      }
+    }
+    await page.getByRole("button", { name: "Congratulations!", exact: true }).click();
+    const scene = page.locator("#victory-celebration");
+    await expect(scene).toBeVisible();
+    await expect(scene).toContainText("đủ 100 màn");
+    await expect(scene.locator(".victory-flower-bloom")).toHaveCount(3);
+    expect(await scene.locator("svg *").count()).toBeLessThanOrEqual(100);
+    expect(await scene.evaluate(node => node.getAnimations({ subtree: true }).length)).toBe(0);
+    await scene.getByRole("button", { name: "Tiếp tục", exact: true }).click();
+    await expect(scene).toHaveCount(0);
+    await page.waitForFunction(async ({ key, id }) => {
+      const { gameState } = await import("/js/gameState.js");
+      if (gameState.progress[key].adventure.currentChapter !== 2) return false;
+      if (id === "memory-match") return gameState.currentLevel === 101;
+      if (id === "link-connect") return (await import("/js/linkConnect/linkState.js")).linkGameState.level === 101;
+      return document.querySelector("[data-triple-level]")?.textContent === "101";
+    }, { key: game.key, id: game.id });
+  });
+}
+
+test("scene replacement and rapid touches keep particles and animations bounded, then cleanup fully", async ({ page }) => {
+  await page.setViewportSize({ width: 412, height: 915 });
   await page.goto("/");
-  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
-
-  const result = await page.evaluate(async () => {
-    const logicResource = performance.getEntriesByType("resource")
-      .map(({ name }) => new URL(name))
-      .find(({ pathname }) => pathname.endsWith("/js/logic.js"));
-    const revision = logicResource?.search || "";
-    const [{ gameState }, { checkLevelComplete }] = await Promise.all([
-      import(`/js/gameState.js${revision}`),
-      import(`/js/logic.js${revision}`),
-    ]);
-    Object.assign(gameState, {
-      currentLevel: 100,
-      matchedPairs: 1,
-      totalPairs: 1,
-      remainingTime: 30,
-      timeLimit: 60,
-      score: 0,
-      moves: 1,
-      misses: 0,
-      isLocked: false,
-      isPaused: false,
-      luckyAwards: [],
-      settings: { ...gameState.settings, mode: "challenge", sound: false },
-    });
-    checkLevelComplete();
-    return {
-      currentLevel: gameState.currentLevel,
-      matchedPairs: gameState.matchedPairs,
-      totalPairs: gameState.totalPairs,
-      isPaused: gameState.isPaused,
-      summaryExists: Boolean(document.getElementById("level-summary-modal")),
-    };
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.evaluate(async () => {
+    const { showVictoryCelebration } = await import("/js/victoryCelebration.js");
+    for (let index = 0; index < 5; index += 1) showVictoryCelebration({ level: 100, completedChapter: 1, settings: { sound: false, music: false } });
+    const scene = document.querySelector(".victory-flower-scene");
+    for (let index = 0; index < 30; index += 1) scene.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, clientX: 200, clientY: 450 }));
   });
-  expect(result).toMatchObject({
-    currentLevel: 100,
-    matchedPairs: 1,
-    totalPairs: 1,
-    isPaused: true,
-  });
-
-  const celebrate = page.getByRole("button", { name: "Congratulations!" });
-  await expect(celebrate).toBeVisible();
-  await celebrate.click();
-  await expect(page.locator("#victory-celebration")).toBeVisible();
-  await expect(page.locator(".victory-flower-overlay__source")).toHaveClass(/is-playing/);
-  await expect(page.locator("#victory-celebration .flower").first()).toBeVisible();
+  await expect(page.locator("#victory-celebration")).toHaveCount(1);
+  expect(await page.locator(".adventure-touch-particle").count()).toBeLessThanOrEqual(24);
+  await page.waitForFunction(() => document.querySelectorAll(".adventure-touch-particle").length === 0);
+  await page.waitForFunction(() => document.querySelector("#victory-celebration").getAnimations({ subtree: true }).every(animation => animation.playState === "finished"), null, { timeout: 7000 });
+  await page.screenshot({ path: "test-results/victory-scene.png" });
+  await page.setViewportSize({ width: 844, height: 390 });
+  const actions = await page.locator(".victory-flower-actions").boundingBox();
+  expect(actions.x).toBeGreaterThanOrEqual(0);
+  expect(actions.x + actions.width).toBeLessThanOrEqual(844);
+  expect(actions.y + actions.height).toBeLessThanOrEqual(390);
+  await page.evaluate(async () => (await import("/js/gameSelector.js")).showGameSelector());
+  await expect(page.locator("#victory-celebration")).toHaveCount(0);
+  await expect(page.locator(".adventure-touch-layer")).toHaveCount(1);
 });
 
-test("Link Connect level 100 opens the flower celebration on mobile web", async ({ page }) => {
-  await page.addInitScript(() => localStorage.clear());
-  await page.goto("/");
-  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
-  await page.locator(".game-selector__choice").filter({ hasText: "Link Connect" }).click();
-  await page.locator(".menu-item").filter({ hasText: "Bắt đầu" }).click();
-  await page.locator("#difficulty-modal .difficulty-option").filter({ hasText: "Thử thách" }).click();
-  await expect(page.locator(".level-reward-overlay")).toBeHidden({ timeout: 5000 });
-
-  const connection = await page.evaluate(async () => {
-    const controllerResource = performance.getEntriesByType("resource")
-      .map(({ name }) => new URL(name))
-      .find(({ pathname }) => pathname.endsWith("/js/linkConnect/linkController.js"));
-    const revision = controllerResource?.search || "";
-    const [{ linkGameState }, { findAvailableConnections }] = await Promise.all([
-      import(`/js/linkConnect/linkState.js${revision}`),
-      import(`/js/linkConnect/pathfinder.js${revision}`),
-    ]);
-    Object.assign(linkGameState, {
-      level: 100,
-      matchedPairs: 0,
-      totalPairs: 1,
-      isCompleted: false,
-      isLocked: false,
-    });
-    return findAvailableConnections(linkGameState.board.grid)[0];
+test("winning level 100 with earlier gaps keeps the chapter open and does not start the celebration", async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem("memoryMatchSave", JSON.stringify({ formatVersion: 1, revision: 1, data: { coins: 0, progress: { memoryMatch: { bestByLevel: { "easy:99": { score: 0, stars: 0 } } } }, settings: {}, appearance: {} } }));
   });
-
-  expect(connection).toBeTruthy();
-  for (const position of [connection.start, connection.end]) {
-    await page.locator(
-      `.link-board__cell[data-row="${position.row}"][data-column="${position.column}"] .link-tile`,
-    ).evaluate((tile) => tile.click());
-  }
-
-  const celebrate = page.getByRole("button", { name: "Congratulations!" });
-  await expect(celebrate).toBeVisible({ timeout: 7000 });
-  await celebrate.click();
-  await expect(page.locator("#victory-celebration")).toBeVisible();
-  await expect(page.locator(".victory-flower-overlay__source")).toHaveClass(/is-playing/);
-  await expect(page.locator("#victory-celebration .flower").first()).toBeVisible();
+  await page.goto("/");
+  await page.evaluate(async () => {
+    await (await import("/tests/ui/helpers/gameNavigation.js")).openReadyGameMenu("memory-match");
+    const { gameState } = await import("/js/gameState.js");
+    gameState.settings.mode = "easy"; gameState.settings.sound = false; gameState.settings.music = false;
+    await (await import("/js/gameController.js")).startNewMemoryRun(100);
+    gameState.matchedPairs = gameState.totalPairs;
+    await (await import("/js/logic.js")).checkLevelComplete();
+  });
+  await expect(page.locator("#level-summary-modal")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Congratulations!", exact: true })).toHaveCount(0);
+  await expect(page.locator("#victory-celebration")).toHaveCount(0);
+  expect(await page.evaluate(async () => (await import("/js/gameState.js")).gameState.progress.memoryMatch.adventure.currentChapter)).toBe(1);
 });

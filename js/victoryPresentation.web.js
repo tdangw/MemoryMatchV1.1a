@@ -1,7 +1,5 @@
 import confetti from "canvas-confetti";
 import "../styles/victory-flower.css";
-import "../styles/victory-flower-source.css";
-import "../styles/victory-flower-palette.css";
 import { showVictoryFireworks } from "./fireworkEffect.js";
 import { showVictoryCelebration } from "./victoryCelebration.js";
 

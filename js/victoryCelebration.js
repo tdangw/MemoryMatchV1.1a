@@ -1,123 +1,94 @@
-import { GAMEPLAY_TIMING } from "./gameplayTuning.js";
-import { showVictoryFireworks } from "./fireworkEffect.js";
 import { createIcon } from "./icons.js";
 import { createVictoryFlowerSceneMarkup } from "./victoryFlowerScene.js";
-import {
-  pauseVictoryFlowerTheme,
-  playVictoryFlowerTheme,
-  sounds,
-} from "./sound.js";
+import { createGameShellLifecycle, getActiveGameScope } from "./gameShell/gameShellLifecycle.js";
+import { getAppPageScope } from "./appPageLifecycle.js";
+import { mountTouchDust } from "./touchDust.js";
+import { pauseVictoryFlowerTheme, playVictoryFlowerTheme, sounds } from "./sound.js";
 
-/** Cảnh chiến thắng độc lập: chỉ hiển thị, không thay đổi gameState hay gameplay. */
-export function showVictoryCelebration({
-  level,
-  onNext,
-  onMenu,
-  settings,
-}) {
-  document.getElementById("victory-celebration")?.remove();
-
-  const { finalLevel, flowerGrowthDurationMs } = GAMEPLAY_TIMING.victoryCelebration;
-  const isFinalVictory = level >= finalLevel;
+let activeCelebration = null;
+export function showVictoryCelebration({ level, completedChapter, onNext, onMenu, settings }) {
+  activeCelebration?.dispose();
+  const scope = createGameShellLifecycle();
+  activeCelebration = scope;
+  const owner = getActiveGameScope() || getAppPageScope();
+  const releaseOwner = owner?.own(() => scope.dispose(), "cleanup");
   const overlay = document.createElement("section");
   overlay.id = "victory-celebration";
   overlay.className = "victory-flower-overlay";
   overlay.setAttribute("role", "dialog");
   overlay.setAttribute("aria-modal", "true");
-  overlay.setAttribute("aria-label", "Chúc mừng chiến thắng");
-
-  overlay.innerHTML = `
-    ${createVictoryFlowerSceneMarkup()}
-    <div class="victory-flower-message" aria-live="polite">
-      <button type="button" class="victory-flower-message__title" data-victory-toggle aria-expanded="false">
-        <span class="victory-title-fireflies" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
-        <span>Congratulations!</span>
-      </button>
-      <div class="victory-flower-message__actions">
-        <button type="button" class="victory-action victory-action--secondary" data-victory-action="menu"></button>
-        <button type="button" class="victory-action victory-action--primary" data-victory-action="next"></button>
-      </div>
-    </div>`;
-
-  const menuButton = overlay.querySelector('[data-victory-action="menu"]');
-  menuButton.append(createIcon("home"), document.createTextNode("Về Menu"));
-  const nextButton = overlay.querySelector('[data-victory-action="next"]');
-  nextButton.append(
-    createIcon(isFinalVictory ? "restart" : "arrow-right"),
-    document.createTextNode(isFinalVictory ? "Chơi lại" : "Tiếp tục"),
-  );
-  const toggleButton = overlay.querySelector("[data-victory-toggle]");
-
-  let closed = false;
-  const swayTimeouts = new Set();
-  const close = (callback) => {
-    if (closed) return;
-    closed = true;
-    swayTimeouts.forEach(clearTimeout);
-    swayTimeouts.clear();
+  overlay.setAttribute("aria-label", "Chúc mừng hoàn thành chặng");
+  overlay.innerHTML = `${createVictoryFlowerSceneMarkup()}<div class="victory-flower-message"><p class="victory-flower-eyebrow">HÀNH TRÌNH HOÀN THÀNH</p><h2>Chúc mừng!</h2><p class="victory-flower-caption"></p></div><div class="victory-flower-actions"></div>`;
+  overlay.querySelector(".victory-flower-caption").textContent = `Bạn đã chinh phục đủ 100 màn của chặng ${completedChapter || Math.ceil(level / 100)}.`;
+  const actions = overlay.querySelector(".victory-flower-actions");
+  const buttons = [
+    { label: "Về Menu", icon: "home", action: onMenu },
+    { label: "Tiếp tục", icon: "arrow-right", action: onNext },
+  ];
+  let closing = false;
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+  for (const entry of buttons) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "victory-action";
+    button.append(createIcon(entry.icon), document.createTextNode(entry.label));
+    actions.append(button);
+    scope.listen(button, "click", () => {
+      if (closing) return;
+      closing = true;
+      for (const control of actions.children) control.disabled = true;
+      const complete = () => { scope.dispose(); if (!owner || owner.active) entry.action?.(); };
+      if (reduced.matches) return complete();
+      scope.animation(overlay.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 180, fill: "forwards" }));
+      scope.timeout(complete, 180);
+    });
+  }
+  const animations = [];
+  scope.own(() => {
+    overlay.remove();
+    releaseOwner?.forget();
     pauseVictoryFlowerTheme();
-    overlay.classList.add("is-closing");
-    setTimeout(() => {
-      overlay.remove();
-      callback?.();
-    }, 300);
-  };
-  menuButton.addEventListener("click", () => close(onMenu));
-  nextButton.addEventListener("click", () => close(onNext));
-  toggleButton.addEventListener("click", () => {
-    const isVisible = overlay.classList.toggle("is-actions-visible");
-    toggleButton.setAttribute("aria-expanded", String(isVisible));
-  });
-
-  overlay.addEventListener("pointerdown", (event) => {
-    if (!overlay.classList.contains("is-interactive")) return;
-    const flower = event.target.closest(".flower");
-    if (!flower || !overlay.contains(flower)) return;
-
-    flower.classList.remove("is-touch-swaying");
-    void flower.offsetWidth;
-    flower.classList.add("is-touch-swaying");
-    const timeoutId = setTimeout(
-      () => {
-        flower.classList.remove("is-touch-swaying");
-        swayTimeouts.delete(timeoutId);
-      },
-      1000,
-    );
-    swayTimeouts.add(timeoutId);
-  });
-
-  document.body.appendChild(overlay);
-  playVictoryFlowerTheme(settings);
-  const startFlowerFireworks = () => showVictoryFireworks({
-    durationMs: 3600,
-    containerId: "victory-celebration",
-    burstCount: 8,
-    burstIntervalMs: 260,
-  });
-  const startFinaleFireworks = () => showVictoryFireworks({
-    durationMs: 2200,
-    containerId: "victory-celebration",
-    burstCount: 3,
-    burstIntervalMs: 360,
-  });
-  requestAnimationFrame(() => {
-    overlay.classList.add("is-playing");
-    overlay
-      .querySelector(".victory-flower-overlay__source")
-      ?.classList.add("is-playing");
-  });
-  setTimeout(() => {
-    overlay.classList.add("is-message-visible", "is-interactive");
-    if (settings?.sound) {
-      sounds.congratulations.currentTime = 0;
-      sounds.congratulations.play().catch(() => {});
-      sounds.congratulations.addEventListener("ended", startFinaleFireworks, {
-        once: true,
-      });
-    } else {
-      setTimeout(startFinaleFireworks, 4000);
+    sounds.congratulations.pause();
+    sounds.congratulations.currentTime = 0;
+    if (activeCelebration === scope) activeCelebration = null;
+  }, "node");
+  document.body.append(overlay);
+  mountTouchDust(overlay, scope, { selector: ".victory-flower-scene, .victory-action" });
+  if (!reduced.matches) {
+    for (const [index, bloom] of [...overlay.querySelectorAll(".victory-flower-bloom")].entries()) {
+      const animation = bloom.animate([
+        { opacity: 0, transform: "scale(.88) rotate(-3deg)", offset: 0 },
+        { opacity: 1, transform: "scale(1) rotate(1deg)", offset: .32 },
+        { opacity: 1, transform: "scale(1) rotate(-1deg)", offset: .6 },
+        { opacity: 1, transform: "scale(1) rotate(.7deg)", offset: .82 },
+        { opacity: 1, transform: "scale(1) rotate(0deg)", offset: 1 },
+      ], { duration: 5200, delay: index * 120, easing: "ease-in-out", fill: "backwards" });
+      scope.animation(animation); animations.push(animation);
+      if (document.hidden) animation.pause();
     }
-  }, flowerGrowthDurationMs);
-  setTimeout(startFlowerFireworks, Math.max(0, flowerGrowthDurationMs - 2000));
+  }
+  scope.listen(reduced, "change", () => { if (reduced.matches) for (const animation of animations) animation.cancel(); });
+  scope.listen(document, "visibilitychange", () => {
+    for (const animation of animations) {
+      if (animation.playState === "finished" || animation.playState === "idle") continue;
+      if (document.hidden) animation.pause(); else animation.play();
+    }
+    if (document.hidden) { pauseVictoryFlowerTheme(); sounds.congratulations.pause(); }
+  });
+  scope.listen(document, "keydown", event => {
+    if (!overlay.contains(document.activeElement)) return;
+    if (event.key === "Tab") {
+      event.preventDefault();
+      const controls = [...actions.children];
+      const index = controls.indexOf(document.activeElement);
+      controls[(index + (event.shiftKey ? controls.length - 1 : 1)) % controls.length].focus();
+    } else if (event.key === "Escape") actions.firstElementChild.click();
+  });
+  playVictoryFlowerTheme(settings);
+  if (settings?.sound && !document.hidden) {
+    sounds.congratulations.currentTime = 0;
+    sounds.congratulations.play().catch(error => { if (error.name !== "NotAllowedError" && error.name !== "AbortError") console.warn("Victory audio unavailable", error.name); });
+  }
+  actions.querySelector("button").focus();
+  return scope;
 }

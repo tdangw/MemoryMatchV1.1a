@@ -2,7 +2,7 @@
 
 Ngày cập nhật: 2026-10-13.
 
-Trạng thái: **được giao triển khai toàn bộ phase**, theo yêu cầu ngày 2026-10-13; kiểm tra và commit riêng từng phase, tiếp tục tới hết phạm vi đã giao. Đây là kế hoạch hiện hành duy nhất. Phase 0 đã chốt phạm vi, dữ liệu, economy rương và backend free; các phase implementation chưa pass. Không tự deploy Hosting, nâng billing hoặc gắn SDK quảng cáo chưa được chọn.
+Trạng thái: **được giao triển khai toàn bộ phase**, theo yêu cầu ngày 2026-10-13; kiểm tra và commit riêng từng phase, tiếp tục tới hết phạm vi đã giao. Đây là kế hoạch hiện hành duy nhất. Phase 0 đã chốt phạm vi, dữ liệu, economy rương và backend free; các phase đã pass được ghi tại bảng theo dõi triển khai. Không tự deploy Hosting, nâng billing hoặc gắn SDK quảng cáo chưa được chọn.
 
 ## 1. Mục tiêu và phạm vi
 
@@ -330,7 +330,8 @@ Gate là checkpoint, không mặc định là ranh giới kết thúc lượt. Y
 | 1 | Pass — persistence v2, progression, launch, rewards, timing/run (0fedb86) | check/build pass; 6 browser data/cleanup pass; review độc lập không còn finding |
 | 2 | Pass — home/header/dock/menu ads, gameplay giữ HUD | check/build pass; navigation 3 viewport pass; lifecycle 100 switches pass; review owner pass |
 | 3 | Pass — 110 nodes/chapter, mode patch, previews, resume, chest, chapters | check/build pass; map+catalog 7 pass; navigation/data 7 pass; menu/Triple regression 28 pass (caption fixes rerun); independent review settings race fixed + unit |
-| 4–8 | Chưa bắt đầu | Không đánh dấu pass bằng kết quả baseline |
+| 4 | Pass — SVG hoa riêng, chuyển động hữu hạn, touch cap24 | check/build web+Android pass; victory/music 6 tests pass, mobile/landscape checked; lifecycle review pass |
+| 5–8 | Chưa bắt đầu | Không đánh dấu pass bằng kết quả baseline |
 
 Firebase (2026-10-13): người dùng đã tạo `(default)` ở `asia-southeast1`; CLI xác nhận Firestore Native Standard, `freeTier=true`. Chưa deploy Hosting hoặc thay billing.
 
@@ -352,7 +353,7 @@ Baseline trước sửa (2026-10-13): Chrome headless 412×915, không overflow;
 
 - CONTEXT.md, gameCatalog.js, gameState.js, persistence.js, sessionProgress.js, sessionTiming.js.
 - config.js/logic.js/grid.js; linkConfig.js/linkBoard.js/linkController.js; tripleConfig.js/tripleBoard.js/tripleRules.js/tripleState.js/tripleController.js.
-- victoryCelebration.js, victoryFlowerSourceTemplate.js và CSS victory; public/sw.js, pwa.js, firebase.json/.firebaserc.
+- victoryCelebration.js, victoryFlowerScene.js và CSS victory; public/sw.js, pwa.js, firebase.json/.firebaserc.
 - Code inspection trước đó: 202 phần tử trong markup nguồn hoa, nhiều infinite animation và blur/filter; timer/RAF/audio callback chưa được cancel đầy đủ. Đây là risk inventory, không phải FPS/memory benchmark.
 - [Firebase Anonymous Auth](https://firebase.google.com/docs/auth/web/anonymous-auth), [Account linking](https://firebase.google.com/docs/auth/web/account-linking), [Firestore rules](https://firebase.google.com/docs/firestore/security/rules-conditions), [Firestore quotas](https://firebase.google.com/docs/firestore/quotas), [Analytics](https://firebase.google.com/docs/analytics), [Hosting quota](https://firebase.google.com/docs/hosting/usage-quotas-pricing).
 - Xếp hạng (kiểm tra ngày 2026-10-12): [Firestore order/limit](https://firebase.google.com/docs/firestore/query-data/order-limit-data), [Aggregation count](https://firebase.google.com/docs/firestore/query-data/aggregation-queries), [Firestore pricing/free quota](https://firebase.google.com/docs/firestore/pricing), [App Check và giới hạn bảo vệ](https://firebase.google.com/docs/app-check), [Cloud Functions yêu cầu Blaze](https://firebase.google.com/docs/functions/get-started).
@@ -360,3 +361,5 @@ Baseline trước sửa (2026-10-13): Chrome headless 412×915, không overflow;
 Phase 1 đã triển khai runtime/schema local, chưa cấu hình Auth/rules Firebase, chưa đo FPS hoặc cân bằng gameplay. Kết quả test runtime ghi trong CONTEXT là lịch sử, không đại diện cho tính năng đề xuất.
 
 2026-10-13: Cửa hàng/Bộ sưu tập ở home mặc định Memory Match; sau khi một trò thực sự ready để chơi, nhớ settings.lastPlayedGameId cho lần mở sau. Không có bước chọn trò trung gian. Xu chung, inventory/appearance theo từng trò.
+
+Phase 4: cảnh hoa SVG gốc ≤100 SVG nodes, ba nhóm chuyển động 5,2s rồi tĩnh; reduced-motion tĩnh ngay. Hạt tương tác tối đa24 toàn app, mỗi hạt600ms, không RAF loop mới. CSS build giảm198,79 →153,71kB; đây là kích thước bundle, chưa phải FPS thiết bị thật. Auth đã xác minh Anonymous/Google enabled; authorized domains hiện production và localhost.

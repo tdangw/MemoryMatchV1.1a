@@ -113,7 +113,7 @@ Game Shell giữ đủ sáu region công khai: `title`, `progress`, `hud`, `mile
 - Asset runtime nằm trong `public/assets/`; Vite copy sang `dist/assets/`.
 - `themeCatalog.js` giữ metadata. `scripts/generate-theme-manifest.mjs` quét WebP và sinh manifest; mã gameplay không giữ danh sách tên ảnh thủ công.
 - JavaScript tạo URL asset bằng `import.meta.env.BASE_URL`; CSS để Vite viết lại URL theo build target.
-- `vite.config.js` chọn implementation trình bày chiến thắng cho web hoặc Android qua alias `victory-presentation`.
+- `vite.config.js` chọn wrapper web/Android qua alias `victory-presentation`; cả hai dùng scene SVG nguyên bản do `victoryCelebration.js` sở hữu. Ba nhóm animation hữu hạn, audio/listener/timer cleanup theo game/page scope; `touchDust.js` giới hạn tổng24 hạt, không loop mới.
 - Service worker/PWA nằm trong `js/pwa.js` và `public/sw.js`; Capacitor dùng cùng đầu ra web qua profile Android.
 - Service worker chỉ cache phản hồi đầy đủ HTTP `200` và bỏ qua request `Range` để không làm lỗi audio tải từng đoạn.
 - Service worker gộp yêu cầu cùng URL và giới hạn số lượt tải tài nguyên đồng thời; catalog chủ đề không tạo hoặc giải mã toàn bộ ảnh.
