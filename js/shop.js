@@ -102,8 +102,8 @@ export function openQuickAssistOverlay(kind) {
     const quantity = document.createElement("span");
     quantity.textContent = `Đang có: ${count}`;
     button.append(createIcon(item.icon), label, quantity);
-    button.addEventListener("click", () => {
-      if (!useMemoryAssistItem(item, roundId)) return;
+    button.addEventListener("click", async () => {
+      if (!(await useMemoryAssistItem(item, roundId))) return;
       if (item.type === "preview") pendingPreviewItem = item;
       modal.close();
     });
@@ -111,7 +111,7 @@ export function openQuickAssistOverlay(kind) {
   });
 }
 
-function useMemoryAssistItem(item, roundId) {
+async function useMemoryAssistItem(item, roundId) {
   if (gameState.roundId !== roundId || getMemoryItemCount(item.id) <= 0)
     return false;
   const previousItems = { ...gameState.progress.memoryMatch.items };
@@ -124,7 +124,7 @@ function useMemoryAssistItem(item, roundId) {
     gameState.remainingTime += item.value;
     stageMemorySession();
   }
-  if (!savePersistentGameData({ progress: gameState.progress })) {
+  if (!(await savePersistentGameData({ progress: gameState.progress }))) {
     gameState.progress.memoryMatch.items = previousItems;
     gameState.remainingTime = previousTime;
     if (previousSession) sessions[mode] = previousSession;
@@ -144,7 +144,7 @@ function useMemoryAssistItem(item, roundId) {
   return true;
 }
 
-export function openShopOverlay({
+export async function openShopOverlay({
   fromMenu = false,
   gameId = "memory-match",
   linkConnect = false,
@@ -205,7 +205,7 @@ export function openShopOverlay({
     .insertBefore(wallet, closeButton);
 
   if (gameId === "link-connect") {
-    mountCatalogTabs({ gameId, surface: "shop", tablist: tabs, panel: grid, tabs: [
+    (await mountCatalogTabs({ gameId, surface: "shop", tablist: tabs, panel: grid, tabs: [
       { id: "items", label: "Vật phẩm", render: () => renderLinkItems(grid, roundId, modal) },
       { id: "path", label: "Đường nối", render: () => renderLinkEffectShop(
         grid,
@@ -226,9 +226,9 @@ export function openShopOverlay({
         modal,
       ) },
       { id: "themes", label: "Chủ đề", render: () => renderThemes(grid, roundId, modal, gameId) },
-    ] });
+    ] }));
   } else if (tripleConnect) {
-    mountCatalogTabs({ gameId, surface: "shop", tablist: tabs, panel: grid, tabs: [
+    (await mountCatalogTabs({ gameId, surface: "shop", tablist: tabs, panel: grid, tabs: [
       { id: "items", label: "Vật phẩm", render: () => renderTripleItems(grid, roundId, modal) },
       { id: "path", label: "Đường nối", render: () => renderTripleEffectShop(
         grid,
@@ -249,14 +249,14 @@ export function openShopOverlay({
         modal,
       ) },
       { id: "themes", label: "Chủ đề", render: () => renderThemes(grid, roundId, modal, gameId) },
-    ] });
+    ] }));
   } else {
-    mountCatalogTabs({ gameId, surface: "shop", tablist: tabs, panel: grid, tabs: [
+    (await mountCatalogTabs({ gameId, surface: "shop", tablist: tabs, panel: grid, tabs: [
       { id: "items", label: "Vật phẩm", render: () => renderMemoryItems(grid, roundId, modal) },
       { id: "appearance", label: "Ngoại hình", render: () => renderAppearance(grid, roundId, modal) },
       { id: "flip", label: "Hiệu ứng lật", render: () => renderFlipEffects(grid, roundId, modal) },
       { id: "themes", label: "Chủ đề", render: () => renderThemes(grid, roundId, modal, gameId) },
-    ] });
+    ] }));
   }
 }
 
@@ -723,15 +723,15 @@ function openPurchaseConfirmation(item, roundId, shopModal, onPurchase) {
         label: "Mua ngay",
         icon: "coin",
         variant: "primary",
-        onClick: (closeConfirmation) => {
+        onClick: async (closeConfirmation) => {
           if (isSubmitting) return true;
           isSubmitting = true;
           if (
-            !handleBuyItem(
+            !(await handleBuyItem(
               item,
               roundId,
               shopModal?.overlay?.dataset.fromMenu === "true",
-            )
+            ))
           ) {
             isSubmitting = false;
             return true;
@@ -746,7 +746,7 @@ function openPurchaseConfirmation(item, roundId, shopModal, onPurchase) {
 }
 
 // Mua vật phẩm
-function handleBuyItem(item, roundId, fromMenu = false) {
+async function handleBuyItem(item, roundId, fromMenu = false) {
   const tripleType =
     item.type === "triple-item" ||
     item.type === "triple-theme" ||
@@ -760,7 +760,7 @@ function handleBuyItem(item, roundId, fromMenu = false) {
     return false;
 
   if (item.type === "triple-item") {
-    if (!purchaseTripleItem(item.id)) {
+    if (!(await purchaseTripleItem(item.id))) {
       showShopMessage(
         gameState.coins < item.price
           ? "Bạn không đủ Xu để mua vật phẩm này."
@@ -774,7 +774,7 @@ function handleBuyItem(item, roundId, fromMenu = false) {
     return true;
   }
   if (item.type === "triple-theme") {
-    if (!purchaseTripleTheme(item.id, item.price)) {
+    if (!(await purchaseTripleTheme(item.id, item.price))) {
       showShopMessage("Không thể mua chủ đề này.", "error");
       return false;
     }
@@ -783,7 +783,7 @@ function handleBuyItem(item, roundId, fromMenu = false) {
     return true;
   }
   if (item.type === "triple-effect") {
-    if (!purchaseTripleEffect(item.effectKind, item.id, item.price)) {
+    if (!(await purchaseTripleEffect(item.effectKind, item.id, item.price))) {
       showShopMessage("Không thể mua hiệu ứng này.", "error");
       return false;
     }
@@ -792,7 +792,7 @@ function handleBuyItem(item, roundId, fromMenu = false) {
     return true;
   }
   if (item.type === "triple-tray-expansion") {
-    if (!purchaseTripleTrayExpansion()) {
+    if (!(await purchaseTripleTrayExpansion())) {
       showShopMessage(
         normalizeTripleTrayExpansionSlots(gameState.progress.tripleConnect.trayExpansionSlots) >= TRIPLE_PRODUCT_DECISIONS.trayExpansion.bonusCapacity
           ? "Khay đã mở tối đa."
@@ -852,7 +852,7 @@ function handleBuyItem(item, roundId, fromMenu = false) {
   }
 
   if (item.type === "link-item") {
-    if (!buyLinkItem(item.id)) {
+    if (!(await buyLinkItem(item.id))) {
       showShopMessage(
         "Không thể lưu giao dịch. Xu và vật phẩm chưa thay đổi.",
         "error",
@@ -880,10 +880,10 @@ function handleBuyItem(item, roundId, fromMenu = false) {
     if (!gameState.appearance[ownedKey].includes(item.id))
       gameState.appearance[ownedKey].push(item.id);
     if (
-      !savePersistentGameData({
+      !(await savePersistentGameData({
         coins: gameState.coins,
         appearance: gameState.appearance,
-      })
+      }))
     ) {
       gameState.coins = previousCoins;
       gameState.appearance[ownedKey] = gameState.appearance[ownedKey].filter(
@@ -904,10 +904,10 @@ function handleBuyItem(item, roundId, fromMenu = false) {
     ownTheme(gameState.appearance, item.gameId, item.id);
     const theme = getTheme(item.id);
     if (
-      !savePersistentGameData({
+      !(await savePersistentGameData({
         coins: gameState.coins,
         appearance: gameState.appearance,
-      })
+      }))
     ) {
       gameState.coins = previousCoins;
       gameState.appearance.ownedThemes = getOwnedThemeIds(
@@ -948,10 +948,10 @@ function handleBuyItem(item, roundId, fromMenu = false) {
       return false;
     }
     if (
-      !savePersistentGameData({
+      !(await savePersistentGameData({
         coins: gameState.coins,
         progress: gameState.progress,
-      })
+      }))
     ) {
       gameState.coins = previousCoins;
       gameState.progress.memoryMatch.items = previousItems;
@@ -974,10 +974,10 @@ function handleBuyItem(item, roundId, fromMenu = false) {
       gameState.progress.memoryMatch.items.hint + item.value,
     );
     if (
-      !savePersistentGameData({
+      !(await savePersistentGameData({
         coins: gameState.coins,
         progress: gameState.progress,
-      })
+      }))
     ) {
       gameState.coins = previousCoins;
       gameState.progress.memoryMatch.items.hint = previousHints;

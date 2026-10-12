@@ -1,6 +1,7 @@
 import { createIcon } from "./icons.js";
 import { UI_TIMING } from "./uiCatalog.js";
 import { createGameShellLifecycle, getActiveGameScope } from "./gameShell/gameShellLifecycle.js";
+import { getActivePlayMetrics } from "./playMetrics.js";
 
 const modals = new Map();
 
@@ -16,15 +17,17 @@ export function openAppModal({
   closeOnBackdrop = true,
   closeOnEscape = true,
   onClose,
+  owner = getActiveGameScope(),
 }) {
   if (id) {
     modals.get(id)?.();
     document.getElementById(id)?.remove();
   }
   const lifecycle = createGameShellLifecycle();
-  const owner = getActiveGameScope();
+  const metrics = getActivePlayMetrics();
 
   const overlay = document.createElement("div");
+  metrics?.clock.pause(overlay);
   overlay.className = "app-modal-overlay";
   if (id) overlay.id = id;
 
@@ -44,6 +47,7 @@ export function openAppModal({
 
   let closed = false;
   let destroyed = false;
+  let submitting = false;
   let releaseOwner;
   const destroy = () => {
     if (destroyed) return;
@@ -51,6 +55,7 @@ export function openAppModal({
     lifecycle.dispose();
     releaseOwner?.forget();
     overlay.remove();
+    metrics?.clock.resume(overlay);
     if (id && modals.get(id) === destroy) modals.delete(id);
   };
   releaseOwner = owner?.own(destroy, "node");
@@ -72,7 +77,7 @@ export function openAppModal({
     closeButton.type = "button";
     closeButton.setAttribute("aria-label", "Đóng");
     closeButton.textContent = "×";
-    lifecycle.listen(closeButton, "click", close);
+    lifecycle.listen(closeButton, "click", () => { if (!submitting) close(); });
     header.appendChild(closeButton);
   }
 
@@ -93,7 +98,26 @@ export function openAppModal({
       button.className = `app-button app-button--${variant}`;
       if (icon) button.appendChild(createIcon(icon));
       button.appendChild(document.createTextNode(label));
-      lifecycle.listen(button, "click", () => onClick?.(close) ?? close());
+      lifecycle.listen(button, "click", async () => {
+        if (submitting || closed) return;
+        submitting = true;
+        panel.setAttribute("aria-busy", "true");
+        const controls = [...panel.querySelectorAll("button")].map(control => [control, control.disabled]);
+        for (const [control] of controls) control.disabled = true;
+        try {
+          const result = await onClick?.(close);
+          if (result === undefined || result === null) close();
+        } catch (error) {
+          console.error("Modal action failed", error);
+          if (!destroyed) showAppToast("Thao tác chưa hoàn tất. Hãy thử lại.", { tone: "warning" });
+        } finally {
+          submitting = false;
+          if (!destroyed) {
+            panel.removeAttribute("aria-busy");
+            for (const [control, disabled] of controls) control.disabled = disabled;
+          }
+        }
+      });
       footer.appendChild(button);
     });
     panel.appendChild(footer);
@@ -103,13 +127,13 @@ export function openAppModal({
   document.body.appendChild(overlay);
 
   function handleKeydown(event) {
-    if (event.key === "Escape" && dismissible && closeOnEscape) close();
+    if (event.key === "Escape" && dismissible && closeOnEscape && !submitting) close();
   }
 
   const removeKeydown = lifecycle.listen(document, "keydown", handleKeydown);
   if (closeOnBackdrop && dismissible) {
     lifecycle.listen(overlay, "click", (event) => {
-      if (event.target === overlay) close();
+      if (event.target === overlay && !submitting) close();
     });
   }
 

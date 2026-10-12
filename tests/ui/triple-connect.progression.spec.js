@@ -216,10 +216,13 @@ test("Triple match transaction rolls back state, progress, and session when pers
   });
   await playTripleWitness(page, null, 2);
   const before = await page.evaluate(async () => {
+    await (await import("/js/persistence.js")).flushPersistentWrites();
     const { gameState } = await import("/js/gameState.js");
-    const prototype = Object.getPrototypeOf(localStorage);
-    window.__tripleStorageSetItem = prototype.setItem;
-    prototype.setItem = () => { throw new Error("terminal persistence failure"); };
+    window.__tripleStorePut = IDBObjectStore.prototype.put;
+    IDBObjectStore.prototype.put = function (...args) {
+      if (this.name === "profile") throw new DOMException("terminal persistence failure", "QuotaExceededError");
+      return window.__tripleStorePut.apply(this, args);
+    };
     return structuredClone({
       state: window.__tripleRun.getState(),
       coins: gameState.coins,
@@ -232,6 +235,8 @@ test("Triple match transaction rolls back state, progress, and session when pers
   await page
     .locator(`.triple-connect__board [data-tile-id="${finalTileId}"]`)
     .click();
+  await expect(page.locator("#persistence-recovery-modal")).toBeVisible();
+  await page.evaluate(async () => { await (await import("/js/persistence.js")).flushPersistentWrites(); });
   const after = await page.evaluate(async () => {
     const { gameState } = await import("/js/gameState.js");
     return structuredClone({
@@ -242,8 +247,8 @@ test("Triple match transaction rolls back state, progress, and session when pers
   });
   expect(after).toEqual(before);
   await page.evaluate(() => {
-    Object.getPrototypeOf(localStorage).setItem = window.__tripleStorageSetItem;
-    delete window.__tripleStorageSetItem;
+    IDBObjectStore.prototype.put = window.__tripleStorePut;
+    delete window.__tripleStorePut;
   });
 });
 
@@ -306,14 +311,25 @@ test("Triple preserves representative Link path and exit effect IDs through its 
       await flight.waitFor({ state: "visible" });
       await flight.waitFor({ state: "detached" });
     }
+    await page.evaluate(() => {
+      window.__observedTripleExits = [];
+      window.__exitObserver = new MutationObserver(records => {
+        for (const record of records) {
+          const candidates = record.type === "attributes" ? [record.target] : record.addedNodes;
+          for (const node of candidates) {
+            if (node instanceof Element && node.matches(".triple-connect__ghost")) window.__observedTripleExits.push(node.className);
+          }
+        }
+      });
+      window.__exitObserver.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["class"] });
+    });
     await page.locator(`[data-tile-id="${witness[2].tileId}"]`).click();
     await expect(page.locator(".triple-connect__line")).toHaveClass(
       new RegExp(`link-path-overlay--${pathId}`),
     );
-    await expect(page.locator(".triple-connect__ghost").first()).toHaveClass(
-      new RegExp(`triple-connect__exit--${exitId}`),
-    );
+    await expect.poll(() => page.evaluate(id => window.__observedTripleExits.some(classes => classes.split(" ").includes(`triple-connect__exit--${id}`)), exitId)).toBe(true);
     await expect(page.locator(".triple-connect__ghost")).toHaveCount(0);
+    await page.evaluate(() => { window.__exitObserver.disconnect(); delete window.__exitObserver; });
   }
 });
 

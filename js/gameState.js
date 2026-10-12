@@ -9,6 +9,9 @@ import { getTripleTrayCapacity, normalizeTripleTrayExpansionSlots, TRIPLE_PRODUC
 import { normalizeTripleMilestones } from "./tripleConnect/tripleMilestones.js";
 import { getThemeSelectionManifest } from "./themeCatalog.js";
 import { appendThemeSelectionHistory, normalizeThemeSelectionHistory } from "./themeSelection.js";
+import { getAdventureSummary, isCompletedLevelResult, isNormalAdventureMode, MAX_ADVENTURE_CHAPTER } from "./adventureProgress.js";
+import { normalizePlayMetrics } from "./playMetrics.js";
+import { normalizeRankedRun } from "./rankingRules.js";
 
 const GAME_MODE_IDS = new Set(GAME_MODES.map(({ id }) => id));
 
@@ -90,13 +93,14 @@ export function hydrateGameState({
     progress?.themeSelectionHistory,
     getThemeSelectionManifest(),
   );
-  const memorySessions = normalizeSessions(memoryMatch.sessionsByMode);
+  const memorySessions = normalizeSessions(memoryMatch.sessionsByMode, "memory-match");
   gameState.progress.memoryMatch = {
     totalStars: normalizeNonNegativeInteger(memoryMatch.totalStars),
     totalScore: normalizeNonNegativeInteger(memoryMatch.totalScore),
     bestByLevel: normalizeBestByLevel(memoryMatch.bestByLevel),
     sessionsByMode: memorySessions,
     items: normalizeMemoryItems(memoryMatch.items),
+    ...normalizeAdventure(memoryMatch, "memory-match"),
   };
   const linkConnect = progress?.linkConnect || {};
   const linkItems = linkConnect.items || {};
@@ -110,7 +114,8 @@ export function hydrateGameState({
       thunder: normalizeItemCount(linkItems.thunder),
       freeze: normalizeItemCount(linkItems.freeze),
     },
-    sessionsByMode: normalizeSessions(linkConnect.sessionsByMode),
+    sessionsByMode: normalizeSessions(linkConnect.sessionsByMode, "link-connect"),
+    ...normalizeAdventure(linkConnect, "link-connect"),
   };
   const tripleConnect = progress?.tripleConnect || {};
   const trayExpansionSlots = normalizeTripleTrayExpansionSlots(
@@ -130,6 +135,7 @@ export function hydrateGameState({
       getTripleTrayCapacity(trayExpansionSlots),
     ),
     milestones: normalizeTripleMilestones(tripleConnect.milestones),
+    ...normalizeAdventure(tripleConnect, "triple-connect"),
   };
   gameState.settings = normalizeSettings(settings, gameState.settings);
   gameState.appearance = normalizeAppearance(appearance);
@@ -155,14 +161,18 @@ function normalizeItemCount(value) {
   return Math.min(GAMEPLAY_LIMITS.itemCount, normalizeNonNegativeInteger(value));
 }
 
-function normalizeActiveSession(session) {
+function normalizeActiveSession(session, gameId) {
   if (!session || typeof session !== "object") return null;
   if (!GAME_MODE_IDS.has(session.mode)) return null;
   const level = Math.max(1, normalizeNonNegativeInteger(session.level) || 1);
   return {
     mode: session.mode,
+    ...(normalizePlayMetrics(session.metrics) ? { metrics: normalizePlayMetrics(session.metrics) } : {}),
+    ...(normalizeRankedRun(session.run, { gameId, mode: session.mode, level })
+      ? { run: normalizeRankedRun(session.run, { gameId, mode: session.mode, level }) } : {}),
     level,
     ...(typeof session.gravityShift === "string" ? { gravityShift: session.gravityShift } : {}),
+    ...(Number.isFinite(session.hints) ? { hints: normalizeItemCount(session.hints) } : {}),
     ...(Number.isFinite(session.specialProgress)
       ? { specialProgress: Math.max(0, Math.floor(session.specialProgress)) }
       : {}),
@@ -184,11 +194,11 @@ function normalizeActiveSession(session) {
   };
 }
 
-function normalizeSessions(sessions) {
+function normalizeSessions(sessions, gameId) {
   const source = sessions && typeof sessions === "object" ? sessions : {};
   const normalized = Object.fromEntries(
     Object.entries(source)
-      .map(([mode, session]) => [mode, normalizeActiveSession(session)])
+      .map(([mode, session]) => [mode, normalizeActiveSession(session, gameId)])
       .filter(([, session]) => session),
   );
   return normalized;
@@ -198,11 +208,34 @@ function normalizeBestByLevel(value) {
   if (!value || typeof value !== "object" || Array.isArray(value)) return {};
   return Object.fromEntries(Object.entries(value).flatMap(([key, result]) => {
     if (!result || typeof result !== "object" || Array.isArray(result)) return [];
+    if (isNormalAdventureMode(key.split(":")[0]) && !isCompletedLevelResult(result)) return [];
     return [[key, {
       score: normalizeNonNegativeInteger(result.score),
       stars: Math.min(3, normalizeNonNegativeInteger(result.stars)),
+      ...(result.cleared === true ? { cleared: true } : {}),
+      ...(Number.isSafeInteger(result.durationMs) && result.durationMs > 0 ? { durationMs: result.durationMs } : {}),
     }]];
   }));
+}
+
+function normalizeAdventure(progress, gameId) {
+  const currentChapter = Number.isSafeInteger(progress.adventure?.currentChapter) && progress.adventure.currentChapter > 0
+    && progress.adventure.currentChapter <= MAX_ADVENTURE_CHAPTER
+    ? progress.adventure.currentChapter : 1;
+  return {
+    adventure: getAdventureSummary(normalizeBestByLevel(progress.bestByLevel), currentChapter),
+    claimedChests: progress.claimedChests && typeof progress.claimedChests === "object" && !Array.isArray(progress.claimedChests)
+      ? structuredClone(progress.claimedChests) : {},
+    startedLevels: progress.startedLevels && typeof progress.startedLevels === "object" && !Array.isArray(progress.startedLevels)
+      ? Object.fromEntries(Object.entries(progress.startedLevels).filter(([, value]) => value === true)) : {},
+    activeRankedRuns: Object.fromEntries(Object.entries(progress.activeRankedRuns || {}).flatMap(([mode, run]) => {
+      if (!Number.isSafeInteger(run?.level) || run.level < 1) return [];
+      const normalized = normalizeRankedRun(run, { gameId, mode, level: run.level });
+      return normalized ? [[mode, normalized]] : [];
+    })),
+    runBests: Object.fromEntries(Object.entries(progress.runBests || {}).filter(([mode, result]) => ["challenge", "endless"].includes(mode)
+      && result && Number.isSafeInteger(result.levelReached) && result.levelReached > 0 && Number.isSafeInteger(result.totalScore) && result.totalScore >= 0)),
+  };
 }
 
 function normalizeSettings(value, fallback) {
@@ -251,6 +284,9 @@ function normalizeTripleSessions(sessions, trayCapacity = TRIPLE_PRODUCT_DECISIO
       const snapshot = serializeTripleRoundState(restored);
       return [[mode, {
         mode,
+        ...(normalizePlayMetrics(session.metrics) ? { metrics: normalizePlayMetrics(session.metrics) } : {}),
+        ...(normalizeRankedRun(session.run, { gameId: "triple-connect", mode, level: session.level })
+          ? { run: normalizeRankedRun(session.run, { gameId: "triple-connect", mode, level: session.level }) } : {}),
         level: Math.max(1, normalizeNonNegativeInteger(session.level) || 1),
         ...(typeof session.seed === "string" && session.seed ? { seed: session.seed } : {}),
         layoutId: session.layoutId,
@@ -336,39 +372,22 @@ export function increaseScore(points) {
   return gameState.score;
 }
 
-export function recordMemoryMatchResult({ mode, level, score, stars }) {
-  const progress = gameState.progress.memoryMatch;
-  const key = `${mode}:${level}`;
-  const previous = progress.bestByLevel[key] || { score: 0, stars: 0 };
-  const nextScore = Math.max(previous.score || 0, score);
-  const nextStars = Math.max(previous.stars || 0, stars);
-  progress.totalScore += nextScore - (previous.score || 0);
-  progress.totalStars += nextStars - (previous.stars || 0);
-  progress.bestByLevel[key] = { score: nextScore, stars: nextStars };
-  return { totalStars: progress.totalStars, isNewBest: score > (previous.score || 0) || stars > (previous.stars || 0) };
-}
+export function recordMemoryMatchResult(result) { return recordGameResult(gameState.progress.memoryMatch, result); }
+export function recordLinkConnectResult(result) { return recordGameResult(gameState.progress.linkConnect, result); }
+export function recordTripleConnectResult(result) { return recordGameResult(gameState.progress.tripleConnect, result); }
 
-export function recordLinkConnectResult({ mode, level, score, stars }) {
-  const progress = gameState.progress.linkConnect;
+function recordGameResult(progress, { mode, level, score, stars, durationMs }) {
   const key = `${mode}:${level}`;
   const previous = progress.bestByLevel[key] || { score: 0, stars: 0 };
   const nextScore = Math.max(previous.score || 0, score);
   const nextStars = Math.max(previous.stars || 0, stars);
   progress.totalScore += nextScore - (previous.score || 0);
   progress.totalStars += nextStars - (previous.stars || 0);
-  progress.bestByLevel[key] = { score: nextScore, stars: nextStars };
-  return { totalStars: progress.totalStars, isNewBest: score > (previous.score || 0) || stars > (previous.stars || 0) };
-}
-
-export function recordTripleConnectResult({ mode, level, score, stars }) {
-  const progress = gameState.progress.tripleConnect;
-  const key = `${mode}:${level}`;
-  const previous = progress.bestByLevel[key] || { score: 0, stars: 0 };
-  const nextScore = Math.max(previous.score || 0, score);
-  const nextStars = Math.max(previous.stars || 0, stars);
-  progress.totalScore += nextScore - (previous.score || 0);
-  progress.totalStars += nextStars - (previous.stars || 0);
-  progress.bestByLevel[key] = { score: nextScore, stars: nextStars };
+  const previousTime = previous.durationMs;
+  const measuredTime = Number.isSafeInteger(durationMs) && durationMs > 0 ? durationMs : null;
+  const bestTime = measuredTime ? Math.min(previousTime || Infinity, measuredTime) : previousTime;
+  progress.bestByLevel[key] = { score: nextScore, stars: nextStars, cleared: true, ...(bestTime ? { durationMs: bestTime } : {}) };
+  if (isNormalAdventureMode(mode)) progress.adventure = getAdventureSummary(progress.bestByLevel, progress.adventure?.currentChapter || 1);
   return { totalStars: progress.totalStars, isNewBest: score > (previous.score || 0) || stars > (previous.stars || 0) };
 }
 

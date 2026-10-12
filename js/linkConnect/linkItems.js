@@ -13,7 +13,7 @@ export function getLinkItemCount(id) {
   return gameState.progress.linkConnect.items[id] || 0;
 }
 
-export function grantLinkItem(id, amount = 1) {
+export async function grantLinkItem(id, amount = 1) {
   if (!getLinkItemDefinition(id)) return false;
   const currentCount = getLinkItemCount(id);
   const nextCount = Math.min(
@@ -22,31 +22,31 @@ export function grantLinkItem(id, amount = 1) {
   );
   if (nextCount <= currentCount) return false;
   gameState.progress.linkConnect.items[id] = nextCount;
-  if (!saveProgress(gameState.progress)) {
+  if (!(await saveProgress(gameState.progress))) {
     gameState.progress.linkConnect.items[id] = currentCount;
     return false;
   }
   return true;
 }
 
-export function consumeLinkItem(id) {
+export async function consumeLinkItem(id) {
   if (!getLinkItemDefinition(id) || getLinkItemCount(id) < 1) return false;
   const previousCount = getLinkItemCount(id);
   gameState.progress.linkConnect.items[id] -= 1;
-  if (!saveProgress(gameState.progress)) {
+  if (!(await saveProgress(gameState.progress))) {
     gameState.progress.linkConnect.items[id] = previousCount;
     return false;
   }
   return true;
 }
 
-export function buyLinkItem(id) {
+export async function buyLinkItem(id) {
   const item = getLinkItemDefinition(id);
   if (!item || getLinkItemCount(id) >= GAMEPLAY_LIMITS.itemCount || !spendCoins(item.price)) return false;
   const previousCoins = gameState.coins + item.price;
   const previousCount = getLinkItemCount(id);
   gameState.progress.linkConnect.items[id] = previousCount + 1;
-  if (!savePersistentGameData({ coins: gameState.coins, progress: gameState.progress })) {
+  if (!(await savePersistentGameData({ coins: gameState.coins, progress: gameState.progress }))) {
     gameState.coins = previousCoins;
     gameState.progress.linkConnect.items[id] = previousCount;
     return false;

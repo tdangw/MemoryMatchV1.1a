@@ -32,6 +32,8 @@ import {
 } from "./ui.js";
 import { duckBackgroundMusicForVictory, pauseBackgroundMusic, sounds } from "./sound.js"; // 📦 Tách âm thanh
 import { saveCoins, savePersistentGameData } from "./persistence.js";
+import { finishPlayMetrics } from "./playMetrics.js";
+import { stageRankedAttempt } from "./rankingRules.js";
 import { getFlipAnimationClass } from "./appearance.js";
 import { clearMemoryTileAnimations, restartMemoryTileAnimation } from "./memoryMatch/tileAnimation.js";
 import {
@@ -39,7 +41,6 @@ import {
   GAMEPLAY_TIMING,
   getComboTimeBonus,
   getComboWindowMs,
-  shouldShowVictoryCelebration,
 } from "./gameplayTuning.js";
 import { calculateMatchCoinReward } from "./coinRewards.js";
 import {
@@ -144,14 +145,14 @@ export function initLogic() {
   resetLogicRuntime();
   const tiles = document.querySelectorAll(".tile");
   tiles.forEach((tile) => {
-    tile.onclick = () => handleTileClick(tile);
+    tile.onclick = async () => (await handleTileClick(tile));
   });
 }
 
 /**
  * Xử lý khi người chơi click vào tile
  */
-export function handleTileClick(tileElement) {
+export async function handleTileClick(tileElement) {
   // Chạm một thẻ mới trong lúc cặp sai đang hiện sẽ đóng cặp đó ngay.
   resolvePendingMismatch({ immediately: true });
   if (gameState.isLocked || selectedTiles.length >= 2) return;
@@ -191,12 +192,12 @@ export function handleTileClick(tileElement) {
     gameState.moves++;
     updateMovesDisplay(gameState.moves);
     setInteractionLocked(true);
-    checkMatch(gameState.roundId);
+    (await checkMatch(gameState.roundId));
   }
 }
 
 // So khớp 2 tile được chọn
-function checkMatch(roundId) {
+async function checkMatch(roundId) {
   const [first, second] = selectedTiles;
 
   if (first.imageId === second.imageId) {
@@ -222,11 +223,15 @@ function checkMatch(roundId) {
     const matchCoins = calculateMatchCoinReward(gameState.combo);
     const previousCoins = gameState.coins;
     const totalCoins = increaseCoins(matchCoins);
-    if (!saveCoins(totalCoins)) {
+    if (!(await saveCoins(totalCoins))) {
+      if (gameState.roundId !== roundId) return;
       gameState.coins = previousCoins;
       showBonusOverlay("Không thể lưu phần thưởng Xu lúc này.");
     }
-    else showMemoryCoinReward(second.element, previousCoins, totalCoins, matchCoins);
+    else {
+      if (gameState.roundId !== roundId) return;
+      showMemoryCoinReward(second.element, previousCoins, totalCoins, matchCoins);
+    }
     highlightTarget("#score");
     updateLevelStarsDisplay(calculateStarProgress(score, gameState.totalPairs, gameState.settings.mode));
     updateComboDisplay(gameState.combo);
@@ -248,11 +253,13 @@ function checkMatch(roundId) {
       sounds.match.play().catch(() => {});
     }
 
-    awardLuckyReward(first.imageId, first.element);
-    if (first.special) handleMemorySpecialMatch(second.element, roundId);
+    (await awardLuckyReward(first.imageId, first.element, roundId));
+    if (gameState.roundId !== roundId) return;
+    if (first.special) (await handleMemorySpecialMatch(second.element, roundId));
+    if (gameState.roundId !== roundId) return;
 
     setInteractionLocked(false, roundId);
-    checkLevelComplete();
+    (await checkLevelComplete());
   } else {
     gameState.misses++;
     gameState.combo = 0;
@@ -307,8 +314,12 @@ function stopComboWindow() {
 /**
  * Kiểm tra nếu đã matched hết → qua màn
  */
-export function checkLevelComplete() {
+export async function checkLevelComplete() {
   if (!gameState.isPaused && gameState.totalPairs > 0 && gameState.matchedPairs >= gameState.totalPairs) {
+    const roundId = gameState.roundId;
+    const durationMs = finishPlayMetrics();
+    const rollback = { coins: gameState.coins, score: gameState.score, progress: structuredClone(gameState.progress.memoryMatch) };
+    const previousChapter = gameState.progress.memoryMatch.adventure?.currentChapter || 1;
     setInteractionLocked(true);
     gameState.isPaused = true;
     const grossCoins = calculateCoinReward(
@@ -330,21 +341,32 @@ export function checkLevelComplete() {
       level: gameState.currentLevel,
       score: finalScore,
       stars,
+      durationMs,
     });
     updateScoreDisplay(finalScore);
     updateLevelStarsDisplay(stars);
     updateTotalStarsDisplay(progressResult.totalStars);
     const totalCoins = increaseCoins(coinsEarned);
-    if (!savePersistentGameData({ coins: totalCoins, progress: gameState.progress })) {
-      showBonusOverlay("Không thể lưu kết quả lúc này. Tiến trình vẫn được giữ trong lượt chơi.");
+    stageRankedAttempt("memory-match", gameState.settings.mode, finalScore, true);
+    delete gameState.progress.memoryMatch.sessionsByMode?.[gameState.settings.mode];
+    if (!(await savePersistentGameData({ coins: totalCoins, progress: gameState.progress }))) {
+      if (gameState.roundId === roundId) {
+        gameState.coins = rollback.coins;
+        gameState.score = rollback.score;
+        gameState.progress.memoryMatch = rollback.progress;
+      }
+      return;
     }
+    if (gameState.roundId !== roundId) return;
     updateCoinDisplay(totalCoins);
     duckBackgroundMusicForVictory(gameState.settings);
     if (gameState.settings?.sound) {
       sounds.victory.currentTime = 0;
       sounds.victory.play().catch(() => {});
     }
-    const continueToNextLevel = () => levelCompleteActions.onNext();
+    const completedChapter = gameState.progress.memoryMatch.adventure?.currentChapter > previousChapter ? previousChapter : null;
+    const nextLevel = completedChapter ? gameState.progress.memoryMatch.adventure.firstLevel : gameState.currentLevel + 1;
+    const continueToNextLevel = () => levelCompleteActions.onNext(nextLevel);
     const completion = {
       level: gameState.currentLevel,
       remainingTime: gameState.remainingTime,
@@ -358,10 +380,11 @@ export function checkLevelComplete() {
       settings: gameState.settings,
       onNext: continueToNextLevel,
       onMenu: levelCompleteActions.onMenu,
+      completedChapter,
     };
     if (
       canShowFullVictoryCelebration
-      && shouldShowVictoryCelebration(gameState.currentLevel)
+      && completion.completedChapter
     ) {
       showLevelSummaryOverlay({
         ...completion,
@@ -374,11 +397,12 @@ export function checkLevelComplete() {
   }
 }
 
-function awardLuckyReward(imageId, tileElement) {
-  awardLuckyRewardValue(consumeLuckyReward(imageId), tileElement);
+async function awardLuckyReward(imageId, tileElement, roundId) {
+  (await awardLuckyRewardValue(consumeLuckyReward(imageId), tileElement, roundId));
 }
 
-function awardLuckyRewardValue(reward, tileElement) {
+async function awardLuckyRewardValue(reward, tileElement, roundId) {
+  if (gameState.roundId !== roundId) return;
   if (!reward) return;
 
   if (reward.type === "time") {
@@ -396,10 +420,11 @@ function awardLuckyRewardValue(reward, tileElement) {
     const before = gameState.progress.memoryMatch.items.hint;
     gameState.progress.memoryMatch.items.hint = Math.min(GAMEPLAY_LIMITS.itemCount, before + reward.value);
     if (gameState.progress.memoryMatch.items.hint > before) {
-      if (!savePersistentGameData({ progress: gameState.progress })) {
+      if (!(await savePersistentGameData({ progress: gameState.progress }))) {
         gameState.progress.memoryMatch.items.hint = before;
         return;
       }
+      if (gameState.roundId !== roundId) return;
       tileElement?.classList.add("lucky-reward");
       recordLuckyAward(reward);
       updateHintDisplay(gameState.progress.memoryMatch.items.hint);
@@ -412,7 +437,7 @@ function awardLuckyRewardValue(reward, tileElement) {
     }
     let fallback = getLuckyReward();
     while (fallback.type === "hints") fallback = getLuckyReward();
-    awardLuckyRewardValue(fallback, tileElement);
+    (await awardLuckyRewardValue(fallback, tileElement, roundId));
     return;
   }
 
@@ -420,7 +445,7 @@ function awardLuckyRewardValue(reward, tileElement) {
   const totalCoins = increaseCoins(reward.value);
   tileElement?.classList.add("lucky-reward");
   recordLuckyAward(reward);
-  if (!saveCoins(totalCoins)) {
+  if (!(await saveCoins(totalCoins))) {
     gameState.coins = previousCoins;
     showBonusOverlay("Không thể lưu phần thưởng Xu lúc này.");
     return;

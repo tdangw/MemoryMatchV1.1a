@@ -22,6 +22,7 @@ test("defeat navigation cleanup preserves the session captured before menu reset
   const snapshot = () => page.evaluate(async () => structuredClone((await import("/js/sessionProgress.js")).getActiveSession("memory-match", "easy")));
   const before = await snapshot();
   expect(before.level).toBe(7);
+  expect(before.remainingTime).toBe(0, "An expired board must not retain a positive checkpoint time.");
   await page.locator("#time-up-modal").getByRole("button", { name: "Về Menu" }).click();
   await expect(page.locator("#game-container")).toBeHidden();
   expect(await snapshot()).toEqual(before);

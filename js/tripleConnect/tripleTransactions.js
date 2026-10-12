@@ -8,20 +8,20 @@ import { THEMES } from "../themeCatalog.js";
 import { LINK_EXIT_EFFECTS, LINK_PATH_EFFECTS } from "../linkConnect/linkEffects.js";
 import { normalizeTripleTrayExpansionSlots, TRIPLE_PRODUCT_DECISIONS } from "./tripleConfig.js";
 
-export function consumeTripleItemWithSession(itemId, session) {
+export async function consumeTripleItemWithSession(itemId, session) {
   const item = getTripleItemDefinition(itemId);
   const items = gameState.progress.tripleConnect.items;
   if (!item || !session?.mode || !Number.isInteger(items[itemId]) || items[itemId] < 1) return false;
   const rollback = createRollbackPoint();
   items[itemId] -= 1;
-  if (!stageActiveSession("triple-connect", session) || !savePersistentGameData({ coins: gameState.coins, progress: gameState.progress })) {
+  if (!stageActiveSession("triple-connect", session) || !(await savePersistentGameData({ coins: gameState.coins, progress: gameState.progress }))) {
     restoreRollbackPoint(rollback);
     return false;
   }
   return true;
 }
 
-export function commitTripleRewardTransaction({ session, milestones, rewards }) {
+export async function commitTripleRewardTransaction({ session, milestones, rewards }) {
   if (!session?.mode || !milestones || !Array.isArray(rewards)) return null;
   const rollback = createRollbackPoint();
   const granted = [];
@@ -49,28 +49,28 @@ export function commitTripleRewardTransaction({ session, milestones, rewards }) 
   }
   gameState.coins += coins;
   gameState.progress.tripleConnect.milestones = milestones;
-  if (!stageActiveSession("triple-connect", session) || !savePersistentGameData({ coins: gameState.coins, progress: gameState.progress })) {
+  if (!stageActiveSession("triple-connect", session) || !(await savePersistentGameData({ coins: gameState.coins, progress: gameState.progress }))) {
     restoreRollbackPoint(rollback);
     return null;
   }
   return granted;
 }
 
-export function purchaseTripleItem(itemId) {
+export async function purchaseTripleItem(itemId) {
   const item = getTripleItemDefinition(itemId);
   const items = gameState.progress.tripleConnect.items;
   if (!item || !Number.isInteger(items[itemId]) || items[itemId] >= GAMEPLAY_LIMITS.itemCount || gameState.coins < item.price) return false;
   const rollback = createRollbackPoint();
   gameState.coins -= item.price;
   items[itemId] += 1;
-  if (!savePersistentGameData({ coins: gameState.coins, progress: gameState.progress })) {
+  if (!(await savePersistentGameData({ coins: gameState.coins, progress: gameState.progress }))) {
     restoreRollbackPoint(rollback);
     return false;
   }
   return true;
 }
 
-export function purchaseTripleTrayExpansion() {
+export async function purchaseTripleTrayExpansion() {
   const profile = gameState.progress.tripleConnect;
   const expansion = TRIPLE_PRODUCT_DECISIONS.trayExpansion;
   const price = expansion.releasePrice;
@@ -80,7 +80,7 @@ export function purchaseTripleTrayExpansion() {
   gameState.coins -= price;
   profile.trayExpansionSlots = currentSlots + 1;
   profile.trayExpansionOwned = profile.trayExpansionSlots === expansion.bonusCapacity;
-  if (!savePersistentGameData({ coins: gameState.coins, progress: gameState.progress })) {
+  if (!(await savePersistentGameData({ coins: gameState.coins, progress: gameState.progress }))) {
     restoreRollbackPoint(rollback);
     return false;
   }
@@ -88,53 +88,53 @@ export function purchaseTripleTrayExpansion() {
   return true;
 }
 
-export function purchaseTripleTheme(themeId, price) {
+export async function purchaseTripleTheme(themeId, price) {
   const theme = THEMES.find((candidate) => candidate.id === themeId);
   if (!theme || theme.price !== price) return false;
-  return commitAppearancePurchase(price, (appearance) => ownTheme(appearance, "triple-connect", themeId));
+  return (await commitAppearancePurchase(price, (appearance) => ownTheme(appearance, "triple-connect", themeId)));
 }
 
-export function purchaseTripleEffect(kind, effectId, price) {
+export async function purchaseTripleEffect(kind, effectId, price) {
   const effects = kind === "path" ? LINK_PATH_EFFECTS : kind === "exit" ? LINK_EXIT_EFFECTS : null;
   const effect = effects?.find((candidate) => candidate.id === effectId);
   if (!effect || effect.price !== price) return false;
   const key = kind === "path" ? "ownedTriplePathEffects" : "ownedTripleExitEffects";
-  return commitAppearancePurchase(price, (appearance) => {
+  return (await commitAppearancePurchase(price, (appearance) => {
     if (appearance[key].includes(effectId)) return false;
     appearance[key] = [...appearance[key], effectId];
     return true;
-  });
+  }));
 }
 
-export function equipTripleTheme(themeId) {
-  return commitAppearanceChange((appearance) => equipTheme(appearance, "triple-connect", themeId));
+export async function equipTripleTheme(themeId) {
+  return (await commitAppearanceChange((appearance) => equipTheme(appearance, "triple-connect", themeId)));
 }
 
-export function equipTripleEffect(kind, effectId) {
+export async function equipTripleEffect(kind, effectId) {
   if (kind !== "path" && kind !== "exit") return false;
   const ownedKey = kind === "path" ? "ownedTriplePathEffects" : "ownedTripleExitEffects";
   const equippedKey = kind === "path" ? "triplePathEffect" : "tripleExitEffect";
-  return commitAppearanceChange((appearance) => {
+  return (await commitAppearanceChange((appearance) => {
     if (!appearance[ownedKey].includes(effectId)) return false;
     appearance[equippedKey] = effectId;
     return true;
-  });
+  }));
 }
 
-function commitAppearancePurchase(price, apply) {
+async function commitAppearancePurchase(price, apply) {
   if (!Number.isInteger(price) || price < 0 || gameState.coins < price) return false;
   const rollback = createRollbackPoint();
   gameState.coins -= price;
-  if (!apply(gameState.appearance) || !savePersistentGameData({ coins: gameState.coins, appearance: gameState.appearance })) {
+  if (!apply(gameState.appearance) || !(await savePersistentGameData({ coins: gameState.coins, appearance: gameState.appearance }))) {
     restoreRollbackPoint(rollback);
     return false;
   }
   return true;
 }
 
-function commitAppearanceChange(apply) {
+async function commitAppearanceChange(apply) {
   const rollback = createRollbackPoint();
-  if (!apply(gameState.appearance) || !savePersistentGameData({ appearance: gameState.appearance })) {
+  if (!apply(gameState.appearance) || !(await savePersistentGameData({ appearance: gameState.appearance }))) {
     restoreRollbackPoint(rollback);
     return false;
   }

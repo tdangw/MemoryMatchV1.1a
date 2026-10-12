@@ -107,14 +107,14 @@ export function createMainMenu() {
     {
       icon: "collection",
       text: "Bộ sưu tập",
-      action: () => {
-        showCollectionModal();
+      action: async () => {
+        (await showCollectionModal());
       },
     },
     {
       icon: "shop",
       text: "Cửa hàng",
-      action: () => openShopOverlay({ fromMenu: true }),
+      action: async () => (await openShopOverlay({ fromMenu: true })),
     },
     {
       icon: "book",
@@ -166,10 +166,10 @@ export function showDifficultyOverlay(fromGame = false) {
   gameState.isPaused = true;
   let modeSelected = false;
 
-  const startMode = (mode, close) => {
+  const startMode = async (mode, close) => {
     modeSelected = true;
     gameState.fromDefeat = false;
-    clearActiveSession("memory-match", mode);
+    (await clearActiveSession("memory-match", mode));
     resetGame();
     gameState.settings.mode = mode;
     document.getElementById("menu-container")?.remove();
@@ -206,7 +206,7 @@ export function showDifficultyOverlay(fromGame = false) {
   changeThemeButton.onclick = () => {
     modal.close();
     setTimeout(
-      () => showCollectionModal({ fromGame, gameId: "memory-match" }),
+      async () => (await showCollectionModal({ fromGame, gameId: "memory-match" })),
       UI_TIMING.modalCloseMs,
     );
   };
@@ -215,16 +215,16 @@ export function showDifficultyOverlay(fromGame = false) {
     button.type = "button";
     button.className = "difficulty-option";
     button.append(createIcon(icon), document.createTextNode(label));
-    button.onclick = () =>
-      chooseMemoryMode(mode, label, startMode, modal.close, () => {
+    button.onclick = async () =>
+      (await chooseMemoryMode(mode, label, startMode, modal.close, () => {
         modeSelected = true;
-      });
+      }));
     options.append(button);
   });
   content.append(themeRow, options);
 }
 
-function chooseMemoryMode(
+async function chooseMemoryMode(
   mode,
   label,
   startMode,
@@ -232,7 +232,7 @@ function chooseMemoryMode(
   confirmModeSelection,
 ) {
   const session = getActiveSession("memory-match", mode);
-  if (!session) return startMode(mode, closeDifficulty);
+  if (!session) return (await startMode(mode, closeDifficulty));
   showSessionChoice({
     label,
     session,
@@ -243,7 +243,7 @@ function chooseMemoryMode(
       closeDifficulty();
       onContinueGame(session);
     },
-    onNew: () => startMode(mode, closeDifficulty),
+    onNew: async () => (await startMode(mode, closeDifficulty)),
   });
 }
 
@@ -290,11 +290,11 @@ function showSessionPicker(gameId, onContinue) {
   changeTheme.onclick = () => {
     modal.close();
     setTimeout(
-      () =>
-        showCollectionModal({
+      async () =>
+        (await showCollectionModal({
           gameId,
           onClose: () => showSessionPicker(gameId, onContinue),
-        }),
+        })),
       UI_TIMING.modalCloseMs,
     );
   };
@@ -320,7 +320,7 @@ function showSessionChoice({ label, session, onContinue, onNew }) {
   modal.panel.classList.add("session-choice-modal");
 }
 
-export function showCollectionModal({
+export async function showCollectionModal({
   fromGame = false,
   gameId = "memory-match",
   onClose = () => {},
@@ -410,10 +410,10 @@ export function showCollectionModal({
       } else {
         button.classList.add("appearance-action--equip");
         button.textContent = "Trang bị";
-        button.onclick = () => {
+        button.onclick = async () => {
           const saved = gameId === "triple-connect"
-            ? equipTripleTheme(theme.id)
-            : equipTheme(gameState.appearance, gameId, theme.id) && saveAppearance(gameState.appearance);
+            ? (await equipTripleTheme(theme.id))
+            : equipTheme(gameState.appearance, gameId, theme.id) && (await saveAppearance(gameState.appearance));
           if (!saved) {
             showAppToast("Không thể lưu thay đổi chủ đề.", { tone: "error" });
             return;
@@ -464,9 +464,9 @@ export function showCollectionModal({
           } else {
             button.classList.add("appearance-action--equip");
             button.textContent = "Trang bị";
-            button.onclick = () => {
+            button.onclick = async () => {
               gameState.appearance[equippedKey] = item.id;
-              saveAppearance(gameState.appearance);
+              (await saveAppearance(gameState.appearance));
               renderLinkEffects(title, equippedKey, ownedKey, effects);
               showAppToast(`Đã trang bị ${item.title}.`, { tone: "info" });
             };
@@ -477,11 +477,11 @@ export function showCollectionModal({
       group.append(heading, choices);
       grid.append(group);
     };
-    mountCatalogTabs({ gameId, surface: "collection", tablist: tabs, panel: grid, tabs: [
+    (await mountCatalogTabs({ gameId, surface: "collection", tablist: tabs, panel: grid, tabs: [
       { id: "themes", label: "Chủ đề", render: renderThemes },
       { id: "path", label: "Đường nối", render: () => renderLinkEffects("Hiệu ứng đường nối", "linkPathEffect", "ownedLinkPathEffects", LINK_PATH_EFFECTS) },
       { id: "exit", label: "Xóa thẻ", render: () => renderLinkEffects("Hiệu ứng xóa thẻ", "linkExitEffect", "ownedLinkExitEffects", LINK_EXIT_EFFECTS) },
-    ] });
+    ] }));
   } else if (gameId === "triple-connect") {
     const renderTripleEffects = (title, kind, ownedKey, equippedKey, effects) => {
       grid.className = "shop-item-grid shop-item-grid--appearance";
@@ -511,8 +511,8 @@ export function showCollectionModal({
         } else {
           button.classList.add("appearance-action--equip");
           button.textContent = "Trang bị";
-          button.onclick = () => {
-            if (!equipTripleEffect(kind, item.id)) {
+          button.onclick = async () => {
+            if (!(await equipTripleEffect(kind, item.id))) {
               showAppToast("Không thể lưu thay đổi hiệu ứng.", { tone: "error" });
               return;
             }
@@ -526,17 +526,17 @@ export function showCollectionModal({
       group.append(heading, choices);
       grid.append(group);
     };
-    mountCatalogTabs({ gameId, surface: "collection", tablist: tabs, panel: grid, tabs: [
+    (await mountCatalogTabs({ gameId, surface: "collection", tablist: tabs, panel: grid, tabs: [
       { id: "themes", label: "Chủ đề", render: renderThemes },
       { id: "path", label: "Đường nối", render: () => renderTripleEffects("Hiệu ứng đường nối", "path", "ownedTriplePathEffects", "triplePathEffect", LINK_PATH_EFFECTS) },
       { id: "exit", label: "Xóa thẻ", render: () => renderTripleEffects("Hiệu ứng xóa thẻ", "exit", "ownedTripleExitEffects", "tripleExitEffect", LINK_EXIT_EFFECTS) },
-    ] });
+    ] }));
   } else {
-    mountCatalogTabs({ gameId, surface: "collection", tablist: tabs, panel: grid, tabs: [
+    (await mountCatalogTabs({ gameId, surface: "collection", tablist: tabs, panel: grid, tabs: [
       { id: "appearance", label: "Ngoại hình", render: renderAppearance },
       { id: "flip", label: "Hiệu ứng lật", render: renderFlipEffects },
       { id: "themes", label: "Chủ đề", render: renderThemes },
-    ] });
+    ] }));
   }
   return modal;
 }
@@ -575,10 +575,10 @@ function renderCollectionAppearanceGroup(grid, title, type, items) {
       } else {
         button.classList.add("appearance-action--equip");
         button.textContent = "Trang bị";
-        button.onclick = () => {
+        button.onclick = async () => {
           const previousId = gameState.appearance[type];
           gameState.appearance[type] = item.id;
-          if (!saveAppearance(gameState.appearance)) {
+          if (!(await saveAppearance(gameState.appearance))) {
             gameState.appearance[type] = previousId;
             showAppToast("Không thể lưu thay đổi ngoại hình.", { tone: "error" });
             return;

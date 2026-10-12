@@ -9,13 +9,13 @@ export function getCatalogTab(gameId, surface, availableTabs) {
   return availableTabs.includes(tab) ? tab : availableTabs[0];
 }
 
-export function setCatalogTab(gameId, surface, tabId) {
+export async function setCatalogTab(gameId, surface, tabId) {
   if (!SURFACES.has(surface) || !TAB_IDS.has(tabId)) return false;
   const key = `${gameId}:${surface}`;
   if (gameState.settings.catalogTabs?.[key] === tabId) return true;
   const previous = gameState.settings.catalogTabs || {};
   gameState.settings.catalogTabs = { ...previous, [key]: tabId };
-  if (savePersistentGameData({ settings: gameState.settings })) return true;
+  if ((await savePersistentGameData({ settings: gameState.settings }))) return true;
   gameState.settings.catalogTabs = previous;
   return false;
 }
@@ -24,7 +24,7 @@ export function setCatalogTab(gameId, surface, tabId) {
  * Owns the catalog tab UI for both Shop and Collection. Rendering a tab never
  * changes the preference: only an explicit user selection is persisted.
  */
-export function mountCatalogTabs({ gameId, surface, tabs, tablist, panel }) {
+export async function mountCatalogTabs({ gameId, surface, tabs, tablist, panel }) {
   const availableTabs = tabs.map(({ id }) => id).filter((id) => TAB_IDS.has(id));
   if (!SURFACES.has(surface) || !availableTabs.length) {
     throw new Error("Catalog navigation requires a supported surface and tab.");
@@ -38,9 +38,10 @@ export function mountCatalogTabs({ gameId, surface, tabs, tablist, panel }) {
 
   const buttons = new Map();
   let selectedId = getCatalogTab(gameId, surface, availableTabs);
-  const activate = (tabId, { persist = false, focus = false } = {}) => {
+  const activate = async (tabId, { persist = false, focus = false } = {}) => {
     if (!availableTabs.includes(tabId)) return false;
-    if (persist && !setCatalogTab(gameId, surface, tabId)) return false;
+    const previousId = selectedId;
+    const saving = persist ? setCatalogTab(gameId, surface, tabId) : Promise.resolve(true);
     selectedId = tabId;
     for (const [id, button] of buttons) {
       const selected = id === tabId;
@@ -51,6 +52,10 @@ export function mountCatalogTabs({ gameId, surface, tabs, tablist, panel }) {
     panel.setAttribute("aria-labelledby", `${baseId}-tab-${tabId}`);
     tabs.find(({ id }) => id === tabId).render();
     if (focus) buttons.get(tabId).focus();
+    if (!await saving) {
+      await activate(previousId);
+      return false;
+    }
     return true;
   };
 
@@ -62,8 +67,8 @@ export function mountCatalogTabs({ gameId, surface, tabs, tablist, panel }) {
     button.textContent = label;
     button.setAttribute("role", "tab");
     button.setAttribute("aria-controls", panel.id);
-    button.addEventListener("click", () => activate(id, { persist: true }));
-    button.addEventListener("keydown", (event) => {
+    button.addEventListener("click", async () => (await activate(id, { persist: true })));
+    button.addEventListener("keydown", async (event) => {
       const index = availableTabs.indexOf(id);
       const nextIndex = event.key === "ArrowRight" || event.key === "ArrowDown"
         ? (index + 1) % availableTabs.length
@@ -72,12 +77,12 @@ export function mountCatalogTabs({ gameId, surface, tabs, tablist, panel }) {
           : event.key === "Home" ? 0 : event.key === "End" ? availableTabs.length - 1 : null;
       if (nextIndex === null) return;
       event.preventDefault();
-      activate(availableTabs[nextIndex], { persist: true, focus: true });
+      (await activate(availableTabs[nextIndex], { persist: true, focus: true }));
     });
     buttons.set(id, button);
     tablist.append(button);
   }
 
-  activate(selectedId);
+  (await activate(selectedId));
   return Object.freeze({ selectedId: () => selectedId, activate });
 }

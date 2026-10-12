@@ -1,11 +1,11 @@
-# CONTEXT — Trạng thái hiện tại (2026-10-12)
+# CONTEXT — Trạng thái hiện tại (2026-10-13)
 
 Đọc file này khi bắt đầu task mới. Đây là snapshot điều hướng, không thay thế code/config và không chứa lịch sử triển khai chi tiết.
 
 ## Sản phẩm
 
-- Ứng dụng JavaScript ES modules, lưu dữ liệu trên thiết bị bằng `localStorage`; Firebase chỉ dùng Hosting.
-- Sản phẩm chưa phát hành. Yêu cầu mới ngày 2026-10-13 thay chính sách reset development: giữ Xu/vật phẩm/chủ đề/kỷ lục/session khi chuyển định dạng, có bước chuyển đổi idempotent và bản phục hồi; không tự ghi đè dữ liệu hỏng hoặc version chưa biết. Source hiện tại là formatVersion=1; backend theo chặng được triển khai ở phase 1.
+- Ứng dụng JavaScript ES modules; backend local chính là IndexedDB theo chặng, facade persistence bất đồng bộ. Firebase hiện dùng Hosting; database Firestore Singapore đã được người dùng tạo, Auth/sync/xếp hạng/Analytics được triển khai ở các phase sau.
+- Sản phẩm chưa phát hành. Yêu cầu ngày 2026-10-13 thay chính sách reset development: giữ Xu/vật phẩm/chủ đề/kỷ lục/session khi chuyển định dạng. Bản nguồn formatVersion=1 được giữ làm phục hồi; formatVersion=2 dùng transaction profile + chapter, cache giới hạn theo chặng đang xem/phiên. Không fallback sang v1 khi backend mới từng được dùng; dữ liệu hỏng/version lạ chặn ghi. Ghi thất bại chặn các snapshot phụ thuộc và yêu cầu tải lại bản đã commit, không tiếp tục ghi dữ liệu RAM chưa bền vững.
 - Ba game có trong runtime/menu: Memory Match, Link Connect và Triple Connect.
 - Memory Match, Link Connect và Triple Connect dùng Game Shell chung; state/session gameplay vẫn tách theo game và mode.
 - Runtime Closure và Render Performance Closure đã hoàn tất ở phạm vi runtime: validation boundary Triple, scheduler HUD chung, benchmark/soak ba game và review closure đều đã đạt trước khi kế hoạch triển khai được xóa. Không khôi phục kế hoạch runtime cũ từ Git history. Effect V2 runtime đã đạt; tinh chỉnh hình ảnh 21 line effect là việc tùy chọn tách riêng, không phải gate hay nội dung chưa hoàn tất.
@@ -19,7 +19,7 @@
 
 - Firebase Hosting dùng chung project `memorymatchv1-1a` với ba site: target `production` → `memorymatchv1-1a`, target `beta` → `memorymatchv1-1b`, target `test` → `memorymatch-test`. `npm run deploy`, `npm run deploy:beta` và `npm run deploy:test` chỉ deploy đúng site tương ứng. Mỗi URL có storage trình duyệt riêng vì khác origin.
 
-- Kế hoạch hiện hành duy nhất: `ADVENTURE_WEB_PLAN.md` (2026-10-12), đã được giao triển khai toàn bộ phase 0–8 ngày 2026-10-13, kiểm tra/review và commit từng phase; phase 0 đã chốt, bắt đầu phase 1 dữ liệu/tiến trình/launch/kỷ lục local. Phạm vi: hành trình riêng từng trò; map bốn độ khó thường dùng chung mở khóa N+3, sao/điểm riêng; 100 màn + 10 rương mỗi chặng; thắng đủ 100 màn mới mở chặng sau; luôn đếm ngược; guest backup/Google link; Analytics; UI và cảnh chiến thắng nhẹ. Nhiệm vụ/cơ chế gameplay mới tạm hoãn để người dùng nghiên cứu; giữ luật và điều kiện thắng hiện hữu, không triển khai early-win hoặc HUD nhiệm vụ trong task menu/map. Trọng tâm phân tích hiện tại là bản đồ so với luồng chọn mode/session và thiết kế lại menu mobile. Các quyết định còn chờ và gate được ghi trong kế hoạch, không tự coi đề xuất là scope đã duyệt.
+- Kế hoạch hiện hành duy nhất: `ADVENTURE_WEB_PLAN.md` (2026-10-12), đã được giao triển khai toàn bộ phase 0–8 ngày 2026-10-13, kiểm tra/review và commit từng phase; phase 0–1 đã pass, bắt đầu phase 2 navigation/menu. Phạm vi: hành trình riêng từng trò; map bốn độ khó thường dùng chung mở khóa N+3, sao/điểm riêng; 100 màn + 10 rương mỗi chặng; thắng đủ 100 màn mới mở chặng sau; luôn đếm ngược; guest backup/Google link; Analytics; UI và cảnh chiến thắng nhẹ. Nhiệm vụ/cơ chế gameplay mới tạm hoãn để người dùng nghiên cứu; giữ luật và điều kiện thắng hiện hữu, không triển khai early-win hoặc HUD nhiệm vụ trong task menu/map. Trọng tâm phân tích hiện tại là bản đồ so với luồng chọn mode/session và thiết kế lại menu mobile. Các quyết định còn chờ và gate được ghi trong kế hoạch, không tự coi đề xuất là scope đã duyệt.
 - Rương tạm dùng ba gói Xu có phần cố định + ngẫu nhiên: Nhỏ 60 + 20–40 (70%), Vừa 100 + 30–60 (25%), Lớn 150 + 50–100 (5%); catalog/grants có thể mở rộng vật phẩm sau. Backend ranking cơ bản/mọi thời gian/có gửi lại offline đã được người dùng đồng ý. Agent review chỉ dùng khi cần với thay đổi rủi ro, chỉ đọc/test, không sửa/commit.
 - Yêu cầu triển khai mới: bốn nút đáy đồng nhất Cửa hàng → Bộ sưu tập → Xếp hạng → Cài đặt trên menu chính, bản đồ và gameplay. Menu chính/bản đồ chừa vùng quảng cáo riêng dưới dãy nút; gameplay ẩn cả vùng quảng cáo để lấy lại diện tích. Chưa gắn ad provider/ad unit và chưa được giao deploy Hosting hoặc nâng billing. Baseline trước sửa: npm run check/build pass; Firebase web app/CLI đã có, Firestore databases:list trả danh sách trống.
 - Tài liệu repository chỉ chứa thiết kế/kế hoạch của dự án. Nội dung nghiên cứu/tham khảo trò khác chỉ ở chat; không lưu tên, mô tả, bảng so sánh, đường dẫn hoặc tài nguyên của các trò đó vào dự án.
@@ -80,3 +80,5 @@ Các kế hoạch HUD, Startup, Triple/Effect/Theme, Runtime Closure và Board S
 - Mỗi contract có một test owner; không nhân mọi suite qua mọi viewport. Chỉ layout/hit target/overflow/presentation geometry cần matrix responsive.
 - Test/build pass không thay thế visual review, số đo hiệu suất hoặc nghiệm thu thực tế của người dùng.
 - `dist/`, `test-results/`, `playwright-report/`, `node_modules/` và manifest sinh là đầu ra có thể tạo lại, không phải source cần dọn thủ công trong task gameplay.
+
+Phase 1 (2026-10-13): check/build pass; browser adventure-data + cleanup 6/6 pass, review độc lập. Bundle JS 505,10 kB (gzip 138,91), sẽ tách tải ở phase 7; chưa tuyên bố FPS thiết bị thật.

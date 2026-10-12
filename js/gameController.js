@@ -49,7 +49,7 @@ import {
   resetGame,
   spendCoins,
 } from "./gameState.js";
-import { savePersistentGameData } from "./persistence.js";
+import { savePersistentGameData, isPersistenceBlocked } from "./persistence.js";
 import { getActiveSession } from "./sessionProgress.js";
 import { getTheme, getThemeSelectionEligibility } from "./themeCatalog.js";
 import { showAppToast } from "./modal.js";
@@ -59,10 +59,14 @@ import { GAMEPLAY_TIMING } from "./gameplayTuning.js";
 import { TIME_UP_PURCHASES } from "./shopCatalog.js";
 import { resolveSessionTiming } from "./sessionTiming.js";
 import { clearLootEffects } from "./lootEffects.js";
-import { commitMemoryThemeSession, saveMemorySession, stageMemorySession } from "./memorySession.js";
+import { commitMemoryThemeSession, getMemorySessionSnapshot, saveMemorySession, stageMemorySession } from "./memorySession.js";
 import { getMemoryShell } from "./memoryMatch/memoryShell.js";
 import { bindMemoryMenus } from "./gameMenu.js";
 import { clearTooltip } from "./tooltips.js";
+import { beginPlayMetrics, resumePlayMetrics } from "./playMetrics.js";
+import { prepareAdventureChapter, stageAdventureLevelStart, canAdvanceAdventure } from "./adventureLaunch.js";
+import { getChapterNumber } from "./adventureProgress.js";
+import { beginRankedAttempt, finalizeRankedRun } from "./rankingRules.js";
 
 let countdownInterval;
 let isAutoPaused = false;
@@ -86,7 +90,8 @@ export function continueMemorySession(session) {
 }
 
 export function restartMemoryLevel() {
-  const session = getActiveSession("memory-match", gameState.settings.mode);
+  const session = getActiveSession("memory-match", gameState.settings.mode)
+    || getMemorySessionSnapshot(activeAssetPaths.length ? { assetPaths: activeAssetPaths } : {});
   return initializeLevel(gameState.currentLevel, { reason: "restart", session });
 }
 
@@ -107,19 +112,22 @@ export function initializeLevel(level, { reason = "new", session = null } = {}) 
   const scope = getMemoryShell().mount({ cleanup: () => {
     stopCountdown();
     stopGridLayout();
-    if (isGameVisible() && scope.startup?.status === 'ready') persistMemorySession();
+    if (isGameVisible() && gameState.remainingTime > 0 && gameState.matchedPairs < gameState.totalPairs && scope.startup?.status === 'ready') void persistMemorySession();
     invalidateRound();
     resetLogicRuntime();
     clearLootEffects();
     clearGameplayRewardPopups();
     clearTooltip();
   } });
+  beginPlayMetrics(scope, { gameId: "memory-match", mode: requestedMode, level }, reason === "resume" ? session?.metrics || {} : null);
   bindMemoryMenus(scope, getMemoryShell().refs.root);
   const startup = createGameShellStartup(scope, getMemoryShell().refs, error => {
     console.error('Memory startup failed', error);
     showAppToast('Không thể chuẩn bị bàn chơi. Hãy chơi lại.');
   });
   return startup.run(async () => {
+  if (!await prepareAdventureChapter("memory-match", getChapterNumber(level), () => scope.active)) return null;
+  startup.check();
   stopCountdown();
   resetLogicRuntime();
   clearLootEffects();
@@ -137,7 +145,8 @@ export function initializeLevel(level, { reason = "new", session = null } = {}) 
   const layout = isChallengeMode(mode) ? getChallengeLayout(level) : modeLayout;
   const timing = resolveMemoryLevelTiming({ mode, level, modeLayout, reason, session });
   const roundId = beginRound();
-  const hintBonus = reason === "new" || reason === "advance"
+  const firstStart = !gameState.progress.memoryMatch.startedLevels?.[`${mode}:${level}`];
+  const hintBonus = (reason === "new" || reason === "advance") && firstStart
     ? getLevelHintBonus(level, gameState.progress.memoryMatch.items.hint)
     : 0;
   gameState.remainingTime = timing.remainingTime;
@@ -164,7 +173,6 @@ export function initializeLevel(level, { reason = "new", session = null } = {}) 
     history: reason === "resume" ? undefined : gameState.progress.themeSelectionHistory[themeId],
   }));
   await startup.yield();
-  gameState.progress.memoryMatch.items.hint += hintBonus;
   activeAssetPaths = selectedCards?.map((card) => card.assetPath).filter(Boolean) || [];
 
   gameState.moves = 0;
@@ -189,8 +197,14 @@ export function initializeLevel(level, { reason = "new", session = null } = {}) 
   showLevelRewardOverlay();
   await startup.phase('images', () => startup.decodeBoard());
   startup.check();
-  if (reason !== "resume" && activeAssetPaths.length) commitMemoryThemeSession(themeId, activeAssetPaths);
-  else persistMemorySession(true);
+  beginRankedAttempt("memory-match", mode, level, { reason, savedRun: session?.run });
+  stageAdventureLevelStart("memory-match", mode, level);
+  gameState.progress.memoryMatch.items.hint += hintBonus;
+  const committed = reason !== "resume" && activeAssetPaths.length
+    ? await commitMemoryThemeSession(themeId, activeAssetPaths) : await persistMemorySession(true);
+  if (!committed) return null;
+  updateHintDisplay(gameState.progress.memoryMatch.items.hint);
+  startup.check();
   showRevealTimerInHud(previewDurationMs / 1000, roundId);
   document.getElementById("btn-buy-time")?.toggleAttribute("hidden", isEndlessMode(mode));
   revealAndHideTiles(roundId, startCountdown, previewDurationMs);
@@ -200,11 +214,13 @@ export function initializeLevel(level, { reason = "new", session = null } = {}) 
 function startCountdown(roundId = gameState.roundId) {
   if (gameState.roundId !== roundId) return;
   stopCountdown();
+  resumePlayMetrics("startup");
   restoreBackgroundMusic(gameState.settings);
   startMemoryTimeProgress({ remainingSeconds: gameState.remainingTime, timeLimit: gameState.timeLimit });
   syncDefaultMusic(gameState.settings);
-  countdownInterval = setInterval(() => {
+  countdownInterval = setInterval(async () => {
     if (gameState.roundId !== roundId) return stopCountdown();
+    if (isPersistenceBlocked()) return stopCountdown();
     // Khóa thao tác chỉ bảo vệ lượt chọn/hiệu ứng; đồng hồ chỉ dừng khi game thật sự pause.
     if (gameState.isPaused) return;
 
@@ -213,7 +229,7 @@ function startCountdown(roundId = gameState.roundId) {
     sessionCheckpointTicks += 1;
     if (sessionCheckpointTicks >= GAMEPLAY_TIMING.sessionCheckpointSeconds) {
       sessionCheckpointTicks = 0;
-      persistMemorySession();
+      void persistMemorySession();
     }
     updateTimerDisplay(gameState.remainingTime);
     if (direction === "down" && gameState.remainingTime <= 0) handleTimeUp();
@@ -231,18 +247,18 @@ function isGameVisible() {
   return gameContainer?.style.display === "flex";
 }
 
-function pauseForBackground() {
+async function pauseForBackground() {
   // Âm thanh phải dừng ở mọi màn hình, kể cả menu và popup.
   if (isAutoPaused) return;
   shouldResumeMusic = isBackgroundMusicPlaying();
   pauseGameAudio();
 
   if (!isGameVisible() || gameState.isPaused) return;
-  persistMemorySession();
   isAutoPaused = true;
   gameState.isPaused = true;
   getMemoryShell().update({ paused: true });
   document.body.classList.add("game-is-paused");
+  await persistMemorySession();
 }
 
 function resumeFromBackground() {
@@ -260,9 +276,18 @@ function resumeFromBackground() {
 function handleTimeUp() {
   stopCountdown();
   invalidateRound();
+  void persistMemorySession();
   let actionSelected = false;
 
-  const returnToMenu = () => {
+  const returnToMenu = async () => {
+    const scope = getMemoryShell().scope;
+    if (gameState.settings.mode === "challenge") {
+      finalizeRankedRun("memory-match", "challenge", gameState.score);
+      delete gameState.progress.memoryMatch.sessionsByMode.challenge;
+      if (!await savePersistentGameData({ progress: gameState.progress })) return;
+    }
+    if (!scope.active) return;
+    getMemoryShell().unmount();
     resetGame();
     document
       .getElementById("game-container")
@@ -271,7 +296,9 @@ function handleTimeUp() {
     syncDefaultMusic(gameState.settings);
   };
 
-  const buyMoreTime = (seconds, price, close) => {
+  const buyMoreTime = async (seconds, price, close) => {
+    const scope = getMemoryShell().scope;
+    const expiredRoundId = gameState.roundId;
     const previousCoins = gameState.coins;
     const previousTiming = {
       remainingTime: gameState.remainingTime,
@@ -293,7 +320,7 @@ function handleTimeUp() {
       timeLimit: seconds,
       levelStartTime: gameState.levelStartTime,
     });
-    if (!savePersistentGameData({ coins: gameState.coins, progress: gameState.progress })) {
+    if (!(await savePersistentGameData({ coins: gameState.coins, progress: gameState.progress }))) {
       gameState.coins = previousCoins;
       Object.assign(gameState, previousTiming);
       if (previousSession) sessions[mode] = previousSession;
@@ -301,6 +328,7 @@ function handleTimeUp() {
       showBonusOverlay("Không thể lưu giao dịch. Xu và thời gian chưa thay đổi.");
       return true;
     }
+    if (!scope.active || gameState.roundId !== expiredRoundId) return true;
     // Đồng bộ HUD trước khi đóng modal: nếu không, số Xu cũ có thể lưu lại
     // đến tận lần nhận thưởng tiếp theo dù giao dịch đã được lưu thành công.
     updateCoinDisplay(gameState.coins);
@@ -354,7 +382,7 @@ function handleTimeUp() {
         label: `+${seconds} giây · ${price} Xu`,
         icon: "coin",
         variant: "time-purchase",
-        onClick: (close) => buyMoreTime(seconds, price, close),
+        onClick: async (close) => (await buyMoreTime(seconds, price, close)),
       })),
     ],
     onClose: () => {
@@ -364,16 +392,16 @@ function handleTimeUp() {
 
 }
 
-export function nextLevel() {
-  gameState.currentLevel += 1;
-  initializeLevel(gameState.currentLevel, { reason: "advance" });
+export function nextLevel(targetLevel = gameState.currentLevel + 1) {
+  const next = targetLevel;
+  if (!canAdvanceAdventure("memory-match", gameState.settings.mode, next)) return returnToMainMenu();
+  initializeLevel(next, { reason: "advance" });
 }
 
 export function returnToMainMenu() {
   getMemoryShell().unmount();
   stopCountdown();
   stopGridLayout();
-  persistMemorySession();
   isAutoPaused = false;
   document.body.classList.remove("game-is-paused");
   resetGame();
@@ -399,16 +427,17 @@ function resolveMemoryLevelTiming({ mode, level, modeLayout, reason, session }) 
   });
 }
 
-function persistMemorySession(allowStartup = false) {
+async function persistMemorySession(allowStartup = false) {
   const startup = getMemoryShell().scope?.startup;
   if (startup && startup.status !== 'ready' && !allowStartup) return false;
   if (!gameState.settings.mode || gameState.currentLevel < 1) return false;
-  return saveMemorySession(activeAssetPaths.length ? { assetPaths: activeAssetPaths } : {});
+  return (await saveMemorySession(activeAssetPaths.length ? { assetPaths: activeAssetPaths } : {}));
 }
 
-export function handleHintClick() {
+export async function handleHintClick() {
   if (gameState.isLocked || gameState.isPaused) return;
   if (gameState.progress.memoryMatch.items.hint <= 0) return showBonusOverlay("Bạn đã hết lượt gợi ý.");
+  const roundId = gameState.roundId;
   if (document.querySelector(".tile.selected")) {
     showBonusOverlay("Hãy hoàn thành lượt chọn hiện tại trước khi dùng gợi ý.");
     return;
@@ -430,12 +459,13 @@ export function handleHintClick() {
   if (!pair) return showBonusOverlay("Hiện không có cặp thẻ phù hợp để gợi ý.");
 
   gameState.progress.memoryMatch.items.hint -= 1;
-  if (!persistMemorySession()) {
+  if (!(await persistMemorySession())) {
     gameState.progress.memoryMatch.items.hint += 1;
     return showBonusOverlay("Không thể lưu lượt gợi ý. Hãy thử lại.");
   }
+  if (gameState.roundId !== roundId) return;
   updateHintDisplay(gameState.progress.memoryMatch.items.hint);
-  revealHintPair(pair.slice(0, 2), gameState.roundId);
+  revealHintPair(pair.slice(0, 2), roundId);
   showBonusOverlay("Đã lật 2 thẻ trong vài giây.");
 }
 
@@ -485,11 +515,11 @@ function revealHintPair(tiles, roundId) {
 
 configureLogic({ onNext: nextLevel, onMenu: returnToMainMenu });
 
-document.addEventListener("visibilitychange", () => {
-  if (document.hidden) pauseForBackground();
+document.addEventListener("visibilitychange", async () => {
+  if (document.hidden) (await pauseForBackground());
   else resumeFromBackground();
 });
 
-window.addEventListener("pagehide", () => {
-  if (isGameVisible()) persistMemorySession();
+window.addEventListener("pagehide", async () => {
+  if (isGameVisible()) (await persistMemorySession());
 });

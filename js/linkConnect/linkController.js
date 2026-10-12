@@ -12,7 +12,7 @@ import { clearLootEffects } from "../lootEffects.js";
 import { openAppModal, showAppToast } from "../modal.js";
 import { duckBackgroundMusicForVictory, pauseBackgroundMusic, restoreBackgroundMusic, sounds, syncDefaultMusic } from "../sound.js";
 import { getEquippedThemeId } from "../appearance.js";
-import { GAMEPLAY_TIMING, shouldShowVictoryCelebration } from "../gameplayTuning.js";
+import { GAMEPLAY_TIMING } from "../gameplayTuning.js";
 import {
   animateCoinCounter,
   calculateMatchCoinReward,
@@ -20,7 +20,11 @@ import {
   playCoinRewardFlight,
 } from "../coinRewards.js";
 import { gameState, increaseCoins, recordLinkConnectResult, spendCoins } from "../gameState.js";
-import { saveCoins, savePersistentGameData } from "../persistence.js";
+import { saveCoins, savePersistentGameData, isPersistenceBlocked } from "../persistence.js";
+import { beginPlayMetrics, resumePlayMetrics, snapshotPlayMetrics, finishPlayMetrics } from "../playMetrics.js";
+import { prepareAdventureChapter, stageAdventureLevelStart, canAdvanceAdventure } from "../adventureLaunch.js";
+import { getChapterNumber } from "../adventureProgress.js";
+import { beginRankedAttempt, finalizeRankedRun, getRankedRun, stageRankedAttempt } from "../rankingRules.js";
 import { getTheme, getThemeSelectionEligibility } from "../themeCatalog.js";
 import { GAME_MODES } from "../gameCatalog.js";
 import { TIME_UP_PURCHASES } from "../shopCatalog.js";
@@ -218,6 +222,7 @@ export function startLinkLevel({
   level = 1,
   resume = false,
   restart = false,
+  advance = false,
   gravityShift,
   specialProgress,
   specialNoEnergyDropStreak,
@@ -225,6 +230,8 @@ export function startLinkLevel({
   timeLimit,
   levelStartTime,
   assetPaths,
+  metrics,
+  run,
 } = {}) {
   const modeLayout = getLinkModeLayout(mode);
   const layout = getLinkBoardLayoutForViewport(isLinkChallengeMode(mode) ? getLinkChallengeLayout(level) : modeLayout);
@@ -244,12 +251,15 @@ export function startLinkLevel({
   pendingCompactLayout = null;
   linkTimeWarningPlayed = false;
   const scope = showLinkGame();
+  beginPlayMetrics(scope, { gameId: "link-connect", mode, level }, resume ? metrics || {} : null);
   const startup = createGameShellStartup(scope, getLinkShell().refs, error => {
     console.error('Link startup failed', error);
     showAppToast('Không thể chuẩn bị bàn chơi. Hãy chơi lại.');
   });
   linkGameState.isLocked = true;
   return startup.run(async () => {
+  if (!await prepareAdventureChapter("link-connect", getChapterNumber(level), () => scope.active)) return null;
+  startup.check();
   const board = await startup.phase('prepare', () => createLinkBoard({
     layout,
     themeId,
@@ -262,7 +272,6 @@ export function startLinkLevel({
   if (level === 1 && !resume && !restart) {
     linkGameState.specialProgress = 0;
     linkGameState.specialNoEnergyDropStreak = 0;
-    clearActiveSession("link-connect", mode);
   } else if (resume) {
     const progressTarget = LINK_CONNECT_CONFIG.special.progressTarget;
     if (Number.isFinite(specialProgress)) {
@@ -292,10 +301,6 @@ export function startLinkLevel({
   linkGameState.timeLimit = timing.timeLimit;
   linkGameState.levelStartTime = timing.levelStartTime;
   linkSessionCheckpointTicks = 0;
-  if (!resume && !restart) {
-    const hintBonus = getLinkLevelHintBonus(level, getLinkItemCount("hint"));
-    if (hintBonus > 0) grantLinkItem("hint", hintBonus);
-  }
   await startup.yield();
   await startup.phase('render', () => renderLinkBoardStartup(board, { onTileClick: handleLinkTileClick, onCompactLandscapeChange: handleLinkCompactLandscapeChange }, startup));
   await startup.yield();
@@ -322,8 +327,14 @@ export function startLinkLevel({
   });
   await startup.phase('images', () => startup.decodeBoard());
   startup.check();
-  if (!resume && activeAssetPaths.length) commitThemeSession("link-connect", createLinkSession(), themeId, activeAssetPaths);
-  else persistLinkRunProgress(true);
+  beginRankedAttempt("link-connect", mode, level, { reason: resume ? "resume" : restart ? "restart" : advance ? "advance" : "new", savedRun: run });
+  if (stageAdventureLevelStart("link-connect", mode, level) && !resume && !restart) {
+    gameState.progress.linkConnect.items.hint += getLinkLevelHintBonus(level, getLinkItemCount("hint"));
+  }
+  const committed = !resume && activeAssetPaths.length
+    ? await commitThemeSession("link-connect", createLinkSession(), themeId, activeAssetPaths) : await persistLinkRunProgress(true);
+  if (!committed) return null;
+  startup.check();
   imagesReady = true;
   activateWhenReady();
   });
@@ -335,10 +346,14 @@ export function continueLinkSession(session) {
 }
 
 export function returnToLinkMenu() {
+  if (!linkGameState.isCompleted && linkGameState.remainingTime <= 0 && linkGameState.mode === "challenge") {
+    finalizeRankedRun("link-connect", linkGameState.mode, linkGameState.score);
+    delete gameState.progress.linkConnect.sessionsByMode.challenge;
+    void savePersistentGameData({ progress: gameState.progress });
+  }
   getLinkShell().unmount();
   stopCountdown();
   stopLinkBoardLayout();
-  if (isLinkGameVisible()) persistLinkRunProgress();
   clearGameplayRewardPopups();
   resetLinkGame();
   selectedPosition = null;
@@ -361,7 +376,8 @@ function showLinkGame() {
   const scope = getLinkShell().mount({ cleanup: () => {
     stopCountdown();
     stopLinkBoardLayout();
-    if (scope.startup?.status === 'ready') persistLinkRunProgress();
+    const endedChallenge = linkGameState.mode === "challenge" && linkGameState.remainingTime <= 0;
+    if (scope.startup?.status === 'ready' && !linkGameState.isCompleted && !endedChallenge) void persistLinkRunProgress();
     clearGameplayRewardPopups();
     clearLinkPath();
     clearLinkTileHints();
@@ -373,8 +389,8 @@ function showLinkGame() {
   return scope;
 }
 
-function runLinkGameAction(action) {
-  if (action === "menu") return returnToLinkMenu();
+async function runLinkGameAction(action) {
+  if (action === "menu") return (await returnToLinkMenu());
   if (action === "restart") {
     return startLinkLevel({ mode: linkGameState.mode, level: linkGameState.level, restart: true });
   }
@@ -421,7 +437,7 @@ function resumeLinkAfterShop() {
   updateLinkHud();
 }
 
-function handleLinkTileClick(position) {
+async function handleLinkTileClick(position) {
   if (linkGameState.isLocked || linkGameState.isPaused) return;
   const tile = getLinkBoardTile(linkGameState.board, position);
   if (!tile || tile.frozen) return;
@@ -482,58 +498,65 @@ function handleLinkTileClick(position) {
   });
   linkGameState.score += matchPoints;
   drawLinkPath(path, linkGameState.board);
-  if (isSpecialMatch && shouldDropLinkEnergy()) {
-    const energyProgress = reserveLinkEnergy(roundId, board);
+  const dropsEnergy = isSpecialMatch && (await shouldDropLinkEnergy());
+  if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
+  if (dropsEnergy) {
+    const energyProgress = (await reserveLinkEnergy(roundId, board));
+    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
     playLinkEnergyFlight(selectedPosition, position, {
       targetProgress: energyProgress,
       progressTarget: LINK_CONNECT_CONFIG.special.progressTarget,
-      onArrive: () => collectLinkEnergy(roundId, board),
+      onArrive: async () => (await collectLinkEnergy(roundId, board)),
     });
   }
   const matchedTiles = playLinkMatchExit(selectedPosition, position);
   const matchRewardCoins = calculateMatchCoinReward(linkGameState.combo);
   const matchRewardAnchor = matchedTiles[1] || matchedTiles[0];
-  awardLinkCoins(matchRewardCoins, matchRewardAnchor);
+  (await awardLinkCoins(matchRewardCoins, matchRewardAnchor));
+  if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
   showScoreEffect(matchedTiles[0], matchPoints);
   showComboEffect(matchedTiles[1] || matchedTiles[0], linkGameState.combo);
-  setTimeout(() => {
+  setTimeout(async () => {
     // Người chơi có thể khởi động màn khác trước khi hiệu ứng kết thúc.
     // Khi đó callback cũ không được phép thay đổi trạng thái của bàn mới.
     if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
     removeLinkBoardPair(board, matchedStart, position);
     linkGameState.matchedPairs += 1;
     const premiumReward = isSpecialMatch
-      ? applyPremiumMatchReward(premiumType, matchedTiles[0])
+      ? (await applyPremiumMatchReward(premiumType, matchedTiles[0]))
       : { triggerPairBreak: false };
-    if (firstTile.luckyReward) applyLinkLuckyReward(firstTile.luckyReward, matchedTiles[1] || matchedTiles[0]);
+    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
+    if (firstTile.luckyReward) (await applyLinkLuckyReward(firstTile.luckyReward, matchedTiles[1] || matchedTiles[0]));
+    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
     const boardShifted = applyLinkGravityShift(board, linkGameState.gravityShift);
     selectedPosition = null;
     clearLinkPath();
     if (boardShifted) renderLinkBoardShift(linkGameState.board, { onTileClick: handleLinkTileClick });
     else clearLinkMatchedPair(matchedStart, position);
-    const finishResolution = () => {
+    const finishResolution = async () => {
+    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
       updateLinkHud();
       if (linkGameState.matchedPairs >= linkGameState.totalPairs) {
-        completeLinkLevel();
+        (await completeLinkLevel());
         return;
       }
       recoverBlockedLinkBoard(linkGameState.board);
       playPendingBoardTransforms();
       if (linkGameState.pendingSpecialMilestones.length) {
-        processPendingSpecialMilestones(roundId, board);
+        (await processPendingSpecialMilestones(roundId, board));
         return;
       }
       unlockLinkBoard();
     };
     if (premiumReward.triggerPairBreak && linkGameState.matchedPairs < linkGameState.totalPairs) {
-      playAutomaticPairBreak(roundId, board, finishResolution, { scoreMode: "combo" });
+      (await playAutomaticPairBreak(roundId, board, finishResolution, { scoreMode: "combo" }));
       return;
     }
-    finishResolution();
+    (await finishResolution());
   }, getLinkMatchResolveDelay());
 }
 
-function useLinkItem(id) {
+async function useLinkItem(id) {
   if (linkGameState.isLocked || linkGameState.isPaused || isLinkBoardMoving()) return;
   if (id === "freeze" && isLinkEndlessMode(linkGameState.mode)) {
     showAppToast("Chế độ Vô tận không dùng đóng băng thời gian.");
@@ -544,7 +567,13 @@ function useLinkItem(id) {
     showAppToast("Không có đường nối khả dụng để gợi ý.");
     return;
   }
-  if (!consumeLinkItem(id)) {
+  const roundId = linkGameState.roundId;
+  const board = linkGameState.board;
+  linkGameState.isLocked = true;
+  const consumed = await consumeLinkItem(id);
+  if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
+  linkGameState.isLocked = false;
+  if (!consumed) {
     showAppToast("Bạn chưa có vật phẩm này.");
     return;
   }
@@ -631,7 +660,7 @@ function playNextThunderStrike(pairs, index, roundId, board, colorId) {
     if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
     affectedTiles = playLinkMatchExit(start, end);
   }, LINK_CONNECT_TIMING.thunderCardExitDelayMs);
-  setTimeout(() => {
+  setTimeout(async () => {
     strike?.remove();
     if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
     applyThunderPairScore("normal", affectedTiles[0]);
@@ -646,7 +675,7 @@ function playNextThunderStrike(pairs, index, roundId, board, colorId) {
       );
       return;
     }
-    finishLinkThunder(board, roundId);
+    (await finishLinkThunder(board, roundId));
   }, getLinkThunderResolveDelay());
 }
 
@@ -654,10 +683,10 @@ function getThunderColor(pairCount) {
   return pairCount === 1 ? "yellow" : pairCount === 2 ? "blue" : "red";
 }
 
-function finishLinkThunder(board, roundId) {
+async function finishLinkThunder(board, roundId) {
   if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
   if (linkGameState.matchedPairs >= linkGameState.totalPairs) {
-    completeLinkLevel();
+    (await completeLinkLevel());
     return;
   }
   const boardShifted = applyLinkGravityShift(board, linkGameState.gravityShift);
@@ -723,8 +752,12 @@ function unlockLinkBoard() {
   applyPendingLinkCompactLayout();
 }
 
-function completeLinkLevel() {
+async function completeLinkLevel() {
   if (linkGameState.isCompleted) return;
+  const roundId = linkGameState.roundId;
+  const durationMs = finishPlayMetrics();
+  const rollback = { coins: gameState.coins, score: linkGameState.score, progress: structuredClone(gameState.progress.linkConnect) };
+  const previousChapter = gameState.progress.linkConnect.adventure?.currentChapter || 1;
   linkGameState.isCompleted = true;
   stopCountdown();
   linkGameState.isLocked = true;
@@ -743,12 +776,24 @@ function completeLinkLevel() {
     level: linkGameState.level,
     score: linkGameState.score,
     stars,
+    durationMs,
   });
-  awardLinkCoins(coinsEarned, null, { animate: false, persist: false });
-  if (!savePersistentGameData({ coins: gameState.coins, progress: gameState.progress })) {
-    showAppToast("Không thể lưu kết quả lúc này. Tiến trình vẫn được giữ trong lượt chơi.");
+  (await awardLinkCoins(coinsEarned, null, { animate: false, persist: false }));
+  if (linkGameState.roundId !== roundId) return;
+  stageRankedAttempt("link-connect", linkGameState.mode, linkGameState.score, true);
+  delete gameState.progress.linkConnect.sessionsByMode?.[linkGameState.mode];
+  if (!(await savePersistentGameData({ coins: gameState.coins, progress: gameState.progress }))) {
+    if (linkGameState.roundId === roundId) {
+      gameState.coins = rollback.coins;
+      linkGameState.score = rollback.score;
+      gameState.progress.linkConnect = rollback.progress;
+    }
+    return;
   }
+  if (linkGameState.roundId !== roundId) return;
   updateLinkHud();
+  const completedChapter = gameState.progress.linkConnect.adventure?.currentChapter > previousChapter ? previousChapter : null;
+  const nextLevel = completedChapter ? gameState.progress.linkConnect.adventure.firstLevel : linkGameState.level + 1;
   const completion = {
     fireworksContainerId: "link-connect-container",
     level: linkGameState.level,
@@ -762,9 +807,11 @@ function completeLinkLevel() {
     luckyAwards: linkGameState.luckyAwards,
     settings: { ...gameState.settings, mode: linkGameState.mode },
     onMenu: returnToLinkMenu,
-    onNext: () => startLinkLevel({ mode: linkGameState.mode, level: linkGameState.level + 1 }),
+    completedChapter,
+    onNext: () => canAdvanceAdventure("link-connect", linkGameState.mode, nextLevel)
+      ? startLinkLevel({ mode: linkGameState.mode, level: nextLevel, advance: true }) : returnToLinkMenu(),
   };
-  if (canShowFullVictoryCelebration && shouldShowVictoryCelebration(linkGameState.level)) {
+  if (canShowFullVictoryCelebration && completion.completedChapter) {
     showLevelSummaryOverlay({
       ...completion,
       isVictoryCelebration: true,
@@ -775,11 +822,11 @@ function completeLinkLevel() {
   }
 }
 
-function applyLinkLuckyReward(reward, anchor) {
+async function applyLinkLuckyReward(reward, anchor) {
   playLinkSound("bonus");
   linkGameState.luckyAwards.push(reward);
   if (reward.type === "coins") {
-    awardLinkCoins(reward.value, anchor);
+    (await awardLinkCoins(reward.value, anchor));
     showGameplayRewardEffect(anchor, { type: "coins", value: reward.value });
     return;
   }
@@ -796,11 +843,13 @@ function playLinkSound(name) {
 }
 
 function startCountdown(roundId) {
+  resumePlayMetrics("startup");
   stopCountdown();
   restoreBackgroundMusic(gameState.settings);
   startLinkTimeProgress(roundId);
   syncDefaultMusic(gameState.settings);
-  countdownInterval = setInterval(() => {
+  countdownInterval = setInterval(async () => {
+    if (isPersistenceBlocked()) return stopCountdown();
     // isLocked chỉ khóa input trong lúc board đổi trạng thái; không được làm dừng đồng hồ.
     if (linkGameState.roundId !== roundId || linkGameState.isPaused) return;
     if (linkGameState.freezeSeconds > 0) {
@@ -813,7 +862,7 @@ function startCountdown(roundId) {
     linkSessionCheckpointTicks += 1;
     if (linkSessionCheckpointTicks >= GAMEPLAY_TIMING.sessionCheckpointSeconds) {
       linkSessionCheckpointTicks = 0;
-      persistLinkRunProgress();
+      void persistLinkRunProgress();
     }
     syncLinkTimeProgress();
     updateLinkTimerHud();
@@ -833,8 +882,10 @@ function handleLinkTimeUp() {
   pauseBackgroundMusic();
   playLinkSound("defeat");
   let actionSelected = false;
-  const returnToMenu = () => returnToLinkMenu();
-  const buyMoreTime = (seconds, price, close) => {
+  const returnToMenu = async () => (await returnToLinkMenu());
+  const buyMoreTime = async (seconds, price, close) => {
+    const scope = getLinkShell().scope;
+    const expiredRoundId = linkGameState.roundId;
     const previousCoins = gameState.coins;
     const previousTiming = {
       remainingTime: linkGameState.remainingTime,
@@ -862,7 +913,7 @@ function handleLinkTimeUp() {
       timeLimit: seconds,
       levelStartTime: linkGameState.levelStartTime,
     });
-    if (!savePersistentGameData({ coins: gameState.coins, progress: gameState.progress })) {
+    if (!(await savePersistentGameData({ coins: gameState.coins, progress: gameState.progress }))) {
       gameState.coins = previousCoins;
       Object.assign(linkGameState, previousTiming);
       if (previousSession) sessions[linkGameState.mode] = previousSession;
@@ -870,6 +921,7 @@ function handleLinkTimeUp() {
       showAppToast("Không thể lưu giao dịch. Xu và thời gian chưa thay đổi.");
       return true;
     }
+    if (!scope.active || linkGameState.roundId !== expiredRoundId) return true;
     updateCoinDisplay(gameState.coins);
     updateLinkCoinHud();
     actionSelected = true;
@@ -881,7 +933,7 @@ function handleLinkTimeUp() {
     showAppToast(`Đã mua +${seconds}s với ${price} Xu.`);
     playLinkSound("bonus");
     syncDefaultMusic(gameState.settings);
-    setTimeout(() => startCountdown(linkGameState.roundId), LINK_CONNECT_TIMING.countdownResumeDelayMs);
+    setTimeout(() => startCountdown(expiredRoundId), LINK_CONNECT_TIMING.countdownResumeDelayMs);
     return true;
   };
   openTimeUpModal({
@@ -890,10 +942,10 @@ function handleLinkTimeUp() {
         label: "Về Menu",
         icon: "home",
         variant: "secondary",
-        onClick: (close) => {
+        onClick: async (close) => {
           actionSelected = true;
           close();
-          returnToMenu();
+          (await returnToMenu());
         },
       },
       {
@@ -910,11 +962,11 @@ function handleLinkTimeUp() {
         label: `+${seconds} giây · ${price} Xu`,
         icon: "coin",
         variant: "time-purchase",
-        onClick: (close) => buyMoreTime(seconds, price, close),
+        onClick: async (close) => (await buyMoreTime(seconds, price, close)),
       })),
     ],
-    onClose: () => {
-      if (!actionSelected) returnToMenu();
+    onClose: async () => {
+      if (!actionSelected) (await returnToMenu());
     },
   });
 }
@@ -949,12 +1001,14 @@ function updateLinkCoinHud(hud = getLinkHudElements()) {
   if (!isCoinCounterAnimating(hud.coinBalance)) getLinkHud(hud).coins(gameState.coins);
 }
 
-function awardLinkCoins(amount, anchor, { animate = true, persist = true } = {}) {
+async function awardLinkCoins(amount, anchor, { animate = true, persist = true } = {}) {
+  const roundId = linkGameState.roundId;
+  const board = linkGameState.board;
   const value = Math.max(0, Math.floor(Number(amount) || 0));
   if (value < 1) return 0;
   const previousCoins = gameState.coins;
   increaseCoins(value);
-  if (persist && !saveCoins(gameState.coins)) {
+  if (persist && !(await saveCoins(gameState.coins))) {
     gameState.coins = previousCoins;
     showAppToast("Không thể lưu phần thưởng Xu lúc này.");
     return 0;
@@ -1051,7 +1105,7 @@ function updateLinkSpecialMilestones(hud = getLinkHudElements()) {
     descriptions: hud.milestones.map((_, index) => linkGameState.specialMilestoneRewards[index + 1] || getLinkSpecialMilestoneTooltip(index + 1)) });
 }
 
-function shouldDropLinkEnergy() {
+async function shouldDropLinkEnergy() {
   const energy = LINK_CONNECT_CONFIG.special.energyDrop;
   if (
     linkGameState.specialProgress + linkGameState.pendingEnergyCollections
@@ -1066,18 +1120,19 @@ function shouldDropLinkEnergy() {
     return true;
   }
   linkGameState.specialNoEnergyDropStreak += 1;
-  persistLinkRunProgress();
+  (await persistLinkRunProgress());
   return false;
 }
 
-function reserveLinkEnergy(roundId, board) {
+async function reserveLinkEnergy(roundId, board) {
   if (linkGameState.roundId !== roundId || linkGameState.board !== board) return 0;
   linkGameState.pendingEnergyCollections += 1;
-  persistLinkRunProgress();
+  (await persistLinkRunProgress());
+  if (linkGameState.roundId !== roundId || linkGameState.board !== board) return 0;
   return linkGameState.specialProgress + linkGameState.pendingEnergyCollections;
 }
 
-function collectLinkEnergy(roundId, board) {
+async function collectLinkEnergy(roundId, board) {
   if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
   linkGameState.pendingEnergyCollections = Math.max(0, linkGameState.pendingEnergyCollections - 1);
   linkGameState.specialProgress = Math.min(
@@ -1085,23 +1140,27 @@ function collectLinkEnergy(roundId, board) {
     linkGameState.specialProgress + 1,
   );
   const reachedProgress = linkGameState.specialProgress;
-  persistLinkRunProgress();
+  (await persistLinkRunProgress());
+    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
   updateLinkHud();
-  queueLinkEnergyMilestone(reachedProgress, roundId, board);
+  (await queueLinkEnergyMilestone(reachedProgress, roundId, board));
 }
 
-function queueLinkEnergyMilestone(progress, roundId, board) {
+async function queueLinkEnergyMilestone(progress, roundId, board) {
   if (!progress || linkGameState.roundId !== roundId || linkGameState.board !== board) return;
   linkGameState.pendingSpecialMilestones.push(progress);
-  if (!linkGameState.isLocked) processPendingSpecialMilestones(roundId, board);
+  if (!linkGameState.isLocked) (await processPendingSpecialMilestones(roundId, board));
 }
 
-function applyPremiumMatchReward(premiumType, anchor) {
+async function applyPremiumMatchReward(premiumType, anchor) {
+  const roundId = linkGameState.roundId;
+  const board = linkGameState.board;
   const definition = getLinkPremiumTypeDefinition(premiumType);
   if (definition.id === "blue") {
     if (Math.random() >= definition.effectChance) return { triggerPairBreak: false };
     const itemId = getLinkPremiumSupplyItem(linkGameState.mode);
-    grantAndAnimateLinkItem(itemId, anchor);
+    (await grantAndAnimateLinkItem(itemId, anchor));
+    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
     return { triggerPairBreak: false };
   }
   if (definition.id === "red") {
@@ -1115,7 +1174,8 @@ function applyPremiumMatchReward(premiumType, anchor) {
   const range = special.frozenFallbackReward[rewardType === "coins" ? "coin" : "time"];
   const value = randomInteger(range.min, range.max);
   if (rewardType === "coins") {
-    awardLinkCoins(value, anchor);
+    (await awardLinkCoins(value, anchor));
+    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
   } else {
     linkGameState.remainingTime += value;
     syncLinkTimeProgress();
@@ -1124,7 +1184,7 @@ function applyPremiumMatchReward(premiumType, anchor) {
   return { triggerPairBreak: false };
 }
 
-function processPendingSpecialMilestones(roundId, board) {
+async function processPendingSpecialMilestones(roundId, board) {
   if (linkGameState.isResolvingSpecialMilestone || linkGameState.roundId !== roundId || linkGameState.board !== board) return;
   const progress = linkGameState.pendingSpecialMilestones.shift();
   if (!progress) {
@@ -1133,29 +1193,33 @@ function processPendingSpecialMilestones(roundId, board) {
   }
   linkGameState.isResolvingSpecialMilestone = true;
   const anchor = getLinkHudElements().specialTrack;
-  const finish = () => {
+  const finish = async () => {
+    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
     linkGameState.isResolvingSpecialMilestone = false;
     if (progress >= LINK_CONNECT_CONFIG.special.progressTarget) linkGameState.specialProgress = 0;
-    persistLinkRunProgress();
+    (await persistLinkRunProgress());
+    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
     updateLinkHud();
-    if (linkGameState.matchedPairs >= linkGameState.totalPairs) return completeLinkLevel();
+    if (linkGameState.matchedPairs >= linkGameState.totalPairs) return (await completeLinkLevel());
     recoverBlockedLinkBoard(board);
-    processPendingSpecialMilestones(roundId, board);
+    (await processPendingSpecialMilestones(roundId, board));
   };
-  const rewardPairBreak = () => playAutomaticPairBreak(roundId, board, finish);
+  const rewardPairBreak = async () => (await playAutomaticPairBreak(roundId, board, finish));
   if (progress === 1 || progress === 3) {
     linkGameState.specialMilestoneRewards[progress] = "Phá 1 cặp thường ngẫu nhiên.";
-    rewardPairBreak();
+    (await rewardPairBreak());
   } else if (progress === 2) {
     const coins = LINK_CONNECT_CONFIG.special.milestones.two.coins;
-    awardLinkCoins(coins, anchor);
+    (await awardLinkCoins(coins, anchor));
+    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
     showGameplayRewardEffect(anchor, { type: "coins", value: coins });
     linkGameState.specialMilestoneRewards[progress] = `+${coins} Xu.`;
-    finish();
+    (await finish());
   } else if (progress === 4) {
     const rules = LINK_CONNECT_CONFIG.special.milestones.four;
     if (isLinkEndlessMode(linkGameState.mode)) {
-      awardLinkCoins(rules.fallbackCoins, anchor);
+      (await awardLinkCoins(rules.fallbackCoins, anchor));
+    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
       showGameplayRewardEffect(anchor, { type: "coins", value: rules.fallbackCoins });
       linkGameState.specialMilestoneRewards[progress] = `+${rules.fallbackCoins} Xu.`;
     } else {
@@ -1165,14 +1229,15 @@ function processPendingSpecialMilestones(roundId, board) {
       showGameplayRewardEffect(anchor, { type: "time", value: seconds });
       linkGameState.specialMilestoneRewards[progress] = `+${seconds}s.`;
     }
-    finish();
+    (await finish());
   } else if (progress === 5) {
     const item = Math.random() < 0.5 ? "hint" : "reshuffle";
-    const granted = grantAndAnimateLinkItem(item, anchor);
+    const granted = (await grantAndAnimateLinkItem(item, anchor));
+    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
     linkGameState.specialMilestoneRewards[progress] = granted
       ? `+1 ${item === "hint" ? "Gợi ý" : "Xáo trộn"}.`
       : "Không thể lưu vật phẩm thưởng.";
-    finish();
+    (await finish());
   } else if (progress === 6) {
     const rules = LINK_CONNECT_CONFIG.special.milestones.six;
     const thawedPairs = unlockFrozenLinkPairs(board, rules.frozenPairs, { onUnlock: rememberFrozenPairForTransform });
@@ -1180,11 +1245,12 @@ function processPendingSpecialMilestones(roundId, board) {
       linkGameState.specialMilestoneRewards[progress] = "Mở 1 cặp băng.";
       playPendingBoardTransforms();
     } else {
-      awardLinkCoins(rules.fallbackCoins, anchor);
+      (await awardLinkCoins(rules.fallbackCoins, anchor));
+    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
       showGameplayRewardEffect(anchor, { type: "coins", value: rules.fallbackCoins });
       linkGameState.specialMilestoneRewards[progress] = `Hết băng: +${rules.fallbackCoins} Xu.`;
     }
-    finish();
+    (await finish());
   } else if (progress === 7) {
     const rules = LINK_CONNECT_CONFIG.special.milestones.seven;
     const seconds = randomInteger(rules.time.min, rules.time.max);
@@ -1193,40 +1259,48 @@ function processPendingSpecialMilestones(roundId, board) {
       syncLinkTimeProgress();
       showGameplayRewardEffect(anchor, { type: "time", value: seconds });
     }
-    awardLinkCoins(rules.coins, anchor);
+    (await awardLinkCoins(rules.coins, anchor));
+    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
     showGameplayRewardEffect(anchor, { type: "coins", value: rules.coins });
     linkGameState.specialMilestoneRewards[progress] = isLinkEndlessMode(linkGameState.mode)
       ? `+${rules.coins} Xu.`
       : `+${seconds}s và +${rules.coins} Xu.`;
-    finish();
+    (await finish());
   } else if (progress === 8) {
     const rules = LINK_CONNECT_CONFIG.special.milestones.eight;
     const itemId = isLinkEndlessMode(linkGameState.mode) ? rules.endlessItem : rules.standardItem;
-    const granted = grantAndAnimateLinkItem(itemId, anchor);
+    const granted = (await grantAndAnimateLinkItem(itemId, anchor));
+    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
     linkGameState.specialMilestoneRewards[progress] = granted
       ? `+1 ${itemId === "freeze" ? "Đóng băng thời gian" : "Xáo trộn"}.`
       : "Không thể lưu vật phẩm thưởng.";
-    finish();
+    (await finish());
   } else if (progress === 9 || progress === 10) {
-    const hintGranted = grantAndAnimateLinkItem("hint", anchor);
+    const hintGranted = (await grantAndAnimateLinkItem("hint", anchor));
+    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
     if (progress === 10) {
       const coins = LINK_CONNECT_CONFIG.special.milestones.ten.coins;
-      awardLinkCoins(coins, anchor);
-      const reshuffleGranted = grantAndAnimateLinkItem("reshuffle", anchor, { delayMs: 180 });
+      (await awardLinkCoins(coins, anchor));
+    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
+      const reshuffleGranted = (await grantAndAnimateLinkItem("reshuffle", anchor, { delayMs: 180 }));
+    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
       showGameplayRewardEffect(anchor, { type: "coins", value: coins });
       linkGameState.specialMilestoneRewards[progress] = `+${coins} Xu${reshuffleGranted ? ", +1 Xáo trộn" : ""}${hintGranted ? ", +1 Gợi ý" : ""} và phá cặp.`;
     } else linkGameState.specialMilestoneRewards[progress] = hintGranted
       ? "+1 Gợi ý và phá 1 cặp thường."
       : "Phá 1 cặp thường; không thể lưu Gợi ý thưởng.";
-    rewardPairBreak();
-  } else finish();
+    (await rewardPairBreak());
+  } else (await finish());
 }
 
-function grantAndAnimateLinkItem(itemId, anchor, { delayMs = 0 } = {}) {
-  if (!grantLinkItem(itemId)) {
+async function grantAndAnimateLinkItem(itemId, anchor, { delayMs = 0 } = {}) {
+  const roundId = linkGameState.roundId;
+  const board = linkGameState.board;
+  if (!(await grantLinkItem(itemId))) {
     showAppToast("Không thể lưu vật phẩm thưởng lúc này.");
     return false;
   }
+  if (linkGameState.roundId !== roundId || linkGameState.board !== board) return false;
   showGameplayRewardEffect(anchor, { type: itemId, value: 1 });
   playLinkItemRewardFlight(anchor, itemId, { delayMs });
   return true;
@@ -1257,7 +1331,7 @@ function recoverBlockedLinkBoard(board) {
   return false;
 }
 
-function playAutomaticPairBreak(roundId, board, onComplete, { scoreMode = "none" } = {}) {
+async function playAutomaticPairBreak(roundId, board, onComplete, { scoreMode = "none" } = {}) {
   const milestone = LINK_CONNECT_CONFIG.special.milestones;
   const pair = removeRandomLinkPair(board, {
     remove: false,
@@ -1268,7 +1342,8 @@ function playAutomaticPairBreak(roundId, board, onComplete, { scoreMode = "none"
   });
   if (!pair) {
     const anchor = getLinkHudElements().specialTrack;
-    awardLinkCoins(milestone.breakCoins, anchor);
+    (await awardLinkCoins(milestone.breakCoins, anchor));
+    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
     showGameplayRewardEffect(anchor, { type: "coins", value: milestone.breakCoins });
     onComplete();
     return;
@@ -1350,13 +1425,15 @@ function randomInteger(minimum, maximum) {
   return minimum + Math.floor(Math.random() * (maximum - minimum + 1));
 }
 
-function persistLinkRunProgress(allowStartup = false) {
+async function persistLinkRunProgress(allowStartup = false) {
   const startup = getLinkShell().scope?.startup;
   if (startup && startup.status !== 'ready' && !allowStartup) return false;
-  saveActiveSession("link-connect", createLinkSession());
+  if (linkGameState.isCompleted) return await savePersistentGameData({ progress: gameState.progress });
+  return await saveActiveSession("link-connect", createLinkSession());
 }
 
 function createLinkSession() {
+  stageRankedAttempt("link-connect", linkGameState.mode, linkGameState.score, linkGameState.isCompleted);
   return {
     mode: linkGameState.mode,
     level: linkGameState.level,
@@ -1366,6 +1443,8 @@ function createLinkSession() {
     remainingTime: linkGameState.remainingTime,
     timeLimit: linkGameState.timeLimit,
     levelStartTime: linkGameState.levelStartTime,
+    metrics: snapshotPlayMetrics({ gameId: "link-connect", mode: linkGameState.mode, level: linkGameState.level }),
+    run: getRankedRun("link-connect", linkGameState.mode),
     ...(activeAssetPaths.length ? { assetPaths: activeAssetPaths } : {}),
   };
 }
@@ -1397,13 +1476,13 @@ function isLinkGameVisible() {
   return Boolean(container && !container.hasAttribute("hidden"));
 }
 
-function pauseLinkForBackground() {
+async function pauseLinkForBackground() {
   if (!isLinkGameVisible()) return;
-  persistLinkRunProgress();
   if (linkGameState.isPaused) return;
   isLinkAutoPaused = true;
   linkGameState.isPaused = true;
   getLinkShell().update({ paused: true });
+  await persistLinkRunProgress();
 }
 
 function resumeLinkFromBackground() {
@@ -1421,13 +1500,13 @@ function stopCountdown() {
   stopLinkComboWindow();
 }
 
-document.addEventListener("visibilitychange", () => {
-  if (document.hidden) pauseLinkForBackground();
+document.addEventListener("visibilitychange", async () => {
+  if (document.hidden) (await pauseLinkForBackground());
   else resumeLinkFromBackground();
 });
 
-window.addEventListener("pagehide", () => {
-  if (isLinkGameVisible()) persistLinkRunProgress();
+window.addEventListener("pagehide", async () => {
+  if (isLinkGameVisible()) (await persistLinkRunProgress());
 });
 
 function startLinkComboWindow(durationMs, matchedAt, roundId, board) {

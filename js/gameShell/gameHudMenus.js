@@ -1,7 +1,10 @@
 /** One exclusive menu state per HUD mount, owned by its lifecycle scope. */
+import { getActivePlayMetrics } from "../playMetrics.js";
 export function bindGameHudMenus(scope, entries) {
   let menus = entries;
   let current = null;
+  let pausedMetrics = null;
+  const pauseReason = {};
   const close = () => {
     for (const { trigger, panel } of menus) {
       panel.hidden = true;
@@ -9,6 +12,8 @@ export function bindGameHudMenus(scope, entries) {
       trigger.classList.remove("is-open");
     }
     current = null;
+    pausedMetrics?.clock.resume(pauseReason);
+    pausedMetrics = null;
   };
   close();
   for (const entry of menus) {
@@ -17,6 +22,8 @@ export function bindGameHudMenus(scope, entries) {
       close();
       if (!opening) return;
       current = entry;
+      pausedMetrics = getActivePlayMetrics();
+      pausedMetrics?.clock.pause(pauseReason);
       entry.panel.hidden = false;
       entry.trigger.setAttribute("aria-expanded", "true");
       entry.trigger.classList.add("is-open");

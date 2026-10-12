@@ -53,7 +53,7 @@ Ngoài phạm vi mặc định: APK/store, multiplayer, lives/energy để giớ
 2. Rương đã chốt theo nhóm 10 màn và ba gói Xu tạm thời ở mục 2; có thể chỉnh catalog hoặc thêm vật phẩm ở task sau. Thưởng nhận một lần mỗi trò, không bắt buộc nhận để chơi tiếp.
 3. Đối chiếu restart/replay/resume của từng trò để bảo đảm thao tác chọn màn giữ contract hiện hữu. Mọi thay đổi về seed/bố trí khi retry phải được giao riêng, không tự thêm vào thiết kế menu.
 4. Thiết bị/browser thấp nhất ngoài baseline hiện có; phạm vi dưới 100 người chơi; phong cách cụ thể trong hướng mobile tươi sáng.
-5. Xung đột tài liệu save đã được giải quyết bằng yêu cầu mới: giữ dữ liệu và có chuyển đổi. Source hiện tại dùng formatVersion=1; không dùng schemaVersion/key migration lịch sử làm schema nguồn. Phase 1 chuẩn hóa version cũ vào contract mới, giữ bản phục hồi và test chuyển đổi idempotent/failure.
+5. Xung đột tài liệu save đã được giải quyết bằng yêu cầu mới: giữ dữ liệu và có chuyển đổi. Source v1 dùng formatVersion=1; phase 1 nâng lên formatVersion=2, giữ nguồn phục hồi, test idempotent/failure. Không dùng schemaVersion/key migration lịch sử làm schema nguồn.
 6. Backend cơ bản/mọi thời gian/offline đã chốt. Account-linking gặp UID khác dùng lựa chọn local/cloud cho save, không tự union hoặc chuyển public entry của UID trước. Tên hiển thị/avatar dùng giá trị tối thiểu có fallback và được escape. Không thêm mùa giải hoặc nâng billing trong task.
 
 Các đề xuất chưa xác nhận không phải acceptance criteria đã phê duyệt.
@@ -160,6 +160,8 @@ Hai phương án: giữ root localStorage đồng bộ dễ giữ chữ ký cũ 
 Root profile giữ settings/wallet/appearance/session/totals và metadata chặng cần điều hướng; kết quả lịch sử ở chapter records, chỉ đọc chặng cần dùng. Summary/index là cache suy ra từ chapter results, cập nhật trong cùng transaction, không là sổ completion thứ hai. Khi nâng bản lưu v1, chỉ coi entry best hợp lệ của mode thường là thắng (bao gồm 0 sao); giữ kỷ lục Challenge/Endless và toàn bộ session/appearance/item hiện hữu. Không suy thời gian hoặc tổng điểm lượt chưa từng được đo.
 
 Chuyển đổi hoàn tất atomically rồi mới dùng backend mới; bản v1 được giữ làm bản phục hồi, không xóa trước commit. Không fallback âm thầm về bản v1 cũ nếu backend mới đã có dữ liệu nhưng tạm không truy cập được. Trình duyệt chưa từng dùng backend mới có thể dùng fallback localStorage được khai báo rõ; lỗi storage không được ghi đè dữ liệu hỏng/không biết version bằng profile rỗng.
+
+Failure policy của phase 1: một write thất bại làm chặn các snapshot đã xếp hàng phụ thuộc vào RAM optimistic; phục hồi bằng tải lại profile đã commit. Modal recovery có owner app, không bị cleanup round hủy và không bị popup retry/timeout khác che. Timer dừng khi backend blocked. Đây là lựa chọn an toàn thay cho việc tiếp tục ghi snapshot có thể chứa thay đổi của giao dịch đã rollback.
 
 Mô hình dự kiến: profile/wallet/appearance/settings, chapter progress của mỗi game, active sessions, bản ghi thời gian tốt nhất, metadata lượt liên tục và sync metadata tách ownership. Không lưu bitmap hoặc toàn bộ mô tả 100 màn lặp lại; dùng catalog hiện hành và trạng thái session cần thiết. Completion/claim không bị cắt mất chỉ để giảm kích thước. Dữ liệu bảng xếp hạng công khai tách khỏi save riêng của người chơi.
 
@@ -324,8 +326,11 @@ Gate là checkpoint, không mặc định là ranh giới kết thúc lượt. Y
 
 | Phase | Trạng thái | Bằng chứng/commit |
 | --- | --- | --- |
-| 0 | Pass — phạm vi và quyết định sản phẩm đã chốt | Baseline npm run check/build pass; Firebase web app đã có, chưa có Firestore database; commit phase 0 |
-| 1–8 | Chưa bắt đầu | Chưa có commit implementation; không đánh dấu pass bằng kết quả baseline |
+| 0 | Pass — phạm vi và quyết định sản phẩm đã chốt | Commit a7e4579; baseline check/build pass |
+| 1 | Pass — persistence v2, progression, launch, rewards, timing/run | check/build pass; 6 browser data/cleanup pass; review độc lập không còn finding |
+| 2–8 | Chưa bắt đầu | Không đánh dấu pass bằng kết quả baseline |
+
+Firebase (2026-10-13): người dùng đã tạo `(default)` ở `asia-southeast1`; CLI xác nhận Firestore Native Standard, `freeTier=true`. Chưa deploy Hosting hoặc thay billing.
 
 Baseline trước sửa (2026-10-13): Chrome headless 412×915, không overflow; frame gồm cả khay của Triple. Memory Easy/Super Hard còn lần lượt 460/113px dưới frame; Link 459/115px; Triple 134/269px. Đây là bằng chứng bố cục hiện tại đủ chỗ cho một hàng nút gọn ở portrait, chưa là pass của hàng nút mới, landscape hoặc khay mở rộng. Các phép đo dùng browser context mới, không thay dữ liệu người chơi.
 
@@ -350,4 +355,4 @@ Baseline trước sửa (2026-10-13): Chrome headless 412×915, không overflow;
 - [Firebase Anonymous Auth](https://firebase.google.com/docs/auth/web/anonymous-auth), [Account linking](https://firebase.google.com/docs/auth/web/account-linking), [Firestore rules](https://firebase.google.com/docs/firestore/security/rules-conditions), [Firestore quotas](https://firebase.google.com/docs/firestore/quotas), [Analytics](https://firebase.google.com/docs/analytics), [Hosting quota](https://firebase.google.com/docs/hosting/usage-quotas-pricing).
 - Xếp hạng (kiểm tra ngày 2026-10-12): [Firestore order/limit](https://firebase.google.com/docs/firestore/query-data/order-limit-data), [Aggregation count](https://firebase.google.com/docs/firestore/query-data/aggregation-queries), [Firestore pricing/free quota](https://firebase.google.com/docs/firestore/pricing), [App Check và giới hạn bảo vệ](https://firebase.google.com/docs/app-check), [Cloud Functions yêu cầu Blaze](https://firebase.google.com/docs/functions/get-started).
 
-Chưa sửa runtime/schema/config Firebase, chưa tạo asset, chưa đo FPS hoặc cân bằng gameplay trong task lập kế hoạch. Kết quả test runtime ghi trong CONTEXT là lịch sử, không đại diện cho tính năng đề xuất.
+Phase 1 đã triển khai runtime/schema local, chưa cấu hình Auth/rules Firebase, chưa đo FPS hoặc cân bằng gameplay. Kết quả test runtime ghi trong CONTEXT là lịch sử, không đại diện cho tính năng đề xuất.

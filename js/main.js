@@ -41,11 +41,13 @@ import {
   showReturnToMenuOverlay,
   updateMemoryAssistInventoryDisplay,
 } from "./ui.js";
-import { showAppToast } from "./modal.js";
+import { showAppToast, openAppModal } from "./modal.js";
 import { gameState, hydrateGameState } from "./gameState.js";
 import {
   loadPersistentGameData,
   subscribeToExternalSave,
+  subscribeToPersistenceFailure,
+  getPersistenceStatus,
 } from "./persistence.js";
 import {
   configureGameController,
@@ -72,7 +74,19 @@ document.documentElement.dataset.buildTarget =
 
 // Entry point: nạp dữ liệu đã lưu và nối các module qua callback.
 registerProgressiveWebApp();
-hydrateGameState(loadPersistentGameData());
+async function initializeApplication() {
+hydrateGameState(await loadPersistentGameData());
+subscribeToPersistenceFailure(() => {
+  openAppModal({
+    id: "persistence-recovery-modal",
+    title: "Chưa thể lưu dữ liệu",
+    content: "<p>Để bảo vệ bản lưu, các thay đổi tiếp theo đã dừng. Hãy tải lại trang để sử dụng dữ liệu được lưu thành công gần nhất.</p>",
+    dismissible: false, closeOnBackdrop: false, closeOnEscape: false,
+    owner: null,
+    actions: [{ label: "Tải lại", variant: "primary", onClick: () => window.location.reload() }],
+  });
+});
+if (getPersistenceStatus().blocked) return;
 updateMemoryAssistInventoryDisplay();
 initializeMeteorEffects(gameState.settings.meteorEffects);
 applyEffectsSettings(gameState.settings);
@@ -89,26 +103,26 @@ configureSettings({ onCloseMenu: createActiveGameMenu });
 configureGameSelector({
   startLinkConnect: showLinkDifficultyOverlay,
   continueLinkConnect: (session) => continueLinkSession(session),
-  openLinkCollection: (onClose) =>
-    showCollectionModal({ gameId: "link-connect", onClose }),
-  openLinkShop: () =>
-    openShopOverlay({ fromMenu: true, gameId: "link-connect" }),
+  openLinkCollection: async (onClose) =>
+    (await showCollectionModal({ gameId: "link-connect", onClose })),
+  openLinkShop: async () =>
+    (await openShopOverlay({ fromMenu: true, gameId: "link-connect" })),
   startTripleConnect: (mode) => {
     void startTripleConnectRound({ mode });
   },
   continueTripleConnect: (session) => continueTripleConnectSession(session),
   validateTripleSession: isValidTripleConnectSession,
-  openTripleCollection: (onClose) =>
-    showCollectionModal({ gameId: "triple-connect", onClose }),
-  openTripleShop: () =>
-    openShopOverlay({ fromMenu: true, gameId: "triple-connect" }),
+  openTripleCollection: async (onClose) =>
+    (await showCollectionModal({ gameId: "triple-connect", onClose })),
+  openTripleShop: async () =>
+    (await openShopOverlay({ fromMenu: true, gameId: "triple-connect" })),
 });
 configureTripleConnectController({
   showMenu: () => openGameMenu("triple-connect"),
-  showCollection: (onClose) =>
-    showCollectionModal({ fromGame: true, gameId: "triple-connect", onClose }),
-  showShop: (onClose) =>
-    openShopOverlay({ fromMenu: false, gameId: "triple-connect", onClose }),
+  showCollection: async (onClose) =>
+    (await showCollectionModal({ fromGame: true, gameId: "triple-connect", onClose })),
+  showShop: async (onClose) =>
+    (await openShopOverlay({ fromMenu: false, gameId: "triple-connect", onClose })),
   showSettings: (onClose) => showSettingsPanel(true, onClose),
   showHelp: (onClose) =>
     showGameInfoModal(
@@ -121,20 +135,20 @@ configureTripleConnectController({
 });
 configureLinkController({
   showMenu: () => openGameMenu("link-connect"),
-  showCollection: (onClose) => {
-    showCollectionModal({
+  showCollection: async (onClose) => {
+    (await showCollectionModal({
       fromGame: true,
       gameId: "link-connect",
       onClose,
-    });
+    }));
   },
-  showShop: (onClose) =>
-    openShopOverlay({
+  showShop: async (onClose) =>
+    (await openShopOverlay({
       fromMenu: false,
       gameId: "link-connect",
       linkConnect: true,
       onClose,
-    }),
+    })),
   showSettings: (onClose) => showSettingsPanel(true, onClose),
   showReset: (onClose) => showResetConfirmationOverlay({ onClose }),
 });
@@ -149,7 +163,8 @@ subscribeToExternalSave(({ data, accept }) => {
     document
       .getElementById("link-connect-container")
       ?.hasAttribute("hidden") === false;
-  if (memoryGameVisible || linkGameVisible) {
+  const tripleGameVisible = document.getElementById("triple-connect-container")?.hasAttribute("hidden") === false;
+  if (memoryGameVisible || linkGameVisible || tripleGameVisible) {
     showAppToast(
       "Dữ liệu vừa thay đổi ở tab khác. Hãy tải lại trước khi tiếp tục chơi.",
       {
@@ -185,9 +200,7 @@ document.addEventListener(
   { passive: false },
 );
 
-window.onload = () => {
-  showGameSelector();
-};
+showGameSelector();
 
 if (new URLSearchParams(window.location.search).has("effect-performance")) {
   Object.defineProperty(window, "__effectV2Performance", {
@@ -208,7 +221,7 @@ document
   ?.addEventListener("click", () => showSettingsPanel(true));
 document
   .getElementById("btn-game-collection")
-  ?.addEventListener("click", () => showCollectionModal({ fromGame: true }));
+  ?.addEventListener("click", async () => (await showCollectionModal({ fromGame: true })));
 document.getElementById("btn-shop")?.addEventListener("click", openShopOverlay);
 document.getElementById("btn-game-help")?.addEventListener("click", () =>
   showGameInfoModal(
@@ -241,3 +254,8 @@ document
 document
   .getElementById("btn-preview-cards")
   ?.addEventListener("click", () => openQuickAssistOverlay("preview"));
+}
+initializeApplication().catch(error => {
+  console.error("[Startup]", error);
+  showAppToast("Không tải được dữ liệu. Hãy tải lại trang; bản lưu được giữ nguyên.", { tone: "warning", duration: 5000 });
+});

@@ -20,7 +20,7 @@ import {
 } from "./ui.js";
 import { GAMEPLAY_LIMITS, GAMEPLAY_TIMING } from "./gameplayTuning.js";
 
-export function handleMemorySpecialMatch(source, roundId = gameState.roundId) {
+export async function handleMemorySpecialMatch(source, roundId = gameState.roundId) {
   if (!source || gameState.roundId !== roundId) return;
   const target = GAME_CONFIG.special.progressTarget;
   const hasCollectionCapacity = gameState.specialProgress + gameState.pendingEnergyCollections < target;
@@ -29,44 +29,48 @@ export function handleMemorySpecialMatch(source, roundId = gameState.roundId) {
   if (!dropsEnergy) {
     if (hasCollectionCapacity) {
       gameState.specialNoEnergyDropStreak += 1;
-      persistMemoryRewards();
+      (await persistMemoryRewards());
+      if (gameState.roundId !== roundId) return;
     }
   } else {
     gameState.specialNoEnergyDropStreak = 0;
     gameState.pendingEnergyCollections += 1;
-    persistMemoryRewards();
+    (await persistMemoryRewards());
+    if (gameState.roundId !== roundId) return;
     playLootDrop(source, {
       icon: "energy",
       tier: "energy",
       target: document.getElementById("memory-special-milestones"),
-      onCollected: () => collectMemoryEnergy(source, roundId),
+      onCollected: async () => (await collectMemoryEnergy(source, roundId)),
     });
   }
 
   const supportReward = getMemorySupportDrop();
-  if (supportReward) setTimeout(() => grantMemoryReward(supportReward, source, roundId), 180);
+  if (supportReward) setTimeout(async () => (await grantMemoryReward(supportReward, source, roundId)), 180);
 }
 
-function collectMemoryEnergy(source, roundId) {
+async function collectMemoryEnergy(source, roundId) {
   if (gameState.roundId !== roundId) return;
   const target = GAME_CONFIG.special.progressTarget;
   gameState.pendingEnergyCollections = Math.max(0, gameState.pendingEnergyCollections - 1);
   gameState.specialProgress = Math.min(target, gameState.specialProgress + 1);
   const reachedProgress = gameState.specialProgress;
   updateMemorySpecialProgress(reachedProgress);
-  persistMemoryRewards();
+  (await persistMemoryRewards());
+  if (gameState.roundId !== roundId) return;
   resolveMemoryMilestoneRewards(reachedProgress).forEach((reward, index) => {
-    setTimeout(() => grantMemoryReward(reward, source, roundId), index * 130);
+    setTimeout(async () => (await grantMemoryReward(reward, source, roundId)), index * 130);
   });
   if (reachedProgress < target) return;
   gameState.specialProgress = 0;
-  persistMemoryRewards();
+  (await persistMemoryRewards());
+  if (gameState.roundId !== roundId) return;
   setTimeout(() => {
     if (gameState.roundId === roundId) updateMemorySpecialProgress(0);
   }, 1200);
 }
 
-function grantMemoryReward(reward, source, roundId) {
+async function grantMemoryReward(reward, source, roundId) {
   if (!reward || gameState.roundId !== roundId) return;
   if (reward.type === "preview-auto") {
     const item = getMemoryItem(getMemoryItemId("preview", reward.value));
@@ -82,10 +86,11 @@ function grantMemoryReward(reward, source, roundId) {
   if (reward.type === "coins") {
     const before = gameState.coins;
     const after = increaseCoins(reward.value);
-    if (!persistMemoryRewards({ coins: after })) {
+    if (!(await persistMemoryRewards({ coins: after }))) {
       gameState.coins = before;
       return;
     }
+    if (gameState.roundId !== roundId) return;
     updateCoinDisplay(after);
     showMemoryCoinReward(source, before, after, reward.value);
     return;
@@ -93,7 +98,8 @@ function grantMemoryReward(reward, source, roundId) {
 
   if (reward.type === "hint") {
     gameState.progress.memoryMatch.items.hint = Math.min(GAMEPLAY_LIMITS.itemCount, gameState.progress.memoryMatch.items.hint + reward.value);
-    persistMemoryRewards();
+    (await persistMemoryRewards());
+    if (gameState.roundId !== roundId) return;
     updateHintDisplay(gameState.progress.memoryMatch.items.hint);
     playLootDrop(source, {
       icon: "search",
@@ -106,7 +112,8 @@ function grantMemoryReward(reward, source, roundId) {
   const itemType = reward.type === "time-item" ? "time" : "preview";
   const item = getMemoryItem(getMemoryItemId(itemType, reward.value));
   if (!item || !changeMemoryItemCount(item.id, 1)) return;
-  persistMemoryRewards();
+  (await persistMemoryRewards());
+  if (gameState.roundId !== roundId) return;
   updateMemoryAssistInventoryDisplay();
   playLootDrop(source, {
     icon: item.icon,
@@ -126,10 +133,10 @@ function useAutomaticPreviewWhenReady(value, roundId, attempts = 0) {
   revealMemoryTiles(value, GAMEPLAY_TIMING.shopRevealDurationMs, roundId);
 }
 
-function persistMemoryRewards({ coins } = {}) {
-  stageMemorySession();
-  return savePersistentGameData({
+async function persistMemoryRewards({ coins } = {}) {
+  if (gameState.matchedPairs < gameState.totalPairs) stageMemorySession();
+  return (await savePersistentGameData({
     ...(Number.isFinite(coins) ? { coins } : {}),
     progress: gameState.progress,
-  });
+  }));
 }

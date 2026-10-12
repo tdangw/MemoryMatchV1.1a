@@ -581,10 +581,9 @@ export function showResetConfirmationOverlay({ onClose = () => {} } = {}) {
       {
         label: "Xóa dữ liệu",
         variant: "danger",
-        onClick: () => {
+        onClick: async () => {
           sounds.confirm?.play().catch(() => {});
-          clearPersistentGameData();
-          setTimeout(() => location.reload(), 220);
+          if (await clearPersistentGameData()) location.reload();
         },
       },
     ],

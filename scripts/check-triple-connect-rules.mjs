@@ -239,8 +239,8 @@ assert.equal(gameState.progress.tripleConnect.sessionsByMode.easy.snapshot.tray.
 hydrateGameState({ progress: { tripleConnect: { sessionsByMode: { easy: { mode: "easy", level: 1, layoutId: "easy", snapshot: { ...persisted, tray: ["missing"] } } } } } });
 assert.deepEqual(gameState.progress.tripleConnect.sessionsByMode, {}, "Invalid Triple saves must not reach runtime state.");
 assert.equal(getTripleItemCount("hint"), 3, "Triple defaults must grant the approved initial Hint inventory.");
-assert.equal(consumeTripleItem("unknown"), false);
-assert.equal(consumeTripleItem("hint"), false, "A failed persistence transaction must not consume a Hint.");
+assert.equal(await consumeTripleItem("unknown"), false);
+assert.equal(await consumeTripleItem("hint"), false, "A failed persistence transaction must not consume a Hint.");
 assert.equal(getTripleItemCount("hint"), 3);
 assert.equal(gameState.progress.tripleConnect.trayExpansionOwned, false, "Old profiles default to the base tray entitlement.");
 

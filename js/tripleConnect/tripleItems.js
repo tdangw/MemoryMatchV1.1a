@@ -14,22 +14,22 @@ export function getTripleItemCount(id) {
   return gameState.progress.tripleConnect.items[id] || 0;
 }
 
-export function consumeTripleItem(id) {
+export async function consumeTripleItem(id) {
   if (!getTripleItemDefinition(id) || getTripleItemCount(id) < 1) return false;
   const previousCount = getTripleItemCount(id);
   gameState.progress.tripleConnect.items[id] = previousCount - 1;
-  if (saveProgress(gameState.progress)) return true;
+  if ((await saveProgress(gameState.progress))) return true;
   gameState.progress.tripleConnect.items[id] = previousCount;
   return false;
 }
 
-export function grantTripleItem(id, amount = 1) {
+export async function grantTripleItem(id, amount = 1) {
   if (!getTripleItemDefinition(id)) return false;
   const previousCount = getTripleItemCount(id);
   const nextCount = Math.min(GAMEPLAY_LIMITS.itemCount, previousCount + Math.max(0, Math.floor(amount)));
   if (nextCount <= previousCount) return false;
   gameState.progress.tripleConnect.items[id] = nextCount;
-  if (saveProgress(gameState.progress)) return true;
+  if ((await saveProgress(gameState.progress))) return true;
   gameState.progress.tripleConnect.items[id] = previousCount;
   return false;
 }

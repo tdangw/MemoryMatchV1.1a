@@ -52,26 +52,25 @@ for (const gameId of GAMES) {
 }
 
 test("catalog navigation ignores an invalid persisted tab and does not write while rendering", async ({ page }) => {
-  await page.goto("/");
-  const result = await page.evaluate(async () => {
+  await page.addInitScript(() => {
     localStorage.setItem("memoryMatchSave", JSON.stringify({
       formatVersion: 1,
       revision: 7,
       updatedAt: Date.now(),
       data: { coins: 0, appearance: {}, progress: {}, settings: { catalogTabs: { "memory-match:shop": "path" } } },
     }));
-    location.reload();
-    return true;
   });
-  expect(result).toBe(true);
-  await page.waitForLoadState("domcontentloaded");
+  await page.goto("/");
   await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const revisions = await page.evaluate(async () => {
-    const before = JSON.parse(localStorage.getItem("memoryMatchSave")).revision;
-    (await import("/js/shop.js")).openShopOverlay({ gameId: "memory-match", fromMenu: true });
-    const after = JSON.parse(localStorage.getItem("memoryMatchSave")).revision;
+    const persistence = await import("/js/persistence.js");
+    const before = persistence.getPersistenceStatus().revision;
+    await (await import("/js/shop.js")).openShopOverlay({ gameId: "memory-match", fromMenu: true });
+    await persistence.flushPersistentWrites();
+    const after = persistence.getPersistenceStatus().revision;
     return { before, after };
   });
-  expect(revisions).toEqual({ before: 7, after: 7 });
+  expect(revisions.before).toBeGreaterThan(0);
+  expect(revisions.after).toBe(revisions.before);
   await expect(page.locator("#shop-modal").getByRole("tab", { selected: true })).toHaveText("Vật phẩm");
 });

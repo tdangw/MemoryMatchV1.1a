@@ -27,9 +27,9 @@ export function configureSettings({ onCloseMenu } = {}) {
   onCloseFromMenu = onCloseMenu || onCloseFromMenu;
 }
 
-function saveGameSetting(key, value) {
+async function saveGameSetting(key, value) {
   gameState.settings[key] = value;
-  saveSetting(key, value);
+  (await saveSetting(key, value));
 }
 
 function updateVolumeLabel(output, value) {
@@ -53,55 +53,55 @@ function syncSettingsControls() {
 
 function bindSettingsControls() {
   if (soundToggle) {
-    soundToggle.onchange = () => {
-      saveGameSetting("sound", soundToggle.checked);
+    soundToggle.onchange = async () => {
+      (await saveGameSetting("sound", soundToggle.checked));
       if (soundVolume) soundVolume.disabled = !soundToggle.checked;
       applyEffectsSettings(gameState.settings);
     };
   }
 
   if (musicToggle) {
-    musicToggle.onchange = () => {
-      saveGameSetting("music", musicToggle.checked);
+    musicToggle.onchange = async () => {
+      (await saveGameSetting("music", musicToggle.checked));
       if (musicVolume) musicVolume.disabled = !musicToggle.checked;
       syncDefaultMusic(gameState.settings, musicToggle.checked);
     };
   }
 
   if (meteorEffectsToggle) {
-    meteorEffectsToggle.onchange = () => {
-      saveGameSetting("meteorEffects", meteorEffectsToggle.checked);
+    meteorEffectsToggle.onchange = async () => {
+      (await saveGameSetting("meteorEffects", meteorEffectsToggle.checked));
       setMeteorEffectsEnabled(meteorEffectsToggle.checked);
     };
   }
 
   if (boardCoordinatesToggle) {
-    boardCoordinatesToggle.onchange = () => {
-      saveGameSetting("boardCoordinates", boardCoordinatesToggle.checked);
+    boardCoordinatesToggle.onchange = async () => {
+      (await saveGameSetting("boardCoordinates", boardCoordinatesToggle.checked));
       setBoardCoordinatesVisible(boardCoordinatesToggle.checked);
     };
   }
 
   if (cardDescriptionsToggle) {
-    cardDescriptionsToggle.onchange = () => {
-      saveGameSetting("cardDescriptions", cardDescriptionsToggle.checked);
+    cardDescriptionsToggle.onchange = async () => {
+      (await saveGameSetting("cardDescriptions", cardDescriptionsToggle.checked));
       if (!cardDescriptionsToggle.checked) clearTooltip();
     };
   }
 
   if (soundVolume) {
-    soundVolume.oninput = () => {
+    soundVolume.oninput = async () => {
       const value = Number(soundVolume.value) / 100;
-      saveGameSetting("soundVolume", value);
+      (await saveGameSetting("soundVolume", value));
       updateVolumeLabel(soundVolumeValue, value);
       applyEffectsSettings(gameState.settings);
     };
   }
 
   if (musicVolume) {
-    musicVolume.oninput = () => {
+    musicVolume.oninput = async () => {
       const value = Number(musicVolume.value) / 100;
-      saveGameSetting("musicVolume", value);
+      (await saveGameSetting("musicVolume", value));
       updateVolumeLabel(musicVolumeValue, value);
       syncDefaultMusic(gameState.settings, gameState.settings.music);
     };

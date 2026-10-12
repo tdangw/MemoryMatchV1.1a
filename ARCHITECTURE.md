@@ -78,14 +78,16 @@ Game Shell giữ đủ sáu region công khai: `title`, `progress`, `hud`, `mile
 
 ## 3. Trạng thái và lưu trữ
 
-- `gameState` giữ Xu, cài đặt, ngoại hình và namespace tiến trình `memoryMatch`/`linkConnect`.
-- Persistence có một owner; bản lưu nguồn hiện hữu dùng `formatVersion` và `revision`, không dùng `schemaVersion`. Theo yêu cầu Adventure Web ngày 2026-10-13, chuyển định dạng phải giữ Xu/vật phẩm/chủ đề/kỷ lục/session, có kiểm thử idempotent và rollback/failure. Không dùng key migration lịch sử làm schema nguồn hoặc reset dữ liệu chỉ vì là version trước. Backend theo chặng và contract durability bất đồng bộ được triển khai ở phase dữ liệu của kế hoạch hiện hành.
-- Giao dịch thay đổi nhiều miền dữ liệu phải ghi bằng một snapshot; nếu ghi thất bại, caller hoàn tác thay đổi runtime có tính chất mua hàng.
+- `gameState` giữ Xu, cài đặt, ngoại hình và namespace tiến trình `memoryMatch`/`linkConnect`/`tripleConnect`; lịch sử chỉ hydrate các chặng cần dùng.
+- Persistence có một owner trong `persistence.js`; `chapterStore.js` sở hữu IndexedDB `memoryMatchAdventure` với transaction profile + chapter. `formatVersion=2`, revision tăng sau durability; các caller phải await boolean kết quả. Migration từ nguồn v1 giữ bản phục hồi, không tự reset hoặc ghi đè bản hỏng/version lạ. localStorage là fallback khai báo rõ cho trình duyệt chưa dùng backend mới; marker primary ngăn đọc/ghi bản v1 cũ khi IndexedDB không khả dụng.
+- Giao dịch nhiều miền có một snapshot/transaction; thất bại hoàn tác và chặn các snapshot xếp hàng phụ thuộc, dùng recovery toàn cục để tải lại nguồn đã commit. Cleanup/lifecycle vẫn đồng bộ; snapshot ghi bất đồng bộ không trì hoãn invalidate/cleanup hoặc điều hướng.
 - `sessionsByMode` lưu phiên độc lập theo từng mode, gồm level, thời gian còn lại, giới hạn và thời gian đầu màn. Mỗi trò lưu riêng tiến trình năng lượng/chuỗi không-rơi; Link Connect lưu thêm quy tắc dịch chuyển.
 - Sự kiện `storage` phát hiện revision mới từ tab khác. Tab cũ không được ghi đè; dữ liệu chỉ tự hydrate khi không có bàn đang chơi.
 - Vật phẩm mỗi trò nằm trong namespace `progress.<game>.items`; không dùng chung tồn kho giữa các trò.
 - Dữ liệu đọc từ storage phải được chuẩn hóa trước khi gán vào runtime. Giá trị âm, sai kiểu hoặc vượt giới hạn không được đi thẳng vào gameplay.
 - `roundId` là mã phiên runtime: callback bất đồng bộ phải kiểm tra đúng round và đúng board trước khi sửa trạng thái hoặc DOM.
+- `adventureProgress.js` sở hữu N+3/completion/chặng/rương; `adventureLaunch.js` tải kỷ lục canonical trước replay và giữ cache giới hạn. `adventureRewards.js` sở hữu catalog grant có type và claim một lần, commit cùng wallet.
+- `playMetrics.js` đo thời gian thực theo ready/pause/modal/visibility/outcome, không có loop đo hoặc ghi theo frame. `rankingRules.js` sở hữu comparator và lượt liên tục: advance chuyển điểm một lần, restart thay điểm hiện tại, chỉ finalize khi kết thúc thật.
 
 ## 4. Luồng render và hiệu ứng
 
