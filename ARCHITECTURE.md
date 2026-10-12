@@ -79,7 +79,7 @@ Game Shell giữ đủ sáu region công khai: `title`, `progress`, `hud`, `mile
 ## 3. Trạng thái và lưu trữ
 
 - `gameState` giữ Xu, cài đặt, ngoại hình và namespace tiến trình `memoryMatch`/`linkConnect`.
-- `localStorage` chỉ được truy cập qua `persistence.js`; bản lưu gốc có `schemaVersion`, `revision` và toàn bộ snapshot dùng chung. Key cũ chỉ phục vụ migration.
+- Persistence có một owner; bản lưu nguồn hiện hữu dùng `formatVersion` và `revision`, không dùng `schemaVersion`. Theo yêu cầu Adventure Web ngày 2026-10-13, chuyển định dạng phải giữ Xu/vật phẩm/chủ đề/kỷ lục/session, có kiểm thử idempotent và rollback/failure. Không dùng key migration lịch sử làm schema nguồn hoặc reset dữ liệu chỉ vì là version trước. Backend theo chặng và contract durability bất đồng bộ được triển khai ở phase dữ liệu của kế hoạch hiện hành.
 - Giao dịch thay đổi nhiều miền dữ liệu phải ghi bằng một snapshot; nếu ghi thất bại, caller hoàn tác thay đổi runtime có tính chất mua hàng.
 - `sessionsByMode` lưu phiên độc lập theo từng mode, gồm level, thời gian còn lại, giới hạn và thời gian đầu màn. Mỗi trò lưu riêng tiến trình năng lượng/chuỗi không-rơi; Link Connect lưu thêm quy tắc dịch chuyển.
 - Sự kiện `storage` phát hiện revision mới từ tab khác. Tab cũ không được ghi đè; dữ liệu chỉ tự hydrate khi không có bàn đang chơi.
