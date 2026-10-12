@@ -1,6 +1,7 @@
 const SVG_NS = "http://www.w3.org/2000/svg";
 
 const ICON_PATHS = Object.freeze({
+  account: '<circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/>',
   menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
   home: '<path d="m3 11 9-7 9 7"/><path d="M5.5 9.5V20h13V9.5M9.5 20v-6h5v6"/>',
   restart: '<path d="M20 7v5h-5"/><path d="M19 12a7.5 7.5 0 1 0 .2 5"/>',

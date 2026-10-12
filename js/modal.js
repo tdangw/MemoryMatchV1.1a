@@ -3,6 +3,8 @@ import { UI_TIMING } from "./uiCatalog.js";
 import { createGameShellLifecycle, getActiveGameScope } from "./gameShell/gameShellLifecycle.js";
 import { getActivePlayMetrics } from "./playMetrics.js";
 
+import { getAppPageScope } from "./appPageLifecycle.js";
+
 const modals = new Map();
 
 export function openAppModal({
@@ -17,7 +19,7 @@ export function openAppModal({
   closeOnBackdrop = true,
   closeOnEscape = true,
   onClose,
-  owner = getActiveGameScope(),
+  owner = getActiveGameScope() || getAppPageScope(),
 }) {
   if (id) {
     modals.get(id)?.();

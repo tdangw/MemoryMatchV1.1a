@@ -1,6 +1,9 @@
 import { activateGameScope, createGameShellLifecycle, getActiveGameScope } from "./gameShellLifecycle.js";
 import { mountGameFullscreen } from "./gameFullscreen.js";
 
+import { disposeAppPage } from "../appPageLifecycle.js";
+import { mountGameplayDock } from "../appNavigation.js";
+
 let activeShell = null;
 const regionNames = ["title", "progress", "hud", "milestones", "frame", "board"];
 
@@ -48,6 +51,7 @@ export function createGameShell({ root = document.createElement("section"), regi
     refs,
     get scope() { return scope; },
     mount({ cleanup } = {}) {
+      disposeAppPage();
       activeShell?.unmount();
       const nextScope = createGameShellLifecycle();
       scope = nextScope;
@@ -57,6 +61,7 @@ export function createGameShell({ root = document.createElement("section"), regi
       root.hidden = false;
       root.style.display = display;
       mountGameFullscreen(refs, nextScope);
+      mountGameplayDock(root, nextScope);
       if (cleanup) nextScope.own(cleanup);
       assertVisibleScope("mount");
       return nextScope;

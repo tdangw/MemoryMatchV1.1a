@@ -1,4 +1,5 @@
 // Mainmenu.js
+import { decorateAdventureMenu } from "./appNavigation.js";
 
 import { syncDefaultMusic } from "./sound.js";
 import { showSettingsPanel } from "./settings.js";
@@ -157,6 +158,7 @@ export function createMainMenu() {
   wrapper.appendChild(menuList);
   menuOverlay.appendChild(wrapper);
   document.body.appendChild(menuOverlay);
+  decorateAdventureMenu(menuOverlay, { gameId: "memory-match", onHome: onChangeGame });
 }
 
 /**

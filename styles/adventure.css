@@ -1,0 +1,109 @@
+.adventure-page {
+  --adventure-gold: #f6d68b;
+  --adventure-surface: #17283e;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  padding: env(safe-area-inset-top) 0 0;
+  overflow: hidden;
+  background: linear-gradient(180deg, #081727d9, #102239a8 50%, #071321ed);
+  color: #f7f3e9;
+}
+.adventure-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: min(100%, 640px);
+  box-sizing: border-box;
+  padding: 14px 20px;
+  margin: auto;
+}
+.adventure-account, .adventure-back {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #ffffff24;
+  border-radius: 24px;
+  padding: 9px 12px;
+  background: #10283dd9;
+  color: inherit;
+}
+.adventure-wallet { display: flex; align-items: center; gap: 8px; margin-left: auto; color: #ffe6a4; font-weight: 700; }
+.adventure-page > .menu-wrapper {
+  width: min(100%, 600px);
+  max-height: none;
+  box-sizing: border-box;
+  margin: 0 auto;
+  padding: 16px 24px 24px;
+  overflow: auto;
+  background: none;
+  box-shadow: none;
+  border: 0;
+  backdrop-filter: none;
+}
+.adventure-page .game-title { font-size: clamp(26px, 6vw, 40px); margin: 10px 0; color: #ffe8b4; }
+.adventure-page .menu-description { font-size: 14px; color: #c8d7e2; margin-bottom: 24px; }
+.adventure-page .game-selector__choices { display: grid; gap: 16px; }
+.adventure-page .game-selector__choice {
+  min-height: 116px;
+  padding: 20px;
+  border: 1px solid #f3d49e45;
+  border-radius: 24px;
+  background: linear-gradient(120deg, #27455fe8, #142d47f0);
+  color: #fdf7e7;
+  box-shadow: 0 8px 18px #0003;
+}
+.adventure-page .game-selector__choice:nth-child(2) { background: linear-gradient(120deg, #276057e8, #163b42f0); }
+.adventure-page .game-selector__choice:nth-child(3) { background: linear-gradient(120deg, #54476ae8, #2b2c4bf0); }
+.adventure-page .game-selector__choice strong { font-size: 21px; }
+.adventure-page .game-selector__choice small { color: #d3dfe5; font-size: 13px; }
+.adventure-footer { width: min(100%, 640px); margin: auto; }
+.adventure-dock {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  box-sizing: border-box;
+  padding: 7px 8px;
+  border-top: 1px solid #eed39e38;
+  border-radius: 20px 20px 0 0;
+  background: #0f2438f5;
+  box-shadow: 0 -4px 14px #0002;
+}
+.adventure-dock button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 5px;
+  min-height: 50px;
+  padding: 4px 0;
+  background: none;
+  color: #e4d9c4;
+  border: 0;
+  border-radius: 12px;
+  font-size: 11px;
+  cursor: pointer;
+}
+.adventure-dock button .ui-icon { width: 23px; height: 23px; }
+.adventure-dock button:active { background: #ffffff12; transform: translateY(1px); }
+.adventure-dock button:focus-visible, .adventure-header button:focus-visible { outline: 2px solid #f6d68b; outline-offset: -2px; }
+.adventure-ad-slot { height: calc(60px + env(safe-area-inset-bottom)); background: #07132180; }
+.adventure-dock--playing {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  width: min(100%, 640px);
+  transform: translateX(-50%);
+  padding-bottom: calc(7px + env(safe-area-inset-bottom));
+  z-index: 25;
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .adventure-page .game-selector__choices { grid-template-columns: repeat(3, 1fr); }
+  .adventure-page .game-selector__choice { padding: 10px; min-height: 90px; }
+  .adventure-page .menu-description { display: none; }
+  .adventure-page .game-selector__choice small { display: none; }
+  .adventure-header { padding: 7px 20px; }
+  .adventure-ad-slot { height: calc(40px + env(safe-area-inset-bottom)); }
+  .adventure-dock button { min-height: 40px; }
+}

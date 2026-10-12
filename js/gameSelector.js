@@ -29,6 +29,8 @@ import {
   preloadGameBackground,
 } from "./gameShell/gameBackgroundTransition.js";
 
+import { decorateAdventureMenu } from "./appNavigation.js";
+
 let activeGameId = null;
 let onStartLinkConnect = () => {};
 let onOpenLinkCollection = () => {};
@@ -103,6 +105,7 @@ export function showGameSelector() {
   wrapper.append(choices);
   overlay.append(wrapper);
   document.body.append(overlay);
+  decorateAdventureMenu(overlay, { gameId: activeGameId, onHome: showGameSelector });
 }
 
 export function openGameMenu(gameId) {
@@ -116,6 +119,10 @@ export function openGameMenu(gameId) {
   activeGameId = gameId;
   document.getElementById("menu-container")?.remove();
   navigation.openMenu();
+  const menu = document.getElementById("menu-container");
+  if (menu && !menu.classList.contains("adventure-page")) {
+    decorateAdventureMenu(menu, { gameId, onHome: showGameSelector });
+  }
 
   void backgroundTransition
     .then((backgroundStatus) => {

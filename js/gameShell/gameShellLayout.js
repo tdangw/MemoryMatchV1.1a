@@ -123,7 +123,9 @@ export function connectGameShellLayout({ root, frame, board, chrome, getShape, a
     const width = Math.min(config.layout.contentMaxWidth, centeredWidth, rootRect.width - rootPaddingX,
       visible.width * (mobile ? config.layout.mobileWidthRatio : config.layout.widthRatio)
         - 2 * (mobile ? config.layout.mobileSideInset : config.layout.sideInset)) - edgeInset * 2 - gutter;
-    const height = visible.top + visible.height - boardTop - config.layout.bottomInset
+    const dock = root.querySelector(".adventure-dock--playing");
+    const bottom = dock ? Math.min(visible.top + visible.height, dock.getBoundingClientRect().top) : visible.top + visible.height;
+    const height = bottom - boardTop - config.layout.bottomInset
       - px(rootStyle.getPropertyValue("--shell-viewport-safe-bottom")) - gutter;
     const result = calculateBoardLayout({ width, height, columns: shape.columns, rows: shape.rows,
       gap: narrow ? config.board.narrowGap : config.board.gap,

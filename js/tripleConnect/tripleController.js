@@ -782,10 +782,12 @@ function playTripleSound(name) {
   sound.play().catch(() => {});
 }
 
-function openTripleModal(open) {
+export function openTripleModal(open) {
+  const scope = getTripleShell().scope;
   modalPaused = true;
   rebaseTripleTimer();
-  open(() => {
+  return open(() => {
+    if (!scope?.active) return;
     modalPaused = false;
     rebaseTripleTimer();
   });

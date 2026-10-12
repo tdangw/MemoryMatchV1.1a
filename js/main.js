@@ -1,4 +1,5 @@
 import "./memoryMatch/memoryShellDom.js";
+import { configureAppNavigation, openLocalRankings, refreshAppWallet } from "./appNavigation.js";
 import {
   applyEffectsSettings,
   enableButtonClickSounds,
@@ -22,6 +23,7 @@ import {
 } from "./gameSelector.js";
 import {
   configureLinkController,
+  openLinkPanel,
   continueLinkSession,
   showLinkDifficultyOverlay,
   startLinkLevel,
@@ -61,6 +63,7 @@ import { registerProgressiveWebApp } from "./pwa.js";
 import { initializeMeteorEffects } from "./backgroundEffects.js";
 import {
   configureTripleConnectController,
+  openTripleModal,
   continueTripleConnectSession,
   isValidTripleConnectSession,
   startTripleConnectRound,
@@ -100,6 +103,40 @@ configureMainMenu({
   continueGame: continueMemorySession,
 });
 configureSettings({ onCloseMenu: createActiveGameMenu });
+configureAppNavigation({
+  account: () => openAppModal({ id: 'account-modal', title: 'Tài khoản', icon: 'account', content: '<p>Bạn đang chơi với bản lưu trên thiết bị này.</p>' }),
+  action: (action, { gameId, playing, root, scope }) => {
+    if (action === 'ranking') {
+      if (document.getElementById('rankings-modal')) return;
+      const open = onClose => openLocalRankings(gameId, onClose);
+      if (!playing) return open();
+      if (gameId === 'link-connect') return openLinkPanel(open);
+      if (gameId === 'triple-connect') return openTripleModal(open);
+      const paused = gameState.isPaused;
+      gameState.isPaused = true;
+      return open(() => { if (scope.active) gameState.isPaused = paused; });
+    }
+    if (playing) {
+      const selectors = {
+        'memory-match': { shop: '#btn-shop', collection: '#btn-game-collection', settings: '#btn-game-settings' },
+        'link-connect': { shop: '[data-action="shop"]', collection: '[data-action="collection"]', settings: '[data-action="settings"]' },
+        'triple-connect': { shop: '[data-triple-action="shop"]', collection: '[data-triple-action="collection"]', settings: '[data-triple-action="settings"]' },
+      };
+      return root.querySelector(selectors[gameId][action]).click();
+    }
+    if (action === 'settings') return showSettingsPanel();
+    const open = id => action === 'shop' ? openShopOverlay({ gameId: id, fromMenu: true, onClose: refreshAppWallet }) : showCollectionModal({ gameId: id, onClose: refreshAppWallet });
+    if (gameId) return open(gameId);
+    const content = document.createElement('div');
+    for (const [id, title] of [['memory-match', 'Memory Match'], ['link-connect', 'Link Connect'], ['triple-connect', 'Triple Connect']]) {
+      const button = document.createElement('button');
+      button.type = 'button'; button.className = 'app-button'; button.textContent = title;
+      button.onclick = () => { picker.destroy(); void open(id); };
+      content.append(button);
+    }
+    const picker = openAppModal({ id: 'catalog-game-picker', title: 'Chọn trò chơi', content });
+  },
+});
 configureGameSelector({
   startLinkConnect: showLinkDifficultyOverlay,
   continueLinkConnect: (session) => continueLinkSession(session),

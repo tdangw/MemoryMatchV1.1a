@@ -327,8 +327,9 @@ Gate là checkpoint, không mặc định là ranh giới kết thúc lượt. Y
 | Phase | Trạng thái | Bằng chứng/commit |
 | --- | --- | --- |
 | 0 | Pass — phạm vi và quyết định sản phẩm đã chốt | Commit a7e4579; baseline check/build pass |
-| 1 | Pass — persistence v2, progression, launch, rewards, timing/run | check/build pass; 6 browser data/cleanup pass; review độc lập không còn finding |
-| 2–8 | Chưa bắt đầu | Không đánh dấu pass bằng kết quả baseline |
+| 1 | Pass — persistence v2, progression, launch, rewards, timing/run (0fedb86) | check/build pass; 6 browser data/cleanup pass; review độc lập không còn finding |
+| 2 | Pass — home/header/dock/menu ads, gameplay giữ HUD | check/build pass; navigation 3 viewport pass; lifecycle 100 switches pass; review owner pass |
+| 3–8 | Chưa bắt đầu | Không đánh dấu pass bằng kết quả baseline |
 
 Firebase (2026-10-13): người dùng đã tạo `(default)` ở `asia-southeast1`; CLI xác nhận Firestore Native Standard, `freeTier=true`. Chưa deploy Hosting hoặc thay billing.
 

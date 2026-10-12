@@ -423,6 +423,12 @@ function showLinkGameModal(title, content, icon) {
   openAppModal({ id: "link-game-info-modal", title, content, icon, onClose: resumeLinkAfterModal });
 }
 
+export function openLinkPanel(open) {
+  const scope = getLinkShell().scope;
+  pauseLinkForModal();
+  return open(() => { if (scope?.active) resumeLinkAfterModal(); });
+}
+
 function pauseLinkForModal() {
   linkGameState.isPaused = true;
 }
