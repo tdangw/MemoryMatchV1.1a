@@ -13,6 +13,7 @@
     "prebuild:gh-pages": "npm run assets:sync",
     "build:gh-pages": "vite build --base=/MemoryMatchV1.1a/",
     "deploy": "npm run build && firebase deploy --only hosting:production",
+    "deploy:beta": "npm run build && firebase deploy --only hosting:beta",
     "deploy:test": "npm run build && firebase deploy --only hosting:test",
     "deploy:gh-pages": "npm run build:gh-pages && gh-pages -d dist --add",
     "preview": "vite preview",

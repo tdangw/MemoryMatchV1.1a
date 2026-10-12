@@ -5,8 +5,11 @@
   "targets": {
     "memorymatchv1-1a": {
       "hosting": {
-        "test": [
+        "beta": [
           "memorymatchv1-1b"
+        ],
+        "test": [
+          "memorymatch-test"
         ],
         "production": [
           "memorymatchv1-1a"

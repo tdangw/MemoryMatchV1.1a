@@ -1,4 +1,4 @@
-# CONTEXT — Trạng thái hiện tại (2026-09-30)
+# CONTEXT — Trạng thái hiện tại (2026-10-12)
 
 Đọc file này khi bắt đầu task mới. Đây là snapshot điều hướng, không thay thế code/config và không chứa lịch sử triển khai chi tiết.
 
@@ -13,13 +13,13 @@
 - Review runtime gần nhất ngày 2026-09-29: `npm run check` pass; Effect V2 24/24 pass sau khi bỏ brightness ngoài contract của Dissolve; lifecycle 100 vòng ba game và Triple Worker 20 chu kỳ cancel đều trả resource về baseline. Hai test Triple HUD đang thay đổi song song chưa thuộc kết luận runtime này.
 - Mục tiêu hiện tại là hoàn thiện trải nghiệm web desktop/mobile. PWA/APK/Android/signing/store QA chỉ bắt đầu bằng task riêng sau khi người dùng xác nhận web ổn định.
 - Gate renderer Board Startup trước đây đã hoàn tất: Link batch DOM ban đầu và cải thiện board-ready CPU 6× khoảng 20%; thử nghiệm Memory không tạo lợi ích rõ và Triple batching bị loại do làm xấu số đo. Phần async controller chưa được giao lại và không còn là kế hoạch active; nếu cần phải lập task riêng sau HUD.
-- HUD Unification Repair hoàn tất Gate 0–5 ngày 2026-09-30: một owner menu theo scope cho ba game, progress là placeholder rỗng/ẩn, metric/ref chết đã loại và CSS shared sở hữu thanh ngang liền mạch với nút 44px, nhãn vàng/giá trị trắng. Regression 60/60 và review menu 5/5 pass; check/build pass; node HUD giữ 79/91/74 và soak không tăng resource. Báo cáo/baseline nằm trong `TASK_HUD_UNIFICATION_REPAIR_PLAN.md`. Hiện không còn kế hoạch active. Chưa nghiệm thu trên Galaxy thật; chuyển cảnh background no-preference có lỗi có sẵn ngoài phạm vi, đã ghi trong báo cáo.
+- HUD dùng một owner menu theo scope cho ba game; progress là placeholder rỗng/ẩn, metric/ref chết đã loại và CSS shared sở hữu thanh ngang liền mạch với nút 44px, nhãn vàng/giá trị trắng. Regression HUD 60/60, review menu 5/5, check/build và nghiệm thu Galaxy S22 Ultra đã pass; soak không tăng resource. Chuyển cảnh background no-preference có lỗi có sẵn ngoài phạm vi, chưa được thay đổi.
 
 ## Contract dùng chung
 
-- Firebase Hosting dùng chung project `memorymatchv1-1a` với hai site: target `production` → `memorymatchv1-1a`, target `test` → `memorymatchv1-1b`. `npm run deploy` chỉ deploy site production; `npm run deploy:test` chỉ deploy site test. Hai URL có storage trình duyệt riêng vì khác origin.
+- Firebase Hosting dùng chung project `memorymatchv1-1a` với ba site: target `production` → `memorymatchv1-1a`, target `beta` → `memorymatchv1-1b`, target `test` → `memorymatch-test`. `npm run deploy`, `npm run deploy:beta` và `npm run deploy:test` chỉ deploy đúng site tương ứng. Mỗi URL có storage trình duyệt riêng vì khác origin.
 
-- Kế hoạch active: `TASK_STARTUP_RESPONSIVENESS_PLAN.md`, áp dụng cả ba game; agent chạy gate tự động, người dùng tự nghiệm thu điện thoại thật. Không thay luật/save/asset catalog.
+- Hiện không có kế hoạch active. Startup ba game hiển thị popup đầu màn ngay khi HUD/board DOM sẵn sàng, decode ảnh tiếp tục nền, không có nhãn loading và input/timer chỉ mở sau khi readiness hoàn tất. Startup regression 9/9, contract popup/timer Triple 1/1, check/build và nghiệm thu Galaxy S22 Ultra đã pass. Trace cold board-ready có nhiễu profiler được giữ làm dữ liệu tham khảo, không phải lỗi mở.
 
 - Tinh chỉnh HUD ngày 2026-09-30: bỏ animation `pulse-red` phóng to ô timer, giữ cảnh báo màu tĩnh; nút menu hệ thống có nền xanh dương, công cụ gameplay có nền tím và icon sáng, cùng viền inset, không đổi kích thước 44px. Regression HUD/menu/presentation 10/10 ở 412×915; sau khi tách màu nút, presentation 3/3 và check/build pass; API/save không đổi. Chưa kiểm tra trên thiết bị thật.
 
@@ -62,7 +62,7 @@
 - `Memory Match.md`, `Link Connect.md`, `Triple Connect.md`: luật/thiết kế từng game.
 - `themes.md`: catalog/chất lượng asset chủ đề.
 
-Các kế hoạch Triple/Effect/Theme, Runtime Closure và Board Startup cũ đã được hợp nhất, hoàn tất hoặc ngừng active và bị xóa. Không khôi phục chúng từ Git history làm nguồn triển khai. `TASK_HUD_UNIFICATION_REPAIR_PLAN.md` giữ báo cáo task HUD đã hoàn tất; dùng code/config và các tài liệu bền vững ở trên làm nguồn hiện hành.
+Các kế hoạch HUD, Startup, Triple/Effect/Theme, Runtime Closure và Board Startup cũ đã được hợp nhất, hoàn tất hoặc ngừng active và bị xóa. Không khôi phục chúng từ Git history làm nguồn triển khai; dùng code/config và các tài liệu bền vững ở trên làm nguồn hiện hành.
 
 ## Quy tắc bàn giao
 
