@@ -1,4 +1,4 @@
-import { doc, collection, getDocFromServer, getDocsFromServer, query, orderBy, documentId, limit, runTransaction, serverTimestamp } from 'firebase/firestore';
+import { doc, collection, getDocFromServer, getDocsFromServer, query, orderBy, documentId, limit, startAfter, runTransaction, serverTimestamp } from 'firebase/firestore';
 import { rankingBoardId, validateRankingResult, comparePublicResults } from './rankingResult.js';
 const cache = new Map();
 const CACHE_LIMIT = 12;
@@ -9,7 +9,7 @@ export async function submitRankingResult({ database, environment, uid, playerNa
   if (!validateRankingResult(result)) throw new Error('Thành tích không hợp lệ.');
   const boardId = rankingBoardId(result);
   const ref = doc(entries(database, environment, boardId), uid);
-  const next = { rulesVersion: 1, resultId: result.id, gameId: result.gameId, mode: result.mode, kind: result.kind, playerName, updatedAt: serverTimestamp(),
+  const next = { rulesVersion: result.rulesVersion, resultId: result.id, gameId: result.gameId, mode: result.mode, kind: result.kind, playerName, updatedAt: serverTimestamp(),
     ...(result.kind === 'time' ? { level: result.level, durationMs: result.durationMs, score: result.score, stars: result.stars } : { levelReached: result.levelReached, totalScore: result.totalScore, outcome: result.outcome }) };
   let reads = 0;
   const commit = () => runTransaction(database, async transaction => {
@@ -29,21 +29,60 @@ export async function submitRankingResult({ database, environment, uid, playerNa
   if (written) for (const key of cache.keys()) if (key.startsWith(`${environment}:${boardId}:`)) cache.delete(key);
   return { reads, writes: written ? 1 : 0 };
 }
-export async function readLeaderboard({ database, environment, board, uid = null, refresh = false }) {
+export async function readLeaderboard({ database, environment, board, uid = null, refresh = false, page = 1 }) {
+  if (!Number.isSafeInteger(page) || page < 1 || page > 100) throw pageError('reset');
   const boardId = rankingBoardId(board);
   const key = `${environment}:${boardId}:${uid || ''}`;
-  const previous = cache.get(key);
-  const age = previous ? Date.now() - previous.fetchedAt : Infinity;
-  if (previous && age < (refresh ? REFRESH_INTERVAL_MS : CACHE_TTL_MS)) return { ...previous, cached: true };
+  let state = cache.get(key);
+  const now = Date.now();
+  if (state && refresh && now - state.refreshedAt >= REFRESH_INTERVAL_MS) { cache.delete(key); state = null; page = 1; }
+  if (state && now - state.fetchedAt >= CACHE_TTL_MS) { cache.delete(key); state = null; }
+  if (!state) {
+    if (page !== 1) throw pageError('reset');
+    state = { pages: new Map(), cursors: new Map([[1, null]]), ownTask: null, own: null, seenPages: new Map(), fetchedAt: now, refreshedAt: now };
+    cache.set(key, state);
+    while (cache.size > CACHE_LIMIT) cache.delete(cache.keys().next().value);
+  } else { cache.delete(key); cache.set(key, state); }
+  const cached = state.pages.get(page);
+  if (cached) { state.pages.delete(page); state.pages.set(page, cached); return { ...cached, knownPages: [...state.cursors.keys()], cached: true }; }
+  if (!state.cursors.has(page)) throw pageError('reset');
   const ref = entries(database, environment, boardId);
   const ordering = board.kind === 'time' ? [orderBy('durationMs', 'asc')] : [orderBy('levelReached', 'desc'), orderBy('totalScore', 'desc')];
-  const [top, own] = await Promise.all([
-    getDocsFromServer(query(ref, ...ordering, orderBy(documentId(), 'asc'), limit(20))),
-    uid ? getDocFromServer(doc(ref, uid)) : Promise.resolve(null),
+  const ownReads = !state.ownTask && uid ? 1 : 0;
+  if (!state.ownTask) state.ownTask = (uid ? getDocFromServer(doc(ref, uid)) : Promise.resolve(null)).then(own => {
+    state.own = own?.exists() ? { uid: own.id, ...own.data() } : null;
+  }).catch(error => { state.ownTask = null; throw error; });
+  const cursor = state.cursors.get(page);
+  const [top] = await Promise.all([
+    getDocsFromServer(query(ref, ...ordering, orderBy(documentId(), 'asc'), ...(cursor ? [startAfter(...cursor)] : []), limit(11))),
+    state.ownTask,
   ]);
-  const result = { top: top.docs.map(item => ({ uid: item.id, ...item.data() })), own: own?.exists() ? { uid: own.id, ...own.data() } : null, fetchedAt: Date.now(), reads: top.size + (uid ? 1 : 0), cached: false };
-  cache.delete(key); cache.set(key, result);
-  while (cache.size > CACHE_LIMIT) cache.delete(cache.keys().next().value);
+  const rows = top.docs.slice(0, 10).map(item => ({ uid: item.id, ...item.data() }));
+  assertOrderedPage(rows, board.kind, cursor, state.pages, page);
+  const seen = new Set();
+  for (const [number, ids] of state.seenPages) if (number !== page) for (const id of ids) seen.add(id);
+  if (rows.some(row => seen.has(row.uid))) throw pageError('stale');
+  state.seenPages.set(page, rows.map(row => row.uid));
+  const hasNext = top.size > 10;
+  if (hasNext && page < 100) state.cursors.set(page + 1, rankingCursor(rows[9], board.kind));
+  const result = { top: rows, own: state.own, page, hasNext, knownPages: [...state.cursors.keys()], fetchedAt: Date.now(), reads: top.size + ownReads, cached: false };
+  if (cache.get(key) === state) {
+    state.pages.set(page, result);
+    while (state.pages.size > 5) state.pages.delete(state.pages.keys().next().value);
+  }
   return result;
 }
+export function rankingCursor(row, kind) { return kind === 'time' ? [row.durationMs, row.uid] : [row.levelReached, row.totalScore, row.uid]; }
+export function assertOrderedPage(rows, kind, cursor = null, pages = new Map(), page = 1) {
+  const compare = (a, b) => comparePublicResults(a, b, kind) || (a.uid < b.uid ? -1 : a.uid > b.uid ? 1 : 0);
+  const seen = new Set();
+  for (const [number, cached] of pages) if (number !== page) for (const item of cached.top) seen.add(item.uid);
+  let previous = cursor ? (kind === 'time' ? { durationMs: cursor[0], uid: cursor[1] } : { levelReached: cursor[0], totalScore: cursor[1], uid: cursor[2] }) : null;
+  for (const row of rows) {
+    if (seen.has(row.uid) || previous && compare(previous, row) >= 0) throw pageError('stale');
+    seen.add(row.uid); previous = row;
+  }
+}
+function pageError(code) { const error = new Error(code === 'stale' ? 'Bảng đã thay đổi. Hãy làm mới.' : 'Hãy về trang đầu và làm mới.'); error.code = code; return error; }
 export function clearLeaderboardCache() { cache.clear(); }
+export function getLeaderboardCacheDiagnostics() { return { boards: cache.size, pages: [...cache.values()].map(state => state.pages.size), cursors: [...cache.values()].map(state => state.cursors.size) }; }

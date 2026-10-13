@@ -33,7 +33,7 @@ import {
 import { duckBackgroundMusicForVictory, pauseBackgroundMusic, sounds } from "./sound.js"; // 📦 Tách âm thanh
 import { saveCoins, savePersistentGameData } from "./persistence.js";
 import { finishPlayMetrics } from "./playMetrics.js";
-import { stageRankedAttempt } from "./rankingRules.js";
+import { checkpointRankedRun, stageRankedAttempt } from "./rankingRules.js";
 import { getFlipAnimationClass } from "./appearance.js";
 import { clearMemoryTileAnimations, restartMemoryTileAnimation } from "./memoryMatch/tileAnimation.js";
 import {
@@ -348,6 +348,7 @@ export async function checkLevelComplete() {
     updateTotalStarsDisplay(progressResult.totalStars);
     const totalCoins = increaseCoins(coinsEarned);
     stageRankedAttempt("memory-match", gameState.settings.mode, finalScore, true);
+    checkpointRankedRun("memory-match", gameState.settings.mode);
     delete gameState.progress.memoryMatch.sessionsByMode?.[gameState.settings.mode];
     if (!(await savePersistentGameData({ coins: totalCoins, progress: gameState.progress, cloudEvent: true }))) {
       if (gameState.roundId === roundId) {

@@ -1,10 +1,11 @@
 import { getGameProgressKey } from "./gameCatalog.js";
 import { gameState } from "./gameState.js";
 import { getRankingOwner } from './rankingOwner.js';
+import { validateRankingResult } from './rankingResult.js';
 
-export const RANKING_RULES_VERSION = 1;
+export const RANKING_RULES_VERSION = 2;
 export function supportsRunRanking(gameId, mode) {
-  return Boolean(getGameProgressKey(gameId)) && (mode === "challenge" || (gameId === "triple-connect" && mode === "endless"));
+  return Boolean(getGameProgressKey(gameId)) && (mode === "challenge" || mode === "endless");
 }
 export function compareRankingResults(a, b, kind = "time") {
   if (kind === "time") return a.durationMs - b.durationMs;
@@ -13,15 +14,15 @@ export function compareRankingResults(a, b, kind = "time") {
 export function createRankedRun(gameId, mode, level = 1, { rankable = level === 1, id = crypto.randomUUID() } = {}) {
   if (!supportsRunRanking(gameId, mode)) return null;
   if (!Number.isSafeInteger(level) || level < 1) throw new RangeError("Invalid ranked run level.");
-  return { version: 1, id, gameId, mode, level, previousScore: 0, attemptScore: 0, attemptCleared: false, finalized: false, rankable, owner: getRankingOwner() };
+  return { version: 2, id, gameId, mode, level, previousScore: 0, attemptScore: 0, attemptCleared: false, finalized: false, rankable, owner: getRankingOwner() };
 }
 export function normalizeRankedRun(value, { gameId, mode, level }) {
-  if (!value || value.version !== 1 || value.gameId !== gameId || value.mode !== mode || value.level !== level
+  if (!supportsRunRanking(gameId, mode) || !value || ![1, 2].includes(value.version) || value.gameId !== gameId || value.mode !== mode || value.level !== level
     || typeof value.id !== "string" || !value.id || value.id.length > 100
     || !Number.isSafeInteger(value.previousScore) || value.previousScore < 0
-    || !Number.isSafeInteger(value.attemptScore) || value.attemptScore < 0) return null;
+    || !Number.isSafeInteger(value.attemptScore) || value.attemptScore < 0 || !Number.isSafeInteger(value.previousScore + value.attemptScore)) return null;
   return {
-    version: 1, id: value.id, gameId, mode, level,
+    version: 2, id: value.id, gameId, mode, level,
     previousScore: value.previousScore, attemptScore: value.attemptScore,
     finalized: value.finalized === true, rankable: value.rankable === true, attemptCleared: value.attemptCleared === true,
     owner: typeof value.owner?.profileId === 'string' && (value.owner.uid === null || typeof value.owner.uid === 'string') ? { ...value.owner } : null,
@@ -35,6 +36,7 @@ export function reduceRankedRun(run, event) {
     next.attemptCleared = false;
   } else if (event.type === "advance") {
     if (!run.attemptCleared || event.level !== run.level + 1) throw new Error("A ranked run advances exactly once after a cleared board.");
+    if (!Number.isSafeInteger(event.level) || !Number.isSafeInteger(run.previousScore + run.attemptScore)) throw new RangeError('Ranked run exceeds the supported range.');
     next.previousScore += run.attemptScore;
     next.level = event.level;
     next.attemptScore = 0;
@@ -68,22 +70,50 @@ export function stageRankedAttempt(gameId, mode, score, won = false) {
 export function getRankedRun(gameId, mode) {
   return gameState.progress[getGameProgressKey(gameId)].activeRankedRuns?.[mode] || null;
 }
-export function finalizeRankedRun(gameId, mode, score, outcome = "lost") {
+/** Stage with the winning settlement transaction; subscribers see it only after durability. */
+export function checkpointRankedRun(gameId, mode) {
   const profile = gameState.progress[getGameProgressKey(gameId)];
-  let run = profile.activeRankedRuns?.[mode];
+  const run = profile.activeRankedRuns?.[mode];
+  if (!run || run.finalized || !run.rankable || !run.attemptCleared || !run.owner) return null;
+  const totalScore = run.previousScore + run.attemptScore;
+  if (!Number.isSafeInteger(totalScore)) throw new RangeError('Run score exceeds the supported range.');
+  const result = Object.freeze({ rulesVersion: RANKING_RULES_VERSION, runId: run.id, levelReached: run.level, totalScore,
+    outcome: 'won', recordedAt: Date.now(), id: crypto.randomUUID(), owner: Object.freeze({ ...run.owner }), gameId, mode, kind: 'run' });
+  profile.runBestsV2 ||= {};
+  const previous = profile.runBestsV2[mode];
+  const sameOwner = previous && (run.owner.uid ? run.owner.uid === previous.owner.uid : run.owner.profileId === previous.owner.profileId && previous.owner.uid === null);
+  if (!sameOwner || compareRankingResults(result, previous, 'run') < 0) {
+    profile.runBestsV2[mode] = result;
+    return result;
+  }
+  return null;
+}
+export function finalizeRankedRun(gameId, mode, score, outcome = 'lost') {
+  const profile = gameState.progress[getGameProgressKey(gameId)];
+  const run = profile.activeRankedRuns?.[mode];
   if (!run || run.finalized) return null;
-  run = reduceRankedRun(run, { type: outcome === "won" ? "win" : "score", score });
-  run = reduceRankedRun(run, { type: "finalize" });
-  profile.activeRankedRuns[mode] = run;
-  if (!run.rankable) return null;
-  const owner = run.owner;
-  const result = { rulesVersion: RANKING_RULES_VERSION, runId: run.id, levelReached: run.level, totalScore: run.previousScore + run.attemptScore, outcome, recordedAt: Date.now(), ...(owner ? { id: crypto.randomUUID(), owner, gameId, mode, kind: 'run' } : {}) };
-  profile.runBests ||= {};
-  const previous = profile.runBests[mode];
-  if (!previous || compareRankingResults(result, previous, "run") < 0) profile.runBests[mode] = { ...result };
-  const rankedPrevious = previous?.rankingResult || (previous?.owner ? previous : null);
-  const sameOwner = rankedPrevious && (owner?.uid ? owner.uid === rankedPrevious.owner.uid : owner?.profileId === rankedPrevious.owner.profileId);
-  if (owner && (!sameOwner || compareRankingResults(result, rankedPrevious, 'run') < 0)) profile.runBests[mode].rankingResult = result;
-  else if (rankedPrevious) profile.runBests[mode].rankingResult = rankedPrevious;
-  return result;
+  // Closing a run never publishes the unfinished board or repeats its last checkpoint.
+  profile.activeRankedRuns[mode] = reduceRankedRun(run, { type: 'finalize' });
+  return null;
+}
+
+/** Import only when the matching finalized v1 run proves the cleared-board total. */
+export function normalizeRunBestsV2(progress, gameId) {
+  const bests = Object.fromEntries(Object.entries(progress.runBestsV2 || {}).filter(([mode, result]) =>
+    supportsRunRanking(gameId, mode) && result?.rulesVersion === 2 && result.gameId === gameId && result.mode === mode && validateRankingResult(result)));
+  for (const [mode, legacy] of Object.entries(progress.runBests || {})) {
+    const source = legacy?.rankingResult || legacy;
+    const rawRun = progress.activeRankedRuns?.[mode];
+    const run = rawRun?.version === 1 ? normalizeRankedRun(rawRun, { gameId, mode, level: rawRun.level }) : null;
+    if (!run || !run.finalized || !run.rankable || !run.owner || !validateRankingResult(source) || source.rulesVersion !== 1 || source.kind !== 'run'
+      || source.gameId !== gameId || source.mode !== mode || source.runId !== run.id || source.levelReached !== run.level
+      || source.totalScore !== run.previousScore + run.attemptScore || source.owner.profileId !== run.owner.profileId || source.owner.uid !== run.owner.uid
+      || (source.outcome === 'won') !== run.attemptCleared) continue;
+    const levelReached = run.attemptCleared ? run.level : run.level - 1;
+    if (levelReached < 1) continue;
+    const candidate = { ...source, rulesVersion: 2, outcome: 'won', levelReached, totalScore: run.previousScore + (run.attemptCleared ? run.attemptScore : 0) };
+    const previous = bests[mode];
+    if (!previous || previous.owner.uid === candidate.owner.uid && previous.owner.profileId === candidate.owner.profileId && compareRankingResults(candidate, previous, 'run') < 0) bests[mode] = candidate;
+  }
+  return bests;
 }

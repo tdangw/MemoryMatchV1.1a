@@ -1,0 +1,64 @@
+import assert from 'node:assert/strict';
+import { gameState, hydrateGameState } from '../js/gameState.js';
+import { setRankingOwner } from '../js/rankingOwner.js';
+import { beginRankedAttempt, stageRankedAttempt, checkpointRankedRun, finalizeRankedRun, getRankedRun, normalizeRankedRun, normalizeRunBestsV2 } from '../js/rankingRules.js';
+import { validateRankingResult, rankingBoardId, collectRankingResults } from '../js/rankingResult.js';
+import { rankingCursor, assertOrderedPage } from '../js/leaderboardStore.js';
+setRankingOwner({ id: 'checkpoint-profile', uid: 'checkpoint-owner' });
+for (const gameId of ['memory-match', 'link-connect', 'triple-connect']) for (const mode of ['challenge', 'endless']) {
+  beginRankedAttempt(gameId, mode, 1);
+  let last;
+  for (let level = 1; level <= 10; level++) {
+    stageRankedAttempt(gameId, mode, level * 100, true);
+    last = checkpointRankedRun(gameId, mode);
+    assert.equal(last.levelReached, level); assert(validateRankingResult(last));
+    assert.equal(rankingBoardId(last), `v2_${gameId}_${mode}`);
+    assert.equal(getRankedRun(gameId, mode).finalized, false);
+    if (level < 10) beginRankedAttempt(gameId, mode, level + 1, { reason: 'advance' });
+  }
+  assert.equal(last.totalScore, 5500);
+  beginRankedAttempt(gameId, mode, 10, { reason: 'restart' });
+  assert.equal(checkpointRankedRun(gameId, mode), null);
+  stageRankedAttempt(gameId, mode, 900000); assert.equal(checkpointRankedRun(gameId, mode), null);
+  stageRankedAttempt(gameId, mode, 1100, true);
+  assert.equal(checkpointRankedRun(gameId, mode).totalScore, 5600);
+  assert.equal(checkpointRankedRun(gameId, mode), null, 'Duplicate settlement is not published.');
+  beginRankedAttempt(gameId, mode, 11, { reason: 'advance' });
+  stageRankedAttempt(gameId, mode, 900000);
+  const key = { 'memory-match': 'memoryMatch', 'link-connect': 'linkConnect', 'triple-connect': 'tripleConnect' }[gameId];
+  const best = gameState.progress[key].runBestsV2[mode];
+  assert.equal(best.levelReached, 10); assert.equal(best.totalScore, 5600);
+  stageRankedAttempt(gameId, mode, 1200, true);
+  assert.equal(checkpointRankedRun(gameId, mode).totalScore, 6800);
+  const beforeClose = gameState.progress[key].runBestsV2[mode].id;
+  finalizeRankedRun(gameId, mode, 999999);
+  assert.equal(gameState.progress[key].runBestsV2[mode].id, beforeClose);
+  beginRankedAttempt(gameId, mode, 1); stageRankedAttempt(gameId, mode, 999999, true);
+  assert.equal(checkpointRankedRun(gameId, mode), null, 'A weaker new run cannot lower public best.');
+}
+const run = getRankedRun('memory-match', 'endless');
+assert.equal(normalizeRankedRun({ ...run, version: 1 }, run).version, 2);
+assert.equal(normalizeRankedRun({ ...run, previousScore: -1 }, run), null);
+const snapshot = structuredClone({ progress: gameState.progress, coins: 123, settings: {}, appearance: {} });
+hydrateGameState(snapshot);
+assert.equal(gameState.coins, 123);
+assert.equal(collectRankingResults({ profile: { data: { progress: gameState.progress } }, chapters: [] }).filter(result => result.rulesVersion === 2).length, 6);
+const rows = Array.from({ length: 10 }, (_, i) => ({ uid: String(i).padStart(2, '0'), durationMs: 1000 }));
+assertOrderedPage(rows, 'time'); assert.deepEqual(rankingCursor(rows[9], 'time'), [1000, '09']);
+assert.throws(() => assertOrderedPage([rows[1], rows[0]], 'time'), { code: 'stale' });
+assert.throws(() => assertOrderedPage([rows[0]], 'time', null, new Map([[1, { top: rows }]]), 2), { code: 'stale' });
+console.log('Six v2 checkpoint boards: clear/restart/reclear/advance, unfinished loss, owner, reload, legacy normalization and stable page ordering passed.');
+
+const legacyOwner = { profileId: 'legacy', uid: 'legacy-user' };
+const legacyRun = { version: 1, id: crypto.randomUUID(), gameId: 'triple-connect', mode: 'challenge', level: 10, previousScore: 900, attemptScore: 50, attemptCleared: false, finalized: true, rankable: true, owner: legacyOwner };
+const legacyBest = { rulesVersion: 1, id: crypto.randomUUID(), runId: legacyRun.id, gameId: 'triple-connect', mode: 'challenge', kind: 'run', owner: legacyOwner, levelReached: 10, totalScore: 950, outcome: 'lost', recordedAt: Date.now() };
+const legacyProgress = { activeRankedRuns: { challenge: legacyRun }, runBests: { challenge: legacyBest } };
+const migrated = normalizeRunBestsV2(legacyProgress, 'triple-connect');
+assert.equal(migrated.challenge.levelReached, 9); assert.equal(migrated.challenge.totalScore, 900); assert.equal(migrated.challenge.rulesVersion, 2);
+assert.equal(legacyProgress.runBests.challenge.totalScore, 950, 'Historical v1 is unchanged.');
+assert.deepEqual(normalizeRunBestsV2({ ...legacyProgress, runBestsV2: migrated }, 'triple-connect'), migrated, 'Migration is idempotent.');
+assert.deepEqual(normalizeRunBestsV2({ runBests: legacyProgress.runBests }, 'triple-connect'), {}, 'An aggregate without cleared-score proof is never imported.');
+assert.deepEqual(normalizeRunBestsV2({ ...legacyProgress, activeRankedRuns: { challenge: { ...legacyRun, id: 'other-run' } } }, 'triple-connect'), {});
+const complete = normalizeRunBestsV2({ activeRankedRuns: { challenge: { ...legacyRun, attemptCleared: true } }, runBests: { challenge: { ...legacyBest, outcome: 'won' } } }, 'triple-connect');
+assert.equal(complete.challenge.levelReached, 10); assert.equal(complete.challenge.totalScore, 950);
+console.log('Proven v1 cleared totals import as v2 idempotently; ambiguous aggregates remain historical.');

@@ -1,6 +1,6 @@
 # Kế hoạch hiệu ứng nền và bảng xếp hạng
 
-Ngày: 2026-10-13. Trạng thái: đang thực hiện; Gate1 đã nghiệm thu browser, Gate2 đang triển khai. Đây là kế hoạch hiện hành duy nhất; ADVENTURE_WEB_PLAN.md là hồ sơ đã hoàn tất.
+Ngày: 2026-10-13. Trạng thái: đang thực hiện; Gate1–2 đã nghiệm thu browser/emulator; Gate3 đang audit. Đây là kế hoạch hiện hành duy nhất; ADVENTURE_WEB_PLAN.md là hồ sơ đã hoàn tất.
 
 ## 1. Phạm vi và dữ kiện đã xác minh
 
@@ -68,7 +68,7 @@ Người dùng đã thử mobile và thấy mượt; chưa có bằng chứng c�
 
 ## 5. Thực hiện và nguồn
 
-Gate0 khảo sát/tài liệu hoàn tất; Gate1–3 chưa triển khai trong lượt này. Khi được giao code: thực hiện tuần tự, commit từng gate; unit/lifecycle và browser mục tiêu, check/build cuối cùng, review độc lập khi thay owner. Không deploy/push hoặc thay dữ liệu bằng task này.
+Gate0 khảo sát/tài liệu hoàn tất; Gate1–2 đã triển khai/nghiệm thu browser và emulator; Gate3 đang thực hiện audit. Khi được giao code: thực hiện tuần tự, commit từng gate; unit/lifecycle và browser mục tiêu, check/build cuối cùng, review độc lập khi thay owner. Không deploy/push hoặc thay dữ liệu bằng task này.
 
 Nguồn dự án: backgroundEffects.js/style.css; appPageLifecycle.js/gameShellLifecycle.js; victoryCelebration.js/victoryFlowerScene.js/fireworkEffect.js/victoryPresentation.web.js/ui.js/sound.js; leaderboardPanel.js/leaderboardStore.js/rankingResult.js/firestore.rules.
 
@@ -86,3 +86,16 @@ Browser Chrome155 Windows, viewport412×915/DPR1: 4/4 tests pass, gồm soak CSS
 So sánh hai cửa sổ35s: baseline tạo6/xóa5 node sao; pool tạo0/xóa0. Frame p95 cả hai8,1ms, không long task; phép đo không chứng minh tăng FPS. Profile1/1 và navigation responsive3/3 pass. Lần soak đầu bị lỗi lưu trace do dùng chung outputDir; đã chạy lại thư mục riêng và pass đầy đủ. Review độc lập đọc diff/chạy test và yêu cầu thêm soak/navigation thật; đã bổ sung bằng chứng. Check/build pass trước commit. Không deploy/push.
 
 Gate2 tiếp tục trong cùng task: logic/version trước UI, kỷ lục v1 giữ lịch sử, checkpoint v2 tách riêng trong transaction thắng.
+
+
+### Gate2
+
+Checkpoint v2 cho Thử thách/Vô tận cả ba trò được stage cùng settlement thắng và chỉ vào outbox sau durability. Restart thay attemptScore, advance cộng đúng một lần; finalize chỉ đóng run, không gửi điểm màn dở. `runBestsV2` tách khỏi `runBests` lịch sử; formatVersion2, Xu/item/appearance/chặng và board thời gianv1 giữ nguyên. Chỉ nhập v1 khi finalized run khớp ID/owner/level/total/outcome chứng minh phần đã thắng; lost bỏ current attempt, thiếu proof không nhập. Dùng ID cũ ở board v2 riêng giúp nhập idempotent. Đây là extension ranking/session được kế hoạch cho phép, không reset save.
+
+UI ba tab trò/sáu mode, badgeC/B/A/S, frontier mặc định,10 dòng/trang + own riêng, avatar dự phòng, tên an toàn. Store query11/startAfter mục10 với đủ sort keys + UID; cache12board/5page và100cursor, own một lần/TTL, request generation/UID guard và stale-order/duplicate warning. Không polling/count query/realtime list. Rules cho đúng v2sáu mode, v1historical/time giữ nguyên; composite index hiện có đã đủ, không cần đổi indexfile.
+
+Nghiệm thu: emulator browser10/10 (sáu controller-mode settlement thật, quota-failure rollback/no outbox, offline/reload/receipt, UIDv2, time regression). Rules fixtures0/1/10/11/20/21,tieUID,version isolation,best-only/concurrent,cache12/TTL/refresh pass; reviewer chạy độc lập Rules và pure compatibility. UI/data/catalog regression12/12, gồm412×915,640×360,1024×900,stale/error/close/name safety. Review phát hiện pager clipping ở landscape và khóa nút Trước khi lỗi; đã sửa/rerun4/4 độc lập. Check/build pass trước commit. Không deploy Rules/Hosting hoặc push; môi trường hosted cần Rules mới khi phát hành bằng task riêng.
+
+### Chuẩn bị Gate3 — giữ mỹ thuật
+
+Baseline audit chứng minh owner.dispose để lại canvas pháo hoa1 và confetti1; mở hoa nhanh vẫn có canvas confetti chồng lên. Chọn A: giữ SVG/renderers hiện có, sửa owner/cancellation; không chọn raster vì chưa có bằng chứng bottleneck của hoa. Luồng giữ pháo hoa3,6s → tổng kết/confetti150hạt → hoa3nhóm5,2s/delay120ms. Fireworks giữ cap175/250, DPR1,25/1,5 và repaint canvas fullscreen; hoa chỉ opacity/transform, không đổi95SVGnode. Confetti tối đa một canvas của riêng summary. Interrupt cancel RAF/timer/canvas theo đúng owner; reduced-motion bỏ canvas/chuyển động và giữ thông tin tĩnh. Nhạc cảnh dừng/reset riêng, không phá audio app. So sánh timeline/hìnhảnh và trace, heap/resources30vòng; chưa có quyền truy cập thiết bị Galaxy S22 Ultra thật để đo GPU/FPS vật lý.

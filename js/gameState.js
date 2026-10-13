@@ -11,7 +11,7 @@ import { getThemeSelectionManifest } from "./themeCatalog.js";
 import { appendThemeSelectionHistory, normalizeThemeSelectionHistory } from "./themeSelection.js";
 import { getAdventureSummary, isCompletedLevelResult, isNormalAdventureMode, MAX_ADVENTURE_CHAPTER } from "./adventureProgress.js";
 import { normalizePlayMetrics, getActivePlayMetrics } from "./playMetrics.js";
-import { normalizeRankedRun } from "./rankingRules.js";
+import { normalizeRankedRun, normalizeRunBestsV2 } from "./rankingRules.js";
 import { getRankingOwner } from './rankingOwner.js';
 import { validateRankingResult } from './rankingResult.js';
 
@@ -236,6 +236,7 @@ function normalizeAdventure(progress, gameId) {
       const normalized = normalizeRankedRun(run, { gameId, mode, level: run.level });
       return normalized ? [[mode, normalized]] : [];
     })),
+    runBestsV2: normalizeRunBestsV2(progress, gameId),
     runBests: Object.fromEntries(Object.entries(progress.runBests || {}).filter(([mode, result]) => ["challenge", "endless"].includes(mode)
       && result && Number.isSafeInteger(result.levelReached) && result.levelReached > 0 && Number.isSafeInteger(result.totalScore) && result.totalScore >= 0)),
   };

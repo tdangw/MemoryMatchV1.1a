@@ -57,7 +57,7 @@ import { savePersistentGameData, isPersistenceBlocked } from "../persistence.js"
 import { beginPlayMetrics, resumePlayMetrics, snapshotPlayMetrics, finishPlayMetrics } from "../playMetrics.js";
 import { prepareAdventureChapter, stageAdventureLevelStart, canAdvanceAdventure } from "../adventureLaunch.js";
 import { getChapterNumber } from "../adventureProgress.js";
-import { beginRankedAttempt, finalizeRankedRun, getRankedRun, stageRankedAttempt } from "../rankingRules.js";
+import { beginRankedAttempt, checkpointRankedRun, finalizeRankedRun, getRankedRun, stageRankedAttempt } from "../rankingRules.js";
 import { stageActiveSession } from "../sessionProgress.js";
 import { calculateTripleCoinReward } from "./tripleConfig.js";
 import { getLinkExitEffect, getLinkPathEffect } from "../linkConnect/linkEffects.js";
@@ -971,6 +971,7 @@ async function commitTripleTerminalResult() {
     gameState.coins += reward;
     recordTripleConnectResult({ mode: currentMode, level: currentLevel, score: completion.score, stars, durationMs: finishPlayMetrics() });
     stageRankedAttempt("triple-connect", currentMode, completion.score, true);
+    checkpointRankedRun("triple-connect", currentMode);
     if (currentMode === "challenge" && isTripleChallengeComplete(currentLevel)) finalizeRankedRun("triple-connect", currentMode, completion.score, "won");
   }
   delete gameState.progress.tripleConnect.sessionsByMode[currentMode];

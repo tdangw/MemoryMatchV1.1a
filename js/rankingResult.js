@@ -1,20 +1,20 @@
 import { NORMAL_MODE_IDS, MAX_ADVENTURE_LEVEL } from './adventureProgress.js';
 const games = new Set(['memory-match', 'link-connect', 'triple-connect']);
-export function rankingBoardId({ gameId, mode, level, kind }) {
+export function rankingBoardId({ gameId, mode, level, kind, rulesVersion = kind === 'run' ? 2 : 1 }) {
   if (!games.has(gameId)) throw new RangeError('Unknown ranking game.');
   if (kind === 'time' && NORMAL_MODE_IDS.includes(mode) && Number.isSafeInteger(level) && level > 0 && level <= MAX_ADVENTURE_LEVEL) return `v1_${gameId}_${mode}_${level}`;
-  if (kind === 'run' && (mode === 'challenge' || gameId === 'triple-connect' && mode === 'endless')) return `v1_${gameId}_${mode}`;
+  if (kind === 'run' && [1, 2].includes(rulesVersion) && (mode === 'challenge' || mode === 'endless' && (rulesVersion === 2 || gameId === 'triple-connect'))) return `v${rulesVersion}_${gameId}_${mode}`;
   throw new RangeError('Unsupported ranking board.');
 }
 export function validateRankingResult(result) {
   try {
     rankingBoardId(result);
-    return result.rulesVersion === 1 && typeof result.id === 'string' && /^[a-f0-9-]{36}$/.test(result.id)
+    return (result.kind === 'time' ? result.rulesVersion === 1 : [1, 2].includes(result.rulesVersion)) && typeof result.id === 'string' && /^[a-f0-9-]{36}$/.test(result.id)
       && Number.isSafeInteger(result.recordedAt) && result.recordedAt > 0
       && typeof result.owner?.profileId === 'string' && result.owner.profileId.length > 0
       && (result.owner.uid === null || typeof result.owner.uid === 'string')
       && (result.kind === 'time' ? result.outcome === 'won' && integer(result.durationMs, 1) && integer(result.score) && integer(result.stars) && result.stars <= 3
-        : ['won', 'lost'].includes(result.outcome) && integer(result.levelReached, 1) && integer(result.totalScore));
+        : (result.rulesVersion === 2 ? result.outcome === 'won' : ['won', 'lost'].includes(result.outcome)) && integer(result.levelReached, 1) && integer(result.totalScore));
   } catch { return false; }
 }
 export function comparePublicResults(a, b, kind) {
@@ -25,7 +25,7 @@ export function collectRankingResults(snapshot) {
   const collect = progress => {
     for (const game of Object.values(progress || {})) {
       for (const result of Object.values(game?.bestByLevel || {})) if (validateRankingResult(result.rankingResult)) records.push(result.rankingResult);
-      for (const best of Object.values(game?.runBests || {})) {
+      for (const best of [...Object.values(game?.runBests || {}), ...Object.values(game?.runBestsV2 || {})]) {
         const result = best.rankingResult || best;
         if (validateRankingResult(result)) records.push(result);
       }

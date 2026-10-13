@@ -27,7 +27,7 @@ import { saveCoins, savePersistentGameData, isPersistenceBlocked } from "../pers
 import { beginPlayMetrics, resumePlayMetrics, snapshotPlayMetrics, finishPlayMetrics } from "../playMetrics.js";
 import { prepareAdventureChapter, stageAdventureLevelStart, canAdvanceAdventure } from "../adventureLaunch.js";
 import { getChapterNumber } from "../adventureProgress.js";
-import { beginRankedAttempt, finalizeRankedRun, getRankedRun, stageRankedAttempt } from "../rankingRules.js";
+import { beginRankedAttempt, checkpointRankedRun, finalizeRankedRun, getRankedRun, stageRankedAttempt } from "../rankingRules.js";
 import { getTheme, getThemeSelectionEligibility } from "../themeCatalog.js";
 import { GAME_MODES } from "../gameCatalog.js";
 import { TIME_UP_PURCHASES } from "../shopCatalog.js";
@@ -793,6 +793,7 @@ async function completeLinkLevel() {
   (await awardLinkCoins(coinsEarned, null, { animate: false, persist: false }));
   if (linkGameState.roundId !== roundId) return;
   stageRankedAttempt("link-connect", linkGameState.mode, linkGameState.score, true);
+  checkpointRankedRun("link-connect", linkGameState.mode);
   delete gameState.progress.linkConnect.sessionsByMode?.[linkGameState.mode];
   if (!(await savePersistentGameData({ coins: gameState.coins, progress: gameState.progress, cloudEvent: true }))) {
     if (linkGameState.roundId === roundId) {

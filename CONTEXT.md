@@ -17,7 +17,7 @@
 
 ## Contract dùng chung
 
-- Kế hoạch hiện hành mới: `EFFECTS_LEADERBOARD_PLAN.md` (2026-10-13), đang thực hiện theo yêu cầu; Gate1 pool đã nghiệm thu, Gate2/3 đang thực hiện. Gate1 pool sao băng; Gate2 UI xếp hạng ba trò × sáu mode,10 người/trang và cursor; Gate3 đo/audit cảnh thắng trước khi quyết định sửa mỹ thuật. ADVENTURE_WEB_PLAN.md phase0–20 đã hoàn tất và là hồ sơ lịch sử.
+- Kế hoạch hiện hành mới: `EFFECTS_LEADERBOARD_PLAN.md` (2026-10-13), đang thực hiện theo yêu cầu; Gate1 pool và Gate2 checkpoint/UI đã nghiệm thu browser/emulator, Gate3 đang audit. Gate1 pool sao băng; Gate2 UI xếp hạng ba trò × sáu mode,10 người/trang và cursor; Gate3 đo/audit cảnh thắng trước khi quyết định sửa mỹ thuật. ADVENTURE_WEB_PLAN.md phase0–20 đã hoàn tất và là hồ sơ lịch sử.
 - Cảnh hoa hiện tại95 phần tử SVG/ba nhóm animation hữu hạn; người dùng đã thử mobile và thấy mượt. Kế hoạch giữ hình ảnh hiện có, đo allocations/frame/paint và audit confetti còn lại/RAF cleanup khi chuyển cảnh nhanh. Sao băng dùng eligibility từ page/navigation/shell lifecycle.
 
 - Firebase Hosting dùng chung project `memorymatchv1-1a` với ba site: target `production` → `memorymatchv1-1a`, target `beta` → `memorymatchv1-1b`, target `test` → `memorymatch-test`. `npm run deploy`, `npm run deploy:beta` và `npm run deploy:test` chỉ deploy đúng site tương ứng. Mỗi URL có storage trình duyệt riêng vì khác origin.
@@ -29,7 +29,7 @@
 - Hướng menu hiện tại (mục20): ngoài gameplay dùng năm tab toàn màn hình. Home: Nhiệm vụ/Bạn bè/Profile/Xếp hạng/Cài đặt, hai mục đầu Sắp ra mắt. Chọn trò: Cửa hàng/Bộ sưu tập/Bản đồ/Xếp hạng/Cài đặt. Không profile/Xu trên header; Exit góc trên phải map/tab trở về Home. Gameplay giữ HUD/bàn/khay, ẩn dock; ba gạch mở Tạm dừng với Thoát game/Chơi lại/Cài đặt, giữ ván và pause trong Cài đặt. Quảng cáo chỉ Home/map. Mục20 là scope hiện hành, thay các mô tả UI cũ.
 - Bản đồ dùng sao chưa sáng/sao sáng theo kết quả của độ khó đang xem; completion chung giữa độ khó vẫn là dữ liệu riêng, không suy từ số sao. Không có tìm/lọc màn; re-entry về frontier.
 - Màn thường xếp hạng riêng theo trò/độ khó/màn, ưu tiên thời gian thực đang chơi ngắn nhất (loại tải/pause/menu/tab ẩn). Cho phép hỗ trợ, guest/Google; một kỷ lục mỗi UID/bảng. Backend cơ bản client-trusted đã triển khai, contract/quota cũ ở mục12 ADVENTURE_WEB_PLAN.md.
-- Quyết định mới đã chốt2026-10-13, CHƯA triển khai: Thử thách/Vô tận của cả ba trò gửi checkpoint sau mỗi màn thắng đã commit; xếp số màn thắng liên tiếp trong lượt rồi tổng điểm các màn thắng. Clear10, chơi/thua11 vẫn ghi10 và điểm đến10. Mua giờ/restart giữ lượt; restart không gửi, thắng lại thay điểm hiện tại, không cộng lặp. Snapshot checkpoint không finalize run. Bảng lượt dùng v2; giữ dữ liệu/bảng v1 làm lịch sử, chỉ nhập kỷ lục có đủ dữ liệu các màn thắng. Màn thường không đổi. Gate2 EFFECTS_LEADERBOARD_PLAN.md bao gồm logic/version/Rules/outbox trước UI.
+- Quyết định đã triển khai2026-10-14 ở Gate2: Thử thách/Vô tận của cả ba trò gửi checkpoint sau mỗi màn thắng đã commit; xếp số màn thắng liên tiếp trong lượt rồi tổng điểm các màn thắng. Clear10, chơi/thua11 vẫn ghi10 và điểm đến10. Mua giờ/restart giữ lượt; restart không gửi, thắng lại thay điểm hiện tại, không cộng lặp. Snapshot checkpoint không finalize run. Bảng lượt dùng v2; giữ dữ liệu/bảng v1 làm lịch sử, chỉ nhập kỷ lục có đủ dữ liệu các màn thắng. Màn thường không đổi. Gate2 EFFECTS_LEADERBOARD_PLAN.md bao gồm logic/version/Rules/outbox trước UI.
 - Startup ba game hiển thị popup đầu màn ngay khi HUD/board DOM sẵn sàng, decode ảnh tiếp tục nền, không có nhãn loading và input/timer chỉ mở sau khi readiness hoàn tất. Startup regression 9/9, contract popup/timer Triple 1/1, check/build và nghiệm thu Galaxy S22 Ultra đã pass. Trace cold board-ready có nhiễu profiler được giữ làm dữ liệu tham khảo, không phải lỗi mở.
 
 - Tinh chỉnh HUD ngày 2026-09-30: bỏ animation `pulse-red` phóng to ô timer, giữ cảnh báo màu tĩnh; nút menu hệ thống có nền xanh dương, công cụ gameplay có nền tím và icon sáng, cùng viền inset, không đổi kích thước 44px. Regression HUD/menu/presentation 10/10 ở 412×915; sau khi tách màu nút, presentation 3/3 và check/build pass; API/save không đổi. Chưa kiểm tra trên thiết bị thật.
@@ -66,7 +66,7 @@
 
 ## Tài liệu giữ lại
 
-- `EFFECTS_LEADERBOARD_PLAN.md`: kế hoạch hiện hành; Gate1 pool sao băng đã đạt browser checks, Gate2/3 tiếp tục.
+- `EFFECTS_LEADERBOARD_PLAN.md`: kế hoạch hiện hành; Gate1 sao băng và Gate2 xếp hạng đã đạt browser/emulator checks, Gate3 tiếp tục.
 - `ADVENTURE_WEB_PLAN.md`: hồ sơ đã hoàn tất phase0–20 và quyết định UI/data hiện có.
 - `AGENTS.md`: chuẩn làm việc bắt buộc.
 - `ARCHITECTURE.md`: ownership và contract kỹ thuật bền vững.
@@ -124,3 +124,6 @@ Mục18 và19 đã hoàn tất: check/build và44 UI/startup pass; built3 pass; 
 
 
 Gate1 EFFECTS_LEADERBOARD_PLAN.md (2026-10-14): pool sao băng hai node/một scheduler và eligibility Home/map trực tiếp từ owner đã triển khai. Soak animation thật10 phút/114 lần hoàn tất,100 lần chuyển Home/map/game thật giữ node/timer ổn định; post-GC heap gần7MB. So sánh35s: allocations node6→0, frame p95 8,1→8,1ms/không long task trên Chrome155 Windows/DPR1. Check/build và browser tests pass, review độc lập. Chưa có số đo Galaxy S22 Ultra; không tuyên bố FPS thiết bị thật. Gate2/3 đang thực hiện, chưa đánh dấu hoàn tất.
+
+
+Gate2 EFFECTS_LEADERBOARD_PLAN.md (2026-10-14): checkpoint thắng v2 cho Challenge/Endless cả ba trò, best-only theo số màn thắng/điểm các màn thắng; stage cùng transaction settlement, thất bại không outbox, restart thay điểm/advance cộng một lần/finalize không gửi màn dở. runBestsV2 mới giữ runBestsv1 làm lịch sử; nhập v1 chỉ khi matching finalized run chứng minh totals. UI3trò×6mode/10người+own/cursor11entries, cache12board×5page/100cursor và UID/generation guard. Browser emulator10/10, UI/data/catalog12/12, Rules/pure/check/build pass, review độc lập findings đã sửa. Không deploy Rules hoặc Hosting; index hiện có đủ. Gate3 audit ownership/cảnh thắng đang thực hiện; thiết bị thật chưa đo.
