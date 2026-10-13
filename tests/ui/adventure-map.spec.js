@@ -34,6 +34,18 @@ for (const [gameId, title, progressKey] of [['memory-match', 'Memory Match', 'me
       const node = await page.locator('[data-level="7"]').boundingBox();
       expect(node.width).toBeGreaterThanOrEqual(44);
       expect(node.width).toBeLessThan(58);
+      const scenery = await page.evaluate(async () => {
+        const sprites = [...document.querySelectorAll('.adventure-map-decoration')];
+        const controls = [...document.querySelectorAll('.adventure-map-cell')];
+        const overlap = (a, b) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+        const image = new Image(); image.src = '/assets/adventure/garden-sprites.webp'; await image.decode();
+        return { count: sprites.length, collisions: sprites.filter(sprite => controls.some(control => overlap(sprite.getBoundingClientRect(), control.getBoundingClientRect()))).length, width: image.naturalWidth, pointerEvents: getComputedStyle(sprites[0]).pointerEvents };
+      });
+      expect(scenery.count).toBeGreaterThanOrEqual(10);
+      expect(scenery.count).toBeLessThanOrEqual(37);
+      expect(scenery.collisions).toBe(0);
+      expect(scenery.width).toBeGreaterThan(0);
+      expect(scenery.pointerEvents).toBe('none');
       expect(await page.locator('.adventure-map-path path').first().evaluate(el => Number.parseFloat(getComputedStyle(el).strokeWidth))).toBeLessThan(15);
       await page.locator('.adventure-mode-toggle').click();
       await expect(page.locator('.adventure-mode-option')).toHaveCount(6);
@@ -96,7 +108,7 @@ test("chapter nodes stay mounted on mode changes, shared clear stays distinct fr
     const chest = document.querySelector('[data-chest="1"]').getBoundingClientRect();
     return { levelY: level.top + level.height / 2, chestY: chest.top + chest.height / 2, distance: Math.abs(level.left - chest.left), trailWidth: trail.width };
   });
-  expect(Math.abs(alignment.levelY - alignment.chestY)).toBeLessThan(1);
+  expect(Math.abs(alignment.levelY - alignment.chestY)).toBeLessThanOrEqual(16);
   expect(alignment.distance).toBeGreaterThan(70);
   await page.evaluate(() => {
     window.__mapNode = document.querySelector('[data-level="1"]');
@@ -109,6 +121,7 @@ test("chapter nodes stay mounted on mode changes, shared clear stays distinct fr
   expect(await page.locator('[data-level="1"]').getAttribute("class")).toContain("is-cleared");
   expect(await page.evaluate(() => document.querySelector(".adventure-map-scroll").scrollTop)).toBe(await page.evaluate(() => window.__mapScroll));
   await page.locator('[data-chest="1"]').scrollIntoViewIfNeeded();
+  await expect(page.locator('[data-chest="1"] .adventure-map-chest-art')).toHaveCSS('background-position', '0% 100%');
   await page.locator('[data-chest="1"]').click();
   await page.getByRole("button", { name: "Nhận thưởng", exact: true }).click();
   await expect(page.locator("#adventure-chest-modal")).toContainText("Đã nhận thưởng");
@@ -117,6 +130,7 @@ test("chapter nodes stay mounted on mode changes, shared clear stays distinct fr
   expect(coins).toBeLessThanOrEqual(950);
   await page.locator("#adventure-chest-modal .app-modal__close").click();
   await expect(page.locator("#adventure-chest-modal")).toHaveCount(0);
+  await expect(page.locator('[data-chest="1"] .adventure-map-chest-art')).toHaveCSS('background-position', '33.3333% 100%');
   await page.locator('[data-chest="1"]').click();
   await expect(page.locator("#adventure-chest-modal")).not.toContainText("Nhận thưởng");
   expect(await page.evaluate(async () => (await import("/js/gameState.js")).gameState.coins)).toBe(coins);

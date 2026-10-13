@@ -129,11 +129,15 @@
 .adventure-map-node:disabled { background: #263b4c; border-color: #718697; color: #9caeb7; box-shadow: 0 4px 0 #162536; cursor: default; }
 .adventure-map-node.is-cleared::after { content: "✓"; position: absolute; right: -7px; top: -5px; width: 21px; height: 21px; border-radius: 50%; background: #377868; color: #fff; font-size: 14px; line-height: 21px; }
 .adventure-map-node.is-mode-cleared { background: linear-gradient(#7fc3ac, #407e70); color: #fff; border-color: #a5dcca; box-shadow: 0 4px 0 #245648, 0 8px 16px #0004; }
-.adventure-map-node--chest { border-radius: 16px; background: #795b3c; color: #e7c692; }
+.adventure-map-node--chest { width: 72px; height: 64px; border: 0; border-radius: 16px; padding: 0; background: #19364866; color: #e7c692; box-shadow: none; }
 .adventure-map-cell--chest { width: 90px; }
 .adventure-map-node.is-current { outline: 3px solid #ffe08c; outline-offset: 4px; box-shadow: 0 0 22px #f7c96f88; }
-.adventure-map-node--chest.is-ready { background: #cfa14f; color: #fff1b8; }
-.adventure-map-node--chest.is-claimed { background: #25423c; color: #91baa7; border-color: #669d85; }
+.adventure-map-node--chest.is-ready { background: #e3b85b26; outline: 1px solid #f0cf8170; box-shadow: 0 0 16px #e8b85455; }
+.adventure-map-node--chest.is-claimed { background: #20433d44; }
+.adventure-map-sprite { display: block; background-image: url('/assets/adventure/garden-sprites.webp'); background-size: 400% 400%; background-repeat: no-repeat; pointer-events: none; }
+.adventure-map-chest-art { width: 72px; height: 64px; background-position: 0% 100%; }
+.adventure-map-node--chest.is-claimed .adventure-map-chest-art { background-position: 33.333333% 100%; }
+.adventure-map-decoration { position: absolute; aspect-ratio: 1; transform: translate(-50%, -50%); }
 .adventure-map-stars { color: #ffe096; font-size: 17px; letter-spacing: 1px; line-height: 21px; text-shadow: 0 1px 3px #000; }
 .adventure-map-detail { color: #d1dedf; font-size: 12px; white-space: nowrap; line-height: 16px; max-width: 140px; overflow: hidden; text-overflow: ellipsis; }
 .adventure-mode-selector { position: relative; display: flex; justify-content: center; padding: 6px 12px; background: #0b2033e8; z-index: 2; }

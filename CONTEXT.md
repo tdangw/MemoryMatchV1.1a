@@ -70,6 +70,7 @@
 - `ADD_GAME.md`: checklist tích hợp game.
 - `Memory Match.md`, `Link Connect.md`, `Triple Connect.md`: luật/thiết kế từng game.
 - `themes.md`: catalog/chất lượng asset chủ đề.
+- `MAP_ART_NOTES.md`: atlas trang trí/rương bản đồ vườn đêm, quy tắc bố trí và prompt gốc.
 
 Các kế hoạch HUD, Startup, Triple/Effect/Theme, Runtime Closure và Board Startup cũ đã được hợp nhất, hoàn tất hoặc ngừng active và bị xóa. Không khôi phục chúng từ Git history làm nguồn triển khai; dùng code/config và các tài liệu bền vững ở trên làm nguồn hiện hành.
 
@@ -100,3 +101,7 @@ Phase7: production-only Analytics active_play_time theo pause/end segment, khôn
 Đã hoàn tất tinh chỉnh: bỏ nhãn/điều hướng chặng, tiến trình, chủ đề và mọi nút tiếp tục ngoài map; tên trò cùng hàng avatar/Xu ở trên; một nút chọn sáu chế độ; nút màn44px và đường SVG mảnh có hoa văn tĩnh. Mỗi lần vào map trở về màn cao nhất đang chơi được ở chặng hiện tại. Bấm màn hoặc chọn chế độ đặc biệt bắt đầu lượt mới; không tự xóa phiên chỉ vì về menu. Luật/đồng hồ/ranking/economy/schema save giữ nguyên. Kiểm tra mode/focus/keyboard, re-entry, seam/reward, vòng đời và ba viewport; check/build trước hoàn tất. Không thay gameplay, backend, nền bitmap hoặc quảng cáo.
 
 Nghiệm thu tinh gọn: check/build pass; browser33/33 (map, progression, compact shell), bản đồ cuối20/20 gồm3 trò×6 mode/keyboard/seam; built-app smoke2/2. Registry/HUD/audit/geometry/menu38 kiểm tra pass ở lượt đầu, seed expectation được cập nhật đúng variant generator và pass khi chạy lại progression. Headless dev715 DOM nodes, mode patch p95 6,7ms, không long task; chưa đo FPS điện thoại thật. Skill làm rõ yêu cầu được dùng để chốt lựa chọn vào lượt mới; không thay schema save/backend/gameplay.
+
+## Trang trí map — 2026-10-13
+
+Task ADVENTURE_WEB_PLAN.md mục17 đã hoàn tất, không còn gate active. Atlas gốc vườn đêm gồm14 trang trí và2 trạng thái rương; layout thuần theo game/màn, ổn định khi nối chặng và tính Y tương đối để không mất chính xác ở số màn lớn. Giữ shared map/page ownership, không thêm listener/RAF/animation loop/backend/schema. Skill imagegen được dùng để tạo và chỉnh khoảng trống atlas; prompt/nguồn ở MAP_ART_NOTES.md. check/build pass;19 map contracts được xác minh qua lượt rộng/chạy lại reward, performance1 và built-smoke2 pass. Lượt cuối722 DOM nodes, mode patch p95 5,8ms, không long task; lượt trước có54–55ms trong cửa sổ toàn tải/đo. Chưa đo60FPS trên điện thoại thật.

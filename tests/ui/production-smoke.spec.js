@@ -13,6 +13,12 @@ test('built mobile menu, map and account open without writing to production serv
   await expect(page.locator('.adventure-map-node--level')).toHaveCount(100);
   await expect(page.locator('[data-level="1"]')).toBeEnabled();
   await expect(page.locator('[data-level="2"]')).toBeDisabled();
+  expect(await page.locator('.adventure-map-decoration').count()).toBeGreaterThanOrEqual(10);
+  const atlasReady = await page.evaluate(async () => {
+    const image = new Image(); image.src = '/assets/adventure/garden-sprites.webp'; await image.decode();
+    return image.naturalWidth > 0 && getComputedStyle(document.querySelector('.adventure-map-chest-art')).backgroundImage.includes('garden-sprites.webp');
+  });
+  expect(atlasReady).toBe(true);
   await page.locator('.adventure-mode-toggle').click();
   await page.locator('[data-mode="hard"]').click();
   await expect(page.locator('.adventure-mode-toggle')).toContainText('Khó');

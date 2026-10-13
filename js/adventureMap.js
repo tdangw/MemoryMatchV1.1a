@@ -1,6 +1,6 @@
 import { gameState } from "./gameState.js";
 import { GAME_MODES, getGameDefinition, getGameModeLabel } from "./gameCatalog.js";
-import { createIcon } from "./icons.js";
+import { MAP_LEVEL_STEP, getMapLevelPoint, getMapChestPoint, createMapDecorations } from "./adventureMapLayout.js";
 import { decorateAdventureMenu, refreshAppWallet } from "./appNavigation.js";
 import { prepareAdventureChapter } from "./adventureLaunch.js";
 import { createAdventureChapterNodes, getAdventureSummary, getAdventureLevelState, getAdventureChestState, isNormalAdventureMode } from "./adventureProgress.js";
@@ -107,8 +107,8 @@ export function mountAdventureMap(gameId) {
   let extraLevels = [];
   let topLevel = view.chapter * 100;
   let bottomLevel = topLevel - 99;
-  const step = 104;
-  const position = level => ({ x: 200 + Math.sin((level - 1) * .62) * 82, y: (topLevel - level) * step + 64 });
+  const step = MAP_LEVEL_STEP;
+  const position = level => getMapLevelPoint(gameId, level, topLevel);
   function mapNodes() {
     const summary = profile.adventure || getAdventureSummary(profile.bestByLevel);
     const best = { ...adjacentBest, ...profile.bestByLevel };
@@ -199,12 +199,25 @@ export function mountAdventureMap(gameId) {
     path.append(line, ornament);
     trail.append(path);
     trail.style.height = `${height}px`;
+    const scenery = document.createDocumentFragment();
+    for (const decoration of createMapDecorations(gameId, bottomLevel, topLevel)) {
+      const sprite = document.createElement("span");
+      sprite.className = "adventure-map-decoration adventure-map-sprite";
+      sprite.setAttribute("aria-hidden", "true");
+      sprite.dataset.scenery = String(decoration.id);
+      sprite.style.left = `${decoration.x / 4}%`;
+      sprite.style.top = `${decoration.y}px`;
+      sprite.style.width = `${decoration.size / 4}%`;
+      sprite.style.backgroundPosition = `${(decoration.slot % 4) * 100 / 3}% ${Math.floor(decoration.slot / 4) * 100 / 3}%`;
+      scenery.append(sprite);
+    }
+    trail.append(scenery);
     nodes.forEach((node, index) => {
       const cell = document.createElement("div");
       cell.className = "adventure-map-cell";
-      const point = position(node.kind === "level" ? node.level : node.lastLevel);
-      cell.style.top = `${point.y - 22}px`;
-      cell.style.left = `${node.kind === "level" ? point.x / 4 : point.x < 200 ? 83 : 17}%`;
+      const point = node.kind === "level" ? position(node.level) : getMapChestPoint(gameId, node.chestNumber, topLevel);
+      cell.style.top = `${point.y - (node.kind === "level" ? 22 : 32)}px`;
+      cell.style.left = `${point.x / 4}%`;
       cell.classList.toggle("adventure-map-cell--chest", node.kind === "chest");
       const control = button(node.kind === "level" ? String(node.level) : "", `adventure-map-node adventure-map-node--${node.kind}`);
       const stars = document.createElement("span");
@@ -212,7 +225,13 @@ export function mountAdventureMap(gameId) {
       const detail = document.createElement("small");
       detail.className = "adventure-map-detail";
       if (node.kind === "level") control.dataset.level = String(node.level);
-      else { control.dataset.chest = String(node.chestNumber); control.append(createIcon("collection")); }
+      else {
+        control.dataset.chest = String(node.chestNumber);
+        const art = document.createElement("span");
+        art.className = "adventure-map-chest-art adventure-map-sprite";
+        art.setAttribute("aria-hidden", "true");
+        control.append(art);
+      }
       cell.append(control, stars, detail);
       trail.append(cell);
       renderedNodes.push({ node, control, stars, detail });
