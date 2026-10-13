@@ -11,10 +11,10 @@ export function closeCloudConflictDialog() {
   activeConflict = null;
   previous?.release?.forget(); previous?.modal.destroy();
 }
-export function showAccountPanel() {
+export function showAccountPanel(surface = {}) {
   activeView?.dispose();
   const service = getAccountService();
-  if (!service) return openAppModal({ id: "account-modal", title: "Tài khoản", content: "<p>Người chơi</p><p>Tiến trình đã lưu trên thiết bị.</p>" });
+  if (!service) return openAppModal({ ...surface, id: "account-modal", title: "Tài khoản", content: "<p>Người chơi</p><p>Tiến trình đã lưu trên thiết bị.</p>" });
   const content = document.createElement("div");
   const identity = document.createElement("p");
   identity.className = "account-identity";
@@ -33,7 +33,7 @@ export function showAccountPanel() {
   explanation.className = "account-explanation";
   explanation.textContent = "Liên kết Google để chơi tiếp trên thiết bị khác.";
   content.append(identity, status, label, saveName, explanation);
-  const modal = openAppModal({ id: "account-modal", title: "Tài khoản", icon: "account", content, onClose: () => dispose(), onActionSettled: () => renderState(service.getState()), actions: [
+  const modal = openAppModal({ ...surface, id: "account-modal", title: "Tài khoản", icon: "account", content, onDestroy: () => dispose(), onClose: () => dispose(), onActionSettled: () => renderState(service.getState()), actions: [
     { label: "Google", icon: "account", variant: "primary", onClick: async () => { await service.requestGoogleLogin(); return false; } },
   ] });
   let releaseOwner;
@@ -45,7 +45,7 @@ export function showAccountPanel() {
     if (activeView?.modal === modal) activeView = null;
   }
   activeView = { modal, dispose };
-  releaseOwner = getAppPageScope()?.own(dispose, "cleanup");
+  releaseOwner = (surface.owner || getAppPageScope())?.own(dispose, "cleanup");
   function renderState(state) {
     if (disposed) return;
     identity.textContent = state.isAnonymous ? "Tài khoản khách" : "Đã đăng nhập Google";

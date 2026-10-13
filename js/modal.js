@@ -22,7 +22,10 @@ export function openAppModal({
   onDestroy,
   onActionSettled,
   owner = getActiveGameScope() || getAppPageScope(),
+  presentation = "modal",
+  host = document.body,
 }) {
+  const screen = presentation === 'screen';
   const previousFocus = document.activeElement;
   if (id) {
     modals.get(id)?.();
@@ -33,13 +36,14 @@ export function openAppModal({
 
   const overlay = document.createElement("div");
   metrics?.clock.pause(overlay);
-  overlay.className = "app-modal-overlay";
+  overlay.className = screen ? 'app-screen-content' : "app-modal-overlay";
   if (id) overlay.id = id;
 
   const panel = document.createElement("section");
   panel.className = `app-modal app-modal--${size}`;
-  panel.setAttribute("role", "dialog");
-  panel.setAttribute("aria-modal", "true");
+  panel.setAttribute("role", screen ? 'region' : "dialog");
+  if (!screen) panel.setAttribute("aria-modal", "true");
+  else panel.setAttribute('aria-label', title);
 
   const header = document.createElement("header");
   header.className = "app-modal__header";
@@ -79,7 +83,7 @@ export function openAppModal({
     }, UI_TIMING.modalCloseMs);
   };
 
-  if (dismissible) {
+  if (dismissible && !screen) {
     const closeButton = document.createElement("button");
     closeButton.className = "app-modal__close";
     closeButton.type = "button";
@@ -133,7 +137,7 @@ export function openAppModal({
   }
 
   overlay.appendChild(panel);
-  document.body.appendChild(overlay);
+  host.appendChild(overlay);
   panel.tabIndex = -1;
   (panel.querySelector("button:not([disabled]), input:not([disabled]), select:not([disabled])") || panel).focus();
 
@@ -151,8 +155,8 @@ export function openAppModal({
     if (event.key === "Escape" && dismissible && closeOnEscape && !submitting) close();
   }
 
-  const removeKeydown = lifecycle.listen(document, "keydown", handleKeydown);
-  if (closeOnBackdrop && dismissible) {
+  const removeKeydown = screen ? () => {} : lifecycle.listen(document, "keydown", handleKeydown);
+  if (closeOnBackdrop && dismissible && !screen) {
     lifecycle.listen(overlay, "click", (event) => {
       if (event.target === overlay && !submitting) close();
     });

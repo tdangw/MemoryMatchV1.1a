@@ -117,7 +117,7 @@ test("production Triple Connect keeps interaction, DOM, long-task and heap budge
 
   await page.locator("#triple-actions-menu-toggle").click();
   await page.locator('#game-exit-modal').getByRole('button', { name: 'Thoát game', exact: true }).click();
-  await page.locator('.adventure-home').click();
+  await page.locator('.adventure-exit').click();
   await expect(page.locator(".game-selector__choice").first()).toBeVisible();
 
   await cdp.send("HeapProfiler.collectGarbage");

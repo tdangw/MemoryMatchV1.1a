@@ -132,7 +132,7 @@ bindSettingsControls();
 if (versionValue) versionValue.textContent = APP_VERSION;
 versionInfoButton?.addEventListener("click", showVersionInfo);
 
-export function showSettingsPanel(fromGame = false, onClose = () => {}, actions = navigation) {
+export function showSettingsPanel(fromGame = false, onClose = () => {}, actions = navigation, surface = {}) {
   if (!settingsContainer || !settingsHome) return;
 
   settingsContainer.style.display = "grid";
@@ -141,12 +141,20 @@ export function showSettingsPanel(fromGame = false, onClose = () => {}, actions 
   let nextAction = null;
 
   openAppModal({
+    ...surface,
     id: "settings-modal",
     icon: "settings",
     title: "Cài đặt",
     content: settingsContainer,
     size: "medium",
-    actions: [['Hướng dẫn', 'book', actions.onHelp], ['Xóa dữ liệu', 'wand', actions.onReset]].filter(([, , action]) => typeof action === 'function').map(([label, icon, action]) => ({ label, icon, onClick: () => { nextAction = action; } })),
+    actions: [['Hướng dẫn', 'book', actions.onHelp], ['Xóa dữ liệu', 'wand', actions.onReset]].filter(([, , action]) => typeof action === 'function').map(([label, icon, action]) => ({ label, icon, onClick: () => {
+      if (surface.presentation === 'screen') { action(); return false; }
+      nextAction = action;
+    } })),
+    onDestroy: () => {
+      settingsContainer.style.display = "none";
+      settingsHome.appendChild(settingsContainer);
+    },
     onClose: () => {
       settingsContainer.style.display = "none";
       settingsHome.appendChild(settingsContainer);

@@ -1,39 +1,6 @@
 import { previewMapLevel, startMapLevel, closeLevelPreview } from './helpers/adventureNavigation.js';
 import { expect, test } from "@playwright/test";
 
-test('home and map keep the account at right with a centered glyph in every cloud state', async ({ page }) => {
-  await page.setViewportSize({ width: 412, height: 915 });
-  await page.goto('/');
-  await expect(page.locator('.game-selector__choice')).toHaveCount(3);
-  async function verify() {
-    await expect(page.locator('.adventure-wallet')).toHaveCount(0);
-    for (const phase of ['connecting', 'offline', 'synced']) {
-      const geometry = await page.evaluate(async phase => {
-        (await import('/js/appNavigation.js')).refreshAppAccount({ phase });
-        const button = document.querySelector('.adventure-account'), icon = button.querySelector('svg');
-        const rect = button.getBoundingClientRect(), glyph = icon.getBoundingClientRect(), header = button.parentElement.getBoundingClientRect(), drawing = icon.getBBox();
-        return { x: rect.x, headerCenter: header.left + header.width / 2, dx: Math.abs(glyph.left + glyph.width / 2 - rect.left - rect.width / 2), dy: Math.abs(glyph.top + glyph.height / 2 - rect.top - rect.height / 2), drawingX: drawing.x + drawing.width / 2, drawingY: drawing.y + drawing.height / 2 };
-      }, phase);
-      expect(geometry.x).toBeGreaterThan(geometry.headerCenter);
-      expect(geometry.dx).toBeLessThan(1); expect(geometry.dy).toBeLessThan(1);
-      expect(geometry.drawingX).toBe(12); expect(geometry.drawingY).toBe(12);
-    }
-  }
-  await verify();
-  await page.screenshot({ path: '.firebase/home-profile-right.png' });
-  await page.locator('.adventure-account').click();
-  await expect(page.locator('#account-modal')).toBeVisible();
-  await page.locator('#account-modal .app-modal__close').click();
-  await expect(page.locator('#account-modal')).toHaveCount(0);
-  await page.evaluate(async () => (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('memory-match'));
-  await verify();
-  const before = await page.locator('.adventure-account').boundingBox();
-  await page.locator('.adventure-map-scroll').evaluate(scroll => { scroll.scrollTop = 0; });
-  expect(await page.locator('.adventure-account').boundingBox()).toEqual(before);
-  await page.locator('.adventure-home').click();
-  await expect(page.locator('.game-selector__choice')).toHaveCount(3);
-  await verify();
-});
 
 test('level submission locks difficulty and rejects repeated clicks until the launch settles', async ({ page }) => {
   await page.goto('/');
@@ -152,9 +119,11 @@ for (const [gameId, title, progressKey] of [['memory-match', 'Memory Match', 'me
       expect(scenery.pointerEvents).toBe('none');
       expect(await page.locator('.adventure-map-path path').first().evaluate(el => Number.parseFloat(getComputedStyle(el).strokeWidth))).toBeLessThan(15);
       await expect(page.locator('.adventure-mode-toggle, .adventure-wallet')).toHaveCount(0);
-      const home = await page.locator('.adventure-home').boundingBox();
-      const account = await page.locator('.adventure-account').boundingBox();
-      expect(home.x).toBeLessThan(account.x);
+      const home = await page.locator('.adventure-exit').boundingBox();
+      const settings = await page.locator('[data-dock-action="settings"]').boundingBox();
+      expect(home.y).toBeLessThan(settings.y);
+      expect(home.x).toBeGreaterThan(viewport.width / 2 - 50);
+      await expect(page.locator('.adventure-header .adventure-account')).toHaveCount(0);
       const fixed = await page.locator('.adventure-special-modes').boundingBox();
       await page.locator('.adventure-map-scroll').evaluate(el => { el.scrollTop = 0; });
       const afterScroll = await page.locator('.adventure-special-modes').boundingBox();
@@ -167,9 +136,9 @@ for (const [gameId, title, progressKey] of [['memory-match', 'Memory Match', 'me
       await closeLevelPreview(page);
       await page.locator('[data-dock-action="settings"]').click();
       await expect(page.locator('#settings-modal').getByRole('button', { name: 'Trang chủ', exact: true })).toHaveCount(0);
-      await page.locator('#settings-modal .app-modal__close').click();
+      await page.locator('.adventure-screen [data-dock-action="map"]').click();
       await expect(page.locator('#settings-modal')).toHaveCount(0);
-      await page.locator('.adventure-home').click();
+      await page.locator('.adventure-exit').click();
       await expect(page.locator('.game-selector__choice')).toHaveCount(3);
       await expect(page.locator('.adventure-wallet')).toHaveCount(0);
       await page.evaluate(async id => (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu(id), gameId);
@@ -219,8 +188,7 @@ test("chapter nodes stay mounted on mode changes, shared clear stays distinct fr
   await expect(page.locator('[data-level="11"]')).toBeEnabled();
   await expect(page.locator('[data-level="12"]')).toBeDisabled();
   await expect(page.locator('.adventure-back')).toHaveCount(0);
-  await expect(page.locator('.adventure-account')).toHaveAccessibleName('Tài khoản');
-  await expect(page.locator('.adventure-account')).toHaveText('');
+  await expect(page.locator('.adventure-account')).toHaveCount(0);
   await expect(page.locator('.adventure-map-completion, .adventure-map-theme, .adventure-map-sessions, .adventure-map-play, .adventure-chapter-controls')).toHaveCount(0);
   const alignment = await page.evaluate(() => {
     const trail = document.querySelector('.adventure-map-trail').getBoundingClientRect();
@@ -259,12 +227,14 @@ test("chapter nodes stay mounted on mode changes, shared clear stays distinct fr
   await page.screenshot({ path: ".firebase/adventure-map-mobile.png" });
 });
 
-test("home catalogs default to Memory and remember the most recently played game after reload", async ({ page }) => {
+test("catalog access follows the selected game and remains separate from home placeholders", async ({ page }) => {
   await page.goto("/");
+  await expect(page.locator('[data-dock-action="shop"], [data-dock-action="collection"]')).toHaveCount(0);
+  await page.evaluate(async () => (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('memory-match'));
   await page.locator('[data-dock-action="collection"]').click();
   await expect(page.locator("#collection-modal")).toBeVisible();
   await expect(page.locator("#catalog-game-picker")).toHaveCount(0);
-  await page.locator("#collection-modal .app-modal__close").click();
+  await page.locator('.adventure-screen [data-dock-action="map"]').click();
   await expect(page.locator("#collection-modal")).toHaveCount(0);
   await page.evaluate(async () => {
     await (await import("/tests/ui/helpers/gameNavigation.js")).openReadyGameMenu("triple-connect");
@@ -272,6 +242,7 @@ test("home catalogs default to Memory and remember the most recently played game
     await (await import("/js/persistence.js")).flushPersistentWrites();
   });
   await page.reload();
+  await page.evaluate(async () => (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('triple-connect'));
   await page.locator('[data-dock-action="collection"]').click();
   await expect(page.locator("#collection-modal")).toContainText("Triple Connect");
 });

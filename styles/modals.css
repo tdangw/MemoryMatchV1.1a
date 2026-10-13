@@ -446,7 +446,7 @@
   color: #f5f7fb;
 }
 
-#settings-modal .app-modal,
+#settings-modal:not(.app-screen-content) .app-modal,
 #info-modal .app-modal,
 #version-modal .app-modal {
   width: min(370px, calc(100vw - 36px));
@@ -623,7 +623,7 @@
 }
 
 /* Các popup từ menu chính dùng cùng một ngôn ngữ thiết kế. */
-#settings-modal .app-modal,
+#settings-modal:not(.app-screen-content) .app-modal,
 #info-modal .app-modal {
   border-color: rgb(255 255 255 / 16%);
   border-radius: 24px;
@@ -632,7 +632,7 @@
 }
 
 /* Khung Cài đặt giữ nguyên chiều cao; các lựa chọn mới sẽ cuộn trong phần nội dung. */
-#settings-modal .app-modal {
+#settings-modal:not(.app-screen-content) .app-modal {
   height: min(560px, calc(100dvh - 32px));
 }
 
@@ -682,7 +682,7 @@
   #difficulty-modal .app-modal,
   #triple-difficulty-modal .app-modal,
   #triple-session-picker-modal .app-modal,
-  #settings-modal .app-modal {
+  #settings-modal:not(.app-screen-content) .app-modal {
     height: calc(100dvh - 16px);
     max-height: calc(100dvh - 16px);
   }
@@ -709,7 +709,7 @@
 }
 
 @media screen and (width <= 600px) {
-  #settings-modal .app-modal {
+  #settings-modal:not(.app-screen-content) .app-modal {
     height: min(560px, calc(100dvh - 20px));
   }
 }

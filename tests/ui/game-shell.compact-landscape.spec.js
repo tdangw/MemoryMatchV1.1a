@@ -79,16 +79,6 @@ for (const game of games) {
     expect(menuBounds.bottom).toBeLessThanOrEqual(menuBounds.height + 1);
     await page.keyboard.press('Escape');
     await expect(page.locator('#game-exit-modal')).toHaveCount(0);
-    await page.locator('.adventure-dock--playing [data-dock-action="settings"]').click();
-    const modal = page.locator("#settings-modal .app-modal");
-    await expect(modal).toBeVisible();
-    const modalBounds = await modal.evaluate(element => {
-      const rect = element.getBoundingClientRect();
-      return { left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom, width: innerWidth, height: innerHeight };
-    });
-    expect(modalBounds.left).toBeGreaterThanOrEqual(-1);
-    expect(modalBounds.right).toBeLessThanOrEqual(modalBounds.width + 1);
-    expect(modalBounds.top).toBeGreaterThanOrEqual(-1);
-    expect(modalBounds.bottom).toBeLessThanOrEqual(modalBounds.height + 1);
+    await expect(page.locator('.adventure-dock--playing')).toHaveCount(0);
   });
 }

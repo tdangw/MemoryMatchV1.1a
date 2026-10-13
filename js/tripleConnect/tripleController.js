@@ -756,7 +756,7 @@ function playTripleSound(name) {
 }
 
 export function runTripleGameAction(action) {
-  if (action === 'exit-dialog') return openTripleModal(onClose => openGameExitDialog({ owner: getTripleShell().scope, trigger: getTripleShell().refs.root.querySelector('#triple-actions-menu-toggle'), onClose, onExit: returnTripleToMenu, onRestart: () => startTripleConnectRound({ mode: currentMode, level: currentLevel, reason: 'restart' }) }));
+  if (action === 'exit-dialog') return openTripleModal(onClose => openGameExitDialog({ owner: getTripleShell().scope, trigger: getTripleShell().refs.root.querySelector('#triple-actions-menu-toggle'), onClose, onExit: returnTripleToMenu, onRestart: () => startTripleConnectRound({ mode: currentMode, level: currentLevel, reason: 'restart' }), onSettings: () => runTripleGameAction('settings') }));
   if (action === 'menu') return returnTripleToMenu();
   if (action === 'restart') return startTripleConnectRound({ mode: currentMode, level: currentLevel, reason: 'restart' });
   const key = { collection: 'showCollection', shop: 'showShop', settings: 'showSettings', help: 'showHelp', reset: 'showReset' }[action];

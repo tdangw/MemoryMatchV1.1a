@@ -13,7 +13,8 @@ test('built chunks open home/maps and account fallback without module initializa
   await previewMapLevel(page, 1, 'hard');
   await closeLevelPreview(page);
   await expect(page.locator('[data-level="1"]')).toBeEnabled();
-  await page.locator('.adventure-account').click();
+  await page.locator('.adventure-exit').click();
+  await page.locator('[data-dock-action="profile"]').click();
   await expect(page.locator('#account-modal')).toBeVisible();
   expect(errors).toEqual([]);
 });

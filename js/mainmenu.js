@@ -176,6 +176,7 @@ export async function showCollectionModal({
   fromGame = false,
   gameId = "memory-match",
   onClose = () => {},
+  surface = {},
 } = {}) {
   // Khi mở từ item menu, trình duyệt truyền MouseEvent làm đối số đầu tiên.
   // Chỉ callback thực sự mới được dùng khi đóng để không gọi nhầm event như hàm.
@@ -184,6 +185,7 @@ export async function showCollectionModal({
   const content = document.createElement("div");
   content.className = "collection-content";
   const modal = openAppModal({
+    ...surface,
     id: "collection-modal",
     icon: "collection",
     title: gameId === "link-connect"

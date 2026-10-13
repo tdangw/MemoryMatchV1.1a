@@ -1,6 +1,6 @@
 /* Cửa hàng: kích thước cố định, phần nội dung tự cuộn. */
-#shop-modal .app-modal,
-#collection-modal .app-modal,
+#shop-modal:not(.app-screen-content) .app-modal,
+#collection-modal:not(.app-screen-content) .app-modal,
 #shop-confirm-modal .app-modal,
 #theme-change-notice-modal .app-modal,
 #quick-time-modal .app-modal,
@@ -11,8 +11,8 @@
   color: #f5f7fb;
 }
 
-#shop-modal .app-modal,
-#collection-modal .app-modal {
+#shop-modal:not(.app-screen-content) .app-modal,
+#collection-modal:not(.app-screen-content) .app-modal {
   width: min(620px, calc(100vw - 24px));
   height: min(650px, calc(100dvh - 24px));
   max-height: none;

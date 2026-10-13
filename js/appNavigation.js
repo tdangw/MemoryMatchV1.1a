@@ -3,6 +3,7 @@ import { gameState } from "./gameState.js";
 import { getGameDefinition, GAME_DEFINITIONS, getGameModeLabel } from "./gameCatalog.js";
 import { openAppModal, showAppToast } from "./modal.js";
 import { mountAppPage } from "./appPageLifecycle.js";
+import { createGameShellLifecycle } from './gameShell/gameShellLifecycle.js';
 
 import { mountTouchDust } from "./touchDust.js";
 
@@ -16,19 +17,24 @@ let handlers = {};
 let cloudState = "connecting";
 export function configureAppNavigation(next) { handlers = next; }
 
-export function createAppDock(scope, { gameId = null, playing = false, root = null } = {}) {
+export function createAppDock(scope, { gameId = null, selected = null, onAction } = {}) {
   const dock = document.createElement("nav");
   dock.className = "adventure-dock";
   dock.setAttribute("aria-label", "Chức năng");
-  for (const action of actions) {
+  const center = gameId ? { id: 'map', icon: 'map', label: 'Bản đồ' } : { id: 'profile', icon: 'account', label: 'Profile' };
+  const leading = gameId ? actions.slice(0, 2) : [{ id: 'missions', icon: 'missions', label: 'Nhiệm vụ' }, { id: 'friends', icon: 'friends', label: 'Bạn bè' }];
+  const entries = [...leading, center, ...actions.slice(2)];
+  for (const action of entries) {
     const button = document.createElement("button");
     button.type = "button";
     button.dataset.dockAction = action.id;
+    if (action.id === 'profile') button.dataset.cloudState = cloudState;
+    if (selected === action.id) button.setAttribute('aria-current', 'page');
     button.append(createIcon(action.icon), document.createTextNode(action.label));
     scope.listen(button, "click", async () => {
       if (button.disabled) return;
       button.disabled = true;
-      try { await handlers.action?.(action.id, { gameId, playing, root, scope }); }
+      try { await onAction(action.id); }
       catch (error) {
         console.error("Navigation action failed", error);
         if (scope.active) showAppToast("Chưa mở được chức năng. Hãy thử lại.");
@@ -45,32 +51,46 @@ export function decorateAdventureMenu(root, { gameId = null, onHome } = {}) {
   root.classList.add("adventure-page");
   const header = document.createElement("header");
   header.className = "adventure-header";
-  const account = document.createElement("button");
-  account.type = "button";
-  account.className = "adventure-account";
-  account.setAttribute("aria-label", "Tài khoản");
-  account.dataset.cloudState = cloudState;
-  account.append(createIcon("account"));
-  scope.listen(account, "click", () => handlers.account?.());
-  if (root.classList.contains("adventure-map-page")) {
-    const home = document.createElement("button");
-    home.type = "button"; home.className = "adventure-home";
-    home.setAttribute("aria-label", "Trang chủ"); home.append(createIcon("home"));
-    scope.listen(home, "click", () => (onHome || handlers.home)());
-    header.append(home, account);
-  } else {
-    header.append(account);
-  }
   root.prepend(header);
-  const footer = document.createElement("footer");
-  footer.className = "adventure-footer";
-  footer.append(createAppDock(scope, { gameId }));
-  const ad = document.createElement("div");
-  ad.className = "adventure-ad-slot";
-  ad.dataset.adPlacement = "menu";
-  ad.setAttribute("aria-hidden", "true");
-  footer.append(ad);
-  root.append(footer);
+  let screen = null;
+  scope.own(() => screen?.dispose());
+  const goHome = () => (onHome || handlers.home)();
+  function createExit(owner) {
+    const exit = document.createElement('button'); exit.type = 'button'; exit.className = 'adventure-exit';
+    exit.setAttribute('aria-label', 'Thoát về trang chủ'); exit.append(createIcon('exit'));
+    owner.listen(exit, 'click', goHome);
+    return exit;
+  }
+  if (gameId) header.append(createExit(scope));
+  const navigate = async action => {
+    screen?.dispose();
+    screen = null;
+    if (action === 'map') { root.querySelector('[data-dock-action="map"]').focus(); return; }
+    const viewScope = createGameShellLifecycle();
+    screen = viewScope;
+    const view = document.createElement('section');
+    view.className = 'adventure-page adventure-screen';
+    view.dataset.screen = action;
+    const host = document.createElement('div'); host.className = 'adventure-screen-host';
+    const footer = createFooter(viewScope, action);
+    view.append(host, footer, createExit(viewScope));
+    document.body.append(view);
+    root.hidden = true;
+    viewScope.own(() => { view.remove(); if (scope.active) root.hidden = false; }, 'node');
+    const surface = { presentation: 'screen', host, owner: viewScope };
+    if (action === 'profile') return handlers.account?.(surface);
+    return handlers.action?.(action, { gameId, playing: false, root: view, scope: viewScope, surface });
+  };
+  function createFooter(owner, selected) {
+    const footer = document.createElement('footer'); footer.className = 'adventure-footer';
+    footer.append(createAppDock(owner, { gameId, selected, onAction: navigate }));
+    if (!selected || selected === 'map') {
+      const ad = document.createElement('div'); ad.className = 'adventure-ad-slot'; ad.dataset.adPlacement = 'menu'; ad.setAttribute('aria-hidden', 'true');
+      footer.append(ad);
+    }
+    return footer;
+  }
+  root.append(createFooter(scope, gameId ? 'map' : null));
   // Functional destinations now have a single shared dock owner.
   for (const item of root.querySelectorAll(".menu-item")) {
     if (["Cửa hàng", "Bộ sưu tập", "Cài đặt", "Home"].includes(item.textContent.trim())) item.remove();
@@ -78,13 +98,7 @@ export function decorateAdventureMenu(root, { gameId = null, onHome } = {}) {
   return scope;
 }
 
-export function mountGameplayDock(root, scope) {
-  const gameId = ({ "game-container": "memory-match", "link-connect-container": "link-connect", "triple-connect-container": "triple-connect" })[root.id];
-  if (!gameId) return;
-  const dock = createAppDock(scope, { gameId, playing: true, root });
-  dock.classList.add("adventure-dock--playing");
-  root.append(dock);
-  scope.own(() => dock.remove(), "node");
+export function mountGameplayTouchEffects(root, scope) {
   mountTouchDust(root, scope);
 }
 
@@ -94,13 +108,10 @@ export function refreshAppWallet() {
 }
 export function refreshAppAccount(state) {
   cloudState = state.phase;
-  const account = document.querySelector(".adventure-account");
-  if (!account) return;
-  account.dataset.cloudState = cloudState;
-  account.title = "Tài khoản";
+  for (const account of document.querySelectorAll('[data-dock-action="profile"]')) account.dataset.cloudState = cloudState;
 }
 
-export function openLocalRankings(gameId, onClose) {
+export function openLocalRankings(gameId, onClose, surface = {}) {
   const content = document.createElement("div");
   const games = gameId ? [getGameDefinition(gameId)] : GAME_DEFINITIONS;
   for (const game of games) {
@@ -122,5 +133,5 @@ export function openLocalRankings(gameId, onClose) {
       content.append(text);
     } else content.append(list);
   }
-  return openAppModal({ id: "rankings-modal", title: "Kỷ lục của bạn", icon: "trophy", content, onClose });
+  return openAppModal({ ...surface, id: "rankings-modal", title: "Kỷ lục của bạn", icon: "trophy", content, onClose });
 }

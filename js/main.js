@@ -25,7 +25,6 @@ import {
 } from "./gameSelector.js";
 import {
   configureLinkController,
-  openLinkPanel,
   startLinkLevel,
   runLinkGameAction,
 } from "./linkConnect/linkController.js";
@@ -63,7 +62,6 @@ import { registerProgressiveWebApp } from "./pwa.js";
 import { initializeMeteorEffects } from "./backgroundEffects.js";
 import {
   configureTripleConnectController,
-  openTripleModal,
   startTripleConnectRound,
   runTripleGameAction,
 } from "./tripleConnect/tripleController.js";
@@ -89,12 +87,6 @@ function showMemoryHelp() {
     "book",
   );
 }
-function runMemoryGameAction(action) {
-  if (action === 'settings') return showSettingsPanel(true, () => {}, { onHelp: showMemoryHelp, onReset: () => showResetConfirmationOverlay({}) });
-  if (action === 'shop') return openShopOverlay({ fromMenu: false, gameId: 'memory-match' });
-  if (action === 'collection') return showCollectionModal({ fromGame: true, gameId: 'memory-match' });
-  throw new RangeError('Unsupported Memory navigation action.');
-}
 
 async function initializeApplication() {
 let accountRuntime = null;
@@ -116,6 +108,7 @@ updateMemoryAssistInventoryDisplay();
 initializeMeteorEffects(gameState.settings.meteorEffects);
 applyEffectsSettings(gameState.settings);
 configureGameController({
+  showSettings: () => showSettingsPanel(true, () => {}, { onHelp: showMemoryHelp, onReset: () => showResetConfirmationOverlay({}) }),
   showDifficulty: showDifficultyOverlay,
   createMenu: createMainMenu,
 });
@@ -126,31 +119,24 @@ configureMainMenu({
 configureSettings({ onCloseMenu: createActiveGameMenu, onHelp: () => showGameInfoModal('Hướng dẫn', '<p>Chọn một trò và màn chơi, chọn độ khó rồi bấm Chơi. Memory Match rèn trí nhớ bằng ghép cặp; Link Connect nối cặp hình; Triple Connect ghép bộ ba và quản lý khay.</p>', 'book'), onReset: () => showResetConfirmationOverlay({}) });
 configureAppNavigation({
   home: showGameSelector,
-  account: async () => {
-    if (import.meta.env.VITE_FIREBASE_DISABLED === '1') return openAppModal({ id: 'account-modal', title: 'Tài khoản', content: '<p>Bản lưu trên thiết bị đang hoạt động. Cloud được tắt trong môi trường kiểm tra.</p>' });
+  account: async (surface = {}) => {
+    if (import.meta.env.VITE_FIREBASE_DISABLED === '1') return openAppModal({ ...surface, id: 'account-modal', title: 'Tài khoản', content: '<p>Người chơi</p><p>Tiến trình đã lưu trên thiết bị.</p>' });
     await accountReady;
-    if (!accountRuntime) return openAppModal({ id: 'account-modal', title: 'Chưa kết nối được cloud', content: '<p>Bản máy vẫn được lưu. Hãy tải lại ứng dụng để thử kết nối cloud.</p>', actions: [{ label: 'Tải lại', onClick: () => window.location.reload() }] });
-    return accountRuntime.showAccountPanel();
+    if (surface.owner && !surface.owner.active) return;
+    if (!accountRuntime) return openAppModal({ ...surface, id: 'account-modal', title: 'Tài khoản', content: '<p>Tiến trình đã lưu trên thiết bị. Hãy tải lại ứng dụng để kết nối tài khoản.</p>', actions: [{ label: 'Tải lại', onClick: () => window.location.reload() }] });
+    return accountRuntime.showAccountPanel(surface);
   },
-  action: async (action, { gameId, playing, root, scope }) => {
+  action: async (action, { gameId, scope, surface = {} }) => {
+    if (action === 'missions' || action === 'friends') return openAppModal({ ...surface, id: `${action}-screen`, title: action === 'missions' ? 'Nhiệm vụ' : 'Bạn bè', icon: action, content: '<p class="navigation-coming-soon">Sắp ra mắt</p>' });
     if (action === 'ranking') {
       if (document.getElementById('rankings-modal')) return;
       const rankings = import.meta.env.VITE_FIREBASE_DISABLED === '1' ? null : await import('./leaderboardPanel.js');
       if (!scope.active) return;
-      const open = onClose => rankings ? rankings.openLeaderboards(gameId, onClose) : openLocalRankings(gameId, onClose);
-      if (!playing) return open();
-      if (gameId === 'link-connect') return openLinkPanel(open);
-      if (gameId === 'triple-connect') return openTripleModal(open);
-      const paused = gameState.isPaused;
-      gameState.isPaused = true;
-      return open(() => { if (scope.active) gameState.isPaused = paused; });
+      const open = onClose => rankings ? rankings.openLeaderboards(gameId, onClose, surface) : openLocalRankings(gameId, onClose, surface);
+      return open();
     }
-    if (playing) {
-      const actionHandlers = { 'memory-match': runMemoryGameAction, 'link-connect': runLinkGameAction, 'triple-connect': runTripleGameAction };
-      return actionHandlers[gameId](action);
-    }
-    if (action === 'settings') return showSettingsPanel();
-    const open = id => action === 'shop' ? openShopOverlay({ gameId: id, fromMenu: true, onClose: refreshAppWallet }) : showCollectionModal({ gameId: id, onClose: refreshAppWallet });
+    if (action === 'settings') return showSettingsPanel(false, () => {}, gameId === 'memory-match' ? { onHelp: showMemoryHelp, onReset: () => showResetConfirmationOverlay({}) } : undefined, surface);
+    const open = id => action === 'shop' ? openShopOverlay({ gameId: id, fromMenu: true, onClose: refreshAppWallet, surface }) : showCollectionModal({ gameId: id, onClose: refreshAppWallet, surface });
     if (gameId) return open(gameId);
     return open(getRecentGameId());
   },

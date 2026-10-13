@@ -14,7 +14,7 @@ export function createGameShellStartup(scope, refs, onFailure) {
   const pending = new Set();
   refs.root.dataset.shellStartup = status;
   refs.board.setAttribute('aria-busy', 'true');
-  const controls = [...refs.hud.querySelectorAll('button:not(.game-menu-toggle):not(.game-action-item)')].map(node => ({ node, disabled: node.disabled }));
+  const controls = [...refs.hud.querySelectorAll('button')].map(node => ({ node, disabled: node.disabled }));
   controls.forEach(({ node }) => { node.disabled = true; });
   const finishUI = () => {
     refs.board.removeAttribute('aria-busy');

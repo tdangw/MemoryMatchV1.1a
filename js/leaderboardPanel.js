@@ -9,7 +9,7 @@ import { readLeaderboard } from './leaderboardStore.js';
 import { createGameShellLifecycle, getActiveGameScope } from './gameShell/gameShellLifecycle.js';
 import { getAppPageScope } from './appPageLifecycle.js';
 
-export function openLeaderboards(gameId = getRecentGameId(), onClose) {
+export function openLeaderboards(gameId = getRecentGameId(), onClose, surface = {}) {
   const scope = createGameShellLifecycle();
   let generation = 0;
   const content = document.createElement('div'); content.className = 'leaderboard-view';
@@ -22,9 +22,9 @@ export function openLeaderboards(gameId = getRecentGameId(), onClose) {
   const results = document.createElement('div');
   const note = document.createElement('p'); note.className = 'account-explanation'; note.textContent = 'Kỷ lục mọi thời gian · Có thể dùng hỗ trợ. Thành tích do ứng dụng gửi, chưa xác minh toàn bộ ván chơi trên máy chủ.';
   filters.append(game, mode, level, refresh); content.append(filters, status, results, note);
-  const owner = getActiveGameScope() || getAppPageScope();
+  const owner = surface.owner || getActiveGameScope() || getAppPageScope();
   const release = owner?.own(() => scope.dispose(), 'cleanup');
-  const modal = openAppModal({ id: 'rankings-modal', title: 'Bảng xếp hạng', icon: 'trophy', content, onDestroy: () => { scope.dispose(); release?.forget(); }, onClose });
+  const modal = openAppModal({ ...surface, id: 'rankings-modal', title: 'Bảng xếp hạng', icon: 'trophy', content, onDestroy: () => { scope.dispose(); release?.forget(); }, onClose });
   function updateModes() {
     const previous = mode.value;
     mode.replaceChildren(...GAME_MODES.filter(item => NORMAL_MODE_IDS.includes(item.id) || item.id === 'challenge' || item.id === 'endless' && game.value === 'triple-connect').map(item => new Option(item.label, item.id)));

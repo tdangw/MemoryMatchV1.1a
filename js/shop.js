@@ -149,6 +149,7 @@ export async function openShopOverlay({
   gameId = "memory-match",
   linkConnect = false,
   onClose = () => {},
+  surface = {},
 } = {}) {
   const tripleConnect = gameId === "triple-connect";
   if (
@@ -172,6 +173,7 @@ export async function openShopOverlay({
   content.append(tabs, grid);
 
   const modal = openAppModal({
+    ...surface,
     id: "shop-modal",
     icon: "shop",
     title: "Cửa hàng",

@@ -21,7 +21,7 @@ test('Triple map previews normal modes and keeps theme access in the shared coll
   await closeLevelPreview(page);
   await page.locator('[data-dock-action="collection"]').click();
   await expect(page.locator('#collection-modal')).toContainText('Bộ sưu tập · Triple Connect');
-  await page.locator('#collection-modal .app-modal__close').click();
+  await page.locator('.adventure-screen [data-dock-action="map"]').click();
   await expect(page.locator('#collection-modal')).toHaveCount(0);
   await previewMapLevel(page);
   await expect(page.locator('#adventure-level-modal input[value="hard"]')).toBeChecked();
@@ -39,7 +39,7 @@ test('visiting the map and collection preserves a session until the player expli
   });
   await expect(page.locator('#menu-container[data-map-ready="true"]')).toBeVisible();
   await page.locator('[data-dock-action="collection"]').click();
-  await page.locator('#collection-modal .app-modal__close').click();
+  await page.locator('.adventure-screen [data-dock-action="map"]').click();
   await expect(page.locator('#collection-modal')).toHaveCount(0);
   expect(await page.evaluate(async () => (await import('/js/sessionProgress.js')).getActiveSession('triple-connect','normal').seed)).toBe(oldSeed);
   await startMapLevel(page, 1, 'normal');
@@ -130,7 +130,7 @@ test("Triple combo bar counts down and expires the active combo", async ({ page 
 
 test("Triple menu, start modal and timer follow the shared round contract", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
-  await expect(page.locator('[data-dock-action]')).toHaveText(['Cửa hàng', 'Bộ sưu tập', 'Xếp hạng', 'Cài đặt']);
+  await expect(page.locator('[data-dock-action]')).toHaveText(['Cửa hàng', 'Bộ sưu tập', 'Bản đồ', 'Xếp hạng', 'Cài đặt']);
   await page.evaluate(async () => (await import("/js/tripleConnect/tripleController.js")).startTripleConnectRound({ mode: "easy", level: 1 }));
   const start = page.locator("#triple-round-start-modal");
   await expect(start).toContainText(/Màn 1.*Dễ.*Chủ đề.*Mục tiêu: 9 bộ thẻ.*Gợi ý: 3/s);
@@ -155,7 +155,7 @@ test("Triple menu, start modal and timer follow the shared round contract", asyn
   await page.waitForTimeout(1100);
   await expect(timer).not.toHaveText(before || "01:00");
   await page.locator("#triple-actions-menu-toggle").click();
-  await expect(page.locator('#game-exit-modal .app-modal__footer button')).toHaveText(['Thoát game', 'Chơi lại']);
+  await expect(page.locator('#game-exit-modal .app-modal__footer button')).toHaveText(['Thoát game', 'Chơi lại', 'Cài đặt']);
 });
 
 test("Triple Continue resumes without replaying the start modal", async ({ page }) => {

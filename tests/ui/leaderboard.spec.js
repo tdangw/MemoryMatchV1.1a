@@ -40,7 +40,7 @@ test('durable offline result retries once; slow attempts cannot overwrite best; 
   await expect(page.locator('.leaderboard-list')).toContainText('<img src=x>');
   await expect(page.locator('.leaderboard-list img')).toHaveCount(0);
   await expect(page.locator('.leaderboard-own')).toContainText('1.00 giây');
-  await page.locator('#rankings-modal .app-modal__close').click();
+  await page.locator('.adventure-screen .adventure-exit').click();
   await expect(page.locator('#rankings-modal')).toHaveCount(0);
   await page.reload(); await ready(page);
   expect((await own(page)).durationMs).toBe(1000);

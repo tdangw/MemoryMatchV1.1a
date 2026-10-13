@@ -5,7 +5,7 @@ import { gameState } from './gameState.js';
 let activeMenus = null;
 export function closeGameMenu() { activeMenus?.close(); }
 
-export function bindMemoryMenus(scope, root, { onExit, onRestart }) {
+export function bindMemoryMenus(scope, root, { onExit, onRestart, onSettings }) {
   const menus = bindGameHudMenus(scope, [
     { trigger: root.querySelector("#memory-tools-toggle"), panel: root.querySelector("#memory-tools-menu") },
   ]);
@@ -15,7 +15,7 @@ export function bindMemoryMenus(scope, root, { onExit, onRestart }) {
     menus.close();
     const paused = gameState.isPaused;
     gameState.isPaused = true;
-    openGameExitDialog({ owner: scope, trigger, onExit, onRestart, onClose: () => { if (scope.active) gameState.isPaused = paused; } });
+    openGameExitDialog({ owner: scope, trigger, onExit, onRestart, onSettings, onClose: () => { if (scope.active) gameState.isPaused = paused; } });
   });
   scope.own(() => { if (activeMenus === menus) activeMenus = null; });
 }

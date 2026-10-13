@@ -123,7 +123,7 @@ export function initializeLevel(level, { reason = "new", session = null, skipInt
     clearTooltip();
   } });
   beginPlayMetrics(scope, { gameId: "memory-match", mode: requestedMode, level }, reason === "resume" ? session?.metrics || {} : null);
-  bindMemoryMenus(scope, getMemoryShell().refs.root, { onExit: returnToMainMenu, onRestart: restartMemoryLevel });
+  bindMemoryMenus(scope, getMemoryShell().refs.root, { onExit: returnToMainMenu, onRestart: restartMemoryLevel, onSettings: navigation.showSettings });
   const startup = createGameShellStartup(scope, getMemoryShell().refs, error => {
     console.error('Memory startup failed', error);
     showAppToast('Không thể chuẩn bị bàn chơi. Hãy chơi lại.');

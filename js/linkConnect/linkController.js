@@ -395,7 +395,7 @@ function showLinkGame() {
 }
 
 export async function runLinkGameAction(action) {
-  if (action === 'exit-dialog') return openLinkPanel(onClose => openGameExitDialog({ owner: getLinkShell().scope, trigger: getLinkShell().refs.root.querySelector('#link-actions-menu-toggle'), onClose, onExit: () => runLinkGameAction('menu'), onRestart: () => runLinkGameAction('restart') }));
+  if (action === 'exit-dialog') return openLinkPanel(onClose => openGameExitDialog({ owner: getLinkShell().scope, trigger: getLinkShell().refs.root.querySelector('#link-actions-menu-toggle'), onClose, onExit: () => runLinkGameAction('menu'), onRestart: () => runLinkGameAction('restart'), onSettings: () => runLinkGameAction('settings') }));
   if (action === "menu") return (await returnToLinkMenu());
   if (action === "restart") {
     return startLinkLevel({ mode: linkGameState.mode, level: linkGameState.level, restart: true });

@@ -40,7 +40,7 @@ for (const game of games) {
     const wrapper = page.locator("#menu-container .adventure-map-view");
     const items = page.locator("#menu-container [data-dock-action]");
     await expect(wrapper).toBeVisible();
-    await expect(items).toHaveCount(4);
+    await expect(items).toHaveCount(5);
     const result = await wrapper.evaluate(element => {
       const rect = node => {
         const value = node.getBoundingClientRect();
@@ -61,7 +61,7 @@ for (const game of games) {
     });
     const lastSetting = page.locator("#settings-modal #settings-container .settings-control").last();
     await expect(lastSetting).toBeInViewport();
-    await page.locator("#settings-modal .app-modal__close").click();
+    await page.locator('.adventure-screen [data-dock-action="map"]').click();
 
     await expect(page.locator("#settings-modal")).toHaveCount(0);
     await page.locator('[data-level="1"]').click();

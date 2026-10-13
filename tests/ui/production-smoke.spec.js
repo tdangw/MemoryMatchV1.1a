@@ -10,7 +10,7 @@ test('built mobile menu, map and account open without writing to production serv
   await page.goto('/');
   await expect(page.locator('.game-selector__choice')).toHaveCount(3);
   await expect(page.locator('.adventure-wallet')).toHaveCount(0);
-  expect((await page.locator('.adventure-account').boundingBox()).x).toBeGreaterThan(206);
+  await expect(page.locator('.adventure-account')).toHaveCount(0);
   await page.locator('.game-selector__choice').filter({ hasText: 'Memory Match' }).click();
   await expect(page.locator('#menu-container[data-map-ready="true"]')).toBeVisible();
   await expect(page.locator('.adventure-map-node--level')).toHaveCount(100);
@@ -25,11 +25,13 @@ test('built mobile menu, map and account open without writing to production serv
   await previewMapLevel(page, 1, 'hard');
   await closeLevelPreview(page);
   await expect(page.locator('.adventure-mode-toggle')).toHaveCount(0);
-  await page.getByRole('button', { name: 'Tài khoản', exact: true }).click();
+  await page.locator('.adventure-exit').click();
+  await page.locator('[data-dock-action="profile"]').click();
   await expect(page.locator('#account-modal')).toBeVisible();
   await expect(page.locator('#account-modal')).not.toContainText('Firebase');
   await expect(page.getByRole('button', { name: 'Đồng bộ ngay', exact: true })).toHaveCount(0);
-  await page.locator('#account-modal .app-modal__close').click();
+  await expect(page.locator('#account-modal .app-modal__close')).toHaveCount(0);
+  await page.locator('.adventure-screen .adventure-exit').click();
   await expect(page.locator('.app-modal-overlay')).toHaveCount(0);
   await page.screenshot({ path: '.firebase/production-map-mobile.png' });
   expect(errors).toEqual([]);
