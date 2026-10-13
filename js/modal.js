@@ -19,6 +19,7 @@ export function openAppModal({
   closeOnBackdrop = true,
   closeOnEscape = true,
   onClose,
+  onDestroy,
   onActionSettled,
   owner = getActiveGameScope() || getAppPageScope(),
 }) {
@@ -63,6 +64,7 @@ export function openAppModal({
     if (restoreFocus && (!owner || owner.active) && previousFocus?.isConnected && typeof previousFocus.focus === "function") previousFocus.focus();
     metrics?.clock.resume(overlay);
     if (id && modals.get(id) === destroy) modals.delete(id);
+    onDestroy?.();
   };
   releaseOwner = owner?.own(destroy, "node");
   if (id) modals.set(id, destroy);

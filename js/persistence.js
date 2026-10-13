@@ -3,6 +3,7 @@ import {
   hydrateChapterProfile, readChapter, resetChapterProfile,
   exportChapterSnapshot, replaceChapterSnapshot, readChapterMetadata, writeChapterMetadata, readChapterBackups,
   ensureChapterProfileOwner,
+  updateChapterMetadata,
 } from "./chapterStore.js";
 
 export const SAVE_FORMAT_VERSION = 2;
@@ -26,6 +27,11 @@ const commitSubscribers = new Set();
 export function subscribeToLocalCommit(listener) {
   commitSubscribers.add(listener);
   return () => commitSubscribers.delete(listener);
+}
+export async function updateSyncMetadata(key, update, isCurrent = () => true) {
+  await initialize();
+  if (!database || blocked) throw new Error('Không thể lưu hàng đợi trên thiết bị.');
+  return updateChapterMetadata(database, `cloud:${key}`, update, isCurrent);
 }
 function notifyCommit(patch) {
   for (const listener of commitSubscribers) {

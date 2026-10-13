@@ -158,3 +158,11 @@
   .adventure-mode-tab { padding: 5px; }
   .adventure-special-modes { padding: 3px; }
 }
+.leaderboard-filters { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
+.leaderboard-filters select, .leaderboard-filters input { min-height:44px; min-width:0; max-width:100%; border-radius:12px; padding:8px; }
+.leaderboard-filters input { width:90px; }
+.leaderboard-list { padding-left:30px; }
+.leaderboard-list li { padding:10px 6px; border-bottom:1px solid #ffffff26; }
+.leaderboard-list li span { display:inline-block; max-width:65%; overflow-wrap:anywhere; }
+.leaderboard-list li strong { float:right; }
+.leaderboard-list .is-self, .leaderboard-own { color:#ffdf8a; }

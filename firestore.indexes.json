@@ -1,5 +1,11 @@
 {
-  "indexes": [],
+  "indexes": [
+    { "collectionGroup": "entries", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "levelReached", "order": "DESCENDING" },
+      { "fieldPath": "totalScore", "order": "DESCENDING" },
+      { "fieldPath": "__name__", "order": "ASCENDING" }
+    ] }
+  ],
   "fieldOverrides": [
     { "collectionGroup": "objects", "fieldPath": "payload", "indexes": [] },
     { "collectionGroup": "players", "fieldPath": "manifest", "indexes": [] }

@@ -50,7 +50,9 @@ import {
   subscribeToExternalSave,
   subscribeToPersistenceFailure,
   getPersistenceStatus,
+  loadProfileOwner,
 } from "./persistence.js";
+import { setRankingOwner } from './rankingOwner.js';
 import {
   configureGameController,
   handleHintClick,
@@ -81,6 +83,7 @@ async function initializeApplication() {
 let accountRuntime = null;
 let accountReady = null;
 hydrateGameState(await loadPersistentGameData());
+setRankingOwner(await loadProfileOwner());
 subscribeToPersistenceFailure(() => {
   openAppModal({
     id: "persistence-recovery-modal",
@@ -111,10 +114,12 @@ configureAppNavigation({
     if (!accountRuntime) return openAppModal({ id: 'account-modal', title: 'Chưa kết nối được cloud', content: '<p>Bản máy vẫn được lưu. Hãy tải lại ứng dụng để thử kết nối cloud.</p>', actions: [{ label: 'Tải lại', onClick: () => window.location.reload() }] });
     return accountRuntime.showAccountPanel();
   },
-  action: (action, { gameId, playing, root, scope }) => {
+  action: async (action, { gameId, playing, root, scope }) => {
     if (action === 'ranking') {
       if (document.getElementById('rankings-modal')) return;
-      const open = onClose => openLocalRankings(gameId, onClose);
+      const rankings = import.meta.env.VITE_FIREBASE_DISABLED === '1' ? null : await import('./leaderboardPanel.js');
+      if (!scope.active) return;
+      const open = onClose => rankings ? rankings.openLeaderboards(gameId, onClose) : openLocalRankings(gameId, onClose);
       if (!playing) return open();
       if (gameId === 'link-connect') return openLinkPanel(open);
       if (gameId === 'triple-connect') return openTripleModal(open);
@@ -257,6 +262,7 @@ if (import.meta.env.VITE_FIREBASE_DISABLED !== '1') {
         showGameSelector();
       },
     });
+    return import('./leaderboardService.js').then(module => module.initializeLeaderboardService().ready);
   }).catch(error => {
     console.warn('Cloud startup unavailable', error.code || error.name);
     showAppToast('Cloud chưa kết nối được. Bản máy vẫn hoạt động.');

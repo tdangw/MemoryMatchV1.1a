@@ -1,0 +1,44 @@
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { initializeTestEnvironment, assertFails, assertSucceeds } from '@firebase/rules-unit-testing';
+import { doc, setDoc, getDocs, collection, query, limit, serverTimestamp } from 'firebase/firestore';
+import { submitRankingResult, readLeaderboard, clearLeaderboardCache } from '../js/leaderboardStore.js';
+const env = await initializeTestEnvironment({ projectId: 'demo-memory-match', firestore: { host: '127.0.0.1', port: 8180, rules: readFileSync('firestore.rules', 'utf8') } });
+await env.clearFirestore();
+const result = { rulesVersion: 1, id: crypto.randomUUID(), gameId: 'memory-match', mode: 'easy', level: 1, kind: 'time', durationMs: 1000, score: 100, stars: 3, outcome: 'won', recordedAt: Date.now(), owner: { profileId: 'fixture', uid: 'a' } };
+try {
+  const database = env.authenticatedContext('a').firestore();
+  const stranger = env.authenticatedContext('b').firestore();
+  const publicDatabase = env.unauthenticatedContext().firestore();
+  const submit = (value, uid = 'a', db = database) => submitRankingResult({ database: db, environment: 'test', uid, playerName: '<img src=x onerror=alert(1)>', result: value });
+  assert.equal((await assertSucceeds(submit(result))).writes, 1);
+  assert.equal((await submit({ ...result, durationMs: 2000 })).writes, 0);
+  assert.equal((await submit({ ...result, id: crypto.randomUUID() })).writes, 0);
+  await Promise.all([submit({ ...result, durationMs: 800, id: crypto.randomUUID() }), submit({ ...result, durationMs: 900, id: crypto.randomUUID() })]);
+  const own = await readLeaderboard({ database, environment: 'test', board: result, uid: 'a' });
+  assert.equal(own.own.durationMs, 800);
+  assert.equal((await readLeaderboard({ database, environment: 'test', board: result, uid: 'a' })).cached, true);
+  assert.equal((await readLeaderboard({ database, environment: 'test', board: result, uid: 'a', refresh: true })).cached, true);
+  await assertFails(submit({ ...result, durationMs: 700 }, 'a', stranger));
+  const entry = { rulesVersion: 1, resultId: crypto.randomUUID(), gameId: 'memory-match', mode: 'easy', level: 1, kind: 'time', durationMs: 600, score: 1, stars: 1, playerName: 'A', updatedAt: serverTimestamp() };
+  const ref = doc(database, 'gamespaces/test/leaderboards/v1_memory-match_easy_1/entries/a');
+  await assertFails(setDoc(ref, { ...entry, email: 'private@example.test' }));
+  await assertFails(setDoc(ref, { ...entry, durationMs: -1 }));
+  await assertFails(setDoc(ref, { ...entry, durationMs: 900 }));
+  await assertFails(setDoc(doc(database, 'gamespaces/test/leaderboards/v1_memory-match_hard_1/entries/a'), entry));
+  await assertFails(getDocs(collection(publicDatabase, 'gamespaces/test/leaderboards/v1_memory-match_easy_1/entries')));
+  await assertFails(getDocs(query(collection(publicDatabase, 'gamespaces/test/leaderboards/v1_memory-match_easy_1/entries'), limit(21))));
+  for (let i = 0; i < 22; i++) { const uid = `fixture-${String(i).padStart(2, '0')}`; await submit({ ...result, id: crypto.randomUUID() }, uid, env.authenticatedContext(uid).firestore()); }
+  clearLeaderboardCache();
+  const top = await readLeaderboard({ database: publicDatabase, environment: 'test', board: result });
+  assert.equal(top.top.length, 20);
+  assert.deepEqual(top.top.slice(1).map(item => item.uid), top.top.slice(1).map(item => item.uid).sort());
+  const run = { ...result, id: crypto.randomUUID(), gameId: 'triple-connect', mode: 'endless', kind: 'run', levelReached: 10, totalScore: 500, outcome: 'lost' };
+  await assertSucceeds(submit(run));
+  assert.equal((await submit({ ...run, id: crypto.randomUUID(), levelReached: 11, totalScore: 1 })).writes, 1);
+  assert.equal((await submit({ ...run, id: crypto.randomUUID(), levelReached: 10, totalScore: 99999 })).writes, 0);
+  assert.equal((await submit({ ...run, id: crypto.randomUUID(), levelReached: 11, totalScore: 2 })).writes, 1);
+  assert.equal((await readLeaderboard({ database, environment: 'test', board: run, uid: 'a' })).own.totalScore, 2);
+  assert.equal((await readLeaderboard({ database, environment: 'beta', board: run, uid: 'a' })).top.length, 0);
+  console.log('Public leaderboard ownership/schema, top20 limits, cache, time/run comparator, concurrent best and environment isolation passed; best submit 1 read/1 write, slower retry 1 read/0 writes.');
+} finally { await env.cleanup(); }

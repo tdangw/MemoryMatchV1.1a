@@ -6,6 +6,7 @@ import { exportPersistentSnapshot, loadSyncMetadata, saveSyncMetadata, importPer
 import { createGameShellLifecycle, getActiveGameScope, clearShellTimeout } from "./gameShell/gameShellLifecycle.js";
 import { getAppPageScope, subscribeToAppPages } from "./appPageLifecycle.js";
 import { replaceProfileSafely, waitForProfileReplacement } from "./profileOperations.js";
+import { setRankingOwner } from './rankingOwner.js';
 
 const AUTO_SYNC_INTERVAL_MS = 60000;
 const MAX_RETRIES = 5;
@@ -34,6 +35,7 @@ function createAccountService(options) {
   const publicState = () => ({ ...state, conflict: Boolean(pending), bound: metadata?.uid === state.uid && Boolean(state.uid) });
   const current = (id, uid = state.uid) => scope.active && generation === id && backend?.auth.currentUser?.uid === uid;
   const notify = () => {
+    if (owner) setRankingOwner({ id: owner.id, uid: metadata?.uid === state.uid ? metadata.uid : owner.uid });
     for (const listener of listeners) { try { listener(publicState()); } catch (error) { console.error("Account listener failed", error); } }
     options.onState?.(publicState());
   };
@@ -72,6 +74,7 @@ function createAccountService(options) {
     if (!await saveSyncMetadata(state.environment, next, () => current(id))) return false;
     if (!current(id)) return false;
     metadata = next;
+    if (owner?.id === next.profileId) owner = { ...owner, uid: next.uid, firstUid: owner.firstUid || owner.uid || next.uid };
     return true;
   }
   async function pendingConflict(root, id) {
@@ -357,7 +360,7 @@ function createAccountService(options) {
   const service = {
     ready: null,
     getState: publicState,
-    getIdentity: () => metadata?.uid === state.uid && state.uid ? { uid: state.uid, profileId: metadata.profileId, playerName: state.playerName, environment: state.environment } : null,
+    getIdentity: () => metadata?.uid === state.uid && state.uid ? { uid: state.uid, profileId: metadata.profileId, firstUid: owner?.firstUid || owner?.uid || state.uid, playerName: state.playerName, environment: state.environment } : null,
     subscribe(listener) { listeners.add(listener); listener(publicState()); return () => listeners.delete(listener); },
     syncNow, chooseConflict, requestGoogleLogin, setPlayerName, restoreLocalBackup,
     acceptGoogleCredential: credential => signInWithCredential(backend.auth, credential),

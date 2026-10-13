@@ -88,7 +88,7 @@ export async function replaceChapterSnapshot(database, snapshot, envelope, expec
     if (metadataKey) {
       const store = transaction.objectStore("metadata");
       store.put(metadata, metadataKey);
-      if (metadata?.profileId && metadata.uid) store.put({ id: metadata.profileId, uid: metadata.uid }, "profile-owner");
+      if (metadata?.profileId && metadata.uid) store.put({ id: metadata.profileId, uid: metadata.uid, firstUid: metadata.uid }, "profile-owner");
     }
     await complete;
   } catch (error) {
@@ -101,13 +101,24 @@ export async function replaceChapterSnapshot(database, snapshot, envelope, expec
 export async function readChapterMetadata(database, key) {
   return requestResult(database.transaction("metadata", "readonly").objectStore("metadata").get(key));
 }
+export async function updateChapterMetadata(database, key, update, isCurrent = () => true) {
+  const transaction = database.transaction('metadata', 'readwrite');
+  const complete = transactionResult(transaction);
+  const store = transaction.objectStore('metadata');
+  const previous = await requestResult(store.get(key));
+  if (!isCurrent()) { transaction.abort(); await complete.catch(() => {}); return null; }
+  const next = update(previous);
+  store.put(next, key);
+  await complete;
+  return next;
+}
 export async function writeChapterMetadata(database, key, value) {
   const transaction = database.transaction("metadata", "readwrite");
   const complete = transactionResult(transaction);
   const store = transaction.objectStore("metadata");
   const owner = await requestResult(store.get("profile-owner"));
   store.put(value, key);
-  if (value?.profileId && value.uid && value.profileId === owner?.id) store.put({ id: owner.id, uid: value.uid }, "profile-owner");
+  if (value?.profileId && value.uid && value.profileId === owner?.id) store.put({ id: owner.id, uid: value.uid, firstUid: owner.firstUid || owner.uid || value.uid }, "profile-owner");
   await complete;
 }
 export async function ensureChapterProfileOwner(database) {

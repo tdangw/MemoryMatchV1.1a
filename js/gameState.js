@@ -10,8 +10,10 @@ import { normalizeTripleMilestones } from "./tripleConnect/tripleMilestones.js";
 import { getThemeSelectionManifest } from "./themeCatalog.js";
 import { appendThemeSelectionHistory, normalizeThemeSelectionHistory } from "./themeSelection.js";
 import { getAdventureSummary, isCompletedLevelResult, isNormalAdventureMode, MAX_ADVENTURE_CHAPTER } from "./adventureProgress.js";
-import { normalizePlayMetrics } from "./playMetrics.js";
+import { normalizePlayMetrics, getActivePlayMetrics } from "./playMetrics.js";
 import { normalizeRankedRun } from "./rankingRules.js";
+import { getRankingOwner } from './rankingOwner.js';
+import { validateRankingResult } from './rankingResult.js';
 
 const GAME_MODE_IDS = new Set(GAME_MODES.map(({ id }) => id));
 
@@ -214,6 +216,7 @@ function normalizeBestByLevel(value) {
       stars: Math.min(3, normalizeNonNegativeInteger(result.stars)),
       ...(result.cleared === true ? { cleared: true } : {}),
       ...(Number.isSafeInteger(result.durationMs) && result.durationMs > 0 ? { durationMs: result.durationMs } : {}),
+      ...(validateRankingResult(result.rankingResult) ? { rankingResult: structuredClone(result.rankingResult) } : {}),
     }]];
   }));
 }
@@ -373,11 +376,11 @@ export function increaseScore(points) {
   return gameState.score;
 }
 
-export function recordMemoryMatchResult(result) { return recordGameResult(gameState.progress.memoryMatch, result); }
-export function recordLinkConnectResult(result) { return recordGameResult(gameState.progress.linkConnect, result); }
-export function recordTripleConnectResult(result) { return recordGameResult(gameState.progress.tripleConnect, result); }
+export function recordMemoryMatchResult(result) { return recordGameResult(gameState.progress.memoryMatch, result, 'memory-match'); }
+export function recordLinkConnectResult(result) { return recordGameResult(gameState.progress.linkConnect, result, 'link-connect'); }
+export function recordTripleConnectResult(result) { return recordGameResult(gameState.progress.tripleConnect, result, 'triple-connect'); }
 
-function recordGameResult(progress, { mode, level, score, stars, durationMs }) {
+function recordGameResult(progress, { mode, level, score, stars, durationMs }, gameId) {
   const key = `${mode}:${level}`;
   const previous = progress.bestByLevel[key] || { score: 0, stars: 0 };
   const nextScore = Math.max(previous.score || 0, score);
@@ -388,6 +391,13 @@ function recordGameResult(progress, { mode, level, score, stars, durationMs }) {
   const measuredTime = Number.isSafeInteger(durationMs) && durationMs > 0 ? durationMs : null;
   const bestTime = measuredTime ? Math.min(previousTime || Infinity, measuredTime) : previousTime;
   progress.bestByLevel[key] = { score: nextScore, stars: nextStars, cleared: true, ...(bestTime ? { durationMs: bestTime } : {}) };
+  if (previous.rankingResult) progress.bestByLevel[key].rankingResult = previous.rankingResult;
+  const metrics = getActivePlayMetrics();
+  const owner = metrics ? metrics.owner : getRankingOwner();
+  const sameRankingOwner = previous.rankingResult && (owner?.uid ? owner.uid === previous.rankingResult.owner.uid : owner?.profileId === previous.rankingResult.owner.profileId);
+  if (owner && isNormalAdventureMode(mode) && measuredTime && (!sameRankingOwner || measuredTime < previous.rankingResult.durationMs)) {
+    progress.bestByLevel[key].rankingResult = { rulesVersion: 1, id: crypto.randomUUID(), gameId, mode, level, kind: 'time', durationMs: measuredTime, score, stars, outcome: 'won', recordedAt: Date.now(), owner };
+  }
   if (isNormalAdventureMode(mode)) progress.adventure = getAdventureSummary(progress.bestByLevel, progress.adventure?.currentChapter || 1);
   return { totalStars: progress.totalStars, isNewBest: score > (previous.score || 0) || stars > (previous.stars || 0) };
 }

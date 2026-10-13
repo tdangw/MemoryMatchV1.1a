@@ -1,4 +1,5 @@
 /** Event-driven active-time measurement. Countdown bonuses and freezes never change this clock. */
+import { getRankingOwner } from './rankingOwner.js';
 export function createActivePlayClock({ elapsedMs = 0, now = () => performance.now() } = {}) {
   let elapsed = Number.isSafeInteger(elapsedMs) && elapsedMs >= 0 ? elapsedMs : 0;
   let startedAt = null;
@@ -22,6 +23,7 @@ let lastMetrics = null;
 export function beginPlayMetrics(scope, identity, metadata = null) {
   const record = {
     ...identity,
+    owner: metadata?.owner || getRankingOwner(),
     clock: createActivePlayClock({ elapsedMs: metadata?.elapsedMs || 0 }),
     rankable: metadata === null || (metadata?.version === 1 && metadata.rankable !== false),
   };
@@ -41,7 +43,7 @@ export function getActivePlayMetrics() { return activeMetrics; }
 export function snapshotPlayMetrics(identity) {
   const record = activeMetrics || lastMetrics;
   if (!record || (identity && ["gameId", "mode", "level"].some(key => record[key] !== identity[key]))) return null;
-  return { version: 1, elapsedMs: record.clock.durationMs(), rankable: record.rankable };
+  return { version: 1, elapsedMs: record.clock.durationMs(), rankable: record.rankable, ...(record.owner ? { owner: record.owner } : {}) };
 }
 export function pausePlayMetrics(reason) { activeMetrics?.clock.pause(reason); }
 export function resumePlayMetrics(reason) { activeMetrics?.clock.resume(reason); }
@@ -52,5 +54,5 @@ export function finishPlayMetrics() {
 }
 export function normalizePlayMetrics(value) {
   return value?.version === 1 && Number.isSafeInteger(value.elapsedMs) && value.elapsedMs >= 0
-    ? { version: 1, elapsedMs: value.elapsedMs, rankable: value.rankable !== false } : null;
+    ? { version: 1, elapsedMs: value.elapsedMs, rankable: value.rankable !== false, ...(typeof value.owner?.profileId === 'string' && (value.owner.uid === null || typeof value.owner.uid === 'string') ? { owner: { ...value.owner } } : {}) } : null;
 }

@@ -1,5 +1,6 @@
 import { getGameProgressKey } from "./gameCatalog.js";
 import { gameState } from "./gameState.js";
+import { getRankingOwner } from './rankingOwner.js';
 
 export const RANKING_RULES_VERSION = 1;
 export function supportsRunRanking(gameId, mode) {
@@ -12,7 +13,7 @@ export function compareRankingResults(a, b, kind = "time") {
 export function createRankedRun(gameId, mode, level = 1, { rankable = level === 1, id = crypto.randomUUID() } = {}) {
   if (!supportsRunRanking(gameId, mode)) return null;
   if (!Number.isSafeInteger(level) || level < 1) throw new RangeError("Invalid ranked run level.");
-  return { version: 1, id, gameId, mode, level, previousScore: 0, attemptScore: 0, attemptCleared: false, finalized: false, rankable };
+  return { version: 1, id, gameId, mode, level, previousScore: 0, attemptScore: 0, attemptCleared: false, finalized: false, rankable, owner: getRankingOwner() };
 }
 export function normalizeRankedRun(value, { gameId, mode, level }) {
   if (!value || value.version !== 1 || value.gameId !== gameId || value.mode !== mode || value.level !== level
@@ -23,6 +24,7 @@ export function normalizeRankedRun(value, { gameId, mode, level }) {
     version: 1, id: value.id, gameId, mode, level,
     previousScore: value.previousScore, attemptScore: value.attemptScore,
     finalized: value.finalized === true, rankable: value.rankable === true, attemptCleared: value.attemptCleared === true,
+    owner: typeof value.owner?.profileId === 'string' && (value.owner.uid === null || typeof value.owner.uid === 'string') ? { ...value.owner } : null,
   };
 }
 export function reduceRankedRun(run, event) {
@@ -74,8 +76,14 @@ export function finalizeRankedRun(gameId, mode, score, outcome = "lost") {
   run = reduceRankedRun(run, { type: "finalize" });
   profile.activeRankedRuns[mode] = run;
   if (!run.rankable) return null;
-  const result = { rulesVersion: RANKING_RULES_VERSION, runId: run.id, levelReached: run.level, totalScore: run.previousScore + run.attemptScore, outcome, recordedAt: Date.now() };
+  const owner = run.owner;
+  const result = { rulesVersion: RANKING_RULES_VERSION, runId: run.id, levelReached: run.level, totalScore: run.previousScore + run.attemptScore, outcome, recordedAt: Date.now(), ...(owner ? { id: crypto.randomUUID(), owner, gameId, mode, kind: 'run' } : {}) };
   profile.runBests ||= {};
-  if (!profile.runBests[mode] || compareRankingResults(result, profile.runBests[mode], "run") < 0) profile.runBests[mode] = result;
+  const previous = profile.runBests[mode];
+  if (!previous || compareRankingResults(result, previous, "run") < 0) profile.runBests[mode] = { ...result };
+  const rankedPrevious = previous?.rankingResult || (previous?.owner ? previous : null);
+  const sameOwner = rankedPrevious && (owner?.uid ? owner.uid === rankedPrevious.owner.uid : owner?.profileId === rankedPrevious.owner.profileId);
+  if (owner && (!sameOwner || compareRankingResults(result, rankedPrevious, 'run') < 0)) profile.runBests[mode].rankingResult = result;
+  else if (rankedPrevious) profile.runBests[mode].rankingResult = rankedPrevious;
   return result;
 }

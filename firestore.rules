@@ -37,6 +37,37 @@ service cloud.firestore {
         allow delete: if knownSpace(space) && owner(uid);
       }
     }
+    function validEntry(data, board) {
+      return data.rulesVersion == 1 && data.resultId is string && data.resultId.matches('^[a-f0-9-]{36}$')
+        && data.gameId in ['memory-match', 'link-connect', 'triple-connect']
+        && data.playerName is string && data.playerName.size() > 0 && data.playerName.size() <= 40
+        && data.updatedAt == request.time
+        && (data.kind == 'time'
+          ? data.keys().hasOnly(['rulesVersion', 'resultId', 'gameId', 'mode', 'kind', 'playerName', 'updatedAt', 'level', 'durationMs', 'score', 'stars'])
+            && data.mode in ['easy', 'normal', 'hard', 'superHard']
+            && data.level is int && data.level > 0 && data.level <= 9007199254740900
+            && board == 'v1_' + data.gameId + '_' + data.mode + '_' + string(data.level)
+            && data.durationMs is int && data.durationMs > 0 && data.durationMs <= 9007199254740991
+            && data.score is int && data.score >= 0 && data.score <= 9007199254740991
+            && data.stars is int && data.stars >= 0 && data.stars <= 3
+          : data.kind == 'run' && data.keys().hasOnly(['rulesVersion', 'resultId', 'gameId', 'mode', 'kind', 'playerName', 'updatedAt', 'levelReached', 'totalScore', 'outcome'])
+            && (data.mode == 'challenge' || data.gameId == 'triple-connect' && data.mode == 'endless')
+            && board == 'v1_' + data.gameId + '_' + data.mode
+            && data.levelReached is int && data.levelReached > 0 && data.levelReached <= 9007199254740991
+            && data.totalScore is int && data.totalScore >= 0 && data.totalScore <= 9007199254740991
+            && data.outcome in ['won', 'lost']);
+    }
+    function betterEntry(next, previous) {
+      return next.kind == previous.kind && (next.kind == 'time' ? next.durationMs < previous.durationMs
+        : next.levelReached > previous.levelReached || next.levelReached == previous.levelReached && next.totalScore > previous.totalScore);
+    }
+    match /gamespaces/{space}/leaderboards/{board}/entries/{uid} {
+      allow get: if knownSpace(space);
+      allow list: if knownSpace(space) && request.query.limit != null && request.query.limit <= 20;
+      allow create: if knownSpace(space) && owner(uid) && validEntry(request.resource.data, board);
+      allow update: if knownSpace(space) && owner(uid) && validEntry(request.resource.data, board) && betterEntry(request.resource.data, resource.data);
+      allow delete: if false;
+    }
     match /{document=**} { allow read, write: if false; }
   }
 }

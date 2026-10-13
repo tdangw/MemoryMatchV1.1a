@@ -364,3 +364,5 @@ Phase 1 đã triển khai runtime/schema local, chưa cấu hình Auth/rules Fir
 2026-10-13: Cửa hàng/Bộ sưu tập ở home mặc định Memory Match; sau khi một trò thực sự ready để chơi, nhớ settings.lastPlayedGameId cho lần mở sau. Không có bước chọn trò trung gian. Xu chung, inventory/appearance theo từng trò.
 
 Phase 4: cảnh hoa SVG gốc ≤100 SVG nodes, ba nhóm chuyển động 5,2s rồi tĩnh; reduced-motion tĩnh ngay. Hạt tương tác tối đa24 toàn app, mỗi hạt600ms, không RAF loop mới. CSS build giảm198,79 →153,71kB; đây là kích thước bundle, chưa phải FPS thiết bị thật. Auth đã xác minh Anonymous/Google enabled; authorized domains hiện production và localhost.
+
+Phase6 (2026-10-13): runtime/rules emulator pass; Auth+ranking5 browser pass; immutable result/legacy-run/UID units pass; check/build pass. Tiếp tục phase7–8.
