@@ -1,0 +1,7 @@
+{
+  "indexes": [],
+  "fieldOverrides": [
+    { "collectionGroup": "objects", "fieldPath": "payload", "indexes": [] },
+    { "collectionGroup": "players", "fieldPath": "manifest", "indexes": [] }
+  ]
+}

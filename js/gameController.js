@@ -1,4 +1,5 @@
 import { rememberRecentGame } from './recentGame.js';
+import { canLaunchGame } from "./profileOperations.js";
 import { shellTimeout as setTimeout, shellInterval as setInterval, clearShellInterval as clearInterval } from "./gameShell/gameShellLifecycle.js";
 import {
   isBackgroundMusicPlaying,
@@ -85,7 +86,7 @@ export function startNewMemoryRun(level = 1) {
 }
 
 export function continueMemorySession(session) {
-  if (!session) return;
+  if (!session || !canLaunchGame()) return;
   gameState.settings.mode = session.mode;
   return initializeLevel(session.level, { reason: "resume", session });
 }
@@ -97,6 +98,7 @@ export function restartMemoryLevel() {
 }
 
 export function initializeLevel(level, { reason = "new", session = null } = {}) {
+  if (!canLaunchGame()) return null;
   const requestedMode = gameState.settings.mode || "easy";
   const requestedModeLayout = getModeLayout(requestedMode);
   const requestedLayout = isChallengeMode(requestedMode)

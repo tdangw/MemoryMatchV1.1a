@@ -19,8 +19,10 @@ export function openAppModal({
   closeOnBackdrop = true,
   closeOnEscape = true,
   onClose,
+  onActionSettled,
   owner = getActiveGameScope() || getAppPageScope(),
 }) {
+  const previousFocus = document.activeElement;
   if (id) {
     modals.get(id)?.();
     document.getElementById(id)?.remove();
@@ -56,7 +58,9 @@ export function openAppModal({
     destroyed = closed = true;
     lifecycle.dispose();
     releaseOwner?.forget();
+    const restoreFocus = overlay.contains(document.activeElement);
     overlay.remove();
+    if (restoreFocus && (!owner || owner.active) && previousFocus?.isConnected && typeof previousFocus.focus === "function") previousFocus.focus();
     metrics?.clock.resume(overlay);
     if (id && modals.get(id) === destroy) modals.delete(id);
   };
@@ -110,13 +114,14 @@ export function openAppModal({
           const result = await onClick?.(close);
           if (result === undefined || result === null) close();
         } catch (error) {
-          console.error("Modal action failed", error);
+          console.error("Modal action failed", error.code || error.name);
           if (!destroyed) showAppToast("Thao tác chưa hoàn tất. Hãy thử lại.", { tone: "warning" });
         } finally {
           submitting = false;
           if (!destroyed) {
             panel.removeAttribute("aria-busy");
             for (const [control, disabled] of controls) control.disabled = disabled;
+            onActionSettled?.();
           }
         }
       });
@@ -127,8 +132,20 @@ export function openAppModal({
 
   overlay.appendChild(panel);
   document.body.appendChild(overlay);
+  panel.tabIndex = -1;
+  (panel.querySelector("button:not([disabled]), input:not([disabled]), select:not([disabled])") || panel).focus();
 
   function handleKeydown(event) {
+    const top = [...document.querySelectorAll(".app-modal-overlay:not(.is-closing)")].at(-1);
+    if (top !== overlay) return;
+    if (event.key === "Tab") {
+      const controls = [...panel.querySelectorAll("button:not([disabled]), input:not([disabled]), select:not([disabled]), a[href], [tabindex='0']")].filter(control => control.getClientRects().length);
+      if (!controls.length) { event.preventDefault(); panel.focus(); return; }
+      const index = controls.indexOf(document.activeElement);
+      if (index < 0 || !event.shiftKey && index === controls.length - 1 || event.shiftKey && index === 0) {
+        event.preventDefault(); controls[event.shiftKey ? controls.length - 1 : 0].focus();
+      }
+    }
     if (event.key === "Escape" && dismissible && closeOnEscape && !submitting) close();
   }
 

@@ -331,7 +331,8 @@ Gate là checkpoint, không mặc định là ranh giới kết thúc lượt. Y
 | 2 | Pass — home/header/dock/menu ads, gameplay giữ HUD | check/build pass; navigation 3 viewport pass; lifecycle 100 switches pass; review owner pass |
 | 3 | Pass — 110 nodes/chapter, mode patch, previews, resume, chest, chapters | check/build pass; map+catalog 7 pass; navigation/data 7 pass; menu/Triple regression 28 pass (caption fixes rerun); independent review settings race fixed + unit |
 | 4 | Pass — SVG hoa riêng, chuyển động hữu hạn, touch cap24 | check/build web+Android pass; victory/music 6 tests pass, mobile/landscape checked; lifecycle review pass |
-| 5–8 | Chưa bắt đầu | Không đánh dấu pass bằng kết quả baseline |
+| 5 | Pass — Guest/Google, private cloud CAS, lựa chọn bản và phục hồi | check/build pass; emulator Rules/CAS/GC pass; Auth3 + navigation/catalog/cleanup12 pass; review UID guards |
+| 6–8 | Đang tiếp tục | Xếp hạng online → Analytics/tải → nghiệm thu |
 
 Firebase (2026-10-13): người dùng đã tạo `(default)` ở `asia-southeast1`; CLI xác nhận Firestore Native Standard, `freeTier=true`. Chưa deploy Hosting hoặc thay billing.
 

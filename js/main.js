@@ -1,7 +1,7 @@
 import { getRecentGameId } from "./recentGame.js";
 import { configureAdventureMap } from "./adventureMap.js";
 import "./memoryMatch/memoryShellDom.js";
-import { configureAppNavigation, openLocalRankings, refreshAppWallet } from "./appNavigation.js";
+import { configureAppNavigation, openLocalRankings, refreshAppWallet, refreshAppAccount } from "./appNavigation.js";
 import {
   applyEffectsSettings,
   enableButtonClickSounds,
@@ -78,6 +78,8 @@ document.documentElement.dataset.buildTarget =
 // Entry point: nạp dữ liệu đã lưu và nối các module qua callback.
 registerProgressiveWebApp();
 async function initializeApplication() {
+let accountRuntime = null;
+let accountReady = null;
 hydrateGameState(await loadPersistentGameData());
 subscribeToPersistenceFailure(() => {
   openAppModal({
@@ -103,7 +105,12 @@ configureMainMenu({
 });
 configureSettings({ onCloseMenu: createActiveGameMenu });
 configureAppNavigation({
-  account: () => openAppModal({ id: 'account-modal', title: 'Tài khoản', icon: 'account', content: '<p>Bạn đang chơi với bản lưu trên thiết bị này.</p>' }),
+  account: async () => {
+    if (import.meta.env.VITE_FIREBASE_DISABLED === '1') return openAppModal({ id: 'account-modal', title: 'Tài khoản', content: '<p>Bản lưu trên thiết bị đang hoạt động. Cloud được tắt trong môi trường kiểm tra.</p>' });
+    await accountReady;
+    if (!accountRuntime) return openAppModal({ id: 'account-modal', title: 'Chưa kết nối được cloud', content: '<p>Bản máy vẫn được lưu. Hãy tải lại ứng dụng để thử kết nối cloud.</p>', actions: [{ label: 'Tải lại', onClick: () => window.location.reload() }] });
+    return accountRuntime.showAccountPanel();
+  },
   action: (action, { gameId, playing, root, scope }) => {
     if (action === 'ranking') {
       if (document.getElementById('rankings-modal')) return;
@@ -235,6 +242,26 @@ document.addEventListener(
 );
 
 showGameSelector();
+if (import.meta.env.VITE_FIREBASE_DISABLED !== '1') {
+  accountReady = Promise.all([import('./accountService.js'), import('./accountPanel.js')]).then(([account, panels]) => {
+    accountRuntime = panels;
+    account.initializeAccountService({
+      onState: refreshAppAccount,
+      onConflict: panels.showCloudConflictDialog,
+      onConflictCleared: panels.closeCloudConflictDialog,
+      onProfileReplaced: async () => {
+        hydrateGameState(await loadPersistentGameData());
+        updateMemoryAssistInventoryDisplay();
+        applyEffectsSettings(gameState.settings);
+        initializeMeteorEffects(gameState.settings.meteorEffects);
+        showGameSelector();
+      },
+    });
+  }).catch(error => {
+    console.warn('Cloud startup unavailable', error.code || error.name);
+    showAppToast('Cloud chưa kết nối được. Bản máy vẫn hoạt động.');
+  });
+}
 
 if (new URLSearchParams(window.location.search).has("effect-performance")) {
   Object.defineProperty(window, "__effectV2Performance", {

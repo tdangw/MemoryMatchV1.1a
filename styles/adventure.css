@@ -31,6 +31,12 @@
   color: inherit;
 }
 .adventure-wallet { display: flex; align-items: center; gap: 8px; margin-left: auto; color: #ffe6a4; font-weight: 700; }
+.adventure-account { min-width: 0; max-width: 65%; }
+.adventure-account span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.adventure-account .ui-icon { flex-shrink: 0; }
+.adventure-account[data-cloud-state="synced"]::after { content: ""; width: 6px; height: 6px; flex-shrink: 0; border-radius: 50%; background: #7ac7aa; }
+.account-name-input { display: block; box-sizing: border-box; width: 100%; border: 1px solid #8faba455; border-radius: 12px; padding: 12px; margin: 8px 0; background: #10283d; color: #fff; }
+.account-explanation { font-size: 12px; color: #b7c6d2; line-height: 1.7; }
 .adventure-page > .menu-wrapper {
   width: min(100%, 600px);
   max-height: none;

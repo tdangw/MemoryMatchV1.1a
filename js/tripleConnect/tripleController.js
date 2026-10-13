@@ -1,4 +1,5 @@
 import { showFullVictoryCelebration } from "victory-presentation";
+import { canLaunchGame } from "../profileOperations.js";
 import { rememberRecentGame } from '../recentGame.js';
 import {
   createTripleCoverGraph,
@@ -126,6 +127,7 @@ export async function startTripleConnectDevelopmentRound({
 }
 
 export function startTripleConnectRound({ seed, mode = "easy", level = 1, elapsedTime, skipIntro = false, reason = "new" } = {}) {
+  if (!canLaunchGame()) return null;
   const normalizedLevel = normalizeLevel(level);
   if (mode === "challenge") getTripleChallengeStage(normalizedLevel);
   const roundSeed = seed || createRoundSeed(mode, normalizedLevel);
@@ -163,6 +165,7 @@ export function startTripleConnectRound({ seed, mode = "easy", level = 1, elapse
 }
 
 function prepareTripleStartup(prepare) {
+  if (!canLaunchGame()) return Promise.resolve(null);
   const shell = getTripleShell();
   const scope = shell.mount();
   const startup = createGameShellStartup(scope, shell.refs, error => {

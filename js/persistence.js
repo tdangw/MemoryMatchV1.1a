@@ -1,6 +1,8 @@
 import {
   openChapterDatabase, readChapterProfile, writeChapterProfile,
   hydrateChapterProfile, readChapter, resetChapterProfile,
+  exportChapterSnapshot, replaceChapterSnapshot, readChapterMetadata, writeChapterMetadata, readChapterBackups,
+  ensureChapterProfileOwner,
 } from "./chapterStore.js";
 
 export const SAVE_FORMAT_VERSION = 2;
@@ -19,6 +21,18 @@ let currentEnvelope = null;
 let blocked = false;
 const subscribers = new Set();
 const failureSubscribers = new Set();
+const commitSubscribers = new Set();
+
+export function subscribeToLocalCommit(listener) {
+  commitSubscribers.add(listener);
+  return () => commitSubscribers.delete(listener);
+}
+function notifyCommit(patch) {
+  for (const listener of commitSubscribers) {
+    try { listener({ revision: knownRevision, patch }); }
+    catch (error) { console.error("Persistence subscriber failed", error); }
+  }
+}
 
 export async function loadPersistentGameData() {
   await queue;
@@ -78,6 +92,7 @@ export function savePersistentGameData({ coins, appearance, progress, settings }
         try { localStorage.setItem(PRIMARY_MARKER_KEY, String(knownRevision)); }
         catch (error) { console.warn("[Persistence] Không gửi được thông báo giữa các tab:", error.message); }
       }
+      notifyCommit(patch);
       return true;
     } catch (error) { blocked = true; reportPersistenceError("write", error); return false; }
   });
@@ -103,6 +118,7 @@ export function clearPersistentGameData() {
       knownRevision = envelope.revision;
       blocked = false;
       lastPersistenceError = null;
+      notifyCommit({ reset: true });
       return true;
     } catch (error) { reportPersistenceError("remove", error); return false; }
   });
@@ -130,6 +146,52 @@ export async function loadPersistentChapter(game, number) {
 
 export function getPersistenceStatus() {
   return { formatVersion: SAVE_FORMAT_VERSION, revision: knownRevision, backend: database ? "indexedDB" : "localStorage", blocked, error: lastPersistenceError };
+}
+
+export async function exportPersistentSnapshot() {
+  await queue;
+  await initialize();
+  if (blocked || !database) throw new Error("Sao lưu cần backend IndexedDB đang hoạt động.");
+  const snapshot = await exportChapterSnapshot(database);
+  if (snapshot.profile.revision !== knownRevision) throw new Error("Bản lưu vừa thay đổi ở tab khác. Hãy tải lại trước khi đồng bộ.");
+  return snapshot;
+}
+export async function loadSyncMetadata(environment) {
+  await queue;
+  await initialize();
+  return database && !blocked ? await readChapterMetadata(database, `cloud:${environment}`) || null : null;
+}
+export async function loadProfileOwner() {
+  await queue;
+  await initialize();
+  if (!database || blocked) return null;
+  return ensureChapterProfileOwner(database);
+}
+export function saveSyncMetadata(environment, metadata, isCurrent = () => true) {
+  return enqueue(async () => {
+    await initialize();
+    if (blocked || !database || !isCurrent()) return false;
+    await writeChapterMetadata(database, `cloud:${environment}`, metadata);
+    return true;
+  });
+}
+export function importPersistentSnapshot(snapshot, environment, metadata, isCurrent = () => true, { synced = true } = {}) {
+  return enqueue(async () => {
+    await initialize();
+    if (blocked || !database || !isCurrent()) return false;
+    const envelope = createEnvelope(snapshot.profile.data, knownRevision + 1);
+    await replaceChapterSnapshot(database, snapshot, envelope, knownRevision, `cloud:${environment}`, { ...metadata, lastSyncedLocalRevision: synced ? envelope.revision : 0 }, isCurrent);
+    currentEnvelope = envelope; knownRevision = envelope.revision;
+    try { localStorage.setItem(PRIMARY_MARKER_KEY, String(knownRevision)); }
+    catch (error) { console.warn("[Persistence] Không gửi được thông báo import giữa các tab:", error.message); }
+    if (!synced) notifyCommit({ restored: true });
+    return true;
+  });
+}
+export async function getLocalRestoreBackups() {
+  await queue;
+  await initialize();
+  return database ? readChapterBackups(database) : [];
 }
 export function isPersistenceBlocked() { return blocked; }
 export function subscribeToExternalSave(listener) {

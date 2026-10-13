@@ -1,4 +1,4 @@
-import { getAdventureSummary, getChapterNumber } from "./adventureProgress.js";
+import { getAdventureSummary, getChapterNumber, MAX_ADVENTURE_CHAPTER } from "./adventureProgress.js";
 
 export const CHAPTER_DATABASE = "memoryMatchAdventure";
 const GAME_KEYS = ["memoryMatch", "linkConnect", "tripleConnect"];
@@ -6,10 +6,11 @@ const LEVEL_KEY = /^(easy|normal|hard|superHard|challenge|endless):([1-9]\d*)$/;
 
 export function openChapterDatabase() {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open(CHAPTER_DATABASE, 1);
+    const request = indexedDB.open(CHAPTER_DATABASE, 2);
     request.onupgradeneeded = () => {
-      request.result.createObjectStore("profile");
-      request.result.createObjectStore("chapters");
+      for (const name of ["profile", "chapters", "metadata", "backups"]) {
+        if (!request.result.objectStoreNames.contains(name)) request.result.createObjectStore(name);
+      }
     };
     request.onsuccess = () => {
       const database = request.result;
@@ -25,6 +26,103 @@ export async function readChapterProfile(database) {
   const transaction = database.transaction("profile", "readonly");
   return requestResult(transaction.objectStore("profile").get("active"));
 }
+
+/** Consistent export of durable state; never export the optimistic gameplay object. */
+export async function exportChapterSnapshot(database) {
+  const transaction = database.transaction(["profile", "chapters"], "readonly");
+  const complete = transactionResult(transaction);
+  const chapters = transaction.objectStore("chapters");
+  const [profile, keys, values] = await Promise.all([
+    requestResult(transaction.objectStore("profile").get("active")),
+    requestResult(chapters.getAllKeys()), requestResult(chapters.getAll()),
+  ]);
+  await complete;
+  return { snapshotVersion: 1, profile, chapters: keys.map((key, index) => ({ key, value: values[index] })) };
+}
+
+export function validateChapterSnapshot(snapshot) {
+  const profile = snapshot?.profile;
+  const data = profile?.data;
+  if (snapshot?.snapshotVersion !== 1 || profile?.formatVersion !== 2 || !record(data)
+    || !Number.isFinite(data.coins) || data.coins < 0 || !record(data.progress) || !record(data.appearance)
+    || !record(data.settings) || !Array.isArray(snapshot.chapters)) throw new Error("Bản lưu cloud không đúng định dạng hỗ trợ.");
+  for (const game of GAME_KEYS) {
+    const chapter = data.progress[game]?.adventure?.currentChapter;
+    if (chapter !== undefined && (!Number.isSafeInteger(chapter) || chapter < 1 || chapter > MAX_ADVENTURE_CHAPTER)) throw new Error("Chặng cloud không hợp lệ.");
+  }
+  const seen = new Set();
+  for (const entry of snapshot.chapters) {
+    const match = /^(memoryMatch|linkConnect|tripleConnect):([1-9]\d*)$/.exec(entry?.key || "");
+    const number = match && Number(match[2]);
+    if (!match || !Number.isSafeInteger(number) || number > MAX_ADVENTURE_CHAPTER || seen.has(entry.key)
+      || !record(entry.value) || !record(entry.value.bestByLevel) || !record(entry.value.claimedChests)
+      || !record(entry.value.startedLevels || {})) throw new Error("Dữ liệu chặng cloud không hợp lệ.");
+    seen.add(entry.key);
+  }
+  return snapshot;
+}
+
+/** Replace rather than merge; backup and identity change commit with the profile and all chapters. */
+export async function replaceChapterSnapshot(database, snapshot, envelope, expectedRevision, metadataKey, metadata, isCurrent = () => true) {
+  validateChapterSnapshot(snapshot);
+  const transaction = database.transaction(["profile", "chapters", "metadata", "backups"], "readwrite");
+  const complete = transactionResult(transaction);
+  const profiles = transaction.objectStore("profile");
+  const chapters = transaction.objectStore("chapters");
+  const backups = transaction.objectStore("backups");
+  try {
+    const [previous, keys, values, oldBackups] = await Promise.all([
+      requestResult(profiles.get("active")), requestResult(chapters.getAllKeys()),
+      requestResult(chapters.getAll()), requestResult(backups.getAllKeys()),
+    ]);
+    if (!isCurrent()) throw new Error("Tài khoản hoặc màn hình đã thay đổi.");
+    if ((previous?.revision || 0) !== expectedRevision) throw new Error("Dữ liệu đã thay đổi ở tab khác.");
+    if (previous) {
+      backups.put({ snapshotVersion: 1, savedAt: Date.now(), profile: previous, chapters: keys.map((key, index) => ({ key, value: values[index] })) }, previous.revision);
+      // Keep the two older snapshots plus the new one.
+      for (const key of oldBackups.slice(0, Math.max(0, oldBackups.length - 2))) backups.delete(key);
+    }
+    chapters.clear();
+    for (const entry of snapshot.chapters) chapters.put(entry.value, entry.key);
+    profiles.put(envelope, "active");
+    if (metadataKey) {
+      const store = transaction.objectStore("metadata");
+      store.put(metadata, metadataKey);
+      if (metadata?.profileId && metadata.uid) store.put({ id: metadata.profileId, uid: metadata.uid }, "profile-owner");
+    }
+    await complete;
+  } catch (error) {
+    try { transaction.abort(); } catch (abortError) { if (abortError.name !== "InvalidStateError") throw abortError; }
+    await complete.catch(() => {});
+    throw error;
+  }
+}
+
+export async function readChapterMetadata(database, key) {
+  return requestResult(database.transaction("metadata", "readonly").objectStore("metadata").get(key));
+}
+export async function writeChapterMetadata(database, key, value) {
+  const transaction = database.transaction("metadata", "readwrite");
+  const complete = transactionResult(transaction);
+  const store = transaction.objectStore("metadata");
+  const owner = await requestResult(store.get("profile-owner"));
+  store.put(value, key);
+  if (value?.profileId && value.uid && value.profileId === owner?.id) store.put({ id: owner.id, uid: value.uid }, "profile-owner");
+  await complete;
+}
+export async function ensureChapterProfileOwner(database) {
+  const transaction = database.transaction("metadata", "readwrite");
+  const complete = transactionResult(transaction);
+  const store = transaction.objectStore("metadata");
+  let owner = await requestResult(store.get("profile-owner"));
+  if (!owner) { owner = { id: crypto.randomUUID(), uid: null }; store.put(owner, "profile-owner"); }
+  await complete;
+  return owner;
+}
+export async function readChapterBackups(database) {
+  return requestResult(database.transaction("backups", "readonly").objectStore("backups").getAll());
+}
+function record(value) { return value !== null && typeof value === "object" && !Array.isArray(value); }
 
 /** A profile and all changed chapter records share one durability boundary. */
 export async function writeChapterProfile(database, envelope, expectedRevision, { migration = false } = {}) {

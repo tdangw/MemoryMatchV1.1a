@@ -1,0 +1,42 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function knownSpace(space) { return space in ['production', 'beta', 'test', 'local']; }
+    function owner(uid) { return request.auth != null && request.auth.uid == uid; }
+    function validRoot(data) {
+      return data.keys().hasOnly(['snapshotVersion', 'formatVersion', 'revision', 'manifest', 'fingerprint', 'byteLength', 'playerName', 'updatedAt'])
+        && data.keys().hasAll(['snapshotVersion', 'formatVersion', 'revision', 'manifest', 'fingerprint', 'byteLength', 'playerName', 'updatedAt'])
+        && data.snapshotVersion == 1 && data.formatVersion == 2
+        && data.revision is int && data.revision > 0
+        && data.manifest is map && data.manifest.profile is list && data.manifest.profile.size() > 0
+        && data.fingerprint is string && data.fingerprint.matches('^[a-f0-9]{64}$')
+        && data.byteLength is int && data.byteLength > 0 && data.byteLength <= 134217728
+        && data.playerName is string && data.playerName.size() > 0 && data.playerName.size() <= 40
+        && data.updatedAt == request.time;
+    }
+    function validObject(data, hash) {
+      return hash.matches('^[a-f0-9]{64}$')
+        && data.keys().hasOnly(['snapshotVersion', 'payload', 'byteLength', 'stageId', 'createdAt'])
+        && data.keys().hasAll(['snapshotVersion', 'payload', 'byteLength', 'stageId', 'createdAt'])
+        && data.snapshotVersion == 1 && data.payload is string && data.payload.size() > 0 && data.payload.size() <= 90000
+        && data.byteLength is int && data.byteLength > 0 && data.byteLength <= 65536
+        && data.stageId is string && data.stageId.matches('^[a-f0-9-]{36}$') && data.createdAt == request.time;
+    }
+    match /gamespaces/{space}/players/{uid} {
+      allow get: if knownSpace(space) && owner(uid);
+      allow list, delete: if false;
+      allow create: if knownSpace(space) && owner(uid) && validRoot(request.resource.data) && request.resource.data.revision == 1;
+      allow update: if knownSpace(space) && owner(uid) && validRoot(request.resource.data)
+        && request.resource.data.revision == resource.data.revision + 1;
+      match /objects/{hash} {
+        allow get: if knownSpace(space) && owner(uid);
+        allow list: if false;
+        allow create: if knownSpace(space) && owner(uid) && validObject(request.resource.data, hash);
+        allow update: if knownSpace(space) && owner(uid) && validObject(request.resource.data, hash)
+          && request.resource.data.payload == resource.data.payload && request.resource.data.byteLength == resource.data.byteLength;
+        allow delete: if knownSpace(space) && owner(uid);
+      }
+    }
+    match /{document=**} { allow read, write: if false; }
+  }
+}

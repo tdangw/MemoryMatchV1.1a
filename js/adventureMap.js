@@ -9,6 +9,7 @@ import { getActiveSessions } from "./sessionProgress.js";
 import { getEquippedThemeId } from "./appearance.js";
 import { getTheme } from "./themeCatalog.js";
 import { openAppModal, showAppToast } from "./modal.js";
+import { canLaunchGame } from "./profileOperations.js";
 
 const views = new Map(); // One bounded view per released game, independent of durable progress.
 let adapters = {};
@@ -171,7 +172,7 @@ export function mountAdventureMap(gameId) {
   }
 
   function launch(mode, level, session = null) {
-    if (!scope.active || loading) return false;
+    if (!scope.active || loading || !canLaunchGame()) return false;
     view.scroll = scroll.scrollTop;
     return session ? adapter.resume(session) : adapter.launch({ mode, level });
   }

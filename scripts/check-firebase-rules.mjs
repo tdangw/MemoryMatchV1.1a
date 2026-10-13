@@ -1,0 +1,52 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { initializeTestEnvironment, assertFails, assertSucceeds } from "@firebase/rules-unit-testing";
+import { doc, setDoc, getDoc, getDocs, collection, serverTimestamp } from "firebase/firestore";
+import { encodeCloudSnapshot } from "../js/cloudSnapshot.js";
+import { readCloudRoot, readCloudSnapshot, publishCloudSnapshot, collectCloudObjects, CloudConflictError } from "../js/cloudStore.js";
+
+const env = await initializeTestEnvironment({ projectId: "demo-memory-match", firestore: { host: "127.0.0.1", port: 8180, rules: readFileSync("firestore.rules", "utf8") } });
+await env.clearFirestore();
+try {
+  const database = env.authenticatedContext("owner-a", { firebase: { sign_in_provider: "anonymous" } }).firestore();
+  const other = env.authenticatedContext("owner-b", { firebase: { sign_in_provider: "google.com" } }).firestore();
+  const unauthenticated = env.unauthenticatedContext().firestore();
+  const snapshot = { snapshotVersion: 1, profile: { formatVersion: 2, revision: 1, data: { coins: 100, progress: { memoryMatch: { totalStars: 0 } }, settings: {}, appearance: {} } }, chapters: [{ key: "memoryMatch:1", value: { bestByLevel: { "easy:1": { score: 10, stars: 0 } }, claimedChests: {}, startedLevels: { "easy:1": true } } }] };
+  const encoded = await encodeCloudSnapshot(snapshot);
+  const first = await assertSucceeds(publishCloudSnapshot({ database, environment: "test", uid: "owner-a", encoded, expectedRevision: 0, playerName: "Người chơi A" }));
+  assert.equal(first.root.revision, 1);
+  assert.equal(first.writes, encoded.objects.size + 1);
+  const root = await readCloudRoot(database, "test", "owner-a");
+  assert.equal((await readCloudSnapshot(database, "test", "owner-a", root)).profile.data.coins, 100);
+  const hash = [...encoded.objects.keys()][0];
+  await assertFails(getDoc(doc(other, "gamespaces/test/players/owner-a")));
+  await assertFails(getDoc(doc(unauthenticated, "gamespaces/test/players/owner-a")));
+  await assertFails(getDoc(doc(other, `gamespaces/test/players/owner-a/objects/${hash}`)));
+  await assertFails(getDocs(collection(database, "gamespaces/test/players")));
+  await assertFails(getDoc(doc(database, "gamespaces/unknown/players/owner-a")));
+  await assertFails(setDoc(doc(database, "gamespaces/test/players/owner-a"), { ...root, revision: 1, updatedAt: serverTimestamp() }));
+  await assertFails(setDoc(doc(database, "gamespaces/test/players/owner-a"), { ...root, revision: 2, email: "hidden@example.test", updatedAt: serverTimestamp() }));
+  await assertFails(setDoc(doc(database, "gamespaces/test/players/owner-a"), { ...root, revision: 2, byteLength: -1, updatedAt: serverTimestamp() }));
+  await assertFails(setDoc(doc(database, `gamespaces/test/players/owner-a/objects/${hash}`), { ...encoded.objects.get(hash), payload: "changed", stageId: crypto.randomUUID(), createdAt: serverTimestamp() }));
+  assert.equal((await readCloudRoot(database, "production", "owner-a")), null, "Environments are isolated.");
+  const changed = structuredClone(snapshot); changed.profile.data.coins = 200;
+  const changedAgain = structuredClone(snapshot); changedAgain.profile.data.coins = 300;
+  const a = await encodeCloudSnapshot(changed);
+  const b = await encodeCloudSnapshot(changedAgain);
+  const planned = [];
+  const results = await Promise.allSettled([a, b].map(value => publishCloudSnapshot({ database, environment: "test", uid: "owner-a", encoded: value, expectedRevision: 1, playerName: "Người chơi A", onStagePlan: async jobs => { planned.push(...jobs); return true; } })));
+  assert.equal(results.filter(result => result.status === "fulfilled").length, 1, "Only one device can publish against the same revision.");
+  const rejected = results.find(result => result.status === "rejected");
+  assert.ok(rejected.reason instanceof CloudConflictError);
+  const winner = await readCloudRoot(database, "test", "owner-a");
+  assert.equal(winner.revision, 2);
+  const winnerCoins = (await readCloudSnapshot(database, "test", "owner-a", winner)).profile.data.coins;
+  assert.ok([200, 300].includes(winnerCoins));
+  await collectCloudObjects({ database, environment: "test", uid: "owner-a", jobs: planned });
+  assert.equal((await readCloudSnapshot(database, "test", "owner-a", winner)).profile.data.coins, winnerCoins, "Recovery cleanup preserves the winner's committed references.");
+  // Stale result / interrupted staging cannot publish a new pointer.
+  let alive = true;
+  await assert.rejects(publishCloudSnapshot({ database, environment: "test", uid: "owner-a", encoded, expectedRevision: 2, playerName: "Người chơi A", isCurrent: () => alive, onStagePlan: async () => { alive = false; return true; } }), /phục hồi|thay đổi/);
+  assert.equal((await readCloudRoot(database, "test", "owner-a")).revision, 2);
+  console.log(`Firebase private rules, anonymous/Google ownership, CAS, partial upload isolation and GC recovery passed; initial ${first.reads} reads/${first.writes} writes, ${encoded.byteLength} bytes.`);
+} finally { await env.cleanup(); }

@@ -44,6 +44,7 @@ export default defineConfig({
     ...(name === "desktop" ? {} : { testMatch: responsiveTestPattern }),
   })),
   webServer: {
+    env: { VITE_FIREBASE_DISABLED: process.env.VITE_FIREBASE_USE_EMULATORS === "1" ? "0" : "1", VITE_FIREBASE_USE_EMULATORS: process.env.VITE_FIREBASE_USE_EMULATORS || "0" },
     command: serverCommand,
     url: baseURL,
     // Every test run owns a fresh Vite process. Reusing a developer server lets

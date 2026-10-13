@@ -63,7 +63,7 @@
 
 ## Tài liệu giữ lại
 
-- `ADVENTURE_WEB_PLAN.md`: kế hoạch thiết kế hiện hành; các gate code chưa được triển khai.
+- `ADVENTURE_WEB_PLAN.md`: kế hoạch hiện hành; phase0–5 đã triển khai, tiếp tục phase6–8.
 - `AGENTS.md`: chuẩn làm việc bắt buộc.
 - `ARCHITECTURE.md`: ownership và contract kỹ thuật bền vững.
 - `README.md`: cách chạy/build.
@@ -88,3 +88,5 @@ Phase 2: appPageLifecycle sở hữu trang menu/modal; game shell sở hữu doc
 Phase 3: adventureMap sở hữu một chặng 110 node, patch mode không remount/đổi scroll; native scroll, không finder. Adapter launch/resume từng trò, preview cảnh báo thay session cùng mode; rương commit rồi mới xác nhận. LastPlayedGameId có check concurrency với catalogTabs. Map chapter navigation 5 vòng giữ diagnostics/page resources ổn định.
 
 Phase 4: bỏ scene202nodes/CSS infinite cũ; victoryFlowerScene tạo SVG nguyên bản, victoryCelebration sở hữu animation/audio/listener và được game/page owner hủy. Triple cũng có celebration đủ100 clear và tiếp tục101. Web/Android build pass (không build APK), 6 victory/music tests pass, review lifecycle pass.
+
+Phase5 (2026-10-13): Firebase Anonymous/Google enabled, authorized domains production/beta/test + localhost. Private Rules/indexes deployed only, no Hosting/billing change. Guest offline/reload, same-UID link, existing Google cloud/local choice, recovery backup and conflict deferred during gameplay: emulator Auth3 pass; private CAS/GC/ownership pass. Cloud uses content-addressed 64KiB chunks + CAS manifest; local restore atomic with up to3 backups and UID/generation guards. check/build pass; navigation/catalog/cleanup12 pass; independent review findings fixed. Real Google OAuth popup and Android provider flow require device/domain QA; emulator credentials do not prove hosted OAuth.

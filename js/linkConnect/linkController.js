@@ -1,4 +1,5 @@
 import { rememberRecentGame } from '../recentGame.js';
+import { canLaunchGame } from "../profileOperations.js";
 import { getLinkShell, getLinkHud, getLinkHudElements, bindLinkControls, closeLinkMenus, applyLinkTimingStyles } from "./linkShell.js";
 import { setHudText, renderHudTimer } from "../gameShell/gameShellHud.js";
 import { shellTimeout as setTimeout, clearShellTimeout as clearTimeout, shellInterval as setInterval, clearShellInterval as clearInterval } from "../gameShell/gameShellLifecycle.js";
@@ -234,6 +235,7 @@ export function startLinkLevel({
   metrics,
   run,
 } = {}) {
+  if (!canLaunchGame()) return null;
   const modeLayout = getLinkModeLayout(mode);
   const layout = getLinkBoardLayoutForViewport(isLinkChallengeMode(mode) ? getLinkChallengeLayout(level) : modeLayout);
   const themeId = getTheme(getEquippedThemeId(gameState.appearance, "link-connect")).id;
