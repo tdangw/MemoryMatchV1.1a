@@ -23,7 +23,7 @@ Game Shell đã ổn định. `js/gameShell/` sở hữu config, sáu vùng sema
 - Ứng dụng dùng HTML/CSS và JavaScript ES modules, không có framework UI.
 - `js/main.js` là entry point duy nhất; module chức năng không tự bootstrap ứng dụng.
 - Các controller phụ thuộc module dùng chung, nhưng không import lẫn nhau. Callback `configure*` nối các luồng cần điều hướng chéo.
-- Không có backend. Firebase chỉ là đích Hosting.
+- Firebase Auth, Firestore và Analytics hỗ trợ tài khoản, backup theo sự kiện, bảng xếp hạng và thống kê; Hosting là đích phát hành riêng. Gameplay/local save tiếp tục hoạt động theo persistence khi offline.
 
 ## 2. Phân lớp và quyền sở hữu
 
@@ -36,7 +36,7 @@ Game Shell đã ổn định. `js/gameShell/` sở hữu config, sáu vùng sema
 | `gameState.js` | Trạng thái runtime dùng chung và chuẩn hóa dữ liệu đã lưu; không thao tác DOM hoặc `localStorage`. |
 | `sessionProgress.js` | Đọc, ghi và xóa phiên theo game/mode. |
 | `sessionTiming.js` | Giải quyết thời gian cho màn mới, chơi lại, khôi phục và chuyển màn. |
-| `persistence.js` | Cổng duy nhất đọc/ghi gói dữ liệu có phiên bản trong `localStorage`. |
+| `persistence.js`, `chapterStore.js` | Facade dữ liệu có phiên bản và backend IndexedDB theo profile/chặng; migration/fallback theo contract mục3. |
 | `gameplayTuning.js` | Giới hạn và nhịp gameplay dùng chung. |
 | `motion.js` | Tiện ích thời lượng CSS, tùy chọn giảm chuyển động và phép tính FLIP dùng chung. |
 | `coinRewards.js` | Quy tắc Xu theo cặp và hoạt ảnh bộ đếm/thu thập dùng chung. |
@@ -47,8 +47,11 @@ Game Shell đã ổn định. `js/gameShell/` sở hữu config, sáu vùng sema
 | `shop.js`, `shopCatalog.js` | Giao diện mua và catalog/giá sản phẩm. |
 | `appearance.js`, `themeCatalog.js` | Quyền sở hữu/trang bị ngoại hình và dữ liệu chủ đề. |
 | `sound.js`, `backgroundEffects.js` | Âm thanh và hiệu ứng nền theo cài đặt/vòng đời trang. |
+| `appNavigation.js`, `appPageLifecycle.js` | Một page owner, tối đa một screen chức năng con, giữ map/scroll khi đổi tab; gameplay không có dock. |
+| `leaderboardPanel.js`, `leaderboardStore.js`, `leaderboardService.js` | Renderer bộ lọc, query/cache/best-only và outbox theo UID; luật/board ID thuộc rankingResult/rankingRules. |
+| `victoryCelebration.js`, `victoryFlowerScene.js` | Cảnh hoa SVG hiện hữu, animation hữu hạn và scope/audio cleanup; không sở hữu luật hoàn thành chặng. |
 
-Game Shell giữ đủ sáu region công khai: `title`, `progress`, `hud`, `milestones`, `frame`, `board`. `progress` là placeholder tương thích rỗng, luôn ẩn; metric thật thuộc `refs.hud`, còn Xu/mốc/sao màn thuộc `refs.milestones`. `gameHudMenus.js` sở hữu trạng thái mở duy nhất, ARIA, Escape/click ngoài và cleanup theo scope mount. `styles/game-shell/hud-unified.css` sở hữu geometry và presentation thanh HUD một hàng; CSS game chỉ giữ trạng thái có ngữ nghĩa và phần board/milestone đặc thù.
+Game Shell giữ đủ sáu region công khai: `title`, `progress`, `hud`, `milestones`, `frame`, `board`. `progress` là placeholder tương thích rỗng, luôn ẩn; metric thật thuộc `refs.hud`, còn Xu/mốc/sao màn thuộc `refs.milestones`. `gameHudMenus.js` sở hữu menu công cụ, ARIA, Escape/click ngoài và cleanup theo scope mount. `gameExitDialog.js` sở hữu popup Tạm dừng; controller cung cấp Thoát/Chơi lại/Cài đặt và pause/resume. Startup khóa HUD đến khi readiness hoàn tất, tránh round initialization ghi đè pause. `styles/game-shell/hud-unified.css` sở hữu geometry và presentation thanh HUD một hàng; CSS game chỉ giữ trạng thái có ngữ nghĩa và phần board/milestone đặc thù.
 
 ### Memory Match
 | Module | Trách nhiệm |
@@ -152,4 +155,14 @@ playMetrics/rankingRules chụp owner khi bắt đầu attempt/run. bestByLevel 
 
 Analytics chỉ chạy production, gửi active_play_time theo segment của active clock khi pause/end; không có timer ghi mỗi giây. Auth UID làm pseudonymous userId. Không sử dụng Firestore cho DAU/WAU/MAU hoặc playtime counters. Các thống kê/dashboard thực và OAuth hosted cần xác minh trước phát hành.
 
-Bản đồ tinh gọn: adventureMap sở hữu selector sáu chế độ, focus/keyboard/outside dismissal qua app-page scope; không có các control chặng/chủ đề/resume/preview. Adapter chỉ cần launch. Controller/session API cũ giữ tương thích; entry từ map tạo lượt mới, không đổi gameplay hoặc schema save. Map re-entry trở về highest playable của frontier, rebase giữ anchor và pha texture tĩnh.
+Bản đồ: adventureMap sở hữu preview màn với bốn độ khó và hai lối vào Thử thách/Vô tận cố định; adapter cung cấp goal/preview/launch. Entry thường từ map bỏ giới thiệu trùng nhưng giữ Memory reveal; các lối vào khác giữ intro. Map re-entry trở về highest playable của frontier, rebase giữ anchor và pha texture tĩnh. Controller/session API và schema save tương thích.
+
+Điều hướng ngoài gameplay: Home có Nhiệm vụ/Bạn bè/Profile/Xếp hạng/Cài đặt, map có Cửa hàng/Bộ sưu tập/Bản đồ/Xếp hạng/Cài đặt. appNavigation giữ base page và một child scope; modal.js nhận presentation=screen/host/owner để tái dùng renderer với role region, không overlay/focus trap. Đổi screen hủy owner cũ; Account subscription và settings DOM được giải phóng/trả về đúng owner qua onDestroy. Exit của map/screen về Home. Gameplay không có dock; Cài đặt mở qua Tạm dừng, giữ ván và đồng hồ pause. Quảng cáo chỉ chừa chỗ trên Home/map.
+
+## Hướng tối ưu đã lập kế hoạch, chưa triển khai
+
+`EFFECTS_LEADERBOARD_PLAN.md` là nguồn phạm vi mới; không diễn giải nội dung sau thành trạng thái runtime đã có:
+
+- Sao băng: backgroundEffects hiện còn tạo/xóa node và chưa chặn gameplay. Dự kiến singleton pool hai node, một scheduler, IDLE/ACTIVE, eligibility từ page/navigation/shell lifecycle thay vì data-active-game. Không dùng thuật ngữ Zero GC hoặc GPU100% làm invariant.
+- Xếp hạng: hiện top20+own/cache, chưa phân trang. Dự kiến ba tab trò × sáu mode, mười người/trang, query cursor và request generation/UID guard. Vô tận Memory/Link chưa có bảng hợp lệ; giữ comparator và board IDs. Query/cache thuộc store, tương tác/phân trang thuộc panel, outbox vẫn thuộc service.
+- Cảnh thắng: giữ SVG/nhạc và chất lượng hiện có. Phân tích cả chuỗi fireworks/summary/confetti/hoa; sửa cancel/ownership khi có bằng chứng, không mặc định thay mỹ thuật. Scope của cảnh hoa không tự bao phủ RAF/canvas của hiệu ứng tổng kết; audit phải kiểm tra owner của từng resource. Chỉ dừng/reset audio của cảnh, không phá tài nguyên âm thanh dùng chung.
