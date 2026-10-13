@@ -51,7 +51,6 @@ for (const [id, title, root, board] of [
     });
     await page.locator(".game-selector__choice").filter({ hasText: title }).click();
     await page.locator('[data-level="1"]').click();
-  await page.getByRole("button", { name: "Chơi", exact: true }).click();
     await page.mouse.move(0, 0);
     await page.evaluate(() => document.activeElement?.blur());
     // Advance virtual time, not wall time; settle preview, popup and layout callbacks.

@@ -82,7 +82,6 @@ test("Triple menu starts a visible playable board", async ({ page }) => {
     .filter({ hasText: "Triple Connect" })
     .click();
   await page.locator('[data-level="1"]').click();
-  await page.getByRole("button", { name: "Chơi", exact: true }).click();
   await expect(page.locator("#triple-connect-container")).toBeVisible();
   await expect(
     page.locator(".triple-connect__board .triple-connect__tile"),
@@ -98,7 +97,6 @@ test("switching all released games after a production Triple start keeps one act
     .filter({ hasText: "Triple Connect" })
     .click();
   await page.locator('[data-level="1"]').click();
-  await page.getByRole("button", { name: "Chơi", exact: true }).click();
   await expect(page.locator("#triple-connect-container")).toBeVisible();
 
   const result = await page.evaluate(async () => {

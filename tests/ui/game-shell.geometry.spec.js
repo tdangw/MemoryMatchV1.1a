@@ -134,5 +134,4 @@ for (const viewport of [
 async function startEasyGame(page, title) {
   await page.locator(".game-selector__choice").filter({ hasText: title }).click();
   await page.locator('[data-level="1"]').click();
-  await page.getByRole("button", { name: "Chơi", exact: true }).click();
 }

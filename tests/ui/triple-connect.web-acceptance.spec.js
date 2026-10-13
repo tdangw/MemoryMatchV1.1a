@@ -25,9 +25,9 @@ test("production Triple Connect keeps interaction, DOM, long-task and heap budge
   const cdp = await page.context().newCDPSession(page);
 
   await page.locator(".game-selector__choice").filter({ hasText: "Triple Connect" }).click();
+  await page.locator('.adventure-mode-toggle').click();
   await page.locator('[data-mode="superHard"]').click();
   await page.locator('[data-level="1"]').click();
-  await page.getByRole("button", { name: "Chơi", exact: true }).click();
   const intro = page.locator("#triple-round-start-modal");
   await intro.waitFor({ state: "visible" });
   await expect(intro).toHaveCount(0, { timeout: 4000 });

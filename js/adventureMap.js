@@ -3,21 +3,17 @@ import { GAME_MODES, getGameDefinition, getGameModeLabel } from "./gameCatalog.j
 import { createIcon } from "./icons.js";
 import { decorateAdventureMenu, refreshAppWallet } from "./appNavigation.js";
 import { prepareAdventureChapter } from "./adventureLaunch.js";
-import { createAdventureChapterNodes, getAdventureSummary, getChapterProgress, getAdventureLevelState, getAdventureChestState, getSuggestedAdventureLevel, isNormalAdventureMode } from "./adventureProgress.js";
+import { createAdventureChapterNodes, getAdventureSummary, getAdventureLevelState, getAdventureChestState, isNormalAdventureMode } from "./adventureProgress.js";
 import { loadPersistentChapter } from "./persistence.js";
 import { claimAdventureChest } from "./adventureRewards.js";
-import { getActiveSessions } from "./sessionProgress.js";
-import { getEquippedThemeId } from "./appearance.js";
-import { getTheme } from "./themeCatalog.js";
 import { openAppModal, showAppToast } from "./modal.js";
 import { canLaunchGame } from "./profileOperations.js";
 
 const views = new Map(); // One bounded view per released game, independent of durable progress.
+const MAP_TEXTURE_HEIGHT = 660;
 let adapters = {};
-let onHome = () => {};
 export function configureAdventureMap(options) {
   adapters = options.adapters;
-  onHome = options.onHome;
 }
 
 export function mountAdventureMap(gameId) {
@@ -27,38 +23,14 @@ export function mountAdventureMap(gameId) {
   const profile = gameState.progress[game.progressKey];
   const frontier = profile.adventure || getAdventureSummary(profile.bestByLevel);
   const view = views.get(gameId) || { mode: "easy", chapter: frontier.currentChapter, scroll: null };
-  view.chapter = Math.min(view.chapter, frontier.currentChapter);
+  view.chapter = frontier.currentChapter;
+  view.scroll = null; view.anchor = null;
   views.set(gameId, view);
   const root = document.createElement("section");
   root.id = "menu-container";
   root.className = `adventure-map-page ${gameId}-menu`;
   const body = document.createElement("main");
   body.className = "adventure-map-view";
-  const titlebar = document.createElement("div");
-  titlebar.className = "adventure-map-titlebar";
-  const title = document.createElement("h1");
-  title.textContent = game.title;
-  const chapterLabel = document.createElement("span");
-  chapterLabel.className = "adventure-chapter-label";
-  const chapterControls = document.createElement("div");
-  chapterControls.className = "adventure-chapter-controls";
-  const previous = button("←", "adventure-chapter-button");
-  previous.setAttribute("aria-label", "Chặng trước");
-  const next = button("→", "adventure-chapter-button");
-  next.setAttribute("aria-label", "Chặng sau");
-  chapterControls.append(previous, chapterLabel, next);
-  titlebar.append(title, chapterControls);
-  const completion = document.createElement("div");
-  completion.className = "adventure-map-completion";
-  const completionLabel = document.createElement("span");
-  const completionBar = document.createElement("progress");
-  completionBar.max = 100;
-  completionBar.setAttribute("aria-label", "Tiến trình chặng");
-  completion.append(completionLabel, completionBar);
-  titlebar.append(completion);
-  const theme = button("", "adventure-map-theme");
-  const sessions = document.createElement("div");
-  sessions.className = "adventure-map-sessions";
   const scroll = document.createElement("div");
   scroll.className = "adventure-map-scroll";
   scroll.setAttribute("aria-label", "Bản đồ màn chơi");
@@ -66,37 +38,67 @@ export function mountAdventureMap(gameId) {
   const trail = document.createElement("div");
   trail.className = "adventure-map-trail";
   scroll.append(trail);
-  body.append(titlebar, theme, sessions, scroll);
+  body.append(scroll);
   root.append(body);
   document.body.append(root);
-  const scope = decorateAdventureMenu(root, { gameId, onHome });
-  const footer = root.querySelector(".adventure-footer");
-  const play = button("", "adventure-map-play");
-  scope.listen(play, "click", () => {
-    const session = currentModeSession();
-    if (session) launch(session.mode, session.level, session);
-    else openLevel(getSuggestedAdventureLevel(profile.bestByLevel, profile.adventure));
-  });
+  const scope = decorateAdventureMenu(root, { gameId });
+  root.classList.add("game-shell-tokens");
+  const title = document.createElement("h1");
+  title.className = "adventure-map-title";
+  title.textContent = game.title;
+  root.querySelector(".adventure-header").insertBefore(title, root.querySelector(".adventure-wallet"));
+  const selector = document.createElement("div");
+  selector.className = "adventure-mode-selector";
+  const modeButton = button("", "adventure-mode-toggle");
+  modeButton.setAttribute("aria-haspopup", "menu");
+  modeButton.setAttribute("aria-expanded", "false");
+  modeButton.setAttribute("aria-controls", "adventure-mode-menu");
   const modes = document.createElement("div");
-  modes.className = "adventure-mode-tabs";
-  modes.setAttribute("role", "tablist");
-  modes.setAttribute("aria-label", "Độ khó");
-  for (const mode of GAME_MODES.filter(({ id }) => isNormalAdventureMode(id))) {
-    const tab = button(mode.label, "adventure-mode-tab");
-    tab.dataset.mode = mode.id;
-    tab.setAttribute("role", "tab");
-    scope.listen(tab, "click", () => { view.mode = mode.id; patchNodes(); });
-    modes.append(tab);
+  modes.id = "adventure-mode-menu";
+  modes.className = "adventure-mode-menu";
+  modes.setAttribute("role", "menu");
+  modes.setAttribute("aria-label", "Chọn chế độ");
+  modes.hidden = true;
+  for (const mode of GAME_MODES) {
+    const option = button(mode.label, "adventure-mode-option");
+    option.dataset.mode = mode.id;
+    option.setAttribute("role", "menuitemradio");
+    option.tabIndex = -1;
+    modes.append(option);
   }
-  const special = document.createElement("div");
-  special.className = "adventure-special-modes";
-  for (const mode of GAME_MODES.filter(({ id }) => !isNormalAdventureMode(id))) {
-    const entry = button(mode.label, "adventure-special-button");
-    entry.append(createIcon(mode.icon));
-    scope.listen(entry, "click", () => openSpecialMode(mode.id));
-    special.append(entry);
+  selector.append(modeButton, modes);
+  root.querySelector(".adventure-footer").prepend(selector);
+  function closeModes(focus = false) {
+    modes.hidden = true; modeButton.setAttribute("aria-expanded", "false");
+    if (focus) modeButton.focus();
   }
-  footer.prepend(play, modes, special);
+  function showModes() {
+    modes.hidden = false; modeButton.setAttribute("aria-expanded", "true");
+    (modes.querySelector('[aria-checked="true"]') || modes.firstElementChild).focus();
+  }
+  scope.listen(modeButton, "click", () => modes.hidden ? showModes() : closeModes());
+  scope.listen(modeButton, "keydown", event => {
+    if (!["ArrowDown", "ArrowUp"].includes(event.key)) return;
+    event.preventDefault(); event.stopPropagation(); showModes();
+  });
+  scope.listen(document, "pointerdown", event => { if (!selector.contains(event.target)) closeModes(); });
+  scope.listen(selector, "focusout", event => { if (!selector.contains(event.relatedTarget)) closeModes(); });
+  scope.listen(modes, "click", event => {
+    const option = event.target.closest("[data-mode]");
+    if (!option || loading) return;
+    closeModes(true);
+    if (!isNormalAdventureMode(option.dataset.mode)) { openSpecialMode(option.dataset.mode); return; }
+    view.mode = option.dataset.mode; patchNodes();
+  });
+  scope.listen(selector, "keydown", event => {
+    if (event.key === "Escape") { closeModes(true); return; }
+    if (modes.hidden || !["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) return;
+    event.preventDefault();
+    const items = [...modes.children];
+    const index = items.indexOf(document.activeElement);
+    const target = event.key === "Home" ? 0 : event.key === "End" ? items.length - 1 : (index + (event.key === "ArrowDown" ? 1 : items.length - 1)) % items.length;
+    items[target].focus();
+  });
   let chapterGeneration = 0;
   let renderedNodes = [];
   let loading = false;
@@ -105,7 +107,7 @@ export function mountAdventureMap(gameId) {
   let extraLevels = [];
   let topLevel = view.chapter * 100;
   let bottomLevel = topLevel - 99;
-  const step = 132;
+  const step = 104;
   const position = level => ({ x: 200 + Math.sin((level - 1) * .62) * 82, y: (topLevel - level) * step + 64 });
   function mapNodes() {
     const summary = profile.adventure || getAdventureSummary(profile.bestByLevel);
@@ -119,10 +121,17 @@ export function mountAdventureMap(gameId) {
     return nodes.sort((a, b) => (b.level || b.lastLevel) - (a.level || a.lastLevel) || (a.kind === "chest" ? -1 : 1));
   }
 
+  function currentLevelInMap(summary) {
+    for (let level = summary.lastLevel; level >= summary.firstLevel; level -= 1) {
+      if (!getAdventureLevelState(profile.bestByLevel, view.mode, level, summary).locked) return level;
+    }
+    return summary.firstLevel;
+  }
+
   function patchNodes() {
     if (!scope.active || loading) return;
     const summary = profile.adventure || getAdventureSummary(profile.bestByLevel);
-    const currentLevel = getSuggestedAdventureLevel(profile.bestByLevel, summary);
+    const currentLevel = currentLevelInMap(summary);
     const nodes = mapNodes();
     nodes.forEach((node, index) => {
       const element = renderedNodes[index];
@@ -146,14 +155,9 @@ export function mountAdventureMap(gameId) {
     });
     for (const tab of modes.children) {
       const selected = tab.dataset.mode === view.mode;
-      tab.setAttribute("aria-selected", String(selected));
-      tab.tabIndex = selected ? 0 : -1;
+      tab.setAttribute("aria-checked", String(selected));
     }
-    const session = currentModeSession();
-    play.textContent = session ? `Tiếp tục màn ${session.level}` : `Chơi màn ${currentLevel}`;
-  }
-  function currentModeSession() {
-    return getActiveSessions(gameId).find(session => session.mode === view.mode && (!adapter.validateSession || adapter.validateSession(session))) || null;
+    modeButton.textContent = `Chế độ: ${getGameModeLabel(view.mode)} ▾`;
   }
 
   async function renderChapter() {
@@ -161,7 +165,7 @@ export function mountAdventureMap(gameId) {
     loading = true;
     root.dataset.mapReady = "false";
     body.setAttribute("aria-busy", "true");
-    previous.disabled = next.disabled = true;
+    modeButton.disabled = true;
     if (!await prepareAdventureChapter(gameId, view.chapter, () => scope.active && generation === chapterGeneration)) return;
     const neighbors = [view.chapter - 1, view.chapter + 1].filter(chapter => chapter >= 1 && chapter <= profile.adventure.currentChapter);
     const records = await Promise.all(neighbors.map(chapter => loadPersistentChapter(game.progressKey, chapter)));
@@ -175,6 +179,8 @@ export function mountAdventureMap(gameId) {
     });
     topLevel = view.chapter * 100 + (neighbors.includes(view.chapter + 1) ? 5 : 0);
     bottomLevel = (view.chapter - 1) * 100 + 1 - (neighbors.includes(view.chapter - 1) ? 5 : 0);
+    trail.style.setProperty("--adventure-map-texture-height", `${MAP_TEXTURE_HEIGHT}px`);
+    trail.style.backgroundPositionY = `${((topLevel % MAP_TEXTURE_HEIGHT) * step) % MAP_TEXTURE_HEIGHT}px`;
     const nodes = mapNodes();
     renderedNodes = [];
     trail.replaceChildren();
@@ -188,14 +194,16 @@ export function mountAdventureMap(gameId) {
     const line = document.createElementNS(path.namespaceURI, "path");
     const points = levelNodes.map(node => position(node.level));
     line.setAttribute("d", points.reduce((d, point, index) => index === 0 ? `M ${point.x} ${point.y}` : `${d} C ${points[index - 1].x} ${point.y - step / 2} ${point.x} ${point.y - step / 2} ${point.x} ${point.y}`, ""));
-    path.append(line);
+    const ornament = line.cloneNode();
+    ornament.classList.add("adventure-map-path-ornament");
+    path.append(line, ornament);
     trail.append(path);
     trail.style.height = `${height}px`;
     nodes.forEach((node, index) => {
       const cell = document.createElement("div");
       cell.className = "adventure-map-cell";
       const point = position(node.kind === "level" ? node.level : node.lastLevel);
-      cell.style.top = `${point.y - 29}px`;
+      cell.style.top = `${point.y - 22}px`;
       cell.style.left = `${node.kind === "level" ? point.x / 4 : point.x < 200 ? 83 : 17}%`;
       cell.classList.toggle("adventure-map-cell--chest", node.kind === "chest");
       const control = button(node.kind === "level" ? String(node.level) : "", `adventure-map-node adventure-map-node--${node.kind}`);
@@ -209,20 +217,8 @@ export function mountAdventureMap(gameId) {
       trail.append(cell);
       renderedNodes.push({ node, control, stars, detail });
     });
-    const equipped = getTheme(getEquippedThemeId(gameState.appearance, gameId));
-    theme.replaceChildren(createIcon(equipped.icon), document.createTextNode(`${equipped.title} · Đổi chủ đề`));
-    sessions.replaceChildren();
-    for (const session of getActiveSessions(gameId).filter(session => !adapter.validateSession || adapter.validateSession(session))) {
-      const resume = button(`Tiếp tục ${getGameModeLabel(session.mode)} · Màn ${session.level}`, "adventure-resume-button");
-      resume.dataset.resumeMode = session.mode;
-      sessions.append(resume);
-    }
-    chapterLabel.textContent = `Chặng ${view.chapter}`;
-    const chapterProgress = getChapterProgress(profile.bestByLevel, view.chapter, profile.adventure);
-    completionLabel.textContent = `Đã thắng ${chapterProgress.completedCount}/100 màn`;
-    completionBar.value = chapterProgress.completedCount;
-    previous.disabled = view.chapter === 1;
-    next.disabled = view.chapter >= profile.adventure.currentChapter;
+    root.dataset.mapChapter = String(view.chapter);
+    modeButton.disabled = false;
     loading = false;
     patchNodes();
     body.removeAttribute("aria-busy");
@@ -231,49 +227,28 @@ export function mountAdventureMap(gameId) {
       scroll.scrollTop = position(view.anchor.level).y - view.anchor.screenY;
       view.anchor = null;
     } else if (view.scroll === null) {
-      const currentLevel = getSuggestedAdventureLevel(profile.bestByLevel, profile.adventure);
-      scroll.scrollTop = view.chapter === profile.adventure.currentChapter ? Math.max(0, position(currentLevel).y - scroll.clientHeight * .65) : scroll.scrollHeight;
+      const currentLevel = currentLevelInMap(profile.adventure);
+      scroll.scrollTop = view.chapter === profile.adventure.currentChapter ? Math.max(0, position(currentLevel).y - scroll.clientHeight * .5) : scroll.scrollHeight;
     }
     else scroll.scrollTop = view.scroll;
   }
 
-  function launch(mode, level, session = null) {
+  async function launch(mode, level) {
     if (!scope.active || loading || !canLaunchGame()) return false;
-    view.scroll = scroll.scrollTop;
-    return session ? adapter.resume(session) : adapter.launch({ mode, level });
-  }
-
-  function openLevel(level, mode = view.mode, explicitSession = null) {
-    const result = profile.bestByLevel[`${mode}:${level}`] || adjacentBest[`${mode}:${level}`];
-    const session = explicitSession || getActiveSessions(gameId).find(candidate => candidate.mode === mode && candidate.level === level);
-    const content = document.createElement("div");
-    const text = document.createElement("p");
-    text.textContent = adapter.description;
-    content.append(text);
-    if (result) {
-      const best = document.createElement("p");
-      best.textContent = `Kỷ lục: ${result.score.toLocaleString("vi-VN")} điểm · ${result.stars} sao${result.durationMs ? ` · ${(result.durationMs / 1000).toFixed(2)}s` : ""}`;
-      content.append(best);
+    loading = true;
+    modeButton.disabled = true;
+    body.setAttribute("aria-busy", "true");
+    try { return await adapter.launch({ mode, level }); }
+    catch (error) {
+      console.error("Level launch failed", error);
+      if (scope.active) showAppToast("Chưa mở được màn chơi. Hãy thử lại.");
+      return false;
+    } finally {
+      if (scope.active) { loading = false; modeButton.disabled = false; body.removeAttribute("aria-busy"); }
     }
-    const otherSession = getActiveSessions(gameId).find(candidate => candidate.mode === mode && candidate.level !== level);
-    if (otherSession) {
-      const warning = document.createElement("p");
-      warning.textContent = `Chơi mới sẽ thay phiên đang dở ở màn ${otherSession.level} của độ khó này.`;
-      content.append(warning);
-    }
-    const actions = [];
-    if (session && (!adapter.validateSession || adapter.validateSession(session))) actions.push({ label: "Tiếp tục", icon: "play", variant: "primary", onClick: () => launch(mode, level, session) });
-    actions.push({ label: result || session ? "Chơi lại" : "Chơi", icon: "play", variant: session ? "secondary" : "primary", onClick: () => launch(mode, level) });
-    openAppModal({ id: "adventure-level-modal", title: `Màn ${level} · ${getGameModeLabel(mode)}`, content, actions });
   }
-
-  function openSpecialMode(mode) {
-    const session = getActiveSessions(gameId).find(candidate => candidate.mode === mode);
-    openAppModal({ id: "adventure-special-modal", title: getGameModeLabel(mode), content: `<p>${mode === "endless" ? "Tiếp tục qua nhiều màn, không đếm ngược." : "Chuỗi màn thử thách với đồng hồ hiện tại."}</p>`, actions: [
-      ...(session && (!adapter.validateSession || adapter.validateSession(session)) ? [{ label: "Tiếp tục", variant: "primary", onClick: () => launch(mode, session.level, session) }] : []),
-      { label: "Chơi mới", icon: "play", onClick: () => launch(mode, 1) },
-    ] });
-  }
+  function openLevel(level) { return launch(view.mode, level); }
+  function openSpecialMode(mode) { return launch(mode, 1); }
 
   function openChest(node) {
     const outcome = profile.claimedChests?.[node.chestNumber] || adjacentChests[node.chestNumber];
@@ -296,26 +271,7 @@ export function mountAdventureMap(gameId) {
     if (entry.node.kind === "level") openLevel(entry.node.level);
     else openChest(entry.node);
   });
-  scope.listen(theme, "click", () => adapter.collection(() => {
-    if (!scope.active) return;
-    const equipped = getTheme(getEquippedThemeId(gameState.appearance, gameId));
-    theme.replaceChildren(createIcon(equipped.icon), document.createTextNode(`${equipped.title} · Đổi chủ đề`));
-    refreshAppWallet();
-  }));
   scope.listen(scroll, "scroll", () => { if (!loading) view.scroll = scroll.scrollTop; }, { passive: true });
-  scope.listen(sessions, "click", event => {
-    if (loading) return;
-    const mode = event.target.closest("[data-resume-mode]")?.dataset.resumeMode;
-    const session = getActiveSessions(gameId).find(candidate => candidate.mode === mode);
-    if (session) openLevel(session.level, session.mode, session);
-  });
-  scope.listen(modes, "keydown", event => {
-    const index = [...modes.children].indexOf(event.target);
-    if (index < 0 || !["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
-    event.preventDefault();
-    const target = event.key === "Home" ? 0 : event.key === "End" ? 3 : (index + (event.key === "ArrowRight" ? 1 : 3)) % 4;
-    modes.children[target].click(); modes.children[target].focus();
-  });
   const changeChapter = (direction, continuous = false) => {
     if (loading) return;
     const candidate = view.chapter + direction;
@@ -327,14 +283,20 @@ export function mountAdventureMap(gameId) {
     view.chapter = candidate; view.scroll = null;
     void renderChapter().catch(error => { if (scope.active) { console.error("Map load failed", error); showAppToast("Chưa tải được chặng này."); } });
   };
-  scope.listen(previous, "click", () => changeChapter(-1));
-  scope.listen(next, "click", () => changeChapter(1));
   // Rebase at chapter boundaries: DOM/scroll height remain bounded independently of history.
   scope.listen(scroll, "wheel", event => {
     if (loading) return;
     if (event.deltaY < 0 && scroll.scrollTop < 2 && view.chapter < profile.adventure.currentChapter) { event.preventDefault(); changeChapter(1, true); }
     else if (event.deltaY > 0 && scroll.scrollHeight - scroll.clientHeight - scroll.scrollTop < 2 && view.chapter > 1) { event.preventDefault(); changeChapter(-1, true); }
   }, { passive: false });
+  scope.listen(scroll, "keydown", event => {
+    if (event.target !== scroll || loading) return;
+    if (["ArrowUp", "PageUp"].includes(event.key) && scroll.scrollTop < 2 && view.chapter < profile.adventure.currentChapter) {
+      event.preventDefault(); changeChapter(1, true);
+    } else if (["ArrowDown", "PageDown"].includes(event.key) && scroll.scrollHeight - scroll.clientHeight - scroll.scrollTop < 2 && view.chapter > 1) {
+      event.preventDefault(); changeChapter(-1, true);
+    }
+  });
   let touchY = null;
   scope.listen(scroll, "touchstart", event => { touchY = event.touches[0]?.clientY ?? null; }, { passive: true });
   scope.listen(scroll, "touchend", event => {

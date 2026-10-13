@@ -64,12 +64,14 @@ for (const game of games) {
     await page.locator("#settings-modal .app-modal__close").click();
 
     await expect(page.locator("#settings-modal")).toHaveCount(0);
-    await page.locator('[data-level="1"]').click();
-    const difficultyBody = await expectModalBodyScrollsWithinViewport(page, "#adventure-level-modal");
-    await difficultyBody.evaluate(element => {
-      element.scrollTop = element.scrollHeight;
-    });
-    const lastMode = page.locator("#adventure-level-modal .app-modal__footer button").last();
-    await expect(lastMode).toBeInViewport();
+    await page.locator('.adventure-mode-toggle').click();
+    const menu = page.locator('.adventure-mode-menu');
+    await expect(menu).toBeVisible();
+    await menu.evaluate(element => { element.scrollTop = element.scrollHeight; });
+    await expect(menu.locator('[data-mode="challenge"]')).toBeInViewport();
+    const bounds = await menu.boundingBox();
+    expect(bounds.y).toBeGreaterThanOrEqual(0);
+    expect(bounds.y + bounds.height).toBeLessThanOrEqual(360);
+
   });
 }

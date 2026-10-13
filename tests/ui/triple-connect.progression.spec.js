@@ -31,38 +31,22 @@ async function advanceSeconds(clock, seconds) {
   for (let tick = 0; tick < seconds; tick += 1) await clock.fastForward(1000);
 }
 
-test("Triple saves a validated level session and exposes it through Continue", async ({
-  page,
-}) => {
-  await page.goto("/");
-  await page.evaluate(async () => {
-    const { startTripleConnectRound } = await import(
-      "/js/tripleConnect/tripleController.js"
-    );
-    window.__tripleRun = await startTripleConnectRound({ mode: "normal", level: 3, skipIntro: true });
-  });
+test("Triple retains its saved session on reload and starts a fresh board only when its level is selected", async ({ page }) => {
+  await page.goto('/');
   const session = await page.evaluate(async () => {
-    const { getActiveSession } = await import("/js/sessionProgress.js");
-    return getActiveSession("triple-connect", "normal");
+    await (await import('/js/tripleConnect/tripleController.js')).startTripleConnectRound({ mode: 'normal', level: 1, seed: 'stored-session', skipIntro: true });
+    return (await import('/js/sessionProgress.js')).getActiveSession('triple-connect','normal');
   });
-
-  expect(session).toMatchObject({
-    mode: "normal",
-    level: 3,
-    seed: expect.stringMatching(/^triple-normal-level-3-/),
-    layoutId: "normal",
-  });
+  expect(session).toMatchObject({ mode: 'normal', level: 1, seed: expect.stringMatching(/^stored-session:/), layoutId: 'normal' });
   await page.reload();
-  await page.evaluate(async () =>
-    (await import("/js/gameSelector.js")).openGameMenu("triple-connect"),
-  );
-  await expect(
-    page.locator("#menu-container.triple-connect-menu"),
-  ).toContainText("Tiếp tục");
-  await page.locator('[data-resume-mode="normal"]').click();
-  await page.getByRole("button", { name: "Tiếp tục", exact: true }).click();
-  await expect(page.locator("[data-triple-total-stars]")).toHaveText("0");
-  await expect(page.locator("[data-triple-level]")).toHaveText("3");
+  await page.evaluate(async () => (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('triple-connect'));
+  await expect(page.locator('#menu-container')).not.toContainText('Tiếp tục');
+  expect(await page.evaluate(async () => (await import('/js/sessionProgress.js')).getActiveSession('triple-connect','normal').seed)).toBe(session.seed);
+  await page.locator('.adventure-mode-toggle').click();
+  await page.locator('[data-mode="normal"]').click();
+  await page.locator('[data-level="1"]').click();
+  await expect(page.locator('[data-triple-level]')).toHaveText('1');
+  await expect.poll(() => page.evaluate(async () => (await import('/js/sessionProgress.js')).getActiveSession('triple-connect','normal')?.seed)).not.toBe(session.seed);
 });
 
 test("Triple hides malformed sessions instead of offering a broken Continue path", async ({

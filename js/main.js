@@ -25,7 +25,6 @@ import {
 import {
   configureLinkController,
   openLinkPanel,
-  continueLinkSession,
   startLinkLevel,
 } from "./linkConnect/linkController.js";
 import {
@@ -66,8 +65,6 @@ import { initializeMeteorEffects } from "./backgroundEffects.js";
 import {
   configureTripleConnectController,
   openTripleModal,
-  continueTripleConnectSession,
-  isValidTripleConnectSession,
   startTripleConnectRound,
 } from "./tripleConnect/tripleController.js";
 import {
@@ -142,25 +139,10 @@ configureAppNavigation({
   },
 });
 configureAdventureMap({
-  onHome: showGameSelector,
   adapters: {
-    'memory-match': {
-      description: 'Ghi nhớ vị trí và ghép hết các cặp thẻ trước khi hết giờ.',
-      launch: ({ mode, level }) => { resetGame(); gameState.settings.mode = mode; return startNewMemoryRun(level); },
-      resume: continueMemorySession,
-      collection: onClose => showCollectionModal({ gameId: 'memory-match', onClose }),
-    },
-    'link-connect': {
-      description: 'Quan sát và nối hết các cặp hình bằng đường nối hợp lệ trước khi hết giờ.',
-      launch: options => startLinkLevel(options), resume: continueLinkSession,
-      collection: onClose => showCollectionModal({ gameId: 'link-connect', onClose }),
-    },
-    'triple-connect': {
-      description: 'Tìm bộ ba thẻ giống nhau và tính toán chỗ trống trong khay.',
-      launch: options => startTripleConnectRound(options), resume: continueTripleConnectSession,
-      validateSession: isValidTripleConnectSession,
-      collection: onClose => showCollectionModal({ gameId: 'triple-connect', onClose }),
-    },
+    'memory-match': { launch: ({ mode, level }) => { resetGame(); gameState.settings.mode = mode; return startNewMemoryRun(level); } },
+    'link-connect': { launch: options => startLinkLevel(options) },
+    'triple-connect': { launch: options => startTripleConnectRound(options) },
   },
 });
 configureTripleConnectController({

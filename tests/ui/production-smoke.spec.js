@@ -13,8 +13,9 @@ test('built mobile menu, map and account open without writing to production serv
   await expect(page.locator('.adventure-map-node--level')).toHaveCount(100);
   await expect(page.locator('[data-level="1"]')).toBeEnabled();
   await expect(page.locator('[data-level="2"]')).toBeDisabled();
+  await page.locator('.adventure-mode-toggle').click();
   await page.locator('[data-mode="hard"]').click();
-  await expect(page.locator('.adventure-map-play')).toHaveText('Chơi màn 1');
+  await expect(page.locator('.adventure-mode-toggle')).toContainText('Khó');
   await page.getByRole('button', { name: 'Tài khoản', exact: true }).click();
   await expect(page.locator('#account-modal')).toBeVisible();
   await expect(page.locator('#account-modal')).not.toContainText('Firebase');

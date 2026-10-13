@@ -13,38 +13,41 @@ async function finishTripleIntro(page, clock = null) {
   else await expect(intro).toHaveCount(0, { timeout: 4000 });
 }
 
-test('Triple map shares theme flow and separates ordinary from special modes', async ({ page }) => {
-  await expect(page.locator('.adventure-mode-tab')).toHaveText(['Dễ', 'Trung bình', 'Khó', 'Siêu khó']);
-  await expect(page.locator('.adventure-special-button')).toHaveText(['Vô tận', 'Thử thách']);
+test('Triple map keeps all modes in one menu and theme access in the shared collection dock', async ({ page }) => {
+  await expect(page.locator('.adventure-map-theme, .adventure-map-play, .adventure-map-sessions')).toHaveCount(0);
+  await page.locator('.adventure-mode-toggle').click();
+  await expect(page.locator('.adventure-mode-option')).toHaveText(['Dễ', 'Trung bình', 'Khó', 'Siêu khó', 'Vô tận', 'Thử thách']);
   await page.locator('[data-mode="hard"]').click();
-  await page.locator('.adventure-map-theme').click();
+  await page.locator('[data-dock-action="collection"]').click();
   await expect(page.locator('#collection-modal')).toContainText('Bộ sưu tập · Triple Connect');
   await page.locator('#collection-modal .app-modal__close').click();
   await expect(page.locator('#collection-modal')).toHaveCount(0);
-  await expect(page.locator('[data-mode="hard"]')).toHaveAttribute('aria-selected', 'true');
+  await expect(page.locator('[data-mode="hard"]')).toHaveAttribute('aria-checked', 'true');
   await expect(page.locator('.adventure-map-node--level')).toHaveCount(100);
 });
 
-test('Triple map preserves its resumable session across collection visits', async ({ page }) => {
-  await page.evaluate(async () => {
-    await (await import('/js/tripleConnect/tripleController.js')).startTripleConnectRound({ mode: 'normal', level: 3, seed: 'chrome-session', skipIntro: true });
+test('visiting the map and collection preserves a session until the player explicitly starts a new board', async ({ page }) => {
+  const oldSeed = await page.evaluate(async () => {
+    await (await import('/js/tripleConnect/tripleController.js')).startTripleConnectRound({ mode: 'normal', level: 1, seed: 'chrome-session', skipIntro: true });
+    const { getActiveSession } = await import('/js/sessionProgress.js');
+    const seed = getActiveSession('triple-connect', 'normal').seed;
     (await import('/js/gameSelector.js')).openGameMenu('triple-connect');
+    return seed;
   });
-  await page.locator('[data-resume-mode="normal"]').click();
-  const preview = page.locator('#adventure-level-modal');
-  await expect(preview).toContainText('Màn 3 · Trung bình');
-  await expect(preview.getByRole('button', {name: 'Tiếp tục', exact: true})).toBeVisible();
-  await preview.locator('.app-modal__close').click();
-  await expect(preview).toHaveCount(0);
-  await page.locator('.adventure-map-theme').click();
+  await expect(page.locator('#menu-container[data-map-ready="true"]')).toBeVisible();
+  await page.locator('[data-dock-action="collection"]').click();
   await page.locator('#collection-modal .app-modal__close').click();
   await expect(page.locator('#collection-modal')).toHaveCount(0);
-  await expect(page.locator('[data-resume-mode="normal"]')).toHaveText('Tiếp tục Trung bình · Màn 3');
+  expect(await page.evaluate(async () => (await import('/js/sessionProgress.js')).getActiveSession('triple-connect','normal').seed)).toBe(oldSeed);
+  await page.locator('.adventure-mode-toggle').click();
+  await page.locator('[data-mode="normal"]').click();
+  await page.locator('[data-level="1"]').click();
+  await finishTripleIntro(page);
+  await expect.poll(() => page.evaluate(async () => (await import('/js/sessionProgress.js')).getActiveSession('triple-connect','normal')?.seed)).not.toBe(oldSeed);
 });
 
 test("Triple HUD uses the shared contract and mutually exclusive menus", async ({ page }) => {
   await page.locator('[data-level="1"]').click();
-  await page.getByRole("button", { name: "Chơi", exact: true }).click();
   await finishTripleIntro(page);
   const shell = page.locator(".triple-connect-game");
   const progress = page.locator(".triple-connect__milestones .stat-star-progress");
@@ -126,7 +129,6 @@ test("Triple menu, start modal and timer follow the shared round contract", asyn
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await expect(page.locator('[data-dock-action]')).toHaveText(['Cửa hàng', 'Bộ sưu tập', 'Xếp hạng', 'Cài đặt']);
   await page.locator('[data-level="1"]').click();
-  await page.getByRole("button", { name: "Chơi", exact: true }).click();
   const start = page.locator("#triple-round-start-modal");
   await expect(start).toContainText(/Màn 1.*Dễ.*Chủ đề.*Mục tiêu: 9 bộ thẻ.*Gợi ý: 3/s);
   const timer = page.locator("[data-triple-timer]");
@@ -172,7 +174,6 @@ test("Triple Continue resumes without replaying the start modal", async ({ page 
 test("Triple timer pauses in the background and resumes from the same timestamp", async ({ page }) => {
   await page.clock.install();
   await page.locator('[data-level="1"]').click();
-  await page.getByRole("button", { name: "Chơi", exact: true }).click();
   await finishTripleIntro(page, page.clock);
   const timer = page.locator("[data-triple-timer]");
   await page.clock.fastForward(1100);

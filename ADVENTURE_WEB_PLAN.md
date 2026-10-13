@@ -102,37 +102,16 @@ Bản đồ/menu dùng kết quả thắng hiện hữu. Task này không cần 
 | Chi phí làm/kiểm chứng | Thấp nếu chỉ sắp xếp menu | Thêm progress/launch/replay/layout | Thêm map và logic phân biệt resume/new |
 | Tạo nội dung mới | Không tự tạo | Không tự tạo | Không tự tạo |
 
-Đề xuất bản đồ + nút Tiếp tục làm màn Chơi của từng trò. Bản đồ là cách điều hướng/biểu diễn tiến trình, không chứng minh 100 màn đã đa dạng hơn. Trong phạm vi hiện tại, các màn vẫn chơi theo luật/cấu hình mode đang có.
+Thiết kế hiện hành dùng bản đồ gọn, bấm màn để chơi trực tiếp theo mục6.3. Bản đồ là cách điều hướng/biểu diễn tiến trình, không chứng minh 100 màn đã đa dạng hơn. Trong phạm vi hiện tại, các màn vẫn chơi theo luật/cấu hình mode đang có.
 
-### 6.3. Cách vào chơi phải rõ
+### 6.3. Luồng vào chơi cập nhật ngày 2026-10-13
 
-- Có session của mode đang chọn: nút chính ghi Tiếp tục kèm màn và mode, resume session đó.
-- Không có session: nút chính dẫn tới màn chưa thắng được đề xuất trong các màn đã mở; nhãn Chơi màn N.
-- Chạm node màn đang có session có lựa chọn tiếp tục hoặc chơi lại. Chơi lại/mở màn khác không âm thầm xóa session đang dở.
-- Nếu cần thay session duy nhất của một mode, thông báo cụ thể trước khi thay; các session ở mode/trò khác được giữ.
-- Sau thắng: nút chơi tiếp dùng cùng độ khó và đưa tới màn phù hợp đã mở. Có nút về bản đồ để xem sao/rương và chọn lại.
-- Thay mode chỉ thay dữ liệu sao/điểm/session của UI; không reset mở khóa, rebuild bàn đang chơi hoặc tự bắt đầu một run.
-- Header/chọn node ghi rõ mode. Tiến độ rương và hoàn thành chặng dùng completion chung; sao/điểm node thuộc mode đang chọn.
+- Bản đồ không có nút tiếp tục, chủ đề, tiến trình hoặc nhãn/nút chuyển chặng. Mỗi lần vào lại trở về màn cao nhất đang chơi được trong chặng hiện tại; bốn độ khó thường vẫn dùng chung mở khóa.
+- Bấm màn bắt đầu lượt mới ngay, không mở preview hoặc tự resume. Chọn Thử thách/Vô tận từ danh sách cũng bắt đầu lượt mới ở màn1. Phiên cũ không bị xóa chỉ vì về map; controller thay phiên sau khi ghi phiên mới thành công. Sao/kỷ lục/tài nguyên giữ nguyên.
+- Một nút Chế độ ở trên dock, danh sách thả lên gồm cả sáu mode. Đổi mode thường chỉ patch sao/điểm và trạng thái chọn; không remount node hoặc đổi vị trí cuộn.
+- Tên trò ở hàng avatar/Xu phía trên, dùng token typography của tên trong gameplay. Node44px vẫn là hit target đầy đủ; đường11px có nét hoa văn tĩnh. Không thêm loop trang trí.
+- Cuộn, vuốt hoặc phím PageUp/PageDown ở ranh giới nối các vùng có chồng lấp; giữ anchor màn và pha texture, tối đa122 nút.
 
-### 6.4. Chặng dài hạn khi chưa có nhiệm vụ
-
-100 màn + 10 rương là cấu trúc hành trình. Sau đủ 100 completion khác nhau mở chặng sau; số màn tiếp tục tăng. Chỉ tải chặng đang xem, prefetch có cap và sinh board cho màn được chọn.
-
-Không tăng board, giảm thời gian hoặc bổ sung mechanic mới theo số chặng trong task này. Không tự áp recipe mission, seed cố định hay luật replay mới; launch/replay/resume phải giữ đúng semantic timer/vật phẩm của controller hiện tại.
-
-Trước khi thêm archive/chunk storage, đo kích thước save và chi phí hydrate/stringify; không xử lý mọi chặng lịch sử trong mỗi checkpoint. Giữ mọi completion/claim và báo được lỗi storage thay vì cắt dữ liệu.
-
-### 6.5. Rủi ro khi chuyển sang bản đồ
-
-- Session hiện chỉ có một slot mỗi game/mode. Chọn màn khác phải phân biệt chơi mới với tiếp tục, không âm thầm thay phiên đang dở hoặc tác động các slot khác.
-- Kỷ lục hiện có theo mode/level không thay thế quy tắc completion/claim mới. Không suy đủ 100 màn từ màn cao nhất hoặc từ sao; mở khóa chung, kỷ lục riêng và rương một lần phải được kiểm tra độc lập.
-- Replay/chọn node có thể đi sai nhánh new/advance và cấp vật phẩm đầu màn lặp. Giữ thưởng ghép/thắng theo luật hiện hữu; rương mới dùng claim riêng, commit cùng Xu và rollback khi lưu lỗi.
-- mở màn tuần tự cho phép chơi không theo thứ tự. Phân biệt khóa/mở và hiển thị sao theo độ khó ngay trên node; người chơi tự cuộn tìm màn. Không coi việc cần tìm màn là lý do thêm nút hoặc bộ lọc. Điều kiện mở chặng sau vẫn dựa trên đủ 100 completion chung.
-- Bản đồ tăng khả năng thấy tiến trình nhưng chưa làm các màn đa dạng hơn. Không hứa giải quyết độ lặp khi nhiệm vụ đang tạm hoãn.
-- Chỉ giữ DOM/tài nguyên của chặng đang xem, không sinh 100 bàn hoặc render mọi chặng lịch sử; kiểm tra chi phí lưu theo lịch sử tăng dần.
-- Thanh nút gameplay tận dụng khoảng trống phía dưới mà người dùng xác nhận có ở cả ba trò. Giữ giao diện hiện hữu, không phủ lên bàn/khay; kiểm tra thanh mới vừa vùng trống và các nút chạm được trên baseline 412×915, kể cả Triple mở rộng khay.
-
-Tách dữ liệu/luật hành trình, luồng chọn màn và thêm thanh nút gameplay thành các thay đổi kiểm chứng được. Auth, Analytics, nhiệm vụ và thay mỹ thuật gameplay không được gộp vào để hoàn thành chuyển bản đồ. Đây là đánh giá thiết kế, chưa là kết quả test implementation.
 
 ## 7. Kiến trúc menu/bản đồ
 
@@ -381,3 +360,5 @@ Chưa xác minh OAuth hosted thật, Analytics dashboard/DebugView hoặc60FPS t
 Nền runtime: public/assets/adventure/moonlit-garden.webp,1024×1536,234542byte; built-in imagegen, WebP quality82. Một texture tái dùng với fade CSS ở ranh giới; không vẽ đường vào bitmap.
 
 Prompt tạo nền: Use case: stylized-concept. Asset type: original mobile game journey background. Create a tall portrait 1024x1536 richly painted moonlit botanical river garden, deep navy and teal, warm amber lanterns among silver flowering shrubs, mossy stones and gentle water reflections on the outer sides. Calm low contrast center with plenty of unobstructed dark space for a programmatically drawn winding level path and large buttons. Orthographic landscape illustration, no perspective vanishing point, no actual path painted into the image. Top and bottom edges must both fade smoothly to the same deep navy teal tone so repeated vertical panels blend. Ornamental plants on edges, subtly luminous original fantasy scenery, beautiful but readable. No text, no numbers, no buttons, no interface, no characters, no logos, no watermark. Original independent artwork, do not reproduce the attached composition.
+
+Tinh gọn UI sau phase8 (2026-10-13) đã hoàn tất theo mục6.3: check/build pass; map/progression/compact33 pass, map/mode/keyboard/seam/performance20 pass, production smoke2 pass. Không đổi schema save hoặc luật gameplay; bitmap nền giữ nguyên, ornament SVG tĩnh.

@@ -9,6 +9,7 @@ test('built chunks open home/maps and account fallback without module initializa
   await expect(page.locator('.adventure-dock')).toBeVisible();
   await page.getByRole('button', { name: /Memory Match Mới thấy/ }).click();
   await expect(page.locator('.adventure-map-node--level')).toHaveCount(100);
+  await page.locator('.adventure-mode-toggle').click();
   await page.locator('[data-mode="hard"]').click();
   await expect(page.locator('[data-level="1"]')).toBeEnabled();
   await page.locator('.adventure-account').click();

@@ -9,7 +9,6 @@ const viewports = [{ width: 640, height: 360 }, { width: 914, height: 411 }];
 async function start(page, game) {
   await page.locator(".game-selector__choice").filter({ hasText: game.title }).click();
   await page.locator('[data-level="1"]').click();
-  await page.getByRole("button", { name: "Chơi", exact: true }).click();
   await expect(page.locator(`${game.root} [data-shell-region="board"]`)).toBeVisible();
   await page.waitForFunction(({ rootSelector, layoutVariable }) => {
     const board = document.querySelector(`${rootSelector} [data-shell-region="board"]`);

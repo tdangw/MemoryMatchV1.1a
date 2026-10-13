@@ -15,6 +15,7 @@ test('map mode/scroll remains bounded and captures cold/warm transfer and frame 
     const node = document.querySelector('[data-level="1"]');
     const timings = [];
     for (let i = 0; i < 40; i++) {
+      document.querySelector(".adventure-mode-toggle").click();
       const started = performance.now();
       document.querySelector(`[data-mode="${i % 2 ? 'easy' : 'hard'}"]`).click();
       document.querySelector('.adventure-map-scroll').scrollTop = i % 2 ? 1500 : 0;
