@@ -1,3 +1,4 @@
+import { setMeteorSceneEligible } from "./backgroundEffects.js";
 import { createIcon } from "./icons.js";
 import { gameState } from "./gameState.js";
 import { getGameDefinition, GAME_DEFINITIONS, getGameModeLabel } from "./gameCatalog.js";
@@ -47,6 +48,7 @@ export function createAppDock(scope, { gameId = null, selected = null, onAction 
 
 export function decorateAdventureMenu(root, { gameId = null, onHome } = {}) {
   const scope = mountAppPage(root);
+  setMeteorSceneEligible(true);
   mountTouchDust(root, scope);
   root.classList.add("adventure-page");
   const header = document.createElement("header");
@@ -65,6 +67,7 @@ export function decorateAdventureMenu(root, { gameId = null, onHome } = {}) {
   const navigate = async action => {
     screen?.dispose();
     screen = null;
+    setMeteorSceneEligible(action === 'map');
     if (action === 'map') { root.querySelector('[data-dock-action="map"]').focus(); return; }
     const viewScope = createGameShellLifecycle();
     screen = viewScope;

@@ -1,3 +1,4 @@
+import { setMeteorSceneEligible } from "../backgroundEffects.js";
 let activeScope = null;
 const pending = { timeout: new Map(), interval: new Map(), frame: new Map() };
 
@@ -57,6 +58,7 @@ export function createGameShellLifecycle() {
 
 export function getActiveGameScope() { return activeScope; }
 export function activateGameScope(scope) {
+  setMeteorSceneEligible(false);
   if (activeScope !== scope) activeScope?.dispose();
   activeScope = scope;
 }

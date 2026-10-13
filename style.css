@@ -239,6 +239,7 @@ button {
 }
 
 /* 🌌 Hiệu ứng shooting star */
+.meteor-layer { pointer-events: none; }
 .shooting-star {
   position: fixed;
   top: -20px;
@@ -249,12 +250,13 @@ button {
   transform: rotate(45deg);
   z-index: 1;
   pointer-events: none;
-  animation-name: shooting;
+  animation-name: none;
   animation-timing-function: linear;
   animation-fill-mode: forwards;
 }
 
-.star-head {
+.shooting-star.is-bright::after {
+  content: "";
   width: 8px;
   height: 8px;
   background-color: white; /* ✅ Đầu sao */
@@ -478,3 +480,5 @@ body.meteor-effects-disabled .shooting-star {
   height: 30px;
 }
 
+
+.shooting-star[data-state="IDLE"] { visibility: hidden; }

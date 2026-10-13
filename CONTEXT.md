@@ -17,7 +17,7 @@
 
 ## Contract dùng chung
 
-- Kế hoạch hiện hành mới: `EFFECTS_LEADERBOARD_PLAN.md` (2026-10-13), đã khảo sát/lập kế hoạch, chưa được giao code. Gate1 pool sao băng; Gate2 UI xếp hạng ba trò × sáu mode,10 người/trang và cursor; Gate3 đo/audit cảnh thắng trước khi quyết định sửa mỹ thuật. ADVENTURE_WEB_PLAN.md phase0–20 đã hoàn tất và là hồ sơ lịch sử.
+- Kế hoạch hiện hành mới: `EFFECTS_LEADERBOARD_PLAN.md` (2026-10-13), đang thực hiện theo yêu cầu; Gate1 pool đã nghiệm thu, Gate2/3 đang thực hiện. Gate1 pool sao băng; Gate2 UI xếp hạng ba trò × sáu mode,10 người/trang và cursor; Gate3 đo/audit cảnh thắng trước khi quyết định sửa mỹ thuật. ADVENTURE_WEB_PLAN.md phase0–20 đã hoàn tất và là hồ sơ lịch sử.
 - Cảnh hoa hiện tại95 phần tử SVG/ba nhóm animation hữu hạn; người dùng đã thử mobile và thấy mượt. Kế hoạch giữ hình ảnh hiện có, đo allocations/frame/paint và audit confetti còn lại/RAF cleanup khi chuyển cảnh nhanh. Sao băng dùng eligibility từ page/navigation/shell lifecycle.
 
 - Firebase Hosting dùng chung project `memorymatchv1-1a` với ba site: target `production` → `memorymatchv1-1a`, target `beta` → `memorymatchv1-1b`, target `test` → `memorymatch-test`. `npm run deploy`, `npm run deploy:beta` và `npm run deploy:test` chỉ deploy đúng site tương ứng. Mỗi URL có storage trình duyệt riêng vì khác origin.
@@ -66,7 +66,7 @@
 
 ## Tài liệu giữ lại
 
-- `EFFECTS_LEADERBOARD_PLAN.md`: kế hoạch hiện hành mới, chưa triển khai; sao băng/xếp hạng/audit cảnh thắng.
+- `EFFECTS_LEADERBOARD_PLAN.md`: kế hoạch hiện hành; Gate1 pool sao băng đã đạt browser checks, Gate2/3 tiếp tục.
 - `ADVENTURE_WEB_PLAN.md`: hồ sơ đã hoàn tất phase0–20 và quyết định UI/data hiện có.
 - `AGENTS.md`: chuẩn làm việc bắt buộc.
 - `ARCHITECTURE.md`: ownership và contract kỹ thuật bền vững.
@@ -121,3 +121,6 @@ Mục18 và19 đã hoàn tất: check/build và44 UI/startup pass; built3 pass; 
 
 2026-10-13: Các gate mục19–20 ADVENTURE_WEB_PLAN.md đã hoàn tất; kế hoạch hiện hành mới là EFFECTS_LEADERBOARD_PLAN.md, chưa triển khai. Thiết kế hiện hành theo mục20: home Nhiệm vụ/Bạn bè/Profile/Xếp hạng/Cài đặt; map Cửa hàng/Bộ sưu tập/Bản đồ/Xếp hạng/Cài đặt; Exit góc trên phải map/tab, không profile/Xu trên header. Gameplay không dock; popup Tạm dừng có Thoát game/Chơi lại/Cài đặt. C/B/A/S nâu/xanh dương/vàng/tím. Các tab là screen region, không dialog; giữ map subtree/scroll, cleanup scope, Settings DOM và Account subscription. HUD khóa trong startup, tránh ghi đè pause. Check/build và lượt độc lập34/34 cùng built3/3 pass, review finding đã sửa. Mục20 có chi tiết matrix78 và benchmark chạy lại; chưa QA FPS/Google thật. Không đổi save/schema và không deploy/push.
 
+
+
+Gate1 EFFECTS_LEADERBOARD_PLAN.md (2026-10-14): pool sao băng hai node/một scheduler và eligibility Home/map trực tiếp từ owner đã triển khai. Soak animation thật10 phút/114 lần hoàn tất,100 lần chuyển Home/map/game thật giữ node/timer ổn định; post-GC heap gần7MB. So sánh35s: allocations node6→0, frame p95 8,1→8,1ms/không long task trên Chrome155 Windows/DPR1. Check/build và browser tests pass, review độc lập. Chưa có số đo Galaxy S22 Ultra; không tuyên bố FPS thiết bị thật. Gate2/3 đang thực hiện, chưa đánh dấu hoàn tất.

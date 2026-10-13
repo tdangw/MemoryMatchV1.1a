@@ -1,6 +1,6 @@
 # Kế hoạch hiệu ứng nền và bảng xếp hạng
 
-Ngày: 2026-10-13. Trạng thái: đã khảo sát/lập kế hoạch, chưa triển khai runtime. Đây là kế hoạch hiện hành duy nhất; ADVENTURE_WEB_PLAN.md là hồ sơ đã hoàn tất.
+Ngày: 2026-10-13. Trạng thái: đang thực hiện; Gate1 đã nghiệm thu browser, Gate2 đang triển khai. Đây là kế hoạch hiện hành duy nhất; ADVENTURE_WEB_PLAN.md là hồ sơ đã hoàn tất.
 
 ## 1. Phạm vi và dữ kiện đã xác minh
 
@@ -73,3 +73,16 @@ Gate0 khảo sát/tài liệu hoàn tất; Gate1–3 chưa triển khai trong l�
 Nguồn dự án: backgroundEffects.js/style.css; appPageLifecycle.js/gameShellLifecycle.js; victoryCelebration.js/victoryFlowerScene.js/fireworkEffect.js/victoryPresentation.web.js/ui.js/sound.js; leaderboardPanel.js/leaderboardStore.js/rankingResult.js/firestore.rules.
 
 Nguồn kỹ thuật kiểm tra2026-10-13: [Animation và rendering](https://web.dev/articles/animations-guide), [Firestore query cursors](https://firebase.google.com/docs/firestore/query-data/query-cursors). Không coi các hướng dẫn này là số đo của dự án.
+
+
+## Nhật ký thực hiện — 2026-10-14
+
+### Gate1
+
+Pool hai node, pseudo-element đầu sáng, IDLE/ACTIVE và một scheduler; eligibility trực tiếp từ page/navigation/game shell. Init/dispose idempotent; tab ẩn/reduced-motion/cài đặt thu hồi ngay. Không đổi save/API cũ hay điều khiển mây/sương.
+
+Browser Chrome155 Windows, viewport412×915/DPR1: 4/4 tests pass, gồm soak CSS animation thật10 phút (114 lần kết thúc),100 lần Home/map/startup/gameplay thật qua ba trò, visibility và stale animationend. Danh tính hai node giữ nguyên; tối đa một timer; post-GC heap6.962→7.044MB, phút2–10 dao động15.120bytes. Đây là số đo browser trên máy tính, không phải FPS/heap của Galaxy S22 Ultra.
+
+So sánh hai cửa sổ35s: baseline tạo6/xóa5 node sao; pool tạo0/xóa0. Frame p95 cả hai8,1ms, không long task; phép đo không chứng minh tăng FPS. Profile1/1 và navigation responsive3/3 pass. Lần soak đầu bị lỗi lưu trace do dùng chung outputDir; đã chạy lại thư mục riêng và pass đầy đủ. Review độc lập đọc diff/chạy test và yêu cầu thêm soak/navigation thật; đã bổ sung bằng chứng. Check/build pass trước commit. Không deploy/push.
+
+Gate2 tiếp tục trong cùng task: logic/version trước UI, kỷ lục v1 giữ lịch sử, checkpoint v2 tách riêng trong transaction thắng.

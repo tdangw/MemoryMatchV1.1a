@@ -1,67 +1,63 @@
-const meteorQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-const activeMeteors = new Set();
+const meteorQuery = typeof window === 'undefined' ? null : window.matchMedia('(prefers-reduced-motion: reduce)');
+let container = null;
+let nodes = [];
 let meteorTimer;
-let isMeteorEnabled = true;
-
-function canAnimateMeteors() {
-  return isMeteorEnabled && !document.hidden && !meteorQuery.matches;
+let enabled = true;
+let eligible = false;
+function canAnimate() { return container && enabled && eligible && !document.hidden && !meteorQuery.matches; }
+function idle(node) { node.dataset.state = 'IDLE'; node.style.animationName = 'none'; }
+function ended(event) {
+  const node = event.target;
+  if (!nodes.includes(node) || node.dataset.state !== 'ACTIVE' || event.animationName !== node.style.animationName) return;
+  if (node.getAnimations().some(animation => animation.playState === 'running')) return;
+  idle(node);
 }
-
-function clearMeteorTimer() {
-  clearTimeout(meteorTimer);
+function isIdle(node) { return node.dataset.state === 'IDLE'; }
+function tick() {
   meteorTimer = undefined;
-}
-
-function removeActiveMeteors() {
-  activeMeteors.forEach((meteor) => meteor.remove());
-  activeMeteors.clear();
-}
-
-function createMeteor() {
-  if (!canAnimateMeteors() || activeMeteors.size >= 2) return;
-
-  const meteor = document.createElement("div");
-  meteor.className = "shooting-star";
-  const isBright = Math.random() < 0.12;
-  const duration = 1.2 + Math.random() * 1.3;
-  meteor.style.left = `${Math.random() * window.innerWidth}px`;
-  meteor.style.height = `${isBright ? 150 : 72 + Math.random() * 68}px`;
-  meteor.style.opacity = String(isBright ? 0.92 : 0.45 + Math.random() * 0.3);
-  meteor.style.animationDuration = `${duration}s`;
-
-  if (isBright) {
-    const head = document.createElement("div");
-    head.className = "star-head";
-    meteor.append(head);
+  if (!canAnimate()) return;
+  const node = nodes.find(isIdle);
+  if (node) {
+    const bright = Math.random() < .12;
+    node.classList.toggle('is-bright', bright);
+    node.style.left = `${Math.random() * window.innerWidth}px`;
+    node.style.height = `${bright ? 150 : 72 + Math.random() * 68}px`;
+    node.style.opacity = String(bright ? .92 : .45 + Math.random() * .3);
+    node.style.animationDuration = `${1.2 + Math.random() * 1.3}s`;
+    node.dataset.state = 'ACTIVE';
+    node.style.animationName = 'shooting';
   }
-
-  activeMeteors.add(meteor);
-  document.body.append(meteor);
-  setTimeout(() => {
-    meteor.remove();
-    activeMeteors.delete(meteor);
-  }, duration * 1000 + 100);
+  schedule();
 }
-
-function scheduleMeteor() {
-  clearMeteorTimer();
-  if (!canAnimateMeteors()) return;
-  meteorTimer = setTimeout(() => {
-    createMeteor();
-    scheduleMeteor();
-  }, 3200 + Math.random() * 3800);
+function schedule() {
+  clearTimeout(meteorTimer); meteorTimer = undefined;
+  if (canAnimate()) meteorTimer = setTimeout(tick, 3500 + Math.random() * 3500);
 }
-
-export function setMeteorEffectsEnabled(enabled) {
-  isMeteorEnabled = Boolean(enabled);
-  document.body.classList.toggle("meteor-effects-disabled", !isMeteorEnabled);
-  if (!isMeteorEnabled) removeActiveMeteors();
-  scheduleMeteor();
+function reconcile() {
+  if (container) container.hidden = !canAnimate();
+  if (!canAnimate()) for (const node of nodes) idle(node);
+  schedule();
 }
-
-export function initializeMeteorEffects(enabled = true) {
-  setMeteorEffectsEnabled(enabled);
+export function setMeteorSceneEligible(value) { eligible = Boolean(value); reconcile(); }
+export function setMeteorEffectsEnabled(value) {
+  enabled = Boolean(value);
+  document.body.classList.toggle('meteor-effects-disabled', !enabled);
+  reconcile();
 }
-
-document.addEventListener("visibilitychange", scheduleMeteor);
-meteorQuery.addEventListener("change", scheduleMeteor);
+export function initializeMeteorEffects(value = true) {
+  if (!container) {
+    container = document.createElement('div'); container.className = 'meteor-layer'; container.setAttribute('aria-hidden', 'true');
+    nodes = Array.from({ length: 2 }, () => { const node = document.createElement('div'); node.className = 'shooting-star'; idle(node); return node; });
+    container.append(...nodes); document.body.append(container);
+    container.addEventListener('animationend', ended); container.addEventListener('animationcancel', ended);
+    document.addEventListener('visibilitychange', reconcile); meteorQuery.addEventListener('change', reconcile);
+  }
+  setMeteorEffectsEnabled(value);
+}
+export function disposeMeteorEffects() {
+  clearTimeout(meteorTimer); meteorTimer = undefined;
+  document.removeEventListener('visibilitychange', reconcile); meteorQuery.removeEventListener('change', reconcile);
+  if (container) { container.removeEventListener('animationend', ended); container.removeEventListener('animationcancel', ended); container.remove(); }
+  container = null; nodes = []; eligible = false;
+}
+export function getMeteorDiagnostics() { return { nodes: nodes.length, active: nodes.filter(node => node.dataset.state === 'ACTIVE').length, timers: meteorTimer === undefined ? 0 : 1, eligible: Boolean(canAnimate()) }; }
