@@ -90,7 +90,7 @@ Game Shell giữ đủ sáu region công khai: `title`, `progress`, `hud`, `mile
 - Dữ liệu đọc từ storage phải được chuẩn hóa trước khi gán vào runtime. Giá trị âm, sai kiểu hoặc vượt giới hạn không được đi thẳng vào gameplay.
 - `roundId` là mã phiên runtime: callback bất đồng bộ phải kiểm tra đúng round và đúng board trước khi sửa trạng thái hoặc DOM.
 - `adventureProgress.js` sở hữu mở khóa tuần tự/completion/chặng/rương; `adventureLaunch.js` tải kỷ lục canonical trước replay và giữ cache giới hạn. `adventureRewards.js` sở hữu catalog grant có type và claim một lần, commit cùng wallet.
-- `playMetrics.js` đo thời gian thực theo ready/pause/modal/visibility/outcome, không có loop đo hoặc ghi theo frame. `rankingRules.js` sở hữu comparator và lượt liên tục: advance chuyển điểm một lần, restart thay điểm hiện tại, chỉ finalize khi kết thúc thật.
+- `playMetrics.js` đo thời gian thực theo ready/pause/modal/visibility/outcome, không có loop đo hoặc ghi theo frame. `rankingRules.js` sở hữu comparator và lượt liên tục: advance chuyển điểm một lần, restart thay điểm hiện tại, chỉ finalize khi kết thúc thật. Runtime v1 hiện chỉ tạo thành tích bảng lượt lúc finalize; checkpoint thắng v2 bên dưới là thay đổi dự kiến.
 
 ## 4. Luồng render và hiệu ứng
 
@@ -164,5 +164,5 @@ Bản đồ: adventureMap sở hữu preview màn với bốn độ khó và hai
 `EFFECTS_LEADERBOARD_PLAN.md` là nguồn phạm vi mới; không diễn giải nội dung sau thành trạng thái runtime đã có:
 
 - Sao băng: backgroundEffects hiện còn tạo/xóa node và chưa chặn gameplay. Dự kiến singleton pool hai node, một scheduler, IDLE/ACTIVE, eligibility từ page/navigation/shell lifecycle thay vì data-active-game. Không dùng thuật ngữ Zero GC hoặc GPU100% làm invariant.
-- Xếp hạng: hiện top20+own/cache, chưa phân trang. Dự kiến ba tab trò × sáu mode, mười người/trang, query cursor và request generation/UID guard. Vô tận Memory/Link chưa có bảng hợp lệ; giữ comparator và board IDs. Query/cache thuộc store, tương tác/phân trang thuộc panel, outbox vẫn thuộc service.
+- Xếp hạng: hiện top20+own/cache, chưa phân trang. Dự kiến ba tab trò × sáu mode đều hoạt động, mười người/trang, query cursor và request generation/UID guard. Thử thách/Vô tận cả ba trò chụp checkpoint sau mỗi màn thắng đã commit, không finalize run; số màn đã thắng rồi điểm các màn thắng quyết định best-only. Controller settlement tạo snapshot durable, rankingRules/rankingResult sở hữu metric/version, service gửi outbox idempotent theo UID, store query/cache, panel phân trang. Bảng lượt v2 không trộn v1 có điểm màn thua; giữ dữ liệu cũ và chuẩn hóa session/Rules tương thích. Board thời gian v1 không đổi; không thêm luật thua để bật bảng Vô tận Memory/Link.
 - Cảnh thắng: giữ SVG/nhạc và chất lượng hiện có. Phân tích cả chuỗi fireworks/summary/confetti/hoa; sửa cancel/ownership khi có bằng chứng, không mặc định thay mỹ thuật. Scope của cảnh hoa không tự bao phủ RAF/canvas của hiệu ứng tổng kết; audit phải kiểm tra owner của từng resource. Chỉ dừng/reset audio của cảnh, không phá tài nguyên âm thanh dùng chung.

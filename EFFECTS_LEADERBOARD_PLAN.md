@@ -4,12 +4,12 @@ Ngày: 2026-10-13. Trạng thái: đã khảo sát/lập kế hoạch, chưa tri
 
 ## 1. Phạm vi và dữ kiện đã xác minh
 
-- Tối ưu sao băng, thiết kế lại xếp hạng; phân tích cảnh hoàn thành chặng trước khi quyết định sửa hình ảnh. Giữ save/schema, luật thắng, mở khóa, thưởng và cách tính thành tích.
+- Tối ưu sao băng, thiết kế lại xếp hạng; phân tích cảnh hoàn thành chặng trước khi quyết định sửa hình ảnh. Giữ dữ liệu cũ, luật thắng, mở khóa và thưởng. Quy tắc gửi/xếp hạng Thử thách/Vô tận thay đổi theo mục3.1 bên dưới, cần version tương thích riêng.
 - backgroundEffects.js hiện tạo/xóa sao và đầu sáng, tối đa hai sao; có timer thu hồi từng sao. Chỉ kiểm tra cài đặt/tab ẩn/reduced-motion, chưa chặn gameplay; ẩn tab chưa thu hồi ngay sao đang bay.
 - data-active-game không phân biệt map với gameplay: map cũng mang ID trò. Không dùng điều kiện activeGame=selector làm nguồn quyết định hiệu ứng.
 - Cảnh hoa hiện tại có95 phần tử SVG, ba nhóm WAAPI hữu hạn5,2s với delay; không còn template hoa DOM cũ hoặc offsetWidth trong victoryCelebration.js. Cleanup theo scope đã có. Âm thanh dùng HTMLAudioElement tái sử dụng, không có AudioContext riêng để đóng.
 - Luồng hiện tại: pháo hoa → tổng kết/confetti → bấm chúc mừng → hoa. Không khẳng định ba hiệu ứng cùng khởi chạy; confetti còn lại có thể chồng hoa khi bấm nhanh. fireworkEffect.js còn RAF/timer tự quản và wrapper confetti chưa có cancel handle của riêng lượt; cần kiểm chứng đường hủy.
-- Xếp hạng online hiện là các select + top20 và kỷ lục riêng; chưa phân trang. Board thường riêng theo trò/độ khó/màn; Thử thách và Vô tận Triple xếp theo màn đạt tới rồi điểm lượt. Vô tận Memory/Link chưa đủ luật kết thúc để xếp hạng.
+- Xếp hạng online hiện là các select + top20 và kỷ lục riêng; chưa phân trang. Board thường riêng theo trò/độ khó/màn; runtime cũ chỉ gửi bảng lượt khi kết thúc hẳn, Vô tận Memory/Link chưa được bật. Đây là baseline, được thay bằng quy tắc đã chốt sau mỗi màn thắng dưới đây.
 
 Loại khỏi đề xuất: khẳng định0 byte GC,100% GPU,60FPS mọi máy/dưới25FPS khi chưa đo; số200 node/50 loop/8 đợt và ép reflow của bản hoa cũ; bắt buộc thay hoa hoặc thêm Lottie/video; đóng audio context dùng chung. Đổi thành mục tiêu giảm cấp phát, giữ tài nguyên có giới hạn và chứng minh bằng profile. Transform/opacity giúp giảm layout/paint, không đảm bảo browser luôn compositor-only.
 
@@ -26,25 +26,37 @@ Chọn pool hai node + CSS animation thay tạo/xóa từng đợt; không cần
 
 ## 3. Gate2 — Bảng xếp hạng toàn màn hình
 
+### 3.1. Quy tắc Thử thách/Vô tận đã chốt bổ sung
+
+- Áp dụng cho cả ba trò: sau mỗi màn thắng đã commit dữ liệu thành công, chụp thành tích bất biến và cập nhật kỷ lục; không cần đợi kết thúc cả ván hoặc thêm điều kiện thua cho Vô tận Memory/Link.
+- Ưu tiên số màn đã thắng trong đúng lượt (từ màn1, liên tiếp), rồi tổng điểm các màn thắng của lượt đó. Clear màn10 ghi10; đang chơi/thua màn11 vẫn giữ10 và điểm đến màn10. Không cộng điểm của màn chưa thắng hoặc kỷ lục từ lượt khác. Màn thường vẫn xếp thời gian riêng từng màn/độ khó.
+- Snapshot thắng không finalize run: tiếp tục màn sau, mua giờ hoặc chơi lại giữ identity của lượt. Restart không gửi ngay; khi thắng lại, điểm màn hiện tại thay lần trước, không cộng lặp. Kỷ lục public best-only không giảm khi lượt mới/yếu hơn được ghi.
+- Thua/thoát/kết thúc Thử thách chỉ đóng lượt theo luật hiện hữu; không gửi thêm điểm màn dở, không tạo record trùng checkpoint cuối. Thắng hết7 màn Thử thách Triple ghi7 như bình thường.
+- Một kỷ lục mỗi UID/trò/mode, guest và Google đều dùng được; snapshot durable trước outbox, retry offline idempotent, giữ owner khi đổi tài khoản. Chỉ ghi khi có kỷ lục tốt hơn sau clear, không theo tick/score đang tăng; giữ batch/rate limit hiện có.
+- Bảng lượt v1 cũ dùng màn đạt tới và điểm cả màn thua, nên không trộn với metric mới. Bảng Thử thách/Vô tận mới dùng version2 cho cả ba trò; board thời gian v1 giữ nguyên. Giữ nguyên dữ liệu/bảng v1 làm lịch sử, không tự chuyển điểm cũ thiếu breakdown thành kỷ lục mới. Chuẩn hóa session/run v1 tương thích; phiên cũ chỉ tham gia bảng v2 khi chứng minh đủ dữ liệu các màn thắng, nếu thiếu thì lượt mới bắt đầu ghi v2. Không reset Xu/vật phẩm/tiến trình.
+- Gate2 phải cập nhật rankingRules/rankingResult, serializer/normalizer, controller settlement, leaderboardService/store, Rules/indexes và kiểm thử phiên bản; tách bước logic/version khỏi bước UI. Đây là thay đổi dự kiến, chưa sửa runtime.
+
+Nghiệm thu thêm: clear10→checkpoint10→restart10→clear lại→clear11; thua/mua giờ không nâng số màn thắng; điểm không cộng lặp; retry/reload/offline/đổi UID không gửi trùng hoặc sai owner; v1 không ghi vào v2; save thất bại không gửi; đủ sáu bảng hợp lệ cho cả ba trò.
+
 ### Bố cục
 
 - Header Bảng xếp hạng, Exit như navigation hiện hành. Ba tab trên: Memory Match / Link Connect / Triple Connect; mở từ map mặc định đúng trò, mở Home nhớ lựa chọn gần nhất trong phiên.
-- Sáu mục: Dễ / Trung bình / Khó / Siêu khó / Thử thách / Vô tận. Mobile dùng3×2 để thấy đủ, C/B/A/S giữ nâu/xanh/vàng/tím. Vô tận Memory/Link hiển thị chưa hỗ trợ, không truy vấn/giả lập bảng; không tự thêm luật thua.
+- Sáu mục đều hoạt động cho cả ba trò: Dễ / Trung bình / Khó / Siêu khó / Thử thách / Vô tận. Mobile dùng3×2 để thấy đủ, C/B/A/S giữ nâu/xanh/vàng/tím. Thử thách/Vô tận dùng checkpoint màn thắng, không tự thêm luật thua.
 - Màn thường có bộ chọn Màn hợp lệ, mặc định màn đang chọn hoặc frontier; Thử thách/Vô tận ẩn bộ chọn màn. Đổi bộ lọc về trang1.
 - Danh sách tối đa10 người/trang: số thứ tự, avatar dự phòng, tên, thời gian hoặc màn/điểm. Top3 dùng huy hiệu nhỏ ngay trong dòng; tô dòng của mình, không thêm podium lặp dữ liệu. Kỷ lục của bạn riêng bên dưới, không tính thành người thứ11 và không giả số hạng toàn cục khi chưa có dữ liệu.
 - Header/bộ lọc/pager/dock giữ ổn định; danh sách cuộn khi viewport thấp, ẩn thanh cuộn nhưng giữ touch/wheel/keyboard/focus. Nút44px, tên dài được giới hạn, số thẳng cột, empty/loading/offline/error rõ và không có giải thích kỹ thuật cho người chơi. Chuyển tab nhẹ, reduced-motion tĩnh.
 
 ### Dữ liệu và phân trang
 
-Chọn cursor Firestore thay offset hoặc tải toàn bộ bảng: phù hợp cache/quota, tiếp tục dùng board ID/comparator hiện hữu.
+Chọn cursor Firestore thay offset hoặc tải toàn bộ bảng: phù hợp cache/quota. Board thời gian/comparator giữ nguyên; bảng lượt dùng version2 và metric màn đã thắng theo mục3.1.
 
 - Mỗi request tối đa11 entries, render10; mục dư chỉ xác định còn trang. Trang sau bắt đầu sau mục thứ10, không bỏ mất mục thăm dò. Sort time ASC hoặc levelReached DESC,totalScore DESC, cuối cùng UID/document ID ASC; cursor chứa đủ khóa.
 - Pager Trước / Trang N / Sau, kèm nút số các trang đã có cursor; disable ở biên, không tự đoán tổng trang hoặc nhảy cuối khi chưa biết. Khi hết danh sách mới biết trang cuối; chưa thêm count query hoặc bảng tổng hợp chỉ để hiển thị tổng.
 - Cache theo environment/board/UID/trang, tối đa12 board và5 trang gần nhất mỗi board; giữ cursor gọn cho tối đa100 trang/board, vượt giới hạn yêu cầu về trang1/làm mới. Kỷ lục riêng đọc một lần mỗi board/TTL, không mỗi trang. Không realtime listener cho danh sách, không polling; giữ TTL120s và giới hạn refresh15s.
 - Tải trang giữ bộ lọc/cursor/scroll riêng của board, chỉ commit UI khi đúng request generation và UID; mở/đóng/đổi tab phải hủy owner và bỏ response cũ. Refresh xóa cursor/cache rồi về trang1. Các trang tải ở thời điểm khác nhau không phải snapshot nguyên tử: nếu phát hiện UID lặp hoặc thứ tự bất thường, đề nghị làm mới, không âm thầm bỏ dòng rồi gán hạng sai.
-- Rules hiện giới hạn list≤20 nên request11 không cần nới quyền. Kiểm tra index thực tế, outbox/offline/best-only và receipt; không đổi schema để làm UI. Cùng metric dùng UID làm thứ tự hiển thị ổn định; không tự đổi luật đồng hạng/điểm phụ.
+- Rules hiện giới hạn list≤20 nên request11 không cần nới quyền đọc. Mở quyền ghi đúng format bảng lượt v2/mode của ba trò, không mở rộng sang dữ liệu khác. Kiểm tra index thực tế, outbox/offline/best-only và receipt; thay format chỉ cho quy tắc checkpoint/version, không vì bố cục UI. Cùng metric dùng UID làm thứ tự hiển thị ổn định; không tự đổi luật đồng hạng/điểm phụ.
 
-Nghiệm thu: fixtures0/1/10/11/20/21 người, trang cuối, tie UID, đổi bộ lọc nhanh/UID/offline, đóng khi đang tải, quota/cache và nội dung tên an toàn; emulator kiểm query/Rules. Layout412×915,640×360,1024×900; scrollbar ẩn vẫn thao tác được, focus/touch/reduced-motion. Giữ logic xếp hạng và dữ liệu cũ.
+Nghiệm thu: fixtures0/1/10/11/20/21 người, trang cuối, tie UID, đổi bộ lọc nhanh/UID/offline, đóng khi đang tải, quota/cache và nội dung tên an toàn; emulator kiểm query/Rules. Layout412×915,640×360,1024×900; scrollbar ẩn vẫn thao tác được, focus/touch/reduced-motion. Giữ dữ liệu cũ, xác minh riêng quy tắc checkpoint mới.
 
 ## 4. Gate3 — Phân tích cảnh thắng, giữ mỹ thuật
 
