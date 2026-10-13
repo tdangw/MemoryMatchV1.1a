@@ -1,6 +1,6 @@
 # Kế hoạch hiệu ứng nền và bảng xếp hạng
 
-Ngày: 2026-10-13. Trạng thái: đang thực hiện; Gate1–2 đã nghiệm thu browser/emulator; Gate3 đang audit. Đây là kế hoạch hiện hành duy nhất; ADVENTURE_WEB_PLAN.md là hồ sơ đã hoàn tất.
+Ngày: 2026-10-13. Trạng thái: triển khai Gate1–3 và nghiệm thu browser/emulator đã hoàn tất. Nghiệm thu Galaxy S22 Ultra thật còn chờ theo xác nhận người dùng2026-10-14; không còn gate code đang mở. Đây là kế hoạch hiện hành duy nhất; ADVENTURE_WEB_PLAN.md là hồ sơ đã hoàn tất.
 
 ## 1. Phạm vi và dữ kiện đã xác minh
 
@@ -68,7 +68,7 @@ Người dùng đã thử mobile và thấy mượt; chưa có bằng chứng c�
 
 ## 5. Thực hiện và nguồn
 
-Gate0 khảo sát/tài liệu hoàn tất; Gate1–2 đã triển khai/nghiệm thu browser và emulator; Gate3 đang thực hiện audit. Khi được giao code: thực hiện tuần tự, commit từng gate; unit/lifecycle và browser mục tiêu, check/build cuối cùng, review độc lập khi thay owner. Không deploy/push hoặc thay dữ liệu bằng task này.
+Gate0 khảo sát/tài liệu hoàn tất; Gate1–3 đã triển khai/nghiệm thu browser và emulator; đo thiết bị thật được người dùng cho ghi còn chờ. Khi được giao code: thực hiện tuần tự, commit từng gate; unit/lifecycle và browser mục tiêu, check/build cuối cùng, review độc lập khi thay owner. Không deploy/push hoặc thay dữ liệu bằng task này.
 
 Nguồn dự án: backgroundEffects.js/style.css; appPageLifecycle.js/gameShellLifecycle.js; victoryCelebration.js/victoryFlowerScene.js/fireworkEffect.js/victoryPresentation.web.js/ui.js/sound.js; leaderboardPanel.js/leaderboardStore.js/rankingResult.js/firestore.rules.
 
@@ -99,3 +99,16 @@ Nghiệm thu: emulator browser10/10 (sáu controller-mode settlement thật, quo
 ### Chuẩn bị Gate3 — giữ mỹ thuật
 
 Baseline audit chứng minh owner.dispose để lại canvas pháo hoa1 và confetti1; mở hoa nhanh vẫn có canvas confetti chồng lên. Chọn A: giữ SVG/renderers hiện có, sửa owner/cancellation; không chọn raster vì chưa có bằng chứng bottleneck của hoa. Luồng giữ pháo hoa3,6s → tổng kết/confetti150hạt → hoa3nhóm5,2s/delay120ms. Fireworks giữ cap175/250, DPR1,25/1,5 và repaint canvas fullscreen; hoa chỉ opacity/transform, không đổi95SVGnode. Confetti tối đa một canvas của riêng summary. Interrupt cancel RAF/timer/canvas theo đúng owner; reduced-motion bỏ canvas/chuyển động và giữ thông tin tĩnh. Nhạc cảnh dừng/reset riêng, không phá audio app. So sánh timeline/hìnhảnh và trace, heap/resources30vòng; chưa có quyền truy cập thiết bị Galaxy S22 Ultra thật để đo GPU/FPS vật lý.
+
+
+### Gate3 — nghiệm thu browser, thiết bị thật còn chờ
+
+Đã xử lý nguyên nhân: pháo hoa không có owner/cancel promise và confetti global không thuộc popup. fireworkEffect có scope/RAF/timer cleanup idempotent, replacement trả cancellation để không mở summary cũ, tab ẩn pause/resume không nhân scheduler. Confetti dùng instance/canvas riêng theo summary, reset chỉ instance đó khi đóng/chuyển/ẩn/reduced-motion; không can thiệp confetti khác. SDK dùng Worker singleton/reset chung; chọn instance useWorker=false trên main thread để có cancellation riêng, giữ150hạt. Đó là trade-off ownership/CPU, cần đo điện thoại thật trước khi kết luận budget mobile. ui.js có owner riêng cho toàn pipeline và counter; continuation có actionScope riêng của parent, bị hủy khi thay summary/parent dispose, có generation guard. Review độc lập đã phát hiện callback cũ trong cùng parent; fix có regression riêng. Counter chuyển tĩnh khi reduced-motion/tab ẩn.
+
+Giữ nguyên SVG95node/nhóm/timeline, fireworks cap/đường bay và confetti150hạt/màu, âm thanh dùng chung. Chọn ownership optimization (A), không raster (B). Các hàm giữ lối gọi cũ, thêm owner/cancellation; effect/catalog ID và format save không đổi ở phase này.
+
+Bằng chứng: baseline test owner.dispose còn canvas pháo hoa1 + confetti1; sau sửa0/0. Trace full thắng100→summary/confetti→hoa→idle→menu ở Chrome155 Windows, viewport412×915/DPR3 mô phỏng: overlap canvas khi mở hoa1→0, thoát canvas0; no-preference max21layers, reduced17. Trace Paint events trước/sau lần lượt1629/1588 (motion) và139/136 (reduced) ở lượt final; không diễn giải thành cải thiện paint hay GPU vì thời điểm chụp/driver khác nhau. Frame p95 hoa8,4→8,5ms; không long task trong hai trace. Summary p95 có nhiễu screenshot/driver (55,4ms trước/32,1ms ở lượt final; reduced final55,5ms), không dùng để tuyên bố FPS hay đạt16,7ms trên thiết bị thật. post-GC heap full-flow khoảng7,3→9,4MB có lazy imports/warmup; không gọi đó là leak hoặc giảm heap. Soak30vòng sau warmup7.611→7.653MB (delta42.392bytes), nodes1127/listeners76 giữ nguyên; owned resources về0. Có trace JSON và metrics trong test-results/victory-profile-before/final, không đưa output vào bundle/Git.
+
+Kiểm cuối23/23 browser (shared shell cleanup/lifecycle100switches, chapter đủ100 cả ba trò→101, audio,30cycle ownership/hidden/close, media changes, natural completion, summary replacement và actual restart ba trò×3vòng); profile2/2 pass. Reviewer chạy độc lập12tests và3targeted cuối, không finding còn mở. npm run check, npm run build, npm run build:android pass (chỉ wrapper, không APK); built web smoke2/2 pass. Diff không debug/asset thử nghiệm; không deploy/push.
+
+Người dùng xác nhận2026-10-14 chưa có thiết bị/remote debugging và yêu cầu ghi nghiệm thu thiết bị thật còn chờ. Vì vậy browser QA/code đã đóng; chưa xác minh frame/heap/GPU/repaint trên Galaxy S22 Ultra và không tuyên bố60FPS điện thoại. Hình hoa không cần đổi theo bằng chứng browser hiện có; đánh giá vật lý sẽ là QA sau, không mở thêm task mỹ thuật tự động.

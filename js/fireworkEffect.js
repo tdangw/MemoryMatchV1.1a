@@ -1,3 +1,7 @@
+import { createGameShellLifecycle, getActiveGameScope } from './gameShell/gameShellLifecycle.js';
+import { getAppPageScope } from './appPageLifecycle.js';
+let activeFireworks = null;
+
 const MOBILE_QUERY = "(max-width: 600px)";
 
 function random(min, max) {
@@ -10,12 +14,17 @@ export function showVictoryFireworks({
   containerId = "game-container",
   burstCount = 4,
   burstIntervalMs = 620,
+  owner = getActiveGameScope() || getAppPageScope(),
 } = {}) {
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  activeFireworks?.dispose();
+  if (owner && !owner.active) return Promise.resolve(false);
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+  if (reduced.matches) {
     return Promise.resolve();
   }
 
-  document.getElementById("victory-fireworks")?.remove();
+  const scope = createGameShellLifecycle();
+  activeFireworks = scope;
   const canvas = document.createElement("canvas");
   canvas.id = "victory-fireworks";
   canvas.setAttribute("aria-hidden", "true");
@@ -40,7 +49,11 @@ export function showVictoryFireworks({
   const particles = [];
   const particleLimit = compact ? 175 : 250;
   const particlesPerBurst = compact ? 44 : 60;
-  let frameId;
+  let frameId = null;
+  let endTimer = null;
+  let remainingMs = durationMs;
+  let deadline = 0;
+  let hiddenAt = null;
   let previous = performance.now();
   let nextBurstAt = 0;
   let launches = 0;
@@ -90,6 +103,8 @@ export function showVictoryFireworks({
   };
 
   const render = (now) => {
+    frameId = null;
+    if (!scope.active || document.hidden) return;
     const delta = Math.min(2, (now - previous) / 16.67);
     previous = now;
     context.clearRect(0, 0, canvas.width, canvas.height);
@@ -133,10 +148,41 @@ export function showVictoryFireworks({
     frameId = requestAnimationFrame(render);
   };
 
-  frameId = requestAnimationFrame(render);
-  return new Promise((resolve) => setTimeout(() => {
-    cancelAnimationFrame(frameId);
-    canvas.remove();
-    resolve();
-  }, durationMs));
+  let resolveCompletion;
+  let completed = false;
+  const completion = new Promise(resolve => { resolveCompletion = resolve; });
+  const releaseOwner = owner?.own(() => scope.dispose(), 'cleanup');
+  scope.own(() => {
+    cancelAnimationFrame(frameId); clearTimeout(endTimer);
+    frameId = endTimer = null;
+    rockets.length = particles.length = 0;
+    canvas.remove(); canvas.width = canvas.height = 0;
+    releaseOwner?.forget();
+    if (activeFireworks === scope) activeFireworks = null;
+    resolveCompletion(completed ? undefined : false);
+  });
+  function finish() { completed = true; scope.dispose(); }
+  function start() {
+    if (!scope.active || document.hidden || frameId !== null || endTimer !== null) return;
+    canvas.hidden = false;
+    previous = performance.now(); deadline = previous + remainingMs;
+    frameId = requestAnimationFrame(render); endTimer = setTimeout(finish, remainingMs);
+  }
+  scope.listen(document, 'visibilitychange', () => {
+    if (document.hidden) {
+      if (hiddenAt !== null) return;
+      hiddenAt = performance.now();
+      remainingMs = Math.max(0, deadline - hiddenAt);
+      cancelAnimationFrame(frameId); clearTimeout(endTimer); frameId = endTimer = null;
+      canvas.hidden = true;
+    } else {
+      if (hiddenAt !== null) nextBurstAt += performance.now() - hiddenAt;
+      hiddenAt = null; start();
+    }
+  });
+  scope.listen(reduced, 'change', () => { if (reduced.matches) finish(); });
+  if (!context) finish();
+  else if (document.hidden) { hiddenAt = performance.now(); canvas.hidden = true; }
+  else start();
+  return completion;
 }

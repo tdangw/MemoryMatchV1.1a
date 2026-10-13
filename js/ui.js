@@ -23,8 +23,13 @@ import {
   playCoinRewardFlight,
 } from "./coinRewards.js";
 import { getMemoryItemTotal } from "./memoryItems.js";
-import { getActiveGameScope } from "./gameShell/gameShellLifecycle.js";
+import { createGameShellLifecycle, getActiveGameScope } from "./gameShell/gameShellLifecycle.js";
 import { createHudTimerScheduler } from "./gameShell/gameTimerProgress.js";
+
+import { getAppPageScope } from './appPageLifecycle.js';
+let activeSummary = null;
+let summaryGeneration = 0;
+let pendingSummaryAction = null;
 
 const scoreElement = document.getElementById("score");
 const timerElement = document.getElementById("timer-value");
@@ -369,11 +374,24 @@ export function showLevelRewardOverlay({
 
 export function showLevelSummaryOverlay(completion) {
   gameState.isPaused = true;
-  const scope = getActiveGameScope();
+  const generation = ++summaryGeneration;
+  pendingSummaryAction?.dispose();
+  activeSummary?.dispose();
+  const scope = createGameShellLifecycle(); activeSummary = scope;
+  const owner = getActiveGameScope() || getAppPageScope();
+  const release = owner?.own(() => scope.dispose(), 'cleanup');
+  scope.own(() => { release?.forget(); if (activeSummary === scope) activeSummary = null; });
   showSummaryFireworks({
     durationMs: GAMEPLAY_TIMING.victoryFireworksDurationMs,
-    containerId: completion.fireworksContainerId,
-  }).finally(() => { if (!scope || scope.active) openLevelSummaryOverlay(completion); });
+    containerId: completion.fireworksContainerId, owner: scope,
+  }).then(result => {
+    if (result === false || !scope.active) return;
+    const open = () => { if (scope.active) openLevelSummaryOverlay(completion, scope, owner, generation); };
+    if (!document.hidden) open();
+    else {
+      const releaseVisibility = scope.listen(document, 'visibilitychange', () => { if (!document.hidden) { releaseVisibility(); open(); } });
+    }
+  }, error => { scope.dispose(); console.error('Victory fireworks failed', error); });
 }
 
 function openLevelSummaryOverlay({
@@ -392,7 +410,17 @@ function openLevelSummaryOverlay({
   onMenu,
   isVictoryCelebration = false,
   onCelebrate,
-}) {
+}, scope, continuationOwner, generation) {
+  function afterClose(callback) {
+    pendingSummaryAction?.dispose();
+    const actionScope = createGameShellLifecycle(); pendingSummaryAction = actionScope;
+    const release = continuationOwner?.own(() => actionScope.dispose(), 'cleanup');
+    actionScope.own(() => { release?.forget(); if (pendingSummaryAction === actionScope) pendingSummaryAction = null; });
+    actionScope.timeout(() => {
+      actionScope.dispose();
+      if (generation === summaryGeneration && (!continuationOwner || continuationOwner.active)) callback();
+    }, 200);
+  }
   let actionSelected = false;
 
   const content = document.createElement("div");
@@ -465,6 +493,8 @@ function openLevelSummaryOverlay({
 
   const modal = openAppModal({
     id: "level-summary-modal",
+    owner: scope,
+    onDestroy: () => scope.dispose(),
     showHeader: false,
     dismissible: false,
     content,
@@ -477,7 +507,7 @@ function openLevelSummaryOverlay({
         onClick: (close) => {
           actionSelected = true;
           close();
-          setTimeout(() => onCelebrate?.(), 200);
+          afterClose(() => onCelebrate?.());
         },
       },
     ] : [
@@ -488,7 +518,7 @@ function openLevelSummaryOverlay({
         onClick: (close) => {
           actionSelected = true;
           close();
-          setTimeout(() => onMenu?.(), 200);
+          afterClose(() => onMenu?.());
         },
       },
       {
@@ -498,10 +528,10 @@ function openLevelSummaryOverlay({
         onClick: (close) => {
           actionSelected = true;
           close();
-          setTimeout(() => {
+          afterClose(() => {
             gameState.isPaused = false;
             onNext?.();
-          }, 200);
+          });
         },
       },
     ],
@@ -514,14 +544,15 @@ function openLevelSummaryOverlay({
   if (isVictoryCelebration) {
     modal.panel.classList.add("level-summary-modal--victory");
   }
-  launchSummaryConfetti();
-  animateSummaryNumber(resultScore, score, { suffix: " ĐIỂM", delayMs: 360, durationMs: 1250 });
+  launchSummaryConfetti(scope);
+  animateSummaryNumber(resultScore, score, { scope, suffix: " ĐIỂM", delayMs: 360, durationMs: 1250 });
   if (coinsValueElement) {
-    animateSummaryNumber(coinsValueElement, coinsEarned, { prefix: "+", delayMs: 760, durationMs: 1000 });
+    animateSummaryNumber(coinsValueElement, coinsEarned, { scope, prefix: "+", delayMs: 760, durationMs: 1000 });
   }
 }
 
 function animateSummaryNumber(element, target, {
+  scope,
   prefix = "",
   suffix = "",
   delayMs = 0,
@@ -531,23 +562,26 @@ function animateSummaryNumber(element, target, {
   const render = (value) => {
     element.textContent = `${prefix}${Number(value).toLocaleString("en-US")}${suffix}`;
   };
-  const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
-  if (!total || reducedMotion) {
-    render(total);
-    return;
-  }
-
-  setTimeout(() => {
-    if (!element.isConnected) return;
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+  if (!total || reduced.matches || document.hidden) { render(total); return; }
+  const animationScope = createGameShellLifecycle();
+  const releaseOwner = scope.own(() => animationScope.dispose(), 'cleanup');
+  let frame;
+  animationScope.own(() => { globalThis.cancelAnimationFrame(frame); releaseOwner.forget(); }, 'frame');
+  function finish() { if (scope.active && element.isConnected) render(total); animationScope.dispose(); }
+  animationScope.listen(reduced, 'change', () => { if (reduced.matches) finish(); });
+  animationScope.listen(document, 'visibilitychange', () => { if (document.hidden) finish(); });
+  animationScope.timeout(() => {
+    if (!element.isConnected) { animationScope.dispose(); return; }
     const startedAt = performance.now();
-    const tick = (now) => {
-      if (!element.isConnected) return;
+    const tick = now => {
+      if (!scope.active || !animationScope.active || !element.isConnected) { animationScope.dispose(); return; }
       const progress = Math.min(1, (now - startedAt) / durationMs);
-      const easedProgress = 1 - (1 - progress) ** 3;
-      render(Math.round(total * easedProgress));
-      if (progress < 1) requestAnimationFrame(tick);
+      render(Math.round(total * (1 - (1 - progress) ** 3)));
+      if (progress < 1) frame = globalThis.requestAnimationFrame(tick);
+      else animationScope.dispose();
     };
-    requestAnimationFrame(tick);
+    frame = globalThis.requestAnimationFrame(tick);
   }, delayMs);
 }
 

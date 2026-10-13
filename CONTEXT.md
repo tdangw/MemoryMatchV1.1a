@@ -17,7 +17,7 @@
 
 ## Contract dùng chung
 
-- Kế hoạch hiện hành mới: `EFFECTS_LEADERBOARD_PLAN.md` (2026-10-13), đang thực hiện theo yêu cầu; Gate1 pool và Gate2 checkpoint/UI đã nghiệm thu browser/emulator, Gate3 đang audit. Gate1 pool sao băng; Gate2 UI xếp hạng ba trò × sáu mode,10 người/trang và cursor; Gate3 đo/audit cảnh thắng trước khi quyết định sửa mỹ thuật. ADVENTURE_WEB_PLAN.md phase0–20 đã hoàn tất và là hồ sơ lịch sử.
+- Hồ sơ thực hiện mới: `EFFECTS_LEADERBOARD_PLAN.md` (2026-10-13), đang thực hiện theo yêu cầu; Gate1–3 triển khai/browser QA đã hoàn tất; Galaxy S22 Ultra thật còn chờ theo xác nhận người dùng2026-10-14. Gate1 pool sao băng; Gate2 UI xếp hạng ba trò × sáu mode,10 người/trang và cursor; Gate3 đo/audit cảnh thắng trước khi quyết định sửa mỹ thuật. ADVENTURE_WEB_PLAN.md phase0–20 đã hoàn tất và là hồ sơ lịch sử.
 - Cảnh hoa hiện tại95 phần tử SVG/ba nhóm animation hữu hạn; người dùng đã thử mobile và thấy mượt. Kế hoạch giữ hình ảnh hiện có, đo allocations/frame/paint và audit confetti còn lại/RAF cleanup khi chuyển cảnh nhanh. Sao băng dùng eligibility từ page/navigation/shell lifecycle.
 
 - Firebase Hosting dùng chung project `memorymatchv1-1a` với ba site: target `production` → `memorymatchv1-1a`, target `beta` → `memorymatchv1-1b`, target `test` → `memorymatch-test`. `npm run deploy`, `npm run deploy:beta` và `npm run deploy:test` chỉ deploy đúng site tương ứng. Mỗi URL có storage trình duyệt riêng vì khác origin.
@@ -66,7 +66,7 @@
 
 ## Tài liệu giữ lại
 
-- `EFFECTS_LEADERBOARD_PLAN.md`: kế hoạch hiện hành; Gate1 sao băng và Gate2 xếp hạng đã đạt browser/emulator checks, Gate3 tiếp tục.
+- `EFFECTS_LEADERBOARD_PLAN.md`: kế hoạch hiện hành; Gate1–3 code/browser QA đã đạt; hồ sơ số đo và QA thiết bị thật còn chờ.
 - `ADVENTURE_WEB_PLAN.md`: hồ sơ đã hoàn tất phase0–20 và quyết định UI/data hiện có.
 - `AGENTS.md`: chuẩn làm việc bắt buộc.
 - `ARCHITECTURE.md`: ownership và contract kỹ thuật bền vững.
@@ -127,3 +127,6 @@ Gate1 EFFECTS_LEADERBOARD_PLAN.md (2026-10-14): pool sao băng hai node/một sc
 
 
 Gate2 EFFECTS_LEADERBOARD_PLAN.md (2026-10-14): checkpoint thắng v2 cho Challenge/Endless cả ba trò, best-only theo số màn thắng/điểm các màn thắng; stage cùng transaction settlement, thất bại không outbox, restart thay điểm/advance cộng một lần/finalize không gửi màn dở. runBestsV2 mới giữ runBestsv1 làm lịch sử; nhập v1 chỉ khi matching finalized run chứng minh totals. UI3trò×6mode/10người+own/cursor11entries, cache12board×5page/100cursor và UID/generation guard. Browser emulator10/10, UI/data/catalog12/12, Rules/pure/check/build pass, review độc lập findings đã sửa. Không deploy Rules hoặc Hosting; index hiện có đủ. Gate3 audit ownership/cảnh thắng đang thực hiện; thiết bị thật chưa đo.
+
+
+Gate3 EFFECTS_LEADERBOARD_PLAN.md (2026-10-14): audit phát hiện orphan fireworks/confetti và continuation summary cũ cùng parent; đã sửa scope/cancel/generation, instance confetti riêng, counter motion/visibility cleanup. Giữ95SVGnode/nhạc/timeline/cap và màu. Final browser23/23 + profile2/2, independent review12+3tests, check/web/Android-wrapper build và built-smoke2/2 pass. Soak30vòng giữ1127node/76listener, heapdelta≈42KB; flower overlap canvas1→0. Chrome155 Windows/DPR3 mô phỏng có flower p95≈8,5ms/no long task; trace không chứng minh FPS điện thoại. Người dùng xác nhận không có thiết bị/remote debug và cho ghi QA Galaxy S22 Ultra còn chờ. Không còn gate code active; kế hoạch giữ làm hồ sơ có mục QA vật lý chưa xác minh. Không deploy/push hoặc APK.
