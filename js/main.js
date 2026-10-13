@@ -1,5 +1,6 @@
 import { getRecentGameId } from "./recentGame.js";
 import { configureAdventureMap } from "./adventureMap.js";
+import { previewMemoryLevel, previewLinkLevel, previewTripleLevel } from './adventurePreview.js';
 import "./memoryMatch/memoryShellDom.js";
 import { configureAppNavigation, openLocalRankings, refreshAppWallet, refreshAppAccount } from "./appNavigation.js";
 import {
@@ -103,8 +104,9 @@ configureMainMenu({
   startGame: startNewMemoryRun,
   continueGame: continueMemorySession,
 });
-configureSettings({ onCloseMenu: createActiveGameMenu, onHome: showGameSelector });
+configureSettings({ onCloseMenu: createActiveGameMenu });
 configureAppNavigation({
+  home: showGameSelector,
   account: async () => {
     if (import.meta.env.VITE_FIREBASE_DISABLED === '1') return openAppModal({ id: 'account-modal', title: 'Tài khoản', content: '<p>Bản lưu trên thiết bị đang hoạt động. Cloud được tắt trong môi trường kiểm tra.</p>' });
     await accountReady;
@@ -140,9 +142,9 @@ configureAppNavigation({
 });
 configureAdventureMap({
   adapters: {
-    'memory-match': { launch: ({ mode, level }) => { resetGame(); gameState.settings.mode = mode; return startNewMemoryRun(level); } },
-    'link-connect': { launch: options => startLinkLevel(options) },
-    'triple-connect': { launch: options => startTripleConnectRound(options) },
+    'memory-match': { goal: 'Ghi nhớ vị trí và ghép hết các cặp thẻ trước khi hết giờ.', preview: ({ mode, level, startedLevels }) => previewMemoryLevel(mode, level, { ...gameState.progress.memoryMatch, startedLevels }), launch: ({ mode, level, skipIntro }) => { resetGame(); gameState.settings.mode = mode; return startNewMemoryRun(level, { skipIntro }); } },
+    'link-connect': { goal: 'Tìm đường nối và ghép hết các cặp thẻ trước khi hết giờ.', preview: ({ mode, level, startedLevels }) => previewLinkLevel(mode, level, { ...gameState.progress.linkConnect, startedLevels }), launch: options => startLinkLevel(options) },
+    'triple-connect': { goal: 'Ghép hết các bộ ba trước khi hết giờ. Đừng để khay đầy!', preview: ({ mode, level }) => previewTripleLevel(mode, level, gameState.progress.tripleConnect), launch: options => startTripleConnectRound(options) },
   },
 });
 configureTripleConnectController({

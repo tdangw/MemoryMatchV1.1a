@@ -52,10 +52,15 @@ export function decorateAdventureMenu(root, { gameId = null, onHome } = {}) {
   account.dataset.cloudState = cloudState;
   account.append(createIcon("account"));
   scope.listen(account, "click", () => handlers.account?.());
-  const coins = document.createElement("span");
-  coins.className = "adventure-wallet";
-  coins.append(createIcon("coin"), document.createTextNode(gameState.coins.toLocaleString("vi-VN")));
-  header.append(account, coins);
+  if (root.classList.contains("adventure-map-page")) {
+    const home = document.createElement("button");
+    home.type = "button"; home.className = "adventure-home";
+    home.setAttribute("aria-label", "Trang chủ"); home.append(createIcon("home"));
+    scope.listen(home, "click", () => (onHome || handlers.home)());
+    header.append(home, account);
+  } else {
+    header.append(account);
+  }
   root.prepend(header);
   const footer = document.createElement("footer");
   footer.className = "adventure-footer";

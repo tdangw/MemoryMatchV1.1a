@@ -1,3 +1,4 @@
+import { startMapLevel } from './helpers/adventureNavigation.js';
 import { expect, test } from "@playwright/test";
 
 test("registry exposes only released games in the selector", async ({
@@ -81,7 +82,7 @@ test("Triple menu starts a visible playable board", async ({ page }) => {
     .locator(".game-selector__choice")
     .filter({ hasText: "Triple Connect" })
     .click();
-  await page.locator('[data-level="1"]').click();
+  await startMapLevel(page);
   await expect(page.locator("#triple-connect-container")).toBeVisible();
   await expect(
     page.locator(".triple-connect__board .triple-connect__tile"),
@@ -96,7 +97,7 @@ test("switching all released games after a production Triple start keeps one act
     .locator(".game-selector__choice")
     .filter({ hasText: "Triple Connect" })
     .click();
-  await page.locator('[data-level="1"]').click();
+  await startMapLevel(page);
   await expect(page.locator("#triple-connect-container")).toBeVisible();
 
   const result = await page.evaluate(async () => {

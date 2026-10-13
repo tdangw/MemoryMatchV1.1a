@@ -1,3 +1,4 @@
+import { previewMapLevel, closeLevelPreview } from './helpers/adventureNavigation.js';
 import { expect, test } from '@playwright/test';
 
 test.skip(process.env.GAME_SHELL_TEST_SERVER !== 'preview', 'Built application smoke only.');
@@ -8,6 +9,8 @@ test('built mobile menu, map and account open without writing to production serv
   page.on('pageerror', error => errors.push(error.message));
   await page.goto('/');
   await expect(page.locator('.game-selector__choice')).toHaveCount(3);
+  await expect(page.locator('.adventure-wallet')).toHaveCount(0);
+  expect((await page.locator('.adventure-account').boundingBox()).x).toBeGreaterThan(206);
   await page.locator('.game-selector__choice').filter({ hasText: 'Memory Match' }).click();
   await expect(page.locator('#menu-container[data-map-ready="true"]')).toBeVisible();
   await expect(page.locator('.adventure-map-node--level')).toHaveCount(100);
@@ -19,9 +22,9 @@ test('built mobile menu, map and account open without writing to production serv
     return image.naturalWidth > 0 && getComputedStyle(document.querySelector('.adventure-map-chest-art')).backgroundImage.includes('garden-sprites.webp');
   });
   expect(atlasReady).toBe(true);
-  await page.locator('.adventure-mode-toggle').click();
-  await page.locator('[data-mode="hard"]').click();
-  await expect(page.locator('.adventure-mode-toggle')).toContainText('Khó');
+  await previewMapLevel(page, 1, 'hard');
+  await closeLevelPreview(page);
+  await expect(page.locator('.adventure-mode-toggle')).toHaveCount(0);
   await page.getByRole('button', { name: 'Tài khoản', exact: true }).click();
   await expect(page.locator('#account-modal')).toBeVisible();
   await expect(page.locator('#account-modal')).not.toContainText('Firebase');

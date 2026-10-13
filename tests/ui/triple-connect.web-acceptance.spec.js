@@ -1,3 +1,4 @@
+import { startMapLevel } from './helpers/adventureNavigation.js';
 import { expect, test } from "@playwright/test";
 
 const P95_TAP_FEEDBACK_MS = 50;
@@ -10,6 +11,7 @@ function percentile(values, fraction) {
 
 test("production Triple Connect keeps interaction, DOM, long-task and heap budgets", async ({ page }, testInfo) => {
   test.setTimeout(60000);
+  await page.route(/googleapis\.com|google-analytics\.com|googletagmanager\.com/, route => route.abort());
   await page.addInitScript(() => {
     localStorage.clear();
     window.__tripleLongTasks = [];
@@ -25,12 +27,10 @@ test("production Triple Connect keeps interaction, DOM, long-task and heap budge
   const cdp = await page.context().newCDPSession(page);
 
   await page.locator(".game-selector__choice").filter({ hasText: "Triple Connect" }).click();
-  await page.locator('.adventure-mode-toggle').click();
-  await page.locator('[data-mode="superHard"]').click();
-  await page.locator('[data-level="1"]').click();
+  await startMapLevel(page, 1, 'superHard');
   const intro = page.locator("#triple-round-start-modal");
-  await intro.waitFor({ state: "visible" });
-  await expect(intro).toHaveCount(0, { timeout: 4000 });
+  await expect(page.locator('.game-shell-root:visible')).not.toHaveAttribute('data-shell-startup', /.+/);
+  await expect(intro).toHaveCount(0);
   await page.evaluate(async () => {
     await Promise.all([...document.images].map((image) => image.decode().catch(() => {})));
   });
@@ -117,8 +117,7 @@ test("production Triple Connect keeps interaction, DOM, long-task and heap budge
 
   await page.locator("#triple-actions-menu-toggle").click();
   await page.locator("#triple-actions-menu").getByRole("button", { name: "Menu" }).click();
-  await page.locator('[data-dock-action="settings"]').click();
-  await page.getByRole('button', { name: 'Trang chủ', exact: true }).click();
+  await page.locator('.adventure-home').click();
   await expect(page.locator(".game-selector__choice").first()).toBeVisible();
 
   await cdp.send("HeapProfiler.collectGarbage");

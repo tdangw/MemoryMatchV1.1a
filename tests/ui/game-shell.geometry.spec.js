@@ -1,3 +1,4 @@
+import { startMapLevel } from './helpers/adventureNavigation.js';
 import { expect, test } from "@playwright/test";
 
 const GEOMETRY_TOLERANCE_PX = 1;
@@ -133,5 +134,5 @@ for (const viewport of [
 
 async function startEasyGame(page, title) {
   await page.locator(".game-selector__choice").filter({ hasText: title }).click();
-  await page.locator('[data-level="1"]').click();
+  await startMapLevel(page);
 }

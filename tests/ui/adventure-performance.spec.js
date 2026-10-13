@@ -16,11 +16,18 @@ test('map mode/scroll remains bounded and captures cold/warm transfer and frame 
     const node = document.querySelector('[data-level="1"]');
     const timings = [];
     for (let i = 0; i < 40; i++) {
-      document.querySelector(".adventure-mode-toggle").click();
+      node.click();
       const started = performance.now();
-      document.querySelector(`[data-mode="${i % 2 ? 'easy' : 'hard'}"]`).click();
+      const radio = document.querySelector(`#adventure-level-modal input[value="${i % 2 ? 'easy' : 'hard'}"]`);
+      radio.checked = true; radio.dispatchEvent(new Event('change', { bubbles: true }));
       document.querySelector('.adventure-map-scroll').scrollTop = i % 2 ? 1500 : 0;
       timings.push(performance.now() - started);
+      const modal = document.querySelector('#adventure-level-modal');
+      await new Promise(resolve => {
+        const observer = new MutationObserver(() => { if (!modal.isConnected) { observer.disconnect(); resolve(); } });
+        observer.observe(document.body, { childList: true });
+        modal.querySelector('.app-modal__close').click();
+      });
       await new Promise(requestAnimationFrame);
     }
     const frames = [];

@@ -1,3 +1,4 @@
+import { startMapLevel } from './helpers/adventureNavigation.js';
 import { expect, test } from "@playwright/test";
 
 async function winActiveTripleRound(page, clock = null) {
@@ -42,9 +43,7 @@ test("Triple retains its saved session on reload and starts a fresh board only w
   await page.evaluate(async () => (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('triple-connect'));
   await expect(page.locator('#menu-container')).not.toContainText('Tiếp tục');
   expect(await page.evaluate(async () => (await import('/js/sessionProgress.js')).getActiveSession('triple-connect','normal').seed)).toBe(session.seed);
-  await page.locator('.adventure-mode-toggle').click();
-  await page.locator('[data-mode="normal"]').click();
-  await page.locator('[data-level="1"]').click();
+  await startMapLevel(page, 1, 'normal');
   await expect(page.locator('[data-triple-level]')).toHaveText('1');
   await expect.poll(() => page.evaluate(async () => (await import('/js/sessionProgress.js')).getActiveSession('triple-connect','normal')?.seed)).not.toBe(session.seed);
 });

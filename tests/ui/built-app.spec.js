@@ -1,3 +1,4 @@
+import { previewMapLevel, closeLevelPreview } from './helpers/adventureNavigation.js';
 import { expect, test } from '@playwright/test';
 test.skip(process.env.GAME_SHELL_TEST_SERVER !== 'preview', 'Production bundle smoke only.');
 test('built chunks open home/maps and account fallback without module initialization errors', async ({ page }) => {
@@ -9,8 +10,8 @@ test('built chunks open home/maps and account fallback without module initializa
   await expect(page.locator('.adventure-dock')).toBeVisible();
   await page.getByRole('button', { name: /Memory Match Mới thấy/ }).click();
   await expect(page.locator('.adventure-map-node--level')).toHaveCount(100);
-  await page.locator('.adventure-mode-toggle').click();
-  await page.locator('[data-mode="hard"]').click();
+  await previewMapLevel(page, 1, 'hard');
+  await closeLevelPreview(page);
   await expect(page.locator('[data-level="1"]')).toBeEnabled();
   await page.locator('.adventure-account').click();
   await expect(page.locator('#account-modal')).toBeVisible();

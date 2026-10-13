@@ -225,6 +225,7 @@ export function startLinkLevel({
   resume = false,
   restart = false,
   advance = false,
+  skipIntro = false,
   gravityShift,
   specialProgress,
   specialNoEnergyDropStreak,
@@ -309,14 +310,14 @@ export function startLinkLevel({
   await startup.yield();
   updateLinkHud();
   linkGameState.isLocked = true;
-  let introComplete = false;
+  let introComplete = skipIntro;
   let imagesReady = false;
   const activateWhenReady = () => {
     if (!introComplete || !imagesReady || linkGameState.roundId !== roundId) return;
     unlockLinkBoard();
     startCountdown(roundId);
   };
-  showLevelRewardOverlay({
+  if (!skipIntro) showLevelRewardOverlay({
     level,
     mode,
     themeId: getEquippedThemeId(gameState.appearance, "link-connect"),

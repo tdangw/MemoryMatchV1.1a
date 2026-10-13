@@ -1,3 +1,4 @@
+import { startMapLevel, previewMapLevel, closeLevelPreview } from './helpers/adventureNavigation.js';
 import { expect, test } from "@playwright/test";
 
 test.beforeEach(async ({ page }) => {
@@ -13,16 +14,18 @@ async function finishTripleIntro(page, clock = null) {
   else await expect(intro).toHaveCount(0, { timeout: 4000 });
 }
 
-test('Triple map keeps all modes in one menu and theme access in the shared collection dock', async ({ page }) => {
+test('Triple map previews normal modes and keeps theme access in the shared collection dock', async ({ page }) => {
   await expect(page.locator('.adventure-map-theme, .adventure-map-play, .adventure-map-sessions')).toHaveCount(0);
-  await page.locator('.adventure-mode-toggle').click();
-  await expect(page.locator('.adventure-mode-option')).toHaveText(['Dễ', 'Trung bình', 'Khó', 'Siêu khó', 'Vô tận', 'Thử thách']);
-  await page.locator('[data-mode="hard"]').click();
+  await previewMapLevel(page, 1, 'hard');
+  await expect(page.locator('.adventure-level-modes label')).toHaveText(['C', 'B', 'A', 'S']);
+  await closeLevelPreview(page);
   await page.locator('[data-dock-action="collection"]').click();
   await expect(page.locator('#collection-modal')).toContainText('Bộ sưu tập · Triple Connect');
   await page.locator('#collection-modal .app-modal__close').click();
   await expect(page.locator('#collection-modal')).toHaveCount(0);
-  await expect(page.locator('[data-mode="hard"]')).toHaveAttribute('aria-checked', 'true');
+  await previewMapLevel(page);
+  await expect(page.locator('#adventure-level-modal input[value="hard"]')).toBeChecked();
+  await closeLevelPreview(page);
   await expect(page.locator('.adventure-map-node--level')).toHaveCount(100);
 });
 
@@ -39,15 +42,13 @@ test('visiting the map and collection preserves a session until the player expli
   await page.locator('#collection-modal .app-modal__close').click();
   await expect(page.locator('#collection-modal')).toHaveCount(0);
   expect(await page.evaluate(async () => (await import('/js/sessionProgress.js')).getActiveSession('triple-connect','normal').seed)).toBe(oldSeed);
-  await page.locator('.adventure-mode-toggle').click();
-  await page.locator('[data-mode="normal"]').click();
-  await page.locator('[data-level="1"]').click();
+  await startMapLevel(page, 1, 'normal');
   await finishTripleIntro(page);
   await expect.poll(() => page.evaluate(async () => (await import('/js/sessionProgress.js')).getActiveSession('triple-connect','normal')?.seed)).not.toBe(oldSeed);
 });
 
 test("Triple HUD uses the shared contract and mutually exclusive menus", async ({ page }) => {
-  await page.locator('[data-level="1"]').click();
+  await startMapLevel(page);
   await finishTripleIntro(page);
   const shell = page.locator(".triple-connect-game");
   const progress = page.locator(".triple-connect__milestones .stat-star-progress");
@@ -128,7 +129,7 @@ test("Triple combo bar counts down and expires the active combo", async ({ page 
 test("Triple menu, start modal and timer follow the shared round contract", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await expect(page.locator('[data-dock-action]')).toHaveText(['Cửa hàng', 'Bộ sưu tập', 'Xếp hạng', 'Cài đặt']);
-  await page.locator('[data-level="1"]').click();
+  await page.evaluate(async () => (await import("/js/tripleConnect/tripleController.js")).startTripleConnectRound({ mode: "easy", level: 1 }));
   const start = page.locator("#triple-round-start-modal");
   await expect(start).toContainText(/Màn 1.*Dễ.*Chủ đề.*Mục tiêu: 9 bộ thẻ.*Gợi ý: 3/s);
   const timer = page.locator("[data-triple-timer]");
@@ -173,7 +174,7 @@ test("Triple Continue resumes without replaying the start modal", async ({ page 
 
 test("Triple timer pauses in the background and resumes from the same timestamp", async ({ page }) => {
   await page.clock.install();
-  await page.locator('[data-level="1"]').click();
+  await startMapLevel(page);
   await finishTripleIntro(page, page.clock);
   const timer = page.locator("[data-triple-timer]");
   await page.clock.fastForward(1100);

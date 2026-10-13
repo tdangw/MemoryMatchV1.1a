@@ -64,14 +64,11 @@ for (const game of games) {
     await page.locator("#settings-modal .app-modal__close").click();
 
     await expect(page.locator("#settings-modal")).toHaveCount(0);
-    await page.locator('.adventure-mode-toggle').click();
-    const menu = page.locator('.adventure-mode-menu');
-    await expect(menu).toBeVisible();
-    await menu.evaluate(element => { element.scrollTop = element.scrollHeight; });
-    await expect(menu.locator('[data-mode="challenge"]')).toBeInViewport();
-    const bounds = await menu.boundingBox();
-    expect(bounds.y).toBeGreaterThanOrEqual(0);
-    expect(bounds.y + bounds.height).toBeLessThanOrEqual(360);
+    await page.locator('[data-level="1"]').click();
+    await expectModalBodyScrollsWithinViewport(page, '#adventure-level-modal');
+    await expect(page.getByRole('radio', { name: 'Siêu khó', exact: true })).toBeInViewport();
+    await expect(page.locator('#adventure-level-modal').getByRole('button', { name: 'Chơi', exact: true })).toBeInViewport();
+
 
   });
 }

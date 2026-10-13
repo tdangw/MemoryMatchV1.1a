@@ -105,3 +105,12 @@ Nghiệm thu tinh gọn: check/build pass; browser33/33 (map, progression, compa
 ## Trang trí map — 2026-10-13
 
 Task ADVENTURE_WEB_PLAN.md mục17 đã hoàn tất, không còn gate active. Atlas gốc vườn đêm gồm14 trang trí và2 trạng thái rương; layout thuần theo game/màn, ổn định khi nối chặng và tính Y tương đối để không mất chính xác ở số màn lớn. Giữ shared map/page ownership, không thêm listener/RAF/animation loop/backend/schema. Skill imagegen được dùng để tạo và chỉnh khoảng trống atlas; prompt/nguồn ở MAP_ART_NOTES.md. check/build pass;19 map contracts được xác minh qua lượt rộng/chạy lại reward, performance1 và built-smoke2 pass. Lượt cuối722 DOM nodes, mode patch p95 5,8ms, không long task; lượt trước có54–55ms trong cửa sổ toàn tải/đo. Chưa đo60FPS trên điện thoại thật.
+
+## Popup chọn màn — 2026-10-13
+
+Task hiện hành ADVENTURE_WEB_PLAN.md mục18: bản đồ bấm màn mở preview và chọn bốn độ khó trước khi Chơi; hai nút Vô tận/Thử thách cố định riêng. Home trái/tài khoản phải ở map; theo yêu cầu mới tiếp theo, home cũng bỏ Xu và dời tài khoản phải, không thêm nút Home trên trang chủ. Xu vẫn xem trong cửa hàng. Bỏ Home trong Cài đặt. Profile silhouette SVG được vẽ lại đối xứng, chấm trạng thái absolute để không đẩy glyph lệch. Số nhiều chữ số bị lệch vì padding chung của button; sửa padding/căn giữa/font ở owner map. Gameplay/schema/luật/mở khóa/thưởng/ranking giữ nguyên. Skill làm rõ yêu cầu dùng để chốt phạm vi header trước khi người dùng cập nhật thêm. Không dùng bitmap mới, không đưa nội dung tham khảo ngoài dự án vào source.
+
+
+Điều chỉnh popup cuối mục18: dùng huy hiệu C/B/A/S, bỏ sao và lịch sử; tiêu đề Màn N · độ khó; goal/time/assist/theme lấy từ config thật. Chỉ bắt đầu map thường skip intro; Memory reveal, decode/commit gating và intro ở các lối vào khác vẫn giữ. Mục19 được người dùng giao tiếp: menu trên chỉ mở popup Exit/Restart, Help/Reset xuống Settings; footer gọi hành động controller thay click vào dropdown cũ. Thực hiện tuần tự và commit từng phần, chưa push/deploy.
+
+Mục18 hoàn tất, mục19 đang active: check/build và44 UI/startup pass; built3 pass; review độc lập không finding. Chưa nghiệm thu FPS máy thật; chưa push/deploy. Các commit tiếp theo tiếp tục popup thoát game và di chuyển Help/Reset vào Settings.

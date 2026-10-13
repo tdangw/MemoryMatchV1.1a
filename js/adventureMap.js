@@ -1,3 +1,6 @@
+import { getTheme } from "./themeCatalog.js";
+import { getEquippedThemeId } from "./appearance.js";
+import { createIcon } from "./icons.js";
 import { gameState } from "./gameState.js";
 import { GAME_MODES, getGameDefinition, getGameModeLabel } from "./gameCatalog.js";
 import { MAP_LEVEL_STEP, getMapLevelPoint, getMapChestPoint, createMapDecorations } from "./adventureMapLayout.js";
@@ -46,64 +49,33 @@ export function mountAdventureMap(gameId) {
   const title = document.createElement("h1");
   title.className = "adventure-map-title";
   title.textContent = game.title;
-  root.querySelector(".adventure-header").insertBefore(title, root.querySelector(".adventure-wallet"));
-  const selector = document.createElement("div");
-  selector.className = "adventure-mode-selector";
-  const modeButton = button("", "adventure-mode-toggle");
-  modeButton.setAttribute("aria-haspopup", "menu");
-  modeButton.setAttribute("aria-expanded", "false");
-  modeButton.setAttribute("aria-controls", "adventure-mode-menu");
-  const modes = document.createElement("div");
-  modes.id = "adventure-mode-menu";
-  modes.className = "adventure-mode-menu";
-  modes.setAttribute("role", "menu");
-  modes.setAttribute("aria-label", "Chọn chế độ");
-  modes.hidden = true;
-  for (const mode of GAME_MODES) {
-    const option = button(mode.label, "adventure-mode-option");
-    option.dataset.mode = mode.id;
-    option.setAttribute("role", "menuitemradio");
-    option.tabIndex = -1;
-    modes.append(option);
+  root.querySelector(".adventure-header").insertBefore(title, root.querySelector(".adventure-account"));
+  const specials = document.createElement("nav");
+  specials.className = "adventure-special-modes";
+  specials.setAttribute("aria-label", "Chế độ đặc biệt");
+  for (const mode of GAME_MODES.filter(mode => !isNormalAdventureMode(mode.id))) {
+    const control = button("", "adventure-special-mode");
+    control.dataset.specialMode = mode.id;
+    control.setAttribute("aria-label", mode.label);
+    control.append(createIcon(mode.id === "endless" ? "infinity" : "energy"));
+    const label = document.createElement("span"); label.textContent = mode.label;
+    control.append(label); specials.append(control);
+    scope.listen(control, "click", () => openSpecialMode(mode.id));
   }
-  selector.append(modeButton, modes);
-  root.querySelector(".adventure-footer").prepend(selector);
-  function closeModes(focus = false) {
-    modes.hidden = true; modeButton.setAttribute("aria-expanded", "false");
-    if (focus) modeButton.focus();
+  body.append(specials);
+  function setBusy(busy) {
+    loading = busy;
+    for (const control of specials.children) control.disabled = busy;
+    for (const control of document.querySelectorAll('#adventure-level-modal input')) control.disabled = busy;
+    if (busy) body.setAttribute("aria-busy", "true");
+    else body.removeAttribute("aria-busy");
   }
-  function showModes() {
-    modes.hidden = false; modeButton.setAttribute("aria-expanded", "true");
-    (modes.querySelector('[aria-checked="true"]') || modes.firstElementChild).focus();
-  }
-  scope.listen(modeButton, "click", () => modes.hidden ? showModes() : closeModes());
-  scope.listen(modeButton, "keydown", event => {
-    if (!["ArrowDown", "ArrowUp"].includes(event.key)) return;
-    event.preventDefault(); event.stopPropagation(); showModes();
-  });
-  scope.listen(document, "pointerdown", event => { if (!selector.contains(event.target)) closeModes(); });
-  scope.listen(selector, "focusout", event => { if (!selector.contains(event.relatedTarget)) closeModes(); });
-  scope.listen(modes, "click", event => {
-    const option = event.target.closest("[data-mode]");
-    if (!option || loading) return;
-    closeModes(true);
-    if (!isNormalAdventureMode(option.dataset.mode)) { openSpecialMode(option.dataset.mode); return; }
-    view.mode = option.dataset.mode; patchNodes();
-  });
-  scope.listen(selector, "keydown", event => {
-    if (event.key === "Escape") { closeModes(true); return; }
-    if (modes.hidden || !["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) return;
-    event.preventDefault();
-    const items = [...modes.children];
-    const index = items.indexOf(document.activeElement);
-    const target = event.key === "Home" ? 0 : event.key === "End" ? items.length - 1 : (index + (event.key === "ArrowDown" ? 1 : items.length - 1)) % items.length;
-    items[target].focus();
-  });
   let chapterGeneration = 0;
   let renderedNodes = [];
   let loading = false;
   let adjacentBest = {};
   let adjacentChests = {};
+  let adjacentStarted = {};
   let extraLevels = [];
   let topLevel = view.chapter * 100;
   let bottomLevel = topLevel - 99;
@@ -153,27 +125,22 @@ export function mountAdventureMap(gameId) {
         control.setAttribute("aria-label", `Rương ${node.chestNumber}, ${element.detail.textContent}`);
       }
     });
-    for (const tab of modes.children) {
-      const selected = tab.dataset.mode === view.mode;
-      tab.setAttribute("aria-checked", String(selected));
-    }
-    modeButton.textContent = `Chế độ: ${getGameModeLabel(view.mode)} ▾`;
+
   }
 
   async function renderChapter() {
     const generation = ++chapterGeneration;
-    loading = true;
+    setBusy(true);
     root.dataset.mapReady = "false";
-    body.setAttribute("aria-busy", "true");
-    modeButton.disabled = true;
     if (!await prepareAdventureChapter(gameId, view.chapter, () => scope.active && generation === chapterGeneration)) return;
     const neighbors = [view.chapter - 1, view.chapter + 1].filter(chapter => chapter >= 1 && chapter <= profile.adventure.currentChapter);
     const records = await Promise.all(neighbors.map(chapter => loadPersistentChapter(game.progressKey, chapter)));
     if (!scope.active || generation !== chapterGeneration) return;
-    adjacentBest = {}; adjacentChests = {}; extraLevels = [];
+    adjacentBest = {}; adjacentChests = {}; adjacentStarted = {}; extraLevels = [];
     neighbors.forEach((chapter, index) => {
       Object.assign(adjacentBest, records[index].bestByLevel);
       Object.assign(adjacentChests, records[index].claimedChests);
+      Object.assign(adjacentStarted, records[index].startedLevels);
       const first = chapter < view.chapter ? chapter * 100 - 4 : (chapter - 1) * 100 + 1;
       for (let level = first; level < first + 5; level += 1) extraLevels.push(level);
     });
@@ -219,12 +186,18 @@ export function mountAdventureMap(gameId) {
       cell.style.top = `${point.y - (node.kind === "level" ? 22 : 32)}px`;
       cell.style.left = `${point.x / 4}%`;
       cell.classList.toggle("adventure-map-cell--chest", node.kind === "chest");
-      const control = button(node.kind === "level" ? String(node.level) : "", `adventure-map-node adventure-map-node--${node.kind}`);
+      const control = button("", `adventure-map-node adventure-map-node--${node.kind}`);
       const stars = document.createElement("span");
       stars.className = "adventure-map-stars";
       const detail = document.createElement("small");
       detail.className = "adventure-map-detail";
-      if (node.kind === "level") control.dataset.level = String(node.level);
+      if (node.kind === "level") {
+        control.dataset.level = String(node.level);
+        const number = document.createElement("span"); number.className = "adventure-level-number";
+        number.textContent = String(node.level);
+        number.style.fontSize = `${Math.min(15, 52 / number.textContent.length)}px`;
+        control.append(number);
+      }
       else {
         control.dataset.chest = String(node.chestNumber);
         const art = document.createElement("span");
@@ -237,8 +210,7 @@ export function mountAdventureMap(gameId) {
       renderedNodes.push({ node, control, stars, detail });
     });
     root.dataset.mapChapter = String(view.chapter);
-    modeButton.disabled = false;
-    loading = false;
+    setBusy(false);
     patchNodes();
     body.removeAttribute("aria-busy");
     root.dataset.mapReady = "true";
@@ -252,21 +224,62 @@ export function mountAdventureMap(gameId) {
     else scroll.scrollTop = view.scroll;
   }
 
-  async function launch(mode, level) {
+  async function launch(mode, level, { skipIntro = false } = {}) {
     if (!scope.active || loading || !canLaunchGame()) return false;
-    loading = true;
-    modeButton.disabled = true;
-    body.setAttribute("aria-busy", "true");
-    try { return await adapter.launch({ mode, level }); }
+    setBusy(true);
+    try { return await adapter.launch({ mode, level, skipIntro }); }
     catch (error) {
       console.error("Level launch failed", error);
       if (scope.active) showAppToast("Chưa mở được màn chơi. Hãy thử lại.");
       return false;
     } finally {
-      if (scope.active) { loading = false; modeButton.disabled = false; body.removeAttribute("aria-busy"); }
+      if (scope.active) setBusy(false);
     }
   }
-  function openLevel(level) { return launch(view.mode, level); }
+  function openLevel(level) {
+    const content = document.createElement("div");
+    content.className = "adventure-level-preview";
+    const goal = document.createElement("p"); goal.className = "adventure-level-goal";
+    goal.textContent = adapter.goal;
+    const choices = document.createElement("fieldset"); choices.className = "adventure-level-modes";
+    const legend = document.createElement("legend"); legend.textContent = "Chọn độ khó";
+    choices.append(legend);
+    for (const [index, mode] of GAME_MODES.filter(mode => isNormalAdventureMode(mode.id)).entries()) {
+      const label = document.createElement("label");
+      label.dataset.grade = ["C", "B", "A", "S"][index]; label.title = mode.label;
+      const input = document.createElement("input");
+      input.type = "radio"; input.name = "adventure-level-mode"; input.value = mode.id;
+      input.checked = mode.id === view.mode;
+      input.setAttribute("aria-label", mode.label);
+      const text = document.createElement("span"); text.textContent = label.dataset.grade;
+      label.append(input, text); choices.append(label);
+    }
+    const details = document.createElement("ul"); details.className = "adventure-level-details";
+    details.setAttribute("aria-live", "polite");
+    function updatePreview() {
+      const info = adapter.preview({ mode: view.mode, level, startedLevels: { ...adjacentStarted, ...profile.startedLevels } });
+      const theme = getTheme(getEquippedThemeId(gameState.appearance, gameId));
+      details.replaceChildren(...[
+        `Thời gian: ${info.timeSeconds} giây`,
+        `Mục tiêu: ${info.target}`,
+        `Gợi ý: ${info.hints}${info.assistNote ? ` · ${info.assistNote}` : ""}`,
+        `Chủ đề: ${theme.title}`,
+      ].map(text => { const row = document.createElement("li"); row.textContent = text; return row; }));
+    }
+    updatePreview(); content.append(choices, goal, details);
+    const release = scope.listen(choices, "change", event => {
+      if (loading || !isNormalAdventureMode(event.target.value)) return;
+      view.mode = event.target.value; patchNodes(); updatePreview();
+      modal.panel.querySelector(".app-modal__title").lastChild.textContent = `Màn ${level} · ${getGameModeLabel(view.mode)}`;
+      modal.panel.setAttribute("aria-label", `${game.title} · Màn ${level} · ${getGameModeLabel(view.mode)}`);
+    });
+    const modal = openAppModal({ id: "adventure-level-modal", title: `Màn ${level} · ${getGameModeLabel(view.mode)}`, content, owner: scope,
+      onDestroy: release,
+      actions: [{ label: "Chơi", variant: "primary", onClick: async () => await launch(view.mode, level, { skipIntro: true }) ? undefined : false }],
+    });
+    modal.panel.classList.add("adventure-level-dialog");
+    modal.panel.setAttribute("aria-label", `${game.title} · Màn ${level} · ${getGameModeLabel(view.mode)}`);
+  }
   function openSpecialMode(mode) { return launch(mode, 1); }
 
   function openChest(node) {
@@ -325,7 +338,7 @@ export function mountAdventureMap(gameId) {
     else if (y < touchY && scroll.scrollHeight - scroll.clientHeight - scroll.scrollTop < 2) changeChapter(-1, true);
     touchY = null;
   }, { passive: true });
-  scope.own(() => { if (!loading) view.scroll = scroll.scrollTop; renderedNodes = []; adjacentBest = {}; adjacentChests = {}; extraLevels = []; });
+  scope.own(() => { if (!loading) view.scroll = scroll.scrollTop; renderedNodes = []; adjacentBest = {}; adjacentChests = {}; adjacentStarted = {}; extraLevels = []; });
   void renderChapter().catch(error => { if (scope.active) { console.error("Map load failed", error); showAppToast("Chưa tải được bản đồ. Hãy tải lại trang."); } });
   return root;
 }

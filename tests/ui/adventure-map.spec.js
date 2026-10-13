@@ -1,12 +1,116 @@
+import { previewMapLevel, startMapLevel, closeLevelPreview } from './helpers/adventureNavigation.js';
 import { expect, test } from "@playwright/test";
+
+test('home and map keep the account at right with a centered glyph in every cloud state', async ({ page }) => {
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.goto('/');
+  await expect(page.locator('.game-selector__choice')).toHaveCount(3);
+  async function verify() {
+    await expect(page.locator('.adventure-wallet')).toHaveCount(0);
+    for (const phase of ['connecting', 'offline', 'synced']) {
+      const geometry = await page.evaluate(async phase => {
+        (await import('/js/appNavigation.js')).refreshAppAccount({ phase });
+        const button = document.querySelector('.adventure-account'), icon = button.querySelector('svg');
+        const rect = button.getBoundingClientRect(), glyph = icon.getBoundingClientRect(), header = button.parentElement.getBoundingClientRect(), drawing = icon.getBBox();
+        return { x: rect.x, headerCenter: header.left + header.width / 2, dx: Math.abs(glyph.left + glyph.width / 2 - rect.left - rect.width / 2), dy: Math.abs(glyph.top + glyph.height / 2 - rect.top - rect.height / 2), drawingX: drawing.x + drawing.width / 2, drawingY: drawing.y + drawing.height / 2 };
+      }, phase);
+      expect(geometry.x).toBeGreaterThan(geometry.headerCenter);
+      expect(geometry.dx).toBeLessThan(1); expect(geometry.dy).toBeLessThan(1);
+      expect(geometry.drawingX).toBe(12); expect(geometry.drawingY).toBe(12);
+    }
+  }
+  await verify();
+  await page.screenshot({ path: '.firebase/home-profile-right.png' });
+  await page.locator('.adventure-account').click();
+  await expect(page.locator('#account-modal')).toBeVisible();
+  await page.locator('#account-modal .app-modal__close').click();
+  await expect(page.locator('#account-modal')).toHaveCount(0);
+  await page.evaluate(async () => (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('memory-match'));
+  await verify();
+  const before = await page.locator('.adventure-account').boundingBox();
+  await page.locator('.adventure-map-scroll').evaluate(scroll => { scroll.scrollTop = 0; });
+  expect(await page.locator('.adventure-account').boundingBox()).toEqual(before);
+  await page.locator('.adventure-home').click();
+  await expect(page.locator('.game-selector__choice')).toHaveCount(3);
+  await verify();
+});
+
+test('level submission locks difficulty and rejects repeated clicks until the launch settles', async ({ page }) => {
+  await page.goto('/');
+  await page.evaluate(async () => {
+    window.__launchCount = 0;
+    (await import('/js/adventureMap.js')).configureAdventureMap({ adapters: { 'memory-match': {
+      goal: 'Ghép hết các cặp thẻ.', preview: () => ({ timeSeconds: 60, target: '6 cặp · 12 thẻ', hints: 3, assistNote: '' }),
+      launch: () => { window.__launchCount++; return new Promise(resolve => { window.__finishLaunch = resolve; }); },
+    } } });
+    await (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('memory-match');
+  });
+  await previewMapLevel(page);
+  const play = page.locator('#adventure-level-modal').getByRole('button', { name: 'Chơi', exact: true });
+  await play.click();
+  await expect(play).toBeDisabled();
+  await expect(page.getByRole('radio', { name: 'Khó', exact: true })).toBeDisabled();
+  await play.evaluate(button => { button.click(); button.click(); });
+  expect(await page.evaluate(() => window.__launchCount)).toBe(1);
+  await page.evaluate(() => window.__finishLaunch(false));
+  await expect(play).toBeEnabled();
+  await expect(page.getByRole('radio', { name: 'Dễ', exact: true })).toBeEnabled();
+  await closeLevelPreview(page);
+});
+
+for (const [gameId, progressKey] of [['memory-match', 'memoryMatch'], ['link-connect', 'linkConnect'], ['triple-connect', 'tripleConnect']]) {
+  test(`${gameId} centers multi-digit levels and previews separate difficulty records`, async ({ page }) => {
+    await page.setViewportSize({ width: 412, height: 915 });
+    await page.addInitScript(key => {
+      const bestByLevel = Object.fromEntries(Array.from({ length: 99 }, (_, i) => [`easy:${i + 1}`, { stars: 2, score: 120, durationMs: 2000 }]));
+      bestByLevel['hard:1'] = { stars: 1, score: 250, durationMs: 1500 };
+      localStorage.setItem('memoryMatchSave', JSON.stringify({ formatVersion: 1, revision: 1, data: { coins: 0, progress: { [key]: { bestByLevel } }, settings: {}, appearance: {} } }));
+    }, progressKey);
+    await page.goto('/');
+    await page.evaluate(async id => (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu(id), gameId);
+    for (const level of [1, 10, 99, 100]) {
+      const bounds = await page.locator(`[data-level="${level}"]`).evaluate(button => {
+        const node = button.getBoundingClientRect(), label = button.firstElementChild.getBoundingClientRect();
+        return { dx: Math.abs(label.left + label.width / 2 - node.left - node.width / 2), dy: Math.abs(label.top + label.height / 2 - node.top - node.height / 2), fits: label.left >= node.left && label.right <= node.right, width: node.width };
+      });
+      expect(bounds.dx).toBeLessThan(1); expect(bounds.dy).toBeLessThan(1);
+      expect(bounds.fits).toBe(true); expect(bounds.width).toBe(44);
+    }
+    await expect(page.locator('[data-level="100"]')).toBeInViewport();
+    await previewMapLevel(page, 1, 'easy');
+    await expect(page.locator('.adventure-level-modes label')).toHaveText(['C', 'B', 'A', 'S']);
+    await expect(page.locator('#adventure-level-modal .app-modal__title')).toHaveText('Màn 1 · Dễ');
+    await expect(page.locator('.adventure-level-details')).toContainText('Thời gian:');
+    await expect(page.locator('.adventure-level-result, .adventure-level-stars')).toHaveCount(0);
+    await page.getByRole('radio', { name: 'Khó', exact: true }).check();
+    await expect(page.locator('#adventure-level-modal .app-modal__title')).toHaveText('Màn 1 · Khó');
+    await expect(page.locator('.adventure-level-details')).toContainText('Mục tiêu:');
+    await closeLevelPreview(page);
+  });
+  for (const mode of ['easy', 'normal', 'superHard']) {
+    test(`${gameId} launches ${mode} only after confirming the level preview`, async ({ page }) => {
+      await page.goto('/');
+      await page.evaluate(async id => (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu(id), gameId);
+      await previewMapLevel(page, 1, mode);
+      await expect(page.locator('.adventure-map-page')).toBeVisible();
+      await page.locator('#adventure-level-modal').getByRole('button', { name: 'Chơi', exact: true }).click();
+      await expect.poll(() => page.evaluate(async ({ gameId, mode }) => {
+        const session = (await import('/js/sessionProgress.js')).getActiveSession(gameId, mode);
+        return session ? { mode: session.mode, level: session.level } : null;
+      }, { gameId, mode })).toEqual({ mode, level: 1 });
+      await expect(page.locator('#adventure-level-modal')).toHaveCount(0);
+      await expect(page.locator('.level-reward-overlay')).toHaveCount(0);
+      await expect(page.locator('.game-shell-root:visible')).not.toHaveAttribute('data-shell-startup', /.+/);
+    });
+  }
+}
 
 for (const gameId of ['memory-match', 'link-connect', 'triple-connect']) {
   for (const mode of ['endless', 'challenge']) {
-    test(`${gameId} selects ${mode} from the same menu and starts at level 1`, async ({ page }) => {
+    test(`${gameId} selects ${mode} from its fixed button and starts at level 1`, async ({ page }) => {
       await page.goto('/');
       await page.evaluate(async id => (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu(id), gameId);
-      await page.locator('.adventure-mode-toggle').click();
-      await page.locator(`[data-mode="${mode}"]`).click();
+      await page.locator(`[data-special-mode="${mode}"]`).click();
       await expect.poll(() => page.evaluate(async ({ gameId, mode }) => {
         const session = (await import('/js/sessionProgress.js')).getActiveSession(gameId, mode);
         return session ? { mode: session.mode, level: session.level } : null;
@@ -47,43 +151,59 @@ for (const [gameId, title, progressKey] of [['memory-match', 'Memory Match', 'me
       expect(scenery.width).toBeGreaterThan(0);
       expect(scenery.pointerEvents).toBe('none');
       expect(await page.locator('.adventure-map-path path').first().evaluate(el => Number.parseFloat(getComputedStyle(el).strokeWidth))).toBeLessThan(15);
-      await page.locator('.adventure-mode-toggle').click();
-      await expect(page.locator('.adventure-mode-option')).toHaveCount(6);
-      await page.locator('[data-mode="hard"]').click();
-      await expect(page.locator('.adventure-mode-menu')).toBeHidden();
-      await expect(page.locator('.adventure-mode-toggle')).toContainText('Khó');
+      await expect(page.locator('.adventure-mode-toggle, .adventure-wallet')).toHaveCount(0);
+      const home = await page.locator('.adventure-home').boundingBox();
+      const account = await page.locator('.adventure-account').boundingBox();
+      expect(home.x).toBeLessThan(account.x);
+      const fixed = await page.locator('.adventure-special-modes').boundingBox();
       await page.locator('.adventure-map-scroll').evaluate(el => { el.scrollTop = 0; });
+      const afterScroll = await page.locator('.adventure-special-modes').boundingBox();
+      expect(afterScroll).toEqual(fixed);
+      await page.locator('[data-level="7"]').scrollIntoViewIfNeeded();
+      await previewMapLevel(page, 7, 'hard');
+      await expect(page.locator('.adventure-level-modes label')).toHaveText(['C', 'B', 'A', 'S']);
+      await expect(page.locator('.adventure-level-details')).toContainText('Gợi ý:');
+      if (viewport.width === 412) await page.screenshot({ path: `.firebase/level-preview-${gameId}.png` });
+      await closeLevelPreview(page);
       await page.locator('[data-dock-action="settings"]').click();
-      await page.getByRole('button', { name: 'Trang chủ', exact: true }).click();
+      await expect(page.locator('#settings-modal').getByRole('button', { name: 'Trang chủ', exact: true })).toHaveCount(0);
+      await page.locator('#settings-modal .app-modal__close').click();
+      await expect(page.locator('#settings-modal')).toHaveCount(0);
+      await page.locator('.adventure-home').click();
       await expect(page.locator('.game-selector__choice')).toHaveCount(3);
+      await expect(page.locator('.adventure-wallet')).toHaveCount(0);
       await page.evaluate(async id => (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu(id), gameId);
       await expect(page.locator('[data-level="7"]')).toBeInViewport();
-      await expect(page.locator('.adventure-mode-toggle')).toContainText('Khó');
+      await previewMapLevel(page, 7);
+      await expect(page.locator('#adventure-level-modal input[value="hard"]')).toBeChecked();
+      await closeLevelPreview(page);
       if (viewport.width === 412) await page.screenshot({ path: `.firebase/refined-${gameId}.png` });
-      await page.locator('[data-level="7"]').click();
+      await startMapLevel(page, 7);
       await expect(page.locator('.adventure-map-page')).toHaveCount(0);
       await expect(page.locator('#adventure-level-modal')).toHaveCount(0);
+      await expect(page.locator('.level-reward-overlay')).toHaveCount(0);
+      await expect(page.locator('.game-shell-root:visible')).not.toHaveAttribute('data-shell-startup', /.+/);
     });
   }
 }
 
-test('mode menu supports keyboard, escape and outside dismissal; special modes enter new rounds directly', async ({ page }) => {
+test('level preview supports native keyboard choices, escape/focus restoration and bounded modal ownership', async ({ page }) => {
   await page.goto('/');
   await page.evaluate(async () => (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('triple-connect'));
-  const toggle = page.locator('.adventure-mode-toggle');
-  await toggle.focus(); await page.keyboard.press('ArrowDown');
-  await expect(page.locator('[data-mode="easy"]')).toBeFocused();
-  await page.keyboard.press('End');
-  await expect(page.locator('[data-mode="challenge"]')).toBeFocused();
-  await page.keyboard.press('Escape');
-  await expect(toggle).toBeFocused();
-  await expect(toggle).toHaveAttribute('aria-expanded', 'false');
-  await toggle.click(); await page.locator('.adventure-map-title').click();
-  await expect(page.locator('.adventure-mode-menu')).toBeHidden();
-  await toggle.click(); await page.locator('[data-mode="challenge"]').click();
+  const baseline = await page.evaluate(async () => (await import('/js/appPageLifecycle.js')).getAppPageScope().diagnostics());
+  for (let index = 0; index < 12; index++) {
+    await previewMapLevel(page);
+    await page.getByRole('radio', { name: 'Dễ', exact: true }).focus();
+    await page.keyboard.press('ArrowRight');
+    await expect(page.getByRole('radio', { name: 'Trung bình', exact: true })).toBeChecked();
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#adventure-level-modal')).toHaveCount(0);
+    await expect(page.locator('[data-level="1"]')).toBeFocused();
+  }
+  expect(await page.evaluate(async () => (await import('/js/appPageLifecycle.js')).getAppPageScope().diagnostics())).toEqual(baseline);
+  await page.locator('[data-special-mode="challenge"]').click();
   await expect(page.locator('#triple-round-start-modal')).toContainText('Thử thách');
   await expect(page.locator('[data-triple-level]')).toHaveText('1');
-  await expect(page.locator('#adventure-special-modal')).toHaveCount(0);
 });
 
 test("chapter nodes stay mounted on mode changes, shared clear stays distinct from mode stars and chests claim once", async ({ page }) => {
@@ -114,8 +234,8 @@ test("chapter nodes stay mounted on mode changes, shared clear stays distinct fr
     window.__mapNode = document.querySelector('[data-level="1"]');
     window.__mapScroll = document.querySelector(".adventure-map-scroll").scrollTop;
   });
-  await page.locator('.adventure-mode-toggle').click();
-  await page.locator('[data-mode="hard"]').click();
+  await previewMapLevel(page, 11, 'hard');
+  await closeLevelPreview(page);
   expect(await page.evaluate(() => document.querySelector('[data-level="1"]') === window.__mapNode)).toBe(true);
   expect(await page.locator('[data-level="1"]').getAttribute("aria-label")).toContain("0 sao");
   expect(await page.locator('[data-level="1"]').getAttribute("class")).toContain("is-cleared");

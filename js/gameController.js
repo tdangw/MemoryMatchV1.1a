@@ -81,8 +81,8 @@ export function configureGameController(actions) {
   navigation = { ...navigation, ...actions };
 }
 
-export function startNewMemoryRun(level = 1) {
-  return initializeLevel(level, { reason: "new" });
+export function startNewMemoryRun(level = 1, { skipIntro = false } = {}) {
+  return initializeLevel(level, { reason: "new", skipIntro });
 }
 
 export function continueMemorySession(session) {
@@ -97,7 +97,7 @@ export function restartMemoryLevel() {
   return initializeLevel(gameState.currentLevel, { reason: "restart", session });
 }
 
-export function initializeLevel(level, { reason = "new", session = null } = {}) {
+export function initializeLevel(level, { reason = "new", session = null, skipIntro = false } = {}) {
   if (!canLaunchGame()) return null;
   const requestedMode = gameState.settings.mode || "easy";
   const requestedModeLayout = getModeLayout(requestedMode);
@@ -197,7 +197,7 @@ export function initializeLevel(level, { reason = "new", session = null } = {}) 
   updateComboDisplay(gameState.combo);
   updateTimerDisplay(gameState.remainingTime);
   setMemoryTimeProgress({ remainingSeconds: gameState.remainingTime, timeLimit: gameState.timeLimit });
-  showLevelRewardOverlay();
+  if (!skipIntro) showLevelRewardOverlay();
   await startup.phase('images', () => startup.decodeBoard());
   startup.check();
   beginRankedAttempt("memory-match", mode, level, { reason, savedRun: session?.run });
