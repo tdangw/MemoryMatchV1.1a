@@ -1,9 +1,9 @@
 import { expect, test } from "@playwright/test";
 
 const games = [
-  { id: "memory-match", trigger: "#btn-actions-menu", tools: "#memory-tools-toggle", panel: "#game-actions-menu", toolPanel: "#memory-tools-menu" },
-  { id: "link-connect", trigger: "#link-actions-menu-toggle", tools: "#link-tools-toggle", panel: "#link-actions-menu", toolPanel: "#link-tools-menu" },
-  { id: "triple-connect", trigger: "#triple-actions-menu-toggle", tools: "#triple-tools-toggle", panel: "#triple-actions-menu", toolPanel: "#triple-tools-menu" },
+  { id: "memory-match", trigger: "#btn-actions-menu", tools: "#memory-tools-toggle", toolPanel: "#memory-tools-menu" },
+  { id: "link-connect", trigger: "#link-actions-menu-toggle", tools: "#link-tools-toggle", toolPanel: "#link-tools-menu" },
+  { id: "triple-connect", trigger: "#triple-actions-menu-toggle", tools: "#triple-tools-toggle", toolPanel: "#triple-tools-menu" },
 ];
 
 async function start(page, id) {
@@ -27,15 +27,17 @@ for (const game of games) test(`${game.id}: menu exclusion, ARIA, dismissal and 
   const assertOpen = async (actions, tools) => {
     await expect(page.locator(game.trigger)).toHaveAttribute("aria-expanded", String(actions));
     await expect(page.locator(game.tools)).toHaveAttribute("aria-expanded", String(tools));
-    await expect(page.locator(game.panel))[actions ? "toBeVisible" : "toBeHidden"]();
+    if (actions) await expect(page.locator('#game-exit-modal')).toBeVisible();
+    else await expect(page.locator('#game-exit-modal')).toHaveCount(0);
     await expect(page.locator(game.toolPanel))[tools ? "toBeVisible" : "toBeHidden"]();
-    expect(await page.locator(game.trigger).evaluate(node => node.classList.contains("is-open"))).toBe(actions);
     expect(await page.locator(game.tools).evaluate(node => node.classList.contains("is-open"))).toBe(tools);
   };
   await page.locator(game.tools).click();
   await assertOpen(false, true);
   await page.locator(game.trigger).click();
   await assertOpen(true, false);
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#game-exit-modal')).toHaveCount(0);
   await page.locator(game.tools).click();
   await assertOpen(false, true);
   await page.locator(game.tools).click();
@@ -53,8 +55,8 @@ for (const game of games) test(`${game.id}: menu exclusion, ARIA, dismissal and 
   await page.evaluate(async () => {
     const { activeShell } = (await import("/js/gameShell/gameShell.js")).getGameShellDiagnostics();
     window.menuPreviousScope = activeShell.scope;
-    activeShell.root.querySelector('.game-actions-menu button').click();
   });
+  await page.locator('#game-exit-modal').getByRole('button', { name: 'Chơi lại', exact: true }).click();
   await expect.poll(() => page.evaluate(async () => {
     const { activeShell } = (await import("/js/gameShell/gameShell.js")).getGameShellDiagnostics();
     return Boolean(activeShell?.scope.active && activeShell.scope !== window.menuPreviousScope);
@@ -62,15 +64,13 @@ for (const game of games) test(`${game.id}: menu exclusion, ARIA, dismissal and 
   await page.evaluate(() => { delete window.menuPreviousScope; });
   await assertOpen(false, false);
   await page.emulateMedia({ reducedMotion: "no-preference" });
-  await page.evaluate(game => {
-    for (let index = 0; index < 30; index++) {
-      document.querySelector(game.tools).click();
-      document.querySelector(game.trigger).click();
-      if (!document.querySelector(game.toolPanel).hidden || document.querySelector(game.panel).hidden) throw new Error("Rapid menu state drifted");
-    }
-  }, game);
-  await assertOpen(true, false);
-  await page.keyboard.press("Escape");
+  for (let index = 0; index < 10; index++) {
+    await page.locator(game.tools).click();
+    await page.locator(game.trigger).click();
+    await assertOpen(true, false);
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#game-exit-modal')).toHaveCount(0);
+  }
   await assertOpen(false, false);
 });
 
@@ -105,12 +105,12 @@ test("20 cycles per game of mount, restart, switch release HUD listeners and ref
         if (count !== baseline[game.id].count || nodes !== baseline[game.id].nodes) throw new Error(`HUD resources grew: ${game.id}`);
         document.querySelector(game.tools).click();
         document.querySelector(game.trigger).click();
-        if (!document.querySelector(game.toolPanel).hidden || document.querySelector(game.panel).hidden) throw new Error("Menu exclusion failed");
+        if (!document.querySelector(game.toolPanel).hidden || !document.querySelector('#game-exit-modal')) throw new Error("Menu exclusion failed");
         if (restart === 0) {
           active.scope.dispose();
           disposed.push(active.scope.diagnostics());
           document.querySelector(game.trigger).click();
-          if (!document.querySelector(game.panel).hidden) throw new Error("Disposed menu listener remains");
+          if (document.querySelector('#game-exit-modal')) throw new Error("Disposed menu listener remains");
         }
         previous = active;
       }

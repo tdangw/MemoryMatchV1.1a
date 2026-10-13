@@ -27,6 +27,7 @@ import {
   configureLinkController,
   openLinkPanel,
   startLinkLevel,
+  runLinkGameAction,
 } from "./linkConnect/linkController.js";
 import {
   clearConnectionV2,
@@ -40,7 +41,6 @@ import { configureSettings, showSettingsPanel } from "./settings.js";
 import { openQuickAssistOverlay, openShopOverlay } from "./shop.js";
 import {
   showResetConfirmationOverlay,
-  showReturnToMenuOverlay,
   updateMemoryAssistInventoryDisplay,
 } from "./ui.js";
 import { showAppToast, openAppModal } from "./modal.js";
@@ -57,8 +57,6 @@ import {
   configureGameController,
   handleHintClick,
   continueMemorySession,
-  restartMemoryLevel,
-  returnToMainMenu,
   startNewMemoryRun,
 } from "./gameController.js";
 import { registerProgressiveWebApp } from "./pwa.js";
@@ -67,6 +65,7 @@ import {
   configureTripleConnectController,
   openTripleModal,
   startTripleConnectRound,
+  runTripleGameAction,
 } from "./tripleConnect/tripleController.js";
 import {
   TRIPLE_CONNECT_HELP_CONTENT,
@@ -77,6 +76,26 @@ document.documentElement.dataset.buildTarget =
 
 // Entry point: nạp dữ liệu đã lưu và nối các module qua callback.
 registerProgressiveWebApp();
+function showMemoryHelp() {
+  showGameInfoModal(
+    "Cách chơi",
+    `<ul class="app-feature-list">
+        <li>Lật hai thẻ để tìm cặp hình giống nhau.</li>
+        <li>Ghép hết các cặp trước khi thời gian kết thúc.</li>
+        <li>Ghép đúng liên tiếp để tạo Combo và nhận thêm thời gian.</li>
+        <li>Ghép thẻ đặc biệt để thu thập năng lượng và nhận hỗ trợ.</li>
+        <li>Vật phẩm Thời gian và Xem trước mua ở cửa hàng sẽ được cất vào kho trên HUD.</li>
+      </ul>`,
+    "book",
+  );
+}
+function runMemoryGameAction(action) {
+  if (action === 'settings') return showSettingsPanel(true, () => {}, { onHelp: showMemoryHelp, onReset: () => showResetConfirmationOverlay({}) });
+  if (action === 'shop') return openShopOverlay({ fromMenu: false, gameId: 'memory-match' });
+  if (action === 'collection') return showCollectionModal({ fromGame: true, gameId: 'memory-match' });
+  throw new RangeError('Unsupported Memory navigation action.');
+}
+
 async function initializeApplication() {
 let accountRuntime = null;
 let accountReady = null;
@@ -104,7 +123,7 @@ configureMainMenu({
   startGame: startNewMemoryRun,
   continueGame: continueMemorySession,
 });
-configureSettings({ onCloseMenu: createActiveGameMenu });
+configureSettings({ onCloseMenu: createActiveGameMenu, onHelp: () => showGameInfoModal('Hướng dẫn', '<p>Chọn một trò và màn chơi, chọn độ khó rồi bấm Chơi. Memory Match rèn trí nhớ bằng ghép cặp; Link Connect nối cặp hình; Triple Connect ghép bộ ba và quản lý khay.</p>', 'book'), onReset: () => showResetConfirmationOverlay({}) });
 configureAppNavigation({
   home: showGameSelector,
   account: async () => {
@@ -127,12 +146,8 @@ configureAppNavigation({
       return open(() => { if (scope.active) gameState.isPaused = paused; });
     }
     if (playing) {
-      const selectors = {
-        'memory-match': { shop: '#btn-shop', collection: '#btn-game-collection', settings: '#btn-game-settings' },
-        'link-connect': { shop: '[data-action="shop"]', collection: '[data-action="collection"]', settings: '[data-action="settings"]' },
-        'triple-connect': { shop: '[data-triple-action="shop"]', collection: '[data-triple-action="collection"]', settings: '[data-triple-action="settings"]' },
-      };
-      return root.querySelector(selectors[gameId][action]).click();
+      const actionHandlers = { 'memory-match': runMemoryGameAction, 'link-connect': runLinkGameAction, 'triple-connect': runTripleGameAction };
+      return actionHandlers[gameId](action);
     }
     if (action === 'settings') return showSettingsPanel();
     const open = id => action === 'shop' ? openShopOverlay({ gameId: id, fromMenu: true, onClose: refreshAppWallet }) : showCollectionModal({ gameId: id, onClose: refreshAppWallet });
@@ -153,7 +168,7 @@ configureTripleConnectController({
     (await showCollectionModal({ fromGame: true, gameId: "triple-connect", onClose })),
   showShop: async (onClose) =>
     (await openShopOverlay({ fromMenu: false, gameId: "triple-connect", onClose })),
-  showSettings: (onClose) => showSettingsPanel(true, onClose),
+  showSettings: (onClose) => showSettingsPanel(true, onClose, { onHelp: () => runTripleGameAction("help"), onReset: () => runTripleGameAction("reset") }),
   showHelp: (onClose) =>
     showGameInfoModal(
       "Cách chơi Triple Connect",
@@ -161,7 +176,7 @@ configureTripleConnectController({
       "book",
       onClose,
     ),
-  showReset: () => showResetConfirmationOverlay({}),
+  showReset: (onClose) => showResetConfirmationOverlay({ onClose }),
 });
 configureLinkController({
   showMenu: () => openGameMenu("link-connect"),
@@ -179,7 +194,7 @@ configureLinkController({
       linkConnect: true,
       onClose,
     })),
-  showSettings: (onClose) => showSettingsPanel(true, onClose),
+  showSettings: (onClose) => showSettingsPanel(true, onClose, { onHelp: () => runLinkGameAction("help"), onReset: () => runLinkGameAction("reset") }),
   showReset: (onClose) => showResetConfirmationOverlay({ onClose }),
 });
 unlockSound();
@@ -269,37 +284,6 @@ if (new URLSearchParams(window.location.search).has("effect-performance")) {
   });
 }
 
-document
-  .getElementById("btn-game-settings")
-  ?.addEventListener("click", () => showSettingsPanel(true));
-document
-  .getElementById("btn-game-collection")
-  ?.addEventListener("click", async () => (await showCollectionModal({ fromGame: true })));
-document.getElementById("btn-shop")?.addEventListener("click", openShopOverlay);
-document.getElementById("btn-game-help")?.addEventListener("click", () =>
-  showGameInfoModal(
-    "Cách chơi",
-    `<ul class="app-feature-list">
-        <li>Lật hai thẻ để tìm cặp hình giống nhau.</li>
-        <li>Ghép hết các cặp trước khi thời gian kết thúc.</li>
-        <li>Ghép đúng liên tiếp để tạo Combo và nhận thêm thời gian.</li>
-        <li>Ghép thẻ đặc biệt để thu thập năng lượng và nhận hỗ trợ.</li>
-        <li>Vật phẩm Thời gian và Xem trước mua ở cửa hàng sẽ được cất vào kho trên HUD.</li>
-      </ul>`,
-    "book",
-  ),
-);
-document
-  .getElementById("btn-restart")
-  ?.addEventListener("click", restartMemoryLevel);
-document
-  .getElementById("btn-menu")
-  ?.addEventListener("click", () =>
-    showReturnToMenuOverlay({ onConfirm: returnToMainMenu }),
-  );
-document
-  .getElementById("btn-full-reset")
-  ?.addEventListener("click", showResetConfirmationOverlay);
 document.getElementById("btn-hint")?.addEventListener("click", handleHintClick);
 document
   .getElementById("btn-buy-time")

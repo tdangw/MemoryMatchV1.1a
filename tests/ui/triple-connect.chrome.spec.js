@@ -66,9 +66,11 @@ test("Triple HUD uses the shared contract and mutually exclusive menus", async (
     /linear-gradient/,
   );
   await page.locator("#triple-actions-menu-toggle").click();
-  await expect(page.locator("#triple-actions-menu")).toBeVisible();
+  await expect(page.locator('#game-exit-modal')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#game-exit-modal')).toHaveCount(0);
   await page.locator("#triple-tools-toggle").click();
-  await expect(page.locator("#triple-actions-menu")).toBeHidden();
+  await expect(page.locator('#game-exit-modal')).toHaveCount(0);
   await expect(page.locator("#triple-tools-menu")).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(page.locator("#triple-tools-menu")).toBeHidden();
@@ -153,9 +155,7 @@ test("Triple menu, start modal and timer follow the shared round contract", asyn
   await page.waitForTimeout(1100);
   await expect(timer).not.toHaveText(before || "01:00");
   await page.locator("#triple-actions-menu-toggle").click();
-  await expect(page.locator("#triple-actions-menu .game-action-item")).toHaveText([
-    "Chơi lại", "Menu", "Cài đặt", "Cửa hàng", "Bộ sưu tập", "Hướng dẫn", "Xóa dữ liệu",
-  ]);
+  await expect(page.locator('#game-exit-modal .app-modal__footer button')).toHaveText(['Thoát game', 'Chơi lại']);
 });
 
 test("Triple Continue resumes without replaying the start modal", async ({ page }) => {

@@ -114,3 +114,6 @@ Task hiện hành ADVENTURE_WEB_PLAN.md mục18: bản đồ bấm màn mở pre
 Điều chỉnh popup cuối mục18: dùng huy hiệu C/B/A/S, bỏ sao và lịch sử; tiêu đề Màn N · độ khó; goal/time/assist/theme lấy từ config thật. Chỉ bắt đầu map thường skip intro; Memory reveal, decode/commit gating và intro ở các lối vào khác vẫn giữ. Mục19 được người dùng giao tiếp: menu trên chỉ mở popup Exit/Restart, Help/Reset xuống Settings; footer gọi hành động controller thay click vào dropdown cũ. Thực hiện tuần tự và commit từng phần, chưa push/deploy.
 
 Mục18 hoàn tất, mục19 đang active: check/build và44 UI/startup pass; built3 pass; review độc lập không finding. Chưa nghiệm thu FPS máy thật; chưa push/deploy. Các commit tiếp theo tiếp tục popup thoát game và di chuyển Help/Reset vào Settings.
+
+2026-10-13: Mục19 đã hoàn tất (popup thoát/chơi lại và Help/Reset trong Cài đặt), check/build, regression và timer3 trò pass. Mục20 ADVENTURE_WEB_PLAN.md đang active theo yêu cầu mới: năm tab ngoài gameplay, toàn màn hình; gameplay ẩn dock; C/B/A/S nâu/xanh/vàng/tím; profile chuyển xuống tab giữa ở home, bản đồ giữa khi đã chọn trò; Home góc dưới phải ngoài gameplay.
+

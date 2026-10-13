@@ -22,9 +22,11 @@ const versionInfoButton = document.getElementById("version-info");
 const versionValue = document.getElementById("settings-version-value");
 
 let onCloseFromMenu = () => {};
+let navigation = {};
 
-export function configureSettings({ onCloseMenu } = {}) {
+export function configureSettings({ onCloseMenu, onHelp, onReset } = {}) {
   onCloseFromMenu = onCloseMenu || onCloseFromMenu;
+  navigation = { onHelp, onReset };
 }
 
 async function saveGameSetting(key, value) {
@@ -130,12 +132,13 @@ bindSettingsControls();
 if (versionValue) versionValue.textContent = APP_VERSION;
 versionInfoButton?.addEventListener("click", showVersionInfo);
 
-export function showSettingsPanel(fromGame = false, onClose = () => {}) {
+export function showSettingsPanel(fromGame = false, onClose = () => {}, actions = navigation) {
   if (!settingsContainer || !settingsHome) return;
 
   settingsContainer.style.display = "grid";
   gameState.isPaused = fromGame;
   syncSettingsControls();
+  let nextAction = null;
 
   openAppModal({
     id: "settings-modal",
@@ -143,12 +146,14 @@ export function showSettingsPanel(fromGame = false, onClose = () => {}) {
     title: "Cài đặt",
     content: settingsContainer,
     size: "medium",
+    actions: [['Hướng dẫn', 'book', actions.onHelp], ['Xóa dữ liệu', 'wand', actions.onReset]].filter(([, , action]) => typeof action === 'function').map(([label, icon, action]) => ({ label, icon, onClick: () => { nextAction = action; } })),
     onClose: () => {
       settingsContainer.style.display = "none";
       settingsHome.appendChild(settingsContainer);
       gameState.isPaused = false;
       if (!fromGame) onCloseFromMenu();
       onClose();
+      nextAction?.();
     },
   });
 }

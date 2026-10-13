@@ -11,20 +11,11 @@ template.innerHTML = `<div id="game-container" class="game-shell-tokens" style="
           class="game-menu-toggle"
           type="button"
           aria-label="Mở menu chức năng"
-          aria-controls="game-actions-menu"
+          aria-controls="game-exit-modal"
+          aria-haspopup="dialog"
           aria-expanded="false"
           data-icon="menu"
         ></button>
-
-        <div id="game-actions-menu" class="game-actions-menu" hidden>
-          <button id="btn-restart" class="game-action-item" type="button" data-icon="restart">Chơi lại</button>
-          <button id="btn-menu" class="game-action-item" type="button" data-icon="home">Menu</button>
-          <button id="btn-game-settings" class="game-action-item" type="button" data-icon="settings">Cài đặt</button>
-          <button id="btn-shop" class="game-action-item" type="button" data-icon="shop">Cửa hàng</button>
-          <button id="btn-game-collection" class="game-action-item" type="button" data-icon="collection">Bộ sưu tập</button>
-          <button id="btn-game-help" class="game-action-item" type="button" data-icon="book">Hướng dẫn</button>
-          <button id="btn-full-reset" class="game-action-item" type="button" data-icon="wand">Xóa dữ liệu</button>
-        </div>
 
         <button id="memory-tools-toggle" class="memory-tools-toggle" type="button" aria-label="Mở công cụ hỗ trợ" aria-controls="memory-tools-menu" aria-expanded="false" data-icon="wand"></button>
         <div id="memory-tools-menu" class="memory-tools-menu" hidden>

@@ -64,12 +64,12 @@ for (const game of games) {
     await page.goto("/");
     await start(page, game);
     const selectors = game.id === "memory-match"
-      ? { actions: "#btn-actions-menu", menu: "#game-actions-menu", settings: "#btn-game-settings" }
-      : { actions: "#link-actions-menu-toggle", menu: "#link-actions-menu", settings: '#link-actions-menu [data-action="settings"]' };
+      ? { actions: "#btn-actions-menu" }
+      : { actions: "#link-actions-menu-toggle" };
     await page.locator(selectors.actions).click();
     await expect(page.locator(selectors.actions)).toHaveAttribute("aria-expanded", "true");
-    await expect(page.locator(selectors.menu)).toBeVisible();
-    const menuBounds = await page.locator(selectors.menu).evaluate(element => {
+    await expect(page.locator('#game-exit-modal')).toBeVisible();
+    const menuBounds = await page.locator('#game-exit-modal .app-modal').evaluate(element => {
       const rect = element.getBoundingClientRect();
       return { left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom, width: innerWidth, height: innerHeight };
     });
@@ -77,7 +77,9 @@ for (const game of games) {
     expect(menuBounds.right).toBeLessThanOrEqual(menuBounds.width + 1);
     expect(menuBounds.top).toBeGreaterThanOrEqual(-1);
     expect(menuBounds.bottom).toBeLessThanOrEqual(menuBounds.height + 1);
-    await page.locator(selectors.settings).click();
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#game-exit-modal')).toHaveCount(0);
+    await page.locator('.adventure-dock--playing [data-dock-action="settings"]').click();
     const modal = page.locator("#settings-modal .app-modal");
     await expect(modal).toBeVisible();
     const modalBounds = await modal.evaluate(element => {

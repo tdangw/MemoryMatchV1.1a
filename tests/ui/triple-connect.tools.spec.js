@@ -23,13 +23,13 @@ test("Triple HUD uses the shared action menu and keeps tools separate", async ({
   await expect(actions).toHaveClass(/game-menu-toggle/);
   await actions.click();
   await expect(actions).toHaveAttribute("aria-expanded", "true");
-  await expect(page.locator("#triple-actions-menu")).toBeVisible();
+  await expect(page.locator('#game-exit-modal')).toBeVisible();
   await expect(
-    page.locator("#triple-actions-menu [data-triple-action]"),
-  ).toHaveCount(7);
+    page.locator('#game-exit-modal .app-modal__footer button'),
+  ).toHaveText(['Thoát game', 'Chơi lại']);
   await expect(page.locator("#triple-tools-menu")).toBeHidden();
   const bounds = await page
-    .locator("#triple-actions-menu")
+    .locator('#game-exit-modal .app-modal')
     .evaluate((element) => {
       const rect = element.getBoundingClientRect();
       return {

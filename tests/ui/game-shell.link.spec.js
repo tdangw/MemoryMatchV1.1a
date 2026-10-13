@@ -20,8 +20,11 @@ test("Link shell owns controls once per round and preserves patched tile identit
       renderLinkBoard(linkGameState.board);
       const stableTiles = tiles.every(tile => tile.isConnected && refs.board.querySelector(`[data-tile-key="${tile.dataset.tileKey}"]`) === tile);
       document.querySelector("#link-actions-menu-toggle").click();
-      const openedOnce = !document.querySelector("#link-actions-menu").hidden;
-      document.querySelector("#link-actions-menu-toggle").click();
+      const openedOnce = Boolean(document.querySelector('#game-exit-modal'));
+      document.querySelector('#game-exit-modal .app-modal__close').click();
+      await new Promise(resolve => new MutationObserver((_, observer) => {
+        if (!document.querySelector('#game-exit-modal')) { observer.disconnect(); resolve(); }
+      }).observe(document.body, { childList: true }));
       gameState.progress.linkConnect.items.hint = 20;
       linkGameState.isLocked = false;
       linkGameState.isPaused = false;

@@ -19,16 +19,7 @@ export function getLinkShell() {
       <div id="link-game-logo" data-shell-region="title" class="link-game-name game-name">Link Connect</div>
       <div class="link-game-progress-hud" data-shell-region="progress" hidden></div>
       <header id="link-game-title" data-shell-region="hud" class="link-game-hud game-hud">
-        <button id="link-actions-menu-toggle" class="link-connect-game__menu game-menu-toggle" type="button" aria-label="Mở menu chức năng" aria-controls="link-actions-menu" aria-expanded="false"></button>
-        <div id="link-actions-menu" class="link-connect-game__actions game-actions-menu" hidden>
-          <button class="game-action-item" type="button" data-action="restart">Chơi lại</button>
-          <button class="game-action-item" type="button" data-action="menu">Menu</button>
-          <button class="game-action-item" type="button" data-action="settings">Cài đặt</button>
-          <button class="game-action-item" type="button" data-action="shop">Cửa hàng</button>
-          <button class="game-action-item" type="button" data-action="collection">Bộ sưu tập</button>
-          <button class="game-action-item" type="button" data-action="help">Hướng dẫn</button>
-          <button class="game-action-item" type="button" data-action="reset">Xóa dữ liệu</button>
-        </div>
+        <button id="link-actions-menu-toggle" class="link-connect-game__menu game-menu-toggle" type="button" aria-label="Mở menu chức năng" aria-controls="game-exit-modal" aria-haspopup="dialog" aria-expanded="false"></button>
         <div class="game-stats game-hud__stats" aria-label="Thông tin màn chơi">
           <div class="game-hud__stats-group game-hud__stats-group--left"><span class="info stat-card game-hud__metric stat-moves"><span class="stat-label">MOVES</span><span id="link-moves">0</span></span><span class="info stat-card game-hud__metric stat-misses"><span class="stat-label">MISS</span><span id="link-misses">0</span></span></div>
           <div class="game-hud__stats-group game-hud__stats-group--center"><span class="info stat-card game-hud__metric stat-level"><span class="stat-label">LEVEL</span><span id="link-level-label">1</span></span><span class="info stat-card game-hud__metric stat-timer"><span class="stat-label">THỜI GIAN</span><span id="link-timer">00:00</span></span><span class="info stat-card game-hud__metric stat-stars"><span class="stat-label"><span data-link-icon="star"></span></span><span id="link-total-stars">0</span></span></div>
@@ -60,25 +51,13 @@ export function getLinkShell() {
 
 function decorateShell(container) {
   const toggle = container.querySelector("#link-actions-menu-toggle");
-  const actions = container.querySelector("#link-actions-menu");
   const toolsToggle = container.querySelector("#link-tools-toggle");
   container.querySelectorAll("[data-link-icon]").forEach((element) => {
     element.append(createIcon(element.dataset.linkIcon));
   });
   toggle?.append(createIcon("menu"));
   toolsToggle?.append(createIcon("wand"));
-  const actionIcons = {
-    restart: "restart",
-    menu: "home",
-    settings: "settings",
-    collection: "collection",
-    shop: "shop",
-    help: "book",
-    reset: "wand",
-  };
-  actions?.querySelectorAll("button[data-action]").forEach((button) => {
-    button.prepend(createIcon(actionIcons[button.dataset.action]));
-  });
+
 }
 
 function createItemButtons(container) {
@@ -106,18 +85,13 @@ export function bindLinkControls(scope, { onAction, onItem }) {
     if (button) onItem(button.dataset.item);
   });
   const toggle = container.querySelector("#link-actions-menu-toggle");
-  const actions = container.querySelector("#link-actions-menu");
   const toolsToggle = container.querySelector("#link-tools-toggle");
   const toolsMenu = container.querySelector("#link-tools-menu");
-  const menus = bindGameHudMenus(scope, [{ trigger: toggle, panel: actions }, { trigger: toolsToggle, panel: toolsMenu }]);
+  const menus = bindGameHudMenus(scope, [{ trigger: toolsToggle, panel: toolsMenu }]);
   activeMenus = menus;
   scope.own(() => { if (activeMenus === menus) activeMenus = null; });
-  scope.listen(actions, "click", (event) => {
-    const action = event.target.closest("button")?.dataset.action;
-    if (!action) return;
-    menus.close();
-    onAction(action);
-  });
+  scope.listen(toggle, "click", () => { menus.close(); onAction('exit-dialog'); });
+
 }
 
 export function getLinkHudElements() {

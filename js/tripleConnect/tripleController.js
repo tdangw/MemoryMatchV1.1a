@@ -1,3 +1,4 @@
+import { openGameExitDialog } from "../gameExitDialog.js";
 import { showFullVictoryCelebration } from "victory-presentation";
 import { canLaunchGame } from "../profileOperations.js";
 import { rememberRecentGame } from '../recentGame.js';
@@ -453,43 +454,8 @@ async function mountTripleDevelopmentRound(generated, { skipIntro = false, start
   const actionsToggle = shell.refs.root.querySelector(
     "#triple-actions-menu-toggle",
   );
-  const actionsMenu = shell.refs.root.querySelector("#triple-actions-menu");
-  const menus = bindGameHudMenus(scope, [{ trigger: actionsToggle, panel: actionsMenu }, { trigger: toolsToggle, panel: toolsMenu }]);
-  const navigationActions = {
-    collection: "showCollection",
-    shop: "showShop",
-    settings: "showSettings",
-    help: "showHelp",
-    reset: "showReset",
-  };
-  actionsMenu.querySelectorAll("[data-triple-action]").forEach((button) => {
-    const navigationKey = navigationActions[button.dataset.tripleAction];
-    button.hidden = Boolean(
-      navigationKey && typeof navigation[navigationKey] !== "function",
-    );
-  });
-  scope.listen(actionsMenu, "click", (event) => {
-    const action = event.target.closest("button")?.dataset.tripleAction;
-    if (!action) return;
-    menus.close();
-    if (action === "menu") return returnTripleToMenu();
-    if (action === "restart")
-      return void startTripleConnectRound({
-        mode: currentMode,
-        level: currentLevel,
-        reason: "restart",
-      });
-    if (action === "collection" && navigation.showCollection)
-      return openTripleModal(navigation.showCollection);
-    if (action === "shop" && navigation.showShop)
-      return openTripleModal(navigation.showShop);
-    if (action === "settings" && navigation.showSettings)
-      return openTripleModal(navigation.showSettings);
-    if (action === "help" && navigation.showHelp)
-      return openTripleModal(navigation.showHelp);
-    if (action === "reset" && navigation.showReset)
-      return navigation.showReset();
-  });
+  const menus = bindGameHudMenus(scope, [{ trigger: toolsToggle, panel: toolsMenu }]);
+  scope.listen(actionsToggle, 'click', () => { menus.close(); void runTripleGameAction('exit-dialog'); });
   scope.listen(document, "visibilitychange", async () => {
     if (document.hidden) {
       if (state.status !== "playing" || !roundStarted) return;
@@ -787,6 +753,15 @@ function playTripleSound(name) {
   if (!sound) return;
   sound.currentTime = 0;
   sound.play().catch(() => {});
+}
+
+export function runTripleGameAction(action) {
+  if (action === 'exit-dialog') return openTripleModal(onClose => openGameExitDialog({ owner: getTripleShell().scope, trigger: getTripleShell().refs.root.querySelector('#triple-actions-menu-toggle'), onClose, onExit: returnTripleToMenu, onRestart: () => startTripleConnectRound({ mode: currentMode, level: currentLevel, reason: 'restart' }) }));
+  if (action === 'menu') return returnTripleToMenu();
+  if (action === 'restart') return startTripleConnectRound({ mode: currentMode, level: currentLevel, reason: 'restart' });
+  const key = { collection: 'showCollection', shop: 'showShop', settings: 'showSettings', help: 'showHelp', reset: 'showReset' }[action];
+  if (!key || typeof navigation[key] !== 'function') throw new RangeError('Unsupported Triple navigation action.');
+  return openTripleModal(navigation[key]);
 }
 
 export function openTripleModal(open) {

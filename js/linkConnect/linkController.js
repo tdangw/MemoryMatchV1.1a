@@ -1,4 +1,5 @@
 import { rememberRecentGame } from '../recentGame.js';
+import { openGameExitDialog } from '../gameExitDialog.js';
 import { canLaunchGame } from "../profileOperations.js";
 import { getLinkShell, getLinkHud, getLinkHudElements, bindLinkControls, closeLinkMenus, applyLinkTimingStyles } from "./linkShell.js";
 import { setHudText, renderHudTimer } from "../gameShell/gameShellHud.js";
@@ -393,7 +394,8 @@ function showLinkGame() {
   return scope;
 }
 
-async function runLinkGameAction(action) {
+export async function runLinkGameAction(action) {
+  if (action === 'exit-dialog') return openLinkPanel(onClose => openGameExitDialog({ owner: getLinkShell().scope, trigger: getLinkShell().refs.root.querySelector('#link-actions-menu-toggle'), onClose, onExit: () => runLinkGameAction('menu'), onRestart: () => runLinkGameAction('restart') }));
   if (action === "menu") return (await returnToLinkMenu());
   if (action === "restart") {
     return startLinkLevel({ mode: linkGameState.mode, level: linkGameState.level, restart: true });
