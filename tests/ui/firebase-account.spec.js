@@ -60,7 +60,7 @@ test("guest backup survives offline/reload and only publishes the durable new sn
   await context.close();
 });
 
-test("Google links the guest UID; another guest choosing the existing Google cloud keeps a local recovery copy without adding coins", async ({ browser, baseURL }) => {
+test("Google links the guest UID; another guest restores the existing Google cloud keeps a local recovery copy without adding coins", async ({ browser, baseURL }) => {
   test.setTimeout(90000);
   const first = await browser.newContext({ baseURL, serviceWorkers: "block" }); const second = await browser.newContext({ baseURL, serviceWorkers: "block" });
   await seed(first, 1234); await seed(second, 4321);
@@ -74,12 +74,8 @@ test("Google links the guest UID; another guest choosing the existing Google clo
   const otherGuest = await state(b);
   expect(otherGuest.uid).not.toBe(guest.uid);
   await link(b, "adventure-cloud@example.test");
-  await expect(b.locator("#cloud-conflict-modal")).toBeVisible();
-  await expect(b.locator("#cloud-conflict-modal")).toContainText("4.321 Xu");
-  await expect(b.locator("#cloud-conflict-modal")).toContainText("1.234 Xu");
-  await b.getByRole("button", { name: "Dùng bản cloud", exact: true }).click();
-  await expect(b.locator("#cloud-conflict-modal")).toHaveCount(0);
   await ready(b);
+  await expect(b.locator("#cloud-conflict-modal")).toHaveCount(0);
   expect((await state(b)).uid).toBe(guest.uid);
   expect(await b.evaluate(async () => (await import("/js/gameState.js")).gameState.coins)).toBe(1234);
   expect(await b.evaluate(async () => (await (await import("/js/persistence.js")).getLocalRestoreBackups()).at(-1).profile.data.coins)).toBe(4321);
@@ -90,7 +86,7 @@ test("Google links the guest UID; another guest choosing the existing Google clo
   await first.close(); await second.close();
 });
 
-test("an existing Google conflict waits until gameplay closes; choosing local replaces cloud without adding resources", async ({ browser, baseURL }) => {
+test("a remote Google save waits until gameplay closes and later completed events become the newest save", async ({ browser, baseURL }) => {
   test.setTimeout(90000);
   const first = await browser.newContext({ baseURL, serviceWorkers: 'block' });
   const second = await browser.newContext({ baseURL, serviceWorkers: 'block' });
@@ -106,10 +102,15 @@ test("an existing Google conflict waits until gameplay closes; choosing local re
   await expect.poll(async () => (await state(b)).conflict).toBe(true);
   await expect(b.locator('#cloud-conflict-modal')).toHaveCount(0);
   await b.evaluate(async () => (await import('/js/gameSelector.js')).showGameSelector());
-  await expect(b.locator('#cloud-conflict-modal')).toBeVisible();
-  await b.getByRole('button', { name: 'Dùng bản máy', exact: true }).click();
   await ready(b);
-  expect(await b.evaluate(async () => (await import('/js/gameState.js')).gameState.coins)).toBe(850);
+  expect(await b.evaluate(async () => (await import('/js/gameState.js')).gameState.coins)).toBe(120);
+  await b.evaluate(async () => {
+    const { gameState } = await import('/js/gameState.js');
+    gameState.coins = 850;
+    await (await import('/js/persistence.js')).saveCoins(850);
+  });
+  await ready(b);
+  await expect.poll(() => a.evaluate(async () => (await import('/js/gameState.js')).gameState.coins), { timeout: 30000 }).toBe(850);
   const saved = await b.evaluate(async () => {
     const backend = await (await import('/js/firebaseBackend.js')).getFirebaseBackend();
     const store = await import('/js/cloudStore.js');
@@ -117,5 +118,57 @@ test("an existing Google conflict waits until gameplay closes; choosing local re
     return (await store.readCloudSnapshot(backend.database, backend.environment, backend.auth.currentUser.uid, root)).profile.data.coins;
   });
   expect(saved).toBe(850);
+  await second.setOffline(true);
+  await b.evaluate(async () => {
+    const { gameState } = await import('/js/gameState.js');
+    gameState.coins = 999;
+    await (await import('/js/persistence.js')).saveCoins(999);
+  });
+  await a.evaluate(async () => {
+    const { gameState } = await import('/js/gameState.js');
+    gameState.coins = 777;
+    await (await import('/js/persistence.js')).saveCoins(777);
+  });
+  await ready(a);
+  await second.setOffline(false);
+  await b.reload(); await ready(b);
+  expect(await b.evaluate(async () => (await import('/js/gameState.js')).gameState.coins)).toBe(999);
+  await expect.poll(() => a.evaluate(async () => (await import('/js/gameState.js')).gameState.coins), { timeout: 30000 }).toBe(999);
   await first.close(); await second.close();
+});
+
+test("session checkpoints survive reload without cloud writes, while an explicit completion is backed up", async ({ page }) => {
+  test.setTimeout(60000);
+  await page.goto('/'); await ready(page);
+  const revision = async () => page.evaluate(async () => {
+    const backend = await (await import('/js/firebaseBackend.js')).getFirebaseBackend();
+    return (await (await import('/js/cloudStore.js')).readCloudRoot(backend.database, backend.environment, backend.auth.currentUser.uid)).revision;
+  });
+  const before = await revision();
+  await page.evaluate(async () => {
+    const { gameState } = await import('/js/gameState.js');
+    gameState.progress.memoryMatch.sessionsByMode.easy = { mode: 'easy', level: 1, remainingTime: 50, timeLimit: 60 };
+    await (await import('/js/persistence.js')).saveProgress(gameState.progress);
+    await (await import('/js/persistence.js')).saveSetting('musicVolume', .3);
+  });
+  const signatures = await page.evaluate(async () => {
+    const backend = await (await import('/js/firebaseBackend.js')).getFirebaseBackend();
+    const store = await import('/js/cloudStore.js');
+    const root = await store.readCloudRoot(backend.database, backend.environment, backend.auth.currentUser.uid);
+    const remote = await store.readCloudSnapshot(backend.database, backend.environment, backend.auth.currentUser.uid, root);
+    const local = await (await import('/js/persistence.js')).exportPersistentSnapshot();
+    const { cloudSaveEventSignature } = await import('/js/cloudSaveEvents.js');
+    return { local: cloudSaveEventSignature(local.profile.data), remote: cloudSaveEventSignature(remote.profile.data) };
+  });
+  expect(signatures.local).toBe(signatures.remote);
+  await page.reload(); await ready(page);
+  expect(await revision()).toBe(before);
+  expect(await page.evaluate(async () => (await import('/js/gameState.js')).gameState.progress.memoryMatch.sessionsByMode.easy.remainingTime)).toBe(50);
+  await page.evaluate(async () => {
+    const { gameState } = await import('/js/gameState.js');
+    delete gameState.progress.memoryMatch.sessionsByMode.easy;
+    await (await import('/js/persistence.js')).savePersistentGameData({ progress: gameState.progress, cloudEvent: true });
+  });
+  await ready(page);
+  expect(await revision()).toBeGreaterThan(before);
 });

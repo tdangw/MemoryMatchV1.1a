@@ -20,14 +20,14 @@ test("Triple commerce keeps its catalog, ownership, and equipped appearance sepa
     });
     const beforeMemory = structuredClone(gameState.appearance);
     const purchases = {
-      item: purchaseTripleItem("time"),
-      theme: purchaseTripleTheme("fruits", 1),
-      effect: purchaseTripleEffect("path", "electric", 1),
-      invalidEffect: purchaseTripleEffect("invalid", "electric", 1),
+      item: await purchaseTripleItem("time"),
+      theme: await purchaseTripleTheme("fruits", 1),
+      effect: await purchaseTripleEffect("path", "electric", 1),
+      invalidEffect: await purchaseTripleEffect("invalid", "electric", 1),
     };
     const equips = {
-      theme: equipTripleTheme("fruits"),
-      effect: equipTripleEffect("path", "electric"),
+      theme: await equipTripleTheme("fruits"),
+      effect: await equipTripleEffect("path", "electric"),
     };
     const { GAMEPLAY_LIMITS } = await import("/js/gameplayTuning.js");
     gameState.progress.tripleConnect.items.time = GAMEPLAY_LIMITS.itemCount;
@@ -35,7 +35,7 @@ test("Triple commerce keeps its catalog, ownership, and equipped appearance sepa
       coins: gameState.coins,
       items: gameState.progress.tripleConnect.items,
     });
-    const atCap = purchaseTripleItem("time");
+    const atCap = await purchaseTripleItem("time");
     return {
       purchases,
       equips,
@@ -126,23 +126,23 @@ test("Triple appearance purchase and equip roll back when persistence fails", as
     const { gameState, hydrateGameState } = await import("/js/gameState.js");
     const { purchaseTripleTheme, equipTripleTheme } = await import("/js/tripleConnect/tripleTransactions.js");
     hydrateGameState({ coins: 10 });
-    const original = Storage.prototype.setItem;
+    const original = IDBObjectStore.prototype.put;
     const before = structuredClone({ coins: gameState.coins, appearance: gameState.appearance });
-    Storage.prototype.setItem = function forceFailure(key, value) {
-      if (key === "memoryMatchSave") throw new Error("forced commerce failure");
-      return original.call(this, key, value);
+    IDBObjectStore.prototype.put = function forceFailure(...args) {
+      if (this.name === "profile") throw new Error("forced commerce failure");
+      return original.apply(this, args);
     };
     let bought;
-    try { bought = purchaseTripleTheme("fruits", 1); } finally { Storage.prototype.setItem = original; }
+    try { bought = await purchaseTripleTheme("fruits", 1); } finally { IDBObjectStore.prototype.put = original; }
     const afterPurchase = structuredClone({ coins: gameState.coins, appearance: gameState.appearance });
     gameState.appearance.ownedTripleThemes.push("fruits");
-    Storage.prototype.setItem = function forceFailure(key, value) {
-      if (key === "memoryMatchSave") throw new Error("forced equip failure");
-      return original.call(this, key, value);
+    IDBObjectStore.prototype.put = function forceFailure(...args) {
+      if (this.name === "profile") throw new Error("forced equip failure");
+      return original.apply(this, args);
     };
     const beforeEquip = structuredClone(gameState.appearance);
     let equipped;
-    try { equipped = equipTripleTheme("fruits"); } finally { Storage.prototype.setItem = original; }
+    try { equipped = await equipTripleTheme("fruits"); } finally { IDBObjectStore.prototype.put = original; }
     return { bought, before, afterPurchase, equipped, beforeEquip, afterEquip: gameState.appearance };
   });
   expect(result.bought).toBe(false);

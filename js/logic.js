@@ -349,7 +349,7 @@ export async function checkLevelComplete() {
     const totalCoins = increaseCoins(coinsEarned);
     stageRankedAttempt("memory-match", gameState.settings.mode, finalScore, true);
     delete gameState.progress.memoryMatch.sessionsByMode?.[gameState.settings.mode];
-    if (!(await savePersistentGameData({ coins: totalCoins, progress: gameState.progress }))) {
+    if (!(await savePersistentGameData({ coins: totalCoins, progress: gameState.progress, cloudEvent: true }))) {
       if (gameState.roundId === roundId) {
         gameState.coins = rollback.coins;
         gameState.score = rollback.score;

@@ -11,14 +11,16 @@ function parseTrayFlight(transform) {
 test("Triple tray flight uses one surface coordinate space and scales to its slot", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const flight = await page.evaluate(async () => {
     const { startTripleConnectDevelopmentRound } = await import("/js/tripleConnect/tripleController.js");
-    startTripleConnectDevelopmentRound({ seed: "tray-flight-geometry" });
+    const run = await startTripleConnectDevelopmentRound({ seed: "tray-flight-geometry" });
     const surface = document.querySelector(".triple-connect__surface");
     const source = document.querySelector(".triple-connect__board .triple-connect__tile:not(:disabled)");
     const sourceRect = source.getBoundingClientRect();
     const surfaceRect = surface.getBoundingClientRect();
     source.click();
+    await run.whenIdle();
     const target = document.querySelector(".triple-connect__tray .triple-connect__tile");
     const ghost = document.querySelector(".triple-connect__tray-flight");
     const targetRect = target.getBoundingClientRect();
@@ -59,14 +61,15 @@ test("Triple tray flight uses one surface coordinate space and scales to its slo
 test("Triple match commits before presentation and unmount cancels removal feedback", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const witness = await page.evaluate(async () => {
     const { startTripleConnectDevelopmentRound } = await import("/js/tripleConnect/tripleController.js");
-    globalThis.__triplePresentationRun = startTripleConnectDevelopmentRound({ seed: "presentation" });
+    globalThis.__triplePresentationRun = (await startTripleConnectDevelopmentRound({ seed: "presentation" }));
     return globalThis.__triplePresentationRun.generated.witness.map(({ tileId }) => tileId);
   });
   for (const tileId of witness) {
     await page.locator(`[data-tile-id="${tileId}"]`).click();
-    const matched = await page.evaluate(() => globalThis.__triplePresentationRun.getState().matchedTriples);
+    const matched = await page.evaluate(async () => { await globalThis.__triplePresentationRun.whenIdle(); return globalThis.__triplePresentationRun.getState().matchedTriples; });
     if (matched) break;
     await expect(page.locator('[data-triple-presenting="false"]')).toBeVisible();
   }
@@ -81,14 +84,15 @@ test("Triple match commits before presentation and unmount cancels removal feedb
 test("Triple commits score state before its presentation lifecycle completes", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const witness = await page.evaluate(async () => {
     const { startTripleConnectDevelopmentRound } = await import("/js/tripleConnect/tripleController.js");
-    globalThis.__triplePresentationRun = startTripleConnectDevelopmentRound({ seed: "score-anchor" });
+    globalThis.__triplePresentationRun = (await startTripleConnectDevelopmentRound({ seed: "score-anchor" }));
     return globalThis.__triplePresentationRun.generated.witness.map(({ tileId }) => tileId);
   });
   for (const tileId of witness) {
     await page.locator(`[data-tile-id="${tileId}"]`).click();
-    if (await page.evaluate(() => globalThis.__triplePresentationRun.getState().matchedTriples)) break;
+    if (await page.evaluate(async () => { await globalThis.__triplePresentationRun.whenIdle(); return globalThis.__triplePresentationRun.getState().matchedTriples; })) break;
     await expect(page.locator('[data-triple-presenting="true"]')).toBeVisible();
     await expect(page.locator('[data-triple-presenting="false"]')).toBeVisible();
   }
@@ -103,6 +107,7 @@ test("Triple commits score state before its presentation lifecycle completes", a
 test("Triple commits a match immediately while its removal effect plays", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const timeline = await page.evaluate(async () => {
     const waitFor = (predicate, message) => new Promise((resolve, reject) => {
       const deadline = window.setTimeout(() => reject(new Error(message)), 2000);
@@ -117,16 +122,18 @@ test("Triple commits a match immediately while its removal effect plays", async 
       requestAnimationFrame(check);
     });
     const { startTripleConnectDevelopmentRound } = await import("/js/tripleConnect/tripleController.js");
-    const run = startTripleConnectDevelopmentRound({ seed: "tray-match-timeline" });
+    const run = (await startTripleConnectDevelopmentRound({ seed: "tray-match-timeline" }));
     const matchIds = run.generated.witness.slice(0, 3).map((command) => command.tileId);
     for (const tileId of matchIds.slice(0, 2)) {
       document.querySelector(`[data-tile-id="${tileId}"]`)?.click();
+      await run.whenIdle();
       await waitFor(
         () => document.querySelector('[data-triple-presenting="false"]'),
         "tray arrival did not settle",
       );
     }
     document.querySelector(`[data-tile-id="${matchIds[2]}"]`)?.click();
+    await run.whenIdle();
     const beforeArrival = {
       flight: document.querySelectorAll(".triple-connect__tray-flight").length,
       removing: document.querySelectorAll(".triple-connect__ghost.is-removing").length,
@@ -154,6 +161,7 @@ test("Triple commits a match immediately while its removal effect plays", async 
 test("Triple flies the third matching card beside its pair, not to the tray end", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const landing = await page.evaluate(async () => {
     const waitForIdle = () => new Promise((resolve, reject) => {
       const deadline = window.setTimeout(() => reject(new Error("tray flight did not settle")), 2000);
@@ -168,18 +176,22 @@ test("Triple flies the third matching card beside its pair, not to the tray end"
       requestAnimationFrame(check);
     });
     const { startTripleConnectDevelopmentRound } = await import("/js/tripleConnect/tripleController.js");
-    const run = startTripleConnectDevelopmentRound({ seed: "tray-match-insert" });
+    const run = (await startTripleConnectDevelopmentRound({ seed: "tray-match-insert" }));
     const matchIds = run.generated.witness.slice(0, 3).map(({ tileId }) => tileId);
     document.querySelector(`[data-tile-id="${matchIds[0]}"]`)?.click();
+    await run.whenIdle();
     await waitForIdle();
     const other = [...document.querySelectorAll(".triple-connect__board .triple-connect__tile:not(:disabled)")]
       .find((tile) => !matchIds.includes(tile.dataset.tileId));
     const otherId = other?.dataset.tileId;
     other?.click();
+    await run.whenIdle();
     await waitForIdle();
     document.querySelector(`[data-tile-id="${matchIds[1]}"]`)?.click();
+    await run.whenIdle();
     await waitForIdle();
     document.querySelector(`[data-tile-id="${matchIds[2]}"]`)?.click();
+    await run.whenIdle();
     await new Promise((resolve, reject) => {
       const deadline = window.setTimeout(() => reject(new Error("match feedback did not begin")), 2000);
       const check = () => {
@@ -220,11 +232,13 @@ test("Triple flies the third matching card beside its pair, not to the tray end"
 test("Triple reduced motion settles to the same committed match without ghosts", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const result = await page.evaluate(async () => {
     const { startTripleConnectDevelopmentRound } = await import("/js/tripleConnect/tripleController.js");
-    const run = startTripleConnectDevelopmentRound({ seed: "reduced" });
+    const run = (await startTripleConnectDevelopmentRound({ seed: "reduced" }));
     for (const command of run.generated.witness) {
       document.querySelector(`[data-tile-id="${command.tileId}"]`)?.click();
+      await run.whenIdle();
       await new Promise((resolve) => requestAnimationFrame(resolve));
       if (run.getState().matchedTriples) break;
     }
@@ -237,12 +251,14 @@ test("Triple reduced motion settles to the same committed match without ghosts",
 test("Triple reduced-motion tray feedback cleans up within the 100 ms budget", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const elapsed = await page.evaluate(async () => {
     const { startTripleConnectDevelopmentRound } = await import("/js/tripleConnect/tripleController.js");
-    startTripleConnectDevelopmentRound({ seed: "reduced-tray-budget" });
+    const run = await startTripleConnectDevelopmentRound({ seed: "reduced-tray-budget" });
     const source = document.querySelector(".triple-connect__board .triple-connect__tile:not(:disabled)");
     const startedAt = performance.now();
     source.click();
+    await run.whenIdle();
     await new Promise((resolve, reject) => {
       const deadline = window.setTimeout(() => reject(new Error("tray feedback did not settle")), 200);
       const check = () => {
@@ -264,18 +280,22 @@ test("Triple reduced-motion tray feedback cleans up within the 100 ms budget", a
 test("Triple accepts a second tap while a tray flight is presenting", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const result = await page.evaluate(async () => {
     const { startTripleConnectDevelopmentRound } = await import("/js/tripleConnect/tripleController.js");
-    const run = startTripleConnectDevelopmentRound({ seed: "flight-input-lock" });
+    const run = (await startTripleConnectDevelopmentRound({ seed: "flight-input-lock" }));
     const tiles = [...document.querySelectorAll(".triple-connect__board .triple-connect__tile:not(:disabled)")];
     tiles[0].click();
+    await run.whenIdle();
     tiles[1].click();
+    await run.whenIdle();
     const duringFlight = {
       moves: run.getState().moves,
       misses: run.getState().misses,
     };
     await new Promise((resolve) => setTimeout(resolve, 340));
     tiles[1].click();
+    await run.whenIdle();
     return {
       duringFlight,
       afterFlight: {
@@ -290,11 +310,12 @@ test("Triple accepts a second tap while a tray flight is presenting", async ({ p
 
 test("Triple tray flights clean up across repeated mount cycles", async ({ page }) => {
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const result = await page.evaluate(async () => {
     const controller = await import("/js/tripleConnect/tripleController.js");
     const shellApi = await import("/js/gameShell/gameShell.js");
     for (let index = 0; index < 20; index += 1) {
-      controller.startTripleConnectDevelopmentRound({ seed: `flight-cleanup-${index}` });
+      (await controller.startTripleConnectDevelopmentRound({ seed: `flight-cleanup-${index}` }));
       document.querySelector(".triple-connect__board .triple-connect__tile:not(:disabled)")?.click();
       shellApi.unmountActiveGameShell();
     }

@@ -107,7 +107,7 @@ export function connectGameShellLayout({ root, frame, board, chrome, getShape, a
     }
     // All layout reads are in this block. apply() is a write-only board adapter.
     const rootRect = root.getBoundingClientRect();
-    const boardTop = frame.getBoundingClientRect().top;
+    const boardTop = frame.getBoundingClientRect().top + root.scrollTop;
     const chromeRects = chrome.map(element => element.getBoundingClientRect());
     const rootStyle = getComputedStyle(root);
     const boardStyle = getComputedStyle(board);
@@ -127,7 +127,8 @@ export function connectGameShellLayout({ root, frame, board, chrome, getShape, a
     const bottom = dock ? Math.min(visible.top + visible.height, dock.getBoundingClientRect().top) : visible.top + visible.height;
     const height = bottom - boardTop - config.layout.bottomInset
       - px(rootStyle.getPropertyValue("--shell-viewport-safe-bottom")) - gutter;
-    const result = calculateBoardLayout({ width, height, columns: shape.columns, rows: shape.rows,
+    const scrollHeight = Math.max(height, (shape.minimumTileSize || 0) * shape.rows);
+    const result = calculateBoardLayout({ width, height: scrollHeight, columns: shape.columns, rows: shape.rows,
       gap: narrow ? config.board.narrowGap : config.board.gap,
       padding: narrow ? config.board.narrowPadding : config.board.padding,
       borderX: px(boardStyle.borderLeftWidth) + px(boardStyle.borderRightWidth),
@@ -146,6 +147,7 @@ export function connectGameShellLayout({ root, frame, board, chrome, getShape, a
     if (nextSignature === signature) return;
     signature = nextSignature;
     apply(result);
+    root.classList.toggle("shell-scroll-playing", scrollHeight > height);
     if (debug) diagnostics.writes += 1;
   }
 
@@ -176,6 +178,7 @@ export function connectGameShellLayout({ root, frame, board, chrome, getShape, a
       cancelAnimationFrame(pending);
       pending = null;
       observer?.disconnect();
+      root.classList.remove("shell-scroll-playing");
       listeners.forEach(remove => remove());
       if (activeConnection === connection) activeConnection = null;
     },

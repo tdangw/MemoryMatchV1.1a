@@ -107,12 +107,12 @@ test("Triple milestone persistence failure restores board, inventory, timer, and
   const before = await page.evaluate(async () => {
     const { gameState } = await import("/js/gameState.js");
     const { getActiveSession } = await import("/js/sessionProgress.js");
-    const original = Storage.prototype.setItem;
-    Storage.prototype.setItem = function failMilestoneSave(key, value) {
-      if (key === "memoryMatchSave") throw new Error("milestone persistence failure");
-      return original.call(this, key, value);
+    const original = IDBObjectStore.prototype.put;
+    IDBObjectStore.prototype.put = function failMilestoneSave(...args) {
+      if (this.name === "profile") throw new Error("milestone persistence failure");
+      return original.apply(this, args);
     };
-    window.__restoreMilestoneStorage = () => { Storage.prototype.setItem = original; };
+    window.__restoreMilestoneStorage = () => { IDBObjectStore.prototype.put = original; };
     return {
       state: JSON.stringify(window.__tripleMilestoneRun.getState()),
       coins: gameState.coins,
@@ -146,7 +146,7 @@ test("Triple converts full milestone item inventory with the approved fallback v
     const { getActiveSession } = await import("/js/sessionProgress.js");
     const { commitTripleRewardTransaction } = await import("/js/tripleConnect/tripleTransactions.js");
     gameState.progress.tripleConnect.items = { hint: GAMEPLAY_LIMITS.itemCount, time: 0, undo: GAMEPLAY_LIMITS.itemCount, shuffle: GAMEPLAY_LIMITS.itemCount };
-    const grants = commitTripleRewardTransaction({
+    const grants = await commitTripleRewardTransaction({
       session: getActiveSession("triple-connect", "easy"),
       milestones: { version: 2, progress: 9, cycleId: 0, claimedIds: ["0:1", "0:2", "0:3"] },
       rewards: [

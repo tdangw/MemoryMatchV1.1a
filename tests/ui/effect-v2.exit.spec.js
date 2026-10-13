@@ -4,7 +4,7 @@ test("Link exit families keep portal, blackhole and implode distinct and clean t
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
   const result = await page.evaluate(async () => {
-    (await import("/js/gameSelector.js")).openGameMenu("link-connect");
+    await (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('link-connect');
     const controller = await import("/js/linkConnect/linkController.js");
     const { linkGameState } = await import("/js/linkConnect/linkState.js");
     const { findAvailableConnections } = await import("/js/linkConnect/pathfinder.js");
@@ -18,6 +18,8 @@ test("Link exit families keep portal, blackhole and implode distinct and clean t
       const tiles = playLinkMatchExit(connection.start, connection.end);
       output[id] = {
         names: tiles.map(tile => getComputedStyle(tile).animationName),
+        canvasOwned: tiles.every(tile => tile.classList.contains('has-canvas-exit')),
+        familyClasses: tiles.map(tile => [...tile.classList].filter(name => name === `link-tile--${id}`)),
         pull: tiles.map(tile => [tile.style.getPropertyValue("--link-exit-pull-x"), tile.style.getPropertyValue("--link-exit-pull-y")]),
         collide: tiles.map(tile => [tile.style.getPropertyValue("--link-exit-collide-x"), tile.style.getPropertyValue("--link-exit-collide-y")]),
       };
@@ -26,8 +28,11 @@ test("Link exit families keep portal, blackhole and implode distinct and clean t
     const tiles = [...document.querySelectorAll(".link-tile")].slice(0, 2);
     return { output, after: tiles.map(tile => [tile.style.getPropertyValue("--link-exit-pull-x"), tile.style.getPropertyValue("--link-exit-pull-y")]) };
   });
-  expect(result.output.portal.names).toEqual(["link-tile-portal", "link-tile-portal"]);
-  expect(result.output.blackhole.names).toEqual(["link-tile-blackhole", "link-tile-blackhole"]);
+  for (const id of ['portal', 'blackhole']) {
+    expect(result.output[id].names).toEqual(['none', 'none']);
+    expect(result.output[id].canvasOwned).toBe(true);
+    expect(result.output[id].familyClasses).toEqual([[`link-tile--${id}`], [`link-tile--${id}`]]);
+  }
   expect(result.output.implode.names).toEqual(["link-tile-implode", "link-tile-implode"]);
   expect(result.output.collide.names).toEqual(["link-tile-collide", "link-tile-collide"]);
   expect(result.output.blackhole.pull.flat()).toEqual(expect.not.arrayContaining([""]));

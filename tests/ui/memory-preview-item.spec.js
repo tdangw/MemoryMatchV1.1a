@@ -5,7 +5,7 @@ test("Memory preview item reveals cards after its picker closes", async ({ page 
   await expect(page.locator(".game-selector__choice").first()).toBeVisible();
 
   const hiddenCards = await page.evaluate(async () => {
-    (await import("/js/gameSelector.js")).openGameMenu("memory-match");
+    await (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('memory-match');
     await (await import("/js/gameController.js")).startNewMemoryRun(1);
     const { gameState } = await import("/js/gameState.js");
     gameState.progress.memoryMatch.items.preview4 = 1;
@@ -19,6 +19,7 @@ test("Memory preview item reveals cards after its picker closes", async ({ page 
   });
   expect(hiddenCards).toBeGreaterThanOrEqual(4);
 
+  await page.locator('#memory-tools-toggle').click();
   await page.locator("#btn-preview-cards").click();
   await page.getByRole("button", { name: /Xem trước 4 thẻ/ }).click();
 

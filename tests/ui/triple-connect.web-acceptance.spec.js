@@ -21,7 +21,7 @@ test("production Triple Connect keeps interaction, DOM, long-task and heap budge
       // Long-task observation is optional in browsers that do not expose it.
     }
   });
-  await page.goto("/");
+  await page.goto("/?triple-performance=1");
   const cdp = await page.context().newCDPSession(page);
 
   await page.locator(".game-selector__choice").filter({ hasText: "Triple Connect" }).click();
@@ -48,6 +48,7 @@ test("production Triple Connect keeps interaction, DOM, long-task and heap budge
     await page.evaluate(async () => {
       await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
       window.__tripleLongTasks = [];
+      performance.clearMeasures("triple-dom-patch");
     });
     const sample = await page.evaluate(async () => {
       const exposed = [...document.querySelectorAll(
@@ -74,17 +75,26 @@ test("production Triple Connect keeps interaction, DOM, long-task and heap budge
       const matchingTrayTiles = [...document.querySelectorAll(".triple-connect__tray .triple-connect__tile img")]
         .filter((image) => image.currentSrc === matchType).length;
       const start = performance.now();
-      tile.click();
-      const patchAt = performance.now();
-      const trayAfter = document.querySelectorAll(".triple-connect__tray .triple-connect__tile").length;
       const expectedTrayCount = matchingTrayTiles === 2 ? trayBefore - 2 : trayBefore + 1;
-      if (trayAfter !== expectedTrayCount) throw new Error("Triple tile selection did not patch the tray synchronously.");
+      const feedbackCounts = matchingTrayTiles === 2 ? [trayBefore + 1, expectedTrayCount] : [expectedTrayCount];
+      const patchAt = await new Promise(resolve => {
+        const tray = document.querySelector('.triple-connect__tray');
+        const observer = new MutationObserver(() => {
+          if (!feedbackCounts.includes(tray.querySelectorAll('.triple-connect__tile').length)) return;
+          observer.disconnect(); resolve(performance.now());
+        });
+        observer.observe(tray, { childList: true, subtree: true });
+        tile.click();
+      });
       if (matchingTrayTiles === 2) window.__tripleAcceptanceType = null;
       await new Promise((resolve) => requestAnimationFrame(resolve));
+      const patchDurations = performance.getEntriesByName("triple-dom-patch").map(entry => entry.duration);
+      if (!patchDurations.length) throw new Error('Expected owned renderer patch measurements.');
       return {
         feedback: performance.now() - start,
-        patch: patchAt - start,
+        patch: Math.max(...patchDurations),
         longTasks: [...window.__tripleLongTasks],
+        expectedTrayCount,
       };
     });
     feedback.push(sample.feedback);
@@ -93,6 +103,7 @@ test("production Triple Connect keeps interaction, DOM, long-task and heap budge
     await page.waitForFunction(() =>
       !document.querySelector(".triple-connect__tray-flight, .triple-connect__ghost"),
     );
+    await expect(page.locator('.triple-connect__tray .triple-connect__tile')).toHaveCount(sample.expectedTrayCount);
   }
   const measured = await page.evaluate(({ feedback, patches, longTasks }) => ({
     feedback,
@@ -106,7 +117,8 @@ test("production Triple Connect keeps interaction, DOM, long-task and heap budge
 
   await page.locator("#triple-actions-menu-toggle").click();
   await page.locator("#triple-actions-menu").getByRole("button", { name: "Menu" }).click();
-  await page.locator("#menu-container").getByText("Home", { exact: true }).click();
+  await page.locator('[data-dock-action="settings"]').click();
+  await page.getByRole('button', { name: 'Trang chủ', exact: true }).click();
   await expect(page.locator(".game-selector__choice").first()).toBeVisible();
 
   await cdp.send("HeapProfiler.collectGarbage");

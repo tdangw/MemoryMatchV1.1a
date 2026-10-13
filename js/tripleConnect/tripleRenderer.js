@@ -11,6 +11,8 @@ const layoutTopologyCache = new WeakMap();
 
 export function createTripleRenderer(shell, { onLockedTraySlotClick } = {}) {
   const root = shell.refs.root;
+  const measurePatches = new URLSearchParams(location.search).has("triple-performance");
+  let patchMeasurements = 0;
   const board = root.querySelector(".triple-connect__board");
   const tray = root.querySelector(".triple-connect__tray");
   const nodes = new Map();
@@ -60,6 +62,7 @@ export function createTripleRenderer(shell, { onLockedTraySlotClick } = {}) {
   const coverDepthCache = new WeakMap();
 
   function render(state, layout, themeId = "default", startup) {
+    const patchStart = measurePatches && !startup ? performance.now() : null;
     tray.dataset.tripleTrayCapacity = String(state.trayCapacity);
     const lockedCount = TRAY_VISIBLE_SLOT_COUNT - state.trayCapacity;
     tray.setAttribute(
@@ -152,6 +155,11 @@ export function createTripleRenderer(shell, { onLockedTraySlotClick } = {}) {
         node.remove();
         nodes.delete(id);
       }
+    if (patchStart !== null) {
+      if (patchMeasurements >= 64) { performance.clearMeasures("triple-dom-patch"); patchMeasurements = 0; }
+      performance.measure("triple-dom-patch", { start: patchStart, end: performance.now() });
+      patchMeasurements += 1;
+    }
     };
     if (startup) return startup.batch(Object.values(state.tiles), syncTile).then(commit);
     Object.values(state.tiles).forEach(syncTile);
@@ -190,6 +198,7 @@ export function createTripleRenderer(shell, { onLockedTraySlotClick } = {}) {
           rows: geometry.gridHeight + TRAY_LOGICAL_ROWS
             + (visible.height >= visible.width ? 2 : 1),
           coordinates: false,
+          minimumTileSize: visible.width > visible.height && visible.height <= 500 ? 12 : 0,
         };
       },
       apply: ({ tileSize, boardHeight }) => {

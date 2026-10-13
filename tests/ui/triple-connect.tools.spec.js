@@ -4,11 +4,12 @@ test("Triple HUD uses the shared action menu and keeps tools separate", async ({
   page,
 }) => {
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   await page.evaluate(async () => {
     const { startTripleConnectDevelopmentRound } = await import(
       "/js/tripleConnect/tripleController.js"
     );
-    startTripleConnectDevelopmentRound({ seed: "hud" });
+    (await startTripleConnectDevelopmentRound({ seed: "hud" }));
   });
   const viewport = page.viewportSize();
   if (viewport.height < 500) {
@@ -50,6 +51,7 @@ test("Triple Time commits inventory, timer, and session in one transaction", asy
   page,
 }) => {
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const before = await page.evaluate(async () => {
     const { startTripleConnectDevelopmentRound } = await import(
       "/js/tripleConnect/tripleController.js"
@@ -57,8 +59,8 @@ test("Triple Time commits inventory, timer, and session in one transaction", asy
     const { grantTripleItem } = await import(
       "/js/tripleConnect/tripleItems.js"
     );
-    const run = startTripleConnectDevelopmentRound({ seed: "tools" });
-    grantTripleItem("time");
+    const run = (await startTripleConnectDevelopmentRound({ seed: "tools" }));
+    await grantTripleItem("time");
     return {
       time: run.getState().status,
       timer: document.querySelector("[data-triple-timer]").textContent,
@@ -81,14 +83,15 @@ test("Triple Time commits inventory, timer, and session in one transaction", asy
 
 test("Triple Time is not available in Endless", async ({ page }) => {
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   await page.evaluate(async () => {
     const { startTripleConnectDevelopmentRound } = await import(
       "/js/tripleConnect/tripleController.js"
     );
-    startTripleConnectDevelopmentRound({
+    (await startTripleConnectDevelopmentRound({
       seed: "endless-time",
       mode: "endless",
-    });
+    }));
   });
   await expect(page.locator('[data-triple-item="time"]')).toBeHidden();
 });
@@ -97,6 +100,7 @@ test("Triple Time restores its committed inventory and timer after reload", asyn
   page,
 }) => {
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   await page.evaluate(async () => {
     const { startTripleConnectDevelopmentRound } = await import(
       "/js/tripleConnect/tripleController.js"
@@ -104,8 +108,8 @@ test("Triple Time restores its committed inventory and timer after reload", asyn
     const { grantTripleItem } = await import(
       "/js/tripleConnect/tripleItems.js"
     );
-    startTripleConnectDevelopmentRound({ seed: "time-reload" });
-    grantTripleItem("time");
+    (await startTripleConnectDevelopmentRound({ seed: "time-reload" }));
+    await grantTripleItem("time");
   });
   await page.locator("#triple-tools-toggle").click();
   await page.locator('[data-triple-item="time"]').click();
@@ -134,6 +138,7 @@ test("Triple Time rolls back coin, inventory, timer, and session when persistenc
   page,
 }) => {
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const result = await page.evaluate(async () => {
     const { startTripleConnectDevelopmentRound } = await import(
       "/js/tripleConnect/tripleController.js"
@@ -143,9 +148,9 @@ test("Triple Time rolls back coin, inventory, timer, and session when persistenc
     );
     const { gameState } = await import("/js/gameState.js");
     const { getActiveSession } = await import("/js/sessionProgress.js");
-    const run = startTripleConnectDevelopmentRound({ seed: "time-rollback" });
+    const run = (await startTripleConnectDevelopmentRound({ seed: "time-rollback" }));
     gameState.coins = 31;
-    grantTripleItem("time");
+    await grantTripleItem("time");
     const before = {
       coins: gameState.coins,
       count: gameState.progress.tripleConnect.items.time,
@@ -153,16 +158,17 @@ test("Triple Time rolls back coin, inventory, timer, and session when persistenc
       state: JSON.stringify(run.getState()),
       session: JSON.stringify(getActiveSession("triple-connect", "easy")),
     };
-    const original = Storage.prototype.setItem;
-    Storage.prototype.setItem = function forceFailure(key, value) {
-      if (key === "memoryMatchSave")
+    const original = IDBObjectStore.prototype.put;
+    IDBObjectStore.prototype.put = function forceFailure(...args) {
+      if (this.name === "profile")
         throw new Error("forced transaction failure");
-      return original.call(this, key, value);
+      return original.apply(this, args);
     };
     try {
       document.querySelector('[data-triple-item="time"]').click();
+      await run.whenIdle();
     } finally {
-      Storage.prototype.setItem = original;
+      IDBObjectStore.prototype.put = original;
     }
     return {
       before,
@@ -182,6 +188,7 @@ test("Triple Shuffle preserves tray, multiset, cover graph, and clears undo afte
   page,
 }) => {
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const before = await page.evaluate(async () => {
     const { startTripleConnectDevelopmentRound } = await import(
       "/js/tripleConnect/tripleController.js"
@@ -189,13 +196,14 @@ test("Triple Shuffle preserves tray, multiset, cover graph, and clears undo afte
     const { grantTripleItem } = await import(
       "/js/tripleConnect/tripleItems.js"
     );
-    const run = startTripleConnectDevelopmentRound({ seed: "shuffle" });
-    grantTripleItem("shuffle");
+    const run = (await startTripleConnectDevelopmentRound({ seed: "shuffle" }));
+    await grantTripleItem("shuffle");
     document
       .querySelector(
         ".triple-connect__board .triple-connect__tile:not(:disabled)",
       )
       .click();
+    await run.whenIdle();
     window.__tripleShuffleRun = run;
     const state = run.getState();
     return {
@@ -217,6 +225,7 @@ test("Triple Shuffle preserves tray, multiset, cover graph, and clears undo afte
   await page.locator("#triple-tools-toggle").click();
   await page.locator('[data-triple-item="shuffle"]').click();
   const after = await page.evaluate(async () => {
+    await window.__tripleShuffleRun.whenIdle();
     const { assertTripleStateInvariant } = await import(
       "/js/tripleConnect/tripleState.js"
     );
@@ -278,6 +287,7 @@ test("Triple Shuffle persistence failure leaves runtime state and inventory unch
   page,
 }) => {
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const result = await page.evaluate(async () => {
     const { startTripleConnectDevelopmentRound } = await import(
       "/js/tripleConnect/tripleController.js"
@@ -287,30 +297,32 @@ test("Triple Shuffle persistence failure leaves runtime state and inventory unch
     );
     const { gameState } = await import("/js/gameState.js");
     const { getActiveSession } = await import("/js/sessionProgress.js");
-    const run = startTripleConnectDevelopmentRound({
+    const run = (await startTripleConnectDevelopmentRound({
       seed: "shuffle-rollback",
-    });
-    grantTripleItem("shuffle");
+    }));
+    await grantTripleItem("shuffle");
     document
       .querySelector(
         ".triple-connect__board .triple-connect__tile:not(:disabled)",
       )
       .click();
+    await run.whenIdle();
     const before = {
       count: gameState.progress.tripleConnect.items.shuffle,
       state: JSON.stringify(run.getState()),
       session: JSON.stringify(getActiveSession("triple-connect", "easy")),
     };
-    const original = Storage.prototype.setItem;
-    Storage.prototype.setItem = function forceFailure(key, value) {
-      if (key === "memoryMatchSave")
+    const original = IDBObjectStore.prototype.put;
+    IDBObjectStore.prototype.put = function forceFailure(...args) {
+      if (this.name === "profile")
         throw new Error("forced transaction failure");
-      return original.call(this, key, value);
+      return original.apply(this, args);
     };
     try {
       document.querySelector('[data-triple-item="shuffle"]').click();
+      await run.whenIdle();
     } finally {
-      Storage.prototype.setItem = original;
+      IDBObjectStore.prototype.put = original;
     }
     return {
       before,
@@ -328,6 +340,7 @@ test("Triple purchase rolls back coins and inventory when persistence fails", as
   page,
 }) => {
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const result = await page.evaluate(async () => {
     const { gameState } = await import("/js/gameState.js");
     const { purchaseTripleItem } = await import(
@@ -339,16 +352,16 @@ test("Triple purchase rolls back coins and inventory when persistence fails", as
       coins: gameState.coins,
       time: gameState.progress.tripleConnect.items.time,
     };
-    const original = Storage.prototype.setItem;
-    Storage.prototype.setItem = function forceFailure(key, value) {
-      if (key === "memoryMatchSave") throw new Error("forced purchase failure");
-      return original.call(this, key, value);
+    const original = IDBObjectStore.prototype.put;
+    IDBObjectStore.prototype.put = function forceFailure(...args) {
+      if (this.name === "profile") throw new Error("forced purchase failure");
+      return original.apply(this, args);
     };
     let purchased;
     try {
-      purchased = purchaseTripleItem("time");
+      purchased = await purchaseTripleItem("time");
     } finally {
-      Storage.prototype.setItem = original;
+      IDBObjectStore.prototype.put = original;
     }
     return {
       purchased,
@@ -367,6 +380,7 @@ test("Triple Shuffle layout cleanup remains bounded across remounts", async ({
   page,
 }) => {
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const diagnostics = await page.evaluate(async () => {
     const { startTripleConnectDevelopmentRound } = await import(
       "/js/tripleConnect/tripleController.js"
@@ -375,9 +389,8 @@ test("Triple Shuffle layout cleanup remains bounded across remounts", async ({
       "/js/gameShell/gameShellLayout.js"
     );
     const { getTripleShell } = await import("/js/tripleConnect/tripleShell.js");
-    ["easy", "normal", "hard", "superHard", "easy"].forEach((mode, index) =>
-      startTripleConnectDevelopmentRound({ mode, seed: `layout-${index}` }),
-    );
+    const modes = ['easy', 'normal', 'hard', 'superHard', 'easy'];
+    for (const [index, mode] of modes.entries()) await startTripleConnectDevelopmentRound({ mode, seed: `layout-${index}` });
     const mounted = getGameShellLayoutDiagnostics();
     getTripleShell().unmount();
     return { mounted, unmounted: getGameShellLayoutDiagnostics() };
@@ -399,6 +412,7 @@ test("Triple returns shell layout resources to baseline after 20 restart, mode, 
   page,
 }) => {
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const viewports = [
     { width: 360, height: 640 },
     { width: 640, height: 360 },
@@ -414,7 +428,7 @@ test("Triple returns shell layout resources to baseline after 20 restart, mode, 
       );
       const { getTripleShell } = await import("/js/tripleConnect/tripleShell.js");
       const { unmountActiveGameShell } = await import("/js/gameShell/gameShell.js");
-      startTripleConnectDevelopmentRound({ mode, seed: `cycle-${cycleId}` });
+      (await startTripleConnectDevelopmentRound({ mode, seed: `cycle-${cycleId}` }));
       await new Promise((resolve) => requestAnimationFrame(resolve));
       const scope = getTripleShell().scope;
       unmountActiveGameShell();

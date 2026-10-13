@@ -2,7 +2,6 @@ import { openAppModal, showAppToast } from "./modal.js";
 import { getAccountService } from "./accountService.js";
 import { getAppPageScope } from "./appPageLifecycle.js";
 import { gameState } from "./gameState.js";
-import { getLocalRestoreBackups } from "./persistence.js";
 import { createIcon } from "./icons.js";
 
 let activeView = null;
@@ -15,7 +14,7 @@ export function closeCloudConflictDialog() {
 export function showAccountPanel() {
   activeView?.dispose();
   const service = getAccountService();
-  if (!service) return openAppModal({ id: "account-modal", title: "Tài khoản", content: "<p>Bạn đang dùng bản lưu trên thiết bị. Kết nối cloud chưa được bật ở môi trường kiểm tra này.</p>" });
+  if (!service) return openAppModal({ id: "account-modal", title: "Tài khoản", content: "<p>Người chơi</p><p>Tiến trình đã lưu trên thiết bị.</p>" });
   const content = document.createElement("div");
   const identity = document.createElement("p");
   identity.className = "account-identity";
@@ -32,13 +31,10 @@ export function showAccountPanel() {
   saveName.type = "button"; saveName.className = "app-button"; saveName.textContent = "Lưu tên";
   const explanation = document.createElement("p");
   explanation.className = "account-explanation";
-  explanation.textContent = "Guest cũng có bản sao lưu. Liên kết Google giúp lấy lại tài khoản trên thiết bị khác. Nếu Google đã có bản lưu riêng, bạn sẽ chọn bản máy hoặc bản cloud; Xu và vật phẩm không cộng gộp.";
-  const restore = document.createElement("button");
-  restore.type = "button"; restore.className = "app-button"; restore.textContent = "Phục hồi bản máy trước đó"; restore.hidden = true;
-  content.append(identity, status, label, saveName, explanation, restore);
+  explanation.textContent = "Liên kết Google để chơi tiếp trên thiết bị khác.";
+  content.append(identity, status, label, saveName, explanation);
   const modal = openAppModal({ id: "account-modal", title: "Tài khoản", icon: "account", content, onClose: () => dispose(), onActionSettled: () => renderState(service.getState()), actions: [
     { label: "Google", icon: "account", variant: "primary", onClick: async () => { await service.requestGoogleLogin(); return false; } },
-    { label: "Đồng bộ ngay", icon: "restart", onClick: async () => { await service.syncNow({ manual: true }); return false; } },
   ] });
   let releaseOwner;
   let unsubscribe;
@@ -52,15 +48,14 @@ export function showAccountPanel() {
   releaseOwner = getAppPageScope()?.own(dispose, "cleanup");
   function renderState(state) {
     if (disposed) return;
-    identity.textContent = state.isAnonymous ? "Đang chơi với tài khoản Guest" : "Đã đăng nhập Google";
-    status.textContent = state.message;
+    identity.textContent = state.isAnonymous ? "Tài khoản khách" : "Đã đăng nhập Google";
+    status.textContent = ({ connecting: "Đang kết nối…", restoring: "Đang tải tiến trình…", syncing: "Đang lưu…", synced: "Đã lưu tiến trình", waiting: "Đang chờ lưu", offline: "Chưa có kết nối", error: "Chưa lưu được. Sẽ thử lại.", disabled: "Tiến trình đã lưu trên thiết bị.", conflict: "Đang tải tiến trình…" })[state.phase] || "";
     if (document.activeElement !== name) name.value = state.playerName;
     const busy = ["connecting", "restoring", "syncing", "conflict"].includes(state.phase);
     name.disabled = saveName.disabled = !state.bound || busy;
     const google = modal.panel.querySelector(".app-modal__footer button");
     google.replaceChildren(createIcon("account"), document.createTextNode(state.isAnonymous ? "Liên kết Google" : "Đổi tài khoản Google"));
     google.disabled = !state.bound || busy;
-    restore.disabled = busy;
   }
   unsubscribe = service.subscribe(renderState);
   saveName.onclick = async () => {
@@ -69,11 +64,6 @@ export function showAccountPanel() {
     catch (error) { if (!disposed) showAppToast(error.message); }
     finally { if (!disposed) saveName.disabled = false; }
   };
-  restore.onclick = () => openAppModal({ id: "restore-local-confirmation", title: "Phục hồi bản máy?", content: "<p>Bản máy trước khi dùng cloud sẽ thay dữ liệu hiện tại. Dữ liệu hiện tại cũng được giữ trong danh sách phục hồi.</p>", actions: [
-    { label: "Giữ hiện tại", onClick: close => close() },
-    { label: "Phục hồi", variant: "primary", onClick: async () => service.restoreLocalBackup() },
-  ] });
-  void getLocalRestoreBackups().then(backups => { if (!disposed) restore.hidden = !backups.length; }).catch(error => { if (!disposed) showAppToast(error.message); });
   return modal;
 }
 

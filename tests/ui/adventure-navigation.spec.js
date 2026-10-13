@@ -29,6 +29,10 @@ for (const viewport of [{ width: 412, height: 915 }, { width: 844, height: 390 }
       await page.waitForFunction(() => {
         const dock = document.querySelector(".adventure-dock--playing");
         const frame = [...document.querySelectorAll('[data-shell-region="frame"]')].find(node => node.getBoundingClientRect().height > 0);
+        if (frame?.closest('.shell-scroll-playing')) {
+          const root = frame.closest('.shell-scroll-playing');
+          root.scrollTop = root.scrollHeight;
+        }
         return frame && frame.getBoundingClientRect().bottom <= dock.getBoundingClientRect().top + 2;
       });
       await dock.locator('[data-dock-action="ranking"]').click();

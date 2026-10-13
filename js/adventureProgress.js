@@ -49,12 +49,12 @@ export function getAdventureSummary(bestByLevel = {}, firstIncompleteChapter = 1
   const firstLevel = (currentChapter - 1) * CHAPTER_SIZE + 1;
   const lastLevel = firstLevel + CHAPTER_SIZE - 1;
   const completed = chapters.get(currentChapter) || new Set();
-  let highestCleared = firstLevel - 1;
-  for (const level of completed) highestCleared = Math.max(highestCleared, level);
+  let nextLevel = firstLevel;
+  while (completed.has(nextLevel) && nextLevel < lastLevel) nextLevel += 1;
   return {
     currentChapter, firstLevel, lastLevel,
     completedCount: completed.size,
-    unlockedThrough: Math.min(lastLevel, Math.max(firstLevel + 2, highestCleared + 3)),
+    unlockedThrough: nextLevel,
   };
 }
 
@@ -83,7 +83,7 @@ export function getAdventureLevelState(bestByLevel, mode, level, summary = getAd
   const modeCleared = isCompletedLevelResult(result);
   return {
     level, chapter,
-    locked: chapter > summary.currentChapter || (chapter === summary.currentChapter && level > summary.unlockedThrough),
+    locked: chapter > summary.currentChapter || (chapter === summary.currentChapter && level > summary.unlockedThrough && !isAdventureLevelCleared(bestByLevel, level)),
     cleared: isAdventureLevelCleared(bestByLevel, level),
     modeCleared,
     stars: modeCleared ? result.stars : 0,

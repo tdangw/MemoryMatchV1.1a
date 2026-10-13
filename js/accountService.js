@@ -1,14 +1,16 @@
 import { onIdTokenChanged, signInAnonymously, GoogleAuthProvider, linkWithPopup, signInWithPopup, signInWithCredential } from "firebase/auth";
 import { getFirebaseBackend } from "./firebaseBackend.js";
 import { encodeCloudSnapshot } from "./cloudSnapshot.js";
-import { readCloudRoot, readCloudSnapshot, publishCloudSnapshot, collectCloudObjects, CloudConflictError } from "./cloudStore.js";
-import { exportPersistentSnapshot, loadSyncMetadata, saveSyncMetadata, importPersistentSnapshot, getLocalRestoreBackups, loadProfileOwner, getPersistenceStatus, subscribeToLocalCommit } from "./persistence.js";
+import { readCloudRoot, readCloudSnapshot, publishCloudSnapshot, collectCloudObjects, CloudConflictError, observeCloudRoot } from "./cloudStore.js";
+import { exportPersistentSnapshot, loadSyncMetadata, saveSyncMetadata, updateSyncMetadata, importPersistentSnapshot, getLocalRestoreBackups, loadProfileOwner, subscribeToLocalCommit } from "./persistence.js";
 import { createGameShellLifecycle, getActiveGameScope, clearShellTimeout } from "./gameShell/gameShellLifecycle.js";
 import { getAppPageScope, subscribeToAppPages } from "./appPageLifecycle.js";
 import { replaceProfileSafely, waitForProfileReplacement } from "./profileOperations.js";
 import { setRankingOwner } from './rankingOwner.js';
+import { gameState } from './gameState.js';
+import { createCloudSaveEventFilter, cloudSaveEventSignature } from './cloudSaveEvents.js';
 
-const AUTO_SYNC_INTERVAL_MS = 60000;
+const AUTO_SYNC_INTERVAL_MS = 15000;
 const MAX_RETRIES = 5;
 const MAX_PENDING_HASHES = 8192;
 let instance = null;
@@ -32,6 +34,11 @@ function createAccountService(options) {
   let scheduled = null;
   let lastUploadAt = 0;
   let retries = 0;
+  let saveGeneration = 0;
+  let isCloudSaveEvent = createCloudSaveEventFilter(gameState.progress, gameState.coins, gameState.appearance);
+  let stopCloudObserver = null;
+  let remoteRoot = null;
+  scope.own(() => stopCloudObserver?.(), "listener");
   const publicState = () => ({ ...state, conflict: Boolean(pending), bound: metadata?.uid === state.uid && Boolean(state.uid) });
   const current = (id, uid = state.uid) => scope.active && generation === id && backend?.auth.currentUser?.uid === uid;
   const notify = () => {
@@ -41,15 +48,20 @@ function createAccountService(options) {
   };
   const setPhase = (phase, message) => { state.phase = phase; state.message = message; notify(); };
   const workKey = uid => `${state.environment}:work:${uid}`;
+  const eventKey = uid => `${state.environment}:events:${uid}`;
   const defaultName = uid => `Người chơi ${uid.slice(-5)}`;
 
   function scheduleSync(delay, manual = false) {
-    if (!scope.active || !metadata || pending || retries >= MAX_RETRIES) return;
+    if (!scope.active || !metadata || retries >= MAX_RETRIES) return;
     const wait = delay ?? Math.max(0, AUTO_SYNC_INTERVAL_MS - (Date.now() - lastUploadAt));
     const dueAt = Date.now() + wait;
     if (scheduled && scheduled.dueAt <= dueAt) return;
     if (scheduled) clearShellTimeout(scheduled.handle);
-    const handle = scope.timeout(() => { scheduled = null; void syncNow({ manual }).catch(handleFailure); }, wait);
+    const handle = scope.timeout(() => {
+      scheduled = null;
+      if (pending) { pending.notifiedOwner = null; notifyConflict(); }
+      else void syncNow({ manual }).catch(handleFailure);
+    }, wait);
     scheduled = { handle, dueAt };
   }
   function handleFailure(error) {
@@ -57,7 +69,7 @@ function createAccountService(options) {
     const offline = !navigator.onLine || ["unavailable", "auth/network-request-failed", "deadline-exceeded"].includes(error.code);
     setPhase(offline ? "offline" : "error", offline ? "Đang offline. Bản máy vẫn được lưu; sẽ gửi lại khi kết nối." : "Chưa đồng bộ được. Bản máy vẫn được giữ nguyên.");
     retries += 1;
-    if (offline && navigator.onLine && retries < MAX_RETRIES) scheduleSync(Math.min(900000, AUTO_SYNC_INTERVAL_MS * 2 ** retries));
+    if (navigator.onLine && retries < MAX_RETRIES) scheduleSync(Math.min(900000, AUTO_SYNC_INTERVAL_MS * 2 ** retries));
   }
   async function ensureGuest() {
     if (backend.auth.currentUser) return backend.auth.currentUser;
@@ -83,7 +95,7 @@ function createAccountService(options) {
     const preview = root ? await readCloudSnapshot(backend.database, state.environment, state.uid, { ...root, manifest: { profile: root.manifest.profile } }, () => current(id)) : null;
     if (!current(id)) return;
     pending = { root, preview, notifiedOwner: null };
-    setPhase("conflict", "Bản máy và bản cloud khác nhau. Hãy chọn một bản, không cộng Xu hoặc vật phẩm.");
+    setPhase("conflict", "Đang tải tiến trình…");
     notifyConflict();
   }
   function notifyConflict() {
@@ -91,14 +103,15 @@ function createAccountService(options) {
     if (!pending || state.phase === "restoring" || getActiveGameScope() || !page?.active || pending.notifiedOwner === page) return;
     pending.notifiedOwner = page;
     const id = generation;
-    options.onConflict?.({ root: pending.root, cloud: pending.preview?.profile.data || null, choose: choice => current(id) ? chooseConflict(choice) : false });
+    void chooseConflict("cloud").catch(error => { if (current(id)) handleFailure(error); });
   }
-  async function bindUser(user) {
+  async function bindUser(user, force = false) {
     if (!scope.active) return;
-    if (state.uid === user.uid && metadata?.uid === user.uid && !pending) {
+    if (!force && state.uid === user.uid && metadata?.uid === user.uid && !pending) {
       state.isAnonymous = user.isAnonymous; notify(); return;
     }
     const id = ++generation;
+    stopCloudObserver?.(); stopCloudObserver = null; remoteRoot = null;
     pending = null;
     options.onConflictCleared?.();
     if (scheduled !== null) { clearShellTimeout(scheduled.handle); scheduled = null; }
@@ -116,15 +129,26 @@ function createAccountService(options) {
     if (!current(id, user.uid)) return;
     const snapshot = await exportPersistentSnapshot();
     const encoded = await encodeCloudSnapshot(snapshot);
+    const event = await loadSyncMetadata(eventKey(user.uid));
     if (!current(id, user.uid)) return;
-    if (root?.fingerprint === encoded.fingerprint) {
+    const dirtyEvent = metadata?.uid === user.uid && event?.profileId === owner.id && event.counter > event.savedCounter;
+    if (root?.fingerprint === encoded.fingerprint && root.playerName === state.playerName) {
+      if (dirtyEvent) await updateSyncMetadata(eventKey(user.uid), latest => latest?.profileId === event.profileId ? { ...latest, savedCounter: Math.max(latest.savedCounter || 0, event.counter) } : latest, () => current(id, user.uid));
+      if (!current(id, user.uid)) return;
       const next = { uid: user.uid, profileId: owner.id, cloudRevision: root.revision, fingerprint: root.fingerprint, lastSyncedLocalRevision: snapshot.profile.revision, playerName: metadata?.uid === user.uid ? metadata.playerName : root.playerName };
       if (!await persistMetadata(next, id)) throw new Error("Chưa lưu được liên kết tài khoản.");
       if (!current(id, user.uid)) return;
       state.playerName = next.playerName; state.lastSavedAt = root.updatedAt?.toMillis?.() || Date.now();
       setPhase("synced", "Đã sao lưu.");
-      scheduleSync();
-    } else if (!root || metadata?.uid === user.uid && metadata.cloudRevision === root.revision) {
+    } else if (!root || metadata?.uid === user.uid && (metadata.cloudRevision === root.revision || dirtyEvent)) {
+      if (root && !dirtyEvent) {
+        const cloud = await readCloudSnapshot(backend.database, state.environment, user.uid, { ...root, manifest: { profile: root.manifest.profile } }, () => current(id, user.uid));
+        if (!current(id, user.uid)) return;
+        if (root.playerName === state.playerName && cloudSaveEventSignature(snapshot.profile.data) === cloudSaveEventSignature(cloud.profile.data)) {
+          setPhase("synced", "Đã lưu tiến trình");
+          return;
+        }
+      }
       const next = { uid: user.uid, profileId: owner.id, cloudRevision: root?.revision || 0, fingerprint: root?.fingerprint || null, lastSyncedLocalRevision: metadata?.uid === user.uid ? metadata.lastSyncedLocalRevision || 0 : 0, playerName: metadata?.uid === user.uid ? metadata.playerName : root?.playerName || defaultName(user.uid) };
       if (!await persistMetadata(next, id)) throw new Error("Chưa lưu được liên kết tài khoản.");
       if (!current(id, user.uid)) return;
@@ -169,6 +193,9 @@ function createAccountService(options) {
     const id = generation;
     const uid = state.uid;
     const operation = async () => {
+      const snapshotSaveGeneration = saveGeneration;
+      const snapshotEvent = await loadSyncMetadata(eventKey(uid));
+      if (!current(id, uid)) return false;
       setPhase("syncing", "Đang sao lưu…");
       await clearWork(uid, id);
       const snapshot = await exportPersistentSnapshot();
@@ -185,12 +212,13 @@ function createAccountService(options) {
       });
       if (!current(id, uid)) return false;
       lastUploadAt = Date.now(); retries = 0;
+      if (snapshotEvent?.profileId === owner.id) await updateSyncMetadata(eventKey(uid), event => event?.profileId === snapshotEvent.profileId ? { ...event, savedCounter: Math.max(event.savedCounter || 0, snapshotEvent.counter) } : event, () => current(id, uid));
       const next = { ...metadata, cloudRevision: result.root.revision, fingerprint: result.root.fingerprint, lastSyncedLocalRevision: snapshot.profile.revision, playerName: state.playerName };
       if (!await persistMetadata(next, id)) throw new Error("Cloud đã lưu nhưng chưa xác nhận được trên máy. Hãy kết nối lại để kiểm tra.");
       if (!result.cleanupError) await saveSyncMetadata(workKey(uid), { jobs: [] }, () => current(id, uid));
       if (!current(id, uid)) return false;
       state.lastSavedAt = result.root.updatedAt?.toMillis?.() || Date.now(); state.operations = { reads: result.reads, writes: result.writes, bytes: encoded.byteLength };
-      const changed = getPersistenceStatus().revision !== snapshot.profile.revision || state.playerName !== result.root.playerName;
+      const changed = saveGeneration !== snapshotSaveGeneration || state.playerName !== result.root.playerName;
       setPhase(changed ? "waiting" : "synced", changed ? "Đã lưu một bản; các thay đổi mới đang chờ gửi." : "Đã sao lưu.");
       if (changed || result.cleanupError) scheduleSync();
       return true;
@@ -198,12 +226,17 @@ function createAccountService(options) {
     networkTask = operation().catch(async error => {
       if (!current(id, uid)) return false;
       if (error instanceof CloudConflictError) {
-        try { await pendingConflict(error.root, id); }
-        catch (previewError) { if (current(id, uid)) handleFailure(previewError); }
+        // A locally completed event is a new save: retry against the latest server revision.
+        // The server transaction remains the only ordering authority; device clocks are not compared.
+        if (await persistMetadata({ ...metadata, cloudRevision: error.root?.revision || 0 }, id)) {
+          retries += 1;
+          setPhase("waiting", "Đang chờ lưu");
+          scheduleSync(AUTO_SYNC_INTERVAL_MS);
+        }
       }
       else handleFailure(error);
       return false;
-    }).finally(() => { networkTask = null; });
+    }).finally(() => { networkTask = null; refreshRemote(); });
     return networkTask;
   }
 
@@ -232,6 +265,7 @@ function createAccountService(options) {
       const restoredOwner = await loadProfileOwner();
       if (!current(id, uid)) return true;
       metadata = restoredMetadata; owner = restoredOwner;
+      isCloudSaveEvent = createCloudSaveEventFilter(gameState.progress, gameState.coins, gameState.appearance);
       pending = null; state.playerName = next.playerName; state.lastSavedAt = latest.updatedAt?.toMillis?.() || Date.now();
       setPhase("synced", "Đã dùng bản cloud. Bản máy trước đó vẫn có thể phục hồi.");
       return true;
@@ -257,7 +291,7 @@ function createAccountService(options) {
   }
 
   async function requestGoogleLogin() {
-    if (!backend) throw new Error("Chưa kết nối được Firebase.");
+    if (!backend) throw new Error("Chưa có kết nối. Hãy thử lại.");
     if (["connecting", "restoring", "syncing", "conflict"].includes(state.phase)) throw new Error("Hãy hoàn tất đồng bộ hoặc chọn bản lưu trước.");
     const user = await ensureGuest();
     if (metadata?.uid !== user.uid) await bindUser(user);
@@ -283,7 +317,8 @@ function createAccountService(options) {
     const next = { ...metadata, playerName: name };
     if (!await persistMetadata(next, id)) return false;
     if (!current(id, next.uid)) return false;
-    state.playerName = name; setPhase("waiting", "Tên mới đã lưu trên máy, đang chờ đồng bộ."); scheduleSync();
+    saveGeneration += 1;
+    state.playerName = name; setPhase("waiting", "Tên mới đã lưu trên máy, đang chờ đồng bộ."); markSaveEvent();
     return true;
   }
   async function applyLocalBackup() {
@@ -329,33 +364,58 @@ function createAccountService(options) {
       if (user) {
         const binding = bindUser(user);
         const id = generation;
-        void binding.catch(error => { if (current(id, user.uid)) handleFailure(error); });
+        void binding.then(() => observeBoundUser(user, id)).catch(error => { if (current(id, user.uid)) handleFailure(error); });
       }
       else connectGuest();
     }, handleFailure), "listener");
-    scope.own(subscribeToLocalCommit(() => {
-      if (!metadata || pending) return;
+    scope.own(subscribeToLocalCommit(({ patch }) => {
+      if (!metadata || metadata.uid !== state.uid) return;
+      if (!isCloudSaveEvent(patch)) return;
+      if (pending) { pending = null; options.onConflictCleared?.(); }
+      saveGeneration += 1;
       if (state.phase === "synced") setPhase("waiting", "Các thay đổi mới đã lưu trên máy, đang chờ gửi.");
-      scheduleSync();
+      markSaveEvent();
     }), "listener");
-    scope.own(subscribeToAppPages(() => { queueMicrotask(() => { if (scope.active) notifyConflict(); }); }), "listener");
+    scope.own(subscribeToAppPages(() => { queueMicrotask(() => { if (scope.active) { notifyConflict(); refreshRemote(); } }); }), "listener");
     scope.listen(window, "online", () => {
       retries = 0;
+      if (pending) { pending.notifiedOwner = null; notifyConflict(); return; }
       if (!backend.auth.currentUser) connectGuest();
-      else if (metadata?.uid !== state.uid) {
+      else {
         const user = backend.auth.currentUser;
-        const binding = bindUser(user);
+        const binding = bindUser(user, true);
         const id = generation;
-        void binding.catch(error => { if (current(id, user.uid)) handleFailure(error); });
+        void binding.then(() => observeBoundUser(user, id)).catch(error => { if (current(id, user.uid)) handleFailure(error); });
       }
-      else scheduleSync(0, true);
     });
     scope.listen(document, "visibilitychange", () => {
-      if (document.hidden && !pending) void syncNow({ manual: true }).catch(handleFailure);
-      else if (!document.hidden) notifyConflict();
+      if (!document.hidden) notifyConflict();
     });
     scope.listen(window, "pagehide", event => { if (!event.persisted) service.dispose(); });
     notify();
+  }
+  function observeBoundUser(user, id) {
+    if (!current(id, user.uid) || stopCloudObserver) return;
+    stopCloudObserver = observeCloudRoot(backend.database, state.environment, user.uid, root => {
+      if (!current(id, user.uid) || root.revision <= (metadata?.cloudRevision || 0)) return;
+      remoteRoot = root;
+      refreshRemote();
+    }, error => { if (current(id, user.uid)) handleFailure(error); });
+  }
+  function markSaveEvent() {
+    const id = generation; const uid = state.uid; const profileId = owner.id;
+    const ownsProfile = () => current(id, uid) && owner.id === profileId && metadata?.profileId === profileId;
+    void updateSyncMetadata(eventKey(uid), event => ({ profileId, counter: (event?.profileId === profileId ? event.counter || 0 : 0) + 1, savedCounter: event?.profileId === profileId ? event.savedCounter || 0 : 0 }), ownsProfile)
+      .then(() => { if (ownsProfile()) scheduleSync(); })
+      .catch(error => { if (ownsProfile()) handleFailure(error); });
+  }
+  function refreshRemote() {
+    if (!remoteRoot || pending || scheduled || networkTask || getActiveGameScope() || !getAppPageScope()?.active) return;
+    const root = remoteRoot; remoteRoot = null;
+    if (root.revision > (metadata?.cloudRevision || 0)) {
+      const id = generation; const uid = state.uid;
+      void pendingConflict(root, id).catch(error => { if (current(id, uid)) handleFailure(error); });
+    }
   }
   const service = {
     ready: null,

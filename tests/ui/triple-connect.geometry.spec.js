@@ -22,6 +22,7 @@ for (const viewport of viewports) {
   }) => {
     await page.setViewportSize(viewport);
     await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
 
     for (const [mode, expectedTileCount] of modes) {
       const geometry = await page.evaluate(
@@ -32,10 +33,10 @@ for (const viewport of viewports) {
           const { getTripleLayout } = await import(
             "/js/tripleConnect/tripleBoard.js"
           );
-          const run = startTripleConnectDevelopmentRound({
+          const run = (await startTripleConnectDevelopmentRound({
             mode: selectedMode,
             seed: `geometry-${selectedMode}`,
-          });
+          }));
           await new Promise((resolve) =>
             requestAnimationFrame(() => requestAnimationFrame(resolve)),
           );
@@ -48,6 +49,8 @@ for (const viewport of viewports) {
             root: rect(root),
             board: rect(board),
             tray: rect(tray),
+            scrolling: root.classList.contains("shell-scroll-playing"),
+            scrollRange: root.scrollHeight - root.clientHeight,
             boardTiles: [
               ...board.querySelectorAll(".triple-connect__tile"),
             ].map((node) => ({
@@ -64,22 +67,23 @@ for (const viewport of viewports) {
               getComputedStyle(tray).gridTemplateColumns.split(" ").length,
             boardAndTraySeparated: board.getBoundingClientRect().bottom <=
               tray.getBoundingClientRect().top,
-            cornerStacks: Object.values(run.getState().cornerStacks).map((pile, index) => {
+            cornerStacks: await Promise.all(Object.values(run.getState().cornerStacks).map(async (pile, index) => {
               const tileId = pile.tileIds.at(-1);
               const node = board.querySelector(`[data-tile-id="${tileId}"]`);
+              if (root.classList.contains("shell-scroll-playing")) node?.scrollIntoView({ block: "center" });
               const tileRect = node?.getBoundingClientRect();
               const hit = tileRect && document.elementFromPoint(
                 tileRect.left + tileRect.width / 2,
                 tileRect.top + tileRect.height / 2,
               );
-              if (index === 0) node?.click();
+              if (index === 0) { node?.click(); await run.whenIdle(); }
               return {
                 tileId,
                 rendered: Boolean(node),
                 hitTargetId: hit?.closest("[data-tile-id]")?.dataset.tileId || null,
                 movedOffBoard: index === 0 && run.getState().tiles[tileId].location !== "board",
               };
-            }),
+            })),
             layout,
           };
         },
@@ -112,7 +116,15 @@ for (const viewport of viewports) {
       expect(geometry.root.top).toBeGreaterThanOrEqual(-1);
       expect(geometry.root.bottom).toBeLessThanOrEqual(viewport.height + 1);
       expect(geometry.tray.top).toBeGreaterThanOrEqual(-1);
-      expect(geometry.tray.bottom).toBeLessThanOrEqual(viewport.height + 1);
+      if (geometry.scrolling) {
+        expect(geometry.scrollRange).toBeGreaterThan(0);
+        const trayBottom = await page.evaluate(() => {
+          const root = document.querySelector('#triple-connect-container');
+          root.scrollTop = root.scrollHeight;
+          return root.querySelector('.triple-connect__tray').getBoundingClientRect().bottom;
+        });
+        expect(trayBottom).toBeLessThanOrEqual(viewport.height - 44 + 1);
+      } else expect(geometry.tray.bottom).toBeLessThanOrEqual(viewport.height + 1);
       expect(geometry.layout.coordinateUnit).toBe("half-card");
       expect(
         Math.abs(
@@ -135,11 +147,12 @@ for (const viewport of viewports) {
 test("Triple tray owns ten stable visual slots with three locked by default", async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 640 });
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const trayGeometry = await page.evaluate(async () => {
     const { startTripleConnectDevelopmentRound } = await import(
       "/js/tripleConnect/tripleController.js"
     );
-    const run = startTripleConnectDevelopmentRound({ seed: "tray-touch-target" });
+    const run = (await startTripleConnectDevelopmentRound({ seed: "tray-touch-target" }));
     const rect = (node) => node.getBoundingClientRect().toJSON();
     const tray = document.querySelector(".triple-connect__tray");
     const snapshots = [{ tray: rect(tray), slots: [...tray.children].map(rect) }];
@@ -189,11 +202,12 @@ test("Triple tray owns ten stable visual slots with three locked by default", as
 test("Triple milestone HUD uses the shared ten-marker geometry", async ({ page }) => {
   await page.setViewportSize({ width: 914, height: 900 });
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const milestones = await page.evaluate(async () => {
     const { startTripleConnectDevelopmentRound } = await import(
       "/js/tripleConnect/tripleController.js"
     );
-    startTripleConnectDevelopmentRound({ seed: "triple-milestone-geometry" });
+    (await startTripleConnectDevelopmentRound({ seed: "triple-milestone-geometry" }));
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
     const root = document.querySelector("#triple-connect-container");
     const hud = root.querySelector(".triple-connect__milestones");
@@ -227,11 +241,12 @@ test("Triple image errors fall back without changing board topology", async ({
   page,
 }) => {
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const fallback = await page.evaluate(async () => {
     const { startTripleConnectDevelopmentRound } = await import(
       "/js/tripleConnect/tripleController.js"
     );
-    const run = startTripleConnectDevelopmentRound({ seed: "image-fallback" });
+    const run = (await startTripleConnectDevelopmentRound({ seed: "image-fallback" }));
     const image = document.querySelector(
       ".triple-connect__board .triple-connect__tile img",
     );
@@ -261,14 +276,15 @@ test("Triple orientation changes preserve the active board instance", async ({
 }) => {
   await page.setViewportSize({ width: 360, height: 640 });
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const before = await page.evaluate(async () => {
     const { startTripleConnectDevelopmentRound } = await import(
       "/js/tripleConnect/tripleController.js"
     );
-    startTripleConnectDevelopmentRound({
+    (await startTripleConnectDevelopmentRound({
       mode: "superHard",
       seed: "orientation",
-    });
+    }));
     return [
       ...document.querySelectorAll(
         ".triple-connect__board .triple-connect__tile",

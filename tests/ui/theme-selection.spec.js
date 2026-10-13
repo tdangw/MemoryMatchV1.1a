@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 
 test("theme selection is shared, snapshots Continue assets, and Triple maps every type distinctly", async ({ page }) => {
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const result = await page.evaluate(async () => {
     const { gameState } = await import("/js/gameState.js");
     const { startNewMemoryRun, continueMemorySession } = await import("/js/gameController.js");
@@ -21,7 +22,7 @@ test("theme selection is shared, snapshots Continue assets, and Triple maps ever
     await continueLinkSession(linkSession);
     const linkAfter = [...new Set([...document.querySelectorAll(".link-tile img")].map((image) => image.src))];
 
-    const triple = startTripleConnectDevelopmentRound({ mode: "superHard", seed: "theme-map" });
+    const triple = (await startTripleConnectDevelopmentRound({ mode: "superHard", seed: "theme-map" }));
     const tripleSession = structuredClone(gameState.progress.tripleConnect.sessionsByMode.superHard);
     const typeMap = tripleSession.snapshot.assetPathsByType;
     const typeCounts = Object.values(tripleSession.snapshot.tiles).reduce((counts, tile) => {
@@ -52,6 +53,7 @@ test("theme selection is shared, snapshots Continue assets, and Triple maps ever
 
 test("Triple production rounds receive fresh seeds while explicit fixture seeds reproduce visual mapping", async ({ page }) => {
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const result = await page.evaluate(async () => {
     const { gameState } = await import("/js/gameState.js");
     const { startTripleConnectRound, startTripleConnectDevelopmentRound } = await import("/js/tripleConnect/tripleController.js");
@@ -61,9 +63,9 @@ test("Triple production rounds receive fresh seeds while explicit fixture seeds 
     await startTripleConnectRound({ mode: "easy", skipIntro: true });
     const productionSecond = structuredClone(gameState.progress.tripleConnect.sessionsByMode.easy);
 
-    startTripleConnectDevelopmentRound({ mode: "easy", seed: "stable-visual-fixture" });
+    (await startTripleConnectDevelopmentRound({ mode: "easy", seed: "stable-visual-fixture" }));
     const fixtureFirst = structuredClone(gameState.progress.tripleConnect.sessionsByMode.easy);
-    startTripleConnectDevelopmentRound({ mode: "easy", seed: "stable-visual-fixture" });
+    (await startTripleConnectDevelopmentRound({ mode: "easy", seed: "stable-visual-fixture" }));
     const fixtureSecond = structuredClone(gameState.progress.tripleConnect.sessionsByMode.easy);
 
     return {
@@ -80,6 +82,7 @@ test("Triple production rounds receive fresh seeds while explicit fixture seeds 
 
 test("generated themes persist stable selection IDs for Memory, Link, and Triple", async ({ page }) => {
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const result = await page.evaluate(async () => {
     const { gameState } = await import("/js/gameState.js");
     const { startNewMemoryRun } = await import("/js/gameController.js");
@@ -94,7 +97,7 @@ test("generated themes persist stable selection IDs for Memory, Link, and Triple
       gameState.settings.mode = "easy";
       await startNewMemoryRun();
       await startLinkLevel({ mode: "easy" });
-      startTripleConnectDevelopmentRound({ mode: "easy", seed: `generated-${theme}` });
+      (await startTripleConnectDevelopmentRound({ mode: "easy", seed: `generated-${theme}` }));
       results.push({
         theme,
         memory: gameState.progress.memoryMatch.sessionsByMode.easy.assetPaths,

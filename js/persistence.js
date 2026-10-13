@@ -70,7 +70,7 @@ export async function loadPersistentGameData() {
 }
 
 /** Snapshot at invocation: a later round cannot change a queued write's data. */
-export function savePersistentGameData({ coins, appearance, progress, settings } = {}) {
+export function savePersistentGameData({ coins, appearance, progress, settings, cloudEvent = false } = {}) {
   const patch = structuredClone({
     ...(coins !== undefined ? { coins: normalizeNonNegativeInteger(coins) } : {}),
     ...(appearance !== undefined ? { appearance } : {}),
@@ -98,7 +98,7 @@ export function savePersistentGameData({ coins, appearance, progress, settings }
         try { localStorage.setItem(PRIMARY_MARKER_KEY, String(knownRevision)); }
         catch (error) { console.warn("[Persistence] Không gửi được thông báo giữa các tab:", error.message); }
       }
-      notifyCommit(patch);
+      notifyCommit({ ...patch, ...(cloudEvent ? { cloudEvent: true } : {}) });
       return true;
     } catch (error) { blocked = true; reportPersistenceError("write", error); return false; }
   });

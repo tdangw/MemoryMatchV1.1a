@@ -50,13 +50,13 @@ for (const game of games) {
     expect(await scene.evaluate(node => node.getAnimations({ subtree: true }).length)).toBe(0);
     await scene.getByRole("button", { name: "Tiếp tục", exact: true }).click();
     await expect(scene).toHaveCount(0);
-    await page.waitForFunction(async ({ key, id }) => {
+    await expect.poll(() => page.evaluate(async ({ key, id }) => {
       const { gameState } = await import("/js/gameState.js");
       if (gameState.progress[key].adventure.currentChapter !== 2) return false;
       if (id === "memory-match") return gameState.currentLevel === 101;
       if (id === "link-connect") return (await import("/js/linkConnect/linkState.js")).linkGameState.level === 101;
       return document.querySelector("[data-triple-level]")?.textContent === "101";
-    }, { key: game.key, id: game.id });
+    }, { key: game.key, id: game.id })).toBe(true);
   });
 }
 

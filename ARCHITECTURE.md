@@ -86,7 +86,7 @@ Game Shell giữ đủ sáu region công khai: `title`, `progress`, `hud`, `mile
 - Vật phẩm mỗi trò nằm trong namespace `progress.<game>.items`; không dùng chung tồn kho giữa các trò.
 - Dữ liệu đọc từ storage phải được chuẩn hóa trước khi gán vào runtime. Giá trị âm, sai kiểu hoặc vượt giới hạn không được đi thẳng vào gameplay.
 - `roundId` là mã phiên runtime: callback bất đồng bộ phải kiểm tra đúng round và đúng board trước khi sửa trạng thái hoặc DOM.
-- `adventureProgress.js` sở hữu N+3/completion/chặng/rương; `adventureLaunch.js` tải kỷ lục canonical trước replay và giữ cache giới hạn. `adventureRewards.js` sở hữu catalog grant có type và claim một lần, commit cùng wallet.
+- `adventureProgress.js` sở hữu mở khóa tuần tự/completion/chặng/rương; `adventureLaunch.js` tải kỷ lục canonical trước replay và giữ cache giới hạn. `adventureRewards.js` sở hữu catalog grant có type và claim một lần, commit cùng wallet.
 - `playMetrics.js` đo thời gian thực theo ready/pause/modal/visibility/outcome, không có loop đo hoặc ghi theo frame. `rankingRules.js` sở hữu comparator và lượt liên tục: advance chuyển điểm một lần, restart thay điểm hiện tại, chỉ finalize khi kết thúc thật.
 
 ## 4. Luồng render và hiệu ứng
@@ -141,3 +141,13 @@ Gợi ý Memory dùng `progress.memoryMatch.items.hint`; `gameState.hints` là g
 `linkConnect/linkShell.js` sở hữu markup/vùng semantic/HUD/timing presentation của Link. Controller mount shell và cung cấp callback cho `bindLinkControls`; listener gắn scope theo lượt, node dựng một lần. Hai adapter legacy đã xóa. Renderer vẫn quản lý tile/path/shift/băng/hiệu ứng; shell không sở hữu board gameplay.
 
 `check-game-shell-contract.mjs` khóa import/ownership và contract sáu vùng semantic. UI audit kiểm ID trùng, `aria-controls`, geometry toolbar và tương tác giữa các nút con. Toolbar Memory ngang dùng token `hud.landscapeMinWidth`; thay đổi shared shell phải chạy lại contract và audit liên quan.
+
+## Tài khoản và dữ liệu online
+
+chapterStore/persistence sở hữu profile và các chapter IndexedDB; migration v1→v2 giữ nguồn cũ. Import profile, chapter, identity và backup là một transaction; profileOperations giữ khóa đến khi hydrate RAM hoàn tất. profile-owner/firstUid là metadata máy, không đưa vào cloud profile.
+
+accountService sở hữu Auth listener, lịch sync và UID/generation guard. cloudSnapshot mã hóa từng profile/chapter thành chunk có hash; cloudStore stage chunk rồi CAS root manifest, GC theo root đang dùng và stage identity. Bản commit lên máy chủ gần nhất thắng, không cộng gộp Xu/vật phẩm. cloudSaveEvents phân biệt thành tích/tài nguyên với checkpoint và cache chặng; event counter bền vững giữ retry sau reload. Cloud listener được hủy khi đổi UID và chỉ áp dụng snapshot mới tại menu. Môi trường production/beta/test/local có namespace riêng.
+
+playMetrics/rankingRules chụp owner khi bắt đầu attempt/run. bestByLevel và runBests giữ metric local aggregate; rankingResult là snapshot bất biến của đúng lượt đủ điều kiện. leaderboardService chỉ scan kết quả đã commit; outbox/receipt IndexedDB tách UID/profile, không gửi queue UID cũ bằng tài khoản mới. Queue giới hạn2000 mỗi owner và refill từ kết quả durable; tối đa20 kết quả mỗi15s. leaderboardStore ghi conditional best, top20+own, cache12 bảng/120s và refresh15s. Public Rules không chứa save, email hoặc credential.
+
+Analytics chỉ chạy production, gửi active_play_time theo segment của active clock khi pause/end; không có timer ghi mỗi giây. Auth UID làm pseudonymous userId. Không sử dụng Firestore cho DAU/WAU/MAU hoặc playtime counters. Các thống kê/dashboard thực và OAuth hosted cần xác minh trước phát hành.

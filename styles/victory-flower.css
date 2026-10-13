@@ -18,6 +18,9 @@
 .victory-action { display: flex; align-items: center; gap: 8px; justify-content: center; min-height: 48px; padding: 12px 22px; border: 1px solid #aecac3; border-radius: 24px; color: #dde8dc; background: #17364be8; font-size: 14px; cursor: pointer; }
 .victory-action:last-child { color: #183247; border-color: #ffe2a4; background: #e5c389; font-weight: 700; }
 .victory-action:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) {
+  .victory-flower-overlay, .victory-flower-overlay * { animation: none !important; transition: none !important; }
+}
 @media (max-height: 500px) and (orientation: landscape) {
   .victory-flower-scene { height: 96%; width: 48%; left: 28%; bottom: -8%; }
   .victory-flower-message { left: 50%; right: 4%; top: 20%; }

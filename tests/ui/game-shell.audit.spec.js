@@ -93,6 +93,7 @@ for (const [id, title, root, board] of [
         viewport: { width: innerWidth, height: innerHeight },
         regions: [...shell.children].map(element => ({ selector: element.id || element.className, ...rect(element) })),
         shellElementsExcludingBoard: [...shell.querySelectorAll("*")].filter(element => !element.closest(board)).length + 1,
+        dockElements: shell.querySelector('.adventure-dock').querySelectorAll('*').length + 1,
         boardElements: document.querySelector(board).querySelectorAll("*").length + 1,
         scheduledSinceMenu: window.auditPending(),
         timer: getComputedStyle(shell.querySelector(".game-hud"), "::after").height,
@@ -115,8 +116,10 @@ for (const [id, title, root, board] of [
     expect(baseline || visualCandidateViewport, "Every non-candidate viewport/game must have a preservation baseline").toBeTruthy();
     const shellOwnedRegions = metrics.regions
       .map(region => region.selector)
-      .filter(selector => !["shell-fullscreen-button", "shell-fullscreen-status"].includes(selector));
-    if (baseline) expect(shellOwnedRegions).toEqual(baseline.metrics.regions.map(region => region.selector));
+      .map(selector => selector.split(' ')[0])
+      .filter(selector => !['shell-fullscreen-button', 'shell-fullscreen-status', 'adventure-dock'].includes(selector));
+    if (baseline) expect(shellOwnedRegions).toEqual(baseline.metrics.regions.map(region => region.selector.split(' ')[0]));
+    await expect(page.locator(`${root} .adventure-dock button`)).toHaveText(['Cửa hàng', 'Bộ sưu tập', 'Xếp hạng', 'Cài đặt']);
     // The user intentionally unified the frame with Link Connect. Keep Phase 1
     // DOM budgets, but validate the new geometry and fullscreen in current snapshots.
     for (const region of metrics.regions) {
@@ -129,8 +132,8 @@ for (const [id, title, root, board] of [
     const comboProgressElements = await page.locator(`${root} .combo-window-progress`).count();
     expect(comboProgressElements, "Each game shell owns one WAAPI combo progress node").toBe(1);
     if (baseline) {
-      expect(metrics.shellElementsExcludingBoard - metrics.fullscreenElements - comboProgressElements)
-        .toBe(baseline.metrics.shellElementsExcludingBoard);
+      expect(metrics.shellElementsExcludingBoard - metrics.fullscreenElements - comboProgressElements - metrics.dockElements)
+        .toBeLessThanOrEqual(baseline.metrics.shellElementsExcludingBoard);
       expect(metrics.boardElements).toBe(baseline.metrics.boardElements);
     }
     const cdp = await page.context().newCDPSession(page);

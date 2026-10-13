@@ -106,7 +106,7 @@ configureMainMenu({
   startGame: startNewMemoryRun,
   continueGame: continueMemorySession,
 });
-configureSettings({ onCloseMenu: createActiveGameMenu });
+configureSettings({ onCloseMenu: createActiveGameMenu, onHome: showGameSelector });
 configureAppNavigation({
   account: async () => {
     if (import.meta.env.VITE_FIREBASE_DISABLED === '1') return openAppModal({ id: 'account-modal', title: 'Tài khoản', content: '<p>Bản lưu trên thiết bị đang hoạt động. Cloud được tắt trong môi trường kiểm tra.</p>' });
@@ -266,7 +266,7 @@ if (import.meta.env.VITE_FIREBASE_DISABLED !== '1') {
     return import('./leaderboardService.js').then(module => module.initializeLeaderboardService().ready);
   }).catch(error => {
     console.warn('Cloud startup unavailable', error.code || error.name);
-    showAppToast('Cloud chưa kết nối được. Bản máy vẫn hoạt động.');
+    showAppToast('Chưa kết nối được tài khoản. Tiến trình vẫn được lưu.');
   });
   void accountReady.then(() => import('./analyticsService.js')).then(module => module.initializeAnalytics()).catch(error => console.warn('Analytics unavailable', error.code || error.name));
 }

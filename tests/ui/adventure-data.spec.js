@@ -23,7 +23,7 @@ test("v1 migration preserves wallet/session and zero-star wins, then closes a ch
   expect(imported.coins).toBe(742);
   expect(imported.progress.items).toMatchObject({ hint: 9, time30: 2 });
   expect(imported.progress.sessionsByMode.easy).toMatchObject({ level: 3, remainingTime: 37 });
-  expect(imported.progress.adventure).toMatchObject({ currentChapter: 1, completedCount: 99, unlockedThrough: 100 });
+  expect(imported.progress.adventure).toMatchObject({ currentChapter: 1, completedCount: 99, unlockedThrough: 15 });
   expect(imported.status).toMatchObject({ backend: "indexedDB", formatVersion: 2 });
   expect(imported.recovery).toMatchObject({ formatVersion: 1, revision: 41, data: { coins: 742 } });
   await page.evaluate(async () => {
@@ -43,7 +43,7 @@ test("v1 migration preserves wallet/session and zero-star wins, then closes a ch
     const persistence = await import("/js/persistence.js");
     return { profile: (await persistence.loadPersistentGameData()).progress.memoryMatch, chapter: await persistence.loadPersistentChapter("memoryMatch", 1) };
   });
-  expect(completed.profile.adventure).toMatchObject({ currentChapter: 2, firstLevel: 101, unlockedThrough: 103 });
+  expect(completed.profile.adventure).toMatchObject({ currentChapter: 2, firstLevel: 101, unlockedThrough: 101 });
   expect(Object.keys(completed.chapter.bestByLevel)).toHaveLength(100);
   expect(completed.chapter.bestByLevel["easy:15"].cleared).toBe(true);
   expect(completed.profile.totalScore).toBeGreaterThanOrEqual(9900);

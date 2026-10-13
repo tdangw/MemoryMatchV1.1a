@@ -32,6 +32,7 @@ for (const game of [
   test(`${game.title}: HUD and board stay inside the viewport without overlap`, async ({ page }) => {
     await startEasyGame(page, game.title);
     await expect(page.locator(game.tile).first()).toBeVisible();
+    await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
 
     const geometry = await page.evaluate((selectors) => {
       const root = document.querySelector(selectors.root);

@@ -2,9 +2,10 @@ import { expect, test } from "@playwright/test";
 
 test("Triple development checkpoint restores after reload without undo history", async ({ page }) => {
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const before = await page.evaluate(async () => {
     const { startTripleConnectDevelopmentRound } = await import("/js/tripleConnect/tripleController.js");
-    const run = startTripleConnectDevelopmentRound({ seed: "persist" });
+    const run = (await startTripleConnectDevelopmentRound({ seed: "persist" }));
     for (const command of run.generated.witness) {
       document.querySelector(`[data-tile-id="${command.tileId}"]`)?.click();
       await new Promise((resolve) => setTimeout(resolve, 280));
@@ -24,10 +25,11 @@ test("Triple development checkpoint restores after reload without undo history",
 
 test("Triple hidden pile Continue restores the revealed top and fixed asset mapping", async ({ page }) => {
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const before = await page.evaluate(async () => {
     const { startTripleConnectDevelopmentRound } = await import("/js/tripleConnect/tripleController.js");
     const { getExposedTileIds } = await import("/js/tripleConnect/tripleState.js");
-    const run = startTripleConnectDevelopmentRound({ mode: "normal", seed: "persist-hidden-pile" });
+    const run = (await startTripleConnectDevelopmentRound({ mode: "normal", seed: "persist-hidden-pile" }));
     const current = run.getState();
     const pile = Object.values(current.cornerStacks).find((value) => getExposedTileIds(current).includes(value.tileIds.at(-1)));
     document.querySelector(`[data-tile-id="${pile.tileIds.at(-1)}"]`).click();
@@ -55,16 +57,17 @@ test("Triple hidden pile Continue restores the revealed top and fixed asset mapp
 
 test("Triple tray expansion purchases one slot at a time and applies immediately to the active round", async ({ page }) => {
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const purchased = await page.evaluate(async () => {
     const controller = await import("/js/tripleConnect/tripleController.js");
     const { gameState } = await import("/js/gameState.js");
     const { purchaseTripleTrayExpansion } = await import("/js/tripleConnect/tripleTransactions.js");
-    const run = controller.startTripleConnectDevelopmentRound({ seed: "expanded-tray" });
+    const run = (await controller.startTripleConnectDevelopmentRound({ seed: "expanded-tray" }));
     gameState.coins = 9000;
     const purchases = [];
     for (let slot = 1; slot <= 3; slot += 1) {
       purchases.push({
-        bought: purchaseTripleTrayExpansion(),
+        bought: await purchaseTripleTrayExpansion(),
         capacity: run.getState().trayCapacity,
         slots: gameState.progress.tripleConnect.trayExpansionSlots,
         coins: gameState.coins,
@@ -104,25 +107,26 @@ test("Triple tray expansion purchases one slot at a time and applies immediately
 
 test("Triple tray expansion stops at three slots and rolls back when persistence fails", async ({ page }) => {
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const result = await page.evaluate(async () => {
     const { gameState } = await import("/js/gameState.js");
     const { purchaseTripleTrayExpansion } = await import("/js/tripleConnect/tripleTransactions.js");
     gameState.coins = 12000;
     gameState.progress.tripleConnect.trayExpansionSlots = 0;
     gameState.progress.tripleConnect.trayExpansionOwned = false;
-    const first = purchaseTripleTrayExpansion();
-    const second = purchaseTripleTrayExpansion();
-    const third = purchaseTripleTrayExpansion();
+    const first = await purchaseTripleTrayExpansion();
+    const second = await purchaseTripleTrayExpansion();
+    const third = await purchaseTripleTrayExpansion();
     const afterThird = { coins: gameState.coins, slots: gameState.progress.tripleConnect.trayExpansionSlots, owned: gameState.progress.tripleConnect.trayExpansionOwned };
-    const fourth = purchaseTripleTrayExpansion();
+    const fourth = await purchaseTripleTrayExpansion();
     const afterFourth = { coins: gameState.coins, slots: gameState.progress.tripleConnect.trayExpansionSlots, owned: gameState.progress.tripleConnect.trayExpansionOwned };
     gameState.coins = 3000;
     gameState.progress.tripleConnect.trayExpansionSlots = 0;
     gameState.progress.tripleConnect.trayExpansionOwned = false;
-    const originalSetItem = Storage.prototype.setItem;
-    Storage.prototype.setItem = () => { throw new Error("storage unavailable"); };
-    const failed = purchaseTripleTrayExpansion();
-    Storage.prototype.setItem = originalSetItem;
+    const originalPut = IDBObjectStore.prototype.put;
+    IDBObjectStore.prototype.put = function (...args) { if (this.name === "profile") throw new DOMException("storage unavailable", "QuotaExceededError"); return originalPut.apply(this, args); };
+    const failed = await purchaseTripleTrayExpansion();
+    IDBObjectStore.prototype.put = originalPut;
     return {
       first,
       second,
@@ -148,13 +152,14 @@ test("Triple tray expansion stops at three slots and rolls back when persistence
 
 test("Triple opens the tray expansion purchase directly from a locked slot", async ({ page }) => {
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   await page.evaluate(async () => {
     const { gameState } = await import("/js/gameState.js");
     const { startTripleConnectDevelopmentRound } = await import(
       "/js/tripleConnect/tripleController.js"
     );
     gameState.coins = 3000;
-    startTripleConnectDevelopmentRound({ seed: "tray-direct-purchase" });
+    (await startTripleConnectDevelopmentRound({ seed: "tray-direct-purchase" }));
   });
 
   const unlock = page.locator('[data-triple-tray-unlock="true"]:visible').first();
@@ -174,6 +179,7 @@ test("Triple opens the tray expansion purchase directly from a locked slot", asy
 
 test("Triple legacy tray expansion save keeps all three unlocked slots", async ({ page }) => {
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const migrated = await page.evaluate(async () => {
     const { gameState, hydrateGameState } = await import("/js/gameState.js");
     hydrateGameState({ progress: { tripleConnect: { trayExpansionOwned: true } } });

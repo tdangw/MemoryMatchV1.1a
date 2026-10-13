@@ -1,4 +1,4 @@
-import { doc, getDocFromServer, writeBatch, runTransaction, serverTimestamp } from "firebase/firestore";
+import { doc, getDocFromServer, writeBatch, runTransaction, serverTimestamp, onSnapshot } from "firebase/firestore";
 import { CLOUD_SNAPSHOT_VERSION, decodeCloudSnapshot, manifestHashes, validateCloudManifest, fingerprintCloudManifest } from "./cloudSnapshot.js";
 
 const STAGING_BATCH_SIZE = 300;
@@ -7,6 +7,12 @@ export class CloudConflictError extends Error {
   constructor(root) { super("Bản cloud đã thay đổi ở thiết bị khác."); this.name = "CloudConflictError"; this.root = root; }
 }
 export function cloudProfileRef(database, environment, uid) { return doc(database, "gamespaces", environment, "players", uid); }
+export function observeCloudRoot(database, environment, uid, onRoot, onError) {
+  return onSnapshot(cloudProfileRef(database, environment, uid), snapshot => {
+    if (snapshot.metadata.hasPendingWrites || snapshot.metadata.fromCache || !snapshot.exists()) return;
+    try { onRoot(validateRoot(snapshot.data())); } catch (error) { onError(error); }
+  }, onError);
+}
 function objectRef(database, environment, uid, hash) { return doc(cloudProfileRef(database, environment, uid), "objects", hash); }
 export async function readCloudRoot(database, environment, uid) {
   const snapshot = await getDocFromServer(cloudProfileRef(database, environment, uid));

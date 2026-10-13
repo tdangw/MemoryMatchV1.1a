@@ -97,16 +97,16 @@ test("Nguyệt Sơn can be purchased, equipped, reloaded, and rendered in Memory
   }
 });
 
-test("Nguyệt Sơn purchase and equip roll back RAM when persistence fails", async ({ page }) => {
+test("Nguyệt Sơn purchase rolls back RAM and enters recovery when IndexedDB persistence fails", async ({ page }) => {
   const shopCard = await openMoonMountainShopCard(page);
   await shopCard.locator(".shop-buy-button").click();
   await page.evaluate(() => {
-    const original = Storage.prototype.setItem;
-    Storage.prototype.setItem = function failCardBackPurchase(key, value) {
-      if (key === "memoryMatchSave") throw new Error("forced card-back purchase failure");
-      return original.call(this, key, value);
+    const original = IDBObjectStore.prototype.put;
+    IDBObjectStore.prototype.put = function failCardBackPurchase(...args) {
+      if (this.name === 'profile') throw new DOMException('forced card-back purchase failure', 'QuotaExceededError');
+      return original.apply(this, args);
     };
-    window.__restoreCardBackStorage = () => { Storage.prototype.setItem = original; };
+    window.__restoreCardBackStorage = () => { IDBObjectStore.prototype.put = original; };
   });
   await page.getByRole("button", { name: "Mua ngay", exact: true }).click();
   const purchaseState = await page.evaluate(async () => {
@@ -119,8 +119,11 @@ test("Nguyệt Sơn purchase and equip roll back RAM when persistence fails", as
   });
   expect(purchaseState.coins).toBe(500);
   expect(purchaseState.owned).not.toContain("moon-mountain");
+  await expect(page.locator('#persistence-recovery-modal')).toBeVisible();
+});
 
-  await page.locator("#shop-confirm-modal").getByRole("button", { name: "Đóng" }).click();
+test('Nguyệt Sơn equip rolls back RAM and enters recovery when IndexedDB persistence fails', async ({ page }) => {
+  await openMoonMountainShopCard(page);
   await page.locator("#shop-modal").getByRole("button", { name: "Đóng" }).click();
   await page.evaluate(async () => {
     const { gameState } = await import("/js/gameState.js");
@@ -131,12 +134,12 @@ test("Nguyệt Sơn purchase and equip roll back RAM when persistence fails", as
     has: page.getByText("Nguyệt Sơn", { exact: true }),
   });
   await page.evaluate(() => {
-    const original = Storage.prototype.setItem;
-    Storage.prototype.setItem = function failCardBackEquip(key, value) {
-      if (key === "memoryMatchSave") throw new Error("forced card-back equip failure");
-      return original.call(this, key, value);
+    const original = IDBObjectStore.prototype.put;
+    IDBObjectStore.prototype.put = function failCardBackEquip(...args) {
+      if (this.name === 'profile') throw new DOMException('forced card-back equip failure', 'QuotaExceededError');
+      return original.apply(this, args);
     };
-    window.__restoreCardBackStorage = () => { Storage.prototype.setItem = original; };
+    window.__restoreCardBackStorage = () => { IDBObjectStore.prototype.put = original; };
   });
   await collectionCard.getByRole("button", { name: "Trang bị", exact: true }).click();
   const equipState = await page.evaluate(async () => {
@@ -144,7 +147,7 @@ test("Nguyệt Sơn purchase and equip roll back RAM when persistence fails", as
     return (await import("/js/gameState.js")).gameState.appearance.cardBack;
   });
   expect(equipState).toBe("classic");
-  await expect(collectionCard.getByRole("button", { name: "Trang bị", exact: true })).toBeEnabled();
+  await expect(page.locator('#persistence-recovery-modal')).toBeVisible();
 });
 
 test("game-inspired card backs are valid catalog assets", async ({ page }) => {

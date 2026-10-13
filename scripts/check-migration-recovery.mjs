@@ -27,7 +27,7 @@ IDBObjectStore.prototype.put = put;
 const retried = await import("../js/persistence.js?migration-retry");
 const recovered = await retried.loadPersistentGameData();
 assert.equal(recovered.coins, 42);
-assert.equal(recovered.progress.memoryMatch.adventure.unlockedThrough, 6);
+assert.equal(recovered.progress.memoryMatch.adventure.unlockedThrough, 1);
 assert.equal(first.values.get("memoryMatchSave"), first.original);
 assert.equal(first.values.get("memoryMatchChapterBackend"), "1");
 const repeated = await import("../js/persistence.js?migration-idempotent");

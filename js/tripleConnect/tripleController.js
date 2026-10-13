@@ -525,6 +525,7 @@ return runRoundCommand(async () => {
     roundLuckyRewards.push(...rewards.lucky);
     roundMilestoneRewards.push(...rewards.milestones);
     const roundWon = transition.events.some((event) => event.type === "round-won");
+    if (roundWon) finishPlayMetrics();
     if (state.status !== "playing") stopComboWindow();
     else if (matchEvent) startComboWindow();
     else if (transition.events.some((event) => event.type === "miss")) stopComboWindow();
@@ -689,7 +690,7 @@ return runRoundCommand(async () => {
     (await beginRound());
   };
   if (!startup) (await activate());
-  return { generated, getState: () => state, shell, renderInitial: () => render(state, { startup }), activate, markStartupReady };
+  return { generated, getState: () => state, whenIdle: () => commandQueue, shell, renderInitial: () => render(state, { startup }), activate, markStartupReady };
 }
 
 function showTripleStartModal({ shell, scope, generation, render, hudElements, hud, onComplete }) {
@@ -998,7 +999,7 @@ async function commitTripleTerminalResult() {
     if (currentMode === "challenge" && isTripleChallengeComplete(currentLevel)) finalizeRankedRun("triple-connect", currentMode, completion.score, "won");
   }
   delete gameState.progress.tripleConnect.sessionsByMode[currentMode];
-  if ((await savePersistentGameData({ coins: gameState.coins, progress: gameState.progress }))) {
+  if ((await savePersistentGameData({ coins: gameState.coins, progress: gameState.progress, cloudEvent: won }))) {
     if (generation !== roundGeneration) return false;
     state = settledState;
     return { reward, stars, timeBonus: completion.timeBonus,

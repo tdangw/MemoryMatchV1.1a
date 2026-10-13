@@ -22,9 +22,11 @@ const versionInfoButton = document.getElementById("version-info");
 const versionValue = document.getElementById("settings-version-value");
 
 let onCloseFromMenu = () => {};
+let onHome = () => {};
 
-export function configureSettings({ onCloseMenu } = {}) {
+export function configureSettings({ onCloseMenu, onHome: home } = {}) {
   onCloseFromMenu = onCloseMenu || onCloseFromMenu;
+  onHome = home || onHome;
 }
 
 async function saveGameSetting(key, value) {
@@ -143,6 +145,7 @@ export function showSettingsPanel(fromGame = false, onClose = () => {}) {
     title: "Cài đặt",
     content: settingsContainer,
     size: "medium",
+    actions: [{ label: "Trang chủ", icon: "home", onClick: close => { close(); onHome(); } }],
     onClose: () => {
       settingsContainer.style.display = "none";
       settingsHome.appendChild(settingsContainer);

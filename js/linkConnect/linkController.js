@@ -791,7 +791,7 @@ async function completeLinkLevel() {
   if (linkGameState.roundId !== roundId) return;
   stageRankedAttempt("link-connect", linkGameState.mode, linkGameState.score, true);
   delete gameState.progress.linkConnect.sessionsByMode?.[linkGameState.mode];
-  if (!(await savePersistentGameData({ coins: gameState.coins, progress: gameState.progress }))) {
+  if (!(await savePersistentGameData({ coins: gameState.coins, progress: gameState.progress, cloudEvent: true }))) {
     if (linkGameState.roundId === roundId) {
       gameState.coins = rollback.coins;
       linkGameState.score = rollback.score;

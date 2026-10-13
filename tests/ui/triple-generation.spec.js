@@ -158,15 +158,15 @@ test("Triple menu navigation cancels a pending generation before it can mount", 
   await page.goto("/");
   const result = await page.evaluate(async () => {
     const { startTripleConnectRound } = await import("/js/tripleConnect/tripleController.js");
-    const { openGameMenu } = await import("/js/gameSelector.js");
+    const { openReadyGameMenu } = await import('/tests/ui/helpers/gameNavigation.js');
     const pending = startTripleConnectRound({ mode: "superHard", seed: "worker-menu-cancel", skipIntro: true });
-    openGameMenu("triple-connect");
+    await openReadyGameMenu('triple-connect');
     const run = await pending;
     return {
       run: run === null,
       loading: Boolean(document.querySelector("#triple-generation-loading")),
-      board: Boolean(document.querySelector(".triple-connect__board")),
-      menu: Boolean(document.querySelector("#menu-container.triple-connect-menu")),
+      board: Boolean([...document.querySelectorAll('.triple-connect__board')].find(node => node.getBoundingClientRect().height > 0 && node.getBoundingClientRect().width > 0)),
+      menu: Boolean(document.querySelector('#menu-container[data-map-ready="true"]')),
     };
   });
   expect(result).toEqual({ run: true, loading: false, board: false, menu: true });

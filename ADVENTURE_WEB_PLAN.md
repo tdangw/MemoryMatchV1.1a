@@ -21,11 +21,11 @@ Ngoài phạm vi mặc định: APK/store, multiplayer, lives/energy để giớ
 - Mỗi trò có hành trình độc lập.
 - Bản đồ dùng cho Dễ, Trung bình, Khó, Siêu khó. Thử thách và Vô tận hiện hữu giữ lối vào riêng.
 - Trong một trò, mở khóa màn dùng chung giữa bốn độ khó; sao và điểm thuộc độ khó đang chơi.
-- Ban đầu có thể chọn màn 1–3. Thắng màn N mở tất cả màn đến N+3; không thu hồi màn đã mở. Đã xác nhận ví dụ: thắng màn 3 trước màn 1–2 mở thêm 4–6; vẫn quay lại chơi 1–2.
+- Bắt đầu ở màn 1; thắng màn N mở màn N+1. Tiến trình chung giữa bốn độ khó. Kết quả cũ đã thắng vượt màn được giữ và có thể chơi lại; frontier là màn chưa thắng đầu tiên.
 - Người chơi tự vuốt bản đồ để chọn/tìm màn, không thêm nút tìm, lọc hoặc nhảy tới màn chưa clear. Node đã mở hiện sao chưa sáng; kết quả clear hiển thị sao sáng theo số sao đạt được ở độ khó đang xem. Logic completion dùng chung giữa độ khó vẫn được lưu độc lập với số sao.
 - Mỗi 10 màn có một rương; cần thắng 10 màn để mở rương. Thưởng trước mắt là Xu, catalog cho phép đổi nội dung sau.
-- Mỗi chặng có 100 màn chơi và 10 nút rương, tổng cộng 110 nút bản đồ. Sau chặng có thể chơi 101–200, 201–300…
-- Chặng tiếp theo chỉ mở khi thắng đủ 100 màn khác nhau trong chặng hiện tại, tính chung giữa bốn độ khó. N+3 dừng ở ranh giới chặng cho tới khi đủ điều kiện; cảnh hoàn tất chặng theo completion này, không theo việc chỉ thắng màn 100/200/300.
+- Mỗi chặng có 100 màn chơi và 10 rương nằm bên cạnh đường đi, không thêm vị trí trên đường. Sau chặng có thể chơi 101–200, 201–300…
+- Chặng tiếp theo chỉ mở khi thắng đủ 100 màn khác nhau trong chặng hiện tại, tính chung giữa bốn độ khó. mở màn tuần tự dừng ở ranh giới chặng cho tới khi đủ điều kiện; cảnh hoàn tất chặng theo completion này, không theo việc chỉ thắng màn 100/200/300.
 - Chưa áp dụng nhiệm vụ. Bản đồ dùng kết quả thắng theo luật hiện tại của từng trò; không thay điều kiện thắng hoặc bổ sung early-win.
 - Giao diện đang chơi giữ nguyên HUD, bàn, khay, công cụ hỗ trợ và cách trình bày hiện hữu. Chỉ thêm bốn nút chức năng đã chốt vào phần trống dưới game hiện tại; người dùng xác nhận cả ba trò đều còn khoảng trống. Không dùng bố cục gameplay trong minh họa làm thiết kế triển khai.
 - Dãy nút đáy thống nhất trên menu chính, bản đồ từng trò và gameplay: Cửa hàng → Bộ sưu tập → Xếp hạng → Cài đặt. Các hành động quay lại, chọn mode, chơi lại và trợ giúp giữ ở owner/vị trí phù hợp hiện hữu, không thay bằng các tab đáy khác nhau.
@@ -34,7 +34,7 @@ Ngoài phạm vi mặc định: APK/store, multiplayer, lives/energy để giớ
 - Người dùng tự nghiên cứu thêm phần nhiệm vụ. Các đề xuất nhiệm vụ chưa được duyệt và không là dependency hay acceptance criteria của bản đồ/menu.
 - Hình ảnh, tên vùng, bố cục chi tiết, icon, âm thanh và luật được thiết kế riêng cho dự án.
 - Cảnh cuối chặng ưu tiên đẹp với chuyển động nhẹ; chạm có hạt bụi hoặc phản hồi nhẹ.
-- Guest có sao lưu; có thể liên kết Google sau. Khi có hai bản lưu khác nhau, cho chọn bản, không tự cộng tài nguyên.
+- Guest có sao lưu; có thể liên kết Google sau. Khi có bản lưu máy chủ, tự dùng bản đã commit gần nhất; không cộng tài nguyên.
 - Giữ Xu/vật phẩm/chủ đề/kỷ lục/session hiện có khi chuyển định dạng; được phép bước chuyển đổi dữ liệu. Không tiếp tục chính sách reset development chỉ vì save là version trước.
 - Rương theo nhóm 1–10, 11–20… một lần mỗi trò; tạm dùng Nhỏ 60 + ngẫu nhiên 20–40 Xu (70%), Vừa 100 + 30–60 (25%), Lớn 150 + 50–100 (5%). Catalog có version, phần cố định/phần ngẫu nhiên và danh sách grants để mở rộng vật phẩm sau; kết quả đã nhận được lưu, không quay lại khi mở/đóng.
 - Backend xếp hạng bản đầu đã được chọn: Firebase free, kiểm tra identity/dữ liệu, lưu best từ client, bảng mọi thời gian và gửi lại kết quả offline. Chưa xác minh toàn bộ gameplay trên server.
@@ -54,22 +54,19 @@ Ngoài phạm vi mặc định: APK/store, multiplayer, lives/energy để giớ
 3. Đối chiếu restart/replay/resume của từng trò để bảo đảm thao tác chọn màn giữ contract hiện hữu. Mọi thay đổi về seed/bố trí khi retry phải được giao riêng, không tự thêm vào thiết kế menu.
 4. Thiết bị/browser thấp nhất ngoài baseline hiện có; phạm vi dưới 100 người chơi; phong cách cụ thể trong hướng mobile tươi sáng.
 5. Xung đột tài liệu save đã được giải quyết bằng yêu cầu mới: giữ dữ liệu và có chuyển đổi. Source v1 dùng formatVersion=1; phase 1 nâng lên formatVersion=2, giữ nguồn phục hồi, test idempotent/failure. Không dùng schemaVersion/key migration lịch sử làm schema nguồn.
-6. Backend cơ bản/mọi thời gian/offline đã chốt. Account-linking gặp UID khác dùng lựa chọn local/cloud cho save, không tự union hoặc chuyển public entry của UID trước. Tên hiển thị/avatar dùng giá trị tối thiểu có fallback và được escape. Không thêm mùa giải hoặc nâng billing trong task.
+6. Backend cơ bản/mọi thời gian/offline đã chốt. Account-linking gặp UID khác tự dùng bản lưu máy chủ, không tự union hoặc chuyển public entry của UID trước. Tên hiển thị/avatar dùng giá trị tối thiểu có fallback và được escape. Không thêm mùa giải hoặc nâng billing trong task.
 
 Các đề xuất chưa xác nhận không phải acceptance criteria đã phê duyệt.
 
-## 4. Logic hành trình và đánh giá N+3
+## 4. Logic hành trình và đánh giá mở màn tuần tự
 
-### Hai phương án đã cân nhắc
+### Quyết định cập nhật ngày 2026-10-13
 
-- Mở theo màn thắng cao nhất +3: có lựa chọn để tránh bị kẹt một màn; có thể đi 1→4→7… và còn nhiều màn thiếu. Đây là phương án người dùng đã chọn.
-- Cửa sổ ba màn từ màn chưa thắng đầu tiên: ít bỏ sót, kiểm soát nội dung tốt hơn; dễ bị chặn khi hai màn sau đã thắng nhưng màn đầu vẫn khó. Không tự thay thế phương án đã chọn.
+Mở tuần tự thay cửa sổ ba màn theo yêu cầu mới. Chỉ completion hợp lệ mới mở màn kế tiếp; rương không chặn tiến trình. Bản lưu có khoảng trống tiếp tục từ màn còn thiếu đầu tiên, vẫn giữ các kết quả đã thắng phía sau. Thắng đủ 100 màn mở chặng tiếp theo.
 
-N+3 hợp lý cho mục tiêu tự do chọn màn, với điều kiện bản đồ giải thích rõ mở khóa không đồng nghĩa hoàn tất.
+Bản đồ chỉ hiển thị đến hết chặng hiện tại; nối chặng đã mở khi cuộn qua ranh giới. Owner chỉ giữ một chặng 100 màn/10 rương và tối đa 5 màn chồng lấp mỗi đầu trong DOM (≤122 nút), rebase vị trí cuộn để không tăng chiều cao theo toàn lịch sử. Đường Bézier và các nút dùng chung tọa độ; rương nằm bên cạnh màn kết thúc nhóm. Nền WebP gốc tái sử dụng, không tạo loop animation. Phương án dựng toàn lịch sử bị loại vì DOM/chiều cao tăng không giới hạn.
 
-UI dùng trạng thái sao trên node để thể hiện kết quả của độ khó đang xem; rương hiển thị tiến độ 7/10. Người chơi tự vuốt lên/xuống tìm và chọn màn, không thêm nút tìm/lọc/nhảy tới màn chưa clear. Trạng thái hết chặng hiển thị tiến độ và điều kiện mở chặng sau.
-
-Rương đề xuất chỉ là phần thưởng, không là cổng chặn sau mỗi 10 màn. Chặng tiếp theo yêu cầu đủ 100 màn nên chặn ở ranh giới chặng; người chơi tự cuộn về các màn còn thiếu. Người chơi có thể thắng màn 100 trước màn 47: chặng vẫn chưa hoàn tất; khi thắng màn thiếu cuối cùng mới mở 101–103 và có cảnh tổng kết chặng. Không dùng số màn cao nhất để giả định đã hoàn thành 100 màn.
+Header: avatar tài khoản bên trái, Xu bên phải; không hiện tên hoặc nút Home. Trang chủ nằm trong Cài đặt. Không có avatar nổi ở dưới hoặc nút tìm màn. Gameplay giữ bố cục; màn ngang thiếu chỗ cho cuộn nhẹ để giữ thẻ tối thiểu.
 
 Completion phải lưu rõ theo game/mode/level. Không suy thắng từ stars >0: luật cũ có thể ghi kết quả thắng 0 sao. Completion chung giữa mode là kết quả suy ra từ các completion riêng, không tạo hai sổ sự thật lệch nhau.
 
@@ -100,7 +97,7 @@ Bản đồ/menu dùng kết quả thắng hiện hữu. Task này không cần 
 | Vào chơi nhanh | Hợp với run liên tục, nhưng có nhiều lớp chọn | Có thể cần tìm/chạm một node | Nút chính vào session hoặc màn đề xuất |
 | Xem tiến trình | Chủ yếu qua phiên/kỷ lục khác | Thấy màn, sao, khóa và rương | Có đủ tiến trình, vẫn vào chơi nhanh |
 | Chọn chơi lại | UI hiện thiếu | Chọn đúng màn/độ khó | Giống bản đồ |
-| Rương/chặng/N+3 | Khó diễn đạt bằng danh sách mode | Phù hợp với cấu trúc hành trình | Phù hợp với cấu trúc hành trình |
+| Rương/chặng/mở màn tuần tự | Khó diễn đạt bằng danh sách mode | Phù hợp với cấu trúc hành trình | Phù hợp với cấu trúc hành trình |
 | Giữ mục đích luyện tập | Dễ chọn độ khó và chơi liên tục | Cần tránh làm thao tác chọn màn thành cản trở | Giữ độ khó rõ và nối màn nhanh |
 | Chi phí làm/kiểm chứng | Thấp nếu chỉ sắp xếp menu | Thêm progress/launch/replay/layout | Thêm map và logic phân biệt resume/new |
 | Tạo nội dung mới | Không tự tạo | Không tự tạo | Không tự tạo |
@@ -130,7 +127,7 @@ Trước khi thêm archive/chunk storage, đo kích thước save và chi phí h
 - Session hiện chỉ có một slot mỗi game/mode. Chọn màn khác phải phân biệt chơi mới với tiếp tục, không âm thầm thay phiên đang dở hoặc tác động các slot khác.
 - Kỷ lục hiện có theo mode/level không thay thế quy tắc completion/claim mới. Không suy đủ 100 màn từ màn cao nhất hoặc từ sao; mở khóa chung, kỷ lục riêng và rương một lần phải được kiểm tra độc lập.
 - Replay/chọn node có thể đi sai nhánh new/advance và cấp vật phẩm đầu màn lặp. Giữ thưởng ghép/thắng theo luật hiện hữu; rương mới dùng claim riêng, commit cùng Xu và rollback khi lưu lỗi.
-- N+3 cho phép chơi không theo thứ tự. Phân biệt khóa/mở và hiển thị sao theo độ khó ngay trên node; người chơi tự cuộn tìm màn. Không coi việc cần tìm màn là lý do thêm nút hoặc bộ lọc. Điều kiện mở chặng sau vẫn dựa trên đủ 100 completion chung.
+- mở màn tuần tự cho phép chơi không theo thứ tự. Phân biệt khóa/mở và hiển thị sao theo độ khó ngay trên node; người chơi tự cuộn tìm màn. Không coi việc cần tìm màn là lý do thêm nút hoặc bộ lọc. Điều kiện mở chặng sau vẫn dựa trên đủ 100 completion chung.
 - Bản đồ tăng khả năng thấy tiến trình nhưng chưa làm các màn đa dạng hơn. Không hứa giải quyết độ lặp khi nhiệm vụ đang tạm hoãn.
 - Chỉ giữ DOM/tài nguyên của chặng đang xem, không sinh 100 bàn hoặc render mọi chặng lịch sử; kiểm tra chi phí lưu theo lịch sử tăng dần.
 - Thanh nút gameplay tận dụng khoảng trống phía dưới mà người dùng xác nhận có ở cả ba trò. Giữ giao diện hiện hữu, không phủ lên bàn/khay; kiểm tra thanh mới vừa vùng trống và các nút chạm được trên baseline 412×915, kể cả Triple mở rộng khay.
@@ -195,21 +192,21 @@ Một document Firestore tối đa 1 MiB; không đổ mọi chặng/session và
 
 ### 9.3. Hệ hình ảnh và cảnh cuối chặng
 
-Hướng mỹ thuật cụ thể chưa duyệt. Concept cũ chỉ là phương án; prototype hiện giúp chọn cấu trúc điều hướng, không chốt palette/asset.
+Hướng đã chọn: cảnh vườn đêm nguyên bản với nền WebP tĩnh, chuyển động và tương tác nhẹ; giữ tương phản cho các nút màn.
 
 Cảnh cuối chặng: ảnh hoa/cây 3–5 lớp, animate transform/opacity ngắn rồi đứng yên; nút tiếp tục hiện rõ. Chạm sinh hạt nhỏ có cap chung (mục tiêu thử 12 hạt đồng thời). Reduced-motion dùng ảnh tĩnh và phản hồi tối thiểu. Owner hủy timers/RAF/audio/listeners kể cả khi đóng trước resolve. Các budget này chưa là số đo pass.
 
 Timeline thử: anticipation 0–200 ms; hoa/cây xuất hiện 200–1400 ms; title/reward resolve 1400–2000 ms; sau đó tĩnh. Chỉ render trong vùng hoa. Cảnh gắn với đủ 100 completion trong chặng, không chỉ số màn cao nhất.
 
-Bitmap mới dùng imagegen; raster card/theme dùng memory-match-image-assets khi có task asset. Chưa sinh asset hoặc sửa cảnh trong task phân tích này.
+Bitmap mới dùng imagegen; raster card/theme dùng memory-match-image-assets khi có task asset. Nền bản đồ đã tạo bằng imagegen; cảnh cuối chặng đã triển khai bằng SVG gốc ở phase4.
 
 ## 10. Guest/Google và cloud sync
 
 Firebase Anonymous Auth cho guest online; chơi offline vẫn lưu local và tạo/link identity khi kết nối được. Tạo một UID bền vững, không tạo user mới mỗi màn. Liên kết Google giữ UID khi tài khoản chưa liên kết nơi khác.
 
-Nếu Google đã có user/save khác: tải metadata hai bản, hiển thị game/chặng/time/coins, cho chọn local hoặc cloud. Account-linking thất bại do credential đã dùng là nhánh dự kiến, không bắt lỗi chung rồi ghi đè. Giữ bản phục hồi trước khi áp dụng lựa chọn; không tự union Xu/item/claim/session và không xóa dữ liệu tài khoản cũ trong luồng này.
+Nếu Google đã có user/save khác, tự dùng bản đang lưu trên máy chủ. Giữ bản phục hồi nội bộ trước khi thay; không cộng gộp Xu/vật phẩm hoặc xóa dữ liệu tài khoản cũ. Chuyển profile chỉ ở menu, không thay giữa ván.
 
-Cloud revision/server timestamps và giao dịch chống stale overwrite; local revision hiện tại chỉ chống tab khác, không đủ cho hai thiết bị. Dirty state có owner, batch/debounce theo event; retry backoff hữu hạn; lỗi mạng/quota không làm mất local hoặc khóa chơi. Không chỉ trông vào unload để lưu.
+Chính sách mới: bản commit lên máy chủ gần nhất thắng, thứ tự do transaction/revision và server timestamp xác định, không dùng đồng hồ thiết bị. Một sự kiện local mới bị tranh chấp được gửi lại hữu hạn với revision mới; do đó một máy chơi offline rồi gửi sau có thể thay bản trước đó. Listener metadata nhận bản mới từ thiết bị khác và áp dụng khi về menu; không ghi theo frame/tick. Sao lưu khi thắng màn hoặc thay đổi Xu/vật phẩm/trang bị/tên, session checkpoint lưu local. Debounce/cooldown 15 giây và retry hữu hạn. UI chỉ có tên, trạng thái lưu ngắn gọn và liên kết Google, không có nút đồng bộ/phục hồi thủ công.
 
 Rules chỉ cho UID đọc/ghi dữ liệu của mình, validate shape/bounds/version. Không mở collection saves công khai. Test/beta/production tách dữ liệu và Analytics; ba site hiện cùng project không tự tách Auth/Firestore. Chưa truy cập console hoặc bật dịch vụ trong task này.
 
@@ -257,7 +254,7 @@ Hiện recordMemoryMatchResult/recordLinkConnectResult/recordTripleConnectResult
 
 Đề xuất run metadata gồm runId, gameId, mode, rulesVersion, levelReached, lastClearedLevel, completedLevelsScore, currentLevelScore, terminalOutcome và trạng thái đã chốt/gửi. completedLevelsScore là điểm các màn trước màn hiện tại trong đúng lượt; currentLevelScore là điểm attempt hiện tại, gồm completion bonus khi attempt clear. runScore bằng hai phần này cộng lại. Khi Next sang màn sau, chuyển điểm màn vừa clear vào completedLevelsScore đúng một lần rồi bắt đầu currentLevelScore mới. Không cộng lại điểm round khi event clear/Next/outcome bị gọi lặp; không suy tổng lượt từ ledger kỷ lục toàn bộ lịch sử.
 
-- Lượt Thử thách/Vô tận dùng để xếp hạng bắt đầu từ màn 1 và đi theo luồng Next hiện hữu; không đi qua N+3 hoặc nhảy từ bản đồ.
+- Lượt Thử thách/Vô tận dùng để xếp hạng bắt đầu từ màn 1 và đi theo luồng Next hiện hữu; không đi qua mở màn tuần tự hoặc nhảy từ bản đồ.
 - Resume giữ runId và tổng điểm cùng session. Đề xuất pause/quay menu không tự kết thúc lượt; bắt đầu lượt mới không được thừa hưởng runScore cũ.
 - Chơi lại màn giữ runId và completedLevelsScore, tạo attempt mới cho màn hiện tại và thay/reset currentLevelScore theo luật restart hiện hữu; không cộng điểm của attempt bị bỏ. Nếu màn hiện tại đã clear nhưng chưa Next, replay cũng chỉ thay phần điểm màn đó, không cộng thêm một lần clear vào tổng lượt. Giữ hành vi chơi lại màn của controller; không tự reset cả lượt về màn 1 hoặc loại lượt khỏi bảng.
 - Đã xác nhận ví dụ restart màn 10 rồi kết thúc hẳn ở màn 15 vẫn được gửi thành tích màn 15. Khi ván thật sự đã được chốt, snapshot kết quả là bất biến; bắt đầu ván mới không mở lại run đã kết thúc hoặc kế thừa điểm. Đối chiếu riêng các nút replay sau khi hoàn tất Triple Thử thách 7 để không biến một lần chơi lại màn 7 thành lượt mới đã đạt 7 mà chưa chơi các màn trước.
@@ -311,11 +308,11 @@ Theo Firebase, [Rules](https://firebase.google.com/docs/firestore/security/rules
 | Gate | Kết quả phải bàn giao | Bằng chứng hoàn thành |
 | --- | --- | --- |
 | 0 — Chốt menu/map/dữ liệu | Menu chính/bản đồ; gameplay giữ nguyên + hàng nút đáy; resume/replay; economy rương; contract save và các quyết định xếp hạng còn chờ | Người dùng chốt behavior/art; tài liệu không xung đột; không dùng gameplay mockup thay runtime |
-| 1 — Tiến trình/launch/kỷ lục local | Completion/mode, N+3, rương, chặng; launch/replay/resume; duration/run metadata và comparator thuần | Unit/contract; save fail/rollback; 9/10/11, 99/100/101; timer pause/resume/Freeze; không đổi luật hoặc cấp lại hỗ trợ |
+| 1 — Tiến trình/launch/kỷ lục local | Completion/mode, mở màn tuần tự, rương, chặng; launch/replay/resume; duration/run metadata và comparator thuần | Unit/contract; save fail/rollback; 9/10/11, 99/100/101; timer pause/resume/Freeze; không đổi luật hoặc cấp lại hỗ trợ |
 | 2 — Navigation/menu | Header/content; bốn tab đáy đồng nhất; capability shop/collection; mode/theme riêng; vùng quảng cáo menu | Back/return giữ context; session ở mode khác; keyboard/focus; không popup nhân đôi; gameplay không có vùng quảng cáo |
-| 3 — Map | Một chặng 110 node, mode patch, preview, resume/replay, rương/chuyển chặng | Layout/scroll/focus; khóa/mở/sao rõ trên node; không có nút tìm màn; resource/DOM ổn định; chơi liên tục thuận tiện |
+| 3 — Map | Một chặng 100 màn + 10 rương bên đường, mode patch, preview, resume/replay, rương/chuyển chặng | Layout/scroll/focus; khóa/mở/sao rõ trên node; không có nút tìm màn; resource/DOM ổn định; chơi liên tục thuận tiện |
 | 4 — UI/cảnh chiến thắng | Token/surface thống nhất; hoa nhiều lớp nếu hạng mục được giao | Visual review; reduced-motion; spam đóng/mở/chạm; lifecycle và asset budget |
-| 5 — Auth/sync | Guest backup, Google link, chọn bản, offline/conflict/quota nếu hạng mục được giao | Emulator/rules; 2 tab/2 thiết bị; fail/recovery; operations/payload đo thật |
+| 5 — Auth/sync | Guest backup, Google link, bản lưu máy chủ gần nhất, offline/conflict/quota nếu hạng mục được giao | Emulator/rules; 2 tab/2 thiết bị; fail/recovery; operations/payload đo thật |
 | 6 — Xếp hạng online | Bảng/entry public tách saves; submit best, danh sách giới hạn/cache, guest/Google, version và chính sách trust nếu được giao | Emulator ownership/validation/query; tie/comparator; terminal/retry không lặp; offline/UID conflict; quota operations đo thật |
 | 7 — Analytics/tải | Báo cáo người chơi/playtime; cache/load nếu hạng mục được giao | DebugView; loại test traffic; event không lặp; cold/warm transfer |
 | 8 — Nghiệm thu | Review sau implementation, kiểm tra tổng thể và cập nhật tài liệu | npm run check/build; suites tương xứng; thiết bị mục tiêu; diff đúng phạm vi |
@@ -332,7 +329,9 @@ Gate là checkpoint, không mặc định là ranh giới kết thúc lượt. Y
 | 3 | Pass — 110 nodes/chapter, mode patch, previews, resume, chest, chapters | check/build pass; map+catalog 7 pass; navigation/data 7 pass; menu/Triple regression 28 pass (caption fixes rerun); independent review settings race fixed + unit |
 | 4 | Pass — SVG hoa riêng, chuyển động hữu hạn, touch cap24 | check/build web+Android pass; victory/music 6 tests pass, mobile/landscape checked; lifecycle review pass |
 | 5 | Pass — Guest/Google, private cloud CAS, lựa chọn bản và phục hồi | check/build pass; emulator Rules/CAS/GC pass; Auth3 + navigation/catalog/cleanup12 pass; review UID guards |
-| 6–8 | Đang tiếp tục | Xếp hạng online → Analytics/tải → nghiệm thu |
+| 6 | Pass — xếp hạng mọi thời gian, outbox UID, conditional best | 810db9a; unit/rules/concurrency pass; Auth/ranking5 browser pass |
+| 7 | Runtime/tải pass — dashboard thật chưa xác minh | 0c4bd6a; check/build, built smoke, segments/unit, headless performance; DebugView/OAuth thực là QA trước phát hành |
+| 8 | Hoàn tất triển khai và nghiệm thu web | check/build/build:android pass; Rules/CAS/GC + ranking rules pass; Auth/Ranking emulator6 pass và offline hai máy1 pass; regression UI/lifecycle/geometry/effect được kiểm tra lại sau sửa; built-app smoke1 pass |
 
 Firebase (2026-10-13): người dùng đã tạo `(default)` ở `asia-southeast1`; CLI xác nhận Firestore Native Standard, `freeTier=true`. Chưa deploy Hosting hoặc thay billing.
 
@@ -340,9 +339,9 @@ Baseline trước sửa (2026-10-13): Chrome headless 412×915, không overflow;
 
 ## 14. Ma trận kiểm chứng bắt buộc khi triển khai
 
-- Logic: N+3 chơi đảo thứ tự; completion 0 sao; mode khác mở chung; rương không nhận lặp; đủ 10 đúng nhóm; missing level; chặng trước/sau; replay level rất cao không dựng toàn lịch sử.
+- Logic: mở màn tuần tự chơi đảo thứ tự; completion 0 sao; mode khác mở chung; rương không nhận lặp; đủ 10 đúng nhóm; missing level; chặng trước/sau; replay level rất cao không dựng toàn lịch sử.
 - Gameplay regression: luật thắng/thua, timer, combo, inventory, hỗ trợ tự động, restart/resume và kết quả sao/điểm giữ contract hiện hữu; chọn lại màn không cấp lại quà đầu màn.
-- Data: rollback đa miền, quota/network/storage fail, stale result sau đổi UID/mode/round, hai tab/thiết bị, dữ liệu chưa sync, chọn local/cloud, account-linking collision.
+- Data: rollback đa miền, quota/network/storage fail, stale result sau đổi UID/mode/round, hai tab/thiết bị, dữ liệu chưa sync, tự dùng bản máy chủ, account-linking collision.
 - Timing: không tính loading/intro trước ready hoặc resolve sau clear; pause/menu/tab ẩn; resume sau reload; cộng giờ/Freeze không làm giảm duration; timer callback trễ; restart và stale outcome; không ghi theo tick.
 - Run ranking: điểm cộng dồn đúng lượt, gồm màn cuối; không lấy totalScore/bestByLevel; clear/Next chuyển điểm đúng một lần; hết giờ rồi mua tiếp giữ cùng run và không gửi sớm; Chơi lại giữ eligibility, thay điểm màn hiện tại chứ không cộng thêm; restart màn 10 rồi kết thúc 15 gửi đúng lượt; session cũ thiếu metadata không tạo thành tích giả; mất mạng/retry không cộng/gửi hai lần; thua khác clear; Triple Thử thách hoàn tất 7; replay sau run đã chốt không mở lại run cũ; chưa có bảng Vô tận Memory/Link; hỗ trợ được phép.
 - Public data/ranking: fast/slow/tie, đồng hạng và order ổn định, hai tab gửi best, attempt snapshot không trộn; write UID khác/field lạ bị chặn; tên được escape; read save riêng bị chặn; query limit/index/cache; count rank ngoài top nếu được giao; test/beta không vào production; old save thiếu duration giữ tiến trình và không tạo time record giả.
@@ -359,7 +358,7 @@ Baseline trước sửa (2026-10-13): Chrome headless 412×915, không overflow;
 - [Firebase Anonymous Auth](https://firebase.google.com/docs/auth/web/anonymous-auth), [Account linking](https://firebase.google.com/docs/auth/web/account-linking), [Firestore rules](https://firebase.google.com/docs/firestore/security/rules-conditions), [Firestore quotas](https://firebase.google.com/docs/firestore/quotas), [Analytics](https://firebase.google.com/docs/analytics), [Hosting quota](https://firebase.google.com/docs/hosting/usage-quotas-pricing).
 - Xếp hạng (kiểm tra ngày 2026-10-12): [Firestore order/limit](https://firebase.google.com/docs/firestore/query-data/order-limit-data), [Aggregation count](https://firebase.google.com/docs/firestore/query-data/aggregation-queries), [Firestore pricing/free quota](https://firebase.google.com/docs/firestore/pricing), [App Check và giới hạn bảo vệ](https://firebase.google.com/docs/app-check), [Cloud Functions yêu cầu Blaze](https://firebase.google.com/docs/functions/get-started).
 
-Phase 1 đã triển khai runtime/schema local, chưa cấu hình Auth/rules Firebase, chưa đo FPS hoặc cân bằng gameplay. Kết quả test runtime ghi trong CONTEXT là lịch sử, không đại diện cho tính năng đề xuất.
+Runtime đã triển khai dữ liệu/map/Auth/xếp hạng/Analytics theo các phase. Auth và Rules/indexes đã cấu hình trên Firebase; chưa deploy Hosting, chưa nghiệm thu OAuth/Analytics dashboard hoặc FPS trên thiết bị thật. Không dùng kết quả tự động thay cho những phần chưa xác minh này.
 
 2026-10-13: Cửa hàng/Bộ sưu tập ở home mặc định Memory Match; sau khi một trò thực sự ready để chơi, nhớ settings.lastPlayedGameId cho lần mở sau. Không có bước chọn trò trung gian. Xu chung, inventory/appearance theo từng trò.
 
@@ -368,3 +367,17 @@ Phase 4: cảnh hoa SVG gốc ≤100 SVG nodes, ba nhóm chuyển động 5,2s r
 Phase6 (2026-10-13): runtime/rules emulator pass; Auth+ranking5 browser pass; immutable result/legacy-run/UID units pass; check/build pass. Tiếp tục phase7–8.
 
 Phase7 runtime/tải: check/build, Analytics segments/unit, Auth/ranking5, map performance và built-bundle smoke pass. DebugView/GA4 dashboard thực chưa xác minh; cần nghiệm thu trước phát hành, không có Hosting deploy trong task này.
+
+## 16. Kết quả phase 8 ngày 2026-10-13
+
+Đã thay contract mở màn thành tuần tự; avatar trái/Xu phải; Trang chủ trong Cài đặt; rương ngoài đường; nền nguyên bản và đường Bézier cùng tọa độ nút. Cuộn nối chặng rebase một vùng 100 màn/10 rương với tối đa 5 màn chồng lấp mỗi đầu, ≤122 nút, không dựng chiều cao theo toàn lịch sử. Gameplay ngang thiếu chỗ giữ bố cục và cuộn nhẹ, nút đáy vẫn cố định.
+
+Sync theo sự kiện, marker bền vững qua reload và canonical signature chuẩn hóa/sắp khóa. Review độc lập phát hiện checkpoint/cache bị hiểu nhầm là dirty, retry restore sau offline và guard UID/profile; các điểm này đã sửa, thêm unit/emulator. Đồng bộ chỉ áp dụng profile từ xa ở menu; hai máy cập nhật riêng được sắp theo commit máy chủ. Dữ liệu cũ và backup nội bộ giữ nguyên, không cộng gộp tài nguyên.
+
+Bằng chứng: lần chạy rộng ban đầu370 gồm278 pass/86 fail/6 skip (kiểm tra cũ dùng API đồng bộ/dock cũ). Sau sửa chạy mục tiêu132 (111 pass),62 (53 pass),57 (55 pass),104 (102 pass); từng lỗi còn lại đã được chạy lại ở cổng mục tiêu: navigation/geometry14 pass, map/cleanup/topology10 pass, map/performance4 pass. Không ghi nhận toàn matrix370 pass. Auth/ranking emulator6 pass; trường hợp offline hai máy/reload1 pass; built mobile smoke1 pass. Map cuối3 pass: rương chặng cũ nhận một lần và rebase hai chiều giữ anchor lệch dưới1px. check/build/build:android pass; diff không lỗi whitespace. Đo phản hồi và CPU DOM riêng; không tăng ngân sách50ms/8ms. Một lượt đo trong lúc build vượt52,1ms; chạy riêng sau khi build kết thúc pass.
+
+Chưa xác minh OAuth hosted thật, Analytics dashboard/DebugView hoặc60FPS trên điện thoại vật lý. Chưa deploy Hosting, gắn quảng cáo thật, thêm nhiệm vụ hoặc build APK. Đây là kiểm tra trước phát hành đã ghi trong README, không được coi emulator là bằng chứng thay thế.
+
+Nền runtime: public/assets/adventure/moonlit-garden.webp,1024×1536,234542byte; built-in imagegen, WebP quality82. Một texture tái dùng với fade CSS ở ranh giới; không vẽ đường vào bitmap.
+
+Prompt tạo nền: Use case: stylized-concept. Asset type: original mobile game journey background. Create a tall portrait 1024x1536 richly painted moonlit botanical river garden, deep navy and teal, warm amber lanterns among silver flowering shrubs, mossy stones and gentle water reflections on the outer sides. Calm low contrast center with plenty of unobstructed dark space for a programmatically drawn winding level path and large buttons. Orthographic landscape illustration, no perspective vanishing point, no actual path painted into the image. Top and bottom edges must both fade smoothly to the same deep navy teal tone so repeated vertical panels blend. Ornamental plants on edges, subtly luminous original fantasy scenery, beautiful but readable. No text, no numbers, no buttons, no interface, no characters, no logos, no watermark. Original independent artwork, do not reproduce the attached composition.

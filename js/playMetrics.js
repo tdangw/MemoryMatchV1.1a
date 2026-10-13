@@ -25,14 +25,28 @@ export function createActivePlayClock({ elapsedMs = 0, now = () => performance.n
 let activeMetrics = null;
 let lastMetrics = null;
 const segmentListeners = new Set();
-export function subscribeToPlaySegments(listener) { segmentListeners.add(listener); return () => segmentListeners.delete(listener); }
+const pendingSegments = [];
+export function subscribeToPlaySegments(listener) {
+  segmentListeners.add(listener);
+  const buffered = pendingSegments.splice(0);
+  for (const segment of buffered) {
+    try { listener(segment); }
+    catch (error) { console.warn('Buffered play telemetry unavailable', error.name); }
+  }
+  return () => segmentListeners.delete(listener);
+}
 export function beginPlayMetrics(scope, identity, metadata = null) {
   const record = {
     ...identity,
     owner: metadata?.owner || getRankingOwner(),
     clock: createActivePlayClock({ elapsedMs: metadata?.elapsedMs || 0, onSegment: durationMs => {
+      const segment = { ...identity, owner: record.owner, durationMs };
+      if (!segmentListeners.size) {
+        pendingSegments.push(segment);
+        if (pendingSegments.length > 32) pendingSegments.shift();
+      }
       for (const listener of segmentListeners) {
-        try { listener({ ...identity, owner: record.owner, durationMs }); }
+        try { listener(segment); }
         catch (error) { console.warn('Play telemetry unavailable', error.name); }
       }
     } }),

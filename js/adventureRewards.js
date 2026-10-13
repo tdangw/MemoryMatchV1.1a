@@ -1,7 +1,7 @@
-import { getAdventureChestState } from "./adventureProgress.js";
+import { getAdventureChestState, getChapterNumber } from "./adventureProgress.js";
 import { getGameProgressKey } from "./gameCatalog.js";
 import { gameState } from "./gameState.js";
-import { savePersistentGameData, getPersistenceStatus } from "./persistence.js";
+import { savePersistentGameData, getPersistenceStatus, loadPersistentChapter } from "./persistence.js";
 
 /** Grants are typed records so later catalogs can add item packs without changing claim storage. */
 export const ADVENTURE_REWARD_PACKS = Object.freeze([
@@ -36,7 +36,9 @@ async function commitChestClaim(gameId, chestNumber) {
   const key = getGameProgressKey(gameId);
   const profile = key && gameState.progress[key];
   if (!profile || getPersistenceStatus().blocked) return null;
-  const eligibility = getAdventureChestState(profile.bestByLevel, chestNumber, profile.claimedChests);
+  const record = await loadPersistentChapter(key, getChapterNumber(chestNumber * 10));
+  if (gameState.progress[key] !== profile || getPersistenceStatus().blocked) return null;
+  const eligibility = getAdventureChestState(record.bestByLevel, chestNumber, { ...record.claimedChests, ...profile.claimedChests });
   if (!eligibility.eligible) return null;
   const outcome = { ...drawAdventureReward(), claimedAt: Date.now() };
   const previousCoins = gameState.coins;

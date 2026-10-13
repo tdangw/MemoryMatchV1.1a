@@ -67,8 +67,7 @@ test('a queued result remains bound to the original UID after switching to anoth
     const auth = await import(url);
     await (await import('/js/accountService.js')).getAccountService().acceptGoogleCredential(auth.GoogleAuthProvider.credential(JSON.stringify({ sub: 'ranking-google@example.test', email: 'ranking-google@example.test', email_verified: true })));
   });
-  await expect(second.locator('#cloud-conflict-modal')).toBeVisible();
-  await second.getByRole('button', { name: 'Dùng bản máy', exact: true }).click();
+  await expect(second.locator('#cloud-conflict-modal')).toHaveCount(0);
   await expect.poll(() => second.evaluate(async () => (await import('/js/accountService.js')).getAccountService().getState().phase), { timeout: 30000 }).toBe('synced');
   await second.evaluate(async () => {
     const service = (await import('/js/leaderboardService.js')).initializeLeaderboardService();

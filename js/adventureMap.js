@@ -3,7 +3,8 @@ import { GAME_MODES, getGameDefinition, getGameModeLabel } from "./gameCatalog.j
 import { createIcon } from "./icons.js";
 import { decorateAdventureMenu, refreshAppWallet } from "./appNavigation.js";
 import { prepareAdventureChapter } from "./adventureLaunch.js";
-import { createAdventureChapterNodes, getAdventureSummary, isNormalAdventureMode } from "./adventureProgress.js";
+import { createAdventureChapterNodes, getAdventureSummary, getChapterProgress, getAdventureLevelState, getAdventureChestState, getSuggestedAdventureLevel, isNormalAdventureMode } from "./adventureProgress.js";
+import { loadPersistentChapter } from "./persistence.js";
 import { claimAdventureChest } from "./adventureRewards.js";
 import { getActiveSessions } from "./sessionProgress.js";
 import { getEquippedThemeId } from "./appearance.js";
@@ -47,6 +48,14 @@ export function mountAdventureMap(gameId) {
   next.setAttribute("aria-label", "Chặng sau");
   chapterControls.append(previous, chapterLabel, next);
   titlebar.append(title, chapterControls);
+  const completion = document.createElement("div");
+  completion.className = "adventure-map-completion";
+  const completionLabel = document.createElement("span");
+  const completionBar = document.createElement("progress");
+  completionBar.max = 100;
+  completionBar.setAttribute("aria-label", "Tiến trình chặng");
+  completion.append(completionLabel, completionBar);
+  titlebar.append(completion);
   const theme = button("", "adventure-map-theme");
   const sessions = document.createElement("div");
   sessions.className = "adventure-map-sessions";
@@ -62,6 +71,12 @@ export function mountAdventureMap(gameId) {
   document.body.append(root);
   const scope = decorateAdventureMenu(root, { gameId, onHome });
   const footer = root.querySelector(".adventure-footer");
+  const play = button("", "adventure-map-play");
+  scope.listen(play, "click", () => {
+    const session = currentModeSession();
+    if (session) launch(session.mode, session.level, session);
+    else openLevel(getSuggestedAdventureLevel(profile.bestByLevel, profile.adventure));
+  });
   const modes = document.createElement("div");
   modes.className = "adventure-mode-tabs";
   modes.setAttribute("role", "tablist");
@@ -81,16 +96,35 @@ export function mountAdventureMap(gameId) {
     scope.listen(entry, "click", () => openSpecialMode(mode.id));
     special.append(entry);
   }
-  footer.prepend(modes, special);
+  footer.prepend(play, modes, special);
   let chapterGeneration = 0;
   let renderedNodes = [];
   let loading = false;
+  let adjacentBest = {};
+  let adjacentChests = {};
+  let extraLevels = [];
+  let topLevel = view.chapter * 100;
+  let bottomLevel = topLevel - 99;
+  const step = 132;
+  const position = level => ({ x: 200 + Math.sin((level - 1) * .62) * 82, y: (topLevel - level) * step + 64 });
+  function mapNodes() {
+    const summary = profile.adventure || getAdventureSummary(profile.bestByLevel);
+    const best = { ...adjacentBest, ...profile.bestByLevel };
+    const chests = { ...adjacentChests, ...profile.claimedChests };
+    const nodes = createAdventureChapterNodes(best, view.mode, view.chapter, chests, summary);
+    for (const level of extraLevels) {
+      nodes.push({ kind: "level", ...getAdventureLevelState(best, view.mode, level, summary) });
+      if (level % 10 === 0) nodes.push({ kind: "chest", ...getAdventureChestState(best, level / 10, chests) });
+    }
+    return nodes.sort((a, b) => (b.level || b.lastLevel) - (a.level || a.lastLevel) || (a.kind === "chest" ? -1 : 1));
+  }
 
   function patchNodes() {
     if (!scope.active || loading) return;
     const summary = profile.adventure || getAdventureSummary(profile.bestByLevel);
-    const nodes = createAdventureChapterNodes(profile.bestByLevel, view.mode, view.chapter, profile.claimedChests, summary);
-    nodes.reverse().forEach((node, index) => {
+    const currentLevel = getSuggestedAdventureLevel(profile.bestByLevel, summary);
+    const nodes = mapNodes();
+    nodes.forEach((node, index) => {
       const element = renderedNodes[index];
       element.node = node;
       const control = element.control;
@@ -98,6 +132,7 @@ export function mountAdventureMap(gameId) {
         control.disabled = node.locked;
         control.classList.toggle("is-cleared", node.cleared);
         control.classList.toggle("is-mode-cleared", node.modeCleared);
+        control.classList.toggle("is-current", node.level === currentLevel);
         element.stars.textContent = "★".repeat(node.stars) + "☆".repeat(3 - node.stars);
         element.detail.textContent = node.modeCleared ? `${node.score.toLocaleString("vi-VN")} điểm` : node.cleared ? "Đã thắng ở độ khó khác" : "";
         control.setAttribute("aria-label", `Màn ${node.level}, ${node.locked ? "chưa mở" : node.cleared ? "đã thắng" : "đã mở"}, ${node.stars} sao`);
@@ -114,6 +149,11 @@ export function mountAdventureMap(gameId) {
       tab.setAttribute("aria-selected", String(selected));
       tab.tabIndex = selected ? 0 : -1;
     }
+    const session = currentModeSession();
+    play.textContent = session ? `Tiếp tục màn ${session.level}` : `Chơi màn ${currentLevel}`;
+  }
+  function currentModeSession() {
+    return getActiveSessions(gameId).find(session => session.mode === view.mode && (!adapter.validateSession || adapter.validateSession(session))) || null;
   }
 
   async function renderChapter() {
@@ -123,24 +163,41 @@ export function mountAdventureMap(gameId) {
     body.setAttribute("aria-busy", "true");
     previous.disabled = next.disabled = true;
     if (!await prepareAdventureChapter(gameId, view.chapter, () => scope.active && generation === chapterGeneration)) return;
-    const nodes = createAdventureChapterNodes(profile.bestByLevel, view.mode, view.chapter, profile.claimedChests, profile.adventure).reverse();
+    const neighbors = [view.chapter - 1, view.chapter + 1].filter(chapter => chapter >= 1 && chapter <= profile.adventure.currentChapter);
+    const records = await Promise.all(neighbors.map(chapter => loadPersistentChapter(game.progressKey, chapter)));
+    if (!scope.active || generation !== chapterGeneration) return;
+    adjacentBest = {}; adjacentChests = {}; extraLevels = [];
+    neighbors.forEach((chapter, index) => {
+      Object.assign(adjacentBest, records[index].bestByLevel);
+      Object.assign(adjacentChests, records[index].claimedChests);
+      const first = chapter < view.chapter ? chapter * 100 - 4 : (chapter - 1) * 100 + 1;
+      for (let level = first; level < first + 5; level += 1) extraLevels.push(level);
+    });
+    topLevel = view.chapter * 100 + (neighbors.includes(view.chapter + 1) ? 5 : 0);
+    bottomLevel = (view.chapter - 1) * 100 + 1 - (neighbors.includes(view.chapter - 1) ? 5 : 0);
+    const nodes = mapNodes();
     renderedNodes = [];
     trail.replaceChildren();
     const path = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     path.classList.add("adventure-map-path");
-    path.setAttribute("viewBox", `0 0 400 ${nodes.length * 92 + 40}`);
+    const levelNodes = nodes.filter(node => node.kind === "level");
+    const height = levelNodes.length * step + 60;
+    path.setAttribute("viewBox", `0 0 400 ${height}`);
     path.setAttribute("preserveAspectRatio", "none");
     path.setAttribute("aria-hidden", "true");
-    const line = document.createElementNS(path.namespaceURI, "polyline");
-    line.setAttribute("points", nodes.map((_, index) => `${200 + Math.sin(index * .62) * 105},${index * 92 + 50}`).join(" "));
+    const line = document.createElementNS(path.namespaceURI, "path");
+    const points = levelNodes.map(node => position(node.level));
+    line.setAttribute("d", points.reduce((d, point, index) => index === 0 ? `M ${point.x} ${point.y}` : `${d} C ${points[index - 1].x} ${point.y - step / 2} ${point.x} ${point.y - step / 2} ${point.x} ${point.y}`, ""));
     path.append(line);
     trail.append(path);
-    trail.style.height = `${nodes.length * 92 + 40}px`;
+    trail.style.height = `${height}px`;
     nodes.forEach((node, index) => {
       const cell = document.createElement("div");
       cell.className = "adventure-map-cell";
-      cell.style.top = `${index * 92 + 15}px`;
-      cell.style.left = `${50 + Math.sin(index * .62) * 26.25}%`;
+      const point = position(node.kind === "level" ? node.level : node.lastLevel);
+      cell.style.top = `${point.y - 29}px`;
+      cell.style.left = `${node.kind === "level" ? point.x / 4 : point.x < 200 ? 83 : 17}%`;
+      cell.classList.toggle("adventure-map-cell--chest", node.kind === "chest");
       const control = button(node.kind === "level" ? String(node.level) : "", `adventure-map-node adventure-map-node--${node.kind}`);
       const stars = document.createElement("span");
       stars.className = "adventure-map-stars";
@@ -161,13 +218,22 @@ export function mountAdventureMap(gameId) {
       sessions.append(resume);
     }
     chapterLabel.textContent = `Chặng ${view.chapter}`;
+    const chapterProgress = getChapterProgress(profile.bestByLevel, view.chapter, profile.adventure);
+    completionLabel.textContent = `Đã thắng ${chapterProgress.completedCount}/100 màn`;
+    completionBar.value = chapterProgress.completedCount;
     previous.disabled = view.chapter === 1;
     next.disabled = view.chapter >= profile.adventure.currentChapter;
     loading = false;
     patchNodes();
     body.removeAttribute("aria-busy");
     root.dataset.mapReady = "true";
-    if (view.scroll === null) scroll.scrollTop = scroll.scrollHeight;
+    if (view.anchor) {
+      scroll.scrollTop = position(view.anchor.level).y - view.anchor.screenY;
+      view.anchor = null;
+    } else if (view.scroll === null) {
+      const currentLevel = getSuggestedAdventureLevel(profile.bestByLevel, profile.adventure);
+      scroll.scrollTop = view.chapter === profile.adventure.currentChapter ? Math.max(0, position(currentLevel).y - scroll.clientHeight * .65) : scroll.scrollHeight;
+    }
     else scroll.scrollTop = view.scroll;
   }
 
@@ -178,7 +244,7 @@ export function mountAdventureMap(gameId) {
   }
 
   function openLevel(level, mode = view.mode, explicitSession = null) {
-    const result = profile.bestByLevel[`${mode}:${level}`];
+    const result = profile.bestByLevel[`${mode}:${level}`] || adjacentBest[`${mode}:${level}`];
     const session = explicitSession || getActiveSessions(gameId).find(candidate => candidate.mode === mode && candidate.level === level);
     const content = document.createElement("div");
     const text = document.createElement("p");
@@ -210,7 +276,7 @@ export function mountAdventureMap(gameId) {
   }
 
   function openChest(node) {
-    const outcome = profile.claimedChests?.[node.chestNumber];
+    const outcome = profile.claimedChests?.[node.chestNumber] || adjacentChests[node.chestNumber];
     const describe = reward => reward.grants.map(grant => `${grant.amount} Xu`).join(" · ");
     openAppModal({ id: "adventure-chest-modal", title: `Rương ${node.chestNumber}`, icon: "collection", content: `<p>${outcome ? describe(outcome) : `Thắng đủ màn ${node.firstLevel}–${node.lastLevel} để nhận rương (${node.completedCount}/10).`}</p>`, actions: node.eligible ? [{ label: "Nhận thưởng", variant: "primary", onClick: async () => {
       const reward = await claimAdventureChest(gameId, node.chestNumber);
@@ -250,16 +316,35 @@ export function mountAdventureMap(gameId) {
     const target = event.key === "Home" ? 0 : event.key === "End" ? 3 : (index + (event.key === "ArrowRight" ? 1 : 3)) % 4;
     modes.children[target].click(); modes.children[target].focus();
   });
-  const changeChapter = direction => {
+  const changeChapter = (direction, continuous = false) => {
     if (loading) return;
     const candidate = view.chapter + direction;
     if (candidate < 1 || candidate > profile.adventure.currentChapter) return;
+    if (continuous) {
+      const level = direction > 0 ? topLevel : bottomLevel;
+      view.anchor = { level, screenY: position(level).y - scroll.scrollTop };
+    }
     view.chapter = candidate; view.scroll = null;
     void renderChapter().catch(error => { if (scope.active) { console.error("Map load failed", error); showAppToast("Chưa tải được chặng này."); } });
   };
   scope.listen(previous, "click", () => changeChapter(-1));
   scope.listen(next, "click", () => changeChapter(1));
-  scope.own(() => { if (!loading) view.scroll = scroll.scrollTop; renderedNodes = []; });
+  // Rebase at chapter boundaries: DOM/scroll height remain bounded independently of history.
+  scope.listen(scroll, "wheel", event => {
+    if (loading) return;
+    if (event.deltaY < 0 && scroll.scrollTop < 2 && view.chapter < profile.adventure.currentChapter) { event.preventDefault(); changeChapter(1, true); }
+    else if (event.deltaY > 0 && scroll.scrollHeight - scroll.clientHeight - scroll.scrollTop < 2 && view.chapter > 1) { event.preventDefault(); changeChapter(-1, true); }
+  }, { passive: false });
+  let touchY = null;
+  scope.listen(scroll, "touchstart", event => { touchY = event.touches[0]?.clientY ?? null; }, { passive: true });
+  scope.listen(scroll, "touchend", event => {
+    const y = event.changedTouches[0]?.clientY;
+    if (touchY === null || !Number.isFinite(y) || Math.abs(y - touchY) < 24) return;
+    if (y > touchY && scroll.scrollTop < 2) changeChapter(1, true);
+    else if (y < touchY && scroll.scrollHeight - scroll.clientHeight - scroll.scrollTop < 2) changeChapter(-1, true);
+    touchY = null;
+  }, { passive: true });
+  scope.own(() => { if (!loading) view.scroll = scroll.scrollTop; renderedNodes = []; adjacentBest = {}; adjacentChests = {}; extraLevels = []; });
   void renderChapter().catch(error => { if (scope.active) { console.error("Map load failed", error); showAppToast("Chưa tải được bản đồ. Hãy tải lại trang."); } });
   return root;
 }

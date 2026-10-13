@@ -7,6 +7,7 @@ const games = [
 
 async function startLargestBoard(page, id) {
   await page.evaluate(async gameId => {
+    await (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu(gameId);
     const { gameState } = await import("/js/gameState.js");
     gameState.settings.mode = "superHard";
     if (gameId === "memory-match") await (await import("/js/gameController.js")).startNewMemoryRun();
@@ -32,10 +33,10 @@ for (const game of games) {
       window.compactTopologyTiles = [...document.querySelectorAll(selector)];
     }, `${game.board} ${game.tile}`);
     if (game.id === "link-connect") {
-      await page.waitForFunction(async () => {
+      await expect.poll(() => page.evaluate(async () => {
         const { linkGameState } = await import("/js/linkConnect/linkState.js");
         return !linkGameState.isLocked;
-      });
+      })).toBe(true);
       await board.locator(`${game.tile}:not([disabled])`).first().click();
       await expect(board.locator(`${game.tile}.is-selected`)).toHaveCount(1);
     }

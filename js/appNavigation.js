@@ -13,7 +13,6 @@ const actions = Object.freeze([
   { id: "settings", icon: "settings", label: "Cài đặt" },
 ]);
 let handlers = {};
-let accountLabel = "Khách";
 let cloudState = "connecting";
 export function configureAppNavigation(next) { handlers = next; }
 
@@ -49,24 +48,14 @@ export function decorateAdventureMenu(root, { gameId = null, onHome } = {}) {
   const account = document.createElement("button");
   account.type = "button";
   account.className = "adventure-account";
-  const accountName = document.createElement("span");
-  accountName.textContent = accountLabel;
+  account.setAttribute("aria-label", "Tài khoản");
   account.dataset.cloudState = cloudState;
-  account.append(createIcon("account"), accountName);
+  account.append(createIcon("account"));
   scope.listen(account, "click", () => handlers.account?.());
   const coins = document.createElement("span");
   coins.className = "adventure-wallet";
   coins.append(createIcon("coin"), document.createTextNode(gameState.coins.toLocaleString("vi-VN")));
   header.append(account, coins);
-  if (gameId && onHome) {
-    const back = document.createElement("button");
-    back.type = "button";
-    back.className = "adventure-back";
-    back.setAttribute("aria-label", "Về menu chính");
-    back.append(createIcon("home"));
-    scope.listen(back, "click", onHome);
-    header.prepend(back);
-  }
   root.prepend(header);
   const footer = document.createElement("footer");
   footer.className = "adventure-footer";
@@ -99,13 +88,11 @@ export function refreshAppWallet() {
   if (wallet) wallet.replaceChildren(createIcon("coin"), document.createTextNode(gameState.coins.toLocaleString("vi-VN")));
 }
 export function refreshAppAccount(state) {
-  accountLabel = state.playerName || (state.isAnonymous ? "Khách" : "Tài khoản");
   cloudState = state.phase;
   const account = document.querySelector(".adventure-account");
   if (!account) return;
-  account.querySelector("span").textContent = accountLabel;
   account.dataset.cloudState = cloudState;
-  account.title = state.message;
+  account.title = "Tài khoản";
 }
 
 export function openLocalRankings(gameId, onClose) {
