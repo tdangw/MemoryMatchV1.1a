@@ -68,3 +68,15 @@ npm run android:apk
 - `vite.config.js`: cấu hình web JavaScript thuần.
 
 Mỗi game có sáu mode và giữ session độc lập theo mode. `js/gameCatalog.js` là catalog chung cho selector và namespace tiến trình. Xem trạng thái sản phẩm trong `CONTEXT.md`, kiến trúc module trong `ARCHITECTURE.md`, và thiết kế chi tiết trong `Memory Match.md`/`Link Connect.md`/`Triple Connect.md`.
+
+## Tài khoản, xếp hạng và thống kê
+
+Cấu hình Firebase Web app trong .env: VITE_FIREBASE_API_KEY, VITE_FIREBASE_AUTH_DOMAIN, VITE_FIREBASE_PROJECT_ID, VITE_FIREBASE_STORAGE_BUCKET, VITE_FIREBASE_MESSAGING_SENDER_ID, VITE_FIREBASE_APP_ID, VITE_FIREBASE_MEASUREMENT_ID. Không commit .env. Auth bật Anonymous và Google; Rules/indexes trong repository. Không cần Cloud Functions hoặc nâng billing.
+
+Cloud phân vùng production/beta/test/local theo hostname; có thể override VITE_FIREBASE_ENV. Emulator dùng VITE_FIREBASE_USE_EMULATORS=1 (Auth9199, Firestore8180). Kiểm thử Rules bằng firebase emulators:exec với project demo-memory-match, không ghi dữ liệu kiểm thử vào production.
+
+Analytics chỉ bật production, không chạy trên emulator/beta/test/local. VITE_FIREBASE_ANALYTICS_DISABLED=1 tắt thu thập; VITE_FIREBASE_ANALYTICS_DEBUG=1 đánh dấu debug_mode để kiểm tra DebugView trên bản production thử nghiệm riêng. Không bật debug trên bản phát hành.
+
+Trong Analytics/GA4 xem Active users theo khoảng ngày,7 ngày hoặc30 ngày để theo dõi số người chơi; đây là số tài khoản/trình duyệt được nhận diện, không bảo đảm một người thật một tài khoản. Đăng ký custom metric active_seconds (Seconds) cho event active_play_time, và dimensions game_id/game_mode/level_number để xem tổng thời gian chơi từng trò/chế độ. Thời gian này chỉ gửi khi dừng một đoạn chơi đang hoạt động; menu, tab ẩn và tải màn không tính. Không gửi email, credential, Xu hoặc session vào Analytics.
+
+Trước phát hành: xác nhận measurement ID thuộc đúng web stream, event vào DebugView, cấu hình lọc developer/internal traffic, rồi tắt debug. Xác minh Google OAuth popup trên các miền production/beta/test và Google login trên Android thực. Các phép thử emulator không xác minh popup hosted hoặc dashboard Analytics.

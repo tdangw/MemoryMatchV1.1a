@@ -260,6 +260,7 @@ if (import.meta.env.VITE_FIREBASE_DISABLED !== '1') {
         applyEffectsSettings(gameState.settings);
         initializeMeteorEffects(gameState.settings.meteorEffects);
         showGameSelector();
+        await (await import('./leaderboardService.js')).getLeaderboardService()?.recover();
       },
     });
     return import('./leaderboardService.js').then(module => module.initializeLeaderboardService().ready);
@@ -267,6 +268,7 @@ if (import.meta.env.VITE_FIREBASE_DISABLED !== '1') {
     console.warn('Cloud startup unavailable', error.code || error.name);
     showAppToast('Cloud chưa kết nối được. Bản máy vẫn hoạt động.');
   });
+  void accountReady.then(() => import('./analyticsService.js')).then(module => module.initializeAnalytics()).catch(error => console.warn('Analytics unavailable', error.code || error.name));
 }
 
 if (new URLSearchParams(window.location.search).has("effect-performance")) {

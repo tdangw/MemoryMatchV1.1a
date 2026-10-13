@@ -6,6 +6,15 @@ export default defineConfig(({ mode }) => {
 
   return {
     publicDir: 'public',
+    build: {
+      rollupOptions: { output: { manualChunks(id) {
+        if (id.includes('/node_modules/@firebase/auth/') || id.includes('/node_modules/firebase/auth/')) return 'firebase-auth';
+        if (id.includes('/node_modules/@firebase/firestore/') || id.includes('/node_modules/firebase/firestore/')) return 'firebase-firestore';
+        if (id.includes('/node_modules/@firebase/analytics/') || id.includes('/node_modules/firebase/analytics/')) return 'firebase-analytics';
+        if (id.includes('/node_modules/@firebase/') || id.includes('/node_modules/firebase/')) return 'firebase-core';
+        if (id.endsWith('/js/generated/themeAssetManifest.js')) return 'theme-manifest';
+      } } },
+    },
     resolve: {
       alias: {
         'victory-presentation': fileURLToPath(

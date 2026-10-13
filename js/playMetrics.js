@@ -1,12 +1,16 @@
 /** Event-driven active-time measurement. Countdown bonuses and freezes never change this clock. */
 import { getRankingOwner } from './rankingOwner.js';
-export function createActivePlayClock({ elapsedMs = 0, now = () => performance.now() } = {}) {
+export function createActivePlayClock({ elapsedMs = 0, now = () => performance.now(), onSegment = () => {} } = {}) {
   let elapsed = Number.isSafeInteger(elapsedMs) && elapsedMs >= 0 ? elapsedMs : 0;
   let startedAt = null;
   const pauses = new Set(["startup"]);
   let stopped = false;
   function pause(reason) {
-    if (startedAt !== null) { elapsed += Math.max(0, now() - startedAt); startedAt = null; }
+    if (startedAt !== null) {
+      const segment = Math.max(0, now() - startedAt);
+      elapsed += segment; startedAt = null;
+      if (segment > 0) onSegment(segment);
+    }
     pauses.add(reason);
   }
   function resume(reason) {
@@ -20,11 +24,18 @@ export function createActivePlayClock({ elapsedMs = 0, now = () => performance.n
 
 let activeMetrics = null;
 let lastMetrics = null;
+const segmentListeners = new Set();
+export function subscribeToPlaySegments(listener) { segmentListeners.add(listener); return () => segmentListeners.delete(listener); }
 export function beginPlayMetrics(scope, identity, metadata = null) {
   const record = {
     ...identity,
     owner: metadata?.owner || getRankingOwner(),
-    clock: createActivePlayClock({ elapsedMs: metadata?.elapsedMs || 0 }),
+    clock: createActivePlayClock({ elapsedMs: metadata?.elapsedMs || 0, onSegment: durationMs => {
+      for (const listener of segmentListeners) {
+        try { listener({ ...identity, owner: record.owner, durationMs }); }
+        catch (error) { console.warn('Play telemetry unavailable', error.name); }
+      }
+    } }),
     rankable: metadata === null || (metadata?.version === 1 && metadata.rankable !== false),
   };
   activeMetrics = record;

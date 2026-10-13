@@ -108,7 +108,7 @@ export async function updateChapterMetadata(database, key, update, isCurrent = (
   const previous = await requestResult(store.get(key));
   if (!isCurrent()) { transaction.abort(); await complete.catch(() => {}); return null; }
   const next = update(previous);
-  store.put(next, key);
+  if (next !== previous) store.put(next, key);
   await complete;
   return next;
 }

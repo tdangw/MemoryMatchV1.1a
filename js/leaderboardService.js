@@ -23,10 +23,10 @@ export function initializeLeaderboardService() {
     if (!scope.active || timer !== null || retries >= 5) return;
     timer = scope.timeout(() => { timer = null; void service.flush(); }, Math.max(delay, nextAllowedAt - Date.now(), 0));
   };
-  function recover() {
-    scanning = scanning.catch(() => {}).then(async () => {
+  function recover(progress = null) {
+    scanning = scanning.then(async () => {
       if (!scope.active || !backend) return;
-      const results = collectRankingResults(await exportPersistentSnapshot());
+      const results = collectRankingResults(progress ? { profile: { data: { progress } }, chapters: [] } : await exportPersistentSnapshot());
       const groups = new Map();
       for (const result of results) {
         const groupKey = key(result.owner);
@@ -34,19 +34,20 @@ export function initializeLeaderboardService() {
         groups.get(groupKey).push(result);
       }
       for (const [groupKey, group] of groups) await updateSyncMetadata(groupKey, previous => {
-        const next = previous || { queue: {}, receipts: {} };
+        const next = { queue: { ...previous?.queue }, receipts: { ...previous?.receipts }, deferred: progress ? previous?.deferred || false : false };
+        let changed = !previous || next.deferred !== previous.deferred;
         let size = Object.keys(next.queue).length;
-        next.deferred = false;
         for (const result of group) {
           const id = ownerKey(result);
           if (next.receipts[id] === result.id) continue;
-          if (!next.queue[id] && size >= QUEUE_LIMIT) { next.deferred = true; continue; }
+          if (!next.queue[id] && size >= QUEUE_LIMIT) { if (!next.deferred) changed = true; next.deferred = true; continue; }
           if (!next.queue[id] || comparePublicResults(result, next.queue[id], result.kind) < 0) {
             if (!next.queue[id]) size++;
             next.queue[id] = result;
+            changed = true;
           }
         }
-        return next;
+        return changed ? next : previous;
       }, () => scope.active);
       schedule();
     }).catch(error => { message = `Hàng đợi chưa cập nhật được (${error.code || error.name}); kỷ lục vẫn ở bản máy.`; });
@@ -71,16 +72,15 @@ export function initializeLeaderboardService() {
         // Bind a pre-login result once, before making its first network request.
         const bound = { ...result, owner: { ...result.owner, uid: identity.uid } };
         await updateSyncMetadata(groupKey, previous => {
-          if (previous.queue[id]?.id === result.id) previous.queue[id] = bound;
-          return previous;
+          return previous.queue[id]?.id === result.id && !previous.queue[id].owner.uid ? { ...previous, queue: { ...previous.queue, [id]: bound } } : previous;
         }, current);
         if (!current()) return false;
         operations = await submitRankingResult({ database: backend.database, environment: backend.environment, uid: identity.uid, playerName: identity.playerName, result: bound, isCurrent: current });
         if (!current()) return false;
         await updateSyncMetadata(groupKey, previous => {
-          previous.receipts[id] = result.id;
-          if (previous.queue[id]?.id === result.id) delete previous.queue[id];
-          return previous;
+          const queue = { ...previous.queue };
+          if (queue[id]?.id === result.id) delete queue[id];
+          return { ...previous, queue, receipts: { ...previous.receipts, [id]: result.id } };
         }, current);
         submitted++;
         if (submitted >= 20) { nextAllowedAt = Date.now() + 15000; message = 'Đang gửi lần lượt kỷ lục đã lưu trên máy.'; schedule(15000); return true; }
@@ -99,7 +99,7 @@ export function initializeLeaderboardService() {
   service.ready = getFirebaseBackend().then(value => {
     backend = value;
     if (!backend || !scope.active) return;
-    scope.own(subscribeToLocalCommit(() => { void recover(); }), 'listener');
+    scope.own(subscribeToLocalCommit(({ patch }) => { if (patch.progress) void recover(patch.progress); else if (patch.restored) void recover(); }), 'listener');
     scope.own(getAccountService().subscribe(state => { if (state.bound && !state.conflict) schedule(); }), 'listener');
     scope.listen(window, 'online', () => { retries = 0; schedule(); });
     scope.listen(window, 'pagehide', event => { if (!event.persisted) service.dispose(); });

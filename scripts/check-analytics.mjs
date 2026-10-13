@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import { shouldEnableAnalytics } from '../js/analyticsService.js';
+import { createActivePlayClock } from '../js/playMetrics.js';
+for (const environment of ['local', 'beta', 'test']) assert.equal(shouldEnableAnalytics(environment, false), false);
+assert.equal(shouldEnableAnalytics('production', true), false);
+assert.equal(shouldEnableAnalytics('production', false, { VITE_FIREBASE_ANALYTICS_DISABLED: '1' }), false);
+assert.equal(shouldEnableAnalytics('production', false), true);
+let now = 0; const segments = [];
+const clock = createActivePlayClock({ now: () => now, onSegment: value => segments.push(value) });
+clock.resume('startup'); now = 1000; clock.pause('menu'); clock.pause('modal'); now = 5000; clock.resume('menu'); now = 6000; clock.resume('modal'); now = 8000; clock.finish(); clock.finish(); clock.pause('again');
+assert.deepEqual(segments, [1000, 2000]);
+assert.equal(clock.durationMs(), 3000);
+console.log('Analytics production-only/test exclusion and event-driven non-duplicated active segments passed.');
