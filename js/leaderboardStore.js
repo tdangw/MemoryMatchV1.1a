@@ -85,4 +85,10 @@ export function assertOrderedPage(rows, kind, cursor = null, pages = new Map(), 
 }
 function pageError(code) { const error = new Error(code === 'stale' ? 'Bảng đã thay đổi. Hãy làm mới.' : 'Hãy về trang đầu và làm mới.'); error.code = code; return error; }
 export function clearLeaderboardCache() { cache.clear(); }
+export function readCachedLeaderboard({ environment, board, uid = null, page = 1 }) {
+  const state = cache.get(`${environment}:${rankingBoardId(board)}:${uid || ''}`);
+  if (!state || Date.now() - state.fetchedAt >= CACHE_TTL_MS) return null;
+  const data = state.pages.get(page);
+  return data ? { ...data, knownPages: [...state.cursors.keys()], cached: true } : null;
+}
 export function getLeaderboardCacheDiagnostics() { return { boards: cache.size, pages: [...cache.values()].map(state => state.pages.size), cursors: [...cache.values()].map(state => state.cursors.size) }; }

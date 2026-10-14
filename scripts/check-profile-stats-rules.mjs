@@ -11,6 +11,14 @@ try {
   const guest = env.unauthenticatedContext().firestore();
   const admin = env.authenticatedContext('manager', { admin: true }).firestore();
   const fakeAdmin = env.authenticatedContext('fake-manager', { isAdmin: true }).firestore();
+  // Regression for the reported local environment read; an absent record is a valid first visit.
+  const reportedUid = 'LbYS4J8YLkdQpfB0YFcpHaRReks2';
+  const reportedPath = `gamespaces/local/profileStats/${reportedUid}`;
+  const reportedOwner = env.authenticatedContext(reportedUid).firestore();
+  assert.equal((await assertSucceeds(getDoc(doc(reportedOwner, reportedPath)))).exists(), false);
+  await assertSucceeds(getDoc(doc(admin, reportedPath)));
+  await assertFails(getDoc(doc(other, reportedPath)));
+  await assertFails(getDoc(doc(guest, reportedPath)));
   const a = crypto.randomUUID(); const b = crypto.randomUUID(); const now = Date.now() - 1000;
   const write = (id, ms) => publishProfileCounter({ database: db, environment: 'test', uid: 'stats-owner', local: { counterId: id, totalMs: ms, trackedSince: now } });
   await assertSucceeds(write(a, 60000));

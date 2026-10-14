@@ -147,7 +147,7 @@ test("replacing a modal ID disposes old listeners and callback", async ({ page }
   expect(await page.evaluate(() => window.oldModalCalls)).toBe(1);
 });
 
-test("restarting a playing round cancels its timer and preserves shell nodes", async ({ page }) => {
+test("restarting a playing round cancels countdown and play-time checkpoint timers and preserves shell nodes", async ({ page }) => {
   test.setTimeout(60000);
   await page.clock.install();
   for (const id of ["memory-match", "link-connect"]) {
@@ -160,13 +160,16 @@ test("restarting a playing round cancels its timer and preserves shell nodes", a
       const previous = shell.scope;
       const refs = shell.refs;
       const running = previous.diagnostics().interval;
+      (await import('/js/playMetrics.js')).finishPlayMetrics();
+      const afterMetricsFinish = previous.diagnostics().interval;
       window.staleRoundCalls = 0;
       previous.timeout(() => window.staleRoundCalls++, 1000);
       if (id === "memory-match") await (await import("/js/gameController.js")).restartMemoryLevel();
       else await (await import("/js/linkConnect/linkController.js")).startLinkLevel({ mode: "easy", restart: true });
-      return { running, sameRefs: refs === shell.refs, old: previous.diagnostics(), changed: previous !== shell.scope };
+      return { running, afterMetricsFinish, sameRefs: refs === shell.refs, old: previous.diagnostics(), changed: previous !== shell.scope };
     }, id);
-    expect(result.running).toBe(1);
+    expect(result.running).toBe(2);
+    expect(result.afterMetricsFinish).toBe(1);
     expect(result.sameRefs && result.changed).toBe(true);
     expect(Object.values(result.old).every(value => value === false || value === 0)).toBe(true);
     await page.clock.runFor(15000);

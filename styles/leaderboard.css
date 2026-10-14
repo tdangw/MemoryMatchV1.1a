@@ -43,6 +43,7 @@
 .leaderboard-context[hidden] { display: none; }
 .leaderboard-status { margin: 0; padding: 24px 12px; font-size: 13px; text-align: center; color: var(--ranking-muted); }
 .leaderboard-status:empty { display: none; }
+.leaderboard-results[data-offline="true"] .leaderboard-status { padding: 8px 12px; }
 .leaderboard-results { overflow: auto; min-height: 44px; flex: 1; scrollbar-width: none; overscroll-behavior: contain; background: #071f28ed; border: 1px solid var(--ranking-line); border-radius: 14px; }
 .leaderboard-list { list-style: none; padding: 0; margin: 0; }
 .leaderboard-heading { display: grid; grid-template-columns: 30px minmax(0, 1fr) 80px; align-items: center; gap: 8px; padding: 12px 10px; border-bottom: 1px solid var(--ranking-line); background: #10343a; position: sticky; top: 0; z-index: 1; color: var(--ranking-muted); font-size: 11px; }
@@ -51,14 +52,14 @@
 .leaderboard-results[data-kind="run"] li { grid-template-columns: 30px 30px minmax(0, 1fr) 38px 76px; }
 .leaderboard-results[data-kind="time"] li { grid-template-columns: 30px 30px minmax(0, 1fr) 80px; }
 .leaderboard-stage, .leaderboard-metric { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.leaderboard-rank--1, .leaderboard-rank--2, .leaderboard-rank--3 { display: grid; place-items: center; width: 28px; height: 30px; border-radius: 9px 9px 12px 12px; color: #3a2a11; font-size: 16px; font-weight: 800; background: linear-gradient(#ffebad, #c69b49); border: 1px solid #fae8ad; box-sizing: border-box; }
-.leaderboard-rank--2 { background: linear-gradient(#e4eff0, #8fa8b1); border-color: #d7e9ea; color: #253b42; }
-.leaderboard-rank--3 { background: linear-gradient(#eabe9e, #a86d45); border-color: #ebc3a1; }
-.leaderboard-list li { display: grid; grid-template-columns: 30px 30px minmax(0, 1fr) auto; align-items: center; gap: 8px; padding: 10px; min-height: 54px; box-sizing: border-box; border-bottom: 1px solid #8cb6b11c; }
+.leaderboard-list .leaderboard-rank--1, .leaderboard-list .leaderboard-rank--2, .leaderboard-list .leaderboard-rank--3 { display: grid; place-items: center; width: 28px; height: 30px; border-radius: 9px 9px 12px 12px; color: #3a2a11; font-size: 16px; font-weight: 800; background: linear-gradient(#ffebad, #c69b49); border: 1px solid #fae8ad; box-sizing: border-box; }
+.leaderboard-list .leaderboard-rank--2 { background: linear-gradient(#e4eff0, #8fa8b1); border-color: #d7e9ea; color: #253b42; }
+.leaderboard-list .leaderboard-rank--3 { background: linear-gradient(#eabe9e, #a86d45); border-color: #ebc3a1; }
+.leaderboard-list li { display: grid; grid-template-columns: 30px 30px minmax(0, 1fr) auto; align-items: center; gap: 8px; padding: 9px 10px; min-height: 50px; box-sizing: border-box; border-bottom: 1px solid #8cb6b11c; }
 .leaderboard-list li:last-child { border-bottom: 0; }
 .leaderboard-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; font-weight: 600; }
 .leaderboard-rank { text-align: center; font-variant-numeric: tabular-nums; color: var(--ranking-muted); font-size: 13px; }
-.leaderboard-avatar { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; border: 1px solid #d9e9d540; background: #34514f; color: #e8efdc; }
+.leaderboard-avatar { display: grid; place-items: center; width: 30px; height: 30px; box-sizing: border-box; border-radius: 50%; border: 1px solid #d9e9d540; background: #34514f; color: #e8efdc; }
 .leaderboard-avatar .ui-icon { width: 20px; height: 20px; }
 .leaderboard-list strong { font-size: 13px; font-variant-numeric: tabular-nums; text-align: right; }
 .leaderboard-list .is-self { background: #f1d58b14; box-shadow: inset 3px 0 var(--ranking-gold); color: #ffe3a0; }
@@ -77,6 +78,7 @@
 .leaderboard-page-numbers { display: none; }
 .leaderboard-pager .app-button { font-size: 26px; }
 .leaderboard-stage-dialog { background: linear-gradient(145deg, #14383d, #071e28); color: #edf4eb; border-color: #dfc17b70; }
+.app-modal-overlay:has(> .leaderboard-stage-dialog) { background: #020e15b8; }
 .leaderboard-stage-dialog .app-modal__title, .leaderboard-stage-dialog .app-modal__close { color: #ffe1a0; }
 .leaderboard-stage-dialog .app-modal__close { width: 44px; height: 44px; flex-basis: 44px; }
 .leaderboard-stage-form { display: grid; gap: 12px; }

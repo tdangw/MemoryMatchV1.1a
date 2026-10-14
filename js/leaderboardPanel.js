@@ -8,6 +8,7 @@ import { getFirebaseBackend } from './firebaseBackend.js';
 import { getAccountService } from './accountService.js';
 import { getLeaderboardService } from './leaderboardService.js';
 import { readLeaderboard } from './leaderboardStore.js';
+import { readCachedLeaderboard } from './leaderboardStore.js';
 import { rankingBoardId } from './rankingResult.js';
 import { formatLeaderboardTime, formatLeaderboardNumber } from './leaderboardPresentation.js';
 import { createGameShellLifecycle, getActiveGameScope } from './gameShell/gameShellLifecycle.js';
@@ -82,11 +83,14 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
     try {
       const backend = await getFirebaseBackend();
       if (!scope.active || id !== generation || uid !== getAccountService()?.getIdentity()?.uid) return;
-      if (!backend || !navigator.onLine) { status.textContent = 'Chưa có kết nối.'; return; }
-      if (refreshRequested) await getLeaderboardService()?.flush();
+      if (!backend) { status.textContent = 'Chưa có kết nối.'; return; }
+      if (refreshRequested && navigator.onLine) await getLeaderboardService()?.flush();
       if (!scope.active || id !== generation) return;
-      const data = await readLeaderboard({ database: backend.database, environment: backend.environment, board, uid, refresh: refreshRequested, page: requestedPage });
+      const offline = !navigator.onLine;
+      const data = offline ? readCachedLeaderboard({ environment: backend.environment, board, uid, page: requestedPage })
+        : await readLeaderboard({ database: backend.database, environment: backend.environment, board, uid, refresh: refreshRequested, page: requestedPage });
       if (!scope.active || id !== generation || uid !== getAccountService()?.getIdentity()?.uid) return;
+      if (!data) { status.textContent = 'Chưa có kết nối.'; return; }
       currentPage = data.page;
       results.dataset.kind = board.kind;
       const heading = document.createElement('div'); heading.className = `leaderboard-heading leaderboard-heading--${board.kind}`;
@@ -105,7 +109,8 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
         if (board.kind === 'run') row.append(metric(formatLeaderboardNumber(item.levelReached), 'leaderboard-stage', 'Màn'));
         row.append(metric(board.kind === 'time' ? formatLeaderboardTime(item.durationMs) : formatLeaderboardNumber(item.totalScore), 'leaderboard-metric', board.kind === 'time' ? 'Thời gian' : 'Điểm')); list.append(row);
       }
-      if (data.top.length) { status.textContent = ''; results.replaceChildren(status, heading, list); }
+      results.dataset.offline = String(offline);
+      if (data.top.length) { status.textContent = offline ? 'Chưa có kết nối.' : ''; results.replaceChildren(status, heading, list); }
       else { status.textContent = 'Chưa có thành tích.'; }
       own.textContent = data.own && !data.top.some(item => item.uid === uid) ? `Thành tích của bạn: ${describe(data.own, board.kind)}` : '';
       results.scrollTop = refreshRequested ? 0 : scrolls.get(`${currentKey}:${currentPage}`) || 0;

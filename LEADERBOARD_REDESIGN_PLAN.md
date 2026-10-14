@@ -1,6 +1,6 @@
 # Kế hoạch làm lại bảng xếp hạng
 
-Ngày: 2026-10-14. Trạng thái: đã lập kế hoạch và vẽ nền; chưa triển khai UI hoặc dữ liệu hồ sơ. Đây là kế hoạch triển khai hiện hành duy nhất. EFFECTS_LEADERBOARD_PLAN.md là hồ sơ Gate1–3 đã hoàn tất ở phạm vi code/browser, còn QA thiết bị thật.
+Ngày: 2026-10-14. Trạng thái: đã hoàn tất Phase1–5 trong phạm vi code/browser và cập nhật Firestore Rules. Không còn phase triển khai đang chờ. EFFECTS_LEADERBOARD_PLAN.md là hồ sơ Gate1–3 đã hoàn tất ở phạm vi code/browser, còn QA thiết bị thật.
 
 ## 1. Mục tiêu và phạm vi
 
@@ -9,7 +9,7 @@ Làm lại bảng xếp hạng theo phong cách Vườn đêm, nội dung dành 
 - Không thêm cấp người chơi hoặc XP.
 - Không thêm bảng chung cộng điểm của ba trò; tiếp tục tách theo trò/chế độ.
 - Không làm lại gameplay, effect, dock dùng chung hoặc hệ thống đăng nhập.
-- Không push/deploy Hosting, Firebase hoặc build APK trong phạm vi thiết kế.
+- Không push/deploy Hosting hoặc build APK. Theo yêu cầu sửa permission-denied ngày2026-10-14, đã cập nhật riêng Firestore Rules của memorymatchv1-1a sau kiểm thử; không thay dữ liệu tài khoản.
 - Theo dõi ngày tham gia và tổng thời gian chơi trong hồ sơ riêng, ở phase tách biệt sau UI. Không đưa hai dữ liệu này vào bảng public.
 - Không xây mới hệ thống quản lý admin. Tích hợp màn quản lý cần nguồn và cơ chế quyền của hệ thống đó; repository hiện chưa có màn quản lý/role admin được xác minh.
 
@@ -82,7 +82,7 @@ Làm lại bảng xếp hạng theo phong cách Vườn đêm, nội dung dành 
 
 ## 6. Phase triển khai và commit
 
-Mỗi phase triển khai có commit riêng sau kiểm tra/diff. Lượt này chỉ tạo kế hoạch và ảnh, không coi phase UI đã hoàn thành.
+Mỗi phase triển khai có commit riêng sau kiểm tra/diff. Các Phase1–5 đã hoàn tất, bằng chứng và giới hạn ghi ở mục9.
 
 ### Phase 1 — Nền và shell trình bày
 
@@ -139,16 +139,16 @@ Yêu cầu đã giữ lại: ngày tham gia và tổng thời gian chơi của m
 
 ## 7. Checklist nghiệm thu sản phẩm
 
-- [ ] Không có wordmark thừa, mô tả nội bộ hoặc XP/cấp.
-- [ ] Một hàng6mode cuộn ngang, scrollbar ẩn, touch/keyboard hoạt động.
-- [ ] Time/run đúng cột, sort đúng contract và top3/self rõ.
-- [ ] Ô chọn màn cạnh pager phía dưới; nhập212 trực tiếp; nhãn đầu bảng đúng màn hiện tại.
-- [ ] Pager ở tâm panel, không bịa tổng số trang, không tràn/chồng nhau.
-- [ ] Empty/loading/error/offline/own ngoài trang không làm nhầm bảng hoặc hạng.
-- [ ] Background tĩnh đủ tối; fallback/crop/asset budgets đạt, không vào gameplay.
-- [ ] Không đổi public ranking schema/board IDs/API/save vì UI.
-- [ ] Nếu triển khai profile: thống kê riêng bền vững, migration/đồng bộ/quyền đã test; phần admin ngoài repo được ghi đúng trạng thái.
-- [ ] Check/build/browser/review pass; QA thiết bị thật được báo đúng.
+- [x] Không có wordmark thừa, mô tả nội bộ hoặc XP/cấp.
+- [x] Một hàng6mode cuộn ngang, scrollbar ẩn, touch/keyboard hoạt động.
+- [x] Time/run đúng cột, sort đúng contract và top3/self rõ.
+- [x] Ô chọn màn cạnh pager phía dưới; nhập212 trực tiếp; nhãn đầu bảng đúng màn hiện tại.
+- [x] Pager ở tâm panel, không bịa tổng số trang, không tràn/chồng nhau.
+- [x] Empty/loading/error/offline/own ngoài trang không làm nhầm bảng hoặc hạng.
+- [x] Background tĩnh đủ tối; fallback/crop/asset budgets đạt, không vào gameplay.
+- [x] Không đổi public ranking schema/board IDs/API/save vì UI.
+- [x] Nếu triển khai profile: thống kê riêng bền vững, migration/đồng bộ/quyền đã test; phần admin ngoài repo được ghi đúng trạng thái.
+- [x] Check/build/browser/review pass; QA thiết bị thật được báo đúng.
 
 ## 8. Kết quả của lượt lập kế hoạch
 
@@ -161,4 +161,9 @@ Yêu cầu đã giữ lại: ngày tham gia và tổng thời gian chơi của m
 - Phase1: nền WebP36.046byte,940×1672, decode6.287MB; CSS ranking có owner riêng, một hàngmode cuộn ngang, footer ở tâm. StaticJS/CSS pass; browser layout/18filters/scroll/stale4/4 pass ở412×915,640×360,1024×900. Đã đọc ảnh runtime mobile. Chưa thay presentation record/picker, thuộc Phase2–3.
 - Phase2: format time có carry centisecond/hour, sốvi-VN; run tách hai cột, huy hiệu top3 và avatar dự phòng; success không có status/card lặp. Contract presentation/ranking pass; browser layout4/4 và count0/1/10/11+own trong/ngoài trang4/4 pass, tên public chỉ text.
 - Phase3: picker nhập212/MAX, không query khi gõ, hủy trảfocus, invalid giữ bảng; footer ‹ TrangN › ở tâm, không đoán tổngtrang. Browser10/10 pass gồm18filters, race/close, trangcuối,30mount/picker/mode cleanup; owner diagnostics và DOM trở baseline. Ranking rules/checkpoints pass. Ảnh runtime mobile đã được đọc, không còn text success nội bộ.
-- Phase4: profile active time dùng clock hiện có, checkpoint30s + pause/finish, metadata riêng theoUID/replica, counter monotonic cộng transaction, retry idempotent, cap128 replica/tài khoản. Adoption guest là transaction2record với owner marker bất biến; không đổi game save/public ranking schema. Timestamp tham gia đọc trực tiếp Auth creationTime, không nhận ngày do client tự ghi vào Firestore; admin quản lý lấy Auth Admin metadata khi tích hợp. Browser profile5/5 pass (96s/3game, pause/reload, guesttail/UID, quota retry, corrupt/binding error). Emulator online+auth+ranking16/16 pass, gồm2device và staleUID/error; privateRules owner/admin/concurrency/invalid pass. Review độc lập đã chấp thuận các fix. Hard-kill có thể mất đoạn chưa checkpoint tối đa30s cộng latency commit; background/pagehide/pause cố gắng flush, không tuyên bố unload luôn hoàn tất. Dữ liệu thiếu/corrupt không bịa lịch sử. Rules mới chưa deploy; admin dashboard và QA phone vẫn ngoài môi trường hiện có.
+- Phase4: profile active time dùng clock hiện có, checkpoint30s + pause/finish, metadata riêng theoUID/replica, counter monotonic cộng transaction, retry idempotent, cap128 replica/tài khoản. Adoption guest là transaction2record với owner marker bất biến; không đổi game save/public ranking schema. Timestamp tham gia đọc trực tiếp Auth creationTime, không nhận ngày do client tự ghi vào Firestore; admin quản lý lấy Auth Admin metadata khi tích hợp. Browser profile5/5 pass (96s/3game, pause/reload, guesttail/UID, quota retry, corrupt/binding error). Emulator online+auth+ranking16/16 pass, gồm2device và staleUID/error; privateRules owner/admin/concurrency/invalid pass. Review độc lập đã chấp thuận các fix. Hard-kill có thể mất đoạn chưa checkpoint tối đa30s cộng latency commit; background/pagehide/pause cố gắng flush, không tuyên bố unload luôn hoàn tất. Dữ liệu thiếu/corrupt không bịa lịch sử. Rules đã deploy riêng ngày2026-10-14 theo yêu cầu sửa permission-denied; admin dashboard và QA phone vẫn ngoài môi trường hiện có.
+
+- Phase5: review độc lập chấp thuận; sửa cache offline đúng board/UID/page, bỏ nhánh UI cũ khi Firebase disabled, tăng tương phản huy hiệu và nền picker; mobile412×915 đủ10 dòng. npm run check, build web và build Android wrapper pass; không build APK. Browser ranking13/13, profile5/5, regression shell/navigation/cleanup và online/auth/ranking16/16 pass qua các lượt mục tiêu. Test30chu kỳ trả resource về baseline, dùng một request ảnh đã warm và tối đa1 sự kiện decode trong trace; không suy diễn thành60FPS trên điện thoại. Ảnh runtime mobile/time/run/picker, landscape, desktop và fallback ở docs/design/leaderboard/qa/.
+- Firebase2026-10-14: permission-denied do Rules đang chạy thiếu profileStats và chỉ có ranking v1. Đã so diff với bản remote, kiểm privateRules owner/admin/concurrent/replay/invalid pass, deploy chỉ firestore:rules; đọc lại release xác nhận đúng source local, có profileStats và v2. Metadata trước/sau lưu trong qa/firebase-rules-before.json và firebase-rules-after.json. Chưa thử lại phiên trình duyệt thực của người báo lỗi vì không có phiên đó trong công cụ; không giả nhận client đã reconnect.
+- Commit Phase1–4: 459e4fe / f98bd8d / 572515a / 72fdfcc. Phase5 chứa nghiệm thu và các sửa cuối.
+- Giới hạn còn lại: Galaxy S22 Ultra thật chưa có thiết bị/remote debugging; dashboard admin ngoài repository chưa tích hợp. Ngày tham gia online từ Auth; không bịa lịch sử thời gian trước khi theo dõi. API gameplay, save format và schema ranking public được giữ; thêm metadata/counter private độc lập đã test.

@@ -3,7 +3,7 @@ import { initializeProfileStatsService } from './profileStatsService.js';
 import { configureAdventureMap } from "./adventureMap.js";
 import { previewMemoryLevel, previewLinkLevel, previewTripleLevel } from './adventurePreview.js';
 import "./memoryMatch/memoryShellDom.js";
-import { configureAppNavigation, openLocalRankings, refreshAppWallet, refreshAppAccount } from "./appNavigation.js";
+import { configureAppNavigation, refreshAppWallet, refreshAppAccount } from "./appNavigation.js";
 import {
   applyEffectsSettings,
   enableButtonClickSounds,
@@ -135,9 +135,9 @@ configureAppNavigation({
     if (action === 'missions' || action === 'friends') return openAppModal({ ...surface, id: `${action}-screen`, title: action === 'missions' ? 'Nhiệm vụ' : 'Bạn bè', icon: action, content: '<p class="navigation-coming-soon">Sắp ra mắt</p>' });
     if (action === 'ranking') {
       if (document.getElementById('rankings-modal')) return;
-      const rankings = import.meta.env.VITE_FIREBASE_DISABLED === '1' ? null : await import('./leaderboardPanel.js');
+      const rankings = await import('./leaderboardPanel.js');
       if (!scope.active) return;
-      const open = onClose => rankings ? rankings.openLeaderboards(gameId, onClose, surface) : openLocalRankings(gameId, onClose, surface);
+      const open = onClose => rankings.openLeaderboards(gameId, onClose, surface);
       return open();
     }
     if (action === 'settings') return showSettingsPanel(false, () => {}, gameId === 'memory-match' ? { onHelp: showMemoryHelp, onReset: () => showResetConfirmationOverlay({}) } : undefined, surface);

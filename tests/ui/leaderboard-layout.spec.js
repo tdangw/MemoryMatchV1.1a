@@ -2,19 +2,23 @@ import { expect, test } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 const source = readFileSync('js/leaderboardPanel.js', 'utf8')
   .replace("import { getFirebaseBackend } from './firebaseBackend.js';", "const getFirebaseBackend = async () => ({ database: null, environment: 'test' });")
+  .replace("import { readCachedLeaderboard } from './leaderboardStore.js';", "const readCachedLeaderboard = ({ board, uid, page }) => window.rankCache.get(JSON.stringify({ board, uid, page })) || null;")
   .replace("import { getAccountService } from './accountService.js';", "const getAccountService = () => ({ getIdentity: () => ({ uid: window.rankUid }), subscribe: listener => { listener(); return () => {}; } });")
-  .replace("import { readLeaderboard } from './leaderboardStore.js';", `const readLeaderboard = async ({ board, page = 1 }) => {
+  .replace("import { readLeaderboard } from './leaderboardStore.js';", `const readLeaderboard = async ({ board, uid, page = 1 }) => {
     window.rankRequests.push({ ...board, page });
     if (window.rankDeferred) await new Promise(resolve => window.rankResolvers.push(resolve));
     if (window.rankError) throw new Error('offline');
     const count = window.rankCount;
-    return { page, hasNext: page * 10 < count, knownPages: Array.from({ length: Math.min(Math.ceil(count / 10), page + 1) }, (_, i) => i + 1),
-      top: Array.from({ length: Math.max(0, Math.min(10, count - (page - 1) * 10)) }, (_, i) => ({ uid: 'row-' + ((page - 1) * 10 + i), playerName: '<img src=x> Tên người chơi rất dài rất dài', durationMs: 1000, levelReached: 10, totalScore: 12345 })), own: window.rankUid ? { durationMs: 1000, levelReached: 10, totalScore: 12345 } : null };
+    const data = { page, hasNext: page * 10 < count, knownPages: Array.from({ length: Math.min(Math.ceil(count / 10), page + 1) }, (_, i) => i + 1),
+      top: Array.from({ length: Math.max(0, Math.min(10, count - (page - 1) * 10)) }, (_, i) => ({ uid: 'row-' + ((page - 1) * 10 + i), playerName: window.rankNames?.[i] || '<img src=x> Tên người chơi rất dài rất dài', durationMs: window.rankNames ? 41810 + i * 1370 : 1000, levelReached: window.rankNames ? 42 - i : 10, totalScore: window.rankNames ? 128640 - i * 3500 : 12345 })), own: window.rankUid ? { durationMs: 1000, levelReached: 10, totalScore: 12345 } : null };
+    window.rankCache.set(JSON.stringify({ board, uid, page }), data); return data;
   };`);
-async function open(page, count = 21) {
-  await page.addInitScript(count => { window.rankCount = count; window.rankRequests = []; window.rankResolvers = []; }, count);
+async function open(page, count = 21, gameContext = false) {
+  await page.addInitScript(count => { window.rankCount = count; window.rankRequests = []; window.rankResolvers = []; window.rankCache = new Map(); }, count);
   await page.route('**/js/leaderboardPanel.js*', route => route.fulfill({ contentType: 'text/javascript', body: source }));
-  await page.goto('/'); await page.locator('[data-dock-action="ranking"]').click();
+  await page.goto('/');
+  if (gameContext) await page.evaluate(async () => (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('memory-match'));
+  await page.locator('[data-dock-action="ranking"]').click();
   await page.evaluate(async () => { window.rankCycleModal = (await import('/js/leaderboardPanel.js')).openLeaderboards(undefined, undefined, { presentation: 'screen', host: document.querySelector('.adventure-screen-host'), owner: (await import('/js/appPageLifecycle.js')).getAppPageScope() }); });
   await expect(page.locator('.leaderboard-list li')).toHaveCount(Math.min(count, 10));
 }
@@ -59,6 +63,12 @@ test('stage picker confirms 212 once, rejects invalid input and returns focus on
 });
 test('30 mount, picker cancel and mode changes release every page-owned resource', async ({ page }) => {
   await open(page);
+  await page.waitForFunction(() => performance.getEntriesByType('resource').some(entry => entry.name.includes('leaderboard-night-garden.webp')));
+  const imageLoads = await page.evaluate(() => performance.getEntriesByType('resource').filter(entry => entry.name.includes('leaderboard-night-garden.webp')).length);
+  await page.screenshot({ animations: 'disabled' });
+  const tracing = await page.context().newCDPSession(page); const decodes = [];
+  tracing.on('Tracing.dataCollected', ({ value }) => { for (const event of value) if (/Decode Image|ImageDecodeTask/.test(event.name)) decodes.push({ name: event.name, data: event.args }); });
+  await tracing.send('Tracing.start', { categories: 'devtools.timeline,disabled-by-default-devtools.timeline', transferMode: 'ReportEvents' });
   await page.evaluate(() => window.rankCycleModal.destroy());
   const diagnostics = () => page.evaluate(async () => ({ nodes: document.querySelectorAll('*').length, owner: (await import('/js/appPageLifecycle.js')).getAppPageScope().diagnostics() }));
   const before = await diagnostics();
@@ -73,8 +83,13 @@ test('30 mount, picker cancel and mode changes release every page-owned resource
     await page.evaluate(() => window.rankCycleModal.destroy());
   }
   expect(await diagnostics()).toEqual(before);
+  expect(await page.evaluate(() => performance.getEntriesByType('resource').filter(entry => entry.name.includes('leaderboard-night-garden.webp')).length)).toBe(imageLoads);
+  const complete = new Promise(resolve => tracing.once('Tracing.tracingComplete', resolve));
+  await tracing.send('Tracing.end'); await complete; await tracing.detach();
+  await test.info().attach('ranking-30-cycle-resources', { body: JSON.stringify({ imageLoads, decodes, before, after: await diagnostics() }), contentType: 'application/json' });
+  expect(decodes.length).toBeLessThanOrEqual(1);
 });
-for (const viewport of [{ width: 412, height: 915 }, { width: 640, height: 360 }, { width: 1024, height: 900 }]) {
+for (const viewport of [{ width: 412, height: 915 }, { width: 640, height: 360 }, { width: 844, height: 390 }, { width: 1024, height: 900 }]) {
   test(`ranking layout, all 18 filters and scroll at ${viewport.width}x${viewport.height}`, async ({ page }) => {
     await page.setViewportSize(viewport); await open(page);
     for (const game of ['memory-match', 'link-connect', 'triple-connect']) {
@@ -124,4 +139,45 @@ test('stale requests, empty/offline state and close during load never commit the
   await page.locator('.adventure-screen .adventure-exit').click();
   await page.evaluate(() => { for (const resolve of window.rankResolvers) resolve(); });
   await expect(page.locator('#rankings-modal')).toHaveCount(0);
+});
+test('offline refresh preserves only the same board and UID cache', async ({ page, context }) => {
+  await open(page);
+  await context.setOffline(true);
+  await page.getByRole('button', { name: 'Làm mới', exact: true }).click();
+  await expect(page.locator('.leaderboard-list li')).toHaveCount(10);
+  await expect(page.locator('.leaderboard-status')).toHaveText('Chưa có kết nối.');
+  await page.locator('[data-rank-game="link-connect"]').click();
+  await expect(page.locator('.leaderboard-list li')).toHaveCount(0);
+  await page.locator('[data-rank-game="memory-match"]').click();
+  await expect(page.locator('.leaderboard-list li')).toHaveCount(10);
+  await page.evaluate(() => { window.rankUid = 'another-owner'; });
+  await page.getByRole('button', { name: 'Làm mới', exact: true }).click();
+  await expect(page.locator('.leaderboard-list li')).toHaveCount(0);
+});
+test('final garden artwork, centered footer and background failure keep a usable product screen', async ({ page }) => {
+  await page.setViewportSize({ width: 412, height: 915 }); await open(page, 21, true);
+  await page.evaluate(() => { window.rankNames = ['Linh Nguyễn', 'Hải Minh', 'Ngọc Anh', 'Bảo Trân', 'Hoàng Nam', 'Mai Chi', 'An Nhiên', 'Tuấn Anh', 'Thanh Hà', 'Minh Khôi']; window.rankUid = 'row-6'; });
+  await page.getByRole('button', { name: 'Chọn màn', exact: true }).click();
+  await page.getByLabel('Màn chơi', { exact: true }).fill('212'); await page.getByRole('button', { name: 'Xem', exact: true }).click();
+  await expect(page.locator('.leaderboard-list .is-self')).toHaveCount(1);
+  const last = await page.locator('.leaderboard-list li').last().boundingBox();
+  const region = await page.locator('.leaderboard-results').boundingBox();
+  expect(last.y + last.height).toBeLessThanOrEqual(region.y + region.height);
+  expect(await page.locator('.leaderboard-rank--1').evaluate(node => getComputedStyle(node).color)).toBe('rgb(58, 42, 17)');
+  await page.locator('.leaderboard-results').blur();
+  await page.screenshot({ path: 'docs/design/leaderboard/qa/mobile-time.png', animations: 'disabled' });
+  await page.getByRole('button', { name: 'Chọn màn', exact: true }).click();
+  await page.screenshot({ path: 'docs/design/leaderboard/qa/mobile-picker.png', animations: 'disabled' });
+  await page.getByLabel('Màn chơi', { exact: true }).press('Escape'); await expect(page.locator('#leaderboard-stage-picker')).toHaveCount(0);
+  await page.locator('[data-rank-mode="challenge"]').click(); await expect(page.locator('.leaderboard-heading')).toContainText('Điểm');
+  await page.screenshot({ path: 'docs/design/leaderboard/qa/mobile-run.png', animations: 'disabled' });
+  await page.setViewportSize({ width: 844, height: 390 }); await page.screenshot({ path: 'docs/design/leaderboard/qa/landscape-run.png', animations: 'disabled' });
+  await page.setViewportSize({ width: 1024, height: 900 }); await page.screenshot({ path: 'docs/design/leaderboard/qa/desktop-run.png', animations: 'disabled' });
+  const resources = await page.evaluate(() => performance.getEntriesByType('resource').filter(entry => entry.name.includes('leaderboard-night-garden.webp')).length);
+  expect(resources).toBe(1);
+  await page.route('**/leaderboard-night-garden.webp', route => route.abort());
+  await page.reload(); await page.locator('[data-dock-action="ranking"]').click();
+  await expect(page.locator('.leaderboard-panel')).toBeVisible(); await expect(page.locator('.leaderboard-heading')).toBeVisible();
+  expect(await page.locator('.leaderboard-panel').evaluate(node => getComputedStyle(node).backgroundColor)).toBe('rgb(6, 28, 36)');
+  await page.screenshot({ path: 'docs/design/leaderboard/qa/background-fallback.png', animations: 'disabled' });
 });

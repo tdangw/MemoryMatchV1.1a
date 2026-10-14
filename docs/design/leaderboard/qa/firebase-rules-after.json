@@ -1,0 +1,11 @@
+{
+  "project": "memorymatchv1-1a",
+  "release": "projects/memorymatchv1-1a/releases/cloud.firestore",
+  "ruleset": "projects/memorymatchv1-1a/rulesets/8c6f7da0-d74f-40df-95b0-ea0586c94922",
+  "matchesLocal": true,
+  "hasProfileStats": true,
+  "hasRankingV2": true,
+  "sha256": "d4edf196f8a75af8dbb96044ceaa16babf087edd83cbb428a9e3643a20b133d8",
+  "checkedAt": "2026-10-14T13:20:38.626Z",
+  "clientSessionRetest": "Pending: user browser session unavailable"
+}
