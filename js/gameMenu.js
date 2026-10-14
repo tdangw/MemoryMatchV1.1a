@@ -15,7 +15,7 @@ export function bindMemoryMenus(scope, root, { onExit, onRestart, onSettings }) 
     menus.close();
     const paused = gameState.isPaused;
     gameState.isPaused = true;
-    openGameExitDialog({ owner: scope, trigger, onExit, onRestart, onSettings, onClose: () => { if (scope.active) gameState.isPaused = paused; } });
+    openGameExitDialog({ owner: scope, trigger, onExit, onRestart, onSettings, mode: gameState.settings.mode, onClose: () => { if (scope.active) gameState.isPaused = paused; } });
   });
   scope.own(() => { if (activeMenus === menus) activeMenus = null; });
 }

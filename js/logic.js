@@ -32,6 +32,8 @@ import {
 } from "./ui.js";
 import { duckBackgroundMusicForVictory, pauseBackgroundMusic, sounds } from "./sound.js"; // 📦 Tách âm thanh
 import { saveCoins, savePersistentGameData } from "./persistence.js";
+import { stageMemorySession, saveMemorySession } from './memorySession.js';
+import { getActiveSession } from './sessionProgress.js';
 import { finishPlayMetrics } from "./playMetrics.js";
 import { checkpointRankedRun, stageRankedAttempt } from "./rankingRules.js";
 import { getFlipAnimationClass } from "./appearance.js";
@@ -223,7 +225,9 @@ async function checkMatch(roundId) {
     const matchCoins = calculateMatchCoinReward(gameState.combo);
     const previousCoins = gameState.coins;
     const totalCoins = increaseCoins(matchCoins);
-    if (!(await saveCoins(totalCoins))) {
+    gameState.matchedPairs++;
+    stageMemorySession({ assetPaths: getActiveSession('memory-match', gameState.settings.mode)?.assetPaths || [] });
+    if (!(await savePersistentGameData({ coins: totalCoins, progress: gameState.progress }))) {
       if (gameState.roundId !== roundId) return;
       gameState.coins = previousCoins;
       showBonusOverlay("Không thể lưu phần thưởng Xu lúc này.");
@@ -242,7 +246,6 @@ async function checkMatch(roundId) {
       syncMemoryTimeProgress({ remainingSeconds: gameState.remainingTime, timeLimit: gameState.timeLimit });
       highlightTarget("#timer");
     }
-    gameState.matchedPairs++;
     if (comboTimeBonus > 0) {
       setTimeout(() => showComboEffect(second.element, resolvedCombo), 650);
     }
@@ -259,6 +262,7 @@ async function checkMatch(roundId) {
     if (gameState.roundId !== roundId) return;
 
     setInteractionLocked(false, roundId);
+    if (gameState.matchedPairs < gameState.totalPairs) await saveMemorySession({ assetPaths: getActiveSession('memory-match', gameState.settings.mode)?.assetPaths || [] });
     (await checkLevelComplete());
   } else {
     gameState.misses++;

@@ -1,6 +1,6 @@
 import { openAppModal } from './modal.js';
 
-export function openGameExitDialog({ owner, trigger, onExit, onRestart, onSettings, onClose }) {
+export function openGameExitDialog({ owner, trigger, onExit, onRestart, onSettings, onClose, mode = 'easy' }) {
   if (!owner.active || document.getElementById('game-exit-modal')) return null;
   trigger.setAttribute('aria-expanded', 'true');
   let nextAction = null;
@@ -9,7 +9,7 @@ export function openGameExitDialog({ owner, trigger, onExit, onRestart, onSettin
     content: '<p>Bạn muốn thoát màn chơi hay bắt đầu lại?</p>',
     actions: [
       { label: 'Thoát game', icon: 'exit', onClick: async () => { await onExit(); return false; } },
-      { label: 'Chơi lại', icon: 'restart', variant: 'primary', onClick: async () => { await onRestart(); return false; } },
+      { label: ['challenge', 'endless'].includes(mode) ? 'Lượt mới' : 'Chơi lại', icon: 'restart', variant: 'primary', onClick: async () => { await onRestart(); return false; } },
       { label: 'Cài đặt', icon: 'settings', onClick: () => { nextAction = onSettings; } },
     ],
     onClose: () => { onClose(); nextAction?.(); },

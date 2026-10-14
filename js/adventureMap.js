@@ -115,7 +115,7 @@ export function mountAdventureMap(gameId) {
         control.classList.toggle("is-mode-cleared", node.modeCleared);
         control.classList.toggle("is-current", node.level === currentLevel);
         element.stars.textContent = "★".repeat(node.stars) + "☆".repeat(3 - node.stars);
-        element.detail.textContent = node.modeCleared ? `${node.score.toLocaleString("vi-VN")} điểm` : node.cleared ? "Đã thắng ở độ khó khác" : "";
+        element.detail.textContent = '';
         control.setAttribute("aria-label", `Màn ${node.level}, ${node.locked ? "chưa mở" : node.cleared ? "đã thắng" : "đã mở"}, ${node.stars} sao`);
       } else {
         control.disabled = false;

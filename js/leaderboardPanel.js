@@ -1,8 +1,6 @@
 import { createIcon } from './icons.js';
 import { openAppModal } from './modal.js';
-import { GAME_DEFINITIONS, GAME_MODES, getGameDefinition } from './gameCatalog.js';
-import { gameState } from './gameState.js';
-import { NORMAL_MODE_IDS, MAX_ADVENTURE_LEVEL, getSuggestedAdventureLevel } from './adventureProgress.js';
+import { GAME_DEFINITIONS } from './gameCatalog.js';
 import { getRecentGameId } from './recentGame.js';
 import { getFirebaseBackend } from './firebaseBackend.js';
 import { getAccountService } from './accountService.js';
@@ -10,31 +8,28 @@ import { getLeaderboardService } from './leaderboardService.js';
 import { readLeaderboard } from './leaderboardStore.js';
 import { readCachedLeaderboard } from './leaderboardStore.js';
 import { rankingBoardId } from './rankingResult.js';
-import { openLeaderboardStagePicker } from './leaderboardStagePicker.js';
-import { formatLeaderboardTime, formatLeaderboardNumber, compactLeaderboardPages } from './leaderboardPresentation.js';
+import { formatLeaderboardNumber, compactLeaderboardPages } from './leaderboardPresentation.js';
 import { createGameShellLifecycle, getActiveGameScope } from './gameShell/gameShellLifecycle.js';
 import { getAppPageScope } from './appPageLifecycle.js';
 let lastGame = null;
+const families = [['adventure', 'Hành trình'], ['challenge', 'Thử thách'], ['endless', 'Vô tận']];
+const rememberedFamilies = new Map();
 
 export function openLeaderboards(gameId, onClose, surface = {}) {
   const scope = createGameShellLifecycle();
   let generation = 0;
   let selectedGame = gameId || lastGame || getRecentGameId();
-  let selectedMode = NORMAL_MODE_IDS.includes(gameState.settings.mode) ? gameState.settings.mode : 'easy';
+  let selectedFamily = rememberedFamilies.get(selectedGame) || 'adventure';
   let currentPage = 1;
   let currentKey = null;
   let loading = false;
-  let picker = null;
+  let dropdown = null;
   let loadedPages = [1];
   const compactPager = window.matchMedia('(max-width: 700px)');
   const scrolls = new Map();
   const content = document.createElement('div'); content.className = 'leaderboard-view';
   const games = tabs('Trò chơi', GAME_DEFINITIONS.map(item => [item.id, item.title]), 'game');
-  const modes = tabs('Chế độ', [...GAME_MODES].sort((a, b) => (a.id === 'endless') - (b.id === 'endless')).map(item => [item.id, item.label]), 'mode');
-  const filters = document.createElement('div'); filters.className = 'leaderboard-filters';
   const footer = document.createElement('div'); footer.className = 'leaderboard-footer';
-  const levelLabel = button(''); levelLabel.classList.add('leaderboard-level'); levelLabel.setAttribute('aria-label', 'Chọn màn'); levelLabel.setAttribute('aria-haspopup', 'dialog'); levelLabel.setAttribute('aria-expanded', 'false');
-  const level = { value: '1' };
   const refresh = button('Làm mới');
   refresh.setAttribute('aria-label', 'Làm mới'); refresh.replaceChildren(createIcon('restart')); refresh.classList.add('leaderboard-refresh');
   const status = document.createElement('p'); status.className = 'leaderboard-status'; status.setAttribute('aria-live', 'polite');
@@ -46,23 +41,64 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
   next.setAttribute('aria-label', 'Sau'); next.textContent = '›';
   const pageNumbers = document.createElement('span'); pageNumbers.className = 'leaderboard-page-numbers';
   pager.append(previous, pageNumbers, next);
-  filters.append(levelLabel); footer.append(filters, pager); results.append(status); content.append(games, modes, results, own, footer);
+  footer.append(pager); results.append(status); content.append(games, results, own, footer);
   const owner = surface.owner || getActiveGameScope() || getAppPageScope();
   const release = owner?.own(() => scope.dispose(), 'cleanup');
   const modal = openAppModal({ ...surface, id: 'rankings-modal', title: 'Bảng xếp hạng', icon: 'trophy', content, onDestroy: () => { generation++; scope.dispose(); release?.forget(); }, onClose });
   modal.panel.classList.add('leaderboard-panel');
   modal.panel.querySelector('.app-modal__header').append(refresh);
-  function frontier() {
-    const progress = gameState.progress[getGameDefinition(selectedGame).progressKey];
-    level.value = String(getSuggestedAdventureLevel(progress.bestByLevel, progress.adventure));
-  }
   function updateFilters() {
-    picker?.destroy();
     lastGame = selectedGame;
-    for (const item of games.children) item.setAttribute('aria-pressed', String(item.dataset.rankGame === selectedGame));
-    for (const item of modes.children) item.setAttribute('aria-pressed', String(item.dataset.rankMode === selectedMode));
-    levelLabel.hidden = !NORMAL_MODE_IDS.includes(selectedMode);
-    levelLabel.textContent = `Màn ${level.value} ▾`; levelLabel.title = `Màn ${level.value}`;
+    for (const item of games.children) {
+      const selected = item.dataset.rankGame === selectedGame;
+      item.setAttribute('aria-pressed', String(selected));
+      item.setAttribute('aria-haspopup', 'menu'); item.setAttribute('aria-expanded', String(dropdown?.anchor === item));
+      const title = GAME_DEFINITIONS.find(game => game.id === item.dataset.rankGame).title;
+      item.replaceChildren(document.createTextNode(`${title} ▾`));
+      if (selected) { const label = document.createElement('small'); label.textContent = families.find(([id]) => id === selectedFamily)[1]; item.append(label); }
+    }
+  }
+  function closeDropdown(restoreFocus = false) {
+    if (!dropdown) return;
+    const { anchor, lifecycle, menu } = dropdown; dropdown = null;
+    lifecycle.dispose(); menu.remove(); anchor.setAttribute('aria-expanded', 'false');
+    if (restoreFocus && anchor.isConnected) anchor.focus({ preventScroll: true });
+  }
+  scope.own(() => closeDropdown(), 'cleanup');
+  function openDropdown(anchor) {
+    if (dropdown?.anchor === anchor) { closeDropdown(true); return; }
+    closeDropdown();
+    const lifecycle = createGameShellLifecycle();
+    const menu = document.createElement('div'); menu.className = 'leaderboard-family-menu';
+    menu.setAttribute('role', 'menu'); menu.setAttribute('aria-label', anchor.textContent);
+    const choices = families.map(([family, label]) => {
+      const choice = button(label); choice.dataset.rankFamily = family;
+      choice.setAttribute('role', 'menuitemradio'); choice.setAttribute('aria-checked', String(anchor.dataset.rankGame === selectedGame && family === selectedFamily));
+      menu.append(choice); return choice;
+    });
+    document.body.append(menu); dropdown = { anchor, lifecycle, menu }; anchor.setAttribute('aria-expanded', 'true');
+    const position = () => {
+      const rect = anchor.getBoundingClientRect(); const width = Math.min(200, innerWidth - 16); const height = menu.offsetHeight;
+      menu.style.width = `${width}px`; menu.style.left = `${Math.max(8, Math.min(rect.left, innerWidth - width - 8))}px`;
+      const down = innerHeight - rect.bottom >= height + 8;
+      menu.dataset.direction = down ? 'down' : 'up';
+      menu.style.top = `${Math.max(8, Math.min(down ? rect.bottom + 5 : rect.top - height - 5, innerHeight - height - 8))}px`;
+    };
+    position(); choices.find(choice => choice.dataset.rankFamily === (rememberedFamilies.get(anchor.dataset.rankGame) || 'adventure')).focus();
+    lifecycle.listen(window, 'resize', position);
+    lifecycle.listen(document, 'pointerdown', event => { if (!menu.contains(event.target) && !anchor.contains(event.target)) closeDropdown(); }, true);
+    lifecycle.listen(menu, 'keydown', event => {
+      const index = choices.indexOf(document.activeElement);
+      if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); closeDropdown(true); }
+      else if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
+        event.preventDefault(); choices[event.key === 'Home' ? 0 : event.key === 'End' ? 2 : (index + (event.key === 'ArrowDown' ? 1 : 2)) % 3].focus();
+      } else if (event.key === 'Tab') closeDropdown(true);
+    });
+    lifecycle.listen(menu, 'click', event => {
+      const item = event.target.closest('[data-rank-family]'); if (!item) return;
+      selectedGame = anchor.dataset.rankGame; selectedFamily = item.dataset.rankFamily;
+      rememberedFamilies.set(selectedGame, selectedFamily); closeDropdown(true); updateFilters(); void load();
+    });
   }
   function controls(data = null) {
     if (data) loadedPages = data.loadedPages;
@@ -94,13 +130,11 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
     const id = ++generation;
     const uid = getAccountService()?.getIdentity()?.uid;
     if (currentKey) { scrolls.delete(`${currentKey}:${currentPage}`); scrolls.set(`${currentKey}:${currentPage}`, results.scrollTop); while (scrolls.size > 60) scrolls.delete(scrolls.keys().next().value); }
-    const normal = NORMAL_MODE_IDS.includes(selectedMode);
-    const board = { gameId: selectedGame, mode: selectedMode, kind: normal ? 'time' : 'run', ...(normal ? { level: Number(level.value) } : { rulesVersion: 2 }) };
+    const board = { gameId: selectedGame, family: selectedFamily, kind: 'progress', rulesVersion: 3 };
     const nextKey = `${uid || ''}:${rankingBoardId(board)}`;
     if (nextKey !== currentKey) loadedPages = [1];
     loading = true; currentPage = requestedPage; controls();
     results.replaceChildren(status); own.textContent = ''; status.textContent = 'Đang tải…'; results.setAttribute('aria-busy', 'true');
-    if (normal && (!Number.isSafeInteger(board.level) || board.level < 1 || board.level > MAX_ADVENTURE_LEVEL)) { loading = false; results.removeAttribute('aria-busy'); status.textContent = 'Hãy nhập số màn hợp lệ.'; controls(); return; }
     currentKey = nextKey;
     try {
       const backend = await getFirebaseBackend();
@@ -116,7 +150,7 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
       currentPage = data.page;
       results.dataset.kind = board.kind;
       const heading = document.createElement('div'); heading.className = `leaderboard-heading leaderboard-heading--${board.kind}`;
-      for (const text of board.kind === 'time' ? ['Hạng', 'Người chơi', 'Thời gian'] : ['Hạng', 'Người chơi', 'Màn', 'Điểm']) {
+      for (const text of ['Hạng', 'Người chơi', 'Màn']) {
         const cell = document.createElement('span'); cell.textContent = text; heading.append(cell);
       }
       const list = document.createElement('ol'); list.className = 'leaderboard-list'; list.start = (currentPage - 1) * 10 + 1;
@@ -128,8 +162,7 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
         const name = document.createElement('span'); name.className = 'leaderboard-name'; name.textContent = item.playerName; name.title = item.playerName;
         if (item.uid === uid) { row.classList.add('is-self'); name.setAttribute('aria-label', `${item.playerName}, bạn`); }
         row.append(place, avatar, name);
-        if (board.kind === 'run') row.append(metric(formatLeaderboardNumber(item.levelReached), 'leaderboard-stage', 'Màn'));
-        row.append(metric(board.kind === 'time' ? formatLeaderboardTime(item.durationMs) : formatLeaderboardNumber(item.totalScore), 'leaderboard-metric', board.kind === 'time' ? 'Thời gian' : 'Điểm')); list.append(row);
+        row.append(metric(formatLeaderboardNumber(item.levelReached), 'leaderboard-metric', 'Màn')); list.append(row);
       }
       results.dataset.offline = String(offline);
       if (data.top.length) { status.textContent = offline ? 'Chưa có kết nối.' : ''; results.replaceChildren(status, heading, list); }
@@ -143,22 +176,7 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
       if (scope.active && id === generation) { loading = false; refresh.disabled = false; previous.disabled = currentPage === 1; renderPages(); results.removeAttribute('aria-busy'); }
     }
   }
-  scope.listen(games, 'click', event => { const item = event.target.closest('[data-rank-game]'); if (!item) return; selectedGame = item.dataset.rankGame; frontier(); updateFilters(); void load(); });
-  function revealMode(item) {
-    const strip = modes.getBoundingClientRect(); const rect = item.getBoundingClientRect();
-    if (rect.left < strip.left) modes.scrollLeft += rect.left - strip.left;
-    else if (rect.right > strip.right) modes.scrollLeft += rect.right - strip.right;
-  }
-  scope.listen(modes, 'focusin', event => { const item = event.target.closest('[data-rank-mode]'); if (item) revealMode(item); });
-  scope.listen(modes, 'wheel', event => { if (Math.abs(event.deltaY) > Math.abs(event.deltaX) && modes.scrollWidth > modes.clientWidth) { modes.scrollLeft += event.deltaY; event.preventDefault(); } }, { passive: false });
-  scope.listen(modes, 'click', event => { const item = event.target.closest('[data-rank-mode]'); if (!item) return; selectedMode = item.dataset.rankMode; revealMode(item); updateFilters(); void load(); });
-  scope.listen(levelLabel, 'click', () => {
-    if (picker) { picker.panel.focus(); return; }
-    picker = openLeaderboardStagePicker({ anchor: levelLabel, value: Number(level.value), owner: scope,
-      onDestroy: () => { picker = null; },
-      onSelect: value => { level.value = String(value); updateFilters(); void load(); }
-    });
-  });
+  scope.listen(games, 'click', event => { const item = event.target.closest('[data-rank-game]'); if (item) openDropdown(item); });
   scope.listen(refresh, 'click', () => { void load(true); });
   scope.listen(previous, 'click', () => { if (!loading && currentPage > 1) void load(false, currentPage - 1); });
   scope.listen(next, 'click', () => { if (!loading && !next.disabled) void load(false, currentPage + 1); });
@@ -172,19 +190,15 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
     const uid = getAccountService().getIdentity()?.uid;
     if (uid !== previousUid) { previousUid = uid; void load(); }
   }), 'listener');
-  function updateEdges() { modes.classList.toggle('has-left', modes.scrollLeft > 1); modes.classList.toggle('has-right', modes.scrollLeft + modes.clientWidth < modes.scrollWidth - 1); }
-  scope.listen(modes, 'scroll', updateEdges);
-  const resize = new ResizeObserver(updateEdges); resize.observe(modes); scope.own(() => resize.disconnect(), 'cleanup');
-  frontier(); updateFilters(); updateEdges(); void load();
+  updateFilters(); void load();
   return modal;
 }
 function button(text) { const element = document.createElement('button'); element.type = 'button'; element.className = 'app-button'; element.textContent = text; return element; }
 function tabs(label, entries, kind) {
   const group = document.createElement('div'); group.className = `leaderboard-tabs leaderboard-tabs--${kind}`; group.setAttribute('role', 'group'); group.setAttribute('aria-label', label);
   for (const [value, text] of entries) { const item = button(text);
-    if (kind === 'mode' && NORMAL_MODE_IDS.includes(value)) { const badge = document.createElement('span'); badge.textContent = { easy: 'C', normal: 'B', hard: 'A', superHard: 'S' }[value]; badge.className = 'leaderboard-grade'; badge.setAttribute('aria-hidden', 'true'); item.prepend(badge); }
     item.dataset[kind === 'game' ? 'rankGame' : 'rankMode'] = value; group.append(item); }
   return group;
 }
 function metric(text, className, label) { const cell = document.createElement('strong'); cell.className = className; cell.textContent = text; cell.title = text; cell.setAttribute('aria-label', `${label} ${text}`); return cell; }
-function describe(item, kind) { return kind === 'time' ? formatLeaderboardTime(item.durationMs) : `${formatLeaderboardNumber(item.levelReached)} màn · ${formatLeaderboardNumber(item.totalScore)} điểm`; }
+function describe(item) { return `Màn ${formatLeaderboardNumber(item.levelReached)}`; }

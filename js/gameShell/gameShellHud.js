@@ -41,7 +41,7 @@ export function createGameShellHud({ stats = {}, stars = {}, coins = {}, tools =
         if (definition) setHudText(definition.element, definition.format ? definition.format(value) : value);
       }
     },
-    stars({ earned, score, target, totalScore } = {}) {
+    stars({ earned, score, target, record } = {}) {
       if (earned !== undefined) {
         const count = Math.max(0, Math.min(starNodes.length, Number(earned) || 0));
         setHudAttribute(stars.element, "aria-label", `${count} trên ${starNodes.length} sao`);
@@ -51,7 +51,7 @@ export function createGameShellHud({ stats = {}, stars = {}, coins = {}, tools =
         style(stars.fill, "width", `${target > 0 ? Math.max(0, Math.min(100, Math.round(score / target * 100))) : 0}%`);
         setHudTooltip(stars.card, `Mục tiêu: ${target}`);
       }
-      if (totalScore !== undefined) setHudTooltip(stars.scoreCard, `Tổng điểm: ${totalScore}`);
+      if (record !== undefined) setHudTooltip(stars.scoreCard, record);
     },
     coins(value, { animating = false } = {}) {
       if (!animating) setHudText(coins.balance, value);

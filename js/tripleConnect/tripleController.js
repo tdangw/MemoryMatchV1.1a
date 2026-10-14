@@ -1,3 +1,4 @@
+import { gameRecordLabel } from '../gameRecord.js';
 import { openGameExitDialog } from "../gameExitDialog.js";
 import { showFullVictoryCelebration } from "victory-presentation";
 import { canLaunchGame } from "../profileOperations.js";
@@ -396,7 +397,7 @@ async function mountTripleDevelopmentRound(generated, { skipIntro = false, start
       earned: starProgress.stars,
       score: starProgress.score,
       target: starProgress.thresholds.three,
-      totalScore: roundState.score,
+      record: gameRecordLabel(gameState.progress.tripleConnect, currentMode, currentLevel),
     });
     const milestones = gameState.progress.tripleConnect.milestones;
     hud.coins(gameState.coins);
@@ -756,7 +757,7 @@ function playTripleSound(name) {
 }
 
 export function runTripleGameAction(action) {
-  if (action === 'exit-dialog') return openTripleModal(onClose => openGameExitDialog({ owner: getTripleShell().scope, trigger: getTripleShell().refs.root.querySelector('#triple-actions-menu-toggle'), onClose, onExit: returnTripleToMenu, onRestart: () => startTripleConnectRound({ mode: currentMode, level: currentLevel, reason: 'restart' }), onSettings: () => runTripleGameAction('settings') }));
+  if (action === 'exit-dialog') return openTripleModal(onClose => openGameExitDialog({ mode: currentMode, owner: getTripleShell().scope, trigger: getTripleShell().refs.root.querySelector('#triple-actions-menu-toggle'), onClose, onExit: returnTripleToMenu, onRestart: () => startTripleConnectRound({ mode: currentMode, level: currentLevel, reason: 'restart' }), onSettings: () => runTripleGameAction('settings') }));
   if (action === 'menu') return returnTripleToMenu();
   if (action === 'restart') return startTripleConnectRound({ mode: currentMode, level: currentLevel, reason: 'restart' });
   const key = { collection: 'showCollection', shop: 'showShop', settings: 'showSettings', help: 'showHelp', reset: 'showReset' }[action];

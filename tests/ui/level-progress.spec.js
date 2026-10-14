@@ -66,15 +66,40 @@ for (const id of ['memory-match', 'link-connect']) test(`${id} restores the same
     if (id === 'memory-match') {
       await (await import('/js/gameController.js')).continueMemorySession(session);
       const { gameState } = await import('/js/gameState.js');
-      return { score: gameState.score, matchedPairs: gameState.matchedPairs, luckyAwards: gameState.luckyAwards, tiles: [...document.querySelectorAll('#grid-container .tile')].map(tile => tile.dataset.imageId) };
+      return { score: gameState.score, combo: gameState.combo, matchedPairs: gameState.matchedPairs, luckyAwards: gameState.luckyAwards, tiles: [...document.querySelectorAll('#grid-container .tile')].map(tile => tile.dataset.imageId) };
     }
     await (await import('/js/linkConnect/linkController.js')).continueLinkSession(session);
     const { linkGameState } = await import('/js/linkConnect/linkState.js');
-    return { score: linkGameState.score, matchedPairs: linkGameState.matchedPairs, luckyAwards: linkGameState.luckyAwards, board: linkGameState.board };
+    return { score: linkGameState.score, combo: linkGameState.combo, matchedPairs: linkGameState.matchedPairs, luckyAwards: linkGameState.luckyAwards, board: linkGameState.board };
   }, { id, session: saved });
   expect(restored.score).toBe(37);
+  expect(restored.combo).toBe(3);
   expect(restored.matchedPairs).toBe(1);
   expect(restored.luckyAwards).toEqual(saved.pairSnapshot.luckyAwards);
   if (id === 'memory-match') expect(restored.tiles).toEqual(saved.pairSnapshot.tiles.map(tile => tile.id));
   else expect(restored.board).toEqual(saved.pairSnapshot.board);
+});
+for (const id of ['memory-match', 'link-connect']) test(`${id} preserves a damaged pair snapshot and refuses to replace its board on resume`, async ({ page }) => {
+  await page.goto('/');
+  const result = await page.evaluate(async id => {
+    await (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu(id);
+    const { gameState, hydrateGameState } = await import('/js/gameState.js');
+    gameState.settings.mode = 'challenge';
+    if (id === 'memory-match') await (await import('/js/gameController.js')).startNewMemoryRun(1, { skipIntro: true });
+    else await (await import('/js/linkConnect/linkController.js')).startLinkLevel({ mode: 'challenge', level: 1, skipIntro: true });
+    const persistence = await import('/js/persistence.js');
+    const payload = await persistence.loadPersistentGameData();
+    const key = (await import('/js/gameCatalog.js')).getGameProgressKey(id);
+    const source = payload.progress[key].sessionsByMode.challenge;
+    if (id === 'memory-match') source.pairSnapshot.luckyRewards = [null];
+    else source.pairSnapshot.board.grid[0][0] = { id: 'corrupt' };
+    hydrateGameState(payload);
+    const session = (await import('/js/sessionProgress.js')).getActiveSession(id, 'challenge');
+    const retained = structuredClone(session.pairSnapshotSource);
+    const continued = id === 'memory-match' ? await (await import('/js/gameController.js')).continueMemorySession(session) : await (await import('/js/linkConnect/linkController.js')).continueLinkSession(session);
+    await persistence.saveProgress(gameState.progress);
+    const durable = await persistence.loadPersistentGameData();
+    return { refused: continued === null, invalid: session.pairSnapshotInvalid, retained, stored: durable.progress[key].sessionsByMode.challenge.pairSnapshotSource };
+  }, id);
+  expect(result.refused).toBe(true); expect(result.invalid).toBe(true); expect(result.stored).toEqual(result.retained);
 });

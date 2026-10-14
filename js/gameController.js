@@ -55,7 +55,7 @@ import { savePersistentGameData, isPersistenceBlocked } from "./persistence.js";
 import { getActiveSession } from "./sessionProgress.js";
 import { getTheme, getThemeSelectionEligibility } from "./themeCatalog.js";
 import { showAppToast } from "./modal.js";
-import { configureLogic, resetLogicRuntime, restoreMemoryCombo } from "./logic.js";
+import { configureLogic, resetLogicRuntime, restoreMemoryCombo, checkLevelComplete } from "./logic.js";
 import { remainingComboWindow } from './pairSessionSnapshot.js';
 import { getComboWindowMs } from './gameplayTuning.js';
 import { restartMemoryTileAnimation } from "./memoryMatch/tileAnimation.js";
@@ -108,7 +108,7 @@ export function initializeLevel(level, { reason = "new", session = null, skipInt
     ? getChallengeLayout(level)
     : requestedModeLayout;
   if (reason === 'resume' && (session?.pairSnapshotInvalid || session?.run?.version === 3 && !session.pairSnapshot
-    || session?.pairSnapshot && session.pairSnapshot.totalPairs * 2 !== requestedLayout.tileCount)) {
+    || session?.pairSnapshot && (session.pairSnapshot.totalPairs * 2 !== requestedLayout.tileCount || getTheme(session.pairSnapshot.themeId).id !== session.pairSnapshot.themeId))) {
     showAppToast('Không thể tiếp tục lượt này. Hãy bắt đầu lượt mới.');
     return null;
   }
@@ -198,6 +198,7 @@ export function initializeLevel(level, { reason = "new", session = null, skipInt
   if (pairSnapshot) {
     for (const key of ['score', 'moves', 'misses', 'matchedPairs', 'totalPairs']) gameState[key] = pairSnapshot[key];
     gameState.luckyAwards = structuredClone(pairSnapshot.luckyAwards);
+    restoreMemoryCombo(pairSnapshot.combo, remainingComboWindow(pairSnapshot, getComboWindowMs(gameState.totalPairs)));
   }
 
   updateLevelDisplay(level);
@@ -228,6 +229,7 @@ export function initializeLevel(level, { reason = "new", session = null, skipInt
   revealAndHideTiles(roundId, () => {
     if (pairSnapshot) restoreMemoryCombo(pairSnapshot.combo, remainingComboWindow(pairSnapshot, getComboWindowMs(gameState.totalPairs)));
     startCountdown(roundId);
+    if (pairSnapshot?.matchedPairs === pairSnapshot?.totalPairs && pairSnapshot) void checkLevelComplete();
   }, previewDurationMs);
   });
 }

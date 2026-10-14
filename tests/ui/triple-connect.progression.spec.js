@@ -135,7 +135,7 @@ test("Triple completion grants the approved reward from the highest combo exactl
   await expect(summary).toContainText(`${result.best.score} ĐIỂM`);
   await expect(summary).toContainText("THƯỞNG THỜI GIAN");
   await expect(
-    page.getByLabel(`Tổng điểm: ${result.best.score}`),
+    page.getByLabel(`Kỷ lục: ${result.best.score.toLocaleString("vi-VN")} điểm`),
   ).toBeVisible();
 });
 
@@ -337,7 +337,7 @@ test("Triple Endless advances without resetting accumulated elapsed time", async
   expect(session.remainingTime).toBeGreaterThanOrEqual(5);
 });
 
-test("Triple Challenge advances deterministically through its staged timer and ends at 75 tiles", async ({
+test("Triple Challenge advances deterministically through its staged timer and continues past level seven", async ({
   page,
 }) => {
   test.setTimeout(60_000);
@@ -367,7 +367,11 @@ test("Triple Challenge advances deterministically through its staged timer and e
   });
   await expect(page.locator("[data-triple-timer]")).toHaveText("03:30");
   await winActiveTripleRound(page);
-  await expect(page.getByRole("button", { name: "Màn tiếp theo" })).toHaveCount(0);
+  await page.getByRole("button", { name: "Màn tiếp theo" }).click();
+  await expect(page.locator('[data-triple-level]')).toHaveText('8');
+  const continued = await page.evaluate(async () => (await import('/js/sessionProgress.js')).getActiveSession('triple-connect', 'challenge'));
+  expect(continued.level).toBe(8);
+  expect(continued.snapshot.tiles.length).toBeLessThanOrEqual(93);
 });
 
 test("Triple time-up clears the session and opens one loss modal", async ({

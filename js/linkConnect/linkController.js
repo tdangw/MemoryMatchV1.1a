@@ -1,3 +1,4 @@
+import { gameRecordLabel } from '../gameRecord.js';
 import { rememberRecentGame } from '../recentGame.js';
 import { remainingComboWindow } from '../pairSessionSnapshot.js';
 import { openGameExitDialog } from '../gameExitDialog.js';
@@ -24,7 +25,7 @@ import {
   playCoinRewardFlight,
 } from "../coinRewards.js";
 import { gameState, increaseCoins, recordLinkConnectResult, spendCoins } from "../gameState.js";
-import { saveCoins, savePersistentGameData, isPersistenceBlocked } from "../persistence.js";
+import { savePersistentGameData, isPersistenceBlocked } from "../persistence.js";
 import { beginPlayMetrics, resumePlayMetrics, snapshotPlayMetrics, finishPlayMetrics } from "../playMetrics.js";
 import { prepareAdventureChapter, stageAdventureLevelStart, canAdvanceAdventure } from "../adventureLaunch.js";
 import { getChapterNumber } from "../adventureProgress.js";
@@ -244,7 +245,7 @@ export function startLinkLevel({
   if (restart && (mode === 'challenge' || mode === 'endless')) { level = 1; restart = false; advance = false; }
   const modeLayout = getLinkModeLayout(mode);
   const layout = getLinkBoardLayoutForViewport(isLinkChallengeMode(mode) ? getLinkChallengeLayout(level) : modeLayout);
-  if (resume && (pairSnapshotInvalid || run?.version === 3 && !pairSnapshot || pairSnapshot && pairSnapshot.totalPairs * 2 !== layout.tileCount)) {
+  if (resume && (pairSnapshotInvalid || run?.version === 3 && !pairSnapshot || pairSnapshot && (pairSnapshot.totalPairs * 2 !== layout.tileCount || getTheme(pairSnapshot.themeId).id !== pairSnapshot.themeId))) {
     showAppToast('Không thể tiếp tục lượt này. Hãy bắt đầu lượt mới.');
     return null;
   }
@@ -316,6 +317,10 @@ export function startLinkLevel({
   if (resume && pairSnapshot) {
     linkGameState.luckyAwards = structuredClone(pairSnapshot.luckyAwards || []);
     linkGameState.freezeSeconds = pairSnapshot.freezeSeconds || 0;
+    const windowMs = getLinkComboWindowMs(linkGameState.totalPairs);
+    const remaining = remainingComboWindow(pairSnapshot, windowMs);
+    linkGameState.combo = remaining > 0 ? pairSnapshot.combo : 0;
+    linkGameState.lastMatchAt = linkGameState.combo ? performance.now() - windowMs + remaining : 0;
   }
   linkGameState.remainingTime = timing.remainingTime;
   linkGameState.timeLimit = timing.timeLimit;
@@ -342,6 +347,7 @@ export function startLinkLevel({
       updateLinkHud();
     }
     startCountdown(roundId);
+    if (resume && pairSnapshot?.matchedPairs === pairSnapshot?.totalPairs && pairSnapshot) void completeLinkLevel();
   };
   if (!skipIntro) showLevelRewardOverlay({
     level,
@@ -420,7 +426,7 @@ function showLinkGame() {
 }
 
 export async function runLinkGameAction(action) {
-  if (action === 'exit-dialog') return openLinkPanel(onClose => openGameExitDialog({ owner: getLinkShell().scope, trigger: getLinkShell().refs.root.querySelector('#link-actions-menu-toggle'), onClose, onExit: () => runLinkGameAction('menu'), onRestart: () => runLinkGameAction('restart'), onSettings: () => runLinkGameAction('settings') }));
+  if (action === 'exit-dialog') return openLinkPanel(onClose => openGameExitDialog({ mode: linkGameState.mode, owner: getLinkShell().scope, trigger: getLinkShell().refs.root.querySelector('#link-actions-menu-toggle'), onClose, onExit: () => runLinkGameAction('menu'), onRestart: () => runLinkGameAction('restart'), onSettings: () => runLinkGameAction('settings') }));
   if (action === "menu") return (await returnToLinkMenu());
   if (action === "restart") {
     return startLinkLevel({ mode: linkGameState.mode, level: linkGameState.level, restart: true });
@@ -535,6 +541,8 @@ async function handleLinkTileClick(position) {
   });
   linkGameState.score += matchPoints;
   drawLinkPath(path, linkGameState.board);
+  removeLinkBoardPair(board, matchedStart, position);
+  linkGameState.matchedPairs += 1;
   const dropsEnergy = isSpecialMatch && (await shouldDropLinkEnergy());
   if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
   if (dropsEnergy) {
@@ -557,8 +565,6 @@ async function handleLinkTileClick(position) {
     // Người chơi có thể khởi động màn khác trước khi hiệu ứng kết thúc.
     // Khi đó callback cũ không được phép thay đổi trạng thái của bàn mới.
     if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
-    removeLinkBoardPair(board, matchedStart, position);
-    linkGameState.matchedPairs += 1;
     const premiumReward = isSpecialMatch
       ? (await applyPremiumMatchReward(premiumType, matchedTiles[0]))
       : { triggerPairBreak: false };
@@ -584,6 +590,7 @@ async function handleLinkTileClick(position) {
         return;
       }
       unlockLinkBoard();
+      await persistLinkRunProgress();
     };
     if (premiumReward.triggerPairBreak && linkGameState.matchedPairs < linkGameState.totalPairs) {
       (await playAutomaticPairBreak(roundId, board, finishResolution, { scoreMode: "combo" }));
@@ -1039,7 +1046,8 @@ async function awardLinkCoins(amount, anchor, { animate = true, persist = true }
   if (value < 1) return 0;
   const previousCoins = gameState.coins;
   increaseCoins(value);
-  if (persist && !(await saveCoins(gameState.coins))) {
+  if (persist) stageActiveSession('link-connect', createLinkSession());
+  if (persist && !(await savePersistentGameData({ coins: gameState.coins, progress: gameState.progress }))) {
     gameState.coins = previousCoins;
     showAppToast("Không thể lưu phần thưởng Xu lúc này.");
     return 0;
@@ -1127,7 +1135,7 @@ function stopLinkTimeProgress() {
 function updateLinkStarsHud(hud = getLinkHudElements()) {
   const component = getLinkHud(hud);
   component.stars({ earned: calculateLinkStarRating(linkGameState.score, linkGameState.totalPairs, linkGameState.mode), score: linkGameState.score,
-    target: getLinkStarScoreTargets(linkGameState.totalPairs, linkGameState.mode).three, totalScore: gameState.progress.linkConnect.totalScore });
+    target: getLinkStarScoreTargets(linkGameState.totalPairs, linkGameState.mode).three, record: gameRecordLabel(gameState.progress.linkConnect, linkGameState.mode, linkGameState.level) });
   component.stats({ totalStars: gameState.progress.linkConnect.totalStars });
 }
 

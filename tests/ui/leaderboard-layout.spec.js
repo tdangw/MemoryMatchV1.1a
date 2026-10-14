@@ -10,7 +10,7 @@ const source = readFileSync('js/leaderboardPanel.js', 'utf8')
     if (window.rankError) throw new Error('offline');
     const count = window.rankCount;
     const data = { page, hasNext: page * 10 < count, knownPages: Array.from({ length: Math.min(Math.ceil(count / 10), page + 1) }, (_, i) => i + 1),
-      top: Array.from({ length: Math.max(0, Math.min(10, count - (page - 1) * 10)) }, (_, i) => ({ uid: 'row-' + ((page - 1) * 10 + i), playerName: window.rankNames?.[i] || '<img src=x> Tên người chơi rất dài rất dài', durationMs: window.rankNames ? 41810 + i * 1370 : 1000, levelReached: window.rankNames ? 42 - i : 10, totalScore: window.rankNames ? 128640 - i * 3500 : 12345 })), own: window.rankUid ? { durationMs: 1000, levelReached: 10, totalScore: 12345 } : null };
+      top: Array.from({ length: Math.max(0, Math.min(10, count - (page - 1) * 10)) }, (_, i) => ({ uid: 'row-' + ((page - 1) * 10 + i), playerName: window.rankNames?.[i] || '<img src=x> Tên người chơi rất dài rất dài', durationMs: window.rankNames ? 41810 + i * 1370 : 1000, levelReached: window.rankNames ? 100000 - i : 10, totalScore: window.rankNames ? 128640 - i * 3500 : 12345 })), own: window.rankUid ? { durationMs: 1000, levelReached: 10, totalScore: 12345 } : null };
     data.loadedPages = [...new Set([...window.rankCache.keys()].map(key => JSON.parse(key)).filter(item => JSON.stringify(item.board) === JSON.stringify(board) && item.uid === uid).map(item => item.page).concat(page))];
     window.rankCache.set(JSON.stringify({ board, uid, page }), data); return data;
   };`);
@@ -23,16 +23,20 @@ async function open(page, count = 21, gameContext = false) {
   await page.evaluate(async () => { window.rankCycleModal = (await import('/js/leaderboardPanel.js')).openLeaderboards(undefined, undefined, { presentation: 'screen', host: document.querySelector('.adventure-screen-host'), owner: (await import('/js/appPageLifecycle.js')).getAppPageScope() }); });
   await expect(page.locator('.leaderboard-list li')).toHaveCount(Math.min(count, 10));
 }
+async function selectFamily(page, game, family) {
+  await page.locator(`[data-rank-game="${game}"]`).click();
+  await page.locator(`[data-rank-family="${family}"]`).click();
+}
 for (const count of [0, 1, 10, 11]) test(`record count ${count}, private own record and no repeated copy`, async ({ page }) => {
   await open(page, count);
-  if (count) await expect(page.locator('.leaderboard-heading')).toContainText('Thời gian');
+  if (count) await expect(page.locator('.leaderboard-heading')).toContainText('Màn');
   else await expect(page.locator('.leaderboard-status')).toHaveText('Chưa có thành tích.');
   await page.evaluate(() => { window.rankUid = 'row-0'; });
   await page.getByRole('button', { name: 'Làm mới', exact: true }).click();
   if (count) { await expect(page.locator('.leaderboard-list .is-self')).toHaveCount(1); await expect(page.locator('.leaderboard-own')).toHaveText(''); }
   await page.evaluate(() => { window.rankUid = 'outside'; });
   await page.getByRole('button', { name: 'Làm mới', exact: true }).click();
-  await expect(page.locator('.leaderboard-own')).toHaveText('Thành tích của bạn: 00:01,00');
+  await expect(page.locator('.leaderboard-own')).toHaveText('Thành tích của bạn: Màn 10');
   await expect(page.locator('.leaderboard-view')).not.toContainText('Đã cập nhật');
   await expect(page.locator('.leaderboard-list img')).toHaveCount(0);
 });
@@ -62,57 +66,41 @@ test('page numbers show only loaded pages, collapse with ellipsis and jump once'
   await expect(numbers.locator('button')).toHaveText(['1', '2', '12']);
   await expect(page.getByRole('button', { name: 'Trang 2', exact: true })).toBeFocused();
   const pager = await page.locator('.leaderboard-pager').boundingBox();
-  const stage = await page.getByRole('button', { name: 'Chọn màn', exact: true }).boundingBox();
   expect(Math.abs(pager.x + pager.width / 2 - 206)).toBeLessThan(2);
-  expect(stage.x + stage.width).toBeLessThanOrEqual(pager.x);
   await page.screenshot({ path: 'docs/design/leaderboard/qa/mobile-pagination.png', animations: 'disabled' });
   await page.setViewportSize({ width: 320, height: 740 });
   const narrowPager = await page.locator('.leaderboard-pager').boundingBox();
-  const narrowStage = await page.getByRole('button', { name: 'Chọn màn', exact: true }).boundingBox();
   expect(Math.abs(narrowPager.x + narrowPager.width / 2 - 160)).toBeLessThan(2);
-  expect(narrowStage.x + narrowStage.width).toBeLessThanOrEqual(narrowPager.x);
-  expect(Math.abs(narrowStage.y + narrowStage.height / 2 - narrowPager.y - narrowPager.height / 2)).toBeLessThan(2);
-  await page.locator('[data-rank-mode="hard"]').click();
+  await selectFamily(page, 'memory-match', 'challenge');
   await expect(numbers.locator('button')).toHaveText(['1']);
 });
 
-test('stage list scrolls upwards, selects 212 and MAX once and restores focus', async ({ page }) => {
+test('game menu opens without querying, supports keyboard and clamps above an anchor near the bottom', async ({ page }) => {
   await page.setViewportSize({ width: 412, height: 915 }); await open(page);
   const before = await page.evaluate(() => window.rankRequests.length);
-  const anchor = page.getByRole('button', { name: 'Chọn màn', exact: true });
-  await anchor.click();
-  const list = page.getByRole('listbox', { name: 'Màn chơi' });
-  await expect(list).toBeFocused(); await expect(page.locator('.leaderboard-stage-dialog')).toHaveAttribute('data-direction', 'up');
-  const box = await list.boundingBox(); const button = await anchor.boundingBox();
-  expect(box.height).toBe(440); expect(box.y + box.height).toBeLessThan(button.y);
-  await list.press('Home');
-  for (let i = 0; i < 21; i++) await list.press('PageDown');
-  await list.press('ArrowDown');
+  const anchor = page.locator('[data-rank-game="link-connect"]'); await anchor.click();
+  const menu = page.getByRole('menu'); await expect(menu).toBeVisible();
   expect(await page.evaluate(() => window.rankRequests.length)).toBe(before);
-  await list.press('Enter');
-  await expect(anchor).toContainText('212');
-  expect(await page.evaluate(() => window.rankRequests.at(-1))).toMatchObject({ level: 212, page: 1 });
-  await anchor.click();
-  await list.evaluate(node => { node.scrollTop = node.scrollHeight; });
-  await expect(page.getByRole('option', { name: 'Màn 246', exact: true })).toHaveCount(1);
-  expect(await list.locator('[role="option"]').count()).toBeLessThanOrEqual(40);
-  await list.press('Escape'); await expect(page.locator('#leaderboard-stage-picker')).toHaveCount(0); await expect(anchor).toBeFocused();
-  await anchor.click(); await list.press('End');
-  const maxOption = page.getByRole('option', { name: 'Màn 9007199254740900', exact: true });
-  await expect(maxOption).toHaveAttribute('title', 'Màn 9007199254740900');
-  expect(await maxOption.evaluate(node => getComputedStyle(node).whiteSpace)).toBe('nowrap');
-  await list.press('Enter');
-  await expect(anchor).toContainText('9007199254740900');
-  expect(await page.evaluate(() => window.rankRequests.at(-1).level)).toBe(9007199254740900);
-  await anchor.click(); await list.press('Home'); await list.press('Enter'); await expect(anchor).toContainText('Màn 1');
-  await anchor.click();
-  await page.setViewportSize({ width: 844, height: 390 });
-  const compact = await list.boundingBox();
-  expect(compact.y).toBeGreaterThanOrEqual(0); expect(compact.y + compact.height).toBeLessThan(390);
-  await page.getByRole('option', { name: 'Màn 2', exact: true }).click();
-  await expect(anchor).toContainText('Màn 2'); await expect(anchor).toBeFocused();
-  expect(await page.evaluate(() => window.rankRequests.at(-1))).toMatchObject({ level: 2, page: 1 });
+  await expect(menu.locator('[data-rank-family="adventure"]')).toBeFocused();
+  await menu.locator('[data-rank-family="adventure"]').press('End');
+  await expect(menu.locator('[data-rank-family="endless"]')).toBeFocused();
+  await menu.locator('[data-rank-family="endless"]').press('Escape');
+  await expect(menu).toHaveCount(0); await expect(anchor).toBeFocused();
+  await anchor.click(); await menu.locator('[data-rank-family="adventure"]').press('Tab');
+  await expect(menu).toHaveCount(0); await expect(page.locator('[data-rank-game="triple-connect"]')).toBeFocused();
+  await anchor.click(); await menu.locator('[data-rank-family="adventure"]').press('Shift+Tab');
+  await expect(menu).toHaveCount(0); await expect(page.locator('[data-rank-game="memory-match"]')).toBeFocused();
+  await anchor.evaluate(node => { node.style.position = 'fixed'; node.style.bottom = '10px'; node.style.zIndex = '15000'; });
+  await anchor.click(); await expect(menu).toHaveAttribute('data-direction', 'up');
+  const box = await menu.boundingBox(); const trigger = await anchor.boundingBox();
+  expect(box.y).toBeGreaterThanOrEqual(8); expect(box.y + box.height).toBeLessThan(trigger.y);
+  await menu.locator('[data-rank-family="adventure"]').press('ArrowDown');
+  await menu.locator('[data-rank-family="challenge"]').press('Enter');
+  expect(await page.evaluate(() => window.rankRequests.at(-1))).toMatchObject({ gameId: 'link-connect', family: 'challenge', page: 1 });
+  expect(await page.evaluate(() => window.rankRequests.length)).toBe(before + 1);
+  await expect(anchor).toBeFocused(); await expect(anchor).toContainText('Thử thách');
 });
+
 test('30 mount, picker cancel and mode changes release every page-owned resource', async ({ page }) => {
   await open(page);
   await page.waitForFunction(() => performance.getEntriesByType('resource').some(entry => entry.name.includes('leaderboard-night-garden.webp')));
@@ -127,11 +115,11 @@ test('30 mount, picker cancel and mode changes release every page-owned resource
   for (let cycle = 0; cycle < 30; cycle++) {
     await page.evaluate(async () => { window.rankCycleModal = (await import('/js/leaderboardPanel.js')).openLeaderboards(undefined, undefined, { presentation: 'screen', host: document.querySelector('.adventure-screen-host'), owner: (await import('/js/appPageLifecycle.js')).getAppPageScope() }); });
     await expect(page.locator('.leaderboard-heading')).toBeVisible();
-    await page.getByRole('button', { name: 'Chọn màn', exact: true }).click();
-    await page.getByRole('listbox', { name: 'Màn chơi', exact: true }).press('Escape');
-    await expect(page.locator('#leaderboard-stage-picker')).toHaveCount(0);
-    await page.locator('[data-rank-mode="challenge"]').click();
-    await expect(page.locator('.leaderboard-heading')).toContainText('Điểm');
+    await page.locator('[data-rank-game="memory-match"]').click();
+    await page.locator('[data-rank-family="adventure"]').press('Escape');
+    await expect(page.getByRole('menu')).toHaveCount(0);
+    await selectFamily(page, 'memory-match', 'challenge');
+    await expect(page.locator('.leaderboard-heading')).toContainText('Màn');
     await page.evaluate(() => window.rankCycleModal.destroy());
   }
   expect(await diagnostics()).toEqual(before);
@@ -142,24 +130,20 @@ test('30 mount, picker cancel and mode changes release every page-owned resource
   expect(decodes.length).toBeLessThanOrEqual(1);
 });
 for (const viewport of [{ width: 412, height: 915 }, { width: 640, height: 360 }, { width: 844, height: 390 }, { width: 1024, height: 900 }]) {
-  test(`ranking layout, all 18 filters and scroll at ${viewport.width}x${viewport.height}`, async ({ page }) => {
+  test(`ranking layout, all nine boards and scroll at ${viewport.width}x${viewport.height}`, async ({ page }) => {
     await page.setViewportSize(viewport); await open(page);
     for (const game of ['memory-match', 'link-connect', 'triple-connect']) {
-      await page.locator(`[data-rank-game="${game}"]`).click();
-      for (const mode of ['easy', 'normal', 'hard', 'superHard', 'challenge', 'endless']) {
-        await page.locator(`[data-rank-mode="${mode}"]`).click();
+      for (const mode of ['adventure', 'challenge', 'endless']) {
+        await selectFamily(page, game, mode);
         await expect(page.locator('.leaderboard-heading')).toBeVisible();
         await expect(page.locator('.leaderboard-status')).toHaveText('');
-        await expect(page.getByRole('button', { name: 'Chọn màn', exact: true })).toBeVisible({ visible: !['challenge', 'endless'].includes(mode) });
         expect(await page.evaluate(() => window.rankRequests.at(-1).page)).toBe(1);
       }
     }
     await expect(page.locator('.leaderboard-list img')).toHaveCount(0);
     const boxes = await page.locator('.leaderboard-tabs--game button, .leaderboard-pager button').evaluateAll(nodes => nodes.map(node => { const rect = node.getBoundingClientRect(); return { x: rect.x, right: rect.right, y: rect.y, bottom: rect.bottom, height: rect.height, minimum: node.closest('.leaderboard-pager') ? 32 : 44 }; }));
     for (const box of boxes) { expect(box.x).toBeGreaterThanOrEqual(0); expect(box.right).toBeLessThanOrEqual(viewport.width); expect(Math.round(box.height * 1000) / 1000).toBeGreaterThanOrEqual(box.minimum); expect(box.bottom).toBeLessThanOrEqual(viewport.height); }
-    const modeGeometry = await page.locator('.leaderboard-tabs--mode button').evaluateAll(nodes => nodes.map(node => ({ y: node.getBoundingClientRect().y, height: node.getBoundingClientRect().height })));
-    expect(new Set(modeGeometry.map(box => box.y)).size).toBe(1);
-    for (const box of modeGeometry) expect(box.height).toBeGreaterThanOrEqual(44);
+    await expect(page.locator('.leaderboard-tabs--mode, .leaderboard-level')).toHaveCount(0);
     const panelBox = await page.locator('.leaderboard-panel').boundingBox();
     const pagerBox = await page.locator('.leaderboard-pager').boundingBox();
     expect(Math.abs(pagerBox.x + pagerBox.width / 2 - panelBox.x - panelBox.width / 2)).toBeLessThan(2);
@@ -179,15 +163,15 @@ for (const viewport of [{ width: 412, height: 915 }, { width: 640, height: 360 }
 test('stale requests, empty/offline state and close during load never commit the old response', async ({ page }) => {
   await open(page);
   await page.evaluate(() => { window.rankDeferred = true; });
-  await page.locator('[data-rank-game="link-connect"]').click();
-  await page.locator('[data-rank-game="triple-connect"]').click();
+  await selectFamily(page, 'link-connect', 'adventure');
+  await selectFamily(page, 'triple-connect', 'adventure');
   await page.evaluate(() => { window.rankDeferred = false; window.rankCount = 0; for (const resolve of window.rankResolvers) resolve(); });
   await expect(page.locator('.leaderboard-results')).toContainText('Chưa có thành tích');
   await page.evaluate(() => { window.rankError = true; });
   await page.getByRole('button', { name: 'Làm mới' }).click();
   await expect(page.locator('.leaderboard-status')).toContainText('Chưa tải được');
   await page.evaluate(() => { window.rankError = false; window.rankDeferred = true; });
-  await page.locator('[data-rank-mode="challenge"]').click();
+  await selectFamily(page, 'memory-match', 'challenge');
   await page.locator('.adventure-screen .adventure-exit').click();
   await page.evaluate(() => { for (const resolve of window.rankResolvers) resolve(); });
   await expect(page.locator('#rankings-modal')).toHaveCount(0);
@@ -198,9 +182,9 @@ test('offline refresh preserves only the same board and UID cache', async ({ pag
   await page.getByRole('button', { name: 'Làm mới', exact: true }).click();
   await expect(page.locator('.leaderboard-list li')).toHaveCount(10);
   await expect(page.locator('.leaderboard-status')).toHaveText('Chưa có kết nối.');
-  await page.locator('[data-rank-game="link-connect"]').click();
+  await selectFamily(page, 'link-connect', 'adventure');
   await expect(page.locator('.leaderboard-list li')).toHaveCount(0);
-  await page.locator('[data-rank-game="memory-match"]').click();
+  await selectFamily(page, 'memory-match', 'adventure');
   await expect(page.locator('.leaderboard-list li')).toHaveCount(10);
   await page.evaluate(() => { window.rankUid = 'another-owner'; });
   await page.getByRole('button', { name: 'Làm mới', exact: true }).click();
@@ -209,22 +193,21 @@ test('offline refresh preserves only the same board and UID cache', async ({ pag
 test('final garden artwork, centered footer and background failure keep a usable product screen', async ({ page }) => {
   await page.setViewportSize({ width: 412, height: 915 }); await open(page, 21, true);
   await page.evaluate(() => { window.rankNames = ['Linh Nguyễn', 'Hải Minh', 'Ngọc Anh', 'Bảo Trân', 'Hoàng Nam', 'Mai Chi', 'An Nhiên', 'Tuấn Anh', 'Thanh Hà', 'Minh Khôi']; window.rankUid = 'row-6'; });
-  await page.getByRole('button', { name: 'Chọn màn', exact: true }).click();
-  const stageList = page.getByRole('listbox', { name: 'Màn chơi', exact: true }); await stageList.press('Home'); for (let i = 0; i < 21; i++) await stageList.press('PageDown'); await stageList.press('ArrowDown'); await stageList.press('Enter');
+  await page.getByRole('button', { name: 'Làm mới', exact: true }).click();
   await expect(page.locator('.leaderboard-list .is-self')).toHaveCount(1);
   const last = await page.locator('.leaderboard-list li').last().boundingBox();
   const region = await page.locator('.leaderboard-results').boundingBox();
   expect(last.y + last.height).toBeLessThanOrEqual(region.y + region.height);
   expect(await page.locator('.leaderboard-rank--1').evaluate(node => getComputedStyle(node).color)).toBe('rgb(58, 42, 17)');
   await page.locator('.leaderboard-results').blur();
-  await page.screenshot({ path: 'docs/design/leaderboard/qa/mobile-time.png', animations: 'disabled' });
-  await page.getByRole('button', { name: 'Chọn màn', exact: true }).click();
-  await page.screenshot({ path: 'docs/design/leaderboard/qa/mobile-picker.png', animations: 'disabled' });
-  await page.getByRole('listbox', { name: 'Màn chơi', exact: true }).press('Escape'); await expect(page.locator('#leaderboard-stage-picker')).toHaveCount(0);
-  await page.locator('[data-rank-mode="challenge"]').click(); await expect(page.locator('.leaderboard-heading')).toContainText('Điểm');
-  await page.screenshot({ path: 'docs/design/leaderboard/qa/mobile-run.png', animations: 'disabled' });
-  await page.setViewportSize({ width: 844, height: 390 }); await page.screenshot({ path: 'docs/design/leaderboard/qa/landscape-run.png', animations: 'disabled' });
-  await page.setViewportSize({ width: 1024, height: 900 }); await page.screenshot({ path: 'docs/design/leaderboard/qa/desktop-run.png', animations: 'disabled' });
+  await page.screenshot({ path: 'docs/design/leaderboard/qa/mobile-level.png', animations: 'disabled' });
+  await page.locator('[data-rank-game="memory-match"]').click();
+  await page.screenshot({ path: 'docs/design/leaderboard/qa/mobile-family-menu.png', animations: 'disabled' });
+  await page.locator('[data-rank-family="adventure"]').press('Escape');
+  await selectFamily(page, 'memory-match', 'challenge'); await expect(page.locator('.leaderboard-heading')).toContainText('Màn');
+  await page.screenshot({ path: 'docs/design/leaderboard/qa/mobile-level-challenge.png', animations: 'disabled' });
+  await page.setViewportSize({ width: 844, height: 390 }); await page.screenshot({ path: 'docs/design/leaderboard/qa/landscape-level.png', animations: 'disabled' });
+  await page.setViewportSize({ width: 1024, height: 900 }); await page.screenshot({ path: 'docs/design/leaderboard/qa/desktop-level.png', animations: 'disabled' });
   const resources = await page.evaluate(() => performance.getEntriesByType('resource').filter(entry => entry.name.includes('leaderboard-night-garden.webp')).length);
   expect(resources).toBe(1);
   await page.route('**/leaderboard-night-garden.webp', route => route.abort());

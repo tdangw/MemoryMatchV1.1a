@@ -1,3 +1,4 @@
+import { gameRecordLabel } from './gameRecord.js';
 import { presentEffect, flyToTarget, pulseTarget } from "./gameShell/gameShellEffects.js";
 import { getMemoryHud } from "./memoryMatch/memoryShell.js";
 import { setHudText, renderHudTimer } from "./gameShell/gameShellHud.js";
@@ -62,7 +63,7 @@ export function showMemoryCoinReward(tileElement, previousCoins, nextCoins, amou
 
 export function updateScoreDisplay(score) {
   getMemoryHud().stats({ score });
-  getMemoryHud().stars({ score, target: getStarScoreTargets(gameState.totalPairs, gameState.settings.mode).three, totalScore: gameState.progress.memoryMatch.totalScore });
+  getMemoryHud().stars({ score, target: getStarScoreTargets(gameState.totalPairs, gameState.settings.mode).three, record: gameRecordLabel(gameState.progress.memoryMatch, gameState.settings.mode, gameState.currentLevel) });
 }
 
 export function updateMemorySpecialProgress(progress = gameState.specialProgress) {
