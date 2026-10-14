@@ -14,6 +14,7 @@ import { normalizePlayMetrics, getActivePlayMetrics } from "./playMetrics.js";
 import { normalizeRankedRun, normalizeRunBestsV2 } from "./rankingRules.js";
 import { getRankingOwner } from './rankingOwner.js';
 import { validateRankingResult } from './rankingResult.js';
+import { normalizeProgressBests } from './progressRankingModel.js';
 
 const GAME_MODE_IDS = new Set(GAME_MODES.map(({ id }) => id));
 
@@ -95,6 +96,11 @@ export function hydrateGameState({
     progress?.themeSelectionHistory,
     getThemeSelectionManifest(),
   );
+  const migration = progress.levelRankingMigration;
+  gameState.progress.levelRankingMigration = migration?.version === 3 && typeof migration.owner?.profileId === 'string'
+    && (migration.owner.uid === null || typeof migration.owner.uid === 'string')
+    && (migration.afterKey === null || typeof migration.afterKey === 'string')
+    ? structuredClone(migration) : undefined;
   const memorySessions = normalizeSessions(memoryMatch.sessionsByMode, "memory-match");
   gameState.progress.memoryMatch = {
     totalStars: normalizeNonNegativeInteger(memoryMatch.totalStars),
@@ -237,6 +243,7 @@ function normalizeAdventure(progress, gameId) {
       return normalized ? [[mode, normalized]] : [];
     })),
     runBestsV2: normalizeRunBestsV2(progress, gameId),
+    levelBestsV3: normalizeProgressBests(progress.levelBestsV3, gameId),
     runBests: Object.fromEntries(Object.entries(progress.runBests || {}).filter(([mode, result]) => ["challenge", "endless"].includes(mode)
       && result && Number.isSafeInteger(result.levelReached) && result.levelReached > 0 && Number.isSafeInteger(result.totalScore) && result.totalScore >= 0)),
   };

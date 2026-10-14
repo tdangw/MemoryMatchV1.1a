@@ -5,6 +5,7 @@ import {
   ensureChapterProfileOwner,
   updateChapterMetadata,
   updateChapterMetadataPair,
+  migrateChapterLevelRankings,
 } from "./chapterStore.js";
 
 export const SAVE_FORMAT_VERSION = 2;
@@ -114,6 +115,15 @@ export const saveProgress = progress => savePersistentGameData({ progress });
 export const saveCoins = coins => savePersistentGameData({ coins });
 export const saveAppearance = appearance => savePersistentGameData({ appearance });
 export const flushPersistentWrites = () => queue;
+export function migrateLevelRankingsBatch(owner, isCurrent = () => true) {
+  return enqueue(async () => {
+    await initialize();
+    if (!database || blocked) throw new Error('Level migration requires the chapter database.');
+    const result = await migrateChapterLevelRankings(database, owner, knownRevision, isCurrent);
+    currentEnvelope = result.envelope; knownRevision = result.envelope.revision;
+    return { complete: result.complete, progress: structuredClone(result.envelope.data.progress) };
+  });
+}
 export function saveSetting(key, value) {
   if (!SETTINGS_KEYS.has(key)) return Promise.resolve(false);
   return savePersistentGameData({ settings: { [key]: value } });

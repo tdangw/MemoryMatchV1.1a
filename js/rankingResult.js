@@ -1,12 +1,15 @@
 import { NORMAL_MODE_IDS, MAX_ADVENTURE_LEVEL } from './adventureProgress.js';
+import { validateProgressResult, RANKING_FAMILIES } from './progressRankingModel.js';
 const games = new Set(['memory-match', 'link-connect', 'triple-connect']);
-export function rankingBoardId({ gameId, mode, level, kind, rulesVersion = kind === 'run' ? 2 : 1 }) {
+export function rankingBoardId({ gameId, mode, family, level, kind, rulesVersion = kind === 'progress' ? 3 : kind === 'run' ? 2 : 1 }) {
   if (!games.has(gameId)) throw new RangeError('Unknown ranking game.');
+  if (kind === 'progress' && rulesVersion === 3 && RANKING_FAMILIES.includes(family)) return `v3_${gameId}_${family}`;
   if (kind === 'time' && NORMAL_MODE_IDS.includes(mode) && Number.isSafeInteger(level) && level > 0 && level <= MAX_ADVENTURE_LEVEL) return `v1_${gameId}_${mode}_${level}`;
   if (kind === 'run' && [1, 2].includes(rulesVersion) && (mode === 'challenge' || mode === 'endless' && (rulesVersion === 2 || gameId === 'triple-connect'))) return `v${rulesVersion}_${gameId}_${mode}`;
   throw new RangeError('Unsupported ranking board.');
 }
 export function validateRankingResult(result) {
+  if (result?.rulesVersion === 3) return validateProgressResult(result);
   try {
     rankingBoardId(result);
     return (result.kind === 'time' ? result.rulesVersion === 1 : [1, 2].includes(result.rulesVersion)) && typeof result.id === 'string' && /^[a-f0-9-]{36}$/.test(result.id)

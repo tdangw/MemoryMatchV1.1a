@@ -1,4 +1,5 @@
 import { getAdventureSummary, getChapterNumber, MAX_ADVENTURE_CHAPTER } from "./adventureProgress.js";
+import { highestOwnedAdventureLevel, createProgressResult, keepProgressBest, sameRankingOwner, validateProgressResult } from './progressRankingModel.js';
 
 export const CHAPTER_DATABASE = "memoryMatchAdventure";
 const GAME_KEYS = ["memoryMatch", "linkConnect", "tripleConnect"];
@@ -25,6 +26,55 @@ export function openChapterDatabase() {
 export async function readChapterProfile(database) {
   const transaction = database.transaction("profile", "readonly");
   return requestResult(transaction.objectStore("profile").get("active"));
+}
+
+/** Bounded, restartable migration; marker and summaries commit together with the profile. */
+export async function migrateChapterLevelRankings(database, owner, expectedRevision, isCurrent = () => true, batchSize = 20) {
+  if (!owner || typeof owner.profileId !== 'string' || !Number.isInteger(batchSize) || batchSize < 1 || batchSize > 100) throw new RangeError('Invalid migration batch.');
+  const transaction = database.transaction(['profile', 'chapters', 'metadata'], 'readwrite');
+  const complete = transactionResult(transaction);
+  try {
+    const profiles = transaction.objectStore('profile');
+    const [previous, profileOwner] = await Promise.all([requestResult(profiles.get('active')), requestResult(transaction.objectStore('metadata').get('profile-owner'))]);
+    if (!isCurrent() || profileOwner?.id !== owner.profileId || profileOwner.uid !== owner.uid) throw new Error('Migration owner changed.');
+    if (!previous || previous.revision !== expectedRevision) throw new Error('Migration revision changed.');
+    const marker = previous.data.progress.levelRankingMigration;
+    const sameOwner = marker?.version === 3 && sameRankingOwner(marker.owner, owner);
+    if (sameOwner && marker.complete) { await complete; return { envelope: previous, complete: true }; }
+    const stored = structuredClone(previous);
+    const keys = { memoryMatch: 'memory-match', linkConnect: 'link-connect', tripleConnect: 'triple-connect' };
+    function inspect(game, records) {
+      const profile = stored.data.progress[game]; if (!profile) return;
+      const bests = profile.levelBestsV3 ||= {};
+      if (Object.values(bests).some(value => !validateProgressResult(value))) throw new Error('Invalid level ranking history.');
+      const level = highestOwnedAdventureLevel(records, owner, profileOwner);
+      if (level) bests.adventure = keepProgressBest(bests.adventure, createProgressResult(keys[game], 'adventure', level, owner));
+    }
+    if (!sameOwner) for (const game of Object.keys(keys)) inspect(game, stored.data.progress[game]?.bestByLevel);
+    let afterKey = sameOwner ? marker.afterKey : null;
+    let exhausted = false; let count = 0;
+    await new Promise((resolve, reject) => {
+      const request = transaction.objectStore('chapters').openCursor(afterKey ? IDBKeyRange.lowerBound(afterKey, true) : undefined);
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => {
+        const cursor = request.result;
+        if (!cursor) { exhausted = true; resolve(); return; }
+        if (count >= batchSize) { resolve(); return; }
+        try {
+          const game = String(cursor.key).split(':')[0];
+          if (keys[game]) inspect(game, cursor.value.bestByLevel);
+          afterKey = cursor.key; count++; cursor.continue();
+        } catch (error) { reject(error); }
+      };
+    });
+    if (!isCurrent()) throw new Error('Migration cancelled.');
+    stored.data.progress.levelRankingMigration = { version: 3, owner: { ...owner }, afterKey, complete: exhausted };
+    stored.revision++; profiles.put(stored, 'active'); await complete;
+    return { envelope: stored, complete: exhausted };
+  } catch (error) {
+    try { transaction.abort(); } catch (abortError) { if (abortError.name !== 'InvalidStateError') throw abortError; }
+    await complete.catch(() => {}); throw error;
+  }
 }
 
 /** Consistent export of durable state; never export the optimistic gameplay object. */
