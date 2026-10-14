@@ -14,7 +14,7 @@ const originalPerformance = globalThis.performance;
 globalThis.performance = { now: () => now };
 globalThis.document = { hidden: false };
 const cleanups = [];
-const scope = { listen() {}, own(callback) { cleanups.push(callback); } };
+const scope = { listen() {}, interval() {}, own(callback) { cleanups.push(callback); } };
 now = 0;
 const record = beginPlayMetrics(scope, { gameId: 'memory-match', mode: 'easy', level: 1 });
 record.clock.resume('startup'); now = 1000; record.clock.pause('menu');

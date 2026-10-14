@@ -1,4 +1,5 @@
 import { getRecentGameId } from "./recentGame.js";
+import { initializeProfileStatsService } from './profileStatsService.js';
 import { configureAdventureMap } from "./adventureMap.js";
 import { previewMemoryLevel, previewLinkLevel, previewTripleLevel } from './adventurePreview.js';
 import "./memoryMatch/memoryShellDom.js";
@@ -120,7 +121,11 @@ configureSettings({ onCloseMenu: createActiveGameMenu, onHelp: () => showGameInf
 configureAppNavigation({
   home: showGameSelector,
   account: async (surface = {}) => {
-    if (import.meta.env.VITE_FIREBASE_DISABLED === '1') return openAppModal({ ...surface, id: 'account-modal', title: 'Tài khoản', content: '<p>Người chơi</p><p>Tiến trình đã lưu trên thiết bị.</p>' });
+    if (import.meta.env.VITE_FIREBASE_DISABLED === '1') {
+      const panels = await import('./accountPanel.js');
+      if (surface.owner && !surface.owner.active) return;
+      return panels.showAccountPanel(surface);
+    }
     await accountReady;
     if (surface.owner && !surface.owner.active) return;
     if (!accountRuntime) return openAppModal({ ...surface, id: 'account-modal', title: 'Tài khoản', content: '<p>Tiến trình đã lưu trên thiết bị. Hãy tải lại ứng dụng để kết nối tài khoản.</p>', actions: [{ label: 'Tải lại', onClick: () => window.location.reload() }] });
@@ -231,6 +236,7 @@ document.addEventListener(
   { passive: false },
 );
 
+const profileStats = await initializeProfileStatsService();
 showGameSelector();
 if (import.meta.env.VITE_FIREBASE_DISABLED !== '1') {
   accountReady = Promise.all([import('./accountService.js'), import('./accountPanel.js')]).then(([account, panels]) => {
@@ -248,6 +254,7 @@ if (import.meta.env.VITE_FIREBASE_DISABLED !== '1') {
         await (await import('./leaderboardService.js')).getLeaderboardService()?.recover();
       },
     });
+    void profileStats?.bindAccount(account.getAccountService()).catch(error => console.warn('Profile statistics startup unavailable', error.code || error.name));
     return import('./leaderboardService.js').then(module => module.initializeLeaderboardService().ready);
   }).catch(error => {
     console.warn('Cloud startup unavailable', error.code || error.name);

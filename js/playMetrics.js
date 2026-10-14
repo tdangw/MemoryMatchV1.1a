@@ -1,16 +1,20 @@
 /** Event-driven active-time measurement. Countdown bonuses and freezes never change this clock. */
 import { getRankingOwner } from './rankingOwner.js';
+import { clearShellInterval } from './gameShell/gameShellLifecycle.js';
 export function createActivePlayClock({ elapsedMs = 0, now = () => performance.now(), onSegment = () => {} } = {}) {
   let elapsed = Number.isSafeInteger(elapsedMs) && elapsedMs >= 0 ? elapsedMs : 0;
   let startedAt = null;
   const pauses = new Set(["startup"]);
   let stopped = false;
-  function pause(reason) {
+  function checkpoint() {
     if (startedAt !== null) {
-      const segment = Math.max(0, now() - startedAt);
-      elapsed += segment; startedAt = null;
+      const at = now(); const segment = Math.max(0, at - startedAt);
+      elapsed += segment; startedAt = at;
       if (segment > 0) onSegment(segment);
     }
+  }
+  function pause(reason) {
+    checkpoint(); startedAt = null;
     pauses.add(reason);
   }
   function resume(reason) {
@@ -19,7 +23,7 @@ export function createActivePlayClock({ elapsedMs = 0, now = () => performance.n
   }
   function durationMs() { return Math.round(elapsed + (startedAt === null ? 0 : Math.max(0, now() - startedAt))); }
   function finish() { const duration = durationMs(); stopped = true; pause("finished"); return duration; }
-  return Object.freeze({ pause, resume, durationMs, finish });
+  return Object.freeze({ pause, resume, durationMs, finish, checkpoint });
 }
 
 let activeMetrics = null;
@@ -58,6 +62,7 @@ export function beginPlayMetrics(scope, identity, metadata = null) {
     else record.clock.resume("hidden");
   });
   if (document.hidden) record.clock.pause("hidden");
+  record.checkpointTimer = scope.interval(() => record.clock.checkpoint(), 30000);
   scope.own(() => {
     record.clock.finish();
     if (activeMetrics === record) { lastMetrics = record; activeMetrics = null; }
@@ -74,6 +79,7 @@ export function pausePlayMetrics(reason) { activeMetrics?.clock.pause(reason); }
 export function resumePlayMetrics(reason) { activeMetrics?.clock.resume(reason); }
 export function finishPlayMetrics() {
   if (!activeMetrics) return null;
+  clearShellInterval(activeMetrics.checkpointTimer);
   const durationMs = activeMetrics.clock.finish();
   return activeMetrics.rankable && durationMs > 0 ? durationMs : null;
 }

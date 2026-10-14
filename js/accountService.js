@@ -420,7 +420,7 @@ function createAccountService(options) {
   const service = {
     ready: null,
     getState: publicState,
-    getIdentity: () => metadata?.uid === state.uid && state.uid ? { uid: state.uid, profileId: metadata.profileId, firstUid: owner?.firstUid || owner?.uid || state.uid, playerName: state.playerName, environment: state.environment } : null,
+    getIdentity: () => metadata?.uid === state.uid && state.uid && backend.auth.currentUser?.uid === state.uid ? { uid: state.uid, profileId: metadata.profileId, firstUid: owner?.firstUid || owner?.uid || state.uid, playerName: state.playerName, environment: state.environment, createdAt: Date.parse(backend.auth.currentUser.metadata.creationTime) || null } : null,
     subscribe(listener) { listeners.add(listener); listener(publicState()); return () => listeners.delete(listener); },
     syncNow, chooseConflict, requestGoogleLogin, setPlayerName, restoreLocalBackup,
     acceptGoogleCredential: credential => signInWithCredential(backend.auth, credential),

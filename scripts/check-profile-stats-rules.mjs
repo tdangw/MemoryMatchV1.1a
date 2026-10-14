@@ -1,0 +1,31 @@
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { initializeTestEnvironment, assertFails, assertSucceeds } from '@firebase/rules-unit-testing';
+import { doc, getDoc, getDocs, collection, query, limit, setDoc, serverTimestamp } from 'firebase/firestore';
+import { publishProfileCounter } from '../js/profileStatsStore.js';
+const env = await initializeTestEnvironment({ projectId: 'demo-memory-match', firestore: { host: '127.0.0.1', port: 8180, rules: readFileSync('firestore.rules', 'utf8') } });
+try {
+  await env.clearFirestore();
+  const db = env.authenticatedContext('stats-owner').firestore();
+  const other = env.authenticatedContext('other').firestore();
+  const guest = env.unauthenticatedContext().firestore();
+  const admin = env.authenticatedContext('manager', { admin: true }).firestore();
+  const fakeAdmin = env.authenticatedContext('fake-manager', { isAdmin: true }).firestore();
+  const a = crypto.randomUUID(); const b = crypto.randomUUID(); const now = Date.now() - 1000;
+  const write = (id, ms) => publishProfileCounter({ database: db, environment: 'test', uid: 'stats-owner', local: { counterId: id, totalMs: ms, trackedSince: now } });
+  await assertSucceeds(write(a, 60000));
+  await Promise.all([write(a, 90000), write(b, 120000)]);
+  await write(a, 90000); await write(b, 1);
+  const path = 'gamespaces/test/profileStats/stats-owner';
+  const data = (await getDoc(doc(db, path))).data();
+  assert.equal(data.totalPlayMs, 210000); assert.equal(Object.keys(data.counters).length, 2);
+  await assertFails(getDoc(doc(other, path))); await assertFails(getDoc(doc(guest, path))); await assertFails(getDoc(doc(fakeAdmin, path)));
+  await assertSucceeds(getDoc(doc(admin, path)));
+  await assertSucceeds(getDocs(query(collection(admin, 'gamespaces/test/profileStats'), limit(100))));
+  await assertFails(getDocs(query(collection(db, 'gamespaces/test/profileStats'), limit(10))));
+  await assertFails(setDoc(doc(other, path), { ...data, totalPlayMs: 100, updatedAt: serverTimestamp() }));
+  await assertFails(setDoc(doc(db, path), { ...data, counters: { [a]: 1, [b]: 120000 }, totalPlayMs: 120001, updatedAt: serverTimestamp() }));
+  await assertFails(setDoc(doc(db, path), { ...data, totalPlayMs: 999999, updatedAt: serverTimestamp() }));
+  await assertFails(setDoc(doc(db, path), { ...data, admin: true, updatedAt: serverTimestamp() }));
+  console.log('Private profile Rules: owner/admin-only reads, bounded admin list, concurrent additive counters, replay and invalid writes passed.');
+} finally { await env.cleanup(); }

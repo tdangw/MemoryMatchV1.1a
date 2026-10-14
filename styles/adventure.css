@@ -27,6 +27,9 @@
 .adventure-account[data-cloud-state="synced"]::after { content: ""; position: absolute; right: 3px; top: 4px; width: 6px; height: 6px; border: 2px solid #10283d; border-radius: 50%; background: #7ac7aa; }
 .account-name-input { display: block; box-sizing: border-box; width: 100%; border: 1px solid #8faba455; border-radius: 12px; padding: 12px; margin: 8px 0; background: #10283d; color: #fff; }
 .account-explanation { font-size: 12px; color: #b7c6d2; line-height: 1.7; }
+.account-play-details { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px 16px; padding-top: 18px; border-top: 1px solid #b9c9c833; color: #d9e6dd; font-size: 14px; }
+.account-play-details dd { margin: 0; color: #ffe1a0; font-variant-numeric: tabular-nums; }
+.account-play-since { font-size: 12px; color: #b7c6d2; }
 .adventure-page > .menu-wrapper {
   width: min(100%, 600px);
   max-height: none;

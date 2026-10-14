@@ -4,6 +4,7 @@ import {
   exportChapterSnapshot, replaceChapterSnapshot, readChapterMetadata, writeChapterMetadata, readChapterBackups,
   ensureChapterProfileOwner,
   updateChapterMetadata,
+  updateChapterMetadataPair,
 } from "./chapterStore.js";
 
 export const SAVE_FORMAT_VERSION = 2;
@@ -32,6 +33,11 @@ export async function updateSyncMetadata(key, update, isCurrent = () => true) {
   await initialize();
   if (!database || blocked) throw new Error('Không thể lưu hàng đợi trên thiết bị.');
   return updateChapterMetadata(database, `cloud:${key}`, update, isCurrent);
+}
+export async function updateSyncMetadataPair(keys, update, isCurrent = () => true) {
+  await initialize();
+  if (!database || blocked) throw new Error('Không thể lưu trên thiết bị.');
+  return updateChapterMetadataPair(database, keys.map(key => `cloud:${key}`), update, isCurrent);
 }
 function notifyCommit(patch) {
   for (const listener of commitSubscribers) {

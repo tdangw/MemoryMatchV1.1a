@@ -49,6 +49,7 @@ Game Shell đã ổn định. `js/gameShell/` sở hữu config, sáu vùng sema
 | `sound.js`, `backgroundEffects.js` | Âm thanh và hiệu ứng nền theo cài đặt/vòng đời trang. |
 | `appNavigation.js`, `appPageLifecycle.js` | Một page owner, tối đa một screen chức năng con, giữ map/scroll khi đổi tab; gameplay không có dock. |
 | `leaderboardPanel.js`, `leaderboardStore.js`, `leaderboardService.js` | Renderer bộ lọc, query/cache/best-only và outbox theo UID; luật/board ID thuộc rankingResult/rankingRules. |
+| `profileStatsService.js`, `profileStatsModel.js`, `profileStatsStore.js` | Thời gian chơi private theo UID, nguồn clock playMetrics, metadata replica monotonic và transaction cộng tổng; Auth sở hữu ngày tạo tài khoản. |
 | `victoryCelebration.js`, `victoryFlowerScene.js` | Cảnh hoa SVG hiện hữu, animation hữu hạn và scope/audio cleanup; không sở hữu luật hoàn thành chặng. |
 
 Game Shell giữ đủ sáu region công khai: `title`, `progress`, `hud`, `milestones`, `frame`, `board`. `progress` là placeholder tương thích rỗng, luôn ẩn; metric thật thuộc `refs.hud`, còn Xu/mốc/sao màn thuộc `refs.milestones`. `gameHudMenus.js` sở hữu menu công cụ, ARIA, Escape/click ngoài và cleanup theo scope mount. `gameExitDialog.js` sở hữu popup Tạm dừng; controller cung cấp Thoát/Chơi lại/Cài đặt và pause/resume. Startup khóa HUD đến khi readiness hoàn tất, tránh round initialization ghi đè pause. `styles/game-shell/hud-unified.css` sở hữu geometry và presentation thanh HUD một hàng; CSS game chỉ giữ trạng thái có ngữ nghĩa và phần board/milestone đặc thù.
@@ -80,6 +81,8 @@ Game Shell giữ đủ sáu region công khai: `title`, `progress`, `hud`, `mile
 | `linkPerformance.js` | Đo số ô được patch và thời gian render trong chế độ debug. |
 
 ## 3. Trạng thái và lưu trữ
+
+- Profile tracking riêng trong IndexedDB metadata, không nhập vào snapshot gameplay hoặc record ranking public. Clock checkpoint30s/pause/finish tạo delta; metadata counter atomically increment, guest adoption+marker cùng transaction và không đổi owner đã nhận. Cloud `gamespaces/{space}/profileStats/{uid}` dùng counter monotonic theo installation/UID (tối đa128), tổng bằng delta so với counter đã nhận; replay/stale không tăng lặp. Acknowledge phần counter server thực sự chứa, không gắn kết quả vào UID mới khi async cũ về. Quyền đọc owner hoặc trusted claim `admin`, list admin có limit≤100, client không xóa dữ liệu. Timestamp Tham gia đọc Auth creationTime; admin dashboard tương lai đọc Auth Admin metadata, không tin client timestamp trong stats. Nguồn tổng cũ thiếu được tính từ ngày bật tracking, không suy từ kỷ lục. Hard-kill có thể mất ≤30s chưa checkpoint cộng latency write; pause/pagehide flush không phải bảo đảm commit khi process bị kill.
 
 - `gameState` giữ Xu, cài đặt, ngoại hình và namespace tiến trình `memoryMatch`/`linkConnect`/`tripleConnect`; lịch sử chỉ hydrate các chặng cần dùng.
 - Persistence có một owner trong `persistence.js`; `chapterStore.js` sở hữu IndexedDB `memoryMatchAdventure` với transaction profile + chapter. `formatVersion=2`, revision tăng sau durability; các caller phải await boolean kết quả. Migration từ nguồn v1 giữ bản phục hồi, không tự reset hoặc ghi đè bản hỏng/version lạ. localStorage là fallback khai báo rõ cho trình duyệt chưa dùng backend mới; marker primary ngăn đọc/ghi bản v1 cũ khi IndexedDB không khả dụng.

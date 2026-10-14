@@ -105,12 +105,18 @@ export async function updateChapterMetadata(database, key, update, isCurrent = (
   const transaction = database.transaction('metadata', 'readwrite');
   const complete = transactionResult(transaction);
   const store = transaction.objectStore('metadata');
-  const previous = await requestResult(store.get(key));
-  if (!isCurrent()) { transaction.abort(); await complete.catch(() => {}); return null; }
-  const next = update(previous);
-  if (next !== previous) store.put(next, key);
-  await complete;
-  return next;
+  try {
+    const previous = await requestResult(store.get(key));
+    if (!isCurrent()) { transaction.abort(); await complete.catch(() => {}); return null; }
+    const next = update(previous);
+    if (next !== previous) store.put(next, key);
+    await complete;
+    return next;
+  } catch (error) {
+    try { transaction.abort(); } catch (abortError) { if (abortError.name !== 'InvalidStateError') throw abortError; }
+    await complete.catch(() => {});
+    throw error;
+  }
 }
 export async function writeChapterMetadata(database, key, value) {
   const transaction = database.transaction("metadata", "readwrite");
@@ -118,15 +124,29 @@ export async function writeChapterMetadata(database, key, value) {
   const store = transaction.objectStore("metadata");
   const owner = await requestResult(store.get("profile-owner"));
   store.put(value, key);
-  if (value?.profileId && value.uid && value.profileId === owner?.id) store.put({ id: owner.id, uid: value.uid, firstUid: owner.firstUid || owner.uid || value.uid }, "profile-owner");
+  if (value?.profileId && value.uid && value.profileId === owner?.id) store.put({ ...owner, uid: value.uid, firstUid: owner.firstUid || owner.uid || value.uid }, "profile-owner");
   await complete;
+}
+export async function updateChapterMetadataPair(database, keys, update, isCurrent = () => true) {
+  const transaction = database.transaction('metadata', 'readwrite');
+  const complete = transactionResult(transaction); const store = transaction.objectStore('metadata');
+  try {
+    const values = await Promise.all(keys.map(key => requestResult(store.get(key))));
+    if (!isCurrent()) { transaction.abort(); await complete.catch(() => {}); return null; }
+    const next = update(values);
+    for (let index = 0; index < keys.length; index++) store.put(next[index], keys[index]);
+    await complete; return next;
+  } catch (error) {
+    try { transaction.abort(); } catch (abortError) { if (abortError.name !== 'InvalidStateError') throw abortError; }
+    await complete.catch(() => {}); throw error;
+  }
 }
 export async function ensureChapterProfileOwner(database) {
   const transaction = database.transaction("metadata", "readwrite");
   const complete = transactionResult(transaction);
   const store = transaction.objectStore("metadata");
   let owner = await requestResult(store.get("profile-owner"));
-  if (!owner) { owner = { id: crypto.randomUUID(), uid: null }; store.put(owner, "profile-owner"); }
+  if (!owner) { owner = { id: crypto.randomUUID(), uid: null, createdAt: Date.now() }; store.put(owner, "profile-owner"); }
   await complete;
   return owner;
 }

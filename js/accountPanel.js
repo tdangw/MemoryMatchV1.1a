@@ -3,6 +3,8 @@ import { getAccountService } from "./accountService.js";
 import { getAppPageScope } from "./appPageLifecycle.js";
 import { gameState } from "./gameState.js";
 import { createIcon } from "./icons.js";
+import { getProfileStatsService } from './profileStatsService.js';
+import { formatProfilePlaytime } from './profileStatsModel.js';
 
 let activeView = null;
 let activeConflict = null;
@@ -14,7 +16,12 @@ export function closeCloudConflictDialog() {
 export function showAccountPanel(surface = {}) {
   activeView?.dispose();
   const service = getAccountService();
-  if (!service) return openAppModal({ ...surface, id: "account-modal", title: "Tài khoản", content: "<p>Người chơi</p><p>Tiến trình đã lưu trên thiết bị.</p>" });
+  if (!service) {
+    const content = document.createElement('div');
+    const stats = profileDetails(content);
+    const modal = openAppModal({ ...surface, id: 'account-modal', title: 'Tài khoản', icon: 'account', content, onDestroy: () => stats.dispose() });
+    return modal;
+  }
   const content = document.createElement("div");
   const identity = document.createElement("p");
   identity.className = "account-identity";
@@ -33,6 +40,7 @@ export function showAccountPanel(surface = {}) {
   explanation.className = "account-explanation";
   explanation.textContent = "Liên kết Google để chơi tiếp trên thiết bị khác.";
   content.append(identity, status, label, saveName, explanation);
+  const stats = profileDetails(content);
   const modal = openAppModal({ ...surface, id: "account-modal", title: "Tài khoản", icon: "account", content, onDestroy: () => dispose(), onClose: () => dispose(), onActionSettled: () => renderState(service.getState()), actions: [
     { label: "Google", icon: "account", variant: "primary", onClick: async () => { await service.requestGoogleLogin(); return false; } },
   ] });
@@ -41,7 +49,7 @@ export function showAccountPanel(surface = {}) {
   let disposed = false;
   function dispose() {
     if (disposed) return;
-    disposed = true; unsubscribe?.(); releaseOwner?.forget(); modal.destroy();
+    disposed = true; unsubscribe?.(); stats.dispose(); releaseOwner?.forget(); modal.destroy();
     if (activeView?.modal === modal) activeView = null;
   }
   activeView = { modal, dispose };
@@ -65,6 +73,26 @@ export function showAccountPanel(surface = {}) {
     finally { if (!disposed) saveName.disabled = false; }
   };
   return modal;
+}
+
+function profileDetails(content) {
+  const details = document.createElement('dl'); details.className = 'account-play-details';
+  const joinedLabel = document.createElement('dt'); const joined = document.createElement('dd');
+  const timeLabel = document.createElement('dt'); timeLabel.textContent = 'Thời gian chơi'; const time = document.createElement('dd');
+  const since = document.createElement('p'); since.className = 'account-play-since';
+  const status = document.createElement('p'); status.className = 'account-play-since'; status.setAttribute('aria-live', 'polite');
+  details.append(joinedLabel, joined, timeLabel, time); content.append(details, since, status);
+  const formatDate = value => new Date(value).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  const stats = getProfileStatsService();
+  const unsubscribe = stats?.subscribe(state => {
+    joinedLabel.textContent = state.onlineAccount ? 'Tham gia' : 'Hồ sơ tạo ngày';
+    joined.textContent = state.joinedAt ? formatDate(state.joinedAt) : '—';
+    time.textContent = state.totalPlayMs === null ? '—' : formatProfilePlaytime(state.totalPlayMs);
+    since.textContent = state.trackedSince ? `Từ ${formatDate(state.trackedSince)}` : '';
+    status.textContent = state.phase === 'error' ? 'Chưa cập nhật được thời gian chơi.' : '';
+  });
+  void stats?.syncNow();
+  return { dispose: () => unsubscribe?.() };
 }
 
 export function showCloudConflictDialog({ root, cloud, choose }) {
