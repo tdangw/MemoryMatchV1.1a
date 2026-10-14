@@ -43,21 +43,21 @@ test('stage picker confirms 212 once, rejects invalid input and returns focus on
   await input.fill('212');
   expect(await page.evaluate(() => window.rankRequests.length)).toBe(before);
   await input.press('Enter');
-  await expect(page.locator('.leaderboard-context')).toHaveText('Màn 212');
+  await expect(page.locator('.leaderboard-context')).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Chọn màn', exact: true })).toContainText('212');
   expect(await page.evaluate(() => window.rankRequests.at(-1))).toMatchObject({ level: 212, page: 1 });
   await page.getByRole('button', { name: 'Chọn màn', exact: true }).click();
   for (const invalid of ['0', '-1', '2.5', 'abc', '9007199254740991']) {
     await input.fill(invalid); await input.press('Enter');
     await expect(input).toHaveAttribute('aria-invalid', 'true');
-    await expect(page.locator('.leaderboard-context')).toHaveText('Màn 212');
+    await expect(page.getByRole('button', { name: 'Chọn màn', exact: true })).toContainText('212');
   }
   await input.press('Escape');
   await expect(page.locator('#leaderboard-stage-picker')).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Chọn màn', exact: true })).toBeFocused();
   await page.getByRole('button', { name: 'Chọn màn', exact: true }).click();
   await input.fill('9007199254740900'); await input.press('Enter');
-  await expect(page.locator('.leaderboard-context')).toHaveText('Màn 9007199254740900');
+  await expect(page.getByRole('button', { name: 'Chọn màn', exact: true })).toContainText('9007199254740900');
   expect(await page.evaluate(() => window.rankRequests.at(-1).level)).toBe(9007199254740900);
   await page.screenshot({ path: 'test-results/ranking-stage-picker-confirmed.png' });
 });

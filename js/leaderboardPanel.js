@@ -30,7 +30,6 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
   const modes = tabs('Chế độ', [...GAME_MODES].sort((a, b) => (a.id === 'endless') - (b.id === 'endless')).map(item => [item.id, item.label]), 'mode');
   const filters = document.createElement('div'); filters.className = 'leaderboard-filters';
   const footer = document.createElement('div'); footer.className = 'leaderboard-footer';
-  const context = document.createElement('p'); context.className = 'leaderboard-context';
   const levelLabel = button(''); levelLabel.classList.add('leaderboard-level'); levelLabel.setAttribute('aria-label', 'Chọn màn');
   const level = { value: '1' };
   const refresh = button('Làm mới');
@@ -44,7 +43,7 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
   next.setAttribute('aria-label', 'Sau'); next.textContent = '›';
   const pageLabel = document.createElement('span');
   pager.append(previous, pageLabel, next);
-  filters.append(levelLabel); footer.append(filters, pager); results.append(status); content.append(games, modes, context, results, own, footer);
+  filters.append(levelLabel); footer.append(filters, pager); results.append(status); content.append(games, modes, results, own, footer);
   const owner = surface.owner || getActiveGameScope() || getAppPageScope();
   const release = owner?.own(() => scope.dispose(), 'cleanup');
   const modal = openAppModal({ ...surface, id: 'rankings-modal', title: 'Bảng xếp hạng', icon: 'trophy', content, onDestroy: () => { generation++; scope.dispose(); release?.forget(); }, onClose });
@@ -61,8 +60,6 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
     for (const item of modes.children) item.setAttribute('aria-pressed', String(item.dataset.rankMode === selectedMode));
     levelLabel.hidden = !NORMAL_MODE_IDS.includes(selectedMode);
     levelLabel.textContent = `Màn ${level.value} ▾`; levelLabel.title = `Màn ${level.value}`;
-    context.textContent = NORMAL_MODE_IDS.includes(selectedMode) ? `Màn ${level.value}` : '';
-    context.hidden = !NORMAL_MODE_IDS.includes(selectedMode);
   }
   function controls(data = null) {
     refresh.disabled = loading;

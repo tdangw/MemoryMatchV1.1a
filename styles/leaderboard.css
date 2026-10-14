@@ -39,8 +39,6 @@
 [data-rank-mode="normal"] .leaderboard-grade { background: #87cfe422; color: #9bd6ef; }
 [data-rank-mode="hard"] .leaderboard-grade { background: #ffdb8122; color: #ffe099; }
 [data-rank-mode="superHard"] .leaderboard-grade { background: #bc98e222; color: #d5b2f6; }
-.leaderboard-context { flex-shrink: 0; margin: 0; padding: 0 4px; font-size: 13px; color: var(--ranking-muted); }
-.leaderboard-context[hidden] { display: none; }
 .leaderboard-status { margin: 0; padding: 24px 12px; font-size: 13px; text-align: center; color: var(--ranking-muted); }
 .leaderboard-status:empty { display: none; }
 .leaderboard-results[data-offline="true"] .leaderboard-status { padding: 8px 12px; }

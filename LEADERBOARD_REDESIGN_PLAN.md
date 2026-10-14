@@ -15,6 +15,7 @@ Làm lại bảng xếp hạng theo phong cách Vườn đêm, nội dung dành 
 
 ## 2. Nguồn thiết kế và quyết định
 
+- Điều chỉnh sau nghiệm thu ngày2026-10-14 theo yêu cầu người dùng: bỏ nhãn Màn N phía trên bảng để không lặp; chỉ giữ nút chọn màn ở footer. Quyết định này thay phần nhãn ngữ cảnh đầu bảng trong thiết kế ban đầu bên dưới.
 - `docs/design/leaderboard/leaderboard-reference.png`: ảnh minh họa đã được người dùng đánh giá tốt hơn. Đây là tham chiếu mỹ thuật, không phải nguồn luật hoặc dữ liệu thật.
 - `docs/design/leaderboard/night-garden-background-master.png`: nền mới, không chứa UI/chữ, nguồn PNG để xuất bản runtime sau.
 - Điều chỉnh sau ảnh tham chiếu: chuyển ô chọn màn xuống cạnh phân trang; giữ phân trang ở giữa. Đặt nhãn nhỏ Màn N ở đầu bảng để vẫn nhận biết bảng đang xem.
