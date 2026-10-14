@@ -1,11 +1,40 @@
-import { exportPersistentSnapshot, loadSyncMetadata, updateSyncMetadata, subscribeToLocalCommit } from './persistence.js';
-import { collectRankingResults, rankingBoardId, comparePublicResults } from './rankingResult.js';
+import { loadPersistentGameData, loadProfileOwner, migrateLevelRankingsBatch, updateSyncMetadata, updateSyncMetadataPair, subscribeToLocalCommit } from './persistence.js';
+import { collectProgressRankingResults, rankingBoardId, comparePublicResults } from './rankingResult.js';
+import { gameState } from './gameState.js';
+import { getRankingOwner } from './rankingOwner.js';
+import { keepProgressBest, sameRankingOwner, validateProgressResult } from './progressRankingModel.js';
 import { getFirebaseBackend } from './firebaseBackend.js';
 import { getAccountService } from './accountService.js';
 import { submitRankingResult } from './leaderboardStore.js';
 import { createGameShellLifecycle } from './gameShell/gameShellLifecycle.js';
-const QUEUE_LIMIT = 2000;
+const QUEUE_LIMIT = 9;
 let instance = null;
+export function normalizeLevelRankingQueue(value, owner = null) {
+  const queue = {};
+  for (const [id, result] of Object.entries(value?.queue || {})) {
+    if (Object.keys(queue).length >= QUEUE_LIMIT) break;
+    if (!validateProgressResult(result)) continue;
+    const owned = !owner || (owner.profileQueue ? result.owner.profileId === owner.profileId && (!result.owner.uid || result.owner.uid === owner.uid)
+      : owner.uid ? result.owner.uid === owner.uid : result.owner.profileId === owner.profileId && result.owner.uid === null);
+    if (owned && id === `${result.owner.uid || result.owner.profileId}:${rankingBoardId(result)}`) queue[id] = result;
+  }
+  const prefix = owner && `${owner.profileQueue ? owner.profileId : owner.uid || owner.profileId}:v3_`;
+  const receipts = Object.fromEntries(Object.entries(value?.receipts || {}).filter(([key, id]) => (!prefix || key.startsWith(prefix)) && key.length <= 512 && /:v3_(memory-match|link-connect|triple-connect)_(adventure|challenge|endless)$/.test(key) && /^[a-f0-9-]{36}$/.test(id)).slice(0, QUEUE_LIMIT));
+  return { queue, receipts, deferred: false };
+}
+export function adoptLevelRankingQueue(source, target, identity) {
+  const from = normalizeLevelRankingQueue(source, { ...identity, profileQueue: true });
+  const to = normalizeLevelRankingQueue(target, { uid: identity.uid });
+  if (identity.firstUid !== identity.uid) return [from, to];
+  for (const [id, result] of Object.entries(from.queue)) {
+    if (!validateProgressResult(result) || result.owner.profileId !== identity.profileId || result.owner.uid && result.owner.uid !== identity.uid) continue;
+    const bound = { ...result, owner: { ...result.owner, uid: identity.uid } };
+    const key = `${identity.uid}:${rankingBoardId(bound)}`;
+    if (to.receipts[key] !== bound.id && (!to.queue[key] || comparePublicResults(bound, to.queue[key], 'progress') < 0)) to.queue[key] = bound;
+    delete from.queue[id]; from.receipts[id] = result.id;
+  }
+  return [from, to];
+}
 export function initializeLeaderboardService() {
   if (instance) return instance;
   const scope = createGameShellLifecycle();
@@ -17,7 +46,7 @@ export function initializeLeaderboardService() {
   let operations = null;
   let backend = null;
   let nextAllowedAt = 0;
-  const key = owner => `ranking:${backend.environment}:${owner.uid ? `uid:${owner.uid}` : `profile:${owner.profileId}`}`;
+  const key = owner => `ranking:v3:${backend.environment}:${owner.uid ? `uid:${owner.uid}` : `profile:${owner.profileId}`}`;
   const ownerKey = result => `${result.owner.uid || result.owner.profileId}:${rankingBoardId(result)}`;
   const schedule = (delay = 0) => {
     if (!scope.active || timer !== null || retries >= 5) return;
@@ -26,7 +55,25 @@ export function initializeLeaderboardService() {
   function recover(progress = null) {
     scanning = scanning.then(async () => {
       if (!scope.active || !backend) return;
-      const results = collectRankingResults(progress ? { profile: { data: { progress } }, chapters: [] } : await exportPersistentSnapshot());
+      if (!progress) {
+        const owner = getRankingOwner();
+        const profile = await loadProfileOwner();
+        const current = () => scope.active && sameRankingOwner(getRankingOwner(), owner);
+        if (owner && profile?.id === owner.profileId && profile.uid === owner.uid) {
+          let migrated;
+          do { migrated = await migrateLevelRankingsBatch(owner, current); } while (!migrated.complete && current());
+          if (!current()) return;
+          for (const game of ['memoryMatch', 'linkConnect', 'tripleConnect']) {
+            const target = gameState.progress[game].levelBestsV3 ||= {};
+            for (const [family, result] of Object.entries(migrated.progress[game]?.levelBestsV3 || {})) {
+              if (sameRankingOwner(result.owner, owner)) target[family] = keepProgressBest(target[family], result);
+            }
+          }
+          gameState.progress.levelRankingMigration = migrated.progress.levelRankingMigration;
+        }
+        progress = (await loadPersistentGameData()).progress;
+      }
+      const results = collectProgressRankingResults(progress);
       const groups = new Map();
       for (const result of results) {
         const groupKey = key(result.owner);
@@ -34,8 +81,8 @@ export function initializeLeaderboardService() {
         groups.get(groupKey).push(result);
       }
       for (const [groupKey, group] of groups) await updateSyncMetadata(groupKey, previous => {
-        const next = { queue: { ...previous?.queue }, receipts: { ...previous?.receipts }, deferred: progress ? previous?.deferred || false : false };
-        let changed = !previous || next.deferred !== previous.deferred;
+        const next = normalizeLevelRankingQueue(previous, group[0].owner);
+        let changed = JSON.stringify(next) !== JSON.stringify(previous);
         let size = Object.keys(next.queue).length;
         for (const result of group) {
           const id = ownerKey(result);
@@ -61,11 +108,12 @@ export function initializeLeaderboardService() {
     const current = () => scope.active && getAccountService()?.getIdentity()?.uid === identity.uid && backend.auth.currentUser?.uid === identity.uid;
     task = (async () => {
       await scanning;
-      const groupKeys = [key({ uid: identity.uid })];
-      if (identity.firstUid === identity.uid) groupKeys.push(key({ profileId: identity.profileId, uid: null }));
+      const accountKey = key({ uid: identity.uid });
+      if (identity.firstUid === identity.uid) await updateSyncMetadataPair([key({ profileId: identity.profileId, uid: null }), accountKey], values => adoptLevelRankingQueue(values[0], values[1], identity), current);
+      const groupKeys = [accountKey];
       let submitted = 0;
       for (const groupKey of groupKeys) {
-      const pending = await loadSyncMetadata(groupKey);
+      const pending = await updateSyncMetadata(groupKey, previous => normalizeLevelRankingQueue(previous, { uid: identity.uid }), current);
       for (const [id, result] of Object.entries(pending?.queue || {})) {
         if (!current()) return false;
         if (result.owner.uid ? result.owner.uid !== identity.uid : result.owner.profileId !== identity.profileId || identity.firstUid !== identity.uid) continue;
@@ -91,7 +139,10 @@ export function initializeLeaderboardService() {
     })().catch(error => {
       if (current()) { retries++; message = `Chưa gửi được (${error.code || error.name}); sẽ gửi lại khi có mạng.`; schedule(Math.min(900000, 15000 * 2 ** retries)); }
       return false;
-    }).finally(() => { task = null; });
+    }).finally(() => {
+      task = null;
+      if (scope.active && getAccountService()?.getIdentity()?.uid !== identity.uid) schedule();
+    });
     return task;
   }
   const service = { recover, flush, getState: () => ({ message, operations }), dispose() { scope.dispose(); if (instance === service) instance = null; } };
@@ -100,11 +151,16 @@ export function initializeLeaderboardService() {
     backend = value;
     if (!backend || !scope.active) return;
     scope.own(subscribeToLocalCommit(({ patch }) => { if (patch.progress) void recover(patch.progress); else if (patch.restored) void recover(); }), 'listener');
-    scope.own(getAccountService().subscribe(state => { if (state.bound && !state.conflict) schedule(); }), 'listener');
+    let previousUid;
+    scope.own(getAccountService().subscribe(state => {
+      const uid = getAccountService().getIdentity()?.uid;
+      if (state.bound && !state.conflict && uid !== previousUid) { previousUid = uid; retries = 0; nextAllowedAt = 0; void recover(); }
+      if (state.bound && !state.conflict) schedule();
+    }), 'listener');
     scope.listen(window, 'online', () => { retries = 0; schedule(); });
     scope.listen(window, 'pagehide', event => { if (!event.persisted) service.dispose(); });
     return recover();
-  });
+  }).catch(() => { message = 'Chưa thể đồng bộ. Kỷ lục vẫn được giữ trên máy.'; });
   return service;
 }
 export function getLeaderboardService() { return instance; }

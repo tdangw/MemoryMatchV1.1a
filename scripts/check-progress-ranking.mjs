@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import { indexedDB, IDBKeyRange, IDBObjectStore } from 'fake-indexeddb';
 import { createProgressRun, reduceProgressRun, normalizeProgressRun, createProgressResult, keepProgressBest, highestOwnedAdventureLevel } from '../js/progressRankingModel.js';
-import { rankingBoardId, validateRankingResult } from '../js/rankingResult.js';
+import { rankingBoardId, validateRankingResult, collectProgressRankingResults } from '../js/rankingResult.js';
+import { adoptLevelRankingQueue, normalizeLevelRankingQueue } from '../js/leaderboardService.js';
 import { gameState, recordMemoryMatchResult } from '../js/gameState.js';
 import { beginRankedAttempt, stageRankedAttempt, checkpointRankedRun } from '../js/rankingRules.js';
 import { setRankingOwner } from '../js/rankingOwner.js';
@@ -9,6 +10,22 @@ import { normalizePairSnapshot } from '../js/pairSessionSnapshot.js';
 import { openChapterDatabase, writeChapterProfile, readChapterProfile, migrateChapterLevelRankings, ensureChapterProfileOwner } from '../js/chapterStore.js';
 globalThis.indexedDB = indexedDB; globalThis.IDBKeyRange = IDBKeyRange;
 const owner = { profileId: 'fixture', uid: null };
+const localQueue = {}; const accountQueue = {};
+for (const gameId of ['memory-match', 'link-connect', 'triple-connect']) for (const family of ['adventure', 'challenge', 'endless']) {
+  const local = createProgressResult(gameId, family, 20, owner);
+  localQueue[`fixture:${rankingBoardId(local)}`] = local;
+  const account = createProgressResult(gameId, family, 10, { ...owner, uid: 'a' });
+  accountQueue[`a:${rankingBoardId(account)}`] = account;
+}
+const adopted = adoptLevelRankingQueue({ queue: localQueue }, { queue: accountQueue }, { uid: 'a', firstUid: 'a', profileId: 'fixture' });
+assert.equal(Object.keys(adopted[0].queue).length, 0);
+assert.equal(Object.keys(adopted[1].queue).length, 9);
+assert.deepEqual(normalizeLevelRankingQueue({ queue: { 'a:v3_memory-match_adventure': {} }, deferred: true }), { queue: {}, receipts: {}, deferred: false });
+assert(Object.values(adopted[1].queue).every(result => result.levelReached === 20 && result.owner.uid === 'a'));
+const foreign = Object.fromEntries(Object.values(accountQueue).map(result => { const other = { ...result, owner: { ...result.owner, uid: 'b' } }; return [`b:${rankingBoardId(other)}`, other]; }));
+assert.equal(Object.keys(adoptLevelRankingQueue({ queue: localQueue }, { queue: foreign }, { uid: 'a', firstUid: 'a', profileId: 'fixture' })[1].queue).length, 9);
+assert.equal(Object.keys(adoptLevelRankingQueue({ queue: localQueue }, null, { uid: 'b', firstUid: 'a', profileId: 'fixture' })[0].queue).length, 9);
+assert.equal(collectProgressRankingResults({ memoryMatch: { levelBestsV3: { extra: localQueue[Object.keys(localQueue)[0]], adventure: createProgressResult('link-connect', 'adventure', 100, owner) } } }).length, 0);
 for (const game of ['memory-match', 'link-connect', 'triple-connect']) for (const mode of ['challenge', 'endless']) {
   let run = createProgressRun(game, mode, 1, owner);
   for (let n = 1; n <= 10; n++) {
@@ -54,6 +71,15 @@ assert.equal(migrated.envelope.data.coins, 99); assert.equal(migrated.envelope.d
 assert.equal(migrated.envelope.data.progress.memoryMatch.sessionsByMode.challenge.level, 9);
 assert.equal(migrated.envelope.data.progress.memoryMatch.levelBestsV3.challenge, undefined);
 assert.equal((await migrateChapterLevelRankings(db, identity, migrated.envelope.revision)).envelope.revision, migrated.envelope.revision);
+const stale = structuredClone(envelope); stale.revision = migrated.envelope.revision + 1;
+const savedStale = await writeChapterProfile(db, stale, migrated.envelope.revision);
+assert.equal(savedStale.data.progress.levelRankingMigration.complete, true, 'A queued pre-migration save cannot reset the durable migration cursor.');
+assert.equal(savedStale.data.progress.memoryMatch.levelBestsV3.adventure.levelReached, 100000);
+const corruptSummary = structuredClone(savedStale); corruptSummary.revision++;
+corruptSummary.data.progress.memoryMatch.levelBestsV3.adventure = createProgressResult('link-connect', 'adventure', 100001, identity);
+const repairedSummary = await writeChapterProfile(db, corruptSummary, savedStale.revision);
+assert.equal(repairedSummary.data.progress.memoryMatch.levelBestsV3.adventure.gameId, 'memory-match');
+assert.equal(repairedSummary.data.progress.memoryMatch.levelBestsV3.adventure.levelReached, 100000);
 db.close();
 setRankingOwner({ id: 'new-policy', uid: 'new-policy-owner' });
 for (const gameId of ['memory-match', 'link-connect', 'triple-connect']) for (const mode of ['challenge', 'endless']) {

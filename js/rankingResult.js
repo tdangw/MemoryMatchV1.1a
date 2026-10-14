@@ -1,5 +1,5 @@
 import { NORMAL_MODE_IDS, MAX_ADVENTURE_LEVEL } from './adventureProgress.js';
-import { validateProgressResult, RANKING_FAMILIES } from './progressRankingModel.js';
+import { validateProgressResult, normalizeProgressBests, RANKING_FAMILIES } from './progressRankingModel.js';
 const games = new Set(['memory-match', 'link-connect', 'triple-connect']);
 export function rankingBoardId({ gameId, mode, family, level, kind, rulesVersion = kind === 'progress' ? 3 : kind === 'run' ? 2 : 1 }) {
   if (!games.has(gameId)) throw new RangeError('Unknown ranking game.');
@@ -21,7 +21,12 @@ export function validateRankingResult(result) {
   } catch { return false; }
 }
 export function comparePublicResults(a, b, kind) {
+  if (kind === 'progress') return b.levelReached - a.levelReached;
   return kind === 'time' ? a.durationMs - b.durationMs : b.levelReached - a.levelReached || b.totalScore - a.totalScore;
+}
+export function collectProgressRankingResults(progress) {
+  return [['memoryMatch', 'memory-match'], ['linkConnect', 'link-connect'], ['tripleConnect', 'triple-connect']]
+    .flatMap(([key, gameId]) => Object.values(normalizeProgressBests(progress?.[key]?.levelBestsV3, gameId)));
 }
 export function collectRankingResults(snapshot) {
   const records = [];

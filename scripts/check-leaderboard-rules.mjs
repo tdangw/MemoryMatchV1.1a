@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { initializeTestEnvironment, assertFails, assertSucceeds } from '@firebase/rules-unit-testing';
 import { doc, setDoc, getDocs, collection, query, limit, serverTimestamp } from 'firebase/firestore';
 import { submitRankingResult, readLeaderboard, clearLeaderboardCache, getLeaderboardCacheDiagnostics } from '../js/leaderboardStore.js';
+import { createProgressResult } from '../js/progressRankingModel.js';
 const env = await initializeTestEnvironment({ projectId: 'demo-memory-match', firestore: { host: '127.0.0.1', port: 8180, rules: readFileSync('firestore.rules', 'utf8') } });
 await env.clearFirestore();
 const result = { rulesVersion: 1, id: crypto.randomUUID(), gameId: 'memory-match', mode: 'easy', level: 1, kind: 'time', durationMs: 1000, score: 100, stars: 3, outcome: 'won', recordedAt: Date.now(), owner: { profileId: 'fixture', uid: 'a' } };
@@ -11,6 +12,40 @@ try {
   const stranger = env.authenticatedContext('b').firestore();
   const publicDatabase = env.unauthenticatedContext().firestore();
   const submit = (value, uid = 'a', db = database) => submitRankingResult({ database: db, environment: 'test', uid, playerName: '<img src=x onerror=alert(1)>', result: value });
+  for (const gameId of ['memory-match', 'link-connect', 'triple-connect']) for (const family of ['adventure', 'challenge', 'endless']) {
+    const progress = createProgressResult(gameId, family, 100000, { profileId: 'fixture', uid: 'a' });
+    assert.equal((await assertSucceeds(submit(progress))).writes, 1);
+    const first = await readLeaderboard({ database, environment: 'test', board: progress, uid: 'a' });
+    assert.equal(first.own.levelReached, 100000);
+    const timestamp = first.own.reachedAt;
+    assert.equal((await submit({ ...progress, id: crypto.randomUUID(), levelReached: 99999 })).writes, 0);
+    assert.equal((await submit({ ...progress, id: crypto.randomUUID() })).writes, 0);
+    clearLeaderboardCache();
+    assert.deepEqual((await readLeaderboard({ database, environment: 'test', board: progress, uid: 'a' })).own.reachedAt, timestamp);
+    await Promise.all([submit({ ...progress, levelReached: 100001 }), submit({ ...progress, levelReached: 100002 })]);
+    clearLeaderboardCache();
+    assert.equal((await readLeaderboard({ database, environment: 'test', board: progress, uid: 'a' })).own.levelReached, 100002);
+    await assertFails(submit({ ...progress, levelReached: 100003 }, 'a', stranger));
+    const record = { rulesVersion: 3, kind: 'progress', resultId: crypto.randomUUID(), gameId, family, levelReached: 100003, playerName: 'A', reachedAt: serverTimestamp() };
+    const ref = doc(database, `gamespaces/test/leaderboards/v3_${gameId}_${family}/entries/a`);
+    await assertFails(setDoc(ref, { ...record, score: 1 }));
+    await assertFails(setDoc(ref, { ...record, levelReached: 0 }));
+    await assertFails(setDoc(ref, { ...record, reachedAt: timestamp }));
+  }
+  const progressBoard = createProgressResult('memory-match', 'adventure', 100, { profileId: 'fixture', uid: 'a' });
+  for (let i = 0; i < 21; i++) {
+    const uid = `progress-${String(i).padStart(2, '0')}`;
+    await submit({ ...progressBoard, id: crypto.randomUUID() }, uid, env.authenticatedContext(uid).firestore());
+  }
+  clearLeaderboardCache();
+  const seenProgress = [];
+  for (let page = 1; page <= 3; page++) {
+    const data = await readLeaderboard({ database: publicDatabase, environment: 'test', board: progressBoard, page });
+    seenProgress.push(...data.top.map(row => row.uid));
+    assert(data.reads <= 11);
+    assert.equal(data.loadedPages.length, page);
+  }
+  assert.equal(new Set(seenProgress).size, 22);
   assert.equal((await assertSucceeds(submit(result))).writes, 1);
   assert.equal((await submit({ ...result, durationMs: 2000 })).writes, 0);
   assert.equal((await submit({ ...result, id: crypto.randomUUID() })).writes, 0);

@@ -68,7 +68,7 @@ service cloud.firestore {
       }
     }
     function validEntry(data, board) {
-      return data.rulesVersion in [1, 2] && data.resultId is string && data.resultId.matches('^[a-f0-9-]{36}$')
+      return data.rulesVersion == 3 ? validProgressEntry(data, board) : data.rulesVersion in [1, 2] && data.resultId is string && data.resultId.matches('^[a-f0-9-]{36}$')
         && data.gameId in ['memory-match', 'link-connect', 'triple-connect']
         && data.playerName is string && data.playerName.size() > 0 && data.playerName.size() <= 40
         && data.updatedAt == request.time
@@ -87,8 +87,18 @@ service cloud.firestore {
             && data.totalScore is int && data.totalScore >= 0 && data.totalScore <= 9007199254740991
             && (data.rulesVersion == 2 ? data.outcome == 'won' : data.outcome in ['won', 'lost']));
     }
+    function validProgressEntry(data, board) {
+      return data.keys().hasOnly(['rulesVersion', 'resultId', 'gameId', 'family', 'kind', 'playerName', 'reachedAt', 'levelReached'])
+        && data.keys().hasAll(['rulesVersion', 'resultId', 'gameId', 'family', 'kind', 'playerName', 'reachedAt', 'levelReached'])
+        && data.resultId is string && data.resultId.matches('^[a-f0-9-]{36}$') && data.kind == 'progress'
+        && data.gameId in ['memory-match', 'link-connect', 'triple-connect'] && data.family in ['adventure', 'challenge', 'endless']
+        && board == 'v3_' + data.gameId + '_' + data.family
+        && data.playerName is string && data.playerName.size() > 0 && data.playerName.size() <= 40
+        && data.levelReached is int && data.levelReached > 0 && data.levelReached <= 9007199254740900
+        && data.reachedAt == request.time;
+    }
     function betterEntry(next, previous) {
-      return next.kind == previous.kind && (next.kind == 'time' ? next.durationMs < previous.durationMs
+      return next.kind == previous.kind && (next.kind == 'progress' ? next.levelReached > previous.levelReached : next.kind == 'time' ? next.durationMs < previous.durationMs
         : next.levelReached > previous.levelReached || next.levelReached == previous.levelReached && next.totalScore > previous.totalScore);
     }
     match /gamespaces/{space}/leaderboards/{board}/entries/{uid} {

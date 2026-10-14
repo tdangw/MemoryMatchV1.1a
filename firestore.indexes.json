@@ -2,6 +2,11 @@
   "indexes": [
     { "collectionGroup": "entries", "queryScope": "COLLECTION", "fields": [
       { "fieldPath": "levelReached", "order": "DESCENDING" },
+      { "fieldPath": "reachedAt", "order": "ASCENDING" },
+      { "fieldPath": "__name__", "order": "ASCENDING" }
+    ] },
+    { "collectionGroup": "entries", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "levelReached", "order": "DESCENDING" },
       { "fieldPath": "totalScore", "order": "DESCENDING" },
       { "fieldPath": "__name__", "order": "ASCENDING" }
     ] }

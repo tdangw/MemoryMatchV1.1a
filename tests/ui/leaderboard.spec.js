@@ -7,7 +7,7 @@ async function ready(page) {
 async function result(page, durationMs, score = 100) {
   await page.evaluate(async ({ durationMs, score }) => {
     const state = await import('/js/gameState.js');
-    state.recordMemoryMatchResult({ mode: 'easy', level: 1, durationMs, score, stars: 3 });
+    state.recordMemoryMatchResult({ mode: 'easy', level: durationMs, durationMs, score, stars: 3 });
     await (await import('/js/persistence.js')).saveProgress(state.gameState.progress);
     await (await import('/js/leaderboardService.js')).getLeaderboardService().recover();
   }, { durationMs, score });
@@ -16,7 +16,7 @@ async function own(page) {
   return page.evaluate(async () => {
     const backend = await (await import('/js/firebaseBackend.js')).getFirebaseBackend();
     const store = await import('/js/leaderboardStore.js'); store.clearLeaderboardCache();
-    return (await store.readLeaderboard({ database: backend.database, environment: backend.environment, uid: backend.auth.currentUser.uid, board: { gameId: 'memory-match', mode: 'easy', level: 1, kind: 'time' } })).own;
+    return (await store.readLeaderboard({ database: backend.database, environment: backend.environment, uid: backend.auth.currentUser.uid, board: { gameId: 'memory-match', family: 'adventure', kind: 'progress', rulesVersion: 3 } })).own;
   });
 }
 test('durable offline result retries once; slow attempts cannot overwrite best; public names render as text', async ({ page, context }) => {
@@ -24,30 +24,27 @@ test('durable offline result retries once; slow attempts cannot overwrite best; 
   await page.goto('/'); await ready(page);
   await page.evaluate(async () => (await import('/js/accountService.js')).getAccountService().setPlayerName('<img src=x>'));
   await context.setOffline(true);
-  await result(page, 1100, 500);
+  await result(page, 11, 500);
   expect(await page.evaluate(async () => (await import('/js/leaderboardService.js')).getLeaderboardService().flush())).toBe(false);
   await context.setOffline(false);
   await page.evaluate(async () => (await import('/js/leaderboardService.js')).getLeaderboardService().flush());
-  await expect.poll(async () => (await own(page))?.durationMs).toBe(1100);
-  await result(page, 2000, 9999);
+  await expect.poll(async () => (await own(page))?.levelReached).toBe(11);
+  await result(page, 10, 9999);
   await page.evaluate(async () => (await import('/js/leaderboardService.js')).getLeaderboardService().flush());
-  expect((await own(page)).score).toBe(500);
-  await result(page, 1000, 50);
+  expect((await own(page)).levelReached).toBe(11);
+  await result(page, 12, 50);
   await page.evaluate(async () => (await import('/js/leaderboardService.js')).getLeaderboardService().flush());
-  expect((await own(page)).score).toBe(50);
+  expect((await own(page)).levelReached).toBe(12);
   await page.locator('[data-dock-action="ranking"]').click();
   await expect(page.locator('#rankings-modal')).toBeVisible();
-  await page.getByRole('button', { name: 'Chọn màn', exact: true }).click();
-  const stages = page.getByRole('listbox', { name: 'Màn chơi' });
-  await stages.press('Home'); await stages.press('Enter');
   await expect(page.locator('.leaderboard-list')).toContainText('<img src=x>');
   await expect(page.locator('.leaderboard-list img')).toHaveCount(0);
-  await expect(page.locator('.leaderboard-list .is-self')).toContainText('00:01,00');
+  await expect(page.locator('.leaderboard-list .is-self')).toContainText('12');
   await expect(page.locator('.leaderboard-own')).toHaveText('');
   await page.locator('.adventure-screen .adventure-exit').click();
   await expect(page.locator('#rankings-modal')).toHaveCount(0);
   await page.reload(); await ready(page);
-  expect((await own(page)).durationMs).toBe(1000);
+  expect((await own(page)).levelReached).toBe(12);
 });
 
 test('a queued result remains bound to the original UID after switching to another Google account', async ({ browser, baseURL }) => {
@@ -89,16 +86,16 @@ test('a queued result remains bound to the original UID after switching to anoth
   expect(await second.evaluate(async () => {
     const backend = await (await import('/js/firebaseBackend.js')).getFirebaseBackend();
     const store = await import('/js/leaderboardStore.js'); store.clearLeaderboardCache();
-    return (await store.readLeaderboard({ database: backend.database, environment: backend.environment, uid: backend.auth.currentUser.uid, board: { gameId: 'memory-match', mode: 'endless', kind: 'run', rulesVersion: 2 } })).own;
+    return (await store.readLeaderboard({ database: backend.database, environment: backend.environment, uid: backend.auth.currentUser.uid, board: { gameId: 'memory-match', family: 'endless', kind: 'progress', rulesVersion: 3 } })).own;
   })).toBeNull();
   await result(second, 1000);
   await second.evaluate(async () => (await import('/js/leaderboardService.js')).getLeaderboardService().flush());
-  expect((await own(second)).durationMs).toBe(1000);
+  expect((await own(second)).levelReached).toBe(1000);
   await a.close(); await b.close();
 });
 
 
-test('v2 winning settlement is durable offline, retries after reload once and ignores an unfinished board', async ({ page, context }) => {
+test('v3 winning settlement is durable offline, retries after reload once and ignores an unfinished board', async ({ page, context }) => {
   test.setTimeout(60000);
   await page.goto('/'); await ready(page);
   await page.evaluate(async () => {
@@ -117,25 +114,25 @@ test('v2 winning settlement is durable offline, retries after reload once and ig
     const persistence = await import('/js/persistence.js');
     const durable = await persistence.loadPersistentGameData();
     const backend = await (await import('/js/firebaseBackend.js')).getFirebaseBackend();
-    const pending = await persistence.loadSyncMetadata(`ranking:${backend.environment}:uid:${backend.auth.currentUser.uid}`);
-    return { result: durable.progress.memoryMatch.runBestsV2.endless, queue: Object.values(pending.queue).filter(item => item.rulesVersion === 2) };
+    const pending = await persistence.loadSyncMetadata(`ranking:v3:${backend.environment}:uid:${backend.auth.currentUser.uid}`);
+    return { result: durable.progress.memoryMatch.levelBestsV3.endless, queue: Object.values(pending.queue).filter(item => item.rulesVersion === 3) };
   });
-  expect(checkpoint.result).toMatchObject({ levelReached: 1, totalScore: 1234, rulesVersion: 2, outcome: 'won' });
+  expect(checkpoint.result).toMatchObject({ levelReached: 1, rulesVersion: 3, kind: 'progress' });
   expect(checkpoint.queue).toHaveLength(1);
   await context.setOffline(false); await page.reload(); await ready(page);
   const read = () => page.evaluate(async () => {
     const backend = await (await import('/js/firebaseBackend.js')).getFirebaseBackend();
     const store = await import('/js/leaderboardStore.js'); store.clearLeaderboardCache();
-    return (await store.readLeaderboard({ database: backend.database, environment: backend.environment, uid: backend.auth.currentUser.uid, board: { gameId: 'memory-match', mode: 'endless', kind: 'run', rulesVersion: 2 } })).own;
+    return (await store.readLeaderboard({ database: backend.database, environment: backend.environment, uid: backend.auth.currentUser.uid, board: { gameId: 'memory-match', family: 'endless', kind: 'progress', rulesVersion: 3 } })).own;
   });
   await page.evaluate(async () => (await import('/js/leaderboardService.js')).getLeaderboardService().flush());
-  await expect.poll(async () => (await read())?.totalScore).toBe(1234);
+  await expect.poll(async () => (await read())?.levelReached).toBe(1);
   expect((await read()).resultId).toBe(checkpoint.result.id);
   const pendingCount = await page.evaluate(async () => {
     const backend = await (await import('/js/firebaseBackend.js')).getFirebaseBackend();
     const service = (await import('/js/leaderboardService.js')).getLeaderboardService();
     await service.recover(); await service.flush();
-    const pending = await (await import('/js/persistence.js')).loadSyncMetadata(`ranking:${backend.environment}:uid:${backend.auth.currentUser.uid}`);
+    const pending = await (await import('/js/persistence.js')).loadSyncMetadata(`ranking:v3:${backend.environment}:uid:${backend.auth.currentUser.uid}`);
     return Object.keys(pending.queue).length;
   });
   expect(pendingCount).toBe(0);
@@ -152,14 +149,14 @@ test('a failed real winning settlement rolls checkpoint back and never creates a
     let commits = 0; const unsubscribe = persistence.subscribeToLocalCommit(() => commits++);
     const original = IDBObjectStore.prototype.put;
     IDBObjectStore.prototype.put = function(value, ...args) {
-      if (this.name === 'profile' && value.data?.progress.memoryMatch.runBestsV2?.endless) throw new DOMException('Fixture quota failure', 'QuotaExceededError');
+      if (this.name === 'profile' && value.data?.progress.memoryMatch.levelBestsV3?.endless) throw new DOMException('Fixture quota failure', 'QuotaExceededError');
       return original.call(this, value, ...args);
     };
     gameState.score = 2000; gameState.matchedPairs = gameState.totalPairs;
     try { await (await import('/js/logic.js')).checkLevelComplete(); } finally { IDBObjectStore.prototype.put = original; unsubscribe(); }
     const backend = await (await import('/js/firebaseBackend.js')).getFirebaseBackend();
-    const pending = await persistence.loadSyncMetadata(`ranking:${backend.environment}:uid:${backend.auth.currentUser.uid}`);
-    return { commits, checkpoint: gameState.progress.memoryMatch.runBestsV2?.endless || null, queued: Object.values(pending?.queue || {}).filter(result => result.rulesVersion === 2).length };
+    const pending = await persistence.loadSyncMetadata(`ranking:v3:${backend.environment}:uid:${backend.auth.currentUser.uid}`);
+    return { commits, checkpoint: gameState.progress.memoryMatch.levelBestsV3?.endless || null, queued: Object.values(pending?.queue || {}).filter(result => result.rulesVersion === 3).length };
   });
   expect(data).toEqual({ commits: 0, checkpoint: null, queued: 0 });
 });
@@ -193,12 +190,12 @@ for (const game of [{ id: 'memory-match', key: 'memoryMatch' }, { id: 'link-conn
         await page.waitForFunction(() => !document.querySelector('.triple-connect__tray-flight, .triple-connect__ghost'));
       }
     }
-    await expect.poll(() => page.evaluate(async ({ key, mode }) => (await (await import('/js/persistence.js')).loadPersistentGameData()).progress[key].runBestsV2[mode]?.levelReached, { key: game.key, mode })).toBe(1);
+    await expect.poll(() => page.evaluate(async ({ key, mode }) => (await (await import('/js/persistence.js')).loadPersistentGameData()).progress[key].levelBestsV3[mode]?.levelReached, { key: game.key, mode })).toBe(1);
     const data = await page.evaluate(async ({ key, mode }) => {
       const durable = await (await import('/js/persistence.js')).loadPersistentGameData();
-      return { checkpoint: durable.progress[key].runBestsV2[mode], run: durable.progress[key].activeRankedRuns[mode] };
+      return { checkpoint: durable.progress[key].levelBestsV3[mode], run: durable.progress[key].activeRankedRuns[mode] };
     }, { key: game.key, mode });
-    expect(data.checkpoint).toMatchObject({ rulesVersion: 2, outcome: 'won', levelReached: 1, gameId: game.id, mode });
+    expect(data.checkpoint).toMatchObject({ rulesVersion: 3, kind: 'progress', levelReached: 1, gameId: game.id, family: mode });
     expect(data.run.finalized).toBe(false);
   });
 }

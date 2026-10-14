@@ -1,0 +1,52 @@
+{
+  "project": "memorymatchv1-1a",
+  "release": {
+    "name": "projects/memorymatchv1-1a/releases/cloud.firestore",
+    "rulesetName": "projects/memorymatchv1-1a/rulesets/951360d8-c561-4d1f-9b9e-e69b87a54a17",
+    "createTime": "2026-10-12T22:04:09.451672Z",
+    "updateTime": "2026-10-14T15:54:25.167476Z"
+  },
+  "sourceHash": "92c03826c552c99abf1776d3d5d0de1919d8f109027c3c0711a90f81b035b2a6",
+  "indexes": [
+    {
+      "name": "projects/memorymatchv1-1a/databases/(default)/collectionGroups/entries/indexes/CICAgJim14AK",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "levelReached",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "totalScore",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "__name__",
+          "order": "ASCENDING"
+        }
+      ],
+      "state": "READY",
+      "density": "SPARSE_ALL"
+    },
+    {
+      "name": "projects/memorymatchv1-1a/databases/(default)/collectionGroups/entries/indexes/CICAgJjF9oIK",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "levelReached",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "reachedAt",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "__name__",
+          "order": "ASCENDING"
+        }
+      ],
+      "state": "READY",
+      "density": "SPARSE_ALL"
+    }
+  ]
+}

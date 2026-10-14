@@ -1,8 +1,9 @@
 import { getAdventureSummary, getChapterNumber, MAX_ADVENTURE_CHAPTER } from "./adventureProgress.js";
-import { highestOwnedAdventureLevel, createProgressResult, keepProgressBest, sameRankingOwner, validateProgressResult, normalizeProgressMigration } from './progressRankingModel.js';
+import { highestOwnedAdventureLevel, createProgressResult, keepProgressBest, sameRankingOwner, validateProgressResult, normalizeProgressMigration, normalizeProgressBests } from './progressRankingModel.js';
 
 export const CHAPTER_DATABASE = "memoryMatchAdventure";
 const GAME_KEYS = ["memoryMatch", "linkConnect", "tripleConnect"];
+const GAME_IDS = { memoryMatch: 'memory-match', linkConnect: 'link-connect', tripleConnect: 'triple-connect' };
 const LEVEL_KEY = /^(easy|normal|hard|superHard|challenge|endless):([1-9]\d*)$/;
 
 export function openChapterDatabase() {
@@ -42,7 +43,7 @@ export async function migrateChapterLevelRankings(database, owner, expectedRevis
     const sameOwner = marker?.version === 3 && sameRankingOwner(marker.owner, owner);
     if (sameOwner && marker.complete) { await complete; return { envelope: previous, complete: true }; }
     const stored = structuredClone(previous);
-    const keys = { memoryMatch: 'memory-match', linkConnect: 'link-connect', tripleConnect: 'triple-connect' };
+    const keys = GAME_IDS;
     function inspect(game, records) {
       const profile = stored.data.progress[game]; if (!profile) return;
       const bests = profile.levelBestsV3 ||= {};
@@ -215,11 +216,24 @@ export async function writeChapterProfile(database, envelope, expectedRevision, 
     const previous = await requestResult(profiles.get("active"));
     if ((previous?.revision || 0) !== expectedRevision) throw new Error("Dữ liệu đã được cập nhật ở tab khác.");
     const stored = structuredClone(envelope);
+    const durableMarker = normalizeProgressMigration(previous?.data.progress.levelRankingMigration);
+    const incomingMarker = normalizeProgressMigration(stored.data.progress.levelRankingMigration);
+    if (durableMarker && (!incomingMarker || sameRankingOwner(durableMarker.owner, incomingMarker.owner)
+      && (durableMarker.complete || !incomingMarker.complete && (durableMarker.afterKey || '') > (incomingMarker.afterKey || '')))) {
+      stored.data.progress.levelRankingMigration = durableMarker;
+    }
     const updated = new Map();
     for (const game of GAME_KEYS) {
       const progress = stored.data.progress[game];
       if (!progress) continue;
       const original = previous?.data.progress[game] || {};
+      const mergedLevelBests = normalizeProgressBests(progress.levelBestsV3, GAME_IDS[game]);
+      for (const [family, result] of Object.entries(normalizeProgressBests(original.levelBestsV3, GAME_IDS[game]))) {
+        if (!validateProgressResult(result)) continue;
+        const incoming = mergedLevelBests[family];
+        if (!validateProgressResult(incoming) || sameRankingOwner(result.owner, incoming.owner) && result.levelReached > incoming.levelReached) mergedLevelBests[family] = result;
+      }
+      progress.levelBestsV3 = mergedLevelBests;
       const groups = splitResults(progress.bestByLevel);
       const claims = splitClaims(progress.claimedChests);
       const starts = splitResults(progress.startedLevels);
