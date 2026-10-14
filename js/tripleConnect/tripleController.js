@@ -128,6 +128,7 @@ export async function startTripleConnectDevelopmentRound({
 
 export function startTripleConnectRound({ seed, mode = "easy", level = 1, elapsedTime, skipIntro = false, reason = "new" } = {}) {
   if (!canLaunchGame()) return null;
+  if (reason === 'restart' && (mode === 'challenge' || mode === 'endless')) { level = 1; reason = 'new'; seed = undefined; elapsedTime = undefined; }
   const normalizedLevel = normalizeLevel(level);
   if (mode === "challenge") getTripleChallengeStage(normalizedLevel);
   const roundSeed = seed || createRoundSeed(mode, normalizedLevel);
@@ -972,6 +973,7 @@ async function commitTripleTerminalResult() {
     stageRankedAttempt("triple-connect", currentMode, completion.score, true);
     checkpointRankedRun("triple-connect", currentMode);
   }
+  else finalizeRankedRun('triple-connect', currentMode, state.score);
   delete gameState.progress.tripleConnect.sessionsByMode[currentMode];
   if ((await savePersistentGameData({ coins: gameState.coins, progress: gameState.progress, cloudEvent: won }))) {
     if (generation !== roundGeneration) return false;
@@ -979,6 +981,7 @@ async function commitTripleTerminalResult() {
     return { reward, stars, timeBonus: completion.timeBonus,
       completedChapter: gameState.progress.tripleConnect.adventure?.currentChapter > previousChapter ? previousChapter : null };
   }
+  if (generation !== roundGeneration) return false;
   gameState.coins = rollback.coins;
   gameState.progress.tripleConnect = rollback.progress;
   return false;

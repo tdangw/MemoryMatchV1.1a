@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
 import { gameState, hydrateGameState } from '../js/gameState.js';
 import { setRankingOwner } from '../js/rankingOwner.js';
-import { beginRankedAttempt, stageRankedAttempt, checkpointRankedRun, finalizeRankedRun, getRankedRun, normalizeRankedRun, normalizeRunBestsV2 } from '../js/rankingRules.js';
+import { beginRankedAttempt, createRankedRun, stageRankedAttempt, checkpointRankedRun, finalizeRankedRun, getRankedRun, normalizeRankedRun, normalizeRunBestsV2 } from '../js/rankingRules.js';
 import { validateRankingResult, rankingBoardId, collectRankingResults } from '../js/rankingResult.js';
 import { rankingCursor, assertOrderedPage } from '../js/leaderboardStore.js';
 setRankingOwner({ id: 'checkpoint-profile', uid: 'checkpoint-owner' });
 for (const gameId of ['memory-match', 'link-connect', 'triple-connect']) for (const mode of ['challenge', 'endless']) {
-  beginRankedAttempt(gameId, mode, 1);
+  beginRankedAttempt(gameId, mode, 1, { reason: 'resume', savedRun: createRankedRun(gameId, mode) });
   let last;
   for (let level = 1; level <= 10; level++) {
     stageRankedAttempt(gameId, mode, level * 100, true);
@@ -33,7 +33,7 @@ for (const gameId of ['memory-match', 'link-connect', 'triple-connect']) for (co
   const beforeClose = gameState.progress[key].runBestsV2[mode].id;
   finalizeRankedRun(gameId, mode, 999999);
   assert.equal(gameState.progress[key].runBestsV2[mode].id, beforeClose);
-  beginRankedAttempt(gameId, mode, 1); stageRankedAttempt(gameId, mode, 999999, true);
+  beginRankedAttempt(gameId, mode, 1, { reason: 'resume', savedRun: createRankedRun(gameId, mode) }); stageRankedAttempt(gameId, mode, 999999, true);
   assert.equal(checkpointRankedRun(gameId, mode), null, 'A weaker new run cannot lower public best.');
 }
 const run = getRankedRun('memory-match', 'endless');

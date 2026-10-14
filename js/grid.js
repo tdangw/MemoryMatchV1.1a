@@ -100,12 +100,12 @@ export function setBoardCoordinatesVisible(visible) {
  */
 export function createGrid(
   { tileCount, columns, mobileColumns },
-  { roundId, onPreviewComplete, previewDurationMs = GAME_CONFIG.previewDurationMs, assetPaths, history, deferPreview = false, startup } = {},
+  { roundId, onPreviewComplete, previewDurationMs = GAME_CONFIG.previewDurationMs, assetPaths, history, deferPreview = false, startup, snapshot } = {},
 ) {
   const totalTiles = tileCount;
   const numberOfPairs = Math.floor(totalTiles / 2);
 
-  const selectedCards = getThemeCards(getEquippedThemeId(gameState.appearance), numberOfPairs, { assetPaths, history });
+  const selectedCards = getThemeCards(snapshot?.themeId || getEquippedThemeId(gameState.appearance), numberOfPairs, { assetPaths, history });
   if (selectedCards.length !== numberOfPairs) throw new Error("Chủ đề không có đủ ảnh cho bàn Memory Match.");
   let cards = [];
   selectedCards.forEach((card) => {
@@ -126,6 +126,14 @@ export function createGrid(
   }
 
   shuffleArray(cards);
+  if (snapshot) {
+    const byId = new Map(selectedCards.map(card => [card.id, card]));
+    cards = snapshot.tiles.map(tile => {
+      const card = byId.get(tile.id); if (!card) throw new Error('Saved Memory card is unavailable.');
+      return { ...card, special: tile.special, matched: tile.matched };
+    });
+    setLuckyRewards(snapshot.luckyRewards);
+  }
 
   // Chuẩn bị DOM
   const gridContainer = document.getElementById("grid-container");
@@ -154,6 +162,7 @@ export function createGrid(
 
     tile.dataset.imageId = cardData.id;
     tile.dataset.special = String(cardData.special === true);
+    if (cardData.matched) tile.classList.add('matched');
     tile.append(img);
     tiles.appendChild(tile);
   };

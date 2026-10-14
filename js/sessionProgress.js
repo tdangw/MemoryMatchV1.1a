@@ -4,6 +4,7 @@ import { GAME_MODES, getGameProgressKey } from "./gameCatalog.js";
 import { appendThemeSelectionHistory } from "./themeSelection.js";
 import { normalizePlayMetrics } from "./playMetrics.js";
 import { normalizeRankedRun } from "./rankingRules.js";
+import { normalizePairSnapshot } from './pairSessionSnapshot.js';
 
 export function getActiveSession(gameId, mode) {
   const key = getGameProgressKey(gameId);
@@ -58,6 +59,7 @@ export function stageActiveSession(gameId, session) {
   if (!key || !session?.mode) return false;
   gameState.progress[key].sessionsByMode ||= {};
   const run = normalizeRankedRun(session.run, { gameId, mode: session.mode, level: session.level });
+  if (gameId !== 'triple-connect' && session.pairSnapshot && !normalizePairSnapshot(session.pairSnapshot, gameId)) return false;
   if (gameId === "triple-connect" && session.snapshot) {
     gameState.progress[key].sessionsByMode[session.mode] = {
       mode: session.mode,
@@ -78,6 +80,7 @@ export function stageActiveSession(gameId, session) {
     return true;
   }
   gameState.progress[key].sessionsByMode[session.mode] = {
+    ...(normalizePairSnapshot(session.pairSnapshot, gameId) ? { pairSnapshot: normalizePairSnapshot(session.pairSnapshot, gameId) } : {}),
     ...(run ? { run } : {}),
     ...(normalizePlayMetrics(session.metrics) ? { metrics: normalizePlayMetrics(session.metrics) } : {}),
     mode: session.mode,

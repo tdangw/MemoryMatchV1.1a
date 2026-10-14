@@ -55,13 +55,15 @@ import { savePersistentGameData, isPersistenceBlocked } from "./persistence.js";
 import { getActiveSession } from "./sessionProgress.js";
 import { getTheme, getThemeSelectionEligibility } from "./themeCatalog.js";
 import { showAppToast } from "./modal.js";
-import { configureLogic, resetLogicRuntime } from "./logic.js";
+import { configureLogic, resetLogicRuntime, restoreMemoryCombo } from "./logic.js";
+import { remainingComboWindow } from './pairSessionSnapshot.js';
+import { getComboWindowMs } from './gameplayTuning.js';
 import { restartMemoryTileAnimation } from "./memoryMatch/tileAnimation.js";
 import { GAMEPLAY_TIMING } from "./gameplayTuning.js";
 import { TIME_UP_PURCHASES } from "./shopCatalog.js";
 import { resolveSessionTiming } from "./sessionTiming.js";
 import { clearLootEffects } from "./lootEffects.js";
-import { commitMemoryThemeSession, getMemorySessionSnapshot, saveMemorySession, stageMemorySession } from "./memorySession.js";
+import { commitMemoryThemeSession, getMemorySessionSnapshot, saveMemorySession, stageMemorySession, beginMemoryBoardIdentity } from "./memorySession.js";
 import { getMemoryShell } from "./memoryMatch/memoryShell.js";
 import { bindMemoryMenus } from "./gameMenu.js";
 import { clearTooltip } from "./tooltips.js";
@@ -92,6 +94,7 @@ export function continueMemorySession(session) {
 }
 
 export function restartMemoryLevel() {
+  if (isChallengeMode(gameState.settings.mode) || isEndlessMode(gameState.settings.mode)) return initializeLevel(1, { reason: 'new' });
   const session = getActiveSession("memory-match", gameState.settings.mode)
     || getMemorySessionSnapshot(activeAssetPaths.length ? { assetPaths: activeAssetPaths } : {});
   return initializeLevel(gameState.currentLevel, { reason: "restart", session });
@@ -104,8 +107,13 @@ export function initializeLevel(level, { reason = "new", session = null, skipInt
   const requestedLayout = isChallengeMode(requestedMode)
     ? getChallengeLayout(level)
     : requestedModeLayout;
+  if (reason === 'resume' && (session?.pairSnapshotInvalid || session?.run?.version === 3 && !session.pairSnapshot
+    || session?.pairSnapshot && session.pairSnapshot.totalPairs * 2 !== requestedLayout.tileCount)) {
+    showAppToast('Không thể tiếp tục lượt này. Hãy bắt đầu lượt mới.');
+    return null;
+  }
   const eligibility = getThemeSelectionEligibility(
-    getTheme(gameState.appearance.themes.memoryMatch).id,
+    getTheme(reason === 'resume' ? session?.pairSnapshot?.themeId || gameState.appearance.themes.memoryMatch : gameState.appearance.themes.memoryMatch).id,
     requestedLayout.tileCount / 2,
   );
   if (!eligibility.ok) {
@@ -148,6 +156,8 @@ export function initializeLevel(level, { reason = "new", session = null, skipInt
   const layout = isChallengeMode(mode) ? getChallengeLayout(level) : modeLayout;
   const timing = resolveMemoryLevelTiming({ mode, level, modeLayout, reason, session });
   const roundId = beginRound();
+  const pairSnapshot = reason === 'resume' ? session?.pairSnapshot : null;
+  beginMemoryBoardIdentity(pairSnapshot?.seed, pairSnapshot?.themeId || gameState.appearance.themes.memoryMatch);
   const firstStart = !gameState.progress.memoryMatch.startedLevels?.[`${mode}:${level}`];
   const hintBonus = (reason === "new" || reason === "advance") && firstStart
     ? getLevelHintBonus(level, gameState.progress.memoryMatch.items.hint)
@@ -165,7 +175,7 @@ export function initializeLevel(level, { reason = "new", session = null, skipInt
     );
   }
   const previewDurationMs = getPreviewDurationMs(mode);
-  const themeId = getTheme(gameState.appearance.themes.memoryMatch).id;
+  const themeId = getTheme(pairSnapshot?.themeId || gameState.appearance.themes.memoryMatch).id;
   const selectedCards = await startup.phase('render', () => createGrid(layout, {
     startup,
     deferPreview: true,
@@ -174,6 +184,7 @@ export function initializeLevel(level, { reason = "new", session = null, skipInt
     previewDurationMs,
     assetPaths: reason === "resume" ? session?.assetPaths : undefined,
     history: reason === "resume" ? undefined : gameState.progress.themeSelectionHistory[themeId],
+    snapshot: pairSnapshot,
   }));
   await startup.yield();
   activeAssetPaths = selectedCards?.map((card) => card.assetPath).filter(Boolean) || [];
@@ -184,6 +195,10 @@ export function initializeLevel(level, { reason = "new", session = null, skipInt
   gameState.score = 0;
   gameState.matchedPairs = 0;
   gameState.totalPairs = layout.tileCount / 2;
+  if (pairSnapshot) {
+    for (const key of ['score', 'moves', 'misses', 'matchedPairs', 'totalPairs']) gameState[key] = pairSnapshot[key];
+    gameState.luckyAwards = structuredClone(pairSnapshot.luckyAwards);
+  }
 
   updateLevelDisplay(level);
   updateScoreDisplay(gameState.score);
@@ -210,13 +225,17 @@ export function initializeLevel(level, { reason = "new", session = null, skipInt
   startup.check();
   showRevealTimerInHud(previewDurationMs / 1000, roundId);
   document.getElementById("btn-buy-time")?.toggleAttribute("hidden", isEndlessMode(mode));
-  revealAndHideTiles(roundId, startCountdown, previewDurationMs);
+  revealAndHideTiles(roundId, () => {
+    if (pairSnapshot) restoreMemoryCombo(pairSnapshot.combo, remainingComboWindow(pairSnapshot, getComboWindowMs(gameState.totalPairs)));
+    startCountdown(roundId);
+  }, previewDurationMs);
   });
 }
 
 function startCountdown(roundId = gameState.roundId) {
   if (gameState.roundId !== roundId) return;
   stopCountdown();
+  if (!isEndlessMode(gameState.settings.mode) && gameState.remainingTime <= 0) { handleTimeUp(); return; }
   resumePlayMetrics("startup");
   void rememberRecentGame("memory-match");
   restoreBackgroundMusic(gameState.settings);

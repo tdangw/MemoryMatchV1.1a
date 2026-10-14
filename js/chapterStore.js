@@ -1,5 +1,5 @@
 import { getAdventureSummary, getChapterNumber, MAX_ADVENTURE_CHAPTER } from "./adventureProgress.js";
-import { highestOwnedAdventureLevel, createProgressResult, keepProgressBest, sameRankingOwner, validateProgressResult } from './progressRankingModel.js';
+import { highestOwnedAdventureLevel, createProgressResult, keepProgressBest, sameRankingOwner, validateProgressResult, normalizeProgressMigration } from './progressRankingModel.js';
 
 export const CHAPTER_DATABASE = "memoryMatchAdventure";
 const GAME_KEYS = ["memoryMatch", "linkConnect", "tripleConnect"];
@@ -38,7 +38,7 @@ export async function migrateChapterLevelRankings(database, owner, expectedRevis
     const [previous, profileOwner] = await Promise.all([requestResult(profiles.get('active')), requestResult(transaction.objectStore('metadata').get('profile-owner'))]);
     if (!isCurrent() || profileOwner?.id !== owner.profileId || profileOwner.uid !== owner.uid) throw new Error('Migration owner changed.');
     if (!previous || previous.revision !== expectedRevision) throw new Error('Migration revision changed.');
-    const marker = previous.data.progress.levelRankingMigration;
+    const marker = normalizeProgressMigration(previous.data.progress.levelRankingMigration);
     const sameOwner = marker?.version === 3 && sameRankingOwner(marker.owner, owner);
     if (sameOwner && marker.complete) { await complete; return { envelope: previous, complete: true }; }
     const stored = structuredClone(previous);

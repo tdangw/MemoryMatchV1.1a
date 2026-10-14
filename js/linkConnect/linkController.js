@@ -1,4 +1,5 @@
 import { rememberRecentGame } from '../recentGame.js';
+import { remainingComboWindow } from '../pairSessionSnapshot.js';
 import { openGameExitDialog } from '../gameExitDialog.js';
 import { canLaunchGame } from "../profileOperations.js";
 import { getLinkShell, getLinkHud, getLinkHudElements, bindLinkControls, closeLinkMenus, applyLinkTimingStyles } from "./linkShell.js";
@@ -236,11 +237,18 @@ export function startLinkLevel({
   assetPaths,
   metrics,
   run,
+  pairSnapshot,
+  pairSnapshotInvalid,
 } = {}) {
   if (!canLaunchGame()) return null;
+  if (restart && (mode === 'challenge' || mode === 'endless')) { level = 1; restart = false; advance = false; }
   const modeLayout = getLinkModeLayout(mode);
   const layout = getLinkBoardLayoutForViewport(isLinkChallengeMode(mode) ? getLinkChallengeLayout(level) : modeLayout);
-  const themeId = getTheme(getEquippedThemeId(gameState.appearance, "link-connect")).id;
+  if (resume && (pairSnapshotInvalid || run?.version === 3 && !pairSnapshot || pairSnapshot && pairSnapshot.totalPairs * 2 !== layout.tileCount)) {
+    showAppToast('Không thể tiếp tục lượt này. Hãy bắt đầu lượt mới.');
+    return null;
+  }
+  const themeId = getTheme(resume && pairSnapshot ? pairSnapshot.themeId || getEquippedThemeId(gameState.appearance, 'link-connect') : getEquippedThemeId(gameState.appearance, 'link-connect')).id;
   const eligibility = getThemeSelectionEligibility(themeId, layout.tileCount / 2);
   if (!eligibility.ok) {
     showAppToast(`Chủ đề ${eligibility.theme.title} cần ${eligibility.required} ảnh khác nhau; hiện có ${eligibility.available}. Hãy chọn chủ đề khác.`);
@@ -265,7 +273,7 @@ export function startLinkLevel({
   return startup.run(async () => {
   if (!await prepareAdventureChapter("link-connect", getChapterNumber(level), () => scope.active)) return null;
   startup.check();
-  const board = await startup.phase('prepare', () => createLinkBoard({
+  const board = await startup.phase('prepare', () => resume && pairSnapshot ? structuredClone(pairSnapshot.board) : createLinkBoard({
     layout,
     themeId,
     level,
@@ -274,6 +282,8 @@ export function startLinkLevel({
     history: resume ? undefined : gameState.progress.themeSelectionHistory[themeId],
   }));
   activeAssetPaths = board.selectedAssetPaths;
+  board.seed = resume && pairSnapshot ? pairSnapshot.seed : crypto.randomUUID();
+  board.themeId = themeId;
   if (level === 1 && !resume && !restart) {
     linkGameState.specialProgress = 0;
     linkGameState.specialNoEnergyDropStreak = 0;
@@ -302,6 +312,11 @@ export function startLinkLevel({
     levelStartTime,
   });
   const roundId = beginLinkRound({ mode, level, layout, board, gravityShift: resolvedGravityShift });
+  if (resume && pairSnapshot) for (const key of ['score', 'moves', 'misses', 'matchedPairs', 'totalPairs']) linkGameState[key] = pairSnapshot[key];
+  if (resume && pairSnapshot) {
+    linkGameState.luckyAwards = structuredClone(pairSnapshot.luckyAwards || []);
+    linkGameState.freezeSeconds = pairSnapshot.freezeSeconds || 0;
+  }
   linkGameState.remainingTime = timing.remainingTime;
   linkGameState.timeLimit = timing.timeLimit;
   linkGameState.levelStartTime = timing.levelStartTime;
@@ -316,6 +331,16 @@ export function startLinkLevel({
   const activateWhenReady = () => {
     if (!introComplete || !imagesReady || linkGameState.roundId !== roundId) return;
     unlockLinkBoard();
+    if (resume && pairSnapshot) {
+      const windowMs = getLinkComboWindowMs(linkGameState.totalPairs);
+      const remaining = remainingComboWindow(pairSnapshot, windowMs);
+      linkGameState.combo = remaining > 0 ? pairSnapshot.combo : 0;
+      if (linkGameState.combo) {
+        linkGameState.lastMatchAt = performance.now() - windowMs + remaining;
+        startLinkComboWindow(remaining, linkGameState.lastMatchAt, roundId, board);
+      }
+      updateLinkHud();
+    }
     startCountdown(roundId);
   };
   if (!skipIntro) showLevelRewardOverlay({
@@ -859,6 +884,7 @@ function startCountdown(roundId) {
   resumePlayMetrics("startup");
   void rememberRecentGame("link-connect");
   stopCountdown();
+  if (!isLinkEndlessMode(linkGameState.mode) && linkGameState.remainingTime <= 0) { handleLinkTimeUp(); return; }
   restoreBackgroundMusic(gameState.settings);
   startLinkTimeProgress(roundId);
   syncDefaultMusic(gameState.settings);
@@ -917,16 +943,7 @@ function handleLinkTimeUp() {
     }
     linkGameState.remainingTime = seconds;
     linkGameState.timeLimit = seconds;
-    stageActiveSession("link-connect", {
-      mode: linkGameState.mode,
-      level: linkGameState.level,
-      gravityShift: linkGameState.gravityShift,
-      specialProgress: linkGameState.specialProgress,
-      specialNoEnergyDropStreak: linkGameState.specialNoEnergyDropStreak,
-      remainingTime: seconds,
-      timeLimit: seconds,
-      levelStartTime: linkGameState.levelStartTime,
-    });
+    stageActiveSession('link-connect', createLinkSession());
     if (!(await savePersistentGameData({ coins: gameState.coins, progress: gameState.progress }))) {
       gameState.coins = previousCoins;
       Object.assign(linkGameState, previousTiming);
@@ -1449,6 +1466,12 @@ async function persistLinkRunProgress(allowStartup = false) {
 function createLinkSession() {
   stageRankedAttempt("link-connect", linkGameState.mode, linkGameState.score, linkGameState.isCompleted);
   return {
+    pairSnapshot: { version: 1, gameId: 'link-connect', seed: linkGameState.board?.seed || 'legacy',
+      themeId: linkGameState.board?.themeId,
+      capturedAt: Date.now(), comboRemainingMs: linkGameState.lastMatchAt ? Math.max(0, getLinkComboWindowMs(linkGameState.totalPairs) - (performance.now() - linkGameState.lastMatchAt)) : 0,
+      luckyAwards: structuredClone(linkGameState.luckyAwards), freezeSeconds: linkGameState.freezeSeconds,
+      board: structuredClone(linkGameState.board), score: linkGameState.score, moves: linkGameState.moves,
+      misses: linkGameState.misses, combo: linkGameState.combo, matchedPairs: linkGameState.matchedPairs, totalPairs: linkGameState.totalPairs },
     mode: linkGameState.mode,
     level: linkGameState.level,
     gravityShift: linkGameState.gravityShift,

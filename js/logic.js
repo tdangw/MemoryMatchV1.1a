@@ -290,6 +290,17 @@ async function checkMatch(roundId) {
   selectedTiles = [];
 }
 
+export function memoryComboRemainingMs() {
+  return lastMatchAt ? Math.max(0, getComboWindowMs(gameState.totalPairs) - (performance.now() - lastMatchAt)) : 0;
+}
+export function restoreMemoryCombo(combo, remainingMs) {
+  gameState.combo = remainingMs > 0 ? combo : 0;
+  if (gameState.combo) {
+    lastMatchAt = performance.now() - getComboWindowMs(gameState.totalPairs) + remainingMs;
+    startComboWindow(remainingMs, lastMatchAt, gameState.roundId);
+  }
+  updateComboDisplay(gameState.combo);
+}
 function startComboWindow(durationMs, matchedAt, roundId) {
   clearTimeout(comboExpiryTimer);
   const card = document.getElementById("combo")?.closest(".stat-combo");

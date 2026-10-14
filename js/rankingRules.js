@@ -2,6 +2,7 @@ import { getGameProgressKey } from "./gameCatalog.js";
 import { gameState } from "./gameState.js";
 import { getRankingOwner } from './rankingOwner.js';
 import { validateRankingResult } from './rankingResult.js';
+import { createProgressRun, normalizeProgressRun, reduceProgressRun, createProgressResult, keepProgressBest } from './progressRankingModel.js';
 
 export const RANKING_RULES_VERSION = 2;
 export function supportsRunRanking(gameId, mode) {
@@ -17,6 +18,7 @@ export function createRankedRun(gameId, mode, level = 1, { rankable = level === 
   return { version: 2, id, gameId, mode, level, previousScore: 0, attemptScore: 0, attemptCleared: false, finalized: false, rankable, owner: getRankingOwner() };
 }
 export function normalizeRankedRun(value, { gameId, mode, level }) {
+  if (value?.version === 3) return normalizeProgressRun(value, { gameId, mode, level });
   if (!supportsRunRanking(gameId, mode) || !value || ![1, 2].includes(value.version) || value.gameId !== gameId || value.mode !== mode || value.level !== level
     || typeof value.id !== "string" || !value.id || value.id.length > 100
     || !Number.isSafeInteger(value.previousScore) || value.previousScore < 0
@@ -29,6 +31,7 @@ export function normalizeRankedRun(value, { gameId, mode, level }) {
   };
 }
 export function reduceRankedRun(run, event) {
+  if (run?.version === 3) return reduceProgressRun(run, event);
   if (!run || run.finalized) return run;
   const next = { ...run };
   if (event.type === "restart") {
@@ -58,7 +61,7 @@ export function beginRankedAttempt(gameId, mode, level, { reason = "new", savedR
   if (reason === "resume") run = normalizeRankedRun(savedRun, { gameId, mode, level }) || createRankedRun(gameId, mode, level, { rankable: false });
   else if (reason === "advance" && run && !run.finalized) run = reduceRankedRun(run, { type: "advance", level });
   else if (reason === "restart" && run && !run.finalized && run.level === level) run = reduceRankedRun(run, { type: "restart" });
-  else run = createRankedRun(gameId, mode, level);
+  else run = createProgressRun(gameId, mode, level, getRankingOwner());
   profile.activeRankedRuns[mode] = run;
 }
 export function stageRankedAttempt(gameId, mode, score, won = false) {
@@ -75,6 +78,7 @@ export function checkpointRankedRun(gameId, mode) {
   const profile = gameState.progress[getGameProgressKey(gameId)];
   const run = profile.activeRankedRuns?.[mode];
   if (!run || run.finalized || !run.rankable || !run.attemptCleared || !run.owner) return null;
+  if (run.version === 3) return recordLevelCheckpoint(gameId, mode, run.clearedLevels, run.owner);
   const totalScore = run.previousScore + run.attemptScore;
   if (!Number.isSafeInteger(totalScore)) throw new RangeError('Run score exceeds the supported range.');
   const result = Object.freeze({ rulesVersion: RANKING_RULES_VERSION, runId: run.id, levelReached: run.level, totalScore,
@@ -87,6 +91,15 @@ export function checkpointRankedRun(gameId, mode) {
     return result;
   }
   return null;
+}
+export function recordLevelCheckpoint(gameId, family, level, owner = getRankingOwner()) {
+  if (!owner) return null;
+  const profile = gameState.progress[getGameProgressKey(gameId)];
+  const bests = profile.levelBestsV3 ||= {};
+  const next = createProgressResult(gameId, family, level, owner);
+  const best = keepProgressBest(bests[family], next);
+  bests[family] = best;
+  return best === next ? next : null;
 }
 export function finalizeRankedRun(gameId, mode, score, outcome = 'lost') {
   const profile = gameState.progress[getGameProgressKey(gameId)];

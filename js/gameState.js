@@ -11,10 +11,11 @@ import { getThemeSelectionManifest } from "./themeCatalog.js";
 import { appendThemeSelectionHistory, normalizeThemeSelectionHistory } from "./themeSelection.js";
 import { getAdventureSummary, isCompletedLevelResult, isNormalAdventureMode, MAX_ADVENTURE_CHAPTER } from "./adventureProgress.js";
 import { normalizePlayMetrics, getActivePlayMetrics } from "./playMetrics.js";
-import { normalizeRankedRun, normalizeRunBestsV2 } from "./rankingRules.js";
+import { normalizeRankedRun, normalizeRunBestsV2, recordLevelCheckpoint } from "./rankingRules.js";
 import { getRankingOwner } from './rankingOwner.js';
 import { validateRankingResult } from './rankingResult.js';
-import { normalizeProgressBests } from './progressRankingModel.js';
+import { normalizeProgressBests, normalizeProgressMigration } from './progressRankingModel.js';
+import { normalizePairSnapshot } from './pairSessionSnapshot.js';
 
 const GAME_MODE_IDS = new Set(GAME_MODES.map(({ id }) => id));
 
@@ -96,11 +97,7 @@ export function hydrateGameState({
     progress?.themeSelectionHistory,
     getThemeSelectionManifest(),
   );
-  const migration = progress.levelRankingMigration;
-  gameState.progress.levelRankingMigration = migration?.version === 3 && typeof migration.owner?.profileId === 'string'
-    && (migration.owner.uid === null || typeof migration.owner.uid === 'string')
-    && (migration.afterKey === null || typeof migration.afterKey === 'string')
-    ? structuredClone(migration) : undefined;
+  gameState.progress.levelRankingMigration = normalizeProgressMigration(progress.levelRankingMigration) || undefined;
   const memorySessions = normalizeSessions(memoryMatch.sessionsByMode, "memory-match");
   gameState.progress.memoryMatch = {
     totalStars: normalizeNonNegativeInteger(memoryMatch.totalStars),
@@ -175,6 +172,8 @@ function normalizeActiveSession(session, gameId) {
   const level = Math.max(1, normalizeNonNegativeInteger(session.level) || 1);
   return {
     mode: session.mode,
+    ...(session.pairSnapshotInvalid || session.pairSnapshot && !normalizePairSnapshot(session.pairSnapshot, gameId) ? { pairSnapshotInvalid: true, pairSnapshotSource: structuredClone(session.pairSnapshotSource || session.pairSnapshot) } : {}),
+    ...(normalizePairSnapshot(session.pairSnapshot, gameId) ? { pairSnapshot: normalizePairSnapshot(session.pairSnapshot, gameId) } : {}),
     ...(normalizePlayMetrics(session.metrics) ? { metrics: normalizePlayMetrics(session.metrics) } : {}),
     ...(normalizeRankedRun(session.run, { gameId, mode: session.mode, level })
       ? { run: normalizeRankedRun(session.run, { gameId, mode: session.mode, level }) } : {}),
@@ -402,6 +401,7 @@ function recordGameResult(progress, { mode, level, score, stars, durationMs }, g
   if (previous.rankingResult) progress.bestByLevel[key].rankingResult = previous.rankingResult;
   const metrics = getActivePlayMetrics();
   const owner = metrics ? metrics.owner : getRankingOwner();
+  if (owner && isNormalAdventureMode(mode)) recordLevelCheckpoint(gameId, 'adventure', level, owner);
   const sameRankingOwner = previous.rankingResult && (owner?.uid ? owner.uid === previous.rankingResult.owner.uid : owner?.profileId === previous.rankingResult.owner.profileId);
   if (owner && isNormalAdventureMode(mode) && measuredTime && (!sameRankingOwner || measuredTime < previous.rankingResult.durationMs)) {
     progress.bestByLevel[key].rankingResult = { rulesVersion: 1, id: crypto.randomUUID(), gameId, mode, level, kind: 'time', durationMs: measuredTime, score, stars, outcome: 'won', recordedAt: Date.now(), owner };
