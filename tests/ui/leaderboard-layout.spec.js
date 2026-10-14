@@ -15,7 +15,7 @@ async function open(page, count = 21) {
   await page.addInitScript(count => { window.rankCount = count; window.rankRequests = []; window.rankResolvers = []; }, count);
   await page.route('**/js/leaderboardPanel.js*', route => route.fulfill({ contentType: 'text/javascript', body: source }));
   await page.goto('/'); await page.locator('[data-dock-action="ranking"]').click();
-  await page.evaluate(async () => (await import('/js/leaderboardPanel.js')).openLeaderboards(undefined, undefined, { presentation: 'screen', host: document.querySelector('.adventure-screen-host'), owner: (await import('/js/appPageLifecycle.js')).getAppPageScope() }));
+  await page.evaluate(async () => { window.rankCycleModal = (await import('/js/leaderboardPanel.js')).openLeaderboards(undefined, undefined, { presentation: 'screen', host: document.querySelector('.adventure-screen-host'), owner: (await import('/js/appPageLifecycle.js')).getAppPageScope() }); });
   await expect(page.locator('.leaderboard-list li')).toHaveCount(Math.min(count, 10));
 }
 for (const count of [0, 1, 10, 11]) test(`record count ${count}, private own record and no repeated copy`, async ({ page }) => {
@@ -31,6 +31,49 @@ for (const count of [0, 1, 10, 11]) test(`record count ${count}, private own rec
   await expect(page.locator('.leaderboard-view')).not.toContainText('Đã cập nhật');
   await expect(page.locator('.leaderboard-list img')).toHaveCount(0);
 });
+test('stage picker confirms 212 once, rejects invalid input and returns focus on cancel', async ({ page }) => {
+  await page.setViewportSize({ width: 412, height: 915 }); await open(page);
+  const before = await page.evaluate(() => window.rankRequests.length);
+  await page.getByRole('button', { name: 'Chọn màn', exact: true }).click();
+  const input = page.getByLabel('Màn chơi', { exact: true });
+  await input.fill('212');
+  expect(await page.evaluate(() => window.rankRequests.length)).toBe(before);
+  await input.press('Enter');
+  await expect(page.locator('.leaderboard-context')).toHaveText('Màn 212');
+  await expect(page.getByRole('button', { name: 'Chọn màn', exact: true })).toContainText('212');
+  expect(await page.evaluate(() => window.rankRequests.at(-1))).toMatchObject({ level: 212, page: 1 });
+  await page.getByRole('button', { name: 'Chọn màn', exact: true }).click();
+  for (const invalid of ['0', '-1', '2.5', 'abc', '9007199254740991']) {
+    await input.fill(invalid); await input.press('Enter');
+    await expect(input).toHaveAttribute('aria-invalid', 'true');
+    await expect(page.locator('.leaderboard-context')).toHaveText('Màn 212');
+  }
+  await input.press('Escape');
+  await expect(page.locator('#leaderboard-stage-picker')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Chọn màn', exact: true })).toBeFocused();
+  await page.getByRole('button', { name: 'Chọn màn', exact: true }).click();
+  await input.fill('9007199254740900'); await input.press('Enter');
+  await expect(page.locator('.leaderboard-context')).toHaveText('Màn 9007199254740900');
+  expect(await page.evaluate(() => window.rankRequests.at(-1).level)).toBe(9007199254740900);
+  await page.screenshot({ path: 'test-results/ranking-stage-picker-confirmed.png' });
+});
+test('30 mount, picker cancel and mode changes release every page-owned resource', async ({ page }) => {
+  await open(page);
+  await page.evaluate(() => window.rankCycleModal.destroy());
+  const diagnostics = () => page.evaluate(async () => ({ nodes: document.querySelectorAll('*').length, owner: (await import('/js/appPageLifecycle.js')).getAppPageScope().diagnostics() }));
+  const before = await diagnostics();
+  for (let cycle = 0; cycle < 30; cycle++) {
+    await page.evaluate(async () => { window.rankCycleModal = (await import('/js/leaderboardPanel.js')).openLeaderboards(undefined, undefined, { presentation: 'screen', host: document.querySelector('.adventure-screen-host'), owner: (await import('/js/appPageLifecycle.js')).getAppPageScope() }); });
+    await expect(page.locator('.leaderboard-heading')).toBeVisible();
+    await page.getByRole('button', { name: 'Chọn màn', exact: true }).click();
+    await page.getByLabel('Màn chơi', { exact: true }).press('Escape');
+    await expect(page.locator('#leaderboard-stage-picker')).toHaveCount(0);
+    await page.locator('[data-rank-mode="challenge"]').click();
+    await expect(page.locator('.leaderboard-heading')).toContainText('Điểm');
+    await page.evaluate(() => window.rankCycleModal.destroy());
+  }
+  expect(await diagnostics()).toEqual(before);
+});
 for (const viewport of [{ width: 412, height: 915 }, { width: 640, height: 360 }, { width: 1024, height: 900 }]) {
   test(`ranking layout, all 18 filters and scroll at ${viewport.width}x${viewport.height}`, async ({ page }) => {
     await page.setViewportSize(viewport); await open(page);
@@ -40,7 +83,7 @@ for (const viewport of [{ width: 412, height: 915 }, { width: 640, height: 360 }
         await page.locator(`[data-rank-mode="${mode}"]`).click();
         await expect(page.locator('.leaderboard-heading')).toBeVisible();
         await expect(page.locator('.leaderboard-status')).toHaveText('');
-        await expect(page.locator('[aria-label="Màn chơi"]')).toBeVisible({ visible: !['challenge', 'endless'].includes(mode) });
+        await expect(page.getByRole('button', { name: 'Chọn màn', exact: true })).toBeVisible({ visible: !['challenge', 'endless'].includes(mode) });
         expect(await page.evaluate(() => window.rankRequests.at(-1).page)).toBe(1);
       }
     }

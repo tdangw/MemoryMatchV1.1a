@@ -22,6 +22,7 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
   let currentPage = 1;
   let currentKey = null;
   let loading = false;
+  let picker = null;
   const scrolls = new Map();
   const content = document.createElement('div'); content.className = 'leaderboard-view';
   const games = tabs('Trò chơi', GAME_DEFINITIONS.map(item => [item.id, item.title]), 'game');
@@ -29,8 +30,8 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
   const filters = document.createElement('div'); filters.className = 'leaderboard-filters';
   const footer = document.createElement('div'); footer.className = 'leaderboard-footer';
   const context = document.createElement('p'); context.className = 'leaderboard-context';
-  const levelLabel = document.createElement('label'); levelLabel.textContent = 'Màn ';
-  const level = document.createElement('input'); level.type = 'number'; level.min = '1'; level.max = String(MAX_ADVENTURE_LEVEL); level.setAttribute('aria-label', 'Màn chơi'); levelLabel.append(level);
+  const levelLabel = button(''); levelLabel.classList.add('leaderboard-level'); levelLabel.setAttribute('aria-label', 'Chọn màn');
+  const level = { value: '1' };
   const refresh = button('Làm mới');
   refresh.setAttribute('aria-label', 'Làm mới'); refresh.replaceChildren(createIcon('restart')); refresh.classList.add('leaderboard-refresh');
   const status = document.createElement('p'); status.className = 'leaderboard-status'; status.setAttribute('aria-live', 'polite');
@@ -38,9 +39,10 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
   const own = document.createElement('p'); own.className = 'leaderboard-own';
   const pager = document.createElement('nav'); pager.className = 'leaderboard-pager'; pager.setAttribute('aria-label', 'Trang xếp hạng');
   const previous = button('Trước'); const next = button('Sau');
+  previous.setAttribute('aria-label', 'Trước'); previous.textContent = '‹';
+  next.setAttribute('aria-label', 'Sau'); next.textContent = '›';
   const pageLabel = document.createElement('span');
-  const numbers = document.createElement('div'); numbers.className = 'leaderboard-page-numbers';
-  pager.append(previous, pageLabel, numbers, next);
+  pager.append(previous, pageLabel, next);
   filters.append(levelLabel); footer.append(filters, pager); results.append(status); content.append(games, modes, context, results, own, footer);
   const owner = surface.owner || getActiveGameScope() || getAppPageScope();
   const release = owner?.own(() => scope.dispose(), 'cleanup');
@@ -52,10 +54,12 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
     level.value = String(getSuggestedAdventureLevel(progress.bestByLevel, progress.adventure));
   }
   function updateFilters() {
+    picker?.destroy();
     lastGame = selectedGame;
     for (const item of games.children) item.setAttribute('aria-pressed', String(item.dataset.rankGame === selectedGame));
     for (const item of modes.children) item.setAttribute('aria-pressed', String(item.dataset.rankMode === selectedMode));
     levelLabel.hidden = !NORMAL_MODE_IDS.includes(selectedMode);
+    levelLabel.textContent = `Màn ${level.value} ▾`; levelLabel.title = `Màn ${level.value}`;
     context.textContent = NORMAL_MODE_IDS.includes(selectedMode) ? `Màn ${level.value}` : '';
     context.hidden = !NORMAL_MODE_IDS.includes(selectedMode);
   }
@@ -64,14 +68,6 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
     previous.disabled = loading || currentPage === 1;
     next.disabled = loading || !data?.hasNext || currentPage >= 100;
     pageLabel.textContent = `Trang ${currentPage}`;
-    numbers.replaceChildren();
-    if (!data) return;
-    const known = data.knownPages;
-    for (const page of known.filter(value => value === 1 || Math.abs(value - currentPage) <= 2 || value === known.at(-1))) {
-      const item = button(String(page)); item.dataset.page = String(page); item.disabled = loading;
-      if (page === currentPage) item.setAttribute('aria-current', 'page');
-      numbers.append(item);
-    }
   }
   async function load(refreshRequested = false, requestedPage = 1) {
     const id = ++generation;
@@ -129,17 +125,40 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
   scope.listen(modes, 'focusin', event => { const item = event.target.closest('[data-rank-mode]'); if (item) revealMode(item); });
   scope.listen(modes, 'wheel', event => { if (Math.abs(event.deltaY) > Math.abs(event.deltaX) && modes.scrollWidth > modes.clientWidth) { modes.scrollLeft += event.deltaY; event.preventDefault(); } }, { passive: false });
   scope.listen(modes, 'click', event => { const item = event.target.closest('[data-rank-mode]'); if (!item) return; selectedMode = item.dataset.rankMode; revealMode(item); updateFilters(); void load(); });
-  scope.listen(level, 'change', () => { updateFilters(); void load(); });
+  scope.listen(levelLabel, 'click', () => {
+    if (picker) { picker.panel.focus(); return; }
+    const form = document.createElement('form'); form.className = 'leaderboard-stage-form';
+    const input = document.createElement('input'); input.type = 'text'; input.inputMode = 'numeric'; input.maxLength = 16; input.value = level.value; input.setAttribute('aria-label', 'Màn chơi'); input.autocomplete = 'off';
+    const message = document.createElement('p'); message.className = 'leaderboard-stage-error'; message.setAttribute('aria-live', 'polite');
+    const confirm = button('Xem'); confirm.type = 'submit';
+    form.append(input, message, confirm);
+    const dialogScope = createGameShellLifecycle();
+    const release = scope.own(() => { dialogScope.dispose(); }, 'cleanup');
+    picker = openAppModal({ id: 'leaderboard-stage-picker', title: 'Chọn màn', icon: 'map', content: form, size: 'small', owner: scope, onDestroy: () => { dialogScope.dispose(); release.forget(); picker = null; } });
+    picker.panel.classList.add('leaderboard-stage-dialog');
+    const dialog = picker;
+    dialogScope.listen(form, 'submit', event => {
+      event.preventDefault();
+      const raw = input.value.trim(); const value = Number(raw);
+      if (!/^\d+$/.test(raw) || !Number.isSafeInteger(value) || value < 1 || value > MAX_ADVENTURE_LEVEL) {
+        message.textContent = 'Số màn chưa hợp lệ.'; input.setAttribute('aria-invalid', 'true'); input.focus(); return;
+      }
+      level.value = String(value); dialog.destroy(); updateFilters(); void load();
+    });
+    input.focus(); input.select();
+  });
   scope.listen(refresh, 'click', () => { void load(true); });
-  scope.listen(previous, 'click', () => { void load(false, currentPage - 1); });
-  scope.listen(next, 'click', () => { void load(false, currentPage + 1); });
-  scope.listen(numbers, 'click', event => { const item = event.target.closest('[data-page]'); if (item) void load(false, Number(item.dataset.page)); });
+  scope.listen(previous, 'click', () => { if (!loading && currentPage > 1) void load(false, currentPage - 1); });
+  scope.listen(next, 'click', () => { if (!loading && !next.disabled) void load(false, currentPage + 1); });
   let previousUid = getAccountService()?.getIdentity()?.uid;
   if (getAccountService()) scope.own(getAccountService().subscribe(() => {
     const uid = getAccountService().getIdentity()?.uid;
     if (uid !== previousUid) { previousUid = uid; void load(); }
   }), 'listener');
-  frontier(); updateFilters(); void load();
+  function updateEdges() { modes.classList.toggle('has-left', modes.scrollLeft > 1); modes.classList.toggle('has-right', modes.scrollLeft + modes.clientWidth < modes.scrollWidth - 1); }
+  scope.listen(modes, 'scroll', updateEdges);
+  const resize = new ResizeObserver(updateEdges); resize.observe(modes); scope.own(() => resize.disconnect(), 'cleanup');
+  frontier(); updateFilters(); updateEdges(); void load();
   return modal;
 }
 function button(text) { const element = document.createElement('button'); element.type = 'button'; element.className = 'app-button'; element.textContent = text; return element; }

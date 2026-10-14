@@ -160,3 +160,4 @@ Yêu cầu đã giữ lại: ngày tham gia và tổng thời gian chơi của m
 
 - Phase1: nền WebP36.046byte,940×1672, decode6.287MB; CSS ranking có owner riêng, một hàngmode cuộn ngang, footer ở tâm. StaticJS/CSS pass; browser layout/18filters/scroll/stale4/4 pass ở412×915,640×360,1024×900. Đã đọc ảnh runtime mobile. Chưa thay presentation record/picker, thuộc Phase2–3.
 - Phase2: format time có carry centisecond/hour, sốvi-VN; run tách hai cột, huy hiệu top3 và avatar dự phòng; success không có status/card lặp. Contract presentation/ranking pass; browser layout4/4 và count0/1/10/11+own trong/ngoài trang4/4 pass, tên public chỉ text.
+- Phase3: picker nhập212/MAX, không query khi gõ, hủy trảfocus, invalid giữ bảng; footer ‹ TrangN › ở tâm, không đoán tổngtrang. Browser10/10 pass gồm18filters, race/close, trangcuối,30mount/picker/mode cleanup; owner diagnostics và DOM trở baseline. Ranking rules/checkpoints pass. Ảnh runtime mobile đã được đọc, không còn text success nội bộ.
