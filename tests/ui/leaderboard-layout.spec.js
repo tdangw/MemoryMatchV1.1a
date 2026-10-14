@@ -2,13 +2,14 @@ import { expect, test } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 const source = readFileSync('js/leaderboardPanel.js', 'utf8')
   .replace("import { getFirebaseBackend } from './firebaseBackend.js';", "const getFirebaseBackend = async () => ({ database: null, environment: 'test' });")
+  .replace("import { getAccountService } from './accountService.js';", "const getAccountService = () => ({ getIdentity: () => ({ uid: window.rankUid }), subscribe: listener => { listener(); return () => {}; } });")
   .replace("import { readLeaderboard } from './leaderboardStore.js';", `const readLeaderboard = async ({ board, page = 1 }) => {
     window.rankRequests.push({ ...board, page });
     if (window.rankDeferred) await new Promise(resolve => window.rankResolvers.push(resolve));
     if (window.rankError) throw new Error('offline');
     const count = window.rankCount;
     return { page, hasNext: page * 10 < count, knownPages: Array.from({ length: Math.min(Math.ceil(count / 10), page + 1) }, (_, i) => i + 1),
-      top: Array.from({ length: Math.max(0, Math.min(10, count - (page - 1) * 10)) }, (_, i) => ({ uid: 'row-' + ((page - 1) * 10 + i), playerName: '<img src=x> Tên người chơi rất dài rất dài', durationMs: 1000, levelReached: 10, totalScore: 12345 })), own: null };
+      top: Array.from({ length: Math.max(0, Math.min(10, count - (page - 1) * 10)) }, (_, i) => ({ uid: 'row-' + ((page - 1) * 10 + i), playerName: '<img src=x> Tên người chơi rất dài rất dài', durationMs: 1000, levelReached: 10, totalScore: 12345 })), own: window.rankUid ? { durationMs: 1000, levelReached: 10, totalScore: 12345 } : null };
   };`);
 async function open(page, count = 21) {
   await page.addInitScript(count => { window.rankCount = count; window.rankRequests = []; window.rankResolvers = []; }, count);
@@ -17,6 +18,19 @@ async function open(page, count = 21) {
   await page.evaluate(async () => (await import('/js/leaderboardPanel.js')).openLeaderboards(undefined, undefined, { presentation: 'screen', host: document.querySelector('.adventure-screen-host'), owner: (await import('/js/appPageLifecycle.js')).getAppPageScope() }));
   await expect(page.locator('.leaderboard-list li')).toHaveCount(Math.min(count, 10));
 }
+for (const count of [0, 1, 10, 11]) test(`record count ${count}, private own record and no repeated copy`, async ({ page }) => {
+  await open(page, count);
+  if (count) await expect(page.locator('.leaderboard-heading')).toContainText('Thời gian');
+  else await expect(page.locator('.leaderboard-status')).toHaveText('Chưa có thành tích.');
+  await page.evaluate(() => { window.rankUid = 'row-0'; });
+  await page.getByRole('button', { name: 'Làm mới', exact: true }).click();
+  if (count) { await expect(page.locator('.leaderboard-list .is-self')).toHaveCount(1); await expect(page.locator('.leaderboard-own')).toHaveText(''); }
+  await page.evaluate(() => { window.rankUid = 'outside'; });
+  await page.getByRole('button', { name: 'Làm mới', exact: true }).click();
+  await expect(page.locator('.leaderboard-own')).toHaveText('Thành tích của bạn: 00:01,00');
+  await expect(page.locator('.leaderboard-view')).not.toContainText('Đã cập nhật');
+  await expect(page.locator('.leaderboard-list img')).toHaveCount(0);
+});
 for (const viewport of [{ width: 412, height: 915 }, { width: 640, height: 360 }, { width: 1024, height: 900 }]) {
   test(`ranking layout, all 18 filters and scroll at ${viewport.width}x${viewport.height}`, async ({ page }) => {
     await page.setViewportSize(viewport); await open(page);
@@ -24,7 +38,8 @@ for (const viewport of [{ width: 412, height: 915 }, { width: 640, height: 360 }
       await page.locator(`[data-rank-game="${game}"]`).click();
       for (const mode of ['easy', 'normal', 'hard', 'superHard', 'challenge', 'endless']) {
         await page.locator(`[data-rank-mode="${mode}"]`).click();
-        await expect(page.locator('.leaderboard-status')).toHaveText('Đã cập nhật');
+        await expect(page.locator('.leaderboard-heading')).toBeVisible();
+        await expect(page.locator('.leaderboard-status')).toHaveText('');
         await expect(page.locator('[aria-label="Màn chơi"]')).toBeVisible({ visible: !['challenge', 'endless'].includes(mode) });
         expect(await page.evaluate(() => window.rankRequests.at(-1).page)).toBe(1);
       }

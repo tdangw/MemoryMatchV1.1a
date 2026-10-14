@@ -9,6 +9,7 @@ import { getAccountService } from './accountService.js';
 import { getLeaderboardService } from './leaderboardService.js';
 import { readLeaderboard } from './leaderboardStore.js';
 import { rankingBoardId } from './rankingResult.js';
+import { formatLeaderboardTime, formatLeaderboardNumber } from './leaderboardPresentation.js';
 import { createGameShellLifecycle, getActiveGameScope } from './gameShell/gameShellLifecycle.js';
 import { getAppPageScope } from './appPageLifecycle.js';
 let lastGame = null;
@@ -40,7 +41,7 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
   const pageLabel = document.createElement('span');
   const numbers = document.createElement('div'); numbers.className = 'leaderboard-page-numbers';
   pager.append(previous, pageLabel, numbers, next);
-  filters.append(levelLabel); footer.append(filters, pager); content.append(games, modes, context, status, results, own, footer);
+  filters.append(levelLabel); footer.append(filters, pager); results.append(status); content.append(games, modes, context, results, own, footer);
   const owner = surface.owner || getActiveGameScope() || getAppPageScope();
   const release = owner?.own(() => scope.dispose(), 'cleanup');
   const modal = openAppModal({ ...surface, id: 'rankings-modal', title: 'Bảng xếp hạng', icon: 'trophy', content, onDestroy: () => { generation++; scope.dispose(); release?.forget(); }, onClose });
@@ -79,37 +80,42 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
     const normal = NORMAL_MODE_IDS.includes(selectedMode);
     const board = { gameId: selectedGame, mode: selectedMode, kind: normal ? 'time' : 'run', ...(normal ? { level: Number(level.value) } : { rulesVersion: 2 }) };
     loading = true; currentPage = requestedPage; controls();
-    results.replaceChildren(); own.textContent = ''; status.textContent = 'Đang tải kỷ lục…'; results.setAttribute('aria-busy', 'true');
+    results.replaceChildren(status); own.textContent = ''; status.textContent = 'Đang tải…'; results.setAttribute('aria-busy', 'true');
     if (normal && (!Number.isSafeInteger(board.level) || board.level < 1 || board.level > MAX_ADVENTURE_LEVEL)) { loading = false; results.removeAttribute('aria-busy'); status.textContent = 'Hãy nhập số màn hợp lệ.'; controls(); return; }
     currentKey = `${uid || ''}:${rankingBoardId(board)}`;
     try {
       const backend = await getFirebaseBackend();
       if (!scope.active || id !== generation || uid !== getAccountService()?.getIdentity()?.uid) return;
-      if (!backend || !navigator.onLine) { status.textContent = 'Chưa có kết nối. Kỷ lục trên máy vẫn được giữ.'; return; }
+      if (!backend || !navigator.onLine) { status.textContent = 'Chưa có kết nối.'; return; }
       if (refreshRequested) await getLeaderboardService()?.flush();
       if (!scope.active || id !== generation) return;
       const data = await readLeaderboard({ database: backend.database, environment: backend.environment, board, uid, refresh: refreshRequested, page: requestedPage });
       if (!scope.active || id !== generation || uid !== getAccountService()?.getIdentity()?.uid) return;
       currentPage = data.page;
+      results.dataset.kind = board.kind;
+      const heading = document.createElement('div'); heading.className = `leaderboard-heading leaderboard-heading--${board.kind}`;
+      for (const text of board.kind === 'time' ? ['Hạng', 'Người chơi', 'Thời gian'] : ['Hạng', 'Người chơi', 'Màn', 'Điểm']) {
+        const cell = document.createElement('span'); cell.textContent = text; heading.append(cell);
+      }
       const list = document.createElement('ol'); list.className = 'leaderboard-list'; list.start = (currentPage - 1) * 10 + 1;
       for (const [index, item] of data.top.entries()) {
         const rank = (currentPage - 1) * 10 + index + 1;
         const row = document.createElement('li');
-        const place = document.createElement('span'); place.className = 'leaderboard-rank'; place.textContent = rank <= 3 ? ['🥇', '🥈', '🥉'][rank - 1] : String(rank); place.setAttribute('aria-label', `Hạng ${rank}`);
-        const avatar = document.createElement('span'); avatar.className = 'leaderboard-avatar'; avatar.append(createIcon('account')); avatar.setAttribute('aria-hidden', 'true');
+        const place = document.createElement('span'); place.className = `leaderboard-rank${rank <= 3 ? ` leaderboard-rank--${rank}` : ''}`; place.textContent = String(rank); place.setAttribute('aria-label', `Hạng ${rank}`);
+        const avatar = document.createElement('span'); avatar.className = 'leaderboard-avatar'; avatar.textContent = Array.from(item.playerName.trim()).slice(0, 1).join('').toLocaleUpperCase('vi-VN') || '•'; avatar.setAttribute('aria-hidden', 'true');
         const name = document.createElement('span'); name.className = 'leaderboard-name'; name.textContent = item.playerName; name.title = item.playerName;
-        const metric = document.createElement('strong'); metric.textContent = describe(item, board.kind);
-        if (item.uid === uid) row.classList.add('is-self');
-        row.append(place, avatar, name, metric); list.append(row);
+        if (item.uid === uid) { row.classList.add('is-self'); name.setAttribute('aria-label', `${item.playerName}, bạn`); }
+        row.append(place, avatar, name);
+        if (board.kind === 'run') row.append(metric(formatLeaderboardNumber(item.levelReached), 'leaderboard-stage', 'Màn'));
+        row.append(metric(board.kind === 'time' ? formatLeaderboardTime(item.durationMs) : formatLeaderboardNumber(item.totalScore), 'leaderboard-metric', board.kind === 'time' ? 'Thời gian' : 'Điểm')); list.append(row);
       }
-      if (data.top.length) results.append(list);
-      else { const empty = document.createElement('p'); empty.textContent = 'Chưa có thành tích trên bảng này.'; results.append(empty); }
-      own.textContent = data.own ? `Kỷ lục của bạn: ${describe(data.own, board.kind)}` : 'Kỷ lục của bạn: chưa có.';
+      if (data.top.length) { status.textContent = ''; results.replaceChildren(status, heading, list); }
+      else { status.textContent = 'Chưa có thành tích.'; }
+      own.textContent = data.own && !data.top.some(item => item.uid === uid) ? `Thành tích của bạn: ${describe(data.own, board.kind)}` : '';
       results.scrollTop = refreshRequested ? 0 : scrolls.get(`${currentKey}:${currentPage}`) || 0;
-      status.textContent = currentPage === 100 && data.hasNext ? 'Hãy làm mới để xem từ trang đầu.' : data.cached ? 'Kỷ lục đã tải gần đây' : 'Đã cập nhật';
       loading = false; controls(data);
     } catch (error) {
-      if (scope.active && id === generation) status.textContent = ['reset', 'stale'].includes(error.code) ? error.message : 'Chưa tải được bảng. Hãy thử lại khi có kết nối.';
+      if (scope.active && id === generation) status.textContent = ['reset', 'stale'].includes(error.code) ? 'Bảng đã thay đổi. Làm mới để xem tiếp.' : 'Chưa tải được bảng. Thử lại.';
     } finally {
       if (scope.active && id === generation) { loading = false; refresh.disabled = false; previous.disabled = currentPage === 1; results.removeAttribute('aria-busy'); }
     }
@@ -144,4 +150,5 @@ function tabs(label, entries, kind) {
     item.dataset[kind === 'game' ? 'rankGame' : 'rankMode'] = value; group.append(item); }
   return group;
 }
-function describe(item, kind) { return kind === 'time' ? `${(item.durationMs / 1000).toFixed(2)} giây` : `Màn ${item.levelReached} · ${item.totalScore.toLocaleString('vi-VN')} điểm`; }
+function metric(text, className, label) { const cell = document.createElement('strong'); cell.className = className; cell.textContent = text; cell.title = text; cell.setAttribute('aria-label', `${label} ${text}`); return cell; }
+function describe(item, kind) { return kind === 'time' ? formatLeaderboardTime(item.durationMs) : `${formatLeaderboardNumber(item.levelReached)} màn · ${formatLeaderboardNumber(item.totalScore)} điểm`; }
