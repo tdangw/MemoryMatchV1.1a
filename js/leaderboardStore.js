@@ -44,7 +44,7 @@ export async function readLeaderboard({ database, environment, board, uid = null
     while (cache.size > CACHE_LIMIT) cache.delete(cache.keys().next().value);
   } else { cache.delete(key); cache.set(key, state); }
   const cached = state.pages.get(page);
-  if (cached) { state.pages.delete(page); state.pages.set(page, cached); return { ...cached, knownPages: [...state.cursors.keys()], cached: true }; }
+  if (cached) { state.pages.delete(page); state.pages.set(page, cached); return { ...cached, knownPages: [...state.cursors.keys()], loadedPages: [...state.seenPages.keys()], cached: true }; }
   if (!state.cursors.has(page)) throw pageError('reset');
   const ref = entries(database, environment, boardId);
   const ordering = board.kind === 'time' ? [orderBy('durationMs', 'asc')] : [orderBy('levelReached', 'desc'), orderBy('totalScore', 'desc')];
@@ -65,7 +65,7 @@ export async function readLeaderboard({ database, environment, board, uid = null
   state.seenPages.set(page, rows.map(row => row.uid));
   const hasNext = top.size > 10;
   if (hasNext && page < 100) state.cursors.set(page + 1, rankingCursor(rows[9], board.kind));
-  const result = { top: rows, own: state.own, page, hasNext, knownPages: [...state.cursors.keys()], fetchedAt: Date.now(), reads: top.size + ownReads, cached: false };
+  const result = { top: rows, own: state.own, page, hasNext, knownPages: [...state.cursors.keys()], loadedPages: [...state.seenPages.keys()], fetchedAt: Date.now(), reads: top.size + ownReads, cached: false };
   if (cache.get(key) === state) {
     state.pages.set(page, result);
     while (state.pages.size > 5) state.pages.delete(state.pages.keys().next().value);
@@ -89,6 +89,6 @@ export function readCachedLeaderboard({ environment, board, uid = null, page = 1
   const state = cache.get(`${environment}:${rankingBoardId(board)}:${uid || ''}`);
   if (!state || Date.now() - state.fetchedAt >= CACHE_TTL_MS) return null;
   const data = state.pages.get(page);
-  return data ? { ...data, knownPages: [...state.cursors.keys()], cached: true } : null;
+  return data ? { ...data, knownPages: [...state.cursors.keys()], loadedPages: [...state.seenPages.keys()], cached: true } : null;
 }
 export function getLeaderboardCacheDiagnostics() { return { boards: cache.size, pages: [...cache.values()].map(state => state.pages.size), cursors: [...cache.values()].map(state => state.cursors.size) }; }

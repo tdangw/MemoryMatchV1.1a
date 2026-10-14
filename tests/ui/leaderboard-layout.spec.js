@@ -11,6 +11,7 @@ const source = readFileSync('js/leaderboardPanel.js', 'utf8')
     const count = window.rankCount;
     const data = { page, hasNext: page * 10 < count, knownPages: Array.from({ length: Math.min(Math.ceil(count / 10), page + 1) }, (_, i) => i + 1),
       top: Array.from({ length: Math.max(0, Math.min(10, count - (page - 1) * 10)) }, (_, i) => ({ uid: 'row-' + ((page - 1) * 10 + i), playerName: window.rankNames?.[i] || '<img src=x> Tên người chơi rất dài rất dài', durationMs: window.rankNames ? 41810 + i * 1370 : 1000, levelReached: window.rankNames ? 42 - i : 10, totalScore: window.rankNames ? 128640 - i * 3500 : 12345 })), own: window.rankUid ? { durationMs: 1000, levelReached: 10, totalScore: 12345 } : null };
+    data.loadedPages = [...new Set([...window.rankCache.keys()].map(key => JSON.parse(key)).filter(item => JSON.stringify(item.board) === JSON.stringify(board) && item.uid === uid).map(item => item.page).concat(page))];
     window.rankCache.set(JSON.stringify({ board, uid, page }), data); return data;
   };`);
 async function open(page, count = 21, gameContext = false) {
@@ -35,6 +36,46 @@ for (const count of [0, 1, 10, 11]) test(`record count ${count}, private own rec
   await expect(page.locator('.leaderboard-view')).not.toContainText('Đã cập nhật');
   await expect(page.locator('.leaderboard-list img')).toHaveCount(0);
 });
+test('page numbers show only loaded pages, collapse with ellipsis and jump once', async ({ page }) => {
+  await page.setViewportSize({ width: 1024, height: 900 }); await open(page, 1000);
+  await page.evaluate(() => { window.rankNames = ['Linh Nguyễn', 'Hải Minh', 'Ngọc Anh', 'Bảo Trân', 'Hoàng Nam', 'Mai Chi', 'An Nhiên', 'Tuấn Anh', 'Thanh Hà', 'Minh Khôi']; });
+  await page.getByRole('button', { name: 'Làm mới', exact: true }).click();
+  const numbers = page.locator('.leaderboard-page-numbers');
+  await expect(numbers.locator('button')).toHaveText(['1']);
+  for (let n = 2; n <= 12; n++) {
+    await page.getByRole('button', { name: 'Sau', exact: true }).click();
+    await expect(numbers.locator('[aria-current="page"]')).toHaveText(String(n));
+  }
+  await page.getByRole('button', { name: 'Trang 11', exact: true }).click();
+  await expect(numbers.locator('[aria-current="page"]')).toHaveText('11');
+  await expect(numbers.locator('button')).toHaveText(['1', '2', '10', '11', '12']);
+  await expect(numbers.locator('.leaderboard-page-gap')).toHaveCount(1);
+  await page.screenshot({ path: 'docs/design/leaderboard/qa/desktop-pagination.png', animations: 'disabled' });
+  await expect(page.getByRole('button', { name: 'Trang 13', exact: true })).toHaveCount(0);
+  const before = await page.evaluate(() => window.rankRequests.length);
+  await page.getByRole('button', { name: 'Trang 2', exact: true }).click();
+  await expect(numbers.locator('[aria-current="page"]')).toHaveText('2');
+  await expect(page.getByRole('button', { name: 'Trang 2', exact: true })).toBeFocused();
+  expect(await page.evaluate(() => window.rankRequests.length)).toBe(before + 1);
+  expect(await page.evaluate(() => window.rankRequests.at(-1).page)).toBe(2);
+  await page.setViewportSize({ width: 412, height: 915 });
+  await expect(numbers.locator('button')).toHaveText(['1', '2', '12']);
+  await expect(page.getByRole('button', { name: 'Trang 2', exact: true })).toBeFocused();
+  const pager = await page.locator('.leaderboard-pager').boundingBox();
+  const stage = await page.getByRole('button', { name: 'Chọn màn', exact: true }).boundingBox();
+  expect(Math.abs(pager.x + pager.width / 2 - 206)).toBeLessThan(2);
+  expect(stage.x + stage.width).toBeLessThanOrEqual(pager.x);
+  await page.screenshot({ path: 'docs/design/leaderboard/qa/mobile-pagination.png', animations: 'disabled' });
+  await page.setViewportSize({ width: 320, height: 740 });
+  const narrowPager = await page.locator('.leaderboard-pager').boundingBox();
+  const narrowStage = await page.getByRole('button', { name: 'Chọn màn', exact: true }).boundingBox();
+  expect(Math.abs(narrowPager.x + narrowPager.width / 2 - 160)).toBeLessThan(2);
+  expect(narrowStage.x + narrowStage.width).toBeLessThanOrEqual(narrowPager.x);
+  expect(Math.abs(narrowStage.y + narrowStage.height / 2 - narrowPager.y - narrowPager.height / 2)).toBeLessThan(2);
+  await page.locator('[data-rank-mode="hard"]').click();
+  await expect(numbers.locator('button')).toHaveText(['1']);
+});
+
 test('stage list scrolls upwards, selects 212 and MAX once and restores focus', async ({ page }) => {
   await page.setViewportSize({ width: 412, height: 915 }); await open(page);
   const before = await page.evaluate(() => window.rankRequests.length);
@@ -114,8 +155,8 @@ for (const viewport of [{ width: 412, height: 915 }, { width: 640, height: 360 }
       }
     }
     await expect(page.locator('.leaderboard-list img')).toHaveCount(0);
-    const boxes = await page.locator('.leaderboard-tabs--game button, .leaderboard-pager > button').evaluateAll(nodes => nodes.map(node => { const rect = node.getBoundingClientRect(); return { x: rect.x, right: rect.right, y: rect.y, bottom: rect.bottom, height: rect.height }; }));
-    for (const box of boxes) { expect(box.x).toBeGreaterThanOrEqual(0); expect(box.right).toBeLessThanOrEqual(viewport.width); expect(Math.round(box.height * 1000) / 1000).toBeGreaterThanOrEqual(44); expect(box.bottom).toBeLessThanOrEqual(viewport.height); }
+    const boxes = await page.locator('.leaderboard-tabs--game button, .leaderboard-pager button').evaluateAll(nodes => nodes.map(node => { const rect = node.getBoundingClientRect(); return { x: rect.x, right: rect.right, y: rect.y, bottom: rect.bottom, height: rect.height, minimum: node.closest('.leaderboard-pager') ? 32 : 44 }; }));
+    for (const box of boxes) { expect(box.x).toBeGreaterThanOrEqual(0); expect(box.right).toBeLessThanOrEqual(viewport.width); expect(Math.round(box.height * 1000) / 1000).toBeGreaterThanOrEqual(box.minimum); expect(box.bottom).toBeLessThanOrEqual(viewport.height); }
     const modeGeometry = await page.locator('.leaderboard-tabs--mode button').evaluateAll(nodes => nodes.map(node => ({ y: node.getBoundingClientRect().y, height: node.getBoundingClientRect().height })));
     expect(new Set(modeGeometry.map(box => box.y)).size).toBe(1);
     for (const box of modeGeometry) expect(box.height).toBeGreaterThanOrEqual(44);
@@ -123,7 +164,7 @@ for (const viewport of [{ width: 412, height: 915 }, { width: 640, height: 360 }
     const pagerBox = await page.locator('.leaderboard-pager').boundingBox();
     expect(Math.abs(pagerBox.x + pagerBox.width / 2 - panelBox.x - panelBox.width / 2)).toBeLessThan(2);
     await page.getByRole('button', { name: 'Sau', exact: true }).click();
-    await expect(page.locator('.leaderboard-pager')).toContainText('Trang 2');
+    await expect(page.getByRole('button', { name: 'Trang 2', exact: true })).toHaveAttribute('aria-current', 'page');
     await page.getByRole('button', { name: 'Sau', exact: true }).click();
     await expect(page.locator('.leaderboard-list li')).toHaveCount(1);
     await expect(page.getByRole('button', { name: 'Sau', exact: true })).toBeDisabled();

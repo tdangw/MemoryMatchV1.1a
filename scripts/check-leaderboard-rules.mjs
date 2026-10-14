@@ -51,10 +51,14 @@ try {
     do {
       data = await readLeaderboard({ database: publicDatabase, environment: 'test', board, page });
       assert(data.top.length <= 10); assert(data.reads <= 11);
+      assert.deepEqual(data.loadedPages, Array.from({ length: page }, (_, i) => i + 1));
+      if (data.hasNext) { assert(data.knownPages.includes(page + 1)); assert(!data.loadedPages.includes(page + 1)); }
       seen.push(...data.top.map(item => item.uid)); page++;
     } while (data.hasNext);
     assert.equal(seen.length, count); assert.equal(new Set(seen).size, count);
     assert.deepEqual(seen, [...seen].sort());
+    const back = await readLeaderboard({ database: publicDatabase, environment: 'test', board, page: 1 });
+    assert.deepEqual(back.loadedPages, data.loadedPages, 'Returning to a cached page retains every successfully loaded page.');
   }
   for (const gameId of ['memory-match', 'link-connect', 'triple-connect']) for (const mode of ['challenge', 'endless']) {
     const checkpoint = { ...run, gameId, mode, rulesVersion: 2, outcome: 'won', id: crypto.randomUUID() };
