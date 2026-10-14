@@ -1,5 +1,7 @@
 # Kế hoạch làm lại bảng xếp hạng
 
+Hồ sơ lịch sử. Kế hoạch hiện hành từ2026-10-14 là `LEVEL_PROGRESS_LEADERBOARD_PLAN.md`; yêu cầu mới thay luật/bộ lọc/picker của hồ sơ này. Không triển khai lại các phase đã hoàn tất dưới đây.
+
 Ngày: 2026-10-14. Trạng thái: đã hoàn tất Phase1–5 trong phạm vi code/browser và cập nhật Firestore Rules. Không còn phase triển khai đang chờ. EFFECTS_LEADERBOARD_PLAN.md là hồ sơ Gate1–3 đã hoàn tất ở phạm vi code/browser, còn QA thiết bị thật.
 
 ## 1. Mục tiêu và phạm vi
