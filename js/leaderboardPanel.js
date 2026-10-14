@@ -10,6 +10,7 @@ import { getLeaderboardService } from './leaderboardService.js';
 import { readLeaderboard } from './leaderboardStore.js';
 import { readCachedLeaderboard } from './leaderboardStore.js';
 import { rankingBoardId } from './rankingResult.js';
+import { openLeaderboardStagePicker } from './leaderboardStagePicker.js';
 import { formatLeaderboardTime, formatLeaderboardNumber } from './leaderboardPresentation.js';
 import { createGameShellLifecycle, getActiveGameScope } from './gameShell/gameShellLifecycle.js';
 import { getAppPageScope } from './appPageLifecycle.js';
@@ -30,7 +31,7 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
   const modes = tabs('Chế độ', [...GAME_MODES].sort((a, b) => (a.id === 'endless') - (b.id === 'endless')).map(item => [item.id, item.label]), 'mode');
   const filters = document.createElement('div'); filters.className = 'leaderboard-filters';
   const footer = document.createElement('div'); footer.className = 'leaderboard-footer';
-  const levelLabel = button(''); levelLabel.classList.add('leaderboard-level'); levelLabel.setAttribute('aria-label', 'Chọn màn');
+  const levelLabel = button(''); levelLabel.classList.add('leaderboard-level'); levelLabel.setAttribute('aria-label', 'Chọn màn'); levelLabel.setAttribute('aria-haspopup', 'dialog'); levelLabel.setAttribute('aria-expanded', 'false');
   const level = { value: '1' };
   const refresh = button('Làm mới');
   refresh.setAttribute('aria-label', 'Làm mới'); refresh.replaceChildren(createIcon('restart')); refresh.classList.add('leaderboard-refresh');
@@ -129,25 +130,10 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
   scope.listen(modes, 'click', event => { const item = event.target.closest('[data-rank-mode]'); if (!item) return; selectedMode = item.dataset.rankMode; revealMode(item); updateFilters(); void load(); });
   scope.listen(levelLabel, 'click', () => {
     if (picker) { picker.panel.focus(); return; }
-    const form = document.createElement('form'); form.className = 'leaderboard-stage-form';
-    const input = document.createElement('input'); input.type = 'text'; input.inputMode = 'numeric'; input.maxLength = 16; input.value = level.value; input.setAttribute('aria-label', 'Màn chơi'); input.autocomplete = 'off';
-    const message = document.createElement('p'); message.className = 'leaderboard-stage-error'; message.setAttribute('aria-live', 'polite');
-    const confirm = button('Xem'); confirm.type = 'submit';
-    form.append(input, message, confirm);
-    const dialogScope = createGameShellLifecycle();
-    const release = scope.own(() => { dialogScope.dispose(); }, 'cleanup');
-    picker = openAppModal({ id: 'leaderboard-stage-picker', title: 'Chọn màn', icon: 'map', content: form, size: 'small', owner: scope, onDestroy: () => { dialogScope.dispose(); release.forget(); picker = null; } });
-    picker.panel.classList.add('leaderboard-stage-dialog');
-    const dialog = picker;
-    dialogScope.listen(form, 'submit', event => {
-      event.preventDefault();
-      const raw = input.value.trim(); const value = Number(raw);
-      if (!/^\d+$/.test(raw) || !Number.isSafeInteger(value) || value < 1 || value > MAX_ADVENTURE_LEVEL) {
-        message.textContent = 'Số màn chưa hợp lệ.'; input.setAttribute('aria-invalid', 'true'); input.focus(); return;
-      }
-      level.value = String(value); dialog.destroy(); updateFilters(); void load();
+    picker = openLeaderboardStagePicker({ anchor: levelLabel, value: Number(level.value), owner: scope,
+      onDestroy: () => { picker = null; },
+      onSelect: value => { level.value = String(value); updateFilters(); void load(); }
     });
-    input.focus(); input.select();
   });
   scope.listen(refresh, 'click', () => { void load(true); });
   scope.listen(previous, 'click', () => { if (!loading && currentPage > 1) void load(false, currentPage - 1); });

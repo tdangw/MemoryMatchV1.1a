@@ -35,31 +35,42 @@ for (const count of [0, 1, 10, 11]) test(`record count ${count}, private own rec
   await expect(page.locator('.leaderboard-view')).not.toContainText('Đã cập nhật');
   await expect(page.locator('.leaderboard-list img')).toHaveCount(0);
 });
-test('stage picker confirms 212 once, rejects invalid input and returns focus on cancel', async ({ page }) => {
+test('stage list scrolls upwards, selects 212 and MAX once and restores focus', async ({ page }) => {
   await page.setViewportSize({ width: 412, height: 915 }); await open(page);
   const before = await page.evaluate(() => window.rankRequests.length);
-  await page.getByRole('button', { name: 'Chọn màn', exact: true }).click();
-  const input = page.getByLabel('Màn chơi', { exact: true });
-  await input.fill('212');
+  const anchor = page.getByRole('button', { name: 'Chọn màn', exact: true });
+  await anchor.click();
+  const list = page.getByRole('listbox', { name: 'Màn chơi' });
+  await expect(list).toBeFocused(); await expect(page.locator('.leaderboard-stage-dialog')).toHaveAttribute('data-direction', 'up');
+  const box = await list.boundingBox(); const button = await anchor.boundingBox();
+  expect(box.height).toBe(440); expect(box.y + box.height).toBeLessThan(button.y);
+  await list.press('Home');
+  for (let i = 0; i < 21; i++) await list.press('PageDown');
+  await list.press('ArrowDown');
   expect(await page.evaluate(() => window.rankRequests.length)).toBe(before);
-  await input.press('Enter');
-  await expect(page.locator('.leaderboard-context')).toHaveCount(0);
-  await expect(page.getByRole('button', { name: 'Chọn màn', exact: true })).toContainText('212');
+  await list.press('Enter');
+  await expect(anchor).toContainText('212');
   expect(await page.evaluate(() => window.rankRequests.at(-1))).toMatchObject({ level: 212, page: 1 });
-  await page.getByRole('button', { name: 'Chọn màn', exact: true }).click();
-  for (const invalid of ['0', '-1', '2.5', 'abc', '9007199254740991']) {
-    await input.fill(invalid); await input.press('Enter');
-    await expect(input).toHaveAttribute('aria-invalid', 'true');
-    await expect(page.getByRole('button', { name: 'Chọn màn', exact: true })).toContainText('212');
-  }
-  await input.press('Escape');
-  await expect(page.locator('#leaderboard-stage-picker')).toHaveCount(0);
-  await expect(page.getByRole('button', { name: 'Chọn màn', exact: true })).toBeFocused();
-  await page.getByRole('button', { name: 'Chọn màn', exact: true }).click();
-  await input.fill('9007199254740900'); await input.press('Enter');
-  await expect(page.getByRole('button', { name: 'Chọn màn', exact: true })).toContainText('9007199254740900');
+  await anchor.click();
+  await list.evaluate(node => { node.scrollTop = node.scrollHeight; });
+  await expect(page.getByRole('option', { name: 'Màn 246', exact: true })).toHaveCount(1);
+  expect(await list.locator('[role="option"]').count()).toBeLessThanOrEqual(40);
+  await list.press('Escape'); await expect(page.locator('#leaderboard-stage-picker')).toHaveCount(0); await expect(anchor).toBeFocused();
+  await anchor.click(); await list.press('End');
+  const maxOption = page.getByRole('option', { name: 'Màn 9007199254740900', exact: true });
+  await expect(maxOption).toHaveAttribute('title', 'Màn 9007199254740900');
+  expect(await maxOption.evaluate(node => getComputedStyle(node).whiteSpace)).toBe('nowrap');
+  await list.press('Enter');
+  await expect(anchor).toContainText('9007199254740900');
   expect(await page.evaluate(() => window.rankRequests.at(-1).level)).toBe(9007199254740900);
-  await page.screenshot({ path: 'test-results/ranking-stage-picker-confirmed.png' });
+  await anchor.click(); await list.press('Home'); await list.press('Enter'); await expect(anchor).toContainText('Màn 1');
+  await anchor.click();
+  await page.setViewportSize({ width: 844, height: 390 });
+  const compact = await list.boundingBox();
+  expect(compact.y).toBeGreaterThanOrEqual(0); expect(compact.y + compact.height).toBeLessThan(390);
+  await page.getByRole('option', { name: 'Màn 2', exact: true }).click();
+  await expect(anchor).toContainText('Màn 2'); await expect(anchor).toBeFocused();
+  expect(await page.evaluate(() => window.rankRequests.at(-1))).toMatchObject({ level: 2, page: 1 });
 });
 test('30 mount, picker cancel and mode changes release every page-owned resource', async ({ page }) => {
   await open(page);
@@ -76,7 +87,7 @@ test('30 mount, picker cancel and mode changes release every page-owned resource
     await page.evaluate(async () => { window.rankCycleModal = (await import('/js/leaderboardPanel.js')).openLeaderboards(undefined, undefined, { presentation: 'screen', host: document.querySelector('.adventure-screen-host'), owner: (await import('/js/appPageLifecycle.js')).getAppPageScope() }); });
     await expect(page.locator('.leaderboard-heading')).toBeVisible();
     await page.getByRole('button', { name: 'Chọn màn', exact: true }).click();
-    await page.getByLabel('Màn chơi', { exact: true }).press('Escape');
+    await page.getByRole('listbox', { name: 'Màn chơi', exact: true }).press('Escape');
     await expect(page.locator('#leaderboard-stage-picker')).toHaveCount(0);
     await page.locator('[data-rank-mode="challenge"]').click();
     await expect(page.locator('.leaderboard-heading')).toContainText('Điểm');
@@ -158,7 +169,7 @@ test('final garden artwork, centered footer and background failure keep a usable
   await page.setViewportSize({ width: 412, height: 915 }); await open(page, 21, true);
   await page.evaluate(() => { window.rankNames = ['Linh Nguyễn', 'Hải Minh', 'Ngọc Anh', 'Bảo Trân', 'Hoàng Nam', 'Mai Chi', 'An Nhiên', 'Tuấn Anh', 'Thanh Hà', 'Minh Khôi']; window.rankUid = 'row-6'; });
   await page.getByRole('button', { name: 'Chọn màn', exact: true }).click();
-  await page.getByLabel('Màn chơi', { exact: true }).fill('212'); await page.getByRole('button', { name: 'Xem', exact: true }).click();
+  const stageList = page.getByRole('listbox', { name: 'Màn chơi', exact: true }); await stageList.press('Home'); for (let i = 0; i < 21; i++) await stageList.press('PageDown'); await stageList.press('ArrowDown'); await stageList.press('Enter');
   await expect(page.locator('.leaderboard-list .is-self')).toHaveCount(1);
   const last = await page.locator('.leaderboard-list li').last().boundingBox();
   const region = await page.locator('.leaderboard-results').boundingBox();
@@ -168,7 +179,7 @@ test('final garden artwork, centered footer and background failure keep a usable
   await page.screenshot({ path: 'docs/design/leaderboard/qa/mobile-time.png', animations: 'disabled' });
   await page.getByRole('button', { name: 'Chọn màn', exact: true }).click();
   await page.screenshot({ path: 'docs/design/leaderboard/qa/mobile-picker.png', animations: 'disabled' });
-  await page.getByLabel('Màn chơi', { exact: true }).press('Escape'); await expect(page.locator('#leaderboard-stage-picker')).toHaveCount(0);
+  await page.getByRole('listbox', { name: 'Màn chơi', exact: true }).press('Escape'); await expect(page.locator('#leaderboard-stage-picker')).toHaveCount(0);
   await page.locator('[data-rank-mode="challenge"]').click(); await expect(page.locator('.leaderboard-heading')).toContainText('Điểm');
   await page.screenshot({ path: 'docs/design/leaderboard/qa/mobile-run.png', animations: 'disabled' });
   await page.setViewportSize({ width: 844, height: 390 }); await page.screenshot({ path: 'docs/design/leaderboard/qa/landscape-run.png', animations: 'disabled' });
