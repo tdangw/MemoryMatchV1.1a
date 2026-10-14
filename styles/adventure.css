@@ -131,55 +131,6 @@
   .adventure-ad-slot { height: calc(40px + env(safe-area-inset-bottom)); }
   .adventure-dock button { min-height: 40px; }
 }
-/* Leaderboard owns its bounded scrolling list and stable controls. */
-.leaderboard-panel .app-modal__body { overflow: hidden; display: flex; flex-direction: column; }
-.leaderboard-view { display: flex; flex-direction: column; gap: 8px; min-height: 0; height: 100%; }
-.leaderboard-tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; flex-shrink: 0; }
-.leaderboard-tabs button { min-height: 44px; padding: 6px; min-width: 0; font-size: 13px; }
-.leaderboard-tabs button[aria-pressed="true"] { outline: 2px solid #ffe1a0; outline-offset: -2px; }
-.leaderboard-tabs [data-rank-mode="easy"] { background: #77513c; }
-.leaderboard-tabs [data-rank-mode="normal"] { background: #286b86; }
-.leaderboard-tabs [data-rank-mode="hard"] { background: #806619; }
-.leaderboard-tabs [data-rank-mode="superHard"] { background: #64408c; }
-.leaderboard-filters > button { width: auto; }
-.leaderboard-filters { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-.leaderboard-filters label[hidden] { display: none; }
-.leaderboard-filters input { min-height: 44px; width: 90px; max-width: 100%; box-sizing: border-box; border-radius: 12px; padding: 8px; }
-.leaderboard-status, .leaderboard-own { margin: 0; font-size: 13px; flex-shrink: 0; }
-.leaderboard-results { overflow: auto; min-height: 0; flex: 1; scrollbar-width: none; }
-.leaderboard-results::-webkit-scrollbar { display: none; }
-.leaderboard-results:focus-visible { outline: 2px solid #ffe1a0; outline-offset: -2px; }
-.leaderboard-list { list-style: none; padding: 0; margin: 0; }
-.leaderboard-list li { display: grid; grid-template-columns: 28px 24px minmax(0, 1fr) auto; align-items: center; gap: 6px; padding: 10px 4px; min-height: 44px; box-sizing: border-box; border-bottom: 1px solid #ffffff26; }
-.leaderboard-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.leaderboard-avatar .ui-icon { width: 22px; height: 22px; }
-.leaderboard-grade { font-weight: 900; }
-.leaderboard-avatar { color: #c4b5e1; text-align: center; }
-.leaderboard-list strong { font-size: 13px; font-variant-numeric: tabular-nums; text-align: right; }
-.leaderboard-list .is-self { background: #ffe1a016; }
-.leaderboard-list .is-self, .leaderboard-own { color: #ffdf8a; }
-.leaderboard-pager, .leaderboard-page-numbers { display: flex; align-items: center; gap: 4px; }
-.leaderboard-pager { flex-shrink: 0; flex-wrap: wrap; justify-content: center; }
-.leaderboard-pager button { width: auto; min-width: 44px; min-height: 44px; padding: 6px; }
-.leaderboard-pager [aria-current="page"] { outline: 2px solid #ffe1a0; outline-offset: -2px; }
-@media (max-height: 500px) {
-  .leaderboard-view { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: 44px 44px minmax(44px, 1fr) auto 44px; gap: 4px; }
-  .leaderboard-tabs--game { grid-column: 1; grid-row: 1; }
-  .leaderboard-filters { grid-column: 2; grid-row: 1; }
-  .leaderboard-tabs--mode { grid-column: 1 / -1; grid-row: 2; }
-  .leaderboard-results { grid-column: 1 / -1; grid-row: 3; }
-  .leaderboard-own { grid-column: 1; grid-row: 4; }
-  .leaderboard-status { grid-column: 2; grid-row: 4; }
-  .leaderboard-pager { grid-column: 1 / -1; grid-row: 5; flex-wrap: nowrap; }
-  .leaderboard-filters input { width: 70px; }
-  .leaderboard-panel .app-modal__body { padding-inline: 10px; }
-  .leaderboard-panel .app-modal__title { font-size: 20px; }
-  .leaderboard-panel .app-modal__header { padding-top: 4px; padding-bottom: 4px; }
-  .leaderboard-panel .app-modal__body { padding-top: 4px; padding-bottom: 4px; }
-  .leaderboard-tabs--mode { grid-template-columns: repeat(6, minmax(0, 1fr)); }
-  .leaderboard-status { font-size: 11px; }
-}
-
 .adventure-exit { position: absolute; right: 12px; top: max(10px, env(safe-area-inset-top)); z-index: 2; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid #f6d68b55; border-radius: 50%; background: #10283dd9; color: #ffe1a0; }
 .adventure-screen > .adventure-exit { right: max(12px, calc((100% - 640px) / 2 + 12px)); }
 .adventure-map-page .adventure-map-title { padding-inline: 50px; }

@@ -1,8 +1,10 @@
-# CONTEXT — Trạng thái hiện tại (2026-10-13)
+# CONTEXT — Trạng thái hiện tại (2026-10-14)
 
 Đọc file này khi bắt đầu task mới. Đây là snapshot điều hướng, không thay thế code/config và không chứa lịch sử triển khai chi tiết.
 
 ## Sản phẩm
+
+- Task hiện hành2026-10-14: `LEADERBOARD_REDESIGN_PLAN.md` là kế hoạch triển khai duy nhất, đã lập theo mẫu Vườn đêm và vẽ nền ở `docs/design/leaderboard/`; chưa sửa runtime. Bỏ XP/cấp; giữ ranking time theo trò/mode/màn và run v2 theo màn thắng/điểm. Một hàng mode cuộn ngang, ô chọn màn dưới cạnh pager căn giữa; nhập số màn trực tiếp. Ngày tham gia/tổng active playtime là phase profile riêng, chỉ owner/admin; hệ thống quản lý admin ngoài repo chưa có nguồn. `EFFECTS_LEADERBOARD_PLAN.md` chuyển thành hồ sơ Gate1–3 cũ, còn QA Galaxy S22 Ultra thật.
 
 - Ứng dụng JavaScript ES modules; backend local chính là IndexedDB theo chặng, facade persistence bất đồng bộ. Firebase Firestore Singapore đã cấu hình Rules/indexes; Auth Guest/Google, sync, xếp hạng online và Analytics production-only đã triển khai. Chưa deploy Hosting trong task này; dashboard Analytics/OAuth hosted/thiết bị thật còn cần QA trước phát hành.
 - Sản phẩm chưa phát hành. Yêu cầu ngày 2026-10-13 thay chính sách reset development: giữ Xu/vật phẩm/chủ đề/kỷ lục/session khi chuyển định dạng. Bản nguồn formatVersion=1 được giữ làm phục hồi; formatVersion=2 dùng transaction profile + chapter, cache giới hạn theo chặng đang xem/phiên. Không fallback sang v1 khi backend mới từng được dùng; dữ liệu hỏng/version lạ chặn ghi. Ghi thất bại chặn các snapshot phụ thuộc và yêu cầu tải lại bản đã commit, không tiếp tục ghi dữ liệu RAM chưa bền vững.
@@ -66,7 +68,8 @@
 
 ## Tài liệu giữ lại
 
-- `EFFECTS_LEADERBOARD_PLAN.md`: kế hoạch hiện hành; Gate1–3 code/browser QA đã đạt; hồ sơ số đo và QA thiết bị thật còn chờ.
+- `LEADERBOARD_REDESIGN_PLAN.md`: kế hoạch hiện hành làm lại UI ranking, nền và phase theo dõi profile riêng; mới hoàn thành lập kế hoạch/ảnh nguồn.
+- `EFFECTS_LEADERBOARD_PLAN.md`: hồ sơ Gate1–3 code/browser QA đã đạt; số đo và QA thiết bị thật còn chờ, không phải kế hoạch triển khai active.
 - `ADVENTURE_WEB_PLAN.md`: hồ sơ đã hoàn tất phase0–20 và quyết định UI/data hiện có.
 - `AGENTS.md`: chuẩn làm việc bắt buộc.
 - `ARCHITECTURE.md`: ownership và contract kỹ thuật bền vững.

@@ -1,6 +1,6 @@
 # Kế hoạch hiệu ứng nền và bảng xếp hạng
 
-Ngày: 2026-10-13. Trạng thái: triển khai Gate1–3 và nghiệm thu browser/emulator đã hoàn tất. Nghiệm thu Galaxy S22 Ultra thật còn chờ theo xác nhận người dùng2026-10-14; không còn gate code đang mở. Đây là kế hoạch hiện hành duy nhất; ADVENTURE_WEB_PLAN.md là hồ sơ đã hoàn tất.
+Ngày: 2026-10-13. Trạng thái: triển khai Gate1–3 và nghiệm thu browser/emulator đã hoàn tất. Nghiệm thu Galaxy S22 Ultra thật còn chờ theo xác nhận người dùng2026-10-14; không còn gate code đang mở. Từ2026-10-14 đây là hồ sơ đã hoàn tất ở phạm vi code/browser; kế hoạch triển khai hiện hành duy nhất là LEADERBOARD_REDESIGN_PLAN.md. Bố cục ranking mới theo kế hoạch đó thay mục Bố cục cũ dưới đây; luật checkpoint/query đã triển khai vẫn được giữ.
 
 ## 1. Phạm vi và dữ kiện đã xác minh
 

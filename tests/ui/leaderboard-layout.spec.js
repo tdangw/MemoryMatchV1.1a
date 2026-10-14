@@ -30,8 +30,14 @@ for (const viewport of [{ width: 412, height: 915 }, { width: 640, height: 360 }
       }
     }
     await expect(page.locator('.leaderboard-list img')).toHaveCount(0);
-    const boxes = await page.locator('.leaderboard-tabs button, .leaderboard-pager button').evaluateAll(nodes => nodes.map(node => { const rect = node.getBoundingClientRect(); return { x: rect.x, right: rect.right, y: rect.y, bottom: rect.bottom, height: rect.height }; }));
+    const boxes = await page.locator('.leaderboard-tabs--game button, .leaderboard-pager > button').evaluateAll(nodes => nodes.map(node => { const rect = node.getBoundingClientRect(); return { x: rect.x, right: rect.right, y: rect.y, bottom: rect.bottom, height: rect.height }; }));
     for (const box of boxes) { expect(box.x).toBeGreaterThanOrEqual(0); expect(box.right).toBeLessThanOrEqual(viewport.width); expect(Math.round(box.height * 1000) / 1000).toBeGreaterThanOrEqual(44); expect(box.bottom).toBeLessThanOrEqual(viewport.height); }
+    const modeGeometry = await page.locator('.leaderboard-tabs--mode button').evaluateAll(nodes => nodes.map(node => ({ y: node.getBoundingClientRect().y, height: node.getBoundingClientRect().height })));
+    expect(new Set(modeGeometry.map(box => box.y)).size).toBe(1);
+    for (const box of modeGeometry) expect(box.height).toBeGreaterThanOrEqual(44);
+    const panelBox = await page.locator('.leaderboard-panel').boundingBox();
+    const pagerBox = await page.locator('.leaderboard-pager').boundingBox();
+    expect(Math.abs(pagerBox.x + pagerBox.width / 2 - panelBox.x - panelBox.width / 2)).toBeLessThan(2);
     await page.getByRole('button', { name: 'Sau', exact: true }).click();
     await expect(page.locator('.leaderboard-pager')).toContainText('Trang 2');
     await page.getByRole('button', { name: 'Sau', exact: true }).click();

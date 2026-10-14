@@ -26,9 +26,12 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
   const games = tabs('Trò chơi', GAME_DEFINITIONS.map(item => [item.id, item.title]), 'game');
   const modes = tabs('Chế độ', [...GAME_MODES].sort((a, b) => (a.id === 'endless') - (b.id === 'endless')).map(item => [item.id, item.label]), 'mode');
   const filters = document.createElement('div'); filters.className = 'leaderboard-filters';
+  const footer = document.createElement('div'); footer.className = 'leaderboard-footer';
+  const context = document.createElement('p'); context.className = 'leaderboard-context';
   const levelLabel = document.createElement('label'); levelLabel.textContent = 'Màn ';
   const level = document.createElement('input'); level.type = 'number'; level.min = '1'; level.max = String(MAX_ADVENTURE_LEVEL); level.setAttribute('aria-label', 'Màn chơi'); levelLabel.append(level);
   const refresh = button('Làm mới');
+  refresh.setAttribute('aria-label', 'Làm mới'); refresh.replaceChildren(createIcon('restart')); refresh.classList.add('leaderboard-refresh');
   const status = document.createElement('p'); status.className = 'leaderboard-status'; status.setAttribute('aria-live', 'polite');
   const results = document.createElement('div'); results.className = 'leaderboard-results'; results.tabIndex = 0; results.setAttribute('aria-label', 'Danh sách xếp hạng');
   const own = document.createElement('p'); own.className = 'leaderboard-own';
@@ -37,11 +40,12 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
   const pageLabel = document.createElement('span');
   const numbers = document.createElement('div'); numbers.className = 'leaderboard-page-numbers';
   pager.append(previous, pageLabel, numbers, next);
-  filters.append(levelLabel, refresh); content.append(games, modes, filters, status, results, own, pager);
+  filters.append(levelLabel); footer.append(filters, pager); content.append(games, modes, context, status, results, own, footer);
   const owner = surface.owner || getActiveGameScope() || getAppPageScope();
   const release = owner?.own(() => scope.dispose(), 'cleanup');
   const modal = openAppModal({ ...surface, id: 'rankings-modal', title: 'Bảng xếp hạng', icon: 'trophy', content, onDestroy: () => { generation++; scope.dispose(); release?.forget(); }, onClose });
   modal.panel.classList.add('leaderboard-panel');
+  modal.panel.querySelector('.app-modal__header').append(refresh);
   function frontier() {
     const progress = gameState.progress[getGameDefinition(selectedGame).progressKey];
     level.value = String(getSuggestedAdventureLevel(progress.bestByLevel, progress.adventure));
@@ -51,6 +55,8 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
     for (const item of games.children) item.setAttribute('aria-pressed', String(item.dataset.rankGame === selectedGame));
     for (const item of modes.children) item.setAttribute('aria-pressed', String(item.dataset.rankMode === selectedMode));
     levelLabel.hidden = !NORMAL_MODE_IDS.includes(selectedMode);
+    context.textContent = NORMAL_MODE_IDS.includes(selectedMode) ? `Màn ${level.value}` : '';
+    context.hidden = !NORMAL_MODE_IDS.includes(selectedMode);
   }
   function controls(data = null) {
     refresh.disabled = loading;
@@ -109,8 +115,15 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
     }
   }
   scope.listen(games, 'click', event => { const item = event.target.closest('[data-rank-game]'); if (!item) return; selectedGame = item.dataset.rankGame; frontier(); updateFilters(); void load(); });
-  scope.listen(modes, 'click', event => { const item = event.target.closest('[data-rank-mode]'); if (!item) return; selectedMode = item.dataset.rankMode; updateFilters(); void load(); });
-  scope.listen(level, 'change', () => { void load(); });
+  function revealMode(item) {
+    const strip = modes.getBoundingClientRect(); const rect = item.getBoundingClientRect();
+    if (rect.left < strip.left) modes.scrollLeft += rect.left - strip.left;
+    else if (rect.right > strip.right) modes.scrollLeft += rect.right - strip.right;
+  }
+  scope.listen(modes, 'focusin', event => { const item = event.target.closest('[data-rank-mode]'); if (item) revealMode(item); });
+  scope.listen(modes, 'wheel', event => { if (Math.abs(event.deltaY) > Math.abs(event.deltaX) && modes.scrollWidth > modes.clientWidth) { modes.scrollLeft += event.deltaY; event.preventDefault(); } }, { passive: false });
+  scope.listen(modes, 'click', event => { const item = event.target.closest('[data-rank-mode]'); if (!item) return; selectedMode = item.dataset.rankMode; revealMode(item); updateFilters(); void load(); });
+  scope.listen(level, 'change', () => { updateFilters(); void load(); });
   scope.listen(refresh, 'click', () => { void load(true); });
   scope.listen(previous, 'click', () => { void load(false, currentPage - 1); });
   scope.listen(next, 'click', () => { void load(false, currentPage + 1); });
