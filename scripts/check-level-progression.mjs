@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import { getChallengeLayout } from '../js/config.js';
-import { getLinkChallengeLayout } from '../js/linkConnect/linkConfig.js';
-import { TRIPLE_CHALLENGE_STAGES } from '../js/tripleConnect/tripleConfig.js';
+import { getLinkChallengeLayout, getLinkChallengeTime } from '../js/linkConnect/linkConfig.js';
+import { TRIPLE_CHALLENGE_STAGES, getTripleChallengeStage } from '../js/tripleConnect/tripleConfig.js';
+import { resolveSessionTiming } from '../js/sessionTiming.js';
 import { generateChallengeTripleBoard, replayTripleWitness } from '../js/tripleConnect/tripleBoard.js';
 import { getAdventureSummary, getAdventureLevelState } from '../js/adventureProgress.js';
 const wins = { 'easy:1': { score: 100, stars: 1, cleared: true } };
@@ -20,3 +21,19 @@ for (const stage of TRIPLE_CHALLENGE_STAGES) {
   assert.equal(replayTripleWitness(generated.board, generated.witness).ok, true);
 }
 console.log('Level progression: shared difficulty unlock, bounded pair layouts and Triple intro witnesses passed.');
+const durations = [];
+for (const level of [8, 9, 19, 20, 99, 100, 101, 999, 1000, 99999, 100000, 100001, 1000000, 9007199254740900]) {
+  assert(getLinkChallengeTime(level) <= 150);
+  const stage = getTripleChallengeStage(level); assert.equal(stage.level, level); assert(stage.tileCount <= 93);
+  for (const variant of ['a', 'b']) {
+    const start = performance.now();
+    const generated = generateChallengeTripleBoard({ level, seed: `high-${level}-${variant}` });
+    durations.push(performance.now() - start);
+    assert.equal(replayTripleWitness(generated.board, generated.witness).ok, true);
+    assert(generated.board.tiles.length <= 93);
+  }
+}
+assert.equal(resolveSessionTiming({ reason: 'advance', carryOnAdvance: true, currentRemaining: 175, advanceBonus: 10, maxCarryBonusTime: 180 }).remainingTime, 180);
+assert.equal(resolveSessionTiming({ reason: 'advance', carryOnAdvance: true, currentRemaining: 240, advanceBonus: 10, maxCarryBonusTime: 180 }).remainingTime, 240, 'Purchased time is not discarded by a bonus cap.');
+assert.throws(() => getTripleChallengeStage(Number.MAX_SAFE_INTEGER), RangeError);
+console.log(`High-level witnesses passed; max generation ${Math.max(...durations).toFixed(2)}ms across ${durations.length} cases (desktop Node, not phone FPS).`);

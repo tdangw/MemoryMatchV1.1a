@@ -269,7 +269,9 @@ for (const stage of TRIPLE_CHALLENGE_STAGES) {
   assert.deepEqual(generated, repeatedChallenge, "Challenge seed must be deterministic.");
   assert.equal(replayTripleWitness(generated.board, generated.witness).ok, true);
 }
-assert.throws(() => generateChallengeTripleBoard({ level: 8 }), /Challenge level/);
+assert.throws(() => generateChallengeTripleBoard({ level: 0 }), /Challenge level/);
+const challengeEight = generateChallengeTripleBoard({ level: 8, seed: 'challenge-eight' });
+assert.equal(replayTripleWitness(challengeEight.board, challengeEight.witness).ok, true);
 for (const luckyCount of [1, 2, 3]) {
   const luckyBoard = generateChallengeTripleBoard({ level: 7, seed: `lucky-${luckyCount}`, luckyCount });
   const luckyTiles = luckyBoard.board.tiles.filter((tile) => tile.lucky);

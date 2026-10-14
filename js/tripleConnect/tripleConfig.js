@@ -1,3 +1,4 @@
+import { MAX_ADVENTURE_LEVEL } from '../adventureProgress.js';
 export const TRIPLE_RULES = Object.freeze({ trayCapacity: 7, matchSize: 3, baseMatchScore: 10, comboScoreStep: 3 });
 export const TRIPLE_CORNER_STACK_CORNERS = Object.freeze(["top-left", "top-right", "bottom-left", "bottom-right"]);
 export const TRIPLE_EASY_CONFIG = Object.freeze({ mode: "easy", tileCount: 27, layerCount: 3, timeSeconds: 93 });
@@ -36,8 +37,13 @@ export const TRIPLE_EASY_FALLBACK_SEED = "triple-easy-fallback";
 export const TRIPLE_HARD_SOLVER_BUDGET = Object.freeze({ maxNodes: 50000, maxMemo: 20000, deadlineMs: 100 });
 export const TRIPLE_SUPER_HARD_SOLVER_BUDGET = Object.freeze({ maxNodes: 150000, maxMemo: 60000, deadlineMs: 400 });
 export function getTripleModeConfig(mode) { const config = [TRIPLE_EASY_CONFIG, TRIPLE_NORMAL_CONFIG, TRIPLE_HARD_CONFIG, TRIPLE_SUPER_HARD_CONFIG, TRIPLE_ENDLESS_CONFIG, TRIPLE_CHALLENGE_CONFIG].find((candidate) => candidate.mode === mode); if (!config) throw new TypeError(`Unsupported Triple mode: ${mode}`); return config; }
-export function getTripleChallengeStage(level = 1) { const stage = TRIPLE_CHALLENGE_STAGES.find((candidate) => candidate.level === Math.floor(Number(level) || 0)); if (!stage) throw new RangeError(`Unsupported Triple Challenge level: ${level}`); return stage; }
-export function isTripleChallengeComplete(level) { return Number(level) >= TRIPLE_CHALLENGE_STAGES.at(-1).level; }
+export function getTripleChallengeStage(level = 1) {
+  if (!Number.isSafeInteger(level) || level < 1 || level > MAX_ADVENTURE_LEVEL) throw new RangeError(`Unsupported Triple Challenge level: ${level}`);
+  if (level <= 7) return TRIPLE_CHALLENGE_STAGES[level - 1];
+  const template = TRIPLE_CHALLENGE_STAGES[4 + (level - 8) % 3];
+  return Object.freeze({ ...template, level });
+}
+export function isTripleChallengeComplete(level) { getTripleChallengeStage(level); return false; }
 export const TRIPLE_PRODUCT_DECISIONS = Object.freeze({ trayCapacity: 7, trayExpansion: Object.freeze({ baseCapacity: 7, bonusCapacity: 3, experimentalPrice: 1, releasePrice: 3000 }), initialItems: Object.freeze({ hint: 3 }), itemPrices: Object.freeze({ hint: 8, timePerSecond: 2, undo: 15, shuffle: 15 }), starTargetScale: 0.8, starPointsPerTriple: Object.freeze({ one: 12, two: 18, three: 25 }), endlessStarPointsPerTriple: Object.freeze({ one: 10, two: 15, three: 20 }), excludedItems: Object.freeze(["thunder", "freeze"]), milestones: Object.freeze({ version: 2, target: 30, step: 3, rewards: Object.freeze([Object.freeze({ coins: 2 }), Object.freeze({ hint: 1 }), Object.freeze({ coins: 3, hint: 1 }), Object.freeze({ time: 2, endlessCoins: 2 }), Object.freeze({ undo: 1 }), Object.freeze({ coins: 5, hint: 1 }), Object.freeze({ shuffle: 1 }), Object.freeze({ time: 3, hint: 1, endlessCoins: 3 }), Object.freeze({ coins: 8 }), Object.freeze({ coins: 25, hint: 1, undo: 1 })]), itemFallbackCoins: Object.freeze({ hint: 4, undo: 8, shuffle: 8 }) }) });
 export function normalizeTripleTrayExpansionSlots(value) { return Math.min(TRIPLE_PRODUCT_DECISIONS.trayExpansion.bonusCapacity, Math.max(0, Math.floor(Number(value) || 0))); }
 export function getTripleTrayCapacity(expansionSlots = 0) { return TRIPLE_PRODUCT_DECISIONS.trayExpansion.baseCapacity + normalizeTripleTrayExpansionSlots(expansionSlots); }

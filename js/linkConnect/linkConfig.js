@@ -216,8 +216,8 @@ export function getLinkLevelHintBonus(level = 1, currentHints = 0) {
 }
 
 export function getLinkChallengeTime(level = 1) {
-  return getLinkModeLayout("challenge").timeSeconds
-    + Math.max(0, level - 1) * LINK_CONNECT_CONFIG.challenge.timeBonusPerLevel;
+  return Math.min(150, getLinkModeLayout("challenge").timeSeconds
+    + Math.max(0, level - 1) * LINK_CONNECT_CONFIG.challenge.timeBonusPerLevel);
 }
 
 export function getLinkLuckyReward(mode) {

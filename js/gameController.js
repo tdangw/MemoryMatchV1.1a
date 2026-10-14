@@ -428,6 +428,7 @@ function resolveMemoryLevelTiming({ mode, level, modeLayout, reason, session }) 
     session,
     carryOnAdvance: challenge,
     advanceBonus: GAME_CONFIG.specialModes.challengeTimeBonusSeconds,
+    maxCarryBonusTime: 180,
   });
 }
 

@@ -42,7 +42,6 @@ import {
   getTripleTrayCapacity,
   getTripleStarProgress,
   TRIPLE_PRODUCT_DECISIONS,
-  isTripleChallengeComplete,
 } from "./tripleConfig.js";
 import { shuffleTripleBoardState } from "./tripleShuffle.js";
 import { getEquippedThemeId } from "../appearance.js";
@@ -839,7 +838,7 @@ async function settleTerminalRound(shell, render) {
   // HUD, persisted best result, and summary always share one source of truth.
   render(state);
   const won = state.status === "won";
-  const canAdvance = won && !(currentMode === "challenge" && isTripleChallengeComplete(currentLevel));
+  const canAdvance = won;
   const summary = createTripleSummary({
     settlement,
     luckyRewards: roundLuckyRewards.length ? roundLuckyRewards : getClaimedLuckyRewards(),
@@ -972,7 +971,6 @@ async function commitTripleTerminalResult() {
     recordTripleConnectResult({ mode: currentMode, level: currentLevel, score: completion.score, stars, durationMs: finishPlayMetrics() });
     stageRankedAttempt("triple-connect", currentMode, completion.score, true);
     checkpointRankedRun("triple-connect", currentMode);
-    if (currentMode === "challenge" && isTripleChallengeComplete(currentLevel)) finalizeRankedRun("triple-connect", currentMode, completion.score, "won");
   }
   delete gameState.progress.tripleConnect.sessionsByMode[currentMode];
   if ((await savePersistentGameData({ coins: gameState.coins, progress: gameState.progress, cloudEvent: won }))) {
@@ -1019,7 +1017,6 @@ function formatTripleReward(reward) {
 }
 
 function startNextTripleLevel(targetLevel = currentLevel + 1) {
-  if (currentMode === "challenge" && isTripleChallengeComplete(currentLevel)) return;
   const nextLevel = targetLevel;
   if (!canAdvanceAdventure("triple-connect", currentMode, nextLevel)) return returnTripleToMenu();
   const elapsedTime = currentMode === "endless" ? remainingTime : undefined;

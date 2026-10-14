@@ -6,6 +6,7 @@ export function resolveSessionTiming({
   session = null,
   carryOnAdvance = false,
   advanceBonus = 0,
+  maxCarryBonusTime = Infinity,
   restartTime,
 } = {}) {
   if (endless) {
@@ -15,7 +16,8 @@ export function resolveSessionTiming({
 
   const fallback = finiteTime(newTime, 0);
   if (reason === "advance" && carryOnAdvance) {
-    const initial = finiteTime(currentRemaining, 0) + finiteTime(advanceBonus, 0);
+    const remaining = finiteTime(currentRemaining, 0);
+    const initial = remaining + Math.min(finiteTime(advanceBonus, 0), Math.max(0, maxCarryBonusTime - remaining));
     return { remainingTime: initial, timeLimit: initial, levelStartTime: initial };
   }
   if (reason === "restart") {
