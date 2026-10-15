@@ -27,6 +27,8 @@ for (const viewport of [{width:412,height:915},{width:844,height:390},{width:102
   await page.setViewportSize(viewport); await start(page,game);
   await page.locator(trigger).click(); await aligned(page,'#game-exit-modal .app-modal');
   await expect(page.locator('#game-exit-modal .app-modal__body')).toBeHidden();
+  expect(await page.locator('#game-exit-modal .app-modal__header').evaluate(el=>getComputedStyle(el,'::before').content)).toBe('none');
+  expect((await page.locator('#game-exit-modal .app-modal__header').boundingBox()).height).toBeLessThanOrEqual(80);
   const bounds = await page.locator('#game-exit-modal .app-modal').boundingBox();
   for(const button of await page.locator('#game-exit-modal button').all()) {
     const b=await button.boundingBox(); expect(b.y).toBeGreaterThanOrEqual(bounds.y); expect(b.y+b.height).toBeLessThanOrEqual(bounds.y+bounds.height);

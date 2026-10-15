@@ -52,3 +52,5 @@ Review bổ sung cuối độc lập7/7pass:4catalog header và3map preview, m�
 Full check cuối: `npm run check` pass136module và toàn bộ contracts. Triple Easy p95 10,51ms;28high-level witnesses max109,09ms trên Node desktop, không phải FPS điện thoại. Placement cuối14/14pass sau steering bản đồ.
 
 Build cuối: `npm run build` và `npm run build:android` đều pass (178/176module). Chỉ build dist, không cap sync/APK/Hosting/Firebase rollout. Diff check pass. Commit: phase1 a7c7b21, phase2 17adc0d, phase3 d79d94f, phase4 2529e81; phase5 gồm2concept/prompt và tài liệu nghiệm thu cuối.
+
+Steering mới: gỡ ornament ảnh trong popup tạm dừng và padding36px đi kèm, header thường72px/landscape60px. Giữ vị trí/nút/pause.20/20 dialog-placement+game-exit pass;3game×3viewport không pseudo ornament, header≤80px và mọi nút vẫn fit. Ảnh pause đã cập nhật.

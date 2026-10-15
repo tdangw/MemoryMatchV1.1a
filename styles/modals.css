@@ -1202,8 +1202,7 @@ body.game-is-paused .shooting-star {
 .app-modal-overlay[data-dialog-placement] .app-button:focus-visible { outline: 2px solid var(--dialog-gold); outline-offset: -3px; }
 .app-modal-overlay[data-dialog-placement] .app-button:active:not(:disabled) { transform: translateY(1px); }
 #game-exit-modal .pause-dialog { position: relative; border-color: #c6ac6b; border-radius: 20px; box-shadow: var(--dialog-edge); }
-#game-exit-modal .app-modal__header { position: relative; min-height: 96px; padding: 36px 14px 14px; border-bottom-color: #b6a16c40; background: #061f2966; }
-#game-exit-modal .app-modal__header::before { content: ''; position: absolute; top: 6px; left: calc(50% - 42px); width: 84px; height: 28px; background: url('/assets/images/backgrounds/botanical-header-flourish.webp') center / contain no-repeat; pointer-events: none; }
+#game-exit-modal .app-modal__header { position: relative; min-height: 72px; padding: 14px; border-bottom-color: #b6a16c40; background: #061f2966; }
 #game-exit-modal .app-modal__title { flex: 1; justify-content: center; margin-left: 44px; color: var(--dialog-gold); font-size: 22px; }
 #game-exit-modal .app-modal__title .ui-icon { display: none; }
 #game-exit-modal .app-modal__body { display: none; }
@@ -1214,7 +1213,6 @@ body.game-is-paused .shooting-star {
 #game-exit-modal .app-button--danger { background: #17333c; border-color: #bf887566; box-shadow: inset 0 1px #ffe8b51c, inset 0 -2px #071923; color: #ffb6a5; }
 @media (height <= 500px) {
   #game-exit-modal .app-modal__header { min-height: 60px; padding: 8px 12px; }
-  #game-exit-modal .app-modal__header::before { display: none; }
   #game-exit-modal .app-modal__footer { gap: 8px; padding: 12px; }
   #game-exit-modal .app-button { min-height: 44px; }
 }

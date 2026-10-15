@@ -4,6 +4,8 @@
 
 ## Sản phẩm
 
+- Active: `HOME_MENU_IMPLEMENTATION_PLAN.md` — triển khai main menu hướng1 bằng art riêng cho3trò, giữ navigation/save, commit từng phase. Steering: gỡ ornament ảnh trong pause popup, không áp dụng sheet popup vào game.
+
 - Home đã chốt hướng1 (một ô lớn/hai ô nhỏ, có thể mở rộng lưới). Sheet12vùng nền trò/popup/tiêu đề/khung dùng skill imagegen đã lưu ở `docs/design/home-assets/README.md`; PNG alpha và ảnh QA nền tối đã kiểm. Chỉ tạo nguồn mỹ thuật, chưa cắt asset rời hoặc sửa code Home. Sheet1254px, chưa xem là master đủ mọi DPR; không còn task triển khai active từ yêu cầu vẽ sheet.
 
 - `POPUP_POLISH_PLAN.md`: phase1–5 hoàn tất trong phạm vi được giao, không còn kế hoạch triển khai active. Exit bản đồ và mọi screen chức năng (gồm Cửa hàng/Bộ sưu tập) gắn header; Xu giữa Cửa hàng; title Bộ sưu tập không lặp game. Popup bám board, bản đồ dùng cùng mốc chrome ngay lần đầu; menu tạm dừng Vườn đêm có Tiếp tục. QA: `docs/design/popups/QA.md`. Hai mẫu Home và prompt ở `docs/design/home-concepts/README.md`, chỉ tham khảo, chưa đổi code Home. Không deploy/đổi save; S22 Ultra thật còn chờ.
