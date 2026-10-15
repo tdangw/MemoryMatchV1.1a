@@ -33,3 +33,22 @@ Soak HUD20vòng mỗi game gồm restart/switch,120scope dispose đều trả t�
 Ảnh runtime: [Tạm dừng dọc](qa/pause-link-connect-412.png), [Tạm dừng ngang](qa/pause-link-connect-844.png), [Memory](qa/pause-memory-match-412.png), [Triple](qa/pause-triple-connect-412.png), [Cài đặt ngang có cuộn](qa/settings-844.png), [Đầu màn](qa/intro-412.png), [Tổng kết](qa/victory.png), [Chọn độ khó cùng cao độ game](qa/map-preview-412.png). Dữ liệu gameplay trong ảnh là ván kiểm tra local; không tạo dữ liệu mẫu production.
 
 Galaxy S22 Ultra thật còn chờ theo xác nhận người dùng; browser Windows không chứng minh60FPS hoặc bàn phím hệ thống trên điện thoại thật.
+
+## Mở rộng header Cửa hàng/Bộ sưu tập
+
+Nguyên nhân exit sót: CSS chỉ liệt kê5screen cụ thể. Đã chuyển sang mọi adventure-screen có data-screen; cùng geometry60px/56px và handler cũ, không dựng exit thứ hai. Xu ở giữa header, số dài bị giới hạn vùng hiển thị nhưng text thật vẫn đủ trong DOM; Bộ sưu tập bỏ tên game, gameId vẫn quyết định catalog/namespace.
+
+- Catalog/inventory/navigation21/21pass; gồm mua vật phẩm trước và trong game, giữ tab qua reload và pause/startup.
+- Sau delta fixture và source cuối:21/21 app-tabs9 +catalog-header4 +Triplechrome8. Header4viewport320/412/844/1024 ×3game ×4screen; tâm Xu, số123456789, không chạm title/exit, titlecollection đúng, scroll cố định và goHome.
+- Fixture số dài ban đầu gọi updateCoinDisplay thiếu tham số, ảnh kiểm tra hiện undefined; đã sửa fixture theo API thật và thêm assertion giá trị123456789. Không sửa runtime để chiều fixture.
+- Ảnh mới: [Cửa hàng](qa/shop-header-412.png), [Bộ sưu tập](qa/collection-header-412.png), [Cửa hàng hẹp](qa/shop-header-320.png).
+
+## Tham khảo Home
+
+[Hai concept](../home-concepts/README.md) và [prompt](../home-concepts/prompts.json) dùng skill imagegen/built-in image_gen. Không ảnh mới được đưa vào runtime. Hướng một lớn/hai nhỏ được khuyến nghị vì đường chọn rõ và co giãn dễ; hướng lối vườn cổng lệch tạo cá tính hơn. Đây là ảnh tham khảo trước khi chốt hướng, không phải Home đã triển khai.
+
+Review bổ sung cuối độc lập7/7pass:4catalog header và3map preview, mỗi ca cả3game. Đối chiếu source CSS/ownership/purchase/equip/catalog/save không có finding. Reviewer/server độc lập đã dừng trước full check để không nhiễu phép đo.
+
+Full check cuối: `npm run check` pass136module và toàn bộ contracts. Triple Easy p95 10,51ms;28high-level witnesses max109,09ms trên Node desktop, không phải FPS điện thoại. Placement cuối14/14pass sau steering bản đồ.
+
+Build cuối: `npm run build` và `npm run build:android` đều pass (178/176module). Chỉ build dist, không cap sync/APK/Hosting/Firebase rollout. Diff check pass. Commit: phase1 a7c7b21, phase2 17adc0d, phase3 d79d94f, phase4 2529e81; phase5 gồm2concept/prompt và tài liệu nghiệm thu cuối.

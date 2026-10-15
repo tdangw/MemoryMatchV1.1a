@@ -12,7 +12,7 @@ Phạm vi đã giao: exit bản đồ gắn góc như5tab; popup bắt đầu t�
 - So sánh hai hướng: CSS top cố định đơn giản nhưng sai khi HUD/viewport thay đổi; đo semantic board theo sự kiện chính xác hơn, chỉ chạy khi popup còn sống. Chọn hướng thứ hai, không vòng lặp frame.
 - Kiểm tra intro/menu/settings/help/summary, viewport, nested/replacement/dispose và tài nguyên; commit.
 
-## Phase3 — Đồng bộ hình thức và nghiệm thu
+## Phase3 — Đồng bộ hình thức và nghiệm thu (hoàn tất)
 - Menu tạm dừng xanh đậm/viền vàng, hierarchy rõ, nút nổi nhẹ, không câu hướng dẫn thừa. Dùng CSS/icon hiện có, không ảnh mới vì art không bổ sung thông tin cần thiết.
 - Đồng bộ surface/header/close/button chung, giữ nội dung và bố cục riêng của popup chức năng; reduced-motion, focus, pause/handoff.
 - Review độc lập, UI mục tiêu, npm run check, build web/Android, ảnh runtime và cập nhật CONTEXT/ARCHITECTURE; commit.
@@ -30,3 +30,11 @@ Steering cuối của người dùng: popup chọn độ khó tại bản đồ 
 Phase4: rà soát exit trên Cửa hàng/Bộ sưu tập và toàn bộ adventure-screen; cùng header corner, safe-area/focus, Xu ở giữa Cửa hàng, bỏ tên game thừa trong tiêu đề Bộ sưu tập. Không thay purchase/equip/catalog/save. Responsive, hit/focus/scroll/navigation và catalog regression, commit riêng.
 
 Phase5: đề xuất và vẽ2concept main menu để chọn trước; chưa thay code Home. Hướng1 một portal lớn và hai portal nhỏ, hướng2 ba cổng theo lối vườn. Dùng imagegen built-in, lưu ảnh/prompt trong docs ngoài bundle. Không thêm XP/bảng số liệu hoặc tính năng mới. Đây là phần tham khảo được giao, không cần triển khai Home để hoàn thành lượt này.
+
+## Kết quả cuối
+
+Phase1 a7c7b21; phase2 17adc0d; phase3 d79d94f. Phase4 exit catalog/header và phase5 concept đã hoàn thành trong phạm vi giao, commit riêng. Main menu chỉ đề xuất2mẫu, chưa được giao triển khai hướng mới. Không còn gate triển khai active; giới hạn thiết bị thật tiếp tục được ghi riêng.
+
+QA/bằng chứng: `docs/design/popups/QA.md`. Regression68/68, placement cuối14/14, catalog/navigation/inventory21/21, header/app-tabs/Triplechrome21/21, review độc lập2case popup và7case bổ sung đều pass. Fullcheck136module pass. Không đổi API/schema/save, deploy hoặc thêm ảnh concept vào bundle.
+
+Phase4 commit2529e81. Review độc lập bổ sung7/7pass; check136module và build web/Android đều pass. Phase5 ảnh concept, prompt và tài liệu được commit riêng; chưa triển khai Home mới theo đúng phạm vi ảnh tham khảo.
