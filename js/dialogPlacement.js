@@ -1,0 +1,42 @@
+import { getActiveGameScope } from './gameShell/gameShellLifecycle.js';
+
+// Each dialog owns its observers/listeners through its existing lifecycle.
+export function connectDialogPlacement(overlay, panel, lifecycle) {
+  const root = getActiveGameScope()?.active
+    ? [...document.querySelectorAll('.game-shell-root')].find(node => node.getClientRects().length && !node.hidden)
+    : null;
+  const board = root?.querySelector('[data-shell-region="board"]');
+  const viewport = window.visualViewport;
+  const edge = 16;
+  let pending = false;
+  overlay.dataset.dialogPlacement = board ? 'board' : 'viewport';
+  function update() {
+    pending = false;
+    if (!lifecycle.active || !overlay.isConnected) return;
+    const style = getComputedStyle(overlay);
+    const safeTop = parseFloat(style.getPropertyValue('--dialog-safe-top')) || 0;
+    const safeBottom = parseFloat(style.paddingBottom) || 0;
+    const viewportTop = viewport?.offsetTop || 0;
+    const bottom = viewportTop + (viewport?.height || window.innerHeight) - safeBottom;
+    const top = Math.min(Math.max(viewportTop + Math.max(edge, safeTop), board?.getBoundingClientRect().top || 0), bottom - edge);
+    overlay.style.setProperty('--dialog-top', `${top}px`);
+    panel.style.maxHeight = `${Math.max(0, bottom - top)}px`;
+  }
+  function schedule() {
+    if (pending || !lifecycle.active) return;
+    pending = true;
+    lifecycle.frame(update);
+  }
+  lifecycle.listen(window, 'resize', schedule);
+  lifecycle.listen(window, 'scroll', schedule, true);
+  if (viewport) {
+    lifecycle.listen(viewport, 'resize', schedule);
+    lifecycle.listen(viewport, 'scroll', schedule);
+  }
+  if (board) {
+    const observer = new ResizeObserver(schedule);
+    observer.observe(board); observer.observe(root);
+    lifecycle.own(() => observer.disconnect());
+  }
+  update();
+}

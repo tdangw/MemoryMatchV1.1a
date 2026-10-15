@@ -6,7 +6,7 @@ Phạm vi đã giao: exit bản đồ gắn góc như5tab; popup bắt đầu t�
 - Giữ một DOM/handler navigation, thay hình dạng/vị trí trong header bản đồ.
 - Kiểm tra3game, mobile/ngang/desktop, scroll và goHome; commit.
 
-## Phase2 — Vị trí popup
+## Phase2 — Vị trí popup (hoàn tất)
 - Một owner positioning dùng region board semantic, không nhánh theo game; dùng chung cho app modal và intro.
 - Theo resize/visualViewport/scroll, giới hạn chiều cao còn lại, nội dung cuộn; cleanup observer/listener/frame khi destroy, replace hoặc round bị hủy.
 - So sánh hai hướng: CSS top cố định đơn giản nhưng sai khi HUD/viewport thay đổi; đo semantic board theo sự kiện chính xác hơn, chỉ chạy khi popup còn sống. Chọn hướng thứ hai, không vòng lặp frame.
@@ -20,3 +20,5 @@ Phạm vi đã giao: exit bản đồ gắn góc như5tab; popup bắt đầu t�
 Thiết bị S22 Ultra thật vẫn chờ theo xác nhận trước đó; không deploy Hosting/APK/Firebase.
 
 Phase1: UI3/3pass ở412/844/1024, mỗi ca cả3game; scroll cố định và goHome đúng.
+
+Phase2: placement11/11pass (9ca3game×3viewport/rotate, fallback/nested/replace/30cycles, summary thật); startup9/9 và settings9/9pass. Bỏ offset riêng của intro/victory, reduced-motion tắt animation popup. Review độc lập CSS/ownership/cleanup không blocker. Bài resource ban đầu chụp trước khi tooltip focus hữu hạn kết thúc; kiểm lại sau advance clock500ms trả baseline, không bỏ assertion tài nguyên.

@@ -1,3 +1,4 @@
+import { connectDialogPlacement } from './dialogPlacement.js';
 import { gameRecordLabel } from './gameRecord.js';
 import { presentEffect, flyToTarget, pulseTarget } from "./gameShell/gameShellEffects.js";
 import { getMemoryHud } from "./memoryMatch/memoryShell.js";
@@ -28,6 +29,7 @@ import { createGameShellLifecycle, getActiveGameScope } from "./gameShell/gameSh
 import { createHudTimerScheduler } from "./gameShell/gameTimerProgress.js";
 
 import { getAppPageScope } from './appPageLifecycle.js';
+let activeIntro = null;
 let activeSummary = null;
 let summaryGeneration = 0;
 let pendingSummaryAction = null;
@@ -313,8 +315,7 @@ export function showLevelRewardOverlay({
   onComplete = () => {},
 } = {}) {
   // 🔄 Xoá overlay cũ nếu còn
-  const existing = document.querySelector(".level-reward-overlay");
-  if (existing) existing.remove();
+  activeIntro?.destroy();
 
   // Nền overlay mờ
   const overlay = document.createElement("div");
@@ -351,6 +352,16 @@ export function showLevelRewardOverlay({
   overlay.appendChild(container);
   document.body.appendChild(overlay);
 
+  const introScope = createGameShellLifecycle();
+  let release;
+  const removeOverlay = () => {
+    introScope.dispose(); overlay.remove(); release?.forget();
+    if (activeIntro?.overlay === overlay) activeIntro = null;
+  };
+  activeIntro = { overlay, destroy: removeOverlay };
+  release = (scope || getActiveGameScope() || getAppPageScope())?.own(removeOverlay, 'node');
+  connectDialogPlacement(overlay, container, introScope);
+
   // Phát âm thanh
   if (gameState.settings?.sound) {
     sounds.bonus.currentTime = 0;
@@ -358,14 +369,11 @@ export function showLevelRewardOverlay({
   }
 
   // Tự động ẩn overlay
-  const schedule = scope?.timeout?.bind(scope) || setTimeout;
-  const removeOverlay = () => overlay.remove();
-  const release = scope?.own?.(removeOverlay, "node");
+  const schedule = introScope.timeout;
   schedule(() => {
     overlay.classList.replace("fade-in", "fade-out");
     schedule(() => {
-      overlay.remove();
-      release?.forget();
+      removeOverlay();
       onComplete();
     }, 400);
   }, GAMEPLAY_TIMING.levelIntroDurationMs);

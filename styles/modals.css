@@ -970,7 +970,7 @@ body.game-is-paused .shooting-star {
 /* Trạng thái chiến thắng chỉ có một hành động chính, chiếm trọn hàng. */
 .level-summary-modal--victory {
   position: relative;
-  top: clamp(14px, 3vh, 32px);
+  top: 0;
 }
 
 .level-summary-modal--victory .app-modal__footer {
@@ -996,18 +996,6 @@ body.game-is-paused .shooting-star {
 .level-summary-modal--victory .app-button--primary:focus-visible {
   background: linear-gradient(135deg, #d44351, #951d37);
   box-shadow: 0 10px 22px rgb(72 6 20 / 48%), inset 0 1px 0 rgb(255 231 177 / 32%);
-}
-
-/* Popup thông tin đầu màn nằm cao hơn tâm màn hình một chút. */
-.level-reward-overlay .reward-container {
-  position: relative;
-  top: -5vh;
-}
-
-@media screen and (width <= 600px) {
-  .level-reward-overlay .reward-container {
-    top: -3vh;
-  }
 }
 
 /* Kết quả màn: tập trung vào sao và điểm, các chỉ số còn lại là một bảng tóm tắt. */
@@ -1176,3 +1164,22 @@ body.game-is-paused .shooting-star {
   }
 }
 
+
+/* Shared placement applies to dialogs only, never full-screen tab regions. */
+.app-modal-overlay[data-dialog-placement] {
+  --dialog-safe-top: env(safe-area-inset-top, 0px);
+  align-items: flex-start;
+  padding-top: var(--dialog-top, max(16px, env(safe-area-inset-top)));
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+  height: 100dvh;
+}
+.app-modal-overlay[data-dialog-placement] > .app-modal { min-height: 0; transform-origin: center top; }
+.app-modal-overlay[data-dialog-placement] .app-modal__header,
+.app-modal-overlay[data-dialog-placement] .app-modal__footer { flex-shrink: 0; }
+.app-modal-overlay[data-dialog-placement] .app-modal__body { min-height: 0; overscroll-behavior: contain; }
+.level-reward-overlay[data-dialog-placement] > .reward-container { top: 0; overflow-y: auto; }
+
+@media (prefers-reduced-motion: reduce) {
+  .app-modal-overlay[data-dialog-placement],
+  .app-modal-overlay[data-dialog-placement] > .app-modal { animation: none; }
+}

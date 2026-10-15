@@ -1,3 +1,4 @@
+import { connectDialogPlacement } from './dialogPlacement.js';
 import { createIcon } from "./icons.js";
 import { UI_TIMING } from "./uiCatalog.js";
 import { createGameShellLifecycle, getActiveGameScope } from "./gameShell/gameShellLifecycle.js";
@@ -138,6 +139,7 @@ export function openAppModal({
 
   overlay.appendChild(panel);
   host.appendChild(overlay);
+  if (!screen) connectDialogPlacement(overlay, panel, lifecycle);
   panel.tabIndex = -1;
   (panel.querySelector("button:not([disabled]), input:not([disabled]), select:not([disabled])") || panel).focus();
 
