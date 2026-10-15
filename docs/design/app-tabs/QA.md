@@ -61,3 +61,27 @@ Lượt đầu58ca có54pass,3teardownENOENT do các Playwright process cùng x�
 Galaxy S22 Ultra thật vẫn chờ thiết bị theo xác nhận của người dùng. Google hosted popup/OAuth, dashboard admin ngoài repo và phát hành Hosting/APK không thuộc lượt này. Không deploy Rules/indexes vì không đổi backend. Không nhận idle browser threshold là60FPS trên điện thoại.
 
 Final delta Settings: display sau openAppModal để olddestroy không ẩn sharedcontrols khi thay cùngID; focus controlenabled/panel sau khi hiện. Review độc lập xác nhận logic,9/9browserpass sau sửa cuối.
+
+## Tinh chỉnh sau nghiệm thu — 2026-10-15
+
+Phạm vi: sửa tên trực tiếp trong hàng danh tính; làm rõ ngày theo dõi thời gian; canh giữa family; huy chương top3 và số thường không khung; chống chói tiêu đề và gắn exit vào góc phải thanh tiêu đề trên cả5tab. Không đổi API/schema/save, Auth, luật xếp hạng hoặc dữ liệu riêng tư.
+
+Chọn giữ DOM/handler exit hiện tại và đổi bố cục tại owner CSS, thay vì dựng nút thoát/handler thứ hai. Header60px và exit56px dùng cùng safe-area, host640px; exit nằm ngoài vùng cuộn. Huy chương mở rộng hệ icon SVG hiện có, giữ số thật và nhãn hạng cho trình đọc màn hình. Không thêm raster/animation/timer.
+
+- Profile: bút ngay cạnh tên, đổi thành dấu xác nhận; Enter lưu và Hủy khôi phục tên. Draft/error/UID/busy/dispose giữ contract cũ. “Tính từ…” nằm trong ô thời gian chơi, chỉ ngày bắt đầu theo dõi; ngày tham gia vẫn từ Auth. Trạng thái synced/disabled không hiện thông báo thường trực; pending/offline/error vẫn hiển thị.
+- Xếp hạng: family canh giữa header, không chạm nhãn ở320px; top3 huy chương vàng/bạc/đồng có ruy băng, hạng4+ số sáng không khung. Không đổi thứ tự hoặc query.
+- Cả5tab: thanh tiêu đề tối che ánh nền; exit vuông gắn góc phải, đứng yên khi cuộn, vẫn trở về Home. Không ảnh hưởng nút gameplay/map.
+
+| Kiểm tra | Kết quả |
+|---|---|
+| Profile/layout/stats, ranking và tab regression |32/32 trước delta exit;11/11 Profile+stats sau đặt ngày vào ô thời gian |
+| Delta huy chương |16/16 leaderboard layout |
+| Delta exit và regression cuối |31/31: app-tabs9, leaderboard16, profile6;320/412/844/1024 và cả5tab |
+| Accessibility cuối |1/1 huy chương có role img và nhãn Hạng1 |
+| Firebase emulator |2/2: lưu tên guest/Google state và hai thiết bị mở lại bảng fresh |
+| Lifecycle ranking30vòng |277node,6listener,0timer/interval/frame trước/sau; ảnh tải1lần |
+| Review độc lập |CSS ownership/diff pass; finding accessibility đã đóng, không còn blocker |
+| npm run check |Pass135module và toàn bộ contracts; Easy p95 10,40ms,28high-level witnesses max103,70ms trên Node desktop |
+| npm run build / build:android |Pass cả hai; không cap sync/APK/Hosting |
+
+Ảnh runtime: [sửa tên trực tiếp](qa/profile-editing-412.png), [Profile](qa/profile-inline-412.png), [Cài đặt và exit](qa/settings-412.png), [huy chương/canh giữa](qa/mobile-level-challenge.png). Screenshot layout dùng fixture, không đưa dữ liệu mẫu vào sản phẩm. Đã xem ảnh runtime; Galaxy S22 Ultra thật vẫn chờ thiết bị theo xác nhận người dùng. Số đo Node/browser không phải nghiệm thu FPS điện thoại.

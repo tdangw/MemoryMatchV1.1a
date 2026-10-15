@@ -29,7 +29,7 @@ test('three games share durable active time, excluding startup and nested pause,
   await expect.poll(total).toBe(96000);
   await page.locator('[data-dock-action="profile"]').click();
   await expect(page.locator('.account-play-details')).toContainText('0 giờ 1 phút');
-  await expect(page.locator('.account-play-since').first()).toContainText('Từ');
+  await expect(page.locator('.account-play-since').first()).toContainText('Tính từ');
   await page.reload();
   await expect(page.locator('[data-dock-action="profile"]')).toBeVisible();
   await expect.poll(total).toBe(96000);

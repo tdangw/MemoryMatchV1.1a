@@ -23,19 +23,20 @@ export function showAccountPanel(surface = {}) {
   const identity = document.createElement('div');
   const playerName = document.createElement('h3'); playerName.className = 'profile-player-name';
   const accountType = document.createElement('p'); accountType.className = 'account-identity';
-  identity.append(playerName, accountType);
+  identity.className = 'profile-identity';
+  const nameRow = document.createElement('div'); nameRow.className = 'profile-name-row';
+  identity.append(nameRow, accountType);
   const edit = document.createElement('button'); edit.type = 'button'; edit.className = 'tab-button tab-button--quiet profile-edit';
   edit.setAttribute('aria-label', 'Sửa tên'); edit.setAttribute('aria-expanded', 'false'); edit.append(createIcon('edit'));
-  summary.append(avatar, identity, edit); hero.append(summary);
+  summary.append(avatar, identity); hero.append(summary);
   const form = document.createElement('form'); form.className = 'profile-name-form'; form.hidden = true;
-  const label = document.createElement('label'); label.textContent = 'Tên hiển thị'; label.htmlFor = 'profile-player-name';
+  const label = document.createElement('label'); label.className = 'profile-name-label'; label.textContent = 'Tên hiển thị'; label.htmlFor = 'profile-player-name';
   const name = document.createElement('input'); name.id = 'profile-player-name'; name.className = 'account-name-input';
   name.type = 'text'; name.maxLength = 20; name.required = true; name.autocomplete = 'nickname';
-  const saveName = document.createElement('button'); saveName.type = 'submit'; saveName.className = 'tab-button'; saveName.textContent = 'Lưu tên';
-  const cancel = document.createElement('button'); cancel.type = 'button'; cancel.className = 'tab-button tab-button--quiet'; cancel.textContent = 'Hủy';
-  const formActions = document.createElement('div'); formActions.className = 'profile-name-actions'; formActions.append(cancel, saveName);
+  const saveName = edit;
+  const cancel = document.createElement('button'); cancel.type = 'button'; cancel.className = 'tab-button tab-button--quiet'; cancel.textContent = '×'; cancel.setAttribute('aria-label', 'Hủy');
   const error = document.createElement('p'); error.className = 'profile-error'; error.setAttribute('role', 'alert');
-  form.append(label, name, error, formActions); hero.append(form);
+  form.append(label, name, cancel); nameRow.append(playerName, form, edit); identity.append(error);
   const stats = profileDetails(hero);
   const account = document.createElement('section'); account.className = 'tab-card profile-account';
   const heading = document.createElement('h3'); heading.className = 'tab-section-title'; heading.textContent = 'Tài khoản';
@@ -53,7 +54,7 @@ export function showAccountPanel(surface = {}) {
   activeView = { modal, dispose };
   releaseOwner = (surface.owner || getAppPageScope())?.own(dispose, 'cleanup');
   function closeEditor(focus = false) {
-    form.hidden = true; edit.setAttribute('aria-expanded', 'false'); error.textContent = ''; name.value = ''; editingUid = null;
+    form.hidden = true; playerName.hidden = false; edit.setAttribute('aria-expanded', 'false'); edit.setAttribute('aria-label', 'Sửa tên'); edit.replaceChildren(createIcon('edit')); error.textContent = ''; name.value = ''; editingUid = null;
     if (focus) edit.focus();
   }
   function renderState(state) {
@@ -62,18 +63,20 @@ export function showAccountPanel(surface = {}) {
     playerName.textContent = state.playerName || 'Người chơi';
     avatar.textContent = Array.from(playerName.textContent.trim())[0]?.toLocaleUpperCase('vi-VN') || '•';
     accountType.textContent = state.isAnonymous === false ? 'Đã liên kết Google' : 'Tài khoản khách';
-    status.textContent = ({ connecting: 'Đang kết nối…', restoring: 'Đang tải tiến trình…', syncing: 'Đang lưu…', synced: 'Đã lưu tiến trình', waiting: 'Đang chờ lưu', offline: 'Chưa có kết nối', error: 'Chưa lưu được. Sẽ thử lại.', disabled: 'Tiến trình đã lưu trên thiết bị.', conflict: 'Đang tải tiến trình…' })[state.phase] || '';
+    status.textContent = ({ connecting: 'Đang kết nối…', restoring: 'Đang tải tiến trình…', syncing: 'Đang lưu…', synced: '', waiting: 'Đang chờ lưu', offline: 'Chưa có kết nối', error: 'Chưa lưu được. Sẽ thử lại.', disabled: '', conflict: 'Đang tải tiến trình…' })[state.phase] || '';
     const busy = saving || linking || ['connecting', 'restoring', 'syncing', 'conflict'].includes(state.phase);
     edit.disabled = name.disabled = saveName.disabled = google.disabled = !service || !state.bound || busy;
     cancel.disabled = saving || linking;
     google.replaceChildren(createIcon('account'), document.createTextNode(state.isAnonymous === false ? 'Đổi tài khoản Google' : 'Liên kết Google'));
     google.hidden = !service || state.phase === 'disabled';
+    account.hidden = google.hidden && !status.textContent;
     if (busy) modal.panel.setAttribute('aria-busy', 'true');
     else modal.panel.removeAttribute('aria-busy');
   }
   edit.onclick = () => {
+    if (!form.hidden) { form.requestSubmit(); return; }
     const state = service.getState(); editingUid = state.uid; name.value = state.playerName || '';
-    form.hidden = false; edit.setAttribute('aria-expanded', 'true'); name.focus(); name.select();
+    form.hidden = false; playerName.hidden = true; edit.setAttribute('aria-expanded', 'true'); edit.setAttribute('aria-label', 'Lưu tên'); edit.replaceChildren(createIcon('check')); name.focus(); name.select();
   };
   cancel.onclick = () => closeEditor(true);
   form.onsubmit = async event => {
@@ -104,17 +107,18 @@ function profileDetails(content) {
   const joinedCard = document.createElement('div'); const timeCard = document.createElement('div');
   const joinedLabel = document.createElement('dt'); const joined = document.createElement('dd');
   const timeLabel = document.createElement('dt'); timeLabel.textContent = 'Thời gian chơi'; const time = document.createElement('dd');
+  const timeValue = document.createElement('span'); time.append(timeValue);
   joinedCard.append(joinedLabel, joined); timeCard.append(timeLabel, time); details.append(joinedCard, timeCard);
-  const since = document.createElement('p'); since.className = 'account-play-since';
+  const since = document.createElement('p'); since.className = 'account-play-since'; time.append(since);
   const status = document.createElement('p'); status.className = 'account-play-since'; status.setAttribute('aria-live', 'polite');
-  content.append(details, since, status);
+  content.append(details, status);
   const formatDate = value => new Date(value).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
   const stats = getProfileStatsService();
   const render = state => {
     joinedLabel.textContent = state.onlineAccount ? 'Tham gia' : 'Hồ sơ tạo ngày';
     joined.textContent = state.joinedAt ? formatDate(state.joinedAt) : '—';
-    time.textContent = state.totalPlayMs === null ? '—' : formatProfilePlaytime(state.totalPlayMs);
-    since.textContent = state.trackedSince ? `Từ ${formatDate(state.trackedSince)}` : '';
+    timeValue.textContent = state.totalPlayMs === null ? '—' : formatProfilePlaytime(state.totalPlayMs);
+    since.textContent = state.trackedSince ? `Tính từ ${formatDate(state.trackedSince)}` : '';
     status.textContent = state.phase === 'error' ? 'Chưa cập nhật được thời gian chơi.' : '';
   };
   render({ onlineAccount: false, totalPlayMs: null });

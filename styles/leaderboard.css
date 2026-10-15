@@ -34,13 +34,19 @@
 .leaderboard-heading { display: grid; grid-template-columns: 30px minmax(0, 1fr) 80px; align-items: center; gap: 8px; padding: 12px 10px; border-bottom: 1px solid var(--ranking-line); background: linear-gradient(#1b464a, #0d2e36); box-shadow: inset 0 1px #e1ebc935, inset 0 -2px #031921; position: sticky; top: 0; z-index: 1; color: var(--ranking-muted); font-size: 11px; }
 .leaderboard-heading > span:nth-child(n+3) { text-align: right; }
 .leaderboard-metric { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.leaderboard-list .leaderboard-rank--1, .leaderboard-list .leaderboard-rank--2, .leaderboard-list .leaderboard-rank--3 { display: grid; place-items: center; width: 28px; height: 30px; border-radius: 9px 9px 12px 12px; color: #3a2a11; font-size: 16px; font-weight: 800; background: linear-gradient(#ffebad, #c69b49); border: 1px solid #fae8ad; box-sizing: border-box; }
-.leaderboard-list .leaderboard-rank--2 { background: linear-gradient(#e4eff0, #8fa8b1); border-color: #d7e9ea; color: #253b42; }
-.leaderboard-list .leaderboard-rank--3 { background: linear-gradient(#eabe9e, #a86d45); border-color: #ebc3a1; }
+/* Top places use illustrated medals; the remaining places stay unframed. */
+.leaderboard-list .leaderboard-rank--1, .leaderboard-list .leaderboard-rank--2, .leaderboard-list .leaderboard-rank--3 { position: relative; display: grid; place-items: center; width: 30px; height: 36px; color: #fff9e8; font-size: 15px; font-weight: 800; --rank-medal-face: #dcae42; --rank-medal-edge: #826321; --rank-medal-light: #fff0a5; }
+.leaderboard-list .leaderboard-rank--2 { --rank-medal-face: #9eafb5; --rank-medal-edge: #5b727d; --rank-medal-light: #f1fbff; }
+.leaderboard-list .leaderboard-rank--3 { --rank-medal-face: #ba8d63; --rank-medal-edge: #795438; --rank-medal-light: #ffe0b5; }
+.leaderboard-rank .ui-icon--rank-medal { position: absolute; inset: 0; width: 30px; height: 36px; stroke-width: 1.1; stroke: var(--rank-medal-edge); }
+.rank-medal__ribbons { fill: var(--rank-medal-face); }
+.rank-medal__face { fill: var(--rank-medal-face); }
+.rank-medal__shine { fill: none; stroke: var(--rank-medal-light); stroke-width: .8; }
+.leaderboard-medal-number { position: absolute; top: 4px; left: 0; width: 30px; line-height: 20px; text-align: center; text-shadow: 0 1px 2px var(--rank-medal-edge), 1px 0 var(--rank-medal-edge), -1px 0 var(--rank-medal-edge); }
 .leaderboard-list li { display: grid; grid-template-columns: 30px 30px minmax(0, 1fr) auto; align-items: center; gap: 8px; padding: 9px 10px; min-height: 50px; box-sizing: border-box; border-bottom: 1px solid #8cb6b11c; }
 .leaderboard-list li:last-child { border-bottom: 0; }
 .leaderboard-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; font-weight: 600; }
-.leaderboard-rank { text-align: center; font-variant-numeric: tabular-nums; color: var(--ranking-muted); font-size: 13px; }
+.leaderboard-rank { text-align: center; font-variant-numeric: tabular-nums; color: #d6e9e5; font-size: 13px; font-weight: 700; }
 .leaderboard-avatar { display: grid; place-items: center; width: 30px; height: 30px; box-sizing: border-box; border-radius: 50%; border: 1px solid #d9e9d540; background: #34514f; color: #e8efdc; }
 .leaderboard-avatar .ui-icon { width: 20px; height: 20px; }
 .leaderboard-list strong { font-size: 13px; font-variant-numeric: tabular-nums; text-align: right; }
@@ -69,8 +75,8 @@
 .leaderboard-results::-webkit-scrollbar { display: none; }
 .leaderboard-heading > span { min-width: 0; }
 .leaderboard-heading > span:not(:last-child) { border-right: 1px solid #d7cb9433; padding-right: 6px; }
-.leaderboard-heading-player { display: flex; align-items: center; justify-content: space-between; gap: 4px; }
+.leaderboard-heading-player { display: flex; align-items: center; gap: 4px; }
 .leaderboard-heading-player > span { white-space: nowrap; }
-.leaderboard-family-label { padding: 3px 5px; border: 1px solid #e6c980a1; border-radius: 6px; background: linear-gradient(#efd28a, #bf974b); box-shadow: inset 0 1px #fff4c680, 0 2px #061b24; color: #16343a; white-space: nowrap; font-size: 10px; line-height: 1.4; }
+.leaderboard-family-label { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); padding: 3px 5px; border: 1px solid #e6c980a1; border-radius: 6px; background: linear-gradient(#efd28a, #bf974b); box-shadow: inset 0 1px #fff4c680, 0 2px #061b24; color: #16343a; white-space: nowrap; font-size: 10px; line-height: 1.4; }
 .leaderboard-panel .leaderboard-retry { display: block; margin: 0 auto 18px; }
 .leaderboard-panel .leaderboard-retry[hidden] { display: none; }

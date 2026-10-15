@@ -162,6 +162,11 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
         const rank = (currentPage - 1) * 10 + index + 1;
         const row = document.createElement('li');
         const place = document.createElement('span'); place.className = `leaderboard-rank${rank <= 3 ? ` leaderboard-rank--${rank}` : ''}`; place.textContent = String(rank); place.setAttribute('aria-label', `Hạng ${rank}`);
+        if (rank <= 3) {
+          place.setAttribute('role', 'img');
+          const number = document.createElement('span'); number.className = 'leaderboard-medal-number'; number.textContent = String(rank); number.setAttribute('aria-hidden', 'true');
+          place.replaceChildren(createIcon('rank-medal'), number);
+        }
         const avatar = document.createElement('span'); avatar.className = 'leaderboard-avatar'; avatar.textContent = Array.from(item.playerName.trim()).slice(0, 1).join('').toLocaleUpperCase('vi-VN') || '•'; avatar.setAttribute('aria-hidden', 'true');
         const name = document.createElement('span'); name.className = 'leaderboard-name'; name.textContent = item.playerName; name.title = item.playerName;
         if (item.uid === uid) { row.classList.add('is-self'); name.setAttribute('aria-label', `${item.playerName}, bạn`); }

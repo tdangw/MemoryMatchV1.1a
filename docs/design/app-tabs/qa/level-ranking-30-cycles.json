@@ -1,6 +1,13 @@
 {
   "imageLoads": 1,
-  "decodes": [],
+  "decodes": [
+    {
+      "name": "ImageDecodeTask",
+      "data": {
+        "pixelRefId": 115500261118808
+      }
+    }
+  ],
   "before": {
     "nodes": 277,
     "owner": {

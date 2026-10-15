@@ -141,7 +141,7 @@ test('30 mount, picker cancel and mode changes release every page-owned resource
   await test.info().attach('ranking-30-cycle-resources', { body: JSON.stringify(evidence), contentType: 'application/json' });
   expect(decodes.length).toBeLessThanOrEqual(1);
 });
-for (const viewport of [{ width: 412, height: 915 }, { width: 640, height: 360 }, { width: 844, height: 390 }, { width: 1024, height: 900 }]) {
+for (const viewport of [{ width: 320, height: 740 }, { width: 412, height: 915 }, { width: 640, height: 360 }, { width: 844, height: 390 }, { width: 1024, height: 900 }]) {
   test(`ranking layout, all nine boards and scroll at ${viewport.width}x${viewport.height}`, async ({ page }) => {
     await page.setViewportSize(viewport); await open(page);
     for (const game of ['memory-match', 'link-connect', 'triple-connect']) {
@@ -157,6 +157,13 @@ for (const viewport of [{ width: 412, height: 915 }, { width: 640, height: 360 }
     for (const box of boxes) { expect(box.x).toBeGreaterThanOrEqual(0); expect(box.right).toBeLessThanOrEqual(viewport.width); expect(Math.round(box.height * 1000) / 1000).toBeGreaterThanOrEqual(box.minimum); expect(box.bottom).toBeLessThanOrEqual(viewport.height); }
     await expect(page.locator('.leaderboard-tabs--mode, .leaderboard-level')).toHaveCount(0);
     const panelBox = await page.locator('.leaderboard-panel').boundingBox();
+    const headingBox = await page.locator('.leaderboard-heading').boundingBox();
+    const familyBox = await page.locator('.leaderboard-family-label').boundingBox();
+    expect(Math.abs(familyBox.x + familyBox.width / 2 - headingBox.x - headingBox.width / 2)).toBeLessThan(1);
+    const playerLabel = await page.locator('.leaderboard-heading-player > span').boundingBox();
+    const levelLabel = await page.locator('.leaderboard-heading > span:last-child').boundingBox();
+    expect(playerLabel.x + playerLabel.width).toBeLessThanOrEqual(familyBox.x);
+    expect(familyBox.x + familyBox.width).toBeLessThanOrEqual(levelLabel.x);
     const pagerBox = await page.locator('.leaderboard-pager').boundingBox();
     expect(Math.abs(pagerBox.x + pagerBox.width / 2 - panelBox.x - panelBox.width / 2)).toBeLessThan(2);
     await page.getByRole('button', { name: 'Sau', exact: true }).click();
@@ -210,7 +217,12 @@ test('final garden artwork, centered footer and background failure keep a usable
   const last = await page.locator('.leaderboard-list li').last().boundingBox();
   const region = await page.locator('.leaderboard-results').boundingBox();
   expect(last.y + last.height).toBeLessThanOrEqual(region.y + region.height);
-  expect(await page.locator('.leaderboard-rank--1').evaluate(node => getComputedStyle(node).color)).toBe('rgb(58, 42, 17)');
+  expect(await page.locator('.leaderboard-rank--1').evaluate(node => getComputedStyle(node).color)).toBe('rgb(255, 249, 232)');
+  await expect(page.locator('.ui-icon--rank-medal')).toHaveCount(3);
+  await expect(page.locator('.leaderboard-medal-number')).toHaveText(['1', '2', '3']);
+  await expect(page.getByRole('img', { name: 'Hạng 1', exact: true })).toHaveCount(1);
+  expect(await page.locator('.leaderboard-rank--1').evaluate(node => getComputedStyle(node).borderStyle)).toBe('none');
+  await expect(page.locator('.leaderboard-list li').nth(3).locator('.ui-icon--rank-medal')).toHaveCount(0);
   await page.locator('.leaderboard-results').blur();
   await page.screenshot({ path: 'docs/design/app-tabs/qa/mobile-level.png', animations: 'disabled' });
   await page.locator('[data-rank-game="memory-match"]').click();

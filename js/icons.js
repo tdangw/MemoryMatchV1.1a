@@ -1,6 +1,8 @@
 const SVG_NS = "http://www.w3.org/2000/svg";
 
 const ICON_PATHS = Object.freeze({
+  'rank-medal': '<path class="rank-medal__ribbons" d="m7 12-2 10 4-2 2 3 2-10M13 13l1 10 3-3 3 2-3-10"/><path class="rank-medal__face" d="m12 1 2 1.2 2.4.2.9 2.2 1.8 1.6-.5 2.3.5 2.3-1.8 1.6-.9 2.2-2.4.2L12 16l-2-1.2-2.4-.2-.9-2.2-1.8-1.6.5-2.3-.5-2.3 1.8-1.6.9-2.2 2.4-.2z"/><circle class="rank-medal__shine" cx="12" cy="8.5" r="5.3"/>',
+  check: '<path d="m5 12 4 4L19 6"/>',
   edit: '<path d="m4 16 11-11 4 4L8 20H4zM13 7l4 4M15 5l2-2 4 4-2 2"/>',
   trash: '<path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7"/>',
   missions: '<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 2h6v4H9zM8 11l2 2 5-5M8 17h8"/>',
