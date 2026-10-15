@@ -93,7 +93,7 @@
   width: min(100%, 640px);
   margin: 0 auto;
 }
-.adventure-map-page .adventure-header { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; padding-top: max(14px, env(safe-area-inset-top)); padding-bottom: 8px; }
+.adventure-map-page .adventure-header { display: grid; grid-template-columns: minmax(0, 1fr); height: calc(60px + env(safe-area-inset-top)); padding: env(safe-area-inset-top) 56px 0; background: linear-gradient(#041923fc, #071f29f7); border-bottom: 1px solid #d9bc6e38; }
 .adventure-map-title { min-height: var(--shell-title-min-height); margin: 0; color: #ffd166; font: 900 clamp(var(--shell-title-font-min), var(--shell-title-font-fluid), var(--shell-title-font-max)) / var(--shell-title-line-height) "Trebuchet MS", "Segoe UI", sans-serif; letter-spacing: var(--shell-title-letter-spacing); text-align: center; text-shadow: 0 3px 0 #7a451c; }
 .adventure-map-scroll { overflow-y: auto; overflow-x: hidden; min-height: 0; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #557587 transparent; }
 .adventure-map-trail { position: relative; width: min(100%, 440px); margin: auto; background: linear-gradient(to bottom, #082333, transparent 12%, transparent 88%, #082333), url('/assets/adventure/moonlit-garden.webp'); background-position: center top; background-size: 440px var(--adventure-map-texture-height, 660px); background-repeat: repeat-y; }
@@ -131,7 +131,9 @@
 }
 .adventure-exit { position: absolute; right: 12px; top: max(10px, env(safe-area-inset-top)); z-index: 2; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid #f6d68b55; border-radius: 50%; background: #10283dd9; color: #ffe1a0; }
 .adventure-screen > .adventure-exit { right: max(12px, calc((100% - 640px) / 2 + 12px)); }
-.adventure-map-page .adventure-map-title { padding-inline: 50px; }
+.adventure-map-page .adventure-map-title { padding: 0; min-height: 0; font-size: clamp(20px, 5vw, 28px); }
+.adventure-map-page .adventure-header > .adventure-exit { top: env(safe-area-inset-top); right: 0; width: 56px; height: 60px; border: 0; border-left: 1px solid #d9bc6e38; border-radius: 0; background: linear-gradient(#08242b, #0b2932); box-shadow: none; }
+.adventure-map-page .adventure-header > .adventure-exit:hover { transform: none; filter: none; }
 .adventure-page[hidden] { display: none !important; }
 .adventure-dock button[aria-current="page"] { color: #ffe1a0; background: #f6d68b16; box-shadow: inset 0 -2px #f6d68b; }
 .adventure-screen { z-index: 101; grid-template-rows: minmax(0, 1fr) auto; background: linear-gradient(160deg, #122b40, #071522); }
