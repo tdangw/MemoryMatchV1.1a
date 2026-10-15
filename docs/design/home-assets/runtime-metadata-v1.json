@@ -1,0 +1,47 @@
+[
+  {
+    "game": "memory-match",
+    "master": "docs/design/home-assets/masters/memory-match-v1.png",
+    "sourceSize": [
+      1536,
+      1024
+    ],
+    "runtime": "public/assets/images/home/memory-match.webp",
+    "size": [
+      900,
+      600
+    ],
+    "bytes": 134722,
+    "sha256": "7dc2a2ff34bde632750abf88777e8938710d3ddb3fda5efa756d9138509b31dd"
+  },
+  {
+    "game": "link-connect",
+    "master": "docs/design/home-assets/masters/link-connect-v1.png",
+    "sourceSize": [
+      1122,
+      1402
+    ],
+    "runtime": "public/assets/images/home/link-connect.webp",
+    "size": [
+      576,
+      720
+    ],
+    "bytes": 100752,
+    "sha256": "1323b0f298c7336968cbabcde6247c5d7cdc7a24563de232ad6cf1db589a771d"
+  },
+  {
+    "game": "triple-connect",
+    "master": "docs/design/home-assets/masters/triple-connect-v1.png",
+    "sourceSize": [
+      1122,
+      1402
+    ],
+    "runtime": "public/assets/images/home/triple-connect.webp",
+    "size": [
+      576,
+      720
+    ],
+    "bytes": 113944,
+    "sha256": "1f122f7545d5eb8ff72b3a74926844b7fbde6e8ef4e1f3058fc64aa148679b33"
+  }
+]

@@ -4,7 +4,7 @@ Scope: một ô Memory lớn, Link/Triple bên dưới; art riêng rõ nét và 
 
 Correction trước phase1: bỏ ornament pause, giữ vị trí/nút/pause; kiểm tra3game, commit riêng.
 
-## Phase1 — Mỹ thuật runtime
+## Phase1 — Mỹ thuật runtime (hoàn tất)
 - Dùng imagegen tạo ảnh riêng theo mẫu1 đã chọn; không kéo giãn các ô400px từ sheet.
 - Master PNG ngoài bundle, WebP đúng kích thước; prompt/metadata, kiểm hình và ngân sách ≤350KB cho3ảnh mới; commit.
 
@@ -19,3 +19,5 @@ Correction trước phase1: bỏ ornament pause, giữ vị trí/nút/pause; ki�
 - Mobile412×915, hẹp, landscape và desktop; ảnh/snapshot runtime, keyboard, lỗi tải ảnh, chuyển game/Home, tab và30cycles ownership.
 - Review độc lập, regression navigation/map/pause phù hợp; fullcheck, build web/Android. Đo browser chỉ là browser, S22 Ultra thật còn chờ. Không deploy.
 - Cập nhật CONTEXT/ARCHITECTURE/QA, commit; không dừng ở checkpoint khi còn phần an toàn làm được.
+
+Correction pause: commit7ea66e9,20/20 browserpass. Phase1:3master/3WebP đã kiểm bằng ảnh, không chữ/UI trong art; xuất349.418bytes≤350KB. Không PNG master trong bundle.
