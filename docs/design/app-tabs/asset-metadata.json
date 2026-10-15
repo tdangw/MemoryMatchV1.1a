@@ -1,0 +1,52 @@
+[
+  {
+    "path": "docs/design/app-tabs/art/botanical-header-flourish-master.png",
+    "width": 2172,
+    "height": 724,
+    "mode": "RGBA",
+    "bytes": 1104453,
+    "transparentPixels": 1136458,
+    "opaquePixels": 527,
+    "alphaBounds": [
+      14,
+      37,
+      2159,
+      724
+    ]
+  },
+  {
+    "path": "docs/design/app-tabs/backgrounds/friends-courtyard-master.png",
+    "width": 940,
+    "height": 1672,
+    "mode": "RGB",
+    "bytes": 1975905
+  },
+  {
+    "path": "docs/design/app-tabs/backgrounds/missions-garden-master.png",
+    "width": 941,
+    "height": 1672,
+    "mode": "RGB",
+    "bytes": 1805544
+  },
+  {
+    "path": "docs/design/app-tabs/backgrounds/profile-keepsake-master.png",
+    "width": 941,
+    "height": 1672,
+    "mode": "RGB",
+    "bytes": 1830741
+  },
+  {
+    "path": "docs/design/app-tabs/backgrounds/settings-retreat-master.png",
+    "width": 940,
+    "height": 1672,
+    "mode": "RGB",
+    "bytes": 1717656
+  },
+  {
+    "path": "docs/design/app-tabs/mockups/profile-settings-ranking-v1.png",
+    "width": 1457,
+    "height": 1080,
+    "mode": "RGB",
+    "bytes": 2043484
+  }
+]
