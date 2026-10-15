@@ -3,14 +3,12 @@ import { shellTimeout as setTimeout, clearShellTimeout as clearTimeout } from ".
 // chức năng của logic.js là xử lý logic của trò chơi, bao gồm việc xử lý sự kiện khi người chơi nhấp vào ô, kiểm tra xem hai ô có khớp nhau hay không, và kiểm tra xem người chơi đã hoàn thành cấp độ hay chưa. Nó cũng bao gồm các chức năng để khởi tạo logic và xử lý âm thanh khi người chơi tương tác với trò chơi.
 
 import {
-  consumeLuckyReward,
   increaseCoins,
   increaseScore,
   gameState,
-  recordLuckyAward,
   recordMemoryMatchResult,
 } from "./gameState.js";
-import { calculateCoinReward, calculateCompletionTimeBonus, calculateMatchPoints, calculateStarProgress, calculateStarRating, getLuckyReward, isEndlessMode } from "./config.js";
+import { calculateCoinReward, calculateCompletionTimeBonus, calculateMatchPoints, calculateStarProgress, calculateStarRating, isEndlessMode } from "./config.js";
 import {
   updateScoreDisplay,
   updateTimerDisplay,
@@ -21,17 +19,15 @@ import {
   updateLevelStarsDisplay,
   updateTotalStarsDisplay,
   updateCoinDisplay,
-  updateHintDisplay,
   showComboEffect,
   showBonusOverlay,
-  showLuckyRewardPopup,
   highlightTarget,
   showScoreEffect,
   showMemoryCoinReward,
   showLevelSummaryOverlay,
 } from "./ui.js";
 import { duckBackgroundMusicForVictory, pauseBackgroundMusic, sounds } from "./sound.js"; // 📦 Tách âm thanh
-import { saveCoins, savePersistentGameData } from "./persistence.js";
+import { savePersistentGameData } from "./persistence.js";
 import { stageMemorySession, saveMemorySession } from './memorySession.js';
 import { getActiveSession } from './sessionProgress.js';
 import { finishPlayMetrics } from "./playMetrics.js";
@@ -39,7 +35,6 @@ import { checkpointRankedRun, stageRankedAttempt } from "./rankingRules.js";
 import { getFlipAnimationClass } from "./appearance.js";
 import { clearMemoryTileAnimations, restartMemoryTileAnimation } from "./memoryMatch/tileAnimation.js";
 import {
-  GAMEPLAY_LIMITS,
   GAMEPLAY_TIMING,
   getComboTimeBonus,
   getComboWindowMs,
@@ -49,7 +44,8 @@ import {
   canShowFullVictoryCelebration,
   showFullVictoryCelebration,
 } from "victory-presentation";
-import { handleMemorySpecialMatch } from "./memorySpecial.js";
+import { presentMemoryPairRewards } from './memorySpecial.js';
+import { resolveMemoryPairRewards } from './memoryMatch/pairRewards.js';
 import { clearComboWindow, playComboWindow } from "./gameShell/comboWindowPresentation.js";
 
 let selectedTiles = [];
@@ -203,6 +199,10 @@ async function checkMatch(roundId) {
   const [first, second] = selectedTiles;
 
   if (first.imageId === second.imageId) {
+    const rollback = structuredClone({ coins: gameState.coins, progress: gameState.progress.memoryMatch,
+      score: gameState.score, combo: gameState.combo, matchedPairs: gameState.matchedPairs, remainingTime: gameState.remainingTime,
+      luckyRewards: gameState.luckyRewards, luckyAwards: gameState.luckyAwards, specialProgress: gameState.specialProgress,
+      specialNoEnergyDropStreak: gameState.specialNoEnergyDropStreak });
     first.element.classList.remove("selected");
     second.element.classList.remove("selected");
     first.element.classList.add("matched");
@@ -224,13 +224,21 @@ async function checkMatch(roundId) {
     showScoreEffect(second.element, matchPoints);
     const matchCoins = calculateMatchCoinReward(gameState.combo);
     const previousCoins = gameState.coins;
-    const totalCoins = increaseCoins(matchCoins);
+    increaseCoins(matchCoins);
+    const comboTimeBonus = getComboTimeBonus(gameState.combo);
+    if (!isEndlessMode(gameState.settings.mode)) gameState.remainingTime += comboTimeBonus;
+    const rewards = resolveMemoryPairRewards(gameState, { imageId: first.imageId, special: first.special });
+    const totalCoins = gameState.coins;
     gameState.matchedPairs++;
-    stageMemorySession({ assetPaths: getActiveSession('memory-match', gameState.settings.mode)?.assetPaths || [] });
-    if (!(await savePersistentGameData({ coins: totalCoins, progress: gameState.progress }))) {
+    const staged = stageMemorySession({ assetPaths: getActiveSession('memory-match', gameState.settings.mode)?.assetPaths || [] });
+    if (!staged || !(await savePersistentGameData({ coins: totalCoins, progress: gameState.progress }))) {
       if (gameState.roundId !== roundId) return;
-      gameState.coins = previousCoins;
+      gameState.progress.memoryMatch = rollback.progress;
+      for (const key of Object.keys(rollback)) if (key !== 'progress') gameState[key] = rollback[key];
+      first.element.classList.remove('matched'); second.element.classList.remove('matched');
+      stopComboWindow(); lastMatchAt = 0;
       showBonusOverlay("Không thể lưu phần thưởng Xu lúc này.");
+      return;
     }
     else {
       if (gameState.roundId !== roundId) return;
@@ -239,9 +247,7 @@ async function checkMatch(roundId) {
     highlightTarget("#score");
     updateLevelStarsDisplay(calculateStarProgress(score, gameState.totalPairs, gameState.settings.mode));
     updateComboDisplay(gameState.combo);
-    const comboTimeBonus = getComboTimeBonus(gameState.combo);
     if (comboTimeBonus > 0 && !isEndlessMode(gameState.settings.mode)) {
-      gameState.remainingTime += comboTimeBonus;
       updateTimerDisplay(gameState.remainingTime);
       syncMemoryTimeProgress({ remainingSeconds: gameState.remainingTime, timeLimit: gameState.timeLimit });
       highlightTarget("#timer");
@@ -256,10 +262,9 @@ async function checkMatch(roundId) {
       sounds.match.play().catch(() => {});
     }
 
-    (await awardLuckyReward(first.imageId, first.element, roundId));
-    if (gameState.roundId !== roundId) return;
-    if (first.special) (await handleMemorySpecialMatch(second.element, roundId));
-    if (gameState.roundId !== roundId) return;
+    presentMemoryPairRewards(rewards, second.element, roundId);
+    updateTimerDisplay(gameState.remainingTime);
+    syncMemoryTimeProgress({ remainingSeconds: gameState.remainingTime, timeLimit: gameState.timeLimit });
 
     setInteractionLocked(false, roundId);
     if (gameState.matchedPairs < gameState.totalPairs) await saveMemorySession({ assetPaths: getActiveSession('memory-match', gameState.settings.mode)?.assetPaths || [] });
@@ -411,61 +416,4 @@ export async function checkLevelComplete() {
       showLevelSummaryOverlay(completion);
     }
   }
-}
-
-async function awardLuckyReward(imageId, tileElement, roundId) {
-  (await awardLuckyRewardValue(consumeLuckyReward(imageId), tileElement, roundId));
-}
-
-async function awardLuckyRewardValue(reward, tileElement, roundId) {
-  if (gameState.roundId !== roundId) return;
-  if (!reward) return;
-
-  if (reward.type === "time") {
-    tileElement?.classList.add("lucky-reward");
-    recordLuckyAward(reward);
-    gameState.remainingTime += reward.value;
-    updateTimerDisplay(gameState.remainingTime);
-    syncMemoryTimeProgress({ remainingSeconds: gameState.remainingTime, timeLimit: gameState.timeLimit });
-    highlightTarget("#timer");
-    showLuckyRewardPopup(reward);
-    return;
-  }
-
-  if (reward.type === "hints") {
-    const before = gameState.progress.memoryMatch.items.hint;
-    gameState.progress.memoryMatch.items.hint = Math.min(GAMEPLAY_LIMITS.itemCount, before + reward.value);
-    if (gameState.progress.memoryMatch.items.hint > before) {
-      if (!(await savePersistentGameData({ progress: gameState.progress }))) {
-        gameState.progress.memoryMatch.items.hint = before;
-        return;
-      }
-      if (gameState.roundId !== roundId) return;
-      tileElement?.classList.add("lucky-reward");
-      recordLuckyAward(reward);
-      updateHintDisplay(gameState.progress.memoryMatch.items.hint);
-      highlightTarget("#hint");
-      showLuckyRewardPopup({
-        ...reward,
-        value: gameState.progress.memoryMatch.items.hint - before,
-      });
-      return;
-    }
-    let fallback = getLuckyReward();
-    while (fallback.type === "hints") fallback = getLuckyReward();
-    (await awardLuckyRewardValue(fallback, tileElement, roundId));
-    return;
-  }
-
-  const previousCoins = gameState.coins;
-  const totalCoins = increaseCoins(reward.value);
-  tileElement?.classList.add("lucky-reward");
-  recordLuckyAward(reward);
-  if (!(await saveCoins(totalCoins))) {
-    gameState.coins = previousCoins;
-    showBonusOverlay("Không thể lưu phần thưởng Xu lúc này.");
-    return;
-  }
-  updateCoinDisplay(totalCoins);
-  showLuckyRewardPopup(reward);
 }

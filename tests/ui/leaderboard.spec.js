@@ -163,26 +163,48 @@ test('a failed real winning settlement rolls checkpoint back and never creates a
 
 for (const game of [{ id: 'memory-match', key: 'memoryMatch' }, { id: 'link-connect', key: 'linkConnect' }, { id: 'triple-connect', key: 'tripleConnect' }]) for (const mode of ['challenge', 'endless']) {
   test(`${game.id} ${mode} winning controller commits a nonfinal checkpoint`, async ({ page }) => {
-    test.setTimeout(60000);
+    test.setTimeout(120000);
     await page.goto('/'); await ready(page);
     await page.evaluate(async ({ id, mode }) => {
       await (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu(id);
       const { gameState } = await import('/js/gameState.js');
       gameState.settings.mode = mode; gameState.settings.sound = gameState.settings.music = false;
       if (id === 'memory-match') {
-        await (await import('/js/gameController.js')).startNewMemoryRun(1);
-        gameState.score = 100; gameState.matchedPairs = gameState.totalPairs;
-        await (await import('/js/logic.js')).checkLevelComplete();
+        await (await import('/js/gameController.js')).startNewMemoryRun(1, { skipIntro: true });
       } else if (id === 'link-connect') {
-        await (await import('/js/linkConnect/linkController.js')).startLinkLevel({ mode, level: 1 });
-        const { linkGameState } = await import('/js/linkConnect/linkState.js');
-        linkGameState.totalPairs = 1; linkGameState.isLocked = false;
-        window.rankConnection = (await import('/js/linkConnect/pathfinder.js')).findAvailableConnections(linkGameState.board.grid)[0];
+        await (await import('/js/linkConnect/linkController.js')).startLinkLevel({ mode, level: 1, skipIntro: true });
       } else window.rankTriple = await (await import('/js/tripleConnect/tripleController.js')).startTripleConnectRound({ mode, level: 1, skipIntro: true });
     }, { id: game.id, mode });
+    if (game.id === 'memory-match') {
+      await expect.poll(() => page.evaluate(async () => (await import('/js/gameState.js')).gameState.isLocked), { timeout: 15000 }).toBe(false);
+      const played = await page.evaluate(async () => {
+        const { handleTileClick } = await import('/js/logic.js');
+        const pairs = new Map();
+        for (const tile of document.querySelectorAll('#grid-container .tile')) {
+          const list = pairs.get(tile.dataset.imageId) || []; list.push(tile); pairs.set(tile.dataset.imageId, list);
+        }
+        for (const pair of pairs.values()) { await handleTileClick(pair[0]); await handleTileClick(pair[1]); }
+        const { gameState } = await import('/js/gameState.js');
+        return { pairs: pairs.size, moves: gameState.moves, matched: gameState.matchedPairs, total: gameState.totalPairs, locked: gameState.isLocked };
+      });
+      expect(played.moves, JSON.stringify(played)).toBeGreaterThan(0);
+      expect(played.matched, JSON.stringify(played)).toBe(played.total);
+    }
     if (game.id === 'link-connect') {
-      const connection = await page.evaluate(() => window.rankConnection);
-      for (const position of [connection.start, connection.end]) await page.locator(`.link-board__cell[data-row="${position.row}"][data-column="${position.column}"] .link-tile`).evaluate(tile => tile.click());
+      for (let attempt = 0; attempt < 60; attempt++) {
+        await expect.poll(() => page.evaluate(async () => { const state = (await import('/js/linkConnect/linkState.js')).linkGameState; return state.isCompleted || !state.isLocked && !state.isPaused && !document.querySelector('.link-board.is-moving'); }), { timeout: 15000 }).toBe(true);
+        const next = await page.evaluate(async () => {
+          const { linkGameState } = await import('/js/linkConnect/linkState.js');
+          if (linkGameState.isCompleted) return null;
+          const connection = (await import('/js/linkConnect/pathfinder.js')).findAvailableConnections(linkGameState.board.grid)[0];
+          if (!connection) throw new Error('Generated board has no playable connection.');
+          return { ...connection, matchedBefore: linkGameState.matchedPairs };
+        });
+        if (!next) break;
+        for (const position of [next.start, next.end]) await page.locator(`.link-board__cell[data-row="${position.row}"][data-column="${position.column}"] .link-tile`).evaluate(tile => tile.click());
+        await expect.poll(() => page.evaluate(async () => (await import('/js/linkConnect/linkState.js')).linkGameState.matchedPairs)).toBeGreaterThan(next.matchedBefore);
+      }
+      expect(await page.evaluate(async () => (await import('/js/linkConnect/linkState.js')).linkGameState.isCompleted)).toBe(true);
     }
     if (game.id === 'triple-connect') {
       for (const command of await page.evaluate(() => window.rankTriple.generated.witness)) {

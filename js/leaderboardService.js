@@ -1,4 +1,4 @@
-import { loadPersistentGameData, loadProfileOwner, migrateLevelRankingsBatch, updateSyncMetadata, updateSyncMetadataPair, subscribeToLocalCommit } from './persistence.js';
+import { loadPersistentGameData, loadProfileOwner, migrateLevelRankingsBatch, loadSyncMetadata, updateSyncMetadata, updateSyncMetadataPair, subscribeToLocalCommit } from './persistence.js';
 import { collectProgressRankingResults, rankingBoardId, comparePublicResults } from './rankingResult.js';
 import { gameState } from './gameState.js';
 import { getRankingOwner } from './rankingOwner.js';
@@ -6,7 +6,7 @@ import { keepProgressBest, sameRankingOwner, validateProgressResult } from './pr
 import { getFirebaseBackend } from './firebaseBackend.js';
 import { getAccountService } from './accountService.js';
 import { submitRankingResult } from './leaderboardStore.js';
-import { createGameShellLifecycle } from './gameShell/gameShellLifecycle.js';
+import { createGameShellLifecycle, clearShellTimeout } from './gameShell/gameShellLifecycle.js';
 const QUEUE_LIMIT = 9;
 let instance = null;
 export function normalizeLevelRankingQueue(value, owner = null) {
@@ -139,9 +139,15 @@ export function initializeLeaderboardService() {
     })().catch(error => {
       if (current()) { retries++; message = `Chưa gửi được (${error.code || error.name}); sẽ gửi lại khi có mạng.`; schedule(Math.min(900000, 15000 * 2 ** retries)); }
       return false;
-    }).finally(() => {
+    }).finally(async () => {
       task = null;
-      if (scope.active && getAccountService()?.getIdentity()?.uid !== identity.uid) schedule();
+      if (!scope.active) return;
+      if (getAccountService()?.getIdentity()?.uid !== identity.uid) { schedule(); return; }
+      if (retries !== 0 || !current()) return;
+      try {
+        const pending = await loadSyncMetadata(key({ uid: identity.uid }));
+        if (current() && Object.keys(pending?.queue || {}).length) schedule();
+      } catch { message = 'Chưa thể đồng bộ. Kỷ lục vẫn được giữ trên máy.'; }
     });
     return task;
   }
@@ -154,7 +160,11 @@ export function initializeLeaderboardService() {
     let previousUid;
     scope.own(getAccountService().subscribe(state => {
       const uid = getAccountService().getIdentity()?.uid;
-      if (state.bound && !state.conflict && uid !== previousUid) { previousUid = uid; retries = 0; nextAllowedAt = 0; void recover(); }
+      if (state.bound && !state.conflict && uid !== previousUid) {
+        previousUid = uid; retries = 0; nextAllowedAt = 0;
+        if (timer !== null) { clearShellTimeout(timer); timer = null; }
+        void recover();
+      }
       if (state.bound && !state.conflict) schedule();
     }), 'listener');
     scope.listen(window, 'online', () => { retries = 0; schedule(); });

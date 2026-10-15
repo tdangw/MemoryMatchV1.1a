@@ -1,3 +1,4 @@
+import { resolveLinkPairRewards } from './pairRewards.js';
 import { gameRecordLabel } from '../gameRecord.js';
 import { rememberRecentGame } from '../recentGame.js';
 import { remainingComboWindow } from '../pairSessionSnapshot.js';
@@ -55,8 +56,6 @@ import {
   getLinkStarScoreTargets,
   getLinkThunderResolveDelay,
   getLinkModeLayout,
-  getLinkPremiumSupplyItem,
-  getLinkPremiumTypeDefinition,
   getLinkTimerDirection,
   getLinkMatchResolveDelay,
   isLinkChallengeMode,
@@ -74,11 +73,10 @@ import {
   removeRandomLinkPair,
   reflowLinkBoard,
   shuffleLinkBoard,
-  unlockFrozenLinkPairs,
   unlockAllFrozenLinkPairsAndEnsurePlayable,
 } from "./linkBoard.js";
 import { findAvailableConnections, findConnectionPath } from "./pathfinder.js";
-import { consumeLinkItem, getLinkItemCount, grantLinkItem } from "./linkItems.js";
+import { consumeLinkItem, getLinkItemCount } from "./linkItems.js";
 import {
   commitThemeSession,
   clearActiveSession,
@@ -109,7 +107,6 @@ import {
   playLinkFrozenPairUnlock,
   playLinkEnergyFlight,
   playLinkItemRewardFlight,
-  playLinkSpecialPairTransform,
   playLinkThunderStrike,
   renderLinkBoard,
   renderLinkBoardStartup,
@@ -521,6 +518,7 @@ async function handleLinkTileClick(position) {
     return;
   }
 
+  const rollback = { coins: gameState.coins, progress: structuredClone(gameState.progress.linkConnect), state: structuredClone(linkGameState) };
   linkGameState.isLocked = true;
   playLinkSound("match");
   const matchedAt = performance.now();
@@ -543,61 +541,56 @@ async function handleLinkTileClick(position) {
   drawLinkPath(path, linkGameState.board);
   removeLinkBoardPair(board, matchedStart, position);
   linkGameState.matchedPairs += 1;
-  const dropsEnergy = isSpecialMatch && (await shouldDropLinkEnergy());
-  if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
-  if (dropsEnergy) {
-    const energyProgress = (await reserveLinkEnergy(roundId, board));
-    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
-    playLinkEnergyFlight(selectedPosition, position, {
-      targetProgress: energyProgress,
-      progressTarget: LINK_CONNECT_CONFIG.special.progressTarget,
-      onArrive: async () => (await collectLinkEnergy(roundId, board)),
-    });
+  const baseCoins = calculateMatchCoinReward(linkGameState.combo);
+  const rewards = resolveLinkPairRewards(linkGameState, gameState.progress.linkConnect.items, { special: isSpecialMatch, premiumType, luckyReward: firstTile.luckyReward });
+  const previousCoins = gameState.coins;
+  increaseCoins(baseCoins + rewards.coins);
+  const staged = stageActiveSession('link-connect', createLinkSession());
+  if (!staged || !await savePersistentGameData({ coins: gameState.coins, progress: gameState.progress })) {
+    if (linkGameState.roundId === roundId) {
+      gameState.coins = rollback.coins; gameState.progress.linkConnect = rollback.progress;
+      Object.assign(linkGameState, rollback.state); linkGameState.isLocked = true; stopLinkComboWindow();
+      renderLinkBoard(linkGameState.board, { onTileClick: handleLinkTileClick });
+      showAppToast('Chưa thể lưu lượt chơi.');
+    }
+    return;
   }
-  const matchedTiles = playLinkMatchExit(selectedPosition, position);
-  const matchRewardCoins = calculateMatchCoinReward(linkGameState.combo);
-  const matchRewardAnchor = matchedTiles[1] || matchedTiles[0];
-  (await awardLinkCoins(matchRewardCoins, matchRewardAnchor));
   if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
+  const matchedTiles = playLinkMatchExit(matchedStart, position);
   showScoreEffect(matchedTiles[0], matchPoints);
   showComboEffect(matchedTiles[1] || matchedTiles[0], linkGameState.combo);
+  animateCoinCounter(getLinkHudElements().coins, getLinkHudElements().coinBalance, previousCoins, gameState.coins);
+  playCoinRewardFlight(matchedTiles[1] || matchedTiles[0], getLinkHudElements().coins, baseCoins + rewards.coins);
+  for (const reward of rewards.rewards) {
+    const anchor = matchedTiles[1] || matchedTiles[0];
+    showGameplayRewardEffect(anchor, reward);
+    if (['hint', 'reshuffle', 'freeze'].includes(reward.type)) playLinkItemRewardFlight(anchor, reward.type);
+  }
+  const bonusPositions = rewards.breakTileKeys.map(keys => keys.map(key => findLinkBoardTilePosition(rollback.state.board, key)));
+  if (bonusPositions.length) {
+    playLinkThunderStrike(bonusPositions.flat(), 'yellow');
+    setTimeout(() => {
+      if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
+      for (const positions of bonusPositions) playLinkMatchExit(...positions);
+    }, LINK_CONNECT_TIMING.thunderCardExitDelayMs);
+  }
+  if (rewards.energyProgress !== null) playLinkEnergyFlight(matchedStart, position, { targetProgress: rewards.energyProgress, progressTarget: LINK_CONNECT_CONFIG.special.progressTarget });
+  if (rewards.unlocked.length) linkGameState.pendingFrozenTileKeys.push(...rewards.unlocked);
+  const comboRemaining = Math.max(0, comboWindowMs - (performance.now() - matchedAt));
+  if (comboRemaining > 0) startLinkComboWindow(comboRemaining, matchedAt, roundId, board);
   setTimeout(async () => {
-    // Người chơi có thể khởi động màn khác trước khi hiệu ứng kết thúc.
-    // Khi đó callback cũ không được phép thay đổi trạng thái của bàn mới.
     if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
-    const premiumReward = isSpecialMatch
-      ? (await applyPremiumMatchReward(premiumType, matchedTiles[0]))
-      : { triggerPairBreak: false };
-    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
-    if (firstTile.luckyReward) (await applyLinkLuckyReward(firstTile.luckyReward, matchedTiles[1] || matchedTiles[0]));
-    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
-    const boardShifted = applyLinkGravityShift(board, linkGameState.gravityShift);
-    selectedPosition = null;
-    clearLinkPath();
-    if (boardShifted) renderLinkBoardShift(linkGameState.board, { onTileClick: handleLinkTileClick });
-    else clearLinkMatchedPair(matchedStart, position);
-    const finishResolution = async () => {
-    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
-      updateLinkHud();
-      if (linkGameState.matchedPairs >= linkGameState.totalPairs) {
-        (await completeLinkLevel());
-        return;
-      }
-      recoverBlockedLinkBoard(linkGameState.board);
-      playPendingBoardTransforms();
-      if (linkGameState.pendingSpecialMilestones.length) {
-        (await processPendingSpecialMilestones(roundId, board));
-        return;
-      }
-      unlockLinkBoard();
-      await persistLinkRunProgress();
-    };
-    if (premiumReward.triggerPairBreak && linkGameState.matchedPairs < linkGameState.totalPairs) {
-      (await playAutomaticPairBreak(roundId, board, finishResolution, { scoreMode: "combo" }));
-      return;
-    }
-    (await finishResolution());
-  }, getLinkMatchResolveDelay());
+    selectedPosition = null; clearLinkPath();
+    renderLinkBoardShift(board, { onTileClick: handleLinkTileClick });
+    playPendingBoardTransforms(); updateLinkHud();
+    if (linkGameState.matchedPairs >= linkGameState.totalPairs) { await completeLinkLevel(); return; }
+    recoverBlockedLinkBoard(board);
+    await persistLinkRunProgress();
+    if (linkGameState.roundId === roundId && linkGameState.board === board) unlockLinkBoard();
+  }, bonusPositions.length
+    ? Math.max(getLinkMatchResolveDelay(), getLinkThunderResolveDelay())
+    : getLinkMatchResolveDelay());
+
 }
 
 async function useLinkItem(id) {
@@ -867,19 +860,6 @@ async function completeLinkLevel() {
   }
 }
 
-async function applyLinkLuckyReward(reward, anchor) {
-  playLinkSound("bonus");
-  linkGameState.luckyAwards.push(reward);
-  if (reward.type === "coins") {
-    (await awardLinkCoins(reward.value, anchor));
-    showGameplayRewardEffect(anchor, { type: "coins", value: reward.value });
-    return;
-  }
-  linkGameState.remainingTime += reward.value;
-  syncLinkTimeProgress();
-  showGameplayRewardEffect(anchor, { type: "time", value: reward.value });
-}
-
 function playLinkSound(name) {
   const sound = sounds[name];
   if (!gameState.settings?.sound || !sound) return;
@@ -1144,207 +1124,6 @@ function updateLinkSpecialMilestones(hud = getLinkHudElements()) {
     descriptions: hud.milestones.map((_, index) => linkGameState.specialMilestoneRewards[index + 1] || getLinkSpecialMilestoneTooltip(index + 1)) });
 }
 
-async function shouldDropLinkEnergy() {
-  const energy = LINK_CONNECT_CONFIG.special.energyDrop;
-  if (
-    linkGameState.specialProgress + linkGameState.pendingEnergyCollections
-      >= LINK_CONNECT_CONFIG.special.progressTarget
-  ) return false;
-  if (linkGameState.specialNoEnergyDropStreak >= energy.guaranteeAfterMisses) {
-    linkGameState.specialNoEnergyDropStreak = 0;
-    return true;
-  }
-  if (Math.random() < energy.chance) {
-    linkGameState.specialNoEnergyDropStreak = 0;
-    return true;
-  }
-  linkGameState.specialNoEnergyDropStreak += 1;
-  (await persistLinkRunProgress());
-  return false;
-}
-
-async function reserveLinkEnergy(roundId, board) {
-  if (linkGameState.roundId !== roundId || linkGameState.board !== board) return 0;
-  linkGameState.pendingEnergyCollections += 1;
-  (await persistLinkRunProgress());
-  if (linkGameState.roundId !== roundId || linkGameState.board !== board) return 0;
-  return linkGameState.specialProgress + linkGameState.pendingEnergyCollections;
-}
-
-async function collectLinkEnergy(roundId, board) {
-  if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
-  linkGameState.pendingEnergyCollections = Math.max(0, linkGameState.pendingEnergyCollections - 1);
-  linkGameState.specialProgress = Math.min(
-    LINK_CONNECT_CONFIG.special.progressTarget,
-    linkGameState.specialProgress + 1,
-  );
-  const reachedProgress = linkGameState.specialProgress;
-  (await persistLinkRunProgress());
-    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
-  updateLinkHud();
-  (await queueLinkEnergyMilestone(reachedProgress, roundId, board));
-}
-
-async function queueLinkEnergyMilestone(progress, roundId, board) {
-  if (!progress || linkGameState.roundId !== roundId || linkGameState.board !== board) return;
-  linkGameState.pendingSpecialMilestones.push(progress);
-  if (!linkGameState.isLocked) (await processPendingSpecialMilestones(roundId, board));
-}
-
-async function applyPremiumMatchReward(premiumType, anchor) {
-  const roundId = linkGameState.roundId;
-  const board = linkGameState.board;
-  const definition = getLinkPremiumTypeDefinition(premiumType);
-  if (definition.id === "blue") {
-    if (Math.random() >= definition.effectChance) return { triggerPairBreak: false };
-    const itemId = getLinkPremiumSupplyItem(linkGameState.mode);
-    (await grantAndAnimateLinkItem(itemId, anchor));
-    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
-    return { triggerPairBreak: false };
-  }
-  if (definition.id === "red") {
-    return { triggerPairBreak: Math.random() < definition.effectChance };
-  }
-
-  const special = LINK_CONNECT_CONFIG.special;
-  const thawedPairs = unlockFrozenLinkPairs(linkGameState.board, 1, { onUnlock: rememberFrozenPairForTransform });
-  if (thawedPairs) return { triggerPairBreak: false };
-  const rewardType = isLinkEndlessMode(linkGameState.mode) || Math.random() < 0.5 ? "coins" : "time";
-  const range = special.frozenFallbackReward[rewardType === "coins" ? "coin" : "time"];
-  const value = randomInteger(range.min, range.max);
-  if (rewardType === "coins") {
-    (await awardLinkCoins(value, anchor));
-    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
-  } else {
-    linkGameState.remainingTime += value;
-    syncLinkTimeProgress();
-  }
-  showGameplayRewardEffect(anchor, { type: rewardType, value });
-  return { triggerPairBreak: false };
-}
-
-async function processPendingSpecialMilestones(roundId, board) {
-  if (linkGameState.isResolvingSpecialMilestone || linkGameState.roundId !== roundId || linkGameState.board !== board) return;
-  const progress = linkGameState.pendingSpecialMilestones.shift();
-  if (!progress) {
-    unlockLinkBoard();
-    return;
-  }
-  linkGameState.isResolvingSpecialMilestone = true;
-  const anchor = getLinkHudElements().specialTrack;
-  const finish = async () => {
-    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
-    linkGameState.isResolvingSpecialMilestone = false;
-    if (progress >= LINK_CONNECT_CONFIG.special.progressTarget) linkGameState.specialProgress = 0;
-    (await persistLinkRunProgress());
-    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
-    updateLinkHud();
-    if (linkGameState.matchedPairs >= linkGameState.totalPairs) return (await completeLinkLevel());
-    recoverBlockedLinkBoard(board);
-    (await processPendingSpecialMilestones(roundId, board));
-  };
-  const rewardPairBreak = async () => (await playAutomaticPairBreak(roundId, board, finish));
-  if (progress === 1 || progress === 3) {
-    linkGameState.specialMilestoneRewards[progress] = "Phá 1 cặp thường ngẫu nhiên.";
-    (await rewardPairBreak());
-  } else if (progress === 2) {
-    const coins = LINK_CONNECT_CONFIG.special.milestones.two.coins;
-    (await awardLinkCoins(coins, anchor));
-    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
-    showGameplayRewardEffect(anchor, { type: "coins", value: coins });
-    linkGameState.specialMilestoneRewards[progress] = `+${coins} Xu.`;
-    (await finish());
-  } else if (progress === 4) {
-    const rules = LINK_CONNECT_CONFIG.special.milestones.four;
-    if (isLinkEndlessMode(linkGameState.mode)) {
-      (await awardLinkCoins(rules.fallbackCoins, anchor));
-    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
-      showGameplayRewardEffect(anchor, { type: "coins", value: rules.fallbackCoins });
-      linkGameState.specialMilestoneRewards[progress] = `+${rules.fallbackCoins} Xu.`;
-    } else {
-      const seconds = randomInteger(rules.time.min, rules.time.max);
-      linkGameState.remainingTime += seconds;
-      syncLinkTimeProgress();
-      showGameplayRewardEffect(anchor, { type: "time", value: seconds });
-      linkGameState.specialMilestoneRewards[progress] = `+${seconds}s.`;
-    }
-    (await finish());
-  } else if (progress === 5) {
-    const item = Math.random() < 0.5 ? "hint" : "reshuffle";
-    const granted = (await grantAndAnimateLinkItem(item, anchor));
-    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
-    linkGameState.specialMilestoneRewards[progress] = granted
-      ? `+1 ${item === "hint" ? "Gợi ý" : "Xáo trộn"}.`
-      : "Không thể lưu vật phẩm thưởng.";
-    (await finish());
-  } else if (progress === 6) {
-    const rules = LINK_CONNECT_CONFIG.special.milestones.six;
-    const thawedPairs = unlockFrozenLinkPairs(board, rules.frozenPairs, { onUnlock: rememberFrozenPairForTransform });
-    if (thawedPairs) {
-      linkGameState.specialMilestoneRewards[progress] = "Mở 1 cặp băng.";
-      playPendingBoardTransforms();
-    } else {
-      (await awardLinkCoins(rules.fallbackCoins, anchor));
-    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
-      showGameplayRewardEffect(anchor, { type: "coins", value: rules.fallbackCoins });
-      linkGameState.specialMilestoneRewards[progress] = `Hết băng: +${rules.fallbackCoins} Xu.`;
-    }
-    (await finish());
-  } else if (progress === 7) {
-    const rules = LINK_CONNECT_CONFIG.special.milestones.seven;
-    const seconds = randomInteger(rules.time.min, rules.time.max);
-    if (!isLinkEndlessMode(linkGameState.mode)) {
-      linkGameState.remainingTime += seconds;
-      syncLinkTimeProgress();
-      showGameplayRewardEffect(anchor, { type: "time", value: seconds });
-    }
-    (await awardLinkCoins(rules.coins, anchor));
-    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
-    showGameplayRewardEffect(anchor, { type: "coins", value: rules.coins });
-    linkGameState.specialMilestoneRewards[progress] = isLinkEndlessMode(linkGameState.mode)
-      ? `+${rules.coins} Xu.`
-      : `+${seconds}s và +${rules.coins} Xu.`;
-    (await finish());
-  } else if (progress === 8) {
-    const rules = LINK_CONNECT_CONFIG.special.milestones.eight;
-    const itemId = isLinkEndlessMode(linkGameState.mode) ? rules.endlessItem : rules.standardItem;
-    const granted = (await grantAndAnimateLinkItem(itemId, anchor));
-    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
-    linkGameState.specialMilestoneRewards[progress] = granted
-      ? `+1 ${itemId === "freeze" ? "Đóng băng thời gian" : "Xáo trộn"}.`
-      : "Không thể lưu vật phẩm thưởng.";
-    (await finish());
-  } else if (progress === 9 || progress === 10) {
-    const hintGranted = (await grantAndAnimateLinkItem("hint", anchor));
-    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
-    if (progress === 10) {
-      const coins = LINK_CONNECT_CONFIG.special.milestones.ten.coins;
-      (await awardLinkCoins(coins, anchor));
-    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
-      const reshuffleGranted = (await grantAndAnimateLinkItem("reshuffle", anchor, { delayMs: 180 }));
-    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
-      showGameplayRewardEffect(anchor, { type: "coins", value: coins });
-      linkGameState.specialMilestoneRewards[progress] = `+${coins} Xu${reshuffleGranted ? ", +1 Xáo trộn" : ""}${hintGranted ? ", +1 Gợi ý" : ""} và phá cặp.`;
-    } else linkGameState.specialMilestoneRewards[progress] = hintGranted
-      ? "+1 Gợi ý và phá 1 cặp thường."
-      : "Phá 1 cặp thường; không thể lưu Gợi ý thưởng.";
-    (await rewardPairBreak());
-  } else (await finish());
-}
-
-async function grantAndAnimateLinkItem(itemId, anchor, { delayMs = 0 } = {}) {
-  const roundId = linkGameState.roundId;
-  const board = linkGameState.board;
-  if (!(await grantLinkItem(itemId))) {
-    showAppToast("Không thể lưu vật phẩm thưởng lúc này.");
-    return false;
-  }
-  if (linkGameState.roundId !== roundId || linkGameState.board !== board) return false;
-  showGameplayRewardEffect(anchor, { type: itemId, value: 1 });
-  playLinkItemRewardFlight(anchor, itemId, { delayMs });
-  return true;
-}
-
 function recoverBlockedLinkBoard(board) {
   if (findAvailableConnections(board.grid).length) return false;
   if (hasOnlyFrozenLinkTiles(board)) {
@@ -1368,48 +1147,6 @@ function recoverBlockedLinkBoard(board) {
     return true;
   }
   return false;
-}
-
-async function playAutomaticPairBreak(roundId, board, onComplete, { scoreMode = "none" } = {}) {
-  const milestone = LINK_CONNECT_CONFIG.special.milestones;
-  const pair = removeRandomLinkPair(board, {
-    remove: false,
-    eligiblePair: (candidate, currentBoard) => candidate.positions.every((position) => {
-      const tile = getLinkBoardTile(currentBoard, position);
-      return tile && !tile.frozen && !tile.special && !tile.luckyReward;
-    }),
-  });
-  if (!pair) {
-    const anchor = getLinkHudElements().specialTrack;
-    (await awardLinkCoins(milestone.breakCoins, anchor));
-    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
-    showGameplayRewardEffect(anchor, { type: "coins", value: milestone.breakCoins });
-    onComplete();
-    return;
-  }
-  const [start, end] = pair.positions;
-  setLinkTileSelected(start, true);
-  setLinkTileSelected(end, true);
-  setTimeout(() => {
-    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
-    const strike = playLinkThunderStrike([start, end], "yellow");
-    let affectedTiles = [];
-    setTimeout(() => {
-      if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
-      affectedTiles = playLinkMatchExit(start, end);
-    }, LINK_CONNECT_TIMING.thunderCardExitDelayMs);
-    setTimeout(() => {
-      if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
-      strike?.remove();
-      applyThunderPairScore(scoreMode, affectedTiles[0]);
-      removeLinkBoardPair(board, start, end);
-      clearLinkMatchedPair(start, end);
-      linkGameState.matchedPairs += 1;
-      const shifted = applyLinkGravityShift(board, linkGameState.gravityShift);
-      if (shifted) renderLinkBoardShift(board, { onTileClick: handleLinkTileClick });
-      onComplete();
-    }, getLinkThunderResolveDelay());
-  }, LINK_CONNECT_TIMING.automaticPairMarkMs);
 }
 
 function applyThunderPairScore(mode, anchor) {
@@ -1437,14 +1174,6 @@ function applyThunderPairScore(mode, anchor) {
   return points;
 }
 
-function rememberSpecialPairForTransform(pair) {
-  const tileKeys = pair?.positions
-    .map((position) => getLinkBoardTile(linkGameState.board, position)?.instanceId)
-    .filter(Boolean) || [];
-  linkGameState.pendingSpecialPairKeys = tileKeys;
-  return tileKeys;
-}
-
 function rememberFrozenPairForTransform({ tileKeys }) {
   linkGameState.pendingFrozenTileKeys = [
     ...new Set([...linkGameState.pendingFrozenTileKeys, ...tileKeys]),
@@ -1452,9 +1181,6 @@ function rememberFrozenPairForTransform({ tileKeys }) {
 }
 
 function playPendingBoardTransforms() {
-  const tileKeys = linkGameState.pendingSpecialPairKeys;
-  linkGameState.pendingSpecialPairKeys = [];
-  if (tileKeys.length) playLinkSpecialPairTransform(tileKeys);
   const frozenTileKeys = linkGameState.pendingFrozenTileKeys;
   linkGameState.pendingFrozenTileKeys = [];
   if (frozenTileKeys.length) playLinkFrozenPairUnlock(frozenTileKeys);

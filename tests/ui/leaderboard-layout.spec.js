@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 const source = readFileSync('js/leaderboardPanel.js', 'utf8')
   .replace("import { getFirebaseBackend } from './firebaseBackend.js';", "const getFirebaseBackend = async () => ({ database: null, environment: 'test' });")
   .replace("import { readCachedLeaderboard } from './leaderboardStore.js';", "const readCachedLeaderboard = ({ board, uid, page }) => window.rankCache.get(JSON.stringify({ board, uid, page })) || null;")
@@ -126,7 +126,9 @@ test('30 mount, picker cancel and mode changes release every page-owned resource
   expect(await page.evaluate(() => performance.getEntriesByType('resource').filter(entry => entry.name.includes('leaderboard-night-garden.webp')).length)).toBe(imageLoads);
   const complete = new Promise(resolve => tracing.once('Tracing.tracingComplete', resolve));
   await tracing.send('Tracing.end'); await complete; await tracing.detach();
-  await test.info().attach('ranking-30-cycle-resources', { body: JSON.stringify({ imageLoads, decodes, before, after: await diagnostics() }), contentType: 'application/json' });
+  const evidence = { imageLoads, decodes, before, after: await diagnostics() };
+  writeFileSync('docs/design/leaderboard/qa/level-ranking-30-cycles.json', JSON.stringify(evidence, null, 2));
+  await test.info().attach('ranking-30-cycle-resources', { body: JSON.stringify(evidence), contentType: 'application/json' });
   expect(decodes.length).toBeLessThanOrEqual(1);
 });
 for (const viewport of [{ width: 412, height: 915 }, { width: 640, height: 360 }, { width: 844, height: 390 }, { width: 1024, height: 900 }]) {

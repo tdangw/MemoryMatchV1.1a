@@ -1,0 +1,31 @@
+{
+  "game": "triple-connect",
+  "viewport": {
+    "width": 412,
+    "height": 915
+  },
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+  "rows": [
+    {
+      "level": 1,
+      "startupMs": 119.89999999850988,
+      "tiles": 18,
+      "nodes": 316,
+      "longTasks": [],
+      "heapBefore": 14767730,
+      "heapAfter": 14361326,
+      "scopeReleased": true
+    },
+    {
+      "level": 100000,
+      "startupMs": 194.19999999552965,
+      "tiles": 79,
+      "nodes": 438,
+      "longTasks": [],
+      "heapBefore": 14361326,
+      "heapAfter": 15615418,
+      "scopeReleased": true
+    }
+  ],
+  "device": "Desktop Chrome headless; mobile viewport, not physical device or FPS proof"
+}

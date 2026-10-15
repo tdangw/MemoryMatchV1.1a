@@ -1,6 +1,6 @@
 # Kế hoạch tiến độ màn và bảng xếp hạng
 
-Ngày: 2026-10-14. Trạng thái: đã lập kế hoạch, chưa triển khai. Đây là kế hoạch triển khai hiện hành duy nhất; LEADERBOARD_REDESIGN_PLAN.md và EFFECTS_LEADERBOARD_PLAN.md là hồ sơ lịch sử. Yêu cầu mới trong kế hoạch này thay luật xếp hạng time/run-score, sáu bộ lọc và picker màn của các hồ sơ trước.
+Ngày lập: 2026-10-14. Cập nhật: 2026-10-15. Trạng thái: Phase0–6 hoàn tất phần mềm, mỗi phase một commit. Không còn kế hoạch triển khai active; tài liệu này là hồ sơ nghiệm thu. QA Galaxy S22 Ultra thật còn chờ theo xác nhận người dùng. LEADERBOARD_REDESIGN_PLAN.md và EFFECTS_LEADERBOARD_PLAN.md là hồ sơ lịch sử. Yêu cầu mới trong kế hoạch này thay luật xếp hạng time/run-score, sáu bộ lọc và picker màn của các hồ sơ trước.
 
 ## 1. Quyết định sản phẩm đã chốt
 
@@ -101,7 +101,7 @@ Triển khai luật tiến độ/bảng mới, lượt chơi lại, sinh màn ca
 
 ## 6. Phases và commit
 
-Mỗi phase triển khai có commit riêng sau gate; đi tuần tự tới hết khi được giao thực hiện. Chỉ lập kế hoạch trong lượt hiện tại, chưa sửa runtime hoặc deploy.
+Mỗi phase triển khai có commit riêng sau gate; đi tuần tự tới hết khi được giao thực hiện. Kế hoạch đã được giao triển khai toàn bộ; kết quả thực thi ở mục9 và hồ sơ QA.
 
 | Phase | Công việc / owner chính | Gate | Commit dự kiến |
 |---|---|---|---|
@@ -128,16 +128,20 @@ Phase4 phải pass emulator/negative Rules rồi mới deploy riêng Rules/index
 
 ## 8. Acceptance và review
 
-- [ ] Mỗi trò đúng3bảng, normal4độkhó cùngHành trình; chỉ level đãthắng quyết địnhkỷlục.
-- [ ] Thử thách/Vô tận córun mới từ1 khi Chơi lại; resumecũ không tăng thànhtích hoặc bị âm thầm xóa.
-- [ ] Cả3game tiếp tục qua mốc kết thúc cũ và100.000; không cấp sẵnlevel, không buộc tăng board/solver/time vô hạn.
-- [ ] Điểm/sao/kỷlục đúngcontext, bỏtổngđiểm gây nhầm trongHUD và điểm trênmap; dữ liệu điểm/sao cũ giữ nguyên.
-- [ ] Game dropdown chỉ một menu, đúngfamily hiện tại, không6mode/picker màn hoặc UIcopy nội bộ dư.
-- [ ] v3/private summaries/outbox/migration owner-safe, idempotent, transactional; v1/v2/save/Xu/kho/theme/privateprofile tương thích.
-- [ ] Rules/indexes/query/sort/page/cache/UID/offline đã có evidence; không publish khi savefail.
-- [ ] Check/build/regression/generator/resource và review độc lập pass; diff không có code chết, asset rác hoặc leak.
-- [ ] Báo commit từngphase, deploy thực tế, số đo thật và các giới hạn device/admin; không nhận phần chưa xác minh là hoàn thành.
+- [x] Mỗi trò đúng3bảng, normal4độkhó cùngHành trình; chỉ level đãthắng quyết địnhkỷlục.
+- [x] Thử thách/Vô tận córun mới từ1 khi Chơi lại; resumecũ không tăng thànhtích hoặc bị âm thầm xóa.
+- [x] Cả3game tiếp tục qua mốc kết thúc cũ và100.000; không cấp sẵnlevel, không buộc tăng board/solver/time vô hạn.
+- [x] Điểm/sao/kỷlục đúngcontext, bỏtổngđiểm gây nhầm trongHUD và điểm trênmap; dữ liệu điểm/sao cũ giữ nguyên.
+- [x] Game dropdown chỉ một menu, đúngfamily hiện tại, không6mode/picker màn hoặc UIcopy nội bộ dư.
+- [x] v3/private summaries/outbox/migration owner-safe, idempotent, transactional; v1/v2/save/Xu/kho/theme/privateprofile tương thích.
+- [x] Rules/indexes/query/sort/page/cache/UID/offline đã có evidence; không publish khi savefail.
+- [x] Check/build/regression/generator/resource và review độc lập pass; diff không có code chết, asset rác hoặc leak.
+- [x] Báo commit từngphase, deploy thực tế, số đo thật và các giới hạn device/admin; không nhận phần chưa xác minh là hoàn thành.
 
-## 9. Trạng thái lượt lập kế hoạch
+## 9. Kết quả thực thi
 
-Đã đối chiếu CONTEXT/ARCHITECTURE, tiến độ chặng, ranking/session/outbox, các controller và generator/config của3trò. Repo sạch trước thao tác. Lượt này chỉ tạo kế hoạch hiện hành và cập nhật nguồn điều hướng; chưa thay runtime, score/star, save, Firestore hoặc giao diện. Kế hoạch điểmcao/thời gian và rankingtheo6mode trước đây không còn là nguồn thực thi cho bảng mới.
+Phase0 `4adcde9`, Phase1 `7c6c6c1`, Phase2 `7d3814f`, Phase3 `2104ce8`, Phase4 `ae5caa9`, Phase5 `b79b0f7`. Phase6 hoàn tất review, kiểm tra/build và hồ sơ QA; commit có title `test: verify level rankings and generated progression`. Chi tiết: `docs/design/leaderboard/LEVEL_RANKING_QA.md`.
+
+Review độc lập đã phát hiện và đóng các lỗi owner/migration marker, corrupt queue, UID/higher-best wakeup, combo/lucky restore, corrupted snapshot và stale Triple rollback. Review cuối phát hiện khoảng hở reward trong animation: chọn atomic pair settlement thay pending ledger. Resolve mutation đồng bộ, snapshot+ví+kho commit trước hiệu ứng; các giá trị/xác suất lấy nguyên config, không đổi ngưỡng sao.
+
+Timeline trình bày giữ anticipation/path/flip, impact/exit/loot, resolve/board render hữu hạn. Chỉ transform/opacity và renderer hiện có; Link bonus dùng một thunder canvas với tối đa4target, dưới cap6target của item hiện hành. Memory tối đa năng lượng + lucky +4reward cues trong một match (registry giữ giới hạn effect hiện có). Timer/animation thuộc shell, hủy/restart không cấp thưởng lại; reduced-motion vẫn nhận cùng mutation đã commit. Không thêm animation loop hoặc network/tick. Bằng chứng reload trước arrival, rollback quota, resource/lifecycle trong hồ sơ QA. Không coi các số desktop là 60FPS trên S22 Ultra.
