@@ -30,13 +30,13 @@ export async function submitRankingResult({ database, environment, uid, playerNa
   if (written) for (const key of cache.keys()) if (key.startsWith(`${environment}:${boardId}:`)) cache.delete(key);
   return { reads, writes: written ? 1 : 0 };
 }
-export async function readLeaderboard({ database, environment, board, uid = null, refresh = false, page = 1 }) {
+export async function readLeaderboard({ database, environment, board, uid = null, refresh = false, forceRefresh = false, page = 1 }) {
   if (!Number.isSafeInteger(page) || page < 1 || page > 100) throw pageError('reset');
   const boardId = rankingBoardId(board);
   const key = `${environment}:${boardId}:${uid || ''}`;
   let state = cache.get(key);
   const now = Date.now();
-  if (state && refresh && now - state.refreshedAt >= REFRESH_INTERVAL_MS) { cache.delete(key); state = null; page = 1; }
+  if (state && (forceRefresh || refresh && now - state.refreshedAt >= REFRESH_INTERVAL_MS)) { cache.delete(key); state = null; page = 1; }
   if (state && now - state.fetchedAt >= CACHE_TTL_MS) { cache.delete(key); state = null; }
   if (!state) {
     if (page !== 1) throw pageError('reset');

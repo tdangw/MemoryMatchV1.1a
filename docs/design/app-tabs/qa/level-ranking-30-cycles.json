@@ -1,0 +1,30 @@
+{
+  "imageLoads": 1,
+  "decodes": [],
+  "before": {
+    "nodes": 277,
+    "owner": {
+      "active": true,
+      "listener": 6,
+      "timeout": 0,
+      "interval": 0,
+      "frame": 0,
+      "animation": 0,
+      "node": 2,
+      "cleanup": 1
+    }
+  },
+  "after": {
+    "nodes": 277,
+    "owner": {
+      "active": true,
+      "listener": 6,
+      "timeout": 0,
+      "interval": 0,
+      "frame": 0,
+      "animation": 0,
+      "node": 2,
+      "cleanup": 1
+    }
+  }
+}

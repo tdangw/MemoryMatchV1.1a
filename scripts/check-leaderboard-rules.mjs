@@ -54,6 +54,10 @@ try {
   assert.equal(own.own.durationMs, 800);
   assert.equal((await readLeaderboard({ database, environment: 'test', board: result, uid: 'a' })).cached, true);
   assert.equal((await readLeaderboard({ database, environment: 'test', board: result, uid: 'a', refresh: true })).cached, true);
+  const forced = await readLeaderboard({ database, environment: 'test', board: result, uid: 'a', forceRefresh: true });
+  assert.equal(forced.cached, false, 'mount/stale recovery must bypass the 15s manual-refresh cooldown');
+  assert.equal(forced.page, 1);
+  assert.equal((await readLeaderboard({ database, environment: 'test', board: result, uid: 'a' })).cached, true);
   await assertFails(submit({ ...result, durationMs: 700 }, 'a', stranger));
   const entry = { rulesVersion: 1, resultId: crypto.randomUUID(), gameId: 'memory-match', mode: 'easy', level: 1, kind: 'time', durationMs: 600, score: 1, stars: 1, playerName: 'A', updatedAt: serverTimestamp() };
   const ref = doc(database, 'gamespaces/test/leaderboards/v1_memory-match_easy_1/entries/a');

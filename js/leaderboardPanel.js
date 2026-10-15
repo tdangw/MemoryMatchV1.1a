@@ -30,9 +30,8 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
   const content = document.createElement('div'); content.className = 'leaderboard-view';
   const games = tabs('Trò chơi', GAME_DEFINITIONS.map(item => [item.id, item.title]), 'game');
   const footer = document.createElement('div'); footer.className = 'leaderboard-footer';
-  const refresh = button('Làm mới');
-  refresh.setAttribute('aria-label', 'Làm mới'); refresh.replaceChildren(createIcon('restart')); refresh.classList.add('leaderboard-refresh');
   const status = document.createElement('p'); status.className = 'leaderboard-status'; status.setAttribute('aria-live', 'polite');
+  const retry = button('Thử lại'); retry.classList.add('leaderboard-retry'); retry.hidden = true;
   const results = document.createElement('div'); results.className = 'leaderboard-results'; results.tabIndex = 0; results.setAttribute('aria-label', 'Danh sách xếp hạng');
   const own = document.createElement('p'); own.className = 'leaderboard-own';
   const pager = document.createElement('nav'); pager.className = 'leaderboard-pager'; pager.tabIndex = -1; pager.setAttribute('aria-label', 'Trang xếp hạng');
@@ -46,7 +45,6 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
   const release = owner?.own(() => scope.dispose(), 'cleanup');
   const modal = openAppModal({ ...surface, id: 'rankings-modal', title: 'Bảng xếp hạng', icon: 'trophy', content, onDestroy: () => { generation++; scope.dispose(); release?.forget(); }, onClose });
   modal.panel.classList.add('leaderboard-panel');
-  modal.panel.querySelector('.app-modal__header').append(refresh);
   function updateFilters() {
     lastGame = selectedGame;
     for (const item of games.children) {
@@ -55,7 +53,6 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
       item.setAttribute('aria-haspopup', 'menu'); item.setAttribute('aria-expanded', String(dropdown?.anchor === item));
       const title = GAME_DEFINITIONS.find(game => game.id === item.dataset.rankGame).title;
       item.replaceChildren(document.createTextNode(`${title} ▾`));
-      if (selected) { const label = document.createElement('small'); label.textContent = families.find(([id]) => id === selectedFamily)[1]; item.append(label); }
     }
   }
   function closeDropdown(restoreFocus = false) {
@@ -78,8 +75,8 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
     });
     document.body.append(menu); dropdown = { anchor, lifecycle, menu }; anchor.setAttribute('aria-expanded', 'true');
     const position = () => {
-      const rect = anchor.getBoundingClientRect(); const width = Math.min(200, innerWidth - 16); const height = menu.offsetHeight;
-      menu.style.width = `${width}px`; menu.style.left = `${Math.max(8, Math.min(rect.left, innerWidth - width - 8))}px`;
+      const rect = anchor.getBoundingClientRect(); const width = menu.getBoundingClientRect().width; const height = menu.offsetHeight;
+      menu.style.left = `${Math.max(8, Math.min(rect.left, innerWidth - width - 8))}px`;
       const down = innerHeight - rect.bottom >= height + 8;
       menu.dataset.direction = down ? 'down' : 'up';
       menu.style.top = `${Math.max(8, Math.min(down ? rect.bottom + 5 : rect.top - height - 5, innerHeight - height - 8))}px`;
@@ -102,7 +99,6 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
   }
   function controls(data = null) {
     if (data) loadedPages = data.loadedPages;
-    refresh.disabled = loading;
     previous.disabled = loading || currentPage === 1;
     next.disabled = loading || !data?.hasNext || currentPage >= 100;
     renderPages();
@@ -126,7 +122,18 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
       target.focus({ preventScroll: true });
     }
   }
-  async function load(refreshRequested = false, requestedPage = 1) {
+  function createHeading() {
+    const heading = document.createElement('div'); heading.className = 'leaderboard-heading leaderboard-heading--progress';
+    const rank = document.createElement('span'); rank.textContent = 'Hạng';
+    const player = document.createElement('span'); player.className = 'leaderboard-heading-player';
+    const label = document.createElement('span'); label.textContent = 'Người chơi';
+    const family = document.createElement('strong'); family.className = 'leaderboard-family-label';
+    family.textContent = families.find(([id]) => id === selectedFamily)[1];
+    player.append(label, family);
+    const level = document.createElement('span'); level.textContent = 'Màn';
+    heading.append(rank, player, level); return heading;
+  }
+  async function load(refreshRequested = false, requestedPage = 1, recovered = false) {
     const id = ++generation;
     const uid = getAccountService()?.getIdentity()?.uid;
     if (currentKey) { scrolls.delete(`${currentKey}:${currentPage}`); scrolls.set(`${currentKey}:${currentPage}`, results.scrollTop); while (scrolls.size > 60) scrolls.delete(scrolls.keys().next().value); }
@@ -134,7 +141,7 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
     const nextKey = `${uid || ''}:${rankingBoardId(board)}`;
     if (nextKey !== currentKey) loadedPages = [1];
     loading = true; currentPage = requestedPage; controls();
-    results.replaceChildren(status); own.textContent = ''; status.textContent = 'Đang tải…'; results.setAttribute('aria-busy', 'true');
+    retry.hidden = true; results.replaceChildren(createHeading(), status, retry); own.textContent = ''; status.textContent = 'Đang tải…'; results.setAttribute('aria-busy', 'true');
     currentKey = nextKey;
     try {
       const backend = await getFirebaseBackend();
@@ -144,15 +151,12 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
       if (!scope.active || id !== generation) return;
       const offline = !navigator.onLine;
       const data = offline ? readCachedLeaderboard({ environment: backend.environment, board, uid, page: requestedPage })
-        : await readLeaderboard({ database: backend.database, environment: backend.environment, board, uid, refresh: refreshRequested, page: requestedPage });
+        : await readLeaderboard({ database: backend.database, environment: backend.environment, board, uid, refresh: refreshRequested, forceRefresh: refreshRequested, page: requestedPage });
       if (!scope.active || id !== generation || uid !== getAccountService()?.getIdentity()?.uid) return;
       if (!data) { status.textContent = 'Chưa có kết nối.'; return; }
       currentPage = data.page;
       results.dataset.kind = board.kind;
-      const heading = document.createElement('div'); heading.className = `leaderboard-heading leaderboard-heading--${board.kind}`;
-      for (const text of ['Hạng', 'Người chơi', 'Màn']) {
-        const cell = document.createElement('span'); cell.textContent = text; heading.append(cell);
-      }
+      const heading = createHeading();
       const list = document.createElement('ol'); list.className = 'leaderboard-list'; list.start = (currentPage - 1) * 10 + 1;
       for (const [index, item] of data.top.entries()) {
         const rank = (currentPage - 1) * 10 + index + 1;
@@ -165,19 +169,22 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
         row.append(metric(formatLeaderboardNumber(item.levelReached), 'leaderboard-metric', 'Màn')); list.append(row);
       }
       results.dataset.offline = String(offline);
-      if (data.top.length) { status.textContent = offline ? 'Chưa có kết nối.' : ''; results.replaceChildren(status, heading, list); }
+      if (data.top.length) { status.textContent = offline ? 'Chưa có kết nối.' : ''; results.replaceChildren(heading, status, retry, list); }
       else { status.textContent = 'Chưa có thành tích.'; }
       own.textContent = data.own && !data.top.some(item => item.uid === uid) ? `Thành tích của bạn: ${describe(data.own, board.kind)}` : '';
       results.scrollTop = refreshRequested ? 0 : scrolls.get(`${currentKey}:${currentPage}`) || 0;
       loading = false; controls(data);
     } catch (error) {
-      if (scope.active && id === generation) status.textContent = ['reset', 'stale'].includes(error.code) ? 'Bảng đã thay đổi. Làm mới để xem tiếp.' : 'Chưa tải được bảng. Thử lại.';
+      if (scope.active && id === generation) {
+        if (['reset', 'stale'].includes(error.code) && !recovered) return await load(true, 1, true);
+        status.textContent = 'Chưa tải được bảng.'; retry.hidden = false;
+      }
     } finally {
-      if (scope.active && id === generation) { loading = false; refresh.disabled = false; previous.disabled = currentPage === 1; renderPages(); results.removeAttribute('aria-busy'); }
+      if (scope.active && id === generation) { loading = false; previous.disabled = currentPage === 1; renderPages(); results.removeAttribute('aria-busy'); }
     }
   }
   scope.listen(games, 'click', event => { const item = event.target.closest('[data-rank-game]'); if (item) openDropdown(item); });
-  scope.listen(refresh, 'click', () => { void load(true); });
+  scope.listen(retry, 'click', () => { if (!loading) void load(true); });
   scope.listen(previous, 'click', () => { if (!loading && currentPage > 1) void load(false, currentPage - 1); });
   scope.listen(next, 'click', () => { if (!loading && !next.disabled) void load(false, currentPage + 1); });
   scope.listen(pageNumbers, 'click', event => {
@@ -188,9 +195,9 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
   let previousUid = getAccountService()?.getIdentity()?.uid;
   if (getAccountService()) scope.own(getAccountService().subscribe(() => {
     const uid = getAccountService().getIdentity()?.uid;
-    if (uid !== previousUid) { previousUid = uid; void load(); }
+    if (uid !== previousUid) { previousUid = uid; void load(true); }
   }), 'listener');
-  updateFilters(); void load();
+  updateFilters(); void load(true);
   return modal;
 }
 function button(text) { const element = document.createElement('button'); element.type = 'button'; element.className = 'app-button'; element.textContent = text; return element; }
