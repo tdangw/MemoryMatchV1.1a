@@ -4,11 +4,11 @@
 
 ## Sản phẩm
 
-- Active: `HOME_MENU_IMPLEMENTATION_PLAN.md` — triển khai main menu hướng1 bằng art riêng cho3trò, giữ navigation/save, commit từng phase. Steering: gỡ ornament ảnh trong pause popup, không áp dụng sheet popup vào game.
+- `HOME_MENU_IMPLEMENTATION_PLAN.md`: Home hướng1 đã triển khai: Memory lớn, Link/Triple bên dưới; ba WebP riêng tổng349.418bytes, CSS và listener có owner rõ. QA: `docs/design/home-menu/QA.md`. Gỡ ornament ảnh trên pause popup theo yêu cầu. Không đổi navigation API/save/catalog; phase1–3 hoàn tất, check/build web và Android pass, review độc lập7/7. Không còn gate triển khai active.
 
-- Home đã chốt hướng1 (một ô lớn/hai ô nhỏ, có thể mở rộng lưới). Sheet12vùng nền trò/popup/tiêu đề/khung dùng skill imagegen đã lưu ở `docs/design/home-assets/README.md`; PNG alpha và ảnh QA nền tối đã kiểm. Chỉ tạo nguồn mỹ thuật, chưa cắt asset rời hoặc sửa code Home. Sheet1254px, chưa xem là master đủ mọi DPR; không còn task triển khai active từ yêu cầu vẽ sheet.
+- Home đã chốt hướng1 (một ô lớn/hai ô nhỏ, có thể mở rộng lưới). Sheet12vùng nền trò/popup/tiêu đề/khung dùng skill imagegen đã lưu ở `docs/design/home-assets/README.md`; PNG alpha và ảnh QA nền tối đã kiểm. Sheet1254px chỉ là nguồn tham khảo; runtime Home dùng ba tranh riêng có master lớn hơn, không dùng sheet làm nền cả màn.
 
-- `POPUP_POLISH_PLAN.md`: phase1–5 hoàn tất trong phạm vi được giao, không còn kế hoạch triển khai active. Exit bản đồ và mọi screen chức năng (gồm Cửa hàng/Bộ sưu tập) gắn header; Xu giữa Cửa hàng; title Bộ sưu tập không lặp game. Popup bám board, bản đồ dùng cùng mốc chrome ngay lần đầu; menu tạm dừng Vườn đêm có Tiếp tục. QA: `docs/design/popups/QA.md`. Hai mẫu Home và prompt ở `docs/design/home-concepts/README.md`, chỉ tham khảo, chưa đổi code Home. Không deploy/đổi save; S22 Ultra thật còn chờ.
+- `POPUP_POLISH_PLAN.md`: phase1–5 hoàn tất trong phạm vi được giao, không còn kế hoạch triển khai active. Exit bản đồ và mọi screen chức năng (gồm Cửa hàng/Bộ sưu tập) gắn header; Xu giữa Cửa hàng; title Bộ sưu tập không lặp game. Popup bám board, bản đồ dùng cùng mốc chrome ngay lần đầu; menu tạm dừng Vườn đêm có Tiếp tục. QA: `docs/design/popups/QA.md`. Hai mẫu Home và prompt ở `docs/design/home-concepts/README.md`, là nguồn tham khảo cho Home hiện tại. Không deploy/đổi save; S22 Ultra thật còn chờ.
 
 - Tinh chỉnh tab ngày2026-10-15: sửa tên ngay cạnh tên với bút/Lưu/Hủy, ngày bắt đầu theo dõi nằm trong ô thời gian chơi; ẩn thông báo đồng bộ bình thường. Family xếp hạng canh giữa; top3 huy chương SVG, các hạng sau số sáng không khung. Header tối và exit gắn góc phải cố định trên cả5tab. UI/emulator/check/build đã đạt; chi tiết ở `docs/design/app-tabs/QA.md`. Không đổi API/schema/save/Auth.
 

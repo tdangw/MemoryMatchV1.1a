@@ -59,8 +59,8 @@ for (const game of games) {
     await settingsBody.evaluate(element => {
       element.scrollTop = element.scrollHeight;
     });
-    const lastSetting = page.locator("#settings-modal #settings-container .settings-control").last();
-    await expect(lastSetting).toBeInViewport();
+    // Help and data actions now belong to the scrollable content after the controls.
+    await expect(page.locator("#settings-modal #settings-reset")).toBeInViewport();
     await page.locator('.adventure-screen [data-dock-action="map"]').click();
 
     await expect(page.locator("#settings-modal")).toHaveCount(0);

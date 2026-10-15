@@ -1,6 +1,6 @@
 # Bộ mỹ thuật Vườn đêm — hướng1
 
-Người dùng đã chọn hướng1 cho màn chính. Lượt này tạo sheet trang trí để dùng làm nguồn mỹ thuật; chưa thay code Home hoặc đưa ảnh vào bundle. Skill `imagegen`, công cụ built-in image_gen, không CLI/API fallback.
+Người dùng đã chọn hướng1 cho màn chính. Sheet trang trí là nguồn tham khảo. Home hiện đã triển khai hướng1 với ba tranh riêng và WebP runtime, xem [QA](../home-menu/QA.md); không dùng sheet nguyên tấm làm giao diện. Skill `imagegen`, công cụ built-in image_gen, không CLI/API fallback.
 
 - [PNG gốc trong suốt](garden-ui-sheet-v1.png)
 - [Kiểm tra hiển thị trên nền tối](garden-ui-sheet-on-dark-qa.png)

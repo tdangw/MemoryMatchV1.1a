@@ -15,7 +15,7 @@ Correction trước phase1: bỏ ornament pause, giữ vị trí/nút/pause; ki�
 -3trò: featured +2ô;4trò trở lên: lưới2cột, nội dung cuộn và dock/ad slot giữ nguyên. Compact landscape3cột ngang để đủ vùng bấm. Giữ cơ chế preload nền map cũ.
 - Không thay tab khác hoặc add ornament popup; commit.
 
-## Phase3 — Nghiệm thu
+## Phase3 — Nghiệm thu (hoàn tất)
 - Mobile412×915, hẹp, landscape và desktop; ảnh/snapshot runtime, keyboard, lỗi tải ảnh, chuyển game/Home, tab và30cycles ownership.
 - Review độc lập, regression navigation/map/pause phù hợp; fullcheck, build web/Android. Đo browser chỉ là browser, S22 Ultra thật còn chờ. Không deploy.
 - Cập nhật CONTEXT/ARCHITECTURE/QA, commit; không dừng ở checkpoint khi còn phần an toàn làm được.
@@ -23,3 +23,5 @@ Correction trước phase1: bỏ ornament pause, giữ vị trí/nút/pause; ki�
 Correction pause: commit7ea66e9,20/20 browserpass. Phase1:3master/3WebP đã kiểm bằng ảnh, không chữ/UI trong art; xuất349.418bytes≤350KB. Không PNG master trong bundle.
 
 Phase2: Home7/7pass ở320/412/844/1024, keyboard/ảnhlỗi,4trò và30cycles. CSS Home cóowner riêng; gridcolumns/stretch sửa co chiều ngang do generic menu cũ. Error ảnh được ẩn theo scope để không lộ icon hỏng. Baseline18listener/0timer/0frame, owner cũ về0; progress durable giữ nguyên.
+
+Phase3: regression37ca đạt (35lần đầu +2landscape chạy lại sau sửa assertion Cài đặt cũ); review độc lập Home7/7, không finding. npm run check, npm run build và npm run build:android đều exit0. Không deploy, không đổi API/save/catalog. QA đầy đủ ở docs/design/home-menu/QA.md. Commits: correction7ea66e9, art7fcf5f8, UI042c544; phase3 là commit chứa bản nghiệm thu này. Không còn gate triển khai active; S22 Ultra thật còn chờ riêng.
