@@ -11,14 +11,14 @@
 .adventure-screen[data-screen="friends"] { --tab-background: url('/assets/images/backgrounds/friends-courtyard.webp'); }
 .adventure-screen[data-screen="profile"] { --tab-background: url('/assets/images/backgrounds/profile-keepsake.webp'); }
 .adventure-screen[data-screen="settings"] { --tab-background: url('/assets/images/backgrounds/settings-retreat.webp'); }
-.adventure-screen:is([data-screen="missions"], [data-screen="friends"], [data-screen="profile"], [data-screen="ranking"], [data-screen="settings"]) { --tab-header-height: 60px; }
-.adventure-screen:is([data-screen="missions"], [data-screen="friends"], [data-screen="profile"], [data-screen="ranking"], [data-screen="settings"]) .app-modal__header {
+.adventure-screen[data-screen] { --tab-header-height: 60px; }
+.adventure-screen[data-screen] .app-modal__header {
   height: var(--tab-header-height);
   min-height: var(--tab-header-height);
   flex: 0 0 var(--tab-header-height);
   padding: 12px 64px 12px 18px;
 }
-.adventure-screen:is([data-screen="missions"], [data-screen="friends"], [data-screen="profile"], [data-screen="ranking"], [data-screen="settings"]) > .adventure-exit {
+.adventure-screen[data-screen] > .adventure-exit {
   top: env(safe-area-inset-top);
   right: max(0px, calc((100% - 640px) / 2));
   width: 56px;
@@ -39,7 +39,7 @@
   background-size: cover;
   background-position: center;
 }
-:is(#account-modal, #settings-modal, #missions-screen, #friends-screen, #rankings-modal) .app-modal__header {
+:is(#account-modal, #settings-modal, #missions-screen, #friends-screen, #rankings-modal, #shop-modal, #collection-modal) .app-modal__header {
   background: linear-gradient(#041923fc, #071f29f7);
   text-shadow: 0 1px 2px #0008;
   border-bottom: 1px solid #d9bc6e38;

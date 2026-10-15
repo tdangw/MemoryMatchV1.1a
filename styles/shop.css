@@ -486,3 +486,13 @@
     height: 54px;
   }
 }
+
+/* Screen headers share the navigation exit; the wallet has its own center slot. */
+.adventure-screen #shop-modal .app-modal__header { position: relative; }
+.adventure-screen #shop-modal .shop-wallet { position: absolute; left: 50%; transform: translateX(-50%); margin: 0; max-width: calc(100% - 220px); }
+.adventure-screen #shop-modal .shop-wallet > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.adventure-screen #shop-modal .shop-wallet .ui-icon { flex-shrink: 0; }
+@media (width <= 380px) {
+  .adventure-screen #shop-modal .app-modal__title { font-size: 18px; }
+  .adventure-screen #shop-modal .app-modal__title .ui-icon { display: none; }
+}

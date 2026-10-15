@@ -20,7 +20,7 @@ test('Triple map previews normal modes and keeps theme access in the shared coll
   await expect(page.locator('.adventure-level-modes label')).toHaveText(['C', 'B', 'A', 'S']);
   await closeLevelPreview(page);
   await page.locator('[data-dock-action="collection"]').click();
-  await expect(page.locator('#collection-modal')).toContainText('Bộ sưu tập · Triple Connect');
+  await expect(page.locator('#collection-modal')).toContainText('Bộ sưu tập');
   await page.locator('.adventure-screen [data-dock-action="map"]').click();
   await expect(page.locator('#collection-modal')).toHaveCount(0);
   await previewMapLevel(page);

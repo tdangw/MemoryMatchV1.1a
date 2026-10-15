@@ -188,11 +188,7 @@ export async function showCollectionModal({
     ...surface,
     id: "collection-modal",
     icon: "collection",
-    title: gameId === "link-connect"
-      ? "Bộ sưu tập · Link Connect"
-      : gameId === "triple-connect"
-        ? "Bộ sưu tập · Triple Connect"
-        : "Bộ sưu tập",
+    title: "Bộ sưu tập",
     content,
     size: "large",
     onClose: () => {
