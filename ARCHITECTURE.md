@@ -175,3 +175,14 @@ Bản đồ: adventureMap sở hữu preview màn với bốn độ khó và hai
 `memoryMatch/pairRewards.js` và `linkConnect/pairRewards.js` resolve đồng bộ lucky/premium/milestone, thời gian, năng lượng, vật phẩm và biến đổi bàn; không tạo timer/network. Controller stage snapshot cùng ví/kho rồi commit một transaction trước presentation. Failure khôi phục RAM và giữ nguồn durable, có round/generation guard. `memorySpecial.js`/renderer trình bày kết quả đã commit; callback bay/thu thập không cấp lại tài nguyên. Không thêm pending-reward ledger hoặc đổi xác suất/giá trị cấu hình.
 
 Pair snapshot giữ seed/theme, bàn thật, score/moves/misses/matched, lucky history; combo giữ cửa sổ còn lại và capturedAt, không cấp window mới khi reload. Link giữ freezeSeconds. Snapshot hỏng được giữ trong source và đánh dấu không thể resume, không sinh bàn mới cho run cũ; controller đối chiếu capacity với mode/level và theme catalog. Legacy session vẫn đọc theo contract cũ. Triple giữ snapshot riêng, ladder challenge8+ giới hạn tối đa93 tile/5layer/210s và solver budget hiện hành.
+
+
+## Mỹ thuật và bố cục các tab (2026-10-15)
+
+`styles/app-tabs.css` sở hữu palette/surface/button và background theo `adventure-screen[data-screen]`;4ảnh WebP chỉ tải khi screen tương ứng mount, Home/map/gameplay không dùng nền này. Pipeline `scripts/prepare-app-tab-assets.py` tạo output từ PNG master trong docs; flourish runtime384px giữ alpha. Xếp hạng giữ Vườn đêm cũ. Không preload toàn bộ nền hoặc thêm animation loop.
+
+`accountPanel.js` sở hữu Profile hero/name editor/stats/account; Google action nằm content thay footer. Draft chỉ thay khi người dùng mở/hủy/lưu hoặc UID đổi; saving/linking khóa đúng controls, dispose không nhận kết quả cũ. `styles/profile.css` là owner bố cục này. Nguồn Auth/ngày tạo/playtime và privacy giữ nguyên.
+
+`settings.js` di chuyển cùng settings DOM vào screen/pause modal và trả về home khi hủy; Help/Reset trong nhóm cuối, handler tạm được gỡ khi destroy. IDs, saveSetting, audio và handoff của từng controller giữ nguyên. `styles/settings.css` sở hữu nhóm/control/toggle/native-range; fill variable cập nhật theo giá trị, reduced-motion không animate thumb.
+
+`leaderboardPanel.js` fresh trang1 ở mount/UID/retry, bỏ refresh thường trực. Store nhận option bổ sung `forceRefresh` mặc địnhfalse, chỉ vô hiệu cache đúng board/environment/UID; semantics refresh cooldown15s cũ và paging cache giữ tương thích. Stale/reset khôi phục trang1 tối đa1lần/request, lỗi có Thử lại theo ngữ cảnh. Family là badge ở header Người chơi, không thêm metric public. Menu max-content128px, hit44px, viewport clamp và focus/keyboard owner giữ nguyên.

@@ -34,7 +34,8 @@ async function saveGameSetting(key, value) {
   (await saveSetting(key, value));
 }
 
-function updateVolumeLabel(output, value) {
+function updateVolumeControl(input, output, value) {
+  if (input) input.style.setProperty('--settings-volume', `${Math.round(value * 100)}%`);
   if (output) output.textContent = `${Math.round(value * 100)}%`;
 }
 
@@ -49,8 +50,8 @@ function syncSettingsControls() {
   if (musicVolume) musicVolume.value = Math.round(settings.musicVolume * 100);
   if (soundVolume) soundVolume.disabled = !settings.sound;
   if (musicVolume) musicVolume.disabled = !settings.music;
-  updateVolumeLabel(soundVolumeValue, settings.soundVolume);
-  updateVolumeLabel(musicVolumeValue, settings.musicVolume);
+  updateVolumeControl(soundVolume, soundVolumeValue, settings.soundVolume);
+  updateVolumeControl(musicVolume, musicVolumeValue, settings.musicVolume);
 }
 
 function bindSettingsControls() {
@@ -95,7 +96,7 @@ function bindSettingsControls() {
     soundVolume.oninput = async () => {
       const value = Number(soundVolume.value) / 100;
       (await saveGameSetting("soundVolume", value));
-      updateVolumeLabel(soundVolumeValue, value);
+      updateVolumeControl(soundVolume, soundVolumeValue, value);
       applyEffectsSettings(gameState.settings);
     };
   }
@@ -104,7 +105,7 @@ function bindSettingsControls() {
     musicVolume.oninput = async () => {
       const value = Number(musicVolume.value) / 100;
       (await saveGameSetting("musicVolume", value));
-      updateVolumeLabel(musicVolumeValue, value);
+      updateVolumeControl(musicVolume, musicVolumeValue, value);
       syncDefaultMusic(gameState.settings, gameState.settings.music);
     };
   }
@@ -135,7 +136,6 @@ versionInfoButton?.addEventListener("click", showVersionInfo);
 export function showSettingsPanel(fromGame = false, onClose = () => {}, actions = navigation, surface = {}) {
   if (!settingsContainer || !settingsHome) return;
 
-  settingsContainer.style.display = "grid";
   gameState.isPaused = fromGame;
   syncSettingsControls();
   let nextAction = null;
@@ -162,6 +162,8 @@ export function showSettingsPanel(fromGame = false, onClose = () => {}, actions 
       nextAction?.();
     },
   });
+  settingsContainer.style.display = "grid";
+  if (!modal.panel.contains(document.activeElement)) (settingsContainer.querySelector('input:not(:disabled)') || modal.panel).focus();
   for (const [id, action] of [['settings-help', actions.onHelp], ['settings-reset', actions.onReset]]) {
     const control = document.getElementById(id);
     control.hidden = typeof action !== 'function';

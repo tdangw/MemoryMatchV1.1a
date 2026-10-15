@@ -4,7 +4,7 @@
 
 ## Sản phẩm
 
-- Kế hoạch hiện hành2026-10-15: `APP_TABS_VISUAL_PLAN.md`. Lượt hiện tại phân tích/thiết kế và tạo4nền/art/mẫu UI, chưa sửa runtime. Profile/Cài đặt sẽ bố trí lại; Xếp hạng bỏrefresh thường trực +fresh khi mở, menufit và family xuống heading. Giữ ranking v3/Auth/save/private stats và nền Vườn đêm. Phase triển khai chỉ bắt đầu khi được giao. Tài nguyên: `docs/design/app-tabs/ASSETS.md`.
+- `APP_TABS_VISUAL_PLAN.md`: Phase0–5 đã hoàn tất, mỗi phase một commit; không còn kế hoạch triển khai active. Bốn nền WebP mới53–112KB; Profile có name editor và stats/account trong content; Cài đặt3nhóm cuộn gồm Help/Reset; Xếp hạng khôngrefresh thường trực, fresh khi mở, menu128px và familyheading. Giữ ranking v3/Auth/save/private stats. QA: `docs/design/app-tabs/QA.md`. Không Hosting/APK/Firebase rollout; S22 Ultra thật còn chờ.
 
 - `LEVEL_PROGRESS_LEADERBOARD_PLAN.md`: Phase0–6 đã hoàn tất; kế hoạch level không còn active. Tài liệu giữ làm hồ sơ nghiệm thu, QA thiết bị thật còn chờ riêng theo xác nhận người dùng. Mỗi trò có ba bảng level Hành trình/Thử thách/Vô tận (v3); Hành trình gom bốn độ khó theo màn đã thắng. Hai mode đặc biệt mở lượt mới từ1 khi Chơi lại/Lượt mới; resume giữ bàn, run và thời gian. Sinh màn tiếp qua100.000 với trần tài nguyên. Dropdown từ từng nút trò thay mode strip/picker màn; điểm giữ cho sao, HUD kỷ lục đúng context, map không ghi điểm trên nút. Save formatVersion2, v1/v2/Xu/kho/theme/private profile được giữ; special v3 chỉ tính từ lượt mới, adventure migration theo batch và owner. Atomic pair settlement lưu bàn+Xu+thưởng trước presentation để reload không mất/nhân thưởng. Rules/index v3 đã rollout và index READY, không deploy Hosting/APK. Báo cáo/bằng chứng: `docs/design/leaderboard/LEVEL_RANKING_QA.md`.
 

@@ -233,6 +233,8 @@
   animation: app-overlay-out 180ms ease-in both;
 }
 
+.game-stats .info > [data-icon] { display: inline-flex; align-items: center; }
+
 .reward-container.app-modal {
   padding: 22px;
   text-align: center;

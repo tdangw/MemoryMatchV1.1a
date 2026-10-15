@@ -95,6 +95,7 @@ export function showAccountPanel(surface = {}) {
   };
   if (service) unsubscribe = service.subscribe(renderState);
   else renderState({ phase: 'disabled', isAnonymous: true, bound: false });
+  if (!modal.panel.contains(document.activeElement)) modal.panel.focus();
   return modal;
 }
 

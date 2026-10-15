@@ -1,6 +1,6 @@
 # Kế hoạch mỹ thuật năm tab và bố cục Profile/Cài đặt
 
-Ngày2026-10-15. Kế hoạch hiện hành duy nhất. Người dùng đã giao triển khai toàn bộ và commit từng phase. Thực hiện tuần tự phase0–5, không dừng ở gate trung gian.
+Ngày2026-10-15. Đã hoàn tất phase0–5; hồ sơ nghiệm thu, không còn kế hoạch triển khai active. Người dùng đã giao triển khai toàn bộ và commit từng phase. Thực hiện tuần tự phase0–5, không dừng ở gate trung gian.
 
 ## 1. Phạm vi
 
@@ -11,7 +11,7 @@ Ngày2026-10-15. Kế hoạch hiện hành duy nhất. Người dùng đã giao 
 - Không đổi nền Home/map/gameplay hoặc các tab Cửa hàng/Bộ sưu tập theo ngữ cảnh map. Nền cho Nhiệm vụ/Bạn bè không có nghĩa triển khai thêm tính năng đang hoãn.
 - Không copy kỹ thuật/nội bộ/hướng dẫn thiết kế trong app. Không dùng dữ liệu mockup làm dữ liệu runtime.
 
-## 2. Nguyên nhân và owner
+## 2. Baseline trước triển khai và owner
 
 - `js/accountPanel.js`: input và Lưu tên luôn mở, status rời danh tính, Google ở modal footer. `renderState` đang tìm button trong footer: bố trí mới phải đổi reference và lifecycle cùng nhau, không chỉ đổi CSS. Giữ dispose/subscription idempotent.
 - `js/settings.js`: chuyển controls DOM vào screen/modal, trả về home khi hủy. Help/Reset tạo ở actions footer: phải chuyển đúng owner vào content, không clone controls/listeners.
@@ -66,7 +66,7 @@ Ngày2026-10-15. Kế hoạch hiện hành duy nhất. Người dùng đã giao 
 
 So sánh ảnh nguyên màn/controls có chữ với nền/art raster +component linh hoạt. Ảnh nguyên màn khó responsive/state/accessibility và dễ mờ, loại. Chọn raster ở phần mỹ thuật, DOM/CSS ở controls và chữ; không thêm framework hoặc viết lại navigation/modal. Chỉ chia token/component có ít nhất hai consumer cùng ngữ nghĩa.
 
-## 8. Phases sau duyệt
+## 8. Phases và commit
 
 |Phase|Phạm vi|Gate / commit dự kiến|
 |---|---|---|
@@ -90,7 +90,7 @@ Mỗi phase triển khai một commit theo quy ước đã dùng khi được gi
 
 ## 10. Trạng thái
 
-Phase0 thiết kế/tài nguyên hoàn tất:4nền PNG master,1art lá vàng RGBA và1mockup ba màn đã lưu và xem. Manifest/prompt/metadata/giới hạn: `docs/design/app-tabs/ASSETS.md`. Menu nhỏ ghi spec, chưa có screenshot runtime. Mockup chỉ là tham khảo hình ảnh; phase1–5 runtime chưa bắt đầu. Chưa commit phase triển khai trong lượt chỉ lập kế hoạch/tạo ảnh này.
+Phase0–5 đã hoàn tất và có commit riêng. Bốn nền/art đã có output runtime; Profile/Cài đặt/Xếp hạng đã triển khai. Nghiệm thu và ảnh runtime: `docs/design/app-tabs/QA.md`; masters/prompt/metadata: `docs/design/app-tabs/ASSETS.md`. Device QA thật còn chờ theo xác nhận người dùng.
 
 ## Nhật ký triển khai
 
@@ -99,3 +99,5 @@ Phase0 thiết kế/tài nguyên hoàn tất:4nền PNG master,1art lá vàng RG
 - Phase2: Profile editor giữ draft/cancel/failure/UID và pending action; stats không đổi nguồn. Browser profile+stats11/11, có4viewport và30cycles, syntax135module pass.
 - Phase3: ba nhóm cùng scroll, action content và owner trả DOM, giữ IDs/âm thanh/handoff. Settings8/8 (4viewport,30cycles,3game paused clock) và navigation9/9 pass; pure CSS/syntax pass. Fixture đầu đã sửa đúng trigger/API/modal riêng của từng game.
 - Phase4: bỏrefresh, menu128px/hit44, familyheading, retry/stale bounded. Layout15/15 và Rules/store emulator thật pass. Review phát hiện cooldown15s; đã thêm forceRefresh theo board/UID để mount/recovery thật sự lấy mới, giữ semantics refresh legacy và cache paging.
+
+- Phase5: review độc lập19ca cópass; regression58/58chạyriêng, Settingsdelta9/9, emulatoronline6/6, fullcheck135modulepass. Resource ranking277node/6listener/0timer không tăng sau30cycles. Build web và Android wrapper pass. Settings replacement/focusdelta9/9 pass, không nới assertion. Finalcommit title `test: verify tab redesign and lifecycle`.

@@ -1,7 +1,24 @@
 import { expect, test } from '@playwright/test';
+test('replacing settings while its previous close is pending keeps the shared controls visible', async ({ page }) => {
+  await page.goto('/');
+  for (let i = 0; i < 10; i++) {
+    await page.evaluate(async () => {
+      const { showSettingsPanel } = await import('/js/settings.js');
+      const previous = showSettingsPanel(true, () => {}, {}); previous.close();
+      window.replacementSettings = showSettingsPanel(true, () => {}, {});
+    });
+    await expect(page.locator('#settings-container')).toBeVisible();
+    await expect(page.locator('#settings-modal')).toHaveCount(1);
+    await expect(page.locator('#toggle-sound')).toHaveCount(1);
+    await page.locator('#settings-modal .app-modal__close').click();
+    await expect(page.locator('#settings-modal')).toHaveCount(0);
+    await expect(page.locator('.main-wrapper > #settings-container')).toHaveCount(1);
+  }
+});
 for (const viewport of [{ width: 320, height: 740 }, { width: 412, height: 915 }, { width: 844, height: 390 }, { width: 1024, height: 900 }]) test(`settings actions scroll with their groups at ${viewport.width}`, async ({ page }) => {
   await page.setViewportSize(viewport); await page.goto('/'); await page.locator('[data-dock-action="settings"]').click();
   await expect(page.locator('#settings-container .settings-section')).toHaveCount(3);
+  expect(await page.locator('#settings-modal').evaluate(el => el.contains(document.activeElement))).toBe(true);
   await expect(page.locator('#settings-modal .app-modal__footer')).toHaveCount(0);
   const reset = page.locator('#settings-reset'); await reset.scrollIntoViewIfNeeded();
   expect(await reset.evaluate(el => !!el.closest('.app-modal__body') && getComputedStyle(el).position === 'static')).toBe(true);
