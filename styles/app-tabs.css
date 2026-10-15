@@ -1,0 +1,73 @@
+/* Shared visual language for functional tabs; gameplay and map are separate. */
+:root {
+  --tab-gold: #f1d58b;
+  --tab-ink: #f5f3e8;
+  --tab-muted: #b8cfcb;
+  --tab-line: #b6a16c70;
+  --tab-surface: #092832f2;
+  --tab-edge: inset 0 1px #f8e6ad30, inset 0 -2px #03141dc9, 0 3px 8px #0004;
+}
+.adventure-screen[data-screen="missions"] { --tab-background: url('/assets/images/backgrounds/missions-garden.webp'); }
+.adventure-screen[data-screen="friends"] { --tab-background: url('/assets/images/backgrounds/friends-courtyard.webp'); }
+.adventure-screen[data-screen="profile"] { --tab-background: url('/assets/images/backgrounds/profile-keepsake.webp'); }
+.adventure-screen[data-screen="settings"] { --tab-background: url('/assets/images/backgrounds/settings-retreat.webp'); }
+.adventure-screen:is([data-screen="missions"], [data-screen="friends"], [data-screen="profile"], [data-screen="settings"]) {
+  background-color: #041c25;
+  background-image: linear-gradient(#04192320, #04192340), var(--tab-background);
+  background-size: cover;
+  background-position: center;
+}
+:is(#account-modal, #settings-modal, #missions-screen, #friends-screen) .app-modal__header {
+  border-bottom: 1px solid #d9bc6e38;
+  color: var(--tab-gold);
+}
+:is(#account-modal, #settings-modal, #missions-screen, #friends-screen) .app-modal__title { color: var(--tab-gold); }
+:is(#account-modal, #settings-modal) .app-modal { color: var(--tab-ink); }
+.tab-card {
+  position: relative;
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--tab-line);
+  border-radius: 18px;
+  background: var(--tab-surface);
+  box-shadow: var(--tab-edge);
+  color: var(--tab-ink);
+}
+.tab-card--ornament::before {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: calc(50% - 42px);
+  width: 84px;
+  height: 28px;
+  background: url('/assets/images/backgrounds/botanical-header-flourish.webp') center / contain no-repeat;
+  pointer-events: none;
+}
+.tab-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-sizing: border-box;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid #cbb07199;
+  border-radius: 12px;
+  background: linear-gradient(#216172, #103b48);
+  box-shadow: var(--tab-edge);
+  color: var(--tab-ink);
+  font: 600 14px/1.3 'Segoe UI', sans-serif;
+  cursor: pointer;
+  transition: transform 120ms ease;
+}
+.tab-button:active:not(:disabled) { transform: translateY(1px); }
+.tab-button:focus-visible { outline: 2px solid var(--tab-gold); outline-offset: 3px; }
+.tab-button:disabled { opacity: .45; cursor: default; }
+.tab-button--quiet { background: #0b2935; }
+.tab-section-title { margin: 0 0 14px; color: var(--tab-gold); font-size: 16px; line-height: 1.4; }
+.adventure-screen:is([data-screen="profile"], [data-screen="settings"]) .adventure-dock button[aria-current="page"] {
+  border-radius: 14px;
+  box-shadow: inset 0 1px #f3d99c55, inset 0 -2px #7d6b39;
+}
+@media (prefers-reduced-motion: reduce) { .tab-button { transition: none; } .tab-button:active:not(:disabled) { transform: none; } }

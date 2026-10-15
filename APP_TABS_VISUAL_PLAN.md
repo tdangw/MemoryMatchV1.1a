@@ -1,6 +1,6 @@
 # Kế hoạch mỹ thuật năm tab và bố cục Profile/Cài đặt
 
-Ngày2026-10-15. Kế hoạch hiện hành duy nhất. Lượt hiện tại: phân tích, lập kế hoạch, tạo tài nguyên và mockup; chưa thay runtime. Phase triển khai chỉ bắt đầu khi người dùng giao thực hiện.
+Ngày2026-10-15. Kế hoạch hiện hành duy nhất. Người dùng đã giao triển khai toàn bộ và commit từng phase. Thực hiện tuần tự phase0–5, không dừng ở gate trung gian.
 
 ## 1. Phạm vi
 
@@ -91,3 +91,8 @@ Mỗi phase triển khai một commit theo quy ước đã dùng khi được gi
 ## 10. Trạng thái
 
 Phase0 thiết kế/tài nguyên hoàn tất:4nền PNG master,1art lá vàng RGBA và1mockup ba màn đã lưu và xem. Manifest/prompt/metadata/giới hạn: `docs/design/app-tabs/ASSETS.md`. Menu nhỏ ghi spec, chưa có screenshot runtime. Mockup chỉ là tham khảo hình ảnh; phase1–5 runtime chưa bắt đầu. Chưa commit phase triển khai trong lượt chỉ lập kế hoạch/tạo ảnh này.
+
+## Nhật ký triển khai
+
+- Phase0 `ac0e6ae`: chốt kế hoạch và masters.
+- Phase1: nền WebP53.774–112.372bytes, flourish19.760bytes; pipeline Pillow chuyển định dạng/resize, không sinh art bằng code. CSS ownership/diffcheck pass, browser nền+navigation10/10 ở412×915,640×360,1024×900.
