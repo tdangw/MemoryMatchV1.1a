@@ -16,81 +16,108 @@ export function closeCloudConflictDialog() {
 export function showAccountPanel(surface = {}) {
   activeView?.dispose();
   const service = getAccountService();
-  if (!service) {
-    const content = document.createElement('div');
-    const stats = profileDetails(content);
-    const modal = openAppModal({ ...surface, id: 'account-modal', title: 'Tài khoản', icon: 'account', content, onDestroy: () => stats.dispose() });
-    return modal;
-  }
-  const content = document.createElement("div");
-  const identity = document.createElement("p");
-  identity.className = "account-identity";
-  const status = document.createElement("p");
-  status.className = "account-status";
-  status.setAttribute("aria-live", "polite");
-  const name = document.createElement("input");
-  name.type = "text"; name.maxLength = 20; name.autocomplete = "nickname";
-  name.className = "account-name-input"; name.setAttribute("aria-label", "Tên hiển thị trên bảng xếp hạng");
-  const label = document.createElement("label");
-  label.textContent = "Tên hiển thị trên bảng xếp hạng";
-  label.append(name);
-  const saveName = document.createElement("button");
-  saveName.type = "button"; saveName.className = "app-button"; saveName.textContent = "Lưu tên";
-  const explanation = document.createElement("p");
-  explanation.className = "account-explanation";
-  explanation.textContent = "Liên kết Google để chơi tiếp trên thiết bị khác.";
-  content.append(identity, status, label, saveName, explanation);
-  const stats = profileDetails(content);
-  const modal = openAppModal({ ...surface, id: "account-modal", title: "Tài khoản", icon: "account", content, onDestroy: () => dispose(), onClose: () => dispose(), onActionSettled: () => renderState(service.getState()), actions: [
-    { label: "Google", icon: "account", variant: "primary", onClick: async () => { await service.requestGoogleLogin(); return false; } },
-  ] });
-  let releaseOwner;
-  let unsubscribe;
-  let disposed = false;
+  const content = document.createElement('div'); content.className = 'profile-view';
+  const hero = document.createElement('section'); hero.className = 'tab-card tab-card--ornament profile-hero';
+  const summary = document.createElement('div'); summary.className = 'profile-summary';
+  const avatar = document.createElement('span'); avatar.className = 'profile-avatar'; avatar.setAttribute('aria-hidden', 'true');
+  const identity = document.createElement('div');
+  const playerName = document.createElement('h3'); playerName.className = 'profile-player-name';
+  const accountType = document.createElement('p'); accountType.className = 'account-identity';
+  identity.append(playerName, accountType);
+  const edit = document.createElement('button'); edit.type = 'button'; edit.className = 'tab-button tab-button--quiet profile-edit';
+  edit.setAttribute('aria-label', 'Sửa tên'); edit.setAttribute('aria-expanded', 'false'); edit.append(createIcon('edit'));
+  summary.append(avatar, identity, edit); hero.append(summary);
+  const form = document.createElement('form'); form.className = 'profile-name-form'; form.hidden = true;
+  const label = document.createElement('label'); label.textContent = 'Tên hiển thị'; label.htmlFor = 'profile-player-name';
+  const name = document.createElement('input'); name.id = 'profile-player-name'; name.className = 'account-name-input';
+  name.type = 'text'; name.maxLength = 20; name.required = true; name.autocomplete = 'nickname';
+  const saveName = document.createElement('button'); saveName.type = 'submit'; saveName.className = 'tab-button'; saveName.textContent = 'Lưu tên';
+  const cancel = document.createElement('button'); cancel.type = 'button'; cancel.className = 'tab-button tab-button--quiet'; cancel.textContent = 'Hủy';
+  const formActions = document.createElement('div'); formActions.className = 'profile-name-actions'; formActions.append(cancel, saveName);
+  const error = document.createElement('p'); error.className = 'profile-error'; error.setAttribute('role', 'alert');
+  form.append(label, name, error, formActions); hero.append(form);
+  const stats = profileDetails(hero);
+  const account = document.createElement('section'); account.className = 'tab-card profile-account';
+  const heading = document.createElement('h3'); heading.className = 'tab-section-title'; heading.textContent = 'Tài khoản';
+  const status = document.createElement('p'); status.className = 'account-status'; status.setAttribute('aria-live', 'polite');
+  const google = document.createElement('button'); google.type = 'button'; google.className = 'tab-button profile-google';
+  account.append(heading, status, google); content.append(hero, account);
+  let disposed = false; let unsubscribe; let releaseOwner;
+  let editingUid = null; let saving = false; let linking = false;
+  const modal = openAppModal({ ...surface, id: 'account-modal', title: 'Hồ sơ', icon: 'account', content, onDestroy: dispose, onClose: dispose });
   function dispose() {
     if (disposed) return;
     disposed = true; unsubscribe?.(); stats.dispose(); releaseOwner?.forget(); modal.destroy();
     if (activeView?.modal === modal) activeView = null;
   }
   activeView = { modal, dispose };
-  releaseOwner = (surface.owner || getAppPageScope())?.own(dispose, "cleanup");
+  releaseOwner = (surface.owner || getAppPageScope())?.own(dispose, 'cleanup');
+  function closeEditor(focus = false) {
+    form.hidden = true; edit.setAttribute('aria-expanded', 'false'); error.textContent = ''; name.value = ''; editingUid = null;
+    if (focus) edit.focus();
+  }
   function renderState(state) {
     if (disposed) return;
-    identity.textContent = state.isAnonymous ? "Tài khoản khách" : "Đã đăng nhập Google";
-    status.textContent = ({ connecting: "Đang kết nối…", restoring: "Đang tải tiến trình…", syncing: "Đang lưu…", synced: "Đã lưu tiến trình", waiting: "Đang chờ lưu", offline: "Chưa có kết nối", error: "Chưa lưu được. Sẽ thử lại.", disabled: "Tiến trình đã lưu trên thiết bị.", conflict: "Đang tải tiến trình…" })[state.phase] || "";
-    if (document.activeElement !== name) name.value = state.playerName;
-    const busy = ["connecting", "restoring", "syncing", "conflict"].includes(state.phase);
-    name.disabled = saveName.disabled = !state.bound || busy;
-    const google = modal.panel.querySelector(".app-modal__footer button");
-    google.replaceChildren(createIcon("account"), document.createTextNode(state.isAnonymous ? "Liên kết Google" : "Đổi tài khoản Google"));
-    google.disabled = !state.bound || busy;
+    if (!form.hidden && editingUid !== state.uid) closeEditor();
+    playerName.textContent = state.playerName || 'Người chơi';
+    avatar.textContent = Array.from(playerName.textContent.trim())[0]?.toLocaleUpperCase('vi-VN') || '•';
+    accountType.textContent = state.isAnonymous === false ? 'Đã liên kết Google' : 'Tài khoản khách';
+    status.textContent = ({ connecting: 'Đang kết nối…', restoring: 'Đang tải tiến trình…', syncing: 'Đang lưu…', synced: 'Đã lưu tiến trình', waiting: 'Đang chờ lưu', offline: 'Chưa có kết nối', error: 'Chưa lưu được. Sẽ thử lại.', disabled: 'Tiến trình đã lưu trên thiết bị.', conflict: 'Đang tải tiến trình…' })[state.phase] || '';
+    const busy = saving || linking || ['connecting', 'restoring', 'syncing', 'conflict'].includes(state.phase);
+    edit.disabled = name.disabled = saveName.disabled = google.disabled = !service || !state.bound || busy;
+    cancel.disabled = saving || linking;
+    google.replaceChildren(createIcon('account'), document.createTextNode(state.isAnonymous === false ? 'Đổi tài khoản Google' : 'Liên kết Google'));
+    google.hidden = !service || state.phase === 'disabled';
+    if (busy) modal.panel.setAttribute('aria-busy', 'true');
+    else modal.panel.removeAttribute('aria-busy');
   }
-  unsubscribe = service.subscribe(renderState);
-  saveName.onclick = async () => {
-    saveName.disabled = true;
-    try { if (await service.setPlayerName(name.value)) showAppToast("Đã lưu tên hiển thị."); }
-    catch (error) { if (!disposed) showAppToast(error.message); }
-    finally { if (!disposed) saveName.disabled = false; }
+  edit.onclick = () => {
+    const state = service.getState(); editingUid = state.uid; name.value = state.playerName || '';
+    form.hidden = false; edit.setAttribute('aria-expanded', 'true'); name.focus(); name.select();
   };
+  cancel.onclick = () => closeEditor(true);
+  form.onsubmit = async event => {
+    event.preventDefault(); if (saving || linking || saveName.disabled || form.hidden) return;
+    const uid = editingUid; saving = true; error.textContent = ''; renderState(service.getState());
+    try {
+      if (await service.setPlayerName(name.value)) {
+        if (!disposed && uid === service.getState().uid) { closeEditor(); showAppToast('Đã lưu tên hiển thị.'); }
+      } else if (!disposed && uid === service.getState().uid) error.textContent = 'Chưa lưu được tên. Hãy thử lại.';
+    } catch (failure) { if (!disposed && uid === service.getState().uid) error.textContent = failure.message; }
+    finally { saving = false; if (!disposed) { renderState(service.getState()); if (form.hidden && !edit.disabled) edit.focus(); } }
+  };
+  google.onclick = async () => {
+    if (linking || saving || google.disabled) return;
+    linking = true; renderState(service.getState());
+    try { await service.requestGoogleLogin(); }
+    catch { if (!disposed) showAppToast('Chưa liên kết được tài khoản. Hãy thử lại.'); }
+    finally { linking = false; if (!disposed) renderState(service.getState()); }
+  };
+  if (service) unsubscribe = service.subscribe(renderState);
+  else renderState({ phase: 'disabled', isAnonymous: true, bound: false });
   return modal;
 }
 
 function profileDetails(content) {
   const details = document.createElement('dl'); details.className = 'account-play-details';
+  const joinedCard = document.createElement('div'); const timeCard = document.createElement('div');
   const joinedLabel = document.createElement('dt'); const joined = document.createElement('dd');
   const timeLabel = document.createElement('dt'); timeLabel.textContent = 'Thời gian chơi'; const time = document.createElement('dd');
+  joinedCard.append(joinedLabel, joined); timeCard.append(timeLabel, time); details.append(joinedCard, timeCard);
   const since = document.createElement('p'); since.className = 'account-play-since';
   const status = document.createElement('p'); status.className = 'account-play-since'; status.setAttribute('aria-live', 'polite');
-  details.append(joinedLabel, joined, timeLabel, time); content.append(details, since, status);
+  content.append(details, since, status);
   const formatDate = value => new Date(value).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
   const stats = getProfileStatsService();
-  const unsubscribe = stats?.subscribe(state => {
+  const render = state => {
     joinedLabel.textContent = state.onlineAccount ? 'Tham gia' : 'Hồ sơ tạo ngày';
     joined.textContent = state.joinedAt ? formatDate(state.joinedAt) : '—';
     time.textContent = state.totalPlayMs === null ? '—' : formatProfilePlaytime(state.totalPlayMs);
     since.textContent = state.trackedSince ? `Từ ${formatDate(state.trackedSince)}` : '';
     status.textContent = state.phase === 'error' ? 'Chưa cập nhật được thời gian chơi.' : '';
-  });
+  };
+  render({ onlineAccount: false, totalPlayMs: null });
+  const unsubscribe = stats?.subscribe(render);
   void stats?.syncNow();
   return { dispose: () => unsubscribe?.() };
 }

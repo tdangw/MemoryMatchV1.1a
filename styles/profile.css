@@ -1,0 +1,30 @@
+.profile-view { display: grid; gap: 22px; padding-top: 10px; min-width: 0; }
+.profile-summary { display: grid; grid-template-columns: 64px minmax(0, 1fr) 44px; gap: 14px; align-items: center; }
+.profile-avatar { display: grid; place-items: center; width: 64px; height: 64px; border: 2px solid var(--tab-gold); border-radius: 50%; background: linear-gradient(140deg, #286070, #09222b); color: var(--tab-gold); box-shadow: var(--tab-edge); font-size: 30px; font-weight: 700; }
+.profile-player-name { margin: 0 0 5px; color: var(--tab-ink); font-size: 22px; line-height: 1.3; overflow-wrap: anywhere; }
+.account-identity { color: var(--tab-muted); font-size: 12px; }
+.profile-edit { padding: 10px; }
+.account-play-details { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 20px 0 0; }
+.account-play-details > div { min-width: 0; padding: 12px; border: 1px solid #b6a16c55; border-radius: 12px; background: #06212acf; box-shadow: var(--tab-edge); }
+.account-play-details dt { color: var(--tab-muted); font-size: 12px; }
+.account-play-details dd { margin: 7px 0 0; color: var(--tab-gold); font-size: 15px; line-height: 1.5; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.account-play-since { margin-top: 10px !important; color: var(--tab-muted); font-size: 11px; }
+.account-play-since:empty { display: none; }
+.account-status { color: var(--tab-muted); font-size: 13px; }
+.profile-google { width: 100%; margin-top: 16px; }
+.profile-name-form { display: grid; gap: 10px; padding-top: 18px; margin-top: 18px; border-top: 1px solid var(--tab-line); font-size: 14px; }
+.profile-name-form[hidden], .profile-google[hidden] { display: none; }
+.account-name-input { box-sizing: border-box; width: 100%; min-height: 44px; border: 1px solid #9fbdb47a; border-radius: 10px; padding: 10px 12px; background: #051c27; color: var(--tab-ink); font: inherit; }
+.account-name-input:focus { outline: 2px solid var(--tab-gold); outline-offset: 2px; }
+.profile-name-actions { display: flex; gap: 10px; justify-content: flex-end; }
+.profile-error { font-size: 13px; color: #ffaaa1; }
+.profile-error:empty { display: none; }
+#account-modal:not(.app-screen-content) .app-modal { background: #071f29; border-color: var(--tab-line); }
+#account-modal .app-modal__close { background: #ffffff12; color: var(--tab-gold); }
+@media (max-width: 360px) {
+  .profile-summary { grid-template-columns: 48px minmax(0, 1fr) 44px; gap: 10px; }
+  .profile-avatar { width: 48px; height: 48px; font-size: 25px; }
+  .profile-player-name { font-size: 19px; }
+  .account-play-details { gap: 8px; }
+  .account-play-details > div { padding: 10px; }
+}
