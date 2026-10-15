@@ -1,4 +1,6 @@
 import { expect, test } from '@playwright/test';
+import { mkdirSync } from 'node:fs';
+mkdirSync('docs/design/popups/qa', {recursive:true});
 const games = [['memory-match','#btn-actions-menu'],['link-connect','#link-actions-menu-toggle'],['triple-connect','#triple-actions-menu-toggle']];
 async function start(page, game) {
   await page.goto('/');
@@ -24,15 +26,30 @@ async function aligned(page, selector) {
 for (const viewport of [{width:412,height:915},{width:844,height:390},{width:1024,height:900}]) for (const [game,trigger] of games) test(`${game} dialogs follow board at ${viewport.width}`, async ({page}) => {
   await page.setViewportSize(viewport); await start(page,game);
   await page.locator(trigger).click(); await aligned(page,'#game-exit-modal .app-modal');
+  await expect(page.locator('#game-exit-modal .app-modal__body')).toBeHidden();
+  const bounds = await page.locator('#game-exit-modal .app-modal').boundingBox();
+  for(const button of await page.locator('#game-exit-modal button').all()) {
+    const b=await button.boundingBox(); expect(b.y).toBeGreaterThanOrEqual(bounds.y); expect(b.y+b.height).toBeLessThanOrEqual(bounds.y+bounds.height);
+    expect(b.height).toBeGreaterThanOrEqual(44); expect(b.x).toBeGreaterThanOrEqual(bounds.x); expect(b.x+b.width).toBeLessThanOrEqual(bounds.x+bounds.width);
+  }
+  const primary = page.locator('#game-exit-modal .app-button--primary');
+  expect(await primary.locator('.ui-icon').evaluate(el=>getComputedStyle(el).color)).toBe(await primary.evaluate(el=>getComputedStyle(el).color));
+  await page.screenshot({path:`docs/design/popups/qa/pause-${game}-${viewport.width}.png`,animations:'disabled'});
+  await page.locator('#game-exit-modal').getByRole('button',{name:'Tiếp tục',exact:true}).click();
+  await expect(page.locator('#game-exit-modal')).toHaveCount(0); await expect(page.locator(trigger)).toBeFocused();
+  await page.locator(trigger).click();
   await page.locator('#game-exit-modal').getByRole('button',{name:'Cài đặt',exact:true}).click();
   await expect(page.locator('#game-exit-modal')).toHaveCount(0); await aligned(page,'#settings-modal .app-modal');
+  if(game==='link-connect') await page.screenshot({path:`docs/design/popups/qa/settings-${viewport.width}.png`,animations:'disabled'});
   const rotated = {width:viewport.height,height:viewport.width}; await page.setViewportSize(rotated); await aligned(page,'#settings-modal .app-modal');
   await page.setViewportSize(viewport); await aligned(page,'#settings-modal .app-modal');
   await page.locator('#settings-help').click();
   const help = game === 'link-connect' ? '#link-game-info-modal' : '#info-modal';
   await aligned(page,`${help} .app-modal`); await page.locator(`${help} .app-modal__close`).click(); await expect(page.locator(help)).toHaveCount(0);
   await page.evaluate(async () => { const {showLevelRewardOverlay} = await import('/js/ui.js'); window.testIntro = showLevelRewardOverlay(); });
-  await aligned(page,'.level-reward-overlay .app-modal'); await page.evaluate(() => window.testIntro.destroy());
+  await aligned(page,'.level-reward-overlay .app-modal');
+  if(game==='link-connect') await page.screenshot({path:`docs/design/popups/qa/intro-${viewport.width}.png`,animations:'disabled'});
+  await page.evaluate(() => window.testIntro.destroy());
 });
 test('viewport fallback, nested/replaced dialogs and intro cleanup release resources', async ({page}) => {
   await page.clock.install(); await page.goto('/');
@@ -76,4 +93,24 @@ test('victory summary uses the same board edge without its old vertical offset',
   await page.evaluate(async () => (await import('/js/ui.js')).showLevelSummaryOverlay({ level:1,score:1234,stars:3,coinsEarned:10,moves:1,misses:0,remainingTime:20,timeBonus:0,settings:{} }));
   await expect(page.locator('#level-summary-modal')).toBeVisible();
   await aligned(page,'#level-summary-modal .app-modal');
+  await page.screenshot({path:'docs/design/popups/qa/victory.png',animations:'disabled'});
+});
+
+for (const viewport of [{width:412,height:915},{width:844,height:390},{width:1024,height:900}]) test(`map preview shares game dialog height on first visit at ${viewport.width}`, async ({page}) => {
+  await page.setViewportSize(viewport); await page.goto('/');
+  for(const [game,trigger] of games) {
+    await page.evaluate(async game => (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu(game), game);
+    await page.locator('.adventure-map-node--level:not(:disabled)').first().click();
+    const preview=page.locator('#adventure-level-modal .app-modal'); await expect(preview).toBeVisible();
+    const before=await preview.boundingBox(); expect(before.y).toBeGreaterThan(60);
+    const play=page.locator('#adventure-level-modal').getByRole('button',{name:'Chơi',exact:true});
+    await play.scrollIntoViewIfNeeded(); const b=await play.boundingBox(); expect(b.y+b.height).toBeLessThanOrEqual(viewport.height-15);
+    if(game==='link-connect') await page.screenshot({path:`docs/design/popups/qa/map-preview-${viewport.width}.png`,animations:'disabled'});
+    await play.click(); await expect(page.locator('#adventure-level-modal')).toHaveCount(0);
+    await expect(page.locator('.game-shell-root:visible')).not.toHaveAttribute('data-shell-startup',/.+/);
+    await page.locator(trigger).click(); await aligned(page,'#game-exit-modal .app-modal');
+    const after=await page.locator('#game-exit-modal .app-modal').boundingBox(); expect(Math.abs(after.y-before.y)).toBeLessThan(2);
+    await page.locator('#game-exit-modal').getByRole('button',{name:'Thoát game',exact:true}).click();
+    await expect(page.locator('#menu-container[data-map-ready="true"]')).toBeVisible();
+  }
 });

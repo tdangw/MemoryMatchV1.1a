@@ -26,7 +26,7 @@ test("Triple HUD uses the shared action menu and keeps tools separate", async ({
   await expect(page.locator('#game-exit-modal')).toBeVisible();
   await expect(
     page.locator('#game-exit-modal .app-modal__footer button'),
-  ).toHaveText(['Thoát game', 'Chơi lại', 'Cài đặt']);
+  ).toHaveText(['Tiếp tục', 'Chơi lại', 'Cài đặt', 'Thoát game']);
   await expect(page.locator("#triple-tools-menu")).toBeHidden();
   const bounds = await page
     .locator('#game-exit-modal .app-modal')

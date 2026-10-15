@@ -155,7 +155,7 @@ test("Triple menu, start modal and timer follow the shared round contract", asyn
   await page.waitForTimeout(1100);
   await expect(timer).not.toHaveText(before || "01:00");
   await page.locator("#triple-actions-menu-toggle").click();
-  await expect(page.locator('#game-exit-modal .app-modal__footer button')).toHaveText(['Thoát game', 'Chơi lại', 'Cài đặt']);
+  await expect(page.locator('#game-exit-modal .app-modal__footer button')).toHaveText(['Tiếp tục', 'Chơi lại', 'Cài đặt', 'Thoát game']);
 });
 
 test("Triple Continue resumes without replaying the start modal", async ({ page }) => {

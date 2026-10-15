@@ -6,15 +6,18 @@ export function openGameExitDialog({ owner, trigger, onExit, onRestart, onSettin
   let nextAction = null;
   const modal = openAppModal({
     id: 'game-exit-modal', title: 'Tạm dừng', icon: 'menu', owner,
-    content: '<p>Bạn muốn thoát màn chơi hay bắt đầu lại?</p>',
+    content: '',
+    size: 'small',
     actions: [
-      { label: 'Thoát game', icon: 'exit', onClick: async () => { await onExit(); return false; } },
-      { label: ['challenge', 'endless'].includes(mode) ? 'Lượt mới' : 'Chơi lại', icon: 'restart', variant: 'primary', onClick: async () => { await onRestart(); return false; } },
+      { label: 'Tiếp tục', icon: 'play', variant: 'primary' },
+      { label: ['challenge', 'endless'].includes(mode) ? 'Lượt mới' : 'Chơi lại', icon: 'restart', onClick: async () => { await onRestart(); return false; } },
       { label: 'Cài đặt', icon: 'settings', onClick: () => { nextAction = onSettings; } },
+      { label: 'Thoát game', icon: 'exit', variant: 'danger', onClick: async () => { await onExit(); return false; } },
     ],
     onClose: () => { onClose(); nextAction?.(); },
     onDestroy: () => trigger.setAttribute('aria-expanded', 'false'),
   });
+  modal.panel.classList.add('pause-dialog');
   modal.panel.setAttribute('aria-label', 'Tạm dừng màn chơi');
   return modal;
 }

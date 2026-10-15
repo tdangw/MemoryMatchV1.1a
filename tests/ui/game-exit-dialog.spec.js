@@ -15,7 +15,7 @@ for (const [gameId, trigger] of [['memory-match', '#btn-actions-menu'], ['link-c
     for (let i = 0; i < 5; i++) {
       await page.locator(trigger).click();
       await expect(page.locator('#game-exit-modal')).toBeVisible();
-      await expect(page.locator('#game-exit-modal .app-modal__footer button')).toHaveText(['Thoát game', 'Chơi lại', 'Cài đặt']);
+      await expect(page.locator('#game-exit-modal .app-modal__footer button')).toHaveText(['Tiếp tục', 'Chơi lại', 'Cài đặt', 'Thoát game']);
       await page.keyboard.press('Escape');
       await expect(page.locator('#game-exit-modal')).toHaveCount(0);
       await expect(page.locator(trigger)).toBeFocused();

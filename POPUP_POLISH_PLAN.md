@@ -22,3 +22,11 @@ Thiết bị S22 Ultra thật vẫn chờ theo xác nhận trước đó; không
 Phase1: UI3/3pass ở412/844/1024, mỗi ca cả3game; scroll cố định và goHome đúng.
 
 Phase2: placement11/11pass (9ca3game×3viewport/rotate, fallback/nested/replace/30cycles, summary thật); startup9/9 và settings9/9pass. Bỏ offset riêng của intro/victory, reduced-motion tắt animation popup. Review độc lập CSS/ownership/cleanup không blocker. Bài resource ban đầu chụp trước khi tooltip focus hữu hạn kết thúc; kiểm lại sau advance clock500ms trả baseline, không bỏ assertion tài nguyên.
+
+Steering cuối của người dùng: popup chọn độ khó tại bản đồ phải cùng cao độ popup trong game, không dùng fallback16px. Đã bổ sung mốc tham chiếu chrome từ token Game Shell (title/HUD/milestone/gaps) và compact landscape; không khởi tạo game giả hoặc cache tọa độ cũ. Bài first-visit map→game→pause3viewport×3game:3/3pass, lệch<2px và nút Chơi nằm trong viewport.
+
+## Phạm vi bổ sung theo yêu cầu tiếp tục
+
+Phase4: rà soát exit trên Cửa hàng/Bộ sưu tập và toàn bộ adventure-screen; cùng header corner, safe-area/focus, Xu ở giữa Cửa hàng, bỏ tên game thừa trong tiêu đề Bộ sưu tập. Không thay purchase/equip/catalog/save. Responsive, hit/focus/scroll/navigation và catalog regression, commit riêng.
+
+Phase5: đề xuất và vẽ2concept main menu để chọn trước; chưa thay code Home. Hướng1 một portal lớn và hai portal nhỏ, hướng2 ba cổng theo lối vườn. Dùng imagegen built-in, lưu ảnh/prompt trong docs ngoài bundle. Không thêm XP/bảng số liệu hoặc tính năng mới. Đây là phần tham khảo được giao, không cần triển khai Home để hoàn thành lượt này.

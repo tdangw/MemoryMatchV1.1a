@@ -108,3 +108,11 @@
   line-height: var(--shell-title-min-height);
   text-shadow: none;
 }
+
+/* Map previews reserve the same chrome height as a normal game before its board. */
+.game-shell-tokens {
+  --shell-board-reference-top: calc(max(var(--shell-safe-area-top), env(safe-area-inset-top)) + max(var(--shell-title-min-height), clamp(var(--shell-title-font-min), var(--shell-title-font-fluid), var(--shell-title-font-max)) * var(--shell-title-line-height)) + var(--shell-active-title-margin) + var(--unified-hud-height) + var(--shell-hud-menu-offset) + var(--shell-milestones-track-height) + 4px + 3 * var(--shell-active-frame-gap));
+}
+@media (orientation: landscape) and (height <= 600px) {
+  .game-shell-tokens { --shell-board-reference-top: calc(max(var(--shell-safe-area-top), env(safe-area-inset-top)) + var(--unified-hud-height) + var(--shell-hud-menu-offset) + var(--shell-active-frame-gap)); }
+}

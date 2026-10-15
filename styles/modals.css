@@ -1,3 +1,12 @@
+/* Dialog surface tokens share the garden palette with the navigation tabs. */
+:root {
+  --dialog-surface: linear-gradient(150deg, #123b43, #071f29 72%);
+  --dialog-ink: #f5f3e8;
+  --dialog-muted: #b8cfcb;
+  --dialog-gold: #f1d58b;
+  --dialog-line: #b6a16c70;
+  --dialog-edge: inset 0 1px #f8e6ad30, inset 0 -2px #03141dc9, 0 14px 36px #0007;
+}
 /* Hệ modal và nút dùng chung */
 .app-modal-overlay {
   position: fixed;
@@ -24,11 +33,11 @@
   flex-direction: column;
   overflow: hidden;
   box-sizing: border-box;
-  border: 1px solid rgb(255 255 255 / 55%);
+  border: 1px solid var(--dialog-line);
   border-radius: 18px;
-  background: linear-gradient(150deg, #fff8ef, #ffe0cf);
-  color: #25324a;
-  box-shadow: 0 24px 70px rgb(0 0 0 / 42%);
+  background: var(--dialog-surface);
+  color: var(--dialog-ink);
+  box-shadow: var(--dialog-edge);
   animation: app-modal-in 220ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
@@ -52,7 +61,7 @@
   gap: 12px;
   padding: 14px 18px;
   box-sizing: border-box;
-  border-bottom: 1px solid rgb(91 73 63 / 14%);
+  border-bottom: 1px solid var(--dialog-line);
 }
 
 .app-modal__title {
@@ -60,7 +69,7 @@
   align-items: center;
   gap: 9px;
   margin: 0;
-  color: #243b64;
+  color: var(--dialog-gold);
   font:
     800 1.25rem/1.25 "Trebuchet MS",
     "Segoe UI",
@@ -73,21 +82,22 @@
 }
 
 .app-modal__close {
-  flex: 0 0 34px;
-  width: 34px;
-  height: 34px;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
   display: grid;
   place-items: center;
   padding: 0;
-  border-radius: 50%;
-  background: rgb(36 59 100 / 10%);
-  color: #243b64;
+  border: 1px solid #b6a16c50;
+  border-radius: 12px;
+  background: #0b2935;
+  color: var(--dialog-gold);
   font-size: 24px;
   line-height: 1;
 }
 
 .app-modal__close:hover {
-  background: rgb(36 59 100 / 18%);
+  background: #1a454e;
   transform: none;
 }
 
@@ -106,7 +116,7 @@
 }
 
 .app-modal__note {
-  color: #667085;
+  color: var(--dialog-muted);
   font-size: 0.9rem;
 }
 
@@ -115,7 +125,7 @@
   grid-template-columns: 1fr;
   gap: 10px;
   padding: 12px 18px 16px;
-  border-top: 1px solid rgb(91 73 63 / 14%);
+  border-top: 1px solid var(--dialog-line);
 }
 
 .app-button {
@@ -124,7 +134,7 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-height: 40px;
+  min-height: 44px;
   padding: 9px 16px;
   border: 1px solid transparent;
   border-radius: 10px;
@@ -143,14 +153,17 @@
 }
 
 .app-button--primary {
-  background: #2167b1;
-  color: #fff;
+  background: linear-gradient(#f4dda2, #c19a50);
+  border-color: #e9cd83;
+  box-shadow: inset 0 1px #fff5ca, inset 0 -2px #8a672c, 0 2px 4px #0005;
+  color: #17303a;
 }
 
 .app-button--secondary {
-  border-color: rgb(36 59 100 / 20%);
-  background: #fff;
-  color: #243b64;
+  border-color: var(--dialog-line);
+  background: linear-gradient(#216172, #103b48);
+  box-shadow: inset 0 1px #f8e6ad30, inset 0 -2px #03141dc9;
+  color: var(--dialog-ink);
 }
 
 .app-button--danger {
@@ -241,7 +254,7 @@
   width: min(370px, calc(100vw - 36px));
   border-color: rgb(255 255 255 / 16%);
   border-radius: 24px;
-  background: linear-gradient(150deg, rgb(24 38 64 / 97%), rgb(10 20 38 / 97%));
+  background: var(--dialog-surface);
   color: #f5f7fb;
 }
 
@@ -389,7 +402,7 @@
   width: min(370px, calc(100vw - 36px));
   border-color: rgb(255 255 255 / 16%);
   border-radius: 24px;
-  background: linear-gradient(150deg, rgb(24 38 64 / 97%), rgb(10 20 38 / 97%));
+  background: var(--dialog-surface);
   color: #f5f7fb;
 }
 
@@ -438,7 +451,7 @@
   width: min(370px, calc(100vw - 36px));
   border-color: rgb(255 255 255 / 16%);
   border-radius: 24px;
-  background: linear-gradient(150deg, rgb(24 38 64 / 97%), rgb(10 20 38 / 97%));
+  background: var(--dialog-surface);
   color: #f5f7fb;
 }
 
@@ -574,7 +587,7 @@
 #info-modal .app-modal {
   border-color: rgb(255 255 255 / 16%);
   border-radius: 24px;
-  background: linear-gradient(155deg, #182942 0%, #243b64 100%);
+  background: var(--dialog-surface);
   color: #f5f7fb;
 }
 
@@ -869,7 +882,7 @@ body.game-is-paused .shooting-star {
 #return-modal .app-modal {
   border-color: rgb(255 255 255 / 16%);
   border-radius: 24px;
-  background: linear-gradient(155deg, #182942 0%, #243b64 100%);
+  background: var(--dialog-surface);
   color: #f5f7fb;
 }
 
@@ -912,7 +925,7 @@ body.game-is-paused .shooting-star {
 .level-summary-modal {
   border-color: rgb(255 255 255 / 16%);
   border-radius: 24px;
-  background: linear-gradient(155deg, #182942 0%, #243b64 100%);
+  background: var(--dialog-surface);
   color: #f5f7fb;
 }
 
@@ -1183,3 +1196,37 @@ body.game-is-paused .shooting-star {
   .app-modal-overlay[data-dialog-placement],
   .app-modal-overlay[data-dialog-placement] > .app-modal { animation: none; }
 }
+
+.app-modal-overlay[data-dialog-placement] { background: #03131d66; }
+.app-modal-overlay[data-dialog-placement] .app-modal__close:focus-visible,
+.app-modal-overlay[data-dialog-placement] .app-button:focus-visible { outline: 2px solid var(--dialog-gold); outline-offset: -3px; }
+.app-modal-overlay[data-dialog-placement] .app-button:active:not(:disabled) { transform: translateY(1px); }
+#game-exit-modal .pause-dialog { position: relative; border-color: #c6ac6b; border-radius: 20px; box-shadow: var(--dialog-edge); }
+#game-exit-modal .app-modal__header { position: relative; min-height: 96px; padding: 36px 14px 14px; border-bottom-color: #b6a16c40; background: #061f2966; }
+#game-exit-modal .app-modal__header::before { content: ''; position: absolute; top: 6px; left: calc(50% - 42px); width: 84px; height: 28px; background: url('/assets/images/backgrounds/botanical-header-flourish.webp') center / contain no-repeat; pointer-events: none; }
+#game-exit-modal .app-modal__title { flex: 1; justify-content: center; margin-left: 44px; color: var(--dialog-gold); font-size: 22px; }
+#game-exit-modal .app-modal__title .ui-icon { display: none; }
+#game-exit-modal .app-modal__body { display: none; }
+#game-exit-modal .app-modal__footer { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; padding: 18px; border: 0; }
+#game-exit-modal .app-button { min-height: 48px; border-radius: 12px; }
+#game-exit-modal .app-button--primary,
+#game-exit-modal .app-button--danger { grid-column: 1 / -1; }
+#game-exit-modal .app-button--danger { background: #17333c; border-color: #bf887566; box-shadow: inset 0 1px #ffe8b51c, inset 0 -2px #071923; color: #ffb6a5; }
+@media (height <= 500px) {
+  #game-exit-modal .app-modal__header { min-height: 60px; padding: 8px 12px; }
+  #game-exit-modal .app-modal__header::before { display: none; }
+  #game-exit-modal .app-modal__footer { gap: 8px; padding: 12px; }
+  #game-exit-modal .app-button { min-height: 44px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .app-modal-overlay[data-dialog-placement] .app-button { transition: none; }
+  .app-modal-overlay[data-dialog-placement] .app-button:hover,
+  .app-modal-overlay[data-dialog-placement] .app-button:active:not(:disabled) { transform: none; }
+}
+
+#game-exit-modal .app-button .ui-icon { color: inherit; }
+.level-reward-overlay .reward-container.app-modal { border-color: var(--dialog-line); box-shadow: var(--dialog-edge); }
+.level-reward-overlay .reward-title.glow { color: var(--dialog-gold); text-shadow: 0 2px 3px #0006; }
+.level-reward-overlay .reward-container .ui-icon { color: var(--dialog-gold); }
+
+.app-modal-overlay[data-dialog-placement="map"]::before { content: ''; position: fixed; top: var(--shell-board-reference-top); left: 0; width: 0; height: 0; pointer-events: none; }

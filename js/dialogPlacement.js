@@ -6,10 +6,12 @@ export function connectDialogPlacement(overlay, panel, lifecycle) {
     ? [...document.querySelectorAll('.game-shell-root')].find(node => node.getClientRects().length && !node.hidden)
     : null;
   const board = root?.querySelector('[data-shell-region="board"]');
+  const map = !board && document.querySelector('.adventure-map-page:not([hidden])');
   const viewport = window.visualViewport;
   const edge = 16;
   let pending = false;
-  overlay.dataset.dialogPlacement = board ? 'board' : 'viewport';
+  overlay.dataset.dialogPlacement = board ? 'board' : map ? 'map' : 'viewport';
+  if (map) overlay.classList.add('game-shell-tokens');
   function update() {
     pending = false;
     if (!lifecycle.active || !overlay.isConnected) return;
@@ -18,7 +20,8 @@ export function connectDialogPlacement(overlay, panel, lifecycle) {
     const safeBottom = parseFloat(style.paddingBottom) || 0;
     const viewportTop = viewport?.offsetTop || 0;
     const bottom = viewportTop + (viewport?.height || window.innerHeight) - safeBottom;
-    const top = Math.min(Math.max(viewportTop + Math.max(edge, safeTop), board?.getBoundingClientRect().top || 0), bottom - edge);
+    const referenceTop = board ? board.getBoundingClientRect().top : map ? parseFloat(getComputedStyle(overlay, '::before').top) : 0;
+    const top = Math.min(Math.max(viewportTop + Math.max(edge, safeTop), referenceTop), bottom - edge);
     overlay.style.setProperty('--dialog-top', `${top}px`);
     panel.style.maxHeight = `${Math.max(0, bottom - top)}px`;
   }
