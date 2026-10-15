@@ -1,6 +1,6 @@
 # Hai hướng màn chọn trò — 2026-10-15
 
-Concept tham khảo, chưa áp dụng vào Home. Skill imagegen, built-in image_gen, không CLI/API fallback. [Prompt đầy đủ](prompts.json).
+Người dùng đã chọn hướng1. Concept chưa áp dụng vào Home; sheet nền/khung/trang trí đã có ở [bộ mỹ thuật](../home-assets/README.md). Skill imagegen, built-in image_gen, không CLI/API fallback. [Prompt đầy đủ](prompts.json).
 
 - [Một lớn, hai nhỏ](home-grid-v1.png): Memory Match portal rộng, Link/Triple ngang hàng phía dưới. Cả3lựa chọn thấy ngay, vùng bấm rõ và dễ co giãn cho mobile/ngang/desktop. Khuyến nghị hướng này để triển khai.
 - [Lối vườn ba cổng](home-portals-v1.png): mỗi game là một cổng riêng trên lối đi lệch, giàu không khí và khác biệt hơn; cần cân đối vùng bấm và crop trên màn hẹp để tên không nhỏ hoặc lẫn với tranh nền.
