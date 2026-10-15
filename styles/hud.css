@@ -178,37 +178,6 @@
 }
 
 
-#settings-container .settings-range:disabled {
-  cursor: default;
-  opacity: 0.38;
-}
-
-
-
-.settings-version-button {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  width: 100%;
-  min-height: 42px;
-  padding: 10px 14px;
-  border: 1px solid rgb(255 255 255 / 11%);
-  border-radius: 14px;
-  background: rgb(8 18 38 / 28%);
-  color: #f5f7fb;
-  text-align: left;
-}
-
-.settings-version-button .ui-icon {
-  color: #f2bf5b;
-}
-
-#settings-version-value {
-  margin-left: auto;
-  color: #b9d5ff;
-  font-variant-numeric: tabular-nums;
-}
-
 #version-modal .app-modal {
   border-color: rgb(255 255 255 / 16%);
   border-radius: 24px;

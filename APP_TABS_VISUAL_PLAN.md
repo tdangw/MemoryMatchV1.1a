@@ -97,3 +97,4 @@ Phase0 thiết kế/tài nguyên hoàn tất:4nền PNG master,1art lá vàng RG
 - Phase0 `ac0e6ae`: chốt kế hoạch và masters.
 - Phase1: nền WebP53.774–112.372bytes, flourish19.760bytes; pipeline Pillow chuyển định dạng/resize, không sinh art bằng code. CSS ownership/diffcheck pass, browser nền+navigation10/10 ở412×915,640×360,1024×900.
 - Phase2: Profile editor giữ draft/cancel/failure/UID và pending action; stats không đổi nguồn. Browser profile+stats11/11, có4viewport và30cycles, syntax135module pass.
+- Phase3: ba nhóm cùng scroll, action content và owner trả DOM, giữ IDs/âm thanh/handoff. Settings8/8 (4viewport,30cycles,3game paused clock) và navigation9/9 pass; pure CSS/syntax pass. Fixture đầu đã sửa đúng trigger/API/modal riêng của từng game.

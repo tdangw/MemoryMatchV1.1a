@@ -140,20 +140,18 @@ export function showSettingsPanel(fromGame = false, onClose = () => {}, actions 
   syncSettingsControls();
   let nextAction = null;
 
-  openAppModal({
+  const modal = openAppModal({
     ...surface,
     id: "settings-modal",
     icon: "settings",
     title: "Cài đặt",
     content: settingsContainer,
     size: "medium",
-    actions: [['Hướng dẫn', 'book', actions.onHelp], ['Xóa dữ liệu', 'wand', actions.onReset]].filter(([, , action]) => typeof action === 'function').map(([label, icon, action]) => ({ label, icon, onClick: () => {
-      if (surface.presentation === 'screen') { action(); return false; }
-      nextAction = action;
-    } })),
     onDestroy: () => {
       settingsContainer.style.display = "none";
       settingsHome.appendChild(settingsContainer);
+      document.getElementById('settings-help').onclick = null;
+      document.getElementById('settings-reset').onclick = null;
     },
     onClose: () => {
       settingsContainer.style.display = "none";
@@ -164,4 +162,13 @@ export function showSettingsPanel(fromGame = false, onClose = () => {}, actions 
       nextAction?.();
     },
   });
+  for (const [id, action] of [['settings-help', actions.onHelp], ['settings-reset', actions.onReset]]) {
+    const control = document.getElementById(id);
+    control.hidden = typeof action !== 'function';
+    control.onclick = () => {
+      if (surface.presentation === 'screen') action();
+      else { nextAction = action; modal.close(); }
+    };
+  }
+  return modal;
 }

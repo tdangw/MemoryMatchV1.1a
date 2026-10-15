@@ -40,89 +40,13 @@
 
     <!-- Settings Overlay -->
     <div id="settings-container" style="display: none;">
-      <div class="settings-control">
-        <div class="settings-row">
-          <label for="toggle-sound">Âm thanh hiệu ứng</label>
-          <label class="toggle-switch">
-            <input type="checkbox" id="toggle-sound" checked />
-            <span class="slider"></span>
-          </label>
-        </div>
-        <div class="settings-range-row">
-          <input
-            id="sound-volume"
-            class="settings-range"
-            type="range"
-            min="0"
-            max="100"
-            step="1"
-            value="40"
-            aria-label="Âm lượng hiệu ứng"
-          />
-          <output id="sound-volume-value">40%</output>
-        </div>
-      </div>
-
-      <div class="settings-control">
-        <div class="settings-row">
-          <label for="toggle-music">Nhạc nền</label>
-          <label class="toggle-switch">
-            <input type="checkbox" id="toggle-music" checked />
-            <span class="slider"></span>
-          </label>
-        </div>
-        <div class="settings-range-row">
-          <input
-            id="music-volume"
-            class="settings-range"
-            type="range"
-            min="0"
-            max="100"
-            step="1"
-            value="35"
-            aria-label="Âm lượng nhạc"
-          />
-          <output id="music-volume-value">35%</output>
-        </div>
-      </div>
-
-      <div class="settings-control">
-        <div class="settings-row">
-          <label for="toggle-meteor-effects">Hiệu ứng nền</label>
-          <label class="toggle-switch">
-            <input type="checkbox" id="toggle-meteor-effects" checked />
-            <span class="slider"></span>
-          </label>
-        </div>
-      </div>
-
-      <div class="settings-control">
-        <div class="settings-row">
-          <label for="toggle-board-coordinates">Hiện tọa độ bàn cờ</label>
-          <label class="toggle-switch">
-            <input type="checkbox" id="toggle-board-coordinates" />
-            <span class="slider"></span>
-          </label>
-        </div>
-      </div>
-
-      <div class="settings-control">
-        <div class="settings-row">
-          <label for="toggle-card-descriptions">Hiển thị tên thẻ</label>
-          <label class="toggle-switch">
-            <input type="checkbox" id="toggle-card-descriptions" checked />
-            <span class="slider"></span>
-          </label>
-        </div>
-      </div>
-
-      <button id="version-info" class="settings-version-button" type="button">
-        <span data-icon="info"></span>
-        <span>Giới thiệu &amp; phiên bản</span>
-        <span id="settings-version-value"></span>
-      </button>
-
-      <!-- Audio player (hidden) -->
+      <section class="tab-card settings-section"><h3 class="tab-section-title">Âm thanh</h3><div class="settings-control"><div class="settings-row"><label for="toggle-sound">Âm thanh hiệu ứng</label><label class="toggle-switch"><input type="checkbox" id="toggle-sound" checked/><span class="slider"></span></label></div><div class="settings-range-row"><input id="sound-volume" class="settings-range" type="range" min="0" max="100" step="1" value="40" aria-label="Âm lượng hiệu ứng"/><output id="sound-volume-value">40%</output></div></div><div class="settings-control"><div class="settings-row"><label for="toggle-music">Nhạc nền</label><label class="toggle-switch"><input type="checkbox" id="toggle-music" checked/><span class="slider"></span></label></div><div class="settings-range-row"><input id="music-volume" class="settings-range" type="range" min="0" max="100" step="1" value="35" aria-label="Âm lượng nhạc"/><output id="music-volume-value">35%</output></div></div></section>
+      <section class="tab-card settings-section"><h3 class="tab-section-title">Hiển thị</h3><div class="settings-control"><div class="settings-row"><label for="toggle-meteor-effects">Hiệu ứng nền</label><label class="toggle-switch"><input type="checkbox" id="toggle-meteor-effects" checked/><span class="slider"></span></label></div></div><div class="settings-control"><div class="settings-row"><label for="toggle-board-coordinates">Tọa độ bàn cờ</label><label class="toggle-switch"><input type="checkbox" id="toggle-board-coordinates" /><span class="slider"></span></label></div></div><div class="settings-control"><div class="settings-row"><label for="toggle-card-descriptions">Tên thẻ</label><label class="toggle-switch"><input type="checkbox" id="toggle-card-descriptions" checked/><span class="slider"></span></label></div></div></section>
+      <section class="tab-card settings-section"><h3 class="tab-section-title">Thông tin và dữ liệu</h3>
+        <button id="settings-help" class="settings-link" type="button"><span data-icon="book"></span><span>Hướng dẫn</span><span class="settings-chevron" aria-hidden="true">›</span></button>
+        <button id="version-info" class="settings-link" type="button"><span data-icon="info"></span><span>Giới thiệu</span><span id="settings-version-value"></span><span class="settings-chevron" aria-hidden="true">›</span></button>
+        <button id="settings-reset" class="settings-link settings-link--danger" type="button"><span data-icon="trash"></span><span>Xóa dữ liệu</span><span class="settings-chevron" aria-hidden="true">›</span></button>
+      </section>
       <audio id="bg-music" loop></audio>
     </div>
   </div>

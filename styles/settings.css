@@ -1,100 +1,31 @@
-/* Bố cục Cài đặt tối giản */
-#settings-container {
-  gap: 14px;
-}
-
-#settings-container .settings-control {
-  display: grid;
-  gap: 10px;
-  padding: 14px 16px;
-  border: 1px solid rgb(36 59 100 / 14%);
-  border-radius: 14px;
-  background: rgb(255 255 255 / 58%);
-}
-
-#settings-container .toggle-switch {
-  position: relative;
-  display: inline-block;
-  width: 50px;
-  height: 26px;
-  flex: 0 0 50px;
-  background: transparent;
-  cursor: pointer;
-}
-
-#settings-container .toggle-switch::before {
-  display: none;
-}
-
-#settings-container .toggle-switch input {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  opacity: 0;
-}
-
-#settings-container .toggle-switch .slider {
-  position: absolute;
-  inset: 0;
-  border-radius: 999px;
-  background: rgb(255 255 255 / 18%);
-  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 16%);
-  transition: background 180ms ease;
-}
-
-#settings-container .toggle-switch .slider::after {
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: #d6e3f5;
-  box-shadow: 0 2px 5px rgb(0 0 0 / 28%);
-  content: "";
-  transition: transform 180ms ease, background 180ms ease;
-}
-
-#settings-container .toggle-switch input:checked + .slider {
-  background: #2f73b8;
-}
-
-#settings-container .toggle-switch input:checked + .slider::after {
-  transform: translateX(24px);
-  background: #fff;
-}
-
-#settings-container .toggle-switch input:focus-visible + .slider {
-  outline: 2px solid #ffd166;
-  outline-offset: 3px;
-}
-
-#settings-container .settings-row,
-#settings-container .settings-range-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-#settings-container .settings-row > label:first-child {
-  color: #243b64;
-  font-weight: 700;
-}
-
-#settings-container output {
-  min-width: 42px;
-  color: #596780;
-  font-variant-numeric: tabular-nums;
-  text-align: right;
-}
-
-#settings-container .settings-range {
-  flex: 1 1 auto;
-  min-width: 0;
-  height: 6px;
-  margin: 0;
-  accent-color: #4779c5;
-  cursor: pointer;
-}
-
+/* Settings owns its controls and grouped layout on both screen and pause modal. */
+#settings-container { position: static; width: 100%; min-width: 0; padding: 0; margin: 0; gap: 18px; background: transparent; color: var(--tab-ink); box-shadow: none; }
+#settings-container .settings-section { padding: 16px; }
+#settings-container .tab-section-title { margin-bottom: 4px; }
+#settings-container .settings-control { padding: 8px 0; }
+#settings-container .settings-control + .settings-control { border-top: 1px solid #a4c5bd25; }
+#settings-container .settings-row, #settings-container .settings-range-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+#settings-container .settings-row > label:first-child { font-size: 14px; font-weight: 600; color: var(--tab-ink); }
+#settings-container .toggle-switch { display: inline-block; position: relative; width: 50px; height: 44px; flex: 0 0 50px; background: transparent; cursor: pointer; }
+#settings-container .toggle-switch::before { display: none; }
+#settings-container .toggle-switch input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+#settings-container .toggle-switch .slider { position: absolute; inset: 9px 0; border: 1px solid #b3c5bc50; border-radius: 99px; background: #1a343e; box-shadow: inset 0 2px 4px #0008; }
+#settings-container .toggle-switch .slider::after { content: ''; position: absolute; width: 20px; height: 20px; top: 2px; left: 3px; border-radius: 50%; background: linear-gradient(#fffef4, #d4d8cd); box-shadow: 0 2px 3px #0006; transition: transform 150ms ease; }
+#settings-container .toggle-switch input:checked + .slider { background: linear-gradient(#27869b, #13586e); border-color: #82c5cf9c; }
+#settings-container .toggle-switch input:checked + .slider::after { transform: translateX(23px); }
+#settings-container .toggle-switch input:focus-visible + .slider { outline: 2px solid var(--tab-gold); outline-offset: 3px; }
+#settings-container .settings-range { flex: 1; min-width: 0; height: 36px; margin: 0; accent-color: #69bdd0; cursor: pointer; }
+#settings-container .settings-range:disabled { opacity: .4; cursor: default; }
+#settings-container output { min-width: 38px; text-align: right; font-size: 13px; color: var(--tab-muted); font-variant-numeric: tabular-nums; }
+.settings-link { display: flex; width: 100%; box-sizing: border-box; min-height: 48px; align-items: center; gap: 10px; padding: 10px 0; border: 0; border-radius: 0; background: transparent; color: var(--tab-ink); font: 500 14px/1.4 'Segoe UI', sans-serif; text-align: left; cursor: pointer; box-shadow: none; }
+.settings-link + .settings-link { border-top: 1px solid #a4c5bd25; }
+.settings-link:hover { background: #b7d6c910; transform: none; filter: none; }
+.settings-link:focus-visible { outline: 2px solid var(--tab-gold); outline-offset: 2px; }
+.settings-link > [data-icon] { display: flex; color: var(--tab-gold); }
+.settings-link--danger, .settings-link--danger > [data-icon] { color: #ff8c80; }
+.settings-link[hidden] { display: none; }
+.settings-chevron { margin-left: auto; color: var(--tab-muted); font-size: 22px; }
+#settings-version-value { margin-left: auto; color: var(--tab-muted); font-size: 12px; }
+#settings-version-value + .settings-chevron { margin-left: 0; }
+#settings-modal:not(.app-screen-content) .app-modal { background: #071f29; border-color: var(--tab-line); }
+@media (prefers-reduced-motion: reduce) { #settings-container .toggle-switch .slider::after { transition: none; } }

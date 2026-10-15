@@ -233,61 +233,6 @@
   animation: app-overlay-out 180ms ease-in both;
 }
 
-#settings-container {
-  position: static;
-  inset: auto;
-  transform: none;
-  width: 100%;
-  max-width: none;
-  min-height: 0;
-  padding: 0;
-  margin: 0;
-  background: transparent;
-  box-shadow: none;
-  color: #25324a;
-  animation: none;
-}
-
-#settings-container .settings-option {
-  margin: 0 0 10px;
-  padding: 12px 14px;
-  border: 1px solid rgb(36 59 100 / 12%);
-  border-radius: 12px;
-  background: rgb(255 255 255 / 55%);
-}
-
-#settings-container .settings-group {
-  padding: 12px 14px;
-  border: 1px solid rgb(36 59 100 / 12%);
-  border-radius: 12px;
-  background: rgb(255 255 255 / 55%);
-}
-
-#settings-container .settings-group + .settings-group {
-  margin-top: 10px;
-}
-
-#settings-container .settings-group h3 {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0 0 8px;
-  color: #243b64;
-}
-
-.game-stats .info > [data-icon],
-#settings-container .label > [data-icon],
-#settings-container h3 > [data-icon] {
-  display: inline-flex;
-  align-items: center;
-}
-
-#settings-container .label {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
 .reward-container.app-modal {
   padding: 22px;
   text-align: center;
@@ -716,16 +661,6 @@
 
 #info-modal .app-modal__note {
   color: rgb(245 247 251 / 62%);
-}
-
-#settings-modal #settings-container .settings-control {
-  border-color: rgb(255 255 255 / 11%);
-  background: rgb(8 18 38 / 28%);
-}
-
-#settings-modal #settings-container .settings-row > label:first-child,
-#settings-modal #settings-container output {
-  color: #f5f7fb;
 }
 
 /* Tạm dừng tự động: dừng các animation của game nhưng giữ popup tiếp tục hiển thị. */
