@@ -87,4 +87,11 @@ assert(!/\.shop-item\s*\{/.test(modals), "modal stylesheet must not own the shop
 assert(!/\.shop-item-title\s*\{/.test(modals), "modal stylesheet must not own the shop title base rule");
 assert(shop.includes(".shop-item-grid"), "shop stylesheet must own shop grid");
 
+const [homeMenu, oldMenu, adventure] = await Promise.all([
+  readCss('styles/home-menu.css'), readCss('styles/menu.css'), readCss('styles/adventure.css'),
+]);
+for (const [path, css] of [['styles/menu.css', oldMenu], ['styles/adventure.css', adventure]]) {
+  assert(!/\.game-selector__/.test(css), `${path}: Home selector presentation belongs to styles/home-menu.css`);
+}
+assert(homeMenu.includes('.game-selector__choice'), 'Home selector owner missing');
 console.log("CSS ownership and collision checks passed.");

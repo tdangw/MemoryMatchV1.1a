@@ -8,7 +8,7 @@ Correction trước phase1: bỏ ornament pause, giữ vị trí/nút/pause; ki�
 - Dùng imagegen tạo ảnh riêng theo mẫu1 đã chọn; không kéo giãn các ô400px từ sheet.
 - Master PNG ngoài bundle, WebP đúng kích thước; prompt/metadata, kiểm hình và ngân sách ≤350KB cho3ảnh mới; commit.
 
-## Phase2 — Giao diện và ownership
+## Phase2 — Giao diện và ownership (hoàn tất)
 - Một owner CSS cho selector, gỡ selector cũ đang trùng ở menu/adventure; không dọn phần khác.
 - Native buttons/DOM title, scope sở hữu listener; background/art tĩnh, không loop. Ảnh lỗi vẫn chọn được bằng tên và nền fallback.
 - So sánh ảnh nguyên màn và DOM+art: chọn DOM+art để keyboard/focus/crop và thêm trò; không screenshot có chữ làm UI.
@@ -21,3 +21,5 @@ Correction trước phase1: bỏ ornament pause, giữ vị trí/nút/pause; ki�
 - Cập nhật CONTEXT/ARCHITECTURE/QA, commit; không dừng ở checkpoint khi còn phần an toàn làm được.
 
 Correction pause: commit7ea66e9,20/20 browserpass. Phase1:3master/3WebP đã kiểm bằng ảnh, không chữ/UI trong art; xuất349.418bytes≤350KB. Không PNG master trong bundle.
+
+Phase2: Home7/7pass ở320/412/844/1024, keyboard/ảnhlỗi,4trò và30cycles. CSS Home cóowner riêng; gridcolumns/stretch sửa co chiều ngang do generic menu cũ. Error ảnh được ẩn theo scope để không lộ icon hỏng. Baseline18listener/0timer/0frame, owner cũ về0; progress durable giữ nguyên.

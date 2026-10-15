@@ -1,0 +1,76 @@
+/* Home owns its art, selector layout, and interactions; map and tabs are separate. */
+.game-selector.adventure-page {
+  grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto;
+  justify-content: stretch; align-items: stretch;
+  background: linear-gradient(#03151e40, #04192399), url('/assets/images/backgrounds/leaderboard-night-garden.webp') center / cover;
+}
+.game-selector > .adventure-header { display: none; }
+.game-selector > .menu-wrapper {
+  display: flex; flex-direction: column; gap: 16px;
+  width: min(100%, 700px); height: 100%; min-height: 0;
+  padding: 14px 18px 20px; overflow-y: auto;
+  scrollbar-width: none; overscroll-behavior: contain;
+}
+.game-selector > .menu-wrapper::-webkit-scrollbar { display: none; }
+.game-selector .game-title, .game-selector .game-title:hover {
+  flex-shrink: 0; width: 100%; margin: auto 0 0; padding: 0;
+  color: #ffe3a0; -webkit-text-fill-color: currentColor;
+  font: 700 clamp(28px, 7vw, 42px)/1.04 Georgia, 'Times New Roman', serif;
+  letter-spacing: -.025em; text-align: center;
+  text-shadow: 0 1px #9b6a2e, 0 3px #4c321b, 0 5px 8px #0009;
+  animation: none; transform: none;
+}
+.game-selector .game-title::after { content: ''; display: block; width: 112px; height: 28px; margin: 6px auto 0; background: url('/assets/images/backgrounds/botanical-header-flourish.webp') center / contain no-repeat; }
+.game-selector__title-line { display: block; }
+.game-selector__title-line--adventure { letter-spacing: .015em; }
+.game-selector__choices {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px;
+  flex: 1 0 360px; width: 100%; max-height: 560px; margin-bottom: auto;
+}
+.game-selector__choices[data-layout="featured"] { grid-template-rows: minmax(168px, 1fr) minmax(178px, 1.05fr); }
+.game-selector__choice {
+  position: relative; display: block; min-width: 0; min-height: 178px; padding: 0;
+  overflow: hidden; isolation: isolate; box-sizing: border-box;
+  border: 2px solid #c6a365; border-radius: 22px;
+  background: linear-gradient(145deg, #174448, #071f29); color: #f9e2a7;
+  box-shadow: inset 0 1px #fff1ac, 0 3px #574126, 0 7px 14px #0007;
+  text-align: center; cursor: pointer;
+  transition: transform 140ms ease;
+}
+.game-selector__choice--featured { grid-column: 1 / -1; }
+.game-selector__choice::after { content: ''; position: absolute; inset: 4px; z-index: 2; border: 1px solid #f8df995e; border-radius: 16px; pointer-events: none; }
+.game-selector__choice[data-game-id="link-connect"] { background: linear-gradient(145deg, #123c62, #071f29); }
+.game-selector__choice[data-game-id="triple-connect"] { background: linear-gradient(145deg, #463359, #101d30); }
+.game-selector__art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 52%; pointer-events: none; }
+.game-selector__label {
+  position: absolute; z-index: 3; left: 8px; right: 8px; bottom: 8px;
+  display: flex; align-items: center; gap: 6px; min-height: 44px; box-sizing: border-box; padding: 5px 7px;
+  border: 1px solid #d8b671; border-radius: 12px;
+  background: linear-gradient(#123c40f5, #061e29fa); box-shadow: inset 0 1px #f7df9e45, 0 2px 4px #0008;
+}
+.game-selector__label strong { flex: 1; min-width: 0; white-space: nowrap; font: 700 clamp(13px, 3.4vw, 20px)/1.15 Georgia, 'Times New Roman', serif; color: #ffe2a1; }
+.game-selector__label > .ui-icon { flex: 0 0 24px; width: 24px; height: 24px; box-sizing: border-box; padding: 4px; border: 1px solid #d6b46c; border-radius: 50%; color: #ffe3a0; background: #75572a66; }
+.game-selector__choice--featured .game-selector__label { left: 12px; right: 12px; bottom: 10px; min-height: 48px; }
+.game-selector__choice--featured strong { font-size: clamp(22px, 5.5vw, 28px); }
+.game-selector__choice:hover { transform: translateY(-2px); }
+.game-selector__choice:active { transform: translateY(1px); }
+.game-selector__choice:focus-visible { outline: 3px solid #fff0b4; outline-offset: 3px; }
+@media (orientation: landscape) and (height <= 600px) {
+  .game-selector > .menu-wrapper { width: min(100%, 980px); gap: 12px; padding: 8px 20px 14px; }
+  .game-selector .game-title, .game-selector .game-title:hover { font-size: 26px; line-height: 1.1; }
+  .game-selector__title-line { display: inline; }
+  .game-selector__title-line--adventure { margin-left: 4px; }
+  .game-selector .game-title::after { display: none; }
+  .game-selector__choices, .game-selector__choices[data-layout="featured"] { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: minmax(130px, 1fr); flex-basis: 130px; max-height: 250px; }
+  .game-selector__choice, .game-selector__choice--featured { grid-column: auto; min-height: 130px; }
+  .game-selector__label, .game-selector__choice--featured .game-selector__label { left: 6px; right: 6px; bottom: 6px; min-height: 40px; }
+  .game-selector__label strong, .game-selector__choice--featured strong { font-size: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .game-selector__choice { transition: none; }
+  .game-selector__choice:hover, .game-selector__choice:active { transform: none; }
+}
+
+@media (width <= 380px), (orientation: landscape) and (width <= 700px) {
+  .game-selector__choice:not(.game-selector__choice--featured) .game-selector__label > .ui-icon { display: none; }
+}

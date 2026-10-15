@@ -39,20 +39,6 @@
 }
 .adventure-page .game-title { font-size: clamp(26px, 6vw, 40px); margin: 10px 0; color: #ffe8b4; }
 .adventure-page .menu-description { font-size: 14px; color: #c8d7e2; margin-bottom: 24px; }
-.adventure-page .game-selector__choices { display: grid; gap: 16px; }
-.adventure-page .game-selector__choice {
-  min-height: 116px;
-  padding: 20px;
-  border: 1px solid #f3d49e45;
-  border-radius: 24px;
-  background: linear-gradient(120deg, #27455fe8, #142d47f0);
-  color: #fdf7e7;
-  box-shadow: 0 8px 18px #0003;
-}
-.adventure-page .game-selector__choice:nth-child(2) { background: linear-gradient(120deg, #276057e8, #163b42f0); }
-.adventure-page .game-selector__choice:nth-child(3) { background: linear-gradient(120deg, #54476ae8, #2b2c4bf0); }
-.adventure-page .game-selector__choice strong { font-size: 21px; }
-.adventure-page .game-selector__choice small { color: #d3dfe5; font-size: 13px; }
 .adventure-footer { position: relative; width: min(100%, 640px); margin: auto; }
 .adventure-dock {
   display: grid;
@@ -121,10 +107,7 @@
 .adventure-touch-layer { position: fixed; inset: 0; pointer-events: none; z-index: 33000; overflow: hidden; }
 .adventure-touch-particle { position: absolute; width: 4px; height: 4px; background: #efd7a0; border-radius: 50%; pointer-events: none; }
 @media (max-height: 500px) and (orientation: landscape) {
-  .adventure-page .game-selector__choices { grid-template-columns: repeat(3, 1fr); }
-  .adventure-page .game-selector__choice { padding: 10px; min-height: 90px; }
   .adventure-page .menu-description { display: none; }
-  .adventure-page .game-selector__choice small { display: none; }
   .adventure-header { padding: 7px 20px; }
   .adventure-ad-slot { height: calc(40px + env(safe-area-inset-bottom)); }
   .adventure-dock button { min-height: 40px; }

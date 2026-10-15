@@ -37,7 +37,8 @@ test('functional tab backgrounds load on demand and never appear on Home', async
   }
   await page.locator('.adventure-screen .adventure-exit').click();
   await expect(page.locator('.adventure-screen')).toHaveCount(0);
-  expect(await page.locator('.adventure-page:visible').evaluate(el => getComputedStyle(el).backgroundImage)).not.toContain('.webp');
+  const homeBackground = await page.locator('.adventure-page:visible').evaluate(el => getComputedStyle(el).backgroundImage);
+  for (const path of paths) expect(homeBackground).not.toContain(`${path}.webp`);
 });
 
 for (const viewport of [{ width: 320, height: 740 }, { width: 412, height: 915 }, { width: 844, height: 390 }, { width: 1024, height: 900 }]) test(`functional screens remain readable and bounded at ${viewport.width}`, async ({ page }) => {
