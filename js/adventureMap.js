@@ -236,7 +236,10 @@ export function mountAdventureMap(gameId) {
       if (scope.active) setBusy(false);
     }
   }
-  function openLevel(level) {
+  function openLevel(level, specialMode = null) {
+    if (!scope.active || loading) return;
+    const selectedMode = () => specialMode || view.mode;
+    const title = () => specialMode ? `${getGameModeLabel(specialMode)} · Màn ${level}` : `Màn ${level} · ${getGameModeLabel(view.mode)}`;
     const content = document.createElement("div");
     content.className = "adventure-level-preview";
     const goal = document.createElement("p"); goal.className = "adventure-level-goal";
@@ -244,7 +247,7 @@ export function mountAdventureMap(gameId) {
     const choices = document.createElement("fieldset"); choices.className = "adventure-level-modes";
     const legend = document.createElement("legend"); legend.textContent = "Chọn độ khó";
     choices.append(legend);
-    for (const [index, mode] of GAME_MODES.filter(mode => isNormalAdventureMode(mode.id)).entries()) {
+    for (const [index, mode] of (specialMode ? [] : GAME_MODES.filter(mode => isNormalAdventureMode(mode.id))).entries()) {
       const label = document.createElement("label");
       label.dataset.grade = ["C", "B", "A", "S"][index]; label.title = mode.label;
       const input = document.createElement("input");
@@ -257,30 +260,39 @@ export function mountAdventureMap(gameId) {
     const details = document.createElement("ul"); details.className = "adventure-level-details";
     details.setAttribute("aria-live", "polite");
     function updatePreview() {
-      const info = adapter.preview({ mode: view.mode, level, startedLevels: { ...adjacentStarted, ...profile.startedLevels } });
+      const info = adapter.preview({ mode: selectedMode(), level, startedLevels: { ...adjacentStarted, ...profile.startedLevels } });
       const theme = getTheme(getEquippedThemeId(gameState.appearance, gameId));
+      goal.textContent = info.goal || adapter.goal;
       details.replaceChildren(...[
-        `Thời gian: ${info.timeSeconds} giây`,
+        `Thời gian: ${info.timeSeconds === 0 ? "Không giới hạn" : `${info.timeSeconds} giây`}`,
         `Mục tiêu: ${info.target}`,
         `Gợi ý: ${info.hints}${info.assistNote ? ` · ${info.assistNote}` : ""}`,
         `Chủ đề: ${theme.title}`,
       ].map(text => { const row = document.createElement("li"); row.textContent = text; return row; }));
     }
-    updatePreview(); content.append(choices, goal, details);
-    const release = scope.listen(choices, "change", event => {
+    updatePreview();
+    if (!specialMode) content.append(choices);
+    content.append(goal, details);
+    if (specialMode) {
+      const rules = document.createElement("p");
+      rules.className = "adventure-level-goal";
+      rules.textContent = "Mỗi lượt mới bắt đầu từ màn 1. Xếp hạng theo màn cao nhất đã vượt qua trong một lượt.";
+      content.append(rules);
+    }
+    const release = specialMode ? undefined : scope.listen(choices, "change", event => {
       if (loading || !isNormalAdventureMode(event.target.value)) return;
       view.mode = event.target.value; patchNodes(); updatePreview();
-      modal.panel.querySelector(".app-modal__title").lastChild.textContent = `Màn ${level} · ${getGameModeLabel(view.mode)}`;
-      modal.panel.setAttribute("aria-label", `${game.title} · Màn ${level} · ${getGameModeLabel(view.mode)}`);
+      modal.panel.querySelector(".app-modal__title").lastChild.textContent = title();
+      modal.panel.setAttribute("aria-label", `${game.title} · ${title()}`);
     });
-    const modal = openAppModal({ id: "adventure-level-modal", title: `Màn ${level} · ${getGameModeLabel(view.mode)}`, content, owner: scope,
+    const modal = openAppModal({ id: "adventure-level-modal", title: title(), content, owner: scope,
       onDestroy: release,
-      actions: [{ label: "Chơi", variant: "primary", onClick: async () => await launch(view.mode, level, { skipIntro: true }) ? undefined : false }],
+      actions: [{ label: "Chơi", variant: "primary", onClick: async () => await launch(selectedMode(), level, { skipIntro: true }) ? undefined : false }],
     });
     modal.panel.classList.add("adventure-level-dialog");
-    modal.panel.setAttribute("aria-label", `${game.title} · Màn ${level} · ${getGameModeLabel(view.mode)}`);
+    modal.panel.setAttribute("aria-label", `${game.title} · ${title()}`);
   }
-  function openSpecialMode(mode) { return launch(mode, 1); }
+  function openSpecialMode(mode) { openLevel(1, mode); }
 
   function openChest(node) {
     const outcome = profile.claimedChests?.[node.chestNumber] || adjacentChests[node.chestNumber];

@@ -74,10 +74,18 @@ for (const [gameId, progressKey] of [['memory-match', 'memoryMatch'], ['link-con
 
 for (const gameId of ['memory-match', 'link-connect', 'triple-connect']) {
   for (const mode of ['endless', 'challenge']) {
-    test(`${gameId} selects ${mode} from its fixed button and starts at level 1`, async ({ page }) => {
+    test(`${gameId} previews ${mode} before confirming a new run at level 1`, async ({ page }) => {
       await page.goto('/');
       await page.evaluate(async id => (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu(id), gameId);
       await page.locator(`[data-special-mode="${mode}"]`).click();
+      await expect(page.locator('#adventure-level-modal')).toBeVisible();
+      await expect(page.locator('.adventure-map-page')).toBeVisible();
+      await expect(page.locator('#adventure-level-modal input[type="radio"]')).toHaveCount(0);
+      await expect(page.locator('#adventure-level-modal')).toContainText(mode === 'endless' ? 'Không giới hạn' : 'Thời gian:');
+      expect(await page.evaluate(async ({gameId,mode}) => (await import('/js/sessionProgress.js')).getActiveSession(gameId,mode), {gameId,mode})).toBeNull();
+      await page.locator('#adventure-level-modal').getByRole('button',{name:'Chơi',exact:true}).click();
+      await expect(page.locator('#adventure-level-modal')).toHaveCount(0);
+      await expect(page.locator('.level-reward-overlay, #triple-round-start-modal')).toHaveCount(0);
       await expect.poll(() => page.evaluate(async ({ gameId, mode }) => {
         const session = (await import('/js/sessionProgress.js')).getActiveSession(gameId, mode);
         return session ? { mode: session.mode, level: session.level } : null;
@@ -171,8 +179,9 @@ test('level preview supports native keyboard choices, escape/focus restoration a
   }
   expect(await page.evaluate(async () => (await import('/js/appPageLifecycle.js')).getAppPageScope().diagnostics())).toEqual(baseline);
   await page.locator('[data-special-mode="challenge"]').click();
-  await expect(page.locator('#triple-round-start-modal')).toContainText('Thử thách');
-  await expect(page.locator('[data-triple-level]')).toHaveText('1');
+  await expect(page.locator('#adventure-level-modal')).toContainText('Thử thách · Màn 1');
+  await expect(page.locator('#adventure-level-modal')).toContainText('6 bộ ba · 18 thẻ');
+  await expect(page.locator('.game-shell-root:visible')).toHaveCount(0);
 });
 
 test("chapter nodes stay mounted on mode changes, shared clear stays distinct from mode stars and chests claim once", async ({ page }) => {
@@ -244,7 +253,9 @@ test("catalog access follows the selected game and remains separate from home pl
   await page.reload();
   await page.evaluate(async () => (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('triple-connect'));
   await page.locator('[data-dock-action="collection"]').click();
-  await expect(page.locator("#collection-modal")).toContainText("Triple Connect");
+  await expect(page.locator('#collection-modal .app-modal__title')).toHaveText('Bộ sưu tập');
+  await expect(page.locator('#catalog-collection-triple-connect-tabs')).toBeVisible();
+  await expect(page.locator('#catalog-collection-triple-connect-panel')).toBeVisible();
 });
 
 test("completed chapters archive safely and repeated chapter navigation keeps page resources bounded", async ({ page }) => {

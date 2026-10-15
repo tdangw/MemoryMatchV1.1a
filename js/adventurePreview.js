@@ -1,10 +1,11 @@
-import { getModeLayout, getLevelTimeBonus, getLevelHintBonus, getPreviewDurationMs } from './config.js';
-import { getLinkModeLayout, getLinkLevelTimeBonus, getLinkLevelHintBonus } from './linkConnect/linkConfig.js';
-import { getTripleModeConfig, getTripleTrayCapacity } from './tripleConnect/tripleConfig.js';
-import { isNormalAdventureMode, getChapterNumber } from './adventureProgress.js';
+import { getModeLayout, getChallengeLayout, getLevelTimeBonus, getLevelHintBonus, getPreviewDurationMs } from './config.js';
+import { getLinkModeLayout, getLinkChallengeLayout, getLinkChallengeTime, getLinkLevelTimeBonus, getLinkLevelHintBonus } from './linkConnect/linkConfig.js';
+import { getTripleModeConfig, getTripleChallengeStage, getTripleTrayCapacity } from './tripleConnect/tripleConfig.js';
+import { getChapterNumber } from './adventureProgress.js';
+import { getGameMode } from './gameCatalog.js';
 
 function check(mode, level) {
-  if (!isNormalAdventureMode(mode)) throw new RangeError('Level previews require a normal difficulty.');
+  if (!getGameMode(mode)) throw new RangeError('Unknown preview mode.');
   getChapterNumber(level);
 }
 function hintCount(profile, mode, level, getBonus) {
@@ -14,16 +15,20 @@ function hintCount(profile, mode, level, getBonus) {
 // Read-only preview: the actual start transaction still owns all grants and persistence.
 export function previewMemoryLevel(mode, level, profile) {
   check(mode, level);
-  const layout = getModeLayout(mode);
-  return { tileCount: layout.tileCount, target: `${layout.tileCount / 2} cặp · ${layout.tileCount} thẻ`, timeSeconds: layout.timeSeconds + getLevelTimeBonus(level), hints: hintCount(profile, mode, level, getLevelHintBonus), assistNote: `Xem trước ${getPreviewDurationMs(mode) / 1000} giây` };
+  const modeLayout = getModeLayout(mode);
+  const layout = mode === 'challenge' ? getChallengeLayout(level) : modeLayout;
+  const timeSeconds = mode === 'endless' ? 0 : mode === 'challenge' ? modeLayout.timeSeconds : modeLayout.timeSeconds + getLevelTimeBonus(level);
+  return { tileCount: layout.tileCount, target: `${layout.tileCount / 2} cặp · ${layout.tileCount} thẻ`, timeSeconds, hints: hintCount(profile, mode, level, getLevelHintBonus), assistNote: `Xem trước ${getPreviewDurationMs(mode) / 1000} giây`, ...(mode === 'endless' ? { goal: 'Ghi nhớ vị trí và ghép hết các cặp thẻ để sang màn tiếp theo.' } : {}) };
 }
 export function previewLinkLevel(mode, level, profile) {
   check(mode, level);
-  const layout = getLinkModeLayout(mode);
-  return { tileCount: layout.tileCount, target: `${layout.tileCount / 2} cặp · ${layout.tileCount} thẻ`, timeSeconds: layout.timeSeconds + getLinkLevelTimeBonus(level), hints: hintCount(profile, mode, level, getLinkLevelHintBonus), assistNote: '' };
+  const modeLayout = getLinkModeLayout(mode);
+  const layout = mode === 'challenge' ? getLinkChallengeLayout(level) : modeLayout;
+  const timeSeconds = mode === 'endless' ? 0 : mode === 'challenge' ? getLinkChallengeTime(level) : modeLayout.timeSeconds + getLinkLevelTimeBonus(level);
+  return { tileCount: layout.tileCount, target: `${layout.tileCount / 2} cặp · ${layout.tileCount} thẻ`, timeSeconds, hints: hintCount(profile, mode, level, getLinkLevelHintBonus), assistNote: '', ...(mode === 'endless' ? { goal: 'Tìm đường nối và ghép hết các cặp thẻ để sang màn tiếp theo.' } : {}) };
 }
 export function previewTripleLevel(mode, level, profile) {
   check(mode, level);
-  const layout = getTripleModeConfig(mode);
-  return { tileCount: layout.tileCount, target: `${layout.tileCount / 3} bộ ba · ${layout.tileCount} thẻ`, timeSeconds: layout.timeSeconds, hints: profile.items.hint, assistNote: `Khay ${getTripleTrayCapacity(profile.trayExpansionSlots)} ô` };
+  const layout = mode === 'challenge' ? getTripleChallengeStage(level) : getTripleModeConfig(mode);
+  return { tileCount: layout.tileCount, target: `${layout.tileCount / 3} bộ ba · ${layout.tileCount} thẻ`, timeSeconds: layout.timeSeconds, hints: profile.items.hint, assistNote: `Khay ${getTripleTrayCapacity(profile.trayExpansionSlots)} ô`, ...(mode === 'endless' ? { goal: 'Ghép hết các bộ ba để sang màn tiếp theo. Đừng để khay đầy!' } : {}) };
 }
