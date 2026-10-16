@@ -1,5 +1,7 @@
 import { gameState } from "./gameState.js";
-import { openAppModal } from "./modal.js";
+import { openAppModal, showAppToast } from "./modal.js";
+import { PRIVACY_CONTENT } from './privacyContent.js';
+import { subscribeAdPrivacy, openAdPrivacyOptions } from './ads/menuAds.js';
 import { applyEffectsSettings, syncDefaultMusic } from "./sound.js";
 import { saveSetting } from "./persistence.js";
 import { APP_VERSION } from "./appMeta.js";
@@ -132,6 +134,9 @@ applyEffectsSettings(gameState.settings);
 bindSettingsControls();
 if (versionValue) versionValue.textContent = APP_VERSION;
 versionInfoButton?.addEventListener("click", showVersionInfo);
+document.getElementById('settings-privacy-policy').addEventListener('click', () => openAppModal({
+  id: 'privacy-policy-modal', title: 'Quyền riêng tư', content: PRIVACY_CONTENT,
+}));
 
 export function showSettingsPanel(fromGame = false, onClose = () => {}, actions = navigation, surface = {}) {
   if (!settingsContainer || !settingsHome) return;
@@ -139,6 +144,8 @@ export function showSettingsPanel(fromGame = false, onClose = () => {}, actions 
   gameState.isPaused = fromGame;
   syncSettingsControls();
   let nextAction = null;
+  let releasePrivacy = () => {};
+  const adPrivacy = document.getElementById('settings-ad-privacy');
 
   const modal = openAppModal({
     ...surface,
@@ -148,6 +155,8 @@ export function showSettingsPanel(fromGame = false, onClose = () => {}, actions 
     content: settingsContainer,
     size: "medium",
     onDestroy: () => {
+      releasePrivacy();
+      adPrivacy.onclick = null;
       settingsContainer.style.display = "none";
       settingsHome.appendChild(settingsContainer);
       document.getElementById('settings-help').onclick = null;
@@ -163,6 +172,14 @@ export function showSettingsPanel(fromGame = false, onClose = () => {}, actions 
     },
   });
   settingsContainer.style.display = "grid";
+  adPrivacy.disabled = false;
+  releasePrivacy = subscribeAdPrivacy(state => { adPrivacy.hidden = !state.supported || !state.privacyRequired; });
+  adPrivacy.onclick = async () => {
+    adPrivacy.disabled = true;
+    try {
+      if (!await openAdPrivacyOptions() && modal.overlay.isConnected) showAppToast('Chưa mở được lựa chọn quảng cáo. Vui lòng thử lại.');
+    } finally { if (modal.overlay.isConnected) adPrivacy.disabled = false; }
+  };
   if (!modal.panel.contains(document.activeElement)) (settingsContainer.querySelector('input:not(:disabled)') || modal.panel).focus();
   for (const [id, action] of [['settings-help', actions.onHelp], ['settings-reset', actions.onReset]]) {
     const control = document.getElementById(id);

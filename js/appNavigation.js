@@ -7,6 +7,7 @@ import { mountAppPage } from "./appPageLifecycle.js";
 import { createGameShellLifecycle } from './gameShell/gameShellLifecycle.js';
 
 import { mountTouchDust } from "./touchDust.js";
+import { setMenuAdTarget, clearMenuAdTarget } from './ads/menuAds.js';
 
 const actions = Object.freeze([
   { id: "shop", icon: "shop", label: "Cửa hàng" },
@@ -55,6 +56,8 @@ export function decorateAdventureMenu(root, { gameId = null, onHome } = {}) {
   header.className = "adventure-header";
   root.prepend(header);
   let screen = null;
+  let adSlot = null;
+  scope.own(() => clearMenuAdTarget(adSlot));
   scope.own(() => screen?.dispose());
   const goHome = () => (onHome || handlers.home)();
   function createExit(owner) {
@@ -67,6 +70,7 @@ export function decorateAdventureMenu(root, { gameId = null, onHome } = {}) {
   const navigate = async action => {
     screen?.dispose();
     screen = null;
+    setMenuAdTarget(action === 'map' ? adSlot : null);
     setMeteorSceneEligible(action === 'map');
     if (action === 'map') { root.querySelector('[data-dock-action="map"]').focus(); return; }
     const viewScope = createGameShellLifecycle();
@@ -90,10 +94,12 @@ export function decorateAdventureMenu(root, { gameId = null, onHome } = {}) {
     if (!selected || selected === 'map') {
       const ad = document.createElement('div'); ad.className = 'adventure-ad-slot'; ad.dataset.adPlacement = 'menu'; ad.setAttribute('aria-hidden', 'true');
       footer.append(ad);
+      adSlot = ad;
     }
     return footer;
   }
   root.append(createFooter(scope, gameId ? 'map' : null));
+  setMenuAdTarget(adSlot);
   // Functional destinations now have a single shared dock owner.
   for (const item of root.querySelectorAll(".menu-item")) {
     if (["Cửa hàng", "Bộ sưu tập", "Cài đặt", "Home"].includes(item.textContent.trim())) item.remove();

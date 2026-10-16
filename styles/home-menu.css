@@ -72,7 +72,7 @@
   .game-selector .game-title, .game-selector .game-title:hover { font-size: 25px; line-height: 1.1; }
   .game-selector__title-line { display: inline; }
   .game-selector__title-line--adventure { margin-left: 4px; }
-  .game-selector__choices { --game-card-width: min(60vw, 360px); height: clamp(130px, 42dvh, 180px); padding-block: 6px; }
+  .game-selector__choices { --game-card-width: min(60vw, 360px); height: clamp(127px, calc(42dvh - max(0px, var(--menu-ad-space, 40px) - 40px)), 180px); padding-block: 6px; }
   .game-selector__label { min-height: 44px; padding: 8px 16px; }
   .game-selector__label strong { font-size: 22px; }
   .game-selector__controls { margin-top: 4px; }

@@ -1,0 +1,18 @@
+// Source shared by the in-game policy and the generated public page.
+export const PRIVACY_CONTENT = `
+<p><strong>Memory Match Adventure</strong> do Đăng phát triển. Trang này giải thích cách trò chơi sử dụng thông tin của bạn. Cập nhật ngày 16 tháng 10 năm 2026.</p>
+<h3>Thông tin khi chơi</h3>
+<p>Trò chơi lưu tiến trình, Xu, vật phẩm, chủ đề và cài đặt trên thiết bị. Nếu sử dụng tính năng tài khoản, thông tin hồ sơ, tên hiển thị và tiến trình có thể được lưu trực tuyến để khôi phục khi đổi thiết bị. Đăng nhập bằng Google có thể cung cấp tên, địa chỉ email và thông tin hồ sơ mà bạn cho phép chia sẻ.</p>
+<p>Khi tham gia bảng xếp hạng, tên hiển thị và thành tích của bạn có thể được người chơi khác nhìn thấy. Không dùng số điện thoại, địa chỉ nhà hoặc thông tin riêng tư làm tên hiển thị.</p>
+<h3>Quảng cáo và trẻ em</h3>
+<p>Trò chơi có người chơi ở nhiều độ tuổi, bao gồm trẻ em. Quảng cáo ở trang chủ và bản đồ được áp dụng chế độ bảo vệ trẻ em cho tất cả người chơi, giới hạn nội dung phù hợp gia đình và không cá nhân hóa theo sở thích. Trò chơi không hỏi ngày sinh và không yêu cầu xem video để nhận thưởng trong phiên bản này.</p>
+<p>Google có thể xử lý thông tin về thiết bị, kết nối và lượt hiển thị hoặc tương tác với quảng cáo để cung cấp quảng cáo, kiểm tra chất lượng và ngăn gian lận. Cách xử lý còn phụ thuộc vào dịch vụ của Google và các lựa chọn được áp dụng tại khu vực của bạn. Nếu có lựa chọn cần xem lại, bạn có thể mở mục Quyền riêng tư quảng cáo trong Cài đặt.</p>
+<p>Phụ huynh nên hướng dẫn trẻ khi sử dụng tài khoản, đặt tên hiển thị và chia sẻ thông tin. Nếu cho rằng trẻ đã cung cấp thông tin cá nhân không phù hợp, hãy liên hệ để chúng tôi xem xét và hỗ trợ xóa.</p>
+<h3>Mục đích sử dụng</h3>
+<p>Thông tin được dùng để duy trì trò chơi, lưu và khôi phục tiến trình, hiển thị bảng xếp hạng, bảo vệ tài khoản, sửa lỗi và cải thiện trải nghiệm. Thông tin về cách sử dụng trò chơi có thể được dùng để hiểu những tính năng được sử dụng và phát hiện sự cố.</p>
+<h3>Dịch vụ hỗ trợ</h3>
+<p>Trò chơi sử dụng các dịch vụ của Google Firebase cho tài khoản, lưu tiến trình và thống kê sử dụng; Google AdMob cung cấp quảng cáo trong ứng dụng Android. Các dịch vụ này có chính sách riêng. Bạn có thể đọc <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Chính sách quyền riêng tư của Google</a>.</p>
+<h3>Lưu giữ và xóa thông tin</h3>
+<p>Dữ liệu trên thiết bị còn được giữ cho tới khi bạn xóa dữ liệu trò chơi hoặc gỡ ứng dụng. Xóa dữ liệu trên thiết bị không tự xóa thông tin đã lưu trực tuyến. Muốn yêu cầu xóa tài khoản hoặc thông tin trực tuyến, hãy gửi email tới địa chỉ bên dưới, nêu tên trò chơi và thông tin cần thiết để nhận diện tài khoản. Không gửi mật khẩu. Chúng tôi có thể cần xác minh quyền sở hữu tài khoản trước khi xử lý.</p>
+<h3>Liên hệ và thay đổi</h3>
+<p>Gửi câu hỏi về quyền riêng tư hoặc yêu cầu xóa dữ liệu tới <a href="mailto:dangvt.studio@gmail.com">dangvt.studio@gmail.com</a>. Nội dung này có thể được cập nhật khi trò chơi thay đổi; ngày cập nhật được ghi ở đầu trang.</p>`;

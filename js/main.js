@@ -1,4 +1,5 @@
 import { getRecentGameId } from "./recentGame.js";
+import { initializeMenuAds } from './ads/menuAds.js';
 import { initializeProfileStatsService } from './profileStatsService.js';
 import { configureAdventureMap } from "./adventureMap.js";
 import { previewMemoryLevel, previewLinkLevel, previewTripleLevel } from './adventurePreview.js';
@@ -238,6 +239,7 @@ document.addEventListener(
 
 const profileStats = await initializeProfileStatsService();
 showGameSelector();
+void initializeMenuAds();
 if (import.meta.env.VITE_FIREBASE_DISABLED !== '1') {
   accountReady = Promise.all([import('./accountService.js'), import('./accountPanel.js')]).then(([account, panels]) => {
     accountRuntime = panels;
