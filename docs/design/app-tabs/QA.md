@@ -91,3 +91,13 @@ Chọn giữ DOM/handler exit hiện tại và đổi bố cục tại owner CSS
 Bỏ node và render “Tính từ…” trong Profile; chỉ còn ngày tham gia/tạo hồ sơ và tổng thời gian chơi. Không ẩn bằng CSS, không đổi trackedSince, counter, service, subscription hoặc save. CSS account-play-since vẫn dùng cho trạng thái lỗi aria-live. Kiểm tra mục tiêu5/5:4viewport320/412/844/1024 và tổng thời gian3trò giữ sau reload. Review độc lập1/1 approve; trackedSince vẫn>0, tổng96000ms không thay. Ảnh profile4viewport đã cập nhật và kiểm trực quan.
 
 Cổng cuối cho thay đổi này: npm run check, npm run build và npm run build:android đều exit0; git diff --check đạt. Không deploy/đổi API hoặc dữ liệu lưu.
+
+## Sự kiện thay Bạn bè — 2026-10-16
+
+Đổi dock action thành events, nhãn/tiêu đề Sự kiện và biểu tượng lịch SVG cùng hệ icon. Trang events-screen vẫn Sắp ra mắt; chưa thêm luật/module/network sự kiện. Đổi các scope CSS header/title/nền và test điều hướng, tái sử dụng friends-courtyard.webp để giữ pipeline/asset hiện tại. Không giữ alias route Bạn bè vì navigation không lưu bền; không đổi schema/save/Auth.
+
+UI36/36 đạt: mobile hẹp/phổ biến, landscape/desktop, header exit/selected/background, chuyển tab/map, profile/settings pending actions và30cycles ownership. Event title/icon/current và không còn Bạn bè được kiểm trực tiếp. Đã xem [ảnh Sự kiện412](qa/events-412.png); các ảnh Profile/Settings cập nhật nhãn dock. Fixture app-tabs-online đổi selector sang events nhưng không chạy emulator trong task trình bày này; không sửa logic Firebase.
+
+Review độc lập Sự kiện3/3 đạt, approve không finding:412/640ngang/1024, title/icon/active, không còn Bạn bè, owner baseline không tăng, pageerrors rỗng.
+
+Cổng cuối cho tab Sự kiện: npm run check, npm run build và npm run build:android đều exit0; git diff --check đạt. Không deploy, không thay schema/save hoặc endpoint.

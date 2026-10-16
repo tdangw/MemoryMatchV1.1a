@@ -132,7 +132,7 @@ configureAppNavigation({
     return accountRuntime.showAccountPanel(surface);
   },
   action: async (action, { gameId, scope, surface = {} }) => {
-    if (action === 'missions' || action === 'friends') return openAppModal({ ...surface, id: `${action}-screen`, title: action === 'missions' ? 'Nhiệm vụ' : 'Bạn bè', icon: action, content: '<p class="navigation-coming-soon">Sắp ra mắt</p>' });
+    if (action === 'missions' || action === 'events') return openAppModal({ ...surface, id: `${action}-screen`, title: action === 'missions' ? 'Nhiệm vụ' : 'Sự kiện', icon: action, content: '<p class="navigation-coming-soon">Sắp ra mắt</p>' });
     if (action === 'ranking') {
       if (document.getElementById('rankings-modal')) return;
       const rankings = await import('./leaderboardPanel.js');

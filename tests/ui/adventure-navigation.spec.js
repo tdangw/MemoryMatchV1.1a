@@ -7,7 +7,7 @@ for (const viewport of [{ width: 412, height: 915 }, { width: 844, height: 390 }
     const errors = [];
     page.on("pageerror", error => errors.push(error.message));
     await expect(page.locator(".adventure-page")).toBeVisible();
-    await expect(page.locator("[data-dock-action]")).toHaveText(["Nhiệm vụ", "Bạn bè", "Profile", "Xếp hạng", "Cài đặt"]);
+    await expect(page.locator("[data-dock-action]")).toHaveText(["Nhiệm vụ", "Sự kiện", "Profile", "Xếp hạng", "Cài đặt"]);
     await expect(page.locator("[data-ad-placement]")).toHaveCount(1);
     for (const id of ["memory-match", "link-connect", "triple-connect"]) {
       await page.evaluate(async id => (await (await import("/tests/ui/helpers/gameNavigation.js")).openReadyGameMenu(id)), id);

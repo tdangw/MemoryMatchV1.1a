@@ -6,7 +6,7 @@ const ICON_PATHS = Object.freeze({
   edit: '<path d="m4 16 11-11 4 4L8 20H4zM13 7l4 4M15 5l2-2 4 4-2 2"/>',
   trash: '<path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7"/>',
   missions: '<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 2h6v4H9zM8 11l2 2 5-5M8 17h8"/>',
-  friends: '<circle cx="9" cy="8" r="3"/><path d="M3 21v-2a6 6 0 0 1 12 0v2M17 5a3 3 0 0 1 0 6M17 14a5 5 0 0 1 5 5v2"/>',
+  events: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18m-13 5 2 2 4-4"/>',
   map: '<path d="m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2zM9 3v16M15 5v16"/>',
   infinity: '<path d="M12 12c-3-5-8-6-9-2-2 6 4 9 9 2s11-4 9 2c-1 4-6 3-9-2z"/>',
   account: '<circle cx="12" cy="7.5" r="3.5" fill="currentColor" stroke="none"/><path d="M5 20v-1a7 7 0 0 1 14 0v1z" fill="currentColor" stroke="none"/>',

@@ -37,7 +37,7 @@ test('reopening a board sees another device result even while the 15s cache cloc
       const result = (await import('/js/progressRankingModel.js')).createProgressResult('memory-match', 'adventure', 1000000, { profileId: identity.profileId, uid: identity.uid });
       await (await import('/js/leaderboardStore.js')).submitRankingResult({ database: backend.database, environment: backend.environment, uid: identity.uid, playerName: 'Người chơi mới', result });
     });
-    await first.locator('.adventure-screen [data-dock-action="friends"]').click();
+    await first.locator('.adventure-screen [data-dock-action="events"]').click();
     await first.locator('.adventure-screen [data-dock-action="ranking"]').click();
     await expect(first.locator('.leaderboard-list')).toContainText('Người chơi mới');
     await expect(first.locator('.leaderboard-list')).toContainText('1.000.000');

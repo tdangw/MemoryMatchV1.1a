@@ -4,7 +4,7 @@ mkdirSync('docs/design/app-tabs/qa', { recursive: true });
 
 for (const viewport of [{ width: 320, height: 740 }, { width: 412, height: 915 }, { width: 844, height: 390 }, { width: 1024, height: 900 }]) test(`five tab exit buttons attach to the header corner at ${viewport.width}`, async ({ page }) => {
   await page.setViewportSize(viewport); await page.goto('/');
-  for (const action of ['missions', 'friends', 'profile', 'ranking', 'settings']) {
+  for (const action of ['missions', 'events', 'profile', 'ranking', 'settings']) {
     await page.locator(`.adventure-page:not([hidden]) [data-dock-action="${action}"]`).click();
     const screen = page.locator('.adventure-screen');
     const header = await screen.locator('.app-modal__header').boundingBox();
@@ -26,7 +26,7 @@ test('functional tab backgrounds load on demand and never appear on Home', async
   await expect(page.locator('[data-dock-action="profile"]')).toBeVisible();
   const paths = ['missions-garden', 'friends-courtyard', 'profile-keepsake', 'settings-retreat'];
   expect(await page.evaluate(paths => performance.getEntriesByType('resource').filter(entry => paths.some(path => entry.name.includes(`${path}.webp`))).length, paths)).toBe(0);
-  for (const [index, action] of ['missions', 'friends', 'profile', 'settings'].entries()) {
+  for (const [index, action] of ['missions', 'events', 'profile', 'settings'].entries()) {
     await page.locator(`.adventure-page:not([hidden]) [data-dock-action="${action}"]`).click();
     const screen = page.locator(`.adventure-screen[data-screen="${action}"]`);
     await expect(screen).toBeVisible();

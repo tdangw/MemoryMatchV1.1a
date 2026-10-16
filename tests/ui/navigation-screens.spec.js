@@ -7,10 +7,18 @@ for (const viewport of [{ width: 412, height: 915 }, { width: 640, height: 360 }
     const errors = []; page.on('pageerror', error => errors.push(error.message));
     await page.goto('/');
     await expect(page.locator('.adventure-header .adventure-account')).toHaveCount(0);
-    await expect(page.locator('[data-dock-action]')).toHaveText(['Nhiệm vụ', 'Bạn bè', 'Profile', 'Xếp hạng', 'Cài đặt']);
-    for (const action of ['missions', 'friends']) {
+    await expect(page.locator('[data-dock-action]')).toHaveText(['Nhiệm vụ', 'Sự kiện', 'Profile', 'Xếp hạng', 'Cài đặt']);
+    for (const action of ['missions', 'events']) {
       await page.locator(`.adventure-page:not([hidden]) [data-dock-action="${action}"]`).click();
       await expect(page.locator(`.adventure-screen[data-screen="${action}"]`)).toContainText('Sắp ra mắt');
+      if (action === 'events') {
+        await expect(page.locator('#events-screen .app-modal__title')).toHaveText('Sự kiện');
+        await expect(page.locator('.adventure-screen [data-dock-action="events"]')).toHaveAttribute('aria-current', 'page');
+        await expect(page.locator('#events-screen .ui-icon--events')).toBeVisible();
+        await expect(page.getByText('Bạn bè', { exact: true })).toHaveCount(0);
+        await expect(page.locator('[data-dock-action="friends"]')).toHaveCount(0);
+        if (viewport.width === 412) await page.screenshot({ path: 'docs/design/app-tabs/qa/events-412.png', animations: 'disabled' });
+      }
     }
     await page.locator('.adventure-page:not([hidden]) [data-dock-action="profile"]').click();
     await expect(page.locator('.adventure-screen[data-screen="profile"] #account-modal')).toBeVisible();

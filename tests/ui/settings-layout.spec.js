@@ -37,7 +37,7 @@ test('audio values persist and settings controls keep one owner over 30 cycles',
   await page.reload(); await page.locator('[data-dock-action="settings"]').click();
   await expect(page.locator('#sound-volume')).toHaveValue('67'); await expect(page.locator('#toggle-sound')).not.toBeChecked();
   for (let i = 0; i < 30; i++) {
-    await page.locator('.adventure-screen [data-dock-action="friends"]').click();
+    await page.locator('.adventure-screen [data-dock-action="events"]').click();
     await expect(page.locator('.main-wrapper > #settings-container')).toHaveCount(1);
     await page.locator('.adventure-screen [data-dock-action="settings"]').click();
     await expect(page.locator('#settings-container')).toHaveCount(1);

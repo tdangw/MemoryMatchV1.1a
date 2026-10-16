@@ -4,6 +4,8 @@
 
 ## Sản phẩm
 
+- Tab Sự kiện thay Bạn bè ngày2026-10-16: action events, tiêu đề/nhãn Sự kiện, biểu tượng lịch. Hiện Sắp ra mắt, chưa triển khai tính năng sự kiện. Giữ nền courtyard hiện có và lifecycle chung; không đổi save/schema/Auth. UI36/36, review độc lập3/3, check/build web/Android pass; QA tại `docs/design/app-tabs/QA.md`.
+
 - Profile đã bỏ dòng “Tính từ…” theo yêu cầu ngày2026-10-16; chỉ hiển thị ngày tham gia/tạo hồ sơ và tổng thời gian chơi. trackedSince/counter vẫn giữ nội bộ, không đổi service/schema/save. UI5/5, review độc lập1/1, check/build web/Android pass. Ảnh và bằng chứng ở `docs/design/app-tabs/QA.md`.
 
 - `HOME_CAROUSEL_PLAN.md` hoàn tất: Home một trò ở giữa, vuốt trái/phải, hé trò hai bên; mũi tên/chấm và bàn phím. Native scroll-snap, scope sở hữu frame/observer/listener, không clone/tự chạy; giữ art/save/catalog/navigation và nội dung tab/popup. Phase1 commit665dafb. Home/registry17ca, regression52/52, review cuối12/12 và touch lặp5/5 đạt; check/build web/Android pass. QA: `docs/design/home-carousel/QA.md`. Không còn gate triển khai active; S22 Ultra thật còn chờ.
@@ -46,7 +48,7 @@
 - Rương tạm dùng ba gói Xu có phần cố định + ngẫu nhiên: Nhỏ 60 + 20–40 (70%), Vừa 100 + 30–60 (25%), Lớn 150 + 50–100 (5%); catalog/grants có thể mở rộng vật phẩm sau. Backend ranking cơ bản/mọi thời gian/có gửi lại offline đã được người dùng đồng ý. Agent review chỉ dùng khi cần với thay đổi rủi ro, chỉ đọc/test, không sửa/commit.
 - Dock hiện tại theo mục20 có năm mục ngoài gameplay, ẩn trong gameplay. Quảng cáo chỉ chừa vùng trên Home/map; chưa gắn provider/ad unit, deploy Hosting hoặc nâng billing.
 - Tài liệu repository chỉ chứa thiết kế/kế hoạch của dự án. Nội dung nghiên cứu/tham khảo trò khác chỉ ở chat; không lưu tên, mô tả, bảng so sánh, đường dẫn hoặc tài nguyên của các trò đó vào dự án.
-- Hướng menu hiện tại (mục20): ngoài gameplay dùng năm tab toàn màn hình. Home: Nhiệm vụ/Bạn bè/Profile/Xếp hạng/Cài đặt, hai mục đầu Sắp ra mắt. Chọn trò: Cửa hàng/Bộ sưu tập/Bản đồ/Xếp hạng/Cài đặt. Không profile/Xu trên header; Exit góc trên phải map/tab trở về Home. Gameplay giữ HUD/bàn/khay, ẩn dock; ba gạch mở Tạm dừng với Thoát game/Chơi lại/Cài đặt, giữ ván và pause trong Cài đặt. Quảng cáo chỉ Home/map. Mục20 là scope hiện hành, thay các mô tả UI cũ.
+- Hướng menu hiện tại (mục20): ngoài gameplay dùng năm tab toàn màn hình. Home: Nhiệm vụ/Sự kiện/Profile/Xếp hạng/Cài đặt, hai mục đầu Sắp ra mắt. Chọn trò: Cửa hàng/Bộ sưu tập/Bản đồ/Xếp hạng/Cài đặt. Không profile/Xu trên header; Exit góc trên phải map/tab trở về Home. Gameplay giữ HUD/bàn/khay, ẩn dock; ba gạch mở Tạm dừng với Thoát game/Chơi lại/Cài đặt, giữ ván và pause trong Cài đặt. Quảng cáo chỉ Home/map. Mục20 là scope hiện hành, thay các mô tả UI cũ.
 - Bản đồ dùng sao chưa sáng/sao sáng theo kết quả của độ khó đang xem; completion chung giữa độ khó vẫn là dữ liệu riêng, không suy từ số sao. Không có tìm/lọc màn; re-entry về frontier.
 - Màn thường xếp hạng riêng theo trò/độ khó/màn, ưu tiên thời gian thực đang chơi ngắn nhất (loại tải/pause/menu/tab ẩn). Cho phép hỗ trợ, guest/Google; một kỷ lục mỗi UID/bảng. Backend cơ bản client-trusted đã triển khai, contract/quota cũ ở mục12 ADVENTURE_WEB_PLAN.md.
 - Luật hiện hành v3 (2026-10-15): mỗi trò ba bảng Hành trình/Thử thách/Vô tận theo màn đã thắng. Hành trình gom bốn độ khó; special Chơi lại bắt đầu lượt mới từ1, resume giữ lượt và bàn. Checkpoint/điểm v2 giữ làm lịch sử, không import special cũ vào v3; luật restart giữ lượt của Gate2 cũ đã được thay thế theo kế hoạch level.

@@ -52,7 +52,7 @@ test('profile failures keep the draft, UID changes discard it, pending actions d
   await page.evaluate(() => { window.profileFailure = false; window.profileDeferred = true; });
   await page.getByRole('button', { name: 'Lưu tên', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Lưu tên', exact: true })).toBeDisabled();
-  await page.locator('.adventure-screen [data-dock-action="friends"]').click();
+  await page.locator('.adventure-screen [data-dock-action="events"]').click();
   await page.evaluate(() => window.profileRelease());
   await expect(page.locator('#account-modal')).toHaveCount(0);
   expect(await page.evaluate(() => window.profileListeners)).toBe(0);
@@ -61,7 +61,7 @@ test('30 profile mount and close cycles release subscriptions', async ({ page })
   await open(page);
   for (let i = 0; i < 30; i++) {
     expect(await page.evaluate(() => window.profileListeners)).toBe(1);
-    await page.locator('.adventure-screen [data-dock-action="friends"]').click();
+    await page.locator('.adventure-screen [data-dock-action="events"]').click();
     expect(await page.evaluate(() => window.profileListeners)).toBe(0);
     await page.locator('.adventure-screen [data-dock-action="profile"]').click();
   }
