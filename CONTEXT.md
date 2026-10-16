@@ -6,6 +6,8 @@ Người dùng đã chọn tự xuất bản website và thông điệp AdMob ng
 
 ## Sản phẩm
 
+- Web đã bổ sung banner tĩnh **Quảng cáo mô phỏng** ở Home/map theo yêu cầu16/10, dùng chung navigation/blocker/lifecycle với Android. Vùng60px + gap28px, ẩn modal/tab/gameplay/nền/nhập chữ; không gọi Google hoặc đổi save/Auth/API. Native regression9/9, web review độc lập4/4, production smoke1/1, check/build web/build Android đạt; ảnh và kết quả ở `docs/ads/QA.md`. Chưa deploy, APK đã bàn giao giữ nguyên.
+
 - Tab Sự kiện thay Bạn bè ngày2026-10-16: action events, tiêu đề/nhãn Sự kiện, biểu tượng lịch. Hiện Sắp ra mắt, chưa triển khai tính năng sự kiện. Giữ nền courtyard hiện có và lifecycle chung; không đổi save/schema/Auth. UI36/36, review độc lập3/3, check/build web/Android pass; QA tại `docs/design/app-tabs/QA.md`.
 
 - Profile đã bỏ dòng “Tính từ…” theo yêu cầu ngày2026-10-16; chỉ hiển thị ngày tham gia/tạo hồ sơ và tổng thời gian chơi. trackedSince/counter vẫn giữ nội bộ, không đổi service/schema/save. UI5/5, review độc lập1/1, check/build web/Android pass. Ảnh và bằng chứng ở `docs/design/app-tabs/QA.md`.

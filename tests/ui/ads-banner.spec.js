@@ -14,6 +14,13 @@ async function settled(page) {
 }
 async function visible(page) { await expect(page.locator('[data-fake-native-banner]')).toHaveCount(1); }
 async function absent(page) { await expect(page.locator('[data-fake-native-banner]')).toHaveCount(0); }
+async function openGameMap(page, game) {
+  const titles = { 'memory-match': 'Memory Match', 'link-connect': 'Link Connect', 'triple-connect': 'Triple Connect' };
+  await page.getByRole('button', { name: `Chọn ${titles[game]}`, exact: true }).click();
+  const card = page.locator(`.game-selector__choice[data-game-id="${game}"]`);
+  await expect(card).toHaveClass(/is-selected/);
+  await card.click();
+}
 
 for (const viewport of [{ width: 412, height: 915 }, { width: 844, height: 390 }, { width: 1024, height: 900 }]) {
   test(`banner preserves dock clearance and home/map layout at ${viewport.width}`, async ({ page }) => {
@@ -29,7 +36,7 @@ for (const viewport of [{ width: 412, height: 915 }, { width: 844, height: 390 }
     expect(controls.y + controls.height).toBeLessThanOrEqual(dock.y + 1);
     await page.screenshot({ path: `docs/ads/qa/banner-mock-${viewport.width}.png` });
     for (const game of ['memory-match', 'link-connect', 'triple-connect']) {
-      await page.locator(`.game-selector__choice[data-game-id="${game}"]`).click();
+      await openGameMap(page, game);
       await expect(page.locator('[data-map-ready="true"]')).toBeVisible(); await visible(page);
       await page.locator('.adventure-map-page .adventure-exit').click(); await visible(page);
     }
@@ -62,7 +69,7 @@ test('all functional tabs hide banner and privacy options open without retaining
 test('preview, gameplay, restart and all three games never retain the menu banner', async ({ page }) => {
   await mockNative(page); await page.goto('/'); await visible(page);
   for (const game of ['memory-match', 'link-connect', 'triple-connect']) {
-    await page.locator(`.game-selector__choice[data-game-id="${game}"]`).click(); await visible(page);
+    await openGameMap(page, game); await visible(page);
     await startMapLevel(page); await absent(page);
     const trigger = game === 'memory-match' ? '#btn-actions-menu' : game === 'link-connect' ? '#link-actions-menu-toggle' : '#triple-actions-menu-toggle';
     await expect(page.locator(trigger)).toBeVisible();

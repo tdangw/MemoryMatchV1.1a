@@ -9,10 +9,12 @@ test('built mobile menu, map and account open without writing to production serv
   page.on('pageerror', error => errors.push(error.message));
   await page.goto('/');
   await expect(page.locator('.game-selector__choice')).toHaveCount(3);
+  await expect(page.locator('.menu-ad-preview')).toHaveCount(1);
   await expect(page.locator('.adventure-wallet')).toHaveCount(0);
   await expect(page.locator('.adventure-account')).toHaveCount(0);
   await page.locator('.game-selector__choice').filter({ hasText: 'Memory Match' }).click();
   await expect(page.locator('#menu-container[data-map-ready="true"]')).toBeVisible();
+  await expect(page.locator('.menu-ad-preview')).toHaveCount(1);
   await expect(page.locator('.adventure-map-node--level')).toHaveCount(100);
   await expect(page.locator('[data-level="1"]')).toBeEnabled();
   await expect(page.locator('[data-level="2"]')).toBeDisabled();
@@ -23,11 +25,14 @@ test('built mobile menu, map and account open without writing to production serv
   });
   expect(atlasReady).toBe(true);
   await previewMapLevel(page, 1, 'hard');
+  await expect(page.locator('.menu-ad-preview')).toHaveCount(0);
   await closeLevelPreview(page);
+  await expect(page.locator('.menu-ad-preview')).toHaveCount(1);
   await expect(page.locator('.adventure-mode-toggle')).toHaveCount(0);
   await page.locator('.adventure-exit').click();
   await page.locator('[data-dock-action="profile"]').click();
   await expect(page.locator('#account-modal')).toBeVisible();
+  await expect(page.locator('.menu-ad-preview')).toHaveCount(0);
   await expect(page.locator('#account-modal')).not.toContainText('Firebase');
   await expect(page.getByRole('button', { name: 'Đồng bộ ngay', exact: true })).toHaveCount(0);
   await expect(page.locator('#account-modal .app-modal__close')).toHaveCount(0);

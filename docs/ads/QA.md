@@ -46,6 +46,17 @@ Reviewer chỉ đọc và chạy test, không sửa file. Đã tìm ra tình hu�
 
 ## Nội dung và ảnh
 
+### Bổ sung banner mô phỏng trên web
+
+Theo yêu cầu tiếp theo ngày16/10, bản web có vùng **Quảng cáo mô phỏng** tĩnh ở Home/map, dùng cùng quy tắc chuyển màn và chặn quảng cáo như Android. Chiều cao đại diện60px, cách dock28px; không mô phỏng nội dung/quảng cáo Google hoặc tự cấp thưởng. Không đổi API lưu/schema/tài khoản/luật chơi. Controller web sở hữu duy nhất một node, hủy ngay khi đổi target/dispose; không thêm listener/timer/animation riêng. Phương án dùng SDK giả đã loại vì có thể nhầm trạng thái quyền riêng tư và tải quảng cáo; phần hiển thị riêng dùng lại lifecycle chung giữ service web unsupported.
+
+- Bộ quảng cáo native mô phỏng chạy lại:9/9 đạt. Test chọn trò qua nút chọn trước khi mở, tương thích carousel đang chỉnh song song.
+- Reviewer đọc diff và chạy độc lập bộ web mới:4/4 đạt ở412×915,844×390,1024×900; tab/màn chơi ba game, mở/đóng level modal, resize, pagehide/pageshow, nhập chữ và30chu kỳ đều đạt; dispose lặp không giữ node. Không finding còn mở.
+- Lần chạy review đầu2/4 đạt, hai ca mobile thất bại vì test bấm thẻ bên cạnh trước khi chọn trò. Đã sửa thao tác test theo hành vi chọn rồi mở, giữ nguyên code carousel, chạy lại4/4 đạt. Không nới assertion/ngưỡng để bỏ qua lỗi.
+- Đã mở ảnh `qa/web-preview-412.png` và `qa/web-preview-844.png`: nhãn mô phỏng rõ, không chồng dock/controls; ảnh desktop ở `qa/web-preview-1024.png`. Các ảnh này không phải quảng cáo thật.
+- Không deploy website, không xuất bản thông điệp AdMob hoặc thay bản APK đã bàn giao trong phần bổ sung web này.
+- Cổng cuối: `npm run check` đạt (unit quảng cáo15/15, Triple p95 15,44ms); `npm run build:android` và `npm run build` đạt. Smoke bản web đã đóng gói1/1 đạt, gồm banner Home/map và ẩn khi mở preview/profile. Build Android chỉ kiểm tra đóng gói phần dùng chung, không tạo lại APK hoặc xác nhận quảng cáo thật.
+
 Đã mở ảnh kiểm tra bố cục dọc/ngang và trang quyền riêng tư. Các ảnh `banner-mock-*` là mô phỏng vùng quảng cáo qua bài test trình duyệt, **không phải quảng cáo từ Google**. `privacy-412.png` là trang công khai được chuẩn bị; `privacy-settings-412.png` là nội dung trong Cài đặt. Không dùng thuật ngữ lập trình trong nội dung giải thích cho người chơi.
 
 Skill làm rõ yêu cầu dùng để chốt banner/package và cách bảo vệ trẻ em. Computer Use dùng để kiểm tra tài khoản AdMob và giới hạn nội dung. Không dùng imagegen hoặc thay mỹ thuật của trò chơi trong task này.

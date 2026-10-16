@@ -10,6 +10,8 @@ Mở **Cài đặt → Quyền riêng tư** để đọc thông tin trong trò c
 
 ## Việc cần làm trong AdMob
 
+Bản web hiện có vùng **Quảng cáo mô phỏng** ở trang chủ và bản đồ để bạn kiểm tra bố cục tương tự ứng dụng Android. Vùng này tự ẩn khi vào màn chơi, tab chức năng, hộp thoại hoặc lúc nhập chữ; không tải quảng cáo từ Google. Banner thật vẫn chỉ được dùng trong ứng dụng Android.
+
 **Đã chuẩn bị ngày 16/10/2026:** mức nội dung G đã được lưu riêng cho Memory Match. Bản nháp **Quyền riêng tư · Memory Match Adventure** đã được lưu trong phần Quy định của Châu Âu, chỉ chọn Memory Match; có lựa chọn đồng ý, không đồng ý và quản lý lựa chọn. Bản nháp dùng tiếng Anh vì danh sách ngôn ngữ Google cung cấp ở đây không có tiếng Việt. Chưa xuất bản. Bạn đã chọn tự đưa website và thông điệp lên.
 
 **Các bước bạn cần làm tiếp:**

@@ -2,6 +2,7 @@ import { isAndroidAdsPlatform } from './platform.js';
 import { AD_CONFIG } from './adConfig.js';
 import { createAdService } from './adService.js';
 import { createBannerController } from './bannerController.js';
+import { createWebBannerController } from './webBannerController.js';
 import { createGameShellLifecycle } from '../gameShell/gameShellLifecycle.js';
 
 let target = null, runtime = null, starting = null;
@@ -28,27 +29,27 @@ export async function openAdPrivacyOptions() {
 }
 
 export function initializeMenuAds() {
-  if (!isAndroidAdsPlatform) return Promise.resolve(null);
   if (runtime) return Promise.resolve(runtime);
   if (starting) return starting;
-  starting = start().catch(error => { console.warn('Android advertisements unavailable', error); return null; })
+  starting = start().catch(error => { console.warn('Menu advertisements unavailable', error); return null; })
     .finally(() => { starting = null; });
   return starting;
 }
 
 async function start() {
-  const { nativeAds, nativeApp } = await import('./nativeAdapter.js');
+  const { nativeAds, nativeApp } = isAndroidAdsPlatform ? await import('./nativeAdapter.js') : {};
   const scope = createGameShellLifecycle();
-  const service = createAdService({ native: nativeAds, supported: true });
-  const controller = createBannerController({ service, render(slot, height) {
+  const service = createAdService({ native: nativeAds, supported: isAndroidAdsPlatform });
+  const render = (slot, height) => {
     if (slot.isConnected) {
       slot.dataset.nativeAd = height > 0 ? 'visible' : 'empty';
       slot.style.setProperty('--ad-banner-height', `${height}px`);
       slot.style.setProperty('--ad-banner-gap', `${height > 0 ? AD_CONFIG.interactionGap : 0}px`);
       slot.closest('.adventure-page').style.setProperty('--menu-ad-space', `${height > 0 ? height + AD_CONFIG.interactionGap : 0}px`);
     }
-  } });
-  let active = false, nativeRevision = 0, lastTarget = null;
+  };
+  const controller = isAndroidAdsPlatform ? createBannerController({ service, render }) : createWebBannerController({ render });
+  let active = !isAndroidAdsPlatform, nativeRevision = 0, lastTarget = null;
   function textEntry() {
     return document.activeElement?.matches('input:not([type="range"]):not([type="checkbox"]):not([type="radio"]), textarea, select, [contenteditable="true"]');
   }
@@ -58,15 +59,17 @@ async function start() {
     controller.setTarget(wanted);
     lastTarget = wanted;
   }
-  const handle = await nativeApp.addListener('appStateChange', state => { nativeRevision++; active = state.isActive; reconcile(); });
-  scope.own(() => { void handle.remove().catch(error => console.warn('AdMob foreground listener cleanup failed', error)); });
-  try {
-    const before = nativeRevision;
-    const state = await nativeApp.getState();
-    if (before === nativeRevision) active = state.isActive;
-  } catch (error) {
-    console.warn('AdMob foreground state unavailable', error);
-    // Fail closed until an actual foreground event arrives.
+  if (isAndroidAdsPlatform) {
+    const handle = await nativeApp.addListener('appStateChange', state => { nativeRevision++; active = state.isActive; reconcile(); });
+    scope.own(() => { void handle.remove().catch(error => console.warn('AdMob foreground listener cleanup failed', error)); });
+    try {
+      const before = nativeRevision;
+      const state = await nativeApp.getState();
+      if (before === nativeRevision) active = state.isActive;
+    } catch (error) {
+      console.warn('AdMob foreground state unavailable', error);
+      // Fail closed until an actual foreground event arrives.
+    }
   }
   scope.listen(document, 'visibilitychange', reconcile);
   scope.listen(document, 'focusin', reconcile);
@@ -86,6 +89,7 @@ async function start() {
   } };
   scope.listen(window, 'pagehide', () => { active = false; reconcile(); });
   scope.listen(window, 'pageshow', () => {
+    if (!isAndroidAdsPlatform) { active = true; reconcile(); return; }
     const before = nativeRevision;
     void nativeApp.getState().then(state => {
       if (scope.active && before === nativeRevision) { active = state.isActive; reconcile(); }
