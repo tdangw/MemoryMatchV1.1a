@@ -52,6 +52,8 @@ npm run android:apk
 
 Để build release, cấu hình keystore theo `android/keystore.properties.example` rồi chạy `npm run android:apk:release`.
 
+Bản Android có banner ở trang chủ và bản đồ, áp dụng bảo vệ trẻ em cho mọi người chơi và không cá nhân hóa quảng cáo. Bản web không tải quảng cáo Android. Xem [hướng dẫn thử APK và chuẩn bị AdMob](docs/ads/HUONG_DAN_THU_APK.md). Trang quyền riêng tư có trong Cài đặt và được chuẩn bị tại `public/legal/privacy.html`; chưa tự đưa lên website khi build APK.
+
 ## Cấu trúc
 
 - `index.html`: khung giao diện và entry `/js/main.js`.

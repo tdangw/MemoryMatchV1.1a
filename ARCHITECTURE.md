@@ -128,6 +128,8 @@ Game Shell giữ đủ sáu region công khai: `title`, `progress`, `hud`, `mile
 
 ## 7. Nguồn cấu hình
 
+Quảng cáo Android nằm trong `js/ads/`: cấu hình ứng dụng và banner ở `adConfig.js`; `menuAds.js` nhận màn hình đang hiển thị và trạng thái ứng dụng; `bannerController.js` quản lý duy nhất một banner, gỡ quảng cáo trước khi chuyển sang màn không được phép hiển thị. `adService.js` xử lý lựa chọn quyền riêng tư trước khi tải quảng cáo. Hai thao tác tạo/hủy qua `BannerBridgePlugin.java` được thực hiện theo thứ tự trên giao diện Android để không giữ banner cũ khi chuyển màn nhanh. Web không tải bộ kết nối quảng cáo Android. Quyền riêng tư trong trò chơi và trang website cùng lấy nội dung từ `js/privacyContent.js`; `scripts/generate-privacy-page.mjs` tạo trang tĩnh trong lần build. Không đổi dữ liệu lưu, tài khoản, luật chơi hoặc phần thưởng.
+
 | Nội dung | Nguồn |
 | --- | --- |
 | Memory Match | `js/config.js` |

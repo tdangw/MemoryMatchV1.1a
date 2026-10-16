@@ -43,7 +43,7 @@ export function createBannerController({ service, render, report = console.warn 
         blocked = ++revision;
         void kick();
       }));
-      if (requested !== revision) continue;
+      if (requested !== revision) { entry.invalidated = true; continue; }
       phase = 'loading';
       entry.started = true; // A rejected bridge call may still have created a view.
       try { await service.show(); }

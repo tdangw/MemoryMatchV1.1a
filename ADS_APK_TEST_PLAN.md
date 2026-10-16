@@ -8,7 +8,7 @@ Ngày khảo sát: 2026-10-15. Người dùng giao triển khai ngày 2026-10-16
 - Phase 1 hoàn tất: đã cài/pin AdMob8.2.1/App8.1.2; cấu hình hai ID thật, bảo vệ trẻ em cho mọi người chơi, không cá nhân hóa, mức nội dung gia đình. Bảy kiểm thử service, Android build/sync và `:app:compileDebugJavaWithJavac` đã đạt. Hai thao tác tạo/hủy banner được chuyển qua cầu nối nhỏ trên luồng giao diện Android: plugin gốc trả promise remove trước lúc view thực sự bị hủy; chỉ xếp hàng JS không đủ chặn race này. Không chỉnh node_modules. Gỡ quyền Advertising ID/AdServices khỏi bản hợp nhất và chặn đo quảng cáo trước initialize; cần kiểm chứng manifest đóng gói cuối.
 - Phase 2 hoàn tất: một banner owner, thao tác native tuần tự, gỡ khi đổi tab/gameplay/modal/nhập chữ/nền; chiều cao theo sự kiện và cách dock28px. Home ngang co thẻ trong phạm vi banner để các nút chuyển trò không bị dock che. Trang quyền riêng tư dùng một nguồn cho bản trong trò chơi và trang website; nội dung dễ hiểu, không sao chép tính năng khác. Tệp app-ads.txt sẵn có cho lần đưa website sau, chưa deploy. Unit14/14, UI9/9 qua adapter mô phỏng đạt, gồm30chu kỳ và restart ba game; đây chưa phải bằng chứng quảng cáo native thật.
 - Phase 3 hoàn tất: xác nhận luồng ứng dụng chỉ gọi banner; không có API thưởng/video/toàn màn hình hoặc mock thưởng trong service. Kiểm thử web xác nhận không tải native adapter. Gate3 dành cho quảng cáo bổ sung đã loại khỏi phạm vi như lựa chọn người dùng; không thêm đếm màn, phần thưởng hay thay save.
-- Phase 4: kiểm thử, đánh giá riêng và đóng gói APK; chưa hoàn tất.
+- Phase 4 hoàn tất: check đầy đủ đạt (Triple p95 14,32ms, không đổi ngưỡng20ms); unit15/15; bộ trình duyệt71/71; chạy lại quảng cáo sau sửa race9/9; bản web đã build và smoke1/1; bản Android build/sync/assembleDebug đạt. APK34.250.102bytes, package/version đúng, chữ ký debug hợp lệ, không có quyền Advertising ID/AdServices trong APK. Reviewer độc lập tái hiện/sửa/xác minh race Home→ẩn→Home, chạy lại15test và probe riêng: một banner, dispose về0banner/0listener; không còn finding mở.
 - Phase 5: thử APK trên thiết bị; chưa hoàn tất. Nếu không có điện thoại kết nối hoặc không truy cập được AdMob thì ghi đúng phần chưa xác minh, hoàn tất mọi phần còn lại có thể thực hiện.
 
 Người dùng xác nhận có trẻ em dưới13tuổi và chọn bảo vệ trẻ em cho tất cả người chơi, không hỏi tuổi. Cấu hình quảng cáo áp dụng lựa chọn này cho mọi request; đây không phải xác nhận phát hành Play hay hoàn tất mọi yêu cầu đối với ứng dụng trẻ em. Không đổi tài khoản hay phát hành website chỉ để tạo bản APK thử.
@@ -22,9 +22,9 @@ Người dùng xác nhận có trẻ em dưới13tuổi và chọn bảo vệ tr
 - Không đổi save/API/catalog/luật game/ranking, không tự deploy Hosting, không tạo tài khoản/quảng cáo trong console hoặc phát hành Play trong lượt lập kế hoạch.
 - Hoàn thành lượt lập kế hoạch: có inventory, lựa chọn kỹ thuật, ranh giới owner, gate kiểm thử, checklist người dùng và các quyết định còn thiếu. Các gate bên dưới là công việc triển khai tương lai, chưa có bằng chứng pass.
 
-**Đã chốt:** banner-only Home/map, giữ package, tạo app AdMob riêng. **Còn cần trước Gate 0:** App ID/banner unit ID; đối tượng tuổi và thị trường dự kiến để cấu hình privacy/ad-request phù hợp. Các quyết định video thưởng/interstitial chỉ cần ở task sau, không chặn banner hoặc trở thành gate của APK đầu tiên.
+**Đã chốt:** chỉ banner Home/map, giữ package, hai ID thật đã được cung cấp. Có trẻ em dưới13tuổi; áp dụng bảo vệ trẻ em cho mọi người chơi, không hỏi tuổi, không cá nhân hóa và chỉ nội dung gia đình. Việc xác nhận thông điệp trong tài khoản AdMob và thử trên điện thoại vẫn cần bằng chứng riêng. Các quyết định video thưởng/interstitial chỉ cần ở task sau, không chặn banner hoặc trở thành gate của APK đầu tiên.
 
-## 2. Bằng chứng hiện trạng
+## 2. Bằng chứng ban đầu, trước triển khai (2026-10-15)
 
 | Hạng mục | Đã kiểm tra | Ý nghĩa |
 |---|---|---|
@@ -122,6 +122,8 @@ Nếu được giao interstitial: chỉ natural break được duyệt, không c
 - Pass: QA native có bằng chứng, lỗi no-fill phân biệt với lỗi cấu hình, không crash/chặn input/timer/reward hoặc mất dữ liệu. Các format không chọn không nằm trong matrix.
 
 ## 6. Việc người dùng chuẩn bị
+
+Đây là checklist từ lần lập kế hoạch. Package và hai ID ở bước1–5 đã được người dùng cung cấp ngày2026-10-16, không tạo lại. Hướng dẫn hiện hành cho những việc còn lại ở `docs/ads/HUONG_DAN_THU_APK.md`.
 
 ### Cần trước khi tích hợp quảng cáo thật
 

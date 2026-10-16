@@ -181,6 +181,22 @@ test('partial registration failure cleans earlier handles immediately', async ()
   assert.equal(f.callbacks.size, 0); assert.equal(f.controller.diagnostics().bannerCount, 0);
 });
 
+test('home → hidden → home during listener registration eventually shows exactly one banner', async () => {
+  const gate = deferred(), registering = deferred(), f = bannerFixture();
+  const original = f.service.listen;
+  let first = true;
+  f.service.listen = async (...args) => {
+    if (first) { first = false; registering.resolve(); await gate.promise; }
+    return original(...args);
+  };
+  f.controller.setTarget('home'); await registering.promise;
+  f.controller.setTarget(null); f.controller.setTarget('home');
+  gate.resolve(); await f.controller.idle();
+  assert.equal(f.calls.filter(value => value === 'show').length, 1);
+  assert.equal(f.callbacks.size, 2); assert.equal(f.maximum(), 1);
+  await f.controller.dispose(); assert.equal(f.callbacks.size, 0);
+});
+
 test('failed remove never permits a second native banner; next event can retry cleanup', async () => {
   const f = bannerFixture(), original = f.service.remove;
   let failed = true;
