@@ -4,6 +4,8 @@
 
 ## Sản phẩm
 
+- Active: `HOME_CAROUSEL_PLAN.md` — Home chọn trò ở giữa, vuốt trái/phải, mũi tên/chấm/bàn phím. Phase1 đã đạt17/17; phase2 regression/review/build đang nghiệm thu. Giữ art/save/catalog/navigation và nội dung tab/popup.
+
 - Popup Thử thách/Vô tận của cả3trò đã đồng bộ với popup màn Hành trình: xem thông tin màn1 rồi bấm Chơi, không chọn độ khó; thời gian/mục tiêu/gợi ý/khay/chủ đề theo config/profile. Vô tận ghi Không giới hạn, không lặp popup intro. Hủy không đổi save/session/độ khó thường; submit có guard/retry. QA45ca có kết quả đạt, review độc lập14/14; check/build web/build Android pass. Không đổi save schema/luật chơi. Chi tiết: `docs/design/special-mode-preview/QA.md`.
 
 - `HOME_MENU_IMPLEMENTATION_PLAN.md`: Home hướng1 đã triển khai: Memory lớn, Link/Triple bên dưới; ba WebP riêng tổng349.418bytes, CSS và listener có owner rõ. QA: `docs/design/home-menu/QA.md`. Gỡ ornament ảnh trên pause popup theo yêu cầu. Không đổi navigation API/save/catalog; phase1–3 hoàn tất, check/build web và Android pass, review độc lập7/7. Không còn gate triển khai active.

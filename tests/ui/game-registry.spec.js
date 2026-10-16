@@ -12,34 +12,10 @@ test("registry exposes only released games in the selector", async ({
     "Memory Match",
     "Adventure",
   ]);
-  await expect(page.locator(".menu-wrapper--game-selector > .menu-description"))
-    .toHaveCSS("font-size", "14px");
-  for (const caption of await page.locator(".game-selector__choice small").all()) await expect(caption).toHaveCSS("font-size", "13px");
-  const selectorDescription = page.locator(".menu-wrapper--game-selector > .menu-description");
-  for (const width of [412, 1024]) {
-    await page.setViewportSize({ width, height: 900 });
-    const lineCount = await selectorDescription.evaluate((element) => {
-      const style = getComputedStyle(element);
-      return Math.round(element.getBoundingClientRect().height / parseFloat(style.lineHeight));
-    });
-    expect(lineCount, `slogan line count at ${width}px`).toBe(1);
-  }
-  await expect(page.locator(".game-selector__choice")).toHaveText([
-    /Memory Match.*Mới thấy đó thôi, chớp mắt đã quên!/s,
-    /Link Connect.*Ngay trước mắt nhìn, vạn dặm xa xôi!/s,
-    /Triple Connect.*Nhìn tưởng dễ ăn, chớp mắt chịu thua!/s,
-  ]);
-  await expect(page.locator(".game-selector")).toContainText(
-    "Memory Match Adventure",
-  );
-  await expect(page.locator(".game-selector")).toContainText(
-    "Trí nhớ là hành trang. Cuộc phiêu lưu là lẽ sống.",
-  );
-  await expect(
-    page
-      .locator(".game-selector__choice")
-      .filter({ hasText: "Triple Connect" }),
-  ).toContainText("Nhìn tưởng dễ ăn, chớp mắt chịu thua!");
+  await expect(page.locator('.menu-wrapper--game-selector > .menu-description')).toHaveCount(0);
+  await expect(page.locator('.game-selector__choice')).toHaveText(['Memory Match', 'Link Connect', 'Triple Connect']);
+  await expect(page.locator('.game-selector__dot')).toHaveCount(3);
+  await expect(page.locator('.game-selector__choice[aria-current="true"]')).toHaveText('Memory Match');
 });
 
 test("released game adapters still open their matching menus", async ({
