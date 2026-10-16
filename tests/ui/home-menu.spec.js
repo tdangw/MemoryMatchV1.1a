@@ -92,11 +92,17 @@ test.describe('native touch scrolling', () => {
     await page.goto('/'); await centered(page, 0);
     const session = await page.context().newCDPSession(page);
     async function swipe(direction) {
+      await page.evaluate(() => {
+        window.homeSwipeSettled = false;
+        document.querySelector('.game-selector__choices').addEventListener('scrollend', () => { window.homeSwipeSettled = true; }, { once: true });
+      });
       const box = await page.locator('.game-selector__choices').boundingBox();
       const x = direction === 'left' ? 330 : 80, y = box.y + box.height / 2;
       await session.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y }] });
       for (let i = 1; i <= 12; i++) await session.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: x + (direction === 'left' ? -1 : 1) * i * 22, y }] });
       await session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+      // A centered card can be crossed while inertia is still active: assert only after native snap settles.
+      await expect.poll(() => page.evaluate(() => window.homeSwipeSettled)).toBe(true);
     }
     await swipe('left'); await centered(page, 1);
     await swipe('left'); await centered(page, 2);

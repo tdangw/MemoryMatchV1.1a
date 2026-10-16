@@ -31,3 +31,5 @@ Sheet là nguồn tổng quan, không phải atlas đã cắt với các ô đ�
 Theo yêu cầu triển khai hướng1, đã dùng imagegen built-in dựng riêng3cảnh theo mẫu đã chọn, không phóng lớn các ô400px của sheet. Master PNG giữ ngoài bundle trong `masters/`; [prompt](runtime-prompts-v1.json), [metadata](runtime-metadata-v1.json). Chỉ ảnh minh họa cơ chế ghép cặp/nối cặp/ba thẻ cùng loại; không bake tên/nút/UI vào tranh. Triple không vẽ khay tránh mô tả sai dung lượng.
 
 `python scripts/prepare-home-menu-assets.py` chỉ xuất RGB/resize/WebP, không vẽ/cắt/chỉnh nội dung. Runtime: Memory900×600/134.722bytes, Link576×720/100.752bytes, Triple576×720/113.944bytes; tổng349.418bytes, gate≤350.000bytes. Tên/viền/focus vẫn là DOM/CSS. Nền Home dùng lại Vườn đêm36.046bytes hiện có, không tạo bản gần giống. Ảnh popup trong game không dùng bộ art này.
+
+Ngày2026-10-16: art runtime giữ nguyên, Home chuyển sang một trò ở giữa và vuốt ngang; viền/nhãn đơn giản hơn, không dùng flourish tiêu đề. Không tạo hoặc tải thêm tranh. QA hiện hành: [carousel](../home-carousel/QA.md).

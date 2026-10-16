@@ -1,5 +1,7 @@
 # Home hướng1 — nghiệm thu 2026-10-15
 
+Bố cục này đã được thay bằng [Home vuốt ngang](../home-carousel/QA.md) ngày2026-10-16 theo yêu cầu người dùng; ảnh dưới đây là hồ sơ của phiên bản trước.
+
 Home dùng Memory Match rộng phía trên, Link/Triple bên dưới; compact landscape dùng ba cột. Thêm trò chuyển sang lưới. Tên và điều hướng là DOM/native buttons để giữ bàn phím, responsive và fallback khi ảnh lỗi; không dùng screenshot làm UI. Không đổi API, catalog hoặc dữ liệu lưu.
 
 Skill imagegen tạo ba tranh riêng theo concept đã chọn. Master PNG ngoài bundle, generator đóng gói WebP: Memory134.722bytes, Link100.752bytes, Triple113.944bytes; tổng349.418bytes ≤350KB. Nền Vườn đêm và flourish Home tái sử dụng. Ornament trên popup tạm dừng đã gỡ theo yêu cầu, không áp dụng art sheet mới vào game.

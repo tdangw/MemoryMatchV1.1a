@@ -1,16 +1,16 @@
-# CONTEXT — Trạng thái hiện tại (2026-10-15)
+# CONTEXT — Trạng thái hiện tại (2026-10-16)
 
 Đọc file này khi bắt đầu task mới. Đây là snapshot điều hướng, không thay thế code/config và không chứa lịch sử triển khai chi tiết.
 
 ## Sản phẩm
 
-- Active: `HOME_CAROUSEL_PLAN.md` — Home chọn trò ở giữa, vuốt trái/phải, mũi tên/chấm/bàn phím. Phase1 đã đạt17/17; phase2 regression/review/build đang nghiệm thu. Giữ art/save/catalog/navigation và nội dung tab/popup.
+- `HOME_CAROUSEL_PLAN.md` hoàn tất: Home một trò ở giữa, vuốt trái/phải, hé trò hai bên; mũi tên/chấm và bàn phím. Native scroll-snap, scope sở hữu frame/observer/listener, không clone/tự chạy; giữ art/save/catalog/navigation và nội dung tab/popup. Phase1 commit665dafb. Home/registry17ca, regression52/52, review cuối12/12 và touch lặp5/5 đạt; check/build web/Android pass. QA: `docs/design/home-carousel/QA.md`. Không còn gate triển khai active; S22 Ultra thật còn chờ.
 
 - Popup Thử thách/Vô tận của cả3trò đã đồng bộ với popup màn Hành trình: xem thông tin màn1 rồi bấm Chơi, không chọn độ khó; thời gian/mục tiêu/gợi ý/khay/chủ đề theo config/profile. Vô tận ghi Không giới hạn, không lặp popup intro. Hủy không đổi save/session/độ khó thường; submit có guard/retry. QA45ca có kết quả đạt, review độc lập14/14; check/build web/build Android pass. Không đổi save schema/luật chơi. Chi tiết: `docs/design/special-mode-preview/QA.md`.
 
-- `HOME_MENU_IMPLEMENTATION_PLAN.md`: Home hướng1 đã triển khai: Memory lớn, Link/Triple bên dưới; ba WebP riêng tổng349.418bytes, CSS và listener có owner rõ. QA: `docs/design/home-menu/QA.md`. Gỡ ornament ảnh trên pause popup theo yêu cầu. Không đổi navigation API/save/catalog; phase1–3 hoàn tất, check/build web và Android pass, review độc lập7/7. Không còn gate triển khai active.
+- `HOME_MENU_IMPLEMENTATION_PLAN.md` là hồ sơ Home bố cục1+2 ngày2026-10-15, đã được thay bằng carousel ngày2026-10-16. Ba WebP riêng tổng349.418bytes tiếp tục dùng; nguồn art ở `docs/design/home-assets/README.md`, QA cũ ở `docs/design/home-menu/QA.md`. Ornament ảnh trên pause popup đã gỡ theo yêu cầu.
 
-- Home đã chốt hướng1 (một ô lớn/hai ô nhỏ, có thể mở rộng lưới). Sheet12vùng nền trò/popup/tiêu đề/khung dùng skill imagegen đã lưu ở `docs/design/home-assets/README.md`; PNG alpha và ảnh QA nền tối đã kiểm. Sheet1254px chỉ là nguồn tham khảo; runtime Home dùng ba tranh riêng có master lớn hơn, không dùng sheet làm nền cả màn.
+- Sheet12vùng nền trò/popup/tiêu đề/khung ở `docs/design/home-assets/README.md` chỉ là nguồn tham khảo; runtime Home dùng ba tranh riêng có master lớn hơn, không dùng sheet làm nền cả màn. Carousel hiện không dùng flourish tiêu đề, không tạo thêm art.
 
 - `POPUP_POLISH_PLAN.md`: phase1–5 hoàn tất trong phạm vi được giao, không còn kế hoạch triển khai active. Exit bản đồ và mọi screen chức năng (gồm Cửa hàng/Bộ sưu tập) gắn header; Xu giữa Cửa hàng; title Bộ sưu tập không lặp game. Popup bám board, bản đồ dùng cùng mốc chrome ngay lần đầu; menu tạm dừng Vườn đêm có Tiếp tục. QA: `docs/design/popups/QA.md`. Hai mẫu Home và prompt ở `docs/design/home-concepts/README.md`, là nguồn tham khảo cho Home hiện tại. Không deploy/đổi save; S22 Ultra thật còn chờ.
 

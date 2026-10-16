@@ -6,6 +6,8 @@ Chọn native horizontal scroll-snap thay custom pointer-drag: browser sở hữ
 
 Phase1 (hoàn tất): renderer/CSS carousel, chỉ số từ vị trí cuộn, keyboard/controls/resize, asset fallback và kiểm tra mobile/landscape/desktop, touch thật qua browser. Commit khi test mục tiêu đạt.
 
-Phase2: regression Home/tab/map,30cycles cleanup, review độc lập; check/build web/Android, context/architecture/QA, commit. S22 Ultra thật còn chờ, không deploy. Không dừng ở phase trung gian.
+Phase2 (hoàn tất): regression Home/tab/map,30cycles cleanup, review độc lập; check/build web/Android, context/architecture/QA, commit. S22 Ultra thật còn chờ, không deploy. Không dừng ở phase trung gian.
 
 Phase1 đạt17/17 (Home12 +registry5), gồm touch CDP trái/phải không mở map, viewport thấp và chuyển động thường. Sửa intrinsic-width từ wrapper center cũ, title border-box và safe vertical overflow bằng auto margins.30cycles:28listeners,0timer/frame/animation, observer cleanup; owner cũ về0.
+
+Phase2: regression52/52, review độc lập cuối12/12 approve. Test vuốt chờ native scrollend thay bắt transient center; lặp5/5 đạt, không sleep/nới assertion hoặc sửa runtime. npm run check, npm run build, npm run build:android đều exit0. QA ở docs/design/home-carousel/QA.md. Phase1 commit665dafb; commit chứa bản nghiệm thu này là phase2. Không còn gate triển khai active; S22 Ultra thật còn chờ riêng.
