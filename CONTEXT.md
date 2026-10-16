@@ -12,6 +12,8 @@
 
 - Popup Thử thách/Vô tận của cả3trò đã đồng bộ với popup màn Hành trình: xem thông tin màn1 rồi bấm Chơi, không chọn độ khó; thời gian/mục tiêu/gợi ý/khay/chủ đề theo config/profile. Vô tận ghi Không giới hạn, không lặp popup intro. Hủy không đổi save/session/độ khó thường; submit có guard/retry. QA45ca có kết quả đạt, review độc lập14/14; check/build web/build Android pass. Không đổi save schema/luật chơi. Chi tiết: `docs/design/special-mode-preview/QA.md`.
 
+- Active: `ADS_APK_TEST_PLAN.md` — người dùng giao triển khai và commit từng phase ngày2026-10-16. Chỉ banner Home/map, giữ `com.memorymatch.adventure`; đã có App ID/banner unit riêng. Video thưởng/toàn màn hình làm sau. Tham khảo quyền riêng tư cùng chủ sở hữu, câu chữ cho người chơi dễ hiểu; không đổi save/API/Auth hoặc triển khai giao diện khác. Thiết bị test đã đăng ký theo xác nhận người dùng; quảng cáo/thiết bị thật chưa xác minh.
+
 - `HOME_MENU_IMPLEMENTATION_PLAN.md` là hồ sơ Home bố cục1+2 ngày2026-10-15, đã được thay bằng carousel ngày2026-10-16. Ba WebP riêng tổng349.418bytes tiếp tục dùng; nguồn art ở `docs/design/home-assets/README.md`, QA cũ ở `docs/design/home-menu/QA.md`. Ornament ảnh trên pause popup đã gỡ theo yêu cầu.
 
 - Sheet12vùng nền trò/popup/tiêu đề/khung ở `docs/design/home-assets/README.md` chỉ là nguồn tham khảo; runtime Home dùng ba tranh riêng có master lớn hơn, không dùng sheet làm nền cả màn. Carousel hiện không dùng flourish tiêu đề, không tạo thêm art.
