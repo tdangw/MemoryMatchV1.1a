@@ -13,7 +13,7 @@ test("registry exposes only released games in the selector", async ({
     "Adventure",
   ]);
   await expect(page.locator('.menu-wrapper--game-selector > .menu-description')).toHaveCount(0);
-  await expect(page.locator('.game-selector__choice')).toHaveText(['Memory Match', 'Link Connect', 'Triple Connect']);
+  for (const name of ['Memory Match', 'Link Connect', 'Triple Connect']) await expect(page.getByRole('button', { name, exact: true })).toHaveCount(1);
   await expect(page.locator('.game-selector__dot')).toHaveCount(3);
   await expect(page.locator('.game-selector__choice[aria-current="true"]')).toHaveText('Memory Match');
 });

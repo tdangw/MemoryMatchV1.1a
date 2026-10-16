@@ -96,6 +96,8 @@ function mountGameCarousel(carousel, choices, games, scope) {
   });
   controls.append(previous, dots, next); carousel.append(controls);
   let selected = 0;
+  const middle = Math.floor(cards.length / 2);
+  const wrap = index => (index % cards.length + cards.length) % cards.length;
   function update(index) {
     selected = index;
     cards.forEach((card, position) => {
@@ -106,16 +108,34 @@ function mountGameCarousel(carousel, choices, games, scope) {
       else card.removeAttribute('aria-current');
       indicators[position].setAttribute('aria-pressed', String(current));
     });
-    previous.disabled = selected === 0;
-    next.disabled = selected === cards.length - 1;
+    previous.disabled = next.disabled = cards.length < 2;
+  }
+  function recenter() {
+    const restoreFocus = choices.contains(document.activeElement);
+    if (choices.children[middle] !== cards[selected]) {
+      const order = cards.map((_, position) => cards[wrap(selected + position - middle)]);
+      choices.replaceChildren(...order);
+    }
+    const card = cards[selected];
+    choices.scrollTo({ left: card.offsetLeft + card.offsetWidth / 2 - choices.clientWidth / 2, behavior: 'auto' });
+    if (restoreFocus && document.activeElement !== card) card.focus({ preventScroll: true });
   }
   function select(index, focus = false) {
     if (!scope.active || !cards.length) return;
-    const target = Math.max(0, Math.min(cards.length - 1, index));
+    const target = wrap(index);
     update(target);
-    // Native touch scrolling owns momentum; explicit controls move to an exact snap.
-    choices.scrollTo({ left: cards[target].offsetLeft - cards[0].offsetLeft, behavior: 'auto' });
+    recenter();
     if (focus) cards[target].focus({ preventScroll: true });
+  }
+  function syncSelection() {
+    if (!choices.clientWidth) return;
+    const center = choices.scrollLeft + choices.clientWidth / 2;
+    let nearest = 0, distance = Infinity;
+    cards.forEach((card, index) => {
+      const delta = Math.abs(card.offsetLeft + card.offsetWidth / 2 - center);
+      if (delta < distance) { nearest = index; distance = delta; }
+    });
+    if (nearest !== selected) update(nearest);
   }
   let queued = false;
   scope.listen(choices, 'scroll', () => {
@@ -123,15 +143,11 @@ function mountGameCarousel(carousel, choices, games, scope) {
     queued = true;
     scope.frame(() => {
       queued = false;
-      const center = choices.scrollLeft + choices.clientWidth / 2;
-      let nearest = 0, distance = Infinity;
-      cards.forEach((card, index) => {
-        const delta = Math.abs(card.offsetLeft + card.offsetWidth / 2 - center);
-        if (delta < distance) { nearest = index; distance = delta; }
-      });
-      if (nearest !== selected) update(nearest);
+      syncSelection();
     });
   }, { passive: true });
+  // Reuse the same nodes after momentum stops; the selected card stays visually centered.
+  scope.listen(choices, 'scrollend', () => { syncSelection(); recenter(); });
   scope.listen(previous, 'click', () => select(selected - 1));
   scope.listen(next, 'click', () => select(selected + 1));
   scope.listen(carousel, 'keydown', event => {
@@ -139,7 +155,6 @@ function mountGameCarousel(carousel, choices, games, scope) {
     if (target === null) return;
     event.preventDefault(); select(target, true);
   });
-  cards.forEach((card, index) => scope.listen(card, 'focus', () => select(index)));
   const observer = new ResizeObserver(() => select(selected));
   observer.observe(choices); scope.own(() => observer.disconnect());
   select(0);

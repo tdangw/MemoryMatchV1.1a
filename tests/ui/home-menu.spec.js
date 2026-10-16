@@ -24,7 +24,7 @@ for (const viewport of [{ width: 320, height: 740 }, { width: 412, height: 915 }
   for (let i = 0; i < 3; i++) {
     await page.getByRole('button', { name: `Chọn ${titles[i]}`, exact: true }).click();
     await centered(page, i);
-    const card = choices.nth(i), bounds = await card.boundingBox();
+    const card = choices.filter({ hasText: titles[i] }), bounds = await card.boundingBox();
     expect(bounds.y + bounds.height).toBeLessThanOrEqual(footer.y);
     expect(bounds.height).toBeGreaterThanOrEqual(115);
     expect(await card.locator('strong').evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
@@ -46,10 +46,10 @@ for (const viewport of [{ width: 320, height: 740 }, { width: 412, height: 915 }
 
 test('arrow controls, keyboard, rapid changes and resizing keep the selection centered', async ({ page }) => {
   await page.setViewportSize({ width: 412, height: 915 }); await page.goto('/');
-  await centered(page, 0); await expect(page.getByRole('button', { name: 'Trò trước', exact: true })).toBeDisabled();
+  await centered(page, 0); await expect(page.getByRole('button', { name: 'Trò trước', exact: true })).toBeEnabled();
   await page.getByRole('button', { name: 'Trò sau', exact: true }).click(); await centered(page, 1);
   await page.getByRole('button', { name: 'Trò sau', exact: true }).click(); await centered(page, 2);
-  await expect(page.getByRole('button', { name: 'Trò sau', exact: true })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Trò sau', exact: true })).toBeEnabled();
   await page.getByRole('button', { name: 'Triple Connect', exact: true }).focus();
   await page.keyboard.press('ArrowLeft'); await centered(page, 1);
   await expect(page.getByRole('button', { name: 'Link Connect', exact: true })).toBeFocused();
@@ -88,7 +88,8 @@ test('a fourth catalog game joins the same carousel without requiring art', asyn
 
 test.describe('native touch scrolling', () => {
   test.use({ hasTouch: true, viewport: { width: 412, height: 915 } });
-  test('horizontal swipes select games without accidentally opening a map', async ({ page }) => {
+  test('horizontal swipes loop across both boundaries without opening a map', async ({ page }) => {
+    test.setTimeout(60000);
     await page.goto('/'); await centered(page, 0);
     const session = await page.context().newCDPSession(page);
     async function swipe(direction) {
@@ -104,11 +105,19 @@ test.describe('native touch scrolling', () => {
       // A centered card can be crossed while inertia is still active: assert only after native snap settles.
       await expect.poll(() => page.evaluate(() => window.homeSwipeSettled)).toBe(true);
     }
-    await swipe('left'); await centered(page, 1);
-    await swipe('left'); await centered(page, 2);
-    await swipe('right'); await centered(page, 1);
+    for (let i = 1; i <= 7; i++) { await swipe('left'); await centered(page, i % 3); }
+    for (let i = 1; i <= 7; i++) { await swipe('right'); await centered(page, ((7 - i) % 3 + 3) % 3); }
     await expect(page.locator('.adventure-map-page')).toHaveCount(0);
     await session.detach();
+  });
+  test('tapping either side peek opens the intended game with normal motion', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    for (const id of ['triple-connect', 'link-connect']) {
+      await page.goto('/'); await centered(page, 0);
+      const card = await page.locator(`.game-selector__choice[data-game-id="${id}"]`).boundingBox();
+      await page.touchscreen.tap(Math.max(3, Math.min(409, card.x + card.width / 2)), card.y + card.height / 2);
+      await expect(page.locator(`#menu-container.${id}-menu[data-map-ready="true"]`)).toBeVisible();
+    }
   });
 });
 
@@ -156,4 +165,23 @@ test('normal motion remains finite and navigation interrupts transitions safely'
   const old = await page.evaluate(() => window.oldHomeScope.diagnostics());
   for (const [key, value] of Object.entries(old)) expect(value).toBe(key === 'active' ? false : 0);
   await centered(page, 0);
+});
+
+test('one hundred forward and backward selections wrap without cloning cards or retaining resources', async ({ page }) => {
+  await page.goto('/'); await centered(page, 0);
+  const result = await page.evaluate(async () => {
+    const scope = (await import('/js/appPageLifecycle.js')).getAppPageScope();
+    const before = scope.diagnostics(), nodes = [...document.querySelectorAll('.game-selector__choice')];
+    for (let i = 0; i < 100; i++) document.querySelector('[aria-label="Trò sau"]').click();
+    const forward = document.querySelector('.game-selector__choice[aria-current="true"]').dataset.gameId;
+    for (let i = 0; i < 100; i++) document.querySelector('[aria-label="Trò trước"]').click();
+    return { before, forward, count: document.querySelectorAll('.game-selector__choice').length, sameNodes: nodes.every(node => node.isConnected) };
+  });
+  expect(result.forward).toBe('link-connect'); expect(result.count).toBe(3); expect(result.sameNodes).toBe(true);
+  await centered(page, 0);
+  await expect.poll(() => page.evaluate(async () => (await import('/js/appPageLifecycle.js')).getAppPageScope().diagnostics())).toEqual(result.before);
+  await page.getByRole('button', { name: 'Memory Match', exact: true }).focus();
+  await page.keyboard.press('ArrowLeft'); await centered(page, 2);
+  await expect(page.getByRole('button', { name: 'Triple Connect', exact: true })).toBeFocused();
+  await page.keyboard.press('ArrowRight'); await centered(page, 0);
 });
