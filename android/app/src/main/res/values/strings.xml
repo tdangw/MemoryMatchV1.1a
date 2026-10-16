@@ -4,4 +4,5 @@
     <string name="title_activity_main">Memory Match Adventure</string>
     <string name="package_name">com.memorymatch.adventure</string>
     <string name="custom_url_scheme">com.memorymatch.adventure</string>
+    <string name="admob_app_id">ca-app-pub-2780380420199964~5572977569</string>
 </resources>

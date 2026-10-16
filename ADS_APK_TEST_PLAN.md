@@ -5,13 +5,13 @@ Ngày khảo sát: 2026-10-15. Người dùng giao triển khai ngày 2026-10-16
 ## Theo dõi thực hiện
 
 - Phase 0: đã nhận App ID `ca-app-pub-2780380420199964~5572977569`, banner unit `ca-app-pub-2780380420199964/4149796201`; giữ package, chỉ banner Home/map. Tham khảo thông tin quyền riêng tư của sản phẩm cùng chủ sở hữu nhưng viết lại theo dữ liệu thực tế của trò chơi này, không sao chép tính năng không có. Câu chữ cho người chơi dùng tiếng Việt dễ hiểu.
-- Phase 1: cấu hình Android, quảng cáo và lựa chọn quyền riêng tư; chưa hoàn tất.
+- Phase 1 hoàn tất: đã cài/pin AdMob8.2.1/App8.1.2; cấu hình hai ID thật, bảo vệ trẻ em cho mọi người chơi, không cá nhân hóa, mức nội dung gia đình. Bảy kiểm thử service, Android build/sync và `:app:compileDebugJavaWithJavac` đã đạt. Hai thao tác tạo/hủy banner được chuyển qua cầu nối nhỏ trên luồng giao diện Android: plugin gốc trả promise remove trước lúc view thực sự bị hủy; chỉ xếp hàng JS không đủ chặn race này. Không chỉnh node_modules. Gỡ quyền Advertising ID/AdServices khỏi bản hợp nhất và chặn đo quảng cáo trước initialize; cần kiểm chứng manifest đóng gói cuối.
 - Phase 2: banner theo màn hình, cài đặt và trang quyền riêng tư; chưa hoàn tất.
 - Phase 3: xác nhận chỉ banner; chưa hoàn tất.
 - Phase 4: kiểm thử, đánh giá riêng và đóng gói APK; chưa hoàn tất.
 - Phase 5: thử APK trên thiết bị; chưa hoàn tất. Nếu không có điện thoại kết nối hoặc không truy cập được AdMob thì ghi đúng phần chưa xác minh, hoàn tất mọi phần còn lại có thể thực hiện.
 
-Chờ trả lời nhóm tuổi/thị trường; chưa tự khai báo ứng dụng dành cho trẻ em hoặc gửi cấu hình độ tuổi khi không có quyết định. Không đổi tài khoản hay phát hành website chỉ để tạo bản APK thử.
+Người dùng xác nhận có trẻ em dưới13tuổi và chọn bảo vệ trẻ em cho tất cả người chơi, không hỏi tuổi. Cấu hình quảng cáo áp dụng lựa chọn này cho mọi request; đây không phải xác nhận phát hành Play hay hoàn tất mọi yêu cầu đối với ứng dụng trẻ em. Không đổi tài khoản hay phát hành website chỉ để tạo bản APK thử.
 
 ## 1. Mục tiêu, phạm vi và quyết định
 
