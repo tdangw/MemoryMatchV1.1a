@@ -4,6 +4,9 @@ Ngày khảo sát: 2026-10-15. Người dùng giao triển khai ngày 2026-10-16
 
 ## Theo dõi thực hiện
 
+- Điều chỉnh theo phản hồi16/10: UI chỉ ghi **Quảng cáo**, không từ kỹ thuật/hướng dẫn; quy định lâu dài trong AGENTS.md. Bỏ viền thử nghiệm, web50px + khoảng tách8px thay60+28; Android dùng cùng gap8px và chiều cao thật từ SDK. Chủ dự án giao đề xuất vị trí: chọn Home/map/shop/collection; không gameplay/modal/forms/ranking/comingsoon. Slot của functional screen thuộc viewScope riêng, không ghi đè slot bản đồ. Acceptance: bố cục dọc/ngang/desktop, một banner,30lần chuyển tab và vòng đời cũ, review độc lập/check/build. Không deploy/publish theo lựa chọn trước.
+- Điều chỉnh đã đạt: native9/9, web review độc lập4/4 (modal thật và30tab transitions), shop/HUD9/9, check/unit15/15, production smoke1/1, web build và android:apk đạt. Lỗi screen content suspend banner đã sửa tại modal presentation. APK cập nhật SHA-256 `D04C1B22E5FC33187B6F5222433035DFCE4BDC4FCC0F04711A7EEFA43D0DCFD7`; chưa kiểm lại trên thiết bị, không chứng nhận ads thật. Bằng chứng/ảnh tại docs/ads/QA.md.
+
 - Bổ sung theo yêu cầu ngày16/10 sau bàn giao APK: web hiển thị banner mô phỏng tĩnh Home/map, cùng quy tắc chặn của Android và vùng60px + khoảng cách28px. Không gọi Google/consent hoặc cấp thưởng trên web, không deploy. Chọn controller hiển thị riêng dùng chung navigation/lifecycle thay vì tạo SDK giả; giữ service web unsupported và đường native hiện có. Acceptance: một banner tối đa, đúng vùng/màn, ẩn modal/tab/gameplay/nền/nhập chữ, cleanup qua30chu kỳ; layout dọc/ngang/desktop, regression native, check/build và review độc lập.
 - Bổ sung web đã hoàn tất: web review độc lập4/4, native regression9/9, production smoke1/1, check/unit15/15, build web/Android đạt. Đã mở ảnh dọc/ngang kiểm tra dock/controls; không finding mở, không thay APK hoặc deploy. Task kiểm tra quảng cáo thật phase5 vẫn giữ trạng thái chờ người dùng xuất bản và kết nối máy.
 

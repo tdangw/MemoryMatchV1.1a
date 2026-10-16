@@ -9,10 +9,11 @@ for (const size of [{ width: 412, height: 915 }, { width: 844, height: 390 }, { 
     await page.setViewportSize(size);
     await page.goto('/');
     await expect(preview(page)).toHaveCount(1);
-    await expect(preview(page)).toHaveText('Quảng cáo mô phỏng');
+    await expect(preview(page)).toHaveText('Quảng cáo');
     const dock = await page.locator('.adventure-dock').boundingBox();
     const banner = await preview(page).boundingBox();
-    expect(banner.y - (dock.y + dock.height)).toBeCloseTo(28, 0);
+    expect(banner.y - (dock.y + dock.height)).toBeCloseTo(8, 0);
+    expect(banner.height).toBe(50);
     expect(banner.y + banner.height).toBeLessThanOrEqual(size.height);
     const controls = await page.locator('.game-selector__controls').boundingBox();
     expect(controls.y + controls.height).toBeLessThanOrEqual(dock.y + 1);
@@ -28,6 +29,25 @@ for (const size of [{ width: 412, height: 915 }, { width: 844, height: 390 }, { 
       await expect(page.locator(`.game-selector__choice[data-game-id="${game}"]`)).toHaveClass(/is-selected/);
       await page.locator(`.game-selector__choice[data-game-id="${game}"]`).click();
       await expect(preview(page)).toHaveCount(1);
+      for (const tab of ['shop', 'collection']) {
+        await page.locator(`[data-dock-action="${tab}"]`).click();
+        await expect(page.locator('.adventure-screen .menu-ad-preview')).toHaveCount(1);
+        await expect(preview(page)).toHaveCount(1);
+        const screenDock = await page.locator('.adventure-screen .adventure-dock').boundingBox();
+        const screenBanner = await preview(page).boundingBox();
+        expect(screenBanner.y - screenDock.y - screenDock.height).toBeCloseTo(8, 0);
+        expect(screenBanner.y + screenBanner.height).toBeLessThanOrEqual(size.height);
+        if (size.width === 412 && game === 'memory-match') await page.screenshot({ path: `docs/ads/qa/web-${tab}-412.png` });
+        if (tab === 'shop' && game === 'memory-match') {
+          await page.evaluate(async () => (await import('/js/modal.js')).openAppModal({ id: 'ads-check-modal', title: 'Thông tin', content: 'Chọn vật phẩm bạn muốn sử dụng.' }));
+          await expect(preview(page)).toHaveCount(0);
+          await page.locator('#ads-check-modal .app-modal__close').click();
+          await expect(page.locator('#ads-check-modal')).toHaveCount(0);
+          await expect(preview(page)).toHaveCount(1);
+        }
+        await page.locator('.adventure-screen [data-dock-action="map"]').click();
+        await expect(preview(page)).toHaveCount(1);
+      }
       await previewMapLevel(page);
       await expect(preview(page)).toHaveCount(0);
       await closeLevelPreview(page);
@@ -53,9 +73,18 @@ test('web preview releases nodes across suspension, background and 30 navigation
     for (let i = 0; i < 30; i++) { menus.openGameMenu('memory-match'); menus.showGameSelector(); }
   });
   await expect(preview(page)).toHaveCount(1);
+  await page.locator('.game-selector__choice.is-selected').click();
+  for (let i = 0; i < 10; i++) {
+    for (const tab of ['shop', 'collection', 'map']) {
+      await page.locator(`[data-dock-action="${tab}"]:visible`).click();
+      await expect(preview(page)).toHaveCount(1);
+    }
+  }
+  await page.locator('.adventure-map-page .adventure-exit').click();
+  await expect(preview(page)).toHaveCount(1);
   await page.setViewportSize({ width: 844, height: 390 });
   await expect(preview(page)).toHaveCount(1);
-  expect((await preview(page).boundingBox()).height).toBe(60);
+  expect((await preview(page).boundingBox()).height).toBe(50);
   await page.evaluate(() => window.dispatchEvent(new Event('pagehide')));
   await expect(preview(page)).toHaveCount(0);
   await page.evaluate(() => window.dispatchEvent(new Event('pageshow')));

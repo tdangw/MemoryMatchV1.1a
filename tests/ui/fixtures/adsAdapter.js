@@ -28,7 +28,7 @@ export const nativeAds = {
     }
     const overlay = document.createElement('aside');
     overlay.dataset.fakeNativeBanner = '';
-    overlay.textContent = 'Mô phỏng vùng quảng cáo — kiểm tra bố cục';
+    overlay.textContent = 'Quảng cáo';
     overlay.style.cssText = 'position:fixed;inset:auto 0 0;height:60px;background:#eee;color:#111;z-index:999999;text-align:center;font:12px/60px sans-serif';
     document.body.append(overlay);
     state.emit('bannerAdSizeChanged', { height: 60, width: innerWidth });

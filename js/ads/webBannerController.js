@@ -1,3 +1,4 @@
+import { AD_CONFIG } from './adConfig.js';
 // A local visual preview only; never requests ads or changes consent.
 export function createWebBannerController({ render }) {
   let target = null, preview = null, disposed = false;
@@ -10,8 +11,8 @@ export function createWebBannerController({ render }) {
   }
   function refresh() {
     if (!target) return;
-    // A stable representative phone banner, matching the native QA fixture.
-    render(target, 60);
+    // Representative standard banner; native height remains SDK-driven.
+    render(target, AD_CONFIG.webBannerHeight);
   }
   return {
     setTarget(slot) {
@@ -21,7 +22,7 @@ export function createWebBannerController({ render }) {
       target = slot;
       preview = document.createElement('div');
       preview.className = 'menu-ad-preview';
-      preview.textContent = 'Quảng cáo mô phỏng';
+      preview.textContent = 'Quảng cáo';
       target.append(preview);
       refresh();
     },

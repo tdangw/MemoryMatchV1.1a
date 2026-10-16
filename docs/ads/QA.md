@@ -2,7 +2,7 @@
 
 ## Đã hoàn tất trong bản mã
 
-Chỉ banner trên trang chủ và bản đồ. Không quảng cáo trong màn chơi, tab chức năng, hộp thoại, khi nhập chữ hoặc khi ứng dụng ở nền. Áp dụng bảo vệ trẻ em cho mọi người chơi, không cá nhân hóa và giới hạn nội dung gia đình. Không đổi tài khoản, định dạng lưu, Xu, vật phẩm, luật chơi hoặc phần thưởng.
+Banner hiện hành trên trang chủ, bản đồ, Cửa hàng và Bộ sưu tập theo phản hồi mới. Không quảng cáo trong màn chơi, hồ sơ/cài đặt/xếp hạng, mục chưa có nội dung, hộp thoại, khi nhập chữ hoặc khi ứng dụng ở nền. Áp dụng bảo vệ trẻ em cho mọi người chơi, không cá nhân hóa và giới hạn nội dung gia đình. Không đổi tài khoản, định dạng lưu, Xu, vật phẩm, luật chơi hoặc phần thưởng.
 
 Đã chọn plugin AdMob sẵn có thay vì tự viết toàn bộ kết nối quảng cáo. Một bộ quản lý chung tạo/hủy banner theo thứ tự; hai thao tác tạo/hủy trên Android đợi xử lý giao diện xong để tránh banner cũ xóa banner mới. Không dùng chờ theo thời gian để che lỗi chuyển màn.
 
@@ -29,10 +29,10 @@ Reviewer chỉ đọc và chạy test, không sửa file. Đã tìm ra tình hu�
 ## APK tạo được
 
 - File: `android/app/build/outputs/apk/debug/app-debug.apk`.
-- Dung lượng:34.250.102bytes.
-- SHA-256:`84C780C312739EA53335C1414BC34621EA52F495A29E2AD37621AE3BD80D9171`.
+- Dung lượng bản cập nhật bố cục:34.250.105bytes.
+- SHA-256:`D04C1B22E5FC33187B6F5222433035DFCE4BDC4FCC0F04711A7EEFA43D0DCFD7`.
 - Package:`com.memorymatch.adventure`, versionCode1, versionName1.0; Android tối thiểu24, target36.
-- Cài cập nhật vào giả lập thành công, giữ dữ liệu. Chưa cài lên Galaxy S22 Ultra thật.
+- Bản trước cài cập nhật vào giả lập thành công, giữ dữ liệu. Bản cập nhật bố cục mới đã build/sync/assembleDebug và kiểm chữ ký/package, chưa cài lại trên thiết bị; chưa cài lên Galaxy S22 Ultra thật. Chữ ký debug giữ nguyên để cập nhật không đổi danh tính.
 
 ## Android và AdMob: phần còn đang xác minh
 
@@ -46,7 +46,21 @@ Reviewer chỉ đọc và chạy test, không sửa file. Đã tìm ra tình hu�
 
 ## Nội dung và ảnh
 
-### Bổ sung banner mô phỏng trên web
+### Điều chỉnh theo phản hồi về bố cục và câu chữ
+
+Phiên bản hiện hành chỉ ghi **Quảng cáo**, bỏ viền nét đứt. Web dùng vùng50px + khoảng tách8px, tổng58px thay88px trước đó (giảm30px); Android giữ chiều cao thực tế do SDK trả về và dùng cùng gap8px. Web là diện tích đại diện để xem UI, không khẳng định pixel-perfect với mọi creative adaptive. Đã đối chiếu [khuyến nghị tách banner khỏi vùng tương tác](https://support.google.com/admob/answer/6275335?hl=en-GB); không coi8px là chứng nhận tuân thủ hoặc một ngưỡng do Google quy định.
+
+Chủ dự án giao đề xuất vị trí; chọn Home/map/shop/collection. Không gameplay/modal/profile/settings/ranking hoặc các mục Sắp ra mắt. Nguyên nhân thiếu banner shop/collection là screen content dùng chung openAppModal đã suspend như overlay; sửa theo presentation, overlay thật vẫn chặn. Root và screen có slot riêng, cleanup so identity, không trộn owner. Không đổi save/schema/API/Auth/luật chơi.
+
+Quy định câu chữ đã lưu trong `AGENTS.md` mục9: giao diện/ảnh/tài liệu người chơi dùng ngôn ngữ sản phẩm, tuyệt đối không chèn thuật ngữ triển khai; vùng thay thế vẫn trình bày như sản phẩm hoàn chỉnh. Báo cáo kỹ thuật này giữ chẩn đoán riêng cho chủ dự án. Skill làm rõ yêu cầu dùng để chốt chủ dự án giao quyền đề xuất placement, không tự đoán mở rộng vào gameplay.
+
+- Native boundary regression9/9 đạt; web reviewer độc lập4/4 đạt: ba viewport, modal lồng trên shop,30menu cycles +30tab transitions, background/focus/resize/dispose. Finding suspend screen đã xử lý, không finding mở.
+- Run đầu8/13 đạt, bắt đúng lỗi screen suspend. Sau sửa12/13 đạt, ca còn lại là test locator trùng dock hidden/visible. Đã scope locator vào dock đang hiển thị, giữ nguyên assertions; reviewer chạy lại4/4 đạt.
+- Đã mở ảnh Home/shop/collection412 và dọc/ngang: nhãn đúng, khoảng gọn, thanh nút không chồng banner; ảnh hiện hành `qa/web-preview-*`, `qa/web-shop-412.png`, `qa/web-collection-412.png`.
+- Shop/inventory và HUD/modal regression9/9 đạt (gồm mua vật phẩm, reload dữ liệu,20chu kỳ mỗi trò). `npm run check` đạt, unit15/15, Triple p95 14,27ms; `npm run android:apk` và `npm run build` đạt. APK cập nhật có receipt ở mục APK; không dùng build thành công thay bằng chứng quảng cáo thật.
+- Production smoke mới1/1 đạt: nhãn Quảng cáo, Home/map/shop/collection và modal/profile trên bản đã đóng gói; không ghi dịch vụ thật. Không deploy website hoặc xuất bản thông điệp AdMob.
+
+### Bản web đầu tiên — đã được điều chỉnh theo phản hồi bên dưới
 
 Theo yêu cầu tiếp theo ngày16/10, bản web có vùng **Quảng cáo mô phỏng** tĩnh ở Home/map, dùng cùng quy tắc chuyển màn và chặn quảng cáo như Android. Chiều cao đại diện60px, cách dock28px; không mô phỏng nội dung/quảng cáo Google hoặc tự cấp thưởng. Không đổi API lưu/schema/tài khoản/luật chơi. Controller web sở hữu duy nhất một node, hủy ngay khi đổi target/dispose; không thêm listener/timer/animation riêng. Phương án dùng SDK giả đã loại vì có thể nhầm trạng thái quyền riêng tư và tải quảng cáo; phần hiển thị riêng dùng lại lifecycle chung giữ service web unsupported.
 

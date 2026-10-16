@@ -37,7 +37,7 @@ export function openAppModal({
   const metrics = getActivePlayMetrics();
 
   const overlay = document.createElement("div");
-  const resumeMenuAds = suspendMenuAds(overlay);
+  const resumeMenuAds = screen ? null : suspendMenuAds(overlay);
   metrics?.clock.pause(overlay);
   overlay.className = screen ? 'app-screen-content' : "app-modal-overlay";
   if (id) overlay.id = id;
@@ -68,7 +68,7 @@ export function openAppModal({
     releaseOwner?.forget();
     const restoreFocus = overlay.contains(document.activeElement);
     overlay.remove();
-    resumeMenuAds();
+    if (resumeMenuAds) resumeMenuAds();
     if (restoreFocus && (!owner || owner.active) && previousFocus?.isConnected && typeof previousFocus.focus === "function") previousFocus.focus();
     metrics?.clock.resume(overlay);
     if (id && modals.get(id) === destroy) modals.delete(id);

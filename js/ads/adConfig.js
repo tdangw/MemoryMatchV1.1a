@@ -2,7 +2,8 @@
 export const AD_CONFIG = Object.freeze({
   appId: 'ca-app-pub-2780380420199964~5572977569',
   bannerId: 'ca-app-pub-2780380420199964/4149796201',
-  interactionGap: 28,
+  interactionGap: 8,
+  webBannerHeight: 50,
 });
 
 export function validateAdConfig(config = AD_CONFIG) {

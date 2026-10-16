@@ -83,6 +83,9 @@ export function decorateAdventureMenu(root, { gameId = null, onHome } = {}) {
     view.append(host, footer, createExit(viewScope));
     document.body.append(view);
     root.hidden = true;
+    const screenAdSlot = footer.querySelector('.adventure-ad-slot');
+    if (screenAdSlot) setMenuAdTarget(screenAdSlot);
+    viewScope.own(() => clearMenuAdTarget(screenAdSlot));
     viewScope.own(() => { view.remove(); if (scope.active) root.hidden = false; }, 'node');
     const surface = { presentation: 'screen', host, owner: viewScope };
     if (action === 'profile') return handlers.account?.(surface);
@@ -91,14 +94,15 @@ export function decorateAdventureMenu(root, { gameId = null, onHome } = {}) {
   function createFooter(owner, selected) {
     const footer = document.createElement('footer'); footer.className = 'adventure-footer';
     footer.append(createAppDock(owner, { gameId, selected, onAction: navigate }));
-    if (!selected || selected === 'map') {
+    if (!selected || ['map', 'shop', 'collection'].includes(selected)) {
       const ad = document.createElement('div'); ad.className = 'adventure-ad-slot'; ad.dataset.adPlacement = 'menu'; ad.setAttribute('aria-hidden', 'true');
       footer.append(ad);
-      adSlot = ad;
     }
     return footer;
   }
-  root.append(createFooter(scope, gameId ? 'map' : null));
+  const footer = createFooter(scope, gameId ? 'map' : null);
+  root.append(footer);
+  adSlot = footer.querySelector('.adventure-ad-slot');
   setMenuAdTarget(adSlot);
   // Functional destinations now have a single shared dock owner.
   for (const item of root.querySelectorAll(".menu-item")) {

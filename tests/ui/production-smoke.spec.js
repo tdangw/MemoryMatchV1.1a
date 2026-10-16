@@ -10,6 +10,7 @@ test('built mobile menu, map and account open without writing to production serv
   await page.goto('/');
   await expect(page.locator('.game-selector__choice')).toHaveCount(3);
   await expect(page.locator('.menu-ad-preview')).toHaveCount(1);
+  await expect(page.locator('.menu-ad-preview')).toHaveText('Quảng cáo');
   await expect(page.locator('.adventure-wallet')).toHaveCount(0);
   await expect(page.locator('.adventure-account')).toHaveCount(0);
   await page.locator('.game-selector__choice').filter({ hasText: 'Memory Match' }).click();
@@ -28,6 +29,13 @@ test('built mobile menu, map and account open without writing to production serv
   await expect(page.locator('.menu-ad-preview')).toHaveCount(0);
   await closeLevelPreview(page);
   await expect(page.locator('.menu-ad-preview')).toHaveCount(1);
+  for (const tab of ['shop', 'collection']) {
+    await page.locator(`[data-dock-action="${tab}"]`).click();
+    await expect(page.locator('.adventure-screen .menu-ad-preview')).toHaveText('Quảng cáo');
+    await expect(page.locator('.menu-ad-preview')).toHaveCount(1);
+    await page.locator('.adventure-screen [data-dock-action="map"]').click();
+    await expect(page.locator('.menu-ad-preview')).toHaveCount(1);
+  }
   await expect(page.locator('.adventure-mode-toggle')).toHaveCount(0);
   await page.locator('.adventure-exit').click();
   await page.locator('[data-dock-action="profile"]').click();

@@ -70,7 +70,7 @@
 .adventure-dock button:focus-visible, .adventure-header button:focus-visible { outline: 2px solid #f6d68b; outline-offset: -2px; }
 .adventure-ad-slot { height: calc(60px + env(safe-area-inset-bottom)); background: #07132180; }
 .adventure-ad-slot[data-native-ad] { height: calc(var(--ad-banner-height, 0px) + var(--ad-banner-gap, 0px) + env(safe-area-inset-bottom)); pointer-events: none; }
-.menu-ad-preview { position: relative; top: var(--ad-banner-gap); display: grid; place-items: center; box-sizing: border-box; height: var(--ad-banner-height); border: 1px dashed #b8c9d64d; background: #102333; color: #b9c9d7; font: 12px / 1.4 "Segoe UI", sans-serif; letter-spacing: .3px; }
+.menu-ad-preview { position: relative; top: var(--ad-banner-gap); display: grid; place-items: center; box-sizing: border-box; height: var(--ad-banner-height); border-top: 1px solid #b8c9d626; background: #102333; color: #b9c9d7; font: 12px / 1.4 "Segoe UI", sans-serif; letter-spacing: .3px; }
 
 .adventure-map-page { justify-content: stretch; align-items: stretch; padding-top: 0; }
 .adventure-map-view {

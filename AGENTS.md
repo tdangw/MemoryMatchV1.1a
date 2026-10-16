@@ -155,6 +155,12 @@ Với effect mới hoặc viết lại effect, mô tả trước khi code:
 - Asset mới phải có tên ổn định, kích thước hợp lý, format/nén phù hợp và không để file nguồn tạm trong bundle.
 - Với hình thẻ Memory Match hoặc raster theme asset, dùng skill chuyên dụng nếu có thay vì tự sinh theo quy trình tùy ý.
 
+### Quy định câu chữ dành cho người chơi (yêu cầu trực tiếp của chủ dự án)
+
+- Mọi nội dung người chơi nhìn thấy trên giao diện, ảnh bàn giao và tài liệu dành cho người chơi phải dùng ngôn ngữ sản phẩm tự nhiên; không đưa thuật ngữ lập trình, ghi chú triển khai, lời hướng dẫn phát triển hoặc trạng thái thử nghiệm vào đó.
+- Kể cả khi chức năng đang dùng dữ liệu hoặc phần hiển thị thay thế, giao diện vẫn phải là giao diện sản phẩm hoàn chỉnh. Vùng quảng cáo chỉ ghi **Quảng cáo**; tuyệt đối không ghi “mô phỏng”, “placeholder”, “mock”, “API”, “SDK”, “debug” hoặc hướng dẫn tích hợp trên giao diện.
+- Giải thích kỹ thuật và giới hạn kiểm chứng chỉ ghi trong báo cáo kỹ thuật cho chủ dự án; không chèn vào trải nghiệm người chơi. Trước bàn giao, kiểm tra câu chữ trong ảnh giao diện thật cùng với bố cục.
+
 ## 10. Dữ liệu và tương thích
 
 - Không đổi key, schema save, ID catalog, public API hoặc format dữ liệu nếu task không cho phép.

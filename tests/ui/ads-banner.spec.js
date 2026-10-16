@@ -27,9 +27,9 @@ for (const viewport of [{ width: 412, height: 915 }, { width: 844, height: 390 }
     await page.setViewportSize(viewport); await mockNative(page); await page.goto('/'); await visible(page);
     const slot = page.locator('.adventure-ad-slot');
     await expect(slot).toHaveAttribute('data-native-ad', 'visible');
-    expect((await slot.boundingBox()).height).toBe(88);
+    expect((await slot.boundingBox()).height).toBe(68);
     const dock = await page.locator('.adventure-dock').boundingBox();
-    expect(dock.y + dock.height).toBeLessThanOrEqual(viewport.height - 88 + 1);
+    expect(dock.y + dock.height).toBeLessThanOrEqual(viewport.height - 68 + 1);
     const selected = await page.locator('.game-selector__choice.is-selected').boundingBox();
     expect(selected.y + selected.height).toBeLessThanOrEqual(dock.y + 1);
     const controls = await page.locator('.game-selector__controls').boundingBox();
@@ -44,7 +44,7 @@ for (const viewport of [{ width: 412, height: 915 }, { width: 844, height: 390 }
   });
 }
 
-test('all functional tabs hide banner and privacy options open without retaining it', async ({ page }) => {
+test('functional placements and privacy options keep the correct banner owner', async ({ page }) => {
   await mockNative(page); await page.goto('/'); await visible(page);
   for (const tab of ['missions', 'events', 'profile', 'ranking', 'settings']) {
     await page.locator(`[data-dock-action="${tab}"]`).click(); await absent(page);
@@ -61,7 +61,9 @@ test('all functional tabs hide banner and privacy options open without retaining
   }
   await page.locator('.game-selector__choice[data-game-id="memory-match"]').click(); await visible(page);
   for (const tab of ['shop', 'collection', 'ranking', 'settings']) {
-    await page.locator(`[data-dock-action="${tab}"]`).click(); await absent(page);
+    await page.locator(`[data-dock-action="${tab}"]`).click();
+    if (tab === 'shop' || tab === 'collection') await visible(page);
+    else await absent(page);
     await page.locator('.adventure-screen [data-dock-action="map"]').click(); await visible(page);
   }
 });
