@@ -2,6 +2,8 @@
 
 Đọc file này khi bắt đầu task mới. Đây là snapshot điều hướng, không thay thế code/config và không chứa lịch sử triển khai chi tiết.
 
+Người dùng đã chọn tự xuất bản website và thông điệp AdMob ngày16/10. Bản nháp **Quyền riêng tư · Memory Match Adventure** đã lưu riêng, chưa bật; URL quyền riêng tư công khai vẫn mở trang chọn trò chơi. Phần chuẩn bị quảng cáo/APK đã bàn giao; phase5 nghiệm thu trên máy thật còn chờ các bước trong `docs/ads/HUONG_DAN_THU_APK.md`. Không tự deploy khi tiếp tục task.
+
 ## Sản phẩm
 
 - Tab Sự kiện thay Bạn bè ngày2026-10-16: action events, tiêu đề/nhãn Sự kiện, biểu tượng lịch. Hiện Sắp ra mắt, chưa triển khai tính năng sự kiện. Giữ nền courtyard hiện có và lifecycle chung; không đổi save/schema/Auth. UI36/36, review độc lập3/3, check/build web/Android pass; QA tại `docs/design/app-tabs/QA.md`.

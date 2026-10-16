@@ -10,6 +10,18 @@ Mở **Cài đặt → Quyền riêng tư** để đọc thông tin trong trò c
 
 ## Việc cần làm trong AdMob
 
+**Đã chuẩn bị ngày 16/10/2026:** mức nội dung G đã được lưu riêng cho Memory Match. Bản nháp **Quyền riêng tư · Memory Match Adventure** đã được lưu trong phần Quy định của Châu Âu, chỉ chọn Memory Match; có lựa chọn đồng ý, không đồng ý và quản lý lựa chọn. Bản nháp dùng tiếng Anh vì danh sách ngôn ngữ Google cung cấp ở đây không có tiếng Việt. Chưa xuất bản. Bạn đã chọn tự đưa website và thông điệp lên.
+
+**Các bước bạn cần làm tiếp:**
+
+1. Đọc lại trang quyền riêng tư đã chuẩn bị tại `public/legal/privacy.html`, nhất là email liên hệ và phần thông tin được sử dụng.
+2. Đưa bản web hiện tại lên website chính của trò chơi. Nếu thực hiện qua Codex, gửi: **“Đưa bản web hiện tại lên memorymatchv1-1a.web.app, gồm trang quyền riêng tư và tệp xác nhận quảng cáo.”** Việc này cập nhật toàn bộ bản web hiện tại, gồm cả giao diện; không chỉ riêng trang quyền riêng tư.
+3. Mở `https://memorymatchv1-1a.web.app/legal/privacy.html`. Phải thấy nội dung quyền riêng tư của Memory Match Adventure. Lần kiểm tra ngày16/10 đường dẫn này vẫn mở trang chọn trò chơi. Kiểm tra thêm `https://memorymatchv1-1a.web.app/app-ads.txt` có dòng `google.com, pub-2780380420199964, DIRECT, f08c47fec0942fa0`.
+4. Trong AdMob → Quyền riêng tư và thông điệp → Quy định của Châu Âu, mở bản nháp **Quyền riêng tư · Memory Match Adventure**. Kiểm tra chỉ chọn Memory Match và đường dẫn ở bước3, rồi bấm **Đăng**. Không cần tạo bản nháp mới hay chỉnh thông điệp của trò chơi khác.
+5. Sau khi Google cập nhật cấu hình, đóng rồi mở lại APK và kiểm tra banner trên điện thoại thử nghiệm. Nếu vẫn không có quảng cáo, gửi ảnh/thời điểm để kiểm tra; bản hiện tại chưa có bằng chứng quảng cáo thật hoặc nhãn Test Ad.
+
+Các mục dưới đây là hướng dẫn đối chiếu đầy đủ; không cần tạo lại ứng dụng, banner hoặc mức G đã có.
+
 1. Đăng nhập tài khoản đang quản lý Memory Match Adventure. Chọn đúng ứng dụng, không chỉnh nhầm trò chơi khác.
 2. Kiểm tra ứng dụng dùng tên gói `com.memorymatch.adventure`. Kiểm tra mã ứng dụng có phần cuối `~5572977569` và mã banner có phần cuối `/4149796201`.
 3. Trong phần kiểm soát quảng cáo của ứng dụng, chọn mức nội dung phù hợp mọi lứa tuổi/G. Chưa bật thêm các mạng quảng cáo khác cho bản thử đầu tiên.
