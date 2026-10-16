@@ -28,8 +28,12 @@ Sheet là nguồn tổng quan, không phải atlas đã cắt với các ô đ�
 
 ## Ảnh riêng cho runtime main menu
 
-Theo yêu cầu triển khai hướng1, đã dùng imagegen built-in dựng riêng3cảnh theo mẫu đã chọn, không phóng lớn các ô400px của sheet. Master PNG giữ ngoài bundle trong `masters/`; [prompt](runtime-prompts-v1.json), [metadata](runtime-metadata-v1.json). Chỉ ảnh minh họa cơ chế ghép cặp/nối cặp/ba thẻ cùng loại; không bake tên/nút/UI vào tranh. Triple không vẽ khay tránh mô tả sai dung lượng.
+Theo yêu cầu triển khai hướng1, đã dùng imagegen built-in dựng riêng3cảnh theo mẫu đã chọn, không phóng lớn các ô400px của sheet. Master PNG giữ ngoài bundle trong `masters/`; [prompt](runtime-prompts-v1.json), [metadata hiện hành](runtime-metadata-v2.json). Chỉ ảnh minh họa cơ chế ghép cặp/nối cặp/ba thẻ cùng loại; không bake tên/nút/UI vào tranh. Triple không vẽ khay tránh mô tả sai dung lượng.
 
-`python scripts/prepare-home-menu-assets.py` chỉ xuất RGB/resize/WebP, không vẽ/cắt/chỉnh nội dung. Runtime: Memory900×600/134.722bytes, Link576×720/100.752bytes, Triple576×720/113.944bytes; tổng349.418bytes, gate≤350.000bytes. Tên/viền/focus vẫn là DOM/CSS. Nền Home dùng lại Vườn đêm36.046bytes hiện có, không tạo bản gần giống. Ảnh popup trong game không dùng bộ art này.
+`python scripts/prepare-home-menu-assets.py` chỉ xuất RGB/resize/WebP, không vẽ/cắt/chỉnh nội dung. Runtime hiện hành: Memory576×768/108.670bytes, Link576×720/100.752bytes, Triple576×720/113.944bytes; tổng323.366bytes, gate≤350.000bytes. Tên/viền/focus vẫn là DOM/CSS. Nền Home dùng lại Vườn đêm36.046bytes hiện có, không tạo bản gần giống. Ảnh popup trong game không dùng bộ art này.
 
-Ngày2026-10-16: art runtime giữ nguyên, Home chuyển sang một trò ở giữa và vuốt ngang; viền/nhãn đơn giản hơn, không dùng flourish tiêu đề. Không tạo hoặc tải thêm tranh. QA hiện hành: [carousel](../home-carousel/QA.md).
+Lần triển khai carousel đầu ngày2026-10-16 giữ art, chuyển sang một trò ở giữa và vuốt ngang; viền/nhãn đơn giản hơn, không dùng flourish tiêu đề. Không tạo hoặc tải thêm tranh. QA hiện hành: [carousel](../home-carousel/QA.md).
+
+## Memory portrait v2 và nối vòng
+
+Theo yêu cầu tiếp theo ngày2026-10-16, skill imagegen dùng built-in image_gen vẽ lại Memory theo3:4 từ ảnh ngang cũ, không crop/phóng ảnh đó. [Master mới](masters/memory-match-v2.png)1086×1448; [prompt nguyên văn](memory-portrait-prompt-v2.json). Hai thẻ hoa giống nhau và mặt lưng được đặt trọn ở giữa khung dọc; giữ vườn đêm/nhà kính/đài phun. Đã kiểm asset và giao diện412/844. Source generator xuất `public/assets/images/home/memory-match-v2.webp`; đổi URL có phiên bản vì hosting immutable và serviceworker cache-first, không để máy giữ ảnh ngang cũ. Runtime cũ đã gỡ, masterv1/metadata-v1 chỉ là hồ sơ thiết kế. Link/Triple không đổi, tổng3ảnh323.366bytes≤350KB.

@@ -8,11 +8,11 @@ root = Path(__file__).resolve().parents[1]
 source = root / 'docs/design/home-assets/masters'
 target = root / 'public/assets/images/home'
 target.mkdir(parents=True, exist_ok=True)
-assets = {'memory-match': ('memory-match-v2.png', (576, 768)), 'link-connect': ('link-connect-v1.png', (576, 720)), 'triple-connect': ('triple-connect-v1.png', (576, 720))}
+assets = {'memory-match': ('memory-match-v2.png', 'memory-match-v2.webp', (576, 768)), 'link-connect': ('link-connect-v1.png', 'link-connect.webp', (576, 720)), 'triple-connect': ('triple-connect-v1.png', 'triple-connect.webp', (576, 720))}
 records = []
-for game, (filename, size) in assets.items():
+for game, (filename, runtime, size) in assets.items():
     master = source / filename
-    output = target / f'{game}.webp'
+    output = target / runtime
     with Image.open(master) as original:
         original_size = original.size
         image = original.convert('RGB')

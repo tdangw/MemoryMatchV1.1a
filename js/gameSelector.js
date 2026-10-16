@@ -23,7 +23,7 @@ import { mountAdventureMap } from "./adventureMap.js";
 import { decorateAdventureMenu } from "./appNavigation.js";
 
 const HOME_ART = Object.freeze({
-  'memory-match': 'memory-match.webp',
+  'memory-match': 'memory-match-v2.webp',
   'link-connect': 'link-connect.webp',
   'triple-connect': 'triple-connect.webp',
 });

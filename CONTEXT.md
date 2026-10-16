@@ -6,19 +6,21 @@ Người dùng đã chọn tự xuất bản website và thông điệp AdMob ng
 
 ## Sản phẩm
 
+- `HOME_CAROUSEL_LOOP_PLAN.md` hoàn tất: Home nối vòng cảhai chiều bằng cùng3node; modulo cho arrows/keyboard, DOM rebase tại native scrollend và giữ focus, không clone/RAF loop. Memory được imagegen tích hợp vẽ lại portraitv2 576×768, URL có phiên bản để tránh cache ngang cũ; tổng3ảnh323.366bytes. Root19/19, review14/14 +cache1/1, regression31ca có kết quả đạt, gate ảnh/UI cuối14/14, check/build web/Android pass. Phase1commitabc5696; QA: `docs/design/home-carousel/QA.md`. Không đổi save/API/catalog, không deploy/APK; S22 Ultra thật còn chờ.
+
 - Web đã bổ sung banner tĩnh **Quảng cáo mô phỏng** ở Home/map theo yêu cầu16/10, dùng chung navigation/blocker/lifecycle với Android. Vùng60px + gap28px, ẩn modal/tab/gameplay/nền/nhập chữ; không gọi Google hoặc đổi save/Auth/API. Native regression9/9, web review độc lập4/4, production smoke1/1, check/build web/build Android đạt; ảnh và kết quả ở `docs/ads/QA.md`. Chưa deploy, APK đã bàn giao giữ nguyên.
 
 - Tab Sự kiện thay Bạn bè ngày2026-10-16: action events, tiêu đề/nhãn Sự kiện, biểu tượng lịch. Hiện Sắp ra mắt, chưa triển khai tính năng sự kiện. Giữ nền courtyard hiện có và lifecycle chung; không đổi save/schema/Auth. UI36/36, review độc lập3/3, check/build web/Android pass; QA tại `docs/design/app-tabs/QA.md`.
 
 - Profile đã bỏ dòng “Tính từ…” theo yêu cầu ngày2026-10-16; chỉ hiển thị ngày tham gia/tạo hồ sơ và tổng thời gian chơi. trackedSince/counter vẫn giữ nội bộ, không đổi service/schema/save. UI5/5, review độc lập1/1, check/build web/Android pass. Ảnh và bằng chứng ở `docs/design/app-tabs/QA.md`.
 
-- `HOME_CAROUSEL_PLAN.md` hoàn tất: Home một trò ở giữa, vuốt trái/phải, hé trò hai bên; mũi tên/chấm và bàn phím. Native scroll-snap, scope sở hữu frame/observer/listener, không clone/tự chạy; giữ art/save/catalog/navigation và nội dung tab/popup. Phase1 commit665dafb. Home/registry17ca, regression52/52, review cuối12/12 và touch lặp5/5 đạt; check/build web/Android pass. QA: `docs/design/home-carousel/QA.md`. Không còn gate triển khai active; S22 Ultra thật còn chờ.
+- `HOME_CAROUSEL_PLAN.md` là hồ sơ carousel ban đầu (đã nối vòng theo kế hoạch mới): Home một trò ở giữa, vuốt trái/phải, hé trò hai bên; mũi tên/chấm và bàn phím. Native scroll-snap, scope sở hữu frame/observer/listener, không clone/tự chạy; giữ art/save/catalog/navigation và nội dung tab/popup. Phase1 commit665dafb. Home/registry17ca, regression52/52, review cuối12/12 và touch lặp5/5 đạt; check/build web/Android pass. QA: `docs/design/home-carousel/QA.md`. Không còn gate triển khai active; S22 Ultra thật còn chờ.
 
 - Popup Thử thách/Vô tận của cả3trò đã đồng bộ với popup màn Hành trình: xem thông tin màn1 rồi bấm Chơi, không chọn độ khó; thời gian/mục tiêu/gợi ý/khay/chủ đề theo config/profile. Vô tận ghi Không giới hạn, không lặp popup intro. Hủy không đổi save/session/độ khó thường; submit có guard/retry. QA45ca có kết quả đạt, review độc lập14/14; check/build web/build Android pass. Không đổi save schema/luật chơi. Chi tiết: `docs/design/special-mode-preview/QA.md`.
 
 - Active: `ADS_APK_TEST_PLAN.md` — phase0–4 đã đạt: chỉ banner Home/map, giữ `com.memorymatch.adventure`, bảo vệ trẻ em cho mọi người chơi, không hỏi tuổi/không cá nhân hóa, nội dung G. Unit15/15, UI71/71 + chạy lại ads9/9, check/build web/Android/APK và review độc lập đạt. Không đổi save/API/Auth. APK debug đã tạo/cài giả lập; phase5 còn chờ thông điệp AdMob riêng và trang quyền riêng tư công khai: SDK hiện chặn request vì app chưa có form. Đã xác nhận đúng App ID/unit và đặt mức G riêng trên AdMob; không deploy website. S22 Ultra/Test Ad thật/Auth APK/hiệu suất chưa xác minh. Chi tiết `docs/ads/QA.md`, hướng dẫn dễ hiểu `docs/ads/HUONG_DAN_THU_APK.md`.
 
-- `HOME_MENU_IMPLEMENTATION_PLAN.md` là hồ sơ Home bố cục1+2 ngày2026-10-15, đã được thay bằng carousel ngày2026-10-16. Ba WebP riêng tổng349.418bytes tiếp tục dùng; nguồn art ở `docs/design/home-assets/README.md`, QA cũ ở `docs/design/home-menu/QA.md`. Ornament ảnh trên pause popup đã gỡ theo yêu cầu.
+- `HOME_MENU_IMPLEMENTATION_PLAN.md` là hồ sơ Home bố cục1+2 ngày2026-10-15, đã được thay bằng carousel ngày2026-10-16. Link/Triple tiếp tục dùng; Memory hiện thay portraitv2 (tổng3ảnh323.366bytes); nguồn art ở `docs/design/home-assets/README.md`, QA cũ ở `docs/design/home-menu/QA.md`. Ornament ảnh trên pause popup đã gỡ theo yêu cầu.
 
 - Sheet12vùng nền trò/popup/tiêu đề/khung ở `docs/design/home-assets/README.md` chỉ là nguồn tham khảo; runtime Home dùng ba tranh riêng có master lớn hơn, không dùng sheet làm nền cả màn. Carousel hiện không dùng flourish tiêu đề, không tạo thêm art.
 

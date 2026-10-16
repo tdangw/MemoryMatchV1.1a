@@ -19,6 +19,8 @@ for (const viewport of [{ width: 320, height: 740 }, { width: 412, height: 915 }
   const root = page.locator('.game-selector'), choices = root.locator('.game-selector__choice');
   await expect(choices).toHaveCount(3); await expect(root.locator('.menu-description')).toHaveCount(0);
   await expect.poll(() => root.locator('.game-selector__art').evaluateAll(els => els.every(im => im.complete && im.naturalWidth > 0))).toBe(true);
+  await expect(root.locator('[data-game-id="memory-match"] img')).toHaveAttribute('src', /memory-match-v2\.webp$/);
+  expect(await root.locator('[data-game-id="memory-match"] img').evaluate(im => [im.naturalWidth, im.naturalHeight])).toEqual([576, 768]);
   const footer = await root.locator('.adventure-footer').boundingBox();
   expect(footer.width).toBe(Math.min(viewport.width, 640));
   for (let i = 0; i < 3; i++) {
