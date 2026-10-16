@@ -4,6 +4,8 @@
 
 ## Sản phẩm
 
+- Profile đã bỏ dòng “Tính từ…” theo yêu cầu ngày2026-10-16; chỉ hiển thị ngày tham gia/tạo hồ sơ và tổng thời gian chơi. trackedSince/counter vẫn giữ nội bộ, không đổi service/schema/save. UI5/5, review độc lập1/1, check/build web/Android pass. Ảnh và bằng chứng ở `docs/design/app-tabs/QA.md`.
+
 - `HOME_CAROUSEL_PLAN.md` hoàn tất: Home một trò ở giữa, vuốt trái/phải, hé trò hai bên; mũi tên/chấm và bàn phím. Native scroll-snap, scope sở hữu frame/observer/listener, không clone/tự chạy; giữ art/save/catalog/navigation và nội dung tab/popup. Phase1 commit665dafb. Home/registry17ca, regression52/52, review cuối12/12 và touch lặp5/5 đạt; check/build web/Android pass. QA: `docs/design/home-carousel/QA.md`. Không còn gate triển khai active; S22 Ultra thật còn chờ.
 
 - Popup Thử thách/Vô tận của cả3trò đã đồng bộ với popup màn Hành trình: xem thông tin màn1 rồi bấm Chơi, không chọn độ khó; thời gian/mục tiêu/gợi ý/khay/chủ đề theo config/profile. Vô tận ghi Không giới hạn, không lặp popup intro. Hủy không đổi save/session/độ khó thường; submit có guard/retry. QA45ca có kết quả đạt, review độc lập14/14; check/build web/build Android pass. Không đổi save schema/luật chơi. Chi tiết: `docs/design/special-mode-preview/QA.md`.
@@ -14,7 +16,7 @@
 
 - `POPUP_POLISH_PLAN.md`: phase1–5 hoàn tất trong phạm vi được giao, không còn kế hoạch triển khai active. Exit bản đồ và mọi screen chức năng (gồm Cửa hàng/Bộ sưu tập) gắn header; Xu giữa Cửa hàng; title Bộ sưu tập không lặp game. Popup bám board, bản đồ dùng cùng mốc chrome ngay lần đầu; menu tạm dừng Vườn đêm có Tiếp tục. QA: `docs/design/popups/QA.md`. Hai mẫu Home và prompt ở `docs/design/home-concepts/README.md`, là nguồn tham khảo cho Home hiện tại. Không deploy/đổi save; S22 Ultra thật còn chờ.
 
-- Tinh chỉnh tab ngày2026-10-15: sửa tên ngay cạnh tên với bút/Lưu/Hủy, ngày bắt đầu theo dõi nằm trong ô thời gian chơi; ẩn thông báo đồng bộ bình thường. Family xếp hạng canh giữa; top3 huy chương SVG, các hạng sau số sáng không khung. Header tối và exit gắn góc phải cố định trên cả5tab. UI/emulator/check/build đã đạt; chi tiết ở `docs/design/app-tabs/QA.md`. Không đổi API/schema/save/Auth.
+- Tinh chỉnh tab ngày2026-10-15: sửa tên ngay cạnh tên với bút/Lưu/Hủy, dòng ngày bắt đầu theo dõi đã được bỏ khỏi giao diện ngày2026-10-16; ẩn thông báo đồng bộ bình thường. Family xếp hạng canh giữa; top3 huy chương SVG, các hạng sau số sáng không khung. Header tối và exit gắn góc phải cố định trên cả5tab. UI/emulator/check/build đã đạt; chi tiết ở `docs/design/app-tabs/QA.md`. Không đổi API/schema/save/Auth.
 
 - `APP_TABS_VISUAL_PLAN.md`: Phase0–5 đã hoàn tất, mỗi phase một commit; không còn kế hoạch triển khai active. Bốn nền WebP mới53–112KB; Profile có name editor và stats/account trong content; Cài đặt3nhóm cuộn gồm Help/Reset; Xếp hạng khôngrefresh thường trực, fresh khi mở, menu128px và familyheading. Giữ ranking v3/Auth/save/private stats. QA: `docs/design/app-tabs/QA.md`. Không Hosting/APK/Firebase rollout; S22 Ultra thật còn chờ.
 

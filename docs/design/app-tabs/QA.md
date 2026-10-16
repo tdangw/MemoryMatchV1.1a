@@ -85,3 +85,9 @@ Chọn giữ DOM/handler exit hiện tại và đổi bố cục tại owner CSS
 | npm run build / build:android |Pass cả hai; không cap sync/APK/Hosting |
 
 Ảnh runtime: [sửa tên trực tiếp](qa/profile-editing-412.png), [Profile](qa/profile-inline-412.png), [Cài đặt và exit](qa/settings-412.png), [huy chương/canh giữa](qa/mobile-level-challenge.png). Screenshot layout dùng fixture, không đưa dữ liệu mẫu vào sản phẩm. Đã xem ảnh runtime; Galaxy S22 Ultra thật vẫn chờ thiết bị theo xác nhận người dùng. Số đo Node/browser không phải nghiệm thu FPS điện thoại.
+
+## Bỏ dòng ngày theo dõi — 2026-10-16
+
+Bỏ node và render “Tính từ…” trong Profile; chỉ còn ngày tham gia/tạo hồ sơ và tổng thời gian chơi. Không ẩn bằng CSS, không đổi trackedSince, counter, service, subscription hoặc save. CSS account-play-since vẫn dùng cho trạng thái lỗi aria-live. Kiểm tra mục tiêu5/5:4viewport320/412/844/1024 và tổng thời gian3trò giữ sau reload. Review độc lập1/1 approve; trackedSince vẫn>0, tổng96000ms không thay. Ảnh profile4viewport đã cập nhật và kiểm trực quan.
+
+Cổng cuối cho thay đổi này: npm run check, npm run build và npm run build:android đều exit0; git diff --check đạt. Không deploy/đổi API hoặc dữ liệu lưu.

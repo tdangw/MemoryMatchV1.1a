@@ -109,7 +109,6 @@ function profileDetails(content) {
   const timeLabel = document.createElement('dt'); timeLabel.textContent = 'Thời gian chơi'; const time = document.createElement('dd');
   const timeValue = document.createElement('span'); time.append(timeValue);
   joinedCard.append(joinedLabel, joined); timeCard.append(timeLabel, time); details.append(joinedCard, timeCard);
-  const since = document.createElement('p'); since.className = 'account-play-since'; time.append(since);
   const status = document.createElement('p'); status.className = 'account-play-since'; status.setAttribute('aria-live', 'polite');
   content.append(details, status);
   const formatDate = value => new Date(value).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
@@ -118,7 +117,6 @@ function profileDetails(content) {
     joinedLabel.textContent = state.onlineAccount ? 'Tham gia' : 'Hồ sơ tạo ngày';
     joined.textContent = state.joinedAt ? formatDate(state.joinedAt) : '—';
     timeValue.textContent = state.totalPlayMs === null ? '—' : formatProfilePlaytime(state.totalPlayMs);
-    since.textContent = state.trackedSince ? `Tính từ ${formatDate(state.trackedSince)}` : '';
     status.textContent = state.phase === 'error' ? 'Chưa cập nhật được thời gian chơi.' : '';
   };
   render({ onlineAccount: false, totalPlayMs: null });
