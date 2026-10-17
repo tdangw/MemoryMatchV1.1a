@@ -10,7 +10,7 @@ import { shellTimeout as setTimeout, clearShellTimeout as clearTimeout, shellInt
 import { createIcon } from "../icons.js";
 import { unmountActiveGameShell } from "../gameShell/gameShell.js";
 import { GAME_SHELL_DEFAULTS } from "../gameShell/gameShellConfig.js";
-import { createHudTimerScheduler } from "../gameShell/gameTimerProgress.js";
+import { createHudTimerScheduler, HUD_PROGRESS_TICK_MS } from "../gameShell/gameTimerProgress.js";
 import { createGameShellStartup } from "../gameShell/gameShellStartup.js";
 import { getCompactLandscapeColumns } from "../gameShell/gameShellLayout.js";
 import { clearTooltip } from "../tooltips.js";
@@ -125,7 +125,7 @@ import {
 
 let countdownInterval;
 const linkTimeScheduler = createHudTimerScheduler({
-  schedule: (callback) => setTimeout(callback, 250),
+  schedule: (callback) => setTimeout(callback, HUD_PROGRESS_TICK_MS),
   cancel: clearTimeout,
 });
 let linkTimeProgressState = null;

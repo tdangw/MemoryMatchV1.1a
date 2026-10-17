@@ -8,7 +8,7 @@ Phạm vi được duyệt: giữ banner ở cửa sổ chọn màn; danh sách 
 - [x] B. Công cụ ba trò dùng cùng bố cục biểu tượng/tên/số lượng; kiểm tra rồi commit.
 - [x] C. Thanh đóng băng theo đồng hồ hiện có, hỗ trợ pause/restart/restore; kiểm tra rồi commit.
 - [x] D. Rà hoạt ảnh ba trò và thay emoji, giữ ownership/cleanup/reduced-motion; kiểm tra rồi commit.
-- [ ] E. Review độc lập, regression liên quan, check/build và ghi bằng chứng cuối.
+- [x] E. Review độc lập, regression liên quan, check/build và ghi bằng chứng cuối.
 
 ## Lựa chọn
 
@@ -33,3 +33,5 @@ Phase B: công cụ cùng geometry ở 412/844/1024; badge số lượng có ở
 Phase C: cùng scheduler HUD 250ms, thêm một node cố định; test dùng vật phẩm/cộng dồn/pause/background/restart đã đạt ở reduce và no-preference. Session đóng băng khôi phục từ freezeSeconds cũ, không đổi schema.
 
 Phase D: rà emoji và ký hiệu font có chuyển động; SVG/CSS thay hình, không đổi effect ID/timeline/cleanup. Review độc lập source và UI/restore17/17, ảnh summary kiểm tra đúng trạng thái2sao đạt/1sao chưa đạt.
+
+Phase E hoàn tất18/10/2026: matrix145/145, independent17/17+cadence2/2, native9/9, check (ads15/15), build web/Android APK và production smoke1/1 đạt. Cadence CSS và scheduler cùng HUD_PROGRESS_TICK_MS; sửa mốc đo victory sau renderer cancellation, không nới tiêu chí. Báo cáo/receipt/ảnh tại docs/design/hud-polish/QA.md. Không còn gate triển khai trong kế hoạch; thiết bị thật/quảng cáo thật vẫn là QA phát hành riêng sau khi chủ dự án tự xuất bản theo hồ sơ quảng cáo.

@@ -261,7 +261,7 @@
   opacity: 0;
   transform: scaleX(0);
   transform-origin: left center;
-  transition: transform 250ms linear;
+  transition: transform var(--link-freeze-progress-tick) linear;
 }
 @media (prefers-reduced-motion: reduce) {
   .link-game-hud .game-hud__metric.stat-timer > .link-freeze-progress { transition: none; }

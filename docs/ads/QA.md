@@ -1,5 +1,11 @@
 # Kết quả kiểm tra quảng cáo và APK — 16–17/10/2026
 
+## Cập nhật18/10 — APK sau hoàn thiện HUD
+
+Preview màn giữ banner và chừa khoảng ở màn hình ngang; các cửa sổ khác vẫn ẩn. Công cụ ba trò đồng bộ, Profile bỏ trang trí nhỏ, Link thêm thanh đóng băng; hình hoạt ảnh dùng SVG/CSS. Chi tiết và ảnh: `docs/design/hud-polish/QA.md`.
+
+Native9/9, matrix145/145, review17/17+2/2, check (ads15/15), web/AndroidAPK build và production smoke1/1 đạt. APK34250200bytes, SHA256 `ABA39E632544068D86544DB24F7FB7F4F8E803FB15AA81DDFE519314873B581A`, packagecom.memorymatch.adventure/version1.0, chữ ký debugv2 hợp lệ. Chưa cài/kiểm tra trên S22 Ultra thật trong lượt này; giữ các bước chủ dự án tự xuất bản website/thông điệp, không bypass consent hoặc thay quyền quảng cáo thật.
+
 ## Cập nhật17/10 — phần mềm đã đóng gói
 
 Chủ dự án chốt web có khung ở mọi tab và gameplay3trò; Android thật mở mọi tab, gameplay native vẫn tắt. PhaseA: shared shell reserve58px, layoutfit trừ cùng58px, long board cuộn tới nội dung cuối trên fixed banner; scope chịu trách nhiệm tạo/hủy slot, không chèn nhánh game trong runtime. Các giới hạn placement ngày16/10 bên dưới là lịch sử, đã được thay bởi phạm vi mới này.

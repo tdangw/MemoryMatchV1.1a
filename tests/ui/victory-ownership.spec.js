@@ -25,6 +25,8 @@ test('30 cancellation, game-switch, hidden-tab and early-flower cycles release e
   const cdp = await page.context().newCDPSession(page); await cdp.send('HeapProfiler.enable'); await cdp.send('Performance.enable');
   const samples = [];
   await page.exposeBinding('sampleVictoryHeap', async () => {
+    // Measure after the renderer has processed cancelled WAAPI effects and detached their targets.
+    await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
     await cdp.send('HeapProfiler.collectGarbage');
     const metrics = Object.fromEntries((await cdp.send('Performance.getMetrics')).metrics.map(item => [item.name, item.value]));
     samples.push({ heap: (await cdp.send('Runtime.getHeapUsage')).usedSize, nodes: metrics.Nodes, listeners: metrics.JSEventListeners });

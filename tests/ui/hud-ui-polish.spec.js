@@ -59,6 +59,7 @@ for (const reducedMotion of ['no-preference', 'reduce']) test(`freeze bar follow
   await expect.poll(() => page.evaluate(async () => (await import('/js/linkConnect/linkState.js')).linkGameState.isLocked)).toBe(false);
   const bar = page.locator('.link-freeze-progress');
   if (reducedMotion === 'reduce') await expect(bar).toHaveCSS('transition-duration', '0s');
+  else await expect(bar).toHaveCSS('transition-duration', '0.25s');
   const sample = () => page.evaluate(async () => {
     const state = (await import('/js/linkConnect/linkState.js')).linkGameState;
     return { seconds: state.freezeSeconds, time: state.remainingTime, scale: Number(document.querySelector('.link-freeze-progress').style.transform.match(/[\d.]+/)[0]) };

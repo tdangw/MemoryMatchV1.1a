@@ -4,6 +4,7 @@ import { formatClockTime } from "../uiCatalog.js";
 import { createIcon } from "../icons.js";
 import { LINK_ITEMS } from "./linkItems.js";
 import { bindGameHudMenus } from "../gameShell/gameHudMenus.js";
+import { HUD_PROGRESS_TICK_MS } from "../gameShell/gameTimerProgress.js";
 
 let shell;
 let linkHudElements = null;
@@ -150,6 +151,7 @@ export function getLinkHud(hud) {
 }
 
 export function applyLinkTimingStyles(container, timing) {
+  container.style.setProperty("--link-freeze-progress-tick", `${HUD_PROGRESS_TICK_MS}ms`);
   container.style.setProperty("--link-path-animation-duration", `${timing.pathAnimationMs}ms`);
   container.style.setProperty("--link-tile-exit-delay", `${timing.tileExitDelayMs}ms`);
   container.style.setProperty("--link-tile-exit-duration", `${timing.tileExitAnimationMs}ms`);

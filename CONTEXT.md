@@ -1,4 +1,4 @@
-# CONTEXT — Trạng thái hiện tại (2026-10-17)
+# CONTEXT — Trạng thái hiện tại (2026-10-18)
 
 Đọc file này khi bắt đầu task mới. Đây là snapshot điều hướng, không thay thế code/config và không chứa lịch sử triển khai chi tiết.
 
@@ -6,7 +6,7 @@ Người dùng đã chọn tự xuất bản website và thông điệp AdMob ng
 
 ## Sản phẩm
 
-- Active 17/10: `HUD_UI_POLISH_PLAN.md` — banner cửa sổ chọn màn, công cụ ba trò, Profile, thanh đóng băng Link và bỏ emoji trong hoạt ảnh. Hồ sơ quảng cáo bên dưới chỉ còn các bước xuất bản/QA do chủ dự án tự thực hiện.
+- Hoàn tất18/10: `HUD_UI_POLISH_PLAN.md` phaseA–E — preview giữ banner/chừa chiều cao; công cụ ba trò cùng bố cục icon/tên/count; Profile bỏ flourish; thanh đóng băng Link dùng cadence HUD, pause/restore/stack/restart; hình hoạt ảnh dùng SVG/CSS. Matrix145/145, review17/17+2/2, native9/9, check/buildweb/AndroidAPK, production smoke1/1 đạt. QA/receipt/ảnh: `docs/design/hud-polish/QA.md`. Không đổi save/catalog/luật chơi, API cũ tương thích, không deploy/publish. Không còn kế hoạch triển khai active; hồ sơ quảng cáo chỉ còn xuất bản/QA thiết bị thật do chủ dự án thực hiện.
 
 - Banner17/10: phaseA/B/C đã hoàn tất, code71f7f18/23b294a — web mọi tab+gameplay3trò, Android mọi tab nhưng gameplay thật tắt theo trả lời user. Shell reserve58px/scroll trên banner; web dùng3cảnh vector/CSS không chữ luân phiên6s/cảnh, reduced-motion đứng yên, dispose hủy scene/listener. Native9/9, matrix121ca có kết quả đạt sau sửa test chờ run.whenIdle, review nguồncuối8/8 có30restart, art4/4+perfHome/3game đạt. Check/unit15/15, buildweb/AndroidAPK và production smoke1/1 cógameplay đạt; receipt17/10 ở docs/ads/QA.md. Không đổi save/API/catalog/Auth, không deploy/publish. ADS_APK_TEST_PLAN.md còn QA quảng cáo thật/điện thoại sau khi người dùng tự xuất bản thông điệp.
 
@@ -22,7 +22,7 @@ Người dùng đã chọn tự xuất bản website và thông điệp AdMob ng
 
 - Popup Thử thách/Vô tận của cả3trò đã đồng bộ với popup màn Hành trình: xem thông tin màn1 rồi bấm Chơi, không chọn độ khó; thời gian/mục tiêu/gợi ý/khay/chủ đề theo config/profile. Vô tận ghi Không giới hạn, không lặp popup intro. Hủy không đổi save/session/độ khó thường; submit có guard/retry. QA45ca có kết quả đạt, review độc lập14/14; check/build web/build Android pass. Không đổi save schema/luật chơi. Chi tiết: `docs/design/special-mode-preview/QA.md`.
 
-- Active: `ADS_APK_TEST_PLAN.md` — phase0–4 đã đạt: chỉ banner Home/map, giữ `com.memorymatch.adventure`, bảo vệ trẻ em cho mọi người chơi, không hỏi tuổi/không cá nhân hóa, nội dung G. Unit15/15, UI71/71 + chạy lại ads9/9, check/build web/Android/APK và review độc lập đạt. Không đổi save/API/Auth. APK debug đã tạo/cài giả lập; phase5 còn chờ thông điệp AdMob riêng và trang quyền riêng tư công khai: SDK hiện chặn request vì app chưa có form. Đã xác nhận đúng App ID/unit và đặt mức G riêng trên AdMob; không deploy website. S22 Ultra/Test Ad thật/Auth APK/hiệu suất chưa xác minh. Chi tiết `docs/ads/QA.md`, hướng dẫn dễ hiểu `docs/ads/HUONG_DAN_THU_APK.md`.
+- Hồ sơ chuẩn bị quảng cáo: `ADS_APK_TEST_PLAN.md` — phase0–4 đã đạt: chỉ banner Home/map, giữ `com.memorymatch.adventure`, bảo vệ trẻ em cho mọi người chơi, không hỏi tuổi/không cá nhân hóa, nội dung G. Unit15/15, UI71/71 + chạy lại ads9/9, check/build web/Android/APK và review độc lập đạt. Không đổi save/API/Auth. APK debug đã tạo/cài giả lập; phase5 còn chờ thông điệp AdMob riêng và trang quyền riêng tư công khai: SDK hiện chặn request vì app chưa có form. Đã xác nhận đúng App ID/unit và đặt mức G riêng trên AdMob; không deploy website. S22 Ultra/Test Ad thật/Auth APK/hiệu suất chưa xác minh. Chi tiết `docs/ads/QA.md`, hướng dẫn dễ hiểu `docs/ads/HUONG_DAN_THU_APK.md`.
 
 - `HOME_MENU_IMPLEMENTATION_PLAN.md` là hồ sơ Home bố cục1+2 ngày2026-10-15, đã được thay bằng carousel ngày2026-10-16. Link/Triple tiếp tục dùng; Memory hiện thay portraitv2 (tổng3ảnh323.366bytes); nguồn art ở `docs/design/home-assets/README.md`, QA cũ ở `docs/design/home-menu/QA.md`. Ornament ảnh trên pause popup đã gỡ theo yêu cầu.
 
