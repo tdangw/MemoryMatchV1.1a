@@ -63,27 +63,6 @@
     min-height: var(--shell-milestones-track-height);
   }
 }
-.triple-connect__items {
-  display: grid;
-  gap: 2px;
-}
-.triple-connect__items button {
-  display: flex;
-  min-height: 36px;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 0 10px;
-  color: #eff8ff;
-  border: 0;
-  border-radius: 6px;
-  background: transparent;
-  text-align: left;
-}
-.triple-connect__items button:hover,
-.triple-connect__items button:focus-visible {
-  background: rgb(255 255 255 / 12%);
-}
 .triple-connect__frame {
   min-height: 0;
   display: grid;

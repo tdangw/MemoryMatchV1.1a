@@ -218,10 +218,3 @@
 #game-title.game-hud .stat-timer.is-previewing .ui-icon--eye {
   color: #b9e5ff;
 }
-
-
-/* Memory Match uses the same compact tool drawer as the other two games. */
-.memory-tool-list { display: grid; gap: 2px; }
-.memory-tool-item { display: flex; width: 100%; min-height: 32px; align-items: center; gap: 7px; padding: 5px 7px; border: 0; border-radius: 7px; background: transparent; color: #eff6ff; font: inherit; font-size: .73rem; text-align: left; }
-.memory-tool-item:hover, .memory-tool-item:focus-visible { background: rgb(255 255 255 / 12%); outline: none; }
-.memory-tool-item .ui-icon { width: 16px; height: 16px; color: #9edbff; }

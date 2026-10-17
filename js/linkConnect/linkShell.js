@@ -27,7 +27,7 @@ export function getLinkShell() {
         </div>
         <button id="link-tools-toggle" class="link-tools-toggle" type="button" aria-label="Mở công cụ hỗ trợ" aria-controls="link-tools-menu" aria-expanded="false"></button>
         <div id="link-tools-menu" class="link-tools-menu" hidden>
-          <aside id="link-item-actions" class="link-tool-list" aria-label="Vật phẩm hỗ trợ"></aside>
+          <aside id="link-item-actions" class="link-tool-list hud-tool-list" aria-label="Vật phẩm hỗ trợ"></aside>
         </div>
       </header>
       <section class="link-special-hud" data-shell-region="milestones" aria-label="Tiến trình năng lượng đặc biệt">
@@ -65,7 +65,7 @@ function createItemButtons(container) {
   LINK_ITEMS.forEach((item) => {
     const button = document.createElement("button");
     button.type = "button";
-    button.className = "link-connect-game__item";
+    button.className = "link-connect-game__item hud-tool-item";
     button.dataset.item = item.id;
     button.setAttribute("aria-label", item.title);
     button.append(createIcon(item.icon));
@@ -73,6 +73,7 @@ function createItemButtons(container) {
     label.textContent = item.id === "hint" ? "Gợi ý" : item.title;
     const count = document.createElement("strong");
     count.dataset.itemCount = item.id;
+    count.className = "hud-tool-count";
     button.append(label, count);
     actions?.append(button);
   });

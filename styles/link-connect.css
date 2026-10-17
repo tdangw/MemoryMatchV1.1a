@@ -899,30 +899,6 @@
   color: #ffe09a;
 }
 
-.link-tool-list { display: grid; gap: 2px; }
-
-.link-tool-list .link-connect-game__item {
-  display: grid;
-  min-height: var(--shell-hud-min-height);
-  grid-template-columns: 19px minmax(0, 1fr) 19px;
-  align-items: center;
-  gap: 7px;
-  width: 100%;
-  padding: 6px 8px;
-  border: 0;
-  border-radius: 8px;
-  background: transparent;
-  color: #f5f7fb;
-  font: 700 0.74rem/1.1 "Segoe UI", sans-serif;
-  text-align: left;
-}
-
-.link-tool-list .link-connect-game__item:hover,
-.link-tool-list .link-connect-game__item:focus-visible { background: rgb(255 255 255 / 16%); outline: none; }
-.link-tool-list .link-connect-game__item .ui-icon { width: 17px; height: 17px; color: #70c5ff; }
-.link-tool-list .link-connect-game__item strong { display: grid; width: 18px; height: 18px; place-items: center; border-radius: 50%; background: rgb(242 191 91 / 18%); color: #f2bf5b; font-size: 0.64rem; }
-.link-tool-list .link-connect-game__item.is-disabled { cursor: not-allowed; opacity: 0.44; }
-
 .link-special-hud {
   position: relative;
   display: flex;

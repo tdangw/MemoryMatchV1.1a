@@ -19,10 +19,10 @@ template.innerHTML = `<div id="game-container" class="game-shell-tokens" style="
 
         <button id="memory-tools-toggle" class="memory-tools-toggle" type="button" aria-label="Mở công cụ hỗ trợ" aria-controls="memory-tools-menu" aria-expanded="false" data-icon="wand"></button>
         <div id="memory-tools-menu" class="memory-tools-menu" hidden>
-          <div class="memory-tool-list" aria-label="Vật phẩm hỗ trợ">
-            <button id="btn-hint" class="memory-tool-item" type="button" aria-label="Dùng gợi ý" data-icon="search">Gợi ý</button>
-            <button id="btn-buy-time" class="memory-tool-item" type="button" aria-label="Kho thời gian" data-icon="timer">Thời gian</button>
-            <button id="btn-preview-cards" class="memory-tool-item" type="button" aria-label="Kho xem trước" data-icon="eye">Xem trước</button>
+          <div class="memory-tool-list hud-tool-list" aria-label="Vật phẩm hỗ trợ">
+            <button id="btn-hint" class="memory-tool-item hud-tool-item" type="button" aria-label="Dùng gợi ý" data-icon="search"><span>Gợi ý</span><strong class="hud-tool-count">0</strong></button>
+            <button id="btn-buy-time" class="memory-tool-item hud-tool-item" type="button" aria-label="Kho thời gian" data-icon="timer"><span>Thời gian</span><strong class="hud-tool-count">0</strong></button>
+            <button id="btn-preview-cards" class="memory-tool-item hud-tool-item" type="button" aria-label="Kho xem trước" data-icon="eye"><span>Xem trước</span><strong class="hud-tool-count">0</strong></button>
           </div>
         </div>
 
