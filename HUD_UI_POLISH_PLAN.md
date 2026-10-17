@@ -7,7 +7,7 @@ Phạm vi được duyệt: giữ banner ở cửa sổ chọn màn; danh sách 
 - [x] A. Banner chọn màn và Profile; kiểm tra rồi commit.
 - [x] B. Công cụ ba trò dùng cùng bố cục biểu tượng/tên/số lượng; kiểm tra rồi commit.
 - [x] C. Thanh đóng băng theo đồng hồ hiện có, hỗ trợ pause/restart/restore; kiểm tra rồi commit.
-- [ ] D. Rà hoạt ảnh ba trò và thay emoji, giữ ownership/cleanup/reduced-motion; kiểm tra rồi commit.
+- [x] D. Rà hoạt ảnh ba trò và thay emoji, giữ ownership/cleanup/reduced-motion; kiểm tra rồi commit.
 - [ ] E. Review độc lập, regression liên quan, check/build và ghi bằng chứng cuối.
 
 ## Lựa chọn
@@ -31,3 +31,5 @@ Phase A: ads native/web 14/14; ảnh Profile và preview ở 412/844/1024 đã k
 Phase B: công cụ cùng geometry ở 412/844/1024; badge số lượng có ở cả ba trò, icon SVG, hook/action không đổi.
 
 Phase C: cùng scheduler HUD 250ms, thêm một node cố định; test dùng vật phẩm/cộng dồn/pause/background/restart đã đạt ở reduce và no-preference. Session đóng băng khôi phục từ freezeSeconds cũ, không đổi schema.
+
+Phase D: rà emoji và ký hiệu font có chuyển động; SVG/CSS thay hình, không đổi effect ID/timeline/cleanup. Review độc lập source và UI/restore17/17, ảnh summary kiểm tra đúng trạng thái2sao đạt/1sao chưa đạt.

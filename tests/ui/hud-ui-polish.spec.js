@@ -96,3 +96,32 @@ for (const reducedMotion of ['no-preference', 'reduce']) test(`freeze bar follow
     await expect.poll(() => page.evaluate(async () => (await import('/js/linkConnect/linkState.js')).linkGameState.isLocked)).toBe(false);
   }
 });
+
+for (const reducedMotion of ['no-preference', 'reduce']) test(`animated artwork uses vector shapes with ${reducedMotion}`, async ({ page }) => {
+  await page.emulateMedia({ reducedMotion });
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.goto('/');
+  await start(page);
+  const freeze = await page.evaluate(async () => {
+    const { gameState } = await import('/js/gameState.js');
+    gameState.appearance.linkExitEffect = 'freeze';
+    const { linkGameState } = await import('/js/linkConnect/linkState.js');
+    const connection = (await import('/js/linkConnect/pathfinder.js')).findAvailableConnections(linkGameState.board.grid)[0];
+    const tiles = (await import('/js/linkConnect/linkRenderer.js')).playLinkMatchExit(connection.start, connection.end);
+    return tiles.map(tile => ({ content: getComputedStyle(tile, '::before').content, art: getComputedStyle(tile, '::before').backgroundImage }));
+  });
+  expect(freeze.every(tile => tile.content === '""' && tile.art.includes('freeze-crystal.svg'))).toBe(true);
+  await page.evaluate(async () => (await import('/js/linkConnect/linkRenderer.js')).clearLinkTransientEffects());
+  await expect(page.locator('.link-tile.is-removing')).toHaveCount(0);
+  await page.evaluate(async () => (await import('/js/ui.js')).showLevelSummaryOverlay({ level: 1, score: 1234, stars: 2, coinsEarned: 10, moves: 1, misses: 0, remainingTime: 20, timeBonus: 0, settings: {} }));
+  const stars = page.locator('#level-summary-modal .level-summary__star');
+  await expect(stars).toHaveCount(3);
+  await expect(stars.locator('svg')).toHaveCount(3);
+  await expect(stars.last().locator('svg')).toHaveCSS('fill', 'none');
+  await expect(stars.last().locator('svg')).toHaveCSS('stroke', 'rgb(145, 165, 197)');
+  expect(await stars.allTextContents()).toEqual(['', '', '']);
+  await expect(stars.first()).toHaveCSS('opacity', '1');
+  await page.screenshot({ path: `docs/design/hud-polish/qa/summary-${reducedMotion}.png` });
+  await page.evaluate(async () => (await import('/js/gameSelector.js')).showGameSelector());
+  await expect(page.locator('#level-summary-modal')).toHaveCount(0);
+});

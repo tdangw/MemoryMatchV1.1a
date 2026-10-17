@@ -46,7 +46,7 @@ template.innerHTML = `<div id="game-container" class="game-shell-tokens" style="
           <span data-memory-special-milestone="9" style="--memory-milestone-position:85%">9</span>
           <span data-memory-special-milestone="10" style="--memory-milestone-position:95%">10</span>
         </div>
-        <span class="game-milestone-stars stat-star-progress" aria-label="Tiến trình sao màn hiện tại"><span id="level-stars" class="star-progress__stars" role="img" aria-label="0 trên 3 sao"><span class="star-progress__milestone" aria-hidden="true">★</span><span class="star-progress__milestone" aria-hidden="true">★</span><span class="star-progress__milestone" aria-hidden="true">★</span></span><span class="star-progress__track"><span id="level-stars-fill" class="star-progress__fill"></span></span></span>
+        <span class="game-milestone-stars stat-star-progress" aria-label="Tiến trình sao màn hiện tại"><span id="level-stars" class="star-progress__stars" role="img" aria-label="0 trên 3 sao"><span class="star-progress__milestone" aria-hidden="true" data-icon="star"></span><span class="star-progress__milestone" aria-hidden="true" data-icon="star"></span><span class="star-progress__milestone" aria-hidden="true" data-icon="star"></span></span><span class="star-progress__track"><span id="level-stars-fill" class="star-progress__fill"></span></span></span>
       </section>
       <div id="grid-board-frame" data-shell-region="frame">
         <div class="grid-coordinate-corner" aria-hidden="true"></div>

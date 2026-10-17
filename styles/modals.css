@@ -1052,6 +1052,9 @@ body.game-is-paused .shooting-star {
   position: relative;
 }
 
+#level-summary-modal .level-summary__star > .ui-icon { width: 1em; height: 1em; vertical-align: middle; color: inherit; fill: none; stroke: currentColor; }
+#level-summary-modal .level-summary__star--earned > .ui-icon { fill: currentColor; }
+
 #level-summary-modal .level-summary__star--middle {
   --star-rest-y: -0.07em;
   margin: 0 0.06em;
@@ -1067,12 +1070,16 @@ body.game-is-paused .shooting-star {
 }
 
 #level-summary-modal .level-summary__star--earned::after {
-  content: "✦";
+  content: "";
   position: absolute;
   top: -0.24em;
   right: -0.26em;
   color: #fff2bd;
   font-size: 0.42em;
+  width: 1em;
+  height: 1em;
+  background: currentColor;
+  clip-path: polygon(50% 0, 64% 36%, 100% 50%, 64% 64%, 50% 100%, 36% 64%, 0 50%, 36% 36%);
   line-height: 1;
   opacity: 0;
   pointer-events: none;

@@ -454,7 +454,7 @@ function openLevelSummaryOverlay({
     ].filter(Boolean).join(" ");
     // Chừa một nhịp để popup ổn định trước, rồi mới hé từng sao.
     if (isEarned) star.style.setProperty("--star-delay", `${420 + index * 380}ms`);
-    star.textContent = isEarned ? "★" : "☆";
+    star.append(createIcon("star"));
     star.setAttribute("aria-hidden", "true");
     resultStars.appendChild(star);
   }

@@ -246,6 +246,7 @@
 .game-hud .hud-tool-item.is-disabled { cursor: not-allowed; opacity: 0.44; }
 
 
+.game-milestone-stars .star-progress__milestone > .ui-icon { display: block; width: 1em; height: 1em; color: inherit; fill: currentColor; }
 
 /* The freeze bar has one fixed node; the existing HUD cadence owns its progress. */
 .link-game-hud .game-hud__metric.stat-timer > .link-freeze-progress {

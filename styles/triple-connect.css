@@ -204,15 +204,15 @@
   outline-offset: 2px;
 }
 .triple-connect__tile.is-lucky::after {
-  content: "★";
+  content: "";
   position: absolute;
   top: 2px;
   right: 3px;
-  color: #ffd35a;
-  font-size: 0.8rem;
-  line-height: 1;
+  width: 0.8rem;
+  height: 0.8rem;
+  background: #ffd35a;
+  clip-path: polygon(50% 0, 61% 35%, 100% 38%, 70% 62%, 80% 100%, 50% 78%, 20% 100%, 30% 62%, 0 38%, 39% 35%);
   pointer-events: none;
-  text-shadow: 0 1px 2px rgb(0 0 0 / 65%);
 }
 
 .triple-connect__board .triple-connect__tile.is-corner-stack::before {

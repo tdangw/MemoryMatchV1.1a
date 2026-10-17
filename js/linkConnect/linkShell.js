@@ -35,7 +35,7 @@ export function getLinkShell() {
         <div class="link-special-hud__milestones" aria-label="Các mốc kích hoạt đặc biệt">
           ${Array.from({ length: 10 }, (_, index) => `<span data-link-special-milestone="${index + 1}" style="--link-milestone-position: ${5 + index * 10}%">${index + 1}</span>`).join("")}
         </div>
-        <span class="game-milestone-stars stat-star-progress" aria-label="Tiến trình sao màn hiện tại"><span id="link-level-stars" class="star-progress__stars" role="img" aria-label="0 trên 3 sao"><span class="star-progress__milestone" aria-hidden="true">★</span><span class="star-progress__milestone" aria-hidden="true">★</span><span class="star-progress__milestone" aria-hidden="true">★</span></span><span class="star-progress__track"><span id="link-level-stars-fill" class="star-progress__fill"></span></span></span>
+        <span class="game-milestone-stars stat-star-progress" aria-label="Tiến trình sao màn hiện tại"><span id="link-level-stars" class="star-progress__stars" role="img" aria-label="0 trên 3 sao"><span class="star-progress__milestone" aria-hidden="true" data-link-icon="star"></span><span class="star-progress__milestone" aria-hidden="true" data-link-icon="star"></span><span class="star-progress__milestone" aria-hidden="true" data-link-icon="star"></span></span><span class="star-progress__track"><span id="link-level-stars-fill" class="star-progress__fill"></span></span></span>
       </section>
       <div id="link-board-frame" data-shell-region="frame" class="link-board-frame">
         <div id="link-board" data-shell-region="board" class="link-board" aria-label="Bàn Link Connect"></div>

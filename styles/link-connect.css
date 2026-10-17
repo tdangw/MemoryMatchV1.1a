@@ -752,16 +752,11 @@
 }
 
 :is(.link-tile, .triple-connect__ghost).is-removing.link-tile--freeze::before {
-  content: "❄";
+  content: "";
   position: absolute;
   z-index: 4;
   inset: 0;
-  display: grid;
-  place-items: center;
-  color: #e9fdff;
-  font-size: clamp(26px, 42%, 52px);
-  line-height: 1;
-  text-shadow: 0 0 8px rgb(214 252 255 / 74%);
+  background: url("/assets/images/ui/freeze-crystal.svg") center / 64% 64% no-repeat;
   opacity: 0;
   pointer-events: none;
   animation: link-tile-freeze-snowflake var(--link-tile-exit-duration, 220ms) ease-out var(--link-tile-exit-delay, 0ms) both;
