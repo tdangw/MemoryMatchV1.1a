@@ -14,6 +14,9 @@
   gap: var(--shell-active-frame-gap);
 }
 .game-shell-root[hidden] { display: none; }
+.game-shell-root[data-gameplay-ad] { padding-bottom: calc(var(--shell-safe-bottom) + var(--shell-ad-space)); }
+.game-shell-root[data-gameplay-ad].shell-scroll-playing { height: calc(100dvh - var(--shell-ad-space)); min-height: 0; padding-bottom: var(--shell-safe-bottom); }
+.gameplay-ad-slot { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: min(100%, 640px); z-index: 100; }
 .game-shell-root > [data-shell-region] { flex-shrink: 0; }
 .game-shell-root { --shell-hud-used-width: 100%; }
 .game-shell-root.shell-compact-landscape > [data-shell-region="title"],

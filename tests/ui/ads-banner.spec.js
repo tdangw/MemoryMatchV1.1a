@@ -47,13 +47,14 @@ for (const viewport of [{ width: 412, height: 915 }, { width: 844, height: 390 }
 test('functional placements and privacy options keep the correct banner owner', async ({ page }) => {
   await mockNative(page); await page.goto('/'); await visible(page);
   for (const tab of ['missions', 'events', 'profile', 'ranking', 'settings']) {
-    await page.locator(`[data-dock-action="${tab}"]`).click(); await absent(page);
+    await page.locator(`[data-dock-action="${tab}"]`).click(); await visible(page);
     if (tab === 'settings') {
       await expect(page.locator('#settings-ad-privacy')).toBeVisible();
       await page.locator('#settings-ad-privacy').click();
       await expect.poll(() => page.evaluate(() => window.__adsTest.calls.filter(([name]) => name === 'privacy').length)).toBe(1);
       await page.locator('#settings-privacy-policy').click();
       await expect(page.locator('#privacy-policy-modal')).toBeVisible();
+      await absent(page);
       await expect(page.locator('#privacy-policy-modal')).not.toContainText(/UID|API|schema|nội bộ|SDK/);
       await page.locator('#privacy-policy-modal .app-modal__close').click();
     }
@@ -62,8 +63,7 @@ test('functional placements and privacy options keep the correct banner owner', 
   await page.locator('.game-selector__choice[data-game-id="memory-match"]').click(); await visible(page);
   for (const tab of ['shop', 'collection', 'ranking', 'settings']) {
     await page.locator(`[data-dock-action="${tab}"]`).click();
-    if (tab === 'shop' || tab === 'collection') await visible(page);
-    else await absent(page);
+    await visible(page);
     await page.locator('.adventure-screen [data-dock-action="map"]').click(); await visible(page);
   }
 });

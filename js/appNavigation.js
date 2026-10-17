@@ -94,10 +94,8 @@ export function decorateAdventureMenu(root, { gameId = null, onHome } = {}) {
   function createFooter(owner, selected) {
     const footer = document.createElement('footer'); footer.className = 'adventure-footer';
     footer.append(createAppDock(owner, { gameId, selected, onAction: navigate }));
-    if (!selected || ['map', 'shop', 'collection'].includes(selected)) {
-      const ad = document.createElement('div'); ad.className = 'adventure-ad-slot'; ad.dataset.adPlacement = 'menu'; ad.setAttribute('aria-hidden', 'true');
-      footer.append(ad);
-    }
+    const ad = document.createElement('div'); ad.className = 'adventure-ad-slot'; ad.dataset.adPlacement = 'menu'; ad.setAttribute('aria-hidden', 'true');
+    footer.append(ad);
     return footer;
   }
   const footer = createFooter(scope, gameId ? 'map' : null);

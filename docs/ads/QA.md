@@ -1,5 +1,13 @@
 # Kết quả kiểm tra quảng cáo và APK — 16/10/2026
 
+## Cập nhật17/10 — đang triển khai
+
+Chủ dự án chốt web có khung ở mọi tab và gameplay3trò; Android thật mở mọi tab, gameplay native vẫn tắt. PhaseA: shared shell reserve58px, layoutfit trừ cùng58px, long board cuộn tới nội dung cuối trên fixed banner; scope chịu trách nhiệm tạo/hủy slot, không chèn nhánh game trong runtime. Các giới hạn placement ngày16/10 bên dưới là lịch sử, đã được thay bởi phạm vi mới này.
+
+- Native boundary9/9, web4/4 đạt. Matrixgeometry/layout/lifecycle/cleanup chạy đủ121ca:120đạt,1ca khay Triple mobile đọc khay rỗng khi click chưasettle. Test vốn chờ1RAF, đã đổi sang run.whenIdle(), giữ nguyên các assertion; chạy lại ca này desktop/mobile/landscape3/3 đạt. Không sửa luật/renderer để né lỗi.
+- Test30restart chia đều3trò đạt: luôn1slot, ownercũ hếtresource, về menu không còn gameplay slot.
+- Hoạt ảnh mới chọn cả3hướng: thẻ ghép đôi → đom đóm/hoa → nhân vật chạy,6s/cảnh. Chưa dùng artwork để báo nghiệm thu trước khi nối/chạy gateB/C.
+
 ## Đã hoàn tất trong bản mã
 
 Banner hiện hành trên trang chủ, bản đồ, Cửa hàng và Bộ sưu tập theo phản hồi mới. Không quảng cáo trong màn chơi, hồ sơ/cài đặt/xếp hạng, mục chưa có nội dung, hộp thoại, khi nhập chữ hoặc khi ứng dụng ở nền. Áp dụng bảo vệ trẻ em cho mọi người chơi, không cá nhân hóa và giới hạn nội dung gia đình. Không đổi tài khoản, định dạng lưu, Xu, vật phẩm, luật chơi hoặc phần thưởng.

@@ -20,7 +20,7 @@ for (const size of [{ width: 412, height: 915 }, { width: 844, height: 390 }, { 
     await page.screenshot({ path: `docs/ads/qa/web-preview-${size.width}.png` });
     for (const tab of ['missions', 'events', 'profile', 'ranking', 'settings']) {
       await page.locator(`[data-dock-action="${tab}"]`).click();
-      await expect(preview(page)).toHaveCount(0);
+      await expect(preview(page)).toHaveCount(1);
       await page.locator('.adventure-screen > .adventure-exit').click();
       await expect(preview(page)).toHaveCount(1);
     }
@@ -53,7 +53,18 @@ for (const size of [{ width: 412, height: 915 }, { width: 844, height: 390 }, { 
       await closeLevelPreview(page);
       await expect(preview(page)).toHaveCount(1);
       await startMapLevel(page);
-      await expect(preview(page)).toHaveCount(0);
+      await expect(page.locator('.gameplay-ad-slot .menu-ad-preview')).toHaveCount(1);
+      const shell = page.locator('.game-shell-root:visible');
+      await expect.poll(() => shell.evaluate(root => {
+        const bannerTop = root.querySelector('.menu-ad-preview').getBoundingClientRect().top;
+        if (root.classList.contains('shell-scroll-playing')) {
+          root.scrollTop = root.scrollHeight;
+          const lastContent = root.querySelector('.triple-connect__tray') || root.querySelector('[data-shell-region="frame"]');
+          return Math.max(root.getBoundingClientRect().bottom, lastContent.getBoundingClientRect().bottom) - bannerTop;
+        }
+        return root.querySelector('[data-shell-region="frame"]').getBoundingClientRect().bottom - bannerTop;
+      })).toBeLessThanOrEqual(1);
+      await page.screenshot({ path: `docs/ads/qa/gameplay-${game}-${size.width}.png` });
       await page.evaluate(async () => (await import('/js/gameSelector.js')).showGameSelector());
       await expect(preview(page)).toHaveCount(1);
     }
@@ -96,4 +107,31 @@ test('web preview releases nodes across suspension, background and 30 navigation
   await expect(preview(page)).toHaveCount(1);
   await page.evaluate(async () => { const runtime = await (await import('/js/ads/menuAds.js')).initializeMenuAds(); await runtime.dispose(); await runtime.dispose(); });
   await expect(preview(page)).toHaveCount(0);
+});
+
+test('30 gameplay restarts across three games release the previous banner owner', async ({ page }) => {
+  test.setTimeout(120000);
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.goto('/');
+  for (const [game, title, trigger] of [
+    ['memory-match', 'Memory Match', '#btn-actions-menu'],
+    ['link-connect', 'Link Connect', '#link-actions-menu-toggle'],
+    ['triple-connect', 'Triple Connect', '#triple-actions-menu-toggle'],
+  ]) {
+    await page.getByRole('button', { name: `Chọn ${title}`, exact: true }).click();
+    await page.locator(`.game-selector__choice[data-game-id="${game}"]`).click();
+    await startMapLevel(page);
+    for (let i = 0; i < 10; i++) {
+      await expect(page.locator('.gameplay-ad-slot')).toHaveCount(1);
+      await page.evaluate(async () => { window.adsPreviousScope = (await import('/js/gameShell/gameShell.js')).getGameShellDiagnostics().activeScope; });
+      await page.locator(trigger).click();
+      await page.locator('#game-exit-modal').getByRole('button', { name: 'Chơi lại', exact: true }).click();
+      await expect(page.locator('#game-exit-modal')).toHaveCount(0);
+      await expect(preview(page)).toHaveCount(1);
+      expect(await page.evaluate(() => Object.values(window.adsPreviousScope.diagnostics()).every(value => value === false || value === 0))).toBe(true);
+    }
+    await page.evaluate(async () => (await import('/js/gameSelector.js')).showGameSelector());
+    await expect(page.locator('.gameplay-ad-slot')).toHaveCount(0);
+    await expect(preview(page)).toHaveCount(1);
+  }
 });

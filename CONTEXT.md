@@ -6,6 +6,8 @@ Người dùng đã chọn tự xuất bản website và thông điệp AdMob ng
 
 ## Sản phẩm
 
+- Active17/10 `ADS_APK_TEST_PLAN.md`: PhaseA placement đã đạt — web mọi tab+gameplay3trò, Android mọi tab nhưng gameplay thật tắt theo trả lời user. Shell reserve58px, long board scroll kết thúc trên banner; native9/9, web4/4,30restart3trò pass; matrix120/121, ca khay Triple sửa test chờ run.whenIdle rồi chạy lại cả3profile đạt. PhaseB đang nối ba cảnh vector/CSS luân phiên6s/cảnh theo lựa chọn user, PhaseC còn check/build/review/performance. Không deploy. Không đổi save/API/catalog.
+
 - `HOME_CAROUSEL_LOOP_PLAN.md` hoàn tất: Home nối vòng cảhai chiều bằng cùng3node; modulo cho arrows/keyboard, DOM rebase tại native scrollend và giữ focus, không clone/RAF loop. Memory được imagegen tích hợp vẽ lại portraitv2 576×768, URL có phiên bản để tránh cache ngang cũ; tổng3ảnh323.366bytes. Root19/19, review14/14 +cache1/1, regression31ca có kết quả đạt, gate ảnh/UI cuối14/14, check/build web/Android pass. Phase1commitabc5696; QA: `docs/design/home-carousel/QA.md`. Không đổi save/API/catalog, không deploy/APK; S22 Ultra thật còn chờ.
 
 - Banner hiện hành16/10: UI chỉ ghi **Quảng cáo**, quy định không đưa câu chữ kỹ thuật lên giao diện/ảnh/tài liệu người chơi lưu ở AGENTS.md mục9. Placement Home/map/shop/collection; ẩn gameplay/modal/forms/ranking/comingsoon. Web50px + gap8px (tổng58px, giảm30px), Android theo chiều cao SDK + gap8px. Sửa screen content không còn bị coi là overlay; slot screen/root có owner riêng, nested modal vẫn ẩn banner. Native9/9, web review độc lập4/4 và shop/HUD9/9 đạt, check/unit15/15 đạt; QA tại `docs/ads/QA.md`. Chưa deploy/publish; quảng cáo thật/S22 Ultra còn chờ như phần APK.

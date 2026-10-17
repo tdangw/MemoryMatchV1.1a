@@ -3,6 +3,7 @@ import { mountGameFullscreen } from "./gameFullscreen.js";
 
 import { disposeAppPage } from "../appPageLifecycle.js";
 import { mountGameplayTouchEffects } from "../appNavigation.js";
+import { mountGameplayBanner } from '../ads/menuAds.js';
 
 let activeShell = null;
 const regionNames = ["title", "progress", "hud", "milestones", "frame", "board"];
@@ -62,6 +63,7 @@ export function createGameShell({ root = document.createElement("section"), regi
       root.style.display = display;
       mountGameFullscreen(refs, nextScope);
       mountGameplayTouchEffects(root, nextScope);
+      mountGameplayBanner(root, nextScope);
       if (cleanup) nextScope.own(cleanup);
       assertVisibleScope("mount");
       return nextScope;

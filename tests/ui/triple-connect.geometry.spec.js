@@ -161,7 +161,7 @@ test("Triple tray owns ten stable visual slots with three locked by default", as
         .find((node) => node.dataset.tileId !== run.getState().tray.at(-1));
       if (!tile) break;
       tile.click();
-      await new Promise((resolve) => requestAnimationFrame(resolve));
+      await run.whenIdle();
       snapshots.push({ tray: rect(tray), slots: [...tray.children].map(rect) });
     }
     return [

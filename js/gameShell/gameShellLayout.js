@@ -125,7 +125,8 @@ export function connectGameShellLayout({ root, frame, board, chrome, getShape, a
         - 2 * (mobile ? config.layout.mobileSideInset : config.layout.sideInset)) - edgeInset * 2 - gutter;
     const bottom = visible.top + visible.height;
     const height = bottom - boardTop - config.layout.bottomInset
-      - px(rootStyle.getPropertyValue("--shell-viewport-safe-bottom")) - gutter;
+      - px(rootStyle.getPropertyValue("--shell-viewport-safe-bottom"))
+      - px(rootStyle.getPropertyValue("--shell-ad-space")) - gutter;
     const scrollHeight = Math.max(height, (shape.minimumTileSize || 0) * shape.rows);
     const result = calculateBoardLayout({ width, height: scrollHeight, columns: shape.columns, rows: shape.rows,
       gap: narrow ? config.board.narrowGap : config.board.gap,

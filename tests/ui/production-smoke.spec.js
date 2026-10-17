@@ -40,7 +40,7 @@ test('built mobile menu, map and account open without writing to production serv
   await page.locator('.adventure-exit').click();
   await page.locator('[data-dock-action="profile"]').click();
   await expect(page.locator('#account-modal')).toBeVisible();
-  await expect(page.locator('.menu-ad-preview')).toHaveCount(0);
+  await expect(page.locator('.menu-ad-preview')).toHaveCount(1);
   await expect(page.locator('#account-modal')).not.toContainText('Firebase');
   await expect(page.getByRole('button', { name: 'Đồng bộ ngay', exact: true })).toHaveCount(0);
   await expect(page.locator('#account-modal .app-modal__close')).toHaveCount(0);

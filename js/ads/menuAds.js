@@ -10,6 +10,22 @@ const blockers = new Set();
 const privacyListeners = new Set();
 export function setMenuAdTarget(slot) { target = slot; runtime?.reconcile(); }
 export function clearMenuAdTarget(slot) { if (target === slot) setMenuAdTarget(null); }
+export function mountGameplayBanner(root, scope) {
+  if (isAndroidAdsPlatform) return;
+  const slot = document.createElement('div');
+  slot.className = 'adventure-ad-slot gameplay-ad-slot';
+  slot.setAttribute('aria-hidden', 'true');
+  root.dataset.gameplayAd = 'true';
+  root.style.setProperty('--shell-ad-space', `${AD_CONFIG.webBannerHeight + AD_CONFIG.interactionGap}px`);
+  root.append(slot);
+  setMenuAdTarget(slot);
+  scope.own(() => {
+    clearMenuAdTarget(slot);
+    slot.remove();
+    delete root.dataset.gameplayAd;
+    root.style.removeProperty('--shell-ad-space');
+  }, 'node');
+}
 export function suspendMenuAds(reason) {
   blockers.add(reason); runtime?.reconcile();
   let released = false;
@@ -45,7 +61,7 @@ async function start() {
       slot.dataset.nativeAd = height > 0 ? 'visible' : 'empty';
       slot.style.setProperty('--ad-banner-height', `${height}px`);
       slot.style.setProperty('--ad-banner-gap', `${height > 0 ? AD_CONFIG.interactionGap : 0}px`);
-      slot.closest('.adventure-page').style.setProperty('--menu-ad-space', `${height > 0 ? height + AD_CONFIG.interactionGap : 0}px`);
+      slot.closest('.adventure-page, .game-shell-root').style.setProperty('--menu-ad-space', `${height > 0 ? height + AD_CONFIG.interactionGap : 0}px`);
     }
   };
   const controller = isAndroidAdsPlatform ? createBannerController({ service, render }) : createWebBannerController({ render });
