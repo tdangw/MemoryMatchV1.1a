@@ -4,6 +4,8 @@ Ngày khảo sát: 2026-10-15. Người dùng giao triển khai ngày 2026-10-16
 
 ## Theo dõi thực hiện
 
+- PhaseC17/10 hoàn tất: check/unit15/15 đạt (Triplep9514,87ms), android:apk và webbuild đạt; production smoke1/1 có vào gameplay/khungkhôngchữ đạt. APK34.250.105bytes, SHA-256 `5F91AE1E56A81A7A4392A4149DEC6E47F666AA458F574D0E1F1B1E543FFEE554`, chữký/packagegiữ nguyên. Toàn bộ phần mềm bổ sung17/10 hoàn tất; giữ Gate5 quảng cáo thật/S22 Ultra chờ chủ dự án xuất bản và kết nối thiết bị, không deploy trong task này.
+
 - PhaseB17/10 đạt: nối3cảnh finite6s không chữ; art4/4, performance ởHome+3game120frame/case khônglongtask vàp95delta không vượt4ms; reviewernguồncuối8/8 (có30restart) đạt, không finding mở. Reducedmotion đã sửa specificitytắtSVGfaceanimations; khônghoạtảnh khiẩn/dispose, không vẽ đèSDK thật. PhaseC check/build/APK đang thực hiện, không lặp matrix121 khi geometrykhôngđổi.
 
 - Timeline hoạt ảnh17/10 đã chốt: mỗi cảnh6giây, chu kỳ18giây; 0–8% hiện nhẹ, action chính8–78%, resolve78–92%, fade cuối92–100%. Cards lật/ghép và3điểm sáng; garden hoa lắc nhẹ và3đom đóm; runner đi ngang với2bước chân/2vệt. Chỉ transform/opacity đổi; hình SVG/CSS tự vẽ, không bitmap mới, không thay theme art. Một scene tối đa18node/10animation, vùng240×50px; chỉ scene đang gắn có animation. Root CSSanimationend chuyển scene, không setInterval/RAF production, không per-frame JS/allocation. Dispose hủy node/listener, modal/background ẩn qua controller, reduced-motion đứng yên. Acceptance: scene thật tựchuyển6s,30lượtrotation/mount/restart, khôngtechnicaltext, static/animated120frame mỗi cảnh p95delta≤4ms và0longtask ở412×915; đây là desktopbrowserbudget, không chứng nhận60FPS điện thoại.

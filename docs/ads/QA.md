@@ -1,6 +1,6 @@
-# Kết quả kiểm tra quảng cáo và APK — 16/10/2026
+# Kết quả kiểm tra quảng cáo và APK — 16–17/10/2026
 
-## Cập nhật17/10 — đang triển khai
+## Cập nhật17/10 — phần mềm đã đóng gói
 
 Chủ dự án chốt web có khung ở mọi tab và gameplay3trò; Android thật mở mọi tab, gameplay native vẫn tắt. PhaseA: shared shell reserve58px, layoutfit trừ cùng58px, long board cuộn tới nội dung cuối trên fixed banner; scope chịu trách nhiệm tạo/hủy slot, không chèn nhánh game trong runtime. Các giới hạn placement ngày16/10 bên dưới là lịch sử, đã được thay bởi phạm vi mới này.
 
@@ -10,8 +10,11 @@ Chủ dự án chốt web có khung ở mọi tab và gameplay3trò; Android th�
 - PhaseB đã nối: bannerArtwork sở hữu1scene,18s/vòng bằng CSSfinite6s + animationend, không timer/RAF production. Tối đa13node thực đo,10animator; sourceJS2809bytes/CSS4069bytes trước tokenrefactor nhỏ. Artwork chỉ web, không overlay quảng cáo thật. Reduced-motion static cả scene vàSVG; đã sửa specificity lúc test tìm ra3animation mặt thẻ chưa bị tắt.
 - Art4/4 đạt, gồm tựchuyển6s thực,30rotation qua CSSAnimation.finish,detach0animation và togglereduced. Perf120frame/case ở412×915: Home staticp95=7,1ms, cards7,1/garden7,0/runner7,1ms; gameplay static13,4–13,9ms và animated7,1–7,4ms,0longtask. Không suy ra animation làm game nhanh hơn: warmup/refresh scheduling khác giữa mẫu; chỉ xác nhận không vượt budgetdelta4ms. Đây là browserdesktop/monitor refresh cao, không chứng nhậnFPS/heap trên S22 Ultra. Receipt `qa/art-performance.json`.
 - Reviewer độc lập đọc diff và chạy nguồn cuối8/8 đạt (web5 + artworkbehavior3), gồm30restart thực cả3game; không finding mở. Giữ nguyên source geometry sau matrixphaseA; artwork absolute không thay reserve, chỉ bổ sung cảnh đồ họa trong cùng50px. Timeline6s đã đưa về custom property chung; sceneheight100% lấy từ khung thay vì lặp50px.
+- GateC: `npm run check` đạt, unit quảng cáo15/15, Triple p95 14,87ms; `npm run android:apk` build/sync/assembleDebug đạt; `npm run build` đạt. Bundleweb tăng khoảng1,82KB gzip so với bản16/10 (JS151,74→152,63KB, CSS35,95→36,88KB); không thêm bitmap/video. Không đổi save/schema/API/catalog/Auth và không deploy/publish.
+- Production smoke1/1 đạt trên bundleweb cuối, có vào gameplay và xác nhận khungđồhọa không chữ/aria-hidden; tabProfile vẫn cókhung. APKverify chữkýdebug/package/version/min24/target36 giữ nguyên; chưa cài lại hoặc xác nhận quảng cáo thật trên máy. Tất cả gatephần mềm17/10 đạt, phần xuất bản/thiết bị do chủ dự án giữ lại vẫn chưa xác minh.
+- Skill `clarify-ambiguous-requirements` dùng thực tế để chốt webgameplay trước, Android chỉmọitab và chọn cả3cảnh. Đồhọa SVG/CSS phù hợp kích thước50px, không tạo bitmap/themeasset nên không dùng imagegen hoặc memory-match-image-assets.
 
-## Đã hoàn tất trong bản mã
+## Hồ sơ triển khai16/10
 
 Banner hiện hành trên trang chủ, bản đồ, Cửa hàng và Bộ sưu tập theo phản hồi mới. Không quảng cáo trong màn chơi, hồ sơ/cài đặt/xếp hạng, mục chưa có nội dung, hộp thoại, khi nhập chữ hoặc khi ứng dụng ở nền. Áp dụng bảo vệ trẻ em cho mọi người chơi, không cá nhân hóa và giới hạn nội dung gia đình. Không đổi tài khoản, định dạng lưu, Xu, vật phẩm, luật chơi hoặc phần thưởng.
 
@@ -41,7 +44,7 @@ Reviewer chỉ đọc và chạy test, không sửa file. Đã tìm ra tình hu�
 
 - File: `android/app/build/outputs/apk/debug/app-debug.apk`.
 - Dung lượng bản cập nhật bố cục:34.250.105bytes.
-- SHA-256:`D04C1B22E5FC33187B6F5222433035DFCE4BDC4FCC0F04711A7EEFA43D0DCFD7`.
+- SHA-256 bản17/10:`5F91AE1E56A81A7A4392A4149DEC6E47F666AA458F574D0E1F1B1E543FFEE554`.
 - Package:`com.memorymatch.adventure`, versionCode1, versionName1.0; Android tối thiểu24, target36.
 - Bản trước cài cập nhật vào giả lập thành công, giữ dữ liệu. Bản cập nhật bố cục mới đã build/sync/assembleDebug và kiểm chữ ký/package, chưa cài lại trên thiết bị; chưa cài lên Galaxy S22 Ultra thật. Chữ ký debug giữ nguyên để cập nhật không đổi danh tính.
 

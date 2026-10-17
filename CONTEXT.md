@@ -1,4 +1,4 @@
-# CONTEXT — Trạng thái hiện tại (2026-10-16)
+# CONTEXT — Trạng thái hiện tại (2026-10-17)
 
 Đọc file này khi bắt đầu task mới. Đây là snapshot điều hướng, không thay thế code/config và không chứa lịch sử triển khai chi tiết.
 
@@ -6,7 +6,7 @@ Người dùng đã chọn tự xuất bản website và thông điệp AdMob ng
 
 ## Sản phẩm
 
-- Active17/10 `ADS_APK_TEST_PLAN.md`: PhaseA placement đã đạt — web mọi tab+gameplay3trò, Android mọi tab nhưng gameplay thật tắt theo trả lời user. Shell reserve58px, long board scroll kết thúc trên banner; native9/9, web4/4,30restart3trò pass; matrix120/121, ca khay Triple sửa test chờ run.whenIdle rồi chạy lại cả3profile đạt. PhaseB đang nối ba cảnh vector/CSS luân phiên6s/cảnh theo lựa chọn user, PhaseC còn check/build/review/performance. Không deploy. Không đổi save/API/catalog.
+- Banner17/10: phaseA/B/C đã hoàn tất, code71f7f18/23b294a — web mọi tab+gameplay3trò, Android mọi tab nhưng gameplay thật tắt theo trả lời user. Shell reserve58px/scroll trên banner; web dùng3cảnh vector/CSS không chữ luân phiên6s/cảnh, reduced-motion đứng yên, dispose hủy scene/listener. Native9/9, matrix121ca có kết quả đạt sau sửa test chờ run.whenIdle, review nguồncuối8/8 có30restart, art4/4+perfHome/3game đạt. Check/unit15/15, buildweb/AndroidAPK và production smoke1/1 cógameplay đạt; receipt17/10 ở docs/ads/QA.md. Không đổi save/API/catalog/Auth, không deploy/publish. ADS_APK_TEST_PLAN.md còn QA quảng cáo thật/điện thoại sau khi người dùng tự xuất bản thông điệp.
 
 - `HOME_CAROUSEL_LOOP_PLAN.md` hoàn tất: Home nối vòng cảhai chiều bằng cùng3node; modulo cho arrows/keyboard, DOM rebase tại native scrollend và giữ focus, không clone/RAF loop. Memory được imagegen tích hợp vẽ lại portraitv2 576×768, URL có phiên bản để tránh cache ngang cũ; tổng3ảnh323.366bytes. Root19/19, review14/14 +cache1/1, regression31ca có kết quả đạt, gate ảnh/UI cuối14/14, check/build web/Android pass. Phase1commitabc5696; QA: `docs/design/home-carousel/QA.md`. Không đổi save/API/catalog, không deploy/APK; S22 Ultra thật còn chờ.
 

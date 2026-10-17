@@ -1,4 +1,4 @@
-import { previewMapLevel, closeLevelPreview } from './helpers/adventureNavigation.js';
+import { previewMapLevel, closeLevelPreview, startMapLevel } from './helpers/adventureNavigation.js';
 import { expect, test } from '@playwright/test';
 
 test.skip(process.env.GAME_SHELL_TEST_SERVER !== 'preview', 'Built application smoke only.');
@@ -46,6 +46,11 @@ test('built mobile menu, map and account open without writing to production serv
   await expect(page.locator('#account-modal .app-modal__close')).toHaveCount(0);
   await page.locator('.adventure-screen .adventure-exit').click();
   await expect(page.locator('.app-modal-overlay')).toHaveCount(0);
+  await page.locator('.game-selector__choice').filter({ hasText: 'Memory Match' }).click();
+  await startMapLevel(page);
+  await expect(page.locator('.gameplay-ad-slot .ad-art-scene')).toHaveCount(1);
+  await expect(page.locator('.gameplay-ad-slot')).toHaveAttribute('aria-hidden', 'true');
+  await expect(page.locator('.menu-ad-preview')).toHaveText('');
   await page.screenshot({ path: '.firebase/production-map-mobile.png' });
   expect(errors).toEqual([]);
 });
