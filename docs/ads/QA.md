@@ -7,6 +7,9 @@ Chủ dự án chốt web có khung ở mọi tab và gameplay3trò; Android th�
 - Native boundary9/9, web4/4 đạt. Matrixgeometry/layout/lifecycle/cleanup chạy đủ121ca:120đạt,1ca khay Triple mobile đọc khay rỗng khi click chưasettle. Test vốn chờ1RAF, đã đổi sang run.whenIdle(), giữ nguyên các assertion; chạy lại ca này desktop/mobile/landscape3/3 đạt. Không sửa luật/renderer để né lỗi.
 - Test30restart chia đều3trò đạt: luôn1slot, ownercũ hếtresource, về menu không còn gameplay slot.
 - Hoạt ảnh mới chọn cả3hướng: thẻ ghép đôi → đom đóm/hoa → nhân vật chạy,6s/cảnh. Chưa dùng artwork để báo nghiệm thu trước khi nối/chạy gateB/C.
+- PhaseB đã nối: bannerArtwork sở hữu1scene,18s/vòng bằng CSSfinite6s + animationend, không timer/RAF production. Tối đa13node thực đo,10animator; sourceJS2809bytes/CSS4069bytes trước tokenrefactor nhỏ. Artwork chỉ web, không overlay quảng cáo thật. Reduced-motion static cả scene vàSVG; đã sửa specificity lúc test tìm ra3animation mặt thẻ chưa bị tắt.
+- Art4/4 đạt, gồm tựchuyển6s thực,30rotation qua CSSAnimation.finish,detach0animation và togglereduced. Perf120frame/case ở412×915: Home staticp95=7,1ms, cards7,1/garden7,0/runner7,1ms; gameplay static13,4–13,9ms và animated7,1–7,4ms,0longtask. Không suy ra animation làm game nhanh hơn: warmup/refresh scheduling khác giữa mẫu; chỉ xác nhận không vượt budgetdelta4ms. Đây là browserdesktop/monitor refresh cao, không chứng nhậnFPS/heap trên S22 Ultra. Receipt `qa/art-performance.json`.
+- Reviewer độc lập đọc diff và chạy nguồn cuối8/8 đạt (web5 + artworkbehavior3), gồm30restart thực cả3game; không finding mở. Giữ nguyên source geometry sau matrixphaseA; artwork absolute không thay reserve, chỉ bổ sung cảnh đồ họa trong cùng50px. Timeline6s đã đưa về custom property chung; sceneheight100% lấy từ khung thay vì lặp50px.
 
 ## Đã hoàn tất trong bản mã
 

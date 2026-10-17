@@ -9,7 +9,8 @@ for (const size of [{ width: 412, height: 915 }, { width: 844, height: 390 }, { 
     await page.setViewportSize(size);
     await page.goto('/');
     await expect(preview(page)).toHaveCount(1);
-    await expect(preview(page)).toHaveText('Quảng cáo');
+    await expect(preview(page)).toHaveText('');
+    await expect(page.locator('.ad-art-scene')).toHaveCount(1);
     const dock = await page.locator('.adventure-dock').boundingBox();
     const banner = await preview(page).boundingBox();
     expect(banner.y - (dock.y + dock.height)).toBeCloseTo(8, 0);

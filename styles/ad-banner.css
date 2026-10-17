@@ -1,0 +1,40 @@
+/* Local banner artwork owns these finite, transform/opacity-only timelines. */
+.ad-art-scene { --ad-art-cycle: 6s; position: absolute; inset: 0; width: min(240px, 100%); height: 100%; margin: auto; animation: ad-art-scene-cycle var(--ad-art-cycle) linear both; }
+.ad-art-card { position: absolute; top: 7px; width: 25px; height: 35px; box-sizing: border-box; border: 1px solid #eaca85; border-radius: 5px; background: #274c58; transform-origin: center; animation: ad-art-card-flip var(--ad-art-cycle) ease-in-out both; }
+.ad-art-card svg { display: block; width: 15px; height: 15px; margin: 9px auto; fill: #f3c8d4; animation: ad-art-card-face var(--ad-art-cycle) linear both; }
+.ad-art-card--left { left: calc(50% - 44px); }
+.ad-art-card--middle { left: calc(50% - 12px); animation-delay: .18s; }
+.ad-art-card--middle svg { animation-delay: .18s; }
+.ad-art-card--right { left: calc(50% + 20px); background: #3b5967; }
+.ad-art-card--right svg { fill: #ecd08b; }
+.ad-art-spark { position: absolute; width: 5px; height: 5px; background: #f6db91; border-radius: 1px; animation: ad-art-match-spark var(--ad-art-cycle) ease-out both; }
+.ad-art-spark--one { left: 37%; top: 4px; }
+.ad-art-spark--two { left: 59%; top: 11px; }
+.ad-art-spark--three { left: 48%; top: 43px; }
+.ad-art-flower { position: absolute; left: calc(50% - 19px); bottom: 0; width: 38px; height: 46px; transform-origin: 50% 100%; animation: ad-art-flower-sway calc(var(--ad-art-cycle) / 2) ease-in-out 2; }
+.ad-art-firefly { position: absolute; left: 50%; top: 22px; width: 4px; height: 4px; border-radius: 50%; background: #ffe6a2; animation: ad-art-firefly-flight var(--ad-art-cycle) ease-in-out both; }
+.ad-art-firefly--one { --ad-fly-x: -54px; --ad-fly-y: -12px; }
+.ad-art-firefly--two { --ad-fly-x: 56px; --ad-fly-y: 16px; animation-direction: reverse; }
+.ad-art-firefly--three { --ad-fly-x: -32px; --ad-fly-y: 21px; }
+.ad-art-runner { position: absolute; left: calc(50% - 22px); bottom: 3px; width: 44px; height: 44px; animation: ad-art-runner-cross var(--ad-art-cycle) linear both; }
+.ad-art-runner svg { display: block; width: 40px; height: 40px; }
+.ad-art-foot { position: absolute; bottom: 0; width: 10px; height: 5px; border-radius: 5px; background: #d7ae68; animation: ad-art-runner-step calc(var(--ad-art-cycle) / 12) ease-in-out 12; }
+.ad-art-foot--left { left: 9px; }
+.ad-art-foot--right { left: 24px; animation-direction: reverse; }
+.ad-art-trail { position: absolute; top: 40px; width: 5px; height: 3px; border-radius: 50%; background: #b4c5ba; animation: ad-art-trail-fade var(--ad-art-cycle) ease-out both; }
+.ad-art-trail--one { left: 35%; }
+.ad-art-trail--two { left: 25%; }
+@keyframes ad-art-scene-cycle { 0%, 100% { opacity: 0; } 8%, 92% { opacity: 1; } }
+@keyframes ad-art-card-flip { 0%, 12%, 90%, 100% { transform: translateY(0) rotateY(0); } 28%, 72% { transform: translateY(-2px) rotateY(180deg); } }
+@keyframes ad-art-card-face { 0%, 18%, 83%, 100% { opacity: 0; } 22%, 78% { opacity: 1; } }
+@keyframes ad-art-match-spark { 0%, 36%, 67%, 100% { opacity: 0; transform: scale(.3) rotate(45deg); } 45%, 56% { opacity: 1; transform: scale(1) rotate(135deg); } }
+@keyframes ad-art-flower-sway { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+@keyframes ad-art-firefly-flight { 0%, 100% { transform: translate(var(--ad-fly-x), var(--ad-fly-y)); opacity: .4; } 30% { transform: translate(calc(var(--ad-fly-x) * -.5), -15px); opacity: 1; } 65% { transform: translate(calc(var(--ad-fly-x) * -.8), 12px); opacity: .7; } }
+@keyframes ad-art-runner-cross { 0% { transform: translateX(-110px); } 25% { transform: translateX(-52px) translateY(-2px); } 50% { transform: translateX(0); } 75% { transform: translateX(52px) translateY(-2px); } 100% { transform: translateX(110px); } }
+@keyframes ad-art-runner-step { 0%, 100% { transform: translateY(0) rotate(-12deg); } 50% { transform: translateY(-3px) rotate(12deg); } }
+@keyframes ad-art-trail-fade { 0%, 28%, 70%, 100% { opacity: 0; transform: scale(.4); } 42% { opacity: .65; transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) {
+  .menu-ad-preview .ad-art-scene, .menu-ad-preview .ad-art-scene * { animation: none; }
+  .ad-art-card svg { opacity: 1; }
+  .ad-art-spark { display: none; }
+}

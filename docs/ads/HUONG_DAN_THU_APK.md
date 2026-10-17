@@ -1,6 +1,6 @@
 # Thử quảng cáo trong Memory Match Adventure
 
-Bản hiện tại dành chỗ cho quảng cáo ở trang chủ, bản đồ, Cửa hàng và Bộ sưu tập. Không có video nhận thưởng hoặc quảng cáo toàn màn hình. Giữ nguyên tiến trình, Xu, vật phẩm và chủ đề của người chơi.
+Bản hiện tại dành chỗ cho quảng cáo ở trang chủ, bản đồ và mọi tab. Bản web có thêm khung trong cả ba màn chơi để bạn xem bố cục; ứng dụng Android chưa bật quảng cáo từ Google khi đang chơi một ván. Không có video nhận thưởng hoặc quảng cáo toàn màn hình. Giữ nguyên tiến trình, Xu, vật phẩm và chủ đề của người chơi.
 
 ## Quyền riêng tư đã chọn
 
@@ -10,7 +10,7 @@ Mở **Cài đặt → Quyền riêng tư** để đọc thông tin trong trò c
 
 ## Việc cần làm trong AdMob
 
-Bản web có vùng **Quảng cáo** ở trang chủ, bản đồ, Cửa hàng và Bộ sưu tập để bạn xem bố cục hoàn chỉnh trước khi bật quảng cáo thật. Vùng này tự ẩn khi vào màn chơi, hộp thoại hoặc lúc nhập chữ. Hồ sơ, Cài đặt, Xếp hạng và các mục chưa có nội dung không đặt quảng cáo. Quảng cáo từ Google chỉ được dùng trong ứng dụng Android.
+Bản web dùng khung hình vui nhộn không chữ: thẻ ghép đôi, đom đóm quanh hoa và nhân vật chạy qua, lần lượt đổi cảnh khoảng mỗi6giây. Khung có ở mọi tab và màn chơi, tự ẩn khi mở hộp thoại hoặc lúc nhập chữ. Nếu bật giảm chuyển động, khung giữ hình đứng yên. Quảng cáo từ Google chỉ được dùng trong ứng dụng Android và không bị vẽ đè hình lên trên.
 
 **Đã chuẩn bị ngày 16/10/2026:** mức nội dung G đã được lưu riêng cho Memory Match. Bản nháp **Quyền riêng tư · Memory Match Adventure** đã được lưu trong phần Quy định của Châu Âu, chỉ chọn Memory Match; có lựa chọn đồng ý, không đồng ý và quản lý lựa chọn. Bản nháp dùng tiếng Anh vì danh sách ngôn ngữ Google cung cấp ở đây không có tiếng Việt. Chưa xuất bản. Bạn đã chọn tự đưa website và thông điệp lên.
 
@@ -37,7 +37,7 @@ Các mục dưới đây là hướng dẫn đối chiếu đầy đủ; không 
 1. Sao lưu tiến trình bằng tài khoản đang dùng nếu cần. Bản web và ứng dụng Android có nơi lưu trên thiết bị khác nhau; không mặc định dữ liệu web sẽ tự xuất hiện trong ứng dụng.
 2. Chép APK sang điện thoại và mở để cài. Nếu điện thoại hỏi, cho phép ứng dụng đang mở file cài từ nguồn này.
 3. Nếu hệ thống báo không cập nhật được vì khác chữ ký, dừng lại và báo lỗi. Không tự gỡ bản cũ hoặc xóa dữ liệu để thử lại.
-4. Mở trò chơi, kiểm tra quảng cáo ở trang chủ, bản đồ, Cửa hàng và Bộ sưu tập. Vào màn chơi, Hồ sơ, Cài đặt hoặc Xếp hạng để kiểm tra quảng cáo đã được gỡ. Mở rồi đóng hộp thoại để kiểm tra quảng cáo tự ẩn và hiện lại đúng chỗ.
+4. Mở trò chơi, kiểm tra quảng cáo ở trang chủ, bản đồ và từng tab. Trên Android, vào màn chơi để kiểm tra quảng cáo đã được gỡ; trên web, kiểm tra khung hình không che bàn cờ hoặc khay. Mở rồi đóng hộp thoại để kiểm tra khung tự ẩn và hiện lại đúng chỗ.
 5. Thử quay lại trang chủ nhiều lần; xoay màn hình; tắt rồi mở kết nối; đưa ứng dụng xuống nền rồi quay lại. Các nút dưới cùng phải vẫn bấm được, không bị quảng cáo che.
 6. Thử tiếp tục ván, chơi lại, chuyển cả ba trò và kiểm tra tiến trình, Xu, vật phẩm. Kiểm tra thêm đăng nhập Google, hủy đăng nhập và trở về trò chơi.
 
