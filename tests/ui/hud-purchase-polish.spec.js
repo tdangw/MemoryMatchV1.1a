@@ -5,6 +5,7 @@ const sizes = [{ width: 412, height: 915 }, { width: 844, height: 390 }, { width
 const adapter = readFileSync(new URL('./fixtures/adsAdapter.js', import.meta.url), 'utf8');
 async function shop(page, game = 'memory-match') {
   await page.evaluate(async game => (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu(game), game);
+  await page.evaluate(async () => { (await import('/js/gameState.js')).gameState.coins = 10000; });
   await page.locator('[data-dock-action="shop"]:visible').click();
   await expect(page.locator('.adventure-screen #shop-modal')).toBeVisible();
 }
@@ -51,6 +52,12 @@ for (const native of [false, true]) for (const size of sizes) {
       await page.getByRole('button', { name: 'Hủy', exact: true }).click();
       await expect(page.locator('#shop-confirm-modal')).toHaveCount(0);
     }
+    await page.locator('#shop-modal .shop-buy-button').first().click();
+    await page.getByRole('button', { name: 'Mua ngay', exact: true }).click();
+    await expect(page.locator('#shop-confirm-modal')).toHaveCount(0);
+    await expect(banner).toHaveCount(1);
+    expect(await page.evaluate(() => window.purchaseBanner === document.querySelector('.menu-ad-preview, [data-fake-native-banner]'))).toBe(true);
+    if (native) expect(await page.evaluate(() => window.__adsTest.calls.length)).toBe(await page.evaluate(() => window.purchaseCalls));
     expect(await page.locator('.adventure-screen .adventure-footer').boundingBox()).toEqual(baseline);
   });
 }

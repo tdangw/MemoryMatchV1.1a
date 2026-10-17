@@ -2,6 +2,26 @@ import { previewMapLevel, closeLevelPreview, startMapLevel } from './helpers/adv
 import { expect, test } from '@playwright/test';
 
 test.skip(process.env.GAME_SHELL_TEST_SERVER !== 'preview', 'Built application smoke only.');
+test('built purchase confirmation preserves the banner and shop position', async ({ page }) => {
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.route(/googleapis\.com|google-analytics\.com|googletagmanager\.com/, route => route.abort());
+  await page.goto('/');
+  await page.locator('.game-selector__choice').filter({ hasText: 'Memory Match' }).click();
+  await expect(page.locator('#menu-container[data-map-ready="true"]')).toBeVisible();
+  await page.locator('[data-dock-action="shop"]:visible').click();
+  await expect(page.locator('.adventure-screen .menu-ad-preview')).toHaveCount(1);
+  const footer = await page.locator('.adventure-screen .adventure-footer').boundingBox();
+  await page.locator('#shop-modal .shop-buy-button').first().click();
+  await expect(page.locator('#shop-confirm-modal')).toBeVisible();
+  await expect(page.locator('.adventure-screen .menu-ad-preview')).toHaveCount(1);
+  expect(await page.locator('.adventure-screen .adventure-footer').boundingBox()).toEqual(footer);
+  const panel = await page.locator('#shop-confirm-modal .app-modal').boundingBox();
+  const overlay = await page.locator('#shop-confirm-modal').boundingBox();
+  expect(Math.abs(panel.y + panel.height / 2 - overlay.height / 2)).toBeLessThan(2);
+  await page.getByRole('button', { name: 'Hủy', exact: true }).click();
+  await expect(page.locator('#shop-confirm-modal')).toHaveCount(0);
+});
+
 test('built mobile menu, map and account open without writing to production services', async ({ page }) => {
   await page.setViewportSize({ width: 412, height: 915 });
   await page.route(/googleapis\.com|google-analytics\.com|googletagmanager\.com/, route => route.abort());

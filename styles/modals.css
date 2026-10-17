@@ -1231,8 +1231,6 @@ body.game-is-paused .shooting-star {
 }
 
 #game-exit-modal .app-button .ui-icon { color: inherit; }
-
-
 .level-reward-overlay .reward-container.app-modal { border-color: var(--dialog-line); box-shadow: var(--dialog-edge); }
 .level-reward-overlay .reward-title.glow { color: var(--dialog-gold); text-shadow: 0 2px 3px #0006; }
 .level-reward-overlay .reward-container .ui-icon { color: var(--dialog-gold); }

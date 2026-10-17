@@ -1,5 +1,11 @@
 # Kết quả kiểm tra quảng cáo và APK — 16–17/10/2026
 
+## Cập nhật18/10 — APK sau tinh chỉnh popup mua
+
+Banner được giữ khi mở/hủy/mua trong xác nhận mua, footer không co giãn. Popup cân giữa vùng khả dụng, công cụ có skin nổi; thanh đóng băng tím4px và mở khóa cặp băng800ms. Review27/27, check (ads15/15), buildweb/AndroidAPK và production smoke2/2 đạt. QA/ảnh tại `docs/design/hud-purchase/QA.md`.
+
+APK hiện hành34250200bytes, SHA256 `FB08BBA4B8D928B2C36CA86F059AD4AC9678D3441DE3E0581000731BF0AC68EC`; packagecom.memorymatch.adventure/version1.0/min24/target36, chữ ký debugv2 hợp lệ. Không xuất bản website/thông điệp, không bypass consent; chưa kiểm tra quảng cáo thật/điện thoại trong lượt này. Các receipt bên dưới là lịch sử.
+
 ## Cập nhật18/10 — APK sau hoàn thiện HUD
 
 Preview màn giữ banner và chừa khoảng ở màn hình ngang; các cửa sổ khác vẫn ẩn. Công cụ ba trò đồng bộ, Profile bỏ trang trí nhỏ, Link thêm thanh đóng băng; hình hoạt ảnh dùng SVG/CSS. Chi tiết và ảnh: `docs/design/hud-polish/QA.md`.
