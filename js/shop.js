@@ -715,6 +715,8 @@ function openPurchaseConfirmation(item, roundId, shopModal, onPurchase) {
 
   openAppModal({
     id: "shop-confirm-modal",
+    keepBanner: true,
+    alignment: "center",
     icon: "shop",
     title: "Xác nhận mua",
     content,

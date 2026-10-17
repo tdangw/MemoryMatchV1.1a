@@ -1194,6 +1194,7 @@ body.game-is-paused .shooting-star {
   height: calc(100dvh - var(--dialog-banner-space, 0px));
 }
 .app-modal-overlay[data-dialog-placement] > .app-modal { min-height: 0; transform-origin: center top; }
+.app-modal-overlay[data-dialog-alignment="center"] { align-items: center; padding-top: max(16px, env(safe-area-inset-top, 0px)); }
 .app-modal-overlay[data-dialog-placement] .app-modal__header,
 .app-modal-overlay[data-dialog-placement] .app-modal__footer { flex-shrink: 0; }
 .app-modal-overlay[data-dialog-placement] .app-modal__body { min-height: 0; overscroll-behavior: contain; }
@@ -1230,6 +1231,8 @@ body.game-is-paused .shooting-star {
 }
 
 #game-exit-modal .app-button .ui-icon { color: inherit; }
+
+
 .level-reward-overlay .reward-container.app-modal { border-color: var(--dialog-line); box-shadow: var(--dialog-edge); }
 .level-reward-overlay .reward-title.glow { color: var(--dialog-gold); text-shadow: 0 2px 3px #0006; }
 .level-reward-overlay .reward-container .ui-icon { color: var(--dialog-gold); }

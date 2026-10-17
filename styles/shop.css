@@ -1,7 +1,6 @@
 /* Cửa hàng: kích thước cố định, phần nội dung tự cuộn. */
 #shop-modal:not(.app-screen-content) .app-modal,
 #collection-modal:not(.app-screen-content) .app-modal,
-#shop-confirm-modal .app-modal,
 #theme-change-notice-modal .app-modal,
 #quick-time-modal .app-modal,
 #quick-preview-modal .app-modal {
@@ -414,7 +413,7 @@
   background: rgb(42 92 149 / 72%);
 }
 #shop-confirm-modal .app-modal__body {
-  padding: 20px;
+  padding: 18px;
   color: rgb(245 247 251 / 88%);
   text-align: center;
 }
@@ -496,3 +495,9 @@
   .adventure-screen #shop-modal .app-modal__title { font-size: 18px; }
   .adventure-screen #shop-modal .app-modal__title .ui-icon { display: none; }
 }
+
+#shop-confirm-modal .app-modal { border-color: #c6ac6b; border-radius: 20px; background: var(--dialog-surface); box-shadow: var(--dialog-edge); }
+#shop-confirm-modal .app-modal__header { min-height: 64px; padding: 12px 14px; background: #061f2966; border-bottom-color: #b6a16c40; }
+#shop-confirm-modal .app-modal__title { color: var(--dialog-gold); font-size: 20px; }
+#shop-confirm-modal .app-modal__footer { padding: 12px 14px 16px; gap: 8px; }
+#shop-confirm-modal .app-button { min-height: 44px; border-radius: 12px; }

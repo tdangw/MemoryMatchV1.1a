@@ -7,7 +7,9 @@ export function connectDialogPlacement(overlay, panel, lifecycle) {
     : null;
   const board = root?.querySelector('[data-shell-region="board"]');
   const map = !board && document.querySelector('.adventure-map-page:not([hidden])');
-  const banner = overlay.dataset.keepBanner ? map?.querySelector('.adventure-ad-slot') : null;
+  const banner = overlay.dataset.keepBanner
+    ? [...document.querySelectorAll('.adventure-ad-slot')].reverse().find(slot => slot.getClientRects().length && !slot.closest('[hidden]'))
+    : null;
   const viewport = window.visualViewport;
   const edge = 16;
   let pending = false;
@@ -24,7 +26,8 @@ export function connectDialogPlacement(overlay, panel, lifecycle) {
     const bannerSpace = banner?.getBoundingClientRect().height || 0;
     const bottom = viewportBottom - safeBottom - bannerSpace;
     overlay.style.setProperty('--dialog-banner-space', `${bannerSpace}px`);
-    const referenceTop = board ? board.getBoundingClientRect().top : map ? parseFloat(getComputedStyle(overlay, '::before').top) : 0;
+    const referenceTop = overlay.dataset.dialogAlignment === 'center' ? 0
+      : board ? board.getBoundingClientRect().top : map ? parseFloat(getComputedStyle(overlay, '::before').top) : 0;
     const top = Math.min(Math.max(viewportTop + Math.max(edge, safeTop), referenceTop), bottom - edge);
     overlay.style.setProperty('--dialog-top', `${top}px`);
     panel.style.maxHeight = `${Math.max(0, bottom - top)}px`;

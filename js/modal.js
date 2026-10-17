@@ -26,6 +26,7 @@ export function openAppModal({
   owner = getActiveGameScope() || getAppPageScope(),
   presentation = "modal",
   keepBanner = false,
+  alignment = "start",
   host = document.body,
 }) {
   const screen = presentation === 'screen';
@@ -42,6 +43,7 @@ export function openAppModal({
   metrics?.clock.pause(overlay);
   overlay.className = screen ? 'app-screen-content' : "app-modal-overlay";
   if (keepBanner) overlay.dataset.keepBanner = 'true';
+  if (alignment === 'center') overlay.dataset.dialogAlignment = 'center';
   if (id) overlay.id = id;
 
   const panel = document.createElement("section");
