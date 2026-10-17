@@ -1184,7 +1184,7 @@ body.game-is-paused .shooting-star {
   align-items: flex-start;
   padding-top: var(--dialog-top, max(16px, env(safe-area-inset-top)));
   padding-bottom: max(16px, env(safe-area-inset-bottom));
-  height: 100dvh;
+  height: calc(100dvh - var(--dialog-banner-space, 0px));
 }
 .app-modal-overlay[data-dialog-placement] > .app-modal { min-height: 0; transform-origin: center top; }
 .app-modal-overlay[data-dialog-placement] .app-modal__header,

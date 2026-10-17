@@ -17,7 +17,7 @@ export function showAccountPanel(surface = {}) {
   activeView?.dispose();
   const service = getAccountService();
   const content = document.createElement('div'); content.className = 'profile-view';
-  const hero = document.createElement('section'); hero.className = 'tab-card tab-card--ornament profile-hero';
+  const hero = document.createElement('section'); hero.className = 'tab-card profile-hero';
   const summary = document.createElement('div'); summary.className = 'profile-summary';
   const avatar = document.createElement('span'); avatar.className = 'profile-avatar'; avatar.setAttribute('aria-hidden', 'true');
   const identity = document.createElement('div');

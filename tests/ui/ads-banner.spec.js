@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { readFileSync, mkdirSync } from 'node:fs';
-import { startMapLevel } from './helpers/adventureNavigation.js';
+import { startMapLevel, previewMapLevel, closeLevelPreview } from './helpers/adventureNavigation.js';
 
 const adapter = readFileSync(new URL('./fixtures/adsAdapter.js', import.meta.url), 'utf8');
 mkdirSync('docs/ads/qa', { recursive: true });
@@ -68,10 +68,12 @@ test('functional placements and privacy options keep the correct banner owner', 
   }
 });
 
-test('preview, gameplay, restart and all three games never retain the menu banner', async ({ page }) => {
+test('preview retains the banner; gameplay and restart release it for all three games', async ({ page }) => {
   await mockNative(page); await page.goto('/'); await visible(page);
   for (const game of ['memory-match', 'link-connect', 'triple-connect']) {
     await openGameMap(page, game); await visible(page);
+    await previewMapLevel(page); await visible(page);
+    await closeLevelPreview(page); await visible(page);
     await startMapLevel(page); await absent(page);
     const trigger = game === 'memory-match' ? '#btn-actions-menu' : game === 'link-connect' ? '#link-actions-menu-toggle' : '#triple-actions-menu-toggle';
     await expect(page.locator(trigger)).toBeVisible();

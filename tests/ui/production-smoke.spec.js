@@ -26,7 +26,7 @@ test('built mobile menu, map and account open without writing to production serv
   });
   expect(atlasReady).toBe(true);
   await previewMapLevel(page, 1, 'hard');
-  await expect(page.locator('.menu-ad-preview')).toHaveCount(0);
+  await expect(page.locator('.menu-ad-preview')).toHaveCount(1);
   await closeLevelPreview(page);
   await expect(page.locator('.menu-ad-preview')).toHaveCount(1);
   for (const tab of ['shop', 'collection']) {

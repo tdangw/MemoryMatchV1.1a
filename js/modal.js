@@ -25,6 +25,7 @@ export function openAppModal({
   onActionSettled,
   owner = getActiveGameScope() || getAppPageScope(),
   presentation = "modal",
+  keepBanner = false,
   host = document.body,
 }) {
   const screen = presentation === 'screen';
@@ -37,9 +38,10 @@ export function openAppModal({
   const metrics = getActivePlayMetrics();
 
   const overlay = document.createElement("div");
-  const resumeMenuAds = screen ? null : suspendMenuAds(overlay);
+  const resumeMenuAds = screen || keepBanner ? null : suspendMenuAds(overlay);
   metrics?.clock.pause(overlay);
   overlay.className = screen ? 'app-screen-content' : "app-modal-overlay";
+  if (keepBanner) overlay.dataset.keepBanner = 'true';
   if (id) overlay.id = id;
 
   const panel = document.createElement("section");

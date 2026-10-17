@@ -285,7 +285,7 @@ export function mountAdventureMap(gameId) {
       modal.panel.querySelector(".app-modal__title").lastChild.textContent = title();
       modal.panel.setAttribute("aria-label", `${game.title} · ${title()}`);
     });
-    const modal = openAppModal({ id: "adventure-level-modal", title: title(), content, owner: scope,
+    const modal = openAppModal({ id: "adventure-level-modal", title: title(), content, owner: scope, keepBanner: true,
       onDestroy: release,
       actions: [{ label: "Chơi", variant: "primary", onClick: async () => await launch(selectedMode(), level, { skipIntro: true }) ? undefined : false }],
     });

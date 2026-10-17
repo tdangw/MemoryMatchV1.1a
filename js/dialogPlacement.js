@@ -7,6 +7,7 @@ export function connectDialogPlacement(overlay, panel, lifecycle) {
     : null;
   const board = root?.querySelector('[data-shell-region="board"]');
   const map = !board && document.querySelector('.adventure-map-page:not([hidden])');
+  const banner = overlay.dataset.keepBanner ? map?.querySelector('.adventure-ad-slot') : null;
   const viewport = window.visualViewport;
   const edge = 16;
   let pending = false;
@@ -19,7 +20,10 @@ export function connectDialogPlacement(overlay, panel, lifecycle) {
     const safeTop = parseFloat(style.getPropertyValue('--dialog-safe-top')) || 0;
     const safeBottom = parseFloat(style.paddingBottom) || 0;
     const viewportTop = viewport?.offsetTop || 0;
-    const bottom = viewportTop + (viewport?.height || window.innerHeight) - safeBottom;
+    const viewportBottom = viewportTop + (viewport?.height || window.innerHeight);
+    const bannerSpace = banner?.getBoundingClientRect().height || 0;
+    const bottom = viewportBottom - safeBottom - bannerSpace;
+    overlay.style.setProperty('--dialog-banner-space', `${bannerSpace}px`);
     const referenceTop = board ? board.getBoundingClientRect().top : map ? parseFloat(getComputedStyle(overlay, '::before').top) : 0;
     const top = Math.min(Math.max(viewportTop + Math.max(edge, safeTop), referenceTop), bottom - edge);
     overlay.style.setProperty('--dialog-top', `${top}px`);
@@ -39,6 +43,11 @@ export function connectDialogPlacement(overlay, panel, lifecycle) {
   if (board) {
     const observer = new ResizeObserver(schedule);
     observer.observe(board); observer.observe(root);
+    lifecycle.own(() => observer.disconnect());
+  }
+  if (banner) {
+    const observer = new ResizeObserver(schedule);
+    observer.observe(banner);
     lifecycle.own(() => observer.disconnect());
   }
   update();

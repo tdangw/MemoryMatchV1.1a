@@ -50,7 +50,7 @@ for (const size of [{ width: 412, height: 915 }, { width: 844, height: 390 }, { 
         await expect(preview(page)).toHaveCount(1);
       }
       await previewMapLevel(page);
-      await expect(preview(page)).toHaveCount(0);
+      await expect(preview(page)).toHaveCount(1);
       await closeLevelPreview(page);
       await expect(preview(page)).toHaveCount(1);
       await startMapLevel(page);
