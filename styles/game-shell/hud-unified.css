@@ -155,7 +155,7 @@
   z-index: var(--shell-layers-menu);
 }
 .game-hud .game-actions-menu { left: 0; }
-.game-hud :is(.memory-tools-menu, .link-tools-menu, .triple-tools-menu) { right: 0; }
+.game-hud :is(.memory-tools-menu, .link-tools-menu, .triple-tools-menu) { right: 0; border-color: #c6ac6b; border-radius: 16px; background: var(--dialog-surface); box-shadow: var(--dialog-edge); }
 .game-hud :is(.game-actions-menu, .memory-tools-menu, .link-tools-menu, .triple-tools-menu)[hidden] { display: none; }
 .game-hud :is(.game-actions-menu, .memory-tools-menu, .link-tools-menu, .triple-tools-menu)::-webkit-scrollbar { display: none; }
 .game-hud .game-hud__metric.stat-combo .combo-window-progress {
@@ -255,9 +255,10 @@
   right: 3px;
   bottom: 1px;
   left: 3px;
-  height: 2px;
+  height: 4px;
   border-radius: 999px;
-  background: linear-gradient(90deg, #81d9ff, #e9fdff);
+  background: linear-gradient(90deg, #6827a6, #9d3dce);
+  box-shadow: 0 0 0 1px #26133b;
   opacity: 0;
   transform: scaleX(0);
   transform-origin: left center;
