@@ -465,6 +465,7 @@ export function openLinkPanel(open) {
 
 function pauseLinkForModal() {
   linkGameState.isPaused = true;
+  linkTimeScheduler.pause();
 }
 
 function resumeLinkAfterModal() {
@@ -734,7 +735,7 @@ async function finishLinkThunder(board, roundId) {
 
 function useLinkFreeze() {
   linkGameState.freezeSeconds += 10;
-  pauseLinkTimeProgressForFreeze();
+  startLinkFreezeProgress();
   showAppToast("Đồng hồ đã đóng băng trong 10 giây.");
 }
 
@@ -881,6 +882,7 @@ function startCountdown(roundId) {
     if (linkGameState.roundId !== roundId || linkGameState.isPaused) return;
     if (linkGameState.freezeSeconds > 0) {
       linkGameState.freezeSeconds -= 1;
+      linkTimeProgressState.freezeRemainingMs = Math.min(linkTimeProgressState.freezeRemainingMs, linkGameState.freezeSeconds * GAMEPLAY_TIMING.secondMs);
       if (linkGameState.freezeSeconds === 0) resumeLinkTimeProgressAfterFreeze();
       updateLinkTimerHud();
       return;
@@ -1012,7 +1014,13 @@ function updateLinkTimerHud(hud = getLinkHudElements()) {
 }
 
 function syncLinkTimerFreezeState(hud = getLinkHudElements()) {
-  hud.timerCard?.classList.toggle("is-time-frozen", linkGameState.freezeSeconds > 0);
+  const frozen = linkGameState.freezeSeconds > 0;
+  hud.timerCard?.classList.toggle("is-time-frozen", frozen);
+  const state = linkTimeProgressState;
+  const ratio = frozen && state?.roundId === linkGameState.roundId
+    ? Math.min(1, state.freezeRemainingMs / Math.max(1, state.freezeDurationMs)) : 0;
+  hud.freezeProgress.style.transform = `scaleX(${ratio})`;
+  hud.freezeProgress.style.opacity = frozen ? "1" : "0";
 }
 
 function updateLinkCoinHud(hud = getLinkHudElements()) {
@@ -1048,9 +1056,12 @@ function setLinkTimeProgress(running, roundId = linkGameState.roundId, hud = get
     timeLimitMs: Math.max(1, Number(linkGameState.timeLimit || linkGameState.remainingTime || 1))
       * GAMEPLAY_TIMING.secondMs,
     remainingMs: Math.max(0, Number(linkGameState.remainingTime || 0)) * GAMEPLAY_TIMING.secondMs,
+    freezeRemainingMs: linkGameState.freezeSeconds * GAMEPLAY_TIMING.secondMs,
+    freezeDurationMs: linkGameState.freezeSeconds * GAMEPLAY_TIMING.secondMs,
     lastFrameAt: null,
   };
   renderLinkTimeProgress(linkTimeProgressState.remainingMs, linkTimeProgressState, hud);
+  syncLinkTimerFreezeState(hud);
   if (!linkTimeProgressState.running) return;
   linkTimeScheduler.start(updateLinkTimeProgressFrame);
 }
@@ -1068,7 +1079,7 @@ function syncLinkTimeProgress() {
   linkTimeProgressState.lastFrameAt = performance.now();
   renderLinkTimeProgress(linkTimeProgressState.remainingMs, linkTimeProgressState);
   if (linkTimeProgressState.running && !linkGameState.isPaused
-    && linkGameState.freezeSeconds <= 0 && !linkTimeScheduler.active) {
+    && !linkTimeScheduler.active) {
     linkTimeScheduler.start(updateLinkTimeProgressFrame);
   }
 }
@@ -1076,9 +1087,11 @@ function syncLinkTimeProgress() {
 function updateLinkTimeProgressFrame(elapsed = 0) {
   const state = linkTimeProgressState;
   if (!state?.running || state.roundId !== linkGameState.roundId) return;
-  // Freeze giữ nguyên thanh thời gian và không để requestAnimationFrame chạy nền.
+  if (linkGameState.isPaused) return false;
   if (linkGameState.freezeSeconds > 0) {
-    return false;
+    state.freezeRemainingMs = Math.max(0, state.freezeRemainingMs - elapsed);
+    syncLinkTimerFreezeState();
+    return true;
   }
   if (!linkGameState.isPaused && linkGameState.freezeSeconds <= 0) {
     state.remainingMs = Math.max(0, state.remainingMs - elapsed);
@@ -1092,8 +1105,15 @@ function updateLinkTimeProgressFrame(elapsed = 0) {
   }
 }
 
-function pauseLinkTimeProgressForFreeze() {
-  linkTimeScheduler.pause();
+function startLinkFreezeProgress() {
+  const state = linkTimeProgressState;
+  if (!state || state.roundId !== linkGameState.roundId) return;
+  state.freezeRemainingMs = linkGameState.freezeSeconds * GAMEPLAY_TIMING.secondMs;
+  state.freezeDurationMs = state.freezeRemainingMs;
+  syncLinkTimerFreezeState();
+  if (state.running && !linkGameState.isPaused && !linkTimeScheduler.active) {
+    linkTimeScheduler.start(updateLinkTimeProgressFrame);
+  }
 }
 
 function resumeLinkTimeProgressAfterFreeze() {
@@ -1252,6 +1272,7 @@ async function pauseLinkForBackground() {
   if (linkGameState.isPaused) return;
   isLinkAutoPaused = true;
   linkGameState.isPaused = true;
+  linkTimeScheduler.pause();
   getLinkShell().update({ paused: true });
   await persistLinkRunProgress();
 }

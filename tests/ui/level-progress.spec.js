@@ -77,7 +77,13 @@ for (const id of ['memory-match', 'link-connect']) test(`${id} restores the same
   expect(restored.matchedPairs).toBe(1);
   expect(restored.luckyAwards).toEqual(saved.pairSnapshot.luckyAwards);
   if (id === 'memory-match') expect(restored.tiles).toEqual(saved.pairSnapshot.tiles.map(tile => tile.id));
-  else expect(restored.board).toEqual(saved.pairSnapshot.board);
+  else {
+    expect(restored.board).toEqual(saved.pairSnapshot.board);
+    await expect(page.locator('.link-freeze-progress')).toHaveCSS('opacity', '1');
+    expect(await page.locator('.link-freeze-progress').evaluate(node => node.style.transform)).toBe('scaleX(1)');
+    await expect.poll(() => page.locator('.link-freeze-progress').evaluate(node => Number(node.style.transform.match(/[\d.]+/)[0]))).toBeLessThan(1);
+    expect(await page.evaluate(async () => (await import('/js/linkConnect/linkState.js')).linkGameState.remainingTime)).toBe(saved.remainingTime);
+  }
 });
 for (const id of ['memory-match', 'link-connect']) test(`${id} preserves a damaged pair snapshot and refuses to replace its board on resume`, async ({ page }) => {
   await page.goto('/');

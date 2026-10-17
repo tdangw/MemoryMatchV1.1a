@@ -89,7 +89,7 @@
   line-height: 1;
   white-space: nowrap;
 }
-.game-hud .game-hud__metric > :not(.stat-label):not(.combo-window-progress) {
+.game-hud .game-hud__metric > :not(.stat-label):not(.combo-window-progress):not(.link-freeze-progress) {
   display: block;
   min-width: 0;
   color: var(--unified-hud-value);
@@ -98,7 +98,7 @@
   line-height: 1;
 }
 .game-hud .stat-stars .stat-label .ui-icon { width: 13px; height: 13px; color: var(--unified-hud-label); }
-.game-hud .game-hud__metric.timer-warning > :not(.stat-label):not(.combo-window-progress) { color: var(--unified-hud-timer-warning); }
+.game-hud .game-hud__metric.timer-warning > :not(.stat-label):not(.combo-window-progress):not(.link-freeze-progress) { color: var(--unified-hud-timer-warning); }
 .game-hud .game-menu-toggle,
 .game-hud :is(.memory-tools-toggle, .link-tools-toggle, .triple-tools-toggle) {
   --unified-hud-control-surface: var(--unified-hud-button-surface);
@@ -244,3 +244,24 @@
 .game-hud .hud-tool-item .ui-icon { width: 17px; height: 17px; color: #70c5ff; }
 .game-hud .hud-tool-item .hud-tool-count { display: grid; width: 18px; height: 18px; place-items: center; border-radius: 50%; background: rgb(242 191 91 / 18%); color: #f2bf5b; font-size: 0.64rem; }
 .game-hud .hud-tool-item.is-disabled { cursor: not-allowed; opacity: 0.44; }
+
+
+
+/* The freeze bar has one fixed node; the existing HUD cadence owns its progress. */
+.link-game-hud .game-hud__metric.stat-timer > .link-freeze-progress {
+  position: absolute;
+  z-index: 3;
+  right: 3px;
+  bottom: 1px;
+  left: 3px;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #81d9ff, #e9fdff);
+  opacity: 0;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 250ms linear;
+}
+@media (prefers-reduced-motion: reduce) {
+  .link-game-hud .game-hud__metric.stat-timer > .link-freeze-progress { transition: none; }
+}
