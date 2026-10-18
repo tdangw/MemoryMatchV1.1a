@@ -87,6 +87,8 @@ Các bước trên là lộ trình sản xuất sau lượt lập kế hoạch, 
 
 Phản hồi bổ sung: thanh đóng băng phải đầy ngay khi dùng và khi dùng chồng, sau đó chỉ giảm. Nguyên nhân là transition250ms cũng áp dụng khi ratio tăng0→1. Đã cân nhắc bỏ transition hoàn toàn (bar giảm theo nấc250ms) và chỉ bỏ chuyển động lúc đầy (vẫn giảm mượt); chọn cách thứ hai, suy ra từ ratio hiện có, không thêm cờ/timer/RAF/reflow. Lần đầu/chồng/restore đầy dùng0s; ratio dưới1 dùng cadence cũ; reduced-motion giữ tĩnh. Kiểm tra computed transform ngay trong lần thay đổi style, thay vì chỉ nhìn giá trị đích trong attribute.
 
-- [ ] Test mục tiêu + responsive + lifecycle + review độc lập.
-- [ ] Check/build, kiểm ảnh thật và diff cuối; commit từng phase. Không xuất bản.
-- [ ] Ghi bằng chứng và giới hạn kiểm chứng; kết thúc kế hoạch hiện hành. Lộ trình bộ hình ở trên vẫn là phần chuẩn bị.
+- [x] Test mục tiêu + responsive + lifecycle + review độc lập.
+- [x] Check/build, kiểm ảnh thật và diff cuối; commit từng phase. Không xuất bản.
+- [x] Ghi bằng chứng và giới hạn kiểm chứng; kết thúc kế hoạch hiện hành. Lộ trình bộ hình ở trên vẫn là phần chuẩn bị.
+
+Nghiệm thu A–C hoàn tất: xem `docs/design/ui-image-upgrade/QA.md`. Kế hoạch này không còn gate triển khai active; phần bộ hình là lộ trình chuẩn bị, chưa tạo hoặc tích hợp ảnh mới.

@@ -6,7 +6,7 @@ Người dùng đã chọn tự xuất bản website và thông điệp AdMob ng
 
 ## Sản phẩm
 
-- Hiện hành18/10: `UI_IMAGE_UPGRADE_PLAN.md` — lập kế hoạch bộ hình đồng bộ ba trò/toàn bộ popup/tab/shop theo hướng Vườn đêm + thắng/thưởng gỗ giấy. Lượt này chỉ lập lộ trình ảnh; phần triển khai đã giao là bar đóng băng2px vàng sát mép, banner5thẻ/3hoa và giữ banner khi mở popup thông thường. Chưa tạo ảnh/đổi toàn bộ skin, không deploy/publish; giữ save/API/catalog và phạm vi Android gameplay.
+- Hoàn tất18/10: `UI_IMAGE_UPGRADE_PLAN.md` A–C — kế hoạch7bộ hình đồng bộ toàn bộ popup/tab/shop/HUD ba trò, hướng Vườn đêm + thắng/thưởng gỗ giấy; chưa tạo/tích hợp sheet. Code: bar đóng băng2px vàng sát mép, snap đầy ngay khi dùng/chồng rồi giảm; banner5thẻ/3hoa; popup thường/intro/cảnh hoàn thành chặng giữ banner và chừa đúng vùng. Review nguồn/lifecycle và refill/chapter cuối đạt; check(ads15/15), buildweb/AndroidAPK, production2/2 đạt. QA/receipt/ảnh: `docs/design/ui-image-upgrade/QA.md`. Không còn gate code active; giữ save/catalog/API tương thích, Android gameplay vẫn tắt, không deploy/publish.
 
 - Hoàn tất18/10: `HUD_PURCHASE_POLISH_PLAN.md` — thanh đóng băng tím4px/viền tối, mở cặp băng800ms, popup mua cân giữa safe viewport trừ banner và không thu hồi banner khi mua/hủy; công cụ ba trò dùng skin nổi của menu. Review27/27 (purchase13/dialog14), check (ads15/15), web/AndroidAPK và production smoke2/2 đạt. QA/ảnh/receipt: `docs/design/hud-purchase/QA.md`. Giữ save/catalog/giao dịch và API cũ tương thích; không deploy/publish. Không còn gate triển khai active. Shop grid legacy Triple qua API trong game ngoài menu hiện hành chưa sửa, ghi rõ trong QA.
 

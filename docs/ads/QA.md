@@ -1,4 +1,10 @@
-# Kết quả kiểm tra quảng cáo và APK — 16–17/10/2026
+# Kết quả kiểm tra quảng cáo và APK — 16–18/10/2026
+
+## Cập nhật18/10 — giữ banner và thanh đóng băng đầy ngay
+
+Popup thường, đầu màn, thắng và cảnh hoàn thành chặng giữ banner/chừa đúng vùng; ngoại lệ quyền riêng tư/bản lưu/lỗi lưu vẫn chặn. Banner web5thẻ/3hoa; Link bar2px vàng sát mép, dùng mới/chồng đầy ngay rồi giảm. Android gameplay vẫn tắt. Kế hoạch7bộ hình cho cả ba trò đã chuẩn bị, chưa sinh ảnh. Review cuối không finding, check(ads15/15), buildweb/AndroidAPK và production smoke2/2 đạt; chi tiết `docs/design/ui-image-upgrade/QA.md`.
+
+APK hiện hành34250200bytes, SHA256 `8ABA924CFD968EF036A5BF3CC04B75EF7D22FF70BF4BE2BD0382CA235641DCF6`; package `com.memorymatch.adventure`/version1.0/min24/target36, chữ ký debugv2 hợp lệ. Đã kiểm bar vàng/nhánh refill0s trong gói. Chưa kiểm máy thật/quảng cáo thật; không deploy/publish hoặc bypass consent. Các mục tiếp theo là lịch sử.
 
 ## Cập nhật18/10 — APK sau tinh chỉnh popup mua
 
