@@ -383,7 +383,7 @@ function renderTripleItems(grid, roundId, modal) {
   card.className = "appearance-choice";
   const preview = document.createElement("div");
   preview.className = "appearance-preview theme-preview";
-  preview.append(createIcon("collection"));
+  preview.append(createIcon("expand"));
   const name = document.createElement("strong");
   name.textContent = "Mở rộng khay";
   const description = document.createElement("small");

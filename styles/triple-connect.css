@@ -455,3 +455,6 @@
   border-radius: 8px;
   font-size: 12px;
 }
+
+.triple-connect__tray { border-image-source: var(--ui-art-garden-tray); border-image-slice: 35% 25% fill; border-image-width: 12px 20px; }
+.triple-connect__tray-slot:not(.is-locked) { background: var(--ui-art-garden-square) center / 100% 100% no-repeat; }

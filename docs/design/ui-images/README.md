@@ -18,7 +18,7 @@ Master thực tế1254×1254, RGBA, có alpha0–255; không coi kích thước2
 | Phần | Dùng hình | Giữ cách điều khiển hiện có |
 |---|---|---|
 | Popup chọn màn/đầu màn/thông tin/tạm dừng/hết giờ/xác nhận/công cụ | Khung/nút Vườn đêm, huy hiệu, icon | Nội dung, focus, cuộn, pause, thao tác và lifecycle |
-| Thắng, rương, quà, kết thúc chặng | Gỗ/giấy, ribbon trống, sao sáng/tối, ô số, nút cam/xanh, quà/rương/xu/giờ | Thưởng thật, sao0–3, nhiều dòng, counter, chuyển tiếp và cảnh hoa hiện có |
+| Thắng, rương, quà, kết thúc chặng | Gỗ/giấy, ribbon trống, sao sáng/tối, ô số, nút cam/xanh, quà/rương/xu/giờ | Thưởng thật, sao0–3, popup thắng đúng3hàng Xu/Thời gian/Điểm, counter, chuyển tiếp và cảnh hoa hiện có |
 | Cửa hàng/Bộ sưu tập | Khung hàng, bệ giá/preview, trạng thái mua/chọn, icon công cụ dùng chung | Giá/kho/giao dịch và preview chủ đề/mặt lưng/hiệu ứng có sẵn |
 | Home/map/tab | Giữ nền/tranh/đồ trang trí cũ, thay bệ tên/khung nhóm/avatar/medal/nút/tab/icon | Carousel, map patch/scroll, hồ sơ và bảng xếp hạng |
 | HUD/khay3trò | Khung và bệ công cụ/khay, sao/xu/icon | Kích thước bàn/HUD, thanh thời gian/combo, đường nối và renderer |

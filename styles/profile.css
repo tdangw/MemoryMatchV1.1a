@@ -35,3 +35,6 @@
   .account-play-details { gap: 8px; }
   .account-play-details > div { padding: 10px; }
 }
+
+.profile-avatar { border-color: transparent; background: var(--ui-art-avatar-frame) center / 100% 100% no-repeat, #092832; }
+.account-play-details > div { border-image-source: var(--ui-art-garden-inset); border-image-slice: 30% fill; border-image-width: 14px; }

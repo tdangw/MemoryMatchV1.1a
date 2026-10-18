@@ -29,7 +29,7 @@ export function getTripleShell() {
     button.type = "button";
     button.dataset.tripleItem = item.id;
     button.className = "hud-tool-item";
-    button.append(createIcon({ hint: "search", time: "timer", undo: "undo", shuffle: "restart" }[item.id]));
+    button.append(createIcon(item.icon));
     const label = document.createElement("span");
     label.textContent = item.title;
     button.append(label);

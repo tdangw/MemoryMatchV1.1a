@@ -4,10 +4,10 @@ import { GAMEPLAY_LIMITS } from "../gameplayTuning.js";
 import { TRIPLE_PRODUCT_DECISIONS } from "./tripleConfig.js";
 
 export const TRIPLE_ITEMS = Object.freeze([
-  Object.freeze({ id: "hint", title: "Gợi ý", price: TRIPLE_PRODUCT_DECISIONS.itemPrices.hint }),
-  Object.freeze({ id: "time", title: "+1 giây", price: TRIPLE_PRODUCT_DECISIONS.itemPrices.timePerSecond }),
-  Object.freeze({ id: "undo", title: "Hoàn tác", price: TRIPLE_PRODUCT_DECISIONS.itemPrices.undo }),
-  Object.freeze({ id: "shuffle", title: "Xáo trộn", price: TRIPLE_PRODUCT_DECISIONS.itemPrices.shuffle }),
+  Object.freeze({ id: "hint", title: "Gợi ý", icon: "search", price: TRIPLE_PRODUCT_DECISIONS.itemPrices.hint }),
+  Object.freeze({ id: "time", title: "+1 giây", icon: "timer", price: TRIPLE_PRODUCT_DECISIONS.itemPrices.timePerSecond }),
+  Object.freeze({ id: "undo", title: "Hoàn tác", icon: "undo", price: TRIPLE_PRODUCT_DECISIONS.itemPrices.undo }),
+  Object.freeze({ id: "shuffle", title: "Xáo trộn", icon: "shuffle", price: TRIPLE_PRODUCT_DECISIONS.itemPrices.shuffle }),
 ]);
 
 export function getTripleItemCount(id) {

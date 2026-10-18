@@ -36,3 +36,8 @@
 #settings-container .settings-range::-moz-range-progress { height: 6px; border-radius: 99px; background: #5bb4c6; }
 #settings-container .settings-range::-moz-range-thumb { width: 18px; height: 18px; border: 1px solid #e4c982; border-radius: 50%; background: linear-gradient(#fffbea, #d2ceb4); box-shadow: 0 2px 3px #0008; }
 #settings-container .settings-range:focus-visible { outline: 2px solid var(--tab-gold); outline-offset: 2px; border-radius: 5px; }
+
+#settings-container .settings-section { padding: 20px 22px; }
+#settings-container .toggle-switch .slider::after { background: var(--ui-art-control-thumb) center / contain no-repeat; box-shadow: none; }
+#settings-container .settings-range::-webkit-slider-thumb { background: var(--ui-art-control-thumb) center / contain no-repeat; border-color: transparent; box-shadow: none; }
+#settings-container .settings-range::-moz-range-thumb { background: var(--ui-art-control-thumb) center / contain no-repeat; border-color: transparent; box-shadow: none; }

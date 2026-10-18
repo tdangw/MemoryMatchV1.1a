@@ -4,9 +4,9 @@ import { GAMEPLAY_LIMITS } from "../gameplayTuning.js";
 
 export const LINK_ITEMS = Object.freeze([
   Object.freeze({ id: "hint", title: "Gợi ý đường nối", icon: "search", price: 8 }),
-  Object.freeze({ id: "reshuffle", title: "Xáo trộn", icon: "restart", price: 15 }),
+  Object.freeze({ id: "reshuffle", title: "Xáo trộn", icon: "shuffle", price: 15 }),
   Object.freeze({ id: "thunder", title: "Sấm sét", icon: "wand", price: 25 }),
-  Object.freeze({ id: "freeze", title: "Đóng băng thời gian", icon: "timer", price: 20 }),
+  Object.freeze({ id: "freeze", title: "Đóng băng thời gian", icon: "freeze", price: 20 }),
 ]);
 
 export function getLinkItemCount(id) {

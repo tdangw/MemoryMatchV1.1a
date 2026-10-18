@@ -46,7 +46,7 @@
 #theme-change-notice-modal .app-modal__close,
 #quick-time-modal .app-modal__close,
 #quick-preview-modal .app-modal__close {
-  background: rgb(255 255 255 / 9%);
+  background: var(--ui-art-garden-square) center / 100% 100% no-repeat;
   color: #f5f7fb;
 }
 
@@ -189,6 +189,7 @@
   height: 100%;
   grid-template-columns: 1fr;
   grid-template-rows: none;
+  grid-auto-rows: max-content;
   align-content: start;
   gap: 15px;
   overflow-y: auto;
@@ -438,16 +439,16 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 #shop-confirm-modal .app-button--secondary {
-  border-color: rgb(255 255 255 / 16%);
-  background: rgb(255 255 255 / 10%);
+  border-color: transparent;
+  background: transparent;
   color: #f5f7fb;
 }
 #shop-confirm-modal .app-button--primary {
-  background: #2f73b8;
+  background: transparent;
   color: #fff;
 }
 #theme-change-notice-modal .app-button--primary {
-  background: #2f73b8;
+  background: transparent;
   color: #fff;
 }
 
@@ -501,3 +502,12 @@
 #shop-confirm-modal .app-modal__title { color: var(--dialog-gold); font-size: 20px; }
 #shop-confirm-modal .app-modal__footer { padding: 12px 14px 16px; gap: 8px; }
 #shop-confirm-modal .app-button { min-height: 44px; border-radius: 12px; }
+
+/* Shop owns its item and purchase image surfaces, including collection reuse. */
+.theme-choice, .appearance-choice, #shop-modal .shop-item { border-image-source: var(--ui-art-garden-inset); border-image-slice: 30% fill; border-image-width: 16px; background: #082631; }
+.theme-preview { background: var(--ui-art-garden-square) center / 100% 100% no-repeat; }
+#shop-modal .shop-buy-button, #collection-modal .shop-buy-button { border-image-source: var(--ui-art-garden-secondary); border-image-slice: 35% 27% fill; border-image-width: 12px 18px; background: transparent; }
+#shop-modal .appearance-action--equip, #collection-modal .appearance-action--equip { border-image-source: var(--ui-art-garden-primary); }
+#shop-modal .shop-buy-button:disabled, #collection-modal .shop-buy-button:disabled { border-image-source: var(--ui-art-garden-disabled); }
+.quick-assist__choice { border-image-source: var(--ui-art-garden-inset); border-image-slice: 30% fill; border-image-width: 18px; }
+#shop-confirm-modal .app-modal { border-image-source: var(--ui-art-garden-panel); }
