@@ -135,7 +135,7 @@ bindSettingsControls();
 if (versionValue) versionValue.textContent = APP_VERSION;
 versionInfoButton?.addEventListener("click", showVersionInfo);
 document.getElementById('settings-privacy-policy').addEventListener('click', () => openAppModal({
-  id: 'privacy-policy-modal', title: 'Quyền riêng tư', content: PRIVACY_CONTENT,
+  id: 'privacy-policy-modal', title: 'Quyền riêng tư', content: PRIVACY_CONTENT, keepBanner: false,
 }));
 
 export function showSettingsPanel(fromGame = false, onClose = () => {}, actions = navigation, surface = {}) {

@@ -31,6 +31,7 @@ test('built mobile menu, map and account open without writing to production serv
   await expect(page.locator('.game-selector__choice')).toHaveCount(3);
   await expect(page.locator('.menu-ad-preview')).toHaveCount(1);
   await expect(page.locator('.menu-ad-preview')).toHaveText('');
+  await expect(page.locator('.ad-art-card')).toHaveCount(5);
   await expect(page.locator('.adventure-wallet')).toHaveCount(0);
   await expect(page.locator('.adventure-account')).toHaveCount(0);
   await page.locator('.game-selector__choice').filter({ hasText: 'Memory Match' }).click();
@@ -71,6 +72,13 @@ test('built mobile menu, map and account open without writing to production serv
   await expect(page.locator('.gameplay-ad-slot .ad-art-scene')).toHaveCount(1);
   await expect(page.locator('.gameplay-ad-slot')).toHaveAttribute('aria-hidden', 'true');
   await expect(page.locator('.menu-ad-preview')).toHaveText('');
+  const board = await page.locator('#game-container [data-shell-region="board"]').boundingBox();
+  await page.locator('#btn-actions-menu').click();
+  await expect(page.locator('#game-exit-modal')).toBeVisible();
+  await expect(page.locator('.gameplay-ad-slot .menu-ad-preview')).toHaveCount(1);
+  expect(await page.locator('#game-container [data-shell-region="board"]').boundingBox()).toEqual(board);
+  await page.getByRole('button', { name: 'Tiếp tục', exact: true }).click();
+  await expect(page.locator('#game-exit-modal')).toHaveCount(0);
   await page.screenshot({ path: '.firebase/production-map-mobile.png' });
   expect(errors).toEqual([]);
 });

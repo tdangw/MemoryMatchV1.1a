@@ -79,9 +79,9 @@ Các bước trên là lộ trình sản xuất sau lượt lập kế hoạch, 
 
 ### B — Thanh đóng băng, hình banner và hiển thị popup
 
-- [ ] Link: bar2px như combo, vàng rõ trên băng trắng, sát hai mép; giữ thời lượng và nhịp HUD hiện có.
-- [ ] Banner:5thẻ và3hoa, giãn ngang theo vùng hiển thị; giữ cảnh chạy, mỗi cảnh6s và một scene tại một thời điểm. Chọn bổ sung SVG/CSS hiện có thay raster/loop mới: chi phí nhỏ, dispose hiện tại vẫn sở hữu toàn cảnh. Tối đa5thẻ/3hoa/3đốm sáng; chỉ transform/opacity; reduced-motion đứng yên. Đo lại node/animation/frame so với cảnh tĩnh, kiểm hủy và30vòng luân phiên.
-- [ ] Popup thông thường giữ node/banner và vùng dành sẵn, gồm thắng/hết giờ/đầu màn/mua/công cụ/menu/thông tin/rương. Chọn chính sách chung ở modal thay thêm nhánh ở mỗi controller; quyền riêng tư, chọn bản lưu và lỗi lưu tắt rõ ràng. Nhập liệu/ứng dụng nền/no-fill giữ xử lý hiện hành; Android gameplay vẫn tắt.
+- [x] Link: bar2px như combo, vàng rõ trên băng trắng, sát hai mép; giữ thời lượng và nhịp HUD hiện có.
+- [x] Banner:5thẻ và3hoa, giãn ngang theo vùng hiển thị; giữ cảnh chạy, mỗi cảnh6s và một scene tại một thời điểm. Chọn bổ sung SVG/CSS hiện có thay raster/loop mới: chi phí nhỏ, dispose hiện tại vẫn sở hữu toàn cảnh. Tối đa5thẻ/3hoa/3đốm sáng; chỉ transform/opacity; reduced-motion đứng yên. Đo lại node/animation/frame so với cảnh tĩnh, kiểm hủy và30vòng luân phiên.
+- [x] Popup thông thường giữ node/banner và vùng dành sẵn, gồm thắng/hết giờ/đầu màn/mua/công cụ/menu/thông tin/rương và cảnh hoàn thành chặng. Cảnh chặng và popup dùng chung hàm chừa banner, observer do lifecycle sở hữu. Chọn chính sách chung ở modal thay thêm nhánh ở mỗi controller; quyền riêng tư, chọn bản lưu và lỗi lưu tắt rõ ràng. Nhập liệu/ứng dụng nền/no-fill giữ xử lý hiện hành; Android gameplay vẫn tắt.
 
 ### C — Nghiệm thu và bàn giao
 

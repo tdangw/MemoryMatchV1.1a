@@ -1,5 +1,25 @@
 import { getActiveGameScope } from './gameShell/gameShellLifecycle.js';
 
+// Dialogs and the chapter scene share the same visible banner and cleanup owner.
+export function connectBannerClearance(overlay, lifecycle, onResize) {
+  const banner = overlay.dataset.keepBanner
+    ? [...document.querySelectorAll('.adventure-ad-slot')].reverse().find(slot => slot.getClientRects().length && !slot.closest('[hidden]'))
+    : null;
+  const readSpace = () => banner?.getBoundingClientRect().height || 0;
+  function update() {
+    if (!lifecycle.active || !overlay.isConnected) return;
+    overlay.style.setProperty('--dialog-banner-space', `${readSpace()}px`);
+    onResize?.();
+  }
+  overlay.style.setProperty('--dialog-banner-space', `${readSpace()}px`);
+  if (banner) {
+    const observer = new ResizeObserver(update);
+    observer.observe(banner);
+    lifecycle.own(() => observer.disconnect());
+  }
+  return readSpace;
+}
+
 // Each dialog owns its observers/listeners through its existing lifecycle.
 export function connectDialogPlacement(overlay, panel, lifecycle) {
   const root = getActiveGameScope()?.active
@@ -7,9 +27,7 @@ export function connectDialogPlacement(overlay, panel, lifecycle) {
     : null;
   const board = root?.querySelector('[data-shell-region="board"]');
   const map = !board && document.querySelector('.adventure-map-page:not([hidden])');
-  const banner = overlay.dataset.keepBanner
-    ? [...document.querySelectorAll('.adventure-ad-slot')].reverse().find(slot => slot.getClientRects().length && !slot.closest('[hidden]'))
-    : null;
+  const readBannerSpace = connectBannerClearance(overlay, lifecycle, schedule);
   const viewport = window.visualViewport;
   const edge = 16;
   let pending = false;
@@ -23,7 +41,7 @@ export function connectDialogPlacement(overlay, panel, lifecycle) {
     const safeBottom = parseFloat(style.paddingBottom) || 0;
     const viewportTop = viewport?.offsetTop || 0;
     const viewportBottom = viewportTop + (viewport?.height || window.innerHeight);
-    const bannerSpace = banner?.getBoundingClientRect().height || 0;
+    const bannerSpace = readBannerSpace();
     const bottom = viewportBottom - safeBottom - bannerSpace;
     overlay.style.setProperty('--dialog-banner-space', `${bannerSpace}px`);
     const referenceTop = overlay.dataset.dialogAlignment === 'center' ? 0
@@ -46,11 +64,6 @@ export function connectDialogPlacement(overlay, panel, lifecycle) {
   if (board) {
     const observer = new ResizeObserver(schedule);
     observer.observe(board); observer.observe(root);
-    lifecycle.own(() => observer.disconnect());
-  }
-  if (banner) {
-    const observer = new ResizeObserver(schedule);
-    observer.observe(banner);
     lifecycle.own(() => observer.disconnect());
   }
   update();

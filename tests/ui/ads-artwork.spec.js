@@ -1,6 +1,8 @@
 import { test, expect } from '@playwright/test';
-import { writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import { startMapLevel } from './helpers/adventureNavigation.js';
+
+mkdirSync('docs/design/ui-image-upgrade/qa', { recursive: true });
 
 test('the browser naturally advances a scene after its six-second timeline', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' });
@@ -19,11 +21,11 @@ test('three finite scenes rotate without text or accumulated nodes', async ({ pa
     const name = ['cards', 'garden', 'runner'][i % 3];
     await expect(scene).toHaveAttribute('data-ad-scene', name);
     await expect(banner).toHaveText('');
-    expect(await scene.locator('*').count()).toBeLessThan(18);
+    expect(await scene.locator('*').count()).toBeLessThanOrEqual(27);
     expect((await banner.boundingBox()).height).toBe(50);
     if (i < 3) {
       await banner.evaluate(node => { for (const animation of node.getAnimations({ subtree: true })) { animation.currentTime = 2000; animation.pause(); } });
-      await banner.screenshot({ path: `docs/ads/qa/art-${name}.png` });
+      await banner.screenshot({ path: `docs/design/ui-image-upgrade/qa/art-${name}.png` });
     }
     await scene.evaluate(node => node.getAnimations().find(animation => animation.animationName === 'ad-art-scene-cycle').finish());
   }
@@ -79,8 +81,8 @@ test('artwork has bounded resources and frame cost compared with a static frame'
   for (const name of ['cards', 'garden', 'runner']) {
     await expect(page.locator('.ad-art-scene')).toHaveAttribute('data-ad-scene', name);
     const metrics = await measure();
-    expect(metrics.sceneNodes).toBeLessThanOrEqual(18);
-    expect(metrics.animationCount).toBeLessThanOrEqual(10);
+    expect(metrics.sceneNodes).toBeLessThanOrEqual(28);
+    expect(metrics.animationCount).toBeLessThanOrEqual(14);
     expect(metrics.longTasks).toBe(0);
     expect(metrics.p95).toBeLessThanOrEqual(baseline.p95 + 4);
     animated.push({ name, ...metrics });
@@ -98,10 +100,10 @@ test('artwork has bounded resources and frame cost compared with a static frame'
     const animatedGame = await measure();
     expect(animatedGame.longTasks).toBe(0);
     expect(animatedGame.p95).toBeLessThanOrEqual(staticGame.p95 + 4);
-    expect(animatedGame.animationCount).toBeLessThanOrEqual(10);
+    expect(animatedGame.animationCount).toBeLessThanOrEqual(14);
     gameplay.push({ game, baseline: staticGame, animated: animatedGame });
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.evaluate(async () => (await import('/js/gameSelector.js')).showGameSelector());
   }
-  writeFileSync('docs/ads/qa/art-performance.json', JSON.stringify({ viewport: '412x915', framesPerScenario: 120, baseline, animated, gameplay }, null, 2) + '\n');
+  writeFileSync('docs/design/ui-image-upgrade/qa/art-performance.json', JSON.stringify({ viewport: '412x915', framesPerScenario: 120, baseline, animated, gameplay }, null, 2) + '\n');
 });

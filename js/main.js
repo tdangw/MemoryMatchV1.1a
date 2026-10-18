@@ -98,6 +98,7 @@ setRankingOwner(await loadProfileOwner());
 subscribeToPersistenceFailure(() => {
   openAppModal({
     id: "persistence-recovery-modal",
+    keepBanner: false,
     title: "Chưa thể lưu dữ liệu",
     content: "<p>Để bảo vệ bản lưu, các thay đổi tiếp theo đã dừng. Hãy tải lại trang để sử dụng dữ liệu được lưu thành công gần nhất.</p>",
     dismissible: false, closeOnBackdrop: false, closeOnEscape: false,

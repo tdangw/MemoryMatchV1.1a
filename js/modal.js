@@ -25,7 +25,7 @@ export function openAppModal({
   onActionSettled,
   owner = getActiveGameScope() || getAppPageScope(),
   presentation = "modal",
-  keepBanner = false,
+  keepBanner = true,
   alignment = "start",
   host = document.body,
 }) {

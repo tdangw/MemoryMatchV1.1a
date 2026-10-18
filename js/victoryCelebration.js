@@ -2,6 +2,7 @@ import { createIcon } from "./icons.js";
 import { createVictoryFlowerSceneMarkup } from "./victoryFlowerScene.js";
 import { createGameShellLifecycle, getActiveGameScope } from "./gameShell/gameShellLifecycle.js";
 import { getAppPageScope } from "./appPageLifecycle.js";
+import { connectBannerClearance } from "./dialogPlacement.js";
 import { mountTouchDust } from "./touchDust.js";
 import { pauseVictoryFlowerTheme, playVictoryFlowerTheme, sounds } from "./sound.js";
 
@@ -15,6 +16,7 @@ export function showVictoryCelebration({ level, completedChapter, onNext, onMenu
   const overlay = document.createElement("section");
   overlay.id = "victory-celebration";
   overlay.className = "victory-flower-overlay";
+  overlay.dataset.keepBanner = 'true';
   overlay.setAttribute("role", "dialog");
   overlay.setAttribute("aria-modal", "true");
   overlay.setAttribute("aria-label", "Chúc mừng hoàn thành chặng");
@@ -53,6 +55,7 @@ export function showVictoryCelebration({ level, completedChapter, onNext, onMenu
     if (activeCelebration === scope) activeCelebration = null;
   }, "node");
   document.body.append(overlay);
+  connectBannerClearance(overlay, scope);
   mountTouchDust(overlay, scope, { selector: ".victory-flower-scene, .victory-action" });
   if (!reduced.matches) {
     for (const [index, bloom] of [...overlay.querySelectorAll(".victory-flower-bloom")].entries()) {

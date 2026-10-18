@@ -1,6 +1,7 @@
 .victory-flower-overlay {
   position: fixed;
   inset: 0;
+  bottom: var(--dialog-banner-space, 0px);
   z-index: 32000;
   overflow: hidden;
   color: #f5e9ce;

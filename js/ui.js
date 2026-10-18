@@ -320,6 +320,7 @@ export function showLevelRewardOverlay({
   // Nền overlay mờ
   const overlay = document.createElement("div");
   overlay.className = "level-reward-overlay app-modal-overlay fade-in";
+  overlay.dataset.keepBanner = 'true';
   if (overlayId) overlay.id = overlayId;
 
   // Layout trực tiếp, không bọc trong .modal

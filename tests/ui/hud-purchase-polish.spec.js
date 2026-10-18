@@ -111,10 +111,12 @@ test('freeze bar remains distinct on the bright ice surface', async ({ page }) =
   await page.locator('[data-item="freeze"]').click();
   const bar = page.locator('.link-freeze-progress');
   await expect(bar).toHaveCSS('opacity', '1');
-  await expect(bar).toHaveCSS('height', '4px');
-  expect(await bar.evaluate(node => getComputedStyle(node).backgroundImage)).toContain('rgb(104, 39, 166)');
+  await expect(bar).toHaveCSS('height', '2px');
+  expect(await bar.evaluate(node => getComputedStyle(node).backgroundImage)).toContain('rgb(255, 191, 36)');
+  await expect(bar).toHaveCSS('left', '0px');
+  await expect(bar).toHaveCSS('right', '0px');
   await page.mouse.move(2, 2);
-  await page.screenshot({ path: 'docs/design/hud-purchase/qa/freeze-412.png' });
+  await page.screenshot({ path: 'docs/design/ui-image-upgrade/qa/freeze-412.png' });
 });
 
 test('purchase from gameplay uses the available landscape height', async ({ page }) => {
@@ -130,7 +132,7 @@ test('purchase from gameplay uses the available landscape height', async ({ page
     }
     const panel = page.locator('#shop-confirm-modal .app-modal');
     await expect(panel).toBeVisible();
-    const available = sizes[1].height - (game === 'triple-connect' ? 58 : 0);
+    const available = sizes[1].height - 58;
     await expect(panel).toHaveCSS('max-height', `${available - 32}px`);
     const bounds = await panel.boundingBox();
     expect(Math.abs(bounds.y + bounds.height / 2 - available / 2)).toBeLessThanOrEqual(2);

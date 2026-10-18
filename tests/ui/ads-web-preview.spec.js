@@ -41,7 +41,7 @@ for (const size of [{ width: 412, height: 915 }, { width: 844, height: 390 }, { 
         if (size.width === 412 && game === 'memory-match') await page.screenshot({ path: `docs/ads/qa/web-${tab}-412.png` });
         if (tab === 'shop' && game === 'memory-match') {
           await page.evaluate(async () => (await import('/js/modal.js')).openAppModal({ id: 'ads-check-modal', title: 'Thông tin', content: 'Chọn vật phẩm bạn muốn sử dụng.' }));
-          await expect(preview(page)).toHaveCount(0);
+          await expect(preview(page)).toHaveCount(1);
           await page.locator('#ads-check-modal .app-modal__close').click();
           await expect(page.locator('#ads-check-modal')).toHaveCount(0);
           await expect(preview(page)).toHaveCount(1);
