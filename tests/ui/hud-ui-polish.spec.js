@@ -64,7 +64,25 @@ for (const reducedMotion of ['no-preference', 'reduce']) test(`freeze bar follow
     const state = (await import('/js/linkConnect/linkState.js')).linkGameState;
     return { seconds: state.freezeSeconds, time: state.remainingTime, scale: Number(document.querySelector('.link-freeze-progress').style.transform.match(/[\d.]+/)[0]) };
   });
-  const freeze = async () => { await page.locator('#link-tools-toggle').click(); await page.locator('[data-item="freeze"]').click(); await expect(bar).toHaveCSS('opacity', '1'); };
+  const freeze = async () => {
+    await page.evaluate(() => {
+      const bar = document.querySelector('.link-freeze-progress');
+      window.freezeRefill = new Promise(resolve => {
+        const observer = new MutationObserver(() => {
+          if (bar.style.transform !== 'scaleX(1)' || bar.style.opacity !== '1') return;
+          const style = getComputedStyle(bar);
+          resolve({ scale: new DOMMatrixReadOnly(style.transform).a, duration: style.transitionDuration,
+            transitions: bar.getAnimations().filter(animation => animation.transitionProperty === 'transform').length });
+          observer.disconnect();
+        });
+        observer.observe(bar, { attributes: true, attributeFilter: ['style'] });
+      });
+    });
+    await page.locator('#link-tools-toggle').click();
+    await page.locator('[data-item="freeze"]').click();
+    expect(await page.evaluate(() => window.freezeRefill)).toEqual({ scale: 1, duration: '0s', transitions: 0 });
+    await expect(bar).toHaveCSS('opacity', '1');
+  };
   await freeze();
   const initial = await sample();
   await page.clock.runFor(2000);

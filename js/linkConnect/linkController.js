@@ -1019,6 +1019,8 @@ function syncLinkTimerFreezeState(hud = getLinkHudElements()) {
   const state = linkTimeProgressState;
   const ratio = frozen && state?.roundId === linkGameState.roundId
     ? Math.min(1, state.freezeRemainingMs / Math.max(1, state.freezeDurationMs)) : 0;
+  // A new or stacked item snaps full; only the countdown interpolates downward.
+  hud.freezeProgress.style.transitionDuration = ratio === 1 ? '0s' : '';
   hud.freezeProgress.style.transform = `scaleX(${ratio})`;
   hud.freezeProgress.style.opacity = frozen ? "1" : "0";
 }

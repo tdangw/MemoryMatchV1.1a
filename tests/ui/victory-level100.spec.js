@@ -22,17 +22,32 @@ for (const game of games) {
         gameState.matchedPairs = gameState.totalPairs; gameState.remainingTime = 30;
         await (await import("/js/logic.js")).checkLevelComplete();
       } else if (id === "link-connect") {
-        await (await import("/js/linkConnect/linkController.js")).startLinkLevel({ mode: "easy", level: 100 });
-        const { linkGameState } = await import("/js/linkConnect/linkState.js");
-        linkGameState.totalPairs = 1; linkGameState.isLocked = false;
-        window.__victoryConnection = (await import("/js/linkConnect/pathfinder.js")).findAvailableConnections(linkGameState.board.grid)[0];
+        await (await import("/js/linkConnect/linkController.js")).startLinkLevel({ mode: "easy", level: 100, skipIntro: true });
       } else {
         window.__victoryTriple = await (await import("/js/tripleConnect/tripleController.js")).startTripleConnectRound({ mode: "easy", level: 100, skipIntro: true });
       }
     }, game.id);
     if (game.id === "link-connect") {
-      const connection = await page.evaluate(() => window.__victoryConnection);
-      for (const position of [connection.start, connection.end]) await page.locator(`.link-board__cell[data-row="${position.row}"][data-column="${position.column}"] .link-tile`).evaluate(tile => tile.click());
+      // Complete the actual board: shortening totalPairs invalidates its saved snapshot.
+      const total = await page.evaluate(async () => (await import('/js/linkConnect/linkState.js')).linkGameState.totalPairs);
+      for (let pair = 0; pair < total; pair++) {
+        await expect.poll(() => page.evaluate(async () => {
+          const state = (await import('/js/linkConnect/linkState.js')).linkGameState;
+          return state.isCompleted || !state.isLocked;
+        })).toBe(true);
+        const next = await page.evaluate(async () => {
+          const state = (await import('/js/linkConnect/linkState.js')).linkGameState;
+          const connection = (await import('/js/linkConnect/pathfinder.js')).findAvailableConnections(state.board.grid)[0];
+          return { completed: state.isCompleted, matched: state.matchedPairs, connection };
+        });
+        if (next.completed) break;
+        expect(next.connection).toBeTruthy();
+        for (const position of [next.connection.start, next.connection.end]) {
+          await page.locator(`.link-board__cell[data-row="${position.row}"][data-column="${position.column}"] .link-tile`).click();
+        }
+        await expect.poll(() => page.evaluate(async () => (await import('/js/linkConnect/linkState.js')).linkGameState.matchedPairs)).toBeGreaterThan(next.matched);
+      }
+      await expect.poll(() => page.evaluate(async () => (await import('/js/linkConnect/linkState.js')).linkGameState.isCompleted)).toBe(true);
     }
     if (game.id === "triple-connect") {
       const witness = await page.evaluate(() => window.__victoryTriple.generated.witness);
