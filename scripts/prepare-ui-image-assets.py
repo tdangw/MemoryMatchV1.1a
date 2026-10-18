@@ -19,7 +19,8 @@ for entry in regions:
         piece = master.crop(rect)
         bounds = piece.getchannel('A').getbbox()
         assert bounds, f"Empty region: {entry['name']}"
-        piece = piece.crop(bounds)
+        if not entry.get("preserveCanvas", False):
+            piece = piece.crop(bounds)
         source_size = piece.size
         piece.thumbnail((entry['maxSize'], entry['maxSize']), Image.Resampling.LANCZOS)
         destination = TARGET / f"{entry['name']}.webp"

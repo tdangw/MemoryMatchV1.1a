@@ -6,6 +6,8 @@ Người dùng đã chọn tự xuất bản website và thông điệp AdMob ng
 
 ## Sản phẩm
 
+- Chỉnh web19/10 theo mẫu thắng: nền gỗ/giấy/lá/ribbon liền mạch, icon từng hàng và nút nhà/mũi tên vẽ lại; sao chưa đạt xám opacity1; chữ cong cao hơn; HUD hai nút dùng chung bề mặt thanh; ẩn scrollbar nhưng giữ cuộn popup dài. Bộ hiện hành59ảnh/604.458bytes; không đổi save/API/luật. Chủ dự án thử web, không tự tạo APK hoặc báo cáo riêng cho chỉnh nhỏ; chỉ APK khi được yêu cầu rõ, đã lưu AGENTS.md. APK/QA ở mục dưới thuộc lần bàn giao trước, không chứa chỉnh web này.
+
 - Hoàn tất19/10: `UI_IMAGE_UPGRADE_PLAN.md` D–G — 3master/56WebP dùng chung cho popup/tab/shop/HUD3trò, giữ nền/tranh/cảnh hoa; summary3hàng Xu/Thời gian/Điểm, nhãn cong đủ999, nút gọn, pause3nút dọc + Cài đặt ở header. Fallback mất ảnh dùng SVG và nền dễ đọc, BASE_URL đúng. Matrix110, target19/13, nghiệm thuart5, review26+9, check(ads15), buildGH+base1, web+production3 và đúng1lần APK cuối đều đạt. QA/receipt: `docs/design/ui-images/QA.md`. Không còn gate UI active; chưa kiểm máy thật/quảng cáo thật, không deploy/publish; giữ save/API/catalog. 8PNG app-tabs và .vscode có sẵn giữ nguyên.
 
 - Hoàn tất18/10: `UI_IMAGE_UPGRADE_PLAN.md` A–C — kế hoạch7bộ hình đồng bộ toàn bộ popup/tab/shop/HUD ba trò, hướng Vườn đêm + thắng/thưởng gỗ giấy; chưa tạo/tích hợp sheet. Code: bar đóng băng2px vàng sát mép, snap đầy ngay khi dùng/chồng rồi giảm; banner5thẻ/3hoa; popup thường/intro/cảnh hoàn thành chặng giữ banner và chừa đúng vùng. Review nguồn/lifecycle và refill/chapter cuối đạt; check(ads15/15), buildweb/AndroidAPK, production2/2 đạt. QA/receipt/ảnh: `docs/design/ui-image-upgrade/QA.md`. Không còn gate code active; giữ save/catalog/API tương thích, Android gameplay vẫn tắt, không deploy/publish.

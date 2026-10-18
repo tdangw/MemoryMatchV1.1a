@@ -1,17 +1,17 @@
 # Bộ hình giao diện Vườn đêm và phần thưởng
 
-Nguồn hiện hành cho `UI_IMAGE_UPGRADE_PLAN.md` D–G. Skill `imagegen`, công cụ built-in; không dùng CLI hoặc khóa riêng. Ba sheet đã tạo: [Vườn đêm](masters/garden-v1.png), [gỗ và giấy](masters/reward-v1.png), [biểu tượng](masters/icons-v1.png). Bộ icon đầu quá sát nhau, đã tạo lại khoảng cách trước khi xuất; không đưa bản bị loại vào gói ứng dụng.
+Nguồn hiện hành cho `UI_IMAGE_UPGRADE_PLAN.md` D–G. Skill `imagegen`, công cụ built-in; không dùng CLI hoặc khóa riêng. Bộ nguồn ban đầu: [Vườn đêm](masters/garden-v1.png), [gỗ và giấy](masters/reward-v1.png), [biểu tượng](masters/icons-v1.png). Bộ icon đầu quá sát nhau, đã tạo lại khoảng cách trước khi xuất; không đưa bản bị loại vào gói ứng dụng.
 
 ## Xuất ảnh
 
-`python scripts/prepare-ui-image-assets.py` đọc `regions.json`, cắt đúng vùng đã kiểm, bỏ lề trong suốt, thu nhỏ và nén WebP. Script không vẽ hoặc sửa nội dung. Chạy lại sinh cùng bộ56ảnh, `styles/ui-art-tokens.css`, `js/uiArtManifest.js` và `runtime-metadata.json`; sửa cấu hình/source rồi chạy script, không sửa tay file sinh.
+`python scripts/prepare-ui-image-assets.py` đọc `regions.json`, cắt đúng vùng đã kiểm, bỏ lề trong suốt, thu nhỏ và nén WebP. Script không vẽ hoặc sửa nội dung. Chạy lại sinh cùng bộ59ảnh, `styles/ui-art-tokens.css`, `js/uiArtManifest.js` và `runtime-metadata.json`; sửa cấu hình/source rồi chạy script, không sửa tay file sinh.
 
 - Vườn đêm16ảnh:218.454bytes, giới hạn350KB.
-- Thắng/thưởng16ảnh:166.190bytes, giới hạn250KB.
-- Biểu tượng24ảnh:141.620bytes, giới hạn250KB.
-- Tổng526.264bytes cho toàn bộ thư viện; không đồng nghĩa Home tải tất cả. CSS biến chỉ tải ảnh khi selector sử dụng; icon chỉ tải khi tạo. Ảnh nguồn không nằm trong public/bundle.
+- Thắng/thưởng17ảnh:239.318bytes, giới hạn250KB.
+- Biểu tượng26ảnh:146.686bytes, giới hạn250KB.
+- Tổng604.458bytes cho toàn bộ thư viện; không đồng nghĩa Home tải tất cả. CSS biến chỉ tải ảnh khi selector sử dụng; icon chỉ tải khi tạo. Ảnh nguồn không nằm trong public/bundle.
 
-Master thực tế1254×1254, RGBA, có alpha0–255; không coi kích thước2048 trong yêu cầu vẽ là kết quả. Khung dùng chia chín phần, không phóng toàn mảnh300px lên làm tranh toàn màn. Góc/cạnh dùng khoảng30–36% nguồn và rộng khoảng28–32px trên popup; phần giữa yên được kéo giãn. `generation-metadata.json` ghi kích thước/hash thật; `regions.json` ghi crop và nguồn. Các biến thể nút/huy hiệu có nguồn riêng vì khác chất liệu/trạng thái; dùng lại giữa trò/tab/popup.
+Ba master ban đầu thực tế1254×1254, RGBA, có alpha0–255; không coi kích thước2048 trong yêu cầu vẽ là kết quả. Khung dùng chia chín phần, không phóng toàn mảnh300px lên làm tranh toàn màn. Góc/cạnh dùng khoảng30–36% nguồn và rộng khoảng28–32px trên popup; phần giữa yên được kéo giãn. `generation-metadata.json` ghi kích thước/hash thật; `regions.json` ghi crop và nguồn. Các biến thể nút/huy hiệu có nguồn riêng vì khác chất liệu/trạng thái; dùng lại giữa trò/tab/popup.
 
 ## Phân công hình và hành vi
 
@@ -28,3 +28,5 @@ Các đường nét chức năng nhỏ (nút đóng, focus, dấu chọn, menu b
 ## Nghiệm thu
 
 Ảnh kiểm tra ở `qa/`; kết quả tổng hợp trong `QA.md`. Không tự xuất bản. Chỉ tạo APK một lần khi hoàn tất toàn bộ D–G theo yêu cầu chủ dự án.
+
+19/10: popup thắng dùng nền liền mạch `masters/reward-victory-v2.png` (1288×1221, giữ canvas khi xuất800px) và hai icon nút từ `masters/victory-buttons-v2.png` (1983×793). Khung gỗ/giấy co giãn ban đầu vẫn dùng cho các popup thưởng khác. Chữ/nút/số vẫn sống; sao chưa đạt xám hoàn toàn; ba hàng có Xu/đồng hồ/sao; điều khiển HUD dùng cùng bề mặt thanh thay vì ô khung riêng. Chỉnh nhỏ kiểm web, không tự tạo APK hay báo cáo riêng theo yêu cầu mới.

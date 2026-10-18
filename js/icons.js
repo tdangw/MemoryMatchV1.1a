@@ -1,5 +1,6 @@
 import { UI_ART_ICONS } from './uiArtManifest.js';
 const SVG_NS = "http://www.w3.org/2000/svg";
+const ICON_FALLBACK_NAMES = Object.freeze({ "star-empty": "star", "victory-home": "home", "victory-next": "arrow-right" });
 
 const ICON_PATHS = Object.freeze({
   'rank-medal': '<path class="rank-medal__ribbons" d="m7 12-2 10 4-2 2 3 2-10M13 13l1 10 3-3 3 2-3-10"/><path class="rank-medal__face" d="m12 1 2 1.2 2.4.2.9 2.2 1.8 1.6-.5 2.3.5 2.3-1.8 1.6-.9 2.2-2.4.2L12 16l-2-1.2-2.4-.2-.9-2.2-1.8-1.6.5-2.3-.5-2.3 1.8-1.6.9-2.2 2.4-.2z"/><circle class="rank-medal__shine" cx="12" cy="8.5" r="5.3"/>',
@@ -79,6 +80,7 @@ export function createIcon(name) {
   svg.setAttribute("viewBox", "0 0 24 24");
   svg.setAttribute("aria-hidden", "true");
   svg.setAttribute("focusable", "false");
+  const fallbackName = ICON_FALLBACK_NAMES[name] || name;
   const artwork = UI_ART_ICONS[name];
   if (artwork) {
     const image = document.createElementNS(SVG_NS, 'image');
@@ -87,11 +89,11 @@ export function createIcon(name) {
     image.setAttribute('height', '24');
     image.setAttribute('preserveAspectRatio', 'xMidYMid meet');
     image.addEventListener('error', () => {
-      svg.innerHTML = ICON_PATHS[name === 'star-empty' ? 'star' : name] || ICON_PATHS.info;
+      svg.innerHTML = ICON_PATHS[fallbackName] || ICON_PATHS.info;
     }, { once: true });
     svg.dataset.uiArt = name;
     svg.append(image);
-  } else svg.innerHTML = ICON_PATHS[name] || ICON_PATHS.info;
+  } else svg.innerHTML = ICON_PATHS[fallbackName] || ICON_PATHS.info;
   return svg;
 }
 

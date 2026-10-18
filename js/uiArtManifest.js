@@ -31,5 +31,7 @@ export const UI_ART_ICONS = Object.freeze({
   "exit": "/assets/images/ui/v1/icon-exit.webp",
   "arrow-right": "/assets/images/ui/v1/icon-arrow-right.webp",
   "book": "/assets/images/ui/v1/icon-book.webp",
-  "energy": "/assets/images/ui/v1/icon-energy.webp"
+  "energy": "/assets/images/ui/v1/icon-energy.webp",
+  "victory-home": "/assets/images/ui/v1/victory-home.webp",
+  "victory-next": "/assets/images/ui/v1/victory-next.webp"
 });

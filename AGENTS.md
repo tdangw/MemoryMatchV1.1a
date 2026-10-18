@@ -253,3 +253,7 @@ Review độc lập phải đối chiếu implementation với task plan và acc
 - [ ] Test phù hợp đã chạy; kết quả được báo chính xác.
 - [ ] Diff cuối không chứa debug, code chết, asset rác hoặc thay đổi ngoài scope.
 - [ ] Acceptance criteria được xác nhận bằng bằng chứng, không bằng suy đoán.
+
+### Cập nhật19/10 — chỉnh giao diện và thử web
+
+Chủ dự án đang thử trực tiếp bản web và sẽ còn chỉnh nhiều chi tiết. Các lượt chỉnh giao diện chỉ sửa và kiểm tra web, không tự đóng gói APK hoặc tạo báo cáo riêng cho từng chi tiết. Chỉ tạo APK khi chủ dự án yêu cầu rõ; ghi nhận kết quả ngắn, không kết thúc bằng lời mời tiếp tục. Quy định này thay ưu tiên tự tạo APK cuối task ở mục13 phía trên.

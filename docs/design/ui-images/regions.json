@@ -789,5 +789,49 @@
     "icons": [
       "energy"
     ]
+  },
+  {
+    "name": "reward-victory-plate",
+    "source": "reward-victory-v2.png",
+    "rect": [
+      0,
+      0,
+      1288,
+      1221
+    ],
+    "maxSize": 800,
+    "group": "reward",
+    "icons": [],
+    "preserveCanvas": true
+  },
+  {
+    "name": "victory-home",
+    "source": "victory-buttons-v2.png",
+    "rect": [
+      0,
+      0,
+      991,
+      793
+    ],
+    "maxSize": 112,
+    "group": "icons",
+    "icons": [
+      "victory-home"
+    ]
+  },
+  {
+    "name": "victory-next",
+    "source": "victory-buttons-v2.png",
+    "rect": [
+      991,
+      0,
+      1983,
+      793
+    ],
+    "maxSize": 112,
+    "group": "icons",
+    "icons": [
+      "victory-next"
+    ]
   }
 ]

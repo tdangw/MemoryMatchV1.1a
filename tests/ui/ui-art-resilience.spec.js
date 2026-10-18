@@ -1,7 +1,8 @@
 import { expect, test } from '@playwright/test';
-import { writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
 
-const folder = 'docs/design/ui-images/qa';
+const folder = 'test-results/victory-design';
+mkdirSync(folder, { recursive: true });
 test('first reward remains readable when the new images cannot be fetched', async ({ page }) => {
   await page.setViewportSize({ width: 412, height: 915 });
   await page.route('**/assets/images/ui/v1/**', route => route.abort());
@@ -12,10 +13,10 @@ test('first reward remains readable when the new images cannot be fetched', asyn
   await expect(panel.locator('.level-summary__stat')).toHaveCount(3);
   await expect(panel.locator('svg image')).toHaveCount(0);
   await expect(panel.locator('.level-summary__stars svg path')).toHaveCount(3);
-  await expect(panel).toHaveCSS('background-color', 'rgb(245, 219, 163)');
+  await expect(panel).toHaveCSS('background-image', /245, 219, 163/);
   await expect(panel.locator('.summary-points strong')).toHaveText('275');
   await expect(panel.locator('.summary-points strong')).toHaveCSS('background-color', 'rgb(104, 64, 25)');
-  await expect(panel.locator('.app-button--primary')).toHaveCSS('background-color', 'rgb(181, 223, 110)');
+  await expect(panel.locator('.app-button--primary')).toHaveCSS('background-color', 'rgb(161, 214, 75)');
   await page.screenshot({ path: `${folder}/unavailable-images-412.png` });
   await panel.getByRole('button', { name: 'Menu', exact: true }).click();
   await expect(page.locator('#level-summary-modal')).toHaveCount(0);

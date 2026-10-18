@@ -1,9 +1,9 @@
 import { expect, test } from '@playwright/test';
 import { mkdirSync, readFileSync } from 'node:fs';
 
-const folder = 'docs/design/ui-images/qa';
+const folder = 'test-results/victory-design';
 mkdirSync(folder, { recursive: true });
-const sizes = [{ width: 412, height: 915 }, { width: 844, height: 390 }, { width: 1024, height: 900 }];
+const sizes = [{ width: 320, height: 740 }, { width: 412, height: 915 }, { width: 844, height: 390 }, { width: 1024, height: 900 }];
 const games = ['memory-match', 'link-connect', 'triple-connect'];
 const metadata = JSON.parse(readFileSync('docs/design/ui-images/runtime-metadata.json', 'utf8'));
 
@@ -78,7 +78,11 @@ for (const size of sizes) test(`painted surfaces preserve three games and screen
     await toggle.click();
     await page.evaluate(async () => (await import('/js/ui.js')).showLevelSummaryOverlay({ level: 999, score: 1234567, stars: 2, coinsEarned: 1234, moves: 100, misses: 12, remainingTime: 77, timeBonus: 15, luckyAwards: [{ type: 'coins', value: 10 }], settings: {} }));
     const summary = page.locator('#level-summary-modal [data-ui-surface="reward"]');
-    await expect(summary).toHaveCSS('border-image-source', /reward-panel.webp/);
+    await expect(summary).toHaveCSS('background-image', /reward-victory-plate.webp/);
+    await expect(summary.locator('.level-summary__stat > svg')).toHaveCount(3);
+    await expect(summary.locator('.level-summary__star--unearned')).toHaveCSS('opacity', '1');
+    await expect(summary.locator('.level-summary__star--unearned')).toHaveCSS('filter', 'grayscale(1) brightness(0.85)');
+    await expect(summary.locator('.app-modal__body')).toHaveCSS('scrollbar-width', 'none');
     await expect(summary.locator('.level-summary__stat')).toHaveCount(3);
     await expect(summary.locator('.level-summary__stat > span')).toHaveText(['Xu nhận', 'Thời gian', 'Điểm']);
     await expect(summary.locator('.summary-points strong')).toHaveText('1,234,567');
@@ -86,8 +90,14 @@ for (const size of sizes) test(`painted surfaces preserve three games and screen
       const box = text.getBBox(); return box.x >= 44 && box.x + box.width <= 316;
     });
     expect(titleFits).toBe(true);
-    await expect(summary.locator('.level-summary__star--unearned image')).toHaveAttribute('href', /star-empty.webp/);
+    await expect(summary.locator('.level-summary__star--unearned image')).toHaveAttribute('href', /star.webp/);
     await expect(summary.locator('.app-modal__footer button').last()).toBeInViewport();
+    const panelBox = await summary.boundingBox();
+    for (const star of await summary.locator('.level-summary__star').all()) {
+      const starBox = await star.boundingBox();
+      expect(starBox.y).toBeGreaterThanOrEqual(panelBox.y);
+      expect(starBox.y + starBox.height).toBeLessThanOrEqual(panelBox.y + panelBox.height);
+    }
     const box = await summary.boundingBox(), slot = await page.locator('.gameplay-ad-slot').boundingBox();
     expect(box.y + box.height).toBeLessThanOrEqual(slot.y);
     await page.screenshot({ path: `${folder}/win-${game}-${size.width}.png` });

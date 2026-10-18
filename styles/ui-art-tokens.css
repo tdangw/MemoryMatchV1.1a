@@ -56,4 +56,7 @@
   --ui-art-icon-arrow-right: url('/assets/images/ui/v1/icon-arrow-right.webp');
   --ui-art-icon-book: url('/assets/images/ui/v1/icon-book.webp');
   --ui-art-icon-energy: url('/assets/images/ui/v1/icon-energy.webp');
+  --ui-art-reward-victory-plate: url('/assets/images/ui/v1/reward-victory-plate.webp');
+  --ui-art-victory-home: url('/assets/images/ui/v1/victory-home.webp');
+  --ui-art-victory-next: url('/assets/images/ui/v1/victory-next.webp');
 }

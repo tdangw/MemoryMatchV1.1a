@@ -1,8 +1,8 @@
 {
   "totals": {
     "garden": 218454,
-    "reward": 166190,
-    "icons": 141620
+    "reward": 239318,
+    "icons": 146686
   },
   "assets": [
     {
@@ -1411,6 +1411,83 @@
       "bytes": 4216,
       "url": "/assets/images/ui/v1/icon-energy.webp",
       "sha256": "ffcf8a4df8e8791943e61370deef7f68a5f8e6b95adc47cdc0f43a5cbdadc6bc"
+    },
+    {
+      "name": "reward-victory-plate",
+      "source": "reward-victory-v2.png",
+      "rect": [
+        0,
+        0,
+        1288,
+        1221
+      ],
+      "maxSize": 800,
+      "group": "reward",
+      "icons": [],
+      "preserveCanvas": true,
+      "sourceSize": [
+        1288,
+        1221
+      ],
+      "size": [
+        800,
+        758
+      ],
+      "bytes": 73128,
+      "url": "/assets/images/ui/v1/reward-victory-plate.webp",
+      "sha256": "746bfb26358545328d9cab1aa5e213bfe504a7aee5736b07d4324cf3f17894d0"
+    },
+    {
+      "name": "victory-home",
+      "source": "victory-buttons-v2.png",
+      "rect": [
+        0,
+        0,
+        991,
+        793
+      ],
+      "maxSize": 112,
+      "group": "icons",
+      "icons": [
+        "victory-home"
+      ],
+      "sourceSize": [
+        815,
+        708
+      ],
+      "size": [
+        112,
+        97
+      ],
+      "bytes": 3188,
+      "url": "/assets/images/ui/v1/victory-home.webp",
+      "sha256": "81ae7dbf8c0ca522c5532ad1bce8ce29997a04e520f51acb78d485189ad7d5fe"
+    },
+    {
+      "name": "victory-next",
+      "source": "victory-buttons-v2.png",
+      "rect": [
+        991,
+        0,
+        1983,
+        793
+      ],
+      "maxSize": 112,
+      "group": "icons",
+      "icons": [
+        "victory-next"
+      ],
+      "sourceSize": [
+        953,
+        748
+      ],
+      "size": [
+        112,
+        88
+      ],
+      "bytes": 1878,
+      "url": "/assets/images/ui/v1/victory-next.webp",
+      "sha256": "0eefa4731cd03fa623ab85fc777e20bf03e0570d02d5aab60a350540da04dd28"
     }
   ]
 }

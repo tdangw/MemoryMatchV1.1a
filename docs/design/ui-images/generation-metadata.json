@@ -39,6 +39,34 @@
         0,
         255
       ]
+    },
+    {
+      "path": "docs/design/ui-images/masters/reward-victory-v2.png",
+      "size": [
+        1288,
+        1221
+      ],
+      "bytes": 1649499,
+      "sha256": "b43ccc18f536eacbadd217b98fe42e8b2bdb325dbd1444314b4d9a1f390a5559",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "purpose": "Victory reference correction, 19/10/2026; cohesive wood/parchment/ribbon plate, no baked text or values."
+    },
+    {
+      "path": "docs/design/ui-images/masters/victory-buttons-v2.png",
+      "size": [
+        1983,
+        793
+      ],
+      "bytes": 656790,
+      "sha256": "03ce49a2cf98c4e171760670efa3c1bd1b60dcf31d54e1e23cc86b70d42884b0",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "purpose": "Reference house and next-arrow, isolated button icons,19/10/2026"
     }
   ],
   "runtimeBytes": {

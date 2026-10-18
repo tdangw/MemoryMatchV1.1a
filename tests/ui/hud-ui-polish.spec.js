@@ -135,9 +135,10 @@ for (const reducedMotion of ['no-preference', 'reduce']) test(`animated artwork 
   await page.evaluate(async () => (await import('/js/ui.js')).showLevelSummaryOverlay({ level: 1, score: 1234, stars: 2, coinsEarned: 10, moves: 1, misses: 0, remainingTime: 20, timeBonus: 0, settings: {} }));
   const stars = page.locator('#level-summary-modal .level-summary__star');
   await expect(stars).toHaveCount(3);
+  await expect(page.locator('#level-summary-modal .level-summary-modal')).toHaveCSS('overflow', 'visible');
   await expect(stars.locator('svg')).toHaveCount(3);
-  await expect(stars.last().locator('svg')).toHaveCSS('fill', 'none');
-  await expect(stars.last().locator('svg')).toHaveCSS('stroke', 'rgb(145, 165, 197)');
+  await expect(stars.last()).toHaveCSS('opacity', '1');
+  await expect(stars.last()).toHaveCSS('filter', 'grayscale(1) brightness(0.85)');
   expect(await stars.allTextContents()).toEqual(['', '', '']);
   await expect(stars.first()).toHaveCSS('opacity', '1');
   await page.screenshot({ path: `docs/design/hud-polish/qa/summary-${reducedMotion}.png` });

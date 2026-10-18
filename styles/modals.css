@@ -655,182 +655,6 @@ body.game-is-paused .shooting-star {
   animation-play-state: paused !important;
 }
 
-/* Popup tổng kết màn chơi */
-.level-summary-modal {
-  position: relative;
-  isolation: isolate;
-  width: min(390px, calc(100vw - 28px));
-  border: 4px solid #e4e7ff;
-  border-radius: 34px;
-  background: #fff;
-  box-shadow: 0 28px 80px rgb(38 36 100 / 42%);
-  animation: summary-modal-in 260ms cubic-bezier(0.2, 0.85, 0.25, 1) both;
-}
-
-.level-summary-modal::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 auto;
-  height: 7px;
-  background: linear-gradient(90deg, #5d45ff, #ad52ec, #ec5bb5);
-  z-index: 4;
-}
-
-.level-summary-modal .app-modal__body,
-.level-summary-modal .app-modal__footer {
-  position: relative;
-  z-index: 2;
-}
-
-.level-summary-modal .app-modal__header {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  min-height: 0;
-  padding: 0;
-  border: 0;
-  z-index: 5;
-}
-
-.level-summary-modal .app-modal__title {
-  display: none;
-}
-
-.level-summary-modal .app-modal__close {
-  background: #eef0f6;
-  color: #526079;
-}
-
-.level-summary-modal .app-modal__body {
-  padding: 42px 30px 24px;
-}
-
-.level-summary-modal .app-modal__footer {
-  gap: 10px;
-  padding: 0 30px 30px;
-  border: 0;
-}
-
-.level-summary {
-  text-align: center;
-}
-
-.level-summary__heading {
-  margin: 0 0 24px;
-  color: #151a2b;
-  font:
-    900 clamp(1.55rem, 7vw, 2rem)/1.15 "Trebuchet MS",
-    "Segoe UI",
-    sans-serif;
-}
-
-.level-summary__stats {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px 12px;
-  padding: 18px 14px;
-  border-radius: 18px;
-  background: #f7f8fc;
-}
-
-.level-summary__stat {
-  display: grid;
-  gap: 4px;
-  padding: 0;
-}
-
-.level-summary__stat span {
-  color: #7d879d;
-  font-size: 0.68rem;
-  font-weight: 900;
-  letter-spacing: 0.04em;
-}
-
-.level-summary__stat strong {
-  color: #5740f0;
-  font-size: 1.35rem;
-}
-
-.level-summary__stat.summary-misses strong {
-  color: #dd3659;
-}
-.level-summary__stat.summary-misses span {
-  color: #dd3659;
-}
-.level-summary__stat.summary-next strong {
-  color: #26a978;
-}
-
-#level-summary-modal .app-button {
-  min-height: 52px;
-  border-radius: 15px;
-  font-size: 1rem;
-}
-
-/* Giao diện tổng kết gọn đã chọn trước đó */
-.level-summary-modal {
-  width: min(440px, calc(100vw - 32px));
-  border: 1px solid rgb(91 69 255 / 26%);
-  border-radius: 18px;
-  background: linear-gradient(160deg, #fff, #f6f7ff);
-  box-shadow: 0 24px 70px rgb(0 0 0 / 42%);
-  animation: app-modal-in 220ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
-}
-
-.level-summary-modal::before {
-  display: none;
-}
-
-.level-summary-modal .app-modal__header {
-  position: relative;
-  inset: auto;
-  min-height: 58px;
-  padding: 14px 18px;
-  border-bottom: 1px solid rgb(91 73 63 / 14%);
-}
-
-.level-summary-modal .app-modal__title {
-  display: flex;
-}
-
-.level-summary-modal .app-modal__close {
-  background: rgb(36 59 100 / 10%);
-  color: #243b64;
-}
-
-.level-summary-modal .app-modal__body {
-  padding: 10px 18px 18px;
-}
-
-.level-summary-modal .app-modal__footer {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-  padding: 12px 18px 16px;
-  border-top: 1px solid rgb(91 73 63 / 14%);
-}
-
-.level-summary__heading {
-  margin: 0 0 12px;
-}
-
-.level-summary__stats {
-  gap: 10px;
-  padding: 0;
-  background: transparent;
-}
-
-.level-summary__stat {
-  padding: 12px 8px;
-  border-radius: 13px;
-  background: rgb(241 243 250 / 88%);
-}
-
-#level-summary-modal .app-button {
-  min-height: 40px;
-  border-radius: 10px;
-  font-size: 14px;
-}
-
 /* Popup xác nhận trong màn chơi cũng dùng tông menu chính. */
 #reset-modal .app-modal,
 #return-modal .app-modal {
@@ -865,241 +689,12 @@ body.game-is-paused .shooting-star {
   color: rgb(245 247 251 / 86%);
 }
 
-/* Tổng kết màn chơi dùng cùng ngôn ngữ với menu và popup hệ thống. */
-.level-summary-modal {
-  border-color: rgb(255 255 255 / 16%);
-  border-radius: 24px;
-  background: var(--dialog-surface);
-  color: #f5f7fb;
-}
-
-.level-summary-modal .app-modal__header,
-.level-summary-modal .app-modal__footer {
-  border-color: rgb(255 255 255 / 11%);
-}
-
-.level-summary-modal .app-modal__title,
-.level-summary-modal .app-modal__title .ui-icon,
-.level-summary__heading {
-  color: #f2bf5b;
-}
-
-.level-summary-modal .app-modal__close {
-  background: rgb(255 255 255 / 9%);
-  color: #f5f7fb;
-}
-
-.level-summary__stats {
-  background: transparent;
-}
-
-.level-summary__stat {
-  border: 1px solid rgb(255 255 255 / 10%);
-  background: rgb(8 18 38 / 28%);
-}
-
-.level-summary__stat span {
-  color: #b9d5ff;
-}
-
-.level-summary__stat strong,
-.level-summary__stat.summary-misses strong,
-.level-summary__stat.summary-next strong {
-  color: #f5f7fb;
-}
-
-.level-summary__stat.summary-misses strong,
-.level-summary__stat.summary-misses span {
-  color: #ff9da8;
-}
-
-/* Trạng thái chiến thắng chỉ có một hành động chính, chiếm trọn hàng. */
-.level-summary-modal--victory {
-  position: relative;
-  top: 0;
-}
-
-.level-summary-modal--victory .app-modal__footer {
-  grid-template-columns: 1fr;
-}
-
-.level-summary-modal--victory .app-button {
-  width: 100%;
-}
-
-/* Kết quả màn: tập trung vào sao và điểm, các chỉ số còn lại là một bảng tóm tắt. */
-#level-summary-modal .level-summary-modal {
-  width: min(420px, calc(100vw - 28px));
-  border-color: rgb(255 255 255 / 22%);
-  border-radius: 18px;
-}
-
-#level-summary-modal .level-summary-modal .app-modal__body {
-  padding: 26px 24px 18px;
-}
-
-#level-summary-modal .level-summary-modal .app-modal__footer {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-  padding: 16px 24px 22px;
-  border-top: 0;
-}
-
-#level-summary-modal .level-summary__heading {
-  margin: 0 0 13px;
-  color: #ffd166;
-  font-size: clamp(1.25rem, 5.5vw, 1.65rem);
-  text-align: center;
-}
-
-#level-summary-modal .level-summary__result {
-  gap: 7px;
-  margin-bottom: 20px;
-}
-
-#level-summary-modal .level-summary__stars {
-  color: #ffd166;
-  font-size: 2rem;
-  text-shadow: 0 2px 8px rgb(255 190 61 / 38%);
-}
-
-#level-summary-modal .level-summary__star {
-  display: inline-block;
-  position: relative;
-}
-
-#level-summary-modal .level-summary__star > .ui-icon { width: 1em; height: 1em; vertical-align: middle; color: inherit; fill: none; stroke: currentColor; }
-#level-summary-modal .level-summary__star--earned > .ui-icon { fill: currentColor; }
-
-#level-summary-modal .level-summary__star--middle {
-  --star-rest-y: -0.07em;
-  margin: 0 0.06em;
-  font-size: 1.24em;
-  line-height: 0.75;
-  transform: translateY(var(--star-rest-y));
-}
-
-/* Sao đạt được chỉ dùng opacity và transform để giữ chuyển động nhẹ trên mobile. */
-#level-summary-modal .level-summary__star--earned {
-  animation: summary-star-earned 640ms cubic-bezier(0.16, 0.9, 0.28, 1.32) var(--star-delay, 0ms) both;
-  text-shadow: 0 2px 8px rgb(255 190 61 / 56%), 0 0 16px rgb(255 222 113 / 38%);
-}
-
-#level-summary-modal .level-summary__star--earned::after {
-  content: "";
-  position: absolute;
-  top: -0.24em;
-  right: -0.26em;
-  color: #fff2bd;
-  font-size: 0.42em;
-  width: 1em;
-  height: 1em;
-  background: currentColor;
-  clip-path: polygon(50% 0, 64% 36%, 100% 50%, 64% 64%, 50% 100%, 36% 64%, 0 50%, 36% 36%);
-  line-height: 1;
-  opacity: 0;
-  pointer-events: none;
-  animation: summary-star-spark 500ms ease-out calc(var(--star-delay, 0ms) + 150ms) both;
-}
-
-#level-summary-modal .level-summary__star--unearned {
-  color: #91a5c5;
-  opacity: 0.7;
-  text-shadow: none;
-}
-
 @keyframes summary-star-earned {
   0% { opacity: 0; transform: translateY(calc(var(--star-rest-y, 0em) + 0.26em)) scale(0.35); }
   58% { opacity: 1; transform: translateY(calc(var(--star-rest-y, 0em) - 0.12em)) scale(1.22); }
   78% { transform: translateY(calc(var(--star-rest-y, 0em) + 0.03em)) scale(0.94); }
   100% { opacity: 1; transform: translateY(var(--star-rest-y, 0em)) scale(1); }
 }
-
-@keyframes summary-star-spark {
-  0% { opacity: 0; transform: translate(-0.18em, 0.2em) scale(0.35) rotate(-18deg); }
-  40% { opacity: 1; }
-  100% { opacity: 0; transform: translate(0.24em, -0.28em) scale(1.1) rotate(22deg); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  #level-summary-modal .level-summary__star--earned,
-  #level-summary-modal .level-summary__star--earned::after {
-    animation: none;
-  }
-
-  #level-summary-modal .level-summary__star--earned::after {
-    display: none;
-  }
-}
-
-#level-summary-modal .level-summary__score {
-  color: #ffd166;
-  font-size: 1.12rem;
-  letter-spacing: 0.07em;
-}
-
-#level-summary-modal .level-summary__stats {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0;
-  padding: 9px 15px;
-  border: 1px solid rgb(255 255 255 / 58%);
-  border-radius: 10px;
-  background: rgb(7 17 36 / 38%);
-}
-
-#level-summary-modal .level-summary__stat {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-height: 30px;
-  padding: 0 2px;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-}
-
-#level-summary-modal .level-summary__stat span {
-  color: #dceaff;
-  font-size: 0.82rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-}
-
-#level-summary-modal .level-summary__stat strong,
-#level-summary-modal .level-summary__stat.summary-misses strong,
-#level-summary-modal .level-summary__stat.summary-next strong {
-  color: #f5f7fb;
-  font-size: 1rem;
-}
-
-#level-summary-modal .level-summary__stat.summary-coins strong,
-#level-summary-modal .level-summary__stat.summary-time-bonus strong,
-#level-summary-modal .level-summary__stat.summary-new-best strong {
-  color: #ffd166;
-}
-
-#level-summary-modal .level-summary__stat.summary-misses span,
-#level-summary-modal .level-summary__stat.summary-misses strong {
-  color: #ff9da8;
-}
-
-#level-summary-modal .app-button {
-  min-height: 42px;
-  border-radius: 11px;
-  font-size: 0.88rem;
-}
-
-@media screen and (width <= 420px) {
-  #level-summary-modal .level-summary-modal .app-modal__body {
-    padding: 22px 18px 14px;
-  }
-
-  #level-summary-modal .level-summary-modal .app-modal__footer {
-    padding: 14px 18px 18px;
-  }
-}
-
 
 /* Shared placement applies to dialogs only, never full-screen tab regions. */
 .app-modal-overlay[data-dialog-placement] {
@@ -1171,48 +766,21 @@ body.game-is-paused .shooting-star {
 .app-button--primary { border-image-source: var(--ui-art-garden-primary); color: #fff5d5; }
 .app-button--danger { border-image-source: var(--ui-art-garden-danger); }
 .app-button:disabled { border-image-source: var(--ui-art-garden-disabled); }
-#level-summary-modal [data-ui-surface="reward"], .app-modal[data-ui-surface="reward"] {
+.app-modal[data-ui-surface="reward"] {
   border-image-source: var(--ui-art-reward-panel); border-image-slice: 30% fill; border-image-width: 32px; background: #f5dba3; color: #60350f;
 }
 .app-modal[data-ui-surface="reward"] .app-modal__title { color: #60350f; }
 .app-modal[data-ui-surface="reward"] .app-button { background-color: #684019; border-image-source: var(--ui-art-reward-orange); color: #fff9df; text-shadow: 0 1px 2px #572f0b; }
 .app-modal[data-ui-surface="reward"] .app-button--primary { background-color: #b5df6e; border-image-source: var(--ui-art-reward-green); color: #173f0d; text-shadow: 0 1px #edffbb; }
 .app-modal[data-ui-surface="reward"] .app-button:disabled { border-image-source: var(--ui-art-reward-disabled); }
-#level-summary-modal .level-summary__heading { color: #fff0b5; background: var(--ui-art-reward-title) center / 100% 100% no-repeat; padding: 0; margin: 0 -8px 8px; text-shadow: 0 2px #822015; }
-#level-summary-modal .level-summary__heading svg { display: block; width: 100%; height: auto; overflow: hidden; }
-#level-summary-modal .level-summary__heading text { fill: currentColor; paint-order: stroke fill; stroke: #782015; stroke-width: 1px; font: 800 20px "Trebuchet MS", "Segoe UI", sans-serif; }
-#level-summary-modal .level-summary__score { color: #704315; }
-#level-summary-modal .level-summary__stat { background: var(--ui-art-reward-paper) center / 100% 100% no-repeat; border: 0; color: #60350f; }
-#level-summary-modal .level-summary__stat span { color: #60350f; font-weight: 700; }
-#level-summary-modal .level-summary__stat strong { color: #fff4d0; background: #684019 var(--ui-art-reward-well) center / 100% 100% no-repeat; padding: 6px 12px; border-radius: 9px; text-shadow: 0 1px #4b270a; }
-#level-summary-modal .level-summary__stat.summary-coins strong, #level-summary-modal .level-summary__stat.summary-time-bonus strong { color: #ffe36b; }
-#level-summary-modal .level-summary__star--unearned { opacity: .6; }
-#level-summary-modal .level-summary__star { font-size: 2.7rem; }
-#level-summary-modal .level-summary__star--middle { font-size: 3.3rem; }
 .app-modal[data-ui-surface="reward"] .app-modal__body { padding-top: 20px; }
-@media (max-height: 500px) and (orientation: landscape) {
-  #level-summary-modal .level-summary__heading { max-width: 280px; margin-inline: auto; }
-  #level-summary-modal .level-summary__result { margin-bottom: 8px; }
-}
 
-#level-summary-modal .level-summary__stats { background: transparent; border: 0; padding: 0; gap: 5px; }
-#level-summary-modal .level-summary__stat { min-height: 38px; padding: 4px 10px; border: 1px solid transparent; border-image-source: var(--ui-art-reward-paper); border-image-slice: 30% fill; border-image-width: 10px; background: transparent; }
-#level-summary-modal .level-summary__stat.summary-misses span { color: #7e311d; }
-#level-summary-modal .level-summary__stat.summary-misses strong { color: #fff4d0; }
 .app-modal[data-ui-surface="reward"] .app-button--secondary { border-image-source: var(--ui-art-reward-secondary); }
-#level-summary-modal [data-ui-surface="reward"] .app-button--secondary { border-image-source: var(--ui-art-reward-orange); }
-
-#level-summary-modal .level-summary__result { margin-bottom: 0; }
-#level-summary-modal .level-summary__score { display: block; text-align: center; margin: 0; }
-#level-summary-modal [data-ui-surface="reward"] { border-image-slice: 36% fill; }
 #game-exit-modal .app-button--danger { background: transparent; }
 
 /* Compact actions retain a comfortable target without stretching across the panel. */
 .app-modal[data-ui-surface] .app-modal__footer { justify-items: center; }
 .app-modal[data-ui-surface] .app-modal__footer .app-button { width: fit-content; max-width: 100%; min-width: min(156px, 100%); min-height: 54px; padding: 12px 22px; }
-#level-summary-modal .level-summary-modal .app-modal__footer { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; padding: 12px 28px 24px; }
-#level-summary-modal .level-summary-modal--victory .app-modal__footer { grid-template-columns: 1fr; }
-#level-summary-modal .app-modal__footer .app-button { min-width: 0; width: min(150px, 100%); min-height: 56px; padding-inline: 14px; }
 #game-exit-modal .app-modal__footer { grid-template-columns: minmax(0, 208px); justify-content: center; gap: 12px; padding: 16px 28px 26px; }
 #game-exit-modal .app-modal__footer .app-button { grid-column: auto; width: 100%; min-height: 56px; }
 #game-exit-modal .pause-settings { flex: 0 0 44px; width: 44px; height: 44px; display: grid; place-items: center; border: 0; background: var(--ui-art-garden-square) center / 100% 100% no-repeat; color: var(--dialog-gold); }
@@ -1221,3 +789,46 @@ body.game-is-paused .shooting-star {
   #game-exit-modal .app-modal__footer { gap: 6px; padding-block: 8px 18px; }
   #game-exit-modal .app-modal__footer .app-button { min-height: 48px; }
 }
+
+/* Victory composition: one painted plate, with live text, values and controls. */
+#level-summary-modal .level-summary-modal {
+  position: relative; top: 0; width: min(520px, calc(100vw - 24px)); aspect-ratio: 1.055;
+  container-type: inline-size; border: 0; border-image: none; border-radius: 0;
+  background: var(--ui-art-reward-victory-plate) center / 100% 100% no-repeat, linear-gradient(#f5dba3, #f5dba3) center 66% / 74% 48% no-repeat;
+  box-shadow: none; overflow: visible; color: #60350f;
+}
+#level-summary-modal .app-modal__body { padding: 0; overflow: hidden; }
+#level-summary-modal .level-summary { text-align: center; }
+#level-summary-modal .level-summary__result { position: absolute; inset: 1% 0 auto; height: 22%; margin: 0; }
+#level-summary-modal .level-summary__stars { display: flex; align-items: flex-end; justify-content: center; gap: 0; height: 100%; width: 72%; margin: auto; }
+#level-summary-modal .level-summary__star { display: block; position: relative; width: auto; height: 80%; aspect-ratio: 1; flex: none; color: #ffd54b; }
+#level-summary-modal .level-summary__star--middle { width: auto; height: 100%; --star-rest-y: 0em; transform: translateY(var(--star-rest-y)); }
+#level-summary-modal .level-summary__star .ui-icon { display: block; width: 100%; height: 100%; fill: currentColor; }
+#level-summary-modal .level-summary__star--earned { animation: summary-star-earned 640ms cubic-bezier(.16,.9,.28,1.32) var(--star-delay,0ms) both; }
+#level-summary-modal .level-summary__star--unearned { opacity: 1; filter: grayscale(1) brightness(.85); color: #999; }
+#level-summary-modal .level-summary__heading { position: absolute; left: 12%; top: 18%; width: 76%; height: 19%; margin: 0; background: none; color: #ffe66c; }
+#level-summary-modal .level-summary__heading svg { display: block; width: 100%; height: 100%; overflow: visible; }
+#level-summary-modal .level-summary__heading text { fill: currentColor; paint-order: stroke fill; stroke: #622a08; stroke-width: 2px; stroke-linejoin: round; filter: drop-shadow(0 2px 0 #7a350b); font: 900 25px "Arial Rounded MT Bold", "Trebuchet MS", "Segoe UI", sans-serif; }
+#level-summary-modal .level-summary__stats { position: absolute; top: 42%; left: 19%; width: 62%; height: 36%; display: grid; grid-template-columns: 1fr; grid-template-rows: repeat(3,minmax(0,1fr)); gap: 5px; padding: 0; border: 0; background: none; }
+#level-summary-modal .level-summary__stat { display: grid; grid-template-columns: 16% minmax(0,1fr) minmax(27%,auto); align-items: center; gap: 6px; min-height: 0; padding: 0 6px 0 0; border: 0; border-radius: 16px; background: #c8975033; }
+#level-summary-modal .level-summary__stat > .ui-icon { width: 100%; height: auto; aspect-ratio: 1; }
+#level-summary-modal .level-summary__stat > span { min-width: 0; text-align: left; color: #60350f; font: 900 clamp(13px,3.6cqw,20px)/1.1 "Trebuchet MS", "Segoe UI",sans-serif; }
+#level-summary-modal .level-summary__stat strong { display: block; min-width: 0; margin: 0; padding: 6px 8px; border-radius: 12px; background: #684019 var(--ui-art-reward-well) center / 100% 100% no-repeat; text-align: center; color: #fff6dd; text-shadow: 0 2px #542a0b; font: 900 clamp(14px,4.4cqw,24px)/1.1 "Trebuchet MS", "Segoe UI",sans-serif; }
+#level-summary-modal .summary-coins strong { color: #ffe254; }
+#level-summary-modal .app-modal__footer { position: absolute; top: 81%; left: 10%; width: 80%; height: 14%; display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; justify-items: stretch; padding: 0; border: 0; }
+#level-summary-modal .level-summary-modal--victory .app-modal__footer { grid-template-columns: 1fr; justify-items: center; }
+#level-summary-modal .app-modal__footer .app-button { width: 100%; max-width: 220px; min-width: 0; min-height: 44px; padding: 8px; border: 0; border-image: none; border-radius: 16px; background: #78471d var(--ui-art-reward-orange) center / 100% 100% no-repeat; color: #fff6dd; text-shadow: 0 2px 2px #65330c; font-size: clamp(12px,3.6cqw,20px); box-shadow: none; }
+#level-summary-modal .app-modal__footer .app-button--primary { background: #a1d64b var(--ui-art-reward-green) center / 100% 100% no-repeat; color: #fff6dd; text-shadow: 0 2px 2px #254c0e; }
+#level-summary-modal .app-modal__footer .ui-icon { width: clamp(22px,6cqw,34px); height: clamp(22px,6cqw,34px); flex-shrink: 0; }
+.app-modal, .app-modal__body, .level-reward-overlay .reward-container { scrollbar-width: none; }
+.app-modal::-webkit-scrollbar, .app-modal__body::-webkit-scrollbar, .level-reward-overlay .reward-container::-webkit-scrollbar { display: none; width: 0; height: 0; }
+@media (max-height: 500px) {
+  #level-summary-modal .level-summary-modal { width: min(440px,calc(100vw - 24px)); }
+  #level-summary-modal .level-summary__stats { top: 40%; height: 35%; gap: 2px; }
+  #level-summary-modal .level-summary__stat { gap: 4px; grid-template-columns: 26px minmax(0,1fr) minmax(64px,auto); }
+  #level-summary-modal .level-summary__stat > span { font-size: 13px; }
+  #level-summary-modal .level-summary__stat strong { font-size: 15px; padding: 4px 6px; }
+  #level-summary-modal .app-modal__footer { top: auto; bottom: 4%; height: 44px; }
+  #level-summary-modal .app-modal__footer .app-button { font-size: 13px; }
+}
+@media (prefers-reduced-motion: reduce) { #level-summary-modal .level-summary__star--earned { animation: none; } }

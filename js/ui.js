@@ -445,16 +445,28 @@ function openLevelSummaryOverlay({
   const curve = document.createElementNS(svgNS, "path");
   const curveId = `summary-title-curve-${generation}`;
   curve.id = curveId;
-  curve.setAttribute("d", "M50 52 Q180 22 310 52");
+  curve.setAttribute("d", "M38 48 Q180 8 322 48");
   curve.setAttribute("fill", "none");
+  const defs = document.createElementNS(svgNS, "defs");
+  const gold = document.createElementNS(svgNS, "linearGradient");
+  const goldId = `summary-title-gold-${generation}`;
+  gold.id = goldId;
+  gold.setAttribute("x2", "0");
+  gold.setAttribute("y2", "1");
+  for (const [offset, color] of [["0%", "#fffbd1"], ["45%", "#ffe665"], ["100%", "#ffbd17"]]) {
+    const stop = document.createElementNS(svgNS, "stop");
+    stop.setAttribute("offset", offset); stop.setAttribute("stop-color", color); gold.append(stop);
+  }
+  defs.append(gold);
   const titleText = document.createElementNS(svgNS, "text");
+  titleText.style.fill = `url(#${goldId})`;
   const titlePath = document.createElementNS(svgNS, "textPath");
   titlePath.setAttribute("href", `#${curveId}`);
   titlePath.setAttribute("startOffset", "50%");
   titlePath.setAttribute("text-anchor", "middle");
   titlePath.textContent = `Hoàn thành Màn ${level}!`;
   titleText.append(titlePath);
-  titleArt.append(curve, titleText);
+  titleArt.append(defs, curve, titleText);
   heading.append(titleArt);
 
   const result = document.createElement("div");
@@ -472,7 +484,7 @@ function openLevelSummaryOverlay({
     ].filter(Boolean).join(" ");
     // Chừa một nhịp để popup ổn định trước, rồi mới hé từng sao.
     if (isEarned) star.style.setProperty("--star-delay", `${420 + index * 380}ms`);
-    star.append(createIcon(isEarned ? "star" : "star-empty"));
+    star.append(createIcon("star"));
     star.setAttribute("aria-hidden", "true");
     resultStars.appendChild(star);
   }
@@ -498,7 +510,8 @@ function openLevelSummaryOverlay({
     const statValue = className === "summary-points" ? resultScore : document.createElement("strong");
     statValue.textContent = className === "summary-coins" ? "+0" : value;
     if (className === "summary-coins") coinsValueElement = statValue;
-    item.append(statLabel, statValue);
+    const statIcon = createIcon(className === "summary-coins" ? "coin" : className === "summary-time" ? "timer" : "star");
+    item.append(statIcon, statLabel, statValue);
     stats.appendChild(item);
   });
 
@@ -527,7 +540,7 @@ function openLevelSummaryOverlay({
     ] : [
       {
         label: "Menu",
-        icon: "home",
+        icon: "victory-home",
         variant: "secondary",
         onClick: (close) => {
           actionSelected = true;
@@ -537,7 +550,7 @@ function openLevelSummaryOverlay({
       },
       {
         label: nextLabel,
-        icon: "arrow-right",
+        icon: "victory-next",
         variant: "primary",
         onClick: (close) => {
           actionSelected = true;
