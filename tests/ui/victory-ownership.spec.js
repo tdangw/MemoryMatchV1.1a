@@ -138,7 +138,7 @@ test('summary counters resolve statically when motion is reduced during their st
   await page.clock.runFor(3600);
   await expect(page.locator('#level-summary-modal')).toBeVisible();
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await expect(page.locator('.level-summary__score')).toHaveText('1,234 ĐIỂM');
+  await expect(page.locator('.level-summary__score')).toHaveText('1,234');
   await expect(page.locator('.summary-coins strong')).toHaveText('+10');
   await expect(page.locator('.summary-confetti')).toHaveCount(0);
   await page.evaluate(async () => (await import('/js/gameSelector.js')).showGameSelector());

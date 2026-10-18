@@ -327,6 +327,7 @@ export function showLevelRewardOverlay({
   const container = document.createElement("div");
   container.className =
     "reward-container direct-layout app-modal";
+  container.dataset.uiSurface = 'garden';
   const rewardTitle = document.createElement("h2");
   rewardTitle.className = "reward-title glow";
   rewardTitle.textContent = `Màn ${level}`;
@@ -438,7 +439,23 @@ function openLevelSummaryOverlay({
 
   const heading = document.createElement("h3");
   heading.className = "level-summary__heading";
-  heading.textContent = `Hoàn thành Màn ${level}!`;
+  const svgNS = "http://www.w3.org/2000/svg";
+  const titleArt = document.createElementNS(svgNS, "svg");
+  titleArt.setAttribute("viewBox", "0 0 360 82");
+  const curve = document.createElementNS(svgNS, "path");
+  const curveId = `summary-title-curve-${generation}`;
+  curve.id = curveId;
+  curve.setAttribute("d", "M50 52 Q180 22 310 52");
+  curve.setAttribute("fill", "none");
+  const titleText = document.createElementNS(svgNS, "text");
+  const titlePath = document.createElementNS(svgNS, "textPath");
+  titlePath.setAttribute("href", `#${curveId}`);
+  titlePath.setAttribute("startOffset", "50%");
+  titlePath.setAttribute("text-anchor", "middle");
+  titlePath.textContent = `Hoàn thành Màn ${level}!`;
+  titleText.append(titlePath);
+  titleArt.append(curve, titleText);
+  heading.append(titleArt);
 
   const result = document.createElement("div");
   result.className = "level-summary__result";
@@ -455,54 +472,41 @@ function openLevelSummaryOverlay({
     ].filter(Boolean).join(" ");
     // Chừa một nhịp để popup ổn định trước, rồi mới hé từng sao.
     if (isEarned) star.style.setProperty("--star-delay", `${420 + index * 380}ms`);
-    star.append(createIcon("star"));
+    star.append(createIcon(isEarned ? "star" : "star-empty"));
     star.setAttribute("aria-hidden", "true");
     resultStars.appendChild(star);
   }
   const resultScore = document.createElement("strong");
   resultScore.className = "level-summary__score";
-  resultScore.textContent = "0 ĐIỂM";
-  result.append(resultStars, resultScore);
+  resultScore.textContent = "0";
+  result.append(resultStars);
 
   const stats = document.createElement("div");
   stats.className = "level-summary__stats";
   let coinsValueElement;
   const summaryStats = [
-    ["XU NHẬN", `+${coinsEarned}`, "summary-coins"],
-    [
-      isEndlessMode(settings.mode) ? "THỜI GIAN ĐÃ CHƠI" : "THỜI GIAN CÒN LẠI",
-      formatClockTime(remainingTime),
-      "summary-time",
-    ],
-    ["SỐ NƯỚC ĐI", moves, "summary-moves"],
-    ["LƯỢT SAI", misses, "summary-misses"],
+    ["Xu nhận", `+${coinsEarned}`, "summary-coins"],
+    ["Thời gian", formatClockTime(remainingTime), "summary-time"],
+    ["Điểm", score, "summary-points"],
   ];
-  if (timeBonus > 0) summaryStats.push(["THƯỞNG THỜI GIAN", `+${timeBonus}`, "summary-time-bonus"]);
-  if (luckyAwards.length > 0) {
-    summaryStats.push(["Ô MAY MẮN", `${luckyAwards.length} phần thưởng`, "summary-lucky"]);
-    summaryStats.push([
-      "PHẦN THƯỞNG",
-      formatLuckyAwardSummary(luckyAwards),
-      "summary-lucky-details",
-    ]);
-  }
 
   summaryStats.forEach(([label, value, className]) => {
     const item = document.createElement("div");
     item.className = `level-summary__stat ${className}`;
     const statLabel = document.createElement("span");
     statLabel.textContent = label;
-    const statValue = document.createElement("strong");
+    const statValue = className === "summary-points" ? resultScore : document.createElement("strong");
     statValue.textContent = className === "summary-coins" ? "+0" : value;
     if (className === "summary-coins") coinsValueElement = statValue;
     item.append(statLabel, statValue);
     stats.appendChild(item);
   });
 
-  content.append(heading, result, stats);
+  content.append(result, heading, stats);
 
   const modal = openAppModal({
     id: "level-summary-modal",
+    artwork: 'reward',
     owner: scope,
     onDestroy: () => scope.dispose(),
     showHeader: false,
@@ -555,7 +559,7 @@ function openLevelSummaryOverlay({
     modal.panel.classList.add("level-summary-modal--victory");
   }
   launchSummaryConfetti(scope);
-  animateSummaryNumber(resultScore, score, { scope, suffix: " ĐIỂM", delayMs: 360, durationMs: 1250 });
+  animateSummaryNumber(resultScore, score, { scope, delayMs: 360, durationMs: 1250 });
   if (coinsValueElement) {
     animateSummaryNumber(coinsValueElement, coinsEarned, { scope, prefix: "+", delayMs: 760, durationMs: 1000 });
   }
@@ -593,18 +597,6 @@ function animateSummaryNumber(element, target, {
     };
     frame = globalThis.requestAnimationFrame(tick);
   }, delayMs);
-}
-
-function formatLuckyAwardSummary(awards) {
-  const totals = awards.reduce((result, award) => {
-    result[award.type] = (result[award.type] || 0) + award.value;
-    return result;
-  }, {});
-  return [
-    totals.time && `+${totals.time}s`,
-    totals.hints && `+${totals.hints} gợi ý`,
-    totals.coins && `+${totals.coins} Xu`,
-  ].filter(Boolean).join(" · ");
 }
 
 export function showResetConfirmationOverlay({ onClose = () => {} } = {}) {

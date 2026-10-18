@@ -1,3 +1,4 @@
+import { UI_ART_ICONS } from './uiArtManifest.js';
 const SVG_NS = "http://www.w3.org/2000/svg";
 
 const ICON_PATHS = Object.freeze({
@@ -78,7 +79,16 @@ export function createIcon(name) {
   svg.setAttribute("viewBox", "0 0 24 24");
   svg.setAttribute("aria-hidden", "true");
   svg.setAttribute("focusable", "false");
-  svg.innerHTML = ICON_PATHS[name] || ICON_PATHS.info;
+  const artwork = UI_ART_ICONS[name];
+  if (artwork) {
+    const image = document.createElementNS(SVG_NS, 'image');
+    image.setAttribute('href', `${import.meta.env.BASE_URL}${artwork.replace(/^\//, '')}`);
+    image.setAttribute('width', '24');
+    image.setAttribute('height', '24');
+    image.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+    svg.dataset.uiArt = name;
+    svg.append(image);
+  } else svg.innerHTML = ICON_PATHS[name] || ICON_PATHS.info;
   return svg;
 }
 

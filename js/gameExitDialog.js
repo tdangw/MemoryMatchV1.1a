@@ -1,3 +1,4 @@
+import { createIcon } from './icons.js';
 import { openAppModal } from './modal.js';
 
 export function openGameExitDialog({ owner, trigger, onExit, onRestart, onSettings, onClose, mode = 'easy' }) {
@@ -17,6 +18,12 @@ export function openGameExitDialog({ owner, trigger, onExit, onRestart, onSettin
     onClose: () => { onClose(); nextAction?.(); },
     onDestroy: () => trigger.setAttribute('aria-expanded', 'false'),
   });
+  // Keep the three main actions centered; settings stays available in the header.
+  const settingsButton = modal.panel.querySelector('.app-modal__footer').children[2];
+  settingsButton.className = 'pause-settings';
+  settingsButton.setAttribute('aria-label', 'Cài đặt');
+  settingsButton.replaceChildren(createIcon('settings'));
+  modal.panel.querySelector('.app-modal__header').insertBefore(settingsButton, modal.panel.querySelector('.app-modal__close'));
   modal.panel.classList.add('pause-dialog');
   modal.panel.setAttribute('aria-label', 'Tạm dừng màn chơi');
   return modal;

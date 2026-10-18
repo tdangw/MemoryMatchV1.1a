@@ -131,9 +131,9 @@ test("Triple completion grants the approved reward from the highest combo exactl
   });
   expect(result.best.score).toBeGreaterThan(198);
   const summary = page.locator("#level-summary-modal");
-  await expect(summary).toContainText(/XU NHẬN\s*\+18/);
-  await expect(summary).toContainText(`${result.best.score} ĐIỂM`);
-  await expect(summary).toContainText("THƯỞNG THỜI GIAN");
+  await expect(summary.locator('.summary-coins strong')).toHaveText('+18');
+  await expect(summary.locator('.summary-points strong')).toHaveText(String(result.best.score));
+  await expect(summary.locator('.level-summary__stat')).toHaveCount(3);
   await expect(
     page.getByLabel(`Kỷ lục: ${result.best.score.toLocaleString("vi-VN")} điểm`),
   ).toBeVisible();
@@ -177,7 +177,7 @@ test("Triple terminal HUD, popup, and saved result use the same time-bonus score
   expect(result.hudStars).toBe(result.best.stars);
   expect(result.popupStars).toBe(result.best.stars);
   await expect(page.locator("#level-summary-modal .level-summary__score")).toHaveText(
-    `${result.state.score} ĐIỂM`,
+    `${result.state.score}`,
   );
 });
 
@@ -369,6 +369,9 @@ test("Triple Challenge advances deterministically through its staged timer and c
   await winActiveTripleRound(page);
   await page.getByRole("button", { name: "Màn tiếp theo" }).click();
   await expect(page.locator('[data-triple-level]')).toHaveText('8');
+  // HUD mounts before the intro completes and the playable session is persisted.
+  await expect(page.locator('#triple-round-start-modal')).toHaveCount(0, { timeout: 4000 });
+  await expect.poll(() => page.evaluate(async () => (await import('/js/sessionProgress.js')).getActiveSession('triple-connect', 'challenge')?.level)).toBe(8);
   const continued = await page.evaluate(async () => (await import('/js/sessionProgress.js')).getActiveSession('triple-connect', 'challenge'));
   expect(continued.level).toBe(8);
   expect(continued.snapshot.tiles.length).toBeLessThanOrEqual(93);

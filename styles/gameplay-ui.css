@@ -635,3 +635,10 @@
     font-size: 11px;
   }
 }
+
+.gameplay-reward-toast { background: #f5dba3; border: 1px solid transparent; border-image-source: var(--ui-art-reward-panel); border-image-slice: 30% fill; border-image-width: 18px; color: #60350f; padding-left: 62px; }
+.gameplay-reward-toast::before { content: ''; position: absolute; width: 34px; height: 34px; left: 18px; top: 50%; transform: translateY(-50%); background: var(--ui-art-gift) center / contain no-repeat; }
+.reward-container[data-ui-surface] .reward-title { padding: 16px 24px; background: var(--ui-art-garden-title) center / 100% 100% no-repeat; }
+
+.gameplay-reward-toast__title { color: #704016; }
+.gameplay-reward-toast__value { color: #62380f; }

@@ -5,9 +5,11 @@
 Người dùng đã giao thực hiện toàn bộ lộ trình ảnh bên dưới. Phần A–C là hồ sơ lượt chuẩn bị trước; phần hiện hành là D–G, thực hiện tới hết. Giữ luật/save/API/catalog, nền và tranh trò đã có; không deploy. Chỉ tạo APK **một lần cuối khi hoàn thành toàn bộ**, báo tiến độ ngắn và giữ bằng chứng trong một QA.
 
 - [x] D — Tạo ảnh nguồn đủ nét, xuất khung/nút/biểu tượng theo bảy nhóm; kiểm alpha, biên co giãn và ngân sách. Gom theo chất liệu/vòng đời thành các master sheet Vườn đêm, gỗ/giấy và biểu tượng; các nhóm dùng lại ảnh thay vì nhân bản sheet gần giống.
-- [ ] E — Gắn khung/nút/biểu tượng cho mọi popup thao tác, đầu màn/chọn màn/công cụ và thắng/thưởng của ba trò; chữ/số/vùng chạm vẫn thật, không đổi luồng.
+- [x] E — Gắn khung/nút/biểu tượng cho mọi popup thao tác, đầu màn/chọn màn/công cụ và thắng/thưởng của ba trò; chữ/số/vùng chạm vẫn thật, không đổi luồng.
 - [ ] F — Đồng bộ cửa hàng/bộ sưu tập/tab/điều hướng/HUD và cảnh kết thúc chặng; giữ nền/trang trí phù hợp hiện có. Kiểm kê mọi thành phần và ghi rõ sử dụng ảnh mới/giữ nguồn đã có.
 - [ ] G — Kiểm ảnh thật412/844/1024, tương tác/focus/lifecycle/reduced-motion/save, đo tải/frame, review độc lập, check/build web và APK cuối; commit từng phase.
+
+Bổ sung đã chốt: popup thắng chỉ ba hàng Xu nhận, Thời gian, Điểm; tiêu đề cong theo dải đỏ và đủ màn999. Nút thao tác gọn, cao vừa tay; tạm dừng có ba hành động dọc (Tiếp tục, Chơi lại/Lượt mới, Thoát game), Cài đặt giữ bằng nút hình ở đầu khung. Không đổi số thưởng/cách tính điểm hay dữ liệu lưu.
 
 Lựa chọn thực hiện: ảnh thành phần co giãn + nội dung sống. Không chọn ảnh toàn màn với tọa độ chữ cố định vì không đáp ứng nội dung dài, popup nhiều dòng hoặc màn ngang. Không thêm animation/RAF mới; ảnh trang trí tĩnh giữ ownership DOM hiện có. Các nguồn icon SVG ít dùng giữ fallback tương thích, bộ hình chính dùng chung ở mọi nơi.
 
@@ -21,7 +23,7 @@ Lượt này **lập kế hoạch bộ hình**, chưa tạo ảnh và chưa thay
 
 | Nơi hiển thị | Hình cần chuẩn bị | Nội dung tiếp tục hiển thị bằng chữ/số | Nguồn quản lý hiện tại |
 |---|---|---|---|
-| Thắng màn, cả ba trò | Khung gỗ/giấy co giãn; dải tiêu đề trống; sao sáng/tối; ô giá trị; nút cam/xanh; xu, đồng hồ, sao | Màn, số sao, điểm, Xu, thời gian, lượt, lỗi, thưởng thêm; Menu/Màn tiếp theo | `js/ui.js`, `styles/modals.css` |
+| Thắng màn, cả ba trò | Khung gỗ/giấy co giãn; dải tiêu đề trống; sao sáng/tối; ô giá trị; nút cam/xanh; xu, đồng hồ, sao | Màn, số sao; ba hàng kết quả Xu nhận, Thời gian, Điểm; Menu/Màn tiếp theo | `js/ui.js`, `styles/modals.css` |
 | Đầu màn chơi | Khung Vườn đêm vừa, bảng tên trống, huy hiệu độ khó, biểu tượng mục tiêu/giờ/công cụ | Màn, độ khó, chủ đề, mục tiêu, thời gian, vật phẩm theo cấu hình thật | `showLevelRewardOverlay` trong `js/ui.js` |
 | Chọn màn/độ khó, chọn tiếp tục hay lượt mới | Khung Vườn đêm lớn, bộ huy hiệu C/B/A/S, bệ huy hiệu đang chọn, nút Chơi/Tiếp tục | Màn, mô tả, thời gian, số thẻ/cặp/bộ ba, chủ đề | `js/adventureMap.js`, `js/mainmenu.js`, controller Link/Triple |
 | Rương, đã nhận thưởng, quà may mắn | Khung gỗ/giấy nhỏ và vừa, rương đóng/mở, xu và vật phẩm, dải tiêu đề trống | Số lượng quà và kết quả nhận thật; không đưa số cố định vào ảnh | `js/adventureMap.js`, toast thưởng trong `js/ui.js` |

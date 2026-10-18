@@ -26,6 +26,7 @@ export function openAppModal({
   owner = getActiveGameScope() || getAppPageScope(),
   presentation = "modal",
   keepBanner = true,
+  artwork = 'garden',
   alignment = "start",
   host = document.body,
 }) {
@@ -48,6 +49,7 @@ export function openAppModal({
 
   const panel = document.createElement("section");
   panel.className = `app-modal app-modal--${size}`;
+  if (!screen) panel.dataset.uiSurface = artwork;
   panel.setAttribute("role", screen ? 'region' : "dialog");
   if (!screen) panel.setAttribute("aria-modal", "true");
   else panel.setAttribute('aria-label', title);
