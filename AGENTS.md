@@ -208,6 +208,11 @@ Nếu không có skill phù hợp, tiếp tục bằng workflow repository này;
 
 ## 13. Kiểm thử theo mức rủi ro
 
+### Tần suất đóng gói và báo cáo (chủ dự án chốt18/10/2026)
+
+- Chỉ tạo APK khi hoàn tất toàn bộ task/kế hoạch để chủ dự án thử, trừ khi người dùng yêu cầu rõ một APK trung gian. Không tạo APK sau mỗi lỗi nhỏ hoặc mỗi commit.
+- Trong quá trình làm, chạy kiểm tra đúng phạm vi vừa sửa; check/build web ở cổng nghiệm thu phù hợp. Tiến độ và báo cáo cuối ngắn gọn; bằng chứng chi tiết lưu chung trong một báo cáo nghiệm thu của task, không lặp lại log/báo cáo dài mỗi bước.
+
 Mức tối thiểu cho thay đổi code:
 
 - static checks phù hợp, sau đó `npm run check` ở gate cuối;

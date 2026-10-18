@@ -1,0 +1,50 @@
+{
+  "mode": "imagegen built-in",
+  "masters": [
+    {
+      "path": "docs/design/ui-images/masters/garden-v1.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "bytes": 1856267,
+      "sha256": "0e40b88281f080d2f5f140bfdac28a9414173a7cded89aadbc6ebd1fb245ae3e",
+      "alphaRange": [
+        0,
+        255
+      ]
+    },
+    {
+      "path": "docs/design/ui-images/masters/icons-v1.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "bytes": 1002277,
+      "sha256": "8b28a7973d6eeca948ca345cca12be1d1396cf35088d451598f38a790c408c92",
+      "alphaRange": [
+        0,
+        255
+      ]
+    },
+    {
+      "path": "docs/design/ui-images/masters/reward-v1.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "bytes": 1416210,
+      "sha256": "270436980437ee3b070507c9ecc73c9e9a3f02983f4050e060fd414ef8003daa",
+      "alphaRange": [
+        0,
+        255
+      ]
+    }
+  ],
+  "runtimeBytes": {
+    "garden": 218454,
+    "reward": 166190,
+    "icons": 141620
+  },
+  "iconsLayout": "second generation corrects gutters; discarded layout is not bundled"
+}

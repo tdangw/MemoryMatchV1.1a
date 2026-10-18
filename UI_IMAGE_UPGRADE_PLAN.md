@@ -1,5 +1,16 @@
 # Kế hoạch bộ hình giao diện — 18/10/2026
 
+## Triển khai bộ hình — đã được giao18/10
+
+Người dùng đã giao thực hiện toàn bộ lộ trình ảnh bên dưới. Phần A–C là hồ sơ lượt chuẩn bị trước; phần hiện hành là D–G, thực hiện tới hết. Giữ luật/save/API/catalog, nền và tranh trò đã có; không deploy. Chỉ tạo APK **một lần cuối khi hoàn thành toàn bộ**, báo tiến độ ngắn và giữ bằng chứng trong một QA.
+
+- [x] D — Tạo ảnh nguồn đủ nét, xuất khung/nút/biểu tượng theo bảy nhóm; kiểm alpha, biên co giãn và ngân sách. Gom theo chất liệu/vòng đời thành các master sheet Vườn đêm, gỗ/giấy và biểu tượng; các nhóm dùng lại ảnh thay vì nhân bản sheet gần giống.
+- [ ] E — Gắn khung/nút/biểu tượng cho mọi popup thao tác, đầu màn/chọn màn/công cụ và thắng/thưởng của ba trò; chữ/số/vùng chạm vẫn thật, không đổi luồng.
+- [ ] F — Đồng bộ cửa hàng/bộ sưu tập/tab/điều hướng/HUD và cảnh kết thúc chặng; giữ nền/trang trí phù hợp hiện có. Kiểm kê mọi thành phần và ghi rõ sử dụng ảnh mới/giữ nguồn đã có.
+- [ ] G — Kiểm ảnh thật412/844/1024, tương tác/focus/lifecycle/reduced-motion/save, đo tải/frame, review độc lập, check/build web và APK cuối; commit từng phase.
+
+Lựa chọn thực hiện: ảnh thành phần co giãn + nội dung sống. Không chọn ảnh toàn màn với tọa độ chữ cố định vì không đáp ứng nội dung dài, popup nhiều dòng hoặc màn ngang. Không thêm animation/RAF mới; ảnh trang trí tĩnh giữ ownership DOM hiện có. Các nguồn icon SVG ít dùng giữ fallback tương thích, bộ hình chính dùng chung ở mọi nơi.
+
 ## Phạm vi đã chốt
 
 Giữ Vườn đêm cho Home, các tab và cửa hàng. Popup thắng dùng gỗ, giấy, sao vàng và nút nổi theo ảnh mẫu. Các popup khác đều được đưa vào bộ hình: thao tác thường ngày dùng khung Vườn đêm được vẽ nổi; nhận thưởng dùng chung chất liệu gỗ và giấy với popup thắng. Cùng hướng ánh sáng trên trái, độ bo tròn, độ dày viền và cách vẽ biểu tượng trong cả ba trò.

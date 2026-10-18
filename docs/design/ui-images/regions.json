@@ -1,0 +1,793 @@
+[
+  {
+    "name": "garden-panel",
+    "source": "garden-v1.png",
+    "rect": [
+      10,
+      55,
+      330,
+      365
+    ],
+    "maxSize": 420,
+    "group": "garden",
+    "icons": []
+  },
+  {
+    "name": "garden-inset",
+    "source": "garden-v1.png",
+    "rect": [
+      331,
+      55,
+      647,
+      365
+    ],
+    "maxSize": 320,
+    "group": "garden",
+    "icons": []
+  },
+  {
+    "name": "garden-title",
+    "source": "garden-v1.png",
+    "rect": [
+      648,
+      145,
+      1034,
+      340
+    ],
+    "maxSize": 400,
+    "group": "garden",
+    "icons": []
+  },
+  {
+    "name": "garden-square",
+    "source": "garden-v1.png",
+    "rect": [
+      1034,
+      145,
+      1247,
+      360
+    ],
+    "maxSize": 160,
+    "group": "garden",
+    "icons": []
+  },
+  {
+    "name": "garden-primary",
+    "source": "garden-v1.png",
+    "rect": [
+      10,
+      395,
+      324,
+      560
+    ],
+    "maxSize": 320,
+    "group": "garden",
+    "icons": []
+  },
+  {
+    "name": "garden-secondary",
+    "source": "garden-v1.png",
+    "rect": [
+      325,
+      395,
+      638,
+      560
+    ],
+    "maxSize": 320,
+    "group": "garden",
+    "icons": []
+  },
+  {
+    "name": "garden-danger",
+    "source": "garden-v1.png",
+    "rect": [
+      638,
+      395,
+      950,
+      560
+    ],
+    "maxSize": 320,
+    "group": "garden",
+    "icons": []
+  },
+  {
+    "name": "garden-disabled",
+    "source": "garden-v1.png",
+    "rect": [
+      950,
+      395,
+      1254,
+      560
+    ],
+    "maxSize": 320,
+    "group": "garden",
+    "icons": []
+  },
+  {
+    "name": "grade-c",
+    "source": "garden-v1.png",
+    "rect": [
+      10,
+      580,
+      320,
+      890
+    ],
+    "maxSize": 192,
+    "group": "garden",
+    "icons": []
+  },
+  {
+    "name": "grade-b",
+    "source": "garden-v1.png",
+    "rect": [
+      321,
+      580,
+      638,
+      890
+    ],
+    "maxSize": 192,
+    "group": "garden",
+    "icons": []
+  },
+  {
+    "name": "grade-a",
+    "source": "garden-v1.png",
+    "rect": [
+      638,
+      580,
+      950,
+      890
+    ],
+    "maxSize": 192,
+    "group": "garden",
+    "icons": []
+  },
+  {
+    "name": "grade-s",
+    "source": "garden-v1.png",
+    "rect": [
+      950,
+      580,
+      1254,
+      890
+    ],
+    "maxSize": 192,
+    "group": "garden",
+    "icons": []
+  },
+  {
+    "name": "avatar-frame",
+    "source": "garden-v1.png",
+    "rect": [
+      8,
+      892,
+      342,
+      1220
+    ],
+    "maxSize": 240,
+    "group": "garden",
+    "icons": []
+  },
+  {
+    "name": "rank-medal",
+    "source": "garden-v1.png",
+    "rect": [
+      344,
+      888,
+      625,
+      1210
+    ],
+    "maxSize": 128,
+    "group": "garden",
+    "icons": []
+  },
+  {
+    "name": "control-thumb",
+    "source": "garden-v1.png",
+    "rect": [
+      630,
+      945,
+      875,
+      1180
+    ],
+    "maxSize": 96,
+    "group": "garden",
+    "icons": []
+  },
+  {
+    "name": "garden-tray",
+    "source": "garden-v1.png",
+    "rect": [
+      878,
+      995,
+      1254,
+      1150
+    ],
+    "maxSize": 320,
+    "group": "garden",
+    "icons": []
+  },
+  {
+    "name": "reward-panel",
+    "source": "reward-v1.png",
+    "rect": [
+      10,
+      65,
+      325,
+      360
+    ],
+    "maxSize": 420,
+    "group": "reward",
+    "icons": []
+  },
+  {
+    "name": "reward-paper",
+    "source": "reward-v1.png",
+    "rect": [
+      326,
+      80,
+      594,
+      345
+    ],
+    "maxSize": 320,
+    "group": "reward",
+    "icons": []
+  },
+  {
+    "name": "reward-title",
+    "source": "reward-v1.png",
+    "rect": [
+      594,
+      135,
+      965,
+      300
+    ],
+    "maxSize": 420,
+    "group": "reward",
+    "icons": []
+  },
+  {
+    "name": "reward-well",
+    "source": "reward-v1.png",
+    "rect": [
+      965,
+      155,
+      1254,
+      300
+    ],
+    "maxSize": 320,
+    "group": "reward",
+    "icons": []
+  },
+  {
+    "name": "reward-orange",
+    "source": "reward-v1.png",
+    "rect": [
+      10,
+      398,
+      324,
+      555
+    ],
+    "maxSize": 320,
+    "group": "reward",
+    "icons": []
+  },
+  {
+    "name": "reward-green",
+    "source": "reward-v1.png",
+    "rect": [
+      325,
+      398,
+      628,
+      555
+    ],
+    "maxSize": 320,
+    "group": "reward",
+    "icons": []
+  },
+  {
+    "name": "reward-secondary",
+    "source": "reward-v1.png",
+    "rect": [
+      628,
+      398,
+      942,
+      555
+    ],
+    "maxSize": 320,
+    "group": "reward",
+    "icons": []
+  },
+  {
+    "name": "reward-disabled",
+    "source": "reward-v1.png",
+    "rect": [
+      942,
+      398,
+      1254,
+      555
+    ],
+    "maxSize": 320,
+    "group": "reward",
+    "icons": []
+  },
+  {
+    "name": "star",
+    "source": "reward-v1.png",
+    "rect": [
+      25,
+      588,
+      310,
+      870
+    ],
+    "maxSize": 192,
+    "group": "reward",
+    "icons": [
+      "star"
+    ]
+  },
+  {
+    "name": "star-empty",
+    "source": "reward-v1.png",
+    "rect": [
+      330,
+      588,
+      628,
+      870
+    ],
+    "maxSize": 192,
+    "group": "reward",
+    "icons": [
+      "star-empty"
+    ]
+  },
+  {
+    "name": "coin",
+    "source": "reward-v1.png",
+    "rect": [
+      640,
+      590,
+      925,
+      880
+    ],
+    "maxSize": 144,
+    "group": "reward",
+    "icons": [
+      "coin"
+    ]
+  },
+  {
+    "name": "timer",
+    "source": "reward-v1.png",
+    "rect": [
+      953,
+      580,
+      1254,
+      880
+    ],
+    "maxSize": 144,
+    "group": "reward",
+    "icons": [
+      "timer",
+      "hourglass"
+    ]
+  },
+  {
+    "name": "chest-closed",
+    "source": "reward-v1.png",
+    "rect": [
+      5,
+      895,
+      324,
+      1190
+    ],
+    "maxSize": 192,
+    "group": "reward",
+    "icons": [
+      "chest"
+    ]
+  },
+  {
+    "name": "chest-open",
+    "source": "reward-v1.png",
+    "rect": [
+      325,
+      875,
+      630,
+      1190
+    ],
+    "maxSize": 192,
+    "group": "reward",
+    "icons": [
+      "chest-open"
+    ]
+  },
+  {
+    "name": "reward-trophy",
+    "source": "reward-v1.png",
+    "rect": [
+      632,
+      900,
+      942,
+      1190
+    ],
+    "maxSize": 144,
+    "group": "reward",
+    "icons": []
+  },
+  {
+    "name": "gift",
+    "source": "reward-v1.png",
+    "rect": [
+      945,
+      895,
+      1254,
+      1190
+    ],
+    "maxSize": 144,
+    "group": "reward",
+    "icons": [
+      "celebrate"
+    ]
+  },
+  {
+    "name": "icon-home",
+    "source": "icons-v1.png",
+    "rect": [
+      0,
+      180,
+      210,
+      400
+    ],
+    "maxSize": 128,
+    "group": "icons",
+    "icons": [
+      "home"
+    ]
+  },
+  {
+    "name": "icon-shop",
+    "source": "icons-v1.png",
+    "rect": [
+      210,
+      180,
+      420,
+      400
+    ],
+    "maxSize": 128,
+    "group": "icons",
+    "icons": [
+      "shop"
+    ]
+  },
+  {
+    "name": "icon-collection",
+    "source": "icons-v1.png",
+    "rect": [
+      420,
+      180,
+      630,
+      400
+    ],
+    "maxSize": 128,
+    "group": "icons",
+    "icons": [
+      "collection"
+    ]
+  },
+  {
+    "name": "icon-map",
+    "source": "icons-v1.png",
+    "rect": [
+      630,
+      180,
+      840,
+      400
+    ],
+    "maxSize": 128,
+    "group": "icons",
+    "icons": [
+      "map"
+    ]
+  },
+  {
+    "name": "icon-trophy",
+    "source": "icons-v1.png",
+    "rect": [
+      840,
+      180,
+      1048,
+      400
+    ],
+    "maxSize": 128,
+    "group": "icons",
+    "icons": [
+      "trophy"
+    ]
+  },
+  {
+    "name": "icon-settings",
+    "source": "icons-v1.png",
+    "rect": [
+      1048,
+      180,
+      1254,
+      400
+    ],
+    "maxSize": 128,
+    "group": "icons",
+    "icons": [
+      "settings"
+    ]
+  },
+  {
+    "name": "icon-account",
+    "source": "icons-v1.png",
+    "rect": [
+      0,
+      450,
+      210,
+      675
+    ],
+    "maxSize": 128,
+    "group": "icons",
+    "icons": [
+      "account"
+    ]
+  },
+  {
+    "name": "icon-missions",
+    "source": "icons-v1.png",
+    "rect": [
+      210,
+      450,
+      420,
+      675
+    ],
+    "maxSize": 128,
+    "group": "icons",
+    "icons": [
+      "missions"
+    ]
+  },
+  {
+    "name": "icon-events",
+    "source": "icons-v1.png",
+    "rect": [
+      420,
+      450,
+      630,
+      675
+    ],
+    "maxSize": 128,
+    "group": "icons",
+    "icons": [
+      "events"
+    ]
+  },
+  {
+    "name": "icon-info",
+    "source": "icons-v1.png",
+    "rect": [
+      630,
+      450,
+      840,
+      675
+    ],
+    "maxSize": 128,
+    "group": "icons",
+    "icons": [
+      "info"
+    ]
+  },
+  {
+    "name": "icon-play",
+    "source": "icons-v1.png",
+    "rect": [
+      840,
+      450,
+      1048,
+      675
+    ],
+    "maxSize": 128,
+    "group": "icons",
+    "icons": [
+      "play"
+    ]
+  },
+  {
+    "name": "icon-restart",
+    "source": "icons-v1.png",
+    "rect": [
+      1048,
+      450,
+      1254,
+      675
+    ],
+    "maxSize": 128,
+    "group": "icons",
+    "icons": [
+      "restart"
+    ]
+  },
+  {
+    "name": "icon-search",
+    "source": "icons-v1.png",
+    "rect": [
+      0,
+      735,
+      210,
+      945
+    ],
+    "maxSize": 128,
+    "group": "icons",
+    "icons": [
+      "search"
+    ]
+  },
+  {
+    "name": "icon-shuffle",
+    "source": "icons-v1.png",
+    "rect": [
+      210,
+      735,
+      420,
+      945
+    ],
+    "maxSize": 128,
+    "group": "icons",
+    "icons": [
+      "shuffle"
+    ]
+  },
+  {
+    "name": "icon-snowflake",
+    "source": "icons-v1.png",
+    "rect": [
+      420,
+      735,
+      630,
+      945
+    ],
+    "maxSize": 128,
+    "group": "icons",
+    "icons": [
+      "snowflake"
+    ]
+  },
+  {
+    "name": "icon-freeze",
+    "source": "icons-v1.png",
+    "rect": [
+      630,
+      735,
+      840,
+      945
+    ],
+    "maxSize": 128,
+    "group": "icons",
+    "icons": [
+      "freeze"
+    ]
+  },
+  {
+    "name": "icon-eye",
+    "source": "icons-v1.png",
+    "rect": [
+      840,
+      735,
+      1048,
+      945
+    ],
+    "maxSize": 128,
+    "group": "icons",
+    "icons": [
+      "eye"
+    ]
+  },
+  {
+    "name": "icon-undo",
+    "source": "icons-v1.png",
+    "rect": [
+      1048,
+      735,
+      1254,
+      945
+    ],
+    "maxSize": 128,
+    "group": "icons",
+    "icons": [
+      "undo"
+    ]
+  },
+  {
+    "name": "icon-expand",
+    "source": "icons-v1.png",
+    "rect": [
+      0,
+      990,
+      210,
+      1200
+    ],
+    "maxSize": 128,
+    "group": "icons",
+    "icons": [
+      "expand"
+    ]
+  },
+  {
+    "name": "icon-wand",
+    "source": "icons-v1.png",
+    "rect": [
+      210,
+      990,
+      420,
+      1200
+    ],
+    "maxSize": 128,
+    "group": "icons",
+    "icons": [
+      "wand"
+    ]
+  },
+  {
+    "name": "icon-exit",
+    "source": "icons-v1.png",
+    "rect": [
+      420,
+      990,
+      630,
+      1200
+    ],
+    "maxSize": 128,
+    "group": "icons",
+    "icons": [
+      "exit"
+    ]
+  },
+  {
+    "name": "icon-arrow-right",
+    "source": "icons-v1.png",
+    "rect": [
+      630,
+      990,
+      840,
+      1200
+    ],
+    "maxSize": 128,
+    "group": "icons",
+    "icons": [
+      "arrow-right"
+    ]
+  },
+  {
+    "name": "icon-book",
+    "source": "icons-v1.png",
+    "rect": [
+      840,
+      990,
+      1048,
+      1200
+    ],
+    "maxSize": 128,
+    "group": "icons",
+    "icons": [
+      "book"
+    ]
+  },
+  {
+    "name": "icon-energy",
+    "source": "icons-v1.png",
+    "rect": [
+      1048,
+      990,
+      1254,
+      1200
+    ],
+    "maxSize": 128,
+    "group": "icons",
+    "icons": [
+      "energy"
+    ]
+  }
+]

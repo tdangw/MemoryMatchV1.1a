@@ -1,0 +1,1416 @@
+{
+  "totals": {
+    "garden": 218454,
+    "reward": 166190,
+    "icons": 141620
+  },
+  "assets": [
+    {
+      "name": "garden-panel",
+      "source": "garden-v1.png",
+      "rect": [
+        10,
+        55,
+        330,
+        365
+      ],
+      "maxSize": 420,
+      "group": "garden",
+      "icons": [],
+      "sourceSize": [
+        319,
+        310
+      ],
+      "size": [
+        319,
+        310
+      ],
+      "bytes": 17136,
+      "url": "/assets/images/ui/v1/garden-panel.webp",
+      "sha256": "2c651d80ab2c81e1a13c07d91c4fd4c527ea20b09dfbc8cb722937853efbf9d3"
+    },
+    {
+      "name": "garden-inset",
+      "source": "garden-v1.png",
+      "rect": [
+        331,
+        55,
+        647,
+        365
+      ],
+      "maxSize": 320,
+      "group": "garden",
+      "icons": [],
+      "sourceSize": [
+        316,
+        310
+      ],
+      "size": [
+        316,
+        310
+      ],
+      "bytes": 17062,
+      "url": "/assets/images/ui/v1/garden-inset.webp",
+      "sha256": "d768d0cde142abd320925b6d1eb4c7dc742a3446182cb40f9629850cf287d68b"
+    },
+    {
+      "name": "garden-title",
+      "source": "garden-v1.png",
+      "rect": [
+        648,
+        145,
+        1034,
+        340
+      ],
+      "maxSize": 400,
+      "group": "garden",
+      "icons": [],
+      "sourceSize": [
+        386,
+        194
+      ],
+      "size": [
+        386,
+        194
+      ],
+      "bytes": 21342,
+      "url": "/assets/images/ui/v1/garden-title.webp",
+      "sha256": "97c68433c93f3a7bbd453690698e7cab4126a0d8c753158c50340a70fc055c1b"
+    },
+    {
+      "name": "garden-square",
+      "source": "garden-v1.png",
+      "rect": [
+        1034,
+        145,
+        1247,
+        360
+      ],
+      "maxSize": 160,
+      "group": "garden",
+      "icons": [],
+      "sourceSize": [
+        194,
+        215
+      ],
+      "size": [
+        144,
+        160
+      ],
+      "bytes": 7350,
+      "url": "/assets/images/ui/v1/garden-square.webp",
+      "sha256": "7845253731c1b2877625e9c37599398fcc73dbb3bcf10ba87383022ff695b476"
+    },
+    {
+      "name": "garden-primary",
+      "source": "garden-v1.png",
+      "rect": [
+        10,
+        395,
+        324,
+        560
+      ],
+      "maxSize": 320,
+      "group": "garden",
+      "icons": [],
+      "sourceSize": [
+        310,
+        160
+      ],
+      "size": [
+        310,
+        160
+      ],
+      "bytes": 14750,
+      "url": "/assets/images/ui/v1/garden-primary.webp",
+      "sha256": "1226fd27cecd7f9f2d86a77b1b252a51360fe1af52921ca5230a5c6e45cb425d"
+    },
+    {
+      "name": "garden-secondary",
+      "source": "garden-v1.png",
+      "rect": [
+        325,
+        395,
+        638,
+        560
+      ],
+      "maxSize": 320,
+      "group": "garden",
+      "icons": [],
+      "sourceSize": [
+        313,
+        165
+      ],
+      "size": [
+        313,
+        165
+      ],
+      "bytes": 13714,
+      "url": "/assets/images/ui/v1/garden-secondary.webp",
+      "sha256": "1f448080a361d64f8af9611d25cd0589db4c3582a24ab4941af1e1660f6bcc59"
+    },
+    {
+      "name": "garden-danger",
+      "source": "garden-v1.png",
+      "rect": [
+        638,
+        395,
+        950,
+        560
+      ],
+      "maxSize": 320,
+      "group": "garden",
+      "icons": [],
+      "sourceSize": [
+        312,
+        164
+      ],
+      "size": [
+        312,
+        164
+      ],
+      "bytes": 14240,
+      "url": "/assets/images/ui/v1/garden-danger.webp",
+      "sha256": "170b900db702fd84d75c251c50bedb83c5efcc8f8777e6e3b6a8b8bd55063142"
+    },
+    {
+      "name": "garden-disabled",
+      "source": "garden-v1.png",
+      "rect": [
+        950,
+        395,
+        1254,
+        560
+      ],
+      "maxSize": 320,
+      "group": "garden",
+      "icons": [],
+      "sourceSize": [
+        288,
+        164
+      ],
+      "size": [
+        288,
+        164
+      ],
+      "bytes": 13436,
+      "url": "/assets/images/ui/v1/garden-disabled.webp",
+      "sha256": "5adfd1be798a79bcd018f2264bc71a2d57578a28b520793fba161c940bc94426"
+    },
+    {
+      "name": "grade-c",
+      "source": "garden-v1.png",
+      "rect": [
+        10,
+        580,
+        320,
+        890
+      ],
+      "maxSize": 192,
+      "group": "garden",
+      "icons": [],
+      "sourceSize": [
+        303,
+        310
+      ],
+      "size": [
+        188,
+        192
+      ],
+      "bytes": 14252,
+      "url": "/assets/images/ui/v1/grade-c.webp",
+      "sha256": "4d4b5090aeca615b65da2393db9d24b8a88b067c4358e30e182dc6d37d241ca2"
+    },
+    {
+      "name": "grade-b",
+      "source": "garden-v1.png",
+      "rect": [
+        321,
+        580,
+        638,
+        890
+      ],
+      "maxSize": 192,
+      "group": "garden",
+      "icons": [],
+      "sourceSize": [
+        310,
+        310
+      ],
+      "size": [
+        192,
+        192
+      ],
+      "bytes": 12394,
+      "url": "/assets/images/ui/v1/grade-b.webp",
+      "sha256": "b6eec9799b8ec9aecb3fb42c04db216704e75190603faa3f28b855f888fffcb8"
+    },
+    {
+      "name": "grade-a",
+      "source": "garden-v1.png",
+      "rect": [
+        638,
+        580,
+        950,
+        890
+      ],
+      "maxSize": 192,
+      "group": "garden",
+      "icons": [],
+      "sourceSize": [
+        310,
+        304
+      ],
+      "size": [
+        192,
+        188
+      ],
+      "bytes": 13874,
+      "url": "/assets/images/ui/v1/grade-a.webp",
+      "sha256": "7e9d489ec15dbbb653f6186e4e1c908b1a6b028ae8d4e70fb372712ea288d3ab"
+    },
+    {
+      "name": "grade-s",
+      "source": "garden-v1.png",
+      "rect": [
+        950,
+        580,
+        1254,
+        890
+      ],
+      "maxSize": 192,
+      "group": "garden",
+      "icons": [],
+      "sourceSize": [
+        288,
+        304
+      ],
+      "size": [
+        182,
+        192
+      ],
+      "bytes": 14480,
+      "url": "/assets/images/ui/v1/grade-s.webp",
+      "sha256": "fc3dfbfa3f6a8c44919b8fb511cb803f066349b557e0f609bebabd38c7f79e4c"
+    },
+    {
+      "name": "avatar-frame",
+      "source": "garden-v1.png",
+      "rect": [
+        8,
+        892,
+        342,
+        1220
+      ],
+      "maxSize": 240,
+      "group": "garden",
+      "icons": [],
+      "sourceSize": [
+        327,
+        328
+      ],
+      "size": [
+        239,
+        240
+      ],
+      "bytes": 23134,
+      "url": "/assets/images/ui/v1/avatar-frame.webp",
+      "sha256": "ab8221a3c5a0fd6dda4ee5ec55bed44b4ea06168a0f14231c1de3858673de8f1"
+    },
+    {
+      "name": "rank-medal",
+      "source": "garden-v1.png",
+      "rect": [
+        344,
+        888,
+        625,
+        1210
+      ],
+      "maxSize": 128,
+      "group": "garden",
+      "icons": [],
+      "sourceSize": [
+        278,
+        322
+      ],
+      "size": [
+        111,
+        128
+      ],
+      "bytes": 6854,
+      "url": "/assets/images/ui/v1/rank-medal.webp",
+      "sha256": "5eca532e5aac3314494380f9173e4a21eb2a0ac37f45e954defd7e66d73fb74b"
+    },
+    {
+      "name": "control-thumb",
+      "source": "garden-v1.png",
+      "rect": [
+        630,
+        945,
+        875,
+        1180
+      ],
+      "maxSize": 96,
+      "group": "garden",
+      "icons": [],
+      "sourceSize": [
+        245,
+        231
+      ],
+      "size": [
+        96,
+        91
+      ],
+      "bytes": 3318,
+      "url": "/assets/images/ui/v1/control-thumb.webp",
+      "sha256": "970afe8c5128a8452904d1b2c6aa962afada835031a310b13939b40a904cd008"
+    },
+    {
+      "name": "garden-tray",
+      "source": "garden-v1.png",
+      "rect": [
+        878,
+        995,
+        1254,
+        1150
+      ],
+      "maxSize": 320,
+      "group": "garden",
+      "icons": [],
+      "sourceSize": [
+        361,
+        154
+      ],
+      "size": [
+        320,
+        137
+      ],
+      "bytes": 11118,
+      "url": "/assets/images/ui/v1/garden-tray.webp",
+      "sha256": "5afc8901ad0604ac9752a72588400499227d5fe3997f26d84f5a38d06f25ee4f"
+    },
+    {
+      "name": "reward-panel",
+      "source": "reward-v1.png",
+      "rect": [
+        10,
+        65,
+        325,
+        360
+      ],
+      "maxSize": 420,
+      "group": "reward",
+      "icons": [],
+      "sourceSize": [
+        310,
+        285
+      ],
+      "size": [
+        310,
+        285
+      ],
+      "bytes": 15850,
+      "url": "/assets/images/ui/v1/reward-panel.webp",
+      "sha256": "0fa92570698612266b1cca6173d07ab1ef75b136d0f397d948f9521bb59123bc"
+    },
+    {
+      "name": "reward-paper",
+      "source": "reward-v1.png",
+      "rect": [
+        326,
+        80,
+        594,
+        345
+      ],
+      "maxSize": 320,
+      "group": "reward",
+      "icons": [],
+      "sourceSize": [
+        261,
+        246
+      ],
+      "size": [
+        261,
+        246
+      ],
+      "bytes": 10820,
+      "url": "/assets/images/ui/v1/reward-paper.webp",
+      "sha256": "4053c921500f05772ed25df01c3cdd12e87e850698763ad797320c589ff612b5"
+    },
+    {
+      "name": "reward-title",
+      "source": "reward-v1.png",
+      "rect": [
+        594,
+        135,
+        965,
+        300
+      ],
+      "maxSize": 420,
+      "group": "reward",
+      "icons": [],
+      "sourceSize": [
+        371,
+        157
+      ],
+      "size": [
+        371,
+        157
+      ],
+      "bytes": 16376,
+      "url": "/assets/images/ui/v1/reward-title.webp",
+      "sha256": "265855ebb547b3914490e0608291d8f7814ebbacbd2e8d8a2d38cd4057157f51"
+    },
+    {
+      "name": "reward-well",
+      "source": "reward-v1.png",
+      "rect": [
+        965,
+        155,
+        1254,
+        300
+      ],
+      "maxSize": 320,
+      "group": "reward",
+      "icons": [],
+      "sourceSize": [
+        275,
+        133
+      ],
+      "size": [
+        275,
+        133
+      ],
+      "bytes": 7426,
+      "url": "/assets/images/ui/v1/reward-well.webp",
+      "sha256": "8bff76779d5798e8f40b03710ae78a3637085e98cd77c03d6c784d74f073016d"
+    },
+    {
+      "name": "reward-orange",
+      "source": "reward-v1.png",
+      "rect": [
+        10,
+        398,
+        324,
+        555
+      ],
+      "maxSize": 320,
+      "group": "reward",
+      "icons": [],
+      "sourceSize": [
+        310,
+        144
+      ],
+      "size": [
+        310,
+        144
+      ],
+      "bytes": 9520,
+      "url": "/assets/images/ui/v1/reward-orange.webp",
+      "sha256": "616c6a02512354b3378b406283a786e872afab84b2f7e407f0bdcaf7bff29be4"
+    },
+    {
+      "name": "reward-green",
+      "source": "reward-v1.png",
+      "rect": [
+        325,
+        398,
+        628,
+        555
+      ],
+      "maxSize": 320,
+      "group": "reward",
+      "icons": [],
+      "sourceSize": [
+        303,
+        149
+      ],
+      "size": [
+        303,
+        149
+      ],
+      "bytes": 10422,
+      "url": "/assets/images/ui/v1/reward-green.webp",
+      "sha256": "5d53ef5e978ac58bc992e30b24ccff29c4c25dacc6e23705c6a21da19efdfe4b"
+    },
+    {
+      "name": "reward-secondary",
+      "source": "reward-v1.png",
+      "rect": [
+        628,
+        398,
+        942,
+        555
+      ],
+      "maxSize": 320,
+      "group": "reward",
+      "icons": [],
+      "sourceSize": [
+        314,
+        141
+      ],
+      "size": [
+        314,
+        141
+      ],
+      "bytes": 8328,
+      "url": "/assets/images/ui/v1/reward-secondary.webp",
+      "sha256": "d1681fbbb745dc1bad7791f138ad09c057999ce0a650c4907092e734a16c0be3"
+    },
+    {
+      "name": "reward-disabled",
+      "source": "reward-v1.png",
+      "rect": [
+        942,
+        398,
+        1254,
+        555
+      ],
+      "maxSize": 320,
+      "group": "reward",
+      "icons": [],
+      "sourceSize": [
+        298,
+        142
+      ],
+      "size": [
+        298,
+        142
+      ],
+      "bytes": 7292,
+      "url": "/assets/images/ui/v1/reward-disabled.webp",
+      "sha256": "a7c6572106e115bafc3ff6b787fa705fc05ad2d1d25a773bb6050fd884ae9211"
+    },
+    {
+      "name": "star",
+      "source": "reward-v1.png",
+      "rect": [
+        25,
+        588,
+        310,
+        870
+      ],
+      "maxSize": 192,
+      "group": "reward",
+      "icons": [
+        "star"
+      ],
+      "sourceSize": [
+        264,
+        254
+      ],
+      "size": [
+        192,
+        185
+      ],
+      "bytes": 10322,
+      "url": "/assets/images/ui/v1/star.webp",
+      "sha256": "7c30bfd5fb597699e6e68e94eb6ce65c1646e26689b476ead0a8ff85be5ea7bb"
+    },
+    {
+      "name": "star-empty",
+      "source": "reward-v1.png",
+      "rect": [
+        330,
+        588,
+        628,
+        870
+      ],
+      "maxSize": 192,
+      "group": "reward",
+      "icons": [
+        "star-empty"
+      ],
+      "sourceSize": [
+        270,
+        253
+      ],
+      "size": [
+        192,
+        180
+      ],
+      "bytes": 9382,
+      "url": "/assets/images/ui/v1/star-empty.webp",
+      "sha256": "d241dfc03b4b60be36be6c7d1c7318afeafda8cb3e000876a072fce4adfaf003"
+    },
+    {
+      "name": "coin",
+      "source": "reward-v1.png",
+      "rect": [
+        640,
+        590,
+        925,
+        880
+      ],
+      "maxSize": 144,
+      "group": "reward",
+      "icons": [
+        "coin"
+      ],
+      "sourceSize": [
+        260,
+        258
+      ],
+      "size": [
+        144,
+        143
+      ],
+      "bytes": 7336,
+      "url": "/assets/images/ui/v1/coin.webp",
+      "sha256": "518554b2388b14b7b1e17e995dc65eff0b190e7a206f057998d633b44d16f2dc"
+    },
+    {
+      "name": "timer",
+      "source": "reward-v1.png",
+      "rect": [
+        953,
+        580,
+        1254,
+        880
+      ],
+      "maxSize": 144,
+      "group": "reward",
+      "icons": [
+        "timer",
+        "hourglass"
+      ],
+      "sourceSize": [
+        240,
+        274
+      ],
+      "size": [
+        126,
+        144
+      ],
+      "bytes": 6922,
+      "url": "/assets/images/ui/v1/timer.webp",
+      "sha256": "b6d45125c359bf6a135fd2641802b8d92a2de7c0f475002536ec4f06cc78fb28"
+    },
+    {
+      "name": "chest-closed",
+      "source": "reward-v1.png",
+      "rect": [
+        5,
+        895,
+        324,
+        1190
+      ],
+      "maxSize": 192,
+      "group": "reward",
+      "icons": [
+        "chest"
+      ],
+      "sourceSize": [
+        311,
+        266
+      ],
+      "size": [
+        192,
+        164
+      ],
+      "bytes": 12654,
+      "url": "/assets/images/ui/v1/chest-closed.webp",
+      "sha256": "61d0fdb59c6e6a9b870ab62a23e61c73be4124d8e18a7dfa82ffd3e78725972c"
+    },
+    {
+      "name": "chest-open",
+      "source": "reward-v1.png",
+      "rect": [
+        325,
+        875,
+        630,
+        1190
+      ],
+      "maxSize": 192,
+      "group": "reward",
+      "icons": [
+        "chest-open"
+      ],
+      "sourceSize": [
+        305,
+        308
+      ],
+      "size": [
+        190,
+        192
+      ],
+      "bytes": 15000,
+      "url": "/assets/images/ui/v1/chest-open.webp",
+      "sha256": "c10fbad5a03c5815286421153a3d5bfa5a673c21b4522e8b27c188140d584cc6"
+    },
+    {
+      "name": "reward-trophy",
+      "source": "reward-v1.png",
+      "rect": [
+        632,
+        900,
+        942,
+        1190
+      ],
+      "maxSize": 144,
+      "group": "reward",
+      "icons": [],
+      "sourceSize": [
+        299,
+        285
+      ],
+      "size": [
+        144,
+        137
+      ],
+      "bytes": 10738,
+      "url": "/assets/images/ui/v1/reward-trophy.webp",
+      "sha256": "681d711ea4798ec4bb8a770f307c98f7931aeb9dd371b7c7d0fa152f65e4a37d"
+    },
+    {
+      "name": "gift",
+      "source": "reward-v1.png",
+      "rect": [
+        945,
+        895,
+        1254,
+        1190
+      ],
+      "maxSize": 144,
+      "group": "reward",
+      "icons": [
+        "celebrate"
+      ],
+      "sourceSize": [
+        278,
+        280
+      ],
+      "size": [
+        143,
+        144
+      ],
+      "bytes": 7802,
+      "url": "/assets/images/ui/v1/gift.webp",
+      "sha256": "f537752cb02e2a3a3c909c365d966e0a3b08eae1ca248c9b31f685c82d854c11"
+    },
+    {
+      "name": "icon-home",
+      "source": "icons-v1.png",
+      "rect": [
+        0,
+        180,
+        210,
+        400
+      ],
+      "maxSize": 128,
+      "group": "icons",
+      "icons": [
+        "home"
+      ],
+      "sourceSize": [
+        165,
+        169
+      ],
+      "size": [
+        125,
+        128
+      ],
+      "bytes": 9098,
+      "url": "/assets/images/ui/v1/icon-home.webp",
+      "sha256": "4cf0c730019442c8b2d429c9d82faf4bf5524cbeea1c5341fc07bccacdd038df"
+    },
+    {
+      "name": "icon-shop",
+      "source": "icons-v1.png",
+      "rect": [
+        210,
+        180,
+        420,
+        400
+      ],
+      "maxSize": 128,
+      "group": "icons",
+      "icons": [
+        "shop"
+      ],
+      "sourceSize": [
+        169,
+        148
+      ],
+      "size": [
+        128,
+        112
+      ],
+      "bytes": 7942,
+      "url": "/assets/images/ui/v1/icon-shop.webp",
+      "sha256": "0c219aac0fd0dd1978bb19eb6bc3dffdaf231524b55ac001de321c1558528b6c"
+    },
+    {
+      "name": "icon-collection",
+      "source": "icons-v1.png",
+      "rect": [
+        420,
+        180,
+        630,
+        400
+      ],
+      "maxSize": 128,
+      "group": "icons",
+      "icons": [
+        "collection"
+      ],
+      "sourceSize": [
+        174,
+        147
+      ],
+      "size": [
+        128,
+        108
+      ],
+      "bytes": 7180,
+      "url": "/assets/images/ui/v1/icon-collection.webp",
+      "sha256": "b2aca1b8c3ff0570c71ce69d09a7f36a770cccadba5d1740f3dbc6342521cc6d"
+    },
+    {
+      "name": "icon-map",
+      "source": "icons-v1.png",
+      "rect": [
+        630,
+        180,
+        840,
+        400
+      ],
+      "maxSize": 128,
+      "group": "icons",
+      "icons": [
+        "map"
+      ],
+      "sourceSize": [
+        198,
+        192
+      ],
+      "size": [
+        128,
+        124
+      ],
+      "bytes": 5986,
+      "url": "/assets/images/ui/v1/icon-map.webp",
+      "sha256": "31d22274e9740ee9ae897ead80ebc3c82cf2d1a32e023da77ca180e53df490e7"
+    },
+    {
+      "name": "icon-trophy",
+      "source": "icons-v1.png",
+      "rect": [
+        840,
+        180,
+        1048,
+        400
+      ],
+      "maxSize": 128,
+      "group": "icons",
+      "icons": [
+        "trophy"
+      ],
+      "sourceSize": [
+        207,
+        193
+      ],
+      "size": [
+        128,
+        119
+      ],
+      "bytes": 6268,
+      "url": "/assets/images/ui/v1/icon-trophy.webp",
+      "sha256": "d4683da8fa781140a2b510fe39f6d8d63735c7883cdae0483ff63c98027018c1"
+    },
+    {
+      "name": "icon-settings",
+      "source": "icons-v1.png",
+      "rect": [
+        1048,
+        180,
+        1254,
+        400
+      ],
+      "maxSize": 128,
+      "group": "icons",
+      "icons": [
+        "settings"
+      ],
+      "sourceSize": [
+        152,
+        219
+      ],
+      "size": [
+        89,
+        128
+      ],
+      "bytes": 4908,
+      "url": "/assets/images/ui/v1/icon-settings.webp",
+      "sha256": "2cee0800cc6d7a455c526743203bf1f220a6586938ab43c88dd6c271394c79ed"
+    },
+    {
+      "name": "icon-account",
+      "source": "icons-v1.png",
+      "rect": [
+        0,
+        450,
+        210,
+        675
+      ],
+      "maxSize": 128,
+      "group": "icons",
+      "icons": [
+        "account"
+      ],
+      "sourceSize": [
+        162,
+        207
+      ],
+      "size": [
+        100,
+        128
+      ],
+      "bytes": 4622,
+      "url": "/assets/images/ui/v1/icon-account.webp",
+      "sha256": "5bda062930f9a8b2c33ad5460a5468bbeea47ebb782ae5a27931423e44045145"
+    },
+    {
+      "name": "icon-missions",
+      "source": "icons-v1.png",
+      "rect": [
+        210,
+        450,
+        420,
+        675
+      ],
+      "maxSize": 128,
+      "group": "icons",
+      "icons": [
+        "missions"
+      ],
+      "sourceSize": [
+        179,
+        196
+      ],
+      "size": [
+        117,
+        128
+      ],
+      "bytes": 6400,
+      "url": "/assets/images/ui/v1/icon-missions.webp",
+      "sha256": "8f34b20d8d9e3ee3adf8447a1100a207784863badc1707ed21d80658a66874c7"
+    },
+    {
+      "name": "icon-events",
+      "source": "icons-v1.png",
+      "rect": [
+        420,
+        450,
+        630,
+        675
+      ],
+      "maxSize": 128,
+      "group": "icons",
+      "icons": [
+        "events"
+      ],
+      "sourceSize": [
+        166,
+        191
+      ],
+      "size": [
+        111,
+        128
+      ],
+      "bytes": 5130,
+      "url": "/assets/images/ui/v1/icon-events.webp",
+      "sha256": "81bc21b450bc8a7acf78e9baa94f2d3161de0d5b3ac27a8c53d40629a2b65a44"
+    },
+    {
+      "name": "icon-info",
+      "source": "icons-v1.png",
+      "rect": [
+        630,
+        450,
+        840,
+        675
+      ],
+      "maxSize": 128,
+      "group": "icons",
+      "icons": [
+        "info"
+      ],
+      "sourceSize": [
+        176,
+        209
+      ],
+      "size": [
+        108,
+        128
+      ],
+      "bytes": 5360,
+      "url": "/assets/images/ui/v1/icon-info.webp",
+      "sha256": "f25c348770cd2e74c54698f70c4876de0f2376f1180268bc1136cc44fe129344"
+    },
+    {
+      "name": "icon-play",
+      "source": "icons-v1.png",
+      "rect": [
+        840,
+        450,
+        1048,
+        675
+      ],
+      "maxSize": 128,
+      "group": "icons",
+      "icons": [
+        "play"
+      ],
+      "sourceSize": [
+        172,
+        195
+      ],
+      "size": [
+        113,
+        128
+      ],
+      "bytes": 4008,
+      "url": "/assets/images/ui/v1/icon-play.webp",
+      "sha256": "4e0a0a0f99baed079e68bd11a7d0096c1bf7b52394d4efbf73ddab076355a0ef"
+    },
+    {
+      "name": "icon-restart",
+      "source": "icons-v1.png",
+      "rect": [
+        1048,
+        450,
+        1254,
+        675
+      ],
+      "maxSize": 128,
+      "group": "icons",
+      "icons": [
+        "restart"
+      ],
+      "sourceSize": [
+        166,
+        193
+      ],
+      "size": [
+        110,
+        128
+      ],
+      "bytes": 6174,
+      "url": "/assets/images/ui/v1/icon-restart.webp",
+      "sha256": "8ed379dd946515b52d9c5e11dc7069ecc0fa9f06e19e3936457537e99ed97a1b"
+    },
+    {
+      "name": "icon-search",
+      "source": "icons-v1.png",
+      "rect": [
+        0,
+        735,
+        210,
+        945
+      ],
+      "maxSize": 128,
+      "group": "icons",
+      "icons": [
+        "search"
+      ],
+      "sourceSize": [
+        161,
+        194
+      ],
+      "size": [
+        106,
+        128
+      ],
+      "bytes": 5492,
+      "url": "/assets/images/ui/v1/icon-search.webp",
+      "sha256": "f696771cf23a841a639df59642502b93ce67676d83df2fb9ff55f8d27dfc7d29"
+    },
+    {
+      "name": "icon-shuffle",
+      "source": "icons-v1.png",
+      "rect": [
+        210,
+        735,
+        420,
+        945
+      ],
+      "maxSize": 128,
+      "group": "icons",
+      "icons": [
+        "shuffle"
+      ],
+      "sourceSize": [
+        174,
+        174
+      ],
+      "size": [
+        128,
+        128
+      ],
+      "bytes": 7494,
+      "url": "/assets/images/ui/v1/icon-shuffle.webp",
+      "sha256": "6373d71e1dda24dd49dbdcf0bec0387878995f1cd85700c22d6c2350c28caab4"
+    },
+    {
+      "name": "icon-snowflake",
+      "source": "icons-v1.png",
+      "rect": [
+        420,
+        735,
+        630,
+        945
+      ],
+      "maxSize": 128,
+      "group": "icons",
+      "icons": [
+        "snowflake"
+      ],
+      "sourceSize": [
+        176,
+        201
+      ],
+      "size": [
+        112,
+        128
+      ],
+      "bytes": 6398,
+      "url": "/assets/images/ui/v1/icon-snowflake.webp",
+      "sha256": "68eff342fe2086aa0f346e42203ddc04e3deb08729a73b300658969cad2adf3f"
+    },
+    {
+      "name": "icon-freeze",
+      "source": "icons-v1.png",
+      "rect": [
+        630,
+        735,
+        840,
+        945
+      ],
+      "maxSize": 128,
+      "group": "icons",
+      "icons": [
+        "freeze"
+      ],
+      "sourceSize": [
+        196,
+        196
+      ],
+      "size": [
+        128,
+        128
+      ],
+      "bytes": 7962,
+      "url": "/assets/images/ui/v1/icon-freeze.webp",
+      "sha256": "260455d35669839ab1d25116b4d058446bf127564267747287aeada03ddd8c11"
+    },
+    {
+      "name": "icon-eye",
+      "source": "icons-v1.png",
+      "rect": [
+        840,
+        735,
+        1048,
+        945
+      ],
+      "maxSize": 128,
+      "group": "icons",
+      "icons": [
+        "eye"
+      ],
+      "sourceSize": [
+        192,
+        210
+      ],
+      "size": [
+        117,
+        128
+      ],
+      "bytes": 3894,
+      "url": "/assets/images/ui/v1/icon-eye.webp",
+      "sha256": "bf5eda68b15aa5341a439ee40500db66bc50b5200ddd8fecd1ee46b5b798a960"
+    },
+    {
+      "name": "icon-undo",
+      "source": "icons-v1.png",
+      "rect": [
+        1048,
+        735,
+        1254,
+        945
+      ],
+      "maxSize": 128,
+      "group": "icons",
+      "icons": [
+        "undo"
+      ],
+      "sourceSize": [
+        172,
+        183
+      ],
+      "size": [
+        120,
+        128
+      ],
+      "bytes": 4952,
+      "url": "/assets/images/ui/v1/icon-undo.webp",
+      "sha256": "81251f9b267a8dcf654106ffb5ff1a7acf3c0e6fc46425bcbefd6f756af834a9"
+    },
+    {
+      "name": "icon-expand",
+      "source": "icons-v1.png",
+      "rect": [
+        0,
+        990,
+        210,
+        1200
+      ],
+      "maxSize": 128,
+      "group": "icons",
+      "icons": [
+        "expand"
+      ],
+      "sourceSize": [
+        168,
+        186
+      ],
+      "size": [
+        116,
+        128
+      ],
+      "bytes": 5644,
+      "url": "/assets/images/ui/v1/icon-expand.webp",
+      "sha256": "357aa58150e0e663d645488a3e58b0153eaf2eedf594c648269490920ea206f2"
+    },
+    {
+      "name": "icon-wand",
+      "source": "icons-v1.png",
+      "rect": [
+        210,
+        990,
+        420,
+        1200
+      ],
+      "maxSize": 128,
+      "group": "icons",
+      "icons": [
+        "wand"
+      ],
+      "sourceSize": [
+        204,
+        190
+      ],
+      "size": [
+        128,
+        119
+      ],
+      "bytes": 6560,
+      "url": "/assets/images/ui/v1/icon-wand.webp",
+      "sha256": "f2dc6f060e6d9b8e2a027815edd4f123f1784bedf9b5bc6e8937ae60955a9fa4"
+    },
+    {
+      "name": "icon-exit",
+      "source": "icons-v1.png",
+      "rect": [
+        420,
+        990,
+        630,
+        1200
+      ],
+      "maxSize": 128,
+      "group": "icons",
+      "icons": [
+        "exit"
+      ],
+      "sourceSize": [
+        184,
+        184
+      ],
+      "size": [
+        128,
+        128
+      ],
+      "bytes": 6320,
+      "url": "/assets/images/ui/v1/icon-exit.webp",
+      "sha256": "39e1c11ef2a21bc967e6571eeeaed00881cc113a24ef7042493037cdbb7d1fb5"
+    },
+    {
+      "name": "icon-arrow-right",
+      "source": "icons-v1.png",
+      "rect": [
+        630,
+        990,
+        840,
+        1200
+      ],
+      "maxSize": 128,
+      "group": "icons",
+      "icons": [
+        "arrow-right"
+      ],
+      "sourceSize": [
+        190,
+        172
+      ],
+      "size": [
+        128,
+        116
+      ],
+      "bytes": 3704,
+      "url": "/assets/images/ui/v1/icon-arrow-right.webp",
+      "sha256": "92daccfe7fdda2736049ebc6a41bf523ae35043fe6ccd2a6b11ea97fff555e7d"
+    },
+    {
+      "name": "icon-book",
+      "source": "icons-v1.png",
+      "rect": [
+        840,
+        990,
+        1048,
+        1200
+      ],
+      "maxSize": 128,
+      "group": "icons",
+      "icons": [
+        "book"
+      ],
+      "sourceSize": [
+        196,
+        184
+      ],
+      "size": [
+        128,
+        120
+      ],
+      "bytes": 5908,
+      "url": "/assets/images/ui/v1/icon-book.webp",
+      "sha256": "306d56946a51ee0ea13145346feb8ce551973997b532c941df848f4c446229d1"
+    },
+    {
+      "name": "icon-energy",
+      "source": "icons-v1.png",
+      "rect": [
+        1048,
+        990,
+        1254,
+        1200
+      ],
+      "maxSize": 128,
+      "group": "icons",
+      "icons": [
+        "energy"
+      ],
+      "sourceSize": [
+        188,
+        204
+      ],
+      "size": [
+        118,
+        128
+      ],
+      "bytes": 4216,
+      "url": "/assets/images/ui/v1/icon-energy.webp",
+      "sha256": "ffcf8a4df8e8791943e61370deef7f68a5f8e6b95adc47cdc0f43a5cbdadc6bc"
+    }
+  ]
+}
