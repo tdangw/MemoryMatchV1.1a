@@ -1,5 +1,11 @@
 # Kết quả kiểm tra quảng cáo và APK — 16–18/10/2026
 
+## Cập nhật19/10 — APK cuối sau nâng cấp bộ hình
+
+UI3trò dùng chung56WebP cho popup/tab/shop/HUD; thắng3hàng Xu/Thời gian/Điểm, nhãn cong đủ999, nút cân đối và pause3nút dọc. Check/ads15, review cuối9, buildweb/AndroidAPK và production3/3 đạt; chỉ tạo một APK cuối. Chi tiết/ảnh/giới hạn: `docs/design/ui-images/QA.md`.
+
+APK hiện hành34778408bytes, SHA256 `386020C6A1BE5CDEB2532A148798DBD971FFE506E660BE6C5622BFC0B2BAA897`; packagecom.memorymatch.adventure/version1.0/min24/target36, chữ ký debugv2 hợp lệ,56ảnh đã đối chiếu hash trong gói. Giữ phạm vi native/child protection/consent; chưa QA thiết bị hoặc quảng cáo thật, không deploy/publish. Các mục sau là lịch sử.
+
 ## Cập nhật18/10 — giữ banner và thanh đóng băng đầy ngay
 
 Popup thường, đầu màn, thắng và cảnh hoàn thành chặng giữ banner/chừa đúng vùng; ngoại lệ quyền riêng tư/bản lưu/lỗi lưu vẫn chặn. Banner web5thẻ/3hoa; Link bar2px vàng sát mép, dùng mới/chồng đầy ngay rồi giảm. Android gameplay vẫn tắt. Kế hoạch7bộ hình cho cả ba trò đã chuẩn bị, chưa sinh ảnh. Review cuối không finding, check(ads15/15), buildweb/AndroidAPK và production smoke2/2 đạt; chi tiết `docs/design/ui-image-upgrade/QA.md`.

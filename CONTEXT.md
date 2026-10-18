@@ -1,4 +1,4 @@
-# CONTEXT — Trạng thái hiện tại (2026-10-18)
+# CONTEXT — Trạng thái hiện tại (2026-10-19)
 
 Đọc file này khi bắt đầu task mới. Đây là snapshot điều hướng, không thay thế code/config và không chứa lịch sử triển khai chi tiết.
 
@@ -6,7 +6,7 @@ Người dùng đã chọn tự xuất bản website và thông điệp AdMob ng
 
 ## Sản phẩm
 
-- Hiện hành18/10: `UI_IMAGE_UPGRADE_PLAN.md` D–G đã được giao triển khai toàn bộ bộ hình, sau khi A–C chuẩn bị hoàn tất. Đang tạo master Vườn đêm/gỗ giấy/icon theo7nhóm và sẽ gắn toàn bộ popup/tab/shop/HUD3trò, giữ luật/save/API. Chỉ APK cuối toàn task; quy định tần suất/báo cáo đã lưu AGENTS.md mục13. Không deploy. Thay đổi sẵn8PNG app-tabs và .vscode giữ nguyên.
+- Hoàn tất19/10: `UI_IMAGE_UPGRADE_PLAN.md` D–G — 3master/56WebP dùng chung cho popup/tab/shop/HUD3trò, giữ nền/tranh/cảnh hoa; summary3hàng Xu/Thời gian/Điểm, nhãn cong đủ999, nút gọn, pause3nút dọc + Cài đặt ở header. Fallback mất ảnh dùng SVG và nền dễ đọc, BASE_URL đúng. Matrix110, target19/13, nghiệm thuart5, review26+9, check(ads15), buildGH+base1, web+production3 và đúng1lần APK cuối đều đạt. QA/receipt: `docs/design/ui-images/QA.md`. Không còn gate UI active; chưa kiểm máy thật/quảng cáo thật, không deploy/publish; giữ save/API/catalog. 8PNG app-tabs và .vscode có sẵn giữ nguyên.
 
 - Hoàn tất18/10: `UI_IMAGE_UPGRADE_PLAN.md` A–C — kế hoạch7bộ hình đồng bộ toàn bộ popup/tab/shop/HUD ba trò, hướng Vườn đêm + thắng/thưởng gỗ giấy; chưa tạo/tích hợp sheet. Code: bar đóng băng2px vàng sát mép, snap đầy ngay khi dùng/chồng rồi giảm; banner5thẻ/3hoa; popup thường/intro/cảnh hoàn thành chặng giữ banner và chừa đúng vùng. Review nguồn/lifecycle và refill/chapter cuối đạt; check(ads15/15), buildweb/AndroidAPK, production2/2 đạt. QA/receipt/ảnh: `docs/design/ui-image-upgrade/QA.md`. Không còn gate code active; giữ save/catalog/API tương thích, Android gameplay vẫn tắt, không deploy/publish.
 

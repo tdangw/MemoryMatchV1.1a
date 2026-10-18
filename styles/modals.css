@@ -1211,6 +1211,7 @@ body.game-is-paused .shooting-star {
 .app-modal[data-ui-surface] .app-modal__footer { justify-items: center; }
 .app-modal[data-ui-surface] .app-modal__footer .app-button { width: fit-content; max-width: 100%; min-width: min(156px, 100%); min-height: 54px; padding: 12px 22px; }
 #level-summary-modal .level-summary-modal .app-modal__footer { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; padding: 12px 28px 24px; }
+#level-summary-modal .level-summary-modal--victory .app-modal__footer { grid-template-columns: 1fr; }
 #level-summary-modal .app-modal__footer .app-button { min-width: 0; width: min(150px, 100%); min-height: 56px; padding-inline: 14px; }
 #game-exit-modal .app-modal__footer { grid-template-columns: minmax(0, 208px); justify-content: center; gap: 12px; padding: 16px 28px 26px; }
 #game-exit-modal .app-modal__footer .app-button { grid-column: auto; width: 100%; min-height: 56px; }

@@ -29,6 +29,11 @@ test('built mobile menu, map and account open without writing to production serv
   page.on('pageerror', error => errors.push(error.message));
   await page.goto('/');
   await expect(page.locator('.game-selector__choice')).toHaveCount(3);
+  const paintedIcon = page.locator('.adventure-dock svg image').first();
+  const iconUrl = await paintedIcon.getAttribute('href');
+  const iconResponse = await page.request.get(iconUrl);
+  expect(iconResponse.ok()).toBe(true);
+  expect(iconResponse.headers()['content-type']).toContain('image/webp');
   await expect(page.locator('.menu-ad-preview')).toHaveCount(1);
   await expect(page.locator('.menu-ad-preview')).toHaveText('');
   await expect(page.locator('.ad-art-card')).toHaveCount(5);

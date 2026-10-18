@@ -1,0 +1,82 @@
+{
+  "viewport": "412x915",
+  "framesPerSample": 119,
+  "scenario": "Home with existing animated banner, static image chrome on/off; desktop Chrome",
+  "loaded": [
+    {
+      "url": "/assets/images/ui/v1/garden-panel.webp",
+      "bytes": 17136
+    },
+    {
+      "url": "/assets/images/ui/v1/icon-wand.webp",
+      "bytes": 6560
+    },
+    {
+      "url": "/assets/images/ui/v1/icon-search.webp",
+      "bytes": 5492
+    },
+    {
+      "url": "/assets/images/ui/v1/timer.webp",
+      "bytes": 6922
+    },
+    {
+      "url": "/assets/images/ui/v1/icon-eye.webp",
+      "bytes": 3894
+    },
+    {
+      "url": "/assets/images/ui/v1/star.webp",
+      "bytes": 10322
+    },
+    {
+      "url": "/assets/images/ui/v1/coin.webp",
+      "bytes": 7336
+    },
+    {
+      "url": "/assets/images/ui/v1/icon-book.webp",
+      "bytes": 5908
+    },
+    {
+      "url": "/assets/images/ui/v1/icon-info.webp",
+      "bytes": 5360
+    },
+    {
+      "url": "/assets/images/ui/v1/icon-settings.webp",
+      "bytes": 4908
+    },
+    {
+      "url": "/assets/images/ui/v1/garden-inset.webp",
+      "bytes": 17062
+    },
+    {
+      "url": "/assets/images/ui/v1/icon-missions.webp",
+      "bytes": 6400
+    },
+    {
+      "url": "/assets/images/ui/v1/icon-events.webp",
+      "bytes": 5130
+    },
+    {
+      "url": "/assets/images/ui/v1/icon-account.webp",
+      "bytes": 4622
+    },
+    {
+      "url": "/assets/images/ui/v1/icon-trophy.webp",
+      "bytes": 6268
+    },
+    {
+      "url": "/assets/images/ui/v1/icon-arrow-right.webp",
+      "bytes": 3704
+    }
+  ],
+  "loadedBytes": 117024,
+  "artOn": {
+    "meanMs": 7.003361344537814,
+    "p95Ms": 7,
+    "maximumMs": 13.900000000000091
+  },
+  "artOff": {
+    "meanMs": 6.9445378151260515,
+    "p95Ms": 7.099999999999909,
+    "maximumMs": 7.200000000000273
+  }
+}

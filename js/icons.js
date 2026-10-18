@@ -82,10 +82,13 @@ export function createIcon(name) {
   const artwork = UI_ART_ICONS[name];
   if (artwork) {
     const image = document.createElementNS(SVG_NS, 'image');
-    image.setAttribute('href', `${import.meta.env.BASE_URL}${artwork.replace(/^\//, '')}`);
+    image.setAttribute('href', `${import.meta.env?.BASE_URL || '/'}${artwork.replace(/^\//, '')}`);
     image.setAttribute('width', '24');
     image.setAttribute('height', '24');
     image.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+    image.addEventListener('error', () => {
+      svg.innerHTML = ICON_PATHS[name === 'star-empty' ? 'star' : name] || ICON_PATHS.info;
+    }, { once: true });
     svg.dataset.uiArt = name;
     svg.append(image);
   } else svg.innerHTML = ICON_PATHS[name] || ICON_PATHS.info;

@@ -7,7 +7,7 @@ Người dùng đã giao thực hiện toàn bộ lộ trình ảnh bên dưới
 - [x] D — Tạo ảnh nguồn đủ nét, xuất khung/nút/biểu tượng theo bảy nhóm; kiểm alpha, biên co giãn và ngân sách. Gom theo chất liệu/vòng đời thành các master sheet Vườn đêm, gỗ/giấy và biểu tượng; các nhóm dùng lại ảnh thay vì nhân bản sheet gần giống.
 - [x] E — Gắn khung/nút/biểu tượng cho mọi popup thao tác, đầu màn/chọn màn/công cụ và thắng/thưởng của ba trò; chữ/số/vùng chạm vẫn thật, không đổi luồng.
 - [x] F — Đồng bộ cửa hàng/bộ sưu tập/tab/điều hướng/HUD và cảnh kết thúc chặng; giữ nền/trang trí phù hợp hiện có. Kiểm kê mọi thành phần và ghi rõ sử dụng ảnh mới/giữ nguồn đã có.
-- [ ] G — Kiểm ảnh thật412/844/1024, tương tác/focus/lifecycle/reduced-motion/save, đo tải/frame, review độc lập, check/build web và APK cuối; commit từng phase.
+- [x] G — Kiểm ảnh thật412/844/1024, tương tác/focus/lifecycle/reduced-motion/save, đo tải/frame, review độc lập, check/build web và APK cuối; commit từng phase.
 
 Bổ sung đã chốt: popup thắng chỉ ba hàng Xu nhận, Thời gian, Điểm; tiêu đề cong theo dải đỏ và đủ màn999. Nút thao tác gọn, cao vừa tay; tạm dừng có ba hành động dọc (Tiếp tục, Chơi lại/Lượt mới, Thoát game), Cài đặt giữ bằng nút hình ở đầu khung. Không đổi số thưởng/cách tính điểm hay dữ liệu lưu.
 
@@ -105,3 +105,5 @@ Phản hồi bổ sung: thanh đóng băng phải đầy ngay khi dùng và khi 
 - [x] Ghi bằng chứng và giới hạn kiểm chứng; kết thúc kế hoạch hiện hành. Lộ trình bộ hình ở trên vẫn là phần chuẩn bị.
 
 Nghiệm thu A–C hoàn tất: xem `docs/design/ui-image-upgrade/QA.md`. Kế hoạch này không còn gate triển khai active; phần bộ hình là lộ trình chuẩn bị, chưa tạo hoặc tích hợp ảnh mới.
+
+Hoàn tất19/10/2026: D–G đạt; bằng chứng, ảnh và biên nhận APK trong `docs/design/ui-images/QA.md`. Chỉ một lần tạo APK cuối, không deploy. Các mục A–C bên dưới là hồ sơ chuẩn bị trước đợt sản xuất ảnh.
