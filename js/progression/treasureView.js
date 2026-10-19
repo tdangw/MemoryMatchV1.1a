@@ -26,7 +26,7 @@ export function renderTreasureContent(content, view, { selected = view.activeTie
   }
   const detail = element('section','treasure-detail'); detail.dataset.selectedTier = selected;
   const hero = element('div','treasure-hero');
-  hero.append(createTreasureArt(selected, phase === 'success' || chest.state === 'claimed'));
+  hero.append(createTreasureArt(selected, phase === 'success' || phase !== 'opening' && chest.state === 'claimed'));
   const heading = element('h3','',chest.name);
   const progress = element('progress','treasure-progress'); progress.max = 100; progress.value = chest.exp;
   progress.setAttribute('aria-label', `${chest.name}: ${chest.exp}/100 kinh nghiệm`);
@@ -37,6 +37,7 @@ export function renderTreasureContent(content, view, { selected = view.activeTie
     : chest.state === 'waiting' ? `Đã đủ kinh nghiệm. Mở ${chest.previousName} trước.`
     : chest.state === 'ready' ? `${chest.name} đã sẵn sàng!`
     : `Còn ${10 - chest.completedLevels} màn ${chest.difficulty} để mở rương.`;
+  if (phase === 'opening') message = 'Đang mở rương…';
   if (phase === 'busy') message = 'Đang nhận thưởng…';
   if (phase === 'success') message = `Bạn đã mở ${chest.name}`;
   if (error) message = error;
@@ -58,6 +59,6 @@ export function renderTreasureContent(content, view, { selected = view.activeTie
   collection.type = 'button'; collection.dataset.treasureAction = 'collection';
   content.className = 'treasure-content'; content.dataset.phase = phase;
   content.replaceChildren(range,cards,detail,collection);
-  if (phase === 'busy') for (const control of content.querySelectorAll('button')) control.disabled = true;
+  if (phase === 'busy' || phase === 'opening') for (const control of content.querySelectorAll('button')) control.disabled = true;
 }
 

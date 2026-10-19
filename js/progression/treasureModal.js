@@ -9,6 +9,7 @@ import { canLaunchGame } from '../profileOperations.js';
 import { createGameShellLifecycle } from '../gameShell/gameShellLifecycle.js';
 import { renderMasteryCollection } from './masteryCollection.js';
 import { projectJourneyTreasure, nextTreasureLevel } from './treasureProjection.js';
+import { presentTreasureOpening } from './treasureAnimation.js';
 import { renderTreasureContent } from './treasureView.js';
 
 /** A single modal owns selection and presentation; only the reward transaction grants inventory. */
@@ -49,7 +50,7 @@ export function openJourneyTreasure({ gameId, block, owner, selectedTier, onClai
   scope.listen(content,'click',event => {
     if (!current()) { modal.destroy(); return; }
     const control=event.target.closest('button');
-    if (!control || control.disabled || phase === 'busy') return;
+    if (!control || control.disabled || (phase === 'busy' || phase === 'opening')) return;
     if (control.dataset.treasureTier) {
       selected=control.dataset.treasureTier;error='';phase='idle';draw();
       content.querySelector(`[data-treasure-tier="${selected}"]`).focus();return;
@@ -60,7 +61,7 @@ export function openJourneyTreasure({ gameId, block, owner, selectedTier, onClai
     if (action==='close') { modal.close(); return; }
     if (action==='next' || action==='previous') { selected=view.activeTier || 'S';error='';phase='idle';draw();return; }
     if (action==='play') {
-      const target=nextTreasureLevel({completed,block,tier:selected,unlockedThrough:profile.adventure?.unlockedThrough});
+      const target=nextTreasureLevel({completed:{...profile.bestByLevel,...completed},block,tier:selected,unlockedThrough:profile.adventure?.unlockedThrough});
       if (target) { modal.destroy(); void onPlay?.(target); } return;
     }
     if (action==='collection') {
@@ -70,9 +71,12 @@ export function openJourneyTreasure({ gameId, block, owner, selectedTier, onClai
       renderMasteryCollection(collection,gameId,{block});return;
     }
     if (action==='claim') void modal.submit(async () => {
+      const tapped=performance.now();
       const requested=selected;phase='busy';error='';draw();
+      modal.panel.dataset.treasureBusyMs=String(performance.now()-tapped);
       try {
         const result=await claimJourneyTreasure(gameId,block,requested);
+        const committed=performance.now();modal.panel.dataset.treasureCommitMs=String(committed-tapped);
         if (!current()) { modal.destroy(); return false; }
         if (!result.ok) {
           phase='idle';
@@ -81,7 +85,16 @@ export function openJourneyTreasure({ gameId, block, owner, selectedTier, onClai
           if(current()) draw();return false;
         }
         if (!await read()) return false;
-        selected=requested;phase='success';draw();onClaimed(result.outcome);
+        selected=requested;phase='opening';draw();onClaimed(result.outcome);
+        // Presentation has its own cancellation path; submit finishes so Close works while it runs.
+        void presentTreasureOpening(content,scope).then(finished => {
+          if (!finished || !current()) { if(scope.active) modal.destroy(); return; }
+          phase='success';draw();
+          modal.panel.dataset.treasurePresentationMs=String(performance.now()-committed);
+          content.querySelector('[data-treasure-action="close"]').focus();
+        }).catch(cause => {
+          if(current()) { phase='success';draw();console.error('Treasure presentation failed',cause.name); }
+        });
       } catch(cause) {
         if (current()) { phase='idle';error='Chưa nhận được thưởng. Hãy thử lại.';draw();console.error('Treasure claim failed',cause.name); }
       }

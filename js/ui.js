@@ -15,7 +15,7 @@ import { clearPersistentGameData } from "./persistence.js";
 import { getTheme } from "./themeCatalog.js";
 import { getEquippedThemeId } from "./appearance.js";
 import { GAME_CONFIG, getStarScoreTargets, getTimerDirection, isEndlessMode } from "./config.js";
-import { getGameModeLabel } from "./gameCatalog.js";
+import { getGameModeLabel, getGameProgressKey } from "./gameCatalog.js";
 import { formatClockTime, UI_COPY } from "./uiCatalog.js";
 import { prefersReducedMotion } from "./motion.js";
 import {
@@ -30,6 +30,8 @@ import { createHudTimerScheduler } from "./gameShell/gameTimerProgress.js";
 
 import { getAppPageScope } from './appPageLifecycle.js';
 import { getProgressionStarTargets } from './progression/gameplayRules.js';
+import { getRankingOwner } from './rankingOwner.js';
+import { treasureDefinition } from './progression/treasureCatalog.js';
 import { waveTotalGroups } from './progression/waveProgress.js';
 let activeIntro = null;
 let activeSummary = null;
@@ -522,8 +524,31 @@ function openLevelSummaryOverlay({
 
   content.append(result, heading, stats);
   if (mastery?.expGained) {
-    const reward = document.createElement('p'); reward.className = 'mastery-win-reward';
-    reward.textContent = `+${mastery.expGained} EXP${mastery.fragmentGained ? ' · +1 mảnh tranh' : ''}`;
+    const rewardProfile = gameState.progress[getGameProgressKey(mastery.gameId)];
+    const rewardOwner = JSON.stringify(getRankingOwner());
+    const reward = document.createElement('section'); reward.className = 'mastery-win-reward';
+    const amount = document.createElement('strong'); amount.textContent = '+' + mastery.expGained + ' kinh nghiệm';
+    reward.append(amount);
+    if (mastery.tier) {
+      const target = document.createElement('p'); target.textContent = treasureDefinition(mastery.tier).name + ' · ' + mastery.beforeExp + ' → ' + mastery.afterExp + '/100';
+      const progress = document.createElement('progress'); progress.max = 100; progress.value = mastery.afterExp;
+      progress.setAttribute('aria-label', target.textContent); reward.append(target,progress);
+      if (!prefersReducedMotion()) scope.animation(reward.animate([{opacity:.6,transform:'translateY(4px)'},{opacity:1,transform:'translateY(0)'}],{duration:400,easing:'ease-out'}));
+      if (mastery.afterExp === 100) {
+        const treasure = document.createElement('button');treasure.type='button';treasure.className='app-button app-button--secondary';treasure.textContent='Xem kho báu';
+        scope.listen(treasure,'click',() => {
+          actionSelected=true;modal.close();
+          afterClose(async () => {
+            await onMenu?.();
+            if (generation !== summaryGeneration || gameState.progress[getGameProgressKey(mastery.gameId)] !== rewardProfile || JSON.stringify(getRankingOwner()) !== rewardOwner) return;
+            const pageOwner=getAppPageScope();
+            const {showAdventureTreasure}=await import('./adventureMap.js');
+            if(pageOwner?.active && getAppPageScope()===pageOwner) showAdventureTreasure(mastery.gameId,mastery.block);
+          });
+        });reward.append(treasure);
+      }
+    }
+    if (mastery.fragmentGained) { const fragment=document.createElement('p');fragment.textContent='+1 mảnh tranh';reward.append(fragment); }
     content.append(reward);
   }
 

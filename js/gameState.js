@@ -15,7 +15,7 @@ import { normalizeRankedRun, normalizeRunBestsV2, recordLevelCheckpoint } from "
 import { getRankingOwner } from './rankingOwner.js';
 import { validateRankingResult } from './rankingResult.js';
 import { normalizeProgressBests, normalizeProgressMigration } from './progressRankingModel.js';
-import { MASTERY_DIFFICULTIES, hasCertifiedCompletion } from './progression/difficultyProgress.js';
+import { MASTERY_DIFFICULTIES, hasCertifiedCompletion, getMasteryBlock } from './progression/difficultyProgress.js';
 import { normalizePairSnapshot } from './pairSessionSnapshot.js';
 import { normalizeWaveProgress } from './progression/waveProgress.js';
 
@@ -413,6 +413,7 @@ function recordGameResult(progress, { mode, level, score, stars, durationMs, wav
   }
   const key = `${mode}:${level}`;
   const previous = progress.bestByLevel[key] || { score: 0, stars: 0 };
+  const beforeMastery = wave && isNormalAdventureMode(mode) ? getMasteryBlock({completed:progress.bestByLevel,level}) : null;
   const firstMasteryWin = Boolean(wave && isNormalAdventureMode(mode) && !hasCertifiedCompletion(progress.bestByLevel, mode, level));
   const nextScore = Math.max(previous.score || 0, score);
   const nextStars = Math.max(previous.stars || 0, stars);
@@ -434,6 +435,10 @@ function recordGameResult(progress, { mode, level, score, stars, durationMs, wav
   if (isNormalAdventureMode(mode)) progress.adventure = getAdventureSummary(progress.bestByLevel, progress.adventure?.currentChapter || 1);
   return { totalStars: progress.totalStars, isNewBest: score > (previous.score || 0) || stars > (previous.stars || 0),
     mastery: { expGained: firstMasteryWin ? 10 : 0,
+      ...(firstMasteryWin ? { gameId, block: beforeMastery.block,
+        tier: beforeMastery.tiers.find(tier => tier.mode === mode).tier,
+        beforeExp: beforeMastery.tiers.find(tier => tier.mode === mode).exp,
+        afterExp: beforeMastery.tiers.find(tier => tier.mode === mode).exp + 10 } : {}),
       fragmentGained: firstMasteryWin && MASTERY_DIFFICULTIES.every(difficulty => hasCertifiedCompletion(progress.bestByLevel, difficulty, level)) } };
 }
 

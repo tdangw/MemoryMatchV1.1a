@@ -92,7 +92,7 @@ test('only terminal multi-wave results certify progress, and duplicate settlemen
   assert.throws(() => recordMemoryMatchResult({ mode: 'easy', level: 1, score: 60, stars: 1, wave: first }));
   const terminal = completeWave(activateNextWave(first), { score: 120, moves: 24, misses: 0, matchedGroups: 6 }).progress;
   const firstWin = recordMemoryMatchResult({ mode: 'easy', level: 1, score: 120, stars: 1, wave: terminal });
-  assert.deepEqual(firstWin.mastery, { expGained: 10, fragmentGained: false });
+  assert.deepEqual(firstWin.mastery, { expGained:10, fragmentGained:false, gameId:'memory-match',block:1,tier:'C',beforeExp:0,afterExp:10 });
   assert.equal(gameState.progress.memoryMatch.bestByLevel['easy:1'].completedWaves, 2);
   const previous = structuredClone(gameState.progress.memoryMatch);
   assert.throws(() => recordMemoryMatchResult({ mode: 'easy', level: 1, score: 120, stars: 1, wave: terminal }));
@@ -105,6 +105,5 @@ test('only terminal multi-wave results certify progress, and duplicate settlemen
   for (const mode of ['normal','hard']) gameState.progress.memoryMatch.bestByLevel[`${mode}:1`] = { rulesVersion:1, cleared:true, score:120, stars:1, completedWaves:2 };
   const mastered = recordMemoryMatchResult({ mode:'superHard', level:1, score:120, stars:1,
     wave:{...terminal, mode:'superHard', attemptId:'mastery', allocatedSeconds:100} });
-  assert.deepEqual(mastered.mastery, { expGained:10, fragmentGained:true });
+  assert.deepEqual(mastered.mastery, { expGained:10, fragmentGained:true, gameId:'memory-match',block:1,tier:'S',beforeExp:0,afterExp:10 });
 });
-

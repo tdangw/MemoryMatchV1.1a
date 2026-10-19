@@ -22,6 +22,10 @@ export function configureAdventureMap(options) {
   adapters = options.adapters;
 }
 
+export function showAdventureTreasure(gameId, block) {
+  return views.get(gameId)?.openTreasure?.(block) || false;
+}
+
 export function mountAdventureMap(gameId) {
   const game = getGameDefinition(gameId);
   const adapter = adapters[gameId];
@@ -76,6 +80,15 @@ export function mountAdventureMap(gameId) {
   let chapterGeneration = 0;
   let renderedNodes = [];
   let loading = false;
+  let pendingTreasure = null;
+  const openTreasure = block => {
+    if (!scope.active || !Number.isSafeInteger(block) || block < 1) return false;
+    if (loading || root.dataset.mapReady !== 'true') pendingTreasure = block;
+    else openChest({chestNumber:block});
+    return true;
+  };
+  view.openTreasure = openTreasure;
+  scope.own(() => { if (view.openTreasure === openTreasure) view.openTreasure = null; });
   let adjacentBest = {};
   let adjacentChests = {};
   let adjacentStarted = {};
@@ -223,6 +236,7 @@ export function mountAdventureMap(gameId) {
     patchNodes();
     body.removeAttribute("aria-busy");
     root.dataset.mapReady = "true";
+    if (pendingTreasure !== null) { const block = pendingTreasure; pendingTreasure = null; openChest({chestNumber:block}); }
     if (view.anchor) {
       scroll.scrollTop = position(view.anchor.level).y - view.anchor.screenY;
       view.anchor = null;

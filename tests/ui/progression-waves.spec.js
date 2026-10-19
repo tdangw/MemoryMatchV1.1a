@@ -41,6 +41,8 @@ test('Triple plays two generated silhouettes and only settles after the second w
   const best = await page.evaluate(async () => (await import('/js/gameState.js')).gameState.progress.tripleConnect.bestByLevel['easy:1']);
   expect(best.completedWaves).toBe(2);
   expect(best.rulesVersion).toBe(1);
+  await expect(page.locator('.mastery-win-reward')).toContainText('+10 kinh nghiệm');
+  await expect(page.locator('.mastery-win-reward')).toContainText('Rương Mầm Non · 0 → 10/100');
 });
 
 test('Link advances waves with shared time, survives reload, and records only a complete level', async ({ page }) => {
@@ -68,7 +70,7 @@ test('Link advances waves with shared time, survives reload, and records only a 
       for (const p of [pair.start, pair.end]) document.querySelector(`.link-board__cell[data-row="${p.row}"][data-column="${p.column}"] .link-tile`).click();
       return { index, won: false };
     });
-    if (result.won) { expect(result.certified.completedWaves).toBe(2); return; }
+    if (result.won) { expect(result.certified.completedWaves).toBe(2); await expect(page.locator('.mastery-win-reward')).toContainText('Rương Mầm Non · 0 → 10/100'); return; }
     await expect.poll(() => page.evaluate(async () => {
       const { linkGameState: s } = await import('/js/linkConnect/linkState.js');
       return s.wave.phase === 'won' || !s.isLocked;
@@ -154,4 +156,5 @@ test('Memory advances to a fresh wave without a win, then settles the whole leve
   expect(settled.after).toBe(settled.before);
   expect(settled.session).toBeUndefined();
   expect(settled.best.rulesVersion).toBe(1);
+  await expect(page.locator('.mastery-win-reward')).toContainText('Rương Mầm Non · 0 → 10/100');
 });

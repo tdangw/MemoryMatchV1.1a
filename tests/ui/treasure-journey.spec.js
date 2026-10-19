@@ -49,3 +49,23 @@ test('incomplete chest navigates to the unlocked preview and inventory failure s
   expect((await snapshot(page,'memory-match')).coins).toBe(0);
   await expect(page.getByRole('button',{name:'Thử lại',exact:true})).toBeEnabled();
 });
+
+test('the tenth first win shows the real EXP delta and opens treasure without forcing the next level',async({page})=>{
+  await seed(page,'memory-match',{count:9,all:false});
+  await page.evaluate(async()=>{
+    const {gameState,recordMemoryMatchResult}=await import('/js/gameState.js');
+    const {createWaveProgress,completeWave,activateNextWave}=await import('/js/progression/waveProgress.js');
+    let wave=createWaveProgress({attemptId:'summary-tenth',gameId:'memory-match',mode:'easy',level:10,groupsPerWave:6});
+    wave=activateNextWave(completeWave(wave,{score:60,moves:12,misses:0,matchedGroups:6}).progress);
+    wave=completeWave(wave,{score:120,moves:24,misses:0,matchedGroups:6}).progress;
+    const result=recordMemoryMatchResult({mode:'easy',level:10,score:120,stars:1,wave});
+    await (await import('/js/persistence.js')).savePersistentGameData({progress:gameState.progress});
+    (await import('/js/ui.js')).showLevelSummaryOverlay({level:10,remainingTime:30,moves:24,misses:0,coinsEarned:24,score:120,stars:1,timeBonus:0,mastery:result.mastery,
+      onMenu:()=>(import('/js/gameSelector.js').then(module=>module.openGameMenu('memory-match')))});
+  });
+  await expect(page.locator('.mastery-win-reward')).toContainText('+10 kinh nghiệm');
+  await expect(page.locator('.mastery-win-reward')).toContainText('Rương Mầm Non · 90 → 100/100');
+  await page.getByRole('button',{name:'Xem kho báu',exact:true}).click();
+  await expect(page.locator('.treasure-card')).toHaveCount(4);
+  await expect(page.getByRole('button',{name:'Mở rương',exact:true})).toBeVisible();
+});
