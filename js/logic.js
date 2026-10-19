@@ -8,7 +8,7 @@ import {
   gameState,
   recordMemoryMatchResult,
 } from "./gameState.js";
-import { calculateCoinReward, calculateCompletionTimeBonus, calculateMatchPoints, calculateStarProgress, calculateStarRating, isEndlessMode } from "./config.js";
+import { isEndlessMode } from "./config.js";
 import {
   updateScoreDisplay,
   updateTimerDisplay,
@@ -30,16 +30,14 @@ import { duckBackgroundMusicForVictory, pauseBackgroundMusic, sounds } from "./s
 import { savePersistentGameData } from "./persistence.js";
 import { stageMemorySession, saveMemorySession } from './memorySession.js';
 import { getActiveSession } from './sessionProgress.js';
-import { finishPlayMetrics } from "./playMetrics.js";
+import { finishPlayMetrics, snapshotPlayMetrics } from "./playMetrics.js";
 import { checkpointRankedRun, stageRankedAttempt } from "./rankingRules.js";
 import { getFlipAnimationClass } from "./appearance.js";
 import { clearMemoryTileAnimations, restartMemoryTileAnimation } from "./memoryMatch/tileAnimation.js";
 import {
   GAMEPLAY_TIMING,
-  getComboTimeBonus,
   getComboWindowMs,
 } from "./gameplayTuning.js";
-import { calculateMatchCoinReward } from "./coinRewards.js";
 import {
   canShowFullVictoryCelebration,
   showFullVictoryCelebration,
@@ -47,6 +45,9 @@ import {
 import { presentMemoryPairRewards } from './memorySpecial.js';
 import { resolveMemoryPairRewards } from './memoryMatch/pairRewards.js';
 import { clearComboWindow, playComboWindow } from "./gameShell/comboWindowPresentation.js";
+
+import { calculateGroupScore, calculateVictoryCoins, calculateFastFinishBonus, calculateProgressionStars } from './progression/gameplayRules.js';
+import { completeWave, waveTotalGroups } from './progression/waveProgress.js';
 
 let selectedTiles = [];
 let levelCompleteActions = { onNext: () => {}, onMenu: () => {} };
@@ -216,17 +217,12 @@ async function checkMatch(roundId) {
     const resolvedCombo = gameState.combo;
     lastMatchAt = matchedAt;
     startComboWindow(comboWindowMs, matchedAt, roundId);
-    const comboAdjustedPoints = calculateMatchPoints(gameState.combo);
-    const specialBonus = first.special ? Math.round(comboAdjustedPoints * 0.5) : 0;
-    const matchPoints = comboAdjustedPoints + specialBonus;
+    const matchPoints = calculateGroupScore({ combo: gameState.combo });
     const score = increaseScore(matchPoints);
     updateScoreDisplay(score);
     showScoreEffect(second.element, matchPoints);
-    const matchCoins = calculateMatchCoinReward(gameState.combo);
+    const matchCoins = 0;
     const previousCoins = gameState.coins;
-    increaseCoins(matchCoins);
-    const comboTimeBonus = getComboTimeBonus(gameState.combo);
-    if (!isEndlessMode(gameState.settings.mode)) gameState.remainingTime += comboTimeBonus;
     const rewards = resolveMemoryPairRewards(gameState, { imageId: first.imageId, special: first.special });
     const totalCoins = gameState.coins;
     gameState.matchedPairs++;
@@ -245,14 +241,9 @@ async function checkMatch(roundId) {
       showMemoryCoinReward(second.element, previousCoins, totalCoins, matchCoins);
     }
     highlightTarget("#score");
-    updateLevelStarsDisplay(calculateStarProgress(score, gameState.totalPairs, gameState.settings.mode));
+    updateLevelStarsDisplay(calculateProgressionStars({ score, totalGroups: waveTotalGroups(gameState.wave), mode: gameState.settings.mode, won: false }));
     updateComboDisplay(gameState.combo);
-    if (comboTimeBonus > 0 && !isEndlessMode(gameState.settings.mode)) {
-      updateTimerDisplay(gameState.remainingTime);
-      syncMemoryTimeProgress({ remainingSeconds: gameState.remainingTime, timeLimit: gameState.timeLimit });
-      highlightTarget("#timer");
-    }
-    if (comboTimeBonus > 0) {
+    if (resolvedCombo >= 2) {
       setTimeout(() => showComboEffect(second.element, resolvedCombo), 650);
     }
     highlightTarget("#pair-progress");
@@ -336,32 +327,32 @@ function stopComboWindow() {
  */
 export async function checkLevelComplete() {
   if (!gameState.isPaused && gameState.totalPairs > 0 && gameState.matchedPairs >= gameState.totalPairs) {
+    if (gameState.wave.index < gameState.wave.count) {
+      await levelCompleteActions.onWave();
+      return;
+    }
     const roundId = gameState.roundId;
+    const activeMs = snapshotPlayMetrics({ gameId: 'memory-match', mode: gameState.settings.mode, level: gameState.currentLevel })?.elapsedMs || 0;
     const durationMs = finishPlayMetrics();
-    const rollback = { coins: gameState.coins, score: gameState.score, progress: structuredClone(gameState.progress.memoryMatch) };
+    const rollback = { coins: gameState.coins, score: gameState.score, wave: gameState.wave, progress: structuredClone(gameState.progress.memoryMatch) };
     const previousChapter = gameState.progress.memoryMatch.adventure?.currentChapter || 1;
     setInteractionLocked(true);
     gameState.isPaused = true;
-    const grossCoins = calculateCoinReward(
-      gameState.settings.mode,
-      gameState.remainingTime,
-    );
-    const coinPenalty = isEndlessMode(gameState.settings.mode)
-      ? 0
-      : Math.min(grossCoins, gameState.misses);
-    const coinsEarned = grossCoins - coinPenalty;
-    const timeBonus = calculateCompletionTimeBonus(
-      gameState.settings.mode,
-      gameState.remainingTime,
-    );
+    gameState.wave = completeWave(gameState.wave, { score: gameState.score, moves: gameState.moves,
+      misses: gameState.misses, matchedGroups: gameState.matchedPairs }).progress;
+    const totalGroups = waveTotalGroups(gameState.wave);
+    const timeBonus = calculateFastFinishBonus({ mode: gameState.settings.mode, totalGroups,
+      activeMs, allocatedSeconds: gameState.wave.allocatedSeconds });
     const finalScore = increaseScore(timeBonus);
-    const stars = calculateStarRating(finalScore, gameState.totalPairs, gameState.settings.mode);
+    const stars = calculateProgressionStars({ score: finalScore, totalGroups, mode: gameState.settings.mode, won: true });
+    const coinsEarned = calculateVictoryCoins({ gameId: 'memory-match', mode: gameState.settings.mode, totalGroups, stars });
     const progressResult = recordMemoryMatchResult({
       mode: gameState.settings.mode,
       level: gameState.currentLevel,
       score: finalScore,
       stars,
       durationMs,
+      wave: gameState.wave,
     });
     updateScoreDisplay(finalScore);
     updateLevelStarsDisplay(stars);
@@ -374,6 +365,7 @@ export async function checkLevelComplete() {
       if (gameState.roundId === roundId) {
         gameState.coins = rollback.coins;
         gameState.score = rollback.score;
+        gameState.wave = rollback.wave;
         gameState.progress.memoryMatch = rollback.progress;
       }
       return;

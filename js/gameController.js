@@ -13,7 +13,6 @@ import {
   GAME_CONFIG,
   getChallengeLayout,
   getLevelHintBonus,
-  getLevelTimeBonus,
   getModeLayout,
   getPreviewDurationMs,
   getTimerDirection,
@@ -61,7 +60,6 @@ import { getComboWindowMs } from './gameplayTuning.js';
 import { restartMemoryTileAnimation } from "./memoryMatch/tileAnimation.js";
 import { GAMEPLAY_TIMING } from "./gameplayTuning.js";
 import { TIME_UP_PURCHASES } from "./shopCatalog.js";
-import { resolveSessionTiming } from "./sessionTiming.js";
 import { clearLootEffects } from "./lootEffects.js";
 import { commitMemoryThemeSession, getMemorySessionSnapshot, saveMemorySession, stageMemorySession, beginMemoryBoardIdentity } from "./memorySession.js";
 import { getMemoryShell } from "./memoryMatch/memoryShell.js";
@@ -71,6 +69,9 @@ import { beginPlayMetrics, resumePlayMetrics } from "./playMetrics.js";
 import { prepareAdventureChapter, stageAdventureLevelStart, canAdvanceAdventure } from "./adventureLaunch.js";
 import { getChapterNumber } from "./adventureProgress.js";
 import { beginRankedAttempt, finalizeRankedRun } from "./rankingRules.js";
+import { createWaveProgress, completeWave, activateNextWave, normalizeWaveProgress } from './progression/waveProgress.js';
+import { getDifficultyAccess } from './progression/difficultyProgress.js';
+import { pausePlayMetrics, snapshotPlayMetrics } from './playMetrics.js';
 
 let countdownInterval;
 let isAutoPaused = false;
@@ -102,6 +103,8 @@ export function restartMemoryLevel() {
 
 export function initializeLevel(level, { reason = "new", session = null, skipIntro = false } = {}) {
   if (!canLaunchGame()) return null;
+  if (session?.waveInvalid) { showAppToast('Lượt chơi này không thể tiếp tục.'); return null; }
+  if (reason === 'resume' && session?.wave?.phase === 'advance') reason = 'wave';
   const requestedMode = gameState.settings.mode || "easy";
   const requestedModeLayout = getModeLayout(requestedMode);
   const requestedLayout = isChallengeMode(requestedMode)
@@ -130,7 +133,7 @@ export function initializeLevel(level, { reason = "new", session = null, skipInt
     clearGameplayRewardPopups();
     clearTooltip();
   } });
-  beginPlayMetrics(scope, { gameId: "memory-match", mode: requestedMode, level }, reason === "resume" ? session?.metrics || {} : null);
+  beginPlayMetrics(scope, { gameId: "memory-match", mode: requestedMode, level }, reason === "resume" || reason === 'wave' ? session?.metrics || {} : null);
   bindMemoryMenus(scope, getMemoryShell().refs.root, { onExit: returnToMainMenu, onRestart: restartMemoryLevel, onSettings: navigation.showSettings });
   const startup = createGameShellStartup(scope, getMemoryShell().refs, error => {
     console.error('Memory startup failed', error);
@@ -139,6 +142,11 @@ export function initializeLevel(level, { reason = "new", session = null, skipInt
   return startup.run(async () => {
   if (!await prepareAdventureChapter("memory-match", getChapterNumber(level), () => scope.active)) return null;
   startup.check();
+  if (!['challenge', 'endless'].includes(requestedMode)
+    && !getDifficultyAccess({ completed: gameState.progress.memoryMatch.bestByLevel, level, mode: requestedMode }).unlocked) {
+    showAppToast('Hãy hoàn thành độ khó trước để mở khóa.');
+    return null;
+  }
   stopCountdown();
   resetLogicRuntime();
   clearLootEffects();
@@ -154,7 +162,14 @@ export function initializeLevel(level, { reason = "new", session = null, skipInt
   gameState.currentLevel = level;
   const modeLayout = getModeLayout(mode);
   const layout = isChallengeMode(mode) ? getChallengeLayout(level) : modeLayout;
-  const timing = resolveMemoryLevelTiming({ mode, level, modeLayout, reason, session });
+  const restoredWave = session?.wave && normalizeWaveProgress(session.wave, { gameId: 'memory-match', mode, level });
+  if ((reason === 'resume' || reason === 'wave') && session?.wave && !restoredWave) throw new Error('Invalid wave checkpoint.');
+  gameState.wave = reason === 'wave' ? activateNextWave(restoredWave)
+    : reason === 'resume' && restoredWave ? restoredWave
+      : createWaveProgress({ attemptId: crypto.randomUUID(), gameId: 'memory-match', mode, level, groupsPerWave: layout.tileCount / 2 });
+  const timing = reason === 'resume' || reason === 'wave'
+    ? { remainingTime: session.remainingTime, timeLimit: session.timeLimit, levelStartTime: session.levelStartTime }
+    : { remainingTime: gameState.wave.allocatedSeconds, timeLimit: gameState.wave.allocatedSeconds, levelStartTime: gameState.wave.allocatedSeconds };
   const roundId = beginRound();
   const pairSnapshot = reason === 'resume' ? session?.pairSnapshot : null;
   beginMemoryBoardIdentity(pairSnapshot?.seed, pairSnapshot?.themeId || gameState.appearance.themes.memoryMatch);
@@ -189,10 +204,10 @@ export function initializeLevel(level, { reason = "new", session = null, skipInt
   await startup.yield();
   activeAssetPaths = selectedCards?.map((card) => card.assetPath).filter(Boolean) || [];
 
-  gameState.moves = 0;
-  gameState.misses = 0;
+  gameState.moves = gameState.wave.completedMoves;
+  gameState.misses = gameState.wave.completedMisses;
   gameState.combo = 0;
-  gameState.score = 0;
+  gameState.score = gameState.wave.completedScore;
   gameState.matchedPairs = 0;
   gameState.totalPairs = layout.tileCount / 2;
   if (pairSnapshot) {
@@ -213,10 +228,10 @@ export function initializeLevel(level, { reason = "new", session = null, skipInt
   updateComboDisplay(gameState.combo);
   updateTimerDisplay(gameState.remainingTime);
   setMemoryTimeProgress({ remainingSeconds: gameState.remainingTime, timeLimit: gameState.timeLimit });
-  if (!skipIntro) showLevelRewardOverlay();
+  if (!skipIntro && reason !== 'wave') showLevelRewardOverlay();
   await startup.phase('images', () => startup.decodeBoard());
   startup.check();
-  beginRankedAttempt("memory-match", mode, level, { reason, savedRun: session?.run });
+  beginRankedAttempt("memory-match", mode, level, { reason: reason === 'wave' ? 'resume' : reason, savedRun: session?.run });
   stageAdventureLevelStart("memory-match", mode, level);
   gameState.progress.memoryMatch.items.hint += hintBonus;
   const committed = reason !== "resume" && activeAssetPaths.length
@@ -232,6 +247,30 @@ export function initializeLevel(level, { reason = "new", session = null, skipInt
     if (pairSnapshot?.matchedPairs === pairSnapshot?.totalPairs && pairSnapshot) void checkLevelComplete();
   }, previewDurationMs);
   });
+}
+
+async function advanceMemoryWave() {
+  const roundId = gameState.roundId;
+  const rollback = { wave: gameState.wave, remainingTime: gameState.remainingTime,
+    progress: structuredClone(gameState.progress.memoryMatch) };
+  gameState.isPaused = true;
+  pausePlayMetrics('wave-transition');
+  const result = completeWave(gameState.wave, { score: gameState.score, moves: gameState.moves,
+    misses: gameState.misses, matchedGroups: gameState.matchedPairs });
+  gameState.wave = result.progress;
+  gameState.remainingTime += result.bonusSeconds;
+  gameState.timeLimit = Math.max(gameState.timeLimit, gameState.remainingTime);
+  if (!await persistMemorySession()) {
+    if (gameState.roundId === roundId) {
+      gameState.wave = rollback.wave; gameState.remainingTime = rollback.remainingTime;
+      gameState.progress.memoryMatch = rollback.progress;
+    }
+    return;
+  }
+  if (gameState.roundId !== roundId) return;
+  const checkpoint = getMemorySessionSnapshot();
+  checkpoint.metrics = snapshotPlayMetrics({ gameId: 'memory-match', mode: gameState.settings.mode, level: gameState.currentLevel });
+  return initializeLevel(gameState.currentLevel, { reason: 'wave', session: checkpoint, skipIntro: true });
 }
 
 function startCountdown(roundId = gameState.roundId) {
@@ -419,6 +458,7 @@ function handleTimeUp() {
 
 export function nextLevel(targetLevel = gameState.currentLevel + 1) {
   const next = targetLevel;
+  if (!['challenge', 'endless'].includes(gameState.settings.mode)) gameState.settings.mode = 'easy';
   if (!canAdvanceAdventure("memory-match", gameState.settings.mode, next)) return returnToMainMenu();
   initializeLevel(next, { reason: "advance" });
 }
@@ -438,22 +478,8 @@ export function returnToMainMenu() {
   syncDefaultMusic(gameState.settings);
 }
 
-function resolveMemoryLevelTiming({ mode, level, modeLayout, reason, session }) {
-  const standardTime = modeLayout.timeSeconds + getLevelTimeBonus(level);
-  const challenge = isChallengeMode(mode);
-  return resolveSessionTiming({
-    endless: isEndlessMode(mode),
-    reason,
-    newTime: challenge ? modeLayout.timeSeconds : standardTime,
-    currentRemaining: gameState.remainingTime,
-    session,
-    carryOnAdvance: challenge,
-    advanceBonus: GAME_CONFIG.specialModes.challengeTimeBonusSeconds,
-    maxCarryBonusTime: 180,
-  });
-}
-
 async function persistMemorySession(allowStartup = false) {
+  if (gameState.wave?.phase === 'won') return true;
   const startup = getMemoryShell().scope?.startup;
   if (startup && startup.status !== 'ready' && !allowStartup) return false;
   if (!gameState.settings.mode || gameState.currentLevel < 1) return false;
@@ -539,7 +565,7 @@ function revealHintPair(tiles, roundId) {
   }, GAME_CONFIG.hintRevealDurationMs);
 }
 
-configureLogic({ onNext: nextLevel, onMenu: returnToMainMenu });
+configureLogic({ onNext: nextLevel, onMenu: returnToMainMenu, onWave: advanceMemoryWave });
 
 document.addEventListener("visibilitychange", async () => {
   if (document.hidden) (await pauseForBackground());

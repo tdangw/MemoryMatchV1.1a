@@ -10,8 +10,9 @@ export function beginMemoryBoardIdentity(seed, themeId) { boardSeed = seed || cr
 
 export function getMemorySessionSnapshot(overrides = {}) {
   stageRankedAttempt("memory-match", gameState.settings.mode, gameState.score,
-    gameState.totalPairs > 0 && gameState.matchedPairs >= gameState.totalPairs);
+    gameState.wave?.phase === 'won');
   return {
+    ...(gameState.wave ? { wave: gameState.wave } : {}),
     pairSnapshot: {
       version: 1, gameId: 'memory-match', seed: boardSeed, themeId: boardThemeId || getEquippedThemeId(gameState.appearance, 'memory-match'),
       score: gameState.score, moves: gameState.moves, misses: gameState.misses, combo: gameState.combo,
