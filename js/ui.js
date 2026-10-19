@@ -445,7 +445,7 @@ function openLevelSummaryOverlay({
   const curve = document.createElementNS(svgNS, "path");
   const curveId = `summary-title-curve-${generation}`;
   curve.id = curveId;
-  curve.setAttribute("d", "M38 62 Q180 26 322 62");
+  curve.setAttribute("d", "M38 54 Q180 18 322 54");
   curve.setAttribute("fill", "none");
   const defs = document.createElementNS(svgNS, "defs");
   const gold = document.createElementNS(svgNS, "linearGradient");

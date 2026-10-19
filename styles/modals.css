@@ -783,36 +783,46 @@ body.game-is-paused .shooting-star {
   border-image-slice: 20% fill; border-image-width: 28px; border-radius: 18px;
   background: var(--dialog-night-surface); color: var(--dialog-ink); overflow: visible;
 }
-#level-summary-modal .app-modal__body { padding: 24px 26px 10px; overflow: auto; }
-#level-summary-modal .level-summary { display: grid; grid-template-areas: "stars" "title" "stats"; gap: 6px; text-align: center; }
+#level-summary-modal .app-modal__body { padding: 18px 26px 6px; overflow: auto; }
+#level-summary-modal .level-summary { display: grid; grid-template-areas: "stars" "title" "stats"; gap: 4px; text-align: center; }
 #level-summary-modal .level-summary__result { grid-area: stars; margin: 0; }
-#level-summary-modal .level-summary__stars { display: flex; align-items: flex-end; justify-content: center; gap: 2px; height: clamp(68px,22cqw,96px); }
-#level-summary-modal .level-summary__star { position: relative; display: block; height: clamp(52px,16cqw,72px); aspect-ratio: 1; flex: none; color: var(--dialog-gold); }
-#level-summary-modal .level-summary__star--middle { height: clamp(64px,20cqw,88px); --star-rest-y: 0em; }
+#level-summary-modal .level-summary__stars { display: flex; align-items: flex-end; justify-content: center; gap: 2px; height: clamp(54px,17cqw,76px); }
+#level-summary-modal .level-summary__star { position: relative; display: block; height: clamp(42px,13cqw,58px); aspect-ratio: 1; flex: none; color: var(--dialog-gold); }
+#level-summary-modal .level-summary__star--middle { height: clamp(52px,16cqw,72px); --star-rest-y: 0em; }
 #level-summary-modal .level-summary__star .ui-icon { display: block; width: 100%; height: 100%; fill: currentColor; }
 #level-summary-modal .level-summary__star--earned { animation: summary-star-earned 640ms cubic-bezier(.16,.9,.28,1.32) var(--star-delay,0ms) both; }
 #level-summary-modal .level-summary__star--unearned { opacity: 1; filter: grayscale(1) brightness(.85); color: #999; }
-#level-summary-modal .level-summary__heading { grid-area: title; width: 100%; height: clamp(64px,19cqw,90px); margin: 0; background: var(--ui-art-garden-title) center / 100% 100% no-repeat; color: var(--dialog-gold); }
+#level-summary-modal .level-summary__heading { grid-area: title; width: 100%; height: clamp(54px,17cqw,74px); margin: 0; background: var(--ui-art-garden-title) center / 100% 100% no-repeat; color: var(--dialog-gold); }
 #level-summary-modal .level-summary__heading svg { display: block; width: 100%; height: 100%; overflow: visible; }
 #level-summary-modal .level-summary__heading text { fill: currentColor; paint-order: stroke fill; stroke: #041923; stroke-width: 2px; stroke-linejoin: round; filter: drop-shadow(0 2px 0 #020f15); font: 900 25px "Arial Rounded MT Bold", "Trebuchet MS", "Segoe UI", sans-serif; }
-#level-summary-modal .level-summary__stats { grid-area: stats; display: grid; grid-template-columns: 1fr; grid-template-rows: repeat(3,minmax(0,1fr)); gap: 7px; padding: 0; border: 0; background: none; }
-#level-summary-modal .level-summary__stat { display: grid; grid-template-columns: 42px minmax(0,1fr) minmax(84px,auto); align-items: center; gap: 8px; min-height: 52px; padding: 5px 10px; border: 1px solid var(--dialog-line); border-radius: 14px; background: var(--dialog-night-inset); }
+#level-summary-modal .level-summary__stats { grid-area: stats; display: grid; grid-template-columns: 1fr; grid-template-rows: repeat(3,minmax(0,1fr)); gap: 5px; padding: 0; border: 0; background: none; }
+#level-summary-modal .level-summary__stat { display: grid; grid-template-columns: 34px minmax(0,1fr) minmax(80px,auto); align-items: center; gap: 7px; min-height: 44px; box-sizing: border-box; padding: 4px 10px; border: 1px solid var(--dialog-line); border-radius: 14px; background: var(--dialog-night-inset); }
 #level-summary-modal .level-summary__stat > .ui-icon { width: 100%; height: auto; aspect-ratio: 1; }
-#level-summary-modal .level-summary__stat > span { min-width: 0; text-align: left; color: var(--dialog-ink); font: 800 clamp(13px,3.6cqw,18px)/1.15 "Trebuchet MS", "Segoe UI",sans-serif; }
-#level-summary-modal .level-summary__stat strong { display: block; min-width: 0; margin: 0; padding: 6px 8px; border: 1px solid var(--dialog-line); border-radius: 10px; background: var(--dialog-night-value); text-align: center; color: var(--dialog-ink); text-shadow: 0 1px #03131d; font: 900 clamp(15px,4.4cqw,22px)/1.1 "Trebuchet MS", "Segoe UI",sans-serif; }
+#level-summary-modal .level-summary__stat > span { min-width: 0; text-align: left; color: var(--dialog-ink); font: 800 clamp(12px,3.3cqw,16px)/1.15 "Trebuchet MS", "Segoe UI",sans-serif; }
+#level-summary-modal .level-summary__stat strong { display: block; min-width: 0; margin: 0; padding: 6px 8px; border: 1px solid var(--dialog-line); border-radius: 10px; background: var(--dialog-night-value); text-align: center; color: var(--dialog-ink); text-shadow: 0 1px #03131d; font: 900 clamp(14px,4cqw,20px)/1.1 "Trebuchet MS", "Segoe UI",sans-serif; }
 #level-summary-modal .summary-coins strong { color: var(--dialog-gold); }
-#level-summary-modal .app-modal__footer { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); justify-items: center; gap: 10px; padding: 10px 26px 24px; border: 0; }
+#level-summary-modal .app-modal__footer { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); justify-items: center; gap: 10px; padding: 8px 26px 20px; border: 0; }
 #level-summary-modal .level-summary-modal--victory .app-modal__footer { grid-template-columns: 1fr; }
-#level-summary-modal .app-modal__footer .app-button { width: 100%; max-width: 200px; min-width: 0; min-height: 54px; padding: 8px; font-size: clamp(12px,3.6cqw,18px); }
+#level-summary-modal .app-modal__footer .app-button { width: 100%; max-width: 200px; min-width: 0; min-height: 48px; padding: 8px; font-size: clamp(12px,3.6cqw,18px); }
 #level-summary-modal .app-modal__footer .ui-icon { width: clamp(22px,6cqw,30px); height: clamp(22px,6cqw,30px); flex-shrink: 0; }
+@media (500px < height <= 700px) {
+  #level-summary-modal .app-modal__body { padding: 12px 24px 6px; }
+  #level-summary-modal .level-summary__stars { height: 52px; }
+  #level-summary-modal .level-summary__star { height: 40px; }
+  #level-summary-modal .level-summary__star--middle { height: 50px; }
+  #level-summary-modal .level-summary__heading { height: 52px; }
+  #level-summary-modal .level-summary__stat { min-height: 40px; grid-template-columns: 30px minmax(0,1fr) minmax(76px,auto); }
+  #level-summary-modal .app-modal__footer { padding: 6px 24px 18px; }
+  #level-summary-modal .app-modal__footer .app-button { min-height: 44px; }
+}
 @media (max-height: 500px) {
   #level-summary-modal .level-summary-modal { width: min(500px,calc(100vw - 24px)); }
   #level-summary-modal .app-modal__body { padding: 12px 24px 4px; }
   #level-summary-modal .level-summary { grid-template-columns: minmax(0,1fr) minmax(0,1.15fr); grid-template-areas: "stars stats" "title stats"; gap: 4px 12px; align-items: center; }
-  #level-summary-modal .level-summary__stars { height: 60px; }
-  #level-summary-modal .level-summary__star { height: 46px; }
-  #level-summary-modal .level-summary__star--middle { height: 58px; }
-  #level-summary-modal .level-summary__heading { height: 54px; }
+  #level-summary-modal .level-summary__stars { height: 50px; }
+  #level-summary-modal .level-summary__star { height: 40px; }
+  #level-summary-modal .level-summary__star--middle { height: 48px; }
+  #level-summary-modal .level-summary__heading { height: 48px; }
   #level-summary-modal .level-summary__stats { gap: 3px; }
   #level-summary-modal .level-summary__stat { min-height: 32px; padding: 3px 5px; gap: 4px; grid-template-columns: 26px minmax(0,1fr) minmax(64px,auto); }
   #level-summary-modal .level-summary__stat > span { font-size: 12px; }

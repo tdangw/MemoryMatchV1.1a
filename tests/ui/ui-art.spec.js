@@ -3,7 +3,7 @@ import { mkdirSync, readFileSync } from 'node:fs';
 
 const folder = 'test-results/victory-design';
 mkdirSync(folder, { recursive: true });
-const sizes = [{ width: 320, height: 740 }, { width: 412, height: 915 }, { width: 844, height: 390 }, { width: 1024, height: 900 }];
+const sizes = [{ width: 320, height: 740 }, { width: 412, height: 915 }, { width: 844, height: 390 }, { width: 1024, height: 900 }, { width: 320, height: 568 }, { width: 412, height: 640 }, { width: 640, height: 600 }];
 const games = ['memory-match', 'link-connect', 'triple-connect'];
 const metadata = JSON.parse(readFileSync('docs/design/ui-images/runtime-metadata.json', 'utf8'));
 
@@ -27,7 +27,7 @@ test('every exported image decodes; icon API keeps SVG accessibility and fallbac
   expect(metadata.totals.icons).toBeLessThanOrEqual(250000);
 });
 
-for (const size of sizes) test(`painted surfaces preserve three games and screen layouts at ${size.width}`, async ({ page }) => {
+for (const size of sizes) test(`painted surfaces preserve three games and screen layouts at ${size.width}x${size.height}`, async ({ page }) => {
   test.setTimeout(60000);
   await page.setViewportSize(size);
   await page.goto('/');
@@ -84,6 +84,7 @@ for (const size of sizes) test(`painted surfaces preserve three games and screen
     await expect(summary.locator('.level-summary__star--unearned')).toHaveCSS('opacity', '1');
     await expect(summary.locator('.level-summary__star--unearned')).toHaveCSS('filter', 'grayscale(1) brightness(0.85)');
     await expect(summary.locator('.app-modal__body')).toHaveCSS('scrollbar-width', 'none');
+    expect(await summary.locator('.app-modal__body').evaluate(node => node.scrollHeight <= node.clientHeight + 1)).toBe(true);
     await expect(summary.locator('.level-summary__stat')).toHaveCount(3);
     await expect(summary.locator('.level-summary__stat > span')).toHaveText(['Xu nhận', 'Thời gian', 'Điểm']);
     await expect(summary.locator('.summary-points strong')).toHaveText('1,234,567');
