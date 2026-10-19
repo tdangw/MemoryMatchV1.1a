@@ -1,0 +1,46 @@
+/* Journey treasure owns its artwork and modal descendants only. */
+.treasure-art { display: block; width: 100%; height: auto; overflow: visible; }
+.treasure-art__lid { transform-origin: 30px 65px; }
+.treasure-art__glow { opacity: 0; }
+.treasure-art.is-open .treasure-art__lid { transform: translateY(-15px) rotate(-13deg); }
+.treasure-art.is-open .treasure-art__glow { opacity: 1; }
+.treasure-dialog { width: min(560px, calc(100vw - 24px)); }
+.treasure-dialog .app-modal__body { padding: 12px 16px 16px; }
+.treasure-content { color: #e5f0ec; }
+.treasure-range { margin: 0 0 12px; color: #bed0ca; text-align: center; font-size: 13px; }
+.treasure-cards { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+.treasure-card { display: grid; justify-items: center; gap: 2px; min-width: 0; padding: 5px 6px 8px; border: 1px solid #55746f; border-radius: 13px; background: linear-gradient(#173c41,#102c33); color: #e5f0ec; font: inherit; cursor: pointer; box-shadow: inset 0 1px #d8edda12,0 2px 3px #0002; }
+.treasure-card[aria-pressed="true"] { border-color: #e9c97b; background: linear-gradient(#285154,#14353b); box-shadow: inset 0 0 0 1px #e9c97b55; }
+.treasure-card:focus-visible, .treasure-content button:focus-visible { outline: 2px solid #fff0be; outline-offset: 2px; }
+.treasure-card .treasure-art { width: 83px; height: 67px; }
+.treasure-card strong { font-size: 12px; text-align: center; line-height: 1.3; }
+.treasure-card small { color: #c8d9d3; font-size: 11px; }
+.treasure-card.is-ready small { color: #ffe095; }
+.treasure-card.is-claimed { background: #123139; }
+.treasure-detail { display: grid; justify-items: center; text-align: center; margin-top: 12px; }
+.treasure-hero { width: 154px; height: 124px; }
+.treasure-detail h3 { margin: 2px 0 5px; font-size: 20px; color: #ffe1a0; }
+.treasure-progress { width: 100%; max-width: 330px; accent-color: #e3c375; height: 9px; border: 0; border-radius: 8px; overflow: hidden; background: #071e26; }
+.treasure-progress::-webkit-progress-bar { background: #071e26; }
+.treasure-progress::-webkit-progress-value { background: linear-gradient(90deg,#98b779,#f0d28b); border-radius: 8px; }
+.treasure-progress-copy { margin: 6px 0 1px; font-size: 13px; }
+.treasure-exp { color: #a9c1bb; font-size: 11px; }
+.treasure-status { margin: 8px 0 10px; font-size: 13px; line-height: 1.4; min-height: 18px; }
+.treasure-rewards { display: flex; justify-content: center; gap: 8px; width: 100%; margin: 0 0 13px; }
+.treasure-reward { display: flex; align-items: center; justify-content: center; gap: 7px; flex: 1; max-width: 150px; padding: 9px 6px; border-radius: 10px; background: #071f28; border: 1px solid #b1c5a12e; font-size: 13px; color: #ffdfa0; }
+.treasure-reward .ui-icon { width: 20px; height: 20px; }
+.treasure-actions { display: flex; gap: 8px; width: 100%; }
+.treasure-actions .app-button { flex: 1; min-height: 42px; padding: 9px 10px; font-size: 13px; }
+.treasure-collection-link { display: block; margin: 12px auto 0; padding: 6px 10px; border: 0; background: transparent; color: #badbd5; text-decoration: underline; font: inherit; font-size: 12px; }
+.treasure-error { color: #ffd3b9; }
+@media (min-width: 700px) { .treasure-cards { grid-template-columns: repeat(4,minmax(0,1fr)); } }
+@media (max-height: 500px) and (min-width: 600px) {
+  .treasure-content { display: grid; grid-template-columns: minmax(210px,.9fr) minmax(260px,1.1fr); gap: 0 16px; }
+  .treasure-range { grid-column: 1/-1; margin-bottom: 8px; }
+  .treasure-cards { grid-template-columns: repeat(2,minmax(0,1fr)); align-self: center; }
+  .treasure-detail { margin-top: 0; }
+  .treasure-hero { width: 105px; height: 85px; }
+  .treasure-detail h3 { font-size: 17px; }
+  .treasure-collection-link { grid-column: 1/-1; }
+}
+@media (prefers-reduced-motion: reduce) { .treasure-content *, .treasure-art * { animation: none !important; transition: none !important; } }
