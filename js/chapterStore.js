@@ -8,7 +8,7 @@ const LEVEL_KEY = /^(easy|normal|hard|superHard|challenge|endless):([1-9]\d*)$/;
 
 export function openChapterDatabase() {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open(CHAPTER_DATABASE, 2);
+    const request = indexedDB.open(CHAPTER_DATABASE, 3);
     request.onupgradeneeded = () => {
       for (const name of ["profile", "chapters", "metadata", "backups"]) {
         if (!request.result.objectStoreNames.contains(name)) request.result.createObjectStore(name);
@@ -48,7 +48,7 @@ export async function migrateChapterLevelRankings(database, owner, expectedRevis
       const profile = stored.data.progress[game]; if (!profile) return;
       const bests = profile.levelBestsV3 ||= {};
       if (Object.values(bests).some(value => !validateProgressResult(value))) throw new Error('Invalid level ranking history.');
-      const level = highestOwnedAdventureLevel(records, owner, profileOwner);
+      const level = highestOwnedAdventureLevel(records, owner, profileOwner, { certifiedOnly: stored.data.progress.gameplaySeason === 1 });
       if (level) bests.adventure = keepProgressBest(bests.adventure, createProgressResult(keys[game], 'adventure', level, owner));
     }
     if (!sameOwner) for (const game of Object.keys(keys)) inspect(game, stored.data.progress[game]?.bestByLevel);
@@ -295,8 +295,8 @@ export async function readChapter(database, game, number) {
     || { bestByLevel: {}, claimedChests: {}, startedLevels: {} };
 }
 
-export async function resetChapterProfile(database, envelope, expectedRevision) {
-  const transaction = database.transaction(["profile", "chapters"], "readwrite");
+export async function resetChapterProfile(database, envelope, expectedRevision, { clearAuxiliary = false } = {}) {
+  const transaction = database.transaction(clearAuxiliary ? ["profile", "chapters", "metadata", "backups"] : ["profile", "chapters"], "readwrite");
   const complete = transactionResult(transaction);
   const store = transaction.objectStore("profile");
   const previous = await requestResult(store.get("active"));
@@ -306,6 +306,10 @@ export async function resetChapterProfile(database, envelope, expectedRevision) 
     throw new Error("Dữ liệu đã được cập nhật ở tab khác.");
   }
   transaction.objectStore("chapters").clear();
+  if (clearAuxiliary) {
+    transaction.objectStore('metadata').clear();
+    transaction.objectStore('backups').clear();
+  }
   store.put(envelope, "active");
   await complete;
 }

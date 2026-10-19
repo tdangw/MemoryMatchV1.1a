@@ -94,6 +94,7 @@ export function hydrateGameState({
   appearance = {},
 } = {}) {
   gameState.coins = Number.isFinite(coins) ? Math.max(0, Math.floor(coins)) : 0;
+  gameState.progress.gameplaySeason = progress.gameplaySeason;
   const memoryMatch = progress?.memoryMatch || {};
   gameState.progress.themeSelectionHistory = normalizeThemeSelectionHistory(
     progress?.themeSelectionHistory,
@@ -400,6 +401,7 @@ export function recordLinkConnectResult(result) { return recordGameResult(gameSt
 export function recordTripleConnectResult(result) { return recordGameResult(gameState.progress.tripleConnect, result, 'triple-connect'); }
 
 function recordGameResult(progress, { mode, level, score, stars, durationMs, wave }, gameId) {
+  if (gameState.progress.gameplaySeason === 1 && !wave) throw new Error('A multi-wave result requires its completed wave proof.');
   if (wave) {
     const normalized = normalizeWaveProgress(wave, { gameId, mode, level });
     if (!normalized || normalized.phase !== 'won') throw new Error('Cannot record an incomplete multi-wave result.');

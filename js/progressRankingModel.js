@@ -1,4 +1,5 @@
 import { MAX_ADVENTURE_LEVEL, NORMAL_MODE_IDS, isCompletedLevelResult } from './adventureProgress.js';
+import { getLevelWaveCount } from './progression/gameplayRules.js';
 export const RANKING_FAMILIES = Object.freeze(['adventure', 'challenge', 'endless']);
 const games = new Set(['memory-match', 'link-connect', 'triple-connect']);
 export const sameRankingOwner = (a, b) => Boolean(a && b && (a.uid && b.uid ? a.uid === b.uid : a.profileId === b.profileId && a.uid === b.uid));
@@ -64,11 +65,13 @@ export function reduceProgressRun(run, event) {
   }
   throw new RangeError('Unknown progress transition.');
 }
-export function highestOwnedAdventureLevel(records, owner, profileOwner) {
+export function highestOwnedAdventureLevel(records, owner, profileOwner, { certifiedOnly = false } = {}) {
   let highest = 0;
   for (const [key, value] of Object.entries(records || {})) {
     const match = /^(easy|normal|hard|superHard):([1-9]\d*)$/.exec(key); const level = match && Number(match[2]);
     if (!match || !validProgressLevel(level) || !isCompletedLevelResult(value)) continue;
+    if (certifiedOnly && (value.rulesVersion !== 1 || value.cleared !== true
+      || value.completedWaves !== getLevelWaveCount(level))) continue;
     const proof = value.rankingResult?.owner;
     const owned = proof ? sameRankingOwner(proof, owner) || proof.profileId === owner.profileId && proof.uid === null
       && profileOwner?.firstUid === owner.uid : profileOwner?.id === owner.profileId

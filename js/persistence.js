@@ -7,9 +7,12 @@ import {
   updateChapterMetadataPair,
   migrateChapterLevelRankings,
 } from "./chapterStore.js";
+import { GAMEPLAY_SEASON, gameplaySeasonReset } from './progression/gameplaySeason.js';
 
 export const SAVE_FORMAT_VERSION = 2;
 const ROOT_STORAGE_KEY = "memoryMatchSave";
+const SEASON_STORAGE_KEY = 'memoryMatchSave:multiwave1';
+let activeStorageKey = ROOT_STORAGE_KEY;
 const PRIMARY_MARKER_KEY = "memoryMatchChapterBackend";
 const SETTINGS_KEYS = new Set([
   "sound", "music", "soundVolume", "musicVolume", "meteorEffects",
@@ -76,6 +79,27 @@ export async function loadPersistentGameData() {
   return structuredClone(currentEnvelope.data);
 }
 
+/** Startup-only season boundary; clear gameplay and sync state in one CAS transaction. */
+export function ensureGameplaySeason() {
+  return enqueue(async () => {
+    await initialize();
+    if (blocked) return false;
+    try {
+      const next = gameplaySeasonReset(currentEnvelope?.data);
+      if (!next) return true;
+      const envelope = createEnvelope(next, knownRevision + 1);
+      if (database) await resetChapterProfile(database, envelope, knownRevision, { clearAuxiliary: true });
+      else {
+        localStorage.setItem(SEASON_STORAGE_KEY, JSON.stringify(envelope));
+        activeStorageKey = SEASON_STORAGE_KEY;
+      }
+      currentEnvelope = envelope; knownRevision = envelope.revision;
+      if (database) localStorage.setItem(PRIMARY_MARKER_KEY, String(knownRevision));
+      return true;
+    } catch (error) { blocked = true; reportPersistenceError('season', error); return false; }
+  });
+}
+
 /** Snapshot at invocation: a later round cannot change a queued write's data. */
 export function savePersistentGameData({ coins, appearance, progress, settings, cloudEvent = false } = {}) {
   const patch = structuredClone({
@@ -96,7 +120,7 @@ export function savePersistentGameData({ coins, appearance, progress, settings, 
       if (patch.settings) envelope.data.settings = { ...previous?.data.settings, ...patch.settings };
       if (database) currentEnvelope = await writeChapterProfile(database, envelope, knownRevision);
       else {
-        localStorage.setItem(ROOT_STORAGE_KEY, JSON.stringify(envelope));
+        localStorage.setItem(activeStorageKey, JSON.stringify(envelope));
         currentEnvelope = envelope;
       }
       knownRevision = envelope.revision;
@@ -133,9 +157,11 @@ export function clearPersistentGameData() {
   return enqueue(async () => {
     await initialize();
     try {
-      const envelope = createEnvelope(createDefaultPayload(), knownRevision + 1);
+      const data = createDefaultPayload();
+      if (currentEnvelope?.data.progress.gameplaySeason === GAMEPLAY_SEASON) data.progress.gameplaySeason = GAMEPLAY_SEASON;
+      const envelope = createEnvelope(data, knownRevision + 1);
       if (database) await resetChapterProfile(database, envelope, knownRevision);
-      else localStorage.setItem(ROOT_STORAGE_KEY, JSON.stringify(envelope));
+      else localStorage.setItem(activeStorageKey, JSON.stringify(envelope));
       currentEnvelope = envelope;
       knownRevision = envelope.revision;
       blocked = false;
@@ -200,6 +226,8 @@ export function saveSyncMetadata(environment, metadata, isCurrent = () => true) 
 export function importPersistentSnapshot(snapshot, environment, metadata, isCurrent = () => true, { synced = true } = {}) {
   return enqueue(async () => {
     await initialize();
+    if (currentEnvelope?.data.progress.gameplaySeason === GAMEPLAY_SEASON && snapshot?.profile?.data.progress.gameplaySeason !== GAMEPLAY_SEASON)
+      throw new Error('Bản lưu không cùng phiên bản. Dữ liệu hiện tại được giữ nguyên.');
     if (blocked || !database || !isCurrent()) return false;
     const envelope = createEnvelope(snapshot.profile.data, knownRevision + 1);
     await replaceChapterSnapshot(database, snapshot, envelope, knownRevision, `cloud:${environment}`, { ...metadata, lastSyncedLocalRevision: synced ? envelope.revision : 0 }, isCurrent);
@@ -228,7 +256,7 @@ export function subscribeToPersistenceFailure(listener) {
 
 if (typeof window !== "undefined") {
   window.addEventListener("storage", async event => {
-    if (![ROOT_STORAGE_KEY, PRIMARY_MARKER_KEY].includes(event.key) || !event.newValue) return;
+    if (![activeStorageKey, PRIMARY_MARKER_KEY].includes(event.key) || !event.newValue) return;
     try {
       await initialize();
       await queue;
@@ -280,7 +308,8 @@ async function initializeBackend() {
 }
 function readLocalEnvelope() {
   try {
-    const serialized = localStorage.getItem(ROOT_STORAGE_KEY);
+    if (localStorage.getItem(SEASON_STORAGE_KEY)) activeStorageKey = SEASON_STORAGE_KEY;
+    const serialized = localStorage.getItem(activeStorageKey);
     if (!serialized) return null;
     const parsed = JSON.parse(serialized);
     if (!isSupportedEnvelope(parsed)) {

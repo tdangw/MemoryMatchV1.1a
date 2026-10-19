@@ -1,3 +1,4 @@
+import { PROGRESSION_HELP_CONTENT } from "../progression/progressionCopy.js";
 import { renderWaveStatus } from "../progression/waveHud.js";
 import { resolveLinkPairRewards } from './pairRewards.js';
 import { gameRecordLabel } from '../gameRecord.js';
@@ -43,7 +44,6 @@ import {
   UI_TIMING,
 } from "../uiCatalog.js";
 import {
-  calculateLinkStarRating,
   getLinkComboWindowMs,
   getLinkChallengeLayout,
   LINK_CONNECT_CONFIG,
@@ -51,7 +51,6 @@ import {
   getLinkLevelHintBonus,
   getLinkGravityShift,
   getLinkSpecialMilestoneTooltip,
-  getLinkStarScoreTargets,
   getLinkThunderResolveDelay,
   getLinkModeLayout,
   getLinkTimerDirection,
@@ -449,7 +448,7 @@ export async function runLinkGameAction(action) {
     return navigation.showShop(resumeLinkAfterShop);
   }
   if (action === "help") {
-    return showLinkGameModal("Cách chơi Link Connect", LINK_CONNECT_HELP_CONTENT, "book");
+    return showLinkGameModal("Cách chơi Link Connect", LINK_CONNECT_HELP_CONTENT + PROGRESSION_HELP_CONTENT, "book");
   }
   if (action === "info") {
     return showLinkGameModal("Giới thiệu", "<p><strong>Link Connect</strong> là trò chơi nối cặp hình giúp rèn luyện khả năng quan sát.</p>", "info");

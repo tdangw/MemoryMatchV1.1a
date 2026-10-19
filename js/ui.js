@@ -29,6 +29,8 @@ import { createGameShellLifecycle, getActiveGameScope } from "./gameShell/gameSh
 import { createHudTimerScheduler } from "./gameShell/gameTimerProgress.js";
 
 import { getAppPageScope } from './appPageLifecycle.js';
+import { getProgressionStarTargets } from './progression/gameplayRules.js';
+import { waveTotalGroups } from './progression/waveProgress.js';
 let activeIntro = null;
 let activeSummary = null;
 let summaryGeneration = 0;
@@ -65,7 +67,9 @@ export function showMemoryCoinReward(tileElement, previousCoins, nextCoins, amou
 
 export function updateScoreDisplay(score) {
   getMemoryHud().stats({ score });
-  getMemoryHud().stars({ score, target: getStarScoreTargets(gameState.totalPairs, gameState.settings.mode).three, record: gameRecordLabel(gameState.progress.memoryMatch, gameState.settings.mode, gameState.currentLevel) });
+  const target = gameState.wave ? getProgressionStarTargets({ totalGroups: waveTotalGroups(gameState.wave), mode: gameState.settings.mode }).three
+    : getStarScoreTargets(gameState.totalPairs, gameState.settings.mode).three;
+  getMemoryHud().stars({ score, target, record: gameRecordLabel(gameState.progress.memoryMatch, gameState.settings.mode, gameState.currentLevel) });
 }
 
 export function updateMemorySpecialProgress(progress = gameState.specialProgress) {

@@ -1,7 +1,7 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    function knownSpace(space) { return space in ['production', 'beta', 'test', 'local']; }
+    function knownSpace(space) { return space in ['production', 'beta', 'test', 'local', 'production-waves1', 'beta-waves1', 'test-waves1', 'local-waves1']; }
     function owner(uid) { return request.auth != null && request.auth.uid == uid; }
     function statisticsAdmin() { return request.auth != null && request.auth.token.admin == true; }
     function validStatistics(data) {

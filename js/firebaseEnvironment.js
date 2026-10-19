@@ -1,4 +1,8 @@
+import { gameplaySpace } from './progression/gameplaySeason.js';
 export function getFirebaseEnvironment(hostname = globalThis.location?.hostname || 'localhost', env = import.meta.env || {}) {
+  return gameplaySpace(baseEnvironment(hostname, env));
+}
+function baseEnvironment(hostname, env) {
   if (['production', 'beta', 'test', 'local'].includes(env.VITE_FIREBASE_ENV)) return env.VITE_FIREBASE_ENV;
   if (env.MODE === 'android') return 'production';
   if (['localhost', '127.0.0.1', '::1'].includes(hostname)) return 'local';

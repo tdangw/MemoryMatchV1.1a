@@ -2,6 +2,7 @@ import { getRecentGameId } from "./recentGame.js";
 import { initializeMenuAds } from './ads/menuAds.js';
 import { initializeProfileStatsService } from './profileStatsService.js';
 import { configureAdventureMap } from "./adventureMap.js";
+import { PROGRESSION_HELP_CONTENT } from './progression/progressionCopy.js';
 import { previewMemoryLevel, previewLinkLevel, previewTripleLevel } from './adventurePreview.js';
 import "./memoryMatch/memoryShellDom.js";
 import { configureAppNavigation, refreshAppWallet, refreshAppAccount } from "./appNavigation.js";
@@ -48,6 +49,7 @@ import { showAppToast, openAppModal } from "./modal.js";
 import { gameState, hydrateGameState, resetGame } from "./gameState.js";
 import {
   loadPersistentGameData,
+  ensureGameplaySeason,
   subscribeToExternalSave,
   subscribeToPersistenceFailure,
   getPersistenceStatus,
@@ -82,10 +84,10 @@ function showMemoryHelp() {
     `<ul class="app-feature-list">
         <li>Lật hai thẻ để tìm cặp hình giống nhau.</li>
         <li>Ghép hết các cặp trước khi thời gian kết thúc.</li>
-        <li>Ghép đúng liên tiếp để tạo Combo và nhận thêm thời gian.</li>
+        <li>Ghép đúng liên tiếp để tăng điểm Combo.</li>
         <li>Ghép thẻ đặc biệt để thu thập năng lượng và nhận hỗ trợ.</li>
         <li>Vật phẩm Thời gian và Xem trước mua ở cửa hàng sẽ được cất vào kho trên HUD.</li>
-      </ul>`,
+      </ul>` + PROGRESSION_HELP_CONTENT,
     "book",
   );
 }
@@ -93,7 +95,9 @@ function showMemoryHelp() {
 async function initializeApplication() {
 let accountRuntime = null;
 let accountReady = null;
-hydrateGameState(await loadPersistentGameData());
+await loadPersistentGameData();
+const seasonReady = await ensureGameplaySeason();
+hydrateGameState(seasonReady ? await loadPersistentGameData() : undefined);
 setRankingOwner(await loadProfileOwner());
 subscribeToPersistenceFailure(() => {
   openAppModal({
