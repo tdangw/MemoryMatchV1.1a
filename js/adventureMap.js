@@ -8,7 +8,9 @@ import { decorateAdventureMenu, refreshAppWallet } from "./appNavigation.js";
 import { prepareAdventureChapter } from "./adventureLaunch.js";
 import { createAdventureChapterNodes, getAdventureSummary, getAdventureLevelState, getAdventureChestState, isNormalAdventureMode } from "./adventureProgress.js";
 import { loadPersistentChapter } from "./persistence.js";
-import { claimAdventureChest } from "./adventureRewards.js";
+import { openJourneyTreasure } from './progression/treasureModal.js';
+import { createTreasureArt } from './progression/treasureArt.js';
+import { treasureDefinition } from './progression/treasureCatalog.js';
 import { openAppModal, showAppToast } from "./modal.js";
 import { canLaunchGame } from "./profileOperations.js";
 import { getDifficultyAccess } from './progression/difficultyProgress.js';
@@ -122,8 +124,14 @@ export function mountAdventureMap(gameId) {
         control.disabled = false;
         control.classList.toggle("is-claimed", node.claimed);
         control.classList.toggle("is-ready", node.eligible);
-        element.detail.textContent = node.claimed ? "Đã nhận" : `${node.activeTier} · ${node.exp}/100 EXP`;
-        control.setAttribute("aria-label", `Rương ${node.activeTier || 'S'}, ${element.detail.textContent}`);
+        const definition = treasureDefinition(node.activeTier || 'S');
+        element.detail.textContent = node.claimed ? 'Đã mở 4/4' : definition.name + '\n' + (node.eligible ? 'Có thể mở' : (node.exp / 10) + '/10');
+        const artState = definition.tier + ':' + node.claimed;
+        if (control.dataset.treasureArtState !== artState) {
+          control.replaceChildren(createTreasureArt(definition.tier, node.claimed));
+          control.dataset.treasureArtState = artState;
+        }
+        control.setAttribute('aria-label', 'Kho báu Màn ' + node.firstLevel + '–' + node.lastLevel + ', ' + element.detail.textContent);
       }
     });
 
@@ -238,7 +246,8 @@ export function mountAdventureMap(gameId) {
       if (scope.active) setBusy(false);
     }
   }
-  function openLevel(level, specialMode = null) {
+  function openLevel(level, specialMode = null, requestedMode = null) {
+    if (requestedMode) view.mode = requestedMode;
     if (!scope.active || loading) return;
     if (!specialMode && !getDifficultyAccess({ completed: profile.bestByLevel, level, mode: view.mode }).unlocked) view.mode = 'easy';
     const selectedMode = () => specialMode || view.mode;
@@ -319,17 +328,13 @@ export function mountAdventureMap(gameId) {
   function openSpecialMode(mode) { openLevel(1, mode); }
 
   function openChest(node) {
-    const describe = reward => reward.grants.map(grant => `${grant.amount} ${grant.type === 'hint' ? 'Gợi ý' : 'xu'}`).join(" · ");
-    const message = node.claimed ? 'Đã nhận đủ bốn rương.'
-      : `${node.exp}/100 EXP · ${getGameModeLabel(node.reward.mode)}<br>${node.reward.coins} xu · ${node.reward.hints} Gợi ý`;
-    openAppModal({ id: "adventure-chest-modal", artwork: "reward", title: `Rương ${node.activeTier || 'S'} · Màn ${node.firstLevel}–${node.lastLevel}`, icon: "chest", content: `<p>${message}</p>`, actions: node.eligible ? [{ label: "Nhận thưởng", variant: "primary", onClick: async () => {
-      const reward = await claimAdventureChest(gameId, node.chestNumber);
-      if (!scope.active) return false;
-      if (!reward) { showAppToast("Chưa nhận được rương. Hãy kiểm tra chỗ trống trong kho Gợi ý và thử lại."); return false; }
-      patchNodes(); refreshAppWallet();
-      openAppModal({ id: "adventure-chest-modal", artwork: "reward", title: "Đã nhận thưởng", icon: "chest-open", content: `<p>${describe(reward)}</p>` });
-      return false;
-    } }] : [] });
+    openJourneyTreasure({ gameId, block: node.chestNumber, owner: scope,
+      onClaimed: () => { if (scope.active) { patchNodes(); refreshAppWallet(); } },
+      onPlay: async target => {
+        if (!await prepareAdventureChapter(gameId, Math.floor((target.level - 1) / 100) + 1, () => scope.active)) return;
+        if (scope.active) openLevel(target.level, null, target.mode);
+      },
+    });
   }
 
   scope.listen(trail, "click", event => {

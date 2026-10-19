@@ -19,12 +19,13 @@ export function projectJourneyTreasure({ completed, block, claim = {} }) {
 }
 
 /** Locate the next missing certification, including any prerequisite, without changing a session. */
-export function nextTreasureLevel({ completed, block, tier }) {
+export function nextTreasureLevel({ completed, block, tier, unlockedThrough }) {
   const definition = TREASURE_CATALOG.find(item => item.tier === tier);
   if (!definition) throw new RangeError('Invalid treasure tier.');
   const view = projectJourneyTreasure({completed,block});
   for (let level = view.firstLevel; level <= view.lastLevel; level++) {
     if (hasCertifiedCompletion(completed, definition.mode, level)) continue;
+    if (Number.isSafeInteger(unlockedThrough) && level > unlockedThrough) return {level:unlockedThrough,mode:'easy'};
     const access = getDifficultyAccess({completed,level,mode:definition.mode});
     return access.unlocked ? {level,mode:definition.mode} : {...access.requires};
   }

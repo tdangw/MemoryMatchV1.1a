@@ -14,12 +14,13 @@ export const COLLECTION_PAINTINGS = Object.freeze([
 ]);
 
 /** One ten-piece set is mounted at a time; late reads cannot rebuild a closed tab. */
-export function renderMasteryCollection(container, gameId) {
+export function renderMasteryCollection(container, gameId, { block: requestedBlock } = {}) {
   container.className = 'mastery-collection-panel';
   const key = getGameProgressKey(gameId);
   const profile = gameState.progress[key];
   let block = Math.floor(((profile.adventure?.unlockedThrough || 1) - 1) / 10) + 1;
-  const lastBlock = block;
+  const lastBlock = Math.max(block, requestedBlock || 1);
+  if (Number.isSafeInteger(requestedBlock) && requestedBlock > 0) block = requestedBlock;
   const root = document.createElement('section');
   root.className = 'mastery-collection';
   container.replaceChildren(root);

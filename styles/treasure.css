@@ -44,3 +44,5 @@
   .treasure-collection-link { grid-column: 1/-1; }
 }
 @media (prefers-reduced-motion: reduce) { .treasure-content *, .treasure-art * { animation: none !important; transition: none !important; } }
+.adventure-map-node--chest > .treasure-art { width: 72px; height: 64px; }
+.adventure-map-cell--chest .adventure-map-detail { max-width: 110px; font-size: 10px; line-height: 12px; white-space: pre-line; text-align: center; }
