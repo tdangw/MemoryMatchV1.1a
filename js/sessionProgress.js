@@ -5,6 +5,7 @@ import { appendThemeSelectionHistory } from "./themeSelection.js";
 import { normalizePlayMetrics } from "./playMetrics.js";
 import { normalizeRankedRun } from "./rankingRules.js";
 import { normalizePairSnapshot } from './pairSessionSnapshot.js';
+import { normalizeWaveProgress } from './progression/waveProgress.js';
 
 export function getActiveSession(gameId, mode) {
   const key = getGameProgressKey(gameId);
@@ -22,6 +23,7 @@ export function getActiveSessions(gameId) {
 export async function saveActiveSession(gameId, session) {
   const key = getGameProgressKey(gameId);
   if (!key || !session?.mode) return false;
+  if (session.waveInvalid) return false;
   const sessions = (gameState.progress[key].sessionsByMode ||= {});
   const previous = sessions[session.mode]
     ? { ...sessions[session.mode] }
@@ -57,11 +59,15 @@ export async function commitThemeSession(gameId, session, themeId, selections) {
 export function stageActiveSession(gameId, session) {
   const key = getGameProgressKey(gameId);
   if (!key || !session?.mode) return false;
+  if (session.waveInvalid) return false;
+  const wave = session.wave ? normalizeWaveProgress(session.wave, { gameId, mode: session.mode, level: session.level }) : null;
+  if (session.wave && !wave) return false;
   gameState.progress[key].sessionsByMode ||= {};
   const run = normalizeRankedRun(session.run, { gameId, mode: session.mode, level: session.level });
   if (gameId !== 'triple-connect' && session.pairSnapshot && !normalizePairSnapshot(session.pairSnapshot, gameId)) return false;
   if (gameId === "triple-connect" && session.snapshot) {
     gameState.progress[key].sessionsByMode[session.mode] = {
+      ...(wave ? { wave } : {}),
       mode: session.mode,
       level: Math.max(1, Math.floor(session.level || 1)),
       ...(typeof session.seed === "string" && session.seed
@@ -80,6 +86,7 @@ export function stageActiveSession(gameId, session) {
     return true;
   }
   gameState.progress[key].sessionsByMode[session.mode] = {
+    ...(wave ? { wave } : {}),
     ...(normalizePairSnapshot(session.pairSnapshot, gameId) ? { pairSnapshot: normalizePairSnapshot(session.pairSnapshot, gameId) } : {}),
     ...(run ? { run } : {}),
     ...(normalizePlayMetrics(session.metrics) ? { metrics: normalizePlayMetrics(session.metrics) } : {}),

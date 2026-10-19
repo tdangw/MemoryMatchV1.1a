@@ -36,3 +36,9 @@ Không phải blocker UI đối với các model đã làm. P2 và việc bật 
 Đã duyệt EXP lần đầu, full board mỗi wave, bỏ giây combo, ngân sách wave sau cộng vào giây dư; reset dữ liệu thử toàn dự án Firebase; mảnh tranh và bảng thưởng C30/B60/A100/S160xu +1/2/3/4gợi ý, bộ300xu. Không còn blocker sản phẩm ở những mục này. Quyền project Firebase đã kiểm tra qua CLI (không xuất thông tin tài khoản lên chat), chưa xóa gì.
 
 P1 bổ sung model wave/snapshot chuẩn hóa/chuyển trạng thái, ngân sách và thưởng nhanh toàn màn, sao, chuỗi rương/giá trị thưởng đã duyệt. `node --test tests/unit/progression.test.js tests/unit/wave-progress.test.js tests/unit/mastery-rewards.test.js`:15/15 đạt. Có ma trận3game×6mode×4mốcwave, serialize/restore giữa mọi bước và chặn clear lặp. Chưa tuyên bố runtime/schema/claim đã được nghiệm thu.
+
+## P2 — boundary dữ liệu wave và kết quả
+
+`sessionProgress`/`gameState` giữ metadata wave có version; dữ liệu wave sai bị từ chối khi stage và được đánh dấu chặn resume khi hydrate, không tự chuyển về luật một board. Triple có thể giữ checkpoint board won ở biên wave khi metadata hợp lệ. Best có chứng nhận số wave, settled attempt theo mode có giới hạn để chặn quyết toán trùng; không scan attempt history.
+
+Unit mới và trước đó19/19 đạt. Thêm test IndexedDB thật qua fake-indexeddb: metadata wave + giây tiếp tế cùng revision, conflict write không sửa checkpoint. Các script persistence, chapter-store, migration-recovery hiện có đều đạt. Hai lỗi phát hiện trong lúc thêm test (flag invalid chỉ chặn save nhưng chưa chặn stage, test gọi sai contract hydrateChapterProfile) đã sửa và chạy lại. Chưa thực hiện reset thực hoặc grant mới ở runtime. Các public API cũ vẫn nhận session không có wave để bảo toàn khả năng đọc trước rollout/reset.

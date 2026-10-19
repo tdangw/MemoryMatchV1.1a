@@ -16,6 +16,7 @@ import { getRankingOwner } from './rankingOwner.js';
 import { validateRankingResult } from './rankingResult.js';
 import { normalizeProgressBests, normalizeProgressMigration } from './progressRankingModel.js';
 import { normalizePairSnapshot } from './pairSessionSnapshot.js';
+import { normalizeWaveProgress } from './progression/waveProgress.js';
 
 const GAME_MODE_IDS = new Set(GAME_MODES.map(({ id }) => id));
 
@@ -172,6 +173,9 @@ function normalizeActiveSession(session, gameId) {
   const level = Math.max(1, normalizeNonNegativeInteger(session.level) || 1);
   return {
     mode: session.mode,
+    ...(session.waveInvalid ? { waveInvalid: true } : session.wave ? (normalizeWaveProgress(session.wave, { gameId, mode: session.mode, level })
+      ? { wave: normalizeWaveProgress(session.wave, { gameId, mode: session.mode, level }) }
+      : { waveInvalid: true }) : {}),
     ...(session.pairSnapshotInvalid || session.pairSnapshot && !normalizePairSnapshot(session.pairSnapshot, gameId) ? { pairSnapshotInvalid: true, pairSnapshotSource: structuredClone(session.pairSnapshotSource || session.pairSnapshot) } : {}),
     ...(normalizePairSnapshot(session.pairSnapshot, gameId) ? { pairSnapshot: normalizePairSnapshot(session.pairSnapshot, gameId) } : {}),
     ...(normalizePlayMetrics(session.metrics) ? { metrics: normalizePlayMetrics(session.metrics) } : {}),
@@ -220,6 +224,8 @@ function normalizeBestByLevel(value) {
       score: normalizeNonNegativeInteger(result.score),
       stars: Math.min(3, normalizeNonNegativeInteger(result.stars)),
       ...(result.cleared === true ? { cleared: true } : {}),
+      ...(result.rulesVersion === 1 && Number.isInteger(result.completedWaves) && result.completedWaves >= 2 && result.completedWaves <= 5
+        ? { rulesVersion: 1, completedWaves: result.completedWaves } : {}),
       ...(Number.isSafeInteger(result.durationMs) && result.durationMs > 0 ? { durationMs: result.durationMs } : {}),
       ...(validateRankingResult(result.rankingResult) ? { rankingResult: structuredClone(result.rankingResult) } : {}),
     }]];
@@ -232,6 +238,8 @@ function normalizeAdventure(progress, gameId) {
     ? progress.adventure.currentChapter : 1;
   return {
     adventure: getAdventureSummary(normalizeBestByLevel(progress.bestByLevel), currentChapter),
+    ...(progress.settledAttempts ? { settledAttempts: Object.fromEntries(Object.entries(progress.settledAttempts)
+      .filter(([mode, id]) => GAME_MODE_IDS.has(mode) && typeof id === 'string' && id.length > 0 && id.length <= 120)) } : {}),
     claimedChests: progress.claimedChests && typeof progress.claimedChests === "object" && !Array.isArray(progress.claimedChests)
       ? structuredClone(progress.claimedChests) : {},
     startedLevels: progress.startedLevels && typeof progress.startedLevels === "object" && !Array.isArray(progress.startedLevels)
@@ -291,9 +299,12 @@ function normalizeTripleSessions(sessions, trayCapacity = TRIPLE_PRODUCT_DECISIO
       if (typeof session.layoutId !== "string" || !session.layoutId) return [];
       getTripleLayout(session.layoutId);
       const restored = restoreSerializedTripleRoundState(session.snapshot, { trayCapacity });
-      if (restored.status !== "playing") return [];
+      const wave = session.wave ? normalizeWaveProgress(session.wave, { gameId: 'triple-connect', mode, level: session.level }) : null;
+      if (session.wave && !wave) return [];
+      if (restored.status !== "playing" && !(restored.status === 'won' && wave && wave.phase !== 'playing')) return [];
       const snapshot = serializeTripleRoundState(restored);
       return [[mode, {
+        ...(wave ? { wave } : {}),
         mode,
         ...(normalizePlayMetrics(session.metrics) ? { metrics: normalizePlayMetrics(session.metrics) } : {}),
         ...(normalizeRankedRun(session.run, { gameId: "triple-connect", mode, level: session.level })
@@ -387,7 +398,14 @@ export function recordMemoryMatchResult(result) { return recordGameResult(gameSt
 export function recordLinkConnectResult(result) { return recordGameResult(gameState.progress.linkConnect, result, 'link-connect'); }
 export function recordTripleConnectResult(result) { return recordGameResult(gameState.progress.tripleConnect, result, 'triple-connect'); }
 
-function recordGameResult(progress, { mode, level, score, stars, durationMs }, gameId) {
+function recordGameResult(progress, { mode, level, score, stars, durationMs, wave }, gameId) {
+  if (wave) {
+    const normalized = normalizeWaveProgress(wave, { gameId, mode, level });
+    if (!normalized || normalized.phase !== 'won') throw new Error('Cannot record an incomplete multi-wave result.');
+    progress.settledAttempts ||= {};
+    if (progress.settledAttempts[mode] === wave.attemptId) throw new Error('Attempt was already settled.');
+    progress.settledAttempts[mode] = wave.attemptId;
+  }
   const key = `${mode}:${level}`;
   const previous = progress.bestByLevel[key] || { score: 0, stars: 0 };
   const nextScore = Math.max(previous.score || 0, score);
@@ -398,6 +416,7 @@ function recordGameResult(progress, { mode, level, score, stars, durationMs }, g
   const measuredTime = Number.isSafeInteger(durationMs) && durationMs > 0 ? durationMs : null;
   const bestTime = measuredTime ? Math.min(previousTime || Infinity, measuredTime) : previousTime;
   progress.bestByLevel[key] = { score: nextScore, stars: nextStars, cleared: true, ...(bestTime ? { durationMs: bestTime } : {}) };
+  if (wave) Object.assign(progress.bestByLevel[key], { rulesVersion: 1, completedWaves: wave.count });
   if (previous.rankingResult) progress.bestByLevel[key].rankingResult = previous.rankingResult;
   const metrics = getActivePlayMetrics();
   const owner = metrics ? metrics.owner : getRankingOwner();
