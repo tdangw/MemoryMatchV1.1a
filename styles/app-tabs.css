@@ -97,7 +97,7 @@
 @media (prefers-reduced-motion: reduce) { .tab-button { transition: none; } .tab-button:active:not(:disabled) { transform: none; } }
 
 /* Painted group frames share one material across every functional screen. */
-.tab-card { border-image-source: var(--ui-art-garden-panel); border-image-slice: 30% fill; border-image-width: 20px; padding: 22px 24px; background: #092832; }
+.tab-card { border-image-source: var(--ui-art-garden-panel); border-image-slice: 20% fill; border-image-width: 20px; padding: 22px 24px; background: #092832; }
 .tab-button { width: fit-content; max-width: 100%; min-height: 48px; justify-self: start; border-image-source: var(--ui-art-garden-primary); border-image-slice: 35% 27% fill; border-image-width: 14px 22px; background: transparent; }
 .tab-button--quiet { border-image-source: var(--ui-art-garden-secondary); background: transparent; }
 .tab-button:disabled { border-image-source: var(--ui-art-garden-disabled); }

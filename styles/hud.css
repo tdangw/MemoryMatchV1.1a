@@ -181,7 +181,7 @@
 #version-modal .app-modal {
   border-color: rgb(255 255 255 / 16%);
   border-radius: 24px;
-  background: linear-gradient(155deg, #182942 0%, #243b64 100%);
+  background: var(--dialog-surface);
   color: #f5f7fb;
 }
 
@@ -195,7 +195,6 @@
 }
 
 #version-modal .app-modal__close {
-  background: rgb(255 255 255 / 9%);
   color: #f5f7fb;
 }
 

@@ -1,56 +1,58 @@
 /* Màu nhấn cho bộ icon SVG */
 .ui-icon--home {
-  color: #4c9fea;
+  color: var(--dialog-gold, #f1d58b);
 }
 .ui-icon--restart {
-  color: #7187d8;
+  color: var(--dialog-gold, #f1d58b);
 }
 .ui-icon--wand {
-  color: #a56bc2;
+  color: var(--dialog-gold, #f1d58b);
 }
 .ui-icon--settings {
-  color: #4779c5;
+  color: var(--dialog-gold, #f1d58b);
 }
 .ui-icon--shop {
-  color: #4c9fea;
+  color: var(--dialog-gold, #f1d58b);
 }
 .ui-icon--search {
-  color: #438bc5;
+  color: var(--dialog-gold, #f1d58b);
 }
 .ui-icon--info {
-  color: #6e7fc2;
+  color: var(--dialog-gold, #f1d58b);
 }
 .ui-icon--play {
-  color: #4c9fea;
+  color: var(--dialog-gold, #f1d58b);
 }
 .ui-icon--book {
-  color: #4e82bd;
+  color: var(--dialog-gold, #f1d58b);
 }
 .ui-icon--exit {
-  color: #cb5e67;
+  color: #e9adad;
 }
 .ui-icon--timer {
-  color: #7567b7;
+  color: var(--dialog-gold, #f1d58b);
 }
 .ui-icon--trophy {
-  color: #c99222;
+  color: var(--dialog-gold, #f1d58b);
 }
 .ui-icon--star {
-  color: #dca51f;
+  color: var(--dialog-gold, #f1d58b);
 }
 .ui-icon--puzzle {
-  color: #58a26d;
+  color: var(--dialog-gold, #f1d58b);
 }
 .ui-icon--sliders {
-  color: #388e7a;
+  color: var(--dialog-gold, #f1d58b);
 }
 .ui-icon--music {
-  color: #835fb6;
+  color: var(--dialog-gold, #f1d58b);
 }
 .ui-icon--hourglass {
-  color: #c86a54;
+  color: var(--dialog-gold, #f1d58b);
 }
 .ui-icon--celebrate {
-  color: #c361a4;
+  color: var(--dialog-gold, #f1d58b);
 }
 
+
+.ui-icon--star-empty { opacity: 1; filter: grayscale(1) brightness(.85); }

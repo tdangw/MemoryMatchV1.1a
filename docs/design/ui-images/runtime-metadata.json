@@ -1,201 +1,201 @@
 {
   "totals": {
-    "garden": 218454,
-    "reward": 239318,
-    "icons": 146686
+    "garden": 180128,
+    "reward": 51882,
+    "icons": 190162
   },
   "assets": [
     {
       "name": "garden-panel",
-      "source": "garden-v1.png",
+      "source": "garden-simple-v2.png",
       "rect": [
-        10,
-        55,
-        330,
-        365
+        0,
+        0,
+        328,
+        360
       ],
       "maxSize": 420,
       "group": "garden",
       "icons": [],
       "sourceSize": [
-        319,
-        310
+        301,
+        270
       ],
       "size": [
-        319,
-        310
+        301,
+        270
       ],
-      "bytes": 17136,
+      "bytes": 14152,
       "url": "/assets/images/ui/v1/garden-panel.webp",
-      "sha256": "2c651d80ab2c81e1a13c07d91c4fd4c527ea20b09dfbc8cb722937853efbf9d3"
+      "sha256": "03531f15676ca16868c32cae4d7bb1c762d628756310522cb574bc2a22f8e7fc"
     },
     {
       "name": "garden-inset",
-      "source": "garden-v1.png",
+      "source": "garden-simple-v2.png",
       "rect": [
-        331,
-        55,
-        647,
-        365
+        328,
+        60,
+        650,
+        350
       ],
       "maxSize": 320,
       "group": "garden",
       "icons": [],
       "sourceSize": [
-        316,
-        310
+        314,
+        147
       ],
       "size": [
-        316,
-        310
+        314,
+        147
       ],
-      "bytes": 17062,
+      "bytes": 7268,
       "url": "/assets/images/ui/v1/garden-inset.webp",
-      "sha256": "d768d0cde142abd320925b6d1eb4c7dc742a3446182cb40f9629850cf287d68b"
+      "sha256": "cccb122795e3bcdc55452ce2c9b057df42485e0f6c4a17fc238292e5daf34ef5"
     },
     {
       "name": "garden-title",
-      "source": "garden-v1.png",
+      "source": "garden-simple-v2.png",
       "rect": [
-        648,
-        145,
-        1034,
-        340
+        650,
+        60,
+        1036,
+        350
       ],
       "maxSize": 400,
       "group": "garden",
       "icons": [],
       "sourceSize": [
-        386,
-        194
+        368,
+        157
       ],
       "size": [
-        386,
-        194
+        368,
+        157
       ],
-      "bytes": 21342,
+      "bytes": 14700,
       "url": "/assets/images/ui/v1/garden-title.webp",
-      "sha256": "97c68433c93f3a7bbd453690698e7cab4126a0d8c753158c50340a70fc055c1b"
+      "sha256": "34585bb7768f27542287903c51a9949a5a7c5f8af2737a4c03be53ec1e8b9f64"
     },
     {
       "name": "garden-square",
-      "source": "garden-v1.png",
+      "source": "garden-simple-v2.png",
       "rect": [
-        1034,
-        145,
-        1247,
-        360
+        1037,
+        60,
+        1312,
+        350
       ],
       "maxSize": 160,
       "group": "garden",
       "icons": [],
       "sourceSize": [
-        194,
-        215
+        246,
+        245
       ],
       "size": [
-        144,
-        160
+        160,
+        159
       ],
-      "bytes": 7350,
+      "bytes": 6686,
       "url": "/assets/images/ui/v1/garden-square.webp",
-      "sha256": "7845253731c1b2877625e9c37599398fcc73dbb3bcf10ba87383022ff695b476"
+      "sha256": "bd3852d9cfb9828830c748683825d910addddb2c2bd060d678faf5f9419f3003"
     },
     {
       "name": "garden-primary",
-      "source": "garden-v1.png",
+      "source": "garden-simple-v2.png",
       "rect": [
-        10,
-        395,
-        324,
-        560
+        0,
+        365,
+        328,
+        565
       ],
       "maxSize": 320,
       "group": "garden",
       "icons": [],
       "sourceSize": [
-        310,
-        160
+        316,
+        146
       ],
       "size": [
-        310,
-        160
+        316,
+        146
       ],
-      "bytes": 14750,
+      "bytes": 7578,
       "url": "/assets/images/ui/v1/garden-primary.webp",
-      "sha256": "1226fd27cecd7f9f2d86a77b1b252a51360fe1af52921ca5230a5c6e45cb425d"
+      "sha256": "8913bd3f544a812894a7220913e7c327fe7e1356cf46cb50d561497cb80141cd"
     },
     {
       "name": "garden-secondary",
-      "source": "garden-v1.png",
+      "source": "garden-simple-v2.png",
       "rect": [
-        325,
-        395,
-        638,
-        560
+        328,
+        365,
+        656,
+        565
       ],
       "maxSize": 320,
       "group": "garden",
       "icons": [],
       "sourceSize": [
-        313,
-        165
+        328,
+        149
       ],
       "size": [
-        313,
-        165
+        320,
+        145
       ],
-      "bytes": 13714,
+      "bytes": 7850,
       "url": "/assets/images/ui/v1/garden-secondary.webp",
-      "sha256": "1f448080a361d64f8af9611d25cd0589db4c3582a24ab4941af1e1660f6bcc59"
+      "sha256": "716f627191e691b731ae9f663df6b94718182e396a7658b12be89a8ee782a420"
     },
     {
       "name": "garden-danger",
-      "source": "garden-v1.png",
+      "source": "garden-simple-v2.png",
       "rect": [
-        638,
-        395,
-        950,
-        560
+        656,
+        365,
+        984,
+        565
       ],
       "maxSize": 320,
       "group": "garden",
       "icons": [],
       "sourceSize": [
-        312,
-        164
+        328,
+        147
       ],
       "size": [
-        312,
-        164
+        320,
+        143
       ],
-      "bytes": 14240,
+      "bytes": 7924,
       "url": "/assets/images/ui/v1/garden-danger.webp",
-      "sha256": "170b900db702fd84d75c251c50bedb83c5efcc8f8777e6e3b6a8b8bd55063142"
+      "sha256": "8d4ae5d2cee0f19f18b9e1d21def897b0966a1f4dbb5d861c8ef3d67dbd4c570"
     },
     {
       "name": "garden-disabled",
-      "source": "garden-v1.png",
+      "source": "garden-simple-v2.png",
       "rect": [
-        950,
-        395,
-        1254,
-        560
+        984,
+        365,
+        1312,
+        565
       ],
       "maxSize": 320,
       "group": "garden",
       "icons": [],
       "sourceSize": [
-        288,
-        164
+        317,
+        150
       ],
       "size": [
-        288,
-        164
+        317,
+        150
       ],
-      "bytes": 13436,
+      "bytes": 7468,
       "url": "/assets/images/ui/v1/garden-disabled.webp",
-      "sha256": "5adfd1be798a79bcd018f2264bc71a2d57578a28b520793fba161c940bc94426"
+      "sha256": "7797f955cff9c21a7c313b9e84f04957a3267808781c8035ca89ca1ef1133da4"
     },
     {
       "name": "grade-c",
@@ -210,16 +210,16 @@
       "group": "garden",
       "icons": [],
       "sourceSize": [
-        303,
-        310
+        292,
+        273
       ],
       "size": [
-        188,
-        192
+        192,
+        180
       ],
-      "bytes": 14252,
+      "bytes": 15298,
       "url": "/assets/images/ui/v1/grade-c.webp",
-      "sha256": "4d4b5090aeca615b65da2393db9d24b8a88b067c4358e30e182dc6d37d241ca2"
+      "sha256": "448f4bda06c4e09fbd2fa895f9687a35388b093d2f015f9da60b94c8d03a2b5d"
     },
     {
       "name": "grade-b",
@@ -234,16 +234,16 @@
       "group": "garden",
       "icons": [],
       "sourceSize": [
-        310,
-        310
+        260,
+        271
       ],
       "size": [
-        192,
+        184,
         192
       ],
-      "bytes": 12394,
+      "bytes": 14990,
       "url": "/assets/images/ui/v1/grade-b.webp",
-      "sha256": "b6eec9799b8ec9aecb3fb42c04db216704e75190603faa3f28b855f888fffcb8"
+      "sha256": "21ffbccc74490af4c3e7c3121c22961e7c7ff4482d27356a72b0b986a56c09e5"
     },
     {
       "name": "grade-a",
@@ -258,16 +258,16 @@
       "group": "garden",
       "icons": [],
       "sourceSize": [
-        310,
-        304
+        275,
+        272
       ],
       "size": [
         192,
-        188
+        190
       ],
-      "bytes": 13874,
+      "bytes": 16440,
       "url": "/assets/images/ui/v1/grade-a.webp",
-      "sha256": "7e9d489ec15dbbb653f6186e4e1c908b1a6b028ae8d4e70fb372712ea288d3ab"
+      "sha256": "4227853613a9cf227648d3fc2f3376ed1cb272b0a529f983bc62f7ce73b942f0"
     },
     {
       "name": "grade-s",
@@ -282,16 +282,16 @@
       "group": "garden",
       "icons": [],
       "sourceSize": [
-        288,
-        304
+        276,
+        272
       ],
       "size": [
-        182,
-        192
+        192,
+        189
       ],
-      "bytes": 14480,
+      "bytes": 16680,
       "url": "/assets/images/ui/v1/grade-s.webp",
-      "sha256": "fc3dfbfa3f6a8c44919b8fb511cb803f066349b557e0f609bebabd38c7f79e4c"
+      "sha256": "10cb7c2773b50c792b1cb39fb7ab10f8a3962ddcf9752ea1a075c6e6fc71dba8"
     },
     {
       "name": "avatar-frame",
@@ -306,16 +306,16 @@
       "group": "garden",
       "icons": [],
       "sourceSize": [
-        327,
-        328
+        307,
+        313
       ],
       "size": [
-        239,
+        235,
         240
       ],
-      "bytes": 23134,
+      "bytes": 24466,
       "url": "/assets/images/ui/v1/avatar-frame.webp",
-      "sha256": "ab8221a3c5a0fd6dda4ee5ec55bed44b4ea06168a0f14231c1de3858673de8f1"
+      "sha256": "b04ddc3f1864771641f8a818d301a44528efcaeb796436d325e8a27920b00c17"
     },
     {
       "name": "rank-medal",
@@ -330,16 +330,16 @@
       "group": "garden",
       "icons": [],
       "sourceSize": [
-        278,
-        322
+        247,
+        301
       ],
       "size": [
-        111,
+        105,
         128
       ],
-      "bytes": 6854,
+      "bytes": 7256,
       "url": "/assets/images/ui/v1/rank-medal.webp",
-      "sha256": "5eca532e5aac3314494380f9173e4a21eb2a0ac37f45e954defd7e66d73fb74b"
+      "sha256": "988807d3550d102dc00366010ed98313b03d6bf5733718b0b5cb911c13349db0"
     },
     {
       "name": "control-thumb",
@@ -354,465 +354,40 @@
       "group": "garden",
       "icons": [],
       "sourceSize": [
-        245,
-        231
+        191,
+        191
       ],
       "size": [
         96,
-        91
+        96
       ],
-      "bytes": 3318,
+      "bytes": 4104,
       "url": "/assets/images/ui/v1/control-thumb.webp",
-      "sha256": "970afe8c5128a8452904d1b2c6aa962afada835031a310b13939b40a904cd008"
+      "sha256": "c01e4f193f5894ac1152d7e404380af68da49f8d71524da2ee9df8837da492e4"
     },
     {
       "name": "garden-tray",
-      "source": "garden-v1.png",
+      "source": "garden-simple-v2.png",
       "rect": [
-        878,
-        995,
-        1254,
-        1150
+        328,
+        60,
+        650,
+        350
       ],
       "maxSize": 320,
       "group": "garden",
       "icons": [],
       "sourceSize": [
-        361,
-        154
+        314,
+        147
       ],
       "size": [
-        320,
-        137
+        314,
+        147
       ],
-      "bytes": 11118,
+      "bytes": 7268,
       "url": "/assets/images/ui/v1/garden-tray.webp",
-      "sha256": "5afc8901ad0604ac9752a72588400499227d5fe3997f26d84f5a38d06f25ee4f"
-    },
-    {
-      "name": "reward-panel",
-      "source": "reward-v1.png",
-      "rect": [
-        10,
-        65,
-        325,
-        360
-      ],
-      "maxSize": 420,
-      "group": "reward",
-      "icons": [],
-      "sourceSize": [
-        310,
-        285
-      ],
-      "size": [
-        310,
-        285
-      ],
-      "bytes": 15850,
-      "url": "/assets/images/ui/v1/reward-panel.webp",
-      "sha256": "0fa92570698612266b1cca6173d07ab1ef75b136d0f397d948f9521bb59123bc"
-    },
-    {
-      "name": "reward-paper",
-      "source": "reward-v1.png",
-      "rect": [
-        326,
-        80,
-        594,
-        345
-      ],
-      "maxSize": 320,
-      "group": "reward",
-      "icons": [],
-      "sourceSize": [
-        261,
-        246
-      ],
-      "size": [
-        261,
-        246
-      ],
-      "bytes": 10820,
-      "url": "/assets/images/ui/v1/reward-paper.webp",
-      "sha256": "4053c921500f05772ed25df01c3cdd12e87e850698763ad797320c589ff612b5"
-    },
-    {
-      "name": "reward-title",
-      "source": "reward-v1.png",
-      "rect": [
-        594,
-        135,
-        965,
-        300
-      ],
-      "maxSize": 420,
-      "group": "reward",
-      "icons": [],
-      "sourceSize": [
-        371,
-        157
-      ],
-      "size": [
-        371,
-        157
-      ],
-      "bytes": 16376,
-      "url": "/assets/images/ui/v1/reward-title.webp",
-      "sha256": "265855ebb547b3914490e0608291d8f7814ebbacbd2e8d8a2d38cd4057157f51"
-    },
-    {
-      "name": "reward-well",
-      "source": "reward-v1.png",
-      "rect": [
-        965,
-        155,
-        1254,
-        300
-      ],
-      "maxSize": 320,
-      "group": "reward",
-      "icons": [],
-      "sourceSize": [
-        275,
-        133
-      ],
-      "size": [
-        275,
-        133
-      ],
-      "bytes": 7426,
-      "url": "/assets/images/ui/v1/reward-well.webp",
-      "sha256": "8bff76779d5798e8f40b03710ae78a3637085e98cd77c03d6c784d74f073016d"
-    },
-    {
-      "name": "reward-orange",
-      "source": "reward-v1.png",
-      "rect": [
-        10,
-        398,
-        324,
-        555
-      ],
-      "maxSize": 320,
-      "group": "reward",
-      "icons": [],
-      "sourceSize": [
-        310,
-        144
-      ],
-      "size": [
-        310,
-        144
-      ],
-      "bytes": 9520,
-      "url": "/assets/images/ui/v1/reward-orange.webp",
-      "sha256": "616c6a02512354b3378b406283a786e872afab84b2f7e407f0bdcaf7bff29be4"
-    },
-    {
-      "name": "reward-green",
-      "source": "reward-v1.png",
-      "rect": [
-        325,
-        398,
-        628,
-        555
-      ],
-      "maxSize": 320,
-      "group": "reward",
-      "icons": [],
-      "sourceSize": [
-        303,
-        149
-      ],
-      "size": [
-        303,
-        149
-      ],
-      "bytes": 10422,
-      "url": "/assets/images/ui/v1/reward-green.webp",
-      "sha256": "5d53ef5e978ac58bc992e30b24ccff29c4c25dacc6e23705c6a21da19efdfe4b"
-    },
-    {
-      "name": "reward-secondary",
-      "source": "reward-v1.png",
-      "rect": [
-        628,
-        398,
-        942,
-        555
-      ],
-      "maxSize": 320,
-      "group": "reward",
-      "icons": [],
-      "sourceSize": [
-        314,
-        141
-      ],
-      "size": [
-        314,
-        141
-      ],
-      "bytes": 8328,
-      "url": "/assets/images/ui/v1/reward-secondary.webp",
-      "sha256": "d1681fbbb745dc1bad7791f138ad09c057999ce0a650c4907092e734a16c0be3"
-    },
-    {
-      "name": "reward-disabled",
-      "source": "reward-v1.png",
-      "rect": [
-        942,
-        398,
-        1254,
-        555
-      ],
-      "maxSize": 320,
-      "group": "reward",
-      "icons": [],
-      "sourceSize": [
-        298,
-        142
-      ],
-      "size": [
-        298,
-        142
-      ],
-      "bytes": 7292,
-      "url": "/assets/images/ui/v1/reward-disabled.webp",
-      "sha256": "a7c6572106e115bafc3ff6b787fa705fc05ad2d1d25a773bb6050fd884ae9211"
-    },
-    {
-      "name": "star",
-      "source": "reward-v1.png",
-      "rect": [
-        25,
-        588,
-        310,
-        870
-      ],
-      "maxSize": 192,
-      "group": "reward",
-      "icons": [
-        "star"
-      ],
-      "sourceSize": [
-        264,
-        254
-      ],
-      "size": [
-        192,
-        185
-      ],
-      "bytes": 10322,
-      "url": "/assets/images/ui/v1/star.webp",
-      "sha256": "7c30bfd5fb597699e6e68e94eb6ce65c1646e26689b476ead0a8ff85be5ea7bb"
-    },
-    {
-      "name": "star-empty",
-      "source": "reward-v1.png",
-      "rect": [
-        330,
-        588,
-        628,
-        870
-      ],
-      "maxSize": 192,
-      "group": "reward",
-      "icons": [
-        "star-empty"
-      ],
-      "sourceSize": [
-        270,
-        253
-      ],
-      "size": [
-        192,
-        180
-      ],
-      "bytes": 9382,
-      "url": "/assets/images/ui/v1/star-empty.webp",
-      "sha256": "d241dfc03b4b60be36be6c7d1c7318afeafda8cb3e000876a072fce4adfaf003"
-    },
-    {
-      "name": "coin",
-      "source": "reward-v1.png",
-      "rect": [
-        640,
-        590,
-        925,
-        880
-      ],
-      "maxSize": 144,
-      "group": "reward",
-      "icons": [
-        "coin"
-      ],
-      "sourceSize": [
-        260,
-        258
-      ],
-      "size": [
-        144,
-        143
-      ],
-      "bytes": 7336,
-      "url": "/assets/images/ui/v1/coin.webp",
-      "sha256": "518554b2388b14b7b1e17e995dc65eff0b190e7a206f057998d633b44d16f2dc"
-    },
-    {
-      "name": "timer",
-      "source": "reward-v1.png",
-      "rect": [
-        953,
-        580,
-        1254,
-        880
-      ],
-      "maxSize": 144,
-      "group": "reward",
-      "icons": [
-        "timer",
-        "hourglass"
-      ],
-      "sourceSize": [
-        240,
-        274
-      ],
-      "size": [
-        126,
-        144
-      ],
-      "bytes": 6922,
-      "url": "/assets/images/ui/v1/timer.webp",
-      "sha256": "b6d45125c359bf6a135fd2641802b8d92a2de7c0f475002536ec4f06cc78fb28"
-    },
-    {
-      "name": "chest-closed",
-      "source": "reward-v1.png",
-      "rect": [
-        5,
-        895,
-        324,
-        1190
-      ],
-      "maxSize": 192,
-      "group": "reward",
-      "icons": [
-        "chest"
-      ],
-      "sourceSize": [
-        311,
-        266
-      ],
-      "size": [
-        192,
-        164
-      ],
-      "bytes": 12654,
-      "url": "/assets/images/ui/v1/chest-closed.webp",
-      "sha256": "61d0fdb59c6e6a9b870ab62a23e61c73be4124d8e18a7dfa82ffd3e78725972c"
-    },
-    {
-      "name": "chest-open",
-      "source": "reward-v1.png",
-      "rect": [
-        325,
-        875,
-        630,
-        1190
-      ],
-      "maxSize": 192,
-      "group": "reward",
-      "icons": [
-        "chest-open"
-      ],
-      "sourceSize": [
-        305,
-        308
-      ],
-      "size": [
-        190,
-        192
-      ],
-      "bytes": 15000,
-      "url": "/assets/images/ui/v1/chest-open.webp",
-      "sha256": "c10fbad5a03c5815286421153a3d5bfa5a673c21b4522e8b27c188140d584cc6"
-    },
-    {
-      "name": "reward-trophy",
-      "source": "reward-v1.png",
-      "rect": [
-        632,
-        900,
-        942,
-        1190
-      ],
-      "maxSize": 144,
-      "group": "reward",
-      "icons": [],
-      "sourceSize": [
-        299,
-        285
-      ],
-      "size": [
-        144,
-        137
-      ],
-      "bytes": 10738,
-      "url": "/assets/images/ui/v1/reward-trophy.webp",
-      "sha256": "681d711ea4798ec4bb8a770f307c98f7931aeb9dd371b7c7d0fa152f65e4a37d"
-    },
-    {
-      "name": "gift",
-      "source": "reward-v1.png",
-      "rect": [
-        945,
-        895,
-        1254,
-        1190
-      ],
-      "maxSize": 144,
-      "group": "reward",
-      "icons": [
-        "celebrate"
-      ],
-      "sourceSize": [
-        278,
-        280
-      ],
-      "size": [
-        143,
-        144
-      ],
-      "bytes": 7802,
-      "url": "/assets/images/ui/v1/gift.webp",
-      "sha256": "f537752cb02e2a3a3c909c365d966e0a3b08eae1ca248c9b31f685c82d854c11"
-    },
-    {
-      "name": "icon-home",
-      "source": "icons-v1.png",
-      "rect": [
-        0,
-        180,
-        210,
-        400
-      ],
-      "maxSize": 128,
-      "group": "icons",
-      "icons": [
-        "home"
-      ],
-      "sourceSize": [
-        165,
-        169
-      ],
-      "size": [
-        125,
-        128
-      ],
-      "bytes": 9098,
-      "url": "/assets/images/ui/v1/icon-home.webp",
-      "sha256": "4cf0c730019442c8b2d429c9d82faf4bf5524cbeea1c5341fc07bccacdd038df"
+      "sha256": "cccb122795e3bcdc55452ce2c9b057df42485e0f6c4a17fc238292e5daf34ef5"
     },
     {
       "name": "icon-shop",
@@ -829,16 +404,16 @@
         "shop"
       ],
       "sourceSize": [
-        169,
-        148
+        158,
+        143
       ],
       "size": [
         128,
-        112
+        116
       ],
-      "bytes": 7942,
+      "bytes": 8610,
       "url": "/assets/images/ui/v1/icon-shop.webp",
-      "sha256": "0c219aac0fd0dd1978bb19eb6bc3dffdaf231524b55ac001de321c1558528b6c"
+      "sha256": "24185e1f59e48313682045f1b4ebd60a811f439348423825220d3bf01fcebbfe"
     },
     {
       "name": "icon-collection",
@@ -855,16 +430,16 @@
         "collection"
       ],
       "sourceSize": [
-        174,
-        147
+        142,
+        137
       ],
       "size": [
         128,
-        108
+        123
       ],
-      "bytes": 7180,
+      "bytes": 9372,
       "url": "/assets/images/ui/v1/icon-collection.webp",
-      "sha256": "b2aca1b8c3ff0570c71ce69d09a7f36a770cccadba5d1740f3dbc6342521cc6d"
+      "sha256": "5548f87340293bb000c141778628d2a066188e76958f6d40cf14dce9e8937087"
     },
     {
       "name": "icon-map",
@@ -881,16 +456,16 @@
         "map"
       ],
       "sourceSize": [
-        198,
-        192
+        147,
+        154
       ],
       "size": [
-        128,
-        124
+        122,
+        128
       ],
-      "bytes": 5986,
+      "bytes": 8588,
       "url": "/assets/images/ui/v1/icon-map.webp",
-      "sha256": "31d22274e9740ee9ae897ead80ebc3c82cf2d1a32e023da77ca180e53df490e7"
+      "sha256": "3e75cfee6072bf59db82c6e40f1ccf4785f68ab31b7b6692ef311494b9958499"
     },
     {
       "name": "icon-trophy",
@@ -907,16 +482,16 @@
         "trophy"
       ],
       "sourceSize": [
-        207,
-        193
+        150,
+        154
       ],
       "size": [
-        128,
-        119
+        125,
+        128
       ],
-      "bytes": 6268,
+      "bytes": 9292,
       "url": "/assets/images/ui/v1/icon-trophy.webp",
-      "sha256": "d4683da8fa781140a2b510fe39f6d8d63735c7883cdae0483ff63c98027018c1"
+      "sha256": "0cda77fbe9ebec43cc546ddc8904dfcccd11de7b8fb59089d0bd5a65c3ab40e1"
     },
     {
       "name": "icon-settings",
@@ -933,16 +508,16 @@
         "settings"
       ],
       "sourceSize": [
-        152,
-        219
+        138,
+        140
       ],
       "size": [
-        89,
+        126,
         128
       ],
-      "bytes": 4908,
+      "bytes": 9242,
       "url": "/assets/images/ui/v1/icon-settings.webp",
-      "sha256": "2cee0800cc6d7a455c526743203bf1f220a6586938ab43c88dd6c271394c79ed"
+      "sha256": "c2d5fa8dd2a4559b07a008304c398a7e5e55da91359609a953f5a55392042029"
     },
     {
       "name": "icon-account",
@@ -959,16 +534,16 @@
         "account"
       ],
       "sourceSize": [
-        162,
-        207
+        133,
+        155
       ],
       "size": [
-        100,
+        110,
         128
       ],
-      "bytes": 4622,
+      "bytes": 6596,
       "url": "/assets/images/ui/v1/icon-account.webp",
-      "sha256": "5bda062930f9a8b2c33ad5460a5468bbeea47ebb782ae5a27931423e44045145"
+      "sha256": "f248bfbe117d4c6a31079644b23beb63d53737cb30f3bea82ae4f798805628a1"
     },
     {
       "name": "icon-missions",
@@ -985,16 +560,16 @@
         "missions"
       ],
       "sourceSize": [
-        179,
-        196
+        157,
+        160
       ],
       "size": [
-        117,
+        126,
         128
       ],
-      "bytes": 6400,
+      "bytes": 8044,
       "url": "/assets/images/ui/v1/icon-missions.webp",
-      "sha256": "8f34b20d8d9e3ee3adf8447a1100a207784863badc1707ed21d80658a66874c7"
+      "sha256": "8c8d0a75b38476f9e24ecb114f27fbeed9d42a5be611f98e9a9b75f5880408dc"
     },
     {
       "name": "icon-events",
@@ -1011,16 +586,16 @@
         "events"
       ],
       "sourceSize": [
-        166,
-        191
+        141,
+        156
       ],
       "size": [
-        111,
+        116,
         128
       ],
-      "bytes": 5130,
+      "bytes": 6510,
       "url": "/assets/images/ui/v1/icon-events.webp",
-      "sha256": "81bc21b450bc8a7acf78e9baa94f2d3161de0d5b3ac27a8c53d40629a2b65a44"
+      "sha256": "c2a82b01447904431fe3abb7c13e37642c6e2a950544d2ee1018bcc42fd495e8"
     },
     {
       "name": "icon-info",
@@ -1037,16 +612,16 @@
         "info"
       ],
       "sourceSize": [
-        176,
-        209
+        151,
+        143
       ],
       "size": [
-        108,
-        128
+        128,
+        121
       ],
-      "bytes": 5360,
+      "bytes": 8034,
       "url": "/assets/images/ui/v1/icon-info.webp",
-      "sha256": "f25c348770cd2e74c54698f70c4876de0f2376f1180268bc1136cc44fe129344"
+      "sha256": "6abedd02e3b2fcfb836ac0a28414b37b0402171111071468950ce3d8d975dbb4"
     },
     {
       "name": "icon-play",
@@ -1063,16 +638,16 @@
         "play"
       ],
       "sourceSize": [
-        172,
-        195
+        123,
+        146
       ],
       "size": [
-        113,
+        108,
         128
       ],
-      "bytes": 4008,
+      "bytes": 5334,
       "url": "/assets/images/ui/v1/icon-play.webp",
-      "sha256": "4e0a0a0f99baed079e68bd11a7d0096c1bf7b52394d4efbf73ddab076355a0ef"
+      "sha256": "14aa2f9ad3a7354c6e48987b36e4e2b5283d839d0632c63c6d3e220ac1877f49"
     },
     {
       "name": "icon-restart",
@@ -1089,16 +664,16 @@
         "restart"
       ],
       "sourceSize": [
-        166,
-        193
+        138,
+        145
       ],
       "size": [
-        110,
+        122,
         128
       ],
-      "bytes": 6174,
+      "bytes": 9376,
       "url": "/assets/images/ui/v1/icon-restart.webp",
-      "sha256": "8ed379dd946515b52d9c5e11dc7069ecc0fa9f06e19e3936457537e99ed97a1b"
+      "sha256": "24f3cf08c8714e325006ae79b32c213efc1710438fecc894497b428c0d2c5561"
     },
     {
       "name": "icon-search",
@@ -1115,16 +690,16 @@
         "search"
       ],
       "sourceSize": [
-        161,
-        194
+        148,
+        161
       ],
       "size": [
-        106,
+        118,
         128
       ],
-      "bytes": 5492,
+      "bytes": 6850,
       "url": "/assets/images/ui/v1/icon-search.webp",
-      "sha256": "f696771cf23a841a639df59642502b93ce67676d83df2fb9ff55f8d27dfc7d29"
+      "sha256": "a7722e656d233771641ca1d640cc899046e0ad6fb7ceaeff93860e4016dc1ffd"
     },
     {
       "name": "icon-shuffle",
@@ -1141,16 +716,16 @@
         "shuffle"
       ],
       "sourceSize": [
-        174,
-        174
+        161,
+        132
       ],
       "size": [
         128,
-        128
+        105
       ],
-      "bytes": 7494,
+      "bytes": 8332,
       "url": "/assets/images/ui/v1/icon-shuffle.webp",
-      "sha256": "6373d71e1dda24dd49dbdcf0bec0387878995f1cd85700c22d6c2350c28caab4"
+      "sha256": "f53fa51002c8825dc2639c7358b00bdace70634b6624458bdda1dc5f4972931a"
     },
     {
       "name": "icon-snowflake",
@@ -1167,16 +742,16 @@
         "snowflake"
       ],
       "sourceSize": [
-        176,
-        201
+        132,
+        151
       ],
       "size": [
         112,
         128
       ],
-      "bytes": 6398,
+      "bytes": 9482,
       "url": "/assets/images/ui/v1/icon-snowflake.webp",
-      "sha256": "68eff342fe2086aa0f346e42203ddc04e3deb08729a73b300658969cad2adf3f"
+      "sha256": "5069d0701892fa5dd2c2804331cfc3a0c1419e89d82eb12068c33bb3b9d469b2"
     },
     {
       "name": "icon-freeze",
@@ -1193,16 +768,16 @@
         "freeze"
       ],
       "sourceSize": [
-        196,
-        196
+        151,
+        162
       ],
       "size": [
-        128,
+        119,
         128
       ],
-      "bytes": 7962,
+      "bytes": 10264,
       "url": "/assets/images/ui/v1/icon-freeze.webp",
-      "sha256": "260455d35669839ab1d25116b4d058446bf127564267747287aeada03ddd8c11"
+      "sha256": "7d5e99dcf7057cfc1d817f1758f6d5dfcd9283ee463f02e571fe56774131a98e"
     },
     {
       "name": "icon-eye",
@@ -1219,16 +794,16 @@
         "eye"
       ],
       "sourceSize": [
-        192,
-        210
+        156,
+        105
       ],
       "size": [
-        117,
-        128
+        128,
+        86
       ],
-      "bytes": 3894,
+      "bytes": 5794,
       "url": "/assets/images/ui/v1/icon-eye.webp",
-      "sha256": "bf5eda68b15aa5341a439ee40500db66bc50b5200ddd8fecd1ee46b5b798a960"
+      "sha256": "47a3cddd66256a547f7506c97df28653933f5f0009c978be4a95a5c73196de85"
     },
     {
       "name": "icon-undo",
@@ -1245,16 +820,16 @@
         "undo"
       ],
       "sourceSize": [
-        172,
-        183
+        142,
+        135
       ],
       "size": [
-        120,
-        128
+        128,
+        122
       ],
-      "bytes": 4952,
+      "bytes": 7030,
       "url": "/assets/images/ui/v1/icon-undo.webp",
-      "sha256": "81251f9b267a8dcf654106ffb5ff1a7acf3c0e6fc46425bcbefd6f756af834a9"
+      "sha256": "41402b7e9a4fe1362fa5598677ae8beb28e18bc57e4a6e228be2ac04621504c9"
     },
     {
       "name": "icon-expand",
@@ -1271,16 +846,16 @@
         "expand"
       ],
       "sourceSize": [
-        168,
-        186
+        144,
+        138
       ],
       "size": [
-        116,
-        128
+        128,
+        123
       ],
-      "bytes": 5644,
+      "bytes": 7248,
       "url": "/assets/images/ui/v1/icon-expand.webp",
-      "sha256": "357aa58150e0e663d645488a3e58b0153eaf2eedf594c648269490920ea206f2"
+      "sha256": "1d55441392aed154aa2c22a40346674f152c71cab00b8f670d50e90b6d9e062d"
     },
     {
       "name": "icon-wand",
@@ -1297,16 +872,16 @@
         "wand"
       ],
       "sourceSize": [
-        204,
-        190
+        125,
+        140
       ],
       "size": [
-        128,
-        119
+        114,
+        128
       ],
-      "bytes": 6560,
+      "bytes": 10676,
       "url": "/assets/images/ui/v1/icon-wand.webp",
-      "sha256": "f2dc6f060e6d9b8e2a027815edd4f123f1784bedf9b5bc6e8937ae60955a9fa4"
+      "sha256": "a4fe52dd73a75ebff9d95ab6eb7d7c0443ec0f6e640f4f4a8b2bc9ad393bc90b"
     },
     {
       "name": "icon-exit",
@@ -1323,42 +898,16 @@
         "exit"
       ],
       "sourceSize": [
-        184,
-        184
+        155,
+        143
       ],
       "size": [
         128,
-        128
+        118
       ],
-      "bytes": 6320,
+      "bytes": 7914,
       "url": "/assets/images/ui/v1/icon-exit.webp",
-      "sha256": "39e1c11ef2a21bc967e6571eeeaed00881cc113a24ef7042493037cdbb7d1fb5"
-    },
-    {
-      "name": "icon-arrow-right",
-      "source": "icons-v1.png",
-      "rect": [
-        630,
-        990,
-        840,
-        1200
-      ],
-      "maxSize": 128,
-      "group": "icons",
-      "icons": [
-        "arrow-right"
-      ],
-      "sourceSize": [
-        190,
-        172
-      ],
-      "size": [
-        128,
-        116
-      ],
-      "bytes": 3704,
-      "url": "/assets/images/ui/v1/icon-arrow-right.webp",
-      "sha256": "92daccfe7fdda2736049ebc6a41bf523ae35043fe6ccd2a6b11ea97fff555e7d"
+      "sha256": "4d5f2b50ba7bc4e858ababdc1574aefc424c0a2d35f645ee763d7c2b385aa991"
     },
     {
       "name": "icon-book",
@@ -1375,16 +924,16 @@
         "book"
       ],
       "sourceSize": [
-        196,
-        184
+        168,
+        123
       ],
       "size": [
         128,
-        120
+        94
       ],
-      "bytes": 5908,
+      "bytes": 6848,
       "url": "/assets/images/ui/v1/icon-book.webp",
-      "sha256": "306d56946a51ee0ea13145346feb8ce551973997b532c941df848f4c446229d1"
+      "sha256": "72eda4837f071badf4925b8190c7fed90e3efa62d464a3a1c00a3740e4570abc"
     },
     {
       "name": "icon-energy",
@@ -1401,93 +950,228 @@
         "energy"
       ],
       "sourceSize": [
-        188,
-        204
+        109,
+        151
       ],
       "size": [
-        118,
+        92,
         128
       ],
-      "bytes": 4216,
+      "bytes": 6328,
       "url": "/assets/images/ui/v1/icon-energy.webp",
-      "sha256": "ffcf8a4df8e8791943e61370deef7f68a5f8e6b95adc47cdc0f43a5cbdadc6bc"
+      "sha256": "d131cb440172950a7a37c593febaa3ce579575f22af5f2a62c649f8dd20e86fb"
     },
     {
-      "name": "reward-victory-plate",
-      "source": "reward-victory-v2.png",
+      "name": "night-home",
+      "source": "garden-simple-v2.png",
       "rect": [
         0,
-        0,
-        1288,
-        1221
+        565,
+        328,
+        886
       ],
-      "maxSize": 800,
-      "group": "reward",
-      "icons": [],
-      "preserveCanvas": true,
-      "sourceSize": [
-        1288,
-        1221
-      ],
-      "size": [
-        800,
-        758
-      ],
-      "bytes": 73128,
-      "url": "/assets/images/ui/v1/reward-victory-plate.webp",
-      "sha256": "746bfb26358545328d9cab1aa5e213bfe504a7aee5736b07d4324cf3f17894d0"
-    },
-    {
-      "name": "victory-home",
-      "source": "victory-buttons-v2.png",
-      "rect": [
-        0,
-        0,
-        991,
-        793
-      ],
-      "maxSize": 112,
+      "maxSize": 160,
       "group": "icons",
       "icons": [
+        "home",
         "victory-home"
       ],
       "sourceSize": [
-        815,
-        708
+        308,
+        302
       ],
       "size": [
-        112,
-        97
+        160,
+        157
       ],
-      "bytes": 3188,
-      "url": "/assets/images/ui/v1/victory-home.webp",
-      "sha256": "81ae7dbf8c0ca522c5532ad1bce8ce29997a04e520f51acb78d485189ad7d5fe"
+      "bytes": 9372,
+      "url": "/assets/images/ui/v1/night-home.webp",
+      "sha256": "959200f7268f98af51fc5f5cb5ed1968d68a96a66bee38795bad7c689ad80239"
     },
     {
-      "name": "victory-next",
-      "source": "victory-buttons-v2.png",
+      "name": "night-next",
+      "source": "garden-simple-v2.png",
       "rect": [
-        991,
-        0,
-        1983,
-        793
+        328,
+        565,
+        656,
+        886
       ],
-      "maxSize": 112,
+      "maxSize": 160,
       "group": "icons",
       "icons": [
+        "arrow-right",
         "victory-next"
       ],
       "sourceSize": [
-        953,
-        748
+        257,
+        232
       ],
       "size": [
-        112,
-        88
+        160,
+        144
       ],
-      "bytes": 1878,
-      "url": "/assets/images/ui/v1/victory-next.webp",
-      "sha256": "0eefa4731cd03fa623ab85fc777e20bf03e0570d02d5aab60a350540da04dd28"
+      "bytes": 5026,
+      "url": "/assets/images/ui/v1/night-next.webp",
+      "sha256": "bef9fd5cd64b43a4930ce0efeb1c924fe449f6cd61461319e8ed08b9d1bf95cb"
+    },
+    {
+      "name": "night-timer",
+      "source": "garden-simple-v2.png",
+      "rect": [
+        656,
+        565,
+        984,
+        886
+      ],
+      "maxSize": 160,
+      "group": "reward",
+      "icons": [
+        "timer",
+        "hourglass"
+      ],
+      "sourceSize": [
+        259,
+        303
+      ],
+      "size": [
+        137,
+        160
+      ],
+      "bytes": 8310,
+      "url": "/assets/images/ui/v1/night-timer.webp",
+      "sha256": "a1b63ef64ed42b954ef1eaa60f2128434ecfd6c576a507caa122e94671038371"
+    },
+    {
+      "name": "night-gift",
+      "source": "garden-simple-v2.png",
+      "rect": [
+        984,
+        565,
+        1312,
+        886
+      ],
+      "maxSize": 160,
+      "group": "reward",
+      "icons": [
+        "celebrate"
+      ],
+      "sourceSize": [
+        297,
+        296
+      ],
+      "size": [
+        160,
+        159
+      ],
+      "bytes": 8620,
+      "url": "/assets/images/ui/v1/night-gift.webp",
+      "sha256": "9608212fc7049ba7792b753522e076d0506c137542a75f71ddb70f63405db69c"
+    },
+    {
+      "name": "night-chest",
+      "source": "garden-simple-v2.png",
+      "rect": [
+        0,
+        886,
+        328,
+        1199
+      ],
+      "maxSize": 160,
+      "group": "reward",
+      "icons": [
+        "chest"
+      ],
+      "sourceSize": [
+        310,
+        253
+      ],
+      "size": [
+        160,
+        131
+      ],
+      "bytes": 7884,
+      "url": "/assets/images/ui/v1/night-chest.webp",
+      "sha256": "182e0bfd5821834fbcee41dcc1fd12442d60bfc0c07f17bc952d7c629ced514a"
+    },
+    {
+      "name": "night-chest-open",
+      "source": "garden-simple-v2.png",
+      "rect": [
+        328,
+        886,
+        656,
+        1199
+      ],
+      "maxSize": 160,
+      "group": "reward",
+      "icons": [
+        "chest-open"
+      ],
+      "sourceSize": [
+        293,
+        273
+      ],
+      "size": [
+        160,
+        149
+      ],
+      "bytes": 9292,
+      "url": "/assets/images/ui/v1/night-chest-open.webp",
+      "sha256": "92ac3b7fb527ff1f8173841f98eec1377370057752c8d0854e30b7e20a1d2735"
+    },
+    {
+      "name": "night-coin",
+      "source": "garden-simple-v2.png",
+      "rect": [
+        656,
+        886,
+        984,
+        1199
+      ],
+      "maxSize": 160,
+      "group": "reward",
+      "icons": [
+        "coin"
+      ],
+      "sourceSize": [
+        261,
+        259
+      ],
+      "size": [
+        160,
+        159
+      ],
+      "bytes": 8290,
+      "url": "/assets/images/ui/v1/night-coin.webp",
+      "sha256": "a7a8da19e63dfeb1bc554e1820f619bfdb88a18b44734061144915bd34355d83"
+    },
+    {
+      "name": "night-star",
+      "source": "garden-simple-v2.png",
+      "rect": [
+        984,
+        886,
+        1312,
+        1199
+      ],
+      "maxSize": 192,
+      "group": "reward",
+      "icons": [
+        "star",
+        "star-empty"
+      ],
+      "sourceSize": [
+        277,
+        259
+      ],
+      "size": [
+        192,
+        180
+      ],
+      "bytes": 9486,
+      "url": "/assets/images/ui/v1/night-star.webp",
+      "sha256": "d76fe334eb2bd81173b7a6b98fd6dd04b2cc3b331039d175270159891c9da78b"
     }
   ]
 }

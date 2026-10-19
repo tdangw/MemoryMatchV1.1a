@@ -21,7 +21,7 @@ test('every exported image decodes; icon API keeps SVG accessibility and fallbac
     return { tag: image.tagName, hidden: image.getAttribute('aria-hidden'), focus: image.getAttribute('focusable'), href: image.querySelector('image').getAttribute('href'), fallback: fallback.querySelectorAll('path, circle').length };
   });
   expect(icons).toMatchObject({ tag: 'svg', hidden: 'true', focus: 'false' });
-  expect(icons.href).toContain('icon-home.webp'); expect(icons.fallback).toBeGreaterThan(0);
+  expect(icons.href).toContain('night-home.webp'); expect(icons.fallback).toBeGreaterThan(0);
   expect(metadata.totals.garden).toBeLessThanOrEqual(350000);
   expect(metadata.totals.reward).toBeLessThanOrEqual(250000);
   expect(metadata.totals.icons).toBeLessThanOrEqual(250000);
@@ -78,7 +78,8 @@ for (const size of sizes) test(`painted surfaces preserve three games and screen
     await toggle.click();
     await page.evaluate(async () => (await import('/js/ui.js')).showLevelSummaryOverlay({ level: 999, score: 1234567, stars: 2, coinsEarned: 1234, moves: 100, misses: 12, remainingTime: 77, timeBonus: 15, luckyAwards: [{ type: 'coins', value: 10 }], settings: {} }));
     const summary = page.locator('#level-summary-modal [data-ui-surface="reward"]');
-    await expect(summary).toHaveCSS('background-image', /reward-victory-plate.webp/);
+    await expect(summary).toHaveCSS('border-image-source', /garden-panel.webp/);
+    await expect(summary).toHaveCSS('background-color', 'rgb(8, 38, 46)');
     await expect(summary.locator('.level-summary__stat > svg')).toHaveCount(3);
     await expect(summary.locator('.level-summary__star--unearned')).toHaveCSS('opacity', '1');
     await expect(summary.locator('.level-summary__star--unearned')).toHaveCSS('filter', 'grayscale(1) brightness(0.85)');

@@ -30,6 +30,6 @@
   .victory-action { padding: 8px 14px; min-height: 42px; }
 }
 
-.victory-action { border-image-source: var(--ui-art-reward-orange); border-image-slice: 35% 27% fill; border-image-width: 16px 26px; background: transparent; color: #fff4ca; }
-.victory-action:last-child { border-image-source: var(--ui-art-reward-green); color: #163b0b; }
-.victory-flower-message h2 { display: inline-block; padding: 14px 32px 20px; margin-block: 8px; background: var(--ui-art-reward-title) center / 100% 100% no-repeat; color: #fff0ac; }
+.victory-action { border-image-source: var(--ui-art-garden-secondary); border-image-slice: 35% 27% fill; border-image-width: 16px 26px; background: transparent; color: var(--dialog-ink); }
+.victory-action:last-child { border-image-source: var(--ui-art-garden-primary); color: var(--dialog-ink); }
+.victory-flower-message h2 { display: inline-block; padding: 14px 32px 20px; margin-block: 8px; background: var(--ui-art-garden-title) center / 100% 100% no-repeat; color: var(--dialog-gold); }

@@ -445,7 +445,7 @@ function openLevelSummaryOverlay({
   const curve = document.createElementNS(svgNS, "path");
   const curveId = `summary-title-curve-${generation}`;
   curve.id = curveId;
-  curve.setAttribute("d", "M38 48 Q180 8 322 48");
+  curve.setAttribute("d", "M38 62 Q180 26 322 62");
   curve.setAttribute("fill", "none");
   const defs = document.createElementNS(svgNS, "defs");
   const gold = document.createElementNS(svgNS, "linearGradient");
@@ -453,7 +453,7 @@ function openLevelSummaryOverlay({
   gold.id = goldId;
   gold.setAttribute("x2", "0");
   gold.setAttribute("y2", "1");
-  for (const [offset, color] of [["0%", "#fffbd1"], ["45%", "#ffe665"], ["100%", "#ffbd17"]]) {
+  for (const [offset, color] of [["0%", "#fff4c8"], ["45%", "#f1d58b"], ["100%", "#c6a353"]]) {
     const stop = document.createElementNS(svgNS, "stop");
     stop.setAttribute("offset", offset); stop.setAttribute("stop-color", color); gold.append(stop);
   }

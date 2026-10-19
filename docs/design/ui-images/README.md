@@ -1,32 +1,24 @@
-# Bộ hình giao diện Vườn đêm và phần thưởng
+# Bộ hình giao diện Vườn đêm
 
-Nguồn hiện hành cho `UI_IMAGE_UPGRADE_PLAN.md` D–G. Skill `imagegen`, công cụ built-in; không dùng CLI hoặc khóa riêng. Bộ nguồn ban đầu: [Vườn đêm](masters/garden-v1.png), [gỗ và giấy](masters/reward-v1.png), [biểu tượng](masters/icons-v1.png). Bộ icon đầu quá sát nhau, đã tạo lại khoảng cách trước khi xuất; không đưa bản bị loại vào gói ứng dụng.
+Nguồn hiện hành gồm `masters/garden-simple-v2.png`, `masters/garden-v1.png` (huy hiệu và chi tiết còn dùng) và `masters/icons-v1.png`. Các master gỗ/giấy và nút cũ được giữ như hồ sơ nguồn, không còn xuất vào bản web. Dùng skill imagegen với công cụ có sẵn; prompt nguyên văn ở [prompts.md](prompts.md).
+
+Khung, nhãn và nút dùng cùng chất liệu xanh đêm, viền vàng đơn giản, nét hoạt hình bo dày và nổi khối ở popup thường, thắng, rương/quà, cửa hàng, các tab, HUD và cảnh hoàn thành chặng. Thắng giữ chữ cong, sao đạt/chưa đạt và ba hàng Xu nhận/Thời gian/Điểm; bố cục tự chảy một cột, chuyển hai cột khi màn thấp. Nút/nhãn không vẽ vào ảnh. Thẻ, nền và đồ vật của trò chơi vẫn giữ hình cần thiết để phân biệt nội dung.
 
 ## Xuất ảnh
 
-`python scripts/prepare-ui-image-assets.py` đọc `regions.json`, cắt đúng vùng đã kiểm, bỏ lề trong suốt, thu nhỏ và nén WebP. Script không vẽ hoặc sửa nội dung. Chạy lại sinh cùng bộ59ảnh, `styles/ui-art-tokens.css`, `js/uiArtManifest.js` và `runtime-metadata.json`; sửa cấu hình/source rồi chạy script, không sửa tay file sinh.
+`python scripts/prepare-ui-image-assets.py` đọc `regions.json`, cắt vùng, bỏ lề trong suốt (tìm biên với alpha lớn hơn8 để bỏ nhiễu gần vô hình; vẫn giữ alpha gốc trong vùng cắt), thu nhỏ và nén WebP; không vẽ lại nội dung. Các file sinh là `public/assets/images/ui/v1/`, `styles/ui-art-tokens.css`, `js/uiArtManifest.js` và `runtime-metadata.json`. Sửa source/config rồi chạy script, không sửa tay output.
 
-- Vườn đêm16ảnh:218.454bytes, giới hạn350KB.
-- Thắng/thưởng17ảnh:239.318bytes, giới hạn250KB.
-- Biểu tượng26ảnh:146.686bytes, giới hạn250KB.
-- Tổng604.458bytes cho toàn bộ thư viện; không đồng nghĩa Home tải tất cả. CSS biến chỉ tải ảnh khi selector sử dụng; icon chỉ tải khi tạo. Ảnh nguồn không nằm trong public/bundle.
+Generator chỉ xóa các ảnh đã được manifest trước quản lý nhưng cấu hình nguồn hiện hành đã bỏ; kiểm đường dẫn tuyệt đối ở trong thư mục xuất, không quét/xóa ảnh ngoài đó. Bộ hình cũ có21ảnh không còn dùng đã được loại khỏi bundle.
 
-Ba master ban đầu thực tế1254×1254, RGBA, có alpha0–255; không coi kích thước2048 trong yêu cầu vẽ là kết quả. Khung dùng chia chín phần, không phóng toàn mảnh300px lên làm tranh toàn màn. Góc/cạnh dùng khoảng30–36% nguồn và rộng khoảng28–32px trên popup; phần giữa yên được kéo giãn. `generation-metadata.json` ghi kích thước/hash thật; `regions.json` ghi crop và nguồn. Các biến thể nút/huy hiệu có nguồn riêng vì khác chất liệu/trạng thái; dùng lại giữa trò/tab/popup.
+- Khung/nút Vườn đêm16ảnh:180.128bytes, giới hạn350KB.
+- Biểu tượng phần thưởng6ảnh:51.882bytes, giới hạn250KB.
+- Biểu tượng điều hướng/công cụ24ảnh:190.162bytes, giới hạn250KB.
+- Tổng46WebP/422.172bytes; browser chỉ tải theo phần được sử dụng. Master không nằm trong bundle.
 
-## Phân công hình và hành vi
+Master khung và biểu tượng ban đầu1254×1254 RGBA; sheet Night Garden đơn giản mới1312×1199 RGBA, alpha0–255. Khung dùng chia9phần; icon xuất160px, sao192px. Kích thước/crop/hash thật ở `generation-metadata.json`, `regions.json` và `runtime-metadata.json`.
 
-| Phần | Dùng hình | Giữ cách điều khiển hiện có |
-|---|---|---|
-| Popup chọn màn/đầu màn/thông tin/tạm dừng/hết giờ/xác nhận/công cụ | Khung/nút Vườn đêm, huy hiệu, icon | Nội dung, focus, cuộn, pause, thao tác và lifecycle |
-| Thắng, rương, quà, kết thúc chặng | Gỗ/giấy, ribbon trống, sao sáng/tối, ô số, nút cam/xanh, quà/rương/xu/giờ | Thưởng thật, sao0–3, popup thắng đúng3hàng Xu/Thời gian/Điểm, counter, chuyển tiếp và cảnh hoa hiện có |
-| Cửa hàng/Bộ sưu tập | Khung hàng, bệ giá/preview, trạng thái mua/chọn, icon công cụ dùng chung | Giá/kho/giao dịch và preview chủ đề/mặt lưng/hiệu ứng có sẵn |
-| Home/map/tab | Giữ nền/tranh/đồ trang trí cũ, thay bệ tên/khung nhóm/avatar/medal/nút/tab/icon | Carousel, map patch/scroll, hồ sơ và bảng xếp hạng |
-| HUD/khay3trò | Khung và bệ công cụ/khay, sao/xu/icon | Kích thước bàn/HUD, thanh thời gian/combo, đường nối và renderer |
+## Tương tác và fallback
 
-Các đường nét chức năng nhỏ (nút đóng, focus, dấu chọn, menu ba gạch, trạng thái khóa), icon chủ đề ít dùng và preview hiệu ứng giữ SVG/CSS theo API cũ. Không thay ảnh thẻ/chủ đề đã có, không biến chỉ số hoặc toàn màn thành ảnh. Không thêm chuyển động mới; các animation cũ vẫn có owner/cancel/reduced-motion. `createIcon` vẫn trả SVG, ảnh được đặt bên trong nên aria/class/call sites tương thích; icon chưa có trong bộ mới vẫn dùng đường SVG hiện có.
+Chữ/số, vùng chạm, focus, cuộn và trạng thái giữ DOM/owner hiện có. `createIcon` vẫn trả SVG/aria như trước; ảnh lỗi dùng đường SVG có sẵn và tông vàng chung. Nền tối, chữ sáng và các nút vẫn đọc được khi ảnh không tải được. Sao chưa đạt xám hoàn toàn, không làm mờ.
 
-## Nghiệm thu
-
-Ảnh kiểm tra ở `qa/`; kết quả tổng hợp trong `QA.md`. Không tự xuất bản. Chỉ tạo APK một lần khi hoàn tất toàn bộ D–G theo yêu cầu chủ dự án.
-
-19/10: popup thắng dùng nền liền mạch `masters/reward-victory-v2.png` (1288×1221, giữ canvas khi xuất800px) và hai icon nút từ `masters/victory-buttons-v2.png` (1983×793). Khung gỗ/giấy co giãn ban đầu vẫn dùng cho các popup thưởng khác. Chữ/nút/số vẫn sống; sao chưa đạt xám hoàn toàn; ba hàng có Xu/đồng hồ/sao; điều khiển HUD dùng cùng bề mặt thanh thay vì ô khung riêng. Chỉnh nhỏ kiểm web, không tự tạo APK hay báo cáo riêng theo yêu cầu mới.
+Không đổi API/schema/save/catalog/effect ID, không thêm chuyển động hoặc timer. Các màu báo lỗi/cảnh báo và màu phân biệt độ khó vẫn giữ ý nghĩa. Bản kiểm tra hình ở `test-results/night-garden` và `test-results/victory-design`; không tạo báo cáo riêng hoặc APK khi chủ dự án đang thử web. QA/APK trong tài liệu cũ là lịch sử trước đổi chủ đề này.

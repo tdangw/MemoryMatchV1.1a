@@ -158,7 +158,7 @@
 .adventure-level-details { display: grid; gap: 5px; margin: 0; padding-left: 18px; color: #f2dfb6; font-size: 14px; }
 
 /* Illustration bases keep live navigation labels, grade letters and level numbers. */
-.adventure-dock { border-image-source: var(--ui-art-garden-inset); border-image-slice: 30% fill; border-image-width: 12px; background: #082630; }
+.adventure-dock { border-image-source: var(--ui-art-garden-inset); border-image-slice: 20% fill; border-image-width: 12px; background: #082630; }
 .adventure-dock button .ui-icon { width: 28px; height: 28px; }
 .adventure-dock button[aria-current="page"] { background: var(--ui-art-garden-primary) center / 100% 100% no-repeat; }
 .adventure-exit { background: var(--ui-art-garden-square) center / 100% 100% no-repeat; }

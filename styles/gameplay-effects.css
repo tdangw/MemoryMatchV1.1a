@@ -366,9 +366,9 @@
 /* Popup hết giờ: giữ cùng bảng màu xanh đậm của màn chơi. */
 #time-up-modal .app-modal {
   width: min(440px, calc(100vw - 32px));
-  border-color: rgb(128 184 243 / 35%);
-  background: linear-gradient(155deg, #182942 0%, #243b64 100%);
-  color: #eef5ff;
+  border-color: var(--dialog-line);
+  background: var(--dialog-surface);
+  color: var(--dialog-ink);
   animation: time-up-modal-enter 460ms cubic-bezier(0.16, 0.85, 0.24, 1.08) both;
 }
 
@@ -383,10 +383,9 @@
 
 #time-up-modal .app-modal__title,
 #time-up-modal .app-modal__title .ui-icon {
-  color: #f2bf5b;
+  color: var(--dialog-gold);
 }
 #time-up-modal .app-modal__close {
-  background: rgb(255 255 255 / 9%);
   color: #f5f7fb;
 }
 #time-up-modal .app-modal__body {
@@ -406,16 +405,17 @@
 }
 #time-up-modal .app-button--secondary {
   border-color: rgb(255 255 255 / 18%);
-  background: rgb(255 255 255 / 8%);
-  color: #eef5ff;
+  background: transparent;
+  color: var(--dialog-ink);
 }
 #time-up-modal .app-button--primary {
-  background: #2f73b8;
+  background: transparent;
   color: #fff;
 }
 #time-up-modal .app-button--time-purchase {
   border-color: rgb(242 191 91 / 40%);
-  background: rgb(242 191 91 / 16%);
+  background: transparent;
+  border-image-source: var(--ui-art-garden-primary);
   color: #ffe09a;
 }
 #time-up-modal .app-button--time-purchase .ui-icon {

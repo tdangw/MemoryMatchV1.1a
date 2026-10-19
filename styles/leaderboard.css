@@ -81,7 +81,7 @@
 .leaderboard-panel .leaderboard-retry { display: block; margin: 0 auto 18px; }
 .leaderboard-panel .leaderboard-retry[hidden] { display: none; }
 
-.leaderboard-results { border-image-source: var(--ui-art-garden-inset); border-image-slice: 30% fill; border-image-width: 14px; }
+.leaderboard-results { border-image-source: var(--ui-art-garden-panel); border-image-slice: 20% fill; border-image-width: 14px; }
 .leaderboard-rank--1 { background: var(--ui-art-rank-medal) center / contain no-repeat; }
 .leaderboard-rank--2 { background: var(--ui-art-grade-b) center / contain no-repeat; }
 .leaderboard-rank--3 { background: var(--ui-art-grade-c) center / contain no-repeat; }

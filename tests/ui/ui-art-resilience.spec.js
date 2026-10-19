@@ -13,10 +13,10 @@ test('first reward remains readable when the new images cannot be fetched', asyn
   await expect(panel.locator('.level-summary__stat')).toHaveCount(3);
   await expect(panel.locator('svg image')).toHaveCount(0);
   await expect(panel.locator('.level-summary__stars svg path')).toHaveCount(3);
-  await expect(panel).toHaveCSS('background-image', /245, 219, 163/);
+  await expect(panel).toHaveCSS('background-color', 'rgb(8, 38, 46)');
   await expect(panel.locator('.summary-points strong')).toHaveText('275');
-  await expect(panel.locator('.summary-points strong')).toHaveCSS('background-color', 'rgb(104, 64, 25)');
-  await expect(panel.locator('.app-button--primary')).toHaveCSS('background-color', 'rgb(161, 214, 75)');
+  await expect(panel.locator('.summary-points strong')).toHaveCSS('background-color', 'rgb(6, 30, 40)');
+  await expect(panel.locator('.app-button--primary')).toHaveCSS('color', 'rgb(255, 245, 213)');
   await page.screenshot({ path: `${folder}/unavailable-images-412.png` });
   await panel.getByRole('button', { name: 'Menu', exact: true }).click();
   await expect(page.locator('#level-summary-modal')).toHaveCount(0);

@@ -6,7 +6,7 @@
 #quick-preview-modal .app-modal {
   border-color: rgb(255 255 255 / 16%);
   border-radius: 24px;
-  background: linear-gradient(155deg, #182942 0%, #243b64 100%);
+  background: var(--dialog-surface);
   color: #f5f7fb;
 }
 
@@ -504,10 +504,10 @@
 #shop-confirm-modal .app-button { min-height: 44px; border-radius: 12px; }
 
 /* Shop owns its item and purchase image surfaces, including collection reuse. */
-.theme-choice, .appearance-choice, #shop-modal .shop-item { border-image-source: var(--ui-art-garden-inset); border-image-slice: 30% fill; border-image-width: 16px; background: #082631; }
+.theme-choice, .appearance-choice, #shop-modal .shop-item { border-image-source: var(--ui-art-garden-panel); border-image-slice: 20% fill; border-image-width: 12px; background: #082631; }
 .theme-preview { background: var(--ui-art-garden-square) center / 100% 100% no-repeat; }
 #shop-modal .shop-buy-button, #collection-modal .shop-buy-button { border-image-source: var(--ui-art-garden-secondary); border-image-slice: 35% 27% fill; border-image-width: 12px 18px; background: transparent; }
 #shop-modal .appearance-action--equip, #collection-modal .appearance-action--equip { border-image-source: var(--ui-art-garden-primary); }
 #shop-modal .shop-buy-button:disabled, #collection-modal .shop-buy-button:disabled { border-image-source: var(--ui-art-garden-disabled); }
-.quick-assist__choice { border-image-source: var(--ui-art-garden-inset); border-image-slice: 30% fill; border-image-width: 18px; }
+.quick-assist__choice { border-image-source: var(--ui-art-garden-panel); border-image-slice: 20% fill; border-image-width: 12px; }
 #shop-confirm-modal .app-modal { border-image-source: var(--ui-art-garden-panel); }

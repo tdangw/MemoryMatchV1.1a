@@ -12,7 +12,8 @@
       "alphaRange": [
         0,
         255
-      ]
+      ],
+      "status": "current"
     },
     {
       "path": "docs/design/ui-images/masters/icons-v1.png",
@@ -25,7 +26,8 @@
       "alphaRange": [
         0,
         255
-      ]
+      ],
+      "status": "current"
     },
     {
       "path": "docs/design/ui-images/masters/reward-v1.png",
@@ -38,7 +40,8 @@
       "alphaRange": [
         0,
         255
-      ]
+      ],
+      "status": "historical source; not exported"
     },
     {
       "path": "docs/design/ui-images/masters/reward-victory-v2.png",
@@ -52,7 +55,8 @@
         0,
         255
       ],
-      "purpose": "Victory reference correction, 19/10/2026; cohesive wood/parchment/ribbon plate, no baked text or values."
+      "purpose": "Victory reference correction, 19/10/2026; cohesive wood/parchment/ribbon plate, no baked text or values.",
+      "status": "historical source; not exported"
     },
     {
       "path": "docs/design/ui-images/masters/victory-buttons-v2.png",
@@ -66,13 +70,29 @@
         0,
         255
       ],
-      "purpose": "Reference house and next-arrow, isolated button icons,19/10/2026"
+      "purpose": "Reference house and next-arrow, isolated button icons,19/10/2026",
+      "status": "historical source; not exported"
+    },
+    {
+      "path": "docs/design/ui-images/masters/garden-simple-v2.png",
+      "size": [
+        1312,
+        1199
+      ],
+      "bytes": 1433093,
+      "sha256": "22b12c4be35a6493818878296dcb260ad45db5f334cea2cdd9db1ae9243d3b93",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "status": "current",
+      "purpose": "Simple chunky Night Garden frames, buttons, ribbon and reward icons; original cartoon victory composition without floral filigree."
     }
   ],
   "runtimeBytes": {
-    "garden": 218454,
-    "reward": 166190,
-    "icons": 141620
+    "garden": 180128,
+    "reward": 51882,
+    "icons": 190162
   },
   "iconsLayout": "second generation corrects gutters; discarded layout is not bundled"
 }

@@ -1,12 +1,12 @@
 [
   {
     "name": "garden-panel",
-    "source": "garden-v1.png",
+    "source": "garden-simple-v2.png",
     "rect": [
-      10,
-      55,
-      330,
-      365
+      0,
+      0,
+      328,
+      360
     ],
     "maxSize": 420,
     "group": "garden",
@@ -14,12 +14,12 @@
   },
   {
     "name": "garden-inset",
-    "source": "garden-v1.png",
+    "source": "garden-simple-v2.png",
     "rect": [
-      331,
-      55,
-      647,
-      365
+      328,
+      60,
+      650,
+      350
     ],
     "maxSize": 320,
     "group": "garden",
@@ -27,12 +27,12 @@
   },
   {
     "name": "garden-title",
-    "source": "garden-v1.png",
+    "source": "garden-simple-v2.png",
     "rect": [
-      648,
-      145,
-      1034,
-      340
+      650,
+      60,
+      1036,
+      350
     ],
     "maxSize": 400,
     "group": "garden",
@@ -40,12 +40,12 @@
   },
   {
     "name": "garden-square",
-    "source": "garden-v1.png",
+    "source": "garden-simple-v2.png",
     "rect": [
-      1034,
-      145,
-      1247,
-      360
+      1037,
+      60,
+      1312,
+      350
     ],
     "maxSize": 160,
     "group": "garden",
@@ -53,12 +53,12 @@
   },
   {
     "name": "garden-primary",
-    "source": "garden-v1.png",
+    "source": "garden-simple-v2.png",
     "rect": [
-      10,
-      395,
-      324,
-      560
+      0,
+      365,
+      328,
+      565
     ],
     "maxSize": 320,
     "group": "garden",
@@ -66,12 +66,12 @@
   },
   {
     "name": "garden-secondary",
-    "source": "garden-v1.png",
+    "source": "garden-simple-v2.png",
     "rect": [
-      325,
-      395,
-      638,
-      560
+      328,
+      365,
+      656,
+      565
     ],
     "maxSize": 320,
     "group": "garden",
@@ -79,12 +79,12 @@
   },
   {
     "name": "garden-danger",
-    "source": "garden-v1.png",
+    "source": "garden-simple-v2.png",
     "rect": [
-      638,
-      395,
-      950,
-      560
+      656,
+      365,
+      984,
+      565
     ],
     "maxSize": 320,
     "group": "garden",
@@ -92,12 +92,12 @@
   },
   {
     "name": "garden-disabled",
-    "source": "garden-v1.png",
+    "source": "garden-simple-v2.png",
     "rect": [
-      950,
-      395,
-      1254,
-      560
+      984,
+      365,
+      1312,
+      565
     ],
     "maxSize": 320,
     "group": "garden",
@@ -196,254 +196,16 @@
   },
   {
     "name": "garden-tray",
-    "source": "garden-v1.png",
+    "source": "garden-simple-v2.png",
     "rect": [
-      878,
-      995,
-      1254,
-      1150
+      328,
+      60,
+      650,
+      350
     ],
     "maxSize": 320,
     "group": "garden",
     "icons": []
-  },
-  {
-    "name": "reward-panel",
-    "source": "reward-v1.png",
-    "rect": [
-      10,
-      65,
-      325,
-      360
-    ],
-    "maxSize": 420,
-    "group": "reward",
-    "icons": []
-  },
-  {
-    "name": "reward-paper",
-    "source": "reward-v1.png",
-    "rect": [
-      326,
-      80,
-      594,
-      345
-    ],
-    "maxSize": 320,
-    "group": "reward",
-    "icons": []
-  },
-  {
-    "name": "reward-title",
-    "source": "reward-v1.png",
-    "rect": [
-      594,
-      135,
-      965,
-      300
-    ],
-    "maxSize": 420,
-    "group": "reward",
-    "icons": []
-  },
-  {
-    "name": "reward-well",
-    "source": "reward-v1.png",
-    "rect": [
-      965,
-      155,
-      1254,
-      300
-    ],
-    "maxSize": 320,
-    "group": "reward",
-    "icons": []
-  },
-  {
-    "name": "reward-orange",
-    "source": "reward-v1.png",
-    "rect": [
-      10,
-      398,
-      324,
-      555
-    ],
-    "maxSize": 320,
-    "group": "reward",
-    "icons": []
-  },
-  {
-    "name": "reward-green",
-    "source": "reward-v1.png",
-    "rect": [
-      325,
-      398,
-      628,
-      555
-    ],
-    "maxSize": 320,
-    "group": "reward",
-    "icons": []
-  },
-  {
-    "name": "reward-secondary",
-    "source": "reward-v1.png",
-    "rect": [
-      628,
-      398,
-      942,
-      555
-    ],
-    "maxSize": 320,
-    "group": "reward",
-    "icons": []
-  },
-  {
-    "name": "reward-disabled",
-    "source": "reward-v1.png",
-    "rect": [
-      942,
-      398,
-      1254,
-      555
-    ],
-    "maxSize": 320,
-    "group": "reward",
-    "icons": []
-  },
-  {
-    "name": "star",
-    "source": "reward-v1.png",
-    "rect": [
-      25,
-      588,
-      310,
-      870
-    ],
-    "maxSize": 192,
-    "group": "reward",
-    "icons": [
-      "star"
-    ]
-  },
-  {
-    "name": "star-empty",
-    "source": "reward-v1.png",
-    "rect": [
-      330,
-      588,
-      628,
-      870
-    ],
-    "maxSize": 192,
-    "group": "reward",
-    "icons": [
-      "star-empty"
-    ]
-  },
-  {
-    "name": "coin",
-    "source": "reward-v1.png",
-    "rect": [
-      640,
-      590,
-      925,
-      880
-    ],
-    "maxSize": 144,
-    "group": "reward",
-    "icons": [
-      "coin"
-    ]
-  },
-  {
-    "name": "timer",
-    "source": "reward-v1.png",
-    "rect": [
-      953,
-      580,
-      1254,
-      880
-    ],
-    "maxSize": 144,
-    "group": "reward",
-    "icons": [
-      "timer",
-      "hourglass"
-    ]
-  },
-  {
-    "name": "chest-closed",
-    "source": "reward-v1.png",
-    "rect": [
-      5,
-      895,
-      324,
-      1190
-    ],
-    "maxSize": 192,
-    "group": "reward",
-    "icons": [
-      "chest"
-    ]
-  },
-  {
-    "name": "chest-open",
-    "source": "reward-v1.png",
-    "rect": [
-      325,
-      875,
-      630,
-      1190
-    ],
-    "maxSize": 192,
-    "group": "reward",
-    "icons": [
-      "chest-open"
-    ]
-  },
-  {
-    "name": "reward-trophy",
-    "source": "reward-v1.png",
-    "rect": [
-      632,
-      900,
-      942,
-      1190
-    ],
-    "maxSize": 144,
-    "group": "reward",
-    "icons": []
-  },
-  {
-    "name": "gift",
-    "source": "reward-v1.png",
-    "rect": [
-      945,
-      895,
-      1254,
-      1190
-    ],
-    "maxSize": 144,
-    "group": "reward",
-    "icons": [
-      "celebrate"
-    ]
-  },
-  {
-    "name": "icon-home",
-    "source": "icons-v1.png",
-    "rect": [
-      0,
-      180,
-      210,
-      400
-    ],
-    "maxSize": 128,
-    "group": "icons",
-    "icons": [
-      "home"
-    ]
   },
   {
     "name": "icon-shop",
@@ -746,21 +508,6 @@
     ]
   },
   {
-    "name": "icon-arrow-right",
-    "source": "icons-v1.png",
-    "rect": [
-      630,
-      990,
-      840,
-      1200
-    ],
-    "maxSize": 128,
-    "group": "icons",
-    "icons": [
-      "arrow-right"
-    ]
-  },
-  {
     "name": "icon-book",
     "source": "icons-v1.png",
     "rect": [
@@ -791,47 +538,127 @@
     ]
   },
   {
-    "name": "reward-victory-plate",
-    "source": "reward-victory-v2.png",
+    "name": "night-home",
+    "source": "garden-simple-v2.png",
     "rect": [
       0,
-      0,
-      1288,
-      1221
+      565,
+      328,
+      886
     ],
-    "maxSize": 800,
-    "group": "reward",
-    "icons": [],
-    "preserveCanvas": true
-  },
-  {
-    "name": "victory-home",
-    "source": "victory-buttons-v2.png",
-    "rect": [
-      0,
-      0,
-      991,
-      793
-    ],
-    "maxSize": 112,
+    "maxSize": 160,
     "group": "icons",
     "icons": [
+      "home",
       "victory-home"
     ]
   },
   {
-    "name": "victory-next",
-    "source": "victory-buttons-v2.png",
+    "name": "night-next",
+    "source": "garden-simple-v2.png",
     "rect": [
-      991,
-      0,
-      1983,
-      793
+      328,
+      565,
+      656,
+      886
     ],
-    "maxSize": 112,
+    "maxSize": 160,
     "group": "icons",
     "icons": [
+      "arrow-right",
       "victory-next"
+    ]
+  },
+  {
+    "name": "night-timer",
+    "source": "garden-simple-v2.png",
+    "rect": [
+      656,
+      565,
+      984,
+      886
+    ],
+    "maxSize": 160,
+    "group": "reward",
+    "icons": [
+      "timer",
+      "hourglass"
+    ]
+  },
+  {
+    "name": "night-gift",
+    "source": "garden-simple-v2.png",
+    "rect": [
+      984,
+      565,
+      1312,
+      886
+    ],
+    "maxSize": 160,
+    "group": "reward",
+    "icons": [
+      "celebrate"
+    ]
+  },
+  {
+    "name": "night-chest",
+    "source": "garden-simple-v2.png",
+    "rect": [
+      0,
+      886,
+      328,
+      1199
+    ],
+    "maxSize": 160,
+    "group": "reward",
+    "icons": [
+      "chest"
+    ]
+  },
+  {
+    "name": "night-chest-open",
+    "source": "garden-simple-v2.png",
+    "rect": [
+      328,
+      886,
+      656,
+      1199
+    ],
+    "maxSize": 160,
+    "group": "reward",
+    "icons": [
+      "chest-open"
+    ]
+  },
+  {
+    "name": "night-coin",
+    "source": "garden-simple-v2.png",
+    "rect": [
+      656,
+      886,
+      984,
+      1199
+    ],
+    "maxSize": 160,
+    "group": "reward",
+    "icons": [
+      "coin"
+    ]
+  },
+  {
+    "name": "night-star",
+    "source": "garden-simple-v2.png",
+    "rect": [
+      984,
+      886,
+      1312,
+      1199
+    ],
+    "maxSize": 192,
+    "group": "reward",
+    "icons": [
+      "star",
+      "star-empty"
     ]
   }
 ]
