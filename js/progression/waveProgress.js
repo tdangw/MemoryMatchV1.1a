@@ -34,7 +34,7 @@ export function normalizeWaveProgress(value, identity = {}) {
     if (!Number.isSafeInteger(value[key]) || value[key] < 0) return null;
   const budget = calculateWaveTime({ gameId: value.gameId, mode: value.mode, totalGroups: value.groupsPerWave });
   if (value.allocatedSeconds !== budget * value.index) return null;
-  if (['gameId', 'mode', 'level'].some(key => identity[key] !== undefined && identity[key] !== value[key])) return null;
+  if (['gameId', 'mode', 'level', 'groupsPerWave'].some(key => identity[key] !== undefined && identity[key] !== value[key])) return null;
   return Object.freeze(Object.fromEntries(KEYS.map(key => [key, value[key]])));
 }
 

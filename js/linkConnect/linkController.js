@@ -1,5 +1,5 @@
 import { PROGRESSION_HELP_CONTENT } from "../progression/progressionCopy.js";
-import { renderWaveStatus } from "../progression/waveHud.js";
+import { renderWaveStatus, announceWave, presentWaveExit } from "../progression/waveHud.js";
 import { resolveLinkPairRewards } from './pairRewards.js';
 import { gameRecordLabel } from '../gameRecord.js';
 import { rememberRecentGame } from '../recentGame.js';
@@ -243,6 +243,9 @@ export function startLinkLevel({
   if (restart && (mode === 'challenge' || mode === 'endless')) { level = 1; restart = false; advance = false; }
   const modeLayout = getLinkModeLayout(mode);
   const layout = getLinkBoardLayoutForViewport(isLinkChallengeMode(mode) ? getLinkChallengeLayout(level) : modeLayout);
+  if (wave && !normalizeWaveProgress(wave, { gameId: 'link-connect', mode, level, groupsPerWave: layout.tileCount / 2 })) {
+    showAppToast('Không thể tiếp tục lượt này. Hãy bắt đầu lượt mới.'); return null;
+  }
   if (resume && (pairSnapshotInvalid || run?.version === 3 && !pairSnapshot || pairSnapshot && (pairSnapshot.totalPairs * 2 !== layout.tileCount || getTheme(pairSnapshot.themeId).id !== pairSnapshot.themeId))) {
     showAppToast('Không thể tiếp tục lượt này. Hãy bắt đầu lượt mới.');
     return null;
@@ -304,7 +307,7 @@ export function startLinkLevel({
   }
   const resolvedGravityShift = gravityShift
     || (restart ? linkGameState.gravityShift : getLinkGravityShift(level));
-  const restoredWave = wave && normalizeWaveProgress(wave, { gameId: 'link-connect', mode, level });
+  const restoredWave = wave && normalizeWaveProgress(wave, { gameId: 'link-connect', mode, level, groupsPerWave: layout.tileCount / 2 });
   if (wave && !restoredWave) throw new Error('Invalid Link wave checkpoint.');
   const activeWave = waveTransition ? activateNextWave(restoredWave)
     : resume && restoredWave ? restoredWave
@@ -339,6 +342,7 @@ export function startLinkLevel({
   let imagesReady = false;
   const activateWhenReady = () => {
     if (!introComplete || !imagesReady || linkGameState.roundId !== roundId) return;
+    announceWave(getLinkShell().refs, scope, linkGameState.wave);
     unlockLinkBoard();
     if (resume && pairSnapshot) {
       const windowMs = getLinkComboWindowMs(linkGameState.totalPairs);
@@ -1212,6 +1216,7 @@ async function advanceLinkWave() {
     return;
   }
   if (linkGameState.roundId !== roundId) return;
+  if (!await presentWaveExit(getLinkShell().refs, getLinkShell().scope) || linkGameState.roundId !== roundId) return;
   return startLinkLevel({ ...session, waveTransition: true, skipIntro: true });
 }
 

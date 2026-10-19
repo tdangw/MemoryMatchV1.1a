@@ -19,6 +19,7 @@
   --unified-hud-value-size: clamp(9px, 2.6vw, 12px);
   --unified-hud-milestone-margin: 2px auto 0;
   --unified-hud-star-offset: 6px;
+  --unified-hud-side-reserve: calc(2 * (56px + 5px + var(--shell-active-side-padding)));
 }
 .game-shell-root > [data-shell-region="progress"] { display: none; }
 .game-shell-root[data-shell-startup="preparing"] [data-shell-region="board"] { pointer-events: none; }

@@ -44,7 +44,7 @@ export function renderMasteryCollection(container, gameId) {
         piece.className = `mastery-collection__piece${earned ? ' is-earned' : ''}`;
         piece.title = `Màn ${firstLevel + index}${earned ? ' · Đã nhận' : ' · Hoàn thành cả bốn độ khó'}`;
         if (earned) {
-          piece.style.backgroundImage = `url('/assets/images/collections/${painting.id}.webp')`;
+          piece.style.backgroundImage = `url('${import.meta.env.BASE_URL}assets/images/collections/${painting.id}.webp')`;
           piece.style.backgroundPosition = `${(index % 5) * 25}% ${Math.floor(index / 5) * 100}%`;
         } else piece.textContent = String(firstLevel + index);
         pieces.append(piece);

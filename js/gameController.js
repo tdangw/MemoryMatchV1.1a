@@ -1,4 +1,4 @@
-import { renderWaveStatus } from "./progression/waveHud.js";
+import { renderWaveStatus, announceWave, presentWaveExit } from "./progression/waveHud.js";
 import { rememberRecentGame } from './recentGame.js';
 import { canLaunchGame } from "./profileOperations.js";
 import { shellTimeout as setTimeout, shellInterval as setInterval, clearShellInterval as clearInterval } from "./gameShell/gameShellLifecycle.js";
@@ -111,6 +111,9 @@ export function initializeLevel(level, { reason = "new", session = null, skipInt
   const requestedLayout = isChallengeMode(requestedMode)
     ? getChallengeLayout(level)
     : requestedModeLayout;
+  if (session?.wave && !normalizeWaveProgress(session.wave, { gameId: 'memory-match', mode: requestedMode, level, groupsPerWave: requestedLayout.tileCount / 2 })) {
+    showAppToast('Không thể tiếp tục lượt này. Hãy bắt đầu lượt mới.'); return null;
+  }
   if (reason === 'resume' && (session?.pairSnapshotInvalid || session?.run?.version === 3 && !session.pairSnapshot
     || session?.pairSnapshot && (session.pairSnapshot.totalPairs * 2 !== requestedLayout.tileCount || getTheme(session.pairSnapshot.themeId).id !== session.pairSnapshot.themeId))) {
     showAppToast('Không thể tiếp tục lượt này. Hãy bắt đầu lượt mới.');
@@ -164,7 +167,7 @@ export function initializeLevel(level, { reason = "new", session = null, skipInt
   gameState.currentLevel = level;
   const modeLayout = getModeLayout(mode);
   const layout = isChallengeMode(mode) ? getChallengeLayout(level) : modeLayout;
-  const restoredWave = session?.wave && normalizeWaveProgress(session.wave, { gameId: 'memory-match', mode, level });
+  const restoredWave = session?.wave && normalizeWaveProgress(session.wave, { gameId: 'memory-match', mode, level, groupsPerWave: layout.tileCount / 2 });
   if ((reason === 'resume' || reason === 'wave') && session?.wave && !restoredWave) throw new Error('Invalid wave checkpoint.');
   gameState.wave = reason === 'wave' ? activateNextWave(restoredWave)
     : reason === 'resume' && restoredWave ? restoredWave
@@ -243,6 +246,7 @@ export function initializeLevel(level, { reason = "new", session = null, skipInt
   updateHintDisplay(gameState.progress.memoryMatch.items.hint);
   startup.check();
   showRevealTimerInHud(previewDurationMs / 1000, roundId);
+  announceWave(getMemoryShell().refs, scope, gameState.wave);
   document.getElementById("btn-buy-time")?.toggleAttribute("hidden", isEndlessMode(mode));
   revealAndHideTiles(roundId, () => {
     if (pairSnapshot) restoreMemoryCombo(pairSnapshot.combo, remainingComboWindow(pairSnapshot, getComboWindowMs(gameState.totalPairs)));
@@ -273,6 +277,7 @@ async function advanceMemoryWave() {
   if (gameState.roundId !== roundId) return;
   const checkpoint = getMemorySessionSnapshot();
   checkpoint.metrics = snapshotPlayMetrics({ gameId: 'memory-match', mode: gameState.settings.mode, level: gameState.currentLevel });
+  if (!await presentWaveExit(getMemoryShell().refs, getMemoryShell().scope) || gameState.roundId !== roundId) return;
   return initializeLevel(gameState.currentLevel, { reason: 'wave', session: checkpoint, skipIntro: true });
 }
 

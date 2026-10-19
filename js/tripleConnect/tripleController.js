@@ -1,4 +1,4 @@
-import { renderWaveStatus } from "../progression/waveHud.js";
+import { renderWaveStatus, announceWave, presentWaveExit } from "../progression/waveHud.js";
 import { gameRecordLabel } from '../gameRecord.js';
 import { openGameExitDialog } from "../gameExitDialog.js";
 import { showFullVictoryCelebration } from "victory-presentation";
@@ -116,13 +116,15 @@ export function configureTripleConnectController(options = {}) {
 export async function startTripleConnectDevelopmentRound({
   seed = "triple-dev",
   mode = "easy",
+  patternIndex,
 } = {}) {
   if (!development)
     throw new Error(
       "Triple Connect development hook is unavailable in production.",
     );
   return prepareTripleStartup(startup => startTripleConnectRoundFromGenerated({
-    generated: generateTripleBoard({ seed, mode, level: 1 }),
+    generated: patternIndex === undefined ? generateTripleBoard({ seed, mode, level: 1 })
+      : generatePatternTripleBoard({ seed, mode, level: 1, patternIndex }),
     mode,
     level: 1,
     skipIntro: true,
@@ -135,6 +137,13 @@ export function startTripleConnectRound({ seed, mode = "easy", level = 1, elapse
   if (!canLaunchGame()) return null;
   if (reason === 'restart' && (mode === 'challenge' || mode === 'endless')) { level = 1; reason = 'new'; seed = undefined; elapsedTime = undefined; }
   const normalizedLevel = normalizeLevel(level);
+  if (reason === 'wave') {
+    const groupsPerWave = (mode === 'challenge' ? getTripleChallengeStage(normalizedLevel) : getTripleModeConfig(mode)).tileCount / 3;
+    const checkpoint = normalizeWaveProgress(waveSession?.wave, { gameId: 'triple-connect', mode, level: normalizedLevel, groupsPerWave });
+    if (!checkpoint || checkpoint.phase !== 'advance' || !Number.isSafeInteger(waveSession.remainingTime) || waveSession.remainingTime < 0) {
+      showAppToast('Không thể tiếp tục lượt này. Hãy bắt đầu lượt mới.'); return null;
+    }
+  }
   if (mode === "challenge") getTripleChallengeStage(normalizedLevel);
   const roundSeed = seed || createRoundSeed(mode, normalizedLevel);
   const patternIndex = seed === undefined ? getWavePatternIndex(normalizedLevel, waveSession?.wave?.index || 1) : undefined;
@@ -335,6 +344,7 @@ export function isValidTripleConnectSession(session) {
   }
   try {
     const roundState = restoreSerializedTripleRoundState(session.snapshot, { trayCapacity: getEffectiveTripleTrayCapacity() });
+    if (session.wave && session.wave.groupsPerWave !== roundState.initialTileCount / 3) return false;
     if (roundState.status !== "playing" && !(roundState.status === 'won' && session.wave && roundState.matchedTriples === session.wave.groupsPerWave)) return false;
     return isCompatibleTripleSession(
       roundState,
@@ -652,6 +662,7 @@ return runRoundCommand(async () => {
     roundStarted = true;
     resumePlayMetrics("startup");
     if (state.status === 'won') { await settleTerminalRound(shell, render); return; }
+    announceWave(shell.refs, scope, activeWave);
   void rememberRecentGame("triple-connect");
     startTripleTimer(scope, shell, render, hudElements, hud);
     if (state.combo > 0) startComboWindow();
@@ -1105,6 +1116,7 @@ async function advanceTripleWave() {
     return;
   }
   if (generation !== roundGeneration) return;
+  if (!await presentWaveExit(getTripleShell().refs, getTripleShell().scope) || generation !== roundGeneration) return;
   return startTripleConnectRound({ mode: currentMode, level: currentLevel, reason: 'wave', waveSession: session, skipIntro: true });
 }
 

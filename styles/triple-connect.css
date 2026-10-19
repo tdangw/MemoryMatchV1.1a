@@ -59,7 +59,7 @@
 @keyframes triple-milestone-pulse { 50% { transform: translateX(-50%) scale(1.45); box-shadow: 0 0 0 5px rgb(124 238 255 / 34%); } }
 @media screen and (width <= 600px) {
   .triple-connect-game > .triple-connect__milestones {
-    width: min(var(--shell-milestones-mobile-width), calc(100vw - 96px));
+    width: min(var(--shell-milestones-mobile-width), calc(100vw - var(--unified-hud-side-reserve, 148px)));
     min-height: var(--shell-milestones-track-height);
   }
 }

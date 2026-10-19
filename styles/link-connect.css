@@ -943,6 +943,6 @@
 .link-special-hud__milestones span.is-next { border-color: #7ceeff; color: #7ceeff; box-shadow: 0 0 0 2px rgb(124 238 255 / 16%); }
 
 @media screen and (width <= 600px) {
-  .link-special-hud { width: min(var(--shell-milestones-mobile-width), calc(100vw - 96px)); min-height: var(--shell-milestones-track-height); }
+  .link-special-hud { width: min(var(--shell-milestones-mobile-width), calc(100vw - var(--unified-hud-side-reserve, 148px))); min-height: var(--shell-milestones-track-height); }
   .link-special-hud__milestones span { width: var(--shell-milestones-marker-size); height: var(--shell-milestones-marker-size); font-size: 0.5rem; }
 }

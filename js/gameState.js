@@ -173,13 +173,15 @@ function normalizeActiveSession(session, gameId) {
   if (!session || typeof session !== "object") return null;
   if (!GAME_MODE_IDS.has(session.mode)) return null;
   const level = Math.max(1, normalizeNonNegativeInteger(session.level) || 1);
+  const pairSnapshot = normalizePairSnapshot(session.pairSnapshot, gameId);
+  const wave = session.wave ? normalizeWaveProgress(session.wave, { gameId, mode: session.mode, level, groupsPerWave: pairSnapshot?.totalPairs }) : null;
   return {
     mode: session.mode,
-    ...(session.waveInvalid ? { waveInvalid: true } : session.wave ? (normalizeWaveProgress(session.wave, { gameId, mode: session.mode, level })
-      ? { wave: normalizeWaveProgress(session.wave, { gameId, mode: session.mode, level }) }
+    ...(session.waveInvalid ? { waveInvalid: true } : session.wave ? (wave
+      ? { wave }
       : { waveInvalid: true }) : {}),
     ...(session.pairSnapshotInvalid || session.pairSnapshot && !normalizePairSnapshot(session.pairSnapshot, gameId) ? { pairSnapshotInvalid: true, pairSnapshotSource: structuredClone(session.pairSnapshotSource || session.pairSnapshot) } : {}),
-    ...(normalizePairSnapshot(session.pairSnapshot, gameId) ? { pairSnapshot: normalizePairSnapshot(session.pairSnapshot, gameId) } : {}),
+    ...(pairSnapshot ? { pairSnapshot } : {}),
     ...(normalizePlayMetrics(session.metrics) ? { metrics: normalizePlayMetrics(session.metrics) } : {}),
     ...(normalizeRankedRun(session.run, { gameId, mode: session.mode, level })
       ? { run: normalizeRankedRun(session.run, { gameId, mode: session.mode, level }) } : {}),
@@ -301,7 +303,7 @@ function normalizeTripleSessions(sessions, trayCapacity = TRIPLE_PRODUCT_DECISIO
       if (typeof session.layoutId !== "string" || !session.layoutId) return [];
       getTripleLayout(session.layoutId);
       const restored = restoreSerializedTripleRoundState(session.snapshot, { trayCapacity });
-      const wave = session.wave ? normalizeWaveProgress(session.wave, { gameId: 'triple-connect', mode, level: session.level }) : null;
+      const wave = session.wave ? normalizeWaveProgress(session.wave, { gameId: 'triple-connect', mode, level: session.level, groupsPerWave: restored.initialTileCount / 3 }) : null;
       if (session.wave && !wave) return [];
       if (restored.status !== "playing" && !(restored.status === 'won' && wave && restored.matchedTriples === wave.groupsPerWave)) return [];
       const snapshot = serializeTripleRoundState(restored);

@@ -94,7 +94,7 @@
 @media screen and (width <= 600px) {
 
   .memory-special-hud {
-    width: min(var(--shell-milestones-mobile-width), calc(100vw - 96px));
+    width: min(var(--shell-milestones-mobile-width), calc(100vw - var(--unified-hud-side-reserve, 148px)));
     min-height: var(--shell-milestones-track-height);
   }
 }

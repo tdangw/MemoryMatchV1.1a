@@ -98,3 +98,11 @@ Firebase: backup riêng được .gitignore, không commit dữ liệu người 
 Mô phỏng432kịch bản lưu economy.csv:3game×6mode×4mốcwave×3nhịpchơi×có/không hỗ trợ tự phá. Đây là ước tính active time, không phải số đo người thật và không gồm preview/intro/quảng cáo. Dễ màn1 Memory/Link:24–26xu,1–2sao ở ba nhịp giả định; Triple34–38xu,1–3sao. Với Memory/Link6cặp/đợt,3sao cần combo tốt và thời gian chủ động khoảng40%ngân sách hoặc nhanh hơn; mức quick giả định45%chưa đạt. Không tự nới ngưỡng đã duyệt để làm bảng đẹp. Màn91+Siêu khó có thể có ngân sách nhiều phút do5bàn đầy, đúng yêu cầu; chưa có đo người thật để tune tiếp.
 
 Thưởng phụ giữ nguyên: Memory mốc năng lượng có20xu/cycle và lucky1–10xu; Link mốc năng lượng30xu/cycle và các drop đặc biệt/lucky riêng; Triple mốc chu kỳ46xu (Endless cộng thêm5xu thay thời gian) và lucky riêng. Các khoản này không phát lại ở bước chuyển wave, nhưng lượt chơi dài thu được nhiều chu kỳ hơn; economy.csv chỉ báo xu thắng màn để không trộn giả định xác suất phụ vào số đo. Không cấp EXP/mảnh lại khi farm replay.
+
+## P9 — nghiệm thu luật nhiều đợt và phản hồi Wave
+
+Đầu lượt hiện Wave 1; sau checkpoint bền vững, bàn cũ mờ 140 ms và bàn mới vào 240 ms với thông báo Wave 2 ở giữa màn hình. Notice không chặn timer/input, dedupe theo round, animation/timer thuộc scope, reduced-motion bỏ chuyển động. Review độc lập đã đọc diff và chạy lại test trọng yếu, không còn lỗi P1/P2 được xác nhận.
+
+Sửa boundary: metadata số nhóm wave phải khớp snapshot board và cấu hình trước resume; fallback localStorage nạp revision trước kiểm mùa; URL tranh dùng BASE_URL. Thanh sao ba trò dành đủ khoảng hai bên ở 320 px, xử lý tràn tại nguồn.
+
+Đạt: 31/31 unit mục tiêu; 17/17 UI wave/matrix/presentation (3 trò, 6 mode, 4 viewport, normal/reduced-motion, 20 pattern Triple có hit target); 15/15 UI lifecycle/access/rewards/reset, gồm 100 lần chuyển trò và baseline tài nguyên. npm run check và npm run build đều đạt; build có cảnh báo kích thước chunk hiện hữu. Bằng chứng dựa trên working tree tích hợp, không đồng nghĩa mọi hunk UI chưa commit đã thuộc task này. Hoàn thành chơi thật hai wave ở cả ba trò; ma trận 3–5 wave kiểm model/layout, không tuyên bố đã chơi hết mọi cấu hình. Galaxy S22 Ultra thật còn chờ thiết bị; số đo headless không thay nghiệm thu 60 FPS máy thật. Không APK/Hosting/push.

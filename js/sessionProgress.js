@@ -62,6 +62,8 @@ export function stageActiveSession(gameId, session) {
   if (session.waveInvalid) return false;
   const wave = session.wave ? normalizeWaveProgress(session.wave, { gameId, mode: session.mode, level: session.level }) : null;
   if (session.wave && !wave) return false;
+  if (wave && session.pairSnapshot && wave.groupsPerWave !== session.pairSnapshot.totalPairs) return false;
+  if (wave && gameId === 'triple-connect' && session.snapshot && wave.groupsPerWave !== session.snapshot.initialTileCount / 3) return false;
   gameState.progress[key].sessionsByMode ||= {};
   const run = normalizeRankedRun(session.run, { gameId, mode: session.mode, level: session.level });
   if (gameId !== 'triple-connect' && session.pairSnapshot && !normalizePairSnapshot(session.pairSnapshot, gameId)) return false;

@@ -5,8 +5,43 @@ import { stageActiveSession, getActiveSession } from '../../js/sessionProgress.j
 import { createWaveProgress, completeWave, activateNextWave } from '../../js/progression/waveProgress.js';
 import { indexedDB } from 'fake-indexeddb';
 import { openChapterDatabase, writeChapterProfile, hydrateChapterProfile, readChapterProfile } from '../../js/chapterStore.js';
+import { createLinkBoard } from '../../js/linkConnect/linkBoard.js';
+import { generatePatternTripleBoard } from '../../js/tripleConnect/tripleBoard.js';
+import { createTripleRoundState, serializeTripleRoundState } from '../../js/tripleConnect/tripleState.js';
 
 const wave = (gameId = 'memory-match') => createWaveProgress({ attemptId: 'attempt-session', gameId, mode: 'easy', level: 1, groupsPerWave: 6 });
+
+test('wave metadata must agree with the pair board at stage and hydration boundaries',()=>{
+  const common={version:1,seed:'fixture',themeId:'default',score:0,moves:0,misses:0,combo:0,matchedPairs:0,totalPairs:6,luckyAwards:[]};
+  const cards=Array.from({length:6},(_,i)=>({id:`pair-${i}`,src:'/assets/fixture.webp',alt:'Card'}));
+  const snapshots={
+    'memory-match':{...common,gameId:'memory-match',tiles:cards.flatMap(card=>[0,1].map(()=>({id:card.id,matched:false,special:false}))),luckyRewards:[]},
+    'link-connect':{...common,gameId:'link-connect',board:createLinkBoard({layout:{tileCount:12,columns:4},cardProvider:()=>cards,random:()=>.5})},
+  };
+  for(const [gameId,pairSnapshot] of Object.entries(snapshots)) {
+    hydrateGameState();
+    const session={mode:'easy',level:1,pairSnapshot,wave:wave(gameId)};
+    assert.equal(stageActiveSession(gameId,session),true);
+    const corrupt={...session,wave:createWaveProgress({attemptId:'mismatch',gameId,mode:'easy',level:1,groupsPerWave:7})};
+    assert.equal(stageActiveSession(gameId,corrupt),false);
+    const key=gameId==='memory-match'?'memoryMatch':'linkConnect';
+    hydrateGameState({progress:{[key]:{sessionsByMode:{easy:corrupt}}}});
+    assert.equal(getActiveSession(gameId,'easy').waveInvalid,true);
+  }
+});
+
+test('Triple playing checkpoint also validates group count, not just won checkpoints',()=>{
+  hydrateGameState();
+  const generated=generatePatternTripleBoard({mode:'easy',patternIndex:0,seed:'checkpoint'});
+  const state=createTripleRoundState(generated.board);
+  const session={mode:'easy',level:1,layoutId:generated.layoutId,snapshot:serializeTripleRoundState(state),remainingTime:75,
+    wave:createWaveProgress({attemptId:'triple',gameId:'triple-connect',mode:'easy',level:1,groupsPerWave:9})};
+  assert.equal(stageActiveSession('triple-connect',session),true);
+  const corrupt={...session,wave:createWaveProgress({attemptId:'mismatch',gameId:'triple-connect',mode:'easy',level:1,groupsPerWave:10})};
+  assert.equal(stageActiveSession('triple-connect',corrupt),false);
+  hydrateGameState({progress:{tripleConnect:{sessionsByMode:{easy:corrupt}}}});
+  assert.equal(getActiveSession('triple-connect','easy'),null);
+});
 
 test('wave checkpoint survives the normal persistence/hydration boundary without losing phase or budget', () => {
   hydrateGameState();
@@ -72,3 +107,4 @@ test('only terminal multi-wave results certify progress, and duplicate settlemen
     wave:{...terminal, mode:'superHard', attemptId:'mastery', allocatedSeconds:100} });
   assert.deepEqual(mastered.mastery, { expGained:10, fragmentGained:true });
 });
+

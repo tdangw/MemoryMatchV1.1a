@@ -69,3 +69,16 @@ test('startup resets once before hydration, then rejects importing a previous-se
   assert.equal(await persistence.ensureGameplaySeason(),true);
   assert.equal(persistence.getPersistenceStatus().revision,resetRevision);
 });
+
+test('localStorage fallback initializes its envelope before checking the season on a fresh page',async()=>{
+  delete globalThis.indexedDB;
+  const values=new Map();
+  globalThis.localStorage={getItem:key=>values.get(key)||null,setItem:(key,value)=>values.set(key,value),removeItem:key=>values.delete(key)};
+  const first=await import('../../js/persistence.js?fallback-first');
+  assert.equal(await first.ensureGameplaySeason(),true);
+  assert.equal(await first.savePersistentGameData({coins:123}),true);
+  const second=await import('../../js/persistence.js?fallback-reload');
+  assert.equal(await second.ensureGameplaySeason(),true);
+  assert.equal((await second.loadPersistentGameData()).coins,123);
+  assert.equal((await second.loadPersistentGameData()).progress.gameplaySeason,1);
+});

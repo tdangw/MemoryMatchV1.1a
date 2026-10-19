@@ -10,6 +10,7 @@ test('Triple plays two generated silhouettes and only settles after the second w
     window.tripleWaveRun = await (await import('/js/tripleConnect/tripleController.js')).startTripleConnectRound({ mode: 'easy', skipIntro: true });
   });
   const layouts = [];
+  await expect(page.locator('.progression-wave-notice')).toHaveText('Wave 1');
   for (let waveIndex = 1; waveIndex <= 2; waveIndex++) {
     await expect.poll(() => page.evaluate(async () => {
       const session = (await import('/js/sessionProgress.js')).getActiveSession('triple-connect','easy');
@@ -30,6 +31,7 @@ test('Triple plays two generated silhouettes and only settles after the second w
       await page.waitForFunction(() => !document.querySelector('.triple-connect__tray-flight, .triple-connect__ghost'));
     }
     if (waveIndex === 1) {
+      await expect(page.locator('.progression-wave-notice')).toHaveText('Wave 2');
       expect(await page.evaluate(async () => (await import('/js/gameState.js')).gameState.progress.tripleConnect.bestByLevel['easy:1'])).toBeUndefined();
       await expect.poll(() => page.evaluate(async () => (await import('/js/sessionProgress.js')).getActiveSession('triple-connect','easy')?.wave?.index)).toBe(2);
     }

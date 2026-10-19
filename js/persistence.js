@@ -85,6 +85,12 @@ export function ensureGameplaySeason() {
     await initialize();
     if (blocked) return false;
     try {
+      if (!database) {
+        const local = readLocalEnvelope();
+        if (blocked) return false;
+        currentEnvelope = local || createEnvelope(createDefaultPayload(), 0);
+        knownRevision = currentEnvelope.revision;
+      }
       const next = gameplaySeasonReset(currentEnvelope?.data);
       if (!next) return true;
       const envelope = createEnvelope(next, knownRevision + 1);
