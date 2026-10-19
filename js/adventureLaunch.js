@@ -10,6 +10,7 @@ export async function prepareAdventureChapter(gameId, chapter, isCurrent = () =>
   await flushPersistentWrites();
   if (getPersistenceStatus().blocked) return false;
   const record = await loadPersistentChapter(key, chapter);
+  const previous = chapter > 1 ? await loadPersistentChapter(key, chapter - 1) : null;
   if (!isCurrent()) return false;
   const profile = gameState.progress[key];
   const keep = new Set([chapter, profile.adventure?.currentChapter || 1]);
@@ -23,6 +24,9 @@ export async function prepareAdventureChapter(gameId, chapter, isCurrent = () =>
     });
     profile[field] = { ...Object.fromEntries(entries), ...record[field] };
   }
+  // The first level of a chapter depends on the preceding chapter's last Easy win.
+  const prerequisite = `easy:${(chapter - 1) * 100}`;
+  if (previous?.bestByLevel[prerequisite]) profile.bestByLevel[prerequisite] = previous.bestByLevel[prerequisite];
   profile.claimedChests = {
     ...Object.fromEntries(Object.entries(profile.claimedChests || {}).filter(([id]) => keep.has(Math.floor((Number(id) - 1) / 10) + 1))),
     ...record.claimedChests,

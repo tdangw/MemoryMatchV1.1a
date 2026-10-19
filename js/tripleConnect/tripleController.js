@@ -1,3 +1,4 @@
+import { renderWaveStatus } from "../progression/waveHud.js";
 import { gameRecordLabel } from '../gameRecord.js';
 import { openGameExitDialog } from "../gameExitDialog.js";
 import { showFullVictoryCelebration } from "victory-presentation";
@@ -225,7 +226,7 @@ async function startTripleConnectRoundFromGenerated({ generated, mode, level, el
   startup.check();
   if (!['challenge','endless'].includes(mode)
     && !getDifficultyAccess({ completed: gameState.progress.tripleConnect.bestByLevel, level, mode }).unlocked) {
-    showAppToast('Hãy hoàn thành độ khó trước để mở khóa.'); return null;
+    showAppToast('Hãy hoàn thành độ khó trước để mở khóa.'); returnTripleToMenu(); return null;
   }
   const themeId = getTheme(getEquippedThemeId(gameState.appearance, "triple-connect")).id;
   const typeIds = [...new Set(generated.board.tiles.map((tile) => tile.type))].sort();
@@ -408,6 +409,7 @@ async function mountTripleDevelopmentRound(generated, { skipIntro = false, start
       score: roundState.score,
       totalStars: gameState.progress.tripleConnect.totalStars,
     });
+    renderWaveStatus(getTripleShell().refs, activeWave);
     ["hint", "time", "undo", "shuffle"].forEach((itemId) => {
       hud.tool(itemId, { count: getTripleItemCount(itemId) });
     });

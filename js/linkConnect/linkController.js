@@ -1,3 +1,4 @@
+import { renderWaveStatus } from "../progression/waveHud.js";
 import { resolveLinkPairRewards } from './pairRewards.js';
 import { gameRecordLabel } from '../gameRecord.js';
 import { rememberRecentGame } from '../recentGame.js';
@@ -274,7 +275,7 @@ export function startLinkLevel({
   startup.check();
   if (!['challenge', 'endless'].includes(mode)
     && !getDifficultyAccess({ completed: gameState.progress.linkConnect.bestByLevel, level, mode }).unlocked) {
-    showAppToast('Hãy hoàn thành độ khó trước để mở khóa.'); return null;
+    showAppToast('Hãy hoàn thành độ khó trước để mở khóa.'); await returnToLinkMenu(); return null;
   }
   const board = await startup.phase('prepare', () => resume && pairSnapshot ? structuredClone(pairSnapshot.board) : createLinkBoard({
     layout,
@@ -1000,6 +1001,7 @@ function handleLinkTimeUp() {
 }
 
 function updateLinkHud() {
+  renderWaveStatus(getLinkShell().refs, linkGameState.wave);
   const hud = getLinkHudElements();
   const component = getLinkHud(hud);
   component.stats({ level: linkGameState.level, moves: linkGameState.moves, misses: linkGameState.misses, combo: linkGameState.combo, score: linkGameState.score });

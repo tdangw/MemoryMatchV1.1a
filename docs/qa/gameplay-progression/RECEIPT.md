@@ -66,3 +66,9 @@ Commit P4 chỉ chứa delta wave/gravity và test/receipt; preflight Sấm sét
 Có 20 mặt nạ hình học, compiler xác định theo màn/wave, cache LRU 24; giữ số thẻ/lớp, góc pile và solver có giới hạn. Kiểm signature dưới cả xoay/lật ở cấu hình Dễ đã bắt hai mẫu trùng và đã thay mẫu. Triple giữ checkpoint board vừa hết, score/moves/miss/time xuyên wave và chỉ quyết toán sau wave cuối; checkpoint không hợp lệ bị chặn tiếp tục.
 
 Unit model 22/22, Triple patterns 2/2 (20 mẫu × 6 mode, witness/geometry, 7 stage thử thách) đạt. Playwright 4/4 đạt: contact sheet hình học và ba lượt chơi thật hai wave, reload ở Memory/Link. Contact sheet chỉ là bằng chứng hình học, chưa thay kiểm tra render/hit-target mọi viewport. Commit chỉ chứa delta gameplay của controller, không stage chỉnh popup/presentation của task khác.
+
+## P6 — chọn độ khó và thông tin đợt
+
+Popup chỉ cho chọn độ khó đã mở, trở về Dễ khi độ khó đang nhớ bị khóa; launch kiểm tra lại. Controller bị gọi trực tiếp với độ khó khóa trả về menu, không để shell trống. Đọc thêm đúng record Dễ cuối chặng trước để không chặn màn101/201. Preview dùng ngân sách mới, mục tiêu đủ số đợt; HUD có nhãn Đợt i/n dùng lại node theo shell, không thêm timer/listener.
+
+Static156module và preview contract đạt; unit model20/20 đạt. Playwright ba lượt hai wave đạt sau thay HUD; khóa/mở Normal ở3trò3/3 đạt. Test lần đầu dùng nhầm nhãn Thường thay vì Trung bình, đã sửa fixture đúng sản phẩm và chạy lại. Kiểm responsive/summary và regression cuối vẫn thuộc P9; chưa coi các ảnh trên desktop là nghiệm thu mọi viewport.

@@ -1,3 +1,4 @@
+import { renderWaveStatus } from "./progression/waveHud.js";
 import { rememberRecentGame } from './recentGame.js';
 import { canLaunchGame } from "./profileOperations.js";
 import { shellTimeout as setTimeout, shellInterval as setInterval, clearShellInterval as clearInterval } from "./gameShell/gameShellLifecycle.js";
@@ -145,6 +146,7 @@ export function initializeLevel(level, { reason = "new", session = null, skipInt
   if (!['challenge', 'endless'].includes(requestedMode)
     && !getDifficultyAccess({ completed: gameState.progress.memoryMatch.bestByLevel, level, mode: requestedMode }).unlocked) {
     showAppToast('Hãy hoàn thành độ khó trước để mở khóa.');
+    returnToMainMenu();
     return null;
   }
   stopCountdown();
@@ -217,6 +219,7 @@ export function initializeLevel(level, { reason = "new", session = null, skipInt
   }
 
   updateLevelDisplay(level);
+  renderWaveStatus(getMemoryShell().refs, gameState.wave);
   updateScoreDisplay(gameState.score);
   updateLevelStarsDisplay(0);
   updateTotalStarsDisplay(gameState.progress.memoryMatch.totalStars);

@@ -1,0 +1,12 @@
+.game-shell-root .progression-wave-status {
+  display: inline-block;
+  margin-inline-start: .65em;
+  padding: .2em .55em;
+  border-radius: 1em;
+  background: #102f3ae6;
+  color: #f5dfa3;
+  font: 600 clamp(10px, 2.7vw, 13px)/1.3 system-ui, sans-serif;
+  vertical-align: middle;
+  text-shadow: none;
+  white-space: nowrap;
+}

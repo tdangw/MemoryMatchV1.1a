@@ -11,6 +11,7 @@ import { loadPersistentChapter } from "./persistence.js";
 import { claimAdventureChest } from "./adventureRewards.js";
 import { openAppModal, showAppToast } from "./modal.js";
 import { canLaunchGame } from "./profileOperations.js";
+import { getDifficultyAccess } from './progression/difficultyProgress.js';
 
 const views = new Map(); // One bounded view per released game, independent of durable progress.
 const MAP_TEXTURE_HEIGHT = 660;
@@ -226,6 +227,7 @@ export function mountAdventureMap(gameId) {
 
   async function launch(mode, level, { skipIntro = false } = {}) {
     if (!scope.active || loading || !canLaunchGame()) return false;
+    if (isNormalAdventureMode(mode) && !getDifficultyAccess({ completed: profile.bestByLevel, level, mode }).unlocked) return false;
     setBusy(true);
     try { return await adapter.launch({ mode, level, skipIntro }); }
     catch (error) {
@@ -238,6 +240,7 @@ export function mountAdventureMap(gameId) {
   }
   function openLevel(level, specialMode = null) {
     if (!scope.active || loading) return;
+    if (!specialMode && !getDifficultyAccess({ completed: profile.bestByLevel, level, mode: view.mode }).unlocked) view.mode = 'easy';
     const selectedMode = () => specialMode || view.mode;
     const title = () => specialMode ? `${getGameModeLabel(specialMode)} · Màn ${level}` : `Màn ${level} · ${getGameModeLabel(view.mode)}`;
     const content = document.createElement("div");
@@ -253,6 +256,8 @@ export function mountAdventureMap(gameId) {
       const input = document.createElement("input");
       input.type = "radio"; input.name = "adventure-level-mode"; input.value = mode.id;
       input.checked = mode.id === view.mode;
+      input.disabled = !getDifficultyAccess({ completed: profile.bestByLevel, level, mode: mode.id }).unlocked;
+      if (input.disabled) { label.title = `${mode.label} · Chưa mở khóa`; label.style.opacity = '0.45'; }
       input.setAttribute("aria-label", mode.label);
       const text = document.createElement("span"); text.textContent = label.dataset.grade;
       label.append(input, text); choices.append(label);
