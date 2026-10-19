@@ -46,3 +46,38 @@ export function calculateVictoryCoins({ gameId, mode, totalGroups, stars }) {
   if (!Number.isSafeInteger(scaled)) throw new RangeError('Coin calculation exceeds safe range.');
   return Math.round(scaled / 100) + 2 * stars;
 }
+
+export function calculateWaveTime({ gameId, mode, totalGroups }) {
+  const seconds = { 'memory-match': 6, 'link-connect': 4, 'triple-connect': 5 }[gameId];
+  const factor = { easy: 1.2, normal: 1.1, hard: 1, superHard: 0.9, challenge: 1, endless: 1 }[mode];
+  if (!getGameDefinition(gameId) || !getGameMode(mode)) throw new RangeError('Unknown game or mode.');
+  if (!Number.isSafeInteger(totalGroups) || totalGroups < 1 || totalGroups > 1000)
+    throw new RangeError('Invalid board group count.');
+  return mode === 'endless' ? 0 : 5 * Math.round((20 + totalGroups * seconds * factor) / 5);
+}
+
+export function calculateFastFinishBonus({ totalGroups, activeMs, allocatedSeconds, mode }) {
+  if (!getGameMode(mode)) throw new RangeError('Unknown mode.');
+  if (!Number.isSafeInteger(totalGroups) || totalGroups < 1 || totalGroups > 5000
+    || !Number.isSafeInteger(activeMs) || activeMs < 0
+    || !Number.isSafeInteger(allocatedSeconds) || allocatedSeconds < 0)
+    throw new RangeError('Invalid completion metrics.');
+  if (mode === 'endless') return 0;
+  if (allocatedSeconds === 0) throw new RangeError('Timed games require a positive budget.');
+  return Math.round(3 * totalGroups * Math.max(0, 1 - activeMs / (allocatedSeconds * 1000)));
+}
+
+export function getProgressionStarTargets({ totalGroups, mode }) {
+  if (!getGameMode(mode) || !Number.isSafeInteger(totalGroups) || totalGroups < 1 || totalGroups > 5000)
+    throw new RangeError('Invalid star target.');
+  const endless = mode === 'endless';
+  return Object.freeze({ two: Math.ceil(totalGroups * (endless ? 12.5 : 13)),
+    three: Math.ceil(totalGroups * (endless ? 15.5 : 16.5)) });
+}
+
+export function calculateProgressionStars({ totalGroups, mode, score, won }) {
+  const targets = getProgressionStarTargets({ totalGroups, mode });
+  if (!Number.isSafeInteger(score) || score < 0 || typeof won !== 'boolean')
+    throw new RangeError('Invalid result.');
+  return score >= targets.three ? 3 : score >= targets.two ? 2 : won ? 1 : 0;
+}

@@ -2,6 +2,14 @@
 
 Ngày lập: 19/10/2026. Trạng thái: **được yêu cầu triển khai; đang làm phần model độc lập P1; P0 còn quyết định, chưa bật luật mới**.
 
+### Quyết định bổ sung sau P0
+
+- Chủ dự án đã duyệt: EXP chỉ lần đầu thắng từng màn/độ khó; mỗi wave giữ kích thước theo độ khó; bỏ giây combo; bắt đầu bằng ngân sách wave đầu và cộng ngân sách wave sau vào toàn bộ thời gian dư.
+- D1/D4/D7 đã được giải quyết theo bộ luật trên. Công thức ngân sách và thưởng nhanh/sao ở mục 3/5 là baseline triển khai; mode Challenge dùng F=1, Vô tận không cấp giây. Wave cuối không cấp thêm giây.
+- D5: chủ dự án yêu cầu reset dữ liệu thử của toàn dự án Firebase (mọi người chơi). Phạm vi thao tác là dữ liệu chơi/cloud save/thống kê gameplay/bảng xếp hạng, giữ Firebase Auth, Hosting, cấu hình và asset. Kiểm tra đúng project memorymatchv1-1a, sao lưu trước, xác minh sau; chỉ thực hiện sau khi luật mới đạt gate. Không tự deploy Hosting.
+- D6 đã duyệt: mảnh tranh; C=30xu+1gợi ý, B=60xu+2gợi ý, A=100xu+3gợi ý, S=160xu+4gợi ý; công cụ ở đúng game. Đủ bộ mở tranh hoàn chỉnh và nhận300xu một lần. Lựa chọn catalog tranh phải tạo ra trải nghiệm thật, không hiển thị ảnh thử.
+- Ghi nhận trước các độ khó cao được giữ; UI chuyển cấp rương sau khi claim cấp trước. Các cụm10màn độc lập. Bảng quyết định ban đầu bên dưới là lịch sử các câu hỏi, các dòng đã được bổ sung ở đây không còn là blocker.
+
 Đây là nguồn phạm vi duy nhất cho thay đổi gameplay mới trong cuộc trao đổi này. Không mở lại các kế hoạch cũ và không trộn với công việc thống nhất UX/UI đang có trong working tree. Tài liệu kỹ thuật dành cho chủ dự án; câu chữ ở đây không được đưa nguyên văn lên giao diện người chơi.
 
 ## 1. Mục tiêu, phạm vi và trạng thái quyết định
