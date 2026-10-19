@@ -28,6 +28,7 @@ for(const [width,height] of [[412,915],[844,390],[1024,900],[320,568]]) for(cons
       for(const card of await page.locator('.treasure-card').all()) await expect(card).toBeVisible();
       const primary=page.locator('.treasure-actions button').first();await primary.scrollIntoViewIfNeeded();await expect(primary).toBeInViewport();
       await page.locator('[data-treasure-tier="S"]').focus();await page.keyboard.press('Enter');await expect(page.locator('.treasure-detail')).toHaveAttribute('data-selected-tier','S');
+      await page.locator('[data-treasure-tier="'+(['waiting','complete'].includes(state)?'S':'C')+'"]').click();
       if(width===844) {
         const clipped=await page.locator('.treasure-dialog').evaluate(panel=>{
           const body=panel.querySelector('.app-modal__body').getBoundingClientRect();
@@ -50,4 +51,15 @@ test('native chest art and reward icons remain usable when all raster images fai
   await expect(page.locator('.treasure-hero svg path').first()).toBeVisible();
   await page.getByRole('button',{name:'Mở rương',exact:true}).click();await expect(page.locator('.treasure-content')).toHaveAttribute('data-phase','success');
   expect((await snapshot(page,'memory-match')).coins).toBe(30);
+});
+
+test.describe('high density chest artwork',()=>{
+  test.use({deviceScaleFactor:3});
+  test('SVG detail stays vector and contained at DPR 3',async({page})=>{
+    await page.setViewportSize({width:412,height:915});await seed(page,'triple-connect');await open(page);
+    await page.locator('[data-treasure-tier="S"]').click();
+    expect(await page.evaluate(()=>devicePixelRatio)).toBe(3);
+    await expect(page.locator('.treasure-hero svg')).toHaveAttribute('viewBox','0 0 180 145');
+    await page.locator('#adventure-chest-modal').screenshot({path:'docs/qa/gameplay-progression/treasure-dpr3.png'});
+  });
 });

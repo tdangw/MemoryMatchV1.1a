@@ -1,7 +1,7 @@
 import { getGameDefinition, getGameMode } from '../gameCatalog.js';
 import { MAX_ADVENTURE_LEVEL } from '../adventureProgress.js';
 
-// Candidate rules are kept separate until persistence and gameplay can switch together.
+// Shared rules for multi-wave sessions, settlement and certified progression.
 export const GAMEPLAY_RULES_VERSION = 1;
 const COIN_EFFORT_TENTHS = Object.freeze({
   'memory-match': 10,

@@ -37,5 +37,5 @@ export async function presentTreasureOpening(content, owner) {
   } catch(error) {
     if (error.name !== 'AbortError') throw error;
     return false;
-  } finally { scope.dispose(); }
+  } finally { for (const animation of animations) animation.cancel(); scope.dispose(); }
 }

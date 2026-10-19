@@ -1,0 +1,49 @@
+
+> memory-match-adventure@1.1.0-a prebuild
+> npm run assets:sync
+
+
+> memory-match-adventure@1.1.0-a assets:sync
+> node scripts/generate-theme-manifest.mjs && node scripts/generate-game-shell-tokens.mjs && node scripts/generate-privacy-page.mjs
+
+Indexed 2472 theme images across 26 folders.
+Generated C:\Users\Dang\MyProject\MemoryMatchV1.1a\styles\game-shell\tokens.css.
+Generated public privacy page.
+
+> memory-match-adventure@1.1.0-a build
+> vite build --base=/
+
+vite v6.4.3 building for production...
+transforming...
+✓ 264 modules transformed.
+rendering chunks...
+[plugin vite:reporter]
+(!) C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/adventureMap.js is dynamically imported by C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/ui.js but also statically imported by C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/gameSelector.js, C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/main.js, C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/mainmenu.js, dynamic import will not move module into another chunk.
+
+computing gzip size...
+dist/index.html                               5.60 kB │ gzip:   1.68 kB
+dist/assets/main-Jkpj08Xg.css                 8.68 kB │ gzip:   2.68 kB
+dist/assets/index-Dp5lpNBB.css              193.55 kB │ gzip:  38.13 kB
+dist/assets/profileStatsStore-DcKqQ4Zu.js     0.80 kB │ gzip:   0.50 kB
+dist/assets/web-CrJBWrZX.js                   0.91 kB │ gzip:   0.44 kB
+dist/assets/analyticsService-RJlafd5f.js      1.47 kB │ gzip:   0.87 kB
+dist/assets/firebaseBackend-Dic-Ss_x.js       1.55 kB │ gzip:   0.84 kB
+dist/assets/web-C57enVz_.js                   2.45 kB │ gzip:   0.78 kB
+dist/assets/nativeAdapter-BB5beH97.js         3.69 kB │ gzip:   1.28 kB
+dist/assets/index-024S17AT.js                 4.74 kB │ gzip:   2.25 kB
+dist/assets/accountPanel-C28AR2_1.js          7.51 kB │ gzip:   2.98 kB
+dist/assets/leaderboardService-DIhoMimw.js    9.76 kB │ gzip:   4.30 kB
+dist/assets/leaderboardPanel-BGPfrOIZ.js      9.79 kB │ gzip:   3.94 kB
+dist/assets/firebase-analytics-DC818Isb.js   15.72 kB │ gzip:   4.29 kB
+dist/assets/accountService-DmAHUL-Y.js       21.94 kB │ gzip:   8.03 kB
+dist/assets/theme-manifest-B2FWcF9N.js       97.68 kB │ gzip:  13.21 kB
+dist/assets/firebase-auth-BTyDC--I.js       114.99 kB │ gzip:  23.36 kB
+dist/assets/firebase-core-BE5S7p7G.js       115.20 kB │ gzip:  32.19 kB
+dist/assets/firebase-firestore-HRkiUw2Q.js  477.19 kB │ gzip: 118.26 kB
+dist/assets/main-Cdvb5_a1.js                519.66 kB │ gzip: 167.41 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 9.02s

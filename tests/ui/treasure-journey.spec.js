@@ -53,3 +53,20 @@ test('the tenth first win shows the real EXP delta and opens treasure without fo
   await expect(page.locator('.treasure-card')).toHaveCount(4);
   await expect(page.getByRole('button',{name:'Mở rương',exact:true})).toBeVisible();
 });
+
+for(const stale of [false,true]) test(`summary treasure navigation rejection is handled${stale?' without feedback on a newer page':''}`,async({page})=>{
+  const errors=[];page.on('pageerror',error=>errors.push(error.message));await seed(page,'memory-match',{count:10,all:false});
+  await page.evaluate(async()=>{
+    (await import('/js/ui.js')).showLevelSummaryOverlay({level:10,remainingTime:30,moves:24,misses:0,coinsEarned:24,score:120,stars:1,timeBonus:0,
+      mastery:{expGained:10,fragmentGained:false,gameId:'memory-match',block:1,tier:'C',beforeExp:90,afterExp:100},
+      onMenu:()=>new Promise((resolve,reject)=>{window.rejectTreasureNavigation=()=>reject(Error('Navigation unavailable'));})});
+  });
+  await expect(page.locator('.mastery-win-status')).toHaveText('Rương Mầm Non đã sẵn sàng!');
+  await page.getByRole('button',{name:'Xem kho báu',exact:true}).click();
+  await page.waitForFunction(()=>typeof window.rejectTreasureNavigation==='function');
+  if(stale)await page.evaluate(async()=> (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('link-connect'));
+  await page.evaluate(()=>window.rejectTreasureNavigation());
+  if(stale)await expect(page.locator('.app-toast')).toHaveCount(0);
+  else await expect(page.locator('.app-toast')).toContainText('Chưa mở được kho báu');
+  expect(errors).toEqual([]);expect((await snapshot(page,'memory-match')).coins).toBe(0);
+});

@@ -5,6 +5,7 @@ import { expect, test } from "@playwright/test";
 test('level submission locks difficulty and rejects repeated clicks until the launch settles', async ({ page }) => {
   await page.goto('/');
   await page.evaluate(async () => {
+    await (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('memory-match');
     window.__launchCount = 0;
     (await import('/js/adventureMap.js')).configureAdventureMap({ adapters: { 'memory-match': {
       goal: 'Ghép hết các cặp thẻ.', preview: () => ({ timeSeconds: 60, target: '6 cặp · 12 thẻ', hints: 3, assistNote: '' }),
@@ -21,6 +22,7 @@ test('level submission locks difficulty and rejects repeated clicks until the la
   expect(await page.evaluate(() => window.__launchCount)).toBe(1);
   await page.evaluate(() => window.__finishLaunch(false));
   await expect(play).toBeEnabled();
+  await expect(page.getByRole('radio', { name: 'Khó', exact: true })).toBeDisabled();
   await expect(page.getByRole('radio', { name: 'Dễ', exact: true })).toBeEnabled();
   await closeLevelPreview(page);
 });
@@ -30,8 +32,10 @@ for (const [gameId, progressKey] of [['memory-match', 'memoryMatch'], ['link-con
     await page.setViewportSize({ width: 412, height: 915 });
     await page.addInitScript(key => {
       const bestByLevel = Object.fromEntries(Array.from({ length: 99 }, (_, i) => [`easy:${i + 1}`, { stars: 2, score: 120, durationMs: 2000 }]));
+      bestByLevel['normal:1'] = { stars: 1, score: 150, durationMs: 1800 };
       bestByLevel['hard:1'] = { stars: 1, score: 250, durationMs: 1500 };
-      localStorage.setItem('memoryMatchSave', JSON.stringify({ formatVersion: 1, revision: 1, data: { coins: 0, progress: { [key]: { bestByLevel } }, settings: {}, appearance: {} } }));
+      for (const [id,record] of Object.entries(bestByLevel)) { const level=Number(id.split(':')[1]); Object.assign(record,{cleared:true,rulesVersion:1,completedWaves:level<=10?2:level<=50?3:level<=90?4:5}); }
+    localStorage.setItem('memoryMatchSave', JSON.stringify({ formatVersion: 1, revision: 1, data: { coins: 0, progress: { gameplaySeason: 1, [key]: { bestByLevel } }, settings: {}, appearance: {} } }));
     }, progressKey);
     await page.goto('/');
     await page.evaluate(async id => (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu(id), gameId);
@@ -58,6 +62,11 @@ for (const [gameId, progressKey] of [['memory-match', 'memoryMatch'], ['link-con
     test(`${gameId} launches ${mode} only after confirming the level preview`, async ({ page }) => {
       await page.goto('/');
       await page.evaluate(async id => (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu(id), gameId);
+      await page.evaluate(async id=>{
+        const {gameState}=await import('/js/gameState.js');const key=(await import('/js/gameCatalog.js')).getGameProgressKey(id);
+        for(const mode of ['easy','normal','hard']) gameState.progress[key].bestByLevel[mode+':1']={cleared:true,rulesVersion:1,completedWaves:2,score:100,stars:1};
+        await (await import('/js/persistence.js')).savePersistentGameData({progress:gameState.progress});
+      },gameId);
       await previewMapLevel(page, 1, mode);
       await expect(page.locator('.adventure-map-page')).toBeVisible();
       await page.locator('#adventure-level-modal').getByRole('button', { name: 'Chơi', exact: true }).click();
@@ -102,7 +111,8 @@ for (const [gameId, title, progressKey] of [['memory-match', 'Memory Match', 'me
       await page.setViewportSize(viewport);
       await page.addInitScript(key => {
         const bestByLevel = Object.fromEntries(Array.from({ length: 6 }, (_, index) => [`easy:${index + 1}`, { stars: 2, score: 100 }]));
-        localStorage.setItem('memoryMatchSave', JSON.stringify({ formatVersion: 1, revision: 1, data: { coins: 813, progress: { [key]: { bestByLevel } }, appearance: {}, settings: {} } }));
+        for (const [id,record] of Object.entries(bestByLevel)) { const level=Number(id.split(':')[1]); Object.assign(record,{cleared:true,rulesVersion:1,completedWaves:level<=10?2:level<=50?3:level<=90?4:5}); }
+    localStorage.setItem('memoryMatchSave', JSON.stringify({ formatVersion: 1, revision: 1, data: { coins: 813, progress: { gameplaySeason: 1, [key]: { bestByLevel } }, appearance: {}, settings: {} } }));
       }, progressKey);
       await page.goto('/');
       await page.evaluate(async id => (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu(id), gameId);
@@ -137,7 +147,7 @@ for (const [gameId, title, progressKey] of [['memory-match', 'Memory Match', 'me
       const afterScroll = await page.locator('.adventure-special-modes').boundingBox();
       expect(afterScroll).toEqual(fixed);
       await page.locator('[data-level="7"]').scrollIntoViewIfNeeded();
-      await previewMapLevel(page, 7, 'hard');
+      await previewMapLevel(page, 7, 'easy');
       await expect(page.locator('.adventure-level-modes label')).toHaveText(['C', 'B', 'A', 'S']);
       await expect(page.locator('.adventure-level-details')).toContainText('Gợi ý:');
       if (viewport.width === 412) await page.screenshot({ path: `.firebase/level-preview-${gameId}.png` });
@@ -152,7 +162,7 @@ for (const [gameId, title, progressKey] of [['memory-match', 'Memory Match', 'me
       await page.evaluate(async id => (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu(id), gameId);
       await expect(page.locator('[data-level="7"]')).toBeInViewport();
       await previewMapLevel(page, 7);
-      await expect(page.locator('#adventure-level-modal input[value="hard"]')).toBeChecked();
+      await expect(page.locator('#adventure-level-modal input[value="easy"]')).toBeChecked();
       await closeLevelPreview(page);
       if (viewport.width === 412) await page.screenshot({ path: `.firebase/refined-${gameId}.png` });
       await startMapLevel(page, 7);
@@ -167,6 +177,7 @@ for (const [gameId, title, progressKey] of [['memory-match', 'Memory Match', 'me
 test('level preview supports native keyboard choices, escape/focus restoration and bounded modal ownership', async ({ page }) => {
   await page.goto('/');
   await page.evaluate(async () => (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('triple-connect'));
+  await page.evaluate(async()=>{const {gameState}=await import('/js/gameState.js');gameState.progress.tripleConnect.bestByLevel['easy:1']={cleared:true,rulesVersion:1,completedWaves:2,score:100,stars:1};});
   const baseline = await page.evaluate(async () => (await import('/js/appPageLifecycle.js')).getAppPageScope().diagnostics());
   for (let index = 0; index < 12; index++) {
     await previewMapLevel(page);
@@ -180,7 +191,7 @@ test('level preview supports native keyboard choices, escape/focus restoration a
   expect(await page.evaluate(async () => (await import('/js/appPageLifecycle.js')).getAppPageScope().diagnostics())).toEqual(baseline);
   await page.locator('[data-special-mode="challenge"]').click();
   await expect(page.locator('#adventure-level-modal')).toContainText('Thử thách · Màn 1');
-  await expect(page.locator('#adventure-level-modal')).toContainText('6 bộ ba · 18 thẻ');
+  await expect(page.locator('#adventure-level-modal')).toContainText('6 bộ ba · 18 thẻ × 2 đợt');
   await expect(page.locator('.game-shell-root:visible')).toHaveCount(0);
 });
 
@@ -188,7 +199,8 @@ test("chapter nodes stay mounted on mode changes, shared clear stays distinct fr
   await page.setViewportSize({ width: 412, height: 915 });
   await page.addInitScript(() => {
     const bestByLevel = Object.fromEntries(Array.from({ length: 10 }, (_, index) => [`easy:${index + 1}`, { score: 100, stars: 3 }]));
-    localStorage.setItem("memoryMatchSave", JSON.stringify({ formatVersion: 1, revision: 1, data: { coins: 700, progress: { memoryMatch: { bestByLevel } }, settings: {}, appearance: {} } }));
+    for (const [id,record] of Object.entries(bestByLevel)) { const level=Number(id.split(':')[1]); Object.assign(record,{cleared:true,rulesVersion:1,completedWaves:level<=10?2:level<=50?3:level<=90?4:5}); }
+    localStorage.setItem("memoryMatchSave", JSON.stringify({ formatVersion: 1, revision: 1, data: { coins: 700, progress: { gameplaySeason: 1, memoryMatch: { bestByLevel } }, settings: {}, appearance: {} } }));
   });
   await page.goto("/");
   await page.evaluate(async () => (await import("/tests/ui/helpers/gameNavigation.js")).openReadyGameMenu("memory-match"));
@@ -207,29 +219,30 @@ test("chapter nodes stay mounted on mode changes, shared clear stays distinct fr
   });
   expect(Math.abs(alignment.levelY - alignment.chestY)).toBeLessThanOrEqual(16);
   expect(alignment.distance).toBeGreaterThan(70);
+  await page.locator('[data-level="1"]').scrollIntoViewIfNeeded();
   await page.evaluate(() => {
     window.__mapNode = document.querySelector('[data-level="1"]');
     window.__mapScroll = document.querySelector(".adventure-map-scroll").scrollTop;
   });
-  await previewMapLevel(page, 11, 'hard');
+  await previewMapLevel(page, 1, 'normal');
   await closeLevelPreview(page);
   expect(await page.evaluate(() => document.querySelector('[data-level="1"]') === window.__mapNode)).toBe(true);
   expect(await page.locator('[data-level="1"]').getAttribute("aria-label")).toContain("0 sao");
   expect(await page.locator('[data-level="1"]').getAttribute("class")).toContain("is-cleared");
   expect(await page.evaluate(() => document.querySelector(".adventure-map-scroll").scrollTop)).toBe(await page.evaluate(() => window.__mapScroll));
   await page.locator('[data-chest="1"]').scrollIntoViewIfNeeded();
-  await expect(page.locator('[data-chest="1"] .adventure-map-chest-art')).toHaveCSS('background-position', '0% 100%');
+  await expect(page.locator('[data-chest="1"] .treasure-art')).toHaveCount(1);
   await page.locator('[data-chest="1"]').click();
-  await page.getByRole("button", { name: "Nhận thưởng", exact: true }).click();
-  await expect(page.locator("#adventure-chest-modal")).toContainText("Đã nhận thưởng");
+  await page.getByRole("button", { name: "Mở rương", exact: true }).click();
+  await expect(page.locator("#adventure-chest-modal")).toContainText("Bạn đã mở Rương Mầm Non");
   const coins = await page.evaluate(async () => (await import("/js/gameState.js")).gameState.coins);
-  expect(coins).toBeGreaterThanOrEqual(780);
-  expect(coins).toBeLessThanOrEqual(950);
+  expect(coins).toBe(730);
   await page.locator("#adventure-chest-modal .app-modal__close").click();
   await expect(page.locator("#adventure-chest-modal")).toHaveCount(0);
-  await expect(page.locator('[data-chest="1"] .adventure-map-chest-art')).toHaveCSS('background-position', '33.3333% 100%');
+  await expect(page.locator('[data-chest="1"]')).toHaveAttribute('data-treasure-art-state', 'B:false');
   await page.locator('[data-chest="1"]').click();
-  await expect(page.locator("#adventure-chest-modal")).not.toContainText("Nhận thưởng");
+  await expect(page.locator("#adventure-chest-modal .treasure-card.is-claimed")).toHaveCount(1);
+  await expect(page.getByRole("button", {name:"Mở rương",exact:true})).toHaveCount(0);
   expect(await page.evaluate(async () => (await import("/js/gameState.js")).gameState.coins)).toBe(coins);
   await page.locator("#adventure-chest-modal .app-modal__close").click();
   await expect(page.locator('.app-modal-overlay')).toHaveCount(0);
@@ -260,8 +273,9 @@ test("catalog access follows the selected game and remains separate from home pl
 
 test("completed chapters archive safely and repeated chapter navigation keeps page resources bounded", async ({ page }) => {
   await page.addInitScript(() => {
-    const bestByLevel = Object.fromEntries(Array.from({ length: 100 }, (_, index) => [`${index % 2 ? "easy" : "hard"}:${index + 1}`, { score: 10, stars: 0 }]));
-    localStorage.setItem("memoryMatchSave", JSON.stringify({ formatVersion: 1, revision: 1, data: { coins: 0, progress: { linkConnect: { bestByLevel } }, settings: {}, appearance: {} } }));
+    const bestByLevel = Object.fromEntries(Array.from({ length: 100 }, (_, index) => [`easy:${index + 1}`, { score: 10, stars: 0 }]));
+    for (const [id,record] of Object.entries(bestByLevel)) { const level=Number(id.split(':')[1]); Object.assign(record,{cleared:true,rulesVersion:1,completedWaves:level<=10?2:level<=50?3:level<=90?4:5}); }
+    localStorage.setItem("memoryMatchSave", JSON.stringify({ formatVersion: 1, revision: 1, data: { coins: 0, progress: { gameplaySeason: 1, linkConnect: { bestByLevel } }, settings: {}, appearance: {} } }));
   });
   await page.goto("/");
   await page.evaluate(async () => (await import("/tests/ui/helpers/gameNavigation.js")).openReadyGameMenu("link-connect"));
@@ -280,8 +294,8 @@ test("completed chapters archive safely and repeated chapter navigation keeps pa
   expect(await page.locator(".adventure-map-node").count()).toBeLessThanOrEqual(122);
   await page.locator('[data-chest="10"]').scrollIntoViewIfNeeded();
   await page.locator('[data-chest="10"]').click();
-  await page.getByRole('button', { name: 'Nhận thưởng', exact: true }).click();
-  await expect(page.locator('#adventure-chest-modal')).toContainText('Đã nhận thưởng');
+  await page.getByRole('button', { name: 'Mở rương', exact: true }).click();
+  await expect(page.locator('#adventure-chest-modal')).toContainText('Bạn đã mở Rương Mầm Non');
   await page.locator('#adventure-chest-modal .app-modal__close').click();
   await expect(page.locator('.app-modal-overlay')).toHaveCount(0);
   await expect(page.locator('#menu-container')).toHaveAttribute('data-map-chapter', '2');

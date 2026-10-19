@@ -1,6 +1,6 @@
 # Kế hoạch tiến trình độ khó, wave và phần thưởng — ba trò
 
-Ngày lập: 19/10/2026. Trạng thái: **được yêu cầu triển khai; đang làm phần model độc lập P1; P0 còn quyết định, chưa bật luật mới**.
+Ngày lập: 19/10/2026. Cập nhật 20/10/2026: **P0–P9 và phần bổ sung R0–R6 đã hoàn tất trên web**. Nghiệm thu Galaxy S22 Ultra thật còn chờ thiết bị theo chấp thuận của chủ dự án; không tự tạo APK/Hosting/push.
 
 ### Quyết định bổ sung sau P0
 
@@ -267,9 +267,187 @@ Trong P3–P5, kết nối luật mới qua cấu hình rollout nhất quán sau
 - Receipt duy nhất ghi bảng kiểm/ảnh/số đo/failure đã sửa và rủi ro còn lại. CONTEXT/ARCHITECTURE cập nhật trạng thái/thay đổi hợp đồng đúng kết quả.
 - Không APK nếu không có yêu cầu rõ; không tự deploy/publish/push. Tài liệu kế hoạch không được đánh dấu implementation pass.
 
-## 11. Trạng thái hiện tại
+## 11. Trạng thái hiện tại — 20/10/2026
 
-- Hoàn tất: đối chiếu owner hiện có và lập toàn bộ kế hoạch; model độc lập `js/progression/gameplayRules.js`, `difficultyProgress.js` và unit test, chưa nối runtime. Model tính tiến độ từ record đã chứng nhận, không quyết định/cấp EXP replay hoặc migrate record cũ.
-- P0 chưa đạt vì còn luật cần chủ dự án chốt; P1 mới phần độc lập, chưa đánh dấu toàn phase pass. P2–P9 chưa thực hiện; chưa bật công thức mới hoặc đổi gameplay/schema/dữ liệu người chơi.
-- Ranh giới với task UI: chỉ tạo file mới dưới `js/progression/`, `tests/unit/progression.test.js` và receipt task; không sửa CSS, popup/HUD, controller hoặc package.json đang có thay đổi. `CONTEXT.md` chỉ cập nhật đúng dòng task gameplay, không stage vào commit khi chứa công việc task khác.
-- Đã cập nhật theo trả lời: D2 chuỗi rương gắn độ khó và D3 wave cả ba mode/đồng hồ chung đã chốt. Đang chờ D1, lượng giây/chi tiết ở D4, D5–D8 và chính sách ghi nhận trước khi claim; không buộc quyết định hình mỹ thuật chi tiết trước khi chốt luật cơ bản.
+- P0–P9 hoàn tất: luật điểm/xu/thời gian, khóa tuần tự, wave cả ba chế độ/ba trò, hai trọng lực Link,20bố cục Triple, EXP/rương/tranh, save/resume và bảng xếp hạng vùng luật mới. Đầu lượt có Wave1; chuyển wave có thông báo giữa màn và animation hữu hạn, reduced-motion và hủy theo scope.
+- Đã deploy riêng Firestore Rules theo quyền được cấp. Đã backup và reset87tài liệu gameplay của toàn dự án memorymatchv1-1a, kiểm kê0tại mốc xóa; giữ Auth/Hosting/cấu hình. Không lặp lại reset nếu client đã tạo dữ liệu mới. Backup riêng không commit.
+- R0–R6 tại mục12 đã hoàn tất. Unit33/33; UI cuối60/60 +3boundary; popup/access/collection hồi quy đã đạt; check/build và production smoke2/2 đạt. Review độc lập đã chạy lại test trọng yếu và không còn P1/P2 xác nhận. Chi tiết, log, giới hạn và commit các phase: docs/qa/gameplay-progression/RECEIPT.md.
+- Nghiệm thu dựa working tree tích hợp; commit chỉ chứa hunk gameplay, giữ nguyên baseline UI/kỹ thuật đang có của task khác. Chưa đo S22 Ultra thật; không suy desktop thành60FPS trên điện thoại. Các dòng câu hỏi/đề xuất ban đầu ở phần trước là lịch sử, quyết định bổ sung sau P0 ở đầu file là luật đã duyệt.
+
+## 12. Bổ sung 19/10 — Kho báu hành trình: EXP và trải nghiệm mở rương
+
+**Trạng thái: hoàn tất R0–R6 trên web ngày20/10; đã kiểm tra và review độc lập.** Chủ dự án xác nhận phương án mỗi cụm 10 màn có bốn rương, không phải bốn rương ở từng màn. Yêu cầu bổ sung: có tên riêng và câu chữ sản phẩm để người chơi đọc, không hiển thị ghi chú nội bộ. Phần này cụ thể hóa trải nghiệm rương của P7; không tạo kế hoạch độc lập hoặc mở lại luật wave/kinh tế của P0–P9.
+
+### 12.1. Vấn đề gốc và phạm vi
+
+`adventureMap.openChest()` hiện đưa tiến độ, độ khó và danh sách thưởng vào một đoạn văn của popup dùng chung. Người chơi chỉ thấy cấp đang xét; không có tổng quan bốn rương, trạng thái từng cấp, hành động tiếp theo hoặc khoảnh khắc mở rương. Tên C/B/A/S và thông tin được ghép như dữ liệu khiến trải nghiệm giống thông báo hành chính dù model đã có chuỗi rương và claim nguyên tử.
+
+Mục tiêu: giúp người chơi trả lời được bốn câu hỏi ngay trên một màn: mình đang hướng tới rương nào, còn thiếu gì, sẽ nhận được gì, và đã nhận thành công chưa. Dùng cùng hệ thống cho ba trò, tiến độ và Gợi ý riêng đúng trò, Xu theo ví chung hiện hành.
+
+Trong phạm vi: tên/copy, bảng rương, progress, phần thưởng xem trước, phản hồi EXP sau thắng, trạng thái rương trên map, animation mở rương, lỗi/cleanup và kiểm chứng. Không đổi điểm, EXP, reward, thứ tự claim, mảnh tranh, save/ID, vật phẩm hoặc quảng cáo. Triển khai giữ nguyên luật kinh tế, receipt và save; không thêm quảng cáo hoặc mua rương.
+
+### 12.2. Luật đã khóa
+
+- Mỗi trò, mỗi đoạn màn 1–10 / 11–20 / ... có bốn rương C/B/A/S, ứng với Dễ/Trung bình/Khó/Siêu khó. Không dùng từ “cấp tài khoản” hoặc tạo EXP hồ sơ.
+- Thắng trọn màn gồm đủ các đợt, lần đầu ở một độ khó, được 10 EXP cho rương tương ứng. Mỗi rương cần 10 màn khác nhau của đúng độ khó trong đoạn đó, tức 100 EXP.
+- Chơi lại không thêm EXP; thua hoặc chỉ vượt một đợt chưa phải thắng màn nên không thêm EXP. Điểm/sao không nhân EXP; vật phẩm hỗ trợ không đổi quy tắc chứng nhận đang có.
+- Giữ chuỗi nhận C → B → A → S. Tiến độ độ khó cao vẫn được ghi trước; đủ EXP nhưng chưa nhận rương trước phải hiện đúng 100/100 và lý do chưa mở, không đưa về 0 hoặc bắt chơi lại.
+- Một rương nhận đúng một lần. Nhận không xóa thành tích hoặc EXP đã kiếm; rương đã mở vẫn hiển thị hoàn tất. Đủ cả bốn kết thúc chuỗi của đoạn đó; đoạn sau có chuỗi riêng.
+- Challenge/Vô tận không nhập vào EXP rương Hành trình. Không tự thêm EXP theo combo, thời gian, quảng cáo hoặc tổng phiên.
+- Mảnh tranh và thưởng bộ là tiến trình riêng đã chốt. Mở rương không phát mảnh; đủ bộ nhận 300 Xu riêng, không cộng lại vào từng rương.
+
+### 12.3. Tên sản phẩm và danh mục hiển thị
+
+Tên khu vực đề xuất để triển khai: **Kho báu hành trình**. Subtitle theo ngữ cảnh: **Màn 1–10**. Không gọi đoạn mười màn là “chặng” để tránh lẫn chặng lưu trữ 100 màn.
+
+| ID giữ nguyên | Tên người chơi thấy | Độ khó | Phần thưởng đã duyệt | Hướng nhận diện |
+|---|---|---|---|---|
+| C | Rương Mầm Non | Dễ | 30 Xu + 1 Gợi ý | Gỗ/đồng, mầm lá |
+| B | Rương Lá Bạc | Trung bình | 60 Xu + 2 Gợi ý | Bạc/xanh lam, lá |
+| A | Rương Hoa Vàng | Khó | 100 Xu + 3 Gợi ý | Vàng ấm, hoa |
+| S | Rương Ánh Sao | Siêu khó | 160 Xu + 4 Gợi ý | Tím ngọc, sao |
+
+Tên là nội dung trình bày, không đổi claim key, tier ID hoặc rulesVersion. C/B/A/S có thể là huy hiệu nhỏ nếu còn giúp nhận diện, không là tiêu đề chính. Màu đi kèm tên/hình/trạng thái, không dùng màu như dấu hiệu duy nhất.
+
+Tổng bốn rương: 350 Xu và 10 Gợi ý. Thưởng bộ tranh 300 Xu tách riêng; không quảng bá 650 Xu như phần thưởng của một rương. Không thêm vật phẩm ngẫu nhiên hoặc hiệu ứng mở rương gợi ý giải thưởng hiếm khi bảng thưởng đang cố định.
+
+### 12.4. Trải nghiệm đề xuất
+
+**Trên bản đồ:** giữ một điểm kho báu ở mốc mười màn; không đặt bốn icon lớn cạnh từng màn. Icon thể hiện rương kế tiếp của chuỗi, tên ngắn và trạng thái dễ hiểu: “Rương Mầm Non · 7/10”, “Có thể mở” hoặc “Đã mở 4/4”. Bốn rương đã mở phải có trạng thái hoàn tất, không fallback thành “Rương S · 0 EXP”. Không pulse vô hạn hoặc đổi kích thước marker gây dịch bản đồ.
+
+**Khi bấm điểm kho báu:** mở bảng riêng của tính năng trong modal owner hiện hữu, căn giữa vùng khả dụng và giữ đúng khoảng banner hiện hành. Bố cục gồm:
+
+1. Header “Kho báu hành trình”, subtitle phạm vi màn và nút đóng.
+2. Bốn thẻ rương dạng lưới 2×2 trên mobile dọc, cùng nhìn thấy tên, tiến độ và trạng thái; màn rộng có thể bốn cột nếu dễ đọc hơn. Không dùng carousel che mất cấp khác.
+3. Vùng chi tiết rương được chọn: hình rương lớn, tên, độ khó, tiến độ thực và phần thưởng bằng ô icon + số lượng.
+4. Một hành động chính theo trạng thái: “Chơi tiếp”, “Mở rương”, hoặc “Xong”. Chạm xem chi tiết cấp khác không tự cấp đồ và không đổi độ khó của phiên hiện hành.
+
+**Rương đã đủ điều kiện:** nút “Mở rương” nổi bật, bảng thưởng rõ trước khi bấm. Bấm một lần → chờ transaction → mở rương và hiện thưởng → xác nhận hoàn tất. Không yêu cầu chạm rương thêm một lần mới thực sự grant.
+
+**Sau mở:** hiện đúng tên rương vừa mở, hình đã mở và những phần thưởng đã nhận; nút “Xong”, có hành động phụ “Xem rương tiếp”. Không thay ngay bằng rương B/A/S khiến người chơi chưa kịp nhận biết đã nhận gì. Nếu nhiều cấp đã đủ EXP từ trước, chỉ gợi ý xem cấp tiếp theo; không tự claim liên tiếp.
+
+**Chơi tiếp:** dẫn tới preview của màn chưa hoàn thành cần thiết cho rương đang có thể tiến tới, qua adapter launch/khóa độ khó hiện hữu. Nếu còn prerequisite, đi tới màn/độ khó cần mở trước; không bypass khóa, không tự ghi đè phiên đang chơi và không bắt đầu level bằng click giả vào DOM.
+
+**Đã nhận đủ bốn rương:** tổng quan giữ bốn rương mở và nhãn “Đã mở trọn bộ”. Có thể xem lại phần thưởng; nút chính “Xong”. Không tự cuộn/nhảy sang đoạn sau hoặc xóa lịch sử. Bộ tranh có một lối xem riêng, không biến thành rương thứ năm.
+
+### 12.5. Copy dành cho người chơi
+
+Những câu dưới đây là nội dung sản phẩm mẫu để triển khai, không là ghi chú kỹ thuật cần hiện trên UI:
+
+| Tình huống | Nội dung hiển thị |
+|---|---|
+| Đang tích tiến độ | “Hoàn thành 10 màn ở mức Dễ để mở Rương Mầm Non.” |
+| Đã thắng 7 màn Dễ | “Đã hoàn thành 7/10 màn Dễ” và “70/100 kinh nghiệm” ở dòng phụ |
+| Chưa đủ EXP | “Còn 3 màn Dễ để mở rương.” |
+| Đã đủ và đúng lượt | “Rương Mầm Non đã sẵn sàng!” — nút “Mở rương” |
+| Cấp sau đủ EXP nhưng chờ cấp trước | “Đã đủ kinh nghiệm. Mở Rương Mầm Non trước.” — giữ tiến độ 100/100 |
+| Đang commit | “Đang nhận thưởng…”; hiển thị trạng thái bận hữu hạn theo kết quả thật |
+| Nhận thành công | “Bạn đã mở Rương Mầm Non” — hai ô thưởng “30 Xu”, “1 Gợi ý” |
+| Đã nhận trước đó | “Đã mở” — vẫn xem được phần thưởng |
+| Kho không đủ chỗ | “Hãy dùng bớt Gợi ý để có chỗ nhận thưởng.”; chỉ dùng khi xác định đúng nguyên nhân |
+| Lỗi lưu/không xác định | “Chưa nhận được thưởng. Hãy thử lại.” — nút “Thử lại” |
+| Hoàn tất chuỗi | “Đã mở trọn bộ kho báu Màn 1–10.” |
+
+Tên độ khó dùng label catalog hiện hành, không gắn cứng “normal” hoặc đổi Trung bình thành Thường ở một số chỗ. Trong UI chính không hiện “tier”, “claim”, “canonical”, “rulesVersion”, “model”, “placeholder”, “mock” hoặc mã lỗi. Replay không cần hiện “+0 EXP”; chỉ giữ tiến độ đúng, có giải thích một lần ở mục thông tin khi cần: “Kinh nghiệm được nhận khi lần đầu hoàn thành mỗi màn ở từng độ khó.”
+
+### 12.6. EXP sau khi thắng
+
+- Điểm cập nhật thuộc settlement thắng màn cuối đã commit; summary chỉ trình bày delta đã được chứng nhận, không tự tăng EXP.
+- Với lần đầu thắng: hiện “+10 kinh nghiệm” kèm tên rương đích và tiến độ trước → sau. Ví dụ “Rương Mầm Non · 60 → 70/100”. Nếu đạt 100, hiện “Rương Mầm Non đã sẵn sàng!” và lối “Xem kho báu”. Không bắt người chơi phải mở rương trước khi chơi tiếp.
+- Thắng độ khó cao trước khi nhận cấp trước vẫn hiện đúng tên rương đang được tích. Summary không báo rương đã mở nếu mới đủ EXP.
+- Một pulse/fill hữu hạn cho progress đang nhìn thấy; không tự phát lại hiệu ứng “nhận +10” khi reopen/reload. Snapshot trước/sau lấy từ kết quả thắng/record hiện có, không thêm counter EXP song song.
+- Mảnh tranh mới, Xu thắng và kinh nghiệm có từng dòng ngữ nghĩa rõ; chỉ hiện delta thực sự có. Không cộng kinh nghiệm từng wave hoặc từng animation.
+
+### 12.7. Trạng thái và nguồn dữ liệu
+
+Giữ `getMasteryBlock`/`getMasteryRewards` là nguồn tiến độ; claim từ record bền vững. Thêm projection chỉ đọc nếu cần cho cả bốn thẻ: tên, mode, số màn hoàn thành, EXP, reward, đã nhận, cấp trước cần nhận và action hợp lệ. Không persist các trạng thái UI này.
+
+Các trạng thái nghiệp vụ suy ra: **chưa bắt đầu**, **đang tích**, **đủ EXP nhưng chờ rương trước**, **sẵn sàng mở**, **đã mở**. **Đang nhận**, **đang diễn hoạt ảnh**, **lỗi thử lại** là trạng thái tạm thuộc một modal owner. Có thể xem tiến độ rương sau dù chưa được claim.
+
+Luồng nhận bắt buộc:
+
+1. Ghi nhận rõ game + đoạn màn + tier mà người chơi chọn nhận; không để nút cũ của C vô tình gọi nhận B khi state đã chuyển.
+2. Revalidate eligibility và đúng tier tại boundary transaction, không chỉ dựa vào disabled của button. Thẩm định precondition `expectedTier` nội bộ hoặc optional tương thích nếu cần; giữ các call site/API hiện hành hoạt động và test rõ. Không đổi key/schema chỉ để phục vụ modal.
+3. Stage claim + Xu + Gợi ý, commit nguyên tử theo queue/persistence hiện có. Không tách grant khỏi claim receipt.
+4. Commit thành công mới chạy mở rương/âm thanh/vật phẩm bay. Nếu đóng tab/modal sau commit, reward vẫn còn và lần mở lại đọc “Đã mở”; không phát lại grant.
+5. Nếu fail, phục hồi theo transaction owner; không trừ thêm hoặc mở rương giả. Nếu kết quả bất định do reload/conflict, đọc canonical receipt trước retry thay vì tự suy từ animation.
+6. Khi profile/UID/game/đoạn thay đổi hoặc modal đã dispose, callback không được ghi vào UI mới. Refresh wallet/map đúng owner; không rebuild toàn bộ map hoặc làm mất scroll chỉ vì claim một rương.
+
+Giữ chính sách kho hiện hành: thiếu chỗ cho toàn bộ Gợi ý thì không nhận một phần, không tự đổi thành Xu và không mất rương. UI phải phân biệt lỗi kho thật với lỗi lưu/đổi profile/no eligibility; API cũ trả null không đủ để khẳng định mọi lỗi là đầy kho. Chọn generic retry khi chưa có mã nguyên nhân tin cậy.
+
+Không thêm mạng/persistence theo tick progress. Đọc đúng chapter/đoạn đang xem, không scan toàn bộ hành trình; lazy hydrate và stale result theo generation. Các cấp đã nhận không giữ EXP=0 chỉ vì `activeTier` đã chuyển.
+
+### 12.8. Hướng hình ảnh và animation
+
+**Hướng đề xuất:** giữ Vườn đêm, gỗ/kim loại/lá/đá quý; bốn rương cùng silhouette/góc nhìn và tăng độ tinh xảo theo cấp. Hình rương là điểm nhấn, nền/viền bảng giảm cạnh tranh. Icon Xu/Gợi ý dùng hệ hiện hành, không emoji/font glyph làm hình trang trí.
+
+Hai phương án đã cân nhắc:
+
+- A: một hình cơ sở + badge/material overlay SVG/CSS. Nhẹ và dễ tái sử dụng; cần xem mẫu để tránh bốn rương chỉ khác màu.
+- B: một bộ source chung sinh bốn rương, mỗi rương đóng/mở; tối đa tám WebP được crop/chuẩn hóa theo kích thước hiển thị. Chất lượng vật liệu dễ đồng nhất với artwork hiện hành, đổi lại cần art QA và thêm decode.
+
+Đề xuất thẩm định mẫu C và S trước; ưu tiên A nếu đạt chất lượng, dùng B nếu cần minh họa để đạt phong cách. Không tạo tám ảnh hàng loạt trước khi mẫu được chốt. Nếu cần raster mới, dùng skill imagegen và generator/manifest source; SVG/CSS không cần imagegen. Không sửa tay manifest sinh hoặc đưa file nguồn tạm vào bundle.
+
+Timeline mở rương **sau commit**, đề xuất khoảng 0,8–1 giây, chỉ là mục tiêu trình bày cần nghiệm thu:
+
+| Pha | Thời lượng dự kiến | Chuyển động/thông tin |
+|---|---:|---|
+| Anticipation | 0–120 ms | Rương nhấn nhẹ bằng transform; phản hồi thao tác |
+| Open/impact | 120–450 ms | Nắp/chuyển trạng thái đóng→mở, ánh sáng giới hạn trong vùng rương |
+| Resolve | 450–850 ms | Hai ô thưởng xuất hiện, bộ đếm ví patch từ state đã commit |
+| Finish | Sau 850 ms | “Xong”/“Xem rương tiếp”, cleanup effect |
+
+Giới hạn ban đầu: một rương chính; tối đa 12 hạt và 18 node hiệu ứng tạm cho một lần mở; không thêm canvas hoặc loop nền mặc định. Transform/opacity là đường chính; repaint trong vùng hero, không full-screen blur/rung cả màn. Node/card tĩnh không được tạo lại mỗi frame.
+
+Reduced-motion: chuyển ngay sang rương mở và thưởng rõ, không rung/bay/hạt; nhận vẫn cùng transaction. Interrupt/close/restart/đổi game hủy animation, audio và callback presentation; mọi promise settle, không giữ node detach. Không để người chơi chờ timeline giả khi lỗi hoặc cần đóng. Âm thanh mở/nhận hữu hạn và tôn trọng mute/foreground/audio owner hiện hữu.
+
+Ảnh lỗi có SVG fallback hoàn chỉnh theo trạng thái; không lộ chữ kỹ thuật, hash asset hoặc vùng trắng. Art QA phải kiểm cả fallback, DPR và kích thước thật; không coi ảnh contact sheet là nghiệm thu responsive.
+
+### 12.9. Ownership và phương án triển khai
+
+Chọn **bảng rương chuyên dụng trên modal/lifecycle dùng chung**, không kéo dài `openChest()` bằng thêm nhiều chuỗi HTML, cũng không tạo một hệ modal mới.
+
+| Owner | Thay đổi dự kiến |
+|---|---|
+| `js/progression/masteryRewards.js`, `difficultyProgress.js` | Giữ luật; bổ sung projection/call helper thuần khi thật sự cần cho bốn cấp, test tất cả trạng thái |
+| Catalog/presentation module riêng, tên chốt khi triển khai | Tên, copy, style token, icon, view model; không giữ kho/EXP riêng |
+| `js/adventureMap.js` | Marker, open action và patch sau claim; tách chi tiết renderer khỏi map |
+| `js/adventureRewards.js` | Giữ atomic claim và API tương thích; thẩm định expected-tier/cause contract nếu cần |
+| Modal controller/presentation mới theo scope | Selection rương xem, busy, success/retry, animation/cancel/focus; không cấp thưởng |
+| `js/ui.js`/summary theo adapter từng trò | Delta EXP/mảnh từ settlement đã commit; không chèn luật vào generic UI |
+| CSS scope riêng cho rương, modal/dialog placement hiện hữu | 2×2/desktop, safe-area/banner, focus và reduced-motion; không override toàn bộ modal |
+| Asset source/generator và manifest hiện hành | Chỉ mở rộng sau duyệt art, giữ BASE_URL/fallback; không sửa generated output tay |
+
+Không đổi bộ sưu tập/tranh thành phần thưởng rương; chỉ liên kết tới tab hiện có. Không thêm nút quảng cáo, mở nhanh hoặc mua rương trong scope.
+
+### 12.10. Gate thiết kế và triển khai bổ sung
+
+R0–R6 là subgate của P7/P9, không là task gameplay mới. Nếu P7 phần model/claim đã pass, giữ bằng chứng và chỉ bổ sung presentation/claim precondition cần thiết. Đã triển khai tuần tự, commit riêng R0/R1/R2/R3/R4/R5 và nghiệm thu R6; giữ riêng thay đổi của task khác.
+
+| Gate | Đầu ra | Điều kiện pass |
+|---|---|---|
+| R0 — Contract và copy | Xác nhận mỗi đoạn10màn, bảng tên/reward, state matrix, inventory source và trạng thái Git | Không có luật/tên/điều kiện grant mơ hồ; chốt tên/art mẫu trước tạo hàng loạt |
+| R1 — Mẫu giao diện | Mẫu 412×915 cho 0/70/100 EXP, chờ rương trước, đã mở và xong4/4; mẫu C/S và fallback | Cả bốn rương nhìn rõ; tên tự nhiên, hiểu còn thiếu gì, thưởng gì và bấm đâu; đúng skin hiện hành |
+| R2 — Projection và claim | Data model chỉ đọc, queue/expected-tier/idempotency, phân biệt lỗi thật | Không đổi luật/catalog/save; claim cũ không nhận nhầm cấp sau; failure không mất hoặc nhân tài nguyên |
+| R3 — Bảng rương và map | Marker/state, bốn thẻ + detail + action, navigation tới preview qua adapter | Ba game, mọi trạng thái, focus/keyboard/banner/scroll đúng; không bypass khóa hoặc overwrite session |
+| R4 — EXP summary và mở rương | Delta sau thắng, animation hữu hạn, âm thanh, reduced-motion/interrupt | Không thêm EXP replay/wave; grant không phụ thuộc animation; không claim hàng loạt; reopen sau commit đúng receipt |
+| R5 — Tài nguyên và responsive | Asset tích hợp/fallback, cache/decode, dọc/ngang/desktop, edge cases | Không méo/cắt tên/che nút/tràn banner; ảnh lỗi vẫn dùng được; không loop/leak hoặc tải toàn catalog |
+| R6 — Nghiệm thu | Check/build web, target UI + regression, review độc lập và receipt chung của gameplay | Đủ test và ảnh thật tất cả trạng thái; không còn copy nội bộ trên UI; giới hạn máy thật ghi chính xác, không APK |
+
+Không tạo báo cáo riêng cho từng chỉnh nhỏ; bổ sung một mục Kho báu hành trình vào `docs/qa/gameplay-progression/RECEIPT.md` khi triển khai, không ghi đè ảnh/log lịch sử.
+
+### 12.11. Ma trận nghiệm thu bắt buộc
+
+- Unit/projection: 0/10/70/90/100 EXP từng cấp; C chưa nhận nhưng B/A/S đã100; claim lần lượt; tất cả đã nhận; replay/clear wave/thua; ranh giới màn10/11/100/101; ba game độc lập; special không nhập EXP.
+- Reward: đúng 30/60/100/160 Xu và1/2/3/4 Gợi ý; đủ bộ300 riêng; thiếu chỗ kho, double click, stale C action sau khi C đã nhận, save fail, reload giữa commit/animation, profile/UID đổi và conflict. Không đánh đồng tất cả lỗi với đầy kho.
+- Test UI phải mở rương bằng marker và nút thật cho cả ba trò, không chỉ gọi `claimAdventureChest()` bốn lần qua evaluate rồi coi trải nghiệm mở rương đã pass. Có assertion ví/kho/receipt sau thao tác và sau reload.
+- Layout: baseline412×915, ngang844×390 và desktop1024×900; kiểm tên dài, chữ lớn/focus, banner/safe-area và cuộn nội dung. Chỉ mở thêm profile hẹp khi có lỗi thực tế theo chuẩn dự án.
+- Lifecycle: ít nhất30 vòng mở/đóng; claim xong đóng ngay; chuyển game/tab trong animation; reduced-motion; background/resume; double mount/supersede. Một modal owner, một effect scene, node/listener/timer/audio về baseline, không chặn input sau cancel.
+- Hiệu năng: đo tap→busy, commit và presentation riêng; trace một lần mở và nhiều chu kỳ, frame/long task/heap và tài nguyên. Mục tiêu60FPS không là kết quả nếu chưa đo thiết bị; không animate layout/filter toàn màn hoặc write theo frame.
+- Gate cuối chạy `npm run check`, `npm run build` và suite mục tiêu rương/summary/map/collection/dialog-placement/persistence theo thay đổi thật. Soát screenshot thật cùng copy: không emoji trang trí, không chữ dev, không rương giả mở thành công khi save fail.
+
+### 12.12. Tiêu chí hoàn thành và trạng thái bàn giao thiết kế
+
+Người chơi nhìn thấy bốn rương có tên riêng, hiểu tiến độ từng độ khó, biết chính xác phần thưởng, mở đúng một rương sau commit và xem được lịch sử đã nhận. Lỗi/reopen/animation không làm mất hoặc nhân reward. Không cần đọc C/B/A/S hoặc ghi chú kỹ thuật để hiểu cách chơi.
+
+Đã nghiệm thu bảng bốn rương với SVG native, từng chất liệu/biểu tượng riêng, sáu trạng thái trên320/412/844/1024px và DPR3; không thêm raster. Claim đúng tier, atomic receipt, summary kinh nghiệm thực và lifecycle30chu kỳ đạt. R0–R6 **hoàn tất trên web**; số đo desktop và giới hạn máy thật ghi tại receipt chung. R0–R6 không đổi luật thưởng/schema hoặc thao tác dữ liệu Firebase thêm lần nào.

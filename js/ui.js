@@ -539,20 +539,22 @@ function openLevelSummaryOverlay({
         const projection=projectJourneyTreasure({completed:rewardProfile.bestByLevel,block:mastery.block,claim:rewardProfile.claimedChests[mastery.block]});
         const chest=projection.chests.find(chest=>chest.tier===mastery.tier);
         const readiness=document.createElement('p');readiness.className='mastery-win-status';
-        readiness.textContent=chest.state==='ready' ? chest.name + ' đã sẵn sàng!' : 'Đã đủ kinh nghiệm. Mở ' + chest.previousName + ' trước.';
+        readiness.textContent=chest.state==='ready' ? chest.name + ' đã sẵn sàng!' : chest.state==='claimed' ? chest.name + ' đã mở.' : 'Đã đủ kinh nghiệm. Mở ' + chest.previousName + ' trước.';
         reward.append(readiness);
         const treasure = document.createElement('button');treasure.type='button';treasure.className='app-button app-button--secondary';treasure.textContent='Xem kho báu';
         scope.listen(treasure,'click',() => {
           actionSelected=true;modal.close();
           afterClose(async () => {
+            let navigationPage=getAppPageScope();
             try {
-            await onMenu?.();
-            if (generation !== summaryGeneration || gameState.progress[getGameProgressKey(mastery.gameId)] !== rewardProfile || JSON.stringify(getRankingOwner()) !== rewardOwner) return;
-            const pageOwner=getAppPageScope();
-            const {showAdventureTreasure}=await import('./adventureMap.js');
-            if(pageOwner?.active && getAppPageScope()===pageOwner) showAdventureTreasure(mastery.gameId,mastery.block);
+              const navigation=onMenu?.();navigationPage=getAppPageScope();
+              await navigation;
+              if (generation !== summaryGeneration || gameState.progress[getGameProgressKey(mastery.gameId)] !== rewardProfile || JSON.stringify(getRankingOwner()) !== rewardOwner) return;
+              const pageOwner=getAppPageScope();navigationPage=pageOwner;
+              const {showAdventureTreasure}=await import('./adventureMap.js');
+              if(pageOwner?.active && getAppPageScope()===pageOwner) showAdventureTreasure(mastery.gameId,mastery.block);
             } catch(error) {
-              if (generation === summaryGeneration && gameState.progress[getGameProgressKey(mastery.gameId)] === rewardProfile && JSON.stringify(getRankingOwner()) === rewardOwner) showAppToast('Chưa mở được kho báu. Hãy vào lại từ bản đồ.');
+              if (navigationPage?.active && getAppPageScope()===navigationPage && generation === summaryGeneration && gameState.progress[getGameProgressKey(mastery.gameId)] === rewardProfile && JSON.stringify(getRankingOwner()) === rewardOwner) showAppToast('Chưa mở được kho báu. Hãy vào lại từ bản đồ.');
               console.error('Treasure navigation failed', error.name);
             }
           });

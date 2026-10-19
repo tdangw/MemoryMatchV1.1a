@@ -73,7 +73,10 @@ export function mountAdventureMap(gameId) {
   function setBusy(busy) {
     loading = busy;
     for (const control of specials.children) control.disabled = busy;
-    for (const control of document.querySelectorAll('#adventure-level-modal input')) control.disabled = busy;
+    for (const control of document.querySelectorAll('#adventure-level-modal input')) {
+      const level = Number(control.closest('fieldset').dataset.level);
+      control.disabled = busy || !getDifficultyAccess({completed:profile.bestByLevel,level,mode:control.value}).unlocked;
+    }
     if (busy) body.setAttribute("aria-busy", "true");
     else body.removeAttribute("aria-busy");
   }
@@ -270,7 +273,7 @@ export function mountAdventureMap(gameId) {
     content.className = "adventure-level-preview";
     const goal = document.createElement("p"); goal.className = "adventure-level-goal";
     goal.textContent = adapter.goal;
-    const choices = document.createElement("fieldset"); choices.className = "adventure-level-modes";
+    const choices = document.createElement("fieldset"); choices.className = "adventure-level-modes"; choices.dataset.level = String(level);
     const legend = document.createElement("legend"); legend.textContent = "Chọn độ khó";
     choices.append(legend);
     for (const [index, mode] of (specialMode ? [] : GAME_MODES.filter(mode => isNormalAdventureMode(mode.id))).entries()) {

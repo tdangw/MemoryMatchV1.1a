@@ -48,10 +48,10 @@ test('built mobile menu, map and account open without writing to production serv
   expect(await page.locator('.adventure-map-decoration').count()).toBeGreaterThanOrEqual(10);
   const atlasReady = await page.evaluate(async () => {
     const image = new Image(); image.src = '/assets/adventure/garden-sprites.webp'; await image.decode();
-    return image.naturalWidth > 0 && getComputedStyle(document.querySelector('.adventure-map-chest-art')).backgroundImage.includes('garden-sprites.webp');
+    return image.naturalWidth > 0 && document.querySelector('[data-chest="1"] .treasure-art') instanceof SVGElement;
   });
   expect(atlasReady).toBe(true);
-  await previewMapLevel(page, 1, 'hard');
+  await previewMapLevel(page, 1, 'easy');
   await expect(page.locator('.menu-ad-preview')).toHaveCount(1);
   await closeLevelPreview(page);
   await expect(page.locator('.menu-ad-preview')).toHaveCount(1);

@@ -1,0 +1,11 @@
+[WebServer] (node:812) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:16540) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 1 [desktop] › tests\ui\production-smoke.spec.js:5:1 › built purchase confirmation preserves the banner and shop position (1.8s)
+  ok 2 [desktop] › tests\ui\production-smoke.spec.js:25:1 › built mobile menu, map and account open without writing to production services (2.6s)
+
+  2 passed (7.2s)

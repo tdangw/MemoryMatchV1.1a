@@ -63,3 +63,37 @@ test('rapid retry after a read failure cannot let an old read destroy the curren
   await page.evaluate(()=>{window.__treasureReadFault.hold=false;window.__treasureReadFault.resume();});
   await expect(page.locator('.treasure-card')).toHaveCount(4);await expect(page.locator('#adventure-chest-modal')).toHaveCount(1);
 });
+
+test('a replacement treasure modal cancels the old opening and releases its own scope',async({page})=>{
+  await page.emulateMedia({reducedMotion:'no-preference'});await seed(page,'memory-match');await open(page);
+  await page.getByRole('button',{name:'Mở rương',exact:true}).click();await expect(page.locator('.treasure-content')).toHaveAttribute('data-phase','opening');
+  await page.evaluate(async()=>{
+    window.replacementTreasure=(await import('/js/progression/treasureModal.js')).openJourneyTreasure({gameId:'memory-match',block:1,owner:(await import('/js/appPageLifecycle.js')).getAppPageScope()});
+  });
+  await expect(page.locator('#adventure-chest-modal')).toHaveCount(1);await expect(page.locator('.treasure-hero')).toHaveCount(1);
+  await expect(page.locator('[data-treasure-tier="C"]')).toHaveClass(/is-claimed/);expect((await snapshot(page,'memory-match')).coins).toBe(30);
+  const disposed=await page.evaluate(()=>{window.replacementTreasure.destroy();return window.replacementTreasure.diagnostics();});
+  expect(disposed).toEqual({active:false,listener:0,timeout:0,interval:0,frame:0,animation:0,node:0,cleanup:0});
+});
+
+test('changing account during the committed opening cannot update the old modal',async({page})=>{
+  await page.emulateMedia({reducedMotion:'no-preference'});await seed(page,'memory-match');await open(page);
+  await page.getByRole('button',{name:'Mở rương',exact:true}).click();await expect(page.locator('.treasure-content')).toHaveAttribute('data-phase','opening');
+  await page.evaluate(async()=> (await import('/js/rankingOwner.js')).setRankingOwner({id:'other-profile',uid:'other-user'}));
+  await expect(page.locator('#adventure-chest-modal')).toHaveCount(0);expect((await snapshot(page,'memory-match')).coins).toBe(30);
+});
+
+test('a failed save shows a generic retry and never opens or partially grants the chest',async({page})=>{
+  await page.route(url=>url.pathname==='/js/persistence.js',async route=>{
+    const response=await route.fetch(),body=await response.text(),signature='export function savePersistentGameData(';
+    expect(body).toContain(signature);
+    await route.fulfill({response,body:body.replace(signature,'function originalTreasureSave(')+`\nexport function savePersistentGameData(...args){return globalThis.__treasureWriteFail?Promise.resolve(false):originalTreasureSave(...args);}\n`});
+  });
+  await seed(page,'memory-match');await open(page);await page.evaluate(()=>window.__treasureWriteFail=true);
+  await page.getByRole('button',{name:'Mở rương',exact:true}).click();
+  await expect(page.locator('.treasure-error')).toHaveText('Chưa nhận được thưởng. Hãy thử lại.');
+  expect((await snapshot(page,'memory-match')).coins).toBe(0);expect((await snapshot(page,'memory-match')).hints).toBe(0);
+  await expect(page.locator('.treasure-hero .is-open')).toHaveCount(0);
+  await page.evaluate(()=>window.__treasureWriteFail=false);await page.getByRole('button',{name:'Thử lại',exact:true}).click();
+  await expect(page.locator('.treasure-content')).toHaveAttribute('data-phase','success');expect((await snapshot(page,'memory-match')).coins).toBe(30);
+});
