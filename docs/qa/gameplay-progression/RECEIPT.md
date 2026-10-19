@@ -60,3 +60,9 @@ Unit progression21/21, board contract và pair-reward contracts đạt. Bài boa
 Playwright2/2 đạt: ghép thật Memory và Link qua hai wave, reload/resume sau wave đầu, chưa có best ở wave đầu và chỉ ghi sau wave cuối. Link giữ tổng ngân sách100giây cho hai wave Dễ. Chưa đo mobile/ma trận special hoặc nghiệm thu gate cuối.
 
 Commit P4 chỉ chứa delta wave/gravity và test/receipt; preflight Sấm sét, Link selection/Hint và alignment popup của task khác vẫn ở working tree, không được stage.
+
+## P5 — Triple waves và thư viện hình
+
+Có 20 mặt nạ hình học, compiler xác định theo màn/wave, cache LRU 24; giữ số thẻ/lớp, góc pile và solver có giới hạn. Kiểm signature dưới cả xoay/lật ở cấu hình Dễ đã bắt hai mẫu trùng và đã thay mẫu. Triple giữ checkpoint board vừa hết, score/moves/miss/time xuyên wave và chỉ quyết toán sau wave cuối; checkpoint không hợp lệ bị chặn tiếp tục.
+
+Unit model 22/22, Triple patterns 2/2 (20 mẫu × 6 mode, witness/geometry, 7 stage thử thách) đạt. Playwright 4/4 đạt: contact sheet hình học và ba lượt chơi thật hai wave, reload ở Memory/Link. Contact sheet chỉ là bằng chứng hình học, chưa thay kiểm tra render/hit-target mọi viewport. Commit chỉ chứa delta gameplay của controller, không stage chỉnh popup/presentation của task khác.

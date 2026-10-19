@@ -2,13 +2,24 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { MAX_ADVENTURE_LEVEL } from '../../js/adventureProgress.js';
 import {
-  GAMEPLAY_RULES_VERSION, getLevelWaveCount, calculateGroupScore, calculateVictoryCoins,
+  GAMEPLAY_RULES_VERSION, getLevelWaveCount, calculateGroupScore, calculateVictoryCoins, getWavePatternIndex,
 } from '../../js/progression/gameplayRules.js';
 import {
   MASTERY_DIFFICULTIES, getDifficultyAccess, getMasteryBlock,
 } from '../../js/progression/difficultyProgress.js';
 
 const clear = () => ({ rulesVersion: GAMEPLAY_RULES_VERSION, cleared: true });
+
+test('the first ten two-wave levels visit all twenty layouts without repeating', () => {
+  const indexes = [];
+  for (let level = 1; level <= 10; level++) for (let wave = 1; wave <= 2; wave++) indexes.push(getWavePatternIndex(level, wave));
+  assert.deepEqual(indexes, Array.from({ length: 20 }, (_, i) => i));
+  assert.equal(getWavePatternIndex(11, 1), 0);
+  assert.equal(getWavePatternIndex(51, 1), 0);
+  assert.equal(getWavePatternIndex(91, 1), 0);
+  assert(Number.isInteger(getWavePatternIndex(MAX_ADVENTURE_LEVEL, 5)));
+  assert.throws(() => getWavePatternIndex(1, 3));
+});
 
 test('wave boundaries remain bounded, including the highest supported level', () => {
   for (const [level, waves] of [[1, 2], [10, 2], [11, 3], [50, 3], [51, 4], [90, 4], [91, 5], [100000, 5], [MAX_ADVENTURE_LEVEL, 5]])

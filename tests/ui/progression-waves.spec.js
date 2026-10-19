@@ -1,5 +1,46 @@
 import { test, expect } from '@playwright/test';
 
+test('Triple plays two generated silhouettes and only settles after the second wave', async ({ page }) => {
+  test.setTimeout(90000);
+  await page.goto('/');
+  await page.evaluate(async () => {
+    await (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('triple-connect');
+    const { gameState } = await import('/js/gameState.js');
+    gameState.settings.sound = gameState.settings.music = false;
+    window.tripleWaveRun = await (await import('/js/tripleConnect/tripleController.js')).startTripleConnectRound({ mode: 'easy', skipIntro: true });
+  });
+  const layouts = [];
+  for (let waveIndex = 1; waveIndex <= 2; waveIndex++) {
+    await expect.poll(() => page.evaluate(async () => {
+      const session = (await import('/js/sessionProgress.js')).getActiveSession('triple-connect','easy');
+      return session?.wave?.phase === 'playing' && window.tripleWaveRun.getState().status === 'playing' && session.wave.index;
+    }), { timeout: 15000 }).toBe(waveIndex);
+    const solution = await page.evaluate(async () => {
+      const state = window.tripleWaveRun.getState();
+      const solved = (await import('/js/tripleConnect/tripleSolver.js')).solveTripleState({ initialState: state, maxNodes: 10000, maxMemo: 5000, deadlineMs: 500 });
+      if (solved.status !== 'solved') throw new Error('Rendered board cannot be solved: '+solved.status);
+      const session = (await import('/js/sessionProgress.js')).getActiveSession('triple-connect','easy');
+      return { witness: solved.witness, layoutId: session.layoutId };
+    });
+    layouts.push(solution.layoutId);
+    for (const command of solution.witness) {
+      const previous = await page.evaluate(() => window.tripleWaveRun.getState().moves);
+      await page.locator(`.triple-connect__board [data-tile-id="${command.tileId}"]`).click();
+      await expect.poll(() => page.evaluate(() => window.tripleWaveRun.getState().moves)).toBeGreaterThan(previous);
+      await page.waitForFunction(() => !document.querySelector('.triple-connect__tray-flight, .triple-connect__ghost'));
+    }
+    if (waveIndex === 1) {
+      expect(await page.evaluate(async () => (await import('/js/gameState.js')).gameState.progress.tripleConnect.bestByLevel['easy:1'])).toBeUndefined();
+      await expect.poll(() => page.evaluate(async () => (await import('/js/sessionProgress.js')).getActiveSession('triple-connect','easy')?.wave?.index)).toBe(2);
+    }
+  }
+  expect(layouts[0]).not.toBe(layouts[1]);
+  await expect(page.locator('#level-summary-modal')).toBeVisible({ timeout: 10000 });
+  const best = await page.evaluate(async () => (await import('/js/gameState.js')).gameState.progress.tripleConnect.bestByLevel['easy:1']);
+  expect(best.completedWaves).toBe(2);
+  expect(best.rulesVersion).toBe(1);
+});
+
 test('Link advances waves with shared time, survives reload, and records only a complete level', async ({ page }) => {
   test.setTimeout(60000);
   await page.goto('/');

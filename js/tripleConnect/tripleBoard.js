@@ -2,6 +2,7 @@ import {
   TRIPLE_EASY_CONFIG,
   TRIPLE_EASY_FALLBACK_SEED,
   TRIPLE_EASY_GENERATOR_BUDGET,
+  TRIPLE_EASY_SOLVER_BUDGET,
   TRIPLE_EASY_LAYOUT,
   TRIPLE_NORMAL_CONFIG,
   TRIPLE_NORMAL_LAYOUT,
@@ -15,12 +16,14 @@ import {
   TRIPLE_ENDLESS_LAYOUT,
   TRIPLE_CHALLENGE_LAYOUTS,
   getTripleChallengeStage,
+  getTripleModeConfig,
   TRIPLE_LUCKY_REWARDS,
   TRIPLE_CORNER_STACK_CORNERS,
 } from "./tripleConfig.js";
 import { reduceTripleCommand } from "./tripleRules.js";
 import { createTripleRoundState } from "./tripleState.js";
 import { solveTripleBoard } from "./tripleSolver.js";
+import { compileTriplePattern } from './triplePatterns.js';
 
 export function getEasyTripleLayout() {
   return TRIPLE_EASY_LAYOUT;
@@ -29,6 +32,12 @@ export function getNormalTripleLayout() {
   return TRIPLE_NORMAL_LAYOUT;
 }
 export function getTripleLayout(layoutId) {
+  const pattern = /^matrix-([0-9]{2})-(easy|normal|hard|super-hard|endless|challenge-[1-7])$/.exec(layoutId);
+  if (pattern) {
+    const baseId = pattern[2];
+    const config = baseId.startsWith('challenge-') ? getTripleChallengeStage(Number(baseId.slice(10))) : getTripleModeConfig(baseId === 'super-hard' ? 'superHard' : baseId);
+    return compileTriplePattern({ index: Number(pattern[1]), config, baseLayout: getTripleLayout(baseId) });
+  }
   const layouts = [
     TRIPLE_EASY_LAYOUT,
     TRIPLE_NORMAL_LAYOUT,
@@ -125,6 +134,18 @@ export function generateEasyTripleBoard({
     config: TRIPLE_EASY_CONFIG,
   });
 }
+export function generatePatternTripleBoard({ mode = 'easy', level = 1, patternIndex = 0, seed, solverOptions } = {}) {
+  const config = mode === 'challenge' ? getTripleChallengeStage(level) : getTripleModeConfig(mode);
+  const baseId = mode === 'challenge' ? config.layoutId : mode === 'superHard' ? 'super-hard' : mode;
+  const layout = compileTriplePattern({ index: patternIndex, config, baseLayout: getTripleLayout(baseId) });
+  const budget = mode === 'challenge' ? config.solverBudget : mode === 'hard' ? TRIPLE_HARD_SOLVER_BUDGET
+    : ['superHard', 'endless'].includes(mode) ? TRIPLE_SUPER_HARD_SOLVER_BUDGET : TRIPLE_EASY_SOLVER_BUDGET;
+  const generated = generateBoard({ seed, layout, config, solverOptions: { ...budget, ...solverOptions },
+    maxAttempts: ['easy', 'normal'].includes(mode) ? TRIPLE_EASY_GENERATOR_BUDGET.maxAttempts : 1,
+    fallbackSeed: `${layout.id}:certified-fallback` });
+  return mode === 'challenge' ? decorateChallengeLuckies(generated, `${seed}:lucky`) : generated;
+}
+
 function generateBoard({
   seed,
   maxAttempts = TRIPLE_EASY_GENERATOR_BUDGET.maxAttempts,

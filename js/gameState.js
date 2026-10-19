@@ -301,7 +301,7 @@ function normalizeTripleSessions(sessions, trayCapacity = TRIPLE_PRODUCT_DECISIO
       const restored = restoreSerializedTripleRoundState(session.snapshot, { trayCapacity });
       const wave = session.wave ? normalizeWaveProgress(session.wave, { gameId: 'triple-connect', mode, level: session.level }) : null;
       if (session.wave && !wave) return [];
-      if (restored.status !== "playing" && !(restored.status === 'won' && wave && wave.phase !== 'playing')) return [];
+      if (restored.status !== "playing" && !(restored.status === 'won' && wave && restored.matchedTriples === wave.groupsPerWave)) return [];
       const snapshot = serializeTripleRoundState(restored);
       return [[mode, {
         ...(wave ? { wave } : {}),

@@ -6,6 +6,7 @@ import { rememberRecentGame } from '../recentGame.js';
 import {
   createTripleCoverGraph,
   generateEasyTripleBoard,
+  generatePatternTripleBoard,
   generateChallengeTripleBoard,
   generateEndlessTripleBoard,
   generateHardTripleBoard,
@@ -39,9 +40,7 @@ import { endTripleRound } from "./tripleState.js";
 import {
   getTripleChallengeStage,
   getTripleModeConfig,
-  getTripleCompletionScore,
   getTripleTrayCapacity,
-  getTripleStarProgress,
   TRIPLE_PRODUCT_DECISIONS,
 } from "./tripleConfig.js";
 import { shuffleTripleBoardState } from "./tripleShuffle.js";
@@ -59,7 +58,6 @@ import { prepareAdventureChapter, stageAdventureLevelStart, canAdvanceAdventure 
 import { getChapterNumber } from "../adventureProgress.js";
 import { beginRankedAttempt, checkpointRankedRun, finalizeRankedRun, getRankedRun, stageRankedAttempt } from "../rankingRules.js";
 import { stageActiveSession } from "../sessionProgress.js";
-import { calculateTripleCoinReward } from "./tripleConfig.js";
 import { getLinkExitEffect, getLinkPathEffect } from "../linkConnect/linkEffects.js";
 import { duckBackgroundMusicForVictory, restoreBackgroundMusic, sounds } from "../sound.js";
 import { getGameModeLabel } from "../gameCatalog.js";
@@ -72,9 +70,14 @@ import { createHudTimerScheduler } from "../gameShell/gameTimerProgress.js";
 import { getComboWindowMs } from "../gameplayTuning.js";
 import { clearComboWindow as clearComboWindowPresentation, playComboWindow } from "../gameShell/comboWindowPresentation.js";
 import { clearShellTimeout } from "../gameShell/gameShellLifecycle.js";
+import { createWaveProgress, completeWave, activateNextWave, normalizeWaveProgress, waveTotalGroups } from '../progression/waveProgress.js';
+import { calculateVictoryCoins, calculateFastFinishBonus, calculateProgressionStars, getProgressionStarTargets, getWavePatternIndex } from '../progression/gameplayRules.js';
+import { getDifficultyAccess } from '../progression/difficultyProgress.js';
+import { pausePlayMetrics } from '../playMetrics.js';
 
 const development = import.meta.env?.DEV === true;
 let state = null;
+let activeWave = null;
 let renderer = null;
 let presentationCount = 0;
 let boardPresentationRevision = 0;
@@ -127,18 +130,19 @@ export async function startTripleConnectDevelopmentRound({
   }));
 }
 
-export function startTripleConnectRound({ seed, mode = "easy", level = 1, elapsedTime, skipIntro = false, reason = "new" } = {}) {
+export function startTripleConnectRound({ seed, mode = "easy", level = 1, elapsedTime, skipIntro = false, reason = "new", waveSession = null } = {}) {
   if (!canLaunchGame()) return null;
   if (reason === 'restart' && (mode === 'challenge' || mode === 'endless')) { level = 1; reason = 'new'; seed = undefined; elapsedTime = undefined; }
   const normalizedLevel = normalizeLevel(level);
   if (mode === "challenge") getTripleChallengeStage(normalizedLevel);
   const roundSeed = seed || createRoundSeed(mode, normalizedLevel);
+  const patternIndex = seed === undefined ? getWavePatternIndex(normalizedLevel, waveSession?.wave?.index || 1) : undefined;
   cancelPendingTripleGeneration();
   return prepareTripleStartup(async startup => {
     let generated;
     let request;
     try {
-      request = requestTripleGeneration({ mode, seed: roundSeed, level: normalizedLevel });
+      request = requestTripleGeneration({ mode, seed: roundSeed, level: normalizedLevel, patternIndex });
       pendingGeneration = request;
       const release = startup.scope.own(() => {
         request.cancel();
@@ -155,13 +159,15 @@ export function startTripleConnectRound({ seed, mode = "easy", level = 1, elapse
       pendingGeneration = null;
       console.warn('Triple worker unavailable; using bounded generation fallback', error);
       await startup.yield();
-      generated = await startup.phase('generation-fallback', () => generateTripleBoard({ mode, seed: roundSeed, level: normalizedLevel }));
+      generated = await startup.phase('generation-fallback', () => patternIndex === undefined
+        ? generateTripleBoard({ mode, seed: roundSeed, level: normalizedLevel })
+        : generatePatternTripleBoard({ mode, seed: roundSeed, level: normalizedLevel, patternIndex }));
     }
     await startup.yield();
     return startup.phase('prepare', async () => (await startTripleConnectRoundFromGenerated({
       generated, mode, level: normalizedLevel, elapsedTime, skipIntro,
       explicitSeed: seed !== undefined, startup,
-      reason,
+      reason, waveSession,
     })));
   });
 }
@@ -214,9 +220,13 @@ function generateTripleBoard({ seed, mode, level }) {
   return generate({ seed, level });
 }
 
-async function startTripleConnectRoundFromGenerated({ generated, mode, level, elapsedTime, skipIntro, explicitSeed, startup, reason = "new" }) {
+async function startTripleConnectRoundFromGenerated({ generated, mode, level, elapsedTime, skipIntro, explicitSeed, startup, reason = "new", waveSession = null }) {
   if (!await prepareAdventureChapter("triple-connect", getChapterNumber(level), () => startup.scope.active)) return null;
   startup.check();
+  if (!['challenge','endless'].includes(mode)
+    && !getDifficultyAccess({ completed: gameState.progress.tripleConnect.bestByLevel, level, mode }).unlocked) {
+    showAppToast('Hãy hoàn thành độ khó trước để mở khóa.'); return null;
+  }
   const themeId = getTheme(getEquippedThemeId(gameState.appearance, "triple-connect")).id;
   const typeIds = [...new Set(generated.board.tiles.map((tile) => tile.type))].sort();
   const theme = getTheme(themeId);
@@ -236,17 +246,19 @@ async function startTripleConnectRoundFromGenerated({ generated, mode, level, el
   }
   currentAssetPathsByType = Object.fromEntries(typeIds.map((type, index) => [type, selectedAssets[index]?.path]).filter(([, path]) => path));
   state = createTripleRoundState({ ...generated.board, assetPathsByType: currentAssetPathsByType, trayCapacity: getEffectiveTripleTrayCapacity() });
+  activeWave = reason === 'wave' ? activateNextWave(waveSession.wave)
+    : createWaveProgress({ attemptId: crypto.randomUUID(), gameId: 'triple-connect', mode, level, groupsPerWave: state.initialTileCount / 3 });
+  if (reason === 'wave') state = restoreTripleStateSnapshot({ ...createTripleStateSnapshot(state),
+    score: activeWave.completedScore, moves: activeWave.completedMoves, misses: activeWave.completedMisses }, []);
   currentMode = mode;
   currentLevel = level;
   currentLayout = getTripleLayout(generated.layoutId);
   currentSeed = generated.seed;
-  remainingTime =
-    mode === "endless" && Number.isInteger(elapsedTime) && elapsedTime >= 0
-      ? elapsedTime
-      : getTripleLevelTime(mode, level);
-  const mounted = (await mountTripleDevelopmentRound(generated, { skipIntro, startup }));
+  remainingTime = reason === 'wave' ? waveSession.remainingTime
+    : mode === 'endless' && Number.isInteger(elapsedTime) && elapsedTime >= 0 ? elapsedTime : activeWave.allocatedSeconds;
+  const mounted = (await mountTripleDevelopmentRound(generated, { skipIntro, startup, metrics: waveSession?.metrics || null }));
   mounted.commitStart = () => {
-    beginRankedAttempt("triple-connect", mode, level, { reason });
+    beginRankedAttempt("triple-connect", mode, level, { reason: reason === 'wave' ? 'resume' : reason, savedRun: waveSession?.run });
     stageAdventureLevelStart("triple-connect", mode, level);
     return commitThemeSession("triple-connect", createSession(state, remainingTime), themeId, selectedAssets);
   };
@@ -263,11 +275,17 @@ export function continueTripleConnectDevelopmentRound({ mode = "easy" } = {}) {
 
 export function continueTripleConnectSession(session) {
   if (!session) return null;
+  if (!isValidTripleConnectSession(session)) return null;
+  if (session.wave?.phase === 'advance') return startTripleConnectRound({ mode: session.mode, level: session.level,
+    reason: 'wave', waveSession: session, skipIntro: true });
   cancelPendingTripleGeneration();
   return prepareTripleStartup(async startup => {
   if (!isValidTripleConnectSession(session)) throw new Error('Invalid Triple session.');
   try {
     state = restoreSerializedTripleRoundState(session.snapshot, { trayCapacity: getEffectiveTripleTrayCapacity() });
+    activeWave = session.wave ? normalizeWaveProgress(session.wave, { gameId: 'triple-connect', mode: session.mode, level: session.level })
+      : createWaveProgress({ attemptId: crypto.randomUUID(), gameId: 'triple-connect', mode: session.mode, level: session.level, groupsPerWave: state.initialTileCount / 3 });
+    if (!activeWave) throw new Error('Invalid Triple wave checkpoint.');
     const layout = getTripleLayout(session.layoutId);
     currentMode = session.mode;
     currentLevel = normalizeLevel(session.level);
@@ -297,6 +315,8 @@ export function continueTripleConnectSession(session) {
 }
 
 export function isValidTripleConnectSession(session) {
+  if (session?.waveInvalid || (session?.wave && !normalizeWaveProgress(session.wave,
+    { gameId: 'triple-connect', mode: session.mode, level: session.level }))) return false;
   if (
     !session?.snapshot ||
     typeof session.layoutId !== "string" ||
@@ -314,7 +334,7 @@ export function isValidTripleConnectSession(session) {
   }
   try {
     const roundState = restoreSerializedTripleRoundState(session.snapshot, { trayCapacity: getEffectiveTripleTrayCapacity() });
-    if (roundState.status !== "playing") return false;
+    if (roundState.status !== "playing" && !(roundState.status === 'won' && session.wave && roundState.matchedTriples === session.wave.groupsPerWave)) return false;
     return isCompatibleTripleSession(
       roundState,
       getTripleLayout(session.layoutId),
@@ -377,11 +397,9 @@ async function mountTripleDevelopmentRound(generated, { skipIntro = false, start
     renderer.nodes.forEach((node, tileId) => {
       node.classList.toggle("is-hinted", hintedTileIds.has(tileId));
     });
-    const starProgress = getTripleStarProgress({
-      mode: currentMode,
-      score: roundState.score,
-      initialTileCount: roundState.initialTileCount,
-    });
+    const totalGroups = activeWave ? waveTotalGroups(activeWave) : roundState.initialTileCount / 3;
+    const starProgress = { stars: calculateProgressionStars({ mode: currentMode, score: roundState.score, totalGroups, won: activeWave?.phase === 'won' }),
+      score: roundState.score, thresholds: getProgressionStarTargets({ mode: currentMode, totalGroups }) };
     hud.stats({
       level: currentLevel,
       moves: roundState.moves,
@@ -492,7 +510,7 @@ return runRoundCommand(async () => {
     roundLuckyRewards.push(...rewards.lucky);
     roundMilestoneRewards.push(...rewards.milestones);
     const roundWon = transition.events.some((event) => event.type === "round-won");
-    if (roundWon) finishPlayMetrics();
+    if (roundWon && activeWave.index === activeWave.count) finishPlayMetrics();
     if (state.status !== "playing") stopComboWindow();
     else if (matchEvent) startComboWindow();
     else if (transition.events.some((event) => event.type === "miss")) stopComboWindow();
@@ -631,6 +649,7 @@ return runRoundCommand(async () => {
     if (!scope.active || generation !== roundGeneration) return;
     roundStarted = true;
     resumePlayMetrics("startup");
+    if (state.status === 'won') { await settleTerminalRound(shell, render); return; }
   void rememberRecentGame("triple-connect");
     startTripleTimer(scope, shell, render, hudElements, hud);
     if (state.combo > 0) startComboWindow();
@@ -785,8 +804,9 @@ async function saveSession() {
 }
 
 function createSession(roundState, sessionRemainingTime) {
-  stageRankedAttempt("triple-connect", currentMode, roundState.score, roundState.status === "won");
+  stageRankedAttempt("triple-connect", currentMode, roundState.score, activeWave?.phase === 'won');
   return {
+    ...(activeWave ? { wave: activeWave } : {}),
     mode: currentMode,
     level: currentLevel,
     seed: currentSeed,
@@ -828,6 +848,10 @@ async function settleTerminalRound(shell, render) {
   if (terminalSettled || state.status === "playing" || !shell.scope?.active)
     return;
   terminalSettled = true;
+  if (state.status === 'won' && activeWave.index < activeWave.count) {
+    await advanceTripleWave();
+    return;
+  }
   const generation = roundGeneration;
   const scope = shell.scope;
   presentationCount = 0;
@@ -947,21 +971,18 @@ async function commitTripleTerminalResult() {
   const rollback = {
     coins: gameState.coins,
     progress: structuredClone(gameState.progress.tripleConnect),
+    wave: activeWave,
   };
   const won = state.status === "won";
-  const completion = getTripleCompletionScore({
-    mode: currentMode,
-    score: state.score,
-    remainingTime,
-  });
-  const stars = won
-    ? getTripleStarProgress({
-      mode: currentMode,
-      score: completion.score,
-      initialTileCount: state.initialTileCount,
-    }).stars
-    : 0;
-  const reward = won ? calculateTripleCoinReward({ mode: currentMode, matchedTriples: state.matchedTriples, stars, maxCombo: state.maxCombo }) : 0;
+  if (won && activeWave.phase === 'playing') activeWave = completeWave(activeWave, { score: state.score,
+    moves: state.moves, misses: state.misses, matchedGroups: state.matchedTriples }).progress;
+  const totalGroups = waveTotalGroups(activeWave);
+  const timeBonus = won ? calculateFastFinishBonus({ mode: currentMode, totalGroups,
+    activeMs: snapshotPlayMetrics({ gameId: 'triple-connect', mode: currentMode, level: currentLevel })?.elapsedMs || 0,
+    allocatedSeconds: activeWave.allocatedSeconds }) : 0;
+  const completion = { baseScore: state.score, timeBonus, score: state.score + timeBonus };
+  const stars = won ? calculateProgressionStars({ mode: currentMode, score: completion.score, totalGroups, won: true }) : 0;
+  const reward = won ? calculateVictoryCoins({ gameId: 'triple-connect', mode: currentMode, totalGroups, stars }) : 0;
   const settledState = won && completion.timeBonus > 0
     ? restoreTripleStateSnapshot({
       ...createTripleStateSnapshot(state),
@@ -970,7 +991,7 @@ async function commitTripleTerminalResult() {
     : state;
   if (won) {
     gameState.coins += reward;
-    recordTripleConnectResult({ mode: currentMode, level: currentLevel, score: completion.score, stars, durationMs: finishPlayMetrics() });
+    recordTripleConnectResult({ mode: currentMode, level: currentLevel, score: completion.score, stars, durationMs: finishPlayMetrics(), wave: activeWave });
     stageRankedAttempt("triple-connect", currentMode, completion.score, true);
     checkpointRankedRun("triple-connect", currentMode);
   }
@@ -984,6 +1005,7 @@ async function commitTripleTerminalResult() {
   }
   if (generation !== roundGeneration) return false;
   gameState.coins = rollback.coins;
+  activeWave = rollback.wave;
   gameState.progress.tripleConnect = rollback.progress;
   return false;
 }
@@ -1022,6 +1044,7 @@ function formatTripleReward(reward) {
 
 function startNextTripleLevel(targetLevel = currentLevel + 1) {
   const nextLevel = targetLevel;
+  if (!['challenge','endless'].includes(currentMode)) currentMode = 'easy';
   if (!canAdvanceAdventure("triple-connect", currentMode, nextLevel)) return returnTripleToMenu();
   const elapsedTime = currentMode === "endless" ? remainingTime : undefined;
   void startTripleConnectRound({ mode: currentMode, level: nextLevel, elapsedTime, reason: "advance" });
@@ -1039,7 +1062,7 @@ function returnTripleToMenu() {
 
 function updateTimer(shell, visualRemainingTime = remainingTime, elements = getTripleHudElements(), hud = getTripleHud(elements)) {
   hud.stats({ timer: remainingTime });
-  const timeLimit = getTripleLevelTime(currentMode, currentLevel);
+  const timeLimit = activeWave?.allocatedSeconds || getTripleLevelTime(currentMode, currentLevel);
   renderHudTimer(elements.gameHud, {
     progress:
       currentMode === "endless" ? 1 : visualRemainingTime / Math.max(1, timeLimit),
@@ -1058,6 +1081,27 @@ function getTripleLevelTime(mode, level) {
   return mode === "challenge"
     ? getTripleChallengeStage(level).timeSeconds
     : getTripleModeConfig(mode).timeSeconds;
+}
+
+async function advanceTripleWave() {
+  const generation = roundGeneration;
+  const previous = { wave: activeWave, time: remainingTime,
+    progress: structuredClone(gameState.progress.tripleConnect) };
+  pausePlayMetrics('wave-transition');
+  const result = completeWave(activeWave, { score: state.score, moves: state.moves,
+    misses: state.misses, matchedGroups: state.matchedTriples });
+  activeWave = result.progress;
+  remainingTime += result.bonusSeconds;
+  const session = createSession(state, remainingTime);
+  if (!await saveActiveSession('triple-connect', session)) {
+    if (generation === roundGeneration) {
+      activeWave = previous.wave; remainingTime = previous.time;
+      gameState.progress.tripleConnect = previous.progress;
+    }
+    return;
+  }
+  if (generation !== roundGeneration) return;
+  return startTripleConnectRound({ mode: currentMode, level: currentLevel, reason: 'wave', waveSession: session, skipIntro: true });
 }
 
 async function commitTripleResolutionRewards({ luckyEvent, matchEvent }) {

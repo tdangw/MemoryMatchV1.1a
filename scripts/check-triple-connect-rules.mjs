@@ -27,7 +27,8 @@ function select(state, tileId) {
 assert.deepEqual(TRIPLE_EASY_CONFIG, { mode: "easy", tileCount: 27, layerCount: 3, timeSeconds: 93 });
 assert.equal(TRIPLE_RULES.trayCapacity, 7);
 assert.equal(calculateTripleMatchScore(1), 10);
-assert.equal(calculateTripleMatchScore(2), 13);
+assert.equal(calculateTripleMatchScore(2), 12);
+assert.equal(calculateTripleMatchScore(30), 18);
 {
   let state = makeState({ a: 3, b: 3 });
   for (const tileId of ["a-1", "a-2", "a-3"]) state = select(state, tileId).nextState;
@@ -144,7 +145,7 @@ assert.deepEqual({ combo: combo.combo, maxCombo: combo.maxCombo, matchedTriples:
   combo: 2,
   maxCombo: 2,
   matchedTriples: 2,
-  score: 23,
+  score: 22,
   misses: 0,
 });
 combo = select(combo, "c-1").nextState;

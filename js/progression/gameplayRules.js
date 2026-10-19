@@ -26,6 +26,15 @@ export function getLevelWaveCount(level) {
   return 5;
 }
 
+export function getWavePatternIndex(level, waveIndex) {
+  const count = getLevelWaveCount(level);
+  if (!Number.isInteger(waveIndex) || waveIndex < 1 || waveIndex > count) throw new RangeError('Invalid wave index.');
+  const previous = level - 1;
+  const lengths = [Math.min(previous, 10), Math.max(0, Math.min(previous, 50) - 10),
+    Math.max(0, Math.min(previous, 90) - 50), Math.max(0, previous - 90)];
+  return (lengths.reduce((sum, length, index) => sum + (length % 20) * (index + 2), 0) + waveIndex - 1) % 20;
+}
+
 export function calculateGroupScore({ combo, automatic = false }) {
   if (!Number.isSafeInteger(combo) || combo < 0)
     throw new RangeError('Invalid combo.');

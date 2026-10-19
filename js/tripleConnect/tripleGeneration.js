@@ -25,7 +25,7 @@ export function getTripleGenerationTimeoutMs({ mode, level = 1 } = {}) {
   return solverBudget.deadlineMs * attempts + 4000;
 }
 
-export function requestTripleGeneration({ mode, seed, level, timeoutMs = getTripleGenerationTimeoutMs({ mode, level }), WorkerClass = globalThis.Worker } = {}) {
+export function requestTripleGeneration({ mode, seed, level, patternIndex, timeoutMs = getTripleGenerationTimeoutMs({ mode, level }), WorkerClass = globalThis.Worker } = {}) {
   if (typeof WorkerClass !== "function")
     throw new Error("Triple generation worker is unavailable.");
   const requestId = ++nextRequestId;
@@ -57,7 +57,7 @@ export function requestTripleGeneration({ mode, seed, level, timeoutMs = getTrip
     timeoutId = setTimeout(() => {
       settle(reject, new Error("Triple generation timed out."));
     }, timeoutMs);
-    worker.postMessage({ requestId, mode, seed, level });
+    worker.postMessage({ requestId, mode, seed, level, ...(patternIndex !== undefined ? { patternIndex } : {}) });
   });
   return Object.freeze({ requestId, promise, cancel: () => {
     if (settled) return;
