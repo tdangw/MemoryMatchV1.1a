@@ -122,8 +122,8 @@ export function mountAdventureMap(gameId) {
         control.disabled = false;
         control.classList.toggle("is-claimed", node.claimed);
         control.classList.toggle("is-ready", node.eligible);
-        element.detail.textContent = node.claimed ? "Đã nhận" : `${node.completedCount}/10 màn`;
-        control.setAttribute("aria-label", `Rương ${node.chestNumber}, ${element.detail.textContent}`);
+        element.detail.textContent = node.claimed ? "Đã nhận" : `${node.activeTier} · ${node.exp}/100 EXP`;
+        control.setAttribute("aria-label", `Rương ${node.activeTier || 'S'}, ${element.detail.textContent}`);
       }
     });
 
@@ -300,12 +300,13 @@ export function mountAdventureMap(gameId) {
   function openSpecialMode(mode) { openLevel(1, mode); }
 
   function openChest(node) {
-    const outcome = profile.claimedChests?.[node.chestNumber] || adjacentChests[node.chestNumber];
-    const describe = reward => reward.grants.map(grant => `${grant.amount} Xu`).join(" · ");
-    openAppModal({ id: "adventure-chest-modal", artwork: "reward", title: `Rương ${node.chestNumber}`, icon: "chest", content: `<p>${outcome ? describe(outcome) : `Thắng đủ màn ${node.firstLevel}–${node.lastLevel} để nhận rương (${node.completedCount}/10).`}</p>`, actions: node.eligible ? [{ label: "Nhận thưởng", variant: "primary", onClick: async () => {
+    const describe = reward => reward.grants.map(grant => `${grant.amount} ${grant.type === 'hint' ? 'Gợi ý' : 'xu'}`).join(" · ");
+    const message = node.claimed ? 'Đã nhận đủ bốn rương.'
+      : `${node.exp}/100 EXP · ${getGameModeLabel(node.reward.mode)}<br>${node.reward.coins} xu · ${node.reward.hints} Gợi ý`;
+    openAppModal({ id: "adventure-chest-modal", artwork: "reward", title: `Rương ${node.activeTier || 'S'} · Màn ${node.firstLevel}–${node.lastLevel}`, icon: "chest", content: `<p>${message}</p>`, actions: node.eligible ? [{ label: "Nhận thưởng", variant: "primary", onClick: async () => {
       const reward = await claimAdventureChest(gameId, node.chestNumber);
       if (!scope.active) return false;
-      if (!reward) { showAppToast("Chưa nhận được rương. Bản lưu vẫn được bảo vệ."); return false; }
+      if (!reward) { showAppToast("Chưa nhận được rương. Hãy kiểm tra chỗ trống trong kho Gợi ý và thử lại."); return false; }
       patchNodes(); refreshAppWallet();
       openAppModal({ id: "adventure-chest-modal", artwork: "reward", title: "Đã nhận thưởng", icon: "chest-open", content: `<p>${describe(reward)}</p>` });
       return false;

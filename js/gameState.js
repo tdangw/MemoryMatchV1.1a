@@ -15,6 +15,7 @@ import { normalizeRankedRun, normalizeRunBestsV2, recordLevelCheckpoint } from "
 import { getRankingOwner } from './rankingOwner.js';
 import { validateRankingResult } from './rankingResult.js';
 import { normalizeProgressBests, normalizeProgressMigration } from './progressRankingModel.js';
+import { MASTERY_DIFFICULTIES, hasCertifiedCompletion } from './progression/difficultyProgress.js';
 import { normalizePairSnapshot } from './pairSessionSnapshot.js';
 import { normalizeWaveProgress } from './progression/waveProgress.js';
 
@@ -276,7 +277,7 @@ function normalizeCatalogTabs(value) {
   if (!value || typeof value !== "object" || Array.isArray(value)) return {};
   return Object.fromEntries(Object.entries(value)
     .filter(([key, tab]) => /^(memory-match|link-connect|triple-connect):(shop|collection)$/.test(key)
-      && ["items", "appearance", "flip", "themes", "path", "exit"].includes(tab)));
+      && ["items", "appearance", "flip", "themes", "path", "exit", "pictures"].includes(tab)));
 }
 
 function normalizeTripleItems(items = {}) {
@@ -408,6 +409,7 @@ function recordGameResult(progress, { mode, level, score, stars, durationMs, wav
   }
   const key = `${mode}:${level}`;
   const previous = progress.bestByLevel[key] || { score: 0, stars: 0 };
+  const firstMasteryWin = Boolean(wave && isNormalAdventureMode(mode) && !hasCertifiedCompletion(progress.bestByLevel, mode, level));
   const nextScore = Math.max(previous.score || 0, score);
   const nextStars = Math.max(previous.stars || 0, stars);
   progress.totalScore += nextScore - (previous.score || 0);
@@ -426,7 +428,9 @@ function recordGameResult(progress, { mode, level, score, stars, durationMs, wav
     progress.bestByLevel[key].rankingResult = { rulesVersion: 1, id: crypto.randomUUID(), gameId, mode, level, kind: 'time', durationMs: measuredTime, score, stars, outcome: 'won', recordedAt: Date.now(), owner };
   }
   if (isNormalAdventureMode(mode)) progress.adventure = getAdventureSummary(progress.bestByLevel, progress.adventure?.currentChapter || 1);
-  return { totalStars: progress.totalStars, isNewBest: score > (previous.score || 0) || stars > (previous.stars || 0) };
+  return { totalStars: progress.totalStars, isNewBest: score > (previous.score || 0) || stars > (previous.stars || 0),
+    mastery: { expGained: firstMasteryWin ? 10 : 0,
+      fragmentGained: firstMasteryWin && MASTERY_DIFFICULTIES.every(difficulty => hasCertifiedCompletion(progress.bestByLevel, difficulty, level)) } };
 }
 
 export function increaseCoins(amount) {

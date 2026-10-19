@@ -936,6 +936,7 @@ async function settleTerminalRound(shell, render) {
       moves: state.moves,
       misses: state.misses,
       coinsEarned: settlement.reward,
+      mastery: settlement.mastery,
       score: state.score,
       stars: settlement.stars,
       timeBonus: settlement.timeBonus,
@@ -991,9 +992,10 @@ async function commitTripleTerminalResult() {
       score: completion.score,
     }, state.undoHistory)
     : state;
+  let mastery = null;
   if (won) {
     gameState.coins += reward;
-    recordTripleConnectResult({ mode: currentMode, level: currentLevel, score: completion.score, stars, durationMs: finishPlayMetrics(), wave: activeWave });
+    mastery = recordTripleConnectResult({ mode: currentMode, level: currentLevel, score: completion.score, stars, durationMs: finishPlayMetrics(), wave: activeWave }).mastery;
     stageRankedAttempt("triple-connect", currentMode, completion.score, true);
     checkpointRankedRun("triple-connect", currentMode);
   }
@@ -1002,7 +1004,7 @@ async function commitTripleTerminalResult() {
   if ((await savePersistentGameData({ coins: gameState.coins, progress: gameState.progress, cloudEvent: won }))) {
     if (generation !== roundGeneration) return false;
     state = settledState;
-    return { reward, stars, timeBonus: completion.timeBonus,
+    return { reward, stars, timeBonus: completion.timeBonus, mastery,
       completedChapter: gameState.progress.tripleConnect.adventure?.currentChapter > previousChapter ? previousChapter : null };
   }
   if (generation !== roundGeneration) return false;

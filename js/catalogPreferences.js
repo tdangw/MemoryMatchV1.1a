@@ -2,7 +2,7 @@ import { gameState } from "./gameState.js";
 import { savePersistentGameData } from "./persistence.js";
 
 const SURFACES = new Set(["shop", "collection"]);
-const TAB_IDS = new Set(["items", "appearance", "flip", "themes", "path", "exit"]);
+const TAB_IDS = new Set(["items", "appearance", "flip", "themes", "path", "exit", "pictures"]);
 
 export function getCatalogTab(gameId, surface, availableTabs) {
   const tab = gameState.settings.catalogTabs?.[`${gameId}:${surface}`];

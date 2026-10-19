@@ -816,7 +816,7 @@ async function completeLinkLevel() {
   linkGameState.score += timeBonus;
   const stars = calculateProgressionStars({ totalGroups, mode: linkGameState.mode, score: linkGameState.score, won: true });
   const coinsEarned = calculateVictoryCoins({ gameId: 'link-connect', totalGroups, mode: linkGameState.mode, stars });
-  recordLinkConnectResult({
+  const progressResult = recordLinkConnectResult({
     mode: linkGameState.mode,
     level: linkGameState.level,
     score: linkGameState.score,
@@ -849,6 +849,7 @@ async function completeLinkLevel() {
     moves: linkGameState.moves,
     misses: linkGameState.misses,
     coinsEarned,
+    mastery: progressResult.mastery,
     score: linkGameState.score,
     stars,
     timeBonus,

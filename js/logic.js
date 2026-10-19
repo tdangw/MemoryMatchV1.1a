@@ -386,6 +386,7 @@ export async function checkLevelComplete() {
       moves: gameState.moves,
       misses: gameState.misses,
       coinsEarned,
+      mastery: progressResult.mastery,
       score: finalScore,
       stars,
       timeBonus,

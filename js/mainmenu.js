@@ -1,5 +1,6 @@
 // Mainmenu.js
 import { mountAdventureMap } from "./adventureMap.js";
+import { renderMasteryCollection } from './progression/masteryCollection.js';
 
 import { syncDefaultMusic } from "./sound.js";
 import { gameState, resetGame } from "./gameState.js";
@@ -328,6 +329,7 @@ export async function showCollectionModal({
       grid.append(group);
     };
     (await mountCatalogTabs({ gameId, surface: "collection", tablist: tabs, panel: grid, tabs: [
+      { id: "pictures", label: "Tranh", render: () => renderMasteryCollection(grid, gameId) },
       { id: "themes", label: "Chủ đề", render: renderThemes },
       { id: "path", label: "Đường nối", render: () => renderLinkEffects("Hiệu ứng đường nối", "linkPathEffect", "ownedLinkPathEffects", LINK_PATH_EFFECTS) },
       { id: "exit", label: "Xóa thẻ", render: () => renderLinkEffects("Hiệu ứng xóa thẻ", "linkExitEffect", "ownedLinkExitEffects", LINK_EXIT_EFFECTS) },
@@ -377,12 +379,14 @@ export async function showCollectionModal({
       grid.append(group);
     };
     (await mountCatalogTabs({ gameId, surface: "collection", tablist: tabs, panel: grid, tabs: [
+      { id: "pictures", label: "Tranh", render: () => renderMasteryCollection(grid, gameId) },
       { id: "themes", label: "Chủ đề", render: renderThemes },
       { id: "path", label: "Đường nối", render: () => renderTripleEffects("Hiệu ứng đường nối", "path", "ownedTriplePathEffects", "triplePathEffect", LINK_PATH_EFFECTS) },
       { id: "exit", label: "Xóa thẻ", render: () => renderTripleEffects("Hiệu ứng xóa thẻ", "exit", "ownedTripleExitEffects", "tripleExitEffect", LINK_EXIT_EFFECTS) },
     ] }));
   } else {
     (await mountCatalogTabs({ gameId, surface: "collection", tablist: tabs, panel: grid, tabs: [
+      { id: "pictures", label: "Tranh", render: () => renderMasteryCollection(grid, gameId) },
       { id: "appearance", label: "Ngoại hình", render: renderAppearance },
       { id: "flip", label: "Hiệu ứng lật", render: renderFlipEffects },
       { id: "themes", label: "Chủ đề", render: renderThemes },

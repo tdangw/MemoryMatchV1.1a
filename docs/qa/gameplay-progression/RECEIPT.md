@@ -72,3 +72,11 @@ Unit model 22/22, Triple patterns 2/2 (20 mẫu × 6 mode, witness/geometry, 7 s
 Popup chỉ cho chọn độ khó đã mở, trở về Dễ khi độ khó đang nhớ bị khóa; launch kiểm tra lại. Controller bị gọi trực tiếp với độ khó khóa trả về menu, không để shell trống. Đọc thêm đúng record Dễ cuối chặng trước để không chặn màn101/201. Preview dùng ngân sách mới, mục tiêu đủ số đợt; HUD có nhãn Đợt i/n dùng lại node theo shell, không thêm timer/listener.
 
 Static156module và preview contract đạt; unit model20/20 đạt. Playwright ba lượt hai wave đạt sau thay HUD; khóa/mở Normal ở3trò3/3 đạt. Test lần đầu dùng nhầm nhãn Thường thay vì Trung bình, đã sửa fixture đúng sản phẩm và chạy lại. Kiểm responsive/summary và regression cuối vẫn thuộc P9; chưa coi các ảnh trên desktop là nghiệm thu mọi viewport.
+
+## P7 — EXP, rương và tranh
+
+EXP/mảnh dẫn xuất từ thắng có chứng nhận, không tăng lại khi replay; summary hiện +10EXP và +1mảnh chỉ khi lần đầu đủ bốn độ khó. Rương mỗi cụm10màn nhận C→B→A→S, đọc chapter canonical, queue chung với thưởng bộ, lưu nguyên tử coins/items/claim; đủ kho mới cho nhận, lỗi lưu rollback cả xu/gợi ý/claim, không rollback vào profile đã thay. Claim numeric block cũ nay chứa rulesVersion/tiers/collection; record legacy không cấp rương mới.
+
+Ba tranh thương mại tạo bằng imagegen tích hợp, WebP1500×600 tổng1.16MB, mười mảnh dùng crop một ảnh; catalog có giới hạn dùng tuần hoàn theo bộ, receipt thưởng vẫn độc lập. Prompt và provenance ở docs/design/mastery-art.md. Bộ sưu tập thêm tab Tranh, một bộ được mount/đọc mỗi lần, có chặn kết quả tải muộn khi tab đóng/chuyển.
+
+Unit model20/20, script reward (chuỗi giá trị, concurrent duplicate, reload, đầy kho, rollback), adventure progress/preview và static157module đạt. Playwright6/6: nhận4rương +300xu bộ ở cả3trò, chặn nhận lại, chụp bốnviewport320/412/844/1024 không tràn ngang; hồi quy chơi thật2wave cả3trò đạt. Đã xem ảnh412: tranh ghép đầy, chữ tự nhiên và bố cục trong skin hiện hành. Chưa chạy gate regression cuối hoặc reset Firebase thực.

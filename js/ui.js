@@ -414,6 +414,7 @@ function openLevelSummaryOverlay({
   score,
   stars,
   timeBonus,
+  mastery,
   luckyAwards = [],
   settings = {},
   onNext,
@@ -516,6 +517,11 @@ function openLevelSummaryOverlay({
   });
 
   content.append(result, heading, stats);
+  if (mastery?.expGained) {
+    const reward = document.createElement('p'); reward.className = 'mastery-win-reward';
+    reward.textContent = `+${mastery.expGained} EXP${mastery.fragmentGained ? ' · +1 mảnh tranh' : ''}`;
+    content.append(reward);
+  }
 
   const modal = openAppModal({
     id: "level-summary-modal",

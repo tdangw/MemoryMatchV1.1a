@@ -1,4 +1,5 @@
 import { GAME_MODES } from "./gameCatalog.js";
+import { getMasteryRewards } from './progression/masteryRewards.js';
 
 export const CHAPTER_SIZE = 100;
 export const MAX_ADVENTURE_CHAPTER = Math.floor(Number.MAX_SAFE_INTEGER / CHAPTER_SIZE);
@@ -98,12 +99,9 @@ export function getAdventureChestState(bestByLevel, chestNumber, claimedChests =
   const lastLevel = chestNumber * CHEST_INTERVAL;
   assertPositiveInteger(lastLevel, "lastLevel");
   const firstLevel = lastLevel - CHEST_INTERVAL + 1;
-  let completedCount = 0;
-  for (let level = firstLevel; level <= lastLevel; level += 1) {
-    if (isAdventureLevelCleared(bestByLevel, level)) completedCount += 1;
-  }
-  const claimed = isRecord(claimedChests) && Object.hasOwn(claimedChests, String(chestNumber));
-  return { chestNumber, firstLevel, lastLevel, completedCount, claimed, eligible: completedCount === CHEST_INTERVAL && !claimed };
+  const mastery = getMasteryRewards({ completed: bestByLevel || {}, level: firstLevel, claim: claimedChests[chestNumber] });
+  return { ...mastery, chestNumber, firstLevel, lastLevel, completedCount: mastery.exp / 10,
+    claimed: mastery.activeTier === null, eligible: mastery.chestEligible };
 }
 
 /** One chapter is exactly 100 playable nodes + 10 independent chest milestones. */

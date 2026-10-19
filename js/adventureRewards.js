@@ -2,6 +2,9 @@ import { getAdventureChestState, getChapterNumber } from "./adventureProgress.js
 import { getGameProgressKey } from "./gameCatalog.js";
 import { gameState } from "./gameState.js";
 import { savePersistentGameData, getPersistenceStatus, loadPersistentChapter } from "./persistence.js";
+import { COLLECTION_REWARD_COINS } from './progression/masteryRewards.js';
+import { GAMEPLAY_LIMITS } from './gameplayTuning.js';
+import { canLaunchGame } from './profileOperations.js';
 
 /** Grants are typed records so later catalogs can add item packs without changing claim storage. */
 export const ADVENTURE_REWARD_PACKS = Object.freeze([
@@ -24,30 +27,51 @@ export function drawAdventureReward(random = secureRandom) {
 }
 
 export function claimAdventureChest(gameId, chestNumber) {
-  const identity = `${gameId}:${chestNumber}`;
+  return enqueueClaim(gameId, chestNumber, 'chest');
+}
+export function claimAdventureCollection(gameId, chestNumber) {
+  return enqueueClaim(gameId, chestNumber, 'collection');
+}
+function enqueueClaim(gameId, chestNumber, kind) {
+  const identity = `${gameId}:${chestNumber}:${kind}`;
   if (pendingClaims.has(identity)) return Promise.resolve(null);
   pendingClaims.add(identity);
-  const result = claimQueue.then(() => commitChestClaim(gameId, chestNumber));
+  const result = claimQueue.then(() => commitChestClaim(gameId, chestNumber, kind));
   claimQueue = result.then(() => {}, () => {});
   return result.finally(() => pendingClaims.delete(identity));
 }
 
-async function commitChestClaim(gameId, chestNumber) {
+async function commitChestClaim(gameId, chestNumber, kind) {
   const key = getGameProgressKey(gameId);
   const profile = key && gameState.progress[key];
-  if (!profile || getPersistenceStatus().blocked) return null;
+  if (!profile || !canLaunchGame() || getPersistenceStatus().blocked) return null;
   const record = await loadPersistentChapter(key, getChapterNumber(chestNumber * 10));
-  if (gameState.progress[key] !== profile || getPersistenceStatus().blocked) return null;
+  if (gameState.progress[key] !== profile || !canLaunchGame() || getPersistenceStatus().blocked) return null;
   const eligibility = getAdventureChestState(record.bestByLevel, chestNumber, { ...record.claimedChests, ...profile.claimedChests });
-  if (!eligibility.eligible) return null;
-  const outcome = { ...drawAdventureReward(), claimedAt: Date.now() };
+  if (kind === 'collection' ? !eligibility.collectionEligible : !eligibility.eligible) return null;
+  const coins = kind === 'collection' ? COLLECTION_REWARD_COINS : eligibility.reward.coins;
+  const hints = kind === 'collection' ? 0 : eligibility.reward.hints;
+  if (profile.items.hint + hints > GAMEPLAY_LIMITS.itemCount) return null;
+  const outcome = { catalogVersion: 2, tier: kind === 'collection' ? 'collection' : eligibility.activeTier,
+    grants: [{ type: 'coins', amount: coins }, ...(hints ? [{ type: 'hint', amount: hints }] : [])], claimedAt: Date.now() };
   const previousCoins = gameState.coins;
+  const previousHints = profile.items.hint;
   profile.claimedChests ||= {};
-  profile.claimedChests[chestNumber] = outcome;
-  gameState.coins += outcome.grants.reduce((sum, grant) => sum + grant.amount, 0);
-  if (await savePersistentGameData({ coins: gameState.coins, progress: gameState.progress })) return outcome;
+  const previousClaim = profile.claimedChests[chestNumber];
+  const claim = previousClaim?.rulesVersion === 1 ? structuredClone(previousClaim) : { rulesVersion: 1, tiers: {} };
+  if (!claim.tiers || typeof claim.tiers !== 'object' || Array.isArray(claim.tiers)) claim.tiers = {};
+  if (kind === 'collection') claim.collection = outcome;
+  else claim.tiers[outcome.tier] = outcome;
+  profile.claimedChests[chestNumber] = claim;
+  gameState.coins += coins;
+  profile.items.hint += hints;
+  const saved = await savePersistentGameData({ coins: gameState.coins, progress: gameState.progress });
+  if (gameState.progress[key] !== profile) return null;
+  if (saved) return outcome;
   gameState.coins = previousCoins;
-  delete profile.claimedChests[chestNumber];
+  profile.items.hint = previousHints;
+  if (previousClaim === undefined) delete profile.claimedChests[chestNumber];
+  else profile.claimedChests[chestNumber] = previousClaim;
   return null;
 }
 function secureRandom() {
