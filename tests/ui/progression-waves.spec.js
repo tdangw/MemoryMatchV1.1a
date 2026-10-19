@@ -1,5 +1,54 @@
 import { test, expect } from '@playwright/test';
 
+test('Link advances waves with shared time, survives reload, and records only a complete level', async ({ page }) => {
+  test.setTimeout(60000);
+  await page.goto('/');
+  await page.evaluate(async () => {
+    await (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('link-connect');
+    const { gameState } = await import('/js/gameState.js');
+    gameState.settings.sound = gameState.settings.music = false;
+    await (await import('/js/linkConnect/linkController.js')).startLinkLevel({ mode: 'easy', level: 1, skipIntro: true });
+  });
+  for (let attempt = 0; attempt < 16; attempt++) {
+    await expect.poll(() => page.evaluate(async () => {
+      const { linkGameState: s } = await import('/js/linkConnect/linkState.js');
+      return s.wave?.phase === 'won' || !s.isLocked;
+    }), { timeout: 15000 }).toBe(true);
+    const result = await page.evaluate(async () => {
+      const { linkGameState: s } = await import('/js/linkConnect/linkState.js');
+      const { gameState } = await import('/js/gameState.js');
+      if (s.wave.phase === 'won') return { won: true, certified: gameState.progress.linkConnect.bestByLevel['easy:1'] };
+      const connections = (await import('/js/linkConnect/pathfinder.js')).findAvailableConnections(s.board.grid);
+      const pair = connections.find(({ start, end }) => !s.board.grid[start.row][start.column].frozen && !s.board.grid[end.row][end.column].frozen);
+      if (!pair) throw new Error('No playable pair after recovery.');
+      const index = s.wave.index;
+      for (const p of [pair.start, pair.end]) document.querySelector(`.link-board__cell[data-row="${p.row}"][data-column="${p.column}"] .link-tile`).click();
+      return { index, won: false };
+    });
+    if (result.won) { expect(result.certified.completedWaves).toBe(2); return; }
+    await expect.poll(() => page.evaluate(async () => {
+      const { linkGameState: s } = await import('/js/linkConnect/linkState.js');
+      return s.wave.phase === 'won' || !s.isLocked;
+    }), { timeout: 15000 }).toBe(true);
+    const checkpoint = await page.evaluate(async () => {
+      const { linkGameState: s } = await import('/js/linkConnect/linkState.js');
+      return { index: s.wave.index, won: s.wave.phase === 'won', allocatedSeconds: s.wave.allocatedSeconds,
+        best: (await import('/js/gameState.js')).gameState.progress.linkConnect.bestByLevel['easy:1'] };
+    });
+    if (checkpoint.index === 2 && !checkpoint.won && result.index === 1) {
+      expect(checkpoint.best).toBeUndefined();
+      expect(checkpoint.allocatedSeconds).toBe(100);
+      await page.reload();
+      await page.evaluate(async () => {
+        await (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('link-connect');
+        const saved = (await import('/js/sessionProgress.js')).getActiveSession('link-connect', 'easy');
+        await (await import('/js/linkConnect/linkController.js')).continueLinkSession(saved);
+      });
+    }
+  }
+  throw new Error('Link failed to settle within its finite pair budget.');
+});
+
 test('Memory advances to a fresh wave without a win, then settles the whole level once', async ({ page }) => {
   test.setTimeout(60000);
   await page.goto('/');

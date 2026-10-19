@@ -50,3 +50,13 @@ Memory dùng ngân sách wave, giữ điểm/moves/miss và playMetrics xuyên w
 Playwright `progression-waves.spec.js` desktop:1/1 đạt với12cặp ghép qua adapter DOM thật, tải lại sau wave1, resume wave2, kiểm budget130giây không cấp lại, kết quả chứng nhận2wave và gọi settle lại không tăng xu. Lần chạy sandbox không khởi động Vite ổn định đã dừng; chạy browser ngoài sandbox thành công. Hai lỗi fixture (chờ5s không bao gồm preview+hide, truyền model thay DOM vào adapter) đã sửa bằng chờ readiness và node thật; không giảm delay runtime. Source parse đạt. Chưa tuyên bố gate regression/UI/performance cuối đạt.
 
 Working tree có baseline kỹ thuật/UI chưa commit từ task khác. Commit P3 chọn riêng hunk gameplay; Hint/model selection và thứ tự patch UI sau persistence của task khác vẫn unstaged. Không đưa các file cũ hoặc controller hunk của họ vào commit; test thực hiện trên working tree tích hợp, không tuyên bố snapshot HEAD bỏ baseline của task khác đã được nghiệm thu độc lập.
+
+## P4 — Link wave và trọng lực
+
+Link giữ điểm/moves/miss, timer và freeze qua wave; checkpoint advance không đánh dấu run thắng; đủ wave mới chốt record/xu. Nhóm người chơi ghép dùng score có trần, không xu combo; nhóm tự phá luôn10điểm không tăng combo. Hai trọng lực bổ sung: dồn chéo xuống/phải theo hai bước cố định, và dồn về tâm riêng của bốn phần tư; vào pool màn28+.
+
+Unit progression21/21, board contract và pair-reward contracts đạt. Bài board cũ dự đoán roll0.999 ra kiểu cuối cũ đã được cập nhật sang kiểu mới của catalog và bổ sung roll dồn chéo, không nới tiêu chí bảo toàn/chống kẹt. Test trọng lực kiểm12/16/24/30/60thẻ, giữ instance/state/biên rỗng và fixed-point, recovery tìm được đường nối.
+
+Playwright2/2 đạt: ghép thật Memory và Link qua hai wave, reload/resume sau wave đầu, chưa có best ở wave đầu và chỉ ghi sau wave cuối. Link giữ tổng ngân sách100giây cho hai wave Dễ. Chưa đo mobile/ma trận special hoặc nghiệm thu gate cuối.
+
+Commit P4 chỉ chứa delta wave/gravity và test/receipt; preflight Sấm sét, Link selection/Hint và alignment popup của task khác vẫn ở working tree, không được stage.

@@ -21,7 +21,6 @@ import { getEquippedThemeId } from "../appearance.js";
 import { GAMEPLAY_TIMING } from "../gameplayTuning.js";
 import {
   animateCoinCounter,
-  calculateMatchCoinReward,
   isCoinCounterAnimating,
   playCoinRewardFlight,
 } from "../coinRewards.js";
@@ -31,6 +30,10 @@ import { beginPlayMetrics, resumePlayMetrics, snapshotPlayMetrics, finishPlayMet
 import { prepareAdventureChapter, stageAdventureLevelStart, canAdvanceAdventure } from "../adventureLaunch.js";
 import { getChapterNumber } from "../adventureProgress.js";
 import { beginRankedAttempt, checkpointRankedRun, finalizeRankedRun, getRankedRun, stageRankedAttempt } from "../rankingRules.js";
+import { createWaveProgress, completeWave, activateNextWave, normalizeWaveProgress, waveTotalGroups } from '../progression/waveProgress.js';
+import { calculateGroupScore, calculateVictoryCoins, calculateFastFinishBonus, calculateProgressionStars, getProgressionStarTargets } from '../progression/gameplayRules.js';
+import { getDifficultyAccess } from '../progression/difficultyProgress.js';
+import { pausePlayMetrics } from '../playMetrics.js';
 import { getTheme, getThemeSelectionEligibility } from "../themeCatalog.js";
 import { GAME_MODES } from "../gameCatalog.js";
 import { TIME_UP_PURCHASES } from "../shopCatalog.js";
@@ -39,18 +42,12 @@ import {
   UI_TIMING,
 } from "../uiCatalog.js";
 import {
-  calculateLinkMatchPoints,
-  calculateLinkCoinReward,
-  calculateLinkCompletionTimeBonus,
-  calculateLinkThunderPairPoints,
   calculateLinkStarRating,
-  getLinkChallengeTime,
   getLinkComboWindowMs,
   getLinkChallengeLayout,
   LINK_CONNECT_CONFIG,
   LINK_CONNECT_HELP_CONTENT,
   getLinkLevelHintBonus,
-  getLinkLevelTimeBonus,
   getLinkGravityShift,
   getLinkSpecialMilestoneTooltip,
   getLinkStarScoreTargets,
@@ -117,7 +114,6 @@ import {
 } from "./linkRenderer.js";
 import { beginLinkRound, linkGameState, resetLinkGame } from "./linkState.js";
 import { clearComboWindow, playComboWindow } from "../gameShell/comboWindowPresentation.js";
-import { resolveSessionTiming } from "../sessionTiming.js";
 import {
   canShowFullVictoryCelebration,
   showFullVictoryCelebration,
@@ -237,8 +233,13 @@ export function startLinkLevel({
   run,
   pairSnapshot,
   pairSnapshotInvalid,
+  wave,
+  waveInvalid,
+  waveTransition = false,
 } = {}) {
   if (!canLaunchGame()) return null;
+  if (waveInvalid) { showAppToast('Lượt chơi này không thể tiếp tục.'); return null; }
+  if (resume && wave?.phase === 'advance') { resume = false; waveTransition = true; skipIntro = true; }
   if (restart && (mode === 'challenge' || mode === 'endless')) { level = 1; restart = false; advance = false; }
   const modeLayout = getLinkModeLayout(mode);
   const layout = getLinkBoardLayoutForViewport(isLinkChallengeMode(mode) ? getLinkChallengeLayout(level) : modeLayout);
@@ -262,7 +263,7 @@ export function startLinkLevel({
   pendingCompactLayout = null;
   linkTimeWarningPlayed = false;
   const scope = showLinkGame();
-  beginPlayMetrics(scope, { gameId: "link-connect", mode, level }, resume ? metrics || {} : null);
+  beginPlayMetrics(scope, { gameId: "link-connect", mode, level }, resume || waveTransition ? metrics || {} : null);
   const startup = createGameShellStartup(scope, getLinkShell().refs, error => {
     console.error('Link startup failed', error);
     showAppToast('Không thể chuẩn bị bàn chơi. Hãy chơi lại.');
@@ -271,6 +272,10 @@ export function startLinkLevel({
   return startup.run(async () => {
   if (!await prepareAdventureChapter("link-connect", getChapterNumber(level), () => scope.active)) return null;
   startup.check();
+  if (!['challenge', 'endless'].includes(mode)
+    && !getDifficultyAccess({ completed: gameState.progress.linkConnect.bestByLevel, level, mode }).unlocked) {
+    showAppToast('Hãy hoàn thành độ khó trước để mở khóa.'); return null;
+  }
   const board = await startup.phase('prepare', () => resume && pairSnapshot ? structuredClone(pairSnapshot.board) : createLinkBoard({
     layout,
     themeId,
@@ -282,7 +287,7 @@ export function startLinkLevel({
   activeAssetPaths = board.selectedAssetPaths;
   board.seed = resume && pairSnapshot ? pairSnapshot.seed : crypto.randomUUID();
   board.themeId = themeId;
-  if (level === 1 && !resume && !restart) {
+  if (level === 1 && !resume && !restart && !waveTransition) {
     linkGameState.specialProgress = 0;
     linkGameState.specialNoEnergyDropStreak = 0;
   } else if (resume) {
@@ -299,17 +304,19 @@ export function startLinkLevel({
   }
   const resolvedGravityShift = gravityShift
     || (restart ? linkGameState.gravityShift : getLinkGravityShift(level));
-  const timing = resolveLinkLevelTiming({
-    mode,
-    level,
-    modeLayout,
-    resume,
-    restart,
-    remainingTime,
-    timeLimit,
-    levelStartTime,
-  });
+  const restoredWave = wave && normalizeWaveProgress(wave, { gameId: 'link-connect', mode, level });
+  if (wave && !restoredWave) throw new Error('Invalid Link wave checkpoint.');
+  const activeWave = waveTransition ? activateNextWave(restoredWave)
+    : resume && restoredWave ? restoredWave
+      : createWaveProgress({ attemptId: crypto.randomUUID(), gameId: 'link-connect', mode, level, groupsPerWave: layout.tileCount / 2 });
+  const timing = resume || waveTransition ? { remainingTime, timeLimit, levelStartTime }
+    : { remainingTime: activeWave.allocatedSeconds, timeLimit: activeWave.allocatedSeconds, levelStartTime: activeWave.allocatedSeconds };
   const roundId = beginLinkRound({ mode, level, layout, board, gravityShift: resolvedGravityShift });
+  linkGameState.wave = activeWave;
+  linkGameState.score = activeWave.completedScore;
+  linkGameState.moves = activeWave.completedMoves;
+  linkGameState.misses = activeWave.completedMisses;
+  if (waveTransition) linkGameState.freezeSeconds = pairSnapshot?.freezeSeconds || 0;
   if (resume && pairSnapshot) for (const key of ['score', 'moves', 'misses', 'matchedPairs', 'totalPairs']) linkGameState[key] = pairSnapshot[key];
   if (resume && pairSnapshot) {
     linkGameState.luckyAwards = structuredClone(pairSnapshot.luckyAwards || []);
@@ -360,7 +367,7 @@ export function startLinkLevel({
   });
   await startup.phase('images', () => startup.decodeBoard());
   startup.check();
-  beginRankedAttempt("link-connect", mode, level, { reason: resume ? "resume" : restart ? "restart" : advance ? "advance" : "new", savedRun: run });
+  beginRankedAttempt("link-connect", mode, level, { reason: resume || waveTransition ? "resume" : restart ? "restart" : advance ? "advance" : "new", savedRun: run });
   if (stageAdventureLevelStart("link-connect", mode, level) && !resume && !restart) {
     gameState.progress.linkConnect.items.hint += getLinkLevelHintBonus(level, getLinkItemCount("hint"));
   }
@@ -535,14 +542,12 @@ async function handleLinkTileClick(position) {
   const board = linkGameState.board;
   startLinkComboWindow(comboWindowMs, matchedAt, roundId, board);
   const matchedStart = selectedPosition;
-  const matchPoints = calculateLinkMatchPoints(linkGameState.combo, {
-    special: isSpecialMatch,
-  });
+  const matchPoints = calculateGroupScore({ combo: linkGameState.combo });
   linkGameState.score += matchPoints;
   drawLinkPath(path, linkGameState.board);
   removeLinkBoardPair(board, matchedStart, position);
   linkGameState.matchedPairs += 1;
-  const baseCoins = calculateMatchCoinReward(linkGameState.combo);
+  const baseCoins = 0;
   const rewards = resolveLinkPairRewards(linkGameState, gameState.progress.linkConnect.items, { special: isSpecialMatch, premiumType, luckyReward: firstTile.luckyReward });
   const previousCoins = gameState.coins;
   increaseCoins(baseCoins + rewards.coins);
@@ -792,29 +797,31 @@ function unlockLinkBoard() {
 
 async function completeLinkLevel() {
   if (linkGameState.isCompleted) return;
+  if (linkGameState.wave.index < linkGameState.wave.count) return advanceLinkWave();
   const roundId = linkGameState.roundId;
+  const activeMs = snapshotPlayMetrics({ gameId: 'link-connect', mode: linkGameState.mode, level: linkGameState.level })?.elapsedMs || 0;
   const durationMs = finishPlayMetrics();
-  const rollback = { coins: gameState.coins, score: linkGameState.score, progress: structuredClone(gameState.progress.linkConnect) };
+  const rollback = { coins: gameState.coins, score: linkGameState.score, wave: linkGameState.wave, progress: structuredClone(gameState.progress.linkConnect) };
   const previousChapter = gameState.progress.linkConnect.adventure?.currentChapter || 1;
   linkGameState.isCompleted = true;
   stopCountdown();
   linkGameState.isLocked = true;
   duckBackgroundMusicForVictory(gameState.settings);
   playLinkSound("victory");
-  const coinsEarned = calculateLinkCoinReward(linkGameState.mode, linkGameState.remainingTime);
-  const timeBonus = calculateLinkCompletionTimeBonus(linkGameState.mode, linkGameState.remainingTime);
+  linkGameState.wave = completeWave(linkGameState.wave, { score: linkGameState.score, moves: linkGameState.moves,
+    misses: linkGameState.misses, matchedGroups: linkGameState.matchedPairs }).progress;
+  const totalGroups = waveTotalGroups(linkGameState.wave);
+  const timeBonus = calculateFastFinishBonus({ totalGroups, mode: linkGameState.mode, activeMs, allocatedSeconds: linkGameState.wave.allocatedSeconds });
   linkGameState.score += timeBonus;
-  const stars = calculateLinkStarRating(
-    linkGameState.score,
-    linkGameState.totalPairs,
-    linkGameState.mode,
-  );
+  const stars = calculateProgressionStars({ totalGroups, mode: linkGameState.mode, score: linkGameState.score, won: true });
+  const coinsEarned = calculateVictoryCoins({ gameId: 'link-connect', totalGroups, mode: linkGameState.mode, stars });
   recordLinkConnectResult({
     mode: linkGameState.mode,
     level: linkGameState.level,
     score: linkGameState.score,
     stars,
     durationMs,
+    wave: linkGameState.wave,
   });
   (await awardLinkCoins(coinsEarned, null, { animate: false, persist: false }));
   if (linkGameState.roundId !== roundId) return;
@@ -825,6 +832,7 @@ async function completeLinkLevel() {
     if (linkGameState.roundId === roundId) {
       gameState.coins = rollback.coins;
       linkGameState.score = rollback.score;
+      linkGameState.wave = rollback.wave;
       gameState.progress.linkConnect = rollback.progress;
     }
     return;
@@ -848,7 +856,7 @@ async function completeLinkLevel() {
     onMenu: returnToLinkMenu,
     completedChapter,
     onNext: () => canAdvanceAdventure("link-connect", linkGameState.mode, nextLevel)
-      ? startLinkLevel({ mode: linkGameState.mode, level: nextLevel, advance: true }) : returnToLinkMenu(),
+      ? startLinkLevel({ mode: ['challenge', 'endless'].includes(linkGameState.mode) ? linkGameState.mode : 'easy', level: nextLevel, advance: true }) : returnToLinkMenu(),
   };
   if (canShowFullVictoryCelebration && completion.completedChapter) {
     showLevelSummaryOverlay({
@@ -1136,8 +1144,9 @@ function stopLinkTimeProgress() {
 
 function updateLinkStarsHud(hud = getLinkHudElements()) {
   const component = getLinkHud(hud);
-  component.stars({ earned: calculateLinkStarRating(linkGameState.score, linkGameState.totalPairs, linkGameState.mode), score: linkGameState.score,
-    target: getLinkStarScoreTargets(linkGameState.totalPairs, linkGameState.mode).three, record: gameRecordLabel(gameState.progress.linkConnect, linkGameState.mode, linkGameState.level) });
+  const totalGroups = linkGameState.wave ? waveTotalGroups(linkGameState.wave) : linkGameState.totalPairs;
+  component.stars({ earned: calculateProgressionStars({ score: linkGameState.score, totalGroups, mode: linkGameState.mode, won: linkGameState.wave?.phase === 'won' }), score: linkGameState.score,
+    target: getProgressionStarTargets({ totalGroups, mode: linkGameState.mode }).three, record: gameRecordLabel(gameState.progress.linkConnect, linkGameState.mode, linkGameState.level) });
   component.stats({ totalStars: gameState.progress.linkConnect.totalStars });
 }
 
@@ -1172,28 +1181,36 @@ function recoverBlockedLinkBoard(board) {
 }
 
 function applyThunderPairScore(mode, anchor) {
-  if (mode === "none") return 0;
-  if (mode === "combo") {
-    linkGameState.combo += 1;
-    const matchedAt = performance.now();
-    linkGameState.lastMatchAt = matchedAt;
-    const comboWindowMs = getLinkComboWindowMs(linkGameState.totalPairs);
-    startLinkComboWindow(
-      comboWindowMs,
-      matchedAt,
-      linkGameState.roundId,
-      linkGameState.board,
-    );
-    setHudText(getLinkHudElements().combo, linkGameState.combo);
-    showComboEffect(anchor, linkGameState.combo);
-  }
-  const points = calculateLinkThunderPairPoints(linkGameState.combo, {
-    countsCombo: mode === "combo",
-  });
+  const points = calculateGroupScore({ combo: linkGameState.combo, automatic: true });
   linkGameState.score += points;
   setHudText(getLinkHudElements().score, linkGameState.score);
   showScoreEffect(anchor, points);
   return points;
+}
+
+async function advanceLinkWave() {
+  const roundId = linkGameState.roundId;
+  const rollback = { wave: linkGameState.wave, remainingTime: linkGameState.remainingTime,
+    progress: structuredClone(gameState.progress.linkConnect) };
+  linkGameState.isCompleted = true;
+  linkGameState.isLocked = true;
+  stopCountdown();
+  pausePlayMetrics('wave-transition');
+  const result = completeWave(linkGameState.wave, { score: linkGameState.score, moves: linkGameState.moves,
+    misses: linkGameState.misses, matchedGroups: linkGameState.matchedPairs });
+  linkGameState.wave = result.progress;
+  linkGameState.remainingTime += result.bonusSeconds;
+  linkGameState.timeLimit = Math.max(linkGameState.timeLimit, linkGameState.remainingTime);
+  const session = createLinkSession();
+  if (!await saveActiveSession('link-connect', session)) {
+    if (linkGameState.roundId === roundId) {
+      linkGameState.wave = rollback.wave; linkGameState.remainingTime = rollback.remainingTime;
+      gameState.progress.linkConnect = rollback.progress;
+    }
+    return;
+  }
+  if (linkGameState.roundId !== roundId) return;
+  return startLinkLevel({ ...session, waveTransition: true, skipIntro: true });
 }
 
 function rememberFrozenPairForTransform({ tileKeys }) {
@@ -1220,8 +1237,9 @@ async function persistLinkRunProgress(allowStartup = false) {
 }
 
 function createLinkSession() {
-  stageRankedAttempt("link-connect", linkGameState.mode, linkGameState.score, linkGameState.isCompleted);
+  stageRankedAttempt("link-connect", linkGameState.mode, linkGameState.score, linkGameState.wave?.phase === 'won');
   return {
+    ...(linkGameState.wave ? { wave: linkGameState.wave } : {}),
     pairSnapshot: { version: 1, gameId: 'link-connect', seed: linkGameState.board?.seed || 'legacy',
       themeId: linkGameState.board?.themeId,
       capturedAt: Date.now(), comboRemainingMs: linkGameState.lastMatchAt ? Math.max(0, getLinkComboWindowMs(linkGameState.totalPairs) - (performance.now() - linkGameState.lastMatchAt)) : 0,
@@ -1240,28 +1258,6 @@ function createLinkSession() {
     run: getRankedRun("link-connect", linkGameState.mode),
     ...(activeAssetPaths.length ? { assetPaths: activeAssetPaths } : {}),
   };
-}
-
-function resolveLinkLevelTiming({
-  mode,
-  level,
-  modeLayout,
-  resume,
-  restart,
-  remainingTime,
-  timeLimit,
-  levelStartTime,
-}) {
-  const fallback = isLinkChallengeMode(mode)
-    ? getLinkChallengeTime(level)
-    : modeLayout.timeSeconds + getLinkLevelTimeBonus(level);
-  return resolveSessionTiming({
-    endless: isLinkEndlessMode(mode),
-    reason: resume ? "resume" : restart ? "restart" : "new",
-    newTime: fallback,
-    restartTime: restart ? linkGameState.levelStartTime : undefined,
-    session: { remainingTime, timeLimit, levelStartTime },
-  });
 }
 
 function isLinkGameVisible() {

@@ -1,6 +1,7 @@
 import { GAMEPLAY_LIMITS } from '../gameplayTuning.js';
 import { LINK_CONNECT_CONFIG, getLinkPremiumTypeDefinition, getLinkPremiumSupplyItem, isLinkEndlessMode, calculateLinkThunderPairPoints, getLinkSpecialMilestoneTooltip } from './linkConfig.js';
 import { getLinkBoardTile, removeRandomLinkPair, removeLinkBoardPair, unlockFrozenLinkPairs, applyLinkGravityShift } from './linkBoard.js';
+import { calculateGroupScore } from '../progression/gameplayRules.js';
 
 // The caller owns persistence and presentation. No timer or network work here.
 export function resolveLinkPairRewards(state, items, { special, premiumType, luckyReward }, random = Math.random) {
@@ -22,7 +23,7 @@ export function resolveLinkPairRewards(state, items, { special, premiumType, luc
     presentation.breakTileKeys.push(pair.positions.map(position => getLinkBoardTile(state.board, position).instanceId));
     removeLinkBoardPair(state.board, ...pair.positions);
     state.matchedPairs++;
-    if (combo) { state.combo++; state.score += calculateLinkThunderPairPoints(state.combo, { countsCombo: true }); }
+    state.score += calculateGroupScore({ combo: state.combo, automatic: true });
     presentation.breaks.push(pair.positions);
     applyLinkGravityShift(state.board, state.gravityShift);
   };

@@ -103,8 +103,30 @@ export function applyLinkGravityShift(board, direction = "static") {
     swapNearbyLinkTiles(board);
   } else if (direction === "rotate-clockwise" || direction === "rotate-counterclockwise") {
     rotateLinkBoardRings(board, direction === "rotate-clockwise");
+  } else if (direction === 'diagonal-down-right') {
+    for (let column = 1; column <= board.columns; column++)
+      compactLine(board, positionsInColumn(column, 1, board.rows), 'end');
+    for (let row = 1; row <= board.rows; row++)
+      compactLine(board, positionsInRow(row, 1, board.columns), 'end');
+  } else if (direction === 'quadrant-centers') {
+    const middleRow = Math.floor(board.rows / 2), middleColumn = Math.floor(board.columns / 2);
+    for (const [top, bottom] of [[1, middleRow], [middleRow + 1, board.rows]])
+      for (const [left, right] of [[1, middleColumn], [middleColumn + 1, board.columns]])
+        pullLinkRegionToCenter(board, top, bottom, left, right);
   }
   return board.grid.some((row, rowIndex) => row.some((tile, columnIndex) => tile !== before[rowIndex][columnIndex]));
+}
+
+function pullLinkRegionToCenter(board, top, bottom, left, right) {
+  const middleRow = Math.floor((top + bottom) / 2), middleColumn = Math.floor((left + right) / 2);
+  for (let column = left; column <= right; column++) {
+    compactLine(board, positionsInColumn(column, top, middleRow), 'end');
+    compactLine(board, positionsInColumn(column, middleRow + 1, bottom), 'start');
+  }
+  for (let row = top; row <= bottom; row++) {
+    compactLine(board, positionsInRow(row, left, middleColumn), 'end');
+    compactLine(board, positionsInRow(row, middleColumn + 1, right), 'start');
+  }
 }
 
 function pullLinkTilesToCenter(board) {

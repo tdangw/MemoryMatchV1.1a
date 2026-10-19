@@ -20,6 +20,8 @@ export const LINK_CONNECT_CONFIG = Object.freeze({
       "swap",
       "rotate-clockwise",
       "rotate-counterclockwise",
+      "diagonal-down-right",
+      "quadrant-centers",
     ]),
     progression: Object.freeze([
       Object.freeze({ fromLevel: 1, untilLevel: 2, directions: Object.freeze(["static"]) }),
@@ -34,6 +36,7 @@ export const LINK_CONNECT_CONFIG = Object.freeze({
       Object.freeze({ fromLevel: 28, untilLevel: Infinity, directions: Object.freeze([
         "down", "up", "left", "right", "center", "split-vertical",
         "split-horizontal", "swap", "rotate-clockwise", "rotate-counterclockwise",
+        "diagonal-down-right", "quadrant-centers",
       ]), random: true }),
     ]),
   }),

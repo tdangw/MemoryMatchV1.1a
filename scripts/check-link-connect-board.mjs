@@ -224,7 +224,8 @@ assert.deepEqual(
   ["static", "down", "up", "left", "right", "center", "split-vertical", "split-horizontal", "swap", "rotate-clockwise", "rotate-counterclockwise"],
 );
 assert.equal(getLinkGravityShift(28, () => 0), "down");
-assert.equal(getLinkGravityShift(28, () => 0.999), "rotate-counterclockwise");
+assert.equal(getLinkGravityShift(28, () => 0.999), "quadrant-centers");
+assert.equal(getLinkGravityShift(28, () => 0.84), "diagonal-down-right");
 
 const advancedGravitySource = {
   rows: 4,
