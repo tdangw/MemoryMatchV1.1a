@@ -176,15 +176,19 @@ export function openAppModal({
   return { overlay, panel, body, close, destroy };
 }
 
-export function showAppToast(message, { tone = "info", duration = 1600 } = {}) {
-  let region = document.querySelector(".app-toast-region");
+export function showAppToast(message, { tone = "info", duration = 1600, position = 'top' } = {}) {
+  const centered = position === 'center';
+  let region = document.querySelector(centered ? '.app-toast-region[data-position="center"]' : '.app-toast-region:not([data-position="center"])');
   if (!region) {
     region = document.createElement("div");
     region.className = "app-toast-region";
+    if (centered) region.dataset.position = 'center';
     region.setAttribute("aria-live", "polite");
     document.body.appendChild(region);
   }
 
+  const existing = centered && region.querySelector('.app-toast:not(.is-closing)');
+  if (existing) { existing.textContent = message; return; }
   const toast = document.createElement("div");
   toast.className = `app-toast app-toast--${tone}`;
   toast.textContent = message;

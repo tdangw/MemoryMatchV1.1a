@@ -155,6 +155,10 @@
 .adventure-level-modes label[data-grade="S"] span { background: radial-gradient(circle at 35% 25%, #d5a1ff, #703ba0); border-color: #ddc0ff; color: #fff0ff; text-shadow: 0 1px 1px #0008; }
 .adventure-level-modes input:checked + span { outline: 3px solid #ffe49d; outline-offset: 3px; box-shadow: inset 0 0 0 2px #fff4, 0 0 14px #f4d88c55; }
 .adventure-level-modes input:focus-visible + span { outline: 2px solid #fff2c9; outline-offset: 2px; }
+.adventure-level-modes label.is-locked > span { opacity: .4; filter: saturate(.35); }
+.adventure-level-modes label.is-locked input { pointer-events: none; }
+.adventure-level-modes label.is-locked:focus-visible { outline: 2px solid #ffe1a0; outline-offset: 4px; border-radius: 50%; }
+.adventure-level-modes .adventure-difficulty-lock { position: absolute; right: -2px; bottom: -2px; width: 20px; height: 20px; padding: 3px; box-sizing: border-box; border-radius: 50%; color: #ffe4aa; background: #102e37; border: 1px solid #b79b60; pointer-events: none; }
 .adventure-level-details { display: grid; gap: 5px; margin: 0; padding-left: 18px; color: #f2dfb6; font-size: 14px; }
 
 /* Illustration bases keep live navigation labels, grade letters and level numbers. */

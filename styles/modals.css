@@ -206,6 +206,7 @@
   text-align: center;
   animation: app-toast-in 180ms ease-out both;
 }
+.app-toast-region[data-position="center"] { top: 50%; transform: translate(-50%, -50%); }
 
 .app-toast--success {
   border: 1px solid rgb(242 191 91 / 48%);

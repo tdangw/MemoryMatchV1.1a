@@ -9,6 +9,16 @@ for (const gameId of ['memory-match', 'link-connect', 'triple-connect']) {
     await expect(choices).toHaveCount(4);
     await expect(choices.nth(0)).toBeEnabled();
     for (let i = 1; i < 4; i++) await expect(choices.nth(i)).toBeDisabled();
+    await expect(page.locator('.adventure-difficulty-lock')).toHaveCount(3);
+    await page.locator('.adventure-level-modes label[data-grade="B"]').click();
+    const toast = page.locator('.app-toast-region[data-position="center"]').last();
+    await expect(toast).toHaveText('Hoàn thành độ khó C của màn này để mở khóa.');
+    const center = await toast.evaluate(node => { const bounds=node.getBoundingClientRect(); return { y:bounds.top+bounds.height/2, screen:innerHeight }; });
+    expect(Math.abs(center.y-center.screen/2)).toBeLessThan(2);
+    await expect(choices.nth(0)).toBeChecked();
+    await page.locator('.adventure-level-modes label[data-grade="S"]').focus();
+    await page.keyboard.press('Enter');
+    await expect(toast.locator('.app-toast')).toHaveCount(1);
     await expect(page.locator('.adventure-level-details')).toContainText('2 đợt');
     await page.locator('#adventure-level-modal .app-modal__close').click();
     await page.evaluate(async id => {

@@ -80,3 +80,9 @@ EXP/mảnh dẫn xuất từ thắng có chứng nhận, không tăng lại khi 
 Ba tranh thương mại tạo bằng imagegen tích hợp, WebP1500×600 tổng1.16MB, mười mảnh dùng crop một ảnh; catalog có giới hạn dùng tuần hoàn theo bộ, receipt thưởng vẫn độc lập. Prompt và provenance ở docs/design/mastery-art.md. Bộ sưu tập thêm tab Tranh, một bộ được mount/đọc mỗi lần, có chặn kết quả tải muộn khi tab đóng/chuyển.
 
 Unit model20/20, script reward (chuỗi giá trị, concurrent duplicate, reload, đầy kho, rollback), adventure progress/preview và static157module đạt. Playwright6/6: nhận4rương +300xu bộ ở cả3trò, chặn nhận lại, chụp bốnviewport320/412/844/1024 không tràn ngang; hồi quy chơi thật2wave cả3trò đạt. Đã xem ảnh412: tranh ghép đầy, chữ tự nhiên và bố cục trong skin hiện hành. Chưa chạy gate regression cuối hoặc reset Firebase thực.
+
+## Bổ sung P6 theo yêu cầu mới — ổ khóa và toast
+
+Mức khó khóa có biểu tượng SVG ổ khóa và huy hiệu làm mờ; label vẫn nhận chạm/Enter/Space để xem điều kiện, radio không được chọn. Câu thông báo nêu đúng mức còn thiếu (C/B/A) và màn khi cần; toast ở giữa viewport, chạm liên tục dùng lại một toast. Listener riêng được gỡ khi đóng popup. API toast chỉ thêm tùy chọn position, giữ mặc định các toast khác.
+
+Playwright3/3 đạt ở cả ba trò: khóa3mức, chạm và bàn phím, câu chữ đúng, tâm toast lệch dưới2px, không đổi mức đang chọn hoặc nhân toast. CSS ownership đạt. Đã deploy riêng Firestore Rules theo chấp thuận mới của chủ dự án; không deploy Hosting.

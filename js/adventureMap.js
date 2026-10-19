@@ -256,11 +256,19 @@ export function mountAdventureMap(gameId) {
       const input = document.createElement("input");
       input.type = "radio"; input.name = "adventure-level-mode"; input.value = mode.id;
       input.checked = mode.id === view.mode;
-      input.disabled = !getDifficultyAccess({ completed: profile.bestByLevel, level, mode: mode.id }).unlocked;
-      if (input.disabled) { label.title = `${mode.label} · Chưa mở khóa`; label.style.opacity = '0.45'; }
+      const access = getDifficultyAccess({ completed: profile.bestByLevel, level, mode: mode.id });
+      input.disabled = !access.unlocked;
+      if (input.disabled) {
+        label.classList.add('is-locked'); label.title = `${mode.label} · Chưa mở khóa`;
+        label.dataset.requiresMode = access.requires.mode;
+        label.dataset.requiresLevel = String(access.requires.level);
+        label.tabIndex = 0; label.setAttribute('role', 'button');
+        label.setAttribute('aria-label', `${mode.label} · Xem điều kiện mở khóa`);
+      }
       input.setAttribute("aria-label", mode.label);
       const text = document.createElement("span"); text.textContent = label.dataset.grade;
       label.append(input, text); choices.append(label);
+      if (input.disabled) { const lock = createIcon('lock'); lock.classList.add('adventure-difficulty-lock'); label.append(lock); }
     }
     const details = document.createElement("ul"); details.className = "adventure-level-details";
     details.setAttribute("aria-live", "polite");
@@ -290,8 +298,19 @@ export function mountAdventureMap(gameId) {
       modal.panel.querySelector(".app-modal__title").lastChild.textContent = title();
       modal.panel.setAttribute("aria-label", `${game.title} · ${title()}`);
     });
+    function explainLockedDifficulty(event) {
+      if (event.type === 'keydown' && !['Enter', ' '].includes(event.key)) return;
+      const label = event.target.closest('label.is-locked');
+      if (!label || loading) return;
+      event.preventDefault();
+      const grade = { easy: 'C', normal: 'B', hard: 'A', superHard: 'S' }[label.dataset.requiresMode];
+      const prerequisite = Number(label.dataset.requiresLevel);
+      showAppToast(`Hoàn thành độ khó ${grade}${prerequisite === level ? ' của màn này' : ` ở màn ${prerequisite}`} để mở khóa.`, { position: 'center', duration: 2200 });
+    }
+    const releaseLockedClick = scope.listen(choices, 'click', explainLockedDifficulty);
+    const releaseLockedKey = scope.listen(choices, 'keydown', explainLockedDifficulty);
     const modal = openAppModal({ id: "adventure-level-modal", title: title(), content, owner: scope, keepBanner: true,
-      onDestroy: release,
+      onDestroy: () => { release?.(); releaseLockedClick(); releaseLockedKey(); },
       actions: [{ label: "Chơi", variant: "primary", onClick: async () => await launch(selectedMode(), level, { skipIntro: true }) ? undefined : false }],
     });
     modal.panel.classList.add("adventure-level-dialog");
