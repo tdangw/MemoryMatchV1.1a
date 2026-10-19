@@ -345,8 +345,17 @@ export function mountAdventureMap(gameId) {
     openJourneyTreasure({ gameId, block: node.chestNumber, owner: scope,
       onClaimed: () => { if (scope.active) { patchNodes(); refreshAppWallet(); } },
       onPlay: async target => {
-        if (!await prepareAdventureChapter(gameId, Math.floor((target.level - 1) / 100) + 1, () => scope.active)) return;
-        if (scope.active) openLevel(target.level, null, target.mode);
+        setBusy(true);
+        try {
+          const ready = await prepareAdventureChapter(gameId, Math.floor((target.level - 1) / 100) + 1, () => scope.active && gameState.progress[game.progressKey] === profile);
+          if (!scope.active || gameState.progress[game.progressKey] !== profile) return;
+          setBusy(false);
+          if (ready) openLevel(target.level, null, target.mode);
+          else showAppToast('Chưa mở được màn chơi. Hãy thử lại.');
+        } catch(error) {
+          if(scope.active) showAppToast('Chưa mở được màn chơi. Hãy thử lại.');
+          console.error('Treasure level navigation failed',error.name);
+        } finally { if(scope.active) setBusy(false); }
       },
     });
   }

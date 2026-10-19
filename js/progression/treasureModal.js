@@ -27,18 +27,22 @@ export function openJourneyTreasure({ gameId, block, owner, selectedTier, onClai
     alignment: 'center', keepBanner: true, onDestroy: () => scope.dispose() });
   modal.panel.classList.add('treasure-dialog');
   const draw = () => renderTreasureContent(content,view,{selected,phase,error});
-  async function read() {
-    const token = ++generation;
+  async function read(token = ++generation) {
     const record = await loadPersistentChapter(key,getChapterNumber(block * 10));
-    if (!current() || token !== generation) { if (scope.active) modal.destroy(); return false; }
+    if (!current()) { if(scope.active) modal.destroy(); return false; }
+    if (token !== generation) return false;
     completed = {...record.bestByLevel};
     // Only one chapter and the existing frontier are needed; no scan through history.
     view = projectJourneyTreasure({completed,block,claim:record.claimedChests[block]});
     selected ||= view.activeTier || 'S'; return true;
   }
   async function load() {
-    try { if (await read()) draw(); }
+    const token=++generation;phase='loading';
+    content.textContent='Đang mở kho báu…';
+    try { if (await read(token)) { phase='idle';draw(); } }
     catch (cause) {
+      if (token !== generation) return;
+      phase='idle';
       if (!current()) { modal.destroy(); return; }
       console.error('Treasure load failed',cause.name);
       content.className='treasure-content';
@@ -50,7 +54,7 @@ export function openJourneyTreasure({ gameId, block, owner, selectedTier, onClai
   scope.listen(content,'click',event => {
     if (!current()) { modal.destroy(); return; }
     const control=event.target.closest('button');
-    if (!control || control.disabled || (phase === 'busy' || phase === 'opening')) return;
+    if (!control || control.disabled || (phase === 'busy' || phase === 'opening' || phase === 'loading')) return;
     if (control.dataset.treasureTier) {
       selected=control.dataset.treasureTier;error='';phase='idle';draw();
       content.querySelector(`[data-treasure-tier="${selected}"]`).focus();return;
@@ -81,7 +85,7 @@ export function openJourneyTreasure({ gameId, block, owner, selectedTier, onClai
         if (!result.ok) {
           phase='idle';
           error=result.reason==='inventory-full' ? 'Hãy dùng bớt Gợi ý để có chỗ nhận thưởng.' : 'Chưa nhận được thưởng. Hãy thử lại.';
-          if (result.reason==='stale-tier') await read();
+          if (result.reason==='stale-tier') { await read(); if(view.chests.find(chest=>chest.tier===requested)?.state==='claimed') error=''; }
           if(current()) draw();return false;
         }
         if (!await read()) return false;
