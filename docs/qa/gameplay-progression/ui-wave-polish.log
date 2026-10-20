@@ -1,0 +1,21 @@
+[WebServer] (node:34108) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 12 tests using 1 worker
+
+(node:9108) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok  1 [desktop] › tests\ui\progression-wave-presentation.spec.js:3:49 › wave notice is centered, finite and cancelled with its owner (reduce) (3.9s)
+  ok  2 [desktop] › tests\ui\progression-wave-presentation.spec.js:3:49 › wave notice is centered, finite and cancelled with its owner (no-preference) (3.9s)
+  ok  3 [desktop] › tests\ui\progression-wave-presentation.spec.js:34:3 › memory-match gives the new wave a finite entrance and longer notice (reduce) (4.8s)
+  ok  4 [desktop] › tests\ui\progression-wave-presentation.spec.js:34:3 › memory-match gives the new wave a finite entrance and longer notice (no-preference) (5.8s)
+  ok  5 [desktop] › tests\ui\progression-wave-presentation.spec.js:34:3 › link-connect gives the new wave a finite entrance and longer notice (reduce) (4.8s)
+  ok  6 [desktop] › tests\ui\progression-wave-presentation.spec.js:34:3 › link-connect gives the new wave a finite entrance and longer notice (no-preference) (5.9s)
+  ok  7 [desktop] › tests\ui\progression-wave-presentation.spec.js:34:3 › triple-connect gives the new wave a finite entrance and longer notice (reduce) (4.8s)
+  ok  8 [desktop] › tests\ui\progression-wave-presentation.spec.js:34:3 › triple-connect gives the new wave a finite entrance and longer notice (no-preference) (5.9s)
+  ok  9 [desktop] › tests\ui\progression-wave-presentation.spec.js:73:1 › changing motion preference or viewport cancels the wave light immediately (3.8s)
+  ok 10 [desktop] › tests\ui\progression-waves.spec.js:3:1 › Triple plays two generated silhouettes and only settles after the second wave (5.9s)
+  ok 11 [desktop] › tests\ui\progression-waves.spec.js:48:1 › Link advances waves with shared time, survives reload, and records only a complete level (16.1s)
+  ok 12 [desktop] › tests\ui\progression-waves.spec.js:97:1 › Memory advances to a fresh wave without a win, then settles the whole level once (14.2s)
+
+  12 passed (1.4m)

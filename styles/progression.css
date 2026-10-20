@@ -11,3 +11,5 @@
   white-space: nowrap;
 }
 .progression-wave-notice { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 30500; padding: 14px 30px; border: 1px solid #cfb36b; border-radius: 18px; background: #0b2c36f5; box-shadow: 0 8px 24px #0005, inset 0 1px #fff2; color: #ffe4a2; font: 800 clamp(20px, 6vw, 28px)/1.2 'Trebuchet MS', sans-serif; text-align: center; pointer-events: none; white-space: nowrap; }
+.progression-wave-arrival { position: fixed; z-index: 20000; overflow: hidden; border-radius: 16px; pointer-events: none; contain: paint; background: radial-gradient(ellipse at 50% 55%, #ffe7ae40, #81bdb21c 55%, transparent 76%); }
+.progression-wave-arrival__light { position: absolute; inset: 0 auto 0 0; width: 42%; background: linear-gradient(110deg, transparent 8%, #fff2ce55 48%, transparent 88%); }
