@@ -2,6 +2,7 @@ import { getTheme } from "./themeCatalog.js";
 import { getEquippedThemeId } from "./appearance.js";
 import { createIcon } from "./icons.js";
 import { gameState } from "./gameState.js";
+import { playGameStartSound } from './sound.js';
 import { GAME_MODES, getGameDefinition, getGameModeLabel } from "./gameCatalog.js";
 import { MAP_LEVEL_STEP, getMapLevelPoint, getMapChestPoint, createMapDecorations } from "./adventureMapLayout.js";
 import { decorateAdventureMenu, refreshAppWallet } from "./appNavigation.js";
@@ -256,6 +257,7 @@ export function mountAdventureMap(gameId) {
     if (!scope.active || loading || !canLaunchGame()) return false;
     if (isNormalAdventureMode(mode) && !getDifficultyAccess({ completed: profile.bestByLevel, level, mode }).unlocked) return false;
     setBusy(true);
+    playGameStartSound(gameState.settings);
     try { return await adapter.launch({ mode, level, skipIntro }); }
     catch (error) {
       console.error("Level launch failed", error);

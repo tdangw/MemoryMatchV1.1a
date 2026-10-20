@@ -6,6 +6,7 @@ const isAndroidBuild = import.meta.env.MODE === "android";
 
 export const sounds = {
   click: new Audio(assetUrl("assets/sounds/click.mp3")),
+  gameStart: new Audio(assetUrl("assets/sounds/game-start-317318.mp3")),
   match: new Audio(assetUrl("assets/sounds/match.mp3")),
   wrong: new Audio(assetUrl("assets/sounds/wrong.mp3")),
   overlay: new Audio(assetUrl("assets/sounds/overlay.mp3")),
@@ -33,6 +34,14 @@ const clampVolume = (value, fallback) => {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? Math.min(1, Math.max(0, parsed)) : fallback;
 };
+
+export function playGameStartSound(settings) {
+  if (!settings?.sound || document.hidden) return;
+  const audio = sounds.gameStart;
+  audio.currentTime = 0;
+  audio.volume = clampVolume(settings.soundVolume, 0.4);
+  try { void audio.play().catch(() => {}); } catch { /* Playback can be blocked by the browser. */ }
+}
 
 // Coin streams use a bounded voice pool; other cues keep a single voice.
 const COIN_CUE_VOICES = 6;

@@ -7,7 +7,7 @@ import { shellTimeout as setTimeout, clearShellTimeout as clearTimeout, shellInt
 // ui.js
 import { gameState } from "./gameState.js";
 import { GAMEPLAY_TIMING, getComboPresentation } from "./gameplayTuning.js";
-import { sounds } from "./sound.js"; // ✅ Đã tách âm thanh
+import { sounds, playGameStartSound } from "./sound.js"; // ✅ Đã tách âm thanh
 import { SUMMARY_REWARD_TIMING, summaryStarDelay, scheduleSummaryRewardAudio } from './progression/summaryRewardAudio.js';
 import { openAppModal, showAppToast } from "./modal.js";
 import { createIcon } from "./icons.js";
@@ -426,7 +426,7 @@ function openLevelSummaryOverlay({
   luckyAwards = [],
   settings = {},
   onNext,
-  nextLabel = "Màn tiếp theo",
+  nextLabel = "Chơi tiếp",
   onMenu,
   isVictoryCelebration = false,
   onCelebrate,
@@ -575,6 +575,7 @@ function openLevelSummaryOverlay({
         variant: "primary",
         onClick: (close) => {
           actionSelected = true;
+          playGameStartSound(gameState.settings);
           close();
           afterClose(() => {
             gameState.isPaused = false;

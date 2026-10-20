@@ -912,7 +912,7 @@ async function settleTerminalRound(shell, render) {
     },
     ...(canAdvance
       ? [{
-        label: currentMode === "endless" ? "Tiếp tục" : "Màn tiếp theo",
+        label: "Chơi tiếp",
         icon: "arrow-right",
         variant: "primary",
         onClick: (close) => {
@@ -966,7 +966,7 @@ async function settleTerminalRound(shell, render) {
         ? () => startNextTripleLevel(settlement.completedChapter ? gameState.progress.tripleConnect.adventure.firstLevel : currentLevel + 1)
         : () => void startTripleConnectRound({ mode: currentMode, level: currentLevel }),
       nextLabel: canAdvance
-        ? currentMode === "endless" ? "Tiếp tục" : "Màn tiếp theo"
+        ? "Chơi tiếp"
         : "Chơi lại",
     });
     return;
