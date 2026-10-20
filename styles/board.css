@@ -110,6 +110,25 @@
   display: none;
 }
 
+/* Hidden faces retain identical backs; the inset ring preserves selection borders. */
+.tile[data-special="true"]:not(.matched):not(.wrong):has(> img:not(.hidden))::after,
+.tile.is-lucky:not(.matched):not(.wrong):has(> img:not(.hidden))::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border: 2px solid #61eadb;
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+.tile.is-lucky:not(.matched):not(.wrong):has(> img:not(.hidden))::after {
+  border-color: #ffd36b;
+}
+
+.tile.is-lucky[data-special="true"]:not(.matched):not(.wrong):has(> img:not(.hidden))::after {
+  border-inline-color: #61eadb;
+}
+
 /* ✅ Ghép đúng */
 .tile.matched {
   opacity: 0.5;

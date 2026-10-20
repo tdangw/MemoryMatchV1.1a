@@ -34,7 +34,7 @@ export function resolveMemoryPairRewards(state, { imageId, special = false }, ra
   if (support) presentation.rewards.push(support);
   for (const reward of presentation.rewards) {
     if (reward.type === 'coins') state.coins += reward.value;
-    else if (reward.type !== 'preview-auto') {
+    else {
       const id = reward.type === 'hint' ? 'hint' : `${reward.type === 'time-item' ? 'time' : 'preview'}${reward.value === 'all' ? 'All' : reward.value}`;
       items[id] = Math.min(GAMEPLAY_LIMITS.itemCount, (items[id] || 0) + (id === 'hint' ? reward.value : 1));
     }

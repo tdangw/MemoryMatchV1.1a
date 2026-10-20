@@ -86,7 +86,6 @@ function describeMemoryMilestoneRewards(rewards = []) {
   return rewards.map((reward) => {
     const values = reward.values || [reward.value];
     const valueText = values.join(" hoặc ");
-    if (reward.type === "preview-auto") return `Xem trước ${valueText} thẻ`;
     if (reward.type === "preview-item") return reward.value === "all" ? "Xem trước tất cả vào kho" : `Xem trước ${valueText} thẻ vào kho`;
     if (reward.type === "time-item") return `+${valueText} giây vào kho`;
     if (reward.type === "hint") return `+${valueText} Gợi ý`;

@@ -3,14 +3,11 @@ import { playOwnedRewardCue } from './sound.js';
 import { gameState } from './gameState.js';
 import { playLootDrop } from './lootEffects.js';
 import { getMemoryItem, getMemoryItemId } from './memoryItems.js';
-import { revealMemoryTiles } from './memoryPreview.js';
 import { savePersistentGameData } from './persistence.js';
 import { stageMemorySession } from './memorySession.js';
 import { getActiveSession } from './sessionProgress.js';
 import { resolveMemoryPairRewards } from './memoryMatch/pairRewards.js';
 import { updateCoinDisplay, updateHintDisplay, updateMemoryAssistInventoryDisplay, updateMemorySpecialProgress, showLuckyRewardPopup } from './ui.js';
-import { GAME_CONFIG } from './config.js';
-import { GAMEPLAY_TIMING } from './gameplayTuning.js';
 
 export async function handleMemorySpecialMatch(source, roundId = gameState.roundId) {
   if (!source || gameState.roundId !== roundId) return;
@@ -35,21 +32,7 @@ export function presentMemoryPairRewards(presentation, source, roundId) {
   presentation.rewards.forEach((reward, index) => setTimeout(() => {
     if (gameState.roundId !== roundId) return;
     if (reward.type === 'coins') { showLuckyRewardPopup(reward); return; }
-    if (reward.type === 'preview-auto') {
-      const item = getMemoryItem(getMemoryItemId('preview', reward.value));
-      playLootDrop(source, { icon: 'eye', tier: item?.tier || GAME_CONFIG.special.previewTierColors[reward.value], target: document.getElementById('btn-preview-cards'), onCollected: () => useAutomaticPreviewWhenReady(reward.value, roundId) });
-      return;
-    }
     const item = getMemoryItem(reward.type === 'hint' ? 'hint' : getMemoryItemId(reward.type === 'time-item' ? 'time' : 'preview', reward.value));
     playLootDrop(source, { icon: item.icon, tier: item.tier, target: document.getElementById(item.type === 'time' ? 'btn-buy-time' : item.type === 'hint' ? 'btn-hint' : 'btn-preview-cards') });
   }, index * 130));
-}
-
-function useAutomaticPreviewWhenReady(value, roundId, attempts = 0) {
-  if (gameState.roundId !== roundId || gameState.isPaused) return;
-  if (gameState.isLocked || document.querySelector('.tile.selected')) {
-    if (attempts < 20) setTimeout(() => useAutomaticPreviewWhenReady(value, roundId, attempts + 1), 250);
-    return;
-  }
-  revealMemoryTiles(value, GAMEPLAY_TIMING.shopRevealDurationMs, roundId);
 }

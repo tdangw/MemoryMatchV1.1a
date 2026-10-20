@@ -73,20 +73,20 @@ export const GAME_CONFIG = Object.freeze({
     energyDrop: Object.freeze({ chance: 1, guaranteeAfterMisses: 9 }),
     supportDrop: Object.freeze({
       chance: 0.5,
-      types: Object.freeze(["preview-auto", "hint", "time-item"]),
+      types: Object.freeze(["preview-item", "hint", "time-item"]),
       timeValues: Object.freeze([10, 30, 45, 60]),
     }),
     previewDropValues: Object.freeze([4, 8, 12]),
     previewTierColors: Object.freeze({ 4: "teal", 8: "blue", 12: "purple", all: "gold" }),
     milestones: Object.freeze([
-      Object.freeze([{ type: "preview-auto", value: 4 }]),
+      Object.freeze([{ type: "preview-item", value: 4 }]),
       Object.freeze([{ type: "time-item", value: 10 }]),
       Object.freeze([{ type: "hint", value: 1 }]),
       Object.freeze([{ type: "coins", value: 5 }]),
-      Object.freeze([{ type: "preview-auto", values: Object.freeze([4, 8]) }]),
+      Object.freeze([{ type: "preview-item", values: Object.freeze([4, 8]) }]),
       Object.freeze([{ type: "time-item", values: Object.freeze([10, 30]) }]),
       Object.freeze([{ type: "hint", value: 1 }, { type: "coins", value: 5 }]),
-      Object.freeze([{ type: "preview-auto", value: 12 }]),
+      Object.freeze([{ type: "preview-item", value: 12 }]),
       Object.freeze([{ type: "time-item", value: 30 }, { type: "hint", value: 1 }]),
       Object.freeze([
         { type: "preview-item", value: "all" },
@@ -261,7 +261,7 @@ export function getMemorySupportDrop(random = Math.random) {
   const support = GAME_CONFIG.special.supportDrop;
   if (random() >= support.chance) return null;
   const type = pickRandom(support.types, random);
-  if (type === "preview-auto") return { type, value: getMemoryPreviewDropValue(random) };
+  if (type === "preview-item") return { type, value: getMemoryPreviewDropValue(random) };
   if (type === "time-item") return { type, value: pickRandom(support.timeValues, random) };
   return { type, value: 1 };
 }

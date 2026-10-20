@@ -163,6 +163,10 @@ export function createGrid(
 
     tile.dataset.imageId = cardData.id;
     tile.dataset.special = String(cardData.special === true);
+    const lucky = gameState.luckyRewards.has(cardData.id);
+    tile.classList.toggle('is-lucky', lucky);
+    const traits = [cardData.special && 'Thẻ năng lượng', lucky && 'Thẻ may mắn'].filter(Boolean);
+    if (traits.length) img.alt = `${cardData.alt} · ${traits.join(' · ')}`;
     if (cardData.matched) tile.classList.add('matched');
     tile.append(img);
     tiles.appendChild(tile);
