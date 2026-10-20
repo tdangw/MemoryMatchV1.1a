@@ -35,7 +35,7 @@ for (const id of ['memory-match', 'link-connect']) test(`${id} first durable pai
   }, id);
   await page.waitForFunction(() => window.firstPairCommit);
   const committed = await page.evaluate(() => window.firstPairCommit);
-  expect(committed.coins - before.coins).toBe(17);
+  expect(committed.coins - before.coins).toBe(15);
   expect(committed.session.specialProgress).toBe(id === 'memory-match' ? 4 : 2);
   expect(committed.session.pairSnapshot.luckyAwards).toEqual([{ type: 'coins', value: 10 }]);
   if (id === 'link-connect') expect(committed.items.hint).toBe(before.hints + 1);

@@ -71,8 +71,9 @@ export function openJourneyTreasure({ gameId, block, owner, selectedTier, onClai
     if (action==='collection') {
       modal.destroy();
       const collection=document.createElement('div');
-      openAppModal({id:'treasure-collection-modal',title:'Bộ sưu tập tranh',content:collection,owner,alignment:'center',keepBanner:true});
-      renderMasteryCollection(collection,gameId,{block});return;
+      const collectionScope = createGameShellLifecycle();
+      openAppModal({onDestroy:()=>collectionScope.dispose(),id:'treasure-collection-modal',title:'Bộ sưu tập tranh',content:collection,owner,alignment:'center',keepBanner:true});
+      renderMasteryCollection(collection,gameId,{block,owner:collectionScope});return;
     }
     if (action==='claim') void modal.submit(async () => {
       const tapped=performance.now();
@@ -91,7 +92,7 @@ export function openJourneyTreasure({ gameId, block, owner, selectedTier, onClai
         if (!await read()) return false;
         selected=requested;phase='opening';draw();onClaimed(result.outcome);
         // Presentation has its own cancellation path; submit finishes so Close works while it runs.
-        void presentTreasureOpening(content,scope).then(finished => {
+        void presentTreasureOpening(content,scope,current).then(finished => {
           if (!finished || !current()) { if(scope.active) modal.destroy(); return; }
           phase='success';draw();
           modal.panel.dataset.treasurePresentationMs=String(performance.now()-committed);

@@ -1,4 +1,4 @@
-import { renderWaveStatus, announceWave, presentWaveExit } from "./progression/waveHud.js";
+import { renderWaveStatus, announceWave, presentWaveExit, prepareWaveArrival } from "./progression/waveHud.js";
 import { rememberRecentGame } from './recentGame.js';
 import { canLaunchGame } from "./profileOperations.js";
 import { shellTimeout as setTimeout, shellInterval as setInterval, clearShellInterval as clearInterval } from "./gameShell/gameShellLifecycle.js";
@@ -137,6 +137,7 @@ export function initializeLevel(level, { reason = "new", session = null, skipInt
     clearGameplayRewardPopups();
     clearTooltip();
   } });
+  if (reason === 'wave') prepareWaveArrival(getMemoryShell().refs, scope);
   beginPlayMetrics(scope, { gameId: "memory-match", mode: requestedMode, level }, reason === "resume" || reason === 'wave' ? session?.metrics || {} : null);
   bindMemoryMenus(scope, getMemoryShell().refs.root, { onExit: returnToMainMenu, onRestart: restartMemoryLevel, onSettings: navigation.showSettings });
   const startup = createGameShellStartup(scope, getMemoryShell().refs, error => {
@@ -156,7 +157,7 @@ export function initializeLevel(level, { reason = "new", session = null, skipInt
   resetLogicRuntime();
   clearLootEffects();
   clearGameplayRewardPopups();
-  pauseBackgroundMusic();
+  if (reason !== 'wave') pauseBackgroundMusic();
   isAutoPaused = false;
   document.getElementById("menu-container")?.remove();
   document.body.classList.remove("game-is-paused");
@@ -245,8 +246,9 @@ export function initializeLevel(level, { reason = "new", session = null, skipInt
   if (!committed) return null;
   updateHintDisplay(gameState.progress.memoryMatch.items.hint);
   startup.check();
+  await announceWave(getMemoryShell().refs, scope, gameState.wave);
+  startup.check();
   showRevealTimerInHud(previewDurationMs / 1000, roundId);
-  announceWave(getMemoryShell().refs, scope, gameState.wave);
   document.getElementById("btn-buy-time")?.toggleAttribute("hidden", isEndlessMode(mode));
   revealAndHideTiles(roundId, () => {
     if (pairSnapshot) restoreMemoryCombo(pairSnapshot.combo, remainingComboWindow(pairSnapshot, getComboWindowMs(gameState.totalPairs)));

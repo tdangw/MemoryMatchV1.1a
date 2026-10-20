@@ -2,6 +2,7 @@ import { animateShellEffect, presentEffect } from "../gameShell/gameShellEffects
 import { playLootDrop } from "../lootEffects.js";
 import { shellTimeout as setTimeout, clearShellTimeout as clearTimeout, shellFrame as requestAnimationFrame } from "../gameShell/gameShellLifecycle.js";
 import { gameState } from "../gameState.js";
+import { playOwnedRewardCue } from '../sound.js';
 import { getLinkItemDefinition } from "./linkItems.js";
 import { calculateMotionDelta, prefersReducedMotion, readCssTimeMs } from "../motion.js";
 import { LINK_CONNECT_TIMING } from "./linkConfig.js";
@@ -472,9 +473,11 @@ const THUNDER_COLORS = Object.freeze({
 });
 
 export function playLinkThunderStrike(positions, colorId = "yellow") {
-  if (prefersReducedMotion()) return null;
   const frame = document.getElementById("link-board-frame");
-  if (!frame) return null;
+  if (!frame || !positions.some(position => getLinkTileButton(position))) return null;
+  const scope = getLinkShell().scope;
+  if (scope?.active) playOwnedRewardCue('thunder', scope, gameState.settings);
+  if (prefersReducedMotion()) return null;
   const frameRect = frame.getBoundingClientRect();
   const density = Math.min(window.devicePixelRatio || 1, 2);
   const effect = document.createElement("canvas");

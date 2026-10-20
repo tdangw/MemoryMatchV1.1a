@@ -1,3 +1,4 @@
+import { playOwnedRewardCue } from '../sound.js';
 import { gameState } from '../gameState.js';
 import { getGameProgressKey } from '../gameCatalog.js';
 import { getChapterNumber } from '../adventureProgress.js';
@@ -14,7 +15,7 @@ export const COLLECTION_PAINTINGS = Object.freeze([
 ]);
 
 /** One ten-piece set is mounted at a time; late reads cannot rebuild a closed tab. */
-export function renderMasteryCollection(container, gameId, { block: requestedBlock } = {}) {
+export function renderMasteryCollection(container, gameId, { block: requestedBlock, owner } = {}) {
   container.className = 'mastery-collection-panel';
   const key = getGameProgressKey(gameId);
   const profile = gameState.progress[key];
@@ -64,7 +65,10 @@ export function renderMasteryCollection(container, gameId, { block: requestedBlo
           claim.disabled = true;
           const outcome = await claimAdventureCollection(gameId, block);
           if (!root.isConnected || identity !== generation) return;
-          if (outcome) { refreshAppWallet(); await render(); }
+          if (outcome) {
+            if (owner) playOwnedRewardCue('reward', owner, gameState.settings);
+            refreshAppWallet(); await render();
+          }
           else { claim.disabled = false; reward.textContent = 'Chưa nhận được thưởng. Hãy thử lại.'; }
         });
         root.append(claim);

@@ -1,4 +1,5 @@
-import { renderWaveStatus, announceWave, presentWaveExit } from "../progression/waveHud.js";
+import { playOwnedRewardCue } from "../sound.js";
+import { renderWaveStatus, announceWave, presentWaveExit, prepareWaveArrival } from "../progression/waveHud.js";
 import { gameRecordLabel } from '../gameRecord.js';
 import { openGameExitDialog } from "../gameExitDialog.js";
 import { showFullVictoryCelebration } from "victory-presentation";
@@ -179,13 +180,14 @@ export function startTripleConnectRound({ seed, mode = "easy", level = 1, elapse
       explicitSeed: seed !== undefined, startup,
       reason, waveSession,
     })));
-  });
+  }, { waveTransition: reason === 'wave' });
 }
 
-function prepareTripleStartup(prepare) {
+function prepareTripleStartup(prepare, { waveTransition = false } = {}) {
   if (!canLaunchGame()) return Promise.resolve(null);
   const shell = getTripleShell();
   const scope = shell.mount();
+  if (waveTransition) prepareWaveArrival(shell.refs, scope);
   const startup = createGameShellStartup(scope, shell.refs, error => {
     console.error('Triple startup failed', error);
     showAppToast('Không thể chuẩn bị bàn chơi. Hãy chơi lại.');
@@ -519,6 +521,7 @@ return runRoundCommand(async () => {
       render(state);
       return;
     }
+    if (rewards.lucky.length || rewards.milestones.length) playOwnedRewardCue('reward', scope, gameState.settings);
     roundLuckyRewards.push(...rewards.lucky);
     roundMilestoneRewards.push(...rewards.milestones);
     const roundWon = transition.events.some((event) => event.type === "round-won");
@@ -659,10 +662,11 @@ return runRoundCommand(async () => {
     roundStarted = "starting";
     (await saveSession());
     if (!scope.active || generation !== roundGeneration) return;
+    if (state.status === 'won') { await settleTerminalRound(shell, render); return; }
+    await announceWave(shell.refs, scope, activeWave);
+    if (!scope.active || generation !== roundGeneration) return;
     roundStarted = true;
     resumePlayMetrics("startup");
-    if (state.status === 'won') { await settleTerminalRound(shell, render); return; }
-    announceWave(shell.refs, scope, activeWave);
   void rememberRecentGame("triple-connect");
     startTripleTimer(scope, shell, render, hudElements, hud);
     if (state.combo > 0) startComboWindow();

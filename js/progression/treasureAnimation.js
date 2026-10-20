@@ -1,14 +1,21 @@
-import { sounds } from '../sound.js';
+import { playOwnedRewardCue } from '../sound.js';
 import { gameState } from '../gameState.js';
 import { createGameShellLifecycle } from '../gameShell/gameShellLifecycle.js';
 
 /** At most four finite animations, no particles/loop; durability is already committed. */
-export async function presentTreasureOpening(content, owner) {
-  if (!owner.active) return false;
+export async function presentTreasureOpening(content, owner, isCurrent = () => true) {
+  if (!owner.active || !isCurrent()) return false;
   const art = content.querySelector('.treasure-hero .treasure-art');
   const rewards = content.querySelector('.treasure-rewards');
+  const playCue = name => { if (isCurrent()) playOwnedRewardCue(name, owner, gameState.settings); };
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  if (reduced.matches || document.hidden) { art.classList.add('is-open'); return true; }
+  if (document.hidden) { art.classList.add('is-open'); return true; }
+  if (reduced.matches) {
+    art.classList.add('is-open');
+    playCue('openBox');
+    owner.timeout(() => playCue('reward'), 180);
+    return true;
+  }
   const scope = createGameShellLifecycle();
   const release = owner.own(() => scope.dispose(), 'cleanup');
   scope.own(() => release.forget());
@@ -22,18 +29,18 @@ export async function presentTreasureOpening(content, owner) {
   const finish = () => { for (const animation of animations) if (animation.playState !== 'idle') animation.finish(); };
   scope.listen(reduced,'change',event => { if(event.matches) finish(); });
   scope.listen(document,'visibilitychange',() => { if(document.hidden) finish(); });
-  if (gameState.settings.sound && !document.hidden) {
-    const audio = sounds.bonus.cloneNode(true);
-    audio.volume = Math.min(1, Math.max(0, Number(gameState.settings.soundVolume) || 0)); audio.loop=false;
-    const stop = scope.own(() => { audio.pause(); audio.removeAttribute('src'); },'cleanup');
-    scope.listen(audio,'ended',stop,{once:true});scope.listen(audio,'error',stop,{once:true});
-    scope.listen(document,'visibilitychange',() => { if(document.hidden) stop(); });
-    void audio.play().catch(stop);
-  }
+  let rewardPresented = false;
+  const reward = () => {
+    if (rewardPresented) return;
+    rewardPresented = true;
+    playCue('reward');
+  };
+  scope.timeout(() => playCue('openBox'), 120);
+  scope.timeout(reward, 450);
   try {
     await Promise.all(animations.map(animation => animation.finished));
     if (!owner.active || !scope.active) return false;
-    art.classList.add('is-open'); return true;
+    art.classList.add('is-open'); reward(); return true;
   } catch(error) {
     if (error.name !== 'AbortError') throw error;
     return false;

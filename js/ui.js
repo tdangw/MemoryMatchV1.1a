@@ -8,6 +8,7 @@ import { shellTimeout as setTimeout, clearShellTimeout as clearTimeout, shellInt
 import { gameState } from "./gameState.js";
 import { GAMEPLAY_TIMING, getComboPresentation } from "./gameplayTuning.js";
 import { sounds } from "./sound.js"; // ✅ Đã tách âm thanh
+import { SUMMARY_REWARD_TIMING, summaryStarDelay, scheduleSummaryRewardAudio } from './progression/summaryRewardAudio.js';
 import { openAppModal, showAppToast } from "./modal.js";
 import { createIcon } from "./icons.js";
 import { launchSummaryConfetti, showSummaryFireworks } from "victory-presentation";
@@ -491,7 +492,7 @@ function openLevelSummaryOverlay({
       isEarned ? "level-summary__star--earned" : "level-summary__star--unearned",
     ].filter(Boolean).join(" ");
     // Chừa một nhịp để popup ổn định trước, rồi mới hé từng sao.
-    if (isEarned) star.style.setProperty("--star-delay", `${420 + index * 380}ms`);
+    if (isEarned) star.style.setProperty("--star-delay", `${summaryStarDelay(index)}ms`);
     star.append(createIcon("star"));
     star.setAttribute("aria-hidden", "true");
     resultStars.appendChild(star);
@@ -616,13 +617,14 @@ function openLevelSummaryOverlay({
   });
 
   modal.panel.classList.add("level-summary-modal");
+  scheduleSummaryRewardAudio({ owner: scope, stars, getSettings: () => gameState.settings });
   if (isVictoryCelebration) {
     modal.panel.classList.add("level-summary-modal--victory");
   }
   launchSummaryConfetti(scope);
   animateSummaryNumber(resultScore, score, { scope, delayMs: 360, durationMs: 1250 });
   if (coinsValueElement) {
-    animateSummaryNumber(coinsValueElement, coinsEarned, { scope, prefix: "+", delayMs: 760, durationMs: 1000 });
+    animateSummaryNumber(coinsValueElement, coinsEarned, { scope, prefix: "+", delayMs: SUMMARY_REWARD_TIMING.coinStart, durationMs: SUMMARY_REWARD_TIMING.coinDuration });
   }
 }
 

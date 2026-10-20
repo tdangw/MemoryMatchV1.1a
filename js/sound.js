@@ -34,11 +34,56 @@ const clampVolume = (value, fallback) => {
   return Number.isFinite(parsed) ? Math.min(1, Math.max(0, parsed)) : fallback;
 };
 
+// Fixed cue bank: no clones and at most one voice per cue across all surfaces.
+const rewardCueFiles = Object.freeze({
+  star1: 'star_1', star2: 'star_2', star3: 'star_3',
+  reward: 'reward', openBox: 'open_box', thunder: 'explosion',
+});
+const rewardCues = new Map();
+
+export function playOwnedRewardCue(name, owner, settings) {
+  if (!Object.hasOwn(rewardCueFiles, name)) throw new Error(`Unknown reward cue: ${name}`);
+  const volume = settings?.sound ? clampVolume(settings.soundVolume, 0.4) : 0;
+  if (!owner.active || document.hidden || !volume) return;
+  let cue = rewardCues.get(name);
+  if (!cue) {
+    cue = { audio: new Audio(assetUrl(`assets/sounds/${rewardCueFiles[name]}.ogg`)), stop: null };
+    rewardCues.set(name, cue);
+  }
+  cue.stop?.();
+  const audio = cue.audio;
+  audio.currentTime = 0;
+  audio.volume = volume;
+  let ended, failed, hidden;
+  const stop = owner.own(() => {
+    audio.removeEventListener('ended', ended);
+    audio.removeEventListener('error', failed);
+    document.removeEventListener('visibilitychange', hidden);
+    audio.pause();
+    audio.currentTime = 0;
+    if (cue.stop === stop) cue.stop = null;
+  });
+  ended = () => { if (audio.ended) stop(); };
+  failed = () => stop();
+  hidden = () => { if (document.hidden) stop(); };
+  audio.addEventListener('ended', ended);
+  audio.addEventListener('error', failed);
+  document.addEventListener('visibilitychange', hidden);
+  cue.stop = stop;
+  // A rejected, older play promise can only dispose its own voice.
+  try { void audio.play().catch(stop); } catch { stop(); }
+  return stop;
+}
+
 export function applyEffectsSettings(settings) {
   const volume = settings?.sound ? clampVolume(settings.soundVolume, 0.4) : 0;
   Object.values(sounds).filter(Boolean).forEach((sound) => {
     sound.volume = volume;
   });
+  for (const cue of rewardCues.values()) {
+    cue.audio.volume = volume;
+    if (!volume) cue.stop?.();
+  }
 }
 
 export function syncDefaultMusic(settings, shouldPlay = true) {
@@ -49,7 +94,7 @@ export function syncDefaultMusic(settings, shouldPlay = true) {
     selectedMenuTrack =
       MENU_MUSIC_TRACKS[Math.floor(Math.random() * MENU_MUSIC_TRACKS.length)];
   }
-  if (music.src !== selectedMenuTrack) music.src = selectedMenuTrack;
+  if (music.src !== new URL(selectedMenuTrack, document.baseURI).href) music.src = selectedMenuTrack;
   music.loop = true;
   music.volume = getBackgroundMusicVolume(settings);
 
@@ -64,7 +109,7 @@ export function syncDefaultMusic(settings, shouldPlay = true) {
     return;
   }
 
-  if (shouldPlay) music.play().catch(() => {});
+  if (shouldPlay && music.paused) music.play().catch(() => {});
 }
 
 export function duckBackgroundMusicForVictory(settings) {
@@ -105,6 +150,7 @@ export function pauseVictoryFlowerTheme() {
 export function pauseGameAudio() {
   pauseBackgroundMusic();
   Object.values(sounds).filter(Boolean).forEach((sound) => sound.pause());
+  for (const cue of rewardCues.values()) cue.stop?.();
 }
 
 export function pauseBackgroundMusic() {

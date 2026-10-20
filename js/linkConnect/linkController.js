@@ -1,5 +1,6 @@
 import { PROGRESSION_HELP_CONTENT } from "../progression/progressionCopy.js";
-import { renderWaveStatus, announceWave, presentWaveExit } from "../progression/waveHud.js";
+import { playOwnedRewardCue } from "../sound.js";
+import { renderWaveStatus, announceWave, presentWaveExit, prepareWaveArrival } from "../progression/waveHud.js";
 import { resolveLinkPairRewards } from './pairRewards.js';
 import { gameRecordLabel } from '../gameRecord.js';
 import { rememberRecentGame } from '../recentGame.js';
@@ -266,6 +267,7 @@ export function startLinkLevel({
   pendingCompactLayout = null;
   linkTimeWarningPlayed = false;
   const scope = showLinkGame();
+  if (waveTransition) prepareWaveArrival(getLinkShell().refs, scope);
   beginPlayMetrics(scope, { gameId: "link-connect", mode, level }, resume || waveTransition ? metrics || {} : null);
   const startup = createGameShellStartup(scope, getLinkShell().refs, error => {
     console.error('Link startup failed', error);
@@ -340,9 +342,13 @@ export function startLinkLevel({
   linkGameState.isLocked = true;
   let introComplete = skipIntro;
   let imagesReady = false;
+  let activation;
   const activateWhenReady = () => {
-    if (!introComplete || !imagesReady || linkGameState.roundId !== roundId) return;
-    announceWave(getLinkShell().refs, scope, linkGameState.wave);
+    if (!introComplete || !imagesReady || linkGameState.roundId !== roundId) return Promise.resolve();
+    if (activation) return activation;
+    activation = (async () => {
+    await announceWave(getLinkShell().refs, scope, linkGameState.wave);
+    if (!scope.active || linkGameState.roundId !== roundId) return;
     unlockLinkBoard();
     if (resume && pairSnapshot) {
       const windowMs = getLinkComboWindowMs(linkGameState.totalPairs);
@@ -356,6 +362,8 @@ export function startLinkLevel({
     }
     startCountdown(roundId);
     if (resume && pairSnapshot?.matchedPairs === pairSnapshot?.totalPairs && pairSnapshot) void completeLinkLevel();
+    })();
+    return activation;
   };
   if (!skipIntro) showLevelRewardOverlay({
     level,
@@ -366,7 +374,11 @@ export function startLinkLevel({
     assistText: `Gợi ý: ${getLinkItemCount("hint")}`,
     onComplete: () => {
       introComplete = true;
-      activateWhenReady();
+      void activateWhenReady().catch(error => {
+        if (!scope.active) return;
+        console.error('Link activation failed', error);
+        showAppToast('Không thể chuẩn bị bàn chơi. Hãy chơi lại.');
+      });
     },
   });
   await startup.phase('images', () => startup.decodeBoard());
@@ -380,7 +392,7 @@ export function startLinkLevel({
   if (!committed) return null;
   startup.check();
   imagesReady = true;
-  activateWhenReady();
+  await activateWhenReady();
   });
 }
 
@@ -571,6 +583,7 @@ async function handleLinkTileClick(position) {
   showComboEffect(matchedTiles[1] || matchedTiles[0], linkGameState.combo);
   animateCoinCounter(getLinkHudElements().coins, getLinkHudElements().coinBalance, previousCoins, gameState.coins);
   playCoinRewardFlight(matchedTiles[1] || matchedTiles[0], getLinkHudElements().coins, baseCoins + rewards.coins);
+  if (rewards.rewards.length) playOwnedRewardCue('reward', getLinkShell().scope, gameState.settings);
   for (const reward of rewards.rewards) {
     const anchor = matchedTiles[1] || matchedTiles[0];
     showGameplayRewardEffect(anchor, reward);

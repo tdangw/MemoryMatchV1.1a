@@ -1,4 +1,5 @@
-import { shellTimeout as setTimeout } from './gameShell/gameShellLifecycle.js';
+import { shellTimeout as setTimeout, getActiveGameScope } from './gameShell/gameShellLifecycle.js';
+import { playOwnedRewardCue } from './sound.js';
 import { gameState } from './gameState.js';
 import { playLootDrop } from './lootEffects.js';
 import { getMemoryItem, getMemoryItemId } from './memoryItems.js';
@@ -27,6 +28,8 @@ export function presentMemoryPairRewards(presentation, source, roundId) {
   if (gameState.roundId !== roundId) return;
   updateCoinDisplay(gameState.coins); updateHintDisplay(gameState.progress.memoryMatch.items.hint);
   updateMemoryAssistInventoryDisplay(); updateMemorySpecialProgress(gameState.specialProgress);
+  const owner = getActiveGameScope();
+  if (owner && (presentation.lucky || presentation.rewards.length)) playOwnedRewardCue('reward', owner, gameState.settings);
   if (presentation.lucky) showLuckyRewardPopup(presentation.lucky);
   if (presentation.energyProgress !== null) playLootDrop(source, { icon: 'energy', tier: 'energy', target: document.getElementById('memory-special-milestones') });
   presentation.rewards.forEach((reward, index) => setTimeout(() => {
