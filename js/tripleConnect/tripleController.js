@@ -558,10 +558,6 @@ return runRoundCommand(async () => {
       shell.refs.root.dataset.triplePresenting = String(presentationCount > 0);
       (await saveSession());
       if (!scope.active || generation !== roundGeneration) return;
-      if (roundWon) {
-        duckBackgroundMusicForVictory(gameState.settings);
-        playTripleSound("victory");
-      }
       (await settleTerminalRound(shell, render));
     });
     playTripleEvents(transition.events);
@@ -780,8 +776,8 @@ function startTripleTimer(scope, shell, render, hudElements, hud) {
 }
 
 function playTripleEvents(events) {
-  // Win audio waits for the final tile presentation, matching Memory and Link.
-  if (events.some((event) => event.type === "round-won")) return;
+  // Intermediate board clears keep match feedback; only the last wave wins the level.
+  if (events.some((event) => event.type === "round-won") && activeWave.index === activeWave.count) return;
   const name = events.some((event) => event.type === "round-lost") ? "defeat"
       : events.some((event) => event.type === "lucky-resolved") ? "bonus"
         : events.some((event) => event.type === "triple-resolved") ? "match"
@@ -880,11 +876,15 @@ async function settleTerminalRound(shell, render) {
   if (!scope.active || generation !== roundGeneration) return;
   // A failed durable write is handled by the app-owned recovery modal. Do not cover its reload action.
   if (!settlement) return;
+  const won = state.status === "won";
+  if (won) {
+    duckBackgroundMusicForVictory(gameState.settings);
+    playTripleSound("victory");
+  }
   // The terminal score includes the time bonus. Re-render from the committed
   // snapshot instead of updating a subset of HUD fields independently, so the
   // HUD, persisted best result, and summary always share one source of truth.
   render(state);
-  const won = state.status === "won";
   const canAdvance = won;
   const summary = createTripleSummary({
     settlement,
