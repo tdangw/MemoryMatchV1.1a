@@ -32,10 +32,11 @@ export async function commitTripleRewardTransaction({ session, milestones, rewar
     if (!Number.isInteger(amount) || amount < 1) continue;
     if (type === "coins") { coins += amount; granted.push({ type, amount, source }); continue; }
     if (type === "time") { granted.push({ type, amount, source }); continue; }
-    if (!Object.hasOwn(items, type)) continue;
-    const capacity = GAMEPLAY_LIMITS.itemCount - items[type];
+    const itemId = type === 'time-item' ? 'time' : type;
+    if (!Object.hasOwn(items, itemId)) continue;
+    const capacity = GAMEPLAY_LIMITS.itemCount - items[itemId];
     const accepted = Math.max(0, Math.min(capacity, amount));
-    items[type] += accepted;
+    items[itemId] += accepted;
     if (accepted) granted.push({ type, amount: accepted, source });
     const overflow = amount - accepted;
     const fallback = Number.isInteger(overflowCoins)

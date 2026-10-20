@@ -15,7 +15,7 @@ import { launchSummaryConfetti, showSummaryFireworks } from "victory-presentatio
 import { clearPersistentGameData } from "./persistence.js";
 import { getTheme } from "./themeCatalog.js";
 import { getEquippedThemeId } from "./appearance.js";
-import { GAME_CONFIG, getStarScoreTargets, getTimerDirection, isEndlessMode } from "./config.js";
+import { GAME_CONFIG, getStarScoreTargets, getTimerDirection, isEndlessMode, getMemoryMilestoneRewards } from "./config.js";
 import { getGameModeLabel, getGameProgressKey } from "./gameCatalog.js";
 import { formatClockTime, UI_COPY } from "./uiCatalog.js";
 import { prefersReducedMotion } from "./motion.js";
@@ -79,7 +79,7 @@ export function updateScoreDisplay(score) {
 export function updateMemorySpecialProgress(progress = gameState.specialProgress) {
   const target = GAME_CONFIG.special.progressTarget;
   getMemoryHud().milestones({ progress: Math.max(0, Math.min(target, Math.floor(Number(progress) || 0))), target,
-    descriptions: GAME_CONFIG.special.milestones.map(describeMemoryMilestoneRewards) });
+    descriptions: GAME_CONFIG.special.milestones.map((_, index) => describeMemoryMilestoneRewards(getMemoryMilestoneRewards(index + 1, gameState.settings.mode))) });
 }
 
 function describeMemoryMilestoneRewards(rewards = []) {
@@ -725,6 +725,7 @@ export function showGameplayRewardEffect(tileElement, { type, value } = {}) {
     hint: { text: `+${value}`, icon: "search" },
     reshuffle: { text: `+${value}`, icon: "restart" },
     freeze: { text: `+${value}`, icon: "timer" },
+    thunder: { text: `+${value}`, icon: "wand" },
   };
   const presentation = presentations[type];
   if (!presentation) return;

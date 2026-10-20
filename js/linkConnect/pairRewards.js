@@ -1,5 +1,5 @@
 import { GAMEPLAY_LIMITS } from '../gameplayTuning.js';
-import { LINK_CONNECT_CONFIG, getLinkPremiumTypeDefinition, getLinkPremiumSupplyItem, isLinkEndlessMode, calculateLinkThunderPairPoints, getLinkSpecialMilestoneTooltip } from './linkConfig.js';
+import { LINK_CONNECT_CONFIG, getLinkPremiumTypeDefinition, getLinkPremiumSupplyItem, isLinkEndlessMode, getLinkMilestoneRewards, getLinkSpecialMilestoneTooltip } from './linkConfig.js';
 import { getLinkBoardTile, removeRandomLinkPair, removeLinkBoardPair, unlockFrozenLinkPairs, applyLinkGravityShift } from './linkBoard.js';
 import { calculateGroupScore } from '../progression/gameplayRules.js';
 
@@ -48,17 +48,12 @@ export function resolveLinkPairRewards(state, items, { special, premiumType, luc
       state.specialNoEnergyDropStreak = 0;
       const progress = state.specialProgress + 1;
       presentation.energyProgress = progress; state.specialProgress = progress % rules.progressTarget;
-      state.specialMilestoneRewards[progress] = getLinkSpecialMilestoneTooltip(progress);
-      if ([1, 3, 9, 10].includes(progress)) {
-        if (progress === 9 || progress === 10) grant('hint');
-        if (progress === 10) { coins(rules.milestones.ten.coins); grant('reshuffle'); }
-        breakPair(false);
-      } else if (progress === 2) coins(rules.milestones.two.coins);
-      else if (progress === 4) { if (isLinkEndlessMode(state.mode)) coins(rules.milestones.four.fallbackCoins); else time(integer(rules.milestones.four.time)); }
-      else if (progress === 5) grant(random() < .5 ? 'hint' : 'reshuffle');
-      else if (progress === 6) { if (!thaw(rules.milestones.six.frozenPairs)) coins(rules.milestones.six.fallbackCoins); }
-      else if (progress === 7) { const seconds = integer(rules.milestones.seven.time); if (!isLinkEndlessMode(state.mode)) time(seconds); coins(rules.milestones.seven.coins); }
-      else if (progress === 8) grant(isLinkEndlessMode(state.mode) ? rules.milestones.eight.endlessItem : rules.milestones.eight.standardItem);
+      state.specialMilestoneRewards[progress] = getLinkSpecialMilestoneTooltip(progress, state.mode);
+      for (const [type, amount] of Object.entries(getLinkMilestoneRewards(progress, state.mode))) {
+        if (type === 'coins') coins(amount);
+        else for (let count = 0; count < amount; count++) grant(type);
+      }
+      if ([1, 3, 9, 10].includes(progress)) breakPair(false);
     } else state.specialNoEnergyDropStreak++;
   }
   state.pendingEnergyCollections = 0; state.pendingSpecialMilestones = []; state.isResolvingSpecialMilestone = false;

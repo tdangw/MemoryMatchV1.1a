@@ -20,7 +20,7 @@ assert.equal(getMemoryPreviewDropValue(() => 0.5), 8);
 assert.equal(getMemoryPreviewDropValue(() => 0.999), 12);
 assert.deepEqual(resolveMemoryMilestoneRewards(7, () => 0), [
   { type: "hint", value: 1 },
-  { type: "coins", value: 5 },
+  { type: "time-item", value: 10 },
 ]);
 assert.equal(getMemorySupportDrop(() => 0)?.type, "preview-item");
 assert.equal(getComboWindowMs(8), 15000);

@@ -280,7 +280,7 @@ function presentCommittedRewards(shell, source, rewards = []) {
     || root.querySelector(".stat-points");
   if (coins > 0) playCoinRewardFlight(source, coinTarget, coins);
   for (const reward of rewards.filter((candidate) => candidate.type !== "coins")) {
-    const itemId = reward.type === "time" ? "time" : reward.type;
+    const itemId = reward.type === "time" || reward.type === 'time-item' ? "time" : reward.type;
     playLootDrop(source, {
       icon: itemId === "time" ? "timer" : itemId === "hint" ? "search" : itemId === "undo" ? "undo" : "shuffle", preset: "linkItem", tier: "blue", holdMs: 0,
       target: root.querySelector(`[data-triple-item="${itemId}"]`),

@@ -66,7 +66,7 @@ storage.failWrites = false;
 await persistence.loadPersistentGameData();
 const revisionBeforePurchase = JSON.parse(storage.getItem("memoryMatchSave")).revision;
 assert.equal(await buyLinkItem("hint"), true);
-assert.equal(gameState.coins, 92);
+assert.equal(gameState.coins, 36);
 assert.equal(gameState.progress.linkConnect.items.hint, 1);
 assert.equal(JSON.parse(storage.getItem("memoryMatchSave")).revision, revisionBeforePurchase + 1);
 

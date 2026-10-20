@@ -79,19 +79,19 @@ export const GAME_CONFIG = Object.freeze({
     previewDropValues: Object.freeze([4, 8, 12]),
     previewTierColors: Object.freeze({ 4: "teal", 8: "blue", 12: "purple", all: "gold" }),
     milestones: Object.freeze([
+      Object.freeze([{ type: "coins", value: 10 }]),
       Object.freeze([{ type: "preview-item", value: 4 }]),
+      Object.freeze([{ type: "coins", value: 20 }]),
       Object.freeze([{ type: "time-item", value: 10 }]),
-      Object.freeze([{ type: "hint", value: 1 }]),
-      Object.freeze([{ type: "coins", value: 5 }]),
-      Object.freeze([{ type: "preview-item", values: Object.freeze([4, 8]) }]),
-      Object.freeze([{ type: "time-item", values: Object.freeze([10, 30]) }]),
-      Object.freeze([{ type: "hint", value: 1 }, { type: "coins", value: 5 }]),
+      Object.freeze([{ type: "preview-item", value: 8 }]),
+      Object.freeze([{ type: "coins", value: 30 }]),
+      Object.freeze([{ type: "hint", value: 1 }, { type: "time-item", value: 10 }]),
       Object.freeze([{ type: "preview-item", value: 12 }]),
-      Object.freeze([{ type: "time-item", value: 30 }, { type: "hint", value: 1 }]),
+      Object.freeze([{ type: "coins", value: 50 }, { type: "hint", value: 1 }]),
       Object.freeze([
         { type: "preview-item", value: "all" },
-        { type: "time-item", value: 60 },
-        { type: "coins", value: 10 },
+        { type: "time-item", value: 30 },
+        { type: "coins", value: 100 },
       ]),
     ]),
   }),
@@ -249,8 +249,14 @@ export function getMemoryPreviewDropValue(random = Math.random) {
   return pickRandom(GAME_CONFIG.special.previewDropValues, random);
 }
 
-export function resolveMemoryMilestoneRewards(progress, random = Math.random) {
+export function getMemoryMilestoneRewards(progress, mode = 'easy') {
   const rewards = GAME_CONFIG.special.milestones[Math.floor(Number(progress) || 0) - 1] || [];
+  return mode === 'endless' ? rewards.map(reward => reward.type === 'time-item'
+    ? { type: 'coins', value: reward.value === 30 ? 80 : 40 } : reward) : rewards;
+}
+
+export function resolveMemoryMilestoneRewards(progress, random = Math.random, mode = 'easy') {
+  const rewards = getMemoryMilestoneRewards(progress, mode);
   return rewards.map((reward) => ({
     ...reward,
     value: reward.values ? pickRandom(reward.values, random) : reward.value,

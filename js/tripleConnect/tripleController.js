@@ -42,6 +42,7 @@ import {
   getTripleModeConfig,
   getTripleTrayCapacity,
   TRIPLE_PRODUCT_DECISIONS,
+  getTripleMilestoneReward,
 } from "./tripleConfig.js";
 import { shuffleTripleBoardState } from "./tripleShuffle.js";
 import { getEquippedThemeId } from "../appearance.js";
@@ -437,8 +438,10 @@ async function mountTripleDevelopmentRound(generated, { skipIntro = false, start
     hud.milestones({
       progress: milestones.progress,
       target: TRIPLE_PRODUCT_DECISIONS.milestones.target,
-      descriptions: TRIPLE_PRODUCT_DECISIONS.milestones.rewards.map((reward) =>
-        Object.entries(reward).filter(([key]) => key !== "endlessCoins").map(([key, value]) => `+${value} ${key === "coins" ? "Xu" : key === "time" ? "giây" : key === "hint" ? "Gợi ý" : key === "undo" ? "Hoàn tác" : "Xáo trộn"}`).join(" · ")),
+      descriptions: TRIPLE_PRODUCT_DECISIONS.milestones.rewards.map((_, index) =>
+        Object.entries(getTripleMilestoneReward(index + 1, currentMode)).map(([key, value]) => key === 'timeItem'
+          ? `+${value} vật phẩm +${getTripleItemDefinition('time').value} giây vào kho`
+          : `+${value} ${key === "coins" ? "Xu" : key === "hint" ? "Gợi ý" : key === "undo" ? "Hoàn tác" : "Xáo trộn"}${key === 'coins' ? '' : ' vào kho'}`).join(" · ")),
     });
     updateTimer(shell, remainingTime, hudElements, hud);
     return pendingRender;
@@ -1063,6 +1066,7 @@ function getClaimedLuckyRewards() {
 function formatTripleReward(reward) {
   if (reward.type === "coins") return `${reward.amount} Xu`;
   if (reward.type === "time") return `+${reward.amount} giây`;
+  if (reward.type === 'time-item') return `+${reward.amount} vật phẩm +${getTripleItemDefinition('time').value} giây`;
   if (reward.type === "hint") return `+${reward.amount} Gợi ý`;
   if (reward.type === "undo") return `+${reward.amount} Hoàn tác`;
   return `+${reward.amount} Xáo trộn`;
@@ -1146,7 +1150,7 @@ async function commitTripleResolutionRewards({ luckyEvent, matchEvent }) {
     ...(freshTileIds.length ? [{ type: 'coins', amount: MATCH_COINS_PER_GROUP, source: 'match' }] : []),
     ...pendingLucky.map((lucky) => ({ ...lucky.reward, source: "lucky", overflowCoins: 10 })),
     ...resolved.rewards.flatMap((milestone) => Object.entries(milestone.reward)
-      .map(([type, amount]) => ({ type, amount, source: "milestone" }))),
+      .map(([type, amount]) => ({ type: type === 'timeItem' ? 'time-item' : type, amount, source: "milestone" }))),
   ];
   const time = requested.filter((reward) => reward.type === "time").reduce((total, reward) => total + reward.amount, 0);
   const committed = (await commitTripleRewardTransaction({

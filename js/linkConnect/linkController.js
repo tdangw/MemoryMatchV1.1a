@@ -587,7 +587,7 @@ async function handleLinkTileClick(position) {
   for (const reward of rewards.rewards) {
     const anchor = matchedTiles[1] || matchedTiles[0];
     showGameplayRewardEffect(anchor, reward);
-    if (['hint', 'reshuffle', 'freeze'].includes(reward.type)) playLinkItemRewardFlight(anchor, reward.type);
+    if (['hint', 'reshuffle', 'freeze', 'thunder'].includes(reward.type)) playLinkItemRewardFlight(anchor, reward.type);
   }
   const bonusPositions = rewards.breakTileKeys.map(keys => keys.map(key => findLinkBoardTilePosition(rollback.state.board, key)));
   if (bonusPositions.length) {
@@ -1186,7 +1186,7 @@ function updateLinkStarsHud(hud = getLinkHudElements()) {
 
 function updateLinkSpecialMilestones(hud = getLinkHudElements()) {
   getLinkHud(hud).milestones({ progress: linkGameState.specialProgress, target: LINK_CONNECT_CONFIG.special.progressTarget,
-    descriptions: hud.milestones.map((_, index) => linkGameState.specialMilestoneRewards[index + 1] || getLinkSpecialMilestoneTooltip(index + 1)) });
+    descriptions: hud.milestones.map((_, index) => getLinkSpecialMilestoneTooltip(index + 1, linkGameState.mode)) });
 }
 
 function recoverBlockedLinkBoard(board) {

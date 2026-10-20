@@ -101,32 +101,41 @@ export const LINK_CONNECT_CONFIG = Object.freeze({
     energyDrop: Object.freeze({ chance: 1, guaranteeAfterMisses: 9 }),
     milestones: Object.freeze({
       breakCoins: 10,
-      two: Object.freeze({ coins: 5 }),
-      four: Object.freeze({ time: Object.freeze({ min: 2, max: 4 }), fallbackCoins: 5 }),
-      six: Object.freeze({ frozenPairs: 1, fallbackCoins: 5 }),
-      seven: Object.freeze({ time: Object.freeze({ min: 2, max: 5 }), coins: 10 }),
-      eight: Object.freeze({ standardItem: "freeze", endlessItem: "reshuffle" }),
-      ten: Object.freeze({ coins: 10 }),
+      rewards: Object.freeze([
+        Object.freeze({ coins: 10 }),
+        Object.freeze({ hint: 1 }),
+        Object.freeze({ coins: 20 }),
+        Object.freeze({ freeze: 1 }),
+        Object.freeze({ reshuffle: 1 }),
+        Object.freeze({ coins: 30 }),
+        Object.freeze({ hint: 1, freeze: 1 }),
+        Object.freeze({ thunder: 1 }),
+        Object.freeze({ coins: 50, hint: 1 }),
+        Object.freeze({ coins: 100, thunder: 1, reshuffle: 1 }),
+      ]),
     }),
   }),
 });
 
-export const LINK_SPECIAL_MILESTONE_TOOLTIPS = Object.freeze({
-  1: "Phá ngẫu nhiên 1 cặp thường.",
-  2: "+5 Xu.",
-  3: "Phá ngẫu nhiên 1 cặp thường.",
-  4: "+2–4 giây.",
-  5: "+1 Gợi ý hoặc +1 Xáo trộn ngẫu nhiên.",
-  6: "Mở 1 cặp băng hoặc +5 Xu.",
-  7: "+2–5 giây · +10 Xu.",
-  8: "+1 Đóng băng thời gian; Vô tận: +1 Xáo trộn.",
-  9: "Phá 1 cặp thường · +1 Gợi ý.",
-  10: "Phá 1 cặp thường · +10 Xu · +1 Xáo trộn · +1 Gợi ý.",
-});
-
-export function getLinkSpecialMilestoneTooltip(milestone) {
-  return LINK_SPECIAL_MILESTONE_TOOLTIPS[milestone] || "Phần thưởng mốc đặc biệt.";
+export function getLinkMilestoneRewards(milestone, mode = 'easy') {
+  const reward = LINK_CONNECT_CONFIG.special.milestones.rewards[milestone - 1];
+  if (!reward) throw new RangeError('Invalid Link milestone.');
+  if (mode !== 'endless' || !reward.freeze) return reward;
+  const { freeze, ...rest } = reward;
+  return { ...rest, coins: (rest.coins || 0) + 40 * freeze };
 }
+
+export function getLinkSpecialMilestoneTooltip(milestone, mode = 'easy') {
+  if (!LINK_CONNECT_CONFIG.special.milestones.rewards[milestone - 1]) return 'Phần thưởng mốc đặc biệt.';
+  const labels = { coins: 'Xu', hint: 'Gợi ý', reshuffle: 'Xáo trộn', thunder: 'Sấm sét', freeze: 'Đóng băng thời gian' };
+  const items = Object.entries(getLinkMilestoneRewards(milestone, mode))
+    .map(([type, value]) => `+${value} ${labels[type]}${type === 'coins' ? '' : ' vào kho'}`).join(' · ');
+  return [1, 3, 9, 10].includes(milestone) ? `Phá ngay 1 cặp thường · ${items}` : items;
+}
+
+export const LINK_SPECIAL_MILESTONE_TOOLTIPS = Object.freeze(Object.fromEntries(
+  Array.from({ length: 10 }, (_, index) => [index + 1, getLinkSpecialMilestoneTooltip(index + 1)]),
+));
 
 // Một nguồn thời lượng duy nhất cho hiệu ứng và nhịp chuyển trạng thái của Link Connect.
 export const LINK_CONNECT_TIMING = Object.freeze({

@@ -59,14 +59,14 @@ assert.deepEqual(TRIPLE_PRODUCT_DECISIONS.itemPrices, { hint: 64, timePerSecond:
 assert.equal(TRIPLE_PRODUCT_DECISIONS.trayExpansion.releasePrice, 3000);
 assert.deepEqual(TRIPLE_PRODUCT_DECISIONS.trayExpansion, { baseCapacity: 7, bonusCapacity: 3, experimentalPrice: 1, releasePrice: 3000 });
 assert.deepEqual(TRIPLE_PRODUCT_DECISIONS.milestones.rewards, [
-  { coins: 2 }, { hint: 1 }, { coins: 3, hint: 1 }, { time: 2, endlessCoins: 2 }, { undo: 1 },
-  { coins: 5, hint: 1 }, { shuffle: 1 }, { time: 3, hint: 1, endlessCoins: 3 }, { coins: 8 }, { coins: 25, hint: 1, undo: 1 },
+  { coins: 10 }, { hint: 1 }, { coins: 20 }, { timeItem: 1 }, { undo: 1 },
+  { coins: 30 }, { hint: 1, timeItem: 1 }, { shuffle: 1 }, { coins: 50, hint: 1 }, { coins: 100, undo: 1, shuffle: 1 },
 ]);
 let milestone = { version: 2, progress: 0, cycleId: 0, claimedIds: [] };
 for (let index = 0; index < 3; index += 1) milestone = resolveTripleMilestoneProgress({ milestones: milestone, tileIds: [`m-${index}`], mode: "easy" }).next;
 assert.equal(milestone.progress, 3);
 assert.deepEqual(milestone.claimedIds, ["0:1"]);
-assert.deepEqual(resolveTripleMilestoneProgress({ milestones: { version: 2, progress: 11, cycleId: 0, claimedIds: [] }, tileIds: ["x"], mode: "endless" }).rewards[0].reward, { coins: 2 });
+assert.deepEqual(resolveTripleMilestoneProgress({ milestones: { version: 2, progress: 11, cycleId: 0, claimedIds: [] }, tileIds: ["x"], mode: "endless" }).rewards[0].reward, { coins: 40 });
 assert.deepEqual(TRIPLE_PRODUCT_DECISIONS.milestones.itemFallbackCoins, { hint: 4, undo: 8, shuffle: 8 });
 let rollover = { version: 2, progress: 29, cycleId: 4, claimedIds: ["4:1", "4:2", "4:3", "4:4", "4:5", "4:6", "4:7", "4:8", "4:9"] };
 rollover = resolveTripleMilestoneProgress({ milestones: rollover, tileIds: ["last"], mode: "easy" }).next;
