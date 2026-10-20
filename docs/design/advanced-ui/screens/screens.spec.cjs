@@ -7,7 +7,8 @@ for (const viewport of sizes) test(`representative screens ${viewport.width}`, a
   const errors = []; page.on('pageerror', error => errors.push(error.message));
   await page.goto('/'); await page.locator('#app-loading').waitFor({ state: 'detached' });
   await page.addStyleTag({ url: '/docs/design/advanced-ui/screens/review.css' });
-  await page.evaluate(() => document.documentElement.dataset.uxReview = 'woodland');
+  await page.addStyleTag({ url: '/styles/ui-skin-icons.css' });
+  await page.evaluate(() => { document.documentElement.dataset.uxReview = 'woodland'; document.documentElement.dataset.uiSkin = 'woodland'; });
   const proof = [];
   async function shot(name, fixture = false) {
     const geometry = await page.evaluate(() => ({

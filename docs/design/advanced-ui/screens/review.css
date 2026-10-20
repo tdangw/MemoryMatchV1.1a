@@ -217,3 +217,64 @@ html[data-ux-review] .leaderboard-panel .leaderboard-tabs--game .app-button[aria
 html[data-ux-review] .leaderboard-panel .leaderboard-row { color: #4b2b18; }
 html[data-ux-review] :is(.profile-error, .account-error) { color: #a13e32; }
 html[data-ux-review] :is(#settings-modal, #account-modal, #missions-screen, #events-screen) .app-modal__header { background: linear-gradient(#a46b38, #6b3c24); }
+/* G2: first material group on the same product DOM. */
+html[data-ux-review] .game-selector__label {
+  background: none; border: 12px solid transparent;
+  border-image: url('/assets/ui/woodland/nameplate.webp') 48 82 fill / 12px stretch;
+}
+html[data-ux-review] .adventure-dock {
+  background: none; border: 10px solid transparent;
+  border-image: url('/assets/ui/woodland/nameplate.webp') 48 82 fill / 10px stretch;
+}
+html[data-ux-review] .adventure-dock button[aria-current="page"] {
+  background: url('/assets/ui/woodland/selected-tab.webp') center / 100% 100% no-repeat;
+  box-shadow: none; border-radius: 0;
+}
+html[data-ux-review] .tab-card {
+  background: none; border: 12px solid transparent;
+  border-image: url('/assets/ui/woodland/paper-panel.webp') 42 fill / 12px stretch;
+}
+html[data-ux-review] :is(.app-modal__close, .game-selector__arrow) {
+  background: url('/assets/ui/woodland/icon-base.webp') center / 100% 100% no-repeat;
+  border-color: transparent; box-shadow: none;
+}
+html[data-ux-review] .app-toast {
+  background: none; border: 10px solid transparent;
+  border-image: url('/assets/ui/woodland/notice.webp') 32 40 fill / 10px stretch;
+}
+html[data-ux-review] :is(.profile-avatar) { background: #fff3d3; }
+html[data-ux-review] .app-modal__title > .ui-icon { color: #fff0c5; }
+/* The dock material must not consume the space reserved for carousel controls. */
+html[data-ux-review] .adventure-dock {
+  position: relative; isolation: isolate; border: 0; border-image: none;
+}
+html[data-ux-review] .adventure-dock::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  border: 10px solid transparent;
+  border-image: url('/assets/ui/woodland/nameplate.webp') 48 82 fill / 10px stretch;
+}
+html[data-ux-review] #settings-container .settings-range::-webkit-slider-thumb {
+  border: 0; background: url('/assets/ui/woodland/slider-thumb.webp') center / contain no-repeat; box-shadow: none;
+}
+html[data-ux-review] #settings-container .settings-range::-moz-range-thumb {
+  border: 0; background: url('/assets/ui/woodland/slider-thumb.webp') center / contain no-repeat; box-shadow: none;
+}
+html[data-ux-review] :is(.app-button, .tab-button) {
+  border-image: url('/assets/ui/woodland/orange-normal.webp') 30 100 fill / 12px stretch;
+}
+html[data-ux-review] :is(.app-button--primary, .tab-button:not(.tab-button--quiet)) { border-image-source: url('/assets/ui/woodland/green-normal.webp'); }
+html[data-ux-review] :is(.app-button, .tab-button):active:not(:disabled) { border-image-source: url('/assets/ui/woodland/orange-pressed.webp'); }
+html[data-ux-review] :is(.app-button--primary, .tab-button:not(.tab-button--quiet)):active:not(:disabled) { border-image-source: url('/assets/ui/woodland/green-pressed.webp'); }
+html[data-ux-review] :is(.app-button--danger, .tab-button--danger) { border-image: none; }
+html[data-ux-review] .leaderboard-panel .leaderboard-tabs--game .app-button { border-image: none; }
+/* G2 reward art stays on the original SVG boxes and product controls. */
+html[data-ux-review] .treasure-art { background: center / contain no-repeat; }
+html[data-ux-review] .treasure-art > * { visibility: hidden; }
+html[data-ux-review] :is([data-treasure-tier="C"], [data-selected-tier="C"], [data-treasure-art-state^="C:"]) .treasure-art { background-image: url('/assets/ui/woodland/chest-C-closed.webp'); }
+html[data-ux-review] :is([data-treasure-tier="B"], [data-selected-tier="B"], [data-treasure-art-state^="B:"]) .treasure-art { background-image: url('/assets/ui/woodland/chest-B-closed.webp'); }
+html[data-ux-review] :is([data-treasure-tier="A"], [data-selected-tier="A"], [data-treasure-art-state^="A:"]) .treasure-art { background-image: url('/assets/ui/woodland/chest-A-closed.webp'); }
+html[data-ux-review] :is([data-treasure-tier="S"], [data-selected-tier="S"], [data-treasure-art-state^="S:"]) .treasure-art { background-image: url('/assets/ui/woodland/chest-S-closed.webp'); }
+html[data-ux-review] :is([data-treasure-tier="C"], [data-selected-tier="C"], [data-treasure-art-state^="C:"]) .treasure-art.is-open { background-image: url('/assets/ui/woodland/chest-C-open.webp'); }
+html[data-ux-review] :is([data-treasure-tier="B"], [data-selected-tier="B"], [data-treasure-art-state^="B:"]) .treasure-art.is-open { background-image: url('/assets/ui/woodland/chest-B-open.webp'); }
+html[data-ux-review] :is([data-treasure-tier="A"], [data-selected-tier="A"], [data-treasure-art-state^="A:"]) .treasure-art.is-open { background-image: url('/assets/ui/woodland/chest-A-open.webp'); }
+html[data-ux-review] :is([data-treasure-tier="S"], [data-selected-tier="S"], [data-treasure-art-state^="S:"]) .treasure-art.is-open { background-image: url('/assets/ui/woodland/chest-S-open.webp'); }
