@@ -46,7 +46,7 @@ import { presentMemoryPairRewards } from './memorySpecial.js';
 import { resolveMemoryPairRewards } from './memoryMatch/pairRewards.js';
 import { clearComboWindow, playComboWindow } from "./gameShell/comboWindowPresentation.js";
 import { memoryBoard, clearMemoryBoard, decideMemorySelection, decideMemoryPair } from './memoryMatch/memoryBoard.js';
-import { calculateGroupScore, calculateVictoryCoins, calculateFastFinishBonus, calculateProgressionStars } from './progression/gameplayRules.js';
+import { MATCH_COINS_PER_GROUP, calculateGroupScore, calculateVictoryCoins, calculateFastFinishBonus, calculateProgressionStars } from './progression/gameplayRules.js';
 import { completeWave, waveTotalGroups } from './progression/waveProgress.js';
 
 let levelCompleteActions = { onNext: () => {}, onMenu: () => {} };
@@ -216,8 +216,9 @@ async function checkMatch(roundId) {
     startComboWindow(comboWindowMs, matchedAt, roundId);
     const matchPoints = calculateGroupScore({ combo: gameState.combo });
     const score = increaseScore(matchPoints);
-    const matchCoins = 0;
+    const matchCoins = MATCH_COINS_PER_GROUP;
     const previousCoins = gameState.coins;
+    increaseCoins(matchCoins);
     const rewards = resolveMemoryPairRewards(gameState, { imageId: first.imageId, special: first.special });
     const totalCoins = gameState.coins;
     gameState.matchedPairs++;

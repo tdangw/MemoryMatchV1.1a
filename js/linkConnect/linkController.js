@@ -31,7 +31,7 @@ import { prepareAdventureChapter, stageAdventureLevelStart, canAdvanceAdventure 
 import { getChapterNumber } from "../adventureProgress.js";
 import { beginRankedAttempt, checkpointRankedRun, finalizeRankedRun, getRankedRun, stageRankedAttempt } from "../rankingRules.js";
 import { createWaveProgress, completeWave, activateNextWave, normalizeWaveProgress, waveTotalGroups } from '../progression/waveProgress.js';
-import { calculateGroupScore, calculateVictoryCoins, calculateFastFinishBonus, calculateProgressionStars, getProgressionStarTargets } from '../progression/gameplayRules.js';
+import { MATCH_COINS_PER_GROUP, calculateGroupScore, calculateVictoryCoins, calculateFastFinishBonus, calculateProgressionStars, getProgressionStarTargets } from '../progression/gameplayRules.js';
 import { getDifficultyAccess } from '../progression/difficultyProgress.js';
 import { playOwnedRewardCue } from '../sound.js';
 import { renderWaveStatus, announceWave, presentWaveExit, prepareWaveArrival } from '../progression/waveHud.js';
@@ -563,7 +563,7 @@ async function handleLinkTileClick(position) {
   drawLinkPath(path, linkGameState.board);
   removeLinkBoardPair(board, matchedStart, position);
   linkGameState.matchedPairs += 1;
-  const baseCoins = 0;
+  const baseCoins = MATCH_COINS_PER_GROUP;
   const rewards = resolveLinkPairRewards(linkGameState, gameState.progress.linkConnect.items, { special: isSpecialMatch, premiumType, luckyReward: firstTile.luckyReward });
   const previousCoins = gameState.coins;
   increaseCoins(baseCoins + rewards.coins);

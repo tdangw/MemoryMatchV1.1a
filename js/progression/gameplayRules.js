@@ -3,6 +3,7 @@ import { MAX_ADVENTURE_LEVEL } from '../adventureProgress.js';
 
 // Shared rules for multi-wave sessions, settlement and certified progression.
 export const GAMEPLAY_RULES_VERSION = 1;
+export const MATCH_COINS_PER_GROUP = 2;
 const COIN_EFFORT_TENTHS = Object.freeze({
   'memory-match': 10,
   'link-connect': 10,

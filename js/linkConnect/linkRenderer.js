@@ -383,6 +383,10 @@ export function playLinkSpecialPairTransform(tileKeys) {
 }
 
 export function playLinkFrozenPairUnlock(tileKeys) {
+  const owner = getLinkShell().scope;
+  if (owner?.active && tileKeys.some(key => tileElementsByKey.get(key)?.isConnected)) {
+    playOwnedRewardCue('frozenUnlock', owner, gameState.settings);
+  }
   const reducedMotion = prefersReducedMotion();
   tileKeys.forEach((tileKey) => {
     const tile = tileElementsByKey.get(tileKey);

@@ -71,7 +71,7 @@ import { getComboWindowMs } from "../gameplayTuning.js";
 import { clearComboWindow as clearComboWindowPresentation, playComboWindow } from "../gameShell/comboWindowPresentation.js";
 import { clearShellTimeout } from "../gameShell/gameShellLifecycle.js";
 import { createWaveProgress, completeWave, activateNextWave, normalizeWaveProgress, waveTotalGroups } from '../progression/waveProgress.js';
-import { calculateVictoryCoins, calculateFastFinishBonus, calculateProgressionStars, getProgressionStarTargets, getWavePatternIndex } from '../progression/gameplayRules.js';
+import { MATCH_COINS_PER_GROUP, calculateVictoryCoins, calculateFastFinishBonus, calculateProgressionStars, getProgressionStarTargets, getWavePatternIndex } from '../progression/gameplayRules.js';
 import { getDifficultyAccess } from '../progression/difficultyProgress.js';
 import { playOwnedRewardCue } from '../sound.js';
 import { renderWaveStatus, announceWave, presentWaveExit, prepareWaveArrival } from '../progression/waveHud.js';
@@ -544,7 +544,7 @@ return runRoundCommand(async () => {
       effects: {
         path: getLinkPathEffect(gameState.appearance.triplePathEffect),
         exit: getLinkExitEffect(gameState.appearance.tripleExitEffect),
-        rewards: [...rewards.lucky, ...rewards.milestones],
+        rewards: [...rewards.match, ...rewards.lucky, ...rewards.milestones],
         milestones: rewards.milestoneEvents,
       },
       render,
@@ -972,13 +972,15 @@ async function settleTerminalRound(shell, render) {
     return;
   }
   const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
-  if (settlement.reward > 0 && !reduced) {
-    const generation = roundGeneration;
+  if (settlement.reward > 0) {
     playCoinRewardFlight(
       shell.refs.board,
       shell.refs.root.querySelector(".stat-points"),
       settlement.reward,
     );
+  }
+  if (settlement.reward > 0 && !reduced) {
+    const generation = roundGeneration;
     shell.scope.timeout(() => {
       if (generation === roundGeneration && shell.scope.active) openSummary();
     }, 1700);
@@ -1132,7 +1134,7 @@ async function commitTripleResolutionRewards({ luckyEvent, matchEvent }) {
   const generation = roundGeneration;
   const pendingLucky = (luckyEvent?.rewards || []).filter((lucky) => !state.claimedLuckyIds.includes(lucky.id));
   const freshTileIds = (matchEvent?.tileIds || []).filter((id) => !state.milestoneTileIds.includes(id));
-  if (!pendingLucky.length && !freshTileIds.length) return { lucky: [], milestones: [], milestoneEvents: [] };
+  if (!pendingLucky.length && !freshTileIds.length) return { match: [], lucky: [], milestones: [], milestoneEvents: [] };
   const resolved = freshTileIds.length
     ? resolveTripleMilestoneProgress({ milestones: gameState.progress.tripleConnect.milestones, tileIds: freshTileIds, mode: currentMode })
     : { next: gameState.progress.tripleConnect.milestones, claimedTileIds: [], rewards: [] };
@@ -1140,6 +1142,7 @@ async function commitTripleResolutionRewards({ luckyEvent, matchEvent }) {
   if (pendingLucky.length) nextState = claimTripleLuckyRewards(nextState, pendingLucky.map((lucky) => lucky.id));
   if (resolved.claimedTileIds.length) nextState = claimTripleMilestoneTiles(nextState, resolved.claimedTileIds);
   const requested = [
+    ...(freshTileIds.length ? [{ type: 'coins', amount: MATCH_COINS_PER_GROUP, source: 'match' }] : []),
     ...pendingLucky.map((lucky) => ({ ...lucky.reward, source: "lucky", overflowCoins: 10 })),
     ...resolved.rewards.flatMap((milestone) => Object.entries(milestone.reward)
       .map(([type, amount]) => ({ type, amount, source: "milestone" }))),
@@ -1155,6 +1158,7 @@ async function commitTripleResolutionRewards({ luckyEvent, matchEvent }) {
   state = nextState;
   remainingTime += time;
   return {
+    match: committed.filter((reward) => reward.source === 'match'),
     lucky: committed.filter((reward) => reward.source === "lucky"),
     milestones: committed.filter((reward) => reward.source === "milestone"),
     milestoneEvents: resolved.rewards,

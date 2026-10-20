@@ -39,6 +39,7 @@ function presentResolvedTripleExit({ shell, scope, previous, match, selected, ef
   const sourceNodes = match.tileIds.map((id) => root.querySelector(`[data-tile-id="${id}"]`)).filter(Boolean);
   if (sourceNodes.length !== 3) { render(next); return Promise.resolve(); }
   if (prefersReducedMotion()) {
+    presentCommittedRewards(shell, sourceNodes[1], effects.rewards);
     render(next);
     return Promise.resolve();
   }

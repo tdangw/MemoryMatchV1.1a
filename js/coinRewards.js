@@ -3,10 +3,13 @@ import { shellTimeout as setTimeout, shellFrame as requestAnimationFrame, cancel
 import { createIcon } from "./icons.js";
 import { GAMEPLAY_TIMING } from "./gameplayTuning.js";
 import { prefersReducedMotion } from "./motion.js";
+import { getActiveGameScope } from './gameShell/gameShellLifecycle.js';
+import { gameState } from './gameState.js';
+import { MATCH_COINS_PER_GROUP } from './progression/gameplayRules.js';
 
 export const MATCH_COIN_REWARD = Object.freeze({
-  base: 2,
-  comboStep: 1,
+  base: MATCH_COINS_PER_GROUP,
+  comboStep: 0,
 });
 
 const counterAnimations = new WeakMap();
@@ -15,14 +18,21 @@ const activeCoinEffects = new Set();
 const effectEntries = new WeakMap();
 const counterPulseEntries = new WeakMap();
 
-export function calculateMatchCoinReward(combo = 1) {
-  return MATCH_COIN_REWARD.base
-    + MATCH_COIN_REWARD.comboStep * Math.max(0, Math.floor(Number(combo) || 1) - 1);
+export function calculateMatchCoinReward() {
+  return MATCH_COINS_PER_GROUP;
 }
 
 export function playCoinRewardFlight(source, target, amount) {
   const coinCount = Math.max(0, Math.floor(Number(amount) || 0));
   if (!source || !target || coinCount < 1) return [];
+  const owner = getActiveGameScope();
+  if (owner?.active) {
+    // Pure reward checks also import this module outside a browser. Audio is
+    // loaded only for a live presentation; the cue rechecks owner and settings.
+    void import('./sound.js').then(({ playOwnedRewardCue }) => {
+      playOwnedRewardCue('coinDrop', owner, gameState.settings);
+    }).catch(error => console.warn('Coin sound unavailable', error));
+  }
   if (prefersReducedMotion()) return [];
   const stableSource = source.closest?.(".link-board__cell, .tile") || source;
   const targetIcon = target.querySelector?.(".ui-icon") || target;

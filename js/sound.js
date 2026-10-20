@@ -36,8 +36,9 @@ const clampVolume = (value, fallback) => {
 
 // Fixed cue bank: no clones and at most one voice per cue across all surfaces.
 const rewardCueFiles = Object.freeze({
-  star1: 'star_1', star2: 'star_2', star3: 'star_3',
-  reward: 'reward', openBox: 'open_box', thunder: 'explosion',
+  star1: 'star_1.ogg', star2: 'star_2.ogg', star3: 'star_3.ogg',
+  reward: 'reward.ogg', openBox: 'open_box.ogg', thunder: 'explosion.ogg',
+  frozenUnlock: 'unlock_1.mp3', coinDrop: 'coin_drop.mp3',
 });
 const rewardCues = new Map();
 
@@ -47,7 +48,7 @@ export function playOwnedRewardCue(name, owner, settings) {
   if (!owner.active || document.hidden || !volume) return;
   let cue = rewardCues.get(name);
   if (!cue) {
-    cue = { audio: new Audio(assetUrl(`assets/sounds/${rewardCueFiles[name]}.ogg`)), stop: null };
+    cue = { audio: new Audio(assetUrl(`assets/sounds/${rewardCueFiles[name]}`)), stop: null };
     rewardCues.set(name, cue);
   }
   cue.stop?.();
