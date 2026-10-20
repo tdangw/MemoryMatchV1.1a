@@ -160,8 +160,13 @@ function positionTooltip(anchor, element) {
     + Math.max(0, candidate.left + size.width - (viewportWidth - VIEWPORT_GAP))
     + Math.max(0, VIEWPORT_GAP - candidate.top)
     + Math.max(0, candidate.top + size.height - (viewportHeight - VIEWPORT_GAP));
-  const candidate = candidates.find((item) => overflow(item) === 0)
-    || candidates.reduce((best, item) => overflow(item) < overflow(best) ? item : best);
+  const hud = anchor.closest('.game-hud')?.getBoundingClientRect();
+  const penalty = candidate => overflow(candidate) + (hud
+    ? Math.max(0, Math.min(candidate.left + size.width, hud.right) - Math.max(candidate.left, hud.left))
+      * Math.max(0, Math.min(candidate.top + size.height, hud.bottom) - Math.max(candidate.top, hud.top))
+    : 0);
+  const candidate = candidates.find(item => penalty(item) === 0)
+    || candidates.reduce((best, item) => penalty(item) < penalty(best) ? item : best);
   const left = Math.min(Math.max(candidate.left, VIEWPORT_GAP), viewportWidth - size.width - VIEWPORT_GAP);
   const top = Math.min(Math.max(candidate.top, VIEWPORT_GAP), viewportHeight - size.height - VIEWPORT_GAP);
   element.dataset.placement = candidate.placement;

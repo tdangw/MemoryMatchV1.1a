@@ -1,5 +1,3 @@
-import { playOwnedRewardCue } from "../sound.js";
-import { renderWaveStatus, announceWave, presentWaveExit, prepareWaveArrival } from "../progression/waveHud.js";
 import { gameRecordLabel } from '../gameRecord.js';
 import { openGameExitDialog } from "../gameExitDialog.js";
 import { showFullVictoryCelebration } from "victory-presentation";
@@ -75,6 +73,8 @@ import { clearShellTimeout } from "../gameShell/gameShellLifecycle.js";
 import { createWaveProgress, completeWave, activateNextWave, normalizeWaveProgress, waveTotalGroups } from '../progression/waveProgress.js';
 import { calculateVictoryCoins, calculateFastFinishBonus, calculateProgressionStars, getProgressionStarTargets, getWavePatternIndex } from '../progression/gameplayRules.js';
 import { getDifficultyAccess } from '../progression/difficultyProgress.js';
+import { playOwnedRewardCue } from '../sound.js';
+import { renderWaveStatus, announceWave, presentWaveExit, prepareWaveArrival } from '../progression/waveHud.js';
 import { pausePlayMetrics } from '../playMetrics.js';
 
 const development = import.meta.env?.DEV === true;
@@ -414,6 +414,7 @@ async function mountTripleDevelopmentRound(generated, { skipIntro = false, start
     const starProgress = { stars: calculateProgressionStars({ mode: currentMode, score: roundState.score, totalGroups, won: activeWave?.phase === 'won' }),
       score: roundState.score, thresholds: getProgressionStarTargets({ mode: currentMode, totalGroups }) };
     hud.stats({
+      // Wave status is separate from the compact numeric level stat.
       level: currentLevel,
       moves: roundState.moves,
       misses: roundState.misses,
@@ -548,6 +549,9 @@ return runRoundCommand(async () => {
       },
       render,
       isCurrent: () => presentationRevision === boardPresentationRevision,
+    }).catch(error => {
+      console.error('Triple presentation failed', error);
+      if (scope.active && generation === roundGeneration) render(state);
     }).finally(async () => {
       if (!scope.active) return;
       if (hasPresentation) presentationCount = Math.max(0, presentationCount - 1);
@@ -611,7 +615,7 @@ return runRoundCommand(async () => {
 return runRoundCommand(async () => {
       if (state.status !== "playing") return;
       const transition = reduceTrustedTripleCommand(state, { type: "undo" });
-      if (!transition.result.ok || !(await consumeTripleItem("undo"))) return;
+      if (!transition.result.ok || !(await consumeTripleItemWithSession("undo", createSession(transition.nextState, remainingTime)))) return;
       if (!scope.active || generation !== roundGeneration) return;
       state = transition.nextState;
       boardPresentationRevision += 1;

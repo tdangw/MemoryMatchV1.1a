@@ -46,7 +46,7 @@
 #theme-change-notice-modal .app-modal__close,
 #quick-time-modal .app-modal__close,
 #quick-preview-modal .app-modal__close {
-  background: var(--ui-art-garden-square) center / 100% 100% no-repeat;
+  background: var(--ui-raised);
   color: #f5f7fb;
 }
 
@@ -144,7 +144,7 @@
 .shop-tab {
   flex: 0 0 auto;
   min-width: 102px;
-  min-height: 34px;
+  min-height: 44px;
   border: 1px solid rgb(255 255 255 / 13%);
   border-radius: 10px;
   background: rgb(7 17 37 / 32%);
@@ -254,7 +254,7 @@
   min-width: 0;
   min-height: 132px;
   grid-template-columns: 1fr;
-  grid-template-rows: 52px minmax(2.1em, auto) 34px;
+  grid-template-rows: 52px minmax(2.1em, auto) 44px;
   align-items: center;
   justify-items: center;
   gap: 7px;
@@ -503,11 +503,8 @@
 #shop-confirm-modal .app-modal__footer { padding: 12px 14px 16px; gap: 8px; }
 #shop-confirm-modal .app-button { min-height: 44px; border-radius: 12px; }
 
-/* Shop owns its item and purchase image surfaces, including collection reuse. */
-.theme-choice, .appearance-choice, #shop-modal .shop-item { border-image-source: var(--ui-art-garden-panel); border-image-slice: 20% fill; border-image-width: 12px; background: #082631; }
-.theme-preview { background: var(--ui-art-garden-square) center / 100% 100% no-repeat; }
-#shop-modal .shop-buy-button, #collection-modal .shop-buy-button { border-image-source: var(--ui-art-garden-secondary); border-image-slice: 35% 27% fill; border-image-width: 12px 18px; background: transparent; }
-#shop-modal .appearance-action--equip, #collection-modal .appearance-action--equip { border-image-source: var(--ui-art-garden-primary); }
-#shop-modal .shop-buy-button:disabled, #collection-modal .shop-buy-button:disabled { border-image-source: var(--ui-art-garden-disabled); }
-.quick-assist__choice { border-image-source: var(--ui-art-garden-panel); border-image-slice: 20% fill; border-image-width: 12px; }
-#shop-confirm-modal .app-modal { border-image-source: var(--ui-art-garden-panel); }
+/* Collection and shop share content surfaces, not ornamental frames. */
+.theme-choice, .appearance-choice, #shop-modal .shop-item, .quick-assist__choice { border: 1px solid var(--ui-line); border-radius: 12px; background: var(--ui-surface); }
+#shop-modal .shop-buy-button, #collection-modal .shop-buy-button { min-height: 44px; min-width: 64px; padding: 8px 14px; background: var(--ui-raised); border: 1px solid var(--ui-line); color: var(--ui-ink); border-radius: 10px; }
+#shop-modal .appearance-action--equip, #collection-modal .appearance-action--equip { background: var(--ui-primary); }
+#shop-modal .shop-buy-button:disabled, #collection-modal .shop-buy-button:disabled { background: var(--ui-inset); color: var(--ui-muted); }

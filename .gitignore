@@ -16,3 +16,15 @@ android/keystores/
 *.keystore
 /docs/qa/gameplay-progression/private/
 /docs/qa/gameplay-progression/firebase-access.json
+
+# Local QA output and historical test runs; keep loading artwork sources.
+/docs/design/loading/*
+!/docs/design/loading/ASSETS.md
+!/docs/design/loading/masters/
+/docs/design/ui-consistency/
+/docs/qa/gameplay-progression/*
+/docs/qa/technical-improvement/
+
+# New local test files are not included in application commits.
+/tests/
+/test/

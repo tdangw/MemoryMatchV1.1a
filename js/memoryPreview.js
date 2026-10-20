@@ -3,6 +3,7 @@ import { gameState } from "./gameState.js";
 import { GAMEPLAY_TIMING } from "./gameplayTuning.js";
 import { showRevealTimerInHud } from "./ui.js";
 import { shuffleArray } from "./utils.js";
+import { memoryBoard } from './memoryMatch/memoryBoard.js';
 
 export function revealMemoryTiles(
   count = "all",
@@ -11,7 +12,8 @@ export function revealMemoryTiles(
 ) {
   if (gameState.roundId !== roundId || gameState.isPaused) return false;
   const grid = document.getElementById("grid-container");
-  const candidates = Array.from(document.querySelectorAll(".tile:not(.matched) img.hidden"));
+  const candidates = Array.from(document.querySelectorAll('#grid-container .tile img.hidden'))
+    .filter(image => memoryBoard.tiles.get(image.parentElement.id).matched === false);
   if (!candidates.length) return false;
   const selected = count === "all"
     ? candidates
@@ -29,7 +31,7 @@ export function revealMemoryTiles(
   setTimeout(() => {
     if (gameState.roundId !== roundId) return;
     selected.forEach((img) => {
-      if (!img.closest(".tile")?.classList.contains("matched")) img.classList.add("hidden");
+      if (img.isConnected && memoryBoard.tiles.get(img.parentElement.id).matched === false) img.classList.add("hidden");
       img.classList.remove("highlight-tile");
     });
     gameState.isLocked = false;

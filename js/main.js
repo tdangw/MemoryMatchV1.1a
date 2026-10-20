@@ -92,13 +92,14 @@ function showMemoryHelp() {
   );
 }
 
-async function initializeApplication() {
+export async function initializeApplication(onProgress = () => {}) {
 let accountRuntime = null;
 let accountReady = null;
 await loadPersistentGameData();
 const seasonReady = await ensureGameplaySeason();
 hydrateGameState(seasonReady ? await loadPersistentGameData() : undefined);
 setRankingOwner(await loadProfileOwner());
+onProgress('save');
 subscribeToPersistenceFailure(() => {
   openAppModal({
     id: "persistence-recovery-modal",
@@ -110,7 +111,7 @@ subscribeToPersistenceFailure(() => {
     actions: [{ label: "Tải lại", variant: "primary", onClick: () => window.location.reload() }],
   });
 });
-if (getPersistenceStatus().blocked) return;
+if (getPersistenceStatus().blocked) return false;
 updateMemoryAssistInventoryDisplay();
 initializeMeteorEffects(gameState.settings.meteorEffects);
 applyEffectsSettings(gameState.settings);
@@ -242,6 +243,7 @@ document.addEventListener(
   { passive: false },
 );
 
+onProgress('interface');
 const profileStats = await initializeProfileStatsService();
 showGameSelector();
 void initializeMenuAds();
@@ -292,7 +294,3 @@ document
   .getElementById("btn-preview-cards")
   ?.addEventListener("click", () => openQuickAssistOverlay("preview"));
 }
-initializeApplication().catch(error => {
-  console.error("[Startup]", error);
-  showAppToast("Không tải được dữ liệu. Hãy tải lại trang; bản lưu được giữ nguyên.", { tone: "warning", duration: 5000 });
-});

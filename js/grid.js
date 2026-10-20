@@ -8,6 +8,7 @@ import { getEquippedThemeId } from "./appearance.js";
 import { getThemeCards } from "./themeCatalog.js";
 import { connectGameShellLayout, getCompactLandscapeColumns } from "./gameShell/gameShellLayout.js";
 import { getMemoryShell } from "./memoryMatch/memoryShell.js";
+import { mountMemoryBoard, memoryBoard } from './memoryMatch/memoryBoard.js';
 
 // Only coordinate labels need a game-specific presentation override.
 const MEMORY_SHELL_UI = { layout: {
@@ -170,6 +171,7 @@ export function createGrid(
   if (startup) startup.check();
   gridContainer.querySelectorAll("img").forEach(image => image.removeAttribute("src"));
   gridContainer.replaceChildren(tiles);
+  mountMemoryBoard(cards, roundId);
 
   // ✅ Preview ảnh trước khi bắt đầu
   if (!deferPreview) setTimeout(() => {
@@ -197,7 +199,7 @@ export function revealAndHideTiles(roundId, onPreviewComplete, previewDurationMs
 
     allImgs.forEach((img) => {
       const parent = img.parentElement;
-      if (!parent.classList.contains("matched")) {
+      if (!memoryBoard.tiles.get(parent.id).matched) {
         img.classList.add("hidden");
       }
     });

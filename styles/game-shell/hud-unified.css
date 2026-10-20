@@ -1,22 +1,23 @@
 /* Geometry and presentation owner for all three HUD adapters. */
 :root {
-  --unified-hud-height: 44px;
+  --unified-hud-height: 48px;
+  --unified-hud-control-width: 44px;
   --unified-hud-radius: 10px;
-  --unified-hud-surface: linear-gradient(100deg, #182942, #243b64);
-  --unified-hud-label: #ffd166;
-  --unified-hud-value: #f5f7fb;
+  --unified-hud-surface: var(--ui-surface);
+  --unified-hud-label: var(--ui-muted);
+  --unified-hud-value: var(--ui-ink);
   --unified-hud-timer-warning: #ff8a80;
-  --unified-hud-divider: rgb(185 213 255 / 22%);
-  --unified-hud-button-surface: #365785;
-  --unified-hud-button-active: #486da1;
+  --unified-hud-divider: var(--ui-line);
+  --unified-hud-button-surface: var(--ui-inset);
+  --unified-hud-button-active: var(--ui-raised);
   --unified-hud-button-edge: rgb(185 213 255 / 55%);
-  --unified-hud-tools-surface: #64457d;
-  --unified-hud-tools-active: #80599a;
+  --unified-hud-tools-surface: var(--ui-inset);
+  --unified-hud-tools-active: var(--ui-raised);
   --unified-hud-tools-edge: rgb(222 184 255 / 65%);
-  --unified-hud-tools-icon: #f4e6ff;
+  --unified-hud-tools-icon: var(--ui-ink);
   --unified-hud-cell-padding: 2px;
-  --unified-hud-label-size: clamp(7px, 1.95vw, 9px);
-  --unified-hud-value-size: clamp(9px, 2.6vw, 12px);
+  --unified-hud-label-size: 10px;
+  --unified-hud-value-size: 14px;
   --unified-hud-milestone-margin: 2px auto 0;
   --unified-hud-star-offset: 6px;
   --unified-hud-side-reserve: calc(2 * (56px + 5px + var(--shell-active-side-padding)));
@@ -26,10 +27,10 @@
 .game-shell-root[data-shell-startup="preparing"] :is(.memory-tools-toggle, .link-tools-toggle, .triple-tools-toggle) { pointer-events: none; }
 .game-shell-root > [data-shell-region="milestones"] { margin: var(--unified-hud-milestone-margin); }
 .game-shell-root .game-hud {
-  --shell-hud-used-width: min(var(--board-width, var(--shell-layout-content-max-width)), 100%);
+  --shell-hud-used-width: 100%;
   position: relative;
   display: grid;
-  grid-template-columns: var(--unified-hud-height) minmax(0, 1fr) var(--unified-hud-height);
+  grid-template-columns: var(--unified-hud-control-width) minmax(0, 1fr) var(--unified-hud-control-width);
   align-items: stretch;
   width: var(--shell-hud-used-width);
   min-width: 0;
@@ -72,7 +73,7 @@
   gap: 1px;
   box-sizing: border-box;
   border: 0;
-  border-inline-start: 1px solid var(--unified-hud-divider);
+  border-inline-start: 0;
   border-radius: 0;
   background: transparent;
   color: var(--unified-hud-value);
@@ -109,7 +110,7 @@
   position: relative;
   display: grid;
   place-items: center;
-  width: var(--unified-hud-height);
+  width: var(--unified-hud-control-width);
   height: var(--unified-hud-height);
   padding: 0;
   margin: 0;
@@ -148,7 +149,7 @@
   box-sizing: border-box;
   border: 1px solid var(--unified-hud-divider);
   border-radius: 12px;
-  background: rgb(16 22 47 / 98%);
+  background: var(--ui-surface);
   box-shadow: 0 12px 30px rgb(0 0 0 / 35%);
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -156,7 +157,7 @@
   z-index: var(--shell-layers-menu);
 }
 .game-hud .game-actions-menu { left: 0; }
-.game-hud :is(.memory-tools-menu, .link-tools-menu, .triple-tools-menu) { right: 0; border-color: #c6ac6b; border-radius: 16px; background: var(--dialog-surface); box-shadow: var(--dialog-edge); }
+.game-hud :is(.memory-tools-menu, .link-tools-menu, .triple-tools-menu) { right: 0; border-color: var(--ui-line); border-radius: 16px; background: var(--dialog-surface); box-shadow: var(--dialog-edge); }
 .game-hud :is(.game-actions-menu, .memory-tools-menu, .link-tools-menu, .triple-tools-menu)[hidden] { display: none; }
 .game-hud :is(.game-actions-menu, .memory-tools-menu, .link-tools-menu, .triple-tools-menu)::-webkit-scrollbar { display: none; }
 .game-hud .game-hud__metric.stat-combo .combo-window-progress {
@@ -226,8 +227,8 @@
 
 .game-hud .hud-tool-item {
   display: grid;
-  min-height: var(--shell-hud-min-height);
-  grid-template-columns: 19px minmax(0, 1fr) 19px;
+  min-height: 48px;
+  grid-template-columns: 22px minmax(0, 1fr) 24px;
   align-items: center;
   gap: 7px;
   width: 100%;
@@ -236,13 +237,13 @@
   border-radius: 8px;
   background: transparent;
   color: #f5f7fb;
-  font: 700 0.74rem/1.1 "Segoe UI", sans-serif;
+  font: 600 14px/1.3 "Segoe UI", sans-serif;
   text-align: left;
 }
 
 .game-hud .hud-tool-item:hover,
 .game-hud .hud-tool-item:focus-visible { background: rgb(255 255 255 / 16%); outline: none; }
-.game-hud .hud-tool-item .ui-icon { width: 17px; height: 17px; color: #70c5ff; }
+.game-hud .hud-tool-item .ui-icon { width: 22px; height: 22px; color: var(--ui-gold); }
 .game-hud .hud-tool-item .hud-tool-count { display: grid; width: 18px; height: 18px; place-items: center; border-radius: 50%; background: rgb(242 191 91 / 18%); color: #f2bf5b; font-size: 0.64rem; }
 .game-hud .hud-tool-item.is-disabled { cursor: not-allowed; opacity: 0.44; }
 
@@ -269,12 +270,21 @@
   .link-game-hud .game-hud__metric.stat-timer > .link-freeze-progress { transition: none; }
 }
 
-/* Static image materials retain the shared HUD geometry and progress owners. */
-.game-shell-root .game-hud { border: 0 solid transparent; border-image-source: var(--ui-art-garden-inset); border-image-slice: 20% fill; border-image-width: 10px; }
+/* The HUD is a quiet surface; its shell still owns measurement and menus. */
+.game-shell-root .game-hud { border: 1px solid var(--ui-line); }
 .game-hud :is(.game-menu-toggle, .memory-tools-toggle, .link-tools-toggle, .triple-tools-toggle) { background: transparent; box-shadow: none; }
-.game-hud :is(.game-menu-toggle, .memory-tools-toggle, .link-tools-toggle, .triple-tools-toggle) .ui-icon { width: 24px; height: 24px; }
-.game-hud .game-actions-menu, .game-hud :is(.memory-tools-menu, .link-tools-menu, .triple-tools-menu) { border-image-source: var(--ui-art-garden-panel); border-image-slice: 20% fill; border-image-width: 18px; padding: 12px; }
-.game-hud .hud-tool-item { background: var(--ui-art-garden-inset) center / 100% 100% no-repeat; }
+.game-hud :is(.game-menu-toggle, .memory-tools-toggle, .link-tools-toggle, .triple-tools-toggle) .ui-icon { width: 24px; height: 24px; color: var(--ui-ink); }
 .game-milestone-stars .star-progress__milestone:not(.is-earned) .ui-icon { opacity: 1; filter: grayscale(1) brightness(.85); }
-
-.game-hud :is(.game-menu-toggle, .memory-tools-toggle, .link-tools-toggle, .triple-tools-toggle):is(:hover, :active, [aria-expanded="true"]) { background: #e8d49918; box-shadow: inset 0 0 0 1px #e3c77d66; }
+@media (width <= 480px) and (orientation: portrait) {
+  :root {
+    --unified-hud-height: 44px;
+    --unified-hud-control-width: 36px;
+    --unified-hud-cell-padding: 0px;
+    --unified-hud-label-size: clamp(6px, 2vw, 9px);
+    --unified-hud-value-size: clamp(9px, 2.75vw, 13px);
+  }
+  .game-hud .game-hud__metric { grid-template-rows: 10px 14px; }
+  .game-hud .stat-points > :not(.stat-label) { font-size: clamp(8px, 2.5vw, 12px); }
+  .game-hud .stat-stars .stat-label .ui-icon { width: 10px; height: 10px; }
+  .game-hud :is(.game-menu-toggle, .memory-tools-toggle, .link-tools-toggle, .triple-tools-toggle) .ui-icon { width: 18px; height: 18px; }
+}

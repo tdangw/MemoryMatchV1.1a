@@ -399,7 +399,7 @@
 }
 
 #time-up-modal .app-button {
-  min-height: 42px;
+  min-height: 48px;
   padding: 8px 10px;
   font-size: 0.82rem;
 }
@@ -409,13 +409,13 @@
   color: var(--dialog-ink);
 }
 #time-up-modal .app-button--primary {
-  background: transparent;
+  background: var(--ui-primary);
   color: #fff;
 }
 #time-up-modal .app-button--time-purchase {
-  border-color: rgb(242 191 91 / 40%);
-  background: transparent;
-  border-image-source: var(--ui-art-garden-primary);
+  border-color: var(--ui-line);
+  background: var(--ui-primary);
+  border-image-source: none;
   color: #ffe09a;
 }
 #time-up-modal .app-button--time-purchase .ui-icon {

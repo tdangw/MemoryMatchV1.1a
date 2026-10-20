@@ -102,3 +102,27 @@ await Promise.all(assetResponses);
 assert.equal(networkRequests, 1, "Hai thẻ cùng ảnh không được tạo hai yêu cầu mạng đồng thời.");
 
 console.log("PWA offline upgrade checks passed.");
+
+// Bootstrap may import the application after window.load has already fired.
+const registrationSource = (await readFile(new URL('../js/pwa.js', import.meta.url), 'utf8'))
+  .replace('export function', 'function')
+  .replace('import.meta.env.DEV', 'false')
+  .replace('import.meta.env.BASE_URL', "'/test/'");
+for (const readyState of ['loading', 'complete']) {
+  let registrations = 0;
+  let onLoad;
+  vm.runInNewContext(`${registrationSource}\nregisterProgressiveWebApp();`, {
+    navigator: {serviceWorker: {register(url) {
+      assert.equal(url, '/test/sw.js'); registrations++;
+      return Promise.resolve();
+    }}},
+    document: {readyState},
+    window: {addEventListener(event, handler, options) {
+      assert.equal(event, 'load'); assert.equal(options.once, true); onLoad = handler;
+    }},
+    console,
+  });
+  if (readyState === 'loading') {assert.equal(registrations, 0); onLoad();}
+  assert.equal(registrations, 1);
+}
+console.log('PWA early and late bootstrap registration passed.');

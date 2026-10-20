@@ -10,9 +10,11 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="description" content="Memory Match Adventure - trò chơi ghép cặp thẻ trên mobile." />
   <title>Memory Match Adventure</title>
+  <link rel="stylesheet" href="styles/startup-loading.css" />
+  <link rel="preload" as="image" href="/assets/images/home/memory-match-v2.webp" fetchpriority="high" />
   <link rel="stylesheet" href="styles/icons.css" />
   <link rel="stylesheet" href="styles/ui-art-tokens.css" />
-  <link rel="preload" as="image" href="/assets/images/ui/v1/garden-panel.webp" />
+  <link rel="stylesheet" href="styles/ui-theme.css" />
   <link rel="stylesheet" href="styles/game-shell/tokens.css" />
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="styles/settings.css" />
@@ -39,6 +41,17 @@
   <link rel="apple-touch-icon" href="./icons/memory-match-icon.svg" />
 </head>
 <body>
+  <section id="app-loading" class="startup-loading" aria-label="Đang mở Memory Match Adventure">
+    <div class="startup-loading__content">
+      <h1 class="startup-loading__title"><span>Memory Match</span><span>Adventure</span></h1>
+      <svg class="startup-loading__ornament" viewBox="0 0 150 22" aria-hidden="true" fill="none" stroke="currentColor"><path d="M0 11h61m28 0h61M68 11l7-7 7 7-7 7z"/><path d="M72 11h6"/></svg>
+      <div class="startup-loading__progress" role="progressbar" aria-label="Tiến trình khởi động" aria-valuemin="0" aria-valuemax="4" aria-valuenow="0" aria-valuetext="Đang tải…"><span class="startup-loading__fill"></span><span class="startup-loading__activity" aria-hidden="true"></span></div>
+      <p class="startup-loading__message" data-loading-message role="status">Đang tải…</p>
+      <button class="startup-loading__retry" data-loading-retry type="button" hidden>Tải lại</button>
+      <a class="startup-loading__retry startup-loading__fallback" href="">Tải lại</a>
+      <noscript><p>Hãy bật JavaScript để mở trò chơi.</p></noscript>
+    </div>
+  </section>
   <div class="main-wrapper">
     <!-- Game shells mount here. -->
 
@@ -57,7 +70,7 @@
     </div>
   </div>
 
-  <script type="module" src="/js/main.js"></script>
+  <script type="module" src="/js/bootstrap.js"></script>
 
 </body>
 </html>

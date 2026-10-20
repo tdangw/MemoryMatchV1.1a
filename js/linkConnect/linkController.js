@@ -1,6 +1,3 @@
-import { PROGRESSION_HELP_CONTENT } from "../progression/progressionCopy.js";
-import { playOwnedRewardCue } from "../sound.js";
-import { renderWaveStatus, announceWave, presentWaveExit, prepareWaveArrival } from "../progression/waveHud.js";
 import { resolveLinkPairRewards } from './pairRewards.js';
 import { gameRecordLabel } from '../gameRecord.js';
 import { rememberRecentGame } from '../recentGame.js';
@@ -36,6 +33,9 @@ import { beginRankedAttempt, checkpointRankedRun, finalizeRankedRun, getRankedRu
 import { createWaveProgress, completeWave, activateNextWave, normalizeWaveProgress, waveTotalGroups } from '../progression/waveProgress.js';
 import { calculateGroupScore, calculateVictoryCoins, calculateFastFinishBonus, calculateProgressionStars, getProgressionStarTargets } from '../progression/gameplayRules.js';
 import { getDifficultyAccess } from '../progression/difficultyProgress.js';
+import { playOwnedRewardCue } from '../sound.js';
+import { renderWaveStatus, announceWave, presentWaveExit, prepareWaveArrival } from '../progression/waveHud.js';
+import { PROGRESSION_HELP_CONTENT } from '../progression/progressionCopy.js';
 import { pausePlayMetrics } from '../playMetrics.js';
 import { getTheme, getThemeSelectionEligibility } from "../themeCatalog.js";
 import { GAME_MODES } from "../gameCatalog.js";
@@ -67,13 +67,16 @@ import {
   findLinkBoardTilePosition,
   getLinkBoardTile,
   hasOnlyFrozenLinkTiles,
+  hasLinkThunderPair,
+  isLinkThunderPairEligible,
   removeLinkBoardPair,
   removeRandomLinkPair,
   reflowLinkBoard,
   shuffleLinkBoard,
   unlockAllFrozenLinkPairsAndEnsurePlayable,
 } from "./linkBoard.js";
-import { findAvailableConnections, findConnectionPath } from "./pathfinder.js";
+import { findFirstAvailableConnection, hasAvailableConnection } from "./pathfinder.js";
+import { decideLinkSelection } from './linkTurn.js';
 import { consumeLinkItem, getLinkItemCount } from "./linkItems.js";
 import {
   commitThemeSession,
@@ -477,7 +480,7 @@ export async function runLinkGameAction(action) {
 
 function showLinkGameModal(title, content, icon) {
   pauseLinkForModal();
-  openAppModal({ id: "link-game-info-modal", title, content, icon, onClose: resumeLinkAfterModal });
+  openAppModal({ id: "link-game-info-modal", alignment: "center", title, content, icon, onClose: resumeLinkAfterModal });
 }
 
 export function openLinkPanel(open) {
@@ -502,26 +505,23 @@ function resumeLinkAfterShop() {
 }
 
 async function handleLinkTileClick(position) {
-  if (linkGameState.isLocked || linkGameState.isPaused) return;
-  const tile = getLinkBoardTile(linkGameState.board, position);
-  if (!tile || tile.frozen) return;
+  const decision = decideLinkSelection({ board: linkGameState.board, selected: selectedPosition,
+    position, locked: linkGameState.isLocked, paused: linkGameState.isPaused });
+  if (decision.type === 'reject') return;
   clearLinkTileHints();
-  if (!selectedPosition) {
+  if (decision.type === 'select') {
     selectedPosition = position;
     setLinkTileSelected(position, true);
     return;
   }
-  if (samePosition(selectedPosition, position)) {
+  if (decision.type === 'deselect') {
     setLinkTileSelected(position, false);
     selectedPosition = null;
     return;
   }
   linkGameState.moves += 1;
-  const firstTile = getLinkBoardTile(linkGameState.board, selectedPosition);
-  const path = firstTile?.id === tile.id
-    ? findConnectionPath(linkGameState.board.grid, selectedPosition, position)
-    : null;
-  if (!path) {
+  const { firstTile, tile, path } = decision;
+  if (decision.type === 'mismatch') {
     const roundId = linkGameState.roundId;
     const board = linkGameState.board;
     playLinkSound("wrong");
@@ -622,18 +622,36 @@ async function useLinkItem(id) {
     showAppToast("Chế độ Vô tận không dùng đóng băng thời gian.");
     return;
   }
-  const hintConnection = id === "hint" ? findAvailableConnections(linkGameState.board.grid)[0] : null;
+  const hintConnection = id === "hint" ? findFirstAvailableConnection(linkGameState.board.grid) : null;
   if (id === "hint" && !hintConnection) {
     showAppToast("Không có đường nối khả dụng để gợi ý.");
+    return;
+  }
+  if (id === 'thunder' && !hasLinkThunderPair(linkGameState.board)) {
+    showAppToast('Không còn cặp thẻ để Sấm sét phá hủy.');
     return;
   }
   const roundId = linkGameState.roundId;
   const board = linkGameState.board;
   linkGameState.isLocked = true;
+  const mode = linkGameState.mode;
+  const sessions = gameState.progress.linkConnect.sessionsByMode;
+  const previousSession = sessions?.[mode];
+  let stagedFreeze = false;
+  if (id === 'freeze' && getLinkItemCount(id) > 0) {
+    const session = createLinkSession();
+    session.pairSnapshot.freezeSeconds += 10;
+    stagedFreeze = stageActiveSession('link-connect', session);
+    if (!stagedFreeze) { linkGameState.isLocked = false; return; }
+  }
   const consumed = await consumeLinkItem(id);
   if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
   linkGameState.isLocked = false;
   if (!consumed) {
+    if (stagedFreeze) {
+      if (previousSession) gameState.progress.linkConnect.sessionsByMode[mode] = previousSession;
+      else delete gameState.progress.linkConnect.sessionsByMode[mode];
+    }
     showAppToast("Bạn chưa có vật phẩm này.");
     return;
   }
@@ -691,10 +709,7 @@ function useLinkThunder() {
     const pair = removeRandomLinkPair(linkGameState.board, {
       remove: false,
       excludeTileKeys: excludedTileKeys,
-      eligiblePair: (candidate, board) => candidate.positions.every((position) => {
-        const tile = getLinkBoardTile(board, position);
-        return tile && !tile.frozen && !tile.special && !tile.luckyReward;
-      }),
+      eligiblePair: isLinkThunderPairEligible,
     });
     if (!pair) break;
     removedPairs.push(pair);
@@ -1175,7 +1190,7 @@ function updateLinkSpecialMilestones(hud = getLinkHudElements()) {
 }
 
 function recoverBlockedLinkBoard(board) {
-  if (findAvailableConnections(board.grid).length) return false;
+  if (hasAvailableConnection(board.grid)) return false;
   if (hasOnlyFrozenLinkTiles(board)) {
     const { unlockedPairs, shuffled } = unlockAllFrozenLinkPairsAndEnsurePlayable(board, {
       onUnlock: rememberFrozenPairForTransform,
@@ -1340,8 +1355,4 @@ function stopLinkComboWindow() {
   clearTimeout(comboExpiryTimer);
   comboExpiryTimer = undefined;
   clearComboWindow(getLinkHudElements().comboCard);
-}
-
-function samePosition(left, right) {
-  return left.row === right.row && left.column === right.column;
 }

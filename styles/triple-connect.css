@@ -456,5 +456,5 @@
   font-size: 12px;
 }
 
-.triple-connect__tray { border-image-source: var(--ui-art-garden-tray); border-image-slice: 35% 25% fill; border-image-width: 12px 20px; }
-.triple-connect__tray-slot:not(.is-locked) { background: var(--ui-art-garden-square) center / 100% 100% no-repeat; }
+.triple-connect__tray { border-color: var(--ui-line); background: var(--ui-surface); }
+.triple-connect__tray-slot:not(.is-locked) { background: var(--ui-inset); border-color: var(--ui-line); }

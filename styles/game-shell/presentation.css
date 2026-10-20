@@ -23,6 +23,8 @@
 .game-shell-root.shell-compact-landscape > [data-shell-region="progress"],
 .game-shell-root.shell-compact-landscape > [data-shell-region="milestones"] { display: none; }
 .game-shell-root.shell-compact-landscape > [data-shell-region="hud"] {
+  align-self: flex-start;
+  margin-inline: 0;
   min-width: 0 !important;
   width: min(calc(var(--shell-hud-used-width) * var(--shell-hud-compact-landscape-width-ratio)), calc(100vw - var(--shell-viewport-safe-left) - var(--shell-viewport-safe-right))) !important;
 }
@@ -61,10 +63,10 @@
   width: var(--shell-fullscreen-size);
   height: var(--shell-fullscreen-size);
   padding: 0;
-  border: 1px solid rgb(146 219 255 / 30%);
+  border: 1px solid var(--ui-line);
   border-radius: var(--shell-fullscreen-radius);
   color: #eff8ff;
-  background: rgb(7 23 49 / 85%);
+  background: var(--ui-inset);
   cursor: pointer;
   touch-action: manipulation;
   z-index: calc(var(--shell-layers-hud) + 1);

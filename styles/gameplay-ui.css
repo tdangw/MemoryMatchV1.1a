@@ -73,7 +73,7 @@
   padding: 0;
   border: 0;
   border-radius: 9px;
-  background: var(--ui-art-garden-square) center / 100% 100% no-repeat;
+  background: var(--ui-raised);
   color: var(--dialog-gold);
   box-shadow: none;
   font-size: 0.7rem;
@@ -138,7 +138,7 @@
   left: var(--shell-hud-timer-inset);
   height: var(--shell-hud-timer-height);
   border-radius: 999px;
-  background: linear-gradient(90deg, #8fe9ff, #b9b0ff);
+  background: #7dafa3;
   box-shadow: 0 0 5px rgb(119 222 255 / 62%);
   opacity: 1;
   transform: scaleX(var(--game-timer-progress, 0));
@@ -481,8 +481,8 @@
   padding: 16px 18px;
   color: #eff8ff;
   text-align: center;
-  background: linear-gradient(145deg, rgb(16 48 83 / 96%), rgb(10 30 57 / 96%));
-  border: 1px solid rgb(160 209 255 / 54%);
+  background: var(--ui-surface);
+  border: 1px solid var(--ui-line);
   border-radius: 14px;
   box-shadow: 0 12px 28px rgb(0 0 0 / 32%), inset 0 1px 0 rgb(255 255 255 / 12%);
   pointer-events: none;
@@ -637,7 +637,6 @@
 
 .gameplay-reward-toast { background: var(--dialog-night-surface); border: 1px solid transparent; border-image-source: var(--ui-art-garden-panel); border-image-slice: 20% fill; border-image-width: 18px; color: var(--dialog-ink); padding-left: 62px; }
 .gameplay-reward-toast::before { content: ''; position: absolute; width: 34px; height: 34px; left: 18px; top: 50%; transform: translateY(-50%); background: var(--ui-art-night-gift) center / contain no-repeat; }
-.reward-container[data-ui-surface] .reward-title { padding: 16px 24px; background: var(--ui-art-garden-title) center / 100% 100% no-repeat; }
 
 .gameplay-reward-toast__title { color: var(--dialog-gold); }
 .gameplay-reward-toast__value { color: var(--dialog-ink); }

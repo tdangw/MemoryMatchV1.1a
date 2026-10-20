@@ -8,10 +8,10 @@ const TRAY_FLIGHT_DURATION_MS = 300;
 const TRAY_COMPACTION_DURATION_MS = 210;
 let activeMatchCleanup = null;
 
-export function presentTripleTransition({ shell, scope, previous, next, events, effects = {}, render, isCurrent = () => true }) {
+export async function presentTripleTransition({ shell, scope, previous, next, events, effects = {}, render, isCurrent = () => true }) {
   const match = events.find((event) => event.type === "triple-resolved");
   const selected = events.find((event) => event.type === "tile-selected");
-  if (!scope.active) { render(next); return Promise.resolve(); }
+  if (!scope.active) return;
   if (!match && selected) return presentTrayFlight({ shell, scope, selected, render, next });
   if (!match) { render(next); return Promise.resolve(); }
   return presentResolvedTriple({ shell, scope, previous, next, match, selected, effects, render, isCurrent });
@@ -44,24 +44,10 @@ function presentResolvedTripleExit({ shell, scope, previous, match, selected, ef
   }
   const ghosts = sourceNodes.map((source) => createGhost(source, surfaceRect));
   ghosts.forEach((ghost) => surface.append(ghost));
-  sourceNodes.forEach((source) => source.classList.add("is-match-exiting"));
-  const visualPreview = createMatchTrayPreview(previous, next, match);
-  // Keep the resolved group in the tray for the visual sequence, but feed the
-  // HUD from the committed state so score and game rules never wait on it.
-  render(next, { boardState: visualPreview });
-  const priorTrayRects = captureTrayRects(root);
-  const selectedGhost = ghosts[sourceNodes.findIndex((node) => node.dataset.tileId === selected?.tileId)];
-  const targetSlot = root.querySelectorAll(".triple-connect__tray-slot")[
-    getResolvedTrayTargetIndex(previous, selected?.tileId)
-  ];
-  const trayFlight = presentResolvedTrayFlight({
-    scope,
-    ghost: selectedGhost,
-    targetRect: targetSlot?.getBoundingClientRect(),
-  });
   let lineAnimation = null;
   let superseded = false;
   const cleanup = () => {
+    if (superseded) return;
     superseded = true;
     lineAnimation?.cancel();
     lineAnimation = null;
@@ -76,33 +62,44 @@ function presentResolvedTripleExit({ shell, scope, previous, match, selected, ef
   };
   activeMatchCleanup = cleanup;
   const release = scope.own(cleanup, "node");
-  return trayFlight
-    .then(() => {
-      if (superseded) return false;
-      showMatchFeedback(ghosts, match);
-      presentTripleConnection({ surface: line, targets: ghosts, effectId: effects.path?.id });
-      presentTripleExit({ surface, targets: ghosts, effectId: effects.exit?.id });
-      lineAnimation = line.animate(
-        [{ opacity: 0 }, { opacity: 1, offset: 0.25 }, { opacity: 1, offset: 0.62 }, { opacity: 0 }],
-        { duration: MATCH_DURATION_MS, easing: "ease-out", fill: "both" },
-      );
-      scope.animation(lineAnimation);
-      return lineAnimation.finished.catch(() => {}).then(() => true);
-    })
-    .then(() => {
-      if (superseded || !isCurrent()) return false;
-      render(next);
-      return animateTrayCompaction({ root, scope, priorTrayRects }).then(() => true);
-    })
-    .then((ready) => (ready && !superseded
-      ? presentMilestoneSequence({ shell, scope, source: ghosts[1] || ghosts[0], milestones: effects.milestones })
-      : false))
-    .then(() => {
-      if (superseded) return;
-      presentCommittedRewards(shell, ghosts[1] || ghosts[0], effects.rewards);
-      cleanup();
-      release.forget();
-    });
+  try {
+    sourceNodes.forEach((source) => source.classList.add("is-match-exiting"));
+    const visualPreview = createMatchTrayPreview(previous, next, match);
+    // The preview owns only the board; HUD always reads committed next state.
+    render(next, { boardState: visualPreview });
+    const priorTrayRects = captureTrayRects(root);
+    const selectedGhost = ghosts[sourceNodes.findIndex((node) => node.dataset.tileId === selected?.tileId)];
+    const targetSlot = root.querySelectorAll(".triple-connect__tray-slot")[getResolvedTrayTargetIndex(previous, selected?.tileId)];
+    const trayFlight = presentResolvedTrayFlight({ scope, ghost: selectedGhost, targetRect: targetSlot?.getBoundingClientRect() });
+    return trayFlight
+      .then(() => {
+        if (superseded) return false;
+        showMatchFeedback(ghosts, match);
+        presentTripleConnection({ surface: line, targets: ghosts, effectId: effects.path?.id });
+        presentTripleExit({ surface, targets: ghosts, effectId: effects.exit?.id });
+        lineAnimation = line.animate(
+          [{ opacity: 0 }, { opacity: 1, offset: 0.25 }, { opacity: 1, offset: 0.62 }, { opacity: 0 }],
+          { duration: MATCH_DURATION_MS, easing: "ease-out", fill: "both" },
+        );
+        scope.animation(lineAnimation);
+        return lineAnimation.finished.catch(() => {}).then(() => true);
+      })
+      .then(() => {
+        if (superseded || !isCurrent()) return false;
+        render(next);
+        return animateTrayCompaction({ root, scope, priorTrayRects }).then(() => true);
+      })
+      .then((ready) => (ready && !superseded
+        ? presentMilestoneSequence({ shell, scope, source: ghosts[1] || ghosts[0], milestones: effects.milestones })
+        : false))
+      .then(() => {
+        if (superseded) return;
+        presentCommittedRewards(shell, ghosts[1] || ghosts[0], effects.rewards);
+      }).finally(() => { cleanup(); release.forget(); });
+  } catch (error) {
+    cleanup(); release.forget();
+    throw error;
+  }
 }
 
 function createMatchTrayPreview(previous, next, match) {
@@ -216,13 +213,18 @@ function presentMilestoneSequence({ shell, scope, source, milestones = [] }) {
   }
   return new Promise((resolve) => {
     let settled = false;
+    let release;
     const finish = () => {
       if (settled) return;
       settled = true;
-      marker?.classList.add("is-milestone-pulse");
-      scope.timeout(() => marker?.classList.remove("is-milestone-pulse"), 260);
+      release?.forget();
+      if (scope.active) {
+        marker?.classList.add("is-milestone-pulse");
+        scope.timeout(() => marker?.classList.remove("is-milestone-pulse"), 260);
+      }
       resolve();
     };
+    release = scope.own(finish);
     const loot = playLootDrop(source, {
       icon: "energy",
       preset: "linkItem",
@@ -325,32 +327,36 @@ function presentTrayFlight({ shell, scope, selected, render, next }) {
   });
   surface.append(ghost);
   target.classList.add("is-tray-flight-target");
-  const dx = targetRect.left - sourceRect.left;
-  const dy = targetRect.top - sourceRect.top;
-  const scaleX = sourceRect.width ? targetRect.width / sourceRect.width : 1;
-  const scaleY = sourceRect.height ? targetRect.height / sourceRect.height : 1;
-  const lift = Math.min(34, Math.max(12, Math.abs(dy) * 0.16));
-  const animation = ghost.animate([
-    { transform: "translate(0, 0) scale(1)", opacity: 1 },
-    {
-      offset: 0.58,
-      transform: `translate(${dx * 0.54}px, ${dy * 0.48 - lift}px) scale(${1 + (scaleX - 1) * 0.54}, ${1 + (scaleY - 1) * 0.54})`,
-      opacity: 1,
-    },
-    { transform: `translate(${dx}px, ${dy}px) scale(${scaleX}, ${scaleY})`, opacity: 0.36 },
-  ], { duration: TRAY_FLIGHT_DURATION_MS, easing: "cubic-bezier(.18,.82,.22,1)", fill: "both" });
-  scope.animation(animation);
   const cleanup = () => {
     ghost.remove();
     target.classList.remove("is-tray-flight-target");
   };
   const release = scope.own(cleanup, "node");
-  return animation.finished.catch(() => {}).then(() => {
-    target.classList.add("is-tray-arrived");
-    scope.timeout(() => target.classList.remove("is-tray-arrived"), 180);
-    cleanup();
-    release.forget();
-  });
+  try {
+    const dx = targetRect.left - sourceRect.left;
+    const dy = targetRect.top - sourceRect.top;
+    const scaleX = sourceRect.width ? targetRect.width / sourceRect.width : 1;
+    const scaleY = sourceRect.height ? targetRect.height / sourceRect.height : 1;
+    const lift = Math.min(34, Math.max(12, Math.abs(dy) * 0.16));
+    const animation = ghost.animate([
+      { transform: "translate(0, 0) scale(1)", opacity: 1 },
+      {
+        offset: 0.58,
+        transform: `translate(${dx * 0.54}px, ${dy * 0.48 - lift}px) scale(${1 + (scaleX - 1) * 0.54}, ${1 + (scaleY - 1) * 0.54})`,
+        opacity: 1,
+      },
+      { transform: `translate(${dx}px, ${dy}px) scale(${scaleX}, ${scaleY})`, opacity: 0.36 },
+    ], { duration: TRAY_FLIGHT_DURATION_MS, easing: "cubic-bezier(.18,.82,.22,1)", fill: "both" });
+    scope.animation(animation);
+    return animation.finished.catch(() => {}).then(() => {
+      if (!scope.active) return;
+      target.classList.add("is-tray-arrived");
+      scope.timeout(() => target.classList.remove("is-tray-arrived"), 180);
+    }).finally(() => { cleanup(); release.forget(); });
+  } catch (error) {
+    cleanup(); release.forget();
+    throw error;
+  }
 }
 
 function prefersReducedMotion() {

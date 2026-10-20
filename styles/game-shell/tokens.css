@@ -32,9 +32,9 @@
   --shell-title-font-fluid: 4vw;
   --shell-title-line-height: 1.1;
   --shell-title-letter-spacing: 0.8px;
-  --shell-fullscreen-size: 24px;
-  --shell-fullscreen-icon-size: 16px;
-  --shell-fullscreen-radius: 8px;
+  --shell-fullscreen-size: 44px;
+  --shell-fullscreen-icon-size: 22px;
+  --shell-fullscreen-radius: 10px;
   --shell-fullscreen-title-gap: 6px;
   --shell-fullscreen-focus-font-size: 17.6px;
   --shell-hud-min-height: 34px;

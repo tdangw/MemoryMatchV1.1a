@@ -1,0 +1,18 @@
+/* Shared presentation tokens. Image URL tokens remain generated separately. */
+:root {
+  --ui-surface: #18313a;
+  --ui-inset: #11282e;
+  --ui-raised: #223f46;
+  --ui-ink: #f2eee2;
+  --ui-muted: #b8c4c2;
+  --ui-gold: #d3bd88;
+  --ui-line: #8c9c9259;
+  --ui-primary: #2b695f;
+  --ui-primary-hover: #34796d;
+  --ui-danger: #704443;
+  --ui-danger-ink: #ffe0da;
+  --ui-shadow: 0 8px 24px #0005;
+  --ui-control-height: 48px;
+  --ui-icon-target: 44px;
+  --ui-focus: #e2cc91;
+}

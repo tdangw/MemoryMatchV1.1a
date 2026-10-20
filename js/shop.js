@@ -34,6 +34,7 @@ import {
   getMemoryItemId,
 } from "./memoryItems.js";
 import { revealMemoryTiles } from "./memoryPreview.js";
+import { memoryBoard } from './memoryMatch/memoryBoard.js';
 import {
   TRIPLE_ITEMS,
   getTripleItemCount,
@@ -48,7 +49,7 @@ import { getTripleTrayCapacity, normalizeTripleTrayExpansionSlots, TRIPLE_PRODUC
 
 export function openQuickAssistOverlay(kind) {
   if (gameState.isLocked || gameState.isPaused) return;
-  if (document.querySelector(".tile.selected")) {
+  if (memoryBoard.selectedIds.length) {
     showShopMessage(
       "Hãy hoàn thành lượt chọn hiện tại trước khi dùng vật phẩm.",
       "info",
@@ -102,11 +103,11 @@ export function openQuickAssistOverlay(kind) {
     const quantity = document.createElement("span");
     quantity.textContent = `Đang có: ${count}`;
     button.append(createIcon(item.icon), label, quantity);
-    button.addEventListener("click", async () => {
-      if (!(await useMemoryAssistItem(item, roundId))) return;
+    button.addEventListener("click", () => modal.submit(async () => {
+      if (!(await useMemoryAssistItem(item, roundId))) return false;
+      if (gameState.roundId !== roundId || !modal.panel.isConnected) return false;
       if (item.type === "preview") pendingPreviewItem = item;
-      modal.close();
-    });
+    }));
     choices.append(button);
   });
 }
@@ -125,6 +126,7 @@ async function useMemoryAssistItem(item, roundId) {
     stageMemorySession();
   }
   if (!(await savePersistentGameData({ progress: gameState.progress }))) {
+    if (gameState.roundId !== roundId) return false;
     gameState.progress.memoryMatch.items = previousItems;
     gameState.remainingTime = previousTime;
     if (previousSession) sessions[mode] = previousSession;
@@ -132,6 +134,7 @@ async function useMemoryAssistItem(item, roundId) {
     showShopMessage("Không thể lưu. Vật phẩm chưa được sử dụng.", "error");
     return false;
   }
+  if (gameState.roundId !== roundId) return false;
   updateMemoryAssistInventoryDisplay();
   if (item.type === "time") {
     updateTimerDisplay(gameState.remainingTime);

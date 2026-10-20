@@ -426,7 +426,7 @@ function openLevelSummaryOverlay({
   luckyAwards = [],
   settings = {},
   onNext,
-  nextLabel = "Next Level",
+  nextLabel = "Màn tiếp theo",
   onMenu,
   isVictoryCelebration = false,
   onCelebrate,
@@ -448,35 +448,7 @@ function openLevelSummaryOverlay({
 
   const heading = document.createElement("h3");
   heading.className = "level-summary__heading";
-  const svgNS = "http://www.w3.org/2000/svg";
-  const titleArt = document.createElementNS(svgNS, "svg");
-  titleArt.setAttribute("viewBox", "0 0 360 82");
-  const curve = document.createElementNS(svgNS, "path");
-  const curveId = `summary-title-curve-${generation}`;
-  curve.id = curveId;
-  curve.setAttribute("d", "M38 54 Q180 18 322 54");
-  curve.setAttribute("fill", "none");
-  const defs = document.createElementNS(svgNS, "defs");
-  const gold = document.createElementNS(svgNS, "linearGradient");
-  const goldId = `summary-title-gold-${generation}`;
-  gold.id = goldId;
-  gold.setAttribute("x2", "0");
-  gold.setAttribute("y2", "1");
-  for (const [offset, color] of [["0%", "#fff4c8"], ["45%", "#f1d58b"], ["100%", "#c6a353"]]) {
-    const stop = document.createElementNS(svgNS, "stop");
-    stop.setAttribute("offset", offset); stop.setAttribute("stop-color", color); gold.append(stop);
-  }
-  defs.append(gold);
-  const titleText = document.createElementNS(svgNS, "text");
-  titleText.style.fill = `url(#${goldId})`;
-  const titlePath = document.createElementNS(svgNS, "textPath");
-  titlePath.setAttribute("href", `#${curveId}`);
-  titlePath.setAttribute("startOffset", "50%");
-  titlePath.setAttribute("text-anchor", "middle");
-  titlePath.textContent = `Hoàn thành Màn ${level}!`;
-  titleText.append(titlePath);
-  titleArt.append(defs, curve, titleText);
-  heading.append(titleArt);
+  heading.textContent = `Hoàn thành Màn ${level}!`;
 
   const result = document.createElement("div");
   result.className = "level-summary__result";

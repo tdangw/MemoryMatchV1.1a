@@ -80,5 +80,3 @@
 @media (prefers-reduced-motion: reduce) {
   .game-selector__choice { transition: none; }
 }
-
-.game-selector__label { background: var(--ui-art-garden-inset) center / 100% 100% no-repeat; }

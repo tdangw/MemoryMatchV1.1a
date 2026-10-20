@@ -45,11 +45,10 @@ import {
 import { presentMemoryPairRewards } from './memorySpecial.js';
 import { resolveMemoryPairRewards } from './memoryMatch/pairRewards.js';
 import { clearComboWindow, playComboWindow } from "./gameShell/comboWindowPresentation.js";
-
+import { memoryBoard, clearMemoryBoard, decideMemorySelection, decideMemoryPair } from './memoryMatch/memoryBoard.js';
 import { calculateGroupScore, calculateVictoryCoins, calculateFastFinishBonus, calculateProgressionStars } from './progression/gameplayRules.js';
 import { completeWave, waveTotalGroups } from './progression/waveProgress.js';
 
-let selectedTiles = [];
 let levelCompleteActions = { onNext: () => {}, onMenu: () => {} };
 let pendingMismatch = null;
 let comboExpiryTimer;
@@ -68,10 +67,11 @@ export function configureLogic(actions) {
   levelCompleteActions = { ...levelCompleteActions, ...actions };
 }
 
-export function resetLogicRuntime() {
+export function resetLogicRuntime({ preserveBoard = false } = {}) {
   if (pendingMismatch) clearTimeout(pendingMismatch.timeoutId);
   pendingMismatch = null;
-  selectedTiles = [];
+  memoryBoard.selectedIds = [];
+  if (!preserveBoard) clearMemoryBoard();
   lastMatchAt = 0;
   stopComboWindow();
   clearMemoryTileAnimations();
@@ -117,6 +117,7 @@ function resolvePendingMismatch({ immediately = false } = {}) {
   clearTimeout(mismatch.timeoutId);
   if (gameState.roundId !== mismatch.roundId) return;
 
+  memoryBoard.selectedIds = [];
   mismatch.tiles.forEach((tile) => tile.classList.remove("selected", "wrong"));
   if (immediately) {
     mismatch.tiles.forEach((tile) =>
@@ -141,7 +142,7 @@ function resolvePendingMismatch({ immediately = false } = {}) {
  * Khởi tạo logic và gán sự kiện click cho tất cả tile
  */
 export function initLogic() {
-  resetLogicRuntime();
+  resetLogicRuntime({ preserveBoard: true });
   const tiles = document.querySelectorAll(".tile");
   tiles.forEach((tile) => {
     tile.onclick = async () => (await handleTileClick(tile));
@@ -152,26 +153,21 @@ export function initLogic() {
  * Xử lý khi người chơi click vào tile
  */
 export async function handleTileClick(tileElement) {
+  if (document.getElementById(tileElement.id) !== tileElement) return;
   // Chạm một thẻ mới trong lúc cặp sai đang hiện sẽ đóng cặp đó ngay.
   resolvePendingMismatch({ immediately: true });
-  if (gameState.isLocked || selectedTiles.length >= 2) return;
-
-  const imageId = tileElement.dataset.imageId;
   const img = tileElement.querySelector("img");
-
-  if (tileElement.classList.contains("selected") && img) {
+  // The DOM adapter resolves a live node to its stable model ID only.
+  const decision = decideMemorySelection(memoryBoard, tileElement.id, {
+    roundId: gameState.roundId, locked: gameState.isLocked, hasImage: Boolean(img),
+  });
+  if (decision === 'reject') return;
+  if (decision === 'deselect') {
     tileElement.classList.remove("selected");
-    selectedTiles = selectedTiles.filter(({ element }) => element !== tileElement);
+    memoryBoard.selectedIds = memoryBoard.selectedIds.filter(id => id !== tileElement.id);
     hideTile(img, gameState.roundId);
     return;
   }
-
-  // Không cho tương tác lại với thẻ đã ghép hoặc phần tử ảnh không hợp lệ.
-  if (
-    tileElement.classList.contains("matched") ||
-    !img
-  )
-    return;
 
   // 🎵 Phát âm click nếu bật sound
   if (gameState.settings?.sound) {
@@ -182,12 +178,8 @@ export async function handleTileClick(tileElement) {
   revealTile(img);
   tileElement.classList.add("selected");
 
-  selectedTiles.push({
-    element: tileElement,
-    imageId,
-    special: tileElement.dataset.special === "true",
-  });
-  if (selectedTiles.length === 2) {
+  memoryBoard.selectedIds.push(tileElement.id);
+  if (memoryBoard.selectedIds.length === 2) {
     gameState.moves++;
     updateMovesDisplay(gameState.moves);
     setInteractionLocked(true);
@@ -197,8 +189,9 @@ export async function handleTileClick(tileElement) {
 
 // So khớp 2 tile được chọn
 async function checkMatch(roundId) {
-  const [first, second] = selectedTiles;
-
+  const [first, second] = memoryBoard.selectedIds.map(id => ({
+    ...memoryBoard.tiles.get(id), id, element: document.getElementById(id),
+  }));
   if (first.imageId === second.imageId) {
     const rollback = structuredClone({ coins: gameState.coins, progress: gameState.progress.memoryMatch,
       score: gameState.score, combo: gameState.combo, matchedPairs: gameState.matchedPairs, remainingTime: gameState.remainingTime,
@@ -208,19 +201,21 @@ async function checkMatch(roundId) {
     second.element.classList.remove("selected");
     first.element.classList.add("matched");
     second.element.classList.add("matched");
+    memoryBoard.tiles.get(first.id).matched = true;
+    memoryBoard.tiles.get(second.id).matched = true;
 
+    // Keep the original logical clock boundary after snapshot/staging work.
     const matchedAt = performance.now();
     const comboWindowMs = getComboWindowMs(gameState.totalPairs);
-    gameState.combo = lastMatchAt && matchedAt - lastMatchAt <= comboWindowMs
-      ? gameState.combo + 1
-      : 1;
+    const decision = decideMemoryPair(first, second, {
+      combo: gameState.combo, lastMatchAt, matchedAt, comboWindowMs,
+    });
+    gameState.combo = decision.combo;
     const resolvedCombo = gameState.combo;
     lastMatchAt = matchedAt;
     startComboWindow(comboWindowMs, matchedAt, roundId);
     const matchPoints = calculateGroupScore({ combo: gameState.combo });
     const score = increaseScore(matchPoints);
-    updateScoreDisplay(score);
-    showScoreEffect(second.element, matchPoints);
     const matchCoins = 0;
     const previousCoins = gameState.coins;
     const rewards = resolveMemoryPairRewards(gameState, { imageId: first.imageId, special: first.special });
@@ -232,19 +227,29 @@ async function checkMatch(roundId) {
       gameState.progress.memoryMatch = rollback.progress;
       for (const key of Object.keys(rollback)) if (key !== 'progress') gameState[key] = rollback[key];
       first.element.classList.remove('matched'); second.element.classList.remove('matched');
+      memoryBoard.tiles.get(first.id).matched = false;
+      memoryBoard.tiles.get(second.id).matched = false;
       stopComboWindow(); lastMatchAt = 0;
+      updateScoreDisplay(gameState.score);
+      updateComboDisplay(gameState.combo);
+      updateTimerDisplay(gameState.remainingTime);
+      syncMemoryTimeProgress({ remainingSeconds: gameState.remainingTime, timeLimit: gameState.timeLimit });
       showBonusOverlay("Không thể lưu phần thưởng Xu lúc này.");
       return;
     }
     else {
       if (gameState.roundId !== roundId) return;
+      updateScoreDisplay(score);
+      showScoreEffect(second.element, matchPoints);
       showMemoryCoinReward(second.element, previousCoins, totalCoins, matchCoins);
     }
     highlightTarget("#score");
     updateLevelStarsDisplay(calculateProgressionStars({ score, totalGroups: waveTotalGroups(gameState.wave), mode: gameState.settings.mode, won: false }));
     updateComboDisplay(gameState.combo);
     if (resolvedCombo >= 2) {
-      setTimeout(() => showComboEffect(second.element, resolvedCombo), 650);
+      setTimeout(() => {
+        if (gameState.roundId === roundId) showComboEffect(second.element, resolvedCombo);
+      }, 650);
     }
     highlightTarget("#pair-progress");
 
@@ -259,6 +264,7 @@ async function checkMatch(roundId) {
 
     setInteractionLocked(false, roundId);
     if (gameState.matchedPairs < gameState.totalPairs) await saveMemorySession({ assetPaths: getActiveSession('memory-match', gameState.settings.mode)?.assetPaths || [] });
+    if (gameState.roundId !== roundId) return;
     (await checkLevelComplete());
   } else {
     gameState.misses++;
@@ -287,7 +293,9 @@ async function checkMatch(roundId) {
     };
   }
 
-  selectedTiles = [];
+  // Wrong tiles remain selected until the mismatch owner closes them, just as
+  // the original DOM contract required for Hint and the item picker.
+  if (gameState.roundId === roundId && !pendingMismatch) memoryBoard.selectedIds = [];
 }
 
 export function memoryComboRemainingMs() {
@@ -354,9 +362,6 @@ export async function checkLevelComplete() {
       durationMs,
       wave: gameState.wave,
     });
-    updateScoreDisplay(finalScore);
-    updateLevelStarsDisplay(stars);
-    updateTotalStarsDisplay(progressResult.totalStars);
     const totalCoins = increaseCoins(coinsEarned);
     stageRankedAttempt("memory-match", gameState.settings.mode, finalScore, true);
     checkpointRankedRun("memory-match", gameState.settings.mode);
@@ -371,6 +376,9 @@ export async function checkLevelComplete() {
       return;
     }
     if (gameState.roundId !== roundId) return;
+    updateScoreDisplay(finalScore);
+    updateLevelStarsDisplay(stars);
+    updateTotalStarsDisplay(progressResult.totalStars);
     updateCoinDisplay(totalCoins);
     duckBackgroundMusicForVictory(gameState.settings);
     if (gameState.settings?.sound) {

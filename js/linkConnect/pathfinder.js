@@ -13,11 +13,11 @@ export function findConnectionPath(grid, start, end, {
   if (!isValidGrid(grid) || !isValidPosition(grid, start) || !isValidPosition(grid, end)) return null;
   if (samePosition(start, end) || !grid[start.row][start.column] || !grid[end.row][end.column]) return null;
 
-  const queue = [{ ...start, direction: -1, turns: 0, route: [{ ...start }] }];
+  const queue = [{ ...start, direction: -1, turns: 0, parent: null }];
   const visited = new Map();
 
-  while (queue.length) {
-    const current = queue.shift();
+  for (let head = 0; head < queue.length; head += 1) {
+    const current = queue[head];
     for (let direction = 0; direction < DIRECTIONS.length; direction += 1) {
       const next = {
         row: current.row + DIRECTIONS[direction].row,
@@ -30,19 +30,18 @@ export function findConnectionPath(grid, start, end, {
         : current.turns + 1;
       if (turns > maxTurns) continue;
 
-      const route = [...current.route, next];
-      if (samePosition(next, end)) return compressRoute(route);
+      if (samePosition(next, end)) return compressRoute(reconstructRoute(current, next, start));
 
       const key = `${next.row}:${next.column}:${direction}`;
       if ((visited.get(key) ?? Infinity) <= turns) continue;
       visited.set(key, turns);
-      queue.push({ ...next, direction, turns, route });
+      queue.push({ ...next, direction, turns, parent: current });
     }
   }
   return null;
 }
 
-export function findAvailableConnections(grid) {
+function collectConnections(grid, firstOnly) {
   if (!isValidGrid(grid)) return [];
   const positionsById = new Map();
   grid.forEach((row, rowIndex) => row.forEach((tile, columnIndex) => {
@@ -53,19 +52,31 @@ export function findAvailableConnections(grid) {
   }));
 
   const connections = [];
-  positionsById.forEach((positions, id) => {
+  for (const [id, positions] of positionsById) {
     for (let left = 0; left < positions.length - 1; left += 1) {
       for (let right = left + 1; right < positions.length; right += 1) {
         const path = findConnectionPath(grid, positions[left], positions[right]);
-        if (path) connections.push({ id, start: positions[left], end: positions[right], path });
+        if (path) {
+          const connection = { id, start: positions[left], end: positions[right], path };
+          if (firstOnly) return [connection];
+          connections.push(connection);
+        }
       }
     }
-  });
+  }
   return connections;
 }
 
+export function findAvailableConnections(grid) {
+  return collectConnections(grid, false);
+}
+
+export function findFirstAvailableConnection(grid) {
+  return collectConnections(grid, true)[0] || null;
+}
+
 export function hasAvailableConnection(grid) {
-  return findAvailableConnections(grid).length > 0;
+  return findFirstAvailableConnection(grid) !== null;
 }
 
 function compressRoute(route) {
@@ -81,6 +92,12 @@ function compressRoute(route) {
   }
   points.push(route.at(-1));
   return points;
+}
+
+function reconstructRoute(current, end, start) {
+  const route = [end];
+  for (let node = current; node; node = node.parent) route.push(node.parent ? { row: node.row, column: node.column } : { ...start });
+  return route.reverse();
 }
 
 function isTraversable(grid, position, end) {

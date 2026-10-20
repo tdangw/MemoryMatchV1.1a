@@ -301,6 +301,17 @@ export function makeRandomLinkPairSpecial(board, random = Math.random) {
   return pair;
 }
 
+export function isLinkThunderPairEligible(pair, board) {
+  return pair.positions.every(position => {
+    const tile = getLinkBoardTile(board, position);
+    return tile && !tile.frozen && !tile.special && !tile.luckyReward;
+  });
+}
+
+export function hasLinkThunderPair(board) {
+  return getLinkPairs(board).some(pair => pair.positions.length === 2 && isLinkThunderPairEligible(pair, board));
+}
+
 export function removeRandomLinkPair(board, { excludeTileKeys = [], eligiblePair, remove = true } = {}) {
   const excludedKeys = new Set(excludeTileKeys);
   const pairs = getLinkPairs(board).filter((pair) => (

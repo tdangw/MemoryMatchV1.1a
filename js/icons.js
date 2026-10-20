@@ -1,8 +1,15 @@
 import { UI_ART_ICONS } from './uiArtManifest.js';
 const SVG_NS = "http://www.w3.org/2000/svg";
-const ICON_FALLBACK_NAMES = Object.freeze({ "star-empty": "star", "victory-home": "home", "victory-next": "arrow-right" });
+const ICON_FALLBACK_NAMES = Object.freeze({ "star-empty": "star", "victory-home": "home", "victory-next": "arrow-right", freeze: "snowflake" });
+// Illustrations stay in rewards; functional controls share the vector icon set.
+const ILLUSTRATED_ICONS = new Set(['coin', 'star', 'star-empty', 'chest', 'chest-open', 'celebrate']);
 
 const ICON_PATHS = Object.freeze({
+  lock: '<rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/>',
+  close: '<path d="m6 6 12 12M18 6 6 18"/>',
+  snowflake: '<path d="M12 2v20M3.3 7l17.4 10M3.3 17 20.7 7M9 4l3 3 3-3M9 20l3-3 3 3M4 10l4-1-1-4M20 14l-4 1 1 4M4 14l4 1-1 4M20 10l-4-1 1-4"/>',
+  shuffle: '<path d="M3 6h3c5 0 7 12 12 12h3M17 14l4 4-4 4M3 18h3c2 0 3.5-2 5-5M13 9c1.5-2 3-3 5-3h3M17 2l4 4-4 4"/>',
+  expand: '<path d="M9 3H3v6M15 3h6v6M3 15v6h6M21 15v6h-6"/>',
   'rank-medal': '<path class="rank-medal__ribbons" d="m7 12-2 10 4-2 2 3 2-10M13 13l1 10 3-3 3 2-3-10"/><path class="rank-medal__face" d="m12 1 2 1.2 2.4.2.9 2.2 1.8 1.6-.5 2.3.5 2.3-1.8 1.6-.9 2.2-2.4.2L12 16l-2-1.2-2.4-.2-.9-2.2-1.8-1.6.5-2.3-.5-2.3 1.8-1.6.9-2.2 2.4-.2z"/><circle class="rank-medal__shine" cx="12" cy="8.5" r="5.3"/>',
   check: '<path d="m5 12 4 4L19 6"/>',
   edit: '<path d="m4 16 11-11 4 4L8 20H4zM13 7l4 4M15 5l2-2 4 4-2 2"/>',
@@ -81,7 +88,7 @@ export function createIcon(name) {
   svg.setAttribute("aria-hidden", "true");
   svg.setAttribute("focusable", "false");
   const fallbackName = ICON_FALLBACK_NAMES[name] || name;
-  const artwork = UI_ART_ICONS[name];
+  const artwork = ILLUSTRATED_ICONS.has(name) ? UI_ART_ICONS[name] : null;
   if (artwork) {
     const image = document.createElementNS(SVG_NS, 'image');
     image.setAttribute('href', `${import.meta.env?.BASE_URL || '/'}${artwork.replace(/^\//, '')}`);

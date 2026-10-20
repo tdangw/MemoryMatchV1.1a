@@ -28,7 +28,7 @@ export const GAME_SHELL_SCHEMA = freeze({
     fontMin: px(21.6), fontMax: px(44.8), fontFluid: { value: 4, unit: "vw", min: 0 },
     lineHeight: { value: 1.1, unit: "", min: 0.1 }, letterSpacing: px(0.8),
   },
-  fullscreen: { size: px(24, 1), iconSize: px(16, 1), radius: px(8), titleGap: px(6), focusFontSize: px(17.6) },
+  fullscreen: { size: px(44, 1), iconSize: px(22, 1), radius: px(10), titleGap: px(6), focusFontSize: px(17.6) },
   hud: {
     minHeight: px(34), mobileMinHeight: px(30), radius: px(9),
     sidePadding: px(74), mobileSidePadding: px(104),

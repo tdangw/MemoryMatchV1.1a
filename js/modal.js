@@ -93,12 +93,36 @@ export function openAppModal({
     }, UI_TIMING.modalCloseMs);
   };
 
+  // Footer and custom content actions share the same modal-owned submission,
+  // dismissal and cleanup boundary.
+  const submit = async (onClick) => {
+    if (submitting || closed) return;
+    submitting = true;
+    panel.setAttribute("aria-busy", "true");
+    const controls = [...panel.querySelectorAll("button")].map(control => [control, control.disabled]);
+    for (const [control] of controls) control.disabled = true;
+    try {
+      const result = await onClick?.(close);
+      if (result === undefined || result === null) close();
+    } catch (error) {
+      console.error("Modal action failed", error.code || error.name);
+      if (!destroyed) showAppToast("Thao tác chưa hoàn tất. Hãy thử lại.", { tone: "warning" });
+    } finally {
+      submitting = false;
+      if (!destroyed) {
+        panel.removeAttribute("aria-busy");
+        for (const [control, disabled] of controls) control.disabled = disabled;
+        onActionSettled?.();
+      }
+    }
+  };
+
   if (dismissible && !screen) {
     const closeButton = document.createElement("button");
     closeButton.className = "app-modal__close";
     closeButton.type = "button";
     closeButton.setAttribute("aria-label", "Đóng");
-    closeButton.textContent = "×";
+    closeButton.append(createIcon('close'));
     lifecycle.listen(closeButton, "click", () => { if (!submitting) close(); });
     header.appendChild(closeButton);
   }
@@ -120,27 +144,7 @@ export function openAppModal({
       button.className = `app-button app-button--${variant}`;
       if (icon) button.appendChild(createIcon(icon));
       button.appendChild(document.createTextNode(label));
-      lifecycle.listen(button, "click", async () => {
-        if (submitting || closed) return;
-        submitting = true;
-        panel.setAttribute("aria-busy", "true");
-        const controls = [...panel.querySelectorAll("button")].map(control => [control, control.disabled]);
-        for (const [control] of controls) control.disabled = true;
-        try {
-          const result = await onClick?.(close);
-          if (result === undefined || result === null) close();
-        } catch (error) {
-          console.error("Modal action failed", error.code || error.name);
-          if (!destroyed) showAppToast("Thao tác chưa hoàn tất. Hãy thử lại.", { tone: "warning" });
-        } finally {
-          submitting = false;
-          if (!destroyed) {
-            panel.removeAttribute("aria-busy");
-            for (const [control, disabled] of controls) control.disabled = disabled;
-            onActionSettled?.();
-          }
-        }
-      });
+      lifecycle.listen(button, "click", () => submit(onClick));
       footer.appendChild(button);
     });
     panel.appendChild(footer);
@@ -173,7 +177,7 @@ export function openAppModal({
     });
   }
 
-  return { overlay, panel, body, close, destroy };
+  return { overlay, panel, body, close, destroy, submit };
 }
 
 export function showAppToast(message, { tone = "info", duration = 1600, position = 'top' } = {}) {

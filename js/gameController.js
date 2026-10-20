@@ -1,5 +1,5 @@
-import { renderWaveStatus, announceWave, presentWaveExit, prepareWaveArrival } from "./progression/waveHud.js";
 import { rememberRecentGame } from './recentGame.js';
+import { memoryBoard } from './memoryMatch/memoryBoard.js';
 import { canLaunchGame } from "./profileOperations.js";
 import { shellTimeout as setTimeout, shellInterval as setInterval, clearShellInterval as clearInterval } from "./gameShell/gameShellLifecycle.js";
 import {
@@ -72,6 +72,7 @@ import { getChapterNumber } from "./adventureProgress.js";
 import { beginRankedAttempt, finalizeRankedRun } from "./rankingRules.js";
 import { createWaveProgress, completeWave, activateNextWave, normalizeWaveProgress } from './progression/waveProgress.js';
 import { getDifficultyAccess } from './progression/difficultyProgress.js';
+import { renderWaveStatus, announceWave, presentWaveExit, prepareWaveArrival } from './progression/waveHud.js';
 import { pausePlayMetrics, snapshotPlayMetrics } from './playMetrics.js';
 
 let countdownInterval;
@@ -500,18 +501,16 @@ export async function handleHintClick() {
   if (gameState.isLocked || gameState.isPaused) return;
   if (gameState.progress.memoryMatch.items.hint <= 0) return showBonusOverlay("Bạn đã hết lượt gợi ý.");
   const roundId = gameState.roundId;
-  if (document.querySelector(".tile.selected")) {
+  if (memoryBoard.selectedIds.length) {
     showBonusOverlay("Hãy hoàn thành lượt chọn hiện tại trước khi dùng gợi ý.");
     return;
   }
 
   const tilePairs = {};
-  document
-    .querySelectorAll(".tile:not(.matched):not(.selected)")
-    .forEach((tile) => {
-      const imageId = tile.dataset.imageId;
-      (tilePairs[imageId] ||= []).push(tile);
-    });
+  for (const [id, tile] of memoryBoard.tiles) {
+    if (tile.matched || memoryBoard.selectedIds.includes(id)) continue;
+    (tilePairs[tile.imageId] ||= []).push(document.getElementById(id));
+  }
 
   const availablePairs = Object.values(tilePairs).filter(
     (tiles) => tiles.length >= 2,
@@ -520,9 +519,12 @@ export async function handleHintClick() {
     availablePairs[Math.floor(Math.random() * availablePairs.length)];
   if (!pair) return showBonusOverlay("Hiện không có cặp thẻ phù hợp để gợi ý.");
 
+  gameState.isLocked = true;
   gameState.progress.memoryMatch.items.hint -= 1;
   if (!(await persistMemorySession())) {
+    if (gameState.roundId !== roundId) return;
     gameState.progress.memoryMatch.items.hint += 1;
+    gameState.isLocked = false;
     return showBonusOverlay("Không thể lưu lượt gợi ý. Hãy thử lại.");
   }
   if (gameState.roundId !== roundId) return;

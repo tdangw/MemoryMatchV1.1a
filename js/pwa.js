@@ -12,9 +12,11 @@ export function registerProgressiveWebApp() {
     return;
   }
 
-  window.addEventListener("load", () => {
+  const register = () => {
     navigator.serviceWorker
       .register(`${import.meta.env.BASE_URL}sw.js`)
       .catch((error) => console.warn("Không thể khởi tạo chế độ chơi offline:", error));
-  });
+  };
+  if (document.readyState === 'complete') register();
+  else window.addEventListener("load", register, {once: true});
 }

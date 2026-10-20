@@ -116,6 +116,7 @@ function bindSettingsControls() {
 function showVersionInfo() {
   openAppModal({
     id: "version-modal",
+    alignment: "center",
     icon: "info",
     title: "Giới thiệu & phiên bản",
     content: `

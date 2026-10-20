@@ -48,6 +48,7 @@ export function configureMainMenu({
 export function showInfoModal(title, message, icon = "info") {
   openAppModal({
     id: "info-modal",
+    alignment: "center",
     icon,
     title,
     content: message,
@@ -470,6 +471,7 @@ export function showGameInfoModal(title, message, icon = "info", onClose = () =>
   gameState.isPaused = true;
   openAppModal({
     id: "info-modal",
+    alignment: "center",
     icon,
     title,
     content: message,

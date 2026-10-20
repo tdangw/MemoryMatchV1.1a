@@ -221,7 +221,9 @@ export function mountAdventureMap(gameId) {
         const number = document.createElement("span"); number.className = "adventure-level-number";
         number.textContent = String(node.level);
         number.style.fontSize = `${Math.min(15, 52 / number.textContent.length)}px`;
-        control.append(number);
+        const lock = createIcon('lock');
+        lock.classList.add('adventure-level-lock');
+        control.append(number, lock);
       }
       else {
         control.dataset.chest = String(node.chestNumber);

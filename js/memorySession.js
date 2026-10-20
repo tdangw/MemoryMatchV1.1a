@@ -4,6 +4,7 @@ import { snapshotPlayMetrics } from "./playMetrics.js";
 import { getRankedRun, stageRankedAttempt } from "./rankingRules.js";
 import { getEquippedThemeId } from './appearance.js';
 import { memoryComboRemainingMs } from './logic.js';
+import { snapshotMemoryTiles } from './memoryMatch/memoryBoard.js';
 let boardSeed = crypto.randomUUID();
 let boardThemeId;
 export function beginMemoryBoardIdentity(seed, themeId) { boardSeed = seed || crypto.randomUUID(); boardThemeId = themeId; }
@@ -18,7 +19,7 @@ export function getMemorySessionSnapshot(overrides = {}) {
       score: gameState.score, moves: gameState.moves, misses: gameState.misses, combo: gameState.combo,
       capturedAt: Date.now(), comboRemainingMs: memoryComboRemainingMs(),
       matchedPairs: gameState.matchedPairs, totalPairs: gameState.totalPairs,
-      tiles: [...document.querySelectorAll('#grid-container .tile')].map(tile => ({ id: tile.dataset.imageId, special: tile.dataset.special === 'true', matched: tile.classList.contains('matched') })),
+      tiles: snapshotMemoryTiles(),
       luckyRewards: [...gameState.luckyRewards.entries()], luckyAwards: structuredClone(gameState.luckyAwards),
     },
     mode: gameState.settings.mode,
