@@ -1,5 +1,16 @@
 # CONTEXT — Trạng thái hiện tại (2026-10-20)
 
+## Kế hoạch hiện hành: giao diện toàn dự án, hướng dẫn và phần thưởng — 20/10/2026
+
+- Nguồn kế hoạch hiện hành duy nhất cho công việc giao diện/hướng dẫn/phần thưởng này: [GAME_UX_SKIN_PLAN.md](GAME_UX_SKIN_PLAN.md). Chủ dự án xác nhận **phạm vi toàn bộ ứng dụng và cả ba trò**, không chỉ popup thắng. Lượt làm rõ này cập nhật kế hoạch/inventory, chưa triển khai toàn bộ skin vào sản phẩm.
+- Phạm vi bắt buộc: startup/Home; dock Home (Nhiệm vụ, Sự kiện, Profile — đề xuất nhãn Hồ sơ, Xếp hạng, Cài đặt); dock từng trò (Cửa hàng, Bộ sưu tập, Bản đồ, Xếp hạng, Cài đặt) và nội dung/tab con; preview; HUD/menu/bàn/công cụ ba trò; mọi họ popup, toast/tooltip; tiến trình/rương/tranh/hướng dẫn. Kế hoạch có bảng owner, ảnh so với dữ liệu động, state, nhóm sheet và gate G0–G10. Nhiệm vụ/Sự kiện chỉ thiết kế trạng thái hiện hữu, không tự thêm chức năng.
+- **Chủ dự án đã loại hướng Ngọc Lam vì quá giống mặc định.** Hướng mới theo mẫu gửi20/10: gỗ/giấy sáng, ribbon đỏ, sao vàng tròn, nút cam/xanh lá nổi khối. Giữ lựa chọn Mặc định/Nâng cao; không tiếp tục dùng palette Ngọc Lam làm nguồn triển khai.
+- Nguồn mới: docs/design/advanced-ui/woodland (14asset, manifest, prompt và phép kiểm trên popup js/ui.js thật). **Đây chỉ là mẫu thử phong cách cho popup thắng, chưa phải catalog toàn dự án.** Test chụp mặc định rồi tiêm CSS review lên cùng DOM/kết quả ở3trò×4viewport; chỉ là fixture hiển thị, không phải lượt chơi thắng tự nhiên hoặc test grant thưởng. Kết quả cuối/giới hạn nằm trong README và qa/ của bộ mới; chưa đưa vào public/preload.
+- Lượt xác nhận cuối bộ mới:12/12case đạt, gồm icon/nhãn/ô số không chồng, panel/nút trong viewport và body hiện đủ tiêu đề/ba hàng kết quả; đã sửa tràn ô số và clipping ở320px/landscape. Ảnh đối chiếu chính là woodland/qa/comparison-runtime.png, không phải comparison.png của bản HTML cũ.
+- Bộ52asset và24case HTML độc lập Ngọc Lam giữ làm lịch sử thiết kế chưa duyệt; chúng **không chứng minh popup thắng sản phẩm**. Bản ghép cũ có bố cục/nút đóng khác thật; không dùng ảnh đó làm baseline nữa.
+- Build web trong lượt thiết kế đạt; check chung trên working tree dừng tại sound.js:5(import.meta.env.MODE trong Node), ngoài thay đổi bộ ảnh. Không báo check toàn dự án đã đạt; giữ log trong QA của bộ thiết kế, không sửa/hoàn nguyên code âm thanh của công việc khác.
+- Hướng dẫn tương tác ba trò và nâng trải nghiệm10mảnh/300xu là các luồng trong cùng kế hoạch hiện hành; không đổi luật/kinh tế hoặc coi Rương Sưu Tập là phần thưởng cộng thêm. Không đánh dấu UI toàn dự án hoàn tất nếu mới có popup thắng. Khi được giao triển khai toàn kế hoạch thì làm liên tục các gate chưa đạt trong phạm vi được giao; yêu cầu cập nhật kế hoạch hiện tại không tự cấp phạm vi sửa runtime toàn app.
+
 ## Gameplay nhiều đợt và Kho báu hành trình — 20/10/2026
 
 - Chuyển wave hiện hành: thông báo khoảng 2 giây; thẻ mới hiện theo lớp với bốn hướng ngẫu nhiên, không quét sáng. Chờ bàn sẵn sàng mới chạy giờ; nhạc tiếp tục xuyên suốt, không đổi nguồn khi đồng bộ. Hiệu ứng có owner, cleanup và reduced-motion; không đổi gameplay/save.
@@ -14,7 +25,7 @@
 
 - Kho báu hành trình R0–R6 đã hoàn tất trên web; xem phần gameplay cập nhật20/10 ở đầu file và receipt chung.
 
-- Không còn gate triển khai kỹ thuật hoặc UI đang mở. Chủ dự án đang thử web; các phản hồi tiếp theo là chỉnh sửa mới, không tự mở lại task đã hoàn tất.
+- Các gate kỹ thuật/UI cũ đã hoàn tất. Kế hoạch GAME_UX_SKIN_PLAN.md hiện bao phủ giao diện toàn dự án; mới có mẫu thử popup thắng, các màn/asset/runtime còn lại đang ở mức kế hoạch. Lượt hiện tại chỉ cập nhật phạm vi và đặc tả; không tự mở lại task cũ hoặc báo toàn bộ giao diện đã xong. Chủ dự án đang thử web.
 - Kế hoạch tiến trình gameplay P0–P9 và R0–R6 đã hoàn tất và được xóa; contract hiện hành ở phần gameplay và ARCHITECTURE.md. Giữ giới hạn máy thật và ranh giới baseline của task khác.
 - Giữ [kế hoạch quảng cáo/APK](ADS_APK_TEST_PLAN.md): phần mềm đã bàn giao, Gate5 quảng cáo thật/Galaxy S22 Ultra/Auth native/hiệu suất thiết bị còn chờ. Đây không phải chỉ thị tự tạo APK hoặc triển khai thêm quảng cáo.
 - Người dùng chọn tự xuất bản website và thông điệp AdMob ngày16/10. Bản nháp Quyền riêng tư đã lưu riêng, chưa bật; URL công khai lần kiểm tra trước vẫn trả trang chọn trò chơi. Cần xác minh lại khi chủ dự án hoàn tất xuất bản. Hướng dẫn: [thử APK](docs/ads/HUONG_DAN_THU_APK.md), [QA quảng cáo](docs/ads/QA.md).

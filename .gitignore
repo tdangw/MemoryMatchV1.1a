@@ -16,7 +16,7 @@ android/keystores/
 *.keystore
 /docs/qa/gameplay-progression/private/
 /docs/qa/gameplay-progression/firebase-access.json
-
+/docs/
 # Local QA output and historical test runs; keep loading artwork sources.
 /docs/design/loading/*
 !/docs/design/loading/ASSETS.md
