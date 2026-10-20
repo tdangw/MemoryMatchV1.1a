@@ -34,7 +34,7 @@ import {
   getActiveSession,
   saveActiveSession,
 } from "../sessionProgress.js";
-import { consumeTripleItem, getTripleItemCount } from "./tripleItems.js";
+import { consumeTripleItem, getTripleItemCount, getTripleItemDefinition } from "./tripleItems.js";
 import { getTripleHintTileIds } from "./tripleHint.js";
 import { endTripleRound } from "./tripleState.js";
 import {
@@ -589,7 +589,7 @@ return runRoundCommand(async () => {
       getTripleItemCount("time") < 1
     )
       return;
-    const nextRemainingTime = remainingTime + 1;
+    const nextRemainingTime = remainingTime + getTripleItemDefinition('time').value;
     if (
       !(await consumeTripleItemWithSession(
         "time",

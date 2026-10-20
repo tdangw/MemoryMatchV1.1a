@@ -1,3 +1,5 @@
+export const CONSUMABLE_PRICE_MULTIPLIER = 8;
+
 export const SHOP_ITEMS = Object.freeze([
   {
     id: "time-10",
@@ -94,13 +96,13 @@ export const SHOP_ITEMS = Object.freeze([
     price: 30,
     type: "reveal-all",
   },
-]);
+].map(item => Object.freeze({ ...item, price: item.price * CONSUMABLE_PRICE_MULTIPLIER })));
 
 // Gói thời gian dùng trong popup hết giờ của mọi game có countdown.
 // Tách riêng khỏi SHOP_ITEMS vì chúng chỉ xuất hiện sau khi hết giờ.
 export const TIME_UP_PURCHASES = Object.freeze([
-  Object.freeze({ seconds: 1, price: 2 }),
-  Object.freeze({ seconds: 5, price: 10 }),
+  ...SHOP_ITEMS.filter(item => item.type === 'time' && [10, 30].includes(item.value))
+    .map(item => Object.freeze({ seconds: item.value, price: item.price })),
 ]);
 
 export function getShopItemPrice(item) {

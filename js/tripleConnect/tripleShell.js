@@ -3,7 +3,7 @@ import { createGameShellHud } from "../gameShell/gameShellHud.js";
 import { createIcon } from "../icons.js";
 import { TRIPLE_ITEMS } from "./tripleItems.js";
 import { formatClockTime } from "../uiCatalog.js";
-import { TRIPLE_PRODUCT_DECISIONS } from "./tripleConfig.js";
+import { TRIPLE_PRODUCT_DECISIONS, TRIPLE_TIME_ITEM_SECONDS } from "./tripleConfig.js";
 
 let shell;
 const tripleHud = new WeakMap();
@@ -74,7 +74,7 @@ export function getTripleHud(elements = getTripleHudElements()) {
   if (tripleHud.has(elements.root)) return tripleHud.get(elements.root);
   const stats = Object.fromEntries(["level", "timer", "totalStars", "moves", "misses", "combo", "score"].map((key) => [key, { element: elements[key] }]));
   stats.timer.format = formatClockTime;
-  const toolCopy = { hint: "Chỉ ra thẻ có thể ghép bộ ba.", time: "Thêm một giây vào đồng hồ.", undo: "Hoàn tác lượt chọn gần nhất.", shuffle: "Xáo vị trí các thẻ còn lại." };
+  const toolCopy = { hint: "Chỉ ra thẻ có thể ghép bộ ba.", time: `Thêm ${TRIPLE_TIME_ITEM_SECONDS} giây vào đồng hồ.`, undo: "Hoàn tác lượt chọn gần nhất.", shuffle: "Xáo vị trí các thẻ còn lại." };
   const tools = Object.fromEntries(elements.itemCounts.map((count) => {
     const key = count.dataset.tripleItemCount;
     return [key, { count, element: count.closest("button"), tooltip: toolCopy[key] }];

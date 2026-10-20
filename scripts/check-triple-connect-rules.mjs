@@ -55,7 +55,7 @@ assert.equal(calculateTripleCoinReward({ mode: "easy", matchedTriples: 6, stars:
 assert.equal(calculateTripleCoinReward({ mode: "challenge", matchedTriples: 3, stars: 2, maxCombo: 1 }), 10);
 assert.equal(calculateTripleCoinReward({ mode: "endless", matchedTriples: 25, stars: 1, maxCombo: 5 }), 25);
 assert.deepEqual(TRIPLE_PRODUCT_DECISIONS.initialItems, { hint: 3 });
-assert.deepEqual(TRIPLE_PRODUCT_DECISIONS.itemPrices, { hint: 8, timePerSecond: 2, undo: 15, shuffle: 15 });
+assert.deepEqual(TRIPLE_PRODUCT_DECISIONS.itemPrices, { hint: 64, timePerSecond: 16, undo: 120, shuffle: 120 });
 assert.equal(TRIPLE_PRODUCT_DECISIONS.trayExpansion.releasePrice, 3000);
 assert.deepEqual(TRIPLE_PRODUCT_DECISIONS.trayExpansion, { baseCapacity: 7, bonusCapacity: 3, experimentalPrice: 1, releasePrice: 3000 });
 assert.deepEqual(TRIPLE_PRODUCT_DECISIONS.milestones.rewards, [
