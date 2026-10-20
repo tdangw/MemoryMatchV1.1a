@@ -1,4 +1,6 @@
 import { getRecentGameId } from "./recentGame.js";
+import { restoreUiSkin } from './uiSkin.js';
+import '../styles/ui-skin-woodland.css';
 import { initializeMenuAds } from './ads/menuAds.js';
 import { initializeProfileStatsService } from './profileStatsService.js';
 import { configureAdventureMap } from "./adventureMap.js";
@@ -99,6 +101,7 @@ await loadPersistentGameData();
 const seasonReady = await ensureGameplaySeason();
 hydrateGameState(seasonReady ? await loadPersistentGameData() : undefined);
 setRankingOwner(await loadProfileOwner());
+await restoreUiSkin();
 onProgress('save');
 subscribeToPersistenceFailure(() => {
   openAppModal({
@@ -219,6 +222,7 @@ subscribeToExternalSave(({ data, accept }) => {
   }
   accept();
   hydrateGameState(data);
+  void restoreUiSkin();
   updateMemoryAssistInventoryDisplay();
   applyEffectsSettings(gameState.settings);
   initializeMeteorEffects(gameState.settings.meteorEffects);
@@ -256,6 +260,7 @@ if (import.meta.env.VITE_FIREBASE_DISABLED !== '1') {
       onConflictCleared: panels.closeCloudConflictDialog,
       onProfileReplaced: async () => {
         hydrateGameState(await loadPersistentGameData());
+        await restoreUiSkin();
         updateMemoryAssistInventoryDisplay();
         applyEffectsSettings(gameState.settings);
         initializeMeteorEffects(gameState.settings.meteorEffects);

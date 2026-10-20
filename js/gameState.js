@@ -18,6 +18,7 @@ import { normalizeProgressBests, normalizeProgressMigration } from './progressRa
 import { MASTERY_DIFFICULTIES, hasCertifiedCompletion, getMasteryBlock } from './progression/difficultyProgress.js';
 import { normalizePairSnapshot } from './pairSessionSnapshot.js';
 import { normalizeWaveProgress } from './progression/waveProgress.js';
+import { normalizeUiSkin } from './uiSkinController.js';
 
 const GAME_MODE_IDS = new Set(GAME_MODES.map(({ id }) => id));
 
@@ -71,6 +72,7 @@ export const gameState = {
   },
   appearance: normalizeAppearance(),
   settings: {
+    uiSkin: 'default',
     mode: "easy",
     sound: true,
     music: true,
@@ -264,6 +266,7 @@ function normalizeSettings(value, fallback) {
   const source = value && typeof value === "object" && !Array.isArray(value) ? value : {};
   return {
     mode: GAME_MODE_IDS.has(source.mode) ? source.mode : fallback.mode,
+    uiSkin: normalizeUiSkin(source.uiSkin),
     sound: typeof source.sound === "boolean" ? source.sound : fallback.sound,
     music: typeof source.music === "boolean" ? source.music : fallback.music,
     soundVolume: normalizeRange(source.soundVolume, fallback.soundVolume, 0, 1),

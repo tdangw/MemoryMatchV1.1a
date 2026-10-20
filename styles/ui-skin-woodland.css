@@ -1,0 +1,77 @@
+@import './ui-skin-icons.css';
+
+/* A skin commit changes color/material in one frame; legacy button color fades
+   must not blend the two palettes or briefly lower text contrast. */
+html[data-ui-skin] button { transition-property: transform, opacity; }
+@media (prefers-reduced-motion: reduce) { html[data-ui-skin] button { transition: none; } }
+
+/* Explicit skin modifiers. Existing owners retain structure, input and lifecycle. */
+html[data-ui-skin="woodland"] {
+  --ui-surface: #fff2ce; --ui-inset: #efd9a6; --ui-raised: #e9c98e;
+  --ui-ink: #4b2b18; --ui-muted: #775432; --ui-gold: #82501f; --ui-line: #ad7e4659;
+  --ui-primary: #4e7d28; --ui-primary-hover: #5e9133; --ui-danger: #a13e32; --ui-focus: #895519;
+  --dialog-surface: var(--ui-surface); --dialog-night-surface: var(--ui-surface);
+  --dialog-night-inset: var(--ui-inset); --dialog-night-value: #fff3d3;
+  --dialog-ink: var(--ui-ink); --dialog-muted: var(--ui-muted); --dialog-gold: var(--ui-gold); --dialog-line: var(--ui-line);
+  --tab-surface: var(--ui-surface); --tab-ink: var(--ui-ink); --tab-muted: var(--ui-muted); --tab-gold: var(--ui-gold); --tab-line: var(--ui-line);
+}
+html[data-ui-skin="woodland"] :is(button, input, select, textarea):focus-visible { outline: 3px solid #895519; outline-offset: 2px; }
+html[data-ui-skin="woodland"] :is(.app-button, .tab-button) {
+  box-sizing: border-box; min-height: 44px; min-width: 44px; padding: 1px 7px;
+  border: 12px solid transparent; border-radius: 0;
+  border-image: url('/assets/ui/woodland/orange-normal.webp') 30 100 fill / 12px stretch;
+  background: none; box-shadow: none; color: #fff7da; text-shadow: 0 1px 2px #48240b;
+}
+html[data-ui-skin="woodland"] :is(.app-button--primary, .tab-button:not(.tab-button--quiet)) { border-image-source: url('/assets/ui/woodland/green-normal.webp'); }
+html[data-ui-skin="woodland"] :is(.app-button, .tab-button):active:not(:disabled) { border-image-source: url('/assets/ui/woodland/orange-pressed.webp'); }
+html[data-ui-skin="woodland"] :is(.app-button--primary, .tab-button:not(.tab-button--quiet)):active:not(:disabled) { border-image-source: url('/assets/ui/woodland/green-pressed.webp'); }
+html[data-ui-skin="woodland"] :is(.app-button--danger, .tab-button--danger) { border: 2px solid #cd7358; border-image: none; border-radius: 12px; padding: 10px 14px; background: #a13e32; color: #fff3de; }
+html[data-ui-skin="woodland"] :is(.app-button, .tab-button):disabled { opacity: .6; }
+html[data-ui-skin="woodland"] :is(.app-modal__close, .game-selector__arrow) {
+  border-color: transparent; background: url('/assets/ui/woodland/icon-base.webp') center / 100% 100% no-repeat;
+  box-shadow: none; color: #fff0c5;
+}
+html[data-ui-skin="woodland"] :is(.app-modal__close, .game-selector__arrow):active:not(:disabled) { filter: brightness(.85); }
+html[data-ui-skin="woodland"] .game-selector__choice { border: 3px solid #b68146; box-shadow: inset 0 1px #ffe8af, 0 4px #492c1f, 0 7px 15px #0005; }
+html[data-ui-skin="woodland"] .game-selector__label { background: none; border: 12px solid transparent; border-image: url('/assets/ui/woodland/nameplate.webp') 48 82 fill / 12px stretch; }
+html[data-ui-skin="woodland"] .game-selector__label strong { color: #fff1c8; }
+html[data-ui-skin="woodland"] .adventure-dock { position: relative; isolation: isolate; border: 0; background: none; box-shadow: none; }
+html[data-ui-skin="woodland"] .adventure-dock::before { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; border: 10px solid transparent; border-image: url('/assets/ui/woodland/nameplate.webp') 48 82 fill / 10px stretch; }
+html[data-ui-skin="woodland"] .adventure-dock button { color: #fff1c8; text-shadow: 0 1px #42230e; }
+html[data-ui-skin="woodland"] .adventure-dock button[aria-current="page"] { color: #4b2b18; text-shadow: none; background: url('/assets/ui/woodland/selected-tab.webp') center / 100% 100% no-repeat; box-shadow: none; border-radius: 0; }
+html[data-ui-skin="woodland"] :is(#settings-modal, #account-modal, #missions-screen, #events-screen, #rankings-modal, #shop-modal, #collection-modal) .app-modal__header,
+html[data-ui-skin="woodland"] .app-modal-overlay .app-modal__header { background: linear-gradient(#a46b38, #6b3c24); border-color: #d7a457; color: #fff0c5; }
+html[data-ui-skin="woodland"] :is(#settings-modal, #account-modal, #missions-screen, #events-screen, #rankings-modal, #shop-modal, #collection-modal) .app-modal__title,
+html[data-ui-skin="woodland"] .app-modal-overlay .app-modal__title,
+html[data-ui-skin="woodland"] .app-modal__title > .ui-icon,
+html[data-ui-skin="woodland"] #shop-modal .shop-wallet { color: #fff0c5; }
+html[data-ui-skin="woodland"] .adventure-screen > .adventure-exit { background: #67391f; color: #fff0c5; }
+html[data-ui-skin="woodland"] .adventure-exit .ui-icon { color: #fff0c5; }
+html[data-ui-skin="woodland"] .app-modal-overlay .app-modal { background: #fff2ce; color: #4b2b18; border: 3px solid #a66e37; border-radius: 20px; box-shadow: 0 3px #4a2818, 0 12px 32px #0005; }
+html[data-ui-skin="woodland"] .app-screen-content .app-modal__body { background: #f9e9c1ed; scrollbar-color: #b78b4d #f4dfae; }
+html[data-ui-skin="woodland"] .app-modal__footer { background: #edd4a2; border-color: #b58b4b66; }
+html[data-ui-skin="woodland"] .tab-card { border: 12px solid transparent; border-image: url('/assets/ui/woodland/paper-panel.webp') 42 fill / 12px stretch; background: none; color: #4b2b18; }
+html[data-ui-skin="woodland"] :is(.theme-choice, .appearance-choice, .account-play-details > div, .account-name-input, .treasure-reward) { background: #fff3d3; color: #4b2b18; border-color: #af8248; }
+html[data-ui-skin="woodland"] :is(.appearance-group h3, .theme-choice strong, .appearance-choice strong, .mastery-collection, .treasure-content, .treasure-detail h3) { color: #4b2b18; }
+html[data-ui-skin="woodland"] :is(.appearance-choice small, .treasure-range, .treasure-card small, .treasure-exp, .treasure-collection-link) { color: #775432; }
+html[data-ui-skin="woodland"] :is(#shop-confirm-modal, #theme-change-notice-modal) .app-modal__body,
+html[data-ui-skin="woodland"] #shop-modal .shop-item-title { color: #4b2b18; }
+html[data-ui-skin="woodland"] :is(.shop-tab, .collection-tab, .catalog-tab) { background: #e5c794; color: #66421f; border-color: #ad8349; }
+html[data-ui-skin="woodland"] :is(.shop-tab, .collection-tab, .catalog-tab)[aria-selected="true"] { background: #fff4d1; color: #3f6223; box-shadow: inset 0 -3px #66883a; }
+html[data-ui-skin="woodland"] :is(.profile-avatar) { background: #fff3d3; }
+html[data-ui-skin="woodland"] :is(.profile-error, .account-error, .treasure-error) { color: #a13e32; }
+html[data-ui-skin="woodland"] .leaderboard-panel { --ranking-gold: #82501f; --ranking-muted: #775432; --ranking-line: #b78a4f66; color: #4b2b18; }
+html[data-ui-skin="woodland"] .leaderboard-panel :is(.leaderboard-results, .leaderboard-tabs--game) { background: #fff3d3; }
+html[data-ui-skin="woodland"] .leaderboard-panel .leaderboard-heading { background: #e8cb96; color: #654421; }
+html[data-ui-skin="woodland"] .leaderboard-panel .leaderboard-tabs--game .app-button { border: 1px solid #b78a4f; border-image: none; border-radius: 10px; background: #e8cb96; color: #654421; text-shadow: none; padding: 6px 4px; }
+html[data-ui-skin="woodland"] .leaderboard-panel .leaderboard-tabs--game .app-button[aria-pressed="true"] { background: #fff7df; box-shadow: inset 0 -3px #4e7d28; }
+html[data-ui-skin="woodland"] .leaderboard-panel .leaderboard-row { color: #4b2b18; }
+html[data-ui-skin="woodland"] #settings-container .toggle-switch .slider { background: #a58b64; border-color: #815b2a; }
+html[data-ui-skin="woodland"] #settings-container .toggle-switch input:checked + .slider { background: #658c39; }
+html[data-ui-skin="woodland"] #settings-container .settings-range::-webkit-slider-thumb { border: 0; background: url('/assets/ui/woodland/slider-thumb.webp') center / contain no-repeat; box-shadow: none; }
+html[data-ui-skin="woodland"] #settings-container .settings-range::-moz-range-thumb { border: 0; background: url('/assets/ui/woodland/slider-thumb.webp') center / contain no-repeat; box-shadow: none; }
+html[data-ui-skin="woodland"] :is(.app-toast, .game-tooltip, .card-tooltip) { background: #fff0ca; color: #4b2b18; border: 2px solid #b58141; box-shadow: 0 4px 12px #0004; }
+html[data-ui-skin="woodland"] .app-toast { background: none; border: 10px solid transparent; border-image: url('/assets/ui/woodland/notice.webp') 32 40 fill / 10px stretch; }
+html[data-ui-skin="woodland"] .treasure-card { background: #f3dfb4; color: #4b2b18; border-color: #b88747; }
+html[data-ui-skin="woodland"] .treasure-card[aria-pressed="true"] { background: #fff4d1; border-color: #4e7d28; box-shadow: inset 0 0 0 2px #4e7d28; }
+@media (max-width: 360px) { html[data-ui-skin="woodland"] :is(.app-button, .tab-button) { border-width: 10px; border-image-width: 10px; padding-inline: 2px; } }

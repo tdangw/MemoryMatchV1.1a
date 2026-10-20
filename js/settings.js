@@ -8,6 +8,7 @@ import { APP_VERSION } from "./appMeta.js";
 import { setMeteorEffectsEnabled } from "./backgroundEffects.js";
 import { setBoardCoordinatesVisible } from "./grid.js";
 import { clearTooltip } from "./tooltips.js";
+import { selectUiSkin, getUiSkin } from './uiSkin.js';
 
 const settingsContainer = document.getElementById("settings-container");
 const settingsHome = settingsContainer?.parentElement;
@@ -42,6 +43,7 @@ function updateVolumeControl(input, output, value) {
 }
 
 function syncSettingsControls() {
+  syncSkinChoices();
   const settings = gameState.settings;
   if (soundToggle) soundToggle.checked = settings.sound;
   if (musicToggle) musicToggle.checked = settings.music;
@@ -54,6 +56,28 @@ function syncSettingsControls() {
   if (musicVolume) musicVolume.disabled = !settings.music;
   updateVolumeControl(soundVolume, soundVolumeValue, settings.soundVolume);
   updateVolumeControl(musicVolume, musicVolumeValue, settings.musicVolume);
+}
+
+let skinChoiceGeneration = 0;
+function syncSkinChoices() {
+  for (const choice of settingsContainer.querySelectorAll('[data-ui-skin-choice]')) {
+    choice.setAttribute('aria-pressed', String(choice.dataset.uiSkinChoice === getUiSkin()));
+  }
+  if (gameState.settings.uiSkin === 'woodland' && getUiSkin() === 'default' && !settingsContainer.querySelector('.skin-choices').hasAttribute('aria-busy')) {
+    document.getElementById('skin-status').textContent = 'Chưa tải được giao diện Nâng cao. Chọn Nâng cao để thử lại.';
+  }
+}
+for (const choice of settingsContainer.querySelectorAll('[data-ui-skin-choice]')) {
+  choice.addEventListener('click', async () => {
+    const token = ++skinChoiceGeneration, status = document.getElementById('skin-status');
+    status.textContent = 'Đang chuẩn bị giao diện…';
+    settingsContainer.querySelector('.skin-choices').setAttribute('aria-busy', 'true');
+    const result = await selectUiSkin(choice.dataset.uiSkinChoice);
+    if (token !== skinChoiceGeneration) return;
+    settingsContainer.querySelector('.skin-choices').removeAttribute('aria-busy');
+    syncSkinChoices();
+    status.textContent = result.status === 'error' ? 'Chưa đổi được giao diện. Hãy thử lại.' : '';
+  });
 }
 
 function bindSettingsControls() {

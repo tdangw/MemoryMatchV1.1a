@@ -5,6 +5,7 @@ import { createGameShellLifecycle, getActiveGameScope } from "./gameShell/gameSh
 import { getActivePlayMetrics } from "./playMetrics.js";
 
 import { getAppPageScope } from "./appPageLifecycle.js";
+import { ensureUiSkinRewards } from './uiSkin.js';
 
 const modals = new Map();
 import { suspendMenuAds } from './ads/menuAds.js';
@@ -30,6 +31,7 @@ export function openAppModal({
   alignment = "start",
   host = document.body,
 }) {
+  if (id && /summary|chest|treasure|collection/.test(id)) void ensureUiSkinRewards();
   const screen = presentation === 'screen';
   const previousFocus = document.activeElement;
   if (id) {

@@ -15,6 +15,7 @@ const SEASON_STORAGE_KEY = 'memoryMatchSave:multiwave1';
 let activeStorageKey = ROOT_STORAGE_KEY;
 const PRIMARY_MARKER_KEY = "memoryMatchChapterBackend";
 const SETTINGS_KEYS = new Set([
+  "uiSkin",
   "sound", "music", "soundVolume", "musicVolume", "meteorEffects",
   "boardCoordinates", "cardDescriptions", "lastPlayedGameId",
 ]);
