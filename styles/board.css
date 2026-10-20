@@ -110,25 +110,6 @@
   display: none;
 }
 
-/* Hidden faces retain identical backs; the inset ring preserves selection borders. */
-.tile[data-special="true"]:not(.matched):not(.wrong):has(> img:not(.hidden))::after,
-.tile.is-lucky:not(.matched):not(.wrong):has(> img:not(.hidden))::after {
-  content: "";
-  position: absolute;
-  inset: 1px;
-  border: 2px solid #61eadb;
-  border-radius: 8px;
-  pointer-events: none;
-}
-
-.tile.is-lucky:not(.matched):not(.wrong):has(> img:not(.hidden))::after {
-  border-color: #ffd36b;
-}
-
-.tile.is-lucky[data-special="true"]:not(.matched):not(.wrong):has(> img:not(.hidden))::after {
-  border-inline-color: #61eadb;
-}
-
 /* ✅ Ghép đúng */
 .tile.matched {
   opacity: 0.5;
@@ -192,6 +173,17 @@
   box-shadow:
     0 0 0 2px rgb(242 189 61 / 42%),
     0 0 12px rgb(242 189 61 / 52%);
+}
+
+/* Match Link Connect's native border and glow without revealing hidden faces. */
+.tile[data-special="true"]:not(.matched):not(.wrong):not(.hint-reveal):has(> img:not(.hidden)) {
+  border-color: #62e9ef;
+  box-shadow: 0 0 0 1px rgb(98 233 239 / 64%), 0 0 11px rgb(72 221 230 / 48%), 0 4px 12px rgb(0 0 0 / 30%);
+}
+
+.tile.is-lucky:not(.matched):not(.wrong):not(.hint-reveal):has(> img:not(.hidden)) {
+  border-color: #ad72ff;
+  box-shadow: 0 0 0 2px rgb(173 114 255 / 30%), 0 0 15px rgb(173 114 255 / 38%);
 }
 
 /* Hiệu ứng khi chọn tile */
