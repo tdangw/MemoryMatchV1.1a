@@ -913,6 +913,7 @@ async function settleTerminalRound(shell, render) {
     ...(canAdvance
       ? [{
         label: "Chơi tiếp",
+        sound: 'gameStart',
         icon: "arrow-right",
         variant: "primary",
         onClick: (close) => {

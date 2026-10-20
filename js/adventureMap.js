@@ -2,7 +2,6 @@ import { getTheme } from "./themeCatalog.js";
 import { getEquippedThemeId } from "./appearance.js";
 import { createIcon } from "./icons.js";
 import { gameState } from "./gameState.js";
-import { playGameStartSound } from './sound.js';
 import { GAME_MODES, getGameDefinition, getGameModeLabel } from "./gameCatalog.js";
 import { MAP_LEVEL_STEP, getMapLevelPoint, getMapChestPoint, createMapDecorations } from "./adventureMapLayout.js";
 import { decorateAdventureMenu, refreshAppWallet } from "./appNavigation.js";
@@ -257,7 +256,6 @@ export function mountAdventureMap(gameId) {
     if (!scope.active || loading || !canLaunchGame()) return false;
     if (isNormalAdventureMode(mode) && !getDifficultyAccess({ completed: profile.bestByLevel, level, mode }).unlocked) return false;
     setBusy(true);
-    playGameStartSound(gameState.settings);
     try { return await adapter.launch({ mode, level, skipIntro }); }
     catch (error) {
       console.error("Level launch failed", error);
@@ -341,7 +339,7 @@ export function mountAdventureMap(gameId) {
     const releaseLockedKey = scope.listen(choices, 'keydown', explainLockedDifficulty);
     const modal = openAppModal({ id: "adventure-level-modal", title: title(), content, owner: scope, keepBanner: true,
       onDestroy: () => { release?.(); releaseLockedClick(); releaseLockedKey(); },
-      actions: [{ label: "Chơi", variant: "primary", onClick: async () => await launch(selectedMode(), level, { skipIntro: true }) ? undefined : false }],
+      actions: [{ label: "Chơi", variant: "primary", sound: 'gameStart', onClick: async () => await launch(selectedMode(), level, { skipIntro: true }) ? undefined : false }],
     });
     modal.panel.classList.add("adventure-level-dialog");
     modal.panel.setAttribute("aria-label", `${game.title} · ${title()}`);

@@ -138,10 +138,11 @@ export function openAppModal({
   if (actions.length > 0) {
     const footer = document.createElement("footer");
     footer.className = "app-modal__footer";
-    actions.forEach(({ label, icon, variant = "secondary", onClick }) => {
+    actions.forEach(({ label, icon, variant = "secondary", sound, onClick }) => {
       const button = document.createElement("button");
       button.type = "button";
       button.className = `app-button app-button--${variant}`;
+      if (sound) button.dataset.clickSound = sound;
       if (icon) button.appendChild(createIcon(icon));
       button.appendChild(document.createTextNode(label));
       lifecycle.listen(button, "click", () => submit(onClick));

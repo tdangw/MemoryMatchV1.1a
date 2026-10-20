@@ -29,6 +29,9 @@ export const MENU_MUSIC_TRACKS = Object.freeze([
 let selectedMenuTrack = null;
 let victoryMusicDuckActive = false;
 const VICTORY_MUSIC_DUCK_RATIO = 0.2;
+// Measured onset of the supplied MP3; preserve its attack after the leading silence.
+const GAME_START_AUDIO_OFFSET_SECONDS = 0.6;
+sounds.gameStart.preload = 'auto';
 
 const clampVolume = (value, fallback) => {
   const parsed = Number(value);
@@ -38,7 +41,7 @@ const clampVolume = (value, fallback) => {
 export function playGameStartSound(settings) {
   if (!settings?.sound || document.hidden) return;
   const audio = sounds.gameStart;
-  audio.currentTime = 0;
+  audio.currentTime = GAME_START_AUDIO_OFFSET_SECONDS;
   audio.volume = clampVolume(settings.soundVolume, 0.4);
   try { void audio.play().catch(() => {}); } catch { /* Playback can be blocked by the browser. */ }
 }
@@ -192,15 +195,20 @@ export function enableButtonClickSounds(getSettings) {
     );
     if (!interactive || interactive.disabled || !getSettings?.()?.sound) return;
 
+    if (interactive.dataset.clickSound === 'gameStart') {
+      playGameStartSound(getSettings());
+      return;
+    }
+
     sounds.click.currentTime = 0;
     sounds.click.play().catch(() => {});
-  });
+  }, { capture: true });
 }
 
 // ✅ Unlock âm thanh sau tương tác đầu tiên
 export function unlockSound() {
   const unlock = () => {
-    Object.values(sounds).filter(Boolean).forEach((sound) => {
+    Object.values(sounds).filter(sound => sound && sound !== sounds.gameStart).forEach((sound) => {
       try {
         sound.play().catch(() => {});
         sound.pause();
