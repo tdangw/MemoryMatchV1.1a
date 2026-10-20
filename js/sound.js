@@ -34,11 +34,13 @@ const clampVolume = (value, fallback) => {
   return Number.isFinite(parsed) ? Math.min(1, Math.max(0, parsed)) : fallback;
 };
 
-// Fixed cue bank: no clones and at most one voice per cue across all surfaces.
+// Coin streams use a bounded voice pool; other cues keep a single voice.
+const COIN_CUE_VOICES = 6;
+const COIN_CUE_GAIN = 0.45;
 const rewardCueFiles = Object.freeze({
   star1: 'star_1.ogg', star2: 'star_2.ogg', star3: 'star_3.ogg',
   reward: 'reward.ogg', openBox: 'open_box.ogg', thunder: 'explosion.ogg',
-  frozenUnlock: 'unlock_1.mp3', coinDrop: 'coin_drop.mp3',
+  frozenUnlock: 'unlock_1.mp3', coinDrop: 'coin_drop.mp3', coinCollect: 'coin-collect.mp3',
 });
 const rewardCues = new Map();
 
@@ -46,15 +48,26 @@ export function playOwnedRewardCue(name, owner, settings) {
   if (!Object.hasOwn(rewardCueFiles, name)) throw new Error(`Unknown reward cue: ${name}`);
   const volume = settings?.sound ? clampVolume(settings.soundVolume, 0.4) : 0;
   if (!owner.active || document.hidden || !volume) return;
-  let cue = rewardCues.get(name);
+  const isCoin = name === 'coinDrop' || name === 'coinCollect';
+  let pool = rewardCues.get(name);
+  if (!pool) {
+    pool = [];
+    rewardCues.set(name, pool);
+  }
+  let cue = pool.find(voice => !voice.stop);
+  if (!cue && pool.length < (isCoin ? COIN_CUE_VOICES : 1)) {
+    cue = { audio: new Audio(assetUrl(`assets/sounds/${rewardCueFiles[name]}`)), stop: null,
+      gain: isCoin ? COIN_CUE_GAIN : 1 };
+    pool.push(cue);
+  }
   if (!cue) {
-    cue = { audio: new Audio(assetUrl(`assets/sounds/${rewardCueFiles[name]}`)), stop: null };
-    rewardCues.set(name, cue);
+    cue = pool.shift();
+    pool.push(cue);
   }
   cue.stop?.();
   const audio = cue.audio;
   audio.currentTime = 0;
-  audio.volume = volume;
+  audio.volume = volume * cue.gain;
   let ended, failed, hidden;
   const stop = owner.own(() => {
     audio.removeEventListener('ended', ended);
@@ -81,8 +94,8 @@ export function applyEffectsSettings(settings) {
   Object.values(sounds).filter(Boolean).forEach((sound) => {
     sound.volume = volume;
   });
-  for (const cue of rewardCues.values()) {
-    cue.audio.volume = volume;
+  for (const cue of [...rewardCues.values()].flat()) {
+    cue.audio.volume = volume * cue.gain;
     if (!volume) cue.stop?.();
   }
 }
@@ -151,7 +164,7 @@ export function pauseVictoryFlowerTheme() {
 export function pauseGameAudio() {
   pauseBackgroundMusic();
   Object.values(sounds).filter(Boolean).forEach((sound) => sound.pause());
-  for (const cue of rewardCues.values()) cue.stop?.();
+  for (const pool of rewardCues.values()) for (const cue of pool) cue.stop?.();
 }
 
 export function pauseBackgroundMusic() {

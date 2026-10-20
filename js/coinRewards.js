@@ -17,6 +17,7 @@ const activeCoinCounters = new Set();
 const activeCoinEffects = new Set();
 const effectEntries = new WeakMap();
 const counterPulseEntries = new WeakMap();
+const coinSoundCleanups = new WeakMap();
 
 export function calculateMatchCoinReward() {
   return MATCH_COINS_PER_GROUP;
@@ -26,14 +27,23 @@ export function playCoinRewardFlight(source, target, amount) {
   const coinCount = Math.max(0, Math.floor(Number(amount) || 0));
   if (!source || !target || coinCount < 1) return [];
   const owner = getActiveGameScope();
-  if (owner?.active) {
-    // Pure reward checks also import this module outside a browser. Audio is
-    // loaded only for a live presentation; the cue rechecks owner and settings.
-    void import('./sound.js').then(({ playOwnedRewardCue }) => {
-      playOwnedRewardCue('coinDrop', owner, gameState.settings);
-    }).catch(error => console.warn('Coin sound unavailable', error));
+  // Audio remains independent of wallet updates and animation completion.
+  const audioReady = owner?.active ? import('./sound.js').catch(error => {
+    console.warn('Coin sound unavailable', error);
+    return null;
+  }) : null;
+  const playCue = (name, effect) => {
+    if (!audioReady) return;
+    void audioReady.then(audio => {
+      if (audio && owner.active && (!effect || activeCoinEffects.has(effect))) {
+        audio.playOwnedRewardCue(name, owner, gameState.settings);
+      }
+    });
+  };
+  if (prefersReducedMotion()) {
+    playCue('coinCollect');
+    return [];
   }
-  if (prefersReducedMotion()) return [];
   const stableSource = source.closest?.(".link-board__cell, .tile") || source;
   const targetIcon = target.querySelector?.(".ui-icon") || target;
   const sourceRect = stableSource.getBoundingClientRect();
@@ -88,6 +98,18 @@ export function playCoinRewardFlight(source, target, amount) {
     effect.style.setProperty("--game-coin-flight-duration", `${flightDuration}ms`);
     effect.style.setProperty("--game-coin-delay", `${delay}ms`);
     activeCoinEffects.add(effect);
+    const onStart = event => {
+      if (event.target === effect && event.animationName === 'game-coin-reward-loot') playCue('coinDrop', effect);
+    };
+    const onEnd = event => {
+      if (event.target === effect && event.animationName === 'game-coin-reward-loot') playCue('coinCollect', effect);
+    };
+    effect.addEventListener('animationstart', onStart);
+    effect.addEventListener('animationend', onEnd);
+    coinSoundCleanups.set(effect, () => {
+      effect.removeEventListener('animationstart', onStart);
+      effect.removeEventListener('animationend', onEnd);
+    });
     fragment.append(effect);
     return effect;
   }).filter(Boolean);
@@ -198,6 +220,8 @@ export function clearCoinRewardEffects() {
 }
 
 function removeCoinEffect(effect) {
+  coinSoundCleanups.get(effect)?.();
+  coinSoundCleanups.delete(effect);
   const entry = effectEntries.get(effect);
   effectEntries.delete(effect);
   entry?.dispose();
