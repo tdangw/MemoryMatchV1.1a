@@ -2,184 +2,80 @@
 
 ## Gameplay nhiều đợt và Kho báu hành trình — 20/10/2026
 
-- Chỉnh Wave20/10: thông báo khoảng2giây; bàn mới hiện520ms cùng ánh sáng quét700ms, scope hủy được và reduced-motion.14bài UI, check/build và review đạt; không đổi gameplay/save.
-- Hoàn tất P0–P9 và R0–R6 của GAMEPLAY_PROGRESSION_PLAN.md, commit từng phase. Dễ mở màn kế và độ khó kế; wave2/3/4/5 theo mốc1–10/11–50/51–90/91+, dùng đồng hồ chung và tiếp tế giữa wave cho timed. Đầu game/thay wave có notice giữa màn và chuyển bàn hữu hạn.
+- Chuyển wave hiện hành: thông báo khoảng 2 giây; thẻ mới hiện theo lớp với bốn hướng ngẫu nhiên, không quét sáng. Chờ bàn sẵn sàng mới chạy giờ; nhạc tiếp tục xuyên suốt, không đổi nguồn khi đồng bộ. Hiệu ứng có owner, cleanup và reduced-motion; không đổi gameplay/save.
+- Hoàn tất P0–P9 và R0–R6 của kế hoạch tiến trình gameplay đã hoàn tất, commit từng phase. Dễ mở màn kế và độ khó kế; wave2/3/4/5 theo mốc1–10/11–50/51–90/91+, dùng đồng hồ chung và tiếp tế giữa wave cho timed. Đầu game/thay wave có notice giữa màn và chuyển bàn hữu hạn.
 - Kho báu hành trình: mỗi trò ×10màn có Mầm Non/Lá Bạc/Hoa Vàng/Ánh Sao; EXP10/lần thắng đầu đúng độ khó,100/rương; thứ tự C→B→A→S, giữ tiến độ kiếm trước và receipt. Bốn thẻ cùng hiện, xem thưởng, Chơi tiếp qua preview, mở sau atomic commit; summary tên rương +kinh nghiệm thực. Tranh/300Xu riêng. SVG native cho rương, ba tranh của P7 dùng imagegen.
 - Luật mới dùng gameplaySeason1/IndexedDB3 và gamespace *-waves1; wire rankingv3 giữ trong vùng riêng. Firestore Rules-only đã deploy theo chấp thuận. Reset toàn bộ gameplay Firebase đã backup87tài liệu rồi xóa/kiểm kê0; giữ Auth/Hosting/config, không lặp xóa dữ liệu mới. Backup riêng bị ignore.
 - Đạt unit33/33, UI cuối60/60 +3boundary, check/build và production smoke2/2; review độc lập không còn P1/P2 xác nhận. UI/lifecycle/economy chi tiết ở docs/qa/gameplay-progression/RECEIPT.md. S22 Ultra thật còn chờ thiết bị; không APK/Hosting/push. Baseline UI/kỹ thuật của task khác vẫn giữ và không đưa vào commit gameplay.
 
-Đọc file này khi bắt đầu task mới. Đây là snapshot điều hướng, không thay thế code/config và không chứa lịch sử triển khai chi tiết.
+Đọc file này khi bắt đầu task mới. Đây là snapshot điều hướng; code/config và ARCHITECTURE.md là nguồn contract hiện hành. Các kế hoạch đã hoàn tất hoặc bị thay thế đã được xóa theo yêu cầu chủ dự án; giữ nguyên receipt, log, baseline, ảnh QA và nguồn artwork. Không khôi phục kế hoạch lịch sử từ Git làm nguồn triển khai.
 
-Người dùng đã chọn tự xuất bản website và thông điệp AdMob ngày16/10. Bản nháp **Quyền riêng tư · Memory Match Adventure** đã lưu riêng, chưa bật; URL quyền riêng tư công khai vẫn mở trang chọn trò chơi. Phần chuẩn bị quảng cáo/APK đã bàn giao; phase5 nghiệm thu trên máy thật còn chờ các bước trong `docs/ads/HUONG_DAN_THU_APK.md`. Không tự deploy khi tiếp tục task.
+## Công việc hiện hành và giới hạn
 
-## Sản phẩm
+- Kho báu hành trình R0–R6 đã hoàn tất trên web; xem phần gameplay cập nhật20/10 ở đầu file và receipt chung.
 
-- Chỉnh web19/10 theo mẫu thắng: nền gỗ/giấy/lá/ribbon liền mạch, icon từng hàng và nút nhà/mũi tên vẽ lại; sao chưa đạt xám opacity1; chữ cong cao hơn; HUD hai nút dùng chung bề mặt thanh; ẩn scrollbar nhưng giữ cuộn popup dài. Bộ hiện hành59ảnh/604.458bytes; không đổi save/API/luật. Chủ dự án thử web, không tự tạo APK hoặc báo cáo riêng cho chỉnh nhỏ; chỉ APK khi được yêu cầu rõ, đã lưu AGENTS.md. APK/QA ở mục dưới thuộc lần bàn giao trước, không chứa chỉnh web này.
+- Không còn gate triển khai kỹ thuật hoặc UI đang mở. Chủ dự án đang thử web; các phản hồi tiếp theo là chỉnh sửa mới, không tự mở lại task đã hoàn tất.
+- Kế hoạch tiến trình gameplay P0–P9 và R0–R6 đã hoàn tất và được xóa; contract hiện hành ở phần gameplay và ARCHITECTURE.md. Giữ giới hạn máy thật và ranh giới baseline của task khác.
+- Giữ [kế hoạch quảng cáo/APK](ADS_APK_TEST_PLAN.md): phần mềm đã bàn giao, Gate5 quảng cáo thật/Galaxy S22 Ultra/Auth native/hiệu suất thiết bị còn chờ. Đây không phải chỉ thị tự tạo APK hoặc triển khai thêm quảng cáo.
+- Người dùng chọn tự xuất bản website và thông điệp AdMob ngày16/10. Bản nháp Quyền riêng tư đã lưu riêng, chưa bật; URL công khai lần kiểm tra trước vẫn trả trang chọn trò chơi. Cần xác minh lại khi chủ dự án hoàn tất xuất bản. Hướng dẫn: [thử APK](docs/ads/HUONG_DAN_THU_APK.md), [QA quảng cáo](docs/ads/QA.md).
+- Các lượt chỉnh hiện tại chỉ kiểm tra web. Không tự tạo APK, deploy, push, bật Publish, đổi dịch vụ hoặc nâng billing. APK chỉ khi người dùng yêu cầu rõ; APK cũ không chứa các chỉnh web mới.
+- Chưa xác minh điện thoại vật lý, audio/SDK quảng cáo thật, OAuth hosted và dashboard Analytics/admin. Desktop/emulator không chứng minh FPS điện thoại.
 
-- Hoàn tất19/10: `UI_IMAGE_UPGRADE_PLAN.md` D–G — 3master/56WebP dùng chung cho popup/tab/shop/HUD3trò, giữ nền/tranh/cảnh hoa; summary3hàng Xu/Thời gian/Điểm, nhãn cong đủ999, nút gọn, pause3nút dọc + Cài đặt ở header. Fallback mất ảnh dùng SVG và nền dễ đọc, BASE_URL đúng. Matrix110, target19/13, nghiệm thuart5, review26+9, check(ads15), buildGH+base1, web+production3 và đúng1lần APK cuối đều đạt. QA/receipt: `docs/design/ui-images/QA.md`. Không còn gate UI active; chưa kiểm máy thật/quảng cáo thật, không deploy/publish; giữ save/API/catalog. 8PNG app-tabs và .vscode có sẵn giữ nguyên.
+## Kết quả gần nhất
 
-- Hoàn tất18/10: `UI_IMAGE_UPGRADE_PLAN.md` A–C — kế hoạch7bộ hình đồng bộ toàn bộ popup/tab/shop/HUD ba trò, hướng Vườn đêm + thắng/thưởng gỗ giấy; chưa tạo/tích hợp sheet. Code: bar đóng băng2px vàng sát mép, snap đầy ngay khi dùng/chồng rồi giảm; banner5thẻ/3hoa; popup thường/intro/cảnh hoàn thành chặng giữ banner và chừa đúng vùng. Review nguồn/lifecycle và refill/chapter cuối đạt; check(ads15/15), buildweb/AndroidAPK, production2/2 đạt. QA/receipt/ảnh: `docs/design/ui-image-upgrade/QA.md`. Không còn gate code active; giữ save/catalog/API tương thích, Android gameplay vẫn tắt, không deploy/publish.
+- Chỉnh popup kết quả20/10: sao chưa đạt giảm sáng/độ nổi; sao giữa lớn thêm khoảng4px và nâng4px trên cả normal/reduced-motion. Chỉ presentation trong styles/modals.css, giữ artwork, số sao, timing và phần thưởng. Kiểm tra responsive và bằng chứng ghi chung trong receipt UI.
 
-- Hoàn tất18/10: `HUD_PURCHASE_POLISH_PLAN.md` — thanh đóng băng tím4px/viền tối, mở cặp băng800ms, popup mua cân giữa safe viewport trừ banner và không thu hồi banner khi mua/hủy; công cụ ba trò dùng skin nổi của menu. Review27/27 (purchase13/dialog14), check (ads15/15), web/AndroidAPK và production smoke2/2 đạt. QA/ảnh/receipt: `docs/design/hud-purchase/QA.md`. Giữ save/catalog/giao dịch và API cũ tương thích; không deploy/publish. Không còn gate triển khai active. Shop grid legacy Triple qua API trong game ngoài menu hiện hành chưa sửa, ghi rõ trong QA.
+- Loading mở/tải lại ứng dụng19/10: cổng vườn tĩnh, không %, theo mốc tải thật; dải sáng báo xử lý và fade180ms theo phản hồi mới. Home không còn chờ toàn bộ ảnh; reduced-motion bỏ chuyển động/fade. Có retry, save recovery, cleanup và PWA late registration; không hiện lại khi đổi trò/màn. Nền/prompt/generator tại docs/design/loading/ASSETS.md; bằng chứng bổ sung chung trong receipt UI. Không đổi luật/API/save, không APK/deploy.
 
-- Hoàn tất18/10: `HUD_UI_POLISH_PLAN.md` phaseA–E — preview giữ banner/chừa chiều cao; công cụ ba trò cùng bố cục icon/tên/count; Profile bỏ flourish; thanh đóng băng Link dùng cadence HUD, pause/restore/stack/restart; hình hoạt ảnh dùng SVG/CSS. Matrix145/145, review17/17+2/2, native9/9, check/buildweb/AndroidAPK, production smoke1/1 đạt. QA/receipt/ảnh: `docs/design/hud-polish/QA.md`. Không đổi save/catalog/luật chơi, API cũ tương thích, không deploy/publish. Không còn kế hoạch triển khai active; hồ sơ quảng cáo chỉ còn xuất bản/QA thiết bị thật do chủ dự án thực hiện.
+- Chỉnh web19/10: Hướng dẫn/thông tin và Giới thiệu & phiên bản căn giữa vùng popup khả dụng bằng alignment hiện hữu. Level chưa mở thêm ổ khóa SVG ở góc và mờ hơn; huy hiệu đã mở và logic tiến độ/đóng popup giữ nguyên. Bằng chứng chung ở receipt UI.
 
-- Banner17/10: phaseA/B/C đã hoàn tất, code71f7f18/23b294a — web mọi tab+gameplay3trò, Android mọi tab nhưng gameplay thật tắt theo trả lời user. Shell reserve58px/scroll trên banner; web dùng3cảnh vector/CSS không chữ luân phiên6s/cảnh, reduced-motion đứng yên, dispose hủy scene/listener. Native9/9, matrix121ca có kết quả đạt sau sửa test chờ run.whenIdle, review nguồncuối8/8 có30restart, art4/4+perfHome/3game đạt. Check/unit15/15, buildweb/AndroidAPK và production smoke1/1 cógameplay đạt; receipt17/10 ở docs/ads/QA.md. Không đổi save/API/catalog/Auth, không deploy/publish. ADS_APK_TEST_PLAN.md còn QA quảng cáo thật/điện thoại sau khi người dùng tự xuất bản thông điệp.
+- Phản hồi web19/10: HUD cả ba trò trở về một hàng, màn dọc hẹp dùng chữ/nút gọn hơn (44px cao,36px rộng control, icon18px); giữ tất cả chỉ số. Popup chơi lại bỏ ribbon cũ, tiêu đề chữ24px đồng bộ; không đổi thời gian giới thiệu/hành vi. Bằng chứng bổ sung chung tại receipt UI.
 
-- `HOME_CAROUSEL_LOOP_PLAN.md` hoàn tất: Home nối vòng cảhai chiều bằng cùng3node; modulo cho arrows/keyboard, DOM rebase tại native scrollend và giữ focus, không clone/RAF loop. Memory được imagegen tích hợp vẽ lại portraitv2 576×768, URL có phiên bản để tránh cache ngang cũ; tổng3ảnh323.366bytes. Root19/19, review14/14 +cache1/1, regression31ca có kết quả đạt, gate ảnh/UI cuối14/14, check/build web/Android pass. Phase1commitabc5696; QA: `docs/design/home-carousel/QA.md`. Không đổi save/API/catalog, không deploy/APK; S22 Ultra thật còn chờ.
+- Kỹ thuật G0–G9, gồm G2A/G2B và G3A/G3B, đã hoàn tất cho cả ba trò. Memory có model theo ID; Link tách quyết định lượt/truy vấn đường; củng cố transaction booster và Triple cleanup, giữ Game Shell/Effect V2/reducer/worker/solver/ghost hiện hữu. Ngoại lệ hành vi duy nhất được chủ dự án duyệt: **Sấm sét không trừ kho nếu không có cặp hợp lệ**; lượt hợp lệ không đổi thứ tự/RNG/timing. [Receipt kỹ thuật](docs/qa/technical-improvement/RECEIPT.md).
+- Kỹ thuật: check/build web đạt, responsive141/141, kiểm tra trọng yếu cuối19/19, production3/3, soak200chu kỳ/profile normal/reduced-motion. Link boolean fixture145,1832→4,2597ms (−97,1%), full listing154,2962→110,7714ms (−28,2%). Đây là số đo desktop deterministic, không phải FPS điện thoại.
+- UI U0–U7 đã hoàn tất theo hướng vườn/gỗ/giấy, dịu màu và gọn. Icon chức năng SVG, exit/close/fullscreen và Chơi/CTA đồng bộ; dock selected có nền/indicator trong cùng box; HUD, công cụ, popup/summary/khay thống nhất. Giữ huy hiệu level đã mở; level khóa cùng kiểu trầm hơn, đường bản đồ xanh lam xám tách sao vàng. Giữ nền/tranh/cảnh hoa, không tạo raster mới. [Receipt UI](docs/design/ui-consistency/RECEIPT.md).
+- UI: check/build cuối đạt; regression101/101, review trọng yếu23/23, responsive138/141 và3/3 chạy lại sau sửa, production4/4 và build subpath đạt. Soak100chu kỳ/profile,40restart/profile: tài nguyên owner sau dispose về0; heap có tăng warmup hữu hạn, không tuyên bố không bao giờ tăng bộ nhớ. Home A/B:16→2request ảnh UI,135.218→18.376byte truyền ảnh UI (−86,4%); DOM289→302 do vector. Main JS gzip154,92→154,88kB; CSS gzip37,94→37,62kB. Chưa có phản hồi chủ dự án duyệt từng màu trên bản mới.
+- Luật/timing/seed/layout/phân phối, kinh tế/giá/drop/reward, public API/catalog/effect ID/save key/schema/format và tiếp tục phiên cũ vẫn tương thích, ngoài ngoại lệ Sấm sét đã duyệt. Không giảm delay, mở input sớm hoặc gộp save để đổi hành vi.
 
-- Banner hiện hành16/10: UI chỉ ghi **Quảng cáo**, quy định không đưa câu chữ kỹ thuật lên giao diện/ảnh/tài liệu người chơi lưu ở AGENTS.md mục9. Placement Home/map/shop/collection; ẩn gameplay/modal/forms/ranking/comingsoon. Web50px + gap8px (tổng58px, giảm30px), Android theo chiều cao SDK + gap8px. Sửa screen content không còn bị coi là overlay; slot screen/root có owner riêng, nested modal vẫn ẩn banner. Native9/9, web review độc lập4/4 và shop/HUD9/9 đạt, check/unit15/15 đạt; QA tại `docs/ads/QA.md`. Chưa deploy/publish; quảng cáo thật/S22 Ultra còn chờ như phần APK.
+## Sản phẩm và điều hướng
 
-- Tab Sự kiện thay Bạn bè ngày2026-10-16: action events, tiêu đề/nhãn Sự kiện, biểu tượng lịch. Hiện Sắp ra mắt, chưa triển khai tính năng sự kiện. Giữ nền courtyard hiện có và lifecycle chung; không đổi save/schema/Auth. UI36/36, review độc lập3/3, check/build web/Android pass; QA tại `docs/design/app-tabs/QA.md`.
+- Ba trò Memory Match, Link Connect, Triple Connect dùng Game Shell chung; state/session theo từng game và mode. Controller/renderer mỗi trò sở hữu luật và presentation đặc thù, không import chéo controller.
+- Home có Nhiệm vụ/Sự kiện/Profile/Xếp hạng/Cài đặt; map có Cửa hàng/Bộ sưu tập/Bản đồ/Xếp hạng/Cài đặt. Nhiệm vụ/Sự kiện hiện Sắp ra mắt, không triển khai hệ thống mới. Header không profile/Xu; Exit map/screen về Home; Xu xem trong Cửa hàng/HUD.
+- Home dùng native scroll-snap nối vòng với cùng ba node; không clone/tự chạy/RAF loop. Memory dùng portraitv2, ba ảnh tổng323.366byte. Nguồn art và QA lịch sử giữ trong docs/design/home-assets và docs/design/home-carousel.
+- Gameplay ẩn dock. Ba gạch mở Tạm dừng; Cài đặt giữ ván và pause. Popup neo theo board/visualViewport/safe-area, body dài cuộn và footer tới được; owner placement/focus/busy/cleanup giữ nguyên.
+- Bản đồ riêng từng trò, mở khóa tuần tự chung bốn độ khó; sao/điểm theo độ khó, completion không suy từ sao. Mỗi chặng 100 màn có 10 mốc kho báu, mỗi mốc gồm 4 rương; đủ 100 màn mới nối chặng, re-entry về frontier. Preview chọn C/B/A/S; chỉ Chơi mới launch, không bỏ Memory reveal/readiness gating. Thử thách/Vô tận xem màn1 trước Chơi, không radio độ khó; Hủy giữ phiên.
+- Rương hành trình dùng thưởng cố định từ `js/progression/masteryRewards.js`: C (Mầm Non) 30 xu + 1 Gợi ý; B (Lá Bạc) 60 xu + 2 Gợi ý; A (Hoa Vàng) 100 xu + 3 Gợi ý; S (Ánh Sao) 160 xu + 4 Gợi ý. Công cụ thuộc đúng trò; mỗi cấp nhận một lần theo cụm 10 màn và thứ tự C→B→A→S. Đủ 10 mảnh tranh nhận thêm 300 xu một lần, độc lập với rương. Gói ngẫu nhiên Nhỏ/Vừa/Lớn là cơ chế cũ, không dùng cho đường nhận rương hiện hành.
+- Web chừa banner58px (50+8) trên mọi tab và gameplay ba trò; Android mọi tab, gameplay native tắt. Web ba cảnh SVG/CSS không chữ,6s/cảnh, reduced-motion tĩnh; dispose hủy scene/listener. Không biến web artwork thành xác nhận quảng cáo SDK thật.
+- Profile sửa tên trong hàng, chỉ hiện ngày tham gia/tạo hồ sơ và tổng thời gian chơi; trackedSince vẫn nội bộ. Sự kiện thay Bạn bè, giữ tên asset courtyard để ổn định pipeline. Cửa hàng/Bộ sưu tập lưu stable tab ID riêng theo game/surface.
 
-- Profile đã bỏ dòng “Tính từ…” theo yêu cầu ngày2026-10-16; chỉ hiển thị ngày tham gia/tạo hồ sơ và tổng thời gian chơi. trackedSince/counter vẫn giữ nội bộ, không đổi service/schema/save. UI5/5, review độc lập1/1, check/build web/Android pass. Ảnh và bằng chứng ở `docs/design/app-tabs/QA.md`.
+## Runtime, dữ liệu và dịch vụ
 
-- `HOME_CAROUSEL_PLAN.md` là hồ sơ carousel ban đầu (đã nối vòng theo kế hoạch mới): Home một trò ở giữa, vuốt trái/phải, hé trò hai bên; mũi tên/chấm và bàn phím. Native scroll-snap, scope sở hữu frame/observer/listener, không clone/tự chạy; giữ art/save/catalog/navigation và nội dung tab/popup. Phase1 commit665dafb. Home/registry17ca, regression52/52, review cuối12/12 và touch lặp5/5 đạt; check/build web/Android pass. QA: `docs/design/home-carousel/QA.md`. Không còn gate triển khai active; S22 Ultra thật còn chờ.
+- ES modules HTML/CSS/JS; IndexedDB theo profile/chặng qua persistence bất đồng bộ, formatVersion2. Giữ nguồn v1 phục hồi; backend mới từng dùng thì không quay về v1. Dữ liệu hỏng/version lạ chặn ghi; failure rollback RAM và chặn snapshot phụ thuộc tới recovery. Không reset Xu/kho/theme/record/session khi chuyển định dạng.
+- Snapshot theo game/mode; transaction bàn+ví+kho+thưởng bền vững trước presentation. Callback có round/generation guard, không cấp thưởng lại ở hoạt ảnh. Timer/checkpoint theo sự kiện/nhịp cấu hình, không persist mỗi frame/tick.
+- Theme ảnh weighted without replacement, giữ tối đa ba board gần nhất theo theme. Image chọn asset path, generated chọn stable ID; snapshot mapping giữ qua Continue, round production mới có seed mới. Theme history/session commit và rollback cùng nhau.
+- Xếp hạng v3: mỗi trò ba family Hành trình/Thử thách/Vô tận theo màn đã thắng; Hành trình gom bốn độ khó. Special Chơi lại/Lượt mới từ1, resume giữ bàn/run/thời gian. Điểm vẫn phục vụ HUD/sao. v1/v2 giữ lịch sử/tương thích, không chứng nhận special cũ thành v3. Rules/index v3 đã rollout; không deploy Hosting trong các task này. [QA ranking](docs/design/leaderboard/LEVEL_RANKING_QA.md).
+- Firebase Guest/Google, backup chunk/hash/CAS, ranking outbox và Analytics production-only đã triển khai. Sync chỉ áp dụng ở menu, UID/generation guard; client-trusted ranking, không tự thêm anti-cheat/dịch vụ. OAuth thật/dashboard vẫn cần QA. Private playtime dùng counter monotonic owner/admin, checkpoint30s; hard-kill có thể mất phần chưa commit, không suy thời gian từ kỷ lục.
+- Effect V2 runtime đã hoàn tất; tinh chỉnh mỹ thuật từng hiệu ứng chỉ khi yêu cầu mới. Sao băng pool hai node/một scheduler, chỉ Home/map đủ điều kiện. Cảnh thắng fireworks/confetti/hoa có cancellation và scope riêng; reduced-motion/visibility/dispose giữ cleanup. Browser/soak đã kiểm, thiết bị thật còn chờ.
 
-- Popup Thử thách/Vô tận của cả3trò đã đồng bộ với popup màn Hành trình: xem thông tin màn1 rồi bấm Chơi, không chọn độ khó; thời gian/mục tiêu/gợi ý/khay/chủ đề theo config/profile. Vô tận ghi Không giới hạn, không lặp popup intro. Hủy không đổi save/session/độ khó thường; submit có guard/retry. QA45ca có kết quả đạt, review độc lập14/14; check/build web/build Android pass. Không đổi save schema/luật chơi. Chi tiết: `docs/design/special-mode-preview/QA.md`.
+## Triple Connect và nguồn cấu hình
 
-- Hồ sơ chuẩn bị quảng cáo: `ADS_APK_TEST_PLAN.md` — phase0–4 đã đạt: chỉ banner Home/map, giữ `com.memorymatch.adventure`, bảo vệ trẻ em cho mọi người chơi, không hỏi tuổi/không cá nhân hóa, nội dung G. Unit15/15, UI71/71 + chạy lại ads9/9, check/build web/Android/APK và review độc lập đạt. Không đổi save/API/Auth. APK debug đã tạo/cài giả lập; phase5 còn chờ thông điệp AdMob riêng và trang quyền riêng tư công khai: SDK hiện chặn request vì app chưa có form. Đã xác nhận đúng App ID/unit và đặt mức G riêng trên AdMob; không deploy website. S22 Ultra/Test Ad thật/Auth APK/hiệu suất chưa xác minh. Chi tiết `docs/ads/QA.md`, hướng dẫn dễ hiểu `docs/ads/HUONG_DAN_THU_APK.md`.
+- Reducer/events/worker/solver/ghost presentation là nền tảng hiện hữu, không viết lại. Tổng thẻ/ladder/xấp/topology/solver budget lấy từ config/model; không đổi trong refactor.
+- Khay cơ bản7ô, mở rộng3.000Xu/ô tới10; renderer luôn10node, dọc10ô dùng5×2. Milestone v2:10mốc,step3,target30; Lucky chỉ Challenge. Challenge8+ dùng ladder template5–7, seed theo level và trần tài nguyên.
+- Combo theo bộ ba/màn:≤8 là15s,9–15 là20s,≥16 là30s; match reset window, Miss/hết giờ reset current và giữ maxCombo. Time bonus chỉ cộng một lần khi kết thúc timed.
+- Các giá trị trên là chỉ dẫn điều hướng; sửa config source, không sửa file generator output. Game Shell token sinh bằng shell:sync; asset manifest/URL do generator riêng sở hữu.
 
-- `HOME_MENU_IMPLEMENTATION_PLAN.md` là hồ sơ Home bố cục1+2 ngày2026-10-15, đã được thay bằng carousel ngày2026-10-16. Link/Triple tiếp tục dùng; Memory hiện thay portraitv2 (tổng3ảnh323.366bytes); nguồn art ở `docs/design/home-assets/README.md`, QA cũ ở `docs/design/home-menu/QA.md`. Ornament ảnh trên pause popup đã gỡ theo yêu cầu.
+## Tài liệu và bằng chứng giữ lại
 
-- Sheet12vùng nền trò/popup/tiêu đề/khung ở `docs/design/home-assets/README.md` chỉ là nguồn tham khảo; runtime Home dùng ba tranh riêng có master lớn hơn, không dùng sheet làm nền cả màn. Carousel hiện không dùng flourish tiêu đề, không tạo thêm art.
+- [AGENTS.md](AGENTS.md): chuẩn làm việc; [ARCHITECTURE.md](ARCHITECTURE.md): ownership/contract; [README.md](README.md): chạy/build; [ADD_GAME.md](ADD_GAME.md): tích hợp trò.
+- Memory Match.md, Link Connect.md, Triple Connect.md: luật/thiết kế; themes.md: catalog/chất lượng; MAP_ART_NOTES.md: nguồn atlas bản đồ.
+- Receipt kỹ thuật/UI ở trên là nơi tra kết quả, baseline, phép đo và giới hạn. Các QA lịch sử trong docs/design và docs/ads vẫn giữ; ảnh cũ không thay thế trạng thái UI mới và không bị ghi đè khi dọn kế hoạch.
+- Kế hoạch mới chỉ tạo khi task cần, xác định rõ trong CONTEXT.md. Không coi mục lịch sử chưa đánh dấu trong receipt cũ là yêu cầu triển khai mới.
 
-- `POPUP_POLISH_PLAN.md`: phase1–5 hoàn tất trong phạm vi được giao, không còn kế hoạch triển khai active. Exit bản đồ và mọi screen chức năng (gồm Cửa hàng/Bộ sưu tập) gắn header; Xu giữa Cửa hàng; title Bộ sưu tập không lặp game. Popup bám board, bản đồ dùng cùng mốc chrome ngay lần đầu; menu tạm dừng Vườn đêm có Tiếp tục. QA: `docs/design/popups/QA.md`. Hai mẫu Home và prompt ở `docs/design/home-concepts/README.md`, là nguồn tham khảo cho Home hiện tại. Không deploy/đổi save; S22 Ultra thật còn chờ.
+## Quy tắc tiếp tục và bàn giao
 
-- Tinh chỉnh tab ngày2026-10-15: sửa tên ngay cạnh tên với bút/Lưu/Hủy, dòng ngày bắt đầu theo dõi đã được bỏ khỏi giao diện ngày2026-10-16; ẩn thông báo đồng bộ bình thường. Family xếp hạng canh giữa; top3 huy chương SVG, các hạng sau số sáng không khung. Header tối và exit gắn góc phải cố định trên cả5tab. UI/emulator/check/build đã đạt; chi tiết ở `docs/design/app-tabs/QA.md`. Không đổi API/schema/save/Auth.
+- Kiểm tra Git status/diff, coi mọi thay đổi có sẵn là của người dùng; không reset/ghi đè, không dọn tiện .vscode hoặc ảnh QA.
+- Test mục tiêu trước, suite rộng theo phạm vi shared owner; layout/hit target/overflow cần mobile hẹp, phổ biến, landscape và desktop. Galaxy S22 Ultra CSS412×915 là viewport tham chiếu, không thay thiết bị vật lý.
+- Implementation và review sau implementation là hai bước riêng; đọc diff theo acceptance và chạy lại kiểm tra trọng yếu. Test/build không thay visual review hoặc số đo thiết bị.
+- dist, test-results, playwright-report, node_modules và manifest sinh là output có thể tái tạo; không dọn thủ công ngoài phạm vi. Không tạo báo cáo riêng cho từng chỉnh web nhỏ; bổ sung bằng chứng chung phù hợp.
 
-- `APP_TABS_VISUAL_PLAN.md`: Phase0–5 đã hoàn tất, mỗi phase một commit; không còn kế hoạch triển khai active. Bốn nền WebP mới53–112KB; Profile có name editor và stats/account trong content; Cài đặt3nhóm cuộn gồm Help/Reset; Xếp hạng khôngrefresh thường trực, fresh khi mở, menu128px và familyheading. Giữ ranking v3/Auth/save/private stats. QA: `docs/design/app-tabs/QA.md`. Không Hosting/APK/Firebase rollout; S22 Ultra thật còn chờ.
-
-- `LEVEL_PROGRESS_LEADERBOARD_PLAN.md`: Phase0–6 đã hoàn tất; kế hoạch level không còn active. Tài liệu giữ làm hồ sơ nghiệm thu, QA thiết bị thật còn chờ riêng theo xác nhận người dùng. Mỗi trò có ba bảng level Hành trình/Thử thách/Vô tận (v3); Hành trình gom bốn độ khó theo màn đã thắng. Hai mode đặc biệt mở lượt mới từ1 khi Chơi lại/Lượt mới; resume giữ bàn, run và thời gian. Sinh màn tiếp qua100.000 với trần tài nguyên. Dropdown từ từng nút trò thay mode strip/picker màn; điểm giữ cho sao, HUD kỷ lục đúng context, map không ghi điểm trên nút. Save formatVersion2, v1/v2/Xu/kho/theme/private profile được giữ; special v3 chỉ tính từ lượt mới, adventure migration theo batch và owner. Atomic pair settlement lưu bàn+Xu+thưởng trước presentation để reload không mất/nhân thưởng. Rules/index v3 đã rollout và index READY, không deploy Hosting/APK. Báo cáo/bằng chứng: `docs/design/leaderboard/LEVEL_RANKING_QA.md`.
-
-- `LEADERBOARD_REDESIGN_PLAN.md` và `EFFECTS_LEADERBOARD_PLAN.md` là hồ sơ lịch sử. UI sáu mode/picker và ranking theo thời gian/điểm của các hồ sơ đó đã được thay bởi v3. Profile vẫn có ngày tham gia Auth và tổng thời gian chơi dùng chung ba trò, quyền đọc owner/admin. Galaxy S22 Ultra thật và dashboard admin ngoài repo vẫn chờ; chưa tuyên bố nghiệm thu thiết bị thật.
-
-- Ứng dụng JavaScript ES modules; backend local chính là IndexedDB theo chặng, facade persistence bất đồng bộ. Firebase Firestore Singapore đã cấu hình Rules/indexes; Auth Guest/Google, sync, xếp hạng online và Analytics production-only đã triển khai. Chưa deploy Hosting trong task này; dashboard Analytics/OAuth hosted/thiết bị thật còn cần QA trước phát hành.
-- Sản phẩm chưa phát hành. Yêu cầu ngày 2026-10-13 thay chính sách reset development: giữ Xu/vật phẩm/chủ đề/kỷ lục/session khi chuyển định dạng. Bản nguồn formatVersion=1 được giữ làm phục hồi; formatVersion=2 dùng transaction profile + chapter, cache giới hạn theo chặng đang xem/phiên. Không fallback sang v1 khi backend mới từng được dùng; dữ liệu hỏng/version lạ chặn ghi. Ghi thất bại chặn các snapshot phụ thuộc và yêu cầu tải lại bản đã commit, không tiếp tục ghi dữ liệu RAM chưa bền vững.
-- Ba game có trong runtime/menu: Memory Match, Link Connect và Triple Connect.
-- Memory Match, Link Connect và Triple Connect dùng Game Shell chung; state/session gameplay vẫn tách theo game và mode.
-- Runtime Closure và Render Performance Closure đã hoàn tất ở phạm vi runtime: validation boundary Triple, scheduler HUD chung, benchmark/soak ba game và review closure đều đã đạt trước khi kế hoạch triển khai được xóa. Không khôi phục kế hoạch runtime cũ từ Git history. Effect V2 runtime đã đạt; tinh chỉnh hình ảnh 21 line effect là việc tùy chọn tách riêng, không phải gate hay nội dung chưa hoàn tất.
-- Hidden Piles, Tray Expansion, Milestone 10/30 và Effect V2 runtime đã được triển khai.
-- Review runtime gần nhất ngày 2026-09-29: `npm run check` pass; Effect V2 24/24 pass sau khi bỏ brightness ngoài contract của Dissolve; lifecycle 100 vòng ba game và Triple Worker 20 chu kỳ cancel đều trả resource về baseline. Hai test Triple HUD đang thay đổi song song chưa thuộc kết luận runtime này.
-- Mục tiêu hiện tại là hoàn thiện trải nghiệm web desktop/mobile. PWA/APK/Android/signing/store QA chỉ bắt đầu bằng task riêng sau khi người dùng xác nhận web ổn định.
-- Gate renderer Board Startup trước đây đã hoàn tất: Link batch DOM ban đầu và cải thiện board-ready CPU 6× khoảng 20%; thử nghiệm Memory không tạo lợi ích rõ và Triple batching bị loại do làm xấu số đo. Phần async controller chưa được giao lại và không còn là kế hoạch active; nếu cần phải lập task riêng sau HUD.
-- HUD dùng một owner menu theo scope cho ba game; progress là placeholder rỗng/ẩn, metric/ref chết đã loại và CSS shared sở hữu thanh ngang liền mạch với nút 44px, nhãn vàng/giá trị trắng. Regression HUD 60/60, review menu 5/5, check/build và nghiệm thu Galaxy S22 Ultra đã pass; soak không tăng resource. Chuyển cảnh background no-preference có lỗi có sẵn ngoài phạm vi, chưa được thay đổi.
-
-## Contract dùng chung
-
-- Hồ sơ lịch sử: `EFFECTS_LEADERBOARD_PLAN.md` (2026-10-13); Gate1–3 triển khai/browser QA đã hoàn tất; Galaxy S22 Ultra thật còn chờ theo xác nhận người dùng2026-10-14. Gate1 pool sao băng; Gate2 UI xếp hạng ba trò × sáu mode,10 người/trang và cursor; Gate3 đo/audit cảnh thắng trước khi quyết định sửa mỹ thuật. ADVENTURE_WEB_PLAN.md phase0–20 đã hoàn tất và là hồ sơ lịch sử.
-- Cảnh hoa hiện tại95 phần tử SVG/ba nhóm animation hữu hạn; người dùng đã thử mobile và thấy mượt. Kế hoạch giữ hình ảnh hiện có, đo allocations/frame/paint và audit confetti còn lại/RAF cleanup khi chuyển cảnh nhanh. Sao băng dùng eligibility từ page/navigation/shell lifecycle.
-
-- Firebase Hosting dùng chung project `memorymatchv1-1a` với ba site: target `production` → `memorymatchv1-1a`, target `beta` → `memorymatchv1-1b`, target `test` → `memorymatch-test`. `npm run deploy`, `npm run deploy:beta` và `npm run deploy:test` chỉ deploy đúng site tương ứng. Mỗi URL có storage trình duyệt riêng vì khác origin.
-
-- ADVENTURE_WEB_PLAN.md phase0–20 đã hoàn tất. Dữ liệu hành trình riêng từng trò, mở khóa tuần tự chung bốn độ khó/sao và điểm riêng;100 màn +10 rương/chặng, thắng đủ100 mới nối chặng. Auth/backup, xếp hạng, Analytics, UI và cảnh hoa đã triển khai. Nhiệm vụ/cơ chế gameplay mới tạm hoãn; thiết kế UI hiện hành theo mục20. Chi tiết nghiệm thu/giới hạn trước phát hành ở mục16/20 và README.
-- Rương tạm dùng ba gói Xu có phần cố định + ngẫu nhiên: Nhỏ 60 + 20–40 (70%), Vừa 100 + 30–60 (25%), Lớn 150 + 50–100 (5%); catalog/grants có thể mở rộng vật phẩm sau. Backend ranking cơ bản/mọi thời gian/có gửi lại offline đã được người dùng đồng ý. Agent review chỉ dùng khi cần với thay đổi rủi ro, chỉ đọc/test, không sửa/commit.
-- Dock hiện tại theo mục20 có năm mục ngoài gameplay, ẩn trong gameplay. Quảng cáo chỉ chừa vùng trên Home/map; chưa gắn provider/ad unit, deploy Hosting hoặc nâng billing.
-- Tài liệu repository chỉ chứa thiết kế/kế hoạch của dự án. Nội dung nghiên cứu/tham khảo trò khác chỉ ở chat; không lưu tên, mô tả, bảng so sánh, đường dẫn hoặc tài nguyên của các trò đó vào dự án.
-- Hướng menu hiện tại (mục20): ngoài gameplay dùng năm tab toàn màn hình. Home: Nhiệm vụ/Sự kiện/Profile/Xếp hạng/Cài đặt, hai mục đầu Sắp ra mắt. Chọn trò: Cửa hàng/Bộ sưu tập/Bản đồ/Xếp hạng/Cài đặt. Không profile/Xu trên header; Exit góc trên phải map/tab trở về Home. Gameplay giữ HUD/bàn/khay, ẩn dock; ba gạch mở Tạm dừng với Thoát game/Chơi lại/Cài đặt, giữ ván và pause trong Cài đặt. Quảng cáo chỉ Home/map. Mục20 là scope hiện hành, thay các mô tả UI cũ.
-- Bản đồ dùng sao chưa sáng/sao sáng theo kết quả của độ khó đang xem; completion chung giữa độ khó vẫn là dữ liệu riêng, không suy từ số sao. Không có tìm/lọc màn; re-entry về frontier.
-- Màn thường xếp hạng riêng theo trò/độ khó/màn, ưu tiên thời gian thực đang chơi ngắn nhất (loại tải/pause/menu/tab ẩn). Cho phép hỗ trợ, guest/Google; một kỷ lục mỗi UID/bảng. Backend cơ bản client-trusted đã triển khai, contract/quota cũ ở mục12 ADVENTURE_WEB_PLAN.md.
-- Luật hiện hành v3 (2026-10-15): mỗi trò ba bảng Hành trình/Thử thách/Vô tận theo màn đã thắng. Hành trình gom bốn độ khó; special Chơi lại bắt đầu lượt mới từ1, resume giữ lượt và bàn. Checkpoint/điểm v2 giữ làm lịch sử, không import special cũ vào v3; luật restart giữ lượt của Gate2 cũ đã được thay thế theo kế hoạch level.
-- Startup ba game hiển thị popup đầu màn ngay khi HUD/board DOM sẵn sàng, decode ảnh tiếp tục nền, không có nhãn loading và input/timer chỉ mở sau khi readiness hoàn tất. Startup regression 9/9, contract popup/timer Triple 1/1, check/build và nghiệm thu Galaxy S22 Ultra đã pass. Trace cold board-ready có nhiễu profiler được giữ làm dữ liệu tham khảo, không phải lỗi mở.
-
-- Tinh chỉnh HUD ngày 2026-09-30: bỏ animation `pulse-red` phóng to ô timer, giữ cảnh báo màu tĩnh; nút menu hệ thống có nền xanh dương, công cụ gameplay có nền tím và icon sáng, cùng viền inset, không đổi kích thước 44px. Regression HUD/menu/presentation 10/10 ở 412×915; sau khi tách màu nút, presentation 3/3 và check/build pass; API/save không đổi. Chưa kiểm tra trên thiết bị thật.
-
-- `js/gameCatalog.js` sở hữu game/mode/namespace; session lưu riêng theo game và mode.
-- Game Shell sở hữu sáu vùng semantic, HUD patch, layout, lifecycle và effect registry; controller/renderer từng game sở hữu luật, tile và presentation đặc thù.
-- Xu và nội dung sở hữu dùng chung khi catalog cho phép; item, session và appearance có namespace/capability theo game.
-- Popup, modal, sound, shop, collection và persistence được tái sử dụng qua adapter; không dùng nhánh mặc định “game khác => Memory/Link”.
-- Transaction Xu/item/appearance phải commit atomically và rollback RAM khi save fail.
-- Timer/session checkpoint theo event có ý nghĩa; không ghi persistence theo frame/tick.
-
-## Triple Connect hiện tại
-
-- Tổng thẻ active: Easy 27, Normal 54, Hard 78, Super Hard/Endless 120.
-- Layout, snapshot và milestone Triple chỉ dùng contract hiện hành; không có yêu cầu đọc save Triple development cũ.
-- Xấp góc: Normal `9`; Hard `7 + 8`; Super Hard/Endless `6 × 4`. Thẻ ẩn không nằm trong DOM/a11y cho tới khi thành top.
-- Khay cơ bản 7 ô; mỗi lần mua Mở rộng khay thêm 1 ô, giá 3.000 Xu, tối đa 10 ô. Renderer luôn tạo 10 node và khóa các ô chưa mua; mobile dọc dùng 5×2 khi có 10 ô.
-- Milestone version 2 có 10 mốc, step 3, target 30. Lucky chỉ có trong Challenge.
-- Challenge level 1–7 có tổng thẻ `18/27/42/51/66/75/93`; stage có xấp cũng dùng topology corner-safe mới. Từ màn8 dùng ladder biến thể các template5–7 với seed theo level, giữ trần tài nguyên.
-- Baseline nghiệm thu HUD/mobile UI hiện tại là Galaxy S22 Ultra ở viewport CSS 412×915 portrait. Không tạo gate hoặc profile test riêng cho viewport 320/360; kích thước nhỏ hơn một chút dùng responsive fluid và chỉ mở test mới khi có lỗi thực tế trên thiết bị mục tiêu.
-- Effect V2 runtime đã hoàn tất với pool/cleanup/reduced-motion cho Link 2-target và Triple 3-target. Chỉ mở task mỹ thuật cho từng hiệu ứng khi người dùng yêu cầu; không nhắc lại như thiếu sót runtime.
-- Triple tính mục tiêu sao theo số bộ thẻ và chỉ cộng time bonus một lần khi kết thúc màn timed.
-- Combo Triple dùng cùng cửa sổ với Memory/Link theo số bộ ba trong màn (≤8: 15s; 9–15: 20s; ≥16: 30s); ghép ba thẻ khởi động lại, Miss hoặc hết giờ đặt combo hiện tại về 0 nhưng giữ maxCombo.
-
-## Theme selection hiện tại
-
-- Image theme dùng manifest đệ quy, chọn weighted without replacement và lưu tối đa ba board gần nhất theo theme.
-- Image selection dùng asset path; generated selection dùng stable ID. Memory/Link snapshot selection; Triple snapshot type → selection; Continue giữ mapping, round production mới có seed mới.
-- Theme history và session commit/rollback atomically trên cả ba game.
-
-## Điều hướng catalog hiện tại
-
-- Cửa hàng và Bộ sưu tập lưu stable tab ID riêng theo `(gameId, shop/collection)`, khôi phục qua reopen/reload và fallback an toàn khi capability không còn.
-
-## Tài liệu giữ lại
-
-- `LEADERBOARD_REDESIGN_PLAN.md`: kế hoạch hiện hành làm lại UI ranking, nền và phase theo dõi profile riêng; mới hoàn thành lập kế hoạch/ảnh nguồn.
-- `EFFECTS_LEADERBOARD_PLAN.md`: hồ sơ Gate1–3 code/browser QA đã đạt; số đo và QA thiết bị thật còn chờ, không phải kế hoạch triển khai active.
-- `ADVENTURE_WEB_PLAN.md`: hồ sơ đã hoàn tất phase0–20 và quyết định UI/data hiện có.
-- `AGENTS.md`: chuẩn làm việc bắt buộc.
-- `ARCHITECTURE.md`: ownership và contract kỹ thuật bền vững.
-- `README.md`: cách chạy/build.
-- `ADD_GAME.md`: checklist tích hợp game.
-- `Memory Match.md`, `Link Connect.md`, `Triple Connect.md`: luật/thiết kế từng game.
-- `themes.md`: catalog/chất lượng asset chủ đề.
-- `MAP_ART_NOTES.md`: atlas trang trí/rương bản đồ vườn đêm, quy tắc bố trí và prompt gốc.
-
-Các kế hoạch HUD, Startup, Triple/Effect/Theme, Runtime Closure và Board Startup cũ đã được hợp nhất, hoàn tất hoặc ngừng active và bị xóa. Không khôi phục chúng từ Git history làm nguồn triển khai; dùng code/config và các tài liệu bền vững ở trên làm nguồn hiện hành.
-
-## Quy tắc bàn giao
-
-- Luôn đọc `git status` trước khi sửa; thay đổi có sẵn thuộc người dùng/agent khác và không được reset hoặc ghi đè.
-- Chạy test mục tiêu trước, suite rộng ở gate cuối hoặc khi chạm shared owner.
-- Mỗi contract có một test owner; không nhân mọi suite qua mọi viewport. Chỉ layout/hit target/overflow/presentation geometry cần matrix responsive.
-- Test/build pass không thay thế visual review, số đo hiệu suất hoặc nghiệm thu thực tế của người dùng.
-- `dist/`, `test-results/`, `playwright-report/`, `node_modules/` và manifest sinh là đầu ra có thể tạo lại, không phải source cần dọn thủ công trong task gameplay.
-
-Phase 1 (2026-10-13): check/build pass; browser adventure-data + cleanup 6/6 pass, review độc lập. Bundle JS 505,10 kB (gzip 138,91), sẽ tách tải ở phase 7; chưa tuyên bố FPS thiết bị thật.
-
-Phase 2: appPageLifecycle sở hữu trang menu/modal; game shell sở hữu dock, fit board trừ dock bound; 3 viewport pass, 100 lần chuyển trò pass. Header wallet/account và dock Shop → Collection → Ranking → Settings; menu chừa slot quảng cáo, gameplay không có slot.
-
-Phase 3: adventureMap sở hữu một chặng 110 node, patch mode không remount/đổi scroll; native scroll, không finder. Adapter launch/resume từng trò, preview cảnh báo thay session cùng mode; rương commit rồi mới xác nhận. LastPlayedGameId có check concurrency với catalogTabs. Map chapter navigation 5 vòng giữ diagnostics/page resources ổn định.
-
-Phase 4: bỏ scene202nodes/CSS infinite cũ; victoryFlowerScene tạo SVG nguyên bản, victoryCelebration sở hữu animation/audio/listener và được game/page owner hủy. Triple cũng có celebration đủ100 clear và tiếp tục101. Web/Android build pass (không build APK), 6 victory/music tests pass, review lifecycle pass.
-
-Phase5 (2026-10-13): Firebase Anonymous/Google enabled, authorized domains production/beta/test + localhost. Private Rules/indexes deployed only, no Hosting/billing change. Guest offline/reload, same-UID link, existing Google cloud/local choice, recovery backup and conflict deferred during gameplay: emulator Auth3 pass; private CAS/GC/ownership pass. Cloud uses content-addressed 64KiB chunks + CAS manifest; local restore atomic with up to3 backups and UID/generation guards. check/build pass; navigation/catalog/cleanup12 pass; independent review findings fixed. Real Google OAuth popup and Android provider flow require device/domain QA; emulator credentials do not prove hosted OAuth.
-
-Phase6: immutable public attempts/runs with start owner; per-UID durable outbox, cap2000 with deferred refill, max20/15s; top20+own cache12 boards/120s, refresh15s. Rules ownership/schema/query-limit and concurrent best pass; Auth/ranking5 browser tests pass. Basic client-trusted all-time; no leaderboard for Memory/Link Endless. Phase6 review data findings fixed; final reviewer execution later hit account usage limit.
-
-Phase7: production-only Analytics active_play_time theo pause/end segment, không tick/Firestore; test/beta/local/emulator bị loại. Event-clock unit pass. Queue scan patch resident khi save thường, archive recovery khi boot/import/deferred; metadata no-op không ghi. Build JS chính517,06→420,42kB; Firebase chunks tối đa472,29kB, không circular/size warning; built-bundle smoke pass. Headless dev map40 switches: patch p95 6,3ms,735 DOM nodes, no long tasks, owner diagnostics stable; cold6.841.051/warm1.607.128 bytes (raw dev resources, không tương đương production gzip hoặc mobile FPS). Auth/ranking5 regression pass. DebugView/dashboard custom metric và OAuth/device thực chưa xác minh; hướng dẫn README, không đánh dấu verified.
-
-## Tinh gọn bản đồ — 2026-10-13
-
-Đã hoàn tất tinh chỉnh: bỏ nhãn/điều hướng chặng, tiến trình, chủ đề và mọi nút tiếp tục ngoài map; tên trò cùng hàng avatar/Xu ở trên; một nút chọn sáu chế độ; nút màn44px và đường SVG mảnh có hoa văn tĩnh. Mỗi lần vào map trở về màn cao nhất đang chơi được ở chặng hiện tại. Bấm màn hoặc chọn chế độ đặc biệt bắt đầu lượt mới; không tự xóa phiên chỉ vì về menu. Luật/đồng hồ/ranking/economy/schema save giữ nguyên. Kiểm tra mode/focus/keyboard, re-entry, seam/reward, vòng đời và ba viewport; check/build trước hoàn tất. Không thay gameplay, backend, nền bitmap hoặc quảng cáo.
-
-Nghiệm thu tinh gọn: check/build pass; browser33/33 (map, progression, compact shell), bản đồ cuối20/20 gồm3 trò×6 mode/keyboard/seam; built-app smoke2/2. Registry/HUD/audit/geometry/menu38 kiểm tra pass ở lượt đầu, seed expectation được cập nhật đúng variant generator và pass khi chạy lại progression. Headless dev715 DOM nodes, mode patch p95 6,7ms, không long task; chưa đo FPS điện thoại thật. Skill làm rõ yêu cầu được dùng để chốt lựa chọn vào lượt mới; không thay schema save/backend/gameplay.
-
-## Trang trí map — 2026-10-13
-
-Task ADVENTURE_WEB_PLAN.md mục17 đã hoàn tất, không còn gate active. Atlas gốc vườn đêm gồm14 trang trí và2 trạng thái rương; layout thuần theo game/màn, ổn định khi nối chặng và tính Y tương đối để không mất chính xác ở số màn lớn. Giữ shared map/page ownership, không thêm listener/RAF/animation loop/backend/schema. Skill imagegen được dùng để tạo và chỉnh khoảng trống atlas; prompt/nguồn ở MAP_ART_NOTES.md. check/build pass;19 map contracts được xác minh qua lượt rộng/chạy lại reward, performance1 và built-smoke2 pass. Lượt cuối722 DOM nodes, mode patch p95 5,8ms, không long task; lượt trước có54–55ms trong cửa sổ toàn tải/đo. Chưa đo60FPS trên điện thoại thật.
-
-## Popup chọn màn — 2026-10-13
-
-Hồ sơ đã hoàn tất ADVENTURE_WEB_PLAN.md mục18 (thiết kế cuối theo mục20): bản đồ bấm màn mở preview và chọn bốn độ khó trước khi Chơi; hai nút Vô tận/Thử thách cố định riêng. Home trái/tài khoản phải ở map; theo yêu cầu mới tiếp theo, home cũng bỏ Xu và dời tài khoản phải, không thêm nút Home trên trang chủ. Xu vẫn xem trong cửa hàng. Bỏ Home trong Cài đặt. Profile silhouette SVG được vẽ lại đối xứng, chấm trạng thái absolute để không đẩy glyph lệch. Số nhiều chữ số bị lệch vì padding chung của button; sửa padding/căn giữa/font ở owner map. Gameplay/schema/luật/mở khóa/thưởng/ranking giữ nguyên. Skill làm rõ yêu cầu dùng để chốt phạm vi header trước khi người dùng cập nhật thêm. Không dùng bitmap mới, không đưa nội dung tham khảo ngoài dự án vào source.
-
-
-Điều chỉnh popup cuối mục18: dùng huy hiệu C/B/A/S, bỏ sao và lịch sử; tiêu đề Màn N · độ khó; goal/time/assist/theme lấy từ config thật. Chỉ bắt đầu map thường skip intro; Memory reveal, decode/commit gating và intro ở các lối vào khác vẫn giữ. Mục19 được người dùng giao tiếp: menu trên chỉ mở popup Exit/Restart, Help/Reset xuống Settings; footer gọi hành động controller thay click vào dropdown cũ. Thực hiện tuần tự và commit từng phần, chưa push/deploy.
-
-Mục18 và19 đã hoàn tất: check/build và44 UI/startup pass; built3 pass; review độc lập không finding ở phần này. Thiết kế và kết quả cuối theo mục20 bên dưới. Chưa nghiệm thu FPS máy thật; chưa push/deploy.
-
-2026-10-13: Các gate mục19–20 ADVENTURE_WEB_PLAN.md đã hoàn tất; kế hoạch hiện hành mới là EFFECTS_LEADERBOARD_PLAN.md, chưa triển khai. Thiết kế hiện hành theo mục20: home Nhiệm vụ/Bạn bè/Profile/Xếp hạng/Cài đặt; map Cửa hàng/Bộ sưu tập/Bản đồ/Xếp hạng/Cài đặt; Exit góc trên phải map/tab, không profile/Xu trên header. Gameplay không dock; popup Tạm dừng có Thoát game/Chơi lại/Cài đặt. C/B/A/S nâu/xanh dương/vàng/tím. Các tab là screen region, không dialog; giữ map subtree/scroll, cleanup scope, Settings DOM và Account subscription. HUD khóa trong startup, tránh ghi đè pause. Check/build và lượt độc lập34/34 cùng built3/3 pass, review finding đã sửa. Mục20 có chi tiết matrix78 và benchmark chạy lại; chưa QA FPS/Google thật. Không đổi save/schema và không deploy/push.
-
-
-
-Gate1 EFFECTS_LEADERBOARD_PLAN.md (2026-10-14): pool sao băng hai node/một scheduler và eligibility Home/map trực tiếp từ owner đã triển khai. Soak animation thật10 phút/114 lần hoàn tất,100 lần chuyển Home/map/game thật giữ node/timer ổn định; post-GC heap gần7MB. So sánh35s: allocations node6→0, frame p95 8,1→8,1ms/không long task trên Chrome155 Windows/DPR1. Check/build và browser tests pass, review độc lập. Chưa có số đo Galaxy S22 Ultra; không tuyên bố FPS thiết bị thật. Gate2/3 đã hoàn tất phần mềm; QA thiết bị thật còn chờ, xem hồ sơ bên dưới.
-
-
-Hồ sơ lịch sử Gate2 EFFECTS_LEADERBOARD_PLAN.md (2026-10-14): checkpoint thắng v2 cho Challenge/Endless cả ba trò, best-only theo số màn thắng/điểm các màn thắng; stage cùng transaction settlement, thất bại không outbox, restart thay điểm/advance cộng một lần/finalize không gửi màn dở. runBestsV2 mới giữ runBestsv1 làm lịch sử; nhập v1 chỉ khi matching finalized run chứng minh totals. UI3trò×6mode/10người+own/cursor11entries, cache12board×5page/100cursor và UID/generation guard. Browser emulator10/10, UI/data/catalog12/12, Rules/pure/check/build pass, review độc lập findings đã sửa. Không deploy Rules hoặc Hosting; index hiện có đủ. Gate3 đã hoàn tất phần mềm; thiết bị thật chưa đo. Luật v2 trong đoạn này đã được v3 thay thế theo kế hoạch level.
-
-
-Gate3 EFFECTS_LEADERBOARD_PLAN.md (2026-10-14): audit phát hiện orphan fireworks/confetti và continuation summary cũ cùng parent; đã sửa scope/cancel/generation, instance confetti riêng, counter motion/visibility cleanup. Giữ95SVGnode/nhạc/timeline/cap và màu. Final browser23/23 + profile2/2, independent review12+3tests, check/web/Android-wrapper build và built-smoke2/2 pass. Soak30vòng giữ1127node/76listener, heapdelta≈42KB; flower overlap canvas1→0. Chrome155 Windows/DPR3 mô phỏng có flower p95≈8,5ms/no long task; trace không chứng minh FPS điện thoại. Người dùng xác nhận không có thiết bị/remote debug và cho ghi QA Galaxy S22 Ultra còn chờ. Không còn gate code active; kế hoạch giữ làm hồ sơ có mục QA vật lý chưa xác minh. Không deploy/push hoặc APK.
-
-- Âm thanh/chuyển wave20/10: sao1–3 phát theo sao đã đạt, tổng kết không phát reward; reward dùng cho vật phẩm/thưởng bộ tranh/rương, open_box khi mở nắp, explosion cho Sấm sét. Voice hữu hạn theo owner, mute/volume/hidden/close được tôn trọng. Wave mới hiện theo lớp bốn hướng ngẫu nhiên, bỏ sweep/flash, chờ thẻ sẵn sàng mới chạy giờ; nhạc không đổi nguồn/chạy lại giữa wave. Build web và kiểm tra chức năng đạt; npm check tổng còn fail phép đo sinh bàn Triple (Easy21.04/40.50/26.73ms>20, lần default Hard209.32ms>200), không đổi generator/ngưỡng. Chi tiết chung tại docs/qa/gameplay-progression/RECEIPT.md. Không đổi schema/save, không APK/deploy.
+- Âm thanh/chuyển wave20/10: sao1–3 phát theo sao đã đạt, tổng kết không phát reward; reward dùng cho vật phẩm/thưởng bộ tranh/rương, open_box khi mở nắp, explosion cho Sấm sét. Voice hữu hạn theo owner, mute/volume/hidden/close được tôn trọng. Wave mới hiện theo lớp bốn hướng ngẫu nhiên, bỏ sweep/flash, chờ thẻ sẵn sàng mới chạy giờ; nhạc không đổi nguồn/chạy lại giữa wave. Build web, kiểm tra chức năng và lượt check toàn dự án sau khi đồng bộ hướng dẫn/tài liệu đều đạt. Các lần đo Triple biến động trước đó giữ trong receipt chung; không đổi generator/ngưỡng. Chi tiết chung tại docs/qa/gameplay-progression/RECEIPT.md. Không đổi schema/save, không APK/deploy.
