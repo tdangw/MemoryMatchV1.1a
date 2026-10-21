@@ -72,7 +72,7 @@ const controller = createUiSkinController({
     if (skin === 'default') return;
     await loadBundle('core', signal);
   },
-  save: skin => gameState.settings.uiSkin === skin ? Promise.resolve(true) : saveSetting('uiSkin', skin),
+  save: skin => saveSetting('uiSkin', skin),
   committed: skin => { gameState.settings.uiSkin = skin; },
   apply: skin => {
     clearRewards(); currentSkin = skin;
@@ -85,6 +85,11 @@ const controller = createUiSkinController({
 export function getUiSkin() { return currentSkin; }
 export async function selectUiSkin(value) {
   if (!canLaunchGame()) return { status: 'error', error: new Error('profile-changing') };
+  // A RAM equality check is safe only before a new request and with no pending
+  // durable commit. A superseded save may already be writing a different skin.
+  if (!controller.busy && normalizeUiSkin(value) === currentSkin && gameState.settings.uiSkin === currentSkin) {
+    return { status: 'applied', skin: currentSkin };
+  }
   const result = await controller.select(value);
   if (result.status === 'error' && currentSkin === 'default') decoded.clear();
   return result;

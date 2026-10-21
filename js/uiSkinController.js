@@ -31,6 +31,7 @@ export function createUiSkinController({ load, save, apply, captureOwner, commit
   }
   return {
     select,
+    get busy() { return loading !== null; },
     dispose() { disposed = true; generation++; loading?.abort(); loading = null; },
   };
 }
