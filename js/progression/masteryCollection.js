@@ -8,6 +8,7 @@ import { claimAdventureCollection } from '../adventureRewards.js';
 import { refreshAppWallet } from '../appNavigation.js';
 import { openAppModal } from '../modal.js';
 import { createGameShellLifecycle } from '../gameShell/gameShellLifecycle.js';
+import { dismissContextGuide, showContextGuide } from '../tutorial/contextGuide.js';
 import '../../styles/mastery-collection.css';
 
 export const COLLECTION_PAINTINGS = Object.freeze([
@@ -61,7 +62,9 @@ export function renderMasteryCollection(container, gameId, { block: requestedBlo
       const next = control('Sau', block >= lastBlock, () => { block++; void render(); });
       const navigation = document.createElement('nav'); navigation.className = 'mastery-collection__navigation';
       navigation.setAttribute('aria-label', 'Chọn bộ tranh'); navigation.append(previous, next);
+      dismissContextGuide(root);
       root.replaceChildren(heading, pieces, progress, reward, navigation);
+      showContextGuide('pieces',pieces,owner);
       if (mastery.collectionComplete) {
         root.append(control('Xem tranh', false, () => showPainting(painting, owner)));
       }

@@ -474,7 +474,7 @@ export async function runLinkGameAction(action) {
     return navigation.showShop(resumeLinkAfterShop);
   }
   if (action === "help") {
-    return showLinkGameModal("Cách chơi Link Connect", LINK_CONNECT_HELP_CONTENT + PROGRESSION_HELP_CONTENT, "book");
+    return showLinkGameModal("Cách chơi Link Connect", LINK_CONNECT_HELP_CONTENT + PROGRESSION_HELP_CONTENT, "book", 'link-connect');
   }
   if (action === "info") {
     return showLinkGameModal("Giới thiệu", "<p><strong>Link Connect</strong> là trò chơi nối cặp hình giúp rèn luyện khả năng quan sát.</p>", "info");
@@ -485,9 +485,9 @@ export async function runLinkGameAction(action) {
   }
 }
 
-function showLinkGameModal(title, content, icon) {
+function showLinkGameModal(title, content, icon, practiceGameId = null) {
   pauseLinkForModal();
-  openAppModal({ id: "link-game-info-modal", alignment: "center", title, content, icon, onClose: resumeLinkAfterModal });
+  openAppModal({ id: "link-game-info-modal", alignment: "center", title, content, icon, practiceGameId, onClose: resumeLinkAfterModal });
 }
 
 export function openLinkPanel(open) {

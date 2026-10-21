@@ -1,5 +1,6 @@
 import '../../styles/progression.css';
 import { createGameShellLifecycle } from '../gameShell/gameShellLifecycle.js';
+import { showContextGuide } from '../tutorial/contextGuide.js';
 
 const announcements = new WeakMap();
 const WAVE_NOTICE_VIEWPORT_INSET = 8;
@@ -90,7 +91,10 @@ export function announceWave(refs, scope, wave) {
   noticeScope.own(() => releaseOwner.forget());
   noticeScope.own(() => notice.remove(), 'node');
   positionWaveNotice(notice, refs, noticeScope);
-  const release = () => noticeScope.dispose();
+  const release = () => {
+    noticeScope.dispose();
+    if (scope.active) showContextGuide(`wave:${wave.gameId}`,refs.title.querySelector('.progression-wave-status'),scope);
+  };
   let arrival = Promise.resolve(scope.active);
   if (!reducedMotion() && !document.hidden) {
     noticeScope.animation(notice.animate([{opacity:0,transform:'translate(-50%,6px)'},{opacity:1,transform:'translate(-50%,0)'}],{duration:WAVE_PRESENTATION_TIMING.noticeEnter,easing:'ease-out'}));

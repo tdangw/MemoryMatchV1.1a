@@ -1,5 +1,6 @@
 /** One exclusive menu state per HUD mount, owned by its lifecycle scope. */
 import { getActivePlayMetrics } from "../playMetrics.js";
+import { showContextGuide } from '../tutorial/contextGuide.js';
 export function bindGameHudMenus(scope, entries) {
   let menus = entries;
   let current = null;
@@ -27,6 +28,10 @@ export function bindGameHudMenus(scope, entries) {
       entry.panel.hidden = false;
       entry.trigger.setAttribute("aria-expanded", "true");
       entry.trigger.classList.add("is-open");
+      if (entry.trigger.id.includes('tools')) {
+        const gameId = entry.trigger.id.startsWith('memory') ? 'memory-match' : entry.trigger.id.startsWith('link') ? 'link-connect' : 'triple-connect';
+        showContextGuide(`tools:${gameId}`,entry.panel,scope);
+      }
     });
     scope.listen(entry.panel, "click", event => {
       if (event.target.closest("button")) close();

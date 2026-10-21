@@ -467,10 +467,11 @@ function applyCollectionCardBack() {
   });
 }
 
-export function showGameInfoModal(title, message, icon = "info", onClose = () => {}) {
+export function showGameInfoModal(title, message, icon = "info", onClose = () => {}, practiceGameId = null) {
   gameState.isPaused = true;
   openAppModal({
     id: "info-modal",
+    practiceGameId,
     alignment: "center",
     icon,
     title,

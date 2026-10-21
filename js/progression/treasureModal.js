@@ -11,6 +11,7 @@ import { renderMasteryCollection } from './masteryCollection.js';
 import { projectJourneyTreasure, nextTreasureLevel } from './treasureProjection.js';
 import { presentTreasureOpening } from './treasureAnimation.js';
 import { renderTreasureContent } from './treasureView.js';
+import { dismissContextGuide, showContextGuide } from '../tutorial/contextGuide.js';
 
 /** A single modal owns selection and presentation; only the reward transaction grants inventory. */
 export function openJourneyTreasure({ gameId, block, owner, selectedTier, onClaimed = () => {}, onPlay }) {
@@ -26,7 +27,11 @@ export function openJourneyTreasure({ gameId, block, owner, selectedTier, onClai
   const modal = openAppModal({ id: 'adventure-chest-modal', title: 'Kho báu hành trình', content, owner: scope,
     alignment: 'center', keepBanner: true, onDestroy: () => scope.dispose() });
   modal.panel.classList.add('treasure-dialog');
-  const draw = () => renderTreasureContent(content,view,{selected,phase,error});
+  const draw = () => {
+    dismissContextGuide(content);
+    renderTreasureContent(content,view,{selected,phase,error});
+    if (phase === 'idle') showContextGuide('chests',content.querySelector('.treasure-cards'),scope);
+  };
   async function read(token = ++generation) {
     const record = await loadPersistentChapter(key,getChapterNumber(block * 10));
     if (!current()) { if(scope.active) modal.destroy(); return false; }

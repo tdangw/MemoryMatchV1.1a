@@ -5,6 +5,7 @@ import { initializeMenuAds } from './ads/menuAds.js';
 import { initializeProfileStatsService } from './profileStatsService.js';
 import { configureAdventureMap } from "./adventureMap.js";
 import { PROGRESSION_HELP_CONTENT } from './progression/progressionCopy.js';
+import { LINK_CONNECT_HELP_CONTENT } from './linkConnect/linkConfig.js';
 import { previewMemoryLevel, previewLinkLevel, previewTripleLevel } from './adventurePreview.js';
 import "./memoryMatch/memoryShellDom.js";
 import { configureAppNavigation, refreshAppWallet, refreshAppAccount } from "./appNavigation.js";
@@ -91,7 +92,17 @@ function showMemoryHelp() {
         <li>Vật phẩm Thời gian và Xem trước mua ở cửa hàng sẽ được cất vào kho trên HUD.</li>
       </ul>` + PROGRESSION_HELP_CONTENT,
     "book",
+    () => {},
+    'memory-match',
   );
+}
+
+function showMenuHelp(gameId) {
+  if (gameId === 'memory-match') return showMemoryHelp();
+  if (!gameId) return showGameInfoModal('Hướng dẫn', '<p>Chọn một trò và màn chơi, chọn độ khó rồi bấm Chơi. Bạn có thể tập trước hoặc xem lại bài đã học.</p>', 'book', () => {}, 'all');
+  return showGameInfoModal(`Cách chơi ${gameId === 'link-connect' ? 'Link Connect' : 'Triple Connect'}`,
+    (gameId === 'link-connect' ? LINK_CONNECT_HELP_CONTENT : TRIPLE_CONNECT_HELP_CONTENT) + PROGRESSION_HELP_CONTENT,
+    'book', () => {}, gameId);
 }
 
 export async function initializeApplication(onProgress = () => {}) {
@@ -127,7 +138,7 @@ configureMainMenu({
   startGame: startNewMemoryRun,
   continueGame: continueMemorySession,
 });
-configureSettings({ onCloseMenu: createActiveGameMenu, onHelp: () => showGameInfoModal('Hướng dẫn', '<p>Chọn một trò và màn chơi, chọn độ khó rồi bấm Chơi. Memory Match rèn trí nhớ bằng ghép cặp; Link Connect nối cặp hình; Triple Connect ghép bộ ba và quản lý khay.</p>', 'book'), onReset: () => showResetConfirmationOverlay({}) });
+configureSettings({ onCloseMenu: createActiveGameMenu, onHelp: () => showMenuHelp(), onReset: () => showResetConfirmationOverlay({}) });
 configureAppNavigation({
   home: showGameSelector,
   account: async (surface = {}) => {
@@ -150,7 +161,7 @@ configureAppNavigation({
       const open = onClose => rankings.openLeaderboards(gameId, onClose, surface);
       return open();
     }
-    if (action === 'settings') return showSettingsPanel(false, () => {}, gameId === 'memory-match' ? { onHelp: showMemoryHelp, onReset: () => showResetConfirmationOverlay({}) } : undefined, surface);
+    if (action === 'settings') return showSettingsPanel(false, () => {}, { onHelp: () => showMenuHelp(gameId), onReset: () => showResetConfirmationOverlay({}) }, surface);
     const open = id => action === 'shop' ? openShopOverlay({ gameId: id, fromMenu: true, onClose: refreshAppWallet, surface }) : showCollectionModal({ gameId: id, onClose: refreshAppWallet, surface });
     if (gameId) return open(gameId);
     return open(getRecentGameId());
@@ -176,6 +187,7 @@ configureTripleConnectController({
       TRIPLE_CONNECT_HELP_CONTENT,
       "book",
       onClose,
+      'triple-connect',
     ),
   showReset: (onClose) => showResetConfirmationOverlay({ onClose }),
 });

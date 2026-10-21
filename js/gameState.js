@@ -19,6 +19,7 @@ import { MASTERY_DIFFICULTIES, hasCertifiedCompletion, getMasteryBlock } from '.
 import { normalizePairSnapshot } from './pairSessionSnapshot.js';
 import { normalizeWaveProgress } from './progression/waveProgress.js';
 import { normalizeUiSkin } from './uiSkinController.js';
+import { normalizeTutorialProgress } from './tutorial/tutorialModel.js';
 
 const GAME_MODE_IDS = new Set(GAME_MODES.map(({ id }) => id));
 
@@ -73,6 +74,7 @@ export const gameState = {
   appearance: normalizeAppearance(),
   settings: {
     uiSkin: 'default',
+    tutorialProgress: normalizeTutorialProgress(),
     mode: "easy",
     sound: true,
     music: true,
@@ -267,6 +269,7 @@ function normalizeSettings(value, fallback) {
   return {
     mode: GAME_MODE_IDS.has(source.mode) ? source.mode : fallback.mode,
     uiSkin: normalizeUiSkin(source.uiSkin),
+    tutorialProgress: normalizeTutorialProgress(source.tutorialProgress),
     sound: typeof source.sound === "boolean" ? source.sound : fallback.sound,
     music: typeof source.music === "boolean" ? source.music : fallback.music,
     soundVolume: normalizeRange(source.soundVolume, fallback.soundVolume, 0, 1),

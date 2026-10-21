@@ -6,6 +6,9 @@ import { getActivePlayMetrics } from "./playMetrics.js";
 
 import { getAppPageScope } from "./appPageLifecycle.js";
 import { ensureUiSkinRewards } from './uiSkin.js';
+import { dismissContextGuide, showContextGuide } from './tutorial/contextGuide.js';
+import { getGameDefinition } from './gameCatalog.js';
+import { TUTORIAL_GAMES } from './tutorial/tutorialModel.js';
 
 const modals = new Map();
 import { suspendMenuAds } from './ads/menuAds.js';
@@ -30,7 +33,9 @@ export function openAppModal({
   artwork = 'garden',
   alignment = "start",
   host = document.body,
+  practiceGameId = null,
 }) {
+  dismissContextGuide();
   if (id && /summary|chest|treasure|collection/.test(id)) void ensureUiSkinRewards();
   const screen = presentation === 'screen';
   const previousFocus = document.activeElement;
@@ -39,6 +44,18 @@ export function openAppModal({
     document.getElementById(id)?.remove();
   }
   const lifecycle = createGameShellLifecycle();
+  if (practiceGameId) {
+    const games = practiceGameId === 'all' ? TUTORIAL_GAMES : [practiceGameId];
+    actions = [...actions, ...games.map(gameId => ({
+      label: practiceGameId === 'all' ? `Tập luyện ${getGameDefinition(gameId).title}` : 'Tập luyện',
+      icon: 'book', variant: 'primary',
+      onClick: async () => {
+        const { openPractice } = await import('./tutorial/practice.js');
+        if (lifecycle.active) openPractice(gameId, { owner: lifecycle });
+        return true;
+      },
+    }))];
+  }
   const metrics = getActivePlayMetrics();
 
   const overlay = document.createElement("div");
@@ -155,6 +172,7 @@ export function openAppModal({
 
   overlay.appendChild(panel);
   host.appendChild(overlay);
+  if (id === 'level-summary-modal') showContextGuide('exp', panel.querySelector('.mastery-win-reward'), lifecycle);
   if (!screen) connectDialogPlacement(overlay, panel, lifecycle);
   panel.tabIndex = -1;
   (panel.querySelector("button:not([disabled]), input:not([disabled]), select:not([disabled])") || panel).focus();

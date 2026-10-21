@@ -15,7 +15,8 @@ Nguồn phạm vi: `GAME_UX_SKIN_PLAN.md`. Bắt đầu 21/10/2026, working tree
 | G6 | Đạt | Gameplay8/8 giảm chuyển động/DPR2 và8/8 thường/DPR3, cả ba trò |
 | G7 | Đạt kiểm trình bày | Dialog8/8; purchase8/8; nhánh hiếm ghi rõ fixture |
 | G8 | Đạt | Natural6/6; treasure8/8; lifecycle7/7 và tranh1/1 |
-| G9–G10 | Đang thực hiện | Chưa nghiệm thu tutorial/toàn bộ sản phẩm |
+| G9 | Đạt | Unit5/5; browser12/12, ba bàn tập và lifecycle |
+| G10 | Đang thực hiện | Regression cuối, check/build, đo và review độc lập |
 
 ## Quyết định và ranh giới
 
@@ -153,3 +154,11 @@ G0 là đọc source và contract. G1 là thiết kế trên DOM ứng dụng th
 - treasure presentation8/8 (2skin×4viewport×3trò): fixture chứng nhận40màn chỉ chuẩn bị điều kiện mốc; click marker/rương thật, trạng thái SđợiC, C→B→A→S grant30/60/100/160Xu và1/2/3/4Gợi ý, đủ350Xu/10Gợi ý; claim300Xu thật tới650Xu, xem ba tranh theo game, mở lại không có Mở rương. Không nhận fixture này là40màn chơi tự nhiên.
 - reward-lifecycle7/7:close/reload/default/reduced/profile replacement khi đang mở, receipt giữ một lần; write-failure boundary rollback rồi retry đúng30Xu; thiếu ảnh rương fallback vẫn nhận đúng. Bổ sung painting error/retry/close1/1, không đổiXu. Unit skin6/6, JS/CSS checks và adventure-rewards/level-progression checks pass. Lượt ma trận đầu phát hiện kiểm ảnh trước load; sửa owner tải/lỗi và await ảnh thật, chạy lại8/8. Đã xem ảnh rương S mobile sau sửa không còn chồng SVG.
 - Chưa gọi đây là kiểm auth/Firebase thật, physical mobile FPS hay toàn bộ G10. Luật/giá/catalog/save key/version không đổi; chỉ UI xem tranh được thêm theo kế hoạch.
+
+## G9 — Tập luyện và gợi ý theo ngữ cảnh (đạt)
+
+- Ba adapter tập luyện cách ly state, gọi lại decideMemorySelection/Pair, findConnectionPath và reduceTripleCommand; không dùng singleton bàn thật hoặc transaction thưởng. Memory thử không khớp/ghi nhớ/úp lại/tự ghép; Link thẳng/góc/thử chặn/dọn cặp giữa/nối lại/tự giải; Triple ô mở/bộba/lộ lớp/khay capacity7 đúng luật. Chỉ tiến theo hành động đúng, không timeout hoàn thành.
+- Hướng dẫn tại Home và từng trò có đường Tập luyện/Xem lại/Bỏ qua; gọi lazy khi người chơi mở. Tranh thẻ tái sử dụng catalog fruits, con trỏ SVG tĩnh, làm tối ô ngoài mục tiêu; không thêm bitmap hoặc loop. Nested modal giữ pause/focus và không chen quảng cáo. Lỗi hình có Tải lại hình; lỗi lưu có Thử lưu lại, generation chặn kết quả cũ sau replay.
+- settings.tutorialProgress={version:1,completed,seen} là mở rộng settings đã chốt trong kế hoạch, normalize tại boundary và whitelist persistence; không đổi key/formatVersion/session/catalog/API hiện có. Queue lưu flags chỉ commit RAM khi bền vững và owner settings còn đúng; skip không hoàn thành. Gợi ý đợt/công cụ/EXP/rương/mảnh xuất hiện tại DOM thật lúc gặp, tối đa1guide; inline trong dialog để giữ focus, floating theo anchor/viewport với ResizeObserver và tối đa1frame đang chờ. Không tự lấy focus/tạm dừng thêm; đóng/chuyển owner/ẩn tab dọn node/listener/frame/observer. Acknowledge mới lưu đã xem.
+- Unit tutorial5/5; browser tutorial12/12:2skin×4viewport×3bài, solve/replay/reload flags, giữ nguyên toàn bộ coins/progress,20lần mở/skip trong ván paused giữ nodeboard/round/moves/time/kho; hidden không nhận input; lỗi hình/retry; lỗi lưu và late-save không redraw bài xem lại; guide viewport/hidden/ack durable. JS/CSS/persistence checks pass. Đã xem ảnh thật320px Memory và Triple, sửa opacity để thẻ lớp dưới không xuyên qua thẻ lớp trên.
+- Có thay đổi đồng thời về âm thanh, Link renderer/shuffle/resolve và exit engine từ phiên khác. Giữ nguyên; Link controller và waveHud chỉ stage các hunk nối tutorial, không stage thay đổi hiệu ứng/âm thanh. CONTEXT.md6dòng có sẵn tiếp tục giữ ngoài commit. Review độc lập đã được chủ dự án cho phép trong G10.
