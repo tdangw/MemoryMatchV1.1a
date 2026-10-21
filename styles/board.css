@@ -88,6 +88,8 @@
   border-radius: 12px;
   box-shadow: 0 4px 8px rgb(0 0 0 / 20%);
   transition:
+    translate var(--shell-card-focus-duration) ease-out,
+    scale var(--shell-card-focus-duration) ease-out,
     transform 0.6s ease,
     box-shadow 0.3s ease;
   transform-style: preserve-3d;

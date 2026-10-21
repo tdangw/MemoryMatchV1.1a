@@ -26,7 +26,7 @@ import {
   showMemoryCoinReward,
   showLevelSummaryOverlay,
 } from "./ui.js";
-import { duckBackgroundMusicForVictory, pauseBackgroundMusic, sounds } from "./sound.js"; // 📦 Tách âm thanh
+import { duckBackgroundMusicForVictory, pauseBackgroundMusic, sounds, playOwnedRewardCue } from "./sound.js"; // 📦 Tách âm thanh
 import { savePersistentGameData } from "./persistence.js";
 import { stageMemorySession, saveMemorySession } from './memorySession.js';
 import { getActiveSession } from './sessionProgress.js';
@@ -244,6 +244,9 @@ async function checkMatch(roundId) {
     }
     else {
       if (gameState.roundId !== roundId) return;
+      if (gameState.matchedPairs >= gameState.totalPairs && gameState.wave.index < gameState.wave.count) {
+        playOwnedRewardCue('wave', getMemoryShell().scope, gameState.settings);
+      }
       updateScoreDisplay(score);
       showScoreEffect(second.element, matchPoints);
       showMemoryCoinReward(second.element, previousCoins, totalCoins, matchCoins);

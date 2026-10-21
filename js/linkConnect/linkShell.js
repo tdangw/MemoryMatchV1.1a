@@ -2,7 +2,7 @@ import { createGameShell } from "../gameShell/gameShell.js";
 import { createGameShellHud } from "../gameShell/gameShellHud.js";
 import { formatClockTime } from "../uiCatalog.js";
 import { createIcon } from "../icons.js";
-import { LINK_ITEMS } from "./linkItems.js";
+import { LINK_ITEMS, LINK_FREEZE_SECONDS } from "./linkItems.js";
 import { bindGameHudMenus } from "../gameShell/gameHudMenus.js";
 import { HUD_PROGRESS_TICK_MS } from "../gameShell/gameTimerProgress.js";
 
@@ -135,7 +135,7 @@ export function getLinkHud(hud) {
   if (link.has(hud.root)) return link.get(hud.root);
   const stats = Object.fromEntries(["level", "moves", "misses", "combo", "score", "totalStars", "timer"].map(key => [key, { element: hud[key] }]));
   stats.timer.format = formatClockTime;
-  const copy = { hint: "Chỉ ra hai thẻ nối được.", reshuffle: "Đổi chỗ thẻ để tìm đường mới.", thunder: "Xóa ngẫu nhiên vài cặp thẻ.", freeze: "Dừng thời gian trong chốc lát." };
+  const copy = { hint: "Chỉ ra hai thẻ nối được.", reshuffle: "Đổi chỗ thẻ để tìm đường mới.", thunder: "Xóa ngẫu nhiên vài cặp thẻ.", freeze: `Dừng đồng hồ trong ${LINK_FREEZE_SECONDS} giây.` };
   const tools = Object.fromEntries(hud.itemCounts.map(count => {
     const key = count.dataset.itemCount;
     return [key, { count, element: count.closest("button"), tooltip: copy[key] }];

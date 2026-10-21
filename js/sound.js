@@ -1,5 +1,6 @@
 // js/sound.js
 // Quản lý âm thanh của dự án
+import { createGameShellLifecycle } from './gameShell/gameShellLifecycle.js';
 
 const assetUrl = (path) => `${import.meta.env.BASE_URL}${path}`;
 const isAndroidBuild = import.meta.env.MODE === "android";
@@ -54,9 +55,12 @@ const rewardCueFiles = Object.freeze({
   star1: 'star_1.ogg', star2: 'star_2.ogg', star3: 'star_3.ogg',
   reward: 'reward.ogg', openBox: 'open_box.ogg', thunder: 'explosion.ogg', summary: 'summary.mp3',
   frozenUnlock: 'unlock_1.mp3', coinDrop: 'coin_drop.mp3', coinCollect: 'coin-collect.mp3',
-  hint: 'hint_1.mp3', shuffle: 'shuffle-85602.mp3',
+  hint: 'hint_1.mp3', shuffle: 'shuffle-cards-46455.mp3', wave: 'level-passed-143039.mp3', freeze: 'fx-time-freeze-107808.mp3',
+  difficulty: 'game-ui-2.mp3',
+  popupClose: 'click-pop-ui-2-262119.mp3',
 });
-const rewardCues = new Map(['summary', 'hint', 'shuffle'].map(name => {
+const uiCueOwner = createGameShellLifecycle();
+const rewardCues = new Map(['summary', 'hint', 'shuffle', 'wave', 'freeze', 'difficulty', 'popupClose'].map(name => {
   const audio = new Audio(assetUrl(`assets/sounds/${rewardCueFiles[name]}`));
   audio.preload = 'auto';
   return [name, [{ audio, stop: null, gain: 1 }]];
@@ -86,15 +90,28 @@ export function playOwnedRewardCue(name, owner, settings) {
   const audio = cue.audio;
   audio.currentTime = name === 'summary' ? SUMMARY_AUDIO_OFFSET_SECONDS : 0;
   audio.volume = volume * cue.gain;
-  let ended, failed, hidden;
-  const stop = owner.own(() => {
+  let ended, failed, hidden, release;
+  let currentOwner = owner;
+  let active = true;
+  const stop = () => {
+    if (!active) return;
+    active = false;
+    release.forget();
     audio.removeEventListener('ended', ended);
     audio.removeEventListener('error', failed);
     document.removeEventListener('visibilitychange', hidden);
     audio.pause();
     audio.currentTime = 0;
     if (cue.stop === stop) cue.stop = null;
-  });
+  };
+  release = owner.own(stop);
+  stop.transferOwner = nextOwner => {
+    if (!active) return;
+    release.forget();
+    currentOwner = nextOwner;
+    release = nextOwner.own(stop);
+  };
+  Object.defineProperty(stop, 'owner', { get: () => currentOwner });
   ended = () => { if (audio.ended) stop(); };
   failed = () => stop();
   hidden = () => { if (document.hidden) stop(); };
@@ -105,6 +122,20 @@ export function playOwnedRewardCue(name, owner, settings) {
   // A rejected, older play promise can only dispose its own voice.
   try { void audio.play().catch(stop); } catch { stop(); }
   return stop;
+}
+
+// A synchronous mount handoff keeps the clear cue playing across wave scopes,
+// while restart, navigation, visibility and mute retain their normal stop paths.
+export function mountWithWaveAudio(previousOwner, mount, continuing = false) {
+  const cue = continuing ? rewardCues.get('wave').find(voice => voice.stop?.owner === previousOwner)?.stop : null;
+  if (!cue) return mount();
+  const bridge = createGameShellLifecycle();
+  cue.transferOwner(bridge);
+  try {
+    const nextOwner = mount();
+    cue.transferOwner(nextOwner);
+    return nextOwner;
+  } finally { bridge.dispose(); }
 }
 
 export function applyEffectsSettings(settings) {
@@ -200,6 +231,11 @@ export function enableButtonClickSounds(getSettings) {
       'button, .menu-item, [role="button"]',
     );
     if (!interactive || interactive.disabled || !getSettings?.()?.sound) return;
+
+    if (interactive.classList.contains('app-modal__close')) {
+      playOwnedRewardCue('popupClose', uiCueOwner, getSettings());
+      return;
+    }
 
     if (interactive.dataset.clickSound === 'gameStart') {
       playGameStartSound(getSettings());

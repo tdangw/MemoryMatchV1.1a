@@ -1,5 +1,8 @@
 /* Shared frame and title; game styles own only gameplay-specific regions. */
 .game-shell-root {
+  --shell-card-focus-lift: -4px;
+  --shell-card-focus-scale: 1.04;
+  --shell-card-focus-duration: 140ms;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -120,4 +123,20 @@
 }
 @media (orientation: landscape) and (height <= 600px) {
   .game-shell-tokens { --shell-board-reference-top: calc(max(var(--shell-safe-area-top), env(safe-area-inset-top)) + var(--unified-hud-height) + var(--shell-hud-menu-offset) + var(--shell-active-frame-gap)); }
+}
+
+/* Individual transforms leave flip, match, shuffle and arrival transforms owned by their presenters. */
+.game-shell-root .tile:is(.selected, .hint-reveal):not(.matched):not(.wrong),
+.game-shell-root .link-tile:is(.is-selected, .is-hinted):not(.is-match-exiting):not(.is-wrong),
+.game-shell-root .triple-connect__board .triple-connect__tile.is-hinted.is-exposed:not(.triple-connect__ghost) {
+  translate: 0 var(--shell-card-focus-lift);
+  scale: var(--shell-card-focus-scale);
+}
+@media (prefers-reduced-motion: reduce) {
+  .game-shell-root .tile:is(.selected, .hint-reveal):not(.matched):not(.wrong),
+  .game-shell-root .link-tile:is(.is-selected, .is-hinted):not(.is-match-exiting):not(.is-wrong),
+  .game-shell-root .triple-connect__board .triple-connect__tile.is-hinted.is-exposed:not(.triple-connect__ghost) {
+    translate: none;
+    scale: none;
+  }
 }

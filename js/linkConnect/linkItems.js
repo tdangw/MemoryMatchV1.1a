@@ -2,6 +2,7 @@ import { gameState, spendCoins } from "../gameState.js";
 import { savePersistentGameData, saveProgress } from "../persistence.js";
 import { GAMEPLAY_LIMITS } from "../gameplayTuning.js";
 import { CONSUMABLE_PRICE_MULTIPLIER } from '../shopCatalog.js';
+export const LINK_FREEZE_SECONDS = 15;
 
 export const LINK_ITEMS = Object.freeze([
   Object.freeze({ id: "hint", title: "Gợi ý đường nối", icon: "search", price: 8 }),

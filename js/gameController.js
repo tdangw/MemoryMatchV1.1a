@@ -10,6 +10,7 @@ import {
   sounds,
   syncDefaultMusic,
   playOwnedRewardCue,
+  mountWithWaveAudio,
 } from "./sound.js";
 import {
   GAME_CONFIG,
@@ -129,7 +130,7 @@ export function initializeLevel(level, { reason = "new", session = null, skipInt
     showAppToast(`Chủ đề ${eligibility.theme.title} cần ${eligibility.required} ảnh khác nhau; hiện có ${eligibility.available}. Hãy chọn chủ đề khác.`);
     return null;
   }
-  const scope = getMemoryShell().mount({ cleanup: () => {
+  const scope = mountWithWaveAudio(getMemoryShell().scope, () => getMemoryShell().mount({ cleanup: () => {
     stopCountdown();
     stopGridLayout();
     if (isGameVisible() && gameState.remainingTime > 0 && gameState.matchedPairs < gameState.totalPairs && scope.startup?.status === 'ready') void persistMemorySession();
@@ -138,7 +139,7 @@ export function initializeLevel(level, { reason = "new", session = null, skipInt
     clearLootEffects();
     clearGameplayRewardPopups();
     clearTooltip();
-  } });
+  } }), reason === 'wave');
   if (reason === 'wave') prepareWaveArrival(getMemoryShell().refs, scope);
   beginPlayMetrics(scope, { gameId: "memory-match", mode: requestedMode, level }, reason === "resume" || reason === 'wave' ? session?.metrics || {} : null);
   bindMemoryMenus(scope, getMemoryShell().refs.root, { onExit: returnToMainMenu, onRestart: restartMemoryLevel, onSettings: navigation.showSettings });

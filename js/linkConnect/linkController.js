@@ -33,7 +33,7 @@ import { beginRankedAttempt, checkpointRankedRun, finalizeRankedRun, getRankedRu
 import { createWaveProgress, completeWave, activateNextWave, normalizeWaveProgress, waveTotalGroups } from '../progression/waveProgress.js';
 import { MATCH_COINS_PER_GROUP, calculateGroupScore, calculateVictoryCoins, calculateFastFinishBonus, calculateProgressionStars, getProgressionStarTargets } from '../progression/gameplayRules.js';
 import { getDifficultyAccess } from '../progression/difficultyProgress.js';
-import { playOwnedRewardCue } from '../sound.js';
+import { playOwnedRewardCue, mountWithWaveAudio } from '../sound.js';
 import { prepareSummaryCoins } from '../progression/summaryCoins.js';
 import { renderWaveStatus, announceWave, presentWaveExit, prepareWaveArrival } from '../progression/waveHud.js';
 import { PROGRESSION_HELP_CONTENT } from '../progression/progressionCopy.js';
@@ -78,7 +78,7 @@ import {
 } from "./linkBoard.js";
 import { findFirstAvailableConnection, hasAvailableConnection } from "./pathfinder.js";
 import { decideLinkSelection } from './linkTurn.js';
-import { consumeLinkItem, getLinkItemCount } from "./linkItems.js";
+import { consumeLinkItem, getLinkItemCount, LINK_FREEZE_SECONDS } from "./linkItems.js";
 import {
   commitThemeSession,
   clearActiveSession,
@@ -262,17 +262,19 @@ export function startLinkLevel({
     showAppToast(`Chủ đề ${eligibility.theme.title} cần ${eligibility.required} ảnh khác nhau; hiện có ${eligibility.available}. Hãy chọn chủ đề khác.`);
     return null;
   }
-  unmountActiveGameShell();
-  pausedComboRemainingMs = waveTransition ? pairSnapshot?.comboRemainingMs ?? 0 : null;
-  stopCountdown();
-  clearGameplayRewardPopups();
-  clearLinkTransientEffects();
-  clearLinkPath();
-  clearLinkTileHints();
-  selectedPosition = null;
-  pendingCompactLayout = null;
-  linkTimeWarningPlayed = false;
-  const scope = showLinkGame();
+  const scope = mountWithWaveAudio(getLinkShell().scope, () => {
+    unmountActiveGameShell();
+    pausedComboRemainingMs = waveTransition ? pairSnapshot?.comboRemainingMs ?? 0 : null;
+    stopCountdown();
+    clearGameplayRewardPopups();
+    clearLinkTransientEffects();
+    clearLinkPath();
+    clearLinkTileHints();
+    selectedPosition = null;
+    pendingCompactLayout = null;
+    linkTimeWarningPlayed = false;
+    return showLinkGame();
+  }, waveTransition);
   if (waveTransition) prepareWaveArrival(getLinkShell().refs, scope);
   beginPlayMetrics(scope, { gameId: "link-connect", mode, level }, resume || waveTransition ? metrics || {} : null);
   const startup = createGameShellStartup(scope, getLinkShell().refs, error => {
@@ -586,6 +588,9 @@ async function handleLinkTileClick(position) {
   }
   if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
   const matchedTiles = playLinkMatchExit(matchedStart, position);
+  if (linkGameState.matchedPairs >= linkGameState.totalPairs && linkGameState.wave.index < linkGameState.wave.count) {
+    playOwnedRewardCue('wave', getLinkShell().scope, gameState.settings);
+  }
   showScoreEffect(matchedTiles[0], matchPoints);
   showComboEffect(matchedTiles[1] || matchedTiles[0], linkGameState.combo);
   animateCoinCounter(getLinkHudElements().coins, getLinkHudElements().coinBalance, previousCoins, gameState.coins);
@@ -644,18 +649,33 @@ async function useLinkItem(id) {
   const mode = linkGameState.mode;
   const sessions = gameState.progress.linkConnect.sessionsByMode;
   const previousSession = sessions?.[mode];
-  let stagedFreeze = false;
+  const previousFreezeSeconds = linkGameState.freezeSeconds;
+  const previousBoard = { ...board };
+  let stagedSession = false;
+  let shuffledBoard = null;
+  const rollbackItemState = () => {
+    if (id === 'freeze') linkGameState.freezeSeconds = previousFreezeSeconds;
+    if (shuffledBoard) Object.assign(board, previousBoard);
+  };
   if (id === 'freeze' && getLinkItemCount(id) > 0) {
-    const session = createLinkSession();
-    session.pairSnapshot.freezeSeconds += 10;
-    stagedFreeze = stageActiveSession('link-connect', session);
-    if (!stagedFreeze) { linkGameState.isLocked = false; return; }
+    linkGameState.freezeSeconds += LINK_FREEZE_SECONDS;
+    stagedSession = stageActiveSession('link-connect', createLinkSession());
+    if (!stagedSession) { rollbackItemState(); linkGameState.isLocked = false; return; }
+  } else if (id === 'reshuffle' && getLinkItemCount(id) > 0) {
+    shuffledBoard = structuredClone(board);
+    shuffleLinkBoard(shuffledBoard);
+    // Autosave and round cleanup must see the same pending state as the item save.
+    // Retain board identity so existing combo callbacks still belong to this round.
+    Object.assign(board, shuffledBoard);
+    stagedSession = stageActiveSession('link-connect', createLinkSession());
+    if (!stagedSession) { rollbackItemState(); linkGameState.isLocked = false; return; }
   }
   const consumed = await consumeLinkItem(id);
   if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
   linkGameState.isLocked = false;
   if (!consumed) {
-    if (stagedFreeze) {
+    rollbackItemState();
+    if (stagedSession) {
       if (previousSession) gameState.progress.linkConnect.sessionsByMode[mode] = previousSession;
       else delete gameState.progress.linkConnect.sessionsByMode[mode];
     }
@@ -663,8 +683,8 @@ async function useLinkItem(id) {
     return;
   }
   closeLinkMenus();
-  if (id === 'hint' || id === 'reshuffle') playOwnedRewardCue(id === 'hint' ? 'hint' : 'shuffle', getLinkShell().scope, gameState.settings);
-  else playLinkSound("overlay");
+  if (id === 'hint' || id === 'freeze') playOwnedRewardCue(id, getLinkShell().scope, gameState.settings);
+  else if (id !== 'reshuffle') playLinkSound("overlay");
   if (id === "hint") useLinkHint(hintConnection);
   else if (id === "reshuffle") useLinkReshuffle();
   else if (id === "thunder") useLinkThunder();
@@ -695,13 +715,9 @@ function useLinkReshuffle() {
   selectedPosition = null;
   clearLinkTileSelection();
   clearLinkPath();
-  shuffleLinkBoard(linkGameState.board);
-  const settleMs = renderLinkBoardShuffle(linkGameState.board, { onTileClick: handleLinkTileClick });
-  showAppToast("Đã xáo lại các thẻ còn lại.");
-  setTimeout(() => {
-    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
-    unlockLinkBoard();
-  }, settleMs);
+  renderLinkBoardShuffle(linkGameState.board, { onTileClick: handleLinkTileClick, onComplete: () => {
+    if (linkGameState.roundId === roundId && linkGameState.board === board) unlockLinkBoard();
+  } });
 }
 
 function isLinkBoardMoving() {
@@ -769,6 +785,7 @@ function getThunderColor(pairCount) {
 async function finishLinkThunder(board, roundId) {
   if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
   if (linkGameState.matchedPairs >= linkGameState.totalPairs) {
+    if (linkGameState.wave.index < linkGameState.wave.count) return advanceLinkWave({ playClearSound: true });
     (await completeLinkLevel());
     return;
   }
@@ -779,9 +796,8 @@ async function finishLinkThunder(board, roundId) {
 }
 
 function useLinkFreeze() {
-  linkGameState.freezeSeconds += 10;
   startLinkFreezeProgress();
-  showAppToast("Đồng hồ đã đóng băng trong 10 giây.");
+  showAppToast(`Đồng hồ đã đóng băng trong ${LINK_FREEZE_SECONDS} giây.`);
 }
 
 function getLinkBoardLayoutForViewport(layout) {
@@ -1213,7 +1229,7 @@ function applyThunderPairScore(mode, anchor) {
   return points;
 }
 
-async function advanceLinkWave() {
+async function advanceLinkWave({ playClearSound = false } = {}) {
   const roundId = linkGameState.roundId;
   const rollback = { wave: linkGameState.wave, remainingTime: linkGameState.remainingTime,
     progress: structuredClone(gameState.progress.linkConnect) };
@@ -1238,6 +1254,7 @@ async function advanceLinkWave() {
     return;
   }
   if (linkGameState.roundId !== roundId) return;
+  if (playClearSound) playOwnedRewardCue('wave', getLinkShell().scope, gameState.settings);
   if (!await presentWaveExit(getLinkShell().refs, getLinkShell().scope) || linkGameState.roundId !== roundId) return;
   return startLinkLevel({ ...session, waveTransition: true, skipIntro: true });
 }

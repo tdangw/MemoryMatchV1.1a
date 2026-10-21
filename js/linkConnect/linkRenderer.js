@@ -9,6 +9,7 @@ import { LINK_CONNECT_TIMING } from "./linkConfig.js";
 import { connectGameShellLayout } from "../gameShell/gameShellLayout.js";
 import { clearLinkEffectSurfaces, presentLinkConnection, presentLinkExit } from "./linkEffectAdapter.js";
 import { getLinkShell } from "./linkShell.js";
+import { captureShuffleCards, presentBoardShuffle } from '../gameShell/boardShufflePresentation.js';
 import {
   measureLinkRender,
   recordLinkLayoutPass,
@@ -21,6 +22,7 @@ let linkLayout = null;
 let linkLayoutShape = null;
 let onCompactLandscapeChange = null;
 let boardInteractionTimer;
+let shufflePresentation = null;
 let renderedBoardShape = "";
 let renderedBoardContainer = null;
 const boardCellsByPosition = new Map();
@@ -40,54 +42,56 @@ export function renderLinkBoardStartup(board, { onTileClick, onCompactLandscapeC
 }
 
 export function renderLinkBoardShift(board, { onTileClick } = {}) {
-  return renderLinkBoardMotion(board, onTileClick, "shift");
+  return renderLinkBoardMotion(board, onTileClick);
 }
 
-export function renderLinkBoardShuffle(board, { onTileClick } = {}) {
-  return renderLinkBoardMotion(board, onTileClick, "shuffle");
+export function renderLinkBoardShuffle(board, { onTileClick, onComplete } = {}) {
+  return measureLinkRender('board shuffle', () => {
+    shufflePresentation?.cancel();
+    clearTimeout(boardInteractionTimer);
+    activeTileMotionAnimations.forEach(animation => animation.cancel());
+    const container = document.getElementById('link-board');
+    const before = captureShuffleCards(tileElementsByKey.values());
+    patchLinkBoard(board, onTileClick);
+    const scope = getLinkShell().scope;
+    playOwnedRewardCue('shuffle', scope, gameState.settings);
+    const presentation = presentBoardShuffle({ board: container, before,
+      elements: tileElementsByKey.values(), owner: scope, duration: readCssTimeMs(getComputedStyle(getLinkShell().refs.root).getPropertyValue('--link-board-shuffle-duration'), LINK_CONNECT_TIMING.boardShuffleMs) });
+    shufflePresentation = presentation;
+    container.classList.toggle('is-moving', presentation.duration > 0);
+    container.classList.toggle('is-shuffling', presentation.duration > 0);
+    presentation.finished.then(() => {
+      if (shufflePresentation !== presentation) return;
+      shufflePresentation = null;
+      container.classList.remove('is-moving', 'is-shuffling');
+      if (scope.active) onComplete?.();
+    });
+    return presentation.duration;
+  });
 }
 
-function renderLinkBoardMotion(board, onTileClick, motion) {
-  return measureLinkRender(motion === "shuffle" ? "board shuffle" : "board shift", () => {
+function renderLinkBoardMotion(board, onTileClick) {
+  return measureLinkRender("board shift", () => {
     const before = getLinkTileRects();
     patchLinkBoard(board, onTileClick);
     const after = getLinkTileRects();
-    const settings = readLinkBoardMotionSettings(motion);
-    let motionIndex = 0;
+    const settings = readLinkBoardShiftSettings();
     after.forEach(({ element, rect, key }) => {
       const previous = before.get(key);
       if (!previous) return;
       const { x: deltaX, y: deltaY } = calculateMotionDelta(previous.rect, rect);
       if (!deltaX && !deltaY) return;
-      animateLinkTileMotion(element, deltaX, deltaY, motionIndex, settings);
-      motionIndex += 1;
+      animateLinkTileMotion(element, deltaX, deltaY, settings);
     });
     return holdLinkBoardDuringMotion(settings);
   });
 }
 
-function readLinkBoardMotionSettings(motion) {
-  const shuffle = motion === "shuffle";
-  const game = document.getElementById("link-connect-container");
-  const styles = game ? getComputedStyle(game) : null;
-  const duration = readCssTimeMs(
-    styles?.getPropertyValue(shuffle ? "--link-board-shuffle-duration" : "--link-board-shift-duration"),
-    shuffle ? LINK_CONNECT_TIMING.boardShuffleMs : LINK_CONNECT_TIMING.boardShiftMs,
-  );
-  const staggerStep = shuffle
-    ? readCssTimeMs(
-      styles?.getPropertyValue("--link-board-shuffle-stagger"),
-      LINK_CONNECT_TIMING.boardShuffleStaggerMs,
-    )
-    : 0;
+function readLinkBoardShiftSettings() {
+  const styles = getComputedStyle(getLinkShell().refs.root);
+  const duration = readCssTimeMs(styles.getPropertyValue('--link-board-shift-duration'), LINK_CONNECT_TIMING.boardShiftMs);
   const reducedMotion = prefersReducedMotion();
-  return {
-    shuffle,
-    duration,
-    staggerStep,
-    reducedMotion,
-    settleMs: reducedMotion ? 0 : duration + Math.min(staggerStep * 8, 96) + 40,
-  };
+  return { duration, reducedMotion, settleMs: reducedMotion ? 0 : duration + 40 };
 }
 
 function holdLinkBoardDuringMotion(settings) {
@@ -95,30 +99,21 @@ function holdLinkBoardDuringMotion(settings) {
   if (!board || settings.reducedMotion) return 0;
   clearTimeout(boardInteractionTimer);
   board.classList.add("is-moving");
-  board.classList.toggle("is-shuffling", settings.shuffle);
+  board.classList.remove("is-shuffling");
   boardInteractionTimer = scheduleTransientEffect(() => {
     board.classList.remove("is-moving", "is-shuffling");
   }, settings.settleMs);
   return settings.settleMs;
 }
 
-function animateLinkTileMotion(element, deltaX, deltaY, index, settings) {
+function animateLinkTileMotion(element, deltaX, deltaY, settings) {
   tileMotionAnimations.get(element)?.cancel();
   if (settings.reducedMotion) return;
-  const stagger = settings.shuffle
-    ? Math.min(index * settings.staggerStep, 96)
-    : 0;
-  const keyframes = settings.shuffle
-    ? [
-      { transform: `translate(${deltaX}px, ${deltaY}px) scale(.94)`, opacity: .58 },
-      { transform: `translate(${deltaX * .24}px, ${deltaY * .24}px) scale(1.025)`, opacity: .92, offset: .72 },
-      { transform: "translate(0, 0) scale(1)", opacity: 1 },
-    ]
-    : [
-      { transform: `translate(${deltaX}px, ${deltaY}px)` },
-      { transform: `translate(${-deltaX * .025}px, ${-deltaY * .025}px)`, offset: .84 },
-      { transform: "translate(0, 0)" },
-    ];
+  const keyframes = [
+    { transform: `translate(${deltaX}px, ${deltaY}px)` },
+    { transform: `translate(${-deltaX * .025}px, ${-deltaY * .025}px)`, offset: .84 },
+    { transform: "translate(0, 0)" },
+  ];
   if (typeof element.animate !== "function") {
     element.style.transition = "none";
     element.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
@@ -131,8 +126,7 @@ function animateLinkTileMotion(element, deltaX, deltaY, index, settings) {
   }
   const animation = animateShellEffect(element, keyframes, {
     duration: settings.duration,
-    delay: stagger,
-    easing: settings.shuffle ? "cubic-bezier(.16,.74,.2,1)" : "cubic-bezier(.18,.72,.2,1)",
+    easing: "cubic-bezier(.18,.72,.2,1)",
   });
   if (!animation) return;
   tileMotionAnimations.set(element, animation);
@@ -524,6 +518,8 @@ export function playLinkThunderStrike(positions, colorId = "yellow") {
 }
 
 export function clearLinkTransientEffects() {
+  shufflePresentation?.cancel();
+  shufflePresentation = null;
   clearTimeout(boardInteractionTimer);
   boardInteractionTimer = undefined;
   clearLinkEffectSurfaces(document.getElementById("link-path-overlay"));

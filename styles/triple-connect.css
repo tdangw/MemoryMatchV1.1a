@@ -130,6 +130,8 @@
     0 4px 10px rgb(0 0 0 / 27%),
     inset 0 1px rgb(255 255 255 / 22%);
   transition:
+    translate var(--shell-card-focus-duration) ease-out,
+    scale var(--shell-card-focus-duration) ease-out,
     opacity 140ms ease,
     filter 140ms ease;
 }

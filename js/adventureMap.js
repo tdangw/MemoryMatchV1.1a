@@ -15,6 +15,7 @@ import { openAppModal, showAppToast } from "./modal.js";
 import { canLaunchGame } from "./profileOperations.js";
 import { getDifficultyAccess } from './progression/difficultyProgress.js';
 import { ensureUiSkinRewards } from './uiSkin.js';
+import { playOwnedRewardCue } from './sound.js';
 
 const views = new Map(); // One bounded view per released game, independent of durable progress.
 const MAP_TEXTURE_HEIGHT = 660;
@@ -323,7 +324,8 @@ export function mountAdventureMap(gameId) {
       content.append(rules);
     }
     const release = specialMode ? undefined : scope.listen(choices, "change", event => {
-      if (loading || !isNormalAdventureMode(event.target.value)) return;
+      if (loading || event.target.disabled || !isNormalAdventureMode(event.target.value)) return;
+      playOwnedRewardCue('difficulty', scope, gameState.settings);
       view.mode = event.target.value; patchNodes(); updatePreview();
       modal.panel.querySelector(".app-modal__title").lastChild.textContent = title();
       modal.panel.setAttribute("aria-label", `${game.title} · ${title()}`);

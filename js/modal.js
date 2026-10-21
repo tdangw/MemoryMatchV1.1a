@@ -104,6 +104,8 @@ export function openAppModal({
   const close = () => {
     if (closed) return;
     closed = true;
+    const dismissButton = panel.querySelector('.app-modal__close');
+    if (dismissButton) dismissButton.disabled = true;
     removeKeydown();
     overlay.classList.add("is-closing");
     lifecycle.timeout(() => {

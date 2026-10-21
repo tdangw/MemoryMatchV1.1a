@@ -1,4 +1,5 @@
 import { gameRecordLabel } from '../gameRecord.js';
+import { captureShuffleCards, presentBoardShuffle } from '../gameShell/boardShufflePresentation.js';
 import { openGameExitDialog } from "../gameExitDialog.js";
 import { showFullVictoryCelebration } from "victory-presentation";
 import { canLaunchGame } from "../profileOperations.js";
@@ -74,7 +75,7 @@ import { clearShellTimeout } from "../gameShell/gameShellLifecycle.js";
 import { createWaveProgress, completeWave, activateNextWave, normalizeWaveProgress, waveTotalGroups } from '../progression/waveProgress.js';
 import { MATCH_COINS_PER_GROUP, calculateVictoryCoins, calculateFastFinishBonus, calculateProgressionStars, getProgressionStarTargets, getWavePatternIndex } from '../progression/gameplayRules.js';
 import { getDifficultyAccess } from '../progression/difficultyProgress.js';
-import { playOwnedRewardCue } from '../sound.js';
+import { playOwnedRewardCue, mountWithWaveAudio } from '../sound.js';
 import { prepareSummaryCoins } from '../progression/summaryCoins.js';
 import { renderWaveStatus, announceWave, presentWaveExit, prepareWaveArrival } from '../progression/waveHud.js';
 import { pausePlayMetrics } from '../playMetrics.js';
@@ -188,7 +189,7 @@ export function startTripleConnectRound({ seed, mode = "easy", level = 1, elapse
 function prepareTripleStartup(prepare, { waveTransition = false } = {}) {
   if (!canLaunchGame()) return Promise.resolve(null);
   const shell = getTripleShell();
-  const scope = shell.mount();
+  const scope = mountWithWaveAudio(shell.scope, () => shell.mount(), waveTransition);
   if (waveTransition) prepareWaveArrival(shell.refs, scope);
   const startup = createGameShellStartup(scope, shell.refs, error => {
     console.error('Triple startup failed', error);
@@ -531,6 +532,7 @@ return runRoundCommand(async () => {
     roundLuckyRewards.push(...rewards.lucky);
     roundMilestoneRewards.push(...rewards.milestones);
     const roundWon = transition.events.some((event) => event.type === "round-won");
+    if (roundWon && activeWave.index < activeWave.count) playOwnedRewardCue('wave', scope, gameState.settings);
     if (roundWon && activeWave.index === activeWave.count) finishPlayMetrics();
     if (state.status !== "playing") stopComboWindow();
     else if (matchEvent) startComboWindow();
@@ -655,12 +657,15 @@ return runRoundCommand(async () => {
       )
         return;
       if (!scope.active || generation !== roundGeneration) return;
+      const shuffleBoard = shell.refs.root.querySelector('.triple-connect__board');
+      const before = captureShuffleCards([...renderer.nodes.values()].filter(node => node.parentElement === shuffleBoard));
       state = result.state;
       playOwnedRewardCue('shuffle', scope, gameState.settings);
       boardPresentationRevision += 1;
       hintedTileIds.clear();
       render(state);
-
+      await presentBoardShuffle({ board: shuffleBoard, before,
+        elements: [...renderer.nodes.values()].filter(node => node.parentElement === shuffleBoard), owner: scope }).finished;
 });
 },
   );

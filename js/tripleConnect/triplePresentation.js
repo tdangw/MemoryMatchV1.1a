@@ -6,6 +6,9 @@ import { showComboEffect, showScoreEffectAt } from "../ui.js";
 const MATCH_DURATION_MS = 300;
 const TRAY_FLIGHT_DURATION_MS = 300;
 const TRAY_COMPACTION_DURATION_MS = 210;
+const SELECTION_LIFT_PX = 4;
+const SELECTION_LIFT_SCALE = 1.04;
+const SELECTION_LIFT_OFFSET = 0.18;
 let activeMatchCleanup = null;
 
 export async function presentTripleTransition({ shell, scope, previous, next, events, effects = {}, render, isCurrent = () => true }) {
@@ -157,6 +160,7 @@ function presentResolvedTrayFlight({ scope, ghost, targetRect }) {
   ghost.style.transformOrigin = "top left";
   const animation = ghost.animate([
     { transform: "translate(0, 0) scale(1)", opacity: 1 },
+    { offset: SELECTION_LIFT_OFFSET, transform: `translate(0, -${SELECTION_LIFT_PX}px) scale(${SELECTION_LIFT_SCALE})`, opacity: 1 },
     {
       offset: 0.58,
       transform: `translate(${dx * 0.54}px, ${dy * 0.48 - lift}px) scale(${1 + (scaleX - 1) * 0.54}, ${1 + (scaleY - 1) * 0.54})`,
@@ -341,6 +345,7 @@ function presentTrayFlight({ shell, scope, selected, render, next }) {
     const lift = Math.min(34, Math.max(12, Math.abs(dy) * 0.16));
     const animation = ghost.animate([
       { transform: "translate(0, 0) scale(1)", opacity: 1 },
+      { offset: SELECTION_LIFT_OFFSET, transform: `translate(0, -${SELECTION_LIFT_PX}px) scale(${SELECTION_LIFT_SCALE})`, opacity: 1 },
       {
         offset: 0.58,
         transform: `translate(${dx * 0.54}px, ${dy * 0.48 - lift}px) scale(${1 + (scaleX - 1) * 0.54}, ${1 + (scaleY - 1) * 0.54})`,
