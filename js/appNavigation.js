@@ -23,7 +23,7 @@ export function createAppDock(scope, { gameId = null, selected = null, onAction 
   const dock = document.createElement("nav");
   dock.className = "adventure-dock";
   dock.setAttribute("aria-label", "Chức năng");
-  const center = gameId ? { id: 'map', icon: 'map', label: 'Bản đồ' } : { id: 'profile', icon: 'account', label: 'Profile' };
+  const center = gameId ? { id: 'map', icon: 'map', label: 'Bản đồ' } : { id: 'profile', icon: 'account', label: 'Hồ sơ' };
   const leading = gameId ? actions.slice(0, 2) : [{ id: 'missions', icon: 'missions', label: 'Nhiệm vụ' }, { id: 'events', icon: 'events', label: 'Sự kiện' }];
   const entries = [...leading, center, ...actions.slice(2)];
   for (const action of entries) {

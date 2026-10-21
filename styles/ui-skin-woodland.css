@@ -38,7 +38,7 @@ html[data-ui-skin="woodland"] .game-selector__label strong { color: #fff1c8; }
 html[data-ui-skin="woodland"] .adventure-dock { position: relative; isolation: isolate; border: 0; background: none; box-shadow: none; }
 html[data-ui-skin="woodland"] .adventure-dock::before { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; border: 10px solid transparent; border-image: url('/assets/ui/woodland/nameplate.webp') 48 82 fill / 10px stretch; }
 html[data-ui-skin="woodland"] .adventure-dock button { color: #fff1c8; text-shadow: 0 1px #42230e; }
-html[data-ui-skin="woodland"] .adventure-dock button[aria-current="page"] { color: #4b2b18; text-shadow: none; background: url('/assets/ui/woodland/selected-tab.webp') center / 100% 100% no-repeat; box-shadow: none; border-radius: 0; }
+html[data-ui-skin="woodland"] .adventure-dock button[aria-current="page"] { color: #4b2b18; text-shadow: none; background: url('/assets/ui/woodland/selected-tab.webp') center top / 100% 140% no-repeat; box-shadow: inset 0 -3px #66883a; border-radius: 10px; }
 html[data-ui-skin="woodland"] :is(#settings-modal, #account-modal, #missions-screen, #events-screen, #rankings-modal, #shop-modal, #collection-modal) .app-modal__header,
 html[data-ui-skin="woodland"] .app-modal-overlay .app-modal__header { background: linear-gradient(#a46b38, #6b3c24); border-color: #d7a457; color: #fff0c5; }
 html[data-ui-skin="woodland"] :is(#settings-modal, #account-modal, #missions-screen, #events-screen, #rankings-modal, #shop-modal, #collection-modal) .app-modal__title,
@@ -74,4 +74,14 @@ html[data-ui-skin="woodland"] :is(.app-toast, .game-tooltip, .card-tooltip) { ba
 html[data-ui-skin="woodland"] .app-toast { background: none; border: 10px solid transparent; border-image: url('/assets/ui/woodland/notice.webp') 32 40 fill / 10px stretch; }
 html[data-ui-skin="woodland"] .treasure-card { background: #f3dfb4; color: #4b2b18; border-color: #b88747; }
 html[data-ui-skin="woodland"] .treasure-card[aria-pressed="true"] { background: #fff4d1; border-color: #4e7d28; box-shadow: inset 0 0 0 2px #4e7d28; }
+html[data-ui-skin="woodland"] .navigation-coming-soon { box-sizing: border-box; max-width: 420px; min-height: 160px; display: grid; place-items: center; margin: 24px auto; padding: 24px; border: 12px solid transparent; border-image: url('/assets/ui/woodland/paper-panel.webp') 42 fill / 12px stretch; color: #775432; font: 700 20px/1.4 Georgia, serif; text-align: center; }
+html[data-ui-skin="woodland"] .leaderboard-family-menu { background: #fff2ce; border-color: #b78a4f; }
+html[data-ui-skin="woodland"] .leaderboard-family-menu button { color: #4b2b18; }
+html[data-ui-skin="woodland"] .leaderboard-family-menu button[aria-checked="true"] { background: #dfc58e; color: #36541e; box-shadow: inset 3px 0 #4e7d28; }
+html[data-ui-skin="woodland"] .leaderboard-family-menu .app-button { border: 0; border-image: none; border-radius: 8px; background: transparent; color: #4b2b18; text-shadow: none; padding: 10px 14px; min-height: 44px; }
+html[data-ui-skin="woodland"] .leaderboard-family-menu .app-button[aria-checked="true"] { background: #dfc58e; color: #36541e; box-shadow: inset 3px 0 #4e7d28; }
+html[data-ui-skin="woodland"] .leaderboard-list :is(.leaderboard-rank:not([role="img"]), .is-self) { color: #654421; }
+html[data-ui-skin="woodland"] .leaderboard-list .is-self { background: #e6d6a9; }
+html[data-ui-skin="woodland"] .leaderboard-avatar { background: #e5c68f; color: #4b2b18; border-color: #a9793c; }
+@media (orientation: landscape) and (max-height: 600px) { html[data-ui-skin="woodland"] .adventure-dock button { min-height: 44px; } }
 @media (max-width: 360px) { html[data-ui-skin="woodland"] :is(.app-button, .tab-button) { border-width: 10px; border-image-width: 10px; padding-inline: 2px; } }

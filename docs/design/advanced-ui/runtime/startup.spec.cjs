@@ -1,0 +1,32 @@
+const { test, expect } = require('@playwright/test');
+const path = require('node:path');
+const { geometry } = require('./helpers.cjs');
+for (const viewport of [{ width: 320, height: 568 }, { width: 412, height: 915 }, { width: 844, height: 390 }, { width: 1024, height: 900 }]) test(`startup ${viewport.width}`, async ({ page }) => {
+  await page.setViewportSize(viewport);
+  let release; const gate = new Promise(resolve => { release = resolve; });
+  await page.route('**/js/main.js*', async route => { await gate; await route.continue(); });
+  await page.goto('/', { waitUntil: 'commit' });
+  await expect(page.locator('#app-loading[data-controlled="true"]')).toBeVisible();
+  await geometry(page);
+  await page.screenshot({ path: path.join(__dirname, 'qa', `startup-${viewport.width}.png`), animations: 'disabled' });
+  release(); await page.locator('#app-loading').waitFor({ state: 'detached' });
+  await expect(page.locator('.game-selector')).toBeVisible();
+});
+test('slow startup and failed module retain a reachable retry action', async ({ page }) => {
+  await page.clock.install();
+  let release; const gate = new Promise(resolve => { release = resolve; });
+  await page.route('**/js/main.js*', async route => { await gate; await route.abort('failed'); });
+  await page.goto('/', { waitUntil: 'commit' });
+  await expect(page.locator('#app-loading[data-controlled="true"]')).toBeVisible();
+  await page.clock.fastForward(15001);
+  await expect(page.locator('[data-loading-message]')).toHaveText('Việc tải đang lâu hơn dự kiến.');
+  await expect(page.locator('[data-loading-retry]')).toBeVisible();
+  await page.screenshot({ path: path.join(__dirname, 'qa', 'startup-slow.png'), animations: 'disabled' });
+  release();
+  await expect(page.locator('[data-loading-message]')).toContainText('Không thể mở trò chơi');
+  await page.screenshot({ path: path.join(__dirname, 'qa', 'startup-error.png'), animations: 'disabled' });
+  await page.unroute('**/js/main.js*');
+  await page.locator('[data-loading-retry]').click();
+  await page.locator('#app-loading').waitFor({ state: 'detached' });
+  await expect(page.locator('.game-selector')).toBeVisible();
+});

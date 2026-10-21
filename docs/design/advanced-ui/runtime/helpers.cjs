@@ -1,0 +1,26 @@
+const { expect } = require('@playwright/test');
+async function installModuleAccess(page) {
+  await page.addInitScript(() => {
+    window.productModule = path => import(performance.getEntriesByType('resource').find(entry => new URL(entry.name).pathname === path)?.name || path);
+  });
+}
+async function ready(page) { await page.goto('/'); await page.locator('#app-loading').waitFor({ state: 'detached' }); }
+async function settings(page) { await page.locator('.adventure-page:visible [data-dock-action="settings"]').click(); await expect(page.locator('#settings-modal')).toBeVisible(); }
+async function choose(page, skin) { await page.locator(`[data-ui-skin-choice="${skin}"]`).click(); await expect(page.locator('html')).toHaveAttribute('data-ui-skin', skin); await expect(page.locator('.skin-choices')).not.toHaveAttribute('aria-busy', 'true'); }
+async function homeSkin(page, skin) { await settings(page); await choose(page, skin); await page.locator('.adventure-screen > .adventure-exit').click(); await expect(page.locator('.game-selector')).toBeVisible(); }
+async function geometry(page) {
+  const result = await page.evaluate(() => ({ overflow: document.documentElement.scrollWidth > innerWidth,
+    panels: [...document.querySelectorAll('.app-modal')].filter(node => node.getBoundingClientRect().width).map(node => {
+      const rect = node.getBoundingClientRect(), body = node.querySelector('.app-modal__body');
+      return { left: rect.left, right: rect.right, bottom: rect.bottom, horizontal: body ? body.scrollWidth > body.clientWidth + 1 : false };
+    }) }));
+  expect(result.overflow).toBe(false);
+  const viewport = page.viewportSize();
+  for (const panel of result.panels) { expect(panel.left).toBeGreaterThanOrEqual(-1); expect(panel.right).toBeLessThanOrEqual(viewport.width + 1); expect(panel.bottom).toBeLessThanOrEqual(viewport.height + 1); expect(panel.horizontal).toBe(false); }
+  return result;
+}
+async function disableRemoteServices(page) {
+  await page.route('**/js/firebaseBackend.js*', route => route.fulfill({ contentType: 'text/javascript', body:
+    "export const getFirebaseBackend = async () => null; export const disposeFirebaseBackend = async () => {}; export { getFirebaseEnvironment } from './firebaseEnvironment.js';" }));
+}
+module.exports = { installModuleAccess, ready, settings, choose, homeSkin, geometry, disableRemoteServices };

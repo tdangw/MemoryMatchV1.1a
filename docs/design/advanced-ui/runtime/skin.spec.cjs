@@ -1,14 +1,7 @@
 const { test, expect } = require('@playwright/test');
 const path = require('node:path');
-test.beforeEach(async ({ page }) => {
-  await page.addInitScript(() => {
-    // Reuse the exact module URL Vite supplied to the product after HMR edits.
-    window.productModule = path => import(performance.getEntriesByType('resource').find(entry => new URL(entry.name).pathname === path)?.name || path);
-  });
-});
-async function ready(page) { await page.goto('/'); await page.locator('#app-loading').waitFor({ state: 'detached' }); }
-async function settings(page) { await page.locator('.adventure-page:visible [data-dock-action="settings"]').click(); await expect(page.locator('#settings-modal')).toBeVisible(); }
-async function choose(page, skin) { await page.locator(`[data-ui-skin-choice="${skin}"]`).click(); await expect(page.locator('html')).toHaveAttribute('data-ui-skin', skin); await expect(page.locator('.skin-choices')).not.toHaveAttribute('aria-busy', 'true'); }
+const { installModuleAccess, ready, settings, choose } = require('./helpers.cjs');
+test.beforeEach(async ({ page }) => { await installModuleAccess(page); });
 for (const viewport of [{ width: 320, height: 568 }, { width: 412, height: 915 }, { width: 844, height: 390 }, { width: 1024, height: 900 }]) {
   test(`choose and reload ${viewport.width}`, async ({ page }) => {
     await page.setViewportSize(viewport); const errors = [], requests = [];
