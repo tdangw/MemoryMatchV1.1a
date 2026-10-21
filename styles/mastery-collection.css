@@ -6,4 +6,6 @@
 .mastery-collection__navigation { display: flex; justify-content: center; gap: 12px; margin: 16px 0; }
 .mastery-collection__navigation .app-button { min-width: 76px; }
 .mastery-collection p { margin: 12px 0; font-size: .875rem; }
+.mastery-painting { display: block; width: 100%; height: auto; max-height: 65dvh; object-fit: contain; }
+#mastery-painting-modal [hidden] { display: none; }
 .level-summary .mastery-win-reward { margin: 14px 0 0; text-align: center; color: #f5dfa3; font-weight: 700; }

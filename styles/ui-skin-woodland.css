@@ -99,16 +99,6 @@ html[data-ui-skin="woodland"] :is(#shop-modal, #collection-modal) .appearance-ac
 html[data-ui-skin="woodland"] :is(#shop-modal, #collection-modal) .appearance-action--equip:active:not(:disabled) { border-image-source: url('/assets/ui/woodland/green-pressed.webp'); }
 html[data-ui-skin="woodland"] :is(#shop-modal, #collection-modal) .shop-buy-button:disabled { border: 2px solid #b58b4b; border-image: none; border-radius: 10px; padding: 7px 10px; background: #e9d6ae; color: #654421; text-shadow: none; opacity: 1; }
 html[data-ui-skin="woodland"] :is(.theme-choice, .appearance-choice).is-equipped { border-color: #66883a; box-shadow: inset 0 0 0 1px #66883a; }
-html[data-ui-skin="woodland"][data-ui-rewards="ready"] .adventure-map-node--chest > .treasure-art { background: center / contain no-repeat; }
-html[data-ui-skin="woodland"][data-ui-rewards="ready"] .adventure-map-node--chest > .treasure-art > * { visibility: hidden; }
-html[data-ui-skin="woodland"][data-ui-rewards="ready"] [data-treasure-art-state="C:false"] > .treasure-art { background-image: url('/assets/ui/woodland/chest-C-closed.webp'); }
-html[data-ui-skin="woodland"][data-ui-rewards="ready"] [data-treasure-art-state="B:false"] > .treasure-art { background-image: url('/assets/ui/woodland/chest-B-closed.webp'); }
-html[data-ui-skin="woodland"][data-ui-rewards="ready"] [data-treasure-art-state="A:false"] > .treasure-art { background-image: url('/assets/ui/woodland/chest-A-closed.webp'); }
-html[data-ui-skin="woodland"][data-ui-rewards="ready"] [data-treasure-art-state="S:false"] > .treasure-art { background-image: url('/assets/ui/woodland/chest-S-closed.webp'); }
-html[data-ui-skin="woodland"][data-ui-rewards="ready"] [data-treasure-art-state="C:true"] > .treasure-art { background-image: url('/assets/ui/woodland/chest-C-open.webp'); }
-html[data-ui-skin="woodland"][data-ui-rewards="ready"] [data-treasure-art-state="B:true"] > .treasure-art { background-image: url('/assets/ui/woodland/chest-B-open.webp'); }
-html[data-ui-skin="woodland"][data-ui-rewards="ready"] [data-treasure-art-state="A:true"] > .treasure-art { background-image: url('/assets/ui/woodland/chest-A-open.webp'); }
-html[data-ui-skin="woodland"][data-ui-rewards="ready"] [data-treasure-art-state="S:true"] > .treasure-art { background-image: url('/assets/ui/woodland/chest-S-open.webp'); }
 /* Board edges paint inside existing padding; tile geometry/theme is untouched. */
 html[data-ui-skin="woodland"] :is(#grid-container, .link-board, .triple-connect__board) { border-image: url('/assets/ui/woodland/nameplate.webp') 48 82 / 4px stretch; box-shadow: inset 0 0 0 2px #b27b3f; }
 html[data-ui-skin="woodland"] .shell-fullscreen-button { border-color: transparent; color: #fff0c5; background: url('/assets/ui/woodland/icon-base.webp') center / contain no-repeat; }
@@ -150,3 +140,18 @@ html[data-ui-skin="woodland"] :is(#quick-time-modal, #quick-preview-modal) .quic
 html[data-ui-skin="woodland"] :is(#quick-time-modal, #quick-preview-modal) .quick-assist__choice > .ui-icon { color: #805528; }
 html[data-ui-skin="woodland"] :is(#quick-time-modal, #quick-preview-modal) .quick-assist__choice:is(:hover, :focus-visible):not(:disabled) { background: #fff4d3; border-color: #658a39; }
 html[data-ui-skin="woodland"] .shop-confirmation__price { color: #82501f; }
+
+/* Two aligned images share each SVG's existing geometry and opening owner. */
+.treasure-art > .treasure-skin-image { visibility: hidden; }
+html[data-ui-skin="woodland"][data-ui-rewards="ready"] .treasure-art.has-skin-art > :not(.treasure-skin-image) { display: none; }
+html[data-ui-skin="woodland"][data-ui-rewards="ready"] .treasure-art > .treasure-skin-image { visibility: visible; }
+html[data-ui-skin="woodland"][data-ui-rewards="ready"] .treasure-skin-image--open { opacity: 0; }
+html[data-ui-skin="woodland"][data-ui-rewards="ready"] .treasure-art.is-open > .treasure-skin-image--open { opacity: 1; }
+html[data-ui-skin="woodland"][data-ui-rewards="ready"] .treasure-art.is-open > .treasure-skin-image--closed { opacity: 0; }
+html[data-ui-skin="woodland"] .level-summary .mastery-win-reward { color: #654421; }
+html[data-ui-skin="woodland"] .mastery-collection__pieces { background: #e6d0a0; border-color: #a9793c; }
+html[data-ui-skin="woodland"] .mastery-collection__piece { color: #775432; }
+html[data-ui-skin="woodland"] .mastery-collection__piece.is-earned { color: transparent; }
+html[data-ui-skin="woodland"] .treasure-dialog .app-modal__close { min-width: 44px; min-height: 44px; }
+html[data-ui-skin="woodland"] .treasure-collection-link { min-height: 44px; min-width: 44px; }
+@media (max-height: 500px) and (min-width: 600px) { html[data-ui-skin="woodland"] .treasure-dialog .app-modal__header { height: auto; min-height: 56px; } }

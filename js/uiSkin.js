@@ -3,6 +3,7 @@ import { saveSetting } from './persistence.js';
 import { canLaunchGame } from './profileOperations.js';
 import { createUiSkinController, normalizeUiSkin } from './uiSkinController.js';
 import { UI_SKIN_ASSETS } from './uiSkinManifest.js';
+import { decorateTreasureSkin, clearTreasureSkins } from './progression/treasureSkin.js';
 
 const base = `${import.meta.env.BASE_URL}assets/ui/woodland/`;
 const decoded = new Map();
@@ -44,6 +45,7 @@ async function loadBundle(bundle, signal) {
 function clearRewards() {
   revision++; rewardAbort?.abort(); rewardAbort = null; rewardLoad = null;
   delete document.documentElement.dataset.uiRewards;
+  clearTreasureSkins();
 }
 
 export function ensureUiSkinRewards() {
@@ -52,7 +54,9 @@ export function ensureUiSkinRewards() {
   const token = revision, owner = gameState.settings, abort = new AbortController(); rewardAbort = abort;
   rewardLoad = loadBundle('rewards', abort.signal).then(() => {
     if (token !== revision || owner !== gameState.settings || currentSkin !== 'woodland') return false;
-    document.documentElement.dataset.uiRewards = 'ready'; return true;
+    document.documentElement.dataset.uiRewards = 'ready';
+    document.querySelectorAll('.treasure-art').forEach(decorateTreasureSkin);
+    return true;
   }).catch(error => {
     abort.abort();
     if (error.name !== 'AbortError') console.warn('Reward skin unavailable', error.message);

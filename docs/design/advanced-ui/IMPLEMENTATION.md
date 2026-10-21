@@ -13,7 +13,9 @@ Nguồn phạm vi: `GAME_UX_SKIN_PLAN.md`. Bắt đầu 21/10/2026, working tree
 | G4 | Đạt | Home8/8; startup5/5 |
 | G5 | Đạt | Catalog8/8, ba trò và mọi tab con |
 | G6 | Đạt | Gameplay8/8 giảm chuyển động/DPR2 và8/8 thường/DPR3, cả ba trò |
-| G7–G10 | Đang thực hiện | Chưa nghiệm thu popup/rewards/tutorial/toàn bộ sản phẩm |
+| G7 | Đạt kiểm trình bày | Dialog8/8; purchase8/8; nhánh hiếm ghi rõ fixture |
+| G8 | Đạt | Natural6/6; treasure8/8; lifecycle7/7 và tranh1/1 |
+| G9–G10 | Đang thực hiện | Chưa nghiệm thu tutorial/toàn bộ sản phẩm |
 
 ## Quyết định và ranh giới
 
@@ -142,3 +144,12 @@ G0 là đọc source và contract. G1 là thiết kế trên DOM ứng dụng th
 - Giấy/gỗ cho nội dung thường, pause, chọn chế độ, xác nhận/reset, kho thời gian/xem trước; tooltip thật .app-tooltip và toast theo tone. Chỉ summary thắng dùng ribbon/sao ảnh khi rewards bundle ready; fallback giữ SVG. Sửa màu legacy theo ID để nội dung và số kho disabled đọc được, không đổi hành vi owner.
 - dialogs.spec.cjs8/8:2skin×4viewport, đường vào thật Giới thiệu/Quyền riêng tư/Hướng dẫn, cuộn đoạn cuối, focus trap/return và Escape; production-owner fixtures reset/return/hết giờ/0–3sao/số dài/xung đột bản lưu/toast. Fixture hiếm chỉ là bằng chứng trình bày, không là cấp thưởng, auth hay natural defeat. purchase dialogs8/8 kiểm đường mua/giá/xác nhận/thiếuXu/Hủy của cả3trò qua nút thật. Popup pause/settings/gameplay đã kiểm G6; preview/chế độ G5; quota failure G3. Các luồng thắng thật/rương/mảnh thuộc G8, toàn bộ regression G10.
 - Đã xem ảnh320px kết quả2sao/số dài, kho thời gian và tooltip. Lượt kiểm mua đầu sửa locator giá (nút số+icon) và chờ toast trò trước kết thúc; không thay app để test pass. CSS ownership pass; generator --check pass với NODE_PATH tới sharp runtime sẵn có. Không thay ui.js/controllers/logic thưởng đang được công việc khác xử lý.
+
+## G8 — EXP, bốn rương và tranh (đạt)
+
+- treasureSkin chỉ ghép hai SVG image cùng frame/pivot khi rewards bundle đã giải mã; default xóa href/node, lỗi ảnh giữ native SVG. Loại lớp SVG cũ bằng modifier rõ để không chồng hình nắp. Dùng lại timeline/owner mở rương:3animation hữu hạn cho bitmap,4cho fallback, không particle/loop/grant trong animation. Đổi skin/ẩn/reduced/đóng vẫn giữ transaction trước presentation.
+- Bộ sưu tập giữ10vị trí mảnh/catalog3tranh, thêm Xem tranh khi đủ bộ; ảnh lớn có tải/lỗi/Thử lại/đóng và cleanup owner. Giấy Nâng cao sửa tương phản EXP/mảnh; không thêm khoản thưởng. Khoảng chạm rương Nâng cao tối thiểu44px kể cả ngang.
+- rewards.spec:6/6 natural rewards (3trò×2skin), bàn sinh thật, click DOM, đủ2wave, thắng/replay/reload; +10EXP lần đầu, replay không thêm, durable10/100 sau reload. Không gọi hàm hoàn tất/grant để thay chơi. Snapshot/ảnh natural-* ghi rõ phạm vi. Bài kiểm đọc state để tìm nước đi, không đổi luật/RNG/board.
+- treasure presentation8/8 (2skin×4viewport×3trò): fixture chứng nhận40màn chỉ chuẩn bị điều kiện mốc; click marker/rương thật, trạng thái SđợiC, C→B→A→S grant30/60/100/160Xu và1/2/3/4Gợi ý, đủ350Xu/10Gợi ý; claim300Xu thật tới650Xu, xem ba tranh theo game, mở lại không có Mở rương. Không nhận fixture này là40màn chơi tự nhiên.
+- reward-lifecycle7/7:close/reload/default/reduced/profile replacement khi đang mở, receipt giữ một lần; write-failure boundary rollback rồi retry đúng30Xu; thiếu ảnh rương fallback vẫn nhận đúng. Bổ sung painting error/retry/close1/1, không đổiXu. Unit skin6/6, JS/CSS checks và adventure-rewards/level-progression checks pass. Lượt ma trận đầu phát hiện kiểm ảnh trước load; sửa owner tải/lỗi và await ảnh thật, chạy lại8/8. Đã xem ảnh rương S mobile sau sửa không còn chồng SVG.
+- Chưa gọi đây là kiểm auth/Firebase thật, physical mobile FPS hay toàn bộ G10. Luật/giá/catalog/save key/version không đổi; chỉ UI xem tranh được thêm theo kế hoạch.

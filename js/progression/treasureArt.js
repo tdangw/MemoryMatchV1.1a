@@ -1,4 +1,5 @@
 import { treasureDefinition } from './treasureCatalog.js';
+import { decorateTreasureSkin } from './treasureSkin.js';
 import '../../styles/treasure.css';
 let serial = 0;
 const ornaments = {
@@ -13,6 +14,7 @@ export function createTreasureArt(tier, opened = false) {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svg.setAttribute('viewBox', '0 0 180 145'); svg.setAttribute('aria-hidden', 'true');
   svg.classList.add('treasure-art'); svg.classList.toggle('is-open', opened);
+  svg.dataset.treasureArtTier = tier;
   svg.innerHTML = `<defs><linearGradient id="${id}-wood" x2="0" y2="1"><stop stop-color="${c.face}"/><stop offset="1" stop-color="${c.wood}"/></linearGradient><linearGradient id="${id}-metal" x2="0" y2="1"><stop stop-color="${c.light}"/><stop offset=".45" stop-color="${c.metal}"/><stop offset="1" stop-color="${c.wood}"/></linearGradient><radialGradient id="${id}-light"><stop stop-color="${c.light}" stop-opacity=".8"/><stop offset="1" stop-color="${c.light}" stop-opacity="0"/></radialGradient></defs>
   <ellipse cx="90" cy="130" rx="67" ry="9" fill="#000" opacity=".22"/>
   <ellipse class="treasure-art__glow" cx="90" cy="70" rx="76" ry="65" fill="url(#${id}-light)"/>
@@ -29,5 +31,6 @@ export function createTreasureArt(tier, opened = false) {
   <path d="M72 70q18-11 36 0v29l-18 17-18-17Z" fill="url(#${id}-metal)" stroke="${c.wood}" stroke-width="2"/>${ornaments[tier]}
   ${['A','S'].includes(tier) ? `<path d="M33 75q8 2 2 12m111-12q-8 2-2 12M53 117q10-10 17-1m40 0q8-9 17 1" fill="none" stroke="${c.metal}" stroke-width="2"/>` : ''}
   <g fill="${c.light}"><circle cx="44" cy="73" r="2"/><circle cx="136" cy="73" r="2"/><circle cx="44" cy="111" r="2"/><circle cx="136" cy="111" r="2"/></g>`;
+  decorateTreasureSkin(svg);
   return svg;
 }

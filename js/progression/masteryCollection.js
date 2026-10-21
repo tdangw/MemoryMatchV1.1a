@@ -6,6 +6,8 @@ import { loadPersistentChapter } from '../persistence.js';
 import { getMasteryRewards } from './masteryRewards.js';
 import { claimAdventureCollection } from '../adventureRewards.js';
 import { refreshAppWallet } from '../appNavigation.js';
+import { openAppModal } from '../modal.js';
+import { createGameShellLifecycle } from '../gameShell/gameShellLifecycle.js';
 import '../../styles/mastery-collection.css';
 
 export const COLLECTION_PAINTINGS = Object.freeze([
@@ -60,6 +62,9 @@ export function renderMasteryCollection(container, gameId, { block: requestedBlo
       const navigation = document.createElement('nav'); navigation.className = 'mastery-collection__navigation';
       navigation.setAttribute('aria-label', 'Chọn bộ tranh'); navigation.append(previous, next);
       root.replaceChildren(heading, pieces, progress, reward, navigation);
+      if (mastery.collectionComplete) {
+        root.append(control('Xem tranh', false, () => showPainting(painting, owner)));
+      }
       if (mastery.collectionEligible) {
         const claim = control('Nhận 300 xu', false, async () => {
           claim.disabled = true;
@@ -80,6 +85,25 @@ export function renderMasteryCollection(container, gameId, { block: requestedBlo
     } finally { if (identity === generation) root.removeAttribute('aria-busy'); }
   }
   void render();
+}
+function showPainting(painting, owner) {
+  const scope = createGameShellLifecycle();
+  const content = document.createElement('div');
+  const image = document.createElement('img');
+  image.className = 'mastery-painting'; image.alt = painting.title; image.hidden = true;
+  const status = document.createElement('p'); status.setAttribute('role', 'status');
+  const retry = control('Thử lại', false, load); retry.hidden = true;
+  content.append(status, image, retry);
+  openAppModal({ id: 'mastery-painting-modal', title: painting.title, content,
+    owner, size: 'large', keepBanner: false, onDestroy: () => scope.dispose() });
+  scope.listen(image, 'load', () => { status.hidden = true; image.hidden = false; });
+  scope.listen(image, 'error', () => { status.textContent = 'Chưa tải được tranh. Hãy thử lại.'; retry.hidden = false; });
+  scope.own(() => image.removeAttribute('src'));
+  function load() {
+    status.hidden = false; status.textContent = 'Đang mở tranh…'; retry.hidden = true; image.hidden = true;
+    image.src = `${import.meta.env.BASE_URL}assets/images/collections/${painting.id}.webp`;
+  }
+  load();
 }
 function control(label, disabled, onClick) {
   const button = document.createElement('button'); button.type = 'button';
