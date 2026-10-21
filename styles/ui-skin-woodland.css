@@ -117,3 +117,36 @@ html[data-ui-skin="woodland"] .triple-connect__tray::before { content: ''; posit
 html[data-ui-skin="woodland"] .triple-connect__tray-slot:not(.is-locked) { background: #efdbac; border-color: #b98b4f; }
 html[data-ui-skin="woodland"] .progression-wave-notice { background: none; border: 10px solid transparent; border-image: url('/assets/ui/woodland/notice.webp') 32 40 fill / 10px stretch; color: #654421; box-shadow: 0 6px 18px #0004; }
 @media (max-width: 360px) { html[data-ui-skin="woodland"] :is(.app-button, .tab-button) { border-width: 10px; border-image-width: 10px; padding-inline: 2px; } }
+
+/* Dialog content retains each owner's focus, scroll and action semantics. */
+html[data-ui-skin="woodland"] :is(#difficulty-modal, #triple-difficulty-modal, #triple-session-picker-modal, #session-choice-modal, #link-session-choice-modal, #info-modal, #version-modal, #reset-modal, #return-modal, #quick-time-modal, #quick-preview-modal) .app-modal__body { color: #4b2b18; }
+html[data-ui-skin="woodland"] :is(.difficulty-theme, .difficulty-option) { background: #efdbaf; color: #4b2b18; border-color: #ad8249; }
+html[data-ui-skin="woodland"] :is(.difficulty-theme strong, .difficulty-option small, .difficulty-theme small, .reward-subtitle) { color: #775432; }
+html[data-ui-skin="woodland"] :is(.difficulty-option, .difficulty-theme__change):is(:hover, :focus-visible) { background: #fff4d3; color: #4b2b18; border-color: #658a39; }
+html[data-ui-skin="woodland"] .difficulty-theme__change { min-height: 44px; background: #e7cc96; color: #4b2b18; border-color: #ad8249; }
+html[data-ui-skin="woodland"] :is(#reset-modal, #return-modal) :is(.app-modal__header, .app-modal__footer) { border-color: #b58b4b66; }
+html[data-ui-skin="woodland"] :is(#reset-modal, #return-modal, #difficulty-modal, #triple-difficulty-modal, #triple-session-picker-modal, #session-choice-modal, #link-session-choice-modal) .app-modal__title { color: #fff0c5; }
+html[data-ui-skin="woodland"] #info-modal .app-modal__note { color: #775432; }
+html[data-ui-skin="woodland"] #game-exit-modal .app-modal__header { background: linear-gradient(#a46b38, #6b3c24); }
+html[data-ui-skin="woodland"] #game-exit-modal .app-modal__title { color: #fff0c5; }
+html[data-ui-skin="woodland"] #game-exit-modal .pause-settings { background: url('/assets/ui/woodland/icon-base.webp') center / contain no-repeat; color: #fff0c5; border-color: transparent; }
+html[data-ui-skin="woodland"] .app-tooltip { background: #fff0ca; color: #4b2b18; border: 2px solid #b58141; box-shadow: 0 3px 9px #0004; }
+html[data-ui-skin="woodland"] .app-toast--success { color: #36551d; }
+html[data-ui-skin="woodland"] .app-toast--error { color: #9a3024; }
+html[data-ui-skin="woodland"] .app-toast--warning { color: #7d4817; }
+html[data-ui-skin="woodland"] #level-summary-modal .level-summary__stat strong { text-shadow: none; overflow-wrap: anywhere; }
+html[data-ui-skin="woodland"][data-ui-rewards="ready"] #level-summary-modal .level-summary__heading { box-sizing: border-box; min-width: 0; height: 58px; padding: 0 16px 4px; margin: 0 0 4px; background: url('/assets/ui/woodland/ribbon.webp') center / 100% 100% no-repeat; color: #fff2c6; text-shadow: 0 1px #692217; font-size: clamp(16px, 5cqw, 24px); }
+html[data-ui-skin="woodland"][data-ui-rewards="ready"] #level-summary-modal .level-summary__star { background: url('/assets/ui/woodland/star-earned.webp') center / contain no-repeat; }
+html[data-ui-skin="woodland"][data-ui-rewards="ready"] #level-summary-modal .level-summary__star--unearned { background-image: url('/assets/ui/woodland/star-unearned.webp'); filter: none; opacity: 1; }
+html[data-ui-skin="woodland"][data-ui-rewards="ready"] #level-summary-modal .level-summary__star > .ui-icon { visibility: hidden; }
+@media (max-height: 480px) { html[data-ui-skin="woodland"][data-ui-rewards="ready"] #level-summary-modal .level-summary__heading { height: 48px; font-size: 16px; } }
+/* ID-specific legacy dialog rules need equally explicit skin variants. */
+html[data-ui-skin="woodland"] :is(#shop-confirm-modal, #theme-change-notice-modal, #quick-time-modal, #quick-preview-modal, #difficulty-modal, #triple-difficulty-modal, #triple-session-picker-modal, #info-modal, #settings-modal, #reset-modal, #return-modal) .app-modal__close { background: url('/assets/ui/woodland/icon-base.webp') center / contain no-repeat; color: #fff0c5; border-color: transparent; }
+html[data-ui-skin="woodland"] :is(#shop-confirm-modal, #theme-change-notice-modal, #quick-time-modal, #quick-preview-modal, #difficulty-modal, #triple-difficulty-modal, #triple-session-picker-modal, #info-modal, #settings-modal, #reset-modal, #return-modal) .app-modal__title .ui-icon { color: #fff0c5; }
+html[data-ui-skin="woodland"] :is(#quick-time-modal, #quick-preview-modal, #shop-confirm-modal, #theme-change-notice-modal) .app-modal__title { color: #fff0c5; }
+html[data-ui-skin="woodland"] :is(#quick-time-modal, #quick-preview-modal) .quick-assist__choice { background: #efdbaf; color: #4b2b18; border-color: #ad8249; }
+html[data-ui-skin="woodland"] :is(#quick-time-modal, #quick-preview-modal) .quick-assist__choice:disabled { opacity: 1; background: #e5d8bc; color: #6d5a3f; }
+html[data-ui-skin="woodland"] :is(#quick-time-modal, #quick-preview-modal) .quick-assist__choice span { color: inherit; }
+html[data-ui-skin="woodland"] :is(#quick-time-modal, #quick-preview-modal) .quick-assist__choice > .ui-icon { color: #805528; }
+html[data-ui-skin="woodland"] :is(#quick-time-modal, #quick-preview-modal) .quick-assist__choice:is(:hover, :focus-visible):not(:disabled) { background: #fff4d3; border-color: #658a39; }
+html[data-ui-skin="woodland"] .shop-confirmation__price { color: #82501f; }
