@@ -75,6 +75,7 @@ import { createWaveProgress, completeWave, activateNextWave, normalizeWaveProgre
 import { MATCH_COINS_PER_GROUP, calculateVictoryCoins, calculateFastFinishBonus, calculateProgressionStars, getProgressionStarTargets, getWavePatternIndex } from '../progression/gameplayRules.js';
 import { getDifficultyAccess } from '../progression/difficultyProgress.js';
 import { playOwnedRewardCue } from '../sound.js';
+import { prepareSummaryCoins } from '../progression/summaryCoins.js';
 import { renderWaveStatus, announceWave, presentWaveExit, prepareWaveArrival } from '../progression/waveHud.js';
 import { pausePlayMetrics } from '../playMetrics.js';
 
@@ -262,7 +263,8 @@ async function startTripleConnectRoundFromGenerated({ generated, mode, level, el
   activeWave = reason === 'wave' ? activateNextWave(waveSession.wave)
     : createWaveProgress({ attemptId: crypto.randomUUID(), gameId: 'triple-connect', mode, level, groupsPerWave: state.initialTileCount / 3 });
   if (reason === 'wave') state = restoreTripleStateSnapshot({ ...createTripleStateSnapshot(state),
-    score: activeWave.completedScore, moves: activeWave.completedMoves, misses: activeWave.completedMisses }, []);
+    score: activeWave.completedScore, moves: activeWave.completedMoves, misses: activeWave.completedMisses,
+    combo: waveSession.snapshot.combo, maxCombo: waveSession.snapshot.maxCombo }, []);
   currentMode = mode;
   currentLevel = level;
   currentLayout = getTripleLayout(generated.layoutId);
@@ -577,6 +579,7 @@ return runRoundCommand(async () => {
       if (!tileIds.length || !(await consumeTripleItem("hint"))) return;
       if (!scope.active || generation !== roundGeneration) return;
       hintedTileIds = new Set(tileIds);
+      playOwnedRewardCue('hint', scope, gameState.settings);
       render(state);
 
 });
@@ -653,6 +656,7 @@ return runRoundCommand(async () => {
         return;
       if (!scope.active || generation !== roundGeneration) return;
       state = result.state;
+      playOwnedRewardCue('shuffle', scope, gameState.settings);
       boardPresentationRevision += 1;
       hintedTileIds.clear();
       render(state);
@@ -880,6 +884,7 @@ async function settleTerminalRound(shell, render) {
   // A failed durable write is handled by the app-owned recovery modal. Do not cover its reload action.
   if (!settlement) return;
   const won = state.status === "won";
+  const coinPresentation = won ? prepareSummaryCoins(getTripleHud(getTripleHudElements()), settlement.reward, gameState.coins, scope) : null;
   if (won) {
     duckBackgroundMusicForVictory(gameState.settings);
     playTripleSound("victory");
@@ -959,6 +964,7 @@ async function settleTerminalRound(shell, render) {
       moves: state.moves,
       misses: state.misses,
       coinsEarned: settlement.reward,
+      coinPresentation,
       mastery: settlement.mastery,
       score: state.score,
       stars: settlement.stars,

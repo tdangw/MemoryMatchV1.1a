@@ -11,7 +11,19 @@ export function openGameExitDialog({ owner, trigger, onExit, onRestart, onSettin
     size: 'small',
     actions: [
       { label: 'Tiếp tục', icon: 'play', variant: 'primary' },
-      { label: ['challenge', 'endless'].includes(mode) ? 'Lượt mới' : 'Chơi lại', icon: 'restart', onClick: async () => { await onRestart(); return false; } },
+      { label: ['challenge', 'endless'].includes(mode) ? 'Lượt mới' : 'Chơi lại', icon: 'restart', onClick: async () => {
+        // The old round owns this dialog and destroys it during restart. Keep
+        // only its backdrop until the replacement round has finished preparing.
+        const backdrop = modal.overlay.cloneNode(false);
+        backdrop.removeAttribute('id');
+        backdrop.setAttribute('aria-hidden', 'true');
+        backdrop.inert = true;
+        backdrop.style.animation = 'none';
+        document.body.append(backdrop);
+        try { await onRestart(); }
+        finally { backdrop.remove(); }
+        return false;
+      } },
       { label: 'Cài đặt', icon: 'settings', onClick: () => { nextAction = onSettings; } },
       { label: 'Thoát game', icon: 'exit', variant: 'danger', onClick: async () => { await onExit(); return false; } },
     ],

@@ -48,11 +48,14 @@ import { clearComboWindow, playComboWindow } from "./gameShell/comboWindowPresen
 import { memoryBoard, clearMemoryBoard, decideMemorySelection, decideMemoryPair } from './memoryMatch/memoryBoard.js';
 import { MATCH_COINS_PER_GROUP, calculateGroupScore, calculateVictoryCoins, calculateFastFinishBonus, calculateProgressionStars } from './progression/gameplayRules.js';
 import { completeWave, waveTotalGroups } from './progression/waveProgress.js';
+import { getMemoryHud, getMemoryShell } from './memoryMatch/memoryShell.js';
+import { prepareSummaryCoins } from './progression/summaryCoins.js';
 
 let levelCompleteActions = { onNext: () => {}, onMenu: () => {} };
 let pendingMismatch = null;
 let comboExpiryTimer;
 let lastMatchAt = 0;
+let pausedComboRemainingMs = null;
 const REVEAL_ANIMATION_CLASSES = [
   "appear-bounce",
   "appear-fade-scale",
@@ -73,6 +76,7 @@ export function resetLogicRuntime({ preserveBoard = false } = {}) {
   memoryBoard.selectedIds = [];
   if (!preserveBoard) clearMemoryBoard();
   lastMatchAt = 0;
+  pausedComboRemainingMs = null;
   stopComboWindow();
   clearMemoryTileAnimations();
 }
@@ -300,13 +304,19 @@ async function checkMatch(roundId) {
 }
 
 export function memoryComboRemainingMs() {
-  return lastMatchAt ? Math.max(0, getComboWindowMs(gameState.totalPairs) - (performance.now() - lastMatchAt)) : 0;
+  return pausedComboRemainingMs ?? (lastMatchAt ? Math.max(0, getComboWindowMs(gameState.totalPairs) - (performance.now() - lastMatchAt)) : 0);
 }
-export function restoreMemoryCombo(combo, remainingMs) {
+export function pauseMemoryCombo() {
+  pausedComboRemainingMs = memoryComboRemainingMs();
+  stopComboWindow();
+}
+export function restoreMemoryCombo(combo, remainingMs, { paused = false } = {}) {
+  stopComboWindow();
+  pausedComboRemainingMs = paused ? remainingMs : null;
   gameState.combo = remainingMs > 0 ? combo : 0;
   if (gameState.combo) {
     lastMatchAt = performance.now() - getComboWindowMs(gameState.totalPairs) + remainingMs;
-    startComboWindow(remainingMs, lastMatchAt, gameState.roundId);
+    if (!paused) startComboWindow(remainingMs, lastMatchAt, gameState.roundId);
   }
   updateComboDisplay(gameState.combo);
 }
@@ -377,6 +387,7 @@ export async function checkLevelComplete() {
       return;
     }
     if (gameState.roundId !== roundId) return;
+    const coinPresentation = prepareSummaryCoins(getMemoryHud(), coinsEarned, totalCoins, getMemoryShell().scope);
     updateScoreDisplay(finalScore);
     updateLevelStarsDisplay(stars);
     updateTotalStarsDisplay(progressResult.totalStars);
@@ -395,6 +406,7 @@ export async function checkLevelComplete() {
       moves: gameState.moves,
       misses: gameState.misses,
       coinsEarned,
+      coinPresentation,
       mastery: progressResult.mastery,
       score: finalScore,
       stars,

@@ -9,6 +9,7 @@ import {
   restoreBackgroundMusic,
   sounds,
   syncDefaultMusic,
+  playOwnedRewardCue,
 } from "./sound.js";
 import {
   GAME_CONFIG,
@@ -55,7 +56,7 @@ import { savePersistentGameData, isPersistenceBlocked } from "./persistence.js";
 import { getActiveSession } from "./sessionProgress.js";
 import { getTheme, getThemeSelectionEligibility } from "./themeCatalog.js";
 import { showAppToast } from "./modal.js";
-import { configureLogic, resetLogicRuntime, restoreMemoryCombo, checkLevelComplete } from "./logic.js";
+import { configureLogic, resetLogicRuntime, restoreMemoryCombo, pauseMemoryCombo, checkLevelComplete } from "./logic.js";
 import { remainingComboWindow } from './pairSessionSnapshot.js';
 import { getComboWindowMs } from './gameplayTuning.js';
 import { restartMemoryTileAnimation } from "./memoryMatch/tileAnimation.js";
@@ -179,6 +180,7 @@ export function initializeLevel(level, { reason = "new", session = null, skipInt
     : { remainingTime: gameState.wave.allocatedSeconds, timeLimit: gameState.wave.allocatedSeconds, levelStartTime: gameState.wave.allocatedSeconds };
   const roundId = beginRound();
   const pairSnapshot = reason === 'resume' ? session?.pairSnapshot : null;
+  const waveCombo = reason === 'wave' ? session?.pairSnapshot : null;
   beginMemoryBoardIdentity(pairSnapshot?.seed, pairSnapshot?.themeId || gameState.appearance.themes.memoryMatch);
   const firstStart = !gameState.progress.memoryMatch.startedLevels?.[`${mode}:${level}`];
   const hintBonus = (reason === "new" || reason === "advance") && firstStart
@@ -223,6 +225,7 @@ export function initializeLevel(level, { reason = "new", session = null, skipInt
     restoreMemoryCombo(pairSnapshot.combo, remainingComboWindow(pairSnapshot, getComboWindowMs(gameState.totalPairs)));
   }
 
+  if (waveCombo) restoreMemoryCombo(waveCombo.combo, waveCombo.comboRemainingMs, { paused: true });
   updateLevelDisplay(level);
   renderWaveStatus(getMemoryShell().refs, gameState.wave);
   updateScoreDisplay(gameState.score);
@@ -253,6 +256,7 @@ export function initializeLevel(level, { reason = "new", session = null, skipInt
   document.getElementById("btn-buy-time")?.toggleAttribute("hidden", isEndlessMode(mode));
   revealAndHideTiles(roundId, () => {
     if (pairSnapshot) restoreMemoryCombo(pairSnapshot.combo, remainingComboWindow(pairSnapshot, getComboWindowMs(gameState.totalPairs)));
+    if (waveCombo) restoreMemoryCombo(waveCombo.combo, waveCombo.comboRemainingMs);
     startCountdown(roundId);
     if (pairSnapshot?.matchedPairs === pairSnapshot?.totalPairs && pairSnapshot) void checkLevelComplete();
   }, previewDurationMs);
@@ -265,6 +269,7 @@ async function advanceMemoryWave() {
     progress: structuredClone(gameState.progress.memoryMatch) };
   gameState.isPaused = true;
   pausePlayMetrics('wave-transition');
+  pauseMemoryCombo();
   const result = completeWave(gameState.wave, { score: gameState.score, moves: gameState.moves,
     misses: gameState.misses, matchedGroups: gameState.matchedPairs });
   gameState.wave = result.progress;
@@ -529,8 +534,9 @@ export async function handleHintClick() {
   }
   if (gameState.roundId !== roundId) return;
   updateHintDisplay(gameState.progress.memoryMatch.items.hint);
+  playOwnedRewardCue('hint', getMemoryShell().scope, gameState.settings);
   revealHintPair(pair.slice(0, 2), roundId);
-  showBonusOverlay("Đã lật 2 thẻ trong vài giây.");
+  showAppToast("Đã lật 2 thẻ trong vài giây.", { tone: 'info', duration: 1600 });
 }
 
 function revealHintPair(tiles, roundId) {

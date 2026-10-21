@@ -35,6 +35,7 @@ import { getRankingOwner } from './rankingOwner.js';
 import { projectJourneyTreasure } from './progression/treasureProjection.js';
 import { treasureDefinition } from './progression/treasureCatalog.js';
 import { waveTotalGroups } from './progression/waveProgress.js';
+import { scheduleSummaryCoins } from './progression/summaryCoins.js';
 let activeIntro = null;
 let activeSummary = null;
 let summaryGeneration = 0;
@@ -396,6 +397,7 @@ export function showLevelSummaryOverlay(completion) {
   pendingSummaryAction?.dispose();
   activeSummary?.dispose();
   const scope = createGameShellLifecycle(); activeSummary = scope;
+  scope.own(() => completion.coinPresentation?.finish());
   const owner = getActiveGameScope() || getAppPageScope();
   const release = owner?.own(() => scope.dispose(), 'cleanup');
   scope.own(() => { release?.forget(); if (activeSummary === scope) activeSummary = null; });
@@ -418,6 +420,7 @@ function openLevelSummaryOverlay({
   moves,
   misses,
   coinsEarned,
+  coinPresentation,
   score,
   stars,
   timeBonus,
@@ -597,6 +600,8 @@ function openLevelSummaryOverlay({
   animateSummaryNumber(resultScore, score, { scope, delayMs: 360, durationMs: 1250 });
   if (coinsValueElement) {
     animateSummaryNumber(coinsValueElement, coinsEarned, { scope, prefix: "+", delayMs: SUMMARY_REWARD_TIMING.coinStart, durationMs: SUMMARY_REWARD_TIMING.coinDuration });
+    scheduleSummaryCoins({ owner: scope, source: coinsValueElement.parentElement, amount: coinsEarned,
+      reward: coinPresentation, getSettings: () => gameState.settings });
   }
 }
 

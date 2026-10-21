@@ -34,6 +34,7 @@ import { createWaveProgress, completeWave, activateNextWave, normalizeWaveProgre
 import { MATCH_COINS_PER_GROUP, calculateGroupScore, calculateVictoryCoins, calculateFastFinishBonus, calculateProgressionStars, getProgressionStarTargets } from '../progression/gameplayRules.js';
 import { getDifficultyAccess } from '../progression/difficultyProgress.js';
 import { playOwnedRewardCue } from '../sound.js';
+import { prepareSummaryCoins } from '../progression/summaryCoins.js';
 import { renderWaveStatus, announceWave, presentWaveExit, prepareWaveArrival } from '../progression/waveHud.js';
 import { PROGRESSION_HELP_CONTENT } from '../progression/progressionCopy.js';
 import { pausePlayMetrics } from '../playMetrics.js';
@@ -130,6 +131,7 @@ const linkTimeScheduler = createHudTimerScheduler({
 });
 let linkTimeProgressState = null;
 let comboExpiryTimer;
+let pausedComboRemainingMs = null;
 let selectedPosition = null;
 let pendingCompactLayout = null;
 let linkTimeWarningPlayed = false;
@@ -261,6 +263,7 @@ export function startLinkLevel({
     return null;
   }
   unmountActiveGameShell();
+  pausedComboRemainingMs = waveTransition ? pairSnapshot?.comboRemainingMs ?? 0 : null;
   stopCountdown();
   clearGameplayRewardPopups();
   clearLinkTransientEffects();
@@ -324,7 +327,10 @@ export function startLinkLevel({
   linkGameState.score = activeWave.completedScore;
   linkGameState.moves = activeWave.completedMoves;
   linkGameState.misses = activeWave.completedMisses;
-  if (waveTransition) linkGameState.freezeSeconds = pairSnapshot?.freezeSeconds || 0;
+  if (waveTransition) {
+    linkGameState.freezeSeconds = pairSnapshot?.freezeSeconds || 0;
+    linkGameState.combo = pausedComboRemainingMs > 0 ? pairSnapshot.combo : 0;
+  }
   if (resume && pairSnapshot) for (const key of ['score', 'moves', 'misses', 'matchedPairs', 'totalPairs']) linkGameState[key] = pairSnapshot[key];
   if (resume && pairSnapshot) {
     linkGameState.luckyAwards = structuredClone(pairSnapshot.luckyAwards || []);
@@ -353,9 +359,10 @@ export function startLinkLevel({
     await announceWave(getLinkShell().refs, scope, linkGameState.wave);
     if (!scope.active || linkGameState.roundId !== roundId) return;
     unlockLinkBoard();
-    if (resume && pairSnapshot) {
+    if ((resume || waveTransition) && pairSnapshot) {
       const windowMs = getLinkComboWindowMs(linkGameState.totalPairs);
-      const remaining = remainingComboWindow(pairSnapshot, windowMs);
+      const remaining = waveTransition ? pausedComboRemainingMs : remainingComboWindow(pairSnapshot, windowMs);
+      pausedComboRemainingMs = null;
       linkGameState.combo = remaining > 0 ? pairSnapshot.combo : 0;
       if (linkGameState.combo) {
         linkGameState.lastMatchAt = performance.now() - windowMs + remaining;
@@ -656,7 +663,8 @@ async function useLinkItem(id) {
     return;
   }
   closeLinkMenus();
-  playLinkSound("overlay");
+  if (id === 'hint' || id === 'reshuffle') playOwnedRewardCue(id === 'hint' ? 'hint' : 'shuffle', getLinkShell().scope, gameState.settings);
+  else playLinkSound("overlay");
   if (id === "hint") useLinkHint(hintConnection);
   else if (id === "reshuffle") useLinkReshuffle();
   else if (id === "thunder") useLinkThunder();
@@ -855,7 +863,7 @@ async function completeLinkLevel() {
     durationMs,
     wave: linkGameState.wave,
   });
-  (await awardLinkCoins(coinsEarned, null, { animate: false, persist: false }));
+  increaseCoins(coinsEarned);
   if (linkGameState.roundId !== roundId) return;
   stageRankedAttempt("link-connect", linkGameState.mode, linkGameState.score, true);
   checkpointRankedRun("link-connect", linkGameState.mode);
@@ -870,6 +878,7 @@ async function completeLinkLevel() {
     return;
   }
   if (linkGameState.roundId !== roundId) return;
+  const coinPresentation = prepareSummaryCoins(getLinkHud(getLinkHudElements()), coinsEarned, gameState.coins, getLinkShell().scope);
   updateLinkHud();
   const completedChapter = gameState.progress.linkConnect.adventure?.currentChapter > previousChapter ? previousChapter : null;
   const nextLevel = completedChapter ? gameState.progress.linkConnect.adventure.firstLevel : linkGameState.level + 1;
@@ -880,6 +889,7 @@ async function completeLinkLevel() {
     moves: linkGameState.moves,
     misses: linkGameState.misses,
     coinsEarned,
+    coinPresentation,
     mastery: progressResult.mastery,
     score: linkGameState.score,
     stars,
@@ -1071,25 +1081,6 @@ function updateLinkCoinHud(hud = getLinkHudElements()) {
   if (!isCoinCounterAnimating(hud.coinBalance)) getLinkHud(hud).coins(gameState.coins);
 }
 
-async function awardLinkCoins(amount, anchor, { animate = true, persist = true } = {}) {
-  const roundId = linkGameState.roundId;
-  const board = linkGameState.board;
-  const value = Math.max(0, Math.floor(Number(amount) || 0));
-  if (value < 1) return 0;
-  const previousCoins = gameState.coins;
-  increaseCoins(value);
-  if (persist) stageActiveSession('link-connect', createLinkSession());
-  if (persist && !(await savePersistentGameData({ coins: gameState.coins, progress: gameState.progress }))) {
-    gameState.coins = previousCoins;
-    showAppToast("Không thể lưu phần thưởng Xu lúc này.");
-    return 0;
-  }
-  const hud = getLinkHudElements();
-  animateCoinCounter(hud.coins, hud.coinBalance, previousCoins, gameState.coins);
-  if (animate && anchor) playCoinRewardFlight(anchor, hud.coins, value);
-  return value;
-}
-
 function setLinkTimeProgress(running, roundId = linkGameState.roundId, hud = getLinkHudElements()) {
   stopLinkTimeProgress();
   const endless = isLinkEndlessMode(linkGameState.mode);
@@ -1230,6 +1221,9 @@ async function advanceLinkWave() {
   linkGameState.isLocked = true;
   stopCountdown();
   pausePlayMetrics('wave-transition');
+  pausedComboRemainingMs = linkGameState.lastMatchAt
+    ? Math.max(0, getLinkComboWindowMs(linkGameState.totalPairs) - (performance.now() - linkGameState.lastMatchAt)) : 0;
+  stopLinkComboWindow();
   const result = completeWave(linkGameState.wave, { score: linkGameState.score, moves: linkGameState.moves,
     misses: linkGameState.misses, matchedGroups: linkGameState.matchedPairs });
   linkGameState.wave = result.progress;
@@ -1277,7 +1271,7 @@ function createLinkSession() {
     ...(linkGameState.wave ? { wave: linkGameState.wave } : {}),
     pairSnapshot: { version: 1, gameId: 'link-connect', seed: linkGameState.board?.seed || 'legacy',
       themeId: linkGameState.board?.themeId,
-      capturedAt: Date.now(), comboRemainingMs: linkGameState.lastMatchAt ? Math.max(0, getLinkComboWindowMs(linkGameState.totalPairs) - (performance.now() - linkGameState.lastMatchAt)) : 0,
+      capturedAt: Date.now(), comboRemainingMs: pausedComboRemainingMs ?? (linkGameState.lastMatchAt ? Math.max(0, getLinkComboWindowMs(linkGameState.totalPairs) - (performance.now() - linkGameState.lastMatchAt)) : 0),
       luckyAwards: structuredClone(linkGameState.luckyAwards), freezeSeconds: linkGameState.freezeSeconds,
       board: structuredClone(linkGameState.board), score: linkGameState.score, moves: linkGameState.moves,
       misses: linkGameState.misses, combo: linkGameState.combo, matchedPairs: linkGameState.matchedPairs, totalPairs: linkGameState.totalPairs },

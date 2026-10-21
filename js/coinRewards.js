@@ -23,12 +23,21 @@ export function calculateMatchCoinReward() {
   return MATCH_COINS_PER_GROUP;
 }
 
-export function playCoinRewardFlight(source, target, amount) {
+export function playCoinRewardFlight(source, target, amount, options = {}) {
   const coinCount = Math.max(0, Math.floor(Number(amount) || 0));
   if (!source || !target || coinCount < 1) return [];
-  const owner = getActiveGameScope();
+  const owner = options.owner || getActiveGameScope();
+  if (owner && !owner.active) return [];
+  const schedule = owner ? owner.timeout : setTimeout;
+  let completed = false;
+  const complete = () => {
+    if (completed) return;
+    completed = true;
+    options.onArrival?.(coinCount);
+    options.onComplete?.();
+  };
   // Audio remains independent of wallet updates and animation completion.
-  const audioReady = owner?.active ? import('./sound.js').catch(error => {
+  const audioReady = options.sound !== false && owner?.active ? import('./sound.js').catch(error => {
     console.warn('Coin sound unavailable', error);
     return null;
   }) : null;
@@ -42,6 +51,7 @@ export function playCoinRewardFlight(source, target, amount) {
   };
   if (prefersReducedMotion()) {
     playCue('coinCollect');
+    complete();
     return [];
   }
   const stableSource = source.closest?.(".link-board__cell, .tile") || source;
@@ -55,15 +65,20 @@ export function playCoinRewardFlight(source, target, amount) {
   const safeInset = 14;
   const viewportWidth = document.documentElement.clientWidth;
   const viewportHeight = document.documentElement.clientHeight;
-  const durationMs = GAMEPLAY_TIMING.coinRewardFlightMs;
-  const staggerMs = GAMEPLAY_TIMING.coinRewardStaggerMs;
-  const durationVarianceMs = 140;
+  const durationMs = options.flightDurationMs ?? GAMEPLAY_TIMING.coinRewardFlightMs;
+  const staggerMs = options.staggerMs ?? GAMEPLAY_TIMING.coinRewardStaggerMs;
+  const durationVarianceMs = options.durationVarianceMs ?? 140;
   const fragment = document.createDocumentFragment();
+  let arrived = 0;
   const effects = Array.from({ length: Math.min(coinCount, 32) }, (_, index) => {
     const effect = document.createElement("span");
     const entry = trackEffect("coin", () => removeCoinEffect(effect));
     if (!entry) return null;
     effectEntries.set(effect, entry);
+    if (options.owner) {
+      const releaseOwner = options.owner.own(() => entry.dispose(), 'cleanup');
+      entry.scope.own(() => releaseOwner.forget());
+    }
     effect.className = "game-coin-reward-flight";
     effect.setAttribute("aria-hidden", "true");
     effect.append(createIcon("coin"));
@@ -101,8 +116,14 @@ export function playCoinRewardFlight(source, target, amount) {
     const onStart = event => {
       if (event.target === effect && event.animationName === 'game-coin-reward-loot') playCue('coinDrop', effect);
     };
+    let landed = false;
     const onEnd = event => {
-      if (event.target === effect && event.animationName === 'game-coin-reward-loot') playCue('coinCollect', effect);
+      if (event.target !== effect || event.animationName !== 'game-coin-reward-loot' || landed) return;
+      landed = true;
+      playCue('coinCollect', effect);
+      arrived++;
+      if (arrived === effects.length) complete();
+      else options.onArrival?.(Math.floor(coinCount * arrived / effects.length));
     };
     effect.addEventListener('animationstart', onStart);
     effect.addEventListener('animationend', onEnd);
@@ -114,13 +135,21 @@ export function playCoinRewardFlight(source, target, amount) {
     return effect;
   }).filter(Boolean);
   document.body.append(fragment);
+  if (!effects.length) { complete(); return effects; }
   const finalArrivalDelay = durationMs + Math.max(0, effects.length - 1) * staggerMs;
-  setTimeout(() => showCoinGainLabel(target, coinCount), finalArrivalDelay);
-  setTimeout(
-    () => effects.forEach(removeCoinEffect),
+  if (options.showLabel !== false) schedule(() => showCoinGainLabel(target, coinCount), finalArrivalDelay);
+  schedule(
+    () => { effects.forEach(removeCoinEffect); complete(); },
     durationMs + durationVarianceMs + Math.max(0, effects.length - 1) * staggerMs + 300,
   );
   return effects;
+}
+
+export function stopCoinCounterAnimation(counter) {
+  const frame = counterAnimations.get(counter);
+  if (frame) cancelAnimationFrame(frame);
+  counterAnimations.delete(counter);
+  activeCoinCounters.delete(counter);
 }
 
 export function animateCoinCounter(container, counter, previousCoins, nextCoins) {

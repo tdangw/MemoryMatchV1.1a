@@ -49,12 +49,18 @@ export function playGameStartSound(settings) {
 // Coin streams use a bounded voice pool; other cues keep a single voice.
 const COIN_CUE_VOICES = 6;
 const COIN_CUE_GAIN = 0.45;
+const SUMMARY_AUDIO_OFFSET_SECONDS = 0.08;
 const rewardCueFiles = Object.freeze({
   star1: 'star_1.ogg', star2: 'star_2.ogg', star3: 'star_3.ogg',
-  reward: 'reward.ogg', openBox: 'open_box.ogg', thunder: 'explosion.ogg',
+  reward: 'reward.ogg', openBox: 'open_box.ogg', thunder: 'explosion.ogg', summary: 'summary.mp3',
   frozenUnlock: 'unlock_1.mp3', coinDrop: 'coin_drop.mp3', coinCollect: 'coin-collect.mp3',
+  hint: 'hint_1.mp3', shuffle: 'shuffle-85602.mp3',
 });
-const rewardCues = new Map();
+const rewardCues = new Map(['summary', 'hint', 'shuffle'].map(name => {
+  const audio = new Audio(assetUrl(`assets/sounds/${rewardCueFiles[name]}`));
+  audio.preload = 'auto';
+  return [name, [{ audio, stop: null, gain: 1 }]];
+}));
 
 export function playOwnedRewardCue(name, owner, settings) {
   if (!Object.hasOwn(rewardCueFiles, name)) throw new Error(`Unknown reward cue: ${name}`);
@@ -78,7 +84,7 @@ export function playOwnedRewardCue(name, owner, settings) {
   }
   cue.stop?.();
   const audio = cue.audio;
-  audio.currentTime = 0;
+  audio.currentTime = name === 'summary' ? SUMMARY_AUDIO_OFFSET_SECONDS : 0;
   audio.volume = volume * cue.gain;
   let ended, failed, hidden;
   const stop = owner.own(() => {

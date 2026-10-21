@@ -31,6 +31,13 @@ export function renderHudTimer(element, { progress, visible = true, endless = fa
 }
 
 export function createGameShellHud({ stats = {}, stars = {}, coins = {}, tools = {}, milestones = {} } = {}) {
+  let coinReward = null;
+  let coinTotal = 0;
+  const renderCoins = (animating = false) => {
+    const value = Math.max(0, coinTotal - (coinReward ? coinReward.amount - coinReward.arrived : 0));
+    if (!animating || coinReward) setHudText(coins.balance, value);
+    setHudTooltip(coins.element, `Xu: ${value}`);
+  };
   const starNodes = [...(stars.element?.querySelectorAll(".star-progress__milestone") || [])];
   const markers = milestones.markers || [];
   for (const tool of Object.values(tools)) if (tool.tooltip) setHudTooltip(tool.element, tool.tooltip);
@@ -54,8 +61,34 @@ export function createGameShellHud({ stats = {}, stars = {}, coins = {}, tools =
       if (record !== undefined) setHudTooltip(stars.scoreCard, record);
     },
     coins(value, { animating = false } = {}) {
-      if (!animating) setHudText(coins.balance, value);
-      setHudTooltip(coins.element, `Xu: ${value}`);
+      coinTotal = value;
+      renderCoins(animating);
+    },
+    deferCoins({ amount, total, owner }) {
+      if (!owner?.active || !coins.balance || !coins.element || !Number.isSafeInteger(amount)
+        || !Number.isSafeInteger(total) || amount < 1 || total < amount) return null;
+      coinReward?.finish();
+      let release;
+      const reward = {
+        amount, arrived: 0, target: coins.element, counter: coins.balance,
+        get finished() { return coinReward !== reward; },
+        arrive(value) {
+          if (coinReward !== reward || !Number.isFinite(value)) return;
+          reward.arrived = Math.max(reward.arrived, Math.min(amount, Math.floor(value)));
+          renderCoins();
+        },
+        finish() {
+          if (coinReward !== reward) return;
+          coinReward = null;
+          release?.forget();
+          renderCoins();
+        },
+      };
+      coinTotal = total;
+      coinReward = reward;
+      release = owner.own(reward.finish, 'cleanup');
+      renderCoins();
+      return reward;
     },
     tool(key, { count, disabled } = {}) {
       const tool = tools[key];
