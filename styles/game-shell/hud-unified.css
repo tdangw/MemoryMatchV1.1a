@@ -1,4 +1,16 @@
 /* Geometry and presentation owner for all three HUD adapters. */
+html[data-ui-skin="woodland"] {
+  --unified-hud-control-width: 44px;
+  --unified-hud-surface: #fff2ce;
+  --unified-hud-label: #775432;
+  --unified-hud-value: #4b2b18;
+  --unified-hud-timer-warning: #9b3028;
+  --unified-hud-divider: #b98b4f77;
+  --unified-hud-button-surface: #89562f;
+  --unified-hud-tools-surface: #89562f;
+  --unified-hud-button-active: #a8733a;
+  --unified-hud-tools-active: #a8733a;
+}
 :root {
   --unified-hud-height: 48px;
   --unified-hud-control-width: 44px;
@@ -288,3 +300,19 @@
   .game-hud .stat-stars .stat-label .ui-icon { width: 10px; height: 10px; }
   .game-hud :is(.game-menu-toggle, .memory-tools-toggle, .link-tools-toggle, .triple-tools-toggle) .ui-icon { width: 18px; height: 18px; }
 }
+
+/* Skin modifiers retain the HUD tree/cadence; controls have a 44px minimum. */
+html[data-ui-skin="woodland"] .game-shell-root .game-hud {
+  border-color: #ad7a3c; box-shadow: inset 0 0 0 2px #d7b271, 0 3px 6px #0004;
+}
+html[data-ui-skin="woodland"] .game-hud :is(.game-menu-toggle, .memory-tools-toggle, .link-tools-toggle, .triple-tools-toggle) {
+  background: linear-gradient(#a8733a, #754324); box-shadow: inset 0 1px #e0bc7c;
+}
+html[data-ui-skin="woodland"] .game-hud :is(.game-menu-toggle, .memory-tools-toggle, .link-tools-toggle, .triple-tools-toggle) .ui-icon { color: #fff0c5; }
+html[data-ui-skin="woodland"] .game-hud :is(.game-menu-toggle, .memory-tools-toggle, .link-tools-toggle, .triple-tools-toggle)[aria-expanded="true"] { background: #a8733a; box-shadow: inset 0 0 0 2px #fff0c5; }
+html[data-ui-skin="woodland"] .game-hud .hud-tool-item { color: #4b2b18; }
+html[data-ui-skin="woodland"] .game-hud .hud-tool-item:hover,
+html[data-ui-skin="woodland"] .game-hud .hud-tool-item:focus-visible { background: #e8ce98; }
+html[data-ui-skin="woodland"] .game-hud .hud-tool-item .hud-tool-count { background: #e5c88f; color: #5f3c1c; }
+html[data-ui-skin="woodland"] .game-hud .hud-tool-item.is-disabled { opacity: 1; color: #806c50; background: #e6d8b9; }
+html[data-ui-skin="woodland"] .game-hud .stat-timer:is(.is-previewing, .is-time-frozen) { --unified-hud-label: #eff8ff; --unified-hud-value: #fff; }

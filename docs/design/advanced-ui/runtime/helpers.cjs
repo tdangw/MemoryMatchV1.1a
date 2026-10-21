@@ -1,4 +1,12 @@
 const { expect } = require('@playwright/test');
+const { execFileSync } = require('node:child_process');
+const { createHash } = require('node:crypto');
+function verificationContext() {
+  return { head: execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),
+    sourceDiffSha256: createHash('sha256').update(execFileSync('git', ['diff', '--', 'js', 'styles', 'index.html'], { stdio: ['ignore', 'pipe', 'pipe'] })).digest('hex'),
+    motion: process.env.UI_SKIN_MOTION || 'reduce', dpr: Number(process.env.UI_SKIN_DPR || 2),
+    baseUrl: process.env.UI_SKIN_BASE_URL || 'http://localhost:4173', capturedAtUTC: new Date().toISOString() };
+}
 async function installModuleAccess(page) {
   await page.addInitScript(() => {
     window.productModule = path => import(performance.getEntriesByType('resource').find(entry => new URL(entry.name).pathname === path)?.name || path);
@@ -29,4 +37,4 @@ async function disableRemoteServices(page) {
   await page.route('**/js/firebaseBackend.js*', route => route.fulfill({ contentType: 'text/javascript', body:
     "export const getFirebaseBackend = async () => null; export const disposeFirebaseBackend = async () => {}; export { getFirebaseEnvironment } from './firebaseEnvironment.js';" }));
 }
-module.exports = { installModuleAccess, ready, settings, choose, homeSkin, geometry, disableRemoteServices, freezeDevelopmentReloads };
+module.exports = { installModuleAccess, ready, settings, choose, homeSkin, geometry, disableRemoteServices, freezeDevelopmentReloads, verificationContext };

@@ -8,7 +8,12 @@ Nguồn phạm vi: `GAME_UX_SKIN_PLAN.md`. Bắt đầu 21/10/2026, working tree
 |---|---|---|
 | G0 | Hoàn tất inventory và contract thiết kế | Kế hoạch mục 1.1–1.3; `inventory.json`; bảng dưới |
 | G1 | Đạt bộ bản ghép đại diện trên DOM thật | `screens/qa/proof-*.json`, 240 ảnh/4 viewport; chưa phải runtime hoặc nghiệm thu G10 |
-| G2–G10 | Chưa thực hiện | Chưa đánh dấu runtime/asset/tutorial/QA sản phẩm đạt |
+| G2 | Đạt | Nhóm core/rewards, generator và ngân sách bên dưới |
+| G3 | Đạt | Unit6/6; runtime skin10/10 |
+| G4 | Đạt | Home8/8; startup5/5 |
+| G5 | Đạt | Catalog8/8, ba trò và mọi tab con |
+| G6 | Đạt | Gameplay8/8 giảm chuyển động/DPR2 và8/8 thường/DPR3, cả ba trò |
+| G7–G10 | Đang thực hiện | Chưa nghiệm thu popup/rewards/tutorial/toàn bộ sản phẩm |
 
 ## Quyết định và ranh giới
 
@@ -125,3 +130,9 @@ G0 là đọc source và contract. G1 là thiết kế trên DOM ứng dụng th
 - catalog.spec.cjs8/8,2skin×4viewport×3trò,45ảnh/profile=360ảnh; JSON từng profile có geometry/errors. Có map, preview thường/Thử thách/Vô tận, tất cả shop/collection subtabs, ranking không kết nối và settings theo ngữ cảnh. Static checks adventure-preview/theme-selection/adventure-map-layout pass. Đã xem ảnh map, preview và shop ngang; sửa cascade khiến icon Thử thách bị nền cũ che và nút đóng mất texture.
 - Một profile giữa lượt đầu bị Vite tự tải lại2lần trong khi working tree khác đang thay đổi, không phải fail app được chứng minh. Helper freezeDevelopmentReloads chỉ cô lập socket Vite có token trong browser test, không đổi server/sandbox/game request. Lượt cuối toàn matrix8/8 đạt. Dịch vụ từ xa dùng backend-null boundary; không nhận đây là nghiệm thu Firebase/account online hoặc giao dịch thưởng.
 - Generator giờ chỉ ghi file khi byte thay đổi, tránh full reload không cần thiết; --check pass, ngân sách asset giữ nguyên. Icon modifier tăng specificity đúng registry để không bị các background shorthand cũ che. Mặc định không đổi art/cascade.
+
+## G6 — HUD, bàn và khay (đạt)
+
+- HUD Nâng cao dùng gỗ/giấy và chữ nâu; công cụ tối thiểu44px ngay ở320px. Khung bàn vẽ trong padding hiện hữu, không thay geometry tile/theme/luật. Khay Triple giữ10node, slot mở giấy và slot khóa nguyên ngữ nghĩa.
+- gameplay.spec.cjs:8/8 giảm chuyển động/DPR2 và8/8 thường/DPR3, mỗi profile đi cả3trò qua Home→bản đồ→preview→chơi thật. Kiểm wave/preview, công cụ/Escape, fullscreen bật/tắt, pause, đổi skin rồi trở lại giữ nguyên nodeboard, resume và thoát round. Scope đã dispose có các bộ đếm resource về0. Screenshot/JSON kèm hash diff lúc đầu/cuối tại runtime/qa/gameplay-*.
+- Đã xem ảnh320px của cả3bàn và menu công cụ. Đây là kiểm UI/lifecycle; chưa thay bằng bằng chứng thắng và cấp thưởng G8. Không thay controller, HUD JS hoặc công việc âm thanh/summary của phiên khác.
