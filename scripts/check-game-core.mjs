@@ -98,7 +98,7 @@ assert.deepEqual(
 assert.deepEqual(calculateMotionDelta(undefined, { left: 45, top: 20 }), { x: 0, y: 0 });
 assert.equal(readCssTimeMs("1.5s", 0), 1500);
 assert.equal(readCssTimeMs("720ms", 0), 720);
-assert.equal(UI_COPY.timeUpPrompt, "<p>Chọn một cách để bắt đầu hành trình của bạn.</p>");
+assert.equal(UI_COPY.timeUpPrompt, "<p>Bạn có thể chơi lại hoặc trở về bản đồ.</p>");
 assert.equal(formatClockTime(65), "01:05");
 assert.equal(formatClockTime(-1), "00:00");
 

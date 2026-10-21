@@ -1,0 +1,77 @@
+{
+  "head": "98ec3b81882ed45a8185e09be7c8aa53887e4f79",
+  "sourceDiffSha256": "c3d2ffbacf928042a045e87816edabdade71fb334bce8580b1e07a3317f98183",
+  "capturedAtUTC": "2026-10-21T12:19:55.952Z",
+  "base": "/docs/design/advanced-ui/runtime/production/",
+  "firebaseDisabled": true,
+  "files": [
+    {
+      "name": "accountPanel-DJq1BZeg.js",
+      "sha256": "01555b31508c78fed7b3b3810976089889a182b3cb6dbb0ef0a755b0547bea0b"
+    },
+    {
+      "name": "accountService-DzQtmVVE.js",
+      "sha256": "b35480df36b2c8d7d931ce6b231d80c1532516732b983d68fd622dbc759125c4"
+    },
+    {
+      "name": "firebase-auth-3ZRysG7r.js",
+      "sha256": "7e2ffa32e81c07f1f1676af5280c669ba93ebb44a144938665dfeb4bc3e1f1a9"
+    },
+    {
+      "name": "firebase-core-Cd2GEJ3a.js",
+      "sha256": "244c4970ff08ea48f767ea8a4dc1ea1ef387900ccd2057d6bf9bff02a345d16d"
+    },
+    {
+      "name": "firebase-firestore-B7LFurdL.js",
+      "sha256": "cd3f7561807581a14cc16a5c93d46212b62279c0f20aaeb23fdb2fd8b50efd5d"
+    },
+    {
+      "name": "firebaseBackend-DCJWixn7.js",
+      "sha256": "fe8c4633af5fdd576e729382ca24e226cb6b235387a6fc131c10173178d7c361"
+    },
+    {
+      "name": "index-CAOK4_3J.js",
+      "sha256": "01aac617fce84f7db0cf0aa17e288083047e048d21c8ab59e08a0c14e7519571"
+    },
+    {
+      "name": "index-DA_dhiEJ.css",
+      "sha256": "1f74e7875d77bce439abf35b1a915745982c0312c0b693e7aa0b0b74a152e40f"
+    },
+    {
+      "name": "leaderboardPanel-csAvZEGB.js",
+      "sha256": "581bef6860076e579448bdda1c06788885075894e81510a69bfba740d25db341"
+    },
+    {
+      "name": "main-a5Z9uKTJ.js",
+      "sha256": "c7c354f1cc3d68807f3dcb5833e1ad9c7025cffb4075908cd00e9a5561e1f36e"
+    },
+    {
+      "name": "main-BR7zmSO6.css",
+      "sha256": "49572f13d880b5e045ae0608557472ff696b3296a7b33f731e38812278423518"
+    },
+    {
+      "name": "nativeAdapter-CshBdMvx.js",
+      "sha256": "1bd7d0a42ed7dd2c2aba52ffbb6ece59c7d1614c51d1dfbbd34cef2445d2e1a4"
+    },
+    {
+      "name": "practice-C56Jczf3.js",
+      "sha256": "b2248e861b48d67e9a10c45e0804a324132a61a196db3997d3d7a22aec41ce22"
+    },
+    {
+      "name": "profileStatsStore-DcH5AvZ2.js",
+      "sha256": "6f70fc22aa58df27d27dbcb796c57026954d8d24f8af77c75410f81db830740e"
+    },
+    {
+      "name": "theme-manifest-B2FWcF9N.js",
+      "sha256": "22796c23c5b7f6acd5231503a6f1684b5254312d251ad0ec651e6d0968a4cbf8"
+    },
+    {
+      "name": "web-CIqQdgUW.js",
+      "sha256": "703c71fd56c481973c3b3544d1e3b78c29d7e3adfa024a3618bb295b36ca09b7"
+    },
+    {
+      "name": "web-o0cMu26M.js",
+      "sha256": "92b706d4ea5cb2dca5ab615012cae94275b81464ebc30e770beb45e71d3172a3"
+    }
+  ]
+}

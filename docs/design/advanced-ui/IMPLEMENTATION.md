@@ -16,7 +16,7 @@ Nguồn phạm vi: `GAME_UX_SKIN_PLAN.md`. Bắt đầu 21/10/2026, working tree
 | G7 | Đạt kiểm trình bày | Dialog8/8; purchase8/8; nhánh hiếm ghi rõ fixture |
 | G8 | Đạt | Natural6/6; treasure8/8; lifecycle7/7 và tranh1/1 |
 | G9 | Đạt | Unit5/5; browser12/12, ba bàn tập và lifecycle |
-| G10 | Đang thực hiện | Regression cuối, check/build, đo và review độc lập |
+| G10 | Đạt nghiệm thu web, giới hạn máy thật ghi bên dưới | Production32/32; hồ sơ8/8; offline1/1; mua thật2/2; đo4/4; thua thật8/8; check/build và review |
 
 ## Quyết định và ranh giới
 
@@ -168,3 +168,24 @@ G0 là đọc source và contract. G1 là thiết kế trên DOM ứng dụng th
 - Reviewer được chủ dự án cho phép, đọc diff riêng, không sửa source/server/Git. Unit11/11 và browser skin+currenttutorial22/22 pass. Xác nhận1P2: shortcut save dựa RAM bỏ ghi Mặc định khi write Nâng cao đang chạy nhưng đã bị supersede, làm reload đổi skin.
 - Sửa: queue luôn ghi durable cho request đã vào; no-op chỉ bỏ trước request khi controller rảnh và cả RAM/current skin cùng trùng. Không tăng write cho lần bấm lại lựa chọn đã ổn định. Regression browser giữ write đầu, đổi về default, thả write thật, kiểm disk và reloaddefault1/1; reviewer đọc fix và chạy lại unit6/6 + regression1/1, xác nhậnP2đóng, chưa thấyP1/P2khác trong phạm vi đọc.
 - npm run build pass (278modules), cảnh báo chunk lớn/static+dynamic imports hiện hữu được giữ. npm run check hai lượt dừng tại benchmark Easy generator p9524.88/20.51ms >20ms; chạy riêng checker đạt19.95ms. Không nới threshold hoặc sửa generator. Các check phía sau đang chạy riêng, full check sẽ được xác nhận lại ở cổng cuối; chưa đánh dấu G10 đạt.
+
+## G10 — Nghiệm thu web cuối, 22/10/2026
+
+| Phạm vi | Bằng chứng và kết quả |
+|---|---|
+| Home5tab, carousel;3trò×5tab và mọi tab con, map/preview/chế độ, HUD/bàn/khay/công cụ/fullscreen/pause/restart/thoát | production-matrix.spec.cjs32/32,2skin×4viewport×2motion×DPR2/3;60state/profile=1920state;128ảnh; lỗi JS/HTTP0. Bản build B1 cố định, không bị HMR từ công việc đồng thời. |
+| Form tên dài, lưu lỗi/thử lại, đổi UID khi đang sửa, focus/keyboard/safe-area | closure.spec.cjs8/8,2skin×4viewport. Boundary tài khoản thay thế có kiểm soát; form/owner sản phẩm thật. CDP mô phỏng safe-area24/20px và bàn phím; không là điện thoại hay Google OAuth thật. |
+| Offline và subpath | offline.spec.cjs1/1 trên B1: service worker thật, reload offline sau warm; Home, đổi skin và mở tập luyện Triple/3ảnh đã cache đạt. Không nhận là cài mới offline hoặc đồng bộ Firebase offline. |
+| Thắng/cấp thưởng/mua/trang bị/lưu | G8natural6/6 cho3trò×2skin; commerce.spec.cjs2/2: thắng Memory2wave nhận52Xu, mua3theme qua cửa hàng thật, còn49Xu, trang bị/reload giữ đúng. Không fixture ví tiền. |
+| Thua thật | defeat.spec.cjs8/8: timer thật3trò×2skin, clock tiến200s, Escape giữ popup; Triple chơi thắng Dễ mở Thường rồi chọn7ô lộ không ghép ba để thua khay đầy. Mỗi ca4viewport. Sáu ca timer dùng B2; hai ca khay đầy dùng source được ghi trong diff. |
+| Lifecycle/đổi skin và đo | metrics.spec.cjs4/4, B1;50chu kỳ mở/đóng và20lựa chọn nhanh, cả2skin; đo mở rương thật sau chuẩn bị eligibility mốc. G3/G6/G8/G9 kiểm scope dispose, restart/interrupt/owner và lỗi lưu riêng. |
+| Popup/thông báo/loading/error/fallback/hướng dẫn | Các suite G3–G9 ở trên, thêm G10thua thật và tài khoản; fixture chỉ phủ nhánh hiếm, không thay natural game/grant. |
+
+- Lỗi phát hiện cuối: rule legacy theo ID làm chữ popup thua quá nhạt trên giấy kem. Bốn selector chỉ scope woodland/time-up sửa body nâu, tiêu đề/nút kem; câu mô tả đổi thành “Bạn có thể chơi lại hoặc trở về bản đồ.” Hai assertion UI và core contract cập nhật cùng copy, không bỏ assertion. Bổ sung kiểm computed color trong8ca thua, xem lại ảnh320px và844px. G7 trước đó đạt geometry nhưng chưa đủ bằng chứng màu của họ này; G10 đã bổ sung và sửa.
+- B1: runtime/qa/production-build.json (base runtime/production/); B2: runtime/qa/production-v2-build.json (base runtime/production-v2/). Đây là sản phẩm Vite build phục vụ qua server4173 đang có, không server mới/deploy. VITE_FIREBASE_DISABLED=1 là cấu hình đã hỗ trợ để cô lập dịch vụ trong ma trận; không sửa backend sản phẩm. B1 giữ nguyên để bằng chứng32profile tái lập được; B2 chỉ kiểm lại họ thua vừa sửa, không lấy kết quả B1 thay bằng chứng sửa màu. Build/hash, thiết lập và giới hạn ở JSON đi kèm.
+- Số đo Chrome headless đơn worker:50chu kỳ có listenerΔ0/nodeΔ0 ở cả2skin, heapΔ347720byte Mặc định/189348byte Nâng cao. rAFp95~7.1ms, max27/14.4ms, longtask0; màn desktop khoảng144Hz, không kết luận60FPS điện thoại. Rương: commit23.5/28.1ms, presentation890.5/896.9ms, rAFp95~7.1ms, max97.2/27.7ms, longtask0. Lần đầu rương listenerΔ+4/heap tăng~0.8MB (khởi tạo resource); không nhận đây là zero-resource sau mọi rương. Các scope dispose và50chu kỳ ổn định là bằng chứng riêng.
+- Kiểm cuối: npm run check và npm run build đạt exit0 (log/result trong runtime/qa/final-*). Hai lượt check lịch sử từng dừng benchmark Easy24.88/20.51ms; lượt yên tĩnh trước sửa copy đạt14.15ms; lượt cuối sau cập nhật contract đạt11.26ms. Lượt sửa copy đầu dừng đúng assertion cũ, đã cập nhật contract và chạy lại toàn bộ; không nới threshold/xóa test. Build còn cảnh báo chunk>500kB và static/dynamic import hiện hữu.
+- Review độc lập: reviewer đọc diff/check acceptance, chạy lại11unit+22browser; P2 lưu skin đã đóng bằng regression bền vững và rerun6unit+1browser. Với sửa màu cuối, reviewer đọc lại2diff, JS177module/CSSownership pass; không thấy P1/P2 mới trong phạm vi review.
+- Tập luyện có bàn tay SVG tại Cài đặt→Hướng dẫn→Tập luyện của từng trò (Home chọn trò trước); không ảnh chụp cả màn, không tự bật trong ván thưởng. Bỏ qua/xem lại giữ nguyên thưởng và round thật.
+- Giữ nguyên API/catalog/giá/luật/save key/formatVersion; chỉ uiSkin và tutorialProgress mở rộng settings như kế hoạch. Không APK/push/deploy; giữ server chủ dự án. Các diff âm thanh/Link/shuffle/exit từ công việc khác không stage trong gate này. FPS máy thật, Google OAuth và giao dịch Firebase thật chưa xác minh; không đưa chúng vào tuyên bố nghiệm thu web.
+- Bộ kiểm tái chạy: node node_modules/@playwright/test/cli.js test -c docs/design/advanced-ui/runtime/production.config.cjs cho32profile; các file closure/offline/commerce/metrics/defeat dùng runtime/playwright.config.cjs, output tách từng suite. Offline tự bật service worker. Cần quyền localhost của tiến trình agent; các lần sandbox từ chối đã ghi đúng ở hồ sơ, không sửa ACL hoặc lách sandbox.

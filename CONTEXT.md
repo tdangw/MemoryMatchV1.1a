@@ -1,5 +1,12 @@
 # CONTEXT — Trạng thái hiện tại (2026-10-20)
 
+## Nghiệm thu giao diện toàn dự án — 22/10/2026
+
+- GAME_UX_SKIN_PLAN.md G0–G10 đạt phạm vi web; trạng thái cũ phía dưới giữ làm lịch sử. Hồ sơ duy nhất: docs/design/advanced-ui/IMPLEMENTATION.md, phần G10 và runtime/qa/G10_SUMMARY.json.
+- Đã ghép gỗ/giấy trên toàn ứng dụng, giữ Mặc định/Nâng cao; ba bài tập có bàn tay SVG tại Cài đặt→Hướng dẫn→Tập luyện. EXP/bốn rương/tranh giữ transaction và kinh tế hiện hữu.
+- Production32/32 (1920state,3trò/2skin/4viewport/2motion/DPR2–3), hồ sơ8/8, offline1/1, mua thật2/2, đo4/4, thua thật8/8; check/build pass và review độc lập đã đóng P2 race lưu skin. Không xác nhận FPS điện thoại thật hoặc Google OAuth/Firebase live.
+- Không APK/push/deploy hoặc server trùng; các thay đổi đồng thời của công việc khác được giữ ngoài commit UI.
+
 ## Kế hoạch hiện hành: giao diện toàn dự án, hướng dẫn và phần thưởng — 20/10/2026
 
 - Nguồn kế hoạch hiện hành duy nhất cho công việc giao diện/hướng dẫn/phần thưởng này: [GAME_UX_SKIN_PLAN.md](GAME_UX_SKIN_PLAN.md). Chủ dự án xác nhận **phạm vi toàn bộ ứng dụng và cả ba trò**, không chỉ popup thắng. Lượt làm rõ này cập nhật kế hoạch/inventory, chưa triển khai toàn bộ skin vào sản phẩm.

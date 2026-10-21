@@ -4,7 +4,7 @@ export const UI_TIMING = Object.freeze({
 });
 
 export const UI_COPY = Object.freeze({
-  timeUpPrompt: "<p>Chọn một cách để bắt đầu hành trình của bạn.</p>",
+  timeUpPrompt: "<p>Bạn có thể chơi lại hoặc trở về bản đồ.</p>",
 });
 
 export function formatClockTime(seconds) {

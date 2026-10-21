@@ -395,7 +395,7 @@ test("Triple time-up clears the session and opens one loss modal", async ({
   await expect(page.locator("#time-up-modal")).toHaveCount(1);
   await expect(page.locator("#time-up-modal")).toContainText("Bạn đã thua");
   await expect(page.locator("#time-up-modal")).toContainText(
-    "Chọn một cách để bắt đầu hành trình của bạn.",
+    "Bạn có thể chơi lại hoặc trở về bản đồ.",
   );
   const terminal = await page.evaluate(async () =>
     (await import("/js/sessionProgress.js")).getActiveSession(
@@ -433,7 +433,7 @@ test("Triple settles one loss after a seventh non-matching tray tile", async ({
   });
   await expect(page.locator("#time-up-modal")).toHaveCount(1);
   await expect(page.locator("#time-up-modal")).toContainText(
-    "Chọn một cách để bắt đầu hành trình của bạn.",
+    "Bạn có thể chơi lại hoặc trở về bản đồ.",
   );
   const terminal = await page.evaluate(async () =>
     (await import("/js/sessionProgress.js")).getActiveSession(

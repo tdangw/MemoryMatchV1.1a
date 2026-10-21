@@ -124,6 +124,10 @@ html[data-ui-skin="woodland"] .app-tooltip { background: #fff0ca; color: #4b2b18
 html[data-ui-skin="woodland"] .app-toast--success { color: #36551d; }
 html[data-ui-skin="woodland"] .app-toast--error { color: #9a3024; }
 html[data-ui-skin="woodland"] .app-toast--warning { color: #7d4817; }
+html[data-ui-skin="woodland"] #time-up-modal .app-modal__body { color: #4b2b18; }
+html[data-ui-skin="woodland"] #time-up-modal :is(.app-modal__title, .app-modal__title .ui-icon) { color: #fff0c5; }
+html[data-ui-skin="woodland"] #time-up-modal .app-button { color: #fff7da; text-shadow: 0 1px 2px #48240b; }
+html[data-ui-skin="woodland"] #time-up-modal .app-button .ui-icon { color: inherit; }
 html[data-ui-skin="woodland"] #level-summary-modal .level-summary__stat strong { text-shadow: none; overflow-wrap: anywhere; }
 html[data-ui-skin="woodland"][data-ui-rewards="ready"] #level-summary-modal .level-summary__heading { box-sizing: border-box; min-width: 0; height: 58px; padding: 0 16px 4px; margin: 0 0 4px; background: url('/assets/ui/woodland/ribbon.webp') center / 100% 100% no-repeat; color: #fff2c6; text-shadow: 0 1px #692217; font-size: clamp(16px, 5cqw, 24px); }
 html[data-ui-skin="woodland"][data-ui-rewards="ready"] #level-summary-modal .level-summary__star { background: url('/assets/ui/woodland/star-earned.webp') center / contain no-repeat; }

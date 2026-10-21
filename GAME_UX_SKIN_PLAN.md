@@ -210,7 +210,7 @@ Các gate là thứ tự kiểm soát thực hiện, không phải yêu cầu xi
 - Theo dõi tải ban đầu, tải lần đầu từng trang, cache/decoded memory và chuyển trang lại. Ngân sách core/reward ở trên chỉ là dự kiến cho hai bundle, không phải ngân sách tổng app hay bằng chứng mọi sheet đã tối ưu. Chốt trần từng nhóm sau G1/G2 theo kích thước thực; không tải chín nhóm cùng lúc.
 - Ảnh, thao tác và số đo phải gắn bản build/thiết lập kiểm. Chụp trong normal-motion lẫn reduced-motion khi ảnh có thể khác; không dùng 12 case summary để đại diện ma trận này.
 
-## 10. Hồ sơ hiện tại
+## 10. Hồ sơ ban đầu — 20/10/2026 (lịch sử)
 
 | Phần | Trạng thái thật tại lần cập nhật này |
 |---|---|
@@ -226,3 +226,8 @@ Các gate là thứ tự kiểm soát thực hiện, không phải yêu cầu xi
 - Bộ gỗ/giấy mới có14asset, manifest, prompt và CSS review riêng. Test ở woodland/ khởi động app thật, dùng component summary hiện hành; không import CSS này vào index/styles sản phẩm.
 - Kết quả cụ thể và giới hạn tại docs/design/advanced-ui/woodland/README.md và qa/.
 - Chưa thêm lựa chọn skin vào save, chưa thay runtime/public assets, chưa APK/deploy. Các lỗi check chung của working tree ghi trong hồ sơ cũ không được tự nhận đã sửa trong task mỹ thuật.
+
+
+## 11. Cập nhật thực hiện — 22/10/2026
+
+G0–G10 đã đạt phạm vi nghiệm thu web. Hồ sơ hiện hành và bằng chứng/giới hạn từng gate ở [IMPLEMENTATION.md](docs/design/advanced-ui/IMPLEMENTATION.md), phần G10 cuối. Mục10 giữ lịch sử lúc lập kế hoạch, không phải trạng thái runtime hiện tại. Giữ nguyên phạm vi và acceptance criteria của kế hoạch; FPS điện thoại thật/Google OAuth trực tiếp không được tuyên bố đã kiểm.
