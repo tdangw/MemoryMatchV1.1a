@@ -2,6 +2,7 @@ import '../../styles/progression.css';
 import { createGameShellLifecycle } from '../gameShell/gameShellLifecycle.js';
 
 const announcements = new WeakMap();
+const WAVE_NOTICE_VIEWPORT_INSET = 8;
 const reducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 export const WAVE_PRESENTATION_TIMING = Object.freeze({
   exit: 140, noticeEnter: 260, noticeVisible: 1800, noticeExit: 220,
@@ -84,20 +85,59 @@ export function announceWave(refs, scope, wave) {
   notice.setAttribute('role','status'); notice.setAttribute('aria-live','polite');
   notice.textContent = `Wave ${wave.index}`;
   document.body.append(notice);
-  const release = scope.own(() => notice.remove(), 'cleanup');
+  const noticeScope = createGameShellLifecycle();
+  const releaseOwner = scope.own(() => noticeScope.dispose(), 'cleanup');
+  noticeScope.own(() => releaseOwner.forget());
+  noticeScope.own(() => notice.remove(), 'node');
+  positionWaveNotice(notice, refs, noticeScope);
+  const release = () => noticeScope.dispose();
   let arrival = Promise.resolve(scope.active);
   if (!reducedMotion() && !document.hidden) {
-    scope.animation(notice.animate([{opacity:0,transform:'translate(-50%,-40%) scale(.94)'},{opacity:1,transform:'translate(-50%,-50%) scale(1)'}],{duration:WAVE_PRESENTATION_TIMING.noticeEnter,easing:'ease-out'}));
+    noticeScope.animation(notice.animate([{opacity:0,transform:'translate(-50%,6px)'},{opacity:1,transform:'translate(-50%,0)'}],{duration:WAVE_PRESENTATION_TIMING.noticeEnter,easing:'ease-out'}));
     if (wave.index > 1) arrival = presentWaveArrival(refs, scope);
   }
   pendingArrivals.get(scope)?.();
   pendingArrivals.delete(scope);
-  scope.timeout(() => {
+  noticeScope.timeout(() => {
     if (reducedMotion()) { release(); return; }
     const exit=notice.animate([{opacity:1},{opacity:0}],{duration:WAVE_PRESENTATION_TIMING.noticeExit,easing:'ease-in',fill:'forwards'});
-    scope.animation(exit); exit.finished.then(() => { exit.cancel(); release(); }, release);
+    noticeScope.animation(exit); exit.finished.then(() => { exit.cancel(); release(); }, release);
   },WAVE_PRESENTATION_TIMING.noticeVisible);
   return arrival;
+}
+
+function positionWaveNotice(notice, refs, scope) {
+  const viewport = window.visualViewport;
+  let pending = false;
+  function update() {
+    pending = false;
+    if (!scope.active || !notice.isConnected || !refs.board.isConnected) return;
+    const board = refs.board.getBoundingClientRect();
+    const bounds = notice.getBoundingClientRect();
+    const inset = WAVE_NOTICE_VIEWPORT_INSET;
+    const left = (viewport?.offsetLeft || 0) + inset;
+    const top = (viewport?.offsetTop || 0) + inset;
+    const right = left + (viewport?.width || innerWidth) - inset * 2;
+    const bottom = top + (viewport?.height || innerHeight) - inset * 2;
+    notice.style.left = `${Math.max(left + bounds.width / 2, Math.min(board.left + board.width / 2, right - bounds.width / 2))}px`;
+    notice.style.top = `${Math.max(top, Math.min(board.top, bottom - bounds.height))}px`;
+  }
+  function schedule() {
+    if (pending || !scope.active) return;
+    pending = true;
+    scope.frame(update);
+  }
+  scope.listen(window, 'resize', schedule);
+  scope.listen(window, 'scroll', schedule, true);
+  if (viewport) {
+    scope.listen(viewport, 'resize', schedule);
+    scope.listen(viewport, 'scroll', schedule);
+  }
+  const observer = new ResizeObserver(schedule);
+  observer.observe(refs.board);
+  observer.observe(refs.root);
+  scope.own(() => observer.disconnect());
+  update();
 }
 
 // The shell owns the node; remounts update the same badge and create no listeners.
