@@ -4,6 +4,12 @@ async function installModuleAccess(page) {
     window.productModule = path => import(performance.getEntriesByType('resource').find(entry => new URL(entry.name).pathname === path)?.name || path);
   });
 }
+async function freezeDevelopmentReloads(page) {
+  const host = new URL(process.env.UI_SKIN_BASE_URL || 'http://localhost:4173').host;
+  // Only Vite's token-bearing development socket is isolated. Game requests,
+  // persistence and services keep their normal paths in this browser context.
+  await page.routeWebSocket(url => url.host === host && url.pathname === '/' && url.searchParams.has('token'), () => {});
+}
 async function ready(page) { await page.goto('/'); await page.locator('#app-loading').waitFor({ state: 'detached' }); }
 async function settings(page) { await page.locator('.adventure-page:visible [data-dock-action="settings"]').click(); await expect(page.locator('#settings-modal')).toBeVisible(); }
 async function choose(page, skin) { await page.locator(`[data-ui-skin-choice="${skin}"]`).click(); await expect(page.locator('html')).toHaveAttribute('data-ui-skin', skin); await expect(page.locator('.skin-choices')).not.toHaveAttribute('aria-busy', 'true'); }
@@ -23,4 +29,4 @@ async function disableRemoteServices(page) {
   await page.route('**/js/firebaseBackend.js*', route => route.fulfill({ contentType: 'text/javascript', body:
     "export const getFirebaseBackend = async () => null; export const disposeFirebaseBackend = async () => {}; export { getFirebaseEnvironment } from './firebaseEnvironment.js';" }));
 }
-module.exports = { installModuleAccess, ready, settings, choose, homeSkin, geometry, disableRemoteServices };
+module.exports = { installModuleAccess, ready, settings, choose, homeSkin, geometry, disableRemoteServices, freezeDevelopmentReloads };

@@ -14,6 +14,7 @@ import { treasureDefinition } from './progression/treasureCatalog.js';
 import { openAppModal, showAppToast } from "./modal.js";
 import { canLaunchGame } from "./profileOperations.js";
 import { getDifficultyAccess } from './progression/difficultyProgress.js';
+import { ensureUiSkinRewards } from './uiSkin.js';
 
 const views = new Map(); // One bounded view per released game, independent of durable progress.
 const MAP_TEXTURE_HEIGHT = 660;
@@ -51,6 +52,7 @@ export function mountAdventureMap(gameId) {
   body.append(scroll);
   root.append(body);
   document.body.append(root);
+  void ensureUiSkinRewards();
   const scope = decorateAdventureMenu(root, { gameId });
   root.classList.add("game-shell-tokens");
   const title = document.createElement("h1");
