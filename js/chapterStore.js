@@ -209,13 +209,14 @@ export async function readChapterBackups(database) {
 function record(value) { return value !== null && typeof value === "object" && !Array.isArray(value); }
 
 /** A profile and all changed chapter records share one durability boundary. */
-export async function writeChapterProfile(database, envelope, expectedRevision, { migration = false } = {}) {
+export async function writeChapterProfile(database, envelope, expectedRevision, { migration = false, isCurrent = () => true } = {}) {
   const transaction = database.transaction(["profile", "chapters"], "readwrite");
   const complete = transactionResult(transaction);
   const profiles = transaction.objectStore("profile");
   const chapters = transaction.objectStore("chapters");
   try {
     const previous = await requestResult(profiles.get("active"));
+    if (!isCurrent()) throw new DOMException('Cancelled stale profile write.', 'AbortError');
     if ((previous?.revision || 0) !== expectedRevision) throw new Error("Dữ liệu đã được cập nhật ở tab khác.");
     const stored = structuredClone(envelope);
     const durableMarker = normalizeProgressMigration(previous?.data.progress.levelRankingMigration);
@@ -279,6 +280,7 @@ export async function writeChapterProfile(database, envelope, expectedRevision, 
       delete stored.data.progress[game].claimedChests;
       delete stored.data.progress[game].startedLevels;
     }
+    if (!isCurrent()) throw new DOMException('Cancelled stale profile write.', 'AbortError');
     profiles.put(stored, "active");
     await complete;
     return stored;

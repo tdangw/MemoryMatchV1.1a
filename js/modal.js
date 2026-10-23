@@ -85,15 +85,18 @@ export function openAppModal({
 
   let closed = false;
   let destroyed = false;
+  let resolveClosed;
+  const whenClosed = new Promise(resolve => { resolveClosed = resolve; });
   let submitting = false;
   let releaseOwner;
-  const destroy = () => {
+  const destroy = (completedClose = false) => {
     if (destroyed) return;
     destroyed = closed = true;
     lifecycle.dispose();
     releaseOwner?.forget();
     const restoreFocus = overlay.contains(document.activeElement);
     overlay.remove();
+    resolveClosed({ reason: completedClose === true ? 'closed' : 'destroyed' });
     if (resumeMenuAds) resumeMenuAds();
     if (restoreFocus && (!owner || owner.active) && previousFocus?.isConnected && typeof previousFocus.focus === "function") previousFocus.focus();
     metrics?.clock.resume(overlay);
@@ -110,7 +113,7 @@ export function openAppModal({
     removeKeydown();
     overlay.classList.add("is-closing");
     lifecycle.timeout(() => {
-      destroy();
+      destroy(true);
       if (!owner || owner.active) onClose?.();
     }, UI_TIMING.modalCloseMs);
   };
@@ -201,7 +204,7 @@ export function openAppModal({
     });
   }
 
-  return { overlay, panel, body, close, destroy, submit };
+  return { overlay, panel, body, close, destroy, submit, whenClosed };
 }
 
 export function showAppToast(message, { tone = "info", duration = 1600, position = 'top' } = {}) {

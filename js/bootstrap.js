@@ -17,6 +17,8 @@ async function bootstrap() {
     }
     // A blocked save already has its existing recovery dialog: never cover it.
     loading.destroy();
+    if (ready !== false) void import('./progression/achievementAnnouncements.js').then(module => module.resumeAchievementAnnouncements())
+      .catch(error => console.error('Achievement announcement unavailable', error));
   } catch (error) {
     console.error('[Startup]', error);
     loading.fail();

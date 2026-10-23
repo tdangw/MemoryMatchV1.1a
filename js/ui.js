@@ -10,6 +10,7 @@ import { GAMEPLAY_TIMING, getComboPresentation } from "./gameplayTuning.js";
 import { sounds } from "./sound.js"; // ✅ Đã tách âm thanh
 import { SUMMARY_REWARD_TIMING, summaryStarDelay, scheduleSummaryRewardAudio } from './progression/summaryRewardAudio.js';
 import { openAppModal, showAppToast } from "./modal.js";
+import { presentAchievementAnnouncements } from './progression/achievementAnnouncements.js';
 import { createIcon } from "./icons.js";
 import { launchSummaryConfetti, showSummaryFireworks } from "victory-presentation";
 import { clearPersistentGameData } from "./persistence.js";
@@ -412,6 +413,7 @@ export function showLevelSummaryOverlay(completion) {
 }
 
 function openLevelSummaryOverlay({
+  gameId,
   level,
   remainingTime,
   moves,
@@ -432,20 +434,22 @@ function openLevelSummaryOverlay({
     const actionScope = createGameShellLifecycle(); pendingSummaryAction = actionScope;
     const release = continuationOwner?.own(() => actionScope.dispose(), 'cleanup');
     actionScope.own(() => { release?.forget(); if (pendingSummaryAction === actionScope) pendingSummaryAction = null; });
-    actionScope.timeout(() => {
-      actionScope.dispose();
-      if (generation !== summaryGeneration || continuationOwner && !continuationOwner.active) return;
+    const current = () => actionScope.active && generation === summaryGeneration && (!continuationOwner || continuationOwner.active);
+    void modal.whenClosed.then(async result => {
+      if (result.reason !== 'closed' || !current()) { actionScope.dispose(); return; }
       let navigationPage = getAppPageScope();
       const failed = error => {
         if (generation === summaryGeneration && getAppPageScope() === navigationPage && (!navigationPage || navigationPage.active)) showAppToast('Chưa mở được màn chơi. Hãy thử lại.');
         console.error('Summary navigation failed', error.name);
       };
       try {
+        if (!await presentAchievementAnnouncements({ owner: actionScope, gameId, level }) || !current()) return;
         const work = callback();
         navigationPage = getAppPageScope();
-        Promise.resolve(work).catch(failed);
+        await Promise.resolve(work).catch(failed);
       } catch (error) { failed(error); }
-    }, 200);
+      finally { actionScope.dispose(); }
+    });
   }
   let actionSelected = false;
 

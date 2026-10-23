@@ -110,7 +110,7 @@ export function ensureGameplaySeason() {
 }
 
 /** Snapshot at invocation: a later round cannot change a queued write's data. */
-export function savePersistentGameData({ coins, appearance, progress, settings, cloudEvent = false } = {}) {
+export function savePersistentGameData({ coins, appearance, progress, settings, cloudEvent = false, isCurrent = () => true } = {}) {
   const patch = structuredClone({
     ...(coins !== undefined ? { coins: normalizeNonNegativeInteger(coins) } : {}),
     ...(appearance !== undefined ? { appearance } : {}),
@@ -119,7 +119,7 @@ export function savePersistentGameData({ coins, appearance, progress, settings, 
   });
   return enqueue(async () => {
     await initialize();
-    if (blocked) return false;
+    if (blocked || !isCurrent()) return false;
     try {
       const previous = database ? currentEnvelope : readLocalEnvelope();
       if (!database && localStorage.getItem(PRIMARY_MARKER_KEY)) throw new Error("Backend chính đã được sử dụng. Không ghi vào bản localStorage cũ.");
@@ -129,7 +129,7 @@ export function savePersistentGameData({ coins, appearance, progress, settings, 
       if (patch.settings) envelope.data.settings = { ...previous?.data.settings, ...patch.settings };
       if (patch.progress || patch.appearance) envelope.data.appearance = settleAchievementInventory(previous?.data.appearance,
         envelope.data.appearance, patch.progress || {});
-      if (database) currentEnvelope = await writeChapterProfile(database, envelope, knownRevision);
+      if (database) currentEnvelope = await writeChapterProfile(database, envelope, knownRevision, { isCurrent });
       else {
         localStorage.setItem(activeStorageKey, JSON.stringify(envelope));
         currentEnvelope = envelope;
@@ -142,13 +142,13 @@ export function savePersistentGameData({ coins, appearance, progress, settings, 
       }
       notifyCommit({ ...patch, ...((patch.progress || patch.appearance) ? { appearance: structuredClone(envelope.data.appearance) } : {}), ...(cloudEvent ? { cloudEvent: true } : {}) });
       return true;
-    } catch (error) { blocked = true; reportPersistenceError("write", error); return false; }
+    } catch (error) { if (error.name === 'AbortError' && !isCurrent()) return false; blocked = true; reportPersistenceError("write", error); return false; }
   });
 }
 
 export const saveProgress = progress => savePersistentGameData({ progress });
 export const saveCoins = coins => savePersistentGameData({ coins });
-export const saveAppearance = appearance => savePersistentGameData({ appearance });
+export const saveAppearance = (appearance, options = {}) => savePersistentGameData({ appearance, ...options });
 export const flushPersistentWrites = () => queue;
 /** The catalog only covers chapter 1; three bounded reads backfill old certified wins. */
 export function backfillAchievementInventory() {

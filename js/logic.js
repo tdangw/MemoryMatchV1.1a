@@ -404,6 +404,7 @@ export async function checkLevelComplete() {
     const nextLevel = completedChapter ? gameState.progress.memoryMatch.adventure.firstLevel : gameState.currentLevel + 1;
     const continueToNextLevel = () => levelCompleteActions.onNext(nextLevel);
     const completion = {
+      gameId: 'memory-match',
       level: gameState.currentLevel,
       remainingTime: gameState.remainingTime,
       moves: gameState.moves,

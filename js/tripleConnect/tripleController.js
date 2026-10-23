@@ -971,6 +971,7 @@ async function settleTerminalRound(shell, render) {
       coinsEarned: settlement.reward,
       coinPresentation,
       mastery: settlement.mastery,
+      gameId: 'triple-connect',
       score: state.score,
       stars: settlement.stars,
       timeBonus: settlement.timeBonus,

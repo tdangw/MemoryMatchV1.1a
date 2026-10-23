@@ -49,7 +49,8 @@ không phải bằng chứng runtime hoặc FPS.
 | S1 | PASS — registry/loader, 8 unit + 3 browser |
 | S2 | PASS — chrome dùng owner hiện hữu, browser S1/S2 16/16 |
 | F1 | PASS — grants/normalize/backfill/atomic persistence |
-| F2–F3 | Đang triển khai queue/cosmetics/public sync |
+| F2 | PASS — closed signal, queue, destinations, cancellation |
+| F3 | Đang triển khai cosmetics/public sync/effect motion |
 | Q1 | Chưa nghiệm thu sản phẩm |
 
 Skill thực dùng: `clarify-ambiguous-requirements` chốt D0; `imagegen`
@@ -210,3 +211,26 @@ PASS: F1 unit/contract 7/7 (có IndexedDB giả lập, lỗi quota, archive,
 restore cũ và future ledger), UI Chrome1/1 (durable/RAM/reload/replay/backup),
 check-persistence, chapter-store, cloud-snapshot, effect-v2 và appearance.
 Không đổi ranking formula, profile UID ownership hoặc luật chơi. Tự chuyển F2.
+
+## F2 — summary → thưởng → đích đến
+
+Modal owner bổ sung `whenClosed` phân biệt đóng xong và bị owner hủy;
+promise luôn settle sau tháo DOM. API cũ của caller vẫn dùng được. Summary
+đã bỏ timeout200ms, tạo continuation scope theo round/page/generation,
+chờ closed signal rồi presentation receipt, sau Tiếp tục mới gọi đúng đích
+đã chọn. Không để round tiếp theo chạy sau lưng thẻ thưởng.
+
+Thẻ thưởng chỉ Tiếp tục; đọc quà đã commit, không grant hoặc tự equip.
+Ack + first-hint marker persist trước đóng; lỗi giữ thẻ và thông báo tự
+nhiên. Callback muộn/UID đổi/owner dispose không điều hướng hoặc ghi nhầm
+profile; persistence có optional current guard, writer kiểm trước commit.
+Reload khôi phục pending mới, backfill cũ đã silent. Không sleep/timer mới
+để đoán việc đóng, không điều kiện xem hết hoạt ảnh.
+
+F2 browser **8/8 PASS, 1,9 phút**: thắng bằng thao tác thật trên cả ba game,
+mỗi game thử Bản đồ/reduced-motion và Chơi tiếp/normal; summary không chồng
+reward, receipt bền vững trước UI, ván sau chỉ bắt đầu sau Tiếp tục. Kiểm
+reload thông báo một lần, hint nhóm không lặp, 20 lần hủy owner giữa ack:
+promise false, modal/node và parent resource về0, receipt còn pending,
+persistence không bị đánh dấu lỗi do cancellation. Unit F1 và các contract
+persistence/chapter chạy lại PASS. Tự chuyển F3.

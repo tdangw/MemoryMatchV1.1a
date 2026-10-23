@@ -922,6 +922,7 @@ async function completeLinkLevel() {
   const completedChapter = gameState.progress.linkConnect.adventure?.currentChapter > previousChapter ? previousChapter : null;
   const nextLevel = completedChapter ? gameState.progress.linkConnect.adventure.firstLevel : linkGameState.level + 1;
   const completion = {
+    gameId: 'link-connect',
     fireworksContainerId: "link-connect-container",
     level: linkGameState.level,
     remainingTime: linkGameState.remainingTime,
