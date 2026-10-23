@@ -4,9 +4,9 @@
 
 - Đã giao toàn bộ D0–Q1 trong `ILLUSTRATED_UI_ACHIEVEMENTS_PLAN.md`, commit từng phase; receipt chung: `STORYBOOK_IMPLEMENTATION_RECEIPT.md`. Các giới hạn chỉ chuẩn bị bên dưới là lịch sử của lượt trước.
 - D0 đã duyệt 30 quà/thứ tự/hình, giữ 300 Xu và receipt cũ; sau màn 10 tiếp tục chơi nhưng chưa có quà mới. Duyệt Cổ tích/storybook, font miễn phí đủ dấu Việt, bản ghép thật 412×915 phải duyệt trước rollout.
-- Bổ sung trực tiếp: avatar/khung/huy hiệu đang trang bị phải công khai trên BXH, đồng bộ khi lưu Hồ sơ; không thay điểm hay thứ tự xếp hạng. Thay quyết định cục bộ ban đầu. Chưa cho phép deploy dịch vụ/APK/push.
+- Bổ sung trực tiếp: avatar/khung/huy hiệu đang trang bị phải công khai trên BXH, đồng bộ khi lưu Hồ sơ; không thay điểm hay thứ tự xếp hạng. Thay quyết định cục bộ ban đầu. Đã duyệt triển khai riêng Firestore rules; chưa cho phép publish Hosting/APK/push.
 - D0/D1/D2/S1/S2/F1/F2/F3 đã commit riêng; baseline có sẵn đã được chủ dự án cho phép commit riêng `3aaf0e7`. D2 ba bản ghép đã duyệt. F3: `14f20fc`, đủ Hồ sơ/Thành tích/sáu motion/public sync; Q1 code/web check/build và kiểm thử đạt, receipt chung ghi bằng chứng và giới hạn.
-- Public sync đã qua hai tài khoản Auth/Firestore emulator, offline→online, quyền owner/private, rank bất biến. Đang xin duyệt riêng triển khai `firestore.rules` lên `memorymatchv1-1a` theo điều cấm tự deploy của kế hoạch. Chưa nhận public live, không publish Hosting/APK/push. Các mục chuẩn bị/chờ duyệt bên dưới là lịch sử trước lượt triển khai này.
+- Public sync đã qua hai tài khoản Auth/Firestore emulator, offline→online, quyền owner/private, rank bất biến. Q1 commit `5e1c22b`. Chủ dự án duyệt riêng Firestore rules; đã phát hành lên `memorymatchv1-1a` và đọc lại ruleset đang hoạt động, source khớp SHA256 `290cf190d6958ca19256d01dfe7eb879f9622a66ba1b16d0b30d944c1ee9d35a`. Không publish Hosting/APK/push; chưa kiểm end-to-end người chơi live trên web mới. Phạm vi code/nghiệm thu/rules đã hoàn tất. Các mục chuẩn bị/chờ duyệt bên dưới là lịch sử trước lượt triển khai này.
 
 ## Kế hoạch mới: Cổ tích và Thành tích — chuẩn bị23/10/2026
 

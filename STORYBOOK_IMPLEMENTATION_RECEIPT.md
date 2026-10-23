@@ -50,8 +50,8 @@ không phải bằng chứng runtime hoặc FPS.
 | S2 | PASS — chrome dùng owner hiện hữu, browser S1/S2 16/16 |
 | F1 | PASS — grants/normalize/backfill/atomic persistence |
 | F2 | PASS — closed signal, queue, destinations, cancellation |
-| F3 | PASS code/web/emulator; Firestore thật chờ duyệt triển khai riêng |
-| Q1 | PASS nghiệm thu code/web; public rollout chờ quyết định Firestore |
+| F3 | PASS code/web/emulator; Firestore rules thật đã phát hành và đối chiếu |
+| Q1 | PASS nghiệm thu code/web; rules triển khai riêng theo phê duyệt |
 
 Skill thực dùng: `clarify-ambiguous-requirements` chốt D0; `imagegen`
 định tuyến tạo artwork. Bằng chứng mỗi phase bổ sung trong tài liệu này.
@@ -327,6 +327,19 @@ Skill ảnh hưởng thực tế: `imagegen` tạo5 master artwork và prompt t�
 `clarify-ambiguous-requirements` dùng để chốt D0/D2/phạm vi public/baseline.
 Không dùng computer-use để thao tác; kiểm UI bằng Playwright và xem ảnh thật.
 
-Triển khai Firebase thật là bước duy nhất còn chờ quyết định chủ dự án:
-chỉ rules cho project `memorymatchv1-1a`, không publish Hosting/APK/push.
-Code công khai đã kiểm bằng hai account emulator; chưa nhận đã chạy live.
+## Phát hành Firestore rules — đã duyệt riêng ngày23/10/2026
+
+Chủ dự án trả lời “Duyệt triển khai riêng Firestore rules”. Đã chạy
+`firebase deploy --only firestore:rules --project memorymatchv1-1a --non-interactive`:
+compile thành công, released to cloud.firestore, Deploy complete.
+Đọc lại release đang hoạt động qua Firebase Rules API, đối chiếu toàn bộ
+source với file local sau chuẩn hóa CRLF: **khớp hoàn toàn**.
+
+- Ruleset: `projects/memorymatchv1-1a/rulesets/149ba147-a19e-4d8f-8e26-27524a1376b6`.
+- Release update: `2026-10-23T16:38:44.146932Z` (23:38 giờ Việt Nam).
+- SHA256 source: `290cf190d6958ca19256d01dfe7eb879f9622a66ba1b16d0b30d944c1ee9d35a`.
+
+Không thay Hosting, indexes, APK hoặc push; không đọc/ghi dữ liệu người chơi
+để xác minh. Backend đã có quyền cho public cosmetics; luồng hai account
+đã kiểm ở emulator. Chưa nhận end-to-end với người chơi live, vì bản web
+chưa được publish lại trong phạm vi phê duyệt này.
