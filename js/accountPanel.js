@@ -1,4 +1,7 @@
 import { openAppModal, showAppToast } from "./modal.js";
+import { cosmeticPortrait, openProfileCustomization } from './progression/profileCosmetics.js';
+import { createGameShellLifecycle } from './gameShell/gameShellLifecycle.js';
+import { getPublicCosmeticSync } from './progression/publicCosmeticSync.js';
 import { getAccountService } from "./accountService.js";
 import { getAppPageScope } from "./appPageLifecycle.js";
 import { gameState } from "./gameState.js";
@@ -19,7 +22,7 @@ export function showAccountPanel(surface = {}) {
   const content = document.createElement('div'); content.className = 'profile-view';
   const hero = document.createElement('section'); hero.className = 'tab-card profile-hero';
   const summary = document.createElement('div'); summary.className = 'profile-summary';
-  const avatar = document.createElement('span'); avatar.className = 'profile-avatar'; avatar.setAttribute('aria-hidden', 'true');
+  const avatar = document.createElement('button'); avatar.type = 'button'; avatar.className = 'profile-avatar'; avatar.setAttribute('aria-label', 'Trang trí hồ sơ');
   const identity = document.createElement('div');
   const playerName = document.createElement('h3'); playerName.className = 'profile-player-name';
   const accountType = document.createElement('p'); accountType.className = 'account-identity';
@@ -44,14 +47,20 @@ export function showAccountPanel(surface = {}) {
   const google = document.createElement('button'); google.type = 'button'; google.className = 'tab-button profile-google';
   account.append(heading, status, google); content.append(hero, account);
   let disposed = false; let unsubscribe; let releaseOwner;
+  const cosmeticScope = createGameShellLifecycle();
+  const cosmeticsStatus = document.createElement('p'); cosmeticsStatus.className = 'profile-cosmetics-status'; cosmeticsStatus.setAttribute('role', 'status'); hero.append(cosmeticsStatus);
+  const sync = getPublicCosmeticSync();
+  if (sync) cosmeticScope.own(sync.subscribe(state => { cosmeticsStatus.textContent = state.message; }), 'listener');
   let editingUid = null; let saving = false; let linking = false;
   const modal = openAppModal({ ...surface, id: 'account-modal', title: 'Hồ sơ', icon: 'account', content, onDestroy: dispose, onClose: dispose });
   function dispose() {
     if (disposed) return;
-    disposed = true; unsubscribe?.(); stats.dispose(); releaseOwner?.forget(); modal.destroy();
+    disposed = true; unsubscribe?.(); stats.dispose(); cosmeticScope.dispose(); releaseOwner?.forget(); modal.destroy();
     if (activeView?.modal === modal) activeView = null;
   }
   activeView = { modal, dispose };
+  avatar.onclick = () => openProfileCustomization({ playerName: playerName.textContent, owner: cosmeticScope,
+    onSaved: () => { if (!disposed) avatar.replaceChildren(cosmeticPortrait(gameState.appearance.profileCosmetics, { label: playerName.textContent })); } });
   releaseOwner = (surface.owner || getAppPageScope())?.own(dispose, 'cleanup');
   function closeEditor(focus = false) {
     form.hidden = true; playerName.hidden = false; edit.setAttribute('aria-expanded', 'false'); edit.setAttribute('aria-label', 'Sửa tên'); edit.replaceChildren(createIcon('edit')); error.textContent = ''; name.value = ''; editingUid = null;
@@ -61,7 +70,7 @@ export function showAccountPanel(surface = {}) {
     if (disposed) return;
     if (!form.hidden && editingUid !== state.uid) closeEditor();
     playerName.textContent = state.playerName || 'Người chơi';
-    avatar.textContent = Array.from(playerName.textContent.trim())[0]?.toLocaleUpperCase('vi-VN') || '•';
+    avatar.replaceChildren(cosmeticPortrait(gameState.appearance.profileCosmetics, { label: playerName.textContent }));
     accountType.textContent = state.isAnonymous === false ? 'Đã liên kết Google' : 'Tài khoản khách';
     status.textContent = ({ connecting: 'Đang kết nối…', restoring: 'Đang tải tiến trình…', syncing: 'Đang lưu…', synced: '', waiting: 'Đang chờ lưu', offline: 'Chưa có kết nối', error: 'Chưa lưu được. Sẽ thử lại.', disabled: '', conflict: 'Đang tải tiến trình…' })[state.phase] || '';
     const busy = saving || linking || ['connecting', 'restoring', 'syncing', 'conflict'].includes(state.phase);

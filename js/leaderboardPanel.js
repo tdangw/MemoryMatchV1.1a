@@ -1,5 +1,7 @@
 import { createIcon } from './icons.js';
 import { openAppModal } from './modal.js';
+import { readPublicCosmetics } from './progression/publicCosmeticStore.js';
+import { cosmeticPortrait } from './progression/profileCosmetics.js';
 import { GAME_DEFINITIONS } from './gameCatalog.js';
 import { getRecentGameId } from './recentGame.js';
 import { getFirebaseBackend } from './firebaseBackend.js';
@@ -154,6 +156,9 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
         : await readLeaderboard({ database: backend.database, environment: backend.environment, board, uid, refresh: refreshRequested, forceRefresh: refreshRequested, page: requestedPage });
       if (!scope.active || id !== generation || uid !== getAccountService()?.getIdentity()?.uid) return;
       if (!data) { status.textContent = 'Chưa có kết nối.'; return; }
+      const cosmetics = await readPublicCosmetics({ database: backend.database, environment: backend.environment,
+        uids: data.top.map(row => row.uid), refresh: refreshRequested, offline });
+      if (!scope.active || id !== generation || uid !== getAccountService()?.getIdentity()?.uid) return;
       currentPage = data.page;
       results.dataset.kind = board.kind;
       const heading = createHeading();
@@ -167,14 +172,14 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
           const number = document.createElement('span'); number.className = 'leaderboard-medal-number'; number.textContent = String(rank); number.setAttribute('aria-hidden', 'true');
           place.replaceChildren(createIcon('rank-medal'), number);
         }
-        const avatar = document.createElement('span'); avatar.className = 'leaderboard-avatar'; avatar.textContent = Array.from(item.playerName.trim()).slice(0, 1).join('').toLocaleUpperCase('vi-VN') || '•'; avatar.setAttribute('aria-hidden', 'true');
+        const avatar = document.createElement('span'); avatar.className = 'leaderboard-avatar'; avatar.append(cosmeticPortrait(cosmetics.selections.get(item.uid), { label: item.playerName }));
         const name = document.createElement('span'); name.className = 'leaderboard-name'; name.textContent = item.playerName; name.title = item.playerName;
         if (item.uid === uid) { row.classList.add('is-self'); name.setAttribute('aria-label', `${item.playerName}, bạn`); }
         row.append(place, avatar, name);
         row.append(metric(formatLeaderboardNumber(item.levelReached), 'leaderboard-metric', 'Màn')); list.append(row);
       }
       results.dataset.offline = String(offline);
-      if (data.top.length) { status.textContent = offline ? 'Chưa có kết nối.' : ''; results.replaceChildren(heading, status, retry, list); }
+      if (data.top.length) { status.textContent = offline ? 'Chưa có kết nối.' : cosmetics.available ? '' : 'Chưa cập nhật được ảnh hồ sơ.'; results.replaceChildren(heading, status, retry, list); }
       else { status.textContent = 'Chưa có thành tích.'; }
       own.textContent = data.own && !data.top.some(item => item.uid === uid) ? `Thành tích của bạn: ${describe(data.own, board.kind)}` : '';
       results.scrollTop = refreshRequested ? 0 : scrolls.get(`${currentKey}:${currentPage}`) || 0;

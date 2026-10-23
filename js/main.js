@@ -3,6 +3,7 @@ import { restoreUiSkin } from './uiSkin.js';
 import '../styles/ui-skin-woodland.css';
 import '../styles/ui-style-packs.css';
 import '../styles/ui-skin-storybook.css';
+import '../styles/achievement-effects.css';
 import { initializeMenuAds } from './ads/menuAds.js';
 import { initializeProfileStatsService } from './profileStatsService.js';
 import { configureAdventureMap } from "./adventureMap.js";
@@ -293,6 +294,8 @@ if (import.meta.env.VITE_FIREBASE_DISABLED !== '1') {
     console.warn('Cloud startup unavailable', error.code || error.name);
     showAppToast('Chưa kết nối được tài khoản. Tiến trình vẫn được lưu.');
   });
+  void accountReady.then(() => import('./progression/publicCosmeticSync.js')).then(module => module.initializePublicCosmeticSync())
+    .catch(error => console.warn('Public cosmetic startup unavailable', error.code || error.name));
   void accountReady.then(() => import('./analyticsService.js')).then(module => module.initializeAnalytics()).catch(error => console.warn('Analytics unavailable', error.code || error.name));
 }
 

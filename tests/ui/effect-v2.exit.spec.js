@@ -184,7 +184,7 @@ test("every saved Link exit ID resolves, renders, and releases its transient sta
     });
     return rendered;
   });
-  expect(result).toHaveLength(21);
+  expect(result).toHaveLength(23);
   expect(result).toEqual(expect.arrayContaining([
     expect.objectContaining({ id: "default", applied: true, stale: 0 }),
     expect.objectContaining({ id: "blackhole", applied: true, stale: 0 }),

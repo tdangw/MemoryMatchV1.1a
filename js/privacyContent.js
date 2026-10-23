@@ -1,9 +1,9 @@
 // Source shared by the in-game policy and the generated public page.
 export const PRIVACY_CONTENT = `
-<p><strong>Memory Match Adventure</strong> do Đăng phát triển. Trang này giải thích cách trò chơi sử dụng thông tin của bạn. Cập nhật ngày 16 tháng 10 năm 2026.</p>
+<p><strong>Memory Match Adventure</strong> do Đăng phát triển. Trang này giải thích cách trò chơi sử dụng thông tin của bạn. Cập nhật ngày 23 tháng 10 năm 2026.</p>
 <h3>Thông tin khi chơi</h3>
 <p>Trò chơi lưu tiến trình, Xu, vật phẩm, chủ đề và cài đặt trên thiết bị. Nếu sử dụng tính năng tài khoản, thông tin hồ sơ, tên hiển thị và tiến trình có thể được lưu trực tuyến để khôi phục khi đổi thiết bị. Đăng nhập bằng Google có thể cung cấp tên, địa chỉ email và thông tin hồ sơ mà bạn cho phép chia sẻ.</p>
-<p>Khi tham gia bảng xếp hạng, tên hiển thị và thành tích của bạn có thể được người chơi khác nhìn thấy. Không dùng số điện thoại, địa chỉ nhà hoặc thông tin riêng tư làm tên hiển thị.</p>
+<p>Khi tham gia bảng xếp hạng, người chơi khác có thể nhìn thấy tên hiển thị, thành tích, ảnh đại diện, khung viền và huy hiệu đang trang bị của bạn. Không dùng số điện thoại, địa chỉ nhà hoặc thông tin riêng tư làm tên hiển thị.</p>
 <h3>Quảng cáo và trẻ em</h3>
 <p>Trò chơi có người chơi ở nhiều độ tuổi, bao gồm trẻ em. Quảng cáo trên các trang của trò chơi được áp dụng chế độ bảo vệ trẻ em cho tất cả người chơi, giới hạn nội dung phù hợp gia đình và không cá nhân hóa theo sở thích. Trong phiên bản này, quảng cáo từ Google không xuất hiện khi đang chơi một ván. Trò chơi không hỏi ngày sinh và không yêu cầu xem video để nhận thưởng.</p>
 <p>Google có thể xử lý thông tin về thiết bị, kết nối và lượt hiển thị hoặc tương tác với quảng cáo để cung cấp quảng cáo, kiểm tra chất lượng và ngăn gian lận. Cách xử lý còn phụ thuộc vào dịch vụ của Google và các lựa chọn được áp dụng tại khu vực của bạn. Nếu có lựa chọn cần xem lại, bạn có thể mở mục Quyền riêng tư quảng cáo trong Cài đặt.</p>

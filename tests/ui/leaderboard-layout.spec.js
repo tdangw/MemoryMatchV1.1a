@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 mkdirSync('docs/design/app-tabs/qa', { recursive: true });
 const source = readFileSync('js/leaderboardPanel.js', 'utf8')
+  .replace("import { readPublicCosmetics } from './progression/publicCosmeticStore.js';", "const readPublicCosmetics = async () => ({ selections: new Map(), available: true });")
   .replace("import { getFirebaseBackend } from './firebaseBackend.js';", "const getFirebaseBackend = async () => ({ database: null, environment: 'test' });")
   .replace("import { readCachedLeaderboard } from './leaderboardStore.js';", "const readCachedLeaderboard = ({ board, uid, page }) => window.rankCache.get(JSON.stringify({ board, uid, page })) || null;")
   .replace("import { getAccountService } from './accountService.js';", "const getAccountService = () => ({ getIdentity: () => ({ uid: window.rankUid }), subscribe: listener => { listener(); return () => {}; } });")

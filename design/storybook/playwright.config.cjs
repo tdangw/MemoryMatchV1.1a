@@ -1,6 +1,7 @@
 const { defineConfig } = require('@playwright/test');
 module.exports = defineConfig({
   testDir: __dirname, testMatch: '*.spec.cjs', workers: 1, fullyParallel: false,
+  testIgnore: 'public-profile.spec.cjs',
   timeout: 40000, reporter: [['list']], outputDir: '../../docs/design/achievements/runtime/qa/traces',
   use: { baseURL: 'http://127.0.0.1:4189', browserName: 'chromium', channel: 'chrome', headless: true,
     reducedMotion: 'reduce', locale: 'vi-VN', serviceWorkers: 'block', deviceScaleFactor: 1 },

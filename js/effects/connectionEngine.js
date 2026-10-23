@@ -122,9 +122,9 @@ function renderChainLinks(nodes, points) {
 }
 
 function renderRouteTravelers(nodes, points, effectId) {
-  const travelerCount = effectId === "meteor" ? 2 : 1;
+  const travelerCount = ['meteor', 'link-effect-meteor-route'].includes(effectId) ? 2 : 1;
   const path = `M${points.map(({ x, y }) => `${x} ${y}`).join(" L")}`;
-  const duration = effectId === "bullet" ? "260ms" : "420ms";
+  const duration = effectId === 'link-effect-meteor-route' ? '140ms' : effectId === 'bullet' ? '260ms' : '420ms';
   const reducedMotion = Boolean(window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches);
   nodes.routeTravelerNodes.forEach(({ node, motion }, index) => {
     const visible = index < travelerCount;
@@ -142,7 +142,7 @@ function renderRouteTravelers(nodes, points, effectId) {
     }
     node.setAttribute("cx", "0");
     node.setAttribute("cy", "0");
-    motion.beginElementAt(index * .09);
+    motion.beginElementAt(index * (effectId === 'link-effect-meteor-route' ? .02 : .09));
   });
 }
 
@@ -405,7 +405,7 @@ const DECORATION_COUNTS = Object.freeze({
 function renderDecorations(nodes, points, family, effectId) {
   hideMatrixDigits(nodes);
   hideChainLinks(nodes);
-  const count = ["spiral", "dashed", "bullet", "meteor", "chains"].includes(effectId)
+  const count = effectId === 'triple-effect-triad-converge' ? 3 : effectId === 'link-effect-meteor-route' ? 4 : ["spiral", "dashed", "bullet", "meteor", "chains"].includes(effectId)
     ? 0
     : DECORATION_COUNTS[family] || 1;
   const last = points.at(-1);
@@ -488,7 +488,7 @@ export function renderConnectionV2({ surface, points, effect, seed = 1 }) {
   else if (effect.id === "chains") renderChainLinks(nodes, rendered);
   else {
     renderDecorations(nodes, rendered, family, effect.id);
-    if (["bullet", "meteor"].includes(effect.id)) renderRouteTravelers(nodes, rendered, effect.id);
+    if (["bullet", "meteor", 'link-effect-meteor-route'].includes(effect.id)) renderRouteTravelers(nodes, rendered, effect.id);
   }
   restartConnectionAnimations(nodes);
   surface.classList.add("is-visible");

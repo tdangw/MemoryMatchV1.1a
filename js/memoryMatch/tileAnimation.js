@@ -1,4 +1,5 @@
 const pendingByImage = new WeakMap();
+import { decorateAchievementFlip } from '../effects/achievementFlip.js';
 const activeImages = new Set();
 
 export function cancelMemoryTileAnimation(image) {
@@ -6,6 +7,7 @@ export function cancelMemoryTileAnimation(image) {
   if (!pending) return;
   if (pending.frame !== null) cancelAnimationFrame(pending.frame);
   if (pending.timeout !== null) clearTimeout(pending.timeout);
+  pending.cleanup?.();
   pendingByImage.delete(image);
   activeImages.delete(image);
 }
@@ -33,9 +35,11 @@ export function restartMemoryTileAnimation(image, {
     if (pendingByImage.get(image) !== pending) return;
     pending.frame = null;
     image.classList.add(animationClass);
+    pending.cleanup = decorateAchievementFlip(image, animationClass);
     pending.timeout = setTimeout(() => {
       if (pendingByImage.get(image) !== pending) return;
       image.classList.remove(animationClass);
+      pending.cleanup?.();
       pendingByImage.delete(image);
       activeImages.delete(image);
       onFinish?.();

@@ -30,7 +30,7 @@ function makeEntry(effect, family, duration, qualityCost, supportsTargetCounts, 
 export const EFFECT_V2_PATHS = Object.freeze(LINK_PATH_EFFECTS.map(effect => makeEntry(
   effect,
   PATH_FAMILIES[effect.id],
-  effect.id === "bullet" ? 180 : 260,
+  effect.id === 'triple-effect-triad-converge' ? 240 : effect.id === "bullet" ? 180 : 260,
   effect.id === "meteor" ? 3 : 1,
   [2, 3],
   ["electric", "fire"].includes(effect.id) ? 260 : null,

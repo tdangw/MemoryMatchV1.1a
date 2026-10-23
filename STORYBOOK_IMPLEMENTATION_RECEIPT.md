@@ -50,7 +50,7 @@ không phải bằng chứng runtime hoặc FPS.
 | S2 | PASS — chrome dùng owner hiện hữu, browser S1/S2 16/16 |
 | F1 | PASS — grants/normalize/backfill/atomic persistence |
 | F2 | PASS — closed signal, queue, destinations, cancellation |
-| F3 | Đang triển khai cosmetics/public sync/effect motion |
+| F3 | PASS code/web/emulator; Firestore thật chờ duyệt triển khai riêng |
 | Q1 | Chưa nghiệm thu sản phẩm |
 
 Skill thực dùng: `clarify-ambiguous-requirements` chốt D0; `imagegen`
@@ -234,3 +234,40 @@ reload thông báo một lần, hint nhóm không lặp, 20 lần hủy owner gi
 promise false, modal/node và parent resource về0, receipt còn pending,
 persistence không bị đánh dấu lỗi do cancellation. Unit F1 và các contract
 persistence/chapter chạy lại PASS. Tự chuyển F3.
+
+## F3 — Hồ sơ, Thành tích, hiệu ứng và trang trí công khai
+
+Hồ sơ dùng cùng portrait ba lớp với BXH. Ba tab chỉ cho chọn đồ có receipt;
+draft không sửa dữ liệu, hủy/đổi owner không ghi, lưu thất bại giữ draft,
+lưu không đổi không tạo write. Account/profile identity, replacement barrier
+và modal owner chặn callback cũ. Ảnh lỗi trở về portrait an toàn. Mỗi món
+ghi nguồn trò/màn; mọi skin dùng modal, focus và footer hiện hữu.
+
+Thành tích thay tab Tranh nhưng giữ ID tab, export và ba tranh lịch sử.
+Hiển thị 10 màn/trò, bốn chứng nhận/màn; nhóm 300 Xu vẫn nhận một lần, kể
+cả nhóm sau màn10. Không sinh quà mới sau catalog. Sáu cover tĩnh dẫn tới
+đúng slot/trò; equip chỉ cập nhật RAM sau commit, không bán đồ Thành tích.
+
+Chọn public document riêng thay vì ghép vào ranking entry: ranking chỉ
+nhận kết quả tốt hơn nên không phù hợp thay cosmetic độc lập. Projection
+chỉ version/3 ID catalog/timestamp; không công khai backup, email hay kho.
+Save Hồ sơ kích hoạt sync từ dữ liệu bền vững; fingerprint ack riêng,
+retry hữu hạn/offline/online, guard UID+profileId; lựa chọn không đổi không
+ghi lại. BXH đọc theo trang tối đa20 UID, cache100/TTL30s, fallback an toàn.
+Mở lại/làm mới BXH lấy lựa chọn mới; không thêm realtime listener mỗi hàng.
+Rules được sinh từ catalog, owner-only write, exact fields/type whitelist;
+mọi ranking/private rule cũ giữ nguyên. Cập nhật copy quyền riêng tư từ
+source dùng chung rồi sinh lại public page.
+
+Sáu motion chạy trong engine/owner cũ: hai flip hữu hạn260/300ms, path dùng
+tọa độ adapter thật, petal/crystal trên canvas dùng chung260/240ms. Trần24
+hạt/round, canvas một surface/RAF; vượt trần dùng fade hiện hữu, không chặn
+input. Reduced-motion tĩnh; restart/cleanup lặp idempotent. Không timer hay
+engine gameplay thứ hai, không glyph/font làm particle.
+
+PASS F3: equipment10 bài (đủ sáu slot, save/cancel/failure/20 lần hủy,
+locked/image failure, 300 Xu sau màn10), motion9 bài (hai flip và cả ba
+game ở normal/reduced, 20 lần interrupt), public UI1 bài với hai account
+Auth/Firestore emulator: save→BXH bên kia, offline→online, rank không đổi.
+Rules public + toàn bộ progression/private/leaderboard/stats emulator PASS.
+Không nhận đã triển khai public trên server thật trước bước duyệt rules.

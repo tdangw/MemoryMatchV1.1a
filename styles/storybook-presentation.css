@@ -96,6 +96,17 @@
 .storybook-item__source { font-size: 11px; }
 .storybook-item > .ui-icon { position: absolute; right: 4px; bottom: 40px; width: 24px; height: 24px; color: #24702c; background: #fff2ca; border-radius: 50%; }
 .storybook-customization__error { color: #a33022; font-weight: 700; }
+.profile-avatar .storybook-portrait, .leaderboard-avatar .storybook-portrait { width: 100%; height: 100%; }
+.profile-avatar { padding: 0; cursor: pointer; }
+.profile-avatar:focus-visible { outline: 2px solid var(--ui-focus); outline-offset: 3px; }
+.profile-cosmetics-status { font-size: 12px; color: var(--ui-muted); }
+.profile-cosmetics-status:empty { display: none; }
+.app-modal:not(.storybook-surface) .storybook-item { color: var(--ui-ink); background: var(--ui-inset); border-color: var(--ui-line); }
+.app-modal:not(.storybook-surface) .storybook-tab { color: var(--ui-ink); background: var(--ui-raised); border-color: var(--ui-line); font-family: inherit; }
+.app-modal:not(.storybook-surface) .storybook-tab[aria-selected='true'] { color: var(--ui-gold); border-color: var(--ui-gold); }
+.achievement-collection .storybook-achievement-row { background: var(--ui-inset); border-color: var(--ui-line); }
+.achievement-group-reward { margin-top: 18px; }
+.achievement-group-reward nav { display: flex; gap: 8px; margin-top: 12px; }
 .storybook-collection__game { text-align: center; font-weight: 900; font-size: 18px; }
 .storybook-collection__heading { text-align: center; font-size: 20px; margin: 12px 0; }
 .storybook-achievement-row { display: flex; align-items: center; gap: 10px; border: 1px solid #b58a52; border-radius: 12px; padding: 8px 10px; margin: 8px 0; background: #fff4d655; }

@@ -4,12 +4,15 @@ async function startMemory(page, { clock = false } = {}) {
   await page.addInitScript(() => localStorage.clear());
   await page.goto("/");
   await expect(page.locator(".game-selector__choice").first()).toBeVisible();
+  await expect(page.locator('#app-loading')).toHaveCount(0);
   if (clock) await page.clock.install();
   await page.evaluate(async () => {
     const { gameState } = await import("/js/gameState.js");
     gameState.settings.sound = gameState.settings.music = false;
     await (await import("/tests/ui/helpers/gameNavigation.js")).openReadyGameMenu("memory-match");
-    await (await import("/js/gameController.js")).startNewMemoryRun(7);
+    gameState.progress.memoryMatch.bestByLevel['easy:6'] = { score:100,stars:1,cleared:true,rulesVersion:1,completedWaves:2 };
+    await (await import('/js/persistence.js')).savePersistentGameData({ progress: gameState.progress });
+    await (await import("/js/gameController.js")).startNewMemoryRun(7, { skipIntro:true });
   });
 }
 

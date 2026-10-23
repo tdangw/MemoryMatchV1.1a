@@ -10,6 +10,7 @@ async function open(page) {
   await page.addInitScript(() => { window.profileState = { uid: 'owner-a', bound: true, isAnonymous: true, phase: 'synced', playerName: 'An Nhiên' }; window.profileListeners = window.profileSaves = window.profileLinks = 0; });
   await page.route('**/js/accountPanel.js*', route => route.fulfill({ contentType: 'text/javascript', body: source }));
   await page.goto('/'); await page.locator('[data-dock-action="profile"]').click();
+  await expect(page.locator('.profile-view')).toBeVisible();
 }
 for (const viewport of [{ width: 320, height: 740 }, { width: 412, height: 915 }, { width: 844, height: 390 }, { width: 1024, height: 900 }]) test(`profile editor preserves drafts and layout ${viewport.width}`, async ({ page }) => {
   await page.setViewportSize(viewport); await open(page);
@@ -43,7 +44,7 @@ test('profile failures keep the draft, UID changes discard it, pending actions d
   await open(page); await page.getByRole('button', { name: 'Sửa tên' }).click();
   await page.locator('.account-name-input').fill('Bản nháp'); await page.evaluate(() => window.profileFailure = true);
   await page.getByRole('button', { name: 'Lưu tên', exact: true }).click();
-  await expect(page.locator('.profile-error')).toHaveText('Tên chưa được lưu.');
+  await expect(page.locator('.profile-error')).toHaveText('Chưa lưu được tên. Kiểm tra kết nối và thử lại.');
   await expect(page.locator('.account-name-input')).toHaveValue('Bản nháp');
   await page.evaluate(() => { window.profileState = { ...window.profileState, uid: 'owner-b', playerName: 'Chủ mới' }; window.profileSubscriber(window.profileState); });
   await expect(page.locator('.profile-name-form')).toBeHidden();
@@ -64,6 +65,7 @@ test('30 profile mount and close cycles release subscriptions', async ({ page })
     await page.locator('.adventure-screen [data-dock-action="events"]').click();
     expect(await page.evaluate(() => window.profileListeners)).toBe(0);
     await page.locator('.adventure-screen [data-dock-action="profile"]').click();
+    await expect(page.locator('.profile-view')).toBeVisible();
   }
   await expect(page.locator('#account-modal')).toHaveCount(1);
 });

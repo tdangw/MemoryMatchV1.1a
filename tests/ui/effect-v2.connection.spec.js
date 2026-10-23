@@ -16,7 +16,7 @@ test("Link V2 connection surface reuses its SVG nodes and clears without stale d
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
   const result = await page.evaluate(async () => {
-    (await import("/js/gameSelector.js")).openGameMenu("link-connect");
+    await (await import("/tests/ui/helpers/gameNavigation.js")).openReadyGameMenu("link-connect");
     const controller = await import("/js/linkConnect/linkController.js");
     const { linkGameState } = await import("/js/linkConnect/linkState.js");
     const { findAvailableConnections } = await import("/js/linkConnect/pathfinder.js");
@@ -43,7 +43,7 @@ test("Link V2 connection surface reuses its SVG nodes and clears without stale d
     clearLinkPath();
     return { seen, idsBeforeClear, active: getEffectRegistry().diagnostics(), visible: surface.classList.contains("is-visible"), points: [...surface.querySelectorAll(".link-path-overlay__glow, .link-path-overlay__beam")].map(node => node.getAttribute("points")) };
   });
-  expect(result.seen).toHaveLength(21);
+  expect(result.seen).toHaveLength(23);
   for (const entry of result.seen) {
     expect(entry.className).toContain(`link-path-overlay--${entry.id}`);
     expect(entry.reused).toBe(true);
@@ -59,7 +59,7 @@ test("Link V2 connection restarts pooled line animations on every draw", async (
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
   const result = await page.evaluate(async () => {
-    (await import("/js/gameSelector.js")).openGameMenu("link-connect");
+    await (await import("/tests/ui/helpers/gameNavigation.js")).openReadyGameMenu("link-connect");
     const controller = await import("/js/linkConnect/linkController.js");
     const { linkGameState } = await import("/js/linkConnect/linkState.js");
     const { findAvailableConnections } = await import("/js/linkConnect/pathfinder.js");
@@ -121,7 +121,7 @@ test("Link V2 connection keeps catalog decorations bounded in its persistent SVG
     surface.remove();
     return entries;
   });
-  expect(signatures).toHaveLength(21);
+  expect(signatures).toHaveLength(23);
   expect(new Set(signatures.map((entry) => entry.family)).size).toBeGreaterThanOrEqual(17);
   expect(new Set(signatures.map((entry) => `${entry.count}:${entry.signature}`)).size).toBeGreaterThanOrEqual(19);
 });
@@ -439,8 +439,8 @@ test("Link V2 connection handle is disposed when switching games", async ({ page
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
   const result = await page.evaluate(async () => {
-    const selector = await import("/js/gameSelector.js");
-    selector.openGameMenu("link-connect");
+
+    await (await import("/tests/ui/helpers/gameNavigation.js")).openReadyGameMenu("link-connect");
     const controller = await import("/js/linkConnect/linkController.js");
     const { linkGameState } = await import("/js/linkConnect/linkState.js");
     const { findAvailableConnections } = await import("/js/linkConnect/pathfinder.js");
@@ -450,7 +450,7 @@ test("Link V2 connection handle is disposed when switching games", async ({ page
     drawLinkPath(findAvailableConnections(linkGameState.board.grid)[0].path, linkGameState.board);
     const registry = getEffectRegistry();
     const before = registry.diagnostics();
-    selector.openGameMenu("memory-match");
+    await (await import("/tests/ui/helpers/gameNavigation.js")).openReadyGameMenu("memory-match");
     const root = document.querySelector("#link-connect-container");
     return { before, after: registry.diagnostics(), surfaceRetained: Boolean(document.querySelector("#link-path-overlay")), rootHidden: root?.hidden };
   });
@@ -464,7 +464,7 @@ test("Link V2 connection returns to its resource baseline after 100 draw and swi
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
   const result = await page.evaluate(async () => {
-    const selector = await import("/js/gameSelector.js");
+
     const controller = await import("/js/linkConnect/linkController.js");
     const { linkGameState } = await import("/js/linkConnect/linkState.js");
     const { findAvailableConnections } = await import("/js/linkConnect/pathfinder.js");
@@ -472,11 +472,11 @@ test("Link V2 connection returns to its resource baseline after 100 draw and swi
     const { getEffectRegistry } = await import("/js/gameShell/gameShellEffects.js");
     let maximum = 0;
     for (let cycle = 0; cycle < 100; cycle++) {
-      selector.openGameMenu("link-connect");
+      await (await import("/tests/ui/helpers/gameNavigation.js")).openReadyGameMenu("link-connect");
       await controller.startLinkLevel({ mode: "easy" });
       drawLinkPath(findAvailableConnections(linkGameState.board.grid)[0].path, linkGameState.board);
       maximum = Math.max(maximum, getEffectRegistry().diagnostics().connection);
-      selector.openGameMenu("memory-match");
+      await (await import("/tests/ui/helpers/gameNavigation.js")).openReadyGameMenu("memory-match");
       if (getEffectRegistry().diagnostics().connection !== 0) throw new Error("stale connection handle");
     }
     const surface = document.querySelector("#link-path-overlay");

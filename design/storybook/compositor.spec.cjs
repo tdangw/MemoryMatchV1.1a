@@ -14,6 +14,7 @@ async function boot(page) {
     throw error;
   }
   await page.evaluate(async () => {
+    await (await import('/js/uiSkin.js')).selectUiSkin('storybook');
     await (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('link-connect');
     window.storybookRenderer = await import('/js/storybook/presentation.js');
     const manifest = await (await fetch('/docs/design/achievements/art-kit-v1/manifest.json')).json();

@@ -22,10 +22,16 @@ function picture(url, className, label = '') {
 export function createCosmeticPortrait({ avatar, frame, badge, label = 'Ảnh đại diện' }) {
   const root = element('span', 'storybook-portrait');
   root.setAttribute('role', 'img'); root.setAttribute('aria-label', label);
-  if (avatar) root.append(picture(avatar, 'storybook-portrait__avatar'));
+  if (avatar) {
+    const image = picture(avatar, 'storybook-portrait__avatar');
+    image.addEventListener('error', () => { image.remove(); root.prepend(createIcon('account')); }, { once: true });
+    root.append(image);
+  }
   else root.append(createIcon('account'));
-  if (frame) root.append(picture(frame, 'storybook-portrait__frame'));
-  if (badge) root.append(picture(badge, 'storybook-portrait__badge'));
+  for (const [slot, url] of [['frame', frame], ['badge', badge]]) if (url) {
+    const image = picture(url, `storybook-portrait__${slot}`);
+    image.addEventListener('error', () => image.remove(), { once: true }); root.append(image);
+  }
   return root;
 }
 
@@ -87,7 +93,7 @@ export function openCosmeticCustomization({ playerName, items, equipped, onSave,
       button.setAttribute('aria-pressed', String(draft[category] === item.id));
       if (item.type === 'frame') button.append(createCosmeticPortrait({ avatar: selected('avatar'), frame: item.image }));
       else button.append(picture(item.image, 'storybook-item__image'));
-      button.append(element('strong', 'storybook-item__name', item.name), element('small', 'storybook-item__source', item.gameName));
+      button.append(element('strong', 'storybook-item__name', item.name), element('small', 'storybook-item__source', Number.isSafeInteger(item.level) ? `${item.gameName} · Màn ${item.level}` : item.gameName));
       if (!item.owned) button.append(createIcon('lock'));
       else if (draft[category] === item.id) button.append(createIcon('check'));
       return button;
@@ -125,6 +131,7 @@ export function openCosmeticCustomization({ playerName, items, equipped, onSave,
       return undefined;
     } }],
   });
+  modal.panel.focus({ preventScroll: true }); clearTooltip();
   return modal;
 }
 

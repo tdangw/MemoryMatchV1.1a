@@ -640,7 +640,7 @@ function renderAppearanceGroup(grid, title, type, items, roundId, modal) {
     } else {
       const preview = document.createElement("div");
       preview.className = "appearance-effect-preview";
-      preview.textContent = "A";
+      preview.append(createIcon('images'));
       preview.classList.add(item.animationClass);
       card.append(preview);
     }

@@ -112,7 +112,9 @@ test("switch during preview, loot, coin, tooltip and closing modal cancels old w
   const errors = [];
   page.on("pageerror", error => errors.push(error.message));
   await start(page, "memory-match");
+  await page.locator("#btn-hint").dispatchEvent("pointerover", { pointerType: "mouse" });
   await page.evaluate(async () => {
+    const { openGameMenu } = await import('/js/gameSelector.js');
     window.staleCalls = 0;
     const source = document.querySelector(".tile");
     const target = document.querySelector("#memory-game-coins");
@@ -120,8 +122,9 @@ test("switch during preview, loot, coin, tooltip and closing modal cancels old w
     (await import("/js/lootEffects.js")).playLootDrop(source, { target, onCollected: () => window.staleCalls++ });
     const modal = (await import("/js/modal.js")).openAppModal({ id: "lifecycle-modal", title: "Test", onClose: () => window.staleCalls++ });
     modal.close();
+    // Interrupt in this task, before the legitimate close deadline can elapse.
+    openGameMenu('link-connect');
   });
-  await page.locator("#btn-hint").dispatchEvent("pointerover", { pointerType: "mouse" });
   await start(page, "link-connect");
   await expect(page.locator("#lifecycle-modal, .game-loot-drop, .game-coin-reward-flight, .game-coin-gain-label")).toHaveCount(0);
   await expect(page.locator("#app-tooltip")).toBeHidden();

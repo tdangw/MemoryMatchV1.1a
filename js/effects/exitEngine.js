@@ -15,6 +15,8 @@ const TRIANGLE_PALETTE = Object.freeze(["#76e7ff", "#8f7dff", "#66c9f5", "#b391f
 // the renderer prevents a new visual from being implemented but omitted from
 // the runtime gate (which would otherwise fall back to the base CSS exit).
 const CANVAS_EXIT_EFFECTS = Object.freeze({
+  'link-effect-moon-petals': Object.freeze({ needsSourceImage: false, particles: 4, duration: 260 }),
+  'triple-effect-crystal-bloom': Object.freeze({ needsSourceImage: false, particles: 3, duration: 240 }),
   finedust: Object.freeze({ needsSourceImage: true }),
   split2: Object.freeze({ needsSourceImage: true }),
   split4: Object.freeze({ needsSourceImage: true }),
@@ -39,6 +41,11 @@ export function playCanvasExit({ frame, tiles, exitId, quality, diagnostics } = 
   // One bounded canvas/RAF can finish several rapid matches together. At the
   // cap the caller retains its CSS exit instead of cancelling another pair.
   if (exitBatches.length >= MAX_EXIT_BATCHES) return false;
+  if (effect.particles) {
+    let live = 0;
+    for (const batch of exitBatches) if (CANVAS_EXIT_EFFECTS[batch.exitId].particles) for (const card of batch.cards) live += card.fragments.length;
+    if (live + tiles.length * effect.particles > 24) return false;
+  }
   const rect = frame.getBoundingClientRect();
   const cards = tiles.flatMap(tile => {
     const image = tile.querySelector("img:not(.link-tile__frost-overlay)");
@@ -46,11 +53,11 @@ export function playCanvasExit({ frame, tiles, exitId, quality, diagnostics } = 
     const tileRect = tile.getBoundingClientRect();
     tile.classList.add("has-canvas-exit");
     const bounds = { x: tileRect.left - rect.left, y: tileRect.top - rect.top, width: tileRect.width, height: tileRect.height };
-    return [{ image, bounds, pull: exitVector(tile), timing: timing(tile) }];
+    return [{ image, bounds, pull: exitVector(tile), timing: effect.duration ? { delayMs: 0, durationMs: effect.duration } : timing(tile) }];
   });
   if (!cards.length) return false;
   const surface = ensureCanvas(frame, rect);
-  if (!surface.context) return false;
+  if (!surface.context) { tiles.forEach(tile => tile.classList.remove('has-canvas-exit')); clearCanvasExit(); return false; }
   if (!entry) entry = trackEffect("canvas", () => {
     if (frameId) cancelShellFrame(frameId);
     frameId = null;
@@ -115,6 +122,11 @@ function exitVector(tile) {
   };
 }
 function fragments(bounds, exitId, budget) {
+  const reward = CANVAS_EXIT_EFFECTS[exitId];
+  if (reward?.particles) return Array.from({ length: reward.particles }, (_, index) => ({
+    x: bounds.x + bounds.width * (.25 + index % 2 * .5), y: bounds.y + bounds.height * (.3 + Math.floor(index / 2) * .4),
+    dx: index % 2 ? 12 : -12, dy: -12 + index * 5, rotation: index * 1.4,
+  }));
   const random = range => (Math.random() * 2 - 1) * range;
   if (exitId === "triangles") return triangleFragments(bounds, random);
   if (exitId === "blackhole") return blackHoleParticles(bounds, budget, random);
@@ -226,13 +238,27 @@ function bubbleParticles(bounds, budget, random) {
 }
 function drawCard(ctx, card, exitId, progress) {
   ctx.save();
-  if (exitId === "finedust") drawFineDust(ctx, card, progress);
+  if (CANVAS_EXIT_EFFECTS[exitId]?.particles) drawAchievementFragments(ctx, card.fragments, progress, exitId === 'link-effect-moon-petals');
+  else if (exitId === "finedust") drawFineDust(ctx, card, progress);
   else if (exitId === "blackhole") drawBlackHole(ctx, card, progress);
   else if (exitId === "portal") drawPortal(ctx, card, progress);
   else if (exitId === "bubble") drawBubble(ctx, card, progress);
   else if (exitId === "triangles") drawTriangles(ctx, card.fragments, progress);
   else for (let index = 0; index < card.fragments.length; index += 1) drawFragment(ctx, card.image, card.fragments[index], progress);
   ctx.restore();
+}
+
+function drawAchievementFragments(ctx, pieces, progress, petals) {
+  const move = Math.max(0, (progress - .15) / .85);
+  ctx.globalAlpha = 1 - move; ctx.fillStyle = petals ? '#f5b0d3' : '#7bdef2';
+  for (let index = 0; index < pieces.length; index++) {
+    const piece = pieces[index]; ctx.save();
+    ctx.translate(piece.x + piece.dx * move, piece.y + piece.dy * move); ctx.rotate(piece.rotation + move);
+    ctx.beginPath(); ctx.moveTo(0, -7);
+    if (petals) { ctx.quadraticCurveTo(8, -2, 0, 7); ctx.quadraticCurveTo(-8, -2, 0, -7); }
+    else { ctx.lineTo(5, 0); ctx.lineTo(0, 7); ctx.lineTo(-5, 0); ctx.closePath(); }
+    ctx.fill(); ctx.restore();
+  }
 }
 
 function drawTriangles(ctx, fragments, progress) {

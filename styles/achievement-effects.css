@@ -1,0 +1,20 @@
+.achievement-effect-cover { display: grid; place-items: center; width: 100%; min-height: 88px; }
+.achievement-effect-cover img { width: 88px; height: 88px; object-fit: contain; }
+.achievement-effect-cover__source { text-align: center; font-size: 12px; line-height: 1.3; }
+.appear-storybook-moon { animation: achievement-moon-reveal 260ms ease-out both; }
+.appear-storybook-petals { animation: achievement-petal-reveal 300ms ease-out both; }
+.achievement-flip-particles { position: absolute; inset: -12px; width: calc(100% + 24px); height: calc(100% + 24px); pointer-events: none; z-index: 3; animation: achievement-particle-resolve 300ms ease-out both; }
+@keyframes achievement-moon-reveal { 0% { opacity: .3; transform: perspective(400px) rotateY(75deg) scale(.94); } 70% { opacity: 1; transform: perspective(400px) rotateY(-8deg) scale(1); } 100% { transform: none; } }
+@keyframes achievement-petal-reveal { 0% { opacity: .3; transform: rotateY(70deg) scale(.92); } 65% { opacity: 1; transform: rotateY(-6deg) scale(1.03); } 100% { transform: none; } }
+@keyframes achievement-particle-resolve { 0%, 12% { opacity: 0; transform: scale(.8); } 40% { opacity: 1; } 100% { opacity: 0; transform: translateY(8px) scale(1.08); } }
+.link-path-overlay--link-effect-meteor-route { --link-path-color: #9feaff; --link-path-glow: #dbcfff; }
+.link-path-overlay--triple-effect-triad-converge { --link-path-color: #78e4d5; --link-path-glow: #e5cd85; }
+.link-path-overlay--link-effect-meteor-route .link-path-overlay__beam { stroke: #b4ebff; }
+.link-path-overlay--triple-effect-triad-converge .link-path-overlay__beam { stroke: #83e5cd; }
+.effect-v2-connection__route-traveler--link-effect-meteor-route { fill: #fff1bb; }
+.effect-v2-connection__decoration--link-effect-meteor-route { fill: #cbefff; }
+.effect-v2-connection__decoration--triple-effect-triad-converge { fill: #ffe3a0; }
+@media (prefers-reduced-motion: reduce) {
+  .appear-storybook-moon, .appear-storybook-petals { animation: none; }
+  .achievement-flip-particles { display: none; }
+}

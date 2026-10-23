@@ -57,6 +57,7 @@ let comboExpiryTimer;
 let lastMatchAt = 0;
 let pausedComboRemainingMs = null;
 const REVEAL_ANIMATION_CLASSES = [
+  'appear-storybook-moon', 'appear-storybook-petals',
   "appear-bounce",
   "appear-fade-scale",
   "appear-pop",

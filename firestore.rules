@@ -108,6 +108,22 @@ service cloud.firestore {
       allow update: if knownSpace(space) && owner(uid) && validEntry(request.resource.data, board) && betterEntry(request.resource.data, resource.data);
       allow delete: if false;
     }
+    // BEGIN generated public cosmetic contract
+    function validPublicCosmetics(data) {
+      return data.keys().hasOnly(['version', 'avatar', 'frame', 'badge', 'updatedAt'])
+        && data.keys().hasAll(['version', 'avatar', 'frame', 'badge', 'updatedAt'])
+        && data.version == 1 && data.updatedAt == request.time
+        && (data.avatar == null || data.avatar in ['memory-avatar-sapphire-owl', 'memory-avatar-cherry-rabbit', 'memory-avatar-stellar-cat', 'link-avatar-autumn-fox', 'link-avatar-moonfox', 'link-avatar-galaxy-deer', 'triple-avatar-jade-dragon', 'triple-avatar-blue-panda', 'triple-avatar-sunset-dragon'])
+        && (data.frame == null || data.frame in ['memory-frame-golden-laurel', 'memory-frame-cherry-blossom', 'memory-frame-sky-feather', 'link-frame-moonblossom', 'link-frame-silver-moon', 'link-frame-stellar-orbit', 'triple-frame-tri-crystal', 'triple-frame-prism', 'triple-frame-emerald'])
+        && (data.badge == null || data.badge in ['memory-badge-wisdom', 'memory-badge-memory-master', 'link-badge-link-master', 'link-badge-golden-bond', 'triple-badge-crystal-triad', 'triple-badge-triad-master']);
+    }
+    match /gamespaces/{space}/publicCosmetics/{uid} {
+      allow get: if knownSpace(space);
+      allow list: if knownSpace(space) && request.query.limit != null && request.query.limit <= 20;
+      allow create, update: if knownSpace(space) && owner(uid) && validPublicCosmetics(request.resource.data);
+      allow delete: if false;
+    }
+    // END generated public cosmetic contract
     match /{document=**} { allow read, write: if false; }
   }
 }

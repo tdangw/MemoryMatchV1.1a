@@ -1,8 +1,10 @@
-import { getGameProgressKey } from './gameCatalog.js';
 // Mainmenu.js
+import { getGameProgressKey } from './gameCatalog.js';
+import { canLaunchGame } from './profileOperations.js';
 import { createGameShellLifecycle } from "./gameShell/gameShellLifecycle.js";
 import { mountAdventureMap, getViewedAdventureBlock } from "./adventureMap.js";
 import { renderMasteryCollection } from './progression/masteryCollection.js';
+import { decorateAchievementEffectPreview } from './progression/achievementEffectPreview.js';
 
 import { syncDefaultMusic } from "./sound.js";
 import { gameState, resetGame } from "./gameState.js";
@@ -25,7 +27,7 @@ import {
   getOwnedThemeIds,
 } from "./appearance.js";
 import { LINK_EXIT_EFFECTS, LINK_PATH_EFFECTS } from "./linkConnect/linkEffects.js";
-import { equipTripleEffect, equipTripleTheme } from "./tripleConnect/tripleTransactions.js";
+import { equipTripleTheme } from "./tripleConnect/tripleTransactions.js";
 import {
   GAME_MODES,
   getGameModeLabel,
@@ -189,6 +191,8 @@ export async function showCollectionModal({
   const content = document.createElement("div");
   content.className = "collection-content";
   const collectionScope = createGameShellLifecycle();
+  const collectionProfile = gameState.progress[getGameProgressKey(gameId)];
+  const isCollectionCurrent = () => collectionScope.active && canLaunchGame() && gameState.progress[getGameProgressKey(gameId)] === collectionProfile;
   const collectionBlock = fromGame ? undefined : getViewedAdventureBlock(gameId);
   const modal = openAppModal({
     ...surface,
@@ -205,12 +209,6 @@ export async function showCollectionModal({
     },
   });
 
-  const collectionProfile = gameState.progress[getGameProgressKey(gameId)];
-  async function playCollectionLevel(target) {
-    const [selector,map]=await Promise.all([import('./gameSelector.js'),import('./adventureMap.js')]);
-    if (!collectionScope.active || gameState.progress[getGameProgressKey(gameId)] !== collectionProfile) return;
-    modal.destroy(); selector.openGameMenu(gameId); map.previewAdventureLevel(gameId,target);
-  }
   const tabs = document.createElement("div");
   tabs.className = "shop-tabs";
   tabs.setAttribute("role", "tablist");
@@ -226,6 +224,7 @@ export async function showCollectionModal({
       "Mặt lưng thẻ",
       "cardBack",
       CARD_BACKS,
+      isCollectionCurrent,
     );
   };
   const renderFlipEffects = () => {
@@ -236,6 +235,7 @@ export async function showCollectionModal({
       "Hiệu ứng lật",
       "flipEffect",
       FLIP_EFFECTS,
+      isCollectionCurrent,
     );
   };
   const renderThemes = () => {
@@ -314,7 +314,7 @@ export async function showCollectionModal({
           card.className = `appearance-choice${equipped ? " is-equipped" : ""}`;
           const preview = document.createElement("div");
           preview.className = `link-effect-preview ${item.className}`;
-          preview.append(createIcon(item.icon));
+          if (!decorateAchievementEffectPreview(preview, item)) preview.append(createIcon(item.icon));
           const name = document.createElement("strong");
           name.textContent = item.title;
           const button = document.createElement("button");
@@ -328,8 +328,11 @@ export async function showCollectionModal({
             button.classList.add("appearance-action--equip");
             button.textContent = "Trang bị";
             button.onclick = async () => {
-              gameState.appearance[equippedKey] = item.id;
-              (await saveAppearance(gameState.appearance));
+              button.disabled = true;
+              if (!await saveAppearance({ ...gameState.appearance, [equippedKey]: item.id }, { isCurrent: () => isCollectionCurrent() && button.isConnected })) {
+                button.disabled = false; showAppToast('Chưa lưu được hiệu ứng. Hãy thử lại.', { tone: 'error' }); return;
+              }
+              if (!collectionScope.active || !button.isConnected) return;
               renderLinkEffects(title, equippedKey, ownedKey, effects);
               showAppToast(`Đã trang bị ${item.title}.`, { tone: "info" });
             };
@@ -341,7 +344,7 @@ export async function showCollectionModal({
       grid.append(group);
     };
     (await mountCatalogTabs({ gameId, surface: "collection", tablist: tabs, panel: grid, tabs: [
-      { id: "pictures", label: "Tranh", render: () => renderMasteryCollection(grid, gameId, { block: collectionBlock, owner: collectionScope, onPlay: playCollectionLevel }) },
+      { id: "pictures", label: "Thành tích", render: () => renderMasteryCollection(grid, gameId, { block: collectionBlock, owner: collectionScope }) },
       { id: "themes", label: "Chủ đề", render: renderThemes },
       { id: "path", label: "Đường nối", render: () => renderLinkEffects("Hiệu ứng đường nối", "linkPathEffect", "ownedLinkPathEffects", LINK_PATH_EFFECTS) },
       { id: "exit", label: "Xóa thẻ", render: () => renderLinkEffects("Hiệu ứng xóa thẻ", "linkExitEffect", "ownedLinkExitEffects", LINK_EXIT_EFFECTS) },
@@ -362,7 +365,7 @@ export async function showCollectionModal({
         card.className = `appearance-choice${equipped ? " is-equipped" : ""}`;
         const preview = document.createElement("div");
         preview.className = `link-effect-preview ${item.className}`;
-        preview.append(createIcon(item.icon));
+        if (!decorateAchievementEffectPreview(preview, item)) preview.append(createIcon(item.icon));
         const name = document.createElement("strong");
         name.textContent = item.title;
         const button = document.createElement("button");
@@ -376,10 +379,13 @@ export async function showCollectionModal({
           button.classList.add("appearance-action--equip");
           button.textContent = "Trang bị";
           button.onclick = async () => {
-            if (!(await equipTripleEffect(kind, item.id))) {
+            button.disabled = true;
+            if (!(await saveAppearance({ ...gameState.appearance, [equippedKey]: item.id }, { isCurrent: () => isCollectionCurrent() && button.isConnected }))) {
+              button.disabled = false;
               showAppToast("Không thể lưu thay đổi hiệu ứng.", { tone: "error" });
               return;
             }
+            if (!collectionScope.active || !button.isConnected) return;
             renderTripleEffects(title, kind, ownedKey, equippedKey, effects);
             showAppToast(`Đã trang bị ${item.title}.`, { tone: "info" });
           };
@@ -391,14 +397,14 @@ export async function showCollectionModal({
       grid.append(group);
     };
     (await mountCatalogTabs({ gameId, surface: "collection", tablist: tabs, panel: grid, tabs: [
-      { id: "pictures", label: "Tranh", render: () => renderMasteryCollection(grid, gameId, { block: collectionBlock, owner: collectionScope, onPlay: playCollectionLevel }) },
+      { id: "pictures", label: "Thành tích", render: () => renderMasteryCollection(grid, gameId, { block: collectionBlock, owner: collectionScope }) },
       { id: "themes", label: "Chủ đề", render: renderThemes },
       { id: "path", label: "Đường nối", render: () => renderTripleEffects("Hiệu ứng đường nối", "path", "ownedTriplePathEffects", "triplePathEffect", LINK_PATH_EFFECTS) },
       { id: "exit", label: "Xóa thẻ", render: () => renderTripleEffects("Hiệu ứng xóa thẻ", "exit", "ownedTripleExitEffects", "tripleExitEffect", LINK_EXIT_EFFECTS) },
     ] }));
   } else {
     (await mountCatalogTabs({ gameId, surface: "collection", tablist: tabs, panel: grid, tabs: [
-      { id: "pictures", label: "Tranh", render: () => renderMasteryCollection(grid, gameId, { block: collectionBlock, owner: collectionScope, onPlay: playCollectionLevel }) },
+      { id: "pictures", label: "Thành tích", render: () => renderMasteryCollection(grid, gameId, { block: collectionBlock, owner: collectionScope }) },
       { id: "appearance", label: "Ngoại hình", render: renderAppearance },
       { id: "flip", label: "Hiệu ứng lật", render: renderFlipEffects },
       { id: "themes", label: "Chủ đề", render: renderThemes },
@@ -407,7 +413,7 @@ export async function showCollectionModal({
   return modal;
 }
 
-function renderCollectionAppearanceGroup(grid, title, type, items) {
+function renderCollectionAppearanceGroup(grid, title, type, items, isCurrent = () => grid.isConnected) {
   const ownedKey = type === "cardBack" ? "ownedCardBacks" : "ownedFlipEffects";
   const group = document.createElement("section");
   group.className = "appearance-group";
@@ -426,7 +432,7 @@ function renderCollectionAppearanceGroup(grid, title, type, items) {
         preview.className = `appearance-preview ${item.previewClass}`;
       else {
         preview.className = `appearance-effect-preview ${item.animationClass}`;
-        preview.textContent = "A";
+        if (!decorateAchievementEffectPreview(preview, item)) preview.append(createIcon('images'));
       }
       preview.setAttribute("aria-hidden", "true");
       const name = document.createElement("strong");
@@ -442,10 +448,9 @@ function renderCollectionAppearanceGroup(grid, title, type, items) {
         button.classList.add("appearance-action--equip");
         button.textContent = "Trang bị";
         button.onclick = async () => {
-          const previousId = gameState.appearance[type];
-          gameState.appearance[type] = item.id;
-          if (!(await saveAppearance(gameState.appearance))) {
-            gameState.appearance[type] = previousId;
+          button.disabled = true;
+          if (!(await saveAppearance({ ...gameState.appearance, [type]: item.id }, { isCurrent: () => isCurrent() && button.isConnected }))) {
+            button.disabled = false;
             showAppToast("Không thể lưu thay đổi ngoại hình.", { tone: "error" });
             return;
           }
@@ -456,6 +461,7 @@ function renderCollectionAppearanceGroup(grid, title, type, items) {
             type === "cardBack" ? "Mặt lưng thẻ" : "Hiệu ứng lật",
             type,
             type === "cardBack" ? CARD_BACKS : FLIP_EFFECTS,
+            isCurrent,
           );
         };
       }
