@@ -8,6 +8,7 @@ import { getAppPageScope } from "./appPageLifecycle.js";
 import { ensureUiSkinRewards } from './uiSkin.js';
 import { dismissContextGuide } from './tutorial/contextGuide.js';
 import { getGameDefinition } from './gameCatalog.js';
+import { decorateStorybookSurface } from './storybook/surface.js';
 import { TUTORIAL_GAMES } from './tutorial/tutorialModel.js';
 
 const modals = new Map();
@@ -172,6 +173,7 @@ export function openAppModal({
     panel.appendChild(footer);
   }
 
+  decorateStorybookSurface(panel, document.documentElement.dataset.uiSkin === 'storybook');
   overlay.appendChild(panel);
   host.appendChild(overlay);
   if (!screen) connectDialogPlacement(overlay, panel, lifecycle);

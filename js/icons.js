@@ -87,8 +87,14 @@ export function createIcon(name) {
   svg.setAttribute("viewBox", "0 0 24 24");
   svg.setAttribute("aria-hidden", "true");
   svg.setAttribute("focusable", "false");
+  renderIconArtwork(svg, name);
+  return svg;
+}
+
+function renderIconArtwork(svg, name) {
   const fallbackName = ICON_FALLBACK_NAMES[name] || name;
-  const artwork = ILLUSTRATED_ICONS.has(name) ? UI_ART_ICONS[name] : null;
+  const artwork = ILLUSTRATED_ICONS.has(name) || document.documentElement.dataset.uiSkin === 'storybook' ? UI_ART_ICONS[name] : null;
+  svg.replaceChildren(); delete svg.dataset.uiArt;
   if (artwork) {
     const image = document.createElementNS(SVG_NS, 'image');
     image.setAttribute('href', `${import.meta.env?.BASE_URL || '/'}${artwork.replace(/^\//, '')}`);
@@ -101,7 +107,13 @@ export function createIcon(name) {
     svg.dataset.uiArt = name;
     svg.append(image);
   } else svg.innerHTML = ICON_PATHS[fallbackName] || ICON_PATHS.info;
-  return svg;
+}
+
+export function refreshUiIconArtwork(root = document) {
+  for (const svg of root.querySelectorAll('svg.ui-icon')) {
+    const className = [...svg.classList].find(value => value.startsWith('ui-icon--'));
+    if (className) renderIconArtwork(svg, className.slice('ui-icon--'.length));
+  }
 }
 
 export function decorateIcons(root = document) {

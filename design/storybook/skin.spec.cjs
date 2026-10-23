@@ -3,6 +3,12 @@ async function ready(page) { await page.goto('/'); await expect(page.locator('.g
 const choose = (page, skin) => page.evaluate(async skin => (await import('/js/uiSkin.js')).selectUiSkin(skin), skin);
 test('S1 five selections, durable reload, default release', async ({ page }) => {
   await ready(page);
+  await page.evaluate(async () => { (await import('/js/settings.js')).showSettingsPanel(false); });
+  await expect(page.locator('[data-ui-skin-choice]')).toHaveCount(5);
+  await page.locator('[data-ui-skin-choice="storybook"]').click();
+  await expect(page.locator('html')).toHaveAttribute('data-ui-skin', 'storybook');
+  await page.locator('#settings-modal .app-modal__close').click();
+  await expect(page.locator('#settings-modal')).toHaveCount(0);
   for (const skin of ['woodland', 'papercut', 'starship', 'storybook', 'default', 'storybook']) {
     expect((await choose(page, skin)).status).toBe('applied'); await expect(page.locator('html')).toHaveAttribute('data-ui-skin', skin);
   }

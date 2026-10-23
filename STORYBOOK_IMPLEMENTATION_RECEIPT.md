@@ -47,7 +47,7 @@ không phải bằng chứng runtime hoặc FPS.
 | D1 | PASS — inventory/contracts, chưa duyệt mỹ thuật D2 |
 | D2 | PASS — chủ dự án duyệt cả ba bản ghép ngày 23/10/2026 |
 | S1 | PASS — registry/loader, 8 unit + 3 browser |
-| S2 | Đang áp chrome toàn ứng dụng |
+| S2 | PASS — chrome dùng owner hiện hữu, browser S1/S2 16/16 |
 | F1–F3 | Chưa triển khai grant/queue/cosmetics |
 | Q1 | Chưa nghiệm thu sản phẩm |
 
@@ -159,3 +159,24 @@ PASS `node --test tests/unit/ui-skin.test.js design/storybook/skin.test.mjs`
 preference để retry, default giải phóng cache, 20 lựa chọn nhanh không
 commit stale owner. Asset/contract validator PASS. Chưa đổi geometry game,
 save format hoặc điểm/xếp hạng. S1 pass và tự chuyển S2.
+
+## S2 — phủ presentation toàn ứng dụng
+
+`ui-skin-storybook.css` và decorator gắn vào modal owner hiện hữu, cập nhật
+cả panel đang mở khi đổi skin và gỡ khi đổi về skin cũ. Không observer,
+timer hay skin state thứ hai. Home/dock/header/HUD/board/tray, shop/card/tab,
+settings/input, toast/tooltip/tutorial, pause/result và popup dùng material
+cùng art đã duyệt; icon chức năng lấy art hiện hữu cùng nghĩa và SVG fallback.
+Giữ node SVG ngoài để không làm mất ref của HUD; chỉ đổi children ở sự kiện
+đổi skin, không mỗi frame. Một panel chỉ có một decoration subtree.
+
+Đã thêm lựa chọn Cổ tích thực trong Cài đặt (không chỉ gọi API test).
+Sửa header pause để Cài đặt và Đóng có hitbox riêng; nguồn font CSS runtime
+dùng URL public đúng, không tham chiếu `/public/` hoặc source docs.
+
+Browser cuối S1/S2 **16/16 PASS**, gồm ba game × bốn viewport, đổi đủ năm
+skin khi pause, cùng board DOM/kích thước trước/sau, modal/close trong
+viewport, chọn Cổ tích bằng nút thật, shop/collection/settings/profile và
+fallback icon khi asset fail. Xem ảnh reference Memory và landscape Triple;
+CSS ownership + cú pháp PASS. Không đổi luật, persistence, card faces,
+path hoặc timeline gameplay. Tự chuyển F1, chưa nghiệm thu feature grant.

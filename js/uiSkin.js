@@ -4,6 +4,8 @@ import { canLaunchGame } from './profileOperations.js';
 import { createUiSkinController, normalizeUiSkin } from './uiSkinController.js';
 import { getUiSkinPack, uiSkinAssetUrl } from './uiSkinRegistry.js';
 import { decorateTreasureSkin, clearTreasureSkins } from './progression/treasureSkin.js';
+import { decorateStorybookSurface } from './storybook/surface.js';
+import { refreshUiIconArtwork } from './icons.js';
 
 const decoded = new Map();
 let rewardLoad = null, rewardAbort = null, revision = 0;
@@ -85,6 +87,8 @@ const controller = createUiSkinController({
   apply: skin => {
     clearRewards(); currentSkin = skin;
     document.documentElement.dataset.uiSkin = skin;
+    document.querySelectorAll('.app-modal').forEach(panel => decorateStorybookSurface(panel, skin === 'storybook'));
+    refreshUiIconArtwork();
     retainSkins(skin);
   },
 });

@@ -1,6 +1,7 @@
 import { openAppModal } from '../modal.js';
 import { createIcon } from '../icons.js';
 import { clearTooltip } from '../tooltips.js';
+import { decorateStorybookSurface } from './surface.js';
 import { createGameShellLifecycle } from '../gameShell/gameShellLifecycle.js';
 import '../../styles/storybook-presentation.css';
 
@@ -47,11 +48,9 @@ export function createAchievementNoticeContent({ gameName, level, name, category
 /** Shared owner remains openAppModal, including focus, busy state and placement. */
 export function openStorybookModal({ kind, ...options }) {
   const modal = openAppModal({ ...options, alignment: 'center' });
-  modal.panel.classList.add('storybook-surface');
+  decorateStorybookSurface(modal.panel, true);
   modal.panel.dataset.storybookComponent = kind;
   modal.panel.setAttribute('aria-label', options.title);
-  const leaves = element('div', 'storybook-corner-leaves');
-  leaves.setAttribute('aria-hidden', 'true'); modal.panel.prepend(leaves);
   modal.panel.focus({ preventScroll: true });
   // Dismiss the previous control's singleton tooltip at the surface boundary.
   clearTooltip();
@@ -118,7 +117,7 @@ export function openCosmeticCustomization({ playerName, items, equipped, onSave,
     draft[category] = item.id; render();
   });
   render();
-  modal = openStorybookModal({ kind: 'profile-customization', id: 'profile-customization-modal',
+  modal = openAppModal({ id: 'profile-customization-modal', alignment: 'center',
     title: 'Trang trí hồ sơ', content, owner, onDestroy: () => scope.dispose(),
     actions: [{ label: 'Lưu thay đổi', variant: 'primary', onClick: async () => {
       error.textContent = '';

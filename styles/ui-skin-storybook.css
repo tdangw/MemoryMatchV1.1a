@@ -1,0 +1,83 @@
+@import './storybook-presentation.css';
+
+html[data-ui-skin='storybook'] {
+  --ui-surface: #f6e5bf; --ui-inset: #ead3a6; --ui-raised: #f2ddb0; --ui-ink: #4b2916;
+  --ui-muted: #755231; --ui-gold: #775020; --ui-line: #b38a50; --ui-focus: #236d9b;
+  --ui-primary: #387c24; --ui-primary-hover: #478f30; --ui-danger: #983d29; --ui-danger-ink: #fff2d0;
+  --dialog-surface: var(--ui-surface); --dialog-night-surface: var(--ui-surface); --dialog-night-inset: #f4dfb5;
+  --dialog-night-value: #f9eac9; --dialog-ink: var(--ui-ink); --dialog-muted: var(--ui-muted); --dialog-gold: var(--ui-gold); --dialog-line: var(--ui-line);
+  --tab-surface: var(--ui-surface); --tab-ink: var(--ui-ink); --tab-muted: var(--ui-muted); --tab-gold: var(--ui-gold); --tab-line: var(--ui-line);
+  --unified-hud-surface: #754623; --unified-hud-label: #f1d495; --unified-hud-value: #fff2ce;
+  --unified-hud-divider: #d4a85b66; --unified-hud-button-surface: #eacb8e; --unified-hud-tools-surface: #f6e5bf;
+  --unified-hud-timer-warning: #ffe3a0;
+  font-family: 'Storybook Nunito', sans-serif;
+}
+html[data-ui-skin='storybook'] :is(button, input, select, .tab-section-title, .shop-section-title) { font-family: 'Storybook Nunito', sans-serif; }
+html[data-ui-skin='storybook'] :is(.adventure-header, .game-shell-root .game-hud, .adventure-dock) {
+  background: url('/assets/ui/storybook/panel.webp') center 0 / 760px 1007px no-repeat #754623;
+  color: #fff1c9; border-color: #d4a45e;
+}
+html[data-ui-skin='storybook'] :is(.adventure-header, .adventure-dock) :is(button, .game-title, .adventure-map-title) { color: #fff1c9; }
+html[data-ui-skin='storybook'] :is(.tab-card, .theme-choice, .appearance-choice, .shop-item, .difficulty-option, .treasure-card) {
+  background: url('/assets/ui/storybook/panel.webp') center / 760px 1007px no-repeat;
+  color: var(--ui-ink); border-color: #bd9356; box-shadow: 0 2px 4px #5a341c26;
+}
+html[data-ui-skin='storybook'] :is(.tab-button, .shop-buy-button, .game-selector__play, .adventure-play-button, .game-menu-action) {
+  border: 0 solid transparent; border-image: url('/assets/ui/storybook/orange.webp') 0 173 fill / 0 30px / 0 stretch;
+  background: transparent; color: #fff5d9; text-shadow: 0 1px 2px #643810; box-shadow: none;
+}
+html[data-ui-skin='storybook'] :is(.appearance-action--equip, .tab-button--primary, .game-selector__play, .adventure-play-button) {
+  border-image-source: url('/assets/ui/storybook/green.webp');
+}
+html[data-ui-skin='storybook'] :is(.tab-button, .shop-buy-button, .game-selector__play):active:not(:disabled) { filter: brightness(.85); }
+html[data-ui-skin='storybook'] :is(.tab-button, .shop-buy-button):disabled { filter: grayscale(.8); color: #f9efd7; opacity: .75; }
+html[data-ui-skin='storybook'] :is(.shop-tab, .difficulty-mode, .skin-choice) { color: var(--ui-ink); background: #ead0a0; border-color: #b58a4a; }
+html[data-ui-skin='storybook'] :is(.shop-tab.is-active, .skin-choice[aria-pressed='true']) { color: #452616; background: #ffdf96; border-color: #ba812c; }
+html[data-ui-skin='storybook'] :is(input:not([type='range']):not([type='checkbox']), select) { color: #4b2916; background-color: #fff0cc; border-color: #b68c51; }
+html[data-ui-skin='storybook'] :is(input, select, button):focus-visible { outline-color: #236d9b; }
+html[data-ui-skin='storybook'] input[type='range'] { accent-color: #488633; }
+html[data-ui-skin='storybook'] :is(.slider, .difficulty-mode.is-selected) { border-color: #b58c4f; }
+html[data-ui-skin='storybook'] :is(.adventure-treasure-strip, .adventure-level-goal, .difficulty-theme, .treasure-reward-preview, .practice__instruction) {
+  background: #f2deb8; color: #4b2916; border-color: #b38a50;
+}
+html[data-ui-skin='storybook'] :is(.app-toast, .app-tooltip, .tutorial-guide, .progression-wave-notice) {
+  background: url('/assets/ui/storybook/panel.webp') center / 760px 1007px no-repeat;
+  color: #4b2916; border-color: #b38a50; text-shadow: none;
+}
+html[data-ui-skin='storybook'] :is(.tutorial-guide__text, .app-modal__note, .reward-subtitle) { color: #74502d; }
+html[data-ui-skin='storybook'] :is(#grid-container, .link-board, .triple-connect__board) {
+  border-image: url('/assets/ui/storybook/panel.webp') 151 114 / 4px / 0 stretch;
+}
+html[data-ui-skin='storybook'] .triple-connect__tray { background: #774722; border-color: #c79b54; }
+html[data-ui-skin='storybook'] .triple-connect__tray-slot:not(.is-locked) { background: #eed7a8; border-color: #bd955e; }
+html[data-ui-skin='storybook'] .app-screen-content .storybook-surface { width: min(620px, calc(100vw - 24px)); max-height: 100%; margin-inline: auto; }
+html[data-ui-skin='storybook'] :is(#account-modal, #settings-modal, #missions-screen, #events-screen, #rankings-modal, #shop-modal, #collection-modal) .app-modal__header {
+  background: transparent; border: 0; padding: 0 36px; text-shadow: none;
+}
+html[data-ui-skin='storybook'] :is(#account-modal, #settings-modal, #missions-screen, #events-screen) .app-modal__title { color: #fff2c6; }
+html[data-ui-skin='storybook'] #level-summary-modal .level-summary-modal {
+  background: transparent; border: 0; width: min(380px, calc(100vw - 24px)); color: #4b2916;
+}
+html[data-ui-skin='storybook'] #level-summary-modal .app-modal__body { padding: 0 2px; }
+html[data-ui-skin='storybook'] #level-summary-modal .level-summary__heading {
+  position: relative; isolation: isolate; height: 60px; margin-bottom: 10px; color: #fff0c5;
+  font-family: 'Storybook Nunito', sans-serif; font-weight: 900; text-shadow: 0 2px 1px #6b230e;
+}
+html[data-ui-skin='storybook'] #level-summary-modal .level-summary__heading::before {
+  content: ''; position: absolute; inset: 0 -16px; z-index: -1; pointer-events: none;
+  border-image: url('/assets/ui/storybook/ribbon.webp') 0 230 fill / 0 54px / 0 stretch;
+}
+html[data-ui-skin='storybook'] #level-summary-modal .level-summary__stat { min-height: 54px; border-color: #c59c61; background: #f6e5bf; }
+html[data-ui-skin='storybook'] #level-summary-modal .level-summary__stat :is(span, strong) { font-family: 'Storybook Nunito', sans-serif; text-shadow: none; color: #4b2916; }
+html[data-ui-skin='storybook'] #level-summary-modal .level-summary__stat strong { background: transparent; border: 0; }
+html[data-ui-skin='storybook'] #level-summary-modal .app-modal__footer { padding: 14px 0 0; }
+html[data-ui-skin='storybook'] #level-summary-modal .app-modal__footer .app-button { min-height: 56px; max-width: none; padding: 8px; font-size: 18px; }
+html[data-ui-skin='storybook'] #game-exit-modal .pause-settings { position: absolute; left: 0; top: 0; margin: 0; }
+@media (max-height: 500px) {
+  html[data-ui-skin='storybook'] #level-summary-modal .level-summary-modal { width: min(520px, calc(100vw - 24px)); }
+  html[data-ui-skin='storybook'] #level-summary-modal .level-summary__stat { min-height: 36px; }
+  html[data-ui-skin='storybook'] #level-summary-modal .app-modal__footer .app-button { min-height: 44px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-ui-skin='storybook'] :is(.tab-button, .shop-buy-button) { transition: none; }
+}

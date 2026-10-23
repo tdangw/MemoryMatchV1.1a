@@ -1,5 +1,5 @@
-@import '../design/storybook/packed/font.css';
-@import '../design/storybook/packed/geometry.css';
+@import '/assets/ui/storybook/font.css';
+@import '/assets/ui/storybook/geometry.css';
 
 /* D2 compositor is opt-in per modal. No existing skin is changed by this file. */
 .app-modal.storybook-surface {
@@ -18,7 +18,7 @@
 .app-modal.storybook-surface::before {
   content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
   border: 0 solid transparent;
-  border-image: url('../design/storybook/packed/panel.webp') var(--storybook-panel-slice) fill / 38px 29px / 0 stretch;
+  border-image: url('/assets/ui/storybook/panel.webp') var(--storybook-panel-slice) fill / 38px 29px / 0 stretch;
 }
 .app-modal.storybook-surface:focus { outline: none; }
 .storybook-surface .storybook-corner-leaves {
@@ -26,7 +26,7 @@
 }
 .storybook-corner-leaves::before, .storybook-corner-leaves::after {
   content: ''; position: absolute; width: 40px; height: 56px;
-  background: url('../design/storybook/packed/leaves.webp') center / contain no-repeat;
+  background: url('/assets/ui/storybook/leaves.webp') center / contain no-repeat;
 }
 .storybook-corner-leaves::before { left: -6px; transform: rotate(-22deg); }
 .storybook-corner-leaves::after { right: -6px; transform: scaleX(-1) rotate(-22deg); }
@@ -37,29 +37,29 @@
 }
 .storybook-surface .app-modal__header::before {
   content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
-  border-image: url('../design/storybook/packed/ribbon.webp') var(--storybook-ribbon-slice) fill / 0 60px / 0 stretch;
+  border-image: url('/assets/ui/storybook/ribbon.webp') var(--storybook-ribbon-slice) fill / 0 60px / 0 stretch;
 }
 .storybook-surface .app-modal__title {
   display: block; color: #fff2c6; text-align: center; font: 900 23px/1.15 'Storybook Nunito', sans-serif;
   text-shadow: 0 2px 1px #6b230e; padding-bottom: 6px; overflow-wrap: anywhere;
 }
 .storybook-surface .app-modal__title > .ui-icon { display: none; }
-.app-modal.storybook-surface[data-ui-surface] .app-modal__close {
+.app-modal.storybook-surface:is([role=dialog],[role=region]) .app-modal__close {
   position: absolute; right: 0; top: 0; width: 44px; min-width: 44px; height: 44px;
   border: 2px solid #e9bd64; border-radius: 50%; background: #805329; color: #fff3cd;
 }
-.app-modal.storybook-surface[data-ui-surface] > .app-modal__body { min-height: 0; padding: 0 2px; color: inherit; overscroll-behavior: contain; }
-.app-modal.storybook-surface[data-ui-surface] > .app-modal__footer {
+.app-modal.storybook-surface:is([role=dialog],[role=region]) > .app-modal__body { min-height: 0; padding: 0 2px; color: inherit; overscroll-behavior: contain; }
+.app-modal.storybook-surface:is([role=dialog],[role=region]) > .app-modal__footer {
   flex: 0 0 auto; padding: 14px 4px 0; border: 0; background: none; gap: 8px;
 }
-.app-modal.storybook-surface[data-ui-surface] .app-modal__footer .app-button {
+.app-modal.storybook-surface:is([role=dialog],[role=region]) .app-modal__footer .app-button {
   width: 100%; max-width: none; min-height: 56px; border: 0; border-radius: 28px; padding: 10px 24px; background: transparent;
-  border-image: url('../design/storybook/packed/orange.webp') var(--storybook-orange-slice) fill / 0 35px / 0 stretch;
+  border-image: url('/assets/ui/storybook/orange.webp') var(--storybook-orange-slice) fill / 0 35px / 0 stretch;
   color: #fff8de; font: 900 21px/1.2 'Storybook Nunito', sans-serif; text-shadow: 0 2px 1px #593511;
   box-shadow: none;
 }
-.app-modal.storybook-surface[data-ui-surface] .app-modal__footer .app-button--primary {
-  border-image-source: url('../design/storybook/packed/green.webp');
+.app-modal.storybook-surface:is([role=dialog],[role=region]) .app-modal__footer .app-button--primary {
+  border-image-source: url('/assets/ui/storybook/green.webp');
   border-image-slice: var(--storybook-green-slice) fill;
   border-image-width: 0 40px;
 }
