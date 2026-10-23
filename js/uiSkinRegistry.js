@@ -1,8 +1,9 @@
 import { UI_SKIN_ASSETS } from './uiSkinManifest.js';
 import { UI_STYLE_PACKS } from './uiStylePacks.generated.js';
+import { STORYBOOK_UI_PACK } from './storybook/skin.generated.js';
 const woodland = { id: 'woodland', name: 'Nâng cao', base: 'assets/ui/woodland/',
   assets: UI_SKIN_ASSETS.assets, bundles: UI_SKIN_ASSETS.bundles };
-export function getUiSkinPack(skin) { return skin === 'woodland' ? woodland : UI_STYLE_PACKS[skin]; }
+export function getUiSkinPack(skin) { return skin === 'storybook' ? STORYBOOK_UI_PACK : skin === 'woodland' ? woodland : UI_STYLE_PACKS[skin]; }
 export function getUiSkinAsset(skin, id) {
   const pack = getUiSkinPack(skin);
   if (!pack) return null;

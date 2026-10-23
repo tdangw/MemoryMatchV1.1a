@@ -10,7 +10,7 @@ const root = path.resolve(import.meta.dirname, '../design/storybook');
 const output = path.join(root, 'packed');
 await fs.mkdir(output, { recursive: true });
 const sha = bytes => crypto.createHash('sha256').update(bytes).digest('hex');
-const manifest = { version: 1, reviewOnly: true, goldenApproved: false, assets: {}, fonts: [], budgets: contract.budgets };
+const manifest = { version: 1, reviewOnly: !contract.review.goldenApproved, goldenApproved: contract.review.goldenApproved, assets: {}, fonts: [], budgets: contract.budgets };
 for (const name of ['panel', 'ribbon', 'green', 'orange', 'leaves']) {
   const source = await fs.readFile(path.join(root, 'masters', `${name}.png`));
   const { data, info } = await sharp(source).ensureAlpha().raw().toBuffer({ resolveWithObject: true });

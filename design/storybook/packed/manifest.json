@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "reviewOnly": true,
-  "goldenApproved": false,
+  "reviewOnly": false,
+  "goldenApproved": true,
   "assets": {
     "panel": {
       "file": "panel.webp",

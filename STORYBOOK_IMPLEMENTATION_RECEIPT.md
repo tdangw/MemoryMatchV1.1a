@@ -45,8 +45,9 @@ không phải bằng chứng runtime hoặc FPS.
 |---|---|
 | D0 | PASS — quyết định duyệt trong chat |
 | D1 | PASS — inventory/contracts, chưa duyệt mỹ thuật D2 |
-| D2 | Đã có bộ lõi và ba bản ghép thật; CHỜ DUYỆT golden trước rollout |
-| S1–S2 | Chưa rollout skin |
+| D2 | PASS — chủ dự án duyệt cả ba bản ghép ngày 23/10/2026 |
+| S1 | PASS — registry/loader, 8 unit + 3 browser |
+| S2 | Đang áp chrome toàn ứng dụng |
 | F1–F3 | Chưa triển khai grant/queue/cosmetics |
 | Q1 | Chưa nghiệm thu sản phẩm |
 
@@ -139,3 +140,22 @@ Mốc dừng bắt buộc: prompt yêu cầu “chốt golden rồi mới rollou
 S1–S2/F1–F3/Q1 vẫn thuộc task đã giao, không đánh dấu hoàn tất. Yêu cầu
 avatar/khung/huy hiệu công khai trên BXH đã nằm trong contract và phạm vi
 F3; chưa triển khai hoặc deploy. Không có APK/push/deploy.
+
+## S1 — skin thứ năm
+
+Chủ dự án đã duyệt ba ảnh D2 và yêu cầu tiếp tục toàn kế hoạch. Approval
+được ghi ở source contract; pack/review manifest được sinh từ đó.
+Chủ dự án cũng cho phép commit baseline riêng: `3aaf0e7` giữ nguyên các
+thay đổi có sẵn trước S1, không trộn chúng với implementation mới.
+
+`generate-storybook-skin.mjs` đưa đúng WebP/font được duyệt vào public,
+sinh `skin.generated.js`; registry hiện hữu nhận storybook và controller
+giữ đủ năm lựa chọn. Core 5 ảnh, bundle rương 8 ảnh lazy; tái dùng artwork
+rương hiện hành, không đổi luật/quà/ID rương. Giữ cache current/candidate,
+generation/owner/abort và queue save hiện hữu; không tạo skin manager mới.
+
+PASS `node --test tests/unit/ui-skin.test.js design/storybook/skin.test.mjs`
+8/8; browser S1 3/3: năm lựa chọn, save/reload, thiếu ảnh thì fallback giữ
+preference để retry, default giải phóng cache, 20 lựa chọn nhanh không
+commit stale owner. Asset/contract validator PASS. Chưa đổi geometry game,
+save format hoặc điểm/xếp hạng. S1 pass và tự chuyển S2.

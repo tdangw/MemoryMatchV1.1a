@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
 import { createRequire } from 'node:module';
+import { STORYBOOK_CONTRACT } from '../design/storybook/contract.mjs';
 const sharp = createRequire(import.meta.url)(process.env.UI_SKIN_SHARP_MODULE || 'sharp');
 const root = 'design/storybook';
 const manifest = JSON.parse(await fs.readFile(`${root}/packed/manifest.json`, 'utf8'));
@@ -25,5 +26,6 @@ for (const font of manifest.fonts) {
 }
 assert.equal(bytes, manifest.totalBytes); assert.equal(decodedBytes, manifest.decodedBytes);
 assert(bytes <= manifest.budgets.coreBytes); assert(decodedBytes <= manifest.budgets.liveDecodedBytes);
-assert.equal(manifest.goldenApproved, false); assert.equal(manifest.reviewOnly, true);
-console.log(JSON.stringify({ result: 'PASS', assets: 5, fontSubsets: 3, bytes, decodedBytes, goldenApproved: false }));
+assert.equal(manifest.goldenApproved, STORYBOOK_CONTRACT.review.goldenApproved);
+assert.equal(manifest.reviewOnly, !STORYBOOK_CONTRACT.review.goldenApproved);
+console.log(JSON.stringify({ result: 'PASS', assets: 5, fontSubsets: 3, bytes, decodedBytes, goldenApproved: manifest.goldenApproved }));

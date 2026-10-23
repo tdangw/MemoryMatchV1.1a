@@ -1,6 +1,6 @@
 {
-  "status": "awaiting-owner-visual-approval",
-  "goldenApproved": false,
+  "status": "approved-by-owner-2026-10-23",
+  "goldenApproved": true,
   "renderer": "Chrome, DPR1, 412x915, Storybook Nunito ready, reduced motion",
   "scope": "real app map + real openAppModal, fixture data, presentation only; not grant/equip/public sync acceptance",
   "screenshots": [

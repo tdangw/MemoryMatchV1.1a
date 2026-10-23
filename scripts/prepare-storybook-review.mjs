@@ -1,11 +1,12 @@
 import fs from 'node:fs/promises';
 import crypto from 'node:crypto';
 import { createRequire } from 'node:module';
+import { STORYBOOK_CONTRACT as contract } from '../design/storybook/contract.mjs';
 const sharp = createRequire(import.meta.url)(process.env.UI_SKIN_SHARP_MODULE || 'sharp');
 const input = 'docs/design/achievements/runtime/qa';
 const output = 'design/storybook/review';
 await fs.mkdir(output, { recursive: true });
-const manifest = { status: 'awaiting-owner-visual-approval', goldenApproved: false,
+const manifest = { status: contract.review.goldenApproved ? 'approved-by-owner-2026-10-23' : 'awaiting-owner-visual-approval', goldenApproved: contract.review.goldenApproved,
   renderer: 'Chrome, DPR1, 412x915, Storybook Nunito ready, reduced motion',
   scope: 'real app map + real openAppModal, fixture data, presentation only; not grant/equip/public sync acceptance',
   screenshots: [], anchors: {} };

@@ -1,6 +1,7 @@
 export const UI_SKIN_CHOICES = Object.freeze([
   { id: 'default', name: 'Mặc định' }, { id: 'woodland', name: 'Nâng cao' },
   { id: 'papercut', name: 'Giấy cắt nhiều lớp' }, { id: 'starship', name: 'Phi thuyền vũ trụ' },
+  { id: 'storybook', name: 'Cổ tích' },
 ]);
 export const normalizeUiSkin = value => UI_SKIN_CHOICES.some(skin => skin.id === value) ? value : 'default';
 

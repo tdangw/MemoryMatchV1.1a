@@ -84,7 +84,7 @@ export const STORYBOOK_CONTRACT = {
     profileSlots: ['avatar', 'frame', 'badge'], publicScope: 'equipped-selection-on-profile-save',
     unknownId: 'safe-default-without-invalidating-ranking', grantSource: 'committed-game-level-receipt',
     backfill: 'certified-completions-once-no-popup-per-old-level' },
-  review: { goldenApproved: false, renderer: 'Chrome via Playwright, DPR1, Nunito ready',
+  review: { goldenApproved: true, approvedOn: '2026-10-23', renderer: 'Chrome via Playwright, DPR1, Nunito ready',
     maxAnchorErrorCssPx: 1, samples: ['achievement-notice', 'profile-customization', 'collection'],
     prerequisiteForRollout: 'explicit owner approval of real modal compositor screenshots' },
 };

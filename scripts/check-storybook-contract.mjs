@@ -35,6 +35,6 @@ for (const component of Object.values(draft.components)) {
     slots++;
   }
 }
-assert.equal(c.review.goldenApproved, false, 'D1 does not approve the D2 golden');
+assert.equal(c.review.goldenApproved, true, 'The owner approved the D2 golden on 2026-10-23');
 console.log(JSON.stringify({ result: 'PASS', components: componentIds.size, parts: Object.keys(c.parts).length,
   functionalIcons: iconIds.length, draftSlotsInBounds: slots, publicCosmetics: c.cosmetics.publicScope }));
