@@ -45,7 +45,7 @@ không phải bằng chứng runtime hoặc FPS.
 |---|---|
 | D0 | PASS — quyết định duyệt trong chat |
 | D1 | PASS — inventory/contracts, chưa duyệt mỹ thuật D2 |
-| D2 | Chưa tạo đủ chrome, ghép thật và duyệt golden |
+| D2 | Đã có bộ lõi và ba bản ghép thật; CHỜ DUYỆT golden trước rollout |
 | S1–S2 | Chưa rollout skin |
 | F1–F3 | Chưa triển khai grant/queue/cosmetics |
 | Q1 | Chưa nghiệm thu sản phẩm |
@@ -72,3 +72,70 @@ chọn font miễn phí đủ dấu, golden và geometry thực vẫn chờ D2.
 part/source đúng, alias có target, đủ họ icon và slot draft trong biên.
 Các source PNG mới tạo bằng imagegen tích hợp được giữ trong `design/`,
 không đặt source/QA vào public. Không thay hành vi game trong D1.
+
+## D2 — ứng viên để duyệt hình ảnh
+
+Source: `design/storybook/masters`, prompt chính xác ở `prompts.json`.
+`scripts/prepare-storybook.mjs` cắt theo alpha, giữ provenance/hash/native
+size/sourceBounds/frame/pivot/cap và sinh WebP, font CSS, geometry CSS,
+manifest. Không sửa generated output bằng tay, không upscale. Bộ lõi có
+panel gỗ/giấy 9-slice, ribbon và nút 3-slice, nhánh lá cố định; các vai trò
+cùng vật liệu dùng lại theo contract D1. Góc và lá không bị kéo theo chiều
+cao body. Chưa nhận đã rollout chrome của toàn ứng dụng.
+
+Font Nunito variable được tải từ Google Fonts, giữ OFL và upstream CSS;
+chỉ đóng gói Việt/Latin/Latin mở rộng. 5 WebP + 3 subset: **273.736 byte**;
+decode ảnh lý thuyết **5.808.416 byte**, dưới ngân sách 1 MiB/24 MiB. Đây
+không phải số đo GPU/heap hay FPS trên điện thoại.
+
+`js/storybook/presentation.js` là lớp trình bày opt-in trên `openAppModal`
+thật; CSS scope `storybook-surface` không đổi lựa chọn hoặc 4 skin cũ.
+Ba component: thông báo thành tích chỉ Tiếp tục, Trang trí hồ sơ ba nhóm
+có draft và callback Lưu, danh sách bốn độ khó. Chữ/số/tên/nhãn là DOM;
+avatar/khung dùng cùng canvas 512, badge có neo riêng. Không thêm ledger,
+grant, persistence hoặc network vào renderer. Callback Lưu trong bộ kiểm
+tra là fixture, chưa phải lưu và đồng bộ BXH sản phẩm.
+
+Bản ghép được mở trong trang bản đồ thật của game, dùng modal owner thật,
+không dùng một trang HTML vẽ lại game. Dữ liệu hiển thị là fixture có nhãn
+trong manifest kỹ thuật, không chèn ghi chú phát triển lên UI. Ba ảnh gốc
+412×915, bảng đối chiếu và tọa độ neo thực nằm tại `design/storybook/review`;
+`scripts/prepare-storybook-review.mjs` sinh chúng từ ảnh/geometry UI test.
+Giữ `goldenApproved:false` cho đến khi chủ dự án duyệt chính bộ này.
+
+Kiểm tra cuối:
+
+- `node scripts/check-storybook-contract.mjs`: PASS.
+- `node scripts/check-storybook-pack.mjs` (Sharp runtime đã cấu hình): PASS
+  alpha/dimensions/no-upscale/source và output hash/font/cap/budget.
+- `node .../playwright/test/cli.js test --config design/storybook/playwright.config.cjs`:
+  **15/15 PASS** (20,5 giây). 12 case = 3 component × 412×915, 320×740,
+  844×390, 1024×768; không tràn ngang, footer/close trong viewport và >=44px.
+  Keyboard tab/arrow, draft, failure, cancel, success và double-click chỉ
+  gọi save một lần; 20 chu kỳ/profile reduced-motion và normal: parent owner
+  hết resource, không còn modal/node mounted. Không nhận đã đo heap leak.
+- `npm run build`: PASS (build game hiện tại). Module opt-in được biên dịch
+  thêm riêng qua `scripts/build-storybook-preview.mjs`; chưa nối menu thật.
+- `npm run check`: **PASS cuối cùng, exit 0**, sau sửa tooltip boundary.
+  Compiled compositor cuối cũng PASS, exit 0. Hai log `check-final.log` và
+  `build-compositor-final.log` nằm trong `docs/design/achievements/runtime/qa`.
+
+Chẩn đoán và review riêng sau implementation: lần test đầu không tắt HMR
+theo cấu hình dự án nên module graph khởi động chưa sẵn sàng; dùng
+`GAME_SHELL_TEST_PORT` như test chuẩn, không sửa gameplay/startup để vượt
+test. Review ảnh phát hiện selector chrome cũ thắng cascade ở footer/close,
+đã scope override đúng component. Tooltip của control được focus ban đầu
+còn xuất hiện sau chuyển focus; adapter gọi `clearTooltip` của owner hiện
+hữu tại ranh giới chuyển surface, không dùng sleep. Test đợi tooltip hidden
+thật, giữ nguyên tooltip sản phẩm. Các lần fail có chẩn đoán, không tính pass.
+
+Đây là **tự review riêng**, không nhận review độc lập. Đã xem ảnh tham chiếu
+và kiểm lại source/diff/bằng chứng; chưa có kiểm chứng máy thật, grant/save/
+restore/backfill/queue/motion effect/public cosmetics của F1–F3. Không đổi
+API/schema/key/save/effect ID hoặc luật/xếp hạng trong D0–D2.
+
+Mốc dừng bắt buộc: prompt yêu cầu “chốt golden rồi mới rollout”, và chủ dự
+án đã duyệt quy trình xem bản ghép trước rollout. Chờ duyệt ba ảnh D2;
+S1–S2/F1–F3/Q1 vẫn thuộc task đã giao, không đánh dấu hoàn tất. Yêu cầu
+avatar/khung/huy hiệu công khai trên BXH đã nằm trong contract và phạm vi
+F3; chưa triển khai hoặc deploy. Không có APK/push/deploy.

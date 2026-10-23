@@ -1,0 +1,168 @@
+{
+  "status": "awaiting-owner-visual-approval",
+  "goldenApproved": false,
+  "renderer": "Chrome, DPR1, 412x915, Storybook Nunito ready, reduced motion",
+  "scope": "real app map + real openAppModal, fixture data, presentation only; not grant/equip/public sync acceptance",
+  "screenshots": [
+    {
+      "kind": "reward",
+      "file": "reference-reward.png",
+      "sha256": "7a9ed9d007b21af9dbe4f75f74c8ba1d3adfebd93fd69ff6ed7afd74d4fef26e"
+    },
+    {
+      "kind": "profile",
+      "file": "reference-profile.png",
+      "sha256": "5de745a8e161de17d4aaebe06a280587acf15acf8363a3582bcd522187b65e05"
+    },
+    {
+      "kind": "collection",
+      "file": "reference-collection.png",
+      "sha256": "8e00fc4dd9c1b66378d719c7541656079a30f6c383360f1588abfafa4dd3364f"
+    }
+  ],
+  "anchors": {
+    "reward": {
+      "left": 16,
+      "right": 396,
+      "top": 102.9375,
+      "bottom": 754.0625,
+      "footerBottom": 728.0625,
+      "anchors": {
+        "title": [
+          2,
+          10,
+          376,
+          68
+        ],
+        "body": [
+          22,
+          90,
+          336,
+          465.125
+        ],
+        "footer": [
+          22,
+          555.125,
+          336,
+          70
+        ],
+        "hero": [
+          87,
+          165.140625,
+          206,
+          206
+        ]
+      },
+      "overflow": 0,
+      "font": "\"Storybook Nunito\", sans-serif",
+      "buttons": [
+        {
+          "width": 328,
+          "height": 56
+        }
+      ]
+    },
+    "profile": {
+      "left": 16,
+      "right": 396,
+      "top": 16,
+      "bottom": 841,
+      "footerBottom": 815,
+      "anchors": {
+        "title": [
+          2,
+          10,
+          376,
+          68
+        ],
+        "body": [
+          22,
+          90,
+          336,
+          639
+        ],
+        "footer": [
+          22,
+          729,
+          336,
+          70
+        ],
+        "hero": [
+          24,
+          90,
+          332,
+          176
+        ],
+        "tabs": [
+          24,
+          309.4375,
+          332,
+          44
+        ],
+        "grid": [
+          24,
+          365.4375,
+          332,
+          898.984375
+        ]
+      },
+      "overflow": 0,
+      "font": "\"Storybook Nunito\", sans-serif",
+      "buttons": [
+        {
+          "width": 44,
+          "height": 44
+        },
+        {
+          "width": 328,
+          "height": 56
+        }
+      ]
+    },
+    "collection": {
+      "left": 16,
+      "right": 396,
+      "top": 40.609375,
+      "bottom": 816.390625,
+      "footerBottom": 790.390625,
+      "anchors": {
+        "title": [
+          2,
+          10,
+          376,
+          68
+        ],
+        "body": [
+          22,
+          90,
+          336,
+          589.78125
+        ],
+        "footer": [
+          22,
+          679.78125,
+          336,
+          70
+        ],
+        "list": [
+          24,
+          90,
+          332,
+          589.78125
+        ]
+      },
+      "overflow": 0,
+      "font": "\"Storybook Nunito\", sans-serif",
+      "buttons": [
+        {
+          "width": 44,
+          "height": 44
+        },
+        {
+          "width": 328,
+          "height": 56
+        }
+      ]
+    }
+  }
+}

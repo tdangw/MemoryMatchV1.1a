@@ -1,0 +1,129 @@
+@import '../design/storybook/packed/font.css';
+@import '../design/storybook/packed/geometry.css';
+
+/* D2 compositor is opt-in per modal. No existing skin is changed by this file. */
+.app-modal.storybook-surface {
+  --storybook-ink: #4b2916;
+  width: min(380px, calc(100vw - 24px));
+  position: relative;
+  isolation: isolate;
+  border: 0;
+  border-radius: 20px;
+  background: transparent;
+  box-shadow: 0 8px 24px #0005;
+  color: var(--storybook-ink);
+  font-family: 'Storybook Nunito', sans-serif;
+  padding: 20px 22px 26px;
+}
+.app-modal.storybook-surface::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  border: 0 solid transparent;
+  border-image: url('../design/storybook/packed/panel.webp') var(--storybook-panel-slice) fill / 38px 29px / 0 stretch;
+}
+.app-modal.storybook-surface:focus { outline: none; }
+.storybook-surface .storybook-corner-leaves {
+  position: absolute; inset: 102px 0 auto; height: 56px; z-index: 1; pointer-events: none;
+}
+.storybook-corner-leaves::before, .storybook-corner-leaves::after {
+  content: ''; position: absolute; width: 40px; height: 56px;
+  background: url('../design/storybook/packed/leaves.webp') center / contain no-repeat;
+}
+.storybook-corner-leaves::before { left: -6px; transform: rotate(-22deg); }
+.storybook-corner-leaves::after { right: -6px; transform: scaleX(-1) rotate(-22deg); }
+.storybook-surface .app-modal__header {
+  flex: 0 0 auto; position: relative; justify-content: center; min-height: 68px;
+  padding: 0 28px; margin: -10px -20px 12px; border: 0; background: transparent;
+  isolation: isolate;
+}
+.storybook-surface .app-modal__header::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  border-image: url('../design/storybook/packed/ribbon.webp') var(--storybook-ribbon-slice) fill / 0 60px / 0 stretch;
+}
+.storybook-surface .app-modal__title {
+  display: block; color: #fff2c6; text-align: center; font: 900 23px/1.15 'Storybook Nunito', sans-serif;
+  text-shadow: 0 2px 1px #6b230e; padding-bottom: 6px; overflow-wrap: anywhere;
+}
+.storybook-surface .app-modal__title > .ui-icon { display: none; }
+.app-modal.storybook-surface[data-ui-surface] .app-modal__close {
+  position: absolute; right: 0; top: 0; width: 44px; min-width: 44px; height: 44px;
+  border: 2px solid #e9bd64; border-radius: 50%; background: #805329; color: #fff3cd;
+}
+.app-modal.storybook-surface[data-ui-surface] > .app-modal__body { min-height: 0; padding: 0 2px; color: inherit; overscroll-behavior: contain; }
+.app-modal.storybook-surface[data-ui-surface] > .app-modal__footer {
+  flex: 0 0 auto; padding: 14px 4px 0; border: 0; background: none; gap: 8px;
+}
+.app-modal.storybook-surface[data-ui-surface] .app-modal__footer .app-button {
+  width: 100%; max-width: none; min-height: 56px; border: 0; border-radius: 28px; padding: 10px 24px; background: transparent;
+  border-image: url('../design/storybook/packed/orange.webp') var(--storybook-orange-slice) fill / 0 35px / 0 stretch;
+  color: #fff8de; font: 900 21px/1.2 'Storybook Nunito', sans-serif; text-shadow: 0 2px 1px #593511;
+  box-shadow: none;
+}
+.app-modal.storybook-surface[data-ui-surface] .app-modal__footer .app-button--primary {
+  border-image-source: url('../design/storybook/packed/green.webp');
+  border-image-slice: var(--storybook-green-slice) fill;
+  border-image-width: 0 40px;
+}
+.storybook-surface :is(.app-button, .storybook-tab):active:not(:disabled) { filter: brightness(.84); transform: none; }
+.storybook-surface button:disabled { filter: grayscale(.8); opacity: .7; }
+.app-modal-overlay .app-modal.storybook-surface :is(button, [tabindex]):focus-visible { outline: 2px solid #236d9b; outline-offset: 3px; }
+.storybook-achievement { text-align: center; padding: 0 6px; }
+.storybook-achievement__source { font-size: 17px; font-weight: 900; }
+.storybook-surface .storybook-achievement__condition { font-size: 16px; font-weight: 800; margin: 10px 0 4px; }
+.storybook-achievement__hero { position: relative; display: block; width: 200px; height: 200px; margin: 14px auto; }
+.storybook-achievement__hero-image { display: block; width: 100%; height: 100%; object-fit: contain; }
+.storybook-achievement__hero[data-kind='avatar'] { overflow: hidden; border: 3px solid #d6a544; border-radius: 50%; }
+.storybook-achievement__hero[data-kind='avatar'] .storybook-achievement__hero-image { position: absolute; width: 161%; height: 161%; max-width: none; left: -30.5%; top: -30.5%; }
+.storybook-achievement__name { margin: 0; font-size: 24px; line-height: 1.2; font-weight: 900; }
+.storybook-achievement__category { font-weight: 700; }
+.storybook-surface .storybook-achievement__stored { display: flex; justify-content: center; gap: 8px; align-items: center; margin: 10px 0; color: #27672d; font-weight: 900; }
+.storybook-achievement__stored .ui-icon { width: 24px; height: 24px; flex: 0 0 auto; }
+.storybook-surface .storybook-achievement__hint { text-align: left; border: 1px solid #c49c61; border-radius: 12px; padding: 10px 12px; font-weight: 700; background: #e7c78c38; }
+.storybook-portrait { display: inline-block; position: relative; width: 180px; height: 180px; flex: 0 0 auto; }
+.storybook-portrait > .ui-icon { position: absolute; inset: 28%; width: 44%; height: 44%; }
+.storybook-portrait__avatar { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+.storybook-portrait__frame { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+.storybook-portrait__badge { position: absolute; width: 28%; height: 28%; left: 36%; top: 68.4%; object-fit: contain; }
+.storybook-customization__hero { text-align: center; height: 176px; }
+.storybook-customization__name { margin: 2px 0 12px; text-align: center; font-size: 19px; overflow-wrap: anywhere; }
+.storybook-tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px; margin-bottom: 12px; }
+.storybook-tab { min-height: 44px; padding: 5px 4px; border: 1px solid #997044; border-radius: 12px 12px 2px 2px; color: #fff1d2; background: #82562e; font: 800 13px/1.2 'Storybook Nunito', sans-serif; }
+.storybook-tab[aria-selected='true'] { color: #4b2916; background: #ffe2a0; border-color: #c38c2a; }
+.storybook-inventory { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.storybook-item { position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 0; padding: 8px 5px; border: 1px solid #d0af7b; border-radius: 12px; background: #e8cb9440; color: #4b2916; font-family: inherit; }
+.storybook-item[aria-pressed='true'] { border-color: #d99b21; box-shadow: inset 0 0 0 2px #ffd159; background: #fff1c866; }
+.storybook-item__image, .storybook-item .storybook-portrait { width: 118px; max-width: 100%; height: 118px; object-fit: contain; }
+.storybook-item__name { font-size: 14px; line-height: 1.2; }
+.storybook-item__source { font-size: 11px; }
+.storybook-item > .ui-icon { position: absolute; right: 4px; bottom: 40px; width: 24px; height: 24px; color: #24702c; background: #fff2ca; border-radius: 50%; }
+.storybook-customization__error { color: #a33022; font-weight: 700; }
+.storybook-collection__game { text-align: center; font-weight: 900; font-size: 18px; }
+.storybook-collection__heading { text-align: center; font-size: 20px; margin: 12px 0; }
+.storybook-achievement-row { display: flex; align-items: center; gap: 10px; border: 1px solid #b58a52; border-radius: 12px; padding: 8px 10px; margin: 8px 0; background: #fff4d655; }
+.storybook-achievement-row__details { flex: 1; min-width: 0; }
+.storybook-achievement-row h4 { margin: 0 0 6px; font-size: 20px; line-height: 1.2; }
+.storybook-achievement-row__details p { font-size: 14px; line-height: 1.3; margin-top: 5px; }
+.storybook-difficulties { display: flex; gap: 7px; }
+.storybook-difficulty { text-align: center; display: flex; flex-direction: column; font-size: 12px; }
+.storybook-difficulty .ui-icon { width: 27px; height: 27px; padding: 4px; box-sizing: border-box; border: 1px solid #a28b5e; border-radius: 7px; background: #d7ccb3; color: #84735a; }
+.storybook-difficulty[data-complete='true'] .ui-icon { background: #a5c56c; color: #376329; border-color: #6e8c3d; }
+.storybook-achievement-row__reward { flex: 0 0 80px; width: 80px; text-align: center; font-weight: 700; font-size: 11px; line-height: 1.2; }
+.storybook-achievement-row__reward img { display: block; width: 80px; height: 80px; object-fit: contain; }
+.storybook-collection__note { text-align: center; font-size: 13px; font-weight: 700; }
+@media (max-width: 360px) {
+  .app-modal.storybook-surface { padding-inline: 18px; }
+  .storybook-surface .app-modal__title { font-size: 19px; }
+  .storybook-surface .app-modal__header { margin-inline: -16px; padding-inline: 30px; }
+  .storybook-achievement__hero { width: 176px; height: 176px; }
+  .storybook-difficulties { gap: 4px; }
+  .storybook-difficulty .ui-icon { width: 23px; height: 23px; }
+  .storybook-achievement-row { padding: 8px; gap: 4px; }
+  .storybook-achievement-row__reward { flex-basis: 68px; width: 68px; }
+  .storybook-achievement-row__reward img { width: 68px; height: 68px; }
+}
+@media (max-height: 600px) {
+  .storybook-customization__hero { height: 100px; }
+  .storybook-customization__hero .storybook-portrait { width: 100px; height: 100px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .storybook-surface, .storybook-surface * { animation: none; transition: none; }
+}
