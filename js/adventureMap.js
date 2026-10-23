@@ -156,7 +156,7 @@ export function mountAdventureMap(gameId) {
     const treasure = projectJourneyTreasure({completed:{...adjacentBest,...profile.bestByLevel},block,claim:profile.claimedChests[block] || adjacentChests[block]});
     renderTreasureMapCard(treasureCard, treasure);
     collectionBadge.hidden=treasure.fragmentCount===0;collectionBadge.textContent=treasure.fragmentCount+'/10';
-    collectionDock.setAttribute('aria-label', 'Bộ sưu tập, Màn '+treasure.firstLevel+'–'+treasure.lastLevel+', '+treasure.fragmentCount+' trên 10 mảnh tranh');
+    collectionDock.setAttribute('aria-label', 'Bộ sưu tập, Màn '+treasure.firstLevel+'–'+treasure.lastLevel+', '+treasure.fragmentCount+' trên 10 màn hoàn thành cả bốn độ khó');
   }
   scope.listen(window, 'resize', updateTreasureCard);
   function patchNodes() {

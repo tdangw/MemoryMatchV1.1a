@@ -157,13 +157,18 @@ test('account changes cancel delayed summary cues',async({page})=>{
   await page.waitForTimeout(1900);expect(await played(page)).toEqual([]);
 });
 
-test('picture completion plays reward only once after claim',async({page})=>{
+test('achievement group completion plays reward only once after claim',async({page})=>{
   await spy(page);await seed(page,'memory-match');
   await page.evaluate(async()=> (await import('/js/mainmenu.js')).showCollectionModal({gameId:'memory-match'}));
-  await page.getByRole('tab',{name:'Tranh',exact:true}).click();
-  await page.getByRole('button',{name:'Trước',exact:true}).click();
+  await page.getByRole('tab',{name:'Thành tích',exact:true}).click();
+  await expect(page.locator('.achievement-collection')).not.toHaveAttribute('aria-busy','true');
+  for(let index=0;index<10 && await page.getByRole('button',{name:'Nhóm trước',exact:true}).isEnabled();index++) {
+    await page.getByRole('button',{name:'Nhóm trước',exact:true}).click();
+    await expect(page.locator('.achievement-collection')).not.toHaveAttribute('aria-busy','true');
+  }
+  await expect(page.getByRole('heading',{name:'Màn 1–10',exact:true})).toBeVisible();
   await page.getByRole('button',{name:'Nhận 300 Xu',exact:true}).click();
-  await expect(page.locator('.mastery-collection')).toContainText('Đã nhận 300 Xu');
+  await expect(page.locator('.achievement-collection')).toContainText('Đã nhận 300 Xu');
   expect(await played(page)).toEqual(['reward.ogg']);
   await page.locator('#collection-modal .app-modal__close').click();
   await expect(page.locator('#collection-modal')).toHaveCount(0);

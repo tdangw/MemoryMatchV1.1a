@@ -51,7 +51,7 @@ không phải bằng chứng runtime hoặc FPS.
 | F1 | PASS — grants/normalize/backfill/atomic persistence |
 | F2 | PASS — closed signal, queue, destinations, cancellation |
 | F3 | PASS code/web/emulator; Firestore thật chờ duyệt triển khai riêng |
-| Q1 | Chưa nghiệm thu sản phẩm |
+| Q1 | PASS nghiệm thu code/web; public rollout chờ quyết định Firestore |
 
 Skill thực dùng: `clarify-ambiguous-requirements` chốt D0; `imagegen`
 định tuyến tạo artwork. Bằng chứng mỗi phase bổ sung trong tài liệu này.
@@ -271,3 +271,62 @@ game ở normal/reduced, 20 lần interrupt), public UI1 bài với hai account
 Auth/Firestore emulator: save→BXH bên kia, offline→online, rank không đổi.
 Rules public + toàn bộ progression/private/leaderboard/stats emulator PASS.
 Không nhận đã triển khai public trên server thật trước bước duyệt rules.
+
+## Q1 — tự review sau implementation và nghiệm thu web
+
+Review riêng trên diff/commit F3 `14f20fc`; đây là tự review của agent chính,
+không nhận là review độc lập. Đối chiếu D0–F3, ownership, late callback,
+transaction/rollback, catalog/game slot, public projection, rule diff, URL
+fallback, responsive/focus và bundle. Bổ sung guard profileId/replacement,
+không ghi public khi lựa chọn giống nhau, không có ảnh nguồn/QA trong dist.
+Không đổi công thức điểm/thứ hạng, UID ownership, save key/formatVersion2,
+ID đồ đã bán hoặc receipt300Xu; field mới versioned/additive đã test cũ/hỏng.
+
+Kết quả cuối (các bài đều có kết quả hoàn tất, theo nhóm chạy mục tiêu):
+
+- `npm run check`: PASS; `npm run build`: PASS,298 modules. Cảnh báo sound
+  vừa static/dynamic import là cảnh báo chia chunk có sẵn, không lỗi build.
+- Unit storybook/achievement/public projection:10/10 PASS. Contract14 nhóm,
+  66 icon,16 slot; metadata/hash/alpha/budget và rules generator check PASS.
+- Browser task59 bài PASS: compositor15,skin3,surface13,persistence1,
+  announcements8,equipment10,motion9. Public emulator UI1 bài bổ sung PASS.
+- Regression72 bài PASS qua các nhóm effect connection/exit, catalog,
+  shell cleanup/lifecycle, profile layout/stats, leaderboard layout,
+  progression reward và reward audio. Có
+  100 lần đổi trò/draw/cleanup,30 vòng profile/BXH,4 viewport và5 skin.
+- Firestore emulator: `check-progression-rules.mjs` (season/private cloud,
+  ranking,stats) + `check-public-cosmetic-rules.mjs` PASS. Một lần CAS cũ
+  nhận permission-denied thay conflict trong emulator; chạy lại riêng và
+  toàn bộ matrix cuối PASS. Không thay luật hay làm yếu assertion để né.
+
+Các fixture cũ được cập nhật đúng hành vi hiện hành: đợi menu/profile mount
+thật, chứng nhận màn6 trước mở màn7, interrupt modal trong cùng JS task
+trước deadline đóng hợp lệ, mock thêm boundary public cho test bố cục,
+assert copy lỗi sản phẩm có sẵn. Giữ nguyên mục đích/assertion cleanup,
+rank ordering, quota rollback và không tăng điểm. Ảnh QA cũ do regression
+ghi lại đã trả về baseline; bằng chứng task tại docs/design/achievements/runtime/qa.
+
+Review bắt thêm hai nhãn trợ giúp/ARIA còn “mảnh tranh” và âm nhận300Xu
+bị mất khi thay renderer. Đã đổi copy theo Thành tích10màn/trò và khôi phục
+cue sau commit, cùng owner cũ. Test ba trò vẫn nhận đúng4rương+300Xu=650Xu,
+không nhận lại; âm reward một lần và pause đúng khi đóng. Kiểm lại narrow,
+landscape,desktop, summary star cues và đổi account; check/build sau sửa PASS.
+
+Ngân sách có tính cả30 icon dùng lại và8 ảnh rương lazy: core+icons515780B,
+thumbnail+preview tối đa293140B, hero87804B; ước lượng decoded của skin
+Cổ tích+kho/preview17,39MB, dưới24MiB (không gồm game art/GPU/browser cache).
+Nguồn: `check-achievement-assets.mjs`, dùng cùng Sharp runtime như pack checker.
+Mẫu Chrome desktop, viewport412×915,20 lần interrupt: setup p95=4,7ms,
+draw p95=0,2ms; RAF active p95=7,2ms/max27,8ms, idle p95=27,7ms/max194,4ms;
+không long task trong cửa sổ active, một canvas, tối đa hai batch crystal
+(18 mảnh), toàn bộ effect registry/node mới về0. Idle/active ngắn có nhiễu
+startup/lập lịch; không suy ra cải thiện FPS hoặc đạt60FPS điện thoại thật.
+Chưa đo trên điện thoại vật lý; không tạo APK theo chỉ dẫn hiện hành.
+
+Skill ảnh hưởng thực tế: `imagegen` tạo5 master artwork và prompt tái lập;
+`clarify-ambiguous-requirements` dùng để chốt D0/D2/phạm vi public/baseline.
+Không dùng computer-use để thao tác; kiểm UI bằng Playwright và xem ảnh thật.
+
+Triển khai Firebase thật là bước duy nhất còn chờ quyết định chủ dự án:
+chỉ rules cho project `memorymatchv1-1a`, không publish Hosting/APK/push.
+Code công khai đã kiểm bằng hai account emulator; chưa nhận đã chạy live.

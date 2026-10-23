@@ -9,6 +9,7 @@ import { createAchievementListContent } from '../storybook/presentation.js';
 import { claimAdventureCollection } from '../adventureRewards.js';
 import { refreshAppWallet } from '../appNavigation.js';
 import { canLaunchGame } from '../profileOperations.js';
+import { playOwnedRewardCue } from '../sound.js';
 
 export function renderAchievementCollection(container, gameId, { block: requestedBlock, owner } = {}) {
   const key = getGameProgressKey(gameId), profile = gameState.progress[key];
@@ -44,7 +45,7 @@ export function renderAchievementCollection(container, gameId, { block: requeste
           try {
             const result = await claimAdventureCollection(gameId, block);
             if (!current() || token !== generation) return;
-            if (result) { refreshAppWallet(); await render(); }
+            if (result) { if (owner) playOwnedRewardCue('reward', owner, gameState.settings); refreshAppWallet(); await render(); }
             else { claim.disabled = false; text.textContent = 'Chưa nhận được thưởng. Hãy thử lại.'; }
           } catch (error) {
             if (current() && token === generation) { claim.disabled = false; text.textContent = 'Chưa nhận được thưởng. Hãy thử lại.'; }

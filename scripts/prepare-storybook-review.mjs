@@ -20,4 +20,4 @@ await sharp({ create: { width: 1236, height: 915, channels: 4, background: '#081
   .composite(manifest.screenshots.map((entry, index) => ({ input: `${output}/${entry.file}`, left: index * 412, top: 0 })))
   .webp({ quality: 92 }).toFile(`${output}/overview.webp`);
 await fs.writeFile(`${output}/manifest.json`, JSON.stringify(manifest, null, 2) + '\n');
-console.log('Prepared three real-app reference screenshots and measured anchors; golden approval is pending.');
+console.log(`Prepared three real-app reference screenshots and measured anchors; golden approved: ${contract.review.goldenApproved}.`);

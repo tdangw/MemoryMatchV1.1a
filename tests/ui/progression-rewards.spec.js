@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 for (const gameId of ['memory-match','link-connect','triple-connect']) {
-  test(`${gameId} claims four chests and one complete picture without duplicate grants`, async ({ page }) => {
+  test(`${gameId} claims four chests and achievement group reward without duplicate grants`, async ({ page }) => {
     await page.goto('/');
     await page.evaluate(async id => {
       await (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu(id);
@@ -19,16 +19,15 @@ for (const gameId of ['memory-match','link-connect','triple-connect']) {
       await (await import('/js/mainmenu.js')).showCollectionModal({ gameId:id });
     }, gameId);
     expect(await page.evaluate(() => window.claimedTiers)).toEqual(['C','B','A','S']);
-    await page.getByRole('tab',{ name:'Tranh', exact:true }).click();
-    await expect(page.locator('.mastery-collection__piece.is-earned')).toHaveCount(0);
-    await page.getByRole('button',{name:'Trước',exact:true}).click();
-    await expect(page.locator('.mastery-collection__piece.is-earned')).toHaveCount(10);
-    await page.getByRole('button',{name:'Nhận 300 xu',exact:true}).click();
-    await expect(page.locator('.mastery-collection')).toContainText('Đã nhận 300 xu');
+    await page.getByRole('tab',{ name:'Thành tích', exact:true }).click();
+    await expect(page.locator('.storybook-achievement-row')).toHaveCount(10);
+    await expect(page.locator('.storybook-achievement-row [data-complete="true"]')).toHaveCount(40);
+    await page.getByRole('button',{name:'Nhận 300 Xu',exact:true}).click();
+    await expect(page.locator('.achievement-collection')).toContainText('Đã nhận 300 Xu');
     expect(await page.evaluate(async () => (await import('/js/gameState.js')).gameState.coins)).toBe(650);
     for (const [width,height] of [[320,568],[412,915],[844,390],[1024,900]]) {
       await page.setViewportSize({width,height});
-      await expect(page.locator('.mastery-collection__pieces')).toBeVisible();
+      await expect(page.locator('.achievement-collection')).toBeVisible();
       const overflow = await page.locator('#collection-modal .app-modal').evaluate(el => el.scrollWidth > el.clientWidth + 1);
       expect(overflow).toBe(false);
       await page.locator('#collection-modal').screenshot({path:`docs/qa/gameplay-progression/collection-${gameId}-${width}.png`});
