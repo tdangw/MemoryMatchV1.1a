@@ -53,7 +53,7 @@ html[data-ui-skin="woodland"] .app-modal__footer { background: #edd4a2; border-c
 html[data-ui-skin="woodland"] .tab-card { border: 12px solid transparent; border-image: url('/assets/ui/woodland/paper-panel.webp') 42 fill / 12px stretch; background: none; color: #4b2b18; }
 html[data-ui-skin="woodland"] :is(.theme-choice, .appearance-choice, .account-play-details > div, .account-name-input, .treasure-reward) { background: #fff3d3; color: #4b2b18; border-color: #af8248; }
 html[data-ui-skin="woodland"] :is(.appearance-group h3, .theme-choice strong, .appearance-choice strong, .mastery-collection, .treasure-content, .treasure-detail h3) { color: #4b2b18; }
-html[data-ui-skin="woodland"] :is(.appearance-choice small, .treasure-range, .treasure-card small, .treasure-exp, .treasure-collection-link) { color: #775432; }
+html[data-ui-skin="woodland"] :is(.appearance-choice small, .treasure-range, .treasure-card small, .treasure-collection-link) { color: #775432; }
 html[data-ui-skin="woodland"] :is(#shop-confirm-modal, #theme-change-notice-modal) .app-modal__body,
 html[data-ui-skin="woodland"] #shop-modal .shop-item-title { color: #4b2b18; }
 html[data-ui-skin="woodland"] :is(.shop-tab, .collection-tab, .catalog-tab) { background: #e5c794; color: #66421f; border-color: #ad8349; }
@@ -152,10 +152,13 @@ html[data-ui-skin="woodland"][data-ui-rewards="ready"] .treasure-art > .treasure
 html[data-ui-skin="woodland"][data-ui-rewards="ready"] .treasure-skin-image--open { opacity: 0; }
 html[data-ui-skin="woodland"][data-ui-rewards="ready"] .treasure-art.is-open > .treasure-skin-image--open { opacity: 1; }
 html[data-ui-skin="woodland"][data-ui-rewards="ready"] .treasure-art.is-open > .treasure-skin-image--closed { opacity: 0; }
-html[data-ui-skin="woodland"] .level-summary .mastery-win-reward { color: #654421; }
 html[data-ui-skin="woodland"] .mastery-collection__pieces { background: #e6d0a0; border-color: #a9793c; }
 html[data-ui-skin="woodland"] .mastery-collection__piece { color: #775432; }
 html[data-ui-skin="woodland"] .mastery-collection__piece.is-earned { color: transparent; }
 html[data-ui-skin="woodland"] .treasure-dialog .app-modal__close { min-width: 44px; min-height: 44px; }
 html[data-ui-skin="woodland"] .treasure-collection-link { min-height: 44px; min-width: 44px; }
 @media (max-height: 500px) and (min-width: 600px) { html[data-ui-skin="woodland"] .treasure-dialog .app-modal__header { height: auto; min-height: 56px; } }
+
+html[data-ui-skin="woodland"] .treasure-map-card { background: #fff0ca; color: #4b2b18; border: 3px solid #9b6934; }
+
+@media (500px < height <= 700px) { html[data-ui-skin="woodland"][data-ui-rewards="ready"] #level-summary-modal .level-summary__heading { height: 40px; margin-bottom: 0; padding-bottom: 2px; font-size: 18px; } }

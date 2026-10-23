@@ -1,5 +1,7 @@
 # Kế hoạch giao diện toàn dự án, hướng dẫn và trải nghiệm phần thưởng
 
+> Cập nhật điều hướng22/10/2026: G0–G10 của tài liệu này đã có hồ sơ triển khai. Yêu cầu UX mới về nhập môn/câu chữ/rương/collection được lập thành nguồn thực thi hiện hành tại [UI_UX_ONBOARDING_REWARDS_PLAN.md](UI_UX_ONBOARDING_REWARDS_PLAN.md). Thiết kế cũ đưa EXP/rương vào popup thắng được thay bằng yêu cầu mới: summary gọn, tiến trình tại bản đồ/Kho báu. Giữ lịch sử dưới đây, không dùng pass cũ để đóng R0–R8 mới.
+
 Cập nhật 20/10/2026: chủ dự án xác nhận phạm vi là **toàn bộ giao diện Memory Match, Link Connect và Triple Connect**, gồm Home, hai ngữ cảnh năm tab, gameplay, HUD, menu, popup, toast, nút và Cài đặt. Popup thắng chỉ là mẫu thử phong cách, không phải phạm vi cuối. Lượt hiện tại hoàn thiện kế hoạch và inventory từ code; chưa tự triển khai toàn bộ runtime, sinh đủ sheet hoặc thêm setting vào sản phẩm.
 
 Đầu ra khi triển khai xong phải là một bộ giao diện Nâng cao đồng bộ xuyên suốt ứng dụng, có thể chọn cùng bộ Mặc định. Một popup đẹp, một atlas hoặc vài ảnh chụp không đủ để nghiệm thu toàn dự án.

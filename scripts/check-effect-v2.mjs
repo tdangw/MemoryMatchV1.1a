@@ -24,7 +24,7 @@ pool.release(second);
 pool.release(first);
 assert.equal(pool.active, 0);
 const exitEngineSource = readFileSync(new URL("../js/effects/exitEngine.js", import.meta.url), "utf8");
-const rafDrawSource = exitEngineSource.match(/const draw = now => \{([\s\S]*?)\n  \};/);
+const rafDrawSource = exitEngineSource.match(/function drawExitBatches\(now\) \{([\s\S]*?)\n\}/);
 assert.ok(rafDrawSource, "Exit engine must own one bounded RAF draw loop");
 assert.equal(rafDrawSource[1].includes(".forEach("), false, "RAF draw loop must not allocate iterator callbacks");
 console.log("Effect V2 catalog, geometry, quality and pool checks passed.");

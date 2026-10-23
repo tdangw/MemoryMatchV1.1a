@@ -28,7 +28,7 @@ import {
 } from "./ui.js";
 import { duckBackgroundMusicForVictory, pauseBackgroundMusic, sounds, playOwnedRewardCue } from "./sound.js"; // 📦 Tách âm thanh
 import { savePersistentGameData } from "./persistence.js";
-import { stageMemorySession, saveMemorySession } from './memorySession.js';
+import { stageMemorySession } from './memorySession.js';
 import { getActiveSession } from './sessionProgress.js';
 import { finishPlayMetrics, snapshotPlayMetrics } from "./playMetrics.js";
 import { checkpointRankedRun, stageRankedAttempt } from "./rankingRules.js";
@@ -131,14 +131,11 @@ function resolvePendingMismatch({ immediately = false } = {}) {
     return;
   }
 
-  setInteractionLocked(true, mismatch.roundId);
-  let remainingHides = mismatch.tiles.length;
-  const unlockWhenHidden = () => {
-    remainingHides -= 1;
-    if (remainingHides === 0) setInteractionLocked(false, mismatch.roundId);
-  };
+  // Closing cards own their animations. Reselecting one cancels its old hide;
+  // a hide completion must never unlock a later pair's durable transaction.
+  setInteractionLocked(false, mismatch.roundId);
   mismatch.tiles.forEach((tile) =>
-    hideTile(tile.querySelector("img"), mismatch.roundId, unlockWhenHidden),
+    hideTile(tile.querySelector("img"), mismatch.roundId),
   );
 }
 
@@ -158,6 +155,7 @@ export function initLogic() {
  */
 export async function handleTileClick(tileElement) {
   if (document.getElementById(tileElement.id) !== tileElement) return;
+  if (gameState.isPaused) return;
   // Chạm một thẻ mới trong lúc cặp sai đang hiện sẽ đóng cặp đó ngay.
   resolvePendingMismatch({ immediately: true });
   const img = tileElement.querySelector("img");
@@ -270,10 +268,12 @@ async function checkMatch(roundId) {
     updateTimerDisplay(gameState.remainingTime);
     syncMemoryTimeProgress({ remainingSeconds: gameState.remainingTime, timeLimit: gameState.timeLimit });
 
-    setInteractionLocked(false, roundId);
-    if (gameState.matchedPairs < gameState.totalPairs) await saveMemorySession({ assetPaths: getActiveSession('memory-match', gameState.settings.mode)?.assetPaths || [] });
-    if (gameState.roundId !== roundId) return;
-    (await checkLevelComplete());
+    // Board, wallet and rewards were staged and committed together above.
+    // Release this pair before accepting another selection, with no later
+    // continuation capable of clearing the next pair's selected IDs.
+    memoryBoard.selectedIds = [];
+    if (gameState.matchedPairs >= gameState.totalPairs) await checkLevelComplete();
+    else setInteractionLocked(false, roundId);
   } else {
     gameState.misses++;
     gameState.combo = 0;
@@ -303,7 +303,7 @@ async function checkMatch(roundId) {
 
   // Wrong tiles remain selected until the mismatch owner closes them, just as
   // the original DOM contract required for Hint and the item picker.
-  if (gameState.roundId === roundId && !pendingMismatch) memoryBoard.selectedIds = [];
+  // Successful pairs release their selection at the commit boundary above.
 }
 
 export function memoryComboRemainingMs() {

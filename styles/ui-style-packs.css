@@ -1,0 +1,154 @@
+@import './ui-style-packs.generated.css';
+
+/* Material modifiers only. Component owners retain geometry and interaction. */
+html[data-ui-skin="papercut"] {
+  --ui-surface: #f9ecd5; --ui-inset: #ead6ba; --ui-raised: #f2dfc1; --ui-ink: #38263e;
+  --ui-muted: #65485e; --ui-gold: #765022; --ui-line: #88607766; --ui-focus: #385a9c;
+  --ui-primary: #c46455; --ui-primary-hover: #d67a65; --ui-danger: #a34449; --ui-danger-ink: #fff5e7;
+  --skin-button-ink: #301c30; --skin-title-ink: #38263e; --skin-backdrop: #3c294866;
+  --skin-error-ink: #9b283d;
+}
+html[data-ui-skin="starship"] {
+  --ui-surface: #172d40; --ui-inset: #102333; --ui-raised: #243f54; --ui-ink: #edf7ff;
+  --ui-muted: #bfdae7; --ui-gold: #ffe1a3; --ui-line: #8fb3c466; --ui-focus: #f4c47c;
+  --ui-primary: #8a532b; --ui-primary-hover: #a76933; --ui-danger: #843e4b; --ui-danger-ink: #fff0ec;
+  --skin-button-ink: #fff4dc; --skin-title-ink: #edf7ff; --skin-backdrop: #07132166;
+  --skin-error-ink: #ffc6b8;
+}
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) {
+  --dialog-surface: var(--ui-surface); --dialog-night-surface: var(--ui-surface); --dialog-night-inset: var(--ui-inset);
+  --dialog-night-value: var(--ui-surface); --dialog-ink: var(--ui-ink); --dialog-muted: var(--ui-muted);
+  --dialog-gold: var(--ui-gold); --dialog-line: var(--ui-line);
+  --tab-surface: var(--ui-surface); --tab-ink: var(--ui-ink); --tab-muted: var(--ui-muted); --tab-gold: var(--ui-gold); --tab-line: var(--ui-line);
+  --unified-hud-surface: var(--ui-surface); --unified-hud-label: var(--ui-muted); --unified-hud-value: var(--ui-ink);
+  --unified-hud-divider: var(--ui-line); --unified-hud-button-surface: var(--ui-raised); --unified-hud-tools-surface: var(--ui-raised);
+  --unified-hud-timer-warning: var(--skin-error-ink);
+}
+
+/* Border-image widths paint inside the existing border box; no border-width,
+   padding, position, font or minimum hit area is changed by these rules. */
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(.app-button,.tab-button,.shop-buy-button) {
+  --skin-control: var(--skin-secondary-normal); --skin-control-slice: var(--skin-secondary-normal-slice);
+  background: transparent; border-color: transparent; box-shadow: none; color: var(--skin-button-ink); text-shadow: none;
+  border-image: var(--skin-control) var(--skin-control-slice) fill / 8px 16px / 0 stretch;
+}
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(.app-button--primary,.app-button--purchase,.appearance-action--equip) { --skin-control: var(--skin-primary-normal); --skin-control-slice: var(--skin-primary-normal-slice); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(.app-button--danger,.tab-button--danger) { --skin-control: var(--skin-danger-normal); --skin-control-slice: var(--skin-danger-normal-slice); color: var(--skin-button-ink); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(.app-button,.tab-button,.shop-buy-button):active:not(:disabled) { --skin-control: var(--skin-secondary-pressed); --skin-control-slice: var(--skin-secondary-pressed-slice); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(.app-button--primary,.app-button--purchase,.appearance-action--equip):active:not(:disabled) { --skin-control: var(--skin-primary-pressed); --skin-control-slice: var(--skin-primary-pressed-slice); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(.app-button--danger,.tab-button--danger):active:not(:disabled) { --skin-control: var(--skin-danger-pressed); --skin-control-slice: var(--skin-danger-pressed-slice); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(.app-button,.tab-button,.shop-buy-button):disabled { --skin-control: var(--skin-secondary-disabled); --skin-control-slice: var(--skin-secondary-disabled-slice); color: var(--ui-muted); opacity: 1; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(.app-button--primary,.app-button--purchase):disabled { --skin-control: var(--skin-primary-disabled); --skin-control-slice: var(--skin-primary-disabled-slice); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(.app-button--danger,.tab-button--danger):disabled { --skin-control: var(--skin-danger-disabled); --skin-control-slice: var(--skin-danger-disabled-slice); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(button,input,select,textarea):focus-visible { outline: 3px solid var(--ui-focus); outline-offset: -3px; }
+
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(.app-modal,.tab-card,.navigation-coming-soon) { background: transparent; color: var(--ui-ink); border-color: transparent; border-image: var(--skin-panel) var(--skin-panel-slice) fill / 16px 18px / 0 stretch; }
+/* Dialog edges sit above opaque footer backgrounds, without intercepting input.
+   Screens retain their own fixed header/exit positioning owner. */
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .app-modal-overlay > .app-modal { position: relative; border-radius: 0; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .app-modal-overlay > .app-modal::after { content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none; border: 0 solid transparent; border-image: var(--skin-panel) var(--skin-panel-slice) / 16px 18px / 0 stretch; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) #level-summary-modal .level-summary-modal { background: transparent; border-color: transparent; border-image: var(--skin-panel) var(--skin-panel-slice) fill / 16px 18px / 0 stretch; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) #level-summary-modal .level-summary__stat { background: transparent; border-color: transparent; border-image: var(--skin-inset) var(--skin-inset-slice) fill / 8px 12px / 0 stretch; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(.app-modal__header,.adventure-map-page .adventure-header,.game-selector__label) { background: transparent; border-color: transparent; color: var(--skin-title-ink); border-image: var(--skin-title) var(--skin-title-slice) fill / 8px 16px / 0 stretch; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(.app-modal__title,.app-modal__title>.ui-icon,.adventure-map-title,.game-selector__label strong) { color: var(--skin-title-ink); text-shadow: none; }
+/* Legacy variants have ID-specific colors. Override their materials explicitly,
+   without copying the variants' layout, padding, actions or motion. */
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(#shop-modal,#collection-modal,#rankings-modal,#account-modal,#settings-modal,#missions-screen,#events-screen,#difficulty-modal,#triple-difficulty-modal,#triple-session-picker-modal,#info-modal,#version-modal,#reset-modal,#return-modal,#time-up-modal,#game-exit-modal,#quick-time-modal,#quick-preview-modal) :is(.app-modal__title,.app-modal__title>.ui-icon) { color: var(--skin-title-ink); text-shadow: none; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(#difficulty-modal,#triple-difficulty-modal,#triple-session-picker-modal,#info-modal,#version-modal,#reset-modal,#return-modal,#time-up-modal,#quick-time-modal,#quick-preview-modal,#shop-confirm-modal,#theme-change-notice-modal) .app-modal__body { color: var(--ui-ink); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(#info-modal,#version-modal) .app-modal__note { color: var(--ui-muted); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) #shop-modal .shop-wallet { color: var(--ui-ink); text-shadow: none; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(#time-up-modal,#reset-modal,#return-modal,#version-modal,#difficulty-modal,#triple-difficulty-modal,#triple-session-picker-modal) .app-modal__close { color: var(--skin-button-ink); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) #time-up-modal .app-button { background: transparent; color: var(--skin-button-ink); border-color: transparent; border-image: var(--skin-control) var(--skin-control-slice) fill / 8px 16px / 0 stretch; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) #time-up-modal .app-button--time-purchase { --skin-control: var(--skin-primary-normal); --skin-control-slice: var(--skin-primary-normal-slice); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) #time-up-modal .app-button--time-purchase:active:not(:disabled) { --skin-control: var(--skin-primary-pressed); --skin-control-slice: var(--skin-primary-pressed-slice); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) #time-up-modal .app-button--time-purchase:disabled { --skin-control: var(--skin-primary-disabled); --skin-control-slice: var(--skin-primary-disabled-slice); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) #game-exit-modal .pause-settings { background: transparent; color: var(--skin-button-ink); border-image: var(--skin-square-normal) var(--skin-square-normal-slice) fill / 8px / 0 stretch; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(.difficulty-theme,.difficulty-theme__change) { color: var(--ui-ink); background: var(--ui-inset); border-color: var(--ui-line); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .difficulty-theme strong { color: var(--ui-ink); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(.difficulty-theme small,.quick-assist__choice span) { color: var(--ui-muted); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .quick-assist__choice:disabled { opacity: 1; color: var(--ui-muted); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .app-modal__body { color: var(--ui-ink); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .app-screen-content .app-modal__body { background: var(--ui-surface); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .app-modal__footer { background: var(--ui-inset); border-color: var(--ui-line); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .adventure-page { background-color: var(--skin-backdrop); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .adventure-screen > .adventure-exit { background: var(--ui-raised); color: var(--ui-ink); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .game-selector__choice { border-color: var(--ui-line); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(.adventure-dock,.triple-connect__tray) { background: transparent; border-image: var(--skin-dock) var(--skin-dock-slice) fill / 10px 16px / 0 stretch; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .adventure-dock button { color: var(--ui-ink); text-shadow: none; background: var(--skin-tab-idle) center top / 36px 36px no-repeat; box-shadow: none; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .adventure-dock button[aria-current="page"] { background-image: var(--skin-tab-selected); color: var(--ui-ink); box-shadow: inset 0 -3px var(--ui-focus); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(.shop-tab,.collection-tab,.catalog-tab) { background: var(--ui-inset); border-color: var(--ui-line); color: var(--ui-ink); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(.shop-tab,.collection-tab,.catalog-tab)[aria-selected="true"] { background: var(--ui-raised); box-shadow: inset 0 -3px var(--ui-focus); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(.theme-choice,.appearance-choice,.account-play-details>div,.account-name-input,.treasure-reward,.treasure-card,.treasure-map-card,.level-summary__stat,.quick-assist__choice,.difficulty-option) { background: transparent; border-color: transparent; color: var(--ui-ink); border-image: var(--skin-inset) var(--skin-inset-slice) fill / 8px 12px / 0 stretch; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(.theme-choice strong,.appearance-choice strong,.appearance-group h3,.mastery-collection,.treasure-content,.treasure-detail h3,.adventure-level-goal,.adventure-level-details,.adventure-level-modes legend,.shop-item-title,.shop-confirmation__price) { color: var(--ui-ink); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(.appearance-choice small,.treasure-range,.treasure-card small,.treasure-collection-link,.app-modal__note,.difficulty-option small,.reward-subtitle,.skin-status) { color: var(--ui-muted); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(.treasure-card[aria-pressed="true"],.theme-choice.is-equipped,.appearance-choice.is-equipped) { box-shadow: inset 0 0 0 2px var(--ui-focus); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(.profile-avatar,.leaderboard-avatar) { background: var(--skin-avatar-frame) center / contain no-repeat; color: var(--ui-ink); border-color: transparent; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .leaderboard-panel { --ranking-gold: var(--ui-gold); --ranking-muted: var(--ui-muted); --ranking-line: var(--ui-line); color: var(--ui-ink); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(.leaderboard-results,.leaderboard-tabs--game,.leaderboard-heading,.leaderboard-row,.leaderboard-family-menu) { background: var(--ui-surface); color: var(--ui-ink); border-color: var(--ui-line); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .leaderboard-family-menu button { color: var(--ui-ink); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(.profile-error,.account-error,.treasure-error) { color: var(--skin-error-ink); }
+
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(.app-modal__close,.shell-fullscreen-button,.game-selector__arrow,.pause-settings,.game-menu-toggle,.memory-tools-toggle,.link-tools-toggle,.triple-tools-toggle) { background: transparent; border-color: transparent; color: var(--skin-button-ink); box-shadow: none; border-image: var(--skin-square-normal) var(--skin-square-normal-slice) fill / 8px / 0 stretch; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(.app-modal__close,.shell-fullscreen-button,.game-selector__arrow,.pause-settings,.game-menu-toggle,.memory-tools-toggle,.link-tools-toggle,.triple-tools-toggle):active:not(:disabled) { border-image-source: var(--skin-square-pressed); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(.app-modal__close,.shell-fullscreen-button,.game-selector__arrow,.pause-settings,.game-menu-toggle,.memory-tools-toggle,.link-tools-toggle,.triple-tools-toggle):disabled { border-image-source: var(--skin-square-disabled); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .game-shell-root .game-hud { background: var(--skin-hud) center / 100% 100% no-repeat; box-shadow: none; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(#grid-container,.link-board,.triple-connect__board) { border-image: var(--skin-board-frame) var(--skin-board-frame-slice) / 4px / 0 stretch; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .triple-connect__tray-slot:not(.is-locked) { background: var(--ui-inset); border-color: var(--ui-line); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .adventure-map-node--level { background: var(--skin-level-node) center / contain no-repeat; color: var(--ui-ink); text-shadow: none; box-shadow: none; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .adventure-map-node--level:disabled { background-image: var(--skin-level-node); color: var(--ui-muted); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(.app-toast,.progression-wave-notice) { background: transparent; border-color: transparent; border-image: var(--skin-toast) var(--skin-toast-slice) fill / 10px 14px / 0 stretch; color: var(--ui-ink); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(.app-tooltip,.game-tooltip,.card-tooltip,.tutorial-guide) { background: var(--skin-tooltip) center / 100% 100% no-repeat; color: var(--ui-ink); border-color: transparent; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .tutorial-guide p { color: var(--ui-ink); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) #settings-container .toggle-switch .slider { background: transparent; border-color: transparent; box-shadow: none; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) #settings-container .toggle-switch .slider::before { content: ''; position: absolute; width: 44px; height: 44px; left: calc(50% - 22px); top: calc(50% - 22px); pointer-events: none; background: var(--skin-toggle-off) center / contain no-repeat; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) #settings-container .toggle-switch input:checked + .slider::before { background-image: var(--skin-toggle-on); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) #settings-container .toggle-switch .slider::after { opacity: 0; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) #settings-container .settings-range::-webkit-slider-runnable-track { background: transparent; border-image: var(--skin-slider-track) var(--skin-slider-track-slice) fill / 4px 8px; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) #settings-container .settings-range::-webkit-slider-thumb { background: var(--skin-slider-thumb) center / contain no-repeat; box-shadow: none; border-color: transparent; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) #settings-container .settings-range::-moz-range-track { background: transparent; border-image: var(--skin-slider-track) var(--skin-slider-track-slice) fill / 4px 8px; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) #settings-container .settings-range::-moz-range-thumb { background: var(--skin-slider-thumb) center / contain no-repeat; box-shadow: none; border-color: transparent; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) input[type="checkbox"] { accent-color: var(--ui-primary); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .adventure-level-modes span { position: relative; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .adventure-level-modes label:not(.is-locked) span::after { content: ''; position: absolute; right: 0; bottom: 0; width: 18px; height: 18px; pointer-events: none; background: var(--skin-checkbox-off) center / contain no-repeat; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .adventure-level-modes input:checked + span::after { background-image: var(--skin-checkbox-on); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .adventure-level-modes input:focus-visible + span { outline-color: var(--ui-focus); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(.treasure-progress,.combo-window-progress) { background: transparent; border-image: var(--skin-progress-track) var(--skin-progress-track-slice) fill / 3px 7px; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .treasure-progress::-webkit-progress-bar { background: transparent; border-image: var(--skin-progress-track) var(--skin-progress-track-slice) fill / 3px 7px; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .treasure-progress::-webkit-progress-value { background: transparent; border-image: var(--skin-progress-fill) var(--skin-progress-fill-slice) fill / 3px 7px; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .treasure-progress::-moz-progress-bar { background: transparent; border-image: var(--skin-progress-fill) var(--skin-progress-fill-slice) fill / 3px 7px; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .collection-progress-badge { background: var(--skin-notification-badge) center / contain no-repeat; color: var(--ui-ink); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .practice__tile:not(:has(img)) { background: var(--skin-card-back) center / contain no-repeat; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .practice__tile.is-target { outline-color: var(--ui-focus); background-color: var(--ui-raised); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .practice__tile:is(.is-target,.is-selected)::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: var(--skin-focus-ring) center / contain no-repeat; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .practice__tile.is-selected::after { background-image: var(--skin-card-selected); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .practice__slots { background: transparent; border-image: var(--skin-dock) var(--skin-dock-slice) fill / 4px 6px; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .practice__slots > span { background: var(--ui-inset); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) #settings-container .settings-link--danger { color: var(--skin-error-ink); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) #settings-container .settings-link--danger > [data-icon] { color: inherit; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .game-milestone-stars .star-progress__track { background: transparent; border-image: var(--skin-progress-track) var(--skin-progress-track-slice) fill / 2px 5px; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .game-milestone-stars .star-progress__fill { background: transparent; box-shadow: none; border-image: var(--skin-progress-fill) var(--skin-progress-fill-slice) fill / 2px 5px; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .game-hud.has-timer-progress::after { background: transparent; box-shadow: none; border-image: var(--skin-progress-fill) var(--skin-progress-fill-slice) fill / 2px 5px; }
+
+/* Reward frames are not requested until their decoded bundle is ready. */
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"])[data-ui-rewards="ready"] .treasure-art.has-skin-art > :not(.treasure-skin-image) { display: none; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"])[data-ui-rewards="ready"] .treasure-art > .treasure-skin-image { visibility: visible; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"])[data-ui-rewards="ready"] .treasure-skin-image--open { opacity: 0; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"])[data-ui-rewards="ready"] .treasure-art.is-open > .treasure-skin-image--open { opacity: 1; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"])[data-ui-rewards="ready"] .treasure-art.is-open > .treasure-skin-image--closed { opacity: 0; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"])[data-ui-rewards="ready"] .level-summary__heading { background: transparent; border-image: var(--skin-title) var(--skin-title-slice) fill / 6px 12px; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) #level-summary-modal .level-summary__stat strong { text-shadow: none; color: var(--ui-ink); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"])[data-ui-rewards="ready"] .level-summary__star .ui-icon { background: var(--skin-star-earned) center / contain no-repeat; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"])[data-ui-rewards="ready"] .level-summary__star .ui-icon > * { visibility: hidden; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"])[data-ui-rewards="ready"] .level-summary__star--unearned .ui-icon { background-image: var(--skin-star-empty); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"])[data-ui-rewards="ready"] svg.ui-icon.ui-icon--coin { background: var(--skin-coin) center / contain no-repeat; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"])[data-ui-rewards="ready"] svg.ui-icon.ui-icon--puzzle { background: var(--skin-fragment) center / contain no-repeat; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"])[data-ui-rewards="ready"] svg.ui-icon.ui-icon--rank-medal { background: var(--skin-medal) center / contain no-repeat; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"])[data-ui-rewards="ready"] .app-modal__title svg.ui-icon.ui-icon--collection { background: var(--skin-collection-closed) center / contain no-repeat; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"])[data-ui-rewards="ready"] #mastery-painting-modal .app-modal__title svg.ui-icon.ui-icon--collection { background-image: var(--skin-collection-open); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"])[data-ui-rewards="ready"] .practice__pointer {
+  width: 40px; height: 40px; right: auto; bottom: auto;
+  left: clamp(2px, calc(50% - 40px * var(--skin-hand-x)), calc(100% - 42px));
+  top: clamp(2px, calc(50% - 40px * var(--skin-hand-y)), calc(100% - 42px));
+  background: var(--skin-tutorial-hand) center / 100% 100% no-repeat;
+}
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"])[data-ui-rewards="ready"] .practice__pointer > * { visibility: hidden; }

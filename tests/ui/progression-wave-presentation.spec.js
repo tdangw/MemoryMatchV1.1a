@@ -1,14 +1,14 @@
 import { test, expect } from '@playwright/test';
 
-for(const motion of ['reduce','no-preference']) test(`wave notice is centered, finite and cancelled with its owner (${motion})`,async({page})=>{
+for(const motion of ['reduce','no-preference']) test(`wave notice follows board top, finite and cancelled with its owner (${motion})`,async({page})=>{
   await page.emulateMedia({reducedMotion:motion});await page.goto('/');
   await page.evaluate(async()=>{
     await(await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('memory-match');
     await(await import('/js/gameController.js')).startNewMemoryRun(1,{skipIntro:true});
   });
-  await expect(page.locator('.progression-wave-notice')).toHaveText('Wave 1');
-  const centered=await page.locator('.progression-wave-notice').evaluate(node=>{const r=node.getBoundingClientRect();return Math.abs(r.top+r.height/2-innerHeight/2);});
-  // Entry slides at most a fraction of the toast height; reduced motion is exactly centered.
+  await expect(page.locator('.progression-wave-notice')).toHaveText('Đợt 1/2');
+  const centered=await page.locator('.progression-wave-notice').evaluate(node=>{const r=node.getBoundingClientRect(),board=document.querySelector('#grid-container').getBoundingClientRect();return Math.abs(r.top-Math.max(8,board.top));});
+  // Entry moves down by at most 6px; reduced motion is aligned to the board edge.
   expect(centered).toBeLessThan(motion==='reduce'?1:12);
   await expect(page.locator('.progression-wave-notice')).toHaveCount(0,{timeout:3000});
   const result=await page.evaluate(async()=>{

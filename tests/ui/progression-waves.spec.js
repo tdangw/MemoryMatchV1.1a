@@ -10,7 +10,7 @@ test('Triple plays two generated silhouettes and only settles after the second w
     window.tripleWaveRun = await (await import('/js/tripleConnect/tripleController.js')).startTripleConnectRound({ mode: 'easy', skipIntro: true });
   });
   const layouts = [];
-  await expect(page.locator('.progression-wave-notice')).toHaveText('Wave 1');
+  await expect(page.locator('.progression-wave-notice')).toHaveText('Đợt 1/2');
   for (let waveIndex = 1; waveIndex <= 2; waveIndex++) {
     await expect.poll(() => page.evaluate(async () => {
       const session = (await import('/js/sessionProgress.js')).getActiveSession('triple-connect','easy');
@@ -31,7 +31,7 @@ test('Triple plays two generated silhouettes and only settles after the second w
       await page.waitForFunction(() => !document.querySelector('.triple-connect__tray-flight, .triple-connect__ghost'));
     }
     if (waveIndex === 1) {
-      await expect(page.locator('.progression-wave-notice')).toHaveText('Wave 2');
+      await expect(page.locator('.progression-wave-notice')).toHaveText('Đợt 2/2');
       expect(await page.evaluate(async () => (await import('/js/gameState.js')).gameState.progress.tripleConnect.bestByLevel['easy:1'])).toBeUndefined();
       await expect.poll(() => page.evaluate(async () => (await import('/js/sessionProgress.js')).getActiveSession('triple-connect','easy')?.wave?.index)).toBe(2);
     }
@@ -41,8 +41,8 @@ test('Triple plays two generated silhouettes and only settles after the second w
   const best = await page.evaluate(async () => (await import('/js/gameState.js')).gameState.progress.tripleConnect.bestByLevel['easy:1']);
   expect(best.completedWaves).toBe(2);
   expect(best.rulesVersion).toBe(1);
-  await expect(page.locator('.mastery-win-reward')).toContainText('+10 kinh nghiệm');
-  await expect(page.locator('.mastery-win-reward')).toContainText('Rương Mầm Non · 0 → 10/100');
+  await expect(page.locator('.mastery-win-reward')).toHaveCount(0);
+  await expect(page.locator('#level-summary-modal')).not.toContainText(/kinh nghiệm|mảnh tranh/);
 });
 
 test('Link advances waves with shared time, survives reload, and records only a complete level', async ({ page }) => {
@@ -70,7 +70,7 @@ test('Link advances waves with shared time, survives reload, and records only a 
       for (const p of [pair.start, pair.end]) document.querySelector(`.link-board__cell[data-row="${p.row}"][data-column="${p.column}"] .link-tile`).click();
       return { index, won: false };
     });
-    if (result.won) { expect(result.certified.completedWaves).toBe(2); await expect(page.locator('.mastery-win-reward')).toContainText('Rương Mầm Non · 0 → 10/100'); return; }
+    if (result.won) { expect(result.certified.completedWaves).toBe(2); await expect(page.locator('#level-summary-modal')).not.toContainText(/kinh nghiệm|mảnh tranh/); return; }
     await expect.poll(() => page.evaluate(async () => {
       const { linkGameState: s } = await import('/js/linkConnect/linkState.js');
       return s.wave.phase === 'won' || !s.isLocked;
@@ -156,5 +156,5 @@ test('Memory advances to a fresh wave without a win, then settles the whole leve
   expect(settled.after).toBe(settled.before);
   expect(settled.session).toBeUndefined();
   expect(settled.best.rulesVersion).toBe(1);
-  await expect(page.locator('.mastery-win-reward')).toContainText('Rương Mầm Non · 0 → 10/100');
+  await expect(page.locator('#level-summary-modal')).not.toContainText(/kinh nghiệm|mảnh tranh/);
 });

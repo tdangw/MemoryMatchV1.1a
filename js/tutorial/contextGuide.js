@@ -4,9 +4,8 @@ import '../../styles/tutorial.css';
 const shown = new WeakMap();
 let active = null, activeAnchor = null;
 const copy = {
-  exp: 'Mỗi màn và độ khó thắng lần đầu nhận 10 kinh nghiệm. Chơi lại vẫn giữ kinh nghiệm đã có.',
-  chests: 'Rương mở theo thứ tự Mầm Non, Lá Bạc, Hoa Vàng rồi Ánh Sao. Kinh nghiệm ở các độ khó đều được giữ.',
-  pieces: 'Hoàn thành cả bốn độ khó của một màn để nhận một mảnh. Đủ 10 mảnh, bạn có thể xem tranh lớn và nhận 300 Xu một lần.',
+  chests: 'Mở rương lần lượt từ Mầm Non đến Ánh Sao. Tiến trình ở mọi độ khó đều được giữ.',
+  pieces: 'Chọn mảnh còn thiếu để xem cách kiếm. Đủ 10 mảnh, hoàn thiện tranh và nhận 300 Xu một lần.',
 };
 export function dismissContextGuide(root) { if (!root || root.contains(activeAnchor))
   active?.dispose(); }
@@ -25,7 +24,7 @@ export function showContextGuide(topic, anchor, owner) {
   if (presented.has(topic))
     return;
   presented.add(topic);
-  const text = copy[topic] || (topic.startsWith('wave:') ? 'Một màn có nhiều đợt. Dọn hết đợt hiện tại để mở bàn tiếp theo; thời gian được dùng chung trong màn.' : topic.startsWith('tools:') ? 'Công cụ hỗ trợ nằm ở đây. Số bên cạnh là lượng đang có; dùng công cụ trong ván sẽ trừ từ kho của trò đó.' : '');
+  const text = copy[topic] || (topic.startsWith('wave:') ? 'Một màn có nhiều đợt. Dọn hết đợt hiện tại để mở bàn tiếp theo; thời gian được dùng chung trong màn.' : topic.startsWith('tools:') ? 'Chọn công cụ để xem tác dụng và số lượt còn lại. Mỗi lần dùng tốn một lượt của công cụ đó.' : '');
   if (!text)
     return;
   dismissContextGuide();

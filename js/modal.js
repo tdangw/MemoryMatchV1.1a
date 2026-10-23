@@ -6,7 +6,7 @@ import { getActivePlayMetrics } from "./playMetrics.js";
 
 import { getAppPageScope } from "./appPageLifecycle.js";
 import { ensureUiSkinRewards } from './uiSkin.js';
-import { dismissContextGuide, showContextGuide } from './tutorial/contextGuide.js';
+import { dismissContextGuide } from './tutorial/contextGuide.js';
 import { getGameDefinition } from './gameCatalog.js';
 import { TUTORIAL_GAMES } from './tutorial/tutorialModel.js';
 
@@ -36,7 +36,7 @@ export function openAppModal({
   practiceGameId = null,
 }) {
   dismissContextGuide();
-  if (id && /summary|chest|treasure|collection/.test(id)) void ensureUiSkinRewards();
+  if (id && /summary|chest|treasure|collection|practice/.test(id)) void ensureUiSkinRewards({ tutorial: id === 'practice-modal' });
   const screen = presentation === 'screen';
   const previousFocus = document.activeElement;
   if (id) {
@@ -174,7 +174,6 @@ export function openAppModal({
 
   overlay.appendChild(panel);
   host.appendChild(overlay);
-  if (id === 'level-summary-modal') showContextGuide('exp', panel.querySelector('.mastery-win-reward'), lifecycle);
   if (!screen) connectDialogPlacement(overlay, panel, lifecycle);
   panel.tabIndex = -1;
   (panel.querySelector("button:not([disabled]), input:not([disabled]), select:not([disabled])") || panel).focus();

@@ -27,10 +27,18 @@ const CANVAS_EXIT_EFFECTS = Object.freeze({
   bubble: Object.freeze({ needsSourceImage: true }),
 });
 let canvas; let context; let frameId; let entry;
+const MAX_EXIT_BATCHES = 4;
+const exitBatches = [];
+let canvasWidth = 0;
+let canvasHeight = 0;
 
 export function playCanvasExit({ frame, tiles, exitId, quality, diagnostics } = {}) {
   const effect = CANVAS_EXIT_EFFECTS[exitId];
   if (!effect || prefersReducedMotion() || !frame) return false;
+  if (canvas && canvas.parentElement !== frame) clearCanvasExit();
+  // One bounded canvas/RAF can finish several rapid matches together. At the
+  // cap the caller retains its CSS exit instead of cancelling another pair.
+  if (exitBatches.length >= MAX_EXIT_BATCHES) return false;
   const rect = frame.getBoundingClientRect();
   const cards = tiles.flatMap(tile => {
     const image = tile.querySelector("img:not(.link-tile__frost-overlay)");
@@ -43,41 +51,47 @@ export function playCanvasExit({ frame, tiles, exitId, quality, diagnostics } = 
   if (!cards.length) return false;
   const surface = ensureCanvas(frame, rect);
   if (!surface.context) return false;
-  entry?.dispose();
-  const nextEntry = trackEffect("canvas", () => {
+  if (!entry) entry = trackEffect("canvas", () => {
     if (frameId) cancelShellFrame(frameId);
     frameId = null;
-    surface.context.clearRect(0, 0, rect.width, rect.height);
+    surface.context.clearRect(0, 0, canvasWidth, canvasHeight);
+    exitBatches.length = 0;
     // Keep the source image hidden until the match owner removes its tile.
     // Removing this class when the canvas finishes would restart the base
     // exit animation at opacity 1 during the resolve gap, producing a flash.
-    if (entry === nextEntry) entry = null;
+    entry = null;
   });
-  if (!nextEntry) { tiles.forEach(tile => tile.classList.remove("has-canvas-exit")); return false; }
-  entry = nextEntry;
+  if (!entry) { tiles.forEach(tile => tile.classList.remove("has-canvas-exit")); return false; }
   const resolvedQuality = quality || resolveEffectQuality({ reducedMotion: false, coarsePointer: window.matchMedia?.("(pointer: coarse)").matches, deviceMemory: navigator.deviceMemory });
   for (let index = 0; index < cards.length; index += 1) cards[index].fragments = fragments(cards[index].bounds, exitId, particleBudget(resolvedQuality, exitId === "finedust" ? 1 : 2));
   const duration = Math.max(...cards.map(card => card.timing.delayMs + card.timing.durationMs));
-  const startedAt = performance.now();
-  const draw = now => {
+  exitBatches.push({ cards, exitId, duration, startedAt: performance.now(), diagnostics });
+  if (frameId == null) frameId = shellFrame(drawExitBatches);
+  return true;
+}
+
+function drawExitBatches(now) {
+  frameId = null;
+  context.clearRect(0, 0, canvasWidth, canvasHeight);
+  for (let batchIndex = exitBatches.length - 1; batchIndex >= 0; batchIndex -= 1) {
+    const batch = exitBatches[batchIndex];
+    const { cards, exitId, duration, diagnostics } = batch;
     const drawStartedAt = diagnostics ? performance.now() : 0;
-    const elapsed = now - startedAt;
-    surface.context.clearRect(0, 0, rect.width, rect.height);
+    const elapsed = now - batch.startedAt;
     if (exitId === "blackhole" && cards.length) {
       const lead = cards[0];
       const local = Math.min(Math.max((elapsed - lead.timing.delayMs) / lead.timing.durationMs, 0), 1);
-      drawBlackHoleCore(surface.context, lead, local);
+      drawBlackHoleCore(context, lead, local);
     }
     for (let index = 0; index < cards.length; index += 1) {
       const card = cards[index];
-      if (elapsed >= card.timing.delayMs) drawCard(surface.context, card, exitId, Math.min((elapsed - card.timing.delayMs) / card.timing.durationMs, 1));
+      if (elapsed >= card.timing.delayMs) drawCard(context, card, exitId, Math.min((elapsed - card.timing.delayMs) / card.timing.durationMs, 1));
     }
-    if (elapsed < duration && surface.canvas.isConnected) frameId = shellFrame(draw);
-    else nextEntry.dispose();
+    if (elapsed >= duration) exitBatches.splice(batchIndex, 1);
     if (diagnostics) diagnostics.recordFrame(performance.now() - drawStartedAt);
-  };
-  frameId = shellFrame(draw);
-  return true;
+  }
+  if (exitBatches.length && canvas.isConnected) frameId = shellFrame(drawExitBatches);
+  else entry?.dispose();
 }
 
 export function clearCanvasExit() {
@@ -86,6 +100,7 @@ export function clearCanvasExit() {
 }
 
 function ensureCanvas(frame, rect) {
+  canvasWidth = rect.width; canvasHeight = rect.height;
   if (!canvas?.isConnected || canvas.parentElement !== frame) { canvas = document.createElement("canvas"); canvas.className = "link-card-exit-effect"; frame.append(canvas); context = null; }
   const density = Math.min(window.devicePixelRatio || 1, 2); const width = Math.round(rect.width * density); const height = Math.round(rect.height * density);
   if (canvas.width !== width || canvas.height !== height || !context) { canvas.width = width; canvas.height = height; canvas.style.width = `${rect.width}px`; canvas.style.height = `${rect.height}px`; context = canvas.getContext("2d"); context?.scale(density, density); }

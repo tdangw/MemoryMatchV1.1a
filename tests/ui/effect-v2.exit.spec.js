@@ -46,7 +46,7 @@ test("Default and dissolve exits do not brighten both matched tiles", async ({ p
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
   const filters = await page.evaluate(async () => {
-    (await import("/js/gameSelector.js")).openGameMenu("link-connect");
+    await (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('link-connect');
     const controller = await import("/js/linkConnect/linkController.js");
     const { linkGameState } = await import("/js/linkConnect/linkState.js");
     const { findAvailableConnections } = await import("/js/linkConnect/pathfinder.js");
@@ -73,7 +73,7 @@ test("Link V2 connection and exit use a static reduced-motion representation", a
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   const result = await page.evaluate(async () => {
-    (await import("/js/gameSelector.js")).openGameMenu("link-connect");
+    await (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('link-connect');
     const controller = await import("/js/linkConnect/linkController.js");
     const { linkGameState } = await import("/js/linkConnect/linkState.js");
     const { findAvailableConnections } = await import("/js/linkConnect/pathfinder.js");
@@ -99,7 +99,7 @@ test("Electric exit starts at the same impact instant as its travelling bolt", a
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
   const result = await page.evaluate(async () => {
-    (await import("/js/gameSelector.js")).openGameMenu("link-connect");
+    await (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('link-connect');
     const controller = await import("/js/linkConnect/linkController.js");
     const { linkGameState } = await import("/js/linkConnect/linkState.js");
     const { findAvailableConnections } = await import("/js/linkConnect/pathfinder.js");
@@ -135,7 +135,7 @@ test("Fire exit follows the same short impact timeline as Electric", async ({ pa
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
   const result = await page.evaluate(async () => {
-    (await import("/js/gameSelector.js")).openGameMenu("link-connect");
+    await (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('link-connect');
     const controller = await import("/js/linkConnect/linkController.js");
     const { linkGameState } = await import("/js/linkConnect/linkState.js");
     const { findAvailableConnections } = await import("/js/linkConnect/pathfinder.js");
@@ -164,7 +164,7 @@ test("every saved Link exit ID resolves, renders, and releases its transient sta
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
   const result = await page.evaluate(async () => {
-    (await import("/js/gameSelector.js")).openGameMenu("link-connect");
+    await (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('link-connect');
     const controller = await import("/js/linkConnect/linkController.js");
     const { LINK_EXIT_EFFECTS } = await import("/js/linkConnect/linkEffects.js");
     const { linkGameState } = await import("/js/linkConnect/linkState.js");
@@ -197,7 +197,7 @@ test("Link canvas exits reuse one board surface and release it during cleanup", 
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
   await page.evaluate(async () => {
-    (await import("/js/gameSelector.js")).openGameMenu("link-connect");
+    await (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('link-connect');
     const controller = await import("/js/linkConnect/linkController.js");
     const { linkGameState } = await import("/js/linkConnect/linkState.js");
     const { findAvailableConnections } = await import("/js/linkConnect/pathfinder.js");
@@ -231,7 +231,7 @@ test("Canvas exit keeps its source cards hidden until match cleanup removes them
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
   const result = await page.evaluate(async () => {
-    (await import("/js/gameSelector.js")).openGameMenu("link-connect");
+    await (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('link-connect');
     const controller = await import("/js/linkConnect/linkController.js");
     const { linkGameState } = await import("/js/linkConnect/linkState.js");
     const { findAvailableConnections } = await import("/js/linkConnect/pathfinder.js");
@@ -265,7 +265,6 @@ test("Link canvas exit returns to baseline after 100 render, cleanup, and switch
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
   const result = await page.evaluate(async () => {
-    const selector = await import("/js/gameSelector.js");
     const controller = await import("/js/linkConnect/linkController.js");
     const { linkGameState } = await import("/js/linkConnect/linkState.js");
     const { findAvailableConnections } = await import("/js/linkConnect/pathfinder.js");
@@ -274,7 +273,7 @@ test("Link canvas exit returns to baseline after 100 render, cleanup, and switch
     const { getEffectRegistry } = await import("/js/gameShell/gameShellEffects.js");
     let maximum = 0;
     for (let cycle = 0; cycle < 100; cycle += 1) {
-      selector.openGameMenu("link-connect");
+      await (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('link-connect');
       await controller.startLinkLevel({ mode: "easy" });
       gameState.appearance.linkExitEffect = "finedust";
       await Promise.all([...document.querySelectorAll("#link-board-frame .link-tile img:not(.link-tile__frost-overlay)")]
@@ -284,7 +283,7 @@ test("Link canvas exit returns to baseline after 100 render, cleanup, and switch
       maximum = Math.max(maximum, getEffectRegistry().diagnostics().canvas);
       clearLinkTransientEffects();
       if (getEffectRegistry().diagnostics().canvas !== 0) throw new Error("stale canvas handle");
-      selector.openGameMenu("memory-match");
+      await (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('memory-match');
     }
     return { maximum, canvas: document.querySelectorAll(".link-card-exit-effect").length };
   });

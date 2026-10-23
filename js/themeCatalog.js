@@ -93,11 +93,12 @@ export function getThemeCards(themeId, pairCount, { assetPaths, history, random 
     ? restoredValues
     : pickThemeValues(theme, pairCount, { history, random });
   if (values.length !== pairCount) return [];
+  const imageLabels = theme.kind === "image" ? new Map(getThemeSelectionAssets(theme).map((asset, index) => [asset.path, `Hình ${theme.title.toLocaleLowerCase("vi-VN")} ${index + 1}`])) : null;
   return values.map((value) => {
     if (theme.kind === "image") {
       return {
         id: `${theme.id}-${value.path}`,
-        alt: `${theme.title}: ${humanizeAssetId(assetIdFromFile(value.path))}`,
+        alt: imageLabels.get(value.path),
         src: `${import.meta.env.BASE_URL}assets/images/themes/${theme.assetFolder}/${value.path}`,
         assetPath: value.path,
         special: value.special === true,
@@ -152,14 +153,6 @@ function getGeneratedValues(theme) {
   if (theme.generator === "numbers-2") return [...TWO_DIGIT_VALUES];
   if (theme.generator === "numbers-3") return Array.from({ length: 900 }, (_, index) => index + 100);
   return [...COMPUTER_SYMBOLS];
-}
-
-function humanizeAssetId(id) {
-  return id.replaceAll("-", " ");
-}
-
-function assetIdFromFile(file) {
-  return file.replace(/\.webp$/i, "").replaceAll(/[\\/]/g, "-");
 }
 
 function createGeneratedCardImage(label, theme) {

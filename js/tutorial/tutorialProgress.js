@@ -1,14 +1,15 @@
 import { gameState } from '../gameState.js';
 import { saveSetting } from '../persistence.js';
+import { canLaunchGame } from '../profileOperations.js';
 import { normalizeTutorialProgress, TUTORIAL_GAMES, TUTORIAL_TOPICS } from './tutorialModel.js';
 let pending = Promise.resolve();
 export function readTutorialProgress() { return normalizeTutorialProgress(gameState.settings.tutorialProgress); }
 export function markTutorialFlag(group, key) {
-  if (!(group === 'completed' ? TUTORIAL_GAMES : group === 'seen' ? TUTORIAL_TOPICS : []).includes(key))
+  if (!((group === 'completed' || group === 'skipped') ? TUTORIAL_GAMES : group === 'seen' ? TUTORIAL_TOPICS : []).includes(key))
     throw new RangeError('Unknown tutorial flag');
   const owner = gameState.settings;
   const result = pending.then(async () => {
-    if (owner !== gameState.settings)
+    if (owner !== gameState.settings || !canLaunchGame())
       return false;
     const next = normalizeTutorialProgress(owner.tutorialProgress);
     if (next[group][key])

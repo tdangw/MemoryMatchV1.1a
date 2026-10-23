@@ -1,6 +1,7 @@
 import { getRecentGameId } from "./recentGame.js";
 import { restoreUiSkin } from './uiSkin.js';
 import '../styles/ui-skin-woodland.css';
+import '../styles/ui-style-packs.css';
 import { initializeMenuAds } from './ads/menuAds.js';
 import { initializeProfileStatsService } from './profileStatsService.js';
 import { configureAdventureMap } from "./adventureMap.js";

@@ -1,4 +1,8 @@
-export const normalizeUiSkin = value => value === 'woodland' ? 'woodland' : 'default';
+export const UI_SKIN_CHOICES = Object.freeze([
+  { id: 'default', name: 'Mặc định' }, { id: 'woodland', name: 'Nâng cao' },
+  { id: 'papercut', name: 'Giấy cắt nhiều lớp' }, { id: 'starship', name: 'Phi thuyền vũ trụ' },
+]);
+export const normalizeUiSkin = value => UI_SKIN_CHOICES.some(skin => skin.id === value) ? value : 'default';
 
 /** One generation owns loading and one queue owns durable selection commits. */
 export function createUiSkinController({ load, save, apply, captureOwner, committed = () => {} }) {

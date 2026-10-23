@@ -84,7 +84,7 @@ export function announceWave(refs, scope, wave) {
   announcements.set(scope, `${wave.attemptId}:${wave.index}`);
   const notice = document.createElement('div'); notice.className = 'progression-wave-notice';
   notice.setAttribute('role','status'); notice.setAttribute('aria-live','polite');
-  notice.textContent = `Wave ${wave.index}`;
+  notice.textContent = `Đợt ${wave.index}/${wave.count}`;
   document.body.append(notice);
   const noticeScope = createGameShellLifecycle();
   const releaseOwner = scope.own(() => noticeScope.dispose(), 'cleanup');

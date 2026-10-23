@@ -33,14 +33,10 @@ for (const motion of ['no-preference', 'reduce']) test(`profile full chapter vic
   await expect(page.locator('#level-summary-modal')).toBeVisible();
   await page.evaluate(() => { window.victoryProfile.phase = 'summary-confetti'; });
   await page.screenshot({ path: info.outputPath('summary.png') });
-  await page.getByRole('button', { name: 'Congratulations!', exact: true }).click();
-  await expect(page.locator('#victory-celebration')).toBeVisible();
-  const overlap = await page.evaluate(() => { window.victoryProfile.phase = 'flower'; return { canvas: document.querySelectorAll('canvas').length, animations: document.querySelector('#victory-celebration').getAnimations({ subtree: true }).length }; });
-  if (motion === 'no-preference') await page.waitForFunction(() => document.querySelector('#victory-celebration').getAnimations({ subtree: true }).every(animation => animation.playState === 'finished'), null, { timeout: 7000 });
-  await page.evaluate(() => { window.victoryProfile.phase = 'idle'; });
-  await page.waitForTimeout(1000);
-  await page.screenshot({ path: info.outputPath('flower.png') });
-  await page.locator('#victory-celebration').getByRole('button', { name: 'Về Menu' }).click();
+  await expect(page.locator('#level-summary-modal .app-modal__footer button')).toHaveText(['Bản đồ','Chơi tiếp']);
+  const overlap = await page.evaluate(() => ({ canvas: document.querySelectorAll('canvas').length, animations: document.querySelector('#level-summary-modal').getAnimations({subtree:true}).length }));
+  await page.getByRole('button', {name:'Bản đồ',exact:true}).click();
+  await expect(page.locator('#menu-container[data-map-ready="true"]')).toBeVisible();
   await expect(page.locator('#victory-celebration')).toHaveCount(0);
   const data = await page.evaluate(() => {
     const data = window.victoryProfile; cancelAnimationFrame(data.frame); data.observer.disconnect();

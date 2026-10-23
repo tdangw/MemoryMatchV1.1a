@@ -10,7 +10,7 @@ template.innerHTML = `<div id="game-container" class="game-shell-tokens" style="
           id="btn-actions-menu"
           class="game-menu-toggle"
           type="button"
-          aria-label="Mở menu chức năng"
+          aria-label="Tạm dừng"
           aria-controls="game-exit-modal"
           aria-haspopup="dialog"
           aria-expanded="false"
@@ -27,9 +27,9 @@ template.innerHTML = `<div id="game-container" class="game-shell-tokens" style="
         </div>
 
         <div class="game-stats game-hud__stats" aria-label="Thông tin màn chơi">
-          <div class="game-hud__stats-group game-hud__stats-group--left"><span class="info stat-card game-hud__metric stat-moves"><span class="stat-label">MOVES</span><span id="moves">0</span></span><span class="info stat-card game-hud__metric stat-misses"><span class="stat-label">MISS</span><span id="misses">0</span></span></div>
-          <div class="game-hud__stats-group game-hud__stats-group--center"><span class="info stat-card game-hud__metric stat-level"><span class="stat-label">LEVEL</span><span id="level">1</span></span><span class="info stat-card game-hud__metric stat-timer" id="timer"><span class="stat-label">THỜI GIAN</span><span id="timer-value">--:--</span></span><span class="info stat-card game-hud__metric stat-stars"><span class="stat-label"><span data-icon="star"></span></span><span id="total-stars">0</span></span></div>
-          <div class="game-hud__stats-group game-hud__stats-group--right"><span class="info stat-card game-hud__metric stat-combo"><span class="stat-label">COMBO</span><span id="combo">0</span><span class="combo-window-progress" aria-hidden="true"></span></span><span class="info stat-card game-hud__metric stat-points"><span class="stat-label">ĐIỂM</span><span id="score" class="game-hud__score-value">0</span></span></div>
+          <div class="game-hud__stats-group game-hud__stats-group--left"><span class="info stat-card game-hud__metric stat-moves"><span class="stat-label">LƯỢT</span><span id="moves">0</span></span><span class="info stat-card game-hud__metric stat-misses"><span class="stat-label">SAI</span><span id="misses">0</span></span></div>
+          <div class="game-hud__stats-group game-hud__stats-group--center"><span class="info stat-card game-hud__metric stat-level"><span class="stat-label">MÀN</span><span id="level">1</span></span><span class="info stat-card game-hud__metric stat-timer" id="timer"><span class="stat-label">THỜI GIAN</span><span id="timer-value">--:--</span></span><span class="info stat-card game-hud__metric stat-stars"><span class="stat-label"><span data-icon="star"></span></span><span id="total-stars">0</span></span></div>
+          <div class="game-hud__stats-group game-hud__stats-group--right"><span class="info stat-card game-hud__metric stat-combo"><span class="stat-label">CHUỖI</span><span id="combo">0</span><span class="combo-window-progress" aria-hidden="true"></span></span><span class="info stat-card game-hud__metric stat-points"><span class="stat-label">ĐIỂM</span><span id="score" class="game-hud__score-value">0</span></span></div>
         </div>
       </div>
       <section id="memory-special-hud" data-shell-region="milestones" class="memory-special-hud" aria-label="Tiến trình năng lượng đặc biệt">

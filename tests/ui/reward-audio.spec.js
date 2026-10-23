@@ -32,7 +32,7 @@ for(const reducedMotion of ['reduce','no-preference']) test(`summary plays only 
   const events=await page.evaluate(()=>window.rewardAudioEvents.filter(e=>e.kind==='play'));
   expect(events[1].time-events[0].time).toBeGreaterThan(270);
   expect(events.every(e=>e.volume===.4)).toBe(true);
-  await page.getByRole('button',{name:'Menu',exact:true}).click();
+  await page.locator('#level-summary-modal').getByRole('button',{name:'Bản đồ',exact:true}).click();
   await expect(page.locator('#level-summary-modal')).toHaveCount(0);
   expect(await page.evaluate(()=>window.rewardAudioEvents.filter(e=>e.kind==='pause').length)).toBe(3);
 });
@@ -162,8 +162,8 @@ test('picture completion plays reward only once after claim',async({page})=>{
   await page.evaluate(async()=> (await import('/js/mainmenu.js')).showCollectionModal({gameId:'memory-match'}));
   await page.getByRole('tab',{name:'Tranh',exact:true}).click();
   await page.getByRole('button',{name:'Trước',exact:true}).click();
-  await page.getByRole('button',{name:'Nhận 300 xu',exact:true}).click();
-  await expect(page.locator('.mastery-collection')).toContainText('Đã nhận 300 xu');
+  await page.getByRole('button',{name:'Nhận 300 Xu',exact:true}).click();
+  await expect(page.locator('.mastery-collection')).toContainText('Đã nhận 300 Xu');
   expect(await played(page)).toEqual(['reward.ogg']);
   await page.locator('#collection-modal .app-modal__close').click();
   await expect(page.locator('#collection-modal')).toHaveCount(0);

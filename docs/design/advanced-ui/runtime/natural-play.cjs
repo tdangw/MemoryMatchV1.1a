@@ -3,7 +3,7 @@ async function startNatural(page,game){
   await page.locator(`.game-selector__choice[data-game-id="${game}"]`).click();await expect(page.locator('#menu-container[data-map-ready="true"]')).toBeVisible();
   await startMapLevel(page);
 }
-async function startMapLevel(page){await page.locator('[data-level="1"]').click();await page.locator('#adventure-level-modal').getByRole('button',{name:'Chơi',exact:true}).click();await expect(page.locator('.progression-wave-notice')).toBeVisible();await expect(page.locator('.progression-wave-notice')).toHaveCount(0);if(await page.locator('.tutorial-guide button').isVisible())await page.locator('.tutorial-guide button').click();}
+async function startMapLevel(page){await page.locator('[data-level="1"]').click();await page.locator('#adventure-level-modal').getByRole('button',{name:'Chơi',exact:true}).click();await expect(page.locator('#practice-modal, .progression-wave-notice').first()).toBeVisible();if(await page.locator('#practice-modal').isVisible())await page.locator('#practice-modal').getByRole('button',{name:'Bỏ qua',exact:true}).click();await expect(page.locator('.progression-wave-notice')).toBeVisible();await expect(page.locator('.progression-wave-notice')).toHaveCount(0);if(await page.locator('.tutorial-guide button').isVisible())await page.locator('.tutorial-guide button').click();}
 async function solveNatural(page,game){
   if(game==='memory-match') for(let wave=1;wave<=2;wave++){
     await expect.poll(()=>page.evaluate(async()=>{const {gameState:s}=await window.productModule('/js/gameState.js');return !s.isLocked&&!document.querySelector('#game-container.is-previewing')&&s.wave.index;}),{timeout:15000}).toBe(wave);

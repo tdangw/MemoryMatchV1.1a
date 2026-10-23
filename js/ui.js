@@ -16,7 +16,7 @@ import { clearPersistentGameData } from "./persistence.js";
 import { getTheme } from "./themeCatalog.js";
 import { getEquippedThemeId } from "./appearance.js";
 import { GAME_CONFIG, getStarScoreTargets, getTimerDirection, isEndlessMode, getMemoryMilestoneRewards } from "./config.js";
-import { getGameModeLabel, getGameProgressKey } from "./gameCatalog.js";
+import { getGameModeLabel } from "./gameCatalog.js";
 import { formatClockTime, UI_COPY } from "./uiCatalog.js";
 import { prefersReducedMotion } from "./motion.js";
 import {
@@ -31,9 +31,6 @@ import { createHudTimerScheduler } from "./gameShell/gameTimerProgress.js";
 
 import { getAppPageScope } from './appPageLifecycle.js';
 import { getProgressionStarTargets } from './progression/gameplayRules.js';
-import { getRankingOwner } from './rankingOwner.js';
-import { projectJourneyTreasure } from './progression/treasureProjection.js';
-import { treasureDefinition } from './progression/treasureCatalog.js';
 import { waveTotalGroups } from './progression/waveProgress.js';
 import { scheduleSummaryCoins } from './progression/summaryCoins.js';
 let activeIntro = null;
@@ -424,14 +421,11 @@ function openLevelSummaryOverlay({
   score,
   stars,
   timeBonus,
-  mastery,
   luckyAwards = [],
   settings = {},
   onNext,
-  nextLabel = "Chơi tiếp",
   onMenu,
   isVictoryCelebration = false,
-  onCelebrate,
 }, scope, continuationOwner, generation) {
   function afterClose(callback) {
     pendingSummaryAction?.dispose();
@@ -440,7 +434,17 @@ function openLevelSummaryOverlay({
     actionScope.own(() => { release?.forget(); if (pendingSummaryAction === actionScope) pendingSummaryAction = null; });
     actionScope.timeout(() => {
       actionScope.dispose();
-      if (generation === summaryGeneration && (!continuationOwner || continuationOwner.active)) callback();
+      if (generation !== summaryGeneration || continuationOwner && !continuationOwner.active) return;
+      let navigationPage = getAppPageScope();
+      const failed = error => {
+        if (generation === summaryGeneration && getAppPageScope() === navigationPage && (!navigationPage || navigationPage.active)) showAppToast('Chưa mở được màn chơi. Hãy thử lại.');
+        console.error('Summary navigation failed', error.name);
+      };
+      try {
+        const work = callback();
+        navigationPage = getAppPageScope();
+        Promise.resolve(work).catch(failed);
+      } catch (error) { failed(error); }
     }, 200);
   }
   let actionSelected = false;
@@ -481,7 +485,7 @@ function openLevelSummaryOverlay({
   let coinsValueElement;
   const summaryStats = [
     ["Xu nhận", `+${coinsEarned}`, "summary-coins"],
-    ["Thời gian", formatClockTime(remainingTime), "summary-time"],
+    [getTimerDirection(settings.mode) === "up" ? "Thời gian đã chơi" : "Thời gian còn lại", formatClockTime(remainingTime), "summary-time"],
     ["Điểm", score, "summary-points"],
   ];
 
@@ -499,46 +503,6 @@ function openLevelSummaryOverlay({
   });
 
   content.append(result, heading, stats);
-  if (mastery?.expGained) {
-    const rewardProfile = gameState.progress[getGameProgressKey(mastery.gameId)];
-    const rewardOwner = JSON.stringify(getRankingOwner());
-    const reward = document.createElement('section'); reward.className = 'mastery-win-reward';
-    const amount = document.createElement('strong'); amount.textContent = '+' + mastery.expGained + ' kinh nghiệm';
-    reward.append(amount);
-    if (mastery.tier) {
-      const target = document.createElement('p'); target.textContent = treasureDefinition(mastery.tier).name + ' · ' + mastery.beforeExp + ' → ' + mastery.afterExp + '/100';
-      const progress = document.createElement('progress'); progress.max = 100; progress.value = mastery.afterExp;
-      progress.setAttribute('aria-label', target.textContent); reward.append(target,progress);
-      if (!prefersReducedMotion()) scope.animation(reward.animate([{opacity:.6,transform:'translateY(4px)'},{opacity:1,transform:'translateY(0)'}],{duration:400,easing:'ease-out'}));
-      if (mastery.afterExp === 100) {
-        const projection=projectJourneyTreasure({completed:rewardProfile.bestByLevel,block:mastery.block,claim:rewardProfile.claimedChests[mastery.block]});
-        const chest=projection.chests.find(chest=>chest.tier===mastery.tier);
-        const readiness=document.createElement('p');readiness.className='mastery-win-status';
-        readiness.textContent=chest.state==='ready' ? chest.name + ' đã sẵn sàng!' : chest.state==='claimed' ? chest.name + ' đã mở.' : 'Đã đủ kinh nghiệm. Mở ' + chest.previousName + ' trước.';
-        reward.append(readiness);
-        const treasure = document.createElement('button');treasure.type='button';treasure.className='app-button app-button--secondary';treasure.textContent='Xem kho báu';
-        scope.listen(treasure,'click',() => {
-          actionSelected=true;modal.close();
-          afterClose(async () => {
-            let navigationPage=getAppPageScope();
-            try {
-              const navigation=onMenu?.();navigationPage=getAppPageScope();
-              await navigation;
-              if (generation !== summaryGeneration || gameState.progress[getGameProgressKey(mastery.gameId)] !== rewardProfile || JSON.stringify(getRankingOwner()) !== rewardOwner) return;
-              const pageOwner=getAppPageScope();navigationPage=pageOwner;
-              const {showAdventureTreasure}=await import('./adventureMap.js');
-              if(pageOwner?.active && getAppPageScope()===pageOwner) showAdventureTreasure(mastery.gameId,mastery.block);
-            } catch(error) {
-              if (navigationPage?.active && getAppPageScope()===navigationPage && generation === summaryGeneration && gameState.progress[getGameProgressKey(mastery.gameId)] === rewardProfile && JSON.stringify(getRankingOwner()) === rewardOwner) showAppToast('Chưa mở được kho báu. Hãy vào lại từ bản đồ.');
-              console.error('Treasure navigation failed', error.name);
-            }
-          });
-        });reward.append(treasure);
-      }
-    }
-    if (mastery.fragmentGained) { const fragment=document.createElement('p');fragment.textContent='+1 mảnh tranh';reward.append(fragment); }
-    content.append(reward);
-  }
 
   const modal = openAppModal({
     id: "level-summary-modal",
@@ -550,19 +514,9 @@ function openLevelSummaryOverlay({
     content,
     size: "medium",
     closeOnBackdrop: false,
-    actions: isVictoryCelebration ? [
+    actions: [
       {
-        label: "Congratulations!",
-        variant: "primary",
-        onClick: (close) => {
-          actionSelected = true;
-          close();
-          afterClose(() => onCelebrate?.());
-        },
-      },
-    ] : [
-      {
-        label: "Menu",
+        label: "Bản đồ",
         icon: "victory-home",
         variant: "secondary",
         onClick: (close) => {
@@ -572,7 +526,7 @@ function openLevelSummaryOverlay({
         },
       },
       {
-        label: nextLabel,
+        label: "Chơi tiếp",
         sound: 'gameStart',
         icon: "victory-next",
         variant: "primary",
@@ -581,7 +535,7 @@ function openLevelSummaryOverlay({
           close();
           afterClose(() => {
             gameState.isPaused = false;
-            onNext?.();
+            return onNext?.();
           });
         },
       },

@@ -1,6 +1,7 @@
+import { getGameProgressKey } from './gameCatalog.js';
 // Mainmenu.js
 import { createGameShellLifecycle } from "./gameShell/gameShellLifecycle.js";
-import { mountAdventureMap } from "./adventureMap.js";
+import { mountAdventureMap, getViewedAdventureBlock } from "./adventureMap.js";
 import { renderMasteryCollection } from './progression/masteryCollection.js';
 
 import { syncDefaultMusic } from "./sound.js";
@@ -159,7 +160,7 @@ function showSessionChoice({ label, session, onContinue, onNew }) {
   const modal = openAppModal({
     id: "session-choice-modal",
     icon: "play",
-    title: `${label} - Level ${session.level}`,
+    title: `${label} · Màn ${session.level}`,
     content:
       "<p>Bạn muốn tiếp tục hành trình đã lưu hay bắt đầu lại từ cấp 1?</p>",
     actions: [
@@ -188,6 +189,7 @@ export async function showCollectionModal({
   const content = document.createElement("div");
   content.className = "collection-content";
   const collectionScope = createGameShellLifecycle();
+  const collectionBlock = fromGame ? undefined : getViewedAdventureBlock(gameId);
   const modal = openAppModal({
     ...surface,
     id: "collection-modal",
@@ -203,6 +205,12 @@ export async function showCollectionModal({
     },
   });
 
+  const collectionProfile = gameState.progress[getGameProgressKey(gameId)];
+  async function playCollectionLevel(target) {
+    const [selector,map]=await Promise.all([import('./gameSelector.js'),import('./adventureMap.js')]);
+    if (!collectionScope.active || gameState.progress[getGameProgressKey(gameId)] !== collectionProfile) return;
+    modal.destroy(); selector.openGameMenu(gameId); map.previewAdventureLevel(gameId,target);
+  }
   const tabs = document.createElement("div");
   tabs.className = "shop-tabs";
   tabs.setAttribute("role", "tablist");
@@ -333,7 +341,7 @@ export async function showCollectionModal({
       grid.append(group);
     };
     (await mountCatalogTabs({ gameId, surface: "collection", tablist: tabs, panel: grid, tabs: [
-      { id: "pictures", label: "Tranh", render: () => renderMasteryCollection(grid, gameId, { owner: collectionScope }) },
+      { id: "pictures", label: "Tranh", render: () => renderMasteryCollection(grid, gameId, { block: collectionBlock, owner: collectionScope, onPlay: playCollectionLevel }) },
       { id: "themes", label: "Chủ đề", render: renderThemes },
       { id: "path", label: "Đường nối", render: () => renderLinkEffects("Hiệu ứng đường nối", "linkPathEffect", "ownedLinkPathEffects", LINK_PATH_EFFECTS) },
       { id: "exit", label: "Xóa thẻ", render: () => renderLinkEffects("Hiệu ứng xóa thẻ", "linkExitEffect", "ownedLinkExitEffects", LINK_EXIT_EFFECTS) },
@@ -383,14 +391,14 @@ export async function showCollectionModal({
       grid.append(group);
     };
     (await mountCatalogTabs({ gameId, surface: "collection", tablist: tabs, panel: grid, tabs: [
-      { id: "pictures", label: "Tranh", render: () => renderMasteryCollection(grid, gameId, { owner: collectionScope }) },
+      { id: "pictures", label: "Tranh", render: () => renderMasteryCollection(grid, gameId, { block: collectionBlock, owner: collectionScope, onPlay: playCollectionLevel }) },
       { id: "themes", label: "Chủ đề", render: renderThemes },
       { id: "path", label: "Đường nối", render: () => renderTripleEffects("Hiệu ứng đường nối", "path", "ownedTriplePathEffects", "triplePathEffect", LINK_PATH_EFFECTS) },
       { id: "exit", label: "Xóa thẻ", render: () => renderTripleEffects("Hiệu ứng xóa thẻ", "exit", "ownedTripleExitEffects", "tripleExitEffect", LINK_EXIT_EFFECTS) },
     ] }));
   } else {
     (await mountCatalogTabs({ gameId, surface: "collection", tablist: tabs, panel: grid, tabs: [
-      { id: "pictures", label: "Tranh", render: () => renderMasteryCollection(grid, gameId, { owner: collectionScope }) },
+      { id: "pictures", label: "Tranh", render: () => renderMasteryCollection(grid, gameId, { block: collectionBlock, owner: collectionScope, onPlay: playCollectionLevel }) },
       { id: "appearance", label: "Ngoại hình", render: renderAppearance },
       { id: "flip", label: "Hiệu ứng lật", render: renderFlipEffects },
       { id: "themes", label: "Chủ đề", render: renderThemes },

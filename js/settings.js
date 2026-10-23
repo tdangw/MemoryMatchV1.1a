@@ -9,6 +9,7 @@ import { setMeteorEffectsEnabled } from "./backgroundEffects.js";
 import { setBoardCoordinatesVisible } from "./grid.js";
 import { clearTooltip } from "./tooltips.js";
 import { selectUiSkin, getUiSkin } from './uiSkin.js';
+import { UI_SKIN_CHOICES } from './uiSkinController.js';
 
 const settingsContainer = document.getElementById("settings-container");
 const settingsHome = settingsContainer?.parentElement;
@@ -63,8 +64,9 @@ function syncSkinChoices() {
   for (const choice of settingsContainer.querySelectorAll('[data-ui-skin-choice]')) {
     choice.setAttribute('aria-pressed', String(choice.dataset.uiSkinChoice === getUiSkin()));
   }
-  if (gameState.settings.uiSkin === 'woodland' && getUiSkin() === 'default' && !settingsContainer.querySelector('.skin-choices').hasAttribute('aria-busy')) {
-    document.getElementById('skin-status').textContent = 'Chưa tải được giao diện Nâng cao. Chọn Nâng cao để thử lại.';
+  if (gameState.settings.uiSkin !== 'default' && getUiSkin() === 'default' && !settingsContainer.querySelector('.skin-choices').hasAttribute('aria-busy')) {
+    const name = UI_SKIN_CHOICES.find(skin => skin.id === gameState.settings.uiSkin).name;
+    document.getElementById('skin-status').textContent = `Chưa tải được giao diện ${name}. Chọn ${name} để thử lại.`;
   }
 }
 for (const choice of settingsContainer.querySelectorAll('[data-ui-skin-choice]')) {

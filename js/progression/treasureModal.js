@@ -30,7 +30,7 @@ export function openJourneyTreasure({ gameId, block, owner, selectedTier, onClai
   const draw = () => {
     dismissContextGuide(content);
     renderTreasureContent(content,view,{selected,phase,error});
-    if (phase === 'idle') showContextGuide('chests',content.querySelector('.treasure-cards'),scope);
+    if (phase === 'idle') showContextGuide('chests',content.querySelector('.treasure-detail'),scope);
   };
   async function read(token = ++generation) {
     const record = await loadPersistentChapter(key,getChapterNumber(block * 10));
@@ -77,8 +77,8 @@ export function openJourneyTreasure({ gameId, block, owner, selectedTier, onClai
       modal.destroy();
       const collection=document.createElement('div');
       const collectionScope = createGameShellLifecycle();
-      openAppModal({onDestroy:()=>collectionScope.dispose(),id:'treasure-collection-modal',title:'Bộ sưu tập tranh',content:collection,owner,alignment:'center',keepBanner:true});
-      renderMasteryCollection(collection,gameId,{block,owner:collectionScope});return;
+      const collectionModal = openAppModal({onDestroy:()=>collectionScope.dispose(),id:'treasure-collection-modal',title:'Bộ sưu tập tranh',content:collection,owner,alignment:'center',keepBanner:true});
+      renderMasteryCollection(collection,gameId,{block,owner:collectionScope,onPlay:async target=>{collectionModal.destroy();await onPlay?.(target);}});return;
     }
     if (action==='claim') void modal.submit(async () => {
       const tapped=performance.now();

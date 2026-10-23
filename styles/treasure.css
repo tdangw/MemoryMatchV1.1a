@@ -24,7 +24,6 @@
 .treasure-progress::-webkit-progress-bar { background: #071e26; }
 .treasure-progress::-webkit-progress-value { background: linear-gradient(90deg,#98b779,#f0d28b); border-radius: 8px; }
 .treasure-progress-copy { margin: 6px 0 1px; font-size: 13px; }
-.treasure-exp { color: #a9c1bb; font-size: 11px; }
 .treasure-status { margin: 8px 0 10px; font-size: 13px; line-height: 1.4; min-height: 18px; }
 .treasure-rewards { display: flex; justify-content: center; gap: 8px; width: 100%; margin: 0 0 13px; }
 .treasure-reward { display: flex; align-items: center; justify-content: center; gap: 7px; flex: 1; max-width: 150px; padding: 9px 6px; border-radius: 10px; background: #071f28; border: 1px solid #b1c5a12e; font-size: 13px; color: #ffdfa0; }
@@ -51,7 +50,6 @@
   .treasure-card strong { font-size: 11px; }
   .treasure-card small { font-size: 10px; }
   .treasure-detail .treasure-progress-copy { font-size: 11px; line-height: 1.3; margin: 2px 0 0; }
-  .treasure-exp { font-size: 10px; line-height: 1.3; }
   .treasure-detail .treasure-status { font-size: 11px; line-height: 1.3; min-height: 14px; margin: 4px 0; }
   .treasure-rewards { margin-bottom: 6px; }
   .treasure-reward { padding: 4px; font-size: 11px; }
@@ -63,6 +61,3 @@
 @media (prefers-reduced-motion: reduce) { .treasure-content *, .treasure-art * { animation: none !important; transition: none !important; } }
 .adventure-map-node--chest > .treasure-art { width: 72px; height: 64px; }
 .adventure-map-cell--chest .adventure-map-detail { max-width: 110px; font-size: 10px; line-height: 12px; white-space: pre-line; text-align: center; }
-.mastery-win-reward { display: grid; justify-items: center; gap: 6px; margin: 12px 0; color: #e9d29b; text-align: center; }
-.mastery-win-reward p { margin: 0; font-size: 13px; }
-.mastery-win-reward progress { width: min(260px,100%); height: 8px; accent-color: #dfc47a; }

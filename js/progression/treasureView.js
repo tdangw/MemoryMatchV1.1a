@@ -19,22 +19,22 @@ export function renderTreasureContent(content, view, { selected = view.activeTie
     const card = element('button', `treasure-card is-${item.state}`);
     card.type = 'button'; card.dataset.treasureTier = item.tier;
     card.setAttribute('aria-pressed', String(item.tier === selected));
-    card.setAttribute('aria-label', `${item.name}, ${item.exp}/100 kinh nghiệm, ${item.state === 'claimed' ? 'đã mở' : item.state === 'ready' ? 'có thể mở' : item.difficulty}`);
+    const stateLabel={claimed:'Đã nhận',ready:'Có thể mở',waiting:'Chờ rương trước',progress:'Đang tích lũy'}[item.state];
+    card.setAttribute('aria-label', `${item.name}, ${item.completedLevels}/10 màn ${item.difficulty}, ${stateLabel}`);
     card.append(createTreasureArt(item.tier, item.state === 'claimed'), element('strong','',item.name),
-      element('small','',item.state === 'claimed' ? 'Đã mở' : item.state === 'ready' ? 'Có thể mở' : `${item.completedLevels}/10 · ${item.difficulty}`));
+      element('small','',item.state === 'claimed' ? 'Đã nhận' : item.state === 'ready' ? 'Có thể mở' : item.state === 'waiting' ? 'Chờ rương trước' : `${item.completedLevels}/10 · ${item.difficulty}`));
     cards.append(card);
   }
   const detail = element('section','treasure-detail'); detail.dataset.selectedTier = selected;
   const hero = element('div','treasure-hero');
   hero.append(createTreasureArt(selected, phase === 'success' || phase !== 'opening' && chest.state === 'claimed'));
   const heading = element('h3','',chest.name);
-  const progress = element('progress','treasure-progress'); progress.max = 100; progress.value = chest.exp;
-  progress.setAttribute('aria-label', `${chest.name}: ${chest.exp}/100 kinh nghiệm`);
+  const progress = element('progress','treasure-progress'); progress.max = 10; progress.value = chest.completedLevels;
+  progress.setAttribute('aria-label', `${chest.name}: ${chest.completedLevels}/10 màn ${chest.difficulty}`);
   const copy = element('p','treasure-progress-copy',`Đã hoàn thành ${chest.completedLevels}/10 màn ${chest.difficulty}`);
-  const exp = element('span','treasure-exp',`${chest.exp}/100 kinh nghiệm`);
   let message = view.allClaimed ? `Đã mở trọn bộ kho báu Màn ${view.firstLevel}–${view.lastLevel}.`
-    : chest.state === 'claimed' ? 'Đã mở'
-    : chest.state === 'waiting' ? `Đã đủ kinh nghiệm. Mở ${chest.previousName} trước.`
+    : chest.state === 'claimed' ? 'Đã nhận'
+    : chest.state === 'waiting' ? `Đã hoàn thành đủ 10 màn. Mở ${chest.previousName} trước.`
     : chest.state === 'ready' ? `${chest.name} đã sẵn sàng!`
     : `Còn ${10 - chest.completedLevels} màn ${chest.difficulty} để mở rương.`;
   if (phase === 'opening') message = 'Đang mở rương…';
@@ -54,7 +54,7 @@ export function renderTreasureContent(content, view, { selected = view.activeTie
   } else if (chest.state === 'ready') actions.append(action(error ? 'Thử lại' : 'Mở rương','claim',true));
   else if (chest.state === 'waiting') actions.append(action(`Xem rương trước`,'previous',true));
   else actions.append(action('Chơi tiếp','play',true));
-  detail.append(hero,heading,progress,copy,exp,status,rewards,actions);
+  detail.append(hero,heading,copy,progress,status,rewards,actions);
   const collection = element('button','treasure-collection-link','Bộ sưu tập tranh');
   collection.type = 'button'; collection.dataset.treasureAction = 'collection';
   content.className = 'treasure-content'; content.dataset.phase = phase;

@@ -15,6 +15,9 @@ import { openAppModal, showAppToast } from "./modal.js";
 import { canLaunchGame } from "./profileOperations.js";
 import { getDifficultyAccess } from './progression/difficultyProgress.js';
 import { ensureUiSkinRewards } from './uiSkin.js';
+import { projectJourneyTreasure } from './progression/treasureProjection.js';
+import { renderTreasureMapCard } from './progression/treasureMapCard.js';
+import { confirmFirstPlay } from './tutorial/firstPlay.js';
 import { playOwnedRewardCue } from './sound.js';
 
 const views = new Map(); // One bounded view per released game, independent of durable progress.
@@ -27,6 +30,9 @@ export function configureAdventureMap(options) {
 export function showAdventureTreasure(gameId, block) {
   return views.get(gameId)?.openTreasure?.(block) || false;
 }
+
+export function previewAdventureLevel(gameId,target) { return views.get(gameId)?.previewLevel?.(target) || false; }
+export function getViewedAdventureBlock(gameId) { return views.get(gameId)?.readCollectionBlock?.(); }
 
 export function mountAdventureMap(gameId) {
   const game = getGameDefinition(gameId);
@@ -73,9 +79,14 @@ export function mountAdventureMap(gameId) {
     scope.listen(control, "click", () => openSpecialMode(mode.id));
   }
   body.append(specials);
+  const treasureCard = button("", "treasure-map-card");
+  treasureCard.disabled = true;
+  body.prepend(treasureCard);
+  scope.listen(treasureCard, "click", () => { if (!loading) openChest({chestNumber:Number(treasureCard.dataset.block)}); });
   function setBusy(busy) {
     loading = busy;
     for (const control of specials.children) control.disabled = busy;
+    treasureCard.disabled = busy;
     for (const control of document.querySelectorAll('#adventure-level-modal input')) {
       const level = Number(control.closest('fieldset').dataset.level);
       control.disabled = busy || !getDifficultyAccess({completed:profile.bestByLevel,level,mode:control.value}).unlocked;
@@ -87,6 +98,18 @@ export function mountAdventureMap(gameId) {
   let renderedNodes = [];
   let loading = false;
   let pendingTreasure = null;
+  let pendingLevel = null;
+  const readCollectionBlock = () => scope.active && gameState.progress[game.progressKey] === profile ? Number(treasureCard.dataset.block) || undefined : undefined;
+  view.readCollectionBlock = readCollectionBlock;
+  scope.own(() => { if (view.readCollectionBlock === readCollectionBlock) view.readCollectionBlock = null; });
+  const previewLevel = target => {
+    if (!scope.active || !target || !Number.isSafeInteger(target.level) || target.level < 1 || !isNormalAdventureMode(target.mode)) return false;
+    if (loading || root.dataset.mapReady !== "true") pendingLevel=target;
+    else void prepareLevelPreview(target);
+    return true;
+  };
+  view.previewLevel=previewLevel;
+  scope.own(()=>{if(view.previewLevel===previewLevel)view.previewLevel=null;});
   const openTreasure = block => {
     if (!scope.active || !Number.isSafeInteger(block) || block < 1) return false;
     if (loading || root.dataset.mapReady !== 'true') pendingTreasure = block;
@@ -122,11 +145,26 @@ export function mountAdventureMap(gameId) {
     return summary.firstLevel;
   }
 
+  const collectionDock = root.querySelector('[data-dock-action="collection"]');
+  const collectionBadge = document.createElement('small');
+  collectionBadge.className='collection-progress-badge'; collectionBadge.hidden=true;
+  collectionDock.classList.add('has-collection-progress');collectionDock.append(collectionBadge);
+  function updateTreasureCard() {
+    if (!scope.active || loading || root.hidden) return;
+    const level = Math.max(bottomLevel, Math.min(topLevel, topLevel - Math.round((scroll.scrollTop + scroll.clientHeight / 2 - 64) / step)));
+    const block = Math.floor((level-1)/10)+1;
+    const treasure = projectJourneyTreasure({completed:{...adjacentBest,...profile.bestByLevel},block,claim:profile.claimedChests[block] || adjacentChests[block]});
+    renderTreasureMapCard(treasureCard, treasure);
+    collectionBadge.hidden=treasure.fragmentCount===0;collectionBadge.textContent=treasure.fragmentCount+'/10';
+    collectionDock.setAttribute('aria-label', 'Bộ sưu tập, Màn '+treasure.firstLevel+'–'+treasure.lastLevel+', '+treasure.fragmentCount+' trên 10 mảnh tranh');
+  }
+  scope.listen(window, 'resize', updateTreasureCard);
   function patchNodes() {
     if (!scope.active || loading) return;
     const summary = profile.adventure || getAdventureSummary(profile.bestByLevel);
     const currentLevel = currentLevelInMap(summary);
     const nodes = mapNodes();
+    updateTreasureCard();
     nodes.forEach((node, index) => {
       const element = renderedNodes[index];
       element.node = node;
@@ -253,13 +291,19 @@ export function mountAdventureMap(gameId) {
       scroll.scrollTop = view.chapter === profile.adventure.currentChapter ? Math.max(0, position(currentLevel).y - scroll.clientHeight * .5) : scroll.scrollHeight;
     }
     else scroll.scrollTop = view.scroll;
+    updateTreasureCard();
+    if(pendingLevel) {const target=pendingLevel;pendingLevel=null;void prepareLevelPreview(target);}
   }
 
   async function launch(mode, level, { skipIntro = false } = {}) {
     if (!scope.active || loading || !canLaunchGame()) return false;
     if (isNormalAdventureMode(mode) && !getDifficultyAccess({ completed: profile.bestByLevel, level, mode }).unlocked) return false;
     setBusy(true);
-    try { return await adapter.launch({ mode, level, skipIntro }); }
+    try {
+      const identity = gameState.settings;
+      if (!await confirmFirstPlay(gameId, scope) || !scope.active || gameState.settings !== identity || gameState.progress[game.progressKey] !== profile || !canLaunchGame()) return false;
+      return await adapter.launch({ mode, level, skipIntro });
+    }
     catch (error) {
       console.error("Level launch failed", error);
       if (scope.active) showAppToast("Chưa mở được màn chơi. Hãy thử lại.");
@@ -335,7 +379,7 @@ export function mountAdventureMap(gameId) {
       const label = event.target.closest('label.is-locked');
       if (!label || loading) return;
       event.preventDefault();
-      const grade = { easy: 'C', normal: 'B', hard: 'A', superHard: 'S' }[label.dataset.requiresMode];
+      const grade = getGameModeLabel(label.dataset.requiresMode);
       const prerequisite = Number(label.dataset.requiresLevel);
       showAppToast(`Hoàn thành độ khó ${grade}${prerequisite === level ? ' của màn này' : ` ở màn ${prerequisite}`} để mở khóa.`, { position: 'center', duration: 2200 });
     }
@@ -350,10 +394,7 @@ export function mountAdventureMap(gameId) {
   }
   function openSpecialMode(mode) { openLevel(1, mode); }
 
-  function openChest(node) {
-    openJourneyTreasure({ gameId, block: node.chestNumber, owner: scope,
-      onClaimed: () => { if (scope.active) { patchNodes(); refreshAppWallet(); } },
-      onPlay: async target => {
+  async function prepareLevelPreview(target) {
         setBusy(true);
         try {
           const ready = await prepareAdventureChapter(gameId, Math.floor((target.level - 1) / 100) + 1, () => scope.active && gameState.progress[game.progressKey] === profile);
@@ -365,7 +406,11 @@ export function mountAdventureMap(gameId) {
           if(scope.active) showAppToast('Chưa mở được màn chơi. Hãy thử lại.');
           console.error('Treasure level navigation failed',error.name);
         } finally { if(scope.active) setBusy(false); }
-      },
+  }
+  function openChest(node) {
+    openJourneyTreasure({ gameId, block: node.chestNumber, owner: scope,
+      onClaimed: () => { if (scope.active) { patchNodes(); refreshAppWallet(); } },
+      onPlay: prepareLevelPreview,
     });
   }
 
@@ -377,7 +422,9 @@ export function mountAdventureMap(gameId) {
     if (entry.node.kind === "level") openLevel(entry.node.level);
     else openChest(entry.node);
   });
-  scope.listen(scroll, "scroll", () => { if (!loading) view.scroll = scroll.scrollTop; }, { passive: true });
+  scope.listen(scroll, "scroll", () => { if (!loading) { view.scroll = scroll.scrollTop;
+    const level = Math.max(bottomLevel, Math.min(topLevel, topLevel - Math.round((scroll.scrollTop + scroll.clientHeight / 2 - 64) / step)));
+    if (Number(treasureCard.dataset.block) !== Math.floor((level-1)/10)+1) updateTreasureCard(); } }, { passive: true });
   const changeChapter = (direction, continuous = false) => {
     if (loading) return;
     const candidate = view.chapter + direction;

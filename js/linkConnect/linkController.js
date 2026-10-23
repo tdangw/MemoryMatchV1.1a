@@ -105,6 +105,7 @@ import {
   clearLinkTileHints,
   drawLinkPath,
   playLinkMatchExit,
+  getLinkMatchFeedbackDelay,
   playLinkMismatch,
   playLinkFrozenPairUnlock,
   playLinkEnergyFlight,
@@ -196,7 +197,7 @@ function chooseLinkMode(mode, label, difficultyModal) {
   const modal = openAppModal({
     id: "link-session-choice-modal",
     icon: "play",
-    title: `${label} - Level ${session.level}`,
+    title: `${label} · Màn ${session.level}`,
     content: "<p>Bạn muốn tiếp tục hành trình đã lưu hay bắt đầu lại từ cấp 1?</p>",
     actions: [
       {
@@ -538,15 +539,13 @@ async function handleLinkTileClick(position) {
     linkGameState.combo = 0;
     linkGameState.lastMatchAt = 0;
     stopLinkComboWindow();
-    linkGameState.isLocked = true;
     const wrongTiles = playLinkMismatch(selectedPosition, position);
+    clearLinkTileSelection();
+    selectedPosition = null;
     updateLinkHud();
     setTimeout(() => {
       if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
       wrongTiles.forEach((tileElement) => tileElement.classList.remove("is-wrong"));
-      clearLinkTileSelection();
-      selectedPosition = null;
-      unlockLinkBoard();
     }, LINK_CONNECT_TIMING.mismatchFeedbackMs);
     return;
   }
@@ -587,7 +586,11 @@ async function handleLinkTileClick(position) {
     return;
   }
   if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
-  const matchedTiles = playLinkMatchExit(matchedStart, position);
+  const willShift = board.grid.some((row, rowIndex) => row.some((tile, columnIndex) =>
+    tile && tile.instanceId !== rollback.state.board.grid[rowIndex][columnIndex]?.instanceId));
+  const needsBoardRecovery = !hasAvailableConnection(board.grid);
+  const retainVisualBoard = willShift || needsBoardRecovery || linkGameState.matchedPairs >= linkGameState.totalPairs;
+  const matchedTiles = playLinkMatchExit(matchedStart, position, { detached: !retainVisualBoard });
   if (linkGameState.matchedPairs >= linkGameState.totalPairs && linkGameState.wave.index < linkGameState.wave.count) {
     playOwnedRewardCue('wave', getLinkShell().scope, gameState.settings);
   }
@@ -604,27 +607,47 @@ async function handleLinkTileClick(position) {
   const bonusPositions = rewards.breakTileKeys.map(keys => keys.map(key => findLinkBoardTilePosition(rollback.state.board, key)));
   if (bonusPositions.length) {
     playLinkThunderStrike(bonusPositions.flat(), 'yellow');
-    setTimeout(() => {
-      if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
-      for (const positions of bonusPositions) playLinkMatchExit(...positions);
-    }, LINK_CONNECT_TIMING.thunderCardExitDelayMs);
+    // Capture the removed cards before patching the live board. Their old
+    // coordinates may already contain a different card after gravity/reflow.
+    for (const positions of bonusPositions) playLinkMatchExit(...positions, {
+      detached: !retainVisualBoard, delayMs: LINK_CONNECT_TIMING.thunderCardExitDelayMs,
+    });
   }
   if (rewards.energyProgress !== null) playLinkEnergyFlight(matchedStart, position, { targetProgress: rewards.energyProgress, progressTarget: LINK_CONNECT_CONFIG.special.progressTarget });
   if (rewards.unlocked.length) linkGameState.pendingFrozenTileKeys.push(...rewards.unlocked);
   const comboRemaining = Math.max(0, comboWindowMs - (performance.now() - matchedAt));
   if (comboRemaining > 0) startLinkComboWindow(comboRemaining, matchedAt, roundId, board);
-  setTimeout(async () => {
-    if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
-    selectedPosition = null; clearLinkPath();
-    renderLinkBoardShift(board, { onTileClick: handleLinkTileClick });
-    playPendingBoardTransforms(); updateLinkHud();
-    if (linkGameState.matchedPairs >= linkGameState.totalPairs) { await completeLinkLevel(); return; }
-    recoverBlockedLinkBoard(board);
-    await persistLinkRunProgress();
-    if (linkGameState.roundId === roundId && linkGameState.board === board) unlockLinkBoard();
-  }, bonusPositions.length
-    ? Math.max(getLinkMatchResolveDelay(), getLinkThunderResolveDelay())
-    : getLinkMatchResolveDelay());
+  selectedPosition = null;
+  updateLinkHud();
+  const feedbackDelay = getLinkMatchFeedbackDelay(matchedTiles)
+    + (bonusPositions.length ? LINK_CONNECT_TIMING.thunderCardExitDelayMs : 0);
+  if (linkGameState.matchedPairs >= linkGameState.totalPairs) {
+    // The terminal transition keeps its visual board until removal finishes.
+    setTimeout(async () => {
+      if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
+      clearLinkPath();
+      renderLinkBoard(board, { onTileClick: handleLinkTileClick });
+      await completeLinkLevel();
+    }, feedbackDelay);
+    return;
+  }
+  if (willShift || needsBoardRecovery) {
+    // The committed model can differ from the visible board only while input
+    // is locked. Finish removal before gravity/recovery introduces new cards
+    // into the old pair's cells; static boards have no such waiting period.
+    setTimeout(async () => {
+      if (linkGameState.roundId !== roundId || linkGameState.board !== board) return;
+      clearLinkPath();
+      renderLinkBoardShift(board, { onTileClick: handleLinkTileClick });
+      playPendingBoardTransforms();
+      if (recoverBlockedLinkBoard(board) && !await persistLinkRunProgress()) return;
+      if (linkGameState.roundId === roundId && linkGameState.board === board) unlockLinkBoard();
+    }, feedbackDelay);
+    return;
+  }
+  renderLinkBoard(board, { onTileClick: handleLinkTileClick });
+  playPendingBoardTransforms();
+  if (linkGameState.roundId === roundId && linkGameState.board === board) unlockLinkBoard();
 
 }
 

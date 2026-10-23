@@ -18,12 +18,19 @@ const GAME_BACKGROUNDS = Object.freeze({
 });
 
 const preloadCache = new Map();
+const BACKGROUND_LOAD_DEADLINE_MS = 8000;
 let transitionRevision = 0;
 let settlePendingTransition = null;
 
 export function preloadGameBackground(gameId) {
   const source = getGameBackgroundSource(gameId);
   return source ? preloadImage(source) : Promise.resolve(false);
+}
+
+/** Startup warms the same three sources navigation will use, not both orientations. */
+export function preloadGameBackgrounds(signal) {
+  return Promise.all(Object.keys(GAME_BACKGROUNDS).map(gameId =>
+    preloadImage(getGameBackgroundSource(gameId), signal)));
 }
 
 export async function prepareGameBackgroundTransition(gameId) {
@@ -64,23 +71,42 @@ function getGameBackgroundSource(gameId) {
   return `${BASE_PATH}assets/images/backgrounds/${background[orientation]}`;
 }
 
-function preloadImage(source) {
+function preloadImage(source, signal) {
+  if (signal?.aborted) return Promise.resolve(false);
   if (preloadCache.has(source)) return preloadCache.get(source);
   const result = new Promise((resolve) => {
     const image = new Image();
+    let settled = false;
+    const finish = loaded => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(deadline);
+      image.onload = null;
+      image.onerror = null;
+      signal?.removeEventListener('abort', abort);
+      if (!loaded) image.src = '';
+      resolve(loaded);
+    };
+    const abort = () => finish(false);
+    const deadline = setTimeout(abort, BACKGROUND_LOAD_DEADLINE_MS);
+    signal?.addEventListener('abort', abort, {once: true});
     image.decoding = "async";
     image.onload = async () => {
       try {
         if (typeof image.decode === "function") await image.decode();
-        resolve(true);
+        finish(true);
       } catch {
-        resolve(false);
+        finish(false);
       }
     };
-    image.onerror = () => resolve(false);
+    image.onerror = () => finish(false);
     image.src = source;
   });
   preloadCache.set(source, result);
+  // A transient failure must not poison later navigation/retry for this source.
+  void result.then(loaded => {
+    if (!loaded && preloadCache.get(source) === result) preloadCache.delete(source);
+  });
   return result;
 }
 

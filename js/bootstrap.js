@@ -1,13 +1,17 @@
 import { createStartupLoading } from './startupLoading.js';
+import { preloadGameBackgrounds } from './gameShell/gameBackgroundTransition.js';
 
 async function bootstrap() {
   let loading = createStartupLoading();
+  const backgroundOwner = new AbortController();
+  const backgrounds = preloadGameBackgrounds(backgroundOwner.signal);
   try {
     const { initializeApplication } = await import('./main.js');
     loading.complete('modules');
     const ready = await initializeApplication(loading.complete);
     if (ready !== false) {
       loading.prepareHome();
+      await backgrounds;
       loading.complete('home');
       await loading.finish();
     }
@@ -17,6 +21,7 @@ async function bootstrap() {
     console.error('[Startup]', error);
     loading.fail();
   } finally {
+    backgroundOwner.abort();
     loading = null;
   }
 }

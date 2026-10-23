@@ -6,12 +6,58 @@
 - D0 đã duyệt 30 quà/thứ tự/hình, giữ 300 Xu và receipt cũ; sau màn 10 tiếp tục chơi nhưng chưa có quà mới. Duyệt Cổ tích/storybook, font miễn phí đủ dấu Việt, bản ghép thật 412×915 phải duyệt trước rollout.
 - Bổ sung trực tiếp: avatar/khung/huy hiệu đang trang bị phải công khai trên BXH, đồng bộ khi lưu Hồ sơ; không thay điểm hay thứ tự xếp hạng. Thay quyết định cục bộ ban đầu. Chưa cho phép deploy dịch vụ/APK/push.
 
+## Kế hoạch mới: Cổ tích và Thành tích — chuẩn bị23/10/2026
+
+- Nguồn hiện hành của yêu cầu mới: [ILLUSTRATED_UI_ACHIEVEMENTS_PLAN.md](ILLUSTRATED_UI_ACHIEVEMENTS_PLAN.md). Lượt này **chỉ lập kế hoạch và vẽ bộ thưởng**, chưa thêm skin/runtime hoặc thay save. Giao diện mới đề xuất Cổ tích/storybook cạnh4skin đang có; mục tiêu dùng artwork đa lớp và slot chữ thật để sát mẫu, không chỉ đổi màu hộp CSS cũ. Các nghiệm thu UI trước vẫn là lịch sử, không thay acceptance mới.
+- Mỗi trò×màn đủ4độkhó lầnđầu nhận riêng một lần. Quà tự lưu; summary→thẻ thưởng chỉTiếp tục→đích đãchọn, không Nhậnquà/Dùngngay. Avatar/frame/badge qua chạmavatar trongHồsơ; ngoại hình/effect trongBộsưutập đúngtrò. Giữ rương, dữliệu/300Xuđãnhận và chỉ hướngdẫn nơi tìmquà lầnđầu; policy300Xu khi thaybộtranh cầnchốt trước migration.
+- Chủ dự án chốt **10màn mỗi trò —30thành tích**, đã chuẩn bị30ảnh rời tại `docs/design/achievements/art-kit-v1`:9avatar/9frame/6badge/6coverhiệuứng; nguồn riêng, WebP512/256/128 vàmetadata ghéplớp. [Bảng quà](docs/design/achievements/REWARD_CATALOG.md) và `reward-distribution.json` gán một món cho mỗi màn1–10 riêng từng trò; mỹ thuật/thứtự gán còn đểduyệt. Previewcover chưa là effectmotion, chrome toànapp còn gateD1–D2; policy sau màn10/300Xu cũ cầnchốt trước phần phụthuộc. [Prompt agent](docs/design/achievements/IMPLEMENTATION_PROMPT.md), [slotdraft](docs/design/achievements/layout-contract.draft.json), [copyngườichơi](docs/design/achievements/player-copy.vi.json).
+
+## Bổ sung tải nền lúc khởi động
+
+- Bootstrap đã warm/decode ba nền Memory/Link/Triple theo chiều màn hình trong loading, dùng cache/owner navigation hiện hữu. Chờ tối đa8giây; lỗi/hủy không khóa startup và được retry, không tải cả sáu bản dọc/ngang. Không đổi gameplay/save/skin.
+- Browser7/7 (320/412/844, ba trò vào ngay, decode pending, lỗi/timeout/abort/retry); `npm run check` và `npm run build` exit0. Check đầu vấp benchmark Triple khi chạy đồng thời đã giữ log và chạy riêng đạt, không sửa ngưỡng. Bằng chứng chung: `docs/design/advanced-ui/IMPLEMENTATION.md`, mục bổ sung tải nền; log/output `runtime/qa/startup-backgrounds-*`. Chưa đo điện thoại thật, không APK/commit/deploy.
+
+## Tích hợp hai giao diện — hoàn tất phạm vi web I0–I5, 22/10/2026
+
+- Theo yêu cầu tích hợp mới, Cài đặt có bốn lựa chọn: Mặc định/default, Nâng cao/woodland, Giấy cắt nhiều lớp/papercut, Phi thuyền vũ trụ/starship. Mở rộng owner hiện hữu, giữ key/schema save, geometry, ván đang chơi, luật và kinh tế; summary không thêm lại EXP/rương/mảnh.
+- Kế hoạch tích hợp: [PLAN.md](docs/design/ui-style-expansion/PLAN.md). Receipt duy nhất của lượt: [IMPLEMENTATION.md](docs/design/ui-style-expansion/IMPLEMENTATION.md), có kết quả loader/save/lifecycle/coverage, ảnh game thật và giới hạn hiệu suất. Phần chuẩn bị tài nguyên dưới đây là lịch sử trước khi được giao tích hợp, không còn là lệnh cấm runtime của lượt hiện tại.
+- Nguồn kit docs bị ignore; runtime chỉ mang 52WebP+66SVG mỗi bộ trong public, không atlas/source/QA. Generator `scripts/generate-ui-style-packs.mjs` chạy riêng khi có đúng kit nguồn. Không sửa ignore/force-add; không stage/commit/APK/push/deploy.
+- Kiểm tra web có baseline rect, 3game khi đổi skin, 6bài hướng dẫn, natural Memory wins, reward ledger/thu thập, lỗi/hủy/cache và bản build. Check/build đạt. Chưa đo FPS/GPU trên điện thoại thật; sample cold mixed có long task53ms, đã lưu đúng giới hạn trong receipt. Review là tự review riêng theo AGENT_PROMPT, không nhận là review độc lập.
+
+## Hai bộ giao diện bổ sung — tài nguyên và kế hoạch22/10/2026
+
+- Chủ dự án chốt **Giấy cắt nhiều lớp** (`papercut`) và **Phi thuyền vũ trụ** (`starship`), **chỉ tạo tài nguyên + kế hoạch, tích hợp sau**. Nguồn duy nhất của phần chuẩn bị mới: [PLAN.md](docs/design/ui-style-expansion/PLAN.md); tài nguyên/manifest/preview/prompt agent nằm cùng thư mục `docs/design/ui-style-expansion`. Không tự thêm vào Cài đặt hoặc sửa runtime trong lượt tài nguyên.
+- Kiểm kê:2skin runtime default/woodland;0bộ toàn app hoàn chỉnh khác sẵn nhưng chưa áp dụng. Ngọc Lam52ID là ứng viên đã bị loại, Woodland14ID là pilot lịch sử; các nhóm art theo màn không là skin độc lập. Hai bộ mới mỗi bộ52bitmap+66vector, cùng ID/frame; xem README và kết quả kiểm tra của kit, không nhận kit là skin game đã nghiệm thu.
+- Chủ dự án chốt thêm: khi geometry/owner của skin đầu đã đúng, bộ ảnh sau giữ contract chỉ cần kiểm kích thước/cắt/alpha và xem nhanh thành phần tiêu biểu. Không chạy lại toàn bộ game cho mỗi skin; mở rộng regression chỉ theo loader/save/CSS/lifecycle hoặc tải/animation thực sự thay đổi. Gate I0–I5 dành cho lượt tích hợp được giao sau, chưa thực hiện runtime. Giữ luật, save/API, hình mặt thẻ, tranh và kinh tế hiện hành.
+
+## Kế hoạch hiện hành: nhập môn, câu chữ và phần thưởng — 22/10/2026
+
+- Bổ sung tranh thực hiện sau: [COLLECTION_ART_ADDENDUM.md](docs/design/collection-art/COLLECTION_ART_ADDENDUM.md). Sau lần tạm dừng, chủ dự án cho phép tạo đúng3ảnh nữ châu Á trưởng thành18tuổi để đủ10ảnh dùng chung tính cả3legacy+7mới; ảnh mới lưu ở docs/design/collection-art/review-v1, không thay3ảnh public hoặc catalog hiện tại. Hướng mới: phong cảnh lãng mạn, nhân vật nữ trưởng thành. Lưu ý modulo theo length hiện tại có thể đổi tranh cũ nếu chỉ append catalog; phải giữ mapping/quyền sở hữu khi tích hợp sau. Đủ tài nguyên dùng thử không đồng nghĩa đã duyệt mỹ thuật cuối hoặc tích hợp runtime.
+
+- Nguồn thực thi hiện hành duy nhất cho yêu cầu UX mới: [UI_UX_ONBOARDING_REWARDS_PLAN.md](UI_UX_ONBOARDING_REWARDS_PLAN.md), R0–R8 đã triển khai và nghiệm thu phạm vi web; giới hạn và bằng chứng mới ở hồ sơ bên dưới. [Prompt bàn giao](docs/design/advanced-ui/ONBOARDING_REWARDS_AGENT_PROMPT.md).
+- Chủ dự án yêu cầu nhập môn tự động lần đầu ba trò, bàn tay từng bước, sửa phản hồi nối sai/bàn trống, rà câu chữ toàn app; popup thắng bỏ EXP/rương/mảnh, tiến trình về bản đồ/Kho báu và Bộ sưu tập. Giữ kinh tế, transaction và dữ liệu cũ; tranh hiện có chưa chốt mỹ thuật. Hoạt ảnh cảnh nền bản đồ tạm ngoài phạm vi.
+- Kết quả thực hiện22/10: ba trò có first-play/replay cùng bài, một bàn tay SVG đúng thao tác; Link giữ hình sau match và có đường/điểm chặn. Summary chỉ kết quả+Bản đồ/Chơi tiếp; tiến trình về map/Kho báu, bộ tranh có mảnh thiếu/đường chơi hợp lệ/300Xu một lần/xem lại. Chặn nút nhận thưởng của hồ sơ cũ và mở đúng bộ theo cụm bản đồ đang xem. Giữ luật, kinh tế, transaction, save key/formatVersion; chỉ mở rộng tương thích skipped trong tutorialProgress version1.
+- Hồ sơ mới: [IMPLEMENTATION.md](docs/design/advanced-ui/IMPLEMENTATION.md), phần R0–R8 và `runtime/qa/ONBOARDING_REWARDS_SUMMARY.json`.32profile/2016state có bằng chứng mới (lượt đầu31/32, profile carousel còn thiếu chạy lại3/3 theo điều khiển chọn trò rồi thẻ giữa);16profile bài,6thắng thật,8thua thật, lỗi/lifecycle/200cleanup và đo cùng build. Sau sửa range,19source và12compiled closure đạt; check/build cuối exit0. Không nhận mọi lượt click thẻ ngoài tâm đều đã được chứng minh; giữ lỗi đầu và trace trong hồ sơ.
+- Review cuối là tự review riêng, không nhận review độc lập. Mỹ thuật tranh chưa chốt, runtime giữ ba tranh cũ/mapping; nhánh collection-art review không tích hợp trong task UX này. Chưa xác nhận FPS điện thoại thật, keyboard Android thật hoặc Google OAuth/Firebase live. Không stage/commit, APK/push/deploy, server trùng hoặc sửa quyền; giữ công việc đồng thời của các agent khác.
+- G0–G10 UI cũ là nền tảng đã triển khai, không đại diện acceptance UX mới; ghi R0–R8 vào cùng `docs/design/advanced-ui/IMPLEMENTATION.md`. Bằng chứng trực tiếp lần đánh giá: Link→Cài đặt→Hướng dẫn→Tập luyện thiếu pointer ở hai bước đầu, sau nối đúng chỉ còn path, nối bị chặn chỉ hiện chữ. Không tự mở lại toàn bộ skin hoặc task effect/âm thanh của agent khác.
+
 ## Nghiệm thu giao diện toàn dự án — 22/10/2026
 
 - GAME_UX_SKIN_PLAN.md G0–G10 đạt phạm vi web; trạng thái cũ phía dưới giữ làm lịch sử. Hồ sơ duy nhất: docs/design/advanced-ui/IMPLEMENTATION.md, phần G10 và runtime/qa/G10_SUMMARY.json.
 - Đã ghép gỗ/giấy trên toàn ứng dụng, giữ Mặc định/Nâng cao; ba bài tập có bàn tay SVG tại Cài đặt→Hướng dẫn→Tập luyện. EXP/bốn rương/tranh giữ transaction và kinh tế hiện hữu.
 - Production32/32 (1920state,3trò/2skin/4viewport/2motion/DPR2–3), hồ sơ8/8, offline1/1, mua thật2/2, đo4/4, thua thật8/8; check/build pass và review độc lập đã đóng P2 race lưu skin. Không xác nhận FPS điện thoại thật hoặc Google OAuth/Firebase live.
 - Không APK/push/deploy hoặc server trùng; các thay đổi đồng thời của công việc khác được giữ ngoài commit UI.
+
+## Thao tác liên tiếp — phase sửa 21–22/10/2026
+
+- Phạm vi chủ dự án giới hạn: kết thúc phase đang sửa, kiểm tra lỗi thẻ cũ chưa xóa mà thẻ mới đã dồn vào; không mở phase giao diện khác. Link bàn đứng yên nhận lượt mới sau commit, hiệu ứng dùng bản sao không tương tác; bàn dồn/tự xáo và kết thúc đợt giữ thẻ gốc chạy xóa rồi mới thay vị trí. Memory giải phóng lựa chọn ngay sau commit, bỏ ghi lặp và không khóa toàn bàn trong hiệu ứng úp cặp sai. Triple chỉ kiểm chứng trong phase này.
+- 37 ca hành vi đạt, build web đạt; kiểm tra tổng cuối vướng câu chữ `UI_COPY.timeUpPrompt` do thay đổi ngoài phase. Ngân sách đường nối 3ms chưa đạt ổn định: đối chiếu xen kẽ bộ xóa cũ/mới có p95 3,7/3,5ms. Không đánh dấu hiệu năng toàn dự án đạt. Chi tiết, ownership và giới hạn tại `docs/qa/technical-improvement/RECEIPT.md`, mục phase 21–22/10. Không commit, APK, deploy hoặc sửa thay đổi của agent khác.
+
+## Thực hiện giao diện toàn dự án — 21/10/2026
+
+- Chủ dự án giao thực hiện `GAME_UX_SKIN_PLAN.md`, commit từng phase. G0 đã đối chiếu owner/call site và token; hồ sơ duy nhất tại `docs/design/advanced-ui/IMPLEMENTATION.md`, inventory 128 call site tại `inventory.json` (source inventory, không phải branch coverage).
+- G1 đang dựng bản ghép các màn thật, chưa tích hợp runtime. `docs/design/advanced-ui/woodland/README.md` yêu cầu G1 được duyệt trước tích hợp; bộ popup thắng cũ không thay cho duyệt toàn bộ màn. G2–G10 chưa đạt.
+- Trong lượt làm xuất hiện thay đổi ngoài task ở `js/config.js`, `js/memoryMatch/pairRewards.js`, `js/ui.js`; giữ nguyên và không đưa chúng vào commit giao diện.
 
 ## Kế hoạch hiện hành: giao diện toàn dự án, hướng dẫn và phần thưởng — 20/10/2026
 

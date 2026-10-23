@@ -8,4 +8,6 @@
 .mastery-collection p { margin: 12px 0; font-size: .875rem; }
 .mastery-painting { display: block; width: 100%; height: auto; max-height: 65dvh; object-fit: contain; }
 #mastery-painting-modal [hidden] { display: none; }
-.level-summary .mastery-win-reward { margin: 14px 0 0; text-align: center; color: #f5dfa3; font-weight: 700; }
+
+.mastery-collection__piece { border: 0; padding: 0; cursor: pointer; background-color: transparent; font-family: inherit; }
+.mastery-collection__piece:focus-visible { outline: 3px solid #ffd36b; outline-offset: -3px; }

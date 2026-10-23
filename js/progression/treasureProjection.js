@@ -15,7 +15,7 @@ export function projectJourneyTreasure({ completed, block, claim = {} }) {
       reward: MASTERY_CHEST_REWARDS[index] });
   });
   return Object.freeze({ block, firstLevel: mastery.firstLevel, lastLevel: mastery.lastLevel,
-    activeTier: mastery.activeTier, allClaimed: mastery.activeTier === null, chests: Object.freeze(chests) });
+    fragmentCount: mastery.fragmentLevels.length, activeTier: mastery.activeTier, allClaimed: mastery.activeTier === null, chests: Object.freeze(chests) });
 }
 
 /** Locate the next missing certification, including any prerequisite, without changing a session. */

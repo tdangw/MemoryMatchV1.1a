@@ -8,6 +8,8 @@ import { calculateMotionDelta, prefersReducedMotion, readCssTimeMs } from "../mo
 import { LINK_CONNECT_TIMING } from "./linkConfig.js";
 import { connectGameShellLayout } from "../gameShell/gameShellLayout.js";
 import { clearLinkEffectSurfaces, presentLinkConnection, presentLinkExit } from "./linkEffectAdapter.js";
+import { clearConnectionV2 } from "../effects/connectionEngine.js";
+import { getLinkMatchResolveDelay } from "./linkConfig.js";
 import { getLinkShell } from "./linkShell.js";
 import { captureShuffleCards, presentBoardShuffle } from '../gameShell/boardShufflePresentation.js';
 import {
@@ -30,6 +32,9 @@ const tileElementsByKey = new Map();
 const tileMotionAnimations = new WeakMap();
 const activeTileMotionAnimations = new Set();
 const transientEffectTimers = new Set();
+const matchExitCleanups = new Set();
+const MAX_MATCH_EXIT_GROUPS = 4;
+let linkPathTimer;
 
 export function renderLinkBoard(board, { onTileClick, onCompactLandscapeChange: onChange } = {}) {
   if (onChange) onCompactLandscapeChange = onChange;
@@ -76,14 +81,16 @@ function renderLinkBoardMotion(board, onTileClick) {
     patchLinkBoard(board, onTileClick);
     const after = getLinkTileRects();
     const settings = readLinkBoardShiftSettings();
+    let motionIndex = 0;
     after.forEach(({ element, rect, key }) => {
       const previous = before.get(key);
       if (!previous) return;
       const { x: deltaX, y: deltaY } = calculateMotionDelta(previous.rect, rect);
       if (!deltaX && !deltaY) return;
       animateLinkTileMotion(element, deltaX, deltaY, settings);
+      motionIndex += 1;
     });
-    return holdLinkBoardDuringMotion(settings);
+    return motionIndex ? holdLinkBoardDuringMotion(settings) : 0;
   });
 }
 
@@ -425,13 +432,75 @@ export function playLinkMismatch(start, end) {
   });
 }
 
-export function playLinkMatchExit(start, end) {
-  const tiles = [start, end].flatMap((position) => {
+export function playLinkMatchExit(start, end, { detached = false, delayMs = 0 } = {}) {
+  const sources = [start, end].flatMap((position) => {
     const tile = getLinkTileButton(position);
     if (!tile) return [];
     return [tile];
   });
-  return presentLinkExit({ frame: document.getElementById("link-board-frame"), tiles, appearance: gameState.appearance });
+  const frame = document.getElementById("link-board-frame");
+  if (!detached && delayMs && frame && !prefersReducedMotion()) {
+    const appearance = { ...gameState.appearance };
+    scheduleTransientEffect(() => presentLinkExit({ frame, tiles: sources, appearance }), delayMs);
+    return sources;
+  }
+  if (!detached || !frame || prefersReducedMotion()) {
+    return presentLinkExit({ frame, tiles: sources, appearance: gameState.appearance });
+  }
+  const scope = getLinkShell().scope;
+  if (!scope?.active || !sources.length) return [];
+  while (matchExitCleanups.size >= MAX_MATCH_EXIT_GROUPS) matchExitCleanups.values().next().value();
+  const frameRect = frame.getBoundingClientRect();
+  const snapshots = sources.map(source => ({ source, rect: source.getBoundingClientRect() }));
+  const tiles = snapshots.map(({ source, rect }) => {
+    const ghost = source.cloneNode(true);
+    ghost.removeAttribute('id');
+    ghost.removeAttribute('data-tile-key');
+    ghost.removeAttribute('data-row');
+    ghost.removeAttribute('data-column');
+    ghost.classList.remove('is-selected', 'is-hinted');
+    ghost.classList.add('link-match-ghost');
+    ghost.disabled = true;
+    ghost.tabIndex = -1;
+    ghost.setAttribute('aria-hidden', 'true');
+    Object.assign(ghost.style, { position: 'absolute', pointerEvents: 'none', margin: '0',
+      left: `${rect.left - frameRect.left - frame.clientLeft}px`, top: `${rect.top - frameRect.top - frame.clientTop}px`,
+      width: `${rect.width}px`, height: `${rect.height}px`, zIndex: '5' });
+    frame.append(ghost);
+    return ghost;
+  });
+  let release;
+  let timer;
+  let launchTimer;
+  const cleanup = () => {
+    if (!matchExitCleanups.delete(cleanup)) return;
+    clearTimeout(timer);
+    clearTimeout(launchTimer);
+    tiles.forEach(tile => tile.remove());
+    release?.forget();
+  };
+  matchExitCleanups.add(cleanup);
+  release = scope.own(cleanup, 'node');
+  const appearance = { ...gameState.appearance };
+  const launch = () => {
+    presentLinkExit({ frame, tiles, appearance });
+    timer = setTimeout(cleanup, getLinkMatchFeedbackDelay(tiles));
+  };
+  if (delayMs) launchTimer = setTimeout(launch, delayMs);
+  else launch();
+  return tiles;
+}
+
+export function getLinkMatchFeedbackDelay(tiles) {
+  let duration = getLinkMatchResolveDelay();
+  for (const tile of tiles) {
+    const style = getComputedStyle(tile);
+    duration = Math.max(duration,
+      readCssTimeMs(style.getPropertyValue('--link-tile-exit-delay'), LINK_CONNECT_TIMING.tileExitDelayMs)
+      + readCssTimeMs(style.getPropertyValue('--link-tile-exit-duration'), LINK_CONNECT_TIMING.tileExitAnimationMs)
+      + LINK_CONNECT_TIMING.matchSettleMs);
+  }
+  return duration;
 }
 
 // Năng lượng chỉ là hiệu ứng tạm trên lớp phủ; không tạo hay lưu vật phẩm.
@@ -518,6 +587,9 @@ export function playLinkThunderStrike(positions, colorId = "yellow") {
 }
 
 export function clearLinkTransientEffects() {
+  [...matchExitCleanups].forEach(cleanup => cleanup());
+  clearTimeout(linkPathTimer);
+  linkPathTimer = undefined;
   shufflePresentation?.cancel();
   shufflePresentation = null;
   clearTimeout(boardInteractionTimer);
@@ -644,9 +716,17 @@ export function drawLinkPath(path, board) {
   const points = path.map((position) => toPercentPoint(position, board, boardElement));
   if (points.some((point) => !point)) return;
   presentLinkConnection({ surface: svg, points, appearance: gameState.appearance, seed: path.length * 2654435761 });
+  clearTimeout(linkPathTimer);
+  linkPathTimer = setTimeout(() => {
+    clearConnectionV2(svg);
+    linkPathTimer = undefined;
+  }, getLinkMatchResolveDelay());
 }
 
 export function clearLinkPath() {
+  [...matchExitCleanups].forEach(cleanup => cleanup());
+  clearTimeout(linkPathTimer);
+  linkPathTimer = undefined;
   const svg = document.getElementById("link-path-overlay");
   if (!svg) return;
   clearLinkEffectSurfaces(svg);

@@ -86,7 +86,7 @@ export function showAccountPanel(surface = {}) {
       if (await service.setPlayerName(name.value)) {
         if (!disposed && uid === service.getState().uid) { closeEditor(); showAppToast('Đã lưu tên hiển thị.'); }
       } else if (!disposed && uid === service.getState().uid) error.textContent = 'Chưa lưu được tên. Hãy thử lại.';
-    } catch (failure) { if (!disposed && uid === service.getState().uid) error.textContent = failure.message; }
+    } catch (failure) { if (!disposed && uid === service.getState().uid) error.textContent = failure.message === 'Tên hiển thị cần từ 1–20 ký tự.' ? failure.message : 'Chưa lưu được tên. Kiểm tra kết nối và thử lại.'; }
     finally { saving = false; if (!disposed) { renderState(service.getState()); if (form.hidden && !edit.disabled) edit.focus(); } }
   };
   google.onclick = async () => {
