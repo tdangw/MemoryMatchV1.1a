@@ -1,5 +1,11 @@
 # CONTEXT — Trạng thái hiện tại (2026-10-20)
 
+## Triển khai Cổ tích và Thành tích — 23/10/2026
+
+- Đã giao toàn bộ D0–Q1 trong `ILLUSTRATED_UI_ACHIEVEMENTS_PLAN.md`, commit từng phase; receipt chung: `STORYBOOK_IMPLEMENTATION_RECEIPT.md`. Các giới hạn chỉ chuẩn bị bên dưới là lịch sử của lượt trước.
+- D0 đã duyệt 30 quà/thứ tự/hình, giữ 300 Xu và receipt cũ; sau màn 10 tiếp tục chơi nhưng chưa có quà mới. Duyệt Cổ tích/storybook, font miễn phí đủ dấu Việt, bản ghép thật 412×915 phải duyệt trước rollout.
+- Bổ sung trực tiếp: avatar/khung/huy hiệu đang trang bị phải công khai trên BXH, đồng bộ khi lưu Hồ sơ; không thay điểm hay thứ tự xếp hạng. Thay quyết định cục bộ ban đầu. Chưa cho phép deploy dịch vụ/APK/push.
+
 ## Nghiệm thu giao diện toàn dự án — 22/10/2026
 
 - GAME_UX_SKIN_PLAN.md G0–G10 đạt phạm vi web; trạng thái cũ phía dưới giữ làm lịch sử. Hồ sơ duy nhất: docs/design/advanced-ui/IMPLEMENTATION.md, phần G10 và runtime/qa/G10_SUMMARY.json.
