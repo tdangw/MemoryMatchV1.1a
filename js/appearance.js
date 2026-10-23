@@ -1,5 +1,6 @@
 import { THEMES, getTheme, getUsableTheme } from "./themeCatalog.js";
 import { LINK_EXIT_EFFECTS, LINK_PATH_EFFECTS } from "./linkConnect/linkEffects.js";
+import { ACHIEVEMENT_ITEMS, normalizeAchievementLedger, normalizeProfileCosmetics, ACHIEVEMENT_OWNED_SLOTS } from './progression/achievementModel.js';
 
 const DEFAULT_APPEARANCE = Object.freeze({
   cardBack: "classic",
@@ -89,6 +90,8 @@ export const CARD_BACKS = Object.freeze([
 ]);
 
 export const FLIP_EFFECTS = Object.freeze([
+  ...ACHIEVEMENT_ITEMS.filter(item => item.equipSlot === 'flipEffect').map(item => Object.freeze({ id: item.id, title: item.name,
+    price: null, achievementOnly: true, gameId: item.gameId, animationClass: item.id === 'memory-effect-moonflip' ? 'appear-storybook-moon' : 'appear-storybook-petals' })),
   { id: "bounce", title: "Bật nảy", price: 0, animationClass: "appear-bounce" },
   {
     id: "fade-scale",
@@ -135,6 +138,20 @@ function ownedIds(items, value, defaultId) {
 }
 
 export function normalizeAppearance(value = {}) {
+  const achievements = normalizeAchievementLedger(value.achievements);
+  value = { ...value };
+  const linkPaths = LINK_PATH_EFFECTS.filter(item => !item.gameId || item.gameId === 'link-connect');
+  const linkExits = LINK_EXIT_EFFECTS.filter(item => !item.gameId || item.gameId === 'link-connect');
+  const triplePaths = LINK_PATH_EFFECTS.filter(item => !item.gameId || item.gameId === 'triple-connect');
+  const tripleExits = LINK_EXIT_EFFECTS.filter(item => !item.gameId || item.gameId === 'triple-connect');
+  const granted = new Set(Object.values(achievements.grants).map(grant => grant.itemId));
+  for (const slot of Object.values(ACHIEVEMENT_OWNED_SLOTS)) if (Array.isArray(value[slot]))
+    value[slot] = value[slot].filter(id => !ACHIEVEMENT_ITEMS.some(item => item.id === id) || granted.has(id));
+  for (const grant of Object.values(achievements.grants)) {
+    const item = ACHIEVEMENT_ITEMS.find(item => item.id === grant.itemId);
+    const slot = ACHIEVEMENT_OWNED_SLOTS[item.equipSlot];
+    if (slot) value[slot] = [...new Set([...(Array.isArray(value[slot]) ? value[slot] : []), item.id])];
+  }
   const ownedCardBacks = ownedIds(
     CARD_BACKS,
     value.ownedCardBacks,
@@ -146,12 +163,12 @@ export function normalizeAppearance(value = {}) {
     DEFAULT_APPEARANCE.flipEffect,
   );
   const ownedLinkPathEffects = ownedIds(
-    LINK_PATH_EFFECTS,
+    linkPaths,
     value.ownedLinkPathEffects,
     DEFAULT_APPEARANCE.linkPathEffect,
   );
   const ownedLinkExitEffects = ownedIds(
-    LINK_EXIT_EFFECTS,
+    linkExits,
     value.ownedLinkExitEffects,
     DEFAULT_APPEARANCE.linkExitEffect,
   );
@@ -165,16 +182,18 @@ export function normalizeAppearance(value = {}) {
     value.flipEffect,
     DEFAULT_APPEARANCE.flipEffect,
   );
-  const linkPathEffect = knownId(LINK_PATH_EFFECTS, value.linkPathEffect, DEFAULT_APPEARANCE.linkPathEffect);
-  const linkExitEffect = knownId(LINK_EXIT_EFFECTS, value.linkExitEffect, DEFAULT_APPEARANCE.linkExitEffect);
+  const linkPathEffect = knownId(linkPaths, value.linkPathEffect, DEFAULT_APPEARANCE.linkPathEffect);
+  const linkExitEffect = knownId(linkExits, value.linkExitEffect, DEFAULT_APPEARANCE.linkExitEffect);
   const ownedThemes = normalizeOwnedThemes(value);
   const ownedTripleThemes = ownedIds(THEMES, value.ownedTripleThemes, "default");
   const themes = normalizeEquippedThemes(value, ownedThemes, ownedTripleThemes);
-  const ownedTriplePathEffects = ownedIds(LINK_PATH_EFFECTS, value.ownedTriplePathEffects, "default");
-  const ownedTripleExitEffects = ownedIds(LINK_EXIT_EFFECTS, value.ownedTripleExitEffects, "default");
-  const triplePathEffect = knownId(LINK_PATH_EFFECTS, value.triplePathEffect, "default");
-  const tripleExitEffect = knownId(LINK_EXIT_EFFECTS, value.tripleExitEffect, "default");
+  const ownedTriplePathEffects = ownedIds(triplePaths, value.ownedTriplePathEffects, "default");
+  const ownedTripleExitEffects = ownedIds(tripleExits, value.ownedTripleExitEffects, "default");
+  const triplePathEffect = knownId(triplePaths, value.triplePathEffect, "default");
+  const tripleExitEffect = knownId(tripleExits, value.tripleExitEffect, "default");
   return {
+    achievements,
+    profileCosmetics: normalizeProfileCosmetics(value.profileCosmetics, achievements),
     cardBack: ownedCardBacks.includes(cardBack)
       ? cardBack
       : DEFAULT_APPEARANCE.cardBack,

@@ -282,7 +282,7 @@ function renderLinkEffectShop(
   heading.textContent = title;
   const choices = document.createElement("div");
   choices.className = "appearance-choice-grid";
-  effects.forEach((item) => {
+  effects.filter(item => !item.achievementOnly).forEach((item) => {
     const owned = gameState.appearance[ownedKey].includes(item.id);
     const card = document.createElement("article");
     card.className = "appearance-choice";
@@ -439,7 +439,7 @@ function renderTripleEffectShop(
   heading.textContent = title;
   const choices = document.createElement("div");
   choices.className = "appearance-choice-grid";
-  effects.forEach((item) => {
+  effects.filter(item => !item.achievementOnly).forEach((item) => {
     const owned = gameState.appearance[ownedKey].includes(item.id);
     const card = document.createElement("article");
     card.className = "appearance-choice";
@@ -626,7 +626,7 @@ function renderAppearanceGroup(grid, title, type, items, roundId, modal) {
   const choices = document.createElement("div");
   choices.className = "appearance-choice-grid";
 
-  items.forEach((item) => {
+  items.filter(item => !item.achievementOnly).forEach((item) => {
     const ownedKey =
       type === "cardBack" ? "ownedCardBacks" : "ownedFlipEffects";
     const owned = gameState.appearance[ownedKey].includes(item.id);

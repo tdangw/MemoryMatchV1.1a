@@ -5,12 +5,14 @@ const PATH_FAMILIES = Object.freeze({
   cyber: "packets", rainbow: "gradient", hydro: "wave", plasma: "helix", holy: "motes",
   shadow: "ribbon", spiral: "helix", dashed: "dash", bullet: "projectile", kame: "charge",
   halo: "rings", matrix: "symbols", sonic: "wavelets", chains: "links", meteor: "sparks", poison: "droplets",
+  'link-effect-meteor-route': 'sparks', 'triple-effect-triad-converge': 'motes',
 });
 const EXIT_FAMILIES = Object.freeze({
   default: "waapi", dissolve: "mask", finedust: "particles", split4: "fragments", split2: "fragments",
   split8: "fragments", triangles: "fragments", crumble: "particles", gravity: "waapi", collide: "pair",
   portal: "portal", blackhole: "group", freeze: "shards", burn: "mask", pixel: "pixels", implode: "implode",
   slice: "fragments", bubble: "droplets", origami: "fold", "electric-shock": "shock", ghost: "ghost",
+  'link-effect-moon-petals': 'droplets', 'triple-effect-crystal-bloom': 'fragments',
 });
 
 function makeEntry(effect, family, duration, qualityCost, supportsTargetCounts, impactDelayMs = null) {
@@ -47,7 +49,7 @@ export const getEffectV2Path = id => resolve(EFFECT_V2_PATHS, id);
 export const getEffectV2Exit = id => resolve(EFFECT_V2_EXITS, id);
 
 export function validateEffectV2Catalog() {
-  for (const [label, entries, expected] of [["path", EFFECT_V2_PATHS, 21], ["exit", EFFECT_V2_EXITS, 21]]) {
+  for (const [label, entries, expected] of [["path", EFFECT_V2_PATHS, 23], ["exit", EFFECT_V2_EXITS, 23]]) {
     if (entries.length !== expected || new Set(entries.map(entry => entry.id)).size !== expected) {
       throw new Error(`Invalid ${label} effect catalog`);
     }

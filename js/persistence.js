@@ -8,6 +8,7 @@ import {
   migrateChapterLevelRankings,
 } from "./chapterStore.js";
 import { GAMEPLAY_SEASON, gameplaySeasonReset } from './progression/gameplaySeason.js';
+import { settleAchievementInventory, normalizeAchievementLedger, ACHIEVEMENT_GAME_KEYS } from './progression/achievementModel.js';
 
 export const SAVE_FORMAT_VERSION = 2;
 const ROOT_STORAGE_KEY = "memoryMatchSave";
@@ -126,6 +127,8 @@ export function savePersistentGameData({ coins, appearance, progress, settings, 
       if (!database && previous && previous.revision > knownRevision) throw new Error("Dữ liệu đã được cập nhật ở tab khác.");
       const envelope = createEnvelope({ ...(previous?.data || createDefaultPayload()), ...patch }, knownRevision + 1);
       if (patch.settings) envelope.data.settings = { ...previous?.data.settings, ...patch.settings };
+      if (patch.progress || patch.appearance) envelope.data.appearance = settleAchievementInventory(previous?.data.appearance,
+        envelope.data.appearance, patch.progress || {});
       if (database) currentEnvelope = await writeChapterProfile(database, envelope, knownRevision);
       else {
         localStorage.setItem(activeStorageKey, JSON.stringify(envelope));
@@ -137,7 +140,7 @@ export function savePersistentGameData({ coins, appearance, progress, settings, 
         try { localStorage.setItem(PRIMARY_MARKER_KEY, String(knownRevision)); }
         catch (error) { console.warn("[Persistence] Không gửi được thông báo giữa các tab:", error.message); }
       }
-      notifyCommit({ ...patch, ...(cloudEvent ? { cloudEvent: true } : {}) });
+      notifyCommit({ ...patch, ...((patch.progress || patch.appearance) ? { appearance: structuredClone(envelope.data.appearance) } : {}), ...(cloudEvent ? { cloudEvent: true } : {}) });
       return true;
     } catch (error) { blocked = true; reportPersistenceError("write", error); return false; }
   });
@@ -147,6 +150,25 @@ export const saveProgress = progress => savePersistentGameData({ progress });
 export const saveCoins = coins => savePersistentGameData({ coins });
 export const saveAppearance = appearance => savePersistentGameData({ appearance });
 export const flushPersistentWrites = () => queue;
+/** The catalog only covers chapter 1; three bounded reads backfill old certified wins. */
+export function backfillAchievementInventory() {
+  return enqueue(async () => {
+    await initialize(); if (blocked) return false;
+    try {
+      const previous = database ? currentEnvelope : readLocalEnvelope();
+      if (normalizeAchievementLedger(previous?.data.appearance?.achievements).backfillVersion === 1) return true;
+      const progress = {};
+      for (const key of Object.values(ACHIEVEMENT_GAME_KEYS)) progress[key] = database
+        ? await readChapter(database, key, 1) : previous?.data.progress[key] || {};
+      const appearance = settleAchievementInventory(previous?.data.appearance, previous?.data.appearance, progress, { backfill: true });
+      const envelope = createEnvelope({ ...(previous?.data || createDefaultPayload()), appearance }, knownRevision + 1);
+      if (database) currentEnvelope = await writeChapterProfile(database, envelope, knownRevision);
+      else { localStorage.setItem(activeStorageKey, JSON.stringify(envelope)); currentEnvelope = envelope; }
+      knownRevision = envelope.revision;
+      notifyCommit({ appearance: structuredClone(appearance), cloudEvent: true }); return true;
+    } catch (error) { blocked = true; reportPersistenceError('achievements', error); return false; }
+  });
+}
 export function migrateLevelRankingsBatch(owner, isCurrent = () => true) {
   return enqueue(async () => {
     await initialize();
@@ -237,7 +259,10 @@ export function importPersistentSnapshot(snapshot, environment, metadata, isCurr
     if (currentEnvelope?.data.progress.gameplaySeason === GAMEPLAY_SEASON && snapshot?.profile?.data.progress.gameplaySeason !== GAMEPLAY_SEASON)
       throw new Error('Bản lưu không cùng phiên bản. Dữ liệu hiện tại được giữ nguyên.');
     if (blocked || !database || !isCurrent()) return false;
-    const envelope = createEnvelope(snapshot.profile.data, knownRevision + 1);
+    const restored = structuredClone(snapshot.profile.data), certified = {};
+    for (const key of Object.values(ACHIEVEMENT_GAME_KEYS)) certified[key] = snapshot.chapters.find(entry => entry.key === `${key}:1`)?.value || restored.progress[key] || {};
+    restored.appearance = settleAchievementInventory(restored.appearance, restored.appearance, certified, { backfill: true });
+    const envelope = createEnvelope(restored, knownRevision + 1);
     await replaceChapterSnapshot(database, snapshot, envelope, knownRevision, `cloud:${environment}`, { ...metadata, lastSyncedLocalRevision: synced ? envelope.revision : 0 }, isCurrent);
     currentEnvelope = envelope; knownRevision = envelope.revision;
     try { localStorage.setItem(PRIMARY_MARKER_KEY, String(knownRevision)); }

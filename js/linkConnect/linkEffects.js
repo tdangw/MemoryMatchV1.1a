@@ -1,4 +1,8 @@
 const EFFECT_PRICE = 1;
+import { ACHIEVEMENT_ITEMS } from '../progression/achievementCatalog.generated.js';
+const achievementEffects = slot => ACHIEVEMENT_ITEMS.filter(item => slot.includes(item.equipSlot)).map(item =>
+  Object.freeze({ id: item.id, title: item.name, icon: 'star', price: null, achievementOnly: true,
+    gameId: item.gameId, className: `${item.equipSlot.endsWith('PathEffect') ? 'link-path-overlay' : 'link-tile'}--${item.id}` }));
 
 function effect(id, title, icon, className, defaultOwned = false) {
   return Object.freeze({ id, title, icon, price: defaultOwned ? 0 : EFFECT_PRICE, className, defaultOwned });
@@ -28,6 +32,7 @@ export const LINK_PATH_EFFECTS = Object.freeze([
   effect("chains", "Chains", "link", "link-path-overlay--chains"),
   effect("meteor", "Meteor", "celebrate", "link-path-overlay--meteor"),
   effect("poison", "Poison", "leaf", "link-path-overlay--poison"),
+  ...achievementEffects(['linkPathEffect', 'triplePathEffect']),
 ]);
 
 export const LINK_EXIT_EFFECTS = Object.freeze([
@@ -52,6 +57,7 @@ export const LINK_EXIT_EFFECTS = Object.freeze([
   effect("origami", "Origami", "arrow-right", "link-tile--origami"),
   effect("electric-shock", "Electric Shock", "wand", "link-tile--electric-shock"),
   effect("ghost", "Ghost", "moon", "link-tile--ghost"),
+  ...achievementEffects(['linkExitEffect', 'tripleExitEffect']),
 ]);
 
 export function getLinkPathEffect(id) { return LINK_PATH_EFFECTS.find((item) => item.id === id) || LINK_PATH_EFFECTS[0]; }

@@ -48,7 +48,8 @@ không phải bằng chứng runtime hoặc FPS.
 | D2 | PASS — chủ dự án duyệt cả ba bản ghép ngày 23/10/2026 |
 | S1 | PASS — registry/loader, 8 unit + 3 browser |
 | S2 | PASS — chrome dùng owner hiện hữu, browser S1/S2 16/16 |
-| F1–F3 | Chưa triển khai grant/queue/cosmetics |
+| F1 | PASS — grants/normalize/backfill/atomic persistence |
+| F2–F3 | Đang triển khai queue/cosmetics/public sync |
 | Q1 | Chưa nghiệm thu sản phẩm |
 
 Skill thực dùng: `clarify-ambiguous-requirements` chốt D0; `imagegen`
@@ -180,3 +181,32 @@ viewport, chọn Cổ tích bằng nút thật, shop/collection/settings/profile
 fallback icon khi asset fail. Xem ảnh reference Memory và landscape Triple;
 CSS ownership + cú pháp PASS. Không đổi luật, persistence, card faces,
 path hoặc timeline gameplay. Tự chuyển F1, chưa nghiệm thu feature grant.
+
+## F1 — grant và dữ liệu
+
+Catalog sinh từ đúng reward-distribution: 30 ID/game×màn, 90 WebP lazy
+128/256/512; không preload toàn kho. Đăng ký effect ID trước normalize,
+lọc achievement-only khỏi shop, giữ 21 effect cũ/giá/ID và fallback mặc định.
+Hai preset path và hai preset exit mới dùng catalog V2; motion cụ thể được
+hoàn thiện/kiểm F3, không coi cover là runtime effect đã nghiệm thu.
+
+Phương án chọn: projection thuần ở durability boundary chung, không lặp
+grant trong ba controller và không mutate kho RAM trước save. Cùng envelope
+và transaction chứa kết quả, ví, ledger, quyền sở hữu và pending announcement.
+Callback subscriber cập nhật appearance RAM sau commit. Lỗi không commit
+phần nào; stale appearance không xóa receipt hoặc đảo announced về false.
+Điều kiện tái dùng chứng nhận bốn độ khó và validation record hiện hữu,
+không suy từ sao/S. Không auto-equip, không quà sau màn10, không modulo.
+
+Thêm field versioned `appearance.achievements` và `profileCosmetics`, giữ
+formatVersion2/key cũ; save cũ thiếu field được normalize. Ledger hỏng hoặc
+version lạ bị từ chối, không ghi đè nguồn. Quyền effect chỉ hợp lệ ở slot
+đúng trò và có receipt. Receipt là nguồn sở hữu duy nhất của đồ hồ sơ.
+Backfill có marker, đọc hữu hạn ba chapter1 dù frontier đã qua chương đó;
+grant cũ im lặng. Import backfill trong chính transaction restore, không
+buộc chơi lại, không cấp lại/xóa 300Xu hoặc các receipt rương.
+
+PASS: F1 unit/contract 7/7 (có IndexedDB giả lập, lỗi quota, archive,
+restore cũ và future ledger), UI Chrome1/1 (durable/RAM/reload/replay/backup),
+check-persistence, chapter-store, cloud-snapshot, effect-v2 và appearance.
+Không đổi ranking formula, profile UID ownership hoặc luật chơi. Tự chuyển F2.

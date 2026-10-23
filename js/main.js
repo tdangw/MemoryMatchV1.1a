@@ -52,6 +52,7 @@ import {
 } from "./ui.js";
 import { showAppToast, openAppModal } from "./modal.js";
 import { gameState, hydrateGameState, resetGame } from "./gameState.js";
+import { normalizeAppearance } from './appearance.js';
 import {
   loadPersistentGameData,
   ensureGameplaySeason,
@@ -59,6 +60,8 @@ import {
   subscribeToPersistenceFailure,
   getPersistenceStatus,
   loadProfileOwner,
+  backfillAchievementInventory,
+  subscribeToLocalCommit,
 } from "./persistence.js";
 import { setRankingOwner } from './rankingOwner.js';
 import {
@@ -112,7 +115,9 @@ let accountRuntime = null;
 let accountReady = null;
 await loadPersistentGameData();
 const seasonReady = await ensureGameplaySeason();
-hydrateGameState(seasonReady ? await loadPersistentGameData() : undefined);
+const achievementReady = !seasonReady || await backfillAchievementInventory();
+hydrateGameState(seasonReady && achievementReady ? await loadPersistentGameData() : undefined);
+subscribeToLocalCommit(({ patch }) => { if (patch.appearance) gameState.appearance = normalizeAppearance(patch.appearance); });
 setRankingOwner(await loadProfileOwner());
 await restoreUiSkin();
 onProgress('save');

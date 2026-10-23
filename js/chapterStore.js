@@ -1,4 +1,5 @@
 import { getAdventureSummary, getChapterNumber, MAX_ADVENTURE_CHAPTER } from "./adventureProgress.js";
+import { normalizeAchievementLedger } from './progression/achievementModel.js';
 import { highestOwnedAdventureLevel, createProgressResult, keepProgressBest, sameRankingOwner, validateProgressResult, normalizeProgressMigration, normalizeProgressBests } from './progressRankingModel.js';
 
 export const CHAPTER_DATABASE = "memoryMatchAdventure";
@@ -101,6 +102,7 @@ export function validateChapterSnapshot(snapshot) {
     const chapter = data.progress[game]?.adventure?.currentChapter;
     if (chapter !== undefined && (!Number.isSafeInteger(chapter) || chapter < 1 || chapter > MAX_ADVENTURE_CHAPTER)) throw new Error("Chặng cloud không hợp lệ.");
   }
+  normalizeAchievementLedger(data.appearance.achievements);
   const seen = new Set();
   for (const entry of snapshot.chapters) {
     const match = /^(memoryMatch|linkConnect|tripleConnect):([1-9]\d*)$/.exec(entry?.key || "");
