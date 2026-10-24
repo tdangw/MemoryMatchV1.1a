@@ -29,6 +29,7 @@
       "type": "avatar",
       "gameId": "memory-match",
       "level": 11,
+      "sourceKind": "achievement",
       "canvas": [
         512,
         512
@@ -84,6 +85,7 @@
       "type": "frame",
       "gameId": "memory-match",
       "level": 12,
+      "sourceKind": "achievement",
       "canvas": [
         512,
         512
@@ -146,6 +148,7 @@
       "type": "badge",
       "gameId": "memory-match",
       "level": 13,
+      "sourceKind": "achievement",
       "canvas": [
         512,
         512
@@ -192,6 +195,419 @@
           "file": "sprites/memory-badge-wisdom-seal-512.webp",
           "bytes": 68604,
           "sha256": "07657847d0fb091033f6121da7dfd56d3338942d727add4d70d0c593b331b33d"
+        }
+      }
+    },
+    "memory-avatar-stargazer-hedgehog": {
+      "id": "memory-avatar-stargazer-hedgehog",
+      "name": "Nhím Chiêm Tinh",
+      "type": "avatar",
+      "gameId": "memory-match",
+      "level": 14,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 97,
+        "top": 97,
+        "width": 318,
+        "height": 318
+      },
+      "source": {
+        "file": "sources/memory-avatar-stargazer-hedgehog.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 59,
+          "top": 66,
+          "width": 1132,
+          "height": 1122
+        },
+        "sha256": "189177cc4f15f43205ed7a49950e9ae40bad2a20227d531209f1b34b25c4cfa4",
+        "aperture": null
+      },
+      "scale": 0.28342245989304815,
+      "nativeUpscaled": false,
+      "png": "sprites/memory-avatar-stargazer-hedgehog.png",
+      "pngSha256": "6cb67b332afd3ea29d8a35d55ff29fb9149da98babd8a80eacb1398825f7af7d",
+      "exports": {
+        "128": {
+          "file": "sprites/memory-avatar-stargazer-hedgehog-128.webp",
+          "bytes": 5668,
+          "sha256": "d5e270f4354baf3e3588a67530566fe58f3e53338b8cfe59a58ee2b014f0109b"
+        },
+        "256": {
+          "file": "sprites/memory-avatar-stargazer-hedgehog-256.webp",
+          "bytes": 16506,
+          "sha256": "f1e80127b037cf14f940cf7f27394574374fdac812dceeccf49efcd1425e6bb1"
+        },
+        "512": {
+          "file": "sprites/memory-avatar-stargazer-hedgehog-512.webp",
+          "bytes": 49662,
+          "sha256": "4a09f4fa96f8265d6804e5b0e82bf86b5652859030a03f0b3bf5943baa70ef0a"
+        }
+      }
+    },
+    "memory-frame-astral-orbit": {
+      "id": "memory-frame-astral-orbit",
+      "name": "Quỹ Đạo Sao",
+      "type": "frame",
+      "gameId": "memory-match",
+      "level": 15,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 21,
+        "top": 14,
+        "width": 477,
+        "height": 485
+      },
+      "source": {
+        "file": "sources/memory-frame-astral-orbit.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 35,
+          "top": 7,
+          "width": 1200,
+          "height": 1220
+        },
+        "sha256": "bb75f887373929760a87a97e783990d00f788ef6021187ae812b69b3457df3c6",
+        "aperture": {
+          "left": 257,
+          "top": 255,
+          "width": 738,
+          "height": 725,
+          "radius": 362.5,
+          "pixels": 412327
+        }
+      },
+      "scale": 0.3972413793103448,
+      "nativeUpscaled": false,
+      "png": "sprites/memory-frame-astral-orbit.png",
+      "pngSha256": "4b01c42a5d1dccc2d4ed725341777a65689e1db68ce44450109cc39a9dd56ff0",
+      "exports": {
+        "128": {
+          "file": "sprites/memory-frame-astral-orbit-128.webp",
+          "bytes": 10842,
+          "sha256": "ed1882c553826ca4c70f89f07edf78f1313b3ba8cc1608c24aa7988174b0adce"
+        },
+        "256": {
+          "file": "sprites/memory-frame-astral-orbit-256.webp",
+          "bytes": 29930,
+          "sha256": "1c2a83f25662e2e40c5b87cd34d646a3dbda05d12cbab3f882ebcfca401d31bc"
+        },
+        "512": {
+          "file": "sprites/memory-frame-astral-orbit-512.webp",
+          "bytes": 91802,
+          "sha256": "7353c00f9f6fb26ba4cd3732261ecf8140cea07d3a8b329f5f283ba1a309dffa"
+        }
+      }
+    },
+    "memory-avatar-dreaming-deer": {
+      "id": "memory-avatar-dreaming-deer",
+      "name": "Hươu Mộng Mơ",
+      "type": "avatar",
+      "gameId": "memory-match",
+      "level": 16,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 97,
+        "top": 97,
+        "width": 318,
+        "height": 318
+      },
+      "source": {
+        "file": "sources/memory-avatar-dreaming-deer.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 62,
+          "top": 73,
+          "width": 1130,
+          "height": 1111
+        },
+        "sha256": "497d037478dc5d264a7680c2fbdc15ce7a869fa74b180f00b483112bd166793c",
+        "aperture": null
+      },
+      "scale": 0.28622862286228623,
+      "nativeUpscaled": false,
+      "png": "sprites/memory-avatar-dreaming-deer.png",
+      "pngSha256": "752429cd0689219dce98c18f28b34f91205d31678fbbd147d40e95e30ce45418",
+      "exports": {
+        "128": {
+          "file": "sprites/memory-avatar-dreaming-deer-128.webp",
+          "bytes": 5112,
+          "sha256": "2adb65ccbad54e9d858d8aa49daa82e02aa619e008a01b3e4f61d75b4f667ca1"
+        },
+        "256": {
+          "file": "sprites/memory-avatar-dreaming-deer-256.webp",
+          "bytes": 13964,
+          "sha256": "317b326f245733c3801944a0ce586429b823e43387f0fba8155013ab31d88ed5"
+        },
+        "512": {
+          "file": "sprites/memory-avatar-dreaming-deer-512.webp",
+          "bytes": 39028,
+          "sha256": "f58efa6a99915aa3150ea7b52c656f52acfdb345efaddc3f1d0055a31a7cb24c"
+        }
+      }
+    },
+    "memory-frame-silken-clouds": {
+      "id": "memory-frame-silken-clouds",
+      "name": "Mây Lụa",
+      "type": "frame",
+      "gameId": "memory-match",
+      "level": 17,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 20,
+        "top": 45,
+        "width": 470,
+        "height": 418
+      },
+      "source": {
+        "file": "sources/memory-frame-silken-clouds.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 21,
+          "top": 49,
+          "width": 1212,
+          "height": 1076
+        },
+        "sha256": "161ecd682a701c040d82aa1a1235b4f1cd5ee560ce998459ca7a7e758b0ffa9e",
+        "aperture": {
+          "left": 248,
+          "top": 221,
+          "width": 762,
+          "height": 742,
+          "radius": 371,
+          "pixels": 442600
+        }
+      },
+      "scale": 0.3881401617250674,
+      "nativeUpscaled": false,
+      "png": "sprites/memory-frame-silken-clouds.png",
+      "pngSha256": "71c0d8bf579b69ee86708314b6ec29d8204aa5574a6b490340d28eb50e4cc214",
+      "exports": {
+        "128": {
+          "file": "sprites/memory-frame-silken-clouds-128.webp",
+          "bytes": 8936,
+          "sha256": "b4283d0cf94247e2ad9212b89c379e8e2acacc9eddd2316998296fabc2ec80d1"
+        },
+        "256": {
+          "file": "sprites/memory-frame-silken-clouds-256.webp",
+          "bytes": 22018,
+          "sha256": "704ddbc7e1b77267f9491a7f3fa9f33bc6289cf9560c226813d7b85bbc86633b"
+        },
+        "512": {
+          "file": "sprites/memory-frame-silken-clouds-512.webp",
+          "bytes": 62800,
+          "sha256": "f6ff5da0d401e2b848c5a07ae8e4b07cc1d40ea51dc66a800c6e90d39ece46fd"
+        }
+      }
+    },
+    "memory-badge-memory-keeper": {
+      "id": "memory-badge-memory-keeper",
+      "name": "Người Giữ Ký Ức",
+      "type": "badge",
+      "gameId": "memory-match",
+      "level": 18,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 58,
+        "top": 56,
+        "width": 397,
+        "height": 400
+      },
+      "source": {
+        "file": "sources/memory-badge-memory-keeper.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 38,
+          "top": 14,
+          "width": 1178,
+          "height": 1188
+        },
+        "sha256": "a81c29fd46f2d3c8250bc7e2d5537c65562627e41c4c2e2bb4da4f32c1c46941",
+        "aperture": null
+      },
+      "scale": 0.3367003367003367,
+      "nativeUpscaled": false,
+      "png": "sprites/memory-badge-memory-keeper.png",
+      "pngSha256": "58e13bc00f12fdd0092ed68852642f33ff670208df340e9988bb3b0c28bb1190",
+      "exports": {
+        "128": {
+          "file": "sprites/memory-badge-memory-keeper-128.webp",
+          "bytes": 7242,
+          "sha256": "ccf91aa28a227b19bd42c1867a69dd27d1169d22310a104642ffb09f892ad637"
+        },
+        "256": {
+          "file": "sprites/memory-badge-memory-keeper-256.webp",
+          "bytes": 20434,
+          "sha256": "dc67fe94b3ebe8c4e3018f91814f924a4757fa6e68fc295fc2b82eda665d0ad3"
+        },
+        "512": {
+          "file": "sprites/memory-badge-memory-keeper-512.webp",
+          "bytes": 63368,
+          "sha256": "f9922fd190776cf733c31d2278ad36baa8b8a536ffa71aa82bc1b6e5076d61c7"
+        }
+      }
+    },
+    "memory-avatar-galaxy-whale": {
+      "id": "memory-avatar-galaxy-whale",
+      "name": "Cá Voi Ngân Hà",
+      "type": "avatar",
+      "gameId": "memory-match",
+      "level": 19,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 97,
+        "top": 97,
+        "width": 318,
+        "height": 318
+      },
+      "source": {
+        "file": "sources/memory-avatar-galaxy-whale.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 44,
+          "top": 52,
+          "width": 1166,
+          "height": 1155
+        },
+        "sha256": "39db5d776f66a928e063c9a7b27f88e297cbdc86c738c7f95d736f60c4ccb548",
+        "aperture": null
+      },
+      "scale": 0.2753246753246753,
+      "nativeUpscaled": false,
+      "png": "sprites/memory-avatar-galaxy-whale.png",
+      "pngSha256": "01a5d986551703f6c390850f123c4fa5ca12b3abe79dac1b9043eabf038f0d28",
+      "exports": {
+        "128": {
+          "file": "sprites/memory-avatar-galaxy-whale-128.webp",
+          "bytes": 5556,
+          "sha256": "5487fb5a9e1eabbe323378421ac6785f382f921cc2fd3464e465223e40a307c2"
+        },
+        "256": {
+          "file": "sprites/memory-avatar-galaxy-whale-256.webp",
+          "bytes": 15080,
+          "sha256": "35c4f0330cadf63f6be403784d8027b2aef14c2e3354ee5880f38aba7f69f235"
+        },
+        "512": {
+          "file": "sprites/memory-avatar-galaxy-whale-512.webp",
+          "bytes": 44052,
+          "sha256": "4ba5bc0c6cee76ab6a56d13eb25742d50e77a89680c94e7dc24201c00737c4d0"
+        }
+      }
+    },
+    "memory-frame-knowledge-gateway": {
+      "id": "memory-frame-knowledge-gateway",
+      "name": "Cánh Cổng Tri Thức",
+      "type": "frame",
+      "gameId": "memory-match",
+      "level": 20,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 26,
+        "top": 17,
+        "width": 460,
+        "height": 475
+      },
+      "source": {
+        "file": "sources/memory-frame-knowledge-gateway.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 31,
+          "top": 11,
+          "width": 1192,
+          "height": 1231
+        },
+        "sha256": "b41e85ccffbaabe7b7bd94983ef057e1c1657ecab81fec77f167b0b136b8f5f9",
+        "aperture": {
+          "left": 241,
+          "top": 259,
+          "width": 772,
+          "height": 747,
+          "radius": 373.5,
+          "pixels": 453680
+        }
+      },
+      "scale": 0.3855421686746988,
+      "nativeUpscaled": false,
+      "png": "sprites/memory-frame-knowledge-gateway.png",
+      "pngSha256": "6ec3649577275cd8305ccbc53539d75365ef05c3c4872de31f374fdf5d833709",
+      "exports": {
+        "128": {
+          "file": "sprites/memory-frame-knowledge-gateway-128.webp",
+          "bytes": 10720,
+          "sha256": "72e8ef5673d912112c206a44cae445e402dd5b7f6edde959d37dacdaee59607a"
+        },
+        "256": {
+          "file": "sprites/memory-frame-knowledge-gateway-256.webp",
+          "bytes": 28390,
+          "sha256": "179ceb4bd9ce6d5c612ca9dc8cb873aef9ad98be8ce26eeff83ea31be5267a3e"
+        },
+        "512": {
+          "file": "sprites/memory-frame-knowledge-gateway-512.webp",
+          "bytes": 86564,
+          "sha256": "f870146c540307fd19eef6b9605a6aa0d35aeac777f75c09387718e8ec73e445"
         }
       }
     }

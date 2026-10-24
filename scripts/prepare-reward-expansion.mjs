@@ -12,6 +12,8 @@ const read = async file => JSON.parse(await fs.readFile(file, 'utf8'));
 const hash = bytes => crypto.createHash('sha256').update(bytes).digest('hex');
 const clear = (width, height) => sharp({ create: { width, height, channels: 4, background: '#00000000' } });
 const catalog = await read(`${root}/catalog.source.json`);
+const extras = await read(`${root}/cosmetic-extras.source.json`);
+const approvedItems = [...catalog.items, ...extras.items];
 const source = await read(`${root}/art-source.json`);
 const legacy = await read(`${legacyRoot}/manifest.json`);
 const [width, height] = legacy.canvas;
@@ -50,9 +52,11 @@ await fs.mkdir(`${root}/review`, { recursive: true });
 const manifest = { version: 1, status: 'representative-art-review', runtimeApproved: false,
   canvas: [width, height], pivot: legacy.pivot, avatarRect, frameInnerCircle, items: {} };
 const ids = new Set();
+const sourceErrors = [];
 for (const entry of source.items) {
+  try {
   assert(!ids.has(entry.id), 'Duplicate artwork source'); ids.add(entry.id);
-  const item = catalog.items.find(candidate => candidate.id === entry.id);
+  const item = approvedItems.find(candidate => candidate.id === entry.id);
   assert(item, `Unknown approved brief ${entry.id}`);
   const input = await fs.readFile(`${root}/${entry.sourceFile}`);
   const metadata = await sharp(input).metadata();
@@ -80,7 +84,8 @@ for (const entry of source.items) {
   assert(scale <= 1, `${item.id}: never upscale`);
   const targetWidth = item.type === 'avatar' ? avatarRect.width : Math.round(b.width * scale);
   const targetHeight = item.type === 'avatar' ? avatarRect.height : Math.round(b.height * scale);
-  assert(left >= 8 && top >= 8 && left + targetWidth <= 504 && top + targetHeight <= 504, `${item.id}: ornament exceeds shared canvas`);
+  assert(left >= 8 && top >= 8 && left + targetWidth <= 504 && top + targetHeight <= 504,
+    `${item.id}: ornament exceeds shared canvas ${JSON.stringify({ left, top, width: targetWidth, height: targetHeight, hole })}`);
   const art = await sharp(input).extract(b).resize(targetWidth, targetHeight, { fit: 'cover', position: 'centre' }).png().toBuffer();
   const png = await clear(width, height).composite([{ input: art, left, top }]).png().toBuffer();
   await fs.writeFile(`${root}/sprites/${item.id}.png`, png);
@@ -91,10 +96,13 @@ for (const entry of source.items) {
     await fs.writeFile(`${root}/${file}`, bytes);
     exports[size] = { file, bytes: bytes.length, sha256: hash(bytes) };
   }
-  manifest.items[item.id] = { id: item.id, name: item.name, type: item.type, gameId: item.gameId, level: item.level,
+  manifest.items[item.id] = { id: item.id, name: item.name, type: item.type, gameId: item.gameId, level: item.level, sourceKind: item.sourceKind || 'achievement',
     canvas: [width, height], pivot: legacy.pivot, contentRect: { left, top, width: targetWidth, height: targetHeight },
     source: { file: entry.sourceFile, width: info.width, height: info.height, bounds: b, sha256: hash(input), aperture: hole },
     scale, nativeUpscaled: false, png: `sprites/${item.id}.png`, pngSha256: hash(png), exports };
+  } catch (error) {
+    sourceErrors.push({ id: entry.id, message: error.message });
+  }
 }
 await fs.writeFile(`${root}/art-manifest.json`, JSON.stringify(manifest, null, 2) + '\n');
 
@@ -122,10 +130,14 @@ for (const frame of frames) {
   }
 }
 const failedPairs = pairs.filter(pair => pair.uncoveredHole || pair.outsideLeak);
-const report = { result: failedPairs.length ? 'FAIL' : 'PASS', generatedSprites: source.items.length,
-  proposedSprites: catalog.items.length, avatarCount: avatars.length, frameCount: frames.length,
-  checkedPairs: pairs.length, finalRequiredPairs: 1156, fullExpansionComplete: false, runtimeChanged: false, failedPairs, pairs };
+const report = { result: failedPairs.length || sourceErrors.length ? 'FAIL' : 'PASS', generatedSprites: source.items.length,
+  packedSprites: Object.keys(manifest.items).length, sourceErrors,
+  proposedSprites: approvedItems.length, avatarCount: avatars.length, frameCount: frames.length,
+  checkedPairs: pairs.length, finalRequiredPairs: 1225,
+  fullExpansionComplete: Object.keys(manifest.items).length === approvedItems.length && !failedPairs.length && !sourceErrors.length,
+  runtimeChanged: false, failedPairs, pairs };
 await fs.writeFile(`${root}/review/alpha-validation.json`, JSON.stringify(report, null, 2) + '\n');
+assert.equal(sourceErrors.length, 0, JSON.stringify(sourceErrors));
 assert.equal(failedPairs.length, 0, JSON.stringify(failedPairs));
 
 const text = (name, color, w, h = 40) => Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"><text x="${w / 2}" y="28" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="20" font-weight="600" fill="${color}">${name.replaceAll('&', '&amp;').replaceAll('<', '&lt;')}</text></svg>`);

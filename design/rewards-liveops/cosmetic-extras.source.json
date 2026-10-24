@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "eventApprovedAt": "2026-10-24",
+  "starterRequestedAt": "2026-10-24",
+  "starterPolicy": "Always available in the single profile inventory for old and new profiles; preserve equipped selections; no achievement receipt, purchase or mission required.",
+  "items": [
+    { "id": "event-avatar-lantern-otter", "type": "avatar", "name": "Rái Cá Đèn Lồng", "sourceKind": "event", "series": "Lễ hội Đom Đóm", "brief": "Rái cá nhỏ ôm đèn lồng vàng, khu rừng đêm và đom đóm trong chân dung tròn; mắt rõ, toàn bộ chủ thể nằm trong ảnh." },
+    { "id": "event-frame-firefly-glow", "type": "frame", "name": "Ánh Đom Đóm", "sourceKind": "event", "series": "Lễ hội Đom Đóm", "brief": "Vòng cành cây và lá xanh, ánh đom đóm vàng dọc viền; lòng tròn alpha thật, không ghép chân dung, không có đốm rời ngoài canvas." },
+    { "id": "starter-avatar-little-sparrow", "type": "avatar", "name": "Chim Sẻ Nhỏ", "sourceKind": "starter", "series": "Khởi Đầu", "brief": "Chim sẻ nâu nhỏ thân thiện trên nền vườn sáng dịu trong chân dung tròn; mặt rõ, bố cục đơn giản, không vương miện, đá quý hay trang sức." },
+    { "id": "starter-frame-plain-wood", "type": "frame", "name": "Vòng Gỗ Mộc", "sourceKind": "starter", "series": "Khởi Đầu", "brief": "Khung tròn gỗ nâu sáng mộc mạc, vân gỗ nhẹ, hai lá nhỏ ôm mép ngoài; lòng tròn alpha thật. Ít chi tiết, không vàng, đá quý hoặc huy hiệu gắn sẵn." },
+    { "id": "starter-badge-first-leaf", "type": "badge", "name": "Lá Đầu Tiên", "sourceKind": "starter", "series": "Khởi Đầu", "brief": "Một chiếc lá xanh non trên huy hiệu gỗ nhỏ đơn giản, gân lá rõ và cạnh bo tròn; không chữ, không số hạng, không đá quý hoặc vòng nguyệt quế." }
+  ]
+}

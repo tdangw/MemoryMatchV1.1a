@@ -83,3 +83,17 @@ cặp cuối. Playwright mẫu 5/5 PASS: modal Hồ sơ bốn viewport 412/320/8
 1024, ba hero và renderer chân dung 30px của BXH. Đây là QA presentation,
 chưa phải đồng bộ ID mới qua hai tài khoản. Bằng chứng tại
 `design/rewards-liveops/review`; chưa ghi catalog/runtime/quyền sở hữu mới.
+
+### Bổ sung trực tiếp của chủ dự án
+
+Sau khi tạo bộ quà, thêm bộ hồ sơ cơ bản sẵn trong kho: Chim Sẻ Nhỏ,
+Vòng Gỗ Mộc, Lá Đầu Tiên. Nguồn riêng trong `cosmetic-extras.source.json`;
+không chiếm mapping của 90 thành tích, không giả receipt hoặc tự đổi đồ
+đang trang bị. Kiểm cuối tăng thành 35 avatar × 35 khung = 1.225 cặp.
+
+### Lô 1 — Thư viện Ánh Sao
+
+Đủ 10 món màn 11–20 Memory Match, PNG alpha và WebP 128/256/512.
+169 cặp (13×13, gồm đồ cũ) PASS. Hươu được vẽ lại để sừng không vượt
+ảnh tròn; Mây Lụa được rút ngắn ornament dưới để giữ canvas chuẩn.
+Không nới ngưỡng hoặc đổi geometry cũ. Chỉ nguồn/pack/QA, chưa runtime.
