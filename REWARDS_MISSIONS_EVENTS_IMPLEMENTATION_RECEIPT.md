@@ -66,3 +66,20 @@ không đưa chúng vào commit sửa thống kê.
 
 Skill thực dùng: `clarify-ambiguous-requirements` để chốt P0; `imagegen`
 ở chế độ built-in, từng món một, alpha thật và giữ nguồn/prompt khi làm A1.
+
+## A1 — mẫu đại diện đã duyệt
+
+Chủ dự án duyệt Sóc Thư Sinh, Trang Sách Vàng, Dấu Ấn Tri Thức làm chuẩn
+và giao tiếp tục toàn bộ kế hoạch. Mẫu đã pack 512/256/128 bằng source
+generator `scripts/prepare-reward-expansion.mjs`; canvas/pivot/avatarRect
+theo manifest bộ cũ, không upscale. Khung được imagegen chỉnh hai lần:
+thêm margin, rồi sửa lòng 838×752 vượt circularity limit cũ. Giữ ngưỡng,
+không sửa PNG bằng tay hoặc dùng ảnh chân dung gộp vào khung.
+
+Alpha/geometry: 100 cặp (10 avatar × 10 khung, gồm đồ cũ và mẫu mới) PASS,
+không hở lòng/nhô chân dung ra ngoài. Đã xem nền sáng/tối, mọi avatar cũ
+qua khung mới và avatar mới qua mọi khung cũ. Chưa thay cho matrix 1.156
+cặp cuối. Playwright mẫu 5/5 PASS: modal Hồ sơ bốn viewport 412/320/844/
+1024, ba hero và renderer chân dung 30px của BXH. Đây là QA presentation,
+chưa phải đồng bộ ID mới qua hai tài khoản. Bằng chứng tại
+`design/rewards-liveops/review`; chưa ghi catalog/runtime/quyền sở hữu mới.

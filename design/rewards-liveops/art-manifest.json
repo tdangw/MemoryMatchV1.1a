@@ -1,0 +1,199 @@
+{
+  "version": 1,
+  "status": "representative-art-review",
+  "runtimeApproved": false,
+  "canvas": [
+    512,
+    512
+  ],
+  "pivot": {
+    "x": 0.5,
+    "y": 0.5
+  },
+  "avatarRect": {
+    "left": 97,
+    "top": 97,
+    "width": 318,
+    "height": 318
+  },
+  "frameInnerCircle": {
+    "x": 256,
+    "y": 256,
+    "radius": 144,
+    "purpose": "nominal alignment; ornaments may overlap portrait; validate actual aperture coverage"
+  },
+  "items": {
+    "memory-avatar-scholar-squirrel": {
+      "id": "memory-avatar-scholar-squirrel",
+      "name": "Sóc Thư Sinh",
+      "type": "avatar",
+      "gameId": "memory-match",
+      "level": 11,
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 97,
+        "top": 97,
+        "width": 318,
+        "height": 318
+      },
+      "source": {
+        "file": "sources/memory-avatar-scholar-squirrel.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 97,
+          "top": 104,
+          "width": 1060,
+          "height": 1045
+        },
+        "sha256": "7b9848cf2cd1e3509529c7554f97f4c1f9bc282521014e0cd2e0401aa61dd7e2",
+        "aperture": null
+      },
+      "scale": 0.3043062200956938,
+      "nativeUpscaled": false,
+      "png": "sprites/memory-avatar-scholar-squirrel.png",
+      "pngSha256": "ec05fa9a0cae1063bba5ad308044bf44f8780af8c6e8c3b1a53c7cc9729d59b2",
+      "exports": {
+        "128": {
+          "file": "sprites/memory-avatar-scholar-squirrel-128.webp",
+          "bytes": 5260,
+          "sha256": "473cb6ba52856f8c401bc28da48a16e24d4726a95db2c7bdf0a820069e50133d"
+        },
+        "256": {
+          "file": "sprites/memory-avatar-scholar-squirrel-256.webp",
+          "bytes": 14376,
+          "sha256": "c7bc68fb0b35f131cab3fb5e116339f9539d44783295407dfa92a97c905a2d09"
+        },
+        "512": {
+          "file": "sprites/memory-avatar-scholar-squirrel-512.webp",
+          "bytes": 44130,
+          "sha256": "5298b86065689e8a53d062be1f7a4e245d1b548ece6e13effbba778949a32be0"
+        }
+      }
+    },
+    "memory-frame-gilded-pages": {
+      "id": "memory-frame-gilded-pages",
+      "name": "Trang Sách Vàng",
+      "type": "frame",
+      "gameId": "memory-match",
+      "level": 12,
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 48,
+        "top": 50,
+        "width": 416,
+        "height": 420
+      },
+      "source": {
+        "file": "sources/memory-frame-gilded-pages.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 40,
+          "top": 25,
+          "width": 1174,
+          "height": 1184
+        },
+        "sha256": "8dd83fe2e932de572dec8a353dbf95c0a0fef38bb9b4c4f103421b394379a136",
+        "aperture": {
+          "left": 205,
+          "top": 201,
+          "width": 844,
+          "height": 812,
+          "radius": 406,
+          "pixels": 486038
+        }
+      },
+      "scale": 0.35467980295566504,
+      "nativeUpscaled": false,
+      "png": "sprites/memory-frame-gilded-pages.png",
+      "pngSha256": "ee5f1b14281f6c53967e23bb6b24a0da10c168d219a5413ed54897110d8049d5",
+      "exports": {
+        "128": {
+          "file": "sprites/memory-frame-gilded-pages-128.webp",
+          "bytes": 8370,
+          "sha256": "ab74e5df9f6e8597bceeffaa3eb139b3257e55aa8868f1a741aac23f2f81b6f5"
+        },
+        "256": {
+          "file": "sprites/memory-frame-gilded-pages-256.webp",
+          "bytes": 20278,
+          "sha256": "7a8c57a11f459f9af7c66de13afeee1379ecab2d2c3419e08224dd6bae07dd2d"
+        },
+        "512": {
+          "file": "sprites/memory-frame-gilded-pages-512.webp",
+          "bytes": 58612,
+          "sha256": "bea096f8462054f595b84282c36404e24697d2dac513a3e45f80d4e5e3651ba7"
+        }
+      }
+    },
+    "memory-badge-wisdom-seal": {
+      "id": "memory-badge-wisdom-seal",
+      "name": "Dấu Ấn Tri Thức",
+      "type": "badge",
+      "gameId": "memory-match",
+      "level": 13,
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 56,
+        "top": 71,
+        "width": 400,
+        "height": 371
+      },
+      "source": {
+        "file": "sources/memory-badge-wisdom-seal.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 72,
+          "top": 110,
+          "width": 1112,
+          "height": 1030
+        },
+        "sha256": "6e1760fb2212c21e53c0546dab1bbfe4fbb15b9d68b7469f3775e1983d7fb45b",
+        "aperture": null
+      },
+      "scale": 0.3597122302158273,
+      "nativeUpscaled": false,
+      "png": "sprites/memory-badge-wisdom-seal.png",
+      "pngSha256": "084001390822ab69ab57a233b661026b1ba096517e3b3a086e493001fb15b3fe",
+      "exports": {
+        "128": {
+          "file": "sprites/memory-badge-wisdom-seal-128.webp",
+          "bytes": 7966,
+          "sha256": "d45ca360d88a4835198e707594b23aa9801aade2f1f0221d524368f029c33b91"
+        },
+        "256": {
+          "file": "sprites/memory-badge-wisdom-seal-256.webp",
+          "bytes": 21606,
+          "sha256": "15d8c7e30c49c66e7c0befd28c31117e334ca32d6cd3b0e6bf0868c71412df51"
+        },
+        "512": {
+          "file": "sprites/memory-badge-wisdom-seal-512.webp",
+          "bytes": 68604,
+          "sha256": "07657847d0fb091033f6121da7dfd56d3338942d727add4d70d0c593b331b33d"
+        }
+      }
+    }
+  }
+}
