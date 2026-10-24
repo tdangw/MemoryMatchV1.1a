@@ -40,16 +40,29 @@ lỗi build. Tự review diff riêng sau kiểm thử: whitelist vẫn đóng, d
 marker/counter được giữ, không retry/timer mới hoặc ghi vào UID khác;
 không có thay đổi ngoài phạm vi sửa thống kê. Không deploy hoặc APK/push/Hosting.
 
-## P0 — quyết định sản phẩm đang chờ
+## P0 — đã duyệt, 24/10/2026
 
 Đã đọc review, hai proposal JSON, inventory và xem trực tiếp hai ảnh được
 chọn trong `review-v1/selected-images.json`. Chưa có60sprite mới hoặc runtime
-liveops. Đã hỏi ba nhóm: art/catalog/pilot, kinh tế, clock/account/backend/
-facts offline. Chưa coi concept hoặc giá trị đề xuất là phê duyệt.
+liveops tại thời điểm chuẩn bị. Chủ dự án đã duyệt cả ba nhóm: hai concept,
+toàn bộ 60 tên/brief/mapping và hai quà event; nguyên kinh tế proposal;
+clock/account/backend và facts offline. Bản nguồn đã duyệt được chụp riêng
+tại `design/rewards-liveops/{catalog.source,liveops.source,approval}.json`,
+kèm hash nguồn chuẩn bị; không sửa hay commit tài liệu có sẵn của người dùng.
+
+Reset ngày 07:00 Việt Nam, tuần thứ Hai 07:00, chung tài khoản ba trò.
+Facts offline chỉ tính trong kỳ server đã xác nhận và gửi trước khi kỳ hết;
+nhận cần mạng, nhiệm vụ đủ điều kiện chưa nhận chốt một lần khi reset.
+Backend chỉ code/emulator. Pilot chung bảy ngày, chưa có ngày bắt đầu;
+không tự chạy hoặc đếm ngược. Không APK/push/Hosting/backend/rules deploy.
+
+P0 mỹ thuật duyệt concept/brief; bước mẫu avatar/khung/huy hiệu đại diện
+trước sáu lô vẫn theo mục 3 của kế hoạch. Không coi ảnh concept là sprite
+hoặc golden runtime. Giữ nguyên 30 mapping/receipt, sáu hiệu ứng và 300 Xu.
 
 Giữ nguyên các thay đổi có sẵn: `CONTEXT.md`,
 `ILLUSTRATED_UI_ACHIEVEMENTS_PLAN.md`, `REWARDS_MISSIONS_EVENTS_PLAN.md`;
 không đưa chúng vào commit sửa thống kê.
 
-Skill thực dùng: `clarify-ambiguous-requirements` cho các quyết định P0 còn
-mở. Chưa dùng imagegen trong lượt này vì A1 chưa được duyệt.
+Skill thực dùng: `clarify-ambiguous-requirements` để chốt P0; `imagegen`
+ở chế độ built-in, từng món một, alpha thật và giữ nguồn/prompt khi làm A1.

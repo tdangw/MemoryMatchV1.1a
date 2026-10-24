@@ -1,0 +1,1217 @@
+{
+  "scope": "proposal: levels11-30 of each game; preserves existing levels1-10",
+  "approvedForImplementation": true,
+  "existingCount": 30,
+  "newCount": 60,
+  "totalAchievementCountAfterExpansion": 90,
+  "counts": {
+    "avatar": 24,
+    "frame": 24,
+    "badge": 12,
+    "effect-cover": 0
+  },
+  "policy": "deterministic one item per game/level; no random source; no new motion engine",
+  "items": [
+    {
+      "id": "memory-avatar-scholar-squirrel",
+      "gameId": "memory-match",
+      "level": 11,
+      "type": "avatar",
+      "name": "Sóc Thư Sinh",
+      "series": "Thư viện Ánh Sao",
+      "brief": "Sóc nâu ôm sách nhỏ, ánh đèn thư viện; mặt rõ trong chân dung tròn.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "memory-frame-gilded-pages",
+      "gameId": "memory-match",
+      "level": 12,
+      "type": "frame",
+      "name": "Trang Sách Vàng",
+      "series": "Thư viện Ánh Sao",
+      "brief": "Viền sách mở và góc giấy mạ vàng, lòng tròn liền; không vẽ chữ.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "memory-badge-wisdom-seal",
+      "gameId": "memory-match",
+      "level": 13,
+      "type": "badge",
+      "name": "Dấu Ấn Tri Thức",
+      "series": "Thư viện Ánh Sao",
+      "brief": "Ấn đồng có chìa khóa và ngôi sao, dải nhung xanh; không số hạng.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "memory-avatar-stargazer-hedgehog",
+      "gameId": "memory-match",
+      "level": 14,
+      "type": "avatar",
+      "name": "Nhím Chiêm Tinh",
+      "series": "Thư viện Ánh Sao",
+      "brief": "Nhím đeo kính tròn bên kính thiên văn đồng; toàn bộ gai nằm trong ảnh.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "memory-frame-astral-orbit",
+      "gameId": "memory-match",
+      "level": 15,
+      "type": "frame",
+      "name": "Quỹ Đạo Sao",
+      "series": "Thư viện Ánh Sao",
+      "brief": "Vòng thiên văn đồng chạm khắc, các quỹ đạo nằm ngoài lòng avatar.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "memory-avatar-dreaming-deer",
+      "gameId": "memory-match",
+      "level": 16,
+      "type": "avatar",
+      "name": "Hươu Mộng Mơ",
+      "series": "Thư viện Ánh Sao",
+      "brief": "Hươu nhỏ bên mây lụa và sách kem, ánh bình minh tím nhạt.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "memory-frame-silken-clouds",
+      "gameId": "memory-match",
+      "level": 17,
+      "type": "frame",
+      "name": "Mây Lụa",
+      "series": "Thư viện Ánh Sao",
+      "brief": "Mây nổi và dải lụa kem uốn ngoài vòng vàng, không che lòng trong.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "memory-badge-memory-keeper",
+      "gameId": "memory-match",
+      "level": 18,
+      "type": "badge",
+      "name": "Người Giữ Ký Ức",
+      "series": "Thư viện Ánh Sao",
+      "brief": "Đồng hồ cát và chìa khóa trong khiên sao, khác huy hiệu cuốn sách cũ.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "memory-avatar-galaxy-whale",
+      "gameId": "memory-match",
+      "level": 19,
+      "type": "avatar",
+      "name": "Cá Voi Ngân Hà",
+      "series": "Thư viện Ánh Sao",
+      "brief": "Cá voi con giữa bầu trời sao, mắt biểu cảm; hình gọn trong vòng tròn.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "memory-frame-knowledge-gateway",
+      "gameId": "memory-match",
+      "level": 20,
+      "type": "frame",
+      "name": "Cánh Cổng Tri Thức",
+      "series": "Thư viện Ánh Sao",
+      "brief": "Cổng thư viện vàng và ngọc lam; ngoại hình cao cấp, vẫn cùng tâm/lòng tròn.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "memory-avatar-chestnut-squirrel",
+      "gameId": "memory-match",
+      "level": 21,
+      "type": "avatar",
+      "name": "Sóc Hạt Dẻ",
+      "series": "Khu rừng Bốn Mùa",
+      "brief": "Sóc má phồng bên hạt dẻ và lá mùa thu; khác Sóc Thư Sinh về dáng và cảnh.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "memory-frame-autumn-leaves",
+      "gameId": "memory-match",
+      "level": 22,
+      "type": "frame",
+      "name": "Vòng Lá Thu",
+      "series": "Khu rừng Bốn Mùa",
+      "brief": "Vòng lá phong và quả sồi, tông đồng cam, vật liệu gỗ chạm.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "memory-badge-four-seasons",
+      "gameId": "memory-match",
+      "level": 23,
+      "type": "badge",
+      "name": "Bốn Mùa Hội Tụ",
+      "series": "Khu rừng Bốn Mùa",
+      "brief": "Bốn chiếc lá theo mùa trong một huy chương tròn; không bốn phần thưởng phụ.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "memory-avatar-snow-rabbit",
+      "gameId": "memory-match",
+      "level": 24,
+      "type": "avatar",
+      "name": "Thỏ Tuyết",
+      "series": "Khu rừng Bốn Mùa",
+      "brief": "Thỏ trắng trong rừng tuyết xanh, tai ngắn gọn; khác Thỏ Anh Đào về dáng.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "memory-frame-frosted-branch",
+      "gameId": "memory-match",
+      "level": 25,
+      "type": "frame",
+      "name": "Nhành Băng",
+      "series": "Khu rừng Bốn Mùa",
+      "brief": "Cành băng mảnh và nụ trắng ngoài viền bạc tròn.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "memory-avatar-honey-bear",
+      "gameId": "memory-match",
+      "level": 26,
+      "type": "avatar",
+      "name": "Gấu Mật Ong",
+      "series": "Khu rừng Bốn Mùa",
+      "brief": "Gấu vàng hiền bên bình mật và hoa rừng, biểu cảm vui.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "memory-frame-golden-honeycomb",
+      "gameId": "memory-match",
+      "level": 27,
+      "type": "frame",
+      "name": "Tổ Ong Vàng",
+      "series": "Khu rừng Bốn Mùa",
+      "brief": "Mảng tổ ong lục giác vàng quanh viền tròn; lòng trong không đa giác.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "memory-badge-forest-guardian",
+      "gameId": "memory-match",
+      "level": 28,
+      "type": "badge",
+      "name": "Người Giữ Rừng",
+      "series": "Khu rừng Bốn Mùa",
+      "brief": "Lá sồi, khiên gỗ và viên hổ phách, bố cục huy hiệu gọn.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "memory-avatar-dawn-crane",
+      "gameId": "memory-match",
+      "level": 29,
+      "type": "avatar",
+      "name": "Hạc Bình Minh",
+      "series": "Khu rừng Bốn Mùa",
+      "brief": "Hạc trắng giữa lau và bình minh, đầu/cổ bố trí rõ trong portrait tròn.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "memory-frame-memory-crown",
+      "gameId": "memory-match",
+      "level": 30,
+      "type": "frame",
+      "name": "Vương Miện Ký Ức",
+      "series": "Khu rừng Bốn Mùa",
+      "brief": "Vương miện lá bốn mùa và ngọc hổ phách trên vòng gỗ vàng.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "link-avatar-sailor-beaver",
+      "gameId": "link-connect",
+      "level": 11,
+      "type": "avatar",
+      "name": "Hải Ly Thủy Thủ",
+      "series": "Vịnh Nguyệt Quang",
+      "brief": "Hải ly cầm mái chèo nhỏ, cảnh bến thuyền; khác rái cá của sự kiện.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "link-frame-moon-coral",
+      "gameId": "link-connect",
+      "level": 12,
+      "type": "frame",
+      "name": "San Hô Ánh Trăng",
+      "series": "Vịnh Nguyệt Quang",
+      "brief": "San hô kem và ngọc biển trên vòng vàng; lòng tròn ổn định.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "link-badge-lighthouse-guide",
+      "gameId": "link-connect",
+      "level": 13,
+      "type": "badge",
+      "name": "Hải Đăng Dẫn Lối",
+      "series": "Vịnh Nguyệt Quang",
+      "brief": "Ngọn hải đăng nổi trên khiên sóng bạc, không ký tự.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "link-avatar-pearl-dolphin",
+      "gameId": "link-connect",
+      "level": 14,
+      "type": "avatar",
+      "name": "Cá Heo Ngọc",
+      "series": "Vịnh Nguyệt Quang",
+      "brief": "Cá heo thân thiện trong vịnh ngọc, mặt rõ tại thumbnail nhỏ.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "link-frame-silver-waves",
+      "gameId": "link-connect",
+      "level": 15,
+      "type": "frame",
+      "name": "Sóng Bạc",
+      "series": "Vịnh Nguyệt Quang",
+      "brief": "Sóng bạc cuộn hướng ra ngoài vòng, không cắt ngang chân dung.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "link-avatar-azure-turtle",
+      "gameId": "link-connect",
+      "level": 16,
+      "type": "avatar",
+      "name": "Rùa Biển Lam",
+      "series": "Vịnh Nguyệt Quang",
+      "brief": "Rùa biển nhỏ giữa cỏ biển xanh, mắt sáng, không vây ngoài ảnh.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "link-frame-pearl-shell",
+      "gameId": "link-connect",
+      "level": 17,
+      "type": "frame",
+      "name": "Vỏ Trai Ánh Ngọc",
+      "series": "Vịnh Nguyệt Quang",
+      "brief": "Vỏ trai, ngọc trai và dây vàng ngoài lòng tròn.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "link-badge-ocean-knot",
+      "gameId": "link-connect",
+      "level": 18,
+      "type": "badge",
+      "name": "Nút Thắt Đại Dương",
+      "series": "Vịnh Nguyệt Quang",
+      "brief": "Nút dây biển và mỏ neo nhỏ trong huy chương, khác đôi nhẫn cũ.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "link-avatar-royal-seahorse",
+      "gameId": "link-connect",
+      "level": 19,
+      "type": "avatar",
+      "name": "Hải Mã Hoàng Gia",
+      "series": "Vịnh Nguyệt Quang",
+      "brief": "Hải mã vàng tím trong rặng san hô, mặt đọc rõ.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "link-frame-tidal-crown",
+      "gameId": "link-connect",
+      "level": 20,
+      "type": "frame",
+      "name": "Vương Miện Hải Triều",
+      "series": "Vịnh Nguyệt Quang",
+      "brief": "Vương miện vỏ sò và ngọc xanh, viền biển trang trọng.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "link-avatar-lantern-cat",
+      "gameId": "link-connect",
+      "level": 21,
+      "type": "avatar",
+      "name": "Mèo Hoa Đăng",
+      "series": "Đêm Hoa Đăng",
+      "brief": "Mèo tam thể bên đèn lụa đỏ trong phố đêm.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "link-frame-silk-lanterns",
+      "gameId": "link-connect",
+      "level": 22,
+      "type": "frame",
+      "name": "Vòng Đèn Lụa",
+      "series": "Đêm Hoa Đăng",
+      "brief": "Đèn lụa nhỏ treo ngoài vòng gỗ đỏ vàng, không che tâm.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "link-badge-guiding-lantern",
+      "gameId": "link-connect",
+      "level": 23,
+      "type": "badge",
+      "name": "Ngọn Đèn Kết Nối",
+      "series": "Đêm Hoa Đăng",
+      "brief": "Đèn lồng và hai dải sáng gặp nhau trên khiên vàng.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "link-avatar-festival-sparrow",
+      "gameId": "link-connect",
+      "level": 24,
+      "type": "avatar",
+      "name": "Chim Sẻ Đêm Hội",
+      "series": "Đêm Hoa Đăng",
+      "brief": "Chim sẻ nâu trên cành hoa trong đêm hội; mắt và mỏ rõ.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "link-frame-osmanthus-branch",
+      "gameId": "link-connect",
+      "level": 25,
+      "type": "frame",
+      "name": "Nhành Hoa Mộc",
+      "series": "Đêm Hoa Đăng",
+      "brief": "Hoa mộc li ti và nhánh gỗ vàng, bố cục nhẹ hơn khung hoa cũ.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "link-avatar-paperblossom-deer",
+      "gameId": "link-connect",
+      "level": 26,
+      "type": "avatar",
+      "name": "Hươu Hoa Giấy",
+      "series": "Đêm Hoa Đăng",
+      "brief": "Hươu nâu đeo vòng hoa giấy, ánh đèn ấm; sừng ở trong portrait.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "link-frame-moon-silk",
+      "gameId": "link-connect",
+      "level": 27,
+      "type": "frame",
+      "name": "Dải Lụa Trăng",
+      "series": "Đêm Hoa Đăng",
+      "brief": "Lụa đỏ kem quấn viền bạc, chốt ngọc trăng ngoài lòng.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "link-badge-moonlit-promise",
+      "gameId": "link-connect",
+      "level": 28,
+      "type": "badge",
+      "name": "Lời Hẹn Dưới Trăng",
+      "series": "Đêm Hoa Đăng",
+      "brief": "Nút dây đôi dưới trăng, huy chương men xanh trên ruy băng đỏ.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "link-avatar-glasslight-fox",
+      "gameId": "link-connect",
+      "level": 29,
+      "type": "avatar",
+      "name": "Cáo Lưu Ly",
+      "series": "Đêm Hoa Đăng",
+      "brief": "Cáo nâu tím bên đèn thủy tinh xanh, khác Cáo Ánh Trăng về chất/cảnh.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "link-frame-lantern-moon-gate",
+      "gameId": "link-connect",
+      "level": 30,
+      "type": "frame",
+      "name": "Cổng Trăng Hoa Đăng",
+      "series": "Đêm Hoa Đăng",
+      "brief": "Cổng trăng gỗ chạm, đèn lụa và hoa mộc, không đổi aperture avatar.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "triple-avatar-quartz-phoenix",
+      "gameId": "triple-connect",
+      "level": 11,
+      "type": "avatar",
+      "name": "Phượng Hoàng Thạch Anh",
+      "series": "Thành phố Pha Lê",
+      "brief": "Phượng hoàng con lông tím trắng, điểm nhấn thạch anh; mặt gần.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "triple-frame-crystal-arch",
+      "gameId": "triple-connect",
+      "level": 12,
+      "type": "frame",
+      "name": "Vòm Pha Lê",
+      "series": "Thành phố Pha Lê",
+      "brief": "Vòm pha lê tím và viền bạc tròn, gai ngắn hướng ngoài.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "triple-badge-triangle-seal",
+      "gameId": "triple-connect",
+      "level": 13,
+      "type": "badge",
+      "name": "Dấu Ấn Tam Giác",
+      "series": "Thành phố Pha Lê",
+      "brief": "Ba tinh thể nhỏ trên ấn đồng tam giác; silhouette huy hiệu rõ.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "triple-avatar-amethyst-unicorn",
+      "gameId": "triple-connect",
+      "level": 14,
+      "type": "avatar",
+      "name": "Kỳ Lân Tím",
+      "series": "Thành phố Pha Lê",
+      "brief": "Kỳ lân hiền với bờm tím và sừng nhỏ trong thành phố tinh thể.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "triple-frame-three-wing-star",
+      "gameId": "triple-connect",
+      "level": 15,
+      "type": "frame",
+      "name": "Cánh Sao Ba Nhánh",
+      "series": "Thành phố Pha Lê",
+      "brief": "Ba cánh ngọc cách đều bên ngoài một vòng bạc liên tục.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "triple-avatar-platinum-dragon",
+      "gameId": "triple-connect",
+      "level": 16,
+      "type": "avatar",
+      "name": "Rồng Bạch Kim",
+      "series": "Thành phố Pha Lê",
+      "brief": "Rồng nhỏ bạc xanh, mắt vàng, vảy kim loại mềm.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "triple-frame-jade-gears",
+      "gameId": "triple-connect",
+      "level": 17,
+      "type": "frame",
+      "name": "Vòng Bánh Răng Ngọc",
+      "series": "Thành phố Pha Lê",
+      "brief": "Bánh răng nhỏ bạc-ngọc quanh vành tròn, khác khung lăng kính cũ.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "triple-badge-crystal-keeper",
+      "gameId": "triple-connect",
+      "level": 18,
+      "type": "badge",
+      "name": "Người Giữ Tinh Thể",
+      "series": "Thành phố Pha Lê",
+      "brief": "Ba tháp pha lê trong khiên vương miện nhỏ.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "triple-avatar-crystal-mech-cat",
+      "gameId": "triple-connect",
+      "level": 19,
+      "type": "avatar",
+      "name": "Mèo Máy Pha Lê",
+      "series": "Thành phố Pha Lê",
+      "brief": "Mèo máy bằng đồng bạc với mắt ngọc tím, thân thiện.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "triple-frame-tri-star-crown",
+      "gameId": "triple-connect",
+      "level": 20,
+      "type": "frame",
+      "name": "Vương Miện Tam Tinh",
+      "series": "Thành phố Pha Lê",
+      "brief": "Ba chốt sao ngọc trên viền vàng, trang trí gọn không tràn canvas.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "triple-avatar-aurora-snowfox",
+      "gameId": "triple-connect",
+      "level": 21,
+      "type": "avatar",
+      "name": "Cáo Tuyết Cực Quang",
+      "series": "Miền Cực Quang",
+      "brief": "Cáo tuyết giữa dải cực quang xanh tím, mắt hổ phách.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "triple-frame-aurora-ribbon",
+      "gameId": "triple-connect",
+      "level": 22,
+      "type": "frame",
+      "name": "Dải Cực Quang",
+      "series": "Miền Cực Quang",
+      "brief": "Dải men xanh tím quanh vòng bạc, chất liệu đặc không blur lớn.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "triple-badge-three-dawn-rays",
+      "gameId": "triple-connect",
+      "level": 23,
+      "type": "badge",
+      "name": "Ba Tia Bình Minh",
+      "series": "Miền Cực Quang",
+      "brief": "Ba tia sáng và đỉnh núi băng trong huy chương sao.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "triple-avatar-jade-penguin",
+      "gameId": "triple-connect",
+      "level": 24,
+      "type": "avatar",
+      "name": "Chim Cánh Cụt Ngọc",
+      "series": "Miền Cực Quang",
+      "brief": "Chim cánh cụt non với khăn ngọc giữa tuyết và ánh cực quang.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "triple-frame-azure-ice-ring",
+      "gameId": "triple-connect",
+      "level": 25,
+      "type": "frame",
+      "name": "Vòng Băng Lam",
+      "series": "Miền Cực Quang",
+      "brief": "Tinh thể băng lam ngắn trên lòng bạc tròn, không gai dài.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "triple-avatar-polar-bear",
+      "gameId": "triple-connect",
+      "level": 26,
+      "type": "avatar",
+      "name": "Gấu Bắc Cực",
+      "series": "Miền Cực Quang",
+      "brief": "Gấu trắng hiền giữa đêm tuyết, khác Gấu Mật Ong về dáng và cảnh.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "triple-frame-silver-meteor",
+      "gameId": "triple-connect",
+      "level": 27,
+      "type": "frame",
+      "name": "Thiên Thạch Bạc",
+      "series": "Miền Cực Quang",
+      "brief": "Đá thiên thạch bạc và dải sao ngoài vòng tối, không vệt glow chiếm nền.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "triple-badge-aurora-heart",
+      "gameId": "triple-connect",
+      "level": 28,
+      "type": "badge",
+      "name": "Trái Tim Cực Quang",
+      "series": "Miền Cực Quang",
+      "brief": "Ngọc ba mặt phát sắc xanh tím trong khiên băng.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "triple-avatar-galactic-dragon",
+      "gameId": "triple-connect",
+      "level": 29,
+      "type": "avatar",
+      "name": "Rồng Thiên Hà",
+      "series": "Miền Cực Quang",
+      "brief": "Rồng xanh thẫm mắt tím với vảy đốm sao; khác rồng ngọc và hoàng hôn.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "triple-frame-aurora-crown",
+      "gameId": "triple-connect",
+      "level": 30,
+      "type": "frame",
+      "name": "Vương Miện Cực Quang",
+      "series": "Miền Cực Quang",
+      "brief": "Vương miện băng ngọc nhiều lớp, điểm nhấn màn30 nhưng không tăng chỉ số.",
+      "status": "planned-not-drawn",
+      "condition": "first certified completion of all four difficulties",
+      "destination": "profile",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": [
+        256,
+        256
+      ]
+    }
+  ],
+  "approvalDate": "2026-10-24"
+}

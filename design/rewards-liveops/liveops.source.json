@@ -1,0 +1,183 @@
+{
+  "status": "approved for code and emulator; release requires separate authorization",
+  "confirmed": {
+    "spinFreePerDay": 1,
+    "spinOptionalAdPerDay": 1,
+    "existing300Coins": "preserved",
+    "existingAchievementRewards": 30
+  },
+  "scope": {
+    "levelsPerGame": [
+      11,
+      30
+    ],
+    "newAchievementRewards": 60,
+    "postExpansionAchievementRewards": 90,
+    "dailySystems": "one account across all three games",
+    "noNewGameplayRules": true
+  },
+  "dailyClock": {
+    "proposal": "trusted service UTC day; week starts Monday UTC",
+    "resetLocalVietnam": "07:00",
+    "offline": "gameplay remains available; online reward claims await connection",
+    "loginMissedDay": "keep next ordinal; no reset to day1; no catch-up for missed dates"
+  },
+  "login": {
+    "cycleDays": 7,
+    "coins": [
+      10,
+      10,
+      15,
+      10,
+      15,
+      20,
+      25
+    ],
+    "claimOncePerDay": true,
+    "autoPopup": false
+  },
+  "missions": {
+    "daily": [
+      {
+        "id": "win-three",
+        "goal": "Thắng 3 ván",
+        "target": 3,
+        "coins": 5
+      },
+      {
+        "id": "match-thirty",
+        "goal": "Ghép đúng 30 lần",
+        "target": 30,
+        "coins": 5,
+        "help": "Tiến độ được ghi sau mỗi ván thắng."
+      },
+      {
+        "id": "win-without-hint",
+        "goal": "Thắng 1 ván không dùng Gợi ý",
+        "target": 1,
+        "coins": 10
+      }
+    ],
+    "dailyCompletionBonus": 10,
+    "weekly": [
+      {
+        "id": "weekly-wins",
+        "goal": "Thắng 12 ván",
+        "target": 12
+      },
+      {
+        "id": "weekly-matches",
+        "goal": "Ghép đúng 120 lần",
+        "target": 120
+      },
+      {
+        "id": "weekly-no-hint",
+        "goal": "Thắng 3 ván không dùng Gợi ý",
+        "target": 3
+      },
+      {
+        "id": "weekly-visits",
+        "goal": "Điểm danh 3 ngày",
+        "target": 3
+      }
+    ],
+    "weeklyCompletionCoins": 50,
+    "completedUnclaimedAtReset": "settle completed mission rewards and earned completion bonus once; show a grouped notice on next open; incomplete missions expire",
+    "claimStyle": "manual mission claim; completion bonus applied atomically with last daily claim",
+    "tutorialEligible": false,
+    "progressSource": "deduplicated completed winning rounds; normalized match operation is pair for Memory/Link and triad for Triple"
+  },
+  "wheel": {
+    "sectorValuesClockwise": [
+      5,
+      10,
+      10,
+      15,
+      15,
+      20,
+      20,
+      25
+    ],
+    "sectorWeights": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "expectedCoinsPerSpin": 15,
+    "coinsOnlyForPilot": true,
+    "purchasedSpins": false,
+    "resetQuota": "global owner/day/source, not per game",
+    "adBeforeOrAfterFree": "either; independent quota and single active operation",
+    "result": "chosen once durably before presentation; retry returns same receipt and sector"
+  },
+  "event": {
+    "idProposal": "firefly-festival-01",
+    "name": "Lễ hội Đom Đóm",
+    "durationDays": 7,
+    "target": 100,
+    "pointsPerWin": {
+      "easy": 5,
+      "normal": 7,
+      "hard": 9,
+      "superHard": 12
+    },
+    "maxPointsPerDay": 40,
+    "milestones": [
+      {
+        "points": 20,
+        "coins": 5
+      },
+      {
+        "points": 50,
+        "coins": 10
+      },
+      {
+        "points": 80,
+        "coins": 10
+      },
+      {
+        "points": 100,
+        "cosmetics": [
+          "event-avatar-lantern-otter",
+          "event-frame-firefly-glow"
+        ]
+      }
+    ],
+    "endPolicy": "stop new scoring; 48-hour claim grace for rewards already earned",
+    "followup": "recap; no unconfigured new event or fake countdown"
+  },
+  "eventCosmetics": [
+    {
+      "id": "event-avatar-lantern-otter",
+      "type": "avatar",
+      "name": "Rái Cá Đèn Lồng",
+      "status": "planned-not-drawn",
+      "sourceKind": "event"
+    },
+    {
+      "id": "event-frame-firefly-glow",
+      "type": "frame",
+      "name": "Ánh Đom Đóm",
+      "status": "planned-not-drawn",
+      "sourceKind": "event"
+    }
+  ],
+  "economy": {
+    "weeklyLoginCoins": 105,
+    "dailyMissionCoins": 30,
+    "weeklyMissionsCoins": 50,
+    "eventCoinsPerPilot": 25,
+    "expectedWeekWithoutAd": 495,
+    "expectedWeekWithSevenOptionalAds": 600,
+    "maxWeekWithoutAd": 565,
+    "maxWeekWithSevenOptionalAds": 740,
+    "assumptions": "seven daily logins, all daily/weekly missions and one 7-day pilot completed; equal wheel sectors; not telemetry or an approved economy"
+  },
+  "approvedForImplementation": true,
+  "approvalDate": "2026-10-24"
+}

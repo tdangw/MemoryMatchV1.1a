@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "approvedAt": "2026-10-24",
+  "authority": "Direct owner approval in this conversation",
+  "sources": {
+    "expansion-catalog.proposal.json": "dd5a3f45e78e5400405b3bf70001a6723f4850a9992a4f864a1b64d33158245d",
+    "liveops.proposal.json": "74c5907006978389893a97fc109d25fe6cbc87d2f36dc58dbace30611f0ba45e"
+  },
+  "art": {
+    "concepts": [
+      "01-missions-daily-login-v2.png",
+      "02-events-wheel.png"
+    ],
+    "catalog": "catalog.source.json",
+    "newAchievementItems": 60,
+    "newEventItems": 2,
+    "representativeSprites": "review required before six production batches",
+    "fullPagePngAsRuntime": false
+  },
+  "economy": {
+    "source": "liveops.source.json",
+    "approvedInFull": true,
+    "existingCoinsPerTenMasteredLevels": 300
+  },
+  "periods": {
+    "scope": "account shared by all three games",
+    "dailyResetUtc": "00:00",
+    "weeklyResetUtc": "Monday 00:00",
+    "vietnamReset": "07:00"
+  },
+  "offline": {
+    "gameplay": true,
+    "facts": "Only server-confirmed periods; upload before the corresponding period ends. No expired-period catch-up.",
+    "claims": "online required",
+    "reset": "Settle completed unclaimed missions and earned bonus exactly once; expire incomplete missions."
+  },
+  "backend": {
+    "implementation": true,
+    "emulator": true,
+    "deploy": false
+  },
+  "pilot": {
+    "durationDays": 7,
+    "globalSchedule": true,
+    "startAt": null,
+    "unconfigured": "No automatic start or countdown",
+    "earnedRewardGraceHours": 48
+  },
+  "preserved": {
+    "originalRewardMappings": 30,
+    "effects": 6,
+    "ranking": true,
+    "privateData": true
+  },
+  "release": {
+    "apk": false,
+    "push": false,
+    "hosting": false,
+    "backendDeploy": false,
+    "rulesDeploy": false
+  }
+}
