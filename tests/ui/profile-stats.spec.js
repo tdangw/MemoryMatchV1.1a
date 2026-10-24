@@ -1,5 +1,36 @@
 import { expect, test } from '@playwright/test';
 
+test('current-season linked statistics reload without errors or repeated adoption', async ({ page }) => {
+  const warnings = [];
+  page.on('console', message => { if (message.text().includes('Private profile statistics unavailable')) warnings.push(message.text()); });
+  await page.goto('/'); await expect(page.locator('#app-loading')).toHaveCount(0, { timeout:20000 });
+  const initial = await page.evaluate(async () => {
+    const p = await import('/js/persistence.js'), owner = await p.loadProfileOwner();
+    const { getFirebaseEnvironment } = await import('/js/firebaseEnvironment.js');
+    const { adoptProfileStats, normalizeProfileStats } = await import('/js/profileStatsModel.js');
+    const environment = getFirebaseEnvironment(), sourceKey = `profileStats:profile:${owner.id}`, targetKey = `profileStats:${environment}:uid:linked-owner`;
+    await p.updateSyncMetadata(sourceKey, value => ({ ...normalizeProfileStats(value), totalMs:60000 }));
+    await p.updateSyncMetadataPair([sourceKey,targetKey], ([source,target])=>adoptProfileStats(source,target,'linked-owner',environment));
+    return { sourceKey,targetKey,source:await p.loadSyncMetadata(sourceKey) };
+  });
+  for(let cycle=0;cycle<3;cycle++) {
+    await page.reload(); await expect(page.locator('#app-loading')).toHaveCount(0, {timeout:20000});
+    expect(await page.evaluate(async()=> (await import('/js/profileStatsService.js')).getProfileStatsService().getState().phase)).toBe('ready');
+    await page.evaluate(async()=>{
+      const p=await import('/js/persistence.js'), owner=await p.loadProfileOwner();
+      const environment=(await import('/js/firebaseEnvironment.js')).getFirebaseEnvironment();
+      await (await import('/js/profileStatsService.js')).getProfileStatsService().bindAccount({
+        getIdentity:()=>({uid:'linked-owner',profileId:owner.id,firstUid:'linked-owner',environment,createdAt:owner.createdAt}),
+        subscribe:listener=>{listener();return()=>{};},
+      });
+    });
+    await expect.poll(()=>page.evaluate(async()=> (await import('/js/profileStatsService.js')).getProfileStatsService().getState().totalPlayMs)).toBe(60000);
+    expect(await page.evaluate(async key=>(await import('/js/persistence.js')).loadSyncMetadata(key),initial.sourceKey)).toEqual(initial.source);
+    expect(await page.evaluate(async key=>(await (await import('/js/persistence.js')).loadSyncMetadata(key)).totalMs,initial.targetKey)).toBe(60000);
+  }
+  expect(warnings).toEqual([]);
+});
+
 test('three games share durable active time, excluding startup and nested pause, with no finish/reload duplicate', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('[data-dock-action="profile"]')).toBeVisible();

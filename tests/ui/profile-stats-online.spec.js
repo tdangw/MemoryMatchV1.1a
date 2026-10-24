@@ -30,6 +30,8 @@ test('offline/reload retry and a second device add once; linking preserves accou
   test.setTimeout(90000);
   const a = await browser.newContext({ baseURL }); const b = await browser.newContext({ baseURL });
   const first = await a.newPage(); const second = await b.newPage();
+  const statisticsWarnings = [];
+  first.on('console', message => { if (message.text().includes('Invalid linked profile owner')) statisticsWarnings.push(message.text()); });
   await first.goto('/'); await ready(first);
   const created = await first.evaluate(async () => (await import('/js/profileStatsService.js')).getProfileStatsService().getState().joinedAt);
   await google(first, `profile-${Date.now()}@example.test`, true); await ready(first);
@@ -47,6 +49,7 @@ test('offline/reload retry and a second device add once; linking preserves accou
   await expect.poll(() => total(first)).toBe(180000); await expect.poll(() => total(second)).toBe(180000);
   await second.evaluate(async () => { const service = (await import('/js/profileStatsService.js')).getProfileStatsService(); await service.syncNow(); await service.syncNow(); });
   expect(await total(second)).toBe(180000);
+  expect(statisticsWarnings).toEqual([]);
   await a.close(); await b.close();
 });
 

@@ -3,6 +3,7 @@ import { normalizeProfileStats, mergeProfileCounter, profileDisplayTotal, format
 import 'fake-indexeddb/auto';
 import { openChapterDatabase, updateChapterMetadataPair, writeChapterMetadata, readChapterMetadata } from '../js/chapterStore.js';
 import { createActivePlayClock } from '../js/playMetrics.js';
+import { gameplaySpace } from '../js/progression/gameplaySeason.js';
 const a = crypto.randomUUID(); const b = crypto.randomUUID();
 let value = mergeProfileCounter(null, a, 60000, 1000);
 value = mergeProfileCounter(value, b, 120000, 2000);
@@ -26,6 +27,15 @@ assert.equal(adopted[1].totalMs, 1000);
 assert.deepEqual(adoptProfileStats(...adopted, 'first', 'local'), adopted, 'Adoption replay never doubles time.');
 const race = adoptProfileStats(adopted[0], null, 'second', 'local');
 assert.equal(race[0].adoptedUid, 'first'); assert.equal(race[1].totalMs, 0, 'Concurrent adopter cannot repoint the marker.');
+for (const base of ['local', 'test', 'beta', 'production']) for (const environment of [base, gameplaySpace(base)]) {
+  const linked = adoptProfileStats(original, null, 'season-owner', environment);
+  assert.deepEqual(normalizeProfileStats(linked[0]), linked[0], `Persisted adoption marker must reload in ${environment}.`);
+  assert.deepEqual(adoptProfileStats(...linked, 'season-owner', environment), linked, 'Reload/retry must not adopt time twice.');
+}
+for (const environment of ['unknown', 'local-waves999', '', null]) {
+  assert.throws(() => normalizeProfileStats({ ...original, adoptedUid: 'owner', adoptedEnvironment: environment }), /linked profile owner/);
+  assert.throws(() => adoptProfileStats(original, null, 'owner', environment), /linked profile owner/);
+}
 const database = await openChapterDatabase();
 await writeChapterMetadata(database, 'stats-local', original);
 const put = IDBObjectStore.prototype.put;

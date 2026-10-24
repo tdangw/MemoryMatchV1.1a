@@ -22,7 +22,7 @@ export async function initializeProfileStatsService() {
   const keyForSegment = segment => segment.owner?.uid ? `profileStats:${getFirebaseEnvironment()}:uid:${segment.owner.uid}`
     : `profileStats:profile:${segment.owner?.profileId || owner.id}`;
   function notify() { for (const listener of listeners) listener(service.getState()); }
-  function failure(error) { phase = 'error'; console.warn('Private profile statistics unavailable', error.code || error.name); notify(); }
+  function failure(error) { phase = 'error'; console.warn('Private profile statistics unavailable', error.code || error.name, error.message); notify(); }
   async function readLocal(key) { return normalizeProfileStats(await loadSyncMetadata(key)); }
   async function refresh(id = ++generation) {
     const key = keyFor(identity);
