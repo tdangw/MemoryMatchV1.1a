@@ -610,6 +610,594 @@
           "sha256": "f870146c540307fd19eef6b9605a6aa0d35aeac777f75c09387718e8ec73e445"
         }
       }
+    },
+    "memory-avatar-chestnut-squirrel": {
+      "id": "memory-avatar-chestnut-squirrel",
+      "name": "Sóc Hạt Dẻ",
+      "type": "avatar",
+      "gameId": "memory-match",
+      "level": 21,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 97,
+        "top": 97,
+        "width": 318,
+        "height": 318
+      },
+      "source": {
+        "file": "sources/memory-avatar-chestnut-squirrel.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 65,
+          "top": 70,
+          "width": 1124,
+          "height": 1105
+        },
+        "sha256": "217256a43397f30888a5c26353183adde44739e6c72c9232638a7b4b15f137be",
+        "aperture": null
+      },
+      "scale": 0.28778280542986423,
+      "nativeUpscaled": false,
+      "png": "sprites/memory-avatar-chestnut-squirrel.png",
+      "pngSha256": "357de766f69ef26e896e4cce23a80f8cc91487a6f7b09b3ab9ebcc0569f1c56b",
+      "exports": {
+        "128": {
+          "file": "sprites/memory-avatar-chestnut-squirrel-128.webp",
+          "bytes": 5128,
+          "sha256": "a566ce83b492e27d351b1cf61b6d8ac2be8580a3602655bb6238518dba551c3e"
+        },
+        "256": {
+          "file": "sprites/memory-avatar-chestnut-squirrel-256.webp",
+          "bytes": 13058,
+          "sha256": "4eb6249f56c0a580527229d1e0ca11a93bc80652ce08f97045918d10a3d6a2c9"
+        },
+        "512": {
+          "file": "sprites/memory-avatar-chestnut-squirrel-512.webp",
+          "bytes": 39638,
+          "sha256": "48805bb3bbe286513c59eeb874a6eedbf12fb340d3a7c04f1ed2e22e5bf45c33"
+        }
+      }
+    },
+    "memory-frame-autumn-leaves": {
+      "id": "memory-frame-autumn-leaves",
+      "name": "Vòng Lá Thu",
+      "type": "frame",
+      "gameId": "memory-match",
+      "level": 22,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 17,
+        "top": 11,
+        "width": 479,
+        "height": 484
+      },
+      "source": {
+        "file": "sources/memory-frame-autumn-leaves.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 67,
+          "top": 47,
+          "width": 1119,
+          "height": 1131
+        },
+        "sha256": "3c7e8e87b0a31dc7f78d88ce3a9763a4966943cf1c4cb3c873b857edd0349aed",
+        "aperture": {
+          "left": 277,
+          "top": 283,
+          "width": 698,
+          "height": 673,
+          "radius": 336.5,
+          "pixels": 366432
+        }
+      },
+      "scale": 0.4279346210995542,
+      "nativeUpscaled": false,
+      "png": "sprites/memory-frame-autumn-leaves.png",
+      "pngSha256": "a733f6d36f660ca60ab5f48088bb66c1e18121093f646d62c7a569baf37b4c97",
+      "exports": {
+        "128": {
+          "file": "sprites/memory-frame-autumn-leaves-128.webp",
+          "bytes": 10666,
+          "sha256": "1752778d40fef555215b4777284979fffc66608c17ceb0df7649a947e370238c"
+        },
+        "256": {
+          "file": "sprites/memory-frame-autumn-leaves-256.webp",
+          "bytes": 27574,
+          "sha256": "8ea4491b624dc145a1b52c5317e7bb793aaf2b3df08c0c93fd2be3cabab4d372"
+        },
+        "512": {
+          "file": "sprites/memory-frame-autumn-leaves-512.webp",
+          "bytes": 81148,
+          "sha256": "1a51dac8fa598b766316e5fa31fe7f09e9998b4c73b8e8cbb57c985e4e4eedfb"
+        }
+      }
+    },
+    "memory-badge-four-seasons": {
+      "id": "memory-badge-four-seasons",
+      "name": "Bốn Mùa Hội Tụ",
+      "type": "badge",
+      "gameId": "memory-match",
+      "level": 23,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 56,
+        "top": 58,
+        "width": 400,
+        "height": 395
+      },
+      "source": {
+        "file": "sources/memory-badge-four-seasons.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 52,
+          "top": 49,
+          "width": 1150,
+          "height": 1136
+        },
+        "sha256": "d19d6bcf54cee9d426003e26645bd6b21bac19f317a2a36eae237f99b432f048",
+        "aperture": null
+      },
+      "scale": 0.34782608695652173,
+      "nativeUpscaled": false,
+      "png": "sprites/memory-badge-four-seasons.png",
+      "pngSha256": "02da2013255f59448519f3f78c5e7a259628f4512a13688f2f4b20bdb775d2ed",
+      "exports": {
+        "128": {
+          "file": "sprites/memory-badge-four-seasons-128.webp",
+          "bytes": 7480,
+          "sha256": "4446a2b8626af1e5417d253ac6b5a115b41a2c3e732c892e72fa1a883b690e95"
+        },
+        "256": {
+          "file": "sprites/memory-badge-four-seasons-256.webp",
+          "bytes": 21398,
+          "sha256": "ad91cf2272fb6f94e0d248e595d91a52d154e25f6c306c37af44a1155d5b019a"
+        },
+        "512": {
+          "file": "sprites/memory-badge-four-seasons-512.webp",
+          "bytes": 67842,
+          "sha256": "29bd86797991c199ea744ef0466776cfc4e6ad6405b4f79fb1c104342e74a574"
+        }
+      }
+    },
+    "memory-avatar-snow-rabbit": {
+      "id": "memory-avatar-snow-rabbit",
+      "name": "Thỏ Tuyết",
+      "type": "avatar",
+      "gameId": "memory-match",
+      "level": 24,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 97,
+        "top": 97,
+        "width": 318,
+        "height": 318
+      },
+      "source": {
+        "file": "sources/memory-avatar-snow-rabbit.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 82,
+          "top": 87,
+          "width": 1091,
+          "height": 1084
+        },
+        "sha256": "1927bc8e21efea744d7db64f222da1ff58badffcc1dc7ad089317958ed5599cf",
+        "aperture": null
+      },
+      "scale": 0.2933579335793358,
+      "nativeUpscaled": false,
+      "png": "sprites/memory-avatar-snow-rabbit.png",
+      "pngSha256": "74f4768976836bf1eb519ab0d5f9fa2aaf9d1d9e53b11ab10f0e57c69ac58c77",
+      "exports": {
+        "128": {
+          "file": "sprites/memory-avatar-snow-rabbit-128.webp",
+          "bytes": 5306,
+          "sha256": "9887a43ed5800a6dd9eda676a6a37c77f48c2355cc77180c404813b0edac790d"
+        },
+        "256": {
+          "file": "sprites/memory-avatar-snow-rabbit-256.webp",
+          "bytes": 13846,
+          "sha256": "ef6d0e17a0511797297c2ca0302c968382576230e6b7716ee18607989b1758c3"
+        },
+        "512": {
+          "file": "sprites/memory-avatar-snow-rabbit-512.webp",
+          "bytes": 40826,
+          "sha256": "2decbe71597f4f297a81f3e254ee2fc1ad71c4ff88de56de99b4787f120955d3"
+        }
+      }
+    },
+    "memory-frame-frosted-branch": {
+      "id": "memory-frame-frosted-branch",
+      "name": "Nhành Băng",
+      "type": "frame",
+      "gameId": "memory-match",
+      "level": 25,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 32,
+        "top": 40,
+        "width": 444,
+        "height": 444
+      },
+      "source": {
+        "file": "sources/memory-frame-frosted-branch.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 51,
+          "top": 56,
+          "width": 1152,
+          "height": 1153
+        },
+        "sha256": "d6ee9101e09fb130d0b721bf25ed6b7a6c09608933772d144a490b7e37c35f47",
+        "aperture": {
+          "left": 248,
+          "top": 243,
+          "width": 771,
+          "height": 748,
+          "radius": 374,
+          "pixels": 446887
+        }
+      },
+      "scale": 0.3850267379679144,
+      "nativeUpscaled": false,
+      "png": "sprites/memory-frame-frosted-branch.png",
+      "pngSha256": "07c2b92becf5b8eeb9922b79dcf37d0c746a8e699612b972d63650dd6fc092d9",
+      "exports": {
+        "128": {
+          "file": "sprites/memory-frame-frosted-branch-128.webp",
+          "bytes": 9344,
+          "sha256": "06792f4896b69bf3618f9fe7575b8f04ffef9df38db06326cba10ec2e1ee6de4"
+        },
+        "256": {
+          "file": "sprites/memory-frame-frosted-branch-256.webp",
+          "bytes": 26034,
+          "sha256": "12c26ca18a06b6d2477c06bd7c4179cf85d60ee85f0affc0a50b8ea4393f28c8"
+        },
+        "512": {
+          "file": "sprites/memory-frame-frosted-branch-512.webp",
+          "bytes": 82126,
+          "sha256": "fdc5adef0ace3ac9bc2d85b64b606ac12d12a72d8f28063893ac1e0d6e87efc2"
+        }
+      }
+    },
+    "memory-avatar-honey-bear": {
+      "id": "memory-avatar-honey-bear",
+      "name": "Gấu Mật Ong",
+      "type": "avatar",
+      "gameId": "memory-match",
+      "level": 26,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 97,
+        "top": 97,
+        "width": 318,
+        "height": 318
+      },
+      "source": {
+        "file": "sources/memory-avatar-honey-bear.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 35,
+          "top": 40,
+          "width": 1183,
+          "height": 1169
+        },
+        "sha256": "a3dc7ab01cb760efd0c1d07cf78686722e6f45ddcdd01822856e5a0938f32d77",
+        "aperture": null
+      },
+      "scale": 0.272027373823781,
+      "nativeUpscaled": false,
+      "png": "sprites/memory-avatar-honey-bear.png",
+      "pngSha256": "d55b14282f71af1bc4667336224672126423e318d3611fe98ef11aa3c06dbb1e",
+      "exports": {
+        "128": {
+          "file": "sprites/memory-avatar-honey-bear-128.webp",
+          "bytes": 5456,
+          "sha256": "65e5522d26c5383f867d961a55c48ca556b23342a579051b54c6f197771308b5"
+        },
+        "256": {
+          "file": "sprites/memory-avatar-honey-bear-256.webp",
+          "bytes": 15556,
+          "sha256": "28d61a543fd7d29e626e3e1820587e07e29a6c2696be84892625d4697cbd5517"
+        },
+        "512": {
+          "file": "sprites/memory-avatar-honey-bear-512.webp",
+          "bytes": 49194,
+          "sha256": "9ad55b51e7558d08bbac026991aa1f9f2c2ae280cfa10168bbf9224b599e9963"
+        }
+      }
+    },
+    "memory-frame-golden-honeycomb": {
+      "id": "memory-frame-golden-honeycomb",
+      "name": "Tổ Ong Vàng",
+      "type": "frame",
+      "gameId": "memory-match",
+      "level": 27,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 24,
+        "top": 24,
+        "width": 468,
+        "height": 465
+      },
+      "source": {
+        "file": "sources/memory-frame-golden-honeycomb.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 62,
+          "top": 53,
+          "width": 1140,
+          "height": 1133
+        },
+        "sha256": "31a2d5b26109cafc7b8ecccc10fb4a7e5f1700777bd877b91a5dea9472f537d7",
+        "aperture": {
+          "left": 267,
+          "top": 267,
+          "width": 721,
+          "height": 702,
+          "radius": 351,
+          "pixels": 395966
+        }
+      },
+      "scale": 0.41025641025641024,
+      "nativeUpscaled": false,
+      "png": "sprites/memory-frame-golden-honeycomb.png",
+      "pngSha256": "4de61c52667a638643fca60103ec055feb1ee7c51399ca07412e545fcc9ea286",
+      "exports": {
+        "128": {
+          "file": "sprites/memory-frame-golden-honeycomb-128.webp",
+          "bytes": 9650,
+          "sha256": "987b8c968b6fb3b5f3f250b739a9dc3fba5039add4d2f2c5b3ee6d861fc35ed9"
+        },
+        "256": {
+          "file": "sprites/memory-frame-golden-honeycomb-256.webp",
+          "bytes": 25150,
+          "sha256": "8a5b970e23f118095bd2b0eb9dda4bed08bc7f8b8d2da12dbbc36534a637dec2"
+        },
+        "512": {
+          "file": "sprites/memory-frame-golden-honeycomb-512.webp",
+          "bytes": 73234,
+          "sha256": "045a1bcb22aa110c97d702d60b2456dfb862af16611ffa7c7b689c76a85a837d"
+        }
+      }
+    },
+    "memory-badge-forest-guardian": {
+      "id": "memory-badge-forest-guardian",
+      "name": "Người Giữ Rừng",
+      "type": "badge",
+      "gameId": "memory-match",
+      "level": 28,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 56,
+        "top": 60,
+        "width": 400,
+        "height": 392
+      },
+      "source": {
+        "file": "sources/memory-badge-forest-guardian.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 49,
+          "top": 48,
+          "width": 1157,
+          "height": 1134
+        },
+        "sha256": "4a09b293dfabfadd024adf358aa39e83ce36df7c98cd23995d1d234f9b44a96e",
+        "aperture": null
+      },
+      "scale": 0.34572169403630076,
+      "nativeUpscaled": false,
+      "png": "sprites/memory-badge-forest-guardian.png",
+      "pngSha256": "eeb60007466c153c55768cbaea87c6d75c48f0799a847ebd0f83ba84eb488ad2",
+      "exports": {
+        "128": {
+          "file": "sprites/memory-badge-forest-guardian-128.webp",
+          "bytes": 7324,
+          "sha256": "ca34d5981e0c06354dce72657b10fcde88dcb830b3f988ec98b5efabba8c84f7"
+        },
+        "256": {
+          "file": "sprites/memory-badge-forest-guardian-256.webp",
+          "bytes": 20512,
+          "sha256": "f1d7f403dc31a11c8b020c1e64fedf70d78d80c200cb5fae39f647bfa4857f34"
+        },
+        "512": {
+          "file": "sprites/memory-badge-forest-guardian-512.webp",
+          "bytes": 64432,
+          "sha256": "db57f837379882f3c4ca2893aa28cd94944129d93f80f8c49b8b12cbf2a40be6"
+        }
+      }
+    },
+    "memory-avatar-dawn-crane": {
+      "id": "memory-avatar-dawn-crane",
+      "name": "Hạc Bình Minh",
+      "type": "avatar",
+      "gameId": "memory-match",
+      "level": 29,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 97,
+        "top": 97,
+        "width": 318,
+        "height": 318
+      },
+      "source": {
+        "file": "sources/memory-avatar-dawn-crane.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 74,
+          "top": 72,
+          "width": 1107,
+          "height": 1096
+        },
+        "sha256": "c477168b6220470cf42f806170b53f0f184348c05b497fe191fea0be87bb1050",
+        "aperture": null
+      },
+      "scale": 0.29014598540145986,
+      "nativeUpscaled": false,
+      "png": "sprites/memory-avatar-dawn-crane.png",
+      "pngSha256": "079d6e872c8035967f5f160a604981582c85d1b5fdafebad828ba2d2993197ab",
+      "exports": {
+        "128": {
+          "file": "sprites/memory-avatar-dawn-crane-128.webp",
+          "bytes": 5244,
+          "sha256": "99385ed6de5d6ba9a9f83ed6c73a43d04830708f15e84cb1848a9c4703ea0c65"
+        },
+        "256": {
+          "file": "sprites/memory-avatar-dawn-crane-256.webp",
+          "bytes": 13850,
+          "sha256": "76df28d070be7c4a17fa1740da6a2ffdd06a1813bde301f892a7eec7bf2ccd4a"
+        },
+        "512": {
+          "file": "sprites/memory-avatar-dawn-crane-512.webp",
+          "bytes": 39236,
+          "sha256": "ab6c164ec74b12662c9923632438f711a85df293f849024eff2335858c953edd"
+        }
+      }
+    },
+    "memory-frame-memory-crown": {
+      "id": "memory-frame-memory-crown",
+      "name": "Vương Miện Ký Ức",
+      "type": "frame",
+      "gameId": "memory-match",
+      "level": 30,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 25,
+        "top": 12,
+        "width": 463,
+        "height": 464
+      },
+      "source": {
+        "file": "sources/memory-frame-memory-crown.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 39,
+          "top": 27,
+          "width": 1177,
+          "height": 1179
+        },
+        "sha256": "5a3800034148fc37b2af4c1f2c7239d3ddc0f1640544abc86e251248f398cf6d",
+        "aperture": {
+          "left": 252,
+          "top": 282,
+          "width": 751,
+          "height": 732,
+          "radius": 366,
+          "pixels": 431355
+        }
+      },
+      "scale": 0.39344262295081966,
+      "nativeUpscaled": false,
+      "png": "sprites/memory-frame-memory-crown.png",
+      "pngSha256": "6990e0b8fb8fe20b6c10480bd859f8debdd44f9e1b7c54afcec3c6b4074986dc",
+      "exports": {
+        "128": {
+          "file": "sprites/memory-frame-memory-crown-128.webp",
+          "bytes": 9820,
+          "sha256": "9ec2dbf32acab96bb25b0e360acf480b9af0ef41f301685be6ab03a25c6f8487"
+        },
+        "256": {
+          "file": "sprites/memory-frame-memory-crown-256.webp",
+          "bytes": 26152,
+          "sha256": "f81247ac76fffb11df7fcf712a7cfca3205a58675dca1e835ada5b4fc056d8d8"
+        },
+        "512": {
+          "file": "sprites/memory-frame-memory-crown-512.webp",
+          "bytes": 80670,
+          "sha256": "f5e377e19a8653db1774605d03329bad00f616697314043eab37107418c5593d"
+        }
+      }
     }
   }
 }

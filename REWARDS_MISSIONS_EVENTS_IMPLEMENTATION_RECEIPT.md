@@ -97,3 +97,15 @@ không chiếm mapping của 90 thành tích, không giả receipt hoặc tự �
 169 cặp (13×13, gồm đồ cũ) PASS. Hươu được vẽ lại để sừng không vượt
 ảnh tròn; Mây Lụa được rút ngắn ornament dưới để giữ canvas chuẩn.
 Không nới ngưỡng hoặc đổi geometry cũ. Chỉ nguồn/pack/QA, chưa runtime.
+
+### Lô 2 — Khu rừng Bốn Mùa
+
+Đủ thêm 10 món màn 21–30 Memory Match; tổng mới 20 PNG và 60 WebP.
+289 cặp (17×17 gồm đồ cũ) PASS. Sửa hạt dẻ đúng brief và thu gọn lá khung
+qua imagegen; không vẽ sửa bằng code. Một lần tạo Gấu bị moderation output
+từ chối, tạo lại built-in với mô tả động vật rừng rõ ràng và thành công.
+Nguồn native giữ nguyên; crop theo alpha >8 của pipeline cũ, kiểm corner
+alpha=0 trên sprite xuất, kiểm alpha/kích thước mọi WebP. Chưa runtime.
+
+Trong A1 xuất hiện thay đổi gameplay/shop/cấu hình ngoài task. Giữ ngoài
+commit và đã hỏi owner còn hoạt động trước khi nối facts ở các gate sau.

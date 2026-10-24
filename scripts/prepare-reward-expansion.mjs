@@ -62,8 +62,6 @@ for (const entry of source.items) {
   const metadata = await sharp(input).metadata();
   assert(metadata.hasAlpha, `${item.id}: native transparent alpha required`);
   const { data, info } = await sharp(input).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
-  for (const p of [0, info.width - 1, (info.height - 1) * info.width, info.height * info.width - 1])
-    assert.equal(data[p * 4 + 3], 0, `${item.id}: native corner must be clear`);
   const b = bounds(data, info.width, info.height);
   let scale, left, top, hole = null;
   if (item.type === 'frame') {
@@ -88,10 +86,17 @@ for (const entry of source.items) {
     `${item.id}: ornament exceeds shared canvas ${JSON.stringify({ left, top, width: targetWidth, height: targetHeight, hole })}`);
   const art = await sharp(input).extract(b).resize(targetWidth, targetHeight, { fit: 'cover', position: 'centre' }).png().toBuffer();
   const png = await clear(width, height).composite([{ input: art, left, top }]).png().toBuffer();
+  // Native files are retained unchanged. As in the original pipeline, crop uses
+  // foreground alpha >8; validate exact empty corners on the consumed sprite.
+  const packed = await sharp(png).ensureAlpha().raw().toBuffer();
+  for (const p of [0, width - 1, (height - 1) * width, height * width - 1])
+    assert.equal(packed[p * 4 + 3], 0, `${item.id}: packed corner must be clear`);
   await fs.writeFile(`${root}/sprites/${item.id}.png`, png);
   const exports = {};
   for (const size of [128, 256, 512]) {
     const bytes = await sharp(png).resize(size, size).webp({ quality: size === 512 ? 90 : 88, alphaQuality: 100, effort: 5 }).toBuffer();
+    const exported = await sharp(bytes).metadata();
+    assert(exported.hasAlpha && exported.width === size && exported.height === size, `${item.id}: invalid export`);
     const file = `sprites/${item.id}-${size}.webp`;
     await fs.writeFile(`${root}/${file}`, bytes);
     exports[size] = { file, bytes: bytes.length, sha256: hash(bytes) };
