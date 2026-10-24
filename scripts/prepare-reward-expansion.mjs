@@ -69,9 +69,15 @@ for (const entry of source.items) {
     const hb = measured.bounds;
     assert(Math.abs(hb.width / hb.height - 1) <= .1, `Frame aperture must be circular: ${hb.width}x${hb.height}`);
     hole = { ...hb, radius: Math.min(hb.width, hb.height) / 2, pixels: measured.pixels };
-    scale = frameInnerCircle.radius / hole.radius;
-    left = Math.round(256 - (hb.left + (hb.width - 1) / 2 - b.left) * scale);
-    top = Math.round(256 - (hb.top + (hb.height - 1) / 2 - b.top) * scale);
+    const cx = hb.left + (hb.width - 1) / 2, cy = hb.top + (hb.height - 1) / 2;
+    const extent = Math.max(cx - b.left, cy - b.top, b.left + b.width - cx, b.top + b.height - cy);
+    // Radius 144 is nominal, whereas canvas/pivot/portrait rect are fixed.
+    // Uniform fitting retains asymmetric crests without clipping or distortion.
+    // Actual aperture/exterior coverage is still checked against every avatar.
+    scale = Math.min(frameInnerCircle.radius / hole.radius, (width / 2 - 8) / extent);
+    assert(hole.radius * scale >= frameInnerCircle.radius * .95, `${item.id}: crest requires excessive shrink; redraw`);
+    left = Math.round(256 - (cx - b.left) * scale);
+    top = Math.round(256 - (cy - b.top) * scale);
   } else if (item.type === 'avatar') {
     scale = Math.max(avatarRect.width / b.width, avatarRect.height / b.height);
     left = avatarRect.left; top = avatarRect.top;

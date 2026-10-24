@@ -1,12 +1,12 @@
 {
   "result": "PASS",
-  "generatedSprites": 20,
-  "packedSprites": 20,
+  "generatedSprites": 30,
+  "packedSprites": 30,
   "sourceErrors": [],
   "proposedSprites": 65,
-  "avatarCount": 17,
-  "frameCount": 17,
-  "checkedPairs": 289,
+  "avatarCount": 21,
+  "frameCount": 21,
+  "checkedPairs": 441,
   "finalRequiredPairs": 1225,
   "fullExpansionComplete": false,
   "runtimeChanged": false,
@@ -115,6 +115,30 @@
       "outsideLeak": 0
     },
     {
+      "avatar": "link-avatar-sailor-beaver",
+      "frame": "memory-frame-golden-laurel",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-pearl-dolphin",
+      "frame": "memory-frame-golden-laurel",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-azure-turtle",
+      "frame": "memory-frame-golden-laurel",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-royal-seahorse",
+      "frame": "memory-frame-golden-laurel",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
       "avatar": "memory-avatar-sapphire-owl",
       "frame": "link-frame-silver-moon",
       "uncoveredHole": 0,
@@ -217,6 +241,30 @@
       "outsideLeak": 0
     },
     {
+      "avatar": "link-avatar-sailor-beaver",
+      "frame": "link-frame-silver-moon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-pearl-dolphin",
+      "frame": "link-frame-silver-moon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-azure-turtle",
+      "frame": "link-frame-silver-moon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-royal-seahorse",
+      "frame": "link-frame-silver-moon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
       "avatar": "memory-avatar-sapphire-owl",
       "frame": "triple-frame-tri-crystal",
       "uncoveredHole": 0,
@@ -319,6 +367,30 @@
       "outsideLeak": 0
     },
     {
+      "avatar": "link-avatar-sailor-beaver",
+      "frame": "triple-frame-tri-crystal",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-pearl-dolphin",
+      "frame": "triple-frame-tri-crystal",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-azure-turtle",
+      "frame": "triple-frame-tri-crystal",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-royal-seahorse",
+      "frame": "triple-frame-tri-crystal",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
       "avatar": "memory-avatar-sapphire-owl",
       "frame": "memory-frame-cherry-blossom",
       "uncoveredHole": 0,
@@ -421,6 +493,30 @@
       "outsideLeak": 0
     },
     {
+      "avatar": "link-avatar-sailor-beaver",
+      "frame": "memory-frame-cherry-blossom",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-pearl-dolphin",
+      "frame": "memory-frame-cherry-blossom",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-azure-turtle",
+      "frame": "memory-frame-cherry-blossom",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-royal-seahorse",
+      "frame": "memory-frame-cherry-blossom",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
       "avatar": "memory-avatar-sapphire-owl",
       "frame": "memory-frame-sky-feather",
       "uncoveredHole": 0,
@@ -523,6 +619,30 @@
       "outsideLeak": 0
     },
     {
+      "avatar": "link-avatar-sailor-beaver",
+      "frame": "memory-frame-sky-feather",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-pearl-dolphin",
+      "frame": "memory-frame-sky-feather",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-azure-turtle",
+      "frame": "memory-frame-sky-feather",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-royal-seahorse",
+      "frame": "memory-frame-sky-feather",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
       "avatar": "memory-avatar-sapphire-owl",
       "frame": "link-frame-moonblossom",
       "uncoveredHole": 0,
@@ -625,6 +745,30 @@
       "outsideLeak": 0
     },
     {
+      "avatar": "link-avatar-sailor-beaver",
+      "frame": "link-frame-moonblossom",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-pearl-dolphin",
+      "frame": "link-frame-moonblossom",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-azure-turtle",
+      "frame": "link-frame-moonblossom",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-royal-seahorse",
+      "frame": "link-frame-moonblossom",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
       "avatar": "memory-avatar-sapphire-owl",
       "frame": "link-frame-stellar-orbit",
       "uncoveredHole": 0,
@@ -727,6 +871,30 @@
       "outsideLeak": 0
     },
     {
+      "avatar": "link-avatar-sailor-beaver",
+      "frame": "link-frame-stellar-orbit",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-pearl-dolphin",
+      "frame": "link-frame-stellar-orbit",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-azure-turtle",
+      "frame": "link-frame-stellar-orbit",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-royal-seahorse",
+      "frame": "link-frame-stellar-orbit",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
       "avatar": "memory-avatar-sapphire-owl",
       "frame": "triple-frame-prism",
       "uncoveredHole": 0,
@@ -829,6 +997,30 @@
       "outsideLeak": 0
     },
     {
+      "avatar": "link-avatar-sailor-beaver",
+      "frame": "triple-frame-prism",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-pearl-dolphin",
+      "frame": "triple-frame-prism",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-azure-turtle",
+      "frame": "triple-frame-prism",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-royal-seahorse",
+      "frame": "triple-frame-prism",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
       "avatar": "memory-avatar-sapphire-owl",
       "frame": "triple-frame-emerald",
       "uncoveredHole": 0,
@@ -931,6 +1123,30 @@
       "outsideLeak": 0
     },
     {
+      "avatar": "link-avatar-sailor-beaver",
+      "frame": "triple-frame-emerald",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-pearl-dolphin",
+      "frame": "triple-frame-emerald",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-azure-turtle",
+      "frame": "triple-frame-emerald",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-royal-seahorse",
+      "frame": "triple-frame-emerald",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
       "avatar": "memory-avatar-sapphire-owl",
       "frame": "memory-frame-gilded-pages",
       "uncoveredHole": 0,
@@ -1033,6 +1249,30 @@
       "outsideLeak": 0
     },
     {
+      "avatar": "link-avatar-sailor-beaver",
+      "frame": "memory-frame-gilded-pages",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-pearl-dolphin",
+      "frame": "memory-frame-gilded-pages",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-azure-turtle",
+      "frame": "memory-frame-gilded-pages",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-royal-seahorse",
+      "frame": "memory-frame-gilded-pages",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
       "avatar": "memory-avatar-sapphire-owl",
       "frame": "memory-frame-astral-orbit",
       "uncoveredHole": 0,
@@ -1135,6 +1375,30 @@
       "outsideLeak": 0
     },
     {
+      "avatar": "link-avatar-sailor-beaver",
+      "frame": "memory-frame-astral-orbit",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-pearl-dolphin",
+      "frame": "memory-frame-astral-orbit",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-azure-turtle",
+      "frame": "memory-frame-astral-orbit",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-royal-seahorse",
+      "frame": "memory-frame-astral-orbit",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
       "avatar": "memory-avatar-sapphire-owl",
       "frame": "memory-frame-silken-clouds",
       "uncoveredHole": 0,
@@ -1237,6 +1501,30 @@
       "outsideLeak": 0
     },
     {
+      "avatar": "link-avatar-sailor-beaver",
+      "frame": "memory-frame-silken-clouds",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-pearl-dolphin",
+      "frame": "memory-frame-silken-clouds",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-azure-turtle",
+      "frame": "memory-frame-silken-clouds",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-royal-seahorse",
+      "frame": "memory-frame-silken-clouds",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
       "avatar": "memory-avatar-sapphire-owl",
       "frame": "memory-frame-knowledge-gateway",
       "uncoveredHole": 0,
@@ -1339,6 +1627,30 @@
       "outsideLeak": 0
     },
     {
+      "avatar": "link-avatar-sailor-beaver",
+      "frame": "memory-frame-knowledge-gateway",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-pearl-dolphin",
+      "frame": "memory-frame-knowledge-gateway",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-azure-turtle",
+      "frame": "memory-frame-knowledge-gateway",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-royal-seahorse",
+      "frame": "memory-frame-knowledge-gateway",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
       "avatar": "memory-avatar-sapphire-owl",
       "frame": "memory-frame-autumn-leaves",
       "uncoveredHole": 0,
@@ -1441,6 +1753,30 @@
       "outsideLeak": 0
     },
     {
+      "avatar": "link-avatar-sailor-beaver",
+      "frame": "memory-frame-autumn-leaves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-pearl-dolphin",
+      "frame": "memory-frame-autumn-leaves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-azure-turtle",
+      "frame": "memory-frame-autumn-leaves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-royal-seahorse",
+      "frame": "memory-frame-autumn-leaves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
       "avatar": "memory-avatar-sapphire-owl",
       "frame": "memory-frame-frosted-branch",
       "uncoveredHole": 0,
@@ -1543,6 +1879,30 @@
       "outsideLeak": 0
     },
     {
+      "avatar": "link-avatar-sailor-beaver",
+      "frame": "memory-frame-frosted-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-pearl-dolphin",
+      "frame": "memory-frame-frosted-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-azure-turtle",
+      "frame": "memory-frame-frosted-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-royal-seahorse",
+      "frame": "memory-frame-frosted-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
       "avatar": "memory-avatar-sapphire-owl",
       "frame": "memory-frame-golden-honeycomb",
       "uncoveredHole": 0,
@@ -1645,6 +2005,30 @@
       "outsideLeak": 0
     },
     {
+      "avatar": "link-avatar-sailor-beaver",
+      "frame": "memory-frame-golden-honeycomb",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-pearl-dolphin",
+      "frame": "memory-frame-golden-honeycomb",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-azure-turtle",
+      "frame": "memory-frame-golden-honeycomb",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-royal-seahorse",
+      "frame": "memory-frame-golden-honeycomb",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
       "avatar": "memory-avatar-sapphire-owl",
       "frame": "memory-frame-memory-crown",
       "uncoveredHole": 0,
@@ -1743,6 +2127,534 @@
     {
       "avatar": "memory-avatar-dawn-crane",
       "frame": "memory-frame-memory-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-sailor-beaver",
+      "frame": "memory-frame-memory-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-pearl-dolphin",
+      "frame": "memory-frame-memory-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-azure-turtle",
+      "frame": "memory-frame-memory-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-royal-seahorse",
+      "frame": "memory-frame-memory-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-sapphire-owl",
+      "frame": "link-frame-moon-coral",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-moonfox",
+      "frame": "link-frame-moon-coral",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-dragon",
+      "frame": "link-frame-moon-coral",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-cherry-rabbit",
+      "frame": "link-frame-moon-coral",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-stellar-cat",
+      "frame": "link-frame-moon-coral",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-autumn-fox",
+      "frame": "link-frame-moon-coral",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-galaxy-deer",
+      "frame": "link-frame-moon-coral",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-blue-panda",
+      "frame": "link-frame-moon-coral",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-sunset-dragon",
+      "frame": "link-frame-moon-coral",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-scholar-squirrel",
+      "frame": "link-frame-moon-coral",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-stargazer-hedgehog",
+      "frame": "link-frame-moon-coral",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-dreaming-deer",
+      "frame": "link-frame-moon-coral",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-galaxy-whale",
+      "frame": "link-frame-moon-coral",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-chestnut-squirrel",
+      "frame": "link-frame-moon-coral",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-snow-rabbit",
+      "frame": "link-frame-moon-coral",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-honey-bear",
+      "frame": "link-frame-moon-coral",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-dawn-crane",
+      "frame": "link-frame-moon-coral",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-sailor-beaver",
+      "frame": "link-frame-moon-coral",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-pearl-dolphin",
+      "frame": "link-frame-moon-coral",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-azure-turtle",
+      "frame": "link-frame-moon-coral",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-royal-seahorse",
+      "frame": "link-frame-moon-coral",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-sapphire-owl",
+      "frame": "link-frame-silver-waves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-moonfox",
+      "frame": "link-frame-silver-waves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-dragon",
+      "frame": "link-frame-silver-waves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-cherry-rabbit",
+      "frame": "link-frame-silver-waves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-stellar-cat",
+      "frame": "link-frame-silver-waves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-autumn-fox",
+      "frame": "link-frame-silver-waves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-galaxy-deer",
+      "frame": "link-frame-silver-waves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-blue-panda",
+      "frame": "link-frame-silver-waves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-sunset-dragon",
+      "frame": "link-frame-silver-waves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-scholar-squirrel",
+      "frame": "link-frame-silver-waves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-stargazer-hedgehog",
+      "frame": "link-frame-silver-waves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-dreaming-deer",
+      "frame": "link-frame-silver-waves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-galaxy-whale",
+      "frame": "link-frame-silver-waves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-chestnut-squirrel",
+      "frame": "link-frame-silver-waves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-snow-rabbit",
+      "frame": "link-frame-silver-waves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-honey-bear",
+      "frame": "link-frame-silver-waves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-dawn-crane",
+      "frame": "link-frame-silver-waves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-sailor-beaver",
+      "frame": "link-frame-silver-waves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-pearl-dolphin",
+      "frame": "link-frame-silver-waves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-azure-turtle",
+      "frame": "link-frame-silver-waves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-royal-seahorse",
+      "frame": "link-frame-silver-waves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-sapphire-owl",
+      "frame": "link-frame-pearl-shell",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-moonfox",
+      "frame": "link-frame-pearl-shell",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-dragon",
+      "frame": "link-frame-pearl-shell",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-cherry-rabbit",
+      "frame": "link-frame-pearl-shell",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-stellar-cat",
+      "frame": "link-frame-pearl-shell",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-autumn-fox",
+      "frame": "link-frame-pearl-shell",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-galaxy-deer",
+      "frame": "link-frame-pearl-shell",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-blue-panda",
+      "frame": "link-frame-pearl-shell",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-sunset-dragon",
+      "frame": "link-frame-pearl-shell",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-scholar-squirrel",
+      "frame": "link-frame-pearl-shell",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-stargazer-hedgehog",
+      "frame": "link-frame-pearl-shell",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-dreaming-deer",
+      "frame": "link-frame-pearl-shell",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-galaxy-whale",
+      "frame": "link-frame-pearl-shell",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-chestnut-squirrel",
+      "frame": "link-frame-pearl-shell",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-snow-rabbit",
+      "frame": "link-frame-pearl-shell",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-honey-bear",
+      "frame": "link-frame-pearl-shell",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-dawn-crane",
+      "frame": "link-frame-pearl-shell",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-sailor-beaver",
+      "frame": "link-frame-pearl-shell",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-pearl-dolphin",
+      "frame": "link-frame-pearl-shell",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-azure-turtle",
+      "frame": "link-frame-pearl-shell",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-royal-seahorse",
+      "frame": "link-frame-pearl-shell",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-sapphire-owl",
+      "frame": "link-frame-tidal-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-moonfox",
+      "frame": "link-frame-tidal-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-dragon",
+      "frame": "link-frame-tidal-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-cherry-rabbit",
+      "frame": "link-frame-tidal-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-stellar-cat",
+      "frame": "link-frame-tidal-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-autumn-fox",
+      "frame": "link-frame-tidal-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-galaxy-deer",
+      "frame": "link-frame-tidal-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-blue-panda",
+      "frame": "link-frame-tidal-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-sunset-dragon",
+      "frame": "link-frame-tidal-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-scholar-squirrel",
+      "frame": "link-frame-tidal-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-stargazer-hedgehog",
+      "frame": "link-frame-tidal-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-dreaming-deer",
+      "frame": "link-frame-tidal-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-galaxy-whale",
+      "frame": "link-frame-tidal-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-chestnut-squirrel",
+      "frame": "link-frame-tidal-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-snow-rabbit",
+      "frame": "link-frame-tidal-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-honey-bear",
+      "frame": "link-frame-tidal-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-dawn-crane",
+      "frame": "link-frame-tidal-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-sailor-beaver",
+      "frame": "link-frame-tidal-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-pearl-dolphin",
+      "frame": "link-frame-tidal-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-azure-turtle",
+      "frame": "link-frame-tidal-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-royal-seahorse",
+      "frame": "link-frame-tidal-crown",
       "uncoveredHole": 0,
       "outsideLeak": 0
     }

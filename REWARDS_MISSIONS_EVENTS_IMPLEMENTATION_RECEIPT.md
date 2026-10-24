@@ -109,3 +109,16 @@ alpha=0 trên sprite xuất, kiểm alpha/kích thước mọi WebP. Chưa runti
 
 Trong A1 xuất hiện thay đổi gameplay/shop/cấu hình ngoài task. Giữ ngoài
 commit và đã hỏi owner còn hoạt động trước khi nối facts ở các gate sau.
+
+### Lô 3 — Vịnh Nguyệt Quang
+
+Đủ 10 món màn 11–20 Link Connect; tổng 30 PNG/90 WebP mới. 441 cặp
+(21×21 gồm đồ cũ) PASS. Hải Mã được imagegen sửa để mào nằm trong đĩa
+chân dung, không còn hở lòng ở ba khung cũ. Source contracts 5/5 PASS,
+kèm lock bất biến của 30 mapping/files cũ trước khi mở rộng runtime.
+
+Đã cân nhắc vẽ lại mọi crest lệch vài pixel hoặc fit đều theo extent ngoài;
+chọn fit đều cho sai lệch nhỏ vì radius144 là reference trong contract.
+Giữ canvas512/pivot256/avatarRect97/97/318/318 và padding8. Aperture sau
+fit phải >=95% nominal, nếu không vẫn yêu cầu vẽ lại. Giữ kiểm alpha thực
+mọi cặp, không hở lòng hoặc leak ra ngoài. Bộ cũ không được regenerate.

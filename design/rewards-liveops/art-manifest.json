@@ -1198,6 +1198,594 @@
           "sha256": "f5e377e19a8653db1774605d03329bad00f616697314043eab37107418c5593d"
         }
       }
+    },
+    "link-avatar-sailor-beaver": {
+      "id": "link-avatar-sailor-beaver",
+      "name": "Hải Ly Thủy Thủ",
+      "type": "avatar",
+      "gameId": "link-connect",
+      "level": 11,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 97,
+        "top": 97,
+        "width": 318,
+        "height": 318
+      },
+      "source": {
+        "file": "sources/link-avatar-sailor-beaver.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 85,
+          "top": 87,
+          "width": 1086,
+          "height": 1078
+        },
+        "sha256": "a684bcbc1b4ab1f15c57b58a4214817a5c58799bb9b2655b6aaee46d549600ed",
+        "aperture": null
+      },
+      "scale": 0.2949907235621521,
+      "nativeUpscaled": false,
+      "png": "sprites/link-avatar-sailor-beaver.png",
+      "pngSha256": "2bbd31c6f74f77830d759a122a69474f3fc1bdd3d4a7f839ecb7f0fee68e8d2b",
+      "exports": {
+        "128": {
+          "file": "sprites/link-avatar-sailor-beaver-128.webp",
+          "bytes": 5504,
+          "sha256": "30266bcb073bfbfa744e7b84908b02d9f8374e67397bb37c3e5f4a5b3f7eca25"
+        },
+        "256": {
+          "file": "sprites/link-avatar-sailor-beaver-256.webp",
+          "bytes": 15080,
+          "sha256": "f09aff91b37c8bffaddbc6360d68a30f54e76fbbb7951e698e224ee4721d424c"
+        },
+        "512": {
+          "file": "sprites/link-avatar-sailor-beaver-512.webp",
+          "bytes": 44894,
+          "sha256": "5ec79f9eb1c18e877f33efb5cf72c6b288a4de4888fcfa99712d4d828c04407b"
+        }
+      }
+    },
+    "link-frame-moon-coral": {
+      "id": "link-frame-moon-coral",
+      "name": "San Hô Ánh Trăng",
+      "type": "frame",
+      "gameId": "link-connect",
+      "level": 12,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 28,
+        "top": 39,
+        "width": 455,
+        "height": 440
+      },
+      "source": {
+        "file": "sources/link-frame-moon-coral.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 25,
+          "top": 39,
+          "width": 1199,
+          "height": 1159
+        },
+        "sha256": "571a0fc9b8cd3f67b3a5b79ed9c7a14f097a3e8671f46434f35c44b6f099ccab",
+        "aperture": {
+          "left": 227,
+          "top": 233,
+          "width": 800,
+          "height": 759,
+          "radius": 379.5,
+          "pixels": 476068
+        }
+      },
+      "scale": 0.3794466403162055,
+      "nativeUpscaled": false,
+      "png": "sprites/link-frame-moon-coral.png",
+      "pngSha256": "e4c5a6d40de563510a7ae14f1948c9041dba096324b88cb07dde74d4481ae4e6",
+      "exports": {
+        "128": {
+          "file": "sprites/link-frame-moon-coral-128.webp",
+          "bytes": 9986,
+          "sha256": "99e55f2aea82c7a4778842926f4ce0139bfcc6c414b2be1887f6b709cd1f214a"
+        },
+        "256": {
+          "file": "sprites/link-frame-moon-coral-256.webp",
+          "bytes": 26036,
+          "sha256": "330887ada2ff93c6ae935a41dc8cc562f354136a90dea8ef9109647a09fd121d"
+        },
+        "512": {
+          "file": "sprites/link-frame-moon-coral-512.webp",
+          "bytes": 78532,
+          "sha256": "7d527ef45bebf875c32013e0f317a84855a97f93c86b343bd1cb6a620bde8180"
+        }
+      }
+    },
+    "link-badge-lighthouse-guide": {
+      "id": "link-badge-lighthouse-guide",
+      "name": "Hải Đăng Dẫn Lối",
+      "type": "badge",
+      "gameId": "link-connect",
+      "level": 13,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 56,
+        "top": 58,
+        "width": 400,
+        "height": 396
+      },
+      "source": {
+        "file": "sources/link-badge-lighthouse-guide.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 104,
+          "top": 74,
+          "width": 1045,
+          "height": 1035
+        },
+        "sha256": "ce18669f413a633e2b13c63969d14ef118ff62936beb6837e2dc60323178f3d9",
+        "aperture": null
+      },
+      "scale": 0.3827751196172249,
+      "nativeUpscaled": false,
+      "png": "sprites/link-badge-lighthouse-guide.png",
+      "pngSha256": "1867be0a7d36b1283f0ee0dfae4334826c845fc06d4a639e51f8bf8135c2c812",
+      "exports": {
+        "128": {
+          "file": "sprites/link-badge-lighthouse-guide-128.webp",
+          "bytes": 6988,
+          "sha256": "f3185efae40cc6a20ca58ac58950f8ea7aad4f27ebe005668c5bc5b6422a885e"
+        },
+        "256": {
+          "file": "sprites/link-badge-lighthouse-guide-256.webp",
+          "bytes": 19070,
+          "sha256": "f7665c93b2f5b01dd3efe51b0eb8e0208de0faf0b9e5a53e263fe495dd286dac"
+        },
+        "512": {
+          "file": "sprites/link-badge-lighthouse-guide-512.webp",
+          "bytes": 57452,
+          "sha256": "b11db067e1141452aa0274d19ac6ce087691396aa596212b26a31a1aa4ca3957"
+        }
+      }
+    },
+    "link-avatar-pearl-dolphin": {
+      "id": "link-avatar-pearl-dolphin",
+      "name": "Cá Heo Ngọc",
+      "type": "avatar",
+      "gameId": "link-connect",
+      "level": 14,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 97,
+        "top": 97,
+        "width": 318,
+        "height": 318
+      },
+      "source": {
+        "file": "sources/link-avatar-pearl-dolphin.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 85,
+          "top": 83,
+          "width": 1087,
+          "height": 1078
+        },
+        "sha256": "0d0b2d80fabcbe947efdba63542c7b821a9c56631581d2eca39d4cc8f17d9678",
+        "aperture": null
+      },
+      "scale": 0.2949907235621521,
+      "nativeUpscaled": false,
+      "png": "sprites/link-avatar-pearl-dolphin.png",
+      "pngSha256": "1a535973c911aaacc68c8eb72316ed4837fdc8117645e9c58b789086eec7d6d4",
+      "exports": {
+        "128": {
+          "file": "sprites/link-avatar-pearl-dolphin-128.webp",
+          "bytes": 5414,
+          "sha256": "f5cd639a3cd59697ac58be8a3aefc50b0b56c987cb85a731ed1759e548ee232c"
+        },
+        "256": {
+          "file": "sprites/link-avatar-pearl-dolphin-256.webp",
+          "bytes": 14326,
+          "sha256": "87498169ecf934335532bd9df3c5b2a89815fad86fe48b59de7be61a9e303193"
+        },
+        "512": {
+          "file": "sprites/link-avatar-pearl-dolphin-512.webp",
+          "bytes": 42154,
+          "sha256": "1179d867dd3e05e6d92cc45624ae33e8247ed69e808d80e7b611e86ae533789d"
+        }
+      }
+    },
+    "link-frame-silver-waves": {
+      "id": "link-frame-silver-waves",
+      "name": "Sóng Bạc",
+      "type": "frame",
+      "gameId": "link-connect",
+      "level": 15,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 28,
+        "top": 32,
+        "width": 456,
+        "height": 449
+      },
+      "source": {
+        "file": "sources/link-frame-silver-waves.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 23,
+          "top": 30,
+          "width": 1210,
+          "height": 1191
+        },
+        "sha256": "e2d6d01b94c176feb91595c3efebeaebdb1c56f1765dba8c5b85851356d0564d",
+        "aperture": {
+          "left": 233,
+          "top": 243,
+          "width": 789,
+          "height": 764,
+          "radius": 382,
+          "pixels": 467954
+        }
+      },
+      "scale": 0.3769633507853403,
+      "nativeUpscaled": false,
+      "png": "sprites/link-frame-silver-waves.png",
+      "pngSha256": "64b40adae18fdad740f81ac2df3f7bea7019e1033df4949b3053e8fb4280c6a3",
+      "exports": {
+        "128": {
+          "file": "sprites/link-frame-silver-waves-128.webp",
+          "bytes": 9360,
+          "sha256": "cae6a2c138763ab74b764406939d60b98278aa452c373fe595d8b2439fbb5469"
+        },
+        "256": {
+          "file": "sprites/link-frame-silver-waves-256.webp",
+          "bytes": 25216,
+          "sha256": "8866485ac5e2fc6d18b2912fc6bc33f0d2b7585e28b14927498bee017b6b19d2"
+        },
+        "512": {
+          "file": "sprites/link-frame-silver-waves-512.webp",
+          "bytes": 75246,
+          "sha256": "57bf0c07e65d71f5abfbf438f393baf562c4cc3b316a6ac42991841765b11b8c"
+        }
+      }
+    },
+    "link-avatar-azure-turtle": {
+      "id": "link-avatar-azure-turtle",
+      "name": "Rùa Biển Lam",
+      "type": "avatar",
+      "gameId": "link-connect",
+      "level": 16,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 97,
+        "top": 97,
+        "width": 318,
+        "height": 318
+      },
+      "source": {
+        "file": "sources/link-avatar-azure-turtle.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 62,
+          "top": 67,
+          "width": 1130,
+          "height": 1120
+        },
+        "sha256": "9160f056a64e4df74f10f2684a03891b489d076042a322c28770ac429b5785b7",
+        "aperture": null
+      },
+      "scale": 0.2839285714285714,
+      "nativeUpscaled": false,
+      "png": "sprites/link-avatar-azure-turtle.png",
+      "pngSha256": "e5fe9dea2c952ac50cdb6b70236e878de33089fed445cc2d3309f16a18d9786f",
+      "exports": {
+        "128": {
+          "file": "sprites/link-avatar-azure-turtle-128.webp",
+          "bytes": 5894,
+          "sha256": "19c5eb03bbfea119a0bef50bd2db70e5d0beef02546bdf5a51c319992a2e28fa"
+        },
+        "256": {
+          "file": "sprites/link-avatar-azure-turtle-256.webp",
+          "bytes": 16370,
+          "sha256": "433d62483b73104ad7ef2994150307350a041fc76ce6b14e7cd36100119f3c0f"
+        },
+        "512": {
+          "file": "sprites/link-avatar-azure-turtle-512.webp",
+          "bytes": 48736,
+          "sha256": "86710c3fd8bc03e1cc5cbbc1b4db8aa14a4c589451585f7434ef917a44b76e2d"
+        }
+      }
+    },
+    "link-frame-pearl-shell": {
+      "id": "link-frame-pearl-shell",
+      "name": "Vỏ Trai Ánh Ngọc",
+      "type": "frame",
+      "gameId": "link-connect",
+      "level": 17,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 34,
+        "top": 31,
+        "width": 445,
+        "height": 453
+      },
+      "source": {
+        "file": "sources/link-frame-pearl-shell.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 33,
+          "top": 18,
+          "width": 1189,
+          "height": 1211
+        },
+        "sha256": "7b21fd2a39941b60b3c8e3b1bfb259668df268d15df594ed2139b038936c7c6a",
+        "aperture": {
+          "left": 214,
+          "top": 235,
+          "width": 827,
+          "height": 770,
+          "radius": 385,
+          "pixels": 501680
+        }
+      },
+      "scale": 0.37402597402597404,
+      "nativeUpscaled": false,
+      "png": "sprites/link-frame-pearl-shell.png",
+      "pngSha256": "dda19f269dc0b5488beb5bf5e145ee8a92eb50ab8c023d6a1793256576a0d274",
+      "exports": {
+        "128": {
+          "file": "sprites/link-frame-pearl-shell-128.webp",
+          "bytes": 9162,
+          "sha256": "4715c8d9750c034a8f0fbc7d789c5d799beaff8f3575cee939abfecabcceff29"
+        },
+        "256": {
+          "file": "sprites/link-frame-pearl-shell-256.webp",
+          "bytes": 22284,
+          "sha256": "ab3b501e2a6a6f9957a4bdc7ded23bca2d5388681f80c042b1ebf58f7e9cbf28"
+        },
+        "512": {
+          "file": "sprites/link-frame-pearl-shell-512.webp",
+          "bytes": 64460,
+          "sha256": "aec495a2d2eacc5d3b6e498285b8ee9f70af59027698a558a6ee8d605de283c2"
+        }
+      }
+    },
+    "link-badge-ocean-knot": {
+      "id": "link-badge-ocean-knot",
+      "name": "Nút Thắt Đại Dương",
+      "type": "badge",
+      "gameId": "link-connect",
+      "level": 18,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 56,
+        "top": 61,
+        "width": 400,
+        "height": 391
+      },
+      "source": {
+        "file": "sources/link-badge-ocean-knot.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 75,
+          "top": 60,
+          "width": 1105,
+          "height": 1080
+        },
+        "sha256": "18e5ae5ede23a6a4bba2505f68bf23c971f243726f16d792f4b7a115f1abd5f5",
+        "aperture": null
+      },
+      "scale": 0.36199095022624433,
+      "nativeUpscaled": false,
+      "png": "sprites/link-badge-ocean-knot.png",
+      "pngSha256": "d7430e524e72ffd39d9e8571821197b5480a917a59c638d1b226660c066a8e25",
+      "exports": {
+        "128": {
+          "file": "sprites/link-badge-ocean-knot-128.webp",
+          "bytes": 7584,
+          "sha256": "040d1427fd2c4994cd1c991a38844c241565354fc69214f11b2b4defe1ccb57b"
+        },
+        "256": {
+          "file": "sprites/link-badge-ocean-knot-256.webp",
+          "bytes": 20894,
+          "sha256": "63b9f86110b548a6fc7979db713925ec6bcafc2f1830152d9eee83b63d55876c"
+        },
+        "512": {
+          "file": "sprites/link-badge-ocean-knot-512.webp",
+          "bytes": 64270,
+          "sha256": "92fd0fa65fa3cfeb1ee748a2d135033e51e0059d69e4f23eb533767506ad62b5"
+        }
+      }
+    },
+    "link-avatar-royal-seahorse": {
+      "id": "link-avatar-royal-seahorse",
+      "name": "Hải Mã Hoàng Gia",
+      "type": "avatar",
+      "gameId": "link-connect",
+      "level": 19,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 97,
+        "top": 97,
+        "width": 318,
+        "height": 318
+      },
+      "source": {
+        "file": "sources/link-avatar-royal-seahorse.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 75,
+          "top": 87,
+          "width": 1102,
+          "height": 1094
+        },
+        "sha256": "1893c007d09f5672e80bc5701d94d20131400122c293b3d40796bb20ffd8a8c2",
+        "aperture": null
+      },
+      "scale": 0.2906764168190128,
+      "nativeUpscaled": false,
+      "png": "sprites/link-avatar-royal-seahorse.png",
+      "pngSha256": "27ba9719f58f45028434d6a344875552dded5ffe123e60303fb1fca086d01234",
+      "exports": {
+        "128": {
+          "file": "sprites/link-avatar-royal-seahorse-128.webp",
+          "bytes": 5722,
+          "sha256": "d46125a025fda72e2759de8aff3c475028fb390810905a30bad4698ebeb7a885"
+        },
+        "256": {
+          "file": "sprites/link-avatar-royal-seahorse-256.webp",
+          "bytes": 15624,
+          "sha256": "03b28f5f63f696380d3abaaccd56feb5ed724a1fd6d1d8bd66b58733587897b0"
+        },
+        "512": {
+          "file": "sprites/link-avatar-royal-seahorse-512.webp",
+          "bytes": 44464,
+          "sha256": "b54965f4acdfab0466b667c39d14993c4cbab68d1e95f00878b53a7b382cda1a"
+        }
+      }
+    },
+    "link-frame-tidal-crown": {
+      "id": "link-frame-tidal-crown",
+      "name": "Vương Miện Hải Triều",
+      "type": "frame",
+      "gameId": "link-connect",
+      "level": 20,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 19,
+        "top": 8,
+        "width": 475,
+        "height": 475
+      },
+      "source": {
+        "file": "sources/link-frame-tidal-crown.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 35,
+          "top": 31,
+          "width": 1184,
+          "height": 1184
+        },
+        "sha256": "36e26e0767ebbdd659c14c2211204de6f45d99ed76af85f80f6d9d6616e91a50",
+        "aperture": {
+          "left": 241,
+          "top": 296,
+          "width": 772,
+          "height": 708,
+          "radius": 354,
+          "pixels": 435810
+        }
+      },
+      "scale": 0.4009700889248181,
+      "nativeUpscaled": false,
+      "png": "sprites/link-frame-tidal-crown.png",
+      "pngSha256": "67f0e8623d52f69eda73f7608f2f9903511091377df41ea60bc2899d9b224583",
+      "exports": {
+        "128": {
+          "file": "sprites/link-frame-tidal-crown-128.webp",
+          "bytes": 9120,
+          "sha256": "3ceb110dc1ba6b43380f74e306febfc52803290e5692df98819df475a7e51785"
+        },
+        "256": {
+          "file": "sprites/link-frame-tidal-crown-256.webp",
+          "bytes": 23342,
+          "sha256": "a677355d928a23510a1e1953401c4186e087d4d9851f1fda4f889b6f080c0502"
+        },
+        "512": {
+          "file": "sprites/link-frame-tidal-crown-512.webp",
+          "bytes": 70010,
+          "sha256": "64f635108c75745857811fcb4217dc4d6e65469b0fd2a45a4f2ad0c5d1c066f9"
+        }
+      }
     }
   }
 }
