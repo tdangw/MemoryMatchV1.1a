@@ -3,12 +3,13 @@ const SLOW_START_MS = 15000;
 const EXIT_MS = 180;
 
 // One document boot owns this presentation; it never mounts on game navigation.
-export function createStartupLoading() {
+export function createStartupLoading({ onSlow = () => {}, onRetry = () => window.location.reload() } = {}) {
   const root = document.getElementById('app-loading');
   if (!root) throw new Error('Missing startup presentation');
   root.dataset.controlled = 'true';
   const progress = root.querySelector('[role="progressbar"]');
   const message = root.querySelector('[data-loading-message]');
+  const percentage = root.querySelector('[data-loading-percent]');
   const retry = root.querySelector('[data-loading-retry]');
   const owner = new AbortController();
   let state = 'loading';
@@ -20,17 +21,24 @@ export function createStartupLoading() {
     if (document.hidden && state === 'exiting') destroy();
   };
   document.addEventListener('visibilitychange', syncVisibility, {signal:owner.signal});
+  window.addEventListener('pagehide', destroy, {once:true, signal:owner.signal});
   syncVisibility();
   root.tabIndex = -1;
   root.focus({preventScroll: true});
-  const slowStart = setTimeout(() => {
-    if (state !== 'loading') return;
-    state = 'slow';
-    root.dataset.slow = 'true';
-    message.textContent = 'Việc tải đang lâu hơn dự kiến.';
-    retry.hidden = false;
-  }, SLOW_START_MS);
-  retry.addEventListener('click', () => window.location.reload(), {signal: owner.signal});
+  let slowStart = null;
+  function watchSlowStart() {
+    clearTimeout(slowStart);
+    slowStart = setTimeout(() => {
+      if (state !== 'loading') return;
+      state = 'slow';
+      root.dataset.slow = 'true';
+      message.textContent = 'Mã lỗi: ST-LOAD-002';
+      retry.hidden = false;
+      onSlow();
+    }, SLOW_START_MS);
+  }
+  watchSlowStart();
+  retry.addEventListener('click', onRetry, {signal: owner.signal});
 
   function complete(phase) {
     if (state === 'disposed' || state === 'failed') return;
@@ -38,9 +46,15 @@ export function createStartupLoading() {
     if (next <= completed) return;
     if (next !== completed + 1) throw new Error('Startup phases out of order');
     completed = next;
-    progress.setAttribute('aria-valuenow', String(completed));
+    const percent = Math.round(completed / PHASES.length * 100);
+    progress.setAttribute('aria-valuenow', String(percent));
+    progress.setAttribute('aria-valuetext', `${percent}%`);
+    percentage.textContent = `${percent}%`;
     progress.style.setProperty('--startup-progress', String(completed / PHASES.length));
     if (completed === PHASES.length) root.dataset.complete = 'true';
+    if (state === 'slow') { state = 'loading'; root.removeAttribute('data-slow'); message.textContent = 'Đang tải…'; retry.hidden = true; }
+    if (completed < PHASES.length) watchSlowStart();
+    else clearTimeout(slowStart);
   }
   function destroy() {
     if (state === 'disposed') return;
@@ -53,15 +67,15 @@ export function createStartupLoading() {
     root.remove();
     if (restoreFocus && !document.hidden) home?.querySelector('.game-selector__choice[tabindex="0"]')?.focus({preventScroll: true});
   }
-  function fail() {
+  function fail(code = 'ST-INIT-001') {
     if (state === 'disposed') return;
     state = 'failed';
     clearTimeout(slowStart);
     owner.abort();
     // Keep a working retry after releasing any pending resource listeners.
-    retry.onclick = () => window.location.reload();
+    retry.onclick = onRetry;
     progress.hidden = true;
-    message.textContent = 'Không thể mở trò chơi. Hãy tải lại; bản lưu vẫn được giữ nguyên.';
+    message.textContent = `Mã lỗi: ${code}`;
     retry.hidden = false;
   }
   function prepareHome() {

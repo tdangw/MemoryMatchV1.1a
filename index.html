@@ -11,7 +11,6 @@
   <meta name="description" content="Memory Match Adventure - trò chơi ghép cặp thẻ trên mobile." />
   <title>Memory Match Adventure</title>
   <link rel="stylesheet" href="styles/startup-loading.css" />
-  <link rel="preload" as="image" href="/assets/images/home/memory-match-v2.webp" fetchpriority="high" />
   <link rel="stylesheet" href="styles/icons.css" />
   <link rel="stylesheet" href="styles/ui-art-tokens.css" />
   <link rel="stylesheet" href="styles/ui-theme.css" />
@@ -45,11 +44,13 @@
     <div class="startup-loading__content">
       <h1 class="startup-loading__title"><span>Memory Match</span><span>Adventure</span></h1>
       <svg class="startup-loading__ornament" viewBox="0 0 150 22" aria-hidden="true" fill="none" stroke="currentColor"><path d="M0 11h61m28 0h61M68 11l7-7 7 7-7 7z"/><path d="M72 11h6"/></svg>
-      <div class="startup-loading__progress" role="progressbar" aria-label="Tiến trình khởi động" aria-valuemin="0" aria-valuemax="4" aria-valuenow="0" aria-valuetext="Đang tải…"><span class="startup-loading__fill"></span><span class="startup-loading__activity" aria-hidden="true"></span></div>
+      <div class="startup-loading__progress" role="progressbar" aria-label="Tiến trình khởi động" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-valuetext="0%"><span class="startup-loading__fill"></span></div>
+      <p class="startup-loading__percentage" data-loading-percent>0%</p>
       <p class="startup-loading__message" data-loading-message role="status">Đang tải…</p>
       <button class="startup-loading__retry" data-loading-retry type="button" hidden>Tải lại</button>
       <a class="startup-loading__retry startup-loading__fallback" href="">Tải lại</a>
-      <noscript><p>Hãy bật JavaScript để mở trò chơi.</p></noscript>
+      <p class="startup-loading__fallback-error">Mã lỗi: ST-BOOT-001</p>
+      <noscript><p>Mã lỗi: ST-BOOT-002</p></noscript>
     </div>
   </section>
   <div class="main-wrapper">
