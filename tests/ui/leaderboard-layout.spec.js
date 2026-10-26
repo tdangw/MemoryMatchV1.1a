@@ -103,9 +103,9 @@ test('shared family menu opens without querying, supports keyboard and clamps ab
   await menu.locator('[data-rank-family="endless"]').press('Escape');
   await expect(menu).toHaveCount(0); await expect(anchor).toBeFocused();
   await anchor.click(); await menu.locator('[data-rank-family="adventure"]').press('Tab');
-  await expect(menu).toHaveCount(0); await expect(page.locator('.leaderboard-results')).toBeFocused();
+  await expect(menu).toHaveCount(0); await expect(page.getByRole('button',{name:'Trang 1',exact:true})).toBeFocused();
   await anchor.click(); await menu.locator('[data-rank-family="adventure"]').press('Shift+Tab');
-  await expect(menu).toHaveCount(0); await expect(page.locator('[data-rank-game="link-connect"]')).toBeFocused();
+  await expect(menu).toHaveCount(0); await expect(page.locator('.leaderboard-results')).toBeFocused();
   await anchor.evaluate(node => { node.style.position = 'fixed'; node.style.bottom = '10px'; node.style.zIndex = '15000'; });
   await anchor.click(); await expect(menu).toHaveAttribute('data-direction', 'up');
   const box = await menu.boundingBox(); const trigger = await anchor.boundingBox();
@@ -171,7 +171,12 @@ for (const viewport of [{ width: 320, height: 740 }, { width: 412, height: 915 }
     const familyBox = await page.locator('.leaderboard-family-picker').boundingBox();
     const gamesBox = await page.locator('.leaderboard-tabs--game').boundingBox();
     expect(familyBox.y).toBeGreaterThanOrEqual(gamesBox.y + gamesBox.height);
-    expect(familyBox.y + familyBox.height).toBeLessThanOrEqual(headingBox.y);
+    expect(familyBox.y).toBeGreaterThanOrEqual(headingBox.y);
+    expect(familyBox.y + familyBox.height).toBeLessThanOrEqual(headingBox.y + headingBox.height);
+    await expect(page.locator('.leaderboard-heading .leaderboard-family-picker')).toHaveCount(1);
+    await expect(page.locator('.leaderboard-view > .leaderboard-family-picker')).toHaveCount(0);
+    const playerLabel = await page.locator('.leaderboard-heading-player').boundingBox();
+    expect(playerLabel.x + playerLabel.width).toBeLessThanOrEqual(familyBox.x);
     await expect(page.locator('.leaderboard-tabs--game [aria-haspopup]')).toHaveCount(0);
     const pagerBox = await page.locator('.leaderboard-pager').boundingBox();
     expect(Math.abs(pagerBox.x + pagerBox.width / 2 - panelBox.x - panelBox.width / 2)).toBeLessThan(2);
