@@ -11,6 +11,7 @@ import { GAMEPLAY_TIMING, getComboPresentation } from "./gameplayTuning.js";
 import { sounds } from "./sound.js"; // ✅ Đã tách âm thanh
 import { SUMMARY_REWARD_TIMING, summaryStarDelay, scheduleSummaryRewardAudio } from './progression/summaryRewardAudio.js';
 import { openAppModal, showAppToast } from "./modal.js";
+import { suspendAmbientBackground } from './backgroundEffects.js';
 import { presentAchievementAnnouncements } from './progression/achievementAnnouncements.js';
 import { createIcon } from "./icons.js";
 import { launchSummaryConfetti, showSummaryFireworks } from "victory-presentation";
@@ -362,6 +363,7 @@ export function showLevelRewardOverlay({
   document.body.appendChild(overlay);
 
   const introScope = createGameShellLifecycle();
+  introScope.own(suspendAmbientBackground());
   let release;
   const removeOverlay = () => {
     introScope.dispose(); overlay.remove(); release?.forget();

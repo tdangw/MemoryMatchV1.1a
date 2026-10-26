@@ -514,24 +514,6 @@ function handleCancelAction(fromGame) {
   }
 }
 
-// Lớp nền động nhẹ: chỉ giữ hai mây để không che nền sao hoặc tăng chi phí vẽ trên mobile.
-const fog = document.createElement("div");
-fog.className = "fog";
-document.body.appendChild(fog);
-
-const cloudConfigs = [
-  { top: 110, delay: 0 },
-  { top: 280, delay: 55 },
-];
-
-cloudConfigs.forEach(({ top, delay }) => {
-  const cloud = document.createElement("div");
-  cloud.className = "cloud";
-  cloud.style.top = `${top}px`;
-  cloud.style.animationDelay = `${delay}s`;
-  document.body.appendChild(cloud);
-});
-
 window.addEventListener(
   "click",
   () => {

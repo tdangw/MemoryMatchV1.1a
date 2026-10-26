@@ -1,10 +1,8 @@
-const meteorQuery = typeof window === 'undefined' ? null : window.matchMedia('(prefers-reduced-motion: reduce)');
+import { createBackgroundRuntime } from './background/runtime.js';
 let container = null;
 let nodes = [];
-let meteorTimer;
-let enabled = true;
-let eligible = false;
-function canAnimate() { return container && enabled && eligible && !document.hidden && !meteorQuery.matches; }
+let runtime = null;
+let enabled = true, eligible = false;
 function idle(node) { node.dataset.state = 'IDLE'; node.style.animationName = 'none'; }
 function ended(event) {
   const node = event.target;
@@ -13,9 +11,7 @@ function ended(event) {
   idle(node);
 }
 function isIdle(node) { return node.dataset.state === 'IDLE'; }
-function tick() {
-  meteorTimer = undefined;
-  if (!canAnimate()) return;
+function spawn() {
   const node = nodes.find(isIdle);
   if (node) {
     const bright = Math.random() < .12;
@@ -27,22 +23,12 @@ function tick() {
     node.dataset.state = 'ACTIVE';
     node.style.animationName = 'shooting';
   }
-  schedule();
 }
-function schedule() {
-  clearTimeout(meteorTimer); meteorTimer = undefined;
-  if (canAnimate()) meteorTimer = setTimeout(tick, 3500 + Math.random() * 3500);
-}
-function reconcile() {
-  if (container) container.hidden = !canAnimate();
-  if (!canAnimate()) for (const node of nodes) idle(node);
-  schedule();
-}
-export function setMeteorSceneEligible(value) { eligible = Boolean(value); reconcile(); }
+export function setMeteorSceneEligible(value) { eligible = Boolean(value); if (runtime) runtime.setMeteorEligible(eligible); }
 export function setMeteorEffectsEnabled(value) {
   enabled = Boolean(value);
   document.body.classList.toggle('meteor-effects-disabled', !enabled);
-  reconcile();
+  if (runtime) runtime.setEnabled(enabled);
 }
 export function initializeMeteorEffects(value = true) {
   if (!container) {
@@ -50,14 +36,29 @@ export function initializeMeteorEffects(value = true) {
     nodes = Array.from({ length: 2 }, () => { const node = document.createElement('div'); node.className = 'shooting-star'; idle(node); return node; });
     container.append(...nodes); document.body.append(container);
     container.addEventListener('animationend', ended); container.addEventListener('animationcancel', ended);
-    document.addEventListener('visibilitychange', reconcile); meteorQuery.addEventListener('change', reconcile);
+    runtime = createBackgroundRuntime({ view: window, document, meteor: {
+      spawn,
+      cancel() { for (const node of nodes) idle(node); container.hidden = true; },
+      setVisible(value) { container.hidden = !value; },
+      diagnostics() { return { nodes: nodes.length, active: nodes.filter(node => node.dataset.state === 'ACTIVE').length }; },
+    } });
+    runtime.setMeteorEligible(eligible);
   }
   setMeteorEffectsEnabled(value);
 }
 export function disposeMeteorEffects() {
-  clearTimeout(meteorTimer); meteorTimer = undefined;
-  document.removeEventListener('visibilitychange', reconcile); meteorQuery.removeEventListener('change', reconcile);
+  if (runtime) runtime.dispose(); runtime = null;
   if (container) { container.removeEventListener('animationend', ended); container.removeEventListener('animationcancel', ended); container.remove(); }
   container = null; nodes = []; eligible = false;
 }
-export function getMeteorDiagnostics() { return { nodes: nodes.length, active: nodes.filter(node => node.dataset.state === 'ACTIVE').length, timers: meteorTimer === undefined ? 0 : 1, eligible: Boolean(canAnimate()) }; }
+export function getMeteorDiagnostics() { return runtime ? runtime.meteorDiagnostics() : { nodes: 0, active: 0, timers: 0, eligible: false }; }
+export function mountAmbientBackground(options) {
+  if (!runtime) initializeMeteorEffects(enabled);
+  return runtime.mount(options);
+}
+export function suspendAmbientBackground() {
+  if (!runtime) initializeMeteorEffects(enabled);
+  return runtime.suspend();
+}
+export function refreshAmbientBackground(scope) { if (runtime) runtime.refresh(scope); }
+export function getAmbientDiagnostics() { return runtime ? runtime.diagnostics() : { state: 'DISPOSED', scenes: 0, nodes: 0, handles: 0, timers: 0, pendingFrames: 0 }; }

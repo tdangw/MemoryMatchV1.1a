@@ -1,5 +1,6 @@
 import { createGameShellLifecycle } from '../gameShell/gameShellLifecycle.js';
 import { readTutorialProgress, markTutorialFlag } from './tutorialProgress.js';
+import { suspendAmbientBackground } from '../backgroundEffects.js';
 import '../../styles/tutorial.css';
 const shown = new WeakMap();
 let active = null, activeAnchor = null;
@@ -29,6 +30,7 @@ export function showContextGuide(topic, anchor, owner) {
     return;
   dismissContextGuide();
   const scope = createGameShellLifecycle();
+  scope.own(suspendAmbientBackground());
   active = scope;
   activeAnchor = anchor;
   const release = owner.own(() => scope.dispose(), 'cleanup');

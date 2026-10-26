@@ -9,7 +9,8 @@ const origin = process.env.AMBIENT_ORIGIN || 'http://127.0.0.1:4188';
 const output = 'docs/design/animated-backgrounds/qa';
 const browser = await chromium.launch({ channel: 'chrome', args: ['--autoplay-policy=user-gesture-required'] });
 const results = { mode, browser: browser.version(), platform: os.platform(), cpu: os.cpus()[0].model, samples: [], sources: [] };
-const profiles = baseline || mode === 'inspect' || mode === 'pilot-memory' ? [{ name: 'desktop', width: 1024, height: 900, dpr: 1 }]
+const profiles = mode === 'pilot-memory' ? [{ name: 'desktop-portrait', width: 900, height: 1024, dpr: 1 }]
+  : baseline || mode === 'inspect' ? [{ name: 'desktop', width: 1024, height: 900, dpr: 1 }]
   : [{ name: 'narrow', width: 320, height: 740, dpr: 2 }, { name: 'portrait', width: 412, height: 915, dpr: 3 },
     { name: 'landscape', width: 844, height: 390, dpr: 2 }, { name: 'desktop', width: 1024, height: 900, dpr: 1 },
     { name: 'wide', width: 1366, height: 768, dpr: 1 }];
@@ -59,7 +60,7 @@ try {
       await page.evaluate(() => window.stopAmbientPilot());
       if (scene === 'memory') {
         await frame.locator('[data-game-id="memory-match"]').click();
-        if (mode !== 'inspect') await frame.locator('[data-special-mode="endless"]').click();
+        if (!['inspect', 'pilot-memory'].includes(mode)) await frame.locator('[data-special-mode="endless"]').click();
         else await frame.locator('.adventure-map-node[data-level="1"]').click();
         await frame.getByRole('button', { name: 'Chơi', exact: true }).click();
         await frame.getByRole('button', { name: 'Bỏ qua', exact: true }).click();
@@ -77,12 +78,12 @@ try {
           await frame.locator('.tutorial-guide').waitFor({ state: 'hidden' });
         }
       }
-      const row = { profile, environment, scene, scenario: scene === 'memory' ? 'endless-idle' : 'home-idle', errors, pairs: [] };
+      const row = { profile, environment, scene, scenario: scene === 'memory' ? (mode === 'pilot-memory' ? 'easy-idle' : 'endless-idle') : 'home-idle', errors, pairs: [] };
       if (baseline) {
         // This is the initial working tree: legacy clouds/meteors remain part of baseline.
         row.baseline = await sample(frame, cdp, 120000);
       } else {
-        for (let pair = 0; pair < (profile.name === 'desktop' ? 3 : 0); pair++) {
+        for (let pair = 0; pair < (profile.name.startsWith('desktop') ? 3 : 0); pair++) {
           const pairResult = {};
           for (const on of pair % 2 ? [true, false] : [false, true]) {
             await page.evaluate(({ scene, on }) => on ? window.mountAmbientPilot(scene) : window.stopAmbientPilot(), { scene, on });
@@ -104,7 +105,10 @@ try {
                 layoutEvents: events.filter(event => event.name === 'Layout').length,
                 longTasks: events.filter(event => event.name === 'RunTask' && event.dur > 50000).map(event => event.dur / 1000) };
             }
-            if (on) pairResult.resources = await page.evaluate(() => window.ambientPilotDiagnostics());
+            if (on) {
+              pairResult.resources = await page.evaluate(() => window.ambientPilotDiagnostics());
+              if (mode === 'pilot-memory' && pairResult.resources.kinds.filter(kind => kind === 'fish').length !== 2) throw new Error('Two-fish performance sample was not active');
+            }
           }
           row.pairs.push(pairResult);
         }

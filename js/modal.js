@@ -1,4 +1,5 @@
 import { connectDialogPlacement } from './dialogPlacement.js';
+import { suspendAmbientBackground } from './backgroundEffects.js';
 import { createIcon } from "./icons.js";
 import { UI_TIMING } from "./uiCatalog.js";
 import { createGameShellLifecycle, getActiveGameScope } from "./gameShell/gameShellLifecycle.js";
@@ -179,6 +180,7 @@ export function openAppModal({
   decorateStorybookSurface(panel, document.documentElement.dataset.uiSkin === 'storybook');
   overlay.appendChild(panel);
   host.appendChild(overlay);
+  lifecycle.own(suspendAmbientBackground());
   if (!screen) connectDialogPlacement(overlay, panel, lifecycle);
   panel.tabIndex = -1;
   (panel.querySelector("button:not([disabled]), input:not([disabled]), select:not([disabled])") || panel).focus();

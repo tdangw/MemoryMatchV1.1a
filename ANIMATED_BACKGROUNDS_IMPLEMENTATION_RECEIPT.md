@@ -129,6 +129,35 @@ Source ảnh vườn được thêm vào inventory10nguồn tại `qa/pilot.json
 
 ## Review và skill
 
+### Điều chỉnh G1 và G2 — 27/10
+
+- Theo yêu cầu trực tiếp sau duyệt: mirror path cá để đầu đi trước; cá thứ2
+  ở hồ giữa lộ, bớt1đom đóm. Game vẫn4animation,12node/4layer nhỏ.
+  Bản đồ được ưu tiên hoàn thiện; chỉ kiểm live dọc từ mốc này, ngang chủ
+  dự án tự kiểm. Mẫu/JSON/video dọc local đã cập nhật; ngang cũ là lịch sử.
+-6/6Playwright dọc320/412/900pass; A/B bàn Dễ900×1024 với assertion đủ2cá
+  active: delta p95=-0,2/-0,1/-0,1ms; delta p99=-0,1/0/-0,2ms;0LongTask
+  >50ms, giữ outlier on27,8ms. Không lấy case Vô tận đã cull cá làm chứng
+  nhận hiệu suất2cá. Vẫn là số đo sơ bộ, chưa G4 hoặc S22.
+- G2: một runtime owner/state machine, một scheduler sao băng, nested
+  suspension token, stale preparation guard, failed-source không retry
+  khi resize, queued layout RAF bị hủy khi dispose. Master off/reduced/
+  hidden/pagehide/freeze, resume/pageshow đúng owner; gameplay không phụ
+  thuộc meteor eligibility. Scope dispose bỏ reference root/factory.
+- Modal, context guide, wave notice và intro overlay release token theo
+  scope. Consent/privacy/rewarded dùng finally; native foreground có guard
+  scope và cleanup nếu đăng ký listener lỗi. Không đổi provider/reward.
+- Chọn bỏ fog/cloud vô chủ và blur lớn cũ; phương án giữ chúng như primitive
+  được loại vì không hợp bố cục đã chốt và làm tăng chi phí toàn màn.
+  Hai meteor CSS/pool/hành vi facade cũ giữ nguyên, scheduler chuyển về runtime.
+-21/21unit runtime+ads pass;2/2regression meteor pool/cancel pass. Test cũ
+  bổ sung đúng boundary sự kiện MQL bất đồng bộ và chờ pool trước soak;
+  giữ nguyên assertion0resource,100chu kỳ,10phút/ngưỡng heap. JS217module
+  và CSS ownership pass. Chưa rollout preset G3; chưa nghiệm thu G4/G5.
+- Lệnh commit chỉnh G1 trước đó không chạy do automatic approval review
+  báo hết usage. Không có nhận định hành động không an toàn. Sau yêu cầu
+  tiếp tục sẽ gom phần chỉnh G1 vào phase G2; không commit log/ảnh QA mới.
+
 - Review G1 riêng: đọc source/diff, phát hiện và sửa tham chiếu host còn
   giữ sau dispose; thêm assertion disposed nodes=0/pendingFrames=0 ở100chu
   kỳ, chạy lại audit/browser tests sau build. Pilot guard generation tránh

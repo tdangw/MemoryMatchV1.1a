@@ -75,6 +75,7 @@ export function mountPilotScene(doc, scene) {
           node.setAttribute('viewBox', '0 0 32 20');
           const path = doc.createElementNS(SVG_NS, 'path');
           path.setAttribute('d', region.kind === 'fish' ? 'M3 10Q13 0 25 10Q13 20 3 10M24 10L31 4V16Z' : 'M2 17Q3 0 29 2Q29 17 2 17M3 16L23 5');
+          if (region.kind === 'fish') path.setAttribute('transform', 'translate(32 0) scale(-1 1)');
           node.append(path);
         }
         wrapper.append(node);

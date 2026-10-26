@@ -22,7 +22,11 @@ test('two permanent meteors survive ten minutes and 100 eligibility cycles with 
   await page.locator('[data-dock-action="ranking"]').click();
   expect(await page.evaluate(async () => (await import('/js/backgroundEffects.js')).getMeteorDiagnostics())).toMatchObject({ active: 0, timers: 0, eligible: false });
   await page.locator('.adventure-exit').click();
+  await page.evaluate(() => {
+    window.meteorReducedChange = new Promise(resolve => matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', resolve, { once: true }));
+  });
   await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.evaluate(() => window.meteorReducedChange);
   expect(await page.evaluate(async () => (await import('/js/backgroundEffects.js')).getMeteorDiagnostics())).toMatchObject({ active: 0, timers: 0 });
 });
 
@@ -77,6 +81,7 @@ test('ten-minute real animation soak returns heap and nodes to a bounded baselin
   test.setTimeout(650000);
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('/');
+  await expect(page.locator('.meteor-layer')).toHaveCount(1);
   const cdp = await page.context().newCDPSession(page);
   await cdp.send('HeapProfiler.enable');
   await page.evaluate(() => { window.soakNodes = [...document.querySelectorAll('.shooting-star')]; window.meteorCompletions = 0; document.querySelector('.meteor-layer').addEventListener('animationend', () => window.meteorCompletions++); });

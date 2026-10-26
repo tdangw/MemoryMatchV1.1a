@@ -1,7 +1,7 @@
 import { AD_CONFIG, AD_PRIVACY, validateAdConfig } from './adConfig.js';
 import { presentRewarded } from './rewardedController.js';
 
-export function createAdService({ native, supported, config = AD_CONFIG, report = console.warn }) {
+export function createAdService({ native, supported, config = AD_CONFIG, report = console.warn, suspendPresentation = () => () => {} }) {
   validateAdConfig(config);
   let consent = null;
   let initialized = false;
@@ -17,7 +17,10 @@ export function createAdService({ native, supported, config = AD_CONFIG, report 
   }
   async function refreshConsent() {
     let info = await native.requestConsentInfo(AD_PRIVACY.consent);
-    if (info.status === 'REQUIRED' && info.isConsentFormAvailable) info = await native.showConsentForm();
+    if (info.status === 'REQUIRED' && info.isConsentFormAvailable) {
+      const release = suspendPresentation();
+      try { info = await native.showConsentForm(); } finally { release(); }
+    }
     update(info);
     return info.canRequestAds === true;
   }
@@ -44,6 +47,7 @@ export function createAdService({ native, supported, config = AD_CONFIG, report 
     },
     async showPrivacyOptions() {
       if (!supported || !snapshot().privacyRequired) return false;
+      const release = suspendPresentation();
       try {
         await native.showPrivacyOptionsForm();
         await refreshConsent();
@@ -53,7 +57,7 @@ export function createAdService({ native, supported, config = AD_CONFIG, report 
         update(null);
         report('AdMob privacy options unavailable', error);
         return false;
-      }
+      } finally { release(); }
     },
     listen(event, listener) { return native.addListener(event, listener); },
     show() {
@@ -63,7 +67,9 @@ export function createAdService({ native, supported, config = AD_CONFIG, report 
     remove() { return native.removeBanner(); },
     async showRewarded(options, onEarned) {
       if (!supported || !initialized || !snapshot().canRequestAds) throw new Error('AdMob not ready');
-      return presentRewarded(native, options, onEarned);
+      const release = suspendPresentation();
+      try { return await presentRewarded(native, options, onEarned); }
+      finally { release(); }
     },
   };
 }

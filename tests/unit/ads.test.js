@@ -15,6 +15,36 @@ function fixture(overrides = {}, supported = true) {
   return { calls, native, service: createAdService({ native, supported, report: () => {} }) };
 }
 
+test('fullscreen consent/privacy failure releases the background suspension in finally', async () => {
+  let suspended = 0, forms = 0;
+  const service = createAdService({ supported: true, report: () => {},
+    suspendPresentation: () => { suspended++; let done = false; return () => { if (!done) { done = true; suspended--; } }; },
+    native: {
+      requestConsentInfo: async () => ({ status: forms ? 'NOT_REQUIRED' : 'REQUIRED', isConsentFormAvailable: true, canRequestAds: true, privacyOptionsRequirementStatus: 'REQUIRED' }),
+      showConsentForm: async () => { assert.equal(suspended, 1); forms++; return { status: 'NOT_REQUIRED', canRequestAds: true, privacyOptionsRequirementStatus: 'REQUIRED' }; },
+      initialize: async () => {},
+      showPrivacyOptionsForm: async () => { assert.equal(suspended, 1); throw new Error('closed with failure'); },
+    },
+  });
+  assert.equal(await service.prepare(), true); assert.equal(suspended, 0);
+  assert.equal(await service.showPrivacyOptions(), false); assert.equal(suspended, 0);
+});
+
+test('rewarded no-fill releases background after native listener teardown', async () => {
+  let suspended = 0, listeners = 0;
+  const service = createAdService({ supported: true, report: () => {},
+    suspendPresentation: () => { suspended++; return () => { assert.equal(listeners, 0); suspended--; }; },
+    native: {
+      requestConsentInfo: async () => available, initialize: async () => {},
+      addListener: async () => { listeners++; return { remove: async () => { listeners--; } }; },
+      prepareRewardVideoAd: async () => { assert.equal(suspended, 1); throw Object.assign(new Error('no fill'), { code: 3 }); },
+    },
+  });
+  await service.prepare();
+  assert.deepEqual(await service.showRewarded({}), { type: 'noFill', earned: false });
+  assert.equal(suspended, 0); assert.equal(listeners, 0);
+});
+
 test('configuration rejects interchanged IDs and mismatched publishers, Android ID matches', () => {
   assert.throws(() => validateAdConfig({ appId: AD_CONFIG.bannerId, bannerId: AD_CONFIG.appId }));
   assert.throws(() => validateAdConfig({ ...AD_CONFIG, bannerId: 'ca-app-pub-1234567890123456/1234567890' }));

@@ -4,6 +4,7 @@ import { createAdService } from './adService.js';
 import { createBannerController } from './bannerController.js';
 import { createWebBannerController } from './webBannerController.js';
 import { createGameShellLifecycle } from '../gameShell/gameShellLifecycle.js';
+import { suspendAmbientBackground } from '../backgroundEffects.js';
 
 let target = null, runtime = null, starting = null;
 const blockers = new Set();
@@ -55,7 +56,7 @@ export function initializeMenuAds() {
 async function start() {
   const { nativeAds, nativeApp } = isAndroidAdsPlatform ? await import('./nativeAdapter.js') : {};
   const scope = createGameShellLifecycle();
-  const service = createAdService({ native: nativeAds, supported: isAndroidAdsPlatform });
+  const service = createAdService({ native: nativeAds, supported: isAndroidAdsPlatform, suspendPresentation: suspendAmbientBackground });
   const render = (slot, height) => {
     if (slot.isConnected) {
       slot.dataset.nativeAd = height > 0 ? 'visible' : 'empty';
@@ -66,6 +67,13 @@ async function start() {
   };
   const controller = isAndroidAdsPlatform ? createBannerController({ service, render }) : createWebBannerController({ render });
   let active = !isAndroidAdsPlatform, nativeRevision = 0, lastTarget = null;
+  let releaseNativeBackground = null;
+  function setNativeForeground(value) {
+    active = value;
+    if (active) { if (releaseNativeBackground) releaseNativeBackground(); releaseNativeBackground = null; }
+    else if (!releaseNativeBackground) releaseNativeBackground = suspendAmbientBackground();
+  }
+  scope.own(() => { if (releaseNativeBackground) releaseNativeBackground(); });
   function textEntry() {
     return document.activeElement?.matches('input:not([type="range"]):not([type="checkbox"]):not([type="radio"]), textarea, select, [contenteditable="true"]');
   }
@@ -76,12 +84,15 @@ async function start() {
     lastTarget = wanted;
   }
   if (isAndroidAdsPlatform) {
-    const handle = await nativeApp.addListener('appStateChange', state => { nativeRevision++; active = state.isActive; reconcile(); });
+    setNativeForeground(false);
+    let handle;
+    try { handle = await nativeApp.addListener('appStateChange', state => { if (!scope.active) return; nativeRevision++; setNativeForeground(state.isActive); reconcile(); }); }
+    catch (error) { scope.dispose(); throw error; }
     scope.own(() => { void handle.remove().catch(error => console.warn('AdMob foreground listener cleanup failed', error)); });
     try {
       const before = nativeRevision;
       const state = await nativeApp.getState();
-      if (before === nativeRevision) active = state.isActive;
+      if (before === nativeRevision) setNativeForeground(state.isActive);
     } catch (error) {
       console.warn('AdMob foreground state unavailable', error);
       // Fail closed until an actual foreground event arrives.
@@ -103,12 +114,12 @@ async function start() {
     await controller.dispose();
     runtime = null;
   } };
-  scope.listen(window, 'pagehide', () => { active = false; reconcile(); });
+  scope.listen(window, 'pagehide', () => { if (isAndroidAdsPlatform) setNativeForeground(false); else active = false; reconcile(); });
   scope.listen(window, 'pageshow', () => {
     if (!isAndroidAdsPlatform) { active = true; reconcile(); return; }
     const before = nativeRevision;
     void nativeApp.getState().then(state => {
-      if (scope.active && before === nativeRevision) { active = state.isActive; reconcile(); }
+      if (scope.active && before === nativeRevision) { setNativeForeground(state.isActive); reconcile(); }
     }).catch(error => console.warn('AdMob foreground recovery unavailable', error));
   });
   reconcile();

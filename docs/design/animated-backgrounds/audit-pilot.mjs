@@ -4,9 +4,9 @@ const browser = await chromium.launch({ channel: 'chrome' });
 const output = 'docs/design/animated-backgrounds/qa';
 const results = [];
 try {
-  for (const profile of [{ name: 'portrait', width: 412, height: 915, dpr: 3 }, { name: 'landscape', width: 844, height: 390, dpr: 2 }, { name: 'desktop', width: 1024, height: 900, dpr: 1 }]) {
+  for (const profile of [{ name: 'portrait', width: 412, height: 915, dpr: 3 }, { name: 'desktop-portrait', width: 900, height: 1024, dpr: 1 }]) {
     const context = await browser.newContext({ viewport: { width: profile.width, height: profile.height + 60 }, deviceScaleFactor: profile.dpr, reducedMotion: 'no-preference',
-      ...(profile.name !== 'desktop' ? { recordVideo: { dir: `${output}/videos`, size: { width: profile.width, height: profile.height + 60 } } } : {}) });
+      ...(profile.name === 'portrait' ? { recordVideo: { dir: `${output}/videos`, size: { width: profile.width, height: profile.height + 60 } } } : {}) });
     const page = await context.newPage();
     await page.goto('http://127.0.0.1:4188/docs/design/animated-backgrounds/pilot.html');
     const frame = page.frames().find(frame => frame.parentFrame());
@@ -49,7 +49,7 @@ try {
       return window.ambientPilotDiagnostics();
     });
     await page.evaluate(() => window.mountAmbientPilot('memory'));
-    if (profile.name !== 'desktop') await page.waitForTimeout(12000);
+    if (profile.name === 'portrait') await page.waitForTimeout(12000);
     results.push({ profile, diagnostics, ownedLayers, estimatedLayerBytesAtDPR: ownedLayers.reduce((sum, layer) => sum + layer.width * layer.height * 4 * profile.dpr ** 2, 0), release });
     const video = page.video(); await context.close();
     if (video) { await video.saveAs(`${output}/pilot-easy-${profile.name}.webm`); await video.delete(); }

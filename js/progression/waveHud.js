@@ -1,6 +1,7 @@
 import '../../styles/progression.css';
 import { createGameShellLifecycle } from '../gameShell/gameShellLifecycle.js';
 import { showContextGuide } from '../tutorial/contextGuide.js';
+import { suspendAmbientBackground } from '../backgroundEffects.js';
 
 const announcements = new WeakMap();
 const WAVE_NOTICE_VIEWPORT_INSET = 8;
@@ -87,6 +88,7 @@ export function announceWave(refs, scope, wave) {
   notice.textContent = `Màn ${wave.level}-${wave.index}`;
   document.body.append(notice);
   const noticeScope = createGameShellLifecycle();
+  noticeScope.own(suspendAmbientBackground());
   const releaseOwner = scope.own(() => noticeScope.dispose(), 'cleanup');
   noticeScope.own(() => releaseOwner.forget());
   noticeScope.own(() => notice.remove(), 'node');

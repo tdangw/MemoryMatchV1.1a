@@ -13,6 +13,13 @@ tĩnh khi không có vùng phù hợp**. Không đổi ảnh Home hoặc animate
 trong card chọn trò. Quyết định này thay ứng viên thác Home trong bảng
 cảnh/G1 bên dưới; pilot động duyệt trên hồ Memory, Home kiểm fallback.
 
+**Điều chỉnh sau duyệt mẫu:** cá phải bơi đầu đi trước; thêm cá ở vùng hồ
+giữa còn lộ, đổi bớt một đom đóm để tổng chuyển động trong Memory không
+tăng. Trong game tiết chế, ưu tiên độ hoàn thiện và chi tiết ở bản đồ.
+Chủ dự án chỉ yêu cầu agent kiểm dọc từ mốc này; màn ngang chủ dự án tự
+kiểm. Vẫn triển khai đúng metadata/crop ngang, không nhận đã kiểm live
+ngang sau mốc điều chỉnh. Không tăng ngân sách tổng hay sửa gameplay.
+
 ## 1. Mục tiêu, quyết định đã chốt và giới hạn
 
 Chủ dự án đã xác nhận:

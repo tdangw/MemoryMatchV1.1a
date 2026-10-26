@@ -11,15 +11,15 @@ export const PILOT_PRESETS = Object.freeze({
     landscape: { source: '/assets/images/backgrounds/memory-match.webp', width: 1254, height: 1254,
       regions: [
         { kind: 'fish', x: 105, y: 770, width: 78, height: 34 },
+        { kind: 'fish', x: 500, y: 1050, width: 140, height: 38 },
         { kind: 'firefly', x: 29, y: 645, width: 25, height: 32 },
-        { kind: 'firefly', x: 1202, y: 650, width: 25, height: 32 },
         { kind: 'leaf', x: 50, y: 745, width: 34, height: 90 },
       ] },
     portrait: { source: '/assets/images/backgrounds/memory-match-portrait-9x20.webp', width: 1080, height: 2400,
       regions: [
         { kind: 'fish', x: 158, y: 1440, width: 120, height: 38 },
+        { kind: 'fish', x: 480, y: 1700, width: 140, height: 38 },
         { kind: 'firefly', x: 30, y: 1330, width: 32, height: 40 },
-        { kind: 'firefly', x: 1013, y: 1380, width: 32, height: 40 },
         { kind: 'leaf', x: 48, y: 1450, width: 40, height: 100 },
       ] },
   },
