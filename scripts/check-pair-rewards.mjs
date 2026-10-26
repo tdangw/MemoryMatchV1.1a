@@ -6,10 +6,10 @@ import { createLinkGameState } from '../js/linkConnect/linkState.js';
 import { GAMEPLAY_LIMITS } from '../js/gameplayTuning.js';
 
 const memory = { coins: 0, remainingTime: 60, specialProgress: 3, specialNoEnergyDropStreak: 0, pendingEnergyCollections: 0,
-  luckyRewards: new Map([['a', { type: 'coins', value: 10 }]]), luckyAwards: [], progress: { memoryMatch: { items: { hint: 0, time10: 0 } } } };
+  luckyRewards: new Map([['a', { type: 'coins', value: 10 }]]), luckyAwards: [], progress: { memoryMatch: { items: { hint: 0, time10: 0, time30: 0 } } } };
 let calls = 0;
 const memoryPresentation = resolveMemoryPairRewards(memory, { imageId: 'a', special: true }, () => calls++ === 0 ? 0 : .99);
-assert.equal(memory.coins, 10); assert.equal(memory.progress.memoryMatch.items.time10, 1); assert.equal(memory.specialProgress, 4); assert.equal(memory.pendingEnergyCollections, 0);
+assert.equal(memory.coins, 10); assert.equal(memory.progress.memoryMatch.items.time30, 1); assert.equal(memory.progress.memoryMatch.items.time10, 0); assert.equal(memory.specialProgress, 4); assert.equal(memory.pendingEnergyCollections, 0);
 assert.equal(memoryPresentation.energyProgress, 4); assert.equal(memory.luckyRewards.size, 0); assert.equal(memory.luckyAwards.length, 1);
 memory.progress.memoryMatch.items.hint = GAMEPLAY_LIMITS.itemCount;
 memory.luckyRewards.set('b', { type: 'hints', value: 2 });

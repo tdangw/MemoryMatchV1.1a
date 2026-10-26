@@ -1,5 +1,6 @@
 import { getGameDefinition, getGameMode } from '../gameCatalog.js';
 import { MAX_ADVENTURE_LEVEL } from '../adventureProgress.js';
+import { STANDARD_WAVE_SECONDS, calculateChallengeWaveTime, calculateOriginalWaveTime } from './waveTiming.js';
 
 // Shared rules for multi-wave sessions, settlement and certified progression.
 export const GAMEPLAY_RULES_VERSION = 1;
@@ -58,12 +59,11 @@ export function calculateVictoryCoins({ gameId, mode, totalGroups, stars }) {
 }
 
 export function calculateWaveTime({ gameId, mode, totalGroups }) {
-  const seconds = { 'memory-match': 6, 'link-connect': 4, 'triple-connect': 5 }[gameId];
-  const factor = { easy: 1.2, normal: 1.1, hard: 1, superHard: 0.9, challenge: 1, endless: 1 }[mode];
   if (!getGameDefinition(gameId) || !getGameMode(mode)) throw new RangeError('Unknown game or mode.');
   if (!Number.isSafeInteger(totalGroups) || totalGroups < 1 || totalGroups > 1000)
     throw new RangeError('Invalid board group count.');
-  return mode === 'endless' ? 0 : 5 * Math.round((20 + totalGroups * seconds * factor) / 5);
+  return mode === 'challenge' ? calculateChallengeWaveTime({ gameId, totalGroups })
+    : STANDARD_WAVE_SECONDS[gameId][mode] ?? calculateOriginalWaveTime({ gameId, mode, totalGroups });
 }
 
 export function calculateFastFinishBonus({ totalGroups, activeMs, allocatedSeconds, mode }) {

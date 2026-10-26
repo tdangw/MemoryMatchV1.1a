@@ -1,3 +1,4 @@
+import { STANDARD_WAVE_SECONDS } from './progression/waveTiming.js';
 import { GAMEPLAY_LIMITS } from "./gameplayTuning.js";
 
 export const GAME_CONFIG = Object.freeze({
@@ -10,28 +11,28 @@ export const GAME_CONFIG = Object.freeze({
       tileCount: 12,
       columns: 4,
       mobileColumns: 4,
-      timeSeconds: 60,
+      timeSeconds: STANDARD_WAVE_SECONDS['memory-match'].easy,
       coinReward: Object.freeze({ base: 30, speedMultiplier: 0.35 }),
     }),
     normal: Object.freeze({
       tileCount: 24,
       columns: 6,
       mobileColumns: 4,
-      timeSeconds: 90,
+      timeSeconds: STANDARD_WAVE_SECONDS['memory-match'].normal,
       coinReward: Object.freeze({ base: 50, speedMultiplier: 0.5 }),
     }),
     hard: Object.freeze({
       tileCount: 36,
       columns: 6,
       mobileColumns: 6,
-      timeSeconds: 120,
+      timeSeconds: STANDARD_WAVE_SECONDS['memory-match'].hard,
       coinReward: Object.freeze({ base: 70, speedMultiplier: 0.65 }),
     }),
     superHard: Object.freeze({
       tileCount: 60,
       columns: 6,
       mobileColumns: 6,
-      timeSeconds: 180,
+      timeSeconds: STANDARD_WAVE_SECONDS['memory-match'].superHard,
       coinReward: Object.freeze({ base: 90, speedMultiplier: 0.8 }),
     }),
     endless: Object.freeze({
@@ -45,7 +46,7 @@ export const GAME_CONFIG = Object.freeze({
       tileCount: 12,
       columns: 4,
       mobileColumns: 4,
-      timeSeconds: 60,
+      timeSeconds: STANDARD_WAVE_SECONDS['memory-match'].easy,
       coinReward: Object.freeze({ base: 30, speedMultiplier: 0.35 }),
     }),
   }),
@@ -74,7 +75,7 @@ export const GAME_CONFIG = Object.freeze({
     supportDrop: Object.freeze({
       chance: 0.5,
       types: Object.freeze(["preview-item", "hint", "time-item"]),
-      timeValues: Object.freeze([10, 30, 45, 60]),
+      timeValues: Object.freeze([30, 45, 60]),
     }),
     previewDropValues: Object.freeze([4, 8, 12]),
     previewTierColors: Object.freeze({ 4: "teal", 8: "blue", 12: "purple", all: "gold" }),
@@ -82,10 +83,10 @@ export const GAME_CONFIG = Object.freeze({
       Object.freeze([{ type: "coins", value: 10 }]),
       Object.freeze([{ type: "preview-item", value: 4 }]),
       Object.freeze([{ type: "coins", value: 20 }]),
-      Object.freeze([{ type: "time-item", value: 10 }]),
+      Object.freeze([{ type: "time-item", value: 30 }]),
       Object.freeze([{ type: "preview-item", value: 8 }]),
       Object.freeze([{ type: "coins", value: 30 }]),
-      Object.freeze([{ type: "hint", value: 1 }, { type: "time-item", value: 10 }]),
+      Object.freeze([{ type: "hint", value: 1 }, { type: "time-item", value: 30 }]),
       Object.freeze([{ type: "preview-item", value: 12 }]),
       Object.freeze([{ type: "coins", value: 50 }, { type: "hint", value: 1 }]),
       Object.freeze([

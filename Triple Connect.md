@@ -1,5 +1,9 @@
 # Kế hoạch & Thiết kế — Triple Connect
 
+> Cân bằng vật phẩm24/10/2026: chỉ vật phẩm tiêu hao giảm10%, làm tròn đến Xu nguyên; công thức và bảng giá chung tại `js/shopCatalog.js` và mục cân bằng mới nhất trong `CONTEXT.md`. Vật phẩm tăng giờ tối thiểu30s; Xem trước/Gợi ý và thưởng cộng giờ trực tiếp giữ thời lượng. Ngoại hình/hiệu ứng/chủ đề/mở rộng khay giữ giá.
+
+> Cập nhật 24/10/2026: Dễ / Trung bình / Khó / Siêu khó cấp lần lượt **60 / 90 / 120 / 180 giây cho mỗi đợt thẻ**. Thời gian dư được giữ sang đợt tiếp theo; không cộng thêm thời gian theo level ở bốn độ khó này. Thử thách dùng mốc của độ khó nhỏ nhất chứa đủ số thẻ; Vô tận giữ nguyên. Phiên đang lưu giữ thời gian đã cấp/còn lại và dùng mốc mới từ đợt kế tiếp. Quyết định này thay các mốc thời gian cũ bên dưới; nguồn hiện hành là `js/progression/waveTiming.js`.
+
 ## 1. Mục tiêu và phạm vi
 
 **Triple Connect** là trò chơi thứ ba, độc lập với **Memory Match** và **Link Connect**. Người chơi tìm ba thẻ cùng hình trên bàn nhiều lớp. Thẻ được chọn bay vào khay dưới bàn; khi một bộ ba hoàn tất, ba thẻ tự nhóm sang trái, một đường hiệu ứng chạy ngang qua cả ba rồi áp dụng hiệu ứng xóa thẻ đang trang bị.
@@ -76,14 +80,14 @@ Cách này tốt hơn việc chỉ tạo một chuỗi mẫu vì vẫn cho phép
 
 | Chế độ | Thẻ | Bộ ba | Lớp | Thời gian | Ghi chú |
 | --- | ---: | ---: | ---: | --- | --- |
-| Dễ | 27 | 9 | 3 | 93 giây | Không có xấp góc. |
-| Trung bình | 54 | 18 | 4 | 133 giây | Base 45 + một xấp 9. |
-| Khó | 78 | 26 | 5 | 178 giây | Base 63 + hai xấp 7/8. |
-| Siêu khó | 120 | 40 | 6 | 262 giây | Base 96 + bốn xấp 6. |
+| Dễ | 27 | 9 | 3 | 60 giây | Không có xấp góc. |
+| Trung bình | 54 | 18 | 4 | 90 giây | Base 45 + một xấp 9. |
+| Khó | 78 | 26 | 5 | 120 giây | Base 63 + hai xấp 7/8. |
+| Siêu khó | 120 | 40 | 6 | 180 giây | Base 96 + bốn xấp 6. |
 | Vô tận | 120 | 40 | 6 | Đếm xuôi | Cùng topology Siêu khó; qua level liên tiếp. |
-| Thử thách | 18 → 93 | 6 → 31 | 2 → 5 | 75 → 210 giây | Tổng thẻ theo stage `18, 27, 42, 51, 66, 75, 93`; có thẻ may mắn. |
+| Thử thách | 18 → 93 | 6 → 31 | 2 → 5 | 60 → 180 giây | Tổng thẻ theo stage `18, 27, 42, 51, 66, 75, 93`; có thẻ may mắn. |
 
-Mốc thời gian ban đầu đồng bộ với hai game và chỉ được điều chỉnh sau khi có dữ liệu thử nghiệm thực tế.
+Thời gian mỗi đợt ở bốn độ khó đồng bộ với Link Connect theo quyết định ngày 24/10/2026.
 
 ## 5. HUD và giao diện
 
@@ -167,7 +171,7 @@ js/tripleConnect/
 
 ## 9. Trạng thái quyết định sản phẩm
 
-Đã được triển khai: 3 Gợi ý khởi đầu; giá Gợi ý 8 Xu, Thêm thời gian 2 Xu/giây, Hoàn tác/Xáo thẻ 15 Xu; mốc sao `12/18/25` và Endless `10/15/20`; Lucky chỉ có ở Challenge; Mở rộng khay giá 3.000 Xu; milestone version 2 gồm 10 mốc mỗi 3 bộ ba, target 30.
+Đã được triển khai: 3 Gợi ý khởi đầu; giá Gợi ý58Xu, gói Thêm thời gian30s360Xu, Hoàn tác/Xáo thẻ108Xu; mốc sao `12/18/25` và Endless `10/15/20`; Lucky chỉ có ở Challenge; Mở rộng khay giá 3.000 Xu; milestone version 2 gồm 10 mốc mỗi 3 bộ ba, target 30.
 
 Phân bố Lucky, bảng reward milestone, fallback khi inventory đầy và phần thưởng cuối màn/Endless phải lấy từ `tripleConfig.js` cùng module transaction tương ứng; tài liệu này không sao chép bảng số chi tiết để tránh lệch nguồn sự thật.
 

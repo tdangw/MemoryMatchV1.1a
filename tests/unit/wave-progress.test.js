@@ -5,22 +5,63 @@ import { calculateWaveTime, calculateFastFinishBonus, calculateProgressionStars 
 
 const fresh = (overrides = {}) => createWaveProgress({ attemptId: 'attempt-1', gameId: 'memory-match', mode: 'easy', level: 1, groupsPerWave: 6, ...overrides });
 
+test('adventure wave budgets match approved difficulties independently of board size', () => {
+  for (const [gameId, expected] of [['memory-match', [75, 110, 150, 220]],
+    ['link-connect', [60, 90, 120, 180]], ['triple-connect', [60, 90, 120, 180]]]) {
+    for (const [index, mode] of ['easy', 'normal', 'hard', 'superHard'].entries())
+      for (const totalGroups of [6, 9, 12, 18, 26, 30, 40, 1000])
+        assert.equal(calculateWaveTime({ gameId, mode, totalGroups }), expected[index]);
+    assert.equal(calculateWaveTime({ gameId, mode: 'endless', totalGroups: 6 }), 0);
+  }
+  assert.deepEqual(['memory-match', 'link-connect', 'triple-connect'].map(gameId =>
+    calculateWaveTime({ gameId, mode: 'challenge', totalGroups: 6 })), [75, 60, 60]);
+  for (const patch of [{ gameId: 'unknown' }, { mode: 'unknown' }, { totalGroups: 0 }, { totalGroups: 1.5 }])
+    assert.throws(() => calculateWaveTime({ gameId: 'memory-match', mode: 'easy', totalGroups: 6, ...patch }));
+});
+
+test('original and mixed-budget checkpoints retain granted seconds through every remaining wave', () => {
+  for (const [gameId, groups, oldBudgets] of [['memory-match', [6, 12, 18, 30], [65, 100, 130, 180]],
+    ['link-connect', [6, 12, 18, 30], [50, 75, 90, 130]],
+    ['triple-connect', [9, 18, 26, 40], [75, 120, 150, 200]]]) {
+    for (const [index, mode] of ['easy', 'normal', 'hard', 'superHard'].entries()) {
+      for (let savedIndex = 1; savedIndex <= 5; savedIndex++) {
+        const snapshot = { ...fresh({ gameId, mode, level: 91, groupsPerWave: groups[index] }),
+          index: savedIndex, allocatedSeconds: oldBudgets[index] * savedIndex };
+        let progress = normalizeWaveProgress(JSON.parse(JSON.stringify(snapshot)));
+        assert.deepEqual(progress, snapshot);
+        assert.equal(normalizeWaveProgress({ ...snapshot, allocatedSeconds: snapshot.allocatedSeconds + 1 }), null);
+        const budget = calculateWaveTime({ gameId, mode, totalGroups: groups[index] });
+        for (let wave = savedIndex; wave <= 5; wave++) {
+          const result = completeWave(progress, { score: wave * 100, moves: wave * 100,
+            misses: 0, matchedGroups: groups[index] });
+          assert.equal(result.bonusSeconds, wave === 5 ? 0 : budget);
+          progress = normalizeWaveProgress(JSON.parse(JSON.stringify(result.progress)));
+          assert(progress);
+          if (wave < 5) progress = activateNextWave(progress);
+        }
+        assert.equal(progress.phase, 'won');
+        assert.equal(progress.allocatedSeconds, oldBudgets[index] * savedIndex + budget * (5 - savedIndex));
+      }
+    }
+  }
+});
+
 test('shared countdown keeps unused seconds and adds only the next wave budget', () => {
   const initial = fresh();
-  assert.equal(initial.allocatedSeconds, 65);
+  assert.equal(initial.allocatedSeconds, 75);
   const { progress, bonusSeconds } = completeWave(initial, { score: 88, moves: 12, misses: 0, matchedGroups: 6 });
-  assert.equal(bonusSeconds, 65);
-  assert.equal(18 + bonusSeconds, 83);
+  assert.equal(bonusSeconds, 75);
+  assert.equal(18 + bonusSeconds, 93);
   assert.equal(progress.phase, 'advance');
   assert.equal(progress.index, 2);
-  assert.equal(progress.allocatedSeconds, 130);
+  assert.equal(progress.allocatedSeconds, 150);
   assert.throws(() => completeWave(progress, { score: 88, moves: 12, misses: 0, matchedGroups: 6 }));
   const restored = normalizeWaveProgress(JSON.parse(JSON.stringify(progress)));
   const next = activateNextWave(restored);
   const terminal = completeWave(next, { score: 176, moves: 24, misses: 0, matchedGroups: 6 });
   assert.equal(terminal.bonusSeconds, 0);
   assert.equal(terminal.progress.phase, 'won');
-  assert.equal(terminal.progress.allocatedSeconds, 130);
+  assert.equal(terminal.progress.allocatedSeconds, 150);
   assert.equal(waveTotalGroups(terminal.progress), 12);
   assert.throws(() => activateNextWave(terminal.progress));
 });

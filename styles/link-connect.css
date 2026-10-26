@@ -874,6 +874,11 @@
   position: relative;
   z-index: 2;
 }
+.link-game-hud .stat-timer.is-time-frozen > .stat-label,
+.link-game-hud .stat-timer.is-time-frozen > #link-timer {
+  color: #06344d;
+  text-shadow: 0 1px 1px rgb(255 255 255 / 90%);
+}
 .link-game-hud .stat-timer.is-time-frozen::before {
   position: absolute;
   z-index: 1;
@@ -883,7 +888,7 @@
 .link-game-hud .stat-timer.is-time-frozen::before {
   inset: 0;
   background:
-    linear-gradient(145deg, rgb(211 250 255 / 50%), rgb(67 182 232 / 38%)),
+    linear-gradient(145deg, rgb(225 250 255 / 84%), rgb(192 232 249 / 70%)),
     url("/assets/images/ui/frozen-card-overlay.png") center / cover;
 }
 

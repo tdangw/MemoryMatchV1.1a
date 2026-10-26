@@ -1,5 +1,9 @@
 # Quy tắc & Cấu hình — Memory Match
 
+> Cân bằng vật phẩm24/10/2026: chỉ vật phẩm tiêu hao giảm10%, làm tròn đến Xu nguyên; công thức và bảng giá chung tại `js/shopCatalog.js` và mục cân bằng mới nhất trong `CONTEXT.md`. Vật phẩm tăng giờ tối thiểu30s; Xem trước/Gợi ý và thưởng cộng giờ trực tiếp giữ thời lượng. Ngoại hình/hiệu ứng/chủ đề/mở rộng khay giữ giá.
+
+> Cập nhật 24/10/2026: Dễ / Trung bình / Khó / Siêu khó cấp lần lượt **75 / 110 / 150 / 220 giây cho mỗi đợt thẻ**. Thời gian dư được giữ sang đợt tiếp theo; không cộng thêm thời gian theo level ở bốn độ khó này. Thử thách dùng mốc của độ khó nhỏ nhất chứa đủ số thẻ; Vô tận giữ nguyên. Phiên đang lưu giữ thời gian đã cấp/còn lại và dùng mốc mới từ đợt kế tiếp. Quyết định này thay các mốc thời gian cũ bên dưới; nguồn hiện hành là `js/progression/waveTiming.js`.
+
 Tài liệu này là nguồn theo dõi luật chơi, cân bằng và cấu hình sản phẩm hiện hành của **Memory Match**. Ranh giới module và hợp đồng kỹ thuật nằm trong `ARCHITECTURE.md`; trạng thái ngắn gọn của toàn dự án nằm trong `CONTEXT.md`.
 
 ---
@@ -21,14 +25,14 @@ Tài liệu này là nguồn theo dõi luật chơi, cân bằng và cấu hình
 
 | Chế độ | Số thẻ | Số cặp | Cột desktop | Cột mobile | Thời gian gốc | Thưởng Xu cuối màn |
 | --- | ---: | ---: | ---: | ---: | ---: | --- |
-| Dễ | 12 | 6 | 4 | 4 | 60 giây | `30 + floor(thời gian còn lại × 0,35)` |
-| Trung bình | 24 | 12 | 6 | 4 | 90 giây | `50 + floor(thời gian còn lại × 0,50)` |
-| Khó | 36 | 18 | 6 | 6 | 120 giây | `70 + floor(thời gian còn lại × 0,65)` |
-| Siêu khó | 60 | 30 | 6 | 6 | 180 giây | `90 + floor(thời gian còn lại × 0,80)` |
+| Dễ | 12 | 6 | 4 | 4 | 75 giây | `30 + floor(thời gian còn lại × 0,35)` |
+| Trung bình | 24 | 12 | 6 | 4 | 110 giây | `50 + floor(thời gian còn lại × 0,50)` |
+| Khó | 36 | 18 | 6 | 6 | 150 giây | `70 + floor(thời gian còn lại × 0,65)` |
+| Siêu khó | 60 | 30 | 6 | 6 | 220 giây | `90 + floor(thời gian còn lại × 0,80)` |
 | Vô tận | 60 | 30 | 6 | 6 | Không giới hạn | 10 Xu |
-| Thử thách | Theo level | Theo level | Theo level | Theo level | 60 giây ban đầu | `30 + floor(thời gian còn lại × 0,35)` |
+| Thử thách | Theo level | Theo level | Theo level | Theo level | 75 giây ban đầu | `30 + floor(thời gian còn lại × 0,35)` |
 
-Với Dễ, Trung bình, Khó và Siêu khó, mỗi level sau được cộng `2 giây`, tối đa `10 giây` so với thời gian gốc của chế độ.
+Với Dễ, Trung bình, Khó và Siêu khó, mỗi đợt thẻ nhận thời gian cố định theo bảng; không tăng thêm theo level.
 
 ### Bàn Thử thách
 
@@ -45,7 +49,7 @@ Với Dễ, Trung bình, Khó và Siêu khó, mỗi level sau được cộng `2
 | 17–18 | 54 | 27 | 6 | 6 |
 | Từ 19 | 60 | 30 | 6 | 6 |
 
-Thử thách bắt đầu với 60 giây. Khi qua màn, thời gian còn lại được giữ và cộng thêm 10 giây cho màn kế tiếp.
+Thử thách cấp75/110/150/220giây mỗi đợt cho bàn tối đa12/24/36/60thẻ; giữ thời gian dư sang đợt sau.
 
 Giữ mỗi kích thước 2 level để làm quen vị trí: 4×3 → 4×4 → 4×5 → 4×6 → 6×5 → 6×6 → 6×7 → 6×8 → 6×9 → 6×10 (cột × hàng). Từ level 19 giữ tối đa 30 cặp. Cột desktop/mobile giống nhau trong Thử thách để việc resize/fullscreen không đổi vị trí ghi nhớ. Các chế độ cố định giữ cấu hình cũ. Luật thời gian, combo và thưởng giữ nguyên; cần đánh giá thời gian hoàn thành, tỷ lệ thua và lượng hỗ trợ ở nhịp mới trước khi chốt cân bằng phát hành.
 
@@ -164,12 +168,11 @@ Combo chỉ nối tiếp nếu cặp tiếp theo được ghép đúng trong c�
 
 | Gói | Mã dữ liệu | Màu nhận diện | Giá |
 | --- | --- | --- | ---: |
-| +10 giây | `time10` | Teal | 18 Xu |
-| +30 giây | `time30` | Xanh dương | 50 Xu |
-| +45 giây | `time45` | Tím | 70 Xu |
-| +60 giây | `time60` | Vàng | 90 Xu |
+| +30 giây | `time30` | Xanh dương | 360 Xu |
+| +45 giây | `time45` | Tím | 504 Xu |
+| +60 giây | `time60` | Vàng | 648 Xu |
 
-- Mua gói Thời gian chỉ cộng vào kho.
+- Mua gói Thời gian chỉ cộng vào kho. `time10` cũ giữ nguyên số lượng, mỗi món dùng được +30s; không bán hoặc cấp mới loại này.
 - Nút Thời gian trên HUD hiển thị tổng số gói và cho chọn loại để dùng.
 - Nút kho Thời gian được ẩn trong Vô tận.
 - Hai nút hỗ trợ nhanh chỉ hiển thị biểu tượng; số lượng nằm trong tooltip và từng lựa chọn trong kho theo mẫu `Đang có: x`.
@@ -180,8 +183,8 @@ Khi hết giờ, popup thất bại có các lựa chọn:
 
 - Về Menu.
 - Chơi lại.
-- Mua trực tiếp 1 giây với 2 Xu.
-- Mua trực tiếp 5 giây với 10 Xu.
+- Mua trực tiếp30giây với360Xu.
+- Mua trực tiếp60giây với648Xu.
 
 Hai gói cứu thua là giao dịch riêng của popup hết giờ, không lấy từ kho Thời gian. Sau khi mua thành công, đồng hồ bắt đầu lại sau 1 giây đệm.
 

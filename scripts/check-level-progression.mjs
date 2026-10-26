@@ -23,7 +23,9 @@ for (const stage of TRIPLE_CHALLENGE_STAGES) {
 console.log('Level progression: shared difficulty unlock, bounded pair layouts and Triple intro witnesses passed.');
 const durations = [];
 for (const level of [8, 9, 19, 20, 99, 100, 101, 999, 1000, 99999, 100000, 100001, 1000000, 9007199254740900]) {
-  assert(getLinkChallengeTime(level) <= 150);
+  const tileCount = getLinkChallengeLayout(level).tileCount;
+  const expectedSeconds = tileCount <= 12 ? 60 : tileCount <= 24 ? 90 : tileCount <= 36 ? 120 : 180;
+  assert.equal(getLinkChallengeTime(level), expectedSeconds);
   const stage = getTripleChallengeStage(level); assert.equal(stage.level, level); assert(stage.tileCount <= 93);
   for (const variant of ['a', 'b']) {
     const start = performance.now();

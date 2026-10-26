@@ -1,5 +1,9 @@
 # Quy tắc & Thiết kế — Link Connect
 
+> Cân bằng vật phẩm24/10/2026: chỉ vật phẩm tiêu hao giảm10%, làm tròn đến Xu nguyên; công thức và bảng giá chung tại `js/shopCatalog.js` và mục cân bằng mới nhất trong `CONTEXT.md`. Vật phẩm tăng giờ tối thiểu30s; Xem trước/Gợi ý và thưởng cộng giờ trực tiếp giữ thời lượng. Ngoại hình/hiệu ứng/chủ đề/mở rộng khay giữ giá.
+
+> Cập nhật 24/10/2026: Dễ / Trung bình / Khó / Siêu khó cấp lần lượt **60 / 90 / 120 / 180 giây cho mỗi đợt thẻ**. Thời gian dư được giữ sang đợt tiếp theo; không cộng thêm thời gian theo level ở bốn độ khó này. Thử thách dùng mốc của độ khó nhỏ nhất chứa đủ số thẻ; Vô tận giữ nguyên. Phiên đang lưu giữ thời gian đã cấp/còn lại và dùng mốc mới từ đợt kế tiếp. Quyết định này thay các mốc thời gian cũ bên dưới; nguồn hiện hành là `js/progression/waveTiming.js`.
+
 Tài liệu này mô tả luật chơi, cân bằng và phạm vi sản phẩm của **Link Connect**. Ranh giới module nằm trong `ARCHITECTURE.md`; trạng thái ngắn gọn của dự án nằm trong `CONTEXT.md`.
 
 ---
@@ -57,7 +61,7 @@ Sau mỗi cặp ghép, Link Connect áp dụng quy tắc bàn cờ của cả m�
 | 9 | 54 | 27 | 6 |
 | Từ 10 | 60 | 30 | 6 |
 
-Thử thách tăng một bậc mỗi level: 4×3 → 4×4 → 4×5 → 4×6 → 6×5 → 6×6 → 6×7 → 6×8 → 6×9 → 6×10 (cột × hàng). Bỏ bậc 6×4 vì trùng 12 cặp với 4×6 nhưng làm bàn thấp xuống. Từ level 10 giữ tối đa 30 cặp. Số cặp không đổi theo thiết bị hoặc fullscreen. Các chế độ cố định giữ cấu hình cũ. Thời gian chuẩn vẫn là `60 + (level - 1) × 10` giây; nhịp mới cần tiếp tục đánh giá bằng tỷ lệ hoàn thành và lượng hỗ trợ sử dụng, chưa được coi là cân bằng phát hành đã kiểm chứng.
+Thử thách tăng một bậc mỗi level: 4×3 → 4×4 → 4×5 → 4×6 → 6×5 → 6×6 → 6×7 → 6×8 → 6×9 → 6×10 (cột × hàng). Bỏ bậc 6×4 vì trùng 12 cặp với 4×6 nhưng làm bàn thấp xuống. Từ level 10 giữ tối đa 30 cặp. Số cặp không đổi theo thiết bị hoặc fullscreen. Các chế độ cố định giữ cấu hình cũ. Thời gian mỗi đợt là60/90/120/180giây theo bàn tối đa12/24/36/60thẻ; nhịp mới cần tiếp tục đánh giá bằng tỷ lệ hoàn thành và lượng hỗ trợ sử dụng, chưa được coi là cân bằng phát hành đã kiểm chứng.
 
 ### Toàn màn hình và tập trung
 
@@ -105,10 +109,10 @@ Các vật phẩm được tích hợp trực tiếp vào hệ thống tiền t�
 
 | Vật phẩm                               | Icon SVG | Chức năng chi tiết                                                                                    | Giá (Xu) |
 | :------------------------------------- | :------: | :---------------------------------------------------------------------------------------------------- | :--------------: |
-| **Kính Định Vị (Smart Hint)**          | `search`  | Tự động vẽ vệt sáng chỉ rõ đường nối của 1 cặp thẻ có thể ghép ngay.                                  |       8 Xu       |
-| **Xáo Trộn Không Gian (Reshuffle)**    | `restart` | Xáo lại toàn bộ vị trí các thẻ còn lại trên bàn cờ để tạo đường nối mới.                              |      15 Xu       |
-| **Sấm Sét Hủy Diệt (Thunder Strike)**  | `wand`    | Tự động chọn và tiêu diệt ngay 1~3 cặp thẻ bất kỳ mà không cần đường nối.                             |      25 Xu       |
-| **Đồng Hồ Ngưng Đọng (Chrono Freeze)** | `timer`   | Đóng băng đồng hồ đếm ngược trong 10 giây để người chơi thoải mái quan sát.                           |      20 Xu       |
+| **Kính Định Vị (Smart Hint)**          | `search`  | Tự động vẽ vệt sáng chỉ rõ đường nối của 1 cặp thẻ có thể ghép ngay.                                  |       58 Xu       |
+| **Xáo Trộn Không Gian (Reshuffle)**    | `restart` | Xáo lại toàn bộ vị trí các thẻ còn lại trên bàn cờ để tạo đường nối mới.                              |      108 Xu       |
+| **Sấm Sét Hủy Diệt (Thunder Strike)**  | `wand`    | Tự động chọn và tiêu diệt ngay 1~3 cặp thẻ bất kỳ mà không cần đường nối.                             |      180 Xu       |
+| **Đồng Hồ Ngưng Đọng (Chrono Freeze)** | `timer`   | Đóng băng đồng hồ đếm ngược trong 30 giây để người chơi thoải mái quan sát.                           |      288 Xu       |
 
 ---
 

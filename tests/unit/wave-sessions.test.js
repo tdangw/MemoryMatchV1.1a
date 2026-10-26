@@ -57,6 +57,30 @@ test('wave checkpoint survives the normal persistence/hydration boundary without
   assert.equal(stageActiveSession('link-connect', { mode: 'easy', level: 1, wave: advanced }), false);
 });
 
+test('original budgets hydrate with the exact saved clock and receive the new next-wave grant', () => {
+  for (const [gameId, oldBudget, newBudget] of [['memory-match', 65, 75], ['link-connect', 50, 60],
+    ['triple-connect', 75, 60]]) {
+    hydrateGameState();
+    const saved = { mode: 'easy', level: 1, remainingTime: 23, timeLimit: oldBudget,
+      levelStartTime: oldBudget, wave: { ...wave(gameId), allocatedSeconds: oldBudget } };
+    if (gameId === 'triple-connect') {
+      const generated = generatePatternTripleBoard({ mode: 'easy', patternIndex: 0, seed: 'legacy-clock' });
+      saved.layoutId = generated.layoutId;
+      saved.snapshot = serializeTripleRoundState(createTripleRoundState(generated.board));
+      saved.wave.groupsPerWave = 9;
+    }
+    assert.equal(stageActiveSession(gameId, saved), true);
+    hydrateGameState({ progress: JSON.parse(JSON.stringify(gameState.progress)) });
+    const restored = getActiveSession(gameId, 'easy');
+    assert.equal(restored.remainingTime, 23);
+    if (gameId !== 'triple-connect') assert.equal(restored.timeLimit, oldBudget);
+    assert.equal(restored.wave.allocatedSeconds, oldBudget);
+    const next = completeWave(restored.wave, { score: 60, moves: 12, misses: 0, matchedGroups: restored.wave.groupsPerWave });
+    assert.equal(next.bonusSeconds, newBudget);
+    assert.equal(next.progress.allocatedSeconds, oldBudget + newBudget);
+  }
+});
+
 test('corrupt wave input blocks resume rather than silently replacing it with a single-wave game', () => {
   hydrateGameState({ progress: { memoryMatch: { sessionsByMode: { easy: { mode: 'easy', level: 1, wave: { ...wave(), version: 99 } } } } } });
   assert.equal(getActiveSession('memory-match', 'easy').waveInvalid, true);

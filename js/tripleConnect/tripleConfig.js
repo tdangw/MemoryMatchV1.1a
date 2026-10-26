@@ -1,13 +1,14 @@
+import { STANDARD_WAVE_SECONDS, calculateChallengeWaveTime } from '../progression/waveTiming.js';
 import { MAX_ADVENTURE_LEVEL } from '../adventureProgress.js';
 import { calculateGroupScore } from '../progression/gameplayRules.js';
-import { CONSUMABLE_PRICE_MULTIPLIER } from '../shopCatalog.js';
-export const TRIPLE_TIME_ITEM_SECONDS = 10;
+import { calculateConsumablePrice, TIME_ITEM_PRICES } from '../shopCatalog.js';
+export const TRIPLE_TIME_ITEM_SECONDS = 30;
 export const TRIPLE_RULES = Object.freeze({ trayCapacity: 7, matchSize: 3, baseMatchScore: 10, comboScoreStep: 3 });
 export const TRIPLE_CORNER_STACK_CORNERS = Object.freeze(["top-left", "top-right", "bottom-left", "bottom-right"]);
-export const TRIPLE_EASY_CONFIG = Object.freeze({ mode: "easy", tileCount: 27, layerCount: 3, timeSeconds: 93 });
-export const TRIPLE_NORMAL_CONFIG = Object.freeze({ mode: "normal", tileCount: 54, baseTileCount: 45, cornerStackSizes: Object.freeze([9]), layerCount: 4, timeSeconds: 133 });
-export const TRIPLE_HARD_CONFIG = Object.freeze({ mode: "hard", tileCount: 78, baseTileCount: 63, cornerStackSizes: Object.freeze([7, 8]), layerCount: 5, timeSeconds: 178 });
-export const TRIPLE_SUPER_HARD_CONFIG = Object.freeze({ mode: "superHard", tileCount: 120, baseTileCount: 96, cornerStackSizes: Object.freeze([6, 6, 6, 6]), layerCount: 6, timeSeconds: 262 });
+export const TRIPLE_EASY_CONFIG = Object.freeze({ mode: "easy", tileCount: 27, layerCount: 3, timeSeconds: STANDARD_WAVE_SECONDS['triple-connect'].easy });
+export const TRIPLE_NORMAL_CONFIG = Object.freeze({ mode: "normal", tileCount: 54, baseTileCount: 45, cornerStackSizes: Object.freeze([9]), layerCount: 4, timeSeconds: STANDARD_WAVE_SECONDS['triple-connect'].normal });
+export const TRIPLE_HARD_CONFIG = Object.freeze({ mode: "hard", tileCount: 78, baseTileCount: 63, cornerStackSizes: Object.freeze([7, 8]), layerCount: 5, timeSeconds: STANDARD_WAVE_SECONDS['triple-connect'].hard });
+export const TRIPLE_SUPER_HARD_CONFIG = Object.freeze({ mode: "superHard", tileCount: 120, baseTileCount: 96, cornerStackSizes: Object.freeze([6, 6, 6, 6]), layerCount: 6, timeSeconds: STANDARD_WAVE_SECONDS['triple-connect'].superHard });
 export const TRIPLE_ENDLESS_CONFIG = Object.freeze({ mode: "endless", tileCount: 120, baseTileCount: 96, cornerStackSizes: Object.freeze([6, 6, 6, 6]), layerCount: 6, timeSeconds: 0 });
 export const TRIPLE_CHALLENGE_CONFIG = Object.freeze({ mode: "challenge", tileCount: 12, layerCount: 2, timeSeconds: 60 });
 export const TRIPLE_LUCKY_REWARDS = Object.freeze([Object.freeze({ type: "coins", amount: 10 }), Object.freeze({ type: "time", amount: 5 }), Object.freeze({ type: "hint", amount: 1 })]);
@@ -33,7 +34,7 @@ export const TRIPLE_CHALLENGE_LAYOUTS = Object.freeze([
   challengeLayout("challenge-6", 14, 16, [{ layer: 0, rows: [{ y: 0, xs: [0, 2, 4, 6, 8, 10] }, { y: 3, xs: [0, 2, 4, 6, 8, 10] }, { y: 7, xs: [0, 2, 4, 6, 8, 10] }, { y: 11, xs: [0, 2, 4, 6, 8, 10] }, { y: 14, xs: [0, 2, 4] }] }, { layer: 1, rows: [{ y: 1, xs: [1, 3, 5, 7, 9] }, { y: 4, xs: [1, 3, 5, 7, 9] }, { y: 8, xs: [1, 3, 5, 7, 9] }] }, { layer: 2, rows: [{ y: 0, xs: [1, 5, 9] }, { y: 5, xs: [1, 5, 9] }, { y: 9, xs: [1, 5, 9] }, { y: 13, xs: [1, 3, 5] }] }, { layer: 3, rows: [{ y: 4, xs: [2, 6, 10] }, { y: 10, xs: [2, 6, 10] }] }], ["top-left", "top-right", "bottom-left"]),
   challengeLayout("challenge-7", 14, 16, [{ layer: 0, rows: [{ y: 0, xs: [0, 4, 6, 10] }, { y: 3, xs: [0, 2, 4, 6, 8, 10] }, { y: 7, xs: [0, 2, 4, 6, 8, 10, 12] }, { y: 11, xs: [0, 2, 4, 6, 8, 10, 12] }, { y: 14, xs: [0, 2, 4, 6, 8, 10] }] }, { layer: 1, rows: [{ y: 1, xs: [1, 3, 5, 7, 9, 11] }, { y: 4, xs: [1, 3, 5, 7, 9, 11] }, { y: 8, xs: [1, 3, 5, 7, 9, 11] }] }, { layer: 2, rows: [{ y: 0, xs: [1, 5, 9] }, { y: 5, xs: [1, 5, 9] }, { y: 9, xs: [1, 5, 9] }, { y: 12, xs: [1, 5, 9] }, { y: 14, xs: [1, 5, 9] }] }, { layer: 3, rows: [{ y: 4, xs: [2, 6, 10] }, { y: 8, xs: [2, 6, 10] }, { y: 13, xs: [2, 6, 10] }] }, { layer: 4, rows: [{ y: 7, xs: [3, 7, 11] }] }], TRIPLE_CORNER_STACK_CORNERS),
 ]);
-export const TRIPLE_CHALLENGE_STAGES = Object.freeze([[1,18,18,[],2,75,5000,2000,20],[2,27,24,[3],2,85,8000,3000,30],[3,42,36,[6],3,105,15000,6000,50],[4,51,42,[4,5],4,120,30000,12000,80],[5,66,54,[6,6],4,150,75000,30000,150],[6,75,60,[5,5,5],4,175,100000,40000,250],[7,93,75,[4,4,5,5],5,210,150000,60000,400]].map(([level,tileCount,baseTileCount,cornerStackSizes,layerCount,timeSeconds,maxNodes,maxMemo,deadlineMs]) => Object.freeze({ level, tileCount, baseTileCount, cornerStackSizes: Object.freeze(cornerStackSizes), layerCount, layoutId: `challenge-${level}`, timeSeconds, solverBudget: Object.freeze({ maxNodes, maxMemo, deadlineMs }) })));
+export const TRIPLE_CHALLENGE_STAGES = Object.freeze([[1,18,18,[],2,5000,2000,20],[2,27,24,[3],2,8000,3000,30],[3,42,36,[6],3,15000,6000,50],[4,51,42,[4,5],4,30000,12000,80],[5,66,54,[6,6],4,75000,30000,150],[6,75,60,[5,5,5],4,100000,40000,250],[7,93,75,[4,4,5,5],5,150000,60000,400]].map(([level,tileCount,baseTileCount,cornerStackSizes,layerCount,maxNodes,maxMemo,deadlineMs]) => Object.freeze({ level, tileCount, baseTileCount, cornerStackSizes: Object.freeze(cornerStackSizes), layerCount, layoutId: `challenge-${level}`, timeSeconds: calculateChallengeWaveTime({ gameId: 'triple-connect', totalGroups: tileCount / 3 }), solverBudget: Object.freeze({ maxNodes, maxMemo, deadlineMs }) })));
 export const TRIPLE_EASY_SOLVER_BUDGET = Object.freeze({ maxNodes: 5000, maxMemo: 2000, deadlineMs: 30 });
 export const TRIPLE_EASY_GENERATOR_BUDGET = Object.freeze({ maxAttempts: 12 });
 export const TRIPLE_EASY_FALLBACK_SEED = "triple-easy-fallback";
@@ -47,7 +48,7 @@ export function getTripleChallengeStage(level = 1) {
   return Object.freeze({ ...template, level });
 }
 export function isTripleChallengeComplete(level) { getTripleChallengeStage(level); return false; }
-export const TRIPLE_PRODUCT_DECISIONS = Object.freeze({ trayCapacity: 7, trayExpansion: Object.freeze({ baseCapacity: 7, bonusCapacity: 3, experimentalPrice: 1, releasePrice: 3000 }), initialItems: Object.freeze({ hint: 3 }), itemPrices: Object.freeze({ hint: 8 * CONSUMABLE_PRICE_MULTIPLIER, timePerSecond: 2 * CONSUMABLE_PRICE_MULTIPLIER, undo: 15 * CONSUMABLE_PRICE_MULTIPLIER, shuffle: 15 * CONSUMABLE_PRICE_MULTIPLIER }), starTargetScale: 0.8, starPointsPerTriple: Object.freeze({ one: 12, two: 18, three: 25 }), endlessStarPointsPerTriple: Object.freeze({ one: 10, two: 15, three: 20 }), excludedItems: Object.freeze(["thunder", "freeze"]), milestones: Object.freeze({ version: 2, target: 30, step: 3, rewards: Object.freeze([
+export const TRIPLE_PRODUCT_DECISIONS = Object.freeze({ trayCapacity: 7, trayExpansion: Object.freeze({ baseCapacity: 7, bonusCapacity: 3, experimentalPrice: 1, releasePrice: 3000 }), initialItems: Object.freeze({ hint: 3 }), itemPrices: Object.freeze({ hint: calculateConsumablePrice(8), timePerSecond: TIME_ITEM_PRICES[TRIPLE_TIME_ITEM_SECONDS] / TRIPLE_TIME_ITEM_SECONDS, undo: calculateConsumablePrice(15), shuffle: calculateConsumablePrice(15) }), starTargetScale: 0.8, starPointsPerTriple: Object.freeze({ one: 12, two: 18, three: 25 }), endlessStarPointsPerTriple: Object.freeze({ one: 10, two: 15, three: 20 }), excludedItems: Object.freeze(["thunder", "freeze"]), milestones: Object.freeze({ version: 2, target: 30, step: 3, rewards: Object.freeze([
   Object.freeze({ coins: 10 }), Object.freeze({ hint: 1 }), Object.freeze({ coins: 20 }),
   Object.freeze({ timeItem: 1 }), Object.freeze({ undo: 1 }), Object.freeze({ coins: 30 }),
   Object.freeze({ hint: 1, timeItem: 1 }), Object.freeze({ shuffle: 1 }),

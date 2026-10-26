@@ -1,15 +1,15 @@
 import { gameState, spendCoins } from "../gameState.js";
 import { savePersistentGameData, saveProgress } from "../persistence.js";
 import { GAMEPLAY_LIMITS } from "../gameplayTuning.js";
-import { CONSUMABLE_PRICE_MULTIPLIER } from '../shopCatalog.js';
-export const LINK_FREEZE_SECONDS = 15;
+import { calculateConsumablePrice } from '../shopCatalog.js';
+export const LINK_FREEZE_SECONDS = 30;
 
 export const LINK_ITEMS = Object.freeze([
   Object.freeze({ id: "hint", title: "Gợi ý đường nối", icon: "search", price: 8 }),
   Object.freeze({ id: "reshuffle", title: "Xáo trộn", icon: "shuffle", price: 15 }),
   Object.freeze({ id: "thunder", title: "Sấm sét", icon: "wand", price: 25 }),
-  Object.freeze({ id: "freeze", title: "Đóng băng thời gian", icon: "freeze", price: 20 }),
-].map(item => Object.freeze({ ...item, price: item.price * CONSUMABLE_PRICE_MULTIPLIER })));
+  Object.freeze({ id: "freeze", title: "Đóng băng thời gian", icon: "freeze", price: 40 }),
+].map(item => Object.freeze({ ...item, price: calculateConsumablePrice(item.price) })));
 
 export function getLinkItemCount(id) {
   return gameState.progress.linkConnect.items[id] || 0;

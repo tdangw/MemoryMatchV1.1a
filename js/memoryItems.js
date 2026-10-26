@@ -7,7 +7,8 @@ export const MEMORY_ITEMS = Object.freeze([
   Object.freeze({ id: "preview8", type: "preview", value: 8, title: "Xem trước 8 thẻ", icon: "eye", tier: "blue" }),
   Object.freeze({ id: "preview12", type: "preview", value: 12, title: "Xem trước 12 thẻ", icon: "eye", tier: "purple" }),
   Object.freeze({ id: "previewAll", type: "preview", value: "all", title: "Xem trước tất cả", icon: "eye", tier: "gold" }),
-  Object.freeze({ id: "time10", type: "time", value: 10, title: "+10 giây", icon: "timer", tier: "teal" }),
+  // Keep the saved inventory key until existing stock has been consumed.
+  Object.freeze({ id: "time10", type: "time", value: 30, title: "+30 giây", icon: "timer", tier: "teal", legacy: true }),
   Object.freeze({ id: "time30", type: "time", value: 30, title: "+30 giây", icon: "timer", tier: "blue" }),
   Object.freeze({ id: "time45", type: "time", value: 45, title: "+45 giây", icon: "timer", tier: "purple" }),
   Object.freeze({ id: "time60", type: "time", value: 60, title: "+60 giây", icon: "timer", tier: "gold" }),

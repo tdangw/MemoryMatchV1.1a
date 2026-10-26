@@ -59,7 +59,7 @@ export function openQuickAssistOverlay(kind) {
 
   const roundId = gameState.roundId;
   const isTime = kind === "time";
-  const items = MEMORY_ITEMS.filter((item) => item.type === kind);
+  const items = MEMORY_ITEMS.filter((item) => item.type === kind && (!item.legacy || getMemoryItemCount(item.id) > 0));
   if (!items.length) return;
   let pendingPreviewItem = null;
 

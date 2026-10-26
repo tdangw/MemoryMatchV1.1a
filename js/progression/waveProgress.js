@@ -1,5 +1,6 @@
 import { getGameDefinition, getGameMode } from '../gameCatalog.js';
 import { GAMEPLAY_RULES_VERSION, getLevelWaveCount, calculateWaveTime } from './gameplayRules.js';
+import { calculateOriginalWaveTime } from './waveTiming.js';
 
 const PHASES = new Set(['playing', 'advance', 'won']);
 const KEYS = ['version', 'attemptId', 'gameId', 'mode', 'level', 'count', 'index', 'phase',
@@ -33,7 +34,17 @@ export function normalizeWaveProgress(value, identity = {}) {
   for (const key of ['completedScore', 'completedMoves', 'completedMisses', 'allocatedSeconds'])
     if (!Number.isSafeInteger(value[key]) || value[key] < 0) return null;
   const budget = calculateWaveTime({ gameId: value.gameId, mode: value.mode, totalGroups: value.groupsPerWave });
-  if (value.allocatedSeconds !== budget * value.index) return null;
+  const originalBudget = calculateOriginalWaveTime({ gameId: value.gameId, mode: value.mode, totalGroups: value.groupsPerWave });
+  // A saved run can contain an original-budget prefix followed by new-budget waves.
+  // Preserve granted seconds without accepting arbitrary or corrupt allocations.
+  let validBudget = false;
+  for (let originalWaves = 0; originalWaves <= value.index; originalWaves++) {
+    if (value.allocatedSeconds === originalBudget * originalWaves + budget * (value.index - originalWaves)) {
+      validBudget = true;
+      break;
+    }
+  }
+  if (!validBudget) return null;
   if (['gameId', 'mode', 'level', 'groupsPerWave'].some(key => identity[key] !== undefined && identity[key] !== value[key])) return null;
   return Object.freeze(Object.fromEntries(KEYS.map(key => [key, value[key]])));
 }
