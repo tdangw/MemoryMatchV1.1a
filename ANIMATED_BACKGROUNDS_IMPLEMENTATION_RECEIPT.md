@@ -9,7 +9,8 @@ commit riêng từng phase theo yêu cầu bổ sung. Không deploy/APK/push/rul
 - G1: chủ dự án đã duyệt mẫu Memory hiện tại qua câu hỏi trong chat;
   Home giữ ảnh vườn/tĩnh như quyết định bổ sung. Có mẫu dọc/ngang, A/B và
   LayerTree sơ bộ,2/2unit,8/8Playwright,check pass.
-- G2–G5: đang tiếp tục sau phê duyệt G1.
+- G2 commit `dfea4bd`; G3 đã triển khai/phủ cảnh và kiểm chức năng dọc.
+- G4/G5: còn thực hiện, chưa nghiệm thu cuối.
   Không coi việc có pilot là đạt lifecycle/runtime hoặc nghiệm thu cuối.
 
 ## Baseline và ranh giới
@@ -128,6 +129,33 @@ Source ảnh vườn được thêm vào inventory10nguồn tại `qa/pilot.json
   regression G2–G4 hoặc đo S22. Không dùng một phase thay nghiệm thu G5.
 
 ## Review và skill
+
+### G3 — phủ cảnh thật
+
+- `bindings.js` nối page/round owner; game adapters truyền identity vào
+  shared shell, startup ready/pause báo lại đúng scope. Không nhánh luật
+  game trong runtime, không sửa gameplay/persistence/API cũ.
+- `scene.js` + `primitives.js` dùng chung cho sản phẩm/mẫu duyệt, chỉ WAAPI
+  transform/opacity, SVG/CSS tĩnh. Không bitmap hoặc preload motion mới.
+  Home tĩnh theo quyết định mới; Memory tối đa2cá/1glow/1lá, Link thác,
+  Triple thác/lá tím; envelope bị crop/board/HUD/banner che thì bỏ.
+- Map đọc440×660 từ CSS owner, không nhân bản token. Tối đa3tile nhìn
+  thấy, chọn tối đa1thác/2cá/1glow/1lá trong5handle. Chặn convex hull đường,
+  cell/rương/decor; host chỉ cao viewport, nằm trước path/node trong trail.
+  Không node theo màn/chapter, không đo layout mỗi frame. Native scrollend
+  hoặc debounce140ms dùng chung timer của coordinator, không scheduler thứ2.
+- Map source cache giữ tối đa1promise readiness, không giữ Image sau settle;
+  abort bỏ deadline/listener/image khi owner/preparation bị hủy. Game source
+  dùng preload/cache hiện hữu; orientation promise/actor callback có guard
+  generation; lỗi không retry khi resize.7hash/source/region lock được sinh
+  bằng `scripts/ambient-source-lock.mjs`, kiểm bằng `--check`.
+- Đã sửa thêm hai rủi ro qua review: timer scroll-idle không bị popup khác
+  xóa làm kẹt token; dispose facade cũng hủy binding scroll ngay cả khi page
+  còn active. Unit chứng minh cả hai và stale rejection sau off→on.
+-9/9Playwright3viewport dọc pass;4/4portrait kiểm lại (404/decode boundary/
+  route trong tải chậm),10/10unit pass. Build sản phẩm exit0; ảnh thật được
+  xem trong runtime/qa, không đưa ảnh/log mới vào commit. Đây chưa là A/B
+  production/100round/soak G4. Giao diện ngang sau chỉnh do chủ dự án tự kiểm.
 
 ### Điều chỉnh G1 và G2 — 27/10
 

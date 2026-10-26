@@ -14,3 +14,10 @@ export function placeRegion(region, cover, viewport, exclusions = []) {
   if (exclusions.some(other => rect.x < other.right && rect.x + rect.width > other.left && rect.y < other.bottom && rect.y + rect.height > other.top)) return null;
   return rect;
 }
+
+export function visibleMapTiles({ scrollTop, positionY, tileHeight, viewportHeight, maxSlots = 3 }) {
+  if (![scrollTop, positionY, tileHeight, viewportHeight].every(Number.isFinite) || tileHeight <= 0 || viewportHeight <= 0) return [];
+  const first = Math.floor((scrollTop - positionY) / tileHeight);
+  const count = Math.min(maxSlots, Math.ceil((scrollTop + viewportHeight - positionY) / tileHeight) - first);
+  return Array.from({ length: Math.max(0, count) }, (_, index) => first + index);
+}

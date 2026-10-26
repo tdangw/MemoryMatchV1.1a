@@ -1,3 +1,4 @@
+import { refreshAmbientBackground } from '../backgroundEffects.js';
 // Startup work belongs to one mount; no image/node cache outlives the round.
 export const STARTUP_LIMITS = Object.freeze({ decodeConcurrency: 4, batchBudgetMs: 8 });
 class StartupCancelled extends Error {}
@@ -20,6 +21,7 @@ export function createGameShellStartup(scope, refs, onFailure) {
     refs.board.removeAttribute('aria-busy');
     delete refs.root.dataset.shellStartup;
     controls.forEach(({ node, disabled }) => { node.disabled = disabled; });
+    refreshAmbientBackground(scope);
   };
   const dispose = scope.own(() => {
     if (status === 'preparing') status = 'cancelled';

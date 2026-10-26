@@ -46,7 +46,7 @@ export function getLinkShell() {
   decorateShell(container);
   document.querySelector(".main-wrapper").append(container);
   const regions = Object.fromEntries([...container.querySelectorAll("[data-shell-region]")].map(node => [node.dataset.shellRegion, node]));
-  shell = createGameShell({ root: container, regions, title: "Link Connect" });
+  shell = createGameShell({ root: container, regions, title: "Link Connect", backgroundScene: 'link-connect' });
   return shell;
 }
 

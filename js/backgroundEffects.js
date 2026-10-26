@@ -61,4 +61,5 @@ export function suspendAmbientBackground() {
   return runtime.suspend();
 }
 export function refreshAmbientBackground(scope) { if (runtime) runtime.refresh(scope); }
+export function scheduleAmbientIdle(callback, delay) { if (!runtime) throw new Error('Missing ambient owner'); return runtime.idle(callback, delay); }
 export function getAmbientDiagnostics() { return runtime ? runtime.diagnostics() : { state: 'DISPOSED', scenes: 0, nodes: 0, handles: 0, timers: 0, pendingFrames: 0 }; }

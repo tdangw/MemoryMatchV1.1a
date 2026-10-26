@@ -10,6 +10,8 @@
 - G1:2/2unit,8/8Playwright4viewport, check pass; A/B PC sơ bộ3cặp10s sau preview/guide boundary, delta p95≈0/p99≤0,3ms,4layer nền nhỏ được phân loại bằng backendNodeId. Pilot11node/4handle/0timer;100lần tạo/hủy về0. Evidence/video/trace nén ở docs/design/animated-backgrounds/qa; đây chưa là nghiệm thu G4.
 - Điều chỉnh G1 theo yêu cầu tiếp: cá đầu đi trước, thêm cá giữa hồ lộ/bớt1đom đóm, tổng vẫn4animation/4layer,12node.6/6Playwright dọc320/412/900pass; A/B900×1024 có assertion đủ2cá active, delta p95/p99 không tăng trong3cặp10s. Game thưa, ưu tiên hoàn thiện bản đồ. Từ mốc này chỉ agent kiểm dọc; ngang chủ dự án tự kiểm.
 - G2 owner/scheduler và token popup/ad đã triển khai; đang chốt unit/regression và commit trước G3. Giữ facade cũ/hai slot sao băng; remove fog/cloud khởi tạo vô chủ. Không stage log/ảnh QA hoặc file task khác theo quy định27/10.
+- G2 commit `dfea4bd`. G3 đã phủ Home tĩnh, map và ba game bằng renderer SVG/CSS dùng chung; preset theo source dọc/ngang độc lập, source lock7ảnh; không bitmap mới. Map tối đa3tile/5target, clip viewport và tránh hull đường/node/rương; scrollend có fallback dùng chung scheduler. Scope/startup/pause và đổi nguồn nối owner, abort chuẩn bị map khi bị hủy.
+- G3:9/9matrix dọc320/412/900pass;4/4portrait kiểm lại gồm404/tải chậm/staleowner;10/10unit geometry/runtime pass, build sản phẩm pass. Đang chuyển G4 regression/hiệu suất/soak; chưa nhận đạt S22 hoặc kiểm ngang mới.
 
 ## Quy tắc làm việc bổ sung —26/10/2026
 

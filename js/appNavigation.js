@@ -1,4 +1,4 @@
-import { setMeteorSceneEligible } from "./backgroundEffects.js";
+import { setMeteorSceneEligible, suspendAmbientBackground } from './backgroundEffects.js';
 import { createIcon } from "./icons.js";
 import { gameState } from "./gameState.js";
 import { getGameDefinition, GAME_DEFINITIONS, getGameModeLabel } from "./gameCatalog.js";
@@ -75,6 +75,7 @@ export function decorateAdventureMenu(root, { gameId = null, onHome } = {}) {
     setMeteorSceneEligible(action === 'map');
     if (action === 'map') { root.querySelector('[data-dock-action="map"]').focus(); return; }
     const viewScope = createGameShellLifecycle();
+    viewScope.own(suspendAmbientBackground());
     screen = viewScope;
     const view = document.createElement('section');
     view.className = 'adventure-page adventure-screen';

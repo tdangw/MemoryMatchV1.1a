@@ -18,7 +18,7 @@ const GAME_BACKGROUNDS = Object.freeze({
 });
 
 const preloadCache = new Map();
-const BACKGROUND_LOAD_DEADLINE_MS = 8000;
+export const BACKGROUND_LOAD_DEADLINE_MS = 8000;
 let transitionRevision = 0;
 let settlePendingTransition = null;
 
@@ -62,7 +62,7 @@ export function cancelGameBackgroundTransition() {
   layer?.classList.remove("is-visible");
 }
 
-function getGameBackgroundSource(gameId) {
+export function getGameBackgroundSource(gameId) {
   const background = GAME_BACKGROUNDS[gameId];
   if (!background) return null;
   const orientation = window.matchMedia("(orientation: portrait)").matches

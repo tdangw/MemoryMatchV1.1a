@@ -40,7 +40,7 @@ export function getTripleShell() {
     items.append(button);
   });
   const regions = Object.fromEntries([...root.querySelectorAll("[data-shell-region]")].map(node => [node.dataset.shellRegion, node]));
-  shell = createGameShell({ root, regions, title: "Triple Connect" });
+  shell = createGameShell({ root, regions, title: "Triple Connect", backgroundScene: 'triple-connect' });
   return shell;
 }
 

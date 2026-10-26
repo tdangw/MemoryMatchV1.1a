@@ -20,6 +20,8 @@ import { renderTreasureMapCard } from './progression/treasureMapCard.js';
 import { confirmFirstPlay } from './tutorial/firstPlay.js';
 import { playOwnedRewardCue } from './sound.js';
 import { mountPlayerHeaderPortrait } from './progression/playerHeaderPortrait.js';
+import { mountMapAmbient } from './background/bindings.js';
+import { refreshAmbientBackground } from './backgroundEffects.js';
 
 const views = new Map(); // One bounded view per released game, independent of durable progress.
 const MAP_TEXTURE_HEIGHT = 660;
@@ -62,6 +64,7 @@ export function mountAdventureMap(gameId) {
   document.body.append(root);
   void ensureUiSkinRewards();
   const scope = decorateAdventureMenu(root, { gameId });
+  mountMapAmbient(scope, root, trail, scroll);
   root.classList.add("game-shell-tokens");
   const title = document.createElement("h1");
   title.className = "adventure-map-title";
@@ -278,6 +281,7 @@ export function mountAdventureMap(gameId) {
     patchNodes();
     body.removeAttribute("aria-busy");
     root.dataset.mapReady = "true";
+    refreshAmbientBackground(scope);
     if (pendingTreasure !== null) { const block = pendingTreasure; pendingTreasure = null; openChest({chestNumber:block}); }
     if (view.anchor) {
       scroll.scrollTop = position(view.anchor.level).y - view.anchor.screenY;

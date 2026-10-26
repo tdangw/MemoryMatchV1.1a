@@ -1,10 +1,15 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { coverGeometry, placeRegion } from '../../js/background/geometry.js';
+import { coverGeometry, placeRegion, visibleMapTiles } from '../../js/background/geometry.js';
 
 test('center cover uses the real source aspect and rejects invalid measurements', () => {
   assert.deepEqual(coverGeometry(844, 390, 1536, 1024), { scale: 844 / 1536, x: 0, y: (390 - 1024 * 844 / 1536) / 2 });
   for (const width of [0, -1, NaN, Infinity]) assert.equal(coverGeometry(width, 390, 1536, 1024), null);
+});
+test('map repetition handles negative origins and arbitrarily long chapters with three viewport slots', () => {
+  assert.deepEqual(visibleMapTiles({scrollTop:0,positionY:200,tileHeight:660,viewportHeight:915}),[-1,0,1]);
+  assert.equal(visibleMapTiles({scrollTop:1040000,positionY:312,tileHeight:660,viewportHeight:9000}).length,3);
+  assert.deepEqual(visibleMapTiles({scrollTop:NaN,positionY:0,tileHeight:660,viewportHeight:915}),[]);
 });
 test('entire motion envelope must fit crop and avoid every interactive region', () => {
   const cover = coverGeometry(400, 800, 1000, 2000);

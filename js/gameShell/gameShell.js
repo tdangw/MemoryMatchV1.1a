@@ -5,12 +5,13 @@ import { disposeAppPage } from "../appPageLifecycle.js";
 import { mountGameplayTouchEffects } from "../appNavigation.js";
 import { mountGameplayBanner } from '../ads/menuAds.js';
 import { mountPlayerHeaderPortrait } from '../progression/playerHeaderPortrait.js';
+import { mountGameplayAmbient, setAmbientPaused } from '../background/bindings.js';
 
 let activeShell = null;
 const regionNames = ["title", "progress", "hud", "milestones", "frame", "board"];
 
 /** Adopt existing regions or create empty semantic slots for a new adapter. */
-export function createGameShell({ root = document.createElement("section"), regions = {}, title = "", display = "" } = {}) {
+export function createGameShell({ root = document.createElement("section"), regions = {}, title = "", display = "", backgroundScene = null } = {}) {
   const refs = { root };
   root.classList.add("game-shell-root", "game-shell-tokens");
   root.setAttribute("role", "region");
@@ -66,6 +67,7 @@ export function createGameShell({ root = document.createElement("section"), regi
       mountPlayerHeaderPortrait(refs.title,nextScope);
       mountGameplayTouchEffects(root, nextScope);
       mountGameplayBanner(root, nextScope);
+      if (backgroundScene) mountGameplayAmbient(nextScope, root, backgroundScene);
       if (cleanup) nextScope.own(cleanup);
       assertVisibleScope("mount");
       return nextScope;
@@ -74,6 +76,7 @@ export function createGameShell({ root = document.createElement("section"), regi
       assertVisibleScope("update");
       if (!scope?.active || getActiveGameScope() !== scope) return;
       root.dataset.shellPaused = String(paused);
+      setAmbientPaused(scope, paused);
     },
     unmount() {
       if (scope?.active) scope.dispose();

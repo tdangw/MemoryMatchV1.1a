@@ -4,7 +4,7 @@ import { createGameShellHud } from "../gameShell/gameShellHud.js";
 import { formatClockTime } from "../uiCatalog.js";
 
 const regions = Object.fromEntries([...memoryRoot.querySelectorAll("[data-shell-region]")].map(node => [node.dataset.shellRegion, node]));
-const shell = createGameShell({ root: memoryRoot, regions, title: "Memory Match", display: "flex" });
+const shell = createGameShell({ root: memoryRoot, regions, title: "Memory Match", display: "flex", backgroundScene: 'memory-match' });
 export function getMemoryShell() { return shell; }
 let memory;
 export function getMemoryHud() {

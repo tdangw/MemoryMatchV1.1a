@@ -21,6 +21,7 @@ import {
 
 import { mountAdventureMap } from "./adventureMap.js";
 import { decorateAdventureMenu } from "./appNavigation.js";
+import { mountHomeAmbient } from './background/bindings.js';
 
 const HOME_ART = Object.freeze({
   'memory-match': 'memory-match-v2.webp',
@@ -71,6 +72,7 @@ export function showGameSelector() {
     onWarm: () => preloadGameBackground(game.id),
   }, scope));
   mountGameCarousel(carousel, choices, games, scope);
+  mountHomeAmbient(scope, overlay);
 }
 
 function mountGameCarousel(carousel, choices, games, scope) {

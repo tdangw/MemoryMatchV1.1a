@@ -1,0 +1,270 @@
+[
+  {
+    "source": "/assets/images/backgrounds/memory-match-portrait-9x20.webp",
+    "width": 1080,
+    "height": 2400,
+    "regions": [
+      {
+        "kind": "fish",
+        "x": 158,
+        "y": 1440,
+        "width": 120,
+        "height": 38
+      },
+      {
+        "kind": "fish",
+        "x": 480,
+        "y": 1700,
+        "width": 140,
+        "height": 38
+      },
+      {
+        "kind": "firefly",
+        "x": 30,
+        "y": 1330,
+        "width": 32,
+        "height": 40
+      },
+      {
+        "kind": "leaf",
+        "x": 48,
+        "y": 1450,
+        "width": 40,
+        "height": 100
+      }
+    ],
+    "sha256": "7b08aff1ae0d9f050b9c30f4c1f725fe096fc6682c735a618f202c9a0f29a6db"
+  },
+  {
+    "source": "/assets/images/backgrounds/memory-match.webp",
+    "width": 1254,
+    "height": 1254,
+    "regions": [
+      {
+        "kind": "fish",
+        "x": 105,
+        "y": 770,
+        "width": 78,
+        "height": 34
+      },
+      {
+        "kind": "fish",
+        "x": 500,
+        "y": 1050,
+        "width": 140,
+        "height": 38
+      },
+      {
+        "kind": "firefly",
+        "x": 29,
+        "y": 645,
+        "width": 25,
+        "height": 32
+      },
+      {
+        "kind": "leaf",
+        "x": 50,
+        "y": 745,
+        "width": 34,
+        "height": 90
+      }
+    ],
+    "sha256": "bcab00c0daa8ab694f8c9446304d701a4201088940795cdab356c723861a5715"
+  },
+  {
+    "source": "/assets/images/backgrounds/link-connect-portrait-9x20.webp",
+    "width": 1080,
+    "height": 2400,
+    "regions": [
+      {
+        "kind": "water",
+        "x": 98,
+        "y": 353,
+        "width": 26,
+        "height": 128
+      },
+      {
+        "kind": "water",
+        "x": 181,
+        "y": 2050,
+        "width": 28,
+        "height": 125
+      }
+    ],
+    "sha256": "7b201abcb7ae058d6dd234e2baf73697d3a4588ca7cb4c814243dfc9344217b9"
+  },
+  {
+    "source": "/assets/images/backgrounds/link-connect.webp",
+    "width": 1254,
+    "height": 1254,
+    "regions": [
+      {
+        "kind": "water",
+        "x": 79,
+        "y": 218,
+        "width": 18,
+        "height": 94
+      },
+      {
+        "kind": "water",
+        "x": 133,
+        "y": 1051,
+        "width": 20,
+        "height": 58
+      }
+    ],
+    "sha256": "d38ebadfea9ac3501c407bddd6398c4bc825c86ddadfe7bd763206895bcf69c2"
+  },
+  {
+    "source": "/assets/images/backgrounds/triple-connect-portrait-9x20.webp",
+    "width": 1080,
+    "height": 2400,
+    "regions": [
+      {
+        "kind": "water",
+        "x": 122,
+        "y": 579,
+        "width": 20,
+        "height": 138
+      },
+      {
+        "kind": "water",
+        "x": 969,
+        "y": 995,
+        "width": 18,
+        "height": 135
+      },
+      {
+        "kind": "leaf",
+        "x": 39,
+        "y": 1470,
+        "width": 42,
+        "height": 105,
+        "color": "#9580ad",
+        "phase": 6000
+      }
+    ],
+    "sha256": "8c829bb910903a01247a920f667f9b8ec9bdc0704e06a9ed5d0e26e74b94e4c5"
+  },
+  {
+    "source": "/assets/images/backgrounds/triple-connect.webp",
+    "width": 1254,
+    "height": 1254,
+    "regions": [
+      {
+        "kind": "water",
+        "x": 133,
+        "y": 329,
+        "width": 16,
+        "height": 101
+      },
+      {
+        "kind": "water",
+        "x": 1148,
+        "y": 390,
+        "width": 19,
+        "height": 118
+      },
+      {
+        "kind": "leaf",
+        "x": 32,
+        "y": 714,
+        "width": 35,
+        "height": 90,
+        "color": "#9580ad",
+        "phase": 6000
+      }
+    ],
+    "sha256": "ab10279629197fb0b013635e89b0f8b9b00d3be044db8e8a8b1f2a8077b5ed0c"
+  },
+  {
+    "source": "/assets/adventure/moonlit-garden.webp",
+    "width": 1024,
+    "height": 1536,
+    "regions": [
+      {
+        "kind": "water",
+        "x": 181,
+        "y": 524,
+        "width": 22,
+        "height": 69
+      },
+      {
+        "kind": "water",
+        "x": 103,
+        "y": 716,
+        "width": 19,
+        "height": 64
+      },
+      {
+        "kind": "water",
+        "x": 869,
+        "y": 1149,
+        "width": 17,
+        "height": 50
+      },
+      {
+        "kind": "fish",
+        "x": 720,
+        "y": 883,
+        "width": 110,
+        "height": 36
+      },
+      {
+        "kind": "fish",
+        "x": 288,
+        "y": 616,
+        "width": 110,
+        "height": 36,
+        "phase": 2600
+      },
+      {
+        "kind": "fish",
+        "x": 488,
+        "y": 1350,
+        "width": 125,
+        "height": 36
+      },
+      {
+        "kind": "fish",
+        "x": 301,
+        "y": 1058,
+        "width": 110,
+        "height": 36
+      },
+      {
+        "kind": "firefly",
+        "x": 222,
+        "y": 375,
+        "width": 36,
+        "height": 42,
+        "phase": 4000
+      },
+      {
+        "kind": "firefly",
+        "x": 825,
+        "y": 1000,
+        "width": 36,
+        "height": 42,
+        "phase": 6000
+      },
+      {
+        "kind": "leaf",
+        "x": 260,
+        "y": 931,
+        "width": 40,
+        "height": 100,
+        "phase": 5000
+      },
+      {
+        "kind": "leaf",
+        "x": 751,
+        "y": 447,
+        "width": 40,
+        "height": 100,
+        "phase": 9000
+      }
+    ],
+    "sha256": "60492ef5a46ec2e7f216529b40ae7cea7b141371ef0ed1494661bdf839671703"
+  }
+]

@@ -70,3 +70,31 @@ test('a scene exceeding the fixed Light budget falls static and is disposed', as
   await turn(); assert.equal(f.runtime.diagnostics().state, 'STATIC'); assert.equal(disposed, 1); assert.match(f.runtime.diagnostics().lastError, /Error/);
   f.runtime.dispose();
 });
+
+test('turning off pending preparation aborts it; a stale rejection cannot fail the resumed owner', async () => {
+  const f=fixture(), pending=[];
+  f.mount({prepare:signal=>new Promise((resolve,reject)=>pending.push({signal,resolve,reject}))});
+  await turn(); f.runtime.setEnabled(false); assert.equal(pending[0].signal.aborted,true);
+  f.runtime.setEnabled(true); await turn(); assert.equal(pending.length,2);
+  pending[0].reject(new Error('late failure')); pending[1].resolve(f.factory); await turn();
+  assert.equal(f.live,1); assert.equal(f.runtime.diagnostics().state,'RUNNING'); assert.equal(f.errors.length,0); f.runtime.dispose();
+});
+
+test('the shared scroll-idle timer survives another popup and is cancelled on system off', async () => {
+  const f=fixture();let resumeScroll=null,cancelIdle=null;
+  const end=()=>{if(cancelIdle)cancelIdle();cancelIdle=null;const resume=resumeScroll;resumeScroll=null;if(resume)resume();};
+  f.mount({onInactive:end});await turn();resumeScroll=f.runtime.suspend();cancelIdle=f.runtime.idle(end,140);
+  const popup=f.runtime.suspend();assert.equal(f.timers.size,1);
+  f.runtime.refresh();assert.equal(f.timers.size,1);
+  for(const [id,fn] of [...f.timers]){f.timers.delete(id);fn();}
+  assert.equal(f.runtime.diagnostics().blockers,1);popup();assert.equal(f.live,1);
+  resumeScroll=f.runtime.suspend();cancelIdle=f.runtime.idle(end,140);f.runtime.setEnabled(false);
+  assert.equal(f.timers.size,0);assert.equal(f.runtime.diagnostics().blockers,0);f.runtime.dispose();
+});
+
+test('replacing or disposing the app owner releases scene bindings even while its page remains active', async () => {
+  const f=fixture();let cleanups=0;
+  const page=f.mount({onDispose:()=>cleanups++});await turn();
+  f.mount();await turn();assert.equal(cleanups,1);assert.equal(page.scope.active,true);
+  f.runtime.dispose();assert.equal(f.live,0);assert.equal(f.timers.size,0);assert.equal(f.frames.size,0);
+});
