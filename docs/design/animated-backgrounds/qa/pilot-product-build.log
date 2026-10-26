@@ -1,0 +1,62 @@
+
+> memory-match-adventure@1.1.0-a prebuild
+> npm run assets:sync
+
+
+> memory-match-adventure@1.1.0-a assets:sync
+> node scripts/generate-theme-manifest.mjs && node scripts/generate-game-shell-tokens.mjs && node scripts/generate-privacy-page.mjs
+
+Indexed 2472 theme images across 26 folders.
+Generated C:\Users\Dang\MyProject\MemoryMatchV1.1a\styles\game-shell\tokens.css.
+Generated public privacy page.
+
+> memory-match-adventure@1.1.0-a build
+> vite build --base=/
+
+vite v6.4.3 building for production...
+transforming...
+
+__VITE_PUBLIC_ASSET__7f8e62c6__ referenced in __VITE_PUBLIC_ASSET__7f8e62c6__ didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+__VITE_PUBLIC_ASSET__110727c5__ referenced in __VITE_PUBLIC_ASSET__110727c5__ didn't resolve at build time, it will remain unchanged to be resolved at runtime
+✓ 320 modules transformed.
+rendering chunks...
+[plugin vite:reporter]
+(!) C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/firebaseBackend.js is dynamically imported by C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/profileStatsService.js but also statically imported by C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/accountService.js, C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/analyticsService.js, C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/leaderboardPanel.js, C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/leaderboardService.js, C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/liveops/service.js, C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/progression/publicCosmeticSync.js, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter]
+(!) C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/cloudStore.js is dynamically imported by C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/liveops/service.js but also statically imported by C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/accountService.js, C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/liveops/service.js, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter]
+(!) C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/accountService.js is dynamically imported by C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/main.js but also statically imported by C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/accountPanel.js, C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/ads/rewarded.js, C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/analyticsService.js, C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/leaderboardPanel.js, C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/leaderboardService.js, C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/liveops/service.js, C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/progression/profileCosmetics.js, C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/progression/publicCosmeticSync.js, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter]
+(!) C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/sound.js is dynamically imported by C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/coinRewards.js but also statically imported by C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/adventureMap.js, C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/gameController.js, C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/gameSelector.js, C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/linkConnect/linkController.js, C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/linkConnect/linkRenderer.js, C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/logic.js, C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/main.js, C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/mainmenu.js, C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/memorySpecial.js, C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/progression/achievementCollection.js, C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/progression/summaryCoins.js, C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/progression/summaryRewardAudio.js, C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/progression/treasureAnimation.js, C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/settings.js, C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/tripleConnect/tripleController.js, C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/ui.js, C:/Users/Dang/MyProject/MemoryMatchV1.1a/js/victoryCelebration.js, dynamic import will not move module into another chunk.
+
+computing gzip size...
+dist/index.html                                      7.36 kB │ gzip:   2.08 kB
+dist/assets/presentation-81cF5hTa.css                2.85 kB │ gzip:   1.16 kB
+dist/assets/achievementAnnouncements-DWh8sqV2.css   14.30 kB │ gzip:   3.86 kB
+dist/assets/main-nlGLg6UT.css                      112.63 kB │ gzip:  16.43 kB
+dist/assets/index-DQNzRhfi.css                     201.25 kB │ gzip:  39.70 kB
+dist/assets/profileStatsStore-CihxggFr.js            0.92 kB │ gzip:   0.56 kB
+dist/assets/web-41AuzaGY.js                          0.93 kB │ gzip:   0.45 kB
+dist/assets/analyticsService-SGlDyR23.js             1.44 kB │ gzip:   0.87 kB
+dist/assets/publicCosmeticStore-CknlVUIj.js          2.07 kB │ gzip:   1.10 kB
+dist/assets/web-Bk92wzPY.js                          2.47 kB │ gzip:   0.78 kB
+dist/assets/publicCosmeticSync-45sjplll.js           3.11 kB │ gzip:   1.50 kB
+dist/assets/nativeAdapter-CJoAlQaF.js                3.85 kB │ gzip:   1.32 kB
+dist/assets/index-DmqCuHOg.js                        7.62 kB │ gzip:   3.26 kB
+dist/assets/leaderboardService-DbefL1nj.js           9.88 kB │ gzip:   4.34 kB
+dist/assets/accountPanel-Ca7vHFUs.js                10.63 kB │ gzip:   4.16 kB
+dist/assets/presentation-BgsZ4K-n.js                11.14 kB │ gzip:   4.91 kB
+dist/assets/leaderboardPanel-HTCK9DTc.js            11.24 kB │ gzip:   4.37 kB
+dist/assets/firebase-analytics-BIHGOao8.js          15.72 kB │ gzip:   4.29 kB
+dist/assets/practice-CAG2ZLcP.js                    23.86 kB │ gzip:   8.88 kB
+dist/assets/theme-manifest-B2FWcF9N.js              97.68 kB │ gzip:  13.21 kB
+dist/assets/firebase-auth-BlBFwkM9.js              114.99 kB │ gzip:  23.36 kB
+dist/assets/firebase-core-DsQqNHh5.js              115.20 kB │ gzip:  32.19 kB
+dist/assets/achievementAnnouncements-BsljM9_4.js   319.80 kB │ gzip:  85.33 kB
+dist/assets/main-CamDXwUf.js                       404.27 kB │ gzip: 132.65 kB
+dist/assets/firebase-firestore-DNG-3Ebw.js         480.87 kB │ gzip: 119.05 kB
+✓ built in 22.13s

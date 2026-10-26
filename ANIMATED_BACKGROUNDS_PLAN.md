@@ -5,6 +5,14 @@ runtime, tạo asset động, đổi giao diện hoặc phát hành.** Đây là
 hiện hành duy nhất của task nền động; các kế hoạch phần thưởng trước đó đã
 hoàn tất, giữ làm lịch sử và không mở lại.
 
+**Cập nhật triển khai26/10:** Chủ dự án đã giao toàn G0–G5, commit từng
+phase; trạng thái ở receipt và CONTEXT. Phần “chỉ lập kế hoạch” là lịch sử.
+Kiểm ảnh G1 phát hiện Home thực tế dùng ảnh vườn tại `home-menu.css`, che
+kín nền body sao/thác. Chủ dự án đã chốt **giữ ảnh vườn hiện tại; Home giữ
+tĩnh khi không có vùng phù hợp**. Không đổi ảnh Home hoặc animate hình
+trong card chọn trò. Quyết định này thay ứng viên thác Home trong bảng
+cảnh/G1 bên dưới; pilot động duyệt trên hồ Memory, Home kiểm fallback.
+
 ## 1. Mục tiêu, quyết định đã chốt và giới hạn
 
 Chủ dự án đã xác nhận:

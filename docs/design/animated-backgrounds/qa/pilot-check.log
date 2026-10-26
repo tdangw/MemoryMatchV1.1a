@@ -1,0 +1,244 @@
+
+> memory-match-adventure@1.1.0-a check
+> npm run assets:sync && node scripts/check-js.mjs && node scripts/check-css-ownership.mjs && node scripts/check-effect-v2.mjs && node scripts/check-game-core.mjs && node scripts/check-game-registry.mjs && node scripts/check-theme-selection.mjs && node scripts/check-triple-connect-rules.mjs && node scripts/check-triple-connect-board.mjs && node scripts/check-hint-inventory.mjs && node scripts/check-session-timing.mjs && node scripts/check-persistence.mjs && node scripts/check-adventure-progress.mjs && node scripts/check-adventure-map-layout.mjs && node scripts/check-adventure-preview.mjs && node scripts/check-chapter-store.mjs && node scripts/check-migration-recovery.mjs && node scripts/check-adventure-rewards.mjs && node scripts/check-play-metrics.mjs && node scripts/check-ranking-rules.mjs && node scripts/check-ranking-checkpoints.mjs && node scripts/check-progress-ranking.mjs && node scripts/check-pair-rewards.mjs && node scripts/check-level-progression.mjs && node scripts/check-leaderboard.mjs && node scripts/check-leaderboard-presentation.mjs && node scripts/check-profile-stats.mjs && node scripts/check-analytics.mjs && node scripts/check-recent-game.mjs && node scripts/check-cloud-save-events.mjs && node scripts/check-cloud-snapshot.mjs && node scripts/check-pwa.mjs && node scripts/check-memory-special.mjs && node scripts/check-link-connect-core.mjs && node scripts/check-link-connect-board.mjs && node scripts/check-appearance-themes.mjs && node scripts/check-game-shell-config.mjs && node scripts/check-game-shell-layout.mjs && node scripts/check-game-shell-lifecycle.mjs && node scripts/check-game-shell-contract.mjs && node scripts/generate-game-shell-tokens.mjs --check && npm run check:technical && npm run test:ads
+
+
+> memory-match-adventure@1.1.0-a assets:sync
+> node scripts/generate-theme-manifest.mjs && node scripts/generate-game-shell-tokens.mjs && node scripts/generate-privacy-page.mjs
+
+Indexed 2472 theme images across 26 folders.
+Generated C:\Users\Dang\MyProject\MemoryMatchV1.1a\styles\game-shell\tokens.css.
+Generated public privacy page.
+Checked 216 JavaScript modules.
+CSS ownership and collision checks passed.
+Effect V2 catalog, geometry, quality and pool checks passed.
+Shared game catalog checks passed.
+Game registry release and unknown-ID contracts passed.
+Shared theme selection checks passed.
+[Persistence] initialize: localStorage is not defined
+Triple Connect pure rules and state contracts passed.
+Triple Connect Easy board and solver contracts passed (p95 15.99 ms).
+Hint inventory current-contract checks passed.
+Session timing checks passed.
+[Persistence] write: Quota exceeded
+[Persistence] write: Quota exceeded
+[Persistence] write: Quota exceeded
+[Persistence] read: Expected property name or '}' in JSON at position 1 (line 1 column 2)
+[Persistence] read: Bản lưu không đúng định dạng hỗ trợ. Dữ liệu gốc được giữ nguyên.
+[Persistence] read: Bản lưu không đúng định dạng hỗ trợ. Dữ liệu gốc được giữ nguyên.
+[Persistence] read: Bản lưu không đúng định dạng hỗ trợ. Dữ liệu gốc được giữ nguyên.
+[Persistence] write: Dữ liệu đã được cập nhật ở tab khác.
+[Persistence] write: Quota exceeded
+[Persistence] initialize: Backend dữ liệu đã dùng trước đây không khả dụng. Không sử dụng bản v1 cũ.
+Persistence migration source preservation, failure recovery, queued settings and fail-closed transactions passed.
+Adventure sequential unlock, shared completion, chapter boundary, chest eligibility and sparse-history checks passed.
+Adventure map geometry/scenery: deterministic, bounded, collision-safe and seam-stable.
+All-mode level previews, special first-level rules, first-start hints, tray bounds and read-only contract passed.
+[Persistence] initialize: Profile không đúng định dạng hiện hành.
+Chapter migration, bounded hydration, archived records, atomic wallet/claim and revision conflict checks passed.
+[Persistence] initialize: Migration quota failure
+[Persistence] initialize: Marker acknowledgment failure
+[Persistence] initialize: Backend dữ liệu đã dùng trước đây không khả dụng. Không sử dụng bản v1 cũ.
+Interrupted migration, idempotent retry, durable primary barrier and marker acknowledgment failure checks passed.
+[Persistence] write: Quota exceeded
+Reward weights/bounds, zero-star eligibility, duplicate claim, stored outcome and failed-claim rollback checks passed.
+Active play timing, nested modal/visibility pause, finalization and restoration checks passed.
+Ranking comparator, restart replacement, level-15 final score and finalized run checks passed.
+Six v2 checkpoint boards: clear/restart/reclear/advance, unfinished loss, owner, reload, legacy normalization and stable page ordering passed.
+Proven v1 cleared totals import as v2 idempotently; ambiguous aggregates remain historical.
+Progress ranking v3: six runs, max-only checkpoints, owner-safe bounded migration, retry/rollback and 100000 archived level passed.
+Pair rewards: Memory lucky/caps/milestone and 60 Link mode/milestone/premium cases settle without pending animation-owned mutations.
+Level progression: shared difficulty unlock, bounded pair layouts and Triple intro witnesses passed.
+High-level witnesses passed; max generation 176.43ms across 28 cases (desktop Node, not phone FPS).
+Leaderboard immutable checkpoint, historical records, owner isolation and board versions passed.
+Leaderboard presentation checks passed.
+Private profile counters, replay/stale/multi-device totals, old-data validation and checkpoint ownership passed.
+Analytics production-only/test exclusion and event-driven non-duplicated active segments passed.
+Recent game defaults, reload and concurrent catalog settings writes passed.
+Cloud backup event boundaries passed.
+Cloud chunk integrity/Unicode, incremental history, atomic identity/import rollback and bounded recovery backups passed.
+PWA offline upgrade checks passed.
+PWA early and late bootstrap registration passed.
+Memory special rewards and inventory checks passed.
+Link Connect core checks passed.
+Link Connect board checks passed.
+Appearance theme checks passed.
+Game Shell defaults, overrides, validation and production fallback passed.
+Game Shell fit bounds, borders, rounding, tiny viewports and configuration passed.
+Game Shell lifecycle cancellation, stale callbacks, ownership and idempotent cleanup passed.
+Game Shell import, ownership, region and legacy cleanup contracts passed.
+
+> memory-match-adventure@1.1.0-a check:technical
+> node scripts/check-technical-boundaries.mjs && node scripts/check-memory-decisions.mjs && node scripts/check-link-thunder-eligibility.mjs && node scripts/check-technical-pathfinder.mjs
+
+Rule dependency boundaries and RNG-free six-mode/level preview matrix passed.
+Memory pure selection/pair clock boundaries, snapshot format and idempotent cleanup passed.
+Thunder approved preflight: frozen/special/lucky/singletons reject without RNG/mutation; successful selection retains one RNG call.
+{
+  "boards": 100,
+  "routeComparisons": 3000,
+  "baseline": {
+    "boolean": {
+      "p50": 176.76710000000003,
+      "p95": 206.5567000000001,
+      "p99": 206.5567000000001,
+      "samples": [
+        151.59730000000013,
+        157.60590000000002,
+        171.21799999999985,
+        176.76710000000003,
+        180.7134000000001,
+        186.61550000000034,
+        206.5567000000001
+      ]
+    },
+    "listing": {
+      "p50": 142.65740000000005,
+      "p95": 168.03020000000015,
+      "p99": 168.03020000000015,
+      "samples": [
+        119.18190000000004,
+        128.4142999999999,
+        137.90689999999995,
+        142.65740000000005,
+        145.41530000000012,
+        146.4423999999999,
+        168.03020000000015
+      ]
+    }
+  },
+  "candidate": {
+    "boolean": {
+      "p50": 3.9043000000001484,
+      "p95": 3.9484999999999673,
+      "p99": 3.9484999999999673,
+      "samples": [
+        3.6109999999998763,
+        3.6293000000000575,
+        3.8588999999997213,
+        3.9043000000001484,
+        3.9054000000000997,
+        3.910699999999906,
+        3.9484999999999673
+      ]
+    },
+    "listing": {
+      "p50": 86.85519999999997,
+      "p95": 118.42020000000002,
+      "p99": 118.42020000000002,
+      "samples": [
+        76.55709999999999,
+        82.6180000000004,
+        86.3448000000003,
+        86.85519999999997,
+        89.12249999999949,
+        98.14390000000003,
+        118.42020000000002
+      ]
+    }
+  }
+}
+
+> memory-match-adventure@1.1.0-a test:ads
+> node --test tests/unit/ads.test.js
+
+TAP version 13
+# Subtest: configuration rejects interchanged IDs and mismatched publishers, Android ID matches
+ok 1 - configuration rejects interchanged IDs and mismatched publishers, Android ID matches
+  ---
+  duration_ms: 2.1358
+  type: 'test'
+  ...
+# Subtest: web does not initialize, request consent, or offer a reward
+ok 2 - web does not initialize, request consent, or offer a reward
+  ---
+  duration_ms: 1.3154
+  type: 'test'
+  ...
+# Subtest: concurrent initialization shares work, consent precedes SDK and child protection covers every request
+ok 3 - concurrent initialization shares work, consent precedes SDK and child protection covers every request
+  ---
+  duration_ms: 0.6989
+  type: 'test'
+  ...
+# Subtest: required form gates initialization; no permission never initializes
+ok 4 - required form gates initialization; no permission never initializes
+  ---
+  duration_ms: 0.2982
+  type: 'test'
+  ...
+# Subtest: failed consent and SDK initialization can recover on a subsequent event
+ok 5 - failed consent and SDK initialization can recover on a subsequent event
+  ---
+  duration_ms: 0.519
+  type: 'test'
+  ...
+# Subtest: privacy changes refresh authorization and publish a new snapshot
+ok 6 - privacy changes refresh authorization and publish a new snapshot
+  ---
+  duration_ms: 1.2294
+  type: 'test'
+  ...
+# Subtest: a failed privacy form never leaves prior permission usable
+ok 7 - a failed privacy form never leaves prior permission usable
+  ---
+  duration_ms: 0.4534
+  type: 'test'
+  ...
+# Subtest: leaving during preparation never shows an ad or retains listeners
+ok 8 - leaving during preparation never shows an ad or retains listeners
+  ---
+  duration_ms: 0.5531
+  type: 'test'
+  ...
+# Subtest: pending show completes before old teardown and new creation; stale events cannot alter a new page
+ok 9 - pending show completes before old teardown and new creation; stale events cannot alter a new page
+  ---
+  duration_ms: 0.9395
+  type: 'test'
+  ...
+# Subtest: no-fill tears down once, does not loop, and retries on a later explicit event
+ok 10 - no-fill tears down once, does not loop, and retries on a later explicit event
+  ---
+  duration_ms: 0.7669
+  type: 'test'
+  ...
+# Subtest: 30 menu/game cycles and repeated disposal return banner/listeners to baseline
+ok 11 - 30 menu/game cycles and repeated disposal return banner/listeners to baseline
+  ---
+  duration_ms: 5.3433
+  type: 'test'
+  ...
+# Subtest: disposal during listener registration releases the late handle without showing
+ok 12 - disposal during listener registration releases the late handle without showing
+  ---
+  duration_ms: 0.6002
+  type: 'test'
+  ...
+# Subtest: partial registration failure cleans earlier handles immediately
+ok 13 - partial registration failure cleans earlier handles immediately
+  ---
+  duration_ms: 0.4944
+  type: 'test'
+  ...
+# Subtest: home → hidden → home during listener registration eventually shows exactly one banner
+ok 14 - home → hidden → home during listener registration eventually shows exactly one banner
+  ---
+  duration_ms: 0.8378
+  type: 'test'
+  ...
+# Subtest: failed remove never permits a second native banner; next event can retry cleanup
+ok 15 - failed remove never permits a second native banner; next event can retry cleanup
+  ---
+  duration_ms: 0.6086
+  type: 'test'
+  ...
+1..15
+# tests 15
+# suites 0
+# pass 15
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 152.145

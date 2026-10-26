@@ -6,8 +6,10 @@ commit riêng từng phase theo yêu cầu bổ sung. Không deploy/APK/push/rul
 ## Trạng thái
 
 - G0: hoàn thành inventory và baseline PC độc lập; thiếu thiết bị S22 thật.
-- G1: đã có ứng viên Home/Memory tách khỏi entry sản phẩm; đang kiểm và chuẩn bị mẫu duyệt.
-- G2–G5: chưa triển khai; rollout phụ thuộc phê duyệt mẫu cụ thể tại G1.
+- G1: chủ dự án đã duyệt mẫu Memory hiện tại qua câu hỏi trong chat;
+  Home giữ ảnh vườn/tĩnh như quyết định bổ sung. Có mẫu dọc/ngang, A/B và
+  LayerTree sơ bộ,2/2unit,8/8Playwright,check pass.
+- G2–G5: đang tiếp tục sau phê duyệt G1.
   Không coi việc có pilot là đạt lifecycle/runtime hoặc nghiệm thu cuối.
 
 ## Baseline và ranh giới
@@ -38,6 +40,14 @@ commit riêng từng phase theo yêu cầu bổ sung. Không deploy/APK/push/rul
 - G0 chọn chưa thêm sampler tự hạ quality: chưa có số đo chứng minh cần.
   Unknown device vẫn phải Light khi rollout; ngân sách giữ nguyên mục8.
 
+**Đính chính owner Home tại G1:** `styles/home-menu.css:5` dùng ảnh
+`leaderboard-night-garden.webp` trên `.game-selector.adventure-page`,
+phủ kín body background. Inventory của kế hoạch đã bỏ sót owner này.
+Chủ dự án xác nhận qua câu hỏi trong chat: giữ ảnh vườn hiện tại, Home
+giữ tĩnh khi không có vùng phù hợp. Pilot cull toàn bộ vùng Home với lý
+do `home-source-covered`,0handle/0timer; không vẽ thác trên card chọn trò.
+Source ảnh vườn được thêm vào inventory10nguồn tại `qa/pilot.json`.
+
 ## Môi trường
 
 - Windows PC: AMD Ryzen7 4800H; GPU hệ thống Radeon Graphics và NVIDIA
@@ -52,9 +62,11 @@ commit riêng từng phase theo yêu cầu bổ sung. Không deploy/APK/push/rul
 - Chọn DOM vùng nhỏ + SVG/CSS tĩnh + WAAPI transform/opacity, không thư viện.
   CSS keyframes khả thi nhưng WAAPI cho handle cleanup/cancel rõ hơn;
   video/canvas toàn màn bị loại theo kế hoạch vì chi phí/ownership.
-- Home: một lòng thác nguồn độc lập dọc/ngang, 2dải nước opacity.14,
+- Ứng viên thác ban đầu: một lòng thác nguồn độc lập dọc/ngang,2dải nước opacity.14,
   native translateY32px/3.2–3.55s. Không thêm scheduler sao băng; hai slot
-  sao băng sản phẩm vẫn là baseline. Nước chỉ nằm trong clip nhỏ.
+  sao băng sản phẩm vẫn là baseline. Nước chỉ nằm trong clip nhỏ. Sau chốt
+  Home giữ ảnh vườn, ứng viên này không chạy; nguồn được giữ như metadata
+  tham chiếu của pilot, chưa rollout vào sản phẩm.
 - Memory: 1cá SVG opacity.24 bơi trong envelope hữu hạn, 2glow nhỏ và
   1lá SVG. Timeline20–24s gồm vào/chuyển động/ra và nghỉ60%; không tween
   layout/filter/path, không RAF steady-state hoặc timer sinh hạt.
@@ -83,13 +95,47 @@ commit riêng từng phase theo yêu cầu bổ sung. Không deploy/APK/push/rul
 - Lần baseline đầu dừng sau Home do hướng dẫn lần đầu chặn launch Memory;
   log lỗi giữ lại. Đã sửa harness dùng thao tác Bỏ qua/Đã hiểu thật, đo lại
   Memory trong Vô tận để không bị hết75s khi lấy mẫu120s. Không sửa game.
-- Performance G1 và hình/video: đang chạy, chưa kết luận pass.
+- G1 matrix320×740/DPR2,412×915/DPR3,844×390/DPR2,1024×900 và1366×768/DPR1:
+  bình thường/reduced-motion,100lần mount/dispose mỗi cảnh; scene/animation
+  DOM về0. JSON `qa/pilot.json`. Bàn Vô tận dọc412che hết vùng động nên
+  fallback tĩnh,320chỉ còn1đom đóm; không ép đủ nhóm vào vùng bàn.
+- Mẫu duyệt bàn Dễ dọc/ngang và desktop có đủ1cá/2đom đóm/1lá:
+  `qa/easy-{portrait,landscape,desktop}-memory.png`,
+  `qa/pilot-easy-{portrait,landscape}.webm`. Đã xem screenshot thật;
+  không thay hình nền, UI/câu chữ hoặc thêm emoji/font art.
+- `qa/pilot-audit.json`:11node/4handle/0timer/0RAF steady-state; LayerTree
+  resolve backendNodeId về đúng `.ambient-bg-*` xác định4layer của pilot,
+  kích thước20×13,5×5,5×5,12×9CSSpx. Ước tính w×h×4×DPR²=15.048bytes ở
+  DPR3; đây không phải GPU/driver allocation đo thực. Không layer động
+  toàn màn thuộc pilot. Counts riêng pilot trong ngân sách Light; fog/cloud
+  cũ còn là baseline và phải được G2 đóng ownership trước nghiệm thu tổng.
+- A/B PC sau preview/guide boundary thật: `qa/pilot-memory.json`,3cặp
+  đảo thứ tự,10s mỗi nhánh (sơ bộ G1, chưa120s mỗi nhánh của G4).
+  Delta p95≤0,000000001ms (noise float, xấp xỉ0), delta p99≤0,3ms;
+  p95on7,1ms, p99on7,2/7,4/13,9ms. Outlier maxoff55,5ms/maxon25,6ms
+  giữ nguyên. LongTask observer được hỗ trợ,0entry>50ms trong cả6mẫu.
+  RAF period khoảng6,9ms, không chứng minh presentation/jank GPU144Hz.
+- Trace Memory10s off/on ghi39/35Paint và13/12Layout của toàn app,
+  không suy giảm paint từ chênh lệch nhỏ này. Layer/paint toàn app còn có
+  HUD/fog/cloud và hoạt ảnh sản phẩm cũ; G4 phải đo ownership/presentation/
+  input/heap đầy đủ. Trace local ở `runtime/qa/animated-backgrounds/`.
+  Bản gzip commit cùng phase ở `qa/traces/memory-{off,on}.trace.json.gz`.
+- Matrix đầu dùng wait3s chưa đủ chờ preview/guide; số đo đầu trong
+  `qa/pilot.json` chỉ giữ làm raw screening. Harness đã sửa chờ
+  `#grid-container:not(.is-locked)` và guide đóng; đo lại Memory độc lập,
+  chụp/quay lại mẫu duyệt. Không dùng timeout để sửa đồng bộ trong game.
 - Chưa chạy full check/build cuối task,100chu kỳ toàn app,10phút soak,
   regression G2–G4 hoặc đo S22. Không dùng một phase thay nghiệm thu G5.
 
 ## Review và skill
 
-- Chưa review sau implementation cuối. Review G1 sẽ là tự review riêng;
+- Review G1 riêng: đọc source/diff, phát hiện và sửa tham chiếu host còn
+  giữ sau dispose; thêm assertion disposed nodes=0/pendingFrames=0 ở100chu
+  kỳ, chạy lại audit/browser tests sau build. Pilot guard generation tránh
+  callback lỗi animation cũ ảnh hưởng scene mới; pagehide/control action
+  hủy mẫu an toàn.8/8Playwright4viewport pass, CSS ownership pass,
+  unit2/2 chạy lại pass, npm run check exit0.
+- Chưa review sau implementation cuối. Review G1 là tự review riêng;
   không gọi là review độc lập. Chưa có reviewer độc lập được giao.
 - Đã đọc skill computer-use để kiểm routing; chưa điều khiển Windows bằng
   skill này nên không nhận là đã dùng. SVG/CSS đủ cho pilot, không imagegen.
