@@ -1,0 +1,54 @@
+{
+  "mode": "baseline",
+  "browser": "155.0.8059.86",
+  "platform": "win32",
+  "cpu": "AMD Ryzen 7 4800H with Radeon Graphics         ",
+  "samples": [
+    {
+      "profile": {
+        "name": "desktop",
+        "width": 1024,
+        "height": 900,
+        "dpr": 1
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+        "dpr": 1,
+        "width": 1024,
+        "height": 900,
+        "screen": {
+          "width": 1024,
+          "height": 960
+        },
+        "fog": 1,
+        "clouds": 2,
+        "meteorSlots": 2
+      },
+      "scene": "home",
+      "errors": [],
+      "pairs": [],
+      "baseline": {
+        "duration": 120000,
+        "count": 17128,
+        "p50": 6.900000000008731,
+        "p95": 7.100000000005821,
+        "p99": 7.400000000001455,
+        "max": 597.1999999999999,
+        "above25ms": 0.0003503035964502569,
+        "cdpDelta": {
+          "LayoutCount": 21,
+          "RecalcStyleCount": 17131,
+          "LayoutDuration": 0.004091,
+          "RecalcStyleDuration": 3.089751,
+          "DevToolsCommandDuration": 0.0010789999999999997,
+          "ScriptDuration": 0.469204,
+          "V8CompileDuration": 0,
+          "TaskDuration": 12.52663,
+          "TaskOtherDuration": 8.962505,
+          "JSHeapUsedSize": -483916
+        }
+      }
+    }
+  ],
+  "sources": []
+}

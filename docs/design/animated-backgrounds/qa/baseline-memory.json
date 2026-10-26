@@ -1,0 +1,136 @@
+{
+  "mode": "baseline-memory",
+  "browser": "155.0.8059.86",
+  "platform": "win32",
+  "cpu": "AMD Ryzen 7 4800H with Radeon Graphics         ",
+  "samples": [
+    {
+      "profile": {
+        "name": "desktop",
+        "width": 1024,
+        "height": 900,
+        "dpr": 1
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+        "dpr": 1,
+        "width": 1024,
+        "height": 900,
+        "screen": {
+          "width": 1024,
+          "height": 960
+        },
+        "fog": 1,
+        "clouds": 2,
+        "meteorSlots": 2
+      },
+      "scene": "memory",
+      "errors": [],
+      "pairs": [],
+      "baseline": {
+        "duration": 120000,
+        "count": 17271,
+        "p50": 6.900000000008731,
+        "p95": 7.100000000005821,
+        "p99": 7.400000000008731,
+        "max": 27.10000000000582,
+        "above25ms": 0.00011580105378958948,
+        "cdpDelta": {
+          "LayoutCount": 141,
+          "RecalcStyleCount": 17279,
+          "LayoutDuration": 0.16674099999999997,
+          "RecalcStyleDuration": 2.9229570000000002,
+          "DevToolsCommandDuration": 0.00044299999999999895,
+          "ScriptDuration": 0.502629,
+          "V8CompileDuration": 0,
+          "TaskDuration": 11.916557,
+          "TaskOtherDuration": 8.323787000000001,
+          "JSHeapUsedSize": -423288
+        }
+      }
+    }
+  ],
+  "sources": [
+    {
+      "source": "/assets/images/background-main.webp",
+      "bytes": 142808,
+      "geometry": [
+        1536,
+        1024
+      ],
+      "sha256": "b31458fafd2fe4eb3820dcf59344913adc3316ed3a85e38622a6403436944a5a"
+    },
+    {
+      "source": "/assets/images/background-main-portrait.webp",
+      "bytes": 171230,
+      "geometry": [
+        1080,
+        2400
+      ],
+      "sha256": "0301b775e40d77e181519f10aec3a9085ea61251ff35a6c564caf0defb7b9941"
+    },
+    {
+      "source": "/assets/images/backgrounds/memory-match.webp",
+      "bytes": 108876,
+      "geometry": [
+        1254,
+        1254
+      ],
+      "sha256": "bcab00c0daa8ab694f8c9446304d701a4201088940795cdab356c723861a5715"
+    },
+    {
+      "source": "/assets/images/backgrounds/memory-match-portrait-9x20.webp",
+      "bytes": 198714,
+      "geometry": [
+        1080,
+        2400
+      ],
+      "sha256": "7b08aff1ae0d9f050b9c30f4c1f725fe096fc6682c735a618f202c9a0f29a6db"
+    },
+    {
+      "source": "/assets/images/backgrounds/link-connect.webp",
+      "bytes": 86622,
+      "geometry": [
+        1254,
+        1254
+      ],
+      "sha256": "d38ebadfea9ac3501c407bddd6398c4bc825c86ddadfe7bd763206895bcf69c2"
+    },
+    {
+      "source": "/assets/images/backgrounds/link-connect-portrait-9x20.webp",
+      "bytes": 162004,
+      "geometry": [
+        1080,
+        2400
+      ],
+      "sha256": "7b201abcb7ae058d6dd234e2baf73697d3a4588ca7cb4c814243dfc9344217b9"
+    },
+    {
+      "source": "/assets/images/backgrounds/triple-connect.webp",
+      "bytes": 134400,
+      "geometry": [
+        1254,
+        1254
+      ],
+      "sha256": "ab10279629197fb0b013635e89b0f8b9b00d3be044db8e8a8b1f2a8077b5ed0c"
+    },
+    {
+      "source": "/assets/images/backgrounds/triple-connect-portrait-9x20.webp",
+      "bytes": 233896,
+      "geometry": [
+        1080,
+        2400
+      ],
+      "sha256": "8c829bb910903a01247a920f667f9b8ec9bdc0704e06a9ed5d0e26e74b94e4c5"
+    },
+    {
+      "source": "/assets/adventure/moonlit-garden.webp",
+      "bytes": 234542,
+      "geometry": [
+        1024,
+        1536
+      ],
+      "sha256": "60492ef5a46ec2e7f216529b40ae7cea7b141371ef0ed1494661bdf839671703"
+    }
+  ]
+}

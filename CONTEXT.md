@@ -1,5 +1,13 @@
 # CONTEXT — Trạng thái hiện tại (2026-10-26)
 
+## Nền động nhẹ — 26/10/2026, đang triển khai G0–G5
+
+- Nguồn kế hoạch hiện hành duy nhất: `ANIMATED_BACKGROUNDS_PLAN.md`. Chủ dự án đã giao toàn bộ G0–G5 và yêu cầu commit từng phase. Các ghi chú chỉ lập kế hoạch trước đây là lịch sử. Receipt chung: `ANIMATED_BACKGROUNDS_IMPLEMENTATION_RECEIPT.md`. Không deploy/APK/push/rules.
+- Đã chốt trang chủ/bản đồ/cả ba màn chơi; giữ ảnh nền hiện có, chuyển động nhẹ theo cảnh; thiết bị thử Web PC và Samsung S22 Android. Thác Home/Link/Triple/map, cá ở hồ Memory/map, đom đóm/lá theo vùng cây; không dồn mọi nhóm vào mọi nền hoặc chạy qua bàn/HUD/khay/node/quảng cáo.
+- Phương án đề xuất: lớp nhỏ DOM/SVG/texture tĩnh + WAAPI transform/opacity, scope/page/round và coordinator hữu hạn; master setting `meteorEffects`/UI Hiệu ứng nền giữ nguyên. Không video/GIF/WebGL/RAF nền liên tục, không scheduler sao băng chạy chồng. Có Light/Standard/Static, reduced-motion/hidden/modal/pause/cancel, crop dọc/ngang/map lặp và fallback vùng không an toàn.
+- G0 có snapshot working tree, inventory owner/crop/stack/map và hai mẫu PC120s Home/Memory (Vô tận), motion master off; Chrome155, RAF khoảng6,9ms. Home có outlier597,2ms được giữ trong JSON, chưa chứng nhận steady-state/GPU. ADB không có thiết bị nên S22 chưa đo. Ngân sách không đổi; chưa thêm sampler tự hạ quality khi chưa có bằng chứng cần.
+- G1 đang chuẩn bị mẫu Home/Memory riêng trên sản phẩm thật dọc/ngang. Chưa rollout vào entry sản phẩm; chờ duyệt mỹ thuật mẫu cụ thể trước G2–G3. G4/G5 và100chu kỳ toàn app/10phút soak/A-B đầy đủ còn nguyên. Không gọi số đo PC là S22 hay review tự thực hiện là độc lập.
+
 ## Quy tắc làm việc bổ sung —26/10/2026
 
 Chỉ test/build khi thay đổi hoặc rủi ro cần đến, không tự deploy mỗi lượt. Commit theo phase hoàn chỉnh; loại file thử tạm/log/ảnh QA không cần thiết, giữ các kiểm thử hiện hữu cần cập nhật theo hành vi. Lượt gom commit lịch sử không bao gồm nền động đang làm.
