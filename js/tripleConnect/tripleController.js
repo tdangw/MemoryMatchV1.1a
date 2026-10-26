@@ -80,7 +80,7 @@ import { MATCH_COINS_PER_GROUP, calculateVictoryCoins, calculateFastFinishBonus,
 import { getDifficultyAccess } from '../progression/difficultyProgress.js';
 import { playOwnedRewardCue, mountWithWaveAudio } from '../sound.js';
 import { prepareSummaryCoins } from '../progression/summaryCoins.js';
-import { renderWaveStatus, announceWave, presentWaveExit, prepareWaveArrival } from '../progression/waveHud.js';
+import { renderWaveStatus, formatWaveLevel, announceWave, presentWaveExit, prepareWaveArrival } from '../progression/waveHud.js';
 import { pausePlayMetrics } from '../playMetrics.js';
 
 const development = import.meta.env?.DEV === true;
@@ -391,6 +391,10 @@ async function mountTripleDevelopmentRound(generated, { skipIntro = false, start
   roundMilestoneRewards = [];
   modalPaused = false;
   backgroundPaused = false;
+  scope.pauseForProfile=()=>{
+    const paused=modalPaused;modalPaused=true;rebaseTripleTimer();
+    return()=>{if(scope.active){modalPaused=paused;rebaseTripleTimer();}};
+  };
   const generation = ++roundGeneration;
   const startImmediately = !generated.board || skipIntro;
   roundStarted = startup ? false : startImmediately;
@@ -421,8 +425,7 @@ async function mountTripleDevelopmentRound(generated, { skipIntro = false, start
     const starProgress = { stars: calculateProgressionStars({ mode: currentMode, score: roundState.score, totalGroups, won: activeWave?.phase === 'won' }),
       score: roundState.score, thresholds: getProgressionStarTargets({ mode: currentMode, totalGroups }) };
     hud.stats({
-      // Wave status is separate from the compact numeric level stat.
-      level: currentLevel,
+      level: formatWaveLevel(currentLevel,activeWave),
       moves: roundState.moves,
       misses: roundState.misses,
       combo: roundState.combo,

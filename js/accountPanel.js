@@ -28,8 +28,14 @@ export function showAccountPanel(surface = {}) {
   const accountType = document.createElement('p'); accountType.className = 'account-identity';
   identity.className = 'profile-identity';
   const nameRow = document.createElement('div'); nameRow.className = 'profile-name-row';
-  identity.append(nameRow, accountType);
-  const edit = document.createElement('button'); edit.type = 'button'; edit.className = 'tab-button tab-button--quiet profile-edit';
+  const uidRow=document.createElement('div');uidRow.className='profile-uid';uidRow.hidden=true;
+  const uidLabel=document.createElement('span');uidLabel.textContent='UID:';
+  const uidValue=document.createElement('span');uidValue.className='profile-uid__value';
+  const copyUid=document.createElement('button');copyUid.type='button';copyUid.className='profile-copy-uid';copyUid.setAttribute('aria-label','Sao chép UID');copyUid.append(createIcon('copy'));
+  uidRow.append(uidLabel,uidValue,copyUid);
+  const identityMeta=document.createElement('div');identityMeta.className='profile-identity-meta';
+  identityMeta.append(accountType);identity.append(nameRow,uidRow,identityMeta);
+  const edit = document.createElement('button'); edit.type = 'button'; edit.className = 'profile-edit';
   edit.setAttribute('aria-label', 'Sửa tên'); edit.setAttribute('aria-expanded', 'false'); edit.append(createIcon('edit'));
   summary.append(avatar, identity); hero.append(summary);
   const form = document.createElement('form'); form.className = 'profile-name-form'; form.hidden = true;
@@ -39,14 +45,14 @@ export function showAccountPanel(surface = {}) {
   const saveName = edit;
   const cancel = document.createElement('button'); cancel.type = 'button'; cancel.className = 'tab-button tab-button--quiet'; cancel.textContent = '×'; cancel.setAttribute('aria-label', 'Hủy');
   const error = document.createElement('p'); error.className = 'profile-error'; error.setAttribute('role', 'alert');
-  form.append(label, name, cancel); nameRow.append(playerName, form, edit); identity.append(error);
+  form.append(label, name, cancel); nameRow.append(playerName, form,edit); identity.append(error);
   const stats = profileDetails(hero);
   const account = document.createElement('section'); account.className = 'tab-card profile-account';
   const heading = document.createElement('h3'); heading.className = 'tab-section-title'; heading.textContent = 'Tài khoản';
   const status = document.createElement('p'); status.className = 'account-status'; status.setAttribute('aria-live', 'polite');
   const google = document.createElement('button'); google.type = 'button'; google.className = 'tab-button profile-google';
   account.append(heading, status, google); content.append(hero, account);
-  let disposed = false; let unsubscribe; let releaseOwner;
+  let disposed = false; let unsubscribe; let releaseOwner;let currentUid=null,copyingUid=false;
   const cosmeticScope = createGameShellLifecycle();
   const cosmeticsStatus = document.createElement('p'); cosmeticsStatus.className = 'profile-cosmetics-status'; cosmeticsStatus.setAttribute('role', 'status'); hero.append(cosmeticsStatus);
   const sync = getPublicCosmeticSync();
@@ -60,7 +66,7 @@ export function showAccountPanel(surface = {}) {
   }
   activeView = { modal, dispose };
   avatar.onclick = () => openProfileCustomization({ playerName: playerName.textContent, owner: cosmeticScope,
-    onSaved: () => { if (!disposed) avatar.replaceChildren(cosmeticPortrait(gameState.appearance.profileCosmetics, { label: playerName.textContent })); } });
+    onSaved: () => { if (!disposed) avatar.replaceChildren(cosmeticPortrait(gameState.appearance.profileCosmetics, { label: playerName.textContent, size: 256 })); } });
   releaseOwner = (surface.owner || getAppPageScope())?.own(dispose, 'cleanup');
   function closeEditor(focus = false) {
     form.hidden = true; playerName.hidden = false; edit.setAttribute('aria-expanded', 'false'); edit.setAttribute('aria-label', 'Sửa tên'); edit.replaceChildren(createIcon('edit')); error.textContent = ''; name.value = ''; editingUid = null;
@@ -70,7 +76,11 @@ export function showAccountPanel(surface = {}) {
     if (disposed) return;
     if (!form.hidden && editingUid !== state.uid) closeEditor();
     playerName.textContent = state.playerName || 'Người chơi';
-    avatar.replaceChildren(cosmeticPortrait(gameState.appearance.profileCosmetics, { label: playerName.textContent }));
+    currentUid=typeof state.uid==='string'&&state.uid ? state.uid : null;
+    uidRow.hidden=!currentUid;
+    uidValue.textContent=currentUid&&currentUid.length>14 ? `${currentUid.slice(0,6)}…${currentUid.slice(-4)}` : currentUid||'';
+    copyUid.disabled=!currentUid||copyingUid;
+    avatar.replaceChildren(cosmeticPortrait(gameState.appearance.profileCosmetics, { label: playerName.textContent, size: 256 }));
     accountType.textContent = state.isAnonymous === false ? 'Đã liên kết Google' : 'Tài khoản khách';
     status.textContent = ({ connecting: 'Đang kết nối…', restoring: 'Đang tải tiến trình…', syncing: 'Đang lưu…', synced: '', waiting: 'Đang chờ lưu', offline: 'Chưa có kết nối', error: 'Chưa lưu được. Sẽ thử lại.', disabled: '', conflict: 'Đang tải tiến trình…' })[state.phase] || '';
     const busy = saving || linking || ['connecting', 'restoring', 'syncing', 'conflict'].includes(state.phase);
@@ -82,6 +92,21 @@ export function showAccountPanel(surface = {}) {
     if (busy) modal.panel.setAttribute('aria-busy', 'true');
     else modal.panel.removeAttribute('aria-busy');
   }
+  copyUid.onclick=async()=>{
+    if(!currentUid||copyingUid)return;
+    const uid=currentUid;copyingUid=true;copyUid.disabled=true;
+    try{
+      if(navigator.clipboard?.writeText)await navigator.clipboard.writeText(uid);
+      else{
+        const input=document.createElement('textarea');input.value=uid;input.setAttribute('readonly','');input.style.cssText='position:fixed;top:0;left:0;opacity:0;pointer-events:none';
+        document.body.append(input);
+        try{input.focus({preventScroll:true});input.select();if(!document.execCommand('copy'))throw new Error('Clipboard unavailable');}
+        finally{input.remove();if(!disposed)copyUid.focus({preventScroll:true});}
+      }
+      if(!disposed&&currentUid===uid)showAppToast('Đã sao chép UID.');
+    }catch(error){if(!disposed)showAppToast('Chưa sao chép được UID. Hãy thử lại.');console.warn('Profile UID copy unavailable',error.name);}
+    finally{copyingUid=false;if(!disposed)copyUid.disabled=!currentUid;}
+  };
   edit.onclick = () => {
     if (!form.hidden) { form.requestSubmit(); return; }
     const state = service.getState(); editingUid = state.uid; name.value = state.playerName || '';

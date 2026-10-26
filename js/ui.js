@@ -1,4 +1,5 @@
 import { connectDialogPlacement } from './dialogPlacement.js';
+import { formatWaveLevel } from './progression/waveHud.js';
 import { gameRecordLabel } from './gameRecord.js';
 import { presentEffect, flyToTarget, pulseTarget } from "./gameShell/gameShellEffects.js";
 import { getMemoryHud } from "./memoryMatch/memoryShell.js";
@@ -104,7 +105,7 @@ export function updateLevelStarsDisplay(stars) { getMemoryHud().stars({ earned: 
 
 export function updateTotalStarsDisplay(stars) { getMemoryHud().stats({ totalStars: stars }); }
 
-export function updateLevelDisplay(level) { getMemoryHud().stats({ level: level }); }
+export function updateLevelDisplay(level) { getMemoryHud().stats({ level: formatWaveLevel(level,gameState.wave) }); }
 
 export function updateHintDisplay(hints) { getMemoryHud().tool("hint", { count: hints }); }
 

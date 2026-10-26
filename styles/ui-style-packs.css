@@ -116,7 +116,6 @@ html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(.treasure-progr
 html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .treasure-progress::-webkit-progress-bar { background: transparent; border-image: var(--skin-progress-track) var(--skin-progress-track-slice) fill / 3px 7px; }
 html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .treasure-progress::-webkit-progress-value { background: transparent; border-image: var(--skin-progress-fill) var(--skin-progress-fill-slice) fill / 3px 7px; }
 html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .treasure-progress::-moz-progress-bar { background: transparent; border-image: var(--skin-progress-fill) var(--skin-progress-fill-slice) fill / 3px 7px; }
-html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .collection-progress-badge { background: var(--skin-notification-badge) center / contain no-repeat; color: var(--ui-ink); }
 html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .practice__tile:not(:has(img)) { background: var(--skin-card-back) center / contain no-repeat; }
 html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .practice__tile.is-target { outline-color: var(--ui-focus); background-color: var(--ui-raised); }
 html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .practice__tile:is(.is-target,.is-selected)::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: var(--skin-focus-ring) center / contain no-repeat; }

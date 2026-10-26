@@ -257,3 +257,7 @@ Review độc lập phải đối chiếu implementation với task plan và acc
 ### Cập nhật19/10 — chỉnh giao diện và thử web
 
 Chủ dự án đang thử trực tiếp bản web và sẽ còn chỉnh nhiều chi tiết. Các lượt chỉnh giao diện chỉ sửa và kiểm tra web, không tự đóng gói APK hoặc tạo báo cáo riêng cho từng chi tiết. Chỉ tạo APK khi chủ dự án yêu cầu rõ; ghi nhận kết quả ngắn, không kết thúc bằng lời mời tiếp tục. Quy định này thay ưu tiên tự tạo APK cuối task ở mục13 phía trên.
+
+### Cập nhật26/10 — kiểm tra theo rủi ro và commit theo phase
+
+Không tự deploy hoặc chạy test sau mỗi lần sửa. Chỉ kiểm tra khi thay đổi hoặc rủi ro thực tế cần đến; các tác vụ không đổi giao diện hay logic chỉ cập nhật code/tài liệu và rà soát diff. Gom commit theo phase hoàn chỉnh, không commit từng chỉnh sửa lẻ. Khi gom lịch sử công việc, giữ riêng task đang làm; không đưa log, ảnh QA, file thử tạm hoặc test không cần thiết vào commit. Quy định trực tiếp này thay yêu cầu chạy check/build mặc định ở mỗi lượt phía trên.

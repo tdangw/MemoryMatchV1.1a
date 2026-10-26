@@ -38,7 +38,7 @@ import { MATCH_COINS_PER_GROUP, calculateGroupScore, calculateVictoryCoins, calc
 import { getDifficultyAccess } from '../progression/difficultyProgress.js';
 import { playOwnedRewardCue, mountWithWaveAudio } from '../sound.js';
 import { prepareSummaryCoins } from '../progression/summaryCoins.js';
-import { renderWaveStatus, announceWave, presentWaveExit, prepareWaveArrival } from '../progression/waveHud.js';
+import { renderWaveStatus, formatWaveLevel, announceWave, presentWaveExit, prepareWaveArrival } from '../progression/waveHud.js';
 import { PROGRESSION_HELP_CONTENT } from '../progression/progressionCopy.js';
 import { pausePlayMetrics } from '../playMetrics.js';
 import { getTheme, getThemeSelectionEligibility } from "../themeCatalog.js";
@@ -279,6 +279,10 @@ export function startLinkLevel({
     linkTimeWarningPlayed = false;
     return showLinkGame();
   }, waveTransition);
+  scope.pauseForProfile=()=>{
+    const paused=linkGameState.isPaused;pauseLinkForModal();
+    return()=>{if(scope.active&&!paused)resumeLinkAfterModal();};
+  };
   if (waveTransition) prepareWaveArrival(getLinkShell().refs, scope);
   beginPlayMetrics(scope, { gameId: "link-connect", mode, level }, resume || waveTransition ? metrics || {} : null);
   const startup = createGameShellStartup(scope, getLinkShell().refs, error => {
@@ -1098,7 +1102,7 @@ function updateLinkHud() {
   renderWaveStatus(getLinkShell().refs, linkGameState.wave);
   const hud = getLinkHudElements();
   const component = getLinkHud(hud);
-  component.stats({ level: linkGameState.level, moves: linkGameState.moves, misses: linkGameState.misses, combo: linkGameState.combo, score: linkGameState.score });
+  component.stats({ level: formatWaveLevel(linkGameState.level,linkGameState.wave), moves: linkGameState.moves, misses: linkGameState.misses, combo: linkGameState.combo, score: linkGameState.score });
   updateLinkCoinHud(hud);
   updateLinkTimerHud(hud);
   updateLinkStarsHud(hud);

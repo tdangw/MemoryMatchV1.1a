@@ -1,5 +1,7 @@
 # Giao diện Cổ tích và phần thưởng Thành tích
 
+> Trạng thái hiện hành: D0–Q1 đã triển khai và nghiệm thu theo [STORYBOOK_IMPLEMENTATION_RECEIPT.md](STORYBOOK_IMPLEMENTATION_RECEIPT.md). Các đoạn “chờ duyệt/chỉ chuẩn bị” bên dưới ghi lịch sử lúc lập kế hoạch. Yêu cầu mới về màn11–30, Nhiệm vụ và Sự kiện dùng [REWARDS_MISSIONS_EVENTS_PLAN.md](REWARDS_MISSIONS_EVENTS_PLAN.md); không thực hiện lại các gate cũ.
+
 Ngày23/10/2026. **Nguồn kế hoạch hiện hành cho yêu cầu này.** Phạm vi lượt chuẩn bị: phân tích, thiết kế hợp đồng giao diện, vẽ/đóng gói bộ thưởng để duyệt, viết kế hoạch và prompt tích hợp. **Không triển khai runtime trong lượt chuẩn bị.** Không mở lại các kế hoạch UI/runtime đã hoàn tất.
 
 ## 1. Mục tiêu và quyết định đã chốt

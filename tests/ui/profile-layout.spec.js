@@ -38,6 +38,22 @@ for (const viewport of [{ width: 320, height: 740 }, { width: 412, height: 915 }
   await expect(page.getByRole('button', { name: 'Liên kết Google', exact: true })).toBeVisible();
   await page.evaluate(() => { window.profileState.phase = 'synced'; window.profileSubscriber(window.profileState); });
   await expect(page.locator('.app-toast')).toHaveCount(0);
+  await page.evaluate(()=>{window.profileState.playerName='Người chơi Reks2';window.profileSubscriber(window.profileState);});
+  await expect(page.locator('.profile-player-name')).toHaveText('Người chơi Reks2');
+  const layout=await page.locator('.profile-summary').evaluate(root=>{
+    const name=root.querySelector('.profile-player-name'),identity=root.querySelector('.profile-identity'),edit=root.querySelector('.profile-edit');
+    return{nameWidth:name.getBoundingClientRect().width,identityWidth:identity.getBoundingClientRect().width,nameOverflow:name.scrollWidth-name.clientWidth,
+      border:getComputedStyle(edit).borderTopWidth,icon:getComputedStyle(edit.querySelector('.ui-icon')).width};
+  });
+  expect(layout.nameWidth).toBeLessThanOrEqual(layout.identityWidth);expect(layout.nameOverflow).toBeLessThanOrEqual(1);
+  expect(layout.border).toBe('0px');expect(layout.icon).toBe('14px');
+  await page.evaluate(()=>{
+    window.profileState.uid='firebase-user-0123456789abcdef';window.profileSubscriber(window.profileState);
+    Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async value=>{window.profileCopiedUid=value;}}});
+  });
+  await expect(page.locator('.profile-uid__value')).toHaveText('fireba…cdef');
+  await page.getByRole('button',{name:'Sao chép UID',exact:true}).click();
+  expect(await page.evaluate(()=>window.profileCopiedUid)).toBe('firebase-user-0123456789abcdef');
   await page.screenshot({ path: `docs/design/app-tabs/qa/profile-inline-${viewport.width}.png`, animations: 'disabled' });
 });
 test('profile failures keep the draft, UID changes discard it, pending actions do not mutate a closed view', async ({ page }) => {
@@ -68,4 +84,44 @@ test('30 profile mount and close cycles release subscriptions', async ({ page })
     await expect(page.locator('.profile-view')).toBeVisible();
   }
   await expect(page.locator('#account-modal')).toHaveCount(1);
+});
+
+test('profile popup keeps long name compact pencil and shortened UID readable across sizes and skins',async({page})=>{
+ test.setTimeout(120000);await open(page);
+ await page.evaluate(async()=>{
+  const {gameState}=await import('/js/gameState.js');
+  await(await import('/js/persistence.js')).saveAppearance({...gameState.appearance,profileCosmetics:{avatar:'starter-avatar-little-sparrow',frame:'starter-frame-plain-wood',badge:'starter-badge-first-leaf'}});
+  window.profileState.playerName='Người chơi Reks2';window.profileState.uid='firebase-user-0123456789abcdef';
+ });
+ for(const skin of ['default','woodland','papercut','starship','storybook'])for(const width of [320,412,844,1024]){
+  await page.setViewportSize({width,height:width===844?390:915});
+  await page.evaluate(async skin=>{await(await import('/js/uiSkin.js')).selectUiSkin(skin);(await import('/js/accountPanel.js')).showAccountPanel();},skin);
+  await expect(page.locator('#account-modal .profile-player-name')).toHaveText('Người chơi Reks2');
+  await expect(page.locator('#account-modal .profile-uid__value')).toHaveText('fireba…cdef');
+  const measured=await page.locator('#account-modal .app-modal').evaluate(node=>{
+   const name=node.querySelector('.profile-player-name'),body=node.querySelector('.app-modal__body');
+   const rect=node.getBoundingClientRect();
+   return{left:rect.left,right:rect.right,viewport:innerWidth,pageOverflow:document.documentElement.scrollWidth-innerWidth,nameOverflow:name.scrollWidth-name.clientWidth,nameClip:name.scrollHeight-name.clientHeight,scrollbar:getComputedStyle(body).scrollbarWidth};
+  });
+  expect(measured.left).toBeGreaterThanOrEqual(0);expect(measured.right).toBeLessThanOrEqual(measured.viewport);expect(measured.pageOverflow).toBeLessThanOrEqual(1);
+  expect(measured.nameOverflow).toBeLessThanOrEqual(1);expect(measured.nameClip).toBeLessThanOrEqual(1);expect(measured.scrollbar).toBe('none');
+  if(skin==='default'&&[320,412].includes(width))await page.screenshot({path:`runtime/qa/profile-modal-${width}.png`,animations:'disabled'});
+  await page.locator('#account-modal .app-modal__close').click();await expect(page.locator('#account-modal')).toHaveCount(0);
+ }
+});
+
+test('UID copy fallback cleans its field and permission failures leave copying available',async({page})=>{
+ await open(page);
+ await page.evaluate(()=>{
+  window.profileState.uid='firebase-user-0123456789abcdef';window.profileSubscriber(window.profileState);
+  Object.defineProperty(navigator,'clipboard',{configurable:true,value:undefined});
+  document.execCommand=command=>{if(command==='copy'){window.fallbackUid=document.querySelector('textarea').value;return true;}return false;};
+ });
+ await page.getByRole('button',{name:'Sao chép UID',exact:true}).click();
+ expect(await page.evaluate(()=>window.fallbackUid)).toBe('firebase-user-0123456789abcdef');
+ await expect(page.locator('textarea')).toHaveCount(0);
+ await page.evaluate(()=>Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async()=>{throw new Error('Denied');}}}));
+ await page.getByRole('button',{name:'Sao chép UID',exact:true}).click();
+ await expect(page.locator('.app-toast').filter({hasText:'Chưa sao chép được UID. Hãy thử lại.'})).toBeVisible();
+ await expect(page.getByRole('button',{name:'Sao chép UID',exact:true})).toBeEnabled();
 });

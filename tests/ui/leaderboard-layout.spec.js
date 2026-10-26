@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 mkdirSync('docs/design/app-tabs/qa', { recursive: true });
 const source = readFileSync('js/leaderboardPanel.js', 'utf8')
-  .replace("import { readPublicCosmetics } from './progression/publicCosmeticStore.js';", "const readPublicCosmetics = async () => ({ selections: new Map(), available: true });")
+  .replace("import { readPublicCosmetics } from './progression/publicCosmeticStore.js';", "const readPublicCosmetics = async () => ({ selections: new Map(window.rankCosmetics || []), available: true });")
   .replace("import { getFirebaseBackend } from './firebaseBackend.js';", "const getFirebaseBackend = async () => ({ database: null, environment: 'test' });")
   .replace("import { readCachedLeaderboard } from './leaderboardStore.js';", "const readCachedLeaderboard = ({ board, uid, page }) => window.rankCache.get(JSON.stringify({ board, uid, page })) || null;")
   .replace("import { getAccountService } from './accountService.js';", "const getAccountService = () => ({ getIdentity: () => ({ uid: window.rankUid }), subscribe: listener => { listener(); return () => {}; } });")
@@ -19,6 +19,7 @@ const source = readFileSync('js/leaderboardPanel.js', 'utf8')
     window.rankCache.set(JSON.stringify({ board, uid, page }), data); return data;
   };`);
 async function open(page, count = 21, gameContext = false) {
+  await page.addInitScript(() => performance.setResourceTimingBufferSize(2000));
   await page.addInitScript(count => { window.rankCount = count; window.rankRequests = []; window.rankResolvers = []; window.rankCache = new Map(); }, count);
   await page.route('**/js/leaderboardPanel.js*', route => route.fulfill({ contentType: 'text/javascript', body: source }));
   await page.goto('/');
@@ -215,9 +216,11 @@ test('final garden artwork, centered footer and background failure keep a usable
   await page.evaluate(() => { window.rankNames = ['Linh Nguyễn', 'Hải Minh', 'Ngọc Anh', 'Bảo Trân', 'Hoàng Nam', 'Mai Chi', 'An Nhiên', 'Tuấn Anh', 'Thanh Hà', 'Minh Khôi']; window.rankUid = 'row-6'; });
   await reopen(page);
   await expect(page.locator('.leaderboard-list .is-self')).toHaveCount(1);
+  await page.locator('.leaderboard-list li').last().scrollIntoViewIfNeeded();
   const last = await page.locator('.leaderboard-list li').last().boundingBox();
   const region = await page.locator('.leaderboard-results').boundingBox();
   expect(last.y + last.height).toBeLessThanOrEqual(region.y + region.height);
+  await page.locator('.leaderboard-results').evaluate(node => { node.scrollTop = 0; });
   expect(await page.locator('.leaderboard-rank--1').evaluate(node => getComputedStyle(node).color)).toBe('rgb(255, 249, 232)');
   await expect(page.locator('.ui-icon--rank-medal')).toHaveCount(3);
   await expect(page.locator('.leaderboard-medal-number')).toHaveText(['1', '2', '3']);
@@ -263,4 +266,46 @@ test('each mount is fresh, menu is query-free, and stale recovery is bounded wit
   await page.getByRole('button', { name: 'Thử lại', exact: true }).click();
   await expect(page.locator('.leaderboard-list li')).toHaveCount(10);
   await expect(page.getByRole('button', { name: 'Thử lại', exact: true })).toBeHidden();
+});
+
+test('equipped portrait fills its slot without a second circular backing or cropped ornaments', async ({ page }) => {
+  await page.setViewportSize({ width: 412, height: 915 }); await open(page, 4, true);
+  await page.evaluate(() => {
+    window.rankNames = ['Người chơi Reks2', 'Ảnh không khung', 'Khung trang trí', 'Chưa trang bị'];
+    window.rankCosmetics = [
+      ['row-0', { avatar: 'starter-avatar-little-sparrow', frame: 'starter-frame-plain-wood', badge: 'starter-badge-first-leaf' }],
+      ['row-1', { avatar: 'starter-avatar-little-sparrow' }],
+      ['row-2', { avatar: 'memory-avatar-sapphire-owl', frame: 'memory-frame-golden-laurel', badge: 'memory-badge-wisdom-seal' }],
+    ];
+  });
+  await reopen(page);
+  for (const [width, height] of [[412, 915], [320, 740], [844, 390], [1024, 900]]) {
+    await page.setViewportSize({ width, height });
+    const measurements = await page.locator('.leaderboard-list li').evaluateAll(async rows => {
+      await Promise.all(rows.flatMap(row => [...row.querySelectorAll('img')].map(image => image.decode())));
+      return rows.map(row => {
+        const slot = row.querySelector('.leaderboard-avatar'), portrait = slot.firstElementChild;
+        const slotStyle = getComputedStyle(slot), box = row.getBoundingClientRect(), portraitBox = portrait.getBoundingClientRect();
+        const avatar = portrait.querySelector('.storybook-portrait__avatar');
+        const avatarBox = avatar?.getBoundingClientRect();
+        return { background: slotStyle.backgroundColor, border: slotStyle.borderWidth, radius: slotStyle.borderRadius,
+          layerCount: portrait.querySelectorAll('img').length, portraitWidth: portraitBox.width,
+          faceWidth: avatarBox ? avatarBox.width * 318 / 512 : null,
+          paintedTop: avatarBox ? avatarBox.top + avatarBox.height * 97 / 512 : null,
+          paintedBottom: avatarBox ? avatarBox.top + avatarBox.height * 415 / 512 : null,
+          rowTop: box.top, rowBottom: box.bottom, fallbackWidth: portrait.querySelector('.ui-icon')?.getBoundingClientRect().width };
+      });
+    });
+    expect(measurements.map(row => row.layerCount)).toEqual([3, 1, 3, 0]);
+    for (const row of measurements) {
+      expect(row.background).toBe('rgba(0, 0, 0, 0)'); expect(row.border).toBe('0px'); expect(row.radius).toBe('0px');
+      if (row.faceWidth) {
+        expect(row.faceWidth).toBeGreaterThan(40); expect(row.paintedTop).toBeGreaterThanOrEqual(row.rowTop);
+        expect(row.paintedBottom).toBeLessThanOrEqual(row.rowBottom);
+      } else expect(row.fallbackWidth).toBeGreaterThan(36);
+    }
+    expect(measurements[1].faceWidth).toBeGreaterThan(55);
+    await page.screenshot({ path: `design/rewards-liveops/review/ranking-portrait-tight-${width}.png` });
+    expect(await page.locator('.leaderboard-results').evaluate(node => node.scrollWidth - node.clientWidth)).toBeLessThanOrEqual(1);
+  }
 });

@@ -6,7 +6,7 @@ for(const motion of ['reduce','no-preference']) test(`wave notice follows board 
     await(await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('memory-match');
     await(await import('/js/gameController.js')).startNewMemoryRun(1,{skipIntro:true});
   });
-  await expect(page.locator('.progression-wave-notice')).toHaveText('Đợt 1/2');
+  await expect(page.locator('.progression-wave-notice')).toHaveText('Màn 1-1');
   const centered=await page.locator('.progression-wave-notice').evaluate(node=>{const r=node.getBoundingClientRect(),board=document.querySelector('#grid-container').getBoundingClientRect();return Math.abs(r.top-Math.max(8,board.top));});
   // Entry moves down by at most 6px; reduced motion is aligned to the board edge.
   expect(centered).toBeLessThan(motion==='reduce'?1:12);
@@ -51,7 +51,7 @@ for(const gameId of ['memory-match','link-connect','triple-connect']) for(const 
           const board=shell.refs.board;const before=board.children.length;
           prepareWaveArrival(shell.refs,scope);const hidden=getComputedStyle(board).visibility;
           const random=Math.random;Math.random=()=>direction/4+.01;
-          try {announceWave(shell.refs,scope,{attemptId:crypto.randomUUID(),index:2});}finally{Math.random=random;}
+          try {announceWave(shell.refs,scope,{attemptId:crypto.randomUUID(),gameId,level:1,count:2,index:2});}finally{Math.random=random;}
           const animations=board.getAnimations({subtree:true}).filter(a=>a.effect.target!==board && a.effect.getTiming().duration===340);
           const layers=animations.map(a=>{
             a.pause();a.currentTime=0;
@@ -100,7 +100,7 @@ test('motion changes, resize and natural completion restore cards and input',asy
   const start=()=>page.evaluate(async()=>{
     const shell=(await import('/js/memoryMatch/memoryShell.js')).getMemoryShell();
     window.waveEntranceOwner=(await import('/js/gameShell/gameShellLifecycle.js')).createGameShellLifecycle();
-    (await import('/js/progression/waveHud.js')).announceWave(shell.refs,window.waveEntranceOwner,{attemptId:crypto.randomUUID(),index:2});
+    (await import('/js/progression/waveHud.js')).announceWave(shell.refs,window.waveEntranceOwner,{attemptId:crypto.randomUUID(),gameId:'memory-match',level:1,count:2,index:2});
   });
   await start();await expect(page.locator('[data-wave-arrival]')).toHaveCount(1);
   await page.emulateMedia({reducedMotion:'reduce'});await expect(page.locator('[data-wave-arrival]')).toHaveCount(0);

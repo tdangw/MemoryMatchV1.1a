@@ -70,16 +70,23 @@ export function openCosmeticCustomization({ playerName, items, equipped, onSave,
   const scope = createGameShellLifecycle();
   const draft = { ...equipped };
   let category = 'avatar';
+  const pageSize = 12;
+  let page = 0;
   const content = element('div', 'storybook-customization');
   const hero = element('div', 'storybook-customization__hero');
   const name = element('h3', 'storybook-customization__name', playerName);
   const tabs = element('div', 'storybook-tabs'); tabs.setAttribute('role', 'tablist'); tabs.setAttribute('aria-label', 'Đồ hồ sơ');
   const grid = element('div', 'storybook-inventory'); grid.setAttribute('role', 'tabpanel'); grid.id = 'storybook-cosmetics-grid';
   const error = element('p', 'storybook-customization__error'); error.setAttribute('role', 'alert');
-  content.append(hero, name, tabs, grid, error);
+  const navigation = element('nav', 'storybook-inventory-navigation'); navigation.setAttribute('aria-label', 'Trang đồ hồ sơ');
+  const previous = element('button', 'tab-button', 'Trang trước'), next = element('button', 'tab-button', 'Trang sau');
+  previous.type = next.type = 'button';
+  const pageLabel = element('span', 'storybook-inventory-page'); pageLabel.setAttribute('aria-live', 'polite');
+  navigation.append(previous, pageLabel, next);
+  content.append(hero, name, tabs, element('p','storybook-customization__hint','Chọn một món để trang bị; chọn lại để bỏ.'), grid, navigation, error);
   const tabButtons = [];
   function render() {
-    const selected = slot => items.find(item => item.id === draft[slot])?.image;
+    const selected = slot => { const item = items.find(item => item.id === draft[slot]); return item?.previewImage || item?.image; };
     hero.replaceChildren(createCosmeticPortrait({ avatar: selected('avatar'), frame: selected('frame'), badge: selected('badge'), label: playerName }));
     for (const button of tabButtons) {
       const active = button.dataset.category === category;
@@ -87,7 +94,12 @@ export function openCosmeticCustomization({ playerName, items, equipped, onSave,
     }
     grid.setAttribute('aria-labelledby', `storybook-tab-${category}`);
     // Item button events are delegated once to this owner, never added per render.
-    grid.replaceChildren(...items.filter(item => item.type === category).map(item => {
+    const categoryItems = items.filter(item => item.type === category);
+    const pages = Math.max(1, Math.ceil(categoryItems.length / pageSize));
+    page = Math.min(page, pages - 1);
+    previous.disabled = page === 0; next.disabled = page === pages - 1;
+    navigation.hidden = pages === 1; pageLabel.textContent = `${page + 1}/${pages}`;
+    grid.replaceChildren(...categoryItems.slice(page * pageSize, (page + 1) * pageSize).map(item => {
       const button = element('button', 'storybook-item'); button.type = 'button';
       button.dataset.itemId = item.id; button.disabled = !item.owned;
       button.setAttribute('aria-pressed', String(draft[category] === item.id));
@@ -103,24 +115,27 @@ export function openCosmeticCustomization({ playerName, items, equipped, onSave,
     const button = element('button', 'storybook-tab', label); button.type = 'button';
     button.dataset.category = id; button.id = `storybook-tab-${id}`;
     button.setAttribute('role', 'tab'); button.setAttribute('aria-controls', grid.id);
-    scope.listen(button, 'click', () => { category = id; render(); });
+    scope.listen(button, 'click', () => { category = id; page = 0; render(); });
     scope.listen(button, 'keydown', event => {
       if (!['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(event.key)) return;
       event.preventDefault();
       const index = tabButtons.indexOf(button), last = tabButtons.length - 1;
       const next = event.key === 'Home' ? 0 : event.key === 'End' ? last
         : (index + (event.key === 'ArrowRight' ? 1 : last)) % tabButtons.length;
-      category = tabButtons[next].dataset.category; render(); tabButtons[next].focus();
+      category = tabButtons[next].dataset.category; page = 0; render(); tabButtons[next].focus();
     });
     tabButtons.push(button); tabs.append(button);
   }
   let modal;
+  scope.listen(previous, 'click', () => { if (!previous.disabled) { page--; render(); } });
+  scope.listen(next, 'click', () => { if (!next.disabled) { page++; render(); } });
   scope.listen(grid, 'click', event => {
     const button = event.target.closest('button[data-item-id]');
     if (!button || !grid.contains(button) || button.disabled || modal.panel.getAttribute('aria-busy') === 'true') return;
     const item = items.find(candidate => candidate.id === button.dataset.itemId);
     if (!item || !item.owned || item.type !== category) return;
-    draft[category] = item.id; render();
+    draft[category] = draft[category] === item.id ? null : item.id;
+    render();grid.querySelector(`[data-item-id="${item.id}"]`).focus({preventScroll:true});
   });
   render();
   modal = openAppModal({ id: 'profile-customization-modal', alignment: 'center',

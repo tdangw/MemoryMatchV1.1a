@@ -18,6 +18,7 @@ const actions = Object.freeze([
 let handlers = {};
 let cloudState = "connecting";
 export function configureAppNavigation(next) { handlers = next; }
+export function openPlayerProfile(surface = {}) { return handlers.account?.(surface); }
 
 export function createAppDock(scope, { gameId = null, selected = null, onAction } = {}) {
   const dock = document.createElement("nav");

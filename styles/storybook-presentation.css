@@ -96,6 +96,9 @@
 .storybook-item__source { font-size: 11px; }
 .storybook-item > .ui-icon { position: absolute; right: 4px; bottom: 40px; width: 24px; height: 24px; color: #24702c; background: #fff2ca; border-radius: 50%; }
 .storybook-customization__error { color: #a33022; font-weight: 700; }
+.storybook-inventory-navigation { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 12px; }
+.storybook-inventory-navigation[hidden] { display: none; }
+.storybook-inventory-navigation button { min-height: 44px; }
 .profile-avatar .storybook-portrait, .leaderboard-avatar .storybook-portrait { width: 100%; height: 100%; }
 .profile-avatar { padding: 0; cursor: pointer; }
 .profile-avatar:focus-visible { outline: 2px solid var(--ui-focus); outline-offset: 3px; }

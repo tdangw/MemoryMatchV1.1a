@@ -43,12 +43,17 @@
 .rank-medal__face { fill: var(--rank-medal-face); }
 .rank-medal__shine { fill: none; stroke: var(--rank-medal-light); stroke-width: .8; }
 .leaderboard-medal-number { position: absolute; top: 4px; left: 0; width: 30px; line-height: 20px; text-align: center; text-shadow: 0 1px 2px var(--rank-medal-edge), 1px 0 var(--rank-medal-edge), -1px 0 var(--rank-medal-edge); }
-.leaderboard-list li { display: grid; grid-template-columns: 30px 30px minmax(0, 1fr) auto; align-items: center; gap: 8px; padding: 9px 10px; min-height: 50px; box-sizing: border-box; border-bottom: 1px solid #8cb6b11c; }
+.leaderboard-list li { display: grid; grid-template-columns: 30px 56px minmax(0, 1fr) auto; align-items: center; gap: 8px; padding: 7px 10px; min-height: 70px; box-sizing: border-box; border-bottom: 1px solid #8cb6b11c; }
 .leaderboard-list li:last-child { border-bottom: 0; }
 .leaderboard-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; font-weight: 600; }
 .leaderboard-rank { text-align: center; font-variant-numeric: tabular-nums; color: #d6e9e5; font-size: 13px; font-weight: 700; }
-.leaderboard-avatar { display: grid; place-items: center; width: 30px; height: 30px; box-sizing: border-box; border-radius: 50%; border: 1px solid #d9e9d540; background: #34514f; color: #e8efdc; }
-.leaderboard-avatar .ui-icon { width: 20px; height: 20px; }
+.leaderboard-avatar { display: grid; place-items: center; width: 56px; height: 56px; box-sizing: border-box; color: #e8efdc; }
+/* Keep the shared 512px layer geometry; use the row's existing gutters to
+   enlarge artwork instead of adding a second circular backing around it. */
+.leaderboard-avatar .storybook-portrait:has(img) { transform: scale(1.2); }
+.leaderboard-avatar .storybook-portrait:has(.storybook-portrait__avatar):not(:has(.storybook-portrait__frame, .storybook-portrait__badge)) { transform: scale(1.6); }
+.leaderboard-avatar .storybook-portrait > .ui-icon { inset: 28%; width: 44%; height: 44%; }
+.leaderboard-avatar .storybook-portrait:not(:has(img)) > .ui-icon { inset: 16%; width: 68%; height: 68%; }
 .leaderboard-list strong { font-size: 13px; font-variant-numeric: tabular-nums; text-align: right; }
 .leaderboard-list .is-self { background: #f1d58b14; box-shadow: inset 3px 0 var(--ranking-gold); color: #ffe3a0; }
 .leaderboard-own { margin: 0; color: var(--ranking-gold); font-size: 13px; flex-shrink: 0; }

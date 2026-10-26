@@ -824,6 +824,6 @@ body.game-is-paused .shooting-star {
   #level-summary-modal .app-modal__footer { padding: 4px 24px 18px; }
   #level-summary-modal .app-modal__footer .app-button { min-height: 44px; font-size: 13px; }
 }
-.app-modal, .app-modal__body, .level-reward-overlay .reward-container { scrollbar-width: thin; scrollbar-color: #728c86 transparent; }
-.app-modal::-webkit-scrollbar, .app-modal__body::-webkit-scrollbar, .level-reward-overlay .reward-container::-webkit-scrollbar { width: 4px; }
+:is(.app-modal, [role="dialog"], .level-reward-overlay .reward-container), :is(.app-modal, [role="dialog"], .level-reward-overlay .reward-container) * { scrollbar-width: none; }
+:is(.app-modal, [role="dialog"], .level-reward-overlay .reward-container)::-webkit-scrollbar, :is(.app-modal, [role="dialog"], .level-reward-overlay .reward-container) *::-webkit-scrollbar { display: none; width: 0; height: 0; }
 @media (prefers-reduced-motion: reduce) { #level-summary-modal .level-summary__star--earned { animation: none; } }

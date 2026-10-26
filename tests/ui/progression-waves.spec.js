@@ -10,7 +10,7 @@ test('Triple plays two generated silhouettes and only settles after the second w
     window.tripleWaveRun = await (await import('/js/tripleConnect/tripleController.js')).startTripleConnectRound({ mode: 'easy', skipIntro: true });
   });
   const layouts = [];
-  await expect(page.locator('.progression-wave-notice')).toHaveText('Đợt 1/2');
+  await expect(page.locator('.progression-wave-notice')).toHaveText('Màn 1-1');
   for (let waveIndex = 1; waveIndex <= 2; waveIndex++) {
     await expect.poll(() => page.evaluate(async () => {
       const session = (await import('/js/sessionProgress.js')).getActiveSession('triple-connect','easy');
@@ -31,7 +31,8 @@ test('Triple plays two generated silhouettes and only settles after the second w
       await page.waitForFunction(() => !document.querySelector('.triple-connect__tray-flight, .triple-connect__ghost'));
     }
     if (waveIndex === 1) {
-      await expect(page.locator('.progression-wave-notice')).toHaveText('Đợt 2/2');
+      await expect(page.locator('.progression-wave-notice')).toHaveText('Màn 1-2');
+      await expect(page.locator('[data-triple-level]')).toHaveText('1-2');
       expect(await page.evaluate(async () => (await import('/js/gameState.js')).gameState.progress.tripleConnect.bestByLevel['easy:1'])).toBeUndefined();
       await expect.poll(() => page.evaluate(async () => (await import('/js/sessionProgress.js')).getActiveSession('triple-connect','easy')?.wave?.index)).toBe(2);
     }
@@ -82,7 +83,8 @@ test('Link advances waves with shared time, survives reload, and records only a 
     });
     if (checkpoint.index === 2 && !checkpoint.won && result.index === 1) {
       expect(checkpoint.best).toBeUndefined();
-      expect(checkpoint.allocatedSeconds).toBe(100);
+      expect(checkpoint.allocatedSeconds).toBe(120);
+      await expect(page.locator('#link-level-label')).toHaveText('1-2');
       await page.reload();
       await page.evaluate(async () => {
         await (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('link-connect');
@@ -128,7 +130,7 @@ test('Memory advances to a fresh wave without a win, then settles the whole leve
       });
       expect(state.index).toBe(2);
       expect(state.best).toBeUndefined();
-      expect(state.allocatedSeconds).toBe(130);
+      expect(state.allocatedSeconds).toBe(150);
       await page.reload();
       const resumed = await page.evaluate(async () => {
         await (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('memory-match');
@@ -139,7 +141,8 @@ test('Memory advances to a fresh wave without a win, then settles the whole leve
         return { index: gameState.wave.index, allocatedSeconds: gameState.wave.allocatedSeconds, score: gameState.score };
       });
       expect(resumed.index).toBe(2);
-      expect(resumed.allocatedSeconds).toBe(130);
+      await expect(page.locator('#level')).toHaveText('1-2');
+      expect(resumed.allocatedSeconds).toBe(150);
       expect(resumed.score).toBeGreaterThanOrEqual(60);
     }
   }
@@ -158,3 +161,26 @@ test('Memory advances to a fresh wave without a win, then settles the whole leve
   expect(settled.best.rulesVersion).toBe(1);
   await expect(page.locator('#level-summary-modal')).not.toContainText(/kinh nghiệm|mảnh tranh/);
 });
+
+
+for (const [gameId, budgets] of [['memory-match', [75, 110, 150, 220]],
+  ['link-connect', [60, 90, 120, 180]], ['triple-connect', [60, 90, 120, 180]]]) {
+  test(`${gameId} starts all difficulties with the approved wave budget`, async ({ page }) => {
+    test.setTimeout(90000);
+    await page.goto('/');
+    await page.evaluate(async id => {
+      await (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu(id);
+      await (await import('/tests/ui/helpers/progressionFixtures.js')).seedProgressionAccess();
+    }, gameId);
+    for (const [index, mode] of ['easy', 'normal', 'hard', 'superHard'].entries()) {
+      const result = await page.evaluate(async ({ gameId, mode }) => {
+        await (await import('/tests/ui/helpers/progressionFixtures.js')).startProgressionScene(gameId, mode);
+        const session = (await import('/js/sessionProgress.js')).getActiveSession(gameId, mode);
+        return { allocated: session.wave.allocatedSeconds, timeLimit: session.timeLimit,
+          remaining: session.remainingTime, count: session.wave.count, index: session.wave.index };
+      }, { gameId, mode });
+      expect(result).toEqual({ allocated: budgets[index], timeLimit: gameId === 'triple-connect' ? undefined : budgets[index],
+        remaining: budgets[index], count: 2, index: 1 });
+    }
+  });
+}

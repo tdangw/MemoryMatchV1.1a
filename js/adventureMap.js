@@ -19,6 +19,7 @@ import { projectJourneyTreasure } from './progression/treasureProjection.js';
 import { renderTreasureMapCard } from './progression/treasureMapCard.js';
 import { confirmFirstPlay } from './tutorial/firstPlay.js';
 import { playOwnedRewardCue } from './sound.js';
+import { mountPlayerHeaderPortrait } from './progression/playerHeaderPortrait.js';
 
 const views = new Map(); // One bounded view per released game, independent of durable progress.
 const MAP_TEXTURE_HEIGHT = 660;
@@ -65,6 +66,7 @@ export function mountAdventureMap(gameId) {
   const title = document.createElement("h1");
   title.className = "adventure-map-title";
   title.textContent = game.title;
+  mountPlayerHeaderPortrait(title,scope);
   root.querySelector(".adventure-header").insertBefore(title, root.querySelector(".adventure-account"));
   const specials = document.createElement("nav");
   specials.className = "adventure-special-modes";
@@ -145,18 +147,12 @@ export function mountAdventureMap(gameId) {
     return summary.firstLevel;
   }
 
-  const collectionDock = root.querySelector('[data-dock-action="collection"]');
-  const collectionBadge = document.createElement('small');
-  collectionBadge.className='collection-progress-badge'; collectionBadge.hidden=true;
-  collectionDock.classList.add('has-collection-progress');collectionDock.append(collectionBadge);
   function updateTreasureCard() {
     if (!scope.active || loading || root.hidden) return;
     const level = Math.max(bottomLevel, Math.min(topLevel, topLevel - Math.round((scroll.scrollTop + scroll.clientHeight / 2 - 64) / step)));
     const block = Math.floor((level-1)/10)+1;
     const treasure = projectJourneyTreasure({completed:{...adjacentBest,...profile.bestByLevel},block,claim:profile.claimedChests[block] || adjacentChests[block]});
     renderTreasureMapCard(treasureCard, treasure);
-    collectionBadge.hidden=treasure.fragmentCount===0;collectionBadge.textContent=treasure.fragmentCount+'/10';
-    collectionDock.setAttribute('aria-label', 'Bộ sưu tập, Màn '+treasure.firstLevel+'–'+treasure.lastLevel+', '+treasure.fragmentCount+' trên 10 màn hoàn thành cả bốn độ khó');
   }
   scope.listen(window, 'resize', updateTreasureCard);
   function patchNodes() {

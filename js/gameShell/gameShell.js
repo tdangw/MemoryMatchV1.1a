@@ -4,6 +4,7 @@ import { mountGameFullscreen } from "./gameFullscreen.js";
 import { disposeAppPage } from "../appPageLifecycle.js";
 import { mountGameplayTouchEffects } from "../appNavigation.js";
 import { mountGameplayBanner } from '../ads/menuAds.js';
+import { mountPlayerHeaderPortrait } from '../progression/playerHeaderPortrait.js';
 
 let activeShell = null;
 const regionNames = ["title", "progress", "hud", "milestones", "frame", "board"];
@@ -62,6 +63,7 @@ export function createGameShell({ root = document.createElement("section"), regi
       root.hidden = false;
       root.style.display = display;
       mountGameFullscreen(refs, nextScope);
+      mountPlayerHeaderPortrait(refs.title,nextScope);
       mountGameplayTouchEffects(root, nextScope);
       mountGameplayBanner(root, nextScope);
       if (cleanup) nextScope.own(cleanup);

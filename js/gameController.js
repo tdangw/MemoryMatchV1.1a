@@ -140,6 +140,10 @@ export function initializeLevel(level, { reason = "new", session = null, skipInt
     clearGameplayRewardPopups();
     clearTooltip();
   } }), reason === 'wave');
+  scope.pauseForProfile=()=>{
+    const paused=gameState.isPaused;gameState.isPaused=true;
+    return()=>{if(scope.active){gameState.isPaused=paused;syncMemoryTimeProgress({remainingSeconds:gameState.remainingTime,timeLimit:gameState.timeLimit});}};
+  };
   if (reason === 'wave') prepareWaveArrival(getMemoryShell().refs, scope);
   beginPlayMetrics(scope, { gameId: "memory-match", mode: requestedMode, level }, reason === "resume" || reason === 'wave' ? session?.metrics || {} : null);
   bindMemoryMenus(scope, getMemoryShell().refs.root, { onExit: returnToMainMenu, onRestart: restartMemoryLevel, onSettings: navigation.showSettings });

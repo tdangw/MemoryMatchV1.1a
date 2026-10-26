@@ -6,7 +6,7 @@ const announcements = new WeakMap();
 const WAVE_NOTICE_VIEWPORT_INSET = 8;
 const reducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 export const WAVE_PRESENTATION_TIMING = Object.freeze({
-  exit: 140, noticeEnter: 260, noticeVisible: 1800, noticeExit: 220,
+  exit: 140, noticeEnter: 260, noticeVisible: 1800, noticeExit: 500,
   cardEnter: 340, layerSpread: 560,
 });
 
@@ -84,7 +84,7 @@ export function announceWave(refs, scope, wave) {
   announcements.set(scope, `${wave.attemptId}:${wave.index}`);
   const notice = document.createElement('div'); notice.className = 'progression-wave-notice';
   notice.setAttribute('role','status'); notice.setAttribute('aria-live','polite');
-  notice.textContent = `Đợt ${wave.index}/${wave.count}`;
+  notice.textContent = `Màn ${wave.level}-${wave.index}`;
   document.body.append(notice);
   const noticeScope = createGameShellLifecycle();
   const releaseOwner = scope.own(() => noticeScope.dispose(), 'cleanup');
@@ -93,18 +93,23 @@ export function announceWave(refs, scope, wave) {
   positionWaveNotice(notice, refs, noticeScope);
   const release = () => {
     noticeScope.dispose();
-    if (scope.active) showContextGuide(`wave:${wave.gameId}`,refs.title.querySelector('.progression-wave-status'),scope);
+    if (scope.active) showContextGuide(`wave:${wave.gameId}`,refs.title,scope);
   };
   let arrival = Promise.resolve(scope.active);
   if (!reducedMotion() && !document.hidden) {
-    noticeScope.animation(notice.animate([{opacity:0,transform:'translate(-50%,6px)'},{opacity:1,transform:'translate(-50%,0)'}],{duration:WAVE_PRESENTATION_TIMING.noticeEnter,easing:'ease-out'}));
+    noticeScope.animation(notice.animate([{opacity:0,transform:'translate(-50%,0) scale(.86)'},{opacity:1,transform:'translate(-50%,0) scale(1)'}],{duration:WAVE_PRESENTATION_TIMING.noticeEnter,easing:'ease-out'}));
     if (wave.index > 1) arrival = presentWaveArrival(refs, scope);
   }
   pendingArrivals.get(scope)?.();
   pendingArrivals.delete(scope);
   noticeScope.timeout(() => {
     if (reducedMotion()) { release(); return; }
-    const exit=notice.animate([{opacity:1},{opacity:0}],{duration:WAVE_PRESENTATION_TIMING.noticeExit,easing:'ease-in',fill:'forwards'});
+    const rect=notice.getBoundingClientRect(),viewport=window.visualViewport,inset=WAVE_NOTICE_VIEWPORT_INSET;
+    const left=viewport?.offsetLeft||0,top=viewport?.offsetTop||0,center=rect.left+rect.width/2;
+    const fitX=2*Math.min(center-left-inset,left+(viewport?.width||innerWidth)-inset-center)/rect.width;
+    const fitY=(top+(viewport?.height||innerHeight)-inset-rect.top)/rect.height;
+    const zoom=Math.max(1,Math.min(1.5,fitX,fitY));
+    const exit=notice.animate([{opacity:1,transform:'translate(-50%,0) scale(1)'},{opacity:1,transform:`translate(-50%,0) scale(${Math.min(1.12,zoom)})`,offset:.3},{opacity:0,transform:`translate(-50%,0) scale(${zoom})`}],{duration:WAVE_PRESENTATION_TIMING.noticeExit,easing:'ease-in',fill:'forwards'});
     noticeScope.animation(exit); exit.finished.then(() => { exit.cancel(); release(); }, release);
   },WAVE_PRESENTATION_TIMING.noticeVisible);
   return arrival;
@@ -144,16 +149,17 @@ function positionWaveNotice(notice, refs, scope) {
   update();
 }
 
-// The shell owns the node; remounts update the same badge and create no listeners.
+export function formatWaveLevel(level,wave) {
+  return wave?.level===level ? `${level}-${wave.index}` : String(level);
+}
+
+// Wave metadata remains on the shell; the compact HUD owns the visible label.
 export function renderWaveStatus(refs, wave) {
   if (!wave) return;
-  let badge = refs.title.querySelector('.progression-wave-status');
-  if (!badge) {
-    badge = document.createElement('span');
-    badge.className = 'progression-wave-status';
-    refs.title.append(badge);
-  }
-  badge.textContent = `Đợt ${wave.index}/${wave.count}`;
-  refs.root.dataset.waveIndex = String(wave.index);
-  refs.root.dataset.waveCount = String(wave.count);
+  refs.title.querySelector('.progression-wave-status')?.remove();
+  const level=refs.hud.querySelector('.stat-level');
+  const label=`Màn ${wave.level}-${wave.index}`;
+  if(level&&level.getAttribute('aria-label')!==label)level.setAttribute('aria-label',label);
+  if(refs.root.dataset.waveIndex!==String(wave.index))refs.root.dataset.waveIndex=String(wave.index);
+  if(refs.root.dataset.waveCount!==String(wave.count))refs.root.dataset.waveCount=String(wave.count);
 }

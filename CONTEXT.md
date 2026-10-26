@@ -1,4 +1,102 @@
-# CONTEXT — Trạng thái hiện tại (2026-10-23)
+# CONTEXT — Trạng thái hiện tại (2026-10-26)
+
+## Quy tắc làm việc bổ sung —26/10/2026
+
+Chỉ test/build khi thay đổi hoặc rủi ro cần đến, không tự deploy mỗi lượt. Commit theo phase hoàn chỉnh; loại file thử tạm/log/ảnh QA không cần thiết, giữ các kiểm thử hiện hữu cần cập nhật theo hành vi. Lượt gom commit lịch sử không bao gồm nền động đang làm.
+
+## Popup Hồ sơ, UID và bỏ trang bị —26/10/2026
+
+Chủ dự án yêu cầu ẩn scrollbar trong popup nhưng vẫn cuộn, tên hiện đủ/bút nhỏ không viền, chọn lại để bỏ avatar/khung/huy hiệu. Bổ sung ảnh mẫu bố cục và UID: đã chốt dùng UID Firebase hiện có, hiển thị6ký tự đầu…4cuối, copy toàn bộ; không cấp mã ngắn riêng.
+
+Đã chỉnh accountPanel/profileCSS theo tên+bút, UID+copy, loại tài khoản; nút bút/copySVG14px không viền. Chỉ hiển thị UID khi state có uid, không tự tạoID từ profilelocal. Clipboard async giữ UID tại click, guard dispose/UID switch, có fallback khi API thiếu và thông báo lỗi tự nhiên. UID không ghi thêm vào save hoặc publicprojection.
+
+Customization click món đang chọn ->null, click lại ->itemID, không mất kho/quà; model/save/publicprojection đã hỗ trợ null nên không đổi schema/rules. Focus giữ ở đúng item sau render. Scrollbar CSS chỉ áp popup/dialog và descendants, overflow không đổi.
+
+UI9case đạt (4viewport, popup×5skin,30mountclosecycles, rename/UIDswitch, copyfull, nullsave/reload/reequip, scrollwheel/nested), thêm1casecopyfallback/permissionfailure đạt. npm run check đạt ở lần chạy lại (lần đầu benchmark Triple vượt ngưỡng, giữ log); không build/deploy lượt Hồ sơ theo quy tắc mới. KhôngAPK.
+
+## Tinh chỉnh avatar, popup Màn và nhãn Bộ sưu tập —26/10/2026
+
+Yêu cầu tiếp theo đã triển khai: avatar thành button52px không border/padding, portraitscale1.1 giữ nguyên hệ tọa độ avatar/khung/huy hiệu; bấm mở popup Hồ sơ hiện có trên map và game. Mỗi adapter cung cấp pauseForProfile theo cờ/scheduler pause cũ; chờ whenClosed rồi resume nếu scope còn active. Có guard startup/doubleopen/async owner. Không đổi save/API dữ liệu.
+
+Popup đầu đợt nay Màn1-1/Màn2-1…, enter scale.86→1, giữ1.800ms, exit phóng tối đa1.5/fade500ms. Giới hạn zoom theo mép viewport và origin center top để không vượt vùng nhìn; reduced-motion tĩnh. Đã bỏ badge số1/10 khỏi nút Bộ sưu tập và các selector chỉ phục vụ badge.
+
+Ba UI matrix avatar/profile/map/game (4viewport×5skin,20cycles), dừng countdown3giây và resume cả ba trò đạt;12case wave presentation/reduced-motion/cancellation đạt,6wave regression đạt. Check/build exit0, Hosting test đã cập nhật đúng main-Du3aOr0A.js. Smoke live bấm avatar mở/đóng Hồ sơ/không tooltip sót và không badge đạt. Bằng chứng receipt chung. KhôngAPK.
+
+## Avatar trên thanh tên và gộp Màn-Đợt —26/10/2026
+
+Yêu cầu UI: bỏ badge Đợt1/2 cạnh tên game; số HUD hiển thị1-1,9-2… dưới nhãn MÀN, giữ popup đầu đợt. Đã dùng formatWaveLevel cho cả ba adapter, metadata wave/session không đổi. Guide vẫn neo thanh tên để không che thao tác bàn. Avatar/khung/huy hiệu đang trang bị xuất hiện bên trái thanh tên trong game và bản đồ; landscape compact vẫn ẩn cùng thanh tên theo layout cũ. Không thêm thao tác bấm avatar.
+
+Shared mountPlayerHeaderPortrait theo scope có1subscriber, chỉ thay DOM khi3ID trang bị đổi; unmount gỡ node/subscriber. Helper cosmeticPortrait chuyển sang profilePortrait.js và reexport ở profileCosmetics.js để giữ API cũ, không kéo luồng chỉnh ngoại hình vào shared shell. Không tạo ảnh mới/ghi save hoặc đổi quy tắc chơi.
+
+Matrix mới ba trò×4viewport×5skin và20lần chuyển map/game mỗi trò đạt, scope cũ diagnostics về0. Sáu wave regression gồm1-2/reload/tiếp tục đạt, tổng9case trong scope đạt; check exit0. Suite13Triplelegacy launch quá sớm trả run/session null chưa đạt, giữ bằng chứng ngoài scope tại player-header-ui-final.log. Build exit0; Hosting test đã cập nhật và đọc lại đúng main-Cyh60Pko.js có avatar header. Bằng chứng chung receipt nhiệm vụ hiện có. KhôngAPK.
+
+## Vé rơi như vật phẩm và chữ2,5giây —26/10/2026
+
+Đã chốt chỉ chữ hiện giữa màn; vé dùng playLootDrop như năng lượng/vật phẩm, không central toast. Tỷ lệ vé5% từ nhóm đặc biệt không đổi, độc lập chữ. Renderer trước chỉ đọc outcome.letter nên vé cộng kho mà không thấy rơi; nay đọc ticket sau durable commit, iconSVG vé vàng/vòng quay dùng chung số dư Events. Guard active scope, cùng poolitem12/cleanup/reduced-motion cũ, không thêm write/schema/rules. Chữ tăng2.500ms; reduced-motion vẫn1.100ms. UI9/9 gồm ghép thật cả ba trò, vé/chữ cùng lúc,20scope cycles đạt; unit38/38,layout2/2,check/build/review đạt. Đã cập nhật Hosting test và đọc lại đúng bundle main-CDnLQn5r.js có vé rơi/chữ2500ms. Chi tiết receipt chung. KhôngAPK.
+
+## Hiệu ứng nhận chữ trong màn chơi —26/10/2026
+
+Phản hồi tiếp theo: bỏ preload sheet chữ khỏi trang chủ để không cảnh báo unused preload; CSS image-set tải khi dùng. Keyframes mới phóng nhẹ116% sau khi về giữa, sau đó thu nhỏ dần108%→85%→35% và fade;Chủ dự án yêu cầu tan chậm thêm: đã tăng tổng1.700→2.200ms, reduced-motion giữ tĩnh. UI3/3 và check tổng thể đạt trước khi tăng thời lượng; kiểm tra lại thời lượng và bằng chứng cuối theo receipt; kiểm tra lại UI3/3, syntax/build đạt; đã cập nhật web thử và đọc lại không preload chữ, đúng pulse116%/duration2200ms. Chi tiết/dao động benchmark trong receipt chung.
+
+
+Chủ dự án yêu cầu sheet chữ và chữ rơi tại nhóm ghép, tự thu thập rồi hiện lớn giữa màn và tự ẩn. Đã chốt cộng kho ngay, không chạm nhặt/đổi luật rơi. Dùng skill imagegen tạo17glyph vàng–men xanh, source/prompt/crop tại `design/rewards-letters/drop/source.json`, atlas128/256px do `scripts/prepare-letter-drop-atlas.mjs` sinh. Renderer chung `js/liveops/letterDropFeedback.js` nhận callback sau durable commit từ ba trò; tối đa5entry, transform/opacity1.700ms, reduced-motion tĩnh1.100ms, scope cleanup hủy toàn bộ. Vị trí chỉ capture cho nhóm đặc biệt hợp lệ. Không đổi save/rules/kinh tế hoặc write cloud.
+
+UI matrix mới15/15 đạt, gồm bốn viewport/hai motion/20scope, durable/dedup/aborted và ghép thật ba trò, wave regression. 25unit mục tiêu đạt; review độc lập không còn P1/P2 xác nhận. Check/build exit0, đã cập nhật https://memorymatch-test.web.app và đọc lại entry/bundle/atlas mới khớp build. Bằng chứng cuối trong receipt chung; chưaAPK. Kế hoạch hiện hành vẫn REWARDS_MISSIONS_EVENTS_PLAN.md, mục10 bổ sung acceptance.
+
+## Bật web dùng Firebase thật —26/10/2026
+
+Chủ dự án đã yêu cầu deploy rules và bật môi trường thật để thử web trước APK. Đã phát hành Firestore rules Spark/12ID mới lên memorymatchv1-1a và đọc lại khớp SHA256662edab10b2cbfb626c60c32931ed0009a82e40ca6a398e90e0a8136263a2f7a. Bật VITE_LIVEOPS_ENABLED=1 trong .env.local, giữ public expansion=1; build thành công, Hosting test đã phát hành tại https://memorymatch-test.web.app. Production/beta Hosting không đổi; không Functions/billing/push/APK. Smoke trên URL đã phát hành PASS: tải nhiệm vụ/chữ, quay free thật ở guest mới, reload giữ quota; cần Tải lại tiến độ nếu mở modal trước khi tài khoản kết nối. Bằng chứng live trong receipt chung. Các câu production tắt/chưa deploy bên dưới là trạng thái trước quyền bổ sung này.
+
+## Spark và sưu tập chữ — kết quả hiện hành
+
+- Kế hoạch duy nhất: `REWARDS_MISSIONS_EVENTS_PLAN.md`. Toàn bộ S0–S5 đã được giao; implementation và nghiệm thu source/web/emulator đã hoàn tất; bằng chứng trong receipt chung `REWARDS_MISSIONS_EVENTS_IMPLEMENTATION_RECEIPT.md`. Các đoạn bên dưới là lịch sử, không dùng phục hồi Functions/SSV hoặc quà100điểm.
+- Đã đủ quyết định sản phẩm: MEMORY MATCH/LINK CONNECT/TRIPLE CONNECT/ADVENTURE cùng kho chữ và toàn bộ12món riêng (4avatar/4khung/4huy hiệu); mỗi lần đổi tiêu công thức nhận1món chưa có, hết12món nhận rương10.000Xu. Không lấy quà Thành tích. Chọn món theo catalog ổn định, xem trước trước đổi. Mỹ thuật rừng/ký ức, đèn lồng, pha lê, hoàng gia đã duyệt.
+- Trial100% rơi1chữ/nhóm đặc biệt ở mọi trò, chọn đều bảng chữ chung;20% chỉ dự kiến. Vé5% độc lập, nhận ngay kể cả thua. Kho không hết hạn.2M+1A hiển thị `M-M--- -A---`; bán1chữ1.000Xu, ghép3chữ giống nhau ra1chữ đều, có thể trùng. Đổi nhiều lần, đồ sở hữu vĩnh viễn.
+- Nhiệm vụ reset07:00ngày/thứHai tuần; giữ Xu/bonus1vé ngày+2vé tuần, điểm danh7ô. Mốc Xu tuần20/50/80→5/10/10 chuyển vào Nhiệm vụ; điểm reset tuần, không cấp đồ ở100. Free1/ad earned10/ngày chung tài khoản; vé dùng riêng không cap. Các bảng thưởng Xu cũ giữ nguyên.
+- Auth+Firestore, một private state và root snapshot cùng CAS transaction, queue account/persistence dùng chung. Không Functions/SSV hoặc collection từng ván. Pending/RNG bền, chữ sync tối đa4loại/publication; retry/restore/UID/chuyển ngày có guard. Backup Spark phải đối chiếu canonical trước hydrate, không hoàn Xu đã tiêu. Giữ save key/formatVersion2/API legacy; thêm optionalfields có normalizer và12ID được duyệt.
+- Đã đạt38unit, emulator matrix,15web(account/liveops/ba trò),2layout/lifecycle(4viewport×5skin,20chu kỳ), alpha1.521cặp, assetbudget dưới24MiB, build. Review độc lập không thấy P1/P2. Check tổng thể và build exit0; chi tiết/giới hạn theo receipt; không dùng kết quả lịch sử thay bằng chứng mới.
+- Production vẫn tắt, rules và12ID mới chưa deploy, khôngAPK/push/Hosting/billing. Native ad provider/điện thoại/live hai thiết bị chưa kiểm. Rules public đã deploy ở task trước không chứng nhận12ID mới. Không còn câu hỏi sản phẩm chờ.
+
+## Lịch sử trước kết quả Spark hiện hành
+
+## Nghiệm thu Nhiệm vụ/Sự kiện và rules — 25/10/2026
+
+- Giữ P0/mẫu đã duyệt theo xác nhận trực tiếp trong lượt này. Đã tiếp quản65source, chạy lại pack/alpha1.225/1.225cặp; catalog90 +2event +3cơ bản, giữ30mapping/receipt/sáu effect/300Xu. Source/generator/backfill/acquisition/public ID và phân trang đã triển khai. Receipt duy nhất: `REWARDS_MISSIONS_EVENTS_IMPLEMENTATION_RECEIPT.md`.
+- Đã có policy/callable transaction, ledger ví/receipt, facts ba adapter sau settlement, nhiệm vụ/điểm danh, vòng quay/rewarded/SSV và pilot chưa có lịch. Giao diện qua owner/dock hiện có, không PNG cả trang. Avatar Hồ sơ104–116px, BXH56px; đồ cơ bản ở đầu từng nhóm theo yêu cầu bổ sung. Không tự trang bị lại đồ của save cũ.
+- Unit/contract36/36, art/page/profile8/8 (bốn viewport/năm skin/20chu kỳ), regression ba trò/BXH22case đã có kết quả đạt sau chạy lại ba bài;30chu kỳ BXH giữ node364/listener26. Emulator hai tài khoản/two-device quota/round dedup và browser quay/ngắt/reload/reduced-motion đạt. Decode ước tính15.812.384B dưới24MiB; không tuyên bố60FPSđiện thoại thật. Chi tiết/log/giới hạn trong receipt.
+- Chủ dự án đã cho phép **riêng deploy rules**: đã phát hành lên `memorymatchv1-1a`, đọc lại source live khớp SHA256 `20193fd2962846639c7d1403260676fb93bc8df099ff47dce113e1f3c2eef364`, ruleset `86ce11fd-9f35-4b4b-8317-885363665cc4`. Đã bật ID public mới bằng `VITE_REWARDS_PUBLIC_EXPANSION_ENABLED=1` trong `.env.local`. Reload web để gửi lại đồ đang trang bị; chưa kiểm hai người chơi live sau deploy.
+- **Chưa được deploy Functions/Hosting/APK/push.** Liveops mặc định không gọi Function chưa phát hành (đã sửa nguyên nhân CORS trong log người dùng). Emulator tự bật; chỉ bật `VITE_LIVEOPS_ENABLED=1` sau phát hành backend được duyệt riêng. Rewarded thật còn cần ad unit/SSV cấu hình; web không provider không giả thưởng. Pilot không tự bắt đầu/countdown. Native provider, cloud hai thiết bị live và điện thoại thật chưa xác minh.
+- Tự review diff riêng, không nhận review từ agent độc lập. Không sửa quyền/ignore, không stage/commit hoặc ghi đè thay đổi cân bằng của công việc khác. Những trạng thái “A1 đang làm/chưa runtime/chưa deploy rules” bên dưới là lịch sử trước nghiệm thu và quyền bổ sung.
+- Cổng cuối sau mọi sửa recovery/outbox: `npm run check` và `npm run build` exit0; generated server policy khớp source, catalog regenerate không đổi hash, diff whitespace đạt. Rules đã deploy không kèm backend/Hosting.
+
+## Tiếp tục Nhiệm vụ/Sự kiện — 25/10/2026
+
+- Chủ dự án xác nhận giữ phê duyệt P0 và mẫu đại diện trong receipt24/10, giao tiếp tục toàn bộ A1–Q2, gồm ba đồ hồ sơ cơ bản và matrix1.225cặp. Kế hoạch hiện hành duy nhất: `REWARDS_MISSIONS_EVENTS_PLAN.md`; nguồn đã duyệt ở `design/rewards-liveops/approval.json`, `catalog.source.json`, `liveops.source.json`. Các đoạn “chỉ chuẩn bị/chờ P0” bên dưới là lịch sử.
+- A1 đã có65nguồn riêng (60thành tích+2event+3cơ bản), pack và kiểm1.225/1.225cặp alpha đạt; đang nghiệm thu hình/renderer. A2–Q2 chưa nghiệm thu. Receipt chung: `REWARDS_MISSIONS_EVENTS_IMPLEMENTATION_RECEIPT.md`. Không APK/push/Hosting/backend/rules deploy; giữ các thay đổi cân bằng/gameplay đồng thời ngoài phạm vi.
+
+- 24/10 — Link Đóng băng: nhãn/số đồng hồ dùng xanh đậm #06344d trên lớp băng được làm sáng đều để giữ tương phản; selector trực tiếp giữ màu rõ cả khi timer-warning hoặc đổi skin. Chỉ sửa CSS tại styles/link-connect.css, không đổi timing/lifecycle/save. Kiểm tra ownership CSS đạt; chưa kiểm lại giao diện browser, không build/APK.
+
+## Điều chỉnh cân bằng bổ sung — 24/10/2026 (đã cập nhật dữ liệu)
+
+- Thử thách theo kích thước bàn: chọn độ khó nhỏ nhất chứa đủ số thẻ, dùng mốc Memory75/110/150/220s hoặc Link/Triple60/90/120/180s mỗi đợt, giữ giờ dư. Ngưỡng Memory/Link12/24/36/60thẻ, Triple27/54/78/120thẻ; trên ngưỡng lớn nhất dùng Siêu khó. Nguồn `calculateChallengeWaveTime` trong `js/progression/waveTiming.js`; phiên cũ giữ ngân sách đã cấp. Thay quyết định Thử thách không đổi của lượt trước bên dưới.
+- Vật phẩm tăng giờ mới chỉ còn30/45/60s ở Memory; Triple dùng30s. Bỏ gói10s khỏi cửa hàng và nguồn thưởng Memory mới; mốc thưởng từng cấp10s chuyển sang30s. Giữ key `time10` của kho cũ nhưng mỗi món dùng được30s, chỉ hiện lựa chọn này khi còn tồn kho, không chuyển/xóa số lượng. Không đổi schema/save/catalog ID còn dùng. Xem trước5s, Gợi ý2,5s và các khoản cộng giờ trực tiếp từ thẻ may mắn/Phá Băng/combo giữ nguyên vì không phải vật phẩm tăng giờ trong kho.
+- Giá chỉ vật phẩm tiêu hao của cả ba trò: `round(giá gốc × 8 × 90 / 100)` Xu, làm tròn một lần đến Xu nguyên. `CONSUMABLE_PRICE_MULTIPLIER=8` là hệ số gốc, `CONSUMABLE_DISCOUNT_PERCENT=10` là mức giảm; không giảm lần nữa ở UI/giao dịch. Nguồn `calculateConsumablePrice`, `SHOP_ITEMS`, `TIME_ITEM_PRICES` trong `js/shopCatalog.js`. Không đổi giá chủ đề, ngoại hình, hiệu ứng, mở rộng khay hay thưởng Xu.
+- Giá hiện hành Memory: +30s360/+45s504/+60s648; Gợi ý1/2/3/5lượt58/108/151/216; Xem trước4/8/12/tất cả58/108/158/216Xu. Link: Gợi ý58/Xáo108/Sấm sét180/Đóng băng30s288Xu. Đóng băng tăng15→30s nên giá gốc tăng theo tỷ lệ2 rồi giảm10% (`160×2×0,9=288`). Triple: Gợi ý58/+30s360/Hoàn tác108/Xáo108Xu; giá30s lấy trực tiếp bảng chung, `timePerSecond=12` là đơn giá suy ra từ gói30s, không áp lại giảm10%.
+- Popup thua Memory/Link bán30s360Xu và60s648Xu, cùng giá cửa hàng; Triple chưa có mua giờ khi thua và chủ dự án chốt chưa bổ sung. Khác biệt còn giữ: cộng giờ trực tiếp từ may mắn/Phá Băng có thể dưới30s, thời gian Xem trước/Gợi ý khác tác dụng tăng giờ, từng game có danh sách công cụ riêng. Không tự đồng nhất các phần này.
+- Đã đối chiếu source/diff và cập nhật các kỳ vọng dữ liệu liên quan trong kiểm thử hiện hữu; **không chạy build/check/test** theo yêu cầu. Kết quả kiểm thử của lượt trước bên dưới không chứng nhận lần sửa dữ liệu này. Không APK/deploy. Skill làm rõ yêu cầu đã giúp chốt cách tính Thử thách, phạm vi vật phẩm và giảm giá; không còn quyết định chờ ở lượt cân bằng này.
+
+## Cập nhật thời gian mỗi đợt — 24/10/2026
+
+- Chủ dự án chốt Dễ/Trung bình/Khó/Siêu khó: Memory Match **75/110/150/220 giây**; Link Connect và Triple Connect **60/90/120/180 giây**. Mỗi đợt được cấp đúng mốc này, giữ thời gian dư; Thử thách/Vô tận không đổi.
+- Nguồn chung `js/progression/waveTiming.js`, dùng cho runtime, preview và ba config. Phiên cũ giữ nguyên thời gian đã cấp/còn lại, nhận mốc mới từ đợt sau; validator chỉ chấp nhận tổng ngân sách cũ/mới hợp lệ, không đổi schema/key/rulesVersion/API hiện hữu.
+- Nghiệm thu web: `npm run check` và `npm run build` đạt; 23/23 unit/contract, 6/6 Playwright desktop (12 tổ hợp trò/độ khó và ba lượt hoàn tất nhiều đợt; Memory/Link tải lại giữa đợt). Log tại `runtime/qa/wave-timing-{unit,check,build,ui-final}.log`; tự review diff riêng, chưa kiểm điện thoại thật, không APK/deploy. Skill làm rõ yêu cầu đã giúp chốt mốc Memory và phạm vi mỗi đợt; nguồn chung được chọn thay cho sửa riêng bảng cũ vốn không điều khiển giờ runtime.
+
+## Kế hoạch đề xuất mới: mở rộng quà, Nhiệm vụ và Sự kiện
+
+- Nguồn hiện hành của yêu cầu mới: [REWARDS_MISSIONS_EVENTS_PLAN.md](REWARDS_MISSIONS_EVENTS_PLAN.md). Lượt này chỉ đánh giá, lập kế hoạch và tạo hai concept; chưa sửa game/save/quảng cáo/rules. Cổ tích D0–Q1 bên dưới đã hoàn tất, không mở lại.
+- Đề xuất màn11–30 mỗi trò: thêm60quà riêng (24avatar/24khung/12huy hiệu), tổng90thành tích; giữ30quà/sáu effect/rương/300Xu hiện có. Danh sách đủ tên, ID, level, brief tại `docs/design/rewards-liveops/expansion-catalog.proposal.json`;60sprite mới chưa vẽ.
+- Chủ dự án đã chốt vòng quay1lượt miễn phí/ngày+1lượt quảng cáo tùy chọn/ngày. Đề xuất điểm danh/nhiệm vụ/vòng quay dùng chung tài khoản, event7ngày và hai quà event riêng. MứcXu, clock/backend, bảng60món và mỹ thuật còn để duyệt trước triển khai; không suy từ số trong concept thành kinh tế đã chốt.
+- Hai ảnh chọn: `docs/design/rewards-liveops/review-v1/01-missions-daily-login-v2.png` và `02-events-wheel.png`. [Review/kiểm tra](docs/design/rewards-liveops/REVIEW_AND_PREPARATION.md), [prompt bàn giao](docs/design/rewards-liveops/IMPLEMENTATION_PROMPT.md). Đã chạy lại8unit/contract đạt; kiểm60mapping và ngân sách đề xuất đạt. Không nhận đã chạy lại toàn bộ web hoặc kiểm điện thoại/live.
 
 ## Triển khai Cổ tích và Thành tích — 23/10/2026
 
