@@ -496,3 +496,9 @@ hai tài khoản/emulator và nguồn rules live là hai bằng chứng riêng.
 ## Gom commit lịch sử —26/10/2026
 
 Chủ dự án yêu cầu rà soát và commit các lượt đã hoàn tất, trừ nền động. Gom ba phase: cân bằng giờ/giá vật phẩm; phần thưởng Spark/nhiệm vụ/sưu tập chữ cùng nguồn ảnh và generator; giao diện Hồ sơ/avatar/HUD. Chỉ rà diff/phụ thuộc/file được stage, không sửa behavior hoặc chạy lại test/build/deploy. Giữ kiểm thử hiện hữu gắn với hành vi đã đổi và script kiểm tra tái sử dụng; không đưa runtime/log/ảnh QA, harness cục bộ hoặc bộ test mới không cần thiết. Bộ Triple progression cũ còn kỳ vọng thời gian lỗi thời nên giữ chỉnh sửa cục bộ, không nhận là regression đã pass. Phần nền động và ghi chú active của nó được giữ ngoài commit.
+
+## Cân lại giao diện sửa tên —26/10/2026
+
+Nguyên nhân: ô nhập/nút Hủy nằm trong form trong khi nút Lưu tái dùng bút bên ngoài, tạo hai nhóm kích thước khác nhau và làm ô nhập quá hẹp. Đã dùng nút submit riêng trong form, ô nhập trọn chiều rộng, hàng Hủy/Lưu hai cột bằng nhau; bút chỉ mở sửa và ẩn khi đang nhập. Summary căn trên để avatar không dịch theo chiều cao editor. Giữ handler lưu, chặn busy, UID guard, lỗi/draft và save format; không thêm timer/listener. Chọn form một cột + hàng action thay ép ba nút vào một hàng trên mobile.
+
+Playwright mục tiêu:5/5case trang Hồ sơ (320/412/844/1024, draft/lưu/hủy/lỗi/đổiUID/đóng khi đang lưu);1/1case popup với4viewport×5skin, input không tràn và hai nút bằng nhau/cùng hàng. Đã xem ảnh sửa tên tại320px popup và412px trang. Log profile-name-layout.log/profile-name-popup.log trong runtime/qa; ảnh/log không commit. Diff whitespace đạt. Không chạy full check/build/deploy/APK; chưa kiểm bàn phím Android thật.

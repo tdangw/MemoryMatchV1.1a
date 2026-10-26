@@ -20,8 +20,20 @@ for (const viewport of [{ width: 320, height: 740 }, { width: 412, height: 915 }
   const title = await page.locator('.profile-player-name').boundingBox();
   const pencil = await page.getByRole('button', { name: 'Sửa tên' }).boundingBox();
   expect(pencil.x - title.x - title.width).toBeLessThanOrEqual(8);
+  const avatarBefore = await page.locator('.profile-avatar').boundingBox();
   await page.getByRole('button', { name: 'Sửa tên' }).click();
   await expect(page.locator('.profile-player-name')).toBeHidden();
+  await expect(page.getByRole('button', { name: 'Sửa tên' })).toBeHidden();
+  const inputBox = await page.locator('.account-name-input').boundingBox();
+  const cancelBox = await page.getByRole('button', { name: 'Hủy', exact: true }).boundingBox();
+  const saveBox = await page.getByRole('button', { name: 'Lưu tên', exact: true }).boundingBox();
+  const avatarAfter = await page.locator('.profile-avatar').boundingBox();
+  expect(avatarAfter).toEqual(avatarBefore);
+  expect(Math.abs(cancelBox.width - saveBox.width)).toBeLessThanOrEqual(1);
+  expect(cancelBox.height).toBe(saveBox.height);
+  expect(cancelBox.y).toBe(saveBox.y);
+  expect(inputBox.y + inputBox.height).toBeLessThanOrEqual(cancelBox.y);
+  expect(Math.abs(inputBox.width - (saveBox.x + saveBox.width - cancelBox.x))).toBeLessThanOrEqual(1);
   await expect(page.locator('.app-modal-overlay')).toHaveCount(0);
   await page.locator('.account-name-input').fill('Tên đang sửa');
   if (viewport.width === 412) await page.screenshot({ path: 'docs/design/app-tabs/qa/profile-editing-412.png', animations: 'disabled' });
@@ -105,6 +117,15 @@ test('profile popup keeps long name compact pencil and shortened UID readable ac
   });
   expect(measured.left).toBeGreaterThanOrEqual(0);expect(measured.right).toBeLessThanOrEqual(measured.viewport);expect(measured.pageOverflow).toBeLessThanOrEqual(1);
   expect(measured.nameOverflow).toBeLessThanOrEqual(1);expect(measured.nameClip).toBeLessThanOrEqual(1);expect(measured.scrollbar).toBe('none');
+  await page.getByRole('button',{name:'Sửa tên',exact:true}).click();
+  const editor=await page.locator('.profile-name-form').evaluate(form=>{
+   const input=form.querySelector('input').getBoundingClientRect(),buttons=[...form.querySelectorAll('button')].map(button=>button.getBoundingClientRect());
+   return{overflow:form.scrollWidth-form.clientWidth,inputWidth:input.width,buttonWidths:buttons.map(button=>button.width),buttonY:buttons.map(button=>button.y),inputBottom:input.bottom};
+  });
+  expect(editor.overflow).toBeLessThanOrEqual(1);expect(Math.abs(editor.buttonWidths[0]-editor.buttonWidths[1])).toBeLessThanOrEqual(1);
+  expect(editor.buttonY[0]).toBe(editor.buttonY[1]);expect(editor.inputBottom).toBeLessThanOrEqual(editor.buttonY[0]);expect(editor.inputWidth).toBeGreaterThan(editor.buttonWidths[0]);
+  if(skin==='default'&&[320,412].includes(width))await page.screenshot({path:`runtime/qa/profile-name-modal-${width}.png`,animations:'disabled'});
+  await page.getByRole('button',{name:'Hủy',exact:true}).click();
   if(skin==='default'&&[320,412].includes(width))await page.screenshot({path:`runtime/qa/profile-modal-${width}.png`,animations:'disabled'});
   await page.locator('#account-modal .app-modal__close').click();await expect(page.locator('#account-modal')).toHaveCount(0);
  }

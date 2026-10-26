@@ -42,10 +42,11 @@ export function showAccountPanel(surface = {}) {
   const label = document.createElement('label'); label.className = 'profile-name-label'; label.textContent = 'Tên hiển thị'; label.htmlFor = 'profile-player-name';
   const name = document.createElement('input'); name.id = 'profile-player-name'; name.className = 'account-name-input';
   name.type = 'text'; name.maxLength = 20; name.required = true; name.autocomplete = 'nickname';
-  const saveName = edit;
-  const cancel = document.createElement('button'); cancel.type = 'button'; cancel.className = 'tab-button tab-button--quiet'; cancel.textContent = '×'; cancel.setAttribute('aria-label', 'Hủy');
+  const saveName = document.createElement('button'); saveName.type = 'submit'; saveName.className = 'profile-name-action'; saveName.textContent = 'Lưu'; saveName.setAttribute('aria-label', 'Lưu tên');
+  const cancel = document.createElement('button'); cancel.type = 'button'; cancel.className = 'profile-name-action'; cancel.textContent = 'Hủy';
+  const nameActions = document.createElement('div'); nameActions.className = 'profile-name-actions'; nameActions.append(cancel, saveName);
   const error = document.createElement('p'); error.className = 'profile-error'; error.setAttribute('role', 'alert');
-  form.append(label, name, cancel); nameRow.append(playerName, form,edit); identity.append(error);
+  form.append(label, name, nameActions); nameRow.append(playerName, form,edit); identity.append(error);
   const stats = profileDetails(hero);
   const account = document.createElement('section'); account.className = 'tab-card profile-account';
   const heading = document.createElement('h3'); heading.className = 'tab-section-title'; heading.textContent = 'Tài khoản';
@@ -69,7 +70,7 @@ export function showAccountPanel(surface = {}) {
     onSaved: () => { if (!disposed) avatar.replaceChildren(cosmeticPortrait(gameState.appearance.profileCosmetics, { label: playerName.textContent, size: 256 })); } });
   releaseOwner = (surface.owner || getAppPageScope())?.own(dispose, 'cleanup');
   function closeEditor(focus = false) {
-    form.hidden = true; playerName.hidden = false; edit.setAttribute('aria-expanded', 'false'); edit.setAttribute('aria-label', 'Sửa tên'); edit.replaceChildren(createIcon('edit')); error.textContent = ''; name.value = ''; editingUid = null;
+    form.hidden = true; playerName.hidden = false; edit.hidden = false; edit.setAttribute('aria-expanded', 'false'); error.textContent = ''; name.value = ''; editingUid = null;
     if (focus) edit.focus();
   }
   function renderState(state) {
@@ -108,9 +109,8 @@ export function showAccountPanel(surface = {}) {
     finally{copyingUid=false;if(!disposed)copyUid.disabled=!currentUid;}
   };
   edit.onclick = () => {
-    if (!form.hidden) { form.requestSubmit(); return; }
     const state = service.getState(); editingUid = state.uid; name.value = state.playerName || '';
-    form.hidden = false; playerName.hidden = true; edit.setAttribute('aria-expanded', 'true'); edit.setAttribute('aria-label', 'Lưu tên'); edit.replaceChildren(createIcon('check')); name.focus(); name.select();
+    form.hidden = false; playerName.hidden = true; edit.hidden = true; edit.setAttribute('aria-expanded', 'true'); name.focus(); name.select();
   };
   cancel.onclick = () => closeEditor(true);
   form.onsubmit = async event => {
