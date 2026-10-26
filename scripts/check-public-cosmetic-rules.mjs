@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { initializeTestEnvironment, assertFails, assertSucceeds } from '@firebase/rules-unit-testing';
 import { doc, setDoc, getDoc, getDocs, collection, query, limit, serverTimestamp } from 'firebase/firestore';
-import { ACHIEVEMENT_ITEMS } from '../js/progression/achievementModel.js';
+import { ACHIEVEMENT_ITEMS, PROFILE_COSMETIC_ITEMS } from '../js/progression/achievementModel.js';
 import { publishPublicCosmetics, readPublicCosmetics, getPublicCosmeticCacheSize } from '../js/progression/publicCosmeticStore.js';
 const env = await initializeTestEnvironment({ projectId: 'demo-memory-match', firestore: { host: '127.0.0.1', port: 8180, rules: readFileSync('firestore.rules', 'utf8') } });
 await env.clearFirestore();
@@ -37,6 +37,14 @@ try {
   observed = await readPublicCosmetics({ database: b, environment: 'test', uids: ['cosmetic-a'], refresh: true });
   assert.equal(observed.selections.get('cosmetic-a').avatar, changed.avatar); assert.equal(observed.selections.get('cosmetic-a').badge, null);
   assert.deepEqual((await getDoc(doc(b, boardPath))).data(), before, 'Cosmetic-only publish leaves rank untouched.');
+  // Check every new/starter/event ID through actual deployed-rule evaluation,
+  // then read the equipped choice from the other account. No inventory fields.
+  for (const item of PROFILE_COSMETIC_ITEMS) {
+    const expanded = { version: 1, avatar: null, frame: null, badge: null, [item.type]: item.id };
+    await assertSucceeds(publishPublicCosmetics({ database: a, environment: 'test', uid: 'cosmetic-a', selection: expanded, expanded: true }));
+    assert.equal((await getDoc(doc(b, ref.path))).data()[item.type], item.id);
+  }
+  assert.deepEqual((await getDoc(doc(b, boardPath))).data(), before, 'All expanded choices preserve rank.');
   for (let index = 0; index < 7; index++) await readPublicCosmetics({ database: b, environment: 'test', uids: Array.from({ length: 20 }, (_, offset) => `missing-${index}-${offset}`) });
   assert.ok(getPublicCosmeticCacheSize() <= 100);
   assert.equal((await readPublicCosmetics({ database: b, environment: 'test', uids: ['missing-6-1'], offline: true })).selections.get('missing-6-1').avatar, null);

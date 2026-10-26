@@ -21,7 +21,7 @@ export async function consumeTripleItemWithSession(itemId, session) {
   return true;
 }
 
-export async function commitTripleRewardTransaction({ session, milestones, rewards }) {
+export async function commitTripleRewardTransaction({ session, milestones, rewards, ticketDrop, onSpecialDrop }) {
   if (!session?.mode || !milestones || !Array.isArray(rewards)) return null;
   const rollback = createRollbackPoint();
   const granted = [];
@@ -50,7 +50,7 @@ export async function commitTripleRewardTransaction({ session, milestones, rewar
   }
   gameState.coins += coins;
   gameState.progress.tripleConnect.milestones = milestones;
-  if (!stageActiveSession("triple-connect", session) || !(await savePersistentGameData({ coins: gameState.coins, progress: gameState.progress }))) {
+  if (!stageActiveSession("triple-connect", session) || !(await savePersistentGameData({ coins: gameState.coins, progress: gameState.progress, ticketDrop, onSpecialDrop }))) {
     restoreRollbackPoint(rollback);
     return null;
   }

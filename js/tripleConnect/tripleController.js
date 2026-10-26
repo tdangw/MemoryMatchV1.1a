@@ -1,3 +1,5 @@
+import { tripleTicketDrop } from '../liveops/dropAdapters.js';
+import { prepareLetterDropFeedback } from '../liveops/letterDropFeedback.js';
 import { gameRecordLabel } from '../gameRecord.js';
 import { captureShuffleCards, presentBoardShuffle } from '../gameShell/boardShufflePresentation.js';
 import { openGameExitDialog } from "../gameExitDialog.js";
@@ -55,6 +57,7 @@ import { bindGameHudMenus } from "../gameShell/gameHudMenus.js";
 import { commitTripleRewardTransaction, consumeTripleItemWithSession } from "./tripleTransactions.js";
 import { renderHudTimer } from "../gameShell/gameShellHud.js";
 import { savePersistentGameData, isPersistenceBlocked } from "../persistence.js";
+import { tripleSettlementFact } from '../liveops/settlementAdapters.js';
 import { beginPlayMetrics, resumePlayMetrics, snapshotPlayMetrics, finishPlayMetrics } from "../playMetrics.js";
 import { prepareAdventureChapter, stageAdventureLevelStart, canAdvanceAdventure } from "../adventureLaunch.js";
 import { getChapterNumber } from "../adventureProgress.js";
@@ -521,7 +524,8 @@ return runRoundCommand(async () => {
     const presentationRevision = ++boardPresentationRevision;
     const matchEvent = transition.events.find((event) => event.type === "triple-resolved");
     const luckyEvent = transition.events.find((event) => event.type === "lucky-resolved");
-    const rewards = (await commitTripleResolutionRewards({ luckyEvent, matchEvent }));
+    const rewards = (await commitTripleResolutionRewards({ luckyEvent, matchEvent,
+      feedbackAnchor:event.target.closest('[data-tile-id]') }));
     if (!scope.active || generation !== roundGeneration) return;
     if (!rewards) {
       state = previous;
@@ -578,7 +582,17 @@ return runRoundCommand(async () => {
 return runRoundCommand(async () => {
       if (state.status !== "playing") return;
       const tileIds = getTripleHintTileIds(state);
-      if (!tileIds.length || !(await consumeTripleItem("hint"))) return;
+      if (!tileIds.length || getTripleItemCount('hint') < 1) return;
+      const previousHintWave = activeWave;
+      activeWave = normalizeWaveProgress({ ...activeWave, hintUsed: true });
+      const previousHintSession = gameState.progress.tripleConnect.sessionsByMode[currentMode];
+      stageActiveSession('triple-connect', createSession(state, remainingTime));
+      if (!(await consumeTripleItem("hint"))) {
+        activeWave = previousHintWave;
+        if (previousHintSession) gameState.progress.tripleConnect.sessionsByMode[currentMode] = previousHintSession;
+        else delete gameState.progress.tripleConnect.sessionsByMode[currentMode];
+        return;
+      }
       if (!scope.active || generation !== roundGeneration) return;
       hintedTileIds = new Set(tileIds);
       playOwnedRewardCue('hint', scope, gameState.settings);
@@ -1038,7 +1052,7 @@ async function commitTripleTerminalResult() {
   }
   else finalizeRankedRun('triple-connect', currentMode, state.score);
   delete gameState.progress.tripleConnect.sessionsByMode[currentMode];
-  if ((await savePersistentGameData({ coins: gameState.coins, progress: gameState.progress, cloudEvent: won }))) {
+  if ((await savePersistentGameData({ coins: gameState.coins, progress: gameState.progress, rewardFact: won ? tripleSettlementFact(activeWave) : undefined, cloudEvent: won }))) {
     if (generation !== roundGeneration) return false;
     state = settledState;
     return { reward, stars, timeBonus: completion.timeBonus, mastery,
@@ -1147,7 +1161,7 @@ async function advanceTripleWave() {
   return startTripleConnectRound({ mode: currentMode, level: currentLevel, reason: 'wave', waveSession: session, skipIntro: true });
 }
 
-async function commitTripleResolutionRewards({ luckyEvent, matchEvent }) {
+async function commitTripleResolutionRewards({ luckyEvent, matchEvent, feedbackAnchor }) {
   const generation = roundGeneration;
   const pendingLucky = (luckyEvent?.rewards || []).filter((lucky) => !state.claimedLuckyIds.includes(lucky.id));
   const freshTileIds = (matchEvent?.tileIds || []).filter((id) => !state.milestoneTileIds.includes(id));
@@ -1165,10 +1179,13 @@ async function commitTripleResolutionRewards({ luckyEvent, matchEvent }) {
       .map(([type, amount]) => ({ type: type === 'timeItem' ? 'time-item' : type, amount, source: "milestone" }))),
   ];
   const time = requested.filter((reward) => reward.type === "time").reduce((total, reward) => total + reward.amount, 0);
+  const ticketDrop=matchEvent ? tripleTicketDrop(activeWave,state.tiles,matchEvent.tileIds,freshTileIds) : undefined;
   const committed = (await commitTripleRewardTransaction({
     session: createSession(nextState, remainingTime + time),
     milestones: resolved.next,
     rewards: requested,
+    ticketDrop,
+    onSpecialDrop:ticketDrop?.special ? prepareLetterDropFeedback(feedbackAnchor,getTripleShell().scope) : undefined,
   }));
   if (!committed) return null;
   if (generation !== roundGeneration) return null;

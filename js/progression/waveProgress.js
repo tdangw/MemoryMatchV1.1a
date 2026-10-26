@@ -4,13 +4,13 @@ import { calculateOriginalWaveTime } from './waveTiming.js';
 
 const PHASES = new Set(['playing', 'advance', 'won']);
 const KEYS = ['version', 'attemptId', 'gameId', 'mode', 'level', 'count', 'index', 'phase',
-  'groupsPerWave', 'completedScore', 'completedMoves', 'completedMisses', 'allocatedSeconds'];
+  'groupsPerWave', 'completedScore', 'completedMoves', 'completedMisses', 'allocatedSeconds', 'hintUsed'];
 
 export function createWaveProgress({ attemptId, gameId, mode, level, groupsPerWave }) {
   const budget = calculateWaveTime({ gameId, mode, totalGroups: groupsPerWave });
   const result = { version: GAMEPLAY_RULES_VERSION, attemptId, gameId, mode, level,
     count: getLevelWaveCount(level), index: 1, phase: 'playing', groupsPerWave,
-    completedScore: 0, completedMoves: 0, completedMisses: 0, allocatedSeconds: budget };
+    completedScore: 0, completedMoves: 0, completedMisses: 0, allocatedSeconds: budget, hintUsed: false };
   return requireWaveProgress(result);
 }
 
@@ -46,7 +46,10 @@ export function normalizeWaveProgress(value, identity = {}) {
   }
   if (!validBudget) return null;
   if (['gameId', 'mode', 'level', 'groupsPerWave'].some(key => identity[key] !== undefined && identity[key] !== value[key])) return null;
-  return Object.freeze(Object.fromEntries(KEYS.map(key => [key, value[key]])));
+  if (value.hintUsed !== undefined && typeof value.hintUsed !== 'boolean') return null;
+  // Legacy sessions have no reliable history of tools used; keep gameplay but
+  // conservatively omit their no-hint bonus.
+  return Object.freeze(Object.fromEntries(KEYS.map(key => [key, key === 'hintUsed' ? value.hintUsed !== false : value[key]])));
 }
 
 export function requireWaveProgress(value) {

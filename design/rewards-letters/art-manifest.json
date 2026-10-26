@@ -1,0 +1,703 @@
+{
+  "version": 1,
+  "status": "representative-art-review",
+  "runtimeApproved": false,
+  "canvas": [
+    512,
+    512
+  ],
+  "pivot": {
+    "x": 0.5,
+    "y": 0.5
+  },
+  "avatarRect": {
+    "left": 97,
+    "top": 97,
+    "width": 318,
+    "height": 318
+  },
+  "frameInnerCircle": {
+    "x": 256,
+    "y": 256,
+    "radius": 144,
+    "purpose": "nominal alignment; ornaments may overlap portrait; validate actual aperture coverage"
+  },
+  "items": {
+    "letters-memory-avatar-moss-redpanda": {
+      "id": "letters-memory-avatar-moss-redpanda",
+      "name": "Gấu Trúc Ký Ức",
+      "type": "avatar",
+      "sourceKind": "letters",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 97,
+        "top": 97,
+        "width": 318,
+        "height": 318
+      },
+      "source": {
+        "file": "sources/letters-memory-avatar-moss-redpanda.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 53,
+          "top": 58,
+          "width": 1149,
+          "height": 1134
+        },
+        "sha256": "50ac2ff154764f5920d547da416e0e93923e60121223455b23781723288e7df8",
+        "aperture": null
+      },
+      "scale": 0.2804232804232804,
+      "nativeUpscaled": false,
+      "png": "sprites/letters-memory-avatar-moss-redpanda.png",
+      "pngSha256": "2148d35f6a17a91b69beb0d154a10aaee1cdfe748918fb358ef16ca6f72866d2",
+      "exports": {
+        "128": {
+          "file": "sprites/letters-memory-avatar-moss-redpanda-128.webp",
+          "bytes": 5498,
+          "sha256": "4267da8c782f62de0e9d62e46cdaba3f452d10add16192ae6d1bc3299eb705cb"
+        },
+        "256": {
+          "file": "sprites/letters-memory-avatar-moss-redpanda-256.webp",
+          "bytes": 14882,
+          "sha256": "12702f77aec8d5e92b548efe3e9ee777557efc2c835d1268e87e4875c3c88acd"
+        },
+        "512": {
+          "file": "sprites/letters-memory-avatar-moss-redpanda-512.webp",
+          "bytes": 46802,
+          "sha256": "e7ff754769d9a179e11179efc4a56c1fb8e6f50d446ac71ab3be17f1630fdfc5"
+        }
+      }
+    },
+    "letters-memory-frame-memory-leaves": {
+      "id": "letters-memory-frame-memory-leaves",
+      "name": "Vòng Lá Hoài Niệm",
+      "type": "frame",
+      "sourceKind": "letters",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 20,
+        "top": 29,
+        "width": 473,
+        "height": 459
+      },
+      "source": {
+        "file": "sources/letters-memory-frame-memory-leaves.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 42,
+          "top": 50,
+          "width": 1172,
+          "height": 1136
+        },
+        "sha256": "fbd9f81c0750572c237b7f80d60799e712860b20a18003258cea9f42462665ad",
+        "aperture": {
+          "left": 266,
+          "top": 257,
+          "width": 721,
+          "height": 713,
+          "radius": 356.5,
+          "pixels": 402839
+        }
+      },
+      "scale": 0.40392706872370265,
+      "nativeUpscaled": false,
+      "png": "sprites/letters-memory-frame-memory-leaves.png",
+      "pngSha256": "3f01ef1980ddfc528fdaa15880c11eeb851ac2d81939804148f4588deac90b0e",
+      "exports": {
+        "128": {
+          "file": "sprites/letters-memory-frame-memory-leaves-128.webp",
+          "bytes": 11250,
+          "sha256": "59f0a72c8e84950b4f8cd7d08da65106c32697517212f43cb29592c4e6d41ae7"
+        },
+        "256": {
+          "file": "sprites/letters-memory-frame-memory-leaves-256.webp",
+          "bytes": 31284,
+          "sha256": "6588754a995e76486ab0298ba8ee20b0da03c6dd13cc2b584851d49fc5060cdb"
+        },
+        "512": {
+          "file": "sprites/letters-memory-frame-memory-leaves-512.webp",
+          "bytes": 98506,
+          "sha256": "cf241210828e0d91fe87313461b220308d6166677712bee0327ad63aafb1119e"
+        }
+      }
+    },
+    "letters-memory-badge-folded-leaf": {
+      "id": "letters-memory-badge-folded-leaf",
+      "name": "Dấu Ấn Ký Ức",
+      "type": "badge",
+      "sourceKind": "letters",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 56,
+        "top": 62,
+        "width": 400,
+        "height": 388
+      },
+      "source": {
+        "file": "sources/letters-memory-badge-folded-leaf.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 31,
+          "top": 31,
+          "width": 1195,
+          "height": 1158
+        },
+        "sha256": "1d4657bb8a4204aff5e40312be004125a823c5cf4982d5920da060f7be0781a1",
+        "aperture": null
+      },
+      "scale": 0.33472803347280333,
+      "nativeUpscaled": false,
+      "png": "sprites/letters-memory-badge-folded-leaf.png",
+      "pngSha256": "8eb88d7f820bb98d99560b4fc6987dc66f6c384cbd0c45e3ba032e21ac7dffe2",
+      "exports": {
+        "128": {
+          "file": "sprites/letters-memory-badge-folded-leaf-128.webp",
+          "bytes": 6730,
+          "sha256": "512ee5ca70f6aae05b8e11680ec52b369d107a2f9082ec4dd7dd427cefade8cc"
+        },
+        "256": {
+          "file": "sprites/letters-memory-badge-folded-leaf-256.webp",
+          "bytes": 18800,
+          "sha256": "ff16c1a1ca05e5c8414aa399c1d12226fdbc9c8853d03d8a0913b19f65eb2c7d"
+        },
+        "512": {
+          "file": "sprites/letters-memory-badge-folded-leaf-512.webp",
+          "bytes": 59258,
+          "sha256": "04e569bd25719851948aecaaa863dca78b148bc3ef6e435db3b865511b5934c5"
+        }
+      }
+    },
+    "letters-link-avatar-flower-fox": {
+      "id": "letters-link-avatar-flower-fox",
+      "name": "Cáo Đèn Hoa",
+      "type": "avatar",
+      "sourceKind": "letters",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 97,
+        "top": 97,
+        "width": 318,
+        "height": 318
+      },
+      "source": {
+        "file": "sources/letters-link-avatar-flower-fox.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 44,
+          "top": 46,
+          "width": 1167,
+          "height": 1157
+        },
+        "sha256": "bec59afa33a959d011862e534646d61ecfccacdfdc251c779591e6ead0666d7d",
+        "aperture": null
+      },
+      "scale": 0.2748487467588591,
+      "nativeUpscaled": false,
+      "png": "sprites/letters-link-avatar-flower-fox.png",
+      "pngSha256": "b5d34cdb17eedd72cfbec087b646f061c9c6b9f9772ed17101b784d715226cf0",
+      "exports": {
+        "128": {
+          "file": "sprites/letters-link-avatar-flower-fox-128.webp",
+          "bytes": 5510,
+          "sha256": "c67a8cf04966c2c716823700ddfc973a4d9f54e2c114b59f4824e7a7bb174f8f"
+        },
+        "256": {
+          "file": "sprites/letters-link-avatar-flower-fox-256.webp",
+          "bytes": 14702,
+          "sha256": "d415f0d6d4590b1ddb52bcf227dff19f2236bb213a9148f2e001552332576a61"
+        },
+        "512": {
+          "file": "sprites/letters-link-avatar-flower-fox-512.webp",
+          "bytes": 44820,
+          "sha256": "d3d0432431afe3efe3dcee1e3ec101f9e777ffd1923e3c7cf4b46b27663d17a2"
+        }
+      }
+    },
+    "letters-link-frame-silk-lantern": {
+      "id": "letters-link-frame-silk-lantern",
+      "name": "Tơ Duyên Hoa Đăng",
+      "type": "frame",
+      "sourceKind": "letters",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 42,
+        "top": 56,
+        "width": 426,
+        "height": 421
+      },
+      "source": {
+        "file": "sources/letters-link-frame-silk-lantern.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 31,
+          "top": 30,
+          "width": 1190,
+          "height": 1177
+        },
+        "sha256": "97bd951671a5130781f34ac60da75daee02b3dd8ed1ae7cd32039ab9470840c2",
+        "aperture": {
+          "left": 224,
+          "top": 186,
+          "width": 812,
+          "height": 805,
+          "radius": 402.5,
+          "pixels": 496061
+        }
+      },
+      "scale": 0.3577639751552795,
+      "nativeUpscaled": false,
+      "png": "sprites/letters-link-frame-silk-lantern.png",
+      "pngSha256": "e9d18a2ce715025836af6444587719feb43ead1bedebd32d8a8afe2672acf652",
+      "exports": {
+        "128": {
+          "file": "sprites/letters-link-frame-silk-lantern-128.webp",
+          "bytes": 10092,
+          "sha256": "85800cea5e234bb6411ca2161574daebdd72e53cbd62e098ddf4e69485fb78b6"
+        },
+        "256": {
+          "file": "sprites/letters-link-frame-silk-lantern-256.webp",
+          "bytes": 27338,
+          "sha256": "16c88ebec683c40ca5ccf68618447328443d3635341460cf6c9d67e0f6c45ecf"
+        },
+        "512": {
+          "file": "sprites/letters-link-frame-silk-lantern-512.webp",
+          "bytes": 85564,
+          "sha256": "741b835b235b85e791e1c216b90dcfbc64d3cf80b24321855e94015c3784274d"
+        }
+      }
+    },
+    "letters-link-badge-wish-knot": {
+      "id": "letters-link-badge-wish-knot",
+      "name": "Nút Thắt Nguyện Ước",
+      "type": "badge",
+      "sourceKind": "letters",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 83,
+        "top": 56,
+        "width": 347,
+        "height": 400
+      },
+      "source": {
+        "file": "sources/letters-link-badge-wish-knot.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 107,
+          "top": 17,
+          "width": 1040,
+          "height": 1199
+        },
+        "sha256": "682267708736da1c2e663f3811dbc4c949267c3bd2239efc92efb2c9fa558613",
+        "aperture": null
+      },
+      "scale": 0.3336113427856547,
+      "nativeUpscaled": false,
+      "png": "sprites/letters-link-badge-wish-knot.png",
+      "pngSha256": "3390652cb2a286833d7bc20f0323336ecbcd6299ba70358a73e25bc2d8f4b7ce",
+      "exports": {
+        "128": {
+          "file": "sprites/letters-link-badge-wish-knot-128.webp",
+          "bytes": 6798,
+          "sha256": "bad6e5e5a199efc4045fcc14477bd484f1f1ed8758ec23425dea5bb76e77bbdf"
+        },
+        "256": {
+          "file": "sprites/letters-link-badge-wish-knot-256.webp",
+          "bytes": 18326,
+          "sha256": "4efe168768a245a596fef5d93c18ed4354aaa27349deb6c6b44de53c13d5739b"
+        },
+        "512": {
+          "file": "sprites/letters-link-badge-wish-knot-512.webp",
+          "bytes": 55832,
+          "sha256": "3b1411e976da4749ef11c2851409ab3518e9f9a211e89c21c92943d1ca51fe0b"
+        }
+      }
+    },
+    "letters-triple-avatar-rose-dragon": {
+      "id": "letters-triple-avatar-rose-dragon",
+      "name": "Rồng Thạch Anh Hồng",
+      "type": "avatar",
+      "sourceKind": "letters",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 97,
+        "top": 97,
+        "width": 318,
+        "height": 318
+      },
+      "source": {
+        "file": "sources/letters-triple-avatar-rose-dragon.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 66,
+          "top": 60,
+          "width": 1123,
+          "height": 1125
+        },
+        "sha256": "e609bec765731b7a6ae4803837d243a5adfa115bc3eeb638d90d181f0507827d",
+        "aperture": null
+      },
+      "scale": 0.2831700801424755,
+      "nativeUpscaled": false,
+      "png": "sprites/letters-triple-avatar-rose-dragon.png",
+      "pngSha256": "6d83e301e83840384378d6fb2a8b181d176ce71e5d072867e93fecae936aa502",
+      "exports": {
+        "128": {
+          "file": "sprites/letters-triple-avatar-rose-dragon-128.webp",
+          "bytes": 5596,
+          "sha256": "c26b7ee11132816562873af02b7550edacf9f93f667b30cda6480403896ccbce"
+        },
+        "256": {
+          "file": "sprites/letters-triple-avatar-rose-dragon-256.webp",
+          "bytes": 15258,
+          "sha256": "8ae5e213ef0578978ac0ca5214abd5be16970afd74d62656a54138fa69110aef"
+        },
+        "512": {
+          "file": "sprites/letters-triple-avatar-rose-dragon-512.webp",
+          "bytes": 46326,
+          "sha256": "f395552a35c48b510831d0813609268c451d75b45350764c60521ed6a7d5e65d"
+        }
+      }
+    },
+    "letters-triple-frame-prism-glass": {
+      "id": "letters-triple-frame-prism-glass",
+      "name": "Vòng Kính Sắc Màu",
+      "type": "frame",
+      "sourceKind": "letters",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 8,
+        "top": 10,
+        "width": 496,
+        "height": 488
+      },
+      "source": {
+        "file": "sources/letters-triple-frame-prism-glass.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 33,
+          "top": 35,
+          "width": 1188,
+          "height": 1170
+        },
+        "sha256": "941891ff4529b5bf34cae69d598748c8eb360e86d2e2056f087605749bdec577",
+        "aperture": {
+          "left": 273,
+          "top": 280,
+          "width": 708,
+          "height": 689,
+          "radius": 344.5,
+          "pixels": 383109
+        }
+      },
+      "scale": 0.41715727502102606,
+      "nativeUpscaled": false,
+      "png": "sprites/letters-triple-frame-prism-glass.png",
+      "pngSha256": "7e47bb573954d1f176e5e5e1d8d77f68e80dfdf65236ebde56ada2cfdb4b4cbe",
+      "exports": {
+        "128": {
+          "file": "sprites/letters-triple-frame-prism-glass-128.webp",
+          "bytes": 10740,
+          "sha256": "6c649812d08624edefe952c29ee2768d0e1184d05a5d2deace8d1a439aba628a"
+        },
+        "256": {
+          "file": "sprites/letters-triple-frame-prism-glass-256.webp",
+          "bytes": 28282,
+          "sha256": "1b6395748eb5ef93ace649d48f6783fae1763a664e6aa8819054347ae5542d54"
+        },
+        "512": {
+          "file": "sprites/letters-triple-frame-prism-glass-512.webp",
+          "bytes": 85582,
+          "sha256": "1705da67d179273c6d18f04c6500f1b69207070cda8096e77221ba68a95484b7"
+        }
+      }
+    },
+    "letters-triple-badge-prism-heart": {
+      "id": "letters-triple-badge-prism-heart",
+      "name": "Trái Tim Lăng Kính",
+      "type": "badge",
+      "sourceKind": "letters",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 57,
+        "top": 56,
+        "width": 397,
+        "height": 400
+      },
+      "source": {
+        "file": "sources/letters-triple-badge-prism-heart.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 38,
+          "top": 32,
+          "width": 1179,
+          "height": 1187
+        },
+        "sha256": "c7b992621b96e11035db9d85765d92b43ed68abbc648279a93c43db25434f29d",
+        "aperture": null
+      },
+      "scale": 0.33698399326032014,
+      "nativeUpscaled": false,
+      "png": "sprites/letters-triple-badge-prism-heart.png",
+      "pngSha256": "49362faf757c1ead0ae0160e4eeadd452c146c5f067df0c249906b54d517bcfa",
+      "exports": {
+        "128": {
+          "file": "sprites/letters-triple-badge-prism-heart-128.webp",
+          "bytes": 6604,
+          "sha256": "f2607279500e576a3d9e6b1d8a67740a478856201a17bf2d5a43be64d6baa700"
+        },
+        "256": {
+          "file": "sprites/letters-triple-badge-prism-heart-256.webp",
+          "bytes": 17808,
+          "sha256": "2f14f499b16a9f7bc5886f9a07c09b80edbf64ad998e2e934466fc29f51d1aea"
+        },
+        "512": {
+          "file": "sprites/letters-triple-badge-prism-heart-512.webp",
+          "bytes": 53554,
+          "sha256": "a4e76cc72d8a185484b8d2c80cd2ca68ca4815819091130d3e8aea69000c86e6"
+        }
+      }
+    },
+    "letters-royal-avatar-dawn-lion": {
+      "id": "letters-royal-avatar-dawn-lion",
+      "name": "Sư Tử Bình Minh",
+      "type": "avatar",
+      "sourceKind": "letters",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 97,
+        "top": 97,
+        "width": 318,
+        "height": 318
+      },
+      "source": {
+        "file": "sources/letters-royal-avatar-dawn-lion.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 42,
+          "top": 46,
+          "width": 1168,
+          "height": 1160
+        },
+        "sha256": "0c909e8aae86ee9d068ee6a084fbd0a5d15cf84994b3987022414fe38180db1c",
+        "aperture": null
+      },
+      "scale": 0.27413793103448275,
+      "nativeUpscaled": false,
+      "png": "sprites/letters-royal-avatar-dawn-lion.png",
+      "pngSha256": "3254f06cd765046f49a01f1f497c33f78cee2b7d20cb1b4ae269f23c1c2af2b3",
+      "exports": {
+        "128": {
+          "file": "sprites/letters-royal-avatar-dawn-lion-128.webp",
+          "bytes": 5606,
+          "sha256": "301415791ec9d590b2e7568ef552d4659d247576f24c4ac06499c35a0a30bbac"
+        },
+        "256": {
+          "file": "sprites/letters-royal-avatar-dawn-lion-256.webp",
+          "bytes": 15588,
+          "sha256": "bf2dc52baa0214522f72ec12f955a0d47376058eec31f67dc2dc18bb63839cf1"
+        },
+        "512": {
+          "file": "sprites/letters-royal-avatar-dawn-lion-512.webp",
+          "bytes": 46440,
+          "sha256": "22296040d7b0e596b214040ba8029e9627f08d15c08e77a45106ecd203a73a1a"
+        }
+      }
+    },
+    "letters-royal-frame-journey-crown": {
+      "id": "letters-royal-frame-journey-crown",
+      "name": "Vương Miện Hành Trình",
+      "type": "frame",
+      "sourceKind": "letters",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 43,
+        "top": 27,
+        "width": 427,
+        "height": 438
+      },
+      "source": {
+        "file": "sources/letters-royal-frame-journey-crown.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 41,
+          "top": 17,
+          "width": 1173,
+          "height": 1202
+        },
+        "sha256": "656fc035c7521fbd952ac5253f7c503ab4865957c5cda634e6f6955c401fa452",
+        "aperture": {
+          "left": 220,
+          "top": 251,
+          "width": 815,
+          "height": 791,
+          "radius": 395.5,
+          "pixels": 504547
+        }
+      },
+      "scale": 0.3640960809102402,
+      "nativeUpscaled": false,
+      "png": "sprites/letters-royal-frame-journey-crown.png",
+      "pngSha256": "4965ec9b4c154172a5c4cbdbca1da21f24720420fd3e1505728b872c74bf7ec6",
+      "exports": {
+        "128": {
+          "file": "sprites/letters-royal-frame-journey-crown-128.webp",
+          "bytes": 8594,
+          "sha256": "add580b993356a2507778593f8598b3ce0cdcf2198f474b11526f7c57240b7c3"
+        },
+        "256": {
+          "file": "sprites/letters-royal-frame-journey-crown-256.webp",
+          "bytes": 21556,
+          "sha256": "0cdc3531df7892c633b2403f76e9b3b50d121edfe653f35f4fed9aa9600b9e11"
+        },
+        "512": {
+          "file": "sprites/letters-royal-frame-journey-crown-512.webp",
+          "bytes": 64330,
+          "sha256": "fa7a6255a50565f1ad0589b10ff859434b8377da6c3c7a4bd54b514300a3801e"
+        }
+      }
+    },
+    "letters-royal-badge-royal-seal": {
+      "id": "letters-royal-badge-royal-seal",
+      "name": "Ấn Hoàng Gia",
+      "type": "badge",
+      "sourceKind": "letters",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 81,
+        "top": 56,
+        "width": 350,
+        "height": 400
+      },
+      "source": {
+        "file": "sources/letters-royal-badge-royal-seal.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 147,
+          "top": 48,
+          "width": 961,
+          "height": 1098
+        },
+        "sha256": "fec1f2dbce72cb94b222f08c74bccc4d94ff377e75ef4c1d8152081f06fcb965",
+        "aperture": null
+      },
+      "scale": 0.36429872495446264,
+      "nativeUpscaled": false,
+      "png": "sprites/letters-royal-badge-royal-seal.png",
+      "pngSha256": "77e2e88ec64cf203f80c11bda8a9706a534eeda48acb21458d1560669d42b3b9",
+      "exports": {
+        "128": {
+          "file": "sprites/letters-royal-badge-royal-seal-128.webp",
+          "bytes": 6742,
+          "sha256": "619f3ae28c921e38ab43baf82d7b36586254d39fd19711c7c9d87358467e141d"
+        },
+        "256": {
+          "file": "sprites/letters-royal-badge-royal-seal-256.webp",
+          "bytes": 18370,
+          "sha256": "af88637455fdf0aa369b50a21f81ab489f4d258b44856e5db9d4ac561d22ffc5"
+        },
+        "512": {
+          "file": "sprites/letters-royal-badge-royal-seal-512.webp",
+          "bytes": 57606,
+          "sha256": "4b6fba5750ea5b68562f05eda1719ed1ff86c8dbf43f9aabbbc701831d1053c2"
+        }
+      }
+    }
+  }
+}

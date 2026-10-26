@@ -14,5 +14,7 @@ export const nativeAds = {
   addListener: (event, listener) => AdMob.addListener(event, listener),
   showBanner: options => BannerBridge.showBanner(options),
   removeBanner: () => BannerBridge.removeBanner(),
+  prepareRewardVideoAd: options => AdMob.prepareRewardVideoAd(options),
+  showRewardVideoAd: () => AdMob.showRewardVideoAd(),
 };
 export const nativeApp = App;

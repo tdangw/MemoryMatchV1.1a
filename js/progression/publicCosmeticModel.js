@@ -1,7 +1,7 @@
-import { achievementItem } from './achievementModel.js';
+import { cosmeticItem } from './achievementModel.js';
 export function normalizePublicCosmetics(value) {
   return Object.fromEntries(['avatar', 'frame', 'badge'].map(slot => {
-    const id = value?.version === 1 ? value[slot] : null, item = achievementItem(id);
+    const id = value?.version === 1 ? value[slot] : null, item = cosmeticItem(id);
     return [slot, item?.type === slot ? id : null];
   }));
 }

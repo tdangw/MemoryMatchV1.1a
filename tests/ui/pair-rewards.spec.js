@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 for (const id of ['memory-match', 'link-connect']) test(`${id} first durable pair includes lucky, energy and item rewards before effects finish`, async ({ page }) => {
+  await page.emulateMedia({reducedMotion:'no-preference'});
   await page.goto('/');
   const before = await page.evaluate(async id => {
     await (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu(id);
@@ -9,7 +10,15 @@ for (const id of ['memory-match', 'link-connect']) test(`${id} first durable pai
     const key = (await import('/js/gameCatalog.js')).getGameProgressKey(id);
     if (id === 'memory-match') await (await import('/js/gameController.js')).startNewMemoryRun(1, { skipIntro: true });
     else await (await import('/js/linkConnect/linkController.js')).startLinkLevel({ mode: 'challenge', level: 1, skipIntro: true });
-    const initial = { coins: gameState.coins, hints: gameState.progress[key].items.hint || 0 };
+    const initial = { coins: gameState.coins, hints: gameState.progress[key].items.hint || 0,
+      lettersEnabled:(await import('/js/liveops/availability.js')).liveopsEnabled() };
+    window.letterFeedbackSeen=[];window.ticketFeedbackSeen=0;
+    new MutationObserver(records=>{for(const record of records)for(const node of record.addedNodes)
+      {if(node.classList?.contains('letter-drop-feedback__entry')&&node.dataset.rewardKind==='letter')window.letterFeedbackSeen.push(node.textContent);
+      if(node.classList?.contains('game-loot-drop')&&node.querySelector('.ui-icon--ticket'))window.ticketFeedbackSeen++;}
+    }).observe(document.body,{childList:true,subtree:true});
+    const originalRandom=crypto.getRandomValues.bind(crypto);
+    crypto.getRandomValues=array=>{if(array instanceof Uint32Array&&array.length===1){array[0]=0;return array;}return originalRandom(array);};
     (await import('/js/persistence.js')).subscribeToLocalCommit(({ patch }) => {
       const session = patch.progress?.[key]?.sessionsByMode.challenge;
       if (!window.firstPairCommit && session?.pairSnapshot?.matchedPairs === 1) window.firstPairCommit = { coins: patch.coins, session: structuredClone(session), items: structuredClone(patch.progress[key].items) };
@@ -17,6 +26,8 @@ for (const id of ['memory-match', 'link-connect']) test(`${id} first durable pai
     if (id === 'memory-match') {
       const first = document.querySelector('#grid-container .tile'); const pair = [...document.querySelectorAll('#grid-container .tile')].filter(tile => tile.dataset.imageId === first.dataset.imageId);
       pair.forEach(tile => { tile.dataset.special = 'true'; });
+      const {memoryBoard}=await import('/js/memoryMatch/memoryBoard.js');
+      pair.forEach(tile=>{memoryBoard.tiles.get(tile.id).special=true;});
       gameState.luckyRewards.set(first.dataset.imageId, { type: 'coins', value: 10 });
       gameState.specialProgress = 3; gameState.isLocked = false; Math.random = () => .99;
       const { handleTileClick } = await import('/js/logic.js'); await handleTileClick(pair[0]); void handleTileClick(pair[1]);
@@ -35,10 +46,17 @@ for (const id of ['memory-match', 'link-connect']) test(`${id} first durable pai
   }, id);
   await page.waitForFunction(() => window.firstPairCommit);
   const committed = await page.evaluate(() => window.firstPairCommit);
-  expect(committed.coins - before.coins).toBe(15);
+  expect(committed.coins - before.coins).toBe(12);
+  if(before.lettersEnabled){
+    await expect.poll(()=>page.evaluate(()=>window.letterFeedbackSeen.length)).toBe(1);
+    await expect.poll(()=>page.evaluate(()=>window.ticketFeedbackSeen)).toBe(1);
+    expect(await page.evaluate(async()=>(await (await import('/js/persistence.js')).loadPersistentGameData()).appearance.spark.ticketEarned)).toBe(1);
+    expect(await page.evaluate(async()=>Object.values((await (await import('/js/persistence.js')).loadPersistentGameData()).appearance.spark.letterEarned).reduce((a,b)=>a+b,0))).toBe(1);
+    await page.screenshot({path:`design/rewards-letters/drop/review/${id}-gameplay.png`});
+  }
   expect(committed.session.specialProgress).toBe(id === 'memory-match' ? 4 : 2);
   expect(committed.session.pairSnapshot.luckyAwards).toEqual([{ type: 'coins', value: 10 }]);
-  if (id === 'link-connect') expect(committed.items.hint).toBe(before.hints + 1);
+  if (id === 'link-connect') expect(committed.items.hint).toBe(before.hints + 2); // Blue supply + second energy milestone.
   await page.reload();
   const restored = await page.evaluate(async id => {
     await (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu(id);

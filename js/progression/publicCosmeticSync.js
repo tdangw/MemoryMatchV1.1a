@@ -5,6 +5,7 @@ import { loadPersistentGameData, loadSyncMetadata, saveSyncMetadata, subscribeTo
 import { createGameShellLifecycle } from '../gameShell/gameShellLifecycle.js';
 import { publishPublicCosmetics } from './publicCosmeticStore.js';
 import { publicCosmeticSelection, publicCosmeticFingerprint } from './publicCosmeticModel.js';
+import { canPublishCosmetics, expandedPublicCosmeticsEnabled } from '../liveops/availability.js';
 let instance = null;
 export const getPublicCosmeticSync = () => instance;
 export function initializePublicCosmeticSync() {
@@ -33,12 +34,17 @@ export function initializePublicCosmeticSync() {
         if (!current()) return false;
         const selection = publicCosmeticSelection(stored.appearance), fingerprint = publicCosmeticFingerprint(selection);
         submitted = fingerprint;
+        const expanded = backend.emulator || expandedPublicCosmeticsEnabled();
+        if (!canPublishCosmetics(selection, expanded)) {
+          notify('Đã lưu trên thiết bị. Đồ trang trí mới sẽ hiện trên bảng xếp hạng khi tính năng được mở.');
+          return false;
+        }
         const receiptKey = `publicCosmetics:${backend.environment}:${identity.uid}`;
         const receipt = await loadSyncMetadata(receiptKey);
         if (!current()) return false;
         if (receipt?.profileId === identity.profileId && receipt.fingerprint === fingerprint) { notify('Trang trí hồ sơ đã đồng bộ.'); return true; }
         notify('Đang đồng bộ trang trí hồ sơ…');
-        if (!await publishPublicCosmetics({ database: backend.database, environment: backend.environment, uid: identity.uid, selection, isCurrent: current }) || !current()) return false;
+        if (!await publishPublicCosmetics({ database: backend.database, environment: backend.environment, uid: identity.uid, selection, expanded, isCurrent: current }) || !current()) return false;
         if (!await saveSyncMetadata(receiptKey, { profileId: identity.profileId, fingerprint }, current)) {
           if (!current()) return false;
           throw new Error('Cosmetic acknowledgment could not be saved.');

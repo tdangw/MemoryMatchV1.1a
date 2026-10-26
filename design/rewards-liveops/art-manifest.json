@@ -1786,6 +1786,2054 @@
           "sha256": "64f635108c75745857811fcb4217dc4d6e65469b0fd2a45a4f2ad0c5d1c066f9"
         }
       }
+    },
+    "link-avatar-lantern-cat": {
+      "id": "link-avatar-lantern-cat",
+      "name": "Mèo Hoa Đăng",
+      "type": "avatar",
+      "gameId": "link-connect",
+      "level": 21,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 97,
+        "top": 97,
+        "width": 318,
+        "height": 318
+      },
+      "source": {
+        "file": "sources/link-avatar-lantern-cat.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 77,
+          "top": 76,
+          "width": 1102,
+          "height": 1093
+        },
+        "sha256": "4d5dfc19113f0b04b2fc5cfcad2b75ae2cf636aa9f9eebe8bf7ab71c2cfa4041",
+        "aperture": null
+      },
+      "scale": 0.2909423604757548,
+      "nativeUpscaled": false,
+      "png": "sprites/link-avatar-lantern-cat.png",
+      "pngSha256": "ac95e40826eb2fa8e1a9f0e9e360ce3956319dee47636389baaa66cc3c3e439c",
+      "exports": {
+        "128": {
+          "file": "sprites/link-avatar-lantern-cat-128.webp",
+          "bytes": 5302,
+          "sha256": "92ab40c15bc758569787c6375de97824aca80d202f8813a3d96bf471fce2b3c8"
+        },
+        "256": {
+          "file": "sprites/link-avatar-lantern-cat-256.webp",
+          "bytes": 14020,
+          "sha256": "90ab20261f8080671a4b0947a5231664748937f791dfdf1039cf4e7e0a1883c2"
+        },
+        "512": {
+          "file": "sprites/link-avatar-lantern-cat-512.webp",
+          "bytes": 41094,
+          "sha256": "8072020fcb9fdc65623d50e7fe04c61f7a846dcbc584a380fc04a91e71991f1d"
+        }
+      }
+    },
+    "link-frame-silk-lanterns": {
+      "id": "link-frame-silk-lanterns",
+      "name": "Vòng Đèn Lụa",
+      "type": "frame",
+      "gameId": "link-connect",
+      "level": 22,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 31,
+        "top": 62,
+        "width": 452,
+        "height": 427
+      },
+      "source": {
+        "file": "sources/link-frame-silk-lanterns.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 22,
+          "top": 53,
+          "width": 1214,
+          "height": 1148
+        },
+        "sha256": "8a3f656360d4e913436852a71f97335ebb2423fc51a7b78fe19680b4c5ff0063",
+        "aperture": {
+          "left": 234,
+          "top": 189,
+          "width": 786,
+          "height": 774,
+          "radius": 387,
+          "pixels": 469152
+        }
+      },
+      "scale": 0.37209302325581395,
+      "nativeUpscaled": false,
+      "png": "sprites/link-frame-silk-lanterns.png",
+      "pngSha256": "bdebe5a836974282163fb4d3b74437a398cd5b8fe30dbf7f12c96af64e375c07",
+      "exports": {
+        "128": {
+          "file": "sprites/link-frame-silk-lanterns-128.webp",
+          "bytes": 9220,
+          "sha256": "462b1ca94d52accd19430b75c7fff1f40845fa69eed54d9f4203392499a156f5"
+        },
+        "256": {
+          "file": "sprites/link-frame-silk-lanterns-256.webp",
+          "bytes": 23252,
+          "sha256": "c6468b8402c2a957146db10b72186b92f30b0f0a051860cd8161dac3b5d2d0f1"
+        },
+        "512": {
+          "file": "sprites/link-frame-silk-lanterns-512.webp",
+          "bytes": 67548,
+          "sha256": "22cb67ee60cbce941d0c4a5e37067f7d3dc90ec3e5823fea109ff6667f72c8b9"
+        }
+      }
+    },
+    "link-badge-guiding-lantern": {
+      "id": "link-badge-guiding-lantern",
+      "name": "Ngọn Đèn Kết Nối",
+      "type": "badge",
+      "gameId": "link-connect",
+      "level": 23,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 56,
+        "top": 60,
+        "width": 400,
+        "height": 393
+      },
+      "source": {
+        "file": "sources/link-badge-guiding-lantern.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 28,
+          "top": 18,
+          "width": 1198,
+          "height": 1176
+        },
+        "sha256": "0346b50f650130592ce9bd759f8797082cdcc008c8862eac5724ae8cbe8a3fbe",
+        "aperture": null
+      },
+      "scale": 0.333889816360601,
+      "nativeUpscaled": false,
+      "png": "sprites/link-badge-guiding-lantern.png",
+      "pngSha256": "1ba0fd7aa0ee94566a808dcff7742f7dd3e4cd9ba1971a36ff82f28c92fec428",
+      "exports": {
+        "128": {
+          "file": "sprites/link-badge-guiding-lantern-128.webp",
+          "bytes": 7834,
+          "sha256": "9f8337d69dc6765d45452207b7bbb5e97f702bfcb55f90c663952e02f24315b6"
+        },
+        "256": {
+          "file": "sprites/link-badge-guiding-lantern-256.webp",
+          "bytes": 21004,
+          "sha256": "80b8d39768d0511fb8e99d20fa844ce1aba5477570764e47269031d6cfe626c1"
+        },
+        "512": {
+          "file": "sprites/link-badge-guiding-lantern-512.webp",
+          "bytes": 62870,
+          "sha256": "aa0af4d2ff92cc637b02239ebf928ce78fe4b16f0082b7f6d9d9d4e609ee04fd"
+        }
+      }
+    },
+    "link-avatar-festival-sparrow": {
+      "id": "link-avatar-festival-sparrow",
+      "name": "Chim Sẻ Đêm Hội",
+      "type": "avatar",
+      "gameId": "link-connect",
+      "level": 24,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 97,
+        "top": 97,
+        "width": 318,
+        "height": 318
+      },
+      "source": {
+        "file": "sources/link-avatar-festival-sparrow.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 65,
+          "top": 71,
+          "width": 1123,
+          "height": 1112
+        },
+        "sha256": "5e54cb2404ef94b8737676a798da66da9ae7a24743e5baac1496516a61076da2",
+        "aperture": null
+      },
+      "scale": 0.28597122302158273,
+      "nativeUpscaled": false,
+      "png": "sprites/link-avatar-festival-sparrow.png",
+      "pngSha256": "20bb2bff7a81f319bd92ce799c96f16353a3ecb137355db79846ed1a5c3538ec",
+      "exports": {
+        "128": {
+          "file": "sprites/link-avatar-festival-sparrow-128.webp",
+          "bytes": 5762,
+          "sha256": "e52f195e26cb28444f84429266598feae24114cfbc4adf71e847ad63e259e3c6"
+        },
+        "256": {
+          "file": "sprites/link-avatar-festival-sparrow-256.webp",
+          "bytes": 15952,
+          "sha256": "e3a9ef1f20a19f48588ed06b41a36115513534e78a20e30d603523f9d8b474a4"
+        },
+        "512": {
+          "file": "sprites/link-avatar-festival-sparrow-512.webp",
+          "bytes": 48436,
+          "sha256": "4855289f929f439b7d1ceacfb3ddefe0899bf8af2abdde70dba5f3328207f07f"
+        }
+      }
+    },
+    "link-frame-osmanthus-branch": {
+      "id": "link-frame-osmanthus-branch",
+      "name": "Nhành Hoa Mộc",
+      "type": "frame",
+      "gameId": "link-connect",
+      "level": 25,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 38,
+        "top": 46,
+        "width": 436,
+        "height": 410
+      },
+      "source": {
+        "file": "sources/link-frame-osmanthus-branch.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 11,
+          "top": 26,
+          "width": 1227,
+          "height": 1153
+        },
+        "sha256": "83d0132c6066cee9086f90de6dff17b17c3ddc99c8cdab020d080173a043f4f1",
+        "aperture": {
+          "left": 218,
+          "top": 212,
+          "width": 813,
+          "height": 810,
+          "radius": 405,
+          "pixels": 507483
+        }
+      },
+      "scale": 0.35555555555555557,
+      "nativeUpscaled": false,
+      "png": "sprites/link-frame-osmanthus-branch.png",
+      "pngSha256": "c0e04f9082469eca900374a44293ded68e4bd016a023a453f65b9c3ba17b3828",
+      "exports": {
+        "128": {
+          "file": "sprites/link-frame-osmanthus-branch-128.webp",
+          "bytes": 9930,
+          "sha256": "6797ef869c25850791c8e759f7d5740878a3b64c158bc1d858c989c3dd0d14ff"
+        },
+        "256": {
+          "file": "sprites/link-frame-osmanthus-branch-256.webp",
+          "bytes": 26778,
+          "sha256": "fa8eb6ba5b3a2acfca000e16c86f69a3dba5575c183620c7850d744473e73145"
+        },
+        "512": {
+          "file": "sprites/link-frame-osmanthus-branch-512.webp",
+          "bytes": 80932,
+          "sha256": "3f8482ddc8fe8895d879533c3084679c541aad56503a57a21790d880dda1aee8"
+        }
+      }
+    },
+    "link-avatar-paperblossom-deer": {
+      "id": "link-avatar-paperblossom-deer",
+      "name": "Hươu Hoa Giấy",
+      "type": "avatar",
+      "gameId": "link-connect",
+      "level": 26,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 97,
+        "top": 97,
+        "width": 318,
+        "height": 318
+      },
+      "source": {
+        "file": "sources/link-avatar-paperblossom-deer.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 95,
+          "top": 93,
+          "width": 1064,
+          "height": 1057
+        },
+        "sha256": "c66036776ec9f830e7e5308d98a4d6494b67fcbf702d8af691c13351ff734132",
+        "aperture": null
+      },
+      "scale": 0.3008514664143803,
+      "nativeUpscaled": false,
+      "png": "sprites/link-avatar-paperblossom-deer.png",
+      "pngSha256": "1c5ee4f5e7f26470f0bfa502e2f6de77056ed63c4cc68c3f532749a0689535db",
+      "exports": {
+        "128": {
+          "file": "sprites/link-avatar-paperblossom-deer-128.webp",
+          "bytes": 5624,
+          "sha256": "414c0f45d90695e3c4f0f58edfd4e94ca560eea1ff1a9987ba0224ff6e379a24"
+        },
+        "256": {
+          "file": "sprites/link-avatar-paperblossom-deer-256.webp",
+          "bytes": 15104,
+          "sha256": "16c84a96a207b74f4d263a817153791772f560ebc5d579928ac2af22fcf8e95c"
+        },
+        "512": {
+          "file": "sprites/link-avatar-paperblossom-deer-512.webp",
+          "bytes": 44276,
+          "sha256": "4c01efcd942099042c4cf094e7a39d7f16428ea9bd313f4ef03994437c919b2c"
+        }
+      }
+    },
+    "link-frame-moon-silk": {
+      "id": "link-frame-moon-silk",
+      "name": "Dải Lụa Trăng",
+      "type": "frame",
+      "gameId": "link-connect",
+      "level": 27,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 42,
+        "top": 57,
+        "width": 434,
+        "height": 412
+      },
+      "source": {
+        "file": "sources/link-frame-moon-silk.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 34,
+          "top": 61,
+          "width": 1200,
+          "height": 1141
+        },
+        "sha256": "f0f7b9413fcb47a3f87b32277c7808519b424c9a5717d9d939fd429fb7800310",
+        "aperture": {
+          "left": 221,
+          "top": 215,
+          "width": 810,
+          "height": 797,
+          "radius": 398.5,
+          "pixels": 503229
+        }
+      },
+      "scale": 0.3613550815558344,
+      "nativeUpscaled": false,
+      "png": "sprites/link-frame-moon-silk.png",
+      "pngSha256": "ddeca2b043926ba3430eaf779793e377078bcbe1d746c89acd8b741d756e127e",
+      "exports": {
+        "128": {
+          "file": "sprites/link-frame-moon-silk-128.webp",
+          "bytes": 8574,
+          "sha256": "8b430ea8e0999da9668beca151ea2e83a639893fd59fe347dee82d6e34b7cf5b"
+        },
+        "256": {
+          "file": "sprites/link-frame-moon-silk-256.webp",
+          "bytes": 21652,
+          "sha256": "6837f94d5fb428ae1cbb32303e126a94355a42b4325b25a8b6363539cbbfc132"
+        },
+        "512": {
+          "file": "sprites/link-frame-moon-silk-512.webp",
+          "bytes": 63190,
+          "sha256": "ea91442ab567040faf8aee5d85fa4bb52ab982509f4d21c82b41f3ce2b596e6c"
+        }
+      }
+    },
+    "link-badge-moonlit-promise": {
+      "id": "link-badge-moonlit-promise",
+      "name": "Lời Hẹn Dưới Trăng",
+      "type": "badge",
+      "gameId": "link-connect",
+      "level": 28,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 82,
+        "top": 56,
+        "width": 348,
+        "height": 400
+      },
+      "source": {
+        "file": "sources/link-badge-moonlit-promise.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 108,
+          "top": 31,
+          "width": 1038,
+          "height": 1192
+        },
+        "sha256": "3c469690f5d296388799fe203d178d8efca49dca9dea4f8987727e08d3a20304",
+        "aperture": null
+      },
+      "scale": 0.33557046979865773,
+      "nativeUpscaled": false,
+      "png": "sprites/link-badge-moonlit-promise.png",
+      "pngSha256": "24c1ca53c98fad0a6e34c43e5bc62f49db509a9f03e0883bf9e940a10d9563eb",
+      "exports": {
+        "128": {
+          "file": "sprites/link-badge-moonlit-promise-128.webp",
+          "bytes": 7506,
+          "sha256": "16be47624c0d1edd89e8b677b411e4a6b9ffbf6f0292f10bbb930b20287425db"
+        },
+        "256": {
+          "file": "sprites/link-badge-moonlit-promise-256.webp",
+          "bytes": 19942,
+          "sha256": "9a4017410bac6b7d700c339f56db6e0e982ee6ace1423366a134cd5d6a3dd64d"
+        },
+        "512": {
+          "file": "sprites/link-badge-moonlit-promise-512.webp",
+          "bytes": 59012,
+          "sha256": "5c55848ae67442f2b973e6c6c30ce9821271f7db307776d692350fc85b85a1af"
+        }
+      }
+    },
+    "link-avatar-glasslight-fox": {
+      "id": "link-avatar-glasslight-fox",
+      "name": "Cáo Lưu Ly",
+      "type": "avatar",
+      "gameId": "link-connect",
+      "level": 29,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 97,
+        "top": 97,
+        "width": 318,
+        "height": 318
+      },
+      "source": {
+        "file": "sources/link-avatar-glasslight-fox.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 54,
+          "top": 61,
+          "width": 1145,
+          "height": 1135
+        },
+        "sha256": "913da063699f22741cd728b3e1ef22e02104be705313ad65080243f4b01f6ab4",
+        "aperture": null
+      },
+      "scale": 0.2801762114537445,
+      "nativeUpscaled": false,
+      "png": "sprites/link-avatar-glasslight-fox.png",
+      "pngSha256": "68d2de6d0937b8e73b2e347e4aff623d05b58941d869239726bec906516d0a38",
+      "exports": {
+        "128": {
+          "file": "sprites/link-avatar-glasslight-fox-128.webp",
+          "bytes": 5282,
+          "sha256": "50e98085d3c08414635c36d3564c61c6d7c474d36b732121ddbc2155f5430131"
+        },
+        "256": {
+          "file": "sprites/link-avatar-glasslight-fox-256.webp",
+          "bytes": 14196,
+          "sha256": "6f3fc9fa1ba820e2076f848b8713271d7333f07a1d3a6b2308653c4bf554ac31"
+        },
+        "512": {
+          "file": "sprites/link-avatar-glasslight-fox-512.webp",
+          "bytes": 42548,
+          "sha256": "6e302e4f0d5888581494fcaed863dbccc4df23a704ebbbd4dc32ff1ef57ff33b"
+        }
+      }
+    },
+    "link-frame-lantern-moon-gate": {
+      "id": "link-frame-lantern-moon-gate",
+      "name": "Cổng Trăng Hoa Đăng",
+      "type": "frame",
+      "gameId": "link-connect",
+      "level": 30,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 16,
+        "top": 22,
+        "width": 482,
+        "height": 444
+      },
+      "source": {
+        "file": "sources/link-frame-lantern-moon-gate-v2.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 24,
+          "top": 46,
+          "width": 1206,
+          "height": 1112
+        },
+        "sha256": "cd0da72543be5898332279078694ffd4669d5e3b4ee1a996f315fabf38b437e5",
+        "aperture": {
+          "left": 263,
+          "top": 272,
+          "width": 727,
+          "height": 721,
+          "radius": 360.5,
+          "pixels": 407537
+        }
+      },
+      "scale": 0.39944521497919555,
+      "nativeUpscaled": false,
+      "png": "sprites/link-frame-lantern-moon-gate.png",
+      "pngSha256": "5ff0b81aac15ee22b7ed247f88b20898e166000bcda80f5b480cdc5c1378460a",
+      "exports": {
+        "128": {
+          "file": "sprites/link-frame-lantern-moon-gate-128.webp",
+          "bytes": 9982,
+          "sha256": "de3880d328dd890f7d72ccf11b95fae202aeed8fffe4453fc60b6b17c9cc54ed"
+        },
+        "256": {
+          "file": "sprites/link-frame-lantern-moon-gate-256.webp",
+          "bytes": 25994,
+          "sha256": "954b9a5e96945adb95399386b7a7f735bd4adc52618b92d0efd7ce3a80b28d07"
+        },
+        "512": {
+          "file": "sprites/link-frame-lantern-moon-gate-512.webp",
+          "bytes": 75520,
+          "sha256": "2de9aaa3b23312b6949394945a27a0f5794f559beb6c46298b620f03e8eda755"
+        }
+      }
+    },
+    "triple-avatar-quartz-phoenix": {
+      "id": "triple-avatar-quartz-phoenix",
+      "name": "Phượng Hoàng Thạch Anh",
+      "type": "avatar",
+      "gameId": "triple-connect",
+      "level": 11,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 97,
+        "top": 97,
+        "width": 318,
+        "height": 318
+      },
+      "source": {
+        "file": "sources/triple-avatar-quartz-phoenix.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 63,
+          "top": 66,
+          "width": 1128,
+          "height": 1118
+        },
+        "sha256": "e97e03bfbd08a9970b0aed9db98dae56e4d2e6d3250f4ac2d8dd48f7e3b31adc",
+        "aperture": null
+      },
+      "scale": 0.2844364937388193,
+      "nativeUpscaled": false,
+      "png": "sprites/triple-avatar-quartz-phoenix.png",
+      "pngSha256": "dbc7605172a6e3f460725d3158e000b1f1551408c1094ec890646a08468e9330",
+      "exports": {
+        "128": {
+          "file": "sprites/triple-avatar-quartz-phoenix-128.webp",
+          "bytes": 5800,
+          "sha256": "5d7c6ffc8512c2953caa4c9fc8f8db344ad20720fb87cc5923feb9c4ce6836a8"
+        },
+        "256": {
+          "file": "sprites/triple-avatar-quartz-phoenix-256.webp",
+          "bytes": 16862,
+          "sha256": "b0ae5b0ad6ff909cab52b6e94f3a334571a3d538316f71e87329fea6fc9f1158"
+        },
+        "512": {
+          "file": "sprites/triple-avatar-quartz-phoenix-512.webp",
+          "bytes": 55822,
+          "sha256": "3fbd7878bcc77f35f14d36894cb7e9ad5518c1fb3014ca2822ccc1e50c7a3438"
+        }
+      }
+    },
+    "triple-frame-crystal-arch": {
+      "id": "triple-frame-crystal-arch",
+      "name": "Vòm Pha Lê",
+      "type": "frame",
+      "gameId": "triple-connect",
+      "level": 12,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 29,
+        "top": 30,
+        "width": 454,
+        "height": 456
+      },
+      "source": {
+        "file": "sources/triple-frame-crystal-arch.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 25,
+          "top": 17,
+          "width": 1204,
+          "height": 1209
+        },
+        "sha256": "e6c6868c61909dd9445be4f27b990dff1353c6298a51600fb13ead72073d5ccb",
+        "aperture": {
+          "left": 229,
+          "top": 234,
+          "width": 796,
+          "height": 764,
+          "radius": 382,
+          "pixels": 479477
+        }
+      },
+      "scale": 0.3769633507853403,
+      "nativeUpscaled": false,
+      "png": "sprites/triple-frame-crystal-arch.png",
+      "pngSha256": "f6847b9d8cb2f86740fc14096e19dba6f5850c10f31b54cc72149779e047ca5c",
+      "exports": {
+        "128": {
+          "file": "sprites/triple-frame-crystal-arch-128.webp",
+          "bytes": 8876,
+          "sha256": "cf1ee7ff7249f4f77bac90b8bd220d22a802fc9df9970028bcc7d71e325bc4cf"
+        },
+        "256": {
+          "file": "sprites/triple-frame-crystal-arch-256.webp",
+          "bytes": 22838,
+          "sha256": "541ee63ee26001cde4b0f5d99585f06b2fee32d7644da073ae05f4447766190d"
+        },
+        "512": {
+          "file": "sprites/triple-frame-crystal-arch-512.webp",
+          "bytes": 68828,
+          "sha256": "ac84df37166313c0b1fbcfc003e0ed06d1c67150f83fba12b2a45fe5e7d44da7"
+        }
+      }
+    },
+    "triple-badge-triangle-seal": {
+      "id": "triple-badge-triangle-seal",
+      "name": "Dấu Ấn Tam Giác",
+      "type": "badge",
+      "gameId": "triple-connect",
+      "level": 13,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 76,
+        "top": 56,
+        "width": 360,
+        "height": 400
+      },
+      "source": {
+        "file": "sources/triple-badge-triangle-seal.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 147,
+          "top": 71,
+          "width": 959,
+          "height": 1067
+        },
+        "sha256": "9cf409137431350108986dcb9ce977a0868e420b00c21a6d3beeac83a3ee7ab8",
+        "aperture": null
+      },
+      "scale": 0.37488284910965325,
+      "nativeUpscaled": false,
+      "png": "sprites/triple-badge-triangle-seal.png",
+      "pngSha256": "797bbe786c36cd16f6963a33754cc9cd40003f62eafab242bd76afe36bd8881e",
+      "exports": {
+        "128": {
+          "file": "sprites/triple-badge-triangle-seal-128.webp",
+          "bytes": 6460,
+          "sha256": "b8d5aecb02c1e0d49ac94674893a8a05fb8727746677e0ea9cdd59482da50b7d"
+        },
+        "256": {
+          "file": "sprites/triple-badge-triangle-seal-256.webp",
+          "bytes": 17682,
+          "sha256": "ca1b279c7a3efef73e6a323e0568c4e0260f8175b0cd714d5c12953c24d32c8c"
+        },
+        "512": {
+          "file": "sprites/triple-badge-triangle-seal-512.webp",
+          "bytes": 54186,
+          "sha256": "56bc0442fd175c0e07d4705d92761b46e4c90687a3ce6074d95901df6bfc5a4b"
+        }
+      }
+    },
+    "triple-avatar-amethyst-unicorn": {
+      "id": "triple-avatar-amethyst-unicorn",
+      "name": "Kỳ Lân Tím",
+      "type": "avatar",
+      "gameId": "triple-connect",
+      "level": 14,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 97,
+        "top": 97,
+        "width": 318,
+        "height": 318
+      },
+      "source": {
+        "file": "sources/triple-avatar-amethyst-unicorn.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 51,
+          "top": 58,
+          "width": 1153,
+          "height": 1144
+        },
+        "sha256": "fa361b6ac3521bc07937be3f385eb00e55154bb61075c845021a5dccb8a0da62",
+        "aperture": null
+      },
+      "scale": 0.27797202797202797,
+      "nativeUpscaled": false,
+      "png": "sprites/triple-avatar-amethyst-unicorn.png",
+      "pngSha256": "1cdad4e62c37ae21b67307d263ce335072ad138877d24ea62523d7b7af72f1dd",
+      "exports": {
+        "128": {
+          "file": "sprites/triple-avatar-amethyst-unicorn-128.webp",
+          "bytes": 5686,
+          "sha256": "c43df00bbed96171d87abf048e39ce25fdd69553de88e7930e3ede249265d17a"
+        },
+        "256": {
+          "file": "sprites/triple-avatar-amethyst-unicorn-256.webp",
+          "bytes": 16204,
+          "sha256": "25f7c9f091cef815cbade465211ac5b5868e53db5701522f32d99c8b2cc29cce"
+        },
+        "512": {
+          "file": "sprites/triple-avatar-amethyst-unicorn-512.webp",
+          "bytes": 51224,
+          "sha256": "a5ac42b5b68882fb53c9c7d1385865142e0c8865d20092aae89fecaf5f626e22"
+        }
+      }
+    },
+    "triple-frame-three-wing-star": {
+      "id": "triple-frame-three-wing-star",
+      "name": "Cánh Sao Ba Nhánh",
+      "type": "frame",
+      "gameId": "triple-connect",
+      "level": 15,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 46,
+        "top": 24,
+        "width": 422,
+        "height": 415
+      },
+      "source": {
+        "file": "sources/triple-frame-three-wing-star.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 40,
+          "top": 23,
+          "width": 1177,
+          "height": 1158
+        },
+        "sha256": "a5754cf5acfa1666a2161c22cbcd61754936b80b0cec2b2cdc5b1060c634bc43",
+        "aperture": {
+          "left": 224,
+          "top": 268,
+          "width": 806,
+          "height": 804,
+          "radius": 402,
+          "pixels": 505731
+        }
+      },
+      "scale": 0.3582089552238806,
+      "nativeUpscaled": false,
+      "png": "sprites/triple-frame-three-wing-star.png",
+      "pngSha256": "74bfe112f21404a195feb88d95539b093790a46d8cbe6372aefc47b1a4a069c4",
+      "exports": {
+        "128": {
+          "file": "sprites/triple-frame-three-wing-star-128.webp",
+          "bytes": 6524,
+          "sha256": "6f6263993369b4e98092a6d7a977025533558f96468fdfd49eb45ad7592057a9"
+        },
+        "256": {
+          "file": "sprites/triple-frame-three-wing-star-256.webp",
+          "bytes": 16688,
+          "sha256": "4c50e5727bddf436175c2988275f56e72cb159e4de10c3b1905d1c634f871886"
+        },
+        "512": {
+          "file": "sprites/triple-frame-three-wing-star-512.webp",
+          "bytes": 47582,
+          "sha256": "17dea0416457564c89f58ae2df88f8235e2feb7ddcd246b2ac01ee76ae431d1c"
+        }
+      }
+    },
+    "triple-avatar-platinum-dragon": {
+      "id": "triple-avatar-platinum-dragon",
+      "name": "Rồng Bạch Kim",
+      "type": "avatar",
+      "gameId": "triple-connect",
+      "level": 16,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 97,
+        "top": 97,
+        "width": 318,
+        "height": 318
+      },
+      "source": {
+        "file": "sources/triple-avatar-platinum-dragon.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 44,
+          "top": 47,
+          "width": 1164,
+          "height": 1156
+        },
+        "sha256": "a0d0b96607d2fca77166e8a3762e72ee1afb98595d23bc4e38ceb78a0c65d6bb",
+        "aperture": null
+      },
+      "scale": 0.2750865051903114,
+      "nativeUpscaled": false,
+      "png": "sprites/triple-avatar-platinum-dragon.png",
+      "pngSha256": "883aeb52d404c935b1c3f31dd22622aabcf47d419dbe9412ebafe2c1eb4ed879",
+      "exports": {
+        "128": {
+          "file": "sprites/triple-avatar-platinum-dragon-128.webp",
+          "bytes": 5812,
+          "sha256": "3d2d6e983df73d9a157a58dce8b0e8e5c39c3808ed02cb9aed2d64c28b39601a"
+        },
+        "256": {
+          "file": "sprites/triple-avatar-platinum-dragon-256.webp",
+          "bytes": 16424,
+          "sha256": "090381750b675b46b41d57c49956986d69ae303c1e4d6c5e6203a28a031adc20"
+        },
+        "512": {
+          "file": "sprites/triple-avatar-platinum-dragon-512.webp",
+          "bytes": 53358,
+          "sha256": "0a15ee4f8d4b542ccd6edc75c70409c5395be291064a143a895f6cae81924203"
+        }
+      }
+    },
+    "triple-frame-jade-gears": {
+      "id": "triple-frame-jade-gears",
+      "name": "Vòng Bánh Răng Ngọc",
+      "type": "frame",
+      "gameId": "triple-connect",
+      "level": 17,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 28,
+        "top": 35,
+        "width": 456,
+        "height": 445
+      },
+      "source": {
+        "file": "sources/triple-frame-jade-gears.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 9,
+          "top": 8,
+          "width": 1235,
+          "height": 1205
+        },
+        "sha256": "46ca3b237eee30b4972fbd4d616eddc967ae7369d28d1777e4d192f2c128f06c",
+        "aperture": {
+          "left": 228,
+          "top": 217,
+          "width": 797,
+          "height": 780,
+          "radius": 390,
+          "pixels": 485982
+        }
+      },
+      "scale": 0.36923076923076925,
+      "nativeUpscaled": false,
+      "png": "sprites/triple-frame-jade-gears.png",
+      "pngSha256": "536849716a1352e0422905dcc5af806e43df1e9c1f2ece5aa2ae7a6f1ff242e9",
+      "exports": {
+        "128": {
+          "file": "sprites/triple-frame-jade-gears-128.webp",
+          "bytes": 8316,
+          "sha256": "dabb34836f75ce8f5d60e69a1b9ccaf5ff35e6adbf30fa8cc239d865cb9a5c2f"
+        },
+        "256": {
+          "file": "sprites/triple-frame-jade-gears-256.webp",
+          "bytes": 22990,
+          "sha256": "b1039dbd2994276e071f1d4f20692b56ebca88b73a68379b8ccc665d6f95411f"
+        },
+        "512": {
+          "file": "sprites/triple-frame-jade-gears-512.webp",
+          "bytes": 69488,
+          "sha256": "ed024ad5732fcb089fde186a09480acd7a4f28bf2fe20742ed4b0bdfb0e45086"
+        }
+      }
+    },
+    "triple-badge-crystal-keeper": {
+      "id": "triple-badge-crystal-keeper",
+      "name": "Người Giữ Tinh Thể",
+      "type": "badge",
+      "gameId": "triple-connect",
+      "level": 18,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 97,
+        "top": 56,
+        "width": 317,
+        "height": 400
+      },
+      "source": {
+        "file": "sources/triple-badge-crystal-keeper.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 212,
+          "top": 61,
+          "width": 830,
+          "height": 1046
+        },
+        "sha256": "c93d8fe9d4f70543487b63d35236f6292a31d6c3fe59b6a48813185c5751e52c",
+        "aperture": null
+      },
+      "scale": 0.3824091778202677,
+      "nativeUpscaled": false,
+      "png": "sprites/triple-badge-crystal-keeper.png",
+      "pngSha256": "7188b9ccdc678bf2e42b55b9deaeaa19aae25d2be72031927c1d45c9e0dbff2f",
+      "exports": {
+        "128": {
+          "file": "sprites/triple-badge-crystal-keeper-128.webp",
+          "bytes": 6688,
+          "sha256": "da8f8b8ca0f9f78257e171c7a1aae736c708aadf5351249482595f3164004963"
+        },
+        "256": {
+          "file": "sprites/triple-badge-crystal-keeper-256.webp",
+          "bytes": 17486,
+          "sha256": "4ef6c80c17ab2f177c38758dab55eeb20070417cf5da931c41eb037aabcd0980"
+        },
+        "512": {
+          "file": "sprites/triple-badge-crystal-keeper-512.webp",
+          "bytes": 52696,
+          "sha256": "857d3170019041e3072209ad26fefb8baf0007a6ef3daa3d03269bf9295f3ba7"
+        }
+      }
+    },
+    "triple-avatar-crystal-mech-cat": {
+      "id": "triple-avatar-crystal-mech-cat",
+      "name": "Mèo Máy Pha Lê",
+      "type": "avatar",
+      "gameId": "triple-connect",
+      "level": 19,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 97,
+        "top": 97,
+        "width": 318,
+        "height": 318
+      },
+      "source": {
+        "file": "sources/triple-avatar-crystal-mech-cat-v2.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 73,
+          "top": 67,
+          "width": 1105,
+          "height": 1104
+        },
+        "sha256": "40b3e4cfcd793cc2e4be2d7c13b471f3da0a47aed161df6137e2ed41f5b3c832",
+        "aperture": null
+      },
+      "scale": 0.28804347826086957,
+      "nativeUpscaled": false,
+      "png": "sprites/triple-avatar-crystal-mech-cat.png",
+      "pngSha256": "f64b25966bea82caca1a8380d48f06680ed6f94f48f06f95d7c78b36c63e68fc",
+      "exports": {
+        "128": {
+          "file": "sprites/triple-avatar-crystal-mech-cat-128.webp",
+          "bytes": 5390,
+          "sha256": "edaf0343adde4437980acd3e27248df5d0fcf2c9b1a750186088875df87b443e"
+        },
+        "256": {
+          "file": "sprites/triple-avatar-crystal-mech-cat-256.webp",
+          "bytes": 15388,
+          "sha256": "972bbf13a72027809eeaf32668c168bff7c8376de456690a2b90313be1fa26c7"
+        },
+        "512": {
+          "file": "sprites/triple-avatar-crystal-mech-cat-512.webp",
+          "bytes": 48920,
+          "sha256": "e5d91f8547b4291875fa56d02827a48596f5467456fadad48636c19c7e61a4c1"
+        }
+      }
+    },
+    "triple-frame-tri-star-crown": {
+      "id": "triple-frame-tri-star-crown",
+      "name": "Vương Miện Tam Tinh",
+      "type": "frame",
+      "gameId": "triple-connect",
+      "level": 20,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 39,
+        "top": 29,
+        "width": 434,
+        "height": 429
+      },
+      "source": {
+        "file": "sources/triple-frame-tri-star-crown-v2.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 87,
+          "top": 99,
+          "width": 1080,
+          "height": 1066
+        },
+        "sha256": "dfa813ccf54679d4d9985603c95e45d480c829c10e8624e155c3d65be1526931",
+        "aperture": {
+          "left": 253,
+          "top": 305,
+          "width": 748,
+          "height": 716,
+          "radius": 358,
+          "pixels": 413220
+        }
+      },
+      "scale": 0.4022346368715084,
+      "nativeUpscaled": false,
+      "png": "sprites/triple-frame-tri-star-crown.png",
+      "pngSha256": "40fbfc3b9f600260ccb07c97f33d255d8e2f7a8160caa9ea252491c2f99d52a4",
+      "exports": {
+        "128": {
+          "file": "sprites/triple-frame-tri-star-crown-128.webp",
+          "bytes": 8846,
+          "sha256": "cbb940d9db1b2ce92420940a3fac6e504cbaf98d005bd6a31ff38682fb34201a"
+        },
+        "256": {
+          "file": "sprites/triple-frame-tri-star-crown-256.webp",
+          "bytes": 21364,
+          "sha256": "8b72a254bf0ad06fc19b4c288c4eb270d42a2bfe71b7ee7a5373ecdfd6b7f59f"
+        },
+        "512": {
+          "file": "sprites/triple-frame-tri-star-crown-512.webp",
+          "bytes": 61946,
+          "sha256": "4a8a46da460d7dadfd944eecf148730912eea8ec870ca7889a53bfb793e8b6cd"
+        }
+      }
+    },
+    "triple-avatar-aurora-snowfox": {
+      "id": "triple-avatar-aurora-snowfox",
+      "name": "Cáo Tuyết Cực Quang",
+      "type": "avatar",
+      "gameId": "triple-connect",
+      "level": 21,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 97,
+        "top": 97,
+        "width": 318,
+        "height": 318
+      },
+      "source": {
+        "file": "sources/triple-avatar-aurora-snowfox.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 29,
+          "top": 37,
+          "width": 1196,
+          "height": 1185
+        },
+        "sha256": "827d02110095aa18daeeaf2bba08f72f4487abe4009a225de62c8a26d421383f",
+        "aperture": null
+      },
+      "scale": 0.2683544303797468,
+      "nativeUpscaled": false,
+      "png": "sprites/triple-avatar-aurora-snowfox.png",
+      "pngSha256": "f682ec5ce4ad4f7520185e68f16ad94c96b2025ef727faac2cf544ae04ece85c",
+      "exports": {
+        "128": {
+          "file": "sprites/triple-avatar-aurora-snowfox-128.webp",
+          "bytes": 5286,
+          "sha256": "305ab07adc858c4bcbac80cd7ab0d0e6bd252774a9478b1bd9f5dd8ff2fdf11d"
+        },
+        "256": {
+          "file": "sprites/triple-avatar-aurora-snowfox-256.webp",
+          "bytes": 14704,
+          "sha256": "65486f5f5a62fdf97eba69f058aba8470223a452c9d40cce369f2ce5f1f765ec"
+        },
+        "512": {
+          "file": "sprites/triple-avatar-aurora-snowfox-512.webp",
+          "bytes": 44618,
+          "sha256": "ca06f6b432ee8857e17fe21df23ef329cc07eba80814ee6472d17a50cae0f6f9"
+        }
+      }
+    },
+    "triple-frame-aurora-ribbon": {
+      "id": "triple-frame-aurora-ribbon",
+      "name": "Dải Cực Quang",
+      "type": "frame",
+      "gameId": "triple-connect",
+      "level": 22,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 47,
+        "top": 44,
+        "width": 419,
+        "height": 426
+      },
+      "source": {
+        "file": "sources/triple-frame-aurora-ribbon-v2.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 121,
+          "top": 102,
+          "width": 1019,
+          "height": 1037
+        },
+        "sha256": "e4e5988ca4f9d521869fd5cd43289949ddb0e4ab8d36cfc6361074e2154a9535",
+        "aperture": {
+          "left": 250,
+          "top": 269,
+          "width": 761,
+          "height": 701,
+          "radius": 350.5,
+          "pixels": 407564
+        }
+      },
+      "scale": 0.4108416547788873,
+      "nativeUpscaled": false,
+      "png": "sprites/triple-frame-aurora-ribbon.png",
+      "pngSha256": "9657be889b2ecd812801b72997208a81f96d09c81d99f171f90651a3cf6379df",
+      "exports": {
+        "128": {
+          "file": "sprites/triple-frame-aurora-ribbon-128.webp",
+          "bytes": 7506,
+          "sha256": "a0fd1cab27e09944f79478ed8cc1feee9776da87c482c4c1aa30b4d7d776f5fe"
+        },
+        "256": {
+          "file": "sprites/triple-frame-aurora-ribbon-256.webp",
+          "bytes": 18484,
+          "sha256": "ff2f810bed93728609e8fb90e6a16b299ade4713fe9c8065c7657edac6ee8377"
+        },
+        "512": {
+          "file": "sprites/triple-frame-aurora-ribbon-512.webp",
+          "bytes": 54832,
+          "sha256": "659976296951694eda86c8e9758f997b54f618288e746662fa51735556068ef9"
+        }
+      }
+    },
+    "triple-badge-three-dawn-rays": {
+      "id": "triple-badge-three-dawn-rays",
+      "name": "Ba Tia Bình Minh",
+      "type": "badge",
+      "gameId": "triple-connect",
+      "level": 23,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 70,
+        "top": 56,
+        "width": 372,
+        "height": 400
+      },
+      "source": {
+        "file": "sources/triple-badge-three-dawn-rays.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 108,
+          "top": 54,
+          "width": 1039,
+          "height": 1118
+        },
+        "sha256": "2b94c3d543a1e672a2f71673ecbc102d1b65f49eafbbbaf5723076e124b682f9",
+        "aperture": null
+      },
+      "scale": 0.35778175313059035,
+      "nativeUpscaled": false,
+      "png": "sprites/triple-badge-three-dawn-rays.png",
+      "pngSha256": "57dfc72e0a89d40cae9755cd1722f759e10e2829c479091531cfc98ed4b1099f",
+      "exports": {
+        "128": {
+          "file": "sprites/triple-badge-three-dawn-rays-128.webp",
+          "bytes": 6230,
+          "sha256": "7ebe8f0e1b18561222552a2e4bf27169eb1b7e5c5bbda85a2eea7cdc55ae994b"
+        },
+        "256": {
+          "file": "sprites/triple-badge-three-dawn-rays-256.webp",
+          "bytes": 16656,
+          "sha256": "10a910e3912652ae255d947e37939ce6dcac548b1516ca2052ce70378ed2c496"
+        },
+        "512": {
+          "file": "sprites/triple-badge-three-dawn-rays-512.webp",
+          "bytes": 50082,
+          "sha256": "baa229e2d07f88344cc9becdcb3e7f344e5816a3d58af96d196ded4497327037"
+        }
+      }
+    },
+    "triple-avatar-jade-penguin": {
+      "id": "triple-avatar-jade-penguin",
+      "name": "Chim Cánh Cụt Ngọc",
+      "type": "avatar",
+      "gameId": "triple-connect",
+      "level": 24,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 97,
+        "top": 97,
+        "width": 318,
+        "height": 318
+      },
+      "source": {
+        "file": "sources/triple-avatar-jade-penguin.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 44,
+          "top": 50,
+          "width": 1163,
+          "height": 1152
+        },
+        "sha256": "3304703dd1663553d6da528bda0bade67003edc34fd13e782ec58f3dd68117c0",
+        "aperture": null
+      },
+      "scale": 0.2760416666666667,
+      "nativeUpscaled": false,
+      "png": "sprites/triple-avatar-jade-penguin.png",
+      "pngSha256": "99c38bdfc24f171479ddf314c8b946aa547e7d11e1926cdf54f161102a07b2e3",
+      "exports": {
+        "128": {
+          "file": "sprites/triple-avatar-jade-penguin-128.webp",
+          "bytes": 5504,
+          "sha256": "e0ea1eb6de99fed038185e6cda761716d626f0d37e6ab54a186603c577a3ad22"
+        },
+        "256": {
+          "file": "sprites/triple-avatar-jade-penguin-256.webp",
+          "bytes": 14780,
+          "sha256": "d7f8db8461ecce1f442ef8724970a0bf685338393cebd3b01be74b60e0ce60f1"
+        },
+        "512": {
+          "file": "sprites/triple-avatar-jade-penguin-512.webp",
+          "bytes": 43854,
+          "sha256": "17e46b70aac96d722a4444519cd31b6824512a9b6770a9bb38fee43b4cefeab9"
+        }
+      }
+    },
+    "triple-frame-azure-ice-ring": {
+      "id": "triple-frame-azure-ice-ring",
+      "name": "Vòng Băng Lam",
+      "type": "frame",
+      "gameId": "triple-connect",
+      "level": 25,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 33,
+        "top": 37,
+        "width": 446,
+        "height": 440
+      },
+      "source": {
+        "file": "sources/triple-frame-azure-ice-ring.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 26,
+          "top": 25,
+          "width": 1202,
+          "height": 1187
+        },
+        "sha256": "66c704ff3258b8ec17fabd0f3ddb0cb6fa8a37c830c8c27e0a8af52b33d55ee7",
+        "aperture": {
+          "left": 226,
+          "top": 228,
+          "width": 802,
+          "height": 777,
+          "radius": 388.5,
+          "pixels": 489922
+        }
+      },
+      "scale": 0.37065637065637064,
+      "nativeUpscaled": false,
+      "png": "sprites/triple-frame-azure-ice-ring.png",
+      "pngSha256": "d92075b7c4276170a429f1b1bb5863b81323053c164bca4290af3f42d40fcaa5",
+      "exports": {
+        "128": {
+          "file": "sprites/triple-frame-azure-ice-ring-128.webp",
+          "bytes": 8134,
+          "sha256": "00cde1563e00253407abcc1d0b0f7cbb4ec914a32f53c73ab2c2ced10b7c906c"
+        },
+        "256": {
+          "file": "sprites/triple-frame-azure-ice-ring-256.webp",
+          "bytes": 21516,
+          "sha256": "a9f19bb69899142abcd0d01510d534ebd32278d8bae0941162391aff992d9204"
+        },
+        "512": {
+          "file": "sprites/triple-frame-azure-ice-ring-512.webp",
+          "bytes": 67270,
+          "sha256": "7d923b6ce47cc04d1034b427fa913f40c171661fdb16b4afac0c4333f3e7cd45"
+        }
+      }
+    },
+    "triple-avatar-polar-bear": {
+      "id": "triple-avatar-polar-bear",
+      "name": "Gấu Bắc Cực",
+      "type": "avatar",
+      "gameId": "triple-connect",
+      "level": 26,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 97,
+        "top": 97,
+        "width": 318,
+        "height": 318
+      },
+      "source": {
+        "file": "sources/triple-avatar-polar-bear.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 30,
+          "top": 39,
+          "width": 1192,
+          "height": 1178
+        },
+        "sha256": "2ccb952b2a21bf69f2a82776037fc536e9c45556de6d5357c4667194a85c5d98",
+        "aperture": null
+      },
+      "scale": 0.2699490662139219,
+      "nativeUpscaled": false,
+      "png": "sprites/triple-avatar-polar-bear.png",
+      "pngSha256": "20bfb4632a41f1f8cbf6b0b2620ef329b9c73230d024b79b44dd57d2c9366428",
+      "exports": {
+        "128": {
+          "file": "sprites/triple-avatar-polar-bear-128.webp",
+          "bytes": 5046,
+          "sha256": "aede1c99acfe70c22a3ba88d7eb6ff680f4ed135b0f2736476419ab8e879a263"
+        },
+        "256": {
+          "file": "sprites/triple-avatar-polar-bear-256.webp",
+          "bytes": 13688,
+          "sha256": "51b8334d6217b1f4f81ad2147282a6ef097910881ca094aad07dbbaf483780cb"
+        },
+        "512": {
+          "file": "sprites/triple-avatar-polar-bear-512.webp",
+          "bytes": 41472,
+          "sha256": "b5e817e9d0430b277c58a257fdc45c4b02c7ddee07e4e530e7fc0884f4d4c3ec"
+        }
+      }
+    },
+    "triple-frame-silver-meteor": {
+      "id": "triple-frame-silver-meteor",
+      "name": "Thiên Thạch Bạc",
+      "type": "frame",
+      "gameId": "triple-connect",
+      "level": 27,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 44,
+        "top": 39,
+        "width": 424,
+        "height": 436
+      },
+      "source": {
+        "file": "sources/triple-frame-silver-meteor.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 32,
+          "top": 11,
+          "width": 1190,
+          "height": 1224
+        },
+        "sha256": "213b9ccc4185f20a227fa702ec16cdade7f47cb3ab3ff9550992360220ea2651",
+        "aperture": {
+          "left": 209,
+          "top": 217,
+          "width": 836,
+          "height": 808,
+          "radius": 404,
+          "pixels": 527500
+        }
+      },
+      "scale": 0.3564356435643564,
+      "nativeUpscaled": false,
+      "png": "sprites/triple-frame-silver-meteor.png",
+      "pngSha256": "b36666cc7d4a28744f3b11efd046ffc684d275f6fedeeaae72a8b8922873f646",
+      "exports": {
+        "128": {
+          "file": "sprites/triple-frame-silver-meteor-128.webp",
+          "bytes": 7790,
+          "sha256": "a19d316e81dc991ca0dd0ad268a080d953950415b88a41ca372fec4ec0dd5cac"
+        },
+        "256": {
+          "file": "sprites/triple-frame-silver-meteor-256.webp",
+          "bytes": 21036,
+          "sha256": "7c541d4d922886f769c6e2e92d3ada18a208547862e318b407e7f0a2c9a23169"
+        },
+        "512": {
+          "file": "sprites/triple-frame-silver-meteor-512.webp",
+          "bytes": 64038,
+          "sha256": "64a39ce60a5f8b14b6cc42a0db1923478887f742a46d5a710c4139315880449b"
+        }
+      }
+    },
+    "triple-badge-aurora-heart": {
+      "id": "triple-badge-aurora-heart",
+      "name": "Trái Tim Cực Quang",
+      "type": "badge",
+      "gameId": "triple-connect",
+      "level": 28,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 60,
+        "top": 56,
+        "width": 391,
+        "height": 400
+      },
+      "source": {
+        "file": "sources/triple-badge-aurora-heart.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 66,
+          "top": 35,
+          "width": 1122,
+          "height": 1147
+        },
+        "sha256": "48d1aae608c300ad7d38351c570556cf4130b2a0911d074e67ca95ea2a10f4ae",
+        "aperture": null
+      },
+      "scale": 0.34873583260680036,
+      "nativeUpscaled": false,
+      "png": "sprites/triple-badge-aurora-heart.png",
+      "pngSha256": "5c38223e32d0c698410a23b134eec5c9e70ec0b0a5b5ced0a114712297e4de27",
+      "exports": {
+        "128": {
+          "file": "sprites/triple-badge-aurora-heart-128.webp",
+          "bytes": 7336,
+          "sha256": "42606196a63e6316842ed3b1ebb2f8ec533cd5f5194d68af32b3dfa4b1615331"
+        },
+        "256": {
+          "file": "sprites/triple-badge-aurora-heart-256.webp",
+          "bytes": 20190,
+          "sha256": "3d063560a2bba8cf26f482f09fbe624f3dd2e645fe223d24840a2c0cd46a5ad9"
+        },
+        "512": {
+          "file": "sprites/triple-badge-aurora-heart-512.webp",
+          "bytes": 63052,
+          "sha256": "dc7a0911309b3b892981b081b92257c24bdadc75cf68dc543b657ced8d861b32"
+        }
+      }
+    },
+    "triple-avatar-galactic-dragon": {
+      "id": "triple-avatar-galactic-dragon",
+      "name": "Rồng Thiên Hà",
+      "type": "avatar",
+      "gameId": "triple-connect",
+      "level": 29,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 97,
+        "top": 97,
+        "width": 318,
+        "height": 318
+      },
+      "source": {
+        "file": "sources/triple-avatar-galactic-dragon.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 27,
+          "top": 32,
+          "width": 1200,
+          "height": 1187
+        },
+        "sha256": "916433a4d06d9a2908cf5cefa8c2cccffd93e6df17102da508347cde8697074e",
+        "aperture": null
+      },
+      "scale": 0.2679022746419545,
+      "nativeUpscaled": false,
+      "png": "sprites/triple-avatar-galactic-dragon.png",
+      "pngSha256": "03bc4a8a7b9c27d6ace73aba3a2e7bb467fa484d6f8512cc3d187aa66b497b19",
+      "exports": {
+        "128": {
+          "file": "sprites/triple-avatar-galactic-dragon-128.webp",
+          "bytes": 5254,
+          "sha256": "fe5472970d449faec003e36f7922b363fc5aa95f16f35425195af6a7a223b9e9"
+        },
+        "256": {
+          "file": "sprites/triple-avatar-galactic-dragon-256.webp",
+          "bytes": 15090,
+          "sha256": "cb0d0e506c4ca38378bd1471948a9070fc4b192b4226c1be1cb83c9cc9084aff"
+        },
+        "512": {
+          "file": "sprites/triple-avatar-galactic-dragon-512.webp",
+          "bytes": 46106,
+          "sha256": "11f5be5c0a180b75c881fcbc8997fb56dcbea28da31e8f48eef4f0e894fc3757"
+        }
+      }
+    },
+    "triple-frame-aurora-crown": {
+      "id": "triple-frame-aurora-crown",
+      "name": "Vương Miện Cực Quang",
+      "type": "frame",
+      "gameId": "triple-connect",
+      "level": 30,
+      "sourceKind": "achievement",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 38,
+        "top": 15,
+        "width": 436,
+        "height": 463
+      },
+      "source": {
+        "file": "sources/triple-frame-aurora-crown.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 65,
+          "top": 21,
+          "width": 1125,
+          "height": 1195
+        },
+        "sha256": "7e8129fd7df017885e9d280909d186451b559e3b280df8836488b8e6d94618bb",
+        "aperture": {
+          "left": 240,
+          "top": 272,
+          "width": 774,
+          "height": 743,
+          "radius": 371.5,
+          "pixels": 449718
+        }
+      },
+      "scale": 0.3876177658142665,
+      "nativeUpscaled": false,
+      "png": "sprites/triple-frame-aurora-crown.png",
+      "pngSha256": "9430de97c1d36c40d65108c2108e97edae3c7547d342a28422b4eed93793d11d",
+      "exports": {
+        "128": {
+          "file": "sprites/triple-frame-aurora-crown-128.webp",
+          "bytes": 9366,
+          "sha256": "5a77d5df747cb675943cd074a196ed9b1ff24b1a1af5bf97f2c335a0952a8ffc"
+        },
+        "256": {
+          "file": "sprites/triple-frame-aurora-crown-256.webp",
+          "bytes": 26122,
+          "sha256": "f46ec5ddd4d559dc85cc0e79b272ecc76a1d7b4f29a48464c6b344ce6f5d08ad"
+        },
+        "512": {
+          "file": "sprites/triple-frame-aurora-crown-512.webp",
+          "bytes": 84580,
+          "sha256": "7790d268c45eae38b718c5dbc18dc977123d253d18c12944a37df6ada3af21d9"
+        }
+      }
+    },
+    "event-avatar-lantern-otter": {
+      "id": "event-avatar-lantern-otter",
+      "name": "Rái Cá Đèn Lồng",
+      "type": "avatar",
+      "sourceKind": "event",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 97,
+        "top": 97,
+        "width": 318,
+        "height": 318
+      },
+      "source": {
+        "file": "sources/event-avatar-lantern-otter.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 100,
+          "top": 99,
+          "width": 1054,
+          "height": 1054
+        },
+        "sha256": "c52a47e02207973a4efaea893a2871b8d18a2e67e6ec304a40d44472a7276d05",
+        "aperture": null
+      },
+      "scale": 0.301707779886148,
+      "nativeUpscaled": false,
+      "png": "sprites/event-avatar-lantern-otter.png",
+      "pngSha256": "b759bee43d228b2090e221827611ad9b962d2d0465155dd42f21d0ebaf84e997",
+      "exports": {
+        "128": {
+          "file": "sprites/event-avatar-lantern-otter-128.webp",
+          "bytes": 5120,
+          "sha256": "7f69ea3998d3699eeef9eefc96ec9d84d38ded095fc4eb6176454bdf5644f4ba"
+        },
+        "256": {
+          "file": "sprites/event-avatar-lantern-otter-256.webp",
+          "bytes": 14310,
+          "sha256": "cc265cf110f5fabb98edf95045f27be892d48e091e3e3c16cf7c94e8f20d6b35"
+        },
+        "512": {
+          "file": "sprites/event-avatar-lantern-otter-512.webp",
+          "bytes": 45488,
+          "sha256": "8f5d2108af1c38fada654f16953ad2b7873963954f2cd7499bdfc69c81e3967b"
+        }
+      }
+    },
+    "event-frame-firefly-glow": {
+      "id": "event-frame-firefly-glow",
+      "name": "Ánh Đom Đóm",
+      "type": "frame",
+      "sourceKind": "event",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 59,
+        "top": 66,
+        "width": 393,
+        "height": 386
+      },
+      "source": {
+        "file": "sources/event-frame-firefly-glow.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 55,
+          "top": 58,
+          "width": 1154,
+          "height": 1133
+        },
+        "sha256": "cd08f4dbba1c3979342191a86c46103bbca09e5879453ee898a36eb07844a561",
+        "aperture": {
+          "left": 205,
+          "top": 194,
+          "width": 858,
+          "height": 846,
+          "radius": 423,
+          "pixels": 522078
+        }
+      },
+      "scale": 0.3404255319148936,
+      "nativeUpscaled": false,
+      "png": "sprites/event-frame-firefly-glow.png",
+      "pngSha256": "7f700ec0bb158d2770e635327445e34dbe857565a744d0c4e20e2eab1b773fce",
+      "exports": {
+        "128": {
+          "file": "sprites/event-frame-firefly-glow-128.webp",
+          "bytes": 8088,
+          "sha256": "93f6d7d88fe38cc19c0cc423d4be7815db591b53e1ba9aaccd061a3e38029da5"
+        },
+        "256": {
+          "file": "sprites/event-frame-firefly-glow-256.webp",
+          "bytes": 21256,
+          "sha256": "d6ce382a595cc332969000a7ef3912bafb2a91a43a3260536edd53b55fd995e0"
+        },
+        "512": {
+          "file": "sprites/event-frame-firefly-glow-512.webp",
+          "bytes": 63456,
+          "sha256": "ac5824bde9ad0c7de2e042ad13e18a7e7f41311d6552825b8462218f26ed2944"
+        }
+      }
+    },
+    "starter-avatar-little-sparrow": {
+      "id": "starter-avatar-little-sparrow",
+      "name": "Chim Sẻ Nhỏ",
+      "type": "avatar",
+      "sourceKind": "starter",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 97,
+        "top": 97,
+        "width": 318,
+        "height": 318
+      },
+      "source": {
+        "file": "sources/starter-avatar-little-sparrow.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 84,
+          "top": 91,
+          "width": 1084,
+          "height": 1071
+        },
+        "sha256": "c1a3853cbd2fd2f9a5b7b8840de8193c18861696c5380aef74096779af4da15b",
+        "aperture": null
+      },
+      "scale": 0.2969187675070028,
+      "nativeUpscaled": false,
+      "png": "sprites/starter-avatar-little-sparrow.png",
+      "pngSha256": "7dbed512d833520e579c51a8cc9e2582871285d332c60b56e1f76002b2a459dd",
+      "exports": {
+        "128": {
+          "file": "sprites/starter-avatar-little-sparrow-128.webp",
+          "bytes": 5382,
+          "sha256": "2400b2c6855f565abaed6a936bb6318bdaf8936d9578190567f4c57793c7b38b"
+        },
+        "256": {
+          "file": "sprites/starter-avatar-little-sparrow-256.webp",
+          "bytes": 14240,
+          "sha256": "ff49e9583a74dd9e3ef1462109627b29c0c3a9ed7a465bd0f2bfb0f85fa87549"
+        },
+        "512": {
+          "file": "sprites/starter-avatar-little-sparrow-512.webp",
+          "bytes": 39802,
+          "sha256": "3b4a062165100eca5e1f915faebc776e6d32e12e27bfa596babadb0e981bba5a"
+        }
+      }
+    },
+    "starter-frame-plain-wood": {
+      "id": "starter-frame-plain-wood",
+      "name": "Vòng Gỗ Mộc",
+      "type": "frame",
+      "sourceKind": "starter",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 62,
+        "top": 71,
+        "width": 389,
+        "height": 379
+      },
+      "source": {
+        "file": "sources/starter-frame-plain-wood.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 89,
+          "top": 107,
+          "width": 1076,
+          "height": 1049
+        },
+        "sha256": "a13c4d5db77d6e28284330ed430eea2469a9b21c424a0daeb64e562e167bf777",
+        "aperture": {
+          "left": 223,
+          "top": 222,
+          "width": 808,
+          "height": 797,
+          "radius": 398.5,
+          "pixels": 501586
+        }
+      },
+      "scale": 0.3613550815558344,
+      "nativeUpscaled": false,
+      "png": "sprites/starter-frame-plain-wood.png",
+      "pngSha256": "2253d20dd4979c1a4c93827817428659f19220afdf9d55263525f8ad1b02eeec",
+      "exports": {
+        "128": {
+          "file": "sprites/starter-frame-plain-wood-128.webp",
+          "bytes": 6100,
+          "sha256": "7e69f60bf93167b6894613a190b37b16053c19a48bc7fdb5bb52be8c1c35f278"
+        },
+        "256": {
+          "file": "sprites/starter-frame-plain-wood-256.webp",
+          "bytes": 13652,
+          "sha256": "4e2bacf68b81a70b4cacaf959a2ab511e74ba1aeade87c881a521fadcafeb1c5"
+        },
+        "512": {
+          "file": "sprites/starter-frame-plain-wood-512.webp",
+          "bytes": 33418,
+          "sha256": "464ca3b6eec27475d11d5ec929455cd3b96e70251b433dc482be050a5ac90bc6"
+        }
+      }
+    },
+    "starter-badge-first-leaf": {
+      "id": "starter-badge-first-leaf",
+      "name": "Lá Đầu Tiên",
+      "type": "badge",
+      "sourceKind": "starter",
+      "canvas": [
+        512,
+        512
+      ],
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "contentRect": {
+        "left": 56,
+        "top": 57,
+        "width": 400,
+        "height": 398
+      },
+      "source": {
+        "file": "sources/starter-badge-first-leaf.png",
+        "width": 1254,
+        "height": 1254,
+        "bounds": {
+          "left": 259,
+          "top": 267,
+          "width": 736,
+          "height": 732
+        },
+        "sha256": "deb2733b683e5a981c7e044e933c42869c01f8ec95d015a0dabcbdb59bf2f321",
+        "aperture": null
+      },
+      "scale": 0.5434782608695652,
+      "nativeUpscaled": false,
+      "png": "sprites/starter-badge-first-leaf.png",
+      "pngSha256": "2b620aa50a863e2d783f37f2675537dd26d6010c12c6e1adcd8328d1a0692ff9",
+      "exports": {
+        "128": {
+          "file": "sprites/starter-badge-first-leaf-128.webp",
+          "bytes": 6062,
+          "sha256": "631299590611b87c677f723f845edc10c4086dbe7c72ecf62bbd3e32c8c9331b"
+        },
+        "256": {
+          "file": "sprites/starter-badge-first-leaf-256.webp",
+          "bytes": 15818,
+          "sha256": "0419a1d208ced8a78bdee416275b485b33aae005c6fc853eed4a019f40935342"
+        },
+        "512": {
+          "file": "sprites/starter-badge-first-leaf-512.webp",
+          "bytes": 47922,
+          "sha256": "cef22ba437b3d7bf58e2470528f416f235128d86170b2d95cc436c1a8e8d7aca"
+        }
+      }
     }
   }
 }

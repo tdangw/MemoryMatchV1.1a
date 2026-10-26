@@ -31,11 +31,13 @@ export async function readCloudSnapshot(database, environment, uid, root, isCurr
 }
 
 /** Stage immutable payloads, then publish one CAS pointer. A failed upload cannot expose half a save. */
-export async function publishCloudSnapshot({ database, environment, uid, encoded, expectedRevision, playerName, isCurrent = () => true, onStagePlan = async () => true }) {
+export async function publishCloudSnapshot({ database, environment, uid, encoded, expectedRevision, playerName, isCurrent = () => true, onStagePlan = async () => true, reward = null, rewardRevision = 0, economyRevision = 0 }) {
   const previous = await readCloudRoot(database, environment, uid);
   if (!isCurrent()) throw new Error("Tài khoản đã thay đổi.");
   if ((previous?.revision || 0) !== expectedRevision) throw new CloudConflictError(previous);
-  if (previous?.fingerprint === encoded.fingerprint && previous.playerName === playerName) return { root: previous, reads: 1, writes: 0 };
+  if ((previous?.economyRevision || 0) > economyRevision) throw new CloudConflictError(previous);
+  if ((previous?.rewardRevision || 0) > rewardRevision) throw new CloudConflictError(previous);
+  if (!reward && previous?.fingerprint === encoded.fingerprint && previous.playerName === playerName) return { root: previous, reads: 1, writes: 0 };
   const previousHashes = previous ? manifestHashes(previous.manifest) : new Set();
   const changed = [...encoded.objects].filter(([hash]) => !previousHashes.has(hash));
   const stageId = crypto.randomUUID();
@@ -57,16 +59,22 @@ export async function publishCloudSnapshot({ database, environment, uid, encoded
   const next = {
     snapshotVersion: CLOUD_SNAPSHOT_VERSION, formatVersion: 2, revision: expectedRevision + 1,
     manifest: encoded.manifest, fingerprint: encoded.fingerprint, byteLength: encoded.byteLength,
-    playerName, updatedAt: serverTimestamp(),
+    playerName, ...(economyRevision || previous?.economyRevision ? {economyRevision} : {}), ...(reward || previous?.rewardRevision ? { rewardRevision: reward ? reward.state.revision : rewardRevision } : {}), updatedAt: serverTimestamp(),
   };
   await runTransaction(database, async transaction => {
     if (!isCurrent()) throw new Error("Tài khoản đã thay đổi.");
     const current = await transaction.get(cloudProfileRef(database, environment, uid)); reads += 1;
     const root = current.exists() ? validateRoot(current.data()) : null;
     if ((root?.revision || 0) !== expectedRevision) throw new CloudConflictError(root);
+    if (reward) {
+      const ref = doc(database, 'gamespaces', environment, 'liveops', uid);
+      const stored = await transaction.get(ref); reads += 1;
+      if ((stored.exists() ? stored.data().revision : 0) !== reward.expectedRevision) throw new CloudConflictError(root);
+      transaction.set(ref, { ...reward.state, rootRevision: next.revision, fingerprint: next.fingerprint, updatedAt: serverTimestamp() });
+    }
     transaction.set(cloudProfileRef(database, environment, uid), next);
   });
-  writes += 1;
+  writes += reward ? 2 : 1;
   // Refreshing a staged old hash gives it a newer createdAt. Cleanup must not delete that concurrent upload.
   let cleanupError = null;
   if (jobs.length) {
@@ -112,6 +120,7 @@ export function validateRoot(root) {
     || root.revision < 1 || typeof root.fingerprint !== "string" || !/^[a-f0-9]{64}$/.test(root.fingerprint)
     || typeof root.playerName !== "string" || !root.playerName.trim() || root.playerName.length > 40
     || !Number.isSafeInteger(root.byteLength) || root.byteLength < 1) throw new Error("Bản cloud không đúng phiên bản hỗ trợ; bản máy được giữ nguyên.");
+  if(root.economyRevision !== undefined && (!Number.isSafeInteger(root.economyRevision) || root.economyRevision<0))throw new Error('Bản lưu kho không hợp lệ.');
   validateCloudManifest(root.manifest);
   return root;
 }

@@ -1,0 +1,24 @@
+import fs from 'node:fs/promises';
+import crypto from 'node:crypto';
+import assert from 'node:assert/strict';
+import { createRequire } from 'node:module';
+const require = createRequire(import.meta.url);
+const project = 'memorymatchv1-1a';
+const auth = require('firebase-tools/lib/auth');
+const options = { project, nonInteractive: true };
+const account = auth.selectAccount(undefined, process.cwd());
+if (account) auth.setActiveAccount(options, account);
+await require('firebase-tools/lib/requireAuth').requireAuth(options);
+const rules = require('firebase-tools/lib/gcp/rules');
+const releases = await rules.listAllReleases(project);
+const release = releases.find(item => item.name === `projects/${project}/releases/cloud.firestore`);
+assert(release, 'No active default Firestore release');
+const files = await rules.getRulesetContent(release.rulesetName);
+const remote = files.find(file => file.name === 'firestore.rules');
+assert(remote, 'Missing deployed firestore.rules source');
+const local = await fs.readFile('firestore.rules', 'utf8');
+assert.equal(remote.content, local, 'Live Firestore rules differ from local source');
+const result = { project, release: release.name, ruleset: release.rulesetName,
+  sha256: crypto.createHash('sha256').update(local).digest('hex'), result: 'PASS' };
+await fs.writeFile('runtime/qa/rewards-liveops-rules-verified.json', JSON.stringify(result, null, 2));
+console.log(JSON.stringify(result));

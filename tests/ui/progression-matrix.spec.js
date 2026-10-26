@@ -19,7 +19,9 @@ for(const [width,height] of [[320,568],[412,915],[844,390],[1024,900]]) for(cons
       },{gameId,mode,level});
       const root=page.locator('.game-shell-root:visible');
       await expect(root).toHaveCount(1);
-      await expect(root.locator('.progression-wave-status')).toHaveText(`Đợt 1/${waves}`);
+      await expect(root.locator('.progression-wave-status')).toHaveCount(0);
+      await expect(root.locator('.stat-level')).toHaveAttribute('aria-label',`Màn ${level}-1`);
+      await expect(root).toHaveAttribute('data-wave-count',String(waves));
       await page.evaluate(async()=>{await document.fonts.ready;await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));});
       const measured=await root.evaluate(root=>{
         const board=root.querySelector('[data-shell-region="board"]');

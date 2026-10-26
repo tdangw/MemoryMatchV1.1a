@@ -81,8 +81,8 @@ const repeatedMemoryProgress = recordMemoryMatchResult({ mode: "easy", level: 1,
 assert.equal(repeatedMemoryProgress.totalStars, 3, "Memory Match không được cộng trùng sao khi chơi lại.");
 
 assert.deepEqual(TIME_UP_PURCHASES, [
-  { seconds: 10, price: 144 },
-  { seconds: 30, price: 400 },
+  { seconds: 30, price: 360 },
+  { seconds: 60, price: 648 },
 ]);
 assert.equal(
   new Set(TIME_UP_PURCHASES.map((purchase) => purchase.seconds)).size,

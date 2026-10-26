@@ -10,6 +10,9 @@ export function createCloudSaveEventFilter(initial = {}, coins = null, appearanc
   let previousCoins = coins;
   let previousAppearance = stableJSON(appearance);
   return patch => {
+    if (patch.rewardPublished) {
+      previousCoins = patch.coins; previousAppearance = stableJSON(patch.appearance); return false;
+    }
     let changed = Boolean(patch.cloudEvent || patch.reset || patch.restored);
     if (Object.hasOwn(patch, "coins")) {
       changed ||= patch.coins !== previousCoins;

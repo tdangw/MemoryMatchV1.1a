@@ -5,13 +5,13 @@ import { ACHIEVEMENT_ITEMS, settleAchievementInventory, normalizeAchievementLedg
 import { normalizeAppearance } from '../../js/appearance.js';
 const certified = (levels = [1], modes = ['easy', 'normal', 'hard', 'superHard']) => Object.fromEntries(levels.flatMap(level => modes.map(mode => [`${mode}:${level}`, { cleared: true, rulesVersion: 1, score: 0, stars: 0 }])));
 const allGames = bestByLevel => Object.fromEntries(['memoryMatch', 'linkConnect', 'tripleConnect'].map(key => [key, { bestByLevel }]));
-test('F1 deterministic catalog has 30 distinct game/level rewards and exact type counts', () => {
-  assert.equal(new Set(ACHIEVEMENT_ITEMS.map(item => item.id)).size, 30);
-  assert.equal(new Set(ACHIEVEMENT_ITEMS.map(item => item.gameId + ':' + item.level)).size, 30);
+test('catalog has 90 distinct game/level rewards and preserves six effects', () => {
+  assert.equal(new Set(ACHIEVEMENT_ITEMS.map(item => item.id)).size, 90);
+  assert.equal(new Set(ACHIEVEMENT_ITEMS.map(item => item.gameId + ':' + item.level)).size, 90);
   for (const gameId of ['memory-match', 'link-connect', 'triple-connect']) {
     const items = ACHIEVEMENT_ITEMS.filter(item => item.gameId === gameId);
-    assert.deepEqual(items.map(item => item.level), [1,2,3,4,5,6,7,8,9,10]);
-    assert.deepEqual(['avatar', 'frame', 'badge', 'effect-cover'].map(type => items.filter(item => item.type === type).length), [3,3,2,2]);
+    assert.deepEqual(items.map(item => item.level), Array.from({ length: 30 }, (_, i) => i + 1));
+    assert.deepEqual(['avatar', 'frame', 'badge', 'effect-cover'].map(type => items.filter(item => item.type === type).length), [11,11,6,2]);
   }
 });
 test('F1 certification rather than stars/S, independent games, replay and no auto-equip', () => {
@@ -21,7 +21,8 @@ test('F1 certification rather than stars/S, independent games, replay and no aut
   assert.equal(Object.keys(a.achievements.grants).length, 3); assert.equal(pendingAchievements(a).length, 3);
   assert.deepEqual(a.profileCosmetics, { avatar: null, frame: null, badge: null });
   assert.deepEqual(settleAchievementInventory(a, a, allGames(certified([1])), { now: 99 }), a);
-  assert.equal(Object.keys(settleAchievementInventory({}, {}, allGames(certified([11]))).achievements.grants).length, 0);
+  assert.equal(Object.keys(settleAchievementInventory({}, {}, allGames(certified([11]))).achievements.grants).length, 3);
+  assert.equal(Object.keys(settleAchievementInventory({}, {}, allGames(certified([31]))).achievements.grants).length, 0);
   const invalid = certified([1]); invalid['easy:1'] = { stars: 3, cleared: true };
   assert.equal(Object.keys(settleAchievementInventory({}, {}, allGames(invalid)).achievements.grants).length, 0);
 });

@@ -17,7 +17,7 @@ export function renderAchievementCollection(container, gameId, { block: requeste
   container.className = 'achievement-collection-panel'; container.replaceChildren(root);
   let generation = 0;
   let block = Number.isSafeInteger(requestedBlock) && requestedBlock > 0 ? requestedBlock : 1;
-  const maxBlock = Math.max(block, Math.ceil((profile.adventure?.unlockedThrough || 1) / 10));
+  const maxBlock = Math.max(3, block, Math.ceil((profile.adventure?.unlockedThrough || 1) / 10));
   const current = () => root.isConnected && (!owner || owner.active) && gameState.progress[key] === profile && canLaunchGame();
   const control = (label, disabled, action) => { const button = document.createElement('button'); button.type = 'button'; button.className = 'tab-button'; button.textContent = label; button.disabled = disabled; button.onclick = action; return button; };
   async function render() {
@@ -28,10 +28,10 @@ export function renderAchievementCollection(container, gameId, { block: requeste
       const [first, rewardChapter] = await Promise.all([firstPromise, chapter === 1 ? firstPromise : loadPersistentChapter(key, chapter)]);
       if (!current() || token !== generation) return;
       const completed = { ...first.bestByLevel, ...profile.bestByLevel };
-      const content = createAchievementListContent({ gameName: getGameDefinition(gameId).title,
-        levels: ACHIEVEMENT_ITEMS.filter(item => item.gameId === gameId).map(item => ({ level: item.level, name: item.name,
-          image: achievementAssetUrl(item, 128), completed: MASTERY_DIFFICULTIES.map(mode => hasCertifiedCompletion(completed, mode, item.level)) })) });
       const firstLevel = (block - 1) * 10 + 1;
+      const content = createAchievementListContent({ gameName: getGameDefinition(gameId).title,
+        levels: ACHIEVEMENT_ITEMS.filter(item => item.gameId === gameId && item.level >= firstLevel && item.level < firstLevel + 10).map(item => ({ level: item.level, name: item.name,
+          image: achievementAssetUrl(item, 128), completed: MASTERY_DIFFICULTIES.map(mode => hasCertifiedCompletion(completed, mode, item.level)) })) });
       const mastery = getMasteryRewards({ completed: { ...rewardChapter.bestByLevel, ...profile.bestByLevel }, level: firstLevel,
         claim: profile.claimedChests?.[block] || rewardChapter.claimedChests[block] });
       const group = document.createElement('section'); group.className = 'tab-card achievement-group-reward';

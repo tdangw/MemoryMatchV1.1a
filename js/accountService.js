@@ -127,7 +127,24 @@ function createAccountService(options) {
     state.playerName = metadata?.uid === user.uid ? metadata.playerName : defaultName(user.uid);
     const root = await readCloudRoot(backend.database, state.environment, user.uid);
     if (!current(id, user.uid)) return;
-    const snapshot = await exportPersistentSnapshot();
+    if(metadata?.uid===user.uid && metadata.restoreNeedsReconcile && root){await pendingConflict(root,id);return;}
+    let snapshot = await exportPersistentSnapshot();
+    const rewardOwner = snapshot.profile.data.appearance.spark?.ownerUid;
+    if (rewardOwner && rewardOwner !== user.uid && !root) {
+      if (getActiveGameScope()) throw new Error('Hãy về trang chính để đổi tài khoản. Bản máy được giữ nguyên.');
+      const next = { uid:user.uid, profileId:crypto.randomUUID(), cloudRevision:0, fingerprint:null,
+        playerName:defaultName(user.uid), lastSyncedLocalRevision:0 };
+      const fresh = { ...snapshot, chapters:[], profile:{ ...snapshot.profile, data:{ coins:0, appearance:{},
+        progress:{ gameplaySeason:snapshot.profile.data.progress.gameplaySeason }, settings:snapshot.profile.data.settings } } };
+      await replaceProfileSafely(async () => {
+        if (!await importPersistentSnapshot(fresh, state.environment, next, () => current(id,user.uid), {synced:false})) throw new Error('Chưa thể đổi bản lưu.');
+        await options.onProfileReplaced?.();
+      });
+      if (!current(id,user.uid)) return;
+      metadata = await loadSyncMetadata(state.environment); owner = await loadProfileOwner();
+      state.playerName = next.playerName;
+      snapshot = await exportPersistentSnapshot();
+    }
     const encoded = await encodeCloudSnapshot(snapshot);
     const event = await loadSyncMetadata(eventKey(user.uid));
     if (!current(id, user.uid)) return;
@@ -140,7 +157,7 @@ function createAccountService(options) {
       if (!current(id, user.uid)) return;
       state.playerName = next.playerName; state.lastSavedAt = root.updatedAt?.toMillis?.() || Date.now();
       setPhase("synced", "Đã sao lưu.");
-    } else if (!root || metadata?.uid === user.uid && (metadata.cloudRevision === root.revision || dirtyEvent)) {
+    } else if (!root || metadata?.uid === user.uid && (metadata.cloudRevision === root.revision )) {
       if (root && !dirtyEvent) {
         const cloud = await readCloudSnapshot(backend.database, state.environment, user.uid, { ...root, manifest: { profile: root.manifest.profile } }, () => current(id, user.uid));
         if (!current(id, user.uid)) return;
@@ -162,13 +179,14 @@ function createAccountService(options) {
 
   async function clearWork(uid, id) {
     const work = await loadSyncMetadata(workKey(uid));
-    if (!work?.jobs?.length) return;
-    await collectCloudObjects({ database: backend.database, environment: state.environment, uid, jobs: work.jobs, isCurrent: () => current(id, uid) });
+    if (!work?.jobs?.length) return {reads:0,writes:0};
+    const collected = await collectCloudObjects({ database: backend.database, environment: state.environment, uid, jobs: work.jobs, isCurrent: () => current(id, uid) });
     if (current(id, uid)) await saveSyncMetadata(workKey(uid), { jobs: [] }, () => current(id, uid));
+    return collected;
   }
 
   async function syncNow({ manual = false } = {}) {
-    if (networkTask) return networkTask;
+    if (networkTask) { await networkTask; return syncNow({manual}); }
     if (!navigator.onLine) { setPhase("offline", "Đang offline. Bản máy vẫn được lưu; sẽ gửi lại khi kết nối."); return false; }
     if (manual && backend && !backend.auth.currentUser) {
       const id = generation;
@@ -196,12 +214,16 @@ function createAccountService(options) {
       const snapshotSaveGeneration = saveGeneration;
       const snapshotEvent = await loadSyncMetadata(eventKey(uid));
       if (!current(id, uid)) return false;
+      const durableMetadata = await loadSyncMetadata(state.environment);
+      if(durableMetadata?.restoreNeedsReconcile){await pendingConflict(await readCloudRoot(backend.database,state.environment,uid),id);return false;}
       setPhase("syncing", "Đang sao lưu…");
       await clearWork(uid, id);
       const snapshot = await exportPersistentSnapshot();
       const encoded = await encodeCloudSnapshot(snapshot);
       if (!current(id, uid)) return false;
       const result = await publishCloudSnapshot({
+        rewardRevision: snapshot.profile.data.appearance.spark?.state?.revision || 0,
+        economyRevision: snapshot.profile.data.appearance.spark?.economyRevision || 0,
         database: backend.database, environment: state.environment, uid, encoded,
         expectedRevision: metadata.cloudRevision, playerName: state.playerName,
         isCurrent: () => current(id, uid),
@@ -226,13 +248,7 @@ function createAccountService(options) {
     networkTask = operation().catch(async error => {
       if (!current(id, uid)) return false;
       if (error instanceof CloudConflictError) {
-        // A locally completed event is a new save: retry against the latest server revision.
-        // The server transaction remains the only ordering authority; device clocks are not compared.
-        if (await persistMetadata({ ...metadata, cloudRevision: error.root?.revision || 0 }, id)) {
-          retries += 1;
-          setPhase("waiting", "Đang chờ lưu");
-          scheduleSync(AUTO_SYNC_INTERVAL_MS);
-        }
+        await pendingConflict(error.root, id);
       }
       else handleFailure(error);
       return false;
@@ -271,6 +287,7 @@ function createAccountService(options) {
       return true;
       });
     } else {
+      if(metadata.restoreNeedsReconcile)throw new Error('Bản phục hồi cần được đối chiếu với tiến trình đã đồng bộ.');
       if (!await persistMetadata(next, id)) return false;
       if (!current(id, uid)) return false;
       pending = null; options.onConflictCleared?.(); state.playerName = next.playerName;
@@ -329,6 +346,13 @@ function createAccountService(options) {
     const backups = await getLocalRestoreBackups();
     const backup = backups.at(-1);
     if (!backup || !current(id, uid) || pending || getActiveGameScope()) return false;
+    const currentSnapshot = await exportPersistentSnapshot();
+    if(currentSnapshot.profile.data.appearance.spark?.state || backup.profile.data.appearance.spark?.state){
+      if(!navigator.onLine)throw new Error('Kết nối tài khoản để đối chiếu bản phục hồi. Bản máy vẫn được giữ nguyên.');
+      const root=await readCloudRoot(backend.database,state.environment,uid);
+      const restored=await encodeCloudSnapshot(backup);
+      if(root && restored.fingerprint!==root.fingerprint)throw Object.assign(new Error('Bản phục hồi cũ hơn kho đã đồng bộ. Bản này vẫn được giữ để đối chiếu; ví hiện tại không thay đổi.'),{code:'rewards/stale-backup'});
+    }
     return replaceProfileSafely(async () => {
     if (!current(id, uid) || pending || getActiveGameScope()) return false;
     setPhase("restoring", "Đang phục hồi bản máy trước đó…");
@@ -371,7 +395,7 @@ function createAccountService(options) {
     scope.own(subscribeToLocalCommit(({ patch }) => {
       if (!metadata || metadata.uid !== state.uid) return;
       if (!isCloudSaveEvent(patch)) return;
-      if (pending) { pending = null; options.onConflictCleared?.(); }
+      // A new local event cannot resolve a conflicting cloud revision. Keep the backup path.
       saveGeneration += 1;
       if (state.phase === "synced") setPhase("waiting", "Các thay đổi mới đã lưu trên máy, đang chờ gửi.");
       markSaveEvent();
@@ -417,12 +441,36 @@ function createAccountService(options) {
       void pendingConflict(root, id).catch(error => { if (current(id, uid)) handleFailure(error); });
     }
   }
+  async function runRewardOperation(operation) {
+    if (networkTask) await networkTask;
+    if (!backend || !metadata || metadata.uid !== state.uid || pending || getActiveGameScope()) throw new Error('Hãy hoàn tất đồng bộ trước khi nhận thưởng.');
+    const id = generation, uid = state.uid, profileId = metadata.profileId;
+    const owns = () => current(id, uid) && metadata?.profileId === profileId && !pending && !getActiveGameScope();
+    const task = replaceProfileSafely(async () => {
+      if (!owns()) throw new Error('Tài khoản đã thay đổi.');
+      const durableMetadata=await loadSyncMetadata(state.environment);
+      if(durableMetadata?.restoreNeedsReconcile)throw new Error('Bản phục hồi cần được đối chiếu trước khi nhận thưởng.');
+      const cleanupOperations = await clearWork(uid,id);
+      const result = await operation({ backend, cleanupOperations, identity: service.getIdentity(), metadata: { ...metadata }, isCurrent: owns });
+      if (result.root && owns()) {
+        const next = { ...metadata, cloudRevision: result.root.revision, fingerprint: result.root.fingerprint, lastSyncedLocalRevision: 0 };
+        if (!await persistMetadata(next, id)) throw new Error('Quà đã lưu. Hãy tải lại tiến độ.');
+        lastUploadAt = Date.now(); state.operations = result.operations || null;
+        setPhase('synced', 'Đã sao lưu.');
+      }
+      return result;
+    });
+    networkTask = task;
+    try { return await task; }
+    catch (error) { if (owns() && error instanceof CloudConflictError) await pendingConflict(error.root, id); throw error; }
+    finally { if (networkTask === task) networkTask = null; refreshRemote(); }
+  }
   const service = {
     ready: null,
     getState: publicState,
     getIdentity: () => metadata?.uid === state.uid && state.uid && backend.auth.currentUser?.uid === state.uid ? { uid: state.uid, profileId: metadata.profileId, firstUid: owner?.firstUid || owner?.uid || state.uid, playerName: state.playerName, environment: state.environment, createdAt: Date.parse(backend.auth.currentUser.metadata.creationTime) || null } : null,
     subscribe(listener) { listeners.add(listener); listener(publicState()); return () => listeners.delete(listener); },
-    syncNow, chooseConflict, requestGoogleLogin, setPlayerName, restoreLocalBackup,
+    runRewardOperation, syncNow, chooseConflict, requestGoogleLogin, setPlayerName, restoreLocalBackup,
     acceptGoogleCredential: credential => signInWithCredential(backend.auth, credential),
     dispose() { scope.dispose(); listeners.clear(); if (instance === service) instance = null; },
   };

@@ -1,0 +1,115 @@
+{
+  "version": 1,
+  "approvedForImplementation": true,
+  "sharedPool": true,
+  "items": [
+    {
+      "id": "letters-memory-avatar-moss-redpanda",
+      "name": "Gấu Trúc Ký Ức",
+      "type": "avatar",
+      "theme": "memory",
+      "sourceKind": "letters",
+      "sourceFile": "sources/letters-memory-avatar-moss-redpanda.png",
+      "prompt": "Use case: stylized-concept. Asset type: one standalone production profile avatar sprite for Memory Match Adventure.\nPrimary request: an adorable red panda librarian with rich auburn fur, expressive warm eyes and a pressed-leaf bookmark tucked into a little blank green book; glowing mossy storybook forest library inside the circular portrait.\nStyle: rich polished storybook fantasy collectible game art, finely painted dimensional materials, elegant warm gold highlights, deep blue shadows, expressive charming subject where applicable. Match the established premium storybook animal portraits and ornamented frames; distinct new artwork, no copied existing character.\nComposition: square canvas. One round opaque portrait disk centered precisely on square. Circle diameter about78% of canvas; outside circle genuinely transparent alpha. Entire subject, ears, horns, crown and scene strictly inside the circular disk. Smooth filled circular edge. No frame, ring, loose particles or protrusions. This avatar will fit under a separate overlay frame.\nCritical: genuine RGBA transparency, not painted checkerboard. ONE item only, no sheet, comparison, UI, text, letters, numbers, logos or watermark. All ornament tips complete, no cropping."
+    },
+    {
+      "id": "letters-memory-frame-memory-leaves",
+      "name": "Vòng Lá Hoài Niệm",
+      "type": "frame",
+      "theme": "memory",
+      "sourceKind": "letters",
+      "sourceFile": "sources/letters-memory-frame-memory-leaves.png",
+      "prompt": "Use case: stylized-concept. Asset type: one standalone production profile frame sprite for Memory Match Adventure.\nPrimary request: a continuous circular warm-gold and carved walnut ring surrounded by emerald fern leaves and a few luminous amber seed gems; compact woodland ornament, all foliage outside the circular aperture.\nStyle: rich polished storybook fantasy collectible game art, finely painted dimensional materials, elegant warm gold highlights, deep blue shadows, expressive charming subject where applicable. Match the established premium storybook animal portraits and ornamented frames; distinct new artwork, no copied existing character.\nComposition: square canvas. EMPTY FRAME LAYER ONLY: frontal orthographic perfectly circular ring centered50%/50%. Broad empty aperture is a true circle, equal width and height, diameter about63% of square. Inner circle and exterior truly transparent alpha. Outer ornaments fit inside90% of canvas; at least5% transparent margin on EVERY side. Closed continuous inner rim; no jewel/crest/ribbon crosses into or flattens opening. No portrait, background disk, scene or face.\nCritical: genuine RGBA transparency, not painted checkerboard. ONE item only, no sheet, comparison, UI, text, letters, numbers, logos or watermark. All ornament tips complete, no cropping."
+    },
+    {
+      "id": "letters-memory-badge-folded-leaf",
+      "name": "Dấu Ấn Ký Ức",
+      "type": "badge",
+      "theme": "memory",
+      "sourceKind": "letters",
+      "sourceFile": "sources/letters-memory-badge-folded-leaf.png",
+      "prompt": "Use case: stylized-concept. Asset type: one standalone production profile badge sprite for Memory Match Adventure.\nPrimary request: a dimensional emerald folded leaf resting over a small closed ivory book with a gold clasp, held in a compact golden medallion; no letters or decorative writing.\nStyle: rich polished storybook fantasy collectible game art, finely painted dimensional materials, elegant warm gold highlights, deep blue shadows, expressive charming subject where applicable. Match the established premium storybook animal portraits and ornamented frames; distinct new artwork, no copied existing character.\nComposition: square canvas. BADGE LAYER ONLY: isolated compact dimensional medallion, complete silhouette inside center80% of square with clear transparent margins on every side. Clear at28px, frontal composition. Background genuinely transparent alpha.\nCritical: genuine RGBA transparency, not painted checkerboard. ONE item only, no sheet, comparison, UI, text, letters, numbers, logos or watermark. All ornament tips complete, no cropping."
+    },
+    {
+      "id": "letters-link-avatar-flower-fox",
+      "name": "Cáo Đèn Hoa",
+      "type": "avatar",
+      "theme": "link",
+      "sourceKind": "letters",
+      "sourceFile": "sources/letters-link-avatar-flower-fox.png",
+      "prompt": "Use case: stylized-concept. Asset type: one standalone production profile avatar sprite for Memory Match Adventure.\nPrimary request: an enchanting fluffy white fox wearing a silk midnight-blue collar, holding one warm coral paper lantern, behind it softly glowing flowering branches on a moonlit garden bridge; face large and expressive inside circular portrait.\nStyle: rich polished storybook fantasy collectible game art, finely painted dimensional materials, elegant warm gold highlights, deep blue shadows, expressive charming subject where applicable. Match the established premium storybook animal portraits and ornamented frames; distinct new artwork, no copied existing character.\nComposition: square canvas. One round opaque portrait disk centered precisely on square. Circle diameter about78% of canvas; outside circle genuinely transparent alpha. Entire subject, ears, horns, crown and scene strictly inside the circular disk. Smooth filled circular edge. No frame, ring, loose particles or protrusions. This avatar will fit under a separate overlay frame.\nCritical: genuine RGBA transparency, not painted checkerboard. ONE item only, no sheet, comparison, UI, text, letters, numbers, logos or watermark. All ornament tips complete, no cropping."
+    },
+    {
+      "id": "letters-link-frame-silk-lantern",
+      "name": "Tơ Duyên Hoa Đăng",
+      "type": "frame",
+      "theme": "link",
+      "sourceKind": "letters",
+      "sourceFile": "sources/letters-link-frame-silk-lantern.png",
+      "prompt": "Use case: stylized-concept. Asset type: one standalone production profile frame sprite for Memory Match Adventure.\nPrimary request: a continuous thin circular gold ring surrounded on the outside by elegantly looping rose silk cords, two compact glowing blossom lanterns and cream plum blossoms; balanced compact silhouette; every decoration outside circular aperture.\nStyle: rich polished storybook fantasy collectible game art, finely painted dimensional materials, elegant warm gold highlights, deep blue shadows, expressive charming subject where applicable. Match the established premium storybook animal portraits and ornamented frames; distinct new artwork, no copied existing character.\nComposition: square canvas. EMPTY FRAME LAYER ONLY: frontal orthographic perfectly circular ring centered50%/50%. Broad empty aperture is a true circle, equal width and height, diameter about63% of square. Inner circle and exterior truly transparent alpha. Outer ornaments fit inside90% of canvas; at least5% transparent margin on EVERY side. Closed continuous inner rim; no jewel/crest/ribbon crosses into or flattens opening. No portrait, background disk, scene or face.\nCritical: genuine RGBA transparency, not painted checkerboard. ONE item only, no sheet, comparison, UI, text, letters, numbers, logos or watermark. All ornament tips complete, no cropping."
+    },
+    {
+      "id": "letters-link-badge-wish-knot",
+      "name": "Nút Thắt Nguyện Ước",
+      "type": "badge",
+      "theme": "link",
+      "sourceKind": "letters",
+      "sourceFile": "sources/letters-link-badge-wish-knot.png",
+      "prompt": "Use case: stylized-concept. Asset type: one standalone production profile badge sprite for Memory Match Adventure.\nPrimary request: a richly woven red silk auspicious knot with gold fittings and a single tiny glowing amber lantern-shaped gem, compact and nearly square, no characters or writing.\nStyle: rich polished storybook fantasy collectible game art, finely painted dimensional materials, elegant warm gold highlights, deep blue shadows, expressive charming subject where applicable. Match the established premium storybook animal portraits and ornamented frames; distinct new artwork, no copied existing character.\nComposition: square canvas. BADGE LAYER ONLY: isolated compact dimensional medallion, complete silhouette inside center80% of square with clear transparent margins on every side. Clear at28px, frontal composition. Background genuinely transparent alpha.\nCritical: genuine RGBA transparency, not painted checkerboard. ONE item only, no sheet, comparison, UI, text, letters, numbers, logos or watermark. All ornament tips complete, no cropping."
+    },
+    {
+      "id": "letters-triple-avatar-rose-dragon",
+      "name": "Rồng Thạch Anh Hồng",
+      "type": "avatar",
+      "theme": "triple",
+      "sourceKind": "letters",
+      "sourceFile": "sources/letters-triple-avatar-rose-dragon.png",
+      "prompt": "Use case: stylized-concept. Asset type: one standalone production profile avatar sprite for Memory Match Adventure.\nPrimary request: a charming small rose-quartz dragon with translucent pink crystal horns and scales, intelligent luminous blue eyes, sitting among soft lilac crystalline clouds; close-up expressive circular portrait.\nStyle: rich polished storybook fantasy collectible game art, finely painted dimensional materials, elegant warm gold highlights, deep blue shadows, expressive charming subject where applicable. Match the established premium storybook animal portraits and ornamented frames; distinct new artwork, no copied existing character.\nComposition: square canvas. One round opaque portrait disk centered precisely on square. Circle diameter about78% of canvas; outside circle genuinely transparent alpha. Entire subject, ears, horns, crown and scene strictly inside the circular disk. Smooth filled circular edge. No frame, ring, loose particles or protrusions. This avatar will fit under a separate overlay frame.\nCritical: genuine RGBA transparency, not painted checkerboard. ONE item only, no sheet, comparison, UI, text, letters, numbers, logos or watermark. All ornament tips complete, no cropping."
+    },
+    {
+      "id": "letters-triple-frame-prism-glass",
+      "name": "Vòng Kính Sắc Màu",
+      "type": "frame",
+      "theme": "triple",
+      "sourceKind": "letters",
+      "sourceFile": "sources/letters-triple-frame-prism-glass.png",
+      "prompt": "Use case: stylized-concept. Asset type: one standalone production profile frame sprite for Memory Match Adventure.\nPrimary request: a closed perfectly circular silver and turquoise rim surrounded by a compact radial arrangement of rose, violet and aquamarine triangular cut crystals; all points outside the circular opening; polished iridescent facets.\nStyle: rich polished storybook fantasy collectible game art, finely painted dimensional materials, elegant warm gold highlights, deep blue shadows, expressive charming subject where applicable. Match the established premium storybook animal portraits and ornamented frames; distinct new artwork, no copied existing character.\nComposition: square canvas. EMPTY FRAME LAYER ONLY: frontal orthographic perfectly circular ring centered50%/50%. Broad empty aperture is a true circle, equal width and height, diameter about63% of square. Inner circle and exterior truly transparent alpha. Outer ornaments fit inside90% of canvas; at least5% transparent margin on EVERY side. Closed continuous inner rim; no jewel/crest/ribbon crosses into or flattens opening. No portrait, background disk, scene or face.\nCritical: genuine RGBA transparency, not painted checkerboard. ONE item only, no sheet, comparison, UI, text, letters, numbers, logos or watermark. All ornament tips complete, no cropping."
+    },
+    {
+      "id": "letters-triple-badge-prism-heart",
+      "name": "Trái Tim Lăng Kính",
+      "type": "badge",
+      "theme": "triple",
+      "sourceKind": "letters",
+      "sourceFile": "sources/letters-triple-badge-prism-heart.png",
+      "prompt": "Use case: stylized-concept. Asset type: one standalone production profile badge sprite for Memory Match Adventure.\nPrimary request: one finely faceted luminous aquamarine crystal heart in a dimensional gold and violet triangular cradle, clean compact medallion silhouette with a few iridescent edges.\nStyle: rich polished storybook fantasy collectible game art, finely painted dimensional materials, elegant warm gold highlights, deep blue shadows, expressive charming subject where applicable. Match the established premium storybook animal portraits and ornamented frames; distinct new artwork, no copied existing character.\nComposition: square canvas. BADGE LAYER ONLY: isolated compact dimensional medallion, complete silhouette inside center80% of square with clear transparent margins on every side. Clear at28px, frontal composition. Background genuinely transparent alpha.\nCritical: genuine RGBA transparency, not painted checkerboard. ONE item only, no sheet, comparison, UI, text, letters, numbers, logos or watermark. All ornament tips complete, no cropping."
+    },
+    {
+      "id": "letters-royal-avatar-dawn-lion",
+      "name": "Sư Tử Bình Minh",
+      "type": "avatar",
+      "theme": "royal",
+      "sourceKind": "letters",
+      "sourceFile": "sources/letters-royal-avatar-dawn-lion.png",
+      "prompt": "Use case: stylized-concept. Asset type: one standalone production profile avatar sprite for Memory Match Adventure.\nPrimary request: a noble friendly golden lion cub prince wearing a finely crafted small emerald crown and navy velvet royal mantle, warm sunrise and subtle palace arches behind, highly polished royal storybook portrait with fine mane detail.\nStyle: rich polished storybook fantasy collectible game art, finely painted dimensional materials, elegant warm gold highlights, deep blue shadows, expressive charming subject where applicable. Match the established premium storybook animal portraits and ornamented frames; distinct new artwork, no copied existing character.\nComposition: square canvas. One round opaque portrait disk centered precisely on square. Circle diameter about78% of canvas; outside circle genuinely transparent alpha. Entire subject, ears, horns, crown and scene strictly inside the circular disk. Smooth filled circular edge. No frame, ring, loose particles or protrusions. This avatar will fit under a separate overlay frame.\nCritical: genuine RGBA transparency, not painted checkerboard. ONE item only, no sheet, comparison, UI, text, letters, numbers, logos or watermark. All ornament tips complete, no cropping."
+    },
+    {
+      "id": "letters-royal-frame-journey-crown",
+      "name": "Vương Miện Hành Trình",
+      "type": "frame",
+      "theme": "royal",
+      "sourceKind": "letters",
+      "sourceFile": "sources/letters-royal-frame-journey-crown.png",
+      "prompt": "Use case: stylized-concept. Asset type: one standalone production profile frame sprite for Memory Match Adventure.\nPrimary request: an opulent closed circular chased-gold ring with navy enamel, emerald jewels and compact golden crown crest at top, symmetric royal filigree and restrained ivory pearl accents, ornaments all outside the aperture, regal and richly detailed.\nStyle: rich polished storybook fantasy collectible game art, finely painted dimensional materials, elegant warm gold highlights, deep blue shadows, expressive charming subject where applicable. Match the established premium storybook animal portraits and ornamented frames; distinct new artwork, no copied existing character.\nComposition: square canvas. EMPTY FRAME LAYER ONLY: frontal orthographic perfectly circular ring centered50%/50%. Broad empty aperture is a true circle, equal width and height, diameter about63% of square. Inner circle and exterior truly transparent alpha. Outer ornaments fit inside90% of canvas; at least5% transparent margin on EVERY side. Closed continuous inner rim; no jewel/crest/ribbon crosses into or flattens opening. No portrait, background disk, scene or face.\nCritical: genuine RGBA transparency, not painted checkerboard. ONE item only, no sheet, comparison, UI, text, letters, numbers, logos or watermark. All ornament tips complete, no cropping."
+    },
+    {
+      "id": "letters-royal-badge-royal-seal",
+      "name": "Ấn Hoàng Gia",
+      "type": "badge",
+      "theme": "royal",
+      "sourceKind": "letters",
+      "sourceFile": "sources/letters-royal-badge-royal-seal.png",
+      "prompt": "Use case: stylized-concept. Asset type: one standalone production profile badge sprite for Memory Match Adventure.\nPrimary request: an opulent compact gold compass-rose medallion with navy enamel, central emerald jewel and tiny sculpted golden crown above, fine raised royal detailing, sharp readable silhouette, no letters or numbers.\nStyle: rich polished storybook fantasy collectible game art, finely painted dimensional materials, elegant warm gold highlights, deep blue shadows, expressive charming subject where applicable. Match the established premium storybook animal portraits and ornamented frames; distinct new artwork, no copied existing character.\nComposition: square canvas. BADGE LAYER ONLY: isolated compact dimensional medallion, complete silhouette inside center80% of square with clear transparent margins on every side. Clear at28px, frontal composition. Background genuinely transparent alpha.\nCritical: genuine RGBA transparency, not painted checkerboard. ONE item only, no sheet, comparison, UI, text, letters, numbers, logos or watermark. All ornament tips complete, no cropping."
+    }
+  ]
+}

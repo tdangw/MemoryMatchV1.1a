@@ -3,6 +3,7 @@ import { expect, test } from "@playwright/test";
 test("Challenge Lucky rewards once, clears Undo, and persists its claim ledger", async ({ page }) => {
   await page.goto("/");
   const result = await page.evaluate(async () => {
+    await (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('triple-connect');
     const { startTripleConnectRound } = await import("/js/tripleConnect/tripleController.js");
     const { getActiveSession } = await import("/js/sessionProgress.js");
     const run = await startTripleConnectRound({ mode: "challenge", level: 1, seed: "lucky-ui", skipIntro: true });

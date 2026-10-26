@@ -6,6 +6,7 @@ import '../styles/ui-skin-storybook.css';
 import '../styles/achievement-effects.css';
 import { initializeMenuAds } from './ads/menuAds.js';
 import { initializeProfileStatsService } from './profileStatsService.js';
+import { requestLiveops, bindLiveopsAccount } from './liveops/service.js';
 import { configureAdventureMap } from "./adventureMap.js";
 import { PROGRESSION_HELP_CONTENT } from './progression/progressionCopy.js';
 import { LINK_CONNECT_HELP_CONTENT } from './linkConnect/linkConfig.js';
@@ -118,7 +119,11 @@ await loadPersistentGameData();
 const seasonReady = await ensureGameplaySeason();
 const achievementReady = !seasonReady || await backfillAchievementInventory();
 hydrateGameState(seasonReady && achievementReady ? await loadPersistentGameData() : undefined);
-subscribeToLocalCommit(({ patch }) => { if (patch.appearance) gameState.appearance = normalizeAppearance(patch.appearance); });
+subscribeToLocalCommit(({ patch }) => {
+  if (patch.appearance) gameState.appearance = normalizeAppearance(patch.appearance);
+  if (patch.coins !== undefined) gameState.coins = patch.coins;
+  if (patch.rewardSettlement) void requestLiveops().catch(error => console.info('Reward facts await connection', error.code || error.name));
+});
 setRankingOwner(await loadProfileOwner());
 await restoreUiSkin();
 onProgress('save');
@@ -161,7 +166,11 @@ configureAppNavigation({
     return accountRuntime.showAccountPanel(surface);
   },
   action: async (action, { gameId, scope, surface = {} }) => {
-    if (action === 'missions' || action === 'events') return openAppModal({ ...surface, id: `${action}-screen`, title: action === 'missions' ? 'Nhiệm vụ' : 'Sự kiện', icon: action, content: '<p class="navigation-coming-soon">Sắp ra mắt</p>' });
+    if (action === 'missions' || action === 'events') {
+      const { openLiveopsPage } = await import('./liveops/presentation.js');
+      if (!scope.active) return;
+      return openLiveopsPage(action, surface);
+    }
     if (action === 'ranking') {
       if (document.getElementById('rankings-modal')) return;
       const rankings = await import('./leaderboardPanel.js');
@@ -289,6 +298,7 @@ if (import.meta.env.VITE_FIREBASE_DISABLED !== '1') {
       },
     });
     void profileStats?.bindAccount(account.getAccountService()).catch(error => console.warn('Profile statistics startup unavailable', error.code || error.name));
+    bindLiveopsAccount(account.getAccountService());
     return import('./leaderboardService.js').then(module => module.initializeLeaderboardService().ready);
   }).catch(error => {
     console.warn('Cloud startup unavailable', error.code || error.name);

@@ -218,6 +218,259 @@
       "prompt": "Use case: stylized-concept. Create ONE standalone polished storybook fantasy game collectible sprite for Memory Match Adventure. Rich painted dimensional materials, readable silhouette, charming luxury game art consistent with warm gold/ivory animal collectible portraits. No sprite sheet, UI, text, letters, numbers, rank numerals, watermark, logo, painted checkerboard. Genuine RGBA transparent outside. Complete artwork with transparent margins, no clipped ornament.\nItem ID link-frame-tidal-crown. Metadata name NOT printed: Vương Miện Hải Triều.\nApproved subject brief (Vietnamese): Vương miện vỏ sò và ngọc xanh, viền biển trang trọng.\nCollection: Vịnh Nguyệt Quang. Follow its specified materials and colors; no unrelated stars/jewels.\nEMPTY CIRCULAR FRAME LAYER ONLY, no face, portrait, scene or interior filling. Opening is a true circle centered at 50%/50%, equal horizontal and vertical diameter about 63% of square. The entire inner hole and outside are genuinely transparent alpha. Closed continuous inner rim, all ornaments strictly OUTSIDE the circular opening; no crest may flatten or protrude into aperture. Outer ornament diameter about 90%, at least 4% clear margin on every side, keep complete tips. Frontal orthographic ring, never oval or perspective.\nAll features strictly inside the silhouette. Clear transparent margin on every canvas edge. For frames keep ornaments compact, no long hanging pendants.",
       "reviewApproved": false,
       "approvedBrief": true
+    },
+    {
+      "id": "link-avatar-lantern-cat",
+      "sourceFile": "sources/link-avatar-lantern-cat.png",
+      "prompt": "Use case: stylized-concept. Create ONE standalone polished storybook fantasy game collectible sprite for Memory Match Adventure. Rich painted dimensional materials, readable silhouette, charming luxury game art consistent with warm gold/ivory animal collectible portraits. No sprite sheet, UI, text, letters, numbers, rank numerals, watermark, logo, painted checkerboard. Genuine RGBA transparent outside. Complete artwork with transparent margins, no clipped ornament.\nItem ID link-avatar-lantern-cat. Metadata name NOT printed: Mèo Hoa Đăng.\nApproved subject brief (Vietnamese): Mèo tam thể bên đèn lụa đỏ trong phố đêm.\nCollection: Đêm Hoa Đăng. Respect the specified red silk, cream, warm lantern and wood palette where mentioned. Do not add unrelated jewelry.\nAVATAR LAYER ONLY, no frame or border. A round animal/character portrait centered exactly on square, circular scene backdrop opaque inside circle. Face expressive and large, close-up, subject and all features inside circle. Portrait disk diameter about 78% of canvas, outside disk genuinely transparent. The entire round disk must be filled to its circular edge for underlap beneath a separate frame. No decorative ring.\nAll ears/antlers/crests inside the opaque circular portrait, never protruding. Keep frame ornaments compact outside its circular aperture. Clear transparent margins on all edges.",
+      "reviewApproved": false,
+      "approvedBrief": true
+    },
+    {
+      "id": "link-frame-silk-lanterns",
+      "sourceFile": "sources/link-frame-silk-lanterns.png",
+      "prompt": "Use case: stylized-concept. Create ONE standalone polished storybook fantasy game collectible sprite for Memory Match Adventure. Rich painted dimensional materials, readable silhouette, charming luxury game art consistent with warm gold/ivory animal collectible portraits. No sprite sheet, UI, text, letters, numbers, rank numerals, watermark, logo, painted checkerboard. Genuine RGBA transparent outside. Complete artwork with transparent margins, no clipped ornament.\nItem ID link-frame-silk-lanterns. Metadata name NOT printed: Vòng Đèn Lụa.\nApproved subject brief (Vietnamese): Đèn lụa nhỏ treo ngoài vòng gỗ đỏ vàng, không che tâm.\nCollection: Đêm Hoa Đăng. Respect the specified red silk, cream, warm lantern and wood palette where mentioned. Do not add unrelated jewelry.\nEMPTY CIRCULAR FRAME LAYER ONLY, no face, portrait, scene or interior filling. Opening is a true circle centered at 50%/50%, equal horizontal and vertical diameter about 63% of square. The entire inner hole and outside are genuinely transparent alpha. Closed continuous inner rim, all ornaments strictly OUTSIDE the circular opening; no crest may flatten or protrude into aperture. Outer ornament diameter about 90%, at least 4% clear margin on every side, keep complete tips. Frontal orthographic ring, never oval or perspective.\nAll ears/antlers/crests inside the opaque circular portrait, never protruding. Keep frame ornaments compact outside its circular aperture. Clear transparent margins on all edges.",
+      "reviewApproved": false,
+      "approvedBrief": true
+    },
+    {
+      "id": "link-badge-guiding-lantern",
+      "sourceFile": "sources/link-badge-guiding-lantern.png",
+      "prompt": "Use case: stylized-concept. Create ONE standalone polished storybook fantasy game collectible sprite for Memory Match Adventure. Rich painted dimensional materials, readable silhouette, charming luxury game art consistent with warm gold/ivory animal collectible portraits. No sprite sheet, UI, text, letters, numbers, rank numerals, watermark, logo, painted checkerboard. Genuine RGBA transparent outside. Complete artwork with transparent margins, no clipped ornament.\nItem ID link-badge-guiding-lantern. Metadata name NOT printed: Ngọn Đèn Kết Nối.\nApproved subject brief (Vietnamese): Đèn lồng và hai dải sáng gặp nhau trên khiên vàng.\nCollection: Đêm Hoa Đăng. Respect the specified red silk, cream, warm lantern and wood palette where mentioned. Do not add unrelated jewelry.\nBADGE LAYER ONLY. One isolated medallion with clearly readable central emblem, frontal view, compact nearly square silhouette, fully within center 80% of square, all ribbon tips intact. Materials and symbolism as the brief, clear at 28px. Background transparent.\nAll ears/antlers/crests inside the opaque circular portrait, never protruding. Keep frame ornaments compact outside its circular aperture. Clear transparent margins on all edges.",
+      "reviewApproved": false,
+      "approvedBrief": true
+    },
+    {
+      "id": "link-avatar-festival-sparrow",
+      "sourceFile": "sources/link-avatar-festival-sparrow.png",
+      "prompt": "Use case: stylized-concept. Create ONE standalone polished storybook fantasy game collectible sprite for Memory Match Adventure. Rich painted dimensional materials, readable silhouette, charming luxury game art consistent with warm gold/ivory animal collectible portraits. No sprite sheet, UI, text, letters, numbers, rank numerals, watermark, logo, painted checkerboard. Genuine RGBA transparent outside. Complete artwork with transparent margins, no clipped ornament.\nItem ID link-avatar-festival-sparrow. Metadata name NOT printed: Chim Sẻ Đêm Hội.\nApproved subject brief (Vietnamese): Chim sẻ nâu trên cành hoa trong đêm hội; mắt và mỏ rõ.\nCollection: Đêm Hoa Đăng. Respect the specified red silk, cream, warm lantern and wood palette where mentioned. Do not add unrelated jewelry.\nAVATAR LAYER ONLY, no frame or border. A round animal/character portrait centered exactly on square, circular scene backdrop opaque inside circle. Face expressive and large, close-up, subject and all features inside circle. Portrait disk diameter about 78% of canvas, outside disk genuinely transparent. The entire round disk must be filled to its circular edge for underlap beneath a separate frame. No decorative ring.\nAll ears/antlers/crests inside the opaque circular portrait, never protruding. Keep frame ornaments compact outside its circular aperture. Clear transparent margins on all edges.",
+      "reviewApproved": false,
+      "approvedBrief": true
+    },
+    {
+      "id": "link-frame-osmanthus-branch",
+      "sourceFile": "sources/link-frame-osmanthus-branch.png",
+      "prompt": "Use case: stylized-concept. Create ONE standalone polished storybook fantasy game collectible sprite for Memory Match Adventure. Rich painted dimensional materials, readable silhouette, charming luxury game art consistent with warm gold/ivory animal collectible portraits. No sprite sheet, UI, text, letters, numbers, rank numerals, watermark, logo, painted checkerboard. Genuine RGBA transparent outside. Complete artwork with transparent margins, no clipped ornament.\nItem ID link-frame-osmanthus-branch. Metadata name NOT printed: Nhành Hoa Mộc.\nApproved subject brief (Vietnamese): Hoa mộc li ti và nhánh gỗ vàng, bố cục nhẹ hơn khung hoa cũ.\nCollection: Đêm Hoa Đăng. Respect the specified red silk, cream, warm lantern and wood palette where mentioned. Do not add unrelated jewelry.\nEMPTY CIRCULAR FRAME LAYER ONLY, no face, portrait, scene or interior filling. Opening is a true circle centered at 50%/50%, equal horizontal and vertical diameter about 63% of square. The entire inner hole and outside are genuinely transparent alpha. Closed continuous inner rim, all ornaments strictly OUTSIDE the circular opening; no crest may flatten or protrude into aperture. Outer ornament diameter about 90%, at least 4% clear margin on every side, keep complete tips. Frontal orthographic ring, never oval or perspective.\nAll ears/antlers/crests inside the opaque circular portrait, never protruding. Keep frame ornaments compact outside its circular aperture. Clear transparent margins on all edges.",
+      "reviewApproved": false,
+      "approvedBrief": true
+    },
+    {
+      "id": "link-avatar-paperblossom-deer",
+      "sourceFile": "sources/link-avatar-paperblossom-deer.png",
+      "prompt": "Use case: stylized-concept. Create ONE standalone polished storybook fantasy game collectible sprite for Memory Match Adventure. Rich painted dimensional materials, readable silhouette, charming luxury game art consistent with warm gold/ivory animal collectible portraits. No sprite sheet, UI, text, letters, numbers, rank numerals, watermark, logo, painted checkerboard. Genuine RGBA transparent outside. Complete artwork with transparent margins, no clipped ornament.\nItem ID link-avatar-paperblossom-deer. Metadata name NOT printed: Hươu Hoa Giấy.\nApproved subject brief (Vietnamese): Hươu nâu đeo vòng hoa giấy, ánh đèn ấm; sừng ở trong portrait.\nCollection: Đêm Hoa Đăng. Respect the specified red silk, cream, warm lantern and wood palette where mentioned. Do not add unrelated jewelry.\nAVATAR LAYER ONLY, no frame or border. A round animal/character portrait centered exactly on square, circular scene backdrop opaque inside circle. Face expressive and large, close-up, subject and all features inside circle. Portrait disk diameter about 78% of canvas, outside disk genuinely transparent. The entire round disk must be filled to its circular edge for underlap beneath a separate frame. No decorative ring.\nAll ears/antlers/crests inside the opaque circular portrait, never protruding. Keep frame ornaments compact outside its circular aperture. Clear transparent margins on all edges.",
+      "reviewApproved": false,
+      "approvedBrief": true
+    },
+    {
+      "id": "link-frame-moon-silk",
+      "sourceFile": "sources/link-frame-moon-silk.png",
+      "prompt": "Use case: stylized-concept. Create ONE standalone polished storybook fantasy game collectible sprite for Memory Match Adventure. Rich painted dimensional materials, readable silhouette, charming luxury game art consistent with warm gold/ivory animal collectible portraits. No sprite sheet, UI, text, letters, numbers, rank numerals, watermark, logo, painted checkerboard. Genuine RGBA transparent outside. Complete artwork with transparent margins, no clipped ornament.\nItem ID link-frame-moon-silk. Metadata name NOT printed: Dải Lụa Trăng.\nApproved subject brief (Vietnamese): Lụa đỏ kem quấn viền bạc, chốt ngọc trăng ngoài lòng.\nCollection: Đêm Hoa Đăng. Respect the specified red silk, cream, warm lantern and wood palette where mentioned. Do not add unrelated jewelry.\nEMPTY CIRCULAR FRAME LAYER ONLY, no face, portrait, scene or interior filling. Opening is a true circle centered at 50%/50%, equal horizontal and vertical diameter about 63% of square. The entire inner hole and outside are genuinely transparent alpha. Closed continuous inner rim, all ornaments strictly OUTSIDE the circular opening; no crest may flatten or protrude into aperture. Outer ornament diameter about 90%, at least 4% clear margin on every side, keep complete tips. Frontal orthographic ring, never oval or perspective.\nAll ears/antlers/crests inside the opaque circular portrait, never protruding. Keep frame ornaments compact outside its circular aperture. Clear transparent margins on all edges.",
+      "reviewApproved": false,
+      "approvedBrief": true
+    },
+    {
+      "id": "link-badge-moonlit-promise",
+      "sourceFile": "sources/link-badge-moonlit-promise.png",
+      "prompt": "Use case: stylized-concept. Create ONE standalone polished storybook fantasy game collectible sprite for Memory Match Adventure. Rich painted dimensional materials, readable silhouette, charming luxury game art consistent with warm gold/ivory animal collectible portraits. No sprite sheet, UI, text, letters, numbers, rank numerals, watermark, logo, painted checkerboard. Genuine RGBA transparent outside. Complete artwork with transparent margins, no clipped ornament.\nItem ID link-badge-moonlit-promise. Metadata name NOT printed: Lời Hẹn Dưới Trăng.\nApproved subject brief (Vietnamese): Nút dây đôi dưới trăng, huy chương men xanh trên ruy băng đỏ.\nCollection: Đêm Hoa Đăng. Respect the specified red silk, cream, warm lantern and wood palette where mentioned. Do not add unrelated jewelry.\nBADGE LAYER ONLY. One isolated medallion with clearly readable central emblem, frontal view, compact nearly square silhouette, fully within center 80% of square, all ribbon tips intact. Materials and symbolism as the brief, clear at 28px. Background transparent.\nAll ears/antlers/crests inside the opaque circular portrait, never protruding. Keep frame ornaments compact outside its circular aperture. Clear transparent margins on all edges.",
+      "reviewApproved": false,
+      "approvedBrief": true
+    },
+    {
+      "id": "link-avatar-glasslight-fox",
+      "sourceFile": "sources/link-avatar-glasslight-fox.png",
+      "prompt": "Use case: stylized-concept. Create ONE standalone polished storybook fantasy game collectible sprite for Memory Match Adventure. Rich painted dimensional materials, readable silhouette, charming luxury game art consistent with warm gold/ivory animal collectible portraits. No sprite sheet, UI, text, letters, numbers, rank numerals, watermark, logo, painted checkerboard. Genuine RGBA transparent outside. Complete artwork with transparent margins, no clipped ornament.\nItem ID link-avatar-glasslight-fox. Metadata name NOT printed: Cáo Lưu Ly.\nApproved subject brief (Vietnamese): Cáo nâu tím bên đèn thủy tinh xanh, khác Cáo Ánh Trăng về chất/cảnh.\nCollection: Đêm Hoa Đăng. Respect the specified red silk, cream, warm lantern and wood palette where mentioned. Do not add unrelated jewelry.\nAVATAR LAYER ONLY, no frame or border. A round animal/character portrait centered exactly on square, circular scene backdrop opaque inside circle. Face expressive and large, close-up, subject and all features inside circle. Portrait disk diameter about 78% of canvas, outside disk genuinely transparent. The entire round disk must be filled to its circular edge for underlap beneath a separate frame. No decorative ring.\nAll ears/antlers/crests inside the opaque circular portrait, never protruding. Keep frame ornaments compact outside its circular aperture. Clear transparent margins on all edges.",
+      "reviewApproved": false,
+      "approvedBrief": true
+    },
+    {
+      "id": "link-frame-lantern-moon-gate",
+      "sourceFile": "sources/link-frame-lantern-moon-gate-v2.png",
+      "prompt": "Use case: stylized-concept. Create ONE standalone polished storybook fantasy game collectible sprite for Memory Match Adventure. Rich painted dimensional materials, readable silhouette, charming luxury game art consistent with warm gold/ivory animal collectible portraits. No sprite sheet, UI, text, letters, numbers, rank numerals, watermark, logo, painted checkerboard. Genuine RGBA transparent outside. Complete artwork with transparent margins, no clipped ornament.\nItem ID link-frame-lantern-moon-gate. Metadata name NOT printed: Cổng Trăng Hoa Đăng.\nApproved subject brief (Vietnamese): Cổng trăng gỗ chạm, đèn lụa và hoa mộc, không đổi aperture avatar.\nCollection: Đêm Hoa Đăng. Respect the specified red silk, cream, warm lantern and wood palette where mentioned. Do not add unrelated jewelry.\nEMPTY CIRCULAR FRAME LAYER ONLY, no face, portrait, scene or interior filling. Opening is a true circle centered at 50%/50%, equal horizontal and vertical diameter about 63% of square. The entire inner hole and outside are genuinely transparent alpha. Closed continuous inner rim, all ornaments strictly OUTSIDE the circular opening; no crest may flatten or protrude into aperture. Outer ornament diameter about 90%, at least 4% clear margin on every side, keep complete tips. Frontal orthographic ring, never oval or perspective.\nAll ears/antlers/crests inside the opaque circular portrait, never protruding. Keep frame ornaments compact outside its circular aperture. Clear transparent margins on all edges.",
+      "reviewApproved": false,
+      "approvedBrief": true,
+      "previousSource": "sources/link-frame-lantern-moon-gate.png",
+      "geometryEditPrompt": "Use case: precise-object-edit. Edit target: ornate wooden moon gate profile frame shown. Preserve carved dark warm wood, red silk drapes, osmanthus blossoms and small silk lanterns, polished storybook game art, transparent inner aperture and exterior. Change only geometry: make the opening a TRUE CIRCLE centered exactly on square canvas; make outer silhouette compact and nearly circular. REMOVE long hanging tassel below bottom rim; bottom ornament ends adjacent to rim. Shorten all top/side crests so total outer diameter is at most 1.48 times inner aperture diameter. Keep opening about 64% canvas, ornaments within 92% canvas with generous transparent margins, circle perfectly centered. No portrait, filling scene, text, numbers, watermark. Separate hollow frame with genuine alpha inside and outside."
+    },
+    {
+      "id": "triple-avatar-quartz-phoenix",
+      "prompt": "Use case: stylized-concept. Asset: ONE standalone collectible avatar sprite, triple-avatar-quartz-phoenix, Phượng Hoàng Thạch Anh. Subject: baby phoenix with white and lilac feathers and small quartz accents, expressive close-up face in a crystal city. Polished rich painted dimensional storybook fantasy game art, friendly, luminous amethyst and silver palette. Square composition, a perfectly circular fully opaque portrait disk centered, diameter 78% of square. ALL feathers, crest, wings and scenery strictly inside disk; opaque painted scene all the way to smooth circular edge. Outside circle genuinely transparent alpha. No decorative frame or border. Generous transparent outer margins. No text, letters, numbers, watermark, UI or sheet. Single separate avatar layer for overlay beneath arbitrary frames.",
+      "sourceFile": "sources/triple-avatar-quartz-phoenix.png",
+      "approvedBrief": true,
+      "reviewApproved": false
+    },
+    {
+      "id": "triple-frame-crystal-arch",
+      "prompt": "Use case: stylized-concept. ONE standalone circular profile FRAME sprite triple-frame-crystal-arch, Vòm Pha Lê. Rich polished painted storybook fantasy game art. Continuous silver circular rim with compact lilac quartz crystal arch ornament and short outward-facing crystal tips. Perfect true circular aperture at exact center of square, diameter 66% canvas; outer silhouette within 92% canvas. All crystals strictly outside inner opening. Outer maximum extent at most 1.45 times inner radius; no long crests. Genuine transparent alpha entire circular center and exterior, hollow ring only. Frontal orthographic, no oval/perspective. No animal, face, portrait, filled disk, scene, letters, numbers, UI, watermark, sheet. Clear transparent margins, no clipping.",
+      "sourceFile": "sources/triple-frame-crystal-arch.png",
+      "approvedBrief": true,
+      "reviewApproved": false
+    },
+    {
+      "id": "triple-badge-triangle-seal",
+      "prompt": "Use case: stylized-concept. Asset: ONE separate profile badge collectible triple-badge-triangle-seal, Dấu Ấn Tam Giác. A compact triangular antique bronze seal medallion with rounded corners, three small lilac quartz crystals grouped in the center, dimensional engraved bronze edge and a short deep violet ribbon behind. Clear recognizable silhouette at 28 pixels. Rich polished painted storybook fantasy game art, bronze gold highlights, amethyst facets. Front view, centered within center 75% of a square canvas; generous empty transparent margins and complete ribbon tips. Genuine alpha background, no portrait, scene, surrounding frame, sheet, text, letters, numbers, watermark or UI.",
+      "sourceFile": "sources/triple-badge-triangle-seal.png",
+      "approvedBrief": true,
+      "reviewApproved": false
+    },
+    {
+      "id": "triple-avatar-amethyst-unicorn",
+      "prompt": "Use case: stylized-concept. ONE standalone profile avatar collectible triple-avatar-amethyst-unicorn, Kỳ Lân Tím. Gentle young unicorn with soft purple mane and small horn, close-up expressive face in a luminous crystal city. Rich polished painted storybook fantasy art, silver and lilac highlights. All ears, mane and HORN strictly INSIDE a perfectly circular opaque portrait disk, diameter 78% of square canvas, centered. Scale character so horn fits fully inside disk. Painted background fills disk to smooth circular edge; genuinely transparent outside. No separate border or frame, no projecting features outside circle. Complete round silhouette, clear outer transparent padding. No UI, sheet, letters, text, watermark, numbers.",
+      "sourceFile": "sources/triple-avatar-amethyst-unicorn.png",
+      "approvedBrief": true,
+      "reviewApproved": false
+    },
+    {
+      "id": "triple-frame-three-wing-star",
+      "prompt": "Use case: stylized-concept. ONE standalone circular profile FRAME triple-frame-three-wing-star, Cánh Sao Ba Nhánh. Continuous polished silver circular rim with THREE compact jade wing ornaments spaced equally OUTSIDE rim, one at top and two lower sides. Refined pale jade and silver fantasy storybook painted game art. Hollow TRUE CIRCULAR aperture centered exactly in square, diameter 66% canvas; smooth unbroken inner circle with no inward point or crest. Wings extend tangentially compactly along outside rim, maximum outer diameter 92% canvas. Genuine transparent alpha in whole center and exterior. Orthographic frontal, no oval. Generous transparent margins, complete tips. No portrait, filling disk, face, scene, text, numbers, UI, watermark or sheet.",
+      "sourceFile": "sources/triple-frame-three-wing-star.png",
+      "approvedBrief": true,
+      "reviewApproved": false
+    },
+    {
+      "id": "triple-avatar-platinum-dragon",
+      "prompt": "Use case: stylized-concept. ONE standalone profile avatar triple-avatar-platinum-dragon, Rồng Bạch Kim. Friendly SMALL silver-blue baby dragon with golden eyes, softly metallic platinum scales, close expressive face against jade and silver crystal-city backdrop. Rich polished dimensional painted storybook fantasy game collectible art. Square canvas, perfectly circular opaque portrait disk centered exactly, diameter 78% canvas. All horns, ears, wings and face fully INSIDE disk; paint scene continuously to circular edge. True transparent alpha outside disk with generous clear margins. NO decorative frame/ring. No projecting features, letters, numbers, text, watermark, UI or sheet.",
+      "sourceFile": "sources/triple-avatar-platinum-dragon.png",
+      "approvedBrief": true,
+      "reviewApproved": false
+    },
+    {
+      "id": "triple-frame-jade-gears",
+      "prompt": "Use case: stylized-concept. Asset ONE separate circular profile FRAME triple-frame-jade-gears, Vòng Bánh Răng Ngọc. Continuous smooth silver inner circular rim, compact interlocking small silver and jade gears placed around OUTSIDE circumference. Refined handcrafted dimensional storybook fantasy game collectible, pale jade enamel and brushed silver, restrained gold pivots. TRUE CIRCLE aperture exactly centered on square, inner diameter 66% canvas; empty interior completely transparent. Outer silhouette round and within 92% canvas, all gear teeth short OUTWARD, no ornaments across opening. Generous clear alpha margins. Frontal orthographic no perspective or ellipse. Genuinely transparent exterior and center; no face, portrait, filled scene, disk, text, numbers, UI, sheet or watermark.",
+      "sourceFile": "sources/triple-frame-jade-gears.png",
+      "approvedBrief": true,
+      "reviewApproved": false
+    },
+    {
+      "id": "triple-badge-crystal-keeper",
+      "prompt": "Use case: stylized-concept. ONE isolated collectible profile badge triple-badge-crystal-keeper, Người Giữ Tinh Thể. Three little lilac crystal towers within a silver shield, a SMALL compact gold crown integrated at top, short dark-violet ribbon. Polished rich dimensional storybook fantasy game painted art, amethyst quartz, silver and restrained gold. Front facing medallion with simple clear emblem readable at 28 pixels. Centered within 75% of square canvas, complete tips and generous genuine transparent alpha margins. No portrait, animal, scenery, frame surrounding scene, text, letters, numbers, rank, UI, sheet or watermark.",
+      "sourceFile": "sources/triple-badge-crystal-keeper.png",
+      "approvedBrief": true,
+      "reviewApproved": false
+    },
+    {
+      "id": "triple-avatar-crystal-mech-cat",
+      "prompt": "Use case: stylized-concept. ONE standalone profile avatar triple-avatar-crystal-mech-cat, Mèo Máy Pha Lê. Friendly little mechanical cat made of warm bronze and silver, large amethyst gemstone eyes, small rounded ears, gentle expressive face. A crystal city workshop softly painted behind. Polished dimensional painted storybook fantasy game art, tactile metal, purple reflections. Perfectly circular FULLY OPAQUE portrait disk centered on square, diameter 78% canvas. Whole ears and head and details fit comfortably INSIDE circle with interior headroom. Smooth painted scene to disk edge, outside genuine transparent alpha, generous margins. No border/frame, no text, letters, numbers, rank, UI, watermark, sheet.",
+      "sourceFile": "sources/triple-avatar-crystal-mech-cat-v2.png",
+      "approvedBrief": true,
+      "reviewApproved": false,
+      "previousSource": "sources/triple-avatar-crystal-mech-cat.png",
+      "geometryEditPrompt": "Use case: precise-object-edit. Target mechanical cat portrait. Preserve bronze/silver friendly cat, amethyst eyes and same crystal workshop storybook painted style. Change ONLY circular silhouette: create ONE geometrically exact smooth circle centered in square, diameter 80% canvas, completely OPAQUE including painted workshop background right up to every circular edge. Remove any isolated pixels or protrusions outside circle; ALL ears/whiskers/tail inside circular scene. Scale/reposition scene as necessary; no transparent dents inside disk. Outside disk genuinely transparent alpha with generous padding. No ring, frame, text, numbers, watermark."
+    },
+    {
+      "id": "triple-frame-tri-star-crown",
+      "prompt": "Use case: stylized-concept. ONE separate hollow circular profile FRAME triple-frame-tri-star-crown, Vương Miện Tam Tinh. Luxurious continuous golden ring with THREE compact jade star settings spaced equally on outside rim, small crown-like shapes integrated tangentially. Polished dimensional painted storybook fantasy game art, gold and pale jade, crystal-city collectible. A perfectly CIRCULAR centered transparent opening, diameter 66% square canvas. Outer silhouette at most 92% canvas, compact ornaments no tall crest; everything outside aperture, smooth uninterrupted circular inner rim. Frontal orthographic, no oval/perspective. Genuine alpha exterior AND entire empty center, generous margins. NO portrait, animal, filling disk, scene, UI, letters, text, numbers, watermark, sheet.",
+      "sourceFile": "sources/triple-frame-tri-star-crown-v2.png",
+      "approvedBrief": true,
+      "reviewApproved": false,
+      "geometryEditPrompt": "Use case: precise-object-edit. Target: gold and jade three-star circular avatar frame. Preserve same gold braided rim, three jade star emblems and polished storybook game artwork. Change ONLY padding and compact top crest: scale WHOLE frame down to fit central 80% of square canvas, leaving at least 10% completely transparent margin on ALL FOUR sides. Reconstruct the tiny cropped top crown tip fully; make its height compact. Keep genuine transparent circular central hole and exterior, aperture perfectly circular centered. No portrait, background disk, text, letters, watermark or scene. Every ornament must be complete and clearly separated from canvas edges.",
+      "previousSource": "sources/triple-frame-tri-star-crown.png"
+    },
+    {
+      "id": "triple-avatar-aurora-snowfox",
+      "prompt": "Use case: stylized-concept. ONE profile avatar collectible triple-avatar-aurora-snowfox, Cáo Tuyết Cực Quang. Friendly white arctic fox with amber eyes, fully visible small ears, close-up expressive face under turquoise and violet northern lights, snowy night background. Polished rich dimensional painted storybook fantasy game art. Perfectly circular opaque portrait disk at canvas center, 78% square width, with ALL ears/fur inside and clear interior headroom. Background fills to circular edge. Genuine alpha outside, generous clear padding. No separate frame/ring, projecting fur, text, letters, numbers, UI, watermark or sheet.",
+      "sourceFile": "sources/triple-avatar-aurora-snowfox.png",
+      "approvedBrief": true,
+      "reviewApproved": false
+    },
+    {
+      "id": "triple-frame-aurora-ribbon",
+      "prompt": "Use case: stylized-concept. ONE standalone circular profile FRAME triple-frame-aurora-ribbon, Dải Cực Quang. A smooth continuous silver circular rim wrapped in sculpted SOLID enamel ribbons shaded turquoise green and violet like northern lights, compact rounded folds around outside. Rich polished painted dimensional storybook fantasy game collectible art; clear solid materials, no large glow or blur. Perfect true circular inner aperture centered on square, diameter 66% canvas. Ornaments all outside opening, round compact outer silhouette within 88% canvas, generous alpha margins. Genuine transparent center AND outside. No portrait, animal, filling disk, background, letters, text, numbers, UI, watermark or sheet. Frontal orthographic ring, no ellipse.",
+      "sourceFile": "sources/triple-frame-aurora-ribbon-v2.png",
+      "approvedBrief": true,
+      "reviewApproved": false,
+      "previousSource": "sources/triple-frame-aurora-ribbon.png",
+      "geometryEditPrompt": "Use case: precise-object-edit. Target aurora ribbon circular avatar frame. Preserve silver circular rim, solid turquoise and purple enamel ribbons and star ornaments, polished storybook collectible art. Change only padding and silhouette: scale entire object SMALLER to central 78% of square canvas, reconstruct clipped top tip, leave generous at least 10% fully transparent border ALL sides. Top and bottom star tips compact, all fully visible. Keep centered perfectly CIRCULAR transparent aperture and fully transparent exterior. No portrait, filling scene/disk, new objects, text, numbers, watermark."
+    },
+    {
+      "id": "triple-badge-three-dawn-rays",
+      "prompt": "Use case: stylized-concept. ONE isolated collectible profile badge triple-badge-three-dawn-rays, Ba Tia Bình Minh. A compact silver star-shaped medallion with a snowy ice mountain peak and THREE golden dawn rays in raised enamel relief at center. Deep blue and turquoise accents, short violet-blue ribbon. Rich polished dimensional painted storybook fantasy game art. Clear central emblem at 28 pixels. Front view, fully inside central 75% of square canvas with generous empty alpha margins, no clipped tips. Genuine transparent background. No text, letters, numbers, animal, portrait, scene outside medallion, UI, sheet or watermark.",
+      "sourceFile": "sources/triple-badge-three-dawn-rays.png",
+      "approvedBrief": true,
+      "reviewApproved": false
+    },
+    {
+      "id": "triple-avatar-jade-penguin",
+      "prompt": "Use case: stylized-concept. ONE standalone avatar triple-avatar-jade-penguin, Chim Cánh Cụt Ngọc. A charming young penguin with a jade green scarf, snowy landscape and turquoise-violet aurora behind. Expressive friendly face, finely painted fluffy feathers, polished dimensional storybook fantasy game art. Full head with clear space above, whole scarf knot fits INSIDE perfectly circular opaque portrait disk centered in square, disk diameter 78% canvas. Smooth uninterrupted circular scene edge, fully opaque painted background all way to edge; true transparent outside and generous margins. No ring/frame, no letters, text, numbers, UI, sheet or watermark.",
+      "sourceFile": "sources/triple-avatar-jade-penguin.png",
+      "approvedBrief": true,
+      "reviewApproved": false
+    },
+    {
+      "id": "triple-frame-azure-ice-ring",
+      "prompt": "Use case: stylized-concept. ONE standalone hollow circular profile FRAME triple-frame-azure-ice-ring, Vòng Băng Lam. Small short azure ice crystals attached OUTSIDE a smooth continuous silver circular inner rim. Distinct compact icy facets and silver settings, no long spikes. Rich polished dimensional painted storybook fantasy collectible art. Transparent TRUE CIRCLE aperture centered, diameter 66% square canvas. Entire object fits within central 82% canvas leaving 9% clear transparent margins all sides. Outer silhouette nearly round, no tall crest. All crystals strictly outside opening, no inward tips. Frontal orthographic. Genuine alpha center and outside. No portrait, face, scene, disk, text, numbers, UI, watermark or sheet.",
+      "sourceFile": "sources/triple-frame-azure-ice-ring.png",
+      "approvedBrief": true,
+      "reviewApproved": false
+    },
+    {
+      "id": "triple-avatar-polar-bear",
+      "prompt": "Use case: stylized-concept. ONE standalone collectible profile avatar triple-avatar-polar-bear, Gấu Bắc Cực. A gentle white polar bear cub, round full face looking softly toward viewer, small ears, under snowy midnight sky with soft distant northern lights, different pose from honey bear. Rich polished painted dimensional storybook fantasy game art. Square canvas centered perfectly circular opaque scene disk 78% canvas width. Whole head and ears INSIDE disk with headroom, background continuously filled to circle edge. Genuine transparent alpha outside and clear margins. No frame/ring, no lettering, text, numbers, UI, sheet, watermark.",
+      "sourceFile": "sources/triple-avatar-polar-bear.png",
+      "approvedBrief": true,
+      "reviewApproved": false
+    },
+    {
+      "id": "triple-frame-silver-meteor",
+      "prompt": "Use case: stylized-concept. ONE standalone hollow circular profile FRAME triple-frame-silver-meteor, Thiên Thạch Bạc. Dark silver continuous circular rim set with small compact silver meteorite stones and sculpted star trails around OUTSIDE circumference, solid metallic detail with no broad glow. Rich polished dimensional painted storybook fantasy game art, midnight blue accents. Perfect true circle transparent aperture centered, diameter 66% canvas. Round compact exterior fits central 82% square, generous transparent margins all sides, short ornaments only. Smooth unbroken inner circle, no inward intrusion. Genuine alpha empty center and exterior. Front orthographic, no oval. No portrait, face, scene, disk, letters, text, numbers, UI, watermark, sheet.",
+      "sourceFile": "sources/triple-frame-silver-meteor.png",
+      "approvedBrief": true,
+      "reviewApproved": false
+    },
+    {
+      "id": "triple-badge-aurora-heart",
+      "prompt": "Use case: stylized-concept. ONE standalone collectible badge triple-badge-aurora-heart, Trái Tim Cực Quang. A three-faceted large jade gemstone shifting turquoise and violet, held inside a compact ICE SHIELD with silver rim. Rich dimensional painted storybook fantasy game art, luminous solid enamel and crystal materials, no broad glow. Short dark blue ribbon behind shield. Clear simple emblem at 28px, frontal centered inside 75% square canvas with all tips intact and genuine transparent empty margins. No animal, portrait, background scene, letters, text, numbers, UI, sheet or watermark.",
+      "sourceFile": "sources/triple-badge-aurora-heart.png",
+      "approvedBrief": true,
+      "reviewApproved": false
+    },
+    {
+      "id": "triple-avatar-galactic-dragon",
+      "prompt": "Use case: stylized-concept. ONE standalone collectible profile avatar triple-avatar-galactic-dragon, Rồng Thiên Hà. Friendly dark midnight-blue young dragon with purple eyes and small star-speckled scales, compact SHORT curved horns fully visible, aurora night sky behind. Different from jade or sunset dragons. Rich polished dimensional painted storybook fantasy game art, close expressive face. PERFECT circular fully opaque scene disk centered in square at 78% canvas diameter. Whole horns and ears INSIDE disk with ample sky above, no cropping any horn tip. Smooth painted background fills circle all way to edge. Genuine transparent outside with broad margins. No separate frame/ring, text, letters, numbers, UI, sheet, watermark.",
+      "sourceFile": "sources/triple-avatar-galactic-dragon.png",
+      "approvedBrief": true,
+      "reviewApproved": false
+    },
+    {
+      "id": "triple-frame-aurora-crown",
+      "prompt": "Use case: stylized-concept. ONE separate hollow circular profile FRAME triple-frame-aurora-crown, Vương Miện Cực Quang. Luxurious layered jade and ice crown ornament integrated compactly around a continuous silver circular ring, turquoise/violet enamel aurora accents. Level 30 prestige fantasy storybook game collectible, rich polished dimensional painted materials. Small crown points around OUTSIDE only, no tall crest. A TRUE CIRCULAR empty aperture exactly centered, diameter 64% square. ENTIRE outer ornament silhouette fits central 80% square with 10% completely clear transparent margin on every edge. Inner circle smooth unbroken, no gems crossing inside. Frontal orthographic no ellipse. Genuine alpha outside and inside, NO portrait, face, scene, filled disk, text, numbers, UI, watermark, sheet.",
+      "sourceFile": "sources/triple-frame-aurora-crown.png",
+      "approvedBrief": true,
+      "reviewApproved": false
+    },
+    {
+      "id": "event-avatar-lantern-otter",
+      "prompt": "Use case: stylized-concept. ONE separate collectible avatar event-avatar-lantern-otter, Rái Cá Đèn Lồng. A friendly small otter hugging a warm golden lantern in an enchanted night forest with subtle tiny fireflies inside scene, expressive readable eyes. Rich polished dimensional painted storybook fantasy game art, warm gold and deep forest green. Perfectly circular completely OPAQUE portrait scene disk centered on square, diameter 78% canvas, ALL head/ears/paws/lantern and fireflies INSIDE disk, no projecting details. Background fills circle to smooth exact edge; outside genuinely transparent alpha with generous empty margins. No frame/ring, text, letters, numbers, UI, sheet, watermark.",
+      "sourceFile": "sources/event-avatar-lantern-otter.png",
+      "approvedBrief": true,
+      "reviewApproved": false
+    },
+    {
+      "id": "event-frame-firefly-glow",
+      "prompt": "Use case: stylized-concept. ONE standalone hollow circular profile FRAME event-frame-firefly-glow, Ánh Đom Đóm. Continuous circular ring of warm forest branches and small green leaves, tiny golden firefly lights ATTACHED along rim, polished rich painted dimensional storybook fantasy game art. No loose particles outside object, no large glow. Smooth TRUE CIRCULAR alpha aperture centered on square, diameter 65% canvas, all branches/leaves strictly outside opening. Compact round exterior within 84% canvas, generous empty transparent margins ALL edges, no tall crest. Genuine transparent alpha inside and outside. Frontal orthographic no ellipse. No otter, portrait, animal, filled disk, forest scene, text, letters, numbers, UI, watermark, sheet.",
+      "sourceFile": "sources/event-frame-firefly-glow.png",
+      "approvedBrief": true,
+      "reviewApproved": false
+    },
+    {
+      "id": "starter-avatar-little-sparrow",
+      "prompt": "Use case: stylized-concept. ONE standalone starter profile avatar starter-avatar-little-sparrow, Chim Sẻ Nhỏ. A friendly small brown sparrow on a twig in a softly sunlit simple garden, expressive close face, gentle warm cream and brown feathers. Polished dimensional painted storybook fantasy game art, restrained simple design, no crown, jewels, ornaments or jewelry. Perfectly circular OPAQUE painted scene disk centered, diameter 78% of square; whole head, wings and twig INSIDE circle, with interior headroom and smooth filled scene edge. True alpha outside, generous clear padding. No frame/ring, text, letters, numbers, UI, watermark or sheet.",
+      "sourceFile": "sources/starter-avatar-little-sparrow.png",
+      "approvedBrief": true,
+      "reviewApproved": false
+    },
+    {
+      "id": "starter-frame-plain-wood",
+      "prompt": "Use case: stylized-concept. ONE isolated starter profile FRAME starter-frame-plain-wood, Vòng Gỗ Mộc. Simple smooth light brown natural wood circular ring with gentle wood grain, just TWO small green leaves hugging OUTER edge at lower sides. Humble warm friendly painted dimensional storybook game art, much simpler than prestige frames. No gold, no gemstones, no attached badge, no crown. Perfect TRUE CIRCULAR empty transparent center at exact square center, diameter 66% canvas, outer diameter 84%, generous empty alpha margin on all four sides. Smooth continuous inner rim, leaves strictly outside aperture. Frontal orthographic, no oval/perspective. Genuine transparent center/exterior, no portrait, scene, filling disk, text, numbers, UI, watermark, sheet.",
+      "sourceFile": "sources/starter-frame-plain-wood.png",
+      "approvedBrief": true,
+      "reviewApproved": false
+    },
+    {
+      "id": "starter-badge-first-leaf",
+      "prompt": "Use case: stylized-concept. ONE standalone simple starter profile badge starter-badge-first-leaf, Lá Đầu Tiên. One fresh young green leaf with readable veins on a SMALL simple rounded wooden medallion. Warm light brown wood, soft fresh leaf green, friendly polished dimensional painted storybook game art. Very simple humble starter reward, no gold, jewels, wreath, crown, ribbon, rank, text or numbers. Compact nearly square silhouette centered within 70% of square canvas, complete leaf tip and generous genuinely transparent alpha outside. Front view, clear at 28px. No portrait, scenery, UI, sheet, watermark.",
+      "sourceFile": "sources/starter-badge-first-leaf.png",
+      "approvedBrief": true,
+      "reviewApproved": false
     }
   ],
   "representativesApprovedAt": "2026-10-24"

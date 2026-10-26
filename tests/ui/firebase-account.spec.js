@@ -1,10 +1,11 @@
+import { GAMEPLAY_SEASON } from '../../js/progression/gameplaySeason.js';
 import { expect, test } from "@playwright/test";
 
 test.skip(process.env.VITE_FIREBASE_USE_EMULATORS !== "1", "Runs only against the isolated Firebase emulators.");
 async function seed(context, coins) {
-  await context.addInitScript(coins => {
-    localStorage.setItem("memoryMatchSave", JSON.stringify({ formatVersion: 1, revision: 1, data: { coins, progress: {}, settings: {}, appearance: {} } }));
-  }, coins);
+  await context.addInitScript(({coins,season}) => {
+    localStorage.setItem("memoryMatchSave", JSON.stringify({ formatVersion: 1, revision: 1, data: { coins, progress: {gameplaySeason:season}, settings: {}, appearance: {} } }));
+  }, {coins,season:GAMEPLAY_SEASON});
 }
 async function ready(page) {
   await expect.poll(async () => page.evaluate(async () => (await import('/js/accountService.js')).getAccountService()?.getState().phase), { timeout: 30000 }).toBe('synced');
@@ -79,9 +80,9 @@ test("Google links the guest UID; another guest restores the existing Google clo
   expect((await state(b)).uid).toBe(guest.uid);
   expect(await b.evaluate(async () => (await import("/js/gameState.js")).gameState.coins)).toBe(1234);
   expect(await b.evaluate(async () => (await (await import("/js/persistence.js")).getLocalRestoreBackups()).at(-1).profile.data.coins)).toBe(4321);
-  expect(await b.evaluate(async () => (await import('/js/accountService.js')).getAccountService().restoreLocalBackup())).toBe(true);
-  await ready(b);
-  expect(await b.evaluate(async () => (await import('/js/gameState.js')).gameState.coins)).toBe(4321);
+  const restore=await b.evaluate(async()=>{try{await(await import('/js/accountService.js')).getAccountService().restoreLocalBackup();return 'unexpected';}catch(error){return error.code;}});
+  expect(restore).toBe('rewards/stale-backup');
+  expect(await b.evaluate(async () => (await import('/js/gameState.js')).gameState.coins)).toBe(1234);
   expect((await state(b)).uid).toBe(guest.uid);
   await first.close(); await second.close();
 });
@@ -132,8 +133,9 @@ test("a remote Google save waits until gameplay closes and later completed event
   await ready(a);
   await second.setOffline(false);
   await b.reload(); await ready(b);
-  expect(await b.evaluate(async () => (await import('/js/gameState.js')).gameState.coins)).toBe(999);
-  await expect.poll(() => a.evaluate(async () => (await import('/js/gameState.js')).gameState.coins), { timeout: 30000 }).toBe(999);
+  expect(await b.evaluate(async () => (await import('/js/gameState.js')).gameState.coins)).toBe(777);
+  expect(await b.evaluate(async () => (await(await import('/js/persistence.js')).getLocalRestoreBackups()).some(snapshot=>snapshot.profile.data.coins===999))).toBe(true);
+  await expect.poll(() => a.evaluate(async () => (await import('/js/gameState.js')).gameState.coins), { timeout: 30000 }).toBe(777);
   await first.close(); await second.close();
 });
 

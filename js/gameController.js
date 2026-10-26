@@ -527,9 +527,12 @@ export async function handleHintClick() {
 
   gameState.isLocked = true;
   gameState.progress.memoryMatch.items.hint -= 1;
+  const beforeHintWave = gameState.wave;
+  gameState.wave = normalizeWaveProgress({ ...gameState.wave, hintUsed: true });
   if (!(await persistMemorySession())) {
     if (gameState.roundId !== roundId) return;
     gameState.progress.memoryMatch.items.hint += 1;
+    gameState.wave = beforeHintWave;
     gameState.isLocked = false;
     return showBonusOverlay("Không thể lưu lượt gợi ý. Hãy thử lại.");
   }

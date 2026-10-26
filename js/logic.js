@@ -1,3 +1,5 @@
+import { memoryTicketDrop } from './liveops/dropAdapters.js';
+import { prepareLetterDropFeedback } from './liveops/letterDropFeedback.js';
 import { shellTimeout as setTimeout, clearShellTimeout as clearTimeout } from "./gameShell/gameShellLifecycle.js";
 // logic.js - Xử lý logic của trò chơi
 // chức năng của logic.js là xử lý logic của trò chơi, bao gồm việc xử lý sự kiện khi người chơi nhấp vào ô, kiểm tra xem hai ô có khớp nhau hay không, và kiểm tra xem người chơi đã hoàn thành cấp độ hay chưa. Nó cũng bao gồm các chức năng để khởi tạo logic và xử lý âm thanh khi người chơi tương tác với trò chơi.
@@ -28,6 +30,7 @@ import {
 } from "./ui.js";
 import { duckBackgroundMusicForVictory, pauseBackgroundMusic, sounds, playOwnedRewardCue } from "./sound.js"; // 📦 Tách âm thanh
 import { savePersistentGameData } from "./persistence.js";
+import { memorySettlementFact } from './liveops/settlementAdapters.js';
 import { stageMemorySession } from './memorySession.js';
 import { getActiveSession } from './sessionProgress.js';
 import { finishPlayMetrics, snapshotPlayMetrics } from "./playMetrics.js";
@@ -225,8 +228,11 @@ async function checkMatch(roundId) {
     const rewards = resolveMemoryPairRewards(gameState, { imageId: first.imageId, special: first.special });
     const totalCoins = gameState.coins;
     gameState.matchedPairs++;
+    const ticketDrop=memoryTicketDrop(gameState.wave,first,second,rewards);
     const staged = stageMemorySession({ assetPaths: getActiveSession('memory-match', gameState.settings.mode)?.assetPaths || [] });
-    if (!staged || !(await savePersistentGameData({ coins: totalCoins, progress: gameState.progress }))) {
+    if (!staged || !(await savePersistentGameData({ coins: totalCoins, progress: gameState.progress,
+      ticketDrop,
+      onSpecialDrop: ticketDrop?.special ? prepareLetterDropFeedback(second.element,getMemoryShell().scope) : undefined }))) {
       if (gameState.roundId !== roundId) return;
       gameState.progress.memoryMatch = rollback.progress;
       for (const key of Object.keys(rollback)) if (key !== 'progress') gameState[key] = rollback[key];
@@ -381,7 +387,7 @@ export async function checkLevelComplete() {
     stageRankedAttempt("memory-match", gameState.settings.mode, finalScore, true);
     checkpointRankedRun("memory-match", gameState.settings.mode);
     delete gameState.progress.memoryMatch.sessionsByMode?.[gameState.settings.mode];
-    if (!(await savePersistentGameData({ coins: totalCoins, progress: gameState.progress, cloudEvent: true }))) {
+    if (!(await savePersistentGameData({ coins: totalCoins, progress: gameState.progress, rewardFact: memorySettlementFact(gameState.wave), cloudEvent: true }))) {
       if (gameState.roundId === roundId) {
         gameState.coins = rollback.coins;
         gameState.score = rollback.score;

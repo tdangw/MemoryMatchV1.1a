@@ -1,14 +1,14 @@
 {
   "result": "PASS",
-  "generatedSprites": 30,
-  "packedSprites": 30,
+  "generatedSprites": 65,
+  "packedSprites": 65,
   "sourceErrors": [],
   "proposedSprites": 65,
-  "avatarCount": 21,
-  "frameCount": 21,
-  "checkedPairs": 441,
+  "avatarCount": 35,
+  "frameCount": 35,
+  "checkedPairs": 1225,
   "finalRequiredPairs": 1225,
-  "fullExpansionComplete": false,
+  "fullExpansionComplete": true,
   "runtimeChanged": false,
   "failedPairs": [],
   "pairs": [
@@ -139,6 +139,90 @@
       "outsideLeak": 0
     },
     {
+      "avatar": "link-avatar-lantern-cat",
+      "frame": "memory-frame-golden-laurel",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-festival-sparrow",
+      "frame": "memory-frame-golden-laurel",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-paperblossom-deer",
+      "frame": "memory-frame-golden-laurel",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-glasslight-fox",
+      "frame": "memory-frame-golden-laurel",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-quartz-phoenix",
+      "frame": "memory-frame-golden-laurel",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-amethyst-unicorn",
+      "frame": "memory-frame-golden-laurel",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-platinum-dragon",
+      "frame": "memory-frame-golden-laurel",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-crystal-mech-cat",
+      "frame": "memory-frame-golden-laurel",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-aurora-snowfox",
+      "frame": "memory-frame-golden-laurel",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-penguin",
+      "frame": "memory-frame-golden-laurel",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-polar-bear",
+      "frame": "memory-frame-golden-laurel",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-galactic-dragon",
+      "frame": "memory-frame-golden-laurel",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "event-avatar-lantern-otter",
+      "frame": "memory-frame-golden-laurel",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "starter-avatar-little-sparrow",
+      "frame": "memory-frame-golden-laurel",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
       "avatar": "memory-avatar-sapphire-owl",
       "frame": "link-frame-silver-moon",
       "uncoveredHole": 0,
@@ -265,6 +349,90 @@
       "outsideLeak": 0
     },
     {
+      "avatar": "link-avatar-lantern-cat",
+      "frame": "link-frame-silver-moon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-festival-sparrow",
+      "frame": "link-frame-silver-moon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-paperblossom-deer",
+      "frame": "link-frame-silver-moon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-glasslight-fox",
+      "frame": "link-frame-silver-moon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-quartz-phoenix",
+      "frame": "link-frame-silver-moon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-amethyst-unicorn",
+      "frame": "link-frame-silver-moon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-platinum-dragon",
+      "frame": "link-frame-silver-moon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-crystal-mech-cat",
+      "frame": "link-frame-silver-moon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-aurora-snowfox",
+      "frame": "link-frame-silver-moon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-penguin",
+      "frame": "link-frame-silver-moon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-polar-bear",
+      "frame": "link-frame-silver-moon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-galactic-dragon",
+      "frame": "link-frame-silver-moon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "event-avatar-lantern-otter",
+      "frame": "link-frame-silver-moon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "starter-avatar-little-sparrow",
+      "frame": "link-frame-silver-moon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
       "avatar": "memory-avatar-sapphire-owl",
       "frame": "triple-frame-tri-crystal",
       "uncoveredHole": 0,
@@ -391,6 +559,90 @@
       "outsideLeak": 0
     },
     {
+      "avatar": "link-avatar-lantern-cat",
+      "frame": "triple-frame-tri-crystal",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-festival-sparrow",
+      "frame": "triple-frame-tri-crystal",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-paperblossom-deer",
+      "frame": "triple-frame-tri-crystal",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-glasslight-fox",
+      "frame": "triple-frame-tri-crystal",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-quartz-phoenix",
+      "frame": "triple-frame-tri-crystal",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-amethyst-unicorn",
+      "frame": "triple-frame-tri-crystal",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-platinum-dragon",
+      "frame": "triple-frame-tri-crystal",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-crystal-mech-cat",
+      "frame": "triple-frame-tri-crystal",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-aurora-snowfox",
+      "frame": "triple-frame-tri-crystal",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-penguin",
+      "frame": "triple-frame-tri-crystal",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-polar-bear",
+      "frame": "triple-frame-tri-crystal",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-galactic-dragon",
+      "frame": "triple-frame-tri-crystal",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "event-avatar-lantern-otter",
+      "frame": "triple-frame-tri-crystal",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "starter-avatar-little-sparrow",
+      "frame": "triple-frame-tri-crystal",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
       "avatar": "memory-avatar-sapphire-owl",
       "frame": "memory-frame-cherry-blossom",
       "uncoveredHole": 0,
@@ -517,6 +769,90 @@
       "outsideLeak": 0
     },
     {
+      "avatar": "link-avatar-lantern-cat",
+      "frame": "memory-frame-cherry-blossom",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-festival-sparrow",
+      "frame": "memory-frame-cherry-blossom",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-paperblossom-deer",
+      "frame": "memory-frame-cherry-blossom",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-glasslight-fox",
+      "frame": "memory-frame-cherry-blossom",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-quartz-phoenix",
+      "frame": "memory-frame-cherry-blossom",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-amethyst-unicorn",
+      "frame": "memory-frame-cherry-blossom",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-platinum-dragon",
+      "frame": "memory-frame-cherry-blossom",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-crystal-mech-cat",
+      "frame": "memory-frame-cherry-blossom",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-aurora-snowfox",
+      "frame": "memory-frame-cherry-blossom",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-penguin",
+      "frame": "memory-frame-cherry-blossom",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-polar-bear",
+      "frame": "memory-frame-cherry-blossom",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-galactic-dragon",
+      "frame": "memory-frame-cherry-blossom",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "event-avatar-lantern-otter",
+      "frame": "memory-frame-cherry-blossom",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "starter-avatar-little-sparrow",
+      "frame": "memory-frame-cherry-blossom",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
       "avatar": "memory-avatar-sapphire-owl",
       "frame": "memory-frame-sky-feather",
       "uncoveredHole": 0,
@@ -643,6 +979,90 @@
       "outsideLeak": 0
     },
     {
+      "avatar": "link-avatar-lantern-cat",
+      "frame": "memory-frame-sky-feather",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-festival-sparrow",
+      "frame": "memory-frame-sky-feather",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-paperblossom-deer",
+      "frame": "memory-frame-sky-feather",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-glasslight-fox",
+      "frame": "memory-frame-sky-feather",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-quartz-phoenix",
+      "frame": "memory-frame-sky-feather",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-amethyst-unicorn",
+      "frame": "memory-frame-sky-feather",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-platinum-dragon",
+      "frame": "memory-frame-sky-feather",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-crystal-mech-cat",
+      "frame": "memory-frame-sky-feather",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-aurora-snowfox",
+      "frame": "memory-frame-sky-feather",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-penguin",
+      "frame": "memory-frame-sky-feather",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-polar-bear",
+      "frame": "memory-frame-sky-feather",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-galactic-dragon",
+      "frame": "memory-frame-sky-feather",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "event-avatar-lantern-otter",
+      "frame": "memory-frame-sky-feather",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "starter-avatar-little-sparrow",
+      "frame": "memory-frame-sky-feather",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
       "avatar": "memory-avatar-sapphire-owl",
       "frame": "link-frame-moonblossom",
       "uncoveredHole": 0,
@@ -769,6 +1189,90 @@
       "outsideLeak": 0
     },
     {
+      "avatar": "link-avatar-lantern-cat",
+      "frame": "link-frame-moonblossom",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-festival-sparrow",
+      "frame": "link-frame-moonblossom",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-paperblossom-deer",
+      "frame": "link-frame-moonblossom",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-glasslight-fox",
+      "frame": "link-frame-moonblossom",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-quartz-phoenix",
+      "frame": "link-frame-moonblossom",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-amethyst-unicorn",
+      "frame": "link-frame-moonblossom",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-platinum-dragon",
+      "frame": "link-frame-moonblossom",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-crystal-mech-cat",
+      "frame": "link-frame-moonblossom",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-aurora-snowfox",
+      "frame": "link-frame-moonblossom",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-penguin",
+      "frame": "link-frame-moonblossom",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-polar-bear",
+      "frame": "link-frame-moonblossom",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-galactic-dragon",
+      "frame": "link-frame-moonblossom",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "event-avatar-lantern-otter",
+      "frame": "link-frame-moonblossom",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "starter-avatar-little-sparrow",
+      "frame": "link-frame-moonblossom",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
       "avatar": "memory-avatar-sapphire-owl",
       "frame": "link-frame-stellar-orbit",
       "uncoveredHole": 0,
@@ -895,6 +1399,90 @@
       "outsideLeak": 0
     },
     {
+      "avatar": "link-avatar-lantern-cat",
+      "frame": "link-frame-stellar-orbit",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-festival-sparrow",
+      "frame": "link-frame-stellar-orbit",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-paperblossom-deer",
+      "frame": "link-frame-stellar-orbit",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-glasslight-fox",
+      "frame": "link-frame-stellar-orbit",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-quartz-phoenix",
+      "frame": "link-frame-stellar-orbit",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-amethyst-unicorn",
+      "frame": "link-frame-stellar-orbit",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-platinum-dragon",
+      "frame": "link-frame-stellar-orbit",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-crystal-mech-cat",
+      "frame": "link-frame-stellar-orbit",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-aurora-snowfox",
+      "frame": "link-frame-stellar-orbit",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-penguin",
+      "frame": "link-frame-stellar-orbit",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-polar-bear",
+      "frame": "link-frame-stellar-orbit",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-galactic-dragon",
+      "frame": "link-frame-stellar-orbit",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "event-avatar-lantern-otter",
+      "frame": "link-frame-stellar-orbit",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "starter-avatar-little-sparrow",
+      "frame": "link-frame-stellar-orbit",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
       "avatar": "memory-avatar-sapphire-owl",
       "frame": "triple-frame-prism",
       "uncoveredHole": 0,
@@ -1021,6 +1609,90 @@
       "outsideLeak": 0
     },
     {
+      "avatar": "link-avatar-lantern-cat",
+      "frame": "triple-frame-prism",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-festival-sparrow",
+      "frame": "triple-frame-prism",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-paperblossom-deer",
+      "frame": "triple-frame-prism",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-glasslight-fox",
+      "frame": "triple-frame-prism",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-quartz-phoenix",
+      "frame": "triple-frame-prism",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-amethyst-unicorn",
+      "frame": "triple-frame-prism",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-platinum-dragon",
+      "frame": "triple-frame-prism",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-crystal-mech-cat",
+      "frame": "triple-frame-prism",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-aurora-snowfox",
+      "frame": "triple-frame-prism",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-penguin",
+      "frame": "triple-frame-prism",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-polar-bear",
+      "frame": "triple-frame-prism",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-galactic-dragon",
+      "frame": "triple-frame-prism",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "event-avatar-lantern-otter",
+      "frame": "triple-frame-prism",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "starter-avatar-little-sparrow",
+      "frame": "triple-frame-prism",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
       "avatar": "memory-avatar-sapphire-owl",
       "frame": "triple-frame-emerald",
       "uncoveredHole": 0,
@@ -1147,6 +1819,90 @@
       "outsideLeak": 0
     },
     {
+      "avatar": "link-avatar-lantern-cat",
+      "frame": "triple-frame-emerald",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-festival-sparrow",
+      "frame": "triple-frame-emerald",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-paperblossom-deer",
+      "frame": "triple-frame-emerald",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-glasslight-fox",
+      "frame": "triple-frame-emerald",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-quartz-phoenix",
+      "frame": "triple-frame-emerald",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-amethyst-unicorn",
+      "frame": "triple-frame-emerald",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-platinum-dragon",
+      "frame": "triple-frame-emerald",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-crystal-mech-cat",
+      "frame": "triple-frame-emerald",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-aurora-snowfox",
+      "frame": "triple-frame-emerald",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-penguin",
+      "frame": "triple-frame-emerald",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-polar-bear",
+      "frame": "triple-frame-emerald",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-galactic-dragon",
+      "frame": "triple-frame-emerald",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "event-avatar-lantern-otter",
+      "frame": "triple-frame-emerald",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "starter-avatar-little-sparrow",
+      "frame": "triple-frame-emerald",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
       "avatar": "memory-avatar-sapphire-owl",
       "frame": "memory-frame-gilded-pages",
       "uncoveredHole": 0,
@@ -1273,6 +2029,90 @@
       "outsideLeak": 0
     },
     {
+      "avatar": "link-avatar-lantern-cat",
+      "frame": "memory-frame-gilded-pages",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-festival-sparrow",
+      "frame": "memory-frame-gilded-pages",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-paperblossom-deer",
+      "frame": "memory-frame-gilded-pages",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-glasslight-fox",
+      "frame": "memory-frame-gilded-pages",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-quartz-phoenix",
+      "frame": "memory-frame-gilded-pages",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-amethyst-unicorn",
+      "frame": "memory-frame-gilded-pages",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-platinum-dragon",
+      "frame": "memory-frame-gilded-pages",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-crystal-mech-cat",
+      "frame": "memory-frame-gilded-pages",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-aurora-snowfox",
+      "frame": "memory-frame-gilded-pages",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-penguin",
+      "frame": "memory-frame-gilded-pages",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-polar-bear",
+      "frame": "memory-frame-gilded-pages",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-galactic-dragon",
+      "frame": "memory-frame-gilded-pages",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "event-avatar-lantern-otter",
+      "frame": "memory-frame-gilded-pages",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "starter-avatar-little-sparrow",
+      "frame": "memory-frame-gilded-pages",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
       "avatar": "memory-avatar-sapphire-owl",
       "frame": "memory-frame-astral-orbit",
       "uncoveredHole": 0,
@@ -1399,6 +2239,90 @@
       "outsideLeak": 0
     },
     {
+      "avatar": "link-avatar-lantern-cat",
+      "frame": "memory-frame-astral-orbit",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-festival-sparrow",
+      "frame": "memory-frame-astral-orbit",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-paperblossom-deer",
+      "frame": "memory-frame-astral-orbit",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-glasslight-fox",
+      "frame": "memory-frame-astral-orbit",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-quartz-phoenix",
+      "frame": "memory-frame-astral-orbit",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-amethyst-unicorn",
+      "frame": "memory-frame-astral-orbit",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-platinum-dragon",
+      "frame": "memory-frame-astral-orbit",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-crystal-mech-cat",
+      "frame": "memory-frame-astral-orbit",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-aurora-snowfox",
+      "frame": "memory-frame-astral-orbit",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-penguin",
+      "frame": "memory-frame-astral-orbit",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-polar-bear",
+      "frame": "memory-frame-astral-orbit",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-galactic-dragon",
+      "frame": "memory-frame-astral-orbit",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "event-avatar-lantern-otter",
+      "frame": "memory-frame-astral-orbit",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "starter-avatar-little-sparrow",
+      "frame": "memory-frame-astral-orbit",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
       "avatar": "memory-avatar-sapphire-owl",
       "frame": "memory-frame-silken-clouds",
       "uncoveredHole": 0,
@@ -1525,6 +2449,90 @@
       "outsideLeak": 0
     },
     {
+      "avatar": "link-avatar-lantern-cat",
+      "frame": "memory-frame-silken-clouds",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-festival-sparrow",
+      "frame": "memory-frame-silken-clouds",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-paperblossom-deer",
+      "frame": "memory-frame-silken-clouds",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-glasslight-fox",
+      "frame": "memory-frame-silken-clouds",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-quartz-phoenix",
+      "frame": "memory-frame-silken-clouds",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-amethyst-unicorn",
+      "frame": "memory-frame-silken-clouds",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-platinum-dragon",
+      "frame": "memory-frame-silken-clouds",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-crystal-mech-cat",
+      "frame": "memory-frame-silken-clouds",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-aurora-snowfox",
+      "frame": "memory-frame-silken-clouds",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-penguin",
+      "frame": "memory-frame-silken-clouds",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-polar-bear",
+      "frame": "memory-frame-silken-clouds",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-galactic-dragon",
+      "frame": "memory-frame-silken-clouds",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "event-avatar-lantern-otter",
+      "frame": "memory-frame-silken-clouds",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "starter-avatar-little-sparrow",
+      "frame": "memory-frame-silken-clouds",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
       "avatar": "memory-avatar-sapphire-owl",
       "frame": "memory-frame-knowledge-gateway",
       "uncoveredHole": 0,
@@ -1651,6 +2659,90 @@
       "outsideLeak": 0
     },
     {
+      "avatar": "link-avatar-lantern-cat",
+      "frame": "memory-frame-knowledge-gateway",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-festival-sparrow",
+      "frame": "memory-frame-knowledge-gateway",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-paperblossom-deer",
+      "frame": "memory-frame-knowledge-gateway",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-glasslight-fox",
+      "frame": "memory-frame-knowledge-gateway",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-quartz-phoenix",
+      "frame": "memory-frame-knowledge-gateway",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-amethyst-unicorn",
+      "frame": "memory-frame-knowledge-gateway",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-platinum-dragon",
+      "frame": "memory-frame-knowledge-gateway",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-crystal-mech-cat",
+      "frame": "memory-frame-knowledge-gateway",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-aurora-snowfox",
+      "frame": "memory-frame-knowledge-gateway",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-penguin",
+      "frame": "memory-frame-knowledge-gateway",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-polar-bear",
+      "frame": "memory-frame-knowledge-gateway",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-galactic-dragon",
+      "frame": "memory-frame-knowledge-gateway",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "event-avatar-lantern-otter",
+      "frame": "memory-frame-knowledge-gateway",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "starter-avatar-little-sparrow",
+      "frame": "memory-frame-knowledge-gateway",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
       "avatar": "memory-avatar-sapphire-owl",
       "frame": "memory-frame-autumn-leaves",
       "uncoveredHole": 0,
@@ -1777,6 +2869,90 @@
       "outsideLeak": 0
     },
     {
+      "avatar": "link-avatar-lantern-cat",
+      "frame": "memory-frame-autumn-leaves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-festival-sparrow",
+      "frame": "memory-frame-autumn-leaves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-paperblossom-deer",
+      "frame": "memory-frame-autumn-leaves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-glasslight-fox",
+      "frame": "memory-frame-autumn-leaves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-quartz-phoenix",
+      "frame": "memory-frame-autumn-leaves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-amethyst-unicorn",
+      "frame": "memory-frame-autumn-leaves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-platinum-dragon",
+      "frame": "memory-frame-autumn-leaves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-crystal-mech-cat",
+      "frame": "memory-frame-autumn-leaves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-aurora-snowfox",
+      "frame": "memory-frame-autumn-leaves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-penguin",
+      "frame": "memory-frame-autumn-leaves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-polar-bear",
+      "frame": "memory-frame-autumn-leaves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-galactic-dragon",
+      "frame": "memory-frame-autumn-leaves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "event-avatar-lantern-otter",
+      "frame": "memory-frame-autumn-leaves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "starter-avatar-little-sparrow",
+      "frame": "memory-frame-autumn-leaves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
       "avatar": "memory-avatar-sapphire-owl",
       "frame": "memory-frame-frosted-branch",
       "uncoveredHole": 0,
@@ -1903,6 +3079,90 @@
       "outsideLeak": 0
     },
     {
+      "avatar": "link-avatar-lantern-cat",
+      "frame": "memory-frame-frosted-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-festival-sparrow",
+      "frame": "memory-frame-frosted-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-paperblossom-deer",
+      "frame": "memory-frame-frosted-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-glasslight-fox",
+      "frame": "memory-frame-frosted-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-quartz-phoenix",
+      "frame": "memory-frame-frosted-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-amethyst-unicorn",
+      "frame": "memory-frame-frosted-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-platinum-dragon",
+      "frame": "memory-frame-frosted-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-crystal-mech-cat",
+      "frame": "memory-frame-frosted-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-aurora-snowfox",
+      "frame": "memory-frame-frosted-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-penguin",
+      "frame": "memory-frame-frosted-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-polar-bear",
+      "frame": "memory-frame-frosted-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-galactic-dragon",
+      "frame": "memory-frame-frosted-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "event-avatar-lantern-otter",
+      "frame": "memory-frame-frosted-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "starter-avatar-little-sparrow",
+      "frame": "memory-frame-frosted-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
       "avatar": "memory-avatar-sapphire-owl",
       "frame": "memory-frame-golden-honeycomb",
       "uncoveredHole": 0,
@@ -2029,6 +3289,90 @@
       "outsideLeak": 0
     },
     {
+      "avatar": "link-avatar-lantern-cat",
+      "frame": "memory-frame-golden-honeycomb",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-festival-sparrow",
+      "frame": "memory-frame-golden-honeycomb",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-paperblossom-deer",
+      "frame": "memory-frame-golden-honeycomb",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-glasslight-fox",
+      "frame": "memory-frame-golden-honeycomb",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-quartz-phoenix",
+      "frame": "memory-frame-golden-honeycomb",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-amethyst-unicorn",
+      "frame": "memory-frame-golden-honeycomb",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-platinum-dragon",
+      "frame": "memory-frame-golden-honeycomb",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-crystal-mech-cat",
+      "frame": "memory-frame-golden-honeycomb",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-aurora-snowfox",
+      "frame": "memory-frame-golden-honeycomb",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-penguin",
+      "frame": "memory-frame-golden-honeycomb",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-polar-bear",
+      "frame": "memory-frame-golden-honeycomb",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-galactic-dragon",
+      "frame": "memory-frame-golden-honeycomb",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "event-avatar-lantern-otter",
+      "frame": "memory-frame-golden-honeycomb",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "starter-avatar-little-sparrow",
+      "frame": "memory-frame-golden-honeycomb",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
       "avatar": "memory-avatar-sapphire-owl",
       "frame": "memory-frame-memory-crown",
       "uncoveredHole": 0,
@@ -2155,6 +3499,90 @@
       "outsideLeak": 0
     },
     {
+      "avatar": "link-avatar-lantern-cat",
+      "frame": "memory-frame-memory-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-festival-sparrow",
+      "frame": "memory-frame-memory-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-paperblossom-deer",
+      "frame": "memory-frame-memory-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-glasslight-fox",
+      "frame": "memory-frame-memory-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-quartz-phoenix",
+      "frame": "memory-frame-memory-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-amethyst-unicorn",
+      "frame": "memory-frame-memory-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-platinum-dragon",
+      "frame": "memory-frame-memory-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-crystal-mech-cat",
+      "frame": "memory-frame-memory-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-aurora-snowfox",
+      "frame": "memory-frame-memory-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-penguin",
+      "frame": "memory-frame-memory-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-polar-bear",
+      "frame": "memory-frame-memory-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-galactic-dragon",
+      "frame": "memory-frame-memory-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "event-avatar-lantern-otter",
+      "frame": "memory-frame-memory-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "starter-avatar-little-sparrow",
+      "frame": "memory-frame-memory-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
       "avatar": "memory-avatar-sapphire-owl",
       "frame": "link-frame-moon-coral",
       "uncoveredHole": 0,
@@ -2281,6 +3709,90 @@
       "outsideLeak": 0
     },
     {
+      "avatar": "link-avatar-lantern-cat",
+      "frame": "link-frame-moon-coral",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-festival-sparrow",
+      "frame": "link-frame-moon-coral",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-paperblossom-deer",
+      "frame": "link-frame-moon-coral",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-glasslight-fox",
+      "frame": "link-frame-moon-coral",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-quartz-phoenix",
+      "frame": "link-frame-moon-coral",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-amethyst-unicorn",
+      "frame": "link-frame-moon-coral",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-platinum-dragon",
+      "frame": "link-frame-moon-coral",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-crystal-mech-cat",
+      "frame": "link-frame-moon-coral",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-aurora-snowfox",
+      "frame": "link-frame-moon-coral",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-penguin",
+      "frame": "link-frame-moon-coral",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-polar-bear",
+      "frame": "link-frame-moon-coral",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-galactic-dragon",
+      "frame": "link-frame-moon-coral",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "event-avatar-lantern-otter",
+      "frame": "link-frame-moon-coral",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "starter-avatar-little-sparrow",
+      "frame": "link-frame-moon-coral",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
       "avatar": "memory-avatar-sapphire-owl",
       "frame": "link-frame-silver-waves",
       "uncoveredHole": 0,
@@ -2407,6 +3919,90 @@
       "outsideLeak": 0
     },
     {
+      "avatar": "link-avatar-lantern-cat",
+      "frame": "link-frame-silver-waves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-festival-sparrow",
+      "frame": "link-frame-silver-waves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-paperblossom-deer",
+      "frame": "link-frame-silver-waves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-glasslight-fox",
+      "frame": "link-frame-silver-waves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-quartz-phoenix",
+      "frame": "link-frame-silver-waves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-amethyst-unicorn",
+      "frame": "link-frame-silver-waves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-platinum-dragon",
+      "frame": "link-frame-silver-waves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-crystal-mech-cat",
+      "frame": "link-frame-silver-waves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-aurora-snowfox",
+      "frame": "link-frame-silver-waves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-penguin",
+      "frame": "link-frame-silver-waves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-polar-bear",
+      "frame": "link-frame-silver-waves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-galactic-dragon",
+      "frame": "link-frame-silver-waves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "event-avatar-lantern-otter",
+      "frame": "link-frame-silver-waves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "starter-avatar-little-sparrow",
+      "frame": "link-frame-silver-waves",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
       "avatar": "memory-avatar-sapphire-owl",
       "frame": "link-frame-pearl-shell",
       "uncoveredHole": 0,
@@ -2533,6 +4129,90 @@
       "outsideLeak": 0
     },
     {
+      "avatar": "link-avatar-lantern-cat",
+      "frame": "link-frame-pearl-shell",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-festival-sparrow",
+      "frame": "link-frame-pearl-shell",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-paperblossom-deer",
+      "frame": "link-frame-pearl-shell",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-glasslight-fox",
+      "frame": "link-frame-pearl-shell",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-quartz-phoenix",
+      "frame": "link-frame-pearl-shell",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-amethyst-unicorn",
+      "frame": "link-frame-pearl-shell",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-platinum-dragon",
+      "frame": "link-frame-pearl-shell",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-crystal-mech-cat",
+      "frame": "link-frame-pearl-shell",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-aurora-snowfox",
+      "frame": "link-frame-pearl-shell",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-penguin",
+      "frame": "link-frame-pearl-shell",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-polar-bear",
+      "frame": "link-frame-pearl-shell",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-galactic-dragon",
+      "frame": "link-frame-pearl-shell",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "event-avatar-lantern-otter",
+      "frame": "link-frame-pearl-shell",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "starter-avatar-little-sparrow",
+      "frame": "link-frame-pearl-shell",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
       "avatar": "memory-avatar-sapphire-owl",
       "frame": "link-frame-tidal-crown",
       "uncoveredHole": 0,
@@ -2655,6 +4335,3030 @@
     {
       "avatar": "link-avatar-royal-seahorse",
       "frame": "link-frame-tidal-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-lantern-cat",
+      "frame": "link-frame-tidal-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-festival-sparrow",
+      "frame": "link-frame-tidal-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-paperblossom-deer",
+      "frame": "link-frame-tidal-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-glasslight-fox",
+      "frame": "link-frame-tidal-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-quartz-phoenix",
+      "frame": "link-frame-tidal-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-amethyst-unicorn",
+      "frame": "link-frame-tidal-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-platinum-dragon",
+      "frame": "link-frame-tidal-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-crystal-mech-cat",
+      "frame": "link-frame-tidal-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-aurora-snowfox",
+      "frame": "link-frame-tidal-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-penguin",
+      "frame": "link-frame-tidal-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-polar-bear",
+      "frame": "link-frame-tidal-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-galactic-dragon",
+      "frame": "link-frame-tidal-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "event-avatar-lantern-otter",
+      "frame": "link-frame-tidal-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "starter-avatar-little-sparrow",
+      "frame": "link-frame-tidal-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-sapphire-owl",
+      "frame": "link-frame-silk-lanterns",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-moonfox",
+      "frame": "link-frame-silk-lanterns",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-dragon",
+      "frame": "link-frame-silk-lanterns",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-cherry-rabbit",
+      "frame": "link-frame-silk-lanterns",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-stellar-cat",
+      "frame": "link-frame-silk-lanterns",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-autumn-fox",
+      "frame": "link-frame-silk-lanterns",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-galaxy-deer",
+      "frame": "link-frame-silk-lanterns",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-blue-panda",
+      "frame": "link-frame-silk-lanterns",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-sunset-dragon",
+      "frame": "link-frame-silk-lanterns",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-scholar-squirrel",
+      "frame": "link-frame-silk-lanterns",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-stargazer-hedgehog",
+      "frame": "link-frame-silk-lanterns",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-dreaming-deer",
+      "frame": "link-frame-silk-lanterns",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-galaxy-whale",
+      "frame": "link-frame-silk-lanterns",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-chestnut-squirrel",
+      "frame": "link-frame-silk-lanterns",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-snow-rabbit",
+      "frame": "link-frame-silk-lanterns",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-honey-bear",
+      "frame": "link-frame-silk-lanterns",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-dawn-crane",
+      "frame": "link-frame-silk-lanterns",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-sailor-beaver",
+      "frame": "link-frame-silk-lanterns",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-pearl-dolphin",
+      "frame": "link-frame-silk-lanterns",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-azure-turtle",
+      "frame": "link-frame-silk-lanterns",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-royal-seahorse",
+      "frame": "link-frame-silk-lanterns",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-lantern-cat",
+      "frame": "link-frame-silk-lanterns",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-festival-sparrow",
+      "frame": "link-frame-silk-lanterns",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-paperblossom-deer",
+      "frame": "link-frame-silk-lanterns",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-glasslight-fox",
+      "frame": "link-frame-silk-lanterns",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-quartz-phoenix",
+      "frame": "link-frame-silk-lanterns",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-amethyst-unicorn",
+      "frame": "link-frame-silk-lanterns",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-platinum-dragon",
+      "frame": "link-frame-silk-lanterns",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-crystal-mech-cat",
+      "frame": "link-frame-silk-lanterns",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-aurora-snowfox",
+      "frame": "link-frame-silk-lanterns",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-penguin",
+      "frame": "link-frame-silk-lanterns",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-polar-bear",
+      "frame": "link-frame-silk-lanterns",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-galactic-dragon",
+      "frame": "link-frame-silk-lanterns",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "event-avatar-lantern-otter",
+      "frame": "link-frame-silk-lanterns",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "starter-avatar-little-sparrow",
+      "frame": "link-frame-silk-lanterns",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-sapphire-owl",
+      "frame": "link-frame-osmanthus-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-moonfox",
+      "frame": "link-frame-osmanthus-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-dragon",
+      "frame": "link-frame-osmanthus-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-cherry-rabbit",
+      "frame": "link-frame-osmanthus-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-stellar-cat",
+      "frame": "link-frame-osmanthus-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-autumn-fox",
+      "frame": "link-frame-osmanthus-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-galaxy-deer",
+      "frame": "link-frame-osmanthus-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-blue-panda",
+      "frame": "link-frame-osmanthus-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-sunset-dragon",
+      "frame": "link-frame-osmanthus-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-scholar-squirrel",
+      "frame": "link-frame-osmanthus-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-stargazer-hedgehog",
+      "frame": "link-frame-osmanthus-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-dreaming-deer",
+      "frame": "link-frame-osmanthus-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-galaxy-whale",
+      "frame": "link-frame-osmanthus-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-chestnut-squirrel",
+      "frame": "link-frame-osmanthus-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-snow-rabbit",
+      "frame": "link-frame-osmanthus-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-honey-bear",
+      "frame": "link-frame-osmanthus-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-dawn-crane",
+      "frame": "link-frame-osmanthus-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-sailor-beaver",
+      "frame": "link-frame-osmanthus-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-pearl-dolphin",
+      "frame": "link-frame-osmanthus-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-azure-turtle",
+      "frame": "link-frame-osmanthus-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-royal-seahorse",
+      "frame": "link-frame-osmanthus-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-lantern-cat",
+      "frame": "link-frame-osmanthus-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-festival-sparrow",
+      "frame": "link-frame-osmanthus-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-paperblossom-deer",
+      "frame": "link-frame-osmanthus-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-glasslight-fox",
+      "frame": "link-frame-osmanthus-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-quartz-phoenix",
+      "frame": "link-frame-osmanthus-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-amethyst-unicorn",
+      "frame": "link-frame-osmanthus-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-platinum-dragon",
+      "frame": "link-frame-osmanthus-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-crystal-mech-cat",
+      "frame": "link-frame-osmanthus-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-aurora-snowfox",
+      "frame": "link-frame-osmanthus-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-penguin",
+      "frame": "link-frame-osmanthus-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-polar-bear",
+      "frame": "link-frame-osmanthus-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-galactic-dragon",
+      "frame": "link-frame-osmanthus-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "event-avatar-lantern-otter",
+      "frame": "link-frame-osmanthus-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "starter-avatar-little-sparrow",
+      "frame": "link-frame-osmanthus-branch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-sapphire-owl",
+      "frame": "link-frame-moon-silk",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-moonfox",
+      "frame": "link-frame-moon-silk",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-dragon",
+      "frame": "link-frame-moon-silk",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-cherry-rabbit",
+      "frame": "link-frame-moon-silk",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-stellar-cat",
+      "frame": "link-frame-moon-silk",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-autumn-fox",
+      "frame": "link-frame-moon-silk",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-galaxy-deer",
+      "frame": "link-frame-moon-silk",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-blue-panda",
+      "frame": "link-frame-moon-silk",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-sunset-dragon",
+      "frame": "link-frame-moon-silk",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-scholar-squirrel",
+      "frame": "link-frame-moon-silk",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-stargazer-hedgehog",
+      "frame": "link-frame-moon-silk",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-dreaming-deer",
+      "frame": "link-frame-moon-silk",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-galaxy-whale",
+      "frame": "link-frame-moon-silk",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-chestnut-squirrel",
+      "frame": "link-frame-moon-silk",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-snow-rabbit",
+      "frame": "link-frame-moon-silk",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-honey-bear",
+      "frame": "link-frame-moon-silk",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-dawn-crane",
+      "frame": "link-frame-moon-silk",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-sailor-beaver",
+      "frame": "link-frame-moon-silk",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-pearl-dolphin",
+      "frame": "link-frame-moon-silk",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-azure-turtle",
+      "frame": "link-frame-moon-silk",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-royal-seahorse",
+      "frame": "link-frame-moon-silk",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-lantern-cat",
+      "frame": "link-frame-moon-silk",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-festival-sparrow",
+      "frame": "link-frame-moon-silk",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-paperblossom-deer",
+      "frame": "link-frame-moon-silk",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-glasslight-fox",
+      "frame": "link-frame-moon-silk",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-quartz-phoenix",
+      "frame": "link-frame-moon-silk",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-amethyst-unicorn",
+      "frame": "link-frame-moon-silk",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-platinum-dragon",
+      "frame": "link-frame-moon-silk",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-crystal-mech-cat",
+      "frame": "link-frame-moon-silk",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-aurora-snowfox",
+      "frame": "link-frame-moon-silk",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-penguin",
+      "frame": "link-frame-moon-silk",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-polar-bear",
+      "frame": "link-frame-moon-silk",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-galactic-dragon",
+      "frame": "link-frame-moon-silk",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "event-avatar-lantern-otter",
+      "frame": "link-frame-moon-silk",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "starter-avatar-little-sparrow",
+      "frame": "link-frame-moon-silk",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-sapphire-owl",
+      "frame": "link-frame-lantern-moon-gate",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-moonfox",
+      "frame": "link-frame-lantern-moon-gate",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-dragon",
+      "frame": "link-frame-lantern-moon-gate",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-cherry-rabbit",
+      "frame": "link-frame-lantern-moon-gate",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-stellar-cat",
+      "frame": "link-frame-lantern-moon-gate",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-autumn-fox",
+      "frame": "link-frame-lantern-moon-gate",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-galaxy-deer",
+      "frame": "link-frame-lantern-moon-gate",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-blue-panda",
+      "frame": "link-frame-lantern-moon-gate",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-sunset-dragon",
+      "frame": "link-frame-lantern-moon-gate",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-scholar-squirrel",
+      "frame": "link-frame-lantern-moon-gate",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-stargazer-hedgehog",
+      "frame": "link-frame-lantern-moon-gate",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-dreaming-deer",
+      "frame": "link-frame-lantern-moon-gate",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-galaxy-whale",
+      "frame": "link-frame-lantern-moon-gate",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-chestnut-squirrel",
+      "frame": "link-frame-lantern-moon-gate",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-snow-rabbit",
+      "frame": "link-frame-lantern-moon-gate",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-honey-bear",
+      "frame": "link-frame-lantern-moon-gate",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-dawn-crane",
+      "frame": "link-frame-lantern-moon-gate",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-sailor-beaver",
+      "frame": "link-frame-lantern-moon-gate",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-pearl-dolphin",
+      "frame": "link-frame-lantern-moon-gate",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-azure-turtle",
+      "frame": "link-frame-lantern-moon-gate",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-royal-seahorse",
+      "frame": "link-frame-lantern-moon-gate",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-lantern-cat",
+      "frame": "link-frame-lantern-moon-gate",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-festival-sparrow",
+      "frame": "link-frame-lantern-moon-gate",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-paperblossom-deer",
+      "frame": "link-frame-lantern-moon-gate",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-glasslight-fox",
+      "frame": "link-frame-lantern-moon-gate",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-quartz-phoenix",
+      "frame": "link-frame-lantern-moon-gate",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-amethyst-unicorn",
+      "frame": "link-frame-lantern-moon-gate",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-platinum-dragon",
+      "frame": "link-frame-lantern-moon-gate",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-crystal-mech-cat",
+      "frame": "link-frame-lantern-moon-gate",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-aurora-snowfox",
+      "frame": "link-frame-lantern-moon-gate",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-penguin",
+      "frame": "link-frame-lantern-moon-gate",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-polar-bear",
+      "frame": "link-frame-lantern-moon-gate",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-galactic-dragon",
+      "frame": "link-frame-lantern-moon-gate",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "event-avatar-lantern-otter",
+      "frame": "link-frame-lantern-moon-gate",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "starter-avatar-little-sparrow",
+      "frame": "link-frame-lantern-moon-gate",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-sapphire-owl",
+      "frame": "triple-frame-crystal-arch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-moonfox",
+      "frame": "triple-frame-crystal-arch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-dragon",
+      "frame": "triple-frame-crystal-arch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-cherry-rabbit",
+      "frame": "triple-frame-crystal-arch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-stellar-cat",
+      "frame": "triple-frame-crystal-arch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-autumn-fox",
+      "frame": "triple-frame-crystal-arch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-galaxy-deer",
+      "frame": "triple-frame-crystal-arch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-blue-panda",
+      "frame": "triple-frame-crystal-arch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-sunset-dragon",
+      "frame": "triple-frame-crystal-arch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-scholar-squirrel",
+      "frame": "triple-frame-crystal-arch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-stargazer-hedgehog",
+      "frame": "triple-frame-crystal-arch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-dreaming-deer",
+      "frame": "triple-frame-crystal-arch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-galaxy-whale",
+      "frame": "triple-frame-crystal-arch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-chestnut-squirrel",
+      "frame": "triple-frame-crystal-arch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-snow-rabbit",
+      "frame": "triple-frame-crystal-arch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-honey-bear",
+      "frame": "triple-frame-crystal-arch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-dawn-crane",
+      "frame": "triple-frame-crystal-arch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-sailor-beaver",
+      "frame": "triple-frame-crystal-arch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-pearl-dolphin",
+      "frame": "triple-frame-crystal-arch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-azure-turtle",
+      "frame": "triple-frame-crystal-arch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-royal-seahorse",
+      "frame": "triple-frame-crystal-arch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-lantern-cat",
+      "frame": "triple-frame-crystal-arch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-festival-sparrow",
+      "frame": "triple-frame-crystal-arch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-paperblossom-deer",
+      "frame": "triple-frame-crystal-arch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-glasslight-fox",
+      "frame": "triple-frame-crystal-arch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-quartz-phoenix",
+      "frame": "triple-frame-crystal-arch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-amethyst-unicorn",
+      "frame": "triple-frame-crystal-arch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-platinum-dragon",
+      "frame": "triple-frame-crystal-arch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-crystal-mech-cat",
+      "frame": "triple-frame-crystal-arch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-aurora-snowfox",
+      "frame": "triple-frame-crystal-arch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-penguin",
+      "frame": "triple-frame-crystal-arch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-polar-bear",
+      "frame": "triple-frame-crystal-arch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-galactic-dragon",
+      "frame": "triple-frame-crystal-arch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "event-avatar-lantern-otter",
+      "frame": "triple-frame-crystal-arch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "starter-avatar-little-sparrow",
+      "frame": "triple-frame-crystal-arch",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-sapphire-owl",
+      "frame": "triple-frame-three-wing-star",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-moonfox",
+      "frame": "triple-frame-three-wing-star",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-dragon",
+      "frame": "triple-frame-three-wing-star",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-cherry-rabbit",
+      "frame": "triple-frame-three-wing-star",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-stellar-cat",
+      "frame": "triple-frame-three-wing-star",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-autumn-fox",
+      "frame": "triple-frame-three-wing-star",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-galaxy-deer",
+      "frame": "triple-frame-three-wing-star",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-blue-panda",
+      "frame": "triple-frame-three-wing-star",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-sunset-dragon",
+      "frame": "triple-frame-three-wing-star",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-scholar-squirrel",
+      "frame": "triple-frame-three-wing-star",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-stargazer-hedgehog",
+      "frame": "triple-frame-three-wing-star",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-dreaming-deer",
+      "frame": "triple-frame-three-wing-star",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-galaxy-whale",
+      "frame": "triple-frame-three-wing-star",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-chestnut-squirrel",
+      "frame": "triple-frame-three-wing-star",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-snow-rabbit",
+      "frame": "triple-frame-three-wing-star",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-honey-bear",
+      "frame": "triple-frame-three-wing-star",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-dawn-crane",
+      "frame": "triple-frame-three-wing-star",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-sailor-beaver",
+      "frame": "triple-frame-three-wing-star",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-pearl-dolphin",
+      "frame": "triple-frame-three-wing-star",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-azure-turtle",
+      "frame": "triple-frame-three-wing-star",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-royal-seahorse",
+      "frame": "triple-frame-three-wing-star",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-lantern-cat",
+      "frame": "triple-frame-three-wing-star",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-festival-sparrow",
+      "frame": "triple-frame-three-wing-star",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-paperblossom-deer",
+      "frame": "triple-frame-three-wing-star",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-glasslight-fox",
+      "frame": "triple-frame-three-wing-star",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-quartz-phoenix",
+      "frame": "triple-frame-three-wing-star",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-amethyst-unicorn",
+      "frame": "triple-frame-three-wing-star",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-platinum-dragon",
+      "frame": "triple-frame-three-wing-star",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-crystal-mech-cat",
+      "frame": "triple-frame-three-wing-star",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-aurora-snowfox",
+      "frame": "triple-frame-three-wing-star",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-penguin",
+      "frame": "triple-frame-three-wing-star",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-polar-bear",
+      "frame": "triple-frame-three-wing-star",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-galactic-dragon",
+      "frame": "triple-frame-three-wing-star",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "event-avatar-lantern-otter",
+      "frame": "triple-frame-three-wing-star",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "starter-avatar-little-sparrow",
+      "frame": "triple-frame-three-wing-star",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-sapphire-owl",
+      "frame": "triple-frame-jade-gears",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-moonfox",
+      "frame": "triple-frame-jade-gears",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-dragon",
+      "frame": "triple-frame-jade-gears",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-cherry-rabbit",
+      "frame": "triple-frame-jade-gears",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-stellar-cat",
+      "frame": "triple-frame-jade-gears",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-autumn-fox",
+      "frame": "triple-frame-jade-gears",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-galaxy-deer",
+      "frame": "triple-frame-jade-gears",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-blue-panda",
+      "frame": "triple-frame-jade-gears",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-sunset-dragon",
+      "frame": "triple-frame-jade-gears",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-scholar-squirrel",
+      "frame": "triple-frame-jade-gears",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-stargazer-hedgehog",
+      "frame": "triple-frame-jade-gears",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-dreaming-deer",
+      "frame": "triple-frame-jade-gears",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-galaxy-whale",
+      "frame": "triple-frame-jade-gears",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-chestnut-squirrel",
+      "frame": "triple-frame-jade-gears",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-snow-rabbit",
+      "frame": "triple-frame-jade-gears",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-honey-bear",
+      "frame": "triple-frame-jade-gears",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-dawn-crane",
+      "frame": "triple-frame-jade-gears",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-sailor-beaver",
+      "frame": "triple-frame-jade-gears",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-pearl-dolphin",
+      "frame": "triple-frame-jade-gears",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-azure-turtle",
+      "frame": "triple-frame-jade-gears",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-royal-seahorse",
+      "frame": "triple-frame-jade-gears",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-lantern-cat",
+      "frame": "triple-frame-jade-gears",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-festival-sparrow",
+      "frame": "triple-frame-jade-gears",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-paperblossom-deer",
+      "frame": "triple-frame-jade-gears",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-glasslight-fox",
+      "frame": "triple-frame-jade-gears",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-quartz-phoenix",
+      "frame": "triple-frame-jade-gears",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-amethyst-unicorn",
+      "frame": "triple-frame-jade-gears",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-platinum-dragon",
+      "frame": "triple-frame-jade-gears",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-crystal-mech-cat",
+      "frame": "triple-frame-jade-gears",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-aurora-snowfox",
+      "frame": "triple-frame-jade-gears",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-penguin",
+      "frame": "triple-frame-jade-gears",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-polar-bear",
+      "frame": "triple-frame-jade-gears",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-galactic-dragon",
+      "frame": "triple-frame-jade-gears",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "event-avatar-lantern-otter",
+      "frame": "triple-frame-jade-gears",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "starter-avatar-little-sparrow",
+      "frame": "triple-frame-jade-gears",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-sapphire-owl",
+      "frame": "triple-frame-tri-star-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-moonfox",
+      "frame": "triple-frame-tri-star-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-dragon",
+      "frame": "triple-frame-tri-star-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-cherry-rabbit",
+      "frame": "triple-frame-tri-star-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-stellar-cat",
+      "frame": "triple-frame-tri-star-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-autumn-fox",
+      "frame": "triple-frame-tri-star-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-galaxy-deer",
+      "frame": "triple-frame-tri-star-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-blue-panda",
+      "frame": "triple-frame-tri-star-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-sunset-dragon",
+      "frame": "triple-frame-tri-star-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-scholar-squirrel",
+      "frame": "triple-frame-tri-star-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-stargazer-hedgehog",
+      "frame": "triple-frame-tri-star-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-dreaming-deer",
+      "frame": "triple-frame-tri-star-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-galaxy-whale",
+      "frame": "triple-frame-tri-star-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-chestnut-squirrel",
+      "frame": "triple-frame-tri-star-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-snow-rabbit",
+      "frame": "triple-frame-tri-star-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-honey-bear",
+      "frame": "triple-frame-tri-star-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-dawn-crane",
+      "frame": "triple-frame-tri-star-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-sailor-beaver",
+      "frame": "triple-frame-tri-star-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-pearl-dolphin",
+      "frame": "triple-frame-tri-star-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-azure-turtle",
+      "frame": "triple-frame-tri-star-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-royal-seahorse",
+      "frame": "triple-frame-tri-star-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-lantern-cat",
+      "frame": "triple-frame-tri-star-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-festival-sparrow",
+      "frame": "triple-frame-tri-star-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-paperblossom-deer",
+      "frame": "triple-frame-tri-star-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-glasslight-fox",
+      "frame": "triple-frame-tri-star-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-quartz-phoenix",
+      "frame": "triple-frame-tri-star-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-amethyst-unicorn",
+      "frame": "triple-frame-tri-star-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-platinum-dragon",
+      "frame": "triple-frame-tri-star-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-crystal-mech-cat",
+      "frame": "triple-frame-tri-star-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-aurora-snowfox",
+      "frame": "triple-frame-tri-star-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-penguin",
+      "frame": "triple-frame-tri-star-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-polar-bear",
+      "frame": "triple-frame-tri-star-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-galactic-dragon",
+      "frame": "triple-frame-tri-star-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "event-avatar-lantern-otter",
+      "frame": "triple-frame-tri-star-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "starter-avatar-little-sparrow",
+      "frame": "triple-frame-tri-star-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-sapphire-owl",
+      "frame": "triple-frame-aurora-ribbon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-moonfox",
+      "frame": "triple-frame-aurora-ribbon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-dragon",
+      "frame": "triple-frame-aurora-ribbon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-cherry-rabbit",
+      "frame": "triple-frame-aurora-ribbon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-stellar-cat",
+      "frame": "triple-frame-aurora-ribbon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-autumn-fox",
+      "frame": "triple-frame-aurora-ribbon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-galaxy-deer",
+      "frame": "triple-frame-aurora-ribbon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-blue-panda",
+      "frame": "triple-frame-aurora-ribbon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-sunset-dragon",
+      "frame": "triple-frame-aurora-ribbon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-scholar-squirrel",
+      "frame": "triple-frame-aurora-ribbon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-stargazer-hedgehog",
+      "frame": "triple-frame-aurora-ribbon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-dreaming-deer",
+      "frame": "triple-frame-aurora-ribbon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-galaxy-whale",
+      "frame": "triple-frame-aurora-ribbon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-chestnut-squirrel",
+      "frame": "triple-frame-aurora-ribbon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-snow-rabbit",
+      "frame": "triple-frame-aurora-ribbon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-honey-bear",
+      "frame": "triple-frame-aurora-ribbon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-dawn-crane",
+      "frame": "triple-frame-aurora-ribbon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-sailor-beaver",
+      "frame": "triple-frame-aurora-ribbon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-pearl-dolphin",
+      "frame": "triple-frame-aurora-ribbon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-azure-turtle",
+      "frame": "triple-frame-aurora-ribbon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-royal-seahorse",
+      "frame": "triple-frame-aurora-ribbon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-lantern-cat",
+      "frame": "triple-frame-aurora-ribbon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-festival-sparrow",
+      "frame": "triple-frame-aurora-ribbon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-paperblossom-deer",
+      "frame": "triple-frame-aurora-ribbon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-glasslight-fox",
+      "frame": "triple-frame-aurora-ribbon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-quartz-phoenix",
+      "frame": "triple-frame-aurora-ribbon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-amethyst-unicorn",
+      "frame": "triple-frame-aurora-ribbon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-platinum-dragon",
+      "frame": "triple-frame-aurora-ribbon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-crystal-mech-cat",
+      "frame": "triple-frame-aurora-ribbon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-aurora-snowfox",
+      "frame": "triple-frame-aurora-ribbon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-penguin",
+      "frame": "triple-frame-aurora-ribbon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-polar-bear",
+      "frame": "triple-frame-aurora-ribbon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-galactic-dragon",
+      "frame": "triple-frame-aurora-ribbon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "event-avatar-lantern-otter",
+      "frame": "triple-frame-aurora-ribbon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "starter-avatar-little-sparrow",
+      "frame": "triple-frame-aurora-ribbon",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-sapphire-owl",
+      "frame": "triple-frame-azure-ice-ring",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-moonfox",
+      "frame": "triple-frame-azure-ice-ring",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-dragon",
+      "frame": "triple-frame-azure-ice-ring",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-cherry-rabbit",
+      "frame": "triple-frame-azure-ice-ring",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-stellar-cat",
+      "frame": "triple-frame-azure-ice-ring",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-autumn-fox",
+      "frame": "triple-frame-azure-ice-ring",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-galaxy-deer",
+      "frame": "triple-frame-azure-ice-ring",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-blue-panda",
+      "frame": "triple-frame-azure-ice-ring",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-sunset-dragon",
+      "frame": "triple-frame-azure-ice-ring",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-scholar-squirrel",
+      "frame": "triple-frame-azure-ice-ring",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-stargazer-hedgehog",
+      "frame": "triple-frame-azure-ice-ring",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-dreaming-deer",
+      "frame": "triple-frame-azure-ice-ring",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-galaxy-whale",
+      "frame": "triple-frame-azure-ice-ring",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-chestnut-squirrel",
+      "frame": "triple-frame-azure-ice-ring",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-snow-rabbit",
+      "frame": "triple-frame-azure-ice-ring",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-honey-bear",
+      "frame": "triple-frame-azure-ice-ring",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-dawn-crane",
+      "frame": "triple-frame-azure-ice-ring",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-sailor-beaver",
+      "frame": "triple-frame-azure-ice-ring",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-pearl-dolphin",
+      "frame": "triple-frame-azure-ice-ring",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-azure-turtle",
+      "frame": "triple-frame-azure-ice-ring",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-royal-seahorse",
+      "frame": "triple-frame-azure-ice-ring",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-lantern-cat",
+      "frame": "triple-frame-azure-ice-ring",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-festival-sparrow",
+      "frame": "triple-frame-azure-ice-ring",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-paperblossom-deer",
+      "frame": "triple-frame-azure-ice-ring",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-glasslight-fox",
+      "frame": "triple-frame-azure-ice-ring",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-quartz-phoenix",
+      "frame": "triple-frame-azure-ice-ring",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-amethyst-unicorn",
+      "frame": "triple-frame-azure-ice-ring",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-platinum-dragon",
+      "frame": "triple-frame-azure-ice-ring",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-crystal-mech-cat",
+      "frame": "triple-frame-azure-ice-ring",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-aurora-snowfox",
+      "frame": "triple-frame-azure-ice-ring",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-penguin",
+      "frame": "triple-frame-azure-ice-ring",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-polar-bear",
+      "frame": "triple-frame-azure-ice-ring",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-galactic-dragon",
+      "frame": "triple-frame-azure-ice-ring",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "event-avatar-lantern-otter",
+      "frame": "triple-frame-azure-ice-ring",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "starter-avatar-little-sparrow",
+      "frame": "triple-frame-azure-ice-ring",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-sapphire-owl",
+      "frame": "triple-frame-silver-meteor",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-moonfox",
+      "frame": "triple-frame-silver-meteor",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-dragon",
+      "frame": "triple-frame-silver-meteor",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-cherry-rabbit",
+      "frame": "triple-frame-silver-meteor",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-stellar-cat",
+      "frame": "triple-frame-silver-meteor",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-autumn-fox",
+      "frame": "triple-frame-silver-meteor",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-galaxy-deer",
+      "frame": "triple-frame-silver-meteor",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-blue-panda",
+      "frame": "triple-frame-silver-meteor",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-sunset-dragon",
+      "frame": "triple-frame-silver-meteor",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-scholar-squirrel",
+      "frame": "triple-frame-silver-meteor",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-stargazer-hedgehog",
+      "frame": "triple-frame-silver-meteor",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-dreaming-deer",
+      "frame": "triple-frame-silver-meteor",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-galaxy-whale",
+      "frame": "triple-frame-silver-meteor",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-chestnut-squirrel",
+      "frame": "triple-frame-silver-meteor",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-snow-rabbit",
+      "frame": "triple-frame-silver-meteor",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-honey-bear",
+      "frame": "triple-frame-silver-meteor",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-dawn-crane",
+      "frame": "triple-frame-silver-meteor",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-sailor-beaver",
+      "frame": "triple-frame-silver-meteor",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-pearl-dolphin",
+      "frame": "triple-frame-silver-meteor",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-azure-turtle",
+      "frame": "triple-frame-silver-meteor",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-royal-seahorse",
+      "frame": "triple-frame-silver-meteor",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-lantern-cat",
+      "frame": "triple-frame-silver-meteor",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-festival-sparrow",
+      "frame": "triple-frame-silver-meteor",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-paperblossom-deer",
+      "frame": "triple-frame-silver-meteor",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-glasslight-fox",
+      "frame": "triple-frame-silver-meteor",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-quartz-phoenix",
+      "frame": "triple-frame-silver-meteor",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-amethyst-unicorn",
+      "frame": "triple-frame-silver-meteor",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-platinum-dragon",
+      "frame": "triple-frame-silver-meteor",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-crystal-mech-cat",
+      "frame": "triple-frame-silver-meteor",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-aurora-snowfox",
+      "frame": "triple-frame-silver-meteor",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-penguin",
+      "frame": "triple-frame-silver-meteor",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-polar-bear",
+      "frame": "triple-frame-silver-meteor",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-galactic-dragon",
+      "frame": "triple-frame-silver-meteor",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "event-avatar-lantern-otter",
+      "frame": "triple-frame-silver-meteor",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "starter-avatar-little-sparrow",
+      "frame": "triple-frame-silver-meteor",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-sapphire-owl",
+      "frame": "triple-frame-aurora-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-moonfox",
+      "frame": "triple-frame-aurora-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-dragon",
+      "frame": "triple-frame-aurora-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-cherry-rabbit",
+      "frame": "triple-frame-aurora-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-stellar-cat",
+      "frame": "triple-frame-aurora-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-autumn-fox",
+      "frame": "triple-frame-aurora-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-galaxy-deer",
+      "frame": "triple-frame-aurora-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-blue-panda",
+      "frame": "triple-frame-aurora-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-sunset-dragon",
+      "frame": "triple-frame-aurora-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-scholar-squirrel",
+      "frame": "triple-frame-aurora-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-stargazer-hedgehog",
+      "frame": "triple-frame-aurora-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-dreaming-deer",
+      "frame": "triple-frame-aurora-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-galaxy-whale",
+      "frame": "triple-frame-aurora-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-chestnut-squirrel",
+      "frame": "triple-frame-aurora-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-snow-rabbit",
+      "frame": "triple-frame-aurora-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-honey-bear",
+      "frame": "triple-frame-aurora-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-dawn-crane",
+      "frame": "triple-frame-aurora-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-sailor-beaver",
+      "frame": "triple-frame-aurora-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-pearl-dolphin",
+      "frame": "triple-frame-aurora-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-azure-turtle",
+      "frame": "triple-frame-aurora-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-royal-seahorse",
+      "frame": "triple-frame-aurora-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-lantern-cat",
+      "frame": "triple-frame-aurora-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-festival-sparrow",
+      "frame": "triple-frame-aurora-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-paperblossom-deer",
+      "frame": "triple-frame-aurora-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-glasslight-fox",
+      "frame": "triple-frame-aurora-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-quartz-phoenix",
+      "frame": "triple-frame-aurora-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-amethyst-unicorn",
+      "frame": "triple-frame-aurora-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-platinum-dragon",
+      "frame": "triple-frame-aurora-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-crystal-mech-cat",
+      "frame": "triple-frame-aurora-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-aurora-snowfox",
+      "frame": "triple-frame-aurora-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-penguin",
+      "frame": "triple-frame-aurora-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-polar-bear",
+      "frame": "triple-frame-aurora-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-galactic-dragon",
+      "frame": "triple-frame-aurora-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "event-avatar-lantern-otter",
+      "frame": "triple-frame-aurora-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "starter-avatar-little-sparrow",
+      "frame": "triple-frame-aurora-crown",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-sapphire-owl",
+      "frame": "event-frame-firefly-glow",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-moonfox",
+      "frame": "event-frame-firefly-glow",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-dragon",
+      "frame": "event-frame-firefly-glow",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-cherry-rabbit",
+      "frame": "event-frame-firefly-glow",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-stellar-cat",
+      "frame": "event-frame-firefly-glow",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-autumn-fox",
+      "frame": "event-frame-firefly-glow",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-galaxy-deer",
+      "frame": "event-frame-firefly-glow",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-blue-panda",
+      "frame": "event-frame-firefly-glow",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-sunset-dragon",
+      "frame": "event-frame-firefly-glow",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-scholar-squirrel",
+      "frame": "event-frame-firefly-glow",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-stargazer-hedgehog",
+      "frame": "event-frame-firefly-glow",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-dreaming-deer",
+      "frame": "event-frame-firefly-glow",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-galaxy-whale",
+      "frame": "event-frame-firefly-glow",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-chestnut-squirrel",
+      "frame": "event-frame-firefly-glow",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-snow-rabbit",
+      "frame": "event-frame-firefly-glow",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-honey-bear",
+      "frame": "event-frame-firefly-glow",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-dawn-crane",
+      "frame": "event-frame-firefly-glow",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-sailor-beaver",
+      "frame": "event-frame-firefly-glow",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-pearl-dolphin",
+      "frame": "event-frame-firefly-glow",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-azure-turtle",
+      "frame": "event-frame-firefly-glow",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-royal-seahorse",
+      "frame": "event-frame-firefly-glow",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-lantern-cat",
+      "frame": "event-frame-firefly-glow",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-festival-sparrow",
+      "frame": "event-frame-firefly-glow",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-paperblossom-deer",
+      "frame": "event-frame-firefly-glow",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-glasslight-fox",
+      "frame": "event-frame-firefly-glow",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-quartz-phoenix",
+      "frame": "event-frame-firefly-glow",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-amethyst-unicorn",
+      "frame": "event-frame-firefly-glow",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-platinum-dragon",
+      "frame": "event-frame-firefly-glow",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-crystal-mech-cat",
+      "frame": "event-frame-firefly-glow",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-aurora-snowfox",
+      "frame": "event-frame-firefly-glow",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-penguin",
+      "frame": "event-frame-firefly-glow",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-polar-bear",
+      "frame": "event-frame-firefly-glow",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-galactic-dragon",
+      "frame": "event-frame-firefly-glow",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "event-avatar-lantern-otter",
+      "frame": "event-frame-firefly-glow",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "starter-avatar-little-sparrow",
+      "frame": "event-frame-firefly-glow",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-sapphire-owl",
+      "frame": "starter-frame-plain-wood",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-moonfox",
+      "frame": "starter-frame-plain-wood",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-dragon",
+      "frame": "starter-frame-plain-wood",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-cherry-rabbit",
+      "frame": "starter-frame-plain-wood",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-stellar-cat",
+      "frame": "starter-frame-plain-wood",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-autumn-fox",
+      "frame": "starter-frame-plain-wood",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-galaxy-deer",
+      "frame": "starter-frame-plain-wood",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-blue-panda",
+      "frame": "starter-frame-plain-wood",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-sunset-dragon",
+      "frame": "starter-frame-plain-wood",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-scholar-squirrel",
+      "frame": "starter-frame-plain-wood",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-stargazer-hedgehog",
+      "frame": "starter-frame-plain-wood",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-dreaming-deer",
+      "frame": "starter-frame-plain-wood",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-galaxy-whale",
+      "frame": "starter-frame-plain-wood",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-chestnut-squirrel",
+      "frame": "starter-frame-plain-wood",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-snow-rabbit",
+      "frame": "starter-frame-plain-wood",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-honey-bear",
+      "frame": "starter-frame-plain-wood",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "memory-avatar-dawn-crane",
+      "frame": "starter-frame-plain-wood",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-sailor-beaver",
+      "frame": "starter-frame-plain-wood",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-pearl-dolphin",
+      "frame": "starter-frame-plain-wood",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-azure-turtle",
+      "frame": "starter-frame-plain-wood",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-royal-seahorse",
+      "frame": "starter-frame-plain-wood",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-lantern-cat",
+      "frame": "starter-frame-plain-wood",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-festival-sparrow",
+      "frame": "starter-frame-plain-wood",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-paperblossom-deer",
+      "frame": "starter-frame-plain-wood",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "link-avatar-glasslight-fox",
+      "frame": "starter-frame-plain-wood",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-quartz-phoenix",
+      "frame": "starter-frame-plain-wood",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-amethyst-unicorn",
+      "frame": "starter-frame-plain-wood",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-platinum-dragon",
+      "frame": "starter-frame-plain-wood",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-crystal-mech-cat",
+      "frame": "starter-frame-plain-wood",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-aurora-snowfox",
+      "frame": "starter-frame-plain-wood",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-jade-penguin",
+      "frame": "starter-frame-plain-wood",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-polar-bear",
+      "frame": "starter-frame-plain-wood",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "triple-avatar-galactic-dragon",
+      "frame": "starter-frame-plain-wood",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "event-avatar-lantern-otter",
+      "frame": "starter-frame-plain-wood",
+      "uncoveredHole": 0,
+      "outsideLeak": 0
+    },
+    {
+      "avatar": "starter-avatar-little-sparrow",
+      "frame": "starter-frame-plain-wood",
       "uncoveredHole": 0,
       "outsideLeak": 0
     }

@@ -1,6 +1,9 @@
+import { normalizeSparkSave } from './liveops/sparkModel.js';
 import { THEMES, getTheme, getUsableTheme } from "./themeCatalog.js";
 import { LINK_EXIT_EFFECTS, LINK_PATH_EFFECTS } from "./linkConnect/linkEffects.js";
 import { ACHIEVEMENT_ITEMS, normalizeAchievementLedger, normalizeProfileCosmetics, ACHIEVEMENT_OWNED_SLOTS } from './progression/achievementModel.js';
+import { normalizeAcquisitions } from './progression/acquisitionModel.js';
+import { normalizeRewardLedger } from './liveops/ledger.js';
 
 const DEFAULT_APPEARANCE = Object.freeze({
   cardBack: "classic",
@@ -139,6 +142,7 @@ function ownedIds(items, value, defaultId) {
 
 export function normalizeAppearance(value = {}) {
   const achievements = normalizeAchievementLedger(value.achievements);
+  const acquisitions = normalizeAcquisitions(value.acquisitions);
   value = { ...value };
   const linkPaths = LINK_PATH_EFFECTS.filter(item => !item.gameId || item.gameId === 'link-connect');
   const linkExits = LINK_EXIT_EFFECTS.filter(item => !item.gameId || item.gameId === 'link-connect');
@@ -193,7 +197,10 @@ export function normalizeAppearance(value = {}) {
   const tripleExitEffect = knownId(tripleExits, value.tripleExitEffect, "default");
   return {
     achievements,
-    profileCosmetics: normalizeProfileCosmetics(value.profileCosmetics, achievements),
+    acquisitions,
+    rewards: normalizeRewardLedger(value.rewards),
+    spark: normalizeSparkSave(value.spark),
+    profileCosmetics: normalizeProfileCosmetics(value.profileCosmetics, achievements, acquisitions),
     cardBack: ownedCardBacks.includes(cardBack)
       ? cardBack
       : DEFAULT_APPEARANCE.cardBack,

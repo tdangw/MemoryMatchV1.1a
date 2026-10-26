@@ -1,4 +1,5 @@
 import { AD_CONFIG, AD_PRIVACY, validateAdConfig } from './adConfig.js';
+import { presentRewarded } from './rewardedController.js';
 
 export function createAdService({ native, supported, config = AD_CONFIG, report = console.warn }) {
   validateAdConfig(config);
@@ -60,5 +61,9 @@ export function createAdService({ native, supported, config = AD_CONFIG, report 
       return native.showBanner({ adId: config.bannerId, adSize: 'ADAPTIVE_BANNER', position: 'BOTTOM_CENTER', margin: 0, npa: true });
     },
     remove() { return native.removeBanner(); },
+    async showRewarded(options, onEarned) {
+      if (!supported || !initialized || !snapshot().canRequestAds) throw new Error('AdMob not ready');
+      return presentRewarded(native, options, onEarned);
+    },
   };
 }

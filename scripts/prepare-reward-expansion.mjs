@@ -6,15 +6,16 @@ import { createRequire } from 'node:module';
 // Offline art pipeline only. No runtime catalog, ownership or public assets writes.
 const require = createRequire(import.meta.url);
 const sharp = require(process.env.UI_SKIN_SHARP_MODULE || 'sharp');
-const root = 'design/rewards-liveops';
+const letters = process.argv.includes('--letters');
+const root = letters ? 'design/rewards-letters' : 'design/rewards-liveops';
 const legacyRoot = 'docs/design/achievements/art-kit-v1';
 const read = async file => JSON.parse(await fs.readFile(file, 'utf8'));
 const hash = bytes => crypto.createHash('sha256').update(bytes).digest('hex');
 const clear = (width, height) => sharp({ create: { width, height, channels: 4, background: '#00000000' } });
 const catalog = await read(`${root}/catalog.source.json`);
-const extras = await read(`${root}/cosmetic-extras.source.json`);
+const extras = letters ? {items:[]} : await read(`${root}/cosmetic-extras.source.json`);
 const approvedItems = [...catalog.items, ...extras.items];
-const source = await read(`${root}/art-source.json`);
+const source = letters ? catalog : await read(`${root}/art-source.json`);
 const legacy = await read(`${legacyRoot}/manifest.json`);
 const [width, height] = legacy.canvas;
 assert.deepEqual([width, height], [512, 512]);
@@ -124,6 +125,12 @@ for (const item of Object.values(legacy.items).filter(item => ['avatar', 'frame'
   assert.equal(hash(bytes), item.pngSha256, 'Legacy artwork changed');
   assets.push({ ...item, bytes });
 }
+if(letters){
+  const existing=await read('design/rewards-liveops/art-manifest.json');
+  for(const item of Object.values(existing.items)){
+    const bytes=await fs.readFile(`design/rewards-liveops/${item.png}`);assert.equal(hash(bytes),item.pngSha256,'Existing reward artwork changed');assets.push({...item,bytes});
+  }
+}
 for (const item of Object.values(manifest.items)) assets.push({ ...item, bytes: await fs.readFile(`${root}/${item.png}`) });
 for (const item of assets) item.raw = await sharp(item.bytes).ensureAlpha().raw().toBuffer();
 const avatars = assets.filter(item => item.type === 'avatar'), frames = assets.filter(item => item.type === 'frame');
@@ -144,7 +151,7 @@ const failedPairs = pairs.filter(pair => pair.uncoveredHole || pair.outsideLeak)
 const report = { result: failedPairs.length || sourceErrors.length ? 'FAIL' : 'PASS', generatedSprites: source.items.length,
   packedSprites: Object.keys(manifest.items).length, sourceErrors,
   proposedSprites: approvedItems.length, avatarCount: avatars.length, frameCount: frames.length,
-  checkedPairs: pairs.length, finalRequiredPairs: 1225,
+  checkedPairs: pairs.length, finalRequiredPairs: letters ? avatars.length * frames.length : 1225,
   fullExpansionComplete: Object.keys(manifest.items).length === approvedItems.length && !failedPairs.length && !sourceErrors.length,
   runtimeChanged: false, failedPairs, pairs };
 await fs.writeFile(`${root}/review/alpha-validation.json`, JSON.stringify(report, null, 2) + '\n');
@@ -154,11 +161,13 @@ assert.equal(failedPairs.length, 0, JSON.stringify(failedPairs));
 const text = (name, color, w, h = 40) => Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"><text x="${w / 2}" y="28" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="20" font-weight="600" fill="${color}">${name.replaceAll('&', '&amp;').replaceAll('<', '&lt;')}</text></svg>`);
 for (const [name, background, ink] of [['light', '#f5e7cc', '#4a2c1a'], ['dark', '#0c1c30', '#f6e6c5']]) {
   const layers = [];
+  const columns = 5;
   for (const [i, item] of Object.values(manifest.items).entries()) {
-    layers.push({ input: await sharp(`${root}/${item.png}`).resize(300, 300).png().toBuffer(), left: i * 320 + 10, top: 0 });
-    layers.push({ input: text(item.name, ink, 320), left: i * 320, top: 300 });
+    const left = (i % columns) * 320, top = Math.floor(i / columns) * 350;
+    layers.push({ input: await sharp(`${root}/${item.png}`).resize(300, 300).png().toBuffer(), left: left + 10, top });
+    layers.push({ input: text(item.name, ink, 320), left, top: top + 300 });
   }
-  await sharp({ create: { width: source.items.length * 320, height: 350, channels: 4, background } })
+  await sharp({ create: { width: columns * 320, height: Math.ceil(Object.keys(manifest.items).length / columns) * 350, channels: 4, background } })
     .composite(layers).png().toFile(`${root}/review/representatives-${name}.png`);
 }
 // Every legacy avatar through the new frame, and the new avatar through every frame.

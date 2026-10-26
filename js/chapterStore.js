@@ -1,5 +1,8 @@
+import { normalizeSparkSave } from './liveops/sparkModel.js';
 import { getAdventureSummary, getChapterNumber, MAX_ADVENTURE_CHAPTER } from "./adventureProgress.js";
 import { normalizeAchievementLedger } from './progression/achievementModel.js';
+import { normalizeAcquisitions } from './progression/acquisitionModel.js';
+import { normalizeRewardLedger } from './liveops/ledger.js';
 import { highestOwnedAdventureLevel, createProgressResult, keepProgressBest, sameRankingOwner, validateProgressResult, normalizeProgressMigration, normalizeProgressBests } from './progressRankingModel.js';
 
 export const CHAPTER_DATABASE = "memoryMatchAdventure";
@@ -103,6 +106,9 @@ export function validateChapterSnapshot(snapshot) {
     if (chapter !== undefined && (!Number.isSafeInteger(chapter) || chapter < 1 || chapter > MAX_ADVENTURE_CHAPTER)) throw new Error("Chặng cloud không hợp lệ.");
   }
   normalizeAchievementLedger(data.appearance.achievements);
+  normalizeAcquisitions(data.appearance.acquisitions);
+  normalizeRewardLedger(data.appearance.rewards);
+  normalizeSparkSave(data.appearance.spark);
   const seen = new Set();
   for (const entry of snapshot.chapters) {
     const match = /^(memoryMatch|linkConnect|tripleConnect):([1-9]\d*)$/.exec(entry?.key || "");

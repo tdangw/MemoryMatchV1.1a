@@ -1,3 +1,5 @@
+import { linkTicketDrop } from '../liveops/dropAdapters.js';
+import { prepareLetterDropFeedback } from '../liveops/letterDropFeedback.js';
 import { resolveLinkPairRewards } from './pairRewards.js';
 import { gameRecordLabel } from '../gameRecord.js';
 import { rememberRecentGame } from '../recentGame.js';
@@ -26,6 +28,7 @@ import {
 } from "../coinRewards.js";
 import { gameState, increaseCoins, recordLinkConnectResult, spendCoins } from "../gameState.js";
 import { savePersistentGameData, isPersistenceBlocked } from "../persistence.js";
+import { linkSettlementFact } from '../liveops/settlementAdapters.js';
 import { beginPlayMetrics, resumePlayMetrics, snapshotPlayMetrics, finishPlayMetrics } from "../playMetrics.js";
 import { prepareAdventureChapter, stageAdventureLevelStart, canAdvanceAdventure } from "../adventureLaunch.js";
 import { getChapterNumber } from "../adventureProgress.js";
@@ -575,8 +578,11 @@ async function handleLinkTileClick(position) {
   const rewards = resolveLinkPairRewards(linkGameState, gameState.progress.linkConnect.items, { special: isSpecialMatch, premiumType, luckyReward: firstTile.luckyReward });
   const previousCoins = gameState.coins;
   increaseCoins(baseCoins + rewards.coins);
+  const ticketDrop=linkTicketDrop(linkGameState.wave,firstTile,tile);
   const staged = stageActiveSession('link-connect', createLinkSession());
-  if (!staged || !await savePersistentGameData({ coins: gameState.coins, progress: gameState.progress })) {
+  if (!staged || !await savePersistentGameData({ coins: gameState.coins, progress: gameState.progress,
+    ticketDrop,
+    onSpecialDrop: ticketDrop?.special ? prepareLetterDropFeedback(getLinkShell().refs.root.querySelector(`[data-row="${position.row}"][data-column="${position.column}"]`),getLinkShell().scope) : undefined })) {
     if (linkGameState.roundId === roundId) {
       gameState.coins = rollback.coins; gameState.progress.linkConnect = rollback.progress;
       Object.assign(linkGameState, rollback.state); linkGameState.isLocked = true; stopLinkComboWindow();
@@ -673,14 +679,20 @@ async function useLinkItem(id) {
   const sessions = gameState.progress.linkConnect.sessionsByMode;
   const previousSession = sessions?.[mode];
   const previousFreezeSeconds = linkGameState.freezeSeconds;
+  const previousHintWave = linkGameState.wave;
   const previousBoard = { ...board };
   let stagedSession = false;
   let shuffledBoard = null;
   const rollbackItemState = () => {
+    if (id === 'hint') linkGameState.wave = previousHintWave;
     if (id === 'freeze') linkGameState.freezeSeconds = previousFreezeSeconds;
     if (shuffledBoard) Object.assign(board, previousBoard);
   };
-  if (id === 'freeze' && getLinkItemCount(id) > 0) {
+  if (id === 'hint' && getLinkItemCount(id) > 0) {
+    linkGameState.wave = normalizeWaveProgress({ ...linkGameState.wave, hintUsed: true });
+    stagedSession = stageActiveSession('link-connect', createLinkSession());
+    if (!stagedSession) { rollbackItemState(); linkGameState.isLocked = false; return; }
+  } else if (id === 'freeze' && getLinkItemCount(id) > 0) {
     linkGameState.freezeSeconds += LINK_FREEZE_SECONDS;
     stagedSession = stageActiveSession('link-connect', createLinkSession());
     if (!stagedSession) { rollbackItemState(); linkGameState.isLocked = false; return; }
@@ -907,7 +919,7 @@ async function completeLinkLevel() {
   stageRankedAttempt("link-connect", linkGameState.mode, linkGameState.score, true);
   checkpointRankedRun("link-connect", linkGameState.mode);
   delete gameState.progress.linkConnect.sessionsByMode?.[linkGameState.mode];
-  if (!(await savePersistentGameData({ coins: gameState.coins, progress: gameState.progress, cloudEvent: true }))) {
+  if (!(await savePersistentGameData({ coins: gameState.coins, progress: gameState.progress, rewardFact: linkSettlementFact(linkGameState.wave), cloudEvent: true }))) {
     if (linkGameState.roundId === roundId) {
       gameState.coins = rollback.coins;
       linkGameState.score = rollback.score;

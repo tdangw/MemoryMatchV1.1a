@@ -1,13 +1,15 @@
 import { doc, collection, query, where, documentId, limit, getDocsFromServer, runTransaction, serverTimestamp } from 'firebase/firestore';
 import { normalizePublicCosmetics } from './publicCosmeticModel.js';
+import { canPublishCosmetics, expandedPublicCosmeticsEnabled } from '../liveops/availability.js';
 const cache = new Map(), MAX_CACHE = 100, TTL_MS = 30000;
 const key = (environment, uid) => `${environment}:${uid}`;
 function remember(environment, uid, selection) {
   const id = key(environment, uid); cache.delete(id); cache.set(id, { selection, at: Date.now() });
   while (cache.size > MAX_CACHE) cache.delete(cache.keys().next().value);
 }
-export async function publishPublicCosmetics({ database, environment, uid, selection, isCurrent = () => true }) {
+export async function publishPublicCosmetics({ database, environment, uid, selection, isCurrent = () => true, expanded = expandedPublicCosmeticsEnabled() }) {
   const normalized = normalizePublicCosmetics(selection);
+  if (!canPublishCosmetics(normalized, expanded)) throw Object.assign(new Error('New public cosmetics await release.'), { code: 'cosmetics/not-enabled' });
   const ref = doc(database, 'gamespaces', environment, 'publicCosmetics', uid);
   await runTransaction(database, async transaction => {
     if (!isCurrent()) throw new DOMException('Stale cosmetic owner.', 'AbortError');
