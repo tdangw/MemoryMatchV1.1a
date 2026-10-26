@@ -15,13 +15,13 @@ import { createGameShellLifecycle, getActiveGameScope } from './gameShell/gameSh
 import { getAppPageScope } from './appPageLifecycle.js';
 let lastGame = null;
 const families = [['adventure', 'Hành trình'], ['challenge', 'Thử thách'], ['endless', 'Vô tận']];
-const rememberedFamilies = new Map();
+let lastFamily = 'adventure';
 
 export function openLeaderboards(gameId, onClose, surface = {}) {
   const scope = createGameShellLifecycle();
   let generation = 0;
   let selectedGame = gameId || lastGame || getRecentGameId();
-  let selectedFamily = rememberedFamilies.get(selectedGame) || 'adventure';
+  let selectedFamily = lastFamily;
   let currentPage = 1;
   let currentKey = null;
   let loading = false;
@@ -31,18 +31,20 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
   const scrolls = new Map();
   const content = document.createElement('div'); content.className = 'leaderboard-view';
   const games = tabs('Trò chơi', GAME_DEFINITIONS.map(item => [item.id, item.title]), 'game');
+  const familyPicker = button(''); familyPicker.classList.add('leaderboard-family-picker');
+  familyPicker.setAttribute('aria-haspopup', 'menu'); familyPicker.setAttribute('aria-expanded', 'false');
   const footer = document.createElement('div'); footer.className = 'leaderboard-footer';
   const status = document.createElement('p'); status.className = 'leaderboard-status'; status.setAttribute('aria-live', 'polite');
   const retry = button('Thử lại'); retry.classList.add('leaderboard-retry'); retry.hidden = true;
   const results = document.createElement('div'); results.className = 'leaderboard-results'; results.tabIndex = 0; results.setAttribute('aria-label', 'Danh sách xếp hạng');
-  const own = document.createElement('p'); own.className = 'leaderboard-own';
+  const own = document.createElement('div'); own.className = 'leaderboard-own'; own.setAttribute('aria-label', 'Thứ hạng của bạn'); own.setAttribute('role', 'group');
   const pager = document.createElement('nav'); pager.className = 'leaderboard-pager'; pager.tabIndex = -1; pager.setAttribute('aria-label', 'Trang xếp hạng');
   const previous = button('Trước'); const next = button('Sau');
   previous.setAttribute('aria-label', 'Trước'); previous.textContent = '‹';
   next.setAttribute('aria-label', 'Sau'); next.textContent = '›';
   const pageNumbers = document.createElement('span'); pageNumbers.className = 'leaderboard-page-numbers';
   pager.append(previous, pageNumbers, next);
-  footer.append(pager); results.append(status); content.append(games, results, own, footer);
+  footer.append(pager); results.append(status); content.append(games, familyPicker, results, footer, own);
   const owner = surface.owner || getActiveGameScope() || getAppPageScope();
   const release = owner?.own(() => scope.dispose(), 'cleanup');
   const modal = openAppModal({ ...surface, id: 'rankings-modal', title: 'Bảng xếp hạng', icon: 'trophy', content, onDestroy: () => { generation++; scope.dispose(); release?.forget(); }, onClose });
@@ -51,11 +53,11 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
     lastGame = selectedGame;
     for (const item of games.children) {
       const selected = item.dataset.rankGame === selectedGame;
-      item.setAttribute('aria-pressed', String(selected));
-      item.setAttribute('aria-haspopup', 'menu'); item.setAttribute('aria-expanded', String(dropdown?.anchor === item));
-      const title = GAME_DEFINITIONS.find(game => game.id === item.dataset.rankGame).title;
-      item.replaceChildren(document.createTextNode(`${title} ▾`));
+      item.setAttribute('aria-selected', String(selected)); item.tabIndex = selected ? 0 : -1;
     }
+    const familyLabel = families.find(([id]) => id === selectedFamily)[1];
+    familyPicker.replaceChildren(document.createTextNode(familyLabel), createIcon('chevron-down'));
+    familyPicker.setAttribute('aria-label', `Loại bảng xếp hạng: ${familyLabel}`);
   }
   function closeDropdown(restoreFocus = false) {
     if (!dropdown) return;
@@ -69,10 +71,10 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
     closeDropdown();
     const lifecycle = createGameShellLifecycle();
     const menu = document.createElement('div'); menu.className = 'leaderboard-family-menu';
-    menu.setAttribute('role', 'menu'); menu.setAttribute('aria-label', anchor.textContent);
+    menu.setAttribute('role', 'menu'); menu.setAttribute('aria-label', 'Loại bảng xếp hạng');
     const choices = families.map(([family, label]) => {
       const choice = button(label); choice.dataset.rankFamily = family;
-      choice.setAttribute('role', 'menuitemradio'); choice.setAttribute('aria-checked', String(anchor.dataset.rankGame === selectedGame && family === selectedFamily));
+      choice.setAttribute('role', 'menuitemradio'); choice.setAttribute('aria-checked', String(family === selectedFamily));
       menu.append(choice); return choice;
     });
     document.body.append(menu); dropdown = { anchor, lifecycle, menu }; anchor.setAttribute('aria-expanded', 'true');
@@ -83,7 +85,7 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
       menu.dataset.direction = down ? 'down' : 'up';
       menu.style.top = `${Math.max(8, Math.min(down ? rect.bottom + 5 : rect.top - height - 5, innerHeight - height - 8))}px`;
     };
-    position(); choices.find(choice => choice.dataset.rankFamily === (rememberedFamilies.get(anchor.dataset.rankGame) || 'adventure')).focus();
+    position(); choices.find(choice => choice.dataset.rankFamily === selectedFamily).focus();
     lifecycle.listen(window, 'resize', position);
     lifecycle.listen(document, 'pointerdown', event => { if (!menu.contains(event.target) && !anchor.contains(event.target)) closeDropdown(); }, true);
     lifecycle.listen(menu, 'keydown', event => {
@@ -95,8 +97,10 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
     });
     lifecycle.listen(menu, 'click', event => {
       const item = event.target.closest('[data-rank-family]'); if (!item) return;
-      selectedGame = anchor.dataset.rankGame; selectedFamily = item.dataset.rankFamily;
-      rememberedFamilies.set(selectedGame, selectedFamily); closeDropdown(true); updateFilters(); void load();
+      const family = item.dataset.rankFamily;
+      closeDropdown(true);
+      if (family === selectedFamily) return;
+      selectedFamily = lastFamily = family; updateFilters(); void load();
     });
   }
   function controls(data = null) {
@@ -129,9 +133,7 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
     const rank = document.createElement('span'); rank.textContent = 'Hạng';
     const player = document.createElement('span'); player.className = 'leaderboard-heading-player';
     const label = document.createElement('span'); label.textContent = 'Người chơi';
-    const family = document.createElement('strong'); family.className = 'leaderboard-family-label';
-    family.textContent = families.find(([id]) => id === selectedFamily)[1];
-    player.append(label, family);
+    player.append(label);
     const level = document.createElement('span'); level.textContent = 'Màn';
     heading.append(rank, player, level); return heading;
   }
@@ -157,7 +159,7 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
       if (!scope.active || id !== generation || uid !== getAccountService()?.getIdentity()?.uid) return;
       if (!data) { status.textContent = 'Chưa có kết nối.'; return; }
       const cosmetics = await readPublicCosmetics({ database: backend.database, environment: backend.environment,
-        uids: data.top.map(row => row.uid), refresh: refreshRequested, offline });
+        uids: [...new Set([...data.top.map(row => row.uid), ...(data.own && uid ? [uid] : [])])], refresh: refreshRequested, offline });
       if (!scope.active || id !== generation || uid !== getAccountService()?.getIdentity()?.uid) return;
       currentPage = data.page;
       results.dataset.kind = board.kind;
@@ -181,7 +183,17 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
       results.dataset.offline = String(offline);
       if (data.top.length) { status.textContent = offline ? 'Chưa có kết nối.' : cosmetics.available ? '' : 'Chưa cập nhật được ảnh hồ sơ.'; results.replaceChildren(heading, status, retry, list); }
       else { status.textContent = 'Chưa có thành tích.'; }
-      own.textContent = data.own && !data.top.some(item => item.uid === uid) ? `Thành tích của bạn: ${describe(data.own, board.kind)}` : '';
+      if (data.own && uid) {
+        const rowIndex = data.top.findIndex(item => item.uid === uid);
+        const ownRank = data.ownRank || (rowIndex >= 0 ? (currentPage - 1) * 10 + rowIndex + 1 : null);
+        const rank = document.createElement('span'); rank.className = 'leaderboard-rank'; rank.textContent = ownRank ? formatLeaderboardNumber(ownRank) : '—';
+        rank.setAttribute('aria-label', ownRank ? `Hạng ${ownRank}` : 'Chưa cập nhật hạng');
+        const avatar = document.createElement('span'); avatar.className = 'leaderboard-avatar'; avatar.append(cosmeticPortrait(cosmetics.selections.get(uid), { label: data.own.playerName || 'Bạn' }));
+        const name = document.createElement('span'); name.className = 'leaderboard-name'; name.textContent = data.own.playerName || 'Bạn'; name.title = name.textContent; name.setAttribute('aria-label', `${name.textContent}, bạn`);
+        const identity = document.createElement('div'); identity.className = 'leaderboard-own-identity';
+        const label = document.createElement('small'); label.textContent = 'Bạn'; identity.append(label, name);
+        own.replaceChildren(rank, avatar, identity, metric(formatLeaderboardNumber(data.own.levelReached), 'leaderboard-metric', 'Màn'));
+      } else own.textContent = uid ? 'Bạn chưa có thành tích ở bảng này.' : '';
       results.scrollTop = refreshRequested ? 0 : scrolls.get(`${currentKey}:${currentPage}`) || 0;
       loading = false; controls(data);
     } catch (error) {
@@ -193,7 +205,20 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
       if (scope.active && id === generation) { loading = false; previous.disabled = currentPage === 1; renderPages(); results.removeAttribute('aria-busy'); }
     }
   }
-  scope.listen(games, 'click', event => { const item = event.target.closest('[data-rank-game]'); if (item) openDropdown(item); });
+  function selectGame(item) {
+    if (!item || item.dataset.rankGame === selectedGame) return;
+    closeDropdown(); selectedGame = item.dataset.rankGame; updateFilters(); void load();
+  }
+  scope.listen(games, 'click', event => selectGame(event.target.closest('[data-rank-game]')));
+  scope.listen(games, 'keydown', event => {
+    if (!['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(event.key)) return;
+    const items = [...games.children], index = items.indexOf(document.activeElement);
+    if (index < 0) return;
+    event.preventDefault();
+    const next = event.key === 'Home' ? 0 : event.key === 'End' ? items.length - 1 : (index + (event.key === 'ArrowRight' ? 1 : items.length - 1)) % items.length;
+    selectGame(items[next]); items[next].focus();
+  });
+  scope.listen(familyPicker, 'click', () => openDropdown(familyPicker));
   scope.listen(retry, 'click', () => { if (!loading) void load(true); });
   scope.listen(previous, 'click', () => { if (!loading && currentPage > 1) void load(false, currentPage - 1); });
   scope.listen(next, 'click', () => { if (!loading && !next.disabled) void load(false, currentPage + 1); });
@@ -212,10 +237,9 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
 }
 function button(text) { const element = document.createElement('button'); element.type = 'button'; element.className = 'app-button'; element.textContent = text; return element; }
 function tabs(label, entries, kind) {
-  const group = document.createElement('div'); group.className = `leaderboard-tabs leaderboard-tabs--${kind}`; group.setAttribute('role', 'group'); group.setAttribute('aria-label', label);
+  const group = document.createElement('div'); group.className = `leaderboard-tabs leaderboard-tabs--${kind}`; group.setAttribute('role', 'tablist'); group.setAttribute('aria-label', label);
   for (const [value, text] of entries) { const item = button(text);
-    item.dataset[kind === 'game' ? 'rankGame' : 'rankMode'] = value; group.append(item); }
+    item.dataset[kind === 'game' ? 'rankGame' : 'rankMode'] = value; item.setAttribute('role', 'tab'); group.append(item); }
   return group;
 }
 function metric(text, className, label) { const cell = document.createElement('strong'); cell.className = className; cell.textContent = text; cell.title = text; cell.setAttribute('aria-label', `${label} ${text}`); return cell; }
-function describe(item) { return `Màn ${formatLeaderboardNumber(item.levelReached)}`; }

@@ -1,4 +1,4 @@
-import { doc, collection, getDocFromServer, getDocsFromServer, query, orderBy, documentId, limit, startAfter, runTransaction, serverTimestamp } from 'firebase/firestore';
+import { doc, collection, getDocFromServer, getDocsFromServer, getCountFromServer, query, orderBy, documentId, limit, startAfter, endBefore, runTransaction, serverTimestamp } from 'firebase/firestore';
 import { rankingBoardId, validateRankingResult, comparePublicResults } from './rankingResult.js';
 const cache = new Map();
 const CACHE_LIMIT = 12;
@@ -40,7 +40,7 @@ export async function readLeaderboard({ database, environment, board, uid = null
   if (state && now - state.fetchedAt >= CACHE_TTL_MS) { cache.delete(key); state = null; }
   if (!state) {
     if (page !== 1) throw pageError('reset');
-    state = { pages: new Map(), cursors: new Map([[1, null]]), ownTask: null, own: null, seenPages: new Map(), fetchedAt: now, refreshedAt: now };
+    state = { pages: new Map(), cursors: new Map([[1, null]]), ownTask: null, own: null, ownRank: null, seenPages: new Map(), fetchedAt: now, refreshedAt: now };
     cache.set(key, state);
     while (cache.size > CACHE_LIMIT) cache.delete(cache.keys().next().value);
   } else { cache.delete(key); cache.set(key, state); }
@@ -51,8 +51,13 @@ export async function readLeaderboard({ database, environment, board, uid = null
   const ordering = board.kind === 'progress' ? [orderBy('levelReached', 'desc'), orderBy('reachedAt', 'asc')]
     : board.kind === 'time' ? [orderBy('durationMs', 'asc')] : [orderBy('levelReached', 'desc'), orderBy('totalScore', 'desc')];
   const ownReads = !state.ownTask && uid ? 1 : 0;
-  if (!state.ownTask) state.ownTask = (uid ? getDocFromServer(doc(ref, uid)) : Promise.resolve(null)).then(own => {
+  if (!state.ownTask) state.ownTask = (uid ? getDocFromServer(doc(ref, uid)) : Promise.resolve(null)).then(async own => {
     state.own = own?.exists() ? { uid: own.id, ...own.data() } : null;
+    state.ownRank = null;
+    if (state.own) {
+      const preceding = await getCountFromServer(query(ref, ...ordering, orderBy(documentId(), 'asc'), endBefore(own)));
+      state.ownRank = preceding.data().count + 1;
+    }
   }).catch(error => { state.ownTask = null; throw error; });
   const cursor = state.cursors.get(page);
   const [top] = await Promise.all([
@@ -67,7 +72,7 @@ export async function readLeaderboard({ database, environment, board, uid = null
   state.seenPages.set(page, rows.map(row => row.uid));
   const hasNext = top.size > 10;
   if (hasNext && page < 100) state.cursors.set(page + 1, rankingCursor(rows[9], board.kind));
-  const result = { top: rows, own: state.own, page, hasNext, knownPages: [...state.cursors.keys()], loadedPages: [...state.seenPages.keys()], fetchedAt: Date.now(), reads: top.size + ownReads, cached: false };
+  const result = { top: rows, own: state.own, ownRank: state.ownRank, page, hasNext, knownPages: [...state.cursors.keys()], loadedPages: [...state.seenPages.keys()], fetchedAt: Date.now(), reads: top.size + ownReads, rankQueries: ownReads && state.own ? 1 : 0, cached: false };
   if (cache.get(key) === state) {
     state.pages.set(page, result);
     while (state.pages.size > 5) state.pages.delete(state.pages.keys().next().value);

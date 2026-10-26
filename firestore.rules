@@ -105,7 +105,10 @@ service cloud.firestore {
     }
     match /gamespaces/{space}/leaderboards/{board}/entries/{uid} {
       allow get: if knownSpace(space);
-      allow list: if knownSpace(space) && request.query.limit != null && request.query.limit <= 20;
+      // Approved 26/10: exact personal rank counts the public ordered prefix.
+      // Firestore uses the same permission for document and aggregation queries.
+      allow list: if knownSpace(space) && ((request.query.limit != null && request.query.limit <= 20)
+        || (request.auth != null && request.query.limit == null));
       allow create: if knownSpace(space) && owner(uid) && validEntry(request.resource.data, board);
       allow update: if knownSpace(space) && owner(uid) && validEntry(request.resource.data, board) && betterEntry(request.resource.data, resource.data);
       allow delete: if false;

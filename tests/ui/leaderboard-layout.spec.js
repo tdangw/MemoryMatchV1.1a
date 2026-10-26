@@ -14,7 +14,7 @@ const source = readFileSync('js/leaderboardPanel.js', 'utf8')
     if (window.rankError) throw new Error('offline');
     const count = window.rankCount;
     const data = { page, hasNext: page * 10 < count, knownPages: Array.from({ length: Math.min(Math.ceil(count / 10), page + 1) }, (_, i) => i + 1),
-      top: Array.from({ length: Math.max(0, Math.min(10, count - (page - 1) * 10)) }, (_, i) => ({ uid: 'row-' + ((page - 1) * 10 + i), playerName: window.rankNames?.[i] || '<img src=x> Tên người chơi rất dài rất dài', durationMs: window.rankNames ? 41810 + i * 1370 : 1000, levelReached: window.rankNames ? 100000 - i : 10, totalScore: window.rankNames ? 128640 - i * 3500 : 12345 })), own: window.rankUid ? { durationMs: 1000, levelReached: 10, totalScore: 12345 } : null };
+      top: Array.from({ length: Math.max(0, Math.min(10, count - (page - 1) * 10)) }, (_, i) => ({ uid: 'row-' + ((page - 1) * 10 + i), playerName: window.rankNames?.[i] || '<img src=x> Tên người chơi rất dài rất dài', durationMs: window.rankNames ? 41810 + i * 1370 : 1000, levelReached: window.rankNames ? 100000 - i : 10, totalScore: window.rankNames ? 128640 - i * 3500 : 12345 })), own: window.rankUid && !window.rankNoOwn ? { uid: window.rankUid, playerName: 'Người chơi Reks2', durationMs: 1000, levelReached: 10, totalScore: 12345 } : null, ownRank: window.rankUid?.startsWith('row-') ? Number(window.rankUid.slice(4)) + 1 : 42 };
     data.loadedPages = [...new Set([...window.rankCache.keys()].map(key => JSON.parse(key)).filter(item => JSON.stringify(item.board) === JSON.stringify(board) && item.uid === uid).map(item => item.page).concat(page))];
     window.rankCache.set(JSON.stringify({ board, uid, page }), data); return data;
   };`);
@@ -37,6 +37,7 @@ async function reopen(page) {
 }
 async function selectFamily(page, game, family) {
   await page.locator(`[data-rank-game="${game}"]`).click();
+  await page.locator('.leaderboard-family-picker').click();
   await page.locator(`[data-rank-family="${family}"]`).click();
 }
 for (const count of [0, 1, 10, 11]) test(`record count ${count}, private own record and no repeated copy`, async ({ page }) => {
@@ -45,10 +46,11 @@ for (const count of [0, 1, 10, 11]) test(`record count ${count}, private own rec
   else await expect(page.locator('.leaderboard-status')).toHaveText('Chưa có thành tích.');
   await page.evaluate(() => { window.rankUid = 'row-0'; });
   await reopen(page);
-  if (count) { await expect(page.locator('.leaderboard-list .is-self')).toHaveCount(1); await expect(page.locator('.leaderboard-own')).toHaveText(''); }
+  if (count) { await expect(page.locator('.leaderboard-list .is-self')).toHaveCount(1); await expect(page.locator('.leaderboard-own .leaderboard-rank')).toHaveText('1'); }
   await page.evaluate(() => { window.rankUid = 'outside'; });
   await reopen(page);
-  await expect(page.locator('.leaderboard-own')).toHaveText('Thành tích của bạn: Màn 10');
+  await expect(page.locator('.leaderboard-own .leaderboard-metric')).toHaveText('10');
+  await expect(page.locator('.leaderboard-own')).toContainText('Bạn');
   await expect(page.locator('.leaderboard-view')).not.toContainText('Đã cập nhật');
   await expect(page.locator('.leaderboard-list img')).toHaveCount(0);
 });
@@ -87,10 +89,12 @@ test('page numbers show only loaded pages, collapse with ellipsis and jump once'
   await expect(numbers.locator('button')).toHaveText(['1']);
 });
 
-test('game menu opens without querying, supports keyboard and clamps above an anchor near the bottom', async ({ page }) => {
+test('shared family menu opens without querying, supports keyboard and clamps above an anchor near the bottom', async ({ page }) => {
   await page.setViewportSize({ width: 412, height: 915 }); await open(page);
+  await page.locator('[data-rank-game="link-connect"]').click();
+  await expect(page.locator('.leaderboard-results')).not.toHaveAttribute('aria-busy', 'true');
   const before = await page.evaluate(() => window.rankRequests.length);
-  const anchor = page.locator('[data-rank-game="link-connect"]'); await anchor.click();
+  const anchor = page.locator('.leaderboard-family-picker'); await anchor.click();
   const menu = page.getByRole('menu'); await expect(menu).toBeVisible();
   expect(await page.evaluate(() => window.rankRequests.length)).toBe(before);
   await expect(menu.locator('[data-rank-family="adventure"]')).toBeFocused();
@@ -99,9 +103,9 @@ test('game menu opens without querying, supports keyboard and clamps above an an
   await menu.locator('[data-rank-family="endless"]').press('Escape');
   await expect(menu).toHaveCount(0); await expect(anchor).toBeFocused();
   await anchor.click(); await menu.locator('[data-rank-family="adventure"]').press('Tab');
-  await expect(menu).toHaveCount(0); await expect(page.locator('[data-rank-game="triple-connect"]')).toBeFocused();
+  await expect(menu).toHaveCount(0); await expect(page.locator('.leaderboard-results')).toBeFocused();
   await anchor.click(); await menu.locator('[data-rank-family="adventure"]').press('Shift+Tab');
-  await expect(menu).toHaveCount(0); await expect(page.locator('[data-rank-game="memory-match"]')).toBeFocused();
+  await expect(menu).toHaveCount(0); await expect(page.locator('[data-rank-game="link-connect"]')).toBeFocused();
   await anchor.evaluate(node => { node.style.position = 'fixed'; node.style.bottom = '10px'; node.style.zIndex = '15000'; });
   await anchor.click(); await expect(menu).toHaveAttribute('data-direction', 'up');
   const box = await menu.boundingBox(); const trigger = await anchor.boundingBox();
@@ -110,7 +114,11 @@ test('game menu opens without querying, supports keyboard and clamps above an an
   await menu.locator('[data-rank-family="challenge"]').press('Enter');
   expect(await page.evaluate(() => window.rankRequests.at(-1))).toMatchObject({ gameId: 'link-connect', family: 'challenge', page: 1 });
   expect(await page.evaluate(() => window.rankRequests.length)).toBe(before + 1);
-  await expect(anchor).toBeFocused(); await expect(anchor).not.toContainText('Thử thách'); await expect(page.locator('.leaderboard-family-label')).toHaveText('Thử thách');
+  await expect(anchor).toBeFocused(); await expect(anchor).toContainText('Thử thách');
+  await page.locator('[data-rank-game="triple-connect"]').click();
+  await expect(page.locator('[data-rank-game="triple-connect"]')).toHaveAttribute('aria-selected','true');
+  await expect(anchor).toContainText('Thử thách');
+  expect(await page.evaluate(()=>window.rankRequests.at(-1))).toMatchObject({gameId:'triple-connect',family:'challenge',page:1});
 });
 
 test('30 mount, picker cancel and mode changes release every page-owned resource', async ({ page }) => {
@@ -127,7 +135,7 @@ test('30 mount, picker cancel and mode changes release every page-owned resource
   for (let cycle = 0; cycle < 30; cycle++) {
     await page.evaluate(async () => { window.rankCycleModal = (await import('/js/leaderboardPanel.js')).openLeaderboards(undefined, undefined, { presentation: 'screen', host: document.querySelector('.adventure-screen-host'), owner: (await import('/js/appPageLifecycle.js')).getAppPageScope() }); });
     await expect(page.locator('.leaderboard-heading')).toBeVisible();
-    await page.locator('[data-rank-game="memory-match"]').click();
+    await page.locator('.leaderboard-family-picker').click();
     await page.locator('[data-rank-family="adventure"]').press('Escape');
     await expect(page.getByRole('menu')).toHaveCount(0);
     await selectFamily(page, 'memory-match', 'challenge');
@@ -160,12 +168,11 @@ for (const viewport of [{ width: 320, height: 740 }, { width: 412, height: 915 }
     await expect(page.locator('.leaderboard-tabs--mode, .leaderboard-level')).toHaveCount(0);
     const panelBox = await page.locator('.leaderboard-panel').boundingBox();
     const headingBox = await page.locator('.leaderboard-heading').boundingBox();
-    const familyBox = await page.locator('.leaderboard-family-label').boundingBox();
-    expect(Math.abs(familyBox.x + familyBox.width / 2 - headingBox.x - headingBox.width / 2)).toBeLessThan(1);
-    const playerLabel = await page.locator('.leaderboard-heading-player > span').boundingBox();
-    const levelLabel = await page.locator('.leaderboard-heading > span:last-child').boundingBox();
-    expect(playerLabel.x + playerLabel.width).toBeLessThanOrEqual(familyBox.x);
-    expect(familyBox.x + familyBox.width).toBeLessThanOrEqual(levelLabel.x);
+    const familyBox = await page.locator('.leaderboard-family-picker').boundingBox();
+    const gamesBox = await page.locator('.leaderboard-tabs--game').boundingBox();
+    expect(familyBox.y).toBeGreaterThanOrEqual(gamesBox.y + gamesBox.height);
+    expect(familyBox.y + familyBox.height).toBeLessThanOrEqual(headingBox.y);
+    await expect(page.locator('.leaderboard-tabs--game [aria-haspopup]')).toHaveCount(0);
     const pagerBox = await page.locator('.leaderboard-pager').boundingBox();
     expect(Math.abs(pagerBox.x + pagerBox.width / 2 - panelBox.x - panelBox.width / 2)).toBeLessThan(2);
     await page.getByRole('button', { name: 'Sau', exact: true }).click();
@@ -229,7 +236,7 @@ test('final garden artwork, centered footer and background failure keep a usable
   await expect(page.locator('.leaderboard-list li').nth(3).locator('.ui-icon--rank-medal')).toHaveCount(0);
   await page.locator('.leaderboard-results').blur();
   await page.screenshot({ path: 'docs/design/app-tabs/qa/mobile-level.png', animations: 'disabled' });
-  await page.locator('[data-rank-game="memory-match"]').click();
+  await page.locator('.leaderboard-family-picker').click();
   await page.screenshot({ path: 'docs/design/app-tabs/qa/mobile-family-menu.png', animations: 'disabled' });
   await page.locator('[data-rank-family="adventure"]').press('Escape');
   await selectFamily(page, 'memory-match', 'challenge'); await expect(page.locator('.leaderboard-heading')).toContainText('Màn');
@@ -308,4 +315,27 @@ test('equipped portrait fills its slot without a second circular backing or crop
     await page.screenshot({ path: `design/rewards-liveops/review/ranking-portrait-tight-${width}.png` });
     expect(await page.locator('.leaderboard-results').evaluate(node => node.scrollWidth - node.clientWidth)).toBeLessThanOrEqual(1);
   }
+});
+
+
+test('personal rank stays pinned below scrolling results and pagination across games and sizes', async ({page}) => {
+  await open(page, 100); await page.evaluate(()=>{window.rankUid='outside';}); await reopen(page);
+  for (const width of [320,412,844,1024]) {
+    await page.setViewportSize({width,height:width===844?390:915});
+    await expect(page.locator('.leaderboard-own .leaderboard-rank')).toHaveText('42');
+    await expect(page.locator('.leaderboard-own')).toContainText('Người chơi Reks2');
+    const before=await page.locator('.leaderboard-own').boundingBox();
+    await page.locator('.leaderboard-results').evaluate(node=>{node.scrollTop=node.scrollHeight;});
+    expect(await page.locator('.leaderboard-own').boundingBox()).toEqual(before);
+    const result=await page.locator('.leaderboard-results').boundingBox();
+    expect(before.y).toBeGreaterThanOrEqual(result.y+result.height);
+    expect(before.y+before.height).toBeLessThanOrEqual(width===844?390:915);
+    if(width===412)await page.screenshot({path:'runtime/qa/leaderboard-tabs-pinned-412.png',animations:'disabled'});
+  }
+  await page.getByRole('button',{name:'Sau',exact:true}).click();
+  await expect(page.locator('.leaderboard-own .leaderboard-rank')).toHaveText('42');
+  await page.locator('[data-rank-game="link-connect"]').click();
+  await expect(page.locator('.leaderboard-own .leaderboard-rank')).toHaveText('42');
+  await page.evaluate(()=>{window.rankNoOwn=true;}); await reopen(page);
+  await expect(page.locator('.leaderboard-own')).toHaveText('Bạn chưa có thành tích ở bảng này.');
 });

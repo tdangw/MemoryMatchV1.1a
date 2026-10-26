@@ -1,10 +1,11 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { initializeTestEnvironment, assertFails, assertSucceeds } from '@firebase/rules-unit-testing';
-import { doc, setDoc, getDocs, collection, query, limit, serverTimestamp } from 'firebase/firestore';
+import { doc, setDoc, getDocs, getCountFromServer, collection, query, limit, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { submitRankingResult, readLeaderboard, clearLeaderboardCache, getLeaderboardCacheDiagnostics } from '../js/leaderboardStore.js';
 import { createProgressResult } from '../js/progressRankingModel.js';
-const env = await initializeTestEnvironment({ projectId: 'demo-memory-match', firestore: { host: '127.0.0.1', port: 8180, rules: readFileSync('firestore.rules', 'utf8') } });
+const [emulatorHost, emulatorPort] = (process.env.FIRESTORE_EMULATOR_HOST || '127.0.0.1:8180').split(':');
+const env = await initializeTestEnvironment({ projectId: 'demo-memory-match', firestore: { host: emulatorHost, port: Number(emulatorPort), rules: readFileSync('firestore.rules', 'utf8') } });
 await env.clearFirestore();
 const result = { rulesVersion: 1, id: crypto.randomUUID(), gameId: 'memory-match', mode: 'easy', level: 1, kind: 'time', durationMs: 1000, score: 100, stars: 3, outcome: 'won', recordedAt: Date.now(), owner: { profileId: 'fixture', uid: 'a' } };
 try {
@@ -17,6 +18,7 @@ try {
     assert.equal((await assertSucceeds(submit(progress))).writes, 1);
     const first = await readLeaderboard({ database, environment: 'test', board: progress, uid: 'a' });
     assert.equal(first.own.levelReached, 100000);
+    assert.equal(first.ownRank, 1);
     const timestamp = first.own.reachedAt;
     assert.equal((await submit({ ...progress, id: crypto.randomUUID(), levelReached: 99999 })).writes, 0);
     assert.equal((await submit({ ...progress, id: crypto.randomUUID() })).writes, 0);
@@ -46,6 +48,32 @@ try {
     assert.equal(data.loadedPages.length, page);
   }
   assert.equal(new Set(seenProgress).size, 22);
+  // Equal levels use reachedAt, then UID, exactly as the public page ordering.
+  // The pinned player must have an exact global rank even on an unrelated page.
+  const rankBoard = createProgressResult('link-connect', 'challenge', 10, { profileId: 'fixture', uid: 'rank-23' });
+  await env.withSecurityRulesDisabled(async context => {
+    const admin = context.firestore();
+    for (let index = 0; index < 31; index++) {
+      const uid = `rank-${String(index).padStart(2, '0')}`;
+      await setDoc(doc(admin, `gamespaces/test/leaderboards/v3_link-connect_challenge/entries/${uid}`), {
+        rulesVersion: 3, kind: 'progress', resultId: crypto.randomUUID(), gameId: 'link-connect', family: 'challenge',
+        playerName: uid, levelReached: index < 5 ? 20 : 10, reachedAt: Timestamp.fromMillis(index < 15 ? 1000 : 2000),
+      });
+    }
+  });
+  clearLeaderboardCache();
+  const rankDatabase = env.authenticatedContext('rank-23').firestore();
+  const pinned = await readLeaderboard({ database: rankDatabase, environment: 'test', board: rankBoard, uid: 'rank-23' });
+  assert.equal(pinned.ownRank, 25); // Existing level100002 player precedes the31 seeded entries.
+  assert(!pinned.top.some(item => item.uid === 'rank-23'));
+  assert.equal(pinned.rankQueries, 1);
+  const nextPinned = await readLeaderboard({ database: rankDatabase, environment: 'test', board: rankBoard, uid: 'rank-23', page: 2 });
+  assert.equal(nextPinned.ownRank, 25); assert.equal(nextPinned.rankQueries, 0);
+  const publicEntries = collection(publicDatabase, 'gamespaces/test/leaderboards/v3_link-connect_challenge/entries');
+  await assertFails(getCountFromServer(query(publicEntries)));
+  assert.equal((await assertSucceeds(getCountFromServer(collection(rankDatabase, publicEntries.path)))).data().count, 32);
+  const missingRank = await readLeaderboard({ database: stranger, environment: 'test', board: rankBoard, uid: 'b' });
+  assert.equal(missingRank.ownRank, null); assert.equal(missingRank.rankQueries, 0);
   assert.equal((await assertSucceeds(submit(result))).writes, 1);
   assert.equal((await submit({ ...result, durationMs: 2000 })).writes, 0);
   assert.equal((await submit({ ...result, id: crypto.randomUUID() })).writes, 0);
