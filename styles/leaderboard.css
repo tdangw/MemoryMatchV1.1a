@@ -37,9 +37,9 @@
 .leaderboard-heading > span:nth-child(n+3) { text-align: right; }
 .leaderboard-metric { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* Top places use illustrated medals; the remaining places stay unframed. */
-.leaderboard-list .leaderboard-rank--1, .leaderboard-list .leaderboard-rank--2, .leaderboard-list .leaderboard-rank--3 { position: relative; display: grid; place-items: center; width: 30px; height: 36px; color: #fff9e8; font-size: 15px; font-weight: 800; --rank-medal-face: #dcae42; --rank-medal-edge: #826321; --rank-medal-light: #fff0a5; }
-.leaderboard-list .leaderboard-rank--2 { --rank-medal-face: #9eafb5; --rank-medal-edge: #5b727d; --rank-medal-light: #f1fbff; }
-.leaderboard-list .leaderboard-rank--3 { --rank-medal-face: #ba8d63; --rank-medal-edge: #795438; --rank-medal-light: #ffe0b5; }
+.leaderboard-panel .leaderboard-rank--1, .leaderboard-panel .leaderboard-rank--2, .leaderboard-panel .leaderboard-rank--3 { position: relative; display: grid; place-items: center; width: 30px; height: 36px; color: #fff9e8; font-size: 15px; font-weight: 800; --rank-medal-face: #dcae42; --rank-medal-edge: #826321; --rank-medal-light: #fff0a5; }
+.leaderboard-panel .leaderboard-rank--2 { --rank-medal-face: #9eafb5; --rank-medal-edge: #5b727d; --rank-medal-light: #f1fbff; }
+.leaderboard-panel .leaderboard-rank--3 { --rank-medal-face: #ba8d63; --rank-medal-edge: #795438; --rank-medal-light: #ffe0b5; }
 .leaderboard-rank .ui-icon--rank-medal { position: absolute; inset: 0; width: 30px; height: 36px; stroke-width: 1.1; stroke: var(--rank-medal-edge); }
 .rank-medal__ribbons { fill: var(--rank-medal-face); }
 .rank-medal__face { fill: var(--rank-medal-face); }

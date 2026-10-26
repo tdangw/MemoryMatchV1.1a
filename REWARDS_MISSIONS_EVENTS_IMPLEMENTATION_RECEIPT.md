@@ -520,3 +520,9 @@ Rules được deploy riêng theo quyền đã duyệt lên memorymatchv1-1a; đ
 Chủ dự án làm rõ vị trí: dùng nhãn Hành trình/Thử thách/Vô tận trong thanh heading làm nút dropdown, bỏ hoàn toàn hàng filter riêng; ba game vẫn là tab. Picker nhỏ có SVGchevron trong grid heading, không absolute overlay để tránh đè nhãn trên màn hẹp. Chọn giữ heading/picker mounted khi loading/paging thay tạo lại heading mỗi response; chỉ thay sibling nội dung, giữ focus/menu anchor/lifecycle. Không đổi truy vấn, cache/rank/rules/save hay hàng ghim.
 
 9/9Playwright mục tiêu PASS (leaderboard-hud-ui.log):5viewport320/412/640/844/1024×9board, picker thật nằm trong heading/không có hàng riêng, menu focus/keyboard/clamp, stale/close,30mountcycles và hàng ghim khi scroll/page. Đã xem screenshot320px. Syntax/CSSownership/diff whitespace PASS. Không test lại backend, không build/deploy/Hosting/APK; ảnh/log QA và nền động ngoài commit.
+
+## Đồng bộ huy chương hạng của hàng ghim —26/10/2026
+
+Nguyên nhân: danh sách tự dựng medal cho top3, hàng ghim chỉ dựng text; CSS màu medal còn scope riêng leaderboard-list. Đã dùng chung rankMarker cho cả hai vị trí và chuyển scope medal sang leaderboard-panel. CùngSVG/số/aria/màu/kíchthước30×36 cho hạng1–3; từ4 hiển thị số, giữ fallback thiếu hạng. Không thêm asset, listener/timer/animation, không đổi rankquery/rules/save/API.
+
+2/2Playwright mục tiêu PASS (leaderboard-pinned-medal.log):đối chiếu markup+computedcolors+size cho1/2/3,4/42khôngmedal ở320/412/1024px và regression medal/danh sách/backgroundfailure; đã xem ảnh412px. Syntax/CSSownership/diff whitespace PASS. Không fullsuite/build/deploy/APK; ảnh/logQA và nền động ngoài commit.

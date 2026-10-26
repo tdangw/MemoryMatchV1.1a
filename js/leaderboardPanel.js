@@ -173,12 +173,7 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
       for (const [index, item] of data.top.entries()) {
         const rank = (currentPage - 1) * 10 + index + 1;
         const row = document.createElement('li');
-        const place = document.createElement('span'); place.className = `leaderboard-rank${rank <= 3 ? ` leaderboard-rank--${rank}` : ''}`; place.textContent = String(rank); place.setAttribute('aria-label', `Hạng ${rank}`);
-        if (rank <= 3) {
-          place.setAttribute('role', 'img');
-          const number = document.createElement('span'); number.className = 'leaderboard-medal-number'; number.textContent = String(rank); number.setAttribute('aria-hidden', 'true');
-          place.replaceChildren(createIcon('rank-medal'), number);
-        }
+        const place = rankMarker(rank);
         const avatar = document.createElement('span'); avatar.className = 'leaderboard-avatar'; avatar.append(cosmeticPortrait(cosmetics.selections.get(item.uid), { label: item.playerName }));
         const name = document.createElement('span'); name.className = 'leaderboard-name'; name.textContent = item.playerName; name.title = item.playerName;
         if (item.uid === uid) { row.classList.add('is-self'); name.setAttribute('aria-label', `${item.playerName}, bạn`); }
@@ -191,8 +186,7 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
       if (data.own && uid) {
         const rowIndex = data.top.findIndex(item => item.uid === uid);
         const ownRank = data.ownRank || (rowIndex >= 0 ? (currentPage - 1) * 10 + rowIndex + 1 : null);
-        const rank = document.createElement('span'); rank.className = 'leaderboard-rank'; rank.textContent = ownRank ? formatLeaderboardNumber(ownRank) : '—';
-        rank.setAttribute('aria-label', ownRank ? `Hạng ${ownRank}` : 'Chưa cập nhật hạng');
+        const rank = rankMarker(ownRank);
         const avatar = document.createElement('span'); avatar.className = 'leaderboard-avatar'; avatar.append(cosmeticPortrait(cosmetics.selections.get(uid), { label: data.own.playerName || 'Bạn' }));
         const name = document.createElement('span'); name.className = 'leaderboard-name'; name.textContent = data.own.playerName || 'Bạn'; name.title = name.textContent; name.setAttribute('aria-label', `${name.textContent}, bạn`);
         const identity = document.createElement('div'); identity.className = 'leaderboard-own-identity';
@@ -239,6 +233,17 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
   }), 'listener');
   updateFilters(); void load(true);
   return modal;
+}
+function rankMarker(rank) {
+  const place = document.createElement('span'); place.className = 'leaderboard-rank';
+  place.textContent = rank ? formatLeaderboardNumber(rank) : '—';
+  place.setAttribute('aria-label', rank ? `Hạng ${rank}` : 'Chưa cập nhật hạng');
+  if (rank >= 1 && rank <= 3) {
+    place.classList.add(`leaderboard-rank--${rank}`); place.setAttribute('role', 'img');
+    const number = document.createElement('span'); number.className = 'leaderboard-medal-number'; number.textContent = String(rank); number.setAttribute('aria-hidden', 'true');
+    place.replaceChildren(createIcon('rank-medal'), number);
+  }
+  return place;
 }
 function button(text) { const element = document.createElement('button'); element.type = 'button'; element.className = 'app-button'; element.textContent = text; return element; }
 function tabs(label, entries, kind) {

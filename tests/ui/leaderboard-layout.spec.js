@@ -344,3 +344,24 @@ test('personal rank stays pinned below scrolling results and pagination across g
   await page.evaluate(()=>{window.rankNoOwn=true;}); await reopen(page);
   await expect(page.locator('.leaderboard-own')).toHaveText('Bạn chưa có thành tích ở bảng này.');
 });
+
+
+test('pinned rank uses the same gold silver bronze markers as the list', async ({page}) => {
+  await open(page,100);
+  for(const width of [320,412,1024]) {
+    await page.setViewportSize({width,height:915});
+    for(const rank of [1,2,3,4,42]) {
+      await page.evaluate(rank=>{window.rankUid='row-'+(rank-1);},rank); await reopen(page);
+      const pinned=page.locator('.leaderboard-own .leaderboard-rank');
+      await expect(pinned).toHaveText(String(rank));
+      if(rank<=3) {
+        const listed=page.locator('.leaderboard-list .leaderboard-rank').nth(rank-1);
+        await expect(pinned).toHaveAttribute('role','img'); await expect(pinned).toHaveAttribute('aria-label',`Hạng ${rank}`);
+        expect(await pinned.innerHTML()).toBe(await listed.innerHTML());
+        const appearance=node=>{const style=getComputedStyle(node),rect=node.getBoundingClientRect();return{face:style.getPropertyValue('--rank-medal-face'),edge:style.getPropertyValue('--rank-medal-edge'),color:style.color,width:rect.width,height:rect.height};};
+        expect(await pinned.evaluate(appearance)).toEqual(await listed.evaluate(appearance));
+        if(width===412&&rank===1)await page.screenshot({path:'runtime/qa/leaderboard-pinned-medal-412.png',animations:'disabled'});
+      } else await expect(pinned.locator('.ui-icon--rank-medal')).toHaveCount(0);
+    }
+  }
+});
