@@ -71,7 +71,10 @@ html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .app-modal__body { 
 html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .app-screen-content .app-modal__body { background: var(--ui-surface); }
 html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .app-modal__footer { background: var(--ui-inset); border-color: var(--ui-line); }
 html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .adventure-page { background-color: var(--skin-backdrop); }
-html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .adventure-screen > .adventure-exit { background: var(--ui-raised); color: var(--ui-ink); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .adventure-page .adventure-exit { top: calc(env(safe-area-inset-top) + 8px); width: 44px; min-width: 44px; height: 44px; padding: 0; border-width: 0; border-radius: 0; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .adventure-screen[data-screen] > .adventure-exit { right: max(8px, calc((100% - 640px) / 2 + 8px)); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .adventure-map-page .adventure-header > .adventure-exit { right: 8px; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .adventure-exit .ui-icon { width: 24px; height: 24px; color: inherit; }
 html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .game-selector__choice { border-color: var(--ui-line); }
 html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(.adventure-dock,.triple-connect__tray) { background: transparent; border-image: var(--skin-dock) var(--skin-dock-slice) fill / 10px 16px / 0 stretch; }
 html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .adventure-dock button { color: var(--ui-ink); text-shadow: none; background: var(--skin-tab-idle) center top / 36px 36px no-repeat; box-shadow: none; }
@@ -88,9 +91,12 @@ html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(.leaderboard-re
 html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .leaderboard-family-menu button { color: var(--ui-ink); }
 html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(.profile-error,.account-error,.treasure-error) { color: var(--skin-error-ink); }
 
-html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(.app-modal__close,.shell-fullscreen-button,.game-selector__arrow,.pause-settings,.game-menu-toggle,.memory-tools-toggle,.link-tools-toggle,.triple-tools-toggle) { background: transparent; border-color: transparent; color: var(--skin-button-ink); box-shadow: none; border-image: var(--skin-square-normal) var(--skin-square-normal-slice) fill / 8px / 0 stretch; }
-html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(.app-modal__close,.shell-fullscreen-button,.game-selector__arrow,.pause-settings,.game-menu-toggle,.memory-tools-toggle,.link-tools-toggle,.triple-tools-toggle):active:not(:disabled) { border-image-source: var(--skin-square-pressed); }
-html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(.app-modal__close,.shell-fullscreen-button,.game-selector__arrow,.pause-settings,.game-menu-toggle,.memory-tools-toggle,.link-tools-toggle,.triple-tools-toggle):disabled { border-image-source: var(--skin-square-disabled); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(.app-modal__close,.shell-fullscreen-button,.game-selector__arrow,.pause-settings,.game-menu-toggle,.memory-tools-toggle,.link-tools-toggle,.triple-tools-toggle),
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .adventure-page .adventure-exit { background: transparent; border-color: transparent; color: var(--skin-button-ink); box-shadow: none; border-image: var(--skin-square-normal) var(--skin-square-normal-slice) fill / 8px / 0 stretch; }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(.app-modal__close,.shell-fullscreen-button,.game-selector__arrow,.pause-settings,.game-menu-toggle,.memory-tools-toggle,.link-tools-toggle,.triple-tools-toggle):active:not(:disabled),
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .adventure-page .adventure-exit:active:not(:disabled) { border-image-source: var(--skin-square-pressed); }
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(.app-modal__close,.shell-fullscreen-button,.game-selector__arrow,.pause-settings,.game-menu-toggle,.memory-tools-toggle,.link-tools-toggle,.triple-tools-toggle):disabled,
+html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .adventure-page .adventure-exit:disabled { border-image-source: var(--skin-square-disabled); }
 html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .game-shell-root .game-hud { background: var(--skin-hud) center / 100% 100% no-repeat; box-shadow: none; }
 html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) :is(#grid-container,.link-board,.triple-connect__board) { border-image: var(--skin-board-frame) var(--skin-board-frame-slice) / 4px / 0 stretch; }
 html:is([data-ui-skin="papercut"],[data-ui-skin="starship"]) .triple-connect__tray-slot:not(.is-locked) { background: var(--ui-inset); border-color: var(--ui-line); }

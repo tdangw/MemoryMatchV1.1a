@@ -31,7 +31,7 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
   const scrolls = new Map();
   const content = document.createElement('div'); content.className = 'leaderboard-view';
   const games = tabs('Trò chơi', GAME_DEFINITIONS.map(item => [item.id, item.title]), 'game');
-  const familyPicker = button(''); familyPicker.classList.add('leaderboard-family-picker');
+  const familyPicker = button(''); familyPicker.className = 'leaderboard-family-picker';
   familyPicker.setAttribute('aria-haspopup', 'menu'); familyPicker.setAttribute('aria-expanded', 'false');
   const footer = document.createElement('div'); footer.className = 'leaderboard-footer';
   const status = document.createElement('p'); status.className = 'leaderboard-status'; status.setAttribute('aria-live', 'polite');

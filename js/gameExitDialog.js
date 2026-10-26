@@ -25,7 +25,7 @@ export function openGameExitDialog({ owner, trigger, onExit, onRestart, onSettin
         return false;
       } },
       { label: 'Cài đặt', icon: 'settings', onClick: () => { nextAction = onSettings; } },
-      { label: 'Thoát game', icon: 'exit', variant: 'danger', onClick: async () => { await onExit(); return false; } },
+      { label: 'Thoát game', icon: 'close', variant: 'danger', onClick: async () => { await onExit(); return false; } },
     ],
     onClose: () => { onClose(); nextAction?.(); },
     onDestroy: () => trigger.setAttribute('aria-expanded', 'false'),

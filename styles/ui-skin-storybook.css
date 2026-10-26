@@ -18,6 +18,12 @@ html[data-ui-skin='storybook'] :is(.adventure-header, .game-shell-root .game-hud
   color: #fff1c9; border-color: #d4a45e;
 }
 html[data-ui-skin='storybook'] :is(.adventure-header, .adventure-dock) :is(button, .game-title, .adventure-map-title) { color: #fff1c9; }
+html[data-ui-skin='storybook'] .adventure-page .adventure-exit {
+  top: calc(env(safe-area-inset-top) + 8px); width: 44px; min-width: 44px; height: 44px; padding: 0; box-shadow: none;
+}
+html[data-ui-skin='storybook'] .adventure-screen[data-screen] > .adventure-exit { right: max(20px, calc((100% - 620px) / 2 + 8px)); }
+html[data-ui-skin='storybook'] .adventure-map-page .adventure-header > .adventure-exit { right: 8px; }
+html[data-ui-skin='storybook'] .adventure-exit .ui-icon { width: 24px; height: 24px; color: inherit; }
 html[data-ui-skin='storybook'] :is(.tab-card, .theme-choice, .appearance-choice, .shop-item, .difficulty-option, .treasure-card) {
   background: url('/assets/ui/storybook/panel.webp') center / 760px 1007px no-repeat;
   color: var(--ui-ink); border-color: #bd9356; box-shadow: 0 2px 4px #5a341c26;

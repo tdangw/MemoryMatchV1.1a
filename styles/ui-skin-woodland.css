@@ -27,11 +27,13 @@ html[data-ui-skin="woodland"] :is(.app-button, .tab-button):active:not(:disabled
 html[data-ui-skin="woodland"] :is(.app-button--primary, .tab-button:not(.tab-button--quiet)):active:not(:disabled) { border-image-source: url('/assets/ui/woodland/green-pressed.webp'); }
 html[data-ui-skin="woodland"] :is(.app-button--danger, .tab-button--danger) { border: 2px solid #cd7358; border-image: none; border-radius: 12px; padding: 10px 14px; background: #a13e32; color: #fff3de; }
 html[data-ui-skin="woodland"] :is(.app-button, .tab-button):disabled { opacity: .6; }
-html[data-ui-skin="woodland"] :is(.app-modal__close, .game-selector__arrow) {
+html[data-ui-skin="woodland"] :is(.app-modal__close, .game-selector__arrow),
+html[data-ui-skin="woodland"] .adventure-page .adventure-exit {
   border-color: transparent; background: url('/assets/ui/woodland/icon-base.webp') center / 100% 100% no-repeat;
   box-shadow: none; color: #fff0c5;
 }
-html[data-ui-skin="woodland"] :is(.app-modal__close, .game-selector__arrow):active:not(:disabled) { filter: brightness(.85); }
+html[data-ui-skin="woodland"] :is(.app-modal__close, .game-selector__arrow):active:not(:disabled),
+html[data-ui-skin="woodland"] .adventure-page .adventure-exit:active:not(:disabled) { filter: brightness(.85); }
 html[data-ui-skin="woodland"] .game-selector__choice { border: 3px solid #b68146; box-shadow: inset 0 1px #ffe8af, 0 4px #492c1f, 0 7px 15px #0005; }
 html[data-ui-skin="woodland"] .game-selector__label { background: none; border: 12px solid transparent; border-image: url('/assets/ui/woodland/nameplate.webp') 48 82 fill / 12px stretch; }
 html[data-ui-skin="woodland"] .game-selector__label strong { color: #fff1c8; }
@@ -45,8 +47,10 @@ html[data-ui-skin="woodland"] :is(#settings-modal, #account-modal, #missions-scr
 html[data-ui-skin="woodland"] .app-modal-overlay .app-modal__title,
 html[data-ui-skin="woodland"] .app-modal__title > .ui-icon,
 html[data-ui-skin="woodland"] #shop-modal .shop-wallet { color: #fff0c5; }
-html[data-ui-skin="woodland"] .adventure-screen > .adventure-exit { background: #67391f; color: #fff0c5; }
-html[data-ui-skin="woodland"] .adventure-exit .ui-icon { color: #fff0c5; }
+html[data-ui-skin="woodland"] .adventure-page .adventure-exit { top: calc(env(safe-area-inset-top) + 8px); width: 44px; min-width: 44px; height: 44px; padding: 0; border-width: 0; border-radius: 50%; }
+html[data-ui-skin="woodland"] .adventure-screen[data-screen] > .adventure-exit { right: max(8px, calc((100% - 640px) / 2 + 8px)); }
+html[data-ui-skin="woodland"] .adventure-map-page .adventure-header > .adventure-exit { right: 8px; }
+html[data-ui-skin="woodland"] .adventure-exit .ui-icon { width: 24px; height: 24px; color: inherit; }
 html[data-ui-skin="woodland"] .app-modal-overlay .app-modal { background: #fff2ce; color: #4b2b18; border: 3px solid #a66e37; border-radius: 20px; box-shadow: 0 3px #4a2818, 0 12px 32px #0005; }
 html[data-ui-skin="woodland"] .app-screen-content .app-modal__body { background: #f9e9c1ed; scrollbar-color: #b78b4d #f4dfae; }
 html[data-ui-skin="woodland"] .app-modal__footer { background: #edd4a2; border-color: #b58b4b66; }

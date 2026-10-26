@@ -261,3 +261,7 @@ Chủ dự án đang thử trực tiếp bản web và sẽ còn chỉnh nhiều
 ### Cập nhật26/10 — kiểm tra theo rủi ro và commit theo phase
 
 Không tự deploy hoặc chạy test sau mỗi lần sửa. Chỉ kiểm tra khi thay đổi hoặc rủi ro thực tế cần đến; các tác vụ không đổi giao diện hay logic chỉ cập nhật code/tài liệu và rà soát diff. Gom commit theo phase hoàn chỉnh, không commit từng chỉnh sửa lẻ. Khi gom lịch sử công việc, giữ riêng task đang làm; không đưa log, ảnh QA, file thử tạm hoặc test không cần thiết vào commit. Quy định trực tiếp này thay yêu cầu chạy check/build mặc định ở mỗi lượt phía trên.
+
+### Cập nhật27/10 — thay icon thuần giao diện
+
+Với lượt chỉ đổi icon, không đổi logic, không chạy test. Chỉ rà soát diff và gom commit theo phase; không tự build/deploy. Đây là yêu cầu trực tiếp bổ sung của chủ dự án.

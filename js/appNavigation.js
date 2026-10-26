@@ -63,7 +63,7 @@ export function decorateAdventureMenu(root, { gameId = null, onHome } = {}) {
   const goHome = () => (onHome || handlers.home)();
   function createExit(owner) {
     const exit = document.createElement('button'); exit.type = 'button'; exit.className = 'adventure-exit';
-    exit.setAttribute('aria-label', 'Thoát về trang chủ'); exit.append(createIcon('exit'));
+    exit.setAttribute('aria-label', 'Đóng, về trang chủ'); exit.append(createIcon('close'));
     owner.listen(exit, 'click', goHome);
     return exit;
   }
