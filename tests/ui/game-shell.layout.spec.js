@@ -44,6 +44,14 @@ async function start(page, game, mode, coordinates = false, level = 1) {
     gameState.settings.mode = mode;
     gameState.settings.boardCoordinates = coordinates;
     await (await import("/tests/ui/helpers/gameNavigation.js")).openReadyGameMenu(id);
+    // Exercise a legitimately unlocked difficulty; keep the product's
+    // progression guard enabled instead of returning to the map mid-fixture.
+    const difficulties=['easy','normal','hard','superHard'],rank=difficulties.indexOf(mode);
+    if(rank>0){
+      const {GAMEPLAY_RULES_VERSION}=await import('/js/progression/gameplayRules.js');
+      const completed=gameState.progress[id==='memory-match'?'memoryMatch':'linkConnect'].bestByLevel;
+      for(const prerequisite of difficulties.slice(0,rank))completed[`${prerequisite}:${level}`]={cleared:true,rulesVersion:GAMEPLAY_RULES_VERSION};
+    }
     if (id === "memory-match") await (await import("/js/gameController.js")).startNewMemoryRun(level);
     else await (await import("/js/linkConnect/linkController.js")).startLinkLevel({ mode, level });
   }, { id: game.id, mode, coordinates, level });
@@ -130,24 +138,16 @@ for (const game of games) for (const mode of modes) for (const coordinates of ga
 }
 
 for (const game of games) {
-  test(`${game.id}: large Challenge, orientation, rapid resize and modal`, async ({ page }) => {
+  test(`${game.id}: large Challenge, orientation, rapid resize and modal`, async ({ page },testInfo) => {
     const errors = [];
     page.on("pageerror", error => errors.push(error.message));
     await start(page, game, "challenge", game.id === "memory-match", 100);
     const originalTiles = await page.locator(`${game.board} ${game.tile}`).elementHandles();
     await assertFit(page, game);
-    await page.setViewportSize({ width: 640, height: 360 });
-    await settle(page);
-    await assertFit(page, game);
-    await page.setViewportSize({ width: 412, height: 915 });
-    await settle(page);
-    await assertFit(page, game);
-    await page.setViewportSize({ width: 914, height: 411 });
-    await settle(page);
-    await assertFit(page, game);
-    await page.setViewportSize({ width: 411, height: 914 });
-    await settle(page);
-    await assertFit(page, game);
+    const sizes=testInfo.project.metadata.portraitOnly
+      ? [{width:412,height:835},{width:412,height:915},{width:320,height:740},{width:411,height:914}]
+      : [{width:640,height:360},{width:412,height:915},{width:914,height:411},{width:411,height:914}];
+    for(const size of sizes){await page.setViewportSize(size);await settle(page);await assertFit(page,game);}
     await page.evaluate(() => { for (let i = 0; i < 50; i++) window.dispatchEvent(new Event("resize")); });
     await settle(page);
     await assertFit(page, game);

@@ -98,3 +98,19 @@ test('replacing or disposing the app owner releases scene bindings even while it
   f.mount();await turn();assert.equal(cleanups,1);assert.equal(page.scope.active,true);
   f.runtime.dispose();assert.equal(f.live,0);assert.equal(f.timers.size,0);assert.equal(f.frames.size,0);
 });
+
+test('layout reconciliation releases meteors before allocating a larger scene',async()=>{
+  const f=fixture();let handles=1,refreshed=false;
+  f.runtime.setMeteorEligible(true);
+  f.mount({prepare:async()=>()=>({diagnostics:()=>({nodes:12,handles}),dispose(){},refresh(){
+    assert.equal(f.runtime.meteorDiagnostics().active,0);
+    handles=5;refreshed=true;
+  }})});
+  await turn();
+  for(let i=0;i<2;i++){const [id,callback]=f.timers.entries().next().value;f.timers.delete(id);callback();}
+  assert.equal(f.runtime.meteorDiagnostics().active,2);
+  f.runtime.refresh();
+  for(const [id,callback]of [...f.frames]){f.frames.delete(id);callback();}
+  assert.equal(refreshed,true);assert.equal(f.runtime.diagnostics().handles,5);
+  assert.equal(f.runtime.diagnostics().lastError,null);assert.equal(f.timers.size,0);f.runtime.dispose();
+});

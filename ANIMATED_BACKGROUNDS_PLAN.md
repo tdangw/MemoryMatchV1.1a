@@ -423,10 +423,15 @@ key setting, Firebase/rules hoặc cổng deploy. Không sửa generated file ta
 | G4 — regression và hiệu suất | UI/lifecycle100chu kỳ,10phút soak, A/B PC+S22; tune giảm chi phí trong budget | Đạt ngưỡng/trace/copy/reduced/safe-area; báo đúng phần tĩnh/chưa đo |
 | G5 — review/bàn giao | Đọc diff riêng, chạy lại critical evidence, check/build, ghi một receipt chung | Không sửa ngoài scope/leak/rác; đủ evidence; không APK/deploy khi chưa yêu cầu riêng |
 
-**Lượt hiện tại chỉ tạo kế hoạch. G0–G5 chưa thực hiện.** Khi giao triển khai
+**Ghi chú lịch sử lúc lập kế hoạch: G0–G5 chưa thực hiện.** Khi giao triển khai
 toàn bộ, đi liên tục qua các gate; chỉ chờ ở G1 khi cần quyết định mỹ thuật
 về mẫu cụ thể hoặc blocker thật. Không tự bắt đầu pilot/asset/runtime từ
 yêu cầu “chỉ lên kế hoạch”. Không tạo receipt/ảnh QA giả trước triển khai.
+
+**Cập nhật triển khai27/10:** G1 đã duyệt; G2–G3 đã commit. G4 đã có
+kiểm chứng PC/portrait,100chu kỳ,soak10phút và A/B; đang chốt G5 review/
+check/build. S22 thật chưa có thiết bị nên chưa nhận đạt phần thiết bị đó.
+Chi tiết/kết quả thật nằm trong `ANIMATED_BACKGROUNDS_IMPLEMENTATION_RECEIPT.md`.
 
 ### Kiểm thử và lệnh dự kiến
 

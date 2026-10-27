@@ -1,9 +1,21 @@
 import { expect, test } from '@playwright/test';
 
+// Exercise the preserved facade independently of Home's approved static scene.
+async function isolateMeteorFacade(page) {
+  await page.locator('.game-selector__choice').first().waitFor();
+  await page.evaluate(async () => {
+    (await import('/js/appPageLifecycle.js')).disposeAppPage();
+    const effects = await import('/js/backgroundEffects.js');
+    effects.setMeteorSceneEligible(true);
+    effects.setMeteorEffectsEnabled(true);
+  });
+}
+
 test('two permanent meteors survive ten minutes and 100 eligibility cycles with one scheduler', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('/');
   await expect(page.locator('.meteor-layer .shooting-star')).toHaveCount(2);
+  await isolateMeteorFacade(page);
   await page.clock.install();
   await page.evaluate(() => { window.meteorNodes = [...document.querySelectorAll('.shooting-star')]; });
   await page.clock.runFor(600000);
@@ -19,6 +31,7 @@ test('two permanent meteors survive ten minutes and 100 eligibility cycles with 
     return { ...effects.getMeteorDiagnostics(), same: window.meteorNodes.every((node, i) => node === document.querySelectorAll('.shooting-star')[i]) };
   });
   expect(diagnostics).toMatchObject({ nodes: 2, timers: 1, same: true });
+  await page.evaluate(async () => (await import('/js/gameSelector.js')).showGameSelector());
   await page.locator('[data-dock-action="ranking"]').click();
   expect(await page.evaluate(async () => (await import('/js/backgroundEffects.js')).getMeteorDiagnostics())).toMatchObject({ active: 0, timers: 0, eligible: false });
   await page.locator('.adventure-exit').click();
@@ -33,6 +46,7 @@ test('two permanent meteors survive ten minutes and 100 eligibility cycles with 
 test('real animation returns to idle and rapid cancellation leaves no active resources', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('/');
+  await isolateMeteorFacade(page);
   await expect(page.locator('.shooting-star[data-state="ACTIVE"]')).toHaveCount(1, { timeout: 10000 });
   expect(await page.evaluate(() => { const node = document.querySelector('.shooting-star[data-state="ACTIVE"]'); node.dispatchEvent(new AnimationEvent('animationend', { bubbles: true, animationName: 'shooting' })); return node.dataset.state; })).toBe('ACTIVE');
   await expect(page.locator('.shooting-star[data-state="ACTIVE"]')).toHaveCount(0, { timeout: 3000 });
@@ -63,14 +77,14 @@ test('100 real Home/map/game switches preserve pool and block every game startup
       await navigation.openReadyGameMenu(game);
       if (!effects.getMeteorDiagnostics().eligible) throw new Error('Map is ineligible');
       let ready;
-      if (game === 'memory-match') ready = (await import('/js/gameController.js')).startNewMemoryRun(1);
-      else if (game === 'link-connect') ready = (await import('/js/linkConnect/linkController.js')).startLinkLevel({ mode: 'easy', level: 1 });
+      if (game === 'memory-match') ready = (await import('/js/gameController.js')).startNewMemoryRun(1,{skipIntro:true});
+      else if (game === 'link-connect') ready = (await import('/js/linkConnect/linkController.js')).startLinkLevel({ mode: 'easy', level: 1,skipIntro:true });
       else ready = (await import('/js/tripleConnect/tripleController.js')).startTripleConnectRound({ mode: 'easy', skipIntro: true });
       if (effects.getMeteorDiagnostics().timers || effects.getMeteorDiagnostics().active) throw new Error('Startup meteor resource');
       await ready;
       if (effects.getMeteorDiagnostics().eligible) throw new Error('Gameplay is eligible');
       selector.showGameSelector();
-      if (!effects.getMeteorDiagnostics().eligible) throw new Error('Home is ineligible');
+      if (effects.getMeteorDiagnostics().eligible) throw new Error('Static Home is eligible');
     }
     return nodes.every((node, i) => node === document.querySelectorAll('.shooting-star')[i]);
   });
@@ -82,6 +96,7 @@ test('ten-minute real animation soak returns heap and nodes to a bounded baselin
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('/');
   await expect(page.locator('.meteor-layer')).toHaveCount(1);
+  await isolateMeteorFacade(page);
   const cdp = await page.context().newCDPSession(page);
   await cdp.send('HeapProfiler.enable');
   await page.evaluate(() => { window.soakNodes = [...document.querySelectorAll('.shooting-star')]; window.meteorCompletions = 0; document.querySelector('.meteor-layer').addEventListener('animationend', () => window.meteorCompletions++); });

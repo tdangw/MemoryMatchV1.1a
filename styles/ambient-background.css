@@ -1,10 +1,12 @@
-/* G1 candidates: imported only by the separate review entry. */
+/* Shared native timelines; product scenes import this lazily. */
 .ambient-bg-pilot, .ambient-bg-host { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
-.ambient-bg-map { position: absolute; inset: auto 0 auto; z-index: 0; overflow: hidden; }
+.ambient-bg-map { position: absolute; inset: auto; z-index: 0; overflow: hidden; --ambient-bg-water-opacity: .2; --ambient-bg-water-ink: #cfebff; --ambient-bg-leaf-color: #b9c58b; }
 .ambient-bg-region { position: absolute; overflow: hidden; pointer-events: none; contain: layout paint; }
-.ambient-bg-water { position: absolute; top: 0; width: 100%; height: calc(100% + 32px); opacity: .14; background: repeating-linear-gradient(180deg, transparent 0 10px, #cfebff80 13px, transparent 16px 32px); border-radius: 50%; }
-.ambient-bg-fish, .ambient-bg-leaf { position: absolute; width: 20px; height: 13px; opacity: 0; }
+/* The wrapper clips the stream. Keep the moving texture periodic, including
+   its edges, so translateY(-32px) and translateY(0) join without a width pulse. */
+.ambient-bg-water { position: absolute; top: 0; width: 100%; height: calc(100% + 32px); opacity: var(--ambient-bg-water-opacity, .14); background: repeating-linear-gradient(180deg, transparent 0 10px, var(--ambient-bg-water-ink, #cfebff80) 13px, transparent 16px 32px); }
+.ambient-bg-fish, .ambient-bg-leaf { position: absolute; opacity: 0; transform-origin: center; }
 .ambient-bg-fish { fill: #789da6; }
-.ambient-bg-leaf { width: 12px; height: 9px; fill: var(--ambient-bg-leaf-color, #9aaf71); stroke: #58734d; stroke-width: 1px; }
-.ambient-bg-firefly { position: absolute; width: 5px; height: 5px; opacity: 0; border-radius: 50%; background: radial-gradient(circle, #fff5bf 0, #d9dc8560 35%, transparent 70%); }
+.ambient-bg-leaf { fill: var(--ambient-bg-leaf-color, #9aaf71); stroke: #58734d; stroke-width: 1px; }
+.ambient-bg-firefly { position: absolute; opacity: 0; border-radius: 50%; background: radial-gradient(circle, #fff5bf 0, #d9dc8560 35%, transparent 70%); }
 @media (prefers-reduced-motion: reduce) { .ambient-bg-pilot, .ambient-bg-host { display: none; } }

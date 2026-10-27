@@ -22,6 +22,7 @@ import {
 import { mountAdventureMap } from "./adventureMap.js";
 import { decorateAdventureMenu } from "./appNavigation.js";
 import { mountHomeAmbient } from './background/bindings.js';
+import { refreshAmbientBackground } from './backgroundEffects.js';
 
 const HOME_ART = Object.freeze({
   'memory-match': 'memory-match-v2.webp',
@@ -183,11 +184,13 @@ export function openGameMenu(gameId) {
       if (activeGameId !== gameId || backgroundStatus === "cancelled") return;
       document.documentElement.dataset.activeGame = gameId;
       if (backgroundStatus === "ready") completeGameBackgroundTransition();
+      refreshAmbientBackground();
     })
     .catch((error) => {
       if (activeGameId !== gameId) return;
       cancelGameBackgroundTransition();
       document.documentElement.dataset.activeGame = gameId;
+      refreshAmbientBackground();
       console.error("Game menu background transition failed", error);
     });
   return true;

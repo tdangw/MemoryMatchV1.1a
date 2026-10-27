@@ -41,14 +41,9 @@ body {
   background-size: cover;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 220ms ease-out;
 }
 
 .game-background-transition.is-visible { opacity: 1; }
-
-@media (prefers-reduced-motion: reduce) {
-  .game-background-transition { transition: none; }
-}
 
 html[data-active-game="memory-match"] body {
   background-image: url("/assets/images/backgrounds/memory-match.webp");

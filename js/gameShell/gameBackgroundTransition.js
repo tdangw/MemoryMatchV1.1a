@@ -19,6 +19,7 @@ const GAME_BACKGROUNDS = Object.freeze({
 
 const preloadCache = new Map();
 export const BACKGROUND_LOAD_DEADLINE_MS = 8000;
+const BACKGROUND_FADE_MS = 220;
 let transitionRevision = 0;
 let settlePendingTransition = null;
 
@@ -122,25 +123,35 @@ function getTransitionLayer() {
 
 function fadeInLayer(layer, revision) {
   return new Promise((resolve) => {
+    const events = new AbortController();
+    const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let animation = null;
     const settle = (completed) => {
       if (settlePendingTransition !== settle) return;
       settlePendingTransition = null;
-      layer.removeEventListener("transitionend", onTransitionEnd);
+      events.abort();
+      completed = completed && revision === transitionRevision;
+      if (completed) layer.classList.add('is-visible');
+      if (animation) animation.cancel();
       resolve(completed);
-    };
-    const onTransitionEnd = (event) => {
-      if (event.target === layer && event.propertyName === "opacity") settle(true);
     };
     settlePendingTransition?.(false);
     settlePendingTransition = settle;
-    layer.addEventListener("transitionend", onTransitionEnd);
-    requestAnimationFrame(() => {
-      if (revision !== transitionRevision) {
-        settle(false);
-        return;
-      }
-      layer.classList.add("is-visible");
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) settle(true);
+    if (revision !== transitionRevision) { settle(false); return; }
+    if (motion.matches || typeof layer.animate !== 'function') { settle(true); return; }
+    // Native completion does not depend on the browser observing an initial
+    // CSS style frame. No forced style flush or double-RAF navigation race.
+    animation = layer.animate([{opacity:0},{opacity:1}], {duration:BACKGROUND_FADE_MS,easing:'ease-out',fill:'forwards'});
+    void animation.finished.then(() => settle(true), error => {
+      if (error.name !== 'AbortError') console.warn('Background fade unavailable', error.name);
+      // The decoded image is still usable if its live fade is unavailable.
+      // Owner cancellation already cleared settlePendingTransition/revision.
+      settle(revision === transitionRevision);
     });
+    const options = {signal:events.signal};
+    motion.addEventListener('change', event => { if (event.matches) animation.finish(); }, options);
+    document.addEventListener('visibilitychange', () => { if (document.hidden) animation.finish(); }, options);
+    window.addEventListener('pagehide', () => animation.finish(), options);
+    if (document.hidden) animation.finish();
   });
 }

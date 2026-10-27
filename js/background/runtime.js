@@ -76,7 +76,7 @@ export function createBackgroundRuntime({ view, document: doc, meteor, report = 
       if (!scene) {
         const owner = current;
         const actor = ++actorRevision;
-        try { scene = current.factory({ requestRefresh: () => { if (current === owner && actor === actorRevision) requestRefresh(owner.scope); }, onError: error => { if (actor === actorRevision) fail(owner, error); }, maxHandles: eligible && current.reserveMeteors ? limit - 2 : limit }); }
+        try { scene = current.factory({ requestRefresh: () => { if (current === owner && actor === actorRevision) requestRefresh(owner.scope); }, onError: error => { if (actor === actorRevision) fail(owner, error); }, maxHandles: limit }); }
         catch (error) { fail(current, error); return; }
       }
       const data = scene.diagnostics();
@@ -95,6 +95,9 @@ export function createBackgroundRuntime({ view, document: doc, meteor, report = 
       frame = undefined;
       if (!baseAllowed() || suspended()) { reconcile(); return; }
       if (scene) {
+        // A new layout may use every slot. Release meteors before allocating
+        // replacements so even the reconcile batch stays within Light.
+        meteor.cancel();
         try { scene.refresh(); } catch (error) { fail(current, error); return; }
       }
       reconcile();
@@ -154,8 +157,8 @@ export function createBackgroundRuntime({ view, document: doc, meteor, report = 
     setMeteorEligible(value) { eligible = Boolean(value); reconcile(); },
     meteorDiagnostics() { return { ...meteor.diagnostics(), timers: timer === undefined ? 0 : 1, eligible: Boolean(meteorAllowed()) }; },
     diagnostics() {
-      const data = scene ? scene.diagnostics() : { nodes: 0, handles: 0 }, meteors = meteor.diagnostics();
-      return { ...data, state, quality: 'light', scenes: scene ? 1 : 0, scene: current ? current.kind : null,
+      const data = scene ? scene.diagnostics() : { nodes: 0, handles: 0, observers: 0 }, meteors = meteor.diagnostics();
+      return { ...data, state, quality: 'light', scenes: scene && data.handles ? 1 : 0, sceneInstances: scene ? 1 : 0, scene: current ? current.kind : null,
         sceneHandles: data.handles, handles: data.handles + meteors.active, timers: timer === undefined ? 0 : 1,
         listeners: (state === 'DISPOSED' ? 0 : view.visualViewport ? 9 : 7) + (current && current.bindingListeners || 0),
         pendingFrames: frame === undefined ? 0 : 1, blockers: blockers.size, preparing: current?.status === 'PREPARING' ? 1 : 0,

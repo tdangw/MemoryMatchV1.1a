@@ -86,7 +86,8 @@
 }
 .adventure-map-page .adventure-header { display: grid; grid-template-columns: minmax(0, 1fr); height: calc(60px + env(safe-area-inset-top)); padding: env(safe-area-inset-top) 56px 0; background: linear-gradient(#041923fc, #071f29f7); border-bottom: 1px solid #d9bc6e38; }
 .adventure-map-title { min-height: var(--shell-title-min-height); margin: 0; color: #ffd166; font: 900 clamp(var(--shell-title-font-min), var(--shell-title-font-fluid), var(--shell-title-font-max)) / var(--shell-title-line-height) "Trebuchet MS", "Segoe UI", sans-serif; letter-spacing: var(--shell-title-letter-spacing); text-align: center; text-shadow: 0 3px 0 #7a451c; }
-.adventure-map-scroll { overflow-y: auto; overflow-x: hidden; min-height: 0; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #557587 transparent; }
+.adventure-map-scroll { position: relative; overflow-y: auto; overflow-x: hidden; min-height: 0; overscroll-behavior: contain; scrollbar-width: none; }
+.adventure-map-scroll::-webkit-scrollbar { display: none; }
 .adventure-map-trail { position: relative; width: min(100%, 440px); margin: auto; background: linear-gradient(to bottom, #082333, transparent 12%, transparent 88%, #082333), url('/assets/adventure/moonlit-garden.webp'); background-position: center top; background-size: 440px var(--adventure-map-texture-height, 660px); background-repeat: repeat-y; }
 .adventure-map-path { position: absolute; inset: 0; height: 100%; width: 100%; pointer-events: none; }
 .adventure-map-path path { fill: none; stroke: #477d8ce6; stroke-width: 11; stroke-linecap: round; stroke-linejoin: round; }

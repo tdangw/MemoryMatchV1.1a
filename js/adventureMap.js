@@ -64,7 +64,7 @@ export function mountAdventureMap(gameId) {
   document.body.append(root);
   void ensureUiSkinRewards();
   const scope = decorateAdventureMenu(root, { gameId });
-  mountMapAmbient(scope, root, trail, scroll);
+  const ambient = mountMapAmbient(scope, root, trail, scroll);
   root.classList.add("game-shell-tokens");
   const title = document.createElement("h1");
   title.className = "adventure-map-title";
@@ -90,6 +90,7 @@ export function mountAdventureMap(gameId) {
   scope.listen(treasureCard, "click", () => { if (!loading) openChest({chestNumber:Number(treasureCard.dataset.block)}); });
   function setBusy(busy) {
     loading = busy;
+    ambient.setPaused(busy || root.dataset.mapReady !== 'true');
     for (const control of specials.children) control.disabled = busy;
     treasureCard.disabled = busy;
     for (const control of document.querySelectorAll('#adventure-level-modal input')) {
@@ -281,6 +282,7 @@ export function mountAdventureMap(gameId) {
     patchNodes();
     body.removeAttribute("aria-busy");
     root.dataset.mapReady = "true";
+    ambient.setPaused(false);
     refreshAmbientBackground(scope);
     if (pendingTreasure !== null) { const block = pendingTreasure; pendingTreasure = null; openChest({chestNumber:block}); }
     if (view.anchor) {

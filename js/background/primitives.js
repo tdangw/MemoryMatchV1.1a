@@ -1,10 +1,13 @@
+import { boundedSpriteMotion } from './geometry.js';
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
 /** Native timelines, finite slots. Shared by the approved review and product scenes. */
 export function createRegionRenderer({ document: doc, parent = doc.body, map = false, maxHandles, onError = console.error }) {
   let host = doc.createElement('div');
   host.className = `ambient-bg-host ${map ? 'ambient-bg-map' : 'ambient-bg-body'}`;
-  host.setAttribute('aria-hidden', 'true'); parent.prepend(host);
+  host.setAttribute('aria-hidden', 'true');
+  const attach = () => map ? parent.append(host) : parent.prepend(host);
+  attach();
   let handles = [], kinds = [], generation = 0, signature = null;
   function clear() {
     generation++;
@@ -16,7 +19,9 @@ export function createRegionRenderer({ document: doc, parent = doc.body, map = f
     const identity = generation, animation = node.animate(frames, options);
     handles.push(animation);
     void animation.finished.catch(error => {
-      if (host && generation === identity && error.name !== 'AbortError') onError(error);
+      // Owned cancellation advances generation before cancelling. A rejection
+      // in the live generation is unexpected, including AbortError.
+      if (host && generation === identity) onError(error);
     });
   }
   return {
@@ -27,8 +32,8 @@ export function createRegionRenderer({ document: doc, parent = doc.body, map = f
       const next = JSON.stringify([selected, geometry]);
       if (signature === next && host.isConnected) return;
       clear(); signature = next;
-      if (!host.isConnected) parent.prepend(host);
-      if (geometry) Object.assign(host.style, { top: `${geometry.top}px`, width: `${geometry.width}px`, height: `${geometry.height}px` });
+      if (!host.isConnected) attach();
+      if (geometry) Object.assign(host.style, { left: `${geometry.left || 0}px`, top: `${geometry.top}px`, width: `${geometry.width}px`, height: `${geometry.height}px` });
       for (const { region, rect } of selected) {
         const wrapper = doc.createElement('div'); wrapper.className = `ambient-bg-region ambient-bg-region--${region.kind}`;
         Object.assign(wrapper.style, { left: `${rect.x}px`, top: `${rect.y}px`, width: `${rect.width}px`, height: `${rect.height}px` });
@@ -41,6 +46,8 @@ export function createRegionRenderer({ document: doc, parent = doc.body, map = f
         }
         const node = region.kind === 'firefly' ? doc.createElement('div') : doc.createElementNS(SVG_NS, 'svg');
         node.classList.add(`ambient-bg-${region.kind}`);
+        const motion=boundedSpriteMotion(region.kind,rect,map);
+        Object.assign(node.style,{width:`${motion.width}px`,height:`${motion.height}px`,left:`${motion.left}px`,top:`${motion.top}px`});
         if (region.kind !== 'firefly') {
           node.setAttribute('viewBox', '0 0 32 20'); node.setAttribute('focusable', 'false');
           const path = doc.createElementNS(SVG_NS, 'path');
@@ -50,7 +57,7 @@ export function createRegionRenderer({ document: doc, parent = doc.body, map = f
         }
         wrapper.append(node);
         const leaf = region.kind === 'leaf', fish = region.kind === 'fish';
-        const end = leaf ? `translate(8px, ${Math.max(4, rect.height - 14)}px) rotate(55deg)` : fish ? `translate(${Math.max(4, rect.width - 22)}px, 3px) rotate(-4deg)` : 'translate(9px, 12px)';
+        const end = `translate(${motion.endX}px, ${motion.endY}px) rotate(${motion.rotation}deg)`;
         animate(node, [
           { transform: 'translate(0, 0)', opacity: 0, offset: 0 },
           { transform: 'translate(0, 0)', opacity: fish ? .24 : .34, offset: .02 },

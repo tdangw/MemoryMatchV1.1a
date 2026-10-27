@@ -32,14 +32,18 @@ for(const motion of ['reduce','no-preference']) test(`wave notice follows board 
 
 
 for(const gameId of ['memory-match','link-connect','triple-connect']) for(const motion of ['reduce','no-preference']) {
-  test(`${gameId} reveals spatial layers without a board flash (${motion})`,async({page})=>{
+  test(`${gameId} reveals spatial layers without a board flash (${motion})`,async({page},testInfo)=>{
     await page.emulateMedia({reducedMotion:motion});await page.goto('/');
     await page.evaluate(async id=>{
       await(await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu(id);
       await(await import('/tests/ui/helpers/progressionFixtures.js')).startProgressionScene(id);
     },gameId);
     await expect(page.locator('.progression-wave-notice')).toHaveCount(0,{timeout:4000});
-    for(const [width,height] of [[320,568],[412,915],[844,390],[1024,900]]) {
+    const sizes=testInfo.project.metadata.portraitOnly
+      ? [[320,568],[412,915],[412,835],[900,1024]]
+      : [[320,568],[412,915],[844,390],[1024,900]];
+    await testInfo.attach('wave-viewports',{body:JSON.stringify(sizes),contentType:'application/json'});
+    for(const [width,height] of sizes) {
       await page.setViewportSize({width,height});
       for(let direction=0;direction<4;direction++) {
         const result=await page.evaluate(async({gameId,direction})=>{
