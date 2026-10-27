@@ -44,7 +44,7 @@ test("Triple retains its saved session on reload and starts a fresh board only w
   await expect(page.locator('#menu-container')).not.toContainText('Tiếp tục');
   expect(await page.evaluate(async () => (await import('/js/sessionProgress.js')).getActiveSession('triple-connect','normal').seed)).toBe(session.seed);
   await startMapLevel(page, 1, 'normal');
-  await expect(page.locator('[data-triple-level]')).toHaveText('1');
+  await expect(page.locator('[data-triple-level]')).toHaveText('1-1');
   await expect.poll(() => page.evaluate(async () => (await import('/js/sessionProgress.js')).getActiveSession('triple-connect','normal')?.seed)).not.toBe(session.seed);
 });
 
@@ -90,7 +90,7 @@ test("Triple win settles once, clears Continue, and Next starts the following le
   expect(terminal).toBeNull();
   await page.getByRole("button", { name: "Màn tiếp theo" }).click();
   await expect(page.locator("[data-triple-total-stars]")).toHaveText("3");
-  await expect(page.locator("[data-triple-level]")).toHaveText("2");
+  await expect(page.locator("[data-triple-level]")).toHaveText("2-1");
   await expect(page.locator("#triple-round-start-modal")).toHaveCount(0, { timeout: 4000 });
   const nextSession = await page.evaluate(async () =>
     (await import("/js/sessionProgress.js")).getActiveSession(
@@ -324,7 +324,7 @@ test("Triple Endless advances without resetting accumulated elapsed time", async
   await advanceSeconds(page.clock, 5);
   await winActiveTripleRound(page, page.clock);
   await page.getByRole("button", { name: "Tiếp tục" }).click();
-  await expect(page.locator("[data-triple-level]")).toHaveText("5");
+  await expect(page.locator("[data-triple-level]")).toHaveText("5-1");
   await page.clock.fastForward(2500);
   await expect(page.locator("#triple-round-start-modal")).toHaveCount(0);
   const session = await page.evaluate(async () =>
@@ -351,7 +351,7 @@ test("Triple Challenge advances deterministically through its staged timer and c
   await expect(page.locator("[data-triple-timer]")).toHaveText("01:15");
   await winActiveTripleRound(page);
   await page.getByRole("button", { name: "Màn tiếp theo" }).click();
-  await expect(page.locator("[data-triple-level]")).toHaveText("2");
+  await expect(page.locator("[data-triple-level]")).toHaveText("2-1");
   await expect(page.locator("[data-triple-timer]")).toHaveText("01:25");
   await expect(page.locator("#triple-round-start-modal")).toHaveCount(0, { timeout: 4000 });
   const levelTwo = await page.evaluate(async () =>
@@ -368,7 +368,7 @@ test("Triple Challenge advances deterministically through its staged timer and c
   await expect(page.locator("[data-triple-timer]")).toHaveText("03:30");
   await winActiveTripleRound(page);
   await page.getByRole("button", { name: "Màn tiếp theo" }).click();
-  await expect(page.locator('[data-triple-level]')).toHaveText('8');
+  await expect(page.locator('[data-triple-level]')).toHaveText('8-1');
   // HUD mounts before the intro completes and the playable session is persisted.
   await expect(page.locator('#triple-round-start-modal')).toHaveCount(0, { timeout: 4000 });
   await expect.poll(() => page.evaluate(async () => (await import('/js/sessionProgress.js')).getActiveSession('triple-connect', 'challenge')?.level)).toBe(8);
@@ -465,7 +465,7 @@ test("Triple cancels a settling round before restart so its stale callback canno
     );
   });
   await expect(page.locator("#triple-round-summary-modal")).toHaveCount(0);
-  await expect(page.locator("[data-triple-level]")).toHaveText("2");
+  await expect(page.locator("[data-triple-level]")).toHaveText("2-1");
   const session = await page.evaluate(async () =>
     (await import("/js/sessionProgress.js")).getActiveSession(
       "triple-connect",
