@@ -6,6 +6,7 @@ import { pendingAchievements, achievementAssetUrl } from './achievementModel.js'
 import { getRankingOwner } from '../rankingOwner.js';
 import { sameRankingOwner } from '../progressRankingModel.js';
 import { getAppPageScope } from '../appPageLifecycle.js';
+import { CHEST_NAMES } from '../liveops/chestConfig.js';
 const names = { 'memory-match': 'Memory Match', 'link-connect': 'Link Connect', 'triple-connect': 'Triple Connect' };
 const types = { avatar: 'Ảnh đại diện', frame: 'Khung viền', badge: 'Huy hiệu', 'effect-cover': 'Hiệu ứng' };
 
@@ -18,9 +19,11 @@ export async function presentAchievementAnnouncements({ owner = getAppPageScope(
     if (!current()) return false;
     const profile = item.type !== 'effect-cover', gameName = names[item.gameId];
     const seen = gameState.appearance.achievements.hintsSeen[item.type];
-    const firstHint = seen ? '' : profile ? 'Chạm ảnh đại diện trong Hồ sơ để thay đổi.' : `Bạn có thể chọn hiệu ứng trong Bộ sưu tập ${gameName}.`;
-    const content = createAchievementNoticeContent({ gameName, level: item.level, name: item.name, category: types[item.type],
-      type: item.type, image: achievementAssetUrl(item), firstHint, storedIn: profile ? 'Đã thêm vào Hồ sơ' : `Đã thêm vào Bộ sưu tập ${gameName}` });
+    const firstHint = item.grant.chestType ? 'Mở Bộ sưu tập → Kho rương để xem quà và mở khi bạn muốn.' : seen ? '' : profile ? 'Chạm ảnh đại diện trong Hồ sơ để thay đổi.' : `Bạn có thể chọn hiệu ứng trong Bộ sưu tập ${gameName}.`;
+    const content = createAchievementNoticeContent({ gameName, level: item.level, name: item.grant.chestType ? CHEST_NAMES[item.grant.chestType] : item.name,
+      category: item.grant.chestType ? 'Mở rương để khám phá quà bên trong' : types[item.type],
+      type: item.type, image: item.grant.chestType ? null : achievementAssetUrl(item), firstHint,
+      storedIn: item.grant.chestType ? 'Đã thêm vào Kho rương trong Bộ sưu tập' : profile ? 'Đã thêm vào Hồ sơ' : `Đã thêm vào Bộ sưu tập ${gameName}` });
     const error = document.createElement('p'); error.setAttribute('role', 'alert'); content.append(error);
     let continued = false;
     const modal = openAppModal({ id: 'achievement-notice-modal', title: 'Thành tích hoàn tất', content, owner,

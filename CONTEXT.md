@@ -297,3 +297,4 @@ Chủ dự án đã yêu cầu deploy rules và bật môi trường thật đ�
 
 - Nguồn active: EVENTS_MOBILE_FESTIVAL_PLAN.md, giao toàn bộ P0–Q1 và commit từng phase. Chủ dự án đã duyệt toàn bộ đề xuất còn lại P0 trong chat: 50/100 Xu, subpool chia đều, đầy 999 giữ candidate, pool Thành tích/chữ/event bỏ starter/effect, loại rương chữ lặp 12 slot, trong ván chỉ xem, SVG tĩnh khu vườn đêm. Receipt chung EVENTS_MOBILE_FESTIVAL_RECEIPT.md. Các đoạn chỉ lập kế hoạch ở trên là lịch sử; không tự deploy/rules live/APK/push và không trộn task thẻ đặc biệt.
 
+- Đính chính trực tiếp khi triển khai: bỏ 12 slot/cursor luân phiên. Mapping thưởng chữ cố định đã được chủ dự án duyệt: MEMORY MATCH→Rương Avatar, LINK CONNECT→Rương Khung, TRIPLE CONNECT→Rương Huy hiệu, ADVENTURE→Rương Avatar. Quà bên trong vẫn theo bảng rương chung.

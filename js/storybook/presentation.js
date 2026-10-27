@@ -39,7 +39,7 @@ export function createCosmeticPortrait({ avatar, frame, badge, label = 'Ảnh đ
 export function createAchievementNoticeContent({ gameName, level, name, category, image, type = 'item', firstHint = '', storedIn }) {
   const content = element('div', 'storybook-achievement');
   const hero = element('div', 'storybook-achievement__hero'); hero.dataset.kind = type;
-  hero.append(picture(image, 'storybook-achievement__hero-image', name));
+  hero.append(image ? picture(image, 'storybook-achievement__hero-image', name) : createIcon('chest'));
   content.append(element('p', 'storybook-achievement__source', `${gameName} · Màn ${level}`),
     element('p', 'storybook-achievement__condition', 'Đã hoàn thành cả bốn độ khó'),
     hero,

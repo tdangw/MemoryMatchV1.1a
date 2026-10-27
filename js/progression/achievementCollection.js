@@ -1,3 +1,4 @@
+import { festivalChestsEnabled } from '../liveops/availability.js';
 import { gameState } from '../gameState.js';
 import { getGameProgressKey, getGameDefinition } from '../gameCatalog.js';
 import { loadPersistentChapter } from '../persistence.js';
@@ -11,7 +12,7 @@ import { refreshAppWallet } from '../appNavigation.js';
 import { canLaunchGame } from '../profileOperations.js';
 import { playOwnedRewardCue } from '../sound.js';
 
-export function renderAchievementCollection(container, gameId, { block: requestedBlock, owner } = {}) {
+export function renderAchievementCollection(container, gameId, { block: requestedBlock, owner, onOpenChests } = {}) {
   const key = getGameProgressKey(gameId), profile = gameState.progress[key];
   const root = document.createElement('section'); root.className = 'achievement-collection';
   container.className = 'achievement-collection-panel'; container.replaceChildren(root);
@@ -55,6 +56,7 @@ export function renderAchievementCollection(container, gameId, { block: requeste
       }
       const navigation = document.createElement('nav'); navigation.setAttribute('aria-label', 'Chọn nhóm thưởng');
       navigation.append(control('Nhóm trước', block <= 1, () => { block--; void render(); }), control('Nhóm sau', block >= maxBlock, () => { block++; void render(); }));
+      if(festivalChestsEnabled()&&onOpenChests)navigation.append(control('Xem Kho rương',false,onOpenChests));
       group.append(navigation); root.replaceChildren(content, group);
     } catch (error) {
       if (current() && token === generation) root.replaceChildren(document.createTextNode('Chưa tải được Thành tích. Hãy thử lại.'), control('Thử lại', false, () => void render()));

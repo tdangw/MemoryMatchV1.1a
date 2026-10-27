@@ -1,5 +1,6 @@
 import { TRIPLE_PRODUCT_DECISIONS } from './tripleConnect/tripleConfig.js';
 import { liveopsEnabled } from './liveops/availability.js';
+import { festivalChestsEnabled } from './liveops/availability.js';
 import { normalizeSparkSave, applySpecialDrop } from './liveops/sparkModel.js';
 import {
   openChapterDatabase, readChapterProfile, writeChapterProfile,
@@ -144,9 +145,9 @@ export function savePersistentGameData({ coins, appearance, progress, settings, 
         envelope.data.appearance, patch.progress || {});
       let specialDrop=null;
       if (dropAttempt && liveopsEnabled()) {
-        const dropped = applySpecialDrop(envelope.data.appearance.spark, dropAttempt);
+        const dropped = applySpecialDrop(envelope.data.appearance.spark, dropAttempt,{dropFireflies:festivalChestsEnabled()});
         envelope.data.appearance.spark = dropped.save;
-        specialDrop={letter:dropped.letter,ticket:dropped.dropped};
+        specialDrop={letter:dropped.letter,ticket:dropped.dropped,firefly:dropped.firefly};
       }
       if (settledRewardFact) {
         const item = settledRewardFact; item.fact = normalizeFact(item.fact);

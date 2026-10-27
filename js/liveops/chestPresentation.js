@@ -6,10 +6,11 @@ import { getAccountService } from '../accountService.js';
 import { CHEST_TYPES, CHEST_NAMES, CHEST_POLICY, CHEST_ITEMS, CHEST_POOLS } from './chestConfig.js';
 import { createIcon } from '../icons.js';
 import { refreshAppWallet } from '../appNavigation.js';
+import { ownedProfileCosmeticItems } from '../progression/achievementModel.js';
 import '../../styles/liveops.css';
 
 /** A collection-owned child view. Closing presentation never cancels a committed reward. */
-export function mountChestInventory(host, { owner, back, gameId = 'memory-match' }) {
+export function mountChestInventory(host, { owner, back, profile, gameId = 'memory-match' }) {
   const scope = createGameShellLifecycle(), release = owner.own(() => scope.dispose());
   const identity = getAccountService()?.getIdentity();
   const current = () => scope.active && host.isConnected && getAccountService()?.getIdentity()?.profileId === identity?.profileId && getAccountService()?.getIdentity()?.uid === identity?.uid;
@@ -17,6 +18,7 @@ export function mountChestInventory(host, { owner, back, gameId = 'memory-match'
   status.setAttribute('role', 'status'); root.append(action('Quay lại Bộ sưu tập', back), status); host.replaceChildren(root);
   let view = null, busy = false, connected = false, selected = null, page = 0;
   const cards = node('div', 'liveops__chest-grid'), detail = node('section', 'liveops__card'); root.append(cards, detail);
+  if (profile) root.append(action('Xem trong Hồ sơ', profile));
   function render() {
     const focus = document.activeElement?.dataset.focusKey;
     cards.replaceChildren(); detail.replaceChildren();
@@ -71,12 +73,18 @@ export function mountChestInventory(host, { owner, back, gameId = 'memory-match'
   async function load() {
     if (busy) return; busy = true;
     try {
-      const result = getActiveGameScope() ? { state: (await loadPersistentGameData()).appearance.spark?.state } : await requestLiveops();
+      let result;
+      if (getActiveGameScope() || !navigator.onLine) {
+        const data = await loadPersistentGameData();
+        result = data.appearance.spark?.ownerUid === identity?.uid ? { state:data.appearance.spark.state, ownedItemIds:ownedProfileCosmeticItems(data.appearance).map(item=>item.id) } : {state:null};
+      } else result = await requestLiveops();
       if (!current()) return;
       view = result; connected = navigator.onLine && !getActiveGameScope(); status.textContent = result.state?.chests ? 'Kho rương' : 'Kho rương sắp mở.';
     } catch { connected = false; if (current()) status.textContent = 'Chưa tải được Kho rương. Hãy kết nối và thử lại.'; }
     finally { busy = false; if (current()) render(); }
   }
+  scope.listen(window,'offline',()=>{connected=false;if(current())render();});
+  scope.listen(window,'online',()=>{if(current())void load();});
   root.append(action('Tải lại Kho rương', () => void load())); void load();
   return () => { scope.dispose(); release.forget(); };
 }

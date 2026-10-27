@@ -19,7 +19,7 @@ async function commit(command={type:'status'}, options={}) {
   const old=options.state??state,copy=structuredClone(options.snapshot||saved),expected=options.revision??revision;
   const owned=Object.values(copy.profile.data.appearance.acquisitions?.grants||{}).flatMap(grant=>grant.items);
   const result=transitionSpark(old,command,{uid,now,festivalEnabled:options.enabled??true,fireflyEarned:options.earned??old?.festival?.earnedTotal??0,
-    ticketEarned:old?.ticketEarned||0,letterEarned:options.letters||old?.letters.earned||{},ownedItemIds:owned});
+    ticketEarned:old?.ticketEarned||0,letterEarned:options.letters||old?.letters.earned||{},ownedItemIds:owned,sourceEarned:options.sourceEarned});
   result.state.revision=(old?.revision||0)+1;
   const grants=copy.profile.data.appearance.acquisitions||{version:1,grants:{}};
   for(const receipt of result.receipts){copy.profile.data.coins+=receipt.coins;if(receipt.acquisition)grants.grants[receipt.receiptId]={...receipt.acquisition,receiptId:receipt.receiptId,ownerUid:uid,grantedAt:now};}
@@ -36,6 +36,9 @@ try {
   now=(await confirmSparkClock(db,space,uid,()=>true)).timestamp;
   // Existing account first migrates without changing legacy reward rights.
   accept(await commit({type:'status'},{enabled:false}));accept(await commit());
+  accept(await commit({type:'status'},{sourceEarned:{c:0,avatar:1,frame:1,badge:1}}));
+  const sourceReplay = transitionSpark(state,{type:'status'},{uid,now,festivalEnabled:true,sourceEarned:{c:0,avatar:1,frame:1,badge:1}});
+  assert.deepEqual(sourceReplay.state.chests,state.chests);
   accept(await commit({type:'status'},{earned:130}));
   for(const points of [100,75,50,25])accept(await commit({type:'claimFestival',cycle:0,points}));
   assert.equal(state.festival.completedCycles,1);assert.equal(state.festival.earnedTotal,130);assert.equal(saved.profile.data.coins,250);

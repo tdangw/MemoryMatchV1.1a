@@ -41,3 +41,13 @@ U3: Nhiệm vụ hai tab, lịch 4+3 luôn hiện, đúng trạng thái sau ngà
 
 D1: model version mở rộng tương thích, 4 counter earned/spent + sequence/result, festival earned/cycle/mask, command nhận/mở nguyên tử qua CAS/queue hiện có. Candidate ghi bền trước transaction; đầy 999 giữ pending; ownership grant UID+itemID riêng. Hỗ trợ cập nhật kho và RAM cùng commit. Rules sửa từ template/generator, dispatch chuyên biệt giữ quota/invariant trong ngân sách1000. 46/46 unit đạt. Hai suite Firebase emulator đạt: regression cũ và migration/130/claim mọi thứ tự/4 recipe/4 loại/race rương cuối/recovery/deny owner-counter-cycle. Suite mới21 publication:124reads/83writes/28.733bytes; chỉ đo emulator. Log runtime/qa/events-d1-*.log; không đưa log/test tạm vào commit.
 
+
+D2: Thành tích mới lưu chestType riêng, không trở thành ownership; grant cũ
+(kể cả chưa announced/backfill) và sáu effect giữ nguyên. Watermark bốn
+source counter cấp rương một lần qua publication, không document/receipt
+mỗi vòng. Bốn bộ chữ theo mapping cố định được duyệt. Lễ hội có đủ road
+25/50/75/100 và entry kho chung. Đom đóm SVG dùng loot owner/cap12/timeline
+và reduced-motion sẵn có, chỉ phát sau durable commit và hủy theo round.
+Không thêm loop hoặc allocation mỗi frame; không thay gameplay task năng lượng.
+9/9 unit nguồn/kinh tế mới đạt; emulator nguồn+chest22 publication đạt
+(130reads/87writes/30.934bytes). Cú pháp/diff đạt; UI tích hợp kiểm ở Q1.

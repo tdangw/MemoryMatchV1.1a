@@ -1,4 +1,4 @@
-import { normalizeChests, normalizeFestival, earnChest, claimFestival, openChest } from './chests.js';
+import { normalizeChests, normalizeFestival, earnChest, claimFestival, openChest, creditSourceChests } from './chests.js';
 import { FIREFLY_DROP_CHANCE } from './chestConfig.js';
 import { normalizeLetterCounts, normalizeLetters, creditLetters, mutateLetters, exchangeLetterSet, nextLetterReward } from './letters.js';
 import { LETTER_DROP_CHANCE, LETTER_ALPHABET, ACTIVE_EVENT_COLLECTION_ID, eventCollection } from './config.js';
@@ -103,10 +103,10 @@ export function applySpecialDrop(previous, { gameId, mode, attempt, wave, group,
 export function secureUnit() { const bytes = new Uint32Array(1); crypto.getRandomValues(bytes); return bytes[0] / 4294967296; }
 export const secureSector = () => Math.floor(secureUnit() * 8);
 /** No I/O or presentation. The published snapshot carries all entitlement markers. */
-export function transitionSpark(previous, command, { uid, now, sector = 0, ticketEarned = 0, letterEarned = {}, randomLetter = LETTER_ALPHABET[0], ownedItemIds = [], facts = [], festivalEnabled=false, fireflyEarned=0, supportCount=0 } = {}) {
+export function transitionSpark(previous, command, { uid, now, sector = 0, ticketEarned = 0, letterEarned = {}, randomLetter = LETTER_ALPHABET[0], ownedItemIds = [], facts = [], festivalEnabled=false, fireflyEarned=0, supportCount=0, sourceEarned } = {}) {
   if (!id(uid) || !integer(ticketEarned)) fail();
   const state = previous ? normalizeSparkState(previous) : initialSparkState(now), receipts = [];
-  if(festivalEnabled){state.chests=normalizeChests(state.chests);state.festival=normalizeFestival(state.festival);if(!integer(fireflyEarned)||fireflyEarned<state.festival.earnedTotal)fail();state.festival.earnedTotal=fireflyEarned;}
+  if(festivalEnabled){state.chests=normalizeChests(state.chests);if(sourceEarned)state.chests=creditSourceChests(state.chests,sourceEarned);state.festival=normalizeFestival(state.festival);if(!integer(fireflyEarned)||fireflyEarned<state.festival.earnedTotal)fail();state.festival.earnedTotal=fireflyEarned;}
   const p = periods(now); if (p.day < state.day || ticketEarned < state.ticketEarned) fail();
   const grant = (key, coins, extra = {}) => receipts.push({ receiptId: `${uid}:${key}`, ownerUid: uid, coins, grantedAt: now, ...extra });
   const addTickets = n => { state.tickets += n; if (!integer(state.tickets)) fail(); };

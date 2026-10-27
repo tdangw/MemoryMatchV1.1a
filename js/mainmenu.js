@@ -1,3 +1,4 @@
+import { openPlayerProfile } from './appNavigation.js';
 import { festivalChestsEnabled } from './liveops/availability.js';
 import { mountChestInventory } from './liveops/chestPresentation.js';
 // Mainmenu.js
@@ -220,13 +221,14 @@ export async function showCollectionModal({
   const chestHost = document.createElement('div'); chestHost.hidden = true;
   let disposeChest = null;
   const chestEntry = document.createElement('button'); chestEntry.type = 'button';
-  chestEntry.className = 'tab-button'; chestEntry.textContent = 'Kho rương';
+  chestEntry.className = 'tab-button';
+  const updateChestEntry=()=>{const chests=gameState.appearance.spark?.state?.chests;chestEntry.textContent=chests?`Kho rương · ${Object.keys(chests.earned).reduce((sum,type)=>sum+chests.earned[type]-chests.spent[type],0).toLocaleString('vi-VN')} chưa mở`:'Kho rương';};updateChestEntry();
   const openChests = () => {
     tabs.hidden = grid.hidden = chestEntry.hidden = true; chestHost.hidden = false;
     disposeChest?.();
-    disposeChest = mountChestInventory(chestHost, { owner: collectionScope, gameId, back: () => {
+    disposeChest = mountChestInventory(chestHost, { owner: collectionScope, gameId, profile:fromGame?null:()=>{modal.destroy();void openPlayerProfile(surface);}, back: () => {
       disposeChest?.(); disposeChest = null; chestHost.replaceChildren(); chestHost.hidden = true;
-      tabs.hidden = grid.hidden = chestEntry.hidden = false; chestEntry.focus();
+      tabs.hidden = grid.hidden = chestEntry.hidden = false; updateChestEntry();chestEntry.focus();
     } });
   };
   chestEntry.onclick = openChests;
@@ -361,7 +363,7 @@ export async function showCollectionModal({
       grid.append(group);
     };
     (await mountCatalogTabs({ gameId, surface: "collection", tablist: tabs, panel: grid, tabs: [
-      { id: "pictures", label: "Thành tích", render: () => renderMasteryCollection(grid, gameId, { block: collectionBlock, owner: collectionScope }) },
+      { id: "pictures", label: "Thành tích", render: () => renderMasteryCollection(grid, gameId, { block: collectionBlock, owner: collectionScope, onOpenChests:openChests }) },
       { id: "themes", label: "Chủ đề", render: renderThemes },
       { id: "path", label: "Đường nối", render: () => renderLinkEffects("Hiệu ứng đường nối", "linkPathEffect", "ownedLinkPathEffects", LINK_PATH_EFFECTS) },
       { id: "exit", label: "Xóa thẻ", render: () => renderLinkEffects("Hiệu ứng xóa thẻ", "linkExitEffect", "ownedLinkExitEffects", LINK_EXIT_EFFECTS) },
@@ -414,14 +416,14 @@ export async function showCollectionModal({
       grid.append(group);
     };
     (await mountCatalogTabs({ gameId, surface: "collection", tablist: tabs, panel: grid, tabs: [
-      { id: "pictures", label: "Thành tích", render: () => renderMasteryCollection(grid, gameId, { block: collectionBlock, owner: collectionScope }) },
+      { id: "pictures", label: "Thành tích", render: () => renderMasteryCollection(grid, gameId, { block: collectionBlock, owner: collectionScope, onOpenChests:openChests }) },
       { id: "themes", label: "Chủ đề", render: renderThemes },
       { id: "path", label: "Đường nối", render: () => renderTripleEffects("Hiệu ứng đường nối", "path", "ownedTriplePathEffects", "triplePathEffect", LINK_PATH_EFFECTS) },
       { id: "exit", label: "Xóa thẻ", render: () => renderTripleEffects("Hiệu ứng xóa thẻ", "exit", "ownedTripleExitEffects", "tripleExitEffect", LINK_EXIT_EFFECTS) },
     ] }));
   } else {
     (await mountCatalogTabs({ gameId, surface: "collection", tablist: tabs, panel: grid, tabs: [
-      { id: "pictures", label: "Thành tích", render: () => renderMasteryCollection(grid, gameId, { block: collectionBlock, owner: collectionScope }) },
+      { id: "pictures", label: "Thành tích", render: () => renderMasteryCollection(grid, gameId, { block: collectionBlock, owner: collectionScope, onOpenChests:openChests }) },
       { id: "appearance", label: "Ngoại hình", render: renderAppearance },
       { id: "flip", label: "Hiệu ứng lật", render: renderFlipEffects },
       { id: "themes", label: "Chủ đề", render: renderThemes },

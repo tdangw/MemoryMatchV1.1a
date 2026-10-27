@@ -1,3 +1,5 @@
+import { FESTIVAL_MILESTONES } from './chestConfig.js';
+import { getAppPageScope } from '../appPageLifecycle.js';
 import { renderMissions as mountMissions, updateMissionCountdown } from './missionsPresentation.js';
 import { getAccountService } from '../accountService.js';
 import { CHEST_NAMES } from './chestConfig.js';
@@ -101,10 +103,24 @@ export function openLiveopsPage(kind, surface = {}) {
     const tabs = createTabs('events', [['wheel','Vòng quay'],['letters','Sưu tập chữ'],...(festivalChestsEnabled() ? [['festival','Lễ hội']] : [])], eventTab, (key, panel) => {
       eventTab = key; animation?.cancel(); panel.replaceChildren();
       const old = content; content = panel;
-      if (key === 'wheel') renderWheel(); else if (key === 'letters') renderLetters(); else panel.append(el('p','','Lễ hội Đom Đóm sắp mở.'));
+      if (key === 'wheel') renderWheel(); else if (key === 'letters') renderLetters(); else renderFestival();
       content = old;
     });
     content.append(tabs.root, tabs.panel); tabs.select(eventTab, false);
+  }
+  function renderFestival() {
+    if(!view?.state.festival){content.append(el('p','','Kết nối để xem Lễ hội Đom Đóm.'));return;}
+    const festival=view.state.festival,available=festival.earnedTotal-festival.completedCycles*100;
+    const banner=panel('Lễ hội Đom Đóm');banner.append(createIcon('firefly'),el('strong','',`Vòng ${festival.completedCycles+1}`),el('p','',`${available.toLocaleString('vi-VN')} đom đóm · Mỗi vòng 100 điểm`),progress(Math.min(available,100),100,'Điểm Lễ hội'));
+    content.append(banner);
+    for(const [index,item]of FESTIVAL_MILESTONES.entries()){
+      const claimed=Boolean(festival.mask&(1<<index)),ready=available>=item.points;
+      const row=panel(`${item.points} điểm`);
+      row.append(createIcon(item.chest?'chest':'coins'),el('p','',[item.coins?`${item.coins} Xu`:'',item.chest?CHEST_NAMES[item.chest]:''].filter(Boolean).join(' + ')),
+        el('p','',claimed?'Đã nhận':ready?'Đủ điều kiện':'Chưa đủ'),button(claimed?'Đã nhận':'Nhận',()=>void run({type:'claimFestival',cycle:festival.completedCycles,points:item.points}),busy||claimed||!ready,`festival-${item.points}`));content.append(row);
+    }
+    content.append(button('Xem quà & Kho rương',openChests),button(getActiveGameScope()?'Quay lại ván chơi':'Chơi ngay',play,busy||Boolean(getActiveGameScope())),
+      el('p','','Thu thập đom đóm khi ghép nhóm thẻ đặc biệt. Điểm được giữ kể cả khi thua. Nhận đủ bốn mốc để sang vòng mới và giữ điểm dư; rương có thể mở sau.'));
   }
   function renderWheel() {
     const wheel = panel('Vòng quay may mắn'), stage = el('div', 'liveops__wheel');
@@ -134,7 +150,8 @@ export function openLiveopsPage(kind, surface = {}) {
     if(festivalChestsEnabled()) content.append(button('Xem Kho rương', openChests));
   }
   function openChests() {
-    modal.destroy(); void import('../mainmenu.js').then(module => module.showCollectionModal({ initialChest:true, surface }));
+    const owner=surface.owner||getAppPageScope(),identity=getAccountService()?.getIdentity();
+    modal.destroy(); void import('../mainmenu.js').then(module => {if((!owner||owner.active)&&getAccountService()?.getIdentity()?.uid===identity?.uid)void module.showCollectionModal({initialChest:true,fromGame:Boolean(getActiveGameScope()),surface:{...surface,owner}});});
   }
   function renderLetters() {
     const letters = panel('Sưu tập chữ'), counts = view?.state.letters.counts || {};

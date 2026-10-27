@@ -14,6 +14,7 @@ export function prepareLetterDropFeedback(anchor,scope) {
   const origin={x:rect.left+rect.width/2,y:rect.top+rect.height/2};
   return outcome=>{
     if(scope.active && outcome?.letter)showLetterDropFeedback(outcome.letter,origin,scope);
+    if(scope.active && outcome?.firefly)showTicketDropFeedback(origin,scope,'firefly');
     if(scope.active && outcome?.ticket)showTicketDropFeedback(origin,scope);
   };
 }
@@ -67,9 +68,9 @@ export function showLetterDropFeedback(letter,origin,scope) {
   animation.finished.then(entry.dispose,entry.dispose);
 }
 
-export function showTicketDropFeedback(origin,scope) {
+export function showTicketDropFeedback(origin,scope,icon='ticket') {
   if(!scope?.active || getActiveGameScope()!==scope || !Number.isFinite(origin?.x) || !Number.isFinite(origin?.y))return;
   const source={getBoundingClientRect:()=>({left:origin.x-20,top:origin.y-20,width:40,height:40})};
-  return playLootDrop(source,{icon:'ticket',tier:'gold',preset:'linkItem',holdMs:450,
+  return playLootDrop(source,{icon,tier:'gold',preset:'linkItem',holdMs:450,
     target:document.querySelector('[data-dock-action="events"]')});
 }

@@ -4,7 +4,7 @@ const record = value => value !== null && typeof value === 'object' && !Array.is
 const invalid = () => { throw new Error('Bản lưu Kho rương chưa toàn vẹn. Dữ liệu được giữ nguyên.'); };
 const counters = () => Object.fromEntries(CHEST_TYPES.map(type => [type,0]));
 export function normalizeChests(value) {
-  if (value === undefined) return { version:1, earned:counters(), spent:counters(), sequence:0, last:null };
+  if (value === undefined) return { version:1, earned:counters(), spent:counters(), sourceEarned:counters(), sequence:0, last:null };
   if (!record(value) || value.version !== 1 || !integer(value.sequence) || !record(value.earned) || !record(value.spent)
     || Object.keys(value.earned).length !== 4 || Object.keys(value.spent).length !== 4
     || CHEST_TYPES.some(type => !integer(value.earned[type]) || !integer(value.spent[type]) || value.spent[type] > value.earned[type])
@@ -17,7 +17,19 @@ export function normalizeChests(value) {
     if (last.kind === 'item' && !CHEST_POOLS[last.chestType]?.includes(last.itemId)) invalid();
     if (last.kind === 'support' && !CHEST_SUPPORTS[last.gameId].some(item => item.key === last.key && item.label === last.label)) invalid();
   } else if (value.sequence !== 0) invalid();
-  return structuredClone(value);
+  const sourceEarned = value.sourceEarned === undefined ? counters() : value.sourceEarned;
+  if (!record(sourceEarned) || Object.keys(sourceEarned).length !== 4 || CHEST_TYPES.some(type => !integer(sourceEarned[type]) || sourceEarned[type] > value.earned[type])) invalid();
+  return { ...structuredClone(value),sourceEarned:{...sourceEarned} };
+}
+export function creditSourceChests(value, incoming) {
+  let chests = normalizeChests(value);
+  if (!record(incoming) || Object.keys(incoming).length !== 4) invalid();
+  for (const type of CHEST_TYPES) {
+    if (!integer(incoming[type]) || incoming[type] < chests.sourceEarned[type]) invalid();
+    const delta = incoming[type] - chests.sourceEarned[type];
+    if (delta) { chests = earnChest(chests,type,delta); chests.sourceEarned[type] = incoming[type]; }
+  }
+  return normalizeChests(chests);
 }
 export function normalizeFestival(value) {
   if (value === undefined) return { version:1, earnedTotal:0, completedCycles:0, mask:0 };

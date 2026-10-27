@@ -5,6 +5,7 @@ const ICON_FALLBACK_NAMES = Object.freeze({ "star-empty": "star", "victory-home"
 const ILLUSTRATED_ICONS = new Set(['coin', 'star', 'star-empty', 'chest', 'chest-open', 'celebrate']);
 
 const ICON_PATHS = Object.freeze({
+  firefly: '<ellipse cx="8" cy="10" rx="4" ry="6" transform="rotate(-35 8 10)" fill="#bcece0" stroke="#386e64"/><ellipse cx="16" cy="10" rx="4" ry="6" transform="rotate(35 16 10)" fill="#bcece0" stroke="#386e64"/><ellipse cx="12" cy="16" rx="4" ry="6" fill="#e9d862" stroke="#466749"/><path d="M9 14h6m-6 4h6" stroke="#789348"/><circle cx="12" cy="8" r="3" fill="#235749" stroke="#183d36"/><path d="M10 5 8 2m6 3 2-3" stroke="#386e64"/>',
   calendar: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 11h18m-13 4h2m4 0h2m-8 3h2"/>',
   cards: '<rect x="3" y="5" width="10" height="15" rx="2"/><rect x="11" y="3" width="10" height="15" rx="2"/><path d="m14 10 2 2 3-4"/>',
   achievements: '<path d="m8 14-2 8 6-3 6 3-2-8"/><circle cx="12" cy="8" r="6"/><path d="m9 8 2 2 4-4"/>',

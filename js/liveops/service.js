@@ -1,3 +1,4 @@
+import { CHEST_TYPES } from './chestConfig.js';
 import { chestCandidate } from './chests.js';
 import { festivalChestsEnabled } from './availability.js';
 import { ownedProfileCosmeticItems } from '../progression/achievementModel.js';
@@ -35,6 +36,7 @@ export function bindLiveopsAccount(account) {
       if(!scope.active||account.getIdentity()?.profileId!==identity.profileId||getActiveGameScope())return;
       const save=normalizeSparkSave(data.appearance.spark),state=save.state;
       const dirty=(data.appearance.rewards?.pending||[]).some(item=>item.uid===identity.uid)
+        || festivalChestsEnabled() && CHEST_TYPES.some(type=>Object.values(data.appearance.achievements?.grants||{}).filter(grant=>grant.chestType===type).length!==(state?.chests?.sourceEarned?.[type]||0))
         || festivalChestsEnabled() && save.fireflyEarned!==(state?.festival?.earnedTotal||0)
         || save.ticketEarned!==(state?.ticketEarned||0)
         || LETTER_ALPHABET.some(letter=>(save.letterEarned[letter]||0)!==(state?.letters.earned[letter]||0));
@@ -114,7 +116,10 @@ async function perform(command, pass = 0, expected = null, totals = {reads:0,wri
       const initializing = !stored.state;
       const pending = data.appearance.rewards?.pending || [];
       const periodOnly = Boolean(stored.state && stored.state.day !== Math.floor(now / DAY_MS));
+      const sourceCounts=Object.fromEntries(CHEST_TYPES.map(type=>[type,Object.values(data.appearance.achievements?.grants||{}).filter(grant=>grant.chestType===type).length]));
+      const newSources=festivalChestsEnabled()&&CHEST_TYPES.some(type=>sourceCounts[type] !== (stored.state?.chests?.sourceEarned?.[type]||0));
       const migrateOnly=festivalChestsEnabled()&&!initializing&&!periodOnly&&!stored.state.chests;
+      const sourcesOnly=newSources&&!initializing&&!periodOnly&&!migrateOnly;
       const earnedBefore = stored.state?.letters.earned || {};
       const changedLetters = LETTER_ALPHABET.filter(letter=>(local.letterEarned[letter]||0)!==(earnedBefore[letter]||0));
       const newFireflies = festivalChestsEnabled() && local.fireflyEarned !== (stored.state?.festival?.earnedTotal||0);
@@ -122,12 +127,12 @@ async function perform(command, pass = 0, expected = null, totals = {reads:0,wri
       const unappliedDrops = newFireflies || newTickets || changedLetters.length > 0;
       const hasFacts = pending.some(v=>v.uid===identity.uid);
       const preflightOnly = Boolean(operation && (unappliedDrops || hasFacts));
-      const statsOnly = !migrateOnly && !initializing && !periodOnly && Boolean(hasFacts || newTickets || newFireflies);
-      const letterOnly = !migrateOnly && !initializing && !periodOnly && !statsOnly && changedLetters.length > 0;
+      const statsOnly = !sourcesOnly && !migrateOnly && !initializing && !periodOnly && Boolean(hasFacts || newTickets || newFireflies);
+      const letterOnly = !sourcesOnly && !migrateOnly && !initializing && !periodOnly && !statsOnly && changedLetters.length > 0;
       const earnedCandidate = {...earnedBefore};
       if(letterOnly)for(const letter of changedLetters.slice(0,LETTER_SYNC_KEYS_PER_COMMIT))earnedCandidate[letter]=local.letterEarned[letter]||0;
       const remainingLetterWork = letterOnly ? changedLetters.length > LETTER_SYNC_KEYS_PER_COMMIT : changedLetters.length > 0;
-      const reconcileOnly = migrateOnly || initializing || periodOnly || preflightOnly || statsOnly || letterOnly;
+      const reconcileOnly = sourcesOnly || migrateOnly || initializing || periodOnly || preflightOnly || statsOnly || letterOnly;
       const resolved = resolveSparkOperation(stored.state, operation, now);
       const action = operation && !reconcileOnly ? { ...resolved.command, day: resolved.command.day ?? Math.floor(now / DAY_MS),
         sequence: operation.sequence ?? (['sellLetter','fuseLetter','exchangeLetterSet'].includes(operation.type) ? stored.state?.letters.sequence || 0 : operation.type==='openChest' ? stored.state?.chests?.sequence||0 : stored.state?.ticketSpent || 0) + 1 } : { type: 'status' };
@@ -141,7 +146,7 @@ async function perform(command, pass = 0, expected = null, totals = {reads:0,wri
       const acquisitions = normalizeAcquisitions(data.appearance.acquisitions);
       let result;
       try { result = transitionSpark(stored.state, action, { uid: identity.uid, now, sector: operation?.sector ?? 0,
-        ticketEarned: initializing ? 0 : periodOnly || migrateOnly ? stored.state.ticketEarned : local.ticketEarned, letterEarned:initializing ? {} : earnedCandidate, randomLetter:operation?.randomLetter, ownedItemIds:ownedIds, festivalEnabled:festivalChestsEnabled()&&(!periodOnly||Boolean(stored.state.chests)),fireflyEarned:initializing||migrateOnly?0:periodOnly?(stored.state.festival?.earnedTotal||0):local.fireflyEarned,supportCount:action.type==='openChest'?data.progress[getGameProgressKey(action.gameId)]?.items?.[action.candidate?.key]??0:0, facts: (initializing || periodOnly || migrateOnly ? [] : pending).filter(v => v.uid === identity.uid).map(v => v.fact) }); }
+        ticketEarned: initializing ? 0 : periodOnly || migrateOnly || sourcesOnly ? stored.state.ticketEarned : local.ticketEarned, letterEarned:initializing ? {} : earnedCandidate, randomLetter:operation?.randomLetter, ownedItemIds:ownedIds, festivalEnabled:festivalChestsEnabled()&&(!periodOnly||Boolean(stored.state.chests)),sourceEarned:sourcesOnly?sourceCounts:undefined,fireflyEarned:initializing||migrateOnly?0:periodOnly||sourcesOnly?(stored.state.festival?.earnedTotal||0):local.fireflyEarned,supportCount:action.type==='openChest'?data.progress[getGameProgressKey(action.gameId)]?.items?.[action.candidate?.key]??0:0, facts: (initializing || periodOnly || migrateOnly || sourcesOnly ? [] : pending).filter(v => v.uid === identity.uid).map(v => v.fact) }); }
       catch(error) { if(error.code!=='rewards/inventory-full')error.code='rewards/invalid-operation'; throw error; }
       const changed = stableJSON(result.state) !== stableJSON(stored.state && cleanState(stored.state)) || pending.some(v => v.uid === identity.uid);
       if (!changed) return { ...result, expiredOperation:resolved.discarded, operations:{...totals}, appliedCoins:totals.coins };
@@ -157,7 +162,7 @@ async function perform(command, pass = 0, expected = null, totals = {reads:0,wri
       data.coins += added;
       if (!Number.isSafeInteger(data.coins)) throw new Error('Kho Xu đã đầy.');
       data.appearance = { ...data.appearance, acquisitions: normalizeAcquisitions(acquisitions),
-        spark: { ...local, economyRevision:local.economyRevision+1, state: result.state, ownerUid:identity.uid }, rewards: { ...(data.appearance.rewards || { version:1, applied:{} }), pending: initializing || periodOnly || migrateOnly ? pending : pending.filter(v => v.uid !== identity.uid) } };
+        spark: { ...local, economyRevision:local.economyRevision+1, state: result.state, ownerUid:identity.uid }, rewards: { ...(data.appearance.rewards || { version:1, applied:{} }), pending: initializing || periodOnly || migrateOnly || sourcesOnly ? pending : pending.filter(v => v.uid !== identity.uid) } };
       const encoded = await encodeCloudSnapshot(snapshot);
       const published = await publishCloudSnapshot({ database: backend.database, environment: identity.environment, uid: identity.uid,
         encoded, expectedRevision: metadata.cloudRevision, playerName: identity.playerName, isCurrent,
@@ -165,7 +170,7 @@ async function perform(command, pass = 0, expected = null, totals = {reads:0,wri
         onStagePlan: jobs => updateSyncMetadata(`${identity.environment}:work:${identity.uid}`, () => ({ jobs }), isCurrent) });
       if(!published.cleanupError)await updateSyncMetadata(`${identity.environment}:work:${identity.uid}`,()=>({jobs:[]}),isCurrent);
       totals.reads+=published.reads;totals.writes+=published.writes;totals.bytes+=encoded.byteLength;totals.coins+=added;
-      return { ...result, initializing, continueOperation:reconcileOnly && Boolean(migrateOnly || operation || initializing && (unappliedDrops || hasFacts) || periodOnly && (unappliedDrops || hasFacts) || remainingLetterWork), expiredOperation:resolved.discarded, root: published.root, data, added, appliedCoins:totals.coins,
+      return { ...result, initializing, continueOperation:reconcileOnly && Boolean(migrateOnly || sourcesOnly && (operation||unappliedDrops||hasFacts) || operation || initializing && (unappliedDrops || hasFacts || newSources) || periodOnly && (unappliedDrops || hasFacts) || remainingLetterWork), expiredOperation:resolved.discarded, root: published.root, data, added, appliedCoins:totals.coins,
         operations: {...totals} };
     }, isCurrent);
   }); } catch(error) {

@@ -148,7 +148,7 @@ export function normalizeAppearance(value = {}) {
   const linkExits = LINK_EXIT_EFFECTS.filter(item => !item.gameId || item.gameId === 'link-connect');
   const triplePaths = LINK_PATH_EFFECTS.filter(item => !item.gameId || item.gameId === 'triple-connect');
   const tripleExits = LINK_EXIT_EFFECTS.filter(item => !item.gameId || item.gameId === 'triple-connect');
-  const granted = new Set(Object.values(achievements.grants).map(grant => grant.itemId));
+  const granted = new Set(Object.values(achievements.grants).filter(grant=>!grant.chestType).map(grant => grant.itemId));
   for (const slot of Object.values(ACHIEVEMENT_OWNED_SLOTS)) if (Array.isArray(value[slot]))
     value[slot] = value[slot].filter(id => !ACHIEVEMENT_ITEMS.some(item => item.id === id) || granted.has(id));
   for (const grant of Object.values(achievements.grants)) {

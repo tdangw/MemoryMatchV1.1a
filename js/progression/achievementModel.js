@@ -1,3 +1,4 @@
+import { festivalChestsEnabled } from '../liveops/availability.js';
 import { LETTER_REWARD_ITEMS } from '../liveops/letterCatalog.generated.js';
 import { mergeSparkSave } from '../liveops/sparkModel.js';
 import { ACHIEVEMENT_ITEMS, EXTRA_COSMETIC_ITEMS } from './achievementCatalog.generated.js';
@@ -28,9 +29,9 @@ export function normalizeAchievementLedger(value) {
   for (const [key, grant] of Object.entries(value.grants)) {
     const item = byLevel.get(key);
     if (!item || !object(grant) || grant.itemId !== item.id || grant.catalogVersion !== 1
-      || !Number.isSafeInteger(grant.grantedAt) || grant.grantedAt < 0 || typeof grant.announced !== 'boolean')
+      || !Number.isSafeInteger(grant.grantedAt) || grant.grantedAt < 0 || typeof grant.announced !== 'boolean' || grant.chestType!==undefined&&(!['avatar','frame','badge'].includes(item.type)||grant.chestType!==item.type))
       throw new Error('Bản lưu Thành tích chưa toàn vẹn. Dữ liệu được giữ nguyên.');
-    grants[key] = { itemId: item.id, catalogVersion: 1, grantedAt: grant.grantedAt, announced: grant.announced };
+    grants[key] = { itemId: item.id, catalogVersion: 1, grantedAt: grant.grantedAt, announced: grant.announced, ...(grant.chestType?{chestType:grant.chestType}:{}) };
   }
   const hintsSeen = Object.fromEntries(['avatar', 'frame', 'badge', 'effect-cover'].filter(type => value.hintsSeen?.[type] === true).map(type => [type, true]));
   const coverageRevision = value.coverageRevision ?? (value.backfillVersion === 1 ? 1 : 0);
@@ -39,24 +40,25 @@ export function normalizeAchievementLedger(value) {
   return { version: 1, grants, hintsSeen, backfillVersion: value.backfillVersion === 1 ? 1 : 0, coverageRevision };
 }
 export function ownedAchievementItems(appearance) {
-  return Object.values(normalizeAchievementLedger(appearance?.achievements).grants).map(grant => catalog.get(grant.itemId));
+  return Object.values(normalizeAchievementLedger(appearance?.achievements).grants).filter(grant=>!grant.chestType).map(grant => catalog.get(grant.itemId));
 }
 export function ownedProfileCosmeticItems(appearance) {
   const owned = new Set([...ownedAchievementItems(appearance).map(item => item.id), ...extraOwnedIds(appearance?.acquisitions)]);
   return PROFILE_COSMETIC_ITEMS.filter(item => owned.has(item.id));
 }
 export function normalizeProfileCosmetics(value, ledger, acquisitions) {
-  const owned = new Set([...Object.values(ledger.grants).map(grant => grant.itemId), ...extraOwnedIds(acquisitions)]);
+  const owned = new Set([...Object.values(ledger.grants).filter(grant=>!grant.chestType).map(grant => grant.itemId), ...extraOwnedIds(acquisitions)]);
   return Object.fromEntries(['avatar', 'frame', 'badge'].map(slot => {
     const id = value?.[slot], item = cosmeticItem(id);
     return [slot, item?.type === slot && owned.has(id) ? id : null];
   }));
 }
 /** Pure settlement projection. Receipts, inventory and announcements share one payload. */
-export function settleAchievementInventory(previous = {}, incoming = previous, progress = {}, { backfill = false, now = Date.now() } = {}) {
+export function settleAchievementInventory(previous = {}, incoming = previous, progress = {}, { backfill = false, now = Date.now(), chestRewards=festivalChestsEnabled() } = {}) {
   const before = normalizeAchievementLedger(previous.achievements), next = normalizeAchievementLedger(incoming.achievements);
   const grants = { ...before.grants, ...next.grants };
   // A stale queued appearance must not un-announce a durable receipt.
+  for(const [key,grant]of Object.entries(before.grants))if(next.grants[key]&&next.grants[key].chestType!==grant.chestType)throw new Error('Quyền thưởng Thành tích đã được lưu và không thể đổi loại.');
   for (const [key, grant] of Object.entries(before.grants)) if (grant.announced) grants[key] = { ...grants[key], announced: true };
   const ledger = { version: 1, grants, hintsSeen: { ...before.hintsSeen, ...next.hintsSeen }, backfillVersion: backfill || before.backfillVersion || next.backfillVersion ? 1 : 0,
     coverageRevision: backfill ? ACHIEVEMENT_COVERAGE_REVISION : Math.max(before.coverageRevision, next.coverageRevision) };
@@ -65,7 +67,7 @@ export function settleAchievementInventory(previous = {}, incoming = previous, p
     if (grants[key]) continue;
     const completed = progress[ACHIEVEMENT_GAME_KEYS[item.gameId]]?.bestByLevel || {};
     if (MASTERY_DIFFICULTIES.every(mode => isCompletedLevelResult(completed[`${mode}:${item.level}`]) && hasCertifiedCompletion(completed, mode, item.level)))
-      grants[key] = { itemId: item.id, catalogVersion: 1, grantedAt: now, announced: backfill };
+      grants[key] = { itemId: item.id, catalogVersion: 1, grantedAt: now, announced: backfill, ...(chestRewards&&['avatar','frame','badge'].includes(item.type)?{chestType:item.type}:{}) };
   }
   const appearance = { ...incoming, achievements: ledger, acquisitions: mergeAcquisitions(previous.acquisitions, incoming.acquisitions) };
   appearance.spark = mergeSparkSave(previous.spark, incoming.spark);
