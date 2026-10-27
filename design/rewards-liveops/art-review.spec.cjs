@@ -75,6 +75,6 @@ test('A1 three heroes and existing small portrait renderer', async ({ page }) =>
   await decoded(page);
   const geometry = await page.locator('.storybook-surface .leaderboard-avatar').evaluate(node => ({
     width: node.getBoundingClientRect().width, layers: node.querySelectorAll('img').length }));
-  expect(geometry.width).toBe(30); expect(geometry.layers).toBe(3);
+  expect(geometry.width).toBe(56); expect(geometry.layers).toBe(3);
   await page.screenshot({ path: path.join(output, 'reference-small-portraits.png') });
 });

@@ -1,6 +1,6 @@
 const { defineConfig } = require('@playwright/test');
 module.exports = defineConfig({
-  testDir: __dirname, testMatch: 'art-review.spec.cjs', workers: 1,
+  testDir: __dirname, testMatch: ['art-review.spec.cjs', 'liveops-ui.spec.cjs'], workers: 1,
   timeout: 45000, reporter: 'list', outputDir: '../../docs/design/rewards-liveops/traces',
   use: { baseURL: 'http://127.0.0.1:4192', browserName: 'chromium', channel: 'chrome',
     headless: true, reducedMotion: 'reduce', locale: 'vi-VN', serviceWorkers: 'block', deviceScaleFactor: 1 },
