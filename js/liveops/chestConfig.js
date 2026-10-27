@@ -15,3 +15,8 @@ export const CHEST_POOLS = Object.freeze(Object.fromEntries(['avatar','frame','b
 export const FESTIVAL_MILESTONES = Object.freeze([{ points:25, coins:50 }, { points:50, coins:100, chest:'c' },
   { points:75, coins:0, chest:'frame' }, { points:100, coins:0, chest:'avatar' }]);
 export const FIREFLY_DROP_CHANCE = 1;
+export const CHEST_SUPPORTS = Object.freeze({
+  'memory-match': [{ key:'hint', label:'Gợi ý 1 lượt' }, { key:'preview4', label:'Xem trước 4 thẻ' }, { key:'time30', label:'+30 giây' }],
+  'link-connect': [{ key:'hint', label:'Gợi ý' }, { key:'reshuffle', label:'Xáo trộn' }, { key:'thunder', label:'Sấm sét' }, { key:'freeze', label:'Đóng băng 30 giây' }],
+  'triple-connect': [{ key:'hint', label:'Gợi ý' }, { key:'undo', label:'Hoàn tác' }, { key:'shuffle', label:'Xáo trộn' }, { key:'time', label:'+30 giây' }],
+});

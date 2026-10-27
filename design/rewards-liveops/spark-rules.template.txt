@@ -1,3 +1,4 @@
+CHEST_CONTRACT
     // Spark reward contract: one private account document; no round/receipt collections.
     function rewardPath(space, uid) { return /databases/$(database)/documents/gamespaces/$(space)/liveops/$(uid); }
     function rootPath(space, uid) { return /databases/$(database)/documents/gamespaces/$(space)/players/$(uid); }
@@ -29,7 +30,8 @@
     function validRewardState(n, o) {
       let day = int(request.time.toMillis() / 86400000);
       let changed = n.diff(o).affectedKeys();
-      return n.keys().hasOnly(['version','revision','day','week','daily','weekly','loginNext','loginDay','spins','tickets','ticketEarned','ticketSpent','event','cosmetics','letters','rootRevision','fingerprint','updatedAt'])
+      return n.keys().hasOnly(['version','revision','day','week','daily','weekly','loginNext','loginDay','spins','tickets','ticketEarned','ticketSpent','event','cosmetics','letters','chests','festival','rootRevision','fingerprint','updatedAt'])
+        && n.get('chests',null) == o.get('chests',null) && n.get('festival',null) == o.get('festival',null)
         && n.version == 1 && (n.revision is int && n.revision >= 0 && n.revision <= 9007199254740991) && n.revision > 0 && n.day == day && n.week == day - ((day + 3) % 7)
         && (!changed.hasAny(['daily']) || rewardCounter(n.daily, ['win-three','match-thirty','win-without-hint','bonus']))
         && (!changed.hasAny(['weekly']) || rewardCounter(n.weekly, ['bonus']))
@@ -123,10 +125,10 @@
         && n.counts.keys().hasOnly(LETTER_KEYS) && n.earned.keys().hasOnly(LETTER_KEYS)
         && n.sequence is int && n.sequence >= o.sequence && n.sequence <= o.sequence + 1
         && (n.sequence == o.sequence ? n.last == o.last : n.last is map
-          && n.last.keys().hasOnly(['kind','letter','quantity','coins','received','sequence','operation','setId','itemId'])
+          && n.last.keys().hasOnly(['kind','letter','quantity','coins','received','sequence','operation','setId','itemId','chestType'])
           && n.last.sequence == n.sequence && n.last.operation is string && n.last.operation.matches('^[A-Za-z0-9_-]{1,128}$')
           && (n.last.kind == 'exchange' ? n.last.setId in LETTER_SET_IDS
-            && (n.last.itemId == null ? n.last.coins == 10000 : n.last.itemId in LETTER_REWARDS && n.last.coins == 0)
+            && (n.last.get('chestType','') != '' ? n.last.chestType == chestForSet(n.last.setId) && n.last.itemId == null && n.last.coins == 0 : n.last.itemId == null ? n.last.coins == 10000 : n.last.itemId in LETTER_REWARDS && n.last.coins == 0)
             : n.last.letter in LETTER_KEYS && (n.last.kind == 'sell' ? n.last.quantity is int && n.last.quantity > 0
               && n.last.coins == n.last.quantity * 1000 : n.last.kind == 'fuse' && n.last.received in LETTER_KEYS && n.last.coins == 0)))
 LETTER_VALUES;
@@ -137,9 +139,9 @@ LETTER_VALUES;
       let required = letterRequirementMap(n.last.setId);
       return n.keys().hasOnly(['counts','earned','sequence','last']) && n.earned == o.earned
         && n.sequence == o.sequence + 1 && n.last.sequence == n.sequence
-        && n.last.keys().hasOnly(['kind','setId','itemId','coins','sequence','operation']) && n.last.kind == 'exchange'
+        && n.last.keys().hasOnly(['kind','setId','itemId','coins','sequence','operation','chestType']) && n.last.kind == 'exchange'
         && n.last.setId in LETTER_SET_IDS && n.last.operation is string && n.last.operation.matches('^[A-Za-z0-9_-]{1,128}$')
-        && (n.last.itemId == null ? n.last.coins == 10000 : n.last.itemId in LETTER_REWARDS && n.last.coins == 0)
+        && (n.last.get('chestType','') != '' ? n.last.chestType == chestForSet(n.last.setId) && n.last.itemId == null && n.last.coins == 0 : n.last.itemId == null ? n.last.coins == 10000 : n.last.itemId in LETTER_REWARDS && n.last.coins == 0)
         && n.counts.diff(o.counts).affectedKeys().hasOnly(required.keys())
 LETTER_EXCHANGE_VALUES;
     }
@@ -169,7 +171,7 @@ LETTER_CREDITS;
     }
     function rewardProgressFlush(n,o) {
       let changed = n.diff(o).affectedKeys();
-      return changed.hasOnly(['letters','daily','weekly','event','tickets','ticketEarned','revision','rootRevision','fingerprint','updatedAt'])
+      return changed.hasOnly(['festival','letters','daily','weekly','event','tickets','ticketEarned','revision','rootRevision','fingerprint','updatedAt'])
         && n.revision == o.revision + 1 && n.updatedAt == request.time && n.day == int(request.time.toMillis() / 86400000)
         && n.daily.claimed == o.daily.claimed && n.weekly.claimed == o.weekly.claimed
         && (!changed.hasAny(['daily']) || rewardCounter(n.daily,['win-three','match-thirty','win-without-hint','bonus']) && monotoneCounter(n.daily,o.daily))
@@ -177,6 +179,7 @@ LETTER_CREDITS;
         && n.tickets is int && n.tickets >= 0 && n.tickets <= 9007199254740991
         && n.ticketEarned is int && n.ticketEarned >= o.ticketEarned && n.ticketEarned <= 9007199254740991
         && n.tickets == o.tickets + n.ticketEarned - o.ticketEarned
+        && (!changed.hasAny(['festival']) || festivalValid(n.festival) && n.festival.completedCycles == o.festival.completedCycles && n.festival.mask == o.festival.mask && n.festival.earnedTotal >= o.festival.earnedTotal)
         && (!changed.hasAny(['event']) || rewardEventProgress(n.event,o.event))
         && (!changed.hasAny(['letters']) || rewardLetterCredit(n.letters,o.letters));
     }
@@ -199,13 +202,14 @@ LETTER_CREDITS;
     function rewardInitial(n, space, uid) {
       let empty = {'wins':0,'matches':0,'noHint':0,'visits':0,'claimed':[]};
       let day = int(request.time.toMillis() / 86400000);
-      return n.keys().hasOnly(['version','revision','day','week','daily','weekly','loginNext','loginDay','spins','tickets','ticketEarned','ticketSpent','event','cosmetics','letters','rootRevision','fingerprint','updatedAt'])
+      return n.keys().hasOnly(['version','revision','day','week','daily','weekly','loginNext','loginDay','spins','tickets','ticketEarned','ticketSpent','event','cosmetics','letters','chests','festival','rootRevision','fingerprint','updatedAt'])
         && n.version == 1 && n.revision == 1 && n.day == day && n.week == day - ((day + 3) % 7)
         && n.daily == empty && n.weekly == empty && n.loginNext == 0 && n.loginDay == -1
         && n.spins == {'free':null,'ads':[],'pastAds':[],'ticket':null} && n.tickets == 0 && n.ticketEarned == 0 && n.ticketSpent == 0
         && n.event == {'id':'firefly-festival-01','week':n.week,'points':0,'day':day,'dailyPoints':0,'claimed':[]}
         && n.cosmetics == {'collectionId':'firefly-festival-01','week':n.week,'points':0,'granted':[]}
         && n.letters == {'counts':{},'earned':{},'sequence':0,'last':null}
+        && (!n.keys().hasAny(['chests','festival']) || n.chests == emptyChests() && n.festival == emptyFestival())
         && n.updatedAt == request.time && rewardLinked(n,space,uid);
     }
     match /gamespaces/{space}/liveops/{uid} {
@@ -217,8 +221,5 @@ LETTER_CREDITS;
       allow update: if knownSpace(space) && owner(uid) && (
         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['updatedAt']) && request.resource.data.updatedAt == request.time
         || (resource.data.revision == 0 ? rewardInitial(request.resource.data,space,uid)
-          : rewardLinked(request.resource.data,space,uid) && (request.resource.data.day != resource.data.day
-            ? rewardPeriodRollover(request.resource.data,resource.data)
-            : rewardLetterUpdate(request.resource.data,resource.data) || rewardProgressFlush(request.resource.data,resource.data)
-              || validRewardState(request.resource.data, resource.data) && rewardTransition(request.resource.data,resource.data))));
+          : rewardLinked(request.resource.data,space,uid) && dispatchRewardUpdate(request.resource.data,resource.data)));
     }

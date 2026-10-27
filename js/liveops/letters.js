@@ -1,3 +1,4 @@
+import { CHEST_TYPES } from './chestConfig.js';
 import { LETTER_REWARD_ITEMS } from './letterCatalog.generated.js';
 import { LETTER_SETS, LETTER_FALLBACK_COINS, LETTER_ALPHABET, LETTER_SELL_COINS } from './config.js';
 const integer = n=>Number.isSafeInteger(n)&&n>=0;
@@ -16,8 +17,9 @@ export function normalizeLetters(value) {
     if(!['sell','fuse','exchange'].includes(last.kind))throw new Error('Kết quả đổi chữ chưa được hỗ trợ.');
     if(last.kind==='sell'&&(!LETTER_ALPHABET.includes(last.letter)||!integer(last.quantity)||last.quantity<1||last.coins!==last.quantity*LETTER_SELL_COINS))throw new Error('Kết quả bán chữ chưa toàn vẹn.');
     if(last.kind==='fuse'&&(!LETTER_ALPHABET.includes(last.letter)||!LETTER_ALPHABET.includes(last.received)||last.coins!==0))throw new Error('Kết quả ghép chữ chưa toàn vẹn.');
-    if(last.kind==='exchange'&&(!LETTER_SETS.some(set=>set.id===last.setId)||(last.itemId===null?last.coins!==LETTER_FALLBACK_COINS:!LETTER_REWARD_ITEMS.some(item=>item.id===last.itemId)||last.coins!==0)))throw new Error('Kết quả đổi bộ chữ chưa toàn vẹn.');
+    if(last.kind==='exchange'&&!last.chestType&&(!LETTER_SETS.some(set=>set.id===last.setId)||(last.itemId===null?last.coins!==LETTER_FALLBACK_COINS:!LETTER_REWARD_ITEMS.some(item=>item.id===last.itemId)||last.coins!==0)))throw new Error('Kết quả đổi bộ chữ chưa toàn vẹn.');
   }
+  if(last?.chestType && (last.kind!=='exchange'||!CHEST_TYPES.includes(last.chestType)||last.coins!==0||last.itemId!==null||!LETTER_SETS.some(set=>set.id===last.setId&&set.chestType===last.chestType)))throw new Error('Loại rương đổi chữ chưa toàn vẹn.');
   return {...structuredClone(value),counts:normalizeLetterCounts(value.counts),earned:normalizeLetterCounts(value.earned)};
 }
 export function creditLetters(previous, earned) {
@@ -65,14 +67,14 @@ export function letterProgressLabel(set,counts){return letterSetSlots(set,counts
 
 /** The pool has a stable display order; the exact next reward is visible before exchanging. */
 export function nextLetterReward(ownedIds){const owned=new Set(ownedIds);return LETTER_REWARD_ITEMS.find(item=>!owned.has(item.id))||null;}
-export function exchangeLetterSet(previous,command,ownedIds){
+export function exchangeLetterSet(previous,command,ownedIds,{chestsEnabled=false}={}){
   const state=normalizeLetters(previous);
   if(state.last?.operation===command.operation)return {state,coins:0,item:null,result:state.last};
   if(command.sequence!==state.sequence+1)throw new Error('Lượt đổi chữ đã được xử lý. Hãy tải lại kho chữ.');
   const set=LETTER_SETS.find(v=>v.id===command.setId);if(!set)throw new Error('Bộ chữ không hợp lệ.');
   for(const [letter,amount]of Object.entries(set.required))if((state.counts[letter]||0)<amount)throw new Error('Chưa đủ chữ để đổi quà.');
   for(const [letter,amount]of Object.entries(set.required))state.counts[letter]-=amount;
-  const item=nextLetterReward(ownedIds),coins=item?0:LETTER_FALLBACK_COINS;
-  state.sequence++;state.last={kind:'exchange',setId:set.id,itemId:item?.id||null,coins,sequence:state.sequence,operation:command.operation};
-  return {state,coins,item,result:state.last};
+  const item=chestsEnabled?null:nextLetterReward(ownedIds),coins=chestsEnabled?0:item?0:LETTER_FALLBACK_COINS;
+  state.sequence++;state.last={kind:'exchange',setId:set.id,itemId:item?.id||null,coins,...(chestsEnabled?{chestType:set.chestType}:{}),sequence:state.sequence,operation:command.operation};
+  return {state,coins,item,chestType:chestsEnabled?set.chestType:null,result:state.last};
 }

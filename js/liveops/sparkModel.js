@@ -1,3 +1,5 @@
+import { normalizeChests, normalizeFestival, earnChest, claimFestival, openChest } from './chests.js';
+import { FIREFLY_DROP_CHANCE } from './chestConfig.js';
 import { normalizeLetterCounts, normalizeLetters, creditLetters, mutateLetters, exchangeLetterSet, nextLetterReward } from './letters.js';
 import { LETTER_DROP_CHANCE, LETTER_ALPHABET, ACTIVE_EVENT_COLLECTION_ID, eventCollection } from './config.js';
 import { DAY_MS, DAILY, WEEKLY, LOGIN, WHEEL, periods, normalizeFact } from './model.js';
@@ -43,10 +45,11 @@ export function normalizeSparkState(value) {
     || s.ads.some((r, i) => r.source !== 'ad' || r.ordinal !== i + 1)) fail();
   const { rootRevision, fingerprint, updatedAt, ...state } = structuredClone(value);
   state.letters = normalizeLetters(value.letters);
+  if(value.chests!==undefined||value.festival!==undefined){ if(value.chests===undefined||value.festival===undefined)fail(); state.chests=normalizeChests(value.chests);state.festival=normalizeFestival(value.festival); }
   return state;
 }
 export function normalizeSparkSave(value) {
-  if (value === undefined) return { version: 1, ownerUid: null, economyRevision:0, state: null, ticketEarned: 0, letterEarned:{}, drops: {}, settled: {} };
+  if (value === undefined) return { version: 1, ownerUid: null, economyRevision:0, state: null, ticketEarned: 0, fireflyEarned:0, letterEarned:{}, drops: {}, settled: {} };
   if (!record(value) || value.version !== 1 || value.ownerUid !== null && !id(value.ownerUid) || !integer(value.ticketEarned) || !record(value.drops) || !record(value.settled)
     || Object.keys(value.drops).length > 18 || Object.keys(value.settled).length > 18) fail();
   if(value.economyRevision !== undefined && !integer(value.economyRevision))fail();
@@ -58,8 +61,8 @@ export function normalizeSparkSave(value) {
   }
   for (const [key, attempt] of Object.entries(value.settled))
     if (!/^(memory-match|link-connect|triple-connect):(easy|normal|hard|superHard|challenge|endless)$/.test(key) || !id(attempt)) fail();
-  if (value.state && value.ticketEarned < value.state.ticketEarned) fail();
-  return { ...structuredClone(value), state, economyRevision:value.economyRevision||0, letterEarned:normalizeLetterCounts(value.letterEarned) };
+  if (value.state && value.ticketEarned < value.state.ticketEarned || !integer(value.fireflyEarned??0) || (value.fireflyEarned??0)<(value.state?.festival?.earnedTotal||0)) fail();
+  return { ...structuredClone(value), state, economyRevision:value.economyRevision||0, letterEarned:normalizeLetterCounts(value.letterEarned),fireflyEarned:value.fireflyEarned??0 };
 }
 export function mergeSparkSave(previous, incoming) {
   const a = normalizeSparkSave(previous), b = normalizeSparkSave(incoming);
@@ -67,12 +70,12 @@ export function mergeSparkSave(previous, incoming) {
   // Persistence owns drop/settlement checkpoints. Stale appearance edits cannot undo them.
   const letterEarned = {...b.letterEarned};
   for(const [letter,amount] of Object.entries(a.letterEarned))letterEarned[letter]=Math.max(amount,letterEarned[letter]||0);
-  return { ...b, economyRevision:Math.max(a.economyRevision,b.economyRevision), letterEarned, ticketEarned: Math.max(a.ticketEarned, b.ticketEarned), drops: { ...b.drops, ...a.drops }, settled: { ...b.settled, ...a.settled } };
+  return { ...b, fireflyEarned:Math.max(a.fireflyEarned,b.fireflyEarned), economyRevision:Math.max(a.economyRevision,b.economyRevision), letterEarned, ticketEarned: Math.max(a.ticketEarned, b.ticketEarned), drops: { ...b.drops, ...a.drops }, settled: { ...b.settled, ...a.settled } };
 }
 export function applyTicketDrop(previous, input, random = secureUnit) {
   return applySpecialDrop(previous,input,{ticketRandom:random,dropLetters:false});
 }
-export function applySpecialDrop(previous, { gameId, mode, attempt, wave, group, special }, {ticketRandom=secureUnit,letterRandom=secureUnit,dropLetters=true}={}) {
+export function applySpecialDrop(previous, { gameId, mode, attempt, wave, group, special }, {ticketRandom=secureUnit,letterRandom=secureUnit,fireflyRandom=secureUnit,dropLetters=true,dropFireflies=false}={}) {
   const save = normalizeSparkSave(previous);
   if (!special) return { save, dropped: false };
   const key = `${gameId}:${mode}`;
@@ -93,14 +96,17 @@ export function applySpecialDrop(previous, { gameId, mode, attempt, wave, group,
       letter=LETTER_ALPHABET[Math.floor(choice*LETTER_ALPHABET.length)];save.letterEarned[letter]=(save.letterEarned[letter]||0)+1;
       if(!integer(save.letterEarned[letter]))fail();}
   }
-  return { save, dropped, letter };
+  let firefly=false;
+  if(dropFireflies){const chance=fireflyRandom();if(!(chance>=0&&chance<1))fail();firefly=chance<FIREFLY_DROP_CHANCE;if(firefly){save.fireflyEarned++;if(!integer(save.fireflyEarned))fail();}}
+  return { save, dropped, letter, firefly };
 }
 export function secureUnit() { const bytes = new Uint32Array(1); crypto.getRandomValues(bytes); return bytes[0] / 4294967296; }
 export const secureSector = () => Math.floor(secureUnit() * 8);
 /** No I/O or presentation. The published snapshot carries all entitlement markers. */
-export function transitionSpark(previous, command, { uid, now, sector = 0, ticketEarned = 0, letterEarned = {}, randomLetter = LETTER_ALPHABET[0], ownedItemIds = [], facts = [] } = {}) {
+export function transitionSpark(previous, command, { uid, now, sector = 0, ticketEarned = 0, letterEarned = {}, randomLetter = LETTER_ALPHABET[0], ownedItemIds = [], facts = [], festivalEnabled=false, fireflyEarned=0, supportCount=0 } = {}) {
   if (!id(uid) || !integer(ticketEarned)) fail();
   const state = previous ? normalizeSparkState(previous) : initialSparkState(now), receipts = [];
+  if(festivalEnabled){state.chests=normalizeChests(state.chests);state.festival=normalizeFestival(state.festival);if(!integer(fireflyEarned)||fireflyEarned<state.festival.earnedTotal)fail();state.festival.earnedTotal=fireflyEarned;}
   const p = periods(now); if (p.day < state.day || ticketEarned < state.ticketEarned) fail();
   const grant = (key, coins, extra = {}) => receipts.push({ receiptId: `${uid}:${key}`, ownerUid: uid, coins, grantedAt: now, ...extra });
   const addTickets = n => { state.tickets += n; if (!integer(state.tickets)) fail(); };
@@ -149,7 +155,7 @@ export function transitionSpark(previous, command, { uid, now, sector = 0, ticke
     state.event.dailyPoints+=points;state.event.points=Math.min(100,state.event.points+points);
   }
   eventCoins();
-  let spin = null, letterResult = null;
+  let spin = null, letterResult = null, chestResult = null;
   const ownedLetters = new Set(ownedItemIds);
   switch (command.type) {
     case 'status': break;
@@ -166,9 +172,22 @@ export function transitionSpark(previous, command, { uid, now, sector = 0, ticke
       break;
     }
     case 'exchangeLetterSet': {
-      const exchanged=exchangeLetterSet(state.letters,command,ownedLetters);state.letters=exchanged.state;letterResult=exchanged.result;
+      const exchanged=exchangeLetterSet(state.letters,command,ownedLetters,{chestsEnabled:festivalEnabled});state.letters=exchanged.state;letterResult=exchanged.result;
+      if(exchanged.chestType && previous?.letters?.last?.operation!==command.operation)state.chests=earnChest(state.chests,exchanged.chestType);
       if(exchanged.item){ownedLetters.add(exchanged.item.id);grant(`letters:${exchanged.item.id}`,0,{acquisition:{sourceKind:'letters',sourceId:'letters-collection-01',items:[exchanged.item.id]}});}
       else if(exchanged.coins)grant(`letters:${command.operation}`,exchanged.coins);
+      break;
+    }
+    case 'claimFestival': {
+      if(!festivalEnabled)fail();
+      const claimed=claimFestival(state.festival,state.chests,command);state.festival=claimed.festival;state.chests=claimed.chests;
+      if(claimed.coins)grant(`festival:${command.cycle}:${command.points}`,claimed.coins);
+      break;
+    }
+    case 'openChest': {
+      if(!festivalEnabled)fail();
+      const opened=openChest(state.chests,command,ownedItemIds,supportCount);state.chests=opened.chests;chestResult=opened.result;
+      if(opened.applied)grant(chestResult.kind==='item'?`chest:item:${chestResult.itemId}`:`chest:${command.operation}`,chestResult.coins,chestResult.kind==='item'?{acquisition:{sourceKind:'chest',sourceId:'shared-chests-v1',items:[chestResult.itemId]}}:chestResult.kind==='support'?{support:{gameId:chestResult.gameId,key:chestResult.key}}:{});
       break;
     }
     case 'spin': {
@@ -195,7 +214,7 @@ export function transitionSpark(previous, command, { uid, now, sector = 0, ticke
     }
     default: fail();
   }
-  return { state: normalizeSparkState(state), receipts, spin, letterResult, nextLetterRewardId:nextLetterReward(ownedLetters)?.id||null, ownedLetterIds:[...ownedLetters], serverNow: now };
+  return { state: normalizeSparkState(state), receipts, spin, letterResult, chestResult, ownedItemIds:[...ownedLetters], nextLetterRewardId:nextLetterReward(ownedLetters)?.id||null, ownedLetterIds:[...ownedLetters], serverNow: now };
 }
 
 /** Resolve a durable pending operation against canonical state before a new action. */
@@ -204,6 +223,8 @@ export function resolveSparkOperation(state, operation, now) {
   const day = periods(now).day;
   const existing = state && [state.spins.free,...state.spins.ads,...state.spins.pastAds,state.spins.ticket].find(r=>r?.operation === operation.operation);
   if (existing) return { command:operation, discarded:false };
+  if(operation.type==='claimFestival')return {command:operation,discarded:false};
+  if(operation.type==='openChest'){if(operation.sequence!==undefined&&operation.sequence<=(state?.chests?.sequence||0)&&state?.chests?.last?.operation!==operation.operation)return {command:{type:'status'},discarded:true};return {command:operation,discarded:false};}
   if (['sellLetter','fuseLetter','exchangeLetterSet'].includes(operation.type)) {
     if(operation.sequence !== undefined && operation.sequence <= (state?.letters.sequence || 0) && state?.letters.last?.operation !== operation.operation) return {command:{type:'status'},discarded:true};
     return {command:operation,discarded:false};

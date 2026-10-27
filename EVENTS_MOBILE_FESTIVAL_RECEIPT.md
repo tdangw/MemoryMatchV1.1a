@@ -38,3 +38,6 @@ bán có số lượng/tổng Xu; Kho rương 4 card và chi tiết tỷ lệ/ch
 
 U3: Nhiệm vụ hai tab, lịch 4+3 luôn hiện, đúng trạng thái sau ngày 7/nhận/bỏ ngày; thẻ catalog, tiến độ/bonus/weekly/điểm danh, countdown UTC một timer UI dừng khi ẩn và refresh kỳ mới có khóa chống lặp. Giữ guard ván chơi, stale UID. 13/13 unit nhiệm vụ/Spark đạt; giao diện/lifecycle kiểm chung Q1.
 
+
+D1: model version mở rộng tương thích, 4 counter earned/spent + sequence/result, festival earned/cycle/mask, command nhận/mở nguyên tử qua CAS/queue hiện có. Candidate ghi bền trước transaction; đầy 999 giữ pending; ownership grant UID+itemID riêng. Hỗ trợ cập nhật kho và RAM cùng commit. Rules sửa từ template/generator, dispatch chuyên biệt giữ quota/invariant trong ngân sách1000. 46/46 unit đạt. Hai suite Firebase emulator đạt: regression cũ và migration/130/claim mọi thứ tự/4 recipe/4 loại/race rương cuối/recovery/deny owner-counter-cycle. Suite mới21 publication:124reads/83writes/28.733bytes; chỉ đo emulator. Log runtime/qa/events-d1-*.log; không đưa log/test tạm vào commit.
+

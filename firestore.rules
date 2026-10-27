@@ -130,6 +130,102 @@ service cloud.firestore {
     }
     // END generated public cosmetic contract
     // BEGIN Spark reward contract
+    function emptyChestCounts() { return {'c':0,'frame':0,'avatar':0,'badge':0}; }
+    function emptyChests() { return {'version':1,'earned':emptyChestCounts(),'spent':emptyChestCounts(),'sequence':0,'last':null}; }
+    function emptyFestival() { return {'version':1,'earnedTotal':0,'completedCycles':0,'mask':0}; }
+    function chestCountMap(n) {
+      return n is map && n.keys().hasOnly(['c','frame','avatar','badge']) && n.keys().hasAll(['c','frame','avatar','badge'])
+        && rewardInt(n.c) && rewardInt(n.frame) && rewardInt(n.avatar) && rewardInt(n.badge);
+    }
+    function chestCounts(n) {
+      return n.keys().hasOnly(['version','earned','spent','sequence','last']) && n.version == 1
+        && chestCountMap(n.earned) && chestCountMap(n.spent) && rewardInt(n.sequence)
+        && n.spent.c <= n.earned.c && n.spent.frame <= n.earned.frame && n.spent.avatar <= n.earned.avatar && n.spent.badge <= n.earned.badge
+        && n.sequence == n.spent.c + n.spent.frame + n.spent.avatar + n.spent.badge;
+    }
+    function festivalValid(n) {
+      return n.keys().hasOnly(['version','earnedTotal','completedCycles','mask']) && n.version == 1
+        && rewardInt(n.earnedTotal) && rewardInt(n.completedCycles) && n.earnedTotal >= n.completedCycles * 100
+        && n.mask is int && n.mask >= 0 && n.mask < 15
+        && (n.mask % 2 == 0 || n.earnedTotal - n.completedCycles * 100 >= 25)
+        && (int(n.mask / 2) % 2 == 0 || n.earnedTotal - n.completedCycles * 100 >= 50)
+        && (int(n.mask / 4) % 2 == 0 || n.earnedTotal - n.completedCycles * 100 >= 75)
+        && (int(n.mask / 8) % 2 == 0 || n.earnedTotal - n.completedCycles * 100 >= 100);
+    }
+    function chestBase(n,o,fields) {
+      return n.diff(o).affectedKeys().hasOnly(fields.concat(['revision','rootRevision','fingerprint','updatedAt']))
+        && n.revision == o.revision + 1 && n.updatedAt == request.time && n.day == int(request.time.toMillis() / 86400000);
+    }
+    function rewardChestInit(n,o) {
+      return !o.keys().hasAny(['chests','festival']) && chestBase(n,o,['chests','festival'])
+        && n.chests == emptyChests() && n.festival == emptyFestival();
+    }
+    function chestGain(n,o,type) {
+      return n.version == o.version && n.spent == o.spent && n.last == o.last && n.sequence == o.sequence
+        && n.earned.diff(o.earned).affectedKeys().hasOnly([type]) && rewardInt(n.earned[type]) && n.earned[type] == o.earned[type] + 1;
+    }
+    function chestForSet(id) { return id == 'memory-match' ? 'avatar' : id == 'link-connect' ? 'frame' : id == 'triple-connect' ? 'badge' : id == 'adventure' ? 'avatar' : ''; }
+    function rewardChestExchange(n,o) {
+      return chestBase(n,o,['chests','letters']) && n.letters.last.get('chestType','') == chestForSet(n.letters.last.setId)
+        && rewardLetterExchange(n.letters,o.letters) && chestGain(n.chests,o.chests,n.letters.last.chestType);
+    }
+    function rewardFestivalEarn(n,o) {
+      return chestBase(n,o,['festival']) && festivalValid(n.festival) && n.festival.completedCycles == o.festival.completedCycles
+        && n.festival.mask == o.festival.mask && n.festival.earnedTotal >= o.festival.earnedTotal;
+    }
+    function rewardFestivalClaim(n,o) {
+      let prior = o.festival;
+      let next = n.festival;
+      let delta = next.completedCycles == prior.completedCycles ? next.mask - prior.mask : 15 - prior.mask;
+      let threshold = delta == 1 ? 25 : delta == 2 ? 50 : delta == 4 ? 75 : 100;
+      let type = delta == 2 ? 'c' : delta == 4 ? 'frame' : 'avatar';
+      return chestBase(n,o,['festival','chests']) && festivalValid(next) && next.earnedTotal == prior.earnedTotal
+        && (next.completedCycles == prior.completedCycles && next.mask > prior.mask
+          || next.completedCycles == prior.completedCycles + 1 && next.mask == 0)
+        && delta in [1,2,4,8] && int(prior.mask / delta) % 2 == 0 && prior.earnedTotal - prior.completedCycles * 100 >= threshold
+        && (delta == 1 ? n.chests == o.chests : chestGain(n.chests,o.chests,type));
+    }
+    function validChestResult(r) {
+      return r.keys().hasOnly(['chestType','gameId','poolVersion','kind','coins','reason','key','label','itemId','operation','sequence'])
+        && r.chestType in ['c','avatar','frame','badge'] && r.gameId in ['memory-match','link-connect','triple-connect'] && r.poolVersion == 1
+        && r.operation is string && r.operation.matches('^[A-Za-z0-9_-]{1,128}$') && rewardInt(r.coins)
+        && (r.kind == 'coins' ? (r.reason == 'coins' ? r.coins == (r.chestType == 'c' ? 50 : r.chestType == 'avatar' ? 150 : 100)
+          : r.reason in ['duplicate','full'] && r.chestType != 'c' && r.coins == (r.chestType == 'avatar' ? 300 : 200))
+          : r.kind == 'item' ? r.coins == 0 && r.itemId in (r.chestType == 'avatar' ? ["memory-avatar-sapphire-owl","memory-avatar-cherry-rabbit","memory-avatar-stellar-cat","memory-avatar-scholar-squirrel","memory-avatar-stargazer-hedgehog","memory-avatar-dreaming-deer","memory-avatar-galaxy-whale","memory-avatar-chestnut-squirrel","memory-avatar-snow-rabbit","memory-avatar-honey-bear","memory-avatar-dawn-crane","link-avatar-autumn-fox","link-avatar-moonfox","link-avatar-galaxy-deer","link-avatar-sailor-beaver","link-avatar-pearl-dolphin","link-avatar-azure-turtle","link-avatar-royal-seahorse","link-avatar-lantern-cat","link-avatar-festival-sparrow","link-avatar-paperblossom-deer","link-avatar-glasslight-fox","triple-avatar-jade-dragon","triple-avatar-blue-panda","triple-avatar-sunset-dragon","triple-avatar-quartz-phoenix","triple-avatar-amethyst-unicorn","triple-avatar-platinum-dragon","triple-avatar-crystal-mech-cat","triple-avatar-aurora-snowfox","triple-avatar-jade-penguin","triple-avatar-polar-bear","triple-avatar-galactic-dragon","letters-memory-avatar-moss-redpanda","letters-link-avatar-flower-fox","letters-triple-avatar-rose-dragon","letters-royal-avatar-dawn-lion","event-avatar-lantern-otter"] : (r.chestType == 'frame' ? ["memory-frame-golden-laurel","memory-frame-cherry-blossom","memory-frame-sky-feather","memory-frame-gilded-pages","memory-frame-astral-orbit","memory-frame-silken-clouds","memory-frame-knowledge-gateway","memory-frame-autumn-leaves","memory-frame-frosted-branch","memory-frame-golden-honeycomb","memory-frame-memory-crown","link-frame-moonblossom","link-frame-silver-moon","link-frame-stellar-orbit","link-frame-moon-coral","link-frame-silver-waves","link-frame-pearl-shell","link-frame-tidal-crown","link-frame-silk-lanterns","link-frame-osmanthus-branch","link-frame-moon-silk","link-frame-lantern-moon-gate","triple-frame-tri-crystal","triple-frame-prism","triple-frame-emerald","triple-frame-crystal-arch","triple-frame-three-wing-star","triple-frame-jade-gears","triple-frame-tri-star-crown","triple-frame-aurora-ribbon","triple-frame-azure-ice-ring","triple-frame-silver-meteor","triple-frame-aurora-crown","letters-memory-frame-memory-leaves","letters-link-frame-silk-lantern","letters-triple-frame-prism-glass","letters-royal-frame-journey-crown","event-frame-firefly-glow"] : (r.chestType == 'badge' ? ["memory-badge-wisdom","memory-badge-memory-master","memory-badge-wisdom-seal","memory-badge-memory-keeper","memory-badge-four-seasons","memory-badge-forest-guardian","link-badge-link-master","link-badge-golden-bond","link-badge-lighthouse-guide","link-badge-ocean-knot","link-badge-guiding-lantern","link-badge-moonlit-promise","triple-badge-crystal-triad","triple-badge-triad-master","triple-badge-triangle-seal","triple-badge-crystal-keeper","triple-badge-three-dawn-rays","triple-badge-aurora-heart","letters-memory-badge-folded-leaf","letters-link-badge-wish-knot","letters-triple-badge-prism-heart","letters-royal-badge-royal-seal"] : [])))
+          : r.kind == 'support' && r.coins == 0 && r.key in (r.gameId == 'memory-match' ? ["hint","preview4","time30"] : (r.gameId == 'link-connect' ? ["hint","reshuffle","thunder","freeze"] : (r.gameId == 'triple-connect' ? ["hint","undo","shuffle","time"] : []))));
+    }
+    function rewardChestOpen(n,o) {
+      let last = n.chests.last;
+      return chestBase(n,o,['chests']) && n.chests.earned == o.chests.earned && chestCounts(n.chests)
+        && n.chests.sequence == o.chests.sequence + 1 && last.sequence == n.chests.sequence && validChestResult(last)
+        && n.chests.spent.diff(o.chests.spent).affectedKeys().hasOnly([last.chestType])
+        && n.chests.spent[last.chestType] == o.chests.spent[last.chestType] + 1;
+    }
+    function rewardChestUpdate(n,o) {
+      return rewardChestInit(n,o) || (o.keys().hasAll(['chests','festival'])
+        && (rewardChestOpen(n,o) || rewardFestivalEarn(n,o) || rewardFestivalClaim(n,o) || rewardChestExchange(n,o)));
+    }
+
+    function rewardSpinOnly(n,o) {
+      let spent = n.ticketSpent - o.ticketSpent;
+      return chestBase(n,o,['spins','tickets','ticketSpent']) && rewardSpins(n.spins,o.spins) && rewardSpinTransition(n,o)
+        && rewardInt(n.tickets) && rewardInt(n.ticketSpent) && spent in [0,1] && n.tickets == o.tickets - spent
+        && (spent == 0 ? n.spins.ticket == o.spins.ticket : n.spins.ticket.sequence == n.ticketSpent && n.spins.ticket != o.spins.ticket)
+        && n.spins.pastAds.size() <= o.spins.pastAds.size() + 1;
+    }
+    function dispatchRewardUpdate(n,o) {
+      let changed = n.diff(o).affectedKeys();
+      return n.day != o.day ? rewardPeriodRollover(n,o)
+        : changed.hasAny(['chests','festival']) ? (!o.keys().hasAny(['chests','festival']) ? rewardChestInit(n,o)
+          : changed.hasAny(['letters']) ? rewardChestExchange(n,o)
+          : changed.hasAny(['chests']) ? (n.chests.sequence != o.chests.sequence ? rewardChestOpen(n,o) : rewardFestivalClaim(n,o))
+          : changed.hasOnly(['festival','revision','rootRevision','fingerprint','updatedAt']) ? (n.festival.earnedTotal != o.festival.earnedTotal ? rewardFestivalEarn(n,o) : rewardFestivalClaim(n,o)) : rewardProgressFlush(n,o))
+        : changed.hasOnly(['spins','tickets','ticketSpent','revision','rootRevision','fingerprint','updatedAt']) ? rewardSpinOnly(n,o)
+        : changed.hasOnly(['letters','revision','rootRevision','fingerprint','updatedAt']) ? rewardLetterUpdate(n,o)
+        : changed.hasOnly(['letters','daily','weekly','event','tickets','ticketEarned','revision','rootRevision','fingerprint','updatedAt']) && n.daily.claimed == o.daily.claimed && n.weekly.claimed == o.weekly.claimed ? rewardProgressFlush(n,o)
+        : validRewardState(n,o) && rewardTransition(n,o);
+    }
+
     // Spark reward contract: one private account document; no round/receipt collections.
     function rewardPath(space, uid) { return /databases/$(database)/documents/gamespaces/$(space)/liveops/$(uid); }
     function rootPath(space, uid) { return /databases/$(database)/documents/gamespaces/$(space)/players/$(uid); }
@@ -161,7 +257,8 @@ service cloud.firestore {
     function validRewardState(n, o) {
       let day = int(request.time.toMillis() / 86400000);
       let changed = n.diff(o).affectedKeys();
-      return n.keys().hasOnly(['version','revision','day','week','daily','weekly','loginNext','loginDay','spins','tickets','ticketEarned','ticketSpent','event','cosmetics','letters','rootRevision','fingerprint','updatedAt'])
+      return n.keys().hasOnly(['version','revision','day','week','daily','weekly','loginNext','loginDay','spins','tickets','ticketEarned','ticketSpent','event','cosmetics','letters','chests','festival','rootRevision','fingerprint','updatedAt'])
+        && n.get('chests',null) == o.get('chests',null) && n.get('festival',null) == o.get('festival',null)
         && n.version == 1 && (n.revision is int && n.revision >= 0 && n.revision <= 9007199254740991) && n.revision > 0 && n.day == day && n.week == day - ((day + 3) % 7)
         && (!changed.hasAny(['daily']) || rewardCounter(n.daily, ['win-three','match-thirty','win-without-hint','bonus']))
         && (!changed.hasAny(['weekly']) || rewardCounter(n.weekly, ['bonus']))
@@ -255,10 +352,10 @@ service cloud.firestore {
         && n.counts.keys().hasOnly(['A','C','D','E','H','I','K','L','M','N','O','P','R','T','U','V','Y']) && n.earned.keys().hasOnly(['A','C','D','E','H','I','K','L','M','N','O','P','R','T','U','V','Y'])
         && n.sequence is int && n.sequence >= o.sequence && n.sequence <= o.sequence + 1
         && (n.sequence == o.sequence ? n.last == o.last : n.last is map
-          && n.last.keys().hasOnly(['kind','letter','quantity','coins','received','sequence','operation','setId','itemId'])
+          && n.last.keys().hasOnly(['kind','letter','quantity','coins','received','sequence','operation','setId','itemId','chestType'])
           && n.last.sequence == n.sequence && n.last.operation is string && n.last.operation.matches('^[A-Za-z0-9_-]{1,128}$')
           && (n.last.kind == 'exchange' ? n.last.setId in ["memory-match","link-connect","triple-connect","adventure"]
-            && (n.last.itemId == null ? n.last.coins == 10000 : n.last.itemId in ["letters-memory-avatar-moss-redpanda","letters-memory-frame-memory-leaves","letters-memory-badge-folded-leaf","letters-link-avatar-flower-fox","letters-link-frame-silk-lantern","letters-link-badge-wish-knot","letters-triple-avatar-rose-dragon","letters-triple-frame-prism-glass","letters-triple-badge-prism-heart","letters-royal-avatar-dawn-lion","letters-royal-frame-journey-crown","letters-royal-badge-royal-seal"] && n.last.coins == 0)
+            && (n.last.get('chestType','') != '' ? n.last.chestType == chestForSet(n.last.setId) && n.last.itemId == null && n.last.coins == 0 : n.last.itemId == null ? n.last.coins == 10000 : n.last.itemId in ["letters-memory-avatar-moss-redpanda","letters-memory-frame-memory-leaves","letters-memory-badge-folded-leaf","letters-link-avatar-flower-fox","letters-link-frame-silk-lantern","letters-link-badge-wish-knot","letters-triple-avatar-rose-dragon","letters-triple-frame-prism-glass","letters-triple-badge-prism-heart","letters-royal-avatar-dawn-lion","letters-royal-frame-journey-crown","letters-royal-badge-royal-seal"] && n.last.coins == 0)
             : n.last.letter in ['A','C','D','E','H','I','K','L','M','N','O','P','R','T','U','V','Y'] && (n.last.kind == 'sell' ? n.last.quantity is int && n.last.quantity > 0
               && n.last.coins == n.last.quantity * 1000 : n.last.kind == 'fuse' && n.last.received in ['A','C','D','E','H','I','K','L','M','N','O','P','R','T','U','V','Y'] && n.last.coins == 0)))
         && (!changed.hasAny(['A']) || rewardLetterValue(n,o,'A'))
@@ -285,9 +382,9 @@ service cloud.firestore {
       let required = letterRequirementMap(n.last.setId);
       return n.keys().hasOnly(['counts','earned','sequence','last']) && n.earned == o.earned
         && n.sequence == o.sequence + 1 && n.last.sequence == n.sequence
-        && n.last.keys().hasOnly(['kind','setId','itemId','coins','sequence','operation']) && n.last.kind == 'exchange'
+        && n.last.keys().hasOnly(['kind','setId','itemId','coins','sequence','operation','chestType']) && n.last.kind == 'exchange'
         && n.last.setId in ["memory-match","link-connect","triple-connect","adventure"] && n.last.operation is string && n.last.operation.matches('^[A-Za-z0-9_-]{1,128}$')
-        && (n.last.itemId == null ? n.last.coins == 10000 : n.last.itemId in ["letters-memory-avatar-moss-redpanda","letters-memory-frame-memory-leaves","letters-memory-badge-folded-leaf","letters-link-avatar-flower-fox","letters-link-frame-silk-lantern","letters-link-badge-wish-knot","letters-triple-avatar-rose-dragon","letters-triple-frame-prism-glass","letters-triple-badge-prism-heart","letters-royal-avatar-dawn-lion","letters-royal-frame-journey-crown","letters-royal-badge-royal-seal"] && n.last.coins == 0)
+        && (n.last.get('chestType','') != '' ? n.last.chestType == chestForSet(n.last.setId) && n.last.itemId == null && n.last.coins == 0 : n.last.itemId == null ? n.last.coins == 10000 : n.last.itemId in ["letters-memory-avatar-moss-redpanda","letters-memory-frame-memory-leaves","letters-memory-badge-folded-leaf","letters-link-avatar-flower-fox","letters-link-frame-silk-lantern","letters-link-badge-wish-knot","letters-triple-avatar-rose-dragon","letters-triple-frame-prism-glass","letters-triple-badge-prism-heart","letters-royal-avatar-dawn-lion","letters-royal-frame-journey-crown","letters-royal-badge-royal-seal"] && n.last.coins == 0)
         && n.counts.diff(o.counts).affectedKeys().hasOnly(required.keys())
         && (!required.keys().hasAny(['A']) || rewardExchangeValue(n.counts.get('A',0),o.counts.get('A',0),required.get('A',0)))
         && (!required.keys().hasAny(['C']) || rewardExchangeValue(n.counts.get('C',0),o.counts.get('C',0),required.get('C',0)))
@@ -349,7 +446,7 @@ service cloud.firestore {
     }
     function rewardProgressFlush(n,o) {
       let changed = n.diff(o).affectedKeys();
-      return changed.hasOnly(['letters','daily','weekly','event','tickets','ticketEarned','revision','rootRevision','fingerprint','updatedAt'])
+      return changed.hasOnly(['festival','letters','daily','weekly','event','tickets','ticketEarned','revision','rootRevision','fingerprint','updatedAt'])
         && n.revision == o.revision + 1 && n.updatedAt == request.time && n.day == int(request.time.toMillis() / 86400000)
         && n.daily.claimed == o.daily.claimed && n.weekly.claimed == o.weekly.claimed
         && (!changed.hasAny(['daily']) || rewardCounter(n.daily,['win-three','match-thirty','win-without-hint','bonus']) && monotoneCounter(n.daily,o.daily))
@@ -357,6 +454,7 @@ service cloud.firestore {
         && n.tickets is int && n.tickets >= 0 && n.tickets <= 9007199254740991
         && n.ticketEarned is int && n.ticketEarned >= o.ticketEarned && n.ticketEarned <= 9007199254740991
         && n.tickets == o.tickets + n.ticketEarned - o.ticketEarned
+        && (!changed.hasAny(['festival']) || festivalValid(n.festival) && n.festival.completedCycles == o.festival.completedCycles && n.festival.mask == o.festival.mask && n.festival.earnedTotal >= o.festival.earnedTotal)
         && (!changed.hasAny(['event']) || rewardEventProgress(n.event,o.event))
         && (!changed.hasAny(['letters']) || rewardLetterCredit(n.letters,o.letters));
     }
@@ -379,13 +477,14 @@ service cloud.firestore {
     function rewardInitial(n, space, uid) {
       let empty = {'wins':0,'matches':0,'noHint':0,'visits':0,'claimed':[]};
       let day = int(request.time.toMillis() / 86400000);
-      return n.keys().hasOnly(['version','revision','day','week','daily','weekly','loginNext','loginDay','spins','tickets','ticketEarned','ticketSpent','event','cosmetics','letters','rootRevision','fingerprint','updatedAt'])
+      return n.keys().hasOnly(['version','revision','day','week','daily','weekly','loginNext','loginDay','spins','tickets','ticketEarned','ticketSpent','event','cosmetics','letters','chests','festival','rootRevision','fingerprint','updatedAt'])
         && n.version == 1 && n.revision == 1 && n.day == day && n.week == day - ((day + 3) % 7)
         && n.daily == empty && n.weekly == empty && n.loginNext == 0 && n.loginDay == -1
         && n.spins == {'free':null,'ads':[],'pastAds':[],'ticket':null} && n.tickets == 0 && n.ticketEarned == 0 && n.ticketSpent == 0
         && n.event == {'id':'firefly-festival-01','week':n.week,'points':0,'day':day,'dailyPoints':0,'claimed':[]}
         && n.cosmetics == {'collectionId':'firefly-festival-01','week':n.week,'points':0,'granted':[]}
         && n.letters == {'counts':{},'earned':{},'sequence':0,'last':null}
+        && (!n.keys().hasAny(['chests','festival']) || n.chests == emptyChests() && n.festival == emptyFestival())
         && n.updatedAt == request.time && rewardLinked(n,space,uid);
     }
     match /gamespaces/{space}/liveops/{uid} {
@@ -397,10 +496,7 @@ service cloud.firestore {
       allow update: if knownSpace(space) && owner(uid) && (
         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['updatedAt']) && request.resource.data.updatedAt == request.time
         || (resource.data.revision == 0 ? rewardInitial(request.resource.data,space,uid)
-          : rewardLinked(request.resource.data,space,uid) && (request.resource.data.day != resource.data.day
-            ? rewardPeriodRollover(request.resource.data,resource.data)
-            : rewardLetterUpdate(request.resource.data,resource.data) || rewardProgressFlush(request.resource.data,resource.data)
-              || validRewardState(request.resource.data, resource.data) && rewardTransition(request.resource.data,resource.data))));
+          : rewardLinked(request.resource.data,space,uid) && dispatchRewardUpdate(request.resource.data,resource.data)));
     }
     // END Spark reward contract
     match /{document=**} { allow read, write: if false; }

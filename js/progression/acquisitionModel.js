@@ -1,3 +1,4 @@
+import { CHEST_ITEMS } from '../liveops/chestConfig.js';
 import { LETTER_REWARD_ITEMS } from '../liveops/letterCatalog.generated.js';
 import { eventCollection } from '../liveops/config.js';
 import { EXTRA_COSMETIC_ITEMS } from './achievementCatalog.generated.js';
@@ -11,6 +12,12 @@ export function normalizeAcquisitions(value) {
   if (!record(value) || value.version !== 1 || !record(value.grants)) throw invalid();
   const grants = {};
   for (const [id, grant] of Object.entries(value.grants)) {
+    if(grant?.sourceKind==='chest'){
+      const item=Array.isArray(grant.items)&&grant.items.length===1?CHEST_ITEMS.find(item=>item.id===grant.items[0]):null;
+      if(!item||grant.receiptId!==id||typeof grant.ownerUid!=='string'||!/^[A-Za-z0-9_-]{1,128}$/.test(grant.ownerUid)
+        ||id!==`${grant.ownerUid}:chest:item:${item.id}`||grant.sourceId!=='shared-chests-v1'||!Number.isSafeInteger(grant.grantedAt)||grant.grantedAt<0)throw invalid();
+      grants[id]={receiptId:id,ownerUid:grant.ownerUid,sourceKind:'chest',sourceId:grant.sourceId,items:[item.id],grantedAt:grant.grantedAt};continue;
+    }
     if (grant?.sourceKind === 'letters') {
       const item = Array.isArray(grant.items) && grant.items.length === 1 ? LETTER_REWARD_ITEMS.find(item=>item.id===grant.items[0]) : null;
       if(!item || grant.receiptId!==id || typeof grant.ownerUid!=='string' || !/^[A-Za-z0-9_-]{1,128}$/.test(grant.ownerUid)

@@ -1,9 +1,15 @@
 import { LETTER_REWARD_ITEMS } from '../js/liveops/letterCatalog.generated.js';
 import fs from 'node:fs/promises';
+import { CHEST_POOLS, CHEST_SUPPORTS } from '../js/liveops/chestConfig.js';
 import { LETTER_SETS, LETTER_ALPHABET, ACTIVE_EVENT_COLLECTION_ID, EVENT_COLLECTIONS } from '../js/liveops/config.js';
 // The current rules source is separate from historical approval and the retired Functions package.
 const file = 'firestore.rules';
 let section = await fs.readFile('design/rewards-liveops/spark-rules.template.txt', 'utf8');
+let chestRules = await fs.readFile('design/rewards-liveops/chest-rules.template.txt', 'utf8');
+chestRules = chestRules.replace('CHEST_SET_LOOKUP', LETTER_SETS.map(set=>`id == '${set.id}' ? '${set.chestType}' : `).join('') + "''")
+  .replace('CHEST_POOL_LOOKUP', Object.entries(CHEST_POOLS).map(([type,ids])=>`(r.chestType == '${type}' ? ${JSON.stringify(ids)} : `).join('')+'[])'+')'.repeat(Object.keys(CHEST_POOLS).length-1))
+  .replace('CHEST_SUPPORT_LOOKUP', Object.entries(CHEST_SUPPORTS).map(([game,items])=>`(r.gameId == '${game}' ? ${JSON.stringify(items.map(item=>item.key))} : `).join('')+'[])'+')'.repeat(Object.keys(CHEST_SUPPORTS).length-1));
+section = section.replace('CHEST_CONTRACT',()=>chestRules);
 section = section.replaceAll('LETTER_REQUIREMENTS',JSON.stringify(Object.fromEntries(LETTER_SETS.map(set=>[set.id,set.required])))).replaceAll('LETTER_SET_IDS',JSON.stringify(LETTER_SETS.map(set=>set.id))).replaceAll('LETTER_REWARDS',JSON.stringify(LETTER_REWARD_ITEMS.map(item=>item.id)));
 section=section.replaceAll('LETTER_REQUIREMENT_LOOKUP',LETTER_SETS.map(set=>`setId == '${set.id}' ? ${JSON.stringify(set.required)}.get(key,0) : `).join('')+'0');
 section=section.replaceAll('LETTER_REQUIREMENT_MAP',LETTER_SETS.map(set=>`setId == '${set.id}' ? ${JSON.stringify(set.required)} : `).join('')+'{}');

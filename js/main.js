@@ -120,6 +120,7 @@ const seasonReady = await ensureGameplaySeason();
 const achievementReady = !seasonReady || await backfillAchievementInventory();
 hydrateGameState(seasonReady && achievementReady ? await loadPersistentGameData() : undefined);
 subscribeToLocalCommit(({ patch }) => {
+  if(patch.rewardInventory)for(const key of ['memoryMatch','linkConnect','tripleConnect'])gameState.progress[key].items={...patch.rewardInventory[key].items};
   if (patch.appearance) gameState.appearance = normalizeAppearance(patch.appearance);
   if (patch.coins !== undefined) gameState.coins = patch.coins;
   if (patch.rewardSettlement) void requestLiveops().catch(error => console.info('Reward facts await connection', error.code || error.name));

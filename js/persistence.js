@@ -205,7 +205,7 @@ export function commitSparkOperation(operation, isCurrent = () => true) {
     knownRevision = envelope.revision;
     committedRewardCoins += result.added || 0;
     // Snapshot already published by this operation. Updating RAM must not enqueue a second upload.
-    notifyCommit({ coins: envelope.data.coins, appearance: structuredClone(envelope.data.appearance), rewardPublished: true });
+    notifyCommit({ coins: envelope.data.coins, appearance: structuredClone(envelope.data.appearance), rewardInventory:structuredClone(envelope.data.progress), rewardPublished: true });
     return result;
   });
 }
