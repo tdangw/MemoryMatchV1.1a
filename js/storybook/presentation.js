@@ -39,7 +39,8 @@ export function createCosmeticPortrait({ avatar, frame, badge, label = 'Ảnh đ
 export function createAchievementNoticeContent({ gameName, level, name, category, image, type = 'item', firstHint = '', storedIn }) {
   const content = element('div', 'storybook-achievement');
   const hero = element('div', 'storybook-achievement__hero'); hero.dataset.kind = type;
-  hero.append(image ? picture(image, 'storybook-achievement__hero-image', name) : createIcon('chest'));
+  const art = image ? picture(image, 'storybook-achievement__hero-image', name) : createIcon('chest');
+  art.classList.add('storybook-achievement__hero-image'); hero.append(art);
   content.append(element('p', 'storybook-achievement__source', `${gameName} · Màn ${level}`),
     element('p', 'storybook-achievement__condition', 'Đã hoàn thành cả bốn độ khó'),
     hero,
@@ -166,7 +167,7 @@ export function createAchievementListContent({ gameName, levels }) {
     });
     details.append(difficulties, element('p', '', level.completed.every(Boolean) ? 'Đã hoàn thành' : `${level.completed.filter(Boolean).length}/4 độ khó`));
     const reward = element('div', 'storybook-achievement-row__reward');
-    reward.append(picture(level.image, '', level.name), element('small', '', level.name));
+    reward.append(level.image ? picture(level.image, '', level.name) : createIcon('chest'), element('small', '', level.name));
     row.append(details, reward); content.append(row);
   }
   content.append(element('p', 'storybook-collection__note', 'Mỗi màn nhận thưởng một lần.'));

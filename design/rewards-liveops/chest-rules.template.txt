@@ -69,11 +69,6 @@
         && n.chests.spent.diff(o.chests.spent).affectedKeys().hasOnly([last.chestType])
         && n.chests.spent[last.chestType] == o.chests.spent[last.chestType] + 1;
     }
-    function rewardChestUpdate(n,o) {
-      return rewardChestInit(n,o) || (o.keys().hasAll(['chests','festival'])
-        && (rewardChestOpen(n,o) || rewardFestivalEarn(n,o) || rewardFestivalClaim(n,o) || rewardChestExchange(n,o)));
-    }
-
     function rewardSpinOnly(n,o) {
       let spent = n.ticketSpent - o.ticketSpent;
       return chestBase(n,o,['spins','tickets','ticketSpent']) && rewardSpins(n.spins,o.spins) && rewardSpinTransition(n,o)

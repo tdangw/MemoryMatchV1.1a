@@ -148,7 +148,7 @@ assert.deepEqual(
     achievements: { version: 1, grants: {}, hintsSeen: {}, backfillVersion: 0, coverageRevision: 0 },
     acquisitions: { version: 1, grants: {} },
     rewards: { version: 1, applied: {}, pending: [] },
-    spark: { version: 1, ownerUid: null, economyRevision: 0, state: null, ticketEarned: 0, letterEarned: {}, drops: {}, settled: {} },
+    spark: { version: 1, ownerUid: null, economyRevision: 0, state: null, ticketEarned: 0, fireflyEarned: 0, letterEarned: {}, drops: {}, settled: {} },
     profileCosmetics: { avatar: null, frame: null, badge: null },
   },
 );

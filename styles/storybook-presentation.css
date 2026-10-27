@@ -124,7 +124,7 @@ html[data-ui-skin='storybook'] .adventure-page .adventure-exit {
 .storybook-difficulty .ui-icon { width: 27px; height: 27px; padding: 4px; box-sizing: border-box; border: 1px solid #a28b5e; border-radius: 7px; background: #d7ccb3; color: #84735a; }
 .storybook-difficulty[data-complete='true'] .ui-icon { background: #a5c56c; color: #376329; border-color: #6e8c3d; }
 .storybook-achievement-row__reward { flex: 0 0 80px; width: 80px; text-align: center; font-weight: 700; font-size: 11px; line-height: 1.2; }
-.storybook-achievement-row__reward img { display: block; width: 80px; height: 80px; object-fit: contain; }
+.storybook-achievement-row__reward :is(img, .ui-icon) { display: block; width: 80px; height: 80px; object-fit: contain; }
 .storybook-collection__note { text-align: center; font-size: 13px; font-weight: 700; }
 @media (max-width: 360px) {
   .app-modal.storybook-surface { padding-inline: 18px; }
@@ -135,7 +135,7 @@ html[data-ui-skin='storybook'] .adventure-page .adventure-exit {
   .storybook-difficulty .ui-icon { width: 23px; height: 23px; }
   .storybook-achievement-row { padding: 8px; gap: 4px; }
   .storybook-achievement-row__reward { flex-basis: 68px; width: 68px; }
-  .storybook-achievement-row__reward img { width: 68px; height: 68px; }
+  .storybook-achievement-row__reward :is(img, .ui-icon) { width: 68px; height: 68px; }
 }
 @media (max-height: 600px) {
   .storybook-customization__hero { height: 100px; }

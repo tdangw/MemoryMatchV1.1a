@@ -3,11 +3,17 @@ import { requestLiveops } from './service.js';
 import { loadPersistentGameData } from '../persistence.js';
 import { getActiveGameScope, createGameShellLifecycle } from '../gameShell/gameShellLifecycle.js';
 import { getAccountService } from '../accountService.js';
-import { CHEST_TYPES, CHEST_NAMES, CHEST_POLICY, CHEST_ITEMS, CHEST_POOLS } from './chestConfig.js';
+import { CHEST_TYPES, CHEST_NAMES, CHEST_POLICY, CHEST_ITEMS, CHEST_POOLS, CHEST_SUPPORTS } from './chestConfig.js';
 import { createIcon } from '../icons.js';
 import { refreshAppWallet } from '../appNavigation.js';
 import { ownedProfileCosmeticItems } from '../progression/achievementModel.js';
 import '../../styles/liveops.css';
+
+function rewardDescription(reward) {
+  if (reward.kind === 'item') return `${CHEST_ITEMS.find(item=>item.id===reward.itemId).name} · Xem và trang bị trong Hồ sơ.`;
+  if (reward.kind === 'support') return `${reward.label} · ${reward.gameId === 'memory-match' ? 'Memory Match' : reward.gameId === 'link-connect' ? 'Link Connect' : 'Triple Connect'}.`;
+  return `${reward.reason === 'duplicate' ? 'Đã có · ' : reward.reason === 'full' ? 'Đã đủ bộ · ' : ''}${reward.coins} Xu.`;
+}
 
 /** A collection-owned child view. Closing presentation never cancels a committed reward. */
 export function mountChestInventory(host, { owner, back, profile, gameId = 'memory-match' }) {
@@ -16,35 +22,39 @@ export function mountChestInventory(host, { owner, back, profile, gameId = 'memo
   const current = () => scope.active && host.isConnected && getAccountService()?.getIdentity()?.profileId === identity?.profileId && getAccountService()?.getIdentity()?.uid === identity?.uid;
   const root = node('div', 'liveops liveops--chests'), status = node('p', 'liveops__status', 'Đang tải Kho rương…');
   status.setAttribute('role', 'status'); root.append(action('Quay lại Bộ sưu tập', back), status); host.replaceChildren(root);
-  let view = null, busy = false, connected = false, selected = null, page = 0;
-  const cards = node('div', 'liveops__chest-grid'), detail = node('section', 'liveops__card'); root.append(cards, detail);
+  let view = null, busy = false, connected = false, selected = null, page = 0, pendingChest = null;
+  const lastResult = node('p', 'liveops__last-result'), cards = node('div', 'liveops__chest-grid'), detail = node('section', 'liveops__card'); root.append(lastResult, cards, detail);
   if (profile) root.append(action('Xem trong Hồ sơ', profile));
   function render() {
     const focus = document.activeElement?.dataset.focusKey;
     cards.replaceChildren(); detail.replaceChildren();
+    lastResult.textContent = '';
     if (!view?.state?.chests) return;
     const chests = view.state.chests;
+    if(chests.last)lastResult.textContent=`Lần mở gần nhất: ${rewardDescription(chests.last)}`;
     for (const type of CHEST_TYPES) {
       const count = chests.earned[type] - chests.spent[type], card = node('section', 'liveops__card');
       card.append(createIcon(type === 'c' ? 'chest' : type === 'avatar' ? 'profile' : type === 'frame' ? 'expand' : 'achievements'),
         node('h3', '', CHEST_NAMES[type]), node('p', '', count ? `×${count.toLocaleString('vi-VN')}` : 'Chưa có'),
         action('Xem quà & tỷ lệ', () => { selected = type; page = 0; render(); detail.querySelector('h3').focus(); }, false, `details-${type}`),
-        action('Mở 1 rương', () => { selected = type; page = 0; render(); detail.querySelector('select').focus(); }, busy || !connected || Boolean(getActiveGameScope()) || count < 1, `open-${type}`));
+        action('Mở 1 rương', () => { selected = type; page = 0; render(); detail.querySelector('select').focus(); }, busy || !connected || Boolean(getActiveGameScope()) || count < 1 || Boolean(pendingChest && pendingChest.chestType !== type), `open-${type}`));
       cards.append(card);
     }
     if (selected) {
       const policy = CHEST_POLICY[selected], title = node('h3', '', CHEST_NAMES[selected]); title.tabIndex = -1;
       detail.append(title, node('p', '', `40%: ${policy.coins} Xu · ${selected === 'c' ? '60' : '40'}%: 1 hỗ trợ${selected === 'c' ? '' : ' · 20%: 1 ngoại hình đúng loại'}`));
-      if (policy.duplicate) detail.append(node('p', '', `Ngoại hình trùng: ${policy.duplicate} Xu. Đã đủ toàn bộ pool của loại này: mỗi rương đổi thẳng ${policy.duplicate} Xu.`));
+      if (policy.duplicate) detail.append(node('p', '', `Ngoại hình trùng: ${policy.duplicate} Xu. Khi đã có đủ ngoại hình của loại rương này, mỗi rương đổi thẳng ${policy.duplicate} Xu.`));
       const games = node('select', 'liveops__letter-select'); games.setAttribute('aria-label', 'Trò nhận hỗ trợ');
       for (const [id, label] of [['memory-match','Memory Match'],['link-connect','Link Connect'],['triple-connect','Triple Connect']]) {
         const option = node('option', '', label); option.value = id; games.append(option);
       }
-      games.value = gameId; games.onchange = () => { gameId = games.value; };
-      detail.append(games, action('Mở 1 rương', () => void open(), busy || !connected || Boolean(getActiveGameScope()) || chests.earned[selected] === chests.spent[selected], 'confirm-open'),
+      const supportInfo = node('p', 'liveops__support-pool');
+      const describeSupports = () => { supportInfo.textContent = `Quà hỗ trợ: ${CHEST_SUPPORTS[gameId].map(item=>item.label).join(' · ')}. Nếu nhận hỗ trợ, các món có cơ hội như nhau.`; };
+      games.value = gameId; games.disabled = busy || Boolean(pendingChest); games.onchange = () => { gameId = games.value; describeSupports(); }; describeSupports();
+      detail.append(games, supportInfo, action('Mở 1 rương', () => void open(), busy || !connected || Boolean(getActiveGameScope()) || chests.earned[selected] === chests.spent[selected] || Boolean(pendingChest && pendingChest.chestType !== selected), 'confirm-open'),
         node('p', '', 'Mỗi rương nhận một quà. Xu vào ví, hỗ trợ vào kho trò đã chọn, ngoại hình vào Hồ sơ. Kho hỗ trợ đầy sẽ giữ rương để thử lại.'));
       const pool = CHEST_POOLS[selected] || [], gallery = node('div', 'liveops__chest-grid'), owned = new Set(view.ownedItemIds || view.ownedLetterIds || []);
-      detail.append(node('p', '', `${owned.size ? pool.filter(id => owned.has(id)).length : 0}/${pool.length} ngoại hình đã có`));
+      if(pool.length)detail.append(node('p', '', `${owned.size ? pool.filter(id => owned.has(id)).length : 0}/${pool.length} ngoại hình đã có`),node('p','','Các món ngoại hình có cơ hội như nhau khi nhận quà ngoại hình; có thể gặp lại món đã có.'));
       for (const id of pool.slice(page * 12, page * 12 + 12)) {
         const item = CHEST_ITEMS.find(item => item.id === id), figure = node('figure'), image = node('img', 'liveops__reward-preview');
         image.src = `${import.meta.env.BASE_URL}${item.files[128]}`; image.width = image.height = 128; image.loading = 'lazy'; image.decoding = 'async'; image.alt = item.name;
@@ -58,20 +68,18 @@ export function mountChestInventory(host, { owner, back, profile, gameId = 'memo
     if (focus) [...root.querySelectorAll('button')].find(button => button.dataset.focusKey === focus && !button.disabled)?.focus({ preventScroll: true });
   }
   async function open() {
-    if (busy || !connected || getActiveGameScope()) return;
+    if (busy || !connected || getActiveGameScope() || pendingChest && pendingChest.chestType !== selected) return;
     busy = true; render();
     try {
       const result = await requestLiveops({ type:'openChest', chestType:selected, gameId });
-      if (!current()) return; view = result; refreshAppWallet();
+      if (!current()) return; view = result; pendingChest = null; refreshAppWallet();
       const reward = result.chestResult;
-      status.textContent = reward ? reward.kind === 'item' ? `Đã nhận ${CHEST_ITEMS.find(item => item.id === reward.itemId).name}. Xem và trang bị trong Hồ sơ.`
-        : reward.kind === 'support' ? `Đã nhận ${reward.label} · ${reward.gameId === 'memory-match' ? 'Memory Match' : reward.gameId === 'link-connect' ? 'Link Connect' : 'Triple Connect'}.`
-          : `${reward.reason === 'duplicate' ? 'Đã có · ' : reward.reason === 'full' ? 'Đã đủ bộ · ' : ''}Nhận ${reward.coins} Xu.` : 'Đã cập nhật Kho rương.';
-    } catch (error) { if (current()) status.textContent = error.message || 'Chưa mở được rương. Hãy thử lại.'; }
+      status.textContent = reward ? `${reward.kind==='coins'&&reward.reason!=='coins'?'':'Đã nhận '}${rewardDescription(reward)}` : 'Đã cập nhật Kho rương.';
+    } catch (error) { if (current()) { if(error.pendingChest){pendingChest=error.pendingChest;selected=pendingChest.chestType;gameId=pendingChest.gameId;}status.textContent = error.message || 'Chưa mở được rương. Hãy thử lại.'; } }
     finally { busy = false; if (current()) render(); }
   }
   async function load() {
-    if (busy) return; busy = true;
+    if (busy || !current()) return; busy = true;
     try {
       let result;
       if (getActiveGameScope() || !navigator.onLine) {
@@ -80,11 +88,25 @@ export function mountChestInventory(host, { owner, back, profile, gameId = 'memo
       } else result = await requestLiveops();
       if (!current()) return;
       view = result; connected = navigator.onLine && !getActiveGameScope(); status.textContent = result.state?.chests ? 'Kho rương' : 'Kho rương sắp mở.';
-    } catch { connected = false; if (current()) status.textContent = 'Chưa tải được Kho rương. Hãy kết nối và thử lại.'; }
+    } catch(error) {
+      connected = false;
+      if(current()) {
+        try {
+          const data=await loadPersistentGameData();
+          if(current()&&data.appearance.spark?.ownerUid===identity?.uid){view={state:data.appearance.spark.state,ownedItemIds:ownedProfileCosmeticItems(data.appearance).map(item=>item.id)};}
+          if(error.pendingChest&&current()){pendingChest=error.pendingChest;selected=pendingChest.chestType;gameId=pendingChest.gameId;connected=navigator.onLine&&!getActiveGameScope();}
+          if(current())status.textContent=error.pendingChest?error.message:'Đang xem dữ liệu đã lưu. Kết nối và tải lại để mở rương.';
+        } catch { if(current())status.textContent='Chưa đọc được Kho rương. Hãy tải lại trang.'; }
+      }
+    }
     finally { busy = false; if (current()) render(); }
   }
   scope.listen(window,'offline',()=>{connected=false;if(current())render();});
   scope.listen(window,'online',()=>{if(current())void load();});
+  const account=getAccountService();
+  if(account)scope.own(account.subscribe(()=>{
+    if(scope.active&&!current()){view=null;connected=false;lastResult.textContent='';cards.replaceChildren();detail.replaceChildren();status.textContent='Tài khoản đã thay đổi. Mở lại Bộ sưu tập để xem Kho rương.';}
+  }));
   root.append(action('Tải lại Kho rương', () => void load())); void load();
   return () => { scope.dispose(); release.forget(); };
 }

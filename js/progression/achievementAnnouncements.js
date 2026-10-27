@@ -22,7 +22,7 @@ export async function presentAchievementAnnouncements({ owner = getAppPageScope(
     const firstHint = item.grant.chestType ? 'Mở Bộ sưu tập → Kho rương để xem quà và mở khi bạn muốn.' : seen ? '' : profile ? 'Chạm ảnh đại diện trong Hồ sơ để thay đổi.' : `Bạn có thể chọn hiệu ứng trong Bộ sưu tập ${gameName}.`;
     const content = createAchievementNoticeContent({ gameName, level: item.level, name: item.grant.chestType ? CHEST_NAMES[item.grant.chestType] : item.name,
       category: item.grant.chestType ? 'Mở rương để khám phá quà bên trong' : types[item.type],
-      type: item.type, image: item.grant.chestType ? null : achievementAssetUrl(item), firstHint,
+      type: item.grant.chestType ? 'chest' : item.type, image: item.grant.chestType ? null : achievementAssetUrl(item), firstHint,
       storedIn: item.grant.chestType ? 'Đã thêm vào Kho rương trong Bộ sưu tập' : profile ? 'Đã thêm vào Hồ sơ' : `Đã thêm vào Bộ sưu tập ${gameName}` });
     const error = document.createElement('p'); error.setAttribute('role', 'alert'); content.append(error);
     let continued = false;

@@ -16,7 +16,7 @@ function progress(value, target, label) {
 function card(title, icon) {
   const root = node('section', 'liveops__card'); root.append(createIcon(icon), node('h3', '', title)); return root;
 }
-export function renderMissions(host, { view, tab, busy, run, play, canPlay, selectTab }) {
+export function renderMissions(host, { view, tab, busy, run, play, canPlay, canClaim, selectTab }) {
   const tabs = createTabs('missions', [['daily','Hôm nay'],['weekly','Tuần này']], tab, (key, panel) => {
     selectTab(key); panel.replaceChildren();
     if (!view) { panel.append(node('p', '', 'Kết nối để xem tiến độ và phần thưởng.')); return; }
@@ -28,10 +28,12 @@ export function renderMissions(host, { view, tab, busy, run, play, canPlay, sele
         const tile = node('section', 'liveops__day'); tile.dataset.state = day.status;
         tile.append(node('strong', '', `Ngày ${day.index + 1}`), createIcon(day.status === 'received' ? 'check' : day.status === 'locked' ? 'lock' : 'coins'),
           node('strong', '', `${day.coins} Xu`), node('span', '', day.status === 'received' ? 'Đã nhận' : day.status === 'locked' ? 'Chưa đến lượt' : 'Hôm nay'));
-        if (day.status === 'available') tile.append(action(`Nhận ${day.coins} Xu`, () => void run({type:'login'}), busy, 'claim-login'));
         days.append(tile);
       }
-      login.append(days); panel.append(login);
+      login.append(days);
+      if (state.loginDay === state.day) login.append(action('Đã nhận hôm nay', null, true));
+      else login.append(action(`Nhận ${LOGIN[state.loginNext]} Xu`, () => void run({type:'login'}), busy || !canClaim, 'claim-login'));
+      panel.append(login);
     }
     let completed = 0;
     for (const item of catalog) {
@@ -40,7 +42,7 @@ export function renderMissions(host, { view, tab, busy, run, play, canPlay, sele
       const row = card(item.label, item.key === 'wins' ? 'trophy' : item.key === 'matches' ? 'cards' : item.key === 'visits' ? 'calendar' : 'achievements');
       row.append(progress(value, item.target, item.label));
       if (item.coins) row.append(node('strong', '', `${item.coins} Xu`));
-      if (key === 'daily') row.append(action(claimed ? 'Đã nhận' : ready ? `Nhận ${item.coins} Xu` : canPlay ? 'Chơi' : 'Quay lại ván chơi', ready ? () => void run({ type:'daily', id:item.id }) : play, busy || claimed || !ready && !canPlay, `mission-${item.id}`));
+      if (key === 'daily') row.append(action(claimed ? 'Đã nhận' : ready ? `Nhận ${item.coins} Xu` : canPlay ? 'Chơi' : 'Quay lại ván chơi', ready ? () => void run({ type:'daily', id:item.id }) : play, busy || claimed || (ready ? !canClaim : !canPlay), `mission-${item.id}`));
       else if (ready) row.append(node('p', '', 'Hoàn thành'));
       else if (item.key === 'visits') row.append(action('Điểm danh', () => { tabs.select('daily'); tabs.panel.querySelector('#missions-login').focus(); }, busy));
       else row.append(action(canPlay ? 'Chơi' : 'Quay lại ván chơi', play, busy || !canPlay, `mission-${item.id}`));
@@ -52,7 +54,7 @@ export function renderMissions(host, { view, tab, busy, run, play, canPlay, sele
       const claimed = DAILY.filter(item => current.claimed.includes(item.id)).length;
       bonus.append(node('p', '', received ? 'Đã nhận thưởng trọn bộ' : `Hoàn thành ${completed}/3 · Đã nhận ${claimed}/3`),
         node('p', '', received ? 'Vé quay đã vào Sự kiện.' : 'Nhận đủ ba quà nhiệm vụ để tự nhận thưởng trọn bộ.'));
-    } else bonus.append(action(received ? 'Đã nhận' : 'Nhận thưởng trọn bộ', () => void run({type:'weekly'}), busy || received || completed < catalog.length, 'claim-weekly'));
+    } else bonus.append(action(received ? 'Đã nhận' : 'Nhận thưởng trọn bộ', () => void run({type:'weekly'}), busy || !canClaim || received || completed < catalog.length, 'claim-weekly'));
     panel.append(bonus);
     if (key === 'weekly') {
       const journey = card('Hành trình tuần', 'missions');

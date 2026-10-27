@@ -1,8 +1,8 @@
-import { CHEST_TYPES } from './chestConfig.js';
+import { CHEST_TYPES, CHEST_VERSION } from './chestConfig.js';
 import { chestCandidate } from './chests.js';
 import { festivalChestsEnabled } from './availability.js';
 import { ownedProfileCosmeticItems } from '../progression/achievementModel.js';
-import { getGameProgressKey } from '../gameCatalog.js';
+import { chestSupportCount, creditChestSupport } from './supportInventory.js';
 import { LETTER_ALPHABET, LETTER_SYNC_KEYS_PER_COMMIT } from './config.js';
 import { subscribeToAppPages } from '../appPageLifecycle.js';
 import { getFirebaseBackend } from '../firebaseBackend.js';
@@ -89,6 +89,7 @@ async function perform(command, pass = 0, expected = null, totals = {reads:0,wri
   if (!initial || !navigator.onLine || getActiveGameScope()) throw new Error('Kết nối tài khoản để nhận thưởng.');
   const key = pendingKey(initial);
   let operation = await loadSyncMetadata(key);
+  if(operation?.candidate && operation.candidate.poolVersion!==CHEST_VERSION)throw Object.assign(new Error('Quà đang chờ thuộc phiên bản mới hơn. Hãy cập nhật ứng dụng; rương và quà được giữ nguyên.'),{code:'rewards/unsupported-candidate'});
   const savedAd = await loadSyncMetadata(`rewardedPending:${initial.uid}`);
   if (!operation && savedAd?.earned && savedAd.profileId === initial.profileId) operation = savedAd;
   // A pending spin is resolved before accepting the next command. Status is the recovery entry point.
@@ -146,7 +147,7 @@ async function perform(command, pass = 0, expected = null, totals = {reads:0,wri
       const acquisitions = normalizeAcquisitions(data.appearance.acquisitions);
       let result;
       try { result = transitionSpark(stored.state, action, { uid: identity.uid, now, sector: operation?.sector ?? 0,
-        ticketEarned: initializing ? 0 : periodOnly || migrateOnly || sourcesOnly ? stored.state.ticketEarned : local.ticketEarned, letterEarned:initializing ? {} : earnedCandidate, randomLetter:operation?.randomLetter, ownedItemIds:ownedIds, festivalEnabled:festivalChestsEnabled()&&(!periodOnly||Boolean(stored.state.chests)),sourceEarned:sourcesOnly?sourceCounts:undefined,fireflyEarned:initializing||migrateOnly?0:periodOnly||sourcesOnly?(stored.state.festival?.earnedTotal||0):local.fireflyEarned,supportCount:action.type==='openChest'?data.progress[getGameProgressKey(action.gameId)]?.items?.[action.candidate?.key]??0:0, facts: (initializing || periodOnly || migrateOnly || sourcesOnly ? [] : pending).filter(v => v.uid === identity.uid).map(v => v.fact) }); }
+        ticketEarned: initializing ? 0 : periodOnly || migrateOnly || sourcesOnly ? stored.state.ticketEarned : local.ticketEarned, letterEarned:initializing ? {} : earnedCandidate, randomLetter:operation?.randomLetter, ownedItemIds:ownedIds, festivalEnabled:festivalChestsEnabled()&&(!periodOnly||Boolean(stored.state.chests)),sourceEarned:sourcesOnly?sourceCounts:undefined,fireflyEarned:initializing||migrateOnly?0:periodOnly||sourcesOnly?(stored.state.festival?.earnedTotal||0):local.fireflyEarned,supportCount:action.type==='openChest'&&action.candidate.kind==='support'?chestSupportCount(data.progress,action.gameId,action.candidate.key):0, facts: (initializing || periodOnly || migrateOnly || sourcesOnly ? [] : pending).filter(v => v.uid === identity.uid).map(v => v.fact) }); }
       catch(error) { if(error.code!=='rewards/inventory-full')error.code='rewards/invalid-operation'; throw error; }
       const changed = stableJSON(result.state) !== stableJSON(stored.state && cleanState(stored.state)) || pending.some(v => v.uid === identity.uid);
       if (!changed) return { ...result, expiredOperation:resolved.discarded, operations:{...totals}, appliedCoins:totals.coins };
@@ -154,7 +155,7 @@ async function perform(command, pass = 0, expected = null, totals = {reads:0,wri
       let added = 0;
       for (const receipt of result.receipts) {
         added += receipt.coins;
-        if(receipt.support){const target=data.progress[getGameProgressKey(receipt.support.gameId)].items;const count=target[receipt.support.key];if(!Number.isSafeInteger(count)||count<0||count>=999)throw new Error('Kho hỗ trợ đã đầy.');target[receipt.support.key]=count+1;}
+        if(receipt.support)creditChestSupport(data.progress,receipt.support);
         if (receipt.acquisition) acquisitions.grants[receipt.receiptId] = { ...receipt.acquisition,
           receiptId: receipt.receiptId, ownerUid: identity.uid, grantedAt: receipt.grantedAt };
       }
@@ -174,6 +175,7 @@ async function perform(command, pass = 0, expected = null, totals = {reads:0,wri
         operations: {...totals} };
     }, isCurrent);
   }); } catch(error) {
+    if(error.code==='rewards/inventory-full'&&operation?.type==='openChest')error.pendingChest={chestType:operation.chestType,gameId:operation.gameId};
     if(error.code === 'rewards/invalid-operation') {
       await saveSyncMetadata(key,null,()=>account.getIdentity()?.profileId===initial.profileId);
       if(savedAd?.operation===operation?.operation)await saveSyncMetadata(`rewardedPending:${initial.uid}`,null,()=>account.getIdentity()?.profileId===initial.profileId);

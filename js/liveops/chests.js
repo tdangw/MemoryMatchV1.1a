@@ -16,6 +16,9 @@ export function normalizeChests(value) {
       || !integer(last.coins)) invalid();
     if (last.kind === 'item' && !CHEST_POOLS[last.chestType]?.includes(last.itemId)) invalid();
     if (last.kind === 'support' && !CHEST_SUPPORTS[last.gameId].some(item => item.key === last.key && item.label === last.label)) invalid();
+    if (last.kind !== 'coins' && last.coins !== 0) invalid();
+    if (last.kind === 'coins' && (last.reason === 'coins' ? last.coins !== CHEST_POLICY[last.chestType].coins
+      : !['duplicate','full'].includes(last.reason) || !CHEST_POLICY[last.chestType].duplicate || last.coins !== CHEST_POLICY[last.chestType].duplicate)) invalid();
   } else if (value.sequence !== 0) invalid();
   const sourceEarned = value.sourceEarned === undefined ? counters() : value.sourceEarned;
   if (!record(sourceEarned) || Object.keys(sourceEarned).length !== 4 || CHEST_TYPES.some(type => !integer(sourceEarned[type]) || sourceEarned[type] > value.earned[type])) invalid();
@@ -78,6 +81,7 @@ export function openChest(value, command, ownedIds, supportCount) {
   if (!candidate || candidate.chestType !== command.chestType || candidate.gameId !== command.gameId || candidate.poolVersion !== CHEST_VERSION
     || command.sequence !== chests.sequence + 1 || !CHEST_TYPES.includes(command.chestType)
     || chests.earned[command.chestType] <= chests.spent[command.chestType]) invalid();
+  if (candidate.kind === 'item' && !CHEST_POOLS[command.chestType]?.includes(candidate.itemId)) invalid();
   let result = { ...candidate, operation:command.operation, sequence:command.sequence };
   // Ownership is canonical at commit. A concurrently acquired item becomes duplicate Xu.
   if (candidate.kind === 'item' && ownedIds.includes(candidate.itemId)) result = { ...result,kind:'coins',coins:CHEST_POLICY[command.chestType].duplicate,reason:'duplicate' };

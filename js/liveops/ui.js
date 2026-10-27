@@ -23,12 +23,13 @@ export function createTabs(id, items, initial, render) {
     items.forEach(([value], index) => {
       const current = value === key; buttons[index].tabIndex = current ? 0 : -1;
       buttons[index].setAttribute('aria-selected', String(current));
-      if (current) { panel.setAttribute('aria-labelledby', buttons[index].id); if (focus) buttons[index].focus(); }
+      if (current) { panel.setAttribute('aria-labelledby', buttons[index].id); if (focus) buttons[index].focus({preventScroll:true}); }
     });
     render(key, panel);
   }
   root.onkeydown = event => {
-    const index = items.findIndex(([key]) => key === selected);
+    const focused = buttons.indexOf(document.activeElement);
+    const index = focused >= 0 ? focused : items.findIndex(([key]) => key === selected);
     const next = event.key === 'Home' ? 0 : event.key === 'End' ? items.length - 1
       : event.key === 'ArrowRight' ? (index + 1) % items.length : event.key === 'ArrowLeft' ? (index + items.length - 1) % items.length : -1;
     if (next < 0) return; event.preventDefault(); select(items[next][0]);

@@ -1,4 +1,5 @@
 import { festivalChestsEnabled } from '../liveops/availability.js';
+import { CHEST_NAMES } from '../liveops/chestConfig.js';
 import { gameState } from '../gameState.js';
 import { getGameProgressKey, getGameDefinition } from '../gameCatalog.js';
 import { loadPersistentChapter } from '../persistence.js';
@@ -31,8 +32,12 @@ export function renderAchievementCollection(container, gameId, { block: requeste
       const completed = { ...first.bestByLevel, ...profile.bestByLevel };
       const firstLevel = (block - 1) * 10 + 1;
       const content = createAchievementListContent({ gameName: getGameDefinition(gameId).title,
-        levels: ACHIEVEMENT_ITEMS.filter(item => item.gameId === gameId && item.level >= firstLevel && item.level < firstLevel + 10).map(item => ({ level: item.level, name: item.name,
-          image: achievementAssetUrl(item, 128), completed: MASTERY_DIFFICULTIES.map(mode => hasCertifiedCompletion(completed, mode, item.level)) })) });
+        levels: ACHIEVEMENT_ITEMS.filter(item => item.gameId === gameId && item.level >= firstLevel && item.level < firstLevel + 10).map(item => {
+          const grant = gameState.appearance.achievements.grants[`${gameId}:${item.level}`];
+          const chestType = grant?.chestType || (!grant && festivalChestsEnabled() && ['avatar','frame','badge'].includes(item.type) ? item.type : null);
+          return { level:item.level, name:chestType ? CHEST_NAMES[chestType] : item.name,
+            image:chestType ? null : achievementAssetUrl(item,128), completed:MASTERY_DIFFICULTIES.map(mode=>hasCertifiedCompletion(completed,mode,item.level)) };
+        }) });
       const mastery = getMasteryRewards({ completed: { ...rewardChapter.bestByLevel, ...profile.bestByLevel }, level: firstLevel,
         claim: profile.claimedChests?.[block] || rewardChapter.claimedChests[block] });
       const group = document.createElement('section'); group.className = 'tab-card achievement-group-reward';

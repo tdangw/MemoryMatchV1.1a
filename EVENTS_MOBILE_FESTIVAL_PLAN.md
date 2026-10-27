@@ -5,12 +5,12 @@
 Chủ dự án giao toàn bộ P0–Q1, commit từng phase, và duyệt toàn bộ đề xuất
 còn lại của P0: mốc 25/50 cấp 50/100 Xu; subpool hỗ trợ chia đều theo mục 4;
 kho đầy 999 giữ rương/candidate để thử lại; whitelist gồm ngoại hình
-Thành tích/chữ/event, loại starter/effect, chọn đều; đổi chữ lặp loại theo
-12 slot cũ; trong ván chỉ xem kho; SVG tĩnh khu vườn đêm theo skin hiện có.
+Thành tích/chữ/event, loại starter/effect, chọn đều; loại rương chữ cố định
+theo bộ (bảng đính chính dưới đây); trong ván chỉ xem kho; SVG tĩnh khu vườn đêm theo skin hiện có.
 Các câu “chỉ lập kế hoạch/chưa giao triển khai/còn đề xuất” bên dưới là
 lịch sử trước phê duyệt này. Không deploy, rules live, APK hoặc push.
 
-P0 đã chốt. Bằng chứng và trạng thái các phase triển khai ghi chung trong
+P0–Q1 đã hoàn tất mã nguồn/web local. Bằng chứng và giới hạn ghi chung trong
 `EVENTS_MOBILE_FESTIVAL_RECEIPT.md`.
 
 Đính chính trực tiếp: bỏ cơ chế luân phiên/12 slot. Phần thưởng phải ghi
@@ -145,10 +145,11 @@ Mini-card chữ/kho rương dùng cùng state đã tải, không hứa 10.000 Xu
 - Recipe, tỷ lệ chữ, bán 1.000 Xu/chữ và ghép 3 ra 1 có thể trùng giữ nguyên.
   Quà đổi là **rương loại chung của bước kế tiếp**; preview loại/tỷ lệ,
   không dùng hình một món như thể được nhận chắc chắn.
-- Đề xuất giữ thứ tự loại Avatar/Khung/Huy hiệu của 12 slot catalog cũ,
-  có cursor cấp rương riêng và lặp danh sách. Trừ recipe/cấp rương/tăng
-  cursor cùng commit; bán/ghép không tăng cursor. Không chờ ownership,
-  không chuyển sang payout 10.000 Xu theo số món hoặc số rương.
+- Mỗi bộ chữ đổi một loại rương cố định đã chốt khi triển khai:
+  MEMORY MATCH → Avatar; LINK CONNECT → Khung; TRIPLE CONNECT → Huy hiệu;
+  ADVENTURE → Avatar. Không cursor, không luân phiên theo 12 món cũ.
+  Trừ recipe và cấp rương cùng commit; không chờ ownership và không
+  chuyển sang payout 10.000 Xu theo số món hoặc số rương.
 - Kho chữ dùng button grid có label/số lượng. Ghép 3 có preview ngẫu nhiên;
   Bán mở sheet số lượng −/+, preset hợp lệ, tổng Xu trước xác nhận. Có
   thể có nhập số trong sheet cho lượng lớn, không bán chỉ bằng chạm chữ.
@@ -456,7 +457,7 @@ cần chốt/thử riêng nếu chủ dự án muốn thêm.
   khác ownership ngoại hình. Sáu effect và thưởng cũ khác giữ nguyên.
 - Marker nguồn đã cấp rương chỉ một lần; không để resolver nhìn grant
   rương như đã sở hữu ngoại hình. Popup Tiếp tục không là owner cấp quà.
-- Chữ: recipe exchange cấp rương/tăng cursor loại, không chờ sở hữu món.
+- Chữ: recipe exchange cấp đúng loại rương cố định của bộ, không chờ sở hữu món.
   Bỏ payout 10.000 Xu riêng sau đủ 12 món/12 rương. Đủ pool xử lý khi mở
   bốn loại chung; rương từ mọi nguồn nhập cùng counter theo loại.
 - Lễ hội cấp C/Khung/Avatar tại 50/75/100; Xu tại 25/50 theo bảng đề xuất.

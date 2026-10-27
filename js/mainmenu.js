@@ -14,7 +14,7 @@ import { gameState, resetGame } from "./gameState.js";
 import { openAppModal, showAppToast } from "./modal.js";
 import { createIcon } from "./icons.js";
 import { THEMES, getTheme, isThemePlayable } from "./themeCatalog.js";
-import { saveAppearance } from "./persistence.js";
+import { saveAppearance, subscribeToLocalCommit } from "./persistence.js";
 import { mountCatalogTabs } from "./catalogPreferences.js";
 import {
   clearActiveSession,
@@ -219,16 +219,20 @@ export async function showCollectionModal({
   const grid = document.createElement("div");
   grid.className = "shop-item-grid";
   const chestHost = document.createElement('div'); chestHost.hidden = true;
-  let disposeChest = null;
+  let disposeChest = null, collectionScroll = 0;
+  const collectionScroller = content.closest('.app-modal__body');
   const chestEntry = document.createElement('button'); chestEntry.type = 'button';
   chestEntry.className = 'tab-button';
   const updateChestEntry=()=>{const chests=gameState.appearance.spark?.state?.chests;chestEntry.textContent=chests?`Kho rương · ${Object.keys(chests.earned).reduce((sum,type)=>sum+chests.earned[type]-chests.spent[type],0).toLocaleString('vi-VN')} chưa mở`:'Kho rương';};updateChestEntry();
+  collectionScope.own(subscribeToLocalCommit(({patch})=>{if(patch.appearance)updateChestEntry();}));
   const openChests = () => {
+    collectionScroll = collectionScroller ? collectionScroller.scrollTop : 0;
     tabs.hidden = grid.hidden = chestEntry.hidden = true; chestHost.hidden = false;
     disposeChest?.();
     disposeChest = mountChestInventory(chestHost, { owner: collectionScope, gameId, profile:fromGame?null:()=>{modal.destroy();void openPlayerProfile(surface);}, back: () => {
       disposeChest?.(); disposeChest = null; chestHost.replaceChildren(); chestHost.hidden = true;
-      tabs.hidden = grid.hidden = chestEntry.hidden = false; updateChestEntry();chestEntry.focus();
+      tabs.hidden = grid.hidden = chestEntry.hidden = false; updateChestEntry();chestEntry.focus({preventScroll:true});
+      if (collectionScroller) collectionScroller.scrollTop = collectionScroll;
     } });
   };
   chestEntry.onclick = openChests;

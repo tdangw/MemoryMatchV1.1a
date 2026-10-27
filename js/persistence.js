@@ -16,6 +16,8 @@ import { settleAchievementInventory, normalizeAchievementLedger, ACHIEVEMENT_GAM
 import { normalizeRewardLedger, validateRewardReceipt, MAX_PENDING_REWARD_ROUNDS } from './liveops/ledger.js';
 import { normalizeAcquisitions } from './progression/acquisitionModel.js';
 import { normalizeFact } from './liveops/model.js';
+import { CHEST_SUPPORTS } from './liveops/chestConfig.js';
+import { getGameProgressKey } from './gameCatalog.js';
 
 export const SAVE_FORMAT_VERSION = 2;
 const ROOT_STORAGE_KEY = "memoryMatchSave";
@@ -35,6 +37,10 @@ let knownRevision = 0;
 let lastPersistenceError = null;
 let currentEnvelope = null;
 let committedRewardCoins = 0;
+const rewardItemPaths = Object.entries(CHEST_SUPPORTS).flatMap(([gameId, items]) =>
+  items.map(({ key }) => ({ game: getGameProgressKey(gameId), item: key, id: `${gameId}:${key}` })));
+let committedRewardItems = Object.fromEntries(rewardItemPaths.map(({ id }) => [id, 0]));
+let rewardWriteEpoch = 0;
 let blocked = false;
 const subscribers = new Set();
 const failureSubscribers = new Set();
@@ -111,6 +117,7 @@ export function ensureGameplaySeason() {
         activeStorageKey = SEASON_STORAGE_KEY;
       }
       currentEnvelope = envelope; knownRevision = envelope.revision;
+      resetRewardWriteTracking();
       if (database) localStorage.setItem(PRIMARY_MARKER_KEY, String(knownRevision));
       return true;
     } catch (error) { blocked = true; reportPersistenceError('season', error); return false; }
@@ -122,6 +129,8 @@ export function savePersistentGameData({ coins, appearance, progress, settings, 
   const dropAttempt = ticketDrop ? structuredClone(ticketDrop) : null;
   const settledRewardFact = rewardFact ? structuredClone(rewardFact) : null;
   const rewardCoinsAtInvocation = committedRewardCoins;
+  const rewardItemsAtInvocation = { ...committedRewardItems };
+  const rewardEpochAtInvocation = rewardWriteEpoch;
   const patch = structuredClone({
     ...(coins !== undefined ? { coins: normalizeNonNegativeInteger(coins) } : {}),
     ...(appearance !== undefined ? { appearance } : {}),
@@ -130,7 +139,7 @@ export function savePersistentGameData({ coins, appearance, progress, settings, 
   });
   return enqueue(async () => {
     await initialize();
-    if (blocked || !isCurrent()) return false;
+    if (blocked || !isCurrent() || rewardEpochAtInvocation !== rewardWriteEpoch) return false;
     try {
       const previous = database ? currentEnvelope : readLocalEnvelope();
       if (!database && localStorage.getItem(PRIMARY_MARKER_KEY)) throw new Error("Backend chính đã được sử dụng. Không ghi vào bản localStorage cũ.");
@@ -140,6 +149,7 @@ export function savePersistentGameData({ coins, appearance, progress, settings, 
       // A shop/settlement snapshot can queue while a server reward transaction
       // is in flight. Preserve that intervening delta instead of overwriting it.
       if (patch.coins !== undefined) envelope.data.coins += committedRewardCoins - rewardCoinsAtInvocation;
+      const preservedRewardItems = patch.progress && preserveInterveningRewardItems(envelope.data.progress, previous?.data.progress || {}, rewardItemsAtInvocation);
       if (patch.settings) envelope.data.settings = { ...previous?.data.settings, ...patch.settings };
       if (patch.progress || patch.appearance) envelope.data.appearance = settleAchievementInventory(previous?.data.appearance,
         envelope.data.appearance, patch.progress || {});
@@ -178,6 +188,7 @@ export function savePersistentGameData({ coins, appearance, progress, settings, 
         catch (error) { console.warn("[Persistence] Không gửi được thông báo giữa các tab:", error.message); }
       }
       notifyCommit({ ...patch, ...(patch.coins !== undefined ? { coins: envelope.data.coins } : {}), ...((patch.progress || patch.appearance || rewardFact || dropAttempt) ? { appearance: structuredClone(envelope.data.appearance) } : {}),
+        ...(preservedRewardItems ? { rewardInventory: structuredClone(envelope.data.progress) } : {}),
         ...(settledRewardFact ? { rewardSettlement: true } : {}), ...(cloudEvent ? { cloudEvent: true } : {}) });
       if(specialDrop && typeof onSpecialDrop==='function'){
         try{onSpecialDrop(specialDrop);}catch(error){console.error('Letter reward presentation failed',error);}
@@ -202,9 +213,11 @@ export function commitSparkOperation(operation, isCurrent = () => true) {
     if (!isCurrent()) throw new Error('Tài khoản đã thay đổi. Quyền nhận đã được lưu.');
     if (!result.data) return result;
     const envelope = createEnvelope(result.data, knownRevision + 1);
+    const itemDeltas = rewardInventoryDeltas(snapshot.profile.data.progress, envelope.data.progress);
     currentEnvelope = await writeChapterProfile(database, envelope, knownRevision, { isCurrent });
     knownRevision = envelope.revision;
     committedRewardCoins += result.added || 0;
+    for (const { id, delta } of itemDeltas) committedRewardItems[id] += delta;
     // Snapshot already published by this operation. Updating RAM must not enqueue a second upload.
     notifyCommit({ coins: envelope.data.coins, appearance: structuredClone(envelope.data.appearance), rewardInventory:structuredClone(envelope.data.progress), rewardPublished: true });
     return result;
@@ -300,6 +313,7 @@ export function clearPersistentGameData() {
       else localStorage.setItem(activeStorageKey, JSON.stringify(envelope));
       currentEnvelope = envelope;
       knownRevision = envelope.revision;
+      resetRewardWriteTracking();
       blocked = false;
       lastPersistenceError = null;
       notifyCommit({ reset: true });
@@ -372,6 +386,7 @@ export function importPersistentSnapshot(snapshot, environment, metadata, isCurr
     const needsRewardReconcile = !synced && Boolean(currentEnvelope?.data.appearance.spark?.state || restored.appearance.spark?.state);
     await replaceChapterSnapshot(database, snapshot, envelope, knownRevision, `cloud:${environment}`, { ...metadata, ...(needsRewardReconcile ? {restoreNeedsReconcile:true} : {}), lastSyncedLocalRevision: synced ? envelope.revision : 0 }, isCurrent);
     currentEnvelope = envelope; knownRevision = envelope.revision;
+    resetRewardWriteTracking();
     try { localStorage.setItem(PRIMARY_MARKER_KEY, String(knownRevision)); }
     catch (error) { console.warn("[Persistence] Không gửi được thông báo import giữa các tab:", error.message); }
     if (!synced) notifyCommit({ restored: true });
@@ -406,6 +421,7 @@ if (typeof window !== "undefined") {
       for (const listener of subscribers) listener({ data, revision: envelope.revision, accept: () => {
         currentEnvelope = envelope;
         knownRevision = envelope.revision;
+        resetRewardWriteTracking();
         lastPersistenceError = null;
       } });
     } catch (error) { reportPersistenceError("external", error); }
@@ -459,6 +475,42 @@ function readLocalEnvelope() {
   } catch (error) { blocked = true; reportPersistenceError("read", error); return null; }
 }
 function economicSignature(value) { return JSON.stringify([value.coins,...['memoryMatch','linkConnect','tripleConnect'].map(key=>Object.entries({...(key==='tripleConnect'?{hint:TRIPLE_PRODUCT_DECISIONS.initialItems.hint}:{}),...value.progress[key]?.items}).filter(([,amount])=>amount>0).sort(([a],[b])=>a.localeCompare(b)))]); }
+function resetRewardWriteTracking() {
+  rewardWriteEpoch++;
+  committedRewardCoins = 0;
+  committedRewardItems = Object.fromEntries(rewardItemPaths.map(({ id }) => [id, 0]));
+}
+function rewardItemCount(progress, game, item) {
+  const count = progress[game]?.items?.[item];
+  if (count === undefined) return 0;
+  if (!Number.isSafeInteger(count) || count < 0 || count > 999) throw new Error('Kho hỗ trợ chưa toàn vẹn. Dữ liệu được giữ nguyên.');
+  return count;
+}
+function rewardInventoryDeltas(previous, incoming) {
+  const deltas = [];
+  for (const { game, item, id } of rewardItemPaths) {
+    const delta = rewardItemCount(incoming, game, item) - rewardItemCount(previous, game, item);
+    if (delta > 0) {
+      if (!Number.isSafeInteger(committedRewardItems[id] + delta)) throw new Error('Lịch sử hỗ trợ đã đầy.');
+      deltas.push({ id, delta });
+    }
+  }
+  return deltas;
+}
+function preserveInterveningRewardItems(progress, previous, captured) {
+  let preserved = false;
+  for (const { game, item, id } of rewardItemPaths) {
+    const delta = committedRewardItems[id] - captured[id];
+    if (!delta) continue;
+    const count = rewardItemCount(progress, game, item) + delta;
+    // Reject the entire queued write: neither the granted item nor purchase Xu may be clipped.
+    if (!Number.isSafeInteger(count) || count > 999) throw new Error('Kho hỗ trợ vừa nhận thêm quà và đã đầy. Hãy tải lại tiến độ trước khi thử lại.');
+    const profile = progress[game] || { ...previous[game], items: {} };
+    progress[game] = { ...profile, items: { ...profile.items, [item]: count } };
+    preserved = true;
+  }
+  return preserved;
+}
 function createDefaultPayload() { return { coins: 0, appearance: {}, progress: {}, settings: {} }; }
 function createEnvelope(data, revision) {
   return { formatVersion: SAVE_FORMAT_VERSION, revision, updatedAt: Date.now(), data: {
