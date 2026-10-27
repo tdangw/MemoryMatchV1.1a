@@ -6,7 +6,7 @@
 .liveops__tabs { display: flex; gap: 8px; }
 .liveops__tabs > button { flex: 1; min-width: 0; min-height: 48px; white-space: normal; }
 .liveops__tabs [aria-selected="true"] { outline: 2px solid currentColor; outline-offset: -3px; }
-.liveops__days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.liveops__days { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
 .liveops__day { display: grid; gap: 8px; text-align: center; padding: 8px 2px; border: 1px solid #ad8a53; border-radius: 8px; font-size: .8rem; }
 .liveops__day[data-current] { background: #fff2ab; color: #452b16; outline: 2px solid #99702c; }
 .liveops__progress-row { display: flex; align-items: center; gap: 8px; }
@@ -37,6 +37,15 @@
 .liveops__card > .ui-icon { display: block; width: 64px; height: 64px; margin: 8px auto; }
 .liveops button:focus-visible { outline: 3px solid currentColor; outline-offset: 2px; }
 .liveops__sale { display: grid; gap: 8px; }
+.liveops__day > .ui-icon { width: 32px; height: 32px; margin: auto; }
+.liveops__day[data-state="available"] { background: #fff2ab; color: #452b16; outline: 2px solid #99702c; }
+.liveops__day[data-state="received"] { border-style: double; }
+.liveops__day:last-child { grid-column: span 2; border-width: 2px; }
+.liveops__day .tab-button { font-size: inherit; padding: 4px; }
+.liveops__day { min-width: 0; }
+.liveops__guidance, .liveops__countdown { margin: 4px 0; line-height: 1.5; }
+.liveops__chest-grid figure { margin: 0; min-width: 0; }
+.liveops__chest-grid img { max-width: 100%; height: auto; }
 
 .liveops__letter-set { border-top: 1px solid var(--ui-line, #9b7847); padding-block: 10px; }
 .liveops__letter-set h4 { margin: 0 0 8px; font-size: .95rem; }

@@ -5,6 +5,11 @@ const ICON_FALLBACK_NAMES = Object.freeze({ "star-empty": "star", "victory-home"
 const ILLUSTRATED_ICONS = new Set(['coin', 'star', 'star-empty', 'chest', 'chest-open', 'celebrate']);
 
 const ICON_PATHS = Object.freeze({
+  calendar: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 11h18m-13 4h2m4 0h2m-8 3h2"/>',
+  cards: '<rect x="3" y="5" width="10" height="15" rx="2"/><rect x="11" y="3" width="10" height="15" rx="2"/><path d="m14 10 2 2 3-4"/>',
+  achievements: '<path d="m8 14-2 8 6-3 6 3-2-8"/><circle cx="12" cy="8" r="6"/><path d="m9 8 2 2 4-4"/>',
+  profile: '<circle cx="12" cy="7" r="4"/><path d="M4 22v-3a8 8 0 0 1 16 0v3z"/>',
+  coins: '<circle cx="10" cy="13" r="7"/><path d="M13 3a7 7 0 0 1 7 10M10 9v8m-2-6h4m-4 4h4"/>',
   'chevron-down': '<path d="m6 9 6 6 6-6"/>',
   copy: '<rect x="8" y="8" width="12" height="13" rx="2"/><path d="M15 8V4a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h4"/>',
   ticket: '<path d="M3 5h18v5a2 2 0 0 0 0 4v5H3v-5a2 2 0 0 0 0-4z" fill="#e8b749" stroke="#784a22" stroke-width="1.2"/><path d="M5 7h14v10H5z" fill="#153f47" stroke="#fff0aa" stroke-width=".65"/><path d="M17 7v2m0 2v2m0 2v2" stroke="#e8b749" stroke-width=".7"/><circle cx="10.5" cy="12" r="3.5" fill="#e8b749" stroke="#fff0aa" stroke-width=".65"/><path d="M10.5 8.5v7M7 12h7m-6-2.5 5 5m0-5-5 5" stroke="#805018" stroke-width=".6"/><circle cx="10.5" cy="12" r=".9" fill="#153f47" stroke="none"/>',

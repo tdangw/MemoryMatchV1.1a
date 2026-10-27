@@ -35,3 +35,6 @@ ADVENTURE→Avatar. Mỗi bộ đổi một rương đúng loại; bảng bên t
 U2: wheel theo kích thước thật, hub tĩnh; 4 recipe và 17 chữ button, sheet
 bán có số lượng/tổng Xu; Kho rương 4 card và chi tiết tỷ lệ/chọn trò/gallery
 12 món/trang. Kiểm cú pháp/diff đạt; tích hợp command và kiểm UI ở D1/Q1.
+
+U3: Nhiệm vụ hai tab, lịch 4+3 luôn hiện, đúng trạng thái sau ngày 7/nhận/bỏ ngày; thẻ catalog, tiến độ/bonus/weekly/điểm danh, countdown UTC một timer UI dừng khi ẩn và refresh kỳ mới có khóa chống lặp. Giữ guard ván chơi, stale UID. 13/13 unit nhiệm vụ/Spark đạt; giao diện/lifecycle kiểm chung Q1.
+

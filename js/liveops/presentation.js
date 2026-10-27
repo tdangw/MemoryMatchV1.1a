@@ -1,3 +1,5 @@
+import { renderMissions as mountMissions, updateMissionCountdown } from './missionsPresentation.js';
+import { getAccountService } from '../accountService.js';
 import { CHEST_NAMES } from './chestConfig.js';
 import { letterSetSlots } from './letters.js';
 import { action } from './ui.js';
@@ -8,9 +10,9 @@ import { createIcon } from '../icons.js';
 import { LETTER_REWARD_ITEMS } from './letterCatalog.generated.js';
 import { letterProgressLabel } from './letters.js';
 import { openAppModal } from '../modal.js';
-import { createGameShellLifecycle } from '../gameShell/gameShellLifecycle.js';
+import { createGameShellLifecycle, getActiveGameScope, clearShellInterval } from '../gameShell/gameShellLifecycle.js';
 import { requestLiveops } from './service.js';
-import { DAILY, WEEKLY, LOGIN, WHEEL, DAY_MS } from './model.js';
+import { WHEEL, DAY_MS } from './model.js';
 import { openGameMenu } from '../gameSelector.js';
 import { getRecentGameId } from '../recentGame.js';
 import { refreshAppWallet } from '../appNavigation.js';
@@ -35,11 +37,13 @@ export function openLiveopsPage(kind, surface = {}) {
   }
   async function run(command, { spin = false, rewarded = false } = {}) {
     if (busy || !active()) return;
+    const identity = getAccountService()?.getIdentity();
+    const owns = () => active() && getAccountService()?.getIdentity()?.profileId === identity?.profileId && getAccountService()?.getIdentity()?.uid === identity?.uid;
     busy = true; render(); status.textContent = 'Đang kết nối…';
     try {
       const result = rewarded ? await requestRewardedSpin() : await requestLiveops(command);
-      if (!active()) return;
-      view = result; refreshAppWallet(); status.textContent = result.appliedCoins > 0 ? `Đã nhận ${result.appliedCoins} Xu.` : 'Đã cập nhật tiến độ.';
+      if (!owns()) return;
+      observedAt = performance.now(); view = result; refreshAppWallet(); status.textContent = result.appliedCoins > 0 ? `Đã nhận ${result.appliedCoins} Xu.` : 'Đã cập nhật tiến độ.';
       if(result.letterResult?.kind==='exchange' && result.letterResult.chestType)status.textContent=`Đã nhận ${CHEST_NAMES[result.letterResult.chestType]}. Mở trong Kho rương khi bạn muốn.`;
       else if(result.letterResult?.kind==='exchange')status.textContent=result.letterResult.itemId?`Đã nhận ${LETTER_REWARD_ITEMS.find(item=>item.id===result.letterResult.itemId).name}.`:'Đã mở rương · 10.000 Xu.';
       if (command?.type === 'fuseLetter' && result.state.letters.last?.kind === 'fuse') status.textContent = `Đã nhận chữ ${result.state.letters.last.received}.`;
@@ -59,51 +63,40 @@ export function openLiveopsPage(kind, surface = {}) {
         }
       }
     } catch (error) {
-      if (active()) status.textContent = error.code === 'rewards/invalid-operation' ? error.message : error.code === 'rewards/not-enabled' ? 'Nhiệm vụ và vòng quay sắp mở.'
+      if (owns()) status.textContent = error.code === 'rewards/invalid-operation' ? error.message : error.code === 'rewards/not-enabled' ? 'Nhiệm vụ và vòng quay sắp mở.'
         : 'Chưa thể cập nhật. Quyền nhận được giữ để thử lại khi kết nối.';
       if (error.code !== 'rewards/not-enabled') console.warn('Liveops page operation unavailable', error.code || error.name);
     } finally { busy = false; if (active()) render(); }
   }
-  function play() { modal.destroy(); openGameMenu(getRecentGameId()); }
+  function play() { if(getActiveGameScope())return; modal.destroy(); openGameMenu(getRecentGameId()); }
+  let observedAt=performance.now(), timer=null, refreshDay=null;
+  const scrolls = new Map();
+  const scrollHost = root.closest('.app-modal__body') || root.parentElement;
+  const rememberScroll = key => { if(scrollHost)scrolls.set(key,scrollHost.scrollTop); };
   function renderMissions() {
-    const tabs = el('div', 'liveops__tabs'); tabs.setAttribute('role', 'tablist');
-    for (const [key, label] of [['daily', 'Hôm nay'], ['weekly', 'Tuần này']]) {
-      const node = button(label, () => { tab = key; render(); }); node.setAttribute('role', 'tab'); node.setAttribute('aria-selected', String(tab === key)); tabs.append(node);
-    }
-    content.append(tabs);
-    if (tab === 'daily') {
-      const login = panel('Điểm danh 7 ngày'), days = el('div', 'liveops__days');
-      const state = view?.state, received = state && state.loginDay === state.day;
-      const next = state?.loginNext || 0;
-      for (let index = 0; index < 7; index++) {
-        const tile = el('div', 'liveops__day');
-        if (index === next && !received) tile.dataset.current = 'true';
-        tile.append(el('span', '', `Ngày ${index + 1}`), el('strong', '', `${LOGIN[index]} Xu`)); days.append(tile);
-      }
-      login.append(received ? el('p', '', 'Đã nhận hôm nay') : days,
-        button(received ? 'Đã nhận hôm nay' : `Nhận ${LOGIN[next]} Xu`, () => void run({ type: 'login' }), busy || !view || received));
-      if (received) login.append(button('Xem lịch điểm danh', () => { days.hidden = !days.hidden; }));
-      if (received) { days.hidden = true; login.append(days); }
-      content.append(login);
-    }
-    const state = view?.state[tab];
-    for (const item of tab === 'daily' ? DAILY : WEEKLY) {
-      const row = panel(item.label), value = state?.[item.key] || 0, claimed = state?.claimed.includes(item.id);
-      row.append(progress(value, item.target, item.label));
-      if (item.coins) row.append(el('p', '', `${item.coins} Xu`));
-      if (tab === 'daily') row.append(button(claimed ? 'Đã nhận' : value >= item.target ? 'Nhận' : 'Chơi',
-        value >= item.target ? () => void run({ type: 'daily', id: item.id }) : play, busy || claimed || value >= item.target && !view));
-      content.append(row);
-    }
-    const bonus = panel(tab === 'daily' ? 'Hoàn thành 3 nhiệm vụ · 10 Xu và 1 vé quay' : 'Hoàn thành 4 nhiệm vụ · 50 Xu và 2 vé quay');
-    if (tab === 'weekly') bonus.append(button(state?.claimed.includes('bonus') ? 'Đã nhận' : 'Nhận', () => void run({ type: 'weekly' }),
-      busy || !view || state.claimed.includes('bonus') || !WEEKLY.every(item => state[item.key] >= item.target)));
-    if(tab==='weekly'){
-      const journey=panel('Thắp sáng hành trình');journey.append(progress(view?.state.event.points||0,80,'Điểm hành trình tuần'),
-        el('p','','Mốc 20: 5 Xu · Mốc 50: 10 Xu · Mốc 80: 10 Xu'),el('p','','Thắng ván để tích điểm, tối đa 40 điểm mỗi ngày. Xu được trao khi đạt mốc; tiến độ làm mới thứ Hai lúc 07:00.'));content.append(journey);
-    }
-    content.append(bonus, el('p', '', 'Tiến độ được ghi sau mỗi ván thắng. Một cặp thẻ hoặc một bộ ba được tính là một lần ghép. Làm mới lúc 07:00 mỗi ngày; tuần mới bắt đầu thứ Hai.'));
+    mountMissions(content, {view, tab, busy, run, play, canPlay:!getActiveGameScope(), selectTab:key=>{
+      if(key!==tab){rememberScroll(tab);tab=key;if(scrollHost)scrollHost.scrollTop=scrolls.get(key)||0;}
+    }});
+    tick();
   }
+  function tick() {
+    if(!active()||document.hidden||!view||kind!=='missions')return;
+    const now=Math.floor(view.serverNow+performance.now()-observedAt);
+    updateMissionCountdown(root,view.state,now);
+    const targetDay=Math.floor(now/DAY_MS);
+    if(targetDay>view.state.day&&refreshDay!==targetDay&&!busy&&navigator.onLine){refreshDay=targetDay;void run({type:'status'});}
+  }
+  function visibility() {
+    if(timer!==null){clearShellInterval(timer);timer=null;}
+    if(!document.hidden&&kind==='missions'){tick();timer=scope.interval(tick,60000);}
+  }
+  scope.listen(document,'visibilitychange',visibility);
+  scope.own(()=>{if(timer!==null)clearShellInterval(timer);});
+  const account=getAccountService();let ownerKey=account?.getIdentity()?.profileId;
+  if(account)scope.own(account.subscribe(()=>{
+    const key=account.getIdentity()?.profileId;
+    if(key!==ownerKey){ownerKey=key;view=null;animation?.cancel();status.textContent='Tài khoản đã thay đổi. Tải lại tiến độ để xem phần thưởng.';render();}
+  }));
   function renderEvents() {
     const tabs = createTabs('events', [['wheel','Vòng quay'],['letters','Sưu tập chữ'],...(festivalChestsEnabled() ? [['festival','Lễ hội']] : [])], eventTab, (key, panel) => {
       eventTab = key; animation?.cancel(); panel.replaceChildren();
@@ -199,5 +192,5 @@ export function openLiveopsPage(kind, surface = {}) {
     if(focusKey) [...root.querySelectorAll('button')].find(button=>button.dataset.focusKey===focusKey&&!button.disabled)?.focus({preventScroll:true});
   }
   root.append(button('Tải lại tiến độ', () => void run({ type: 'status' })));
-  render(); void run({ type: 'status' }); return modal;
+  render(); visibility(); void run({ type: 'status' }); return modal;
 }
