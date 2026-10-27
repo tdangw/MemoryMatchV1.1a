@@ -114,3 +114,22 @@ test('layout reconciliation releases meteors before allocating a larger scene',a
   assert.equal(refreshed,true);assert.equal(f.runtime.diagnostics().handles,5);
   assert.equal(f.runtime.diagnostics().lastError,null);assert.equal(f.timers.size,0);f.runtime.dispose();
 });
+
+test('static backing slots share capacity with meteors without changing eligibility',async()=>{
+  const f=fixture();let handles=3;
+  f.runtime.setMeteorEligible(true);
+  f.mount({prepare:async()=>()=>({diagnostics:()=>({nodes:15,handles,reservedSlots:1}),dispose(){},refresh(){}})});
+  await turn();
+  assert.equal(f.runtime.meteorDiagnostics().eligible,true);
+  assert.equal(f.timers.size,0); // 3 native + pad leaves only one, not two meteor slots
+  handles=2;f.runtime.refresh();
+  for(const [id,callback]of [...f.frames]){f.frames.delete(id);callback();}
+  assert.equal(f.timers.size,1);
+  for(let i=0;i<3;i++){const [id,callback]=f.timers.entries().next().value;f.timers.delete(id);callback();}
+  assert.equal(f.runtime.meteorDiagnostics().active,2);
+  assert.equal(f.runtime.diagnostics().handles+f.runtime.diagnostics().reservedSlots,5);
+  handles=5;f.runtime.refresh();
+  for(const [id,callback]of [...f.frames]){f.frames.delete(id);callback();}
+  assert.equal(f.runtime.diagnostics().state,'STATIC');
+  assert.match(f.runtime.diagnostics().lastError,/budget/);f.runtime.dispose();
+});

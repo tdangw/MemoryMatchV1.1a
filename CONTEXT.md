@@ -13,6 +13,8 @@
 
 ## Nền động nhẹ — triển khai G0–G5 đã bàn giao local, còn xác minh S22
 
+- Bổ sung27/10: chủ dự án chốt đèn/gợn hồ/ếch trên lá và đom đóm rõ hơn **chỉ ở bản đồ**, đã duyệt video32s “Duyệt mẫu hiện tại”. M1 opt-in đạt13unit/19UI,100chu kỳ mỗi khổ,3cặp A/B sơ bộ (p95 không tăng/p99+0,1ms),5layer thêm,100mount p952ms vàsoak10phút plateau2.604B/listener131 ổn định. Check/build/self-review đạt; chuẩn bị commitM1 rồi bậtM2. Cùng plan/receipt cũ, giữ ngân sách và ba màn chơi; S22 kiểm ADB vẫn không có thiết bị. Không hỏi lại mẫu/phạm vi đã duyệt.
+
 - Nguồn kế hoạch hiện hành duy nhất: `ANIMATED_BACKGROUNDS_PLAN.md`. Chủ dự án đã giao toàn bộ G0–G5 và yêu cầu commit từng phase. Các ghi chú chỉ lập kế hoạch trước đây là lịch sử. Receipt chung: `ANIMATED_BACKGROUNDS_IMPLEMENTATION_RECEIPT.md`. Không deploy/APK/push/rules.
 - Đã chốt trang chủ/bản đồ/cả ba màn chơi; giữ ảnh nền hiện có, chuyển động nhẹ theo cảnh; thiết bị thử Web PC và Samsung S22 Android. Thác Home/Link/Triple/map, cá ở hồ Memory/map, đom đóm/lá theo vùng cây; không dồn mọi nhóm vào mọi nền hoặc chạy qua bàn/HUD/khay/node/quảng cáo.
 - Phương án đề xuất: lớp nhỏ DOM/SVG/texture tĩnh + WAAPI transform/opacity, scope/page/round và coordinator hữu hạn; master setting `meteorEffects`/UI Hiệu ứng nền giữ nguyên. Không video/GIF/WebGL/RAF nền liên tục, không scheduler sao băng chạy chồng. Có Light/Standard/Static, reduced-motion/hidden/modal/pause/cancel, crop dọc/ngang/map lặp và fallback vùng không an toàn.

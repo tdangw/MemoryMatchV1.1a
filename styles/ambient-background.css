@@ -9,4 +9,9 @@
 .ambient-bg-fish { fill: #789da6; }
 .ambient-bg-leaf { fill: var(--ambient-bg-leaf-color, #9aaf71); stroke: #58734d; stroke-width: 1px; }
 .ambient-bg-firefly { position: absolute; opacity: 0; border-radius: 50%; background: radial-gradient(circle, #fff5bf 0, #d9dc8560 35%, transparent 70%); }
+.ambient-bg-lamp { position: absolute; inset: 0; background: radial-gradient(ellipse, #fff2b0b3 0, #ffc36457 28%, transparent 70%); }
+.ambient-bg-lily, .ambient-bg-frog { position: absolute; transform-origin: center; }
+/* A small isolated static pad avoids a backing surface spanning the scroller. */
+.ambient-bg-lily { will-change: transform; }
+.ambient-bg-ripple { position: absolute; border: 1px solid #a6d6cd; border-radius: 50%; opacity: 0; box-sizing: border-box; }
 @media (prefers-reduced-motion: reduce) { .ambient-bg-pilot, .ambient-bg-host { display: none; } }

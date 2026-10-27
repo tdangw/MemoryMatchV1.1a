@@ -29,16 +29,19 @@ export function createBackgroundRuntime({ view, document: doc, meteor, report = 
   function meteorAllowed() {
     return baseAllowed() && eligible && !suspended() && (!current || current.meteorsVisible !== false);
   }
+  // Static promoted details consume the same finite compositor capacity as a
+  // native target. They never change meteor eligibility, only available slots.
+  const occupiedSlots = data => data.handles + (data.reservedSlots ?? 0);
   function schedule() {
     if (timerRole === 'IDLE') return;
     clearTimer();
-    const handles = scene ? scene.diagnostics().handles : 0;
+    const handles = scene ? occupiedSlots(scene.diagnostics()) : 0;
     if (meteorAllowed() && handles <= limit - 2) { timerRole = 'METEOR'; timer = view.setTimeout(tick, 3500 + Math.random() * 3500); }
   }
   function tick() {
     timer = undefined; timerRole = null;
     if (!meteorAllowed()) return;
-    const handles = scene ? scene.diagnostics().handles : 0;
+    const handles = scene ? occupiedSlots(scene.diagnostics()) : 0;
     if (handles + meteor.diagnostics().active < limit) meteor.spawn();
     schedule();
   }
@@ -80,9 +83,9 @@ export function createBackgroundRuntime({ view, document: doc, meteor, report = 
         catch (error) { fail(current, error); return; }
       }
       const data = scene.diagnostics();
-      if (![data.handles, data.nodes].every(value => Number.isInteger(value) && value >= 0)
-        || data.handles > limit || data.nodes > AMBIENT_LIGHT.nodes) { fail(current, new Error('Ambient Light budget exceeded')); return; }
-      if (data.handles + meteor.diagnostics().active > limit) meteor.cancel();
+      if (![data.handles, data.nodes, data.reservedSlots ?? 0].every(value => Number.isInteger(value) && value >= 0)
+        || occupiedSlots(data) > limit || data.nodes > AMBIENT_LIGHT.nodes) { fail(current, new Error('Ambient Light budget exceeded')); return; }
+      if (occupiedSlots(data) + meteor.diagnostics().active > limit) meteor.cancel();
       state = data.handles ? 'RUNNING' : 'STATIC';
     } else state = meteorAllowed() ? 'RUNNING' : 'STATIC';
     meteor.setVisible(meteorAllowed()); schedule();

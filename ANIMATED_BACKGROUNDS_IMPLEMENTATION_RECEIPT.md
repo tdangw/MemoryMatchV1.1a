@@ -425,3 +425,53 @@ WebView thực và native fullscreen ad/foreground trên máy đó, physical
 presentation/end-to-end input/GPU driver allocation, pin/nhiệt độ. Màn
 ngang sau chỉnh do chủ dự án tự kiểm. Không dùng PC emulation hoặc RAF
 để thay các bằng chứng này, không nhận toàn bộ nghiệm thu thiết bị đã đạt.
+
+## M1 — mẫu chi tiết bản đồ, 27/10/2026
+
+- Yêu cầu bổ sung và câu trả lời chủ dự án: chỉ bản đồ có đèn sáng/tối,
+  gợn nước, ếch nhỏ trên lá; game/Home giữ nguyên. Mẫu opt-in qua QA probe,
+  giữ mặc định cũ trong M1; phê duyệt cụ thể được ghi bên dưới, cho phép
+  tiếp tục M2 sau kiểm chứng M1. Không mở lại G0–G5.
+- `mapDetails.js` sở hữu metadata/SVG và timeline28s: nghỉ, lấy đà, nhảy
+  xuống/gợn, bơi và quay về. Đèn9s/đom đóm7s, không timer hay RAF sản phẩm
+  mới. Chọn WAAPI thay điều phối JS từng pha để hủy trọn theo scene cũ.
+- Native map sample412×915/DPR2:15node,4handle,1observer,0timer; LayerTree
+  có lá22×16, gợn21×7, ếch14×11, fly6×6, lamp31×37 CSSpx. Toàn envelope
+  tránh đường/node/chest/UI, không layer toàn trail. Các vùng130×110source
+  bổ sung cho320px; source lớn hơn bị cell150px che nên fallback đúng.
+- Tự review riêng phát hiện lá tĩnh cần một compositor slot. Đã thêm
+  `reservedSlots` hữu hạn vào phép tính capacity của owner, không đổi
+  meteor eligibility. Renderer tính pond cost3 (2timeline+1backing),
+  runtime chặn oversubscribe kể cả lúc layout refresh/sao băng đang chạy.
+  Giữ nguyên5handle/24node/6layer, không sửa budget file.
+- Kiểm tra:13/13unit geometry/runtime, gồm meteor/static-slot contract mới;
+ 19pass/8skip UI qua320/412/900dọc. Mỗi khổ kiểm101pose của quỹ đạo thực,
+  100toggle, reduced-motion/suspend/dispose; regression nguồn lỗi/stale,
+  wheel/popup/ba trò vẫn đạt. Source-lock7ảnh/metadata cũ khớp; không bitmap
+  mới. Các metadata chi tiết mới còn là đề xuất chờ duyệt, không giả nhận
+  đã nằm trong lock đã duyệt cũ.
+- Giữ log lần fail: thử đầu chưa có pond an toàn trên320; đã bổ sung vùng
+  nhỏ, không giảm buffer tránhUI. Assertion0timer trong test mẫu ban đầu
+  sai hợp đồng vì map vẫn đủchỗ cho scheduler sao băng gốc; sửa thành≤1,
+  off vẫn bắt buộc0. Budget nguồn không đổi. Lần check song song browser
+  vượt Triple generator p9527,50ms/20ms; chạy lại riêng đạt, không đổi test.
+- Chứng cứ mới nằm tại `runtime/qa/animated-backgrounds/map-details-*`;
+  không stage log/ảnh/video/file QA tạm. Skill đã thực dùng:
+  `clarify-ambiguous-requirements` để chốt phạm vi map-only; không imagegen,
+  SVG/CSS đủ cho mẫu. Chưa đo S22 thật; ngang do chủ dự án tự kiểm.
+- Chủ dự án đã trả lời **“Duyệt mẫu hiện tại”** sau video32s và3cặp A/B
+  sơ bộ10s/arm. p95 off/on7,1/7,1;7,1/7,1;7,2/7,1ms; p99 tối đa+0,1ms.
+  Trusted pointer dispatch max off2,6/2,9/2,9ms, on2,5/2,1/2,6ms (không
+  thay end-to-end input). LayerTree off27/on32 ở cả3cặp; LayoutCount2/2,
+  style recalc on không tăng,0LongTask/0layerPainted event trong cửa sổ
+  đo; đây là quan sát CDP, không chứng nhận physical GPU presentation.
+  100mount warm p952,0ms≤4ms, listener131 ở mọi checkpoint20chu kỳ;
+  post-GC heap4.870.832→5.054.060B; node/handle nền giữ15/4 qua checkpoint.
+- Soak đủ10phút:11checkpoint, plateau phút2–10 chỉ2.604B≤2MiB,
+  listener131 ổn định; dispose node/handle/observer/timer scene về0,
+  chỉ còn9listener của app owner chung. Build hash index/probe giữ nguyên
+  suốt phép đo. A/B sàng lọc đạt cả Bmedian6,9ms và Bphysical1000/144ms;
+  max gap delta0,0699điểm%≤0,5; giữ outlier off34,7ms/on41,6ms, không
+  xóa mẫu. Đây là3cặp sơ bộ10s/arm, M2 sẽ kiểm đủchu kỳ trước bàn giao.
+- Sau tự review: `npm run check` exit0 (224JS/17ads), `npm run build`
+  exit0 và `git diff --check` đạt. Không gọi tự review là độc lập.

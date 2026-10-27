@@ -2,11 +2,12 @@ import '../../styles/ambient-background.css';
 import { coverGeometry, placeRegion, visibleMapTiles } from './geometry.js';
 import { createRegionRenderer } from './primitives.js';
 import { MAP_SCENE, SCENE_PRESETS } from './presets.js';
+import { MAP_DETAILS } from './mapDetails.js';
 
 const EXCLUSIONS = '[data-shell-region="frame"], [data-shell-region="title"], [data-shell-region="hud"], [data-shell-region="milestones"], .adventure-dock, .adventure-ad-slot';
 const overlapsView = (rect, height) => rect.bottom > -120 && rect.top < height + 120;
 
-export function createAmbientScene({ document: doc, kind, root, trail, scroll, prepareSource, initialSource, requestRefresh, onError, maxHandles }) {
+export function createAmbientScene({ document: doc, kind, root, trail, scroll, prepareSource, initialSource, requestRefresh, onError, maxHandles, mapDetails = false }) {
   const view = doc.defaultView, map = kind === 'map';
   if (typeof view.Element.prototype.animate !== 'function' || typeof view.ResizeObserver !== 'function') {
     return { refresh() {}, dispose() {}, diagnostics: () => ({ nodes: 0, handles: 0, observers: 0, kinds: [], reason: 'unsupported', tileSlots: 0, mountMs: 0, motionAssetBytes: 0, decodedMotionBytes: 0 }) };
@@ -72,13 +73,19 @@ export function createAmbientScene({ document: doc, kind, root, trail, scroll, p
     const candidates = [];
     for (const tile of tiles) {
       const transform = { x: (width - textureWidth) / 2, y: positionY + tile * textureHeight - scroll.scrollTop, scale: textureWidth / MAP_SCENE.width };
-      for (const region of MAP_SCENE.regions) {
+      for (const sourceRegion of mapDetails ? [...MAP_SCENE.regions, ...MAP_DETAILS] : MAP_SCENE.regions) {
+        const region = mapDetails && sourceRegion.kind === 'firefly' ? {...sourceRegion,detail:true} : sourceRegion;
         const rect = placeRegion(region, transform, viewport, cells);
         if (rect) candidates.push({ region, rect });
       }
     }
     const selected = [];
-    for (const [kind, count] of [['water',1],['fish',2],['firefly',1],['leaf',1]]) selected.push(...candidates.filter(entry => entry.region.kind === kind).slice(0,count));
+    const pond = mapDetails && candidates.find(entry => entry.region.kind === 'pond');
+    // A pond uses two timelines and a small static lily backing layer. Reserve
+    // one slot so pond + fly + lamp + lily + clip stays within six layers.
+    const composition = pond ? [['firefly',1],['lamp',1]] : mapDetails ? [['lamp',1],['firefly',1],['water',1],['fish',1],['leaf',1]] : [['water',1],['fish',2],['firefly',1],['leaf',1]];
+    if (pond) selected.push(pond);
+    for (const [kind, count] of composition) selected.push(...candidates.filter(entry => entry.region.kind === kind).slice(0,count));
     // Last child of the scroller avoids splitting the entire static trail into
     // a foreground backing layer. Exclusions keep all UI pixels disjoint.
     renderer.render(selected, { left:box.left-scrollBox.left-scroll.clientLeft, top: scroll.scrollTop, width, height });

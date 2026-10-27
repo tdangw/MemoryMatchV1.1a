@@ -22,6 +22,28 @@ ngang sau mốc điều chỉnh. Không tăng ngân sách tổng hay sửa gamep
 
 ## 1. Mục tiêu, quyết định đã chốt và giới hạn
 
+### Bổ sung bản đồ 27/10 sau G5
+
+Chủ dự án chốt chỉ bản đồ: làm rõ đom đóm, ánh đèn sáng/tối, gợn hồ và
+lá sen có ếch nhỏ nghỉ → lấy đà → nhảy xuống → bơi → nhảy về, lặp chậm.
+Ba trò/Home không tăng hiệu ứng. Mẫu mới phải duyệt trên nền thật trước
+bật mặc định; mẫu QA riêng không đổi đường startup hay setting/save.
+
+So sánh hai cách: vòng JS điều phối từng pha dễ thêm callback/timer và
+race khi cuộn; chọn hai timeline WAAPI đồng bộ28s cho ếch/gợn, SVG/CSS
+nhỏ cho lá/đèn, dùng owner/cleanup hiện có. Chỉ transform/opacity thay
+đổi; nghỉ0–35%, lấy đà35–37%, nhảy37–43%, bơi43–66%, về66–74%, nghỉ
+đến100%. Lá tĩnh, glow đèn9s và đom đóm7s dịu, không bật/tắt gắt.
+
+Phase M1: mẫu QA opt-in, cả envelope tránh UI/đường/node, tối đa2timeline
+pond +1fly +1lamp; lá nhỏ có backing riêng. Mục tiêu≤24node/5handle/
+6layer như cũ, không bitmap/scheduler mới. Không đủ vùng thì fallback
+các nhóm cũ + đèn trong5slot. Hidden/reduced/scroll/popup/off hủy toàn
+actor như trước. Cần đo bounding/layers/A-B sơ bộ,100chu kỳ và soak
+trước trình mẫu; không dùng chứng cứ G4 cũ thay chứng cứ bổ sung.
+Phase M2 sau duyệt: bật mặc định, regression các map/viewport/skin,
+kiểm tra cuối và commit theo phase; S22 vẫn ghi thiếu nếu không có máy.
+
 Chủ dự án đã xác nhận:
 
 - Áp dụng ở **trang chủ, bản đồ và cả ba màn chơi** Memory Match, Link

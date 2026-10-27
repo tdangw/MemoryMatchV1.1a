@@ -8,6 +8,63 @@ const settle = async page => {
   if (await guide.isVisible()) { await guide.getByRole('button', { name: 'Đã hiểu' }).click(); await expect(guide).toHaveCount(0); }
   await expect.poll(async () => (await diagnostics(page)).preparing).toBe(0);
 };
+
+test('map detail proposal fits native motion envelopes and releases every interrupted cycle', async ({page}) => {
+  await page.evaluate(async()=>{
+    await (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('memory-match');
+    const root=document.querySelector('#menu-container');
+    (await import('/js/background/bindings.js')).mountMapAmbient((await import('/js/appPageLifecycle.js')).getAppPageScope(),root,root.querySelector('.adventure-map-trail'),root.querySelector('.adventure-map-scroll'),{mapDetails:true});
+  });
+  await settle(page);
+  const scroll=page.locator('.adventure-map-scroll');
+  const bottom=await scroll.evaluate(n=>n.scrollHeight-n.clientHeight);
+  let found=false;
+  for(let step=0;step<110;step++){
+    await scroll.evaluate((n,y)=>{n.scrollTop=y;},Math.max(0,bottom-step*100));
+    await page.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))));
+    await expect.poll(async()=>(await diagnostics(page)).blockers).toBe(0);
+    if((await diagnostics(page)).kinds.includes('pond')){found=true;break;}
+  }
+  expect(found,'A clear pond proposal must be available').toBe(true);
+  const bounds=await page.evaluate(()=>{
+    const host=document.querySelector('.ambient-bg-host'), failures=[];
+    const animations=host.getAnimations({subtree:true});
+    animations.forEach(a=>a.pause());
+    for(let step=0;step<=100;step++){
+      animations.forEach(a=>{a.currentTime=28000*step/100;});
+      for(const node of host.querySelectorAll('.ambient-bg-frog,.ambient-bg-ripple,.ambient-bg-lily')){
+        const box=node.getBoundingClientRect(),outer=node.parentElement.getBoundingClientRect();
+        if(box.left<outer.left-.1||box.top<outer.top-.1||box.right>outer.right+.1||box.bottom>outer.bottom+.1)failures.push({step,kind:node.classList[0]});
+      }
+    }
+    return failures;
+  });
+  expect(bounds).toEqual([]);
+  await page.evaluate(async()=>{
+    const api=await import('/js/backgroundEffects.js');
+    for(let i=0;i<100;i++){
+      api.setMeteorEffectsEnabled(false);
+      if(document.querySelector('.ambient-bg-host')||api.getAmbientDiagnostics().handles)throw new Error('Proposal leaked on off');
+      api.setMeteorEffectsEnabled(true);
+      const d=api.getAmbientDiagnostics();
+      // The original meteor scheduler can still use available map slots,
+      // including the reservation for the static pad; at most one timer.
+      if(d.nodes>24||d.handles>5||d.sceneInstances!==1||d.timers>1||d.lastError)throw new Error(JSON.stringify(d));
+    }
+  });
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await expect(page.locator('.ambient-bg-host')).toHaveCount(0);
+  await page.emulateMedia({reducedMotion:'no-preference'});
+  await expect(page.locator('.ambient-bg-frog')).toHaveCount(1);
+  await page.evaluate(async()=>{
+    const api=await import('/js/backgroundEffects.js'); const resume=api.suspendAmbientBackground();
+    if(api.getAmbientDiagnostics().handles)throw new Error('Suspension kept frog');
+    resume();
+    (await import('/js/gameSelector.js')).showGameSelector();
+  });
+  await expect(page.locator('.ambient-bg-host')).toHaveCount(0);
+  expect(await diagnostics(page)).toMatchObject({scene:'home',handles:0,timers:0,observers:0});
+});
 test.beforeEach(async ({ page }) => {
   await page.goto('/'); await page.locator('.game-selector__choice').first().waitFor();
   await page.evaluate(async () => { const { gameState } = await import('/js/gameState.js'); gameState.settings.sound = gameState.settings.music = false; });

@@ -13,11 +13,17 @@ import { grantTripleItem, getTripleItemCount } from '../../../js/tripleConnect/t
 import { openQuickAssistOverlay } from '../../../js/shop.js';
 import { GAMEPLAY_RULES_VERSION } from '../../../js/progression/gameplayRules.js';
 import { saveSetting } from '../../../js/persistence.js';
-import { disposeAppPage } from '../../../js/appPageLifecycle.js';
+import { disposeAppPage, getAppPageScope } from '../../../js/appPageLifecycle.js';
+import { mountMapAmbient } from '../../../js/background/bindings.js';
 
 let triple = null;
 window.ambientProbe = {
   ...effects, home: showGameSelector, map: openGameMenu, skin: selectUiSkin, linkAction: runLinkGameAction, saveSetting, disposeAppPage,
+  mapDetails() {
+    const root = document.querySelector('#menu-container[data-map-ready="true"]');
+    if (!root) throw new Error('Map is not ready');
+    return mountMapAmbient(getAppPageScope(), root, root.querySelector('.adventure-map-trail'), root.querySelector('.adventure-map-scroll'), {mapDetails:true});
+  },
   memoryTime() { openQuickAssistOverlay('time'); },
   linkFreeze() { document.querySelector('#link-connect-container [data-item="freeze"]').click(); },
   linkItemCount: () => getLinkItemCount('freeze'),

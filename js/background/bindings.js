@@ -48,7 +48,7 @@ export function mountHomeAmbient(scope, root) {
   return mountAmbientBackground({ scope, root, kind: 'home', static: true, meteorsVisible: false });
 }
 
-export function mountMapAmbient(scope, root, trail, scroll) {
+export function mountMapAmbient(scope, root, trail, scroll, { mapDetails = false } = {}) {
   const binding = createGameShellLifecycle();
   const releaseParent = scope.own(() => binding.dispose());
   binding.own(() => releaseParent.forget());
@@ -63,7 +63,7 @@ export function mountMapAmbient(scope, root, trail, scroll) {
     prepare: async signal => {
       const [loaded, module] = await Promise.all([prepareMapTexture(signal), import('./scene.js')]);
       if (!loaded || signal.aborted) return null;
-      return options => module.createAmbientScene({ document, kind: 'map', root, trail, scroll, initialSource: '', ...options });
+      return options => module.createAmbientScene({ document, kind: 'map', root, trail, scroll, initialSource: '', mapDetails, ...options });
     },
   });
   binding.listen(scroll, 'scroll', () => {
