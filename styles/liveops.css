@@ -55,3 +55,75 @@ html .liveops__letter-grid > button.tab-button { min-height: 48px; min-width: 48
 .liveops__reward-preview { display: block; width: 128px; height: 128px; object-fit: contain; margin: 0 auto; }
 .liveops__ticket-balance { display: flex; align-items: center; gap: 8px; }
 .liveops__ticket-balance > .ui-icon { width: 32px; height: 32px; flex: none; }
+
+/* Liveops presentation owns its local materials; global skin chrome remains outside these pages. */
+:is(#missions-screen,#events-screen).liveops-page {
+  --lo-canvas:#07192c; --lo-panel:#0b2b3c; --lo-inset:#092234; --lo-ink:#f7e9c3; --lo-muted:#bdcdd3;
+  --lo-line:#c5a468; --lo-gold:#f1d58d; --lo-task:#f3e5c8; --lo-task-ink:#182a39; --lo-task-line:#bca574;
+  --lo-button-top:#22647b; --lo-button-bottom:#12374f; --lo-button-ink:#fff0cc;
+  --lo-claim-top:#ffe899; --lo-claim-bottom:#dba641; --lo-claim-ink:#48300e;
+  --lo-green-top:#267e58; --lo-green-bottom:#07513e;
+  --liveops-wheel-light:#ffedab; --liveops-wheel-dark:#9c601b; --liveops-wheel-sector-a:#b77a26; --liveops-wheel-sector-b:#edba55; --liveops-wheel-gem:#319b76;
+}
+html[data-ui-skin="woodland"] :is(#missions-screen,#events-screen).liveops-page {
+  --lo-canvas:#10281f; --lo-panel:#244332; --lo-inset:#142f25; --lo-line:#b7a16a; --lo-gold:#edd598;
+  --lo-ink:#fff1cf; --lo-muted:#d2ddc1; --lo-task:#eee2c3; --lo-task-ink:#3c2c1a;
+  --lo-button-top:#5a7b3a; --lo-button-bottom:#314d27; --lo-green-top:#647e39; --lo-green-bottom:#304e25;
+  --liveops-wheel-dark:#825b26; --liveops-wheel-gem:#69883d;
+}
+html[data-ui-skin="storybook"] :is(#missions-screen,#events-screen).liveops-page {
+  --lo-canvas:#50331e; --lo-panel:#ead4a9; --lo-inset:#e0c18d; --lo-ink:#482b16; --lo-muted:#735231;
+  --lo-line:#96672f; --lo-gold:#704515; --lo-task:#fff1d2; --lo-task-ink:#482b16; --lo-task-line:#b38a50;
+  --lo-button-top:#8da756; --lo-button-bottom:#476b32; --lo-button-ink:#fff5d5;
+  --lo-claim-top:#ffe6a0; --lo-claim-bottom:#d09b42; --lo-claim-ink:#4b2b13;
+  --lo-green-top:#6b963d; --lo-green-bottom:#3c6629; --liveops-wheel-dark:#8d571f; --liveops-wheel-gem:#5a8a44;
+}
+html[data-ui-skin="papercut"] :is(#missions-screen,#events-screen).liveops-page {
+  --lo-canvas:#203b4b; --lo-panel:#d6e6d3; --lo-inset:#b8d1bb; --lo-ink:#244333; --lo-muted:#496450;
+  --lo-line:#738b62; --lo-gold:#486340; --lo-task:#f6edce; --lo-task-ink:#2c433c; --lo-task-line:#aeb48b;
+  --lo-button-top:#719f8a; --lo-button-bottom:#427865; --lo-button-ink:#fff9df;
+  --lo-claim-top:#f8e8ab; --lo-claim-bottom:#d2ba73; --lo-claim-ink:#3d4d38;
+  --liveops-wheel-light:#fff1bf; --liveops-wheel-dark:#9b8056; --liveops-wheel-gem:#74a98e;
+}
+html[data-ui-skin="starship"] :is(#missions-screen,#events-screen).liveops-page {
+  --lo-canvas:#061425; --lo-panel:#102c45; --lo-inset:#071e33; --lo-ink:#d9f8ff; --lo-muted:#a9cedc;
+  --lo-line:#58b9d6; --lo-gold:#a9e7f5; --lo-task:#d7e7ed; --lo-task-ink:#13304b; --lo-task-line:#85b9ca;
+  --lo-button-top:#247b9a; --lo-button-bottom:#16416b; --lo-button-ink:#edfaff;
+  --lo-green-top:#248b97; --lo-green-bottom:#125261; --liveops-wheel-light:#d3f8ff; --liveops-wheel-dark:#42758e; --liveops-wheel-sector-a:#2a6d86; --liveops-wheel-sector-b:#78c7d3; --liveops-wheel-gem:#83e7f0;
+}
+:is(#missions-screen,#events-screen).liveops-page .liveops-surface {
+  width:min(620px,calc(100vw - 24px)); max-height:calc(100dvh - 24px); margin:auto; padding:0;
+  isolation:isolate; border:1px solid var(--lo-line); border-radius:20px; color:var(--lo-ink);
+  background:linear-gradient(180deg,color-mix(in srgb,var(--lo-canvas) 92%,transparent),color-mix(in srgb,var(--lo-canvas) 85%,transparent)),url('/assets/images/backgrounds/leaderboard-night-garden.webp') center/cover;
+  box-shadow:0 10px 30px #0007,inset 0 0 0 3px #ffffff09;
+}
+:is(#missions-screen,#events-screen).liveops-page .liveops-surface::before,
+:is(#missions-screen,#events-screen).liveops-page .storybook-corner-leaves,
+:is(#missions-screen,#events-screen).liveops-page .app-modal__header::before { content:none; display:none; }
+:is(#missions-screen,#events-screen).liveops-page .liveops-surface > header.app-modal__header {
+  display:flex; align-items:center; justify-content:space-between; min-height:68px; gap:10px; margin:0;
+  padding:10px 14px; border-bottom:1px solid var(--lo-line); background:linear-gradient(180deg,var(--lo-panel),var(--lo-canvas)); text-shadow:none;
+}
+:is(#missions-screen,#events-screen).liveops-page .liveops-surface .app-modal__title { flex:1; min-width:0; margin:0; padding:0; font-size:clamp(21px,5.6vw,28px); line-height:1.2; color:var(--lo-gold); text-align:left; text-shadow:0 1px 1px #0005; }
+:is(#missions-screen,#events-screen).liveops-page .app-modal__title > .ui-icon { display:none; }
+:is(#missions-screen,#events-screen).liveops-page .liveops-surface .app-modal__body { padding:12px; line-height:1.4; }
+:is(#missions-screen,#events-screen).liveops-page .app-modal__close { position:static; flex:none; width:48px; height:48px; min-width:48px; padding:9px; border:2px solid var(--lo-line); border-radius:50%; background:var(--lo-inset); color:var(--lo-gold); box-shadow:inset 0 1px 0 #fff5; }
+:is(#missions-screen,#events-screen).liveops-page.app-screen-content .liveops-surface { width:100%; height:100%; max-height:none; margin:0; border:0; border-radius:0; }
+:is(#missions-screen,#events-screen).liveops-page.app-screen-content .liveops-surface > header.app-modal__header { padding-right:68px; }
+.liveops__wallet { display:flex; align-items:center; gap:5px; flex:none; padding:5px 9px; border:1px solid var(--lo-line); border-radius:24px; background:var(--lo-inset); color:var(--lo-gold); font-size:15px; font-weight:900; font-variant-numeric:tabular-nums; }
+.liveops__wallet > .ui-icon { width:27px; height:27px; }
+.liveops-surface .liveops { max-width:560px; color:var(--lo-ink); }
+.liveops-surface .liveops__card { border-color:var(--lo-line); background:linear-gradient(145deg,color-mix(in srgb,var(--lo-panel) 92%,white),var(--lo-panel)); color:var(--lo-ink); box-shadow:inset 0 0 0 3px #ffffff09,0 3px 0 #0003; }
+.liveops-surface .liveops__card h3 { color:inherit; }
+.liveops-surface .liveops__status { min-height:0; margin:0 0 8px; font-size:12px; color:var(--lo-muted); }
+html .liveops-page .liveops-surface button.tab-button { box-sizing:border-box; min-height:48px; border:1px solid var(--lo-line); border-image:none; border-radius:24px; padding:8px 12px; font:inherit; font-weight:800; color:var(--lo-button-ink); text-shadow:0 1px 1px #0007; background:linear-gradient(var(--lo-button-top),var(--lo-button-bottom)); box-shadow:inset 0 2px 0 #ffffff38,0 3px 0 #0004; }
+html .liveops-page .liveops-surface button.tab-button:disabled { opacity:.65; filter:none; cursor:default; }
+html .liveops-page .liveops-surface button.tab-button:focus-visible { outline:3px solid var(--lo-gold); outline-offset:3px; }
+html .liveops-page .liveops__tabs button { border-radius:22px; background:linear-gradient(var(--lo-panel),var(--lo-inset)); color:var(--lo-muted); }
+html .liveops-page .liveops__tabs button[aria-selected="true"] { color:var(--lo-gold); outline:2px solid var(--lo-line); outline-offset:-3px; box-shadow:inset 0 0 12px #e8d48726,0 2px 0 #0004; }
+.liveops-surface .liveops__progress { appearance:none; border:1px solid var(--lo-line); border-radius:20px; overflow:hidden; height:17px; background:var(--lo-inset); }
+.liveops-surface .liveops__progress::-webkit-progress-bar { background:var(--lo-inset); }
+.liveops-surface .liveops__progress::-webkit-progress-value { border-radius:20px; background:linear-gradient(#8de66e,#208b47); box-shadow:inset 0 2px 0 #fff6; }
+.liveops-surface .liveops__progress::-moz-progress-bar { border-radius:20px; background:linear-gradient(#8de66e,#208b47); }
+.liveops-surface .liveops__progress-row { font-size:12px; font-weight:800; }
+@media(max-width:360px) { :is(#missions-screen,#events-screen).liveops-page .app-modal__title { font-size:20px; } .liveops__wallet { font-size:13px; padding:4px 7px; } .liveops__wallet>.ui-icon { width:23px; height:23px; } }

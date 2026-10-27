@@ -1,5 +1,19 @@
 # CONTEXT — Trạng thái hiện tại (2026-10-27)
 
+## Mở lại mỹ thuật Nhiệm vụ/Sự kiện theo ba ảnh — 27/10/2026
+
+- Chủ dự án xác nhận giao diện hiện tại chưa đúng kế hoạch và cung cấp
+  ảnh Vòng quay/Nhiệm vụ/Sưu tập chữ. P0–Q1 trước chỉ chứng minh chức năng;
+  không coi đó là nghiệm thu mỹ thuật. Phần UI mở lại V1–V3 ngay trong
+  EVENTS_MOBILE_FESTIVAL_PLAN.md, receipt cũ dùng chung, không tạo plan khác.
+- Hướng ảnh: khu vườn đêm navy/emerald/gold, khung vàng, nhiệm vụ ngang,
+  lịch gọn, wheel có khối và ô chữ có chất liệu. Giữ luật thưởng/model/rules;
+  không chép các quà hoặc số minh họa khác quyết định đã chốt. Đã chốt
+  bố cục tham khảo ảnh, mỹ thuật thích ứng từng skin, không ép navy cho mọi skin.
+- Chủ dự án cho phép phát hành chỉ Firestore rules để thử Lễ hội. Đã phát
+  hành và đọc lại khớp source; SHA256 d4f2f15a8c3135441adaf8e3883a5a70675fafad7651d191e9470a26a8f1619d.
+  Đã bật VITE_FESTIVAL_CHESTS_ENABLED=1 trong .env.local; chưa Hosting/APK.
+
 ## Kế hoạch mới: rơi vật phẩm, năng lượng và thẻ đặc biệt ba trò — 27/10/2026
 
 - Chỉ lập kế hoạch theo yêu cầu mới; nguồn duy nhất của task gameplay này: `DROP_ENERGY_SPECIAL_CARDS_PLAN.md`. Chưa sửa code/config/save/rules/asset, chưa test/build/deploy/APK/commit. Giữ task Sự kiện/Nhiệm vụ và nền động riêng, không thay plan hoặc nghiệm thu của chúng.

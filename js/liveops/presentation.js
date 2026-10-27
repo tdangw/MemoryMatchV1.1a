@@ -1,4 +1,5 @@
-import { loadPersistentGameData } from '../persistence.js';
+import { loadPersistentGameData, subscribeToLocalCommit } from '../persistence.js';
+import { gameState } from '../gameState.js';
 import { FESTIVAL_MILESTONES } from './chestConfig.js';
 import { getAppPageScope } from '../appPageLifecycle.js';
 import { renderMissions as mountMissions, updateMissionCountdown } from './missionsPresentation.js';
@@ -29,6 +30,13 @@ export function openLiveopsPage(kind, surface = {}) {
   let content = el('div', 'liveops__content'); root.append(status, content);
   const modal = openAppModal({ ...surface, id: `${kind}-screen`, title: kind === 'missions' ? 'Nhiệm vụ' : 'Sự kiện',
     icon: kind, content: root, onDestroy: () => scope.dispose() });
+  modal.overlay.classList.add('liveops-page'); modal.panel.classList.add('liveops-surface'); root.classList.add(`liveops--${kind}`);
+  const heading = modal.panel.querySelector('.app-modal__header');
+  if(heading&&!document.querySelector('.adventure-wallet')){
+    const wallet=el('div','adventure-wallet liveops__wallet');wallet.setAttribute('aria-label','Xu đang có');heading.append(wallet);
+    const updateWallet=coins=>wallet.replaceChildren(createIcon('coin'),document.createTextNode(coins.toLocaleString('vi-VN')));
+    updateWallet(gameState.coins);scope.own(subscribeToLocalCommit(({data})=>{if(scope.active)updateWallet(data.coins);}));
+  }
   let view = null, tab = 'daily', busy = false, animation = null, presentedSpin = null, wheelExpanded = false, selectedLetter = LETTER_ALPHABET[0], eventTab = 'wheel';
   let wheelRotor=null, confirmedView=false;
   const active = () => scope.active && root.isConnected;

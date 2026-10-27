@@ -1,5 +1,9 @@
 # Nghiệm thu Sự kiện, Nhiệm vụ và Kho rương — 27/10/2026
 
+> Mở lại phần mỹ thuật: chủ dự án gửi ba ảnh tham chiếu và xác nhận UI
+> chưa đúng kế hoạch. Các kết quả P0–Q1 sau đây vẫn là bằng chứng chức năng,
+> không phải bằng chứng khớp mỹ thuật. V1–V3 đang xử lý theo cùng plan.
+
 ## Phạm vi và quyết định
 
 Nguồn: EVENTS_MOBILE_FESTIVAL_PLAN.md, P0–Q1; commit riêng từng phase.
@@ -133,3 +137,17 @@ rương, grant legacy giữ ảnh/tên món; preview không hứa chắc ngoại
 Commits phase trước Q1: P0 `13cde67`, U1 `8c4d5fb`, U2 `f71e697`, U3
 `2ce996b`, D1 `ed57c02`, D2 `8e63e8d`. Q1 chứa sửa từ review và hồ sơ
 nghiệm thu này. Toàn bộ P0–Q1 hoàn tất trong phạm vi local đã giao.
+
+## Phát hành rules được duyệt bổ sung 27/10/2026
+
+Chủ dự án cho phép riêng rules để thử Lễ hội. `firebase deploy --only
+firestore:rules --project memorymatchv1-1a --non-interactive` exit0; đọc lại
+release cloud.firestore bằng scripts/verify-deployed-firestore-rules.mjs đạt.
+Ruleset e539def1-4498-42b6-8e2f-fa6417ab32b9; SHA256
+d4f2f15a8c3135441adaf8e3883a5a70675fafad7651d191e9470a26a8f1619d.
+Đã bật cờ festival/chest trong .env.local (ignored) để thử web local. Không
+Hosting/APK/push, không tạo tài khoản hoặc grant thử trên dữ liệu live.
+Luật vòng lặp vẫn ở code, state hữu hạn; không Functions/Scheduler/Blaze.
+
+V1 mỹ thuật: đã chốt ảnh là tham chiếu bố cục, phối màu/chất liệu theo từng skin. Chuẩn bị wheel SVG80node không filter/loop; palette local và header/ví duy nhất, không nạp Xu, không đổi chrome toàn app. So sánh giữ geometry modal cũ với cô lập surface hai trang: chọn cô lập local để không bị parchment/ribbon ép bố cục nhưng vẫn giữ vật liệu skin. Kiểm cú pháp/diff; đối chiếu ảnh thật ở V3 sau tích hợp V2.
+

@@ -1,5 +1,32 @@
 # Trang Sự kiện, Nhiệm vụ mobile, Kho rương và Lễ hội Đom Đóm
 
+## Mở lại phần mỹ thuật theo ảnh tham chiếu — 27/10/2026
+
+Chủ dự án gửi ba ảnh minh họa (Vòng quay, Nhiệm vụ, Sưu tập chữ) và xác
+nhận giao diện hiện tại chưa đúng kế hoạch. Nghiệm thu chức năng P0–Q1
+bên dưới không chứng nhận mức độ khớp mỹ thuật; kết luận hoàn tất UI
+trước đó đã quá sớm. Phần trình bày được mở lại, vẫn dùng kế hoạch này.
+
+- V1: chốt phạm vi skin; tách chrome hai trang khỏi khung giấy/nút cam,
+  dùng navy/emerald/gold và nền lá đêm tĩnh hiện có. Không sửa skin toàn app.
+- V2: bố cục theo ảnh: thẻ nhiệm vụ ngang icon–nội dung/tiến độ–CTA;
+  lịch4+3 và phần thưởng trọn bộ gọn; wheel vàng có rim/hub/pointer nổi;
+  chọn bộ chữ gọn, một recipe chi tiết, grid17 ô chữ có số lượng và thanh
+  thao tác. Giữ chữ/số thật và một scroll owner, không ép vừa màn.
+- V3: đối chiếu ảnh UI thật với ba reference tại412px, kiểm320/360/412,
+  desktop/landscape/font lớn,48px/focus/reduced-motion và lifecycle liên quan;
+  commit theo phase, không deploy/APK. Không dùng test chức năng thay cho
+  đánh giá mỹ thuật. Ghi bằng chứng chung vào receipt hiện có.
+
+Giữ toàn bộ kinh tế/quyền thưởng đã chốt. Các số1250Xu/vé3/tiến độ trong
+ảnh chỉ là minh họa; không thêm kim cương/nút nạp/vé điểm danh/rương thật
+ngày7/rương10000Xu/English copy/loop đom đóm theo ảnh. Không sửa service,
+reducer, persistence, rules hoặc task năng lượng. Chủ dự án chốt: lấy bố cục/hướng trình bày từ ảnh, còn mỹ thuật/màu sắc
+phải thích ứng với từng skin. Luôn có tab Lễ hội; quyền giao dịch tách
+khỏi khả năng xem trang. Bổ sung đã cho phép phát hành Firestore rules
+để thử Lễ hội; chỉ rules, không Hosting/APK. Rules đã phát hành và đọc
+lại khớp source, chi tiết trong receipt.
+
 ## Triển khai được giao — 27/10/2026
 
 Chủ dự án giao toàn bộ P0–Q1, commit từng phase, và duyệt toàn bộ đề xuất
