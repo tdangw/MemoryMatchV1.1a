@@ -28,3 +28,5 @@ android/keystores/
 # New local test files are not included in application commits.
 /tests/
 /test/
+runtime/
+docs/
