@@ -1,5 +1,18 @@
 # Trang Sự kiện, Nhiệm vụ mobile, Kho rương và Lễ hội Đom Đóm
 
+## Triển khai được giao — 27/10/2026
+
+Chủ dự án giao toàn bộ P0–Q1, commit từng phase, và duyệt toàn bộ đề xuất
+còn lại của P0: mốc 25/50 cấp 50/100 Xu; subpool hỗ trợ chia đều theo mục 4;
+kho đầy 999 giữ rương/candidate để thử lại; whitelist gồm ngoại hình
+Thành tích/chữ/event, loại starter/effect, chọn đều; đổi chữ lặp loại theo
+12 slot cũ; trong ván chỉ xem kho; SVG tĩnh khu vườn đêm theo skin hiện có.
+Các câu “chỉ lập kế hoạch/chưa giao triển khai/còn đề xuất” bên dưới là
+lịch sử trước phê duyệt này. Không deploy, rules live, APK hoặc push.
+
+P0 đã chốt. Bằng chứng và trạng thái các phase triển khai ghi chung trong
+`EVENTS_MOBILE_FESTIVAL_RECEIPT.md`.
+
 Cập nhật ngày 27/10/2026. **Chỉ phân tích và lập kế hoạch; chưa sửa code,
 đổi dữ liệu/rules, tạo icon hoặc phát hành.** Đây là nguồn phạm vi duy
 nhất của task Sự kiện, Nhiệm vụ và Kho rương mới.

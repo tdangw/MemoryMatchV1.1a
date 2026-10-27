@@ -292,3 +292,8 @@ Chủ dự án đã yêu cầu deploy rules và bật môi trường thật đ�
 - 20/10 — Quyết định hiện hành của chủ dự án: ghép thành công nhận cố định 2 xu mỗi cặp (Memory Match/Link Connect) hoặc bộ ba (Triple Connect), không tăng theo combo; giữ nguyên thưởng thắng màn và các nguồn thưởng riêng. MATCH_COINS_PER_GROUP tại js/progression/gameplayRules.js là nguồn chung; lưu ví cùng lượt ghép trước hiệu ứng. Triple dùng dấu đã nhận hiện hữu để không cấp lại khi hoàn tác/tiếp tục. Luật 0 xu cho ghép thường trong đợt nhiều wave ngày19/10 đã được thay bằng quyết định này. Âm unlock_1.mp3 dùng khi mở băng; coin_drop.mp3 dùng cho mỗi đợt xu rơi, theo cài đặt âm lượng/tắt tiếng.
 
 - 22/10 — Âm thanh và phản hồi thẻ: tiếng hoàn thành đợt phát sau lượt ghép cuối đã lưu, tiếp tục phát hết qua bàn mới; chọn độ khó và nút đóng dùng âm riêng. Đóng băng Link Connect kéo dài 15 giây; xáo trộn Link/Triple dùng hai kiểu gom giữa và xoay vòng, có cleanup khi đổi màn/ẩn ứng dụng. Thẻ được chọn/Gợi ý nhô nhẹ ở cả ba trò; Triple nhô trước khi bay vào khay, tôn trọng giảm chuyển động. Không đổi schema/save hoặc luật thưởng.
+
+## Triển khai Sự kiện/Nhiệm vụ/Kho rương — 27/10/2026
+
+- Nguồn active: EVENTS_MOBILE_FESTIVAL_PLAN.md, giao toàn bộ P0–Q1 và commit từng phase. Chủ dự án đã duyệt toàn bộ đề xuất còn lại P0 trong chat: 50/100 Xu, subpool chia đều, đầy 999 giữ candidate, pool Thành tích/chữ/event bỏ starter/effect, loại rương chữ lặp 12 slot, trong ván chỉ xem, SVG tĩnh khu vườn đêm. Receipt chung EVENTS_MOBILE_FESTIVAL_RECEIPT.md. Các đoạn chỉ lập kế hoạch ở trên là lịch sử; không tự deploy/rules live/APK/push và không trộn task thẻ đặc biệt.
+
