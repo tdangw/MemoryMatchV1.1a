@@ -27,3 +27,11 @@ loại rương chữ lặp 12 slot; trong ván chỉ xem; SVG tĩnh khu vườn 
 
 U1: tách owner tab Sự kiện, tablist/tabpanel bàn phím và view con Kho rương trong Bộ sưu tập. Capability festival/chest riêng mặc định tắt đến khi rules tương ứng được phát hành. Kiểm cú pháp các owner và diff đạt; tích hợp dữ liệu/UI/lifecycle kiểm ở Q1.
 
+
+Đính chính P0 sau trao đổi: bỏ 12 slot/cursor. Chủ dự án duyệt mapping
+cố định MEMORY MATCH→Avatar, LINK CONNECT→Khung, TRIPLE CONNECT→Huy hiệu,
+ADVENTURE→Avatar. Mỗi bộ đổi một rương đúng loại; bảng bên trong giữ nguyên.
+
+U2: wheel theo kích thước thật, hub tĩnh; 4 recipe và 17 chữ button, sheet
+bán có số lượng/tổng Xu; Kho rương 4 card và chi tiết tỷ lệ/chọn trò/gallery
+12 món/trang. Kiểm cú pháp/diff đạt; tích hợp command và kiểm UI ở D1/Q1.

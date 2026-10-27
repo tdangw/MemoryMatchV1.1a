@@ -10,8 +10,8 @@ export const LETTER_DROP_CHANCE = 1; // Trial policy; 20% requires a later produ
 export const LETTER_SELL_COINS = 1000;
 export const LETTER_FALLBACK_COINS = 10000;
 export const LETTER_SETS = Object.freeze([
-  { id:'memory-match', label:'MEMORY MATCH' }, { id:'link-connect', label:'LINK CONNECT' },
-  { id:'triple-connect', label:'TRIPLE CONNECT' }, { id:'adventure', label:'ADVENTURE' },
+  { id:'memory-match', label:'MEMORY MATCH', chestType:'avatar' }, { id:'link-connect', label:'LINK CONNECT', chestType:'frame' },
+  { id:'triple-connect', label:'TRIPLE CONNECT', chestType:'badge' }, { id:'adventure', label:'ADVENTURE', chestType:'avatar' },
 ].map(set=>Object.freeze({ ...set, required:Object.freeze([...set.label.replaceAll(' ','')].reduce((counts,letter)=>{
   counts[letter]=(counts[letter]||0)+1; return counts;
 },{})) })));

@@ -1,19 +1,19 @@
-.liveops { width: 100%; max-width: 380px; margin: 0 auto; }
+.liveops { width: 100%; max-width: 520px; margin: 0 auto; overflow-wrap: anywhere; }
 .liveops__content { display: grid; gap: 12px; }
 .liveops__card { padding: 14px; border: 1px solid var(--ui-line, #9b7847); border-radius: 14px; background: var(--ui-surface, #fff6df); color: var(--ui-ink, #452b16); }
 .liveops__card h3 { margin: 0 0 12px; font-size: 1.1rem; }
-.liveops__card .tab-button { margin-block: 6px; width: 100%; white-space: normal; min-height: 44px; }
+.liveops__card .tab-button { margin-block: 6px; width: 100%; white-space: normal; min-height: 48px; }
 .liveops__tabs { display: flex; gap: 8px; }
-.liveops__tabs > button { flex: 1; min-height: 44px; }
+.liveops__tabs > button { flex: 1; min-width: 0; min-height: 48px; white-space: normal; }
 .liveops__tabs [aria-selected="true"] { outline: 2px solid currentColor; outline-offset: -3px; }
 .liveops__days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
 .liveops__day { display: grid; gap: 8px; text-align: center; padding: 8px 2px; border: 1px solid #ad8a53; border-radius: 8px; font-size: .8rem; }
 .liveops__day[data-current] { background: #fff2ab; color: #452b16; outline: 2px solid #99702c; }
 .liveops__progress-row { display: flex; align-items: center; gap: 8px; }
 .liveops__progress { flex: 1; width: 0; height: 18px; accent-color: #35833d; }
-.liveops__wheel { width: min(100%, 356px); aspect-ratio: 1; margin: 12px auto 18px; position: relative; }
+.liveops__wheel { width: min(100%, 304px); aspect-ratio: 1; margin: 12px auto 18px; position: relative; container-type: inline-size; }
 .liveops__rotor { position: absolute; inset: 0; border: 8px ridge #ad7d32; border-radius: 50%; background: repeating-conic-gradient(from -22.5deg, #f5dfa4 0deg 45deg, #246a58 45deg 90deg); }
-.liveops__sector { position: absolute; top: 50%; left: 50%; width: 44px; margin-left: -22px; margin-top: -12px; text-align: center; font-weight: 900; color: #3d2715; transform: rotate(calc(var(--sector) * 45deg)) translateY(-105px); }
+.liveops__sector { position: absolute; top: 50%; left: 50%; width: 44px; margin-left: -22px; margin-top: -12px; text-align: center; font-weight: 900; color: #3d2715; transform: rotate(calc(var(--sector) * 45deg)) translateY(-35cqi); }
 .liveops__sector:nth-child(even) { color: #fff2c0; }
 .liveops__pointer { position: absolute; top: -6px; left: calc(50% - 12px); width: 24px; height: 36px; background: #b37817; clip-path: polygon(0 0, 100% 0, 50% 100%); }
 .liveops__gifts { display: flex; justify-content: center; gap: 8px; }
@@ -22,8 +22,21 @@
 .liveops__rules summary { min-height: 44px; display: list-item; cursor: pointer; }
 @media (max-width: 360px) {
   .liveops__days { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  .liveops__sector { transform: rotate(calc(var(--sector) * 45deg)) translateY(-78px); }
 }
+
+.liveops__panel { display: grid; gap: 12px; min-width: 0; }
+.liveops__hub { position: absolute; inset: 37%; display: grid; place-items: center; border-radius: 50%; border: 4px solid #d4b45c; background: #164c42; color: #fff2c0; box-shadow: 0 4px 0 #09372e, inset 0 2px 0 #fbdd8e; font-weight: 900; }
+.liveops__set-choices, .liveops__chest-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.liveops__letter-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.liveops__letter-grid .tab-button { min-height: 48px; margin: 0; }
+.liveops__letter-grid [aria-pressed="true"] { outline: 3px solid var(--ui-ink, #452b16); outline-offset: -3px; }
+.liveops__letter-slots { display: flex; flex-wrap: wrap; gap: 3px; font-family: inherit; letter-spacing: normal; }
+.liveops__letter-slot { opacity: .55; font-weight: 900; border-bottom: 2px solid currentColor; }
+.liveops__letter-slot[data-filled="true"] { opacity: 1; background: var(--ui-line, #e4c579); border-radius: 3px; }
+.liveops__card { box-shadow: 0 3px 0 color-mix(in srgb, var(--ui-ink, #452b16) 18%, transparent); }
+.liveops__card > .ui-icon { display: block; width: 64px; height: 64px; margin: 8px auto; }
+.liveops button:focus-visible { outline: 3px solid currentColor; outline-offset: 2px; }
+.liveops__sale { display: grid; gap: 8px; }
 
 .liveops__letter-set { border-top: 1px solid var(--ui-line, #9b7847); padding-block: 10px; }
 .liveops__letter-set h4 { margin: 0 0 8px; font-size: .95rem; }

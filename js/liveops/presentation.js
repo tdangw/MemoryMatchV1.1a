@@ -1,3 +1,6 @@
+import { CHEST_NAMES } from './chestConfig.js';
+import { letterSetSlots } from './letters.js';
+import { action } from './ui.js';
 import { createTabs } from './ui.js';
 import { festivalChestsEnabled } from './availability.js';
 import { LETTER_SETS, LETTER_ALPHABET, LETTER_SELL_COINS } from './config.js';
@@ -24,10 +27,7 @@ export function openLiveopsPage(kind, surface = {}) {
   let view = null, tab = 'daily', busy = false, animation = null, presentedSpin = null, wheelExpanded = false, selectedLetter = LETTER_ALPHABET[0], eventTab = 'wheel';
   const active = () => scope.active && root.isConnected;
   scope.own(() => animation?.cancel());
-  function button(label, action, disabled = false) {
-    const node = el('button', 'tab-button', label); node.type = 'button'; node.disabled = disabled;
-    node.onclick = action; return node;
-  }
+  const button = action;
   function panel(title) { const node = el('section', 'liveops__card'); node.append(el('h3', '', title)); return node; }
   function progress(value, target, label) {
     const bar = el('progress', 'liveops__progress'); bar.max = target; bar.value = Math.min(value, target); bar.setAttribute('aria-label', label);
@@ -40,7 +40,8 @@ export function openLiveopsPage(kind, surface = {}) {
       const result = rewarded ? await requestRewardedSpin() : await requestLiveops(command);
       if (!active()) return;
       view = result; refreshAppWallet(); status.textContent = result.appliedCoins > 0 ? `Đã nhận ${result.appliedCoins} Xu.` : 'Đã cập nhật tiến độ.';
-      if(result.letterResult?.kind==='exchange')status.textContent=result.letterResult.itemId?`Đã nhận ${LETTER_REWARD_ITEMS.find(item=>item.id===result.letterResult.itemId).name}.`:'Đã mở rương · 10.000 Xu.';
+      if(result.letterResult?.kind==='exchange' && result.letterResult.chestType)status.textContent=`Đã nhận ${CHEST_NAMES[result.letterResult.chestType]}. Mở trong Kho rương khi bạn muốn.`;
+      else if(result.letterResult?.kind==='exchange')status.textContent=result.letterResult.itemId?`Đã nhận ${LETTER_REWARD_ITEMS.find(item=>item.id===result.letterResult.itemId).name}.`:'Đã mở rương · 10.000 Xu.';
       if (command?.type === 'fuseLetter' && result.state.letters.last?.kind === 'fuse') status.textContent = `Đã nhận chữ ${result.state.letters.last.received}.`;
       render();
       if (spin) {
@@ -118,7 +119,7 @@ export function openLiveopsPage(kind, surface = {}) {
     for (const [index, amount] of WHEEL.entries()) {
       const label = el('span', 'liveops__sector', String(amount)); label.style.setProperty('--sector', index); rotor.append(label);
     }
-    stage.append(rotor, el('span', 'liveops__pointer')); stage.setAttribute('aria-label', 'Tám ô: 5, 10, 10, 15, 15, 20, 20, 25 Xu');
+    stage.append(rotor, el('span', 'liveops__hub', 'Xu'), el('span', 'liveops__pointer')); stage.setAttribute('aria-label', 'Tám ô: 5, 10, 10, 15, 15, 20, 20, 25 Xu');
     const spin = view?.state.spins, last = presentedSpin || spin?.ticket || spin?.ads.at(-1) || spin?.free;
     const exhausted = Boolean(spin?.free) && ((spin?.ads.length || 0) >= 10 || !rewardedSpinAvailable()) && !view?.state.tickets;
     if (last) rotor.style.transform = `rotate(${-last.sector * 45}deg)`;
@@ -136,17 +137,28 @@ export function openLiveopsPage(kind, surface = {}) {
     wheel.append(ticketBalance,
       button('Dùng 1 vé', () => void run({ type:'spin', source:'ticket' }, { spin:true }), busy || !view || view.state.tickets < 1));
     wheel.append(rules); content.append(wheel);
+    content.append(button('Xem Sưu tập chữ', () => { eventTab='letters'; render(); }));
+    if(festivalChestsEnabled()) content.append(button('Xem Kho rương', openChests));
+  }
+  function openChests() {
+    modal.destroy(); void import('../mainmenu.js').then(module => module.showCollectionModal({ initialChest:true, surface }));
   }
   function renderLetters() {
     const letters = panel('Sưu tập chữ'), counts = view?.state.letters.counts || {};
+    const setChoices=el('div','liveops__set-choices');
     for (const set of LETTER_SETS) {
       const row = el('section', 'liveops__letter-set');
-      const title = el('h4', '', set.label), slots = el('p', 'liveops__letter-slots', letterProgressLabel(set,counts));
+      const title = el('h4', '', set.label), slots = el('p', 'liveops__letter-slots');
+      for(const slot of letterSetSlots(set,counts)){ const cell=el('span','liveops__letter-slot',slot.space?' ':slot.letter);cell.dataset.filled=String(slot.filled); slots.append(cell); }
       slots.setAttribute('aria-label', `${set.label}: ${letterProgressLabel(set,counts)}`);row.append(title,slots,
-        button('Đổi quà',()=>void run({type:'exchangeLetterSet',setId:set.id}),busy||!view||!Object.entries(set.required).every(([letter,amount])=>(counts[letter]||0)>=amount)));
-      row.lastChild.setAttribute('aria-label',`Đổi ${set.label}`);letters.append(row);
+        button(festivalChestsEnabled()?`Đổi · ${CHEST_NAMES[set.chestType]}`:'Đổi quà',()=>void run({type:'exchangeLetterSet',setId:set.id}),busy||!view||!Object.entries(set.required).every(([letter,amount])=>(counts[letter]||0)>=amount)));
+      row.lastChild.setAttribute('aria-label',`Đổi ${set.label}`);setChoices.append(row);
     }
-    if(view){
+    letters.append(setChoices);
+    if(view && festivalChestsEnabled()){
+      const type=null;
+      const preview=panel('Quà lần đổi tiếp theo'); preview.append(createIcon('chest'),el('p','',type ? CHEST_NAMES[type] : 'Xem phần thưởng của từng bộ chữ'),el('p','','Đổi đủ bộ chữ để nhận loại rương được ghi trong phần thưởng.'),button('Xem Kho rương',openChests)); letters.prepend(preview);
+    } else if(view){
       const next=LETTER_REWARD_ITEMS.find(item=>item.id===view.nextLetterRewardId);
       const preview=panel(next?'Quà tiếp theo':'Rương 10.000 Xu');
       if(next){const art=el('img','liveops__reward-preview');art.src=`${import.meta.env.BASE_URL}${next.files[256]}`;art.alt=next.name;art.width=art.height=128;art.loading='lazy';art.decoding='async';preview.append(art,el('p','',next.name));}
@@ -154,30 +166,37 @@ export function openLiveopsPage(kind, surface = {}) {
       preview.append(el('p','','Bốn bộ chữ dùng chung kho quà. Mỗi lần đổi nhận một món chưa sở hữu.'));letters.prepend(preview);
     }
     letters.append(el('p', '', 'Thu thập chữ khi ghép thẻ đặc biệt. Chữ được giữ mãi; các bộ chữ dùng chung kho.'));
-    const inventory = panel('Kho chữ'), choices = el('select', 'liveops__letter-select');
-    choices.setAttribute('aria-label','Chọn chữ');
-    for(const letter of LETTER_ALPHABET){const option=el('option','',`${letter} · ${counts[letter]||0}`);option.value=letter;choices.append(option);}
-    choices.value=selectedLetter;choices.onchange=()=>{selectedLetter=choices.value;render();};
-    const quantity=el('input','liveops__letter-quantity');quantity.type='number';quantity.min='1';quantity.max=String(counts[selectedLetter]||1);quantity.step='1';quantity.value='1';quantity.setAttribute('aria-label','Số chữ muốn bán');
+    const inventory = panel('Kho chữ'), choices = el('div', 'liveops__letter-grid');
     const amount=counts[selectedLetter]||0;
-    inventory.append(choices,el('p','',`Đang có ${amount} chữ ${selectedLetter}`),quantity,
-      button(`Bán · ${LETTER_SELL_COINS.toLocaleString('vi-VN')} Xu mỗi chữ`,()=>{const value=Number(quantity.value);if(!Number.isSafeInteger(value)||value<1||value>amount){status.textContent='Chọn số chữ đang có để bán.';return;}void run({type:'sellLetter',letter:selectedLetter,quantity:value});},busy||!view||amount<1),
+    for(const letter of LETTER_ALPHABET){
+      const choice=button(`${letter} · ${counts[letter]||0}`,()=>{selectedLetter=letter;render();},false,`letter-${letter}`);
+      choice.setAttribute('aria-label',`Chữ ${letter}, ${counts[letter]||0} chữ`);choice.setAttribute('aria-pressed',String(letter===selectedLetter));choices.append(choice);
+    }
+    inventory.append(choices,el('p','',`Đang có ${amount} chữ ${selectedLetter}`),
+      button('Bán chữ',()=>sellSheet(selectedLetter,amount),busy||!view||amount<1),
       button(`Ghép 3 chữ ${selectedLetter}`,()=>void run({type:'fuseLetter',letter:selectedLetter}),busy||!view||amount<3),
       el('p','','Ghép 3 chữ giống nhau để nhận 1 chữ ngẫu nhiên. Có thể nhận lại chữ vừa ghép.'));
     letters.append(inventory);
     content.append(letters);
   }
 
+  function sellSheet(letter, max) {
+    const sheet=el('div','liveops__sale'), quantity=el('input','liveops__letter-quantity');
+    quantity.type='number';quantity.min='1';quantity.max=String(max);quantity.value='1';quantity.step='1';quantity.setAttribute('aria-label','Số chữ muốn bán');
+    const total=el('p'), confirm=button('Xác nhận bán',()=>{ const n=Number(quantity.value);if(!Number.isSafeInteger(n)||n<1||n>max)return; sale.destroy();void run({type:'sellLetter',letter,quantity:n}); });
+    const update=()=>{const n=Number(quantity.value);confirm.disabled=!Number.isSafeInteger(n)||n<1||n>max;total.textContent=confirm.disabled?'Chọn số chữ đang có.':`Nhận ${(n*LETTER_SELL_COINS).toLocaleString('vi-VN')} Xu`;};
+    const adjust=n=>{quantity.value=String(Math.min(max,Math.max(1,n)));update();};
+    quantity.oninput=update;
+    sheet.append(el('p','',`Bán chữ ${letter} · Đang có ${max}`),button('Giảm 1',()=>adjust(Number(quantity.value)-1)),quantity,button('Tăng 1',()=>adjust(Number(quantity.value)+1)),button('Bán một nửa',()=>adjust(Math.floor(max/2))),button('Bán tất cả',()=>adjust(max)),total,confirm);update();
+    const sale=openAppModal({id:'letter-sale',title:'Bán chữ',content:sheet,owner:scope});quantity.focus();
+  }
   function render() {
     if (!active()) return;
-    const buttons = [...root.querySelectorAll('button')], focusIndex = buttons.indexOf(document.activeElement);
+    const focusKey = document.activeElement?.dataset.focusKey;
     content.replaceChildren();
     if (kind === 'missions') renderMissions(); else renderEvents();
     root.setAttribute('aria-busy', String(busy));
-    if (focusIndex >= 0) {
-      const next = [...root.querySelectorAll('button')];
-      (next[focusIndex]?.disabled ? next.find(button => !button.disabled) : next[focusIndex])?.focus();
-    }
+    if(focusKey) [...root.querySelectorAll('button')].find(button=>button.dataset.focusKey===focusKey&&!button.disabled)?.focus({preventScroll:true});
   }
   root.append(button('Tải lại tiến độ', () => void run({ type: 'status' })));
   render(); void run({ type: 'status' }); return modal;

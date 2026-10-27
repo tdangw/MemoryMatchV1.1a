@@ -13,6 +13,12 @@ lịch sử trước phê duyệt này. Không deploy, rules live, APK hoặc pu
 P0 đã chốt. Bằng chứng và trạng thái các phase triển khai ghi chung trong
 `EVENTS_MOBILE_FESTIVAL_RECEIPT.md`.
 
+Đính chính trực tiếp: bỏ cơ chế luân phiên/12 slot. Phần thưởng phải ghi
+rõ loại rương chung, bên trong bốc đúng bảng. Mapping đã chốt: MEMORY MATCH → Avatar; LINK CONNECT → Khung;
+TRIPLE CONNECT → Huy hiệu; ADVENTURE → Avatar. Mỗi lần đổi nhận một rương
+đúng loại của bộ, không cursor/luân phiên/đợi ownership. Phê duyệt P0 cũ
+về cursor được thay bằng quyết định trực tiếp này.
+
 Cập nhật ngày 27/10/2026. **Chỉ phân tích và lập kế hoạch; chưa sửa code,
 đổi dữ liệu/rules, tạo icon hoặc phát hành.** Đây là nguồn phạm vi duy
 nhất của task Sự kiện, Nhiệm vụ và Kho rương mới.
