@@ -381,3 +381,47 @@ JS animation nền liên tục. Năng lượng/pin chưa đo, không suy từ s�
 - Live fade bị hủy ngoài owner nay commit ảnh đã decode bằng fallback tĩnh;
   cancellation do owner vẫn trả cancelled. Nguồn orientation thất bại báo
   về owner FAILED để không tự thử lại khi popup đóng; callback stale bị bỏ.
+
+### G5 — review riêng và bàn giao27/10
+
+- G4 commit `c43e087`. Sau commit, cùng agent đọc lại diff riêng, đối chiếu
+  plan với ownership/coordinator/facade/geometry/source/transition/CSS và
+  test changes. Không gọi đây là review độc lập; chưa có reviewer độc lập.
+  Không tìm thấy lỗi còn lại trong phạm vi local đã kiểm chứng.
+- Chạy lại sau review:
+  - `node --test tests/unit/ambient-background-runtime.test.js tests/unit/ambient-background-geometry.test.js tests/unit/ads.test.js`:29pass.
+  - `node scripts/ambient-source-lock.mjs --check`:7nguồn/metadata khớp.
+  - `npm run check`:exit0,223moduleJS/CSS ownership và các regression
+    contract hiện hữu pass,17ads test pass; không làm yếu assertion/budget.
+  - `npm run build`:exit0,build sản phẩm thông thường; không có
+    `ambientProbe` trong dist. Warning public-asset/mixed sound import
+    đã có ở baseline, không thêm preload-unused do motion.
+  - `npx playwright test --config playwright.ambient-runtime.config.js tests/ui/ambient-background-scenes.spec.js`:
+    16pass/8skip có chủ đích qua3profile dọc, process exit0. Bao gồm
+    native bounds, source/fade/cancel, wheel thật/scrollbar, banner-height,
+    popup/hidden/master/reduced-motion/stale-load. Không lặp suite rộng
+    hoặc soak khi nguồn sản phẩm không đổi sau G4.
+- Rà diff cuối: không QA/log/ảnh/video/file thử tạm trong commit G4/G5;
+  công cụ đo lặp lại được giữ làm source. Không stage thay đổi có sẵn,
+  Firebase/config hay kế hoạch Sự kiện/Nhiệm vụ khác. CONTEXT chỉ stage
+  riêng section nền động, giữ nguyên phần working tree của task khác.
+- API facade cũ, `meteorEffects`, effect ID/catalog, save format2,
+  gameplay/kinh tế và Firebase giữ tương thích. Không dependency/video/
+  GIF/WebGL/RAF nền liên tục, không bitmap mới, không APK/deploy/push/rules.
+  Skill trong lượt triển khai: không skill tạo ảnh; SVG/CSS đủ. Chỉ đọc
+  computer-use để định tuyến, không nhận là đã dùng runtime skill đó.
+
+| Gate | Kết quả thật |
+|---|---|
+| G0 | PC baseline/inventory/contract đã có; thiếu baseline S22 thật |
+| G1 | Mẫu Memory đã duyệt; Home tĩnh theo quyết định chủ dự án |
+| G2 | Lifecycle/owner/scheduler/facade và release đã kiểm chứng local |
+| G3 | Map/ba game và fallback/crop/source đã triển khai, kiểm live dọc |
+| G4 | PC software A/B,100chu kỳ/soak/skin/trace đạt; chưa chốt S22/physical GPU |
+| G5 | Tự review riêng, critical rerun/check/build và receipt hoàn tất |
+
+Phần chưa xác minh: S22 thật (ADB không có thiết bị), browser Android/
+WebView thực và native fullscreen ad/foreground trên máy đó, physical
+presentation/end-to-end input/GPU driver allocation, pin/nhiệt độ. Màn
+ngang sau chỉnh do chủ dự án tự kiểm. Không dùng PC emulation hoặc RAF
+để thay các bằng chứng này, không nhận toàn bộ nghiệm thu thiết bị đã đạt.

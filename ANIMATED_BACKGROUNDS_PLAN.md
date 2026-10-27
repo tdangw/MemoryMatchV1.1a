@@ -429,8 +429,9 @@ về mẫu cụ thể hoặc blocker thật. Không tự bắt đầu pilot/asse
 yêu cầu “chỉ lên kế hoạch”. Không tạo receipt/ảnh QA giả trước triển khai.
 
 **Cập nhật triển khai27/10:** G1 đã duyệt; G2–G3 đã commit. G4 đã có
-kiểm chứng PC/portrait,100chu kỳ,soak10phút và A/B; đang chốt G5 review/
-check/build. S22 thật chưa có thiết bị nên chưa nhận đạt phần thiết bị đó.
+kiểm chứng PC/portrait,100chu kỳ,soak10phút và A/B; G5 tự review riêng,
+critical rerun/check/build đã đạt. S22 thật chưa có thiết bị nên chưa nhận
+đạt phần nghiệm thu thiết bị/physical GPU đó; ngang chủ dự án tự kiểm.
 Chi tiết/kết quả thật nằm trong `ANIMATED_BACKGROUNDS_IMPLEMENTATION_RECEIPT.md`.
 
 ### Kiểm thử và lệnh dự kiến
@@ -452,7 +453,7 @@ Chi tiết/kết quả thật nằm trong `ANIMATED_BACKGROUNDS_IMPLEMENTATION_R
 - Review sau implementation là bước riêng: đối chiếu plan/diff và chạy lại
   critical tests, ghi rõ reviewer/tự review; không gọi tự đọc là độc lập.
 
-## 12. Nguồn kỹ thuật và trạng thái kiểm chứng lượt này
+## 12. Nguồn kỹ thuật và trạng thái lúc lập kế hoạch (lịch sử)
 
 - [web.dev: high-performance animations](https://web.dev/articles/animations-guide):
   ưu tiên transform/opacity, đo paint và hạn chế will-change.

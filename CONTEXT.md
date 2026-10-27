@@ -1,6 +1,6 @@
 # CONTEXT — Trạng thái hiện tại (2026-10-26)
 
-## Nền động nhẹ — 26/10/2026, đang triển khai G0–G5
+## Nền động nhẹ — triển khai G0–G5 đã bàn giao local, còn xác minh S22
 
 - Nguồn kế hoạch hiện hành duy nhất: `ANIMATED_BACKGROUNDS_PLAN.md`. Chủ dự án đã giao toàn bộ G0–G5 và yêu cầu commit từng phase. Các ghi chú chỉ lập kế hoạch trước đây là lịch sử. Receipt chung: `ANIMATED_BACKGROUNDS_IMPLEMENTATION_RECEIPT.md`. Không deploy/APK/push/rules.
 - Đã chốt trang chủ/bản đồ/cả ba màn chơi; giữ ảnh nền hiện có, chuyển động nhẹ theo cảnh; thiết bị thử Web PC và Samsung S22 Android. Thác Home/Link/Triple/map, cá ở hồ Memory/map, đom đóm/lá theo vùng cây; không dồn mọi nhóm vào mọi nền hoặc chạy qua bàn/HUD/khay/node/quảng cáo.
@@ -16,6 +16,7 @@
 - G4 sửa transition có thể chờ vô hạn khi CSS frame bị gộp bằng fade WAAPI hữu hạn220ms; refresh scene sau commit source. Map host chuyển thành con cuối scroller để bỏ backing layer dài10461px; vẫn clip/đồng bộ cuộn và tránh UI. Không đổi gameplay/save/API/Firebase. S22 kiểm ADB lại27/10 vẫn không có thiết bị; phần physical presentation/GPU allocation/pin chưa đo. Không stage QA/log/ảnh mới.
 - Chủ dự án hỏi vì mới thấy cá: đã giải thích pilot cũ không phải rollout đầy đủ; thác/đom đóm/lá đã có, gợn sóng/cây lắc lư chưa thuộc scope chốt. Đang tăng nhận biết chỉ ở map (nước opacity0,20 trong ngân sách, đom đóm6px, lá sáng hơn), không tăng slot/nhịp hoặc mật độ trong game. Texture nước giữ cạnh tĩnh để chu kỳ32px nối khít; không bitmap mới. Preview hiện tại4194, ảnh/video chỉ ở runtime/qa.
 - G4 kiểm chứng PC đã chốt: thêm3cặp120s với5target sau chỉnh hình/thanh cuộn đạt (p95+0,20ms,p99≈0,dispatch+0,60ms), layer+6 không vượt Light.100chu kỳ/20restart,soak Home/map/Triple10phút,75regression,29unit và16case dọc/90tổ hợp skin pass. Sprite fit toàn envelope sau xoay; ẩn scrollbar nhưng giữ wheel/cảm ứng. Source/fade lỗi fallback tĩnh, không retry sau popup. S22 vẫn thiếu; G5 review/check/build đang chốt. Không stage phần CONTEXT của task Sự kiện/Nhiệm vụ khác.
+- G4 commit `c43e087`. G5 đã tự review diff riêng sau implementation,29unit/source-lock7nguồn/check/build và critical UI16pass/8skip qua3profile dọc đều exit0. Build thường không có QA probe, không API/save/gameplay/Firebase migration. Không nhận tự review là độc lập; không nhận PC/RAF là S22/GPU physical. Chưa có S22 thật/Android-native-ad/pin/nhiệt độ; ngang chủ dự án tự kiểm. Không APK/deploy/push/rules. Receipt chung là nguồn chi tiết, các ghi chú đang làm phía trên là lịch sử tiến độ.
 
 ## Quy tắc làm việc bổ sung —26/10/2026
 
