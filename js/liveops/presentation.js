@@ -1,3 +1,5 @@
+import { createTabs } from './ui.js';
+import { festivalChestsEnabled } from './availability.js';
 import { LETTER_SETS, LETTER_ALPHABET, LETTER_SELL_COINS } from './config.js';
 import { createIcon } from '../icons.js';
 import { LETTER_REWARD_ITEMS } from './letterCatalog.generated.js';
@@ -16,10 +18,10 @@ const el = (tag, className, text) => { const node = document.createElement(tag);
 export function openLiveopsPage(kind, surface = {}) {
   const scope = createGameShellLifecycle(), root = el('div', 'liveops'), status = el('p', 'liveops__status', 'Đang tải tiến độ…');
   status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
-  const content = el('div', 'liveops__content'); root.append(status, content);
+  let content = el('div', 'liveops__content'); root.append(status, content);
   const modal = openAppModal({ ...surface, id: `${kind}-screen`, title: kind === 'missions' ? 'Nhiệm vụ' : 'Sự kiện',
     icon: kind, content: root, onDestroy: () => scope.dispose() });
-  let view = null, tab = 'daily', busy = false, animation = null, presentedSpin = null, wheelExpanded = false, selectedLetter = LETTER_ALPHABET[0];
+  let view = null, tab = 'daily', busy = false, animation = null, presentedSpin = null, wheelExpanded = false, selectedLetter = LETTER_ALPHABET[0], eventTab = 'wheel';
   const active = () => scope.active && root.isConnected;
   scope.own(() => animation?.cancel());
   function button(label, action, disabled = false) {
@@ -102,6 +104,15 @@ export function openLiveopsPage(kind, surface = {}) {
     content.append(bonus, el('p', '', 'Tiến độ được ghi sau mỗi ván thắng. Một cặp thẻ hoặc một bộ ba được tính là một lần ghép. Làm mới lúc 07:00 mỗi ngày; tuần mới bắt đầu thứ Hai.'));
   }
   function renderEvents() {
+    const tabs = createTabs('events', [['wheel','Vòng quay'],['letters','Sưu tập chữ'],...(festivalChestsEnabled() ? [['festival','Lễ hội']] : [])], eventTab, (key, panel) => {
+      eventTab = key; animation?.cancel(); panel.replaceChildren();
+      const old = content; content = panel;
+      if (key === 'wheel') renderWheel(); else if (key === 'letters') renderLetters(); else panel.append(el('p','','Lễ hội Đom Đóm sắp mở.'));
+      content = old;
+    });
+    content.append(tabs.root, tabs.panel); tabs.select(eventTab, false);
+  }
+  function renderWheel() {
     const wheel = panel('Vòng quay may mắn'), stage = el('div', 'liveops__wheel');
     const rotor = el('div', 'liveops__rotor');
     for (const [index, amount] of WHEEL.entries()) {
@@ -125,6 +136,8 @@ export function openLiveopsPage(kind, surface = {}) {
     wheel.append(ticketBalance,
       button('Dùng 1 vé', () => void run({ type:'spin', source:'ticket' }, { spin:true }), busy || !view || view.state.tickets < 1));
     wheel.append(rules); content.append(wheel);
+  }
+  function renderLetters() {
     const letters = panel('Sưu tập chữ'), counts = view?.state.letters.counts || {};
     for (const set of LETTER_SETS) {
       const row = el('section', 'liveops__letter-set');
@@ -152,7 +165,7 @@ export function openLiveopsPage(kind, surface = {}) {
       button(`Ghép 3 chữ ${selectedLetter}`,()=>void run({type:'fuseLetter',letter:selectedLetter}),busy||!view||amount<3),
       el('p','','Ghép 3 chữ giống nhau để nhận 1 chữ ngẫu nhiên. Có thể nhận lại chữ vừa ghép.'));
     letters.append(inventory);
-    if(exhausted&&!busy)content.prepend(letters);else content.append(letters);
+    content.append(letters);
   }
 
   function render() {

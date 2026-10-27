@@ -1,3 +1,5 @@
+import { festivalChestsEnabled } from './liveops/availability.js';
+import { mountChestInventory } from './liveops/chestPresentation.js';
 // Mainmenu.js
 import { getGameProgressKey } from './gameCatalog.js';
 import { canLaunchGame } from './profileOperations.js';
@@ -179,6 +181,7 @@ function showSessionChoice({ label, session, onContinue, onNew }) {
 }
 
 export async function showCollectionModal({
+  initialChest = false,
   fromGame = false,
   gameId = "memory-match",
   onClose = () => {},
@@ -214,7 +217,21 @@ export async function showCollectionModal({
   tabs.setAttribute("role", "tablist");
   const grid = document.createElement("div");
   grid.className = "shop-item-grid";
-  content.append(tabs, grid);
+  const chestHost = document.createElement('div'); chestHost.hidden = true;
+  let disposeChest = null;
+  const chestEntry = document.createElement('button'); chestEntry.type = 'button';
+  chestEntry.className = 'tab-button'; chestEntry.textContent = 'Kho rương';
+  const openChests = () => {
+    tabs.hidden = grid.hidden = chestEntry.hidden = true; chestHost.hidden = false;
+    disposeChest?.();
+    disposeChest = mountChestInventory(chestHost, { owner: collectionScope, gameId, back: () => {
+      disposeChest?.(); disposeChest = null; chestHost.replaceChildren(); chestHost.hidden = true;
+      tabs.hidden = grid.hidden = chestEntry.hidden = false; chestEntry.focus();
+    } });
+  };
+  chestEntry.onclick = openChests;
+  if (festivalChestsEnabled()) content.append(chestEntry);
+  content.append(tabs, grid, chestHost);
 
   const renderAppearance = () => {
     grid.className = "shop-item-grid shop-item-grid--appearance";
@@ -410,6 +427,7 @@ export async function showCollectionModal({
       { id: "themes", label: "Chủ đề", render: renderThemes },
     ] }));
   }
+  if (initialChest && festivalChestsEnabled()) openChests();
   return modal;
 }
 

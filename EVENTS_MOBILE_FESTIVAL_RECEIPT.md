@@ -24,3 +24,6 @@ loại rương chữ lặp 12 slot; trong ván chỉ xem; SVG tĩnh khu vườn 
 
 - P0: đã duyệt và ghi nhận, chỉ rà diff tài liệu; không chạy test.
 - U1/U2/U3/D1/D2/Q1: đang thực hiện, chưa nghiệm thu.
+
+U1: tách owner tab Sự kiện, tablist/tabpanel bàn phím và view con Kho rương trong Bộ sưu tập. Capability festival/chest riêng mặc định tắt đến khi rules tương ứng được phát hành. Kiểm cú pháp các owner và diff đạt; tích hợp dữ liệu/UI/lifecycle kiểm ở Q1.
+
