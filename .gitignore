@@ -30,3 +30,10 @@ android/keystores/
 /test/
 runtime/
 docs/
+
+# Generated QA captures and validation reports; keep artwork sources/exports.
+/design/rewards-liveops/review/*
+!/design/rewards-liveops/review/alpha-validation.json
+/design/rewards-letters/review/*
+!/design/rewards-letters/review/alpha-validation.json
+/design/rewards-letters/drop/review/

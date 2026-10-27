@@ -1,4 +1,6 @@
 import { expect } from '@playwright/test';
+import { mkdir } from 'node:fs/promises';
+await mkdir('docs/design/animated-backgrounds/qa/traces', {recursive:true});
 export const ORIGIN = 'http://127.0.0.1:4194';
 export const PC_PORTRAIT = { width: 900, height: 1024 };
 

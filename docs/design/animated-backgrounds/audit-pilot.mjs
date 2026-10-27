@@ -1,7 +1,8 @@
 import { chromium } from '@playwright/test';
-import { writeFile } from 'node:fs/promises';
-const browser = await chromium.launch({ channel: 'chrome' });
+import { writeFile, mkdir } from 'node:fs/promises';
 const output = 'docs/design/animated-backgrounds/qa';
+await mkdir(output, {recursive:true});
+const browser = await chromium.launch({ channel: 'chrome' });
 const results = [];
 try {
   for (const profile of [{ name: 'portrait', width: 412, height: 915, dpr: 3 }, { name: 'desktop-portrait', width: 900, height: 1024, dpr: 1 }]) {

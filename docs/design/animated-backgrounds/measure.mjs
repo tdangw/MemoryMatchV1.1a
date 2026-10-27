@@ -1,5 +1,5 @@
 import { chromium } from '@playwright/test';
-import { writeFile, readFile } from 'node:fs/promises';
+import { writeFile, readFile, mkdir } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import os from 'node:os';
 
@@ -7,6 +7,7 @@ const mode = process.argv[2] || 'baseline';
 const baseline = mode.startsWith('baseline');
 const origin = process.env.AMBIENT_ORIGIN || 'http://127.0.0.1:4188';
 const output = 'docs/design/animated-backgrounds/qa';
+await mkdir(`${output}/traces`, {recursive:true});
 const browser = await chromium.launch({ channel: 'chrome', args: ['--autoplay-policy=user-gesture-required'] });
 const results = { mode, browser: browser.version(), platform: os.platform(), cpu: os.cpus()[0].model, samples: [], sources: [] };
 const profiles = mode === 'pilot-memory' ? [{ name: 'desktop-portrait', width: 900, height: 1024, dpr: 1 }]
