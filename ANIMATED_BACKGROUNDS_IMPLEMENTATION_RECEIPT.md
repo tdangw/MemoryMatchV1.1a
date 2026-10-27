@@ -448,8 +448,8 @@ ngang sau chỉnh do chủ dự án tự kiểm. Không dùng PC emulation hoặ
  19pass/8skip UI qua320/412/900dọc. Mỗi khổ kiểm101pose của quỹ đạo thực,
   100toggle, reduced-motion/suspend/dispose; regression nguồn lỗi/stale,
   wheel/popup/ba trò vẫn đạt. Source-lock7ảnh/metadata cũ khớp; không bitmap
-  mới. Các metadata chi tiết mới còn là đề xuất chờ duyệt, không giả nhận
-  đã nằm trong lock đã duyệt cũ.
+  mới. Tại M1, metadata chi tiết mới chưa nằm trong source-lock cũ;
+  M2 bổ sung lock sau khi chủ dự án duyệt mẫu.
 - Giữ log lần fail: thử đầu chưa có pond an toàn trên320; đã bổ sung vùng
   nhỏ, không giảm buffer tránhUI. Assertion0timer trong test mẫu ban đầu
   sai hợp đồng vì map vẫn đủchỗ cho scheduler sao băng gốc; sửa thành≤1,
@@ -475,3 +475,41 @@ ngang sau chỉnh do chủ dự án tự kiểm. Không dùng PC emulation hoặ
   xóa mẫu. Đây là3cặp sơ bộ10s/arm, M2 sẽ kiểm đủchu kỳ trước bàn giao.
 - Sau tự review: `npm run check` exit0 (224JS/17ads), `npm run build`
   exit0 và `git diff --check` đạt. Không gọi tự review là độc lập.
+
+## M2 — bật chi tiết bản đồ đã duyệt
+
+- M1 commit `62d1156`; chủ dự án duyệt mẫu trước rollout. Bật mặc định
+  `mapDetails` trong binding của cả ba bản đồ. Game/Home giữ preset cũ;
+  `meteorEffects`, facade, gameplay/save/Firebase không đổi.
+- Source lock tái sinh từ generator, thêm12vùng nguồn pond/lamp đã duyệt
+  vào metadata ảnh map; hash7bitmap gốc không đổi. Không sửa output tay.
+- Regression bản mặc định:19UIpass/8skip qua320/412/900dọc, gồm100toggle
+  và101pose mới mỗi khổ, nguồn lỗi/cancel, scroll/popup/reduced/ba trò.
+  `npm run check` sau rollout exit0,224JS/17ads và contract hiện hữu đạt.
+- Production matrix:45tổ hợp tại vị trí mở map +45tại vùng cóếch
+  (3map×5skin×3khổdọc), tất cả đạt. 45poseếch gồm15pose chỉpond và30pose
+  pond/fly/lamp; không chồngUI/tràn ngang hoặc lỗi trang. Mỗi lượt kiểm
+  chiều cao trừ80px/khôi phục và reduced-motion. Đã xem ảnh thật mẫu
+  Storybook412px sau rollout; hình nhỏ, không đè đường/node, nội dung UI
+  tự nhiên. Fallback khi không có vùng phù hợp vẫn hợp lệ.
+- Build sản phẩm sau rollout exit0, không chứa `ambientProbe`; QA probe
+  chỉ ở build QA riêng. Chưa có S22 qua ADB lần kiểm27/10; không APK,
+  deploy/push/rules. Phần bộ nhớ10phút dùng đúng cùng implementation
+  của M1; M2 chỉ đổi default binding và metadata lock, không đổi timeline.
+- Lượt A/B32s đầu không hoàn tất vì công cụ QA bật lại LayerTree nhưng
+  Chrome không phát snapshot mới (`LayerTree snapshot unavailable`). Giữ
+  log lỗi riêng; sửa công cụ local để lấy snapshot đầu một lần và giữ
+  cập nhật từ event trong cùng cửa sổ đo. Không sửa game/ngưỡng để chạy lại.
+- A/B rollout cuối:3cặp×off/on×32s, đủ chu kỳ28s; cùng hashindex/probe
+  trước/sau, chạy tuần tự không chồng browser benchmark/check/build.
+  Delta p95 tối đa+0,2ms, p99+0,3ms, missed-gap+0,0218điểm%, pointer
+  dispatch p95+0,6ms; đều đạt ngưỡng cũ ở Bmedian6,9ms và144Hz.
+  LayerTree off27/on32 (+5≤6), LayoutCount5/5 mỗi cặp,0LongTask/
+  layerPainted event/pageerror trong cửa sổ. Giữ max off28,5/on18,2ms,
+  không loại outlier. Không nhận đo được physical presentation/GPU/pin.
+- Tự review M2 riêng: chỉ đổi default và generator/source-lock được duyệt,
+  không đụng timeline sau M1; chạy lại13unit và source-lock đều đạt.
+  Critical rerun3UI trên3khổdọc sau tự review đạt, diff whitespace sạch.
+  Các file/log/ảnh QA và nội dung CONTEXT/task gameplay đồng thời không
+  thuộc commit. Đã tách ghi chú task khác lọt vào commitM1 ngay khi kiểm
+  phát hiện, giữ nguyên working file của task đó; M1 cuối là62d1156.

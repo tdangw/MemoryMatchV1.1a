@@ -44,6 +44,12 @@ trước trình mẫu; không dùng chứng cứ G4 cũ thay chứng cứ bổ s
 Phase M2 sau duyệt: bật mặc định, regression các map/viewport/skin,
 kiểm tra cuối và commit theo phase; S22 vẫn ghi thiếu nếu không có máy.
 
+Trạng thái27/10: mẫu32s đã được chủ dự án trả lời “Duyệt mẫu hiện tại”.
+M1 commit62d1156,100chu kỳ/soak10phút và A/B sơ bộ đạt PC. M2 đã bật
+mặc định và qua19UI/90tổ hợp map-skin-khổdọc/check/build;3cặp A/B32s
+đủchu kỳ trên cùng build rollout đạt (delta p95+0,2ms/p99+0,3ms tối đa).
+Không tăng ngưỡng cũ; S22 thật vẫn chưa có thiết bị để xác minh.
+
 Chủ dự án đã xác nhận:
 
 - Áp dụng ở **trang chủ, bản đồ và cả ba màn chơi** Memory Match, Link

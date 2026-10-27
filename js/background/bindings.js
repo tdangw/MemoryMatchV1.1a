@@ -48,7 +48,7 @@ export function mountHomeAmbient(scope, root) {
   return mountAmbientBackground({ scope, root, kind: 'home', static: true, meteorsVisible: false });
 }
 
-export function mountMapAmbient(scope, root, trail, scroll, { mapDetails = false } = {}) {
+export function mountMapAmbient(scope, root, trail, scroll, { mapDetails = true } = {}) {
   const binding = createGameShellLifecycle();
   const releaseParent = scope.own(() => binding.dispose());
   binding.own(() => releaseParent.forget());
