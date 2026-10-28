@@ -1,0 +1,17 @@
+/* Finite pressed depth shared by purchase and start actions. No animation owner. */
+:is(#shop-modal,#adventure-level-modal) button.ui-raised-action {
+  --raised-top:#ffe79b; --raised-bottom:#dfaa40; --raised-edge:#8e5f1c; --raised-ink:#422b0b;
+  min-height:48px; border:1px solid #c8953e; border-image:none; border-radius:15px;
+  padding:10px 16px; margin-bottom:5px; background:linear-gradient(var(--raised-top),var(--raised-bottom));
+  color:var(--raised-ink); font-weight:900; text-shadow:0 1px #fff5;
+  box-shadow:inset 0 2px 0 #fff9,0 5px 0 var(--raised-edge),0 7px 10px #0003;
+  transform:translateY(0); transition:transform 80ms ease,box-shadow 80ms ease;
+}
+:is(#shop-modal,#adventure-level-modal) button.ui-raised-action:active:not(:disabled) { transform:translateY(4px); box-shadow:inset 0 1px 0 #fff7,0 1px 0 var(--raised-edge),0 2px 4px #0003; }
+:is(#shop-modal,#adventure-level-modal) button.ui-raised-action:disabled { opacity:.65; filter:none; transform:none; box-shadow:inset 0 1px #fff4,0 2px 0 var(--raised-edge); cursor:default; }
+:is(#shop-modal,#adventure-level-modal) button.ui-raised-action:focus-visible { outline:3px solid var(--ui-focus); outline-offset:5px; }
+html[data-ui-skin='starship'] :is(#shop-modal,#adventure-level-modal) button.ui-raised-action { --raised-top:#c6f4ff; --raised-bottom:#66c0d3; --raised-edge:#28667a; --raised-ink:#12344b; border-color:#8bdbeb; }
+#shop-modal .shop-item-title { color:var(--ui-ink); }
+#shop-modal .shop-item-title > .ui-icon { box-sizing:border-box; width:34px; height:34px; padding:6px; border:1px solid var(--ui-line); border-radius:10px; background:var(--ui-inset); color:var(--ui-ink); }
+#shop-modal :is(.appearance-preview,.link-effect-preview) > .ui-icon { color:var(--ui-ink); }
+@media(prefers-reduced-motion:reduce) { :is(#shop-modal,#adventure-level-modal) button.ui-raised-action { transition:none; } }

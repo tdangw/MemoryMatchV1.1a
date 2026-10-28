@@ -17,3 +17,6 @@ Cân nhắc cập nhật số Xu riêng từng màn với dùng chung component:
 component để một nguồn ví và không sót owner/subscription. Hình khối CSS/
 SVG thay engine3D/ảnh mới để giữ tải nhẹ, nút vẫn là button ngữ nghĩa.
 Các số75s/6cặp/5s chỉ tham chiếu; lấy thông số của game/mode/màn thật.
+
+M1 nguồn đã commit4bf4129. M2 đã thêm vật liệu nút mua có cạnh5px/pressed4px
+và nền icon dùng cặp ui-ink/ui-inset; không đổi giá/handler. QA gom ở Q.

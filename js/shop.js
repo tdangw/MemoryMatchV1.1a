@@ -1,3 +1,4 @@
+import '../styles/raised-actions.css';
 import { gameState, spendCoins } from "./gameState.js";
 import {
   updateCoinDisplay,
@@ -280,7 +281,7 @@ function renderLinkEffectShop(
     name.textContent = item.title;
     const button = document.createElement("button");
     button.type = "button";
-    button.className = "app-button app-button--purchase shop-buy-button";
+    button.className = "app-button app-button--purchase shop-buy-button ui-raised-action";
     if (owned) {
       button.classList.add("appearance-action--equipped");
       button.textContent = "Đã sở hữu";
@@ -380,7 +381,7 @@ function renderTripleItems(grid, roundId, modal) {
   description.textContent = `${capacity}/${maximumCapacity} ô · Mỗi lần mua thêm 1 ô`;
   const button = document.createElement("button");
   button.type = "button";
-  button.className = "app-button app-button--purchase shop-buy-button";
+  button.className = "app-button app-button--purchase shop-buy-button ui-raised-action";
   if (expansionSlots >= expansion.bonusCapacity) {
     button.classList.add("appearance-action--equipped");
     button.textContent = "Đã mở tối đa";
@@ -437,7 +438,7 @@ function renderTripleEffectShop(
     name.textContent = item.title;
     const button = document.createElement("button");
     button.type = "button";
-    button.className = "app-button app-button--purchase shop-buy-button";
+    button.className = "app-button app-button--purchase shop-buy-button ui-raised-action";
     if (owned) {
       button.classList.add("appearance-action--equipped");
       button.textContent = "Đã sở hữu";
@@ -500,7 +501,7 @@ function renderInventoryItems(
     count.textContent = `Đang có: ${getCount(item)}`;
     const button = document.createElement("button");
     button.type = "button";
-    button.className = "app-button app-button--purchase shop-buy-button";
+    button.className = "app-button app-button--purchase shop-buy-button ui-raised-action";
     button.append(
       document.createTextNode(String(item.price)),
       createIcon("coin"),
@@ -569,7 +570,7 @@ function renderThemes(grid, roundId, modal, gameId) {
     name.textContent = theme.title;
     const button = document.createElement("button");
     button.type = "button";
-    button.className = "app-button app-button--purchase shop-buy-button";
+    button.className = "app-button app-button--purchase shop-buy-button ui-raised-action";
 
     if (owned) {
       button.classList.add("appearance-action--equipped");
@@ -635,7 +636,7 @@ function renderAppearanceGroup(grid, title, type, items, roundId, modal) {
     name.textContent = item.title;
     const button = document.createElement("button");
     button.type = "button";
-    button.className = "app-button app-button--purchase shop-buy-button";
+    button.className = "app-button app-button--purchase shop-buy-button ui-raised-action";
     if (owned) {
       button.classList.add("appearance-action--equipped");
       button.textContent = "Đã sở hữu";
