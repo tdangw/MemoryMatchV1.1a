@@ -1,3 +1,6 @@
+> Hồ sơ nghiệm thu lịch sử. Tên hiện hành: **Sưu tập huy hiệu** (28/10/2026).
+> Quyết định đang áp dụng ở CONTEXT.md; các tên/quyền phát hành cũ bên dưới chỉ ghi lịch sử.
+
 # Nghiệm thu Sự kiện, Nhiệm vụ và Kho rương — 27/10/2026
 
 > Mở lại phần mỹ thuật: chủ dự án gửi ba ảnh tham chiếu và xác nhận UI
@@ -6,7 +9,7 @@
 
 ## Phạm vi và quyết định
 
-Nguồn: EVENTS_MOBILE_FESTIVAL_PLAN.md, P0–Q1; commit riêng từng phase.
+Nguồn: CONTEXT.md, P0–Q1; commit riêng từng phase.
 Giữ điểm danh/weekly/quota wheel/recipe/bán/ghép/rương bản đồ/300 Xu/sáu effect.
 Không đổi save key hoặc formatVersion 2; mở rộng model có version và capability
 riêng, không tự deploy rules/Hosting/APK/push. Không sửa task drop/năng lượng.
@@ -199,3 +202,37 @@ Không đổi service/reducer/model/API/schema/save ở V1–V3. Rules đã phá
 riêng theo phê duyệt ở trên, cờ Lễ hội bật cho web local; Hosting/APK/push
 chưa thực hiện. Giữ task nền/năng lượng ngoài phạm vi và không stage log,
 ảnh QA, test ignored hoặc tài nguyên thử. V1–V3 hoàn tất trong phạm vi web.
+
+## Đổi sang Sưu tập huy hiệu — 28/10/2026
+
+Theo yêu cầu chủ dự án, đổi toàn bộ tên/đơn vị sự kiện đang hiển thị:
+Sưu tập huy hiệu, mốc25/50/75/100huy hiệu, thông báo chưa đủ và hướng dẫn.
+SVG collection-badge riêng có huy chương vàng, hai thẻ ghép, lõi xanh và
+dải ngọc; thay icon đom đóm trên trang và loot nhận khi ghép. Catalog đổi
+tên series từ source cosmetic-extras rồi chạy generator; giữ nguyên ID,
+ảnh/tên món ngoại hình đã có. Đom đóm trang trí trong nền không thuộc token.
+
+Cân nhắc đổi cả schema/ID với migration hoặc chỉ đổi lớp trình bày: chọn
+lớp trình bày để giữ toàn bộ số đã kiếm, vòng, mốc đã nhận và rules đã phát
+hành. Giữ fireflyEarned/festival/claimFestival/ID/cờ cũ theo ghi chú CONTEXT;
+không phát sinh migration, write hoặc deploy. Tỷ lệ rơi100% để thử, phần
+thưởng và cơ chế giữ dư/sang vòng không đổi.
+
+CONTEXT đã gộp chính sách hiện hành, loại các ghi chú triển khai cũ xung
+đột (12slot/chưa duyệt Xu/chưa triển khai/chưa phát hành rules). Xóa hai
+kế hoạch đã xong EVENTS_MOBILE_FESTIVAL_PLAN.md và REWARDS_MISSIONS_EVENTS_PLAN.md;
+sửa liên kết liên quan sang CONTEXT, đánh dấu receipt là bằng chứng lịch
+sử. Giữ DROP_ENERGY_SPECIAL_CARDS_PLAN.md vì chưa triển khai, chỉ đồng bộ
+tên token/nguồn context; không áp các tỷ lệ gameplay mới trong lượt này.
+
+Kiểm tra đúng rủi ro: 231module JS parse đạt; generator rules --check đạt
+và không đổi firestore.rules; UI5/5 đạt gồm320/412 năm skin, nhận mốc theo
+thứ tự khác nhau/sang vòng, trạng thái unknown và30chu kỳ loot cả normal/
+reduced-motion. Ảnh412 đã xem: tab hai dòng, icon riêng và đơn vị mốc đúng,
+không tràn. Log runtime/qa/badge-collection-ui.log, ảnh gallery ignored.
+Không chạy lại fullcheck/build cho thay đổi tên/icon/tài liệu; không
+Hosting/APK/rules/push. Không thay API/schema/save/catalog ID hoặc luật rơi.
+
+Review độc lập xác nhận không đổi tiến độ/luật thưởng hoặc link plan bị
+xóa; đã sửa hai finding tài liệu: bỏ đoạn Spark cũ mang nhãn hiện hành
+và đồng bộ tên sự kiện ở ghi chú adapter của kế hoạch gameplay còn chờ.

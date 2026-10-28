@@ -1357,7 +1357,7 @@ export const EXTRA_COSMETIC_ITEMS = Object.freeze([
     "name": "Rái Cá Đèn Lồng",
     "type": "avatar",
     "sourceKind": "event",
-    "series": "Lễ hội Đom Đóm",
+    "series": "Sưu tập huy hiệu",
     "files": {
       "128": "assets/achievements/v1/event-avatar-lantern-otter-128.webp",
       "256": "assets/achievements/v1/event-avatar-lantern-otter-256.webp",
@@ -1369,7 +1369,7 @@ export const EXTRA_COSMETIC_ITEMS = Object.freeze([
     "name": "Ánh Đom Đóm",
     "type": "frame",
     "sourceKind": "event",
-    "series": "Lễ hội Đom Đóm",
+    "series": "Sưu tập huy hiệu",
     "files": {
       "128": "assets/achievements/v1/event-frame-firefly-glow-128.webp",
       "256": "assets/achievements/v1/event-frame-firefly-glow-256.webp",

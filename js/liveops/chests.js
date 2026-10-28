@@ -54,7 +54,7 @@ export function claimFestival(festivalValue, chestValue, command) {
   if (index < 0) invalid();
   const milestone = FESTIVAL_MILESTONES[index];
   if (command.cycle < festival.completedCycles || festival.mask & (1 << index)) return { festival,chests,coins:0 };
-  if (festival.earnedTotal - festival.completedCycles * 100 < milestone.points) throw new Error('Chưa đủ đom đóm để nhận quà.');
+  if (festival.earnedTotal - festival.completedCycles * 100 < milestone.points) throw new Error('Chưa đủ huy hiệu để nhận quà.');
   festival.mask |= 1 << index;
   if (milestone.chest) chests = earnChest(chests,milestone.chest);
   if (festival.mask === 15) { festival.completedCycles++; festival.mask = 0; }

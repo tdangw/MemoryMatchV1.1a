@@ -1,6 +1,6 @@
 // Current product policy. Historical approval JSON remains unchanged.
 export const EVENT_COLLECTIONS = Object.freeze([
-  Object.freeze({ id: 'firefly-festival-01', name: 'Bộ sưu tập Đom Đóm', target: 100,
+  Object.freeze({ id: 'firefly-festival-01', name: 'Sưu tập huy hiệu', target: 100,
     items: Object.freeze(['event-avatar-lantern-otter', 'event-frame-firefly-glow']) }),
 ]);
 export const ACTIVE_EVENT_COLLECTION_ID = 'firefly-festival-01';

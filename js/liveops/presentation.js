@@ -121,7 +121,7 @@ export function openLiveopsPage(kind, surface = {}) {
   scope.listen(window,'offline',()=>{confirmedView=false;status.textContent='Đang xem tiến độ đã lưu. Kết nối để nhận thưởng.';render();});
   scope.listen(window,'online',()=>{if(active())void run({type:'status'});});
   function renderEvents() {
-    const tabs = createTabs('events', [['wheel','Vòng quay'],['letters','Sưu tập chữ'],['festival','Lễ hội']], eventTab, (key, panel) => {
+    const tabs = createTabs('events', [['wheel','Vòng quay'],['letters','Sưu tập chữ'],['festival','Sưu tập huy hiệu']], eventTab, (key, panel) => {
       if(key!==eventTab){rememberScroll(`event:${eventTab}`);scope.frame(()=>{if(scrollHost)scrollHost.scrollTop=scrolls.get(`event:${key}`)||0;});}
       eventTab = key; animation?.cancel(); panel.replaceChildren();
       const old = content; content = panel;
@@ -132,22 +132,22 @@ export function openLiveopsPage(kind, surface = {}) {
   }
   function renderFestival() {
     const festival=view?.state.festival, available=festival?festival.earnedTotal-festival.completedCycles*100:null;
-    const banner=panel('Lễ hội Đom Đóm');banner.classList.add('liveops__festival-hero');
-    banner.append(createIcon('firefly'),el('strong','liveops__festival-round',festival?`Vòng ${festival.completedCycles+1}`:'Hành trình Đom Đóm'));
-    if(festival)banner.append(el('p','',`${available.toLocaleString('vi-VN')} đom đóm · Mỗi vòng 100 điểm`),progress(Math.min(available,100),100,'Điểm Lễ hội'));
-    else banner.append(el('p','',festivalChestsEnabled()?'Kết nối để xem vòng và số đom đóm đang có.':'Xem trước các mốc quà. Lễ hội sẽ sớm mở.'));
+    const banner=panel('Sưu tập huy hiệu');banner.classList.add('liveops__festival-hero');
+    banner.append(createIcon('collection-badge'),el('strong','liveops__festival-round',festival?`Vòng ${festival.completedCycles+1}`:'Hành trình huy hiệu'));
+    if(festival)banner.append(el('p','',`${available.toLocaleString('vi-VN')} huy hiệu · Mỗi vòng 100 huy hiệu`),progress(Math.min(available,100),100,'Huy hiệu đã thu thập'));
+    else banner.append(el('p','',festivalChestsEnabled()?'Kết nối để xem vòng và số huy hiệu đang có.':'Xem trước các mốc quà. Sưu tập huy hiệu sẽ sớm mở.'));
     content.append(banner);
     const road=el('div','liveops__festival-road');
     for(const [index,item]of FESTIVAL_MILESTONES.entries()){
       const claimed=Boolean(festival&&(festival.mask&(1<<index))),ready=available!==null&&available>=item.points;
-      const row=panel(`${item.points} điểm`);row.classList.add('liveops__festival-milestone');row.dataset.claimed=String(claimed);
+      const row=panel(`${item.points} huy hiệu`);row.classList.add('liveops__festival-milestone');row.dataset.claimed=String(claimed);
       const body=el('div','liveops__festival-reward');body.append(el('strong','',[item.coins?`${item.coins} Xu`:'',item.chest?CHEST_NAMES[item.chest]:''].filter(Boolean).join(' + ')),el('p','',claimed?'Đã nhận':!festival?'Mốc phần thưởng':ready?'Đủ điều kiện':'Chưa đủ'));
       row.append(createIcon(item.chest?'chest':'coins'),body,button(claimed?'Đã nhận':'Nhận',()=>void run({type:'claimFestival',cycle:festival.completedCycles,points:item.points}),busy||!festivalChestsEnabled()||!canClaim()||claimed||!ready,`festival-${item.points}`));road.append(row);
     }
     content.append(road);
     if(festivalChestsEnabled())content.append(button('Xem quà & Kho rương',openChests));
     content.append(button(getActiveGameScope()?'Quay lại ván chơi':'Chơi ngay',play,busy||Boolean(getActiveGameScope())),
-      el('p','liveops__guidance','Thu thập đom đóm khi ghép nhóm thẻ đặc biệt. Điểm được giữ kể cả khi thua. Nhận đủ bốn mốc để sang vòng mới và giữ điểm dư; rương có thể mở sau.'));
+      el('p','liveops__guidance','Thu thập huy hiệu khi ghép nhóm thẻ đặc biệt. Huy hiệu được giữ kể cả khi thua. Nhận đủ bốn mốc để sang vòng mới và giữ huy hiệu dư; rương có thể mở sau.'));
   }
   function renderWheel() {
     const wheel = panel('Vòng quay may mắn'), stage = el('div', 'liveops__wheel');wheel.classList.add('liveops__wheel-card');

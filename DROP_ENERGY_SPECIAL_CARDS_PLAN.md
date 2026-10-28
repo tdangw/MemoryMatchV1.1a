@@ -2,7 +2,7 @@
 
 Ngày 27/10/2026. **Chỉ lập kế hoạch, chưa thay code, cấu hình, dữ liệu,
 rules, asset hoặc triển khai.** Đây là kế hoạch duy nhất cho task mới này.
-Kế hoạch Sự kiện/Nhiệm vụ ở `EVENTS_MOBILE_FESTIVAL_PLAN.md` vẫn quản task
+Quyết định Sự kiện/Nhiệm vụ đã hoàn tất ở `CONTEXT.md` quản task
 riêng; không nhập thay đổi gameplay này vào task giao diện hoặc nền động.
 
 ## 1. Mục tiêu, phạm vi và quyết định đã xác nhận
@@ -39,7 +39,7 @@ lượt hiện tại chưa được giao triển khai. Agent nhận prompt ở m
 thực hiện trong lượt riêng, sau khi làm rõ các quyết định còn thiếu.
 
 Ngoài phạm vi: giá shop, số Xu cơ bản mỗi nhóm/ván, công thức sao/ranking,
-độ khó và thời lượng ván, nhiệm vụ, rương xác suất, vé/chữ/đom đóm và nền
+độ khó và thời lượng ván, nhiệm vụ, rương xác suất, vé/chữ/huy hiệu sự kiện và nền
 động. Chỉ sửa adapter nhận diện thẻ mới khi cần để tương thích nguồn
 thưởng hiện có; không tự đổi tỷ lệ của các nguồn đó.
 
@@ -59,7 +59,7 @@ ghi Firebase theo animation/tick, kiểm web PC/mobile và S22 khi có máy.
 | `tripleRules.js`, `tripleState.js` | Chỉ select/undo/expire-combo; chưa có Magnet; chọn thẻ bị che bị chặn; có ledger Lucky/mốc | Thêm metadata Magnet và chuyển trạng thái hút trong reducer, normalize/snapshot/undo/solver |
 | `tripleBoard.js`, `tripleGeneration*.js`, `tripleSolver.js` | Board phân lớp/pile, generation có solver/witness; Lucky trang trí sau sinh | Magnet không đổi tổng thẻ/bội số ba; solver và witness phải hiểu hành động mới |
 | `tripleController.js`, `tripleTransactions.js` | Claim Lucky, milestoneTileIds và thưởng đi cùng transaction session | Lưu kết quả RNG, dấu đã xử lý cả khi trượt; không farm lại sau undo |
-| `js/liveops/dropAdapters.js` | Special của vé/chữ nhận diện Lucky/pair Special; Triple hiện chỉ Lucky | Phân biệt phân loại cho năng lượng với nguồn vé/chữ/đom đóm, đề xuất nhận Magnet là Special ở adapter |
+| `js/liveops/dropAdapters.js` | Special của vé/chữ nhận diện Lucky/pair Special; Triple hiện chỉ Lucky | Phân biệt phân loại cho năng lượng với nguồn vé/chữ/huy hiệu sự kiện, đề xuất nhận Magnet là Special ở adapter |
 
 Các test tên `approved` và ghi chú cũ “100% để QA/trả về 20%” là baseline
 của chính sách trước; yêu cầu mới và các xác nhận ở mục 1 là nguồn ưu
@@ -150,7 +150,7 @@ Sấm sét/Đóng băng vốn đang bị loại trong catalog.
 | Phạm vi 1–3 cặp Memory Lucky khi một ván có nhiều đợt | Giữ đúng tổng 1–3 **mỗi ván/attempt**, phân bổ các cặp vào đợt có thể chơi; không tự nhân 1–3 mỗi đợt. Cần chốt ranh giới ván Vô tận và đường đi khi người chơi kết thúc sớm |
 | Mốc 10 Memory | Tất cả quà là vật phẩm vào kho, gồm previewAll + time30, kèm 100 Xu, khớp catalog hiện tại; không tự kích hoạt xem tất cả ngay |
 | Chu kỳ Triple | Giữ 30 năng lượng/10 mốc, mỗi 3 năng lượng nhận 1 mốc và quà hiện có; người dùng chỉ thay nguồn rơi, chưa cho bảng mốc Triple mới |
-| Lucky/Magnet và nguồn vé/chữ/đom đóm | Đề xuất Lucky/Magnet là đặc biệt cho các adapter nhưng không đổi rate nguồn đó; không để thường 20% năng lượng thành đủ điều kiện rơi vé/chữ/đom đóm |
+| Lucky/Magnet và nguồn vé/chữ/huy hiệu sự kiện | Đề xuất Lucky/Magnet là đặc biệt cho các adapter nhưng không đổi rate nguồn đó; không để thường 20% năng lượng thành đủ điều kiện rơi vé/chữ/huy hiệu sự kiện |
 
 Các câu trả lời đã có trong mục 1 không đưa lại vào danh sách chờ duyệt.
 Có thể triển khai phần luật đã rõ khi được giao code; chỉ phần phụ thuộc
@@ -315,7 +315,7 @@ có cùng hợp đồng. Không tạo hệ reward engine tổng quát để dàn
 - Bảo mật cơ bản theo phạm vi đã chốt: owner UID, validate kiểu/phạm vi,
   idempotency, revision/CAS, không sửa tài khoản khác. Client RNG không
   cung cấp chống gian lận tuyệt đối; không đề xuất backend phức tạp mới.
-- Vé/chữ và Lễ hội có owner kế hoạch khác. Khi sửa adapter Magnet, chỉ
+- Vé/chữ và Sưu tập huy hiệu theo quyết định hiện hành ở CONTEXT.md. Khi sửa adapter Magnet, chỉ
   thêm phân loại sau khi chốt mục 4; giữ group key và dedup hiện có,
   không nhận lại quà của thẻ đã undo hoặc bật drop trên mọi thẻ thường.
 

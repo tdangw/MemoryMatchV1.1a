@@ -1,3 +1,6 @@
+> Hồ sơ nghiệm thu lịch sử. Tên hiện hành: **Sưu tập huy hiệu** (28/10/2026).
+> Quyết định đang áp dụng ở CONTEXT.md; các tên/quyền phát hành cũ bên dưới chỉ ghi lịch sử.
+
 # Nghiệm thu mở rộng quà, Nhiệm vụ và Sự kiện
 
 ## Popup Hồ sơ gọn, UID sao chép và tùy chọn bỏ trang bị —26/10/2026
@@ -87,7 +90,7 @@ Theo yêu cầu trực tiếp của chủ dự án sau nghiệm thu cục bộ: 
 
 ## Kết quả hiện hành — 26/10/2026: S0–S5 hoàn tất trong phạm vi source/web/emulator
 
-Phần này thay các ghi chú đang làm/chờ quyết định/lỗi emulator bên dưới. Kế hoạch duy nhất đã viết lại theo quyết định cuối tại `REWARDS_MISSIONS_EVENTS_PLAN.md`. Không còn câu hỏi sản phẩm chờ. Production vẫn tắt; không deploy rules/Hosting, push, APK hoặc thay billing.
+Phần này thay các ghi chú đang làm/chờ quyết định/lỗi emulator bên dưới. Kế hoạch duy nhất đã viết lại theo quyết định cuối tại `CONTEXT.md`. Không còn câu hỏi sản phẩm chờ. Production vẫn tắt; không deploy rules/Hosting, push, APK hoặc thay billing.
 
 ### Hành vi bàn giao
 
@@ -211,7 +214,7 @@ lịch sử hoặc deploy. Không chạy game test/build cho thay đổi chỉ t
 Theo yêu cầu mới nhất, đã phân tích lại kế hoạch và code backend/liveops,
 đường snapshot/account conflict, persistence/rules, nguồn phê duyệt và ngân
 sách Firebase chính thức. Kế hoạch hiện hành đã viết lại tại
-`REWARDS_MISSIONS_EVENTS_PLAN.md`; S0–S5 còn chờ lượt triển khai được giao.
+`CONTEXT.md`; S0–S5 còn chờ lượt triển khai được giao.
 Các kết quả runtime/emulator trước đó bên dưới là lịch sử kiến trúc cũ.
 
 Nguyên nhân phức tạp: callable cho cả status/fact/claim, document mỗi ván,
@@ -241,7 +244,7 @@ kết quả cũ là bằng chứng passS0–S5. Quota trong kế hoạch là d�
 tài liệu chính thức, chưa đo usage live/toàn app hoặc kiểm billing console.
 Skill thực dùng: `clarify-ambiguous-requirements` để chốt tin cậy SDK.
 
-Nguồn phạm vi: `REWARDS_MISSIONS_EVENTS_PLAN.md` cùng bộ chuẩn bị trong
+Nguồn phạm vi: `CONTEXT.md` cùng bộ chuẩn bị trong
 `docs/design/rewards-liveops`. Cổ tích/D0–Q1 và30quà cũ đã hoàn tất; không mở lại.
 
 ## Sửa lỗi ưu tiên — thống kê Hồ sơ,24/10/2026
@@ -302,7 +305,7 @@ trước sáu lô vẫn theo mục 3 của kế hoạch. Không coi ảnh concep
 hoặc golden runtime. Giữ nguyên 30 mapping/receipt, sáu hiệu ứng và 300 Xu.
 
 Giữ nguyên các thay đổi có sẵn: `CONTEXT.md`,
-`ILLUSTRATED_UI_ACHIEVEMENTS_PLAN.md`, `REWARDS_MISSIONS_EVENTS_PLAN.md`;
+`ILLUSTRATED_UI_ACHIEVEMENTS_PLAN.md`, `CONTEXT.md`;
 không đưa chúng vào commit sửa thống kê.
 
 Skill thực dùng: `clarify-ambiguous-requirements` để chốt P0; `imagegen`

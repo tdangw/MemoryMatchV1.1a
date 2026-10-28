@@ -1,42 +1,77 @@
 # CONTEXT — Trạng thái hiện tại (2026-10-28)
 
-## Nghiệm thu mỹ thuật Nhiệm vụ/Sự kiện — 28/10/2026
+## Sự kiện/Nhiệm vụ/Kho rương — nguồn hiện hành 28/10/2026
 
-- Chủ dự án xác nhận giao diện hiện tại chưa đúng kế hoạch và cung cấp
-  ảnh Vòng quay/Nhiệm vụ/Sưu tập chữ. P0–Q1 trước chỉ chứng minh chức năng;
-  không coi đó là nghiệm thu mỹ thuật. Phần UI mở lại V1–V3 ngay trong
-  EVENTS_MOBILE_FESTIVAL_PLAN.md, receipt cũ dùng chung, không tạo plan khác.
-- Hướng ảnh: khu vườn đêm navy/emerald/gold, khung vàng, nhiệm vụ ngang,
-  lịch gọn, wheel có khối và ô chữ có chất liệu. Giữ luật thưởng/model/rules;
-  không chép các quà hoặc số minh họa khác quyết định đã chốt. Đã chốt
-  bố cục tham khảo ảnh, mỹ thuật thích ứng từng skin, không ép navy cho mọi skin.
-- Chủ dự án cho phép phát hành chỉ Firestore rules để thử Lễ hội. Đã phát
-  hành và đọc lại khớp source; SHA256 d4f2f15a8c3135441adaf8e3883a5a70675fafad7651d191e9470a26a8f1619d.
-  Đã bật VITE_FESTIVAL_CHESTS_ENABLED=1 trong .env.local; chưa Hosting/APK.
-- V1 c58ded0, V2 65fcd3f; V3 đã review ảnh thật và sửa cascade, tương phản,
-  focus, độ gọn lịch. Giữ luật thưởng/API/save; UI 14/14, matrix sau nén 6/6,
-  preview chưa có dữ liệu + gallery 2/2, vùng dưới 1/1 đạt. Năm skin,
-  320/360/412/844 chữ lớn/1024; một header/ví/đóng/dock, không tràn ngang.
-  Không nhận kiểm chứng S22/FPS điện thoại. Bằng chứng dùng receipt hiện có.
+- Đã hoàn tất triển khai P0–Q1 và chỉnh mỹ thuật V1–V3. Chủ dự án đổi
+  **Lễ hội Đom Đóm → Sưu tập huy hiệu** ngày28/10. Đây là thay tên/đơn vị/
+  icon, không tạo sự kiện mới, không reset điểm hoặc đổi tỷ lệ/quà.
+  Tab Sự kiện: Vòng quay / Sưu tập chữ / Sưu tập huy hiệu. Màu/chất liệu
+  thích ứng năm skin; một header/ví/nút đóng/dock, một vùng cuộn.
+- Huy hiệu thu thập là token sự kiện, khác ngoại hình huy hiệu trang bị
+  trong Hồ sơ. Icon riêng `collection-badge`: huy chương vàng, lõi xanh,
+  hai thẻ ghép, dải ngọc; SVG dùng chung trên trang và loot khi ghép.
+  Không dùng emoji/font, không thay đàn đom đóm trang trí của nền động.
+- Mỗi nhóm đặc biệt/Lucky hợp lệ thử một lần: **1 huy hiệu100% để thử**,
+  **1 chữ100% để thử**, **1 vé5%**, ba nhánh độc lập. Chưa tự giảm huy hiệu
+  xuống10% hoặc chữ xuống20%. Thẻ thường chưa có các drop này; vẫn giữ
+  **2Xu/cặp hoặc bộ ba** và tiến trình/thưởng mốc hiện hành. Triple dùng
+  nhóm có Lucky cho nhánh đặc biệt; không coi mọi bộ ba thường là đặc biệt.
+  Thưởng ghi bền ngay khi ghép, giữ kể cả thua/rời ván/offline; checkpoint
+  attempt/wave/group ngăn nhận lại qua reload/undo. Tối đa12loot cùng lúc.
+- Sưu tập huy hiệu cá nhân quay vòng, không mùa/reset/countdown/cap ngày.
+  **25 huy hiệu:50Xu; 50:100Xu +1Rương C; 75:1Rương Khung;
+  100:1Rương Avatar.** Nhận đủ bốn mốc theo bất kỳ thứ tự nào sang vòng
+  tiếp theo, giữ số dư; không cần mở rương. Chưa có snapshot thì không
+  bịa số/vòng hoặc bật nhận. Không thêm document theo từng vòng/huy hiệu.
+- Tương thích: cố ý giữ `fireflyEarned`, `festival`, `claimFestival`,
+  `FIREFLY_DROP_CHANCE`, `firefly-festival-01`, receipt/catalog ID và cờ
+  `VITE_FESTIVAL_CHESTS_ENABLED`. Chúng là mã kỹ thuật cũ, nay mang nghĩa
+  Sưu tập huy hiệu; không đổi schema/save key/formatVersion2 hoặc rules.
+  Mọi tiến độ cũ được tiếp tục tự động, không migration/reset.
+- Kho rương chung trong Bộ sưu tập:4card C/Khung/Avatar/Huy hiệu, số lượng
+  gộp, mở1, xem pool/tỷ lệ/chọn trò hỗ trợ, gallery12món/trang. Trong ván
+  chỉ xem. Nhận rương tách ownership; đồ/grant bền cũ/sáu effect/300Xu/
+  rương bản đồ giữ nguyên. Không còn luân phiên12slot hoặc rương10000Xu.
+- C:40%50Xu/60%hỗ trợ. Khung:40%100Xu/40%hỗ trợ/20%khung.
+  Avatar:40%150Xu/40%hỗ trợ/20%avatar. Huy hiệu như Khung với ngoại hình
+  huy hiệu. Ngoại hình trùng/đủ pool đổi200/300/200Xu theo loại; đủ pool
+  đổi thẳngXu, C vẫn40/60. Pool chỉ Thành tích/chữ/event, bỏ starter/effect,
+  chọn đều. Hỗ trợ chia đều trong subpool theo trò; đầy999 giữ rương và
+  candidate đã bốc để thử lại, không mất hoặc reroll.
+- Chữ: MEMORY MATCH→Rương Avatar; LINK CONNECT→Rương Khung;
+  TRIPLE CONNECT→Rương Huy hiệu; ADVENTURE→Rương Avatar. Kho chung17chữ,
+  công thức tiêu đủ số chữ lặp; bán1000Xu/chữ, ghép3chữ giống nhau nhận
+  1chữ ngẫu nhiên đều, có thể trùng đầu vào. Không đổi ownership trực tiếp.
+- Vòng quay8ô bằng nhau5/10/10/15/15/20/20/25Xu;1free+10ad tối đa/ngày,
+  1vé/lượt riêng, vé không hết hạn. Không giả ad earned. Nhiệm vụ ngày
+  thắng3/ghép30/thắng không Gợi ý thưởng5/5/10Xu; nhận đủ ba tự thưởng
+  10Xu+1vé. Tuần thắng12/ghép120/noHint3/điểm danh3, nhận bonus50Xu+2vé.
+  Điểm danh10/10/15/10/15/20/25Xu theo bảy lần thực nhận, bỏ ngày giữ lượt.
+  Reset07:00 Việt Nam, tuần thứ Hai. Hành trình Xu tuần20/50/80→5/10/10Xu,
+  cap40điểm/ngày, tách khỏi Sưu tập huy hiệu, không cấp ngoại hình ở100điểm.
+- Firebase Spark: không Functions/SSV/Scheduler/Blaze/polling, không write
+  mỗi tick/drop hụt; dùng counter/mask/sequence hữu hạn và CAS root+state.
+  Queue ví chung, candidate bền trước publication, marker chống cấp lặp,
+  UID/restore/canonical guards giữ nguyên. Rules bảo vệ invariant cơ bản,
+  không tuyên bố chống app sửa đổi hoặc xác minh quảng cáo phía máy chủ.
+- Rules đã phát hành/đọc lại khớp; cờ liveops và Sưu tập huy hiệu bật trong
+  .env.local. UI mới chưa Hosting/APK/push; chưa đo S22/FPS điện thoại.
+  V1 c58ded0/V2 65fcd3f/V3 88a9bd0; nghiệm thu cũ61unit,22UI local,
+  6Chrome+emulator, rules/check/build đạt; visual14UI và matrix sau nén
+  6case đạt. Lịch412px~271px, nhãn320 không cắt. Receipt lịch sử ở
+  EVENTS_MOBILE_FESTIVAL_RECEIPT.md và REWARDS_MISSIONS_EVENTS_IMPLEMENTATION_RECEIPT.md.
+- Đã xóa hai kế hoạch hoàn tất EVENTS_MOBILE_FESTIVAL_PLAN.md và
+  REWARDS_MISSIONS_EVENTS_PLAN.md theo yêu cầu chủ dự án; không phục hồi
+  chúng làm nguồn thực thi. Quyết định mới nằm ở mục này. Kế hoạch
+  DROP_ENERGY_SPECIAL_CARDS_PLAN.md còn chờ triển khai, tách biệt và giữ lại.
 
 ## Kế hoạch mới: rơi vật phẩm, năng lượng và thẻ đặc biệt ba trò — 27/10/2026
 
 - Chỉ lập kế hoạch theo yêu cầu mới; nguồn duy nhất của task gameplay này: `DROP_ENERGY_SPECIAL_CARDS_PLAN.md`. Chưa sửa code/config/save/rules/asset, chưa test/build/deploy/APK/commit. Giữ task Sự kiện/Nhiệm vụ và nền động riêng, không thay plan hoặc nghiệm thu của chúng.
 - Chủ dự án đã chốt và duyệt cân bằng bổ sung 27/10: mỗi nhóm ghép đặc biệt 80% nhận 1 năng lượng, thường 20%; hỗ trợ độc lập **thường 5%, đặc biệt thông thường 10%, Memory Special/Link Blue 30% thay nhánh chung**, thay bảng hỗ trợ 20%/50% trước đó. Memory Special cũng theo 80%, không chắc chắn +1; không pity. Đồ mạnh hiếm hơn, previewAll chỉ mốc 10; trọng số số học còn P0. Memory Lucky mọi chế độ 1–3 cặp mỗi ván, quà +15 giây/+1 Gợi ý/+10 Xu; Triple Lucky chỉ Thử thách, chọn +15 giây thay dòng +5 giây. Magnet 1 thẻ mỗi đợt mọi chế độ Triple; chỉ chọn khi bóc được, hút đồng loại từ khay hoặc mọi lớp board. Vô tận vẫn cấp item thời gian/đóng băng vào kho, Lucky cộng thời gian trực tiếp đổi Xu; mức đổi chưa chốt.
 - Link đổi Cyan không băng +10 Xu, Blue tiếp tế 30%, Red 50% phá cặp thường/50% tự xáo miễn phí; Lucky 50 Xu hoặc 30 giây. Mốc 1–10 mới: 10 Xu / phá cặp / 20 Xu / Gợi ý / 30 Xu / Xáo trộn / 40 Xu / Sấm sét / 50 Xu / phá cặp +100 Xu +Đóng băng vào kho. Tổng cơ bản 250 Xu +4 item +2 lần phá, không giữ phá mốc 1/3/9 như cũ. Memory 10 mốc gần như đã khớp, giữ 210 Xu +4 preview +2 hint +3 time30/vòng, item mốc vào kho cả Vô tận.
-- Kế hoạch nêu các đề xuất chưa chốt: pool/trọng số hỗ trợ và Lucky (Memory tier 60/30/10 là đề xuất mới, chưa duyệt số), Lucky có tính đặc biệt cho năng lượng, quy đổi Vô tận, kho 999/no-pair fallback, phạm vi 1–3 Lucky với ván nhiều đợt, giữ Triple target30/step3 và adapter Magnet cho vé/chữ/đom đóm. Không tự đổi tỷ lệ sinh thẻ 80/20; không dùng chung RNG hai nhánh hoặc cộng nhánh tiếp tế, không cho cặp phá phụ kích hoạt chuỗi drop. Dấu đã bốc ghi cả lần trượt, giữ qua undo/restore; Magnet xử lý bộ ba nguyên tử trước xét đầy khay và cập nhật solver/witness. Phase P0/D0/D1/L1/M1/T1/T2/Q1 và acceptance/data/lifecycle/perf nằm trong plan; chưa triển khai.
+- Kế hoạch nêu các đề xuất chưa chốt: pool/trọng số hỗ trợ và Lucky (Memory tier 60/30/10 là đề xuất mới, chưa duyệt số), Lucky có tính đặc biệt cho năng lượng, quy đổi Vô tận, kho 999/no-pair fallback, phạm vi 1–3 Lucky với ván nhiều đợt, giữ Triple target30/step3 và adapter Magnet cho vé/chữ/huy hiệu sự kiện. Không tự đổi tỷ lệ sinh thẻ 80/20; không dùng chung RNG hai nhánh hoặc cộng nhánh tiếp tế, không cho cặp phá phụ kích hoạt chuỗi drop. Dấu đã bốc ghi cả lần trượt, giữ qua undo/restore; Magnet xử lý bộ ba nguyên tử trước xét đầy khay và cập nhật solver/witness. Phase P0/D0/D1/L1/M1/T1/T2/Q1 và acceptance/data/lifecycle/perf nằm trong plan; chưa triển khai.
 - Bổ sung đánh giá cân bằng: giữ Lucky/Magnet, mốc và giá shop trong lần thử đầu; đo quà nhận/dùng/tồn, mốc/phút và thắng/đầy khay theo trò/mode/thời lượng, không tự ép Triple từ 30/3 thành 10/1. Prompt bàn giao triển khai đầy đủ ở **mục 13 của plan**; chỉ viết prompt và cập nhật tài liệu trong lượt này, không chạy prompt hoặc bắt đầu code. Tỷ lệ năng lượng/hỗ trợ đã duyệt không hỏi lại ở P0.
-
-## Kế hoạch mới: trang Sự kiện, Nhiệm vụ mobile/Lễ hội vô hạn — 27/10/2026
-
-- Chỉ phân tích/lập kế hoạch theo bản đính kèm và yêu cầu mới; chưa triển khai. Nguồn duy nhất của task Sự kiện/Nhiệm vụ mới: `EVENTS_MOBILE_FESTIVAL_PLAN.md`. Không sửa/đổi trạng thái task nền động G4/G5 đang làm bên dưới.
-- Đối chiếu thấy Events đang gộp wheel/chữ/kho, select/input; kho thực có17chữ nên4×3không đủ. Missions đã có ngày/tuần,20/50/80Xu đang là hành trình tuần, không lấy làm event vô hạn. Concept chỉ bằng chữ, không phê duyệt quà/mức tiền/countdown mới trong đó.
-- Làm rõ cuối27/10: **bốn loại rương chung C/Avatar/Khung/Huy hiệu**, không rương gắn mónA. C cóXu/hỗ trợ, ba loại ngoại hình cóXu/hỗ trợ/món ngẫu nhiên trong pool đúng loại. Quà ngoại hình chưa nhận của Thành tích/chữ/Lễ hội chuyển thành rương tương ứng; nhận rương cập nhật bước thưởng, mở sau. Đồ/grant cũ giữ nguyên. Pool dùng được món từ các bộ khác; trùng ngoại hình đổiXu, hỗ trợ cộng kho. Đủ pool của loại thì mở loại đó đổi thẳngXu, không rươngXu10.000 riêng. Quyết định này thay câu trả lời trước về đợi trúng món mục tiêu/đủ12món.
-- Lễ hội chốt bốn mốc điểm: 25 nhận Xu; 50 nhận Xu + Rương C; 75 nhận Rương Khung; 100 nhận Rương Avatar (mức Xu trực tiếp chưa duyệt). Nhận đủ bốn mốc sang vòng mới, giữ dư, không cần mở rương. Đom đóm 1 con/nhóm đặc biệt, 100% thử rồi dự kiến 10%, độc lập chữ/vé; nhận ngay kể cả thua/offline, không cap ngày/hết hạn. State earned/cycle/mask 4 mốc và kho 4 counter/sequence hữu hạn, không document từng vòng/rương. Icon SVG + loot sau durable commit như vé, không giữa màn.
-- Phê duyệt bổ sung 27/10 theo yêu cầu “Áp dụng như đề xuất trên vào kế hoạch”: **Kho rương chung trong Bộ sưu tập**, lưới 2×2 bốn loại gộp số lượng, xem quà/tỷ lệ/chọn trò hỗ trợ/Mở 1; Sự kiện và Thành tích dẫn cùng kho. Xu vào ví, hỗ trợ vào kho trò đã chọn, ngoại hình vào đồ Hồ sơ; nhận rương chuyển bước thưởng, mở sau. **Bảng rương đã duyệt:** C 40%→50 Xu/60%→1 hỗ trợ; Khung 40%→100 Xu/40%→1 hỗ trợ/20%→1 khung; Avatar 40%→150 Xu/40%→1 hỗ trợ/20%→1 avatar; Huy hiệu như Khung với nhánh huy hiệu. Đổi trùng hoặc đủ pool theo loại: Khung 200/Avatar 300/Huy hiệu 200 Xu; đủ pool mở đổi thẳng, C vẫn 40/60. Không hỏi duyệt lại bảng này hoặc bố cục kho ở P0.
-- UI ba tab Events, Xu trực tiếp mốc 25/50, subpool hỗ trợ, whitelist/trọng số, chu kỳ loại rương chữ, policy kho 999 và mẫu mỹ thuật còn ở mức đề xuất/đặc tả. Trong ván đề xuất xem kho, mở ngoài ván theo guard kinh tế hiện có. Chỉ cập nhật kế hoạch, chưa sửa config/code/save/rules/test/build/deploy/icon. Giữ free 1/ad 10/vé/recipes/điểm danh/weekly/300 Xu/rương độ khó/sáu effect, chưa động task nền.
-
-- Bổ sung trang Nhiệm vụ 27/10: mục 3A và phase U3 bao phủ cả Hôm nay/Tuần này theo khu vườn đêm, 7 ô điểm danh dạng 4+3, thẻ có tiến độ/CTA, thưởng trọn bộ và countdown. Chủ dự án xác nhận **giữ Xu điểm danh hiện tại, chỉ cải tiến giao diện**: 10/10/15/10/15/20/25 Xu; không vé ngày 4–6/rương ngày 7. Giữ ba nhiệm vụ ngày thưởng 5/5/10 Xu, bonus tự cấp khi nhận đủ ba quà là 10 Xu + 1 vé; tuần bốn mục tiêu, nhận bonus 50 Xu + 2 vé. Hình rương trọn bộ chỉ minh họa thưởng cố định, không thêm rương vào kho. Chơi dẫn menu trò gần nhất; visits dẫn điểm danh; giữ tiến độ theo ván thắng. Countdown từ cùng kỳ UTC (07:00 Việt Nam), một timer UI tối đa mỗi phút khi hiện, không polling/ghi Firebase. Giữ tuần 20/50/80 và vòng điểm danh, không thêm state/schema/backend. Đã bổ sung tiêu chí mobile/PC/S22, offline/đổi kỳ/nhận lặp/lifecycle/reduced-motion; chưa code/test/build/deploy. Phần này thay phạm vi cũ chỉ đánh giá Nhiệm vụ, không tạo kế hoạch riêng.
 
 ## Nền động nhẹ — triển khai G0–G5 đã bàn giao local, còn xác minh S22
 
@@ -99,23 +134,22 @@ Phản hồi tiếp theo: bỏ preload sheet chữ khỏi trang chủ để khô
 
 Chủ dự án yêu cầu sheet chữ và chữ rơi tại nhóm ghép, tự thu thập rồi hiện lớn giữa màn và tự ẩn. Đã chốt cộng kho ngay, không chạm nhặt/đổi luật rơi. Dùng skill imagegen tạo17glyph vàng–men xanh, source/prompt/crop tại `design/rewards-letters/drop/source.json`, atlas128/256px do `scripts/prepare-letter-drop-atlas.mjs` sinh. Renderer chung `js/liveops/letterDropFeedback.js` nhận callback sau durable commit từ ba trò; tối đa5entry, transform/opacity1.700ms, reduced-motion tĩnh1.100ms, scope cleanup hủy toàn bộ. Vị trí chỉ capture cho nhóm đặc biệt hợp lệ. Không đổi save/rules/kinh tế hoặc write cloud.
 
-UI matrix mới15/15 đạt, gồm bốn viewport/hai motion/20scope, durable/dedup/aborted và ghép thật ba trò, wave regression. 25unit mục tiêu đạt; review độc lập không còn P1/P2 xác nhận. Check/build exit0, đã cập nhật https://memorymatch-test.web.app và đọc lại entry/bundle/atlas mới khớp build. Bằng chứng cuối trong receipt chung; chưaAPK. Kế hoạch hiện hành vẫn REWARDS_MISSIONS_EVENTS_PLAN.md, mục10 bổ sung acceptance.
+UI matrix mới15/15 đạt, gồm bốn viewport/hai motion/20scope, durable/dedup/aborted và ghép thật ba trò, wave regression. 25unit mục tiêu đạt; review độc lập không còn P1/P2 xác nhận. Check/build exit0, đã cập nhật https://memorymatch-test.web.app và đọc lại entry/bundle/atlas mới khớp build. Bằng chứng cuối trong receipt chung; chưaAPK. Chính sách hiện hành được gộp ở mục Sự kiện/Nhiệm vụ/Kho rương đầu CONTEXT; receipt giữ bằng chứng lịch sử.
 
 ## Bật web dùng Firebase thật —26/10/2026
 
 Chủ dự án đã yêu cầu deploy rules và bật môi trường thật để thử web trước APK. Đã phát hành Firestore rules Spark/12ID mới lên memorymatchv1-1a và đọc lại khớp SHA256662edab10b2cbfb626c60c32931ed0009a82e40ca6a398e90e0a8136263a2f7a. Bật VITE_LIVEOPS_ENABLED=1 trong .env.local, giữ public expansion=1; build thành công, Hosting test đã phát hành tại https://memorymatch-test.web.app. Production/beta Hosting không đổi; không Functions/billing/push/APK. Smoke trên URL đã phát hành PASS: tải nhiệm vụ/chữ, quay free thật ở guest mới, reload giữ quota; cần Tải lại tiến độ nếu mở modal trước khi tài khoản kết nối. Bằng chứng live trong receipt chung. Các câu production tắt/chưa deploy bên dưới là trạng thái trước quyền bổ sung này.
 
-## Spark và sưu tập chữ — kết quả hiện hành
+## Lịch sử nghiệm thu Spark — 26/10/2026
 
-- Kế hoạch duy nhất: `REWARDS_MISSIONS_EVENTS_PLAN.md`. Toàn bộ S0–S5 đã được giao; implementation và nghiệm thu source/web/emulator đã hoàn tất; bằng chứng trong receipt chung `REWARDS_MISSIONS_EVENTS_IMPLEMENTATION_RECEIPT.md`. Các đoạn bên dưới là lịch sử, không dùng phục hồi Functions/SSV hoặc quà100điểm.
-- Đã đủ quyết định sản phẩm: MEMORY MATCH/LINK CONNECT/TRIPLE CONNECT/ADVENTURE cùng kho chữ và toàn bộ12món riêng (4avatar/4khung/4huy hiệu); mỗi lần đổi tiêu công thức nhận1món chưa có, hết12món nhận rương10.000Xu. Không lấy quà Thành tích. Chọn món theo catalog ổn định, xem trước trước đổi. Mỹ thuật rừng/ký ức, đèn lồng, pha lê, hoàng gia đã duyệt.
-- Trial100% rơi1chữ/nhóm đặc biệt ở mọi trò, chọn đều bảng chữ chung;20% chỉ dự kiến. Vé5% độc lập, nhận ngay kể cả thua. Kho không hết hạn.2M+1A hiển thị `M-M--- -A---`; bán1chữ1.000Xu, ghép3chữ giống nhau ra1chữ đều, có thể trùng. Đổi nhiều lần, đồ sở hữu vĩnh viễn.
-- Nhiệm vụ reset07:00ngày/thứHai tuần; giữ Xu/bonus1vé ngày+2vé tuần, điểm danh7ô. Mốc Xu tuần20/50/80→5/10/10 chuyển vào Nhiệm vụ; điểm reset tuần, không cấp đồ ở100. Free1/ad earned10/ngày chung tài khoản; vé dùng riêng không cap. Các bảng thưởng Xu cũ giữ nguyên.
-- Auth+Firestore, một private state và root snapshot cùng CAS transaction, queue account/persistence dùng chung. Không Functions/SSV hoặc collection từng ván. Pending/RNG bền, chữ sync tối đa4loại/publication; retry/restore/UID/chuyển ngày có guard. Backup Spark phải đối chiếu canonical trước hydrate, không hoàn Xu đã tiêu. Giữ save key/formatVersion2/API legacy; thêm optionalfields có normalizer và12ID được duyệt.
-- Đã đạt38unit, emulator matrix,15web(account/liveops/ba trò),2layout/lifecycle(4viewport×5skin,20chu kỳ), alpha1.521cặp, assetbudget dưới24MiB, build. Review độc lập không thấy P1/P2. Check tổng thể và build exit0; chi tiết/giới hạn theo receipt; không dùng kết quả lịch sử thay bằng chứng mới.
-- Production vẫn tắt, rules và12ID mới chưa deploy, khôngAPK/push/Hosting/billing. Native ad provider/điện thoại/live hai thiết bị chưa kiểm. Rules public đã deploy ở task trước không chứng nhận12ID mới. Không còn câu hỏi sản phẩm chờ.
+S0–S5 đã hoàn tất và có bằng chứng trong
+REWARDS_MISSIONS_EVENTS_IMPLEMENTATION_RECEIPT.md (38unit, emulator,
+15web, layout/lifecycle, alpha1521cặp, check/build). Các luật cũ nhận món
+trực tiếp/rương10000Xu và trạng thái phát hành tại thời điểm đó đã được
+thay thế; không dùng lại. Chính sách hiện hành duy nhất của các chức năng
+này nằm ở mục Sự kiện/Nhiệm vụ/Kho rương đầu CONTEXT.
 
-## Lịch sử trước kết quả Spark hiện hành
+## Lịch sử triển khai trước 28/10/2026
 
 ## Nghiệm thu Nhiệm vụ/Sự kiện và rules — 25/10/2026
 
@@ -129,7 +163,7 @@ Chủ dự án đã yêu cầu deploy rules và bật môi trường thật đ�
 
 ## Tiếp tục Nhiệm vụ/Sự kiện — 25/10/2026
 
-- Chủ dự án xác nhận giữ phê duyệt P0 và mẫu đại diện trong receipt24/10, giao tiếp tục toàn bộ A1–Q2, gồm ba đồ hồ sơ cơ bản và matrix1.225cặp. Kế hoạch hiện hành duy nhất: `REWARDS_MISSIONS_EVENTS_PLAN.md`; nguồn đã duyệt ở `design/rewards-liveops/approval.json`, `catalog.source.json`, `liveops.source.json`. Các đoạn “chỉ chuẩn bị/chờ P0” bên dưới là lịch sử.
+- Chủ dự án xác nhận giữ phê duyệt P0 và mẫu đại diện trong receipt24/10, giao tiếp tục toàn bộ A1–Q2, gồm ba đồ hồ sơ cơ bản và matrix1.225cặp. Kế hoạch hiện hành duy nhất: `CONTEXT.md` (mục Sự kiện/Nhiệm vụ/Kho rương); nguồn đã duyệt ở `design/rewards-liveops/approval.json`, `catalog.source.json`, `liveops.source.json`. Các đoạn “chỉ chuẩn bị/chờ P0” bên dưới là lịch sử.
 - A1 đã có65nguồn riêng (60thành tích+2event+3cơ bản), pack và kiểm1.225/1.225cặp alpha đạt; đang nghiệm thu hình/renderer. A2–Q2 chưa nghiệm thu. Receipt chung: `REWARDS_MISSIONS_EVENTS_IMPLEMENTATION_RECEIPT.md`. Không APK/push/Hosting/backend/rules deploy; giữ các thay đổi cân bằng/gameplay đồng thời ngoài phạm vi.
 
 - 24/10 — Link Đóng băng: nhãn/số đồng hồ dùng xanh đậm #06344d trên lớp băng được làm sáng đều để giữ tương phản; selector trực tiếp giữ màu rõ cả khi timer-warning hoặc đổi skin. Chỉ sửa CSS tại styles/link-connect.css, không đổi timing/lifecycle/save. Kiểm tra ownership CSS đạt; chưa kiểm lại giao diện browser, không build/APK.
@@ -151,7 +185,7 @@ Chủ dự án đã yêu cầu deploy rules và bật môi trường thật đ�
 
 ## Kế hoạch đề xuất mới: mở rộng quà, Nhiệm vụ và Sự kiện
 
-- Nguồn hiện hành của yêu cầu mới: [REWARDS_MISSIONS_EVENTS_PLAN.md](REWARDS_MISSIONS_EVENTS_PLAN.md). Lượt này chỉ đánh giá, lập kế hoạch và tạo hai concept; chưa sửa game/save/quảng cáo/rules. Cổ tích D0–Q1 bên dưới đã hoàn tất, không mở lại.
+- Nguồn hiện hành của yêu cầu mới: [CONTEXT.md](CONTEXT.md). Lượt này chỉ đánh giá, lập kế hoạch và tạo hai concept; chưa sửa game/save/quảng cáo/rules. Cổ tích D0–Q1 bên dưới đã hoàn tất, không mở lại.
 - Đề xuất màn11–30 mỗi trò: thêm60quà riêng (24avatar/24khung/12huy hiệu), tổng90thành tích; giữ30quà/sáu effect/rương/300Xu hiện có. Danh sách đủ tên, ID, level, brief tại `docs/design/rewards-liveops/expansion-catalog.proposal.json`;60sprite mới chưa vẽ.
 - Chủ dự án đã chốt vòng quay1lượt miễn phí/ngày+1lượt quảng cáo tùy chọn/ngày. Đề xuất điểm danh/nhiệm vụ/vòng quay dùng chung tài khoản, event7ngày và hai quà event riêng. MứcXu, clock/backend, bảng60món và mỹ thuật còn để duyệt trước triển khai; không suy từ số trong concept thành kinh tế đã chốt.
 - Hai ảnh chọn: `docs/design/rewards-liveops/review-v1/01-missions-daily-login-v2.png` và `02-events-wheel.png`. [Review/kiểm tra](docs/design/rewards-liveops/REVIEW_AND_PREPARATION.md), [prompt bàn giao](docs/design/rewards-liveops/IMPLEMENTATION_PROMPT.md). Đã chạy lại8unit/contract đạt; kiểm60mapping và ngân sách đề xuất đạt. Không nhận đã chạy lại toàn bộ web hoặc kiểm điện thoại/live.
@@ -311,16 +345,3 @@ Chủ dự án đã yêu cầu deploy rules và bật môi trường thật đ�
 - 20/10 — Quyết định hiện hành của chủ dự án: ghép thành công nhận cố định 2 xu mỗi cặp (Memory Match/Link Connect) hoặc bộ ba (Triple Connect), không tăng theo combo; giữ nguyên thưởng thắng màn và các nguồn thưởng riêng. MATCH_COINS_PER_GROUP tại js/progression/gameplayRules.js là nguồn chung; lưu ví cùng lượt ghép trước hiệu ứng. Triple dùng dấu đã nhận hiện hữu để không cấp lại khi hoàn tác/tiếp tục. Luật 0 xu cho ghép thường trong đợt nhiều wave ngày19/10 đã được thay bằng quyết định này. Âm unlock_1.mp3 dùng khi mở băng; coin_drop.mp3 dùng cho mỗi đợt xu rơi, theo cài đặt âm lượng/tắt tiếng.
 
 - 22/10 — Âm thanh và phản hồi thẻ: tiếng hoàn thành đợt phát sau lượt ghép cuối đã lưu, tiếp tục phát hết qua bàn mới; chọn độ khó và nút đóng dùng âm riêng. Đóng băng Link Connect kéo dài 15 giây; xáo trộn Link/Triple dùng hai kiểu gom giữa và xoay vòng, có cleanup khi đổi màn/ẩn ứng dụng. Thẻ được chọn/Gợi ý nhô nhẹ ở cả ba trò; Triple nhô trước khi bay vào khay, tôn trọng giảm chuyển động. Không đổi schema/save hoặc luật thưởng.
-
-## Triển khai Sự kiện/Nhiệm vụ/Kho rương — 27/10/2026
-
-- Nguồn active: EVENTS_MOBILE_FESTIVAL_PLAN.md, giao toàn bộ P0–Q1 và commit từng phase. Chủ dự án đã duyệt toàn bộ đề xuất còn lại P0 trong chat: 50/100 Xu, subpool chia đều, đầy 999 giữ candidate, pool Thành tích/chữ/event bỏ starter/effect, loại rương chữ lặp 12 slot, trong ván chỉ xem, SVG tĩnh khu vườn đêm. Receipt chung EVENTS_MOBILE_FESTIVAL_RECEIPT.md. Các đoạn chỉ lập kế hoạch ở trên là lịch sử; không tự deploy/rules live/APK/push và không trộn task thẻ đặc biệt.
-
-- Đính chính trực tiếp khi triển khai: bỏ 12 slot/cursor luân phiên. Mapping thưởng chữ cố định đã được chủ dự án duyệt: MEMORY MATCH→Rương Avatar, LINK CONNECT→Rương Khung, TRIPLE CONNECT→Rương Huy hiệu, ADVENTURE→Rương Avatar. Quà bên trong vẫn theo bảng rương chung.
-
-## Sự kiện/Nhiệm vụ/Kho rương — hoàn tất mã nguồn và web local 27/10/2026
-
-- Đã triển khai toàn bộ P0/U1/U2/U3/D1/D2/Q1 của EVENTS_MOBILE_FESTIVAL_PLAN.md, commit riêng từng phase. Receipt duy nhất: EVENTS_MOBILE_FESTIVAL_RECEIPT.md. Bỏ hoàn toàn cách hiểu luân phiên12slot trong capability mới; mapping cố định MEMORY MATCH→Avatar, LINK CONNECT→Khung, TRIPLE CONNECT→Huy hiệu, ADVENTURE→Avatar đã được chủ dự án duyệt.
-- Có ba tab Sự kiện, hai tab Nhiệm vụ, lịch4+3 và thưởng giữ nguyên; grid17/sheet bán, Kho rương4card/gallery12món, Lễ hội100điểm bốn mốc, drop đom đóm sau durable commit. Nhận rương tách khỏi ownership, giữ grant cũ/sáu effect/300Xu/rương bản đồ; thêm field có normalizer, không đổi save key/formatVersion2.
-- Theo yêu cầu chia việc, sub-agent review độc lập UI/economy và bổ sung test. Đã sửa queue mất hỗ trợ khi shop chờ, candidate sai loại, cached grant/reconnect, stale UID trong hoạt ảnh, pending kho đầy, scroll và recovery result. 61/61 unit;22case UI local và6case Chrome+Firebase emulator đạt; hai suite rules đạt; check/build cuối exit0. Log/ảnh/test QA ignored giữ local, không vào commit.
-- Chưa bật capability mới trên live: chỉ bật VITE_FESTIVAL_CHESTS_ENABLED=1 ở môi trường đã có rules tương ứng. Không deploy/rules live/Hosting/APK/push. Không đổi task rơi vật phẩm/năng lượng/thẻ đặc biệt. Chưa có S22 thật và không chứng nhận60FPS điện thoại; số đo desktop/long task và giới hạn ghi đầy đủ trong receipt.

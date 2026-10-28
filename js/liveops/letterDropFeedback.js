@@ -14,7 +14,7 @@ export function prepareLetterDropFeedback(anchor,scope) {
   const origin={x:rect.left+rect.width/2,y:rect.top+rect.height/2};
   return outcome=>{
     if(scope.active && outcome?.letter)showLetterDropFeedback(outcome.letter,origin,scope);
-    if(scope.active && outcome?.firefly)showTicketDropFeedback(origin,scope,'firefly');
+    if(scope.active && outcome?.firefly)showTicketDropFeedback(origin,scope,'collection-badge');
     if(scope.active && outcome?.ticket)showTicketDropFeedback(origin,scope);
   };
 }
