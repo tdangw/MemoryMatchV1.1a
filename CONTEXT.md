@@ -2,6 +2,8 @@
 
 ## Menu/Cửa hàng/Preview — hoàn tất 28/10/2026
 
+- Bổ sung29/10: ẩn thanh cuộn toàn giao diện tại style.css (chuẩn và WebKit),
+  bao gồm menu chính/tab/popup; giữ overflow, cuộn ngang/dọc và snap hiện có.
 - Tab chức năng: **Xu trái, tên giữa, X phải**; Cài đặt không có Xu.
   Ví chung có owner/subscription; không còn callback data.coins. Đọc
   patch.coins (kể cả0); reset/restore tải canonical có generation guard,

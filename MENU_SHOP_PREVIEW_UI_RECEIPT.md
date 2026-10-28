@@ -81,3 +81,11 @@ nền tối gần đặc, viền1px và hai họa tiết góc nhỏ. Màu theo n
 giữ vị trí/icon/vùng bấm, không thêm dây treo hay animation. CSS ownership
 đạt; matrix bố cục năm skin ×320/412/844×390 và ảnh thực tế được rà soát.
 Không đổi logic/API/save; không build/deploy/APK.
+
+29/10: Menu chính còn lộ thanh cuộn dọc vì quy tắc ẩn trước đây chỉ có
+trong một số scope/media. Đặt policy chung trong style.css cho document
+và descendant, hỗ trợ scrollbar-width/WebKit; không đổi overflow/touch/snap.
+CSS ownership đạt; kiểm tra năm skin ở942×802/320×740/844×390 đạt3/3:
+menu chính, missions/events/profile/ranking/settings, bản đồ/shop/collection;
+kiểm tra computed scrollbar ẩn và cuộn dọc bằng wheel/ngang bằng scrollLeft.
+Đã xem ảnh menu chính. Chỉ CSS, không đổi logic/save; không build/deploy/APK.
