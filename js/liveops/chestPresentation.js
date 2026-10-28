@@ -21,7 +21,9 @@ export function mountChestInventory(host, { owner, back, profile, gameId = 'memo
   const identity = getAccountService()?.getIdentity();
   const current = () => scope.active && host.isConnected && getAccountService()?.getIdentity()?.profileId === identity?.profileId && getAccountService()?.getIdentity()?.uid === identity?.uid;
   const root = node('div', 'liveops liveops--chests'), status = node('p', 'liveops__status', 'Đang tải Kho rương…');
-  status.setAttribute('role', 'status'); root.append(action('Quay lại Bộ sưu tập', back), status); host.replaceChildren(root);
+  status.setAttribute('role', 'status');
+  if (back) root.append(action('Quay lại Bộ sưu tập', back));
+  root.append(status); host.replaceChildren(root);
   let view = null, busy = false, connected = false, selected = null, page = 0, pendingChest = null;
   const lastResult = node('p', 'liveops__last-result'), cards = node('div', 'liveops__chest-grid'), detail = node('section', 'liveops__card'); root.append(lastResult, cards, detail);
   if (profile) root.append(action('Xem trong Hồ sơ', profile));

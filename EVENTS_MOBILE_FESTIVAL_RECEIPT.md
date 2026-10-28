@@ -236,3 +236,31 @@ Hosting/APK/rules/push. Không thay API/schema/save/catalog ID hoặc luật rơ
 Review độc lập xác nhận không đổi tiến độ/luật thưởng hoặc link plan bị
 xóa; đã sửa hai finding tài liệu: bỏ đoạn Spark cũ mang nhãn hiện hành
 và đồng bộ tên sự kiện ở ghi chú adapter của kế hoạch gameplay còn chờ.
+
+## Bộ sưu tập — tab Kho rương và lỗi hàng tab kéo cao (28/10)
+
+Nguyên nhân gốc: collection-content quy định hai hàng auto/minmax nhưng
+nút Kho rương riêng tạo thêm child trước tablist/panel, khiến tablist rơi
+vào hàng giãn. Đã bỏ entry/chestHost riêng, dùng chung tabpanel và thêm
+Kho rương vào catalog navigation của cả ba trò. Thanh tab cố định gọn3cột,
+vùng chạm48px; panel duy nhất cuộn, không kéo nút tab theo chiều cao.
+Lối tắt Sự kiện/Thành tích và initialChest chọn thẳng tab Kho rương.
+
+So sánh thêm wrapper cho view rương cũ với tích hợp tab: chọn tích hợp để
+root luôn đúng2child và cùng keyboard/ARIA. Chesttab chọn local, không
+thêm giá trị settings/schema lưu, không đổi nhớ tab Shop/Collection cũ.
+Rời tab dispose/forget chestscope; load/open cũ không chạm tab mới, kết quả
+bền vẫn đọc lại. Đổi tab bắt đầu đầu nội dung như renderer cũ, bỏ thử nhớ
+scroll đồng bộ vì renderer async có thể clamp về0 (finding review độc lập).
+Back trong component trở thành tùy chọn; không có nút Back dư trong tab.
+Sửa màu status theo skin trong chestpanel để Cổ tích đọc được.
+
+Kiểm tra: syntax3module và CSS ownership đạt;9/9 UI (ba trò×năm skin tại
+320/412/1024, nhớ tab/reload, initialChest, mở/đổi tab/kết quả bền, keyboard,
+30chu kỳ rời/vào tab). Bổ sung actualdock320/412 default/storybook và claim
+flow2/2; sau đó actualdock+mission/collectionscroll2/2 đạt. Ảnh thật đã xem
+ở runtime/qa/collection-tabs (ignored). Một vùng cuộn, tabs/dock giữ hiện.
+Build source cuối exit0: runtime/qa/collection-tabs-build.log. Không chạy
+fullcheck/emulator cho đổi UI; service/model/rules/economy không đổi.
+Không API/save/catalog ID/migration mới, không deploy/Hosting/APK/push.
+Chỉ cập nhật receipt chung; không đưa log/ảnh/test QA ignored vào commit.

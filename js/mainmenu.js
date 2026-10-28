@@ -14,7 +14,7 @@ import { gameState, resetGame } from "./gameState.js";
 import { openAppModal, showAppToast } from "./modal.js";
 import { createIcon } from "./icons.js";
 import { THEMES, getTheme, isThemePlayable } from "./themeCatalog.js";
-import { saveAppearance, subscribeToLocalCommit } from "./persistence.js";
+import { saveAppearance } from "./persistence.js";
 import { mountCatalogTabs } from "./catalogPreferences.js";
 import {
   clearActiveSession,
@@ -218,26 +218,28 @@ export async function showCollectionModal({
   tabs.setAttribute("role", "tablist");
   const grid = document.createElement("div");
   grid.className = "shop-item-grid";
-  const chestHost = document.createElement('div'); chestHost.hidden = true;
-  let disposeChest = null, collectionScroll = 0;
-  const collectionScroller = content.closest('.app-modal__body');
-  const chestEntry = document.createElement('button'); chestEntry.type = 'button';
-  chestEntry.className = 'tab-button';
-  const updateChestEntry=()=>{const chests=gameState.appearance.spark?.state?.chests;chestEntry.textContent=chests?`Kho rương · ${Object.keys(chests.earned).reduce((sum,type)=>sum+chests.earned[type]-chests.spent[type],0).toLocaleString('vi-VN')} chưa mở`:'Kho rương';};updateChestEntry();
-  collectionScope.own(subscribeToLocalCommit(({patch})=>{if(patch.appearance)updateChestEntry();}));
+  let disposeChest = null, collectionTabs = null, activeTab = null;
+  tabs.classList.add('collection-tabs');
   const openChests = () => {
-    collectionScroll = collectionScroller ? collectionScroller.scrollTop : 0;
-    tabs.hidden = grid.hidden = chestEntry.hidden = true; chestHost.hidden = false;
-    disposeChest?.();
-    disposeChest = mountChestInventory(chestHost, { owner: collectionScope, gameId, profile:fromGame?null:()=>{modal.destroy();void openPlayerProfile(surface);}, back: () => {
-      disposeChest?.(); disposeChest = null; chestHost.replaceChildren(); chestHost.hidden = true;
-      tabs.hidden = grid.hidden = chestEntry.hidden = false; updateChestEntry();chestEntry.focus({preventScroll:true});
-      if (collectionScroller) collectionScroller.scrollTop = collectionScroll;
-    } });
+    if (collectionScope.active && collectionTabs) void collectionTabs.activate('chests', { focus: true });
   };
-  chestEntry.onclick = openChests;
-  if (festivalChestsEnabled()) content.append(chestEntry);
-  content.append(tabs, grid, chestHost);
+  const renderChests = () => {
+    grid.className = 'shop-item-grid collection-chest-panel';
+    grid.replaceChildren();
+    disposeChest = mountChestInventory(grid, { owner: collectionScope, gameId,
+      profile: fromGame ? null : () => { modal.destroy(); void openPlayerProfile(surface); } });
+  };
+  const mountCollectionTabs = entries => mountCatalogTabs({ gameId, surface: 'collection', tablist: tabs, panel: grid,
+    tabs: [...entries, ...(festivalChestsEnabled() ? [{ id: 'chests', label: 'Kho rương', render: renderChests }] : [])]
+      .map(entry => ({ ...entry, render: () => {
+        if (!collectionScope.active || activeTab === 'chests' && entry.id === 'chests') return;
+        disposeChest?.(); disposeChest = null;
+        activeTab = entry.id;
+        entry.render();
+        grid.scrollTop = 0;
+      } })),
+  });
+  content.append(tabs, grid);
 
   const renderAppearance = () => {
     grid.className = "shop-item-grid shop-item-grid--appearance";
@@ -366,12 +368,12 @@ export async function showCollectionModal({
       group.append(heading, choices);
       grid.append(group);
     };
-    (await mountCatalogTabs({ gameId, surface: "collection", tablist: tabs, panel: grid, tabs: [
+    collectionTabs = await mountCollectionTabs([
       { id: "pictures", label: "Thành tích", render: () => renderMasteryCollection(grid, gameId, { block: collectionBlock, owner: collectionScope, onOpenChests:openChests }) },
       { id: "themes", label: "Chủ đề", render: renderThemes },
       { id: "path", label: "Đường nối", render: () => renderLinkEffects("Hiệu ứng đường nối", "linkPathEffect", "ownedLinkPathEffects", LINK_PATH_EFFECTS) },
       { id: "exit", label: "Xóa thẻ", render: () => renderLinkEffects("Hiệu ứng xóa thẻ", "linkExitEffect", "ownedLinkExitEffects", LINK_EXIT_EFFECTS) },
-    ] }));
+    ]);
   } else if (gameId === "triple-connect") {
     const renderTripleEffects = (title, kind, ownedKey, equippedKey, effects) => {
       grid.className = "shop-item-grid shop-item-grid--appearance";
@@ -419,19 +421,19 @@ export async function showCollectionModal({
       group.append(heading, choices);
       grid.append(group);
     };
-    (await mountCatalogTabs({ gameId, surface: "collection", tablist: tabs, panel: grid, tabs: [
+    collectionTabs = await mountCollectionTabs([
       { id: "pictures", label: "Thành tích", render: () => renderMasteryCollection(grid, gameId, { block: collectionBlock, owner: collectionScope, onOpenChests:openChests }) },
       { id: "themes", label: "Chủ đề", render: renderThemes },
       { id: "path", label: "Đường nối", render: () => renderTripleEffects("Hiệu ứng đường nối", "path", "ownedTriplePathEffects", "triplePathEffect", LINK_PATH_EFFECTS) },
       { id: "exit", label: "Xóa thẻ", render: () => renderTripleEffects("Hiệu ứng xóa thẻ", "exit", "ownedTripleExitEffects", "tripleExitEffect", LINK_EXIT_EFFECTS) },
-    ] }));
+    ]);
   } else {
-    (await mountCatalogTabs({ gameId, surface: "collection", tablist: tabs, panel: grid, tabs: [
+    collectionTabs = await mountCollectionTabs([
       { id: "pictures", label: "Thành tích", render: () => renderMasteryCollection(grid, gameId, { block: collectionBlock, owner: collectionScope, onOpenChests:openChests }) },
       { id: "appearance", label: "Ngoại hình", render: renderAppearance },
       { id: "flip", label: "Hiệu ứng lật", render: renderFlipEffects },
       { id: "themes", label: "Chủ đề", render: renderThemes },
-    ] }));
+    ]);
   }
   if (initialChest && festivalChestsEnabled()) openChests();
   return modal;

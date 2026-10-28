@@ -25,7 +25,7 @@ export async function setCatalogTab(gameId, surface, tabId) {
  * changes the preference: only an explicit user selection is persisted.
  */
 export async function mountCatalogTabs({ gameId, surface, tabs, tablist, panel }) {
-  const availableTabs = tabs.map(({ id }) => id).filter((id) => TAB_IDS.has(id));
+  const availableTabs = tabs.map(({ id }) => id).filter((id) => TAB_IDS.has(id) || surface === "collection" && id === "chests");
   if (!SURFACES.has(surface) || !availableTabs.length) {
     throw new Error("Catalog navigation requires a supported surface and tab.");
   }
@@ -41,7 +41,8 @@ export async function mountCatalogTabs({ gameId, surface, tabs, tablist, panel }
   const activate = async (tabId, { persist = false, focus = false } = {}) => {
     if (!availableTabs.includes(tabId)) return false;
     const previousId = selectedId;
-    const saving = persist ? setCatalogTab(gameId, surface, tabId) : Promise.resolve(true);
+    // Chest navigation is local to this opening; keep the saved catalog schema unchanged.
+    const saving = persist && TAB_IDS.has(tabId) ? setCatalogTab(gameId, surface, tabId) : Promise.resolve(true);
     selectedId = tabId;
     for (const [id, button] of buttons) {
       const selected = id === tabId;

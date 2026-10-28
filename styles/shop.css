@@ -214,6 +214,30 @@
   gap: 12px;
 }
 
+/* Collection has exactly two rows: compact tabs and the active scrolling panel. */
+#collection-modal .collection-content > [role="tabpanel"] { min-height: 0; overflow-y: auto; }
+#collection-modal .collection-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-self: start;
+  gap: 6px;
+  overflow: visible;
+}
+#collection-modal .collection-tabs > .shop-tab {
+  min-width: 0;
+  min-height: 48px;
+  padding: 8px 6px;
+  white-space: normal;
+  line-height: 1.25;
+}
+#collection-modal .collection-chest-panel .liveops { color: var(--ui-ink); }
+#collection-modal .collection-chest-panel .liveops__status { min-height: 1.4em; margin: 0 0 12px; }
+#collection-modal .collection-chest-panel .liveops__last-result:empty { display: none; }
+#collection-modal .shop-item-grid.collection-chest-panel {
+  display: block;
+  overflow-y: auto;
+}
+
 .collection-content > p {
   margin: 0;
 }

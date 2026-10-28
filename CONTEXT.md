@@ -28,6 +28,15 @@
   `VITE_FESTIVAL_CHESTS_ENABLED`. Chúng là mã kỹ thuật cũ, nay mang nghĩa
   Sưu tập huy hiệu; không đổi schema/save key/formatVersion2 hoặc rules.
   Mọi tiến độ cũ được tiếp tục tự động, không migration/reset.
+- Sửa Bộ sưu tập28/10: Kho rương là tab thứ năm trong cả ba trò, cạnh
+  các tab tính năng hiện có; bỏ nút riêng đứng trước tablist. Root đúng
+  hai hàng (tabs gọn48px, panel nội dung cuộn), tránh hàng tab bị kéo cao.
+  Kho rương mở theo initialChest/lối tắt sẽ chọn tab đó, giữ thanh tab
+  hiện; rời tab hủy childscope, kết quả đã mở đọc lại từ state. Tab rương
+  chỉ chọn trong lần mở hiện tại, không thêm enum/schema settings lưu;
+  preference các tab cũ giữ nguyên. Đổi tab bắt đầu đầu nội dung, không
+  giả khôi phục scroll trước khi dữ liệu bất đồng bộ tải xong. Không đổi
+  thưởng/guard mở rương trong ván; CSS chỉ scope Bộ sưu tập, không Shop.
 - Kho rương chung trong Bộ sưu tập:4card C/Khung/Avatar/Huy hiệu, số lượng
   gộp, mở1, xem pool/tỷ lệ/chọn trò hỗ trợ, gallery12món/trang. Trong ván
   chỉ xem. Nhận rương tách ownership; đồ/grant bền cũ/sáu effect/300Xu/
