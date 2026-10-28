@@ -138,10 +138,15 @@
 @media (prefers-reduced-motion: reduce) { .app-screen-content > .app-modal { animation: none; } }
 .adventure-map-node--level { display: grid; place-items: center; box-sizing: border-box; padding: 0; line-height: 1; }
 .adventure-level-number { display: block; text-align: center; letter-spacing: 0; font-variant-numeric: tabular-nums; }
-.adventure-special-modes { position: absolute; left: 8px; bottom: 8px; z-index: 2; display: grid; gap: 8px; }
-.adventure-special-mode { display: grid; justify-items: center; gap: 3px; width: 64px; min-height: 70px; padding: 0; border: 0; background: transparent; color: #ffe3a1; font: 700 11px/1.25 "Segoe UI", sans-serif; text-shadow: 0 1px 3px #071321; }
-.adventure-special-mode .ui-icon { width: 48px; height: 48px; box-sizing: border-box; padding: 10px; border: 2px solid #bfa26b; border-radius: 50%; background: linear-gradient(#29485b, #132c40); box-shadow: 0 2px 5px #0008; }
-.adventure-special-mode[data-special-mode="challenge"] .ui-icon { border-radius: 16px; background: linear-gradient(#3e4169, #192c42); }
+.adventure-special-modes { --sign-top:#785239; --sign-bottom:#3d2d23; --sign-line:#c09a61; position:absolute; left:8px; bottom:8px; z-index:2; display:grid; gap:8px; box-sizing:border-box; width:80px; padding:10px 6px; border:2px solid var(--sign-line); border-radius:12px; background:linear-gradient(100deg,var(--sign-top),var(--sign-bottom)); box-shadow:inset 0 0 0 2px #ffffff12,0 4px 0 #231a15,0 5px 9px #0005; }
+.adventure-special-modes::before { content:''; position:absolute; left:13px; right:13px; top:-20px; height:20px; border-inline:3px solid #a98758; pointer-events:none; }
+.adventure-special-modes::after { content:''; position:absolute; left:6px; right:6px; top:-23px; height:6px; border:1px solid var(--sign-line); border-radius:4px; background:var(--sign-bottom); pointer-events:none; }
+.adventure-special-mode { display:grid; justify-items:center; gap:4px; width:64px; max-width:100%; min-height:70px; padding:0; border:0; background:transparent; color:#fff0cf; font:700 11px/1.25 'Segoe UI',sans-serif; text-shadow:0 1px 2px #0009; }
+.adventure-special-mode .ui-icon { width:46px; height:46px; box-sizing:border-box; padding:10px; border:2px solid #e2be78; border-radius:50%; background:linear-gradient(#52765c,#203e34); color:#fff3c7; box-shadow:inset 0 2px 0 #fff4,0 3px 0 #251b14; }
+.adventure-special-mode[data-special-mode='challenge'] .ui-icon { border-radius:50%; background:linear-gradient(#9a743c,#493719); }
+.adventure-special-mode:active:not(:disabled) .ui-icon { transform:translateY(2px); box-shadow:inset 0 1px #fff4,0 1px 0 #251b14; }
+html[data-ui-skin='starship'] .adventure-special-modes { --sign-top:#2e5365; --sign-bottom:#152d40; --sign-line:#8dc9d5; }
+html[data-ui-skin='papercut'] .adventure-special-modes { --sign-top:#789775; --sign-bottom:#4e6c50; --sign-line:#d4ddab; }
 .adventure-special-mode:focus-visible { outline: 2px solid #ffe3a1; outline-offset: 2px; border-radius: 12px; }
 .adventure-special-mode:disabled { opacity: .5; cursor: default; }
 .adventure-level-dialog { border: 1px solid #e9ce8e; background: linear-gradient(145deg, #18384a, #091d31); color: #edf4eb; box-shadow: 0 16px 48px #0009; }
@@ -163,7 +168,15 @@
 .adventure-level-modes label.is-locked input { pointer-events: none; }
 .adventure-level-modes label.is-locked:focus-visible { outline: 2px solid #ffe1a0; outline-offset: 4px; border-radius: 50%; }
 .adventure-level-modes .adventure-difficulty-lock { position: absolute; right: -2px; bottom: -2px; width: 20px; height: 20px; padding: 3px; box-sizing: border-box; border-radius: 50%; color: #ffe4aa; background: #102e37; border: 1px solid #b79b60; pointer-events: none; }
-.adventure-level-details { display: grid; gap: 5px; margin: 0; padding-left: 18px; color: #f2dfb6; font-size: 14px; }
+.adventure-level-details { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:0; padding:0; list-style:none; color:var(--ui-ink); }
+.adventure-preview-metric { display:grid; justify-items:center; align-content:start; gap:5px; min-width:0; padding:12px 8px; border:1px solid var(--ui-line); border-radius:14px; background:linear-gradient(145deg,var(--ui-raised),var(--ui-inset)); text-align:center; box-shadow:inset 0 1px #fff3,0 2px 0 #0002; }
+.adventure-preview-metric > .ui-icon { width:32px; height:32px; color:var(--ui-ink); }
+.adventure-preview-label { font-size:12px; color:var(--ui-muted); }
+.adventure-preview-metric strong { font-size:20px; line-height:1.2; overflow-wrap:anywhere; }
+.adventure-preview-metric small { font-size:11px; line-height:1.4; color:var(--ui-muted); }
+.adventure-preview-metric--theme { grid-column:1/-1; grid-template-columns:32px auto minmax(0,1fr); align-items:center; justify-items:start; text-align:left; gap:8px; }
+.adventure-preview-metric--theme strong { font-size:15px; justify-self:end; }
+
 
 /* Illustration bases keep live navigation labels, grade letters and level numbers. */
 

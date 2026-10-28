@@ -15,3 +15,7 @@ html[data-ui-skin='starship'] :is(#shop-modal,#adventure-level-modal) button.ui-
 #shop-modal .shop-item-title > .ui-icon { box-sizing:border-box; width:34px; height:34px; padding:6px; border:1px solid var(--ui-line); border-radius:10px; background:var(--ui-inset); color:var(--ui-ink); }
 #shop-modal :is(.appearance-preview,.link-effect-preview) > .ui-icon { color:var(--ui-ink); }
 @media(prefers-reduced-motion:reduce) { :is(#shop-modal,#adventure-level-modal) button.ui-raised-action { transition:none; } }
+
+#menu-container #adventure-level-modal button.ui-raised-action, #adventure-level-modal button.ui-raised-action { --raised-top:#65c94c; --raised-bottom:#28843a; --raised-edge:#155528; --raised-ink:#fffbdc; border-color:#a2d773; min-height:64px; width:100%; font-size:24px; text-shadow:0 1px 2px #194728; }
+#adventure-level-modal .app-modal__footer { display:block; padding-bottom:20px; }
+#adventure-level-modal .ui-raised-action > .ui-icon { width:28px; height:28px; color:inherit; }

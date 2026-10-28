@@ -20,3 +20,6 @@ Các số75s/6cặp/5s chỉ tham chiếu; lấy thông số của game/mode/mà
 
 M1 nguồn đã commit4bf4129. M2 đã thêm vật liệu nút mua có cạnh5px/pressed4px
 và nền icon dùng cặp ui-ink/ui-inset; không đổi giá/handler. QA gom ở Q.
+
+M2 nguồn793bcf6. M3 ô thông số/CTA và bảng treo đã tích hợp, dữ liệu vẫn
+đọc adapter/getPreviewDurationMs hiện hành; không hardcode ví dụ.

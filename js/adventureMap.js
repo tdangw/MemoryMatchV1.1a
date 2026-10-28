@@ -1,3 +1,5 @@
+import '../styles/raised-actions.css';
+import { getPreviewDurationMs } from './config.js';
 import { getTheme } from "./themeCatalog.js";
 import { getEquippedThemeId } from "./appearance.js";
 import { createIcon } from "./icons.js";
@@ -353,12 +355,23 @@ export function mountAdventureMap(gameId) {
       const info = adapter.preview({ mode: selectedMode(), level, startedLevels: { ...adjacentStarted, ...profile.startedLevels } });
       const theme = getTheme(getEquippedThemeId(gameState.appearance, gameId));
       goal.textContent = info.goal || adapter.goal;
-      details.replaceChildren(...[
-        `Thời gian: ${info.timeSeconds === 0 ? "Không giới hạn" : `${info.timeSeconds} giây`}`,
-        `Mục tiêu: ${info.target}`,
-        `Gợi ý: ${info.hints}${info.assistNote ? ` · ${info.assistNote}` : ""}`,
-        `Chủ đề: ${theme.title}`,
-      ].map(text => { const row = document.createElement("li"); row.textContent = text; return row; }));
+      const metric = (icon, label, value, note = '') => {
+        const tile = document.createElement('li'); tile.className = 'adventure-preview-metric';
+        const caption = document.createElement('span'); caption.className = 'adventure-preview-label'; caption.textContent = label;
+        const number = document.createElement('strong'); number.textContent = value;
+        tile.append(createIcon(icon), caption, number);
+        if (note) { const hint = document.createElement('small'); hint.textContent = note; tile.append(hint); }
+        return tile;
+      };
+      const stats = [
+        metric(info.timeSeconds === 0 ? 'infinity' : 'timer', 'Thời gian', info.timeSeconds === 0 ? 'Không giới hạn' : `${info.timeSeconds}s`),
+        metric('cards', 'Mục tiêu', `${info.tileCount / (gameId === 'triple-connect' ? 3 : 2)} ${gameId === 'triple-connect' ? 'bộ ba' : 'cặp'}`, `${info.tileCount} thẻ · ${info.waves} đợt`),
+      ];
+      if (gameId === 'memory-match') stats.push(metric('eye', 'Xem trước', `${getPreviewDurationMs(selectedMode()) / 1000}s`));
+      stats.push(metric('wand', 'Gợi ý', `${info.hints} lượt`));
+      if (gameId === 'triple-connect') stats.push(metric('collection', 'Khay thẻ', info.assistNote));
+      const themeTile = metric(theme.icon || 'images', 'Chủ đề', theme.title); themeTile.classList.add('adventure-preview-metric--theme');
+      stats.push(themeTile); details.replaceChildren(...stats);
     }
     updatePreview();
     if (!specialMode) content.append(choices);
@@ -389,9 +402,10 @@ export function mountAdventureMap(gameId) {
     const releaseLockedKey = scope.listen(choices, 'keydown', explainLockedDifficulty);
     const modal = openAppModal({ id: "adventure-level-modal", title: title(), content, owner: scope, keepBanner: true,
       onDestroy: () => { release?.(); releaseLockedClick(); releaseLockedKey(); },
-      actions: [{ label: "Chơi", variant: "primary", sound: 'gameStart', onClick: async () => await launch(selectedMode(), level, { skipIntro: true }) ? undefined : false }],
+      actions: [{ label: "Chơi", icon: "play", variant: "primary", sound: 'gameStart', onClick: async () => await launch(selectedMode(), level, { skipIntro: true }) ? undefined : false }],
     });
     modal.panel.classList.add("adventure-level-dialog");
+    modal.panel.querySelector(".app-button--primary").classList.add("ui-raised-action");
     modal.panel.setAttribute("aria-label", `${game.title} · ${title()}`);
   }
   function openSpecialMode(mode) { openLevel(1, mode); }
