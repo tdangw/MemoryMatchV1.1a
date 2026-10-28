@@ -12,6 +12,8 @@
   Không banner rương ngang, không chữ dài trên lối tắt; chi tiết/tiến độ
   giữ ở popup/aria. Màn ngang tách hai khung trái để không chồng. Lối tắt
   dùng cùng navigate/page owner với dock, không mở luồng thưởng mới.
+  Ba khung rộng60px, lề mép2px; giảm đệm/icon, vùng bấm tối thiểu48px.
+  Nhãn chế độ giữ một dòng; ví thẳng mép với khung bên phải.
 - Shop dùng màu icon/chữ đúng nền theo skin. Nút mua/Play nổi nhẹ2px,
   nhấn1px; Hủy/Mua ngay cùng kích thước và độ nổi, màu phân cấp. Play
   xanh lớn64px. Chỉ CSS/SVG, không emoji/loop, có reduced-motion.

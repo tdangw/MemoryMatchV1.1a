@@ -54,3 +54,9 @@ chạy bằng chứng trên. Không tuyên bố FPS/kiểm chứng native vật 
 Commits: M1 4bf4129; M2 793bcf6; M3 542deac; sửa hợp đồng ví f63e2ec;
 Q chứa chỉnh theo phản hồi cuối, nghiệm thu và đồng bộ context. Không
 stage log/ảnh/test QA ignored hoặc thay đổi gameplay/drop task song song.
+
+Điều chỉnh khung bản đồ theo phản hồi28/10: ba khung72→60px, mép trái/phải
+2px, giảm đệm/khoảng cách/icon; ví thẳng mép phải, nhãn chế độ một dòng.
+Vùng bấm tối thiểu48px. CSS ownership đạt; kiểm tra bố cục320/412/844×390
+trên năm skin đạt3/3, không chồng khung/nút màn1, đã xem ảnh dọc/ngang.
+Chỉ đổi CSS, giữ logic/API/save; không build/deploy/APK cho lượt chỉnh này.

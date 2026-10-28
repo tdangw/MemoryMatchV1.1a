@@ -138,11 +138,11 @@
 @media (prefers-reduced-motion: reduce) { .app-screen-content > .app-modal { animation: none; } }
 .adventure-map-node--level { display: grid; place-items: center; box-sizing: border-box; padding: 0; line-height: 1; }
 .adventure-level-number { display: block; text-align: center; letter-spacing: 0; font-variant-numeric: tabular-nums; }
-.adventure-special-modes { --sign-top:#785239; --sign-bottom:#3d2d23; --sign-line:#c09a61; position:absolute; left:8px; bottom:8px; z-index:2; display:grid; gap:8px; box-sizing:border-box; width:72px; padding:10px 8px; border:2px solid var(--sign-line); border-radius:12px; background:linear-gradient(100deg,var(--sign-top),var(--sign-bottom)); box-shadow:inset 0 0 0 2px #ffffff12,0 4px 0 #231a15,0 5px 9px #0005; }
+.adventure-special-modes { --sign-top:#785239; --sign-bottom:#3d2d23; --sign-line:#c09a61; position:absolute; left:2px; bottom:4px; z-index:2; display:grid; gap:6px; box-sizing:border-box; width:60px; padding:6px 4px; border:2px solid var(--sign-line); border-radius:12px; background:linear-gradient(100deg,var(--sign-top),var(--sign-bottom)); box-shadow:inset 0 0 0 2px #ffffff12,0 4px 0 #231a15,0 5px 9px #0005; }
 .adventure-special-modes::before { content:''; position:absolute; left:13px; right:13px; top:-20px; height:20px; border-inline:3px solid #a98758; pointer-events:none; }
 .adventure-special-modes::after { content:''; position:absolute; left:6px; right:6px; top:-23px; height:6px; border:1px solid var(--sign-line); border-radius:4px; background:var(--sign-bottom); pointer-events:none; }
-.adventure-special-mode { display:grid; justify-items:center; gap:4px; width:64px; max-width:100%; min-height:70px; padding:0; border:0; background:transparent; color:#fff0cf; font:700 11px/1.25 'Segoe UI',sans-serif; text-shadow:0 1px 2px #0009; }
-.adventure-special-mode .ui-icon { width:46px; height:46px; box-sizing:border-box; padding:10px; border:2px solid #e2be78; border-radius:50%; background:linear-gradient(#52765c,#203e34); color:#fff3c7; box-shadow:inset 0 2px 0 #fff4,0 3px 0 #251b14; }
+.adventure-special-mode { display:grid; justify-items:center; gap:3px; width:48px; max-width:100%; min-height:62px; padding:0; border:0; background:transparent; color:#fff0cf; font:700 10px/1.2 'Segoe UI',sans-serif; white-space:nowrap; text-shadow:0 1px 2px #0009; }
+.adventure-special-mode .ui-icon { width:42px; height:42px; box-sizing:border-box; padding:8px; border:2px solid #e2be78; border-radius:50%; background:linear-gradient(#52765c,#203e34); color:#fff3c7; box-shadow:inset 0 2px 0 #fff4,0 3px 0 #251b14; }
 .adventure-special-mode[data-special-mode='challenge'] .ui-icon { border-radius:50%; background:linear-gradient(#9a743c,#493719); }
 .adventure-special-mode:active:not(:disabled) .ui-icon { transform:translateY(2px); box-shadow:inset 0 1px #fff4,0 1px 0 #251b14; }
 html[data-ui-skin='starship'] .adventure-special-modes { --sign-top:#2e5365; --sign-bottom:#152d40; --sign-line:#8dc9d5; }
@@ -193,12 +193,12 @@ html[data-ui-skin='papercut'] .adventure-special-modes { --sign-top:#789775; --s
 .adventure-map-node--level:disabled .adventure-level-lock { display: block; position: absolute; right: -3px; bottom: -1px; width: 17px; height: 17px; padding: 2px; box-sizing: border-box; border: 1px solid #dfd1a1; border-radius: 5px; background: #132a30; color: #fff4d6; }
 .adventure-map-node--level.is-mode-cleared { background: var(--ui-art-grade-b) center / 100% 100% no-repeat; color: #fff; }
 
-.adventure-map-shortcuts { --sign-top:#785239; --sign-bottom:#3d2d23; --sign-line:#c09a61; position:absolute; z-index:3; left:8px; top:26px; display:grid; gap:8px; width:72px; box-sizing:border-box; padding:8px; border:2px solid var(--sign-line); border-radius:12px; background:linear-gradient(100deg,var(--sign-top),var(--sign-bottom)); box-shadow:inset 0 0 0 2px #fff1,0 3px 0 #231a15; }
+.adventure-map-shortcuts { --sign-top:#785239; --sign-bottom:#3d2d23; --sign-line:#c09a61; position:absolute; z-index:3; left:2px; top:26px; display:grid; gap:6px; width:60px; box-sizing:border-box; padding:6px 4px; border:2px solid var(--sign-line); border-radius:12px; background:linear-gradient(100deg,var(--sign-top),var(--sign-bottom)); box-shadow:inset 0 0 0 2px #fff1,0 3px 0 #231a15; }
 .adventure-map-shortcuts::before { content:''; position:absolute; left:12px; right:12px; top:-17px; height:17px; border-inline:3px solid #a98758; pointer-events:none; }
-.adventure-map-shortcuts--events { left:auto; right:12px; top:68px; }
-.adventure-map-page .adventure-map-shortcuts > .adventure-map-shortcut { display:grid; place-items:center; box-sizing:border-box; width:52px; height:52px; min-height:48px; min-width:48px; margin:0; padding:7px; border:2px solid #ddbd7e; border-image:none; border-radius:50%; background:linear-gradient(#536c53,#253e35); color:#fff1c9; box-shadow:inset 0 1px #fff5,0 2px 0 #251b14; }
-.adventure-map-shortcut > .ui-icon { width:28px; height:28px; color:inherit; }
-.adventure-map-shortcuts .treasure-map-card .treasure-art { width:36px; height:34px; }
+.adventure-map-shortcuts--events { left:auto; right:2px; top:68px; }
+.adventure-map-page .adventure-map-shortcuts > .adventure-map-shortcut { display:grid; place-items:center; box-sizing:border-box; width:48px; height:48px; min-height:48px; min-width:48px; margin:0; padding:5px; border:2px solid #ddbd7e; border-image:none; border-radius:50%; background:linear-gradient(#536c53,#253e35); color:#fff1c9; box-shadow:inset 0 1px #fff5,0 2px 0 #251b14; }
+.adventure-map-shortcut > .ui-icon { width:26px; height:26px; color:inherit; }
+.adventure-map-shortcuts .treasure-map-card .treasure-art { width:32px; height:30px; }
 .adventure-map-shortcut[data-ready='true'] { outline:2px solid #bde786; outline-offset:1px; }
 .adventure-map-shortcut:focus-visible { outline:3px solid #fff0b5; outline-offset:3px; }
 .adventure-map-shortcut:disabled { opacity:.6; cursor:default; }
@@ -206,8 +206,8 @@ html[data-ui-skin='starship'] .adventure-map-shortcuts { --sign-top:#2e5365; --s
 html[data-ui-skin='papercut'] .adventure-map-shortcuts { --sign-top:#789775; --sign-bottom:#4e6c50; --sign-line:#d4ddab; }
 
 @media(max-height:500px) and (min-width:600px) {
-  .adventure-special-modes { left:88px; gap:4px; padding-block:6px; }
-  .adventure-map-shortcuts { top:14px; width:68px; padding:6px 8px; gap:4px; }
+  .adventure-special-modes { left:66px; gap:4px; padding-block:6px; }
+  .adventure-map-shortcuts { top:14px; width:60px; padding:6px 4px; gap:4px; }
   .adventure-map-shortcuts--events { top:52px; }
   .adventure-map-page .adventure-map-shortcuts > .adventure-map-shortcut { width:48px; height:48px; padding:5px; }
 }
