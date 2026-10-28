@@ -59,8 +59,12 @@ let revealTimerRoundId = null;
 
 export function updateCoinDisplay(coins) {
   document
-    .querySelectorAll("#coin-balance, [data-shop-coin-balance]")
+    .querySelectorAll("#coin-balance, [data-shop-coin-balance]:not([data-app-coin-balance])")
     .forEach((element) => setHudText(element, coins));
+  for (const element of document.querySelectorAll('[data-app-coin-balance]')) {
+    element.textContent = coins.toLocaleString('vi-VN');
+    element.parentElement.setAttribute('aria-label', `Số Xu hiện có: ${element.textContent}`);
+  }
   getMemoryHud().coins(coins, { animating: isCoinCounterAnimating(memoryCoinElement) });
 }
 
