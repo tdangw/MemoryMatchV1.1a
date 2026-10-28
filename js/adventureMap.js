@@ -68,7 +68,7 @@ export function mountAdventureMap(gameId) {
   root.classList.add("game-shell-tokens");
   const title = document.createElement("h1");
   title.className = "adventure-map-title";
-  title.textContent = game.title;
+  const titleText = document.createElement("span"); titleText.className = "adventure-map-name"; titleText.textContent = game.title; title.append(titleText);
   mountPlayerHeaderPortrait(title,scope);
   root.querySelector(".adventure-header").insertBefore(title, root.querySelector(".adventure-account"));
   const specials = document.createElement("nav");

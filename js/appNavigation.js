@@ -1,3 +1,4 @@
+import { mountAppWallet } from './walletPresentation.js';
 import { setMeteorSceneEligible, suspendAmbientBackground } from './backgroundEffects.js';
 import { createIcon } from "./icons.js";
 import { gameState } from "./gameState.js";
@@ -56,6 +57,7 @@ export function decorateAdventureMenu(root, { gameId = null, onHome } = {}) {
   const header = document.createElement("header");
   header.className = "adventure-header";
   root.prepend(header);
+  mountAppWallet(header, scope);
   let screen = null;
   let adSlot = null;
   scope.own(() => clearMenuAdTarget(adSlot));
@@ -116,8 +118,7 @@ export function mountGameplayTouchEffects(root, scope) {
 }
 
 export function refreshAppWallet() {
-  const wallet = document.querySelector(".adventure-wallet");
-  if (wallet) wallet.replaceChildren(createIcon("coin"), document.createTextNode(gameState.coins.toLocaleString("vi-VN")));
+  for (const value of document.querySelectorAll('[data-app-coin-balance]')) value.textContent = gameState.coins.toLocaleString('vi-VN');
 }
 export function refreshAppAccount(state) {
   cloudState = state.phase;

@@ -1,3 +1,4 @@
+import { mountAppWallet } from './walletPresentation.js';
 import { connectDialogPlacement } from './dialogPlacement.js';
 import { suspendAmbientBackground } from './backgroundEffects.js';
 import { createIcon } from "./icons.js";
@@ -83,6 +84,7 @@ export function openAppModal({
   if (icon) heading.appendChild(createIcon(icon));
   heading.appendChild(document.createTextNode(title));
   header.appendChild(heading);
+  if (["shop-modal","collection-modal","rankings-modal","account-modal","settings-modal","missions-screen","events-screen"].includes(id)) mountAppWallet(header, lifecycle);
 
   let closed = false;
   let destroyed = false;

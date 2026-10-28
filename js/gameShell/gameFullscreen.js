@@ -1,8 +1,10 @@
+import { Capacitor } from '@capacitor/core';
 // Fullscreen belongs to the document so dialogs and level transitions stay visible.
 // Controls/listeners belong to the current shell mount; there is no polling loop.
 let focusMode = false;
 
 export function mountGameFullscreen({ root, title }, scope) {
+  if (Capacitor.isNativePlatform()) return;
   const button = document.createElement("button");
   button.type = "button";
   button.className = "shell-fullscreen-button";

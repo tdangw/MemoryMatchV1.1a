@@ -1,5 +1,12 @@
 # CONTEXT — Trạng thái hiện tại (2026-10-28)
 
+## Menu/Cửa hàng/Preview — task giao28/10
+
+Nguồn hiện hành MENU_SHOP_PREVIEW_UI_PLAN.md, toàn bộ M1/M2/M3/Q được giao.
+Thêm ví Xu cùng vị trí ở Home/map và mọi tab, sửa icon/nút mua, bảng treo
+chế độ, preview bằng ô icon và Play nổi, fullscreen chỉ web/Android immersive.
+Giữ giá/gameplay/save; chỉ web/compile, không APK/deploy.
+
 ## Sự kiện/Nhiệm vụ/Kho rương — nguồn hiện hành 28/10/2026
 
 - Đã hoàn tất triển khai P0–Q1 và chỉnh mỹ thuật V1–V3. Chủ dự án đổi

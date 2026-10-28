@@ -195,19 +195,6 @@ export async function openShopOverlay({
   });
   modal.overlay.dataset.fromMenu = String(fromMenu);
 
-  const wallet = document.createElement("div");
-  wallet.className = "shop-wallet";
-  wallet.setAttribute("aria-label", "Số Xu hiện có");
-  const walletValue = document.createElement("span");
-  // Đây là bản sao số Xu của modal, không dùng id trùng với HUD/menu.
-  // updateCoinDisplay() sẽ đồng bộ mọi ví đang hiển thị.
-  walletValue.dataset.shopCoinBalance = "";
-  walletValue.textContent = String(gameState.coins);
-  wallet.append(walletValue, createIcon("coin"));
-  const closeButton = modal.panel.querySelector(".app-modal__close");
-  modal.panel
-    .querySelector(".app-modal__header")
-    .insertBefore(wallet, closeButton);
 
   if (gameId === "link-connect") {
     (await mountCatalogTabs({ gameId, surface: "shop", tablist: tabs, panel: grid, tabs: [
