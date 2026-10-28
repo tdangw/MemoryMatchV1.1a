@@ -89,3 +89,13 @@ CSS ownership đạt; kiểm tra năm skin ở942×802/320×740/844×390 đạt3
 menu chính, missions/events/profile/ranking/settings, bản đồ/shop/collection;
 kiểm tra computed scrollbar ẩn và cuộn dọc bằng wheel/ngang bằng scrollLeft.
 Đã xem ảnh menu chính. Chỉ CSS, không đổi logic/save; không build/deploy/APK.
+
+29/10: Sửa lệch tên tab do h2 flex bám trái dù ô grid đã giữa; thêm căn giữa
+nội dung, giữ một dòng, header60px gồm cả popup (trước61px). Ownership
+header/heading thắng layout riêng Liveops/Cổ tích. Cổ tích giữ lề body/footer
+22px, header mở hết bề ngang và bỏ lề trên để cùng độ cao tên game.
+CSS ownership đạt; matrix320/412/1024 × năm skin đạt3/3: bảy tab chức năng,
+bản đồ ba trò, overlay dùng chung header trong game. Đo text Range, không
+chỉ bounding box h2: tâm chữ lệch<1px ngang, giữa dọc<3px, một dòng, không
+chồng Xu/X; header screen bắt đầu đúng top và cao60px. Đã xem ảnh default/
+storybook320. Không đổi JS/API/save, không build/deploy/APK.

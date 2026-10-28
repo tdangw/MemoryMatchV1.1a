@@ -4,6 +4,8 @@
 
 - Bổ sung29/10: ẩn thanh cuộn toàn giao diện tại style.css (chuẩn và WebKit),
   bao gồm menu chính/tab/popup; giữ overflow, cuộn ngang/dọc và snap hiện có.
+- Tiêu đề bảy tab chức năng căn giữa cả nội dung flex, không chỉ ô grid;
+  header60px đồng bộ tên game, áp dụng trang menu và popup trong game.
 - Tab chức năng: **Xu trái, tên giữa, X phải**; Cài đặt không có Xu.
   Ví chung có owner/subscription; không còn callback data.coins. Đọc
   patch.coins (kể cả0); reset/restore tải canonical có generation guard,
