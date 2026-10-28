@@ -75,3 +75,9 @@ không đổi bộ icon toàn app. Không timer/listener/asset bitmap mới.
 Syntax/CSS ownership đạt; matrix năm skin ×320/412/844×390 đạt3/3,
 không chồng nhóm hoặc màn1, vùng bấm48px; đã xem ảnh default/storybook.
 Giữ logic/API/save, không build/deploy/APK.
+
+Chốt mẫu viền nhỏ28/10: thêm khung46×94px nằm trong mỗi nhóm48×96px,
+nền tối gần đặc, viền1px và hai họa tiết góc nhỏ. Màu theo năm skin;
+giữ vị trí/icon/vùng bấm, không thêm dây treo hay animation. CSS ownership
+đạt; matrix bố cục năm skin ×320/412/844×390 và ảnh thực tế được rà soát.
+Không đổi logic/API/save; không build/deploy/APK.

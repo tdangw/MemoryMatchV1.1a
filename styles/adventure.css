@@ -138,7 +138,7 @@
 @media (prefers-reduced-motion: reduce) { .app-screen-content > .app-modal { animation: none; } }
 .adventure-map-node--level { display: grid; place-items: center; box-sizing: border-box; padding: 0; line-height: 1; }
 .adventure-level-number { display: block; text-align: center; letter-spacing: 0; font-variant-numeric: tabular-nums; }
-/* Map actions stay visually small; transparent hit areas remain 48px. */
+/* Inset frames preserve the existing 48px hit areas and map layout. */
 .adventure-special-modes { position:absolute; left:2px; bottom:4px; z-index:2; display:flex; flex-direction:column; gap:0; }
 .adventure-special-mode { display:grid; place-items:center; width:48px; height:48px; padding:0; border:0; border-radius:8px; background:transparent; color:#fff0cf; }
 .adventure-special-mode > span { display:none; }
@@ -199,8 +199,12 @@
 .adventure-map-shortcut:active:not(:disabled) { transform:translateY(1px); }
 .adventure-map-shortcut:disabled { opacity:.6; cursor:default; }
 
-.adventure-map-view { --map-art-light:#fff0b4; --map-art-gold:#dba94d; --map-art-dark:#765029; --map-art-body-light:#5e9b79; --map-art-body:#204f45; }
-html[data-ui-skin='woodland'] .adventure-map-view { --map-art-light:#ffe7ad; --map-art-gold:#d8a057; --map-art-dark:#704224; --map-art-body-light:#a47a4a; --map-art-body:#543a24; }
-html[data-ui-skin='papercut'] .adventure-map-view { --map-art-light:#fff2ce; --map-art-gold:#dfb36c; --map-art-dark:#79603f; --map-art-body-light:#a8bb87; --map-art-body:#5c7953; }
-html[data-ui-skin='starship'] .adventure-map-view { --map-art-light:#e5fcff; --map-art-gold:#8dc8d9; --map-art-dark:#3d697e; --map-art-body-light:#5a9cba; --map-art-body:#214b69; }
-html[data-ui-skin='storybook'] .adventure-map-view { --map-art-light:#fff2b3; --map-art-gold:#efb64a; --map-art-dark:#8d5024; --map-art-body-light:#569da2; --map-art-body:#254d70; }
+.adventure-map-shortcuts, .adventure-special-modes { isolation:isolate; }
+.adventure-map-shortcuts::before, .adventure-special-modes::before { content:''; position:absolute; inset:1px; z-index:-1; pointer-events:none; border:1px solid var(--map-art-gold); border-radius:10px 4px; background:var(--map-panel-bg); box-shadow:inset 0 0 0 1px #ffffff0a,0 1px 2px #00151f66; }
+.adventure-map-shortcuts::after, .adventure-special-modes::after { content:''; position:absolute; inset:4px; z-index:-1; pointer-events:none; background:radial-gradient(circle at 0 0,transparent 6px,var(--map-art-gold) 6.5px 7.5px,transparent 8px) top left/12px 12px no-repeat,radial-gradient(circle at 100% 100%,transparent 6px,var(--map-art-gold) 6.5px 7.5px,transparent 8px) bottom right/12px 12px no-repeat; }
+
+.adventure-map-view { --map-panel-bg:#0b2933f5; --map-art-light:#fff0b4; --map-art-gold:#dba94d; --map-art-dark:#765029; --map-art-body-light:#5e9b79; --map-art-body:#204f45; }
+html[data-ui-skin='woodland'] .adventure-map-view { --map-panel-bg:#302a20f5; --map-art-light:#ffe7ad; --map-art-gold:#d8a057; --map-art-dark:#704224; --map-art-body-light:#a47a4a; --map-art-body:#543a24; }
+html[data-ui-skin='papercut'] .adventure-map-view { --map-panel-bg:#273b2af5; --map-art-light:#fff2ce; --map-art-gold:#dfb36c; --map-art-dark:#79603f; --map-art-body-light:#a8bb87; --map-art-body:#5c7953; }
+html[data-ui-skin='starship'] .adventure-map-view { --map-panel-bg:#102637f5; --map-art-light:#e5fcff; --map-art-gold:#8dc8d9; --map-art-dark:#3d697e; --map-art-body-light:#5a9cba; --map-art-body:#214b69; }
+html[data-ui-skin='storybook'] .adventure-map-view { --map-panel-bg:#142c3ef5; --map-art-light:#fff2b3; --map-art-gold:#efb64a; --map-art-dark:#8d5024; --map-art-body-light:#569da2; --map-art-body:#254d70; }

@@ -10,7 +10,8 @@
   X góc phải, dưới ví là cặp icon dọc Nhiệm vụ/Sự kiện. Trên trái có
   cặp icon Kho báu/Bộ sưu tập; dưới trái là cặp icon Vô tận/Thử thách.
   Không banner rương ngang, không chữ dài trên lối tắt; chi tiết/tiến độ
-  giữ ở popup/aria. Ba khu vực không khung/dây treo/nhãn chữ. Lối tắt
+  giữ ở popup/aria. Ba khu vực có khung nhỏ nền tối/viền mảnh/họa tiết góc,
+  không dây treo/nhãn chữ; khung46×94px nằm trong vùng bấm48×96px. Lối tắt
   dùng cùng navigate/page owner với dock, không mở luồng thưởng mới.
   Cả ba cặp xếp dọc, icon30px/vùng bấm48px/lề mép2px. SVG minh họa
   có màu/khối đồng bộ rương, vật liệu theo năm skin; không dùng icon nét
