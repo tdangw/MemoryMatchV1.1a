@@ -94,8 +94,6 @@ html[data-ui-skin="woodland"] .adventure-map-page .adventure-header::before { co
 html[data-ui-skin="woodland"] .adventure-map-title { color: #fff1ce; }
 html[data-ui-skin="woodland"] .adventure-map-page .adventure-exit { background: url('/assets/ui/woodland/icon-base.webp') center / contain no-repeat; box-shadow: none; }
 html[data-ui-skin="woodland"] .app-modal[data-ui-surface] .app-modal__close { background: url('/assets/ui/woodland/icon-base.webp') center / contain no-repeat; color: #fff0c5; border-color: transparent; }
-html[data-ui-skin="woodland"] .adventure-special-mode .ui-icon { border-color: #d6a15c; background-color: #774323; color: #fff1ce; }
-html[data-ui-skin="woodland"] .adventure-special-mode[data-special-mode="endless"] .ui-icon { background-image: url('/assets/ui/woodland/icon-base.webp'); background-size: 100% 100%; }
 html[data-ui-skin="woodland"] :is(.adventure-level-goal, .adventure-level-details, .adventure-level-modes legend) { color: #654421; }
 html[data-ui-skin="woodland"] :is(#shop-modal, #collection-modal) .shop-buy-button { box-sizing: border-box; border: 10px solid transparent; border-image: url('/assets/ui/woodland/orange-normal.webp') 30 100 fill / 10px stretch; border-radius: 0; background: none; padding: 1px 4px; color: #fff4d3; text-shadow: 0 1px 2px #48240b; }
 html[data-ui-skin="woodland"] :is(#shop-modal, #collection-modal) .shop-buy-button:active:not(:disabled) { border-image-source: url('/assets/ui/woodland/orange-pressed.webp'); }

@@ -79,7 +79,7 @@ export function mountAdventureMap(gameId) {
   const shortcuts = document.createElement('nav'); shortcuts.className = 'adventure-map-shortcuts'; shortcuts.setAttribute('aria-label','Kho báu và Bộ sưu tập');
   const eventShortcuts = document.createElement('nav'); eventShortcuts.className = 'adventure-map-shortcuts adventure-map-shortcuts--events'; eventShortcuts.setAttribute('aria-label','Nhiệm vụ và Sự kiện');
   function shortcut(label, icon, destination) {
-    const control = button('', 'adventure-map-shortcut'); control.setAttribute('aria-label',label); control.append(createIcon(icon));
+    const control = button('', 'adventure-map-shortcut'); control.setAttribute('aria-label',label); control.title=label; control.append(createIcon(icon));
     scope.listen(control,'click',async()=>{
       if(control.disabled)return;control.disabled=true;
       try { await openMenuDestination(root,destination); }
@@ -96,6 +96,7 @@ export function mountAdventureMap(gameId) {
     const control = button("", "adventure-special-mode");
     control.dataset.specialMode = mode.id;
     control.setAttribute("aria-label", mode.label);
+    control.title = mode.label;
     control.append(createIcon(mode.id === "endless" ? "infinity" : "energy"));
     const label = document.createElement("span"); label.textContent = mode.label;
     control.append(label); specials.append(control);

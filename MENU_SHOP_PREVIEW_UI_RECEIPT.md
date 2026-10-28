@@ -60,3 +60,10 @@ stage log/ảnh/test QA ignored hoặc thay đổi gameplay/drop task song song.
 Vùng bấm tối thiểu48px. CSS ownership đạt; kiểm tra bố cục320/412/844×390
 trên năm skin đạt3/3, không chồng khung/nút màn1, đã xem ảnh dọc/ngang.
 Chỉ đổi CSS, giữ logic/API/save; không build/deploy/APK cho lượt chỉnh này.
+
+Phản hồi tiếp28/10 thay phương án khung60px: bỏ cả ba khung/dây treo và
+nhãn chế độ, mỗi khu vực là hai icon ngang28–30px với vùng bấm48px.
+Cặp phải ngay dưới Xu; cặp trái ở góc trên/dưới. Bỏ style nền icon chế độ
+woodland cũ; giữ aria và bổ sung title cho nút icon. CSS ownership và
+matrix năm skin × ba viewport320/412/844×390 đạt3/3; đã xem ảnh thực tế.
+Không đổi điều hướng/luật/save; không build/deploy/APK.
