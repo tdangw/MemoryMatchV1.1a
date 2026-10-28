@@ -264,3 +264,27 @@ Build source cuối exit0: runtime/qa/collection-tabs-build.log. Không chạy
 fullcheck/emulator cho đổi UI; service/model/rules/economy không đổi.
 Không API/save/catalog ID/migration mới, không deploy/Hosting/APK/push.
 Chỉ cập nhật receipt chung; không đưa log/ảnh/test QA ignored vào commit.
+
+## Quy ước tab ngang và card rương gọn — 28/10
+
+Chủ dự án đính chính: tab một hàng, không xuống dòng; nhiều tab thì cuộn
+ngang và ẩn scrollbar. Đã bỏ grid3cột mới ở Collection, giữ dải ngang cho
+Shop/Collection, Liveops, Hồ sơ và BXH. revealTab dùng chung cho Catalog/
+Liveops chỉ chỉnh scrollLeft để active tab hiện khi chọn/shortcut/keyboard,
+không kéo trục dọc. Không đổi owner, persistence hoặc enum settings.
+
+Bốn card dùng createIcon('chest') chung, tên/counter/CTA căn gọn, thao tác
+“Xem quà”/“Mở 1” giữ focuskey và guard cũ. Detail vẫn có tỷ lệ, pool, chọn
+trò và xác nhận. Footer tách khoảng cách, emptydetail ẩn. Nút tối thiểu48px,
+không đổi số lượng rương/quà/RNG/luồng mở. Màu/chữ theo skin, không bitmap mới.
+
+Review mã độc lập không có finding; helper mới đi cùng imports. Các ca
+catalogprefs/3game×5skin×320/412/1024/open/result/30switch đã đạt9ca. Một
+assert cũ đòi bắt buộc scroll>0 không còn đúng khi card mới vừa màn; đổi
+thành so vị trí cuối với scrollHeight-clientHeight, vẫn kiểm panel scroll
+và body không cuộn. Source cuối5/5 UI đạt:320 năm skin, actualdock320/412,
+strip nowrap/scrollbarẩn, active tab visible,4chestSVG/card<260px, Hồ sơ/
+BXH strip và luồng claim/open. Ảnh thật default/storybook đã xem; không
+chữ vụn/CTA bị cắt, root không tràn. Log chest-compact-final-ui.log và ảnh
+runtime/qa/collection-tabs ignored. Syntax4module/CSS ownership/build đạt;
+build log chest-compact-build.log. Không fullcheck/emulator/APK/Hosting/push.

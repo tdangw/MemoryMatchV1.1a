@@ -132,6 +132,7 @@
 }
 .shop-tabs {
   display: flex;
+  flex-wrap: nowrap;
   gap: 8px;
   overflow-x: auto;
   padding-bottom: 2px;
@@ -142,6 +143,7 @@
   display: none;
 }
 .shop-tab {
+  white-space: nowrap;
   flex: 0 0 auto;
   min-width: 102px;
   min-height: 44px;
@@ -217,17 +219,18 @@
 /* Collection has exactly two rows: compact tabs and the active scrolling panel. */
 #collection-modal .collection-content > [role="tabpanel"] { min-height: 0; overflow-y: auto; }
 #collection-modal .collection-tabs {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  display: flex;
+  flex-wrap: nowrap;
   align-self: start;
-  gap: 6px;
-  overflow: visible;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
 }
 #collection-modal .collection-tabs > .shop-tab {
-  min-width: 0;
+  flex: 0 0 auto;
   min-height: 48px;
-  padding: 8px 6px;
-  white-space: normal;
+  padding: 8px 14px;
+  white-space: nowrap;
   line-height: 1.25;
 }
 #collection-modal .collection-chest-panel .liveops { color: var(--ui-ink); }

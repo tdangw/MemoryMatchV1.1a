@@ -1,3 +1,4 @@
+import { revealTab } from './tabVisibility.js';
 import { gameState } from "./gameState.js";
 import { savePersistentGameData } from "./persistence.js";
 
@@ -52,7 +53,8 @@ export async function mountCatalogTabs({ gameId, surface, tabs, tablist, panel }
     }
     panel.setAttribute("aria-labelledby", `${baseId}-tab-${tabId}`);
     tabs.find(({ id }) => id === tabId).render();
-    if (focus) buttons.get(tabId).focus();
+    revealTab(tablist, buttons.get(tabId));
+    if (focus) buttons.get(tabId).focus({ preventScroll: true });
     if (!await saving) {
       await activate(previousId);
       return false;

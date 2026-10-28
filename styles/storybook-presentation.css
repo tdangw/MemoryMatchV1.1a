@@ -88,8 +88,9 @@ html[data-ui-skin='storybook'] .adventure-page .adventure-exit {
 .storybook-portrait__badge { position: absolute; width: 28%; height: 28%; left: 36%; top: 68.4%; object-fit: contain; }
 .storybook-customization__hero { text-align: center; height: 176px; }
 .storybook-customization__name { margin: 2px 0 12px; text-align: center; font-size: 19px; overflow-wrap: anywhere; }
-.storybook-tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px; margin-bottom: 12px; }
-.storybook-tab { min-height: 44px; padding: 5px 4px; border: 1px solid #997044; border-radius: 12px 12px 2px 2px; color: #fff1d2; background: #82562e; font: 800 13px/1.2 'Storybook Nunito', sans-serif; }
+.storybook-tabs { display: flex; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; gap: 2px; margin-bottom: 12px; }
+.storybook-tabs::-webkit-scrollbar { display: none; }
+.storybook-tab { flex: 1 0 auto; white-space: nowrap; min-height: 44px; padding: 5px 4px; border: 1px solid #997044; border-radius: 12px 12px 2px 2px; color: #fff1d2; background: #82562e; font: 800 13px/1.2 'Storybook Nunito', sans-serif; }
 .storybook-tab[aria-selected='true'] { color: #4b2916; background: #ffe2a0; border-color: #c38c2a; }
 .storybook-inventory { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .storybook-item { position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 0; padding: 8px 5px; border: 1px solid #d0af7b; border-radius: 12px; background: #e8cb9440; color: #4b2916; font-family: inherit; }

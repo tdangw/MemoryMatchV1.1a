@@ -30,13 +30,23 @@
   Mọi tiến độ cũ được tiếp tục tự động, không migration/reset.
 - Sửa Bộ sưu tập28/10: Kho rương là tab thứ năm trong cả ba trò, cạnh
   các tab tính năng hiện có; bỏ nút riêng đứng trước tablist. Root đúng
-  hai hàng (tabs gọn48px, panel nội dung cuộn), tránh hàng tab bị kéo cao.
+  hai hàng (một dải tab48px, panel nội dung cuộn), tránh hàng tab bị kéo cao.
   Kho rương mở theo initialChest/lối tắt sẽ chọn tab đó, giữ thanh tab
   hiện; rời tab hủy childscope, kết quả đã mở đọc lại từ state. Tab rương
   chỉ chọn trong lần mở hiện tại, không thêm enum/schema settings lưu;
   preference các tab cũ giữ nguyên. Đổi tab bắt đầu đầu nội dung, không
   giả khôi phục scroll trước khi dữ liệu bất đồng bộ tải xong. Không đổi
   thưởng/guard mở rương trong ván; CSS chỉ scope Bộ sưu tập, không Shop.
+- Quy ước tab chủ dự án chốt28/10: **một hàng, chữ không xuống dòng,
+  nhiều tab thì cuộn ngang, ẩn thanh cuộn**. Áp dụng Cửa hàng/Bộ sưu tập,
+  Sự kiện/Nhiệm vụ, Hồ sơ và Xếp hạng; không dùng bố cục tab3cột/2hàng.
+  Tab đang chọn được đưa vào vùng nhìn thấy bằng scrollLeft, không kéo
+  vị trí cuộn dọc. Giữ roving focus/ARIA và nhớ các lựa chọn cũ.
+- Card Kho rương dùng chung icon rương cho cả4loại; tên14px/căn giữa,
+  số lượng “Đang có: N”, nút48px “Xem quà” và “Mở 1”. Tỷ lệ/chọn trò/
+  xác nhận mở vẫn ở phần chi tiết; không đổi xác suất hoặc thao tác kinh tế.
+  Footer Hồ sơ/Tải lại có khoảng cách riêng, màu theo skin; không dùng
+  icon avatar/khung/huy hiệu để thay hình vật chứa rương.
 - Kho rương chung trong Bộ sưu tập:4card C/Khung/Avatar/Huy hiệu, số lượng
   gộp, mở1, xem pool/tỷ lệ/chọn trò hỗ trợ, gallery12món/trang. Trong ván
   chỉ xem. Nhận rương tách ownership; đồ/grant bền cũ/sáu effect/300Xu/

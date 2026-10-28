@@ -4,8 +4,9 @@
 html .liveops button.tab-button, html .liveops__sale button.tab-button { min-height: 48px; }
 .liveops__card h3 { margin: 0 0 12px; font-size: 1.1rem; }
 .liveops__card .tab-button { margin-block: 6px; width: 100%; white-space: normal; min-height: 48px; }
-.liveops__tabs { display: flex; gap: 8px; }
-.liveops__tabs > button { flex: 1; min-width: 0; min-height: 48px; white-space: normal; }
+.liveops__tabs { display: flex; flex-wrap: nowrap; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 3px; }
+.liveops__tabs::-webkit-scrollbar { display: none; }
+.liveops__tabs > button { flex: 1 0 auto; min-height: 48px; white-space: nowrap; }
 .liveops__tabs [aria-selected="true"] { outline: 2px solid currentColor; outline-offset: -3px; }
 .liveops__days { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
 .liveops__day { display: grid; gap: 8px; text-align: center; padding: 8px 2px; border: 1px solid #ad8a53; border-radius: 8px; font-size: .8rem; }
@@ -114,7 +115,7 @@ html[data-ui-skin="starship"] :is(#missions-screen,#events-screen).liveops-page 
 html .liveops-page .liveops-surface button.tab-button { box-sizing:border-box; min-height:48px; border:1px solid var(--lo-line); border-image:none; border-radius:24px; padding:8px 12px; font:inherit; font-weight:800; color:var(--lo-button-ink); text-shadow:0 1px 1px #0007; background:linear-gradient(var(--lo-button-top),var(--lo-button-bottom)); box-shadow:inset 0 2px 0 #ffffff38,0 3px 0 #0004; }
 html .liveops-page .liveops-surface button.tab-button:disabled { opacity:.65; filter:none; cursor:default; }
 html .liveops-page .liveops-surface button.tab-button:focus-visible { outline:3px solid var(--lo-gold); outline-offset:3px; }
-html .liveops-page .liveops-surface .liveops__tabs button { border-radius:22px; background:linear-gradient(var(--lo-panel),var(--lo-inset)); color:var(--lo-muted); }
+html .liveops-page .liveops-surface .liveops__tabs button { white-space: nowrap; border-radius:22px; background:linear-gradient(var(--lo-panel),var(--lo-inset)); color:var(--lo-muted); }
 html .liveops-page .liveops-surface .liveops__tabs button[aria-selected="true"] { color:var(--lo-gold); outline:2px solid var(--lo-line); outline-offset:-3px; box-shadow:inset 0 0 12px #e8d48726,0 2px 0 #0004; }
 .liveops-surface .liveops__progress { appearance:none; border:1px solid var(--lo-line); border-radius:20px; overflow:hidden; height:17px; background:var(--lo-inset); }
 .liveops-surface .liveops__progress::-webkit-progress-bar { background:var(--lo-inset); }
@@ -220,3 +221,18 @@ html .liveops-page .liveops-surface .liveops__festival-milestone > button { widt
   .liveops__recipe-reward > .ui-icon { width:48px; height:48px; }
 }
 html .liveops-page .liveops-surface :is(.liveops__tabs,.liveops__letter-grid) button.tab-button:focus-visible { outline:3px solid var(--lo-gold); outline-offset:3px; }
+
+/* Chest cards describe stored containers, with the same chest illustration for each type. */
+.liveops__chest-card { display: grid; align-content: start; justify-items: center; gap: 6px; min-width: 0; text-align: center; }
+.liveops__chest-card.liveops__card { padding: 10px; }
+.liveops__chest-card.liveops__card > .ui-icon { width: 48px; height: 48px; margin: 0; }
+.liveops__chest-card.liveops__card h3 { width: 100%; min-height: 2.5em; margin: 0; font-size: 14px; line-height: 1.25; display: grid; place-items: center; text-wrap: balance; }
+.liveops__chest-count { margin: 0 0 2px; font-size: 12px; line-height: 1.4; color: var(--ui-muted); }
+html .liveops__chest-card.liveops__card button.tab-button { width: 100%; min-height: 48px; margin: 0; padding: 6px 8px; border: 1px solid var(--ui-line); border-image: none; border-radius: 10px; background: var(--ui-raised); color: var(--ui-ink); font-family: inherit; font-size: 13px; font-weight: 700; line-height: 1.25; text-shadow: none; box-shadow: none; white-space: nowrap; }
+html .liveops__chest-card.liveops__card button.liveops__chest-open { background: var(--ui-primary); color: #fff8df; }
+html .liveops__chest-card.liveops__card button:disabled { opacity: .55; filter: none; }
+.liveops__chest-detail:empty { display: none; }
+.liveops__chest-detail p { font-size: 13px; line-height: 1.5; margin: 8px 0; }
+
+.liveops__chest-tools { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.liveops__chest-tools > button.tab-button { flex: 1 1 120px; min-height: 48px; padding: 8px; font-size: 13px; }

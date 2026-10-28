@@ -1,3 +1,4 @@
+import { revealTab } from '../tabVisibility.js';
 export function node(tag, className = '', text) {
   const element = document.createElement(tag); element.className = className;
   if (text !== undefined) element.textContent = text;
@@ -26,6 +27,7 @@ export function createTabs(id, items, initial, render) {
       if (current) { panel.setAttribute('aria-labelledby', buttons[index].id); if (focus) buttons[index].focus({preventScroll:true}); }
     });
     render(key, panel);
+    revealTab(root, buttons[items.findIndex(([value]) => value === key)]);
   }
   root.onkeydown = event => {
     const focused = buttons.indexOf(document.activeElement);

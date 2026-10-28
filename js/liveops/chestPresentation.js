@@ -25,8 +25,9 @@ export function mountChestInventory(host, { owner, back, profile, gameId = 'memo
   if (back) root.append(action('Quay lại Bộ sưu tập', back));
   root.append(status); host.replaceChildren(root);
   let view = null, busy = false, connected = false, selected = null, page = 0, pendingChest = null;
-  const lastResult = node('p', 'liveops__last-result'), cards = node('div', 'liveops__chest-grid'), detail = node('section', 'liveops__card'); root.append(lastResult, cards, detail);
-  if (profile) root.append(action('Xem trong Hồ sơ', profile));
+  const lastResult = node('p', 'liveops__last-result'), cards = node('div', 'liveops__chest-grid'), detail = node('section', 'liveops__card liveops__chest-detail'); root.append(lastResult, cards, detail);
+  const tools = node('div', 'liveops__chest-tools'); root.append(tools);
+  if (profile) tools.append(action('Xem trong Hồ sơ', profile));
   function render() {
     const focus = document.activeElement?.dataset.focusKey;
     cards.replaceChildren(); detail.replaceChildren();
@@ -35,11 +36,12 @@ export function mountChestInventory(host, { owner, back, profile, gameId = 'memo
     const chests = view.state.chests;
     if(chests.last)lastResult.textContent=`Lần mở gần nhất: ${rewardDescription(chests.last)}`;
     for (const type of CHEST_TYPES) {
-      const count = chests.earned[type] - chests.spent[type], card = node('section', 'liveops__card');
-      card.append(createIcon(type === 'c' ? 'chest' : type === 'avatar' ? 'profile' : type === 'frame' ? 'expand' : 'achievements'),
-        node('h3', '', CHEST_NAMES[type]), node('p', '', count ? `×${count.toLocaleString('vi-VN')}` : 'Chưa có'),
-        action('Xem quà & tỷ lệ', () => { selected = type; page = 0; render(); detail.querySelector('h3').focus(); }, false, `details-${type}`),
-        action('Mở 1 rương', () => { selected = type; page = 0; render(); detail.querySelector('select').focus(); }, busy || !connected || Boolean(getActiveGameScope()) || count < 1 || Boolean(pendingChest && pendingChest.chestType !== type), `open-${type}`));
+      const count = chests.earned[type] - chests.spent[type], card = node('section', 'liveops__card liveops__chest-card');
+      card.append(createIcon('chest'),
+        node('h3', '', CHEST_NAMES[type]), node('p', 'liveops__chest-count', `Đang có: ${count.toLocaleString('vi-VN')}`),
+        action('Xem quà', () => { selected = type; page = 0; render(); detail.querySelector('h3').focus(); }, false, `details-${type}`),
+        action('Mở 1', () => { selected = type; page = 0; render(); detail.querySelector('select').focus(); }, busy || !connected || Boolean(getActiveGameScope()) || count < 1 || Boolean(pendingChest && pendingChest.chestType !== type), `open-${type}`));
+      card.lastElementChild.classList.add('liveops__chest-open');
       cards.append(card);
     }
     if (selected) {
@@ -109,6 +111,6 @@ export function mountChestInventory(host, { owner, back, profile, gameId = 'memo
   if(account)scope.own(account.subscribe(()=>{
     if(scope.active&&!current()){view=null;connected=false;lastResult.textContent='';cards.replaceChildren();detail.replaceChildren();status.textContent='Tài khoản đã thay đổi. Mở lại Bộ sưu tập để xem Kho rương.';}
   }));
-  root.append(action('Tải lại Kho rương', () => void load())); void load();
+  tools.append(action('Tải lại Kho rương', () => void load())); void load();
   return () => { scope.dispose(); release.forget(); };
 }
