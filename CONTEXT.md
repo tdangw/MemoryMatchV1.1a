@@ -1,6 +1,6 @@
-# CONTEXT — Trạng thái hiện tại (2026-10-27)
+# CONTEXT — Trạng thái hiện tại (2026-10-28)
 
-## Mở lại mỹ thuật Nhiệm vụ/Sự kiện theo ba ảnh — 27/10/2026
+## Nghiệm thu mỹ thuật Nhiệm vụ/Sự kiện — 28/10/2026
 
 - Chủ dự án xác nhận giao diện hiện tại chưa đúng kế hoạch và cung cấp
   ảnh Vòng quay/Nhiệm vụ/Sưu tập chữ. P0–Q1 trước chỉ chứng minh chức năng;
@@ -13,6 +13,11 @@
 - Chủ dự án cho phép phát hành chỉ Firestore rules để thử Lễ hội. Đã phát
   hành và đọc lại khớp source; SHA256 d4f2f15a8c3135441adaf8e3883a5a70675fafad7651d191e9470a26a8f1619d.
   Đã bật VITE_FESTIVAL_CHESTS_ENABLED=1 trong .env.local; chưa Hosting/APK.
+- V1 c58ded0, V2 65fcd3f; V3 đã review ảnh thật và sửa cascade, tương phản,
+  focus, độ gọn lịch. Giữ luật thưởng/API/save; UI 14/14, matrix sau nén 6/6,
+  preview chưa có dữ liệu + gallery 2/2, vùng dưới 1/1 đạt. Năm skin,
+  320/360/412/844 chữ lớn/1024; một header/ví/đóng/dock, không tràn ngang.
+  Không nhận kiểm chứng S22/FPS điện thoại. Bằng chứng dùng receipt hiện có.
 
 ## Kế hoạch mới: rơi vật phẩm, năng lượng và thẻ đặc biệt ba trò — 27/10/2026
 

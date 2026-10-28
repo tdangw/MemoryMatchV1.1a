@@ -160,3 +160,42 @@ thưởng. Review độc lập logic không phát hiện lỗi; review CSS bắt
 cascade nút cùng tương phản canvas Cổ tích/Papercut, focus nút đã chọn.
 Unit điểm danh 1/1, UI lần đầu 13/13; V3 kiểm lại sau chỉnh CSS và đối
 chiếu ảnh thật, không lấy kết quả chức năng làm bằng chứng khớp mỹ thuật.
+
+## V3 — nghiệm thu mỹ thuật web local 28/10/2026
+
+V1 `c58ded0`, V2 `65fcd3f`; phase V3 gồm sửa finding từ review và hồ sơ
+nghiệm thu. Đã đối chiếu ảnh ba tham chiếu với UI thật, gồm popup và trang
+mở từ dock. Năm skin giữ chất liệu/màu riêng; không ép tất cả thành navy.
+Reviewer độc lập đã kiểm logic và ảnh, finding đã sửa: cascade làm mất màu
+CTA, tương phản canvas Storybook/Papercut, focus của nút đang chọn và icon
+cúp nhạt. Nén lịch từ khoảng363 xuống271px trên trang412px; vẫn đủ bảy
+ngày, số Xu, trạng thái, nút48px. Ba nhiệm vụ xuất hiện trước dock; thưởng
+trọn bộ và thao tác kho chữ phía dưới vẫn cuộn tới được.
+
+Bằng chứng (runtime/qa, ignored, không đưa vào commit):
+- Unit điểm danh1/1; cú pháp presentation/missions đạt.
+- UI14/14: events-visual-v2-cascade-suite.log; năm skin,320/360/412/844
+  chữ lớn/1024, vùng chạm48px, keyboard/focus/scroll, claim/recipe/sell,
+  offline và30chu kỳ lifecycle. Dock thật có một header/ví/nút đóng/dock.
+- Sau nén CSS: matrix/dock6/6 (events-visual-v2-compact.log), preview khi
+  chưa có dữ liệu Lễ hội và gallery2/2 (events-visual-v2-unknown.log), ảnh
+  phần dưới1/1 (events-visual-v2-bottom.log). Không bịa vòng/điểm khi chưa
+  có snapshot; cả bốn nút nhận bị khóa.
+- Ảnh cuối: runtime/qa/events-visual-v2/, default/storybook/papercut cho
+  missions/wheel/letters/festival, ảnh320 và844 chữ lớn; thêm hai ảnh
+  missions-bottom/letters-bottom412. Reviewer xác nhận nhãn320 không cắt.
+- npm run check exit0: events-v3-final-check.log. Lần đầu khi Chrome đang
+  chạy vượt microbenchmark Triple20,71>20ms; chạy lại khi Chrome dừng đạt,
+  không sửa benchmark hoặc logic Triple. Sau chỉnh CSS chỉ chạy lại gate
+  ownership và UI đúng phạm vi; đều đạt.
+- npm run build trên source cuối exit0: events-v3-final-build.log. Hai
+  cảnh báo VITE_PUBLIC_ASSET đã có ở build Q1; output cuối không còn literal
+  marker đó. Không phát sinh thay đổi generated file hoặc dependency.
+
+30chu kỳ desktop fixture: DOM1411→1413, listener120→117; mount p9552,1ms,
+frame p9561,1ms, long task52/53/68ms khi dồn mở/đổi tab. Đây là kiểm stress
+mount UI, không chứng minh60FPS hoặc số đo điện thoại. Chưa xác minh S22.
+Không đổi service/reducer/model/API/schema/save ở V1–V3. Rules đã phát hành
+riêng theo phê duyệt ở trên, cờ Lễ hội bật cho web local; Hosting/APK/push
+chưa thực hiện. Giữ task nền/năng lượng ngoài phạm vi và không stage log,
+ảnh QA, test ignored hoặc tài nguyên thử. V1–V3 hoàn tất trong phạm vi web.

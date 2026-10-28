@@ -671,5 +671,6 @@ ngày 27/10/2026. Xu mốc 25/50, subpool, whitelist/trọng số, vòng loại
 rương chữ, policy đầy kho và mẫu mỹ thuật còn là đề xuất. Lượt cập nhật
 này chỉ ghi nhận quyết định vào tài liệu, không tự triển khai.
 
-V1 hoàn tất ở c58ded0. V2 đã tích hợp bố cục theo tham chiếu và vật liệu
-riêng năm skin (28/10); đang nghiệm thu V3 bằng ảnh thật và matrix web.
+V1 hoàn tất ở c58ded0; V2 ở 65fcd3f. V3 đã nghiệm thu web local ngày
+28/10: review độc lập ảnh thật, matrix năm skin và kiểm layout/lifecycle
+đạt; đã sửa các finding. Giới hạn thiết bị và bằng chứng ở receipt.
