@@ -8,7 +8,7 @@ bên dưới không chứng nhận mức độ khớp mỹ thuật; kết luận
 trước đó đã quá sớm. Phần trình bày được mở lại, vẫn dùng kế hoạch này.
 
 - V1: chốt phạm vi skin; tách chrome hai trang khỏi khung giấy/nút cam,
-  dùng navy/emerald/gold và nền lá đêm tĩnh hiện có. Không sửa skin toàn app.
+  dùng chất liệu/màu tương ứng năm skin và nền tĩnh hiện có. Không sửa skin toàn app.
 - V2: bố cục theo ảnh: thẻ nhiệm vụ ngang icon–nội dung/tiến độ–CTA;
   lịch4+3 và phần thưởng trọn bộ gọn; wheel vàng có rim/hub/pointer nổi;
   chọn bộ chữ gọn, một recipe chi tiết, grid17 ô chữ có số lượng và thanh
@@ -670,3 +670,6 @@ Bảng rương/quy đổi ở mục 4 và bố cục Kho rương ở mục 5 đ�
 ngày 27/10/2026. Xu mốc 25/50, subpool, whitelist/trọng số, vòng loại
 rương chữ, policy đầy kho và mẫu mỹ thuật còn là đề xuất. Lượt cập nhật
 này chỉ ghi nhận quyết định vào tài liệu, không tự triển khai.
+
+V1 hoàn tất ở c58ded0. V2 đã tích hợp bố cục theo tham chiếu và vật liệu
+riêng năm skin (28/10); đang nghiệm thu V3 bằng ảnh thật và matrix web.

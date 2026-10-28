@@ -16,8 +16,6 @@ html .liveops button.tab-button, html .liveops__sale button.tab-button { min-hei
 .liveops__sector { position: absolute; top: 50%; left: 50%; width: 44px; margin-left: -22px; margin-top: -12px; text-align: center; font-weight: 900; color: #3d2715; transform: rotate(calc(var(--sector) * 45deg)) translateY(-35cqi); }
 .liveops__sector:nth-child(even) { color: #fff2c0; }
 .liveops__pointer { position: absolute; top: -6px; left: calc(50% - 12px); width: 24px; height: 36px; background: #b37817; clip-path: polygon(0 0, 100% 0, 50% 100%); }
-.liveops__gifts { display: flex; justify-content: center; gap: 8px; }
-.liveops__gifts img { width: min(45%, 128px); height: auto; object-fit: contain; }
 .liveops__status { min-height: 2.6em; }
 .liveops__rules summary { min-height: 44px; display: list-item; cursor: pointer; }
 @media (max-width: 360px) {
@@ -25,7 +23,6 @@ html .liveops button.tab-button, html .liveops__sale button.tab-button { min-hei
 }
 
 .liveops__panel { display: grid; gap: 12px; min-width: 0; }
-.liveops__hub { position: absolute; inset: 37%; display: grid; place-items: center; border-radius: 50%; border: 4px solid #d4b45c; background: #164c42; color: #fff2c0; box-shadow: 0 4px 0 #09372e, inset 0 2px 0 #fbdd8e; font-weight: 900; }
 .liveops__set-choices, .liveops__chest-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .liveops__letter-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
 html .liveops__letter-grid > button.tab-button { min-height: 48px; min-width: 48px; margin: 0; box-sizing: border-box; border: 1px solid var(--ui-line, #9b7847); border-image: none; padding: 4px; background: var(--ui-surface, #fff6df); color: var(--ui-ink, #452b16); }
@@ -47,8 +44,6 @@ html .liveops__letter-grid > button.tab-button { min-height: 48px; min-width: 48
 .liveops__chest-grid img { max-width: 100%; height: auto; }
 .collection-content > [hidden] { display: none !important; }
 
-.liveops__letter-set { border-top: 1px solid var(--ui-line, #9b7847); padding-block: 10px; }
-.liveops__letter-set h4 { margin: 0 0 8px; font-size: .95rem; }
 .liveops__letter-slots { margin: 0; font-size: clamp(17px, 5vw, 23px); white-space: pre-wrap; overflow-wrap: anywhere; }
 .liveops__letter-select, .liveops__letter-quantity { box-sizing: border-box; width: 100%; min-height: 48px; font: inherit; color: inherit; background: var(--ui-surface, #fff6df); border: 1px solid currentColor; border-radius: 8px; padding: 8px; }
 
@@ -72,14 +67,14 @@ html[data-ui-skin="woodland"] :is(#missions-screen,#events-screen).liveops-page 
   --liveops-wheel-dark:#825b26; --liveops-wheel-gem:#69883d;
 }
 html[data-ui-skin="storybook"] :is(#missions-screen,#events-screen).liveops-page {
-  --lo-canvas:#50331e; --lo-panel:#ead4a9; --lo-inset:#e0c18d; --lo-ink:#482b16; --lo-muted:#735231;
+  --lo-canvas:#e5c692; --lo-panel:#ead4a9; --lo-inset:#e0c18d; --lo-ink:#482b16; --lo-muted:#735231;
   --lo-line:#96672f; --lo-gold:#704515; --lo-task:#fff1d2; --lo-task-ink:#482b16; --lo-task-line:#b38a50;
   --lo-button-top:#8da756; --lo-button-bottom:#476b32; --lo-button-ink:#fff5d5;
   --lo-claim-top:#ffe6a0; --lo-claim-bottom:#d09b42; --lo-claim-ink:#4b2b13;
   --lo-green-top:#6b963d; --lo-green-bottom:#3c6629; --liveops-wheel-dark:#8d571f; --liveops-wheel-gem:#5a8a44;
 }
 html[data-ui-skin="papercut"] :is(#missions-screen,#events-screen).liveops-page {
-  --lo-canvas:#203b4b; --lo-panel:#d6e6d3; --lo-inset:#b8d1bb; --lo-ink:#244333; --lo-muted:#496450;
+  --lo-canvas:#c5d8c3; --lo-panel:#d6e6d3; --lo-inset:#b8d1bb; --lo-ink:#244333; --lo-muted:#496450;
   --lo-line:#738b62; --lo-gold:#486340; --lo-task:#f6edce; --lo-task-ink:#2c433c; --lo-task-line:#aeb48b;
   --lo-button-top:#719f8a; --lo-button-bottom:#427865; --lo-button-ink:#fff9df;
   --lo-claim-top:#f8e8ab; --lo-claim-bottom:#d2ba73; --lo-claim-ink:#3d4d38;
@@ -106,7 +101,7 @@ html[data-ui-skin="starship"] :is(#missions-screen,#events-screen).liveops-page 
 }
 :is(#missions-screen,#events-screen).liveops-page .liveops-surface .app-modal__title { flex:1; min-width:0; margin:0; padding:0; font-size:clamp(21px,5.6vw,28px); line-height:1.2; color:var(--lo-gold); text-align:left; text-shadow:0 1px 1px #0005; }
 :is(#missions-screen,#events-screen).liveops-page .app-modal__title > .ui-icon { display:none; }
-:is(#missions-screen,#events-screen).liveops-page .liveops-surface .app-modal__body { padding:12px; line-height:1.4; }
+:is(#missions-screen,#events-screen).liveops-page .liveops-surface .app-modal__body { padding:12px; line-height:1.4; background:transparent; }
 :is(#missions-screen,#events-screen).liveops-page .app-modal__close { position:static; flex:none; width:48px; height:48px; min-width:48px; padding:9px; border:2px solid var(--lo-line); border-radius:50%; background:var(--lo-inset); color:var(--lo-gold); box-shadow:inset 0 1px 0 #fff5; }
 :is(#missions-screen,#events-screen).liveops-page.app-screen-content .liveops-surface { width:100%; height:100%; max-height:none; margin:0; border:0; border-radius:0; }
 :is(#missions-screen,#events-screen).liveops-page.app-screen-content .liveops-surface > header.app-modal__header { padding-right:68px; }
@@ -119,11 +114,106 @@ html[data-ui-skin="starship"] :is(#missions-screen,#events-screen).liveops-page 
 html .liveops-page .liveops-surface button.tab-button { box-sizing:border-box; min-height:48px; border:1px solid var(--lo-line); border-image:none; border-radius:24px; padding:8px 12px; font:inherit; font-weight:800; color:var(--lo-button-ink); text-shadow:0 1px 1px #0007; background:linear-gradient(var(--lo-button-top),var(--lo-button-bottom)); box-shadow:inset 0 2px 0 #ffffff38,0 3px 0 #0004; }
 html .liveops-page .liveops-surface button.tab-button:disabled { opacity:.65; filter:none; cursor:default; }
 html .liveops-page .liveops-surface button.tab-button:focus-visible { outline:3px solid var(--lo-gold); outline-offset:3px; }
-html .liveops-page .liveops__tabs button { border-radius:22px; background:linear-gradient(var(--lo-panel),var(--lo-inset)); color:var(--lo-muted); }
-html .liveops-page .liveops__tabs button[aria-selected="true"] { color:var(--lo-gold); outline:2px solid var(--lo-line); outline-offset:-3px; box-shadow:inset 0 0 12px #e8d48726,0 2px 0 #0004; }
+html .liveops-page .liveops-surface .liveops__tabs button { border-radius:22px; background:linear-gradient(var(--lo-panel),var(--lo-inset)); color:var(--lo-muted); }
+html .liveops-page .liveops-surface .liveops__tabs button[aria-selected="true"] { color:var(--lo-gold); outline:2px solid var(--lo-line); outline-offset:-3px; box-shadow:inset 0 0 12px #e8d48726,0 2px 0 #0004; }
 .liveops-surface .liveops__progress { appearance:none; border:1px solid var(--lo-line); border-radius:20px; overflow:hidden; height:17px; background:var(--lo-inset); }
 .liveops-surface .liveops__progress::-webkit-progress-bar { background:var(--lo-inset); }
 .liveops-surface .liveops__progress::-webkit-progress-value { border-radius:20px; background:linear-gradient(#8de66e,#208b47); box-shadow:inset 0 2px 0 #fff6; }
 .liveops-surface .liveops__progress::-moz-progress-bar { border-radius:20px; background:linear-gradient(#8de66e,#208b47); }
 .liveops-surface .liveops__progress-row { font-size:12px; font-weight:800; }
 @media(max-width:360px) { :is(#missions-screen,#events-screen).liveops-page .app-modal__title { font-size:20px; } .liveops__wallet { font-size:13px; padding:4px 7px; } .liveops__wallet>.ui-icon { width:23px; height:23px; } }
+
+/* Composition shared by the five local material palettes above. */
+.liveops-surface .liveops__card-heading { display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:10px; color:var(--lo-gold); }
+.liveops-surface .liveops__card-heading h3 { margin:0; }
+.liveops__card-heading > .ui-icon { width:24px; height:24px; }
+.liveops-surface .liveops__days { gap:6px; }
+.liveops-surface .liveops__day { position:relative; gap:3px; padding:7px 3px; border:1px solid var(--lo-task-line); background:linear-gradient(145deg,var(--lo-task),color-mix(in srgb,var(--lo-task) 80%,var(--lo-line))); color:var(--lo-task-ink); border-radius:10px; }
+.liveops-surface .liveops__day[data-state="available"] { outline:2px solid var(--lo-claim-bottom); box-shadow:0 0 12px #e8c96f66,inset 0 0 0 2px #fff7; }
+.liveops-surface .liveops__day[data-state="received"] { background:color-mix(in srgb,var(--lo-task) 65%,#42694a); }
+.liveops__day-art { height:35px; display:grid; place-items:center; }
+.liveops__day-art > .ui-icon { width:35px; height:35px; }
+.liveops__day-label { font-size:12px; }
+.liveops__day-coins { font-size:14px; }
+.liveops__day-status { display:flex; justify-content:center; align-items:center; gap:2px; min-height:20px; font-size:10px; line-height:1.2; }
+.liveops__day-status > .ui-icon { width:14px; height:14px; flex:none; }
+.liveops__login-action { display:flex; justify-content:center; margin-top:8px; }
+html .liveops-page .liveops-surface .liveops__login-action button { width:auto; min-width:50%; margin:0; color:var(--lo-claim-ink); text-shadow:none; background:linear-gradient(var(--lo-claim-top),var(--lo-claim-bottom)); }
+.liveops__section-title { display:flex; align-items:center; gap:12px; margin:6px 0 0; text-align:center; font-size:1.1rem; color:var(--lo-gold); }
+.liveops__section-title::before,.liveops__section-title::after { content:''; height:1px; flex:1; background:var(--lo-line); }
+.liveops-surface .liveops__mission { display:grid; grid-template-columns:48px minmax(0,1fr) auto; align-items:center; gap:9px; padding:9px; border:2px solid var(--lo-task-line); background:linear-gradient(135deg,var(--lo-task),color-mix(in srgb,var(--lo-task) 85%,var(--lo-line))); color:var(--lo-task-ink); border-radius:12px; }
+.liveops__mission-symbol { display:grid; place-items:center; aspect-ratio:1; border-radius:9px; background:color-mix(in srgb,var(--lo-task-line) 42%,transparent); box-shadow:inset 0 1px 3px #0003; }
+.liveops__mission-symbol > .ui-icon { width:40px; height:40px; }
+.liveops-surface .liveops__mission-body h3 { margin:0 0 6px; font-size:clamp(14px,3.8vw,18px); line-height:1.25; }
+.liveops__mission-reward { display:block; margin-top:3px; font-size:12px; }
+.liveops__mission-action { max-width:115px; }
+html .liveops-page .liveops-surface .liveops__mission-action button { width:100%; margin:0; padding:7px 10px; font-size:13px; }
+.liveops__mission-complete { display:flex; align-items:center; gap:4px; margin:0; font-size:12px; }
+.liveops__mission-complete > .ui-icon { width:22px; height:22px; flex:none; }
+.liveops-surface .liveops__bonus { display:grid; grid-template-columns:minmax(0,1fr) 76px; gap:10px; align-items:center; border:2px solid var(--lo-line); }
+.liveops__bonus-body h3 { margin-bottom:5px; color:var(--lo-gold); }
+.liveops__bonus-body p { font-size:12px; margin:5px 0 0; }
+.liveops__bonus-reward { display:block; font-size:14px; margin-bottom:8px; }
+.liveops__bonus-art > .ui-icon { width:76px; height:76px; }
+.liveops__countdown { justify-self:center; border:1px solid var(--lo-line); border-radius:24px; padding:5px 12px; background:var(--lo-inset); color:var(--lo-gold); font-size:13px; }
+.liveops-surface .liveops__guidance { color:var(--lo-muted); font-size:12px; }
+.liveops-surface .liveops__wheel-card { padding:10px 0 0; border:0; background:none; box-shadow:none; }
+.liveops__wheel-card > h3 { text-align:center; font-size:14px; color:var(--lo-muted); }
+.liveops-surface .liveops__wheel { width:min(100%,440px); margin:10px auto 14px; }
+.liveops-surface .liveops__rotor { border:0; background:none; }
+.liveops__wheel-art { position:absolute; inset:0; pointer-events:none; }
+.liveops__wheel-art--rim { z-index:2; }
+.liveops-surface .liveops__sector { z-index:1; width:40px; margin-left:-20px; margin-top:-10px; font-size:clamp(13px,4vw,20px); color:#fff3c2; text-shadow:0 1px 2px #45290c; transform:rotate(calc(var(--sector) * 45deg)) translateY(-35cqi); }
+.liveops-surface .liveops__pointer { top:2%; left:calc(50% - 9px); width:18px; height:29px; background:linear-gradient(90deg,var(--liveops-wheel-light),var(--liveops-wheel-dark)); z-index:3; }
+.liveops__spin-actions { display:flex; gap:10px; align-items:center; }
+html .liveops-page .liveops-surface .tab-button.liveops__spin-primary { flex:1; width:auto; font-size:clamp(16px,4.5vw,23px); background:linear-gradient(var(--lo-green-top),var(--lo-green-bottom)); border:2px solid var(--lo-line); }
+.liveops__ticket-balance { flex:none; padding:6px 8px; border:1px solid var(--lo-line); border-radius:22px; background:var(--lo-inset); font-size:13px; color:var(--lo-gold); }
+.liveops__ticket-balance > .ui-icon { width:23px; height:23px; }
+.liveops__spin-secondary { display:grid; grid-template-columns:minmax(0,1.5fr) minmax(0,1fr); gap:8px; }
+html .liveops-page .liveops-surface .liveops__spin-secondary button { font-size:12px; margin:4px 0; }
+.liveops__rules { margin-top:6px; font-size:12px; color:var(--lo-muted); }
+.liveops__rules summary { min-height:48px; padding:12px 6px; box-sizing:border-box; }
+.liveops__letter-mini { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; align-items:center; }
+.liveops__letter-mini > h3,.liveops__letter-mini > .liveops__letter-slots { grid-column:1/-1; }
+.liveops-surface .liveops__letter-mini h3 { margin:0; color:var(--lo-gold); }
+html .liveops-page .liveops-surface .liveops__letter-mini > button { width:auto; margin:0; font-size:12px; }
+.liveops-surface .liveops__set-choices { gap:5px; }
+html .liveops-page .liveops-surface .liveops__set-choices button { margin:0; padding:6px; border-radius:9px; font-size:11px; }
+html .liveops-page .liveops-surface .liveops__set-choices button[aria-pressed="true"] { color:var(--lo-claim-ink); text-shadow:none; background:linear-gradient(var(--lo-claim-top),var(--lo-claim-bottom)); }
+.liveops__recipe-name { margin:12px 0 8px; text-align:center; color:var(--lo-gold); }
+.liveops-surface .liveops__letter-slots { display:flex; justify-content:center; gap:3px; margin:8px 0 12px; font-size:clamp(13px,3.9vw,22px); }
+.liveops-surface .liveops__letter-slot { display:grid; place-items:center; min-width:1.15em; height:1.55em; padding:0 1px; border:1px solid var(--lo-line); border-radius:5px; background:var(--lo-inset); color:var(--lo-muted); box-shadow:inset 0 1px 3px #0003; }
+.liveops-surface .liveops__letter-slot[data-filled="true"] { background:linear-gradient(var(--lo-task),color-mix(in srgb,var(--lo-task) 75%,var(--lo-line))); color:var(--lo-task-ink); box-shadow:0 0 5px #e3c86c55,inset 0 0 0 1px #fff7; }
+.liveops-surface .liveops__letter-slot[data-space="true"] { flex-basis:100%; height:0; min-width:0; border:0; box-shadow:none; }
+.liveops__recipe-reward { display:grid; grid-template-columns:64px minmax(0,1fr) auto; align-items:center; gap:8px; margin-top:10px; font-size:14px; }
+.liveops__recipe-reward > .ui-icon { width:64px; height:64px; }
+html .liveops-page .liveops-surface .liveops__recipe-reward > button { width:auto; background:linear-gradient(var(--lo-claim-top),var(--lo-claim-bottom)); color:var(--lo-claim-ink); text-shadow:none; }
+.liveops__inventory > h3 { text-align:center; color:var(--lo-gold); }
+html .liveops-page .liveops-surface .liveops__letter-grid > button.tab-button { position:relative; display:grid; place-items:center; aspect-ratio:1; min-height:60px; padding:4px; border:2px solid var(--lo-task-line); border-radius:12px; background:linear-gradient(145deg,var(--lo-task),color-mix(in srgb,var(--lo-task) 74%,var(--lo-line))); color:var(--lo-task-ink); text-shadow:0 1px #fff8; box-shadow:inset 0 0 0 3px #fff3,0 4px 0 #0004; }
+.liveops__letter-glyph { font-family:Georgia,serif; font-size:clamp(32px,10vw,64px); font-weight:700; line-height:1.1; }
+.liveops__letter-count { position:absolute; bottom:-4px; right:-3px; padding:1px 6px; border:1px solid var(--lo-line); border-radius:12px; background:var(--lo-inset); color:var(--lo-ink); font-size:13px; text-shadow:none; }
+html .liveops-page .liveops-surface .liveops__letter-grid > button[data-empty="true"] { background:color-mix(in srgb,var(--lo-task) 30%,var(--lo-inset)); color:var(--lo-muted); }
+html .liveops-page .liveops-surface .liveops__letter-grid > button[aria-pressed="true"] { outline:3px solid var(--lo-gold); outline-offset:2px; }
+.liveops__letter-actions { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.liveops__selected-letter { text-align:center; font-size:13px; color:var(--lo-gold); margin:16px 0 4px; }
+.liveops-surface .liveops__festival-hero { text-align:center; }
+.liveops__festival-hero > .ui-icon { width:64px; height:64px; }
+.liveops__festival-round { display:block; font-size:22px; color:var(--lo-gold); }
+.liveops__festival-road { position:relative; display:grid; gap:12px; padding-left:12px; border-left:3px solid var(--lo-line); margin-left:8px; }
+.liveops-surface .liveops__festival-milestone { display:grid; grid-template-columns:48px minmax(0,1fr) auto; align-items:center; gap:8px; position:relative; }
+.liveops__festival-milestone::before { content:''; position:absolute; left:-21px; top:26px; width:12px; height:12px; border:2px solid var(--lo-line); border-radius:50%; background:var(--lo-claim-bottom); }
+.liveops-surface .liveops__festival-milestone > h3 { grid-column:1/-1; margin:0; color:var(--lo-gold); }
+.liveops-surface .liveops__festival-milestone > .ui-icon { width:48px; height:48px; margin:0; }
+.liveops__festival-reward { font-size:14px; }
+.liveops__festival-reward p { font-size:12px; margin:3px 0 0; color:var(--lo-muted); }
+html .liveops-page .liveops-surface .liveops__festival-milestone > button { width:auto; margin:0; font-size:13px; }
+@media(max-width:360px) {
+  .liveops-surface .liveops__mission { grid-template-columns:38px minmax(0,1fr) 72px; gap:6px; padding:7px; }
+  .liveops__mission-symbol > .ui-icon { width:32px; height:32px; }
+  html .liveops-page .liveops-surface .liveops__mission-action button { padding:6px; font-size:12px; }
+  .liveops__ticket-balance { gap:3px; padding:6px; font-size:12px; }
+  .liveops__ticket-balance > .ui-icon { display:none; }
+  .liveops__recipe-reward { grid-template-columns:48px minmax(0,1fr) auto; font-size:12px; gap:5px; }
+  .liveops__recipe-reward > .ui-icon { width:48px; height:48px; }
+}
+html .liveops-page .liveops-surface :is(.liveops__tabs,.liveops__letter-grid) button.tab-button:focus-visible { outline:3px solid var(--lo-gold); outline-offset:3px; }

@@ -151,3 +151,12 @@ Luật vòng lặp vẫn ở code, state hữu hạn; không Functions/Scheduler
 
 V1 mỹ thuật: đã chốt ảnh là tham chiếu bố cục, phối màu/chất liệu theo từng skin. Chuẩn bị wheel SVG80node không filter/loop; palette local và header/ví duy nhất, không nạp Xu, không đổi chrome toàn app. So sánh giữ geometry modal cũ với cô lập surface hai trang: chọn cô lập local để không bị parchment/ribbon ép bố cục nhưng vẫn giữ vật liệu skin. Kiểm cú pháp/diff; đối chiếu ảnh thật ở V3 sau tích hợp V2.
 
+
+V2 mỹ thuật (28/10): tích hợp lịch 4+3, hàng nhiệm vụ icon/nội dung/CTA,
+thưởng trọn bộ, wheel SVG có rim/hub/pointer và CTA riêng, một bộ chữ đang
+chọn/kho chữ 4 cột/thao tác ghép-bán; tab Lễ hội luôn hiện với đường mốc
+và trạng thái chưa tải trung thực. Giữ API, save, service, reducer và luật
+thưởng. Review độc lập logic không phát hiện lỗi; review CSS bắt và sửa
+cascade nút cùng tương phản canvas Cổ tích/Papercut, focus nút đã chọn.
+Unit điểm danh 1/1, UI lần đầu 13/13; V3 kiểm lại sau chỉnh CSS và đối
+chiếu ảnh thật, không lấy kết quả chức năng làm bằng chứng khớp mỹ thuật.

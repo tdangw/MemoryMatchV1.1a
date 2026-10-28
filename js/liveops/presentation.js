@@ -1,3 +1,4 @@
+import { createWheelArt } from './wheelArt.js';
 import { loadPersistentGameData, subscribeToLocalCommit } from '../persistence.js';
 import { gameState } from '../gameState.js';
 import { FESTIVAL_MILESTONES } from './chestConfig.js';
@@ -33,12 +34,12 @@ export function openLiveopsPage(kind, surface = {}) {
   modal.overlay.classList.add('liveops-page'); modal.panel.classList.add('liveops-surface'); root.classList.add(`liveops--${kind}`);
   const heading = modal.panel.querySelector('.app-modal__header');
   if(heading&&!document.querySelector('.adventure-wallet')){
-    const wallet=el('div','adventure-wallet liveops__wallet');wallet.setAttribute('aria-label','Xu đang có');heading.append(wallet);
+    const wallet=el('div','adventure-wallet liveops__wallet');wallet.setAttribute('aria-label','Xu đang có');heading.insertBefore(wallet,heading.querySelector('.app-modal__close'));
     const updateWallet=coins=>wallet.replaceChildren(createIcon('coin'),document.createTextNode(coins.toLocaleString('vi-VN')));
     updateWallet(gameState.coins);scope.own(subscribeToLocalCommit(({data})=>{if(scope.active)updateWallet(data.coins);}));
   }
-  let view = null, tab = 'daily', busy = false, animation = null, presentedSpin = null, wheelExpanded = false, selectedLetter = LETTER_ALPHABET[0], eventTab = 'wheel';
-  let wheelRotor=null, confirmedView=false;
+  let view = null, tab = 'daily', busy = false, animation = null, presentedSpin = null, selectedLetter = LETTER_ALPHABET[0], eventTab = 'wheel', selectedSetId = 'adventure';
+  let wheelRotor=null, wheelArt=null, confirmedView=false;
   const active = () => scope.active && root.isConnected;
   const canClaim=()=>confirmedView&&navigator.onLine&&!getActiveGameScope()&&view&&Math.floor((view.serverNow+performance.now()-observedAt)/DAY_MS)===view.state.day;
   scope.own(() => animation?.cancel());
@@ -120,7 +121,7 @@ export function openLiveopsPage(kind, surface = {}) {
   scope.listen(window,'offline',()=>{confirmedView=false;status.textContent='Đang xem tiến độ đã lưu. Kết nối để nhận thưởng.';render();});
   scope.listen(window,'online',()=>{if(active())void run({type:'status'});});
   function renderEvents() {
-    const tabs = createTabs('events', [['wheel','Vòng quay'],['letters','Sưu tập chữ'],...(festivalChestsEnabled() ? [['festival','Lễ hội']] : [])], eventTab, (key, panel) => {
+    const tabs = createTabs('events', [['wheel','Vòng quay'],['letters','Sưu tập chữ'],['festival','Lễ hội']], eventTab, (key, panel) => {
       if(key!==eventTab){rememberScroll(`event:${eventTab}`);scope.frame(()=>{if(scrollHost)scrollHost.scrollTop=scrolls.get(`event:${key}`)||0;});}
       eventTab = key; animation?.cancel(); panel.replaceChildren();
       const old = content; content = panel;
@@ -130,45 +131,44 @@ export function openLiveopsPage(kind, surface = {}) {
     content.append(tabs.root, tabs.panel); tabs.select(eventTab, false);
   }
   function renderFestival() {
-    if(!view?.state.festival){content.append(el('p','','Kết nối để xem Lễ hội Đom Đóm.'));return;}
-    const festival=view.state.festival,available=festival.earnedTotal-festival.completedCycles*100;
-    const banner=panel('Lễ hội Đom Đóm');banner.append(createIcon('firefly'),el('strong','',`Vòng ${festival.completedCycles+1}`),el('p','',`${available.toLocaleString('vi-VN')} đom đóm · Mỗi vòng 100 điểm`),progress(Math.min(available,100),100,'Điểm Lễ hội'));
+    const festival=view?.state.festival, available=festival?festival.earnedTotal-festival.completedCycles*100:null;
+    const banner=panel('Lễ hội Đom Đóm');banner.classList.add('liveops__festival-hero');
+    banner.append(createIcon('firefly'),el('strong','liveops__festival-round',festival?`Vòng ${festival.completedCycles+1}`:'Hành trình Đom Đóm'));
+    if(festival)banner.append(el('p','',`${available.toLocaleString('vi-VN')} đom đóm · Mỗi vòng 100 điểm`),progress(Math.min(available,100),100,'Điểm Lễ hội'));
+    else banner.append(el('p','',festivalChestsEnabled()?'Kết nối để xem vòng và số đom đóm đang có.':'Xem trước các mốc quà. Lễ hội sẽ sớm mở.'));
     content.append(banner);
+    const road=el('div','liveops__festival-road');
     for(const [index,item]of FESTIVAL_MILESTONES.entries()){
-      const claimed=Boolean(festival.mask&(1<<index)),ready=available>=item.points;
-      const row=panel(`${item.points} điểm`);
-      row.append(createIcon(item.chest?'chest':'coins'),el('p','',[item.coins?`${item.coins} Xu`:'',item.chest?CHEST_NAMES[item.chest]:''].filter(Boolean).join(' + ')),
-        el('p','',claimed?'Đã nhận':ready?'Đủ điều kiện':'Chưa đủ'),button(claimed?'Đã nhận':'Nhận',()=>void run({type:'claimFestival',cycle:festival.completedCycles,points:item.points}),busy||!canClaim()||claimed||!ready,`festival-${item.points}`));content.append(row);
+      const claimed=Boolean(festival&&(festival.mask&(1<<index))),ready=available!==null&&available>=item.points;
+      const row=panel(`${item.points} điểm`);row.classList.add('liveops__festival-milestone');row.dataset.claimed=String(claimed);
+      const body=el('div','liveops__festival-reward');body.append(el('strong','',[item.coins?`${item.coins} Xu`:'',item.chest?CHEST_NAMES[item.chest]:''].filter(Boolean).join(' + ')),el('p','',claimed?'Đã nhận':!festival?'Mốc phần thưởng':ready?'Đủ điều kiện':'Chưa đủ'));
+      row.append(createIcon(item.chest?'chest':'coins'),body,button(claimed?'Đã nhận':'Nhận',()=>void run({type:'claimFestival',cycle:festival.completedCycles,points:item.points}),busy||!festivalChestsEnabled()||!canClaim()||claimed||!ready,`festival-${item.points}`));road.append(row);
     }
-    content.append(button('Xem quà & Kho rương',openChests),button(getActiveGameScope()?'Quay lại ván chơi':'Chơi ngay',play,busy||Boolean(getActiveGameScope())),
-      el('p','','Thu thập đom đóm khi ghép nhóm thẻ đặc biệt. Điểm được giữ kể cả khi thua. Nhận đủ bốn mốc để sang vòng mới và giữ điểm dư; rương có thể mở sau.'));
+    content.append(road);
+    if(festivalChestsEnabled())content.append(button('Xem quà & Kho rương',openChests));
+    content.append(button(getActiveGameScope()?'Quay lại ván chơi':'Chơi ngay',play,busy||Boolean(getActiveGameScope())),
+      el('p','liveops__guidance','Thu thập đom đóm khi ghép nhóm thẻ đặc biệt. Điểm được giữ kể cả khi thua. Nhận đủ bốn mốc để sang vòng mới và giữ điểm dư; rương có thể mở sau.'));
   }
   function renderWheel() {
-    const wheel = panel('Vòng quay may mắn'), stage = el('div', 'liveops__wheel');
+    const wheel = panel('Vòng quay may mắn'), stage = el('div', 'liveops__wheel');wheel.classList.add('liveops__wheel-card');
+    if(!wheelArt)wheelArt=createWheelArt();
     const rotor = wheelRotor || el('div', 'liveops__rotor');wheelRotor=rotor;
-    if(!rotor.childElementCount)for (const [index, amount] of WHEEL.entries()) {
-      const label = el('span', 'liveops__sector', String(amount)); label.style.setProperty('--sector', index); rotor.append(label);
-    }
-    stage.append(rotor, el('span', 'liveops__hub', 'Xu'), el('span', 'liveops__pointer')); stage.setAttribute('aria-label', 'Tám ô: 5, 10, 10, 15, 15, 20, 20, 25 Xu');
-    const spin = view?.state.spins, last = presentedSpin || spin?.ticket || spin?.ads.at(-1) || spin?.free;
-    const exhausted = Boolean(spin?.free) && ((spin?.ads.length || 0) >= 10 || !rewardedSpinAvailable()) && !view?.state.tickets;
-    if (last) rotor.style.transform = `rotate(${-last.sector * 45}deg)`;
-    if (!exhausted || busy || wheelExpanded) wheel.append(stage);
-    if (exhausted) {
-      wheel.append(el('p', '', `Lượt miễn phí: ${spin.free.coins} Xu${spin.ads.length ? ` · Đã dùng ${spin.ads.length}/10 lượt quảng cáo` : ''}. Hẹn gặp lại ngày mai!`),
-        button(wheelExpanded ? 'Thu gọn vòng quay' : 'Xem vòng quay', () => { wheelExpanded = !wheelExpanded; render(); }, busy));
-    }
-    wheel.append(button(spin?.free ? 'Đã quay miễn phí hôm nay' : 'Quay miễn phí', () => void run({ type: 'spin', source: 'free' }, { spin: true }), busy || !canClaim() || Boolean(spin?.free)),
-      button((spin?.ads.length || 0) >= 10 ? 'Đã dùng 10 lượt quảng cáo hôm nay' : view?.adPending ? 'Đang xác nhận lượt thưởng' : 'Xem quảng cáo · Thêm 1 lượt', () => void run(null, { spin: true, rewarded: true }), busy || !canClaim() || (spin?.ads.length || 0) >= 10 || view?.adPending || !rewardedSpinAvailable()),
-      el('p', '', rewardedSpinAvailable() ? 'Một lượt miễn phí và tối đa 10 lượt quảng cáo mỗi ngày.' : 'Quảng cáo nhận thưởng hiện chưa khả dụng. Bạn vẫn có lượt quay miễn phí mỗi ngày.'));
-    const rules = el('details', 'liveops__rules'); rules.append(el('summary', '', 'Thể lệ'), el('p', '', 'Mỗi ô có xác suất 12,5%. Lượt miễn phí, quảng cáo và vé quay dùng riêng, chung tài khoản cho cả ba trò. Mỗi vé dùng được một lượt, không hết hạn. Không mua thêm lượt.'));
-    const ticketBalance=el('p','liveops__ticket-balance');
+    if(!rotor.childElementCount){rotor.append(wheelArt.rotor);for(const [index,amount]of WHEEL.entries()){
+      const label=el('span','liveops__sector',String(amount));label.style.setProperty('--sector',index);rotor.append(label);
+    }}
+    stage.append(rotor,wheelArt.rim,el('span','liveops__pointer'));stage.setAttribute('aria-label','Tám ô: 5, 10, 10, 15, 15, 20, 20, 25 Xu');
+    const spin=view?.state.spins,last=presentedSpin||spin?.ticket||spin?.ads.at(-1)||spin?.free;
+    if(last)rotor.style.transform=`rotate(${-last.sector*45}deg)`;
+    const primary=el('div','liveops__spin-actions'),ticketBalance=el('span','liveops__ticket-balance');
     ticketBalance.append(createIcon('ticket'),el('span','',view?`Vé quay: ${view.state.tickets}`:'Vé quay: …'));
-    wheel.append(ticketBalance,
-      button('Dùng 1 vé', () => void run({ type:'spin', source:'ticket' }, { spin:true }), busy || !canClaim() || view.state.tickets < 1));
-    wheel.append(rules); content.append(wheel);
-    content.append(button('Xem Sưu tập chữ', () => { eventTab='letters'; render(); }));
-    if(festivalChestsEnabled()) content.append(button('Xem Kho rương', openChests));
+    const free=button(spin?.free?'Đã quay miễn phí hôm nay':'Quay miễn phí',()=>void run({type:'spin',source:'free'},{spin:true}),busy||!canClaim()||Boolean(spin?.free));free.classList.add('liveops__spin-primary');primary.append(free,ticketBalance);
+    const secondary=el('div','liveops__spin-secondary');
+    secondary.append(button((spin?.ads.length||0)>=10?'Đã dùng 10 lượt quảng cáo hôm nay':view?.adPending?'Đang xác nhận lượt thưởng':'Xem quảng cáo · Thêm 1 lượt',()=>void run(null,{spin:true,rewarded:true}),busy||!canClaim()||(spin?.ads.length||0)>=10||view?.adPending||!rewardedSpinAvailable()),
+      button('Dùng 1 vé',()=>void run({type:'spin',source:'ticket'},{spin:true}),busy||!canClaim()||view.state.tickets<1));
+    const rules=el('details','liveops__rules');rules.append(el('summary','','Thể lệ'),el('p','','Mỗi ô có xác suất 12,5%. Một lượt miễn phí và tối đa 10 lượt quảng cáo mỗi ngày; vé quay dùng riêng, không hết hạn. Không mua thêm lượt.'));
+    wheel.append(stage,primary,secondary,rules);content.append(wheel);
+    if(view){const set=LETTER_SETS.find(item=>item.id===selectedSetId),mini=panel('Sưu tập chữ');mini.classList.add('liveops__letter-mini');mini.append(el('strong','',set.label),letterSlots(set,view.state.letters.counts),button('Xem Sưu tập chữ',()=>{eventTab='letters';render();}));content.append(mini);}
+    if(festivalChestsEnabled())content.append(button('Xem Kho rương',openChests));
   }
   function openChests() {
     const round=getActiveGameScope(),owner=surface.owner||round||getAppPageScope(),identity=getAccountService()?.getIdentity();
@@ -177,40 +177,33 @@ export function openLiveopsPage(kind, surface = {}) {
     void import('../mainmenu.js').then(async module=>{if(current())await module.showCollectionModal({initialChest:true,fromGame:Boolean(round),surface:{...surface,owner}});})
       .catch(()=>{if(current())showAppToast('Chưa mở được Kho rương. Hãy thử lại.',{tone:'error'});});
   }
+  function letterSlots(set,counts){
+    const slots=el('div','liveops__letter-slots');
+    for(const slot of letterSetSlots(set,counts)){
+      const cell=el('span','liveops__letter-slot',slot.space?'':slot.letter);cell.dataset.filled=String(slot.filled);if(slot.space)cell.dataset.space='true';slots.append(cell);
+    }
+    slots.setAttribute('aria-label',`${set.label}: ${letterProgressLabel(set,counts)}`);return slots;
+  }
   function renderLetters() {
     if(!view){content.append(el('p','','Kết nối để xem kho chữ và phần thưởng.'));return;}
-    const letters = panel('Sưu tập chữ'), counts = view?.state.letters.counts || {};
-    const setChoices=el('div','liveops__set-choices');
-    for (const set of LETTER_SETS) {
-      const row = el('section', 'liveops__letter-set');
-      const title = el('h4', '', set.label), slots = el('p', 'liveops__letter-slots');
-      for(const slot of letterSetSlots(set,counts)){ const cell=el('span','liveops__letter-slot',slot.space?' ':slot.letter);cell.dataset.filled=String(slot.filled); slots.append(cell); }
-      slots.setAttribute('aria-label', `${set.label}: ${letterProgressLabel(set,counts)}`);row.append(title,slots,
-        button(festivalChestsEnabled()?`Đổi · ${CHEST_NAMES[set.chestType]}`:'Đổi quà',()=>void run({type:'exchangeLetterSet',setId:set.id}),busy||!canClaim()||!Object.entries(set.required).every(([letter,amount])=>(counts[letter]||0)>=amount)));
-      row.lastChild.setAttribute('aria-label',`Đổi ${set.label}`);setChoices.append(row);
-    }
-    letters.append(setChoices);
-    if(view && festivalChestsEnabled()){
-      const preview=panel('Quà Sưu tập chữ'); preview.append(createIcon('chest'),el('p','','Xem phần thưởng của từng bộ chữ'),el('p','','Đổi đủ bộ chữ để nhận loại rương được ghi trong phần thưởng.'),button('Xem Kho rương',openChests)); letters.prepend(preview);
-    } else if(view){
-      const next=LETTER_REWARD_ITEMS.find(item=>item.id===view.nextLetterRewardId);
-      const preview=panel(next?'Quà tiếp theo':'Rương 10.000 Xu');
-      if(next){const art=el('img','liveops__reward-preview');art.src=`${import.meta.env.BASE_URL}${next.files[256]}`;art.alt=next.name;art.width=art.height=128;art.loading='lazy';art.decoding='async';preview.append(art,el('p','',next.name));}
-      else preview.append(el('p','','Bạn đã có đủ quà trong kho. Mỗi bộ chữ đổi được một rương 10.000 Xu.'));
-      preview.append(el('p','','Bốn bộ chữ dùng chung kho quà. Mỗi lần đổi nhận một món chưa sở hữu.'));letters.prepend(preview);
-    }
-    letters.append(el('p', '', 'Thu thập chữ khi ghép thẻ đặc biệt. Chữ được giữ mãi; các bộ chữ dùng chung kho.'));
-    const inventory = panel('Kho chữ'), choices = el('div', 'liveops__letter-grid');
-    const amount=counts[selectedLetter]||0;
-    for(const letter of LETTER_ALPHABET){
-      const choice=button(`${letter} · ${counts[letter]||0}`,()=>{selectedLetter=letter;render();},false,`letter-${letter}`);
-      choice.setAttribute('aria-label',`Chữ ${letter}, ${counts[letter]||0} chữ`);choice.setAttribute('aria-pressed',String(letter===selectedLetter));choices.append(choice);
-    }
-    inventory.append(choices,el('p','',`Đang có ${amount} chữ ${selectedLetter}`),
-      button('Bán chữ',()=>sellSheet(selectedLetter,amount),busy||!canClaim()||amount<1),
-      button(`Ghép 3 chữ ${selectedLetter}`,()=>void run({type:'fuseLetter',letter:selectedLetter}),busy||!canClaim()||amount<3),
-      el('p','','Ghép 3 chữ giống nhau để nhận 1 chữ ngẫu nhiên. Có thể nhận lại chữ vừa ghép.'));
-    content.append(letters, inventory);
+    const counts=view.state.letters.counts,choices=el('div','liveops__set-choices');
+    for(const set of LETTER_SETS){const choice=button(set.label,()=>{selectedSetId=set.id;render();},false,`set-${set.id}`);choice.setAttribute('aria-pressed',String(selectedSetId===set.id));choices.append(choice);}
+    const set=LETTER_SETS.find(item=>item.id===selectedSetId),letters=panel('Sưu tập chữ');letters.classList.add('liveops__recipe');
+    const filled=letterSetSlots(set,counts).filter(slot=>slot.filled).length,total=Object.values(set.required).reduce((sum,n)=>sum+n,0);
+    letters.append(choices,el('h4','liveops__recipe-name',set.label),letterSlots(set,counts),progress(filled,total,`Số chữ ${set.label}`));
+    const reward=el('div','liveops__recipe-reward');
+    if(festivalChestsEnabled())reward.append(createIcon('chest'),el('strong','',CHEST_NAMES[set.chestType]));
+    else{const next=LETTER_REWARD_ITEMS.find(item=>item.id===view.nextLetterRewardId);reward.append(createIcon('chest'),el('strong','',next?next.name:'10.000 Xu'));}
+    const exchange=button('Đổi quà',()=>void run({type:'exchangeLetterSet',setId:set.id}),busy||!canClaim()||filled<total,`exchange-${set.id}`);exchange.setAttribute('aria-label',`Đổi ${set.label}`);reward.append(exchange);letters.append(reward);
+    if(festivalChestsEnabled())letters.append(button('Xem Kho rương',openChests));
+    const inventory=panel('Kho chữ'),grid=el('div','liveops__letter-grid');inventory.classList.add('liveops__inventory');
+    for(const letter of LETTER_ALPHABET){const count=counts[letter]||0,choice=button('',()=>{selectedLetter=letter;render();},false,`letter-${letter}`);
+      choice.append(el('span','liveops__letter-glyph',letter),el('span','liveops__letter-count',`×${count}`));choice.dataset.empty=String(count===0);choice.setAttribute('aria-label',`Chữ ${letter}, ${count} chữ`);choice.setAttribute('aria-pressed',String(letter===selectedLetter));grid.append(choice);}
+    const amount=counts[selectedLetter]||0,actions=el('div','liveops__letter-actions');
+    actions.append(button(`Ghép 3 chữ ${selectedLetter}`,()=>void run({type:'fuseLetter',letter:selectedLetter}),busy||!canClaim()||amount<3),button('Bán chữ',()=>sellSheet(selectedLetter,amount),busy||!canClaim()||amount<1));
+    inventory.append(grid,el('p','liveops__selected-letter',`Đang chọn chữ ${selectedLetter} · Có ${amount}`),actions,
+      el('p','liveops__guidance',`Bán ${LETTER_SELL_COINS.toLocaleString('vi-VN')} Xu mỗi chữ. Ghép 3 chữ giống nhau nhận 1 chữ ngẫu nhiên; có thể nhận lại chữ vừa ghép.`));
+    content.append(letters,inventory);
   }
 
   function sellSheet(letter, max) {
