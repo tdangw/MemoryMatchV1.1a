@@ -139,11 +139,11 @@
 .adventure-map-node--level { display: grid; place-items: center; box-sizing: border-box; padding: 0; line-height: 1; }
 .adventure-level-number { display: block; text-align: center; letter-spacing: 0; font-variant-numeric: tabular-nums; }
 /* Map actions stay visually small; transparent hit areas remain 48px. */
-.adventure-special-modes { position:absolute; left:2px; bottom:4px; z-index:2; display:flex; gap:0; }
+.adventure-special-modes { position:absolute; left:2px; bottom:4px; z-index:2; display:flex; flex-direction:column; gap:0; }
 .adventure-special-mode { display:grid; place-items:center; width:48px; height:48px; padding:0; border:0; border-radius:8px; background:transparent; color:#fff0cf; }
 .adventure-special-mode > span { display:none; }
-.adventure-special-mode .ui-icon { width:28px; height:28px; color:inherit; filter:drop-shadow(0 1px 2px #00151f); }
-.adventure-special-mode:active:not(:disabled) .ui-icon { transform:translateY(1px); }
+.adventure-action-art { width:30px; height:30px; filter:drop-shadow(0 1px 1px #00151f); }
+.adventure-special-mode:active:not(:disabled) .adventure-action-art { transform:translateY(1px); }
 .adventure-special-mode:focus-visible { outline:2px solid #ffe3a1; outline-offset:-2px; }
 .adventure-special-mode:disabled { opacity:.5; cursor:default; }
 .adventure-level-dialog { border: 1px solid #e9ce8e; background: linear-gradient(145deg, #18384a, #091d31); color: #edf4eb; box-shadow: 0 16px 48px #0009; }
@@ -190,12 +190,17 @@
 .adventure-map-node--level:disabled .adventure-level-lock { display: block; position: absolute; right: -3px; bottom: -1px; width: 17px; height: 17px; padding: 2px; box-sizing: border-box; border: 1px solid #dfd1a1; border-radius: 5px; background: #132a30; color: #fff4d6; }
 .adventure-map-node--level.is-mode-cleared { background: var(--ui-art-grade-b) center / 100% 100% no-repeat; color: #fff; }
 
-.adventure-map-shortcuts { position:absolute; z-index:3; left:2px; top:4px; display:flex; gap:0; }
+.adventure-map-shortcuts { position:absolute; z-index:3; left:2px; top:4px; display:flex; flex-direction:column; gap:0; }
 .adventure-map-shortcuts--events { left:auto; right:2px; top:44px; }
 .adventure-map-page .adventure-map-shortcuts > .adventure-map-shortcut { display:grid; place-items:center; box-sizing:border-box; width:48px; height:48px; min-height:48px; min-width:48px; margin:0; padding:8px; border:0; border-image:none; border-radius:8px; background:transparent; color:#fff1c9; box-shadow:none; }
-.adventure-map-shortcut > .ui-icon { width:28px; height:28px; color:inherit; filter:drop-shadow(0 1px 2px #00151f); }
 .adventure-map-shortcuts .treasure-map-card .treasure-art { width:30px; height:28px; }
 .adventure-map-shortcut[data-ready='true'] { outline:2px solid #bde786; outline-offset:-4px; }
 .adventure-map-shortcut:focus-visible { outline:2px solid #fff0b5; outline-offset:-2px; }
 .adventure-map-shortcut:active:not(:disabled) { transform:translateY(1px); }
 .adventure-map-shortcut:disabled { opacity:.6; cursor:default; }
+
+.adventure-map-view { --map-art-light:#fff0b4; --map-art-gold:#dba94d; --map-art-dark:#765029; --map-art-body-light:#5e9b79; --map-art-body:#204f45; }
+html[data-ui-skin='woodland'] .adventure-map-view { --map-art-light:#ffe7ad; --map-art-gold:#d8a057; --map-art-dark:#704224; --map-art-body-light:#a47a4a; --map-art-body:#543a24; }
+html[data-ui-skin='papercut'] .adventure-map-view { --map-art-light:#fff2ce; --map-art-gold:#dfb36c; --map-art-dark:#79603f; --map-art-body-light:#a8bb87; --map-art-body:#5c7953; }
+html[data-ui-skin='starship'] .adventure-map-view { --map-art-light:#e5fcff; --map-art-gold:#8dc8d9; --map-art-dark:#3d697e; --map-art-body-light:#5a9cba; --map-art-body:#214b69; }
+html[data-ui-skin='storybook'] .adventure-map-view { --map-art-light:#fff2b3; --map-art-gold:#efb64a; --map-art-dark:#8d5024; --map-art-body-light:#569da2; --map-art-body:#254d70; }

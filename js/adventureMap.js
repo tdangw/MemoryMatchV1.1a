@@ -3,6 +3,7 @@ import { getPreviewDurationMs } from './config.js';
 import { getTheme } from "./themeCatalog.js";
 import { getEquippedThemeId } from "./appearance.js";
 import { createIcon } from "./icons.js";
+import { createAdventureActionArt } from './adventureActionArt.js';
 import { gameState } from "./gameState.js";
 import { GAME_MODES, getGameDefinition, getGameModeLabel } from "./gameCatalog.js";
 import { MAP_LEVEL_STEP, getMapLevelPoint, getMapChestPoint, createMapDecorations } from "./adventureMapLayout.js";
@@ -79,7 +80,7 @@ export function mountAdventureMap(gameId) {
   const shortcuts = document.createElement('nav'); shortcuts.className = 'adventure-map-shortcuts'; shortcuts.setAttribute('aria-label','Kho báu và Bộ sưu tập');
   const eventShortcuts = document.createElement('nav'); eventShortcuts.className = 'adventure-map-shortcuts adventure-map-shortcuts--events'; eventShortcuts.setAttribute('aria-label','Nhiệm vụ và Sự kiện');
   function shortcut(label, icon, destination) {
-    const control = button('', 'adventure-map-shortcut'); control.setAttribute('aria-label',label); control.title=label; control.append(createIcon(icon));
+    const control = button('', 'adventure-map-shortcut'); control.setAttribute('aria-label',label); control.title=label; control.append(createAdventureActionArt(icon));
     scope.listen(control,'click',async()=>{
       if(control.disabled)return;control.disabled=true;
       try { await openMenuDestination(root,destination); }
@@ -97,7 +98,7 @@ export function mountAdventureMap(gameId) {
     control.dataset.specialMode = mode.id;
     control.setAttribute("aria-label", mode.label);
     control.title = mode.label;
-    control.append(createIcon(mode.id === "endless" ? "infinity" : "energy"));
+    control.append(createAdventureActionArt(mode.id === "endless" ? "infinity" : "energy"));
     const label = document.createElement("span"); label.textContent = mode.label;
     control.append(label); specials.append(control);
     scope.listen(control, "click", () => openSpecialMode(mode.id));

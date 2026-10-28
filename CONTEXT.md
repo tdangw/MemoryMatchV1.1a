@@ -7,12 +7,14 @@
   patch.coins (kể cả0); reset/restore tải canonical có generation guard,
   không commit hoặc cấp thưởng từ renderer. Số dư hiển thị vi-VN.
 - Home có ví phía trên. Bản đồ: avatar trái/tên game giữa/X phải; ví dưới
-  X góc phải, dưới ví là cặp icon ngang Nhiệm vụ/Sự kiện. Trên trái có
+  X góc phải, dưới ví là cặp icon dọc Nhiệm vụ/Sự kiện. Trên trái có
   cặp icon Kho báu/Bộ sưu tập; dưới trái là cặp icon Vô tận/Thử thách.
   Không banner rương ngang, không chữ dài trên lối tắt; chi tiết/tiến độ
   giữ ở popup/aria. Ba khu vực không khung/dây treo/nhãn chữ. Lối tắt
   dùng cùng navigate/page owner với dock, không mở luồng thưởng mới.
-  Icon28–30px, vùng bấm48px, lề mép2px; ví thẳng mép với cặp icon phải.
+  Cả ba cặp xếp dọc, icon30px/vùng bấm48px/lề mép2px. SVG minh họa
+  có màu/khối đồng bộ rương, vật liệu theo năm skin; không dùng icon nét
+  cho lối tắt bản đồ. Ví thẳng mép với cặp icon phải.
 - Shop dùng màu icon/chữ đúng nền theo skin. Nút mua/Play nổi nhẹ2px,
   nhấn1px; Hủy/Mua ngay cùng kích thước và độ nổi, màu phân cấp. Play
   xanh lớn64px. Chỉ CSS/SVG, không emoji/loop, có reduced-motion.

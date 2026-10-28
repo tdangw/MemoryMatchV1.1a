@@ -67,3 +67,11 @@ Cặp phải ngay dưới Xu; cặp trái ở góc trên/dưới. Bỏ style n�
 woodland cũ; giữ aria và bổ sung title cho nút icon. CSS ownership và
 matrix năm skin × ba viewport320/412/844×390 đạt3/3; đã xem ảnh thực tế.
 Không đổi điều hướng/luật/save; không build/deploy/APK.
+
+Phản hồi tiếp28/10: cả ba nhóm trở lại hàng dọc48×96px, vẫn không khung.
+Thay năm icon nét bằng SVG minh họa30px có vật liệu vàng/giấy/màu nhấn
+theo skin, đồng bộ rương; chỉ áp dụng bản đồ qua adventureActionArt.js,
+không đổi bộ icon toàn app. Không timer/listener/asset bitmap mới.
+Syntax/CSS ownership đạt; matrix năm skin ×320/412/844×390 đạt3/3,
+không chồng nhóm hoặc màn1, vùng bấm48px; đã xem ảnh default/storybook.
+Giữ logic/API/save, không build/deploy/APK.
