@@ -704,7 +704,7 @@ function openPurchaseConfirmation(item, roundId, shopModal, onPurchase) {
   price.append(document.createTextNode(String(item.price)), createIcon("coin"));
   content.append(message, price);
 
-  openAppModal({
+  const confirmation = openAppModal({
     id: "shop-confirm-modal",
     keepBanner: true,
     alignment: "center",
@@ -738,6 +738,7 @@ function openPurchaseConfirmation(item, roundId, shopModal, onPurchase) {
       },
     ],
   });
+  confirmation.panel.querySelector('.app-button--primary').classList.add('ui-raised-action');
 }
 
 // Mua vật phẩm

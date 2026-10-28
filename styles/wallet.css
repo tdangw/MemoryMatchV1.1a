@@ -1,13 +1,21 @@
 .app-wallet { display: inline-flex; align-items: center; gap: 5px; flex: none; max-width: 48%; padding: 5px 9px; border: 1px solid var(--ui-line); border-radius: 24px; background: var(--ui-inset); color: var(--ui-gold); font: 800 14px/1.25 'Segoe UI',sans-serif; white-space: nowrap; box-sizing: border-box; }
 .app-wallet > .ui-icon { width: 25px; height: 25px; flex: none; }
 .app-wallet > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-:is(#shop-modal,#collection-modal,#rankings-modal,#account-modal,#settings-modal,#missions-screen,#events-screen) .app-modal__header.has-app-wallet { display: flex; align-items: center; gap: 8px; }
-:is(#shop-modal,#collection-modal,#rankings-modal,#account-modal,#settings-modal,#missions-screen,#events-screen) .has-app-wallet > .app-modal__title { flex: 1; min-width: 0; font-size: clamp(16px,4.6vw,23px); }
-.has-app-wallet > .app-modal__title > .ui-icon { display: none; }
-.has-app-wallet > .app-modal__close { position: static; flex: none; }
-.game-selector > .adventure-header.has-app-wallet { display: flex; justify-content: flex-end; min-height: 52px; padding: 6px 16px; background: transparent; }
-.game-selector.adventure-page { grid-template-rows: auto minmax(0,1fr) auto; }
-.adventure-map-page .adventure-header.has-app-wallet { grid-template-columns: minmax(0,1fr) auto; gap: 8px; padding-inline: 56px 64px; }
-.adventure-map-page .adventure-map-title { display: flex; align-items: center; min-width: 0; min-height: 44px; font-size: clamp(15px,4vw,24px); }
+.game-selector > .adventure-header.has-app-wallet { display: flex; justify-content: flex-start; min-height: 52px; padding: 6px 16px; background: transparent; }
+.game-selector.adventure-page.has-menu-wallet { grid-template-rows: auto minmax(0,1fr) auto; }
+.adventure-map-page.has-menu-wallet .adventure-header { grid-template-columns: minmax(0,1fr); padding-inline:56px; }
+.adventure-map-page.has-menu-wallet .adventure-map-title { display: flex; align-items: center; justify-content:center; min-width: 0; min-height: 44px; font-size: clamp(15px,4vw,24px); }
 .adventure-map-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 @media(max-width:360px) { .app-wallet { font-size: 12px; padding: 5px 6px; } .app-wallet > .ui-icon { width: 21px; height: 21px; } }
+
+:is(#shop-modal,#collection-modal,#rankings-modal,#account-modal,#settings-modal,#missions-screen,#events-screen) .app-modal.app-modal--functional > header.app-modal__header.app-modal__header--functional {
+  --header-side:clamp(82px,23vw,110px); display:grid; grid-template-columns:var(--header-side) minmax(0,1fr) var(--header-side); align-items:center; gap:4px; min-height:60px; padding:8px 12px; box-sizing:border-box;
+}
+:is(#shop-modal,#collection-modal,#rankings-modal,#account-modal,#settings-modal,#missions-screen,#events-screen) .app-modal--functional > .app-modal__header--functional > .app-modal__title { grid-column:2; grid-row:1; min-width:0; margin:0; padding:0; text-align:center; font-size:clamp(15px,4.4vw,22px); line-height:1.2; }
+.app-modal__header--functional > .app-modal__title > .ui-icon { display:none; }
+.app-modal__header--functional > .app-wallet { grid-column:1; grid-row:1; justify-self:start; max-width:100%; }
+:is(#shop-modal,#collection-modal,#rankings-modal,#account-modal,#settings-modal,#missions-screen,#events-screen) .app-modal--functional > .app-modal__header--functional > .app-modal__close { grid-column:3; grid-row:1; justify-self:end; position:static; margin:0; width:44px; height:44px; padding:9px; }
+@media(max-width:360px) { .app-modal__header--functional .app-wallet { padding:4px; gap:3px; } .app-modal__header--functional .app-wallet > .ui-icon { width:18px; height:18px; } }
+.adventure-header > .app-wallet { max-width:110px; }
+
+.adventure-map-view > .adventure-map-wallet { position:absolute; top:8px; right:12px; z-index:4; max-width:120px; }

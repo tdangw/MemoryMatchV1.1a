@@ -6,7 +6,7 @@ import { createIcon } from "./icons.js";
 import { gameState } from "./gameState.js";
 import { GAME_MODES, getGameDefinition, getGameModeLabel } from "./gameCatalog.js";
 import { MAP_LEVEL_STEP, getMapLevelPoint, getMapChestPoint, createMapDecorations } from "./adventureMapLayout.js";
-import { decorateAdventureMenu, refreshAppWallet } from "./appNavigation.js";
+import { decorateAdventureMenu, refreshAppWallet, openMenuDestination } from "./appNavigation.js";
 import { prepareAdventureChapter } from "./adventureLaunch.js";
 import { createAdventureChapterNodes, getAdventureSummary, getAdventureLevelState, getAdventureChestState, isNormalAdventureMode } from "./adventureProgress.js";
 import { loadPersistentChapter } from "./persistence.js";
@@ -72,7 +72,23 @@ export function mountAdventureMap(gameId) {
   title.className = "adventure-map-title";
   const titleText = document.createElement("span"); titleText.className = "adventure-map-name"; titleText.textContent = game.title; title.append(titleText);
   mountPlayerHeaderPortrait(title,scope);
-  root.querySelector(".adventure-header").insertBefore(title, root.querySelector(".adventure-account"));
+  root.querySelector(".adventure-header").insertBefore(title, root.querySelector(".app-wallet"));
+  const header = root.querySelector('.adventure-header');
+  const wallet = header.querySelector('.app-wallet'); wallet.classList.add('adventure-map-wallet'); body.prepend(wallet);
+  header.classList.remove('has-app-wallet');
+  const shortcuts = document.createElement('nav'); shortcuts.className = 'adventure-map-shortcuts'; shortcuts.setAttribute('aria-label','Kho báu và Bộ sưu tập');
+  const eventShortcuts = document.createElement('nav'); eventShortcuts.className = 'adventure-map-shortcuts adventure-map-shortcuts--events'; eventShortcuts.setAttribute('aria-label','Nhiệm vụ và Sự kiện');
+  function shortcut(label, icon, destination) {
+    const control = button('', 'adventure-map-shortcut'); control.setAttribute('aria-label',label); control.append(createIcon(icon));
+    scope.listen(control,'click',async()=>{
+      if(control.disabled)return;control.disabled=true;
+      try { await openMenuDestination(root,destination); }
+      catch(error) { if(scope.active)showAppToast('Chưa mở được trang. Hãy thử lại.'); console.warn('Map shortcut unavailable',error.code||error.name); }
+      finally { if(scope.active)control.disabled=loading; }
+    });return control;
+  }
+  eventShortcuts.append(shortcut('Nhiệm vụ','missions','missions'),shortcut('Sự kiện','events','events'));
+  body.append(shortcuts,eventShortcuts);
   const specials = document.createElement("nav");
   specials.className = "adventure-special-modes";
   specials.setAttribute("aria-label", "Chế độ đặc biệt");
@@ -88,13 +104,13 @@ export function mountAdventureMap(gameId) {
   body.append(specials);
   const treasureCard = button("", "treasure-map-card");
   treasureCard.disabled = true;
-  body.prepend(treasureCard);
+  treasureCard.classList.add('adventure-map-shortcut'); shortcuts.append(treasureCard,shortcut('Bộ sưu tập','collection','collection'));
   scope.listen(treasureCard, "click", () => { if (!loading) openChest({chestNumber:Number(treasureCard.dataset.block)}); });
   function setBusy(busy) {
     loading = busy;
     ambient.setPaused(busy || root.dataset.mapReady !== 'true');
     for (const control of specials.children) control.disabled = busy;
-    treasureCard.disabled = busy;
+    for (const control of [...shortcuts.querySelectorAll('button'),...eventShortcuts.querySelectorAll('button')]) control.disabled=busy;
     for (const control of document.querySelectorAll('#adventure-level-modal input')) {
       const level = Number(control.closest('fieldset').dataset.level);
       control.disabled = busy || !getDifficultyAccess({completed:profile.bestByLevel,level,mode:control.value}).unlocked;
@@ -363,9 +379,10 @@ export function mountAdventureMap(gameId) {
         if (note) { const hint = document.createElement('small'); hint.textContent = note; tile.append(hint); }
         return tile;
       };
+      const [groupLabel, ...groupNotes] = info.target.split('·');
       const stats = [
         metric(info.timeSeconds === 0 ? 'infinity' : 'timer', 'Thời gian', info.timeSeconds === 0 ? 'Không giới hạn' : `${info.timeSeconds}s`),
-        metric('cards', 'Mục tiêu', `${info.tileCount / (gameId === 'triple-connect' ? 3 : 2)} ${gameId === 'triple-connect' ? 'bộ ba' : 'cặp'}`, `${info.tileCount} thẻ · ${info.waves} đợt`),
+        metric('cards', 'Mục tiêu', groupLabel.trim(), groupNotes.join('·').trim()),
       ];
       if (gameId === 'memory-match') stats.push(metric('eye', 'Xem trước', `${getPreviewDurationMs(selectedMode()) / 1000}s`));
       stats.push(metric('wand', 'Gợi ý', `${info.hints} lượt`));

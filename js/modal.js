@@ -84,7 +84,10 @@ export function openAppModal({
   if (icon) heading.appendChild(createIcon(icon));
   heading.appendChild(document.createTextNode(title));
   header.appendChild(heading);
-  if (["shop-modal","collection-modal","rankings-modal","account-modal","settings-modal","missions-screen","events-screen"].includes(id)) mountAppWallet(header, lifecycle);
+  if (["shop-modal","collection-modal","rankings-modal","account-modal","settings-modal","missions-screen","events-screen"].includes(id)) {
+    panel.classList.add('app-modal--functional'); header.classList.add('app-modal__header--functional');
+    if (id !== 'settings-modal') mountAppWallet(header, lifecycle);
+  }
 
   let closed = false;
   let destroyed = false;

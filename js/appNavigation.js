@@ -16,10 +16,18 @@ const actions = Object.freeze([
   { id: "ranking", icon: "trophy", label: "Xếp hạng" },
   { id: "settings", icon: "settings", label: "Cài đặt" },
 ]);
+const menuDestinations = new WeakMap();
 let handlers = {};
 let cloudState = "connecting";
 export function configureAppNavigation(next) { handlers = next; }
 export function openPlayerProfile(surface = {}) { return handlers.account?.(surface); }
+/** The same page owner serves dock buttons and map shortcuts. */
+export function openMenuDestination(root, action) {
+  const navigate = menuDestinations.get(root);
+  if (!navigate) return false;
+  if (![...actions.map(item => item.id), 'missions', 'events', 'profile', 'map'].includes(action)) throw new RangeError('Unknown menu destination.');
+  return navigate(action);
+}
 
 export function createAppDock(scope, { gameId = null, selected = null, onAction } = {}) {
   const dock = document.createElement("nav");
@@ -53,7 +61,7 @@ export function decorateAdventureMenu(root, { gameId = null, onHome } = {}) {
   const scope = mountAppPage(root);
   setMeteorSceneEligible(true);
   mountTouchDust(root, scope);
-  root.classList.add("adventure-page");
+  root.classList.add("adventure-page", "has-menu-wallet");
   const header = document.createElement("header");
   header.className = "adventure-header";
   root.prepend(header);
@@ -110,6 +118,8 @@ export function decorateAdventureMenu(root, { gameId = null, onHome } = {}) {
   for (const item of root.querySelectorAll(".menu-item")) {
     if (["Cửa hàng", "Bộ sưu tập", "Cài đặt", "Home"].includes(item.textContent.trim())) item.remove();
   }
+  menuDestinations.set(root, navigate);
+  scope.own(() => menuDestinations.delete(root));
   return scope;
 }
 

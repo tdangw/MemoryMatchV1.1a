@@ -1,11 +1,31 @@
 # CONTEXT — Trạng thái hiện tại (2026-10-28)
 
-## Menu/Cửa hàng/Preview — task giao28/10
+## Menu/Cửa hàng/Preview — hoàn tất 28/10/2026
 
-Nguồn hiện hành MENU_SHOP_PREVIEW_UI_PLAN.md, toàn bộ M1/M2/M3/Q được giao.
-Thêm ví Xu cùng vị trí ở Home/map và mọi tab, sửa icon/nút mua, bảng treo
-chế độ, preview bằng ô icon và Play nổi, fullscreen chỉ web/Android immersive.
-Giữ giá/gameplay/save; chỉ web/compile, không APK/deploy.
+- Tab chức năng: **Xu trái, tên giữa, X phải**; Cài đặt không có Xu.
+  Ví chung có owner/subscription; không còn callback data.coins. Đọc
+  patch.coins (kể cả0); reset/restore tải canonical có generation guard,
+  không commit hoặc cấp thưởng từ renderer. Số dư hiển thị vi-VN.
+- Home có ví phía trên. Bản đồ: avatar trái/tên game giữa/X phải; ví dưới
+  X góc phải, dưới ví là khung dọc icon Nhiệm vụ/Sự kiện. Trên trái có
+  khung icon Kho báu/Bộ sưu tập; dưới trái là Vô tận/Thử thách icon tròn.
+  Không banner rương ngang, không chữ dài trên lối tắt; chi tiết/tiến độ
+  giữ ở popup/aria. Màn ngang tách hai khung trái để không chồng. Lối tắt
+  dùng cùng navigate/page owner với dock, không mở luồng thưởng mới.
+- Shop dùng màu icon/chữ đúng nền theo skin. Nút mua/Play nổi nhẹ2px,
+  nhấn1px; Hủy/Mua ngay cùng kích thước và độ nổi, màu phân cấp. Play
+  xanh lớn64px. Chỉ CSS/SVG, không emoji/loop, có reduced-motion.
+- Preview là ô đồ họa thời gian, cặp/bộ ba, xem trước (Memory), gợi ý,
+  khay (Triple), chủ đề; lấy adapter thật, không cố định75s/6cặp/5s.
+  Giữ luật/giá/ID/save/schema và submit/difficulty/first-play guards.
+- Fullscreen chỉ mount ở web; APK dùng immersive Android create/resume/
+  focus, cho vuốt mở system bars tạm. Java compile offline đạt, chưa APK/
+  S22 thật. Web matrix320/412/1024 ba trò/năm skin, header25view, patch/
+  reset/restore/rapidbuy/30owner, map320/412 năm skin và ngang844×390 đạt;
+  syntax/CSS/preview contract/build đạt. Không Hosting/rules/push.
+- M1 4bf4129, M2 793bcf6, M3 542deac, lỗi subscriber f63e2ec; bằng chứng
+  chung MENU_SHOP_PREVIEW_UI_RECEIPT.md. Plan triển khai đã hoàn tất và
+  xóa sau khi gộp vào context; không phục hồi làm nguồn task đang chạy.
 
 ## Sự kiện/Nhiệm vụ/Kho rương — nguồn hiện hành 28/10/2026
 
