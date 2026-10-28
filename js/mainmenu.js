@@ -183,6 +183,7 @@ function showSessionChoice({ label, session, onContinue, onNew }) {
 
 export async function showCollectionModal({
   initialChest = false,
+  themesOnly = false,
   fromGame = false,
   gameId = "memory-match",
   onClose = () => {},
@@ -203,7 +204,7 @@ export async function showCollectionModal({
     id: "collection-modal",
     onDestroy: () => collectionScope.dispose(),
     icon: "collection",
-    title: "Bộ sưu tập",
+    title: themesOnly ? "Chủ đề" : "Bộ sưu tập",
     content,
     size: "large",
     onClose: () => {
@@ -302,6 +303,7 @@ export async function showCollectionModal({
           const saved = gameId === "triple-connect"
             ? (await equipTripleTheme(theme.id))
             : equipTheme(gameState.appearance, gameId, theme.id) && (await saveAppearance(gameState.appearance));
+          if (!collectionScope.active) return;
           if (!saved) {
             showAppToast("Không thể lưu thay đổi chủ đề.", { tone: "error" });
             return;
@@ -321,6 +323,11 @@ export async function showCollectionModal({
     grid.append(group);
   };
 
+  if (themesOnly) {
+    tabs.remove();
+    renderThemes();
+    return modal;
+  }
   if (gameId === "link-connect") {
     const renderLinkEffects = (title, equippedKey, ownedKey, effects) => {
       grid.className = "shop-item-grid shop-item-grid--appearance";

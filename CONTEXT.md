@@ -17,14 +17,22 @@
   giữ ở popup/aria. Ba khu vực có khung nhỏ nền tối/viền mảnh/họa tiết góc,
   không dây treo/nhãn chữ; khung46×94px nằm trong vùng bấm48×96px. Lối tắt
   dùng cùng navigate/page owner với dock, không mở luồng thưởng mới.
+  Trang mở từ bản đồ đóng X về chính bản đồ đang xem, không tạo lại map;
+  giữ chặng/vị trí cuộn. Trang mở từ Home vẫn đóng về Home.
   Cả ba cặp xếp dọc, icon30px/vùng bấm48px/lề mép2px. SVG minh họa
   có màu/khối đồng bộ rương, vật liệu theo năm skin; không dùng icon nét
   cho lối tắt bản đồ. Ví thẳng mép với cặp icon phải.
 - Shop dùng màu icon/chữ đúng nền theo skin. Nút mua/Play nổi nhẹ2px,
   nhấn1px; Hủy/Mua ngay cùng kích thước và độ nổi, màu phân cấp. Play
-  xanh lớn64px. Chỉ CSS/SVG, không emoji/loop, có reduced-motion.
+  xanh48px trong preview gọn. Chỉ CSS/SVG, không emoji/loop, có reduced-motion.
 - Preview là ô đồ họa thời gian, cặp/bộ ba, xem trước (Memory), gợi ý,
   khay (Triple), chủ đề; lấy adapter thật, không cố định75s/6cặp/5s.
+  Cập nhật29/10: tiêu đề giữa chỉ “Màn N”, bỏ mô tả chung và chú thích
+  số thẻ/đợt; ô thông số gọn, bố cục riêng khi ngang. Vô tận/Thử thách có
+  lời giới thiệu ngắn hướng người chơi; điều kiện mở dùng chữ C/B/A.
+  Bấm tên chủ đề mở bộ chọn chủ đề đã sở hữu trên preview; đóng trở lại
+  đúng preview/mode, cập nhật tên và focus. Scope preview hủy bộ chọn con
+  khi rời bản đồ; không tự mở shop, mua chủ đề hoặc cấp vật phẩm.
   Giữ luật/giá/ID/save/schema và submit/difficulty/first-play guards.
 - Fullscreen chỉ mount ở web; APK dùng immersive Android create/resume/
   focus, cho vuốt mở system bars tạm. Java compile offline đạt, chưa APK/

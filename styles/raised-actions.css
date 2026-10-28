@@ -15,8 +15,8 @@ html[data-ui-skin='starship'] :is(#shop-modal,#shop-confirm-modal,#adventure-lev
 #shop-modal .shop-item-title > .ui-icon { box-sizing:border-box; width:34px; height:34px; padding:6px; border:1px solid var(--ui-line); border-radius:10px; background:var(--ui-inset); color:var(--ui-ink); }
 @media(prefers-reduced-motion:reduce) { :is(#shop-modal,#shop-confirm-modal,#adventure-level-modal) button.ui-raised-action { transition:none; } }
 
-#adventure-level-modal .app-modal__footer > button.app-button--primary.ui-raised-action { --raised-top:#65c94c; --raised-bottom:#28843a; --raised-edge:#155528; --raised-ink:#fffbdc; border-color:#a2d773; min-height:64px; width:100%; max-width:none; font-size:24px; text-shadow:0 1px 2px #194728; }
-#adventure-level-modal .app-modal__footer { display:block; padding-bottom:20px; }
+#adventure-level-modal .app-modal__footer > button.app-button--primary.ui-raised-action { --raised-top:#65c94c; --raised-bottom:#28843a; --raised-edge:#155528; --raised-ink:#fffbdc; border-color:#a2d773; min-height:48px; width:100%; max-width:none; font-size:20px; text-shadow:0 1px 2px #194728; }
+#adventure-level-modal .app-modal__footer { display:block; padding:10px 14px 12px; }
 #adventure-level-modal .ui-raised-action > .ui-icon { width:28px; height:28px; color:inherit; }
 
 #shop-modal :is(.appearance-group h3,.theme-choice strong,.appearance-choice strong,.appearance-choice small,.theme-choice small) { color:var(--ui-ink); }

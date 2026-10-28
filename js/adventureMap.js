@@ -2,6 +2,7 @@ import '../styles/raised-actions.css';
 import { getPreviewDurationMs } from './config.js';
 import { getTheme } from "./themeCatalog.js";
 import { getEquippedThemeId } from "./appearance.js";
+import { createGameShellLifecycle } from './gameShell/gameShellLifecycle.js';
 import { createIcon } from "./icons.js";
 import { createAdventureActionArt } from './adventureActionArt.js';
 import { gameState } from "./gameState.js";
@@ -339,11 +340,10 @@ export function mountAdventureMap(gameId) {
     if (!scope.active || loading) return;
     if (!specialMode && !getDifficultyAccess({ completed: profile.bestByLevel, level, mode: view.mode }).unlocked) view.mode = 'easy';
     const selectedMode = () => specialMode || view.mode;
-    const title = () => specialMode ? `${getGameModeLabel(specialMode)} · Màn ${level}` : `Màn ${level} · ${getGameModeLabel(view.mode)}`;
+    const title = () => specialMode ? getGameModeLabel(specialMode) : `Màn ${level}`;
+    const previewScope = createGameShellLifecycle();
     const content = document.createElement("div");
     content.className = "adventure-level-preview";
-    const goal = document.createElement("p"); goal.className = "adventure-level-goal";
-    goal.textContent = adapter.goal;
     const choices = document.createElement("fieldset"); choices.className = "adventure-level-modes"; choices.dataset.level = String(level);
     const legend = document.createElement("legend"); legend.textContent = "Chọn độ khó";
     choices.append(legend);
@@ -369,39 +369,62 @@ export function mountAdventureMap(gameId) {
     }
     const details = document.createElement("ul"); details.className = "adventure-level-details";
     details.setAttribute("aria-live", "polite");
+    const themeButton = button('', 'adventure-preview-theme');
+    themeButton.setAttribute('aria-haspopup', 'dialog');
+    let openingThemes = false;
+    previewScope.listen(themeButton, 'click', async () => {
+      if (openingThemes || loading) return;
+      openingThemes = true; themeButton.disabled = true;
+      try {
+        const { showCollectionModal } = await import('./mainmenu.js');
+        if (!previewScope.active) return;
+        const themes = await showCollectionModal({ gameId, themesOnly: true, surface: { owner: previewScope } });
+        await themes.whenClosed;
+        if (previewScope.active) updatePreview();
+      } catch (error) {
+        console.warn('Theme selection unavailable', error);
+        if (previewScope.active) showAppToast('Chưa mở được chủ đề. Hãy thử lại.');
+      } finally {
+        openingThemes = false;
+        if (previewScope.active) { themeButton.disabled = false; themeButton.focus(); }
+      }
+    });
     function updatePreview() {
       const info = adapter.preview({ mode: selectedMode(), level, startedLevels: { ...adjacentStarted, ...profile.startedLevels } });
       const theme = getTheme(getEquippedThemeId(gameState.appearance, gameId));
-      goal.textContent = info.goal || adapter.goal;
-      const metric = (icon, label, value, note = '') => {
+      const metric = (icon, label, value) => {
         const tile = document.createElement('li'); tile.className = 'adventure-preview-metric';
         const caption = document.createElement('span'); caption.className = 'adventure-preview-label'; caption.textContent = label;
         const number = document.createElement('strong'); number.textContent = value;
         tile.append(createIcon(icon), caption, number);
-        if (note) { const hint = document.createElement('small'); hint.textContent = note; tile.append(hint); }
         return tile;
       };
-      const [groupLabel, ...groupNotes] = info.target.split('·');
+      const [groupLabel] = info.target.split('·');
       const stats = [
         metric(info.timeSeconds === 0 ? 'infinity' : 'timer', 'Thời gian', info.timeSeconds === 0 ? 'Không giới hạn' : `${info.timeSeconds}s`),
-        metric('cards', 'Mục tiêu', groupLabel.trim(), groupNotes.join('·').trim()),
+        metric('cards', 'Mục tiêu', groupLabel.trim()),
       ];
       if (gameId === 'memory-match') stats.push(metric('eye', 'Xem trước', `${getPreviewDurationMs(selectedMode()) / 1000}s`));
       stats.push(metric('wand', 'Gợi ý', `${info.hints} lượt`));
-      if (gameId === 'triple-connect') stats.push(metric('collection', 'Khay thẻ', info.assistNote));
+      if (gameId === 'triple-connect') stats.push(metric('collection', 'Khay thẻ', info.assistNote.replace(/^Khay\s+/, '')));
       const themeTile = metric(theme.icon || 'images', 'Chủ đề', theme.title); themeTile.classList.add('adventure-preview-metric--theme');
+      themeButton.textContent = theme.title;
+      themeButton.setAttribute('aria-label', `Đổi chủ đề: ${theme.title}`);
+      themeTile.lastChild.replaceWith(themeButton);
       stats.push(themeTile); details.replaceChildren(...stats);
     }
     updatePreview();
     if (!specialMode) content.append(choices);
-    content.append(goal, details);
     if (specialMode) {
       const rules = document.createElement("p");
       rules.className = "adventure-level-goal";
-      rules.textContent = "Mỗi lượt mới bắt đầu từ màn 1. Xếp hạng theo màn cao nhất đã vượt qua trong một lượt.";
+      rules.textContent = specialMode === 'endless'
+        ? 'Không giới hạn thời gian. Vượt liên tiếp các màn để lập kỷ lục.'
+        : 'Vượt các màn ngày càng khó trước khi hết giờ để lập kỷ lục.';
       content.append(rules);
     }
-    const release = specialMode ? undefined : scope.listen(choices, "change", event => {
+    content.append(details);
+    if (!specialMode) previewScope.listen(choices, "change", event => {
       if (loading || event.target.disabled || !isNormalAdventureMode(event.target.value)) return;
       playOwnedRewardCue('difficulty', scope, gameState.settings);
       view.mode = event.target.value; patchNodes(); updatePreview();
@@ -413,14 +436,14 @@ export function mountAdventureMap(gameId) {
       const label = event.target.closest('label.is-locked');
       if (!label || loading) return;
       event.preventDefault();
-      const grade = getGameModeLabel(label.dataset.requiresMode);
+      const grade = { easy: 'C', normal: 'B', hard: 'A' }[label.dataset.requiresMode];
       const prerequisite = Number(label.dataset.requiresLevel);
-      showAppToast(`Hoàn thành độ khó ${grade}${prerequisite === level ? ' của màn này' : ` ở màn ${prerequisite}`} để mở khóa.`, { position: 'center', duration: 2200 });
+      showAppToast(`Hoàn thành độ khó ${grade}${prerequisite === level ? '' : ` ở màn ${prerequisite}`} để mở khóa.`, { position: 'center', duration: 2200 });
     }
-    const releaseLockedClick = scope.listen(choices, 'click', explainLockedDifficulty);
-    const releaseLockedKey = scope.listen(choices, 'keydown', explainLockedDifficulty);
-    const modal = openAppModal({ id: "adventure-level-modal", title: title(), content, owner: scope, keepBanner: true,
-      onDestroy: () => { release?.(); releaseLockedClick(); releaseLockedKey(); },
+    previewScope.listen(choices, 'click', explainLockedDifficulty);
+    previewScope.listen(choices, 'keydown', explainLockedDifficulty);
+    const modal = openAppModal({ id: "adventure-level-modal", title: title(), content, owner: scope, keepBanner: true, alignment: 'center',
+      onDestroy: () => previewScope.dispose(),
       actions: [{ label: "Chơi", icon: "play", variant: "primary", sound: 'gameStart', onClick: async () => await launch(selectedMode(), level, { skipIntro: true }) ? undefined : false }],
     });
     modal.panel.classList.add("adventure-level-dialog");

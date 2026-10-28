@@ -115,6 +115,8 @@ export function openAppModal({
     if (closed) return;
     closed = true;
     const dismissButton = panel.querySelector('.app-modal__close');
+    // Keep focus inside the closing dialog until destroy restores its opener.
+    if (document.activeElement === dismissButton) panel.focus();
     if (dismissButton) dismissButton.disabled = true;
     removeKeydown();
     overlay.classList.add("is-closing");

@@ -71,10 +71,10 @@ export function decorateAdventureMenu(root, { gameId = null, onHome } = {}) {
   scope.own(() => clearMenuAdTarget(adSlot));
   scope.own(() => screen?.dispose());
   const goHome = () => (onHome || handlers.home)();
-  function createExit(owner) {
+  function createExit(owner, onExit = goHome, label = 'Đóng, về trang chủ') {
     const exit = document.createElement('button'); exit.type = 'button'; exit.className = 'adventure-exit';
-    exit.setAttribute('aria-label', 'Đóng, về trang chủ'); exit.append(createIcon('close'));
-    owner.listen(exit, 'click', goHome);
+    exit.setAttribute('aria-label', label); exit.append(createIcon('close'));
+    owner.listen(exit, 'click', onExit);
     return exit;
   }
   if (gameId) header.append(createExit(scope));
@@ -92,7 +92,9 @@ export function decorateAdventureMenu(root, { gameId = null, onHome } = {}) {
     view.dataset.screen = action;
     const host = document.createElement('div'); host.className = 'adventure-screen-host';
     const footer = createFooter(viewScope, action);
-    view.append(host, footer, createExit(viewScope));
+    view.append(host, footer, gameId
+      ? createExit(viewScope, () => navigate('map'), 'Đóng, về bản đồ')
+      : createExit(viewScope));
     document.body.append(view);
     root.hidden = true;
     const screenAdSlot = footer.querySelector('.adventure-ad-slot');

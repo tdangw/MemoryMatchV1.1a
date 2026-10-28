@@ -190,8 +190,9 @@ test('level preview supports native keyboard choices, escape/focus restoration a
   }
   expect(await page.evaluate(async () => (await import('/js/appPageLifecycle.js')).getAppPageScope().diagnostics())).toEqual(baseline);
   await page.locator('[data-special-mode="challenge"]').click();
-  await expect(page.locator('#adventure-level-modal')).toContainText('Thử thách · Màn 1');
-  await expect(page.locator('#adventure-level-modal')).toContainText('6 bộ ba · 18 thẻ × 2 đợt');
+  await expect(page.locator('#adventure-level-modal .app-modal__title')).toHaveText('Thử thách');
+  await expect(page.locator('#adventure-level-modal .adventure-level-details')).toContainText('6 bộ ba');
+  await expect(page.locator('#adventure-level-modal small')).toHaveCount(0);
   await expect(page.locator('.game-shell-root:visible')).toHaveCount(0);
 });
 

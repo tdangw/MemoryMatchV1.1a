@@ -99,3 +99,31 @@ bản đồ ba trò, overlay dùng chung header trong game. Đo text Range, khô
 chỉ bounding box h2: tâm chữ lệch<1px ngang, giữa dọc<3px, một dòng, không
 chồng Xu/X; header screen bắt đầu đúng top và cao60px. Đã xem ảnh default/
 storybook320. Không đổi JS/API/save, không build/deploy/APK.
+
+29/10 — Preview gọn và quay về đúng nơi mở:
+- Tiêu đề giữa “Màn N”; bỏ độ khó lặp, goal chung và ghi chú số thẻ/đợt.
+  Metric58px, icon24px, theme44px, Play48px; ngang dùng bố cục hai vùng.
+  Vô tận/Thử thách có lời giới thiệu ngắn; điều kiện khóa dùng C/B/A.
+- Tên chủ đề là nút mở bộ chọn đã sở hữu, dùng renderer/save hiện có qua
+  option themesOnly tương thích ngược. Đóng về đúng preview/mode, tên mới
+  và focus; previewScope sở hữu listener/modal con, hủy khi rời trang.
+  Guard collectionScope ngăn render/toast sau khi đã đóng trong lúc lưu.
+- X của trang chức năng mở từ map dùng navigate('map'), giữ root/chặng/
+  scroll; Home vẫn về Home. Rương giữ modal và đóng về map như trước.
+- Sửa focus ở modal owner: chuyển focus từ X sang panel trước vô hiệu hóa
+  X để destroy còn nhận diện focus bên trong và trả về opener.
+- Kiểm tra syntax4module/CSS ownership/adventure-preview contract đạt.
+  Matrix320×640/412×915/844×390: ba trò × năm skin × ba loại preview đạt3/3,
+  body không cuộn, tiêu đề giữa, nút Play/theme đủ trong popup; đã xem ảnh
+  default dọc và Cổ tích ngang. compact-preview-final.log ghi phần matrix.
+  compact-preview-flow.log đạt: ba trò, đổi sang Chữ cái, đóng/mở theme
+  bốn lần/trò, trả focus, rời map hủy cả hai modal, bốn lối tắt giữ map/scroll.
+  compact-preview-regression-final.log: submit và keyboard12chu kỳ đạt;
+  compact-special-final.log12/12 (ba trò × bốn viewport): mỗi loại special
+  ba chu kỳ, diagnostics bằng baseline, snapshot không đổi, focus/viewport đạt.
+  Các lần đầu phát hiện focus X và số thời gian cố định cũ trong test; đã
+  sửa nguyên nhân và test đọc cấu hình hiện hành, không đổi luật để pass.
+- npm run build đạt (compact-preview-build.log); hai cảnh báo asset marker
+  baseline và cảnh báo module đã import tĩnh/động; output không còn marker
+  literal. Không deploy/APK; không đổi luật/giá/ID/save/schema. Chỉ review
+  diff và bằng chứng tại đây, không nhận là review độc lập hoặc đo FPS.

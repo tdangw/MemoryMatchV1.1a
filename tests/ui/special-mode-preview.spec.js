@@ -22,7 +22,8 @@ for (const gameId of games) {
       await page.locator('[data-level="1"]').click();
       const normal = page.locator('#adventure-level-modal .app-modal');
       await expect(normal).toBeVisible();
-      const normalTop = (await normal.boundingBox()).y;
+      const normalBounds = await normal.boundingBox();
+      const normalCenter = normalBounds.y + normalBounds.height / 2;
       await page.keyboard.press('Escape');
       await expect(page.locator('#adventure-level-modal')).toHaveCount(0);
       for (let cycle = 0; cycle < 3; cycle++) for (const [mode, label] of modes) {
@@ -30,12 +31,19 @@ for (const gameId of games) {
         await trigger.click();
         const dialog = page.locator('#adventure-level-modal');
         const panel = dialog.locator('.app-modal');
-        await expect(panel).toHaveAttribute('aria-label', new RegExp(`${label} · Màn 1$`));
+        await expect(panel).toHaveAttribute('aria-label', new RegExp(`${label}$`));
         await expect(dialog.locator('input[type="radio"]')).toHaveCount(0);
-        await expect(dialog.locator('.adventure-level-details')).toContainText(mode === 'endless' ? 'Thời gian: Không giới hạn' : `Thời gian: ${gameId === 'triple-connect' ? 75 : 60} giây`);
-        await expect(dialog).toContainText('Mỗi lượt mới bắt đầu từ màn 1.');
+        const seconds = await page.evaluate(async ({gameId,mode}) => {
+          const previews = await import('/js/adventurePreview.js');
+          const {gameState} = await import('/js/gameState.js');
+          const {getGameDefinition} = await import('/js/gameCatalog.js');
+          const read = {'memory-match':previews.previewMemoryLevel,'link-connect':previews.previewLinkLevel,'triple-connect':previews.previewTripleLevel}[gameId];
+          return read(mode,1,gameState.progress[getGameDefinition(gameId).progressKey]).timeSeconds;
+        }, {gameId,mode});
+        await expect(dialog.locator('.adventure-level-details')).toContainText(seconds === 0 ? 'Không giới hạn' : `${seconds}s`);
+        await expect(dialog).toContainText('để lập kỷ lục.');
         await expect(page.locator('.game-shell-root:visible')).toHaveCount(0);
-        await expect.poll(async () => Math.abs((await panel.boundingBox()).y - normalTop)).toBeLessThan(2);
+        await expect.poll(async () => panel.boundingBox().then(bounds => Math.abs(bounds.y + bounds.height / 2 - normalCenter))).toBeLessThan(2);
         const bounds = await panel.boundingBox();
         expect(bounds.x).toBeGreaterThanOrEqual(0);
         expect(bounds.x + bounds.width).toBeLessThanOrEqual(viewport.width);
