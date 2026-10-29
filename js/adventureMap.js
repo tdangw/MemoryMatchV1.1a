@@ -1,3 +1,4 @@
+import { mountHourlyGiftCountdown } from './liveops/hourlyGiftViewState.js';
 import '../styles/raised-actions.css';
 import { getPreviewDurationMs } from './config.js';
 import { getTheme } from "./themeCatalog.js";
@@ -79,17 +80,21 @@ export function mountAdventureMap(gameId) {
   const wallet = header.querySelector('.app-wallet'); wallet.classList.add('adventure-map-wallet'); body.prepend(wallet);
   header.classList.remove('has-app-wallet');
   const shortcuts = document.createElement('nav'); shortcuts.className = 'adventure-map-shortcuts'; shortcuts.setAttribute('aria-label','Kho báu và Bộ sưu tập');
-  const eventShortcuts = document.createElement('nav'); eventShortcuts.className = 'adventure-map-shortcuts adventure-map-shortcuts--events'; eventShortcuts.setAttribute('aria-label','Nhiệm vụ và Sự kiện');
+  const eventShortcuts = document.createElement('nav'); eventShortcuts.className = 'adventure-map-shortcuts adventure-map-shortcuts--events'; eventShortcuts.setAttribute('aria-label','Nhiệm vụ, Sự kiện và Quà tặng');
   function shortcut(label, icon, destination) {
     const control = button('', 'adventure-map-shortcut'); control.setAttribute('aria-label',label); control.title=label; control.append(createAdventureActionArt(icon));
+    if(destination==='hourly-gift')mountHourlyGiftCountdown(control,scope);
     scope.listen(control,'click',async()=>{
       if(control.disabled)return;control.disabled=true;
-      try { await openMenuDestination(root,destination); }
+      try {
+        if(destination==='hourly-gift'){const {openHourlyGift}=await import('./liveops/hourlyGiftPresentation.js');if(scope.active&&!loading){control.disabled=false;control.focus();openHourlyGift(scope);}}
+        else await openMenuDestination(root,destination);
+      }
       catch(error) { if(scope.active)showAppToast('Chưa mở được trang. Hãy thử lại.'); console.warn('Map shortcut unavailable',error.code||error.name); }
       finally { if(scope.active)control.disabled=loading; }
     });return control;
   }
-  eventShortcuts.append(shortcut('Nhiệm vụ','missions','missions'),shortcut('Sự kiện','events','events'));
+  eventShortcuts.append(shortcut('Nhiệm vụ','missions','missions'),shortcut('Sự kiện','events','events'),shortcut('Quà tặng','gift','hourly-gift'));
   body.append(shortcuts,eventShortcuts);
   const specials = document.createElement("nav");
   specials.className = "adventure-special-modes";

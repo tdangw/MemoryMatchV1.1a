@@ -9,16 +9,24 @@
 - Đã xóa năm kế hoạch hoàn tất về gameplay, nền động, UI skin, Cổ tích và nhập môn. Không phục hồi chúng từ Git làm nguồn thực thi. Nguồn thiết kế hiện hành: ba tài liệu game, ARCHITECTURE và mục sản phẩm dưới đây; receipt là lịch sử. `ADS_APK_TEST_PLAN.md` chỉ còn checklist thiết bị/provider thật chưa xác minh, không phải quyền tự tạo APK/phát hành.
 - Lượt này được phép commit phần triển khai hai task và cleanup đã rà; không stage ảnh/log QA hoặc thay đổi không liên quan. Không tự push/Hosting/rules/APK/billing.
 
-## Quà tặng 60 phút — đang triển khai 29/10/2026
+## Quà tặng bất ngờ — hoàn tất 29/10/2026
 
-- Kế hoạch hiện hành: HOURLY_GIFT_PLAN.md. Đã duyệt ba nhóm vé/100Xu/hỗ trợ
+- Đã duyệt ba nhóm vé/100Xu/hỗ trợ
   mỗi nhóm1/3; hỗ trợ chọn đều trò rồi đều loại trong pool rương. Lần đầu
   nhận ngay, sau đó60phút thực tế, không cộng dồn, nhận khi online.
 - A đã kiểm tra: mốc máy chủ trong liveops, giao dịch root/snapshot hiện có,
   candidate bền vững/replay, kho đầy đổi10Xu. Unit5/5; emulator riêng đạt
   vé/Xu/hỗ trợ ba trò, nhận song song, chặn sớm/backdate và thao tác cũ.
-- B đang hoàn thiện icon dưới Sự kiện, popup/countdown và hiệu ứng hữu hạn.
-  Chủ dự án cho phép deploy Firestore rules cho quà ngày29/10; không Hosting/APK.
+- Icon dưới Sự kiện, đồng hồ nhỏ dưới icon trong vùng bấm48px; không tăng
+  kích thước nút/khung. Popup “Quà tặng bất ngờ” chỉ hộp quà và nút “Mở quà”.
+  Đợi hết cooldown mới mở; lỗi kết nối đổi chính nút đó thành “Thử lại”.
+- Lưu thành công rồi đóng popup, mới mở hộp/rơi/thu quà trên map. Sáu particle
+  Xu hoặc một vé/vật phẩm, hiệu ứng khoảng1,3s và thông báo ngắn; owner là
+  map, hủy khi rời map. Reduced-motion tĩnh; animation không cấp thưởng.
+- Rules đã deploy thành công lên memorymatchv1-1a ngày29/10 theo cho phép
+  trực tiếp của chủ dự án sau lỗi403. Không Hosting/APK. Build web, unit5/5,
+  UI matrix năm skin/ba viewport và hủy/đóng/thử lại/bấm nhanh đã đạt.
+- Nguồn hiện hành nằm ở đây và HOURLY_GIFT_RECEIPT.md; plan hoàn tất đã xóa.
 
 ## Menu/Cửa hàng/Preview — hoàn tất 28/10/2026
 

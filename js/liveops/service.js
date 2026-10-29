@@ -172,7 +172,19 @@ async function perform(command, pass = 0, expected = null, totals = {reads:0,wri
         onStagePlan: jobs => updateSyncMetadata(`${identity.environment}:work:${identity.uid}`, () => ({ jobs }), isCurrent) });
       if(!published.cleanupError)await updateSyncMetadata(`${identity.environment}:work:${identity.uid}`,()=>({jobs:[]}),isCurrent);
       totals.reads+=published.reads;totals.writes+=published.writes;totals.bytes+=encoded.byteLength;totals.coins+=added;
-      return { ...result, initializing, continueOperation:reconcileOnly && Boolean(migrateOnly || sourcesOnly && (operation||unappliedDrops||hasFacts) || operation || initializing && (unappliedDrops || hasFacts || newSources) || periodOnly && (unappliedDrops || hasFacts) || remainingLetterWork), expiredOperation:resolved.discarded, root: published.root, data, added, appliedCoins:totals.coins,
+      let viewState=result.state,viewNow=result.serverNow;
+      if(result.hourlyGiftApplied){
+        viewNow=clockNow(identity)??viewNow;
+        try {
+          const confirmed=await readSparkState(backend.database,identity.environment,identity.uid);totals.reads++;
+          viewState={...result.state,hourlyGift:confirmed.state.hourlyGift};viewNow=clockNow(identity)??viewNow;
+        } catch(error) {
+          // The grant is already committed. Keep the countdown conservative until the next status read.
+          console.info('Gift clock will refresh on next connection',error.code||error.name);
+          viewState={...result.state,hourlyGift:{...result.state.hourlyGift,claimedAt:viewNow}};
+        }
+      }
+      return { ...result, state:viewState, serverNow:viewNow, initializing, continueOperation:reconcileOnly && Boolean(migrateOnly || sourcesOnly && (operation||unappliedDrops||hasFacts) || operation || initializing && (unappliedDrops || hasFacts || newSources) || periodOnly && (unappliedDrops || hasFacts) || remainingLetterWork), expiredOperation:resolved.discarded, root: published.root, data, added, appliedCoins:totals.coins,
         operations: {...totals} };
     }, isCurrent);
   }); } catch(error) {

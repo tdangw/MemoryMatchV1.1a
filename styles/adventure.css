@@ -208,7 +208,7 @@
 .adventure-map-node--level.is-mode-cleared { background: var(--ui-art-grade-b) center / 100% 100% no-repeat; color: #fff; }
 
 .adventure-map-shortcuts { position:absolute; z-index:3; left:2px; top:4px; display:flex; flex-direction:column; gap:0; }
-.adventure-map-shortcuts--events { left:auto; right:2px; top:44px; }
+.adventure-map-shortcuts--events { --map-divider-first:44px; --map-divider-second:92px; left:auto; right:2px; top:44px; }
 .adventure-map-page .adventure-map-shortcuts > .adventure-map-shortcut { display:grid; place-items:center; box-sizing:border-box; width:48px; height:48px; min-height:48px; min-width:48px; margin:0; padding:8px; border:0; border-image:none; border-radius:8px; background:transparent; color:#fff1c9; box-shadow:none; }
 .adventure-map-shortcuts .treasure-map-card .treasure-art { width:30px; height:28px; }
 .adventure-map-shortcut[data-ready='true'] { outline:2px solid #bde786; outline-offset:-4px; }
@@ -218,10 +218,14 @@
 
 .adventure-map-shortcuts, .adventure-special-modes { isolation:isolate; }
 .adventure-map-shortcuts::before, .adventure-special-modes::before { content:''; position:absolute; inset:1px; z-index:-1; pointer-events:none; border:1px solid var(--map-art-gold); border-radius:10px 4px; background:var(--map-panel-bg); box-shadow:inset 0 0 0 1px #ffffff0a,0 1px 2px #00151f66; }
-.adventure-map-shortcuts::after, .adventure-special-modes::after { content:''; position:absolute; inset:4px; z-index:-1; pointer-events:none; background:linear-gradient(90deg,transparent,var(--map-art-gold) 22% 78%,transparent) center/100% 1px no-repeat,radial-gradient(circle at 0 0,transparent 6px,var(--map-art-gold) 6.5px 7.5px,transparent 8px) top left/12px 12px no-repeat,radial-gradient(circle at 100% 100%,transparent 6px,var(--map-art-gold) 6.5px 7.5px,transparent 8px) bottom right/12px 12px no-repeat; }
+.adventure-map-shortcuts::after, .adventure-special-modes::after { content:''; position:absolute; inset:4px; z-index:-1; pointer-events:none; background:linear-gradient(90deg,transparent,var(--map-art-gold) 22% 78%,transparent) center var(--map-divider-first,50%)/100% 1px no-repeat,linear-gradient(90deg,transparent,var(--map-art-gold) 22% 78%,transparent) center var(--map-divider-second,-10px)/100% 1px no-repeat,radial-gradient(circle at 0 0,transparent 6px,var(--map-art-gold) 6.5px 7.5px,transparent 8px) top left/12px 12px no-repeat,radial-gradient(circle at 100% 100%,transparent 6px,var(--map-art-gold) 6.5px 7.5px,transparent 8px) bottom right/12px 12px no-repeat; }
 
-.adventure-map-view { --map-panel-bg:#0b2933f5; --map-art-light:#fff0b4; --map-art-gold:#dba94d; --map-art-dark:#765029; --map-art-body-light:#5e9b79; --map-art-body:#204f45; }
-html[data-ui-skin='woodland'] .adventure-map-view { --map-panel-bg:#302a20f5; --map-art-light:#ffe7ad; --map-art-gold:#d8a057; --map-art-dark:#704224; --map-art-body-light:#a47a4a; --map-art-body:#543a24; }
-html[data-ui-skin='papercut'] .adventure-map-view { --map-panel-bg:#273b2af5; --map-art-light:#fff2ce; --map-art-gold:#dfb36c; --map-art-dark:#79603f; --map-art-body-light:#a8bb87; --map-art-body:#5c7953; }
-html[data-ui-skin='starship'] .adventure-map-view { --map-panel-bg:#102637f5; --map-art-light:#e5fcff; --map-art-gold:#8dc8d9; --map-art-dark:#3d697e; --map-art-body-light:#5a9cba; --map-art-body:#214b69; }
-html[data-ui-skin='storybook'] .adventure-map-view { --map-panel-bg:#142c3ef5; --map-art-light:#fff2b3; --map-art-gold:#efb64a; --map-art-dark:#8d5024; --map-art-body-light:#569da2; --map-art-body:#254d70; }
+:is(.adventure-map-view,.hourly-gift-dialog,.hourly-gift-reveal) { --map-panel-bg:#0b2933f5; --map-art-light:#fff0b4; --map-art-gold:#dba94d; --map-art-dark:#765029; --map-art-body-light:#5e9b79; --map-art-body:#204f45; }
+html[data-ui-skin='woodland'] :is(.adventure-map-view,.hourly-gift-dialog,.hourly-gift-reveal) { --map-panel-bg:#302a20f5; --map-art-light:#ffe7ad; --map-art-gold:#d8a057; --map-art-dark:#704224; --map-art-body-light:#a47a4a; --map-art-body:#543a24; }
+html[data-ui-skin='papercut'] :is(.adventure-map-view,.hourly-gift-dialog,.hourly-gift-reveal) { --map-panel-bg:#273b2af5; --map-art-light:#fff2ce; --map-art-gold:#dfb36c; --map-art-dark:#79603f; --map-art-body-light:#a8bb87; --map-art-body:#5c7953; }
+html[data-ui-skin='starship'] :is(.adventure-map-view,.hourly-gift-dialog,.hourly-gift-reveal) { --map-panel-bg:#102637f5; --map-art-light:#e5fcff; --map-art-gold:#8dc8d9; --map-art-dark:#3d697e; --map-art-body-light:#5a9cba; --map-art-body:#214b69; }
+html[data-ui-skin='storybook'] :is(.adventure-map-view,.hourly-gift-dialog,.hourly-gift-reveal) { --map-panel-bg:#142c3ef5; --map-art-light:#fff2b3; --map-art-gold:#efb64a; --map-art-dark:#8d5024; --map-art-body-light:#569da2; --map-art-body:#254d70; }
+
+.adventure-map-page .adventure-map-shortcuts > .adventure-map-shortcut--gift { grid-template-rows:28px 10px; align-content:center; gap:0; padding:3px; }
+.adventure-map-shortcut--gift > .adventure-action-art { width:28px; height:28px; }
+.adventure-gift-countdown { display:block; font:700 9px/10px 'Segoe UI',sans-serif; color:#fff0c4; white-space:nowrap; text-shadow:0 1px 2px #00151f; }

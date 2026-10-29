@@ -1,6 +1,7 @@
 // Map-only illustrations share material tokens; functional icons elsewhere stay unchanged.
 let serial = 0;
 const shapes = Object.freeze({
+  gift: '<path d="M5 13h24v18H5Z" fill="url(#ID-body)"/><path d="M14 11h6v20h-6Z" fill="url(#ID-metal)"/><path d="M9 20v7h3m10 0h3v-7" fill="none" stroke="var(--map-art-body-light)"/><path d="m17 19 3 3-3 3-3-3Z" fill="var(--map-art-light)"/><g class="hourly-gift__lid"><path d="M3 10h28v7H3Z" fill="url(#ID-metal)"/><path d="M17 10C5 12 6 1 11 3c4 1 6 7 6 7Zm0 0C29 12 28 1 23 3c-4 1-6 7-6 7Z" fill="url(#ID-metal)"/></g>',
   collection: '<path d="M7 4 27 2l2 27-21 2Z" fill="url(#ID-metal)"/><path d="m10 6 14-1 2 21-15 2Z" fill="url(#ID-body)"/><path d="M8 5 6 6l1 24 3 1M12 29l15-2" fill="none" stroke="var(--map-art-light)"/><path d="m17 10 2 4 4 1-3 3 .5 4-3.5-2-3.5 2 .5-4-3-3 4-1Z" fill="url(#ID-metal)"/>',
   missions: '<rect x="5" y="5" width="23" height="26" rx="3" fill="url(#ID-body)"/><rect x="8" y="7" width="17" height="21" rx="1.5" fill="url(#ID-paper)"/><path d="M12 3h3a2 2 0 0 1 4 0h3v6H12Z" fill="url(#ID-metal)"/><path d="m11 15 3 3 6-6" fill="none" stroke="var(--map-art-body)" stroke-width="2.5"/><path d="M12 23h9" stroke="var(--map-art-dark)" stroke-width="1.4"/>',
   events: '<path d="M5 7h23v23H5Z" fill="url(#ID-metal)"/><path d="M7 13h19v14H7Z" fill="url(#ID-paper)"/><path d="M5 7h23v7H5Z" fill="url(#ID-body)"/><path d="M11 4v6m11-6v6" stroke="var(--map-art-light)" stroke-width="2.5"/><path d="m17 16 1.5 3 3.5.5-2.5 2.5.5 3.5-3-1.5-3 1.5.5-3.5-2.5-2.5 3.5-.5Z" fill="url(#ID-metal)"/>',
