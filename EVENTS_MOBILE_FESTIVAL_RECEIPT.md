@@ -1,6 +1,10 @@
 > Hồ sơ nghiệm thu lịch sử. Tên hiện hành: **Sưu tập huy hiệu** (28/10/2026).
 > Quyết định đang áp dụng ở CONTEXT.md; các tên/quyền phát hành cũ bên dưới chỉ ghi lịch sử.
 
+> Rà soát29/10: task gameplay đã hoàn tất và kế hoạch tương ứng đã được
+> xóa. Các câu “giữ plan vì chưa triển khai” bên dưới mô tả28/10, đã hết
+> hiệu lực. Kết quả rà mới nằm ở GAMEPLAY_ECONOMY_AUDIT.md.
+
 # Nghiệm thu Sự kiện, Nhiệm vụ và Kho rương — 27/10/2026
 
 > Mở lại phần mỹ thuật: chủ dự án gửi ba ảnh tham chiếu và xác nhận UI

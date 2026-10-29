@@ -65,7 +65,7 @@ Game Shell giữ đủ sáu region công khai: `title`, `progress`, `hud`, `mile
 | `memoryItems.js` | Catalog, màu cấp và số lượng kho Xem trước/Thời gian. |
 | `memorySession.js` | Snapshot phiên Memory Match dùng chung cho controller, kho và phần thưởng. |
 | `memoryPreview.js` | Hiệu ứng xem trước 4/8/12/tất cả dùng chung cho kho và phần thưởng. |
-| `memorySpecial.js` | Năng lượng, vòng 10 mốc và phần thưởng từ cặp đặc biệt. |
+| `memorySpecial.js` | Trình bày Lucky/năng lượng/vật phẩm đã commit; resolver nghiệp vụ thuộc `memoryMatch/pairRewards.js`. |
 
 ### Link Connect
 
@@ -242,3 +242,48 @@ Home inert trong fade opacity180ms, rồi giải phóng ngay; reduced-motion/tab
 - adventureRewards giữ queue và atomic coins/items/receipt. API outcome/null cũ được giữ; claimJourneyTreasure trả kết quả chi tiết và expectedTier bắt buộc cho UI mới, kiểm canonical tier/profile/UID trước grant. Full inventory hoặc save/CAS fail không partial grant, rollback vào đúng profile. Callback presentation không phát lại reward. R0–R6 không đổi key/schema/catalog reward.
 - gameplaySeason1 và IndexedDB3 cô lập dữ liệu thử cũ; namespace local/test/beta/production-waves1 cô lập cloud/profileStats/ranking với client cũ. Ranking wirev3 không đổi. Reset Firebase có backup/hash/updateTime precondition và kiểm kê; không phải công việc lặp mỗi startup/deploy.
 - Module settlement chỉ trả delta mastery cho lần thắng đầu; summary đọc tên/projection và điều hướng qua API map có owner, không click DOM giả hoặc tự claim. Bộ tranh/300Xu giữ độc lập với bốn rương.
+
+## Nhiệm vụ, rương và phần thưởng theo nhóm — contract hiện hành29/10/2026
+
+Hai task Sự kiện/Nhiệm vụ và rơi vật phẩm/Nam châm đã hoàn tất phạm vi
+web local. Các plan đã đóng được xóa; không dùng receipt/prompt lịch sử
+làm nguồn thực thi mới. Chính sách sản phẩm ở CONTEXT và ba tài liệu
+game; đánh giá cân bằng mới ở `GAMEPLAY_ECONOMY_AUDIT.md`.
+
+- `progression/gameplayRules.js` là nguồn điểm/sao/Xu/settlement cho cả
+  ba controller nhiều đợt: ghép thủ công2Xu, điểm có trần combo, thưởng
+  hoàn thành nhanh theo thời gian chơi thực. Helper tính điểm/thưởng cũ
+  trong config giữ cho compatibility, không là công thức gameplay mới.
+- `progression/groupDropPolicy.js` giữ tỷ lệ năng lượng80/20 và hỗ trợ
+  thường5/đặc biệt10/Memory Special–Link Blue30 độc lập, không pity.
+  Resolver Memory/Link và Triple milestones quyết định kết quả trước
+  transaction; ledger cả trượt không hoàn tác theo undo. Phá phụ không
+  bốc tiếp. Chính sách2cho đợt mới, phiên thiếu version giữ1tới hết đợt.
+- Triple Magnet giữ type gốc/bội số ba,1thẻ mỗi đợt. State helper chọn
+  đồng loại từ khay trước rồi ID board ổn định dùng chung reducer/Gợi ý;
+  reducer giải quyết nguyên tử trước xét đầy khay. Solver, witness và
+  shuffle dùng cùng luật, metadata đi theo snapshot; animation không xóa
+  thẻ hoặc cấp quà. Không thêm Magnet khi restore phiên cũ.
+- `liveops/presentation.js`, `missionsPresentation.js`, `chestPresentation.js`
+  quản page/tab/operation theo scope, một timer countdown UI khi hiện.
+  Không polling/ghi theo tick, không giả quyền nhận từ cache/offline.
+  Mở rương chỉ ngoài game scope; đang chơi chỉ xem.
+- `liveops/service.js` → `sparkModel.js` và persistence queue/CAS là
+  đường kinh tế hiện hành, không Functions/SSV/scheduler. `model.js` giữ
+  catalog/tính kỳ và pure policy cũ cho compatibility, không là reducer
+  runtime Spark. `supportInventory.js` ghi đúng kho game; queue bù delta
+  tránh snapshot mua hàng cũ ghi đè quà đã commit, reset/UID có epoch guard.
+- `liveops/chests.js` quản earned/spent/sequence/source watermark bốn
+  loại, candidate bền trước publication, kết quả cuối replay không cấp
+  lại. `chestConfig.js` là nguồn pool/rate và mốc Sưu tập huy hiệu; đủ
+  pool/ngoại hình trùng100Xu, overflow hỗ trợ10Xu/đơn vị tại kho9999.
+  Receipt cũ200/300/10000Xu vẫn đọc, không hồi tố ví.
+- Sưu tập huy hiệu giữ các key kỹ thuật `fireflyEarned`/`festival` và
+  command/ID cũ, không migration chỉ vì đổi tên. Vé/chữ/huy hiệu từ
+  nhóm đặc biệt/Lucky/Magnet qua dropAdapters có attempt/wave/group
+  dedup; nhóm thường trúng năng lượng không trở thành đặc biệt.
+- Nguồn source/template/generator giữ rules dispatch và validation.
+  `firestore.rules` là output; không sửa tay hoặc tự deploy khi commit.
+  Firebase free dùng counter/ledger hữu hạn theo snapshot, không thêm
+  document mỗi lượt rơi/rương/vòng. Client trust cơ bản không chống app
+  sửa đổi tuyệt đối; không dùng tăng backend để che bất cân bằng kinh tế.

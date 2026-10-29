@@ -1,5 +1,9 @@
 # Nền động — receipt triển khai chung
 
+> Hồ sơ lịch sử của task đã hoàn tất. Kế hoạch cũ đã được xóa29/10/2026;
+> contract hiện hành ở ARCHITECTURE.md và CONTEXT.md. Những gate/chờ duyệt
+> trong diễn biến bên dưới không phải yêu cầu triển khai mới.
+
 Ngày 26/10/2026. Phạm vi: `ANIMATED_BACKGROUNDS_PLAN.md`, toàn G0–G5;
 commit riêng từng phase theo yêu cầu bổ sung. Không deploy/APK/push/rules.
 

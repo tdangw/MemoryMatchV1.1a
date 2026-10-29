@@ -94,12 +94,22 @@ Thử thách tăng một bậc mỗi level: 4×3 → 4×4 → 4×5 → 4×6 → 
 
 ### Thẻ đặc biệt và thẻ đóng băng
 
+Điểm/Xu/sao của màn nhiều đợt lấy từ `js/progression/gameplayRules.js`:
+ghép thủ công nhận 2 Xu cố định; điểm `10 + 2 × min(max(combo − 1,0),4)`,
+phá phụ tự động 10 điểm. Không áp hệ số điểm 1,5 của helper config cũ.
+Thưởng thắng theo `calculateVictoryCoins`, điểm hoàn thành nhanh theo
+`calculateFastFinishBonus`; không dùng hệ số tốc độ/giây dư cũ trong
+config làm nguồn cân bằng hiện hành. Mốc sao dùng tổng nhóm cả màn,
+chung Memory/Triple. Đánh giá kinh tế mới ở `GAMEPLAY_ECONOMY_AUDIT.md`.
+
 - Thẻ cao cấp không bắt buộc xuất hiện ở mọi màn. Tỷ lệ/số cặp theo kích thước bàn: tối đa 8 cặp là 60% có 1 cặp; 9–15 cặp là 70% có 1–2 cặp; từ 16 cặp là 80% có 2–3 cặp.
 - Số cặp băng: tối đa 8 cặp có 1; 9–15 có 2; 16–24 có 3; từ 25 có 4. Nếu chỉ còn băng hoặc không còn nước đi với thẻ mở, hệ thống mở đồng thời số băng cần thiết để tránh kẹt màn.
-- Ba loại thẻ cao cấp: **Cyan – Phá Băng** luôn mở một cặp băng (hết băng thì nhận ngẫu nhiên Xu hoặc thời gian); **Xanh dương – Tiếp Tế** có 50% nhận Gợi ý, Xáo trộn hoặc Đóng băng thời gian; **Đỏ – Bùng Nổ** có 50% gọi Sấm sét phá một cặp thường. Sấm sét từ thẻ cao cấp tiếp tục combo; Sấm sét từ vật phẩm không tăng combo.
-- Mỗi cặp cao cấp có cơ hội rơi một năng lượng. Trong giai đoạn kiểm thử tỷ lệ đang là 100%; cấu hình phát hành dự kiến là 20%, bảo hiểm rơi ở lần thứ 10 sau 9 lần trượt.
-- Tiến trình năng lượng giữ xuyên các level, khi thua/Chơi lại và khi quay Menu rồi Tiếp tục; chỉ reset khi chọn **Chơi mới**. Sau mốc 10, tiến trình quay về đầu và lặp vòng thưởng. Năng lượng chỉ được tính khi icon bay tới thanh mốc; hiệu ứng thu thập không khóa thao tác.
-- Có đủ 10 mốc thưởng: phá cặp thường, Xu, thời gian, Gợi ý, Xáo trộn, Đóng băng thời gian và mở băng theo cấu hình tập trung. Thưởng phá cặp vẫn xử lý được cặp cuối để hoàn thành màn; không chọn băng, thẻ cao cấp hoặc ô may mắn.
+- Cyan – Phá Băng mở đúng 1 cặp băng; hết băng nhận 10 Xu. Blue – Tiếp Tế có 30% nhận 1 Gợi ý/Xáo trộn/Đóng băng thời gian vào kho, chia đều 3 món. Red – Bùng Nổ có 50% phá 1 cặp thường,50% xáo miễn phí bàn còn lại.
+- Năng lượng: thường 20%, đặc biệt/Lucky 80%, mỗi lần trúng 1 năng lượng. Hỗ trợ độc lập: thường 5%, đặc biệt 10%, Blue 30% thay nhánh chung. Không pity; phá phụ không bốc thưởng hoặc kích hoạt chuỗi mới.
+- Lucky giữ phạm vi xuất hiện hiện hành: chọn đều 50 Xu hoặc 30 giây trực tiếp. Nhánh thời gian ở Vô tận đổi 50 Xu. Hỗ trợ thời gian/đóng băng vẫn vào kho ở Vô tận.
+- Thưởng ghi cùng bàn/phiên trước hiệu ứng. Vòng 10 năng lượng quay về 0 sau mốc 10. Mốc 1/3/5/7/9 nhận 10/20/30/40/50 Xu; mốc 2 phá 1 cặp;4 Gợi ý;6 Xáo trộn;8 Sấm sét;10 phá 1 cặp+100 Xu+1 Đóng băng vào kho.
+- Phá phụ chỉ chọn cặp thường không băng/đặc biệt/Lucky, có score/gravity; không tìm được cặp đổi 10 Xu. Red xáo không tiêu item, có giới hạn thử và giữ bàn cũ nếu không thể tạo nước đi; bàn rỗng không xáo hoặc thêm quà ở nhánh xáo.
+- Kho 9999, hỗ trợ gameplay vượt kho đổi 10 Xu/đơn vị. Phiên cũ giữ chính sách cũ tới hết đợt; không đổi quà Lucky đã lưu hoặc tiến độ.
 
 ---
 

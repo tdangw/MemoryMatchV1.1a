@@ -44,7 +44,7 @@ Trò chơi dùng chung hệ thống Xu, chủ đề ảnh, Bộ sưu tập hiệ
 | `A-A-B` | Lượt `B` tạo đúng một Miss, combo về 0 và bắt đầu chuỗi B. |
 | `A-A-B-B-A` | `B` đầu tiên tạo một Miss; `B` thứ hai tiếp tục chuỗi B; `A` cuối tạo một Miss mới. Nhóm A/B trong khay không thay đổi cách đếm. |
 | `A-A-A → B-B-B` | Hai bộ ba hoàn tất liên tiếp; combo đạt 2 nếu không có lượt khác chen giữa. |
-- Mỗi bộ ba là một match, nhận `10 + (combo − 1) × 3` điểm. Khi thắng ở mode có giới hạn thời gian, cộng số giây còn lại một lần trước khi xét sao; Endless không cộng điểm thời gian. Mốc sao là `ceil(số bộ ba × 0,8 × 12/18/25)` cho mode thường hoặc `ceil(số bộ ba × 0,8 × 10/15/20)` cho Endless, tương ứng 1/2/3 sao.
+- Mỗi bộ ba thủ công nhận `10 + 2 × min(max(combo − 1, 0), 4)` điểm và cố định 2 Xu. Công thức runtime chung ở `js/progression/gameplayRules.js`; helper score/star cũ trong tripleConfig không là nguồn cho màn nhiều đợt. Điểm hoàn thành nhanh tính theo số nhóm/thời gian thực/ngân sách đã cấp, không cộng nguyên giây dư; Endless không có phần này. Hai/ba sao lần lượt là `ceil(tổng số nhóm × 13/16,5)` với mode có giờ, `ceil(tổng số nhóm × 12,5/15,5)` với Endless; hoàn thành màn được ít nhất một sao.
 
 ## 3. Board nhiều lớp và tính khả thi
 
@@ -129,7 +129,9 @@ Các vật phẩm của Triple Connect có tồn kho, cân bằng giá và contr
 
 Trong Thử thách, thẻ may mắn có thể thưởng `+thời gian`, `+gợi ý` hoặc `+Xu`; được thể hiện như một thẻ trong bộ ba và dùng popup phần thưởng chung.
 
-Thẻ đặc biệt, thẻ đóng băng và các luật độ khó bổ sung được hoãn sang giai đoạn sau. Chúng phải được thiết kế lại theo bộ ba, không sao chép trực tiếp luật theo cặp của Link Connect.
+Mỗi đợt mới có 1 Nam châm ở mọi chế độ. Chỉ chọn khi thẻ lộ; hút đủ 2 đồng loại, ưu tiên khay rồi mọi lớp trên bàn. Giải quyết nguyên tử trước xét đầy khay, chỉ 1 bộ ba/1 lượt thưởng. Không gắn thêm Nam châm khi phục hồi bàn cũ. Lucky chỉ Thử thách, chọn đều 10 Xu/15 giây/1 Gợi ý cho quà mới; quà cũ giữ nguyên.
+
+Bộ ba thường có 20% năng lượng/5% hỗ trợ; nhóm cóLucky/Nam châm 80%/10%, hai nhánh độc lập, không pity. Hỗ trợ chia đềuGợi ý/Hoàn tác/Xáo trộn/gói 30 giây vào kho, kể cả Vô tận. Kho 9999, vượt 10 Xu/đơn vị. Dấu đã bốc cả trượt giữ qua undo/restore; nhóm chứa thẻ đã xử lý không bốc lại. Giữ 30 năng lượng/10 mốc, mỗi 3 năng lượng nhận 1 mốc. Thẻ đóng băng và các loại đặc biệt khác chưa được mở rộng trong task này.
 
 ## 7. Cô lập kỹ thuật và tái sử dụng chung
 
@@ -167,11 +169,11 @@ js/tripleConnect/
 - Core gameplay, sáu mode, Challenge/Lucky, item, solver, session, responsive, Hidden Piles, khay 7/10 và milestone 10/30 đã có trong runtime.
 - Round mới dùng topology corner-safe V6; layout V1–V5 tiếp tục là compatibility corpus cho save cũ.
 - Effect V2 runtime dùng adapter chung cho Link/Triple và đã có cleanup/reduced-motion/performance test. Visual fidelity từng line effect là phase riêng, không ảnh hưởng kết quả gameplay.
-- Runtime closure đã hoàn tất: validation boundary renderer, timer owner dùng chung, benchmark/soak ba game và review đều đã đóng. Hiện không có kế hoạch active cho Triple Connect; visual polish Effect V2 chỉ mở thành task mỹ thuật riêng khi người dùng yêu cầu.
+- Runtime closure và cập nhật rơi vật phẩm/Nam châm đã hoàn tất trên web local; bằng chứng ở `DROP_ENERGY_SPECIAL_CARDS_RECEIPT.md`. Kế hoạch đã đóng được xóa, không phục hồi làm nguồn thực thi. Đánh giá mới ở `GAMEPLAY_ECONOMY_AUDIT.md`; visual polish Effect V2 là task mỹ thuật riêng.
 
 ## 9. Trạng thái quyết định sản phẩm
 
-Đã được triển khai: 3 Gợi ý khởi đầu; giá Gợi ý58Xu, gói Thêm thời gian30s360Xu, Hoàn tác/Xáo thẻ108Xu; mốc sao `12/18/25` và Endless `10/15/20`; Lucky chỉ có ở Challenge; Mở rộng khay giá 3.000 Xu; milestone version 2 gồm 10 mốc mỗi 3 bộ ba, target 30.
+Đã được triển khai: 3 Gợi ý khởi đầu; giá Gợi ý58Xu, gói Thêm thời gian30s360Xu, Hoàn tác/Xáo thẻ108Xu; mốc sao theo công thức chung ở mục 3; Lucky chỉ có ở Challenge; Mở rộng khay giá 3.000 Xu mỗi ô; milestone version 2 gồm 10 mốc mỗi3năng lượng, target30.
 
 Phân bố Lucky, bảng reward milestone, fallback khi inventory đầy và phần thưởng cuối màn/Endless phải lấy từ `tripleConfig.js` cùng module transaction tương ứng; tài liệu này không sao chép bảng số chi tiết để tránh lệch nguồn sự thật.
 

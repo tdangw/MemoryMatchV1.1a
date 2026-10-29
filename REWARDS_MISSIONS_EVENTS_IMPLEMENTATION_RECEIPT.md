@@ -1,6 +1,10 @@
 > Hồ sơ nghiệm thu lịch sử. Tên hiện hành: **Sưu tập huy hiệu** (28/10/2026).
 > Quyết định đang áp dụng ở CONTEXT.md; các tên/quyền phát hành cũ bên dưới chỉ ghi lịch sử.
 
+> Rà soát29/10: các kế hoạch Cổ tích/Sự kiện đã hoàn tất và xóa. Không
+> phục hồi chúng để chạy lại task; xem GAMEPLAY_ECONOMY_AUDIT.md và
+> contract hiện hành trong ARCHITECTURE.md.
+
 # Nghiệm thu mở rộng quà, Nhiệm vụ và Sự kiện
 
 ## Popup Hồ sơ gọn, UID sao chép và tùy chọn bỏ trang bị —26/10/2026

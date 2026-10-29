@@ -1,5 +1,10 @@
 # Kế hoạch quảng cáo Android và APK test
 
+> Trạng thái rà soát29/10/2026: phần triển khai phần mềm đã bàn giao;
+> chỉ giữ checklist thiết bị S22/quảng cáo và provider thật còn chưa
+> xác minh. Các câu “đang thực hiện/chưa triển khai” trong lịch sử bên
+> dưới không mở lại task hoặc cho phép tự build APK/deploy.
+
 Ngày khảo sát: 2026-10-15. Người dùng giao triển khai ngày 2026-10-16, commit từng phase. **Kế hoạch triển khai đang thực hiện.** Giao diện carousel và tab Sự kiện đã bàn giao; kiểm tra ban đầu chỉ có tài liệu kế hoạch quảng cáo chưa commit, không có thay đổi code của task khác.
 
 ## Theo dõi thực hiện

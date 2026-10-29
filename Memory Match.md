@@ -25,12 +25,12 @@ Tài liệu này là nguồn theo dõi luật chơi, cân bằng và cấu hình
 
 | Chế độ | Số thẻ | Số cặp | Cột desktop | Cột mobile | Thời gian gốc | Thưởng Xu cuối màn |
 | --- | ---: | ---: | ---: | ---: | ---: | --- |
-| Dễ | 12 | 6 | 4 | 4 | 75 giây | `30 + floor(thời gian còn lại × 0,35)` |
-| Trung bình | 24 | 12 | 6 | 4 | 110 giây | `50 + floor(thời gian còn lại × 0,50)` |
-| Khó | 36 | 18 | 6 | 6 | 150 giây | `70 + floor(thời gian còn lại × 0,65)` |
-| Siêu khó | 60 | 30 | 6 | 6 | 220 giây | `90 + floor(thời gian còn lại × 0,80)` |
-| Vô tận | 60 | 30 | 6 | 6 | Không giới hạn | 10 Xu |
-| Thử thách | Theo level | Theo level | Theo level | Theo level | 75 giây ban đầu | `30 + floor(thời gian còn lại × 0,35)` |
+| Dễ | 12 | 6 | 4 | 4 | 75 giây/đợt | Công thức chung bên dưới |
+| Trung bình | 24 | 12 | 6 | 4 | 110 giây/đợt | Công thức chung bên dưới |
+| Khó | 36 | 18 | 6 | 6 | 150 giây/đợt | Công thức chung bên dưới |
+| Siêu khó | 60 | 30 | 6 | 6 | 220 giây/đợt | Công thức chung bên dưới |
+| Vô tận | 60 | 30 | 6 | 6 | Không giới hạn | Công thức chung khi hoàn thành màn |
+| Thử thách | Theo level | Theo level | Theo level | Theo level | Theo kích thước bàn | Công thức chung bên dưới |
 
 Với Dễ, Trung bình, Khó và Siêu khó, mỗi đợt thẻ nhận thời gian cố định theo bảng; không tăng thêm theo level.
 
@@ -59,7 +59,7 @@ Giữ mỗi kích thước 2 level để làm quen vị trí: 4×3 → 4×4 → 
 - Khi không hỗ trợ hoặc yêu cầu bị từ chối, dùng chế độ tập trung: ẩn Moves, Miss, Điểm và thanh sao phụ; giữ đồng hồ, cặp, combo và công cụ. Nhấn lại nút hoặc Escape để thoát chế độ tập trung.
 - Fullscreen bao gồm cả trang để popup/công cụ vẫn hiển thị. Dùng lại bộ tính bố cục game shell, không tạo lại bàn khi chuyển trạng thái; nút và sự kiện được dọn khi rời shell.
 - Lưới 6×10 ưu tiên màn hình dọc. Màn ngang thấp vẫn vừa khung nhưng thẻ nhỏ; không tự đổi số hàng/cột giữa ván để bảo toàn vị trí ghi nhớ.
-- Phiên lưu hiện chỉ giữ level/tài nguyên/thời gian, không lưu từng vị trí thẻ. Khi tiếp tục sau cập nhật, bàn được tạo theo bảng mới tại level đã lưu; giờ và tiến trình không bị reset. Nên dùng Chơi mới khi đánh giá nhịp cân bằng mới.
+- Phiên lưu giữ seed, vị trí/trạng thái thẻ, quà Lucky và chính sách thưởng của đợt qua pairSnapshot. Tiếp tục khôi phục bàn cũ, không sinh lại Lucky hoặc thay chính sách giữa đợt; bàn mới mới dùng cấu hình hiện hành.
 
 ## 3. Bắt đầu màn và bố cục thích ứng
 
@@ -83,24 +83,23 @@ Giữ mỗi kích thước 2 level để làm quen vị trí: 4×3 → 4×4 → 
 Điểm một cặp thường:
 
 ```text
-10 + (combo - 1) × 3
+10 + 2 × min(max(combo - 1, 0), 4)
 ```
 
-Cặp đặc biệt được cộng thêm 50% điểm ghép hiện tại, làm tròn số nguyên:
-
-```text
-điểm cặp đặc biệt = điểm cặp thường + round(điểm cặp thường × 0,5)
-```
-
-Khi hoàn thành màn có giới hạn thời gian, số giây còn lại được cộng trực tiếp vào tổng điểm trước khi xét sao. Vô tận không có điểm thưởng thời gian cuối màn.
+Điểm nhóm đặc biệt dùng cùng công thức, không nhân 1,5. Nguồn runtime là
+`calculateGroupScore` trong `js/progression/gameplayRules.js`; các helper
+tính điểm cũ trong config không quyết định lượt chơi nhiều đợt hiện tại.
+Điểm hoàn thành nhanh lấy từ `calculateFastFinishBonus`, theo số nhóm,
+thời gian chơi thực và tổng ngân sách đã cấp, không cộng nguyên số giây
+còn lại. Vô tận không có phần điểm hoàn thành nhanh.
 
 ### Mốc sao
 
 | Sao | Màn có giới hạn thời gian | Vô tận |
 | --- | ---: | ---: |
-| 1 sao | `số cặp × 12` | `số cặp × 10` |
-| 2 sao | `số cặp × 18` | `số cặp × 15` |
-| 3 sao | `số cặp × 25` | `số cặp × 20` |
+| 1 sao | Hoàn thành màn nếu chưa đạt ngưỡng 2 sao | Tương tự |
+| 2 sao | `ceil(tổng số nhóm của màn × 13)` | `ceil(tổng số nhóm × 12,5)` |
+| 3 sao | `ceil(tổng số nhóm của màn × 16,5)` | `ceil(tổng số nhóm × 15,5)` |
 
 HUD sao hiển thị tooltip `Mục tiêu: xxx`, trong đó `xxx` là tổng điểm cần để đạt 3 sao.
 
@@ -111,16 +110,16 @@ Kết quả lưu theo `mode:level`. Tổng điểm và tổng sao chỉ tăng th
 Xu nhận ngay khi ghép:
 
 ```text
-2 + (combo - 1)
+2 Xu cho mỗi cặp ghép thủ công, không tăng theo combo
 ```
 
 Mỗi Xu được biểu diễn bằng một icon rơi quanh cặp vừa ghép rồi bay tới icon Xu trên HUD. Bộ đếm Xu cập nhật bằng hoạt ảnh nhưng dữ liệu được cộng ngay khi phần thưởng phát sinh.
 
 Cuối màn:
 
-- Tính thưởng theo bảng chế độ ở mục 2.
-- Mỗi lần ghép sai trừ 1 Xu khỏi thưởng cuối màn, nhưng thưởng không thể âm.
-- Vô tận không áp dụng phạt Xu theo số lần sai.
+- Dùng `calculateVictoryCoins`: `round((10 + tổng số nhóm × 1) × hệ số độ khó) + 2 × sao` cho Memory.
+- Hệ số Dễ/Trung bình/Khó/Siêu khó/Thử thách/Vô tận: 1/1,2/1,5/1,8/1,3/1,3. Tổng nhóm tính cả các đợt của màn.
+- Không trừ Xu cuối màn theo số lần ghép sai. Thưởng từ Lucky, mốc, nhiệm vụ và các nguồn khác tính riêng.
 
 ## 5. Combo
 
@@ -135,7 +134,7 @@ Combo chỉ nối tiếp nếu cặp tiếp theo được ghép đúng trong c�
 - Ghép đúng khởi động lại toàn bộ vạch thời gian combo.
 - Ghép sai hoặc để vạch chạy hết đặt combo về 0.
 - Bỏ chọn cùng thẻ không làm mất combo.
-- Từ combo 2 trở lên, màn có giới hạn thời gian nhận thêm số giây bằng chính combo hiện tại. Vô tận không nhận thưởng thời gian combo.
+- Combo ảnh hưởng điểm theo công thức có trần ở mục 4; không tự cộng giây vào đồng hồ.
 - Nhãn combo bắt đầu từ x2 và tăng cấp trình bày: Nice, Good, Great, Excellent, Perfect, Peak, Unbelievable, Supreme, Legendary, Mythic, Godlike và Ultimate.
 
 ## 6. Gợi ý và Xem trước
@@ -152,17 +151,16 @@ Combo chỉ nối tiếp nếu cặp tiếp theo được ghép đúng trong c�
 
 | Gói | Mã dữ liệu | Màu nhận diện | Giá |
 | --- | --- | --- | ---: |
-| Xem 4 thẻ | `preview4` | Teal | 8 Xu |
-| Xem 8 thẻ | `preview8` | Xanh dương | 15 Xu |
-| Xem 12 thẻ | `preview12` | Tím | 22 Xu |
-| Xem tất cả | `previewAll` | Vàng | 30 Xu |
+| Xem 4 thẻ | `preview4` | Teal | 58 Xu |
+| Xem 8 thẻ | `preview8` | Xanh dương | 108 Xu |
+| Xem 12 thẻ | `preview12` | Tím | 158 Xu |
+| Xem tất cả | `previewAll` | Vàng | 216 Xu |
 
 - Mua gói Xem trước chỉ cộng vào kho, không tự dùng.
 - Nút Xem trước trên HUD hiển thị tổng số gói đang có; mở nút để chọn loại gói và sử dụng.
 - Một lượt Xem trước kéo dài 5 giây và chỉ lật các thẻ chưa ghép đang úp.
 - Gói 4/8/12 chọn ngẫu nhiên tối đa số thẻ tương ứng; gói tất cả lật toàn bộ thẻ hợp lệ.
-- Vật phẩm Xem trước rơi từ cặp đặc biệt tự kích hoạt, không cộng vào kho và chỉ chọn ngẫu nhiên gói 4/8/12.
-- Nếu lúc vật phẩm tự dùng người chơi đang chọn thẻ hoặc bàn đang khóa, hệ thống đợi tối đa khoảng 5 giây để tìm thời điểm an toàn.
+- Vật phẩm Xem trước rơi vào kho; chỉ dùng khi người chơi chọn. Pool tiếp tế có4/8/12thẻ theo60/30/10; Xem tất cả chỉ ở mốc10.
 
 ## 7. Kho Thời gian và xử lý hết giờ
 
@@ -177,7 +175,7 @@ Combo chỉ nối tiếp nếu cặp tiếp theo được ghép đúng trong c�
 - Nút kho Thời gian được ẩn trong Vô tận.
 - Hai nút hỗ trợ nhanh chỉ hiển thị biểu tượng; số lượng nằm trong tooltip và từng lựa chọn trong kho theo mẫu `Đang có: x`.
 - Khi dùng, thời gian được cộng ngay vào đồng hồ và phiên hiện tại được lưu cùng số lượng kho mới.
-- Giới hạn thử nghiệm dùng chung cho mỗi loại vật phẩm và số Gợi ý là 999.
+- Giới hạn thử nghiệm dùng chung cho mỗi loại vật phẩm và số Gợi ý là 9999.
 
 Khi hết giờ, popup thất bại có các lựa chọn:
 
@@ -192,57 +190,42 @@ Hai gói cứu thua là giao dịch riêng của popup hết giờ, không lấy
 
 Thẻ nằm trong thư mục `special/` của chủ đề được đánh dấu là thẻ đặc biệt. Khi ghép đúng một cặp đặc biệt:
 
-1. Điểm cặp được cộng thêm 50% như mục 4.
+1. Tính điểm nhóm theo công thức chung ở mục 4, không nhân hệ số đặc biệt.
 2. Kiểm tra rơi Năng lượng.
 3. Kiểm tra thêm một phần thưởng hỗ trợ độc lập.
 
-### Năng lượng
+### Năng lượng và hỗ trợ
 
-- Tỷ lệ hiện tại: **100%** để kiểm thử hiệu ứng.
-- Cấu hình vẫn giữ bảo hiểm: sau 9 lần liên tiếp không rơi, lần thứ 10 chắc chắn rơi.
-- Năng lượng là tiến trình nội bộ, không phải vật phẩm trong kho.
-- Tiến trình chỉ được cộng và làm sáng mốc khi icon năng lượng bay tới thanh 10 mốc.
-- Qua level, thua rồi Chơi lại và quay Menu rồi Tiếp tục vẫn giữ tiến trình.
-- Chọn Chơi mới reset tiến trình và chuỗi không-rơi.
-- Đạt mốc 10 nhận thưởng, hiển thị đầy thanh trong thời gian ngắn rồi trở về mốc 0 để bắt đầu vòng mới.
-
-### Phần thưởng hỗ trợ độc lập
-
-- Xác suất hiện tại: **50%** cho mỗi cặp đặc biệt.
-- Nếu rơi, chọn đều một trong ba nhóm:
-  - Xem trước tự dùng: ngẫu nhiên 4/8/12 thẻ.
-  - Gợi ý: +1 lượt.
-  - Vật phẩm Thời gian: ngẫu nhiên +10/+30/+45/+60 giây, cộng vào kho.
-- Màu icon Xem trước thể hiện cấp gói; vật phẩm rơi không hiển thị nhãn số để tránh rườm rà.
-- Hiệu ứng rơi và bay thu thập không khóa gameplay. Riêng lúc Xem trước thực sự lật thẻ, bàn được khóa để bảo toàn lựa chọn.
+- Mỗi cặp thường có 20% nhận 1 năng lượng, cặp đặc biệt/Lucky có 80%; không bảo đảm sau chuỗi trượt.
+- Hỗ trợ bốc độc lập: thường 5%, Lucky 10%, Special 30%. Lucky trùng Special chỉ dùng nhánh 30%, không bốc hai lần.
+- Ba nhóm Xem trước/Gợi ý/Thời gian chia đều. Trong nhóm Xem trước,4/8/12 theo 60/30/10; trong nhóm Thời gian,30/45/60 giây theo 60/30/10. Tất cả hỗ trợ vào kho, kể cả Vô tận.
+- Năng lượng và thưởng mốc được lưu cùng lượt ghép trước hiệu ứng. Vòng 10 năng lượng nhận mốc 10 một lần rồi về 0; hoạt ảnh không quyết định quyền nhận quà.
+- Kho mỗi món tối đa 9999; quà hỗ trợ của nguồn gameplay vượt kho đổi 10 Xu/đơn vị.
+- Luật mới áp dụng từ bàn mới. Phiên cũ giữ chính sách thưởng tới hết đợt, giữ quà Lucky đã lưu và tiến độ cũ.
 
 ## 9. Vòng 10 mốc năng lượng
 
-Các phần thưởng dưới đây là cấu hình tạm thời để kiểm thử và sẽ được cân bằng lại sau:
+Bảng đã duyệt; hỗ trợ vào kho, Xu vào ví, kể cả khi chơi Vô tận.
 
-| Mốc | Phần thưởng | Cách nhận |
-| ---: | --- | --- |
-| 1 | Xem trước 4 thẻ | Tự dùng |
-| 2 | Vật phẩm +10 giây | Vào kho |
-| 3 | +1 Gợi ý | Cộng trực tiếp |
-| 4 | +5 Xu | Cộng trực tiếp |
-| 5 | Ngẫu nhiên Xem trước 4 hoặc 8 thẻ | Tự dùng |
-| 6 | Ngẫu nhiên vật phẩm +10 hoặc +30 giây | Vào kho |
-| 7 | +1 Gợi ý và +5 Xu | Cộng trực tiếp |
-| 8 | Xem trước 12 thẻ | Tự dùng |
-| 9 | Vật phẩm +30 giây và +1 Gợi ý | Vào kho và cộng trực tiếp |
-| 10 | Xem trước tất cả, +60 giây và +10 Xu | Hai vật phẩm vào kho, Xu cộng trực tiếp |
+| Mốc | Phần thưởng |
+|---:|---|
+|1|10 Xu|
+|2|Xem trước 4 thẻ|
+|3|20 Xu|
+|4|1 gói 30 giây|
+|5|Xem trước 8 thẻ|
+|6|30 Xu|
+|7|1 Gợi ý và 1 gói 30 giây|
+|8|Xem trước 12 thẻ|
+|9|50 Xu và 1 Gợi ý|
+|10|Xem trước tất cả,1 gói 30 giây và 100 Xu|
 
-## 10. Ô may mắn trong Thử thách
+## 10. Ô may mắn
 
-- Chỉ xuất hiện trong chế độ Thử thách.
-- Mỗi bàn chọn ngẫu nhiên từ 1 đến 3 cặp trong các hình đã có để gắn phần thưởng bí mật.
-- Khi ghép cặp tương ứng, nhận ngẫu nhiên một trong ba nhóm:
-  - +3–5 giây.
-  - +1–2 Gợi ý.
-  - +1–10 Xu.
-- Nếu Gợi ý đã đạt giới hạn, hệ thống chọn lại phần thưởng không phải Gợi ý.
-- Ô may mắn và thẻ đặc biệt là hai cờ độc lập; một hình có thể đồng thời mang dữ liệu đặc biệt của chủ đề và phần thưởng may mắn của màn Thử thách.
+- Mọi chế độ có 1–3 cặp Lucky ở đợt đầu. Thử thách/Vô tận chỉ sinh ở màn 1/đợt 1 của run; Tiếp tục không sinh lại.
+- Chọn đều một trong 15 giây cộng trực tiếp/1 Gợi ý/10 Xu. Nhánh 15 giây ở Vô tận đổi 10 Xu, giữ trọng số ban đầu.
+- Lucky và Special độc lập; Lucky trùng Special vẫn có quà Lucky nhưng chỉ một lần bốc năng lượng/hỗ trợ.
+- Kho đầy đổi phần Gợi ý vượt thành 10 Xu/đơn vị, không bốc lại loại quà.
 
 ## 11. Bắt đầu mới, Chơi lại và Tiếp tục
 
@@ -294,13 +277,14 @@ Ba luồng phải được hiểu tách biệt:
 | Đệm sau mua cứu thua | 1.000 ms |
 | Pháo hoa tổng kết | 2.500 ms |
 | Cảnh chiến thắng đặc biệt | Sau khi hoàn thành level 100; mở từ nút `Congratulations!` ở bảng tổng kết |
-| Giới hạn mỗi loại vật phẩm/Gợi ý | 999 |
+| Giới hạn mỗi loại vật phẩm/Gợi ý | 9999 |
 
 ## 14. Nguồn cấu hình và module
 
 | Nhóm | Nguồn chính |
 | --- | --- |
-| Chế độ, bàn Thử thách, điểm, sao, thời gian, may mắn, năng lượng và mốc thưởng | `js/config.js` |
+| Chế độ, bàn Thử thách, may mắn, năng lượng và mốc thưởng | `js/config.js` |
+| Điểm, sao, Xu ghép/thắng, nhiều đợt và thưởng hoàn thành nhanh | `js/progression/gameplayRules.js` |
 | Thời lượng, cửa sổ combo và giới hạn dùng chung | `js/gameplayTuning.js` |
 | Giá gói cửa hàng và mua cứu thua | `js/shopCatalog.js` |
 | Quy tắc Xu mỗi cặp và hiệu ứng Xu | `js/coinRewards.js` |
@@ -330,9 +314,9 @@ Khi điều chỉnh cân bằng, sửa nguồn cấu hình tương ứng thay v�
 
 - Mua và dùng riêng từng gói Xem trước/Thời gian; số kho giảm đúng một.
 - Lỗi lưu giữa giao dịch không làm mất Xu hoặc tạo vật phẩm lệch.
-- Gói Xem trước tự dùng không cộng kho; gói Xem tất cả mua/thưởng mốc 10 có cộng kho.
-- Cặp đặc biệt ở mốc 1–10, vòng mới sau mốc 10 và tỷ lệ hỗ trợ 50%.
-- Vật phẩm tự dùng khi bàn đang khóa, đang chọn một thẻ hoặc vừa hoàn thành màn.
+- Quà Xem trước vào kho; nhận quà không tự kích hoạt lật thẻ.
+- Cặp đặc biệt ở mốc 1–10, vòng mới sau mốc 10 và tỷ lệ hỗ trợ5/10/30%.
+- Nhận hỗ trợ khi bàn đang khóa không tự dùng vật phẩm hoặc thay lựa chọn.
 - Ô may mắn nhận đủ ba loại thưởng và xử lý khi Gợi ý đã đầy.
 
 ### Giao diện và hiệu suất
@@ -346,7 +330,6 @@ Khi điều chỉnh cân bằng, sửa nguồn cấu hình tương ứng thay v�
 
 ## 16. Trạng thái cân bằng cần nhớ
 
-- `energyDrop.chance = 1` là tỷ lệ **100% phục vụ kiểm thử**, chưa phải tỷ lệ phát hành.
-- `supportDrop.chance = 0.5` và 10 mốc hiện tại là cấu hình tạm thời.
-- Chưa áp dụng giới hạn thấp hơn 999 hoặc trần Xu.
+- Chính sách mới dùng năng lượng80/20, hỗ trợ5/10/30, không pity; không còn tỷ lệ100%/50% để kiểm thử.
+- Giới hạn kho9999; overflow gameplay10Xu/đơn vị. Không đổi giá shop hoặc thưởng thắng.
 - Khi chốt kinh tế chính thức cần đánh giá chung: Xu mỗi cặp, Xu cuối màn, giá cửa hàng, tần suất thẻ đặc biệt, tỷ lệ hỗ trợ và giá trị 10 mốc.

@@ -1,5 +1,9 @@
 # Cổ tích và Thành tích — nghiệm thu triển khai
 
+> Hồ sơ lịch sử, task đã hoàn tất; kế hoạch cũ được xóa29/10/2026.
+> Nguồn sản phẩm hiện hành ở CONTEXT.md/ARCHITECTURE.md; quà chưa nhận
+> đã chuyển sang rương theo cập nhật sau, không dùng bảng cũ để cấp lại đồ.
+
 Nguồn phạm vi duy nhất: `ILLUSTRATED_UI_ACHIEVEMENTS_PLAN.md` và
 `docs/design/achievements/IMPLEMENTATION_PROMPT.md`. Ngày 23/10/2026.
 
