@@ -70,7 +70,8 @@ export async function publishCloudSnapshot({ database, environment, uid, encoded
       const ref = doc(database, 'gamespaces', environment, 'liveops', uid);
       const stored = await transaction.get(ref); reads += 1;
       if ((stored.exists() ? stored.data().revision : 0) !== reward.expectedRevision) throw new CloudConflictError(root);
-      transaction.set(ref, { ...reward.state, rootRevision: next.revision, fingerprint: next.fingerprint, updatedAt: serverTimestamp() });
+      const hourlyGift = reward.state.hourlyGift;
+      transaction.set(ref, { ...reward.state, ...(hourlyGift ? {hourlyGift:{...hourlyGift,claimedAt:reward.hourlyGiftClaim ? serverTimestamp() : stored.data().hourlyGift.claimedAt}} : {}), rootRevision: next.revision, fingerprint: next.fingerprint, updatedAt: serverTimestamp() });
     }
     transaction.set(cloudProfileRef(database, environment, uid), next);
   });

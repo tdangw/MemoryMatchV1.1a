@@ -85,9 +85,26 @@
         && n.chests.sequence == o.chests.sequence && chestSourceValue(n.chests,o.chests,'c') && chestSourceValue(n.chests,o.chests,'frame')
         && chestSourceValue(n.chests,o.chests,'avatar') && chestSourceValue(n.chests,o.chests,'badge');
     }
+    function hourlySupport(r) { return r.key in HOURLY_SUPPORT_LOOKUP; }
+    function rewardHourlyGift(n,o) {
+      let g = n.hourlyGift;
+      let r = g.last;
+      let previous = o.get('hourlyGift',null);
+      return chestBase(n,o,['hourlyGift','tickets'])
+        && g.keys().hasOnly(['version','sequence','claimedAt','last']) && g.version == 1
+        && rewardInt(g.sequence) && g.sequence == (previous == null ? 1 : previous.sequence + 1)
+        && g.claimedAt == request.time
+        && (previous == null || request.time >= previous.claimedAt + duration.value(60,'m'))
+        && r.keys().hasOnly(['operation','sequence','kind','coins','gameId','key'])
+        && r.operation is string && r.operation.matches('^[A-Za-z0-9_-]{1,128}$') && r.sequence == g.sequence
+        && (r.kind == 'ticket' ? r.coins == 0 && r.gameId == null && r.key == null
+          : r.kind == 'coins' ? (r.coins == 100 && r.gameId == null && r.key == null || r.coins == 10 && hourlySupport(r))
+          : r.kind == 'support' && r.coins == 0 && hourlySupport(r))
+        && rewardInt(n.tickets) && n.tickets == o.tickets + (r.kind == 'ticket' ? 1 : 0);
+    }
     function dispatchRewardUpdate(n,o) {
       let changed = n.diff(o).affectedKeys();
-      return n.day != o.day ? rewardPeriodRollover(n,o)
+      return changed.hasAny(['hourlyGift']) ? rewardHourlyGift(n,o) : n.day != o.day ? rewardPeriodRollover(n,o)
         : changed.hasAny(['chests','festival']) ? (!o.keys().hasAny(['chests','festival']) ? rewardChestInit(n,o)
           : changed.hasAny(['letters']) ? rewardChestExchange(n,o)
           : changed.hasAny(['chests']) ? (n.chests.sequence != o.chests.sequence ? rewardChestOpen(n,o) : (changed.hasAny(['festival']) ? rewardFestivalClaim(n,o) : rewardChestSources(n,o)))

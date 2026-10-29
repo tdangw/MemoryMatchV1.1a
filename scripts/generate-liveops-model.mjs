@@ -9,6 +9,7 @@ let chestRules = await fs.readFile('design/rewards-liveops/chest-rules.template.
 chestRules = chestRules.replace('CHEST_SET_LOOKUP', LETTER_SETS.map(set=>`id == '${set.id}' ? '${set.chestType}' : `).join('') + "''")
   .replace('CHEST_POOL_LOOKUP', Object.entries(CHEST_POOLS).map(([type,ids])=>`(r.chestType == '${type}' ? ${JSON.stringify(ids)} : `).join('')+'[])'+')'.repeat(Object.keys(CHEST_POOLS).length-1))
   .replace('CHEST_SUPPORT_LOOKUP', Object.entries(CHEST_SUPPORTS).map(([game,items])=>`(r.gameId == '${game}' ? ${JSON.stringify(items.map(item=>item.key))} : `).join('')+'[])'+')'.repeat(Object.keys(CHEST_SUPPORTS).length-1));
+chestRules = chestRules.replace('HOURLY_SUPPORT_LOOKUP', Object.entries(CHEST_SUPPORTS).map(([game,items])=>`(r.gameId == '${game}' ? ${JSON.stringify(items.map(item=>item.key))} : `).join('')+'[])'+')'.repeat(Object.keys(CHEST_SUPPORTS).length-1));
 section = section.replace('CHEST_CONTRACT',()=>chestRules);
 section = section.replaceAll('LETTER_REQUIREMENTS',JSON.stringify(Object.fromEntries(LETTER_SETS.map(set=>[set.id,set.required])))).replaceAll('LETTER_SET_IDS',JSON.stringify(LETTER_SETS.map(set=>set.id))).replaceAll('LETTER_REWARDS',JSON.stringify(LETTER_REWARD_ITEMS.map(item=>item.id)));
 section = section.replaceAll('LETTER_SALE_PRICE', String(LETTER_SELL_COINS));

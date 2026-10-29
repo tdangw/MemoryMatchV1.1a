@@ -217,9 +217,26 @@ service cloud.firestore {
         && n.chests.sequence == o.chests.sequence && chestSourceValue(n.chests,o.chests,'c') && chestSourceValue(n.chests,o.chests,'frame')
         && chestSourceValue(n.chests,o.chests,'avatar') && chestSourceValue(n.chests,o.chests,'badge');
     }
+    function hourlySupport(r) { return r.key in (r.gameId == 'memory-match' ? ["hint","preview4","time30"] : (r.gameId == 'link-connect' ? ["hint","reshuffle","thunder","freeze"] : (r.gameId == 'triple-connect' ? ["hint","undo","shuffle","time"] : []))); }
+    function rewardHourlyGift(n,o) {
+      let g = n.hourlyGift;
+      let r = g.last;
+      let previous = o.get('hourlyGift',null);
+      return chestBase(n,o,['hourlyGift','tickets'])
+        && g.keys().hasOnly(['version','sequence','claimedAt','last']) && g.version == 1
+        && rewardInt(g.sequence) && g.sequence == (previous == null ? 1 : previous.sequence + 1)
+        && g.claimedAt == request.time
+        && (previous == null || request.time >= previous.claimedAt + duration.value(60,'m'))
+        && r.keys().hasOnly(['operation','sequence','kind','coins','gameId','key'])
+        && r.operation is string && r.operation.matches('^[A-Za-z0-9_-]{1,128}$') && r.sequence == g.sequence
+        && (r.kind == 'ticket' ? r.coins == 0 && r.gameId == null && r.key == null
+          : r.kind == 'coins' ? (r.coins == 100 && r.gameId == null && r.key == null || r.coins == 10 && hourlySupport(r))
+          : r.kind == 'support' && r.coins == 0 && hourlySupport(r))
+        && rewardInt(n.tickets) && n.tickets == o.tickets + (r.kind == 'ticket' ? 1 : 0);
+    }
     function dispatchRewardUpdate(n,o) {
       let changed = n.diff(o).affectedKeys();
-      return n.day != o.day ? rewardPeriodRollover(n,o)
+      return changed.hasAny(['hourlyGift']) ? rewardHourlyGift(n,o) : n.day != o.day ? rewardPeriodRollover(n,o)
         : changed.hasAny(['chests','festival']) ? (!o.keys().hasAny(['chests','festival']) ? rewardChestInit(n,o)
           : changed.hasAny(['letters']) ? rewardChestExchange(n,o)
           : changed.hasAny(['chests']) ? (n.chests.sequence != o.chests.sequence ? rewardChestOpen(n,o) : (changed.hasAny(['festival']) ? rewardFestivalClaim(n,o) : rewardChestSources(n,o)))
@@ -261,7 +278,7 @@ service cloud.firestore {
     function validRewardState(n, o) {
       let day = int(request.time.toMillis() / 86400000);
       let changed = n.diff(o).affectedKeys();
-      return n.keys().hasOnly(['version','revision','day','week','daily','weekly','loginNext','loginDay','spins','tickets','ticketEarned','ticketSpent','event','cosmetics','letters','chests','festival','rootRevision','fingerprint','updatedAt'])
+      return n.keys().hasOnly(['version','revision','day','week','daily','weekly','loginNext','loginDay','spins','tickets','ticketEarned','ticketSpent','event','cosmetics','letters','chests','festival','hourlyGift','rootRevision','fingerprint','updatedAt'])
         && n.get('chests',null) == o.get('chests',null) && n.get('festival',null) == o.get('festival',null)
         && n.version == 1 && (n.revision is int && n.revision >= 0 && n.revision <= 9007199254740991) && n.revision > 0 && n.day == day && n.week == day - ((day + 3) % 7)
         && (!changed.hasAny(['daily']) || rewardCounter(n.daily, ['win-three','match-thirty','win-without-hint','bonus']))
@@ -481,8 +498,8 @@ service cloud.firestore {
     function rewardInitial(n, space, uid) {
       let empty = {'wins':0,'matches':0,'noHint':0,'visits':0,'claimed':[]};
       let day = int(request.time.toMillis() / 86400000);
-      return n.keys().hasOnly(['version','revision','day','week','daily','weekly','loginNext','loginDay','spins','tickets','ticketEarned','ticketSpent','event','cosmetics','letters','chests','festival','rootRevision','fingerprint','updatedAt'])
-        && n.version == 1 && n.revision == 1 && n.day == day && n.week == day - ((day + 3) % 7)
+      return n.keys().hasOnly(['version','revision','day','week','daily','weekly','loginNext','loginDay','spins','tickets','ticketEarned','ticketSpent','event','cosmetics','letters','chests','festival','hourlyGift','rootRevision','fingerprint','updatedAt'])
+        && n.get('hourlyGift',null) == null && n.version == 1 && n.revision == 1 && n.day == day && n.week == day - ((day + 3) % 7)
         && n.daily == empty && n.weekly == empty && n.loginNext == 0 && n.loginDay == -1
         && n.spins == {'free':null,'ads':[],'pastAds':[],'ticket':null} && n.tickets == 0 && n.ticketEarned == 0 && n.ticketSpent == 0
         && n.event == {'id':'firefly-festival-01','week':n.week,'points':0,'day':day,'dailyPoints':0,'claimed':[]}

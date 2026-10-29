@@ -1,3 +1,4 @@
+import { normalizeHourlyGift, claimHourlyGift } from './hourlyGift.js';
 import { normalizeChests, normalizeFestival, earnChest, claimFestival, openChest, creditSourceChests } from './chests.js';
 import { FIREFLY_DROP_CHANCE } from './chestConfig.js';
 import { normalizeLetterCounts, normalizeLetters, creditLetters, mutateLetters, exchangeLetterSet, nextLetterReward } from './letters.js';
@@ -45,6 +46,7 @@ export function normalizeSparkState(value) {
     || s.ads.some((r, i) => r.source !== 'ad' || r.ordinal !== i + 1)) fail();
   const { rootRevision, fingerprint, updatedAt, ...state } = structuredClone(value);
   state.letters = normalizeLetters(value.letters);
+  if (value.hourlyGift !== undefined) state.hourlyGift = normalizeHourlyGift(value.hourlyGift);
   if(value.chests!==undefined||value.festival!==undefined){ if(value.chests===undefined||value.festival===undefined)fail(); state.chests=normalizeChests(value.chests);state.festival=normalizeFestival(value.festival); }
   return state;
 }
@@ -155,9 +157,18 @@ export function transitionSpark(previous, command, { uid, now, sector = 0, ticke
     state.event.dailyPoints+=points;state.event.points=Math.min(100,state.event.points+points);
   }
   eventCoins();
-  let spin = null, letterResult = null, chestResult = null;
+  let spin = null, letterResult = null, chestResult = null, hourlyGiftResult = null, hourlyGiftApplied = false;
   const ownedLetters = new Set(ownedItemIds);
   switch (command.type) {
+    case 'claimHourlyGift': {
+      const claimed = claimHourlyGift(state.hourlyGift,command,now,supportCount);
+      state.hourlyGift = claimed.state; hourlyGiftResult = claimed.result; hourlyGiftApplied = claimed.applied;
+      if (claimed.applied) {
+        if (claimed.result.kind === 'ticket') addTickets(1);
+        grant(`hourly:${command.operation}`,claimed.result.coins,claimed.result.kind === 'support' ? {support:{gameId:claimed.result.gameId,key:claimed.result.key}} : {});
+      }
+      break;
+    }
     case 'status': break;
     case 'login': if (state.loginDay !== p.day) {
       grant(`login:${p.day}`, LOGIN[state.loginNext]); state.loginDay = p.day; state.loginNext = (state.loginNext + 1) % 7;
@@ -214,7 +225,7 @@ export function transitionSpark(previous, command, { uid, now, sector = 0, ticke
     }
     default: fail();
   }
-  return { state: normalizeSparkState(state), receipts, spin, letterResult, chestResult, ownedItemIds:[...ownedLetters], nextLetterRewardId:nextLetterReward(ownedLetters)?.id||null, ownedLetterIds:[...ownedLetters], serverNow: now };
+  return { state: normalizeSparkState(state), receipts, spin, letterResult, chestResult, hourlyGiftResult, hourlyGiftApplied, ownedItemIds:[...ownedLetters], nextLetterRewardId:nextLetterReward(ownedLetters)?.id||null, ownedLetterIds:[...ownedLetters], serverNow: now };
 }
 
 /** Resolve a durable pending operation against canonical state before a new action. */
@@ -223,6 +234,7 @@ export function resolveSparkOperation(state, operation, now) {
   const day = periods(now).day;
   const existing = state && [state.spins.free,...state.spins.ads,...state.spins.pastAds,state.spins.ticket].find(r=>r?.operation === operation.operation);
   if (existing) return { command:operation, discarded:false };
+  if(operation.type==='claimHourlyGift'){if(operation.sequence!==undefined&&operation.sequence<=(state?.hourlyGift?.sequence||0)&&state?.hourlyGift?.last.operation!==operation.operation)return {command:{type:'status'},discarded:true};return {command:operation,discarded:false};}
   if(operation.type==='claimFestival')return {command:operation,discarded:false};
   if(operation.type==='openChest'){if(operation.sequence!==undefined&&operation.sequence<=(state?.chests?.sequence||0)&&state?.chests?.last?.operation!==operation.operation)return {command:{type:'status'},discarded:true};return {command:operation,discarded:false};}
   if (['sellLetter','fuseLetter','exchangeLetterSet'].includes(operation.type)) {
