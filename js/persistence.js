@@ -1,3 +1,4 @@
+import { GAMEPLAY_LIMITS } from './gameplayTuning.js';
 import { TRIPLE_PRODUCT_DECISIONS } from './tripleConnect/tripleConfig.js';
 import { liveopsEnabled } from './liveops/availability.js';
 import { festivalChestsEnabled } from './liveops/availability.js';
@@ -483,7 +484,7 @@ function resetRewardWriteTracking() {
 function rewardItemCount(progress, game, item) {
   const count = progress[game]?.items?.[item];
   if (count === undefined) return 0;
-  if (!Number.isSafeInteger(count) || count < 0 || count > 999) throw new Error('Kho hỗ trợ chưa toàn vẹn. Dữ liệu được giữ nguyên.');
+  if (!Number.isSafeInteger(count) || count < 0 || count > GAMEPLAY_LIMITS.itemCount) throw new Error('Kho hỗ trợ chưa toàn vẹn. Dữ liệu được giữ nguyên.');
   return count;
 }
 function rewardInventoryDeltas(previous, incoming) {
@@ -504,7 +505,7 @@ function preserveInterveningRewardItems(progress, previous, captured) {
     if (!delta) continue;
     const count = rewardItemCount(progress, game, item) + delta;
     // Reject the entire queued write: neither the granted item nor purchase Xu may be clipped.
-    if (!Number.isSafeInteger(count) || count > 999) throw new Error('Kho hỗ trợ vừa nhận thêm quà và đã đầy. Hãy tải lại tiến độ trước khi thử lại.');
+    if (!Number.isSafeInteger(count) || count > GAMEPLAY_LIMITS.itemCount) throw new Error('Kho hỗ trợ vừa nhận thêm quà và đã đầy. Hãy tải lại tiến độ trước khi thử lại.');
     const profile = progress[game] || { ...previous[game], items: {} };
     progress[game] = { ...profile, items: { ...profile.items, [item]: count } };
     preserved = true;

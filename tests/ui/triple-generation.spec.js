@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 
 test("Triple worker generation is deterministic and releases its worker", async ({ page }) => {
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const result = await page.evaluate(async () => {
     const { requestTripleGeneration } = await import("/js/tripleConnect/tripleGeneration.js");
     const first = requestTripleGeneration({ mode: "hard", seed: "worker-deterministic", level: 1 });
@@ -22,6 +23,7 @@ test("Triple worker generation is deterministic and releases its worker", async 
 
 test("Triple worker preserves the main-thread generator contract for the same seed", async ({ page }) => {
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const result = await page.evaluate(async () => {
     const { generateHardTripleBoard } = await import("/js/tripleConnect/tripleBoard.js");
     const { requestTripleGeneration } = await import("/js/tripleConnect/tripleGeneration.js");
@@ -36,6 +38,7 @@ test("Triple worker preserves the main-thread generator contract for the same se
 
 test("Triple generation timeout is derived from the active solver budget", async ({ page }) => {
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const result = await page.evaluate(async () => {
     const { getTripleGenerationTimeoutMs } = await import("/js/tripleConnect/tripleGeneration.js");
     return {
@@ -50,6 +53,7 @@ test("Triple generation timeout is derived from the active solver budget", async
 
 test("Triple caches one board view for each immutable state revision", async ({ page }) => {
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const result = await page.evaluate(async () => {
     const { generateEasyTripleBoard } = await import("/js/tripleConnect/tripleBoard.js");
     const { createTripleRoundState, createTripleBoardView } = await import("/js/tripleConnect/tripleState.js");
@@ -69,6 +73,7 @@ test("Triple caches one board view for each immutable state revision", async ({ 
 
 test("Triple rejects corrupt state at the public board-view boundary", async ({ page }) => {
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const result = await page.evaluate(async () => {
     const { generateEasyTripleBoard } = await import("/js/tripleConnect/tripleBoard.js");
     const {
@@ -92,6 +97,7 @@ test("Triple rejects corrupt state at the public board-view boundary", async ({ 
 
 test("Triple worker cancellation does not publish a result", async ({ page }) => {
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const result = await page.evaluate(async () => {
     const { requestTripleGeneration } = await import("/js/tripleConnect/tripleGeneration.js");
     const request = requestTripleGeneration({ mode: "superHard", seed: "worker-cancel", level: 1 });
@@ -106,6 +112,7 @@ test("Triple worker cancellation does not publish a result", async ({ page }) =>
 
 test("Triple worker request surfaces worker failure and timeout without leaking workers", async ({ page }) => {
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const result = await page.evaluate(async () => {
     const { requestTripleGeneration } = await import("/js/tripleConnect/tripleGeneration.js");
     class FakeWorker {
@@ -136,11 +143,13 @@ test("Triple worker request surfaces worker failure and timeout without leaking 
 
 test("Triple starts without a retry screen when workers are unavailable", async ({ page }) => {
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const result = await page.evaluate(async () => {
     const originalWorker = window.Worker;
     window.Worker = undefined;
     try {
-      const { startTripleConnectRound } = await import("/js/tripleConnect/tripleController.js");
+      await (await import('/tests/ui/helpers/progressionFixtures.js')).seedProgressionAccess();
+    const { startTripleConnectRound } = await import("/js/tripleConnect/tripleController.js");
       const run = await startTripleConnectRound({ mode: "easy", seed: "worker-fallback", skipIntro: true });
       return {
         mounted: Boolean(document.querySelector(".triple-connect__board")),
@@ -156,7 +165,9 @@ test("Triple starts without a retry screen when workers are unavailable", async 
 
 test("Triple menu navigation cancels a pending generation before it can mount", async ({ page }) => {
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const result = await page.evaluate(async () => {
+    await (await import('/tests/ui/helpers/progressionFixtures.js')).seedProgressionAccess();
     const { startTripleConnectRound } = await import("/js/tripleConnect/tripleController.js");
     const { openReadyGameMenu } = await import('/tests/ui/helpers/gameNavigation.js');
     const pending = startTripleConnectRound({ mode: "superHard", seed: "worker-menu-cancel", skipIntro: true });
@@ -174,7 +185,9 @@ test("Triple menu navigation cancels a pending generation before it can mount", 
 
 test("Triple replacement cancels the prior request and keeps one current round", async ({ page }) => {
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const result = await page.evaluate(async () => {
+    await (await import('/tests/ui/helpers/progressionFixtures.js')).seedProgressionAccess();
     const { startTripleConnectRound } = await import("/js/tripleConnect/tripleController.js");
     const first = startTripleConnectRound({ mode: "superHard", seed: "worker-restart", skipIntro: true });
     const second = startTripleConnectRound({ mode: "superHard", seed: "worker-restart-next", skipIntro: true });
@@ -191,6 +204,7 @@ test("Triple replacement cancels the prior request and keeps one current round",
 
 test("Twenty start-cancel cycles release every generation worker", async ({ page }) => {
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const result = await page.evaluate(async () => {
     const { requestTripleGeneration } = await import("/js/tripleConnect/tripleGeneration.js");
     class PendingWorker {
@@ -212,12 +226,17 @@ test("Twenty start-cancel cycles release every generation worker", async ({ page
   expect(result.terminated).toBe(20);
 });
 
-test("Triple start returns control to the browser within the CPU 6x responsiveness budget", async ({ page }, testInfo) => {
+test.describe('startup performance without DOM snapshot instrumentation', () => {
+  // Trace snapshots traverse/instrument connected DOM during the measured call.
+  // Keep all budgets; record metrics as JSON and retain trace on functional tests.
+test("Triple start returns control to the browser within the CPU 6x responsiveness budget", { tag: '@cpu-budget' }, async ({ page }, testInfo) => {
   test.setTimeout(60_000);
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const cdp = await page.context().newCDPSession(page);
   await cdp.send("Emulation.setCPUThrottlingRate", { rate: 6 });
   const metrics = await page.evaluate(async () => {
+    await (await import('/tests/ui/helpers/progressionFixtures.js')).seedProgressionAccess();
     const { startTripleConnectRound } = await import("/js/tripleConnect/tripleController.js");
     const { setMeteorEffectsEnabled } = await import("/js/backgroundEffects.js");
     setMeteorEffectsEnabled(false);
@@ -256,7 +275,9 @@ test("Triple start returns control to the browser within the CPU 6x responsivene
       const startedAt = performance.now();
       tile.click();
       clickPatches.push(performance.now() - startedAt);
-      await new Promise((resolve) => setTimeout(resolve, 320));
+      // Measure dispatch, then await the durable command boundary before the
+      // next witness step. A fixed delay races persistence on a throttled CPU.
+      await currentRun.whenIdle();
     }
     clickPatches.sort((left, right) => left - right);
     return {
@@ -272,6 +293,7 @@ test("Triple start returns control to the browser within the CPU 6x responsivene
     body: JSON.stringify(metrics, null, 2),
     contentType: "application/json",
   });
+  console.log('CPU6X_METRICS',JSON.stringify(metrics));
   expect(metrics.samples.every((sample) => !sample.loading)).toBe(true);
   expect(Math.max(...metrics.samples.map((sample) => sample.elapsed))).toBeLessThanOrEqual(100);
   expect(metrics.frameP95).toBeLessThanOrEqual(25);
@@ -279,9 +301,13 @@ test("Triple start returns control to the browser within the CPU 6x responsivene
   expect(metrics.clickMax).toBeLessThanOrEqual(100);
 });
 
+});
+
 test("Triple production controller mounts after its worker result without a blocking overlay", async ({ page }) => {
   await page.goto("/");
+  await expect(page.locator(".game-selector__choice").first()).toBeVisible();
   const result = await page.evaluate(async () => {
+    await (await import('/tests/ui/helpers/progressionFixtures.js')).seedProgressionAccess();
     const { startTripleConnectRound } = await import("/js/tripleConnect/tripleController.js");
     const pending = startTripleConnectRound({ mode: "hard", seed: "worker-controller", skipIntro: true });
     const loadingVisible = Boolean(document.querySelector("#triple-generation-loading"));

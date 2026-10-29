@@ -1,7 +1,12 @@
-import { getExposedTileIds } from "./tripleState.js";
+import { getExposedTileIds, getTripleMagnetTargetIdsFromTrustedState } from "./tripleState.js";
 
 export function getTripleHintTileIds(state) {
   const exposed = getExposedTileIds(state);
+  const magnet = exposed.find(id => state.tiles[id].magnet);
+  if (magnet) {
+    const partners = getTripleMagnetTargetIdsFromTrustedState(state, magnet);
+    if (partners.length === 2) return [magnet, ...partners];
+  }
   const candidatesByType = new Map();
   // A hint identifies a complete playable triple. Tiles already in the tray
   // are part of that triple, so keep them before exposed board tiles.

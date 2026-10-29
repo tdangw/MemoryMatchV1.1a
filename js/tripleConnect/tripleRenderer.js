@@ -112,7 +112,16 @@ export function createTripleRenderer(shell, { onLockedTraySlotClick } = {}) {
       const lucky = Boolean(tile.lucky);
       if (node.classList.contains("is-lucky") !== lucky)
         node.classList.toggle("is-lucky", lucky);
-      const label = lucky ? "Thẻ may mắn" : "Thẻ";
+      const magnetBadge = node.querySelector('.triple-connect__magnet');
+      if (!tile.magnet && magnetBadge) magnetBadge.remove();
+      if (tile.magnet && !magnetBadge) {
+        const badge = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        badge.setAttribute('viewBox', '0 0 24 24'); badge.setAttribute('aria-hidden', 'true');
+        badge.classList.add('triple-connect__magnet');
+        badge.innerHTML = '<path d="M5 4h5v9a2 2 0 0 0 4 0V4h5v9a7 7 0 0 1-14 0Z" fill="#d95c58" stroke="#5d3430" stroke-width="1.5"/><path d="M5 4h5v4H5zm9 0h5v4h-5z" fill="#eaf5f0" stroke="#5d3430"/>';
+        node.append(badge);
+      }
+      const label = tile.magnet ? 'Thẻ nam châm' : lucky ? "Thẻ may mắn" : "Thẻ";
       if (node.getAttribute("aria-label") !== label)
         node.setAttribute("aria-label", label);
       const occluded = tile.location === "board" && !exposed;

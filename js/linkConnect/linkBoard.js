@@ -259,8 +259,8 @@ export function ensurePlayableBoard(board) {
   return true;
 }
 
-export function shuffleLinkBoard(board) {
-  shuffleIntoPlayableBoard(board);
+export function shuffleLinkBoard(board, { required = true } = {}) {
+  return shuffleIntoPlayableBoard(board, required);
 }
 
 export function unlockFrozenLinkPairs(board, count = 1, { onUnlock } = {}) {
@@ -326,16 +326,19 @@ export function removeRandomLinkPair(board, { excludeTileKeys = [], eligiblePair
   return pair;
 }
 
-function shuffleIntoPlayableBoard(board) {
+function shuffleIntoPlayableBoard(board, required = true) {
   const positions = getOccupiedInteriorPositions(board);
   const tiles = positions.map((position) => board.grid[position.row][position.column]);
-  if (tiles.length < 2) return;
+  const originalTiles = [...tiles];
+  if (tiles.length < 2) return false;
   for (let attempt = 0; attempt < MAX_SHUFFLE_ATTEMPTS; attempt += 1) {
     shuffleArray(tiles);
     placeTilesAtPositions(board, tiles, positions);
-    if (hasAvailableConnection(board.grid)) return;
+    if (hasAvailableConnection(board.grid)) return true;
   }
-  throw new Error("Không thể tạo bàn Link Connect có nước đi hợp lệ.");
+  placeTilesAtPositions(board, originalTiles, positions);
+  if (required) throw new Error("Không thể tạo bàn Link Connect có nước đi hợp lệ.");
+  return false;
 }
 
 export function getRemainingLinkTiles(board) {

@@ -39,9 +39,9 @@ assert.equal(new Set(GAME_DEFINITIONS.map((game) => game.id)).size, GAME_DEFINIT
 
 assert.deepEqual(Object.keys(GAME_CONFIG.modes), modeIds);
 assert.deepEqual(Object.keys(LINK_CONNECT_CONFIG.modes), modeIds);
-assert.equal(GAMEPLAY_LIMITS.itemCount, 999);
-assert.equal(GAME_CONFIG.levelProgression.hintCap, 999);
-assert.equal(LINK_CONNECT_CONFIG.levelProgression.hintCap, 999);
+assert.equal(GAMEPLAY_LIMITS.itemCount, 9999);
+assert.equal(GAME_CONFIG.levelProgression.hintCap, 9999);
+assert.equal(LINK_CONNECT_CONFIG.levelProgression.hintCap, 9999);
 
 hydrateGameState({
   progress: {
@@ -62,7 +62,7 @@ hydrateGameState({
     },
   },
 });
-assert.equal(gameState.progress.linkConnect.items.hint, 999);
+assert.equal(gameState.progress.linkConnect.items.hint, 1200);
 assert.deepEqual(gameState.progress.linkConnect.sessionsByMode.easy, {
   mode: "easy",
   level: 4,

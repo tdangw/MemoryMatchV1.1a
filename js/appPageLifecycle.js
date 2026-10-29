@@ -4,18 +4,23 @@ import { createGameShellLifecycle } from "./gameShell/gameShellLifecycle.js";
 let current = null;
 const listeners = new Set();
 export function subscribeToAppPages(listener) { listeners.add(listener); return () => listeners.delete(listener); }
-export function getAppPageScope() { return current; }
+export function getAppPageScope() { return current?.scope || null; }
 export function disposeAppPage() {
   setMeteorSceneEligible(false);
-  current?.dispose();
+  const previous = current;
   current = null;
+  if (previous) previous.scope.dispose(() => previous.root.remove());
 }
 export function mountAppPage(root) {
   disposeAppPage();
-  current = createGameShellLifecycle();
-  current.own(() => root.remove(), "node");
+  const scope = createGameShellLifecycle();
+  current = { scope, root };
+  scope.own(() => {
+    if (current?.scope === scope) current = null;
+    root.remove();
+  }, "node");
   for (const listener of listeners) {
     try { listener(root); } catch (error) { console.error("Page listener failed", error); }
   }
-  return current;
+  return scope;
 }

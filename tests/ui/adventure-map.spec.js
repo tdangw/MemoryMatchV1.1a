@@ -6,6 +6,7 @@ test('level submission locks difficulty and rejects repeated clicks until the la
   await page.goto('/');
   await page.evaluate(async () => {
     await (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('memory-match');
+    await(await import('/js/tutorial/tutorialProgress.js')).markTutorialFlag('skipped','memory-match');
     window.__launchCount = 0;
     (await import('/js/adventureMap.js')).configureAdventureMap({ adapters: { 'memory-match': {
       goal: 'Ghép hết các cặp thẻ.', preview: () => ({ timeSeconds: 60, target: '6 cặp · 12 thẻ', hints: 3, assistNote: '' }),
@@ -19,7 +20,7 @@ test('level submission locks difficulty and rejects repeated clicks until the la
   await expect(play).toBeDisabled();
   await expect(page.getByRole('radio', { name: 'Khó', exact: true })).toBeDisabled();
   await play.evaluate(button => { button.click(); button.click(); });
-  expect(await page.evaluate(() => window.__launchCount)).toBe(1);
+  await expect.poll(()=>page.evaluate(() => window.__launchCount)).toBe(1);
   await page.evaluate(() => window.__finishLaunch(false));
   await expect(play).toBeEnabled();
   await expect(page.getByRole('radio', { name: 'Khó', exact: true })).toBeDisabled();
@@ -51,11 +52,11 @@ for (const [gameId, progressKey] of [['memory-match', 'memoryMatch'], ['link-con
     await previewMapLevel(page, 1, 'easy');
     await expect(page.locator('.adventure-level-modes label')).toHaveText(['C', 'B', 'A', 'S']);
     await expect(page.locator('#adventure-level-modal .app-modal__title')).toHaveText('Màn 1 · Dễ');
-    await expect(page.locator('.adventure-level-details')).toContainText('Thời gian:');
+    await expect(page.locator('.adventure-level-details')).toContainText('Thời gian');
     await expect(page.locator('.adventure-level-result, .adventure-level-stars')).toHaveCount(0);
     await page.getByRole('radio', { name: 'Khó', exact: true }).check();
     await expect(page.locator('#adventure-level-modal .app-modal__title')).toHaveText('Màn 1 · Khó');
-    await expect(page.locator('.adventure-level-details')).toContainText('Mục tiêu:');
+    await expect(page.locator('.adventure-level-details')).toContainText('Mục tiêu');
     await closeLevelPreview(page);
   });
   for (const mode of ['easy', 'normal', 'superHard']) {
@@ -90,7 +91,7 @@ for (const gameId of ['memory-match', 'link-connect', 'triple-connect']) {
       await expect(page.locator('#adventure-level-modal')).toBeVisible();
       await expect(page.locator('.adventure-map-page')).toBeVisible();
       await expect(page.locator('#adventure-level-modal input[type="radio"]')).toHaveCount(0);
-      await expect(page.locator('#adventure-level-modal')).toContainText(mode === 'endless' ? 'Không giới hạn' : 'Thời gian:');
+      await expect(page.locator('#adventure-level-modal')).toContainText(mode === 'endless' ? 'Không giới hạn' : 'Thời gian');
       expect(await page.evaluate(async ({gameId,mode}) => (await import('/js/sessionProgress.js')).getActiveSession(gameId,mode), {gameId,mode})).toBeNull();
       await page.locator('#adventure-level-modal').getByRole('button',{name:'Chơi',exact:true}).click();
       await expect(page.locator('#adventure-level-modal')).toHaveCount(0);
@@ -149,7 +150,7 @@ for (const [gameId, title, progressKey] of [['memory-match', 'Memory Match', 'me
       await page.locator('[data-level="7"]').scrollIntoViewIfNeeded();
       await previewMapLevel(page, 7, 'easy');
       await expect(page.locator('.adventure-level-modes label')).toHaveText(['C', 'B', 'A', 'S']);
-      await expect(page.locator('.adventure-level-details')).toContainText('Gợi ý:');
+      await expect(page.locator('.adventure-level-details')).toContainText('Gợi ý');
       if (viewport.width === 412) await page.screenshot({ path: `.firebase/level-preview-${gameId}.png` });
       await closeLevelPreview(page);
       await page.locator('[data-dock-action="settings"]').click();

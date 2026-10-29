@@ -11,7 +11,7 @@ export const TRIPLE_HARD_CONFIG = Object.freeze({ mode: "hard", tileCount: 78, b
 export const TRIPLE_SUPER_HARD_CONFIG = Object.freeze({ mode: "superHard", tileCount: 120, baseTileCount: 96, cornerStackSizes: Object.freeze([6, 6, 6, 6]), layerCount: 6, timeSeconds: STANDARD_WAVE_SECONDS['triple-connect'].superHard });
 export const TRIPLE_ENDLESS_CONFIG = Object.freeze({ mode: "endless", tileCount: 120, baseTileCount: 96, cornerStackSizes: Object.freeze([6, 6, 6, 6]), layerCount: 6, timeSeconds: 0 });
 export const TRIPLE_CHALLENGE_CONFIG = Object.freeze({ mode: "challenge", tileCount: 12, layerCount: 2, timeSeconds: 60 });
-export const TRIPLE_LUCKY_REWARDS = Object.freeze([Object.freeze({ type: "coins", amount: 10 }), Object.freeze({ type: "time", amount: 5 }), Object.freeze({ type: "hint", amount: 1 })]);
+export const TRIPLE_LUCKY_REWARDS = Object.freeze([Object.freeze({ type: "coins", amount: 10 }), Object.freeze({ type: "time", amount: 15 }), Object.freeze({ type: "hint", amount: 1 })]);
 const LAYOUT_EPSILON = 0.000001, HALF_CARD_WIDTH = 2, HALF_CARD_HEIGHT = 2;
 function defineTemplate({ id, gridWidth, gridHeight, layerMasks, corners = [] }) {
   const safeInset = corners.length ? 3 : 0, leftInset = corners.some((corner) => corner.endsWith("left")) ? safeInset : 0, rightInset = corners.some((corner) => corner.endsWith("right")) ? safeInset : 0, width = gridWidth + leftInset + rightInset;
@@ -56,12 +56,11 @@ export const TRIPLE_PRODUCT_DECISIONS = Object.freeze({ trayCapacity: 7, trayExp
 ]), itemFallbackCoins: Object.freeze({ hint: 4, undo: 8, shuffle: 8 }) }) });
 export function normalizeTripleTrayExpansionSlots(value) { return Math.min(TRIPLE_PRODUCT_DECISIONS.trayExpansion.bonusCapacity, Math.max(0, Math.floor(Number(value) || 0))); }
 export function getTripleTrayCapacity(expansionSlots = 0) { return TRIPLE_PRODUCT_DECISIONS.trayExpansion.baseCapacity + normalizeTripleTrayExpansionSlots(expansionSlots); }
-export function getTripleMilestoneReward(index, mode) {
+export function getTripleMilestoneReward(index, mode, policyVersion = 2) {
   const reward = TRIPLE_PRODUCT_DECISIONS.milestones.rewards[index - 1];
   if (!reward) throw new RangeError(`Unsupported Triple milestone: ${index}`);
-  if (mode !== 'endless' || !reward.timeItem) return reward;
-  const { timeItem, ...rest } = reward;
-  return { ...rest, coins: (rest.coins || 0) + 40 * timeItem };
+  if (policyVersion === 1 && mode === 'endless' && reward.timeItem) { const { timeItem, ...rest } = reward; return { ...rest, coins: (rest.coins || 0) + timeItem * 40 }; }
+  return reward;
 }
 export function calculateTripleMatchScore(combo) { return calculateGroupScore({ combo: Math.max(1, Math.floor(Number(combo) || 0)) }); }
 export function getTripleCompletionScore({ mode, score, remainingTime }) { const baseScore = Math.max(0, Math.floor(Number(score) || 0)); const timeBonus = mode === "endless" ? 0 : Math.max(0, Math.floor(Number(remainingTime) || 0)); return Object.freeze({ baseScore, timeBonus, score: baseScore + timeBonus }); }

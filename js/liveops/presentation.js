@@ -9,7 +9,7 @@ import { letterSetSlots } from './letters.js';
 import { action } from './ui.js';
 import { createTabs } from './ui.js';
 import { festivalChestsEnabled } from './availability.js';
-import { LETTER_SETS, LETTER_ALPHABET, LETTER_SELL_COINS } from './config.js';
+import { LETTER_SETS, LETTER_ALPHABET, LETTER_SELL_COINS, LETTER_FALLBACK_COINS } from './config.js';
 import { createIcon } from '../icons.js';
 import { LETTER_REWARD_ITEMS } from './letterCatalog.generated.js';
 import { letterProgressLabel } from './letters.js';
@@ -55,7 +55,7 @@ export function openLiveopsPage(kind, surface = {}) {
       if (!owns()) return;
       observedAt = performance.now(); view = result; confirmedView=true; refreshAppWallet(); status.textContent = result.appliedCoins > 0 ? `Đã nhận ${result.appliedCoins} Xu.` : 'Đã cập nhật tiến độ.';
       if(result.letterResult?.kind==='exchange' && result.letterResult.chestType)status.textContent=`Đã nhận ${CHEST_NAMES[result.letterResult.chestType]}. Mở trong Kho rương khi bạn muốn.`;
-      else if(result.letterResult?.kind==='exchange')status.textContent=result.letterResult.itemId?`Đã nhận ${LETTER_REWARD_ITEMS.find(item=>item.id===result.letterResult.itemId).name}.`:'Đã mở rương · 10.000 Xu.';
+      else if(result.letterResult?.kind==='exchange')status.textContent=result.letterResult.itemId?`Đã nhận ${LETTER_REWARD_ITEMS.find(item=>item.id===result.letterResult.itemId).name}.`:`Đã nhận ${result.letterResult.coins} Xu.`;
       if (command?.type === 'fuseLetter' && result.state.letters.last?.kind === 'fuse') status.textContent = `Đã nhận chữ ${result.state.letters.last.received}.`;
       busy=spin;render();renderOnFinish=spin;
       if (spin) {
@@ -187,7 +187,7 @@ export function openLiveopsPage(kind, surface = {}) {
     letters.append(choices,el('h4','liveops__recipe-name',set.label),letterSlots(set,counts),progress(filled,total,`Số chữ ${set.label}`));
     const reward=el('div','liveops__recipe-reward');
     if(festivalChestsEnabled())reward.append(createIcon('chest'),el('strong','',CHEST_NAMES[set.chestType]));
-    else{const next=LETTER_REWARD_ITEMS.find(item=>item.id===view.nextLetterRewardId);reward.append(createIcon('chest'),el('strong','',next?next.name:'10.000 Xu'));}
+    else{const next=LETTER_REWARD_ITEMS.find(item=>item.id===view.nextLetterRewardId);reward.append(createIcon('chest'),el('strong','',next?next.name:`${LETTER_FALLBACK_COINS} Xu`));}
     const exchange=button('Đổi quà',()=>void run({type:'exchangeLetterSet',setId:set.id}),busy||!canClaim()||filled<total,`exchange-${set.id}`);exchange.setAttribute('aria-label',`Đổi ${set.label}`);reward.append(exchange);letters.append(reward);
     if(festivalChestsEnabled())letters.append(button('Xem Kho rương',openChests));
     const inventory=panel('Kho chữ'),grid=el('div','liveops__letter-grid');inventory.classList.add('liveops__inventory');

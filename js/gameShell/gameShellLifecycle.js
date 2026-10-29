@@ -43,10 +43,15 @@ export function createGameShellLifecycle() {
       for (const kind of resources.values()) counts[kind] += 1;
       return { active: alive, ...counts };
     },
-    dispose() {
+    dispose(detach) {
       if (!alive) return;
       alive = false;
       if (activeScope === scope) activeScope = null;
+      // Deactivate callbacks before detaching the owner's tree. Dispose child
+      // resources off-document, and still release them if detachment fails.
+      if (typeof detach === 'function') {
+        try { detach(); } catch (error) { console.error('Game Shell detach failed', error); }
+      }
       // A failed owner must not prevent the rest of the round from being released.
       for (const dispose of [...resources.keys()].reverse()) {
         try { dispose(); } catch (error) { console.error("Game Shell cleanup failed", error); }

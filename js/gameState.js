@@ -306,7 +306,7 @@ function normalizeTripleSessions(sessions, trayCapacity = TRIPLE_PRODUCT_DECISIO
   return Object.fromEntries(Object.entries(source).flatMap(([mode, session]) => {
     if (!GAME_MODE_IDS.has(mode) || !session || typeof session !== "object") return [];
     try {
-      if (typeof session.layoutId !== "string" || !session.layoutId) return [];
+      if (typeof session.layoutId !== "string" || !session.layoutId || session.rewardPolicyVersion !== undefined && ![1,2].includes(session.rewardPolicyVersion)) return [];
       getTripleLayout(session.layoutId);
       const restored = restoreSerializedTripleRoundState(session.snapshot, { trayCapacity });
       const wave = session.wave ? normalizeWaveProgress(session.wave, { gameId: 'triple-connect', mode, level: session.level, groupsPerWave: restored.initialTileCount / 3 }) : null;
@@ -322,6 +322,7 @@ function normalizeTripleSessions(sessions, trayCapacity = TRIPLE_PRODUCT_DECISIO
         level: Math.max(1, normalizeNonNegativeInteger(session.level) || 1),
         ...(typeof session.seed === "string" && session.seed ? { seed: session.seed } : {}),
         layoutId: session.layoutId,
+        rewardPolicyVersion: session.rewardPolicyVersion || 1,
         ...(Number.isFinite(session.remainingTime) ? { remainingTime: Math.max(0, Math.floor(session.remainingTime)) } : {}),
         snapshot,
       }]];

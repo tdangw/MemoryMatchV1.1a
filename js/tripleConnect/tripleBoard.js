@@ -260,6 +260,7 @@ function buildSolutionFirstBoard({ seed, layout, config }) {
       (coverGraphBySlot[tile.slotId] || []).flatMap((blockerSlotId) => tileIdsBySlot.get(blockerSlotId)),
     ]),
   );
+  tiles.at(-1).magnet = true;
   const witness = tiles.map((tile) =>
     Object.freeze({ type: "select-tile", tileId: tile.id }),
   );
@@ -520,7 +521,8 @@ function decorateChallengeLuckies(generated, seed, requestedCount) {
   const selectedGroups = shuffle([...groups.values()], rng).slice(0, count);
   const tiles = generated.board.tiles.map((tile) => tile);
   for (const group of selectedGroups) {
-    const tile = group[Math.floor(rng() * group.length)];
+    const eligible = group.filter(tile => !tile.magnet);
+    const tile = eligible[Math.floor(rng() * eligible.length)];
     const index = tiles.findIndex((candidate) => candidate.id === tile.id);
     tiles[index] = Object.freeze({
       ...tile,
@@ -555,6 +557,7 @@ function shuffle(values, random) {
 }
 
 function freezeGeneratedBoard(result) {
+
   return Object.freeze({
     ...result,
     witness: Object.freeze([...result.witness]),

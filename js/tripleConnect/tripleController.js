@@ -1,3 +1,4 @@
+import { disposeAppPage } from '../appPageLifecycle.js';
 import { tripleTicketDrop } from '../liveops/dropAdapters.js';
 import { prepareLetterDropFeedback } from '../liveops/letterDropFeedback.js';
 import { gameRecordLabel } from '../gameRecord.js';
@@ -29,7 +30,7 @@ import {
   serializeTripleRoundState,
 } from "./tripleState.js";
 import { createTripleRenderer } from "./tripleRenderer.js";
-import { getTripleShell } from "./tripleShell.js";
+import { getTripleShell, prepareTripleShellArtwork } from "./tripleShell.js";
 import { getTripleHud, getTripleHudElements } from "./tripleShell.js";
 import { presentTripleTransition } from "./triplePresentation.js";
 import {
@@ -91,6 +92,7 @@ let presentationCount = 0;
 let boardPresentationRevision = 0;
 let pendingGeneration = null;
 let hintedTileIds = new Set();
+let currentRewardPolicyVersion = 2;
 let currentMode = "easy";
 let currentLayout = null;
 let currentSeed = null;
@@ -191,8 +193,11 @@ export function startTripleConnectRound({ seed, mode = "easy", level = 1, elapse
 
 function prepareTripleStartup(prepare, { waveTransition = false } = {}) {
   if (!canLaunchGame()) return Promise.resolve(null);
+  // Remove the previous page before attaching the new cached shell. Both
+  // teardown and cold construction stay outside each other's live DOM trees.
+  disposeAppPage();
   const shell = getTripleShell();
-  const scope = mountWithWaveAudio(shell.scope, () => shell.mount(), waveTransition);
+  const scope = mountWithWaveAudio(shell.scope, () => shell.mount({ deferPresentation: true }), waveTransition);
   if (waveTransition) prepareWaveArrival(shell.refs, scope);
   const startup = createGameShellStartup(scope, shell.refs, error => {
     console.error('Triple startup failed', error);
@@ -200,6 +205,9 @@ function prepareTripleStartup(prepare, { waveTransition = false } = {}) {
   });
   roundStarted = false;
   return startup.run(async () => {
+    await startup.phase('shell-presentation', () => shell.preparePresentation(scope));
+    await startup.phase('shell-artwork', () => prepareTripleShellArtwork(startup));
+    await startup.yield();
     const mounted = await prepare(startup);
     startup.check();
     if (!mounted) return null;
@@ -269,6 +277,7 @@ async function startTripleConnectRoundFromGenerated({ generated, mode, level, el
   if (reason === 'wave') state = restoreTripleStateSnapshot({ ...createTripleStateSnapshot(state),
     score: activeWave.completedScore, moves: activeWave.completedMoves, misses: activeWave.completedMisses,
     combo: waveSession.snapshot.combo, maxCombo: waveSession.snapshot.maxCombo }, []);
+  currentRewardPolicyVersion = 2;
   currentMode = mode;
   currentLevel = level;
   currentLayout = getTripleLayout(generated.layoutId);
@@ -294,6 +303,7 @@ export function continueTripleConnectDevelopmentRound({ mode = "easy" } = {}) {
 
 export function continueTripleConnectSession(session) {
   if (!session) return null;
+  if (session.rewardPolicyVersion !== undefined && ![1,2].includes(session.rewardPolicyVersion)) return null;
   if (!isValidTripleConnectSession(session)) return null;
   if (session.wave?.phase === 'advance') return startTripleConnectRound({ mode: session.mode, level: session.level,
     reason: 'wave', waveSession: session, skipIntro: true });
@@ -306,6 +316,7 @@ export function continueTripleConnectSession(session) {
       : createWaveProgress({ attemptId: crypto.randomUUID(), gameId: 'triple-connect', mode: session.mode, level: session.level, groupsPerWave: state.initialTileCount / 3 });
     if (!activeWave) throw new Error('Invalid Triple wave checkpoint.');
     const layout = getTripleLayout(session.layoutId);
+    currentRewardPolicyVersion = session.rewardPolicyVersion || 1;
     currentMode = session.mode;
     currentLevel = normalizeLevel(session.level);
     currentLayout = layout;
@@ -448,7 +459,7 @@ async function mountTripleDevelopmentRound(generated, { skipIntro = false, start
       progress: milestones.progress,
       target: TRIPLE_PRODUCT_DECISIONS.milestones.target,
       descriptions: TRIPLE_PRODUCT_DECISIONS.milestones.rewards.map((_, index) =>
-        Object.entries(getTripleMilestoneReward(index + 1, currentMode)).map(([key, value]) => key === 'timeItem'
+        Object.entries(getTripleMilestoneReward(index + 1, currentMode, currentRewardPolicyVersion)).map(([key, value]) => key === 'timeItem'
           ? `+${value} vật phẩm +${getTripleItemDefinition('time').value} giây vào kho`
           : `+${value} ${key === "coins" ? "Xu" : key === "hint" ? "Gợi ý" : key === "undo" ? "Hoàn tác" : "Xáo trộn"}${key === 'coins' ? '' : ' vào kho'}`).join(" · ")),
     });
@@ -854,6 +865,7 @@ function createSession(roundState, sessionRemainingTime) {
   return {
     ...(activeWave ? { wave: activeWave } : {}),
     mode: currentMode,
+    rewardPolicyVersion: currentRewardPolicyVersion,
     level: currentLevel,
     seed: currentSeed,
     layoutId: currentLayout.id,
@@ -1169,15 +1181,17 @@ async function commitTripleResolutionRewards({ luckyEvent, matchEvent, feedbackA
   const pendingLucky = (luckyEvent?.rewards || []).filter((lucky) => !state.claimedLuckyIds.includes(lucky.id));
   const freshTileIds = (matchEvent?.tileIds || []).filter((id) => !state.milestoneTileIds.includes(id));
   if (!pendingLucky.length && !freshTileIds.length) return { match: [], lucky: [], milestones: [], milestoneEvents: [] };
-  const resolved = freshTileIds.length
-    ? resolveTripleMilestoneProgress({ milestones: gameState.progress.tripleConnect.milestones, tileIds: freshTileIds, mode: currentMode })
+  const resolved = freshTileIds.length === 3
+    ? resolveTripleMilestoneProgress({ milestones: gameState.progress.tripleConnect.milestones, tileIds: freshTileIds, mode: currentMode, legacy: currentRewardPolicyVersion === 1, special: matchEvent.tileIds.some(id => state.tiles[id].magnet || state.tiles[id].lucky) })
     : { next: gameState.progress.tripleConnect.milestones, claimedTileIds: [], rewards: [] };
   let nextState = state;
+  if (freshTileIds.length) nextState = claimTripleMilestoneTiles(nextState, freshTileIds);
   if (pendingLucky.length) nextState = claimTripleLuckyRewards(nextState, pendingLucky.map((lucky) => lucky.id));
   if (resolved.claimedTileIds.length) nextState = claimTripleMilestoneTiles(nextState, resolved.claimedTileIds);
   const requested = [
     ...(freshTileIds.length ? [{ type: 'coins', amount: MATCH_COINS_PER_GROUP, source: 'match' }] : []),
     ...pendingLucky.map((lucky) => ({ ...lucky.reward, source: "lucky", overflowCoins: 10 })),
+    ...(resolved.support ? [{ type: resolved.support, amount: 1, source: 'support' }] : []),
     ...resolved.rewards.flatMap((milestone) => Object.entries(milestone.reward)
       .map(([type, amount]) => ({ type: type === 'timeItem' ? 'time-item' : type, amount, source: "milestone" }))),
   ];
@@ -1197,7 +1211,7 @@ async function commitTripleResolutionRewards({ luckyEvent, matchEvent, feedbackA
   return {
     match: committed.filter((reward) => reward.source === 'match'),
     lucky: committed.filter((reward) => reward.source === "lucky"),
-    milestones: committed.filter((reward) => reward.source === "milestone"),
+    milestones: committed.filter((reward) => (reward.source === "milestone" || reward.source === "support")),
     milestoneEvents: resolved.rewards,
   };
 }

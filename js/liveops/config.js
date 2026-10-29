@@ -8,7 +8,7 @@ export function eventCollection(id) { return EVENT_COLLECTIONS.find(collection =
 
 export const LETTER_DROP_CHANCE = 1; // Trial policy; 20% requires a later product decision.
 export const LETTER_SELL_COINS = 1000;
-export const LETTER_FALLBACK_COINS = 10000;
+export const LETTER_FALLBACK_COINS = 100;
 export const LETTER_SETS = Object.freeze([
   { id:'memory-match', label:'MEMORY MATCH', chestType:'avatar' }, { id:'link-connect', label:'LINK CONNECT', chestType:'frame' },
   { id:'triple-connect', label:'TRIPLE CONNECT', chestType:'badge' }, { id:'adventure', label:'ADVENTURE', chestType:'avatar' },

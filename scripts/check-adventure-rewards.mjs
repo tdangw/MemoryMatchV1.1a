@@ -39,7 +39,7 @@ assert.equal(collection.grants[0].amount,300);assert.equal(repeated,null);
 assert.equal(await claimAdventureCollection("memory-match",1),null);
 assert.equal(gameState.coins,660);
 const hints = gameState.progress.memoryMatch.items.hint;
-gameState.progress.memoryMatch.items.hint=999;
+gameState.progress.memoryMatch.items.hint=9999;
 assert.equal(await claimAdventureChest("memory-match",2),null);
 assert.equal(gameState.progress.memoryMatch.claimedChests[2],undefined);
 gameState.progress.memoryMatch.items.hint=hints;

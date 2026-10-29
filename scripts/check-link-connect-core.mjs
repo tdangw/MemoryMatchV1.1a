@@ -77,7 +77,7 @@ assert.equal(calculateMatchCoinReward(4), 2);
 assert.equal(getLinkPremiumType(() => 0.49), "cyan");
 assert.equal(getLinkPremiumType(() => 0.5), "blue");
 assert.equal(getLinkPremiumType(() => 0.8), "red");
-assert.equal(getLinkPremiumSupplyItem("endless", () => 0.99), "reshuffle");
+assert.equal(getLinkPremiumSupplyItem("endless", () => 0.99), "freeze");
 assert.deepEqual(getLinkStarScoreTargets(6, "easy"), { one: 72, two: 108, three: 150 });
 assert.equal(calculateLinkCompletionTimeBonus("easy", 45), 45);
 assert.equal(calculateLinkCompletionTimeBonus("endless", 45), 0);

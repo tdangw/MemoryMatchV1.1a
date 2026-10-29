@@ -17,7 +17,7 @@ export function normalizeLetters(value) {
     if(!['sell','fuse','exchange'].includes(last.kind))throw new Error('Kết quả đổi chữ chưa được hỗ trợ.');
     if(last.kind==='sell'&&(!LETTER_ALPHABET.includes(last.letter)||!integer(last.quantity)||last.quantity<1||last.coins!==last.quantity*LETTER_SELL_COINS))throw new Error('Kết quả bán chữ chưa toàn vẹn.');
     if(last.kind==='fuse'&&(!LETTER_ALPHABET.includes(last.letter)||!LETTER_ALPHABET.includes(last.received)||last.coins!==0))throw new Error('Kết quả ghép chữ chưa toàn vẹn.');
-    if(last.kind==='exchange'&&!last.chestType&&(!LETTER_SETS.some(set=>set.id===last.setId)||(last.itemId===null?last.coins!==LETTER_FALLBACK_COINS:!LETTER_REWARD_ITEMS.some(item=>item.id===last.itemId)||last.coins!==0)))throw new Error('Kết quả đổi bộ chữ chưa toàn vẹn.');
+    if(last.kind==='exchange'&&!last.chestType&&(!LETTER_SETS.some(set=>set.id===last.setId)||(last.itemId===null?![LETTER_FALLBACK_COINS,10000].includes(last.coins):!LETTER_REWARD_ITEMS.some(item=>item.id===last.itemId)||last.coins!==0)))throw new Error('Kết quả đổi bộ chữ chưa toàn vẹn.');
   }
   if(last?.chestType && (last.kind!=='exchange'||!CHEST_TYPES.includes(last.chestType)||last.coins!==0||last.itemId!==null||!LETTER_SETS.some(set=>set.id===last.setId&&set.chestType===last.chestType)))throw new Error('Loại rương đổi chữ chưa toàn vẹn.');
   return {...structuredClone(value),counts:normalizeLetterCounts(value.counts),earned:normalizeLetterCounts(value.earned)};

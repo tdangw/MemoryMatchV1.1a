@@ -27,7 +27,7 @@ test('expected-tier, duplicate, canonical receipt, identity, inventory and atomi
   const old=gameState.progress.memoryMatch;
   const replaced=claimJourneyTreasure('memory-match',2,'C');gameState.progress.memoryMatch={...old};
   assert.equal((await replaced).reason,'stale');gameState.progress.memoryMatch=old;
-  profile.items.hint=999;
+  profile.items.hint=9999;
   assert.equal((await claimJourneyTreasure('memory-match',2,'C')).reason,'inventory-full');assert.equal(gameState.coins,90);
   profile.items.hint=initial+3;fail=true;
   assert.equal((await claimJourneyTreasure('memory-match',2,'C')).reason,'save');

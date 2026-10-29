@@ -63,18 +63,18 @@ assert.deepEqual(TRIPLE_PRODUCT_DECISIONS.milestones.rewards, [
   { coins: 30 }, { hint: 1, timeItem: 1 }, { shuffle: 1 }, { coins: 50, hint: 1 }, { coins: 100, undo: 1, shuffle: 1 },
 ]);
 let milestone = { version: 2, progress: 0, cycleId: 0, claimedIds: [] };
-for (let index = 0; index < 3; index += 1) milestone = resolveTripleMilestoneProgress({ milestones: milestone, tileIds: [`m-${index}`], mode: "easy" }).next;
+for (let index = 0; index < 3; index += 1) milestone = resolveTripleMilestoneProgress({ milestones: milestone, tileIds: [`m-${index}`], mode: "easy" }, () => 0).next;
 assert.equal(milestone.progress, 3);
 assert.deepEqual(milestone.claimedIds, ["0:1"]);
-assert.deepEqual(resolveTripleMilestoneProgress({ milestones: { version: 2, progress: 11, cycleId: 0, claimedIds: [] }, tileIds: ["x"], mode: "endless" }).rewards[0].reward, { coins: 40 });
+assert.deepEqual(resolveTripleMilestoneProgress({ milestones: { version: 2, progress: 11, cycleId: 0, claimedIds: [] }, tileIds: ["x"], mode: "endless" }, () => 0).rewards[0].reward, { timeItem: 1 });
 assert.deepEqual(TRIPLE_PRODUCT_DECISIONS.milestones.itemFallbackCoins, { hint: 4, undo: 8, shuffle: 8 });
 let rollover = { version: 2, progress: 29, cycleId: 4, claimedIds: ["4:1", "4:2", "4:3", "4:4", "4:5", "4:6", "4:7", "4:8", "4:9"] };
-rollover = resolveTripleMilestoneProgress({ milestones: rollover, tileIds: ["last"], mode: "easy" }).next;
+rollover = resolveTripleMilestoneProgress({ milestones: rollover, tileIds: ["last"], mode: "easy" }, () => 0).next;
 assert.deepEqual(rollover, { version: 2, progress: 0, cycleId: 5, claimedIds: [] });
 let twentyCycles = { version: 2, progress: 0, cycleId: 0, claimedIds: [] };
 const allClaims = [];
 for (let index = 0; index < 600; index += 1) {
-  const resolved = resolveTripleMilestoneProgress({ milestones: twentyCycles, tileIds: [`cycle-${index}`], mode: "easy" });
+  const resolved = resolveTripleMilestoneProgress({ milestones: twentyCycles, tileIds: [`cycle-${index}`], mode: "easy" }, () => 0);
   twentyCycles = resolved.next;
   allClaims.push(...resolved.rewards.map((reward) => reward.claimId));
 }
@@ -208,6 +208,25 @@ assert.equal(win.status, "won");
 assert.equal(win.tray.length, 0);
 assert.equal(reduceTripleCommand(win, { type: "undo" }).result.reason, "round-not-playing");
 assert.deepEqual(getTripleHintTileIds(grouped), ["a-1", "a-2", "a-3"]);
+
+// Hint and actual Magnet selection must agree when several same-type targets
+// exist, including covered cards and cards already occupying the tray.
+for (const trayCount of [0, 1, 2]) {
+  const snapshot = structuredClone(serializeTripleRoundState(makeState({ a: 6, b: 3 })));
+  snapshot.tiles.find(tile => tile.id === 'a-6').magnet = true;
+  snapshot.coverGraph['a-1'] = ['b-1'];
+  let magnetState = restoreSerializedTripleRoundState(snapshot);
+  const trayTargets = ['a-5', 'a-4'].slice(0, trayCount);
+  for (const tileId of trayTargets) magnetState = select(magnetState, tileId).nextState;
+  const expectedTargets = [...trayTargets, ...['a-1', 'a-2'].slice(0, 2-trayCount)];
+  assert.deepEqual(getTripleHintTileIds(magnetState), ['a-6', ...expectedTargets]);
+  const resolved = select(magnetState, 'a-6');
+  assert.deepEqual(resolved.events.find(event => event.type === 'magnet-resolved').tileIds,
+    ['a-6', ...expectedTargets]);
+  assert.equal(resolved.nextState.matchedTriples, 1);
+  assert.equal(resolved.nextState.tray.length, 0);
+  for (const tileId of ['a-6', ...expectedTargets]) assert.equal(resolved.nextState.tiles[tileId].location, 'removed');
+}
 
 const persisted = serializeTripleRoundState(matched.nextState);
 assert.equal(Object.hasOwn(persisted, "undoHistory"), false);

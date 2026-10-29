@@ -13,10 +13,10 @@ import { getComboWindowMs } from "../js/gameplayTuning.js";
 import { GAME_SHELL_DEFAULTS } from "../js/gameShell/gameShellConfig.js";
 import { changeMemoryItemCount, getMemoryItemCount, getMemoryItemId, getMemoryItemTotal } from "../js/memoryItems.js";
 
-assert.equal(shouldDropMemoryEnergy(0, () => 0.99), true, "100% test chance must always drop");
-assert.equal(shouldDropMemoryEnergy(9, () => 1), true, "pity threshold must guarantee energy");
+assert.equal(shouldDropMemoryEnergy(0, () => 0.99), false, "Special energy is 80%");
+assert.equal(shouldDropMemoryEnergy(9, () => .99), false, "Legacy streak does not guarantee energy");
 assert.equal(getMemoryPreviewDropValue(() => 0), 4);
-assert.equal(getMemoryPreviewDropValue(() => 0.5), 8);
+assert.equal(getMemoryPreviewDropValue(() => 0.6), 8);
 assert.equal(getMemoryPreviewDropValue(() => 0.999), 12);
 assert.deepEqual(resolveMemoryMilestoneRewards(7, () => 0), [
   { type: "hint", value: 1 },

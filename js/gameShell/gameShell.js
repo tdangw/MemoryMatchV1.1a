@@ -33,6 +33,7 @@ export function createGameShell({ root = document.createElement("section"), regi
   refs.board.setAttribute("aria-label", `Bàn ${title}`);
   Object.freeze(refs);
   let scope = null;
+  let pendingPresentation = null;
   const hideRoot = () => {
     root.hidden = true;
     root.style.display = "none";
@@ -40,6 +41,7 @@ export function createGameShell({ root = document.createElement("section"), regi
   };
   const releaseMount = mountedScope => {
     if (scope !== mountedScope) return;
+    pendingPresentation = null;
     hideRoot();
     if (activeShell === shell) activeShell = null;
   };
@@ -53,7 +55,7 @@ export function createGameShell({ root = document.createElement("section"), regi
   const shell = {
     refs,
     get scope() { return scope; },
-    mount({ cleanup } = {}) {
+    mount({ cleanup, deferPresentation = false } = {}) {
       disposeAppPage();
       activeShell?.unmount();
       const nextScope = createGameShellLifecycle();
@@ -64,13 +66,23 @@ export function createGameShell({ root = document.createElement("section"), regi
       root.hidden = false;
       root.style.display = display;
       mountGameFullscreen(refs, nextScope);
-      mountPlayerHeaderPortrait(refs.title,nextScope);
       mountGameplayTouchEffects(root, nextScope);
-      mountGameplayBanner(root, nextScope);
-      if (backgroundScene) mountGameplayAmbient(nextScope, root, backgroundScene);
+      // Startup can budget this finite presentation work in its next task.
+      // The active scope already owns controls and cancellation at this point.
+      pendingPresentation = () => {
+        pendingPresentation = null;
+        mountPlayerHeaderPortrait(refs.title,nextScope);
+        mountGameplayBanner(root, nextScope);
+        if (backgroundScene) mountGameplayAmbient(nextScope, root, backgroundScene);
+      };
+      if (!deferPresentation) shell.preparePresentation(nextScope);
       if (cleanup) nextScope.own(cleanup);
       assertVisibleScope("mount");
       return nextScope;
+    },
+    preparePresentation(mountedScope) {
+      if (scope !== mountedScope || !mountedScope.active || !pendingPresentation) return;
+      pendingPresentation();
     },
     update({ paused = false } = {}) {
       assertVisibleScope("update");
@@ -79,7 +91,14 @@ export function createGameShell({ root = document.createElement("section"), regi
       setAmbientPaused(scope, paused);
     },
     unmount() {
-      if (scope?.active) scope.dispose();
+      if (scope?.active) {
+        const parent = root.parentNode;
+        const sibling = root.nextSibling;
+        scope.dispose(() => root.remove());
+        // The cached shell stays in its original DOM position, hidden. Child
+        // teardown runs detached so it does not repeatedly invalidate the page.
+        if (parent) parent.insertBefore(root, sibling?.parentNode === parent ? sibling : null);
+      }
       else releaseMount(scope);
     },
   };

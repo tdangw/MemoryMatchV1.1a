@@ -84,7 +84,7 @@ export function updateScoreDisplay(score) {
 export function updateMemorySpecialProgress(progress = gameState.specialProgress) {
   const target = GAME_CONFIG.special.progressTarget;
   getMemoryHud().milestones({ progress: Math.max(0, Math.min(target, Math.floor(Number(progress) || 0))), target,
-    descriptions: GAME_CONFIG.special.milestones.map((_, index) => describeMemoryMilestoneRewards(getMemoryMilestoneRewards(index + 1, gameState.settings.mode))) });
+    descriptions: GAME_CONFIG.special.milestones.map((_, index) => describeMemoryMilestoneRewards(getMemoryMilestoneRewards(index + 1, gameState.settings.mode, gameState.rewardPolicyVersion))) });
 }
 
 function describeMemoryMilestoneRewards(rewards = []) {

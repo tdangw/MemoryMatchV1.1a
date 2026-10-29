@@ -10,5 +10,5 @@ export function linkTicketDrop(wave, first, second) {
   return group(wave,[first.instanceId,second.instanceId],first.special || second.special || first.luckyReward || second.luckyReward);
 }
 export function tripleTicketDrop(wave, tiles, tileIds, freshTileIds) {
-  return freshTileIds.length ? group(wave,tileIds,tileIds.some(id=>Boolean(tiles[id].lucky))) : undefined;
+  return freshTileIds.length === tileIds.length && tileIds.length > 0 ? group(wave,tileIds,tileIds.some(id=>Boolean(tiles[id].lucky || tiles[id].magnet))) : undefined;
 }

@@ -35,14 +35,22 @@ export default defineConfig({
     trace: "retain-on-failure",
     video: "off",
   },
-  projects: Object.entries(viewports).map(([name, viewport]) => ({
+  projects: [...Object.entries(viewports).map(([name, viewport]) => ({
     name,
+    grepInvert: /@cpu-budget/,
     use: { viewport },
     // State, persistence, economy and effect contracts are viewport-invariant.
     // Their owner is desktop; the three mobile profiles retain only responsive
     // geometry, presentation, overflow and playable-witness coverage.
     ...(name === "desktop" ? {} : { testMatch: responsiveTestPattern }),
-  })),
+  })), {
+    // CPU budgets run without trace's DOM snapshotter. The default release run
+    // still includes this project; functional projects retain their traces.
+    name: 'cpu-budget',
+    testMatch: /triple-generation\.spec\.js$/,
+    grep: /@cpu-budget/,
+    use: { viewport: viewports.desktop, trace: 'off' },
+  }],
   webServer: {
     env: { VITE_FIREBASE_DISABLED: process.env.VITE_FIREBASE_USE_EMULATORS === "1" ? "0" : "1", VITE_FIREBASE_USE_EMULATORS: process.env.VITE_FIREBASE_USE_EMULATORS || "0" },
     command: serverCommand,

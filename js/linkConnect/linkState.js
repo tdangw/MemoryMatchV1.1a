@@ -3,6 +3,7 @@ import { getLinkModeLayout } from "./linkConfig.js";
 export function createLinkGameState() {
   return {
     mode: "easy",
+    rewardPolicyVersion: 2,
     level: 1,
     gravityShift: "static",
     score: 0,

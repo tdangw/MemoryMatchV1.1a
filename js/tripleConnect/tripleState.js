@@ -52,6 +52,23 @@ export function getExposedTileIdsFromTrustedState(state) {
   return [...createTripleBoardViewFromTrustedState(state).exposedTileIds];
 }
 
+/** Same tray-first, stable board order for the reducer and hint. State is validated by their boundary. */
+export function getTripleMagnetTargetIdsFromTrustedState(state, tileId) {
+  const type = state.tiles[tileId].type;
+  const targets = [];
+  for (const id of state.tray) {
+    if (id !== tileId && state.tiles[id].type === type) targets.push(id);
+    if (targets.length === 2) return targets;
+  }
+  const boardTargets = Object.keys(state.tiles).filter(id =>
+    id !== tileId && state.tiles[id].location === 'board' && state.tiles[id].type === type).sort();
+  for (const id of boardTargets) {
+    targets.push(id);
+    if (targets.length === 2) break;
+  }
+  return targets;
+}
+
 export function isTripleTileExposed(state, tileId) {
   return createTripleBoardView(state).exposedTileIds.has(tileId);
 }
@@ -138,6 +155,7 @@ export function assertTripleStateInvariant(state) {
     throw new TypeError("Triple state tray contains an unknown tile ID.");
   }
 
+  let magnetCount = 0;
   const locations = { board: 0, tray: 0, removed: 0 };
   const types = new Map();
   const hasPiles = Object.keys(state.cornerStacks || {}).length > 0;
@@ -152,6 +170,7 @@ export function assertTripleStateInvariant(state) {
       tilesAtSlot.push(tileId);
       slotIds.set(tile.slotId, tilesAtSlot);
     } else slotIds.add(tile.slotId);
+    if (tile.magnet !== undefined && typeof tile.magnet !== 'boolean' || tile.magnet && (tile.lucky || ++magnetCount > 1)) throw new TypeError('Invalid Triple Magnet metadata.');
     locations[tile.location] += 1;
     types.set(tile.type, (types.get(tile.type) || 0) + 1);
     if ((tile.location === "tray") !== trayIds.has(tile.id)) {
@@ -290,6 +309,7 @@ function normalizeTiles(tiles) {
     const id = String(source?.id || "");
     const type = String(source?.type || "");
     if (!id || !type || result[id]) throw new TypeError("Triple tile IDs and types must be unique and non-empty.");
+    if (source.magnet !== undefined && typeof source.magnet !== 'boolean') throw new TypeError('Invalid Triple Magnet metadata.');
     result[id] = Object.freeze({
       id,
       type,
@@ -297,6 +317,7 @@ function normalizeTiles(tiles) {
       layer: normalizeLayer(source.layer),
       location: "board",
       lucky: normalizeLucky(source.lucky),
+      ...(source.magnet === true ? { magnet: true } : {}),
     });
   }
   return Object.freeze(result);
@@ -443,7 +464,7 @@ export function claimTripleLuckyRewards(state, luckyIds) {
   return restoreTripleStateSnapshot({
     ...createTripleStateSnapshot(state),
     claimedLuckyIds: [...state.claimedLuckyIds, ...additions],
-  }, []);
+  }, state.undoHistory);
 }
 
 export function claimTripleMilestoneTiles(state, tileIds) {

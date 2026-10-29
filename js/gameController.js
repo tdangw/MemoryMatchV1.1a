@@ -186,7 +186,7 @@ export function initializeLevel(level, { reason = "new", session = null, skipInt
   const roundId = beginRound();
   const pairSnapshot = reason === 'resume' ? session?.pairSnapshot : null;
   const waveCombo = reason === 'wave' ? session?.pairSnapshot : null;
-  beginMemoryBoardIdentity(pairSnapshot?.seed, pairSnapshot?.themeId || gameState.appearance.themes.memoryMatch);
+  beginMemoryBoardIdentity(pairSnapshot?.seed, pairSnapshot?.themeId || gameState.appearance.themes.memoryMatch, pairSnapshot ? pairSnapshot.rewardPolicyVersion || 1 : 2);
   const firstStart = !gameState.progress.memoryMatch.startedLevels?.[`${mode}:${level}`];
   const hintBonus = (reason === "new" || reason === "advance") && firstStart
     ? getLevelHintBonus(level, gameState.progress.memoryMatch.items.hint)

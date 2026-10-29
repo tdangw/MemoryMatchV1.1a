@@ -128,7 +128,7 @@ CHEST_CONTRACT
           && n.last.keys().hasOnly(['kind','letter','quantity','coins','received','sequence','operation','setId','itemId','chestType'])
           && n.last.sequence == n.sequence && n.last.operation is string && n.last.operation.matches('^[A-Za-z0-9_-]{1,128}$')
           && (n.last.kind == 'exchange' ? n.last.setId in LETTER_SET_IDS
-            && (n.last.get('chestType','') != '' ? n.last.chestType == chestForSet(n.last.setId) && n.last.itemId == null && n.last.coins == 0 : n.last.itemId == null ? n.last.coins == 10000 : n.last.itemId in LETTER_REWARDS && n.last.coins == 0)
+            && (n.last.get('chestType','') != '' ? n.last.chestType == chestForSet(n.last.setId) && n.last.itemId == null && n.last.coins == 0 : n.last.itemId == null ? n.last.coins == 100 : n.last.itemId in LETTER_REWARDS && n.last.coins == 0)
             : n.last.letter in LETTER_KEYS && (n.last.kind == 'sell' ? n.last.quantity is int && n.last.quantity > 0
               && n.last.coins == n.last.quantity * 1000 : n.last.kind == 'fuse' && n.last.received in LETTER_KEYS && n.last.coins == 0)))
 LETTER_VALUES;
@@ -141,7 +141,7 @@ LETTER_VALUES;
         && n.sequence == o.sequence + 1 && n.last.sequence == n.sequence
         && n.last.keys().hasOnly(['kind','setId','itemId','coins','sequence','operation','chestType']) && n.last.kind == 'exchange'
         && n.last.setId in LETTER_SET_IDS && n.last.operation is string && n.last.operation.matches('^[A-Za-z0-9_-]{1,128}$')
-        && (n.last.get('chestType','') != '' ? n.last.chestType == chestForSet(n.last.setId) && n.last.itemId == null && n.last.coins == 0 : n.last.itemId == null ? n.last.coins == 10000 : n.last.itemId in LETTER_REWARDS && n.last.coins == 0)
+        && (n.last.get('chestType','') != '' ? n.last.chestType == chestForSet(n.last.setId) && n.last.itemId == null && n.last.coins == 0 : n.last.itemId == null ? n.last.coins == 100 : n.last.itemId in LETTER_REWARDS && n.last.coins == 0)
         && n.counts.diff(o.counts).affectedKeys().hasOnly(required.keys())
 LETTER_EXCHANGE_VALUES;
     }

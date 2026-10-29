@@ -53,7 +53,7 @@ export function mountChestInventory(host, { owner, back, profile, gameId = 'memo
         const option = node('option', '', label); option.value = id; games.append(option);
       }
       const supportInfo = node('p', 'liveops__support-pool');
-      const describeSupports = () => { supportInfo.textContent = `Quà hỗ trợ: ${CHEST_SUPPORTS[gameId].map(item=>item.label).join(' · ')}. Nếu nhận hỗ trợ, các món có cơ hội như nhau.`; };
+      const describeSupports = () => { supportInfo.textContent = `Quà hỗ trợ: ${CHEST_SUPPORTS[gameId].map(item=>item.label).join(' · ')}. Nếu nhận hỗ trợ, các món có cơ hội như nhau. Kho tối đa 9.999 mỗi món; mỗi món vượt kho đổi thành 10 Xu.`; };
       games.value = gameId; games.disabled = busy || Boolean(pendingChest); games.onchange = () => { gameId = games.value; describeSupports(); }; describeSupports();
       detail.append(games, supportInfo, action('Mở 1 rương', () => void open(), busy || !connected || Boolean(getActiveGameScope()) || chests.earned[selected] === chests.spent[selected] || Boolean(pendingChest && pendingChest.chestType !== selected), 'confirm-open'),
         node('p', '', 'Mỗi rương nhận một quà. Xu vào ví, hỗ trợ vào kho trò đã chọn, ngoại hình vào Hồ sơ. Kho hỗ trợ đầy sẽ giữ rương để thử lại.'));

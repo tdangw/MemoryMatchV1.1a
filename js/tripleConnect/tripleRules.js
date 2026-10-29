@@ -4,6 +4,7 @@ import {
   claimTripleMilestoneTiles,
   createTripleStateSnapshotFromTrustedState,
   createTripleBoardViewFromTrustedState,
+  getTripleMagnetTargetIdsFromTrustedState,
   restoreTripleStateSnapshot,
 } from "./tripleState.js";
 
@@ -43,10 +44,17 @@ function selectTile(state, tileId) {
   if (!createTripleBoardViewFromTrustedState(state).exposedTileIds.has(tileId))
     return reject(state, "tile-covered");
 
+  const attracted = tile.magnet ? getTripleMagnetTargetIdsFromTrustedState(state, tileId) : [];
+  if (tile.magnet && attracted.length !== 2) return reject(state, 'magnet-targets-missing');
   const snapshot = createTripleStateSnapshotFromTrustedState(state);
   const tiles = cloneTiles(state.tiles);
   tiles[tileId] = { ...tile, location: "tray" };
   let tray = insertCanonical(state.tray, tileId, tiles);
+  for (const id of attracted) {
+    if (tiles[id].location === 'tray') continue;
+    tiles[id] = { ...tiles[id], location: 'tray' };
+    tray = insertCanonical(tray, id, tiles);
+  }
   let streakType = state.streakType;
   let streakCount = state.streakCount;
   let misses = state.misses;
@@ -55,6 +63,7 @@ function selectTile(state, tileId) {
   let score = state.score;
   let matchedTriples = state.matchedTriples;
   const events = [{ type: "tile-selected", tileId }];
+  if (tile.magnet) events.push({ type: "magnet-resolved", tileIds: [tileId, ...attracted] });
 
   if (streakType && streakType !== tile.type) {
     misses += 1;
@@ -116,7 +125,7 @@ function undoSelection(state) {
   const history = state.undoHistory.slice(0, -1);
   // Milestone attribution is a durable round ledger, not a reversible board move.
   // Restoring an older board snapshot must not make the same tiles earn progress twice.
-  const restored = restoreTripleStateSnapshot(state.undoHistory.at(-1), history);
+  const restored = restoreTripleStateSnapshot({ ...state.undoHistory.at(-1), claimedLuckyIds: state.claimedLuckyIds }, history);
   const nextState = claimTripleMilestoneTiles(restored, state.milestoneTileIds);
   return {
     nextState,

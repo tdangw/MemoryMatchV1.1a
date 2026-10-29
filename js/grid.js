@@ -1,6 +1,6 @@
 import { shellTimeout as setTimeout } from "./gameShell/gameShellLifecycle.js";
 import { shuffleArray } from "./utils.js";
-import { GAME_CONFIG, getLuckyReward, isChallengeMode } from "./config.js";
+import { GAME_CONFIG, getLuckyReward } from "./config.js";
 import { gameState, setLuckyRewards } from "./gameState.js";
 import { getCardBackClass } from "./appearance.js";
 import { initLogic } from "./logic.js";
@@ -113,7 +113,8 @@ export function createGrid(
     cards.push(card, card);
   });
 
-  if (isChallengeMode(gameState.settings.mode)) {
+  if (!snapshot && (!gameState.wave || gameState.wave.index === 1)
+    && (!['challenge', 'endless'].includes(gameState.settings.mode) || gameState.currentLevel === 1)) {
     const maximum = Math.min(
       GAME_CONFIG.specialModes.luckyTileCount.maximum,
       selectedCards.length,
@@ -121,7 +122,7 @@ export function createGrid(
     const minimum = Math.min(GAME_CONFIG.specialModes.luckyTileCount.minimum, maximum);
     const luckyCount = Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
     const luckyCards = shuffleArray([...selectedCards]).slice(0, luckyCount);
-    setLuckyRewards(luckyCards.map((card) => [card.id, getLuckyReward()]));
+    setLuckyRewards(luckyCards.map((card) => [card.id, getLuckyReward(gameState.settings.mode)]));
   } else {
     setLuckyRewards([]);
   }

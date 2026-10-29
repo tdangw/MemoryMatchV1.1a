@@ -7,7 +7,7 @@ import { memoryComboRemainingMs } from './logic.js';
 import { snapshotMemoryTiles } from './memoryMatch/memoryBoard.js';
 let boardSeed = crypto.randomUUID();
 let boardThemeId;
-export function beginMemoryBoardIdentity(seed, themeId) { boardSeed = seed || crypto.randomUUID(); boardThemeId = themeId; }
+export function beginMemoryBoardIdentity(seed, themeId, rewardPolicyVersion = 2) { gameState.rewardPolicyVersion = rewardPolicyVersion; boardSeed = seed || crypto.randomUUID(); boardThemeId = themeId; }
 
 export function getMemorySessionSnapshot(overrides = {}) {
   stageRankedAttempt("memory-match", gameState.settings.mode, gameState.score,
@@ -15,7 +15,7 @@ export function getMemorySessionSnapshot(overrides = {}) {
   return {
     ...(gameState.wave ? { wave: gameState.wave } : {}),
     pairSnapshot: {
-      version: 1, gameId: 'memory-match', seed: boardSeed, themeId: boardThemeId || getEquippedThemeId(gameState.appearance, 'memory-match'),
+      version: 1, rewardPolicyVersion: gameState.rewardPolicyVersion, gameId: 'memory-match', seed: boardSeed, themeId: boardThemeId || getEquippedThemeId(gameState.appearance, 'memory-match'),
       score: gameState.score, moves: gameState.moves, misses: gameState.misses, combo: gameState.combo,
       capturedAt: Date.now(), comboRemainingMs: memoryComboRemainingMs(),
       matchedPairs: gameState.matchedPairs, totalPairs: gameState.totalPairs,

@@ -58,7 +58,7 @@
         && r.chestType in ['c','avatar','frame','badge'] && r.gameId in ['memory-match','link-connect','triple-connect'] && r.poolVersion == 1
         && r.operation is string && r.operation.matches('^[A-Za-z0-9_-]{1,128}$') && rewardInt(r.coins)
         && (r.kind == 'coins' ? (r.reason == 'coins' ? r.coins == (r.chestType == 'c' ? 50 : r.chestType == 'avatar' ? 150 : 100)
-          : r.reason in ['duplicate','full'] && r.chestType != 'c' && r.coins == (r.chestType == 'avatar' ? 300 : 200))
+          : r.reason == 'overflow' ? r.coins == 10 : r.reason in ['duplicate','full'] && r.chestType != 'c' && r.coins in [100, (r.chestType == 'avatar' ? 300 : 200)])
           : r.kind == 'item' ? r.coins == 0 && r.itemId in CHEST_POOL_LOOKUP
           : r.kind == 'support' && r.coins == 0 && r.key in CHEST_SUPPORT_LOOKUP);
     }
@@ -66,6 +66,7 @@
       let last = n.chests.last;
       return chestBase(n,o,['chests']) && n.chests.earned == o.chests.earned && n.chests.sourceEarned == o.chests.sourceEarned && chestCounts(n.chests)
         && n.chests.sequence == o.chests.sequence + 1 && last.sequence == n.chests.sequence && validChestResult(last)
+        && (!(last.get('reason','') in ['duplicate','full']) || last.coins == 100)
         && n.chests.spent.diff(o.chests.spent).affectedKeys().hasOnly([last.chestType])
         && n.chests.spent[last.chestType] == o.chests.spent[last.chestType] + 1;
     }

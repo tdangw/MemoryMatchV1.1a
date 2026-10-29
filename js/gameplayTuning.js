@@ -23,7 +23,8 @@ export const GAMEPLAY_TIMING = Object.freeze({
 
 // Giới hạn thử nghiệm dùng chung cho mọi vật phẩm có thể tích trữ.
 export const GAMEPLAY_LIMITS = Object.freeze({
-  itemCount: 999,
+  itemCount: 9999,
+  itemOverflowCoins: 10,
 });
 
 export const COMBO_WINDOWS = Object.freeze([

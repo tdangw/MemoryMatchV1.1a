@@ -16,32 +16,21 @@ export function getTripleShell() {
   root.hidden = true;
   root.innerHTML = `<header data-shell-region="title" class="triple-connect__title game-name">Triple Connect</header>
     <div data-shell-region="progress" class="triple-connect__progress" hidden></div>
-    <div data-shell-region="hud" class="triple-connect__hud triple-game-hud game-hud"><button id="triple-actions-menu-toggle" class="game-menu-toggle" type="button" aria-label="Tạm dừng" aria-controls="game-exit-modal" aria-haspopup="dialog" aria-expanded="false"></button><div class="game-stats game-hud__stats" aria-label="Thông tin màn chơi"><div class="game-hud__stats-group game-hud__stats-group--left"><span class="info stat-card game-hud__metric stat-moves"><span class="stat-label">LƯỢT</span><span data-triple-stat="moves">0</span></span><span class="info stat-card game-hud__metric stat-misses"><span class="stat-label">SAI</span><span data-triple-stat="misses">0</span></span></div><div class="game-hud__stats-group game-hud__stats-group--center"><span class="info stat-card game-hud__metric stat-level"><span class="stat-label">MÀN</span><span data-triple-level>1</span></span><span class="info stat-card game-hud__metric stat-timer"><span class="stat-label">THỜI GIAN</span><span data-triple-timer>01:00</span></span><span class="info stat-card game-hud__metric stat-stars"><span class="stat-label"><span data-triple-icon="star"></span></span><span data-triple-total-stars>0</span></span></div><div class="game-hud__stats-group game-hud__stats-group--right"><span class="info stat-card game-hud__metric stat-combo"><span class="stat-label">CHUỖI</span><span data-triple-stat="combo">0</span><span class="combo-window-progress" aria-hidden="true"></span></span><span class="info stat-card game-hud__metric stat-points"><span class="stat-label">ĐIỂM</span><span data-triple-stat="score" class="game-hud__score-value">0</span></span></div></div><button id="triple-tools-toggle" class="triple-tools-toggle" type="button" aria-label="Mở công cụ hỗ trợ" aria-controls="triple-tools-menu" aria-expanded="false"></button><div id="triple-tools-menu" class="triple-tools-menu" hidden><div class="triple-connect__items hud-tool-list" aria-label="Vật phẩm hỗ trợ"></div></div></div>
+    <div data-shell-region="hud" class="triple-connect__hud triple-game-hud game-hud"><button id="triple-actions-menu-toggle" data-triple-icon="menu" class="game-menu-toggle" type="button" aria-label="Tạm dừng" aria-controls="game-exit-modal" aria-haspopup="dialog" aria-expanded="false"></button><div class="game-stats game-hud__stats" aria-label="Thông tin màn chơi"><div class="game-hud__stats-group game-hud__stats-group--left"><span class="info stat-card game-hud__metric stat-moves"><span class="stat-label">LƯỢT</span><span data-triple-stat="moves">0</span></span><span class="info stat-card game-hud__metric stat-misses"><span class="stat-label">SAI</span><span data-triple-stat="misses">0</span></span></div><div class="game-hud__stats-group game-hud__stats-group--center"><span class="info stat-card game-hud__metric stat-level"><span class="stat-label">MÀN</span><span data-triple-level>1</span></span><span class="info stat-card game-hud__metric stat-timer"><span class="stat-label">THỜI GIAN</span><span data-triple-timer>01:00</span></span><span class="info stat-card game-hud__metric stat-stars"><span class="stat-label"><span data-triple-icon="star"></span></span><span data-triple-total-stars>0</span></span></div><div class="game-hud__stats-group game-hud__stats-group--right"><span class="info stat-card game-hud__metric stat-combo"><span class="stat-label">CHUỖI</span><span data-triple-stat="combo">0</span><span class="combo-window-progress" aria-hidden="true"></span></span><span class="info stat-card game-hud__metric stat-points"><span class="stat-label">ĐIỂM</span><span data-triple-stat="score" class="game-hud__score-value">0</span></span></div></div><button id="triple-tools-toggle" data-triple-icon="wand" class="triple-tools-toggle" type="button" aria-label="Mở công cụ hỗ trợ" aria-controls="triple-tools-menu" aria-expanded="false"></button><div id="triple-tools-menu" class="triple-tools-menu" hidden><div class="triple-connect__items hud-tool-list" aria-label="Vật phẩm hỗ trợ">${TRIPLE_ITEMS.map(item => `<button type="button" data-triple-item="${item.id}" data-triple-icon="${item.icon}" class="hud-tool-item"><span>${item.title}</span><b data-triple-item-count="${item.id}" class="hud-tool-count"></b></button>`).join('')}</div></div></div>
     <section data-shell-region="milestones" class="triple-connect__milestones" aria-label="Mốc thưởng Triple"><span class="triple-connect__milestone-coins game-coin-hud"><span data-triple-icon="coin"></span><strong data-triple-milestone-coins>0</strong></span><div class="triple-connect__milestone-track" data-triple-milestone-track>${TRIPLE_PRODUCT_DECISIONS.milestones.rewards.map((_, index) => `<span data-triple-milestone="${index + 1}" style="--triple-milestone-position:${5 + index * 10}%">${index + 1}</span>`).join("")}</div><span class="game-milestone-stars stat-star-progress" aria-label="Tiến trình sao màn hiện tại"><span data-triple-stars class="star-progress__stars" role="img" aria-label="0 trên 3 sao"><span class="star-progress__milestone" aria-hidden="true" data-triple-icon="star"></span><span class="star-progress__milestone" aria-hidden="true" data-triple-icon="star"></span><span class="star-progress__milestone" aria-hidden="true" data-triple-icon="star"></span></span><span class="star-progress__track"><span data-triple-stars-fill class="star-progress__fill"></span></span></span></section>
     <div data-shell-region="frame" class="triple-connect__frame"><div data-shell-region="board" class="triple-connect__surface"><div class="triple-connect__board"></div><svg class="triple-connect__line" aria-hidden="true"></svg><div class="triple-connect__tray-divider" aria-hidden="true"><span>◆</span></div><div class="triple-connect__tray" aria-label="Khay 10 ô, 3 ô đang khóa"></div></div></div>`;
-  document.querySelector(".main-wrapper").append(root);
-  root.querySelectorAll("[data-triple-icon]").forEach((element) => element.append(createIcon(element.dataset.tripleIcon)));
-  root.querySelector("#triple-tools-toggle").append(createIcon("wand"));
-  root.querySelector("#triple-actions-menu-toggle").append(createIcon("menu"));
-  const items = root.querySelector(".triple-connect__items");
-  TRIPLE_ITEMS.forEach((item) => {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.dataset.tripleItem = item.id;
-    button.className = "hud-tool-item";
-    button.append(createIcon(item.icon));
-    const label = document.createElement("span");
-    label.textContent = item.title;
-    button.append(label);
-    const count = document.createElement("b");
-    count.dataset.tripleItemCount = item.id;
-    count.className = "hud-tool-count";
-    button.append(count);
-    items.append(button);
-  });
   const regions = Object.fromEntries([...root.querySelectorAll("[data-shell-region]")].map(node => [node.dataset.shellRegion, node]));
   shell = createGameShell({ root, regions, title: "Triple Connect", backgroundScene: 'triple-connect' });
+  document.querySelector(".main-wrapper").append(root);
   return shell;
+}
+
+/** Complete cached shell artwork within the cancellable startup batch budget. */
+export async function prepareTripleShellArtwork(startup) {
+  const targets = getTripleShell().refs.root.querySelectorAll('[data-triple-icon]');
+  await startup.batch(targets, target => {
+    if (!target.querySelector(':scope > .ui-icon')) target.prepend(createIcon(target.dataset.tripleIcon));
+  });
 }
 
 export function getTripleHudElements() {

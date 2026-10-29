@@ -76,7 +76,7 @@ try {
   }
   const beforeChest=saved.profile.data.coins;
   accept(await commit({type:'exchangeLetterSet',setId:'adventure',sequence:state.letters.sequence+1,operation:'fallback-chest'}));
-  assert.equal(saved.profile.data.coins,beforeChest+10000);assert.equal(state.letters.last.itemId,null);
+  assert.equal(saved.profile.data.coins,beforeChest+100);assert.equal(state.letters.last.itemId,null);
   await assertFails(getDocFromServer(sparkRef(other,space,uid)));
   await assertFails(setDoc(sparkRef(db,space,uid),{version:2}));
   const stored=(await getDocFromServer(sparkRef(db,space,uid))).data();

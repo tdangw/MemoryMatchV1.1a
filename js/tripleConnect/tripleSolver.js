@@ -60,7 +60,7 @@ export function createTripleSolverKey(state) {
     .sort(([left], [right]) => left.localeCompare(right))
     .map(([stackId, stack]) => `${stackId}:${[...stack.tileIds].reverse().find((id) => state.tiles[id].location === "board") || "-"}`)
     .join("|");
-  return `${Object.keys(state.tiles).sort().map(id => `${id}:${state.tiles[id].location}`).join("|")};${state.tray.join(",")};${stackTops}`;
+  return `${Object.keys(state.tiles).sort().map(id => `${id}:${state.tiles[id].type}:${state.tiles[id].magnet ? 1 : 0}:${state.tiles[id].location}`).join("|")};${state.tray.join(",")};${stackTops}`;
 }
 
 function orderMoves(state, preferredTileId) {

@@ -308,6 +308,7 @@ export function startLinkLevel({
   activeAssetPaths = board.selectedAssetPaths;
   board.seed = resume && pairSnapshot ? pairSnapshot.seed : crypto.randomUUID();
   board.themeId = themeId;
+  linkGameState.rewardPolicyVersion = resume && pairSnapshot ? pairSnapshot.rewardPolicyVersion || 1 : 2;
   if (level === 1 && !resume && !restart && !waveTransition) {
     linkGameState.specialProgress = 0;
     linkGameState.specialNoEnergyDropStreak = 0;
@@ -1233,7 +1234,7 @@ function updateLinkStarsHud(hud = getLinkHudElements()) {
 
 function updateLinkSpecialMilestones(hud = getLinkHudElements()) {
   getLinkHud(hud).milestones({ progress: linkGameState.specialProgress, target: LINK_CONNECT_CONFIG.special.progressTarget,
-    descriptions: hud.milestones.map((_, index) => getLinkSpecialMilestoneTooltip(index + 1, linkGameState.mode)) });
+    descriptions: hud.milestones.map((_, index) => getLinkSpecialMilestoneTooltip(index + 1, linkGameState.mode, linkGameState.rewardPolicyVersion)) });
 }
 
 function recoverBlockedLinkBoard(board) {
@@ -1326,7 +1327,7 @@ function createLinkSession() {
   stageRankedAttempt("link-connect", linkGameState.mode, linkGameState.score, linkGameState.wave?.phase === 'won');
   return {
     ...(linkGameState.wave ? { wave: linkGameState.wave } : {}),
-    pairSnapshot: { version: 1, gameId: 'link-connect', seed: linkGameState.board?.seed || 'legacy',
+    pairSnapshot: { version: 1, rewardPolicyVersion: linkGameState.rewardPolicyVersion, gameId: 'link-connect', seed: linkGameState.board?.seed || 'legacy',
       themeId: linkGameState.board?.themeId,
       capturedAt: Date.now(), comboRemainingMs: pausedComboRemainingMs ?? (linkGameState.lastMatchAt ? Math.max(0, getLinkComboWindowMs(linkGameState.totalPairs) - (performance.now() - linkGameState.lastMatchAt)) : 0),
       luckyAwards: structuredClone(linkGameState.luckyAwards), freezeSeconds: linkGameState.freezeSeconds,

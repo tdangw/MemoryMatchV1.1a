@@ -1,3 +1,4 @@
+import { GROUP_DROP_RATES } from './progression/groupDropPolicy.js';
 import { STANDARD_WAVE_SECONDS } from './progression/waveTiming.js';
 import { GAMEPLAY_LIMITS } from "./gameplayTuning.js";
 
@@ -71,9 +72,9 @@ export const GAME_CONFIG = Object.freeze({
   hintRevealDurationMs: 2500,
   special: Object.freeze({
     progressTarget: 10,
-    energyDrop: Object.freeze({ chance: 1, guaranteeAfterMisses: 9 }),
+    energyDrop: Object.freeze({ chance: GROUP_DROP_RATES.energy.special, normalChance: GROUP_DROP_RATES.energy.normal, guaranteeAfterMisses: 9 }),
     supportDrop: Object.freeze({
-      chance: 0.5,
+      chance: GROUP_DROP_RATES.support.supply,
       types: Object.freeze(["preview-item", "hint", "time-item"]),
       timeValues: Object.freeze([30, 45, 60]),
     }),
@@ -101,9 +102,9 @@ export const GAME_CONFIG = Object.freeze({
     challengeTimeBonusSeconds: 10,
     luckyTileCount: Object.freeze({ minimum: 1, maximum: 3 }),
     luckyRewards: Object.freeze({
-      time: Object.freeze({ minimum: 3, maximum: 5 }),
-      hints: Object.freeze({ minimum: 1, maximum: 2 }),
-      coins: Object.freeze({ minimum: 1, maximum: 10 }),
+      time: Object.freeze({ minimum: 15, maximum: 15 }),
+      hints: Object.freeze({ minimum: 1, maximum: 1 }),
+      coins: Object.freeze({ minimum: 10, maximum: 10 }),
     }),
   }),
 });
@@ -176,15 +177,15 @@ export function getPreviewDurationMs(mode) {
     : GAME_CONFIG.previewDurationMs;
 }
 
-export function getLuckyReward() {
+export function getLuckyReward(mode, random = Math.random) {
   const rewards = GAME_CONFIG.specialModes.luckyRewards;
   const types = Object.keys(rewards);
-  const type = types[Math.floor(Math.random() * types.length)];
+  const type = types[Math.floor(random() * types.length)];
   const range = rewards[type];
   const value =
-    Math.floor(Math.random() * (range.maximum - range.minimum + 1)) +
+    Math.floor(random() * (range.maximum - range.minimum + 1)) +
     range.minimum;
-  return { type, value };
+  return mode === 'endless' && type === 'time' ? { type: 'coins', value: 10 } : { type, value };
 }
 
 export function calculateCoinReward(mode, remainingTime) {
@@ -242,37 +243,40 @@ export function getLevelHintBonus(level = 1, currentHints = 0) {
 }
 
 export function shouldDropMemoryEnergy(noDropStreak = 0, random = Math.random) {
-  const { chance, guaranteeAfterMisses } = GAME_CONFIG.special.energyDrop;
-  return noDropStreak >= guaranteeAfterMisses || random() < chance;
+  return random() < GAME_CONFIG.special.energyDrop.chance;
 }
 
 export function getMemoryPreviewDropValue(random = Math.random) {
-  return pickRandom(GAME_CONFIG.special.previewDropValues, random);
+  return weightedTier(GAME_CONFIG.special.previewDropValues, random);
 }
 
-export function getMemoryMilestoneRewards(progress, mode = 'easy') {
+export function getMemoryMilestoneRewards(progress, mode = 'easy', policyVersion = 2) {
   const rewards = GAME_CONFIG.special.milestones[Math.floor(Number(progress) || 0) - 1] || [];
-  return mode === 'endless' ? rewards.map(reward => reward.type === 'time-item'
-    ? { type: 'coins', value: reward.value === 30 ? 80 : 40 } : reward) : rewards;
+  return policyVersion === 1 && mode === 'endless' ? rewards.map(reward => reward.type === 'time-item' ? { type: 'coins', value: reward.value === 30 ? 80 : 40 } : reward) : rewards;
 }
 
-export function resolveMemoryMilestoneRewards(progress, random = Math.random, mode = 'easy') {
-  const rewards = getMemoryMilestoneRewards(progress, mode);
+export function resolveMemoryMilestoneRewards(progress, random = Math.random, mode = 'easy', policyVersion = 2) {
+  const rewards = getMemoryMilestoneRewards(progress, mode, policyVersion);
   return rewards.map((reward) => ({
     ...reward,
     value: reward.values ? pickRandom(reward.values, random) : reward.value,
   }));
 }
 
-export function getMemorySupportDrop(random = Math.random) {
+export function getMemorySupportDrop(random = Math.random, chance = GAME_CONFIG.special.supportDrop.chance, legacy = false) {
   const support = GAME_CONFIG.special.supportDrop;
-  if (random() >= support.chance) return null;
+  if (random() >= chance) return null;
   const type = pickRandom(support.types, random);
-  if (type === "preview-item") return { type, value: getMemoryPreviewDropValue(random) };
-  if (type === "time-item") return { type, value: pickRandom(support.timeValues, random) };
+  if (type === "preview-item") return { type, value: legacy ? pickRandom(GAME_CONFIG.special.previewDropValues, random) : getMemoryPreviewDropValue(random) };
+  if (type === "time-item") return { type, value: legacy ? pickRandom(support.timeValues, random) : weightedTier(support.timeValues, random) };
   return { type, value: 1 };
 }
 
 function pickRandom(values, random) {
   return values[Math.min(values.length - 1, Math.floor(random() * values.length))];
+}
+
+function weightedTier(values, random) {
+  const roll = random();
+  return values[roll < .6 ? 0 : roll < .9 ? 1 : 2];
 }

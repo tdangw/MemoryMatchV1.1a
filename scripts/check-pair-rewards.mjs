@@ -14,7 +14,7 @@ assert.equal(memoryPresentation.energyProgress, 4); assert.equal(memory.luckyRew
 memory.progress.memoryMatch.items.hint = GAMEPLAY_LIMITS.itemCount;
 memory.luckyRewards.set('b', { type: 'hints', value: 2 });
 resolveMemoryPairRewards(memory, { imageId: 'b' }, () => 0);
-assert.equal(memory.remainingTime, 63); assert.equal(memory.progress.memoryMatch.items.hint, GAMEPLAY_LIMITS.itemCount);
+assert.equal(memory.remainingTime, 60); assert.equal(memory.progress.memoryMatch.items.hint, GAMEPLAY_LIMITS.itemCount);
 
 const cards = Array.from({ length: 6 }, (_, i) => ({ id: `c-${i}`, src: `/assets/c-${i}.webp`, alt: `C ${i}` }));
 const board = structuredClone(createLinkBoard({ layout: { tileCount: 12, columns: 4 }, cardProvider: () => cards }));
@@ -29,6 +29,6 @@ for (const mode of ['challenge', 'endless']) for (const progress of Array.from({
   assert.equal(getRemainingLinkTiles(state.board).length, (state.totalPairs - state.matchedPairs) * 2);
   assert(presentation.coins >= 10); assert.equal(state.luckyAwards.length, 1);
   if (premiumType === 'blue') assert(items.hint >= 1);
-  if (progress === 9) { assert.equal(items.thunder, 1); assert.equal(items.reshuffle, 1); }
+  if (progress === 9) { assert.equal(items.freeze, 1); }
 }
 console.log('Pair rewards: Memory lucky/caps/milestone and 60 Link mode/milestone/premium cases settle without pending animation-owned mutations.');

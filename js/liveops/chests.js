@@ -1,3 +1,4 @@
+import { GAMEPLAY_LIMITS } from '../gameplayTuning.js';
 import { CHEST_TYPES, CHEST_POLICY, CHEST_POOLS, CHEST_VERSION, CHEST_SUPPORTS, FESTIVAL_MILESTONES } from './chestConfig.js';
 const integer = value => Number.isSafeInteger(value) && value >= 0;
 const record = value => value !== null && typeof value === 'object' && !Array.isArray(value);
@@ -18,7 +19,7 @@ export function normalizeChests(value) {
     if (last.kind === 'support' && !CHEST_SUPPORTS[last.gameId].some(item => item.key === last.key && item.label === last.label)) invalid();
     if (last.kind !== 'coins' && last.coins !== 0) invalid();
     if (last.kind === 'coins' && (last.reason === 'coins' ? last.coins !== CHEST_POLICY[last.chestType].coins
-      : !['duplicate','full'].includes(last.reason) || !CHEST_POLICY[last.chestType].duplicate || last.coins !== CHEST_POLICY[last.chestType].duplicate)) invalid();
+      : !['duplicate','full','overflow'].includes(last.reason) || (last.reason === 'overflow' ? last.coins !== GAMEPLAY_LIMITS.itemOverflowCoins : !CHEST_POLICY[last.chestType].duplicate || ![CHEST_POLICY[last.chestType].duplicate, last.chestType === 'avatar' ? 300 : 200].includes(last.coins)))) invalid();
   } else if (value.sequence !== 0) invalid();
   const sourceEarned = value.sourceEarned === undefined ? counters() : value.sourceEarned;
   if (!record(sourceEarned) || Object.keys(sourceEarned).length !== 4 || CHEST_TYPES.some(type => !integer(sourceEarned[type]) || sourceEarned[type] > value.earned[type])) invalid();
@@ -83,10 +84,13 @@ export function openChest(value, command, ownedIds, supportCount) {
     || chests.earned[command.chestType] <= chests.spent[command.chestType]) invalid();
   if (candidate.kind === 'item' && !CHEST_POOLS[command.chestType]?.includes(candidate.itemId)) invalid();
   let result = { ...candidate, operation:command.operation, sequence:command.sequence };
+  // A queued, uncommitted conversion uses today's approved value; replayed receipts returned above retain their original grant.
+  if (candidate.kind === 'coins' && ['duplicate','full'].includes(candidate.reason)) result = { ...result, coins:CHEST_POLICY[command.chestType].duplicate };
   // Ownership is canonical at commit. A concurrently acquired item becomes duplicate Xu.
   if (candidate.kind === 'item' && ownedIds.includes(candidate.itemId)) result = { ...result,kind:'coins',coins:CHEST_POLICY[command.chestType].duplicate,reason:'duplicate' };
   if (candidate.kind === 'support') {
-    if (!integer(supportCount) || supportCount >= 999) throw Object.assign(new Error('Kho hỗ trợ của trò đã chọn đã đầy. Rương và quà được giữ để thử lại khi có chỗ.'), {code:'rewards/inventory-full'});
+    if (!integer(supportCount) || supportCount > GAMEPLAY_LIMITS.itemCount) invalid();
+    if (supportCount === GAMEPLAY_LIMITS.itemCount) result = { ...result, kind:'coins', coins:GAMEPLAY_LIMITS.itemOverflowCoins, reason:'overflow' };
   }
   chests.spent[command.chestType]++; chests.sequence++; chests.last = result;
   return { chests:normalizeChests(chests), result, applied:true };

@@ -28,7 +28,7 @@ export async function commitTripleRewardTransaction({ session, milestones, rewar
   const items = gameState.progress.tripleConnect.items;
   let coins = 0;
   for (const entry of rewards) {
-    const { type, amount, source = "milestone", overflowCoins } = entry || {};
+    const { type, amount, source = "milestone" } = entry || {};
     if (!Number.isInteger(amount) || amount < 1) continue;
     if (type === "coins") { coins += amount; granted.push({ type, amount, source }); continue; }
     if (type === "time") { granted.push({ type, amount, source }); continue; }
@@ -39,9 +39,7 @@ export async function commitTripleRewardTransaction({ session, milestones, rewar
     items[itemId] += accepted;
     if (accepted) granted.push({ type, amount: accepted, source });
     const overflow = amount - accepted;
-    const fallback = Number.isInteger(overflowCoins)
-      ? overflowCoins
-      : TRIPLE_PRODUCT_DECISIONS.milestones.itemFallbackCoins[type] || 0;
+    const fallback = GAMEPLAY_LIMITS.itemOverflowCoins;
     if (overflow && fallback) {
       const converted = overflow * fallback;
       coins += converted;

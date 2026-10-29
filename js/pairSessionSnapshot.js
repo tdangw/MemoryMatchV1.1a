@@ -9,6 +9,7 @@ export function normalizePairSnapshot(value, gameId) {
     || typeof value.themeId !== 'string' || !/^[a-zA-Z0-9_-]{1,80}$/.test(value.themeId)
     || integers.some(key => !Number.isSafeInteger(value[key]) || value[key] < 0)
     || value.totalPairs < 1 || value.totalPairs > 60 || value.matchedPairs > value.totalPairs) return null;
+  if (value.rewardPolicyVersion !== undefined && ![1,2].includes(value.rewardPolicyVersion)) return null;
   if (gameId === 'memory-match') {
     if (!Array.isArray(value.tiles) || value.tiles.length !== value.totalPairs * 2) return null;
     const pairs = new Map(); let matched = 0;

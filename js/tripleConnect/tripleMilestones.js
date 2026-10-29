@@ -1,3 +1,4 @@
+import { groupEnergyChance, groupSupportChance } from '../progression/groupDropPolicy.js';
 import { getTripleMilestoneReward, TRIPLE_PRODUCT_DECISIONS } from "./tripleConfig.js";
 
 export function normalizeTripleMilestones(value = {}) {
@@ -14,7 +15,7 @@ export function normalizeTripleMilestones(value = {}) {
   });
 }
 
-export function resolveTripleMilestoneProgress({ milestones, tileIds, mode }) {
+export function resolveTripleMilestoneProgress({ milestones, tileIds, mode, special = false, legacy = false }, random = Math.random) {
   const contributed = [...new Set(tileIds || [])].filter((id) => typeof id === "string" && id);
   if (!contributed.length) return Object.freeze({ next: milestones, claimedTileIds: [], rewards: [] });
   const target = TRIPLE_PRODUCT_DECISIONS.milestones.target;
@@ -24,13 +25,16 @@ export function resolveTripleMilestoneProgress({ milestones, tileIds, mode }) {
   let cycleId = normalized.cycleId;
   let claimedIds = [...normalized.claimedIds];
   const rewards = [];
-  progress += 1;
-  if (progress % step === 0) {
+  const energy = legacy || random() < groupEnergyChance(special);
+  const support = !legacy && random() < groupSupportChance(special)
+    ? ['hint', 'undo', 'shuffle', 'time-item'][Math.min(3, Math.floor(random() * 4))] : null;
+  if (energy) progress += 1;
+  if (energy && progress % step === 0) {
     const index = progress / step;
     const claimId = `${cycleId}:${index}`;
     if (!claimedIds.includes(claimId)) {
       claimedIds.push(claimId);
-      rewards.push({ claimId, milestone: index, reward: getTripleMilestoneReward(index, mode) });
+      rewards.push({ claimId, milestone: index, reward: getTripleMilestoneReward(index, mode, legacy ? 1 : 2) });
     }
   }
   if (progress === target) {
@@ -42,6 +46,7 @@ export function resolveTripleMilestoneProgress({ milestones, tileIds, mode }) {
     next: Object.freeze({ version: TRIPLE_PRODUCT_DECISIONS.milestones.version, progress, cycleId, claimedIds }),
     claimedTileIds: Object.freeze(contributed),
     rewards: Object.freeze(rewards),
+    energy, support,
   });
 }
 

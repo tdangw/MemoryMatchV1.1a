@@ -1,3 +1,4 @@
+import { GROUP_DROP_RATES } from '../progression/groupDropPolicy.js';
 import { STANDARD_WAVE_SECONDS, calculateChallengeWaveTime } from '../progression/waveTiming.js';
 import { COMBO_WINDOWS, GAMEPLAY_LIMITS, getComboWindowMs } from "../gameplayTuning.js";
 
@@ -6,7 +7,7 @@ export const LINK_CONNECT_HELP_CONTENT = `
     <li>Ghép hai hình giống nhau khi đường nối không quá hai lần rẽ.</li>
     <li>Sau mỗi cặp, các thẻ có thể dồn, tách, đổi chỗ hoặc xoay theo quy tắc của cấp.</li>
     <li>Thẻ cao cấp có thể mở băng, tặng công cụ hoặc gọi Sấm sét.</li>
-    <li>Ghép thẻ cao cấp để thu thập năng lượng và mở các mốc thưởng.</li>
+    <li>Cặp thường có 20% nhận năng lượng, 5% nhận hỗ trợ; cặp đặc biệt có 80% nhận năng lượng, 10% nhận hỗ trợ. Tiếp Tế có 30% nhận hỗ trợ thay cho 10%. Hai phần thưởng rơi độc lập.</li>
     <li>Hết đường nối, game sẽ tự xáo; nếu chỉ còn thẻ băng, tất cả sẽ tự mở.</li>
   </ul>
 `;
@@ -67,8 +68,8 @@ export const LINK_CONNECT_CONFIG = Object.freeze({
     timeBonusPerLevel: 10,
     luckyPairCount: Object.freeze({ min: 1, max: 3 }),
     luckyRewards: Object.freeze({
-      coins: Object.freeze({ min: 10, max: 50 }),
-      time: Object.freeze({ min: 3, max: 10 }),
+      coins: Object.freeze({ min: 50, max: 50 }),
+      time: Object.freeze({ min: 30, max: 30 }),
     }),
   }),
   special: Object.freeze({
@@ -76,12 +77,12 @@ export const LINK_CONNECT_CONFIG = Object.freeze({
     progressTarget: 10,
     premiumTypes: Object.freeze([
       Object.freeze({ id: "cyan", label: "Phá Băng", weight: 0.5, effectChance: 1 }),
-      Object.freeze({ id: "blue", label: "Tiếp Tế", weight: 0.3, effectChance: 0.5 }),
+      Object.freeze({ id: "blue", label: "Tiếp Tế", weight: 0.3, effectChance: GROUP_DROP_RATES.support.supply }),
       Object.freeze({ id: "red", label: "Bùng Nổ", weight: 0.2, effectChance: 0.5 }),
     ]),
     supplyItems: Object.freeze({
       standard: Object.freeze(["hint", "reshuffle", "freeze"]),
-      endless: Object.freeze(["hint", "reshuffle"]),
+      endless: Object.freeze(["hint", "reshuffle", "freeze"]),
     }),
     pairGeneration: Object.freeze([
       Object.freeze({ maxPairs: 8, chance: 0.6, min: 1, max: 1 }),
@@ -98,40 +99,35 @@ export const LINK_CONNECT_CONFIG = Object.freeze({
       coin: Object.freeze({ min: 5, max: 15 }),
       time: Object.freeze({ min: 2, max: 5 }),
     }),
-    // Tạm để 100% nhằm kiểm tra hiệu ứng bay năng lượng; trả về 0.2 khi kết thúc QA.
-    energyDrop: Object.freeze({ chance: 1, guaranteeAfterMisses: 9 }),
+    energyDrop: Object.freeze({ chance: GROUP_DROP_RATES.energy.special, normalChance: GROUP_DROP_RATES.energy.normal, guaranteeAfterMisses: 9 }),
     milestones: Object.freeze({
       breakCoins: 10,
+      breakMilestones: Object.freeze([2, 10]),
       rewards: Object.freeze([
-        Object.freeze({ coins: 10 }),
-        Object.freeze({ hint: 1 }),
-        Object.freeze({ coins: 20 }),
-        Object.freeze({ freeze: 1 }),
-        Object.freeze({ reshuffle: 1 }),
-        Object.freeze({ coins: 30 }),
-        Object.freeze({ hint: 1, freeze: 1 }),
-        Object.freeze({ thunder: 1 }),
-        Object.freeze({ coins: 50, hint: 1 }),
-        Object.freeze({ coins: 100, thunder: 1, reshuffle: 1 }),
+        Object.freeze({ coins: 10 }), Object.freeze({}), Object.freeze({ coins: 20 }),
+        Object.freeze({ hint: 1 }), Object.freeze({ coins: 30 }), Object.freeze({ reshuffle: 1 }),
+        Object.freeze({ coins: 40 }), Object.freeze({ thunder: 1 }), Object.freeze({ coins: 50 }),
+        Object.freeze({ coins: 100, freeze: 1 }),
       ]),
     }),
   }),
 });
 
-export function getLinkMilestoneRewards(milestone, mode = 'easy') {
-  const reward = LINK_CONNECT_CONFIG.special.milestones.rewards[milestone - 1];
+const LEGACY_MILESTONES = Object.freeze([{coins:10},{hint:1},{coins:20},{freeze:1},{reshuffle:1},{coins:30},{hint:1,freeze:1},{thunder:1},{coins:50,hint:1},{coins:100,thunder:1,reshuffle:1}]);
+export function getLinkBreakMilestones(policyVersion = 2) { return policyVersion === 1 ? [1,3,9,10] : LINK_CONNECT_CONFIG.special.milestones.breakMilestones; }
+export function getLinkMilestoneRewards(milestone, mode = 'easy', policyVersion = 2) {
+  const reward = (policyVersion === 1 ? LEGACY_MILESTONES : LINK_CONNECT_CONFIG.special.milestones.rewards)[milestone - 1];
   if (!reward) throw new RangeError('Invalid Link milestone.');
-  if (mode !== 'endless' || !reward.freeze) return reward;
-  const { freeze, ...rest } = reward;
-  return { ...rest, coins: (rest.coins || 0) + 40 * freeze };
+  if (policyVersion === 1 && mode === 'endless' && reward.freeze) { const { freeze, ...rest } = reward; return { ...rest, coins: (rest.coins || 0) + freeze * 40 }; }
+  return reward;
 }
 
-export function getLinkSpecialMilestoneTooltip(milestone, mode = 'easy') {
+export function getLinkSpecialMilestoneTooltip(milestone, mode = 'easy', policyVersion = 2) {
   if (!LINK_CONNECT_CONFIG.special.milestones.rewards[milestone - 1]) return 'Phần thưởng mốc đặc biệt.';
   const labels = { coins: 'Xu', hint: 'Gợi ý', reshuffle: 'Xáo trộn', thunder: 'Sấm sét', freeze: 'Đóng băng thời gian' };
-  const items = Object.entries(getLinkMilestoneRewards(milestone, mode))
+  const items = Object.entries(getLinkMilestoneRewards(milestone, mode, policyVersion))
     .map(([type, value]) => `+${value} ${labels[type]}${type === 'coins' ? '' : ' vào kho'}`).join(' · ');
-  return [1, 3, 9, 10].includes(milestone) ? `Phá ngay 1 cặp thường · ${items}` : items;
+  return getLinkBreakMilestones(policyVersion).includes(milestone) ? `Phá ngay 1 cặp thường · ${items}` : items;
 }
 
 export const LINK_SPECIAL_MILESTONE_TOOLTIPS = Object.freeze(Object.fromEntries(
@@ -234,10 +230,10 @@ export function getLinkChallengeTime(level = 1) {
 
 export function getLinkLuckyReward(mode) {
   const rewards = LINK_CONNECT_CONFIG.challenge.luckyRewards;
-  const types = isLinkEndlessMode(mode) ? ["coins"] : Object.keys(rewards);
+  const types = Object.keys(rewards);
   const type = types[Math.floor(Math.random() * types.length)];
   const range = rewards[type];
-  return { type, value: randomInteger(range.min, range.max) };
+  return isLinkEndlessMode(mode) && type === 'time' ? { type: 'coins', value: 50 } : { type, value: randomInteger(range.min, range.max) };
 }
 
 export function calculateLinkCoinReward(mode, remainingTime) {

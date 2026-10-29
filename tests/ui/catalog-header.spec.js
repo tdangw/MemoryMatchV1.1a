@@ -11,8 +11,8 @@ for(const viewport of [{width:320,height:740},{width:412,height:915},{width:844,
       const h=await header.boundingBox(), e=await exit.boundingBox(); expect(e.y).toBe(h.y); expect(e.height).toBe(h.height); expect(Math.abs(e.x+e.width-h.x-h.width)).toBeLessThan(1);
       await expect(exit).toHaveCSS('border-radius','0px'); expect(e.width).toBeGreaterThanOrEqual(44);
       if(action==='shop') {
-        await expect(screen.locator('.shop-wallet')).toBeVisible();
-        const wallet=screen.locator('.shop-wallet'), w=await wallet.boundingBox(), title=await screen.locator('.app-modal__title').boundingBox();
+        await expect(screen.locator('.app-wallet')).toBeVisible();
+        const wallet=screen.locator('.app-wallet'), w=await wallet.boundingBox(), title=await screen.locator('.app-modal__title').boundingBox();
         expect(Math.abs(w.x+w.width/2-h.x-h.width/2)).toBeLessThan(1); expect(title.x+title.width).toBeLessThanOrEqual(w.x); expect(w.x+w.width).toBeLessThanOrEqual(e.x);
         await page.evaluate(async()=>{const {gameState}=await import('/js/gameState.js');gameState.coins=123456789; (await import('/js/ui.js')).updateCoinDisplay(gameState.coins);});
         await expect(wallet.locator('[data-shop-coin-balance]')).toHaveText('123456789');

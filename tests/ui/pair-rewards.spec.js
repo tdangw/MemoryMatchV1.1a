@@ -21,7 +21,7 @@ for (const id of ['memory-match', 'link-connect']) test(`${id} first durable pai
     crypto.getRandomValues=array=>{if(array instanceof Uint32Array&&array.length===1){array[0]=0;return array;}return originalRandom(array);};
     (await import('/js/persistence.js')).subscribeToLocalCommit(({ patch }) => {
       const session = patch.progress?.[key]?.sessionsByMode.challenge;
-      if (!window.firstPairCommit && session?.pairSnapshot?.matchedPairs === 1) window.firstPairCommit = { coins: patch.coins, session: structuredClone(session), items: structuredClone(patch.progress[key].items) };
+      if (!window.firstPairCommit && session?.pairSnapshot?.matchedPairs > 0) window.firstPairCommit = { coins: patch.coins, session: structuredClone(session), items: structuredClone(patch.progress[key].items) };
     });
     if (id === 'memory-match') {
       const first = document.querySelector('#grid-container .tile'); const pair = [...document.querySelectorAll('#grid-container .tile')].filter(tile => tile.dataset.imageId === first.dataset.imageId);
@@ -29,7 +29,7 @@ for (const id of ['memory-match', 'link-connect']) test(`${id} first durable pai
       const {memoryBoard}=await import('/js/memoryMatch/memoryBoard.js');
       pair.forEach(tile=>{memoryBoard.tiles.get(tile.id).special=true;});
       gameState.luckyRewards.set(first.dataset.imageId, { type: 'coins', value: 10 });
-      gameState.specialProgress = 3; gameState.isLocked = false; Math.random = () => .99;
+      gameState.specialProgress = 3; gameState.isLocked = false; let roll=0; Math.random = () => roll++===0?0:.99;
       const { handleTileClick } = await import('/js/logic.js'); await handleTileClick(pair[0]); void handleTileClick(pair[1]);
     } else {
       const { linkGameState } = await import('/js/linkConnect/linkState.js');
@@ -56,7 +56,7 @@ for (const id of ['memory-match', 'link-connect']) test(`${id} first durable pai
   }
   expect(committed.session.specialProgress).toBe(id === 'memory-match' ? 4 : 2);
   expect(committed.session.pairSnapshot.luckyAwards).toEqual([{ type: 'coins', value: 10 }]);
-  if (id === 'link-connect') expect(committed.items.hint).toBe(before.hints + 2); // Blue supply + second energy milestone.
+  if (id === 'link-connect') expect(committed.items.hint).toBe(before.hints + 1); // Blue supply; milestone 2 breaks a normal pair.
   await page.reload();
   const restored = await page.evaluate(async id => {
     await (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu(id);
@@ -69,7 +69,7 @@ for (const id of ['memory-match', 'link-connect']) test(`${id} first durable pai
   }, id);
   expect(restored.coins).toBe(committed.coins);
   expect(restored.session.specialProgress).toBe(committed.session.specialProgress);
-  expect(restored.session.pairSnapshot.matchedPairs).toBe(1);
+  expect(restored.session.pairSnapshot.matchedPairs).toBe(id === "link-connect" ? 2 : 1);
   expect(restored.session.pairSnapshot.luckyAwards).toEqual(committed.session.pairSnapshot.luckyAwards);
   expect(restored.items).toEqual(committed.items);
 });
@@ -88,7 +88,7 @@ test('Link bonus pair exits remain bounded and a restart cancels their pending p
       window.bonusScope = (await import('/js/gameShell/gameShellLifecycle.js')).getActiveGameScope();
       for (const p of [connection.start, connection.end]) document.querySelector(`.link-board__cell[data-row="${p.row}"][data-column="${p.column}"] .link-tile`).click();
     });
-    await expect.poll(() => page.evaluate(async () => (await import('/js/linkConnect/linkState.js')).linkGameState.matchedPairs)).toBe(3);
+    await expect.poll(() => page.evaluate(async () => (await import('/js/linkConnect/linkState.js')).linkGameState.matchedPairs)).toBe(2);
     expect(await page.locator('.link-thunder-strike').count()).toBeLessThanOrEqual(1);
     await page.evaluate(async () => (await import('/js/linkConnect/linkController.js')).startLinkLevel({ mode: 'challenge', level: 1, restart: true, skipIntro: true }));
     await expect(page.locator('.link-thunder-strike')).toHaveCount(0);

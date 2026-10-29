@@ -13,21 +13,22 @@ let activeMatchCleanup = null;
 
 export async function presentTripleTransition({ shell, scope, previous, next, events, effects = {}, render, isCurrent = () => true }) {
   const match = events.find((event) => event.type === "triple-resolved");
+  const magnet = events.some(event => event.type === "magnet-resolved");
   const selected = events.find((event) => event.type === "tile-selected");
   if (!scope.active) return;
   if (!match && selected) return presentTrayFlight({ shell, scope, selected, render, next });
   if (!match) { render(next); return Promise.resolve(); }
-  return presentResolvedTriple({ shell, scope, previous, next, match, selected, effects, render, isCurrent });
+  return presentResolvedTriple({ shell, scope, previous, next, match, selected, effects, render, isCurrent, magnet });
 }
 
-function presentResolvedTriple({ shell, scope, previous, next, match, selected, effects, render, isCurrent }) {
+function presentResolvedTriple({ shell, scope, previous, next, match, selected, effects, render, isCurrent, magnet }) {
   // The rule state is committed already. Preserve the visual sequence with
   // ghosts: the selected card reaches the tray before the three-card exit,
   // while the live board stays available for the next input.
-  return presentResolvedTripleExit({ shell, scope, previous, match, selected, effects, render, next, isCurrent });
+  return presentResolvedTripleExit({ shell, scope, previous, match, selected, effects, render, next, isCurrent, magnet });
 }
 
-function presentResolvedTripleExit({ shell, scope, previous, match, selected, effects, render, next, isCurrent }) {
+function presentResolvedTripleExit({ shell, scope, previous, match, selected, effects, render, next, isCurrent, magnet }) {
   const root = shell.refs.root;
   const surface = shell.refs.board;
   const line = root.querySelector(".triple-connect__line");
@@ -68,13 +69,16 @@ function presentResolvedTripleExit({ shell, scope, previous, match, selected, ef
   const release = scope.own(cleanup, "node");
   try {
     sourceNodes.forEach((source) => source.classList.add("is-match-exiting"));
-    const visualPreview = createMatchTrayPreview(previous, next, match);
+    const visualPreview = magnet ? next : createMatchTrayPreview(previous, next, match);
     // The preview owns only the board; HUD always reads committed next state.
     render(next, { boardState: visualPreview });
     const priorTrayRects = captureTrayRects(root);
     const selectedGhost = ghosts[sourceNodes.findIndex((node) => node.dataset.tileId === selected?.tileId)];
     const targetSlot = root.querySelectorAll(".triple-connect__tray-slot")[getResolvedTrayTargetIndex(previous, selected?.tileId)];
-    const trayFlight = presentResolvedTrayFlight({ scope, ghost: selectedGhost, targetRect: targetSlot?.getBoundingClientRect() });
+    const targetRect = magnet ? selectedGhost.getBoundingClientRect() : targetSlot?.getBoundingClientRect();
+    const trayFlight = magnet
+      ? Promise.all(ghosts.map(ghost => presentResolvedTrayFlight({ scope, ghost, targetRect, duration: 220 })))
+      : presentResolvedTrayFlight({ scope, ghost: selectedGhost, targetRect });
     return trayFlight
       .then(() => {
         if (superseded) return false;
@@ -83,7 +87,7 @@ function presentResolvedTripleExit({ shell, scope, previous, match, selected, ef
         presentTripleExit({ surface, targets: ghosts, effectId: effects.exit?.id });
         lineAnimation = line.animate(
           [{ opacity: 0 }, { opacity: 1, offset: 0.25 }, { opacity: 1, offset: 0.62 }, { opacity: 0 }],
-          { duration: MATCH_DURATION_MS, easing: "ease-out", fill: "both" },
+          { duration: magnet ? 180 : MATCH_DURATION_MS, easing: "ease-out", fill: "both" },
         );
         scope.animation(lineAnimation);
         return lineAnimation.finished.catch(() => {}).then(() => true);
@@ -147,7 +151,7 @@ function getResolvedTrayTargetIndex(previous, selectedTileId) {
   ) + 1;
 }
 
-function presentResolvedTrayFlight({ scope, ghost, targetRect }) {
+function presentResolvedTrayFlight({ scope, ghost, targetRect, duration = TRAY_FLIGHT_DURATION_MS }) {
   if (!ghost || !targetRect || prefersReducedMotion()) return Promise.resolve();
   const sourceRect = ghost.getBoundingClientRect();
   const dx = targetRect.left - sourceRect.left;
@@ -167,7 +171,7 @@ function presentResolvedTrayFlight({ scope, ghost, targetRect }) {
       opacity: 1,
     },
     { transform: finalTransform, opacity: 1 },
-  ], { duration: TRAY_FLIGHT_DURATION_MS, easing: "cubic-bezier(.18,.82,.22,1)", fill: "both" });
+  ], { duration, easing: "cubic-bezier(.18,.82,.22,1)", fill: "both" });
   scope.animation(animation);
   return animation.finished.catch(() => {}).then(() => {
     // A finished Web Animation with fill: both continues to composite its
