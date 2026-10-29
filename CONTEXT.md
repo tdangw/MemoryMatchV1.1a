@@ -39,7 +39,8 @@
   khay (Triple), chủ đề; lấy adapter thật, không cố định75s/6cặp/5s.
   Cập nhật29/10: tiêu đề giữa chỉ “Màn N”, bỏ mô tả chung và chú thích
   số thẻ/đợt; ô thông số gọn, bố cục riêng khi ngang. Vô tận/Thử thách có
-  lời giới thiệu ngắn hướng người chơi; điều kiện mở dùng chữ C/B/A.
+  lời giới thiệu ngắn trong ô nền riêng, có viền và khoảng cách với thông số;
+  điều kiện mở dùng chữ C/B/A.
   Bấm tên chủ đề mở bộ chọn chủ đề đã sở hữu trên preview; đóng trở lại
   đúng preview/mode, cập nhật tên và focus. Scope preview hủy bộ chọn con
   khi rời bản đồ; không tự mở shop, mua chủ đề hoặc cấp vật phẩm.

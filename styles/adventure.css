@@ -150,7 +150,7 @@
 .adventure-level-dialog .app-modal__title, .adventure-level-dialog .app-modal__close { color: #ffe1a0; }
 .adventure-level-dialog .app-modal__header, .adventure-level-dialog .app-modal__footer { border-color: #e9ce8e33; }
 .adventure-level-dialog .app-button--primary { min-height: 48px; background: var(--ui-primary); color: var(--ui-ink); }
-.adventure-level-goal { margin:0 0 10px; color:var(--ui-ink); font-size:12px; line-height:1.4; }
+.adventure-level-preview > .adventure-level-goal { margin:0 0 10px; padding:10px 12px; border:1px solid var(--ui-line); border-radius:10px; background:var(--ui-inset); color:var(--ui-ink); font-size:12px; line-height:1.4; }
 .adventure-level-modes { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; padding: 0; border: 0; margin:0 0 12px; }
 .adventure-level-modes legend { width: 100%; margin-bottom:8px; text-align: center; color: #ffe1a0; font:700 17px/1.2 Georgia,serif; }
 .adventure-level-modes label { position: relative; width:48px; max-width:100%; justify-self:center; cursor: pointer; }
