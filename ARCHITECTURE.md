@@ -282,6 +282,11 @@ game; đánh giá cân bằng mới ở `GAMEPLAY_ECONOMY_AUDIT.md`.
   command/ID cũ, không migration chỉ vì đổi tên. Vé/chữ/huy hiệu từ
   nhóm đặc biệt/Lucky/Magnet qua dropAdapters có attempt/wave/group
   dedup; nhóm thường trúng năng lượng không trở thành đặc biệt.
+- Chữ hiện rơi30% và bán10Xu/chữ. `liveops/config.js` giữ giá mới và
+  danh sách giá receipt cũ được đọc; `letters.js` chỉ cấp giá mới khi
+  tạo giao dịch, replay receipt1000Xu không cộng lại/định giá lại. Rules
+  cho giao dịch mới sinh từ LETTER_SELL_COINS qua generator, không giữ
+  hằng1000 riêng trong template. Không đổi schema hoặc xóa chữ cũ.
 - Nguồn source/template/generator giữ rules dispatch và validation.
   `firestore.rules` là output; không sửa tay hoặc tự deploy khi commit.
   Firebase free dùng counter/ledger hữu hạn theo snapshot, không thêm

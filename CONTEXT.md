@@ -4,7 +4,7 @@
 
 - Sự kiện/Nhiệm vụ/Kho rương và rơi vật phẩm/năng lượng/Nam châm đã hoàn tất chức năng web local; không còn kế hoạch triển khai active của hai task. Đánh giá hiện hành: `GAMEPLAY_ECONOMY_AUDIT.md`; bằng chứng trước: `EVENTS_MOBILE_FESTIVAL_RECEIPT.md`, `DROP_ENERGY_SPECIAL_CARDS_RECEIPT.md`.
 - Rà mới: 76 unit, 33 UI, 2 Magnet (40 chu kỳ), CPU6x và hai Firestore emulator suite đạt; check/build cuối được ghi trong audit. Chưa có S22 vật lý, chưa chứng nhận60FPS hoặc tiêu hao thật. UI fixture không chứng minh OAuth/quảng cáo/live hai thiết bị.
-- Rủi ro kinh tế: chữ100% thử và bán1000Xu/chữ áp đảo 2Xu/nhóm, làm đổi bộ9–13chữ lấy rương kém hấp dẫn; Triple30/3 chậm hơn hai trò10/1; pool ngoại hình lớn có trùng nên hoàn tất chậm. Các số cân bằng vẫn giữ nguyên; đề xuất chi tiết trong audit, chưa là lệnh chỉnh rate/giá.
+- Cập nhật được duyệt29/10 sau audit: chữ rơi30% trên nhóm đặc biệt/Lucky/Magnet hợp lệ, bán10Xu/chữ, áp dụng cả ba trò. Thay100%/1000Xu trước đây; không đổi Xu đã có, số chữ/kho hoặc giao dịch cũ. Bản lưu vẫn đọc receipt bán1000Xu/chữ, giao dịch mới dùng10Xu. Triple30/3 và luật rương chưa đổi; đề xuất ưu tiên ngoại hình chưa có ở mục8 GAMEPLAY_ECONOMY_AUDIT.md còn chờ duyệt.
 - Dọn code an toàn: Magnet reducer/Gợi ý dùng chung chọn hai đồng loại, ưu tiên khay rồi ID board, chỉ sort các mục tiêu hợp lệ. Giữ API/ledger/save/nhánh legacy. `node scripts/analyze-game-economy.mjs` đọc cấu hình và xuất kỳ vọng, không ghi dữ liệu hoặc truy cập Firebase.
 - Đã xóa năm kế hoạch hoàn tất về gameplay, nền động, UI skin, Cổ tích và nhập môn. Không phục hồi chúng từ Git làm nguồn thực thi. Nguồn thiết kế hiện hành: ba tài liệu game, ARCHITECTURE và mục sản phẩm dưới đây; receipt là lịch sử. `ADS_APK_TEST_PLAN.md` chỉ còn checklist thiết bị/provider thật chưa xác minh, không phải quyền tự tạo APK/phát hành.
 - Lượt này được phép commit phần triển khai hai task và cleanup đã rà; không stage ảnh/log QA hoặc thay đổi không liên quan. Không tự push/Hosting/rules/APK/billing.
@@ -66,8 +66,8 @@
   hai thẻ ghép, dải ngọc; SVG dùng chung trên trang và loot khi ghép.
   Không dùng emoji/font, không thay đàn đom đóm trang trí của nền động.
 - Mỗi nhóm đặc biệt/Lucky hợp lệ thử một lần: **1 huy hiệu100% để thử**,
-  **1 chữ100% để thử**, **1 vé5%**, ba nhánh độc lập. Chưa tự giảm huy hiệu
-  xuống10% hoặc chữ xuống20%. Thẻ thường chưa có các drop này; vẫn giữ
+  **1 chữ30%**, **1 vé5%**, ba nhánh độc lập. Huy hiệu vẫn100% để thử,
+  chưa tự giảm xuống10%. Thẻ thường chưa có các drop này; vẫn giữ
   **2Xu/cặp hoặc bộ ba** và tiến trình/thưởng mốc hiện hành. Triple dùng
   nhóm có Lucky cho nhánh đặc biệt; không coi mọi bộ ba thường là đặc biệt.
   Thưởng ghi bền ngay khi ghép, giữ kể cả thua/rời ván/offline; checkpoint
@@ -113,7 +113,7 @@
   không mất quà hoặc reroll. Candidate vẫn được giữ qua lỗi kết nối để thử lại.
 - Chữ: MEMORY MATCH→Rương Avatar; LINK CONNECT→Rương Khung;
   TRIPLE CONNECT→Rương Huy hiệu; ADVENTURE→Rương Avatar. Kho chung17chữ,
-  công thức tiêu đủ số chữ lặp; bán1000Xu/chữ, ghép3chữ giống nhau nhận
+  công thức tiêu đủ số chữ lặp; bán10Xu/chữ, ghép3chữ giống nhau nhận
   1chữ ngẫu nhiên đều, có thể trùng đầu vào. Không đổi ownership trực tiếp.
 - Vòng quay8ô bằng nhau5/10/10/15/15/20/20/25Xu;1free+10ad tối đa/ngày,
   1vé/lượt riêng, vé không hết hạn. Không giả ad earned. Nhiệm vụ ngày

@@ -1,5 +1,11 @@
 # Rà soát Sự kiện/Nhiệm vụ và gameplay — 29/10/2026
 
+> Cập nhật sau đánh giá: chủ dự án đã chốt chữ **30% / bán10Xu**.
+> Đã cập nhật mã/rules source tại workspace; các mục3–4 bên dưới là
+> phép tính ở thời điểm audit trước thay đổi. Mục8 ghi trạng thái mới
+> và đề xuất ngoại hình còn chưa áp dụng. Không dùng số100%/1000Xu
+> trong phân tích lịch sử làm chính sách hiện hành.
+
 Đây là **báo cáo đánh giá**, không là kế hoạch triển khai hoặc phê duyệt
 đổi giá/tỷ lệ. Chủ dự án giao kiểm tra hai task đã hoàn tất, phân tích
 cân bằng, dọn code/tài liệu cũ và commit. Không deploy/push/APK hoặc đổi
@@ -187,3 +193,62 @@ chứng CI clone sạch sẽ có mọi fixture đó.
 Chưa kiểm S22, mạng/provider/quảng cáo thật, tỷ lệ sinh thẻ thực và hành
 vi dùng đồ. Những giới hạn này không phải lý do giữ plan đã hoàn tất
 như đang triển khai, cũng không cho phép tuyên bố kinh tế đã cân bằng.
+
+## 8. Chữ30%/10Xu đã chốt và đề xuất hoàn tất ngoại hình
+
+### Chính sách chữ hiện hành
+
+Chủ dự án chốt30% rơi chữ từ nhóm đặc biệt/Lucky/Magnet hợp lệ của cả
+ba trò; chữ vẫn chọn đều17loại, độc lập vé/huy hiệu, không rơi từ nhóm
+thường hoặc bốc lại sau retry/undo. Bán10Xu/chữ cho giao dịch mới.
+Không xóa chữ, không sửa Xu cũ, không đổi schema; giữ receipt1000Xu/chữ
+và replay không cấp lại. Rules sinh từ giá trong config, cần phát hành
+riêng cùng bản web tương ứng; không tự deploy trong lượt cập nhật này.
+
+Scenario100nhóm/10%đặc biệt: kỳ vọng3chữ, bán30Xu, thay10000Xu trước.
+Giá bán riêng bộ MEMORY MATCH/LINK CONNECT/TRIPLE CONNECT/ADVENTURE
+hiện110/110/130/90Xu; đổi lấy rương đã là lựa chọn hợp lý hơn trước.
+Đây là kỳ vọng cấu hình, vẫn chưa có dữ liệu tiêu hao chơi thật.
+
+Kiểm tra: `scripts/check-letter-policy.mjs` bao phủ biên0,3 của ba trò,
+nhóm thường, retry cả lần trượt, bán mới10Xu và receipt cũ1000Xu. Bảy
+unit chữ đạt; UI luồng đổi/bán/rương1/1 đạt; hai suite emulator đạt gồm
+giao dịch mới giá10Xu được chấp nhận và giá1000Xu bị từ chối. Generated
+rules/check/build đạt (build18,80s), log `letter-policy-20261029-*`.
+Các thay đổi quà theo giờ đang được task khác sửa cùng workspace được
+giữ riêng, không coi là phạm vi hoặc phần thưởng đã duyệt của task này.
+
+### Phương án ngoại hình khuyên dùng — mới là đề xuất
+
+**Giữ20% nhánh ngoại hình; khi trúng, chọn đều trong những món chưa có
+của đúng loại rương.** Không đổi nhánh Xu/hỗ trợ, quà mốc hoặc pool ID.
+
+| Loại | Số món | Hiện tại, kỳ vọng đủ bộ | Đề xuất ưu tiên chưa có |
+|---|---:|---:|---:|
+| Avatar | 38 | ≈803rương | ≈190rương |
+| Khung | 38 | ≈803rương | ≈190rương |
+| Huy hiệu | 22 | ≈406rương | ≈110rương |
+
+Giả định bắt đầu chưa có món nào, chỉ mở rương cùng loại và không nguồn
+ngoại hình khác. Hiện tại là `N×H(N)/0,2`, đề xuất là `N/0,2`; đây là số
+rương trung bình, không trần bảo đảm. Trung bình5rương có1món, nhưng
+vẫn có thể nhiều lần chỉ nhận Xu/hỗ trợ. Không hứa5lần chắc chắn trúng.
+
+- Chưa đủ pool: nhánh ngoại hình luôn tiến thêm một món mới, giảm cảm
+  giác mở trùng khi còn nhiều món thiếu. Đổi lại hoàn tất bộ nhanh hơn
+  khoảng4,2lần cho Avatar/Khung và3,7lần cho Huy hiệu trong mô hình này.
+- Đủ pool loại đang mở: vẫn đổi thẳng100Xu như hiện tại. Rương C giữ
+  nguyên. Không tự trang bị, đổi quà mốc hoặc tạo rương mới.
+- Nếu món đã bốc được sở hữu ở thiết bị/nguồn khác trước commit, giữ
+  quy đổi trùng100Xu; không reroll. Candidate/receipt cũ đã bền giữ nguyên.
+- Tái dùng ownership canonical đang có để lọc pool khi bốc candidate;
+  không thêm bộ đếm pity, document/lịch ngày hoặc backend trả phí. Cùng
+  transaction/CAS hiện có xử lý quà thật trước presentation.
+- So với tăng20% lên30% nhưng vẫn chọn cả món trùng: cách ưu tiên chưa
+  có giải quyết trực tiếp việc thiếu món cuối, không tăng rơi ngoại hình
+  trong mọi lần mở. Chưa đề xuất bảo đảm sau10rương vì cần thêm trạng
+  thái và thay xác suất thực; chưa cần thêm độ phức tạp đó.
+
+**Chưa sửa chestCandidate/luật rương.** Chờ chủ dự án chọn phương án
+trước khi triển khai; các phép tính so sánh được in riêng bởi script
+phân tích, không bị dùng làm cấu hình runtime.

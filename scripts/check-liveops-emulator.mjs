@@ -1,4 +1,4 @@
-import { LETTER_SETS, LETTER_ALPHABET, LETTER_SYNC_KEYS_PER_COMMIT } from '../js/liveops/config.js';
+import { LETTER_SETS, LETTER_ALPHABET, LETTER_SYNC_KEYS_PER_COMMIT, LETTER_SELL_COINS } from '../js/liveops/config.js';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { initializeTestEnvironment, assertFails } from '@firebase/rules-unit-testing';
@@ -18,6 +18,11 @@ async function commit(command={type:'status'}, options={}) {
   const database=options.database||db, before=options.state??state, expected=options.revision??revision, copy=structuredClone(options.snapshot||saved);
   const result=transitionSpark(before,command,{uid,now,sector:7,ticketEarned:options.ticketEarned??before?.ticketEarned??0,ownedItemIds:Object.values(copy.profile.data.appearance.acquisitions?.grants||{}).flatMap(grant=>grant.items),facts:options.facts||[],letterEarned:options.letterEarned??before?.letters.earned??{},randomLetter:'A'});
   result.state.revision=(before?.revision||0)+1;
+  if (options.salePriceOverride !== undefined) {
+    assert.equal(command.type,'sellLetter');
+    result.state.letters.last.coins=command.quantity*options.salePriceOverride;
+    for (const receipt of result.receipts) receipt.coins=command.quantity*options.salePriceOverride;
+  }
   const acquisitions=copy.profile.data.appearance.acquisitions||{version:1,grants:{}};
   for(const receipt of result.receipts)if(receipt.acquisition)acquisitions.grants[receipt.receiptId]={...receipt.acquisition,receiptId:receipt.receiptId,ownerUid:uid,grantedAt:receipt.grantedAt};
   copy.profile.data.appearance.acquisitions=acquisitions;
@@ -54,7 +59,11 @@ try {
   assert.equal(state.tickets,1);assert.equal(state.event.points,36);
   accept(await commit({type:'status'},{letterEarned:{M:6}}));
   assert.equal(state.letters.counts.M,6);
+  const beforeSaleCoins=saved.profile.data.coins;
+  await assert.rejects(commit({type:'sellLetter',letter:'M',quantity:1,sequence:1,operation:'rejected-old-price'},{salePriceOverride:1000}));
   accept(await commit({type:'sellLetter',letter:'M',quantity:1,sequence:1,operation:'sell-M'}));
+  assert.equal(saved.profile.data.coins,beforeSaleCoins+LETTER_SELL_COINS);
+  assert.equal(state.letters.last.coins,10);
   assert.equal(state.letters.counts.M,5);
   accept(await commit({type:'fuseLetter',letter:'M',sequence:2,operation:'fuse-M'}));
   assert.equal(state.letters.counts.M,2);assert.equal(state.letters.counts.A,1);

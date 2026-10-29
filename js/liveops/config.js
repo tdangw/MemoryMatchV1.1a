@@ -6,8 +6,10 @@ export const EVENT_COLLECTIONS = Object.freeze([
 export const ACTIVE_EVENT_COLLECTION_ID = 'firefly-festival-01';
 export function eventCollection(id) { return EVENT_COLLECTIONS.find(collection => collection.id === id); }
 
-export const LETTER_DROP_CHANCE = 1; // Trial policy; 20% requires a later product decision.
-export const LETTER_SELL_COINS = 1000;
+export const LETTER_DROP_CHANCE = .3;
+export const LETTER_SELL_COINS = 10;
+// Historical sale receipts remain readable; new sales always use LETTER_SELL_COINS.
+export const LETTER_SALE_RECEIPT_PRICES = Object.freeze([LETTER_SELL_COINS, 1000]);
 export const LETTER_FALLBACK_COINS = 100;
 export const LETTER_SETS = Object.freeze([
   { id:'memory-match', label:'MEMORY MATCH', chestType:'avatar' }, { id:'link-connect', label:'LINK CONNECT', chestType:'frame' },

@@ -130,7 +130,7 @@ CHEST_CONTRACT
           && (n.last.kind == 'exchange' ? n.last.setId in LETTER_SET_IDS
             && (n.last.get('chestType','') != '' ? n.last.chestType == chestForSet(n.last.setId) && n.last.itemId == null && n.last.coins == 0 : n.last.itemId == null ? n.last.coins == 100 : n.last.itemId in LETTER_REWARDS && n.last.coins == 0)
             : n.last.letter in LETTER_KEYS && (n.last.kind == 'sell' ? n.last.quantity is int && n.last.quantity > 0
-              && n.last.coins == n.last.quantity * 1000 : n.last.kind == 'fuse' && n.last.received in LETTER_KEYS && n.last.coins == 0)))
+              && n.last.coins == n.last.quantity * LETTER_SALE_PRICE : n.last.kind == 'fuse' && n.last.received in LETTER_KEYS && n.last.coins == 0)))
 LETTER_VALUES;
     }
     function letterRequirementMap(setId) { return LETTER_REQUIREMENT_MAP; }

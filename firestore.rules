@@ -361,7 +361,7 @@ service cloud.firestore {
           && (n.last.kind == 'exchange' ? n.last.setId in ["memory-match","link-connect","triple-connect","adventure"]
             && (n.last.get('chestType','') != '' ? n.last.chestType == chestForSet(n.last.setId) && n.last.itemId == null && n.last.coins == 0 : n.last.itemId == null ? n.last.coins == 100 : n.last.itemId in ["letters-memory-avatar-moss-redpanda","letters-memory-frame-memory-leaves","letters-memory-badge-folded-leaf","letters-link-avatar-flower-fox","letters-link-frame-silk-lantern","letters-link-badge-wish-knot","letters-triple-avatar-rose-dragon","letters-triple-frame-prism-glass","letters-triple-badge-prism-heart","letters-royal-avatar-dawn-lion","letters-royal-frame-journey-crown","letters-royal-badge-royal-seal"] && n.last.coins == 0)
             : n.last.letter in ['A','C','D','E','H','I','K','L','M','N','O','P','R','T','U','V','Y'] && (n.last.kind == 'sell' ? n.last.quantity is int && n.last.quantity > 0
-              && n.last.coins == n.last.quantity * 1000 : n.last.kind == 'fuse' && n.last.received in ['A','C','D','E','H','I','K','L','M','N','O','P','R','T','U','V','Y'] && n.last.coins == 0)))
+              && n.last.coins == n.last.quantity * 10 : n.last.kind == 'fuse' && n.last.received in ['A','C','D','E','H','I','K','L','M','N','O','P','R','T','U','V','Y'] && n.last.coins == 0)))
         && (!changed.hasAny(['A']) || rewardLetterValue(n,o,'A'))
         && (!changed.hasAny(['C']) || rewardLetterValue(n,o,'C'))
         && (!changed.hasAny(['D']) || rewardLetterValue(n,o,'D'))
