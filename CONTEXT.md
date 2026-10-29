@@ -15,7 +15,8 @@
   cặp icon Kho báu/Bộ sưu tập; dưới trái là cặp icon Vô tận/Thử thách.
   Không banner rương ngang, không chữ dài trên lối tắt; chi tiết/tiến độ
   giữ ở popup/aria. Ba khu vực có khung nhỏ nền tối/viền mảnh/họa tiết góc,
-  không dây treo/nhãn chữ; khung46×94px nằm trong vùng bấm48×96px. Lối tắt
+  không dây treo/nhãn chữ; khung46×94px nằm trong vùng bấm48×96px, có vạch
+  phân cách mảnh giữa hai icon theo màu viền skin. Lối tắt
   dùng cùng navigate/page owner với dock, không mở luồng thưởng mới.
   Trang mở từ bản đồ đóng X về chính bản đồ đang xem, không tạo lại map;
   giữ chặng/vị trí cuộn. Trang mở từ Home vẫn đóng về Home.
