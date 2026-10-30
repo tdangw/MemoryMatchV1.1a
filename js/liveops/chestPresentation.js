@@ -47,7 +47,7 @@ export function mountChestInventory(host, { owner, back, profile, gameId = 'memo
     if (selected) {
       const policy = CHEST_POLICY[selected], title = node('h3', '', CHEST_NAMES[selected]); title.tabIndex = -1;
       detail.append(title, node('p', '', `40%: ${policy.coins} Xu · ${selected === 'c' ? '60' : '40'}%: 1 hỗ trợ${selected === 'c' ? '' : ' · 20%: 1 ngoại hình đúng loại'}`));
-      if (policy.duplicate) detail.append(node('p', '', `Ngoại hình trùng: ${policy.duplicate} Xu. Khi đã có đủ ngoại hình của loại rương này, mỗi rương đổi thẳng ${policy.duplicate} Xu.`));
+      if (policy.duplicate) detail.append(node('p', '', `Khi trúng ngoại hình, ưu tiên món bạn chưa sở hữu. Khi đã có đủ ngoại hình của loại rương này, mỗi rương đổi thẳng ${policy.duplicate} Xu. Nếu món quà đã được chọn trước đó nay đã có, bạn nhận ${policy.duplicate} Xu.`));
       const games = node('select', 'liveops__letter-select'); games.setAttribute('aria-label', 'Trò nhận hỗ trợ');
       for (const [id, label] of [['memory-match','Memory Match'],['link-connect','Link Connect'],['triple-connect','Triple Connect']]) {
         const option = node('option', '', label); option.value = id; games.append(option);
@@ -56,9 +56,14 @@ export function mountChestInventory(host, { owner, back, profile, gameId = 'memo
       const describeSupports = () => { supportInfo.textContent = `Quà hỗ trợ: ${CHEST_SUPPORTS[gameId].map(item=>item.label).join(' · ')}. Nếu nhận hỗ trợ, các món có cơ hội như nhau. Kho tối đa 9.999 mỗi món; mỗi món vượt kho đổi thành 10 Xu.`; };
       games.value = gameId; games.disabled = busy || Boolean(pendingChest); games.onchange = () => { gameId = games.value; describeSupports(); }; describeSupports();
       detail.append(games, supportInfo, action('Mở 1 rương', () => void open(), busy || !connected || Boolean(getActiveGameScope()) || chests.earned[selected] === chests.spent[selected] || Boolean(pendingChest && pendingChest.chestType !== selected), 'confirm-open'),
-        node('p', '', 'Mỗi rương nhận một quà. Xu vào ví, hỗ trợ vào kho trò đã chọn, ngoại hình vào Hồ sơ. Kho hỗ trợ đầy sẽ giữ rương để thử lại.'));
+        node('p', '', 'Mỗi rương nhận một quà. Xu vào ví, hỗ trợ vào kho trò đã chọn, ngoại hình vào Hồ sơ. Mỗi hỗ trợ vượt kho đổi thành 10 Xu.'));
       const pool = CHEST_POOLS[selected] || [], gallery = node('div', 'liveops__chest-grid'), owned = new Set(view.ownedItemIds || view.ownedLetterIds || []);
-      if(pool.length)detail.append(node('p', '', `${owned.size ? pool.filter(id => owned.has(id)).length : 0}/${pool.length} ngoại hình đã có`),node('p','','Các món ngoại hình có cơ hội như nhau khi nhận quà ngoại hình; có thể gặp lại món đã có.'));
+      if (pool.length) {
+        const missing = pool.filter(id => !owned.has(id)).length;
+        const chance = missing ? (20 / missing).toLocaleString('vi-VN', { maximumFractionDigits:3 }) : null;
+        detail.append(node('p', '', `${pool.length - missing}/${pool.length} ngoại hình đã có`),
+          node('p', '', missing ? `20% là cơ hội nhận một ngoại hình; ${missing} món chưa có được chọn đều (mỗi món khoảng ${chance}% mỗi lần mở mới).` : `Đã đủ bộ: mỗi rương nhận ${policy.duplicate} Xu.`));
+      }
       for (const id of pool.slice(page * 12, page * 12 + 12)) {
         const item = CHEST_ITEMS.find(item => item.id === id), figure = node('figure'), image = node('img', 'liveops__reward-preview');
         image.src = `${import.meta.env.BASE_URL}${item.files[128]}`; image.width = image.height = 128; image.loading = 'lazy'; image.decoding = 'async'; image.alt = item.name;

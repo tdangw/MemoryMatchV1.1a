@@ -66,7 +66,8 @@ export function chestCandidate(type, gameId, ownedIds, random) {
   const policy = CHEST_POLICY[type], pool = CHEST_POOLS[type], owned = new Set(ownedIds);
   if (!policy || !CHEST_SUPPORTS[gameId]) invalid();
   const base = { chestType:type, gameId, poolVersion:CHEST_VERSION };
-  if (pool?.length && pool.every(id => owned.has(id))) return { ...base, kind:'coins', coins:policy.duplicate, reason:'full' };
+  const unowned = pool?.filter(id => !owned.has(id));
+  if (unowned?.length === 0) return { ...base, kind:'coins', coins:policy.duplicate, reason:'full' };
   const sample = () => { const n = random(); if (!(n >= 0 && n < 1)) invalid(); return n; };
   const category = sample();
   if (category < policy.coinChance) return { ...base, kind:'coins', coins:policy.coins, reason:'coins' };
@@ -74,7 +75,7 @@ export function chestCandidate(type, gameId, ownedIds, random) {
     const support = CHEST_SUPPORTS[gameId][Math.floor(sample() * CHEST_SUPPORTS[gameId].length)];
     return { ...base, kind:'support', coins:0, ...support };
   }
-  return { ...base, kind:'item', coins:0, itemId:pool[Math.floor(sample() * pool.length)] };
+  return { ...base, kind:'item', coins:0, itemId:unowned[Math.floor(sample() * unowned.length)] };
 }
 export function openChest(value, command, ownedIds, supportCount) {
   const chests = normalizeChests(value), candidate = command.candidate;
