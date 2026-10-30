@@ -1,5 +1,16 @@
 # CONTEXT — Trạng thái hiện tại (2026-10-31)
 
+## Nhận quà gọn trên bản đồ — cập nhật31/10/2026
+
+- Bỏ nền/viền/khung lớn và tiêu đề “Quà của bạn” sau khi nhận.
+  Chỉ giữ toast nhỏ theo màu skin, icon22px/chữ12px, một hàng không xuống dòng.
+- Hộp quà mờ hết trước mốc700ms khi vật phẩm bắt đầu hiện; giữ chỗ hình
+  để toast không nhảy. Khi đã mở giữ hộp ẩn, không che pha rơi/dừng.
+  Giữ timing900/900/850ms, owner/cleanup và reduced-motion; không đổi quà,
+  thời gian10giây test, dữ liệu hoặc rules. Popup trước mở vẫn giữ.
+- UI7/7 đạt; kiểm mọi tên hỗ trợ của3trò trên5skin ở320px đều một
+  hàng/trọn chữ, hộp ẩn trong pha dừng. CSS/syntax/build đạt.
+
 ## Popup chọn màn — mỹ thuật31/10/2026
 
 - Mô tả Vô tận/Thử thách bỏ khung/nền, chữ đậm vừa và cân dòng;

@@ -2,9 +2,9 @@
 .hourly-gift__hero { display:grid; place-items:center; width:120px; height:112px; border-radius:50%; background:radial-gradient(ellipse,#e8bf6140,transparent 70%); }
 .hourly-gift__hero > .adventure-action-art { width:96px; height:96px; }
 .hourly-gift__lid { transform-box:fill-box; transform-origin:center; }
-.hourly-gift__result { display:flex; align-items:center; justify-content:center; gap:10px; padding:12px; border:1px solid var(--ui-line); border-radius:12px; background:var(--ui-inset); width:100%; box-sizing:border-box; font-size:16px; color:var(--ui-ink,#f2eee2); }
-.hourly-gift__result > strong { color:inherit; font-size:inherit; line-height:1.4; }
-.hourly-gift__result > .ui-icon { width:38px; height:38px; flex:none; }
+.hourly-gift__result { display:flex; align-items:center; justify-content:center; gap:6px; padding:7px 10px; border:1px solid var(--ui-line); border-radius:20px; background:var(--ui-inset); width:max-content; max-width:100%; box-sizing:border-box; font-size:12px; color:var(--ui-ink,#f2eee2); box-shadow:0 2px 8px #0003; }
+.hourly-gift__result > strong { min-width:0; color:inherit; font-size:inherit; line-height:1.4; white-space:nowrap; }
+.hourly-gift__result > .ui-icon { width:22px; height:22px; flex:none; }
 .hourly-gift > button { min-height:48px; width:fit-content; max-width:100%; padding-inline:28px; }
 .hourly-gift-particles { position:fixed; inset:0; z-index:31000; pointer-events:none; overflow:hidden; }
 .hourly-gift-particle { position:absolute; left:0; top:0; width:28px; height:28px; will-change:transform,opacity; color:#ffe1a0; }
@@ -18,8 +18,6 @@
 #hourly-gift-modal .app-modal__body { padding:12px; }
 #hourly-gift-modal .hourly-gift > .app-button--primary { border:1px solid #a2d773; border-image:none; background:linear-gradient(#65b94c,#28843a); color:#fffbdc; text-shadow:0 1px 2px #194728; }
 
-.hourly-gift-reveal { position:fixed; z-index:31000; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:12px; width:min(280px,calc(100vw - 32px)); box-sizing:border-box; padding:16px; border:1px solid var(--ui-gold,#d3bd88); border-radius:18px; background:var(--ui-surface,#18313a); color:var(--ui-ink,#f2eee2); box-shadow:var(--ui-shadow,0 8px 24px #0005); pointer-events:none; }
-.hourly-gift-reveal > .adventure-action-art { width:96px; height:96px; }
-.hourly-gift-reveal .is-open .hourly-gift__lid { opacity:0; }
-
-.hourly-gift-reveal__title { margin:0; color:var(--ui-ink,#f2eee2); font-size:17px; font-weight:700; line-height:1.3; }
+.hourly-gift-reveal { position:fixed; z-index:31000; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:12px; width:max-content; max-width:calc(100vw - 24px); color:var(--ui-ink,#f2eee2); pointer-events:none; }
+.hourly-gift-reveal > .adventure-action-art { width:96px; height:96px; flex:none; }
+.hourly-gift-reveal > .adventure-action-art.is-open { visibility:hidden; }

@@ -37,9 +37,9 @@ async function rewardCard(page,width,height){
   const luminance=color=>color.slice(0,3).map(v=>v/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4).reduce((a,v,i)=>a+v*[.2126,.7152,.0722][i],0);
   const contrast=node=>{const bg=background(node),fg=composite(rgba(getComputedStyle(node).color),bg),a=luminance(bg),b=luminance(fg);return (Math.max(a,b)+.05)/(Math.min(a,b)+.05);};
   const title=card.querySelector('.hourly-gift-reveal__title'),label=card.querySelector('.hourly-gift__result strong'),rect=card.getBoundingClientRect(),text=label.getBoundingClientRect();
-  return {title:title.textContent,label:label.textContent,titleContrast:contrast(title),labelContrast:contrast(label),x:rect.x,y:rect.y,right:rect.right,bottom:rect.bottom,textLeft:text.left,textRight:text.right,overflow:card.scrollWidth>card.clientWidth};
+  return {title:Boolean(title),background:getComputedStyle(card).backgroundColor,labelHeight:text.height,label:label.textContent,labelContrast:contrast(label),x:rect.x,y:rect.y,right:rect.right,bottom:rect.bottom,textLeft:text.left,textRight:text.right,overflow:card.scrollWidth>card.clientWidth};
  });
- expect(metrics.title).toBe('Quà của bạn');expect(metrics.label).toBe('100 Xu');expect(metrics.titleContrast).toBeGreaterThanOrEqual(4.5);expect(metrics.labelContrast).toBeGreaterThanOrEqual(4.5);
+ expect(metrics.title).toBe(false);expect(metrics.background).toBe('rgba(0, 0, 0, 0)');expect(metrics.labelHeight).toBeLessThanOrEqual(18);expect(metrics.label).toBe('100 Xu');expect(metrics.labelContrast).toBeGreaterThanOrEqual(4.5);
  expect(metrics.x).toBeGreaterThanOrEqual(0);expect(metrics.y).toBeGreaterThanOrEqual(0);expect(metrics.right).toBeLessThanOrEqual(width);expect(metrics.bottom).toBeLessThanOrEqual(height);expect(metrics.textLeft).toBeGreaterThanOrEqual(metrics.x);expect(metrics.textRight).toBeLessThanOrEqual(metrics.right);expect(metrics.overflow).toBe(false);
 }
 async function open(page){await page.getByRole('button',{name:'Quà tặng',exact:true}).click();await expect(page.getByRole('button',{name:'Mở quà',exact:true})).toBeEnabled();}
@@ -102,6 +102,7 @@ test('gift particles share gameplay drop hold and collection timing and clean hi
    return {duration:options.duration,delay:options.delay,land:frames[2].offset,collect:frames[3].offset,landTransform:frames[2].transform,collectTransform:frames[3].transform};
   })};
  });
+ await expect(page.locator('.hourly-gift-reveal > .adventure-action-art')).toHaveCSS('opacity','0',{timeout:2000});
  expect(timing.policy).toEqual({dropMs:900,holdMs:900,flightMs:850,revealDelayMs:700});
  for(const [index,particle]of timing.particles.entries()){
   expect(particle.duration).toBe(2650);expect(particle.delay).toBe(700+index*24);
@@ -113,4 +114,30 @@ test('gift particles share gameplay drop hold and collection timing and clean hi
  await advance(page);await open(page);await page.getByRole('button',{name:'Mở quà',exact:true}).click();await expect(page.locator('.hourly-gift-particle')).toHaveCount(6);
  await page.emulateMedia({reducedMotion:'reduce'});await expect(page.locator('.hourly-gift-reveal,.hourly-gift-particles')).toHaveCount(0);
  expect(await page.evaluate(async()=>(await import('/js/appPageLifecycle.js')).getAppPageScope().diagnostics())).toEqual(baseline);expect(await page.evaluate(()=>hourlyFixture.claims)).toBe(2);
+});
+
+
+test('support reward toast stays on one compact line for every item at narrow size',async({page},info)=>{
+ test.setTimeout(60000);await ready(page);await page.setViewportSize({width:320,height:640});
+ for(const skin of ['default','woodland','papercut','starship','storybook']){
+  await page.evaluate(async skin=>{
+   await (await import('/js/uiSkin.js')).selectUiSkin(skin);
+   await import('/js/liveops/hourlyGiftPresentation.js');
+   const {CHEST_SUPPORTS}=await import('/js/liveops/chestConfig.js');
+   const names={'memory-match':'Memory Match','link-connect':'Link Connect','triple-connect':'Triple Connect'};
+   const root=document.createElement('div');root.className='hourly-gift-reveal';root.style.left='160px';root.style.top='260px';
+   const toast=document.createElement('div');toast.className='hourly-gift__result';
+   const {createIcon}=await import('/js/icons.js');toast.append(createIcon('timer'));const label=document.createElement('strong');toast.append(label);root.append(toast);document.body.append(root);
+   try {for(const [game,items] of Object.entries(CHEST_SUPPORTS))for(const item of items){
+    label.textContent=`${item.label} ×1 · ${names[game]}`;
+    const r=toast.getBoundingClientRect();
+    if(label.scrollWidth>label.clientWidth+1||r.left<0||r.right>innerWidth||label.getBoundingClientRect().height>18)throw Error(`Reward toast overflow: ${skin}/${game}/${item.key}`);
+   }}finally{root.remove();}
+  },skin);
+ }
+ await page.emulateMedia({reducedMotion:'no-preference'});
+ await page.evaluate(()=>{hourlyFixture.kind='support';hourlyFixture.key='time30';});await open(page);await page.getByRole('button',{name:'Mở quà',exact:true}).click();
+ await page.waitForFunction(()=>document.querySelector('.hourly-gift-particle')?.getAnimations()[0]?.currentTime>=1900);
+ await page.screenshot({path:info.outputPath('compact-support-toast.png')});
+ await expect(page.locator('.hourly-gift-reveal > .adventure-action-art')).toHaveCSS('opacity','0');
 });

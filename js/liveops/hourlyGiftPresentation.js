@@ -38,6 +38,7 @@ async function revealGift(art,result,prize,owner) {
   const animate=(node,frames,options)=>{const a=node.animate(frames,options);scope.animation(a);animations.push(a);};
   animate(art,[{transform:'scale(.7)',opacity:0},{transform:'scale(1.06)',opacity:1,offset:.3},{transform:'scale(.96) rotate(-6deg)',offset:.5},{transform:'scale(1.03) rotate(6deg)',offset:.65},{transform:'scale(1) rotate(0deg)',opacity:1}],{duration:650});
   animate(art.querySelector('.hourly-gift__lid'),[{transform:'translateY(0)',opacity:1},{transform:'translateY(-15px) rotate(-15deg)',opacity:0}],{duration:320,delay:480,fill:'forwards'});
+  animate(art,[{opacity:1},{opacity:0}],{duration:200,delay:500,fill:'forwards'});
   animate(result,[{opacity:0,transform:'translateY(8px) scale(.9)'},{opacity:1,transform:'translateY(0) scale(1)'}],{duration:350,delay:700,fill:'both'});
   const {dropMs,holdMs,flightMs,revealDelayMs}=GIFT_LOOT_TIMING;
   const duration=dropMs+holdMs+flightMs,landOffset=dropMs/duration,collectOffset=(dropMs+holdMs)/duration;
@@ -63,7 +64,7 @@ async function presentGiftOnMap(reward,owner) {
   const scope=createGameShellLifecycle(),release=owner.own(()=>scope.dispose());scope.own(()=>release.forget());
   const floating=el('div','hourly-gift-reveal'),art=createAdventureActionArt('gift'),result=el('div','hourly-gift__result');
   floating.style.left=`${innerWidth/2}px`;floating.style.top=`${Math.max(16,(innerHeight-260)/2)}px`;
-  const prize=describe(reward);result.setAttribute('role','status');result.append(createIcon(prize.icon),el('strong','',prize.label));floating.append(el('p','hourly-gift-reveal__title','Quà của bạn'),art,result);document.body.append(floating);scope.own(()=>floating.remove(),'node');
+  const prize=describe(reward);result.setAttribute('role','status');result.append(createIcon(prize.icon),el('strong','',prize.label));floating.append(art,result);document.body.append(floating);scope.own(()=>floating.remove(),'node');
   try {
     await revealGift(art,result,prize,scope);
     if(scope.active)await new Promise(resolve=>{const cancel=scope.own(resolve);scope.timeout(()=>{cancel.forget();resolve();},1000);});
