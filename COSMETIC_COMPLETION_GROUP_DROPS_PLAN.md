@@ -183,7 +183,7 @@ ván. Firebase free, không thêm Functions/SSV/Scheduler hoặc migration
 vì thay tên/màu/type thẻ. Nếu bắt buộc mở rộng dữ liệu, trình bày mapping
 và tương thích trước code, không tự tăng version làm mất tiến độ.
 
-Task quà60phút đang sửa sparkModel/service/rules/generator. Không cho
+Task quà60phút đã hoàn tất trong HOURLY_GIFT_RECEIPT.md. Không cho
 hai agent sửa cùng owner đồng thời: thống nhất ranh giới/đợi phase chung
 ổn định, đọc lại diff trước tích hợp. Không stage/commit cả các hunk quà
 theo giờ khi chỉ triển khai task này. Rules là generated output; thay
@@ -233,5 +233,11 @@ lập kế hoạch; các thao tác đó chỉ theo phạm vi được giao sau.
 
 - P0: đã khóa bảng tỷ lệ, ownership và call sites. Snapshot cặp tối đa60
   cặp, Triple tối đa120 thẻ/40 bộ ba; cap1000 marker/đợt giữ nguyên.
-- Các phase C1/D1/V1/Q1 đang triển khai; bằng chứng tập trung trong
+- C1 và D1 đã hoàn tất: candidate chưa có, bảng hai nhóm, marker và test biên.
+- V1/Q1 đã hoàn tất; bằng chứng tập trung trong
   `COSMETIC_COMPLETION_GROUP_DROPS_RECEIPT.md`.
+
+- Kết quả30/10: C1/D1/V1/Q1 đã đạt kiểm tra chức năng, tương thích,
+  replay, UI/lifecycle và emulator. Không deploy. PC frame sample và
+  giới hạn S22/cân bằng thực tế được ghi trung thực trong receipt;
+  không tuyên bố chứng nhận60FPS. Không còn phase triển khai chờ xử lý.

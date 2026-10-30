@@ -1,18 +1,31 @@
-# CONTEXT — Trạng thái hiện tại (2026-10-29)
+# CONTEXT — Trạng thái hiện tại (2026-10-30)
 
-## Kế hoạch mới: rương ưu tiên chưa có và drop theo nhóm — 29/10/2026
+## Rương ưu tiên chưa có và drop theo nhóm — hoàn tất30/10/2026
 
-- Ngày30/10 chủ dự án giao **triển khai toàn bộ và commit từng phase**. Nguồn duy nhất: `COSMETIC_COMPLETION_GROUP_DROPS_PLAN.md`. Rương giữ20% nhánh ngoại hình; trúng thì chọn đều món chưa sở hữu đúng loại; full pool100Xu, C/Xu/hỗ trợ/legacy candidate và receipt giữ nguyên. Chưa sửa runtime hoặc luật mở rương.
-- Tỷ lệ mục tiêu đã được chủ dự án chốt: **thường chữ5%/vé2%/huy hiệu6%; đặc biệt–Lucky–Magnet chữ25%/vé10%/huy hiệu30%**, ba nhánh độc lập cho cả ba trò. Giữ bán10Xu/chữ, không đổi năng lượng80/20 hoặc hỗ trợ5/10/30. Bảng này thay các tỷ lệ đề xuất tạm5/1/10 và30/5/100, không hỏi lại khi triển khai.
-- Đây là chính sách tương lai của task mới: code hiện vẫn chữ30%/vé5%/huy hiệu100% chỉ ở nhóm đặc biệt; nhóm thường chưa rơi ba nguồn này. Các mô tả runtime phía dưới giữ baseline đến khi task mới triển khai/kiểm chứng, không tự coi plan đã phát hành. Không cấp hồi tố nhóm đã ghép, không xóa chữ/vé/huy hiệu hoặc đổi Xu cũ.
-- Đã chỉ rõ mở nhánh normal trong resolver, marker cả trượt/undo và feedback hiện đang khóa special ở ba controller; không chỉ sửa hằng số. Tái dùng ownership/CAS/candidate/loot cap12, không thêm pity/backend/document từng drop. Phase P0/C1/D1/V1/Q1 và tiêu chí test/hiệu suất trong plan. Đang triển khai P0/C1/D1/V1/Q1; không tự deploy hoặc tạo APK.
-- Task Quà tặng bất ngờ đã hoàn tất; nguồn hiện hành là `HOURLY_GIFT_RECEIPT.md` và mục tương ứng bên dưới. Khi triển khai plan mới giữ logic quà/cooldown/server timestamp, tích hợp tuần tự các owner chung sparkModel/service/rules/generator; không ghi đè phần quà. Giữ các thay đổi QA/bản đồ có sẵn.
+- P0/C1/D1/V1/Q1 hoàn tất; không còn kế hoạch triển khai active.
+- Nguồn phạm vi `COSMETIC_COMPLETION_GROUP_DROPS_PLAN.md`; bằng chứng
+  `COSMETIC_COMPLETION_GROUP_DROPS_RECEIPT.md`. Chủ dự án giao toàn bộ,
+  commit P0/C1/D1/V1/Q1 và phần tracked còn sót; không deploy/APK.
+- Rương giữ20% nhánh ngoại hình, chọn đều món chưa sở hữu đúng loại;
+  full pool100Xu. Giữ nhánh Xu/hỗ trợ/C, candidate bền, legacy và race
+  đổi trùng100Xu; không reroll hoặc auto-equip.
+- Thường chữ5%/vé2%/huy hiệu6%; đặc biệt–Lucky–Magnet25%/10%/30%,
+  ba RNG độc lập cho cả ba trò. Giữ bán10Xu/chữ, năng lượng80/20,
+  hỗ trợ5/10/30, mốc thưởng và Quà tặng bất ngờ.
+- Marker cả trúng/trượt theo attempt/wave/group; không cấp hồi tố hoặc
+  farm qua undo/reload. Feedback cả normal/special sau lưu, đo origin
+  một lần khi trúng trước tháo DOM; item/energy/letter chung cap12.
+- Không đổi save/schema/rules/catalog. Quà60phút đã hoàn tất, nguồn
+  `HOURLY_GIFT_RECEIPT.md`; giữ cooldown và server timestamp hiện hành.
+- Check/build,13UI (5mới+8regression),100unit reviewer và ba emulator
+  đạt. PC mixedloot cap12/cleanup đạt; P95=21ms, không chứng nhận60FPS
+  hoặc S22. Chi tiết read/write/byte và giới hạn trong receipt chung.
 
 ## Rà soát hai task, cân bằng và dọn tài liệu — 29/10/2026
 
 - Sự kiện/Nhiệm vụ/Kho rương và rơi vật phẩm/năng lượng/Nam châm đã hoàn tất chức năng web local; không còn kế hoạch triển khai active của hai task. Đánh giá hiện hành: `GAMEPLAY_ECONOMY_AUDIT.md`; bằng chứng trước: `EVENTS_MOBILE_FESTIVAL_RECEIPT.md`, `DROP_ENERGY_SPECIAL_CARDS_RECEIPT.md`.
 - Rà mới: 76 unit, 33 UI, 2 Magnet (40 chu kỳ), CPU6x và hai Firestore emulator suite đạt; check/build cuối được ghi trong audit. Chưa có S22 vật lý, chưa chứng nhận60FPS hoặc tiêu hao thật. UI fixture không chứng minh OAuth/quảng cáo/live hai thiết bị.
-- Cập nhật được duyệt29/10 sau audit: chữ rơi30% trên nhóm đặc biệt/Lucky/Magnet hợp lệ, bán10Xu/chữ, áp dụng cả ba trò. Thay100%/1000Xu trước đây; không đổi Xu đã có, số chữ/kho hoặc giao dịch cũ. Bản lưu vẫn đọc receipt bán1000Xu/chữ, giao dịch mới dùng10Xu. Triple30/3 và luật rương chưa đổi; đề xuất ưu tiên ngoại hình chưa có ở mục8 GAMEPLAY_ECONOMY_AUDIT.md còn chờ duyệt.
+- Cập nhật được duyệt29/10 sau audit: chữ rơi30% trên nhóm đặc biệt/Lucky/Magnet hợp lệ, bán10Xu/chữ, áp dụng cả ba trò. Thay100%/1000Xu trước đây; không đổi Xu đã có, số chữ/kho hoặc giao dịch cũ. Bản lưu vẫn đọc receipt bán1000Xu/chữ, giao dịch mới dùng10Xu. Đây là baseline29/10; bảng mới và luật rương triển khai30/10 được ghi tại mục đầu và mục9 GAMEPLAY_ECONOMY_AUDIT.md.
 - Dọn code an toàn: Magnet reducer/Gợi ý dùng chung chọn hai đồng loại, ưu tiên khay rồi ID board, chỉ sort các mục tiêu hợp lệ. Giữ API/ledger/save/nhánh legacy. `node scripts/analyze-game-economy.mjs` đọc cấu hình và xuất kỳ vọng, không ghi dữ liệu hoặc truy cập Firebase.
 - Đã xóa năm kế hoạch hoàn tất về gameplay, nền động, UI skin, Cổ tích và nhập môn. Không phục hồi chúng từ Git làm nguồn thực thi. Nguồn thiết kế hiện hành: ba tài liệu game, ARCHITECTURE và mục sản phẩm dưới đây; receipt là lịch sử. `ADS_APK_TEST_PLAN.md` chỉ còn checklist thiết bị/provider thật chưa xác minh, không phải quyền tự tạo APK/phát hành.
 - Lượt này được phép commit phần triển khai hai task và cleanup đã rà; không stage ảnh/log QA hoặc thay đổi không liên quan. Không tự push/Hosting/rules/APK/billing.
@@ -92,13 +105,12 @@
   trong Hồ sơ. Icon riêng `collection-badge`: huy chương vàng, lõi xanh,
   hai thẻ ghép, dải ngọc; SVG dùng chung trên trang và loot khi ghép.
   Không dùng emoji/font, không thay đàn đom đóm trang trí của nền động.
-- Mỗi nhóm đặc biệt/Lucky hợp lệ thử một lần: **1 huy hiệu100% để thử**,
-  **1 chữ30%**, **1 vé5%**, ba nhánh độc lập. Huy hiệu vẫn100% để thử,
-  chưa tự giảm xuống10%. Thẻ thường chưa có các drop này; vẫn giữ
-  **2Xu/cặp hoặc bộ ba** và tiến trình/thưởng mốc hiện hành. Triple dùng
-  nhóm có Lucky cho nhánh đặc biệt; không coi mọi bộ ba thường là đặc biệt.
-  Thưởng ghi bền ngay khi ghép, giữ kể cả thua/rời ván/offline; checkpoint
-  attempt/wave/group ngăn nhận lại qua reload/undo. Tối đa12loot cùng lúc.
+- Mỗi nhóm thủ công hợp lệ thử ba nhánh độc lập: thường chữ5%/vé2%/
+  huy hiệu6%; đặc biệt/Lucky/Magnet chữ25%/vé10%/huy hiệu30%. Thẻ thường
+  trúng quà không đổi phân loại. Giữ2Xu/nhóm và tiến trình/thưởng mốc.
+  Thưởng ghi bền ngay khi ghép, giữ kể cả thua/rời ván/offline;
+  checkpoint attempt/wave/group và ledger gameplay ngăn farm reload/undo.
+  Tối đa12loot gồm năng lượng/hỗ trợ/chữ/vé/huy hiệu cùng lúc.
 - Sưu tập huy hiệu cá nhân quay vòng, không mùa/reset/countdown/cap ngày.
   **25 huy hiệu:50Xu; 50:100Xu +1Rương C; 75:1Rương Khung;
   100:1Rương Avatar.** Nhận đủ bốn mốc theo bất kỳ thứ tự nào sang vòng
