@@ -1202,7 +1202,7 @@ async function commitTripleResolutionRewards({ luckyEvent, matchEvent, feedbackA
     milestones: resolved.next,
     rewards: requested,
     ticketDrop,
-    onSpecialDrop:ticketDrop?.special ? prepareLetterDropFeedback(feedbackAnchor,getTripleShell().scope) : undefined,
+    onSpecialDrop:ticketDrop ? prepareLetterDropFeedback(feedbackAnchor,getTripleShell().scope) : undefined,
   }));
   if (!committed) return null;
   if (generation !== roundGeneration) return null;

@@ -1,10 +1,9 @@
 # Rà soát Sự kiện/Nhiệm vụ và gameplay — 29/10/2026
 
-> Cập nhật sau đánh giá: chủ dự án đã chốt chữ **30% / bán10Xu**.
-> Đã cập nhật mã/rules source tại workspace; các mục3–4 bên dưới là
-> phép tính ở thời điểm audit trước thay đổi. Mục8 ghi trạng thái mới
-> và đề xuất ngoại hình còn chưa áp dụng. Không dùng số100%/1000Xu
-> trong phân tích lịch sử làm chính sách hiện hành.
+> Cập nhật30/10: luật hiện hành được ghi ở mục9. Các mục1–8 là
+> lịch sử audit/chính sách tại thời điểm29/10, gồm cả đề xuất đã được
+> triển khai sau đó. Không dùng số100%/1000Xu hoặc30% chỉ nhóm đặc biệt
+> trong các mục lịch sử làm chính sách hiện hành.
 
 Đây là **báo cáo đánh giá**, không là kế hoạch triển khai hoặc phê duyệt
 đổi giá/tỷ lệ. Chủ dự án giao kiểm tra hai task đã hoàn tất, phân tích
@@ -194,9 +193,9 @@ Chưa kiểm S22, mạng/provider/quảng cáo thật, tỷ lệ sinh thẻ th�
 vi dùng đồ. Những giới hạn này không phải lý do giữ plan đã hoàn tất
 như đang triển khai, cũng không cho phép tuyên bố kinh tế đã cân bằng.
 
-## 8. Chữ30%/10Xu đã chốt và đề xuất hoàn tất ngoại hình
+## 8. Lịch sử29/10: chữ30%/10Xu và đề xuất hoàn tất ngoại hình
 
-### Chính sách chữ hiện hành
+### Chính sách chữ tại thời điểm29/10
 
 Chủ dự án chốt30% rơi chữ từ nhóm đặc biệt/Lucky/Magnet hợp lệ của cả
 ba trò; chữ vẫn chọn đều17loại, độc lập vé/huy hiệu, không rơi từ nhóm
@@ -255,3 +254,37 @@ cập nhật theo hướng này29/10. Kế hoạch hiện hành là
 thường chữ5%/vé2%/huy hiệu6%; đặc biệt25%/10%/30%. Chưa triển khai các
 thay đổi đó, giá bán10Xu giữ nguyên. Các phép tính so sánh được in riêng
 bởi script phân tích, không bị dùng làm cấu hình runtime.
+
+## 9. Chính sách sau triển khai30/10 — hai nhóm và ngoại hình chưa có
+
+Nguồn phạm vi: `COSMETIC_COMPLETION_GROUP_DROPS_PLAN.md`; bằng chứng
+nghiệm thu task được ghi trong receipt riêng của kế hoạch. Mục này cập
+nhật mô hình, không thay thế kiểm tra runtime hoặc dữ liệu chơi thật.
+
+| Nhóm thủ công hợp lệ | Chữ | Vé quay | Huy hiệu thu thập |
+|---|---:|---:|---:|
+| Thường |5%|2%|6%|
+| Đặc biệt/Lucky/Magnet |25%|10%|30%|
+
+Ba nhánh độc lập; không cộng tỷ lệ để suy ra khả năng nhận quà. Xác suất
+ít nhất một quà thường12,486%, đặc biệt52,75%; cả ba cùng trúng0,006%
+và0,75%. Chữ chọn đều17loại, bán10Xu; receipt bán1000Xu cũ vẫn đọc và
+replay không cấp lại. Giữ năng lượng80/20, hỗ trợ5/10/30, quà mốc, Xu
+thủ công và kho9999/overflow10; không đổi giá hoặc số dư đã có.
+
+Scenario100nhóm90thường/10đặc biệt: kỳ vọng7chữ (bán70Xu),2,8vé
+(giá trị quay dài hạn42Xu, không bảo đảm từng vé),8,4huy hiệu. So với
+baseline3chữ/0,5vé/10huy hiệu ngay trước task, tổng huy hiệu giảm16%
+trong scenario này dù mở rơi nhóm thường. Đây không là telemetry hoặc
+chứng nhận cân bằng. Script `analyze-game-economy.mjs` đọc cả hai bảng
+hiện hành, không thêm telemetry, persistence hoặc mạng.
+
+Rương giữ20% nhánh ngoại hình nhưng chọn đều món chưa sở hữu đúng
+whitelist. Full pool đổi100Xu trước bốc category. Race sở hữu sau bốc
+vẫn chuyển món đã chọn thành100Xu, không reroll; candidate và receipt
+cũ được giữ. Từ kho trống chỉ mở rương cùng loại: kỳ vọng38/0,2=190
+rương Avatar/Khung,22/0,2=110rương Huy hiệu, so với mô hình chọn có
+lặp cũ khoảng803/406rương. Các số là trung bình, không trần bảo đảm.
+
+Không thêm pity/state/schema hoặc thay luật quà60phút. Chưa có S22
+vật lý hoặc telemetry tiêu hao thật để chứng nhận60FPS hay cân bằng.

@@ -2,6 +2,7 @@ import { createGameShellLifecycle, getActiveGameScope } from "./gameShellLifecyc
 import { prefersReducedMotion } from "../motion.js";
 
 export const EFFECT_LIMITS = Object.freeze({ loot: 16, coin: 32, score: 12, combo: 2, item: 12, highlight: 8, flip: 256, canvas: 4, connection: 1 });
+export const LOOT_REWARD_LIMIT = 12;
 const registries = new WeakMap();
 let menuRegistry;
 
@@ -16,6 +17,8 @@ export function createEffectRegistry(owner = null, limits = {}) {
     track(type, cleanup, { allowReducedMotion = false } = {}) {
       if (!(type in caps)) throw new TypeError(`Unknown effect: ${type}`);
       if (owner && !owner.active || (!allowReducedMotion && prefersReducedMotion()) || [...entries].filter(entry => entry.type === type).length >= caps[type]) return null;
+      // Energy, support, tickets, badges and letter feedback share one budget.
+      if ((type === "loot" || type === "item") && [...entries].filter(entry => entry.type === "loot" || entry.type === "item").length >= LOOT_REWARD_LIMIT) return null;
       const scope = createGameShellLifecycle();
       let releaseOwner;
       const entry = { type, scope, dispose() {
@@ -32,8 +35,7 @@ export function createEffectRegistry(owner = null, limits = {}) {
     diagnostics() { return Object.fromEntries(Object.keys(caps).map(type => [type, [...entries].filter(entry => entry.type === type).length])); },
   };
 }
-export function getEffectRegistry() {
-  const owner = getActiveGameScope();
+export function getEffectRegistry(owner = getActiveGameScope()) {
   if (!owner) return menuRegistry ||= createEffectRegistry();
   menuRegistry?.clear();
   if (!registries.has(owner)) registries.set(owner, createEffectRegistry(owner));

@@ -1,5 +1,6 @@
 import { LETTER_ALPHABET } from './config.js';
 import { playLootDrop } from '../lootEffects.js';
+import { getEffectRegistry } from '../gameShell/gameShellEffects.js';
 import { clearShellTimeout, getActiveGameScope } from '../gameShell/gameShellLifecycle.js';
 import '../../styles/letter-drop-feedback.css';
 
@@ -7,15 +8,16 @@ export const LETTER_FEEDBACK = Object.freeze({ duration:2500, reducedDuration:11
 const owners=new WeakMap();
 const positions=[0,-1,1,-2,2];
 
-/** Capture the old card position before a durable match can replace its board. */
+/** Persistence calls this before controllers replace their matched board. */
 export function prepareLetterDropFeedback(anchor,scope) {
-  if(!scope?.active || !anchor?.isConnected)return ()=>{};
-  const rect=anchor.getBoundingClientRect();
-  const origin={x:rect.left+rect.width/2,y:rect.top+rect.height/2};
   return outcome=>{
-    if(scope.active && outcome?.letter)showLetterDropFeedback(outcome.letter,origin,scope);
-    if(scope.active && outcome?.firefly)showTicketDropFeedback(origin,scope,'collection-badge');
-    if(scope.active && outcome?.ticket)showTicketDropFeedback(origin,scope);
+    if(!scope?.active || !anchor?.isConnected || !(outcome?.letter || outcome?.firefly || outcome?.ticket))return;
+    // Misses do not read layout. One source measurement serves all three hits.
+    const rect=anchor.getBoundingClientRect();
+    const origin={x:rect.left+rect.width/2,y:rect.top+rect.height/2};
+    if(outcome.letter)showLetterDropFeedback(outcome.letter,origin,scope);
+    if(outcome.firefly)showTicketDropFeedback(origin,scope,'collection-badge');
+    if(outcome.ticket)showTicketDropFeedback(origin,scope);
   };
 }
 
@@ -31,6 +33,9 @@ export function showLetterDropFeedback(letter,origin,scope) {
     scope.own(()=>{for(const entry of [...owner.entries])entry.dispose();root.remove();owners.delete(scope);},'node');
   }
   if(owner.entries.length>=LETTER_FEEDBACK.maxVisible)owner.entries[0].dispose();
+  let release;
+  const budget=getEffectRegistry(scope).track('item',()=>release(),{allowReducedMotion:true});
+  if(!budget)return;
   const slot=positions.find(position=>!owner.entries.some(entry=>entry.slot===position));
   const node=document.createElement('div');node.className='letter-drop-feedback__entry';
   node.dataset.rewardKind='letter';
@@ -40,10 +45,11 @@ export function showLetterDropFeedback(letter,origin,scope) {
   const label=document.createElement('span');label.className='letter-drop-feedback__label';label.textContent=`Đã nhận chữ ${letter}`;
   node.append(sprite,label);owner.root.append(node);
   const entry={slot,dispose:null};let animation=null,labelAnimation=null,timer=null;
-  entry.dispose=scope.own(()=>{
+  release=scope.own(()=>{
     animation?.cancel();labelAnimation?.cancel();timer?.();node.remove();
     const at=owner.entries.indexOf(entry);if(at>=0)owner.entries.splice(at,1);
   },'node');
+  entry.dispose=()=>budget.dispose();
   owner.entries.push(entry);
   const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
   if(reduced){

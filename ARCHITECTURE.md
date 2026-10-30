@@ -243,7 +243,7 @@ Home inert trong fade opacity180ms, rồi giải phóng ngay; reduced-motion/tab
 - gameplaySeason1 và IndexedDB3 cô lập dữ liệu thử cũ; namespace local/test/beta/production-waves1 cô lập cloud/profileStats/ranking với client cũ. Ranking wirev3 không đổi. Reset Firebase có backup/hash/updateTime precondition và kiểm kê; không phải công việc lặp mỗi startup/deploy.
 - Module settlement chỉ trả delta mastery cho lần thắng đầu; summary đọc tên/projection và điều hướng qua API map có owner, không click DOM giả hoặc tự claim. Bộ tranh/300Xu giữ độc lập với bốn rương.
 
-## Nhiệm vụ, rương và phần thưởng theo nhóm — contract hiện hành29/10/2026
+## Nhiệm vụ, rương và phần thưởng theo nhóm — contract hiện hành30/10/2026
 
 Hai task Sự kiện/Nhiệm vụ và rơi vật phẩm/Nam châm đã hoàn tất phạm vi
 web local. Các plan đã đóng được xóa; không dùng receipt/prompt lịch sử
@@ -276,13 +276,18 @@ game; đánh giá cân bằng mới ở `GAMEPLAY_ECONOMY_AUDIT.md`.
 - `liveops/chests.js` quản earned/spent/sequence/source watermark bốn
   loại, candidate bền trước publication, kết quả cuối replay không cấp
   lại. `chestConfig.js` là nguồn pool/rate và mốc Sưu tập huy hiệu; đủ
-  pool/ngoại hình trùng100Xu, overflow hỗ trợ10Xu/đơn vị tại kho9999.
+  pool100Xu; candidate mới giữ20% ngoại hình nhưng chọn đều món chưa có
+  đúng whitelist. Món đã bốc trở thành trùng trước commit vẫn đổi100Xu,
+  không reroll. Overflow hỗ trợ10Xu/đơn vị tại kho9999.
   Receipt cũ200/300/10000Xu vẫn đọc, không hồi tố ví.
 - Sưu tập huy hiệu giữ các key kỹ thuật `fireflyEarned`/`festival` và
   command/ID cũ, không migration chỉ vì đổi tên. Vé/chữ/huy hiệu từ
-  nhóm đặc biệt/Lucky/Magnet qua dropAdapters có attempt/wave/group
-  dedup; nhóm thường trúng năng lượng không trở thành đặc biệt.
-- Chữ hiện rơi30% và bán10Xu/chữ. `liveops/config.js` giữ giá mới và
+  cả nhóm thường và đặc biệt/Lucky/Magnet qua dropAdapters có attempt/
+  wave/group dedup cả trúng và trượt; Triple chỉ nhóm fresh, undo không
+  bốc lại. Ba nguồn độc lập: thường chữ5%/vé2%/huy hiệu6%; đặc biệt
+  chữ25%/vé10%/huy hiệu30%. Bảng do liveops/config.js sở hữu, không gộp
+  năng lượng/hỗ trợ hoặc đổi cờ special khi thẻ thường trúng quà.
+- Chữ bán10Xu/chữ. `liveops/config.js` giữ giá mới và
   danh sách giá receipt cũ được đọc; `letters.js` chỉ cấp giá mới khi
   tạo giao dịch, replay receipt1000Xu không cộng lại/định giá lại. Rules
   cho giao dịch mới sinh từ LETTER_SELL_COINS qua generator, không giữ

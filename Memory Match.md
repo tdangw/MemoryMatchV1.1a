@@ -333,3 +333,19 @@ Khi điều chỉnh cân bằng, sửa nguồn cấu hình tương ứng thay v�
 - Chính sách mới dùng năng lượng80/20, hỗ trợ5/10/30, không pity; không còn tỷ lệ100%/50% để kiểm thử.
 - Giới hạn kho9999; overflow gameplay10Xu/đơn vị. Không đổi giá shop hoặc thưởng thắng.
 - Khi chốt kinh tế chính thức cần đánh giá chung: Xu mỗi cặp, Xu cuối màn, giá cửa hàng, tần suất thẻ đặc biệt, tỷ lệ hỗ trợ và giá trị 10 mốc.
+
+## Quà sưu tập theo nhóm — cập nhật30/10/2026
+
+Mỗi nhóm ghép thủ công hợp lệ thử ba nguồn độc lập: nhóm thường có5%
+nhận1chữ,2% nhận1vé quay và6% nhận1huy hiệu thu thập; nhóm đặc biệt/
+Lucky/Nam châm có25%/10%/30% tương ứng. Có thể nhận nhiều loại cùng
+lượt hoặc không nhận loại nào. Nhiều dấu đặc biệt vẫn chỉ tính một nhóm;
+thẻ thường trúng quà không trở thành thẻ đặc biệt. Chữ chọn đều17loại,
+bán10Xu/chữ; vé và huy hiệu tích lũy. Giữ tỷ lệ năng lượng/hỗ trợ và
+quà mốc hiện hành. Phá phụ không rơi thêm; retry/undo/restore không bốc
+lại nhóm đã xử lý. Quà lưu cùng tiến độ trước khi hiện hiệu ứng.
+
+Rương ngoại hình giữ20% nhánh ngoại hình, chọn đều trong món chưa có
+đúng loại; đủ bộ đổi thẳng100Xu. Nhánh Xu/hỗ trợ và Rương C giữ nguyên.
+Nếu món quà đã được chọn trước đó nay đã có, đổi100Xu; không chọn lại.
+Candidate/receipt cũ vẫn tương thích; không tự trang bị hoặc xóa kho cũ.

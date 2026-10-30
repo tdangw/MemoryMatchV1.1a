@@ -141,7 +141,7 @@ export function openLiveopsPage(kind, surface = {}) {
     content.append(road);
     if(festivalChestsEnabled())content.append(button('Xem quà & Kho rương',openChests));
     content.append(button(getActiveGameScope()?'Quay lại ván chơi':'Chơi ngay',play,busy||Boolean(getActiveGameScope())),
-      el('p','liveops__guidance','Thu thập huy hiệu khi ghép nhóm thẻ đặc biệt. Huy hiệu được giữ kể cả khi thua. Nhận đủ bốn mốc để sang vòng mới và giữ huy hiệu dư; rương có thể mở sau.'));
+      el('p','liveops__guidance','Mỗi nhóm ghép thường có 6% cơ hội nhận huy hiệu; nhóm đặc biệt, Lucky hoặc Magnet có 30%. Huy hiệu được giữ kể cả khi thua. Nhận đủ bốn mốc để sang vòng mới và giữ huy hiệu dư; rương có thể mở sau.'));
   }
   function renderWheel() {
     const wheel = panel('Vòng quay may mắn'), stage = el('div', 'liveops__wheel');wheel.classList.add('liveops__wheel-card');
@@ -184,7 +184,7 @@ export function openLiveopsPage(kind, surface = {}) {
     for(const set of LETTER_SETS){const choice=button(set.label,()=>{selectedSetId=set.id;render();},false,`set-${set.id}`);choice.setAttribute('aria-pressed',String(selectedSetId===set.id));choices.append(choice);}
     const set=LETTER_SETS.find(item=>item.id===selectedSetId),letters=panel('Sưu tập chữ');letters.classList.add('liveops__recipe');
     const filled=letterSetSlots(set,counts).filter(slot=>slot.filled).length,total=Object.values(set.required).reduce((sum,n)=>sum+n,0);
-    letters.append(choices,el('h4','liveops__recipe-name',set.label),letterSlots(set,counts),progress(filled,total,`Số chữ ${set.label}`));
+    letters.append(el('p','liveops__guidance','Mỗi nhóm thường: 5% nhận chữ, 2% nhận vé quay. Nhóm đặc biệt, Lucky hoặc Magnet: 25% nhận chữ, 10% nhận vé. Các phần quà có thể cùng xuất hiện.'),choices,el('h4','liveops__recipe-name',set.label),letterSlots(set,counts),progress(filled,total,`Số chữ ${set.label}`));
     const reward=el('div','liveops__recipe-reward');
     if(festivalChestsEnabled())reward.append(createIcon('chest'),el('strong','',CHEST_NAMES[set.chestType]));
     else{const next=LETTER_REWARD_ITEMS.find(item=>item.id===view.nextLetterRewardId);reward.append(createIcon('chest'),el('strong','',next?next.name:`${LETTER_FALLBACK_COINS} Xu`));}

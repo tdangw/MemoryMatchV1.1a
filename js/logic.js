@@ -232,7 +232,7 @@ async function checkMatch(roundId) {
     const staged = stageMemorySession({ assetPaths: getActiveSession('memory-match', gameState.settings.mode)?.assetPaths || [] });
     if (!staged || !(await savePersistentGameData({ coins: totalCoins, progress: gameState.progress,
       ticketDrop,
-      onSpecialDrop: ticketDrop?.special ? prepareLetterDropFeedback(second.element,getMemoryShell().scope) : undefined }))) {
+      onSpecialDrop: ticketDrop ? prepareLetterDropFeedback(second.element,getMemoryShell().scope) : undefined }))) {
       if (gameState.roundId !== roundId) return;
       gameState.progress.memoryMatch = rollback.progress;
       for (const key of Object.keys(rollback)) if (key !== 'progress') gameState[key] = rollback[key];

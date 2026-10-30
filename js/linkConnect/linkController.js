@@ -587,7 +587,7 @@ async function handleLinkTileClick(position) {
   const staged = stageActiveSession('link-connect', createLinkSession());
   if (!staged || !await savePersistentGameData({ coins: gameState.coins, progress: gameState.progress,
     ticketDrop,
-    onSpecialDrop: ticketDrop?.special ? prepareLetterDropFeedback(getLinkShell().refs.root.querySelector(`[data-row="${position.row}"][data-column="${position.column}"]`),getLinkShell().scope) : undefined })) {
+    onSpecialDrop: ticketDrop ? prepareLetterDropFeedback(getLinkShell().refs.root.querySelector(`[data-row="${position.row}"][data-column="${position.column}"]`),getLinkShell().scope) : undefined })) {
     if (linkGameState.roundId === roundId) {
       gameState.coins = rollback.coins; gameState.progress.linkConnect = rollback.progress;
       Object.assign(linkGameState, rollback.state); linkGameState.isLocked = true; stopLinkComboWindow();
