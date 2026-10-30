@@ -1,3 +1,4 @@
+import { LOOT_PRESETS, LOOT_HOLD_MS } from '../lootEffects.js';
 import { createAdventureActionArt } from '../adventureActionArt.js';
 import { createIcon } from '../icons.js';
 import { publishHourlyGiftView, hourlyGiftRemaining } from './hourlyGiftViewState.js';
@@ -11,6 +12,10 @@ import { gameState } from '../gameState.js';
 import { refreshAppWallet } from '../appNavigation.js';
 import '../../styles/hourly-gift.css';
 const el = (tag,cls,text) => { const n=document.createElement(tag);n.className=cls;if(text!==undefined)n.textContent=text;return n; };
+export const GIFT_LOOT_TIMING = Object.freeze({
+  dropMs:LOOT_PRESETS.memory.dropMs, holdMs:LOOT_HOLD_MS,
+  flightMs:LOOT_PRESETS.memory.flightMs, revealDelayMs:700,
+});
 const supportIcons = {hint:'wand',preview4:'eye',time30:'timer',reshuffle:'shuffle',thunder:'energy',freeze:'snowflake',undo:'undo',shuffle:'shuffle',time:'timer'};
 function describe(reward) {
   if(reward.kind==='ticket')return {icon:'ticket',label:'1 Vé quay',target:'.adventure-map-shortcuts--events [aria-label="Sự kiện"]'};
@@ -34,13 +39,18 @@ async function revealGift(art,result,prize,owner) {
   animate(art,[{transform:'scale(.7)',opacity:0},{transform:'scale(1.06)',opacity:1,offset:.3},{transform:'scale(.96) rotate(-6deg)',offset:.5},{transform:'scale(1.03) rotate(6deg)',offset:.65},{transform:'scale(1) rotate(0deg)',opacity:1}],{duration:650});
   animate(art.querySelector('.hourly-gift__lid'),[{transform:'translateY(0)',opacity:1},{transform:'translateY(-15px) rotate(-15deg)',opacity:0}],{duration:320,delay:480,fill:'forwards'});
   animate(result,[{opacity:0,transform:'translateY(8px) scale(.9)'},{opacity:1,transform:'translateY(0) scale(1)'}],{duration:350,delay:700,fill:'both'});
+  const {dropMs,holdMs,flightMs,revealDelayMs}=GIFT_LOOT_TIMING;
+  const duration=dropMs+holdMs+flightMs,landOffset=dropMs/duration,collectOffset=(dropMs+holdMs)/duration;
   for(let i=0;i<count;i++){
     const p=el('span','hourly-gift-particle');p.append(createIcon(prize.icon));layer.append(p);
     const x=start.x-14,y=start.y-14,spread=count===1?0:(i-2.5)*18;
+    const landed=`translate(${x+spread}px,${y+18}px) scale(1)`;
     animate(p,[{opacity:0,transform:`translate(${x}px,${y}px) scale(.5)`,offset:0},
-      {opacity:1,transform:`translate(${x+spread}px,${y-48-(i%2)*14}px) scale(1)`,offset:.35},
-      {opacity:1,transform:`translate(${x+spread}px,${y+18}px) scale(1)`,offset:.58},
-      {opacity:0,transform:`translate(${end.x-14}px,${end.y-14}px) scale(.4)`,offset:1}],{duration:850,delay:700+i*24,fill:'both',easing:'ease-in-out'});
+      {opacity:1,transform:`translate(${x+spread*.6}px,${y-48-(i%2)*14}px) scale(1.06)`,offset:landOffset*.42},
+      {opacity:1,transform:landed,offset:landOffset},
+      {opacity:1,transform:landed,offset:collectOffset},
+      {opacity:0,transform:`translate(${end.x-14}px,${end.y-14}px) scale(.4)`,offset:1}],
+      {duration,delay:revealDelayMs+i*24,fill:'both',easing:'ease-in-out'});
   }
   const finish=()=>{for(const a of animations)if(a.playState!=='idle')a.finish();};
   scope.listen(reduced,'change',event=>{if(event.matches)finish();});scope.listen(document,'visibilitychange',()=>{if(document.hidden)finish();});
@@ -52,8 +62,8 @@ async function revealGift(art,result,prize,owner) {
 async function presentGiftOnMap(reward,owner) {
   const scope=createGameShellLifecycle(),release=owner.own(()=>scope.dispose());scope.own(()=>release.forget());
   const floating=el('div','hourly-gift-reveal'),art=createAdventureActionArt('gift'),result=el('div','hourly-gift__result');
-  floating.style.left=`${innerWidth/2}px`;floating.style.top=`${Math.max(70,Math.min(innerHeight*.35,innerHeight-190))}px`;
-  const prize=describe(reward);result.setAttribute('role','status');result.append(createIcon(prize.icon),el('strong','',`Đã nhận ${prize.label}`));floating.append(art,result);document.body.append(floating);scope.own(()=>floating.remove(),'node');
+  floating.style.left=`${innerWidth/2}px`;floating.style.top=`${Math.max(16,(innerHeight-260)/2)}px`;
+  const prize=describe(reward);result.setAttribute('role','status');result.append(createIcon(prize.icon),el('strong','',prize.label));floating.append(el('p','hourly-gift-reveal__title','Quà của bạn'),art,result);document.body.append(floating);scope.own(()=>floating.remove(),'node');
   try {
     await revealGift(art,result,prize,scope);
     if(scope.active)await new Promise(resolve=>{const cancel=scope.own(resolve);scope.timeout(()=>{cancel.forget();resolve();},1000);});

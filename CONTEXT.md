@@ -1,5 +1,27 @@
 # CONTEXT — Trạng thái hiện tại (2026-10-31)
 
+## Chấm báo quà và hiệu ứng nhận — cập nhật31/10/2026
+
+- Sửa nguyên nhân chấm Gift nằm cạnh Nhiệm vụ: từng shortcut có
+  position:relative, chấm đặt theo nút48px của chính icon, không theo nav.
+- Map Nhiệm vụ báo điểm danh/quà ngày/thưởng tuần chưa nhận; Sự kiện
+  báo lượt quay miễn phí/vé/bộ chữ đủ/mốc huy hiệu. Không báo quảng cáo,
+  bán hoặc ghép chữ. Chỉ dùng state đúng UID và kỳ máy chủ đã xác nhận.
+- Kho báu báo tier rương đủ điều kiện của nhóm10màn đang xem; Bộ sưu tập
+  báo300Xu bộ đủ của nhóm đó hoặc rương tồn kho chưa mở đúng tài khoản.
+  Theo đúng nơi shortcut mở, không quét thêm các chương cũ hoặc gọi mạng.
+  Sau commit/chuyển nhóm/đổi tài khoản/trở lại trang cập nhật chấm; map
+  sở hữu listener/timer/dot và hủy cùng map. Không đổi schema/save/quà.
+- Thẻ “Quà của bạn” dùng nền/viền/chữ theo skin, chữ thưởng kế thừa màu
+  tường minh. Đã kiểm màu trên5skin, tương phản>=4,5:1. Hiệu ứng dùng
+  timing Memory900msrơi/900msdừng/850msbay; tối đa6particle, hữu hạn,
+  hủy theo map/ẩn tab/giảm chuyển động; lưu thưởng trước hình ảnh.
+- Unit10/10 và UI7/7 đạt (gồm5skin×3viewport gift,10giây thật,
+  tương phản/timing, hủy/retry; Rương/Bộ sưu tập3trò×3viewport bật/tắt
+  sau nhận và vị trí chấm). JS/CSS/lifecycle/map-layout/build đạt;
+  review độc lập không phát hiện lỗi. Không rules/Hosting/APK lượt này;
+  chu kỳ10giây test vẫn giữ. Không commit ảnh/log thử.
+
 ## Quà tặng và popup — cập nhật31/10/2026
 
 - Chủ dự án yêu cầu tạm đổi chu kỳ Quà tặng bất ngờ từ60phút xuống

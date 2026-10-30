@@ -3,6 +3,7 @@ import { prefersReducedMotion } from "./motion.js";
 import { trackEffect } from "./gameShell/gameShellEffects.js";
 
 const activeLoot = new Map();
+export const LOOT_HOLD_MS = 900;
 export const LOOT_PRESETS = Object.freeze({
   memory: Object.freeze({ dropMs: 900, flightMs: 850, spread: 1 }),
   linkEnergy: Object.freeze({ dropMs: 1100, flightMs: 1050, spread: 1.2 }),
@@ -13,7 +14,7 @@ export function playLootDrop(source, {
   icon = "energy",
   tier = "teal",
   target = null,
-  holdMs = 900,
+  holdMs = LOOT_HOLD_MS,
   onSettled,
   onCollected,
   preset = "memory",

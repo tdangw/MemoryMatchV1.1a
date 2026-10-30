@@ -1,3 +1,8 @@
+import { mountAdventureRewardIndicators } from './adventureRewardIndicators.js';
+import { getAccountService } from './accountService.js';
+import { getRankingOwner } from './rankingOwner.js';
+import { trustedRewardPeriod } from './liveops/service.js';
+import { liveopsEnabled, festivalChestsEnabled } from './liveops/availability.js';
 import { mountHourlyGiftCountdown } from './liveops/hourlyGiftViewState.js';
 import '../styles/raised-actions.css';
 import { getPreviewDurationMs } from './config.js';
@@ -12,7 +17,7 @@ import { MAP_LEVEL_STEP, getMapLevelPoint, getMapChestPoint, createMapDecoration
 import { decorateAdventureMenu, refreshAppWallet, openMenuDestination } from "./appNavigation.js";
 import { prepareAdventureChapter } from "./adventureLaunch.js";
 import { createAdventureChapterNodes, getAdventureSummary, getAdventureLevelState, getAdventureChestState, isNormalAdventureMode } from "./adventureProgress.js";
-import { loadPersistentChapter } from "./persistence.js";
+import { loadPersistentChapter, subscribeToLocalCommit } from "./persistence.js";
 import { openJourneyTreasure } from './progression/treasureModal.js';
 import { createTreasureArt } from './progression/treasureArt.js';
 import { treasureDefinition } from './progression/treasureCatalog.js';
@@ -47,6 +52,7 @@ export function mountAdventureMap(gameId) {
   const adapter = adapters[gameId];
   if (!game || !adapter) throw new RangeError("Missing adventure navigation adapter.");
   const profile = gameState.progress[game.progressKey];
+  const mountedProfileId = getRankingOwner()?.profileId;
   const frontier = profile.adventure || getAdventureSummary(profile.bestByLevel);
   const view = views.get(gameId) || { mode: "easy", chapter: frontier.currentChapter, scroll: null };
   view.chapter = frontier.currentChapter;
@@ -84,7 +90,7 @@ export function mountAdventureMap(gameId) {
   let loading = false;
   let refreshGiftControl;
   function shortcut(label, icon, destination) {
-    const control = button('', 'adventure-map-shortcut'); control.setAttribute('aria-label',label); control.title=label; control.append(createAdventureActionArt(icon));
+    const control = button('', 'adventure-map-shortcut'); control.setAttribute('aria-label',label); control.title=label; control.dataset.mapDestination=destination; control.append(createAdventureActionArt(icon));
     let opening=false;
     if(destination==='hourly-gift')refreshGiftControl=mountHourlyGiftCountdown(control,scope,()=>loading||opening);
     scope.listen(control,'click',async()=>{
@@ -159,6 +165,21 @@ export function mountAdventureMap(gameId) {
   let extraLevels = [];
   let topLevel = view.chapter * 100;
   let bottomLevel = topLevel - 99;
+  const refreshRewardIndicators = mountAdventureRewardIndicators({
+    controls: { missions:eventShortcuts.querySelector('[data-map-destination="missions"]'), events:eventShortcuts.querySelector('[data-map-destination="events"]'),
+      treasure:treasureCard, collection:shortcuts.querySelector('[data-map-destination="collection"]') },
+    owner:scope, subscribeCommit:subscribeToLocalCommit, subscribeAccount:getAccountService()?.subscribe,
+    read:() => {
+      const identity=getAccountService()?.getIdentity(), rankingOwner=getRankingOwner();
+      const block=Number(treasureCard.dataset.block);
+      return { current:gameState.progress[game.progressKey]===profile && canLaunchGame()
+          && (!mountedProfileId || rankingOwner?.profileId===mountedProfileId)
+          && (!identity || rankingOwner?.profileId===identity.profileId && (!rankingOwner.uid || rankingOwner.uid===identity.uid)),
+        spark:gameState.appearance.spark, uid:identity?.uid, period:trustedRewardPeriod(), online:navigator.onLine,
+        enabled:liveopsEnabled(), festivalEnabled:festivalChestsEnabled(), block,
+        completed:{...adjacentBest,...profile.bestByLevel}, claim:profile.claimedChests[block] || adjacentChests[block] };
+    },
+  });
   const step = MAP_LEVEL_STEP;
   const position = level => getMapLevelPoint(gameId, level, topLevel);
   function mapNodes() {
@@ -186,6 +207,7 @@ export function mountAdventureMap(gameId) {
     const block = Math.floor((level-1)/10)+1;
     const treasure = projectJourneyTreasure({completed:{...adjacentBest,...profile.bestByLevel},block,claim:profile.claimedChests[block] || adjacentChests[block]});
     renderTreasureMapCard(treasureCard, treasure);
+    refreshRewardIndicators();
   }
   scope.listen(window, 'resize', updateTreasureCard);
   function patchNodes() {

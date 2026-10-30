@@ -209,7 +209,7 @@
 
 .adventure-map-shortcuts { position:absolute; z-index:3; left:2px; top:4px; display:flex; flex-direction:column; gap:0; }
 .adventure-map-shortcuts--events { --map-divider-first:44px; --map-divider-second:92px; left:auto; right:2px; top:44px; }
-.adventure-map-page .adventure-map-shortcuts > .adventure-map-shortcut { display:grid; place-items:center; box-sizing:border-box; width:48px; height:48px; min-height:48px; min-width:48px; margin:0; padding:8px; border:0; border-image:none; border-radius:8px; background:transparent; color:#fff1c9; box-shadow:none; }
+.adventure-map-page .adventure-map-shortcuts > .adventure-map-shortcut { position:relative; display:grid; place-items:center; box-sizing:border-box; width:48px; height:48px; min-height:48px; min-width:48px; margin:0; padding:8px; border:0; border-image:none; border-radius:8px; background:transparent; color:#fff1c9; box-shadow:none; }
 .adventure-map-shortcuts .treasure-map-card .treasure-art { width:30px; height:28px; }
 .adventure-map-shortcut[data-ready='true'] { outline:2px solid #bde786; outline-offset:-4px; }
 .adventure-map-shortcut:focus-visible { outline:2px solid #fff0b5; outline-offset:-2px; }
@@ -231,5 +231,5 @@ html[data-ui-skin='storybook'] :is(.adventure-map-view,.hourly-gift-dialog,.hour
 .adventure-gift-countdown { display:block; font:700 9px/10px 'Segoe UI',sans-serif; color:#fff0c4; white-space:nowrap; text-shadow:0 1px 2px #00151f; }
 
 .adventure-map-shortcut--gift[data-gift-cooling='true'] > .adventure-action-art { opacity:.4; filter:saturate(.35); }
-.adventure-gift-ready-dot { position:absolute; right:5px; top:5px; width:8px; height:8px; border:1px solid var(--map-art-light); border-radius:50%; background:#e85848; box-shadow:0 1px 3px #00151f; pointer-events:none; }
-.adventure-gift-ready-dot[hidden] { display:none; }
+.adventure-reward-dot, .adventure-gift-ready-dot { position:absolute; right:5px; top:5px; width:8px; height:8px; border:1px solid var(--map-art-light); border-radius:50%; background:#e85848; box-shadow:0 1px 3px #00151f; pointer-events:none; }
+.adventure-reward-dot[hidden], .adventure-gift-ready-dot[hidden] { display:none; }
