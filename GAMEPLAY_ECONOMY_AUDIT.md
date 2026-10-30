@@ -249,6 +249,9 @@ vẫn có thể nhiều lần chỉ nhận Xu/hỗ trợ. Không hứa5lần ch�
   trong mọi lần mở. Chưa đề xuất bảo đảm sau10rương vì cần thêm trạng
   thái và thay xác suất thực; chưa cần thêm độ phức tạp đó.
 
-**Chưa sửa chestCandidate/luật rương.** Chờ chủ dự án chọn phương án
-trước khi triển khai; các phép tính so sánh được in riêng bởi script
-phân tích, không bị dùng làm cấu hình runtime.
+**Chưa sửa chestCandidate/luật rương.** Chủ dự án đã giao lập kế hoạch
+cập nhật theo hướng này29/10. Kế hoạch hiện hành là
+`COSMETIC_COMPLETION_GROUP_DROPS_PLAN.md`, gồm bảng drop mới đã chốt:
+thường chữ5%/vé2%/huy hiệu6%; đặc biệt25%/10%/30%. Chưa triển khai các
+thay đổi đó, giá bán10Xu giữ nguyên. Các phép tính so sánh được in riêng
+bởi script phân tích, không bị dùng làm cấu hình runtime.

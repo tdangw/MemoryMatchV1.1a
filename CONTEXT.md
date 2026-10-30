@@ -1,5 +1,13 @@
 # CONTEXT — Trạng thái hiện tại (2026-10-29)
 
+## Kế hoạch mới: rương ưu tiên chưa có và drop theo nhóm — 29/10/2026
+
+- Ngày30/10 chủ dự án giao **triển khai toàn bộ và commit từng phase**. Nguồn duy nhất: `COSMETIC_COMPLETION_GROUP_DROPS_PLAN.md`. Rương giữ20% nhánh ngoại hình; trúng thì chọn đều món chưa sở hữu đúng loại; full pool100Xu, C/Xu/hỗ trợ/legacy candidate và receipt giữ nguyên. Chưa sửa runtime hoặc luật mở rương.
+- Tỷ lệ mục tiêu đã được chủ dự án chốt: **thường chữ5%/vé2%/huy hiệu6%; đặc biệt–Lucky–Magnet chữ25%/vé10%/huy hiệu30%**, ba nhánh độc lập cho cả ba trò. Giữ bán10Xu/chữ, không đổi năng lượng80/20 hoặc hỗ trợ5/10/30. Bảng này thay các tỷ lệ đề xuất tạm5/1/10 và30/5/100, không hỏi lại khi triển khai.
+- Đây là chính sách tương lai của task mới: code hiện vẫn chữ30%/vé5%/huy hiệu100% chỉ ở nhóm đặc biệt; nhóm thường chưa rơi ba nguồn này. Các mô tả runtime phía dưới giữ baseline đến khi task mới triển khai/kiểm chứng, không tự coi plan đã phát hành. Không cấp hồi tố nhóm đã ghép, không xóa chữ/vé/huy hiệu hoặc đổi Xu cũ.
+- Đã chỉ rõ mở nhánh normal trong resolver, marker cả trượt/undo và feedback hiện đang khóa special ở ba controller; không chỉ sửa hằng số. Tái dùng ownership/CAS/candidate/loot cap12, không thêm pity/backend/document từng drop. Phase P0/C1/D1/V1/Q1 và tiêu chí test/hiệu suất trong plan. Đang triển khai P0/C1/D1/V1/Q1; không tự deploy hoặc tạo APK.
+- Task Quà tặng bất ngờ đã hoàn tất; nguồn hiện hành là `HOURLY_GIFT_RECEIPT.md` và mục tương ứng bên dưới. Khi triển khai plan mới giữ logic quà/cooldown/server timestamp, tích hợp tuần tự các owner chung sparkModel/service/rules/generator; không ghi đè phần quà. Giữ các thay đổi QA/bản đồ có sẵn.
+
 ## Rà soát hai task, cân bằng và dọn tài liệu — 29/10/2026
 
 - Sự kiện/Nhiệm vụ/Kho rương và rơi vật phẩm/năng lượng/Nam châm đã hoàn tất chức năng web local; không còn kế hoạch triển khai active của hai task. Đánh giá hiện hành: `GAMEPLAY_ECONOMY_AUDIT.md`; bằng chứng trước: `EVENTS_MOBILE_FESTIVAL_RECEIPT.md`, `DROP_ENERGY_SPECIAL_CARDS_RECEIPT.md`.
