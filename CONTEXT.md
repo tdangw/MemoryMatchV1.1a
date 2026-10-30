@@ -1,5 +1,15 @@
 # CONTEXT — Trạng thái hiện tại (2026-10-31)
 
+## Popup chọn màn — mỹ thuật31/10/2026
+
+- Mô tả Vô tận/Thử thách bỏ khung/nền, chữ đậm vừa và cân dòng;
+  khoảng cách + đường phân cách mảnh tách khỏi các chỉ số. Không đổi nội dung.
+- Mọi popup chọn màn của3trò có họa tiết SVG đối xứng cạnh tiêu đề,
+  màu theo skin; không thêm nhân vật, thông tin hoặc hoạt ảnh từ ảnh tham khảo.
+- Giữ căn giữa, nút Chơi gọn và layout ngang hiện hành; không đổi logic/save.
+- UI180popup (3trò×3mode×5skin×4viewport), CSS ownership và build đạt.
+  Không deploy/APK hoặc thêm asset/animation.
+
 ## Chấm báo quà và hiệu ứng nhận — cập nhật31/10/2026
 
 - Sửa nguyên nhân chấm Gift nằm cạnh Nhiệm vụ: từng shortcut có

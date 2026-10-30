@@ -150,7 +150,8 @@
 .adventure-level-dialog .app-modal__title, .adventure-level-dialog .app-modal__close { color: #ffe1a0; }
 .adventure-level-dialog .app-modal__header, .adventure-level-dialog .app-modal__footer { border-color: #e9ce8e33; }
 .adventure-level-dialog .app-button--primary { min-height: 48px; background: var(--ui-primary); color: var(--ui-ink); }
-.adventure-level-preview > .adventure-level-goal { margin:0 0 10px; padding:10px 12px; border:1px solid var(--ui-line); border-radius:10px; background:var(--ui-inset); color:var(--ui-ink); font-size:12px; line-height:1.4; }
+#adventure-level-modal .adventure-level-preview > .adventure-level-goal { position:relative; margin:0 0 12px; padding:2px 4px 12px; border:0; border-radius:0; background:transparent; color:var(--ui-ink); font-size:13px; font-weight:600; line-height:1.5; text-align:center; text-wrap:balance; }
+#adventure-level-modal .adventure-level-goal::after { content:''; position:absolute; left:16px; right:16px; bottom:0; height:1px; background:linear-gradient(90deg,transparent,var(--ui-gold),transparent); opacity:.65; pointer-events:none; }
 .adventure-level-modes { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; padding: 0; border: 0; margin:0 0 12px; }
 .adventure-level-modes legend { width: 100%; margin-bottom:8px; text-align: center; color: #ffe1a0; font:700 17px/1.2 Georgia,serif; }
 .adventure-level-modes label { position: relative; width:48px; max-width:100%; justify-self:center; cursor: pointer; }
@@ -175,7 +176,10 @@
 .adventure-preview-theme { justify-self:end; min-height:32px; max-width:100%; padding:3px 6px; border:0; border-radius:5px; background:transparent; color:var(--ui-gold); font-family:inherit; font-size:13px; font-weight:700; line-height:1.2; text-decoration:underline; text-underline-offset:3px; cursor:pointer; }
 .adventure-preview-theme:focus-visible { outline:2px solid var(--ui-gold); outline-offset:1px; }
 #adventure-level-modal .adventure-level-dialog > .app-modal__header { position:relative; justify-content:center; min-height:52px; padding:4px 52px; margin:0; }
-#adventure-level-modal .adventure-level-dialog .app-modal__title { justify-content:center; text-align:center; margin:0; padding:0; font-size:20px; line-height:1.2; }
+#adventure-level-modal .adventure-level-dialog .app-modal__title { justify-content:center; text-align:center; margin:0; padding:0; gap:8px; font-size:20px; line-height:1.2; }
+#adventure-level-modal .adventure-level-dialog .app-modal__title::before,
+#adventure-level-modal .adventure-level-dialog .app-modal__title::after { content:''; display:block; width:24px; height:18px; flex:0 0 24px; background:var(--ui-gold,#d3bd88); mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 24'%3E%3Cpath d='M22 3l4 9-4 9-4-9zM1 12h15M7 7l9 5-9 5M26 12h5' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; pointer-events:none; }
+#adventure-level-modal .adventure-level-dialog .app-modal__title::after { transform:scaleX(-1); }
 #adventure-level-modal .adventure-level-dialog .app-modal__close { position:absolute; right:6px; top:4px; }
 #adventure-level-modal .adventure-level-dialog > .app-modal__body { padding:10px 14px; }
 #adventure-level-modal .adventure-level-dialog { padding-top:0; }
