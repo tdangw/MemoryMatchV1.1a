@@ -78,8 +78,8 @@ export function openLiveopsPage(kind, surface = {}) {
         try {const cached=await loadPersistentGameData();if(owns()&&cached.appearance.spark?.ownerUid===identity?.uid&&cached.appearance.spark.state){view={state:cached.appearance.spark.state,serverNow:Date.now()};observedAt=performance.now();}}
         catch {if(owns())status.textContent='Chưa đọc được bản lưu. Hãy tải lại trang.';return;}
       }
-      if (owns()) status.textContent = error.code === 'rewards/invalid-operation' ? error.message : error.code === 'rewards/not-enabled' ? 'Nhiệm vụ và vòng quay sắp mở.'
-        : 'Chưa thể cập nhật. Quyền nhận được giữ để thử lại khi kết nối.';
+      if (owns()) status.textContent = error.code === 'rewards/invalid-operation' ? error.message : error.code === 'rewards/not-enabled' ? 'Chưa mở được Nhiệm vụ và Sự kiện. Hãy thử lại sau.'
+        : 'Chưa thể cập nhật. Phần thưởng chưa nhận vẫn được giữ. Hãy kết nối và thử lại.';
       if (error.code !== 'rewards/not-enabled') console.warn('Liveops page operation unavailable', error.code || error.name);
     } finally { busy = false; if (active()&&renderOnFinish) render(); }
   }
@@ -129,7 +129,7 @@ export function openLiveopsPage(kind, surface = {}) {
     const banner=panel('Sưu tập huy hiệu');banner.classList.add('liveops__festival-hero');
     banner.append(createIcon('collection-badge'),el('strong','liveops__festival-round',festival?`Vòng ${festival.completedCycles+1}`:'Hành trình huy hiệu'));
     if(festival)banner.append(el('p','',`${available.toLocaleString('vi-VN')} huy hiệu · Mỗi vòng 100 huy hiệu`),progress(Math.min(available,100),100,'Huy hiệu đã thu thập'));
-    else banner.append(el('p','',festivalChestsEnabled()?'Kết nối để xem vòng và số huy hiệu đang có.':'Xem trước các mốc quà. Sưu tập huy hiệu sẽ sớm mở.'));
+    else banner.append(el('p','',festivalChestsEnabled()?'Kết nối để xem vòng và số huy hiệu đang có.':'Thu thập huy hiệu để nhận quà theo từng mốc.'));
     content.append(banner);
     const road=el('div','liveops__festival-road');
     for(const [index,item]of FESTIVAL_MILESTONES.entries()){

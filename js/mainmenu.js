@@ -290,7 +290,7 @@ export async function showCollectionModal({
       button.type = "button";
       button.className = "app-button app-button--purchase shop-buy-button";
       if (!playable) {
-        button.textContent = "Chờ ảnh";
+        button.textContent = "Không khả dụng";
         button.disabled = true;
       } else if (equipped) {
         button.classList.add("appearance-action--equipped");

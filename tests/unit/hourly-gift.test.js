@@ -15,7 +15,7 @@ test('equal categories and equal games select all supported items at boundaries'
   }
   assert.throws(()=>hourlyGiftCandidate(()=>1));
 });
-test('first claim, exact rolling hour, no accumulation and replay',()=>{
+test('first claim, exact rolling interval, no accumulation and replay',()=>{
   const first=claimHourlyGift(undefined,command(),now);assert.equal(first.applied,true);
   assert.equal(claimHourlyGift(first.state,command(),now).applied,false);
   assert.throws(()=>claimHourlyGift(first.state,command('second',2),now+HOURLY_GIFT_MS-1),/Chưa đến giờ/);

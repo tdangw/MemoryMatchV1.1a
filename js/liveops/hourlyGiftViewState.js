@@ -15,9 +15,18 @@ export function hourlyGiftRemaining() {
   const now=trusted?trusted.serverNow+performance.now()-trusted.observedAt:Date.now();
   return Math.max(0,claimedAt+HOURLY_GIFT_MS-now);
 }
-export function mountHourlyGiftCountdown(control,owner) {
-  const text=document.createElement('span');text.className='adventure-gift-countdown';text.setAttribute('aria-hidden','true');control.append(text);
-  control.classList.add('adventure-map-shortcut--gift');
-  const update=()=>{const seconds=Math.ceil(hourlyGiftRemaining()/1000),label=seconds?`${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`:'Sẵn sàng';text.textContent=label;control.title=`Quà tặng · ${label}`;};
+export function mountHourlyGiftCountdown(control,owner,isBlocked=()=>false) {
+  const text=document.createElement('span');text.className='adventure-gift-countdown';text.setAttribute('aria-hidden','true');
+  const dot=document.createElement('span');dot.className='adventure-gift-ready-dot';dot.setAttribute('aria-hidden','true');
+  control.append(text,dot);control.classList.add('adventure-map-shortcut--gift');
+  const update=()=>{
+    const seconds=Math.ceil(hourlyGiftRemaining()/1000);
+    const label=seconds?`${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`:'';
+    text.textContent=label;dot.hidden=seconds>0;
+    control.dataset.giftCooling=String(seconds>0);
+    control.disabled=isBlocked()||seconds>0;
+    control.title=seconds?`Quà tặng · ${label}`:'Quà tặng';
+  };
   listeners.add(update);owner.own(()=>listeners.delete(update));owner.interval(update,1000);update();
+  return update;
 }

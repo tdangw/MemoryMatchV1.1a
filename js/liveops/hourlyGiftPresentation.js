@@ -31,28 +31,28 @@ async function revealGift(art,result,prize,owner) {
   const layer=el('div','hourly-gift-particles');layer.setAttribute('aria-hidden','true');document.body.append(layer);scope.own(()=>layer.remove(),'node');
   const animations=[];
   const animate=(node,frames,options)=>{const a=node.animate(frames,options);scope.animation(a);animations.push(a);};
-  animate(art,[{transform:'scale(1)'},{transform:'scale(.92) rotate(-3deg)'},{transform:'scale(1.05)'},{transform:'scale(1)'}],{duration:450});
-  animate(art.querySelector('.hourly-gift__lid'),[{transform:'translateY(0)',opacity:1},{transform:'translateY(-15px) rotate(-15deg)',opacity:0}],{duration:320,delay:130,fill:'forwards'});
-  animate(result,[{opacity:0,transform:'translateY(8px) scale(.9)'},{opacity:1,transform:'translateY(0) scale(1)'}],{duration:350,delay:350,fill:'both'});
+  animate(art,[{transform:'scale(.7)',opacity:0},{transform:'scale(1.06)',opacity:1,offset:.3},{transform:'scale(.96) rotate(-6deg)',offset:.5},{transform:'scale(1.03) rotate(6deg)',offset:.65},{transform:'scale(1) rotate(0deg)',opacity:1}],{duration:650});
+  animate(art.querySelector('.hourly-gift__lid'),[{transform:'translateY(0)',opacity:1},{transform:'translateY(-15px) rotate(-15deg)',opacity:0}],{duration:320,delay:480,fill:'forwards'});
+  animate(result,[{opacity:0,transform:'translateY(8px) scale(.9)'},{opacity:1,transform:'translateY(0) scale(1)'}],{duration:350,delay:700,fill:'both'});
   for(let i=0;i<count;i++){
     const p=el('span','hourly-gift-particle');p.append(createIcon(prize.icon));layer.append(p);
     const x=start.x-14,y=start.y-14,spread=count===1?0:(i-2.5)*18;
     animate(p,[{opacity:0,transform:`translate(${x}px,${y}px) scale(.5)`,offset:0},
       {opacity:1,transform:`translate(${x+spread}px,${y-48-(i%2)*14}px) scale(1)`,offset:.35},
       {opacity:1,transform:`translate(${x+spread}px,${y+18}px) scale(1)`,offset:.58},
-      {opacity:0,transform:`translate(${end.x-14}px,${end.y-14}px) scale(.4)`,offset:1}],{duration:850,delay:350+i*24,fill:'both',easing:'ease-in-out'});
+      {opacity:0,transform:`translate(${end.x-14}px,${end.y-14}px) scale(.4)`,offset:1}],{duration:850,delay:700+i*24,fill:'both',easing:'ease-in-out'});
   }
   const finish=()=>{for(const a of animations)if(a.playState!=='idle')a.finish();};
   scope.listen(reduced,'change',event=>{if(event.matches)finish();});scope.listen(document,'visibilitychange',()=>{if(document.hidden)finish();});
-  cue('openBox');scope.timeout(()=>cue(prize.icon==='coin'?'coinDrop':'reward'),380);
+  cue('openBox');scope.timeout(()=>cue(prize.icon==='coin'?'coinDrop':'reward'),730);
   try {await Promise.all(animations.map(a=>a.finished));if(owner.active){art.classList.add('is-open');if(prize.icon==='coin')cue('coinCollect');}}
   catch(error){if(error.name!=='AbortError')console.warn('Gift presentation interrupted',error);}
   finally {for(const a of animations)a.cancel();scope.dispose();}
 }
-async function presentGiftOnMap(reward,origin,owner) {
+async function presentGiftOnMap(reward,owner) {
   const scope=createGameShellLifecycle(),release=owner.own(()=>scope.dispose());scope.own(()=>release.forget());
   const floating=el('div','hourly-gift-reveal'),art=createAdventureActionArt('gift'),result=el('div','hourly-gift__result');
-  floating.style.left=`${origin.x+origin.width/2}px`;floating.style.top=`${origin.y}px`;
+  floating.style.left=`${innerWidth/2}px`;floating.style.top=`${Math.max(70,Math.min(innerHeight*.35,innerHeight-190))}px`;
   const prize=describe(reward);result.setAttribute('role','status');result.append(createIcon(prize.icon),el('strong','',`Đã nhận ${prize.label}`));floating.append(art,result);document.body.append(floating);scope.own(()=>floating.remove(),'node');
   try {
     await revealGift(art,result,prize,scope);
@@ -77,8 +77,8 @@ export function openHourlyGift(owner) {
       publishHourlyGiftView(response);ready=true;refreshAppWallet();
       const reward=response.hourlyGiftResult;
       if(reward){
-        const origin=art.getBoundingClientRect();modal.close();await modal.whenClosed;
-        if(owner.active&&identityMatches())await presentGiftOnMap(reward,origin,owner);
+        modal.close();await modal.whenClosed;
+        if(owner.active&&identityMatches())await presentGiftOnMap(reward,owner);
       }
     } catch(error){if(current()){failed=true;claim.textContent='Thử lại';claim.disabled=false;showAppToast(error.code==='rewards/gift-cooldown'?'Quà chưa sẵn sàng. Hãy thử lại sau.':'Chưa kết nối được. Hãy đăng nhập và thử lại.');}}
     finally {busy=false;if(current())tick();}

@@ -229,3 +229,7 @@ html[data-ui-skin='storybook'] :is(.adventure-map-view,.hourly-gift-dialog,.hour
 .adventure-map-page .adventure-map-shortcuts > .adventure-map-shortcut--gift { grid-template-rows:28px 10px; align-content:center; gap:0; padding:3px; }
 .adventure-map-shortcut--gift > .adventure-action-art { width:28px; height:28px; }
 .adventure-gift-countdown { display:block; font:700 9px/10px 'Segoe UI',sans-serif; color:#fff0c4; white-space:nowrap; text-shadow:0 1px 2px #00151f; }
+
+.adventure-map-shortcut--gift[data-gift-cooling='true'] > .adventure-action-art { opacity:.4; filter:saturate(.35); }
+.adventure-gift-ready-dot { position:absolute; right:5px; top:5px; width:8px; height:8px; border:1px solid var(--map-art-light); border-radius:50%; background:#e85848; box-shadow:0 1px 3px #00151f; pointer-events:none; }
+.adventure-gift-ready-dot[hidden] { display:none; }

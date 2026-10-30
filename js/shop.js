@@ -580,7 +580,7 @@ function renderThemes(grid, roundId, modal, gameId) {
       button.textContent = "Sắp có";
       button.disabled = true;
     } else if (!playable) {
-      button.textContent = "Chờ ảnh";
+      button.textContent = "Không khả dụng";
       button.disabled = true;
     } else {
       button.append(

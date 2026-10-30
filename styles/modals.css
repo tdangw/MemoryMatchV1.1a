@@ -764,7 +764,7 @@ body.game-is-paused .shooting-star {
 
 /* Compact actions retain a comfortable target without stretching across the panel. */
 .app-modal[data-ui-surface] .app-modal__footer { justify-items: center; }
-.app-modal[data-ui-surface] .app-modal__footer .app-button { width: 100%; max-width: 208px; min-width: 0; min-height: 48px; padding: 10px 20px; }
+.app-modal[data-ui-surface] .app-modal__footer .app-button { width: fit-content; max-width: 100%; min-width: 0; min-height: 48px; padding: 10px 20px; }
 #game-exit-modal .app-modal__footer { grid-template-columns: minmax(0, 196px); justify-content: center; gap: 12px; padding: 16px 28px 26px; }
 #game-exit-modal .app-modal__footer .app-button { grid-column: auto; width: 100%; min-height: 48px; }
 #game-exit-modal .pause-settings { flex: 0 0 44px; width: 44px; height: 44px; box-sizing: border-box; padding: 0; display: grid; place-items: center; border: 1px solid var(--ui-line); border-radius: 12px; background: var(--ui-raised); color: var(--ui-ink); }
@@ -827,3 +827,7 @@ body.game-is-paused .shooting-star {
 :is(.app-modal, [role="dialog"], .level-reward-overlay .reward-container), :is(.app-modal, [role="dialog"], .level-reward-overlay .reward-container) * { scrollbar-width: none; }
 :is(.app-modal, [role="dialog"], .level-reward-overlay .reward-container)::-webkit-scrollbar, :is(.app-modal, [role="dialog"], .level-reward-overlay .reward-container) *::-webkit-scrollbar { display: none; width: 0; height: 0; }
 @media (prefers-reduced-motion: reduce) { #level-summary-modal .level-summary__star--earned { animation: none; } }
+
+/* Popup actions follow their label width while retaining a touch-sized height. */
+.app-modal .app-modal__footer { justify-items:center; }
+.app-modal .app-modal__footer > .app-button { width:fit-content; max-width:100%; min-width:0; padding-inline:24px; justify-self:center; }

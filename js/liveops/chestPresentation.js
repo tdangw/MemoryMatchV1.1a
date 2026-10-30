@@ -96,7 +96,7 @@ export function mountChestInventory(host, { owner, back, profile, gameId = 'memo
         result = data.appearance.spark?.ownerUid === identity?.uid ? { state:data.appearance.spark.state, ownedItemIds:ownedProfileCosmeticItems(data.appearance).map(item=>item.id) } : {state:null};
       } else result = await requestLiveops();
       if (!current()) return;
-      view = result; connected = navigator.onLine && !getActiveGameScope(); status.textContent = result.state?.chests ? 'Kho rương' : 'Kho rương sắp mở.';
+      view = result; connected = navigator.onLine && !getActiveGameScope(); status.textContent = result.state?.chests ? 'Kho rương' : 'Kết nối để xem Kho rương.';
     } catch(error) {
       connected = false;
       if(current()) {

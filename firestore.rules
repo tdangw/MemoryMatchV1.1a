@@ -226,7 +226,7 @@ service cloud.firestore {
         && g.keys().hasOnly(['version','sequence','claimedAt','last']) && g.version == 1
         && rewardInt(g.sequence) && g.sequence == (previous == null ? 1 : previous.sequence + 1)
         && g.claimedAt == request.time
-        && (previous == null || request.time >= previous.claimedAt + duration.value(60,'m'))
+        && (previous == null || request.time >= previous.claimedAt + duration.value(10,'s'))
         && r.keys().hasOnly(['operation','sequence','kind','coins','gameId','key'])
         && r.operation is string && r.operation.matches('^[A-Za-z0-9_-]{1,128}$') && r.sequence == g.sequence
         && (r.kind == 'ticket' ? r.coins == 0 && r.gameId == null && r.key == null

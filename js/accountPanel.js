@@ -165,14 +165,14 @@ export function showCloudConflictDialog({ root, cloud, choose }) {
   content.className = "account-conflict";
   const local = document.createElement("p");
   const remote = document.createElement("p");
-  local.textContent = describe("Bản máy", { coins: gameState.coins, progress: gameState.progress });
-  remote.textContent = cloud ? describe("Bản cloud", cloud) : "Cloud chưa có bản lưu.";
+  local.textContent = describe("Trên thiết bị", { coins: gameState.coins, progress: gameState.progress });
+  remote.textContent = cloud ? describe("Trực tuyến", cloud) : "Chưa có tiến trình trực tuyến.";
   const note = document.createElement("p");
-  note.textContent = "Chọn một bản để tiếp tục. Xu và vật phẩm không cộng gộp. Chọn cloud vẫn giữ bản máy trước đó để phục hồi; thành tích công khai đã gửi vẫn được giữ.";
+  note.textContent = "Chọn tiến trình để tiếp tục. Xu và vật phẩm không cộng gộp. Khi chọn bản trực tuyến, tiến trình trên thiết bị vẫn được giữ để khôi phục; thành tích trên bảng xếp hạng không thay đổi.";
   content.append(local, remote, note);
-  const modal = openAppModal({ id: "cloud-conflict-modal", title: "Chọn bản lưu", icon: "account", content, keepBanner: false, dismissible: false, closeOnBackdrop: false, closeOnEscape: false, onClose: closeCloudConflictDialog, actions: [
-    { label: "Dùng bản máy", variant: "primary", onClick: async close => { if (await choose("local")) close(); return false; } },
-    ...(root ? [{ label: "Dùng bản cloud", onClick: async close => { if (await choose("cloud")) close(); return false; } }] : []),
+  const modal = openAppModal({ id: "cloud-conflict-modal", title: "Chọn tiến trình", icon: "account", content, keepBanner: false, dismissible: false, closeOnBackdrop: false, closeOnEscape: false, onClose: closeCloudConflictDialog, actions: [
+    { label: "Trên thiết bị", variant: "primary", onClick: async close => { if (await choose("local")) close(); return false; } },
+    ...(root ? [{ label: "Trực tuyến", onClick: async close => { if (await choose("cloud")) close(); return false; } }] : []),
   ] });
   const view = { modal, release: null };
   activeConflict = view;

@@ -81,17 +81,20 @@ export function mountAdventureMap(gameId) {
   header.classList.remove('has-app-wallet');
   const shortcuts = document.createElement('nav'); shortcuts.className = 'adventure-map-shortcuts'; shortcuts.setAttribute('aria-label','Kho báu và Bộ sưu tập');
   const eventShortcuts = document.createElement('nav'); eventShortcuts.className = 'adventure-map-shortcuts adventure-map-shortcuts--events'; eventShortcuts.setAttribute('aria-label','Nhiệm vụ, Sự kiện và Quà tặng');
+  let loading = false;
+  let refreshGiftControl;
   function shortcut(label, icon, destination) {
     const control = button('', 'adventure-map-shortcut'); control.setAttribute('aria-label',label); control.title=label; control.append(createAdventureActionArt(icon));
-    if(destination==='hourly-gift')mountHourlyGiftCountdown(control,scope);
+    let opening=false;
+    if(destination==='hourly-gift')refreshGiftControl=mountHourlyGiftCountdown(control,scope,()=>loading||opening);
     scope.listen(control,'click',async()=>{
-      if(control.disabled)return;control.disabled=true;
+      if(control.disabled)return;opening=true;control.disabled=true;
       try {
         if(destination==='hourly-gift'){const {openHourlyGift}=await import('./liveops/hourlyGiftPresentation.js');if(scope.active&&!loading){control.disabled=false;control.focus();openHourlyGift(scope);}}
         else await openMenuDestination(root,destination);
       }
       catch(error) { if(scope.active)showAppToast('Chưa mở được trang. Hãy thử lại.'); console.warn('Map shortcut unavailable',error.code||error.name); }
-      finally { if(scope.active)control.disabled=loading; }
+      finally { opening=false;if(scope.active){if(destination==='hourly-gift')refreshGiftControl();else control.disabled=loading;} }
     });return control;
   }
   eventShortcuts.append(shortcut('Nhiệm vụ','missions','missions'),shortcut('Sự kiện','events','events'),shortcut('Quà tặng','gift','hourly-gift'));
@@ -119,6 +122,7 @@ export function mountAdventureMap(gameId) {
     ambient.setPaused(busy || root.dataset.mapReady !== 'true');
     for (const control of specials.children) control.disabled = busy;
     for (const control of [...shortcuts.querySelectorAll('button'),...eventShortcuts.querySelectorAll('button')]) control.disabled=busy;
+    refreshGiftControl();
     for (const control of document.querySelectorAll('#adventure-level-modal input')) {
       const level = Number(control.closest('fieldset').dataset.level);
       control.disabled = busy || !getDifficultyAccess({completed:profile.bestByLevel,level,mode:control.value}).unlocked;
@@ -128,7 +132,6 @@ export function mountAdventureMap(gameId) {
   }
   let chapterGeneration = 0;
   let renderedNodes = [];
-  let loading = false;
   let pendingTreasure = null;
   let pendingLevel = null;
   const readCollectionBlock = () => scope.active && gameState.progress[game.progressKey] === profile ? Number(treasureCard.dataset.block) || undefined : undefined;

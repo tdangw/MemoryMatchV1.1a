@@ -96,7 +96,7 @@ function showMemoryHelp() {
         <li>Ghép hết các cặp trước khi thời gian kết thúc.</li>
         <li>Ghép đúng liên tiếp để tăng điểm Combo.</li>
         <li>Mỗi cặp thường có 20% nhận năng lượng và 5% nhận hỗ trợ. Cặp đặc biệt có 80% nhận năng lượng; cặp Năng lượng có 30% nhận hỗ trợ, cặp May mắn có 10%. Hai phần thưởng rơi độc lập.</li>
-        <li>Vật phẩm Thời gian và Xem trước mua ở cửa hàng sẽ được cất vào kho trên HUD.</li>
+        <li>Vật phẩm Thời gian và Xem trước mua ở cửa hàng được cất trong kho công cụ để dùng khi cần.</li>
       </ul>` + PROGRESSION_HELP_CONTENT,
     "book",
     () => {},

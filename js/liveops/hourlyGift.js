@@ -1,6 +1,7 @@
 import { CHEST_SUPPORTS } from './chestConfig.js';
 import { GAMEPLAY_LIMITS } from '../gameplayTuning.js';
-export const HOURLY_GIFT_MS = 60 * 60 * 1000;
+// Temporary 10-second interval requested for gift testing; production policy is 60 minutes.
+export const HOURLY_GIFT_MS = 10 * 1000;
 const games = Object.freeze(Object.keys(CHEST_SUPPORTS));
 const integer = n => Number.isSafeInteger(n) && n >= 0;
 const operationId = value => typeof value === 'string' && /^[A-Za-z0-9_-]{1,128}$/.test(value);

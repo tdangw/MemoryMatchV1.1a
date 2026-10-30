@@ -1,3 +1,4 @@
+import { HOURLY_GIFT_MS } from '../js/liveops/hourlyGift.js';
 import { creditChestSupport } from '../js/liveops/supportInventory.js';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -36,23 +37,23 @@ try {
   assert.equal(state.tickets,1);
   const remote=await readSparkState(db,space,uid);assert.equal(typeof remote.state.hourlyGift.claimedAt,'number');
   assert(Math.abs(remote.state.hourlyGift.claimedAt-Date.now())<5000);
-  assert.throws(()=>transitionSpark(remote.state,command(2),{uid,now:remote.state.hourlyGift.claimedAt+3599999}));
+  assert.throws(()=>transitionSpark(remote.state,command(2),{uid,now:remote.state.hourlyGift.claimedAt+HOURLY_GIFT_MS-1}));
   const ref=doc(db,'gamespaces',space,'liveops',uid),root=doc(db,'gamespaces',space,'players',uid);
   const old=(await getDoc(ref)).data(),oldRoot=(await getDoc(root)).data();
   async function forged(gift){const batch=writeBatch(db);batch.set(root,{...oldRoot,revision:oldRoot.revision+1,rewardRevision:old.revision+1,updatedAt:serverTimestamp()});batch.set(ref,{...old,revision:old.revision+1,rootRevision:oldRoot.revision+1,updatedAt:serverTimestamp(),tickets:old.tickets+1,hourlyGift:gift});return batch.commit();}
   await assertFails(forged({...old.hourlyGift,sequence:2,claimedAt:serverTimestamp(),last:{...candidate,operation:'early',sequence:2}}));
   await assertFails(forged({...old.hourlyGift,sequence:2,claimedAt:Timestamp.fromMillis(0),last:{...candidate,operation:'backdated',sequence:2}}));
-  await env.withSecurityRulesDisabled(async context=>{const batch=writeBatch(context.firestore());batch.update(doc(context.firestore(),'gamespaces',space,'liveops',uid),{hourlyGift:{...old.hourlyGift,claimedAt:Timestamp.fromMillis(Date.now()-3601000)}});await batch.commit();});
+  await env.withSecurityRulesDisabled(async context=>{const batch=writeBatch(context.firestore());batch.update(doc(context.firestore(),'gamespaces',space,'liveops',uid),{hourlyGift:{...old.hourlyGift,claimedAt:Timestamp.fromMillis(Date.now()-HOURLY_GIFT_MS-1000)}});await batch.commit();});
   now=Date.now();accept(await commit(command(2)));assert.equal(state.tickets,2);
   accept(await commit({type:'login'}));assert.equal(state.hourlyGift.sequence,2);
   const beforeCoins=snapshot.profile.data.coins;
   for(const candidate of [{kind:'coins',coins:100,gameId:null,key:null},...['memory-match','link-connect','triple-connect'].map(gameId=>({kind:'support',coins:0,gameId,key:'hint'}))]){
-    await env.withSecurityRulesDisabled(async context=>{const adminRef=doc(context.firestore(),'gamespaces',space,'liveops',uid);const oldGift=(await getDoc(adminRef)).data().hourlyGift;const batch=writeBatch(context.firestore());batch.update(adminRef,{hourlyGift:{...oldGift,claimedAt:Timestamp.fromMillis(Date.now()-3601000)}});await batch.commit();});
+    await env.withSecurityRulesDisabled(async context=>{const adminRef=doc(context.firestore(),'gamespaces',space,'liveops',uid);const oldGift=(await getDoc(adminRef)).data().hourlyGift;const batch=writeBatch(context.firestore());batch.update(adminRef,{hourlyGift:{...oldGift,claimedAt:Timestamp.fromMillis(Date.now()-HOURLY_GIFT_MS-1000)}});await batch.commit();});
     now=Date.now();accept(await commit({type:'claimHourlyGift',operation:`branch-${state.hourlyGift.sequence+1}`,sequence:state.hourlyGift.sequence+1,candidate}));
   }
   assert.equal(snapshot.profile.data.coins,beforeCoins+100);
   for(const game of ['memoryMatch','linkConnect','tripleConnect'])assert.equal(snapshot.profile.data.progress[game].items.hint,1);
 
   const stranger=env.authenticatedContext('stranger').firestore();await assertFails(getDoc(doc(stranger,'gamespaces',space,'liveops',uid)));
-  console.log('Hourly gift emulator passed: atomic double claim, server time, early/backdated denial, next hour, existing actions and ownership.');
+  console.log('Hourly gift emulator passed: atomic double claim, server time, early/backdated denial, next interval, existing actions and ownership.');
 } finally {await env.cleanup();}

@@ -1,4 +1,27 @@
-# CONTEXT — Trạng thái hiện tại (2026-10-30)
+# CONTEXT — Trạng thái hiện tại (2026-10-31)
+
+## Quà tặng và popup — cập nhật31/10/2026
+
+- Chủ dự án yêu cầu tạm đổi chu kỳ Quà tặng bất ngờ từ60phút xuống
+  **10giây để test**. `HOURLY_GIFT_MS` là nguồn chung, generator sinh
+  thời gian rules từ đó; không đổi schema, quà, trọng số hoặc số dư.
+  Khi kết thúc test trả constant về60phút, sinh và deploy rules đồng bộ.
+- Rules10giây đã deploy thành công lên memorymatchv1-1a ngày31/10,
+  dùng quyền cập nhật rules tính năng quà đã được chủ dự án cho phép.
+  Không deploy Hosting hoặc tạo APK.
+- Tham khảo mã gift của Block Gems: icon mờ/khóa trong countdown, đủ
+  giờ chỉ hiện chấm báo, không chữ “Sẵn sàng”. Giữ vùng bấm48px và vị
+  trí đồng hồ. Khóa do tải map/import không bị tick mở lại.
+- Bấm icon mở popup; bấm Mở quà lưu xong mới đóng và mở hộp ở giữa
+  màn hình, rung/nắp mở rồi quà rơi/thu về đích. Tối đa6particle,
+  animation hữu hạn/owner map, reduced-motion/hidden/đổi trang hủy an toàn.
+- Chơi/Mở quà và nút footer popup gọn theo nội dung, căn giữa, giữ
+  chiều cao bấm44–48px. Rà popup: thay HUD/Chờ ảnh/sắp mở/Quyền nhận/
+  bản cloud bằng câu chữ sản phẩm; giữ thông báo kết nối/lưu thực tế.
+- Unit quà5/5, emulator quà (sớm/backdate/replay/race/các loại quà),
+  generator, CSS ownership, preview contract, JS và build web đạt.
+  UI quà kiểm5skin/3viewport, chờ10giây thật, retry/hủy; Play kiểm
+  3trò×5skin×4viewport (60popup). Ảnh/log thử không đưa vào commit.
 
 ## Rương ưu tiên chưa có và drop theo nhóm — hoàn tất30/10/2026
 
