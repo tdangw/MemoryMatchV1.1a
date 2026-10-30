@@ -1,3 +1,4 @@
+import { playRewardPhase } from '../rewardAudio.js';
 import { linkTicketDrop } from '../liveops/dropAdapters.js';
 import { prepareLetterDropFeedback } from '../liveops/letterDropFeedback.js';
 import { resolveLinkPairRewards } from './pairRewards.js';
@@ -609,7 +610,7 @@ async function handleLinkTileClick(position) {
   showComboEffect(matchedTiles[1] || matchedTiles[0], linkGameState.combo);
   animateCoinCounter(getLinkHudElements().coins, getLinkHudElements().coinBalance, previousCoins, gameState.coins);
   playCoinRewardFlight(matchedTiles[1] || matchedTiles[0], getLinkHudElements().coins, baseCoins + rewards.coins);
-  if (rewards.rewards.length) playOwnedRewardCue('reward', getLinkShell().scope, gameState.settings);
+  if (rewards.rewards.length) playRewardPhase('receive', getLinkShell().scope);
   for (const reward of rewards.rewards) {
     const anchor = matchedTiles[1] || matchedTiles[0];
     showGameplayRewardEffect(anchor, reward);

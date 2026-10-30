@@ -1,3 +1,10 @@
+import { mountAdventureRewardIndicators } from './adventureRewardIndicators.js';
+import { subscribeRewardPeriod } from './liveops/rewardPeriodViewState.js';
+import { trustedRewardPeriod } from './liveops/service.js';
+import { liveopsEnabled, festivalChestsEnabled } from './liveops/availability.js';
+import { subscribeToLocalCommit } from './persistence.js';
+import { getAccountService } from './accountService.js';
+import { getRankingOwner } from './rankingOwner.js';
 import { mountAppWallet } from './walletPresentation.js';
 import { setMeteorSceneEligible, suspendAmbientBackground } from './backgroundEffects.js';
 import { createIcon } from "./icons.js";
@@ -53,6 +60,20 @@ export function createAppDock(scope, { gameId = null, selected = null, onAction 
       } finally { if (scope.active) button.disabled = false; }
     });
     dock.append(button);
+  }
+  if (!gameId) {
+    const mountedProfileId=getRankingOwner()?.profileId;
+    mountAdventureRewardIndicators({
+      controls:{ missions:dock.querySelector('[data-dock-action="missions"]'), events:dock.querySelector('[data-dock-action="events"]') },
+      owner:scope, subscribeCommit:subscribeToLocalCommit, subscribePeriod:subscribeRewardPeriod, subscribeAccount:getAccountService()?.subscribe,
+      read:() => {
+        const identity=getAccountService()?.getIdentity(), rankingOwner=getRankingOwner();
+        return { current:(!mountedProfileId || rankingOwner?.profileId===mountedProfileId)
+            && (!identity || rankingOwner?.profileId===identity.profileId && (!rankingOwner.uid || rankingOwner.uid===identity.uid)),
+          spark:gameState.appearance.spark, uid:identity?.uid, period:trustedRewardPeriod(), online:navigator.onLine,
+          enabled:liveopsEnabled(), festivalEnabled:festivalChestsEnabled() };
+      },
+    });
   }
   return dock;
 }

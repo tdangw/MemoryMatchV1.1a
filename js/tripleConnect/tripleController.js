@@ -1,3 +1,4 @@
+import { playRewardPhase } from '../rewardAudio.js';
 import { disposeAppPage } from '../appPageLifecycle.js';
 import { tripleTicketDrop } from '../liveops/dropAdapters.js';
 import { prepareLetterDropFeedback } from '../liveops/letterDropFeedback.js';
@@ -546,7 +547,7 @@ return runRoundCommand(async () => {
       render(state);
       return;
     }
-    if (rewards.lucky.length || rewards.milestones.length) playOwnedRewardCue('reward', scope, gameState.settings);
+    if (rewards.lucky.length || rewards.milestones.length) playRewardPhase('receive', scope);
     roundLuckyRewards.push(...rewards.lucky);
     roundMilestoneRewards.push(...rewards.milestones);
     const roundWon = transition.events.some((event) => event.type === "round-won");

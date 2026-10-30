@@ -4,6 +4,7 @@ import { adventureRewardReadiness, mountAdventureRewardIndicators } from '../../
 import { initialSparkState } from '../../js/liveops/sparkModel.js';
 import { DAY_MS, DAILY, WEEKLY } from '../../js/liveops/model.js';
 import { LETTER_SETS } from '../../js/liveops/config.js';
+import { publishRewardPeriod, subscribeRewardPeriod } from '../../js/liveops/rewardPeriodViewState.js';
 
 const now = Date.UTC(2026,9,31,12), uid = 'reward-owner';
 const sample = () => {
@@ -48,11 +49,37 @@ test('events recognize free spin, tickets, complete letter recipes and each uncl
 });
 
 test('remote dots fail closed for offline, owner mismatch, stale or untrusted day/week and disabled feature', () => {
-  for (const alter of [input => { input.online=false; },input => { input.enabled=false; },input => { input.uid='other'; },input => { input.period=null; },input => { input.spark.ownerUid='other'; },input => { input.period={ uid,day:input.period.day+1 }; },input => { input.spark.state.week--; },input => { input.current=false; }]) {
+  for (const alter of [input => { input.online=false; },input => { input.enabled=false; },input => { input.uid='other'; },input => { input.spark.ownerUid='other'; },input => { input.current=false; }]) {
     const input = sample(); input.spark.state.loginDay--; input.spark.state.tickets = 1; alter(input);
     assert.equal(ready(input).missions,false); assert.equal(ready(input).events,false);
   }
   const input = sample(); input.spark.state.day = Math.floor((now+DAY_MS)/DAY_MS); assert.equal(ready(input).events,false);
+});
+
+test('durable event rewards survive an unknown or expired clock while free/login/missions remain period guarded', () => {
+  const input=sample(), state=input.spark.state;
+  state.spins.free=null; state.loginDay--; state.daily.matches=30;
+  input.period=null;
+  assert.equal(ready(input).events,false); assert.equal(ready(input).missions,false);
+  state.tickets=1; assert.equal(ready(input).events,true); state.tickets=0;
+  state.letters.counts={...LETTER_SETS[0].required}; assert.equal(ready(input).events,true); state.letters.counts={};
+  state.festival={earnedTotal:25,completedCycles:0,mask:0}; assert.equal(ready(input).events,true); state.festival.mask=1;
+  assert.equal(ready(input).events,false);
+  input.period={uid,day:state.day}; assert.equal(ready(input).events,true); assert.equal(ready(input).missions,true);
+  input.period.day++; assert.equal(ready(input).events,false); assert.equal(ready(input).missions,false);
+  state.tickets=1; assert.equal(ready(input).events,true);
+  input.period={uid,day:state.day}; state.week--; assert.equal(ready(input).missions,false);
+});
+
+test('a period confirmation with no save commit refreshes current owners and unsubscribes cleanly', () => {
+  const input=sample(); input.spark.state.spins.free=null; input.period=null;
+  const controls={missions:new Node(),events:new Node()},owner=ownerFixture();
+  mountAdventureRewardIndicators({ controls,owner,read:()=>input,subscribePeriod:subscribeRewardPeriod,
+    eventTarget:{},documentTarget:{ createElement:()=>new Node() } });
+  assert.equal(controls.events.dataset.rewardReady,'false');
+  input.period={uid,day:input.spark.state.day}; publishRewardPeriod(); assert.equal(controls.events.dataset.rewardReady,'true');
+  input.period=null; publishRewardPeriod(); assert.equal(controls.events.dataset.rewardReady,'false');
+  owner.dispose(); publishRewardPeriod(); assert.equal(controls.events.children.length,0);
 });
 
 test('treasure and collection use certified readiness for the exact viewed block, not unread cosmetics; collection also recognizes owned unopened inventory', () => {
@@ -100,7 +127,7 @@ test('mount refreshes after commit, account/visibility/period changes, reattache
     input.spark.state.tickets=1; commit({ patch:{ appearance:{} } }); assert.equal(controls.events.dataset.rewardReady,'true');
     refresh(); assert.equal(controls.events.getAttribute('aria-label'),'events'); assert.equal(controls.events.getAttribute('aria-description'),'Có quà chưa nhận');
     controls.treasure.children[0].remove(); refresh(); assert.equal(controls.treasure.children.length,1);
-    input.period=null; owner.tick(); assert.equal(controls.events.dataset.rewardReady,'false');
+    input.period=null; owner.tick(); assert.equal(controls.events.dataset.rewardReady,'true');
     input.period={ uid,day:input.spark.state.day }; account(); assert.equal(controls.events.dataset.rewardReady,'true');
     input.online=false; owner.event('offline'); assert.equal(controls.events.dataset.rewardReady,'false');
     input.online=true; owner.event('visibilitychange'); assert.equal(controls.events.dataset.rewardReady,'true');

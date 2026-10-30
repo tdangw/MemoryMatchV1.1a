@@ -1,3 +1,4 @@
+import { playRewardPhase } from '../rewardAudio.js';
 import { LETTER_ALPHABET } from './config.js';
 import { playLootDrop } from '../lootEffects.js';
 import { getEffectRegistry } from '../gameShell/gameShellEffects.js';
@@ -51,12 +52,14 @@ export function showLetterDropFeedback(letter,origin,scope) {
   },'node');
   entry.dispose=()=>budget.dispose();
   owner.entries.push(entry);
+  playRewardPhase('receive',scope);
   const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
   if(reduced){
     const handle=scope.timeout(entry.dispose,LETTER_FEEDBACK.reducedDuration);
     timer=()=>clearShellTimeout(handle);
     return;
   }
+  playRewardPhase('drop',scope);
   const target=sprite.getBoundingClientRect();
   const dx=origin.x-(target.left+target.width/2),dy=origin.y-(target.top+target.height/2);
   const startScale=LETTER_FEEDBACK.dropSize/target.width;
@@ -71,7 +74,7 @@ export function showLetterDropFeedback(letter,origin,scope) {
   ],{duration:LETTER_FEEDBACK.duration,easing:'ease-out',fill:'both'});
   labelAnimation=scope.animation(label.animate([{opacity:0,offset:0},{opacity:0,offset:.28},{opacity:1,offset:.36},{opacity:1,offset:.82},{opacity:0,offset:1}],
     {duration:LETTER_FEEDBACK.duration,fill:'both'}));
-  animation.finished.then(entry.dispose,entry.dispose);
+  animation.finished.then(()=>{playRewardPhase('collect',scope);entry.dispose();},entry.dispose);
 }
 
 export function showTicketDropFeedback(origin,scope,icon='ticket') {

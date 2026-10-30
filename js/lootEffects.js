@@ -1,3 +1,5 @@
+import { playRewardPhase } from './rewardAudio.js';
+import { getActiveGameScope } from './gameShell/gameShellLifecycle.js';
 import { createIcon } from "./icons.js";
 import { prefersReducedMotion } from "./motion.js";
 import { trackEffect } from "./gameShell/gameShellEffects.js";
@@ -26,8 +28,10 @@ export function playLootDrop(source, {
     if (!["dropMs", "flightMs"].includes(key) || !Number.isFinite(value) || value < 0 || value > 10000) throw new TypeError(`Invalid loot timing: ${key}`);
   }
   const strategy = { ...base, ...timing };
+  const audioOwner=getActiveGameScope();
   if (!source) { onSettled?.(); onCollected?.(); return null; }
   if (prefersReducedMotion()) {
+    playRewardPhase('receive',audioOwner);
     onSettled?.();
     onCollected?.();
     return null;
@@ -51,7 +55,8 @@ export function playLootDrop(source, {
   element.style.top = `${startY}px`;
   document.body.append(element);
   const lifecycle = entry.scope;
-  activeLoot.set(element, { lifecycle, entry });
+  playRewardPhase('receive',audioOwner);playRewardPhase('drop',audioOwner);
+  activeLoot.set(element, { lifecycle, entry, audioOwner });
 
   const drop = element.animate([
     { opacity: 0, transform: "translate(0,0) scale(.55) rotate(-12deg)" },
@@ -82,6 +87,7 @@ function collectLoot(element, { startX, startY, landX, landY, target, onCollecte
   ], { duration: targetRect ? flightMs : 360, easing: "cubic-bezier(.32,.62,.38,1)", fill: "forwards" });
   lifecycle.animation(animation);
   animation.finished.then(lifecycle.guard(() => {
+    playRewardPhase('collect',activeLoot.get(element)?.audioOwner);
     onCollected?.();
     removeLoot(element);
   }), () => {});

@@ -1,3 +1,4 @@
+import { subscribeRewardPeriod } from './liveops/rewardPeriodViewState.js';
 import { mountAdventureRewardIndicators } from './adventureRewardIndicators.js';
 import { getAccountService } from './accountService.js';
 import { getRankingOwner } from './rankingOwner.js';
@@ -168,7 +169,7 @@ export function mountAdventureMap(gameId) {
   const refreshRewardIndicators = mountAdventureRewardIndicators({
     controls: { missions:eventShortcuts.querySelector('[data-map-destination="missions"]'), events:eventShortcuts.querySelector('[data-map-destination="events"]'),
       treasure:treasureCard, collection:shortcuts.querySelector('[data-map-destination="collection"]') },
-    owner:scope, subscribeCommit:subscribeToLocalCommit, subscribeAccount:getAccountService()?.subscribe,
+    owner:scope, subscribeCommit:subscribeToLocalCommit, subscribePeriod:subscribeRewardPeriod, subscribeAccount:getAccountService()?.subscribe,
     read:() => {
       const identity=getAccountService()?.getIdentity(), rankingOwner=getRankingOwner();
       const block=Number(treasureCard.dataset.block);

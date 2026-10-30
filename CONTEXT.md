@@ -1,5 +1,30 @@
 # CONTEXT — Trạng thái hiện tại (2026-10-31)
 
+## Báo quà Sự kiện/Nhiệm vụ và âm thanh — cập nhật31/10/2026
+
+- Sửa chấm Sự kiện khi còn vé: vé/bộ chữ/mốc huy hiệu không bị chặn
+  vì chưa có kỳ giờ máy chủ. Lượt miễn phí và quà nhiệm vụ vẫn dùng kỳ
+  đúng UID đã xác nhận. Gắn chấm cả HOME/dock chức năng và map; bus
+  xác nhận giờ đánh thức UI ngay cả status không tạo local commit.
+  Không thêm gọi mạng hoặc save; nhận/tiêu quà cập nhật chấm theo state.
+- Nhiệm vụ/Sự kiện có rơi900ms/dừng900ms/bay850ms, toast nhỏ một dòng,
+  tối đa12particle. Xu/vé/rương/chữ/ngoại hình/hỗ trợ lấy từ facts vừa
+  commit. Vòng quay đợi dừng mới hiện quà; status/replay không phát lại.
+- Service trả committedRewards tạm, gom qua các pass đã publish; không
+  persist, không gửi lên Firebase, không đổi schema/quota/luật thưởng.
+  Tách visual owner theo trang thay vì dùng registry gameplay toàn cục.
+- Dùng âm thanh hiện có reward.ogg/coin_drop.mp3/coin-collect.mp3 cho
+  nhận/rơi/thu. Shared rewardAudio gom pha đồng thời100ms theo owner;
+  đồng bộ loot ba trò, chữ/vé/huy hiệu, Gift và quà Nhiệm vụ/Sự kiện.
+  Giữ coin-flight cũ đã có âm thanh; không thêm asset âm thanh. Âm cuối
+  thuộc page/round để không bị cắt khi node biến mất, đóng trang/ẩn/mute
+  vẫn dừng theo lifecycle và cài đặt âm lượng hiện hành.
+- Check/build đạt;37unit mục tiêu (7indicator+30rewards) và20UI
+  (4notification+5feedback+11Gift/letter) đạt, gồm600chu kỳ batch và
+  20lần HOME/map. Kiểm thứ tự âm thanh bằng audio-play spy, muted/close;
+  chưa đánh giá cảm nhận loa thiết bị thật. Không tăng I/O/Firebase writes.
+- Không deploy rules/Hosting/APK; chu kỳ Gift10giây test vẫn giữ.
+
 ## Nhận quà gọn trên bản đồ — cập nhật31/10/2026
 
 - Bỏ nền/viền/khung lớn và tiêu đề “Quà của bạn” sau khi nhận.

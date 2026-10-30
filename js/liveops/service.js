@@ -1,4 +1,6 @@
+import { publishRewardPeriod } from './rewardPeriodViewState.js';
 import { hourlyGiftCandidate } from './hourlyGift.js';
+import { committedRewardsForTransition, mergeCommittedRewards } from './rewardFeedbackModel.js';
 import { CHEST_TYPES, CHEST_VERSION } from './chestConfig.js';
 import { chestCandidate } from './chests.js';
 import { festivalChestsEnabled } from './availability.js';
@@ -18,15 +20,16 @@ import { publishCloudSnapshot, CloudConflictError } from '../cloudStore.js';
 import { encodeCloudSnapshot, stableJSON } from '../cloudSnapshot.js';
 import { normalizeAcquisitions } from '../progression/acquisitionModel.js';
 let running = null, clock = null, binding = null, statusTask = null;
+function updateClock(value) { clock = value; publishRewardPeriod(); }
 const pendingKey = identity => `sparkPending:${identity.environment}:${identity.uid}:${identity.profileId}`;
 export function bindLiveopsAccount(account) {
-  binding?.dispose(); clock = null;
+  binding?.dispose(); updateClock(null);
   if (!liveopsEnabled()) { binding = null; return () => {}; }
   const scope = createGameShellLifecycle(); binding = scope; let bound = null;
   const recover = () => void requestLiveops().catch(error => console.info('Rewards await connection', error.code || error.name));
   scope.own(account.subscribe(state => {
     const identity = account.getIdentity(), key = identity ? `${identity.uid}:${identity.profileId}` : null;
-    if (!key) { bound = null; clock = null; return; }
+    if (!key) { bound = null; updateClock(null); return; }
     if (state.conflict || ['connecting','restoring','syncing'].includes(state.phase)) return;
     if (key !== bound) { bound = key; recover(); }
   }));
@@ -52,11 +55,11 @@ export function bindLiveopsAccount(account) {
     clockRefresh=(async()=>{
       const backend=await getFirebaseBackend();if(!backend||!owns())return;
       const confirmed=await confirmSparkClock(backend.database,identity.environment,identity.uid,owns);
-      if(owns())clock={uid:identity.uid,profileId:identity.profileId,now:confirmed.timestamp,observedAt:performance.now(),observedWall:Date.now()};
+      if(owns())updateClock({uid:identity.uid,profileId:identity.profileId,now:confirmed.timestamp,observedAt:performance.now(),observedWall:Date.now()});
     })().catch(error=>console.info('Reward clock awaits connection',error.code||error.name)).finally(()=>{clockRefresh=null;});
   });
-  scope.listen(window, 'online', () => { clock = null; recover(); });
-  return () => { scope.dispose(); if (binding === scope) { binding = null; clock = null; } };
+  scope.listen(window, 'online', () => { updateClock(null); recover(); });
+  return () => { scope.dispose(); if (binding === scope) { binding = null; updateClock(null); } };
 }
 function clockNow(identity) {
   if(clock&&Math.abs((Date.now()-clock.observedWall)-(performance.now()-clock.observedAt))>2000)return null;
@@ -83,7 +86,7 @@ export function requestLiveops(command = { type: 'status' }) {
   void task.finally(() => { if (running === task) running = null; if(statusTask?.task===task)statusTask=null; }).catch(() => {});
   return task;
 }
-async function perform(command, pass = 0, expected = null, totals = {reads:0,writes:0,bytes:0,coins:0}) {
+async function perform(command, pass = 0, expected = null, totals = {reads:0,writes:0,bytes:0,coins:0}, committedRewards = []) {
   if(pass > 4 + Math.ceil(LETTER_ALPHABET.length / LETTER_SYNC_KEYS_PER_COMMIT)) throw new Error('Hãy tải lại tiến độ để hoàn tất đồng bộ.');
   const account = getAccountService(), initial = account?.getIdentity();
   if(expected && (initial?.uid!==expected.uid || initial?.profileId!==expected.profileId))throw new Error('Tài khoản đã thay đổi.');
@@ -106,7 +109,7 @@ async function perform(command, pass = 0, expected = null, totals = {reads:0,wri
     if (clockNow(identity) === null) {
       stored = await confirmSparkClock(backend.database, identity.environment, identity.uid, isCurrent);
       totals.reads+=stored.operations.reads;totals.writes+=stored.operations.writes;
-      clock = { uid: identity.uid, profileId: identity.profileId, now: stored.timestamp, observedAt: performance.now(), observedWall:Date.now() };
+      updateClock({ uid: identity.uid, profileId: identity.profileId, now: stored.timestamp, observedAt: performance.now(), observedWall:Date.now() });
     } else {stored = await readSparkState(backend.database, identity.environment, identity.uid);totals.reads++;}
     const now = clockNow(identity);
     if (now === null || !Number.isSafeInteger(now)) throw new Error('Chưa xác nhận được thời gian.');
@@ -151,7 +154,8 @@ async function perform(command, pass = 0, expected = null, totals = {reads:0,wri
         ticketEarned: initializing ? 0 : periodOnly || migrateOnly || sourcesOnly ? stored.state.ticketEarned : local.ticketEarned, letterEarned:initializing ? {} : earnedCandidate, randomLetter:operation?.randomLetter, ownedItemIds:ownedIds, festivalEnabled:festivalChestsEnabled()&&(!periodOnly||Boolean(stored.state.chests)),sourceEarned:sourcesOnly?sourceCounts:undefined,fireflyEarned:initializing||migrateOnly?0:periodOnly||sourcesOnly?(stored.state.festival?.earnedTotal||0):local.fireflyEarned,supportCount:['openChest','claimHourlyGift'].includes(action.type)&&action.candidate.kind==='support'?chestSupportCount(data.progress,action.candidate.gameId,action.candidate.key):0, facts: (initializing || periodOnly || migrateOnly || sourcesOnly ? [] : pending).filter(v => v.uid === identity.uid).map(v => v.fact) }); }
       catch(error) { if(!['rewards/inventory-full','rewards/gift-cooldown'].includes(error.code))error.code='rewards/invalid-operation'; throw error; }
       const changed = stableJSON(result.state) !== stableJSON(stored.state && cleanState(stored.state)) || pending.some(v => v.uid === identity.uid);
-      if (!changed) return { ...result, expiredOperation:resolved.discarded, operations:{...totals}, appliedCoins:totals.coins };
+      if (!changed) return { ...result, committedRewards, expiredOperation:resolved.discarded, operations:{...totals}, appliedCoins:totals.coins };
+      const feedback = committedRewardsForTransition(stored.state, result);
       result.state.revision = remoteRevision + 1;
       let added = 0;
       for (const receipt of result.receipts) {
@@ -171,6 +175,7 @@ async function perform(command, pass = 0, expected = null, totals = {reads:0,wri
         economyRevision:local.economyRevision+1, rewardRevision: remoteRevision, reward: { state: result.state, expectedRevision: remoteRevision, hourlyGiftClaim:result.hourlyGiftApplied },
         onStagePlan: jobs => updateSyncMetadata(`${identity.environment}:work:${identity.uid}`, () => ({ jobs }), isCurrent) });
       if(!published.cleanupError)await updateSyncMetadata(`${identity.environment}:work:${identity.uid}`,()=>({jobs:[]}),isCurrent);
+      committedRewards = mergeCommittedRewards(committedRewards, feedback);
       totals.reads+=published.reads;totals.writes+=published.writes;totals.bytes+=encoded.byteLength;totals.coins+=added;
       let viewState=result.state,viewNow=result.serverNow;
       if(result.hourlyGiftApplied){
@@ -184,7 +189,7 @@ async function perform(command, pass = 0, expected = null, totals = {reads:0,wri
           viewState={...result.state,hourlyGift:{...result.state.hourlyGift,claimedAt:viewNow}};
         }
       }
-      return { ...result, state:viewState, serverNow:viewNow, initializing, continueOperation:reconcileOnly && Boolean(migrateOnly || sourcesOnly && (operation||unappliedDrops||hasFacts) || operation || initializing && (unappliedDrops || hasFacts || newSources) || periodOnly && (unappliedDrops || hasFacts) || remainingLetterWork), expiredOperation:resolved.discarded, root: published.root, data, added, appliedCoins:totals.coins,
+      return { ...result, committedRewards, state:viewState, serverNow:viewNow, initializing, continueOperation:reconcileOnly && Boolean(migrateOnly || sourcesOnly && (operation||unappliedDrops||hasFacts) || operation || initializing && (unappliedDrops || hasFacts || newSources) || periodOnly && (unappliedDrops || hasFacts) || remainingLetterWork), expiredOperation:resolved.discarded, root: published.root, data, added, appliedCoins:totals.coins,
         operations: {...totals} };
     }, isCurrent);
   }); } catch(error) {
@@ -196,7 +201,7 @@ async function perform(command, pass = 0, expected = null, totals = {reads:0,wri
     throw error;
   }
   const continuation=result.continueOperation;delete result.data;delete result.added;
-  if (continuation) return perform(command,pass+1,initial,totals);
+  if (continuation) return perform(command,pass+1,initial,totals,committedRewards);
   if (operation) await saveSyncMetadata(key, null, () => account.getIdentity()?.profileId === initial.profileId);
   if (savedAd?.earned && operation?.operation === savedAd.operation)
     await saveSyncMetadata(`rewardedPending:${initial.uid}`, null, () => account.getIdentity()?.profileId === initial.profileId);

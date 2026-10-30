@@ -17,22 +17,25 @@ export function adventureRewardReadiness({ current = true, spark, uid, period, o
   const state = spark?.state;
   const ownsRemote = enabled && online && uid && spark?.ownerUid === uid && state;
   if (ownsRemote && festivalEnabled && state.chests) ready.collection ||= CHEST_TYPES.some(type => state.chests.earned[type] > state.chests.spent[type]);
-  if (!ownsRemote || period?.uid !== uid || state.day !== period.day
-    || state.week !== periods(period.day * DAY_MS).week) return ready;
-  ready.missions = state.loginDay !== state.day
-    || DAILY.some(item => state.daily[item.key] >= item.target && !state.daily.claimed.includes(item.id))
-    || WEEKLY.every(item => state.weekly[item.key] >= item.target) && !state.weekly.claimed.includes('bonus');
+  if (!ownsRemote) return ready;
   const letters = state.letters.counts;
   const letterSet = LETTER_SETS.some(set => Object.entries(set.required).every(([letter, count]) => (letters[letter] || 0) >= count));
   const festival = festivalEnabled ? state.festival : null;
   const badgeMilestone = festival && FESTIVAL_MILESTONES.some((item, index) =>
     festival.earnedTotal - festival.completedCycles * 100 >= item.points && !(festival.mask & (1 << index)));
-  ready.events = !state.spins.free || state.tickets > 0 || letterSet || Boolean(badgeMilestone);
+  // Tickets, recipes and badge milestones do not expire with the daily clock.
+  ready.events = state.tickets > 0 || letterSet || Boolean(badgeMilestone);
+  if (period?.uid !== uid || state.day !== period.day
+    || state.week !== periods(period.day * DAY_MS).week) return ready;
+  ready.missions = state.loginDay !== state.day
+    || DAILY.some(item => state.daily[item.key] >= item.target && !state.daily.claimed.includes(item.id))
+    || WEEKLY.every(item => state.weekly[item.key] >= item.target) && !state.weekly.claimed.includes('bonus');
+  ready.events ||= !state.spins.free;
   return ready;
 }
 
 /** The map owns all dots, subscriptions and the local period check. No network or save writes. */
-export function mountAdventureRewardIndicators({ controls, owner, read, subscribeCommit, subscribeAccount, eventTarget = window, documentTarget = document }) {
+export function mountAdventureRewardIndicators({ controls, owner, read, subscribeCommit, subscribeAccount, subscribePeriod, eventTarget = window, documentTarget = document }) {
   const dots = Object.fromEntries(Object.entries(controls).map(([key, control]) => {
     const dot = documentTarget.createElement('span'); dot.className = 'adventure-reward-dot';
     dot.setAttribute('aria-hidden','true'); dot.hidden = true; control.append(dot); return [key,dot];
@@ -56,6 +59,7 @@ export function mountAdventureRewardIndicators({ controls, owner, read, subscrib
     refresh();
   }));
   if (subscribeAccount) owner.own(subscribeAccount(refresh));
+  if (subscribePeriod) owner.own(subscribePeriod(refresh));
   owner.listen(eventTarget,'online',refresh); owner.listen(eventTarget,'offline',refresh);
   owner.listen(documentTarget,'visibilitychange',refresh);
   owner.interval(refresh,60000);

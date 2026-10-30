@@ -1,3 +1,4 @@
+import { createRewardFeedback, captureRewardOrigin } from './rewardFeedback.js';
 import { createWheelArt } from './wheelArt.js';
 import { loadPersistentGameData } from '../persistence.js';
 import { FESTIVAL_MILESTONES } from './chestConfig.js';
@@ -32,6 +33,7 @@ export function openLiveopsPage(kind, surface = {}) {
     icon: kind, content: root, onDestroy: () => scope.dispose() });
   modal.overlay.classList.add('liveops-page'); modal.panel.classList.add('liveops-surface'); root.classList.add(`liveops--${kind}`);
 
+  const rewardFeedback=createRewardFeedback({owner:scope,host:modal.panel});
   let view = null, tab = 'daily', busy = false, animation = null, presentedSpin = null, selectedLetter = LETTER_ALPHABET[0], eventTab = 'wheel', selectedSetId = 'adventure';
   let wheelRotor=null, wheelArt=null, confirmedView=false;
   const active = () => scope.active && root.isConnected;
@@ -48,6 +50,7 @@ export function openLiveopsPage(kind, surface = {}) {
     if(command?.type!=='status'&&!canClaim()){status.textContent='Kết nối và tải lại tiến độ để nhận thưởng.';return;}
     const identity = getAccountService()?.getIdentity();
     const owns = () => active() && getAccountService()?.getIdentity()?.profileId === identity?.profileId && getAccountService()?.getIdentity()?.uid === identity?.uid;
+    const rewardOrigin=captureRewardOrigin(root);
     let renderOnFinish=true;
     busy = true; if(view)render();else root.setAttribute('aria-busy','true'); status.textContent = 'Đang kết nối…';
     try {
@@ -72,6 +75,7 @@ export function openLiveopsPage(kind, surface = {}) {
           if (owns()) { rotor.style.transform = `rotate(${-receipt.sector * 45}deg)`; status.textContent = `Đã nhận ${receipt.coins} Xu.`; }
         }
       }
+      if(owns())rewardFeedback.present(result.committedRewards,rewardOrigin);
     } catch (error) {
       if(owns())confirmedView=false;
       if(owns()&&!view&&(!navigator.onLine||getActiveGameScope())){
