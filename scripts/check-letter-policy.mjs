@@ -3,22 +3,23 @@ import { LETTER_DROP_CHANCE, LETTER_SELL_COINS } from '../js/liveops/config.js';
 import { creditLetters, mutateLetters, normalizeLetters } from '../js/liveops/letters.js';
 import { applySpecialDrop } from '../js/liveops/sparkModel.js';
 
-assert.equal(LETTER_DROP_CHANCE, .3);
+assert.equal(LETTER_DROP_CHANCE, .25);
 assert.equal(LETTER_SELL_COINS, 10);
 for (const gameId of ['memory-match', 'link-connect', 'triple-connect']) {
-  for (const roll of [0, .299999, .3, .999999]) {
-    const input = { gameId, mode:'easy', attempt:'letter-policy', wave:1, group:'a|b|c', special:true };
-    const samples = [roll, 0];
-    const result = applySpecialDrop(undefined, input, { ticketRandom:()=>.99, letterRandom:()=>samples.shift() });
-    assert.equal(Boolean(result.letter), roll < .3);
-    assert.equal(Object.values(result.save.letterEarned).reduce((a,b)=>a+b,0), Number(roll < .3));
-    const fail = () => { throw new Error('Processed group must not reroll, including a miss.'); };
-    const replay = applySpecialDrop(result.save, input, { ticketRandom:fail, letterRandom:fail });
-    assert.equal(replay.letter, undefined);
-    assert.deepEqual(replay.save.letterEarned, result.save.letterEarned);
+  for (const special of [false, true]) {
+    const threshold = special ? .25 : .05;
+    for (const roll of [0, threshold - .000001, threshold, threshold + .000001, .999999]) {
+      const input = { gameId, mode:'easy', attempt:'letter-policy', wave:1, group:'a|b|c', special };
+      const samples = [roll, 0];
+      const result = applySpecialDrop(undefined, input, { ticketRandom:()=>.99, letterRandom:()=>samples.shift() });
+      assert.equal(Boolean(result.letter), roll < threshold);
+      assert.equal(Object.values(result.save.letterEarned).reduce((a,b)=>a+b,0), Number(roll < threshold));
+      const fail = () => { throw new Error('Processed group must not reroll, including a miss.'); };
+      const replay = applySpecialDrop(result.save, input, { ticketRandom:fail, letterRandom:fail });
+      assert.equal(replay.letter, undefined);
+      assert.deepEqual(replay.save.letterEarned, result.save.letterEarned);
+    }
   }
-  const fail = () => { throw new Error('Ordinary groups must not roll for letters.'); };
-  assert.equal(applySpecialDrop(undefined, {gameId,special:false}, {ticketRandom:fail,letterRandom:fail}).letter, undefined);
 }
 
 const fresh = creditLetters(undefined, {M:5});
@@ -41,4 +42,4 @@ assert.equal(next.coins, 10);
 assert.equal(next.state.counts.M, 2);
 assert.throws(()=>normalizeLetters({...legacy,last:{...legacy.last,coins:2001}}));
 assert.throws(()=>normalizeLetters({...legacy,last:{...legacy.last,coins:Number.MAX_SAFE_INTEGER+1}}));
-console.log('Letter policy passed: 30% special drops, 10 coins, legacy receipts and replay preserved.');
+console.log('Letter policy passed: 5% normal/25% special drops, 10 coins, legacy receipts and replay preserved.');

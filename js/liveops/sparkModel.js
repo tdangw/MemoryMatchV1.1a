@@ -1,8 +1,7 @@
 import { normalizeHourlyGift, claimHourlyGift } from './hourlyGift.js';
 import { normalizeChests, normalizeFestival, earnChest, claimFestival, openChest, creditSourceChests } from './chests.js';
-import { FIREFLY_DROP_CHANCE } from './chestConfig.js';
 import { normalizeLetterCounts, normalizeLetters, creditLetters, mutateLetters, exchangeLetterSet, nextLetterReward } from './letters.js';
-import { LETTER_DROP_CHANCE, LETTER_ALPHABET, ACTIVE_EVENT_COLLECTION_ID, eventCollection } from './config.js';
+import { GROUP_LOOT_DROP_RATES, LETTER_ALPHABET, ACTIVE_EVENT_COLLECTION_ID, eventCollection } from './config.js';
 import { DAY_MS, DAILY, WEEKLY, LOGIN, WHEEL, periods, normalizeFact } from './model.js';
 export const AD_DAILY_LIMIT = 10;
 export const EVENT_ID = 'firefly-festival-01';
@@ -79,7 +78,7 @@ export function applyTicketDrop(previous, input, random = secureUnit) {
 }
 export function applySpecialDrop(previous, { gameId, mode, attempt, wave, group, special }, {ticketRandom=secureUnit,letterRandom=secureUnit,fireflyRandom=secureUnit,dropLetters=true,dropFireflies=false}={}) {
   const save = normalizeSparkSave(previous);
-  if (!special) return { save, dropped: false };
+  const rates = GROUP_LOOT_DROP_RATES[special ? 'special' : 'normal'];
   const key = `${gameId}:${mode}`;
   if (!/^(memory-match|link-connect|triple-connect):(easy|normal|hard|superHard|challenge|endless)$/.test(key)
     || !id(attempt) || !integer(wave) || wave < 1 || typeof group !== 'string' || !group || group.length > 400) fail();
@@ -88,18 +87,18 @@ export function applySpecialDrop(previous, { gameId, mode, attempt, wave, group,
   if (marker.groups.includes(group)) return { save, dropped: false };
   if (marker.groups.length >= 1000) fail();
   const sample = ticketRandom(); if (!(sample >= 0 && sample < 1)) fail();
-  const dropped = sample < .05;
+  const dropped = sample < rates.ticket;
   marker.groups.push(group); save.drops[key] = marker;
   if (dropped) { save.ticketEarned++; if (!integer(save.ticketEarned)) fail(); }
   let letter=null;
   if(dropLetters){
     const chance=letterRandom();if(!(chance>=0&&chance<1))fail();
-    if(chance<LETTER_DROP_CHANCE){const choice=letterRandom();if(!(choice>=0&&choice<1))fail();
+    if(chance<rates.letter){const choice=letterRandom();if(!(choice>=0&&choice<1))fail();
       letter=LETTER_ALPHABET[Math.floor(choice*LETTER_ALPHABET.length)];save.letterEarned[letter]=(save.letterEarned[letter]||0)+1;
       if(!integer(save.letterEarned[letter]))fail();}
   }
   let firefly=false;
-  if(dropFireflies){const chance=fireflyRandom();if(!(chance>=0&&chance<1))fail();firefly=chance<FIREFLY_DROP_CHANCE;if(firefly){save.fireflyEarned++;if(!integer(save.fireflyEarned))fail();}}
+  if(dropFireflies){const chance=fireflyRandom();if(!(chance>=0&&chance<1))fail();firefly=chance<rates.badge;if(firefly){save.fireflyEarned++;if(!integer(save.fireflyEarned))fail();}}
   return { save, dropped, letter, firefly };
 }
 export function secureUnit() { const bytes = new Uint32Array(1); crypto.getRandomValues(bytes); return bytes[0] / 4294967296; }

@@ -1,3 +1,4 @@
+import { GROUP_LOOT_DROP_RATES } from './config.js';
 import { ACHIEVEMENT_ITEMS, EXTRA_COSMETIC_ITEMS } from '../progression/achievementCatalog.generated.js';
 import { LETTER_REWARD_ITEMS } from './letterCatalog.generated.js';
 export const CHEST_VERSION = 1;
@@ -15,7 +16,7 @@ export const CHEST_POOLS = Object.freeze(Object.fromEntries(['avatar','frame','b
 export const FESTIVAL_MILESTONES = Object.freeze([{ points:25, coins:50 }, { points:50, coins:100, chest:'c' },
   { points:75, coins:0, chest:'frame' }, { points:100, coins:0, chest:'avatar' }]);
 // Badge collection uses the legacy firefly save/rules keys to preserve existing progress.
-export const FIREFLY_DROP_CHANCE = 1;
+export const FIREFLY_DROP_CHANCE = GROUP_LOOT_DROP_RATES.special.badge;
 export const CHEST_SUPPORTS = Object.freeze({
   'memory-match': [{ key:'hint', label:'Gợi ý 1 lượt' }, { key:'preview4', label:'Xem trước 4 thẻ' }, { key:'time30', label:'+30 giây' }],
   'link-connect': [{ key:'hint', label:'Gợi ý' }, { key:'reshuffle', label:'Xáo trộn' }, { key:'thunder', label:'Sấm sét' }, { key:'freeze', label:'Đóng băng 30 giây' }],

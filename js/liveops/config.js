@@ -6,7 +6,13 @@ export const EVENT_COLLECTIONS = Object.freeze([
 export const ACTIVE_EVENT_COLLECTION_ID = 'firefly-festival-01';
 export function eventCollection(id) { return EVENT_COLLECTIONS.find(collection => collection.id === id); }
 
-export const LETTER_DROP_CHANCE = .3;
+// Per eligible manual pair/triple. Each source is sampled independently.
+export const GROUP_LOOT_DROP_RATES = Object.freeze({
+  normal: Object.freeze({ letter: .05, ticket: .02, badge: .06 }),
+  special: Object.freeze({ letter: .25, ticket: .10, badge: .30 }),
+});
+// Compatibility export for callers describing the special-group policy.
+export const LETTER_DROP_CHANCE = GROUP_LOOT_DROP_RATES.special.letter;
 export const LETTER_SELL_COINS = 10;
 // Historical sale receipts remain readable; new sales always use LETTER_SELL_COINS.
 export const LETTER_SALE_RECEIPT_PRICES = Object.freeze([LETTER_SELL_COINS, 1000]);
