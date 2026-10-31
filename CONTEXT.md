@@ -1,5 +1,14 @@
 # CONTEXT — Trạng thái hiện tại (2026-10-31)
 
+## Đang thực hiện: Sưu tập chữ và ghép bất kỳ —31/10/2026
+
+- Kế hoạch active duy nhất: LETTER_COLLECTION_FUSION_PLAN.md, yêu cầu
+  thay3chữ giống nhau bằng3đơn vị chữ bất kỳ, lặp khi đủ tồn; uniform17
+  đầu ra/có thể trùng và bán10Xu giữ. Bốn tab nhỏ/rương phải, kho dưới,
+  chạm chữ mở Ghép/Bán; bảng ghép3ô quanh tâm theo skin hiện có.
+- F1 model/rules và F2 UI có ownership riêng, giữ receipt/pending cũ;
+  không khôi phục các kế hoạch đã hoàn tất làm nguồn thực thi.
+
 ## Số mảnh Xu và ảnh Kho chữ — cập nhật31/10/2026
 
 - Hiệu ứng Xu của Gift/Nhiệm vụ/Sự kiện lấy số Xu thực nhận thay6mảnh
