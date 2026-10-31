@@ -50,13 +50,14 @@ export function openLiveopsPage(kind, surface = {}) {
     if(command?.type!=='status'&&!canClaim()){status.textContent='Kết nối và tải lại tiến độ để nhận thưởng.';return;}
     const identity = getAccountService()?.getIdentity();
     const owns = () => active() && getAccountService()?.getIdentity()?.profileId === identity?.profileId && getAccountService()?.getIdentity()?.uid === identity?.uid;
-    const rewardOrigin=captureRewardOrigin(root);
+    const spinHadFocus=spin&&document.activeElement?.dataset.focusKey==='spin-primary';
+    let rewardOrigin=captureRewardOrigin(root);
     let renderOnFinish=true;
-    busy = true; if(view)render();else root.setAttribute('aria-busy','true'); status.textContent = 'Đang kết nối…';
+    busy = true; if(view)render();else root.setAttribute('aria-busy','true'); status.textContent = kind==='events'&&eventTab==='wheel'?'':'Đang kết nối…';
     try {
       const result = rewarded ? await requestRewardedSpin() : await requestLiveops(command);
       if (!owns()) return;
-      observedAt = performance.now(); view = result; confirmedView=true; refreshAppWallet(); status.textContent = result.appliedCoins > 0 ? `Đã nhận ${result.appliedCoins} Xu.` : 'Đã cập nhật tiến độ.';
+      observedAt = performance.now(); view = result; confirmedView=true; refreshAppWallet(); status.textContent = kind==='events'&&eventTab==='wheel'?'':result.appliedCoins > 0 ? `Đã nhận ${result.appliedCoins} Xu.` : 'Đã cập nhật tiến độ.';
       if(result.letterResult?.kind==='exchange' && result.letterResult.chestType)status.textContent=`Đã nhận ${CHEST_NAMES[result.letterResult.chestType]}. Mở trong Kho rương khi bạn muốn.`;
       else if(result.letterResult?.kind==='exchange')status.textContent=result.letterResult.itemId?`Đã nhận ${LETTER_REWARD_ITEMS.find(item=>item.id===result.letterResult.itemId).name}.`:`Đã nhận ${result.letterResult.coins} Xu.`;
       if (command?.type === 'fuseLetter' && result.state.letters.last?.kind === 'fuse') status.textContent = `Đã nhận chữ ${result.state.letters.last.received}.`;
@@ -72,7 +73,12 @@ export function openLiveopsPage(kind, surface = {}) {
               { duration: 2400, easing: 'cubic-bezier(.14,.65,.2,1)', fill: 'forwards' });
             try { await animation.finished; } catch (error) { if (error.name !== 'AbortError') throw error; }
           }
-          if (owns()) { rotor.style.transform = `rotate(${-receipt.sector * 45}deg)`; status.textContent = `Đã nhận ${receipt.coins} Xu.`; }
+          if (owns()) {
+            rotor.style.transform = `rotate(${-receipt.sector * 45}deg)`;
+            const prize=rotor.querySelector(`[data-wheel-sector="${receipt.sector}"]`).getBoundingClientRect();
+            rewardOrigin={x:prize.left+prize.width/2,y:prize.top+prize.height/2};
+            status.textContent='';
+          }
         }
       }
       if(owns())rewardFeedback.present(result.committedRewards,rewardOrigin);
@@ -85,7 +91,7 @@ export function openLiveopsPage(kind, surface = {}) {
       if (owns()) status.textContent = error.code === 'rewards/invalid-operation' ? error.message : error.code === 'rewards/not-enabled' ? 'Chưa mở được Nhiệm vụ và Sự kiện. Hãy thử lại sau.'
         : 'Chưa thể cập nhật. Phần thưởng chưa nhận vẫn được giữ. Hãy kết nối và thử lại.';
       if (error.code !== 'rewards/not-enabled') console.warn('Liveops page operation unavailable', error.code || error.name);
-    } finally { busy = false; if (active()&&renderOnFinish) render(); }
+    } finally { busy = false; if (active()&&renderOnFinish) { render(); if(spinHadFocus)root.querySelector('.liveops__spin-primary:not(:disabled)')?.focus({preventScroll:true}); } }
   }
   function play() { if(getActiveGameScope())return; modal.destroy(); openGameMenu(getRecentGameId()); }
   let observedAt=performance.now(), timer=null, refreshDay=null;
@@ -148,23 +154,34 @@ export function openLiveopsPage(kind, surface = {}) {
       el('p','liveops__guidance','Mỗi nhóm ghép thường có 6% cơ hội nhận huy hiệu; nhóm đặc biệt, Lucky hoặc Magnet có 30%. Huy hiệu được giữ kể cả khi thua. Nhận đủ bốn mốc để sang vòng mới và giữ huy hiệu dư; rương có thể mở sau.'));
   }
   function renderWheel() {
-    const wheel = panel('Vòng quay may mắn'), stage = el('div', 'liveops__wheel');wheel.classList.add('liveops__wheel-card');
+    const wheel=el('section','liveops__card liveops__wheel-card'),stage=el('div','liveops__wheel');wheel.setAttribute('aria-label','Vòng quay');
     if(!wheelArt)wheelArt=createWheelArt();
     const rotor = wheelRotor || el('div', 'liveops__rotor');wheelRotor=rotor;
     if(!rotor.childElementCount){rotor.append(wheelArt.rotor);for(const [index,amount]of WHEEL.entries()){
-      const label=el('span','liveops__sector',String(amount));label.style.setProperty('--sector',index);rotor.append(label);
+      const label=el('span','liveops__sector',String(amount));label.style.setProperty('--sector',index);label.dataset.wheelSector=String(index);rotor.append(label);
     }}
     stage.append(rotor,wheelArt.rim,el('span','liveops__pointer'));stage.setAttribute('aria-label','Tám ô: 5, 10, 10, 15, 15, 20, 20, 25 Xu');
     const spin=view?.state.spins,last=presentedSpin||spin?.ticket||spin?.ads.at(-1)||spin?.free;
     if(last)rotor.style.transform=`rotate(${-last.sector*45}deg)`;
+    const source=!spin?.free?'free':view.state.tickets>0?'ticket':'ad';
+    const exhausted=source==='ad'&&(spin?.ads.length||0)>=10;
+    const labels={free:'Quay miễn phí',ticket:'Dùng 1 vé',ad:'Xem quảng cáo · Thêm 1 lượt'};
+    const unavailable=source==='ad'&&(exhausted||view?.adPending||!rewardedSpinAvailable());
+    const trigger=button('',()=>source==='ad'?void run(null,{spin:true,rewarded:true}):void run({type:'spin',source},{spin:true}),busy||!canClaim()||Boolean(unavailable),'spin-primary');
+    trigger.classList.add('liveops__spin-primary');trigger.dataset.spinSource=source;
+    trigger.setAttribute('aria-label',busy?'Đang quay':exhausted?'Đã hết lượt quảng cáo hôm nay':labels[source]);
+    trigger.append(el('strong','',busy?'Quay…':exhausted?'Hết lượt':source==='ad'?'Thêm lượt':'Quay'),
+      el('small','',busy?'':exhausted?'Hôm nay':source==='free'?'Miễn phí':source==='ticket'?'1 vé':'Quảng cáo'));
+    if(unavailable)trigger.title=exhausted?'Đã dùng 10 lượt quảng cáo hôm nay.':view?.adPending?'Đang xác nhận lượt thưởng.':'Chưa có quảng cáo. Hãy thử lại sau.';
+    stage.append(trigger);
     const primary=el('div','liveops__spin-actions'),ticketBalance=el('span','liveops__ticket-balance');
-    ticketBalance.append(createIcon('ticket'),el('span','',view?`Vé quay: ${view.state.tickets}`:'Vé quay: …'));
-    const free=button(spin?.free?'Đã quay miễn phí hôm nay':'Quay miễn phí',()=>void run({type:'spin',source:'free'},{spin:true}),busy||!canClaim()||Boolean(spin?.free));free.classList.add('liveops__spin-primary');primary.append(free,ticketBalance);
-    const secondary=el('div','liveops__spin-secondary');
-    secondary.append(button((spin?.ads.length||0)>=10?'Đã dùng 10 lượt quảng cáo hôm nay':view?.adPending?'Đang xác nhận lượt thưởng':'Xem quảng cáo · Thêm 1 lượt',()=>void run(null,{spin:true,rewarded:true}),busy||!canClaim()||(spin?.ads.length||0)>=10||view?.adPending||!rewardedSpinAvailable()),
-      button('Dùng 1 vé',()=>void run({type:'spin',source:'ticket'},{spin:true}),busy||!canClaim()||view.state.tickets<1));
-    const rules=el('details','liveops__rules');rules.append(el('summary','','Thể lệ'),el('p','','Mỗi ô có xác suất 12,5%. Một lượt miễn phí và tối đa 10 lượt quảng cáo mỗi ngày; vé quay dùng riêng, không hết hạn. Không mua thêm lượt.'));
-    wheel.append(stage,primary,secondary,rules);content.append(wheel);
+    ticketBalance.append(createIcon('ticket'),el('span','',view?`Vé quay: ${view.state.tickets}`:'Vé quay: …'));primary.append(ticketBalance);
+    const info=button('',()=>{
+      const text=el('p','','Mỗi ô có xác suất 12,5%. Một lượt miễn phí và tối đa 10 lượt quảng cáo mỗi ngày; vé quay dùng riêng, không hết hạn. Không mua thêm lượt.');
+      openAppModal({id:'wheel-rules-modal',title:'Thể lệ vòng quay',content:text,owner:scope,alignment:'center',keepBanner:true});
+    },busy,'wheel-rules');
+    info.classList.add('liveops__wheel-info');info.setAttribute('aria-label','Thể lệ vòng quay');info.append(createIcon('info'));
+    wheel.append(info,stage,primary);content.append(wheel);
     if(view){const set=LETTER_SETS.find(item=>item.id===selectedSetId),mini=panel('Sưu tập chữ');mini.classList.add('liveops__letter-mini');mini.append(el('strong','',set.label),letterSlots(set,view.state.letters.counts),button('Xem Sưu tập chữ',()=>{eventTab='letters';render();}));content.append(mini);}
     if(festivalChestsEnabled())content.append(button('Xem Kho rương',openChests));
   }

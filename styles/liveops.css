@@ -18,7 +18,6 @@ html .liveops button.tab-button, html .liveops__sale button.tab-button { min-hei
 .liveops__sector:nth-child(even) { color: #fff2c0; }
 .liveops__pointer { position: absolute; top: -6px; left: calc(50% - 12px); width: 24px; height: 36px; background: #b37817; clip-path: polygon(0 0, 100% 0, 50% 100%); }
 .liveops__status { min-height: 2.6em; }
-.liveops__rules summary { min-height: 44px; display: list-item; cursor: pointer; }
 @media (max-width: 360px) {
   .liveops__days { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
@@ -160,22 +159,23 @@ html .liveops-page .liveops-surface .liveops__mission-action button { width:100%
 .liveops__bonus-art > .ui-icon { width:76px; height:76px; }
 .liveops__countdown { justify-self:center; border:1px solid var(--lo-line); border-radius:24px; padding:5px 12px; background:var(--lo-inset); color:var(--lo-gold); font-size:13px; }
 .liveops-surface .liveops__guidance { color:var(--lo-muted); font-size:12px; }
-.liveops-surface .liveops__wheel-card { padding:10px 0 0; border:0; background:none; box-shadow:none; }
-.liveops__wheel-card > h3 { text-align:center; font-size:14px; color:var(--lo-muted); }
+.liveops-surface .liveops__wheel-card { position:relative; padding:32px 0 0; border:0; background:none; box-shadow:none; }
 .liveops-surface .liveops__wheel { width:min(100%,440px); margin:10px auto 14px; }
 .liveops-surface .liveops__rotor { border:0; background:none; }
 .liveops__wheel-art { position:absolute; inset:0; pointer-events:none; }
 .liveops__wheel-art--rim { z-index:2; }
 .liveops-surface .liveops__sector { z-index:1; width:40px; margin-left:-20px; margin-top:-10px; font-size:clamp(13px,4vw,20px); color:#fff3c2; text-shadow:0 1px 2px #45290c; transform:rotate(calc(var(--sector) * 45deg)) translateY(-35cqi); }
 .liveops-surface .liveops__pointer { top:2%; left:calc(50% - 9px); width:18px; height:29px; background:linear-gradient(90deg,var(--liveops-wheel-light),var(--liveops-wheel-dark)); z-index:3; }
-.liveops__spin-actions { display:flex; gap:10px; align-items:center; }
-html .liveops-page .liveops-surface .tab-button.liveops__spin-primary { flex:1; width:auto; font-size:clamp(16px,4.5vw,23px); background:linear-gradient(var(--lo-green-top),var(--lo-green-bottom)); border:2px solid var(--lo-line); }
-.liveops__ticket-balance { flex:none; padding:6px 8px; border:1px solid var(--lo-line); border-radius:22px; background:var(--lo-inset); font-size:13px; color:var(--lo-gold); }
-.liveops__ticket-balance > .ui-icon { width:23px; height:23px; }
-.liveops__spin-secondary { display:grid; grid-template-columns:minmax(0,1.5fr) minmax(0,1fr); gap:8px; }
-html .liveops-page .liveops-surface .liveops__spin-secondary button { font-size:12px; margin:4px 0; }
-.liveops__rules { margin-top:6px; font-size:12px; color:var(--lo-muted); }
-.liveops__rules summary { min-height:48px; padding:12px 6px; box-sizing:border-box; }
+.liveops__spin-actions { position:absolute; z-index:5; top:8px; left:0; display:flex; align-items:center; }
+html .liveops-page .liveops-surface .tab-button.liveops__spin-primary { position:absolute; z-index:4; left:50%; top:50%; transform:translate(-50%,-50%); display:flex; flex-direction:column; justify-content:center; gap:2px; flex:none; width:24%; height:24%; max-width:106px; max-height:106px; min-width:56px; min-height:56px; margin:0; padding:4px; border:2px solid var(--liveops-wheel-light); border-image:none; border-radius:50%; background:radial-gradient(circle at 35% 25%,var(--liveops-wheel-light),var(--liveops-wheel-sector-b)); color:#493014; box-shadow:0 2px 4px #42270b88,inset 0 0 0 3px #9b69294d; font-size:clamp(12px,3.5cqi,17px); line-height:1.1; text-shadow:0 1px #fff5; }
+.liveops__spin-primary > strong { color:inherit; font-size:inherit; white-space:nowrap; }
+.liveops__spin-primary > small { font-size:clamp(8px,2.6cqi,12px); color:inherit; line-height:1.1; white-space:nowrap; }
+html .liveops-page .liveops-surface .tab-button.liveops__spin-primary:active:not(:disabled) { transform:translate(-50%,-50%) scale(.97); }
+html .liveops-page .liveops-surface .tab-button.liveops__wheel-info { position:absolute; z-index:5; right:0; top:0; display:grid; place-items:center; width:48px; height:48px; min-height:48px; margin:0; padding:9px; border:0; border-image:none; border-radius:50%; background:transparent; box-shadow:none; color:var(--lo-gold); }
+.liveops__wheel-info > .ui-icon { width:28px; height:28px; }
+.liveops-surface .liveops__status:empty { display:none; }
+.liveops__ticket-balance { display:inline-flex; align-items:center; gap:4px; flex:none; padding:4px 6px; border:1px solid var(--lo-line); border-radius:22px; background:var(--lo-inset); font-size:12px; color:var(--lo-gold); }
+.liveops__ticket-balance > .ui-icon { width:18px; height:18px; }
 .liveops__letter-mini { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; align-items:center; }
 .liveops__letter-mini > h3,.liveops__letter-mini > .liveops__letter-slots { grid-column:1/-1; }
 .liveops-surface .liveops__letter-mini h3 { margin:0; color:var(--lo-gold); }

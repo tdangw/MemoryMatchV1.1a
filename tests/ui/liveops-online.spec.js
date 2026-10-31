@@ -45,7 +45,8 @@ test('Firestore login/spin survive interruption and reload; another account sees
     });
     expect(after).toEqual(before);
     await page.locator('[data-dock-action="events"]:visible').click();
-    await expect(page.getByRole('button', { name: 'Đã quay miễn phí hôm nay' })).toBeDisabled();
+    await expect(page.getByRole('button', { name: 'Quay miễn phí', exact:true })).toHaveCount(0);
+    await expect(page.locator('.liveops__spin-primary')).toHaveAttribute('data-spin-source','ad');
     await expect(page.getByRole('button', { name: 'Xem quảng cáo · Thêm 1 lượt' })).toBeDisabled();
     const uid = await page.evaluate(async () => {
       const { gameState } = await import('/js/gameState.js');
@@ -59,7 +60,8 @@ test('Firestore login/spin survive interruption and reload; another account sees
     await other.locator('[data-dock-action="events"]:visible').click();
     await expect(other.getByRole('button', { name: 'Quay miễn phí', exact: true })).toBeEnabled();
     await other.getByRole('button', { name: 'Quay miễn phí', exact: true }).click();
-    await expect(other.getByRole('button', { name: 'Đã quay miễn phí hôm nay' })).toBeDisabled();
+    await expect(other.getByRole('button', { name: 'Quay miễn phí', exact:true })).toHaveCount(0);
+    await expect(other.locator('.liveops__spin-primary')).toHaveAttribute('data-spin-source','ad');
     await other.getByRole('button', { name:'Xem vòng quay', exact:true }).click();
     await expect(other.locator('.liveops__rotor')).toBeVisible();
     expect(await other.locator('.liveops__rotor').evaluate(node => node.getAnimations().length)).toBe(0);

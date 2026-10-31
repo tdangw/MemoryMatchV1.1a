@@ -1,5 +1,22 @@
 # CONTEXT — Trạng thái hiện tại (2026-10-31)
 
+## Vòng quay với nút tâm — cập nhật31/10/2026
+
+- Bỏ tiêu đề lặp “Vòng quay may mắn” và dòng báo Xu thành công phía
+  trên vòng quay; chỉ giữ toast thưởng. Lỗi kết nối vẫn hiển thị rõ.
+- Một nút ở tâm tự chọn miễn phí → vé → xem quảng cáo. Chỉ trừ lượt
+  khi bấm và service xác nhận; khóa lúc bận, giữ focus sau khi quay.
+  Giữ8ô/12,5%,1free/ngày,10ad/ngày, quota và giao dịch hiện hành.
+- Vé quay nằm góc trái ngay dưới tab, trong khoảng riêng trên vòng;
+  icon thông tin(i) góc phải mở popup Thể lệ, không còn ba nút dưới vòng.
+- Xu rơi từ tọa độ ô trúng sau khi rotor dừng; tiếp tục dùng nhịp
+  900/900/850ms, toast một hàng và âm thanh nhận/rơi/thu hiện hành.
+- UI kiểm5skin×4viewport, thứ tự nguồn lượt, chống bấm đôi, quotaad,
+  tọa độ ô trúng, reduced-motion/đóng giữa vòng và focus bàn phím.
+  UI4test mục tiêu/CSS/syntax/build đạt. Assertion giao diện của test
+  online được cập nhật, không chạy lại emulator vì không đổi giao dịch.
+  Không đổi schema/save/rules, không deploy hoặc tạo APK.
+
 ## Báo quà Sự kiện/Nhiệm vụ và âm thanh — cập nhật31/10/2026
 
 - Sửa chấm Sự kiện khi còn vé: vé/bộ chữ/mốc huy hiệu không bị chặn
