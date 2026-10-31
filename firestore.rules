@@ -356,6 +356,32 @@ service cloud.firestore {
         && (n.event.claimed == o.event.claimed || rewardEventClaims(n.event));
     }
     function letterRequirement(setId,key) { return setId == 'memory-match' ? {"M":3,"E":1,"O":1,"R":1,"Y":1,"A":1,"T":1,"C":1,"H":1}.get(key,0) : setId == 'link-connect' ? {"L":1,"I":1,"N":3,"K":1,"C":2,"O":1,"E":1,"T":1}.get(key,0) : setId == 'triple-connect' ? {"T":2,"R":1,"I":1,"P":1,"L":1,"E":2,"C":2,"O":1,"N":2}.get(key,0) : setId == 'adventure' ? {"A":1,"D":1,"V":1,"E":2,"N":1,"T":1,"U":1,"R":1}.get(key,0) : 0; }
+    function fusionIngredients(r) {
+      return r.keys().hasAny(['ingredients']) ? r.ingredients : [r.letter,r.letter,r.letter];
+    }
+    function rewardFusionValue(n,o,ingredients,key) {
+      let spent = (ingredients[0] == key ? 1 : 0) + (ingredients[1] == key ? 1 : 0) + (ingredients[2] == key ? 1 : 0);
+      let old = o.counts.get(key,0);
+      let amount = n.counts.get(key,0);
+      return rewardInt(amount) && old >= spent && amount == old - spent + (n.last.received == key ? 1 : 0);
+    }
+    function rewardLetterFusion(n,o) {
+      let r = n.last;
+      let ingredients = fusionIngredients(r);
+      return n.keys().hasOnly(['counts','earned','sequence','last']) && n.counts is map && n.earned == o.earned
+        && n.counts.keys().hasOnly(['A','C','D','E','H','I','K','L','M','N','O','P','R','T','U','V','Y']) && rewardInt(n.sequence) && n.sequence == o.sequence + 1 && r.sequence == n.sequence
+        && r.keys().hasOnly(['kind','letter','ingredients','received','coins','sequence','operation'])
+        && r.kind == 'fuse' && r.received in ['A','C','D','E','H','I','K','L','M','N','O','P','R','T','U','V','Y'] && r.coins == 0
+        && r.operation is string && r.operation.matches('^[A-Za-z0-9_-]{1,128}$')
+        && (o.last == null || r.operation != o.last.operation)
+        && (r.keys().hasAny(['ingredients']) ? ingredients is list && ingredients.size() == 3
+          && ingredients.hasOnly(['A','C','D','E','H','I','K','L','M','N','O','P','R','T','U','V','Y']) && r.letter == ingredients[0] : r.letter in ['A','C','D','E','H','I','K','L','M','N','O','P','R','T','U','V','Y'])
+        && n.counts.diff(o.counts).affectedKeys().hasOnly(ingredients.concat([r.received]))
+        && rewardFusionValue(n,o,ingredients,ingredients[0])
+        && (ingredients[1] == ingredients[0] || rewardFusionValue(n,o,ingredients,ingredients[1]))
+        && (ingredients[2] in [ingredients[0],ingredients[1]] || rewardFusionValue(n,o,ingredients,ingredients[2]))
+        && (r.received in ingredients || rewardFusionValue(n,o,ingredients,r.received));
+    }
     function rewardLetterValue(n,o,key) {
       let amount = n.counts.get(key,0);
       let earned = n.earned.get(key,0);
@@ -369,7 +395,8 @@ service cloud.firestore {
     }
     function rewardLetters(n,o) {
       let changed = n.counts.diff(o.counts).affectedKeys().union(n.earned.diff(o.earned).affectedKeys());
-      return n.keys().hasOnly(['counts','earned','sequence','last']) && n.counts is map && n.earned is map
+      return n.sequence != o.sequence && n.last is map && n.last.kind == 'fuse' ? rewardLetterFusion(n,o)
+        : n.keys().hasOnly(['counts','earned','sequence','last']) && n.counts is map && n.earned is map
         && n.counts.keys().hasOnly(['A','C','D','E','H','I','K','L','M','N','O','P','R','T','U','V','Y']) && n.earned.keys().hasOnly(['A','C','D','E','H','I','K','L','M','N','O','P','R','T','U','V','Y'])
         && n.sequence is int && n.sequence >= o.sequence && n.sequence <= o.sequence + 1
         && (n.sequence == o.sequence ? n.last == o.last : n.last is map

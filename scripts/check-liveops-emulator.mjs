@@ -8,7 +8,8 @@ import { publishCloudSnapshot, readCloudRoot, readCloudSnapshot } from '../js/cl
 import { confirmSparkClock, readSparkState, sparkRef } from '../js/liveops/store.js';
 import { initialSparkState, transitionSpark, normalizeSparkSave } from '../js/liveops/sparkModel.js';
 if (!process.env.FIRESTORE_EMULATOR_HOST) throw Error('Isolated emulator required');
-const env=await initializeTestEnvironment({projectId:'demo-memory-match',firestore:{host:'127.0.0.1',port:8180,rules:fs.readFileSync('firestore.rules','utf8')}});
+const [emulatorHost,emulatorPort]=process.env.FIRESTORE_EMULATOR_HOST.split(':');
+const env=await initializeTestEnvironment({projectId:'demo-memory-match',firestore:{host:emulatorHost,port:Number(emulatorPort),rules:fs.readFileSync('firestore.rules','utf8')}});
 const uid='spark-integration', space='local-waves1', db=env.authenticatedContext(uid).firestore(), second=env.authenticatedContext(uid).firestore(), other=env.authenticatedContext('other-account').firestore();
 const snapshot=()=>({snapshotVersion:1,profile:{formatVersion:2,revision:1,data:{coins:100,appearance:{},progress:{},settings:{}}},chapters:[]});
 let saved=snapshot(), revision=0, state=null, now;

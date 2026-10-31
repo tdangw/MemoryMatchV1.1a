@@ -108,6 +108,32 @@ CHEST_CONTRACT
         && (n.event.claimed == o.event.claimed || rewardEventClaims(n.event));
     }
     function letterRequirement(setId,key) { return LETTER_REQUIREMENT_LOOKUP; }
+    function fusionIngredients(r) {
+      return r.keys().hasAny(['ingredients']) ? r.ingredients : [r.letter,r.letter,r.letter];
+    }
+    function rewardFusionValue(n,o,ingredients,key) {
+      let spent = (ingredients[0] == key ? 1 : 0) + (ingredients[1] == key ? 1 : 0) + (ingredients[2] == key ? 1 : 0);
+      let old = o.counts.get(key,0);
+      let amount = n.counts.get(key,0);
+      return rewardInt(amount) && old >= spent && amount == old - spent + (n.last.received == key ? 1 : 0);
+    }
+    function rewardLetterFusion(n,o) {
+      let r = n.last;
+      let ingredients = fusionIngredients(r);
+      return n.keys().hasOnly(['counts','earned','sequence','last']) && n.counts is map && n.earned == o.earned
+        && n.counts.keys().hasOnly(LETTER_KEYS) && rewardInt(n.sequence) && n.sequence == o.sequence + 1 && r.sequence == n.sequence
+        && r.keys().hasOnly(['kind','letter','ingredients','received','coins','sequence','operation'])
+        && r.kind == 'fuse' && r.received in LETTER_KEYS && r.coins == 0
+        && r.operation is string && r.operation.matches('^[A-Za-z0-9_-]{1,128}$')
+        && (o.last == null || r.operation != o.last.operation)
+        && (r.keys().hasAny(['ingredients']) ? ingredients is list && ingredients.size() == 3
+          && ingredients.hasOnly(LETTER_KEYS) && r.letter == ingredients[0] : r.letter in LETTER_KEYS)
+        && n.counts.diff(o.counts).affectedKeys().hasOnly(ingredients.concat([r.received]))
+        && rewardFusionValue(n,o,ingredients,ingredients[0])
+        && (ingredients[1] == ingredients[0] || rewardFusionValue(n,o,ingredients,ingredients[1]))
+        && (ingredients[2] in [ingredients[0],ingredients[1]] || rewardFusionValue(n,o,ingredients,ingredients[2]))
+        && (r.received in ingredients || rewardFusionValue(n,o,ingredients,r.received));
+    }
     function rewardLetterValue(n,o,key) {
       let amount = n.counts.get(key,0);
       let earned = n.earned.get(key,0);
@@ -121,7 +147,8 @@ CHEST_CONTRACT
     }
     function rewardLetters(n,o) {
       let changed = n.counts.diff(o.counts).affectedKeys().union(n.earned.diff(o.earned).affectedKeys());
-      return n.keys().hasOnly(['counts','earned','sequence','last']) && n.counts is map && n.earned is map
+      return n.sequence != o.sequence && n.last is map && n.last.kind == 'fuse' ? rewardLetterFusion(n,o)
+        : n.keys().hasOnly(['counts','earned','sequence','last']) && n.counts is map && n.earned is map
         && n.counts.keys().hasOnly(LETTER_KEYS) && n.earned.keys().hasOnly(LETTER_KEYS)
         && n.sequence is int && n.sequence >= o.sequence && n.sequence <= o.sequence + 1
         && (n.sequence == o.sequence ? n.last == o.last : n.last is map

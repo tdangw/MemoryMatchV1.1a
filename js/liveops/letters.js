@@ -3,6 +3,17 @@ import { LETTER_REWARD_ITEMS } from './letterCatalog.generated.js';
 import { LETTER_SETS, LETTER_FALLBACK_COINS, LETTER_ALPHABET, LETTER_SELL_COINS, LETTER_SALE_RECEIPT_PRICES } from './config.js';
 const integer = n=>Number.isSafeInteger(n)&&n>=0;
 const record = n=>n!==null&&typeof n==='object'&&!Array.isArray(n);
+const validIngredients = value => Array.isArray(value) && value.length === 3
+  && [0,1,2].every(index => LETTER_ALPHABET.includes(value[index]));
+function fusionIngredients(value, receipt = false) {
+  if (Object.hasOwn(value,'ingredients')) {
+    if (!validIngredients(value.ingredients) || (receipt ? value.letter !== value.ingredients[0] : Object.hasOwn(value,'letter')))
+      throw new Error('Chọn đủ 3 chữ để ghép.');
+    return [...value.ingredients];
+  }
+  if (!LETTER_ALPHABET.includes(value.letter)) throw new Error('Chữ không hợp lệ.');
+  return [value.letter,value.letter,value.letter];
+}
 export function normalizeLetterCounts(value = {}) {
   if(!record(value)||Object.keys(value).some(letter=>!LETTER_ALPHABET.includes(letter)||!integer(value[letter])))
     throw new Error('Bản lưu chữ chưa toàn vẹn. Dữ liệu được giữ nguyên.');
@@ -16,7 +27,10 @@ export function normalizeLetters(value) {
   if(last){
     if(!['sell','fuse','exchange'].includes(last.kind))throw new Error('Kết quả đổi chữ chưa được hỗ trợ.');
     if(last.kind==='sell'&&(!LETTER_ALPHABET.includes(last.letter)||!integer(last.quantity)||last.quantity<1||!integer(last.coins)||!LETTER_SALE_RECEIPT_PRICES.some(price=>last.coins===last.quantity*price)))throw new Error('Kết quả bán chữ chưa toàn vẹn.');
-    if(last.kind==='fuse'&&(!LETTER_ALPHABET.includes(last.letter)||!LETTER_ALPHABET.includes(last.received)||last.coins!==0))throw new Error('Kết quả ghép chữ chưa toàn vẹn.');
+    if(last.kind==='fuse'){
+      fusionIngredients(last,true);
+      if(!LETTER_ALPHABET.includes(last.received)||last.coins!==0)throw new Error('Kết quả ghép chữ chưa toàn vẹn.');
+    }
     if(last.kind==='exchange'&&!last.chestType&&(!LETTER_SETS.some(set=>set.id===last.setId)||(last.itemId===null?![LETTER_FALLBACK_COINS,10000].includes(last.coins):!LETTER_REWARD_ITEMS.some(item=>item.id===last.itemId)||last.coins!==0)))throw new Error('Kết quả đổi bộ chữ chưa toàn vẹn.');
   }
   if(last?.chestType && (last.kind!=='exchange'||!CHEST_TYPES.includes(last.chestType)||last.coins!==0||last.itemId!==null||!LETTER_SETS.some(set=>set.id===last.setId&&set.chestType===last.chestType)))throw new Error('Loại rương đổi chữ chưa toàn vẹn.');
@@ -36,19 +50,24 @@ export function mutateLetters(previous, command, randomLetter) {
   const state=normalizeLetters(previous);
   if(state.last?.operation===command.operation)return {state,coins:0,result:state.last};
   if(command.sequence!==state.sequence+1)throw new Error('Lượt đổi chữ đã được xử lý. Hãy tải lại kho chữ.');
-  const count=state.counts[command.letter]||0;
-  if(!LETTER_ALPHABET.includes(command.letter))throw new Error('Chữ không hợp lệ.');
   let coins=0,result;
   if(command.type==='sellLetter'){
+    if(!LETTER_ALPHABET.includes(command.letter))throw new Error('Chữ không hợp lệ.');
+    const count=state.counts[command.letter]||0;
     if(!Number.isSafeInteger(command.quantity)||command.quantity<1||command.quantity>count)throw new Error('Không đủ chữ để bán.');
     coins=command.quantity*LETTER_SELL_COINS;if(!integer(coins))throw new Error('Số Xu vượt giới hạn.');
     state.counts[command.letter]=count-command.quantity;
     result={kind:'sell',letter:command.letter,quantity:command.quantity,coins};
   }else if(command.type==='fuseLetter'){
-    if(count<3||!LETTER_ALPHABET.includes(randomLetter))throw new Error('Cần đủ 3 chữ giống nhau.');
-    state.counts[command.letter]=count-3;state.counts[randomLetter]=(state.counts[randomLetter]||0)+1;
+    const ingredients=fusionIngredients(command);
+    const required=ingredients.reduce((counts,letter)=>{counts[letter]=(counts[letter]||0)+1;return counts;},{});
+    if(!LETTER_ALPHABET.includes(randomLetter))throw new Error('Chữ nhận được không hợp lệ.');
+    for(const [letter,amount]of Object.entries(required))if((state.counts[letter]||0)<amount)throw new Error('Không đủ chữ đã chọn để ghép.');
+    for(const [letter,amount]of Object.entries(required))state.counts[letter]-=amount;
+    state.counts[randomLetter]=(state.counts[randomLetter]||0)+1;
     if(!integer(state.counts[randomLetter]))throw new Error('Kho chữ đã đầy.');
-    result={kind:'fuse',letter:command.letter,received:randomLetter,coins:0};
+    // Old clients require last.letter; it is a display/read hint, not the source quantity.
+    result={kind:'fuse',letter:ingredients[0],...(Object.hasOwn(command,'ingredients')?{ingredients}:{}),received:randomLetter,coins:0};
   }else throw new Error('Thao tác chữ không hợp lệ.');
   state.sequence++;state.last={...result,sequence:state.sequence,operation:command.operation};
   return {state,coins,result:state.last};
