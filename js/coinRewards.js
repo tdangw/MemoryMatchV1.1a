@@ -1,7 +1,7 @@
 import { getEffectRegistry, trackEffect } from "./gameShell/gameShellEffects.js";
 import { shellTimeout as setTimeout, shellFrame as requestAnimationFrame, cancelShellFrame as cancelAnimationFrame } from "./gameShell/gameShellLifecycle.js";
 import { createIcon } from "./icons.js";
-import { GAMEPLAY_TIMING } from "./gameplayTuning.js";
+import { GAMEPLAY_TIMING, COIN_PARTICLE_LIMIT } from "./gameplayTuning.js";
 import { prefersReducedMotion } from "./motion.js";
 import { getActiveGameScope } from './gameShell/gameShellLifecycle.js';
 import { gameState } from './gameState.js';
@@ -70,7 +70,7 @@ export function playCoinRewardFlight(source, target, amount, options = {}) {
   const durationVarianceMs = options.durationVarianceMs ?? 140;
   const fragment = document.createDocumentFragment();
   let arrived = 0;
-  const effects = Array.from({ length: Math.min(coinCount, 32) }, (_, index) => {
+  const effects = Array.from({ length: Math.min(coinCount, COIN_PARTICLE_LIMIT) }, (_, index) => {
     const effect = document.createElement("span");
     const entry = trackEffect("coin", () => removeCoinEffect(effect));
     if (!entry) return null;

@@ -1,3 +1,4 @@
+import { COIN_PARTICLE_LIMIT, COIN_SCATTER_ANGLE } from '../gameplayTuning.js';
 import { playRewardPhase } from '../rewardAudio.js';
 import { LOOT_PRESETS, LOOT_HOLD_MS } from '../lootEffects.js';
 import { createAdventureActionArt } from '../adventureActionArt.js';
@@ -20,7 +21,7 @@ export const GIFT_LOOT_TIMING = Object.freeze({
 const supportIcons = {hint:'wand',preview4:'eye',time30:'timer',reshuffle:'shuffle',thunder:'energy',freeze:'snowflake',undo:'undo',shuffle:'shuffle',time:'timer'};
 function describe(reward) {
   if(reward.kind==='ticket')return {icon:'ticket',label:'1 Vé quay',target:'.adventure-map-shortcuts--events [aria-label="Sự kiện"]'};
-  if(reward.kind==='coins')return {icon:'coin',label:`${reward.coins.toLocaleString('vi-VN')} Xu`,target:'.adventure-map-wallet'};
+  if(reward.kind==='coins')return {icon:'coin',amount:reward.coins,label:`${reward.coins.toLocaleString('vi-VN')} Xu`,target:'.adventure-map-wallet'};
   const item=CHEST_SUPPORTS[reward.gameId].find(item=>item.key===reward.key);
   const game={'memory-match':'Memory Match','link-connect':'Link Connect','triple-connect':'Triple Connect'}[reward.gameId];
   return {icon:supportIcons[reward.key],label:`${item.label} ×1 · ${game}`,target:'.adventure-map-shortcut[aria-label="Bộ sưu tập"]'};
@@ -32,7 +33,7 @@ async function revealGift(art,result,prize,owner,audioOwner=owner) {
   const scope=createGameShellLifecycle(),release=owner.own(()=>scope.dispose());scope.own(()=>release.forget());
   // Read both anchors before mounting the bounded particle batch.
   const from=art.getBoundingClientRect(),target=document.querySelector(prize.target),to=target?.getBoundingClientRect()||result.getBoundingClientRect();
-  const count=prize.icon==='coin'?6:1;
+  const count=prize.icon==='coin'?Math.min(prize.amount,COIN_PARTICLE_LIMIT):1;
   const start={x:from.x+from.width/2,y:from.y+from.height/2},end={x:to.x+to.width/2,y:to.y+to.height/2};
   const layer=el('div','hourly-gift-particles');layer.setAttribute('aria-hidden','true');document.body.append(layer);scope.own(()=>layer.remove(),'node');
   const animations=[];
@@ -45,8 +46,8 @@ async function revealGift(art,result,prize,owner,audioOwner=owner) {
   const duration=dropMs+holdMs+flightMs,landOffset=dropMs/duration,collectOffset=(dropMs+holdMs)/duration;
   for(let i=0;i<count;i++){
     const p=el('span','hourly-gift-particle');p.append(createIcon(prize.icon));layer.append(p);
-    const x=start.x-14,y=start.y-14,spread=count===1?0:(i-2.5)*18;
-    const landed=`translate(${x+spread}px,${y+18}px) scale(1)`;
+    const x=start.x-14,y=start.y-14,spread=count===1?0:Math.cos(i*COIN_SCATTER_ANGLE)*(16+Math.sqrt((i+1)/count)*42);
+    const landed=`translate(${x+spread}px,${y+18+(i%4)*7}px) scale(1)`;
     animate(p,[{opacity:0,transform:`translate(${x}px,${y}px) scale(.5)`,offset:0},
       {opacity:1,transform:`translate(${x+spread*.6}px,${y-48-(i%2)*14}px) scale(1.06)`,offset:landOffset*.42},
       {opacity:1,transform:landed,offset:landOffset},

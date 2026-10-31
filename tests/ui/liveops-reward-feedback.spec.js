@@ -7,18 +7,18 @@ async function finish(page){await page.evaluate(()=>document.querySelectorAll('.
 async function open(page,kind){await page.getByRole('button',{name:kind==='missions'?'Nhiệm vụ':'Sự kiện',exact:true}).click();await expect(page.locator('.liveops__status')).not.toHaveText('Đang kết nối…');}
 test('mission grants show bounded loot and all three owned audio phases; replay/status/close never repeats them',async({page},info)=>{
  await ready(page);await page.emulateMedia({reducedMotion:'no-preference'});await open(page,'missions');
- await page.locator('[data-focus-key="claim-login"]').click();await expect(page.locator('.liveops-reward-feedback__particle')).toHaveCount(6);
+ await page.locator('[data-focus-key="claim-login"]').click();await expect(page.locator('.liveops-reward-feedback__particle')).toHaveCount(15);
  expect(await page.evaluate(()=>rewardAudioPlayed)).toEqual(expect.arrayContaining(['reward.ogg','coin_drop.mp3']));await page.locator('.liveops-reward-feedback__particle').evaluateAll(nodes=>nodes.forEach(n=>n.getAnimations().forEach(a=>{a.pause();a.currentTime=1300;})));await page.screenshot({path:info.outputPath('mission-loot.png')});await finish(page);
  expect(await page.evaluate(()=>rewardAudioPlayed)).toContain('coin-collect.mp3');
  await page.getByRole('tab',{name:'Tuần này',exact:true}).click();await page.locator('[data-focus-key="claim-weekly"]').click();
- await expect(page.locator('.liveops-reward-feedback__particle[data-reward-kind="ticket"]')).toHaveCount(2);expect(await page.locator('.liveops-reward-feedback__particle').count()).toBeLessThanOrEqual(12);await finish(page);
+ await expect(page.locator('.liveops-reward-feedback__particle[data-reward-kind="ticket"]')).toHaveCount(2);expect(await page.locator('.liveops-reward-feedback__particle').count()).toBeLessThanOrEqual(44);await finish(page);
  const count=await page.evaluate(()=>rewardAudioPlayed.filter(n=>['reward.ogg','coin_drop.mp3','coin-collect.mp3'].includes(n)).length);await page.getByRole('button',{name:'Tải lại tiến độ',exact:true}).click();await expect(page.locator('.liveops-reward-feedback')).toHaveCount(0);expect(await page.evaluate(()=>rewardAudioPlayed.filter(n=>['reward.ogg','coin_drop.mp3','coin-collect.mp3'].includes(n)).length)).toBe(count);
  await page.locator('.adventure-screen > .adventure-exit').click();await expect(page.locator('.adventure-screen')).toHaveCount(0);await expect(page.locator('.liveops-reward-feedback')).toHaveCount(0);
 });
 test('wheel waits for its outcome; festival gives coin/chest particles; failure and interruption stay clean',async({page})=>{
  await ready(page);await page.emulateMedia({reducedMotion:'no-preference'});await open(page,'events');
  await page.getByRole('button',{name:'Quay miễn phí',exact:true}).click();await expect(page.locator('.liveops-reward-feedback')).toHaveCount(0);
- await page.locator('.liveops__rotor').evaluate(n=>n.getAnimations().forEach(a=>a.finish()));await expect(page.locator('.liveops-reward-feedback__particle')).toHaveCount(6);await finish(page);
+ await page.locator('.liveops__rotor').evaluate(n=>n.getAnimations().forEach(a=>a.finish()));await expect(page.locator('.liveops-reward-feedback__particle')).toHaveCount(25);await finish(page);
  await page.getByRole('tab',{name:'Sưu tập huy hiệu',exact:true}).click();await page.locator('[data-focus-key="festival-50"]').click();
  await expect(page.locator('.liveops-reward-feedback__particle[data-reward-kind="chest"]')).toHaveCount(1);await page.locator('.adventure-screen > .adventure-exit').click();await expect(page.locator('.adventure-screen')).toHaveCount(0);await expect(page.locator('.liveops-reward-feedback')).toHaveCount(0);
  await open(page,'missions');await page.evaluate(()=>eventsFixture.fail=true);await page.locator('[data-focus-key="claim-login"]').click();await expect(page.locator('.liveops-reward-feedback')).toHaveCount(0);
@@ -60,7 +60,7 @@ test('reward batches clean twenty cycles at mobile and landscape sizes in five s
      for(let i=0;i<20;i++){
       const scope=createGameShellLifecycle(),host=document.createElement('section');host.innerHTML='<header class="app-modal__header">Thưởng</header>';document.body.append(host);
       const feedback=createRewardFeedback({owner:scope,host});feedback.present([{kind:'coins',amount:50},{kind:'ticket',amount:2},{kind:'chest',chestType:'c',amount:1},{kind:'letter',letter:'M',amount:1},{kind:'support',gameId:'memory-match',key:'hint',amount:1},{kind:'item',itemId:CHEST_POOLS.avatar[0],amount:1}],{x:innerWidth/2,y:innerHeight/2});
-      if(document.querySelectorAll('.liveops-reward-feedback__particle').length>12)throw Error('Loot cap exceeded');
+      if(document.querySelectorAll('.liveops-reward-feedback__particle[data-reward-kind="coins"]').length>32||document.querySelectorAll('.liveops-reward-feedback__particle:not([data-reward-kind="coins"])').length>12)throw Error('Loot cap exceeded');
       scope.dispose();scope.dispose();feedback.present([{kind:'coins',amount:1}],{x:30,y:30});host.remove();
       if(document.querySelector('.liveops-reward-feedback'))throw Error('Reward node survived');
       if(Object.entries(scope.diagnostics()).some(([k,v])=>k==='active'?v!==false:v!==0))throw Error('Reward resources survived');
@@ -78,5 +78,5 @@ test('letter fusion, exchange and sale present their actual committed letter, ch
  await page.getByRole('button',{name:'Ghép 3 chữ A',exact:true}).click();
  await expect(page.locator('.liveops-reward-feedback__particle[data-reward-kind="letter"]')).toHaveCount(1);await expect(page.locator('.liveops-reward-feedback__toast')).toContainText('Chữ M');await finish(page);
  await page.locator('[data-focus-key="exchange-adventure"]').click();await expect(page.locator('.liveops-reward-feedback__particle[data-reward-kind="chest"]')).toHaveCount(1);await finish(page);
- await page.getByRole('button',{name:'Bán chữ',exact:true}).click();await page.getByRole('button',{name:'Xác nhận bán',exact:true}).click();await expect(page.locator('.liveops-reward-feedback__particle[data-reward-kind="coins"]')).toHaveCount(6);await expect(page.locator('.liveops-reward-feedback__toast')).toContainText('10 Xu');await finish(page);
+ await page.getByRole('button',{name:'Bán chữ',exact:true}).click();await page.getByRole('button',{name:'Xác nhận bán',exact:true}).click();await expect(page.locator('.liveops-reward-feedback__particle[data-reward-kind="coins"]')).toHaveCount(10);await expect(page.locator('.liveops-reward-feedback__toast')).toContainText('10 Xu');await finish(page);
 });

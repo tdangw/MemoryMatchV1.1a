@@ -1,3 +1,6 @@
+export const COIN_PARTICLE_LIMIT = 32;
+export const COIN_SCATTER_ANGLE = Math.PI * (3 - Math.sqrt(5));
+
 export const GAMEPLAY_TIMING = Object.freeze({
   secondMs: 1000,
   tileRevealAnimationMs: 600,

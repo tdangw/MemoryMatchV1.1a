@@ -25,12 +25,12 @@ test('center consumes free then tickets then earned ad; coins start at the winni
   const trigger=page.locator('.liveops__spin-primary');await expect(trigger).toHaveAttribute('data-spin-source',source);await expect(trigger).toBeEnabled();
   await trigger.focus();await trigger.evaluate(n=>{n.click();n.click();});await expect(page.locator('.liveops-reward-feedback')).toHaveCount(0);
   await expect.poll(()=>page.locator('.liveops__rotor').evaluate(n=>n.getAnimations().length)).toBeGreaterThan(0);
-  await page.locator('.liveops__rotor').evaluate(n=>n.getAnimations().forEach(a=>a.finish()));await expect(page.locator('.liveops-reward-feedback__particle')).toHaveCount(6);
+  await page.locator('.liveops__rotor').evaluate(n=>n.getAnimations().forEach(a=>a.finish()));await expect(page.locator('.liveops-reward-feedback__particle')).toHaveCount(25);
   const origin=await page.evaluate(()=>{const box=document.querySelector('[data-wheel-sector="7"]').getBoundingClientRect();const m=new DOMMatrix(document.querySelector('.liveops-reward-feedback__particle').getAnimations()[0].effect.getKeyframes()[0].transform);return {x:m.m41+18,y:m.m42+18,targetX:box.x+box.width/2,targetY:box.y+box.height/2};});
   expect(origin.x).toBeCloseTo(origin.targetX,1);expect(origin.y).toBeCloseTo(origin.targetY,1);await expect(page.locator('.liveops__status')).toHaveText('');await expect(page.locator('.liveops-reward-feedback__toast')).toContainText('25 Xu');await finish(page);await expect(page.locator('.liveops__spin-primary')).toBeFocused();
  }
  expect(await page.evaluate(()=>wheelCommands)).toEqual(['free','ticket','ticket','ad']);expect(await page.evaluate(()=>eventsFixture.state.tickets)).toBe(0);
- await page.evaluate(()=>{const s=eventsFixture.state;s.spins.ads=Array.from({length:10},(_,i)=>({source:'ad',day:s.day,sector:0,coins:5,operation:`cap-${i}`,ordinal:i+1}));});await page.getByRole('button',{name:'Tải lại tiến độ',exact:true}).click();await expect(page.locator('.liveops__spin-primary')).toBeDisabled();await expect(page.locator('.liveops__spin-primary')).toContainText('Hết lượt');
+ await page.evaluate(()=>{const s=eventsFixture.state;s.spins.ads=Array.from({length:10},(_,i)=>({source:'ad',day:s.day,sector:0,coins:5,operation:`cap-${i}`,ordinal:i+1}));});await page.locator('.adventure-screen > .adventure-exit').click();await page.getByRole('button',{name:'Sự kiện',exact:true}).click();await expect(page.locator('.liveops__spin-primary')).toBeDisabled();await expect(page.locator('.liveops__spin-primary')).toContainText('Hết lượt');
 });
 test('closing during wheel motion cancels visuals while keeping the committed spin and next source',async({page})=>{
  await ready(page);await page.emulateMedia({reducedMotion:'no-preference'});await page.getByRole('button',{name:'Quay miễn phí',exact:true}).click();await expect.poll(()=>page.locator('.liveops__rotor').evaluate(n=>n.getAnimations().length)).toBeGreaterThan(0);

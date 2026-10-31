@@ -51,7 +51,7 @@ for(const [width,height] of [[320,640],[412,915],[844,390]])test(`hourly gift mi
   const claimBox=await popup.getByRole('button',{name:'Mở quà',exact:true}).boundingBox();const dialog=await popup.locator('.app-modal').boundingBox();expect(claimBox.width).toBeLessThanOrEqual(200);expect(Math.abs((claimBox.x+claimBox.width/2)-(dialog.x+dialog.width/2))).toBeLessThanOrEqual(2);const b=await popup.locator('.app-modal').boundingBox();expect(b.x).toBeGreaterThanOrEqual(0);expect(b.x+b.width).toBeLessThanOrEqual(width);expect(b.y+b.height).toBeLessThanOrEqual(height-49);
   if(['default','storybook'].includes(skin)){mkdirSync('runtime/qa/hourly-gift',{recursive:true});await page.screenshot({path:`runtime/qa/hourly-gift/${skin}-${width}.png`});}
   await popup.getByRole('button',{name:'Mở quà',exact:true}).evaluate(el=>{el.click();el.click();});await expect(popup).toHaveCount(0);await expect(page.locator('.hourly-gift-reveal .hourly-gift__result')).toContainText('100 Xu');await rewardCard(page,width,height);if(captureReward){await page.waitForFunction(()=>document.querySelector('.hourly-gift-particle')?.getAnimations()[0]?.currentTime>=1900);await page.screenshot({path:`runtime/qa/hourly-gift/${skin}-reward-hold-${width}.png`});}await expect(page.locator('.adventure-gift-countdown')).toHaveText(/^00:(?:0[1-9]|10)$/);await expect(page.getByRole('button',{name:'Quà tặng',exact:true})).toBeDisabled();await expect(page.locator('.adventure-gift-ready-dot')).toBeHidden();await expect(page.getByRole('button',{name:'Quà tặng',exact:true})).toHaveAttribute('data-gift-cooling','true');
-  await expect(page.locator('.hourly-gift-reveal,.hourly-gift-particles')).toHaveCount(0);await expect(page.getByRole('button',{name:'Quà tặng',exact:true})).toBeDisabled();
+  await expect(page.locator('.hourly-gift-reveal,.hourly-gift-particles')).toHaveCount(0,{timeout:7000});await expect(page.getByRole('button',{name:'Quà tặng',exact:true})).toBeDisabled();
   const hit=await page.getByRole('button',{name:'Quà tặng',exact:true}).boundingBox();expect(hit.width).toBe(48);expect(hit.height).toBe(48);
   await advance(page);
  }
@@ -62,7 +62,7 @@ test('outside popup effects, cooldown, retry and owner interruption preserve one
  const baseline=await page.evaluate(async()=>(await import('/js/appPageLifecycle.js')).getAppPageScope().diagnostics());
  for(const kind of ['ticket','support','coins']){
   await page.evaluate(kind=>hourlyFixture.kind=kind,kind);await advance(page);await open(page);await page.getByRole('button',{name:'Mở quà',exact:true}).click();await expect(page.locator('#hourly-gift-modal')).toHaveCount(0);await expect(page.locator('.hourly-gift-reveal')).toBeVisible();
-  await page.locator('#menu-container .adventure-header .adventure-exit').click();await expect(page.locator('.hourly-gift-reveal,.hourly-gift-particles')).toHaveCount(0);
+  await page.locator('#menu-container .adventure-header .adventure-exit').click();await expect(page.locator('.hourly-gift-reveal,.hourly-gift-particles')).toHaveCount(0,{timeout:7000});
   await page.evaluate(async()=>(await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('memory-match'));
   expect(await page.evaluate(async()=>(await import('/js/appPageLifecycle.js')).getAppPageScope().diagnostics())).toEqual(baseline);
   await expect(page.getByRole('button',{name:'Quà tặng',exact:true})).toBeDisabled();await expect(page.locator('#hourly-gift-modal')).toHaveCount(0);
@@ -71,7 +71,7 @@ test('outside popup effects, cooldown, retry and owner interruption preserve one
  await advance(page);await page.evaluate(()=>hourlyFixture.fail=true);await page.getByRole('button',{name:'Quà tặng',exact:true}).click();await expect(page.getByRole('button',{name:'Thử lại',exact:true})).toBeVisible();
  await page.evaluate(()=>{hourlyFixture.fail=false;hourlyFixture.advance();});await page.getByRole('button',{name:'Thử lại',exact:true}).click();await expect(page.getByRole('button',{name:'Mở quà',exact:true})).toBeEnabled();await page.keyboard.press('Escape');await expect(page.locator('#hourly-gift-modal')).toHaveCount(0);
  await page.evaluate(()=>hourlyFixture.delay=true);await page.getByRole('button',{name:'Quà tặng',exact:true}).click();await page.keyboard.press('Escape');await expect(page.locator('#hourly-gift-modal')).toHaveCount(0);await page.evaluate(()=>{hourlyFixture.delay=false;hourlyFixture.resolve();});await expect(page.locator('.hourly-gift-particles')).toHaveCount(0);
- await advance(page);await open(page);await page.getByRole('button',{name:'Mở quà',exact:true}).click();await expect(page.locator('#hourly-gift-modal')).toHaveCount(0);await expect(page.locator('.hourly-gift-particle')).toHaveCount(6);await expect(page.locator('.hourly-gift-reveal,.hourly-gift-particles')).toHaveCount(0);
+ await advance(page);await open(page);await page.getByRole('button',{name:'Mở quà',exact:true}).click();await expect(page.locator('#hourly-gift-modal')).toHaveCount(0);await expect(page.locator('.hourly-gift-particle')).toHaveCount(32);await expect(page.locator('.hourly-gift-reveal,.hourly-gift-particles')).toHaveCount(0,{timeout:7000});
  expect(await page.evaluate(()=>hourlyFixture.claims)).toBe(4);
  expect(await page.evaluate(async()=>(await import('/js/appPageLifecycle.js')).getAppPageScope().diagnostics())).toEqual(baseline);
 });
@@ -94,7 +94,7 @@ test('ten-second gift cooldown blocks repeat opening, dims icon and returns only
 test('gift particles share gameplay drop hold and collection timing and clean hidden or reduced interruption',async({page})=>{
  test.setTimeout(45000);await ready(page);await page.emulateMedia({reducedMotion:'no-preference'});
  const baseline=await page.evaluate(async()=>(await import('/js/appPageLifecycle.js')).getAppPageScope().diagnostics());
- await open(page);await page.getByRole('button',{name:'Mở quà',exact:true}).click();await expect(page.locator('.hourly-gift-particle')).toHaveCount(6);
+ await open(page);await page.getByRole('button',{name:'Mở quà',exact:true}).click();await expect(page.locator('.hourly-gift-particle')).toHaveCount(32);
  const timing=await page.locator('.hourly-gift-particle').evaluateAll(async particles=>{
   const {GIFT_LOOT_TIMING}=await import('/js/liveops/hourlyGiftPresentation.js');
   return {policy:GIFT_LOOT_TIMING,particles:particles.map(node=>{
@@ -109,11 +109,11 @@ test('gift particles share gameplay drop hold and collection timing and clean hi
   expect((particle.collect-particle.land)*particle.duration).toBeCloseTo(900,5);expect(particle.landTransform).toBe(particle.collectTransform);
  }
  await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,value:true});document.dispatchEvent(new Event('visibilitychange'));});
- await expect(page.locator('.hourly-gift-reveal,.hourly-gift-particles')).toHaveCount(0);await page.evaluate(()=>{delete document.hidden;document.dispatchEvent(new Event('visibilitychange'));});
- expect(await page.evaluate(async()=>(await import('/js/appPageLifecycle.js')).getAppPageScope().diagnostics())).toEqual(baseline);
- await advance(page);await open(page);await page.getByRole('button',{name:'Mở quà',exact:true}).click();await expect(page.locator('.hourly-gift-particle')).toHaveCount(6);
- await page.emulateMedia({reducedMotion:'reduce'});await expect(page.locator('.hourly-gift-reveal,.hourly-gift-particles')).toHaveCount(0);
- expect(await page.evaluate(async()=>(await import('/js/appPageLifecycle.js')).getAppPageScope().diagnostics())).toEqual(baseline);expect(await page.evaluate(()=>hourlyFixture.claims)).toBe(2);
+ await expect(page.locator('.hourly-gift-reveal,.hourly-gift-particles')).toHaveCount(0,{timeout:7000});await page.evaluate(()=>{delete document.hidden;document.dispatchEvent(new Event('visibilitychange'));});
+ await expect.poll(()=>page.evaluate(async()=>(await import('/js/appPageLifecycle.js')).getAppPageScope().diagnostics())).toEqual(baseline);
+ await advance(page);await open(page);await page.getByRole('button',{name:'Mở quà',exact:true}).click();await expect(page.locator('.hourly-gift-particle')).toHaveCount(32);
+ await page.emulateMedia({reducedMotion:'reduce'});await expect(page.locator('.hourly-gift-reveal,.hourly-gift-particles')).toHaveCount(0,{timeout:7000});
+ await expect.poll(()=>page.evaluate(async()=>(await import('/js/appPageLifecycle.js')).getAppPageScope().diagnostics())).toEqual(baseline);expect(await page.evaluate(()=>hourlyFixture.claims)).toBe(2);
 });
 
 

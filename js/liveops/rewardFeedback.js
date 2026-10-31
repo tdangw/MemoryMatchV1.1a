@@ -1,3 +1,4 @@
+import { COIN_PARTICLE_LIMIT, COIN_SCATTER_ANGLE } from '../gameplayTuning.js';
 import { createGameShellLifecycle } from '../gameShell/gameShellLifecycle.js';
 import { createIcon } from '../icons.js';
 import { LOOT_PRESETS, LOOT_HOLD_MS } from '../lootEffects.js';
@@ -62,12 +63,14 @@ export function createRewardFeedback({ owner, host }) {
     cue('drop');
     const animations = [], { dropMs, holdMs, flightMs } = LIVEOPS_REWARD_TIMING;
     const duration = dropMs + holdMs + flightMs, land = dropMs / duration, collect = (dropMs + holdMs) / duration;
-    let count = 0;
+    let count = 0, coinCount = 0, itemCount = 0;
     for (const [index,prize] of prizes.entries()) {
-      const copies = Math.min(REWARD_FEEDBACK_LIMIT-count,prize.kind === 'coins' ? Math.min(6,prize.amount) : Math.min(3,prize.amount));
+      const isCoin=prize.kind==='coins';
+      const copies=isCoin?Math.min(COIN_PARTICLE_LIMIT-coinCount,prize.amount):Math.min(REWARD_FEEDBACK_LIMIT-itemCount,3,prize.amount);
       for (let i=0;i<copies;i++,count++) {
+        if(isCoin)coinCount++;else itemCount++;
         const node = document.createElement('span'); node.className = 'liveops-reward-feedback__particle'; node.dataset.rewardKind = prize.kind; node.setAttribute('aria-hidden','true'); node.append(artwork(prize)); layer.append(node);
-        const x = start.x-18, y = start.y-18, dx = Math.max(18,Math.min(innerWidth-54,Math.max(80,Math.min(innerWidth-80,start.x))-18+(count%6-2.5)*20)), dy = Math.min(innerHeight-152,y+28)+Math.floor(count/6)*32;
+        const x = start.x-18, y = start.y-18, dx = Math.max(18,Math.min(innerWidth-54,start.x-18+Math.cos(count*COIN_SCATTER_ANGLE)*(16+Math.sqrt((i+1)/copies)*42))), dy = Math.min(innerHeight-120,y+20+(count%4)*8);
         const landed = `translate(${dx}px,${dy}px) scale(1)`;
         const animation = node.animate([
           { opacity:0, transform:`translate(${x}px,${y}px) scale(.5)`, offset:0 },

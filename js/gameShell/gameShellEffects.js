@@ -1,7 +1,8 @@
+import { COIN_PARTICLE_LIMIT } from '../gameplayTuning.js';
 import { createGameShellLifecycle, getActiveGameScope } from "./gameShellLifecycle.js";
 import { prefersReducedMotion } from "../motion.js";
 
-export const EFFECT_LIMITS = Object.freeze({ loot: 16, coin: 32, score: 12, combo: 2, item: 12, highlight: 8, flip: 256, canvas: 4, connection: 1 });
+export const EFFECT_LIMITS = Object.freeze({ loot: 16, coin: COIN_PARTICLE_LIMIT, score: 12, combo: 2, item: 12, highlight: 8, flip: 256, canvas: 4, connection: 1 });
 export const LOOT_REWARD_LIMIT = 12;
 const registries = new WeakMap();
 let menuRegistry;

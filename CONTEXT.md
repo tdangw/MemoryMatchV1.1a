@@ -1,5 +1,27 @@
 # CONTEXT — Trạng thái hiện tại (2026-10-31)
 
+## Số mảnh Xu và ảnh Kho chữ — cập nhật31/10/2026
+
+- Hiệu ứng Xu của Gift/Nhiệm vụ/Sự kiện lấy số Xu thực nhận thay6mảnh
+  cố định. Dùng chung COIN_PARTICLE_LIMIT=32 với coinRewards và registry
+  gameplay:25Xu=25mảnh, khoản lớn hơn32 hiện tối đa32mảnh, toast/ví vẫn
+  ghi đủ giá trị. Item vẫn cap12 riêng; batch có thể32coin+12item như game.
+  Scatter hữu hạn trong viewport, giữ âm thanh/timeline/cleanup hiện hành.
+- Bỏ Tải lại tiến độ ở trang Sự kiện (Vòng quay/Sưu tập chữ) và Xem Kho
+  rương ở hai tab đó. Khi lỗi/đổi tài khoản/kỳ không còn hợp lệ, chỉ hiện
+  Thử lại theo ngữ cảnh; không thêm polling/network hoặc đổi giao dịch.
+  Kho rương vẫn có trong Bộ sưu tập và lối đi Sưu tập huy hiệu hiện hữu.
+- Kho chữ và ô bộ chữ dùng atlas letters-128/256.webp giống chữ rơi,
+  cùng LETTER_ALPHABET/index/backgroundPosition; không tạo asset mới.
+  Giữ số lượng, selected/empty state và aria-label trên từng chữ.
+- UI18test mục tiêu đạt (Gift7, feedback5, wheel3, ảnh/chip/coin3), gồm
+  count1/5/25/32/100/1000 đối chiếu game,5skin và mobile hẹp/ngang,
+  retry và cleanup. Audio tail chờ ended trước so baseline tài nguyên.
+  Check/build/CSS đạt. Lượt check đầu Easy generator p95=29,47ms>20ms
+  khi chạy đồng thời Chrome/build; chạy lại yên đạt, không sửa benchmark.
+- Không đổi luật thưởng, schema, số dư hay rules; không deploy/APK.
+  Chu kỳ quà10giây để test vẫn giữ. Không commit ảnh/log thử.
+
 ## Vòng quay với nút tâm — cập nhật31/10/2026
 
 - Bỏ tiêu đề lặp “Vòng quay may mắn” và dòng báo Xu thành công phía
