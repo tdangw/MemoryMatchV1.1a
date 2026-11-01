@@ -1,13 +1,37 @@
-# CONTEXT — Trạng thái hiện tại (2026-10-31)
+# CONTEXT — Trạng thái hiện tại (2026-11-01)
 
-## Đang thực hiện: Sưu tập chữ và ghép bất kỳ —31/10/2026
+## Sưu tập chữ và ghép bất kỳ — hoàn tất 01/11/2026
 
-- Kế hoạch active duy nhất: LETTER_COLLECTION_FUSION_PLAN.md, yêu cầu
-  thay3chữ giống nhau bằng3đơn vị chữ bất kỳ, lặp khi đủ tồn; uniform17
-  đầu ra/có thể trùng và bán10Xu giữ. Bốn tab nhỏ/rương phải, kho dưới,
-  chạm chữ mở Ghép/Bán; bảng ghép3ô quanh tâm theo skin hiện có.
-- F1 model/rules và F2 UI có ownership riêng, giữ receipt/pending cũ;
-  không khôi phục các kế hoạch đã hoàn tất làm nguồn thực thi.
+- Không còn kế hoạch active. LETTER_COLLECTION_FUSION_PLAN.md đã đóng,
+  lưu phạm vi và bằng chứng của task này; không dùng làm task còn chờ.
+- Bốn bộ chữ là tab nhỏ một hàng cuộn ngang, ẩn thanh cuộn; tab đang
+  chọn được đưa vào vùng nhìn thấy. Rương đúng bộ ở cột phải, kho17chữ
+  bên dưới dùng atlas hiện có. Chạm chữ mở Ghép/Bán/X.
+- Ghép chọn3đơn vị chữ bất kỳ, được lặp khi đủ tồn; bỏ/chọn lại trước
+  xác nhận không trừ kho. Ba ô quanh tâm, ra1chữ chọn đều17loại/có thể
+  trùng; Ghép tiếp bắt đầu lựa chọn mới. Giá bán10Xu và bảng rương giữ.
+- Receipt mới thêm ingredients[3], giữ letter=ingredients[0] làm hint
+  cho client cũ đọc; mọi lượng tiêu hao mới chỉ tính từ ingredients.
+  Lệnh/receipt/pending ghép cùng chữ cũ vẫn hợp lệ; không tăng version,
+  reset hay migration dữ liệu. Command có cả letter và ingredients bị
+  từ chối. Rules chứng minh đúng delta từng chữ, earned và Xu không đổi.
+- Giao dịch chỉ gửi khi xác nhận, khóa bấm đôi/chọn mới lúc đang lưu;
+  retry khôi phục kết quả đã lưu trước khi cho gửi lại. Đóng hoặc đổi
+  tài khoản hủy trình bày cũ, không hủy phần thưởng đã commit. Animation
+  hữu hạn, owner cleanup và hidden/reduced-motion; grant không chờ FX.
+- Thông báo kết nối và Thử lại căn giữa vùng nội dung khi chưa tải được
+  kho chữ/Nhiệm vụ. Bỏ Tải lại tiến độ ở Nhiệm vụ; Thử lại chỉ xuất hiện
+  theo lỗi/đổi tài khoản/kỳ hết hiệu lực, không thêm polling.
+- Nghiệm thu:6unit mới + policy/generator đạt; hai emulator đạt cả giao
+  dịch cũ/mới, CAS/recovery/UID và12 dữ liệu giả bị từ chối. UI22ca đạt,
+  thêm4ca sau chỉnh kết nối đạt; gồm40 tổ hợp5skin×4viewport×2motion,
+  keyboard,20vòng cleanup, đóng khi đang lưu và phục hồi mất phản hồi.
+  npm run check đạt; static/CSS và build cuối đạt. Online browser suite
+  cần cả Auth emulator chưa chạy ở lượt này; giao dịch Firestore đã
+  kiểm qua emulator riêng. Chưa đo FPS trên thiết bị thật.
+- Firestore rules đã phát hành thành công tới memorymatchv1-1a theo
+  quyền chủ dự án cấp. Không deploy Hosting hoặc tạo APK. Quà10giây để
+  test vẫn giữ. Không đưa ảnh/log thử vào commit.
 
 ## Số mảnh Xu và ảnh Kho chữ — cập nhật31/10/2026
 
