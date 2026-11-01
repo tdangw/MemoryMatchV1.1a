@@ -23,10 +23,9 @@ html .liveops button.tab-button, html .liveops__sale button.tab-button { min-hei
 }
 
 .liveops__panel { display: grid; gap: 12px; min-width: 0; }
-.liveops__set-choices, .liveops__chest-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.liveops__chest-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .liveops__letter-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
 html .liveops__letter-grid > button.tab-button { min-height: 48px; min-width: 48px; margin: 0; box-sizing: border-box; border: 1px solid var(--ui-line, #9b7847); border-image: none; padding: 4px; background: var(--ui-surface, #fff6df); color: var(--ui-ink, #452b16); }
-.liveops__letter-grid [aria-pressed="true"] { outline: 3px solid var(--ui-ink, #452b16); outline-offset: -3px; }
 .liveops__letter-slots { display: flex; flex-wrap: wrap; gap: 3px; font-family: inherit; letter-spacing: normal; }
 .liveops__letter-slot { font-weight: 900; border-bottom: 2px dashed currentColor; }
 .liveops__letter-slot[data-filled="true"] { border-bottom-style: solid; background: color-mix(in srgb, var(--ui-surface, #fff6df) 90%, var(--ui-ink, #452b16) 10%); border-radius: 3px; }
@@ -180,16 +179,16 @@ html .liveops-page .liveops-surface .tab-button.liveops__wheel-info { position:a
 .liveops__letter-mini > h3,.liveops__letter-mini > .liveops__letter-slots { grid-column:1/-1; }
 .liveops-surface .liveops__letter-mini h3 { margin:0; color:var(--lo-gold); }
 html .liveops-page .liveops-surface .liveops__letter-mini > button { width:auto; margin:0; font-size:12px; }
-.liveops-surface .liveops__set-choices { gap:5px; }
-html .liveops-page .liveops-surface .liveops__set-choices button { margin:0; padding:6px; border-radius:9px; font-size:11px; }
+.liveops-surface .liveops__set-choices { display:flex; flex-wrap:nowrap; gap:4px; overflow-x:auto; scrollbar-width:none; min-width:0; padding:2px; }
+.liveops__set-choices::-webkit-scrollbar { display:none; width:0; height:0; }
+html .liveops-page .liveops-surface .liveops__set-choices button { flex:0 0 auto; width:auto; min-height:36px; margin:0; padding:6px 8px; border-radius:8px; font-size:10px; white-space:nowrap; }
 html .liveops-page .liveops-surface .liveops__set-choices button[aria-pressed="true"] { color:var(--lo-claim-ink); text-shadow:none; background:linear-gradient(var(--lo-claim-top),var(--lo-claim-bottom)); }
-.liveops__recipe-name { margin:12px 0 8px; text-align:center; color:var(--lo-gold); }
 .liveops-surface .liveops__letter-slots { display:flex; justify-content:center; gap:3px; margin:8px 0 12px; font-size:clamp(13px,3.9vw,22px); }
 .liveops-surface .liveops__letter-slot { display:grid; place-items:center; width:1.55em; min-width:1.55em; height:1.55em; padding:0; border:0; border-radius:0; background:transparent; box-shadow:none; opacity:.3; filter:grayscale(.7); }
 .liveops-surface .liveops__letter-slot[data-filled="true"] { background:transparent; box-shadow:none; opacity:1; filter:none; }
 .liveops-surface .liveops__letter-slot[data-space="true"] { flex-basis:100%; height:0; min-width:0; border:0; box-shadow:none; }
-.liveops__recipe-reward { display:grid; grid-template-columns:64px minmax(0,1fr) auto; align-items:center; gap:8px; margin-top:10px; font-size:14px; }
-.liveops__recipe-reward > .ui-icon { width:64px; height:64px; }
+.liveops__recipe-reward { display:grid; justify-items:center; align-content:center; gap:6px; min-width:0; margin:0; font-size:11px; text-align:center; }
+.liveops__recipe-reward > .ui-icon { width:52px; height:52px; }
 html .liveops-page .liveops-surface .liveops__recipe-reward > button { width:auto; background:linear-gradient(var(--lo-claim-top),var(--lo-claim-bottom)); color:var(--lo-claim-ink); text-shadow:none; }
 .liveops__inventory > h3 { text-align:center; color:var(--lo-gold); }
 html .liveops-page .liveops-surface .liveops__letter-grid > button.tab-button { position:relative; display:grid; place-items:center; aspect-ratio:1; min-height:60px; padding:4px; border:2px solid var(--lo-task-line); border-radius:12px; background:linear-gradient(145deg,var(--lo-task),color-mix(in srgb,var(--lo-task) 74%,var(--lo-line))); color:var(--lo-task-ink); text-shadow:0 1px #fff8; box-shadow:inset 0 0 0 3px #fff3,0 4px 0 #0004; }
@@ -198,9 +197,6 @@ html .liveops-page .liveops-surface .liveops__letter-grid > button.tab-button { 
 .liveops > [hidden] { display:none; }
 .liveops__letter-count { position:absolute; bottom:-4px; right:-3px; padding:1px 6px; border:1px solid var(--lo-line); border-radius:12px; background:var(--lo-inset); color:var(--lo-ink); font-size:13px; text-shadow:none; }
 html .liveops-page .liveops-surface .liveops__letter-grid > button[data-empty="true"] { background:color-mix(in srgb,var(--lo-task) 30%,var(--lo-inset)); color:var(--lo-muted); }
-html .liveops-page .liveops-surface .liveops__letter-grid > button[aria-pressed="true"] { outline:3px solid var(--lo-gold); outline-offset:2px; }
-.liveops__letter-actions { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-.liveops__selected-letter { text-align:center; font-size:13px; color:var(--lo-gold); margin:16px 0 4px; }
 .liveops-surface .liveops__festival-hero { text-align:center; }
 .liveops__festival-hero > .ui-icon { width:64px; height:64px; }
 .liveops__festival-round { display:block; font-size:22px; color:var(--lo-gold); }
@@ -218,7 +214,6 @@ html .liveops-page .liveops-surface .liveops__festival-milestone > button { widt
   html .liveops-page .liveops-surface .liveops__mission-action button { padding:6px; font-size:12px; }
   .liveops__ticket-balance { gap:3px; padding:6px; font-size:12px; }
   .liveops__ticket-balance > .ui-icon { display:none; }
-  .liveops__recipe-reward { grid-template-columns:48px minmax(0,1fr) auto; font-size:12px; gap:5px; }
   .liveops__recipe-reward > .ui-icon { width:48px; height:48px; }
 }
 html .liveops-page .liveops-surface :is(.liveops__tabs,.liveops__letter-grid) button.tab-button:focus-visible { outline:3px solid var(--lo-gold); outline-offset:3px; }
@@ -237,3 +232,18 @@ html .liveops__chest-card.liveops__card button:disabled { opacity: .55; filter: 
 
 .liveops__chest-tools { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .liveops__chest-tools > button.tab-button { flex: 1 1 120px; min-height: 48px; padding: 8px; font-size: 13px; }
+
+.liveops__recipe { display:grid; grid-template-columns:minmax(0,1fr) 80px; align-items:center; gap:10px; }
+.liveops__recipe-word { min-width:0; display:grid; gap:8px; container-type:inline-size; }
+.liveops__recipe-word .liveops__letter-slots { gap:2px; margin:0; }
+.liveops__recipe-word .liveops__letter-slot { flex:0 0 min(32px,calc((100cqi - (var(--recipe-columns) - 1)*2px)/var(--recipe-columns))); width:min(32px,calc((100cqi - (var(--recipe-columns) - 1)*2px)/var(--recipe-columns))); min-width:0; height:auto; aspect-ratio:1; }
+.liveops__recipe-word .liveops__letter-slot[data-space='true'] { flex-basis:100%; width:0; height:0; aspect-ratio:auto; }
+html .liveops-page .liveops-surface .liveops__recipe-reward > button { min-height:44px; padding:6px 8px; margin:0; font-size:12px; white-space:nowrap; }
+
+.liveops__recipe-panel { display:grid; gap:8px; min-width:0; }
+.liveops-surface .liveops__status { text-align:center; }
+html .liveops-page .liveops-surface .liveops__retry { display:block; width:fit-content; margin:12px auto; }
+html .liveops-page .liveops-surface .liveops__retry[hidden] { display:none; }
+.liveops__connection { display:flex; flex-direction:column; justify-content:center; align-items:center; gap:12px; min-height:clamp(180px,45svh,420px); text-align:center; }
+.liveops__connection > .liveops__status { margin:0; max-width:38ch; }
+html .liveops-page .liveops-surface .liveops__connection > .liveops__retry { margin:0; }

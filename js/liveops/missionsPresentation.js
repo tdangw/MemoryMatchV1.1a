@@ -19,10 +19,10 @@ function sectionHeading(title, icon) {
   heading.append(node('h3', '', title));
   return heading;
 }
-export function renderMissions(host, { view, tab, busy, run, play, canPlay, canClaim, selectTab }) {
+export function renderMissions(host, { view, tab, busy, run, play, renderEmpty, canPlay, canClaim, selectTab }) {
   const tabs = createTabs('missions', [['daily','Hôm nay'],['weekly','Tuần này']], tab, (key, panel) => {
     selectTab(key); panel.replaceChildren();
-    if (!view) { panel.append(node('p', '', 'Kết nối để xem tiến độ và phần thưởng.')); return; }
+    if (!view) { renderEmpty(panel); return; }
     const state = view.state, current = state[key], catalog = key === 'daily' ? DAILY : WEEKLY;
     if (key === 'daily') {
       const login = node('section', 'liveops__card liveops__login'), days = node('div', 'liveops__days');

@@ -12,7 +12,7 @@ test('mission grants show bounded loot and all three owned audio phases; replay/
  expect(await page.evaluate(()=>rewardAudioPlayed)).toContain('coin-collect.mp3');
  await page.getByRole('tab',{name:'Tuần này',exact:true}).click();await page.locator('[data-focus-key="claim-weekly"]').click();
  await expect(page.locator('.liveops-reward-feedback__particle[data-reward-kind="ticket"]')).toHaveCount(2);expect(await page.locator('.liveops-reward-feedback__particle').count()).toBeLessThanOrEqual(44);await finish(page);
- const count=await page.evaluate(()=>rewardAudioPlayed.filter(n=>['reward.ogg','coin_drop.mp3','coin-collect.mp3'].includes(n)).length);await page.getByRole('button',{name:'Tải lại tiến độ',exact:true}).click();await expect(page.locator('.liveops-reward-feedback')).toHaveCount(0);expect(await page.evaluate(()=>rewardAudioPlayed.filter(n=>['reward.ogg','coin_drop.mp3','coin-collect.mp3'].includes(n)).length)).toBe(count);
+ const count=await page.evaluate(()=>rewardAudioPlayed.filter(n=>['reward.ogg','coin_drop.mp3','coin-collect.mp3'].includes(n)).length);await page.evaluate(()=>window.dispatchEvent(new Event('online')));await expect(page.locator('.liveops')).toHaveAttribute('aria-busy','false');await expect(page.locator('.liveops-reward-feedback')).toHaveCount(0);expect(await page.evaluate(()=>rewardAudioPlayed.filter(n=>['reward.ogg','coin_drop.mp3','coin-collect.mp3'].includes(n)).length)).toBe(count);
  await page.locator('.adventure-screen > .adventure-exit').click();await expect(page.locator('.adventure-screen')).toHaveCount(0);await expect(page.locator('.liveops-reward-feedback')).toHaveCount(0);
 });
 test('wheel waits for its outcome; festival gives coin/chest particles; failure and interruption stay clean',async({page})=>{
@@ -75,8 +75,9 @@ test('reward batches clean twenty cycles at mobile and landscape sizes in five s
 test('letter fusion, exchange and sale present their actual committed letter, chest and coins',async({page})=>{
  await ready(page);await page.emulateMedia({reducedMotion:'no-preference'});await open(page,'events');
  await page.getByRole('tab',{name:'Sưu tập chữ',exact:true}).click();
- await page.getByRole('button',{name:'Ghép 3 chữ A',exact:true}).click();
- await expect(page.locator('.liveops-reward-feedback__particle[data-reward-kind="letter"]')).toHaveCount(1);await expect(page.locator('.liveops-reward-feedback__toast')).toContainText('Chữ M');await finish(page);
+ await page.getByRole('button',{name:/^Chữ A, \d+ chữ$/}).click();await page.locator('#letter-action-modal').getByRole('button',{name:'Ghép',exact:true}).click();
+ for(let i=0;i<2;i++)await page.locator('#letter-fusion-modal').getByRole('button',{name:/^Chọn chữ A, còn \d+$/}).click();await page.locator('#letter-fusion-modal').getByRole('button',{name:'Ghép',exact:true}).click();
+ await expect(page.locator('.liveops-reward-feedback__particle[data-reward-kind="letter"]')).toHaveCount(1);await expect(page.locator('#letter-fusion-modal')).toContainText('Đã ghép được chữ M');await finish(page);await page.locator('#letter-fusion-modal .app-modal__close').click();
  await page.locator('[data-focus-key="exchange-adventure"]').click();await expect(page.locator('.liveops-reward-feedback__particle[data-reward-kind="chest"]')).toHaveCount(1);await finish(page);
- await page.getByRole('button',{name:'Bán chữ',exact:true}).click();await page.getByRole('button',{name:'Xác nhận bán',exact:true}).click();await expect(page.locator('.liveops-reward-feedback__particle[data-reward-kind="coins"]')).toHaveCount(10);await expect(page.locator('.liveops-reward-feedback__toast')).toContainText('10 Xu');await finish(page);
+ await page.getByRole('button',{name:/^Chữ A, \d+ chữ$/}).click();await page.locator('#letter-action-modal').getByRole('button',{name:'Bán',exact:true}).click();await page.getByRole('button',{name:'Xác nhận bán',exact:true}).click();await expect(page.locator('.liveops-reward-feedback__particle[data-reward-kind="coins"]')).toHaveCount(10);await expect(page.locator('.liveops-reward-feedback__toast')).toContainText('10 Xu');await finish(page);
 });

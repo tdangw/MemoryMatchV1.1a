@@ -111,8 +111,8 @@ test('shared letter inventory renders M-M--- -A--- and sell/fuse survive reload'
     const p=await import('/js/persistence.js'),data=await p.loadPersistentGameData();
     await p.saveAppearance({...data.appearance,spark:{...data.appearance.spark,letterEarned:{M:5,A:1}}});
   });
-  await page.getByRole('button',{name:'Tải lại tiến độ',exact:true}).click();
-  await page.getByRole('combobox',{name:'Chọn chữ'}).selectOption('M');
+  await page.evaluate(()=>window.dispatchEvent(new Event('online')));
+  await page.getByRole('tab',{name:'Sưu tập chữ',exact:true}).click();
   await page.evaluate(async()=>{
     const service=await import('/js/liveops/service.js');
     try{await service.requestLiveops({type:'sellLetter',letter:'M',quantity:999});throw Error('Expected rejection');}
@@ -120,14 +120,15 @@ test('shared letter inventory renders M-M--- -A--- and sell/fuse survive reload'
     await service.requestLiveops();
   });
   const before=await page.evaluate(async()=>(await(await import('/js/persistence.js')).loadPersistentGameData()).coins);
-  await page.getByRole('button',{name:'Ghép 3 chữ M',exact:true}).click();
-  await expect(page.locator('.liveops__status')).toContainText('Đã nhận chữ');
+  await page.getByRole('button',{name:/^Chữ M, \d+ chữ$/}).click();await page.locator('#letter-action-modal').getByRole('button',{name:'Ghép',exact:true}).click();
+  for(let i=0;i<2;i++)await page.locator('#letter-fusion-modal').getByRole('button',{name:/^Chọn chữ M, còn \d+$/}).click();await page.locator('#letter-fusion-modal').getByRole('button',{name:'Ghép',exact:true}).click();
+  await expect(page.getByRole('button',{name:'Ghép tiếp',exact:true})).toBeVisible();await page.locator('#letter-fusion-modal .app-modal__close').click();
   const fused=await page.evaluate(async()=>(await(await import('/js/persistence.js')).loadPersistentGameData()).appearance.spark.state.letters);
   expect(Object.values(fused.counts).reduce((a,b)=>a+b,0)).toBe(4);expect(fused.sequence).toBe(1);
-  await page.getByRole('button',{name:'Bán · 1.000 Xu mỗi chữ',exact:true}).click();
-  await expect(page.locator('.liveops__status')).toContainText('1000 Xu');
+  await page.getByRole('button',{name:/^Chữ M, \d+ chữ$/}).click();await page.locator('#letter-action-modal').getByRole('button',{name:'Bán',exact:true}).click();await page.getByRole('button',{name:'Xác nhận bán',exact:true}).click();
+  await expect(page.locator('.liveops__status')).toContainText('10 Xu');
   const snapshot=await page.evaluate(async()=>{const d=await(await import('/js/persistence.js')).loadPersistentGameData();return {coins:d.coins,letters:d.appearance.spark.state.letters};});
-  expect(snapshot.coins).toBe(before+1000);expect(snapshot.letters.sequence).toBe(2);
+  expect(snapshot.coins).toBe(before+10);expect(snapshot.letters.sequence).toBe(2);
   await page.reload();await expect.poll(()=>page.evaluate(async()=>(await import('/js/accountService.js')).getAccountService()?.getState().bound),{timeout:30000}).toBe(true);
   await page.evaluate(async()=>{await(await import('/js/liveops/service.js')).requestLiveops();});
   const restored=await page.evaluate(async()=>{const d=await(await import('/js/persistence.js')).loadPersistentGameData();return {coins:d.coins,letters:d.appearance.spark.state.letters};});

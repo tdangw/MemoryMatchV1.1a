@@ -15,6 +15,7 @@ const ICON_PATHS = Object.freeze({
   copy: '<rect x="8" y="8" width="12" height="13" rx="2"/><path d="M15 8V4a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h4"/>',
   ticket: '<path d="M3 5h18v5a2 2 0 0 0 0 4v5H3v-5a2 2 0 0 0 0-4z" fill="#e8b749" stroke="#784a22" stroke-width="1.2"/><path d="M5 7h14v10H5z" fill="#153f47" stroke="#fff0aa" stroke-width=".65"/><path d="M17 7v2m0 2v2m0 2v2" stroke="#e8b749" stroke-width=".7"/><circle cx="10.5" cy="12" r="3.5" fill="#e8b749" stroke="#fff0aa" stroke-width=".65"/><path d="M10.5 8.5v7M7 12h7m-6-2.5 5 5m0-5-5 5" stroke="#805018" stroke-width=".6"/><circle cx="10.5" cy="12" r=".9" fill="#153f47" stroke="none"/>',
   lock: '<rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
   close: '<path d="m6 6 12 12M18 6 6 18"/>',
   snowflake: '<path d="M12 2v20M3.3 7l17.4 10M3.3 17 20.7 7M9 4l3 3 3-3M9 20l3-3 3 3M4 10l4-1-1-4M20 14l-4 1 1 4M4 14l4 1-1 4M20 10l-4-1 1-4"/>',
   shuffle: '<path d="M3 6h3c5 0 7 12 12 12h3M17 14l4 4-4 4M3 18h3c2 0 3.5-2 5-5M13 9c1.5-2 3-3 5-3h3M17 2l4 4-4 4"/>',
