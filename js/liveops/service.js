@@ -1,5 +1,6 @@
 import { publishRewardPeriod } from './rewardPeriodViewState.js';
 import { hourlyGiftCandidate } from './hourlyGift.js';
+import { MISSING_FIRST_FUSION_POLICY, prepareFusionCandidate } from './letters.js';
 import { committedRewardsForTransition, mergeCommittedRewards } from './rewardFeedbackModel.js';
 import { CHEST_TYPES, CHEST_VERSION } from './chestConfig.js';
 import { chestCandidate } from './chests.js';
@@ -98,7 +99,9 @@ async function perform(command, pass = 0, expected = null, totals = {reads:0,wri
   if (!operation && savedAd?.earned && savedAd.profileId === initial.profileId) operation = savedAd;
   // A pending spin is resolved before accepting the next command. Status is the recovery entry point.
   if (!operation && command.type !== 'status' && command.type !== 'prepareAd') {
-    operation = { ...command, ...(command.type === 'claimHourlyGift' ? {candidate:hourlyGiftCandidate(secureUnit)} : {}), operation: crypto.randomUUID(), sector: secureSector(), randomLetter:LETTER_ALPHABET[Math.floor(secureUnit()*LETTER_ALPHABET.length)] };
+    const newFusion=command.type==='fuseLetter'&&Object.hasOwn(command,'ingredients');
+    operation = { ...command, ...(command.type === 'claimHourlyGift' ? {candidate:hourlyGiftCandidate(secureUnit)} : {}), operation: crypto.randomUUID(), sector: secureSector(),
+      ...(newFusion?{fusionPolicy:MISSING_FIRST_FUSION_POLICY,fusionRoll:secureUnit()}:{randomLetter:LETTER_ALPHABET[Math.floor(secureUnit()*LETTER_ALPHABET.length)]}) };
     await saveSyncMetadata(key, operation, () => account.getIdentity()?.profileId === initial.profileId);
   }
   let result;
@@ -139,9 +142,10 @@ async function perform(command, pass = 0, expected = null, totals = {reads:0,wri
       const remainingLetterWork = letterOnly ? changedLetters.length > LETTER_SYNC_KEYS_PER_COMMIT : changedLetters.length > 0;
       const reconcileOnly = sourcesOnly || migrateOnly || initializing || periodOnly || preflightOnly || statsOnly || letterOnly;
       const resolved = resolveSparkOperation(stored.state, operation, now);
-      const action = operation && !reconcileOnly ? { ...resolved.command, day: resolved.command.day ?? Math.floor(now / DAY_MS),
+      let action = operation && !reconcileOnly ? { ...resolved.command, day: resolved.command.day ?? Math.floor(now / DAY_MS),
         sequence: operation.sequence ?? (['sellLetter','fuseLetter','exchangeLetterSet'].includes(operation.type) ? stored.state?.letters.sequence || 0 : operation.type==='claimHourlyGift' ? stored.state?.hourlyGift?.sequence||0 : operation.type==='openChest' ? stored.state?.chests?.sequence||0 : stored.state?.ticketSpent || 0) + 1 } : { type: 'status' };
       const ownedIds=ownedProfileCosmeticItems(data.appearance).map(item=>item.id);
+      if(action.type==='fuseLetter')action=prepareFusionCandidate(stored.state.letters,action);
       if(action.type==='openChest'&&!action.candidate)action.candidate=chestCandidate(action.chestType,action.gameId,ownedIds,secureUnit);
       // Candidate/sector survive loss of response; day/sequence are saved before publishing.
       if (operation && !reconcileOnly) {

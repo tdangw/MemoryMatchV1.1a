@@ -6,6 +6,7 @@ import { publishCloudSnapshot, readCloudRoot, readCloudSnapshot } from '../js/cl
 import { confirmSparkClock, readSparkState } from '../js/liveops/store.js';
 import { transitionSpark, normalizeSparkSave } from '../js/liveops/sparkModel.js';
 import { LETTER_ALPHABET, LETTER_SYNC_KEYS_PER_COMMIT } from '../js/liveops/config.js';
+import { MISSING_FIRST_FUSION_POLICY, prepareFusionCandidate } from '../js/liveops/letters.js';
 const [host,port]=(process.env.FIRESTORE_EMULATOR_HOST||'').split(':');
 if(!port)throw Error('Isolated emulator required');
 const env=await initializeTestEnvironment({projectId:'demo-letter-fusion',firestore:{host,port:Number(port),rules:fs.readFileSync('firestore.rules','utf8')}});
@@ -15,7 +16,7 @@ let state=null,revision=0,now;
 let operation=0;
 const next=(ingredients)=>({type:'fuseLetter',ingredients,sequence:state.letters.sequence+1,operation:`fusion-${++operation}`});
 async function commit(command={type:'status'},options={}){
-  const before=options.state||state,copy=structuredClone(saved),result=transitionSpark(before,command,{uid,now,randomLetter:options.received||'A',letterEarned:options.earned||before?.letters.earned||{}});
+  const before=options.state||state,copy=structuredClone(saved),result=transitionSpark(before,command,{uid,now,randomLetter:options.received||command.randomLetter||'A',letterEarned:options.earned||before?.letters.earned||{}});
   result.state.revision=(before?.revision||0)+1;
   copy.profile.data.coins+=result.receipts.reduce((sum,r)=>sum+r.coins,0);
   copy.profile.data.appearance.spark={...normalizeSparkSave(copy.profile.data.appearance.spark),ownerUid:uid,state:result.state,letterEarned:result.state.letters.earned};
@@ -61,5 +62,34 @@ try{
   await rejectForge((n,o)=>{n.letters.counts={...o.letters.counts,A:o.letters.counts.A-2};n.letters.last.ingredients=['A','A','M'];n.letters.last.received='A';});
   const final=await readSparkState(db,space,uid);assert.deepEqual(final.state.letters,state.letters);
   assert.equal(saved.profile.data.coins,100);
-  console.log(JSON.stringify({pass:true,valid:['three distinct','two same','three same','output matches inputs','legacy pending','legacy reader hint','lost-response recovery','sameUID race'],denied:12,coinsUnchanged:true}));
+  const policy=(ingredients,roll)=>prepareFusionCandidate(state.letters,{...next(ingredients),fusionPolicy:MISSING_FIRST_FUSION_POLICY,fusionRoll:roll});
+  console.log('Fusion policy scenarios: all-owned, rebase, missing, replay, CAS and forged policies');
+  // All letters are owned BEFORE spending Y twice; Y becomes zero only afterwards.
+  const full=policy(['Y','Y','M'],0);assert.equal(full.randomLetter,'A');accept(await commit(full));assert.equal(state.letters.counts.Y,0);
+  const pending=JSON.parse(JSON.stringify(policy(['A','C','M'],.6)));assert.equal(pending.randomLetter,'Y');
+  // A canonical earned credit changes the pool while leaving the operation sequence intact.
+  accept(await commit({type:'status'},{earned:{...state.letters.earned,Y:state.letters.earned.Y+1}}));
+  const rebased=prepareFusionCandidate(state.letters,pending);assert.equal(rebased.fusionRoll,pending.fusionRoll);assert.notEqual(rebased.randomLetter,pending.randomLetter);
+  accept(await commit(rebased));
+  for(const letter of ['C','N'])accept(await commit({type:'sellLetter',letter,quantity:state.letters.counts[letter],sequence:state.letters.sequence+1,operation:`zero-${letter}`}));
+  const beforePolicyCoins=saved.profile.data.coins;
+  const missing=policy(['A','M','M'],.75);assert.equal(missing.randomLetter,'N');accept(await commit(missing));
+  assert.equal(state.letters.last.fusionPolicy,MISSING_FIRST_FUSION_POLICY);
+  const recoveredPolicy=await readCloudSnapshot(db,space,uid,await readCloudRoot(db,space,uid));
+  const replay=prepareFusionCandidate(recoveredPolicy.profile.data.appearance.spark.state.letters,{...missing,fusionRoll:NaN});assert.equal(replay.randomLetter,'N');
+  assert.deepEqual(transitionSpark(state,replay,{uid,now,randomLetter:replay.randomLetter,letterEarned:state.letters.earned}).state,state);
+  const policyRace=policy(['A','M','M'],0),policyRaces=await Promise.allSettled([commit(policyRace),commit({...policyRace,operation:'other-policy-device'},{database:second})]);
+  assert.equal(policyRaces.filter(value=>value.status==='fulfilled').length,1);accept(policyRaces.find(value=>value.status==='fulfilled').value);
+  // Make C missing again, then forge an otherwise-exact owned output.
+  accept(await commit({type:'sellLetter',letter:'C',quantity:state.letters.counts.C,sequence:state.letters.sequence+1,operation:'zero-C-again'}));
+  const coinsAfterSales=saved.profile.data.coins;
+  await assert.rejects(commit(policy(['A','M','M'],0),{forge:(n,o)=>{
+    n.letters.counts={...o.letters.counts,A:o.letters.counts.A,M:o.letters.counts.M-2};n.letters.last.received='A';
+  }}),/permission|PERMISSION|Missing|denied/);
+  await assert.rejects(commit(policy(['A','M','M'],0),{forge:n=>{n.letters.last.fusionPolicy='future-policy';}}),/permission|PERMISSION|Missing|denied/);
+  await assert.rejects(commit(policy(['A','M','M'],0),{forge:(n,o)=>{
+    n.letters.counts={...o.letters.counts,A:o.letters.counts.A-3,C:1};delete n.letters.last.ingredients;
+  }}),/permission|PERMISSION|Missing|denied/);
+  assert.equal(saved.profile.data.coins,coinsAfterSales);assert.ok(coinsAfterSales>beforePolicyCoins,'only approved sales change coins');
+  console.log(JSON.stringify({pass:true,valid:['three distinct','two same','three same','output matches inputs','legacy pending','legacy reader hint','lost-response recovery','sameUID race','missing-first','all-owned pre-consumption','stable entropy rebase','policy receipt replay','policy CAS race'],denied:15,fusionCoinsUnchanged:true}));
 }finally{await env.cleanup();}

@@ -111,6 +111,8 @@ CHEST_CONTRACT
     function fusionIngredients(r) {
       return r.keys().hasAny(['ingredients']) ? r.ingredients : [r.letter,r.letter,r.letter];
     }
+    // Stored counts already satisfy the canonical nonnegative-integer invariant.
+    function fusionAllOwned(counts) { return counts.keys().hasAll(LETTER_KEYS) && !counts.values().hasAny([0]); }
     function rewardFusionValue(n,o,ingredients,key) {
       let spent = (ingredients[0] == key ? 1 : 0) + (ingredients[1] == key ? 1 : 0) + (ingredients[2] == key ? 1 : 0);
       let old = o.counts.get(key,0);
@@ -122,12 +124,14 @@ CHEST_CONTRACT
       let ingredients = fusionIngredients(r);
       return n.keys().hasOnly(['counts','earned','sequence','last']) && n.counts is map && n.earned == o.earned
         && n.counts.keys().hasOnly(LETTER_KEYS) && rewardInt(n.sequence) && n.sequence == o.sequence + 1 && r.sequence == n.sequence
-        && r.keys().hasOnly(['kind','letter','ingredients','received','coins','sequence','operation'])
+        && r.keys().hasOnly(['kind','letter','ingredients','received','coins','sequence','operation','fusionPolicy'])
         && r.kind == 'fuse' && r.received in LETTER_KEYS && r.coins == 0
         && r.operation is string && r.operation.matches('^[A-Za-z0-9_-]{1,128}$')
         && (o.last == null || r.operation != o.last.operation)
         && (r.keys().hasAny(['ingredients']) ? ingredients is list && ingredients.size() == 3
           && ingredients.hasOnly(LETTER_KEYS) && r.letter == ingredients[0] : r.letter in LETTER_KEYS)
+        && (!r.keys().hasAny(['fusionPolicy']) || r.fusionPolicy == 'missing-first-v1' && r.keys().hasAny(['ingredients'])
+          && (o.counts.get(r.received,0) == 0 || fusionAllOwned(o.counts)))
         && n.counts.diff(o.counts).affectedKeys().hasOnly(ingredients.concat([r.received]))
         && rewardFusionValue(n,o,ingredients,ingredients[0])
         && (ingredients[1] == ingredients[0] || rewardFusionValue(n,o,ingredients,ingredients[1]))

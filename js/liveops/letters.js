@@ -3,6 +3,7 @@ import { LETTER_REWARD_ITEMS } from './letterCatalog.generated.js';
 import { LETTER_SETS, LETTER_FALLBACK_COINS, LETTER_ALPHABET, LETTER_SELL_COINS, LETTER_SALE_RECEIPT_PRICES } from './config.js';
 const integer = n=>Number.isSafeInteger(n)&&n>=0;
 const record = n=>n!==null&&typeof n==='object'&&!Array.isArray(n);
+export const MISSING_FIRST_FUSION_POLICY = 'missing-first-v1';
 const validIngredients = value => Array.isArray(value) && value.length === 3
   && [0,1,2].every(index => LETTER_ALPHABET.includes(value[index]));
 function fusionIngredients(value, receipt = false) {
@@ -19,6 +20,24 @@ export function normalizeLetterCounts(value = {}) {
     throw new Error('Bản lưu chữ chưa toàn vẹn. Dữ liệu được giữ nguyên.');
   return {...value};
 }
+/** The pool is defined before consuming any ingredient, never from the resulting inventory. */
+export function fusionRewardPool(counts) {
+  const inventory=normalizeLetterCounts(counts);
+  const missing=LETTER_ALPHABET.filter(letter=>(inventory[letter]||0)===0);
+  return missing.length ? missing : [...LETTER_ALPHABET];
+}
+export function selectFusionLetter(counts, roll) {
+  if(!Number.isFinite(roll)||roll<0||roll>=1)throw new Error('Chưa chọn được quà ghép chữ. Hãy thử lại.');
+  const pool=fusionRewardPool(counts);
+  return pool[Math.floor(roll*pool.length)];
+}
+/** Stable entropy survives retries; a canonical rebase maps that same entropy to its current pool. */
+export function prepareFusionCandidate(letters, operation) {
+  if(letters.last?.operation===operation.operation)return {...operation,randomLetter:letters.last.received};
+  if(operation.fusionPolicy===undefined)return operation;
+  if(operation.fusionPolicy!==MISSING_FIRST_FUSION_POLICY)throw new Error('Cách ghép chữ này chưa được hỗ trợ. Hãy cập nhật ứng dụng.');
+  return {...operation,randomLetter:selectFusionLetter(letters.counts,operation.fusionRoll)};
+}
 export function normalizeLetters(value) {
   if(value===undefined)return {counts:{},earned:{},sequence:0,last:null};
   if(!record(value)||!integer(value.sequence)||!(value.last===null||record(value.last)&&value.last.sequence===value.sequence
@@ -30,6 +49,8 @@ export function normalizeLetters(value) {
     if(last.kind==='fuse'){
       fusionIngredients(last,true);
       if(!LETTER_ALPHABET.includes(last.received)||last.coins!==0)throw new Error('Kết quả ghép chữ chưa toàn vẹn.');
+      if(Object.hasOwn(last,'fusionPolicy')&&(last.fusionPolicy!==MISSING_FIRST_FUSION_POLICY||!Object.hasOwn(last,'ingredients')))
+        throw new Error('Kết quả ghép chữ chưa được hỗ trợ.');
     }
     if(last.kind==='exchange'&&!last.chestType&&(!LETTER_SETS.some(set=>set.id===last.setId)||(last.itemId===null?![LETTER_FALLBACK_COINS,10000].includes(last.coins):!LETTER_REWARD_ITEMS.some(item=>item.id===last.itemId)||last.coins!==0)))throw new Error('Kết quả đổi bộ chữ chưa toàn vẹn.');
   }
@@ -62,12 +83,17 @@ export function mutateLetters(previous, command, randomLetter) {
     const ingredients=fusionIngredients(command);
     const required=ingredients.reduce((counts,letter)=>{counts[letter]=(counts[letter]||0)+1;return counts;},{});
     if(!LETTER_ALPHABET.includes(randomLetter))throw new Error('Chữ nhận được không hợp lệ.');
+    if(Object.hasOwn(command,'fusionPolicy')){
+      if(command.fusionPolicy!==MISSING_FIRST_FUSION_POLICY||!Object.hasOwn(command,'ingredients'))throw new Error('Cách ghép chữ không hợp lệ.');
+      if(randomLetter!==selectFusionLetter(state.counts,command.fusionRoll))throw new Error('Quà ghép chữ đã thay đổi. Hãy thử lại.');
+    }
     for(const [letter,amount]of Object.entries(required))if((state.counts[letter]||0)<amount)throw new Error('Không đủ chữ đã chọn để ghép.');
     for(const [letter,amount]of Object.entries(required))state.counts[letter]-=amount;
     state.counts[randomLetter]=(state.counts[randomLetter]||0)+1;
     if(!integer(state.counts[randomLetter]))throw new Error('Kho chữ đã đầy.');
     // Old clients require last.letter; it is a display/read hint, not the source quantity.
-    result={kind:'fuse',letter:ingredients[0],...(Object.hasOwn(command,'ingredients')?{ingredients}:{}),received:randomLetter,coins:0};
+    result={kind:'fuse',letter:ingredients[0],...(Object.hasOwn(command,'ingredients')?{ingredients}:{}),
+      ...(Object.hasOwn(command,'fusionPolicy')?{fusionPolicy:command.fusionPolicy}:{}),received:randomLetter,coins:0};
   }else throw new Error('Thao tác chữ không hợp lệ.');
   state.sequence++;state.last={...result,sequence:state.sequence,operation:command.operation};
   return {state,coins,result:state.last};
