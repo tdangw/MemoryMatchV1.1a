@@ -1,4 +1,5 @@
 import { letterArtwork, openLetterActions, openLetterFusion } from './letterCrafting.js';
+import { showCollectionModal } from '../mainmenu.js';
 import { createRewardFeedback, captureRewardOrigin } from './rewardFeedback.js';
 import { createWheelArt } from './wheelArt.js';
 import { loadPersistentGameData } from '../persistence.js';
@@ -196,7 +197,7 @@ export function openLiveopsPage(kind, surface = {}) {
     const round=getActiveGameScope(),owner=surface.owner||round||getAppPageScope(),identity=getAccountService()?.getIdentity();
     const current=()=> (!owner||owner.active)&&(!round||round.active&&getActiveGameScope()===round)&&getAccountService()?.getIdentity()?.uid===identity?.uid;
     modal.destroy();
-    void import('../mainmenu.js').then(async module=>{if(current())await module.showCollectionModal({initialChest:true,fromGame:Boolean(round),surface:{...surface,owner}});})
+    if(current())void showCollectionModal({initialChest:true,fromGame:Boolean(round),surface:{...surface,owner}})
       .catch(()=>{if(current())showAppToast('Chưa mở được Kho rương. Hãy thử lại.',{tone:'error'});});
   }
   function letterSlots(set,counts){

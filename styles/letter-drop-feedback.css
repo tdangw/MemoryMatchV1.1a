@@ -1,5 +1,5 @@
 .letter-drop-feedback { --letter-center-size: clamp(56px, 17vw, 80px); position: fixed; inset: 0; z-index: 1250; pointer-events: none; contain: layout style; }
 .letter-drop-feedback__entry { position: absolute; left: calc(50% + var(--letter-slot) * (var(--letter-center-size) + 4px)); top: 40%; width: var(--letter-center-size); transform: translate(-50%, -50%); text-align: center; pointer-events: none; }
-.letter-drop-feedback__sprite { display: block; width: var(--letter-center-size); height: var(--letter-center-size); background-image: image-set(url('/assets/rewards/letters/letters-128.webp') 1x, url('/assets/rewards/letters/letters-256.webp') 2x); background-size: 500% 400%; background-repeat: no-repeat; }
+.letter-drop-feedback__sprite { display: block; width: var(--letter-center-size); height: var(--letter-center-size); background-image: image-set('/assets/rewards/letters/letters-128.webp' 1x, '/assets/rewards/letters/letters-256.webp' 2x); background-size: 500% 400%; background-repeat: no-repeat; }
 .letter-drop-feedback__label { position: absolute; bottom: calc(100% + 4px); left: 0; width: 100%; box-sizing: border-box; padding: 3px 4px; border-radius: 6px; color: #fff7db; background: #082e36ed; font-size: 11px; font-weight: 700; line-height: 1.35; }
 @media (prefers-reduced-motion: reduce) { .letter-drop-feedback__sprite { transform: none; } }

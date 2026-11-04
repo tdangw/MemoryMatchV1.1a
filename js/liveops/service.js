@@ -17,7 +17,7 @@ import { liveopsEnabled } from './availability.js';
 import { DAY_MS } from './model.js';
 import { normalizeSparkSave, transitionSpark, secureSector, secureUnit, resolveSparkOperation } from './sparkModel.js';
 import { confirmSparkClock, readSparkState } from './store.js';
-import { publishCloudSnapshot, CloudConflictError } from '../cloudStore.js';
+import { publishCloudSnapshot, CloudConflictError, readCloudRoot } from '../cloudStore.js';
 import { encodeCloudSnapshot, stableJSON } from '../cloudSnapshot.js';
 import { normalizeAcquisitions } from '../progression/acquisitionModel.js';
 let running = null, clock = null, binding = null, statusTask = null;
@@ -218,5 +218,5 @@ async function perform(command, pass = 0, expected = null, totals = {reads:0,wri
 }
 function cleanState(state) { const { rootRevision, fingerprint, updatedAt, ...value } = state; return value; }
 async function importRoot(backend, identity) {
-  return (await import('../cloudStore.js')).readCloudRoot(backend.database, identity.environment, identity.uid);
+  return readCloudRoot(backend.database, identity.environment, identity.uid);
 }

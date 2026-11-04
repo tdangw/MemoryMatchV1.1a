@@ -5,6 +5,9 @@ import { STANDARD_WAVE_SECONDS, calculateChallengeWaveTime, calculateOriginalWav
 // Shared rules for multi-wave sessions, settlement and certified progression.
 export const GAMEPLAY_RULES_VERSION = 1;
 export const MATCH_COINS_PER_GROUP = 2;
+export function calculateMatchCoinReward() {
+  return MATCH_COINS_PER_GROUP;
+}
 const COIN_EFFORT_TENTHS = Object.freeze({
   'memory-match': 10,
   'link-connect': 10,

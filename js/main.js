@@ -1,4 +1,5 @@
 import { getRecentGameId } from "./recentGame.js";
+import { initializeAccountService, getAccountService } from './accountService.js';
 import { restoreUiSkin } from './uiSkin.js';
 import '../styles/ui-skin-woodland.css';
 import '../styles/ui-style-packs.css';
@@ -286,9 +287,9 @@ const profileStats = await initializeProfileStatsService();
 showGameSelector();
 void initializeMenuAds();
 if (import.meta.env.VITE_FIREBASE_DISABLED !== '1') {
-  accountReady = Promise.all([import('./accountService.js'), import('./accountPanel.js')]).then(([account, panels]) => {
+  accountReady = import('./accountPanel.js').then(panels => {
     accountRuntime = panels;
-    account.initializeAccountService({
+    initializeAccountService({
       onState: refreshAppAccount,
       onConflict: panels.showCloudConflictDialog,
       onConflictCleared: panels.closeCloudConflictDialog,
@@ -302,8 +303,8 @@ if (import.meta.env.VITE_FIREBASE_DISABLED !== '1') {
         await (await import('./leaderboardService.js')).getLeaderboardService()?.recover();
       },
     });
-    void profileStats?.bindAccount(account.getAccountService()).catch(error => console.warn('Profile statistics startup unavailable', error.code || error.name));
-    bindLiveopsAccount(account.getAccountService());
+    void profileStats?.bindAccount(getAccountService()).catch(error => console.warn('Profile statistics startup unavailable', error.code || error.name));
+    bindLiveopsAccount(getAccountService());
     return import('./leaderboardService.js').then(module => module.initializeLeaderboardService().ready);
   }).catch(error => {
     console.warn('Cloud startup unavailable', error.code || error.name);

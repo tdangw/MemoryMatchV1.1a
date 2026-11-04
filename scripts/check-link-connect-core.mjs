@@ -19,7 +19,7 @@ import {
   getLinkGravityShift,
   LINK_CONNECT_TIMING,
 } from "../js/linkConnect/linkConfig.js";
-import { calculateMatchCoinReward } from "../js/coinRewards.js";
+import { calculateMatchCoinReward } from "../js/progression/gameplayRules.js";
 import {
   getActiveLinkConnectionEffect,
   LINK_EXIT_EFFECTS,

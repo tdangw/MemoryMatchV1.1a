@@ -1,4 +1,25 @@
-# CONTEXT — Trạng thái hiện tại (2026-11-01)
+# CONTEXT — Trạng thái hiện tại (2026-11-04)
+
+## Cảnh báo build/public asset và import core — hoàn tất04/11/2026
+
+- Hai mã __VITE_PUBLIC_ASSET__7f8e62c6__/110727c5__ là hash đường dẫn
+  atlas letters-128/256.webp, không xuất phát từ js/pwa.js. Đổi ba CSS
+  image-set sang URL dạng chuỗi chuẩn, tránh xử lý url() lồng hai lần;
+  ảnh vẫn qua pipeline asset/base của Vite và giữ giao diện hiện hành.
+- Favicon/manifest/apple-touch-icon trong index.html dùng đường dẫn
+  public bắt đầu bằng /. Service worker js/pwa.js đã dùng BASE_URL đúng
+  chuẩn nên giữ; URL tương đối bên trong manifest giữ scope theo manifest.
+- Sáu call site của firebaseBackend/cloudStore/accountService/sound/
+  mainmenu chuyển sang import tĩnh. Giữ bootstrap tài khoản có guard,
+  owner/UID và xử lý lỗi. Các binding mainmenu chỉ gọi sau bootstrap;
+  review độc lập không phát hiện TDZ hoặc kết nối Firebase tự khởi tạo.
+- Hàm thuần calculateMatchCoinReward chuyển về gameplayRules và re-export
+  từ coinRewards để giữ API; kiểm thử luật nhập từ owner thuần, không cần
+  khởi tạo Audio/browser sau khi sound là import tĩnh.
+- npm run check đạt; build cuối13,41giây, không warning/placeholder và
+  đủ SW/manifest/icon/atlas trong dist.7UIca đạt: ba trò mở chủ đề/quay về
+  bản đồ, atlas5skin, audio và bốn kịch bản thống kê/retry/đổi owner.
+  Không đổi schema/save/luật thưởng, không deploy hoặc tạo APK.
 
 ## Vòng ghép chữ và ưu tiên chữ thiếu — hoàn tất
 

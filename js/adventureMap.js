@@ -1,4 +1,5 @@
 import { subscribeRewardPeriod } from './liveops/rewardPeriodViewState.js';
+import { showCollectionModal } from './mainmenu.js';
 import { mountAdventureRewardIndicators } from './adventureRewardIndicators.js';
 import { getAccountService } from './accountService.js';
 import { getRankingOwner } from './rankingOwner.js';
@@ -407,7 +408,6 @@ export function mountAdventureMap(gameId) {
       if (openingThemes || loading) return;
       openingThemes = true; themeButton.disabled = true;
       try {
-        const { showCollectionModal } = await import('./mainmenu.js');
         if (!previewScope.active) return;
         const themes = await showCollectionModal({ gameId, themesOnly: true, surface: { owner: previewScope } });
         await themes.whenClosed;

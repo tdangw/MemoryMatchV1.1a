@@ -6,6 +6,8 @@ import { prefersReducedMotion } from "./motion.js";
 import { getActiveGameScope } from './gameShell/gameShellLifecycle.js';
 import { gameState } from './gameState.js';
 import { MATCH_COINS_PER_GROUP } from './progression/gameplayRules.js';
+export { calculateMatchCoinReward } from './progression/gameplayRules.js';
+import { playOwnedRewardCue } from './sound.js';
 
 export const MATCH_COIN_REWARD = Object.freeze({
   base: MATCH_COINS_PER_GROUP,
@@ -18,10 +20,6 @@ const activeCoinEffects = new Set();
 const effectEntries = new WeakMap();
 const counterPulseEntries = new WeakMap();
 const coinSoundCleanups = new WeakMap();
-
-export function calculateMatchCoinReward() {
-  return MATCH_COINS_PER_GROUP;
-}
 
 export function playCoinRewardFlight(source, target, amount, options = {}) {
   const coinCount = Math.max(0, Math.floor(Number(amount) || 0));
@@ -37,17 +35,11 @@ export function playCoinRewardFlight(source, target, amount, options = {}) {
     options.onComplete?.();
   };
   // Audio remains independent of wallet updates and animation completion.
-  const audioReady = options.sound !== false && owner?.active ? import('./sound.js').catch(error => {
-    console.warn('Coin sound unavailable', error);
-    return null;
-  }) : null;
+  const audioEnabled = options.sound !== false && owner?.active;
   const playCue = (name, effect) => {
-    if (!audioReady) return;
-    void audioReady.then(audio => {
-      if (audio && owner.active && (!effect || activeCoinEffects.has(effect))) {
-        audio.playOwnedRewardCue(name, owner, gameState.settings);
-      }
-    });
+    if (audioEnabled && owner.active && (!effect || activeCoinEffects.has(effect))) {
+      playOwnedRewardCue(name, owner, gameState.settings);
+    }
   };
   if (prefersReducedMotion()) {
     playCue('coinCollect');

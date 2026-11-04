@@ -4,6 +4,7 @@ import { subscribeToPlaySegments, getActivePlayMetrics } from './playMetrics.js'
 import { normalizeProfileStats, profileDisplayTotal, adoptProfileStats } from './profileStatsModel.js';
 import { createGameShellLifecycle } from './gameShell/gameShellLifecycle.js';
 import { getFirebaseEnvironment } from './firebaseEnvironment.js';
+import { getFirebaseBackend } from './firebaseBackend.js';
 let instance = null;
 export function getProfileStatsService() { return instance; }
 export async function initializeProfileStatsService() {
@@ -106,7 +107,7 @@ export async function initializeProfileStatsService() {
   const service = {
     getState: () => ({ phase, joinedAt: identity?.createdAt || local?.profileCreatedAt || null, trackedSince: local?.trackedSince || null, totalPlayMs: local ? profileDisplayTotal(local) : null, onlineAccount: Boolean(identity) }),
     subscribe(listener) { listeners.add(listener); listener(service.getState()); return () => listeners.delete(listener); },
-    async bindAccount(value) { account = value; backend = await (await import('./firebaseBackend.js')).getFirebaseBackend(); if (!scope.active) return; scope.own(account.subscribe(() => { const task = bindIdentity(); const id = generation; void task.then(changed => changed ? syncNow() : false).catch(error => { if (scope.active && generation === id) failure(error); }); }), 'listener'); },
+    async bindAccount(value) { account = value; backend = await getFirebaseBackend(); if (!scope.active) return; scope.own(account.subscribe(() => { const task = bindIdentity(); const id = generation; void task.then(changed => changed ? syncNow() : false).catch(error => { if (scope.active && generation === id) failure(error); }); }), 'listener'); },
     async syncNow() { const uid = identity?.uid; let id = generation; try { if (account && identity && boundKey !== `${identity.uid}:${identity.profileId}`) { const binding = bindIdentity(); id = generation; await binding; } return await syncNow(); } catch (error) { if (scope.active && generation === id && identity?.uid === uid) failure(error); return false; } },
     flushLocal: drain,
     dispose() { scope.dispose(); listeners.clear(); if (instance === service) instance = null; },
