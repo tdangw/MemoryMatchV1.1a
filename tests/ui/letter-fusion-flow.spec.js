@@ -62,6 +62,11 @@ for(const [width,height]of [[320,740],[412,915],[844,390],[1024,900]])test(`fusi
   const recipes=await page.locator('.liveops__set-choices').evaluate(node=>({wrap:getComputedStyle(node).flexWrap,rows:new Set([...node.children].map(child=>Math.round(child.getBoundingClientRect().top))).size,scrollbar:getComputedStyle(node).scrollbarWidth}));
   expect(recipes.wrap).toBe('nowrap');expect(recipes.rows).toBe(1);expect(recipes.scrollbar).toBe('none');await expect(page.locator('.liveops__letter-grid button')).toHaveCount(17);
   await start(page);const modal=page.locator('#letter-fusion-modal');await expect(modal.locator('.letter-forge__slot')).toHaveCount(3);await expect(modal.locator('.letter-forge__palette button')).toHaveCount(17);
+  const triangle=await modal.locator('.letter-forge__stage').evaluate(root=>{
+   const center=node=>{const r=node.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};},c=center(root.querySelector('.letter-forge__result')),points=[...root.querySelectorAll('.letter-forge__slot')].map(center),distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+   return {radii:points.map(p=>distance(p,c)),sides:points.map((p,i)=>distance(p,points[(i+1)%3]))};
+  });
+  expect(Math.max(...triangle.radii)-Math.min(...triangle.radii)).toBeLessThan(1);expect(Math.max(...triangle.sides)-Math.min(...triangle.sides)).toBeLessThan(1);expect(Math.min(...triangle.radii)).toBeGreaterThan(70);
   const bad=await modal.evaluate(root=>[...root.querySelectorAll('button,p,svg')].filter(node=>node.getClientRects().length).filter(node=>{const r=node.getBoundingClientRect();return r.left< -1||r.right>innerWidth+1;}).map(node=>node.outerHTML.slice(0,120)));expect(bad).toEqual([]);
   const bounds=await modal.locator('.app-modal').boundingBox();expect(bounds.x).toBeGreaterThanOrEqual(0);expect(bounds.x+bounds.width).toBeLessThanOrEqual(width);expect(bounds.y).toBeGreaterThanOrEqual(0);expect(bounds.y+bounds.height).toBeLessThanOrEqual(height);
   const sprites=await modal.locator('.liveops__letter-art').evaluateAll(nodes=>nodes.map(node=>getComputedStyle(node).backgroundImage));expect(sprites.every(url=>url.includes('letter'))).toBe(true);

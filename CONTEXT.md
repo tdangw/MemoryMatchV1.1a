@@ -1,5 +1,15 @@
 # CONTEXT — Trạng thái hiện tại (2026-11-04)
 
+## Căn đều ba ô ghép chữ —04/11/2026
+
+- Ba ô nguyên liệu dùng cùng tâm và bán kính84px, cách góc120° tạo
+  tam giác đều; thay định vị phần trăm riêng theo chiều rộng/cao.
+  Stage174px giữ cùng hình học cả dọc/ngang; tia điện/chữ bay tự lấy
+  vị trí thực nên không cần sửa runtime. Không đổi luật hoặc dữ liệu.
+- CSS ownership đạt;5ca UI đạt gồm40tổ hợp5skin×4viewport×2motion,
+  kiểm khoảng cách tâm/cạnh sai số dưới1px và luồng ghép đầy đủ.
+  Review độc lập không finding. Chỉ commit CSS/test/context của task.
+
 ## Tia điện ghép chữ và toast tại tâm — hoàn tất04/11/2026
 
 - Sau commit thành công, ba tia SVG zigzag nối chữ với tâm, chớp hữu
