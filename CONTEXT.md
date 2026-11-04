@@ -1,5 +1,22 @@
 # CONTEXT — Trạng thái hiện tại (2026-11-04)
 
+## Tia điện ghép chữ và toast tại tâm — hoàn tất04/11/2026
+
+- Sau commit thành công, ba tia SVG zigzag nối chữ với tâm, chớp hữu
+  hạn640ms; chữ nguyên liệu sáng lên rồi thu vào tâm sau charge320ms.
+  Ba ghost/ba nhóm tia cố định, không loop hoặc đọc layout mỗi frame.
+  Chữ kết quả sáng ở tâm, chỉ toast nhận chữ; bỏ particle rơi/thu chữ.
+- rewardFeedback.present có tùy chọn tương thích particles:false cho
+  Ghép chữ: toast1100ms +âm nhận quà, không tạo particle, không đo đích
+  hay phát âm rơi/thu. Các nơi khác vẫn mặc định particle như trước.
+- Popup owner hủy mọi animation, ghost, SVG và toast; hidden/reduced
+  motion kết thúc ngay. Recovery không có committedRewards không phát
+  lại toast/audio. Không đổi model, rules, schema hoặc luật ưu tiên chữ.
+- 5ca UI mục tiêu đạt;5ca regression thưởng/audio đạt, gồm5skin/các cỡ
+  màn hình và20vòng đóng giữa absorb. Review độc lập không finding;
+  syntax/CSS/build đạt, build không warning. Chưa đo FPS thiết bị thật.
+  Đã cập nhật kỳ vọng test từ letter particle sang center+toast.
+
 ## Cảnh báo build/public asset và import core — hoàn tất04/11/2026
 
 - Hai mã __VITE_PUBLIC_ASSET__7f8e62c6__/110727c5__ là hash đường dẫn

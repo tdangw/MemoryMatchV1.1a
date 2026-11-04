@@ -26,7 +26,12 @@ const sameIngredients=(last,selected)=>{
   const ingredients=last.ingredients || [last.letter,last.letter,last.letter];
   return [...ingredients].sort().join('')===[...selected].sort().join('');
 };
-const FORGE_MOTION={absorb:520,stagger:60,flash:480};
+const FORGE_MOTION={charge:320,arc:640,absorb:520,stagger:60,flash:480};
+function lightningPath(start,end,index){
+  const dx=end.x-start.x,dy=end.y-start.y,length=Math.hypot(dx,dy),points=[`M${start.x},${start.y}`];
+  for(let step=1;step<8;step++){const t=step/8,offset=(step%2?1:-1)*(4+(step+index)%3*2)*Math.sin(Math.PI*t);points.push(`L${start.x+dx*t-dy/length*offset},${start.y+dy*t+dx/length*offset}`);}
+  points.push(`L${end.x},${end.y}`);return points.join(' ');
+}
 /** Local selection never changes inventory; only the existing transaction can consume it. */
 export function openLetterFusion({initialLetter,owner,current,getContext,execute,refresh}){
   const scope=createGameShellLifecycle(),content=node('div','letter-forge');
@@ -78,14 +83,20 @@ export function openLetterFusion({initialLetter,owner,current,getContext,execute
     received=last.received;phase='revealing';error='';render();
     if(!motion.matches&&!document.hidden){
       const origin=stage.getBoundingClientRect(),center=action.getBoundingClientRect(),rects=slots.map(slot=>slot.getBoundingClientRect());
+      const lightning=document.createElementNS('http://www.w3.org/2000/svg','svg');lightning.classList.add('letter-forge__lightning');lightning.setAttribute('viewBox',`0 0 ${origin.width} ${origin.height}`);effects.append(lightning);
+      const arcs=rects.map((r,i)=>{
+        const group=document.createElementNS(lightning.namespaceURI,'g'),d=lightningPath({x:r.left-origin.left+r.width/2,y:r.top-origin.top+r.height/2},{x:center.left-origin.left+center.width/2,y:center.top-origin.top+center.height/2},i);
+        for(const cls of ['letter-forge__arc-glow','letter-forge__arc-core']){const path=document.createElementNS(lightning.namespaceURI,'path');path.setAttribute('d',d);path.classList.add(cls);group.append(path);}lightning.append(group);
+        return scope.animation(group.animate([{opacity:0},{opacity:1,offset:.12},{opacity:.2,offset:.3},{opacity:1,offset:.46},{opacity:.25,offset:.62},{opacity:1,offset:.78},{opacity:0}],{duration:FORGE_MOTION.arc,delay:i*FORGE_MOTION.stagger,fill:'both'})).finished.then(()=>true,()=>false);
+      });
       const flights=rects.map((r,i)=>{const ghost=letterArtwork(selected[i]);ghost.classList.add('letter-forge__ingredient');ghost.style.cssText+=`;left:${r.left-origin.left}px;top:${r.top-origin.top}px;width:${r.width}px;height:${r.height}px`;effects.append(ghost);
-        const animation=scope.animation(ghost.animate([{transform:'translate(0,0) scale(1)',opacity:1},{transform:`translate(${center.left+center.width/2-r.left-r.width/2}px,${center.top+center.height/2-r.top-r.height/2}px) scale(.12)`,opacity:0}],{duration:FORGE_MOTION.absorb,delay:i*FORGE_MOTION.stagger,easing:'cubic-bezier(.55,0,.85,.6)',fill:'both'}));
+        const animation=scope.animation(ghost.animate([{transform:'translate(0,0) scale(1)',opacity:1},{transform:`translate(${center.left+center.width/2-r.left-r.width/2}px,${center.top+center.height/2-r.top-r.height/2}px) scale(.12)`,opacity:0}],{duration:FORGE_MOTION.absorb,delay:FORGE_MOTION.charge+i*FORGE_MOTION.stagger,easing:'cubic-bezier(.55,0,.85,.6)',fill:'both'}));
         return animation.finished.then(()=>true,()=>false);
       });
-      await Promise.all(flights);effects.replaceChildren();if(!active())return true;
+      await Promise.all([...arcs,...flights]);effects.replaceChildren();if(!active())return true;
     }
     selected=[];phase='result';render();
-    const r=action.getBoundingClientRect();feedback.present(response.committedRewards,{x:r.left+r.width/2,y:r.top+r.height/2});
+    feedback.present(response.committedRewards,null,{particles:false});
     if(!motion.matches&&!document.hidden){scope.animation(face.animate([{transform:'scale(.25)',opacity:0},{transform:'scale(1.12)',opacity:1},{transform:'scale(1)',opacity:1}],{duration:FORGE_MOTION.flash,easing:'ease-out'}));scope.animation(aura.animate([{transform:'scale(.8)',opacity:0},{transform:'scale(1.25)',opacity:.7,offset:.35},{transform:'scale(1.5)',opacity:0}],{duration:FORGE_MOTION.flash}));}
     return true;
   }

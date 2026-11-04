@@ -37,7 +37,7 @@ export function createRewardFeedback({ owner, host }) {
   let current = null;
   const clear = () => { current?.dispose(); current = null; };
   owner.own(clear);
-  return { clear, present(rewards, origin) {
+  return { clear, present(rewards, origin, { particles = true } = {}) {
     if (!owner.active || !host.isConnected || !rewards?.length) return;
     clear();
     const scope = createGameShellLifecycle(), release = owner.own(() => scope.dispose()); current = scope;
@@ -48,6 +48,10 @@ export function createRewardFeedback({ owner, host }) {
     toast.textContent = `Đã nhận ${prizes.map(prize => prize.label).join(' + ')}`; layer.append(toast);
     const reduced = matchMedia('(prefers-reduced-motion: reduce)');
     const cue = phase => playRewardPhase(phase,owner);
+    if (!particles || reduced.matches || document.hidden) {
+      (host.closest('.app-modal-overlay') || document.body).append(layer);scope.own(() => layer.remove(),'node');
+      cue('receive');scope.timeout(() => scope.dispose(),1100);return;
+    }
     // Measure all destinations before mounting this batch. Missing/offscreen
     // destinations resolve to the page header, never a detached control.
     const fallback = center(host.querySelector('.app-modal__header').getBoundingClientRect());
@@ -59,7 +63,6 @@ export function createRewardFeedback({ owner, host }) {
     });
     (host.closest('.app-modal-overlay') || document.body).append(layer); scope.own(() => layer.remove(),'node');
     cue('receive');
-    if (reduced.matches || document.hidden) { scope.timeout(() => scope.dispose(),1100); return; }
     cue('drop');
     const animations = [], { dropMs, holdMs, flightMs } = LIVEOPS_REWARD_TIMING;
     const duration = dropMs + holdMs + flightMs, land = dropMs / duration, collect = (dropMs + holdMs) / duration;

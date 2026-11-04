@@ -23,7 +23,11 @@
 .letter-forge__face > .liveops__letter-art { width:60px; height:60px; }
 .letter-forge__aura { position:absolute; inset:-5px; border-radius:50%; box-shadow:0 0 12px 4px color-mix(in srgb,var(--ui-gold) 65%,transparent); opacity:0; pointer-events:none; }
 .letter-forge__effects { position:absolute; inset:0; z-index:3; pointer-events:none; }
-.letter-forge__ingredient { position:absolute; }
+.letter-forge__ingredient { position:absolute; filter:brightness(1.5) drop-shadow(0 0 4px #fff1ad); }
+.letter-forge__lightning { position:absolute; inset:0; width:100%; height:100%; overflow:visible; fill:none; stroke-linejoin:round; stroke-linecap:round; }
+.letter-forge__arc-glow { stroke:#81e5ff; stroke-width:6px; opacity:.3; }
+.letter-forge__arc-core { stroke:#e7fbff; stroke-width:1.5px; }
+.letter-forge__stage[data-phase='result'] .letter-forge__face > .liveops__letter-art { filter:brightness(1.25) drop-shadow(0 0 4px var(--ui-gold)); }
 .letter-forge__stage[data-phase='revealing'] .letter-forge__slot > .liveops__letter-art { opacity:0; }
 .letter-forge__palette { grid-area:palette; display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:5px; justify-items:center; }
 .letter-forge__palette[hidden] { display:none; }
