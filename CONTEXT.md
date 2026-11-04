@@ -1,8 +1,27 @@
 # CONTEXT — Trạng thái hiện tại (2026-11-01)
 
+## Vòng ghép chữ và ưu tiên chữ thiếu — hoàn tất
+
+- LETTER_FORGE_REFRESH_PLAN.md đã đóng, không còn kế hoạch active. Yêu cầu
+  dùng nút tâm để ghép, bỏ nút Ghép/Ghép tiếp, sửa vòng tròn3D đồng tâm
+  và thêm hiệu ứng ba chữ thu vào tâm rồi chữ mới rơi ra sau commit.
+- Luật đã duyệt: chọn đều các chữ count0 trước tiêu hao; nếu đã sở hữu
+  đủ17loại thì chọn đều cả17. Giữ legacy pending/receipt và quyền cập nhật
+  riêng Firestore rules. Mục bên dưới là lịch sử bản trước yêu cầu này.
+- Đã triển khai nút tâm3D liền, bỏ hai nút phía dưới. Sau commit, ba chữ
+  thu vào tâm rồi một chữ rơi ra bằng feedback/audio hiện có; chọn chữ
+  trong kho để bắt đầu lượt mới. Không thay đổi grant theo animation.
+- Luật mới dùng fusionPolicy missing-first-v1; fusionRoll lưu bền trước
+  mạng, chọn theo canonical counts trước tiêu hao. Retry/rebase dùng cùng
+  entropy; receipt đã commit luôn thắng. Lượt cũ giữ kết quả/law cũ.
+-17unit, hai emulator đạt (15 dữ liệu giả bị chặn), UI20ca và thêm1ca
+  đóng giữa absorb20vòng đạt. Check/build đạt; review độc lập không có
+  finding. Chưa đo FPS thiết bị thật. Rules mới đã released thành công
+  tới memorymatchv1-1a; không deploy Hosting/APK.
+
 ## Sưu tập chữ và ghép bất kỳ — hoàn tất 01/11/2026
 
-- Không còn kế hoạch active. LETTER_COLLECTION_FUSION_PLAN.md đã đóng,
+- LETTER_COLLECTION_FUSION_PLAN.md đã đóng,
   lưu phạm vi và bằng chứng của task này; không dùng làm task còn chờ.
 - Bốn bộ chữ là tab nhỏ một hàng cuộn ngang, ẩn thanh cuộn; tab đang
   chọn được đưa vào vùng nhìn thấy. Rương đúng bộ ở cột phải, kho17chữ
