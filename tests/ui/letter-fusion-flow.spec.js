@@ -125,17 +125,33 @@ test('while a closed forge is still committing, its inventory cannot open a stal
  await page.evaluate(()=>{fusionFixture.delay=false;fusionFixture.resolve();});await expect(inventoryLetter).toBeEnabled();await start(page);await expect(submit(page)).toBeDisabled();expect(await page.evaluate(()=>fusionFixture.letters.sequence)).toBe(1);
 });
 
-test('compact recipe keeps the reward on the right and captures narrow layouts',async({page},info)=>{
+test('compact recipe keeps all letters in one row above its reward and captures narrow layouts',async({page},info)=>{
  await ready(page);
  for(const width of [320,412]){
   await page.setViewportSize({width,height:915});await page.getByRole('tab',{name:'ADVENTURE',exact:true}).click();
   const boxes=await page.locator('.liveops__recipe').evaluate(root=>{
    const panel=root.getBoundingClientRect(),word=root.querySelector('.liveops__recipe-word').getBoundingClientRect(),reward=root.querySelector('.liveops__recipe-reward').getBoundingClientRect();
-   return {left:panel.left,right:panel.right,wordRight:word.right,rewardLeft:reward.left,rewardRight:reward.right,children:[...root.querySelectorAll('.liveops__recipe-reward > *')].map(node=>{const r=node.getBoundingClientRect();return {left:r.left,right:r.right};})};
+   return {left:panel.left,right:panel.right,wordBottom:word.bottom,rewardTop:reward.top,rewardLeft:reward.left,rewardRight:reward.right,children:[...root.querySelectorAll('.liveops__recipe-reward > *')].map(node=>{const r=node.getBoundingClientRect();return {left:r.left,right:r.right};})};
   });
-  expect(boxes.left).toBeGreaterThanOrEqual(0);expect(boxes.right).toBeLessThanOrEqual(width);expect(boxes.wordRight).toBeLessThanOrEqual(boxes.rewardLeft);expect(boxes.rewardRight).toBeLessThanOrEqual(boxes.right);for(const child of boxes.children){expect(child.left).toBeGreaterThanOrEqual(boxes.rewardLeft);expect(child.right).toBeLessThanOrEqual(boxes.right);}
+  expect(boxes.left).toBeGreaterThanOrEqual(0);expect(boxes.right).toBeLessThanOrEqual(width);expect(boxes.wordBottom).toBeLessThanOrEqual(boxes.rewardTop);expect(boxes.rewardRight).toBeLessThanOrEqual(boxes.right);for(const child of boxes.children){expect(child.left).toBeGreaterThanOrEqual(boxes.rewardLeft);expect(child.right).toBeLessThanOrEqual(boxes.right);}
+  await expect(page.locator('.liveops__recipe progress')).toHaveCount(0);
+  for(const name of ['MEMORY MATCH','LINK CONNECT','TRIPLE CONNECT','ADVENTURE']){await page.getByRole('tab',{name,exact:true}).click();const cells=await page.locator('.liveops__recipe .liveops__letter-slot:not([data-space])').evaluateAll(ns=>ns.map(n=>{const r=n.getBoundingClientRect();return {y:r.top,left:r.left,right:r.right};}));expect(new Set(cells.map(r=>Math.round(r.y))).size).toBe(1);expect(cells[0].left).toBeGreaterThanOrEqual(0);expect(cells.at(-1).right).toBeLessThanOrEqual(width);}
   await page.locator('.liveops__recipe').screenshot({path:info.outputPath(`recipe-${width}.png`)});
  }
+});
+
+test('bottom shortcuts retain the tap menu and sale only needs quantity and confirmation',async({page},info)=>{
+ await page.setViewportSize({width:320,height:740});await ready(page,{A:1,M:2,E:3});
+ const tools=page.locator('.liveops__letter-tools');await expect(tools.getByRole('button',{name:'Ghép',exact:true})).toBeEnabled();await tools.getByRole('button',{name:'Bán',exact:true}).click();
+ const sale=page.locator('#letter-sale'),quantity=sale.getByRole('spinbutton',{name:'Số chữ muốn bán',exact:true}),confirm=sale.getByRole('button',{name:'Xác nhận bán',exact:true});
+ await expect(sale.locator('.liveops__sale button')).toHaveCount(1);await expect(sale.locator('input')).toHaveCount(1);await expect(sale).toContainText('Bán 1 chữ A, nhận 10 Xu');
+ for(const n of ['0','2','1.5']){await quantity.fill(n);await expect(confirm).toBeDisabled();await expect(quantity).toHaveAttribute('aria-invalid','true');}
+ await quantity.fill('1');await expect(confirm).toBeEnabled();await sale.screenshot({path:info.outputPath('simple-sale.png')});
+ await confirm.evaluate(n=>{n.click();n.click();});await expect(sale).toHaveCount(0);await expect(page.locator('.liveops')).toHaveAttribute('aria-busy','false');expect(await page.evaluate(()=>fusionFixture.letters.counts.A)).toBe(0);expect(await page.evaluate(()=>fusionFixture.letters.sequence)).toBe(1);
+ await page.getByRole('button',{name:/^Chữ M, \d+ chữ$/}).click();await expect(page.locator('#letter-action-modal')).toBeVisible();await expect(page.locator('#letter-action-modal').getByRole('button',{name:'Ghép',exact:true})).toBeVisible();await page.locator('#letter-action-modal .app-modal__close').click();
+ await expect(page.getByRole('button',{name:/^Chữ M, \d+ chữ$/})).toHaveAttribute('aria-pressed','true');await tools.getByRole('button',{name:'Ghép',exact:true}).click();await expect(page.getByRole('button',{name:'Bỏ chữ M ở ô 1',exact:true})).toBeVisible();await close(page);
+ await tools.getByRole('button',{name:'Bán',exact:true}).click();await quantity.fill('2');await expect(sale).toContainText('nhận 20 Xu');await sale.locator('.app-modal__close').click();expect(await page.evaluate(()=>fusionFixture.letters.counts.M)).toBe(2);
+ const metrics=await page.locator('.liveops__letter-grid').evaluate(grid=>({columns:getComputedStyle(grid).gridTemplateColumns.split(' ').length,height:grid.getBoundingClientRect().height,maxCell:Math.max(...[...grid.children].map(n=>n.getBoundingClientRect().width))}));expect(metrics.columns).toBe(5);expect(metrics.height).toBeLessThan(240);expect(metrics.maxCell).toBeLessThanOrEqual(54);
 });
 
 test('hidden or reduced motion finishes local crafting animations without granting early or losing the result',async({page})=>{

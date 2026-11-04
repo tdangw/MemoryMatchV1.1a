@@ -30,7 +30,7 @@ async function open(page,kind='missions') {
 async function noOverflow(page) {
   const bad=await page.locator('.liveops').evaluate(root=>[...root.querySelectorAll('button,section,select,input')].filter(el=>el.getClientRects().length&&!el.closest('[role=tablist]')).filter(el=>el.getBoundingClientRect().right>innerWidth+1||el.getBoundingClientRect().left< -1).map(el=>el.outerHTML.slice(0,140)));
   expect(bad).toEqual([]);
-  const small=await page.locator('.liveops button:visible').evaluateAll(nodes=>nodes.filter(el=>{const r=el.getBoundingClientRect(),min=el.closest('.liveops__set-choices')?36:el.closest('.liveops__recipe-reward')?44:48;return r.width<min-.5||r.height<min-.5;}).map(el=>({text:el.textContent,width:el.getBoundingClientRect().width,height:el.getBoundingClientRect().height})));
+  const small=await page.locator('.liveops button:visible').evaluateAll(nodes=>nodes.filter(el=>{const r=el.getBoundingClientRect(),min=el.closest('.liveops__set-choices')?36:el.closest('.liveops__recipe-reward,.liveops__letter-grid,.liveops__letter-tools')?44:48;return r.width<min-.5||r.height<min-.5;}).map(el=>({text:el.textContent,width:el.getBoundingClientRect().width,height:el.getBoundingClientRect().height})));
   expect(small).toEqual([]);
 }
 for(const width of [320,360,412,844,1024])test(`five skins and both pages fit ${width}`,async({page})=>{
@@ -57,7 +57,7 @@ test('claims login, fixed recipes, sale confirmation, keyboard and shared four-c
   const weekly=page.getByRole('tab',{name:'Tuần này',exact:true});await weekly.focus();await weekly.press('ArrowLeft');await expect(page.getByRole('tab',{name:'Hôm nay',exact:true})).toBeFocused();
   await open(page,'events');await page.getByRole('tab',{name:'Sưu tập chữ',exact:true}).click();
   await page.getByRole('tab',{name:'MEMORY MATCH',exact:true}).click();await page.getByRole('button',{name:'Đổi MEMORY MATCH',exact:true}).click();await expect(page.locator('.liveops__status')).toContainText('Rương Avatar');
-  await page.getByRole('button',{name:/^Chữ A, \d+ chữ$/}).click();await page.locator('#letter-action-modal').getByRole('button',{name:'Bán',exact:true}).click();await page.getByRole('button',{name:'Bán tất cả',exact:true}).click();await expect(page.locator('#letter-sale')).toContainText('Xu');await page.getByRole('button',{name:'Xác nhận bán',exact:true}).click();await expect(page.locator('#letter-sale')).toHaveCount(0);
+  await page.getByRole('button',{name:/^Chữ A, \d+ chữ$/}).click();await page.locator('#letter-action-modal').getByRole('button',{name:'Bán',exact:true}).click();await page.getByRole('spinbutton',{name:'Số chữ muốn bán',exact:true}).fill(await page.getByRole('spinbutton',{name:'Số chữ muốn bán',exact:true}).getAttribute('max')); await expect(page.locator('#letter-sale')).toContainText('Xu');await page.getByRole('button',{name:'Xác nhận bán',exact:true}).click();await expect(page.locator('#letter-sale')).toHaveCount(0);
   await page.getByRole('tab',{name:'Sưu tập huy hiệu',exact:true}).click();
   for(const points of [100,25,75,50])await page.locator('.liveops__card').filter({has:page.getByRole('heading',{name:points+' huy hiệu',exact:true})}).getByRole('button',{name:'Nhận',exact:true}).click();
   await expect(page.getByText('Vòng 2',{exact:true})).toBeVisible();

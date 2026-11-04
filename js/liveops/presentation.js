@@ -37,7 +37,7 @@ export function openLiveopsPage(kind, surface = {}) {
 
   const rewardFeedback=createRewardFeedback({owner:scope,host:modal.panel});
   let letterDialog=null;scope.own(()=>letterDialog?.destroy());
-  let view = null, tab = 'daily', busy = false, animation = null, presentedSpin = null, eventTab = 'wheel', selectedSetId = 'adventure';
+  let view = null, tab = 'daily', busy = false, animation = null, presentedSpin = null, eventTab = 'wheel', selectedSetId = 'adventure', selectedLetter=null;
   let wheelRotor=null, wheelArt=null, confirmedView=false;
   const active = () => scope.active && root.isConnected;
   const canClaim=()=>confirmedView&&navigator.onLine&&!getActiveGameScope()&&view&&Math.floor((view.serverNow+performance.now()-observedAt)/DAY_MS)===view.state.day;
@@ -128,7 +128,7 @@ export function openLiveopsPage(kind, surface = {}) {
   const account=getAccountService();const accountKey=()=>{const identity=account?.getIdentity();return identity?`${identity.uid}:${identity.profileId}`:null;};let ownerKey=accountKey();
   if(account)scope.own(account.subscribe(()=>{
     const key=accountKey();
-    if(key!==ownerKey){ownerKey=key;letterDialog?.destroy();letterDialog=null;view=null;confirmedView=false;animation?.cancel();status.textContent='Tài khoản đã thay đổi. Cập nhật để xem phần thưởng.';retry.hidden=false;render();}
+    if(key!==ownerKey){ownerKey=key;selectedLetter=null;letterDialog?.destroy();letterDialog=null;view=null;confirmedView=false;animation?.cancel();status.textContent='Tài khoản đã thay đổi. Cập nhật để xem phần thưởng.';retry.hidden=false;render();}
   }));
   scope.listen(window,'offline',()=>{confirmedView=false;status.textContent='Đang xem tiến độ đã lưu. Kết nối để nhận thưởng.';render();});
   scope.listen(window,'online',()=>{if(active())void run({type:'status'});});
@@ -209,13 +209,18 @@ export function openLiveopsPage(kind, surface = {}) {
   }
   function showLetterMenu(letter){
     if(busy)return;
+    selectedLetter=letter;render();
     const key=accountKey(),current=()=>active()&&accountKey()===key;
-    const context=()=>({counts:view?.state.letters.counts||{},sequence:view?.state.letters.sequence||0,canUse:Boolean(canClaim())&&!busy});
     letterDialog?.destroy();
-    letterDialog=openLetterActions({letter,count:context().counts[letter]||0,owner:scope,current,
-      onSell:()=>{if(current())letterDialog=sellSheet(letter,context().counts[letter]||0);},
-      onFuse:()=>{if(current())letterDialog=openLetterFusion({initialLetter:letter,owner:scope,current,getContext:context,
-        execute:ingredients=>run({type:'fuseLetter',ingredients},{feedback:false}),refresh:()=>run({type:'status'},{feedback:false})});}});
+    letterDialog=openLetterActions({letter,count:letterContext().counts[letter]||0,owner:scope,current,
+      onSell:()=>openLetterOperation('sell',letter),onFuse:()=>openLetterOperation('fuse',letter)});
+  }
+  function letterContext(){return {counts:view?.state.letters.counts||{},sequence:view?.state.letters.sequence||0,canUse:Boolean(canClaim())&&!busy};}
+  function openLetterOperation(kind,letter){
+    if(busy||!active()||!(letterContext().counts[letter]>0))return;
+    const key=accountKey(),current=()=>active()&&accountKey()===key;letterDialog?.destroy();
+    letterDialog=kind==='sell'?sellSheet(letter,letterContext().counts[letter]):openLetterFusion({initialLetter:letter,owner:scope,current,getContext:letterContext,
+      execute:ingredients=>run({type:'fuseLetter',ingredients},{feedback:false}),refresh:()=>run({type:'status'},{feedback:false})});
   }
   function renderLetters() {
     if(!view){renderConnection(content);return;}
@@ -228,28 +233,31 @@ export function openLiveopsPage(kind, surface = {}) {
       event.preventDefault();selectedSetId=LETTER_SETS[next].id;render();root.querySelector(`[data-focus-key="set-${selectedSetId}"]`)?.focus({preventScroll:true});
     };
     const set=LETTER_SETS.find(item=>item.id===selectedSetId),letters=el('section','liveops__card liveops__recipe'),word=el('div','liveops__recipe-word');letters.setAttribute('aria-label','Bộ chữ và phần thưởng');
-    word.style.setProperty('--recipe-columns',Math.max(...set.label.split(' ').map(part=>part.length)));
+    word.style.setProperty('--recipe-columns',set.label.length);
     const filled=letterSetSlots(set,counts).filter(slot=>slot.filled).length,total=Object.values(set.required).reduce((sum,n)=>sum+n,0);
-    const recipePanel=el('div','liveops__recipe-panel');recipePanel.id='letter-recipe-panel';recipePanel.setAttribute('role','tabpanel');recipePanel.setAttribute('aria-labelledby',`letter-recipe-${set.id}`);recipePanel.append(letterSlots(set,counts),progress(filled,total,`Số chữ ${set.label}`));word.append(choices,recipePanel);
+    const recipePanel=el('div','liveops__recipe-panel');recipePanel.id='letter-recipe-panel';recipePanel.setAttribute('role','tabpanel');recipePanel.setAttribute('aria-labelledby',`letter-recipe-${set.id}`);recipePanel.append(letterSlots(set,counts));word.append(choices,recipePanel);
     const reward=el('div','liveops__recipe-reward');
     if(festivalChestsEnabled())reward.append(createIcon('chest'),el('strong','',CHEST_NAMES[set.chestType]));
     else{const next=LETTER_REWARD_ITEMS.find(item=>item.id===view.nextLetterRewardId);reward.append(createIcon('chest'),el('strong','',next?next.name:`${LETTER_FALLBACK_COINS} Xu`));}
     const exchange=button('Đổi quà',()=>void run({type:'exchangeLetterSet',setId:set.id}),busy||!canClaim()||filled<total,`exchange-${set.id}`);exchange.setAttribute('aria-label',`Đổi ${set.label}`);reward.append(exchange);letters.append(word,reward);
     const inventory=panel('Kho chữ'),grid=el('div','liveops__letter-grid');inventory.classList.add('liveops__inventory');
+    if(selectedLetter===null)selectedLetter=LETTER_ALPHABET.find(letter=>counts[letter]>0)||LETTER_ALPHABET[0];
     for(const letter of LETTER_ALPHABET){const count=counts[letter]||0,choice=button('',()=>showLetterMenu(letter),busy,`letter-${letter}`);
-      const glyph=letterArtwork(letter);glyph.classList.add('liveops__letter-glyph');choice.append(glyph,el('span','liveops__letter-count',`×${count}`));choice.dataset.empty=String(count===0);choice.setAttribute('aria-label',`Chữ ${letter}, ${count} chữ`);grid.append(choice);}
-    inventory.append(grid);content.append(letters,inventory);
+      const glyph=letterArtwork(letter);glyph.classList.add('liveops__letter-glyph');choice.append(glyph,el('span','liveops__letter-count',`×${count}`));choice.dataset.empty=String(count===0);choice.setAttribute('aria-label',`Chữ ${letter}, ${count} chữ`);choice.setAttribute('aria-pressed',String(selectedLetter===letter));grid.append(choice);}
+    const tools=el('div','liveops__letter-tools'),disabled=busy||!canClaim()||!(counts[selectedLetter]>0);
+    for(const [label,kind,icon]of [['Ghép','fuse','shuffle'],['Bán','sell','coins']]){const control=button(label,()=>openLetterOperation(kind,selectedLetter),disabled,`letter-${kind}`);control.prepend(createIcon(icon));control.setAttribute('aria-description',`Chữ ${selectedLetter}`);tools.append(control);}
+    inventory.append(grid,tools);content.append(letters,inventory);
   }
 
   function sellSheet(letter, max) {
     const sheet=el('div','liveops__sale'), quantity=el('input','liveops__letter-quantity');
     quantity.type='number';quantity.min='1';quantity.max=String(max);quantity.value='1';quantity.step='1';quantity.setAttribute('aria-label','Số chữ muốn bán');
-    const total=el('p'), confirm=button('Xác nhận bán',()=>{ const n=Number(quantity.value);if(!Number.isSafeInteger(n)||n<1||n>max)return; sale.destroy();void run({type:'sellLetter',letter,quantity:n}); });
-    const update=()=>{const n=Number(quantity.value);confirm.disabled=!Number.isSafeInteger(n)||n<1||n>max;total.textContent=confirm.disabled?'Chọn số chữ đang có.':`Nhận ${(n*LETTER_SELL_COINS).toLocaleString('vi-VN')} Xu`;};
-    const adjust=n=>{quantity.value=String(Math.min(max,Math.max(1,n)));update();};
+    quantity.inputMode='numeric';quantity.required=true;
+    const description=el('p'),confirm=button('Xác nhận bán',()=>{ const n=Number(quantity.value);if(!Number.isSafeInteger(n)||n<1||n>max)return; sale.destroy();void run({type:'sellLetter',letter,quantity:n}); });
+    const update=()=>{const n=Number(quantity.value);confirm.disabled=!Number.isSafeInteger(n)||n<1||n>max;quantity.setAttribute('aria-invalid',String(confirm.disabled));description.textContent=confirm.disabled?`Bạn có ${max} chữ ${letter}. Nhập số lượng từ 1 đến ${max}.`:`Bán ${n} chữ ${letter}, nhận ${(n*LETTER_SELL_COINS).toLocaleString('vi-VN')} Xu. Bạn đang có ${max} chữ ${letter}.`;};
     quantity.oninput=update;
-    sheet.append(el('p','',`Bán chữ ${letter} · Đang có ${max}`),button('Giảm 1',()=>adjust(Number(quantity.value)-1)),quantity,button('Tăng 1',()=>adjust(Number(quantity.value)+1)),button('Bán một nửa',()=>adjust(Math.floor(max/2))),button('Bán tất cả',()=>adjust(max)),total,confirm);update();
-    const sale=openAppModal({id:'letter-sale',title:'Bán chữ',content:sheet,owner:scope});quantity.focus();return sale;
+    const label=el('label','liveops__sale-quantity','Số lượng');label.append(quantity);sheet.append(description,label,confirm);update();
+    const sale=openAppModal({id:'letter-sale',title:'Bán chữ',content:sheet,owner:scope});sale.panel.classList.add('letter-sale-dialog');quantity.focus();return sale;
   }
   function render() {
     if (!active()) return;
