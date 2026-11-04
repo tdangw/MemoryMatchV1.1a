@@ -35,7 +35,7 @@ test('mixed and repeated ingredients select locally, commit exactly three once a
  await expect(page.locator('#letter-fusion-modal')).toContainText('Đã ghép được chữ M');
  expect(await page.evaluate(()=>fusionFixture.lastCommand)).toEqual({type:'fuseLetter',ingredients:['A','M','M']});
  expect(await page.evaluate(()=>fusionFixture.letters)).toEqual(expect.objectContaining({counts:{A:0,M:1,E:3},sequence:1,last:expect.objectContaining({ingredients:['A','M','M'],received:'M'})}));
- await page.getByRole('button',{name:'Ghép tiếp',exact:true}).click();await expect(page.locator('.letter-forge__slot[data-filled="true"]')).toHaveCount(0);
+ await expect(page.getByRole('button',{name:'Ghép tiếp',exact:true})).toHaveCount(0);await expect(page.locator('.letter-forge__slot[data-filled="true"]')).toHaveCount(0);
  for(let i=0;i<3;i++)await palette(page,'E').click();await submit(page).click();await expect(page.locator('#letter-fusion-modal')).toContainText('Đã ghép được chữ M');
  expect(await page.evaluate(()=>fusionFixture.letters.counts)).toEqual({A:0,M:2,E:0});expect(await page.evaluate(()=>fusionFixture.letters.sequence)).toBe(2);
 });
@@ -135,10 +135,37 @@ test('compact recipe keeps the reward on the right and captures narrow layouts',
 
 test('hidden or reduced motion finishes local crafting animations without granting early or losing the result',async({page})=>{
  await ready(page,{A:1,M:2});await page.emulateMedia({reducedMotion:'no-preference'});await start(page);await palette(page,'M').click();await palette(page,'M').click();await page.evaluate(()=>fusionFixture.delay=true);await submit(page).click();
- await page.locator('.letter-forge__ring').evaluate(node=>{for(const animation of node.getAnimations()){animation.pause();animation.currentTime=100;}Object.defineProperty(document,'hidden',{configurable:true,value:true});document.dispatchEvent(new Event('visibilitychange'));});
- expect(await page.locator('.letter-forge__ring').evaluate(node=>node.getAnimations().every(animation=>animation.playState==='finished'))).toBe(true);expect(await page.evaluate(()=>fusionFixture.letters.sequence)).toBe(0);
+ await page.locator('.letter-forge__aura').evaluate(node=>{for(const animation of node.getAnimations()){animation.pause();animation.currentTime=100;}Object.defineProperty(document,'hidden',{configurable:true,value:true});document.dispatchEvent(new Event('visibilitychange'));});
+ expect(await page.locator('.letter-forge__aura').evaluate(node=>node.getAnimations().every(animation=>animation.playState==='finished'))).toBe(true);expect(await page.evaluate(()=>fusionFixture.letters.sequence)).toBe(0);
  await page.evaluate(()=>{delete document.hidden;document.dispatchEvent(new Event('visibilitychange'));fusionFixture.delay=false;fusionFixture.resolve();});await expect(page.locator('#letter-fusion-modal')).toContainText('Đã ghép được chữ M');
- await page.locator('.letter-forge__result').evaluate(node=>{for(const animation of node.getAnimations()){animation.pause();animation.currentTime=100;}});await page.emulateMedia({reducedMotion:'reduce'});
- expect(await page.locator('.letter-forge__result').evaluate(node=>node.getAnimations().every(animation=>animation.playState==='finished'))).toBe(true);expect(await page.evaluate(()=>fusionFixture.letters.sequence)).toBe(1);
+ await page.locator('.letter-forge__face').evaluate(node=>{for(const animation of node.getAnimations()){animation.pause();animation.currentTime=100;}});await page.emulateMedia({reducedMotion:'reduce'});
+ expect(await page.locator('.letter-forge__face').evaluate(node=>node.getAnimations().every(animation=>animation.playState==='finished'))).toBe(true);expect(await page.evaluate(()=>fusionFixture.letters.sequence)).toBe(1);
  await close(page);await expect(page.locator('#letter-fusion-modal,.liveops-reward-feedback')).toHaveCount(0);
+});
+
+test('the centered 3D action absorbs three committed ingredients and reveals one letter without extra buttons',async({page},info)=>{
+ await ready(page,{A:1,M:2,E:3});await page.emulateMedia({reducedMotion:'no-preference'});await start(page);await palette(page,'M').click();await palette(page,'M').click();
+ const geometry=async()=>page.locator('.letter-forge__result').evaluate(button=>{const b=button.getBoundingClientRect(),face=button.querySelector('.letter-forge__face').getBoundingClientRect(),stage=button.parentElement.getBoundingClientRect();return {w:b.width,h:b.height,center:b.x+b.width/2,stageCenter:stage.x+stage.width/2,faceCenter:face.x+face.width/2};});
+ const before=await geometry();expect(before.w).toBe(before.h);expect(Math.abs(before.center-before.stageCenter)).toBeLessThan(1);expect(Math.abs(before.center-before.faceCenter)).toBeLessThan(1);
+ await expect(page.locator('.letter-forge__submit,.letter-forge__ring')).toHaveCount(0);await expect(submit(page)).toHaveClass('letter-forge__result');await page.screenshot({path:info.outputPath('forge-ready.png')});
+ await submit(page).click();await expect(page.locator('.letter-forge__ingredient')).toHaveCount(3);await expect(page.locator('.letter-forge__stage')).toHaveAttribute('data-phase','revealing');expect(await page.evaluate(()=>fusionFixture.letters.sequence)).toBe(1);
+ await page.locator('.letter-forge__ingredient').evaluateAll(nodes=>nodes.forEach(n=>n.getAnimations().forEach(a=>{a.pause();a.currentTime=180;})));await page.screenshot({path:info.outputPath('forge-absorb.png')});
+ await page.locator('.letter-forge__ingredient').evaluateAll(nodes=>nodes.forEach(n=>n.getAnimations().forEach(a=>a.finish())));await expect(page.locator('.letter-forge__ingredient')).toHaveCount(0);await expect(page.locator('.letter-forge__stage')).toHaveAttribute('data-phase','result');
+ await expect(page.locator('.liveops-reward-feedback__particle[data-reward-kind="letter"]')).toHaveCount(1);await expect(page.getByRole('button',{name:'Ghép tiếp',exact:true})).toHaveCount(0);expect((await geometry()).center).toBe(before.center);
+ await page.screenshot({path:info.outputPath('forge-result.png')});await palette(page,'E').click();await expect(page.locator('.letter-forge__stage')).toHaveAttribute('data-phase','select');await expect(page.locator('.letter-forge__slot[data-filled="true"]')).toHaveCount(1);await close(page);await expect(page.locator('.letter-forge__ingredient,.liveops-reward-feedback')).toHaveCount(0);
+});
+
+test('closing twenty forges during absorption cancels ghosts and prevents detached result feedback',async({page})=>{
+ await ready(page);await page.emulateMedia({reducedMotion:'no-preference'});
+ expect(await page.evaluate(async()=>{
+  const {createGameShellLifecycle}=await import('/js/gameShell/gameShellLifecycle.js'),{openLetterFusion}=await import('/js/liveops/letterCrafting.js');
+  for(let i=0;i<20;i++){
+   const owner=createGameShellLifecycle(),modal=openLetterFusion({initialLetter:'A',owner,current:()=>owner.active,getContext:()=>({counts:{A:1,M:2},sequence:0,canUse:true}),execute:async ingredients=>({state:{letters:{last:{kind:'fuse',ingredients,received:'C',sequence:1}}},committedRewards:[]}),refresh:async()=>null});
+   modal.panel.querySelector('[aria-label="Chọn chữ M, còn 2"]').click();modal.panel.querySelector('[aria-label="Chọn chữ M, còn 1"]').click();modal.panel.querySelector('[aria-label="Ghép"]').click();await new Promise(requestAnimationFrame);
+   if(modal.panel.querySelectorAll('.letter-forge__ingredient').length!==3)throw Error('Absorption did not start');
+   modal.destroy();owner.dispose();owner.dispose();await Promise.resolve();await Promise.resolve();
+   if(document.querySelector('#letter-fusion-modal,.letter-forge__ingredient,.liveops-reward-feedback'))throw Error('Detached forge retained effects');
+   if(Object.entries(owner.diagnostics()).some(([key,value])=>key==='active'?value!==false:value!==0))throw Error('Owner resources retained');
+  }return true;
+ })).toBe(true);
 });

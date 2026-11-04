@@ -26,24 +26,24 @@ const sameIngredients=(last,selected)=>{
   const ingredients=last.ingredients || [last.letter,last.letter,last.letter];
   return [...ingredients].sort().join('')===[...selected].sort().join('');
 };
+const FORGE_MOTION={absorb:520,stagger:60,flash:480};
 /** Local selection never changes inventory; only the existing transaction can consume it. */
 export function openLetterFusion({initialLetter,owner,current,getContext,execute,refresh}){
   const scope=createGameShellLifecycle(),content=node('div','letter-forge');
-  const description=node('p','letter-forge__intro','Chọn 3 chữ bất kỳ để nhận 1 chữ ngẫu nhiên.');
+  const description=node('p','letter-forge__intro','Ghép 3 chữ bất kỳ, ưu tiên chữ chưa có.');
   const stage=node('div','letter-forge__stage');
-  const ring=document.createElementNS('http://www.w3.org/2000/svg','svg');ring.setAttribute('viewBox','0 0 300 180');ring.classList.add('letter-forge__ring');ring.setAttribute('aria-hidden','true');
-  ring.innerHTML='<circle cx="150" cy="88" r="52"/><circle cx="150" cy="88" r="44"/><path d="M150 25v16M102 110l-32 23M198 110l32 23"/><path d="M150 32l5 7-5 7-5-7zm-61 85l6 5-7 4-5-5zm122 0l6 4-5 5-7-4z"/>';
-  const result=node('div','letter-forge__result');stage.append(ring,result);
+  const action=node('button','letter-forge__result');action.type='button';
+  const aura=node('span','letter-forge__aura'),face=node('span','letter-forge__face');aura.setAttribute('aria-hidden','true');action.append(aura,face);stage.append(action);
+  const effects=node('div','letter-forge__effects');effects.setAttribute('aria-hidden','true');stage.append(effects);
   const slots=Array.from({length:3},(_,i)=>{const b=node('button',`letter-forge__slot letter-forge__slot--${i+1}`);b.type='button';stage.append(b);return b;});
   const palette=node('div','letter-forge__palette');palette.setAttribute('aria-label','Chọn nguyên liệu');
   const status=node('p','letter-forge__status');status.setAttribute('role','status');
-  const action=node('button','app-button app-button--primary letter-forge__submit','Ghép');action.type='button';
-  content.append(description,stage,palette,status,action);
+  content.append(description,stage,palette,status);
   const modal=openAppModal({id:'letter-fusion-modal',title:'Ghép chữ',content,owner,alignment:'center',keepBanner:true,onDestroy:()=>scope.dispose()});
   modal.panel.classList.add('letter-forge-dialog');
   const feedback=createRewardFeedback({owner:scope,host:modal.panel});
   const motion=matchMedia('(prefers-reduced-motion: reduce)');
-  const finishLocalMotion=()=>{for(const element of [ring,result])for(const animation of element.getAnimations())if(animation.playState!=='idle')animation.finish();};
+  const finishLocalMotion=()=>{for(const animation of stage.getAnimations({subtree:true}))if(animation.playState!=='idle')animation.finish();};
   scope.listen(motion,'change',event=>{if(event.matches)finishLocalMotion();});
   scope.listen(document,'visibilitychange',()=>{if(document.hidden)finishLocalMotion();});
   let selected=(getContext().counts[initialLetter]||0)>0?[initialLetter]:[],phase='select',received=null,error='',requestSequence=null;
@@ -56,40 +56,49 @@ export function openLetterFusion({initialLetter,owner,current,getContext,execute
       if(selected[i]){slot.append(letterArtwork(selected[i]));slot.setAttribute('aria-label',`Bỏ chữ ${selected[i]} ở ô ${i+1}`);}
       else{slot.append(createIcon('plus'));slot.setAttribute('aria-label',`Ô nguyên liệu ${i+1}`);}
     }
-    result.replaceChildren();
-    if(received)result.append(letterArtwork(received));else result.append(createIcon('shuffle'),node('span','','Ngẫu nhiên'));
-    stage.dataset.phase=phase;palette.hidden=phase==='result';palette.replaceChildren();
-    if(phase!=='result')for(const letter of LETTER_ALPHABET){
+    face.replaceChildren();
+    if(phase==='result')face.append(letterArtwork(received));else face.append(createIcon('shuffle'),node('span','',phase==='recover'?'Thử lại':phase==='submitting'||phase==='revealing'?'Đang ghép…':'Ghép'));
+    stage.dataset.phase=phase;palette.replaceChildren();
+    for(const letter of LETTER_ALPHABET){
       const available=Math.max(0,(context.counts[letter]||0)-(needed[letter]||0));
-      const tile=node('button','letter-forge__tile');tile.type='button';tile.disabled=locked||phase==='recover'||selected.length>=3||available<1;
+      const tile=node('button','letter-forge__tile');tile.type='button';tile.disabled=(locked&&phase!=='result')||selected.length>=3||available<1;
       tile.setAttribute('aria-label',`Chọn chữ ${letter}, còn ${available}`);tile.dataset.empty=String(available<1);tile.append(letterArtwork(letter),node('span','letter-forge__count',`×${available}`));
-      tile.onclick=()=>{if(active()&&phase==='select'&&selected.length<3){selected.push(letter);error='';render();}};palette.append(tile);
+      tile.onclick=()=>{if(!active())return;if(phase==='result'){selected=[];received=null;phase='select';requestSequence=null;feedback.clear();}if(phase==='select'&&selected.length<3){selected.push(letter);error='';render();}};palette.append(tile);
     }
-    description.textContent=phase==='result'?`Đã ghép được chữ ${received}`:'Chọn 3 chữ bất kỳ để nhận 1 chữ ngẫu nhiên.';
-    status.textContent=error|| (phase==='select'?(context.canUse?`Đã chọn ${selected.length}/3`:'Kết nối để ghép chữ.'):'');
-    action.textContent=phase==='submitting'?'Đang ghép…':phase==='result'?'Ghép tiếp':phase==='recover'?'Thử lại':'Ghép';
-    action.disabled=phase==='submitting'||(phase==='select'&&(!valid()||!context.canUse));
+    description.textContent=phase==='result'?`Đã ghép được chữ ${received}`:'Ghép 3 chữ bất kỳ, ưu tiên chữ chưa có.';
+    status.textContent=error|| (phase==='result'?'Chọn chữ trong kho để ghép.':phase==='select'?(context.canUse?`Đã chọn ${selected.length}/3`:'Kết nối để ghép chữ.'):'');
+    action.setAttribute('aria-label',phase==='submitting'||phase==='revealing'?'Đang ghép…':phase==='result'?`Đã nhận chữ ${received}`:phase==='recover'?'Thử lại':'Ghép');
+    action.disabled=phase==='submitting'||phase==='revealing'||phase==='result'||(phase==='select'&&(!valid()||!context.canUse));
+    action.dataset.ready=String(phase==='select'&&valid()&&context.canUse);
   }
   slots.forEach((slot,i)=>scope.listen(slot,'click',()=>{if(active()&&phase==='select'){selected.splice(i,1);error='';render();}}));
-  function resolve(response){
+  async function resolve(response){
     const last=response.state?.letters.last;
     if(!last||last.kind!=='fuse'||last.sequence<=requestSequence||!sameIngredients(last,selected))return false;
-    received=last.received;phase='result';error='';render();
-    const r=result.getBoundingClientRect();feedback.present(response.committedRewards,{x:r.left+r.width/2,y:r.top+r.height/2});
-    if(!motion.matches&&!document.hidden)scope.animation(result.animate([{transform:'scale(.7)',opacity:0},{transform:'scale(1.08)',opacity:1},{transform:'scale(1)',opacity:1}],{duration:420,easing:'ease-out'}));
+    received=last.received;phase='revealing';error='';render();
+    if(!motion.matches&&!document.hidden){
+      const origin=stage.getBoundingClientRect(),center=action.getBoundingClientRect(),rects=slots.map(slot=>slot.getBoundingClientRect());
+      const flights=rects.map((r,i)=>{const ghost=letterArtwork(selected[i]);ghost.classList.add('letter-forge__ingredient');ghost.style.cssText+=`;left:${r.left-origin.left}px;top:${r.top-origin.top}px;width:${r.width}px;height:${r.height}px`;effects.append(ghost);
+        const animation=scope.animation(ghost.animate([{transform:'translate(0,0) scale(1)',opacity:1},{transform:`translate(${center.left+center.width/2-r.left-r.width/2}px,${center.top+center.height/2-r.top-r.height/2}px) scale(.12)`,opacity:0}],{duration:FORGE_MOTION.absorb,delay:i*FORGE_MOTION.stagger,easing:'cubic-bezier(.55,0,.85,.6)',fill:'both'}));
+        return animation.finished.then(()=>true,()=>false);
+      });
+      await Promise.all(flights);effects.replaceChildren();if(!active())return true;
+    }
+    selected=[];phase='result';render();
+    const r=action.getBoundingClientRect();feedback.present(response.committedRewards,{x:r.left+r.width/2,y:r.top+r.height/2});
+    if(!motion.matches&&!document.hidden){scope.animation(face.animate([{transform:'scale(.25)',opacity:0},{transform:'scale(1.12)',opacity:1},{transform:'scale(1)',opacity:1}],{duration:FORGE_MOTION.flash,easing:'ease-out'}));scope.animation(aura.animate([{transform:'scale(.8)',opacity:0},{transform:'scale(1.25)',opacity:.7,offset:.35},{transform:'scale(1.5)',opacity:0}],{duration:FORGE_MOTION.flash}));}
     return true;
   }
   scope.listen(action,'click',async()=>{
-    if(!active()||phase==='submitting')return;
-    if(phase==='result'){selected=[];received=null;phase='select';requestSequence=null;feedback.clear();render();return;}
+    if(!active()||['submitting','revealing','result'].includes(phase))return;
     const recovering=phase==='recover';if(!recovering&&(!valid()||!getContext().canUse))return;
     if(!recovering)requestSequence=getContext().sequence;
     phase='submitting';error='';render();
-    if(!motion.matches&&!document.hidden)scope.animation(ring.animate([{opacity:.35,transform:'scale(.96)'},{opacity:1,transform:'scale(1.05)'},{opacity:.65,transform:'scale(1)'}],{duration:450,easing:'ease-out'}));
+    if(!motion.matches&&!document.hidden)scope.animation(aura.animate([{opacity:0,transform:'scale(.9)'},{opacity:.6,transform:'scale(1.15)'},{opacity:0,transform:'scale(1.3)'}],{duration:FORGE_MOTION.flash,easing:'ease-out'}));
     try{
       const response=await (recovering?refresh():execute([...selected]));if(!active())return;
       if(!response||response.error)throw new Error(response?.error||'Chưa thể ghép chữ. Hãy thử lại.');
-      if(resolve(response))return;
+      if(await resolve(response))return;
       phase='select';error=recovering?'Kho chữ đã cập nhật. Kiểm tra nguyên liệu rồi ghép lại.':'Chưa thể ghép chữ. Hãy thử lại.';render();
     }catch(cause){if(active()){phase='recover';error=cause.message||'Chưa kết nối được. Hãy thử lại.';render();}}
   });
