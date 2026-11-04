@@ -26,7 +26,11 @@ const sameIngredients=(last,selected)=>{
   const ingredients=last.ingredients || [last.letter,last.letter,last.letter];
   return [...ingredients].sort().join('')===[...selected].sort().join('');
 };
-const FORGE_MOTION={charge:320,arc:640,absorb:520,stagger:60,flash:480};
+const FORGE_MOTION={submit:480,charge:320,arc:640,absorb:520,stagger:60,flash:480};
+function slotChargeArt(){
+  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.classList.add('letter-forge__slot-charge');svg.setAttribute('viewBox','-7 -7 62 62');svg.setAttribute('aria-hidden','true');
+  for(const cls of ['letter-forge__arc-glow','letter-forge__arc-core']){const path=document.createElementNS(svg.namespaceURI,'path');path.setAttribute('d','M-3 8L3 3 10 5 17-3 26 2 34-2 43 4 50 2 47 12 53 21 47 29 50 39 43 45 35 43 27 51 18 46 9 50 2 43 4 35-3 27 2 18Z');path.classList.add(cls);svg.append(path);}return svg;
+}
 function lightningPath(start,end,index){
   const dx=end.x-start.x,dy=end.y-start.y,length=Math.hypot(dx,dy),points=[`M${start.x},${start.y}`];
   for(let step=1;step<8;step++){const t=step/8,offset=(step%2?1:-1)*(4+(step+index)%3*2)*Math.sin(Math.PI*t);points.push(`L${start.x+dx*t-dy/length*offset},${start.y+dy*t+dx/length*offset}`);}
@@ -40,7 +44,8 @@ export function openLetterFusion({initialLetter,owner,current,getContext,execute
   const action=node('button','letter-forge__result');action.type='button';
   const aura=node('span','letter-forge__aura'),face=node('span','letter-forge__face');aura.setAttribute('aria-hidden','true');action.append(aura,face);stage.append(action);
   const effects=node('div','letter-forge__effects');effects.setAttribute('aria-hidden','true');stage.append(effects);
-  const slots=Array.from({length:3},(_,i)=>{const b=node('button',`letter-forge__slot letter-forge__slot--${i+1}`);b.type='button';stage.append(b);return b;});
+  const slotArt=[],slotCharges=[];
+  const slots=Array.from({length:3},(_,i)=>{const b=node('button',`letter-forge__slot letter-forge__slot--${i+1}`);b.type='button';const art=node('span','letter-forge__slot-art'),charge=slotChargeArt();slotArt.push(art);slotCharges.push(charge);b.append(art,charge);stage.append(b);return b;});
   const palette=node('div','letter-forge__palette');palette.setAttribute('aria-label','Chọn nguyên liệu');
   const status=node('p','letter-forge__status');status.setAttribute('role','status');
   content.append(description,stage,palette,status);
@@ -51,15 +56,25 @@ export function openLetterFusion({initialLetter,owner,current,getContext,execute
   const finishLocalMotion=()=>{for(const animation of stage.getAnimations({subtree:true}))if(animation.playState!=='idle')animation.finish();};
   scope.listen(motion,'change',event=>{if(event.matches)finishLocalMotion();});
   scope.listen(document,'visibilitychange',()=>{if(document.hidden)finishLocalMotion();});
+  let chargeScope=null;
+  const stopCharge=()=>{chargeScope?.dispose();chargeScope=null;};scope.own(stopCharge);
+  function startCharge(){
+    stopCharge();if(motion.matches||document.hidden)return Promise.resolve();
+    const local=createGameShellLifecycle();chargeScope=local;
+    const animations=[local.animation(aura.animate([{opacity:0,transform:'scale(.9)'},{opacity:.6,transform:'scale(1.15)'},{opacity:0,transform:'scale(1.3)'}],{duration:FORGE_MOTION.flash,easing:'ease-out'})),
+      ...slotCharges.map((art,i)=>local.animation(art.animate([{opacity:0,transform:'scale(.98)'},{opacity:1,transform:'scale(1.04)',offset:.16},{opacity:.25,offset:.36},{opacity:1,offset:.54},{opacity:.4,offset:.72},{opacity:1,offset:.84},{opacity:0,transform:'scale(1)'}],{duration:FORGE_MOTION.submit+i*FORGE_MOTION.stagger,easing:'ease-out'})))];
+    const finish=()=>{local.dispose();if(chargeScope===local)chargeScope=null;};
+    return Promise.all(animations.map(animation=>animation.finished)).then(finish,finish);
+  }
   let selected=(getContext().counts[initialLetter]||0)>0?[initialLetter]:[],phase='select',received=null,error='',requestSequence=null;
   const active=()=>scope.active&&current();
   const valid=()=>{const context=getContext(),needed=multiset(selected);return selected.length===3&&Object.entries(needed).every(([letter,count])=>(context.counts[letter]||0)>=count);};
   function render(){
     if(!active())return;const context=getContext(),needed=multiset(selected),locked=phase!=='select';
     for(const [i,slot]of slots.entries()){
-      slot.replaceChildren();slot.disabled=locked||!selected[i];slot.dataset.filled=String(Boolean(selected[i]));
-      if(selected[i]){slot.append(letterArtwork(selected[i]));slot.setAttribute('aria-label',`Bỏ chữ ${selected[i]} ở ô ${i+1}`);}
-      else{slot.append(createIcon('plus'));slot.setAttribute('aria-label',`Ô nguyên liệu ${i+1}`);}
+      const art=slotArt[i];art.replaceChildren();slot.disabled=locked||!selected[i];slot.dataset.filled=String(Boolean(selected[i]));
+      if(selected[i]){art.append(letterArtwork(selected[i]));slot.setAttribute('aria-label',`Bỏ chữ ${selected[i]} ở ô ${i+1}`);}
+      else{art.append(createIcon('plus'));slot.setAttribute('aria-label',`Ô nguyên liệu ${i+1}`);}
     }
     face.replaceChildren();
     if(phase==='result')face.append(letterArtwork(received));else face.append(createIcon('shuffle'),node('span','',phase==='recover'?'Thử lại':phase==='submitting'||phase==='revealing'?'Đang ghép…':'Ghép'));
@@ -68,7 +83,7 @@ export function openLetterFusion({initialLetter,owner,current,getContext,execute
       const available=Math.max(0,(context.counts[letter]||0)-(needed[letter]||0));
       const tile=node('button','letter-forge__tile');tile.type='button';tile.disabled=(locked&&phase!=='result')||selected.length>=3||available<1;
       tile.setAttribute('aria-label',`Chọn chữ ${letter}, còn ${available}`);tile.dataset.empty=String(available<1);tile.append(letterArtwork(letter),node('span','letter-forge__count',`×${available}`));
-      tile.onclick=()=>{if(!active())return;if(phase==='result'){selected=[];received=null;phase='select';requestSequence=null;feedback.clear();}if(phase==='select'&&selected.length<3){selected.push(letter);error='';render();}};palette.append(tile);
+      tile.onclick=()=>{if(!active())return;if(phase==='result'){finishLocalMotion();selected=[];received=null;phase='select';requestSequence=null;feedback.clear();}if(phase==='select'&&selected.length<3){selected.push(letter);error='';render();}};palette.append(tile);
     }
     description.textContent=phase==='result'?`Đã ghép được chữ ${received}`:'Ghép 3 chữ bất kỳ, ưu tiên chữ chưa có.';
     status.textContent=error|| (phase==='result'?'Chọn chữ trong kho để ghép.':phase==='select'?(context.canUse?`Đã chọn ${selected.length}/3`:'Kết nối để ghép chữ.'):'');
@@ -104,14 +119,14 @@ export function openLetterFusion({initialLetter,owner,current,getContext,execute
     if(!active()||['submitting','revealing','result'].includes(phase))return;
     const recovering=phase==='recover';if(!recovering&&(!valid()||!getContext().canUse))return;
     if(!recovering)requestSequence=getContext().sequence;
-    phase='submitting';error='';render();
-    if(!motion.matches&&!document.hidden)scope.animation(aura.animate([{opacity:0,transform:'scale(.9)'},{opacity:.6,transform:'scale(1.15)'},{opacity:0,transform:'scale(1.3)'}],{duration:FORGE_MOTION.flash,easing:'ease-out'}));
+    phase='submitting';error='';render();const chargeDone=startCharge();
     try{
       const response=await (recovering?refresh():execute([...selected]));if(!active())return;
       if(!response||response.error)throw new Error(response?.error||'Chưa thể ghép chữ. Hãy thử lại.');
+      await chargeDone;if(!active())return;
       if(await resolve(response))return;
       phase='select';error=recovering?'Kho chữ đã cập nhật. Kiểm tra nguyên liệu rồi ghép lại.':'Chưa thể ghép chữ. Hãy thử lại.';render();
-    }catch(cause){if(active()){phase='recover';error=cause.message||'Chưa kết nối được. Hãy thử lại.';render();}}
+    }catch(cause){stopCharge();if(active()){phase='recover';error=cause.message||'Chưa kết nối được. Hãy thử lại.';render();}}
   });
   render();return modal;
 }

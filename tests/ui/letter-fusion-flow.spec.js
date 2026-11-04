@@ -167,11 +167,28 @@ test('closing twenty forges during absorption cancels ghosts and prevents detach
   const {createGameShellLifecycle}=await import('/js/gameShell/gameShellLifecycle.js'),{openLetterFusion}=await import('/js/liveops/letterCrafting.js');
   for(let i=0;i<20;i++){
    const owner=createGameShellLifecycle(),modal=openLetterFusion({initialLetter:'A',owner,current:()=>owner.active,getContext:()=>({counts:{A:1,M:2},sequence:0,canUse:true}),execute:async ingredients=>({state:{letters:{last:{kind:'fuse',ingredients,received:'C',sequence:1}}},committedRewards:[]}),refresh:async()=>null});
-   modal.panel.querySelector('[aria-label="Chọn chữ M, còn 2"]').click();modal.panel.querySelector('[aria-label="Chọn chữ M, còn 1"]').click();modal.panel.querySelector('[aria-label="Ghép"]').click();await new Promise(requestAnimationFrame);
+   modal.panel.querySelector('[aria-label="Chọn chữ M, còn 2"]').click();modal.panel.querySelector('[aria-label="Chọn chữ M, còn 1"]').click();modal.panel.querySelector('[aria-label="Ghép"]').click();modal.panel.querySelector('.letter-forge__stage').getAnimations({subtree:true}).forEach(a=>a.finish());await new Promise(requestAnimationFrame);
    if(modal.panel.querySelectorAll('.letter-forge__ingredient').length!==3)throw Error('Absorption did not start');
    modal.destroy();owner.dispose();owner.dispose();await Promise.resolve();await Promise.resolve();
    if(document.querySelector('#letter-fusion-modal,.letter-forge__ingredient,.liveops-reward-feedback'))throw Error('Detached forge retained effects');
    if(Object.entries(owner.diagnostics()).some(([key,value])=>key==='active'?value!==false:value!==0))throw Error('Owner resources retained');
   }return true;
  })).toBe(true);
+});
+
+test('click sparks all three slots before the response; rapid retries reuse charge art and close cancels it',async({page},info)=>{
+ await ready(page,{A:1,M:2});await page.emulateMedia({reducedMotion:'no-preference'});await start(page);await palette(page,'M').click();await palette(page,'M').click();
+ await page.evaluate(()=>{fusionFixture.delay=true;window.chargeNodes=[...document.querySelectorAll('.letter-forge__slot-charge')];});
+ const pending=await submit(page).evaluate(button=>{button.click();button.click();return {phase:button.parentElement.dataset.phase,active:[...document.querySelectorAll('.letter-forge__slot-charge')].map(n=>n.getAnimations().filter(a=>a.playState==='running').length),animations:button.parentElement.getAnimations({subtree:true}).length,sequence:fusionFixture.letters.sequence};});
+ expect(pending).toEqual({phase:'submitting',active:[1,1,1],animations:4,sequence:0});await expect(page.locator('.letter-forge__ingredient,.letter-forge__lightning')).toHaveCount(0);
+ await page.locator('.letter-forge__stage').evaluate(n=>n.getAnimations({subtree:true}).forEach(a=>{a.pause();a.currentTime=180;}));await page.screenshot({path:info.outputPath('immediate-slot-charge.png')});
+ await page.locator('.letter-forge__stage').evaluate(n=>n.getAnimations({subtree:true}).forEach(a=>a.finish()));await expect(page.locator('.letter-forge__stage')).toHaveAttribute('data-phase','submitting');expect(await page.evaluate(()=>fusionFixture.letters.sequence)).toBe(0);
+ await page.evaluate(()=>{fusionFixture.fail=true;eventsFixture.fail=true;fusionFixture.delay=false;fusionFixture.resolve();});await expect(page.getByRole('button',{name:'Thử lại',exact:true}).last()).toBeVisible();
+ for(let i=0;i<10;i++){
+  await page.locator('#letter-fusion-modal').getByRole('button',{name:'Thử lại',exact:true}).click();await expect(page.locator('.letter-forge__stage')).toHaveAttribute('data-phase','recover');await expect(page.locator('.letter-forge__status')).not.toHaveText('');
+  expect(await page.locator('.letter-forge__stage').evaluate(n=>n.getAnimations({subtree:true}).filter(a=>a.playState==='running').length)).toBe(0);
+ }
+ expect(await page.evaluate(()=>chargeNodes.every((n,i)=>n===document.querySelectorAll('.letter-forge__slot-charge')[i]))).toBe(true);await expect(page.locator('.letter-forge__slot-charge')).toHaveCount(3);
+ await page.evaluate(()=>{fusionFixture.fail=false;eventsFixture.fail=false;fusionFixture.delay=true;});await page.locator('#letter-fusion-modal').getByRole('button',{name:'Thử lại',exact:true}).click();await close(page);await expect(page.locator('.letter-forge__slot-charge,.liveops-reward-feedback')).toHaveCount(0);
+ await page.evaluate(()=>{fusionFixture.delay=false;fusionFixture.resolve();});await expect(page.locator('#letter-fusion-modal,.liveops-reward-feedback')).toHaveCount(0);expect(await page.evaluate(()=>chargeNodes.every(n=>n.getAnimations().length===0))).toBe(true);
 });
