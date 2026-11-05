@@ -1,3 +1,4 @@
+import { WHEEL_SLOTS, WHEEL_ANGLE } from './wheelRewards.js';
 const SVG_NS = 'http://www.w3.org/2000/svg';
 let nextWheelId = 0;
 
@@ -14,10 +15,8 @@ function svg(className, markup) {
 export function createWheelArt() {
   const id = `liveops-wheel-${++nextWheelId}`;
   const paint = name => `url(#${id}-${name})`;
-  const wedges = Array.from({ length: 8 }, (_, index) =>
-    `<use href="#${id}-wedge" transform="rotate(${index * 45} 200 200)" fill="${paint(index % 2 ? 'sector-b' : 'sector-a')}"/>`).join('');
-  const coins = Array.from({ length: 8 }, (_, index) =>
-    `<use href="#${id}-coins" x="177" y="68" width="46" height="52" transform="rotate(${index * 45} 200 200)"/>`).join('');
+  const wedges = Array.from({ length: WHEEL_SLOTS.length }, (_, index) =>
+    `<use href="#${id}-wedge" transform="rotate(${index * WHEEL_ANGLE} 200 200)" fill="${paint(index % 2 ? 'sector-b' : 'sector-a')}"/>`).join('');
   const medallions = [0, 90, 180, 270].map(angle =>
     `<use href="#${id}-medallion" transform="rotate(${angle} 200 200)"/>`).join('');
   const rivets = [45, 135, 225, 315].map(angle =>
@@ -36,27 +35,13 @@ export function createWheelArt() {
         <stop offset=".36" stop-color="var(--liveops-wheel-sector-b, #b77e2b)"/>
         <stop offset="1" stop-color="var(--liveops-wheel-dark, #573514)"/>
       </radialGradient>
-      <linearGradient id="${id}-coin" x1="0" y1="0" x2="1" y2="1">
-        <stop stop-color="var(--liveops-wheel-light, #fff0a3)"/>
-        <stop offset=".48" stop-color="#f7ce61"/>
-        <stop offset="1" stop-color="#b7731a"/>
-      </linearGradient>
-      <path id="${id}-wedge" d="M200 200 134.56 42.01A171 171 0 0 1 265.44 42.01Z"/>
-      <symbol id="${id}-coins" viewBox="0 0 46 52">
-        <path d="M4 18v22c0 7 27 7 27 0V18Z" fill="#d79626" stroke="#704312" stroke-width="1.2"/>
-        <path d="M4 24c0 7 27 7 27 0M4 30c0 7 27 7 27 0M4 36c0 7 27 7 27 0M4 41c0 7 27 7 27 0" fill="none" stroke="#ffdf77" stroke-width="1.5"/>
-        <ellipse cx="17.5" cy="18" rx="13.5" ry="6.5" fill="${paint('coin')}" stroke="#fff0a3" stroke-width="1.3"/>
-        <ellipse cx="17.5" cy="18" rx="9.5" ry="3.7" fill="none" stroke="#a36a1c" stroke-width=".9"/>
-        <path d="m17.5 14.8 1.3 2.1 3.2.6-2.3 1.5.4 2.2-2.6-1-2.6 1 .4-2.2-2.3-1.5 3.2-.6Z" fill="#fff2ac" stroke="#ab751e" stroke-width=".55"/>
-        <ellipse cx="33" cy="38" rx="10" ry="7.3" transform="rotate(-27 33 38)" fill="${paint('coin')}" stroke="#ffdf77" stroke-width="1.5"/>
-        <ellipse cx="33" cy="38" rx="6.7" ry="4.6" transform="rotate(-27 33 38)" fill="none" stroke="#a36a1c" stroke-width="1"/>
-      </symbol>
+      <path id="${id}-wedge" d="M200 200 147.16 37.37A171 171 0 0 1 252.84 37.37Z"/>
     </defs>
     <circle cx="200" cy="200" r="174" fill="var(--liveops-wheel-dark, #573514)"/>
     <g stroke="#f9da85" stroke-width="2" stroke-linejoin="round">${wedges}</g>
     <circle cx="200" cy="200" r="169" fill="none" stroke="#714415" stroke-width="3"/>
     <circle cx="200" cy="200" r="166.5" fill="none" stroke="#f3d486" stroke-width="1"/>
-    ${coins}`);
+    `);
 
   const rim = svg('liveops__wheel-art liveops__wheel-art--rim', `
     <defs>

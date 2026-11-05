@@ -2,8 +2,11 @@ import { letterArtwork, openLetterActions, openLetterFusion } from './letterCraf
 import { showCollectionModal } from '../mainmenu.js';
 import { createRewardFeedback, captureRewardOrigin } from './rewardFeedback.js';
 import { createWheelArt } from './wheelArt.js';
+import { createWheelGiftArt, presentWheelGift, refreshWheelGiftArt, WHEEL_BOX_LABELS } from './wheelGiftArt.js';
+import { WHEEL_SLOTS, WHEEL_ANGLE, WHEEL_VERSION } from './wheelRewards.js';
+import { WHEEL_ITEMS } from './wheelCatalog.js';
 import { loadPersistentGameData } from '../persistence.js';
-import { FESTIVAL_MILESTONES } from './chestConfig.js';
+import { FESTIVAL_MILESTONES, CHEST_SUPPORTS, CHEST_POLICY } from './chestConfig.js';
 import { getAppPageScope } from '../appPageLifecycle.js';
 import { renderMissions as mountMissions, updateMissionCountdown } from './missionsPresentation.js';
 import { getAccountService } from '../accountService.js';
@@ -19,7 +22,7 @@ import { letterProgressLabel } from './letters.js';
 import { openAppModal, showAppToast } from '../modal.js';
 import { createGameShellLifecycle, getActiveGameScope, clearShellInterval } from '../gameShell/gameShellLifecycle.js';
 import { requestLiveops } from './service.js';
-import { WHEEL, DAY_MS } from './model.js';
+import { DAY_MS } from './model.js';
 import { openGameMenu } from '../gameSelector.js';
 import { getRecentGameId } from '../recentGame.js';
 import { refreshAppWallet } from '../appNavigation.js';
@@ -39,6 +42,10 @@ export function openLiveopsPage(kind, surface = {}) {
   let letterDialog=null;scope.own(()=>letterDialog?.destroy());
   let view = null, tab = 'daily', busy = false, animation = null, presentedSpin = null, eventTab = 'wheel', selectedSetId = 'adventure', selectedLetter=null;
   let wheelRotor=null, wheelArt=null, confirmedView=false;
+  let wheelPresentation=null;
+  scope.own(()=>wheelPresentation?.dispose());
+  const wheelMotion=matchMedia('(prefers-reduced-motion: reduce)');
+  scope.listen(wheelMotion,'change',event=>{if(event.matches&&animation?.playState==='running')animation.finish();});
   const active = () => scope.active && root.isConnected;
   const canClaim=()=>confirmedView&&navigator.onLine&&!getActiveGameScope()&&view&&Math.floor((view.serverNow+performance.now()-observedAt)/DAY_MS)===view.state.day;
   scope.own(() => animation?.cancel());
@@ -56,7 +63,9 @@ export function openLiveopsPage(kind, surface = {}) {
     if(command?.type!=='status'&&!canClaim()){status.textContent='Kết nối để cập nhật phần thưởng.';retry.hidden=false;return;}
     const identity = getAccountService()?.getIdentity();
     const owns = () => active() && getAccountService()?.getIdentity()?.profileId === identity?.profileId && getAccountService()?.getIdentity()?.uid === identity?.uid;
-    const spinHadFocus=spin&&document.activeElement?.dataset.focusKey==='spin-primary';
+    const wheelAction=spin||command?.type==='claimWheelReward';
+    let presentWheelResult=wheelAction;
+    const spinHadFocus=wheelAction&&document.activeElement?.dataset.focusKey==='spin-primary';
     let rewardOrigin=captureRewardOrigin(root);
     let renderOnFinish=true;
     retry.hidden=true;busy = true; if(view)render();else root.setAttribute('aria-busy','true'); status.textContent = kind==='events'&&eventTab==='wheel'?'':'Đang kết nối…';
@@ -67,27 +76,42 @@ export function openLiveopsPage(kind, surface = {}) {
       if(result.letterResult?.kind==='exchange' && result.letterResult.chestType)status.textContent=`Đã nhận ${CHEST_NAMES[result.letterResult.chestType]}. Mở trong Kho rương khi bạn muốn.`;
       else if(result.letterResult?.kind==='exchange')status.textContent=result.letterResult.itemId?`Đã nhận ${LETTER_REWARD_ITEMS.find(item=>item.id===result.letterResult.itemId).name}.`:`Đã nhận ${result.letterResult.coins} Xu.`;
       if (command?.type === 'fuseLetter' && result.state.letters.last?.kind === 'fuse') status.textContent = `Đã nhận chữ ${result.state.letters.last.received}.`;
-      busy=spin;render();renderOnFinish=spin;
-      if (spin) {
-        const source = rewarded ? 'ad' : command.source, receipt = result.spin || (source === 'ad' ? result.state.spins.ads.at(-1) : result.state.spins[source]);
-        presentedSpin = receipt;
+      presentWheelResult=wheelAction||Boolean(eventTab==='wheel'&&result.committedWheelRewards?.length);
+      busy=presentWheelResult;render();renderOnFinish=presentWheelResult;
+      if (presentWheelResult) {
+        const source=rewarded?'ad':command.source,receipt=result.spin||(spin?(source==='ad'?result.state.spins.ads.at(-1):result.state.spins[source]):null);
+        if(receipt)presentedSpin=receipt;
         const rotor = root.querySelector('.liveops__rotor');
-        if (receipt && rotor) {
-          const angle = 5 * 360 - receipt.sector * 45;
-          if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const freshSpin=Boolean(spin&&result.spinApplied),prizes=result.committedWheelRewards||[];
+        const wheel=result.wheelReward||receipt?.wheel;
+        if(freshSpin||prizes.length){
+          wheelPresentation?.dispose();const local=createGameShellLifecycle(),release=scope.own(()=>local.dispose());wheelPresentation=local;
+          local.own(()=>{release.forget();if(wheelPresentation===local)wheelPresentation=null;});
+          try {
+          if(freshSpin&&receipt?.wheel?.version===WHEEL_VERSION&&rotor){
+          const angle = 5 * 360 - receipt.sector * WHEEL_ANGLE;
+          if (!wheelMotion.matches&&!document.hidden) {
             animation = rotor.animate([{ transform: 'rotate(0deg)' }, { transform: `rotate(${angle}deg)` }],
               { duration: 2400, easing: 'cubic-bezier(.14,.65,.2,1)', fill: 'forwards' });
+            local.animation(animation);
             try { await animation.finished; } catch (error) { if (error.name !== 'AbortError') throw error; }
           }
-          if (owns()) {
-            rotor.style.transform = `rotate(${-receipt.sector * 45}deg)`;
+          if (owns()&&local.active&&eventTab==='wheel') {
+            rotor.style.transform = `rotate(${-receipt.sector * WHEEL_ANGLE}deg)`;
             const prize=rotor.querySelector(`[data-wheel-sector="${receipt.sector}"]`).getBoundingClientRect();
             rewardOrigin={x:prize.left+prize.width/2,y:prize.top+prize.height/2};
             status.textContent='';
           }
+          }
+          if(owns()&&local.active&&eventTab==='wheel'&&prizes.length){
+            const box=wheel?.box||(wheel?.version===WHEEL_VERSION&&wheel.sector===2?'coins':null);
+            if(box){const opened=await presentWheelGift(box,{owner:local,host:modal.overlay});if(opened)rewardOrigin=opened;}
+            if(owns()&&local.active&&eventTab==='wheel')rewardFeedback.present(prizes,rewardOrigin,{contextualNames:true});
+          }
+          } finally { local.dispose(); }
         }
       }
-      if(owns()&&feedback)rewardFeedback.present(result.committedRewards,rewardOrigin);
+      if(owns()&&feedback&&!presentWheelResult)rewardFeedback.present(result.committedRewards,rewardOrigin);
       return result;
     } catch (error) {
       if(owns()){confirmedView=false;retry.hidden=false;}
@@ -95,7 +119,7 @@ export function openLiveopsPage(kind, surface = {}) {
         try {const cached=await loadPersistentGameData();if(owns()&&cached.appearance.spark?.ownerUid===identity?.uid&&cached.appearance.spark.state){view={state:cached.appearance.spark.state,serverNow:Date.now()};observedAt=performance.now();}}
         catch {if(owns())status.textContent='Chưa đọc được bản lưu. Hãy tải lại trang.';return;}
       }
-      if (owns()) status.textContent = error.code === 'rewards/invalid-operation' ? error.message : error.code === 'rewards/not-enabled' ? 'Chưa mở được Nhiệm vụ và Sự kiện. Hãy thử lại sau.'
+      if (owns()) status.textContent = error.code === 'rewards/wheel-pending' ? 'Phần quà trước vẫn được giữ. Bấm Thử lại để nhận quà rồi quay tiếp.' : error.code === 'rewards/invalid-operation' ? error.message : error.code === 'rewards/not-enabled' ? 'Chưa mở được Nhiệm vụ và Sự kiện. Hãy thử lại sau.'
         : 'Chưa thể cập nhật. Phần thưởng chưa nhận vẫn được giữ. Hãy kết nối và thử lại.';
       if (error.code !== 'rewards/not-enabled') console.warn('Liveops page operation unavailable', error.code || error.name);
       return {error:status.textContent};
@@ -120,6 +144,7 @@ export function openLiveopsPage(kind, surface = {}) {
     if(targetDay>view.state.day&&refreshDay!==targetDay&&!busy&&navigator.onLine){refreshDay=targetDay;void run({type:'status'});}
   }
   function visibility() {
+    if(document.hidden&&animation?.playState==='running')animation.finish();
     if(timer!==null){clearShellInterval(timer);timer=null;}
     if(!document.hidden&&kind==='missions'){tick();timer=scope.interval(tick,60000);}
   }
@@ -128,13 +153,14 @@ export function openLiveopsPage(kind, surface = {}) {
   const account=getAccountService();const accountKey=()=>{const identity=account?.getIdentity();return identity?`${identity.uid}:${identity.profileId}`:null;};let ownerKey=accountKey();
   if(account)scope.own(account.subscribe(()=>{
     const key=accountKey();
-    if(key!==ownerKey){ownerKey=key;selectedLetter=null;letterDialog?.destroy();letterDialog=null;view=null;confirmedView=false;animation?.cancel();status.textContent='Tài khoản đã thay đổi. Cập nhật để xem phần thưởng.';retry.hidden=false;render();}
+    if(key!==ownerKey){ownerKey=key;selectedLetter=null;letterDialog?.destroy();letterDialog=null;wheelPresentation?.dispose();view=null;confirmedView=false;animation?.cancel();status.textContent='Tài khoản đã thay đổi. Cập nhật để xem phần thưởng.';retry.hidden=false;render();}
   }));
   scope.listen(window,'offline',()=>{confirmedView=false;status.textContent='Đang xem tiến độ đã lưu. Kết nối để nhận thưởng.';render();});
   scope.listen(window,'online',()=>{if(active())void run({type:'status'});});
   function renderEvents() {
     const tabs = createTabs('events', [['wheel','Vòng quay'],['letters','Sưu tập chữ'],['festival','Sưu tập huy hiệu']], eventTab, (key, panel) => {
       if(key!==eventTab){rememberScroll(`event:${eventTab}`);scope.frame(()=>{if(scrollHost)scrollHost.scrollTop=scrolls.get(`event:${key}`)||0;});}
+      if(key!==eventTab)wheelPresentation?.dispose();
       eventTab = key; animation?.cancel(); panel.replaceChildren();
       resetConnection();
       const old = content; content = panel;
@@ -166,31 +192,46 @@ export function openLiveopsPage(kind, surface = {}) {
     const wheel=el('section','liveops__card liveops__wheel-card'),stage=el('div','liveops__wheel');wheel.setAttribute('aria-label','Vòng quay');
     if(!wheelArt)wheelArt=createWheelArt();
     const rotor = wheelRotor || el('div', 'liveops__rotor');wheelRotor=rotor;
-    if(!rotor.childElementCount){rotor.append(wheelArt.rotor);for(const [index,amount]of WHEEL.entries()){
-      const label=el('span','liveops__sector',String(amount));label.style.setProperty('--sector',index);label.dataset.wheelSector=String(index);rotor.append(label);
+    if(!rotor.childElementCount){rotor.append(wheelArt.rotor);for(const [index,slot]of WHEEL_SLOTS.entries()){
+      const label=el('span','liveops__sector');label.style.setProperty('--sector',index);label.dataset.wheelSector=String(index);label.setAttribute('aria-hidden','true');
+      label.append(slot.box||index===2?createWheelGiftArt(slot.box||'coins'):createIcon('coin'),el('span','',slot.label.replace('Rương ','Rương\n')));rotor.append(label);
     }}
-    stage.append(rotor,wheelArt.rim,el('span','liveops__pointer'));stage.setAttribute('aria-label','Tám ô: 5, 10, 10, 15, 15, 20, 20, 25 Xu');
+    refreshWheelGiftArt(rotor);
+    stage.append(rotor,wheelArt.rim,el('span','liveops__pointer'));stage.setAttribute('aria-label','Vòng quay mười ô: 5 Xu, 10 Xu và tám loại rương');
     const spin=view?.state.spins,last=presentedSpin||spin?.ticket||spin?.ads.at(-1)||spin?.free;
-    if(last)rotor.style.transform=`rotate(${-last.sector*45}deg)`;
+    rotor.style.transform=`rotate(${last?.wheel?.version===WHEEL_VERSION?-last.sector*WHEEL_ANGLE:0}deg)`;
+    const pending=view?.state.pendingWheel;
     const source=!spin?.free?'free':view.state.tickets>0?'ticket':'ad';
     const exhausted=source==='ad'&&(spin?.ads.length||0)>=10;
     const labels={free:'Quay miễn phí',ticket:'Dùng 1 vé',ad:'Xem quảng cáo · Thêm 1 lượt'};
     const unavailable=source==='ad'&&(exhausted||view?.adPending||!rewardedSpinAvailable());
-    const trigger=button('',()=>source==='ad'?void run(null,{spin:true,rewarded:true}):void run({type:'spin',source},{spin:true}),busy||!canClaim()||Boolean(unavailable),'spin-primary');
+    const trigger=button('',()=>pending?void run({type:'claimWheelReward',wheelOperation:pending.operation}):source==='ad'?void run(null,{spin:true,rewarded:true}):void run({type:'spin',source},{spin:true}),busy||!canClaim()||(!pending&&Boolean(unavailable)),'spin-primary');
     trigger.classList.add('liveops__spin-primary');trigger.dataset.spinSource=source;
-    trigger.setAttribute('aria-label',busy?'Đang quay':exhausted?'Đã hết lượt quảng cáo hôm nay':labels[source]);
-    trigger.append(el('strong','',busy?'Quay…':exhausted?'Hết lượt':source==='ad'?'Thêm lượt':'Quay'),
-      el('small','',busy?'':exhausted?'Hôm nay':source==='free'?'Miễn phí':source==='ticket'?'1 vé':'Quảng cáo'));
+    trigger.setAttribute('aria-label',busy?'Đang quay':pending?'Nhận quà':exhausted?'Đã hết lượt quảng cáo hôm nay':labels[source]);
+    trigger.append(el('strong','',busy?'Chờ…':pending?'Nhận quà':exhausted?'Hết lượt':source==='ad'?'Thêm lượt':'Quay'),
+      el('small','',busy?'':pending?'Đang giữ':exhausted?'Hôm nay':source==='free'?'Miễn phí':source==='ticket'?'1 vé':'Quảng cáo'));
     if(unavailable)trigger.title=exhausted?'Đã dùng 10 lượt quảng cáo hôm nay.':view?.adPending?'Đang xác nhận lượt thưởng.':'Chưa có quảng cáo. Hãy thử lại sau.';
     stage.append(trigger);
     const primary=el('div','liveops__spin-actions'),ticketBalance=el('span','liveops__ticket-balance');
     ticketBalance.append(createIcon('ticket'),el('span','',view?`Vé quay: ${view.state.tickets}`:'Vé quay: …'));primary.append(ticketBalance);
     const info=button('',()=>{
-      const text=el('p','','Mỗi ô có xác suất 12,5%. Một lượt miễn phí và tối đa 10 lượt quảng cáo mỗi ngày; vé quay dùng riêng, không hết hạn. Không mua thêm lượt.');
-      openAppModal({id:'wheel-rules-modal',title:'Thể lệ vòng quay',content:text,owner:scope,alignment:'center',keepBanner:true});
+      const rules=el('div','liveops__wheel-rules'),list=el('ul');
+      for(const slot of WHEEL_SLOTS)list.append(el('li','',`${slot.label}: ${slot.weight}%`));
+      rules.append(list,el('p','','Rương mở ngay sau khi quay. Rương Xu nhận ngẫu nhiên từ 5 đến 50 Xu. Rương Ngẫu nhiên chọn đều một rương C, Avatar, Khung hoặc Huy hiệu rồi mở rương đó. Các rương còn lại nhận đúng loại quà ghi trên rương; Rương Hỗ trợ chọn đều một trong ba trò rồi chọn đều loại hỗ trợ của trò đó.'),el('p','','Trong các nhóm ngoại hình, hiệu ứng và chủ đề, ưu tiên chọn đều món chưa sở hữu. Khi đã có đủ nhóm, nhận 100 Xu. Nếu món quà đã được chọn nay trở thành trùng, nhận 100 Xu. Kho hỗ trợ đầy thì quà được giữ để nhận sau, không quay lại hoặc dùng thêm lượt.'),el('p','','Một lượt miễn phí và tối đa 10 lượt quảng cáo mỗi ngày. Vé quay dùng riêng, không hết hạn; không mua thêm lượt.'));
+      const games={'memory-match':'Memory Match','link-connect':'Link Connect','triple-connect':'Triple Connect'};
+      for(const slot of WHEEL_SLOTS.filter(slot=>slot.box)){
+        const details=el('details'),summary=el('summary','',`Xem quà trong ${slot.label}`),pool=el('ul');details.append(summary,pool);
+        details.ontoggle=()=>{if(!details.open||pool.childElementCount)return;
+          if(slot.box==='support')for(const [id,items]of Object.entries(CHEST_SUPPORTS))pool.append(el('li','',`${games[id]}: ${items.map(item=>item.label).join(', ')}`));
+          else if(slot.box==='mystery')for(const [type,policy]of Object.entries(CHEST_POLICY))pool.append(el('li','',`${CHEST_NAMES[type]}: ${policy.coinChance*100}% nhận ${policy.coins} Xu, ${policy.supportChance*100}% nhận hỗ trợ${type==='c'?'':', 20% nhận ngoại hình đúng loại'}.`));
+          else for(const item of WHEEL_ITEMS.filter(item=>item.category===slot.box))pool.append(el('li','',item.name+(item.category!=='cosmetic'&&item.gameId?` · ${games[item.gameId]}`:'')));
+        };rules.append(details);
+      }
+      openAppModal({id:'wheel-rules-modal',title:'Thể lệ vòng quay',content:rules,owner:scope,alignment:'center',keepBanner:true});
     },busy,'wheel-rules');
     info.classList.add('liveops__wheel-info');info.setAttribute('aria-label','Thể lệ vòng quay');info.append(createIcon('info'));
     wheel.append(info,stage,primary);content.append(wheel);
+    if(pending){const held=el('div','liveops__wheel-pending');held.append(createWheelGiftArt(pending.wheel.box),el('p','',`${WHEEL_BOX_LABELS[pending.wheel.box]} đang được giữ. Hãy dùng bớt hỗ trợ trong kho rồi bấm Nhận quà.`));content.append(held);}
     if(view){const set=LETTER_SETS.find(item=>item.id===selectedSetId),mini=panel('Sưu tập chữ');mini.classList.add('liveops__letter-mini');mini.append(el('strong','',set.label),letterSlots(set,view.state.letters.counts),button('Xem Sưu tập chữ',()=>{eventTab='letters';render();}));content.append(mini);}
   }
   function openChests() {

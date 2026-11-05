@@ -13,8 +13,8 @@ html .liveops button.tab-button, html .liveops__sale button.tab-button { min-hei
 .liveops__progress-row { display: flex; align-items: center; gap: 8px; }
 .liveops__progress { flex: 1; width: 0; height: 18px; accent-color: #35833d; }
 .liveops__wheel { width: min(100%, 304px); aspect-ratio: 1; margin: 12px auto 18px; position: relative; container-type: inline-size; }
-.liveops__rotor { position: absolute; inset: 0; border: 8px ridge #ad7d32; border-radius: 50%; background: repeating-conic-gradient(from -22.5deg, #f5dfa4 0deg 45deg, #246a58 45deg 90deg); }
-.liveops__sector { position: absolute; top: 50%; left: 50%; width: 44px; margin-left: -22px; margin-top: -12px; text-align: center; font-weight: 900; color: #3d2715; transform: rotate(calc(var(--sector) * 45deg)) translateY(-35cqi); }
+.liveops__rotor { position:absolute; inset:0; border-radius:50%; }
+.liveops__sector { position:absolute; top:50%; left:50%; width:44px; margin-left:-22px; margin-top:-24px; text-align:center; font-weight:900; color:#fff3c2; transform:rotate(calc(var(--sector)*36deg)) translateY(-34cqi); }
 .liveops__sector:nth-child(even) { color: #fff2c0; }
 .liveops__pointer { position: absolute; top: -6px; left: calc(50% - 12px); width: 24px; height: 36px; background: #b37817; clip-path: polygon(0 0, 100% 0, 50% 100%); }
 .liveops__status { min-height: 2.6em; }
@@ -168,7 +168,11 @@ html .liveops-page .liveops-surface .liveops__mission-action button { width:100%
 .liveops-surface .liveops__rotor { border:0; background:none; }
 .liveops__wheel-art { position:absolute; inset:0; pointer-events:none; }
 .liveops__wheel-art--rim { z-index:2; }
-.liveops-surface .liveops__sector { z-index:1; width:40px; margin-left:-20px; margin-top:-10px; font-size:clamp(13px,4vw,20px); color:#fff3c2; text-shadow:0 1px 2px #45290c; transform:rotate(calc(var(--sector) * 45deg)) translateY(-35cqi); }
+.liveops-surface .liveops__sector { z-index:1; display:grid; justify-items:center; gap:1px; width:clamp(28px,12cqi,52px); margin-left:clamp(-26px,-6cqi,-14px); margin-top:-24px; font-size:clamp(7px,2.4cqi,11px); line-height:1.15; color:#fff3c2; text-shadow:0 1px 2px #45290c; transform:rotate(calc(var(--sector)*36deg)) translateY(-34cqi); }
+.liveops__sector > :is(.wheel-gift-art,.ui-icon) { width:clamp(24px,10cqi,44px); height:clamp(24px,10cqi,44px); }
+.liveops__sector > span { white-space:pre-line; }
+.liveops__wheel-rules { font-size:13px; line-height:1.5; }
+.liveops__wheel-rules ul { padding-left:20px; }
 .liveops-surface .liveops__pointer { top:2%; left:calc(50% - 9px); width:18px; height:29px; background:linear-gradient(90deg,var(--liveops-wheel-light),var(--liveops-wheel-dark)); z-index:3; }
 .liveops__spin-actions { position:absolute; z-index:5; top:8px; left:0; display:flex; align-items:center; }
 html .liveops-page .liveops-surface .tab-button.liveops__spin-primary { position:absolute; z-index:4; left:50%; top:50%; transform:translate(-50%,-50%); display:flex; flex-direction:column; justify-content:center; gap:2px; flex:none; width:24%; height:24%; max-width:106px; max-height:106px; min-width:56px; min-height:56px; margin:0; padding:4px; border:2px solid var(--liveops-wheel-light); border-image:none; border-radius:50%; background:radial-gradient(circle at 35% 25%,var(--liveops-wheel-light),var(--liveops-wheel-sector-b)); color:#493014; box-shadow:0 2px 4px #42270b88,inset 0 0 0 3px #9b69294d; font-size:clamp(12px,3.5cqi,17px); line-height:1.1; text-shadow:0 1px #fff5; }

@@ -3,6 +3,7 @@ import { createGameShellLifecycle } from '../gameShell/gameShellLifecycle.js';
 import { createIcon } from '../icons.js';
 import { LOOT_PRESETS, LOOT_HOLD_MS } from '../lootEffects.js';
 import { CHEST_NAMES, CHEST_ITEMS, CHEST_SUPPORTS } from './chestConfig.js';
+import { wheelItem } from './wheelCatalog.js';
 import { LETTER_ALPHABET } from './config.js';
 import { REWARD_FEEDBACK_LIMIT } from './rewardFeedbackModel.js';
 import { playRewardPhase } from '../rewardAudio.js';
@@ -10,16 +11,18 @@ import '../../styles/liveops-reward-feedback.css';
 
 export const LIVEOPS_REWARD_TIMING = Object.freeze({ dropMs:LOOT_PRESETS.memory.dropMs, holdMs:LOOT_HOLD_MS, flightMs:LOOT_PRESETS.memory.flightMs });
 const supportIcons = { hint:'wand', preview4:'eye', time30:'timer', reshuffle:'shuffle', thunder:'energy', freeze:'snowflake', undo:'undo', shuffle:'shuffle', time:'timer' };
-function describe(reward) {
+function describe(reward,contextualNames=false) {
+  const gameName=id=>({'memory-match':'Memory Match','link-connect':'Link Connect','triple-connect':'Triple Connect'})[id];
   if (reward.kind === 'coins') return { icon:'coin', label:`${reward.amount.toLocaleString('vi-VN')} Xu`, target:'.app-wallet' };
   if (reward.kind === 'ticket') return { icon:'ticket', label:`${reward.amount} Vé quay`, target:'.liveops__ticket-balance' };
   if (reward.kind === 'chest') return { icon:'chest', label:`${reward.amount} ${CHEST_NAMES[reward.chestType]}`, target:'[data-dock-action="collection"], [data-map-destination="collection"]' };
   if (reward.kind === 'letter') return { letter:reward.letter, label:`Chữ ${reward.letter}`, target:`.liveops__letter-grid [aria-label^="Chữ ${reward.letter},"]` };
-  if (reward.kind === 'support') return { icon:supportIcons[reward.key], label:CHEST_SUPPORTS[reward.gameId].find(item => item.key === reward.key).label, target:'[data-dock-action="collection"], [data-map-destination="collection"]' };
-  const item = CHEST_ITEMS.find(item => item.id === reward.itemId);
-  return { icon:item?.type === 'avatar' ? 'profile' : 'achievements', label:item?.name || 'Ngoại hình mới', target:'[data-dock-action="collection"], [data-map-destination="collection"]' };
+  if (reward.kind === 'support') return { icon:supportIcons[reward.key], label:CHEST_SUPPORTS[reward.gameId].find(item => item.key === reward.key).label+(contextualNames?` · ${gameName(reward.gameId)}`:''), target:'[data-dock-action="collection"], [data-map-destination="collection"]' };
+  const item = wheelItem(reward.itemId) || CHEST_ITEMS.find(item => item.id === reward.itemId);
+  return { icon:item?.icon || (item?.type === 'avatar' ? 'profile' : 'achievements'), image:item?.files?.[128], label:(item?.name || 'Ngoại hình mới')+(contextualNames&&item?.category!=='cosmetic'&&item?.gameId?` · ${gameName(item.gameId)}`:''), target:'[data-dock-action="collection"], [data-map-destination="collection"]' };
 }
 function artwork(prize) {
+  if (prize.image) { const image=document.createElement('img');image.src=`${import.meta.env.BASE_URL}${prize.image.replace(/^\//,'')}`;image.alt='';image.width=image.height=36;return image; }
   if (!prize.letter) return createIcon(prize.icon);
   const sprite = document.createElement('span'), index = LETTER_ALPHABET.indexOf(prize.letter);
   sprite.className = 'liveops-reward-feedback__letter'; sprite.setAttribute('aria-hidden','true');
@@ -37,14 +40,14 @@ export function createRewardFeedback({ owner, host }) {
   let current = null;
   const clear = () => { current?.dispose(); current = null; };
   owner.own(clear);
-  return { clear, present(rewards, origin, { particles = true } = {}) {
+  return { clear, present(rewards, origin, { particles = true,contextualNames=false } = {}) {
     if (!owner.active || !host.isConnected || !rewards?.length) return;
     clear();
     const scope = createGameShellLifecycle(), release = owner.own(() => scope.dispose()); current = scope;
     scope.own(() => { release.forget(); if (current === scope) current = null; });
     const layer = document.createElement('div'); layer.className = 'liveops-reward-feedback';
     const toast = document.createElement('div'); toast.className = 'liveops-reward-feedback__toast'; toast.setAttribute('role','status');
-    const prizes = rewards.map(reward => ({ ...describe(reward), kind:reward.kind, amount:reward.amount }));
+    const prizes = rewards.map(reward => ({ ...describe(reward,contextualNames), kind:reward.kind, amount:reward.amount }));
     toast.textContent = `Đã nhận ${prizes.map(prize => prize.label).join(' + ')}`; layer.append(toast);
     const reduced = matchMedia('(prefers-reduced-motion: reduce)');
     const cue = phase => playRewardPhase(phase,owner);
