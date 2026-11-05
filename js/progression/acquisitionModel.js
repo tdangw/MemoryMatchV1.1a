@@ -2,6 +2,7 @@ import { CHEST_ITEMS } from '../liveops/chestConfig.js';
 import { LETTER_REWARD_ITEMS } from '../liveops/letterCatalog.generated.js';
 import { eventCollection } from '../liveops/config.js';
 import { EXTRA_COSMETIC_ITEMS } from './achievementCatalog.generated.js';
+import { wheelItem } from '../liveops/wheelCatalog.js';
 
 const record = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 const invalid = () => new Error('Bản lưu quà Sự kiện chưa toàn vẹn. Dữ liệu được giữ nguyên.');
@@ -12,6 +13,12 @@ export function normalizeAcquisitions(value) {
   if (!record(value) || value.version !== 1 || !record(value.grants)) throw invalid();
   const grants = {};
   for (const [id, grant] of Object.entries(value.grants)) {
+    if(grant?.sourceKind==='wheel'){
+      const item=Array.isArray(grant.items)&&grant.items.length===1?wheelItem(grant.items[0]):null;
+      if(!item||grant.receiptId!==id||typeof grant.ownerUid!=='string'||!/^[A-Za-z0-9_-]{1,128}$/.test(grant.ownerUid)
+        ||id!==`${grant.ownerUid}:wheel:item:${item.id}`||grant.sourceId!=='wheel-v2'||!Number.isSafeInteger(grant.grantedAt)||grant.grantedAt<0)throw invalid();
+      grants[id]={receiptId:id,ownerUid:grant.ownerUid,sourceKind:'wheel',sourceId:'wheel-v2',items:[item.id],grantedAt:grant.grantedAt};continue;
+    }
     if(grant?.sourceKind==='chest'){
       const item=Array.isArray(grant.items)&&grant.items.length===1?CHEST_ITEMS.find(item=>item.id===grant.items[0]):null;
       if(!item||grant.receiptId!==id||typeof grant.ownerUid!=='string'||!/^[A-Za-z0-9_-]{1,128}$/.test(grant.ownerUid)
