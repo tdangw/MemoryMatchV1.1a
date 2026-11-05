@@ -32,6 +32,10 @@ test('events recognize free spin, tickets, complete letter recipes and each uncl
   assert.equal(ready(input).events,false);
   state.spins.free = null; assert.equal(ready(input).events,true); state.spins.free = {};
   state.tickets = 1; assert.equal(ready(input).events,true); state.tickets = 0;
+  state.pendingWheel = { operation:'held-support' }; input.period=null;
+  assert.equal(ready(input).events,true,'a held wheel gift remains visible without a daily clock');
+  state.pendingWheel = null; input.period={uid,day:state.day};
+  assert.equal(ready(input).events,false);
   state.letters.counts = { M:99 }; assert.equal(ready(input).events,false, 'sale/fusion and advertisements are optional actions');
   for (const recipe of LETTER_SETS) {
     state.letters.counts = { ...recipe.required }; assert.equal(ready(input).events,true);

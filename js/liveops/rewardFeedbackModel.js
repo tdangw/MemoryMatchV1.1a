@@ -2,6 +2,16 @@ import { CHEST_TYPES } from './chestConfig.js';
 
 // Presentation facts only: never persisted or used to grant an entitlement.
 export const REWARD_FEEDBACK_LIMIT = 12;
+/** A wheel grant is separate from mission/rollover grants in the same request. */
+export function committedWheelRewardsForTransition(result) {
+  if (!result.wheelApplied) return [];
+  const reward = result.wheelReward;
+  if (!reward) return result.spin?.coins > 0 ? [{kind:'coins',amount:result.spin.coins}] : [];
+  if (reward.kind === 'coins') return [{kind:'coins',amount:reward.coins}];
+  if (reward.kind === 'item') return [{kind:'item',itemId:reward.itemId,amount:1}];
+  if (reward.kind === 'support') return [{kind:'support',gameId:reward.gameId,key:reward.key,amount:1}];
+  return [];
+}
 export function mergeCommittedRewards(previous = [], incoming = []) {
   const merged = new Map();
   for (const reward of [...previous, ...incoming]) {

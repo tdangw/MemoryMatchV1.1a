@@ -1,7 +1,9 @@
 import { publishRewardPeriod } from './rewardPeriodViewState.js';
 import { hourlyGiftCandidate } from './hourlyGift.js';
 import { MISSING_FIRST_FUSION_POLICY, prepareFusionCandidate } from './letters.js';
-import { committedRewardsForTransition, mergeCommittedRewards } from './rewardFeedbackModel.js';
+import { committedRewardsForTransition, committedWheelRewardsForTransition, mergeCommittedRewards } from './rewardFeedbackModel.js';
+import { WHEEL_VERSION, createWheelRolls, createWheelCandidate } from './wheelRewards.js';
+import { ownedWheelItemIds, applyWheelAcquisitions } from './wheelCatalog.js';
 import { CHEST_TYPES, CHEST_VERSION } from './chestConfig.js';
 import { chestCandidate } from './chests.js';
 import { festivalChestsEnabled } from './availability.js';
@@ -23,6 +25,13 @@ import { normalizeAcquisitions } from '../progression/acquisitionModel.js';
 let running = null, clock = null, binding = null, statusTask = null;
 function updateClock(value) { clock = value; publishRewardPeriod(); }
 const pendingKey = identity => `sparkPending:${identity.environment}:${identity.uid}:${identity.profileId}`;
+function confirmedWheelFeedback(result, operation) {
+  if(result.wheelApplied)return committedWheelRewardsForTransition(result);
+  // A durable pending request is an unacknowledged result, not another entitlement.
+  const recovered=operation?.type==='spin'&&result.spin?.operation===operation.operation
+    && result.state.pendingWheel?.operation!==operation.operation;
+  return recovered?committedWheelRewardsForTransition({...result,wheelApplied:true}):[];
+}
 export function bindLiveopsAccount(account) {
   binding?.dispose(); updateClock(null);
   if (!liveopsEnabled()) { binding = null; return () => {}; }
@@ -87,20 +96,24 @@ export function requestLiveops(command = { type: 'status' }) {
   void task.finally(() => { if (running === task) running = null; if(statusTask?.task===task)statusTask=null; }).catch(() => {});
   return task;
 }
-async function perform(command, pass = 0, expected = null, totals = {reads:0,writes:0,bytes:0,coins:0}, committedRewards = []) {
+async function perform(command, pass = 0, expected = null, totals = {reads:0,writes:0,bytes:0,coins:0}, committedRewards = [], committedWheelRewards = []) {
   if(pass > 4 + Math.ceil(LETTER_ALPHABET.length / LETTER_SYNC_KEYS_PER_COMMIT)) throw new Error('Hãy tải lại tiến độ để hoàn tất đồng bộ.');
   const account = getAccountService(), initial = account?.getIdentity();
   if(expected && (initial?.uid!==expected.uid || initial?.profileId!==expected.profileId))throw new Error('Tài khoản đã thay đổi.');
   if (!initial || !navigator.onLine || getActiveGameScope()) throw new Error('Kết nối tài khoản để nhận thưởng.');
   const key = pendingKey(initial);
   let operation = await loadSyncMetadata(key);
+  if(operation?.type==='spin'&&operation.wheelVersion!==undefined&&operation.wheelVersion!==WHEEL_VERSION)throw Object.assign(new Error('Quà đang chờ thuộc phiên bản mới hơn. Hãy cập nhật ứng dụng; quà được giữ nguyên.'),{code:'rewards/unsupported-candidate'});
   if(operation?.type==='openChest' && operation.candidate && operation.candidate.poolVersion!==CHEST_VERSION)throw Object.assign(new Error('Quà đang chờ thuộc phiên bản mới hơn. Hãy cập nhật ứng dụng; rương và quà được giữ nguyên.'),{code:'rewards/unsupported-candidate'});
   const savedAd = await loadSyncMetadata(`rewardedPending:${initial.uid}`);
   if (!operation && savedAd?.earned && savedAd.profileId === initial.profileId) operation = savedAd;
+  // A held gift is already canonical. Claim it without replacing any queued spin/ad proof.
+  const canonicalWheelClaim=command.type==='claimWheelReward';
+  if(canonicalWheelClaim)operation={...command,operation:crypto.randomUUID()};
   // A pending spin is resolved before accepting the next command. Status is the recovery entry point.
   if (!operation && command.type !== 'status' && command.type !== 'prepareAd') {
     const newFusion=command.type==='fuseLetter'&&Object.hasOwn(command,'ingredients');
-    operation = { ...command, ...(command.type === 'claimHourlyGift' ? {candidate:hourlyGiftCandidate(secureUnit)} : {}), operation: crypto.randomUUID(), sector: secureSector(),
+    operation = { ...command, ...(command.type === 'claimHourlyGift' ? {candidate:hourlyGiftCandidate(secureUnit)} : {}), ...(command.type==='spin'?{wheelVersion:WHEEL_VERSION,wheelRolls:createWheelRolls(secureUnit)}:{}), operation: crypto.randomUUID(), sector: secureSector(),
       ...(newFusion?{fusionPolicy:MISSING_FIRST_FUSION_POLICY,fusionRoll:secureUnit()}:{randomLetter:LETTER_ALPHABET[Math.floor(secureUnit()*LETTER_ALPHABET.length)]}) };
     await saveSyncMetadata(key, operation, () => account.getIdentity()?.profileId === initial.profileId);
   }
@@ -145,21 +158,30 @@ async function perform(command, pass = 0, expected = null, totals = {reads:0,wri
       let action = operation && !reconcileOnly ? { ...resolved.command, day: resolved.command.day ?? Math.floor(now / DAY_MS),
         sequence: operation.sequence ?? (['sellLetter','fuseLetter','exchangeLetterSet'].includes(operation.type) ? stored.state?.letters.sequence || 0 : operation.type==='claimHourlyGift' ? stored.state?.hourlyGift?.sequence||0 : operation.type==='openChest' ? stored.state?.chests?.sequence||0 : stored.state?.ticketSpent || 0) + 1 } : { type: 'status' };
       const ownedIds=ownedProfileCosmeticItems(data.appearance).map(item=>item.id);
+      const wheelOwned=ownedWheelItemIds(data.appearance);
+      if(action.type==='spin'&&action.wheelVersion===WHEEL_VERSION&&!action.wheelCandidate){
+        const existing=[stored.state.spins.free,...stored.state.spins.ads,...stored.state.spins.pastAds,stored.state.spins.ticket].find(spin=>spin?.operation===action.operation);
+        if(existing?.wheel)action.wheelCandidate=existing.wheel;
+        else if(!existing)action.wheelCandidate=createWheelCandidate(action.wheelRolls,wheelOwned);
+      }
       if(action.type==='fuseLetter')action=prepareFusionCandidate(stored.state.letters,action);
       if(action.type==='openChest'&&!action.candidate)action.candidate=chestCandidate(action.chestType,action.gameId,ownedIds,secureUnit);
       // Candidate/sector survive loss of response; day/sequence are saved before publishing.
-      if (operation && !reconcileOnly) {
-        operation = { ...operation, ...action, sector: operation.sector };
+      if (operation && !reconcileOnly && !canonicalWheelClaim) {
+        operation = { ...operation, ...action, sector: action.wheelCandidate?.sector??operation.sector };
         await updateSyncMetadata(key, () => operation, isCurrent);
       }
       const acquisitions = normalizeAcquisitions(data.appearance.acquisitions);
+      const supportCandidate=['openChest','claimHourlyGift'].includes(action.type)?action.candidate:action.type==='spin'?action.wheelCandidate:action.type==='claimWheelReward'?stored.state.pendingWheel?.wheel:null;
+      const supportCount=supportCandidate?.kind==='support'?chestSupportCount(data.progress,supportCandidate.gameId,supportCandidate.key):0;
       let result;
-      try { result = transitionSpark(stored.state, action, { uid: identity.uid, now, sector: operation?.sector ?? 0,
-        ticketEarned: initializing ? 0 : periodOnly || migrateOnly || sourcesOnly ? stored.state.ticketEarned : local.ticketEarned, letterEarned:initializing ? {} : earnedCandidate, randomLetter:operation?.randomLetter, ownedItemIds:ownedIds, festivalEnabled:festivalChestsEnabled()&&(!periodOnly||Boolean(stored.state.chests)),sourceEarned:sourcesOnly?sourceCounts:undefined,fireflyEarned:initializing||migrateOnly?0:periodOnly||sourcesOnly?(stored.state.festival?.earnedTotal||0):local.fireflyEarned,supportCount:['openChest','claimHourlyGift'].includes(action.type)&&action.candidate.kind==='support'?chestSupportCount(data.progress,action.candidate.gameId,action.candidate.key):0, facts: (initializing || periodOnly || migrateOnly || sourcesOnly ? [] : pending).filter(v => v.uid === identity.uid).map(v => v.fact) }); }
-      catch(error) { if(!['rewards/inventory-full','rewards/gift-cooldown'].includes(error.code))error.code='rewards/invalid-operation'; throw error; }
+      try { result = transitionSpark(stored.state, action, { uid: identity.uid, now, sector: operation?.sector ?? 0, wheelCandidate:action.wheelCandidate, ownedWheelItemIds:wheelOwned,
+        ticketEarned: initializing ? 0 : periodOnly || migrateOnly || sourcesOnly ? stored.state.ticketEarned : local.ticketEarned, letterEarned:initializing ? {} : earnedCandidate, randomLetter:operation?.randomLetter, ownedItemIds:ownedIds, festivalEnabled:festivalChestsEnabled()&&(!periodOnly||Boolean(stored.state.chests)),sourceEarned:sourcesOnly?sourceCounts:undefined,fireflyEarned:initializing||migrateOnly?0:periodOnly||sourcesOnly?(stored.state.festival?.earnedTotal||0):local.fireflyEarned,supportCount, facts: (initializing || periodOnly || migrateOnly || sourcesOnly ? [] : pending).filter(v => v.uid === identity.uid).map(v => v.fact) }); }
+      catch(error) { if(!['rewards/inventory-full','rewards/gift-cooldown','rewards/wheel-pending'].includes(error.code))error.code='rewards/invalid-operation'; throw error; }
       const changed = stableJSON(result.state) !== stableJSON(stored.state && cleanState(stored.state)) || pending.some(v => v.uid === identity.uid);
-      if (!changed) return { ...result, committedRewards, expiredOperation:resolved.discarded, operations:{...totals}, appliedCoins:totals.coins };
+      if (!changed) return { ...result, committedRewards, committedWheelRewards:mergeCommittedRewards(committedWheelRewards,confirmedWheelFeedback(result,operation)), expiredOperation:resolved.discarded, operations:{...totals}, appliedCoins:totals.coins };
       const feedback = committedRewardsForTransition(stored.state, result);
+      const wheelFeedback=confirmedWheelFeedback(result,operation);
       result.state.revision = remoteRevision + 1;
       let added = 0;
       for (const receipt of result.receipts) {
@@ -171,8 +193,8 @@ async function perform(command, pass = 0, expected = null, totals = {reads:0,wri
       result.ownedItemIds=[...new Set([...ownedIds,...Object.values(acquisitions.grants).flatMap(grant=>grant.items)])];
       data.coins += added;
       if (!Number.isSafeInteger(data.coins)) throw new Error('Kho Xu đã đầy.');
-      data.appearance = { ...data.appearance, acquisitions: normalizeAcquisitions(acquisitions),
-        spark: { ...local, economyRevision:local.economyRevision+1, state: result.state, ownerUid:identity.uid }, rewards: { ...(data.appearance.rewards || { version:1, applied:{} }), pending: initializing || periodOnly || migrateOnly || sourcesOnly ? pending : pending.filter(v => v.uid !== identity.uid) } };
+      data.appearance = applyWheelAcquisitions({ ...data.appearance, acquisitions: normalizeAcquisitions(acquisitions),
+        spark: { ...local, economyRevision:local.economyRevision+1, state: result.state, ownerUid:identity.uid }, rewards: { ...(data.appearance.rewards || { version:1, applied:{} }), pending: initializing || periodOnly || migrateOnly || sourcesOnly ? pending : pending.filter(v => v.uid !== identity.uid) } },acquisitions);
       const encoded = await encodeCloudSnapshot(snapshot);
       const published = await publishCloudSnapshot({ database: backend.database, environment: identity.environment, uid: identity.uid,
         encoded, expectedRevision: metadata.cloudRevision, playerName: identity.playerName, isCurrent,
@@ -180,6 +202,7 @@ async function perform(command, pass = 0, expected = null, totals = {reads:0,wri
         onStagePlan: jobs => updateSyncMetadata(`${identity.environment}:work:${identity.uid}`, () => ({ jobs }), isCurrent) });
       if(!published.cleanupError)await updateSyncMetadata(`${identity.environment}:work:${identity.uid}`,()=>({jobs:[]}),isCurrent);
       committedRewards = mergeCommittedRewards(committedRewards, feedback);
+      committedWheelRewards=mergeCommittedRewards(committedWheelRewards,wheelFeedback);
       totals.reads+=published.reads;totals.writes+=published.writes;totals.bytes+=encoded.byteLength;totals.coins+=added;
       let viewState=result.state,viewNow=result.serverNow;
       if(result.hourlyGiftApplied){
@@ -193,26 +216,27 @@ async function perform(command, pass = 0, expected = null, totals = {reads:0,wri
           viewState={...result.state,hourlyGift:{...result.state.hourlyGift,claimedAt:viewNow}};
         }
       }
-      return { ...result, committedRewards, state:viewState, serverNow:viewNow, initializing, continueOperation:reconcileOnly && Boolean(migrateOnly || sourcesOnly && (operation||unappliedDrops||hasFacts) || operation || initializing && (unappliedDrops || hasFacts || newSources) || periodOnly && (unappliedDrops || hasFacts) || remainingLetterWork), expiredOperation:resolved.discarded, root: published.root, data, added, appliedCoins:totals.coins,
+      return { ...result, committedRewards, committedWheelRewards, state:viewState, serverNow:viewNow, initializing, continueOperation:reconcileOnly && Boolean(migrateOnly || sourcesOnly && (operation||unappliedDrops||hasFacts) || operation || initializing && (unappliedDrops || hasFacts || newSources) || periodOnly && (unappliedDrops ||hasFacts) || remainingLetterWork), expiredOperation:resolved.discarded, root: published.root, data, added, appliedCoins:totals.coins,
         operations: {...totals} };
     }, isCurrent);
   }); } catch(error) {
     if(error.code==='rewards/inventory-full'&&operation?.type==='openChest')error.pendingChest={chestType:operation.chestType,gameId:operation.gameId};
-    if(['rewards/invalid-operation','rewards/gift-cooldown'].includes(error.code)) {
+    if(!canonicalWheelClaim&&['rewards/invalid-operation','rewards/gift-cooldown'].includes(error.code)) {
       await saveSyncMetadata(key,null,()=>account.getIdentity()?.profileId===initial.profileId);
       if(savedAd?.operation===operation?.operation)await saveSyncMetadata(`rewardedPending:${initial.uid}`,null,()=>account.getIdentity()?.profileId===initial.profileId);
     }
     throw error;
   }
   const continuation=result.continueOperation;delete result.data;delete result.added;
-  if (continuation) return perform(command,pass+1,initial,totals,committedRewards);
-  if (operation) await saveSyncMetadata(key, null, () => account.getIdentity()?.profileId === initial.profileId);
-  if (savedAd?.earned && operation?.operation === savedAd.operation)
+  if (continuation) return perform(command,pass+1,initial,totals,committedRewards,committedWheelRewards);
+  if (operation&&!canonicalWheelClaim) await saveSyncMetadata(key, null, () => account.getIdentity()?.profileId === initial.profileId);
+  if (!canonicalWheelClaim&&savedAd?.earned && operation?.operation === savedAd.operation)
     await saveSyncMetadata(`rewardedPending:${initial.uid}`, null, () => account.getIdentity()?.profileId === initial.profileId);
   if (command.type === 'prepareAd') {
+    if(result.state.pendingWheel)throw new Error('Bạn còn quà chưa nhận. Hãy nhận quà trước khi quay tiếp.');
     if (result.state.spins.ads.length >= 10) throw new Error('Bạn đã dùng hết lượt quảng cáo hôm nay.');
     result.adOperation = { type:'spin', source:'ad', operation:crypto.randomUUID(), ordinal:result.state.spins.ads.length + 1,
-      sector:secureSector(), day:result.state.day, profileId:initial.profileId };
+      sector:secureSector(), wheelVersion:WHEEL_VERSION,wheelRolls:createWheelRolls(secureUnit), day:result.state.day, profileId:initial.profileId };
   }
   return result;
 }

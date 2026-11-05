@@ -1,4 +1,5 @@
 CHEST_CONTRACT
+WHEEL_CONTRACT
     // Spark reward contract: one private account document; no round/receipt collections.
     function rewardPath(space, uid) { return /databases/$(database)/documents/gamespaces/$(space)/liveops/$(uid); }
     function rootPath(space, uid) { return /databases/$(database)/documents/gamespaces/$(space)/players/$(uid); }
@@ -14,29 +15,23 @@ CHEST_CONTRACT
         && n.claimed is list && n.claimed.hasOnly(allowed) && n.claimed.size() == n.claimed.toSet().size();
     }
     function rewardSpin(r, source) {
-      return r is map && r.keys().hasOnly(['operation','source','day','sector','coins','ordinal','sequence'])
+      return r is map && r.keys().hasOnly(['operation','source','day','sector','coins','ordinal','sequence','wheel'])
         && r.operation is string && r.operation.matches('^[A-Za-z0-9_-]{1,128}$') && r.source == source
-        && rewardInt(r.day) && r.sector is int && r.sector >= 0 && r.sector < 8
-        && r.coins == [5,10,10,15,15,20,20,25][r.sector];
-    }
-    function rewardSpins(n, o) {
-      return n is map && n.keys().hasOnly(['free','ads','pastAds','ticket'])
-        && (n.free == null || n.free == o.get('free', null) || rewardSpin(n.free, 'free'))
-        && (n.ticket == o.get('ticket', null) || rewardSpin(n.ticket, 'ticket') && (n.ticket.sequence is int && n.ticket.sequence >= 0 && n.ticket.sequence <= 9007199254740991))
-        && n.ads is list && n.ads.size() <= 10 && n.pastAds is list && n.pastAds.size() <= 30
-        && (n.ads.size() == 0 || n.ads == o.get('ads', []) || rewardSpin(n.ads[n.ads.size()-1], 'ad') && n.ads[n.ads.size()-1].ordinal == n.ads.size())
-        && (n.pastAds.size() == 0 || n.pastAds == o.get('pastAds', []) || rewardSpin(n.pastAds[n.pastAds.size()-1], 'ad'));
+        && rewardInt(r.day)
+        && (source == 'free' ? !r.keys().hasAny(['ordinal','sequence']) : source == 'ad' ? rewardInt(r.ordinal) && r.ordinal > 0 && r.ordinal <= 10 && !r.keys().hasAny(['sequence']) : source == 'ticket' && rewardInt(r.sequence) && r.sequence > 0 && !r.keys().hasAny(['ordinal']))
+        && (r.keys().hasAny(['wheel']) ? rewardWheelCandidate(r.wheel) && r.sector == r.wheel.sector && r.coins == r.wheel.coins
+          : r.sector is int && r.sector >= 0 && r.sector < 8 && r.coins == [5,10,10,15,15,20,20,25][r.sector]);
     }
     function validRewardState(n, o) {
       let day = int(request.time.toMillis() / 86400000);
       let changed = n.diff(o).affectedKeys();
-      return n.keys().hasOnly(['version','revision','day','week','daily','weekly','loginNext','loginDay','spins','tickets','ticketEarned','ticketSpent','event','cosmetics','letters','chests','festival','hourlyGift','rootRevision','fingerprint','updatedAt'])
+      return n.keys().hasOnly(['version','revision','day','week','daily','weekly','loginNext','loginDay','spins','tickets','ticketEarned','ticketSpent','event','cosmetics','letters','chests','festival','hourlyGift','pendingWheel','rootRevision','fingerprint','updatedAt'])
         && n.get('chests',null) == o.get('chests',null) && n.get('festival',null) == o.get('festival',null)
         && n.version == 1 && (n.revision is int && n.revision >= 0 && n.revision <= 9007199254740991) && n.revision > 0 && n.day == day && n.week == day - ((day + 3) % 7)
         && (!changed.hasAny(['daily']) || rewardCounter(n.daily, ['win-three','match-thirty','win-without-hint','bonus']))
         && (!changed.hasAny(['weekly']) || rewardCounter(n.weekly, ['bonus']))
         && n.loginNext is int && n.loginNext >= 0 && n.loginNext < 7 && n.loginDay is int && n.loginDay >= -1 && n.loginDay <= day
-        && (n.tickets is int && n.tickets >= 0 && n.tickets <= 9007199254740991) && (n.ticketEarned is int && n.ticketEarned >= 0 && n.ticketEarned <= 9007199254740991) && (n.ticketSpent is int && n.ticketSpent >= 0 && n.ticketSpent <= 9007199254740991) && (!changed.hasAny(['spins']) || rewardSpins(n.spins, o.get('spins', {})))
+        && (n.tickets is int && n.tickets >= 0 && n.tickets <= 9007199254740991) && (n.ticketEarned is int && n.ticketEarned >= 0 && n.ticketEarned <= 9007199254740991) && (n.ticketSpent is int && n.ticketSpent >= 0 && n.ticketSpent <= 9007199254740991)
         && (!changed.hasAny(['event']) || n.event is map && n.event.keys().hasOnly(['id','week','points','day','dailyPoints','claimed'])
         && n.event.id == 'firefly-festival-01' && n.event.week == n.week && n.event.day == day
         && (n.event.points is int && n.event.points >= 0) && n.event.points <= 100 && (n.event.dailyPoints is int && n.event.dailyPoints >= 0) && n.event.dailyPoints <= 40
@@ -68,14 +63,6 @@ CHEST_CONTRACT
       return (!n.claimed.hasAny([20]) || n.points >= 20) && (!n.claimed.hasAny([50]) || n.points >= 50)
         && (!n.claimed.hasAny([80]) || n.points >= 80);
     }
-    function rewardSpinTransition(n, o) {
-      let sameDay = n.day == o.day;
-      return (!sameDay || (o.spins.free == null || n.spins.free == o.spins.free)
-          && n.spins.ads.hasAll(o.spins.ads) && n.spins.ads.size() <= o.spins.ads.size() + 1
-          && (n.spins.ads.size() == o.spins.ads.size() || n.spins.ads.removeAll(o.spins.ads) == [n.spins.ads[n.spins.ads.size()-1]]))
-        && (sameDay || n.spins.ads.size() <= 1)
-        && (!sameDay || n.spins.pastAds.hasAll(o.spins.pastAds));
-    }
     function rewardWallet(n,o) {
       let sameDay = n.day == o.day;
       let sameWeek = n.week == o.week;
@@ -94,7 +81,7 @@ CHEST_CONTRACT
       let spent = n.ticketSpent - o.ticketSpent;
       return n.revision == o.revision + 1 && n.day >= o.day && n.week >= o.week
         && (!sameDay || !changed.hasAny(['daily']) || monotoneCounter(n.daily, o.daily))
-        && (!changed.hasAny(['spins']) || rewardSpinTransition(n,o))
+        && (!changed.hasAny(['spins','pendingWheel']) || n.spins != o.spins && rewardWheelSpinUpdate(n,o))
         && (!sameWeek || (!changed.hasAny(['weekly']) || monotoneCounter(n.weekly, o.weekly))
           && (!changed.hasAny(['event']) || n.event.points >= o.event.points && n.event.claimed.hasAll(o.event.claimed))
           && (!changed.hasAny(['cosmetics']) || (n.cosmetics.collectionId != o.cosmetics.collectionId ? n.cosmetics.points == 0 : n.cosmetics.points >= o.cosmetics.points)))
@@ -233,8 +220,8 @@ LETTER_CREDITS;
     function rewardInitial(n, space, uid) {
       let empty = {'wins':0,'matches':0,'noHint':0,'visits':0,'claimed':[]};
       let day = int(request.time.toMillis() / 86400000);
-      return n.keys().hasOnly(['version','revision','day','week','daily','weekly','loginNext','loginDay','spins','tickets','ticketEarned','ticketSpent','event','cosmetics','letters','chests','festival','hourlyGift','rootRevision','fingerprint','updatedAt'])
-        && n.get('hourlyGift',null) == null && n.version == 1 && n.revision == 1 && n.day == day && n.week == day - ((day + 3) % 7)
+      return n.keys().hasOnly(['version','revision','day','week','daily','weekly','loginNext','loginDay','spins','tickets','ticketEarned','ticketSpent','event','cosmetics','letters','chests','festival','hourlyGift','pendingWheel','rootRevision','fingerprint','updatedAt'])
+        && n.get('pendingWheel',null) == null && n.get('hourlyGift',null) == null && n.version == 1 && n.revision == 1 && n.day == day && n.week == day - ((day + 3) % 7)
         && n.daily == empty && n.weekly == empty && n.loginNext == 0 && n.loginDay == -1
         && n.spins == {'free':null,'ads':[],'pastAds':[],'ticket':null} && n.tickets == 0 && n.ticketEarned == 0 && n.ticketSpent == 0
         && n.event == {'id':'firefly-festival-01','week':n.week,'points':0,'day':day,'dailyPoints':0,'claimed':[]}

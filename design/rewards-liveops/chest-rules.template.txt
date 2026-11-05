@@ -72,10 +72,12 @@
     }
     function rewardSpinOnly(n,o) {
       let spent = n.ticketSpent - o.ticketSpent;
-      return chestBase(n,o,['spins','tickets','ticketSpent']) && rewardSpins(n.spins,o.spins) && rewardSpinTransition(n,o)
+      return n.spins.pastAds != o.spins.pastAds ? chestBase(n,o,['spins','pendingWheel']) && rewardWheelLateSpin(n,o)
+        : chestBase(n,o,['spins','tickets','ticketSpent','pendingWheel'])
         && rewardInt(n.tickets) && rewardInt(n.ticketSpent) && spent in [0,1] && n.tickets == o.tickets - spent
         && (spent == 0 ? n.spins.ticket == o.spins.ticket : n.spins.ticket.sequence == n.ticketSpent && n.spins.ticket != o.spins.ticket)
-        && n.spins.pastAds.size() <= o.spins.pastAds.size() + 1;
+        && (n.spins == o.spins ? spent == 0 && n.get('pendingWheel',null) == o.get('pendingWheel',null)
+          : rewardWheelSpinUpdate(n,o));
     }
     function chestSourceValue(n,o,type) {
       return n.sourceEarned[type] >= o.sourceEarned[type] && n.earned[type] == o.earned[type] + n.sourceEarned[type] - o.sourceEarned[type];
@@ -104,12 +106,13 @@
     }
     function dispatchRewardUpdate(n,o) {
       let changed = n.diff(o).affectedKeys();
-      return changed.hasAny(['hourlyGift']) ? rewardHourlyGift(n,o) : n.day != o.day ? rewardPeriodRollover(n,o)
+      return changed.hasAny(['pendingWheel']) && !changed.hasAny(['spins']) ? rewardWheelClaim(n,o)
+        : changed.hasAny(['hourlyGift']) ? rewardHourlyGift(n,o) : n.day != o.day ? rewardPeriodRollover(n,o)
         : changed.hasAny(['chests','festival']) ? (!o.keys().hasAny(['chests','festival']) ? rewardChestInit(n,o)
           : changed.hasAny(['letters']) ? rewardChestExchange(n,o)
           : changed.hasAny(['chests']) ? (n.chests.sequence != o.chests.sequence ? rewardChestOpen(n,o) : (changed.hasAny(['festival']) ? rewardFestivalClaim(n,o) : rewardChestSources(n,o)))
           : changed.hasOnly(['festival','revision','rootRevision','fingerprint','updatedAt']) ? (n.festival.earnedTotal != o.festival.earnedTotal ? rewardFestivalEarn(n,o) : (changed.hasAny(['festival']) ? rewardFestivalClaim(n,o) : rewardChestSources(n,o))) : rewardProgressFlush(n,o))
-        : changed.hasOnly(['spins','tickets','ticketSpent','revision','rootRevision','fingerprint','updatedAt']) ? rewardSpinOnly(n,o)
+        : changed.hasOnly(['spins','tickets','ticketSpent','pendingWheel','revision','rootRevision','fingerprint','updatedAt']) ? rewardSpinOnly(n,o)
         : changed.hasOnly(['letters','revision','rootRevision','fingerprint','updatedAt']) ? rewardLetterUpdate(n,o)
         : changed.hasOnly(['letters','daily','weekly','event','tickets','ticketEarned','revision','rootRevision','fingerprint','updatedAt']) && n.daily.claimed == o.daily.claimed && n.weekly.claimed == o.weekly.claimed ? rewardProgressFlush(n,o)
         : validRewardState(n,o) && rewardTransition(n,o);

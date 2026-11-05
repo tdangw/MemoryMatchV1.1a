@@ -1,0 +1,69 @@
+    function wheelPoolItem(w) { return WHEEL_POOL_ITEM; }
+    function wheelPoolExists(w) { return WHEEL_POOL_EXISTS; }
+    function wheelSupportKeys(game) { return WHEEL_SUPPORT_KEYS; }
+    function wheelSupportLabel(game,key) { return WHEEL_SUPPORT_LABEL; }
+    function wheelBoxKeys(w,extra) {
+      return w.keys().hasOnly(['version','sector','kind','coins','box'].concat(w.box == 'mystery' ? ['chestType'] : []).concat(extra));
+    }
+    function wheelBoxPrize(w) {
+      return w.box == ['','','','mystery','cosmetic','flip','theme','path','exit','support'][w.sector]
+        && (w.box != 'mystery' || w.chestType in ['c','avatar','frame','badge'])
+        && (w.kind == 'support' ? w.box in ['mystery','support'] && w.coins == 0
+          && wheelBoxKeys(w,['gameId','key','label']) && w.gameId in ['memory-match','link-connect','triple-connect']
+          && w.key in wheelSupportKeys(w.gameId) && (!w.keys().hasAny(['label']) || w.label == wheelSupportLabel(w.gameId,w.key))
+          : w.box != 'support' && (w.kind == 'item' ? wheelBoxKeys(w,['itemId']) && w.coins == 0 && wheelPoolItem(w)
+            : w.kind == 'coins' && (w.reason == 'coins' ? wheelBoxKeys(w,['reason']) && w.box == 'mystery'
+                && w.coins == (w.chestType == 'c' ? 50 : w.chestType == 'avatar' ? 150 : 100)
+              : w.reason == 'full' ? wheelBoxKeys(w,['reason']) && w.coins == 100 && wheelPoolExists(w)
+              : w.reason == 'duplicate' && wheelBoxKeys(w,['reason','itemId']) && w.coins == 100 && wheelPoolItem(w))));
+    }
+    function rewardWheelCandidate(w) {
+      return w is map && w.version == 2 && w.sector is int && w.sector >= 0 && w.sector < 10 && rewardInt(w.coins)
+        && (w.sector < 3 ? w.keys().hasOnly(['version','sector','kind','coins']) && w.kind == 'coins'
+          && (w.sector < 2 ? w.coins == [5,10][w.sector] : w.coins >= 5 && w.coins <= 50) : wheelBoxPrize(w));
+    }
+    function wheelChangedField(n,o) {
+      return n.ticket != o.ticket ? 'ticket' : n.free != o.free ? 'free' : n.ads != o.ads ? 'ads' : 'pastAds';
+    }
+    function wheelChangedSpin(n,field) {
+      return field in ['free','ticket'] ? n[field] : n[field][n[field].size()-1];
+    }
+    function wheelPastOrdinal(ads,day,ordinal) {
+      let count = ads.size();
+      return count == 0 || WHEEL_PAST_AD_ORDINAL;
+    }
+    function rewardWheelSpinShape(n,o,field,r) {
+      return n.spins.keys().hasOnly(['free','ads','pastAds','ticket'])
+        && n.spins.diff(o.spins).affectedKeys().hasOnly([field])
+        && (field == 'free' ? o.spins.free == null && r.source == 'free' && r.day == n.day
+          : field == 'ticket' ? r.source == 'ticket' && r.day == n.day && r.sequence == n.ticketSpent
+          : r.source == 'ad' && n.spins[field].size() == o.spins[field].size() + 1
+            && n.spins[field].removeAll([r]) == o.spins[field]
+            && (field == 'ads' ? r.day == n.day && n.spins.ads.size() <= 10 && r.ordinal == n.spins.ads.size()
+              : n.spins.pastAds.size() <= 30 && r.day < n.day && r.day >= n.day - 3
+                && r.ordinal <= 10 && wheelPastOrdinal(o.spins.pastAds,r.day,r.ordinal)));
+    }
+    function rewardWheelPendingForSpin(n,o,r) {
+      let next = n.get('pendingWheel',null);
+      return o.get('pendingWheel',null) == null && (r.keys().hasAny(['wheel'])
+        ? n.keys().hasAny(['pendingWheel']) && (next == null || r.wheel.kind == 'support' && next == {'operation':r.operation,'day':r.day,'wheel':r.wheel})
+        : next == null);
+    }
+    function rewardWheelSpinUpdate(n,o) {
+      let field = wheelChangedField(n.spins,o.spins);
+      let r = wheelChangedSpin(n.spins,field);
+      return rewardWheelSpinShape(n,o,field,r) && rewardSpin(r,r.source) && rewardWheelPendingForSpin(n,o,r);
+    }
+    function rewardWheelLateSpin(n,o) {
+      let prior = o.spins.pastAds;
+      let next = n.spins.pastAds;
+      let r = next[next.size()-1];
+      return n.spins.diff(o.spins).affectedKeys().hasOnly(['pastAds']) && next.size() <= 30 && next.size() == prior.size() + 1
+        && next.removeAll([r]) == prior && rewardSpin(r,'ad') && r.day < n.day && r.day >= n.day - 3
+        && wheelPastOrdinal(prior,r.day,r.ordinal) && rewardWheelPendingForSpin(n,o,r);
+    }
+    function rewardWheelClaim(n,o) {
+      let pending = o.get('pendingWheel',null);
+      return chestBase(n,o,['pendingWheel']) && pending != null && n.get('pendingWheel',null) == null
+        && pending.keys().hasOnly(['operation','day','wheel']) && pending.wheel.kind == 'support' && rewardWheelCandidate(pending.wheel);
+    }

@@ -204,10 +204,12 @@ service cloud.firestore {
     }
     function rewardSpinOnly(n,o) {
       let spent = n.ticketSpent - o.ticketSpent;
-      return chestBase(n,o,['spins','tickets','ticketSpent']) && rewardSpins(n.spins,o.spins) && rewardSpinTransition(n,o)
+      return n.spins.pastAds != o.spins.pastAds ? chestBase(n,o,['spins','pendingWheel']) && rewardWheelLateSpin(n,o)
+        : chestBase(n,o,['spins','tickets','ticketSpent','pendingWheel'])
         && rewardInt(n.tickets) && rewardInt(n.ticketSpent) && spent in [0,1] && n.tickets == o.tickets - spent
         && (spent == 0 ? n.spins.ticket == o.spins.ticket : n.spins.ticket.sequence == n.ticketSpent && n.spins.ticket != o.spins.ticket)
-        && n.spins.pastAds.size() <= o.spins.pastAds.size() + 1;
+        && (n.spins == o.spins ? spent == 0 && n.get('pendingWheel',null) == o.get('pendingWheel',null)
+          : rewardWheelSpinUpdate(n,o));
     }
     function chestSourceValue(n,o,type) {
       return n.sourceEarned[type] >= o.sourceEarned[type] && n.earned[type] == o.earned[type] + n.sourceEarned[type] - o.sourceEarned[type];
@@ -236,15 +238,86 @@ service cloud.firestore {
     }
     function dispatchRewardUpdate(n,o) {
       let changed = n.diff(o).affectedKeys();
-      return changed.hasAny(['hourlyGift']) ? rewardHourlyGift(n,o) : n.day != o.day ? rewardPeriodRollover(n,o)
+      return changed.hasAny(['pendingWheel']) && !changed.hasAny(['spins']) ? rewardWheelClaim(n,o)
+        : changed.hasAny(['hourlyGift']) ? rewardHourlyGift(n,o) : n.day != o.day ? rewardPeriodRollover(n,o)
         : changed.hasAny(['chests','festival']) ? (!o.keys().hasAny(['chests','festival']) ? rewardChestInit(n,o)
           : changed.hasAny(['letters']) ? rewardChestExchange(n,o)
           : changed.hasAny(['chests']) ? (n.chests.sequence != o.chests.sequence ? rewardChestOpen(n,o) : (changed.hasAny(['festival']) ? rewardFestivalClaim(n,o) : rewardChestSources(n,o)))
           : changed.hasOnly(['festival','revision','rootRevision','fingerprint','updatedAt']) ? (n.festival.earnedTotal != o.festival.earnedTotal ? rewardFestivalEarn(n,o) : (changed.hasAny(['festival']) ? rewardFestivalClaim(n,o) : rewardChestSources(n,o))) : rewardProgressFlush(n,o))
-        : changed.hasOnly(['spins','tickets','ticketSpent','revision','rootRevision','fingerprint','updatedAt']) ? rewardSpinOnly(n,o)
+        : changed.hasOnly(['spins','tickets','ticketSpent','pendingWheel','revision','rootRevision','fingerprint','updatedAt']) ? rewardSpinOnly(n,o)
         : changed.hasOnly(['letters','revision','rootRevision','fingerprint','updatedAt']) ? rewardLetterUpdate(n,o)
         : changed.hasOnly(['letters','daily','weekly','event','tickets','ticketEarned','revision','rootRevision','fingerprint','updatedAt']) && n.daily.claimed == o.daily.claimed && n.weekly.claimed == o.weekly.claimed ? rewardProgressFlush(n,o)
         : validRewardState(n,o) && rewardTransition(n,o);
+    }
+
+    function wheelPoolItem(w) { return w.box == 'mystery' ? (w.chestType == 'avatar' ? w.itemId.matches("^(memory-avatar-sapphire-owl|memory-avatar-cherry-rabbit|memory-avatar-stellar-cat|memory-avatar-scholar-squirrel|memory-avatar-stargazer-hedgehog|memory-avatar-dreaming-deer|memory-avatar-galaxy-whale|memory-avatar-chestnut-squirrel|memory-avatar-snow-rabbit|memory-avatar-honey-bear|memory-avatar-dawn-crane|link-avatar-autumn-fox|link-avatar-moonfox|link-avatar-galaxy-deer|link-avatar-sailor-beaver|link-avatar-pearl-dolphin|link-avatar-azure-turtle|link-avatar-royal-seahorse|link-avatar-lantern-cat|link-avatar-festival-sparrow|link-avatar-paperblossom-deer|link-avatar-glasslight-fox|triple-avatar-jade-dragon|triple-avatar-blue-panda|triple-avatar-sunset-dragon|triple-avatar-quartz-phoenix|triple-avatar-amethyst-unicorn|triple-avatar-platinum-dragon|triple-avatar-crystal-mech-cat|triple-avatar-aurora-snowfox|triple-avatar-jade-penguin|triple-avatar-polar-bear|triple-avatar-galactic-dragon|letters-memory-avatar-moss-redpanda|letters-link-avatar-flower-fox|letters-triple-avatar-rose-dragon|letters-royal-avatar-dawn-lion|event-avatar-lantern-otter)$") : w.chestType == 'frame' ? w.itemId.matches("^(memory-frame-golden-laurel|memory-frame-cherry-blossom|memory-frame-sky-feather|memory-frame-gilded-pages|memory-frame-astral-orbit|memory-frame-silken-clouds|memory-frame-knowledge-gateway|memory-frame-autumn-leaves|memory-frame-frosted-branch|memory-frame-golden-honeycomb|memory-frame-memory-crown|link-frame-moonblossom|link-frame-silver-moon|link-frame-stellar-orbit|link-frame-moon-coral|link-frame-silver-waves|link-frame-pearl-shell|link-frame-tidal-crown|link-frame-silk-lanterns|link-frame-osmanthus-branch|link-frame-moon-silk|link-frame-lantern-moon-gate|triple-frame-tri-crystal|triple-frame-prism|triple-frame-emerald|triple-frame-crystal-arch|triple-frame-three-wing-star|triple-frame-jade-gears|triple-frame-tri-star-crown|triple-frame-aurora-ribbon|triple-frame-azure-ice-ring|triple-frame-silver-meteor|triple-frame-aurora-crown|letters-memory-frame-memory-leaves|letters-link-frame-silk-lantern|letters-triple-frame-prism-glass|letters-royal-frame-journey-crown|event-frame-firefly-glow)$") : w.chestType == 'badge' ? w.itemId.matches("^(memory-badge-wisdom|memory-badge-memory-master|memory-badge-wisdom-seal|memory-badge-memory-keeper|memory-badge-four-seasons|memory-badge-forest-guardian|link-badge-link-master|link-badge-golden-bond|link-badge-lighthouse-guide|link-badge-ocean-knot|link-badge-guiding-lantern|link-badge-moonlit-promise|triple-badge-crystal-triad|triple-badge-triad-master|triple-badge-triangle-seal|triple-badge-crystal-keeper|triple-badge-three-dawn-rays|triple-badge-aurora-heart|letters-memory-badge-folded-leaf|letters-link-badge-wish-knot|letters-triple-badge-prism-heart|letters-royal-badge-royal-seal)$") : false) : (w.box == 'cosmetic' ? w.itemId.matches("^(memory-avatar-sapphire-owl|memory-frame-golden-laurel|memory-badge-wisdom|memory-avatar-cherry-rabbit|memory-frame-cherry-blossom|memory-badge-memory-master|memory-avatar-stellar-cat|memory-frame-sky-feather|memory-avatar-scholar-squirrel|memory-frame-gilded-pages|memory-badge-wisdom-seal|memory-avatar-stargazer-hedgehog|memory-frame-astral-orbit|memory-avatar-dreaming-deer|memory-frame-silken-clouds|memory-badge-memory-keeper|memory-avatar-galaxy-whale|memory-frame-knowledge-gateway|memory-avatar-chestnut-squirrel|memory-frame-autumn-leaves|memory-badge-four-seasons|memory-avatar-snow-rabbit|memory-frame-frosted-branch|memory-avatar-honey-bear|memory-frame-golden-honeycomb|memory-badge-forest-guardian|memory-avatar-dawn-crane|memory-frame-memory-crown|link-avatar-autumn-fox|link-frame-moonblossom|link-badge-link-master|link-avatar-moonfox|link-frame-silver-moon|link-badge-golden-bond|link-avatar-galaxy-deer|link-frame-stellar-orbit|link-avatar-sailor-beaver|link-frame-moon-coral|link-badge-lighthouse-guide|link-avatar-pearl-dolphin|link-frame-silver-waves|link-avatar-azure-turtle|link-frame-pearl-shell|link-badge-ocean-knot|link-avatar-royal-seahorse|link-frame-tidal-crown|link-avatar-lantern-cat|link-frame-silk-lanterns|link-badge-guiding-lantern|link-avatar-festival-sparrow|link-frame-osmanthus-branch|link-avatar-paperblossom-deer|link-frame-moon-silk|link-badge-moonlit-promise|link-avatar-glasslight-fox|link-frame-lantern-moon-gate|triple-avatar-jade-dragon|triple-frame-tri-crystal|triple-badge-crystal-triad|triple-avatar-blue-panda|triple-frame-prism|triple-badge-triad-master|triple-avatar-sunset-dragon|triple-frame-emerald|triple-avatar-quartz-phoenix|triple-frame-crystal-arch|triple-badge-triangle-seal|triple-avatar-amethyst-unicorn|triple-frame-three-wing-star|triple-avatar-platinum-dragon|triple-frame-jade-gears|triple-badge-crystal-keeper|triple-avatar-crystal-mech-cat|triple-frame-tri-star-crown|triple-avatar-aurora-snowfox|triple-frame-aurora-ribbon|triple-badge-three-dawn-rays|triple-avatar-jade-penguin|triple-frame-azure-ice-ring|triple-avatar-polar-bear|triple-frame-silver-meteor|triple-badge-aurora-heart|triple-avatar-galactic-dragon|triple-frame-aurora-crown|letters-memory-avatar-moss-redpanda|letters-memory-frame-memory-leaves|letters-memory-badge-folded-leaf|letters-link-avatar-flower-fox|letters-link-frame-silk-lantern|letters-link-badge-wish-knot|letters-triple-avatar-rose-dragon|letters-triple-frame-prism-glass|letters-triple-badge-prism-heart|letters-royal-avatar-dawn-lion|letters-royal-frame-journey-crown|letters-royal-badge-royal-seal|event-avatar-lantern-otter|event-frame-firefly-glow)$") : w.box == 'flip' ? w.itemId.matches("^(wheel-flip-memory-effect-moonflip|wheel-flip-memory-effect-spring-petals|wheel-flip-fade-scale|wheel-flip-pop|wheel-flip-slide-up|wheel-flip-flip-y|wheel-flip-zoom-rotate|wheel-flip-blur-in)$") : w.box == 'theme' ? w.itemId.matches("^(wheel-theme-shared-animals-land|wheel-theme-triple-animals-land|wheel-theme-shared-animals-air|wheel-theme-triple-animals-air|wheel-theme-shared-animals-sea|wheel-theme-triple-animals-sea|wheel-theme-shared-foods|wheel-theme-triple-foods|wheel-theme-shared-drinks|wheel-theme-triple-drinks|wheel-theme-shared-fruits|wheel-theme-triple-fruits|wheel-theme-shared-geometry|wheel-theme-triple-geometry|wheel-theme-shared-cyberpunk|wheel-theme-triple-cyberpunk|wheel-theme-shared-magic-rpg|wheel-theme-triple-magic-rpg|wheel-theme-shared-space|wheel-theme-triple-space|wheel-theme-shared-household|wheel-theme-triple-household|wheel-theme-shared-office-supplies|wheel-theme-triple-office-supplies|wheel-theme-shared-fashion|wheel-theme-triple-fashion|wheel-theme-shared-vehicles|wheel-theme-triple-vehicles|wheel-theme-shared-festivals|wheel-theme-triple-festivals|wheel-theme-shared-alphabet|wheel-theme-triple-alphabet|wheel-theme-shared-numbers-2|wheel-theme-triple-numbers-2|wheel-theme-shared-numbers-3|wheel-theme-triple-numbers-3|wheel-theme-shared-computer-symbols|wheel-theme-triple-computer-symbols)$") : w.box == 'path' ? w.itemId.matches("^(wheel-path-link-electric|wheel-path-triple-electric|wheel-path-link-laser|wheel-path-triple-laser|wheel-path-link-fire|wheel-path-triple-fire|wheel-path-link-magic|wheel-path-triple-magic|wheel-path-link-cyber|wheel-path-triple-cyber|wheel-path-link-rainbow|wheel-path-triple-rainbow|wheel-path-link-hydro|wheel-path-triple-hydro|wheel-path-link-plasma|wheel-path-triple-plasma|wheel-path-link-holy|wheel-path-triple-holy|wheel-path-link-shadow|wheel-path-triple-shadow|wheel-path-link-spiral|wheel-path-triple-spiral|wheel-path-link-dashed|wheel-path-triple-dashed|wheel-path-link-bullet|wheel-path-triple-bullet|wheel-path-link-kame|wheel-path-triple-kame|wheel-path-link-halo|wheel-path-triple-halo|wheel-path-link-matrix|wheel-path-triple-matrix|wheel-path-link-sonic|wheel-path-triple-sonic|wheel-path-link-chains|wheel-path-triple-chains|wheel-path-link-meteor|wheel-path-triple-meteor|wheel-path-link-poison|wheel-path-triple-poison|wheel-path-link-link-effect-meteor-route|wheel-path-triple-triple-effect-triad-converge)$") : w.box == 'exit' ? w.itemId.matches("^(wheel-exit-link-dissolve|wheel-exit-triple-dissolve|wheel-exit-link-finedust|wheel-exit-triple-finedust|wheel-exit-link-split4|wheel-exit-triple-split4|wheel-exit-link-split2|wheel-exit-triple-split2|wheel-exit-link-split8|wheel-exit-triple-split8|wheel-exit-link-triangles|wheel-exit-triple-triangles|wheel-exit-link-crumble|wheel-exit-triple-crumble|wheel-exit-link-gravity|wheel-exit-triple-gravity|wheel-exit-link-collide|wheel-exit-triple-collide|wheel-exit-link-portal|wheel-exit-triple-portal|wheel-exit-link-blackhole|wheel-exit-triple-blackhole|wheel-exit-link-freeze|wheel-exit-triple-freeze|wheel-exit-link-burn|wheel-exit-triple-burn|wheel-exit-link-pixel|wheel-exit-triple-pixel|wheel-exit-link-implode|wheel-exit-triple-implode|wheel-exit-link-slice|wheel-exit-triple-slice|wheel-exit-link-bubble|wheel-exit-triple-bubble|wheel-exit-link-origami|wheel-exit-triple-origami|wheel-exit-link-electric-shock|wheel-exit-triple-electric-shock|wheel-exit-link-ghost|wheel-exit-triple-ghost|wheel-exit-link-link-effect-moon-petals|wheel-exit-triple-triple-effect-crystal-bloom)$") : false); }
+    function wheelPoolExists(w) { return w.box == 'mystery' ? w.chestType in ["avatar","frame","badge"] : w.box in ["cosmetic","flip","theme","path","exit"]; }
+    function wheelSupportKeys(game) { return game == 'memory-match' ? ["hint","preview4","time30"] : game == 'link-connect' ? ["hint","reshuffle","thunder","freeze"] : game == 'triple-connect' ? ["hint","undo","shuffle","time"] : []; }
+    function wheelSupportLabel(game,key) { return {"memory-match":{"hint":"Gợi ý 1 lượt","preview4":"Xem trước 4 thẻ","time30":"+30 giây"},"link-connect":{"hint":"Gợi ý","reshuffle":"Xáo trộn","thunder":"Sấm sét","freeze":"Đóng băng 30 giây"},"triple-connect":{"hint":"Gợi ý","undo":"Hoàn tác","shuffle":"Xáo trộn","time":"+30 giây"}}.get(game,{}).get(key,''); }
+    function wheelBoxKeys(w,extra) {
+      return w.keys().hasOnly(['version','sector','kind','coins','box'].concat(w.box == 'mystery' ? ['chestType'] : []).concat(extra));
+    }
+    function wheelBoxPrize(w) {
+      return w.box == ['','','','mystery','cosmetic','flip','theme','path','exit','support'][w.sector]
+        && (w.box != 'mystery' || w.chestType in ['c','avatar','frame','badge'])
+        && (w.kind == 'support' ? w.box in ['mystery','support'] && w.coins == 0
+          && wheelBoxKeys(w,['gameId','key','label']) && w.gameId in ['memory-match','link-connect','triple-connect']
+          && w.key in wheelSupportKeys(w.gameId) && (!w.keys().hasAny(['label']) || w.label == wheelSupportLabel(w.gameId,w.key))
+          : w.box != 'support' && (w.kind == 'item' ? wheelBoxKeys(w,['itemId']) && w.coins == 0 && wheelPoolItem(w)
+            : w.kind == 'coins' && (w.reason == 'coins' ? wheelBoxKeys(w,['reason']) && w.box == 'mystery'
+                && w.coins == (w.chestType == 'c' ? 50 : w.chestType == 'avatar' ? 150 : 100)
+              : w.reason == 'full' ? wheelBoxKeys(w,['reason']) && w.coins == 100 && wheelPoolExists(w)
+              : w.reason == 'duplicate' && wheelBoxKeys(w,['reason','itemId']) && w.coins == 100 && wheelPoolItem(w))));
+    }
+    function rewardWheelCandidate(w) {
+      return w is map && w.version == 2 && w.sector is int && w.sector >= 0 && w.sector < 10 && rewardInt(w.coins)
+        && (w.sector < 3 ? w.keys().hasOnly(['version','sector','kind','coins']) && w.kind == 'coins'
+          && (w.sector < 2 ? w.coins == [5,10][w.sector] : w.coins >= 5 && w.coins <= 50) : wheelBoxPrize(w));
+    }
+    function wheelChangedField(n,o) {
+      return n.ticket != o.ticket ? 'ticket' : n.free != o.free ? 'free' : n.ads != o.ads ? 'ads' : 'pastAds';
+    }
+    function wheelChangedSpin(n,field) {
+      return field in ['free','ticket'] ? n[field] : n[field][n[field].size()-1];
+    }
+    function wheelPastOrdinal(ads,day,ordinal) {
+      let count = ads.size();
+      return count == 0 || (count >= 10 ? (ads[0].day != day || ads[0].ordinal < ordinal) && (ads[1].day != day || ads[1].ordinal < ordinal) && (ads[2].day != day || ads[2].ordinal < ordinal) && (ads[3].day != day || ads[3].ordinal < ordinal) && (ads[4].day != day || ads[4].ordinal < ordinal) && (ads[5].day != day || ads[5].ordinal < ordinal) && (ads[6].day != day || ads[6].ordinal < ordinal) && (ads[7].day != day || ads[7].ordinal < ordinal) && (ads[8].day != day || ads[8].ordinal < ordinal) && (ads[9].day != day || ads[9].ordinal < ordinal) : (count <= 0 || (ads[0].day != day || ads[0].ordinal < ordinal)) && (count <= 1 || (ads[1].day != day || ads[1].ordinal < ordinal)) && (count <= 2 || (ads[2].day != day || ads[2].ordinal < ordinal)) && (count <= 3 || (ads[3].day != day || ads[3].ordinal < ordinal)) && (count <= 4 || (ads[4].day != day || ads[4].ordinal < ordinal)) && (count <= 5 || (ads[5].day != day || ads[5].ordinal < ordinal)) && (count <= 6 || (ads[6].day != day || ads[6].ordinal < ordinal)) && (count <= 7 || (ads[7].day != day || ads[7].ordinal < ordinal)) && (count <= 8 || (ads[8].day != day || ads[8].ordinal < ordinal)) && (count <= 9 || (ads[9].day != day || ads[9].ordinal < ordinal))) && (count >= 20 ? (ads[10].day != day || ads[10].ordinal < ordinal) && (ads[11].day != day || ads[11].ordinal < ordinal) && (ads[12].day != day || ads[12].ordinal < ordinal) && (ads[13].day != day || ads[13].ordinal < ordinal) && (ads[14].day != day || ads[14].ordinal < ordinal) && (ads[15].day != day || ads[15].ordinal < ordinal) && (ads[16].day != day || ads[16].ordinal < ordinal) && (ads[17].day != day || ads[17].ordinal < ordinal) && (ads[18].day != day || ads[18].ordinal < ordinal) && (ads[19].day != day || ads[19].ordinal < ordinal) : (count <= 10 || (ads[10].day != day || ads[10].ordinal < ordinal)) && (count <= 11 || (ads[11].day != day || ads[11].ordinal < ordinal)) && (count <= 12 || (ads[12].day != day || ads[12].ordinal < ordinal)) && (count <= 13 || (ads[13].day != day || ads[13].ordinal < ordinal)) && (count <= 14 || (ads[14].day != day || ads[14].ordinal < ordinal)) && (count <= 15 || (ads[15].day != day || ads[15].ordinal < ordinal)) && (count <= 16 || (ads[16].day != day || ads[16].ordinal < ordinal)) && (count <= 17 || (ads[17].day != day || ads[17].ordinal < ordinal)) && (count <= 18 || (ads[18].day != day || ads[18].ordinal < ordinal)) && (count <= 19 || (ads[19].day != day || ads[19].ordinal < ordinal))) && (count >= 29 ? (ads[20].day != day || ads[20].ordinal < ordinal) && (ads[21].day != day || ads[21].ordinal < ordinal) && (ads[22].day != day || ads[22].ordinal < ordinal) && (ads[23].day != day || ads[23].ordinal < ordinal) && (ads[24].day != day || ads[24].ordinal < ordinal) && (ads[25].day != day || ads[25].ordinal < ordinal) && (ads[26].day != day || ads[26].ordinal < ordinal) && (ads[27].day != day || ads[27].ordinal < ordinal) && (ads[28].day != day || ads[28].ordinal < ordinal) : (count <= 20 || (ads[20].day != day || ads[20].ordinal < ordinal)) && (count <= 21 || (ads[21].day != day || ads[21].ordinal < ordinal)) && (count <= 22 || (ads[22].day != day || ads[22].ordinal < ordinal)) && (count <= 23 || (ads[23].day != day || ads[23].ordinal < ordinal)) && (count <= 24 || (ads[24].day != day || ads[24].ordinal < ordinal)) && (count <= 25 || (ads[25].day != day || ads[25].ordinal < ordinal)) && (count <= 26 || (ads[26].day != day || ads[26].ordinal < ordinal)) && (count <= 27 || (ads[27].day != day || ads[27].ordinal < ordinal)) && (count <= 28 || (ads[28].day != day || ads[28].ordinal < ordinal)));
+    }
+    function rewardWheelSpinShape(n,o,field,r) {
+      return n.spins.keys().hasOnly(['free','ads','pastAds','ticket'])
+        && n.spins.diff(o.spins).affectedKeys().hasOnly([field])
+        && (field == 'free' ? o.spins.free == null && r.source == 'free' && r.day == n.day
+          : field == 'ticket' ? r.source == 'ticket' && r.day == n.day && r.sequence == n.ticketSpent
+          : r.source == 'ad' && n.spins[field].size() == o.spins[field].size() + 1
+            && n.spins[field].removeAll([r]) == o.spins[field]
+            && (field == 'ads' ? r.day == n.day && n.spins.ads.size() <= 10 && r.ordinal == n.spins.ads.size()
+              : n.spins.pastAds.size() <= 30 && r.day < n.day && r.day >= n.day - 3
+                && r.ordinal <= 10 && wheelPastOrdinal(o.spins.pastAds,r.day,r.ordinal)));
+    }
+    function rewardWheelPendingForSpin(n,o,r) {
+      let next = n.get('pendingWheel',null);
+      return o.get('pendingWheel',null) == null && (r.keys().hasAny(['wheel'])
+        ? n.keys().hasAny(['pendingWheel']) && (next == null || r.wheel.kind == 'support' && next == {'operation':r.operation,'day':r.day,'wheel':r.wheel})
+        : next == null);
+    }
+    function rewardWheelSpinUpdate(n,o) {
+      let field = wheelChangedField(n.spins,o.spins);
+      let r = wheelChangedSpin(n.spins,field);
+      return rewardWheelSpinShape(n,o,field,r) && rewardSpin(r,r.source) && rewardWheelPendingForSpin(n,o,r);
+    }
+    function rewardWheelLateSpin(n,o) {
+      let prior = o.spins.pastAds;
+      let next = n.spins.pastAds;
+      let r = next[next.size()-1];
+      return n.spins.diff(o.spins).affectedKeys().hasOnly(['pastAds']) && next.size() <= 30 && next.size() == prior.size() + 1
+        && next.removeAll([r]) == prior && rewardSpin(r,'ad') && r.day < n.day && r.day >= n.day - 3
+        && wheelPastOrdinal(prior,r.day,r.ordinal) && rewardWheelPendingForSpin(n,o,r);
+    }
+    function rewardWheelClaim(n,o) {
+      let pending = o.get('pendingWheel',null);
+      return chestBase(n,o,['pendingWheel']) && pending != null && n.get('pendingWheel',null) == null
+        && pending.keys().hasOnly(['operation','day','wheel']) && pending.wheel.kind == 'support' && rewardWheelCandidate(pending.wheel);
     }
 
     // Spark reward contract: one private account document; no round/receipt collections.
@@ -262,29 +335,23 @@ service cloud.firestore {
         && n.claimed is list && n.claimed.hasOnly(allowed) && n.claimed.size() == n.claimed.toSet().size();
     }
     function rewardSpin(r, source) {
-      return r is map && r.keys().hasOnly(['operation','source','day','sector','coins','ordinal','sequence'])
+      return r is map && r.keys().hasOnly(['operation','source','day','sector','coins','ordinal','sequence','wheel'])
         && r.operation is string && r.operation.matches('^[A-Za-z0-9_-]{1,128}$') && r.source == source
-        && rewardInt(r.day) && r.sector is int && r.sector >= 0 && r.sector < 8
-        && r.coins == [5,10,10,15,15,20,20,25][r.sector];
-    }
-    function rewardSpins(n, o) {
-      return n is map && n.keys().hasOnly(['free','ads','pastAds','ticket'])
-        && (n.free == null || n.free == o.get('free', null) || rewardSpin(n.free, 'free'))
-        && (n.ticket == o.get('ticket', null) || rewardSpin(n.ticket, 'ticket') && (n.ticket.sequence is int && n.ticket.sequence >= 0 && n.ticket.sequence <= 9007199254740991))
-        && n.ads is list && n.ads.size() <= 10 && n.pastAds is list && n.pastAds.size() <= 30
-        && (n.ads.size() == 0 || n.ads == o.get('ads', []) || rewardSpin(n.ads[n.ads.size()-1], 'ad') && n.ads[n.ads.size()-1].ordinal == n.ads.size())
-        && (n.pastAds.size() == 0 || n.pastAds == o.get('pastAds', []) || rewardSpin(n.pastAds[n.pastAds.size()-1], 'ad'));
+        && rewardInt(r.day)
+        && (source == 'free' ? !r.keys().hasAny(['ordinal','sequence']) : source == 'ad' ? rewardInt(r.ordinal) && r.ordinal > 0 && r.ordinal <= 10 && !r.keys().hasAny(['sequence']) : source == 'ticket' && rewardInt(r.sequence) && r.sequence > 0 && !r.keys().hasAny(['ordinal']))
+        && (r.keys().hasAny(['wheel']) ? rewardWheelCandidate(r.wheel) && r.sector == r.wheel.sector && r.coins == r.wheel.coins
+          : r.sector is int && r.sector >= 0 && r.sector < 8 && r.coins == [5,10,10,15,15,20,20,25][r.sector]);
     }
     function validRewardState(n, o) {
       let day = int(request.time.toMillis() / 86400000);
       let changed = n.diff(o).affectedKeys();
-      return n.keys().hasOnly(['version','revision','day','week','daily','weekly','loginNext','loginDay','spins','tickets','ticketEarned','ticketSpent','event','cosmetics','letters','chests','festival','hourlyGift','rootRevision','fingerprint','updatedAt'])
+      return n.keys().hasOnly(['version','revision','day','week','daily','weekly','loginNext','loginDay','spins','tickets','ticketEarned','ticketSpent','event','cosmetics','letters','chests','festival','hourlyGift','pendingWheel','rootRevision','fingerprint','updatedAt'])
         && n.get('chests',null) == o.get('chests',null) && n.get('festival',null) == o.get('festival',null)
         && n.version == 1 && (n.revision is int && n.revision >= 0 && n.revision <= 9007199254740991) && n.revision > 0 && n.day == day && n.week == day - ((day + 3) % 7)
         && (!changed.hasAny(['daily']) || rewardCounter(n.daily, ['win-three','match-thirty','win-without-hint','bonus']))
         && (!changed.hasAny(['weekly']) || rewardCounter(n.weekly, ['bonus']))
         && n.loginNext is int && n.loginNext >= 0 && n.loginNext < 7 && n.loginDay is int && n.loginDay >= -1 && n.loginDay <= day
-        && (n.tickets is int && n.tickets >= 0 && n.tickets <= 9007199254740991) && (n.ticketEarned is int && n.ticketEarned >= 0 && n.ticketEarned <= 9007199254740991) && (n.ticketSpent is int && n.ticketSpent >= 0 && n.ticketSpent <= 9007199254740991) && (!changed.hasAny(['spins']) || rewardSpins(n.spins, o.get('spins', {})))
+        && (n.tickets is int && n.tickets >= 0 && n.tickets <= 9007199254740991) && (n.ticketEarned is int && n.ticketEarned >= 0 && n.ticketEarned <= 9007199254740991) && (n.ticketSpent is int && n.ticketSpent >= 0 && n.ticketSpent <= 9007199254740991)
         && (!changed.hasAny(['event']) || n.event is map && n.event.keys().hasOnly(['id','week','points','day','dailyPoints','claimed'])
         && n.event.id == 'firefly-festival-01' && n.event.week == n.week && n.event.day == day
         && (n.event.points is int && n.event.points >= 0) && n.event.points <= 100 && (n.event.dailyPoints is int && n.event.dailyPoints >= 0) && n.event.dailyPoints <= 40
@@ -316,14 +383,6 @@ service cloud.firestore {
       return (!n.claimed.hasAny([20]) || n.points >= 20) && (!n.claimed.hasAny([50]) || n.points >= 50)
         && (!n.claimed.hasAny([80]) || n.points >= 80);
     }
-    function rewardSpinTransition(n, o) {
-      let sameDay = n.day == o.day;
-      return (!sameDay || (o.spins.free == null || n.spins.free == o.spins.free)
-          && n.spins.ads.hasAll(o.spins.ads) && n.spins.ads.size() <= o.spins.ads.size() + 1
-          && (n.spins.ads.size() == o.spins.ads.size() || n.spins.ads.removeAll(o.spins.ads) == [n.spins.ads[n.spins.ads.size()-1]]))
-        && (sameDay || n.spins.ads.size() <= 1)
-        && (!sameDay || n.spins.pastAds.hasAll(o.spins.pastAds));
-    }
     function rewardWallet(n,o) {
       let sameDay = n.day == o.day;
       let sameWeek = n.week == o.week;
@@ -342,7 +401,7 @@ service cloud.firestore {
       let spent = n.ticketSpent - o.ticketSpent;
       return n.revision == o.revision + 1 && n.day >= o.day && n.week >= o.week
         && (!sameDay || !changed.hasAny(['daily']) || monotoneCounter(n.daily, o.daily))
-        && (!changed.hasAny(['spins']) || rewardSpinTransition(n,o))
+        && (!changed.hasAny(['spins','pendingWheel']) || n.spins != o.spins && rewardWheelSpinUpdate(n,o))
         && (!sameWeek || (!changed.hasAny(['weekly']) || monotoneCounter(n.weekly, o.weekly))
           && (!changed.hasAny(['event']) || n.event.points >= o.event.points && n.event.claimed.hasAll(o.event.claimed))
           && (!changed.hasAny(['cosmetics']) || (n.cosmetics.collectionId != o.cosmetics.collectionId ? n.cosmetics.points == 0 : n.cosmetics.points >= o.cosmetics.points)))
@@ -529,8 +588,8 @@ service cloud.firestore {
     function rewardInitial(n, space, uid) {
       let empty = {'wins':0,'matches':0,'noHint':0,'visits':0,'claimed':[]};
       let day = int(request.time.toMillis() / 86400000);
-      return n.keys().hasOnly(['version','revision','day','week','daily','weekly','loginNext','loginDay','spins','tickets','ticketEarned','ticketSpent','event','cosmetics','letters','chests','festival','hourlyGift','rootRevision','fingerprint','updatedAt'])
-        && n.get('hourlyGift',null) == null && n.version == 1 && n.revision == 1 && n.day == day && n.week == day - ((day + 3) % 7)
+      return n.keys().hasOnly(['version','revision','day','week','daily','weekly','loginNext','loginDay','spins','tickets','ticketEarned','ticketSpent','event','cosmetics','letters','chests','festival','hourlyGift','pendingWheel','rootRevision','fingerprint','updatedAt'])
+        && n.get('pendingWheel',null) == null && n.get('hourlyGift',null) == null && n.version == 1 && n.revision == 1 && n.day == day && n.week == day - ((day + 3) % 7)
         && n.daily == empty && n.weekly == empty && n.loginNext == 0 && n.loginDay == -1
         && n.spins == {'free':null,'ads':[],'pastAds':[],'ticket':null} && n.tickets == 0 && n.ticketEarned == 0 && n.ticketSpent == 0
         && n.event == {'id':'firefly-festival-01','week':n.week,'points':0,'day':day,'dailyPoints':0,'claimed':[]}

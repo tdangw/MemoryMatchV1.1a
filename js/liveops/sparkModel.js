@@ -3,6 +3,8 @@ import { normalizeChests, normalizeFestival, earnChest, claimFestival, openChest
 import { normalizeLetterCounts, normalizeLetters, creditLetters, mutateLetters, exchangeLetterSet, nextLetterReward } from './letters.js';
 import { GROUP_LOOT_DROP_RATES, LETTER_ALPHABET, ACTIVE_EVENT_COLLECTION_ID, eventCollection } from './config.js';
 import { DAY_MS, DAILY, WEEKLY, LOGIN, WHEEL, periods, normalizeFact } from './model.js';
+import { normalizeWheelCandidate, resolveWheelCandidate } from './wheelRewards.js';
+import { GAMEPLAY_LIMITS } from '../gameplayTuning.js';
 export const AD_DAILY_LIMIT = 10;
 export const EVENT_ID = 'firefly-festival-01';
 const record = v => v !== null && typeof v === 'object' && !Array.isArray(v);
@@ -39,13 +41,22 @@ export function normalizeSparkState(value) {
   if (!record(c) || !eventCollection(c.collectionId) || !integer(c.week) || !integer(c.points) || c.points > 100
     || !Array.isArray(c.granted) || c.granted.some(key => !eventCollection(key)) || new Set(c.granted).size !== c.granted.length) fail();
   const results = [s.free, ...s.ads, ...s.pastAds, s.ticket].filter(Boolean);
-  for (const r of results) if (!record(r) || !id(r.operation) || !['free','ad','ticket'].includes(r.source)
-    || !integer(r.day) || !Number.isInteger(r.sector) || r.sector < 0 || r.sector >= 8 || r.coins !== WHEEL[r.sector]) fail();
+  for (const r of results) {
+    if (!record(r) || !id(r.operation) || !['free','ad','ticket'].includes(r.source)||!integer(r.day))fail();
+    if(Object.hasOwn(r,'wheel')){const prize=normalizeWheelCandidate(r.wheel);if(r.sector!==prize.sector||r.coins!==prize.coins)fail();}
+    else if(!Number.isInteger(r.sector)||r.sector<0||r.sector>=8||r.coins!==WHEEL[r.sector])fail();
+  }
   if (s.free && s.free.source !== 'free' || s.ticket && (s.ticket.source !== 'ticket' || s.ticket.sequence !== value.ticketSpent)
     || s.ads.some((r, i) => r.source !== 'ad' || r.ordinal !== i + 1)) fail();
   const { rootRevision, fingerprint, updatedAt, ...state } = structuredClone(value);
   state.letters = normalizeLetters(value.letters);
   if (value.hourlyGift !== undefined) state.hourlyGift = normalizeHourlyGift(value.hourlyGift);
+  if(value.pendingWheel!==undefined&&value.pendingWheel!==null){
+    const pending=value.pendingWheel;
+    if(!record(pending)||Object.keys(pending).length!==3||!id(pending.operation)||!integer(pending.day)||pending.day>value.day)fail();
+    const prize=normalizeWheelCandidate(pending.wheel);if(prize.kind!=='support')fail();
+    state.pendingWheel={operation:pending.operation,day:pending.day,wheel:prize};
+  }
   if(value.chests!==undefined||value.festival!==undefined){ if(value.chests===undefined||value.festival===undefined)fail(); state.chests=normalizeChests(value.chests);state.festival=normalizeFestival(value.festival); }
   return state;
 }
@@ -104,7 +115,7 @@ export function applySpecialDrop(previous, { gameId, mode, attempt, wave, group,
 export function secureUnit() { const bytes = new Uint32Array(1); crypto.getRandomValues(bytes); return bytes[0] / 4294967296; }
 export const secureSector = () => Math.floor(secureUnit() * 8);
 /** No I/O or presentation. The published snapshot carries all entitlement markers. */
-export function transitionSpark(previous, command, { uid, now, sector = 0, ticketEarned = 0, letterEarned = {}, randomLetter = LETTER_ALPHABET[0], ownedItemIds = [], facts = [], festivalEnabled=false, fireflyEarned=0, supportCount=0, sourceEarned } = {}) {
+export function transitionSpark(previous, command, { uid, now, sector = 0, ticketEarned = 0, letterEarned = {}, randomLetter = LETTER_ALPHABET[0], ownedItemIds = [], ownedWheelItemIds=ownedItemIds, wheelCandidate, facts = [], festivalEnabled=false, fireflyEarned=0, supportCount=0, sourceEarned } = {}) {
   if (!id(uid) || !integer(ticketEarned)) fail();
   const state = previous ? normalizeSparkState(previous) : initialSparkState(now), receipts = [];
   if(festivalEnabled){state.chests=normalizeChests(state.chests);if(sourceEarned)state.chests=creditSourceChests(state.chests,sourceEarned);state.festival=normalizeFestival(state.festival);if(!integer(fireflyEarned)||fireflyEarned<state.festival.earnedTotal)fail();state.festival.earnedTotal=fireflyEarned;}
@@ -157,8 +168,28 @@ export function transitionSpark(previous, command, { uid, now, sector = 0, ticke
   }
   eventCoins();
   let spin = null, letterResult = null, chestResult = null, hourlyGiftResult = null, hourlyGiftApplied = false;
+  let wheelReward=null,spinApplied=false,wheelApplied=false;
   const ownedLetters = new Set(ownedItemIds);
+  const grantWheel=(prize,operation)=>{
+    if(prize.kind==='item'){
+      ownedLetters.add(prize.itemId);
+      grant(`wheel:item:${prize.itemId}`,0,{acquisition:{sourceKind:'wheel',sourceId:'wheel-v2',items:[prize.itemId]}});
+    }else grant(`wheel:${operation}`,prize.coins,prize.kind==='support'?{support:{gameId:prize.gameId,key:prize.key}}:{});
+    wheelApplied=true;
+  };
+  const supportFull=prize=>{
+    if(prize.kind!=='support')return false;
+    if(!integer(supportCount)||supportCount>GAMEPLAY_LIMITS.itemCount)fail();
+    return supportCount===GAMEPLAY_LIMITS.itemCount;
+  };
   switch (command.type) {
+    case 'claimWheelReward': {
+      if(!id(command.wheelOperation))fail();
+      const pending=state.pendingWheel;if(!pending||pending.operation!==command.wheelOperation)break;
+      wheelReward=normalizeWheelCandidate(pending.wheel);
+      if(supportFull(wheelReward))break;
+      grantWheel(wheelReward,pending.operation);state.pendingWheel=null;break;
+    }
     case 'claimHourlyGift': {
       const claimed = claimHourlyGift(state.hourlyGift,command,now,supportCount);
       state.hourlyGift = claimed.state; hourlyGiftResult = claimed.result; hourlyGiftApplied = claimed.applied;
@@ -203,28 +234,42 @@ export function transitionSpark(previous, command, { uid, now, sector = 0, ticke
     case 'spin': {
       if (!id(command.operation) || !['free','ad','ticket'].includes(command.source)) fail();
       spin = [state.spins.free, ...state.spins.ads, ...state.spins.pastAds, state.spins.ticket].find(r => r?.operation === command.operation);
-      if (spin) break;
+      if (spin) {wheelReward=spin.wheel||null;break;}
+      if(state.pendingWheel)throw Object.assign(new Error('Bạn còn một phần quà đang chờ. Hãy nhận quà trước khi quay tiếp.'),{code:'rewards/wheel-pending'});
       const lateAd = command.source === 'ad' && command.day < p.day;
       if (!integer(command.day) || command.day > p.day || command.day !== p.day && !lateAd) throw new Error('Lượt quay thuộc ngày trước.');
       const adList = lateAd ? state.spins.pastAds.filter(r => r.day === command.day) : state.spins.ads;
       if (lateAd && (!integer(command.earnedAt) || (periods(command.earnedAt).day < command.day || periods(command.earnedAt).day > command.day + 1)
         || now < command.earnedAt || now - command.earnedAt > 2 * DAY_MS)) fail();
-      if (command.source === 'free' && state.spins.free) { spin = state.spins.free; break; }
+      if (command.source === 'free' && state.spins.free) { spin = state.spins.free;wheelReward=spin.wheel||null;break; }
       if (command.source === 'ad' && (!command.earned || command.ordinal !== adList.length + 1 || command.ordinal > AD_DAILY_LIMIT)) fail();
       if (command.source === 'ticket') {
         if (command.sequence !== state.ticketSpent + 1 || state.tickets < 1) fail();
         state.tickets--; state.ticketSpent++; if (!integer(state.ticketSpent)) fail();
       }
-      if (!Number.isInteger(sector) || sector < 0 || sector >= 8) fail();
-      spin = { source: command.source, day: command.day, sector, coins: WHEEL[sector], operation: command.operation };
+      const candidate=wheelCandidate===undefined?command.wheelCandidate:wheelCandidate;
+      if(command.wheelVersion!==undefined&&(command.wheelVersion!==2||candidate===undefined))fail();
+      if(candidate!==undefined){
+        wheelReward=resolveWheelCandidate(candidate,ownedWheelItemIds);
+        spin={source:command.source,day:command.day,sector:wheelReward.sector,coins:wheelReward.coins,operation:command.operation,wheel:wheelReward};
+      }else{
+        if (!Number.isInteger(sector) || sector < 0 || sector >= 8) fail();
+        spin = { source: command.source, day: command.day, sector, coins: WHEEL[sector], operation: command.operation };
+      }
       if (command.source === 'ad') { spin.ordinal = command.ordinal; (lateAd ? state.spins.pastAds : state.spins.ads).push(spin); }
       else if (command.source === 'ticket') { spin.sequence = state.ticketSpent; state.spins.ticket = spin; }
       else state.spins.free = spin;
-      grant(`wheel:${command.operation}`, spin.coins); break;
+      spinApplied=true;
+      if(wheelReward){
+        state.pendingWheel=null;
+        if(supportFull(wheelReward))state.pendingWheel={operation:command.operation,day:command.day,wheel:wheelReward};
+        else grantWheel(wheelReward,command.operation);
+      }else{grant(`wheel:${command.operation}`, spin.coins);wheelApplied=true;}
+      break;
     }
     default: fail();
   }
-  return { state: normalizeSparkState(state), receipts, spin, letterResult, chestResult, hourlyGiftResult, hourlyGiftApplied, ownedItemIds:[...ownedLetters], nextLetterRewardId:nextLetterReward(ownedLetters)?.id||null, ownedLetterIds:[...ownedLetters], serverNow: now };
+  return { state: normalizeSparkState(state), receipts, spin, spinApplied, wheelReward, wheelApplied, letterResult, chestResult, hourlyGiftResult, hourlyGiftApplied, ownedItemIds:[...ownedLetters], nextLetterRewardId:nextLetterReward(ownedLetters)?.id||null, ownedLetterIds:[...ownedLetters], serverNow: now };
 }
 
 /** Resolve a durable pending operation against canonical state before a new action. */
@@ -233,6 +278,7 @@ export function resolveSparkOperation(state, operation, now) {
   const day = periods(now).day;
   const existing = state && [state.spins.free,...state.spins.ads,...state.spins.pastAds,state.spins.ticket].find(r=>r?.operation === operation.operation);
   if (existing) return { command:operation, discarded:false };
+  if(operation.type==='claimWheelReward')return {command:operation,discarded:false};
   if(operation.type==='claimHourlyGift'){if(operation.sequence!==undefined&&operation.sequence<=(state?.hourlyGift?.sequence||0)&&state?.hourlyGift?.last.operation!==operation.operation)return {command:{type:'status'},discarded:true};return {command:operation,discarded:false};}
   if(operation.type==='claimFestival')return {command:operation,discarded:false};
   if(operation.type==='openChest'){if(operation.sequence!==undefined&&operation.sequence<=(state?.chests?.sequence||0)&&state?.chests?.last?.operation!==operation.operation)return {command:{type:'status'},discarded:true};return {command:operation,discarded:false};}

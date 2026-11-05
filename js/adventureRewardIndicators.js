@@ -24,7 +24,7 @@ export function adventureRewardReadiness({ current = true, spark, uid, period, o
   const badgeMilestone = festival && FESTIVAL_MILESTONES.some((item, index) =>
     festival.earnedTotal - festival.completedCycles * 100 >= item.points && !(festival.mask & (1 << index)));
   // Tickets, recipes and badge milestones do not expire with the daily clock.
-  ready.events = state.tickets > 0 || letterSet || Boolean(badgeMilestone);
+  ready.events = state.tickets > 0 || Boolean(state.pendingWheel) || letterSet || Boolean(badgeMilestone);
   if (period?.uid !== uid || state.day !== period.day
     || state.week !== periods(period.day * DAY_MS).week) return ready;
   ready.missions = state.loginDay !== state.day
