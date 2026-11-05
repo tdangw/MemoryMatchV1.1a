@@ -128,7 +128,7 @@
   trên vòng quay; chỉ giữ toast thưởng. Lỗi kết nối vẫn hiển thị rõ.
 - Một nút ở tâm tự chọn miễn phí → vé → xem quảng cáo. Chỉ trừ lượt
   khi bấm và service xác nhận; khóa lúc bận, giữ focus sau khi quay.
-  Giữ8ô/12,5%,1free/ngày,10ad/ngày, quota và giao dịch hiện hành.
+  Dùng10ô theo bảng thưởng06/11 bên dưới; giữ1free/ngày,10ad/ngày.
 - Vé quay nằm góc trái ngay dưới tab, trong khoảng riêng trên vòng;
   icon thông tin(i) góc phải mở popup Thể lệ, không còn ba nút dưới vòng.
 - Xu rơi từ tọa độ ô trúng sau khi rotor dừng; tiếp tục dùng nhịp
@@ -384,7 +384,7 @@
   TRIPLE CONNECT→Rương Huy hiệu; ADVENTURE→Rương Avatar. Kho chung17chữ,
   công thức tiêu đủ số chữ lặp; bán10Xu/chữ, ghép3chữ giống nhau nhận
   1chữ ngẫu nhiên đều, có thể trùng đầu vào. Không đổi ownership trực tiếp.
-- Vòng quay8ô bằng nhau5/10/10/15/15/20/20/25Xu;1free+10ad tối đa/ngày,
+- Vòng quay10ô theo bảng thưởng06/11;1free+10ad tối đa/ngày,
   1vé/lượt riêng, vé không hết hạn. Không giả ad earned. Nhiệm vụ ngày
   thắng3/ghép30/thắng không Gợi ý thưởng5/5/10Xu; nhận đủ ba tự thưởng
   10Xu+1vé. Tuần thắng12/ghép120/noHint3/điểm danh3, nhận bonus50Xu+2vé.
@@ -466,3 +466,22 @@
 - Chỉ test/build khi rủi ro cần, không sau mỗi chỉnh sửa; gom commit theo phase. APK/push/deploy cần yêu cầu riêng. Không xóa cache/dist/node_modules/QA chỉ vì dọn kế hoạch.
 - Receipt kỹ thuật/UI là bằng chứng tại thời điểm nghiệm thu, có thể chứa tên Đom Đóm/giá hoặc trạng thái cũ. Contract hiện hành ở phần trên và ARCHITECTURE/ba tài liệu game; không dùng prompt triển khai lịch sử làm lệnh mới.
 - Giữ hạn chế S22, quảng cáo/provider/Google OAuth thật và dữ liệu chơi thực tế. Khi có task mới cần kế hoạch, tạo một plan cho task đó và chỉ rõ tại đây; không phục hồi plan đã đóng.
+
+## Vòng quay10ô — cập nhật06/11/2026
+
+- Thứ tự/tỷ lệ:5Xu40%;10Xu25%;Rương Xu5–50Xu15%;Rương Ngẫu nhiên1%;
+  Rương Ngoại hình2%;Rương Lật thẻ2%;Rương Chủ đề1%;Rương Đường nối2%;
+  Rương Xóa thẻ2%;Rương Hỗ trợ10%.10ô hiển thị bằng nhau, tỷ lệ thực
+  ghi trong Thể lệ. Rương Ngẫu nhiên chọn đều C/Avatar/Khung/Huy hiệu.
+- Rương mở ngay sau khi dừng, dùng ảnh đóng/mở có sẵn theo skin và dấu
+  nhóm; default dùng bộ woodland C/B/A/S. Toast/âm thanh báo quà thực nhận.
+- Chọn đều món chưa có trong đúng nhóm, bỏ default/starter/theme chưa
+  chơi được; đủ bộ hoặc món đã chọn bị trùng do đồng bộ thì100Xu. Giữ đúng
+  kho hiện có, không tự trang bị. Hỗ trợ chọn đều3trò rồi đều loại trong trò.
+- Kho hỗ trợ đầy giữ một pendingWheel canonical qua ngày; nút tâm Nhận quà,
+  dấu chấm Sự kiện và không quay mới tới khi nhận. Lượt chờ/entropy lưu bền,
+  retry không bốc lại, không nhận trùng. Receipt8ô cũ vẫn đọc/khôi phục được;
+  Spark save version1 giữ, receipt mới có wheel.version2 và pending tùy chọn.
+- W0–W3 hoàn tất; nghiệm thu ở WHEEL_REWARDS_PLAN.md, tách khỏi
+  ACCOUNT_RELEASE_PLAN.md. Rules vòng quay đã phát hành06/11, đọc lại
+  khớp bản đã kiểm thử; không deploy Hosting/APK.

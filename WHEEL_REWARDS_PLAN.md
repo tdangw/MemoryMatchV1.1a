@@ -39,11 +39,33 @@ commit này. Chỉ sửa vùng Spark của rules qua source generator.
 
 W0: catalog thuần/entitlement đúng kho, normalize và tương thích dữ liệu —
 đạt.228quyền,7unit mới+7unit legacy và check appearance/theme đạt.
-W1: weighted candidate, Spark/service, rules generated và emulator.
-W2: vòng10ô, hình hộp riêng, mở hộp/toast/âm thanh và state nhận quà giữ.
+W1: weighted candidate, Spark/service, rules generated và emulator — đạt.
+W2: vòng10ô, ảnh rương theo skin, mở hộp/toast/âm thanh và nhận quà giữ — đạt.
 W3: review độc lập, unit/UI/lifecycle/responsive/reduced-motion, check/build,
-commit theo phase. Phát hành riêng rules chỉ khi không kéo theo thay đổi
-tài khoản chưa được phép; không deploy Hosting/APK.
+commit theo phase — đạt. Rules vòng quay đã phát hành và đọc lại xác nhận
+đúng nội dung06/11; ngoài vùng Spark giống hoàn toàn bản production trước
+phát hành. Không deploy Hosting/APK.
+
+Nghiệm thu 06/11 đang thực hiện:
+- Model/service/catalog được review độc lập; 66/66 unit regression đạt.
+- Service thật với Auth/Firestore cục bộ: 2/2 đạt, gồm mất phản hồi và
+  claim quà khi có lượt quay đang chờ; không cấp trùng/không xóa lượt chờ.
+- UI: 12/12 đạt; 5 skin × 4 viewport (320/412/844/1024), đủ 10 kết quả,
+  reduced-motion, 20 chu kỳ đóng giữa hiệu ứng, không còn node/animation.
+  Kiểm tra thêm 4 mẫu rương riêng mỗi skin: đạt. Default dùng lại ảnh
+  woodland C/B/A/S; các skin khác dùng bộ rương riêng hiện có.
+- npm run check và npm run build: đạt. Không đo FPS thiết bị thật.
+- Rules/emulator: đạt đủ10ô, nhận quảng cáo trễ với29 receipt cũ,
+  13 yêu cầu giả bị từ chối (gồm ordinal trùng/lùi/vượt10). Regression
+  liveops cũ đạt; ghép chữ13 luồng hợp lệ/15 yêu cầu giả bị từ chối.
+  Nguồn rules dùng kiểm tra ordinal tăng theo ngày (trần10), không lặp
+  lại kiểm tra receipt cũ; nhóm10 phép so sánh và catalog regex chính xác
+  giữ trong ngân sách biểu thức. Model vẫn phát ordinal liên tiếp.
+- Commits: W0 `25fecd7`; W1 `2fe6cc9`; W2 `ce9c34e`. W3 chỉ ghi nhận
+  nghiệm thu/context. Giữ riêng toàn bộ thay đổi ACCOUNT_RELEASE đang dở.
+- Không đổi ID/effect/kho đang có; Spark save version1 tương thích cũ.
+  Trường wheel.version2 và pendingWheel là phần mở rộng có kiểm tra đã
+  được phê duyệt. Chưa kiểm thử provider quảng cáo/thiết bị Android thật.
 
 Không commit ảnh/log/fixture tạm trong runtime. Không tuyên bố FPS thiết
 bị thật nếu chưa đo. Ghi nghiệm thu tại đây khi đóng task.
