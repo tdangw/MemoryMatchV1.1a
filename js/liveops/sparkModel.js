@@ -5,6 +5,7 @@ import { GROUP_LOOT_DROP_RATES, LETTER_ALPHABET, ACTIVE_EVENT_COLLECTION_ID, eve
 import { DAY_MS, DAILY, WEEKLY, LOGIN, WHEEL, periods, normalizeFact } from './model.js';
 import { normalizeWheelCandidate, resolveWheelCandidate } from './wheelRewards.js';
 import { GAMEPLAY_LIMITS } from '../gameplayTuning.js';
+import { normalizeLoginCandidate, normalizeLoginReward } from './missionRewards.js';
 export const AD_DAILY_LIMIT = 10;
 export const EVENT_ID = 'firefly-festival-01';
 const record = v => v !== null && typeof v === 'object' && !Array.isArray(v);
@@ -50,6 +51,7 @@ export function normalizeSparkState(value) {
     || s.ads.some((r, i) => r.source !== 'ad' || r.ordinal !== i + 1)) fail();
   const { rootRevision, fingerprint, updatedAt, ...state } = structuredClone(value);
   state.letters = normalizeLetters(value.letters);
+  if(value.loginReward!==undefined&&value.loginReward!==null){state.loginReward=normalizeLoginReward(value.loginReward);if(state.loginReward.day>state.day)fail();}
   if (value.hourlyGift !== undefined) state.hourlyGift = normalizeHourlyGift(value.hourlyGift);
   if(value.pendingWheel!==undefined&&value.pendingWheel!==null){
     const pending=value.pendingWheel;
@@ -115,7 +117,7 @@ export function applySpecialDrop(previous, { gameId, mode, attempt, wave, group,
 export function secureUnit() { const bytes = new Uint32Array(1); crypto.getRandomValues(bytes); return bytes[0] / 4294967296; }
 export const secureSector = () => Math.floor(secureUnit() * 8);
 /** No I/O or presentation. The published snapshot carries all entitlement markers. */
-export function transitionSpark(previous, command, { uid, now, sector = 0, ticketEarned = 0, letterEarned = {}, randomLetter = LETTER_ALPHABET[0], ownedItemIds = [], ownedWheelItemIds=ownedItemIds, wheelCandidate, facts = [], festivalEnabled=false, fireflyEarned=0, supportCount=0, sourceEarned } = {}) {
+export function transitionSpark(previous, command, { uid, now, sector = 0, ticketEarned = 0, letterEarned = {}, randomLetter = LETTER_ALPHABET[0], ownedItemIds = [], ownedWheelItemIds=ownedItemIds, wheelCandidate, facts = [], festivalEnabled=false, fireflyEarned=0, supportCount=0, loginSupportCounts=[], sourceEarned } = {}) {
   if (!id(uid) || !integer(ticketEarned)) fail();
   const state = previous ? normalizeSparkState(previous) : initialSparkState(now), receipts = [];
   if(festivalEnabled){state.chests=normalizeChests(state.chests);if(sourceEarned)state.chests=creditSourceChests(state.chests,sourceEarned);state.festival=normalizeFestival(state.festival);if(!integer(fireflyEarned)||fireflyEarned<state.festival.earnedTotal)fail();state.festival.earnedTotal=fireflyEarned;}
@@ -123,7 +125,7 @@ export function transitionSpark(previous, command, { uid, now, sector = 0, ticke
   const grant = (key, coins, extra = {}) => receipts.push({ receiptId: `${uid}:${key}`, ownerUid: uid, coins, grantedAt: now, ...extra });
   const addTickets = n => { state.tickets += n; if (!integer(state.tickets)) fail(); };
   const dailyBonus = () => {
-    if (DAILY.every(item => state.daily.claimed.includes(item.id)) && !state.daily.claimed.includes('bonus')) {
+    if (DAILY.every(item => state.daily[item.key]>=item.target) && !state.daily.claimed.includes('bonus')) {
       state.daily.claimed.push('bonus'); addTickets(1); grant(`daily:${state.day}:bonus`, 10);
     }
   };
@@ -169,6 +171,7 @@ export function transitionSpark(previous, command, { uid, now, sector = 0, ticke
   eventCoins();
   let spin = null, letterResult = null, chestResult = null, hourlyGiftResult = null, hourlyGiftApplied = false;
   let wheelReward=null,spinApplied=false,wheelApplied=false;
+  let loginResult=null,loginApplied=false,bonusApplied=false;
   const ownedLetters = new Set(ownedItemIds);
   const grantWheel=(prize,operation)=>{
     if(prize.kind==='item'){
@@ -200,12 +203,22 @@ export function transitionSpark(previous, command, { uid, now, sector = 0, ticke
       break;
     }
     case 'status': break;
-    case 'login': if (state.loginDay !== p.day) {
-      grant(`login:${p.day}`, LOGIN[state.loginNext]); state.loginDay = p.day; state.loginNext = (state.loginNext + 1) % 7;
+    case 'login': if ((!state.loginReward||state.loginReward.operation!==command.operation)&&state.loginDay !== p.day) {
+      if(command.loginVersion===2){
+        const candidate=normalizeLoginCandidate(command.loginCandidate);if(candidate.index!==state.loginNext||!id(command.operation))fail();
+        if(loginSupportCounts.length!==candidate.supports.length||loginSupportCounts.some(n=>!integer(n)||n>GAMEPLAY_LIMITS.itemCount))fail();
+        if(loginSupportCounts.some(n=>n===GAMEPLAY_LIMITS.itemCount))throw Object.assign(new Error('Kho hỗ trợ đã đầy. Hãy dùng bớt vật phẩm rồi nhận lại quà điểm danh.'),{code:'rewards/inventory-full'});
+        loginResult={...candidate,day:p.day,operation:command.operation};state.loginReward=loginResult;
+        grant(`login:${p.day}`,candidate.coins);
+        for(const support of candidate.supports)grant(`login:${p.day}:support:${support.gameId}`,0,{support});
+      }else if(command.loginVersion!==undefined)fail();
+      else grant(`login:${p.day}`, LOGIN[state.loginNext]);
+      loginApplied=true;state.loginDay = p.day; state.loginNext = (state.loginNext + 1) % 7;
       state.weekly.visits = Math.min(3, state.weekly.visits + 1);
     } break;
-    case 'daily': { const item = DAILY.find(v => v.id === command.id); if (!item) fail(); claimDaily(item); dailyBonus(); break; }
-    case 'weekly': claimWeekly(); break;
+    case 'daily': { const item = DAILY.find(v => v.id === command.id); if (!item) fail(); claimDaily(item); break; }
+    case 'dailyBonus': {const received=state.daily.claimed.includes('bonus');dailyBonus();bonusApplied=!received&&state.daily.claimed.includes('bonus');break;}
+    case 'weekly': {const received=state.weekly.claimed.includes('bonus');claimWeekly();bonusApplied=!received&&state.weekly.claimed.includes('bonus');break;}
     case 'sellLetter':
     case 'fuseLetter': {
       const changed=mutateLetters(state.letters,command,randomLetter);state.letters=changed.state;letterResult=changed.result;
@@ -269,7 +282,7 @@ export function transitionSpark(previous, command, { uid, now, sector = 0, ticke
     }
     default: fail();
   }
-  return { state: normalizeSparkState(state), receipts, spin, spinApplied, wheelReward, wheelApplied, letterResult, chestResult, hourlyGiftResult, hourlyGiftApplied, ownedItemIds:[...ownedLetters], nextLetterRewardId:nextLetterReward(ownedLetters)?.id||null, ownedLetterIds:[...ownedLetters], serverNow: now };
+  return { state: normalizeSparkState(state), receipts, spin, spinApplied, wheelReward, wheelApplied, loginResult,loginApplied,bonusApplied,letterResult, chestResult, hourlyGiftResult, hourlyGiftApplied, ownedItemIds:[...ownedLetters], nextLetterRewardId:nextLetterReward(ownedLetters)?.id||null, ownedLetterIds:[...ownedLetters], serverNow: now };
 }
 
 /** Resolve a durable pending operation against canonical state before a new action. */
@@ -278,6 +291,10 @@ export function resolveSparkOperation(state, operation, now) {
   const day = periods(now).day;
   const existing = state && [state.spins.free,...state.spins.ads,...state.spins.pastAds,state.spins.ticket].find(r=>r?.operation === operation.operation);
   if (existing) return { command:operation, discarded:false };
+  if(operation.type==='login'&&operation.loginVersion===2){
+    const changedIndex=operation.loginCandidate&&operation.loginCandidate.index!==state?.loginNext&&state?.loginReward?.operation!==operation.operation;
+    return changedIndex?{command:{type:'status'},discarded:true}:{command:{...operation,day},discarded:false};
+  }
   if(operation.type==='claimWheelReward')return {command:operation,discarded:false};
   if(operation.type==='claimHourlyGift'){if(operation.sequence!==undefined&&operation.sequence<=(state?.hourlyGift?.sequence||0)&&state?.hourlyGift?.last.operation!==operation.operation)return {command:{type:'status'},discarded:true};return {command:operation,discarded:false};}
   if(operation.type==='claimFestival')return {command:operation,discarded:false};

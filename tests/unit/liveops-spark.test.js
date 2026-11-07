@@ -36,6 +36,8 @@ test('day/week bonuses add 1/2 tickets and coins exactly once including rollover
   let state=initialSparkState(now); Object.assign(state.daily,{wins:3,matches:30,noHint:1}); Object.assign(state.weekly,{wins:12,matches:120,noHint:3,visits:3});
   let coins=0;
   for(const item of DAILY) {const r=run(state,{type:'daily',id:item.id}); state=r.state; coins+=r.receipts.reduce((a,b)=>a+b.coins,0);}
+  assert.equal(coins,20);assert.equal(state.tickets,0);
+  {const r=run(state,{type:'dailyBonus'});state=r.state;coins+=r.receipts.reduce((a,b)=>a+b.coins,0);}
   assert.equal(coins,30); assert.equal(state.tickets,1);
   state=run(state,{type:'weekly'}).state; assert.equal(state.tickets,3); assert.equal(run(state,{type:'weekly'}).receipts.length,0);
   const reset=run(state,{type:'status'},{now:now+7*DAY_MS}); assert.equal(reset.state.tickets,3); assert.equal(reset.receipts.length,0);
