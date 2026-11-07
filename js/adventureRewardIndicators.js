@@ -28,6 +28,7 @@ export function adventureRewardReadiness({ current = true, spark, uid, period, o
   if (period?.uid !== uid || state.day !== period.day
     || state.week !== periods(period.day * DAY_MS).week) return ready;
   ready.missions = state.loginDay !== state.day
+    || DAILY.every(item=>state.daily[item.key]>=item.target) && !state.daily.claimed.includes('bonus')
     || DAILY.some(item => state.daily[item.key] >= item.target && !state.daily.claimed.includes(item.id))
     || WEEKLY.every(item => state.weekly[item.key] >= item.target) && !state.weekly.claimed.includes('bonus');
   ready.events ||= !state.spins.free;

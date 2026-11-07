@@ -36,3 +36,13 @@ và13yêu cầu giả bị từ chối; baseline liveops và ghép chữ13valid/
 Rules nhóm claim hẹp giữ ngân sách biểu thức; không nới điều kiện thưởng.
 Một kiểm tra ad promise cũ trong liveops.test.js vẫn lệch với thay đổi ads
 ngoài task (0thay vì1 callback); không sửa/chặn hành vi quảng cáo ở task này.
+
+M3 đạt:4UI nhiệm vụ mới,5UI loot dùng chung,8UI wheel và5UI responsive
+regression qua5skin/320–1024px đạt. Kiểm tra vùng chữ thực (hoa văn skin
+có thể nhô2px), vùng hỗ trợ, thứ tự reset dưới tab, nhận đủ7ngày, mở rương
+trước từngquà, khóa khi thiếu mục tiêu, reduced-motion và đóng giữa hoạt ảnh.
+Review độc lập không có P1/P2. npm run check/build đạt; không đo FPS/thiết
+bị Android thật. Không đổi catalog ID/kho; không migration/save-version bump.
+Rules nhiệm vụ đã phát hành07/11 và đọc lại khớp artifact đã qua140denial.
+Phần production khác được giữ nguyên. M1 `20a746b`; M2 `33130a0`;
+M3 ghi giao diện/context và đóng task. Không còn gate nhiệm vụ đang chờ.

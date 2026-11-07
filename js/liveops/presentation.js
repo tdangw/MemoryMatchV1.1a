@@ -74,7 +74,7 @@ export function openLiveopsPage(kind, surface = {}) {
     try {
       const result = rewarded ? await requestRewardedSpin() : await requestLiveops(command);
       if (!owns()) return;
-      observedAt = performance.now(); view = result; confirmedView=true; refreshAppWallet(); status.textContent = kind==='events'&&eventTab==='wheel'?'':result.appliedCoins > 0 ? `Đã nhận ${result.appliedCoins} Xu.` : 'Đã cập nhật tiến độ.';
+      observedAt = performance.now(); view = result; confirmedView=true; refreshAppWallet(); status.textContent = kind==='events'&&eventTab==='wheel'?'':result.appliedCoins > 0 ? `Đã nhận ${result.appliedCoins} Xu.` : '';
       if(result.letterResult?.kind==='exchange' && result.letterResult.chestType)status.textContent=`Đã nhận ${CHEST_NAMES[result.letterResult.chestType]}. Mở trong Kho rương khi bạn muốn.`;
       else if(result.letterResult?.kind==='exchange')status.textContent=result.letterResult.itemId?`Đã nhận ${LETTER_REWARD_ITEMS.find(item=>item.id===result.letterResult.itemId).name}.`:`Đã nhận ${result.letterResult.coins} Xu.`;
       if (command?.type === 'fuseLetter' && result.state.letters.last?.kind === 'fuse') status.textContent = `Đã nhận chữ ${result.state.letters.last.received}.`;
@@ -111,15 +111,20 @@ export function openLiveopsPage(kind, surface = {}) {
           } finally { local.dispose(); }
         }
       }
-      if(owns()&&feedback&&!presentWheelResult)rewardFeedback.present(result.committedRewards,rewardOrigin);
+      if(owns()&&feedback&&!presentWheelResult){
+        if(result.bonusApplied||result.loginApplied&&result.loginResult?.index===6){
+          const opened=await presentWheelGift(result.bonusApplied?'mystery':'support',{owner:scope,host:modal.overlay,title:result.bonusApplied?'Thưởng nhiệm vụ':'Gói hỗ trợ'});if(opened)rewardOrigin=opened;
+        }
+        if(owns())rewardFeedback.present(result.committedRewards,rewardOrigin,{contextualNames:true});
+      }
       return result;
     } catch (error) {
-      if(owns()){confirmedView=false;retry.hidden=false;}
+      if(owns()){if(error.code!=='rewards/inventory-full')confirmedView=false;retry.hidden=false;}
       if(owns()&&!view&&(!navigator.onLine||getActiveGameScope())){
         try {const cached=await loadPersistentGameData();if(owns()&&cached.appearance.spark?.ownerUid===identity?.uid&&cached.appearance.spark.state){view={state:cached.appearance.spark.state,serverNow:Date.now()};observedAt=performance.now();}}
         catch {if(owns())status.textContent='Chưa đọc được bản lưu. Hãy tải lại trang.';return;}
       }
-      if (owns()) status.textContent = error.code === 'rewards/wheel-pending' ? 'Phần quà trước vẫn được giữ. Bấm Thử lại để nhận quà rồi quay tiếp.' : error.code === 'rewards/invalid-operation' ? error.message : error.code === 'rewards/not-enabled' ? 'Chưa mở được Nhiệm vụ và Sự kiện. Hãy thử lại sau.'
+      if (owns()) status.textContent = error.code === 'rewards/inventory-full' ? error.message : error.code === 'rewards/wheel-pending' ? 'Phần quà trước vẫn được giữ. Bấm Thử lại để nhận quà rồi quay tiếp.' : error.code === 'rewards/invalid-operation' ? error.message : error.code === 'rewards/not-enabled' ? 'Chưa mở được Nhiệm vụ và Sự kiện. Hãy thử lại sau.'
         : 'Chưa thể cập nhật. Phần thưởng chưa nhận vẫn được giữ. Hãy kết nối và thử lại.';
       if (error.code !== 'rewards/not-enabled') console.warn('Liveops page operation unavailable', error.code || error.name);
       return {error:status.textContent};

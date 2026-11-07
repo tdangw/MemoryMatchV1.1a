@@ -1,11 +1,12 @@
 import { node, action, createTabs } from './ui.js';
-import { DAILY, WEEKLY, LOGIN, DAY_MS } from './model.js';
+import { DAILY, WEEKLY, DAY_MS } from './model.js';
+import { LOGIN_REWARDS } from './missionRewards.js';
 import { createIcon } from '../icons.js';
 
 export function loginDayStates(state) {
   const received = state.loginDay === state.day;
   const count = received ? state.loginNext || 7 : state.loginNext;
-  return LOGIN.map((coins, index) => ({ coins, index,
+  return LOGIN_REWARDS.map((reward, index) => ({ ...reward, index,
     status: index < count ? 'received' : !received && index === count ? 'available' : 'locked' }));
 }
 function progress(value, target, label) {
@@ -24,24 +25,26 @@ export function renderMissions(host, { view, tab, busy, run, play, renderEmpty, 
     selectTab(key); panel.replaceChildren();
     if (!view) { renderEmpty(panel); return; }
     const state = view.state, current = state[key], catalog = key === 'daily' ? DAILY : WEEKLY;
+    const countdown = node('p', 'liveops__countdown');countdown.dataset.period=key;panel.append(countdown);
     if (key === 'daily') {
       const login = node('section', 'liveops__card liveops__login'), days = node('div', 'liveops__days');
       login.id = 'missions-login'; login.tabIndex = -1;
       login.append(sectionHeading('Điểm danh 7 ngày', 'calendar'));
       for (const day of loginDayStates(state)) {
-        const tile = node('section', 'liveops__day'); tile.dataset.state = day.status;
+        const tile = node('button', 'liveops__day'); tile.type='button';tile.dataset.state = day.status;
+        tile.disabled=busy||!canClaim||day.status!=='available';tile.dataset.focusKey=`login-day-${day.index}`;
+        tile.onclick=()=>void run({type:'login',loginVersion:2});
+        const game={'memory-match':'Memory Match','link-connect':'Link Connect','triple-connect':'Triple Connect'}[day.gameId];
+        tile.setAttribute('aria-label',`Ngày ${day.index+1}: ${day.coins} Xu và ${game?`1 Gợi ý ${game}`:'gói 3 vật phẩm hỗ trợ'}${day.status==='received'?', đã nhận':day.status==='locked'?', khóa':''}`);
         const art = node('div', 'liveops__day-art'); art.append(createIcon('coin'));
         const status = node('span', 'liveops__day-status');
         if (day.status !== 'available') status.append(createIcon(day.status === 'received' ? 'check' : 'lock'));
-        status.append(node('span', '', day.status === 'received' ? 'Đã nhận' : day.status === 'locked' ? 'Chưa đến lượt' : 'Hôm nay'));
+        const support=node('span','liveops__day-support');support.append(createIcon(game?'wand':'chest'),node('span','',game?'×1':'×3'),node('small','',game?game.replace(' Match','').replace(' Connect',''):'Hỗ trợ'));
         tile.append(node('strong', 'liveops__day-label', `Ngày ${day.index + 1}`), art,
-          node('strong', 'liveops__day-coins', `${day.coins} Xu`), status);
+          node('strong', 'liveops__day-coins', `${day.coins} Xu`), support,status);
         days.append(tile);
       }
-      const loginAction = node('div', 'liveops__login-action');
-      if (state.loginDay === state.day) loginAction.append(action('Đã nhận hôm nay', null, true));
-      else loginAction.append(action(`Nhận ${LOGIN[state.loginNext]} Xu`, () => void run({type:'login'}), busy || !canClaim, 'claim-login'));
-      login.append(days, loginAction);
+      login.append(days);
       panel.append(login);
     }
     panel.append(node('h3', 'liveops__section-title', key === 'daily' ? 'Nhiệm vụ hôm nay' : 'Nhiệm vụ tuần này'));
@@ -66,27 +69,19 @@ export function renderMissions(host, { view, tab, busy, run, play, renderEmpty, 
       panel.append(row);
     }
     const bonus = node('section', 'liveops__card liveops__bonus'), received = current.claimed.includes('bonus');
-    const bonusBody = node('div', 'liveops__bonus-body'), bonusArt = node('div', 'liveops__bonus-art');
+    const bonusBody = node('div', 'liveops__bonus-body'), bonusArt = node('button', 'liveops__bonus-art');
+    bonusArt.type='button';bonusArt.disabled=busy||!canClaim||received||completed<catalog.length;bonusArt.dataset.state=received?'received':completed===catalog.length?'available':'locked';
+    bonusArt.dataset.focusKey=`claim-${key}-bonus`;bonusArt.setAttribute('aria-label',received?'Đã nhận thưởng nhiệm vụ':key==='daily'?'Mở rương nhiệm vụ: 10 Xu và 1 Vé quay':'Mở rương nhiệm vụ tuần: 50 Xu và 2 Vé quay');
+    bonusArt.onclick=()=>void run({type:key==='daily'?'dailyBonus':'weekly'});
     bonusArt.append(createIcon('chest'));
-    bonusBody.append(node('h3', '', 'Thưởng trọn bộ'),
-      node('strong', 'liveops__bonus-reward', key === 'daily' ? '10 Xu + 1 Vé quay' : '50 Xu + 2 Vé quay'), progress(completed, catalog.length, 'Hoàn thành nhiệm vụ'));
-    if (key === 'daily') {
-      const claimed = DAILY.filter(item => current.claimed.includes(item.id)).length;
-      bonusBody.append(node('p', '', received ? 'Đã nhận thưởng trọn bộ' : `Hoàn thành ${completed}/3 · Đã nhận ${claimed}/3`),
-        node('p', '', received ? 'Vé quay đã vào Sự kiện.' : 'Nhận đủ ba quà nhiệm vụ để tự nhận thưởng trọn bộ.'));
-    } else {
-      const controls = node('div', 'liveops__bonus-action');
-      controls.append(action(received ? 'Đã nhận' : 'Nhận thưởng trọn bộ', () => void run({type:'weekly'}), busy || !canClaim || received || completed < catalog.length, 'claim-weekly'));
-      bonusBody.append(controls);
-    }
+    bonusArt.append(createIcon(received?'check':completed<catalog.length?'lock':'check'));
+    bonusBody.append(node('h3', '', 'Nhiệm vụ đã hoàn thành'),progress(completed, catalog.length, 'Nhiệm vụ đã hoàn thành'));
     bonus.append(bonusBody, bonusArt);
     panel.append(bonus);
     if (key === 'weekly') {
       const journey = node('section', 'liveops__card liveops__journey'); journey.append(sectionHeading('Hành trình tuần', 'missions'));
       journey.append(progress(state.event.points, 80, 'Điểm hành trình tuần'), node('p', '', 'Mốc 20: 5 Xu · Mốc 50: 10 Xu · Mốc 80: 10 Xu'), node('p', '', 'Thắng ván để tích điểm, tối đa 40 điểm mỗi ngày. Xu được trao khi đạt mốc.')); panel.append(journey);
     }
-    const countdown = node('p', 'liveops__countdown'); countdown.dataset.period = key; panel.append(countdown,
-      node('p', 'liveops__guidance', 'Tiến độ được ghi sau mỗi ván thắng. Một cặp thẻ hoặc một bộ ba tính là một lần ghép. Làm mới lúc 07:00; tuần bắt đầu thứ Hai.'));
   });
   host.append(tabs.root, tabs.panel); tabs.select(tab, false);
 }

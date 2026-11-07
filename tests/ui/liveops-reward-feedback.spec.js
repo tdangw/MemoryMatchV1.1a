@@ -7,10 +7,10 @@ async function finish(page){await page.evaluate(()=>document.querySelectorAll('.
 async function open(page,kind){await page.getByRole('button',{name:kind==='missions'?'Nhiệm vụ':'Sự kiện',exact:true}).click();await expect(page.locator('.liveops__status')).not.toHaveText('Đang kết nối…');}
 test('mission grants show bounded loot and all three owned audio phases; replay/status/close never repeats them',async({page},info)=>{
  await ready(page);await page.emulateMedia({reducedMotion:'no-preference'});await open(page,'missions');
- await page.locator('[data-focus-key="claim-login"]').click();await expect(page.locator('.liveops-reward-feedback__particle')).toHaveCount(15);
+ await page.locator('[data-focus-key="login-day-2"]').click();await expect(page.locator('.liveops-reward-feedback__particle')).toHaveCount(16);
  expect(await page.evaluate(()=>rewardAudioPlayed)).toEqual(expect.arrayContaining(['reward.ogg','coin_drop.mp3']));await page.locator('.liveops-reward-feedback__particle').evaluateAll(nodes=>nodes.forEach(n=>n.getAnimations().forEach(a=>{a.pause();a.currentTime=1300;})));await page.screenshot({path:info.outputPath('mission-loot.png')});await finish(page);
  expect(await page.evaluate(()=>rewardAudioPlayed)).toContain('coin-collect.mp3');
- await page.getByRole('tab',{name:'Tuần này',exact:true}).click();await page.locator('[data-focus-key="claim-weekly"]').click();
+ await page.getByRole('tab',{name:'Tuần này',exact:true}).click();await page.locator('[data-focus-key="claim-weekly-bonus"]').click();
  await expect(page.locator('.liveops-reward-feedback__particle[data-reward-kind="ticket"]')).toHaveCount(2);expect(await page.locator('.liveops-reward-feedback__particle').count()).toBeLessThanOrEqual(44);await finish(page);
  const count=await page.evaluate(()=>rewardAudioPlayed.filter(n=>['reward.ogg','coin_drop.mp3','coin-collect.mp3'].includes(n)).length);await page.evaluate(()=>window.dispatchEvent(new Event('online')));await expect(page.locator('.liveops')).toHaveAttribute('aria-busy','false');await expect(page.locator('.liveops-reward-feedback')).toHaveCount(0);expect(await page.evaluate(()=>rewardAudioPlayed.filter(n=>['reward.ogg','coin_drop.mp3','coin-collect.mp3'].includes(n)).length)).toBe(count);
  await page.locator('.adventure-screen > .adventure-exit').click();await expect(page.locator('.adventure-screen')).toHaveCount(0);await expect(page.locator('.liveops-reward-feedback')).toHaveCount(0);
@@ -20,7 +20,7 @@ test('legacy wheel receipt shows its actual coins without a wrong new-wheel angl
  await page.getByRole('button',{name:'Quay miễn phí',exact:true}).click();expect(await page.locator('.liveops__rotor').evaluate(n=>n.getAnimations().length)).toBe(0);await expect(page.locator('.liveops-reward-feedback__particle')).toHaveCount(25);await finish(page);
  await page.getByRole('tab',{name:'Sưu tập huy hiệu',exact:true}).click();await page.locator('[data-focus-key="festival-50"]').click();
  await expect(page.locator('.liveops-reward-feedback__particle[data-reward-kind="chest"]')).toHaveCount(1);await page.locator('.adventure-screen > .adventure-exit').click();await expect(page.locator('.adventure-screen')).toHaveCount(0);await expect(page.locator('.liveops-reward-feedback')).toHaveCount(0);
- await open(page,'missions');await page.evaluate(()=>eventsFixture.fail=true);await page.locator('[data-focus-key="claim-login"]').click();await expect(page.locator('.liveops-reward-feedback')).toHaveCount(0);
+ await open(page,'missions');await page.evaluate(()=>eventsFixture.fail=true);await page.locator('[data-focus-key="login-day-2"]').click();await expect(page.locator('.liveops-reward-feedback')).toHaveCount(0);
 });
 
 

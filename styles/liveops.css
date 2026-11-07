@@ -6,6 +6,9 @@ html .liveops button.tab-button, html .liveops__sale button.tab-button { min-hei
 .liveops__card .tab-button { margin-block: 6px; width: 100%; white-space: normal; min-height: 48px; }
 .liveops__tabs { display: flex; flex-wrap: nowrap; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 3px; }
 .liveops__tabs::-webkit-scrollbar { display: none; }
+.liveops--events .liveops__tabs { --liveops-tab-font:clamp(9px,3.4cqi,13px); display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); container-type:inline-size; gap:2px; padding:1px; overflow:visible; }
+.liveops--missions .liveops__tabs { --liveops-tab-font:clamp(13px,3.4vw,16px); display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:5px; overflow:visible; }
+html .liveops-page .liveops-surface .liveops__tabs > button.tab-button { width:100%; min-width:0; box-sizing:border-box; padding:8px 1px; font-size:var(--liveops-tab-font,clamp(10px,2.6vw,14px)); letter-spacing:0; }
 .liveops__tabs > button { flex: 1 0 auto; min-height: 48px; white-space: nowrap; }
 .liveops__tabs [aria-selected="true"] { outline: 2px solid currentColor; outline-offset: -3px; }
 .liveops__days { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
@@ -137,14 +140,19 @@ html .liveops-page .liveops-surface .liveops__tabs button[aria-selected="true"] 
 .liveops-surface .liveops__day { position:relative; gap:2px; padding:4px 3px; border:1px solid var(--lo-task-line); background:linear-gradient(145deg,var(--lo-task),color-mix(in srgb,var(--lo-task) 80%,var(--lo-line))); color:var(--lo-task-ink); border-radius:10px; }
 .liveops-surface .liveops__day[data-state="available"] { outline:2px solid var(--lo-claim-bottom); box-shadow:0 0 12px #e8c96f66,inset 0 0 0 2px #fff7; }
 .liveops-surface .liveops__day[data-state="received"] { background:color-mix(in srgb,var(--lo-task) 65%,#42694a); }
+.liveops-surface .liveops__day:disabled { cursor:default; }
+.liveops-surface .liveops__day[data-state="locked"] { opacity:.45; filter:grayscale(.7); }
+.liveops-surface .liveops__day[data-state="received"] { opacity:.7; }
+.liveops__day:focus-visible { outline:2px solid var(--lo-gold); outline-offset:2px; }
 .liveops__day-art { height:24px; display:grid; place-items:center; }
 .liveops__day-art > .ui-icon { width:24px; height:24px; }
 .liveops__day-label { font-size:12px; line-height:14px; }
 .liveops__day-coins { font-size:13px; line-height:16px; }
-.liveops__day-status { display:flex; justify-content:center; align-items:center; gap:2px; min-height:12px; font-size:10px; line-height:12px; }
+.liveops__day-status { position:absolute; right:3px; top:3px; display:flex; font-size:10px; line-height:12px; }
 .liveops__day-status > .ui-icon { width:12px; height:12px; flex:none; }
-.liveops__login-action { display:flex; justify-content:center; margin-top:6px; }
-html .liveops-page .liveops-surface .liveops__login-action button { width:auto; min-width:50%; margin:0; color:var(--lo-claim-ink); text-shadow:none; background:linear-gradient(var(--lo-claim-top),var(--lo-claim-bottom)); }
+.liveops__day-support { display:grid; grid-template-columns:15px auto; justify-content:center; align-items:center; column-gap:2px; font-size:9px; line-height:12px; white-space:nowrap; }
+.liveops__day-support > small { grid-column:1/-1; font-size:9px; line-height:11px; }
+.liveops__day-support > .ui-icon { width:15px; height:15px; flex:none; }
 .liveops__section-title { display:flex; align-items:center; gap:12px; margin:6px 0 0; text-align:center; font-size:1.1rem; color:var(--lo-gold); }
 .liveops__section-title::before,.liveops__section-title::after { content:''; height:1px; flex:1; background:var(--lo-line); }
 .liveops-surface .liveops__mission { display:grid; grid-template-columns:48px minmax(0,1fr) auto; align-items:center; gap:9px; padding:9px; border:2px solid var(--lo-task-line); background:linear-gradient(135deg,var(--lo-task),color-mix(in srgb,var(--lo-task) 85%,var(--lo-line))); color:var(--lo-task-ink); border-radius:12px; }
@@ -156,13 +164,15 @@ html .liveops-page .liveops-surface .liveops__login-action button { width:auto; 
 html .liveops-page .liveops-surface .liveops__mission-action button { width:100%; margin:0; padding:7px 10px; font-size:13px; }
 .liveops__mission-complete { display:flex; align-items:center; gap:4px; margin:0; font-size:12px; }
 .liveops__mission-complete > .ui-icon { width:22px; height:22px; flex:none; }
-.liveops-surface .liveops__bonus { display:grid; grid-template-columns:minmax(0,1fr) 76px; gap:10px; align-items:center; border:2px solid var(--lo-line); }
-.liveops__bonus-body h3 { margin-bottom:5px; color:var(--lo-gold); }
-.liveops__bonus-body p { font-size:12px; margin:5px 0 0; }
-.liveops__bonus-reward { display:block; font-size:14px; margin-bottom:8px; }
-.liveops__bonus-art > .ui-icon { width:76px; height:76px; }
-.liveops__countdown { justify-self:center; border:1px solid var(--lo-line); border-radius:24px; padding:5px 12px; background:var(--lo-inset); color:var(--lo-gold); font-size:13px; }
-.liveops-surface .liveops__guidance { color:var(--lo-muted); font-size:12px; }
+.liveops-surface .liveops__bonus { display:grid; grid-template-columns:minmax(0,1fr) 56px; gap:10px; align-items:center; padding:10px; }
+.liveops__bonus-body h3 { margin:0 0 6px; color:var(--lo-gold); font-size:13px; }
+.liveops__bonus-art { position:relative; width:56px; height:56px; display:grid; place-items:center; padding:3px; border:1px solid var(--lo-line); border-radius:10px; background:var(--lo-inset); }
+.liveops__bonus-art > .ui-icon:first-child { width:46px; height:46px; }
+.liveops__bonus-art > .ui-icon:last-child { position:absolute; right:1px; bottom:1px; width:17px; height:17px; color:var(--lo-gold); background:var(--lo-inset); border-radius:50%; }
+.liveops__bonus-art[data-state='locked'] { opacity:.45; filter:grayscale(.7); }
+.liveops__bonus-art[data-state='available'] { box-shadow:0 0 10px #e8c96f66; cursor:pointer; }
+.liveops__bonus-art[data-state='received'] { opacity:.6; }
+.liveops__countdown { justify-self:end; min-height:15px; margin:0; color:var(--lo-muted); font-size:11px; line-height:15px; font-variant-numeric:tabular-nums; }
 .liveops-surface .liveops__wheel-card { position:relative; padding:32px 0 0; border:0; background:none; box-shadow:none; }
 .liveops-surface .liveops__wheel { width:min(100%,440px); margin:10px auto 14px; }
 .liveops-surface .liveops__rotor { border:0; background:none; }

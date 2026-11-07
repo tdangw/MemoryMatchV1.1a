@@ -2,6 +2,7 @@ import { test,expect } from '@playwright/test';
 import { mkdirSync,writeFileSync } from 'node:fs';
 const fixture = `
 import {transitionSpark} from '/js/liveops/sparkModel.js';
+import {createLoginCandidate} from '/js/liveops/missionRewards.js';
 import {LETTER_ALPHABET} from '/js/liveops/config.js';
 import {chestCandidate} from '/js/liveops/chests.js';
 let now=Date.now(), state=transitionSpark(null,{type:'status'},{uid:'ui-owner',now,festivalEnabled:true,fireflyEarned:130}).state;
@@ -15,8 +16,9 @@ export const trustedRewardPeriod=()=>null;
 export async function requestLiveops(command={type:'status'}){
 calls++;if(command.type==='openChest'&&window.eventsFixture.fullSupport)throw Object.assign(new Error('Kho hỗ trợ đã đầy.'),{pendingChest:{chestType:'c',gameId:'memory-match'},code:'rewards/inventory-full'});if(window.eventsFixture.fail)throw new Error('Chưa kết nối được.');const cmd={...command};if(['sellLetter','fuseLetter','exchangeLetterSet'].includes(cmd.type)){cmd.sequence=state.letters.sequence+1;cmd.operation=crypto.randomUUID();}
 if(cmd.type==='spin'){cmd.operation=crypto.randomUUID();cmd.day=state.day;cmd.sequence=state.ticketSpent+1;}
+if(cmd.type==='login'&&cmd.loginVersion===2){cmd.operation=crypto.randomUUID();cmd.loginCandidate=createLoginCandidate(state.loginNext,[.2,.5,.8]);}
 if(cmd.type==='openChest'){cmd.sequence=state.chests.sequence+1;cmd.operation=crypto.randomUUID();cmd.candidate=chestCandidate(cmd.chestType,cmd.gameId,[],()=>.9);}
-const result=transitionSpark(state,cmd,{uid:'ui-owner',now,festivalEnabled:true,fireflyEarned:state.festival.earnedTotal,letterEarned:state.letters.earned,ticketEarned:state.ticketEarned,sector:7,randomLetter:'M'});state=result.state;
+const result=transitionSpark(state,cmd,{uid:'ui-owner',now,festivalEnabled:true,fireflyEarned:state.festival.earnedTotal,letterEarned:state.letters.earned,ticketEarned:state.ticketEarned,loginSupportCounts:cmd.loginCandidate?.supports.map(()=>0)||[],sector:7,randomLetter:'M'});state=result.state;
 result.appliedCoins=result.receipts.reduce((sum,item)=>sum+item.coins,0);await Promise.resolve();return result;
 }`;
 async function ready(page) {
@@ -51,9 +53,9 @@ for(const width of [320,360,412,844,1024])test(`five skins and both pages fit ${
 });
 test('claims login, fixed recipes, sale confirmation, keyboard and shared four-card inventory',async({page})=>{
   test.setTimeout(60000);await ready(page);await open(page);
-  await page.getByRole('button',{name:'Nhận 15 Xu',exact:true}).click();await expect(page.locator('.liveops__day[data-state="received"]')).toHaveCount(3);await expect(page.locator('.liveops__day[data-state="available"]')).toHaveCount(0);
+  await page.locator('[data-focus-key="login-day-2"]').click();await expect(page.locator('.liveops__day[data-state="received"]')).toHaveCount(3);await expect(page.locator('.liveops__day[data-state="available"]')).toHaveCount(0);
   for(const name of ['Nhận 5 Xu','Nhận 5 Xu','Nhận 10 Xu'])await page.getByRole('button',{name,exact:true}).first().click();
-  await expect(page.getByText('Đã nhận thưởng trọn bộ',{exact:true})).toBeVisible();
+  await page.locator('[data-focus-key="claim-daily-bonus"]').click();await expect(page.locator('[data-focus-key="claim-daily-bonus"]')).toBeDisabled();
   const weekly=page.getByRole('tab',{name:'Tuần này',exact:true});await weekly.focus();await weekly.press('ArrowLeft');await expect(page.getByRole('tab',{name:'Hôm nay',exact:true})).toBeFocused();
   await open(page,'events');await page.getByRole('tab',{name:'Sưu tập chữ',exact:true}).click();
   await page.getByRole('tab',{name:'MEMORY MATCH',exact:true}).click();await page.getByRole('button',{name:'Đổi MEMORY MATCH',exact:true}).click();await expect(page.locator('.liveops__status')).toContainText('Rương Avatar');
@@ -89,7 +91,7 @@ test('thirty mount/tab/close cycles release owners and timer; countdown does not
 });
 test('offline disables grants and thirty full-motion cycles keep DOM and listeners bounded',async({page,context})=>{
   test.setTimeout(60000);await ready(page);await page.emulateMedia({reducedMotion:'no-preference'});await open(page);
-  await context.setOffline(true);await expect(page.getByRole('button',{name:'Nhận 15 Xu',exact:true})).toBeDisabled();
+  await context.setOffline(true);await expect(page.locator('[data-focus-key="login-day-2"]')).toBeDisabled();
   const calls=await page.evaluate(()=>eventsFixture.calls);await context.setOffline(false);
   await expect.poll(()=>page.evaluate(()=>eventsFixture.calls)).toBe(calls+1);
   await page.evaluate(()=>{eventsModal.destroy();eventsModal=null;});
@@ -115,12 +117,12 @@ test('offline disables grants and thirty full-motion cycles keep DOM and listene
 
 test('cached progress cannot grant when reconnect status fails',async({page,context})=>{
   await ready(page);await open(page);await context.setOffline(true);
-  await expect(page.getByRole('button',{name:'Nhận 15 Xu',exact:true})).toBeDisabled();
+  await expect(page.locator('[data-focus-key="login-day-2"]')).toBeDisabled();
   await page.evaluate(()=>eventsFixture.fail=true);await context.setOffline(false);
   await expect(page.locator('.liveops__status')).toContainText('Chưa thể cập nhật');
-  await expect(page.getByRole('button',{name:'Nhận 15 Xu',exact:true})).toBeDisabled();
+  await expect(page.locator('[data-focus-key="login-day-2"]')).toBeDisabled();
   await page.evaluate(()=>eventsFixture.fail=false);await page.getByRole('button',{name:'Thử lại',exact:true}).click();
-  await expect(page.getByRole('button',{name:'Nhận 15 Xu',exact:true})).toBeEnabled();
+  await expect(page.locator('[data-focus-key="login-day-2"]')).toBeEnabled();
 });
 
 test('pending full-support chest locks type confirmation while other pools remain viewable',async({page})=>{
@@ -158,7 +160,7 @@ test('mission scroll restores while collection tabs keep one scrolling panel',as
 test('offline keeps Play and login navigation available while grants stay locked',async({page,context})=>{
   await ready(page);await open(page);
   await page.evaluate(()=>{eventsFixture.state.daily.wins=0;eventsFixture.state.weekly.visits=0;});await context.setOffline(true);
-  await expect(page.getByRole('button',{name:'Nhận 15 Xu',exact:true})).toBeDisabled();
+  await expect(page.locator('[data-focus-key="login-day-2"]')).toBeDisabled();
   await expect(page.getByRole('button',{name:'Chơi',exact:true}).first()).toBeEnabled();
   await page.getByRole('tab',{name:'Tuần này',exact:true}).click();await expect(page.getByRole('button',{name:'Điểm danh',exact:true})).toBeEnabled();
   await page.getByRole('button',{name:'Điểm danh',exact:true}).click();await expect(page.getByRole('tab',{name:'Hôm nay',exact:true})).toHaveAttribute('aria-selected','true');

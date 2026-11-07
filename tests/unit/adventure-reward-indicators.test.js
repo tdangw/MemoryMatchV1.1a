@@ -22,8 +22,9 @@ test('missions advertise only current unclaimed login, daily reward, or whole we
   state.weekly.wins = 12; assert.equal(ready(input).missions,false);
   for (const mission of WEEKLY) state.weekly[mission.key] = mission.target;
   assert.equal(ready(input).missions,true); state.weekly.claimed.push('bonus'); assert.equal(ready(input).missions,false);
-  // Daily all-clear is automatically credited; it has no independent claim action.
+  // The separate daily chest is available after completing all missions.
   for (const mission of DAILY) { state.daily[mission.key] = mission.target; state.daily.claimed.push(mission.id); }
+  assert.equal(ready(input).missions,true);state.daily.claimed.push('bonus');
   assert.equal(ready(input).missions,false);
 });
 
@@ -134,7 +135,7 @@ test('mount refreshes after commit, account/visibility/period changes, reattache
     input.period=null; owner.tick(); assert.equal(controls.events.dataset.rewardReady,'true');
     input.period={ uid,day:input.spark.state.day }; account(); assert.equal(controls.events.dataset.rewardReady,'true');
     input.online=false; owner.event('offline'); assert.equal(controls.events.dataset.rewardReady,'false');
-    input.online=true; owner.event('visibilitychange'); assert.equal(controls.events.dataset.rewardReady,'true');
+    input.online=true; owner.event('visibilitychange');owner.event('appvisibilitychange'); assert.equal(controls.events.dataset.rewardReady,'true');
     commit({ patch:{ restored:true } }); assert.equal(controls.events.dataset.rewardReady,'false');
     input.spark.state.tickets=2; refresh(); assert.equal(controls.events.dataset.rewardReady,'false');
     owner.dispose(); refresh(); assert.equal(unsubscribed,2); assert.equal(controls.events.children.length,0);

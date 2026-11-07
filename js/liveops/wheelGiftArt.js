@@ -26,11 +26,11 @@ export function createWheelGiftArt(box){
 export function refreshWheelGiftArt(root){for(const art of root.querySelectorAll('.wheel-gift-art'))if(art.dataset.skin!==(document.documentElement.dataset.uiSkin||'default'))refreshArt(art);}
 
 /** One finite image transition; the server grant is already committed. */
-export async function presentWheelGift(box,{owner,host}){
+export async function presentWheelGift(box,{owner,host,title=WHEEL_BOX_LABELS[box]}){
   if(!owner.active||!host.isConnected)return null;
   const scope=createGameShellLifecycle(),release=owner.own(()=>scope.dispose());scope.own(()=>release.forget());
   const card=document.createElement('div');card.className='wheel-gift-opening';
-  const art=createWheelGiftArt(box),label=document.createElement('strong');label.textContent=WHEEL_BOX_LABELS[box];card.append(art,label);host.append(card);scope.own(()=>card.remove(),'node');
+  const art=createWheelGiftArt(box),label=document.createElement('strong');label.textContent=title;card.append(art,label);host.append(card);scope.own(()=>card.remove(),'node');
   const rect=card.getBoundingClientRect(),origin={x:rect.left+rect.width/2,y:rect.top+rect.height/2};
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
   try{

@@ -362,7 +362,8 @@
   thưởng/guard mở rương trong ván; CSS chỉ scope Bộ sưu tập, không Shop.
 - Quy ước tab chủ dự án chốt28/10: **một hàng, chữ không xuống dòng,
   nhiều tab thì cuộn ngang, ẩn thanh cuộn**. Áp dụng Cửa hàng/Bộ sưu tập,
-  Sự kiện/Nhiệm vụ, Hồ sơ và Xếp hạng; không dùng bố cục tab3cột/2hàng.
+  Hồ sơ và Xếp hạng. Riêng Sự kiện3tab/Nhiệm vụ2tab chia đều một hàng,
+  hiển thị đủ tên theo cập nhật07/11; không dùng tab nhiều hàng.
   Tab đang chọn được đưa vào vùng nhìn thấy bằng scrollLeft, không kéo
   vị trí cuộn dọc. Giữ roving focus/ARIA và nhớ các lựa chọn cũ.
 - Card Kho rương dùng chung icon rương cho cả4loại; tên14px/căn giữa,
@@ -386,9 +387,10 @@
   1chữ ngẫu nhiên đều, có thể trùng đầu vào. Không đổi ownership trực tiếp.
 - Vòng quay10ô theo bảng thưởng06/11;1free+10ad tối đa/ngày,
   1vé/lượt riêng, vé không hết hạn. Không giả ad earned. Nhiệm vụ ngày
-  thắng3/ghép30/thắng không Gợi ý thưởng5/5/10Xu; nhận đủ ba tự thưởng
-  10Xu+1vé. Tuần thắng12/ghép120/noHint3/điểm danh3, nhận bonus50Xu+2vé.
-  Điểm danh10/10/15/10/15/20/25Xu theo bảy lần thực nhận, bỏ ngày giữ lượt.
+  thắng3/ghép30/thắng không Gợi ý thưởng5/5/10Xu; hoàn thành đủ3nhiệm vụ
+  bấm rương nhận10Xu+1vé, không cần nhận từng quà trước. Tuần đủ4nhiệm vụ
+  bấm rương nhận50Xu+2vé. Điểm danh10/10/15/15/20/25/50Xu và hỗ trợ theo
+  bảng07/11 bên dưới; bảy lần thực nhận, bỏ ngày giữ lượt.
   Reset07:00 Việt Nam, tuần thứ Hai. Hành trình Xu tuần20/50/80→5/10/10Xu,
   cap40điểm/ngày, tách khỏi Sưu tập huy hiệu, không cấp ngoại hình ở100điểm.
 - Firebase Spark: không Functions/SSV/Scheduler/Blaze/polling, không write
@@ -494,3 +496,24 @@
   hoặc chuyển nền; reduced-motion bỏ chuyển động quay và giật kim.
 - Dưới vòng quay chỉ có bốn hàng ảnh chữ của bốn bộ, không tiêu đề/nút bấm.
   Ba tab trò chơi ở bảng xếp hạng chia đều một hàng, vừa màn hình320px.
+
+## Nhiệm vụ và điểm danh — cập nhật07/11/2026
+
+- Ô điểm danh là nút nhận: sáng/mở khi tới lượt, mờ/khóa khi chưa tới;
+  đã nhận có dấu kiểm. Không nút nhận riêng, không chữ trạng thái thừa.
+- Ngày1..6:10/10/15/15/20/25Xu +1hint cho Link/Memory/Triple/Memory/
+  Triple/Link. Ngày7:50Xu +gói3hỗ trợ mở ngay, mỗi trò1món chọn đều.
+  Nếu kho đầy, toàn bộ quà giữ nguyên, không bốc lại, không trừ lượt.
+- Hoàn thành đủ nhiệm vụ mở rương ngày10Xu+1vé/tuần50Xu+2vé bằng cách
+  bấm rương bên phải thanh “Nhiệm vụ đã hoàn thành”; không cần nhận từng
+  quà trước. Mở rương, loot, toast dùng owner hữu hạn; không cấp thưởng
+  theo animation. Giữ bảo toàn thưởng khi đổi ngày/tuần như trước.
+- Bỏ “Đã cập nhật tiến độ” và hướng dẫn cuối trang; thời gian làm mới
+  nằm ngay dưới tab, số dùng tabular-nums, không làm dịch chuyển bố cục.
+  Tab Sự kiện3cột/Nhiệm vụ2cột chia đều, đủ tên trên5skin kể cả320px.
+- Giữ save Spark.version1 và LOGIN legacy; receipt loginReward phiên bản1
+  ghi day/index/operation/coins/supports, không cấp bù ngày đã nhận.
+- Task MISSION_REWARDS_PLAN.md, tách các task tài khoản/quảng cáo/Android.
+- M1–M3 hoàn tất; rules nhiệm vụ đã phát hành07/11 và đọc lại khớp bản
+  đã kiểm thử.60unit nhiệm vụ/wheel,22UI và2service Firebase cục bộ đạt;
+  npm run check/build đạt. Không tạo APK/Hosting, chưa đo thiết bị thật.
