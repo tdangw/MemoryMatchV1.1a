@@ -55,6 +55,8 @@
 
 ## Chữ, rương và thưởng gameplay
 
+- Bộ chữ mẫu 02 — 08/11: đã thay 17 glyph bằng vàng sáng nét dày bo tròn, viền đồng mảnh; đồng bộ kho/bốn bộ/ghép/bán và nhận chữ trong ba trò. Atlas `letters-v2-128.webp` + `letters-v2-256.webp` tổng304.352byte, tên mới tránh cache immutable; đã bỏ atlas cũ khỏi bundle. Tăng độ rõ chữ chưa có, giữ bố cục/cỡ ô và save/luật/API. Nguồn/prompt/generator tại `design/rewards-letters/drop/` và `scripts/prepare-letter-drop-atlas.mjs`. 7UI mục tiêu + JS/CSS/diff/build đạt; không deploy/APK.
+
 - UI chữ/rương 07/11: bốn bộ dùng cùng cỡ ảnh chữ theo TRIPLE CONNECT, một hàng cạnh rương, không tên quà/nút Đổi quà. Rương khóa khi thiếu chữ; đủ bộ bấm rương đổi chữ một lần rồi mở chọn trò nhận hỗ trợ. Đóng màn chọn giữ rương trong kho; tiếp tục dùng giao dịch đổi/mở hiện hữu, không đổi save/schema/luật thưởng.
 - Ảnh rương sự kiện/kho: 12 hình nhận diện riêng × đóng/mở = 24 WebP trong suốt 256×256 (459.428 byte), dùng chung theo loại trên mọi skin; đã thay bản SVG thử. Bốn mẫu dự phòng Băng/Lửa/Rừng/Thiên văn ở `design/chests/reserve`, không vào bundle. Xem `design/chests/README.md`; nguồn/prompt ở `runtime/art-source/chests`. Rương cấp bậc bản đồ giữ bộ ảnh riêng. 56 bài UI liên quan đã đạt qua lượt chính và chạy lại 9 bài sau sửa cuối; JS/CSS/diff/build đạt. Không deploy/APK, chưa đo điện thoại thật.
 

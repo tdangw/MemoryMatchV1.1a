@@ -206,7 +206,7 @@ html .liveops-page .liveops-surface .tab-button.liveops__wheel-info { position:a
 html .liveops-page .liveops-surface .liveops__set-choices button { flex:0 0 auto; width:auto; min-height:36px; margin:0; padding:6px 8px; border-radius:8px; font-size:10px; white-space:nowrap; }
 html .liveops-page .liveops-surface .liveops__set-choices button[aria-pressed="true"] { color:var(--lo-claim-ink); text-shadow:none; background:linear-gradient(var(--lo-claim-top),var(--lo-claim-bottom)); }
 .liveops-surface .liveops__letter-slots { display:flex; justify-content:center; gap:3px; margin:8px 0 12px; font-size:clamp(13px,3.9vw,22px); }
-.liveops-surface .liveops__letter-slot { display:grid; place-items:center; width:1.55em; min-width:1.55em; height:1.55em; padding:0; border:0; border-radius:0; background:transparent; box-shadow:none; opacity:.3; filter:grayscale(.7); }
+.liveops-surface .liveops__letter-slot { display:grid; place-items:center; width:1.55em; min-width:1.55em; height:1.55em; padding:0; border:0; border-radius:0; background:transparent; box-shadow:none; opacity:.62; filter:grayscale(1); }
 .liveops-surface .liveops__letter-slot[data-filled="true"] { background:transparent; box-shadow:none; opacity:1; filter:none; }
 .liveops-surface .liveops__letter-slot[data-space="true"] { flex-basis:100%; height:0; min-width:0; border:0; box-shadow:none; }
 .liveops-surface .liveops__letter-mini .liveops__letter-slots { flex-wrap:nowrap; gap:1px; margin:0; }
@@ -215,7 +215,7 @@ html .liveops-page .liveops-surface .liveops__set-choices button[aria-pressed="t
 .liveops__inventory > h3 { margin:0 0 8px; text-align:center; font-size:15px; color:var(--lo-gold); }
 html .liveops-page .liveops-surface .liveops__letter-grid > button.tab-button { position:relative; display:grid; grid-template-columns:minmax(0,1fr); place-items:center; aspect-ratio:1; min-width:0; min-height:44px; padding:2px; border:2px solid var(--lo-task-line); border-radius:8px; background:linear-gradient(145deg,var(--lo-task),color-mix(in srgb,var(--lo-task) 74%,var(--lo-line))); color:var(--lo-task-ink); text-shadow:0 1px #fff8; box-shadow:inset 0 0 0 2px #fff3,0 2px 0 #0004; }
 html .liveops-page .liveops-surface .liveops__letter-grid > button[aria-pressed='true'] { outline:2px solid var(--lo-gold); outline-offset:1px; }
-.liveops__letter-art { display:block; width:100%; height:100%; background-image:image-set('/assets/rewards/letters/letters-128.webp' 1x,'/assets/rewards/letters/letters-256.webp' 2x); background-size:500% 400%; background-repeat:no-repeat; }
+.liveops__letter-art { display:block; width:100%; height:100%; background-image:image-set('/assets/rewards/letters/letters-v2-128.webp' 1x,'/assets/rewards/letters/letters-v2-256.webp' 2x); background-size:500% 400%; background-repeat:no-repeat; }
 .liveops__letter-glyph { width:32px; min-width:0; max-width:100%; height:auto; aspect-ratio:1; }
 .liveops > [hidden] { display:none; }
 .liveops__letter-count { position:absolute; bottom:-2px; right:-2px; padding:0 4px; border:1px solid var(--lo-line); border-radius:10px; background:var(--lo-inset); color:var(--lo-ink); font-size:11px; text-shadow:none; }

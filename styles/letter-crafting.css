@@ -36,7 +36,7 @@
 .letter-forge__palette { grid-area:palette; display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:4px; justify-items:center; width:100%; max-width:288px; margin-inline:auto; }
 .letter-forge__palette[hidden] { display:none; }
 .letter-forge__tile { position:relative; display:grid; place-items:center; box-sizing:border-box; width:100%; max-width:46px; min-width:0; min-height:44px; aspect-ratio:1; margin:0; padding:2px; border:1px solid var(--ui-line); border-radius:8px; background:var(--ui-raised); cursor:pointer; }
-.letter-forge__tile[data-empty='true'] { opacity:.35; }
+.letter-forge__tile[data-empty='true'] { opacity:.6; }
 .letter-forge__count { position:absolute; right:0; bottom:0; padding:0 3px; border:1px solid var(--ui-line); border-radius:8px; background:var(--ui-inset); color:var(--ui-ink); font-size:10px; line-height:1.3; }
 .letter-forge__status { grid-area:status; margin:0; font-size:12px; line-height:1.35; text-align:center; color:var(--ui-muted); }
 .letter-forge__status:empty { display:none; }

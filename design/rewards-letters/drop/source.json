@@ -1,8 +1,8 @@
 {
-  "version": 1,
+  "version": 2,
   "source": "letters-source.png",
   "generator": "built-in imagegen",
-  "prompt": "Use case: stylized-concept. Asset type: production game sprite atlas, transparent PNG. Create ONE sprite sheet of collectible uppercase letter icons for a polished fairy-tale mobile puzzle game. EXACTLY a 5-column by 4-row equal-cell grid on a square canvas, no grid lines. Each cell has one separate upright collectible letter, centered, same cap height and visual weight, generous transparent padding. Row 1: A C D E H. Row 2: I K L M N. Row 3: O P R T U. Row 4: V Y then THREE COMPLETELY EMPTY TRANSPARENT CELLS. These 17 letters are the ONLY contents, in EXACT order. Each letter is the actual physical letter silhouette, thick bold readable uppercase Roman serif, sculpted luminous warm gold with a rich teal enamel inset, subtle engraved fairy-tale ornament and beveled highlights. Tiny restrained highlights, strong dark teal edge for readability at 40-pixel icon size, premium illustrated game item finish. No square tile or disc or plaque behind a letter; the letter itself is the collectible object. Front view, no tilt, no perspective distortion. Clean spacious alpha silhouettes, NO surrounding sparkles, NO glows extending across cells, no cast floor shadows, no background or checkerboard. Text verbatim individually: \"A C D E H I K L M N O P R T U V Y\". No other letters, lowercase, captions, labels, numbers, icons or watermarks. Each occupied cell fully contains its letter without any overlap into neighbouring cells. True transparent background.",
+  "prompt": "Use case: stylized-concept. Production transparent sprite atlas for collectible letters in a mobile fantasy puzzle game. Reference image is ONLY a style reference: use design NUMBER 02 in the TOP MIDDLE cell of the attached board, and ignore all eleven other designs. Match its pale bright golden-yellow solid faces, very heavy friendly rounded SANS-SERIF capitals, narrow dark bronze edge and shallow soft bevel. Clean broad stems, open counters, no serifs, no dark enamel inset, no ornament, no engraving, no extra objects, no tile backgrounds, no glows. High readability at 16 pixels is the priority. Flat front-on view, upright, no perspective or tilt.\nCreate ONE SQUARE transparent image arranged as EXACTLY FIVE COLUMNS by FIVE ROWS of equal SQUARE CELLS. Invisible cell grid; no grid lines or borders. Each letter centered within its own cell. All letters have the same cap height, stroke weight and baseline; narrow I remains narrow instead of stretching. Glyphs occupy about 76% of cell height with ample transparent gutters. Exact placement:\nRow 1: A C D E H\nRow 2: I K L M N\nRow 3: O P R T U\nRow 4: V Y [empty] [empty] [empty]\nRow 5: [empty] [empty] [empty] [empty] [empty]\nExactly SEVENTEEN letters in this exact order. Uppercase meaningful game letters only. No additional alphabet characters, duplicates, captions, index numbers or labels. Empty cells must remain completely transparent. Make P versus R, I versus L, M versus N instantly distinguishable. Each glyph fully contained in its equal square cell and not touching a neighboring cell. True transparent alpha background, no checkerboard, no shadow on a floor, no sparkles, no watermark. Each letter is a solid gold collectible object silhouette. Bright gold dominates the full face; bronze appears only as a narrow outside contour. Do not reproduce the comparison board or any of its text.",
   "alphabet": [
     "A",
     "C",
@@ -30,106 +30,114 @@
   ],
   "glyphBounds": [
     [
-      16,
-      76,
-      257,
-      312
-    ],
-    [
-      275,
-      80,
-      488,
-      315
-    ],
-    [
-      512,
-      76,
-      730,
-      313
-    ],
-    [
-      762,
-      77,
-      967,
-      313
-    ],
-    [
-      996,
-      77,
-      1233,
-      314
-    ],
-    [
       69,
-      372,
-      195,
-      607
+      86,
+      221,
+      237
     ],
     [
-      256,
-      373,
-      493,
-      608
+      320,
+      85,
+      459,
+      237
     ],
     [
-      519,
-      373,
-      720,
-      606
+      556,
+      86,
+      701,
+      237
     ],
     [
-      739,
-      374,
-      992,
-      607
+      797,
+      86,
+      925,
+      237
     ],
     [
-      1006,
-      374,
-      1231,
-      607
+      1037,
+      85,
+      1183,
+      237
     ],
     [
-      21,
-      647,
-      243,
-      900
+      111,
+      322,
+      178,
+      475
     ],
     [
-      275,
-      656,
-      477,
-      890
+      317,
+      321,
+      459,
+      475
     ],
     [
-      503,
-      656,
-      739,
-      894
+      560,
+      323,
+      694,
+      475
     ],
     [
-      752,
-      657,
-      981,
-      892
+      777,
+      322,
+      946,
+      475
     ],
     [
-      1005,
-      656,
-      1237,
-      900
+      1030,
+      322,
+      1188,
+      475
     ],
     [
-      19,
-      952,
-      262,
-      1182
+      64,
+      559,
+      226,
+      716
     ],
     [
-      271,
-      952,
-      498,
-      1182
+      316,
+      560,
+      462,
+      714
+    ],
+    [
+      553,
+      560,
+      698,
+      715
+    ],
+    [
+      788,
+      560,
+      932,
+      715
+    ],
+    [
+      1033,
+      560,
+      1185,
+      716
+    ],
+    [
+      64,
+      800,
+      223,
+      952
+    ],
+    [
+      315,
+      800,
+      464,
+      952
     ]
-  ]
+  ],
+  "sourceWidth": 1254,
+  "sourceHeight": 1254,
+  "sourceColumns": 5,
+  "sourceRows": 5,
+  "style": "02 — Vàng sáng, sans-serif đậm bo tròn, viền đồng mảnh",
+  "cleanupPrompt": "Edit this letter sprite sheet for production. KEEP EXACTLY the same seventeen rounded heavy bright gold sans-serif glyph designs, bronze outline, flat front view and colors. Fix ONLY layout and transparency:\n1. Remove ALL gold-colored mist, haze and noise outside the actual letter silhouettes. Entire outside area and every letter counter/hole must be perfectly transparent alpha=0, not low-opacity yellow fog. No shadows or glow outside the thin bronze contours.\n2. Re-layout the glyphs on a SQUARE canvas into a precise FIVE by FIVE equal SQUARE-cell invisible grid. There are NO drawn grid lines. Canvas coordinates in percentages: column centers x=10%,30%,50%,70%,90%; row centers y=10%,30%,50%,70%,90%. The actual letter cap height must be just 12% of total canvas height (=60% of one cell height), so there are wide clear gutters. Do not enlarge letters to fill the page.\nExact occupied cells:\nrow center 10%: A C D E H\nrow center 30%: I K L M N\nrow center 50%: O P R T U\nrow center 70%: V Y, then three empty cells\nrow center 90%: all five cells empty.\nEverything in the lowest 20% of the canvas is empty transparent. No letter may cross any cell boundary. All glyphs same cap height and baseline within each row. Narrow I stays narrow. No captions, text labels, numbers or new glyphs. True clean transparent background. Do not add a background, checkerboard, particles or decoration.",
+  "reference": "Mẫu 02 trong bảng so sánh được chủ dự án chọn ngày 07/11/2026",
+  "assetPrefix": "letters-v2"
 }
