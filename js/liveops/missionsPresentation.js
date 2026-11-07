@@ -36,12 +36,12 @@ export function renderMissions(host, { view, tab, busy, run, play, renderEmpty, 
         tile.onclick=()=>void run({type:'login',loginVersion:2});
         const game={'memory-match':'Memory Match','link-connect':'Link Connect','triple-connect':'Triple Connect'}[day.gameId];
         tile.setAttribute('aria-label',`Ngày ${day.index+1}: ${day.coins} Xu và ${game?`1 Gợi ý ${game}`:'gói 3 vật phẩm hỗ trợ'}${day.status==='received'?', đã nhận':day.status==='locked'?', khóa':''}`);
-        const art = node('div', 'liveops__day-art'); art.append(createIcon('coin'));
+        const rewards = node('div', 'liveops__day-rewards'),coins=node('span','liveops__day-prize'),support=node('span','liveops__day-prize');
+        coins.append(createIcon('coin'),node('small','',String(day.coins)));
+        support.append(createIcon(game?'wand':'chest'),node('small','',game?'×1':'×3'));rewards.append(coins,support);
         const status = node('span', 'liveops__day-status');
         if (day.status !== 'available') status.append(createIcon(day.status === 'received' ? 'check' : 'lock'));
-        const support=node('span','liveops__day-support');support.append(createIcon(game?'wand':'chest'),node('span','',game?'×1':'×3'),node('small','',game?game.replace(' Match','').replace(' Connect',''):'Hỗ trợ'));
-        tile.append(node('strong', 'liveops__day-label', `Ngày ${day.index + 1}`), art,
-          node('strong', 'liveops__day-coins', `${day.coins} Xu`), support,status);
+        tile.append(node('strong', 'liveops__day-label', `Ngày ${day.index + 1}`), rewards,status);
         days.append(tile);
       }
       login.append(days);
@@ -56,10 +56,14 @@ export function renderMissions(host, { view, tab, busy, run, play, renderEmpty, 
       const symbol = node('div', 'liveops__mission-symbol');
       symbol.append(createIcon(item.key === 'wins' ? 'trophy' : item.key === 'matches' ? 'cards' : item.key === 'visits' ? 'calendar' : 'achievements'));
       const body = node('div', 'liveops__mission-body');
-      body.append(node('h3', '', item.label), progress(value, item.target, item.label));
-      if (item.coins) body.append(node('strong', 'liveops__mission-reward', `${item.coins} Xu`));
+      const title=item.id==='win-without-hint'?'Thắng không dùng gợi ý':item.label;
+      body.append(node('h3', '', title), progress(value, item.target, title));
       const controls = node('div', 'liveops__mission-action');
-      if (key === 'daily') controls.append(action(claimed ? 'Đã nhận' : ready ? `Nhận ${item.coins} Xu` : canPlay ? 'Chơi' : 'Quay lại ván chơi', ready ? () => void run({ type:'daily', id:item.id }) : play, busy || claimed || (ready ? !canClaim : !canPlay), `mission-${item.id}`));
+      if (key === 'daily') {
+        const claim=action(claimed?'Đã nhận':ready?'':canPlay?'Chơi':'Quay lại ván chơi',ready?()=>void run({type:'daily',id:item.id}):play,busy||claimed||(ready?!canClaim:!canPlay),`mission-${item.id}`);
+        if(ready&&!claimed){claim.append(node('span','',String(item.coins)),createIcon('coin'));claim.classList.add('liveops__claim-coins');claim.setAttribute('aria-label',`Nhận ${item.coins} Xu`);}
+        controls.append(claim);
+      }
       else if (ready) {
         const done = node('p', 'liveops__mission-complete'); done.append(createIcon('check'), node('span', '', 'Hoàn thành')); controls.append(done);
       }

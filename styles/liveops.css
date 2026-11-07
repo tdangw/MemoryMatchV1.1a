@@ -4,11 +4,11 @@
 html .liveops button.tab-button, html .liveops__sale button.tab-button { min-height: 48px; }
 .liveops__card h3 { margin: 0 0 12px; font-size: 1.1rem; }
 .liveops__card .tab-button { margin-block: 6px; width: 100%; white-space: normal; min-height: 48px; }
-.liveops__tabs { display: flex; flex-wrap: nowrap; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 3px; }
+.liveops__tabs { display:flex; flex-wrap:nowrap; gap:2px; overflow-x:auto; scrollbar-width:none; padding:3px; border:1px solid var(--lo-line); border-radius:14px; background:var(--lo-inset); }
 .liveops__tabs::-webkit-scrollbar { display: none; }
 .liveops--events .liveops__tabs { --liveops-tab-font:clamp(9px,3.4cqi,13px); display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); container-type:inline-size; gap:2px; padding:1px; overflow:visible; }
-.liveops--missions .liveops__tabs { --liveops-tab-font:clamp(13px,3.4vw,16px); display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:5px; overflow:visible; }
-html .liveops-page .liveops-surface .liveops__tabs > button.tab-button { width:100%; min-width:0; box-sizing:border-box; padding:8px 1px; font-size:var(--liveops-tab-font,clamp(10px,2.6vw,14px)); letter-spacing:0; }
+.liveops--missions .liveops__tabs { --liveops-tab-font:clamp(13px,3.4vw,16px); display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); overflow:visible; }
+html .liveops-page .liveops-surface .liveops__tabs > button.tab-button { width:100%; min-width:0; min-height:44px; box-sizing:border-box; padding:6px 1px; font-size:var(--liveops-tab-font,clamp(10px,2.6vw,14px)); letter-spacing:0; border:1px solid transparent; border-radius:10px; background:transparent; box-shadow:none; text-shadow:none; }
 .liveops__tabs > button { flex: 1 0 auto; min-height: 48px; white-space: nowrap; }
 .liveops__tabs [aria-selected="true"] { outline: 2px solid currentColor; outline-offset: -3px; }
 .liveops__days { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
@@ -120,13 +120,16 @@ html[data-ui-skin="starship"] :is(#missions-screen,#events-screen).liveops-page 
 html .liveops-page .liveops-surface button.tab-button { box-sizing:border-box; min-height:48px; border:1px solid var(--lo-line); border-image:none; border-radius:24px; padding:8px 12px; font:inherit; font-weight:800; color:var(--lo-button-ink); text-shadow:0 1px 1px #0007; background:linear-gradient(var(--lo-button-top),var(--lo-button-bottom)); box-shadow:inset 0 2px 0 #ffffff38,0 3px 0 #0004; }
 html .liveops-page .liveops-surface button.tab-button:disabled { opacity:.65; filter:none; cursor:default; }
 html .liveops-page .liveops-surface button.tab-button:focus-visible { outline:3px solid var(--lo-gold); outline-offset:3px; }
-html .liveops-page .liveops-surface .liveops__tabs button { white-space: nowrap; border-radius:22px; background:linear-gradient(var(--lo-panel),var(--lo-inset)); color:var(--lo-muted); }
-html .liveops-page .liveops-surface .liveops__tabs button[aria-selected="true"] { color:var(--lo-gold); outline:2px solid var(--lo-line); outline-offset:-3px; box-shadow:inset 0 0 12px #e8d48726,0 2px 0 #0004; }
+html .liveops-page .liveops-surface .liveops__tabs button { white-space:nowrap; color:var(--lo-muted); }
+html .liveops-page .liveops-surface .liveops__tabs button.tab-button[aria-selected="true"] { background:var(--ui-raised); color:var(--lo-gold); border-color:color-mix(in srgb,var(--lo-gold) 55%,transparent); outline:0; box-shadow:inset 0 1px #e1f1d538,inset 0 -2px #031a22; }
 .liveops-surface .liveops__progress { appearance:none; border:1px solid var(--lo-line); border-radius:20px; overflow:hidden; height:17px; background:var(--lo-inset); }
 .liveops-surface .liveops__progress::-webkit-progress-bar { background:var(--lo-inset); }
 .liveops-surface .liveops__progress::-webkit-progress-value { border-radius:20px; background:linear-gradient(#8de66e,#208b47); box-shadow:inset 0 2px 0 #fff6; }
 .liveops-surface .liveops__progress::-moz-progress-bar { border-radius:20px; background:linear-gradient(#8de66e,#208b47); }
 .liveops-surface .liveops__progress-row { font-size:12px; font-weight:800; }
+.liveops--missions .liveops__progress-row { position:relative; display:block; }
+.liveops--missions .liveops__progress-row > progress { display:block; width:100%; }
+.liveops--missions .liveops__progress-row > span { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#fff6dd; text-shadow:0 1px 2px #001823,1px 0 1px #001823; font-size:11px; line-height:1; pointer-events:none; }
 @media(max-width:360px) { :is(#missions-screen,#events-screen).liveops-page .app-modal__title { font-size:20px; } .liveops__wallet { font-size:13px; padding:4px 7px; } .liveops__wallet>.ui-icon { width:23px; height:23px; } }
 
 /* Composition shared by the five local material palettes above. */
@@ -144,24 +147,23 @@ html .liveops-page .liveops-surface .liveops__tabs button[aria-selected="true"] 
 .liveops-surface .liveops__day[data-state="locked"] { opacity:.45; filter:grayscale(.7); }
 .liveops-surface .liveops__day[data-state="received"] { opacity:.7; }
 .liveops__day:focus-visible { outline:2px solid var(--lo-gold); outline-offset:2px; }
-.liveops__day-art { height:24px; display:grid; place-items:center; }
-.liveops__day-art > .ui-icon { width:24px; height:24px; }
+.liveops__day-rewards { display:flex; align-items:center; justify-content:center; gap:5px; }
+.liveops__day-prize { display:grid; justify-items:center; gap:1px; min-width:0; }
+.liveops__day-prize > .ui-icon { width:22px; height:22px; }
+.liveops__day-prize > small { font-size:10px; line-height:12px; font-weight:800; }
 .liveops__day-label { font-size:12px; line-height:14px; }
-.liveops__day-coins { font-size:13px; line-height:16px; }
 .liveops__day-status { position:absolute; right:3px; top:3px; display:flex; font-size:10px; line-height:12px; }
 .liveops__day-status > .ui-icon { width:12px; height:12px; flex:none; }
-.liveops__day-support { display:grid; grid-template-columns:15px auto; justify-content:center; align-items:center; column-gap:2px; font-size:9px; line-height:12px; white-space:nowrap; }
-.liveops__day-support > small { grid-column:1/-1; font-size:9px; line-height:11px; }
-.liveops__day-support > .ui-icon { width:15px; height:15px; flex:none; }
 .liveops__section-title { display:flex; align-items:center; gap:12px; margin:6px 0 0; text-align:center; font-size:1.1rem; color:var(--lo-gold); }
 .liveops__section-title::before,.liveops__section-title::after { content:''; height:1px; flex:1; background:var(--lo-line); }
 .liveops-surface .liveops__mission { display:grid; grid-template-columns:48px minmax(0,1fr) auto; align-items:center; gap:9px; padding:9px; border:2px solid var(--lo-task-line); background:linear-gradient(135deg,var(--lo-task),color-mix(in srgb,var(--lo-task) 85%,var(--lo-line))); color:var(--lo-task-ink); border-radius:12px; }
 .liveops__mission-symbol { display:grid; place-items:center; aspect-ratio:1; border-radius:9px; background:color-mix(in srgb,var(--lo-task-line) 42%,transparent); box-shadow:inset 0 1px 3px #0003; }
 .liveops__mission-symbol > .ui-icon { width:40px; height:40px; color:var(--lo-task-ink); }
 .liveops-surface .liveops__mission-body h3 { margin:0 0 6px; font-size:clamp(14px,3.8vw,18px); line-height:1.25; }
-.liveops__mission-reward { display:block; margin-top:3px; font-size:12px; }
 .liveops__mission-action { max-width:115px; }
 html .liveops-page .liveops-surface .liveops__mission-action button { width:100%; margin:0; padding:7px 10px; font-size:13px; }
+html .liveops-page .liveops-surface .liveops__mission-action .liveops__claim-coins { display:flex; align-items:center; justify-content:center; gap:5px; min-width:64px; }
+.liveops__claim-coins > .ui-icon { width:23px; height:23px; }
 .liveops__mission-complete { display:flex; align-items:center; gap:4px; margin:0; font-size:12px; }
 .liveops__mission-complete > .ui-icon { width:22px; height:22px; flex:none; }
 .liveops-surface .liveops__bonus { display:grid; grid-template-columns:minmax(0,1fr) 56px; gap:10px; align-items:center; padding:10px; }

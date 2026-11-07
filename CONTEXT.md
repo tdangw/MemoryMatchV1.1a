@@ -517,3 +517,13 @@
 - M1–M3 hoàn tất; rules nhiệm vụ đã phát hành07/11 và đọc lại khớp bản
   đã kiểm thử.60unit nhiệm vụ/wheel,22UI và2service Firebase cục bộ đạt;
   npm run check/build đạt. Không tạo APK/Hosting, chưa đo thiết bị thật.
+
+### Đồng bộ hiển thị nhiệm vụ07/11/2026
+
+- Tab Sự kiện/Nhiệm vụ dùng thanh nhóm và ô chọn chữ nhật bo góc như BXH.
+- Điểm danh hiện icon Xu và icon hỗ trợ/rương cạnh nhau, chỉ giữ số lượng;
+  nhãn truy cập giữ đủ loại quà/trò. Tiến độ nhiệm vụ đặt số giữa thanh.
+- Tên ngày rút gọn “Thắng không dùng gợi ý”; bỏ giá Xu dưới nội dung.
+  Khi đủ điều kiện, nút hiện số Xu + icon Xu để nhận qua loot/audio hiện có.
+- Không đổi luật thưởng/save/rules.10UI và kiểm tra JS/CSS đạt; review
+  độc lập không có finding. Không build/deploy/APK cho lượt chỉnh này.

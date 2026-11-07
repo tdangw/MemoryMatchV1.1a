@@ -16,13 +16,25 @@ test('mission and event tabs fit entirely; login tiles are direct locked control
    if(kind==='missions'){
     await expect(page.locator('.liveops__status')).toBeEmpty();await expect(page.locator('.liveops__guidance,.liveops__login-action')).toHaveCount(0);
     await expect(page.locator('.liveops__day')).toHaveCount(7);await expect(page.locator('.liveops__day:enabled')).toHaveCount(1);await expect(page.locator('.liveops__day[data-state="locked"]:disabled')).toHaveCount(4);await expect(page.locator('.liveops__day-status')).toHaveText(['','','','','','','']);
-    expect(await page.locator('.liveops__day-support').evaluateAll(nodes=>nodes.every(node=>node.scrollWidth<=node.clientWidth+1))).toBe(true);
+    expect(await page.locator('.liveops__day-rewards').evaluateAll(nodes=>nodes.every(node=>node.scrollWidth<=node.clientWidth+1))).toBe(true);
+    expect((await page.locator('.liveops__day-rewards').allTextContents()).every(text=>!/Xu|Memory|Link|Triple|Hỗ trợ/.test(text))).toBe(true);
+    await expect(page.locator('.liveops__day-prize > .ui-icon')).toHaveCount(14);
     const timer=await page.locator('.liveops__countdown').boundingBox(),login=await page.locator('.liveops__login').boundingBox();expect(timer.y+timer.height).toBeLessThanOrEqual(login.y);
     await expect(page.locator('.liveops__countdown')).toContainText('Làm mới sau:');
     if(width===412&&skin==='default')await page.screenshot({path:info.outputPath('missions-412.png')});
    }
   }
  }
+});
+test('mission counts sit inside bars and completed actions claim the displayed coin amount with loot and audio',async({page})=>{
+ await page.addInitScript(()=>{window.missionAudio=[];HTMLMediaElement.prototype.play=function(){missionAudio.push(this.src.split('/').at(-1));return Promise.resolve();};});
+ await ready(page);await page.evaluate(async()=>{(await import('/js/gameState.js')).gameState.settings.sound=true;});await page.emulateMedia({reducedMotion:'no-preference'});await open(page);
+ await expect(page.locator('.liveops__mission-reward')).toHaveCount(0);await expect(page.locator('.liveops__mission-body h3').last()).toHaveText('Thắng không dùng gợi ý');
+ const centered=await page.locator('.liveops__mission .liveops__progress-row').evaluateAll(nodes=>nodes.every(node=>{const bar=node.querySelector('progress').getBoundingClientRect(),count=node.querySelector('span').getBoundingClientRect();return Math.abs(bar.x+bar.width/2-count.x-count.width/2)<1&&Math.abs(bar.y+bar.height/2-count.y-count.height/2)<1;}));expect(centered).toBe(true);
+ const claim=page.locator('[data-focus-key="mission-win-three"]');await expect(claim).toHaveText('5');await expect(claim.locator('.ui-icon--coin')).toHaveCount(1);await expect(claim).toHaveAttribute('aria-label','Nhận 5 Xu');await claim.click();
+ await expect(page.locator('.liveops-reward-feedback__particle[data-reward-kind="coins"]')).toHaveCount(5);await expect(page.locator('.liveops-reward-feedback__toast')).toHaveText('Đã nhận 5 Xu');
+ await page.locator('.liveops-reward-feedback__particle').evaluateAll(nodes=>nodes.forEach(node=>node.getAnimations().forEach(a=>a.finish())));await expect(page.locator('.liveops-reward-feedback')).toHaveCount(0);
+ expect(await page.evaluate(()=>missionAudio)).toEqual(expect.arrayContaining(['reward.ogg','coin_drop.mp3','coin-collect.mp3']));await expect(claim).toBeDisabled();
 });
 test('seven daily tiles show and grant their exact new rewards including the opened support pack',async({page})=>{
  test.setTimeout(60000);await ready(page);await page.emulateMedia({reducedMotion:'no-preference'});
