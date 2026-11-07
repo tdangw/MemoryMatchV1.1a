@@ -4,6 +4,7 @@ import fs from 'node:fs/promises';
 import { CHEST_POOLS, CHEST_SUPPORTS } from '../js/liveops/chestConfig.js';
 import { WHEEL_POOLS } from '../js/liveops/wheelCatalog.js';
 import { LOGIN_REWARDS } from '../js/liveops/missionRewards.js';
+import { DAILY } from '../js/liveops/model.js';
 import { LETTER_SETS, LETTER_ALPHABET, LETTER_SELL_COINS, ACTIVE_EVENT_COLLECTION_ID, EVENT_COLLECTIONS } from '../js/liveops/config.js';
 // The current rules source is separate from historical approval and the retired Functions package.
 const file = 'firestore.rules';
@@ -31,6 +32,7 @@ let missionRules = await fs.readFile('design/rewards-liveops/mission-rules.templ
 missionRules = missionRules.replace('MISSION_LOGIN_COINS',JSON.stringify(LOGIN_REWARDS.map(reward=>reward.coins)))
   .replace('MISSION_LOGIN_HINT_GAMES',JSON.stringify(LOGIN_REWARDS.slice(0,6).map(reward=>reward.gameId)));
 section=section.replace('MISSION_CONTRACT',()=>missionRules);
+section=section.replaceAll('DAILY_NO_HINT_TARGET',String(DAILY.find(item=>item.id==='win-without-hint').target));
 section = section.replaceAll('LETTER_REQUIREMENTS',JSON.stringify(Object.fromEntries(LETTER_SETS.map(set=>[set.id,set.required])))).replaceAll('LETTER_SET_IDS',JSON.stringify(LETTER_SETS.map(set=>set.id))).replaceAll('LETTER_REWARDS',JSON.stringify(LETTER_REWARD_ITEMS.map(item=>item.id)));
 section = section.replaceAll('LETTER_SALE_PRICE', String(LETTER_SELL_COINS));
 section=section.replaceAll('LETTER_REQUIREMENT_LOOKUP',LETTER_SETS.map(set=>`setId == '${set.id}' ? ${JSON.stringify(set.required)}.get(key,0) : `).join('')+'0');

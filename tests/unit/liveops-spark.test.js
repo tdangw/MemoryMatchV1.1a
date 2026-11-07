@@ -33,7 +33,7 @@ test('equal eight sectors keep approved probabilities and amounts',()=>{
   for(let sector=0;sector<8;sector++) assert.equal(run(null,spin(),{sector}).receipts[0].coins,WHEEL[sector]);
 });
 test('day/week bonuses add 1/2 tickets and coins exactly once including rollover',()=>{
-  let state=initialSparkState(now); Object.assign(state.daily,{wins:3,matches:30,noHint:1}); Object.assign(state.weekly,{wins:12,matches:120,noHint:3,visits:3});
+  let state=initialSparkState(now); Object.assign(state.daily,{wins:3,matches:30,noHint:3}); Object.assign(state.weekly,{wins:12,matches:120,noHint:3,visits:3});
   let coins=0;
   for(const item of DAILY) {const r=run(state,{type:'daily',id:item.id}); state=r.state; coins+=r.receipts.reduce((a,b)=>a+b.coins,0);}
   assert.equal(coins,20);assert.equal(state.tickets,0);
@@ -41,7 +41,7 @@ test('day/week bonuses add 1/2 tickets and coins exactly once including rollover
   assert.equal(coins,30); assert.equal(state.tickets,1);
   state=run(state,{type:'weekly'}).state; assert.equal(state.tickets,3); assert.equal(run(state,{type:'weekly'}).receipts.length,0);
   const reset=run(state,{type:'status'},{now:now+7*DAY_MS}); assert.equal(reset.state.tickets,3); assert.equal(reset.receipts.length,0);
-  const pending=initialSparkState(now); Object.assign(pending.daily,{wins:3,matches:30,noHint:1}); Object.assign(pending.weekly,{wins:12,matches:120,noHint:3,visits:3});
+  const pending=initialSparkState(now); Object.assign(pending.daily,{wins:3,matches:30,noHint:3}); Object.assign(pending.weekly,{wins:12,matches:120,noHint:3,visits:3});
   const all=run(pending,{type:'status'},{now:now+7*DAY_MS}); assert.equal(all.state.tickets,3); assert.equal(all.receipts.reduce((a,b)=>a+b.coins,0),80);
 });
 test('settlement preserves weekly coin milestones while retired cosmetic scoring never grants items',()=>{
@@ -53,7 +53,7 @@ test('settlement preserves weekly coin milestones while retired cosmetic scoring
 });
 test('partial cosmetic points reset; no synthetic rewards for absent weeks or expired facts',()=>{
   const state=run(null,{type:'status'},{facts:[fact(1)]}).state;
-  const r=run(state,{type:'status'},{now:now+21*DAY_MS,facts:[fact('expired')]});assert.equal(r.state.cosmetics.points,0);assert.equal(r.receipts.length,1);assert.equal(r.receipts[0].coins,10);assert(r.receipts[0].receiptId.includes(`daily:${periods(now).day}:`));
+  const r=run(state,{type:'status'},{now:now+21*DAY_MS,facts:[fact('expired')]});assert.equal(r.state.cosmetics.points,0);assert.equal(r.receipts.length,0,'one no-hint win no longer meets the three-win reward');
 });
 test('late earned uses original day quota within48h, never consumes next day ad slot',()=>{
   let state=initialSparkState(now);

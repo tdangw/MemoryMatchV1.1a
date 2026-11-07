@@ -6,6 +6,15 @@ import {DAY_MS,DAILY,WEEKLY} from '../../js/liveops/model.js';
 import {GAMEPLAY_LIMITS} from '../../js/gameplayTuning.js';
 const now=Date.UTC(2026,10,7,12),uid='mission-owner';
 const login=(index,operation=`login-${index}`)=>({type:'login',loginVersion:2,operation,loginCandidate:createLoginCandidate(index,[0,.5,.999999])});
+test('new no-hint claims require three wins while previously received rewards stay received',()=>{
+ for(const noHint of [0,1,2,3]){
+  const state=initialSparkState(now);Object.assign(state.daily,{wins:3,matches:30,noHint});
+  assert.equal(transitionSpark(state,{type:'daily',id:'win-without-hint'},{uid,now}).receipts.length,noHint===3?1:0);
+  assert.equal(transitionSpark(state,{type:'dailyBonus'},{uid,now}).receipts.length,noHint===3?1:0);
+ }
+ const old=initialSparkState(now);Object.assign(old.daily,{wins:3,matches:30,noHint:1,claimed:['win-without-hint','bonus']});
+ const other=transitionSpark(old,{type:'daily',id:'win-three'},{uid,now});assert.equal(other.receipts[0].coins,5);assert.ok(other.state.daily.claimed.includes('bonus'));assert.equal(transitionSpark(other.state,{type:'daily',id:'win-without-hint'},{uid,now}).receipts.length,0);
+});
 test('seven days grant exact coins and hint game, day7 one random support per game',()=>{
  for(let index=0;index<7;index++){
   const state=initialSparkState(now);state.loginNext=index;const command=login(index);

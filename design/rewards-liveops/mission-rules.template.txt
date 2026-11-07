@@ -29,6 +29,6 @@
       return chestBase(n,o,['daily','weekly','tickets'])
         && missionClaimed(n.daily,o.daily,['win-three','match-thirty','win-without-hint','bonus'])
         && missionClaimed(n.weekly,o.weekly,['bonus'])
-        && rewardDailyClaims(n.daily) && rewardWeekClaims(n.weekly)
+        && rewardDailyClaims(n.daily,o.daily) && rewardWeekClaims(n.weekly)
         && rewardInt(n.tickets) && rewardWallet(n,o);
     }

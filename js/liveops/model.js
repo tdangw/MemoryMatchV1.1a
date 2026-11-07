@@ -5,7 +5,7 @@ export const LOGIN = Object.freeze([10, 10, 15, 10, 15, 20, 25]);
 export const DAILY = Object.freeze([
   { id: 'win-three', label: 'Thắng 3 ván', key: 'wins', target: 3, coins: 5 },
   { id: 'match-thirty', label: 'Ghép đúng 30 lần', key: 'matches', target: 30, coins: 5 },
-  { id: 'win-without-hint', label: 'Thắng 1 ván không dùng Gợi ý', key: 'noHint', target: 1, coins: 10 },
+  { id: 'win-without-hint', label: 'Thắng không dùng gợi ý', key: 'noHint', target: 3, coins: 10 },
 ]);
 export const WEEKLY = Object.freeze([
   { id: 'weekly-wins', label: 'Thắng 12 ván', key: 'wins', target: 12 },

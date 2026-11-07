@@ -6,7 +6,7 @@ import {createLoginCandidate} from '/js/liveops/missionRewards.js';
 import {LETTER_ALPHABET} from '/js/liveops/config.js';
 import {chestCandidate} from '/js/liveops/chests.js';
 let now=Date.now(), state=transitionSpark(null,{type:'status'},{uid:'ui-owner',now,festivalEnabled:true,fireflyEarned:130}).state;
-state.daily={wins:3,matches:30,noHint:1,visits:0,claimed:[]};state.weekly={wins:12,matches:120,noHint:3,visits:3,claimed:[]};
+state.daily={wins:3,matches:30,noHint:3,visits:0,claimed:[]};state.weekly={wins:12,matches:120,noHint:3,visits:3,claimed:[]};
 state.loginNext=2;state.loginDay=state.day-1;
 state.letters.earned=Object.fromEntries(LETTER_ALPHABET.map(k=>[k,10]));state.letters.counts={...state.letters.earned};
 state.chests.earned={c:1,frame:0,avatar:10000,badge:1};let calls=0;

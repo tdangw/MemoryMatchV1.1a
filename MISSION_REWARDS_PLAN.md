@@ -46,3 +46,13 @@ bị Android thật. Không đổi catalog ID/kho; không migration/save-version
 Rules nhiệm vụ đã phát hành07/11 và đọc lại khớp artifact đã qua140denial.
 Phần production khác được giữ nguyên. M1 `20a746b`; M2 `33130a0`;
 M3 ghi giao diện/context và đóng task. Không còn gate nhiệm vụ đang chờ.
+
+## Bổ sung theo yêu cầu07/11: M4–M5
+
+M4: tăng mục tiêu thắng không Gợi ý lên3; generator dùng cùng DAILY target.
+Giữ quà/marker đã nhận dưới mốc cũ; chỉ yêu cầu3 cho claim/bonus mới.
+Unit kiểm0/1/2không nhận,3nhận; emulator147trường hợp giả bị từ chối — đạt.
+M5: bỏ statusXu trùngtoast; kim tương phản xanh/viền sáng, giật38độ+hồi8độ;
+kho chữ6cột; bán bằng slider1..max và alignmentcenter như popup chữ khác;
+ghép dùng thunder→frozenUnlock→coinCollect theo ba pha. Âm thanh owner và
+reduced-motion giữ; không thêm grant/timer/animationloop. UI/review đang chốt.

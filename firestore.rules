@@ -353,7 +353,7 @@ service cloud.firestore {
       return chestBase(n,o,['daily','weekly','tickets'])
         && missionClaimed(n.daily,o.daily,['win-three','match-thirty','win-without-hint','bonus'])
         && missionClaimed(n.weekly,o.weekly,['bonus'])
-        && rewardDailyClaims(n.daily) && rewardWeekClaims(n.weekly)
+        && rewardDailyClaims(n.daily,o.daily) && rewardWeekClaims(n.weekly)
         && rewardInt(n.tickets) && rewardWallet(n,o);
     }
 
@@ -408,11 +408,11 @@ service cloud.firestore {
     function monotoneCounter(n, o) {
       return n.wins >= o.wins && n.matches >= o.matches && n.noHint >= o.noHint && n.visits >= o.visits && n.claimed.hasAll(o.claimed);
     }
-    function rewardDailyClaims(n) {
+    function rewardDailyClaims(n,o) {
       return (!n.claimed.hasAny(['win-three']) || n.wins >= 3)
         && (!n.claimed.hasAny(['match-thirty']) || n.matches >= 30)
-        && (!n.claimed.hasAny(['win-without-hint']) || n.noHint >= 1)
-        && (!n.claimed.hasAny(['bonus']) || n.wins >= 3 && n.matches >= 30 && n.noHint >= 1);
+        && (!n.claimed.hasAny(['win-without-hint']) || o.claimed.hasAny(['win-without-hint']) || n.noHint >= 3)
+        && (!n.claimed.hasAny(['bonus']) || o.claimed.hasAny(['bonus']) || n.wins >= 3 && n.matches >= 30 && n.noHint >= 3);
     }
     function rewardWeekClaims(n) {
       return !n.claimed.hasAny(['bonus']) || n.wins >= 12 && n.matches >= 120 && n.noHint >= 3 && n.visits >= 3;
@@ -426,7 +426,7 @@ service cloud.firestore {
       let sameWeek = n.week == o.week;
       let spent = n.ticketSpent - o.ticketSpent;
       let dayBonus = sameDay && n.daily.claimed == o.daily.claimed ? 0 : sameDay ? (!o.daily.claimed.hasAny(['bonus']) && n.daily.claimed.hasAny(['bonus']) ? 1 : 0)
-        : (!o.daily.claimed.hasAny(['bonus']) && o.daily.wins >= 3 && o.daily.matches >= 30 && o.daily.noHint >= 1 ? 1 : 0);
+        : (!o.daily.claimed.hasAny(['bonus']) && o.daily.wins >= 3 && o.daily.matches >= 30 && o.daily.noHint >= 3 ? 1 : 0);
       let weekBonus = sameWeek && n.weekly.claimed == o.weekly.claimed ? 0 : sameWeek ? (!o.weekly.claimed.hasAny(['bonus']) && n.weekly.claimed.hasAny(['bonus']) ? 2 : 0)
         : (!o.weekly.claimed.hasAny(['bonus']) && o.weekly.wins >= 12 && o.weekly.matches >= 120 && o.weekly.noHint >= 3 && o.weekly.visits >= 3 ? 2 : 0);
       return n.ticketEarned >= o.ticketEarned && spent >= 0 && spent <= 1
@@ -448,7 +448,7 @@ service cloud.firestore {
         && (!changed.hasAny(['tickets','ticketEarned','ticketSpent']) || rewardWallet(n,o))
         && (spent == 0 ? n.spins.ticket == o.spins.ticket : n.spins.ticket.sequence == n.ticketSpent && n.spins.ticket != o.spins.ticket)
         && (n.loginDay == o.loginDay ? n.loginNext == o.loginNext : n.loginDay == n.day && n.loginNext == (o.loginNext + 1) % 7)
-        && (n.daily.claimed == o.daily.claimed || rewardDailyClaims(n.daily))
+        && (n.daily.claimed == o.daily.claimed || rewardDailyClaims(n.daily,o.daily))
         && (n.weekly.claimed == o.weekly.claimed || rewardWeekClaims(n.weekly))
         && (n.event.claimed == o.event.claimed || rewardEventClaims(n.event));
     }

@@ -71,16 +71,32 @@ try{
   await reject({type:'status'},n=>{n.loginReward=null;});
   await reject({type:'status'},n=>{n.loginReward={...candidate,day:n.day,operation:'second-login'};n.loginNext=(n.loginNext+1)%7;});
  }
- await seed(n=>{n.daily={wins:3,matches:30,noHint:1,visits:0,claimed:[]};});
+ await seed(n=>{n.daily={wins:3,matches:30,noHint:3,visits:0,claimed:[]};});
  console.log('Mission scenario: daily bonus');
  const bonusBefore=saved.profile.data.coins,ticketBefore=state.tickets;
  const bonus=accept(await commit({type:'dailyBonus'}));assert.equal(bonus.bonusApplied,true);assert.deepEqual(state.daily.claimed,['bonus']);
  assert.equal(saved.profile.data.coins,bonusBefore+10);assert.equal(state.tickets,ticketBefore+1);
  const bonusReplay=accept(await commit({type:'dailyBonus'}));assert.equal(bonusReplay.bonusApplied,false);assert.equal(bonusReplay.receipts.length,0);
- for(const [key,target]of [['wins',3],['matches',30],['noHint',1]]){
-  await seed(n=>{n.daily={wins:3,matches:30,noHint:1,visits:0,claimed:[]};n.daily[key]=target-1;});
+ for(const [key,target]of [['wins',3],['matches',30],['noHint',3]]){
+  await seed(n=>{n.daily={wins:3,matches:30,noHint:3,visits:0,claimed:[]};n.daily[key]=target-1;});
   await reject({type:'dailyBonus'},n=>{n.daily.claimed=['bonus'];n.tickets++;});
  }
+ for(const noHint of [0,1,2]){
+  await seed(n=>{n.daily={wins:3,matches:30,noHint,visits:0,claimed:[]};});
+  await reject({type:'daily',id:'win-without-hint'},n=>{n.daily.claimed=['win-without-hint'];});
+  await reject({type:'dailyBonus'},n=>{n.daily.claimed=['bonus'];n.tickets++;});
+ }
+ await seed(n=>{n.daily={wins:3,matches:30,noHint:3,visits:0,claimed:[]};});
+ const noHintReward=accept(await commit({type:'daily',id:'win-without-hint'}));assert.equal(noHintReward.receipts.length,1);assert.ok(state.daily.claimed.includes('win-without-hint'));
+ console.log('Mission scenario: preserve legacy one-win claims');
+ await seed(n=>{n.daily={wins:3,matches:30,noHint:1,visits:0,claimed:['win-without-hint','bonus']};});
+ const legacyCoins=saved.profile.data.coins,legacyTickets=state.tickets;
+ accept(await commit({type:'daily',id:'win-three'}));accept(await commit({type:'daily',id:'match-thirty'}));
+ assert.equal(saved.profile.data.coins,legacyCoins+10);assert.equal(state.tickets,legacyTickets);
+ for(const command of [{type:'daily',id:'win-without-hint'},{type:'dailyBonus'}])assert.equal(accept(await commit(command)).receipts.length,0);
+ await seed(n=>{n.daily={wins:3,matches:30,noHint:1,visits:0,claimed:['win-without-hint']};});
+ accept(await commit({type:'daily',id:'win-three'}));
+ await reject({type:'dailyBonus'},n=>{n.daily.claimed.push('bonus');n.tickets++;});
  for(const [key,target]of [['wins',12],['matches',120],['noHint',3],['visits',3]]){
   await seed(n=>{n.weekly={wins:12,matches:120,noHint:3,visits:3,claimed:[]};n.weekly[key]=target-1;});
   await reject({type:'weekly'},n=>{n.weekly.claimed=['bonus'];n.tickets+=2;});
@@ -90,14 +106,19 @@ try{
  const weeklyBefore=saved.profile.data.coins,weeklyTickets=state.tickets;
  const weekly=accept(await commit({type:'weekly'}));assert.equal(weekly.bonusApplied,true);assert.equal(saved.profile.data.coins,weeklyBefore+50);assert.equal(state.tickets,weeklyTickets+2);
  const weeklyReplay=accept(await commit({type:'weekly'}));assert.equal(weeklyReplay.bonusApplied,false);
- await seed(n=>{n.day--;n.week=periods(now-DAY_MS).week;n.event.day=n.day;n.event.week=n.week;n.cosmetics.week=n.week;n.loginDay=n.day;n.loginReward.day=n.day;n.daily={wins:3,matches:30,noHint:1,visits:0,claimed:[]};});
+ await seed(n=>{n.day--;n.week=periods(now-DAY_MS).week;n.event.day=n.day;n.event.week=n.week;n.cosmetics.week=n.week;n.loginDay=n.day;n.loginReward.day=n.day;n.daily={wins:3,matches:30,noHint:3,visits:0,claimed:[]};});
  console.log('Mission scenario: rollover');
  const receiptBefore=structuredClone(state.loginReward),rolloverBefore=saved.profile.data.coins;
  const rollover=accept(await commit());assert.deepEqual(state.loginReward,receiptBefore);assert.equal(state.daily.wins,0);assert.equal(saved.profile.data.coins,rolloverBefore+30);
  assert.ok(rollover.receipts.some(receipt=>receipt.receiptId.endsWith(':bonus')));
+ for(const [noHint,claimed]of [[2,[]],[1,['win-without-hint','bonus']]]){
+  await seed(n=>{n.day--;n.week=periods(now-DAY_MS).week;n.event.day=n.day;n.event.week=n.week;n.cosmetics.week=n.week;n.loginDay=n.day;n.loginReward.day=n.day;n.daily={wins:3,matches:30,noHint,visits:0,claimed};});
+  const beforeCoins=saved.profile.data.coins,beforeTickets=state.tickets;
+  accept(await commit());assert.equal(saved.profile.data.coins,beforeCoins+10);assert.equal(state.tickets,beforeTickets);
+ }
  console.log('Mission scenario: legacy login');
  const legacy=accept(await commit({type:'login'}));assert.equal(legacy.loginApplied,true);assert.deepEqual(state.loginReward,receiptBefore);
  const recovered=await readCloudSnapshot(db,space,uid,await readCloudRoot(db,space,uid));assert.deepEqual(recovered.profile.data.appearance.spark.state,state);
  const remote=await readSparkState(db,space,uid);assert.deepEqual(remote.state.loginReward,state.loginReward);
- console.log(JSON.stringify({pass:true,scenarios:['7 login days','strict receipt keys/values','full inventory atomic','supports exact inventory','daily once/replay','manual daily bonus before individual claims','incomplete daily denied','weekly four targets/once','rollover preserves unclaimed rewards','legacy login','snapshot recovery'],forgeriesDenied:denied}));
+ console.log(JSON.stringify({pass:true,scenarios:['7 login days','strict receipt keys/values','full inventory atomic','supports exact inventory','daily once/replay','manual daily bonus before individual claims','new no-hint threshold 3','legacy one-win claims preserved','incomplete daily denied','weekly four targets/once','rollover preserves unclaimed rewards','legacy login','snapshot recovery'],forgeriesDenied:denied}));
 }finally{await env.cleanup();}
