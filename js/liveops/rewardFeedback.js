@@ -2,6 +2,7 @@ import { isAppActive } from '../appVisibility.js';
 import { COIN_PARTICLE_LIMIT, COIN_SCATTER_ANGLE } from '../gameplayTuning.js';
 import { createGameShellLifecycle } from '../gameShell/gameShellLifecycle.js';
 import { createIcon } from '../icons.js';
+import { createChestArt } from './chestArt.js';
 import { LOOT_PRESETS, LOOT_HOLD_MS } from '../lootEffects.js';
 import { CHEST_NAMES, CHEST_ITEMS, CHEST_SUPPORTS } from './chestConfig.js';
 import { wheelItem } from './wheelCatalog.js';
@@ -16,13 +17,14 @@ function describe(reward,contextualNames=false) {
   const gameName=id=>({'memory-match':'Memory Match','link-connect':'Link Connect','triple-connect':'Triple Connect'})[id];
   if (reward.kind === 'coins') return { icon:'coin', label:`${reward.amount.toLocaleString('vi-VN')} Xu`, target:'.app-wallet' };
   if (reward.kind === 'ticket') return { icon:'ticket', label:`${reward.amount} Vé quay`, target:'.liveops__ticket-balance' };
-  if (reward.kind === 'chest') return { icon:'chest', label:`${reward.amount} ${CHEST_NAMES[reward.chestType]}`, target:'[data-dock-action="collection"], [data-map-destination="collection"]' };
+  if (reward.kind === 'chest') return { chestType:reward.chestType, label:`${reward.amount} ${CHEST_NAMES[reward.chestType]}`, target:'[data-dock-action="collection"], [data-map-destination="collection"]' };
   if (reward.kind === 'letter') return { letter:reward.letter, label:`Chữ ${reward.letter}`, target:`.liveops__letter-grid [aria-label^="Chữ ${reward.letter},"]` };
   if (reward.kind === 'support') return { icon:supportIcons[reward.key], label:CHEST_SUPPORTS[reward.gameId].find(item => item.key === reward.key).label+(contextualNames?` · ${gameName(reward.gameId)}`:''), target:'[data-dock-action="collection"], [data-map-destination="collection"]' };
   const item = wheelItem(reward.itemId) || CHEST_ITEMS.find(item => item.id === reward.itemId);
   return { icon:item?.icon || (item?.type === 'avatar' ? 'profile' : 'achievements'), image:item?.files?.[128], label:(item?.name || 'Ngoại hình mới')+(contextualNames&&item?.category!=='cosmetic'&&item?.gameId?` · ${gameName(item.gameId)}`:''), target:'[data-dock-action="collection"], [data-map-destination="collection"]' };
 }
 function artwork(prize) {
+  if(prize.chestType)return createChestArt(prize.chestType);
   if (prize.image) { const image=document.createElement('img');image.src=`${import.meta.env.BASE_URL}${prize.image.replace(/^\//,'')}`;image.alt='';image.width=image.height=36;return image; }
   if (!prize.letter) return createIcon(prize.icon);
   const sprite = document.createElement('span'), index = LETTER_ALPHABET.indexOf(prize.letter);

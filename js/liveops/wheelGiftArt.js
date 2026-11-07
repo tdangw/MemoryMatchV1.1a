@@ -1,28 +1,21 @@
 import { isAppActive } from '../appVisibility.js';
 import { createGameShellLifecycle } from '../gameShell/gameShellLifecycle.js';
-import { createIcon } from '../icons.js';
-import { uiSkinAssetUrl } from '../uiSkinRegistry.js';
+import { chestArtUrl } from './chestArt.js';
 import { WHEEL_SLOTS } from './wheelRewards.js';
 import '../../styles/wheel-gifts.css';
 
 export const WHEEL_BOX_LABELS=Object.freeze({coins:WHEEL_SLOTS[2].label,...Object.fromEntries(WHEEL_SLOTS.filter(slot=>slot.box).map(slot=>[slot.box,slot.label]))});
-const artKinds=Object.freeze({coins:{tier:'C',icon:'coin'},mystery:{tier:'S',icon:'shuffle'},cosmetic:{tier:'A',icon:'profile'},flip:{tier:'B',icon:'cards'},theme:{tier:'S',icon:'images'},path:{tier:'B',icon:'map'},exit:{tier:'A',icon:'exit'},support:{tier:'C',icon:'wand'}});
-function chestImage(box,state){
-  const skin=document.documentElement.dataset.uiSkin,kind=artKinds[box];
-  const id=`chest-${skin==='woodland'?kind.tier:kind.tier.toLowerCase()}-${state}`;
-  return uiSkinAssetUrl(skin,id)||uiSkinAssetUrl('woodland',`chest-${kind.tier}-${state}`);
-}
+const artKinds=new Set(['coins','mystery','cosmetic','flip','theme','path','exit','support']);
 function refreshArt(art){
-  const box=art.dataset.wheelBox;
-  for(const state of ['closed','open'])art.querySelector(`.wheel-gift__image--${state}`).src=chestImage(box,state);
+  for(const state of ['closed','open'])art.querySelector(`.wheel-gift__image--${state}`).src=chestArtUrl(art.dataset.wheelBox,state);
   art.dataset.skin=document.documentElement.dataset.uiSkin||'default';
 }
-/** Reuse the game's paired chest images. The category badge distinguishes shared tiers. */
+/** Each reward category has its own paired image, shared across all skins. */
 export function createWheelGiftArt(box){
-  const kind=artKinds[box];if(!kind)throw new TypeError(`Unknown wheel chest: ${box}`);
+  if(!artKinds.has(box))throw new TypeError(`Unknown wheel chest: ${box}`);
   const art=document.createElement('span');art.className='wheel-gift-art';art.dataset.wheelBox=box;art.setAttribute('aria-hidden','true');
   for(const state of ['closed','open']){const image=document.createElement('img');image.className=`wheel-gift__image wheel-gift__image--${state}`;image.alt='';image.decoding='async';image.draggable=false;art.append(image);}
-  const badge=document.createElement('span');badge.className='wheel-gift__badge';badge.append(createIcon(kind.icon));art.append(badge);refreshArt(art);return art;
+  refreshArt(art);return art;
 }
 export function refreshWheelGiftArt(root){for(const art of root.querySelectorAll('.wheel-gift-art'))if(art.dataset.skin!==(document.documentElement.dataset.uiSkin||'default'))refreshArt(art);}
 

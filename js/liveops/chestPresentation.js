@@ -4,7 +4,7 @@ import { loadPersistentGameData } from '../persistence.js';
 import { getActiveGameScope, createGameShellLifecycle } from '../gameShell/gameShellLifecycle.js';
 import { getAccountService } from '../accountService.js';
 import { CHEST_TYPES, CHEST_NAMES, CHEST_POLICY, CHEST_ITEMS, CHEST_POOLS, CHEST_SUPPORTS } from './chestConfig.js';
-import { createIcon } from '../icons.js';
+import { createChestArt } from './chestArt.js';
 import { refreshAppWallet } from '../appNavigation.js';
 import { ownedProfileCosmeticItems } from '../progression/achievementModel.js';
 import '../../styles/liveops.css';
@@ -16,7 +16,7 @@ function rewardDescription(reward) {
 }
 
 /** A collection-owned child view. Closing presentation never cancels a committed reward. */
-export function mountChestInventory(host, { owner, back, profile, gameId = 'memory-match' }) {
+export function mountChestInventory(host, { owner, back, profile, gameId = 'memory-match', initialType = null }) {
   const scope = createGameShellLifecycle(), release = owner.own(() => scope.dispose());
   const identity = getAccountService()?.getIdentity();
   const current = () => scope.active && host.isConnected && getAccountService()?.getIdentity()?.profileId === identity?.profileId && getAccountService()?.getIdentity()?.uid === identity?.uid;
@@ -24,8 +24,9 @@ export function mountChestInventory(host, { owner, back, profile, gameId = 'memo
   status.setAttribute('role', 'status');
   if (back) root.append(action('Quay lại Bộ sưu tập', back));
   root.append(status); host.replaceChildren(root);
-  let view = null, busy = false, connected = false, selected = null, page = 0, pendingChest = null;
+  let view = null, busy = false, connected = false, selected = CHEST_TYPES.includes(initialType) ? initialType : null, page = 0, pendingChest = null;
   const lastResult = node('p', 'liveops__last-result'), cards = node('div', 'liveops__chest-grid'), detail = node('section', 'liveops__card liveops__chest-detail'); root.append(lastResult, cards, detail);
+  cards.hidden=CHEST_TYPES.includes(initialType);
   const tools = node('div', 'liveops__chest-tools'); root.append(tools);
   if (profile) tools.append(action('Xem trong Hồ sơ', profile));
   function render() {
@@ -37,7 +38,7 @@ export function mountChestInventory(host, { owner, back, profile, gameId = 'memo
     if(chests.last)lastResult.textContent=`Lần mở gần nhất: ${rewardDescription(chests.last)}`;
     for (const type of CHEST_TYPES) {
       const count = chests.earned[type] - chests.spent[type], card = node('section', 'liveops__card liveops__chest-card');
-      card.append(createIcon('chest'),
+      card.append(createChestArt(type),
         node('h3', '', CHEST_NAMES[type]), node('p', 'liveops__chest-count', `Đang có: ${count.toLocaleString('vi-VN')}`),
         action('Xem quà', () => { selected = type; page = 0; render(); detail.querySelector('h3').focus(); }, false, `details-${type}`),
         action('Mở 1', () => { selected = type; page = 0; render(); detail.querySelector('select').focus(); }, busy || !connected || Boolean(getActiveGameScope()) || count < 1 || Boolean(pendingChest && pendingChest.chestType !== type), `open-${type}`));
@@ -46,6 +47,7 @@ export function mountChestInventory(host, { owner, back, profile, gameId = 'memo
     }
     if (selected) {
       const policy = CHEST_POLICY[selected], title = node('h3', '', CHEST_NAMES[selected]); title.tabIndex = -1;
+      if(cards.hidden)detail.append(createChestArt(selected));
       detail.append(title, node('p', '', `40%: ${policy.coins} Xu · ${selected === 'c' ? '60' : '40'}%: 1 hỗ trợ${selected === 'c' ? '' : ' · 20%: 1 ngoại hình đúng loại'}`));
       if (policy.duplicate) detail.append(node('p', '', `Khi trúng ngoại hình, ưu tiên món bạn chưa sở hữu. Khi đã có đủ ngoại hình của loại rương này, mỗi rương đổi thẳng ${policy.duplicate} Xu. Nếu món quà đã được chọn trước đó nay đã có, bạn nhận ${policy.duplicate} Xu.`));
       const games = node('select', 'liveops__letter-select'); games.setAttribute('aria-label', 'Trò nhận hỗ trợ');

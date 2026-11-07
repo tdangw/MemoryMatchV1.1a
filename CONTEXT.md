@@ -55,6 +55,9 @@
 
 ## Chữ, rương và thưởng gameplay
 
+- UI chữ/rương 07/11: bốn bộ dùng cùng cỡ ảnh chữ theo TRIPLE CONNECT, một hàng cạnh rương, không tên quà/nút Đổi quà. Rương khóa khi thiếu chữ; đủ bộ bấm rương đổi chữ một lần rồi mở chọn trò nhận hỗ trợ. Đóng màn chọn giữ rương trong kho; tiếp tục dùng giao dịch đổi/mở hiện hữu, không đổi save/schema/luật thưởng.
+- Ảnh rương sự kiện/kho: 12 hình nhận diện riêng × đóng/mở = 24 WebP trong suốt 256×256 (459.428 byte), dùng chung theo loại trên mọi skin; đã thay bản SVG thử. Bốn mẫu dự phòng Băng/Lửa/Rừng/Thiên văn ở `design/chests/reserve`, không vào bundle. Xem `design/chests/README.md`; nguồn/prompt ở `runtime/art-source/chests`. Rương cấp bậc bản đồ giữ bộ ảnh riêng. 56 bài UI liên quan đã đạt qua lượt chính và chạy lại 9 bài sau sửa cuối; JS/CSS/diff/build đạt. Không deploy/APK, chưa đo điện thoại thật.
+
 - Drop trên nhóm thủ công hợp lệ: thường chữ5%/vé2%/huy hiệu6%; đặc biệt/Lucky/Magnet25%/10%/30%, ba nhánh độc lập. Giữ2Xu/nhóm, marker cả trúng/trượt theo attempt/wave/group, không farm undo/reload/phá phụ. Năng lượng80%đặc biệt/20%thường; hỗ trợ thường5%/đặc biệt10%, Memory Special và Link Blue30% thay nhánh chung.
 - Sưu tập huy hiệu cá nhân, không mùa/capngày/reset.25huy hiệu=50Xu;50=100Xu+1rươngC;75=1rươngKhung;100=1rươngAvatar. Nhận đủ4mốc bất kỳ thứ tự sang vòng tiếp, giữ dư. ID firefly/festival cũ vẫn dùng cho tương thích; không reset/migration.
 - Rương kho chung C/Khung/Avatar/Huy hiệu trong tab thứ5 Bộ sưu tập; trong ván chỉ xem. C40%50Xu/60%hỗtrợ; Khung40%100Xu/40%hỗtrợ/20%khung; Avatar40%150Xu/40%hỗtrợ/20%avatar; Huy hiệu như Khung. Ngoại hình chọn đều món chưa có đúng nhóm, trùng/full100Xu; không tự trang bị. Hỗ trợ vượt9999 đổi10Xu/đơn vị. Không thêm loại rương tồn kho cho quà mở ngay.

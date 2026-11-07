@@ -58,7 +58,7 @@ test('claims login, fixed recipes, sale confirmation, keyboard and shared four-c
   await page.locator('[data-focus-key="claim-daily-bonus"]').click();await expect(page.locator('[data-focus-key="claim-daily-bonus"]')).toBeDisabled();
   const weekly=page.getByRole('tab',{name:'Tuần này',exact:true});await weekly.focus();await weekly.press('ArrowLeft');await expect(page.getByRole('tab',{name:'Hôm nay',exact:true})).toBeFocused();
   await open(page,'events');await page.getByRole('tab',{name:'Sưu tập chữ',exact:true}).click();
-  await page.getByRole('tab',{name:'MEMORY MATCH',exact:true}).click();await page.getByRole('button',{name:'Đổi MEMORY MATCH',exact:true}).click();await expect(page.locator('.liveops__status')).toContainText('Rương Avatar');
+  await page.getByRole('tab',{name:'MEMORY MATCH',exact:true}).click();await page.getByRole('button',{name:'Đổi MEMORY MATCH',exact:true}).click();await expect(page.locator('#letter-chest-modal')).toBeVisible();await expect(page.locator('#letter-chest-modal [aria-label="Trò nhận hỗ trợ"]')).toHaveValue('memory-match');await page.locator('#letter-chest-modal .app-modal__close').click();await expect(page.locator('#letter-chest-modal')).toHaveCount(0);
   await page.getByRole('button',{name:/^Chữ A, \d+ chữ$/}).click();await page.locator('#letter-action-modal').getByRole('button',{name:'Bán',exact:true}).click();await page.getByRole('slider',{name:'Số chữ muốn bán',exact:true}).press('End'); await expect(page.locator('#letter-sale')).toContainText('Xu');await page.getByRole('button',{name:'Xác nhận bán',exact:true}).click();await expect(page.locator('#letter-sale')).toHaveCount(0);
   await page.getByRole('tab',{name:'Sưu tập huy hiệu',exact:true}).click();
   for(const points of [100,25,75,50])await page.locator('.liveops__card').filter({has:page.getByRole('heading',{name:points+' huy hiệu',exact:true})}).getByRole('button',{name:'Nhận',exact:true}).click();
@@ -126,7 +126,7 @@ test('cached progress cannot grant when reconnect status fails',async({page,cont
 });
 
 test('pending full-support chest locks type confirmation while other pools remain viewable',async({page})=>{
-  await ready(page);await open(page,'events');await page.getByRole('button',{name:'Xem Kho rương',exact:true}).click();
+  await ready(page);await open(page,'events');await page.getByRole('tab',{name:'Sưu tập huy hiệu',exact:true}).click();await page.getByRole('button',{name:'Xem quà & Kho rương',exact:true}).click();
   await page.locator('[data-focus-key="details-c"]').click();await page.evaluate(()=>eventsFixture.fullSupport=true);
   await page.locator('[data-focus-key="confirm-open"]').click();await expect(page.locator('.liveops__status')).toContainText('Kho hỗ trợ đã đầy');
   await page.locator('[data-focus-key="details-avatar"]').click();await expect(page.locator('[data-focus-key="confirm-open"]')).toBeDisabled();
@@ -233,5 +233,23 @@ test('lower mission bonus and letter actions remain reachable on the actual scre
   await page.getByRole('tab',{name:'Sưu tập chữ',exact:true}).click();
   await page.locator('.liveops-surface .app-modal__body').evaluate(body=>{body.scrollTop=body.scrollHeight;});
   await page.screenshot({path:'runtime/qa/events-visual-v2/default-screen-letters-bottom-412.png',fullPage:true});
-  await expect(page.getByRole('button',{name:'Bán chữ',exact:true})).toBeVisible();
+  await expect(page.getByRole('button',{name:'Bán',exact:true})).toBeVisible();
+});
+
+
+test('letter chest unlocks only with the full multiset and hands off exactly one earned chest',async({page},info)=>{
+ test.setTimeout(90000);await page.setViewportSize({width:412,height:915});await ready(page);
+ for(const [id,type,game]of [['memory-match','avatar','memory-match'],['link-connect','frame','link-connect'],['triple-connect','badge','triple-connect'],['adventure','avatar',null]]){
+  await page.evaluate(async id=>{const {LETTER_SETS}=await import('/js/liveops/config.js');const set=LETTER_SETS.find(s=>s.id===id);eventsFixture.state.letters.counts={...set.required};eventsFixture.state.letters.counts[Object.keys(set.required)[0]]--;},id);
+  await open(page,'events');await page.getByRole('tab',{name:'Sưu tập chữ',exact:true}).click();await page.locator(`[data-focus-key="set-${id}"]`).click();
+  const chest=page.locator('.liveops__recipe-chest');await expect(chest).toBeDisabled();await expect(chest.locator('.ui-icon--lock')).toHaveCount(1);await expect(chest).toHaveText('');
+  await page.evaluate(async id=>{const {LETTER_SETS}=await import('/js/liveops/config.js');eventsFixture.state.letters.counts={...LETTER_SETS.find(s=>s.id===id).required};},id);
+  await open(page,'events');await page.getByRole('tab',{name:'Sưu tập chữ',exact:true}).click();await page.locator(`[data-focus-key="set-${id}"]`).click();
+  const before=await page.evaluate(type=>eventsFixture.state.chests.earned[type],type);await expect(chest).toBeEnabled();await expect(chest.locator('.ui-icon--lock')).toHaveCount(0);
+  await chest.evaluate(node=>{node.click();node.click();});const picker=page.locator('#letter-chest-modal');await expect(picker.getByRole('combobox',{name:'Trò nhận hỗ trợ'})).toBeVisible();if(game)await expect(picker.getByRole('combobox')).toHaveValue(game);
+  expect(await page.evaluate(type=>eventsFixture.state.chests.earned[type],type)).toBe(before+1);expect(await page.evaluate(()=>Object.values(eventsFixture.state.letters.counts).reduce((a,b)=>a+b,0))).toBe(0);
+  if(id==='memory-match')await picker.screenshot({path:info.outputPath('letter-chest-picker-412.png')});
+  await picker.locator('.app-modal__close').click();await expect(picker).toHaveCount(0);expect(await page.evaluate(type=>eventsFixture.state.chests.earned[type],type)).toBe(before+1);
+  await expect(chest).toBeDisabled();
+ }
 });

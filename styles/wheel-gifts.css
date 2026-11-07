@@ -3,8 +3,6 @@
 .wheel-gift__image--open { opacity:0; }
 .wheel-gift-art[data-open='true'] .wheel-gift__image--closed { opacity:0; }
 .wheel-gift-art[data-open='true'] .wheel-gift__image--open { opacity:1; }
-.wheel-gift__badge { position:absolute; right:-2px; bottom:-2px; z-index:1; display:grid; place-items:center; width:35%; height:35%; min-width:12px; min-height:12px; border:1px solid var(--liveops-wheel-light,#ffe9a0); border-radius:50%; background:var(--lo-inset,#153944); color:var(--lo-gold,#ffe4a0); }
-.wheel-gift__badge > .ui-icon { width:75%; height:75%; }
 .wheel-gift-opening { position:fixed; z-index:31001; left:50%; top:50%; transform:translate(-50%,-50%); display:grid; justify-items:center; gap:10px; box-sizing:border-box; width:min(240px,calc(100vw - 32px)); padding:20px; border:1px solid var(--lo-line,var(--ui-line)); border-radius:18px; background:var(--lo-panel,var(--ui-surface)); color:var(--lo-ink,var(--ui-ink)); box-shadow:0 8px 28px #0005; pointer-events:none; }
 .wheel-gift-opening > .wheel-gift-art { width:112px; height:112px; }
 .wheel-gift-opening > strong { font-size:15px; line-height:1.4; text-align:center; }

@@ -72,6 +72,10 @@ for(const [width,height]of [[320,740],[412,915],[844,390],[1024,900]])test(`fusi
   const recipes=await page.locator('.liveops__set-choices').evaluate(node=>({wrap:getComputedStyle(node).flexWrap,rows:new Set([...node.children].map(child=>Math.round(child.getBoundingClientRect().top))).size,scrollbar:getComputedStyle(node).scrollbarWidth}));
   expect(recipes.wrap).toBe('nowrap');expect(recipes.rows).toBe(1);expect(recipes.scrollbar).toBe('none');await expect(page.locator('.liveops__letter-grid button')).toHaveCount(17);
   await start(page);const modal=page.locator('#letter-fusion-modal');await expect(modal.locator('.letter-forge__slot')).toHaveCount(3);await expect(modal.locator('.letter-forge__palette button')).toHaveCount(17);
+  const paletteLayout=await modal.locator('.letter-forge__palette').evaluate(grid=>({columns:getComputedStyle(grid).gridTemplateColumns.split(' ').length,rows:new Set([...grid.children].map(tile=>tile.offsetTop)).size,overflow:grid.scrollWidth>grid.clientWidth}));
+  expect(paletteLayout,`${skin} / ${motion}`).toEqual({columns:6,rows:3,overflow:false});
+  const glyphSizes=await modal.locator('.letter-forge__palette .liveops__letter-art').evaluateAll(nodes=>nodes.map(node=>{const style=getComputedStyle(node);return [parseFloat(style.width),parseFloat(style.height)];}));
+  expect(glyphSizes).toHaveLength(17);for(const size of glyphSizes)expect(size).toEqual([32,32]);
   const triangle=await modal.locator('.letter-forge__stage').evaluate(root=>{
    const center=node=>{const r=node.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};},c=center(root.querySelector('.letter-forge__result')),points=[...root.querySelectorAll('.letter-forge__slot')].map(center),distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
    return {radii:points.map(p=>distance(p,c)),sides:points.map((p,i)=>distance(p,points[(i+1)%3]))};
@@ -135,17 +139,19 @@ test('while a closed forge is still committing, its inventory cannot open a stal
  await page.evaluate(()=>{fusionFixture.delay=false;fusionFixture.resolve();});await expect(inventoryLetter).toBeEnabled();await start(page);await expect(submit(page)).toBeDisabled();expect(await page.evaluate(()=>fusionFixture.letters.sequence)).toBe(1);
 });
 
-test('compact recipe keeps all letters in one row above its reward and captures narrow layouts',async({page},info)=>{
+test('compact recipe keeps equal letter sizes beside its chest across all four sets',async({page},info)=>{
  await ready(page);
  for(const width of [320,412]){
   await page.setViewportSize({width,height:915});await page.getByRole('tab',{name:'ADVENTURE',exact:true}).click();
   const boxes=await page.locator('.liveops__recipe').evaluate(root=>{
-   const panel=root.getBoundingClientRect(),word=root.querySelector('.liveops__recipe-word').getBoundingClientRect(),reward=root.querySelector('.liveops__recipe-reward').getBoundingClientRect();
-   return {left:panel.left,right:panel.right,wordBottom:word.bottom,rewardTop:reward.top,rewardLeft:reward.left,rewardRight:reward.right,children:[...root.querySelectorAll('.liveops__recipe-reward > *')].map(node=>{const r=node.getBoundingClientRect();return {left:r.left,right:r.right};})};
+   const panel=root.getBoundingClientRect(),word=root.querySelector('.liveops__letter-slots').getBoundingClientRect(),reward=root.querySelector('.liveops__recipe-reward').getBoundingClientRect();
+   return {left:panel.left,right:panel.right,wordRight:word.right,wordTop:word.top,wordBottom:word.bottom,rewardTop:reward.top,rewardBottom:reward.bottom,rewardLeft:reward.left,rewardRight:reward.right};
   });
-  expect(boxes.left).toBeGreaterThanOrEqual(0);expect(boxes.right).toBeLessThanOrEqual(width);expect(boxes.wordBottom).toBeLessThanOrEqual(boxes.rewardTop);expect(boxes.rewardRight).toBeLessThanOrEqual(boxes.right);for(const child of boxes.children){expect(child.left).toBeGreaterThanOrEqual(boxes.rewardLeft);expect(child.right).toBeLessThanOrEqual(boxes.right);}
+  expect(boxes.left).toBeGreaterThanOrEqual(0);expect(boxes.right).toBeLessThanOrEqual(width);expect(boxes.wordRight).toBeLessThanOrEqual(boxes.rewardLeft);expect(boxes.wordTop).toBeLessThan(boxes.rewardBottom);expect(boxes.wordBottom).toBeGreaterThan(boxes.rewardTop);expect(boxes.rewardRight).toBeLessThanOrEqual(boxes.right);
   await expect(page.locator('.liveops__recipe progress')).toHaveCount(0);
-  for(const name of ['MEMORY MATCH','LINK CONNECT','TRIPLE CONNECT','ADVENTURE']){await page.getByRole('tab',{name,exact:true}).click();const cells=await page.locator('.liveops__recipe .liveops__letter-slot:not([data-space])').evaluateAll(ns=>ns.map(n=>{const r=n.getBoundingClientRect();return {y:r.top,left:r.left,right:r.right};}));expect(new Set(cells.map(r=>Math.round(r.y))).size).toBe(1);expect(cells[0].left).toBeGreaterThanOrEqual(0);expect(cells.at(-1).right).toBeLessThanOrEqual(width);}
+  const sizes=[];
+  for(const name of ['MEMORY MATCH','LINK CONNECT','TRIPLE CONNECT','ADVENTURE']){await page.getByRole('tab',{name,exact:true}).click();const cells=await page.locator('.liveops__recipe .liveops__letter-slot:not([data-space])').evaluateAll(ns=>ns.map(n=>{const r=n.getBoundingClientRect();return {y:r.top,left:r.left,right:r.right,width:parseFloat(getComputedStyle(n).width)};}));sizes.push(cells[0].width);expect(new Set(cells.map(r=>Math.round(r.y))).size).toBe(1);expect(cells[0].left).toBeGreaterThanOrEqual(0);expect(cells.at(-1).right).toBeLessThanOrEqual(width);}
+  expect(Math.max(...sizes)-Math.min(...sizes)).toBeLessThan(.1);await expect(page.locator('.liveops__recipe-chest')).toHaveText('');await expect(page.locator('.liveops__recipe-chest')).toHaveCSS('background-image','none');await expect(page.locator('.liveops__recipe-chest')).toHaveCSS('border-top-width','0px');
   await page.locator('.liveops__recipe').screenshot({path:info.outputPath(`recipe-${width}.png`)});
  }
 });

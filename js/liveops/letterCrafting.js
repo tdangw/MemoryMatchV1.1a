@@ -85,7 +85,7 @@ export function openLetterFusion({initialLetter,owner,current,getContext,execute
     for(const letter of LETTER_ALPHABET){
       const available=Math.max(0,(context.counts[letter]||0)-(needed[letter]||0));
       const tile=node('button','letter-forge__tile');tile.type='button';tile.disabled=(locked&&phase!=='result')||selected.length>=3||available<1;
-      tile.setAttribute('aria-label',`Chọn chữ ${letter}, còn ${available}`);tile.dataset.empty=String(available<1);tile.append(letterArtwork(letter),node('span','letter-forge__count',`×${available}`));
+      tile.setAttribute('aria-label',`Chọn chữ ${letter}, còn ${available}`);tile.dataset.empty=String(available<1);const glyph=letterArtwork(letter);glyph.classList.add('liveops__letter-glyph');tile.append(glyph,node('span','letter-forge__count',`×${available}`));
       tile.onclick=()=>{if(!active())return;if(phase==='result'){finishLocalMotion();selected=[];received=null;phase='select';requestSequence=null;feedback.clear();}if(phase==='select'&&selected.length<3){selected.push(letter);error='';render();}};palette.append(tile);
     }
     description.textContent=phase==='result'?`Đã ghép được chữ ${received}`:'Ghép 3 chữ bất kỳ, ưu tiên chữ chưa có.';

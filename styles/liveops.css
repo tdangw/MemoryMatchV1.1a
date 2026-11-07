@@ -187,8 +187,9 @@ html .liveops-page .liveops-surface .liveops__mission-action .liveops__claim-coi
 .liveops__sector > span { white-space:pre-line; }
 .liveops__wheel-rules { font-size:13px; line-height:1.5; }
 .liveops__wheel-rules ul { padding-left:20px; }
-.liveops-surface .liveops__pointer { top:0; left:calc(50% - 12px); width:24px; height:38px; background:linear-gradient(100deg,#c9ffef,#278f82 48%,#073d4a); clip-path:polygon(0 0,100% 0,50% 100%); z-index:3; transform-origin:50% 10%; filter:drop-shadow(0 2px 2px #001820); }
-.liveops__pointer::after { content:''; position:absolute; inset:3px 4px 7px; background:linear-gradient(#f1fff5,#6be7c1); clip-path:polygon(0 0,100% 0,50% 100%); }
+.liveops-surface .liveops__pointer { top:0; left:calc(50% - 12px); width:24px; height:38px; background:none; clip-path:none; z-index:3; transform-origin:50% 10%; filter:drop-shadow(0 2px 2px #001820); }
+.liveops__pointer::before { content:''; position:absolute; inset:0; background:linear-gradient(100deg,#c9ffef,#278f82 48%,#073d4a); clip-path:polygon(0 0,100% 0,50% 100%); }
+.liveops__pointer::after { content:''; position:absolute; top:-3px; left:5px; width:14px; height:14px; box-sizing:border-box; border:2px solid #a9e5d9; border-radius:50%; background:radial-gradient(circle at 35% 30%,#f4fff9,#77bcad 35%,#164c50 75%); box-shadow:0 1px 2px #001820,inset 0 1px 1px #fff9; }
 .liveops__spin-actions { position:absolute; z-index:5; top:8px; left:0; display:flex; align-items:center; }
 html .liveops-page .liveops-surface .tab-button.liveops__spin-primary { position:absolute; z-index:4; left:50%; top:50%; transform:translate(-50%,-50%); display:flex; flex-direction:column; justify-content:center; gap:2px; flex:none; width:24%; height:24%; max-width:106px; max-height:106px; min-width:56px; min-height:56px; margin:0; padding:4px; border:2px solid var(--liveops-wheel-light); border-image:none; border-radius:50%; background:radial-gradient(circle at 35% 25%,var(--liveops-wheel-light),var(--liveops-wheel-sector-b)); color:#493014; box-shadow:0 2px 4px #42270b88,inset 0 0 0 3px #9b69294d; font-size:clamp(12px,3.5cqi,17px); line-height:1.1; text-shadow:0 1px #fff5; }
 .liveops__spin-primary > strong { color:inherit; font-size:inherit; white-space:nowrap; }
@@ -211,9 +212,6 @@ html .liveops-page .liveops-surface .liveops__set-choices button[aria-pressed="t
 .liveops-surface .liveops__letter-mini .liveops__letter-slots { flex-wrap:nowrap; gap:1px; margin:0; }
 .liveops-surface .liveops__letter-mini .liveops__letter-slot { flex:0 0 min(22px,6.5cqi); width:min(22px,6.5cqi); min-width:0; height:auto; aspect-ratio:1; }
 .liveops-surface .liveops__letter-mini .liveops__letter-slot[data-space='true'] { flex:0 0 4px; width:4px; height:1px; aspect-ratio:auto; }
-.liveops__recipe-reward { display:grid; grid-template-columns:32px minmax(0,1fr) auto; align-items:center; gap:8px; min-width:0; margin:0; font-size:12px; }
-.liveops__recipe-reward > .ui-icon { width:32px; height:32px; }
-html .liveops-page .liveops-surface .liveops__recipe-reward > button { width:auto; background:linear-gradient(var(--lo-claim-top),var(--lo-claim-bottom)); color:var(--lo-claim-ink); text-shadow:none; }
 .liveops__inventory > h3 { margin:0 0 8px; text-align:center; font-size:15px; color:var(--lo-gold); }
 html .liveops-page .liveops-surface .liveops__letter-grid > button.tab-button { position:relative; display:grid; grid-template-columns:minmax(0,1fr); place-items:center; aspect-ratio:1; min-width:0; min-height:44px; padding:2px; border:2px solid var(--lo-task-line); border-radius:8px; background:linear-gradient(145deg,var(--lo-task),color-mix(in srgb,var(--lo-task) 74%,var(--lo-line))); color:var(--lo-task-ink); text-shadow:0 1px #fff8; box-shadow:inset 0 0 0 2px #fff3,0 2px 0 #0004; }
 html .liveops-page .liveops-surface .liveops__letter-grid > button[aria-pressed='true'] { outline:2px solid var(--lo-gold); outline-offset:1px; }
@@ -263,14 +261,24 @@ html .liveops__chest-card.liveops__card button:disabled { opacity: .55; filter: 
 .liveops__recipe { display:grid; gap:8px; }
 .liveops__recipe-word { min-width:0; display:grid; gap:8px; container-type:inline-size; }
 .liveops__recipe-word .liveops__letter-slots { flex-wrap:nowrap; align-items:center; gap:1px; margin:0; }
-.liveops__recipe-word .liveops__letter-slot { flex:0 0 min(28px,calc((100cqi - (var(--recipe-columns) - 1)*1px)/var(--recipe-columns))); width:min(28px,calc((100cqi - (var(--recipe-columns) - 1)*1px)/var(--recipe-columns))); min-width:0; height:auto; aspect-ratio:1; }
+.liveops__recipe-word .liveops__letter-slot { flex:0 0 min(24px,calc((100cqi - 56px - (var(--recipe-columns) - 1)*1px)/var(--recipe-columns))); width:min(24px,calc((100cqi - 56px - (var(--recipe-columns) - 1)*1px)/var(--recipe-columns))); min-width:0; height:auto; aspect-ratio:1; }
 .liveops__recipe-word .liveops__letter-slot[data-space='true'] { flex:0 0 5px; width:5px; height:1px; aspect-ratio:auto; }
-html .liveops-page .liveops-surface .liveops__recipe-reward > button { min-height:44px; padding:6px 8px; margin:0; font-size:12px; white-space:nowrap; }
-
-.liveops__recipe-panel { display:grid; gap:8px; min-width:0; }
+.liveops__recipe-panel { display:grid; grid-template-columns:minmax(0,1fr) 48px; align-items:center; gap:8px; min-width:0; min-height:48px; }
+.liveops__recipe-reward { display:grid; place-items:center; min-width:0; }
+html .liveops-page .liveops-surface button.tab-button.liveops__recipe-chest { position:relative; display:grid; place-items:center; width:48px; height:48px; min-height:48px; margin:0; padding:0; border:0; border-image:none; background:transparent; box-shadow:none; }
+.liveops__recipe-chest .liveops__chest-art { width:48px; height:48px; }
+.liveops__recipe-chest[data-locked='true'] .liveops__chest-art { filter:grayscale(.7); }
+.liveops__recipe-chest > .ui-icon { position:absolute; right:0; bottom:0; width:18px; height:18px; padding:2px; border-radius:5px; background:var(--lo-inset); color:var(--lo-ink); }
+.liveops__recipe-chest:focus-visible { outline:2px solid var(--lo-gold); outline-offset:2px; }
+.liveops__chest-art { display:block; width:64px; height:64px; object-fit:contain; }
+.liveops__festival-milestone > .liveops__chest-art { width:48px; height:48px; }
 .liveops-surface .liveops__status { text-align:center; }
 html .liveops-page .liveops-surface .liveops__retry { display:block; width:fit-content; margin:12px auto; }
 html .liveops-page .liveops-surface .liveops__retry[hidden] { display:none; }
 .liveops__connection { display:flex; flex-direction:column; justify-content:center; align-items:center; gap:12px; min-height:clamp(180px,45svh,420px); text-align:center; }
 .liveops__connection > .liveops__status { margin:0; max-width:38ch; }
 html .liveops-page .liveops-surface .liveops__connection > .liveops__retry { margin:0; }
+
+.liveops__chest-grid[hidden] { display:none; }
+
+.liveops__chest-card > .liveops__chest-art { width:48px; height:48px; }

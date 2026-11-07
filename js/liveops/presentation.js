@@ -1,4 +1,6 @@
 import { isAppActive } from '../appVisibility.js';
+import { createChestArt } from './chestArt.js';
+import { mountChestInventory } from './chestPresentation.js';
 import { letterArtwork, openLetterActions, openLetterFusion } from './letterCrafting.js';
 import { showCollectionModal } from '../mainmenu.js';
 import { createRewardFeedback, captureRewardOrigin } from './rewardFeedback.js';
@@ -18,7 +20,7 @@ import { letterSetSlots } from './letters.js';
 import { action } from './ui.js';
 import { createTabs } from './ui.js';
 import { festivalChestsEnabled } from './availability.js';
-import { LETTER_SETS, LETTER_ALPHABET, LETTER_SELL_COINS, LETTER_FALLBACK_COINS } from './config.js';
+import { LETTER_SETS, LETTER_ALPHABET, LETTER_SELL_COINS } from './config.js';
 import { createIcon } from '../icons.js';
 import { LETTER_REWARD_ITEMS } from './letterCatalog.generated.js';
 import { letterProgressLabel } from './letters.js';
@@ -187,7 +189,7 @@ export function openLiveopsPage(kind, surface = {}) {
       const claimed=Boolean(festival&&(festival.mask&(1<<index))),ready=available!==null&&available>=item.points;
       const row=panel(`${item.points} huy hiệu`);row.classList.add('liveops__festival-milestone');row.dataset.claimed=String(claimed);
       const body=el('div','liveops__festival-reward');body.append(el('strong','',[item.coins?`${item.coins} Xu`:'',item.chest?CHEST_NAMES[item.chest]:''].filter(Boolean).join(' + ')),el('p','',claimed?'Đã nhận':!festival?'Mốc phần thưởng':ready?'Đủ điều kiện':'Chưa đủ'));
-      row.append(createIcon(item.chest?'chest':'coins'),body,button(claimed?'Đã nhận':'Nhận',()=>void run({type:'claimFestival',cycle:festival.completedCycles,points:item.points}),busy||!festivalChestsEnabled()||!canClaim()||claimed||!ready,`festival-${item.points}`));road.append(row);
+      row.append(item.chest?createChestArt(item.chest):createIcon('coins'),body,button(claimed?'Đã nhận':'Nhận',()=>void run({type:'claimFestival',cycle:festival.completedCycles,points:item.points}),busy||!festivalChestsEnabled()||!canClaim()||claimed||!ready,`festival-${item.points}`));road.append(row);
     }
     content.append(road);
     if(festivalChestsEnabled())content.append(button('Xem quà & Kho rương',openChests));
@@ -224,7 +226,7 @@ export function openLiveopsPage(kind, surface = {}) {
     const info=button('',()=>{
       const rules=el('div','liveops__wheel-rules'),list=el('ul');
       for(const slot of WHEEL_SLOTS)list.append(el('li','',`${slot.label}: ${slot.weight}%`));
-      rules.append(list,el('p','','Rương mở ngay sau khi quay. Rương Xu nhận ngẫu nhiên từ 5 đến 50 Xu. Rương Ngẫu nhiên chọn đều một rương C, Avatar, Khung hoặc Huy hiệu rồi mở rương đó. Các rương còn lại nhận đúng loại quà ghi trên rương; Rương Hỗ trợ chọn đều một trong ba trò rồi chọn đều loại hỗ trợ của trò đó.'),el('p','','Trong các nhóm ngoại hình, hiệu ứng và chủ đề, ưu tiên chọn đều món chưa sở hữu. Khi đã có đủ nhóm, nhận 100 Xu. Nếu món quà đã được chọn nay trở thành trùng, nhận 100 Xu. Kho hỗ trợ đầy thì quà được giữ để nhận sau, không quay lại hoặc dùng thêm lượt.'),el('p','','Một lượt miễn phí và tối đa 10 lượt quảng cáo mỗi ngày. Vé quay dùng riêng, không hết hạn; không mua thêm lượt.'));
+      rules.append(list,el('p','','Rương mở ngay sau khi quay. Rương Xu nhận ngẫu nhiên từ 5 đến 50 Xu. Rương Ngẫu nhiên chọn đều một rương C, Avatar, Khung hoặc Huy hiệu rồi mở rương đó. Các rương còn lại nhận đúng loại quà ghi trên rương; Rương Hỗ trợ chọn đều một trong ba trò rồi chọn đều loại hỗ trợ của trò đó.'),el('p','','Ngoại hình, hiệu ứng và chủ đề được chọn ngẫu nhiên trong các món bạn chưa có. Nếu đã sở hữu đủ bộ hoặc nhận trùng, bạn nhận 100 Xu. Khi kho hỗ trợ đầy, quà sẽ được giữ lại. Hãy dùng bớt hỗ trợ rồi quay lại nhận quà.'),el('p','','Mỗi ngày có 1 lượt quay miễn phí và tối đa 10 lượt quay bằng cách xem quảng cáo. Mỗi vé dùng cho 1 lượt quay và không hết hạn.'));
       const games={'memory-match':'Memory Match','link-connect':'Link Connect','triple-connect':'Triple Connect'};
       for(const slot of WHEEL_SLOTS.filter(slot=>slot.box)){
         const details=el('details'),summary=el('summary','',`Xem quà trong ${slot.label}`),pool=el('ul');details.append(summary,pool);
@@ -282,13 +284,23 @@ export function openLiveopsPage(kind, surface = {}) {
       event.preventDefault();selectedSetId=LETTER_SETS[next].id;render();root.querySelector(`[data-focus-key="set-${selectedSetId}"]`)?.focus({preventScroll:true});
     };
     const set=LETTER_SETS.find(item=>item.id===selectedSetId),letters=el('section','liveops__card liveops__recipe'),word=el('div','liveops__recipe-word');letters.setAttribute('aria-label','Bộ chữ và phần thưởng');
-    word.style.setProperty('--recipe-columns',set.label.length);
+    word.style.setProperty('--recipe-columns',Math.max(...LETTER_SETS.map(item=>item.label.length)));
     const filled=letterSetSlots(set,counts).filter(slot=>slot.filled).length,total=Object.values(set.required).reduce((sum,n)=>sum+n,0);
     const recipePanel=el('div','liveops__recipe-panel');recipePanel.id='letter-recipe-panel';recipePanel.setAttribute('role','tabpanel');recipePanel.setAttribute('aria-labelledby',`letter-recipe-${set.id}`);recipePanel.append(letterSlots(set,counts));word.append(choices,recipePanel);
     const reward=el('div','liveops__recipe-reward');
-    if(festivalChestsEnabled())reward.append(createIcon('chest'),el('strong','',CHEST_NAMES[set.chestType]));
-    else{const next=LETTER_REWARD_ITEMS.find(item=>item.id===view.nextLetterRewardId);reward.append(createIcon('chest'),el('strong','',next?next.name:`${LETTER_FALLBACK_COINS} Xu`));}
-    const exchange=button('Đổi quà',()=>void run({type:'exchangeLetterSet',setId:set.id}),busy||!canClaim()||filled<total,`exchange-${set.id}`);exchange.setAttribute('aria-label',`Đổi ${set.label}`);reward.append(exchange);letters.append(word,reward);
+    const exchange=button('',async()=>{
+      const result=await run({type:'exchangeLetterSet',setId:set.id});
+      if(!active()||!result?.letterResult?.chestType)return;
+      const chestHost=el('div','liveops__letter-chest');
+      let disposeChest=()=>{};
+      openAppModal({id:'letter-chest-modal',title:CHEST_NAMES[result.letterResult.chestType],content:chestHost,owner:scope,alignment:'center',keepBanner:true,onDestroy:()=>disposeChest()});
+      disposeChest=mountChestInventory(chestHost,{owner:scope,initialType:result.letterResult.chestType,gameId:set.id==='adventure'?(getRecentGameId()||'memory-match'):set.id});
+    },busy||!canClaim()||filled<total,`exchange-${set.id}`);
+    exchange.classList.add('liveops__recipe-chest');exchange.setAttribute('aria-label',`Đổi ${set.label}`);
+    exchange.setAttribute('aria-description',filled<total?'Thu thập đủ bộ chữ để mở khóa rương.':'Đổi bộ chữ lấy rương và chọn trò nhận quà.');
+    exchange.dataset.locked=String(filled<total);exchange.append(createChestArt(set.chestType));
+    if(filled<total)exchange.append(createIcon('lock'));
+    reward.append(exchange);recipePanel.append(reward);letters.append(word);
     const inventory=panel('Kho chữ'),grid=el('div','liveops__letter-grid');inventory.classList.add('liveops__inventory');
     if(selectedLetter===null)selectedLetter=LETTER_ALPHABET.find(letter=>counts[letter]>0)||LETTER_ALPHABET[0];
     for(const letter of LETTER_ALPHABET){const count=counts[letter]||0,choice=button('',()=>showLetterMenu(letter),busy,`letter-${letter}`);

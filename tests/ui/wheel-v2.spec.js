@@ -35,19 +35,19 @@ async function finishOpening(page){await page.locator('.wheel-gift-opening').eva
 async function finishRewards(page){await page.locator('.liveops-reward-feedback__particle').evaluateAll(nodes=>nodes.forEach(node=>node.getAnimations().forEach(animation=>animation.finish())));await expect(page.locator('.liveops-reward-feedback')).toHaveCount(0);await expect(page.locator('.liveops')).toHaveAttribute('aria-busy','false');}
 const center=page=>page.locator('.liveops__spin-primary');
 
-test('ten slots reuse paired chest images for eight named chests in five skins and four viewports',async({page},info)=>{
+test('ten slots show eight distinct paired chest images in five skins and four viewports',async({page},info)=>{
  test.setTimeout(120000);await ready(page);
  for(const skin of ['default','woodland','papercut','starship','storybook'])for(const viewport of [{width:320,height:740},{width:412,height:915},{width:844,height:390},{width:1024,height:900}]){
   await page.setViewportSize(viewport);await page.evaluate(async skin=>(await import('/js/uiSkin.js')).selectUiSkin(skin),skin);await reset(page);
   await expect(page.locator('.liveops__sector')).toHaveCount(10);await expect(page.locator('.liveops__sector .wheel-gift-art')).toHaveCount(8);await expect(page.locator('.liveops__sector > .ui-icon--coin')).toHaveCount(2);
   await expect(page.locator('[data-wheel-sector="2"]')).toContainText('Rương Xu');
   const images=await page.locator('.liveops__sector .wheel-gift__image').evaluateAll(async nodes=>{await Promise.all(nodes.map(node=>node.decode()));return nodes.map(node=>({src:node.src,width:node.naturalWidth}));});expect(images).toHaveLength(16);expect(images.every(image=>image.width>0&&image.src.includes('chest'))).toBe(true);
-  expect(new Set(images.filter((_,index)=>index%2===0).map(image=>image.src)).size).toBe(4);
+  expect(new Set(images.filter((_,index)=>index%2===0).map(image=>image.src)).size).toBe(8);
   const mini=page.locator('.liveops__letter-mini');await expect(mini.locator('.liveops__letter-slots')).toHaveCount(4);await expect(mini.locator('h3,strong,button')).toHaveCount(0);
   expect(await mini.evaluate(node=>node.getBoundingClientRect().height)).toBeLessThan(130);
   expect(await mini.evaluate(node=>[...node.children].every(row=>{const cells=[...row.querySelectorAll('[data-space="false"]')];return cells.every(cell=>Math.abs(cell.getBoundingClientRect().top-cells[0].getBoundingClientRect().top)<1)&&row.scrollWidth<=row.clientWidth+1;}))).toBe(true);
   const bad=await page.locator('.liveops__wheel').evaluate(root=>[...root.querySelectorAll('.liveops__sector,.liveops__spin-primary')].filter(node=>{const r=node.getBoundingClientRect();return r.left< -1||r.right>innerWidth+1;}).map(node=>node.textContent));expect(bad).toEqual([]);
-  const paths=await page.locator('.liveops__sector .wheel-gift-art').evaluateAll(nodes=>nodes.map(node=>node.querySelector('.wheel-gift__badge .ui-icon').classList.value));expect(new Set(paths).size).toBe(8);
+  await expect(page.locator('.wheel-gift__badge')).toHaveCount(0);
   if(viewport.width===412&&['default','storybook'].includes(skin))await page.screenshot({path:info.outputPath(`${skin}-wheel-412.png`)});
  }
 });
