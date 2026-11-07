@@ -40,6 +40,15 @@ async function selectFamily(page, game, family) {
   await page.locator('.leaderboard-family-picker').click();
   await page.locator(`[data-rank-family="${family}"]`).click();
 }
+test('all three game tabs fit one row in every skin on narrow and wide screens',async({page})=>{
+ await open(page,1);
+ for(const skin of ['default','woodland','papercut','starship','storybook'])for(const width of [320,412,1024]){
+  await page.setViewportSize({width,height:900});await page.evaluate(async skin=>(await import('/js/uiSkin.js')).selectUiSkin(skin),skin);
+  const tabs=page.locator('.leaderboard-tabs--game');await expect(tabs.getByRole('tab')).toHaveCount(3);
+  const geometry=await tabs.evaluate(node=>({width:node.clientWidth,scroll:node.scrollWidth,buttons:[...node.children].map(child=>({top:child.offsetTop,width:child.clientWidth,scroll:child.scrollWidth}))}));
+  expect(geometry.scroll).toBeLessThanOrEqual(geometry.width+1);expect(new Set(geometry.buttons.map(button=>button.top)).size).toBe(1);expect(geometry.buttons.every(button=>button.scroll<=button.width+1)).toBe(true);
+ }
+});
 for (const count of [0, 1, 10, 11]) test(`record count ${count}, private own record and no repeated copy`, async ({ page }) => {
   await open(page, count);
   if (count) await expect(page.locator('.leaderboard-heading')).toContainText('Màn');

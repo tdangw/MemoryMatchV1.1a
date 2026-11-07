@@ -43,6 +43,9 @@ test('ten slots reuse paired chest images for eight named chests in five skins a
   await expect(page.locator('[data-wheel-sector="2"]')).toContainText('Rương Xu');
   const images=await page.locator('.liveops__sector .wheel-gift__image').evaluateAll(async nodes=>{await Promise.all(nodes.map(node=>node.decode()));return nodes.map(node=>({src:node.src,width:node.naturalWidth}));});expect(images).toHaveLength(16);expect(images.every(image=>image.width>0&&image.src.includes('chest'))).toBe(true);
   expect(new Set(images.filter((_,index)=>index%2===0).map(image=>image.src)).size).toBe(4);
+  const mini=page.locator('.liveops__letter-mini');await expect(mini.locator('.liveops__letter-slots')).toHaveCount(4);await expect(mini.locator('h3,strong,button')).toHaveCount(0);
+  expect(await mini.evaluate(node=>node.getBoundingClientRect().height)).toBeLessThan(130);
+  expect(await mini.evaluate(node=>[...node.children].every(row=>{const cells=[...row.querySelectorAll('[data-space="false"]')];return cells.every(cell=>Math.abs(cell.getBoundingClientRect().top-cells[0].getBoundingClientRect().top)<1)&&row.scrollWidth<=row.clientWidth+1;}))).toBe(true);
   const bad=await page.locator('.liveops__wheel').evaluate(root=>[...root.querySelectorAll('.liveops__sector,.liveops__spin-primary')].filter(node=>{const r=node.getBoundingClientRect();return r.left< -1||r.right>innerWidth+1;}).map(node=>node.textContent));expect(bad).toEqual([]);
   const paths=await page.locator('.liveops__sector .wheel-gift-art').evaluateAll(nodes=>nodes.map(node=>node.querySelector('.wheel-gift__badge .ui-icon').classList.value));expect(new Set(paths).size).toBe(8);
   if(viewport.width===412&&['default','storybook'].includes(skin))await page.screenshot({path:info.outputPath(`${skin}-wheel-412.png`)});
@@ -56,6 +59,7 @@ test('all ten outcomes reveal only their actual reward after the wheel stops, wi
   await finishSpin(page);
   if(sector>=2){await expect(page.locator('.wheel-gift-opening')).toBeVisible();await expect(page.locator('.wheel-gift-opening img')).toHaveCount(2);await finishOpening(page);}
   await expect(page.locator('.liveops-reward-feedback__toast')).toBeVisible();
+  const toast=await page.locator('.liveops-reward-feedback__toast').boundingBox(),viewport=page.viewportSize();expect(Math.abs(toast.y+toast.height/2-viewport.height/2)).toBeLessThan(2);
   const expected=await page.evaluate(async()=>{const receipt=wheelFixture.state.spins.free,wheel=receipt.wheel;if(wheel.kind==='coins')return wheel.coins+' Xu';if(wheel.kind==='support')return (await import('/js/liveops/chestConfig.js')).CHEST_SUPPORTS[wheel.gameId].find(item=>item.key===wheel.key).label;return (await import('/js/liveops/wheelCatalog.js')).wheelItem(wheel.itemId).name;});
   await expect(page.locator('.liveops-reward-feedback__toast')).toContainText(expected);expect(await page.locator('.liveops-reward-feedback__particle').count()).toBeLessThanOrEqual(44);expect(await page.locator('.liveops-reward-feedback__particle[data-reward-kind="coins"]').count()).toBeLessThanOrEqual(32);await finishRewards(page);
  }
@@ -87,7 +91,22 @@ test('hidden and reduced changes finish the wheel and opening; twenty interrupte
   await reset(page,4);await center(page).click();if(i%2){await finishSpin(page);await expect(page.locator('.wheel-gift-opening')).toBeVisible();}
   await page.evaluate(()=>wheelModal.destroy());await expect(page.locator('.wheel-gift-opening,.liveops-reward-feedback,.liveops')).toHaveCount(0);
  }
- expect(await page.evaluate(()=>document.getAnimations().filter(animation=>animation.effect?.target.closest('.wheel-gift-opening,.liveops__rotor,.liveops-reward-feedback')).length)).toBe(0);
+ expect(await page.evaluate(()=>document.getAnimations().filter(animation=>animation.effect?.target.closest('.wheel-gift-opening,.liveops__rotor,.liveops__pointer,.liveops-reward-feedback')).length)).toBe(0);
+});
+
+test('ticker follows sector crossings and spin audio stops with the rotor or page owner',async({page})=>{
+ await page.addInitScript(()=>{window.spinAudio=[];HTMLMediaElement.prototype.play=function(){if(this.src.includes('wheel-spin.mp3'))spinAudio.push('play');return Promise.resolve();};HTMLMediaElement.prototype.pause=function(){if(this.src.includes('wheel-spin.mp3'))spinAudio.push('pause');};});
+ await ready(page);await page.emulateMedia({reducedMotion:'no-preference'});
+ for(const interrupt of [false,true]){
+  await reset(page);await page.evaluate(async()=>{(await import('/js/gameState.js')).gameState.settings.sound=true;spinAudio.length=0;});await center(page).click();
+  const pointer=page.locator('.liveops__pointer');await expect.poll(()=>pointer.evaluate(node=>node.getAnimations().length)).toBe(1);
+  const frames=await pointer.evaluate(node=>node.getAnimations()[0].effect.getKeyframes());expect(frames.length).toBeLessThanOrEqual(152);expect(frames.some(frame=>frame.transform==='rotate(-22deg)')).toBe(true);
+  expect(await page.evaluate(()=>spinAudio.filter(cue=>cue==='play').length)).toBe(1);
+  await page.evaluate(()=>window.dispatchEvent(new Event('offline')));expect(await pointer.evaluate(node=>node.getAnimations().length)).toBe(1);
+  if(interrupt)await page.evaluate(()=>wheelModal.destroy());else await finishSpin(page);
+  await expect.poll(()=>page.evaluate(()=>spinAudio.filter(cue=>cue==='pause').length)).toBe(1);
+  expect(await page.evaluate(()=>document.getAnimations().filter(a=>a.effect?.target.classList.contains('liveops__pointer')).length)).toBe(0);
+ }
 });
 
 test('rules show current probabilities, chest names, instant opening and owned conversion',async({page})=>{

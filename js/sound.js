@@ -52,6 +52,7 @@ const COIN_CUE_VOICES = 6;
 const COIN_CUE_GAIN = 0.45;
 const SUMMARY_AUDIO_OFFSET_SECONDS = 0.08;
 const rewardCueFiles = Object.freeze({
+  wheelSpin: 'wheel-spin.mp3',
   star1: 'star_1.ogg', star2: 'star_2.ogg', star3: 'star_3.ogg',
   reward: 'reward.ogg', openBox: 'open_box.ogg', thunder: 'explosion.ogg', summary: 'summary.mp3',
   frozenUnlock: 'unlock_1.mp3', coinDrop: 'coin_drop.mp3', coinCollect: 'coin-collect.mp3',

@@ -485,3 +485,12 @@
 - W0–W3 hoàn tất; nghiệm thu ở WHEEL_REWARDS_PLAN.md, tách khỏi
   ACCOUNT_RELEASE_PLAN.md. Rules vòng quay đã phát hành06/11, đọc lại
   khớp bản đã kiểm thử; không deploy Hosting/APK.
+
+### Tinh chỉnh giao diện07/11/2026
+
+- Toast nhận thưởng Nhiệm vụ/Sự kiện đặt giữa màn hình, giữ một hàng.
+- Kim giật theo từng vạch của vòng quay, chậm dần cùng rotor; phát
+  wheel-spin.mp3 trong lúc quay. Motion/audio dừng khi kết thúc, đóng trang
+  hoặc chuyển nền; reduced-motion bỏ chuyển động quay và giật kim.
+- Dưới vòng quay chỉ có bốn hàng ảnh chữ của bốn bộ, không tiêu đề/nút bấm.
+  Ba tab trò chơi ở bảng xếp hạng chia đều một hàng, vừa màn hình320px.

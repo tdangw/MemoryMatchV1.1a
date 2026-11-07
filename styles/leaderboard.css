@@ -23,9 +23,9 @@
 .leaderboard-panel button:disabled { opacity: .4; cursor: default; }
 .leaderboard-panel .app-button:hover { transform: none; filter: none; }
 .leaderboard-panel button:focus-visible, .leaderboard-results:focus-visible { outline: 2px solid var(--ranking-gold); outline-offset: -2px; }
-.leaderboard-tabs--game { display: flex; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding: 3px; border: 1px solid var(--ranking-line); border-radius: 14px; background: #061b23ed; flex-shrink: 0; }
+.leaderboard-tabs--game { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); min-width:0; padding: 3px; border: 1px solid var(--ranking-line); border-radius: 14px; background: #061b23ed; flex-shrink: 0; }
 .leaderboard-tabs--game::-webkit-scrollbar { display: none; }
-.leaderboard-tabs--game .app-button { flex: 1 0 auto; display: flex; align-items: center; justify-content: center; border-color: transparent; background: linear-gradient(#173b4122, #08262d22); font-size: clamp(10px, 3vw, 12px); line-height: 1.4; min-width: 0; padding: 6px 4px; white-space: nowrap; }
+.leaderboard-panel .leaderboard-tabs--game .app-button { display:flex; align-items:center; justify-content:center; width:100%; box-sizing:border-box; border-color:transparent; background:linear-gradient(#173b4122,#08262d22); font-size:clamp(9px,2.5vw,12px); line-height:1.4; min-width:0; padding:6px 2px; white-space:nowrap; }
 .leaderboard-tabs--game .app-button[aria-selected="true"] { background: var(--ui-raised); color: var(--ranking-gold); border-color: #d0b87588; box-shadow: inset 0 1px #e1f1d538, inset 0 -2px #031a22; font-weight: 700; }
 .leaderboard-panel .leaderboard-family-picker { display: flex; align-items: center; justify-content: center; gap: 4px; box-sizing: border-box; min-width: 0; min-height: 28px; margin: 0; padding: 3px 6px; border: 1px solid var(--ui-line); border-radius: 6px; background: var(--ui-raised); color: var(--ui-ink); box-shadow: none; text-shadow: none; font-size: 10px; line-height: 1.4; white-space: nowrap; }
 .leaderboard-panel .leaderboard-family-picker:is(:hover, [aria-expanded="true"]) { border-color: var(--ui-focus); }

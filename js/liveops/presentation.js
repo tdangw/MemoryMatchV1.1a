@@ -2,6 +2,8 @@ import { letterArtwork, openLetterActions, openLetterFusion } from './letterCraf
 import { showCollectionModal } from '../mainmenu.js';
 import { createRewardFeedback, captureRewardOrigin } from './rewardFeedback.js';
 import { createWheelArt } from './wheelArt.js';
+import { startWheelMotion } from './wheelMotion.js';
+import { gameState } from '../gameState.js';
 import { createWheelGiftArt, presentWheelGift, refreshWheelGiftArt, WHEEL_BOX_LABELS } from './wheelGiftArt.js';
 import { WHEEL_SLOTS, WHEEL_ANGLE, WHEEL_VERSION } from './wheelRewards.js';
 import { WHEEL_ITEMS } from './wheelCatalog.js';
@@ -41,11 +43,11 @@ export function openLiveopsPage(kind, surface = {}) {
   const rewardFeedback=createRewardFeedback({owner:scope,host:modal.panel});
   let letterDialog=null;scope.own(()=>letterDialog?.destroy());
   let view = null, tab = 'daily', busy = false, animation = null, presentedSpin = null, eventTab = 'wheel', selectedSetId = 'adventure', selectedLetter=null;
-  let wheelRotor=null, wheelArt=null, confirmedView=false;
+  let wheelRotor=null, wheelPointer=null, wheelArt=null, confirmedView=false;
   let wheelPresentation=null;
   scope.own(()=>wheelPresentation?.dispose());
   const wheelMotion=matchMedia('(prefers-reduced-motion: reduce)');
-  scope.listen(wheelMotion,'change',event=>{if(event.matches&&animation?.playState==='running')animation.finish();});
+  scope.listen(wheelMotion,'change',event=>{if(event.matches&&['running','paused'].includes(animation?.playState))animation.finish();});
   const active = () => scope.active && root.isConnected;
   const canClaim=()=>confirmedView&&navigator.onLine&&!getActiveGameScope()&&view&&Math.floor((view.serverNow+performance.now()-observedAt)/DAY_MS)===view.state.day;
   scope.own(() => animation?.cancel());
@@ -91,9 +93,7 @@ export function openLiveopsPage(kind, surface = {}) {
           if(freshSpin&&receipt?.wheel?.version===WHEEL_VERSION&&rotor){
           const angle = 5 * 360 - receipt.sector * WHEEL_ANGLE;
           if (!wheelMotion.matches&&!document.hidden) {
-            animation = rotor.animate([{ transform: 'rotate(0deg)' }, { transform: `rotate(${angle}deg)` }],
-              { duration: 2400, easing: 'cubic-bezier(.14,.65,.2,1)', fill: 'forwards' });
-            local.animation(animation);
+            animation = startWheelMotion({rotor,pointer:root.querySelector('.liveops__pointer'),angle,owner:local,settings:gameState.settings});
             try { await animation.finished; } catch (error) { if (error.name !== 'AbortError') throw error; }
           }
           if (owns()&&local.active&&eventTab==='wheel') {
@@ -144,7 +144,7 @@ export function openLiveopsPage(kind, surface = {}) {
     if(targetDay>view.state.day&&refreshDay!==targetDay&&!busy&&navigator.onLine){refreshDay=targetDay;void run({type:'status'});}
   }
   function visibility() {
-    if(document.hidden&&animation?.playState==='running')animation.finish();
+    if(document.hidden&&['running','paused'].includes(animation?.playState))animation.finish();
     if(timer!==null){clearShellInterval(timer);timer=null;}
     if(!document.hidden&&kind==='missions'){tick();timer=scope.interval(tick,60000);}
   }
@@ -160,8 +160,8 @@ export function openLiveopsPage(kind, surface = {}) {
   function renderEvents() {
     const tabs = createTabs('events', [['wheel','Vòng quay'],['letters','Sưu tập chữ'],['festival','Sưu tập huy hiệu']], eventTab, (key, panel) => {
       if(key!==eventTab){rememberScroll(`event:${eventTab}`);scope.frame(()=>{if(scrollHost)scrollHost.scrollTop=scrolls.get(`event:${key}`)||0;});}
-      if(key!==eventTab)wheelPresentation?.dispose();
-      eventTab = key; animation?.cancel(); panel.replaceChildren();
+      if(key!==eventTab){wheelPresentation?.dispose();animation?.cancel();}
+      eventTab = key; panel.replaceChildren();
       resetConnection();
       const old = content; content = panel;
       if (key === 'wheel') renderWheel(); else if (key === 'letters') renderLetters(); else renderFestival();
@@ -197,7 +197,8 @@ export function openLiveopsPage(kind, surface = {}) {
       label.append(slot.box||index===2?createWheelGiftArt(slot.box||'coins'):createIcon('coin'),el('span','',slot.label.replace('Rương ','Rương\n')));rotor.append(label);
     }}
     refreshWheelGiftArt(rotor);
-    stage.append(rotor,wheelArt.rim,el('span','liveops__pointer'));stage.setAttribute('aria-label','Vòng quay mười ô: 5 Xu, 10 Xu và tám loại rương');
+    if(!wheelPointer)wheelPointer=el('span','liveops__pointer');
+    stage.append(rotor,wheelArt.rim,wheelPointer);stage.setAttribute('aria-label','Vòng quay mười ô: 5 Xu, 10 Xu và tám loại rương');
     const spin=view?.state.spins,last=presentedSpin||spin?.ticket||spin?.ads.at(-1)||spin?.free;
     rotor.style.transform=`rotate(${last?.wheel?.version===WHEEL_VERSION?-last.sector*WHEEL_ANGLE:0}deg)`;
     const pending=view?.state.pendingWheel;
@@ -232,7 +233,8 @@ export function openLiveopsPage(kind, surface = {}) {
     info.classList.add('liveops__wheel-info');info.setAttribute('aria-label','Thể lệ vòng quay');info.append(createIcon('info'));
     wheel.append(info,stage,primary);content.append(wheel);
     if(pending){const held=el('div','liveops__wheel-pending');held.append(createWheelGiftArt(pending.wheel.box),el('p','',`${WHEEL_BOX_LABELS[pending.wheel.box]} đang được giữ. Hãy dùng bớt hỗ trợ trong kho rồi bấm Nhận quà.`));content.append(held);}
-    if(view){const set=LETTER_SETS.find(item=>item.id===selectedSetId),mini=panel('Sưu tập chữ');mini.classList.add('liveops__letter-mini');mini.append(el('strong','',set.label),letterSlots(set,view.state.letters.counts),button('Xem Sưu tập chữ',()=>{eventTab='letters';render();}));content.append(mini);}
+    if(view){const mini=el('section','liveops__card liveops__letter-mini');mini.setAttribute('aria-label','Tiến độ bốn bộ chữ');
+      for(const set of LETTER_SETS)mini.append(letterSlots(set,view.state.letters.counts));content.append(mini);}
   }
   function openChests() {
     const round=getActiveGameScope(),owner=surface.owner||round||getAppPageScope(),identity=getAccountService()?.getIdentity();

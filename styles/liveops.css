@@ -173,7 +173,7 @@ html .liveops-page .liveops-surface .liveops__mission-action button { width:100%
 .liveops__sector > span { white-space:pre-line; }
 .liveops__wheel-rules { font-size:13px; line-height:1.5; }
 .liveops__wheel-rules ul { padding-left:20px; }
-.liveops-surface .liveops__pointer { top:2%; left:calc(50% - 9px); width:18px; height:29px; background:linear-gradient(90deg,var(--liveops-wheel-light),var(--liveops-wheel-dark)); z-index:3; }
+.liveops-surface .liveops__pointer { top:2%; left:calc(50% - 9px); width:18px; height:29px; background:linear-gradient(90deg,var(--liveops-wheel-light),var(--liveops-wheel-dark)); z-index:3; transform-origin:50% 12%; }
 .liveops__spin-actions { position:absolute; z-index:5; top:8px; left:0; display:flex; align-items:center; }
 html .liveops-page .liveops-surface .tab-button.liveops__spin-primary { position:absolute; z-index:4; left:50%; top:50%; transform:translate(-50%,-50%); display:flex; flex-direction:column; justify-content:center; gap:2px; flex:none; width:24%; height:24%; max-width:106px; max-height:106px; min-width:56px; min-height:56px; margin:0; padding:4px; border:2px solid var(--liveops-wheel-light); border-image:none; border-radius:50%; background:radial-gradient(circle at 35% 25%,var(--liveops-wheel-light),var(--liveops-wheel-sector-b)); color:#493014; box-shadow:0 2px 4px #42270b88,inset 0 0 0 3px #9b69294d; font-size:clamp(12px,3.5cqi,17px); line-height:1.1; text-shadow:0 1px #fff5; }
 .liveops__spin-primary > strong { color:inherit; font-size:inherit; white-space:nowrap; }
@@ -184,10 +184,7 @@ html .liveops-page .liveops-surface .tab-button.liveops__wheel-info { position:a
 .liveops-surface .liveops__status:empty { display:none; }
 .liveops__ticket-balance { display:inline-flex; align-items:center; gap:4px; flex:none; padding:4px 6px; border:1px solid var(--lo-line); border-radius:22px; background:var(--lo-inset); font-size:12px; color:var(--lo-gold); }
 .liveops__ticket-balance > .ui-icon { width:18px; height:18px; }
-.liveops__letter-mini { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; align-items:center; }
-.liveops__letter-mini > h3,.liveops__letter-mini > .liveops__letter-slots { grid-column:1/-1; }
-.liveops-surface .liveops__letter-mini h3 { margin:0; color:var(--lo-gold); }
-html .liveops-page .liveops-surface .liveops__letter-mini > button { width:auto; margin:0; font-size:12px; }
+.liveops__letter-mini { display:grid; gap:5px; container-type:inline-size; }
 .liveops-surface .liveops__set-choices { display:flex; flex-wrap:nowrap; gap:4px; overflow-x:auto; scrollbar-width:none; min-width:0; padding:2px; }
 .liveops__set-choices::-webkit-scrollbar { display:none; width:0; height:0; }
 html .liveops-page .liveops-surface .liveops__set-choices button { flex:0 0 auto; width:auto; min-height:36px; margin:0; padding:6px 8px; border-radius:8px; font-size:10px; white-space:nowrap; }
@@ -196,6 +193,9 @@ html .liveops-page .liveops-surface .liveops__set-choices button[aria-pressed="t
 .liveops-surface .liveops__letter-slot { display:grid; place-items:center; width:1.55em; min-width:1.55em; height:1.55em; padding:0; border:0; border-radius:0; background:transparent; box-shadow:none; opacity:.3; filter:grayscale(.7); }
 .liveops-surface .liveops__letter-slot[data-filled="true"] { background:transparent; box-shadow:none; opacity:1; filter:none; }
 .liveops-surface .liveops__letter-slot[data-space="true"] { flex-basis:100%; height:0; min-width:0; border:0; box-shadow:none; }
+.liveops-surface .liveops__letter-mini .liveops__letter-slots { flex-wrap:nowrap; gap:1px; margin:0; }
+.liveops-surface .liveops__letter-mini .liveops__letter-slot { flex:0 0 min(22px,6.5cqi); width:min(22px,6.5cqi); min-width:0; height:auto; aspect-ratio:1; }
+.liveops-surface .liveops__letter-mini .liveops__letter-slot[data-space='true'] { flex:0 0 4px; width:4px; height:1px; aspect-ratio:auto; }
 .liveops__recipe-reward { display:grid; grid-template-columns:32px minmax(0,1fr) auto; align-items:center; gap:8px; min-width:0; margin:0; font-size:12px; }
 .liveops__recipe-reward > .ui-icon { width:32px; height:32px; }
 html .liveops-page .liveops-surface .liveops__recipe-reward > button { width:auto; background:linear-gradient(var(--lo-claim-top),var(--lo-claim-bottom)); color:var(--lo-claim-ink); text-shadow:none; }
