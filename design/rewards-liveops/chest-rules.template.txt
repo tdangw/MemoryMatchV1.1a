@@ -114,6 +114,8 @@
           : changed.hasOnly(['festival','revision','rootRevision','fingerprint','updatedAt']) ? (n.festival.earnedTotal != o.festival.earnedTotal ? rewardFestivalEarn(n,o) : (changed.hasAny(['festival']) ? rewardFestivalClaim(n,o) : rewardChestSources(n,o))) : rewardProgressFlush(n,o))
         : changed.hasOnly(['spins','tickets','ticketSpent','pendingWheel','revision','rootRevision','fingerprint','updatedAt']) ? rewardSpinOnly(n,o)
         : changed.hasOnly(['letters','revision','rootRevision','fingerprint','updatedAt']) ? rewardLetterUpdate(n,o)
+        : changed.hasAny(['loginReward']) ? rewardMissionLogin(n,o)
         : changed.hasOnly(['letters','daily','weekly','event','tickets','ticketEarned','revision','rootRevision','fingerprint','updatedAt']) && n.daily.claimed == o.daily.claimed && n.weekly.claimed == o.weekly.claimed ? rewardProgressFlush(n,o)
+        : changed.hasOnly(['daily','weekly','tickets','revision','rootRevision','fingerprint','updatedAt']) ? rewardMissionClaims(n,o)
         : validRewardState(n,o) && rewardTransition(n,o);
     }

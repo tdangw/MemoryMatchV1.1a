@@ -1,0 +1,34 @@
+    function missionSupport(r,game) {
+      return r is map && r.keys().hasOnly(['gameId','key']) && r.keys().hasAll(['gameId','key'])
+        && r.gameId == game && r.key in wheelSupportKeys(game);
+    }
+    function missionLoginReceipt(r,n,o) {
+      return r is map && r.keys().hasOnly(['version','index','coins','supports','day','operation'])
+        && r.keys().hasAll(['version','index','coins','supports','day','operation'])
+        && r.version == 1 && r.index is int && r.index >= 0 && r.index < 7 && r.index == o.loginNext
+        && r.day == n.day && r.coins == MISSION_LOGIN_COINS[r.index]
+        && r.operation is string && r.operation.matches('^[A-Za-z0-9_-]{1,128}$')
+        && r.supports is list && (r.index < 6 ? r.supports.size() == 1
+          && missionSupport(r.supports[0],MISSION_LOGIN_HINT_GAMES[r.index]) && r.supports[0].key == 'hint'
+          : r.supports.size() == 3 && missionSupport(r.supports[0],'memory-match')
+            && missionSupport(r.supports[1],'link-connect') && missionSupport(r.supports[2],'triple-connect'));
+    }
+    function rewardMissionLogin(n,o) {
+      return chestBase(n,o,['loginReward','loginDay','loginNext','weekly'])
+        && o.loginDay != n.day && n.loginDay == n.day && n.loginNext == (o.loginNext + 1) % 7
+        && n.weekly.diff(o.weekly).affectedKeys().hasOnly(['visits'])
+        && n.weekly.visits == (o.weekly.visits < 3 ? o.weekly.visits + 1 : 3)
+        && missionLoginReceipt(n.loginReward,n,o);
+    }
+    function missionClaimed(n,o,allowed) {
+      return n.diff(o).affectedKeys().hasOnly(['claimed']) && n.claimed is list
+        && n.claimed.hasOnly(allowed) && n.claimed.hasAll(o.claimed)
+        && n.claimed.size() == n.claimed.toSet().size();
+    }
+    function rewardMissionClaims(n,o) {
+      return chestBase(n,o,['daily','weekly','tickets'])
+        && missionClaimed(n.daily,o.daily,['win-three','match-thirty','win-without-hint','bonus'])
+        && missionClaimed(n.weekly,o.weekly,['bonus'])
+        && rewardDailyClaims(n.daily) && rewardWeekClaims(n.weekly)
+        && rewardInt(n.tickets) && rewardWallet(n,o);
+    }

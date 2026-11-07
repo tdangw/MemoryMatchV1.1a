@@ -1,5 +1,6 @@
 CHEST_CONTRACT
 WHEEL_CONTRACT
+MISSION_CONTRACT
     // Spark reward contract: one private account document; no round/receipt collections.
     function rewardPath(space, uid) { return /databases/$(database)/documents/gamespaces/$(space)/liveops/$(uid); }
     function rootPath(space, uid) { return /databases/$(database)/documents/gamespaces/$(space)/players/$(uid); }
@@ -25,8 +26,9 @@ WHEEL_CONTRACT
     function validRewardState(n, o) {
       let day = int(request.time.toMillis() / 86400000);
       let changed = n.diff(o).affectedKeys();
-      return n.keys().hasOnly(['version','revision','day','week','daily','weekly','loginNext','loginDay','spins','tickets','ticketEarned','ticketSpent','event','cosmetics','letters','chests','festival','hourlyGift','pendingWheel','rootRevision','fingerprint','updatedAt'])
+      return n.keys().hasOnly(['version','revision','day','week','daily','weekly','loginNext','loginDay','loginReward','spins','tickets','ticketEarned','ticketSpent','event','cosmetics','letters','chests','festival','hourlyGift','pendingWheel','rootRevision','fingerprint','updatedAt'])
         && n.get('chests',null) == o.get('chests',null) && n.get('festival',null) == o.get('festival',null)
+        && n.get('loginReward',null) == o.get('loginReward',null)
         && n.version == 1 && (n.revision is int && n.revision >= 0 && n.revision <= 9007199254740991) && n.revision > 0 && n.day == day && n.week == day - ((day + 3) % 7)
         && (!changed.hasAny(['daily']) || rewardCounter(n.daily, ['win-three','match-thirty','win-without-hint','bonus']))
         && (!changed.hasAny(['weekly']) || rewardCounter(n.weekly, ['bonus']))
@@ -54,7 +56,7 @@ WHEEL_CONTRACT
       return (!n.claimed.hasAny(['win-three']) || n.wins >= 3)
         && (!n.claimed.hasAny(['match-thirty']) || n.matches >= 30)
         && (!n.claimed.hasAny(['win-without-hint']) || n.noHint >= 1)
-        && (!n.claimed.hasAny(['bonus']) || n.claimed.hasAll(['win-three','match-thirty','win-without-hint']));
+        && (!n.claimed.hasAny(['bonus']) || n.wins >= 3 && n.matches >= 30 && n.noHint >= 1);
     }
     function rewardWeekClaims(n) {
       return !n.claimed.hasAny(['bonus']) || n.wins >= 12 && n.matches >= 120 && n.noHint >= 3 && n.visits >= 3;
@@ -220,8 +222,8 @@ LETTER_CREDITS;
     function rewardInitial(n, space, uid) {
       let empty = {'wins':0,'matches':0,'noHint':0,'visits':0,'claimed':[]};
       let day = int(request.time.toMillis() / 86400000);
-      return n.keys().hasOnly(['version','revision','day','week','daily','weekly','loginNext','loginDay','spins','tickets','ticketEarned','ticketSpent','event','cosmetics','letters','chests','festival','hourlyGift','pendingWheel','rootRevision','fingerprint','updatedAt'])
-        && n.get('pendingWheel',null) == null && n.get('hourlyGift',null) == null && n.version == 1 && n.revision == 1 && n.day == day && n.week == day - ((day + 3) % 7)
+      return n.keys().hasOnly(['version','revision','day','week','daily','weekly','loginNext','loginDay','loginReward','spins','tickets','ticketEarned','ticketSpent','event','cosmetics','letters','chests','festival','hourlyGift','pendingWheel','rootRevision','fingerprint','updatedAt'])
+        && n.get('loginReward',null) == null && n.get('pendingWheel',null) == null && n.get('hourlyGift',null) == null && n.version == 1 && n.revision == 1 && n.day == day && n.week == day - ((day + 3) % 7)
         && n.daily == empty && n.weekly == empty && n.loginNext == 0 && n.loginDay == -1
         && n.spins == {'free':null,'ads':[],'pastAds':[],'ticket':null} && n.tickets == 0 && n.ticketEarned == 0 && n.ticketSpent == 0
         && n.event == {'id':'firefly-festival-01','week':n.week,'points':0,'day':day,'dailyPoints':0,'claimed':[]}

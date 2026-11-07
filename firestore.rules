@@ -246,7 +246,9 @@ service cloud.firestore {
           : changed.hasOnly(['festival','revision','rootRevision','fingerprint','updatedAt']) ? (n.festival.earnedTotal != o.festival.earnedTotal ? rewardFestivalEarn(n,o) : (changed.hasAny(['festival']) ? rewardFestivalClaim(n,o) : rewardChestSources(n,o))) : rewardProgressFlush(n,o))
         : changed.hasOnly(['spins','tickets','ticketSpent','pendingWheel','revision','rootRevision','fingerprint','updatedAt']) ? rewardSpinOnly(n,o)
         : changed.hasOnly(['letters','revision','rootRevision','fingerprint','updatedAt']) ? rewardLetterUpdate(n,o)
+        : changed.hasAny(['loginReward']) ? rewardMissionLogin(n,o)
         : changed.hasOnly(['letters','daily','weekly','event','tickets','ticketEarned','revision','rootRevision','fingerprint','updatedAt']) && n.daily.claimed == o.daily.claimed && n.weekly.claimed == o.weekly.claimed ? rewardProgressFlush(n,o)
+        : changed.hasOnly(['daily','weekly','tickets','revision','rootRevision','fingerprint','updatedAt']) ? rewardMissionClaims(n,o)
         : validRewardState(n,o) && rewardTransition(n,o);
     }
 
@@ -320,6 +322,41 @@ service cloud.firestore {
         && pending.keys().hasOnly(['operation','day','wheel']) && pending.wheel.kind == 'support' && rewardWheelCandidate(pending.wheel);
     }
 
+    function missionSupport(r,game) {
+      return r is map && r.keys().hasOnly(['gameId','key']) && r.keys().hasAll(['gameId','key'])
+        && r.gameId == game && r.key in wheelSupportKeys(game);
+    }
+    function missionLoginReceipt(r,n,o) {
+      return r is map && r.keys().hasOnly(['version','index','coins','supports','day','operation'])
+        && r.keys().hasAll(['version','index','coins','supports','day','operation'])
+        && r.version == 1 && r.index is int && r.index >= 0 && r.index < 7 && r.index == o.loginNext
+        && r.day == n.day && r.coins == [10,10,15,15,20,25,50][r.index]
+        && r.operation is string && r.operation.matches('^[A-Za-z0-9_-]{1,128}$')
+        && r.supports is list && (r.index < 6 ? r.supports.size() == 1
+          && missionSupport(r.supports[0],["link-connect","memory-match","triple-connect","memory-match","triple-connect","link-connect"][r.index]) && r.supports[0].key == 'hint'
+          : r.supports.size() == 3 && missionSupport(r.supports[0],'memory-match')
+            && missionSupport(r.supports[1],'link-connect') && missionSupport(r.supports[2],'triple-connect'));
+    }
+    function rewardMissionLogin(n,o) {
+      return chestBase(n,o,['loginReward','loginDay','loginNext','weekly'])
+        && o.loginDay != n.day && n.loginDay == n.day && n.loginNext == (o.loginNext + 1) % 7
+        && n.weekly.diff(o.weekly).affectedKeys().hasOnly(['visits'])
+        && n.weekly.visits == (o.weekly.visits < 3 ? o.weekly.visits + 1 : 3)
+        && missionLoginReceipt(n.loginReward,n,o);
+    }
+    function missionClaimed(n,o,allowed) {
+      return n.diff(o).affectedKeys().hasOnly(['claimed']) && n.claimed is list
+        && n.claimed.hasOnly(allowed) && n.claimed.hasAll(o.claimed)
+        && n.claimed.size() == n.claimed.toSet().size();
+    }
+    function rewardMissionClaims(n,o) {
+      return chestBase(n,o,['daily','weekly','tickets'])
+        && missionClaimed(n.daily,o.daily,['win-three','match-thirty','win-without-hint','bonus'])
+        && missionClaimed(n.weekly,o.weekly,['bonus'])
+        && rewardDailyClaims(n.daily) && rewardWeekClaims(n.weekly)
+        && rewardInt(n.tickets) && rewardWallet(n,o);
+    }
+
     // Spark reward contract: one private account document; no round/receipt collections.
     function rewardPath(space, uid) { return /databases/$(database)/documents/gamespaces/$(space)/liveops/$(uid); }
     function rootPath(space, uid) { return /databases/$(database)/documents/gamespaces/$(space)/players/$(uid); }
@@ -345,8 +382,9 @@ service cloud.firestore {
     function validRewardState(n, o) {
       let day = int(request.time.toMillis() / 86400000);
       let changed = n.diff(o).affectedKeys();
-      return n.keys().hasOnly(['version','revision','day','week','daily','weekly','loginNext','loginDay','spins','tickets','ticketEarned','ticketSpent','event','cosmetics','letters','chests','festival','hourlyGift','pendingWheel','rootRevision','fingerprint','updatedAt'])
+      return n.keys().hasOnly(['version','revision','day','week','daily','weekly','loginNext','loginDay','loginReward','spins','tickets','ticketEarned','ticketSpent','event','cosmetics','letters','chests','festival','hourlyGift','pendingWheel','rootRevision','fingerprint','updatedAt'])
         && n.get('chests',null) == o.get('chests',null) && n.get('festival',null) == o.get('festival',null)
+        && n.get('loginReward',null) == o.get('loginReward',null)
         && n.version == 1 && (n.revision is int && n.revision >= 0 && n.revision <= 9007199254740991) && n.revision > 0 && n.day == day && n.week == day - ((day + 3) % 7)
         && (!changed.hasAny(['daily']) || rewardCounter(n.daily, ['win-three','match-thirty','win-without-hint','bonus']))
         && (!changed.hasAny(['weekly']) || rewardCounter(n.weekly, ['bonus']))
@@ -374,7 +412,7 @@ service cloud.firestore {
       return (!n.claimed.hasAny(['win-three']) || n.wins >= 3)
         && (!n.claimed.hasAny(['match-thirty']) || n.matches >= 30)
         && (!n.claimed.hasAny(['win-without-hint']) || n.noHint >= 1)
-        && (!n.claimed.hasAny(['bonus']) || n.claimed.hasAll(['win-three','match-thirty','win-without-hint']));
+        && (!n.claimed.hasAny(['bonus']) || n.wins >= 3 && n.matches >= 30 && n.noHint >= 1);
     }
     function rewardWeekClaims(n) {
       return !n.claimed.hasAny(['bonus']) || n.wins >= 12 && n.matches >= 120 && n.noHint >= 3 && n.visits >= 3;
@@ -588,8 +626,8 @@ service cloud.firestore {
     function rewardInitial(n, space, uid) {
       let empty = {'wins':0,'matches':0,'noHint':0,'visits':0,'claimed':[]};
       let day = int(request.time.toMillis() / 86400000);
-      return n.keys().hasOnly(['version','revision','day','week','daily','weekly','loginNext','loginDay','spins','tickets','ticketEarned','ticketSpent','event','cosmetics','letters','chests','festival','hourlyGift','pendingWheel','rootRevision','fingerprint','updatedAt'])
-        && n.get('pendingWheel',null) == null && n.get('hourlyGift',null) == null && n.version == 1 && n.revision == 1 && n.day == day && n.week == day - ((day + 3) % 7)
+      return n.keys().hasOnly(['version','revision','day','week','daily','weekly','loginNext','loginDay','loginReward','spins','tickets','ticketEarned','ticketSpent','event','cosmetics','letters','chests','festival','hourlyGift','pendingWheel','rootRevision','fingerprint','updatedAt'])
+        && n.get('loginReward',null) == null && n.get('pendingWheel',null) == null && n.get('hourlyGift',null) == null && n.version == 1 && n.revision == 1 && n.day == day && n.week == day - ((day + 3) % 7)
         && n.daily == empty && n.weekly == empty && n.loginNext == 0 && n.loginDay == -1
         && n.spins == {'free':null,'ads':[],'pastAds':[],'ticket':null} && n.tickets == 0 && n.ticketEarned == 0 && n.ticketSpent == 0
         && n.event == {'id':'firefly-festival-01','week':n.week,'points':0,'day':day,'dailyPoints':0,'claimed':[]}

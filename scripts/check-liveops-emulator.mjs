@@ -57,6 +57,8 @@ try {
   const fact={gameId:'memory-match',mode:'superHard',roundId:'mission-round',day:state.day,matches:30,noHint:true};
   accept(await commit({type:'status'},{facts:[fact,{...fact,roundId:'mission-round2'},{...fact,roundId:'mission-round3'}]}));
   for(const id of ['win-three','match-thirty','win-without-hint'])accept(await commit({type:'daily',id}));
+  assert.equal(state.tickets,0);
+  accept(await commit({type:'dailyBonus'}));
   assert.equal(state.tickets,1);assert.equal(state.event.points,36);
   accept(await commit({type:'status'},{letterEarned:{M:6}}));
   assert.equal(state.letters.counts.M,6);
