@@ -7,14 +7,14 @@ import {gameState} from '/js/gameState.js';
 import {HOURLY_GIFT_MS} from '/js/liveops/hourlyGift.js';
 import {publishHourlyGiftView} from '/js/liveops/hourlyGiftViewState.js';
 let offset=0,now=Date.now(),state=transitionSpark(null,{type:'status'},{uid:'gift-test',now}).state;
-window.hourlyFixture={kind:'coins',gameId:'memory-match',key:'hint',claims:0,fail:false,delay:false,advance(ms=HOURLY_GIFT_MS){offset+=ms;now=Date.now()+offset;publishHourlyGiftView({state,serverNow:now});}};
+window.hourlyFixture={kind:'coins',coins:5,gameId:'memory-match',key:'hint',claims:0,fail:false,delay:false,advance(ms=HOURLY_GIFT_MS){offset+=ms;now=Date.now()+offset;publishHourlyGiftView({state,serverNow:now});}};
 export const bindLiveopsAccount=()=>()=>{};
 export const trustedRewardPeriod=()=>null;
 export async function requestLiveops(command={type:'status'}){
  if(hourlyFixture.fail)throw Error('network');
  if(hourlyFixture.delay)await new Promise(resolve=>hourlyFixture.resolve=resolve);
  now=Date.now()+offset;const cmd={...command};
- if(cmd.type==='claimHourlyGift'){hourlyFixture.claims++;cmd.operation=crypto.randomUUID();cmd.sequence=(state.hourlyGift?.sequence||0)+1;cmd.candidate=hourlyFixture.kind==='support'?{kind:'support',coins:0,gameId:hourlyFixture.gameId,key:hourlyFixture.key}:{kind:hourlyFixture.kind,coins:hourlyFixture.kind==='coins'?100:0,gameId:null,key:null};}
+ if(cmd.type==='claimHourlyGift'){hourlyFixture.claims++;cmd.operation=crypto.randomUUID();cmd.sequence=(state.hourlyGift?.sequence||0)+1;cmd.candidate=hourlyFixture.kind==='support'?{kind:'support',coins:0,gameId:hourlyFixture.gameId,key:hourlyFixture.key}:{kind:hourlyFixture.kind,coins:hourlyFixture.kind==='coins'?hourlyFixture.coins:0,gameId:null,key:null,...(hourlyFixture.kind==='ticket'?{tickets:10}:{})};}
  const result=transitionSpark(state,cmd,{uid:'gift-test',now});state=result.state;
  for(const receipt of result.receipts){gameState.coins+=receipt.coins;if(receipt.support)creditChestSupport(gameState.progress,receipt.support);}
  return result;
@@ -39,7 +39,7 @@ async function rewardCard(page,width,height){
   const title=card.querySelector('.hourly-gift-reveal__title'),label=card.querySelector('.hourly-gift__result strong'),rect=card.getBoundingClientRect(),text=label.getBoundingClientRect();
   return {title:Boolean(title),background:getComputedStyle(card).backgroundColor,labelHeight:text.height,label:label.textContent,labelContrast:contrast(label),x:rect.x,y:rect.y,right:rect.right,bottom:rect.bottom,textLeft:text.left,textRight:text.right,overflow:card.scrollWidth>card.clientWidth};
  });
- expect(metrics.title).toBe(false);expect(metrics.background).toBe('rgba(0, 0, 0, 0)');expect(metrics.labelHeight).toBeLessThanOrEqual(18);expect(metrics.label).toBe('100 Xu');expect(metrics.labelContrast).toBeGreaterThanOrEqual(4.5);
+ expect(metrics.title).toBe(false);expect(metrics.background).toBe('rgba(0, 0, 0, 0)');expect(metrics.labelHeight).toBeLessThanOrEqual(18);expect(metrics.label).toBe('5 Xu');expect(metrics.labelContrast).toBeGreaterThanOrEqual(4.5);
  expect(metrics.x).toBeGreaterThanOrEqual(0);expect(metrics.y).toBeGreaterThanOrEqual(0);expect(metrics.right).toBeLessThanOrEqual(width);expect(metrics.bottom).toBeLessThanOrEqual(height);expect(metrics.textLeft).toBeGreaterThanOrEqual(metrics.x);expect(metrics.textRight).toBeLessThanOrEqual(metrics.right);expect(metrics.overflow).toBe(false);
 }
 async function open(page){await page.getByRole('button',{name:'Quà tặng',exact:true}).click();await expect(page.getByRole('button',{name:'Mở quà',exact:true})).toBeEnabled();}
@@ -50,7 +50,7 @@ for(const [width,height] of [[320,640],[412,915],[844,390]])test(`hourly gift mi
   await expect(popup.locator('h2')).toHaveText('Quà tặng bất ngờ');await expect(popup.getByRole('button',{name:'Mở quà',exact:true})).toHaveCSS('color','rgb(255, 251, 220)');await expect(popup.locator('.app-modal__body button')).toHaveCount(1);await expect(popup.locator('.app-modal__body p')).toHaveCount(0);
   const claimBox=await popup.getByRole('button',{name:'Mở quà',exact:true}).boundingBox();const dialog=await popup.locator('.app-modal').boundingBox();expect(claimBox.width).toBeLessThanOrEqual(200);expect(Math.abs((claimBox.x+claimBox.width/2)-(dialog.x+dialog.width/2))).toBeLessThanOrEqual(2);const b=await popup.locator('.app-modal').boundingBox();expect(b.x).toBeGreaterThanOrEqual(0);expect(b.x+b.width).toBeLessThanOrEqual(width);expect(b.y+b.height).toBeLessThanOrEqual(height-49);
   if(['default','storybook'].includes(skin)){mkdirSync('runtime/qa/hourly-gift',{recursive:true});await page.screenshot({path:`runtime/qa/hourly-gift/${skin}-${width}.png`});}
-  await popup.getByRole('button',{name:'Mở quà',exact:true}).evaluate(el=>{el.click();el.click();});await expect(popup).toHaveCount(0);await expect(page.locator('.hourly-gift-reveal .hourly-gift__result')).toContainText('100 Xu');await rewardCard(page,width,height);if(captureReward){await page.waitForFunction(()=>document.querySelector('.hourly-gift-particle')?.getAnimations()[0]?.currentTime>=1900);await page.screenshot({path:`runtime/qa/hourly-gift/${skin}-reward-hold-${width}.png`});}await expect(page.locator('.adventure-gift-countdown')).toHaveText(/^00:(?:0[1-9]|10)$/);await expect(page.getByRole('button',{name:'Quà tặng',exact:true})).toBeDisabled();await expect(page.locator('.adventure-gift-ready-dot')).toBeHidden();await expect(page.getByRole('button',{name:'Quà tặng',exact:true})).toHaveAttribute('data-gift-cooling','true');
+  await popup.getByRole('button',{name:'Mở quà',exact:true}).evaluate(el=>{el.click();el.click();});await expect(popup).toHaveCount(0);await expect(page.locator('.hourly-gift-reveal .hourly-gift__result')).toContainText('5 Xu');await rewardCard(page,width,height);if(captureReward){await page.waitForFunction(()=>document.querySelector('.hourly-gift-particle')?.getAnimations()[0]?.currentTime>=1900);await page.screenshot({path:`runtime/qa/hourly-gift/${skin}-reward-hold-${width}.png`});}await expect(page.locator('.adventure-gift-countdown')).toHaveText(/^00:(?:0[1-9]|10)$/);await expect(page.getByRole('button',{name:'Quà tặng',exact:true})).toBeDisabled();await expect(page.locator('.adventure-gift-ready-dot')).toBeHidden();await expect(page.getByRole('button',{name:'Quà tặng',exact:true})).toHaveAttribute('data-gift-cooling','true');
   await expect(page.locator('.hourly-gift-reveal,.hourly-gift-particles')).toHaveCount(0,{timeout:7000});await expect(page.getByRole('button',{name:'Quà tặng',exact:true})).toBeDisabled();
   const hit=await page.getByRole('button',{name:'Quà tặng',exact:true}).boundingBox();expect(hit.width).toBe(48);expect(hit.height).toBe(48);
   await advance(page);
@@ -61,7 +61,7 @@ test('outside popup effects, cooldown, retry and owner interruption preserve one
  test.setTimeout(90000);await ready(page);await page.emulateMedia({reducedMotion:'no-preference'});
  const baseline=await page.evaluate(async()=>(await import('/js/appPageLifecycle.js')).getAppPageScope().diagnostics());
  for(const kind of ['ticket','support','coins']){
-  await page.evaluate(kind=>hourlyFixture.kind=kind,kind);await advance(page);await open(page);await page.getByRole('button',{name:'Mở quà',exact:true}).click();await expect(page.locator('#hourly-gift-modal')).toHaveCount(0);await expect(page.locator('.hourly-gift-reveal')).toBeVisible();
+  await page.evaluate(kind=>hourlyFixture.kind=kind,kind);await advance(page);await open(page);await page.getByRole('button',{name:'Mở quà',exact:true}).click();await expect(page.locator('#hourly-gift-modal')).toHaveCount(0);await expect(page.locator('.hourly-gift-reveal')).toBeVisible();if(kind==='ticket'){await expect(page.locator('.hourly-gift__result')).toContainText('10 Vé quay');await expect(page.locator('.hourly-gift-particle')).toHaveCount(10);}
   await page.locator('#menu-container .adventure-header .adventure-exit').click();await expect(page.locator('.hourly-gift-reveal,.hourly-gift-particles')).toHaveCount(0,{timeout:7000});
   await page.evaluate(async()=>(await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('memory-match'));
   expect(await page.evaluate(async()=>(await import('/js/appPageLifecycle.js')).getAppPageScope().diagnostics())).toEqual(baseline);
@@ -71,7 +71,7 @@ test('outside popup effects, cooldown, retry and owner interruption preserve one
  await advance(page);await page.evaluate(()=>hourlyFixture.fail=true);await page.getByRole('button',{name:'Quà tặng',exact:true}).click();await expect(page.getByRole('button',{name:'Thử lại',exact:true})).toBeVisible();
  await page.evaluate(()=>{hourlyFixture.fail=false;hourlyFixture.advance();});await page.getByRole('button',{name:'Thử lại',exact:true}).click();await expect(page.getByRole('button',{name:'Mở quà',exact:true})).toBeEnabled();await page.keyboard.press('Escape');await expect(page.locator('#hourly-gift-modal')).toHaveCount(0);
  await page.evaluate(()=>hourlyFixture.delay=true);await page.getByRole('button',{name:'Quà tặng',exact:true}).click();await page.keyboard.press('Escape');await expect(page.locator('#hourly-gift-modal')).toHaveCount(0);await page.evaluate(()=>{hourlyFixture.delay=false;hourlyFixture.resolve();});await expect(page.locator('.hourly-gift-particles')).toHaveCount(0);
- await advance(page);await open(page);await page.getByRole('button',{name:'Mở quà',exact:true}).click();await expect(page.locator('#hourly-gift-modal')).toHaveCount(0);await expect(page.locator('.hourly-gift-particle')).toHaveCount(32);await expect(page.locator('.hourly-gift-reveal,.hourly-gift-particles')).toHaveCount(0,{timeout:7000});
+ await advance(page);await open(page);await page.getByRole('button',{name:'Mở quà',exact:true}).click();await expect(page.locator('#hourly-gift-modal')).toHaveCount(0);await expect(page.locator('.hourly-gift-particle')).toHaveCount(5);await expect(page.locator('.hourly-gift-reveal,.hourly-gift-particles')).toHaveCount(0,{timeout:7000});
  expect(await page.evaluate(()=>hourlyFixture.claims)).toBe(4);
  expect(await page.evaluate(async()=>(await import('/js/appPageLifecycle.js')).getAppPageScope().diagnostics())).toEqual(baseline);
 });
@@ -94,7 +94,7 @@ test('ten-second gift cooldown blocks repeat opening, dims icon and returns only
 test('gift particles share gameplay drop hold and collection timing and clean hidden or reduced interruption',async({page})=>{
  test.setTimeout(45000);await ready(page);await page.emulateMedia({reducedMotion:'no-preference'});
  const baseline=await page.evaluate(async()=>(await import('/js/appPageLifecycle.js')).getAppPageScope().diagnostics());
- await open(page);await page.getByRole('button',{name:'Mở quà',exact:true}).click();await expect(page.locator('.hourly-gift-particle')).toHaveCount(32);
+ await open(page);await page.getByRole('button',{name:'Mở quà',exact:true}).click();await expect(page.locator('.hourly-gift-particle')).toHaveCount(5);
  const timing=await page.locator('.hourly-gift-particle').evaluateAll(async particles=>{
   const {GIFT_LOOT_TIMING}=await import('/js/liveops/hourlyGiftPresentation.js');
   return {policy:GIFT_LOOT_TIMING,particles:particles.map(node=>{
@@ -111,7 +111,7 @@ test('gift particles share gameplay drop hold and collection timing and clean hi
  await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,value:true});document.dispatchEvent(new Event('visibilitychange'));});
  await expect(page.locator('.hourly-gift-reveal,.hourly-gift-particles')).toHaveCount(0,{timeout:7000});await page.evaluate(()=>{delete document.hidden;document.dispatchEvent(new Event('visibilitychange'));});
  await expect.poll(()=>page.evaluate(async()=>(await import('/js/appPageLifecycle.js')).getAppPageScope().diagnostics())).toEqual(baseline);
- await advance(page);await open(page);await page.getByRole('button',{name:'Mở quà',exact:true}).click();await expect(page.locator('.hourly-gift-particle')).toHaveCount(32);
+ await advance(page);await open(page);await page.getByRole('button',{name:'Mở quà',exact:true}).click();await expect(page.locator('.hourly-gift-particle')).toHaveCount(5);
  await page.emulateMedia({reducedMotion:'reduce'});await expect(page.locator('.hourly-gift-reveal,.hourly-gift-particles')).toHaveCount(0,{timeout:7000});
  await expect.poll(()=>page.evaluate(async()=>(await import('/js/appPageLifecycle.js')).getAppPageScope().diagnostics())).toEqual(baseline);expect(await page.evaluate(()=>hourlyFixture.claims)).toBe(2);
 });

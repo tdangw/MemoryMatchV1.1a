@@ -10,7 +10,7 @@ import { publishCloudSnapshot } from '../js/cloudStore.js';
 import { confirmSparkClock, readSparkState } from '../js/liveops/store.js';
 const [host,port] = (process.env.FIRESTORE_EMULATOR_HOST || '').split(':');
 if (!port) throw new Error('Isolated emulator required');
-const env = await initializeTestEnvironment({projectId:'demo-hourly-gift',firestore:{host,port:Number(port),rules:fs.readFileSync('firestore.rules','utf8')}});
+const env = await initializeTestEnvironment({projectId:'demo-hourly-gift',firestore:{host,port:Number(port),rules:fs.readFileSync(process.env.GIFT_RULES_FILE || 'firestore.rules','utf8')}});
 const uid='hourly-test',space='test',db=env.authenticatedContext(uid).firestore();
 let snapshot={snapshotVersion:1,profile:{formatVersion:2,revision:1,data:{coins:0,appearance:{},progress:{},settings:{}}},chapters:[]};
 let state=null,revision=0,now;
@@ -30,6 +30,7 @@ function accept(result){({state,snapshot,revision}=result);}
 const candidate={kind:'ticket',coins:0,gameId:null,key:null};
 const command=(sequence=1)=>({type:'claimHourlyGift',operation:`gift-${sequence}`,sequence,candidate});
 try {
+  await env.clearFirestore();
   now=(await confirmSparkClock(db,space,uid,()=>true)).timestamp;accept(await commit());
   const second=env.authenticatedContext(uid).firestore();
   const claims=await Promise.allSettled([commit(command()),commit(command(),second)]);
@@ -47,13 +48,19 @@ try {
   now=Date.now();accept(await commit(command(2)));assert.equal(state.tickets,2);
   accept(await commit({type:'login'}));assert.equal(state.hourlyGift.sequence,2);
   const beforeCoins=snapshot.profile.data.coins;
-  for(const candidate of [{kind:'coins',coins:100,gameId:null,key:null},...['memory-match','link-connect','triple-connect'].map(gameId=>({kind:'support',coins:0,gameId,key:'hint'}))]){
+  for(const candidate of [{kind:'ticket',tickets:10,coins:0,gameId:null,key:null},...[5,10,100].map(coins=>({kind:'coins',coins,gameId:null,key:null})),...['memory-match','link-connect','triple-connect'].map(gameId=>({kind:'support',coins:0,gameId,key:'hint'}))]){
     await env.withSecurityRulesDisabled(async context=>{const adminRef=doc(context.firestore(),'gamespaces',space,'liveops',uid);const oldGift=(await getDoc(adminRef)).data().hourlyGift;const batch=writeBatch(context.firestore());batch.update(adminRef,{hourlyGift:{...oldGift,claimedAt:Timestamp.fromMillis(Date.now()-HOURLY_GIFT_MS-1000)}});await batch.commit();});
     now=Date.now();accept(await commit({type:'claimHourlyGift',operation:`branch-${state.hourlyGift.sequence+1}`,sequence:state.hourlyGift.sequence+1,candidate}));
   }
-  assert.equal(snapshot.profile.data.coins,beforeCoins+100);
+  assert.equal(snapshot.profile.data.coins,beforeCoins+115);
   for(const game of ['memoryMatch','linkConnect','tripleConnect'])assert.equal(snapshot.profile.data.progress[game].items.hint,1);
 
+  assert.equal(state.tickets,12);
+  await env.withSecurityRulesDisabled(async context=>{const adminRef=doc(context.firestore(),'gamespaces',space,'liveops',uid);const value=(await getDoc(adminRef)).data().hourlyGift;const batch=writeBatch(context.firestore());batch.update(adminRef,{hourlyGift:{...value,claimedAt:Timestamp.fromMillis(Date.now()-HOURLY_GIFT_MS-1000)}});await batch.commit();});
+  const latest=(await getDoc(ref)).data(),latestRoot=(await getDoc(root)).data();
+  async function wrongTicket(tickets,delta=10){const batch=writeBatch(db);batch.set(root,{...latestRoot,revision:latestRoot.revision+1,rewardRevision:latest.revision+1,updatedAt:serverTimestamp()});batch.set(ref,{...latest,revision:latest.revision+1,rootRevision:latestRoot.revision+1,updatedAt:serverTimestamp(),tickets:latest.tickets+delta,hourlyGift:{version:1,sequence:latest.hourlyGift.sequence+1,claimedAt:serverTimestamp(),last:{kind:'ticket',coins:0,gameId:null,key:null,tickets,operation:'invalid-count',sequence:latest.hourlyGift.sequence+1}}});return batch.commit();}
+  for(const count of [0,1,9,11])await assertFails(wrongTicket(count));
+  await assertFails(wrongTicket(10,1));
   const stranger=env.authenticatedContext('stranger').firestore();await assertFails(getDoc(doc(stranger,'gamespaces',space,'liveops',uid)));
-  console.log('Hourly gift emulator passed: atomic double claim, server time, early/backdated denial, next interval, existing actions and ownership.');
+  console.log('Hourly gift emulator passed: atomic double claim, server time, early/backdated denial, next interval, new 10-ticket/5-coin/10-coin branches, legacy receipts, invalid ticket amounts/delta and ownership.');
 } finally {await env.cleanup();}

@@ -97,12 +97,12 @@
         && rewardInt(g.sequence) && g.sequence == (previous == null ? 1 : previous.sequence + 1)
         && g.claimedAt == request.time
         && (previous == null || request.time >= previous.claimedAt + duration.value(HOURLY_GIFT_SECONDS,'s'))
-        && r.keys().hasOnly(['operation','sequence','kind','coins','gameId','key'])
+        && r.keys().hasOnly(['operation','sequence','kind','coins','gameId','key','tickets'])
         && r.operation is string && r.operation.matches('^[A-Za-z0-9_-]{1,128}$') && r.sequence == g.sequence
-        && (r.kind == 'ticket' ? r.coins == 0 && r.gameId == null && r.key == null
-          : r.kind == 'coins' ? (r.coins == 100 && r.gameId == null && r.key == null || r.coins == 10 && hourlySupport(r))
-          : r.kind == 'support' && r.coins == 0 && hourlySupport(r))
-        && rewardInt(n.tickets) && n.tickets == o.tickets + (r.kind == 'ticket' ? 1 : 0);
+        && (r.kind == 'ticket' ? r.coins == 0 && r.gameId == null && r.key == null && (!r.keys().hasAny(['tickets']) || r.tickets == HOURLY_TEST_TICKETS)
+          : !r.keys().hasAny(['tickets']) && (r.kind == 'coins' ? (r.coins in HOURLY_COIN_VALUES && r.gameId == null && r.key == null || r.coins == 10 && hourlySupport(r))
+          : r.kind == 'support' && r.coins == 0 && hourlySupport(r)))
+        && rewardInt(n.tickets) && n.tickets == o.tickets + (r.kind == 'ticket' ? r.get('tickets',1) : 0);
     }
     function dispatchRewardUpdate(n,o) {
       let changed = n.diff(o).affectedKeys();

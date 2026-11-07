@@ -543,3 +543,10 @@
   và đóng giữa request giữ, âm thanh không cấp quà.
 - Rules mốc3 đã phát hành, đọc lại khớp artifact đã kiểm thử147denial.
   61unit và37UI trong phạm vi đạt; check/build đạt; không Hosting/APK.
+
+### Quà tặng test — 07/11/2026
+
+- Giữ chu kỳ10giây, mỗi lần nhận đúng một trong bốn nhóm chia đều25%:10vé quay /5Xu /10Xu /1hỗ trợ ngẫu nhiên. Hỗ trợ vẫn chọn đều3trò rồi chọn đều loại trong trò; đầy kho đổi10Xu như cũ.
+- Vé mới ghi tickets:10; biên nhận cũ thiếu số vé vẫn là1vé, quà100Xu cũ vẫn đọc/nhận được. Giữ hourlyGift.version1 và cơ chế chống nhận trùng.
+- Hiệu ứng dùng số lượng thực nhận:10vé,5/10Xu; giữ giới hạn particle và cleanup hiện có.
+- Nghiệm thu:34unit,7UI (5skin/3viewport), emulator nhận quà/chống nhận trùng/số vé sai đạt; check và build đạt. Rules đã deploy riêng và đọc lại khớp; không deploy Hosting/APK.

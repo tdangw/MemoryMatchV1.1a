@@ -1,4 +1,4 @@
-import { HOURLY_GIFT_MS } from '../js/liveops/hourlyGift.js';
+import { HOURLY_GIFT_MS, HOURLY_GIFT_TEST_TICKETS, HOURLY_GIFT_TEST_COINS } from '../js/liveops/hourlyGift.js';
 import { LETTER_REWARD_ITEMS } from '../js/liveops/letterCatalog.generated.js';
 import fs from 'node:fs/promises';
 import { CHEST_POOLS, CHEST_SUPPORTS } from '../js/liveops/chestConfig.js';
@@ -15,6 +15,7 @@ chestRules = chestRules.replace('CHEST_SET_LOOKUP', LETTER_SETS.map(set=>`id == 
   .replace('CHEST_SUPPORT_LOOKUP', Object.entries(CHEST_SUPPORTS).map(([game,items])=>`(r.gameId == '${game}' ? ${JSON.stringify(items.map(item=>item.key))} : `).join('')+'[])'+')'.repeat(Object.keys(CHEST_SUPPORTS).length-1));
 chestRules = chestRules.replace('HOURLY_SUPPORT_LOOKUP', Object.entries(CHEST_SUPPORTS).map(([game,items])=>`(r.gameId == '${game}' ? ${JSON.stringify(items.map(item=>item.key))} : `).join('')+'[])'+')'.repeat(Object.keys(CHEST_SUPPORTS).length-1));
 chestRules = chestRules.replaceAll('HOURLY_GIFT_SECONDS', String(HOURLY_GIFT_MS / 1000));
+chestRules = chestRules.replaceAll('HOURLY_TEST_TICKETS',String(HOURLY_GIFT_TEST_TICKETS)).replaceAll('HOURLY_COIN_VALUES',JSON.stringify([...HOURLY_GIFT_TEST_COINS,100]));
 section = section.replace('CHEST_CONTRACT',()=>chestRules);
 let wheelRules = await fs.readFile('design/rewards-liveops/wheel-rules.template.txt','utf8');
 // Exact generated alternation keeps catalog membership identical without spending

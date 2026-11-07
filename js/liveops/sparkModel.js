@@ -1,4 +1,4 @@
-import { normalizeHourlyGift, claimHourlyGift } from './hourlyGift.js';
+import { normalizeHourlyGift, claimHourlyGift, hourlyGiftTicketCount } from './hourlyGift.js';
 import { normalizeChests, normalizeFestival, earnChest, claimFestival, openChest, creditSourceChests } from './chests.js';
 import { normalizeLetterCounts, normalizeLetters, creditLetters, mutateLetters, exchangeLetterSet, nextLetterReward } from './letters.js';
 import { GROUP_LOOT_DROP_RATES, LETTER_ALPHABET, ACTIVE_EVENT_COLLECTION_ID, eventCollection } from './config.js';
@@ -197,7 +197,7 @@ export function transitionSpark(previous, command, { uid, now, sector = 0, ticke
       const claimed = claimHourlyGift(state.hourlyGift,command,now,supportCount);
       state.hourlyGift = claimed.state; hourlyGiftResult = claimed.result; hourlyGiftApplied = claimed.applied;
       if (claimed.applied) {
-        if (claimed.result.kind === 'ticket') addTickets(1);
+        if (claimed.result.kind === 'ticket') addTickets(hourlyGiftTicketCount(claimed.result));
         grant(`hourly:${command.operation}`,claimed.result.coins,claimed.result.kind === 'support' ? {support:{gameId:claimed.result.gameId,key:claimed.result.key}} : {});
       }
       break;
