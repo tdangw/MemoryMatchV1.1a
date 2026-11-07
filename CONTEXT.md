@@ -1,5 +1,12 @@
 # CONTEXT — Trạng thái hiện tại (2026-11-04)
 
+## Luật Quà tặng bất ngờ hiện hành — 07/11/2026
+
+- Đang dùng cấu hình test: chờ10giây; mỗi lần mở nhận đúng một nhóm với tỷ lệ25%:10vé quay,5Xu,10Xu hoặc1vật phẩm hỗ trợ.
+- Hỗ trợ chọn đều ba trò rồi chọn đều loại trong kho của trò đó; nếu đầy kho đổi10Xu. Lần đầu nhận ngay, không tích lượt, cần kết nối; giữ cơ chế chống nhận trùng.
+- Quà cũ đã lưu vẫn được nhận theo kết quả cũ (1vé hoặc100Xu); không bốc lại hay chuyển đổi số dư. Khi kết thúc test, thời gian và bảng quà chính thức cần được chốt lại; không tự trả về bảng cũ.
+- Rules tương ứng đã cập nhật và đọc lại khớp. Commit triển khai:680012e. Các mục/receipt ngày29–31/10 bên dưới là lịch sử; luật ở mục này được ưu tiên.
+
 ## Căn đều ba ô ghép chữ —04/11/2026
 
 - Ba ô nguyên liệu dùng cùng tâm và bán kính84px, cách góc120° tạo
@@ -212,7 +219,7 @@
 - Chủ dự án yêu cầu tạm đổi chu kỳ Quà tặng bất ngờ từ60phút xuống
   **10giây để test**. `HOURLY_GIFT_MS` là nguồn chung, generator sinh
   thời gian rules từ đó; không đổi schema, quà, trọng số hoặc số dư.
-  Khi kết thúc test trả constant về60phút, sinh và deploy rules đồng bộ.
+  Cấu hình test mới và cách kết thúc test xem mục luật hiện hành ở đầu file.
 - Rules10giây đã deploy thành công lên memorymatchv1-1a ngày31/10,
   dùng quyền cập nhật rules tính năng quà đã được chủ dự án cho phép.
   Không deploy Hosting hoặc tạo APK.
@@ -220,7 +227,7 @@
   giờ chỉ hiện chấm báo, không chữ “Sẵn sàng”. Giữ vùng bấm48px và vị
   trí đồng hồ. Khóa do tải map/import không bị tick mở lại.
 - Bấm icon mở popup; bấm Mở quà lưu xong mới đóng và mở hộp ở giữa
-  màn hình, rung/nắp mở rồi quà rơi/thu về đích. Tối đa6particle,
+  màn hình, rung/nắp mở rồi quà rơi/thu về đích. Giới hạn6particle là lịch sử; hiện dùng số lượng thực nhận có giới hạn theo runtime,
   animation hữu hạn/owner map, reduced-motion/hidden/đổi trang hủy an toàn.
 - Chơi/Mở quà và nút footer popup gọn theo nội dung, căn giữa, giữ
   chiều cao bấm44–48px. Rà popup: thay HUD/Chờ ảnh/sắp mở/Quyền nhận/
@@ -260,7 +267,7 @@
 - Đã xóa năm kế hoạch hoàn tất về gameplay, nền động, UI skin, Cổ tích và nhập môn. Không phục hồi chúng từ Git làm nguồn thực thi. Nguồn thiết kế hiện hành: ba tài liệu game, ARCHITECTURE và mục sản phẩm dưới đây; receipt là lịch sử. `ADS_APK_TEST_PLAN.md` chỉ còn checklist thiết bị/provider thật chưa xác minh, không phải quyền tự tạo APK/phát hành.
 - Lượt này được phép commit phần triển khai hai task và cleanup đã rà; không stage ảnh/log QA hoặc thay đổi không liên quan. Không tự push/Hosting/rules/APK/billing.
 
-## Quà tặng bất ngờ — hoàn tất 29/10/2026
+## Quà tặng bất ngờ — lịch sử triển khai 29/10/2026
 
 - Đã duyệt ba nhóm vé/100Xu/hỗ trợ
   mỗi nhóm1/3; hỗ trợ chọn đều trò rồi đều loại trong pool rương. Lần đầu
@@ -277,7 +284,7 @@
 - Rules đã deploy thành công lên memorymatchv1-1a ngày29/10 theo cho phép
   trực tiếp của chủ dự án sau lỗi403. Không Hosting/APK. Build web, unit5/5,
   UI matrix năm skin/ba viewport và hủy/đóng/thử lại/bấm nhanh đã đạt.
-- Nguồn hiện hành nằm ở đây và HOURLY_GIFT_RECEIPT.md; plan hoàn tất đã xóa.
+- Receipt HOURLY_GIFT_RECEIPT.md lưu bằng chứng lịch sử; luật hiện hành xem đầu CONTEXT.md. Plan hoàn tất đã xóa.
 
 ## Menu/Cửa hàng/Preview — hoàn tất 28/10/2026
 

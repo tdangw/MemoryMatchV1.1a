@@ -1,5 +1,7 @@
 # Nghiệm thu Quà tặng bất ngờ — 29/10/2026
 
+> Đây là nghiệm thu lịch sử29/10. Luật quà hiện hành xem mục “Luật Quà tặng bất ngờ hiện hành” trong CONTEXT.md; bảng quà, thời gian và particle dưới đây không phải cấu hình đang chạy.
+
 ## Quyết định đã duyệt
 
 - Một quà/lần:1vé quay hoặc100Xu hoặc1hỗ trợ; ba nhóm mỗi nhóm1/3.
