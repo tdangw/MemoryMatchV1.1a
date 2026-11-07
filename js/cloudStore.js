@@ -61,7 +61,7 @@ export async function publishCloudSnapshot({ database, environment, uid, encoded
     manifest: encoded.manifest, fingerprint: encoded.fingerprint, byteLength: encoded.byteLength,
     playerName, ...(economyRevision || previous?.economyRevision ? {economyRevision} : {}), ...(reward || previous?.rewardRevision ? { rewardRevision: reward ? reward.state.revision : rewardRevision } : {}), updatedAt: serverTimestamp(),
   };
-  await runTransaction(database, async transaction => {
+  try { await runTransaction(database, async transaction => {
     if (!isCurrent()) throw new Error("Tài khoản đã thay đổi.");
     const current = await transaction.get(cloudProfileRef(database, environment, uid)); reads += 1;
     const root = current.exists() ? validateRoot(current.data()) : null;
@@ -74,7 +74,16 @@ export async function publishCloudSnapshot({ database, environment, uid, encoded
       transaction.set(ref, { ...reward.state, ...(hourlyGift ? {hourlyGift:{...hourlyGift,claimedAt:reward.hourlyGiftClaim ? serverTimestamp() : stored.data().hourlyGift.claimedAt}} : {}), rootRevision: next.revision, fingerprint: next.fingerprint, updatedAt: serverTimestamp() });
     }
     transaction.set(cloudProfileRef(database, environment, uid), next);
-  });
+  }); } catch (error) {
+    // A competing CAS write can be rejected by revision rules before the SDK
+    // retries its transaction. Only classify it as a conflict after a server read.
+    if (error.code !== 'permission-denied' || !isCurrent()) throw error;
+    let latest;
+    try { latest = await readCloudRoot(database, environment, uid); }
+    catch (readError) { if (readError.code === 'permission-denied') throw error; throw readError; }
+    if ((latest?.revision || 0) !== expectedRevision) throw new CloudConflictError(latest);
+    throw error;
+  }
   writes += reward ? 2 : 1;
   // Refreshing a staged old hash gives it a newer createdAt. Cleanup must not delete that concurrent upload.
   let cleanupError = null;

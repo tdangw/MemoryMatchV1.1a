@@ -68,18 +68,20 @@ test('functional placements and privacy options keep the correct banner owner', 
   }
 });
 
-test('preview retains the banner; gameplay and restart release it for all three games', async ({ page }) => {
+test('preview, gameplay and restart retain one banner for all three games', async ({ page }) => {
   await mockNative(page); await page.goto('/'); await visible(page);
   for (const game of ['memory-match', 'link-connect', 'triple-connect']) {
     await openGameMap(page, game); await visible(page);
     await previewMapLevel(page); await visible(page);
     await closeLevelPreview(page); await visible(page);
-    await startMapLevel(page); await absent(page);
+    await startMapLevel(page);
+    await page.getByRole('button', { name: 'Bỏ qua', exact: true }).click();
+    await visible(page);
     const trigger = game === 'memory-match' ? '#btn-actions-menu' : game === 'link-connect' ? '#link-actions-menu-toggle' : '#triple-actions-menu-toggle';
     await expect(page.locator(trigger)).toBeVisible();
     await page.locator(trigger).click();
     await page.locator('#game-exit-modal').getByRole('button', { name: 'Chơi lại', exact: true }).click();
-    await expect(page.locator('#game-exit-modal')).toHaveCount(0); await absent(page);
+    await expect(page.locator('#game-exit-modal')).toHaveCount(0); await visible(page);
     // Starting a round disposes the old menu owner; returning does not create two.
     await page.evaluate(async () => { (await import('/js/gameSelector.js')).showGameSelector(); });
     await visible(page);

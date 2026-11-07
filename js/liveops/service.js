@@ -1,3 +1,4 @@
+import { isAppActive } from '../appVisibility.js';
 import { publishRewardPeriod } from './rewardPeriodViewState.js';
 import { hourlyGiftCandidate } from './hourlyGift.js';
 import { createLoginCandidate } from './missionRewards.js';
@@ -59,9 +60,9 @@ export function bindLiveopsAccount(account) {
     }).catch(error=>console.info('Reward progress awaits recovery',error.code||error.name));
   }));
   let clockRefresh=null;
-  scope.listen(document,'visibilitychange',()=>{
+  scope.listen(document,'appvisibilitychange',()=>{
     const identity=account.getIdentity();
-    if(document.hidden||!navigator.onLine||!identity||clockNow(identity)!==null||clockRefresh)return;
+    if(!isAppActive()||!navigator.onLine||!identity||clockNow(identity)!==null||clockRefresh)return;
     const owns=()=>scope.active&&account.getIdentity()?.uid===identity.uid&&account.getIdentity()?.profileId===identity.profileId;
     clockRefresh=(async()=>{
       const backend=await getFirebaseBackend();if(!backend||!owns())return;

@@ -11,6 +11,7 @@ const block = `${start}
 ${checks};
     }
     match /gamespaces/{space}/publicCosmetics/{uid} {
+      allow delete: if knownSpace(space) && erasing(space, uid);
       allow get: if knownSpace(space);
       allow list: if knownSpace(space) && request.query.limit != null && request.query.limit <= 20;
       allow create, update: if knownSpace(space) && owner(uid) && validPublicCosmetics(request.resource.data);

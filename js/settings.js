@@ -1,6 +1,7 @@
 import { gameState } from "./gameState.js";
 import { openAppModal, showAppToast } from "./modal.js";
 import { PRIVACY_CONTENT } from './privacyContent.js';
+import { TERMS_CONTENT } from './termsContent.js';
 import { subscribeAdPrivacy, openAdPrivacyOptions } from './ads/menuAds.js';
 import { applyEffectsSettings, syncDefaultMusic } from "./sound.js";
 import { saveSetting } from "./persistence.js";
@@ -163,6 +164,9 @@ if (versionValue) versionValue.textContent = APP_VERSION;
 versionInfoButton?.addEventListener("click", showVersionInfo);
 document.getElementById('settings-privacy-policy').addEventListener('click', () => openAppModal({
   id: 'privacy-policy-modal', title: 'Quyền riêng tư', content: PRIVACY_CONTENT, keepBanner: false,
+}));
+document.getElementById('settings-terms').addEventListener('click', () => openAppModal({
+  id: 'terms-modal', title: 'Điều khoản sử dụng', content: TERMS_CONTENT, keepBanner: false,
 }));
 
 export function showSettingsPanel(fromGame = false, onClose = () => {}, actions = navigation, surface = {}) {

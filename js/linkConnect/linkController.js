@@ -1,3 +1,4 @@
+import { isAppActive } from '../appVisibility.js';
 import { playRewardPhase } from '../rewardAudio.js';
 import { linkTicketDrop } from '../liveops/dropAdapters.js';
 import { prepareLetterDropFeedback } from '../liveops/letterDropFeedback.js';
@@ -143,6 +144,7 @@ let linkTimeWarningPlayed = false;
 let linkSessionCheckpointTicks = 0;
 let activeAssetPaths = [];
 let isLinkAutoPaused = false;
+let backgroundCountdownRound = null;
 let navigation = {
   showMenu: () => {},
   showCollection: () => {},
@@ -972,12 +974,17 @@ async function completeLinkLevel() {
 
 function playLinkSound(name) {
   const sound = sounds[name];
-  if (!gameState.settings?.sound || !sound) return;
+  if (!isAppActive() || !gameState.settings?.sound || !sound) return;
   sound.currentTime = 0;
   sound.play().catch(() => {});
 }
 
 function startCountdown(roundId) {
+  if (!isAppActive()) {
+    backgroundCountdownRound = roundId; isLinkAutoPaused = true; linkGameState.isPaused = true;
+    getLinkShell().update({ paused: true });
+    return;
+  }
   resumePlayMetrics("startup");
   void rememberRecentGame("link-connect");
   stopCountdown();
@@ -1357,6 +1364,8 @@ async function pauseLinkForBackground() {
   if (!isLinkGameVisible()) return;
   if (linkGameState.isPaused) return;
   isLinkAutoPaused = true;
+  backgroundCountdownRound = countdownInterval === undefined ? null : linkGameState.roundId;
+  clearInterval(countdownInterval); countdownInterval = undefined;
   linkGameState.isPaused = true;
   linkTimeScheduler.pause();
   getLinkShell().update({ paused: true });
@@ -1369,6 +1378,8 @@ function resumeLinkFromBackground() {
   linkGameState.isPaused = false;
   getLinkShell().update({ paused: false });
   syncLinkTimeProgress();
+  if (backgroundCountdownRound === linkGameState.roundId) startCountdown(linkGameState.roundId);
+  backgroundCountdownRound = null;
 }
 
 function stopCountdown() {
@@ -1378,8 +1389,8 @@ function stopCountdown() {
   stopLinkComboWindow();
 }
 
-document.addEventListener("visibilitychange", async () => {
-  if (document.hidden) (await pauseLinkForBackground());
+document.addEventListener("appvisibilitychange", async () => {
+  if (!isAppActive()) (await pauseLinkForBackground());
   else resumeLinkFromBackground();
 });
 

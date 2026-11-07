@@ -54,6 +54,7 @@ for (const size of [{ width: 412, height: 915 }, { width: 844, height: 390 }, { 
       await closeLevelPreview(page);
       await expect(preview(page)).toHaveCount(1);
       await startMapLevel(page);
+      await page.getByRole('button', { name: 'Bỏ qua', exact: true }).click();
       await expect(page.locator('.gameplay-ad-slot .menu-ad-preview')).toHaveCount(1);
       const shell = page.locator('.game-shell-root:visible');
       await expect.poll(() => shell.evaluate(root => {
@@ -122,6 +123,7 @@ test('30 gameplay restarts across three games release the previous banner owner'
     await page.getByRole('button', { name: `Chọn ${title}`, exact: true }).click();
     await page.locator(`.game-selector__choice[data-game-id="${game}"]`).click();
     await startMapLevel(page);
+      await page.getByRole('button', { name: 'Bỏ qua', exact: true }).click();
     for (let i = 0; i < 10; i++) {
       await expect(page.locator('.gameplay-ad-slot')).toHaveCount(1);
       await page.evaluate(async () => { window.adsPreviousScope = (await import('/js/gameShell/gameShell.js')).getGameShellDiagnostics().activeScope; });

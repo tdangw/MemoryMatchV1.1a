@@ -4,6 +4,8 @@ import { readFileSync } from 'node:fs';
 import { createAdService } from '../../js/ads/adService.js';
 import { AD_CONFIG, validateAdConfig } from '../../js/ads/adConfig.js';
 import { createBannerController } from '../../js/ads/bannerController.js';
+import { presentRewarded } from '../../js/ads/rewardedController.js';
+import { createInterstitialController } from '../../js/ads/interstitialController.js';
 
 const available = { status: 'NOT_REQUIRED', canRequestAds: true, privacyOptionsRequirementStatus: 'NOT_REQUIRED' };
 function deferred() { let resolve; const promise = new Promise(r => { resolve = r; }); return { promise, resolve }; }
@@ -238,3 +240,118 @@ test('failed remove never permits a second native banner; next event can retry c
   assert.equal(f.maximum(), 1); assert.equal(f.calls.filter(name => name === 'show').length, 2);
   await f.controller.dispose();
 });
+
+{
+
+function deferred() { let resolve; const promise = new Promise(r => { resolve = r; }); return { resolve, promise }; }
+const turn = () => new Promise(resolve => setImmediate(resolve));
+function fixture() {
+  const events = new Map(), calls = [];
+  const native = {
+    async requestConsentInfo() { return { status: 'NOT_REQUIRED', canRequestAds: true }; },
+    async initialize() {},
+    async addListener(event, callback) { events.set(event, callback); return { async remove() { events.delete(event); } }; },
+    async prepareInterstitial(options) { calls.push(['load', options]); },
+    async showInterstitial(options) { calls.push(['show', options]); },
+    async prepareRewardVideoAd(options) { calls.push(['reward-load', options]); },
+    showRewardVideoAd() { calls.push(['reward-show']); return new Promise(() => {}); },
+  };
+  return { native, events, calls };
+}
+
+test('reward is granted once only after earned, early dismissal grants nothing; listeners always released', async () => {
+  for (const earned of Array.from({ length: 30 }, (_, index) => index % 2 === 1)) {
+    const f = fixture(); let grants = 0;
+    const result = presentRewarded(f.native, {}, () => grants++);
+    await turn();
+    if (earned) { f.events.get('onRewardedVideoAdReward')(); f.events.get('onRewardedVideoAdReward')(); }
+    f.events.get('onRewardedVideoAdDismissed')();
+    assert.equal((await result).earned, earned); await turn();
+    assert.equal(grants, Number(earned)); assert.equal(f.events.size, 0);
+  }
+});
+
+test('background/account change during reward load cancels before show without awarding', async () => {
+  const f = fixture(), gate = deferred(); let current = true, grants = 0;
+  f.native.prepareRewardVideoAd = () => gate.promise;
+  const result = presentRewarded(f.native, {}, () => grants++, () => current);
+  await turn(); current = false; gate.resolve();
+  assert.deepEqual(await result, { type: 'cancelled', earned: false });
+  assert.equal(grants, 0); assert.equal(f.events.size, 0);
+  assert.equal(f.calls.filter(([name]) => name === 'reward-show').length, 0);
+});
+
+test('a late bridge earned result is durable after dismissal; a skip result never grants', async () => {
+  for (const earned of [false, true]) {
+    const f = fixture(), gate = deferred(); let grants = 0;
+    f.native.showRewardVideoAd = () => { f.events.get('onRewardedVideoAdDismissed')(); return gate.promise; };
+    const result = await presentRewarded(f.native, {}, () => grants++);
+    assert.equal(result.earned, false); assert.equal(f.events.size, 0);
+    gate.resolve({ earned }); await turn();
+    assert.equal(grants, Number(earned)); assert.equal(f.events.size, 0);
+  }
+});
+
+test('late interstitial load never blocks navigation or shows itself', async () => {
+  const f = fixture(), gate = deferred(); let presentations = 0;
+  f.native.prepareInterstitial = () => gate.promise;
+  const controller = createInterstitialController({ native: f.native, prepare: async () => true,
+    present: async callback => { presentations++; return callback(); }, config: AD_CONFIG });
+  controller.completedLevel(); await turn();
+  assert.equal(await controller.showIfReady(), false);
+  gate.resolve(); await turn();
+  assert.equal(presentations, 0); assert.equal(f.events.size, 0);
+  assert.equal(await controller.showIfReady(() => false), false);
+});
+
+test('interstitial duplicate requests, frequency cap, expiration and 30 cleanup cycles', async () => {
+  const f = fixture(); let time = 0;
+  const controller = createInterstitialController({ native: f.native, prepare: async () => true,
+    present: callback => callback(), config: AD_CONFIG, now: () => time });
+  for (let cycle = 0; cycle < 30; cycle++) {
+    if (cycle) { time += AD_CONFIG.interstitialGapMs; controller.completedLevel(); controller.completedLevel(); }
+    controller.completedLevel(); await turn();
+    const shown = controller.showIfReady(); await turn();
+    assert.equal(await controller.showIfReady(), false);
+    assert.equal(f.events.size, 2);
+    f.events.get('interstitialAdDismissed')();
+    assert.equal(await shown, true); assert.equal(f.events.size, 0);
+    assert.equal(await controller.showIfReady(), false);
+  }
+  time += AD_CONFIG.interstitialGapMs;
+  for (let i = 0; i < 3; i++) controller.completedLevel();
+  await turn(); time += AD_CONFIG.interstitialMaxAgeMs;
+  assert.equal(await controller.showIfReady(), false);
+  assert.equal(f.calls.filter(([name]) => name === 'show').length, 30);
+});
+
+test('no-fill and partial registration failure are recoverable without leaked listeners', async () => {
+  const f = fixture(); let fail = true;
+  f.native.prepareInterstitial = async () => { if (fail) throw new Error('no fill'); };
+  const controller = createInterstitialController({ native: f.native, prepare: async () => true,
+    present: callback => callback(), config: AD_CONFIG, report() {} });
+  controller.completedLevel(); await turn(); assert.equal(await controller.showIfReady(), false);
+  fail = false; controller.completedLevel(); await turn();
+  const original = f.native.addListener;
+  f.native.addListener = async (...args) => { if (f.events.size) throw new Error('listener failure'); return original(...args); };
+  assert.equal(await controller.showIfReady(), false); assert.equal(f.events.size, 0);
+});
+
+test('rewarded and interstitial share one presentation lock and release suspension after dismissal', async () => {
+  const f = fixture(); let suspended = 0;
+  const service = createAdService({ native: f.native, supported: true, report() {},
+    suspendPresentation() { suspended++; return () => suspended--; } });
+  await service.prepare(); service.completedLevel(); await turn();
+  const reward = service.showRewarded({}); await turn();
+  assert.equal(await service.showInterstitialIfReady(() => true), false);
+  assert.equal(suspended, 1);
+  f.events.get('onRewardedVideoAdDismissed')(); await reward;
+  assert.equal(suspended, 0); assert.equal(f.events.size, 0);
+  const interstitial = service.showInterstitialIfReady(() => true); await turn();
+  assert.equal(suspended, 1);
+  await assert.rejects(service.showRewarded({}), /already presenting/);
+  f.events.get('interstitialAdFailedToShow')();
+  assert.equal(await interstitial, false); assert.equal(suspended, 0); assert.equal(f.events.size, 0);
+});
+
+}

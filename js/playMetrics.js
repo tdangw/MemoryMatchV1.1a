@@ -1,3 +1,4 @@
+import { isAppActive } from './appVisibility.js';
 /** Event-driven active-time measurement. Countdown bonuses and freezes never change this clock. */
 import { getRankingOwner } from './rankingOwner.js';
 import { clearShellInterval } from './gameShell/gameShellLifecycle.js';
@@ -23,7 +24,7 @@ export function createActivePlayClock({ elapsedMs = 0, now = () => performance.n
   }
   function durationMs() { return Math.round(elapsed + (startedAt === null ? 0 : Math.max(0, now() - startedAt))); }
   function finish() { const duration = durationMs(); stopped = true; pause("finished"); return duration; }
-  return Object.freeze({ pause, resume, durationMs, finish, checkpoint });
+  return Object.freeze({ pause, resume, durationMs, finish, checkpoint, get finished() { return stopped; } });
 }
 
 let activeMetrics = null;
@@ -57,12 +58,17 @@ export function beginPlayMetrics(scope, identity, metadata = null) {
     rankable: metadata === null || (metadata?.version === 1 && metadata.rankable !== false),
   };
   activeMetrics = record;
-  scope.listen(document, "visibilitychange", () => {
-    if (document.hidden) record.clock.pause("hidden");
-    else record.clock.resume("hidden");
-  });
-  if (document.hidden) record.clock.pause("hidden");
-  record.checkpointTimer = scope.interval(() => record.clock.checkpoint(), 30000);
+  function reconcileVisibility() {
+    if (!isAppActive()) {
+      record.clock.pause("hidden");
+      clearShellInterval(record.checkpointTimer); record.checkpointTimer = null;
+    } else {
+      record.clock.resume("hidden");
+      if (!record.clock.finished && record.checkpointTimer == null) record.checkpointTimer = scope.interval(() => record.clock.checkpoint(), 30000);
+    }
+  }
+  scope.listen(document, "appvisibilitychange", reconcileVisibility);
+  reconcileVisibility();
   scope.own(() => {
     record.clock.finish();
     if (activeMetrics === record) { lastMetrics = record; activeMetrics = null; }

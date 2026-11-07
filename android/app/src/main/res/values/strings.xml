@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Memory Match Adventure</string>
+    <string name="app_name">Memory Match</string>
     <string name="title_activity_main">Memory Match Adventure</string>
     <string name="package_name">com.memorymatch.adventure</string>
     <string name="custom_url_scheme">com.memorymatch.adventure</string>

@@ -1,11 +1,11 @@
 // Source shared by the in-game policy and the generated public page.
 export const PRIVACY_CONTENT = `
-<p><strong>Memory Match Adventure</strong> do Đăng phát triển. Trang này giải thích cách trò chơi sử dụng thông tin của bạn. Cập nhật ngày 23 tháng 10 năm 2026.</p>
+<p><strong>Memory Match Adventure</strong> do Đăng phát triển. Trang này giải thích cách trò chơi sử dụng thông tin của bạn. Cập nhật ngày 7 tháng 11 năm 2026.</p>
 <h3>Thông tin khi chơi</h3>
 <p>Trò chơi lưu tiến trình, Xu, vật phẩm, chủ đề và cài đặt trên thiết bị. Nếu sử dụng tính năng tài khoản, thông tin hồ sơ, tên hiển thị và tiến trình có thể được lưu trực tuyến để khôi phục khi đổi thiết bị. Đăng nhập bằng Google có thể cung cấp tên, địa chỉ email và thông tin hồ sơ mà bạn cho phép chia sẻ.</p>
 <p>Khi tham gia bảng xếp hạng, người chơi khác có thể nhìn thấy tên hiển thị, thành tích, ảnh đại diện, khung viền và huy hiệu đang trang bị của bạn. Không dùng số điện thoại, địa chỉ nhà hoặc thông tin riêng tư làm tên hiển thị.</p>
 <h3>Quảng cáo và trẻ em</h3>
-<p>Trò chơi có người chơi ở nhiều độ tuổi, bao gồm trẻ em. Quảng cáo trên các trang của trò chơi được áp dụng chế độ bảo vệ trẻ em cho tất cả người chơi, giới hạn nội dung phù hợp gia đình và không cá nhân hóa theo sở thích. Trong phiên bản này, quảng cáo từ Google không xuất hiện khi đang chơi một ván. Trò chơi không hỏi ngày sinh và không yêu cầu xem video để nhận thưởng.</p>
+<p>Trò chơi có người chơi ở nhiều độ tuổi, bao gồm trẻ em. Quảng cáo được áp dụng chế độ bảo vệ trẻ em cho tất cả người chơi, giới hạn nội dung phù hợp gia đình và không cá nhân hóa theo sở thích. Dãy quảng cáo được bố trí riêng phía dưới các nút điều khiển và có thể tạm ẩn khi nhập chữ hoặc xác nhận thao tác tài khoản. Quảng cáo toàn màn hình có thể xuất hiện khi bạn chọn chơi tiếp sau khi hoàn thành màn. Bạn có thể tự chọn xem video để nhận thêm lượt quay; đóng video trước khi đủ điều kiện sẽ không nhận lượt thêm. Việc xem video không bắt buộc để chơi. Trò chơi không hỏi ngày sinh.</p>
 <p>Google có thể xử lý thông tin về thiết bị, kết nối và lượt hiển thị hoặc tương tác với quảng cáo để cung cấp quảng cáo, kiểm tra chất lượng và ngăn gian lận. Cách xử lý còn phụ thuộc vào dịch vụ của Google và các lựa chọn được áp dụng tại khu vực của bạn. Nếu có lựa chọn cần xem lại, bạn có thể mở mục Quyền riêng tư quảng cáo trong Cài đặt.</p>
 <p>Phụ huynh nên hướng dẫn trẻ khi sử dụng tài khoản, đặt tên hiển thị và chia sẻ thông tin. Nếu cho rằng trẻ đã cung cấp thông tin cá nhân không phù hợp, hãy liên hệ để chúng tôi xem xét và hỗ trợ xóa.</p>
 <h3>Mục đích sử dụng</h3>
@@ -13,6 +13,10 @@ export const PRIVACY_CONTENT = `
 <h3>Dịch vụ hỗ trợ</h3>
 <p>Trò chơi sử dụng các dịch vụ của Google Firebase cho tài khoản, lưu tiến trình và thống kê sử dụng; Google AdMob cung cấp quảng cáo trong ứng dụng Android. Các dịch vụ này có chính sách riêng. Bạn có thể đọc <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Chính sách quyền riêng tư của Google</a>.</p>
 <h3>Lưu giữ và xóa thông tin</h3>
-<p>Dữ liệu trên thiết bị còn được giữ cho tới khi bạn xóa dữ liệu trò chơi hoặc gỡ ứng dụng. Xóa dữ liệu trên thiết bị không tự xóa thông tin đã lưu trực tuyến. Muốn yêu cầu xóa tài khoản hoặc thông tin trực tuyến, hãy gửi email tới địa chỉ bên dưới, nêu tên trò chơi và thông tin cần thiết để nhận diện tài khoản. Không gửi mật khẩu. Chúng tôi có thể cần xác minh quyền sở hữu tài khoản trước khi xử lý.</p>
+<p>Bạn có thể về trang chính, mở Hồ sơ và chọn Xóa tài khoản để xóa tài khoản đăng nhập cùng tiến trình, Xu, vật phẩm, thống kê và thứ hạng trực tuyến. Tiến trình và bản phục hồi trên thiết bị thực hiện yêu cầu cũng bị xóa. Nếu bị gián đoạn, hãy mở Hồ sơ để tiếp tục. Dữ liệu trên các thiết bị khác có thể vẫn còn; hãy xóa dữ liệu trò chơi trên từng thiết bị nếu bạn không còn sử dụng tài khoản đó.</p>
+<p>Mục Xóa dữ liệu trong Cài đặt giúp chơi lại từ đầu và giữ nguyên đăng nhập cùng tên tài khoản; thao tác này khác với Xóa tài khoản. Gỡ ứng dụng không tự xóa tài khoản trực tuyến.</p>
+<p>Đăng xuất giữ tài khoản và tiến trình trực tuyến đã lưu, đồng thời làm mới dữ liệu trò chơi trên thiết bị để bắt đầu bằng tài khoản khách. Bạn có thể đăng nhập lại Google để khôi phục tiến trình của mình.</p>
+<p>Một bản ghi tối thiểu về mã tài khoản, thời điểm và trạng thái yêu cầu được giữ để ngăn phiên đăng nhập cũ tạo lại dữ liệu đã xóa và tiếp tục yêu cầu bị gián đoạn; bản ghi không chứa tiến trình, tên hoặc email. Thông tin trao đổi hỗ trợ và thông tin cần lưu theo pháp luật được xử lý theo mục đích tương ứng. Dữ liệu do Google xử lý có thời hạn lưu theo chính sách của Google.</p>
+<p>Nếu không mở được trò chơi, gửi yêu cầu xóa tới email bên dưới kèm tên trò chơi, tên hiển thị, email liên kết và mã tài khoản nếu có. Không gửi mật khẩu. Chúng tôi có thể cần xác minh quyền sở hữu trước khi xử lý và sẽ phản hồi qua email.</p>
 <h3>Liên hệ và thay đổi</h3>
 <p>Gửi câu hỏi về quyền riêng tư hoặc yêu cầu xóa dữ liệu tới <a href="mailto:dangvt.studio@gmail.com">dangvt.studio@gmail.com</a>. Nội dung này có thể được cập nhật khi trò chơi thay đổi; ngày cập nhật được ghi ở đầu trang.</p>`;

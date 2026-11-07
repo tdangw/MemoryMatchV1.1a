@@ -1,3 +1,4 @@
+import { isAppActive } from '../appVisibility.js';
 import '../../styles/progression.css';
 import { createGameShellLifecycle } from '../gameShell/gameShellLifecycle.js';
 import { showContextGuide } from '../tutorial/contextGuide.js';
@@ -73,7 +74,7 @@ function presentWaveArrival(refs, owner) {
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   scope.listen(motion, 'change', event => { if (event.matches) scope.dispose(); });
   scope.listen(window, 'resize', () => scope.dispose());
-  scope.listen(document, 'visibilitychange', () => { if (document.hidden) scope.dispose(); });
+  scope.listen(document, 'appvisibilitychange', () => { if (!isAppActive()) scope.dispose(); });
   return Promise.all(animations.map(animation => animation.finished)).then(
     () => { scope.dispose(); return owner.active; },
     () => { scope.dispose(); return owner.active; });
@@ -98,7 +99,7 @@ export function announceWave(refs, scope, wave) {
     if (scope.active) showContextGuide(`wave:${wave.gameId}`,refs.title,scope);
   };
   let arrival = Promise.resolve(scope.active);
-  if (!reducedMotion() && !document.hidden) {
+  if (!reducedMotion() && isAppActive()) {
     noticeScope.animation(notice.animate([{opacity:0,transform:'translate(-50%,0) scale(.86)'},{opacity:1,transform:'translate(-50%,0) scale(1)'}],{duration:WAVE_PRESENTATION_TIMING.noticeEnter,easing:'ease-out'}));
     if (wave.index > 1) arrival = presentWaveArrival(refs, scope);
   }

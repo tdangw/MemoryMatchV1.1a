@@ -10,6 +10,8 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         registerPlugin(BannerBridgePlugin.class);
+        registerPlugin(RewardedBridgePlugin.class);
+        registerPlugin(GoogleAccountPlugin.class);
         super.onCreate(savedInstanceState);
         enterImmersiveMode();
     }

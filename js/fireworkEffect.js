@@ -1,3 +1,4 @@
+import { isAppActive } from './appVisibility.js';
 import { createGameShellLifecycle, getActiveGameScope } from './gameShell/gameShellLifecycle.js';
 import { getAppPageScope } from './appPageLifecycle.js';
 let activeFireworks = null;
@@ -104,7 +105,7 @@ export function showVictoryFireworks({
 
   const render = (now) => {
     frameId = null;
-    if (!scope.active || document.hidden) return;
+    if (!scope.active || !isAppActive()) return;
     const delta = Math.min(2, (now - previous) / 16.67);
     previous = now;
     context.clearRect(0, 0, canvas.width, canvas.height);
@@ -163,13 +164,13 @@ export function showVictoryFireworks({
   });
   function finish() { completed = true; scope.dispose(); }
   function start() {
-    if (!scope.active || document.hidden || frameId !== null || endTimer !== null) return;
+    if (!scope.active || !isAppActive() || frameId !== null || endTimer !== null) return;
     canvas.hidden = false;
     previous = performance.now(); deadline = previous + remainingMs;
     frameId = requestAnimationFrame(render); endTimer = setTimeout(finish, remainingMs);
   }
-  scope.listen(document, 'visibilitychange', () => {
-    if (document.hidden) {
+  scope.listen(document, 'appvisibilitychange', () => {
+    if (!isAppActive()) {
       if (hiddenAt !== null) return;
       hiddenAt = performance.now();
       remainingMs = Math.max(0, deadline - hiddenAt);
@@ -182,7 +183,7 @@ export function showVictoryFireworks({
   });
   scope.listen(reduced, 'change', () => { if (reduced.matches) finish(); });
   if (!context) finish();
-  else if (document.hidden) { hiddenAt = performance.now(); canvas.hidden = true; }
+  else if (!isAppActive()) { hiddenAt = performance.now(); canvas.hidden = true; }
   else start();
   return completion;
 }

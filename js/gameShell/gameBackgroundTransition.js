@@ -1,3 +1,4 @@
+import { isAppActive } from '../appVisibility.js';
 const BASE_PATH = import.meta.env.BASE_URL.endsWith("/")
   ? import.meta.env.BASE_URL
   : `${import.meta.env.BASE_URL}/`;
@@ -150,8 +151,8 @@ function fadeInLayer(layer, revision) {
     });
     const options = {signal:events.signal};
     motion.addEventListener('change', event => { if (event.matches) animation.finish(); }, options);
-    document.addEventListener('visibilitychange', () => { if (document.hidden) animation.finish(); }, options);
+    document.addEventListener('appvisibilitychange', () => { if (!isAppActive()) animation.finish(); }, options);
     window.addEventListener('pagehide', () => animation.finish(), options);
-    if (document.hidden) animation.finish();
+    if (!isAppActive()) animation.finish();
   });
 }

@@ -1,0 +1,38 @@
+.account-erasure-dialog { --erasure-accent: #f1a08b; width: min(100%, 420px); }
+.account-erasure-dialog[data-erasure-kind="reset"] { --erasure-accent: var(--dialog-gold, #ebca83); }
+.account-erasure-dialog .app-modal__title { justify-content: center; width: 100%; text-align: center; }
+.account-erasure-dialog .app-modal__body { padding: 8px 20px 20px; }
+.account-erasure { min-width: 0; text-align: center; }
+.account-erasure__stage > * { animation: account-erasure-enter 160ms ease-out both; }
+.account-erasure__step { margin: 0 0 14px !important; color: var(--dialog-muted); font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.account-erasure__badge { display: grid; place-items: center; width: 58px; height: 58px; margin: 0 auto 14px; border: 1px solid color-mix(in srgb, var(--erasure-accent) 45%, transparent); border-radius: 18px; background: color-mix(in srgb, var(--erasure-accent) 9%, transparent); color: var(--erasure-accent); }
+.account-erasure__badge .ui-icon { width: 28px; height: 28px; }
+.account-erasure__warning { margin: 0 !important; color: var(--dialog-ink); font-size: 15px; font-weight: 700; }
+.account-erasure__losses { display: grid; gap: 6px; margin: 12px 0; padding: 0; list-style: none; color: var(--dialog-muted); font-size: 13px; line-height: 1.45; }
+.account-erasure__identity { margin: 12px 0 18px !important; padding: 10px 12px; border: 1px solid var(--dialog-line); border-radius: 10px; background: color-mix(in srgb, var(--erasure-accent) 6%, transparent); color: var(--dialog-ink); font-size: 13px; line-height: 1.55; }
+.account-erasure__challenge { min-width: 0; margin: 0; padding: 0; border: 0; }
+.account-erasure__challenge legend { width: 100%; padding: 0; color: var(--dialog-muted); font-size: 12px; }
+.account-erasure__question { margin: 8px 0 12px !important; color: var(--dialog-ink); font-size: 22px; font-weight: 750; font-variant-numeric: tabular-nums; }
+.account-erasure__options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.account-erasure__options .app-button { min-height: 48px; padding: 8px; font-size: 18px; }
+.account-erasure__options .app-button[aria-pressed="true"] { border-color: var(--erasure-accent); outline: 1px solid var(--erasure-accent); outline-offset: -2px; }
+.account-erasure__actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 18px; }
+.account-erasure__actions .app-button { min-width: 0; min-height: 48px; padding: 10px 8px; line-height: 1.35; }
+.account-erasure__actions .app-button:only-child { grid-column: 1 / -1; }
+.account-erasure__error { margin: 12px 0 0 !important; color: #ed9382; font-size: 13px; line-height: 1.5; }
+.account-erasure__error:empty { display: none; }
+.account-erasure__final, .account-erasure__grace-copy { margin: 0 !important; color: var(--dialog-muted); font-size: 13px; line-height: 1.6; }
+.account-erasure__connection { margin: 10px 0 0 !important; color: var(--dialog-muted); font-size: 12px; line-height: 1.5; }
+.account-erasure__grace-title { margin: 0 0 10px; color: var(--dialog-ink); font-size: 19px; }
+.account-erasure__countdown { margin: 18px 0 12px !important; color: var(--dialog-muted); font-size: 13px; }
+.account-erasure__countdown strong { color: var(--erasure-accent); font-size: 36px; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.account-erasure__progress { height: 6px; overflow: hidden; border-radius: 8px; background: color-mix(in srgb, var(--erasure-accent) 12%, transparent); }
+.account-erasure__progress-fill { display: block; width: 100%; height: 100%; transform: scaleX(0); transform-origin: left center; background: var(--erasure-accent); }
+.account-erasure-dialog[data-erasure-phase="submitting"] .account-erasure__badge { border-color: var(--dialog-line); }
+@keyframes account-erasure-enter { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 360px) {
+  .account-erasure-dialog .app-modal__body { padding: 6px 14px 16px; }
+  .account-erasure__badge { width: 50px; height: 50px; margin-bottom: 10px; }
+  .account-erasure__identity { margin-bottom: 14px !important; }
+}
+@media (prefers-reduced-motion: reduce) { .account-erasure__stage > * { animation: none; } }

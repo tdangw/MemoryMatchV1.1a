@@ -1,3 +1,4 @@
+import { isAppActive } from '../appVisibility.js';
 import { GAME_SHELL_DEFAULTS, normalizeGameShellConfig } from "./gameShellConfig.js";
 
 /** Fit the board border-box. Coordinates are reserved outside this box by the caller. */
@@ -70,13 +71,13 @@ export function connectGameShellLayout({ root, frame, board, chrome, getShape, a
   };
 
   function schedule() {
-    if (!alive || document.hidden || pending !== null) return;
+    if (!alive || !isAppActive() || pending !== null) return;
     pending = requestAnimationFrame(measureAndApply);
   }
 
   function measureAndApply(timestamp) {
     pending = null;
-    if (!alive || document.hidden || !root.isConnected || root.hidden || root.style.display === "none") return;
+    if (!alive || !isAppActive() || !root.isConnected || root.hidden || root.style.display === "none") return;
     if (lastMeasurementTimestamp === timestamp) {
       // A ResizeObserver callback can arrive in the same visual frame as the first
       // layout write. Defer it so every pass measures stable post-CSS geometry.
@@ -156,8 +157,8 @@ export function connectGameShellLayout({ root, frame, board, chrome, getShape, a
   listen(window, "resize", schedule);
   listen(viewport, "resize", schedule);
   listen(viewport, "scroll", schedule);
-  listen(document, "visibilitychange", () => {
-    if (document.hidden) { cancelAnimationFrame(pending); pending = null; }
+  listen(document, "appvisibilitychange", () => {
+    if (!isAppActive()) { cancelAnimationFrame(pending); pending = null; }
     else schedule();
   });
   // Fixed-size images normally do not alter layout. Limit asset-driven retries to two

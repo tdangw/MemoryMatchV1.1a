@@ -1,11 +1,20 @@
 import { AD_CONFIG, AD_PRIVACY, validateAdConfig } from './adConfig.js';
 import { presentRewarded } from './rewardedController.js';
+import { createInterstitialController } from './interstitialController.js';
 
 export function createAdService({ native, supported, config = AD_CONFIG, report = console.warn, suspendPresentation = () => () => {} }) {
   validateAdConfig(config);
   let consent = null;
   let initialized = false;
   let pending = null;
+  let fullscreen = false;
+  async function present(callback) {
+    if (fullscreen) throw new Error('Advertisement already presenting');
+    fullscreen = true;
+    let release;
+    try { release = suspendPresentation(); return await callback(); }
+    finally { fullscreen = false; release?.(); }
+  }
   const listeners = new Set();
   function snapshot() {
     return { supported, canRequestAds: consent?.canRequestAds === true,
@@ -24,7 +33,7 @@ export function createAdService({ native, supported, config = AD_CONFIG, report 
     update(info);
     return info.canRequestAds === true;
   }
-  return {
+  const service = {
     supported,
     snapshot,
     subscribe(listener) { listeners.add(listener); listener(snapshot()); return () => listeners.delete(listener); },
@@ -65,11 +74,14 @@ export function createAdService({ native, supported, config = AD_CONFIG, report 
       return native.showBanner({ adId: config.bannerId, adSize: 'ADAPTIVE_BANNER', position: 'BOTTOM_CENTER', margin: 0, npa: true });
     },
     remove() { return native.removeBanner(); },
-    async showRewarded(options, onEarned) {
+    async showRewarded(options, onEarned, isCurrent) {
       if (!supported || !initialized || !snapshot().canRequestAds) throw new Error('AdMob not ready');
-      const release = suspendPresentation();
-      try { return await presentRewarded(native, options, onEarned); }
-      finally { release(); }
+      return present(() => presentRewarded(native, options, onEarned, isCurrent));
     },
   };
+  const interstitial = supported ? createInterstitialController({ native, config, report,
+    prepare: () => service.prepare(), present }) : null;
+  service.completedLevel = () => interstitial?.completedLevel();
+  service.showInterstitialIfReady = isCurrent => interstitial ? interstitial.showIfReady(isCurrent) : Promise.resolve(false);
+  return service;
 }

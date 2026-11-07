@@ -1,3 +1,4 @@
+import { isAppActive } from '../appVisibility.js';
 import { COIN_PARTICLE_LIMIT, COIN_SCATTER_ANGLE } from '../gameplayTuning.js';
 import { createGameShellLifecycle } from '../gameShell/gameShellLifecycle.js';
 import { createIcon } from '../icons.js';
@@ -51,7 +52,7 @@ export function createRewardFeedback({ owner, host }) {
     toast.textContent = `Đã nhận ${prizes.map(prize => prize.label).join(' + ')}`; layer.append(toast);
     const reduced = matchMedia('(prefers-reduced-motion: reduce)');
     const cue = phase => {if(audio)playRewardPhase(phase,owner);};
-    if (!particles || reduced.matches || document.hidden) {
+    if (!particles || reduced.matches || !isAppActive()) {
       (host.closest('.app-modal-overlay') || document.body).append(layer);scope.own(() => layer.remove(),'node');
       cue('receive');scope.timeout(() => scope.dispose(),1100);return;
     }
@@ -89,7 +90,7 @@ export function createRewardFeedback({ owner, host }) {
       }
     }
     const finish = () => { for (const animation of animations) if (animation.playState !== 'idle') animation.finish(); };
-    scope.listen(document,'visibilitychange',() => { if (document.hidden) finish(); });
+    scope.listen(document,'appvisibilitychange',() => { if (!isAppActive()) finish(); });
     scope.listen(reduced,'change',event => { if (event.matches) finish(); });
     Promise.all(animations.map(animation => animation.finished)).then(() => { if (scope.active) { cue('collect'); scope.dispose(); } },() => scope.dispose());
   } };

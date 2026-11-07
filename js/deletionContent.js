@@ -1,0 +1,13 @@
+export const DELETION_CONTENT = `
+<p><strong>Memory Match Adventure</strong> — Đăng. Cập nhật ngày 4 tháng 11 năm 2026.</p>
+<h3>Xóa tài khoản trong trò chơi</h3>
+<ol><li>Về trang chính và mở <strong>Hồ sơ</strong>.</li><li>Chọn <strong>Xóa tài khoản</strong>, đọc thông tin và đánh dấu xác nhận.</li><li>Chọn nút xóa và xác minh lại tài khoản Google nếu được yêu cầu.</li></ol>
+<p>Thao tác này xóa tài khoản đăng nhập, tiến trình trực tuyến, Xu, vật phẩm, trang bị hồ sơ, thống kê thời gian chơi và thứ hạng. Tiến trình cùng bản phục hồi của trò chơi trên thiết bị thực hiện yêu cầu cũng bị xóa. Đây là thao tác vĩnh viễn và không thể hoàn tác.</p>
+<p>Cần có kết nối mạng. Nếu yêu cầu bị gián đoạn, hãy mở lại trò chơi, vào Hồ sơ và chọn <strong>Tiếp tục yêu cầu xóa</strong>. Giữ tài khoản đăng nhập cho đến khi hoàn tất. Dữ liệu trên các thiết bị khác có thể vẫn còn; hãy xóa dữ liệu trò chơi trên từng thiết bị nếu bạn không còn sử dụng tài khoản đó.</p>
+<h3>Yêu cầu xóa khi không mở được trò chơi</h3>
+<p>Gửi email tới <a href="mailto:dangvt.studio@gmail.com?subject=Yeu%20cau%20xoa%20tai%20khoan%20Memory%20Match%20Adventure">dangvt.studio@gmail.com</a> với tiêu đề “Yêu cầu xóa tài khoản Memory Match Adventure”. Nêu tên hiển thị, địa chỉ email liên kết Google và mã tài khoản nếu bạn còn lưu. Với tài khoản khách, cung cấp mã tài khoản nếu có; nếu không xác định được tài khoản, chúng tôi sẽ trao đổi để tìm cách xác minh phù hợp. Không gửi mật khẩu.</p>
+<p>Chúng tôi có thể cần xác minh quyền sở hữu trước khi xóa và sẽ phản hồi qua email về việc xử lý. Không cần cài lại trò chơi để gửi yêu cầu. Nếu yêu cầu chưa được xử lý hoặc bạn cần trợ giúp, hãy trả lời cùng chuỗi email.</p>
+<h3>Dữ liệu sau khi xóa</h3>
+<p>Một bản ghi tối thiểu về mã tài khoản, thời điểm và trạng thái yêu cầu được giữ để ngăn phiên đăng nhập cũ tạo lại dữ liệu đã xóa và xử lý yêu cầu bị gián đoạn. Bản ghi này không chứa tiến trình, vật phẩm, tên hiển thị hoặc địa chỉ email. Thông tin trao đổi hỗ trợ và thông tin mà pháp luật yêu cầu lưu được xử lý theo mục đích tương ứng. Dịch vụ của bên thứ ba có chính sách lưu giữ riêng như nêu trong Chính sách quyền riêng tư.</p>
+<h3>Chỉ muốn chơi lại từ đầu?</h3>
+<p>Trong Cài đặt, chọn <strong>Xóa dữ liệu</strong> để xóa tiến trình, Xu, vật phẩm, thống kê và thứ hạng của cả ba trò chơi. Thao tác này giữ nguyên tài khoản đăng nhập và tên hiển thị; bạn không cần tạo tài khoản mới. Đọc xác nhận trước khi thực hiện vì dữ liệu đã xóa không thể khôi phục.</p>`;

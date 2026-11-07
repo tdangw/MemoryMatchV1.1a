@@ -1,3 +1,4 @@
+import { isAppActive } from './appVisibility.js';
 import { createIcon } from "./icons.js";
 import { createVictoryFlowerSceneMarkup } from "./victoryFlowerScene.js";
 import { createGameShellLifecycle, getActiveGameScope } from "./gameShell/gameShellLifecycle.js";
@@ -67,16 +68,16 @@ export function showVictoryCelebration({ level, completedChapter, onNext, onMenu
         { opacity: 1, transform: "scale(1) rotate(0deg)", offset: 1 },
       ], { duration: 5200, delay: index * 120, easing: "ease-in-out", fill: "backwards" });
       scope.animation(animation); animations.push(animation);
-      if (document.hidden) animation.pause();
+      if (!isAppActive()) animation.pause();
     }
   }
   scope.listen(reduced, "change", () => { if (reduced.matches) for (const animation of animations) animation.cancel(); });
-  scope.listen(document, "visibilitychange", () => {
+  scope.listen(document, "appvisibilitychange", () => {
     for (const animation of animations) {
       if (animation.playState === "finished" || animation.playState === "idle") continue;
-      if (document.hidden) animation.pause(); else animation.play();
+      if (!isAppActive()) animation.pause(); else animation.play();
     }
-    if (document.hidden) { pauseVictoryFlowerTheme(); sounds.congratulations.pause(); }
+    if (!isAppActive()) { pauseVictoryFlowerTheme(); sounds.congratulations.pause(); }
   });
   scope.listen(document, "keydown", event => {
     if (!overlay.contains(document.activeElement)) return;
@@ -88,7 +89,7 @@ export function showVictoryCelebration({ level, completedChapter, onNext, onMenu
     } else if (event.key === "Escape") actions.firstElementChild.click();
   });
   playVictoryFlowerTheme(settings);
-  if (settings?.sound && !document.hidden) {
+  if (settings?.sound && isAppActive()) {
     sounds.congratulations.currentTime = 0;
     sounds.congratulations.play().catch(error => { if (error.name !== "NotAllowedError" && error.name !== "AbortError") console.warn("Victory audio unavailable", error.name); });
   }

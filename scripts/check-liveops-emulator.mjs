@@ -52,7 +52,13 @@ try {
   const ticket={type:'spin',source:'ticket',day:state.day,operation:'last-ticket',sequence:1};
   const contenders=await Promise.allSettled([commit(ticket),commit({...ticket,operation:'last-ticket-other'},{database:second})]);
   assert.equal(contenders.filter(r=>r.status==='fulfilled').length,1,JSON.stringify(contenders.map(r=>r.reason?.message)));accept(contenders.find(r=>r.status==='fulfilled').value);assert.equal(state.tickets,0);
-  for(let ordinal=1;ordinal<=10;ordinal++)accept(await commit({type:'spin',source:'ad',day:state.day,operation:`ad-${ordinal}`,ordinal,earned:true}));
+  // Product policy accepts client-confirmed earned receipts on Spark, within quota.
+  const adCommand={type:'spin',source:'ad',day:state.day,operation:'earned-ad',ordinal:1,earned:true};
+  const beforeAdCoins=saved.profile.data.coins;
+  accept(await commit(adCommand));
+  assert.equal(saved.profile.data.coins,beforeAdCoins+25);
+  assert.equal(transitionSpark(state,adCommand,{uid,now,sector:7,ticketEarned:1}).receipts.length,0);
+  await assert.rejects(commit({...adCommand,operation:'duplicate-ordinal'}));
   assert.throws(()=>transitionSpark(state,{type:'spin',source:'ad',day:state.day,operation:'ad-11',ordinal:11,earned:true},{uid,now,ticketEarned:1}));
   const fact={gameId:'memory-match',mode:'superHard',roundId:'mission-round',day:state.day,matches:30,noHint:true};
   accept(await commit({type:'status'},{facts:[fact,{...fact,roundId:'mission-round2'},{...fact,roundId:'mission-round3'}]}));
@@ -93,7 +99,7 @@ try {
   await assertFails(setDoc(sparkRef(db,space,uid),{version:2}));
   const stored=(await getDocFromServer(sparkRef(db,space,uid))).data();
   await assertFails(updateDoc(sparkRef(db,space,uid),{tickets:999,updatedAt:serverTimestamp()}));
-  await assertFails(updateDoc(sparkRef(db,space,uid),{spins:{...stored.spins,ads:[]},updatedAt:serverTimestamp()}));
+  await assertFails(updateDoc(sparkRef(db,space,uid),{spins:{...stored.spins,ads:[{source:'ad',day:stored.day,sector:7,coins:25,ordinal:1,operation:'forged-direct'}]},updatedAt:serverTimestamp()}));
   await assertFails(updateDoc(doc(db,'gamespaces',space,'players',uid),{revision:revision+1,rewardRevision:0,updatedAt:serverTimestamp()}));
   // A stale restore cannot publish a wallet predating rewards.
   await assert.rejects(publishCloudSnapshot({database:db,environment:space,uid,encoded:await encodeCloudSnapshot(old.snapshot),expectedRevision:revision,playerName:'Người chơi',rewardRevision:0}));
@@ -121,5 +127,5 @@ try {
   const before=await readSparkState(db,space,uid);for(let i=0;i<10;i++)await readSparkState(db,space,uid);
   const after=await readSparkState(db,space,uid);assert.deepEqual(after,before);
   fs.writeFileSync('runtime/qa/rewards-spark-operation-counts.json',JSON.stringify({counted,measurements,meaning:'Explicit application SDK operations on bounded fixture; excludes rule-dependent billed reads, transport overhead, auth and other services'},null,2));
-  console.log(JSON.stringify({pass:true,scenarios:['same-UID login race','free spin crash recovery','last-ticket race','ad1-10/11 denied','private UID','malformed','wallet linkage','stale restore','read-only page'],operations:result.out,limit:'emulator; no live provider/phone verification'},null,2));
+  console.log(JSON.stringify({pass:true,scenarios:['same-UID login race','free spin crash recovery','last-ticket race','bounded client-confirmed ad reward and duplicate denial','private UID','malformed','wallet linkage','stale restore','read-only page'],operations:result.out,limit:'Spark accepts client confirmation; emulator, no live provider/phone verification'},null,2));
 } finally {await env.cleanup();}

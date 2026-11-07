@@ -1,3 +1,4 @@
+import { isAppActive } from '../appVisibility.js';
 import { createGameShellLifecycle } from './gameShellLifecycle.js';
 import { prefersReducedMotion } from '../motion.js';
 
@@ -15,7 +16,7 @@ export function cancelBoardShuffle(board) { presentations.get(board)?.cancel(); 
 export function presentBoardShuffle({ board, before, elements, owner, duration = BOARD_SHUFFLE_TIMING.duration }) {
   cancelBoardShuffle(board);
   const nodes = [...elements];
-  if (!owner.active || prefersReducedMotion() || document.hidden || !nodes.length
+  if (!owner.active || prefersReducedMotion() || !isAppActive() || !nodes.length
     || nodes.length > BOARD_SHUFFLE_TIMING.maxCards || typeof board.animate !== 'function') {
     return { duration: 0, finished: Promise.resolve(), cancel() {} };
   }
@@ -48,7 +49,7 @@ export function presentBoardShuffle({ board, before, elements, owner, duration =
   });
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   scope.listen(motion, 'change', () => { if (motion.matches) scope.dispose(); });
-  scope.listen(document, 'visibilitychange', () => { if (document.hidden) scope.dispose(); });
+  scope.listen(document, 'appvisibilitychange', () => { if (!isAppActive()) scope.dispose(); });
   scope.listen(window, 'resize', () => scope.dispose());
   try {
     const animations = cards.map(({ element, next, previous = next, opacity }, index) => {

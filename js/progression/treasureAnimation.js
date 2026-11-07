@@ -1,3 +1,4 @@
+import { isAppActive } from '../appVisibility.js';
 import { playOwnedRewardCue } from '../sound.js';
 import { gameState } from '../gameState.js';
 import { createGameShellLifecycle } from '../gameShell/gameShellLifecycle.js';
@@ -9,7 +10,7 @@ export async function presentTreasureOpening(content, owner, isCurrent = () => t
   const rewards = content.querySelector('.treasure-rewards');
   const playCue = name => { if (isCurrent()) playOwnedRewardCue(name, owner, gameState.settings); };
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  if (document.hidden) { art.classList.add('is-open'); return true; }
+  if (!isAppActive()) { art.classList.add('is-open'); return true; }
   if (reduced.matches) {
     art.classList.add('is-open');
     playCue('openBox');
@@ -33,7 +34,7 @@ export async function presentTreasureOpening(content, owner, isCurrent = () => t
   animations.forEach(animation => scope.animation(animation));
   const finish = () => { for (const animation of animations) if (animation.playState !== 'idle') animation.finish(); };
   scope.listen(reduced,'change',event => { if(event.matches) finish(); });
-  scope.listen(document,'visibilitychange',() => { if(document.hidden) finish(); });
+  scope.listen(document,'appvisibilitychange',() => { if(!isAppActive()) finish(); });
   let rewardPresented = false;
   const reward = () => {
     if (rewardPresented) return;

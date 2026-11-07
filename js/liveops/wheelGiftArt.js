@@ -1,3 +1,4 @@
+import { isAppActive } from '../appVisibility.js';
 import { createGameShellLifecycle } from '../gameShell/gameShellLifecycle.js';
 import { createIcon } from '../icons.js';
 import { uiSkinAssetUrl } from '../uiSkinRegistry.js';
@@ -34,14 +35,14 @@ export async function presentWheelGift(box,{owner,host,title=WHEEL_BOX_LABELS[bo
   const rect=card.getBoundingClientRect(),origin={x:rect.left+rect.width/2,y:rect.top+rect.height/2};
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
   try{
-    if(!reduced.matches&&!document.hidden){
+    if(!reduced.matches&&isAppActive()){
       const animations=[scope.animation(art.animate([{transform:'scale(.7)',opacity:0},{transform:'scale(1.08)',opacity:1,offset:.5},{transform:'scale(1)',opacity:1}],{duration:460})),
         scope.animation(art.querySelector('.wheel-gift__image--closed').animate([{opacity:1},{opacity:0}],{duration:220,delay:300,fill:'forwards'})),
         scope.animation(art.querySelector('.wheel-gift__image--open').animate([{opacity:0,transform:'scale(.9)'},{opacity:1,transform:'scale(1)'}],{duration:260,delay:300,fill:'both'}))];
       const finish=()=>{for(const animation of animations)if(animation.playState!=='idle')animation.finish();};
-      scope.listen(reduced,'change',event=>{if(event.matches)finish();});scope.listen(document,'visibilitychange',()=>{if(document.hidden)finish();});
+      scope.listen(reduced,'change',event=>{if(event.matches)finish();});scope.listen(document,'appvisibilitychange',()=>{if(!isAppActive())finish();});
       await Promise.all(animations.map(animation=>animation.finished));
-    }else if(!document.hidden){
+    }else if(isAppActive()){
       art.dataset.open='true';await new Promise(resolve=>{const cancel=scope.own(resolve);scope.timeout(()=>{cancel.forget();resolve();},350);});
     }
     return owner.active?origin:null;

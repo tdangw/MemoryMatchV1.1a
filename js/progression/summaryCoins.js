@@ -1,3 +1,4 @@
+import { isAppActive } from '../appVisibility.js';
 import { playCoinRewardFlight, stopCoinCounterAnimation } from '../coinRewards.js';
 import { createGameShellLifecycle } from '../gameShell/gameShellLifecycle.js';
 import { playOwnedRewardCue } from '../sound.js';
@@ -18,11 +19,11 @@ export function scheduleSummaryCoins({ owner, source, amount, reward, getSetting
   const release = owner.own(() => scope.dispose(), 'cleanup');
   scope.own(() => { release.forget(); reward?.finish(); });
   const finish = () => scope.dispose();
-  scope.listen(document, 'visibilitychange', () => { if (document.hidden) finish(); });
+  scope.listen(document, 'appvisibilitychange', () => { if (!isAppActive()) finish(); });
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   scope.listen(motion, 'change', () => { if (motion.matches) finish(); });
   scope.timeout(() => {
-    if (identity !== JSON.stringify(getRankingOwner()) || document.hidden || !source.isConnected) { finish(); return; }
+    if (identity !== JSON.stringify(getRankingOwner()) || !isAppActive() || !source.isConnected) { finish(); return; }
     if (amount < 1) { finish(); return; }
     if (reward?.finished) { finish(); return; }
     playOwnedRewardCue('summary', scope, getSettings());

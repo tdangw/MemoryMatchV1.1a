@@ -25,31 +25,36 @@
     "test:ui:smoke": "playwright test tests/ui/catalog-preferences.spec.js tests/ui/theme-selection.spec.js tests/ui/triple-connect.progression.spec.js --project=desktop",
     "test:ui:release": "playwright test",
     "test:ui:debug": "playwright test tests/ui/game-shell.geometry.spec.js --headed --project=desktop",
-    "check": "npm run assets:sync && node scripts/check-js.mjs && node scripts/check-css-ownership.mjs && node scripts/check-effect-v2.mjs && node scripts/check-game-core.mjs && node scripts/check-game-registry.mjs && node scripts/check-theme-selection.mjs && node scripts/check-triple-connect-rules.mjs && node scripts/check-triple-connect-board.mjs && node scripts/check-hint-inventory.mjs && node scripts/check-session-timing.mjs && node scripts/check-persistence.mjs && node scripts/check-adventure-progress.mjs && node scripts/check-adventure-map-layout.mjs && node scripts/check-adventure-preview.mjs && node scripts/check-chapter-store.mjs && node scripts/check-migration-recovery.mjs && node scripts/check-adventure-rewards.mjs && node scripts/check-play-metrics.mjs && node scripts/check-ranking-rules.mjs && node scripts/check-ranking-checkpoints.mjs && node scripts/check-progress-ranking.mjs && node scripts/check-pair-rewards.mjs && node scripts/check-level-progression.mjs && node scripts/check-leaderboard.mjs && node scripts/check-leaderboard-presentation.mjs && node scripts/check-profile-stats.mjs && node scripts/check-analytics.mjs && node scripts/check-recent-game.mjs && node scripts/check-cloud-save-events.mjs && node scripts/check-cloud-snapshot.mjs && node scripts/check-pwa.mjs && node scripts/check-memory-special.mjs && node scripts/check-link-connect-core.mjs && node scripts/check-link-connect-board.mjs && node scripts/check-appearance-themes.mjs && node scripts/check-game-shell-config.mjs && node scripts/check-game-shell-layout.mjs && node scripts/check-game-shell-lifecycle.mjs && node scripts/check-game-shell-contract.mjs && node scripts/generate-game-shell-tokens.mjs --check && npm run check:technical && npm run test:ads",
+    "check": "npm run assets:sync && node scripts/check-js.mjs && node scripts/check-css-ownership.mjs && node scripts/check-effect-v2.mjs && node scripts/check-game-core.mjs && node scripts/check-game-registry.mjs && node scripts/check-theme-selection.mjs && node scripts/check-triple-connect-rules.mjs && node scripts/check-triple-connect-board.mjs && node scripts/check-hint-inventory.mjs && node scripts/check-session-timing.mjs && node scripts/check-persistence.mjs && node scripts/check-adventure-progress.mjs && node scripts/check-adventure-map-layout.mjs && node scripts/check-adventure-preview.mjs && node scripts/check-chapter-store.mjs && node scripts/check-migration-recovery.mjs && node scripts/check-adventure-rewards.mjs && node scripts/check-play-metrics.mjs && node scripts/check-ranking-rules.mjs && node scripts/check-ranking-checkpoints.mjs && node scripts/check-progress-ranking.mjs && node scripts/check-pair-rewards.mjs && node scripts/check-level-progression.mjs && node scripts/check-leaderboard.mjs && node scripts/check-leaderboard-presentation.mjs && node scripts/check-profile-stats.mjs && node scripts/check-analytics.mjs && node scripts/check-recent-game.mjs && node scripts/check-cloud-save-events.mjs && node scripts/check-cloud-snapshot.mjs && node scripts/check-pwa.mjs && node scripts/check-memory-special.mjs && node scripts/check-link-connect-core.mjs && node scripts/check-link-connect-board.mjs && node scripts/check-appearance-themes.mjs && node scripts/check-game-shell-config.mjs && node scripts/check-game-shell-layout.mjs && node scripts/check-game-shell-lifecycle.mjs && node scripts/check-game-shell-contract.mjs && node scripts/generate-game-shell-tokens.mjs --check && npm run check:technical && npm run test:ads && npm run test:accounts",
     "prebuild:android": "npm run assets:sync",
     "build:android": "vite build --mode android --base=/ && node scripts/prepare-android-dist.mjs",
     "android:sync": "npm run build:android && cap sync android",
     "android:apk": "npm run android:sync && cd android && gradlew.bat assembleDebug",
     "android:apk:release": "npm run android:sync && cd android && gradlew.bat assembleRelease",
+    "android:aab": "npm run android:sync && cd android && gradlew.bat bundleRelease",
     "check:technical": "node scripts/check-technical-boundaries.mjs && node scripts/check-memory-decisions.mjs && node scripts/check-link-thunder-eligibility.mjs && node scripts/check-technical-pathfinder.mjs",
-    "test:ads": "node --test tests/unit/ads.test.js"
+    "test:ads": "node --test tests/unit/ads.test.js",
+    "test:accounts": "node scripts/check-account-local-erasure.mjs"
   },
   "dependencies": {
     "@capacitor-community/admob": "8.2.1",
-    "@capacitor/android": "^8.0.0",
+    "@capacitor/android": "8.5.1",
     "@capacitor/app": "8.1.2",
-    "@capacitor/core": "^8.0.0",
+    "@capacitor/core": "8.5.1",
     "canvas-confetti": "^1.9.4",
     "firebase": "^12.19.0"
   },
   "devDependencies": {
-    "@capacitor/cli": "^8.0.0",
+    "@capacitor/cli": "8.5.1",
     "@firebase/rules-unit-testing": "^5.0.2",
     "@playwright/test": "^1.63.0",
     "fake-indexeddb": "^6.2.5",
     "firebase-tools": "^15.28.1",
     "gh-pages": "^6.3.0",
     "vite": "^6.4.3"
+  },
+  "overrides": {
+    "@firebase/firestore": { "@grpc/grpc-js": "^1.14.5" }
   },
   "allowScripts": {
     "esbuild@0.25.12": true

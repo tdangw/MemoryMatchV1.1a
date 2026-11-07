@@ -1,4 +1,6 @@
 import { getRecentGameId } from "./recentGame.js";
+import { initializeAppVisibility } from './appVisibility.js';
+import { initializeAndroidNavigation } from './appExit.js';
 import { initializeAccountService, getAccountService } from './accountService.js';
 import { restoreUiSkin } from './uiSkin.js';
 import '../styles/ui-skin-woodland.css';
@@ -114,6 +116,7 @@ function showMenuHelp(gameId) {
 }
 
 export async function initializeApplication(onProgress = () => {}) {
+await initializeAppVisibility();
 let accountRuntime = null;
 let accountReady = null;
 await loadPersistentGameData();
@@ -285,6 +288,7 @@ document.addEventListener(
 onProgress('interface');
 const profileStats = await initializeProfileStatsService();
 showGameSelector();
+void initializeAndroidNavigation();
 void initializeMenuAds();
 if (import.meta.env.VITE_FIREBASE_DISABLED !== '1') {
   accountReady = import('./accountPanel.js').then(panels => {

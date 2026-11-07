@@ -1,3 +1,4 @@
+import { isAppActive } from '../appVisibility.js';
 import { createPractice } from './practiceAdapters.js';
 import { markTutorialFlag } from './tutorialProgress.js';
 import { getThemeCards, getThemeSelectionAssets } from '../themeCatalog.js';
@@ -22,7 +23,7 @@ export function openPractice(gameId, { owner, firstPlay = false } = {}) {
   const result = new Promise(resolve => { settle = resolve; });
   const content = document.createElement('div');
   content.className = 'practice';
-  const modal = openAppModal({ id: 'practice-modal', title: `Tập luyện ${definition.title}`, icon: 'book', content, owner, size: 'large', keepBanner: false, onDestroy: () => { scope.dispose(); settle('cancelled'); } });
+  const modal = openAppModal({ id: 'practice-modal', title: `Tập luyện ${definition.title}`, icon: 'book', content, owner, size: 'large', keepBanner: true, onDestroy: () => { scope.dispose(); settle('cancelled'); } });
   const current = () => scope.active && gameState.settings === identity && canLaunchGame();
   const heading = document.createElement('h3');
   heading.className = 'practice__instruction';
@@ -58,18 +59,18 @@ export function openPractice(gameId, { owner, firstPlay = false } = {}) {
   retrySave.hidden = true;
   actions.append(next, retryArt, retrySave, replay, skip);
   content.append(heading, board, tray, feedback, actions, note);
-  scope.listen(document, 'visibilitychange', () => { content.inert = document.hidden; });
+  scope.listen(document, 'appvisibilitychange', () => { content.inert = !isAppActive(); });
   scope.listen(content, 'error', event => { if (event.target instanceof HTMLImageElement) {
     board.inert = true;
     next.disabled = true;
     feedback.textContent = 'Chưa tải được hình. Hãy thử lại.';
     retryArt.hidden = false;
   } }, true);
-  scope.listen(board, 'click', event => { const target = event.target.closest('[data-practice-tile]'); if (!target || !current() || document.hidden)
+  scope.listen(board, 'click', event => { const target = event.target.closest('[data-practice-tile]'); if (!target || !current() || !isAppActive())
     return; adapter.select(target.dataset.practiceTile); draw(target.dataset.practiceTile); });
   function button(label, action) { const node = document.createElement('button'); node.type = 'button'; node.className = 'app-button'; node.textContent = label; scope.listen(node, 'click', () => {
     if (!current()) { modal.destroy(); return; }
-    if (!document.hidden) action();
+    if (isAppActive()) action();
   }); return node; }
   function picture(type) { const image = document.createElement('img'); image.src = art[type].src; image.alt = {A:'Chùm quả tím', B:'Quả đỏ có hạt', C:'Quả xanh'}[type]; image.draggable = false; return image; }
   function draw(focusId) {

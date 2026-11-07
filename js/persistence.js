@@ -1,4 +1,5 @@
 import { GAMEPLAY_LIMITS } from './gameplayTuning.js';
+import { isLocalAccountDataLocked, loadLocalAccountOperation, saveLocalAccountOperation } from './accountOperationJournal.js';
 import { TRIPLE_PRODUCT_DECISIONS } from './tripleConnect/tripleConfig.js';
 import { liveopsEnabled } from './liveops/availability.js';
 import { festivalChestsEnabled } from './liveops/availability.js';
@@ -54,12 +55,12 @@ export function subscribeToLocalCommit(listener) {
 export async function updateSyncMetadata(key, update, isCurrent = () => true) {
   await initialize();
   if (!database || blocked) throw new Error('Không thể lưu hàng đợi trên thiết bị.');
-  return updateChapterMetadata(database, `cloud:${key}`, update, isCurrent);
+  return updateChapterMetadata(database, `cloud:${key}`, update, () => !isLocalAccountDataLocked() && isCurrent());
 }
 export async function updateSyncMetadataPair(keys, update, isCurrent = () => true) {
   await initialize();
   if (!database || blocked) throw new Error('Không thể lưu trên thiết bị.');
-  return updateChapterMetadataPair(database, keys.map(key => `cloud:${key}`), update, isCurrent);
+  return updateChapterMetadataPair(database, keys.map(key => `cloud:${key}`), update, () => !isLocalAccountDataLocked() && isCurrent());
 }
 function notifyCommit(patch) {
   for (const listener of commitSubscribers) {
@@ -140,7 +141,7 @@ export function savePersistentGameData({ coins, appearance, progress, settings, 
   });
   return enqueue(async () => {
     await initialize();
-    if (blocked || !isCurrent() || rewardEpochAtInvocation !== rewardWriteEpoch) return false;
+    if (isLocalAccountDataLocked() || blocked || !isCurrent() || rewardEpochAtInvocation !== rewardWriteEpoch) return false;
     try {
       const previous = database ? currentEnvelope : readLocalEnvelope();
       if (!database && localStorage.getItem(PRIMARY_MARKER_KEY)) throw new Error("Backend chính đã được sử dụng. Không ghi vào bản localStorage cũ.");
@@ -207,7 +208,7 @@ export const flushPersistentWrites = () => queue;
 export function commitSparkOperation(operation, isCurrent = () => true) {
   return enqueue(async () => {
     await initialize();
-    if (blocked || !database || !isCurrent()) throw new Error('Chưa thể lưu phần thưởng.');
+    if (isLocalAccountDataLocked() || blocked || !database || !isCurrent()) throw new Error('Chưa thể lưu phần thưởng.');
     const snapshot = await exportChapterSnapshot(database);
     if (snapshot.profile.revision !== knownRevision) throw new Error('Bản lưu thay đổi ở tab khác. Hãy tải lại.');
     const result = await operation(structuredClone(snapshot));
@@ -229,7 +230,7 @@ export function commitLiveopsReceipts(uid, receipts, { isCurrent = () => true, a
   const batch = structuredClone(receipts);
   return enqueue(async () => {
     await initialize();
-    if (blocked || !isCurrent()) return false;
+    if (isLocalAccountDataLocked() || blocked || !isCurrent()) return false;
     try {
       const previous = database ? currentEnvelope : readLocalEnvelope();
       if (blocked || !previous) return false;
@@ -273,7 +274,10 @@ export function commitLiveopsReceipts(uid, receipts, { isCurrent = () => true, a
 /** The catalog only covers chapter 1; three bounded reads backfill old certified wins. */
 export function backfillAchievementInventory() {
   return enqueue(async () => {
-    await initialize(); if (blocked) return false;
+    await initialize();
+    // Pending erasure must reach account recovery without migrating the old save.
+    if (isLocalAccountDataLocked()) return true;
+    if (blocked) return false;
     try {
       const previous = database ? currentEnvelope : readLocalEnvelope();
       if (normalizeAchievementLedger(previous?.data.appearance?.achievements).coverageRevision >= ACHIEVEMENT_COVERAGE_REVISION) return true;
@@ -292,7 +296,7 @@ export function backfillAchievementInventory() {
 export function migrateLevelRankingsBatch(owner, isCurrent = () => true) {
   return enqueue(async () => {
     await initialize();
-    if (!database || blocked) throw new Error('Level migration requires the chapter database.');
+    if (isLocalAccountDataLocked() || !database || blocked) throw new Error('Level migration requires the chapter database.');
     const result = await migrateChapterLevelRankings(database, owner, knownRevision, isCurrent);
     currentEnvelope = result.envelope; knownRevision = result.envelope.revision;
     return { complete: result.complete, progress: structuredClone(result.envelope.data.progress) };
@@ -306,6 +310,7 @@ export function saveSetting(key, value) {
 export function clearPersistentGameData() {
   return enqueue(async () => {
     await initialize();
+    if (isLocalAccountDataLocked()) return false;
     try {
       const data = createDefaultPayload();
       if (currentEnvelope?.data.progress.gameplaySeason === GAMEPLAY_SEASON) data.progress.gameplaySeason = GAMEPLAY_SEASON;
@@ -320,6 +325,28 @@ export function clearPersistentGameData() {
       notifyCommit({ reset: true });
       return true;
     } catch (error) { reportPersistenceError("remove", error); return false; }
+  });
+}
+
+/** Erasure also removes backups, owner and pending cloud work. No upload event. */
+export function clearAccountGameData() {
+  const operation = loadLocalAccountOperation();
+  if (!operation) throw new Error('Thiếu yêu cầu xóa đã xác nhận.');
+  saveLocalAccountOperation({ ...operation, phase: 'local-erasing' });
+  return enqueue(async () => {
+    await initialize();
+    if (blocked) throw new Error('Không thể truy cập dữ liệu trên thiết bị.');
+    const data = createDefaultPayload();
+    data.progress.gameplaySeason = GAMEPLAY_SEASON;
+    const envelope = createEnvelope(data, knownRevision + 1);
+    if (database) await resetChapterProfile(database, envelope, knownRevision, { clearAuxiliary: true });
+    else localStorage.setItem(SEASON_STORAGE_KEY, JSON.stringify(envelope));
+    for (const key of [ROOT_STORAGE_KEY, 'memoryMatchSaveV1Recovery']) localStorage.removeItem(key);
+    if (database) localStorage.removeItem(SEASON_STORAGE_KEY);
+    else activeStorageKey = SEASON_STORAGE_KEY;
+    currentEnvelope = envelope; knownRevision = envelope.revision;
+    resetRewardWriteTracking();
+    return true;
   });
 }
 
@@ -369,7 +396,15 @@ export async function loadProfileOwner() {
 export function saveSyncMetadata(environment, metadata, isCurrent = () => true) {
   return enqueue(async () => {
     await initialize();
-    if (blocked || !database || !isCurrent()) return false;
+    if (isLocalAccountDataLocked() || blocked || !database || !isCurrent()) return false;
+    await writeChapterMetadata(database, `cloud:${environment}`, metadata);
+    return true;
+  });
+}
+export function saveAccountResetMetadata(environment, metadata) {
+  return enqueue(async () => {
+    await initialize();
+    if (!isLocalAccountDataLocked() || blocked || !database) throw new Error('Chưa thể hoàn tất dữ liệu mới.');
     await writeChapterMetadata(database, `cloud:${environment}`, metadata);
     return true;
   });
@@ -379,7 +414,7 @@ export function importPersistentSnapshot(snapshot, environment, metadata, isCurr
     await initialize();
     if (currentEnvelope?.data.progress.gameplaySeason === GAMEPLAY_SEASON && snapshot?.profile?.data.progress.gameplaySeason !== GAMEPLAY_SEASON)
       throw new Error('Bản lưu không cùng phiên bản. Dữ liệu hiện tại được giữ nguyên.');
-    if (blocked || !database || !isCurrent()) return false;
+    if (isLocalAccountDataLocked() || blocked || !database || !isCurrent()) return false;
     const restored = structuredClone(snapshot.profile.data), certified = {};
     for (const key of Object.values(ACHIEVEMENT_GAME_KEYS)) certified[key] = snapshot.chapters.find(entry => entry.key === `${key}:1`)?.value || restored.progress[key] || {};
     restored.appearance = settleAchievementInventory(restored.appearance, restored.appearance, certified, { backfill: true });

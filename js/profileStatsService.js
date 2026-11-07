@@ -1,3 +1,4 @@
+import { isAppActive } from './appVisibility.js';
 import { loadProfileOwner, loadSyncMetadata, updateSyncMetadata, updateSyncMetadataPair } from './persistence.js';
 import { setRankingOwner } from './rankingOwner.js';
 import { subscribeToPlaySegments, getActivePlayMetrics } from './playMetrics.js';
@@ -122,7 +123,7 @@ export async function initializeProfileStatsService() {
     void drain().then(schedule);
   }), 'listener');
   scope.listen(window, 'online', () => { void service.syncNow(); });
-  scope.listen(document, 'visibilitychange', () => { if (!document.hidden) void service.syncNow(); });
+  scope.listen(document, 'appvisibilitychange', () => { if (isAppActive()) void service.syncNow(); });
   scope.listen(window, 'pagehide', () => { getActivePlayMetrics()?.clock.checkpoint(); void drain(); });
   return service;
 }

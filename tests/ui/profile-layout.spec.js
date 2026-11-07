@@ -17,6 +17,20 @@ for (const viewport of [{ width: 320, height: 740 }, { width: 412, height: 915 }
   await expect(page.locator('.profile-name-form')).toBeHidden();
   await expect(page.locator('#account-modal .app-modal__footer')).toHaveCount(0);
   await expect(page.locator('.account-status')).toBeEmpty();
+  await expect(page.locator('.profile-logout')).toBeHidden();
+  await page.evaluate(() => { window.profileState.isAnonymous = false; window.profileSubscriber(window.profileState); });
+  const actionBoxes = await page.locator('.profile-account-actions > button:visible').evaluateAll(nodes => nodes.map(node => {
+    const box = node.getBoundingClientRect(); return { x: box.x, y: box.y, width: box.width, height: box.height };
+  }));
+  expect(actionBoxes).toHaveLength(3);
+  for (let i = 0; i < actionBoxes.length; i++) {
+    expect(actionBoxes[i].height).toBeGreaterThanOrEqual(48);
+    expect(Math.abs(actionBoxes[i].x - actionBoxes[0].x)).toBeLessThan(1);
+    expect(Math.abs(actionBoxes[i].width - actionBoxes[0].width)).toBeLessThan(1);
+    if (i) expect(actionBoxes[i].y).toBeGreaterThanOrEqual(actionBoxes[i - 1].y + actionBoxes[i - 1].height + 9);
+  }
+  if (viewport.width === 412) await page.screenshot({ path: 'runtime/fullscreen-ads-profile-412.png' });
+  await page.evaluate(() => { window.profileState.isAnonymous = true; window.profileSubscriber(window.profileState); });
   const title = await page.locator('.profile-player-name').boundingBox();
   const pencil = await page.getByRole('button', { name: 'Sửa tên' }).boundingBox();
   expect(pencil.x - title.x - title.width).toBeLessThanOrEqual(8);

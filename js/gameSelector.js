@@ -1,4 +1,5 @@
 import { createIcon } from "./icons.js";
+import { mountHomeExit } from './appExit.js';
 import { unmountActiveGameShell } from "./gameShell/gameShell.js";
 import { createMainMenu } from "./mainmenu.js";
 
@@ -66,6 +67,7 @@ export function showGameSelector() {
   overlay.append(wrapper);
   document.body.append(overlay);
   const scope = decorateAdventureMenu(overlay, { gameId: activeGameId, onHome: showGameSelector });
+  mountHomeExit(overlay, scope);
   for (const game of games) choices.append(createGameChoice({
     ...game,
     priority: game.id === games[0].id,

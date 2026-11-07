@@ -1,3 +1,4 @@
+import { isAppActive } from '../appVisibility.js';
 import { COIN_PARTICLE_LIMIT, COIN_SCATTER_ANGLE } from '../gameplayTuning.js';
 import { playRewardPhase } from '../rewardAudio.js';
 import { LOOT_PRESETS, LOOT_HOLD_MS } from '../lootEffects.js';
@@ -31,7 +32,7 @@ function describe(reward) {
 async function revealGift(art,result,prize,owner,audioOwner=owner) {
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
   const cue=name=>playOwnedRewardCue(name,owner,gameState.settings);
-  if(reduced.matches || document.hidden || typeof art.animate!=='function'){art.classList.add('is-open');playRewardPhase('receive',audioOwner);return;}
+  if(reduced.matches || !isAppActive() || typeof art.animate!=='function'){art.classList.add('is-open');playRewardPhase('receive',audioOwner);return;}
   const scope=createGameShellLifecycle(),release=owner.own(()=>scope.dispose());scope.own(()=>release.forget());
   // Read both anchors before mounting the bounded particle batch.
   const from=art.getBoundingClientRect(),target=document.querySelector(prize.target),to=target?.getBoundingClientRect()||result.getBoundingClientRect();
@@ -58,7 +59,7 @@ async function revealGift(art,result,prize,owner,audioOwner=owner) {
       {duration,delay:revealDelayMs+i*24,fill:'both',easing:'ease-in-out'});
   }
   const finish=()=>{for(const a of animations)if(a.playState!=='idle')a.finish();};
-  scope.listen(reduced,'change',event=>{if(event.matches)finish();});scope.listen(document,'visibilitychange',()=>{if(document.hidden)finish();});
+  scope.listen(reduced,'change',event=>{if(event.matches)finish();});scope.listen(document,'appvisibilitychange',()=>{if(!isAppActive())finish();});
   cue('openBox');scope.timeout(()=>{playRewardPhase('receive',audioOwner);playRewardPhase('drop',audioOwner);},730);
   try {await Promise.all(animations.map(a=>a.finished));if(owner.active){art.classList.add('is-open');playRewardPhase('collect',audioOwner);}}
   catch(error){if(error.name!=='AbortError')console.warn('Gift presentation interrupted',error);}

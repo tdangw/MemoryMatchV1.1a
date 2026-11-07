@@ -1,3 +1,4 @@
+import { isAppActive } from './appVisibility.js';
 import { rememberRecentGame } from './recentGame.js';
 import { memoryBoard } from './memoryMatch/memoryBoard.js';
 import { canLaunchGame } from "./profileOperations.js";
@@ -79,6 +80,7 @@ import { pausePlayMetrics, snapshotPlayMetrics } from './playMetrics.js';
 
 let countdownInterval;
 let isAutoPaused = false;
+let backgroundCountdownRound = null;
 let shouldResumeMusic = false;
 let sessionCheckpointTicks = 0;
 let activeAssetPaths = [];
@@ -296,6 +298,11 @@ async function advanceMemoryWave() {
 
 function startCountdown(roundId = gameState.roundId) {
   if (gameState.roundId !== roundId) return;
+  if (!isAppActive()) {
+    backgroundCountdownRound = roundId; isAutoPaused = true; gameState.isPaused = true;
+    getMemoryShell().update({ paused: true });
+    return;
+  }
   stopCountdown();
   if (!isEndlessMode(gameState.settings.mode) && gameState.remainingTime <= 0) { handleTimeUp(); return; }
   resumePlayMetrics("startup");
@@ -340,6 +347,9 @@ async function pauseForBackground() {
 
   if (!isGameVisible() || gameState.isPaused) return;
   isAutoPaused = true;
+  backgroundCountdownRound = countdownInterval === undefined ? null : gameState.roundId;
+  clearInterval(countdownInterval); countdownInterval = undefined;
+  stopMemoryTimeProgress();
   gameState.isPaused = true;
   getMemoryShell().update({ paused: true });
   document.body.classList.add("game-is-paused");
@@ -353,6 +363,8 @@ function resumeFromBackground() {
     getMemoryShell().update({ paused: false });
     document.body.classList.remove("game-is-paused");
     syncMemoryTimeProgress({ remainingSeconds: gameState.remainingTime, timeLimit: gameState.timeLimit });
+    if (backgroundCountdownRound === gameState.roundId) startCountdown(gameState.roundId);
+    backgroundCountdownRound = null;
   }
   if (shouldResumeMusic) syncDefaultMusic(gameState.settings);
   shouldResumeMusic = false;
@@ -593,8 +605,8 @@ function revealHintPair(tiles, roundId) {
 
 configureLogic({ onNext: nextLevel, onMenu: returnToMainMenu, onWave: advanceMemoryWave });
 
-document.addEventListener("visibilitychange", async () => {
-  if (document.hidden) (await pauseForBackground());
+document.addEventListener("appvisibilitychange", async () => {
+  if (!isAppActive()) (await pauseForBackground());
   else resumeFromBackground();
 });
 

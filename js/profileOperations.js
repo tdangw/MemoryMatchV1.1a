@@ -1,5 +1,6 @@
+import { loadLocalAccountOperation } from './accountOperationJournal.js';
 let replacement = null;
-export function canLaunchGame() { return replacement === null; }
+export function canLaunchGame() { return replacement === null && !loadLocalAccountOperation(); }
 export async function waitForProfileReplacement() { if (replacement) await replacement.done; }
 /** One profile replacement includes durable import and RAM hydration; gameplay cannot mount halfway through it. */
 export async function replaceProfileSafely(operation) {

@@ -1,3 +1,5 @@
+import { isAppActive } from './appVisibility.js';
+import { prepareLevelTransitionAd, presentLevelTransitionAd } from './ads/menuAds.js';
 import { connectDialogPlacement } from './dialogPlacement.js';
 import { formatWaveLevel } from './progression/waveHud.js';
 import { gameRecordLabel } from './gameRecord.js';
@@ -15,7 +17,7 @@ import { suspendAmbientBackground } from './backgroundEffects.js';
 import { presentAchievementAnnouncements } from './progression/achievementAnnouncements.js';
 import { createIcon } from "./icons.js";
 import { launchSummaryConfetti, showSummaryFireworks } from "victory-presentation";
-import { clearPersistentGameData } from "./persistence.js";
+import { showAccountErasureDialog } from './accountErasureDialog.js';
 import { getTheme } from "./themeCatalog.js";
 import { getEquippedThemeId } from "./appearance.js";
 import { GAME_CONFIG, getStarScoreTargets, getTimerDirection, isEndlessMode, getMemoryMilestoneRewards } from "./config.js";
@@ -412,9 +414,9 @@ export function showLevelSummaryOverlay(completion) {
   }).then(result => {
     if (result === false || !scope.active) return;
     const open = () => { if (scope.active) openLevelSummaryOverlay(completion, scope, owner, generation); };
-    if (!document.hidden) open();
+    if (isAppActive()) open();
     else {
-      const releaseVisibility = scope.listen(document, 'visibilitychange', () => { if (!document.hidden) { releaseVisibility(); open(); } });
+      const releaseVisibility = scope.listen(document, 'appvisibilitychange', () => { if (isAppActive()) { releaseVisibility(); open(); } });
     }
   }, error => { scope.dispose(); console.error('Victory fireworks failed', error); });
 }
@@ -436,7 +438,8 @@ function openLevelSummaryOverlay({
   onMenu,
   isVictoryCelebration = false,
 }, scope, continuationOwner, generation) {
-  function afterClose(callback) {
+  prepareLevelTransitionAd(() => scope.active && generation === summaryGeneration);
+  function afterClose(callback, transitionAd = false) {
     pendingSummaryAction?.dispose();
     const actionScope = createGameShellLifecycle(); pendingSummaryAction = actionScope;
     const release = continuationOwner?.own(() => actionScope.dispose(), 'cleanup');
@@ -451,6 +454,8 @@ function openLevelSummaryOverlay({
       };
       try {
         if (!await presentAchievementAnnouncements({ owner: actionScope, gameId, level }) || !current()) return;
+        if (transitionAd) await presentLevelTransitionAd(current);
+        if (!current()) return;
         const work = callback();
         navigationPage = getAppPageScope();
         await Promise.resolve(work).catch(failed);
@@ -547,7 +552,7 @@ function openLevelSummaryOverlay({
           afterClose(() => {
             gameState.isPaused = false;
             return onNext?.();
-          });
+          }, true);
         },
       },
     ],
@@ -582,14 +587,14 @@ function animateSummaryNumber(element, target, {
     element.textContent = `${prefix}${Number(value).toLocaleString("en-US")}${suffix}`;
   };
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
-  if (!total || reduced.matches || document.hidden) { render(total); return; }
+  if (!total || reduced.matches || !isAppActive()) { render(total); return; }
   const animationScope = createGameShellLifecycle();
   const releaseOwner = scope.own(() => animationScope.dispose(), 'cleanup');
   let frame;
   animationScope.own(() => { globalThis.cancelAnimationFrame(frame); releaseOwner.forget(); }, 'frame');
   function finish() { if (scope.active && element.isConnected) render(total); animationScope.dispose(); }
   animationScope.listen(reduced, 'change', () => { if (reduced.matches) finish(); });
-  animationScope.listen(document, 'visibilitychange', () => { if (document.hidden) finish(); });
+  animationScope.listen(document, 'appvisibilitychange', () => { if (!isAppActive()) finish(); });
   animationScope.timeout(() => {
     if (!element.isConnected) { animationScope.dispose(); return; }
     const startedAt = performance.now();
@@ -606,33 +611,7 @@ function animateSummaryNumber(element, target, {
 
 export function showResetConfirmationOverlay({ onClose = () => {} } = {}) {
   gameState.isPaused = true;
-
-  if (gameState.settings?.sound) {
-    sounds.overlay.currentTime = 0;
-    sounds.overlay.play().catch(() => {});
-  }
-
-  openAppModal({
-    id: "reset-modal",
-    icon: "wand",
-    title: "Xóa dữ liệu đã lưu",
-    content:
-      "<p>Điểm cao nhất và các cài đặt đã lưu trên thiết bị sẽ bị xóa. Bạn có muốn tiếp tục?</p>",
-    actions: [
-      {
-        label: "Xóa dữ liệu",
-        variant: "danger",
-        onClick: async () => {
-          sounds.confirm?.play().catch(() => {});
-          if (await clearPersistentGameData()) location.reload();
-        },
-      },
-    ],
-    onClose: () => {
-      gameState.isPaused = false;
-      onClose();
-    },
-  });
+  return showAccountErasureDialog('reset', { onClose: () => { gameState.isPaused = false; onClose(); } });
 }
 
 export function showReturnToMenuOverlay({ onConfirm } = {}) {

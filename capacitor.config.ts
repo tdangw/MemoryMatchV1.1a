@@ -5,6 +5,7 @@ const config: CapacitorConfig = {
   appName: "Memory Match Adventure",
   webDir: "dist",
   android: {
+    webContentsDebuggingEnabled: false,
     allowMixedContent: false,
     backgroundColor: "#10162f",
   },

@@ -16,7 +16,8 @@ MISSION_CONTRACT
         && n.claimed is list && n.claimed.hasOnly(allowed) && n.claimed.size() == n.claimed.toSet().size();
     }
     function rewardSpin(r, source) {
-      return r is map && r.keys().hasOnly(['operation','source','day','sector','coins','ordinal','sequence','wheel'])
+      // Spark accepts bounded client reward receipts; it does not verify AdMob SSV.
+      return source in ['free','ticket','ad'] && r is map && r.keys().hasOnly(['operation','source','day','sector','coins','ordinal','sequence','wheel'])
         && r.operation is string && r.operation.matches('^[A-Za-z0-9_-]{1,128}$') && r.source == source
         && rewardInt(r.day)
         && (source == 'free' ? !r.keys().hasAny(['ordinal','sequence']) : source == 'ad' ? rewardInt(r.ordinal) && r.ordinal > 0 && r.ordinal <= 10 && !r.keys().hasAny(['sequence']) : source == 'ticket' && rewardInt(r.sequence) && r.sequence > 0 && !r.keys().hasAny(['ordinal']))
@@ -233,6 +234,7 @@ LETTER_CREDITS;
         && n.updatedAt == request.time && rewardLinked(n,space,uid);
     }
     match /gamespaces/{space}/liveops/{uid} {
+      allow delete: if knownSpace(space) && erasing(space, uid);
       allow get: if knownSpace(space) && owner(uid);
       allow list, delete: if false;
       allow create: if knownSpace(space) && owner(uid)

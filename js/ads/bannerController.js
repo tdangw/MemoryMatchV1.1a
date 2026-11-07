@@ -1,5 +1,5 @@
 // One serialized owner for the native banner, independent of game rules/DOM.
-export function createBannerController({ service, render, report = console.warn }) {
+export function createBannerController({ service, render, report = console.warn, onUnavailable = () => {} }) {
   let desired = null, banner = null, revision = 0, handled = 0, blocked = -1;
   let disposed = false, task = null, phase = 'idle';
 
@@ -26,7 +26,7 @@ export function createBannerController({ service, render, report = console.warn 
       phase = 'preparing';
       const ready = await service.prepare();
       if (requested !== revision) continue;
-      if (!ready) { phase = 'unavailable'; continue; }
+      if (!ready) { phase = 'unavailable'; onUnavailable(); continue; }
       const entry = { target, handles: [], started: false, failed: false, invalidated: false };
       banner = entry;
       entry.handles.push(await service.listen('bannerAdSizeChanged', size => {
@@ -41,6 +41,7 @@ export function createBannerController({ service, render, report = console.warn 
         render(entry.target, 0);
         entry.failed = true;
         blocked = ++revision;
+        onUnavailable();
         void kick();
       }));
       if (requested !== revision) { entry.invalidated = true; continue; }
@@ -50,6 +51,7 @@ export function createBannerController({ service, render, report = console.warn 
       catch (error) {
         report('AdMob banner show unavailable', error);
         entry.failed = true;
+        onUnavailable();
         if (requested === revision) blocked = ++revision;
         else revision++;
       }

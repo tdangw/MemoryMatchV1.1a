@@ -1,3 +1,4 @@
+import { isAppActive } from '../appVisibility.js';
 import { openAppModal } from '../modal.js';
 import { createGameShellLifecycle } from '../gameShell/gameShellLifecycle.js';
 import { createIcon } from '../icons.js';
@@ -57,11 +58,11 @@ export function openLetterFusion({initialLetter,owner,current,getContext,execute
   const motion=matchMedia('(prefers-reduced-motion: reduce)');
   const finishLocalMotion=()=>{for(const animation of stage.getAnimations({subtree:true}))if(animation.playState!=='idle')animation.finish();};
   scope.listen(motion,'change',event=>{if(event.matches)finishLocalMotion();});
-  scope.listen(document,'visibilitychange',()=>{if(document.hidden)finishLocalMotion();});
+  scope.listen(document,'appvisibilitychange',()=>{if(!isAppActive())finishLocalMotion();});
   let chargeScope=null;
   const stopCharge=()=>{chargeScope?.dispose();chargeScope=null;};scope.own(stopCharge);
   function startCharge(){
-    stopCharge();if(motion.matches||document.hidden)return Promise.resolve();
+    stopCharge();if(motion.matches||!isAppActive())return Promise.resolve();
     const local=createGameShellLifecycle();chargeScope=local;
     const animations=[local.animation(aura.animate([{opacity:0,transform:'scale(.9)'},{opacity:.6,transform:'scale(1.15)'},{opacity:0,transform:'scale(1.3)'}],{duration:FORGE_MOTION.flash,easing:'ease-out'})),
       ...slotCharges.map((art,i)=>local.animation(art.animate([{opacity:0,transform:'scale(.98)'},{opacity:1,transform:'scale(1.04)',offset:.16},{opacity:.25,offset:.36},{opacity:1,offset:.54},{opacity:.4,offset:.72},{opacity:1,offset:.84},{opacity:0,transform:'scale(1)'}],{duration:FORGE_MOTION.submit+i*FORGE_MOTION.stagger,easing:'ease-out'})))];
@@ -99,7 +100,7 @@ export function openLetterFusion({initialLetter,owner,current,getContext,execute
     if(!last||last.kind!=='fuse'||last.sequence<=requestSequence||!sameIngredients(last,selected))return false;
     received=last.received;phase='revealing';error='';render();
     playOwnedRewardCue('frozenUnlock',scope,gameState.settings);
-    if(!motion.matches&&!document.hidden){
+    if(!motion.matches&&isAppActive()){
       const origin=stage.getBoundingClientRect(),center=action.getBoundingClientRect(),rects=slots.map(slot=>slot.getBoundingClientRect());
       const lightning=document.createElementNS('http://www.w3.org/2000/svg','svg');lightning.classList.add('letter-forge__lightning');lightning.setAttribute('viewBox',`0 0 ${origin.width} ${origin.height}`);effects.append(lightning);
       const arcs=rects.map((r,i)=>{
@@ -116,7 +117,7 @@ export function openLetterFusion({initialLetter,owner,current,getContext,execute
     selected=[];phase='result';render();
     playOwnedRewardCue('coinCollect',scope,gameState.settings);
     feedback.present(response.committedRewards,null,{particles:false,audio:false});
-    if(!motion.matches&&!document.hidden){scope.animation(face.animate([{transform:'scale(.25)',opacity:0},{transform:'scale(1.12)',opacity:1},{transform:'scale(1)',opacity:1}],{duration:FORGE_MOTION.flash,easing:'ease-out'}));scope.animation(aura.animate([{transform:'scale(.8)',opacity:0},{transform:'scale(1.25)',opacity:.7,offset:.35},{transform:'scale(1.5)',opacity:0}],{duration:FORGE_MOTION.flash}));}
+    if(!motion.matches&&isAppActive()){scope.animation(face.animate([{transform:'scale(.25)',opacity:0},{transform:'scale(1.12)',opacity:1},{transform:'scale(1)',opacity:1}],{duration:FORGE_MOTION.flash,easing:'ease-out'}));scope.animation(aura.animate([{transform:'scale(.8)',opacity:0},{transform:'scale(1.25)',opacity:.7,offset:.35},{transform:'scale(1.5)',opacity:0}],{duration:FORGE_MOTION.flash}));}
     return true;
   }
   scope.listen(action,'click',async()=>{

@@ -62,7 +62,7 @@ export function mountAdventureRewardIndicators({ controls, owner, read, subscrib
   if (subscribeAccount) owner.own(subscribeAccount(refresh));
   if (subscribePeriod) owner.own(subscribePeriod(refresh));
   owner.listen(eventTarget,'online',refresh); owner.listen(eventTarget,'offline',refresh);
-  owner.listen(documentTarget,'visibilitychange',refresh);
+  owner.listen(documentTarget,'appvisibilitychange',refresh);
   owner.interval(refresh,60000);
   owner.own(() => {
     for (const [key,dot] of Object.entries(dots)) {

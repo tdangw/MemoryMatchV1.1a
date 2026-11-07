@@ -1,3 +1,4 @@
+import { isAppActive } from '../appVisibility.js';
 import { playRewardPhase } from '../rewardAudio.js';
 import { disposeAppPage } from '../appPageLifecycle.js';
 import { tripleTicketDrop } from '../liveops/dropAdapters.js';
@@ -514,8 +515,8 @@ async function mountTripleDevelopmentRound(generated, { skipIntro = false, start
   );
   const menus = bindGameHudMenus(scope, [{ trigger: toolsToggle, panel: toolsMenu }]);
   scope.listen(actionsToggle, 'click', () => { menus.close(); void runTripleGameAction('exit-dialog'); });
-  scope.listen(document, "visibilitychange", async () => {
-    if (document.hidden) {
+  scope.listen(document, "appvisibilitychange", async () => {
+    if (!isAppActive()) {
       if (state.status !== "playing" || !roundStarted) return;
       backgroundPaused = true;
       rebaseTripleTimer();
@@ -827,6 +828,7 @@ function playTripleEvents(events) {
 }
 
 function playTripleSound(name) {
+  if (!isAppActive()) return;
   const sound = gameState.settings?.sound && sounds[name];
   if (!sound) return;
   sound.currentTime = 0;

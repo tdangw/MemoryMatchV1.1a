@@ -3,6 +3,7 @@ import { cosmeticPortrait, openProfileCustomization } from './progression/profil
 import { createGameShellLifecycle } from './gameShell/gameShellLifecycle.js';
 import { getPublicCosmeticSync } from './progression/publicCosmeticSync.js';
 import { getAccountService } from "./accountService.js";
+import { showAccountErasureDialog } from './accountErasureDialog.js';
 import { getAppPageScope } from "./appPageLifecycle.js";
 import { gameState } from "./gameState.js";
 import { createIcon } from "./icons.js";
@@ -52,7 +53,25 @@ export function showAccountPanel(surface = {}) {
   const heading = document.createElement('h3'); heading.className = 'tab-section-title'; heading.textContent = 'Tài khoản';
   const status = document.createElement('p'); status.className = 'account-status'; status.setAttribute('aria-live', 'polite');
   const google = document.createElement('button'); google.type = 'button'; google.className = 'tab-button profile-google';
-  account.append(heading, status, google); content.append(hero, account);
+  const logout = document.createElement('button'); logout.type = 'button'; logout.className = 'tab-button profile-logout'; logout.textContent = 'Đăng xuất';
+  logout.onclick = () => {
+    const note = document.createElement('p');
+    note.textContent = 'Tiến trình sẽ được lưu vào tài khoản trước khi đăng xuất. Dữ liệu trò chơi trên thiết bị này sẽ được xóa và bạn sẽ bắt đầu bằng tài khoản khách mới. Bạn có thể đăng nhập lại Google để khôi phục tiến trình.';
+    const failure = document.createElement('p'); failure.className = 'profile-error'; failure.setAttribute('role', 'alert');
+    const body = document.createElement('div'); body.append(note, failure);
+    openAppModal({ id: 'logout-modal', title: 'Đăng xuất tài khoản?', content: body, keepBanner: false,
+      actions: [{ label: 'Hủy', onClick: close => close() }, { label: 'Đăng xuất', onClick: async () => {
+        try { await service.logout(); }
+        catch { failure.textContent = 'Chưa đăng xuất được. Kiểm tra kết nối và thử lại; tiến trình vẫn được giữ.'; }
+        return false;
+      } }],
+    });
+  };
+  const erase = document.createElement('button'); erase.type = 'button'; erase.className = 'tab-button profile-delete'; erase.textContent = 'Xóa tài khoản';
+  erase.onclick = () => showAccountErasureDialog('delete');
+  const accountActions = document.createElement('div'); accountActions.className = 'profile-account-actions';
+  accountActions.append(google, logout, erase);
+  account.append(heading, status, accountActions); content.append(hero, account);
   let disposed = false; let unsubscribe; let releaseOwner;let currentUid=null,copyingUid=false;
   const cosmeticScope = createGameShellLifecycle();
   const cosmeticsStatus = document.createElement('p'); cosmeticsStatus.className = 'profile-cosmetics-status'; cosmeticsStatus.setAttribute('role', 'status'); hero.append(cosmeticsStatus);
@@ -85,8 +104,18 @@ export function showAccountPanel(surface = {}) {
     accountType.textContent = state.isAnonymous === false ? 'Đã liên kết Google' : 'Tài khoản khách';
     status.textContent = ({ connecting: 'Đang kết nối…', restoring: 'Đang tải tiến trình…', syncing: 'Đang lưu…', synced: '', waiting: 'Đang chờ lưu', offline: 'Chưa có kết nối', error: 'Chưa lưu được. Sẽ thử lại.', disabled: '', conflict: 'Đang tải tiến trình…' })[state.phase] || '';
     const busy = saving || linking || ['connecting', 'restoring', 'syncing', 'conflict'].includes(state.phase);
+    const erasing = ['erasing', 'erasure-pending'].includes(state.phase);
+    const signingOut = ['signing-out', 'logout-pending'].includes(state.phase);
+    logout.hidden = !service || state.isAnonymous !== false && !signingOut;
+    logout.replaceChildren(createIcon('exit'), document.createTextNode(state.phase === 'logout-pending' ? 'Tiếp tục đăng xuất' : 'Đăng xuất'));
+    logout.disabled = saving || linking || busy || erasing || state.phase === 'signing-out';
+    erase.replaceChildren(createIcon('trash'), document.createTextNode(state.phase === 'erasure-pending' ? 'Tiếp tục yêu cầu xóa' : 'Xóa tài khoản'));
+    erase.hidden = !service || !state.uid;
+    erase.disabled = saving || linking || busy || state.phase === 'erasing';
+    if (signingOut) { erase.disabled = true; status.textContent = state.message; }
     edit.disabled = name.disabled = saveName.disabled = google.disabled = !service || !state.bound || busy;
     cancel.disabled = saving || linking;
+    if (erasing || signingOut) { edit.disabled = name.disabled = saveName.disabled = google.disabled = true; status.textContent = state.message; }
     google.replaceChildren(createIcon('account'), document.createTextNode(state.isAnonymous === false ? 'Đổi tài khoản Google' : 'Liên kết Google'));
     google.hidden = !service || state.phase === 'disabled';
     account.hidden = google.hidden && !status.textContent;

@@ -1,4 +1,5 @@
 import { AMBIENT_LIGHT } from './budgets.js';
+import { isAppActive } from '../appVisibility.js';
 /** One app owner. The caller supplies scene preparation; no page/game imports. */
 export function createBackgroundRuntime({ view, document: doc, meteor, report = console.warn }) {
   const query = view.matchMedia('(prefers-reduced-motion: reduce)');
@@ -23,7 +24,7 @@ export function createBackgroundRuntime({ view, document: doc, meteor, report = 
   }
   function baseAllowed() { return state !== 'DISPOSED' && enabled && !query.matches; }
   function suspended() {
-    return doc.hidden || frozen || blockers.size || current && (current.paused || !current.scope.active || current.root.hidden
+    return doc.hidden || !isAppActive() || frozen || blockers.size || current && (current.paused || !current.scope.active || current.root.hidden
       || current.scope.startup && current.scope.startup.status !== 'ready');
   }
   function meteorAllowed() {
@@ -138,6 +139,7 @@ export function createBackgroundRuntime({ view, document: doc, meteor, report = 
   }
   const options = { signal: listeners.signal };
   doc.addEventListener('visibilitychange', reconcile, options);
+  doc.addEventListener('appvisibilitychange', reconcile, options);
   query.addEventListener('change', reconcile, options);
   view.addEventListener('resize', () => requestRefresh(), options);
   if (view.visualViewport) {
@@ -163,7 +165,7 @@ export function createBackgroundRuntime({ view, document: doc, meteor, report = 
       const data = scene ? scene.diagnostics() : { nodes: 0, handles: 0, observers: 0 }, meteors = meteor.diagnostics();
       return { ...data, state, quality: 'light', scenes: scene && data.handles ? 1 : 0, sceneInstances: scene ? 1 : 0, scene: current ? current.kind : null,
         sceneHandles: data.handles, handles: data.handles + meteors.active, timers: timer === undefined ? 0 : 1,
-        listeners: (state === 'DISPOSED' ? 0 : view.visualViewport ? 9 : 7) + (current && current.bindingListeners || 0),
+        listeners: (state === 'DISPOSED' ? 0 : view.visualViewport ? 10 : 8) + (current && current.bindingListeners || 0),
         pendingFrames: frame === undefined ? 0 : 1, blockers: blockers.size, preparing: current?.status === 'PREPARING' ? 1 : 0,
         revision, lastError, meteor: meteors };
     },

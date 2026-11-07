@@ -1,3 +1,4 @@
+import { isAppActive } from '../appVisibility.js';
 import { createGameShellLifecycle } from '../gameShell/gameShellLifecycle.js';
 import { readTutorialProgress, markTutorialFlag } from './tutorialProgress.js';
 import { suspendAmbientBackground } from '../backgroundEffects.js';
@@ -12,7 +13,7 @@ export function dismissContextGuide(root) { if (!root || root.contains(activeAnc
   active?.dispose(); }
 /** One static guide. Inline in dialogs; floating guides track their actual DOM anchor. */
 export function showContextGuide(topic, anchor, owner) {
-  if (!anchor || !owner?.active || document.hidden || readTutorialProgress().seen[topic])
+  if (!anchor || !owner?.active || !isAppActive() || readTutorialProgress().seen[topic])
     return;
   const inline = !!anchor.closest('.app-modal');
   if (!inline && document.querySelector('.app-modal-overlay:not(.is-closing)'))
@@ -66,7 +67,7 @@ export function showContextGuide(topic, anchor, owner) {
   finally {
     scope.dispose();
   } });
-  scope.listen(document, 'visibilitychange', () => { if (document.hidden)
+  scope.listen(document, 'appvisibilitychange', () => { if (!isAppActive())
     scope.dispose(); });
   if (!inline) {
     let scheduled = false;

@@ -2,7 +2,38 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     function knownSpace(space) { return space in ['production', 'beta', 'test', 'local', 'production-waves1', 'beta-waves1', 'test-waves1', 'local-waves1']; }
-    function owner(uid) { return request.auth != null && request.auth.uid == uid; }
+    function identityOwner(uid) { return request.auth != null && request.auth.uid == uid; }
+    function operationPath(uid) { return /databases/$(database)/documents/accountOperations/$(uid); }
+    function operationLocked(uid) { return exists(operationPath(uid)) && get(operationPath(uid)).data.phase != 'reset-complete'; }
+    function owner(uid) { return identityOwner(uid) && !operationLocked(uid); }
+    function erasing(space, uid) {
+      return identityOwner(uid) && exists(operationPath(uid))
+        && get(operationPath(uid)).data.phase == 'erasing'
+        && (get(operationPath(uid)).data.kind == 'delete' || get(operationPath(uid)).data.space == space);
+    }
+    match /accountOperations/{uid} {
+      allow get: if identityOwner(uid);
+      allow list, delete: if false;
+      allow create, update: if identityOwner(uid)
+        && request.resource.data.keys().hasOnly(['kind','space','phase','cursor','createdAt'])
+        && request.resource.data.kind in ['delete','reset'] && knownSpace(request.resource.data.space)
+        && request.resource.data.phase in ['erasing','data-erased','reset-complete','deleted']
+        && request.resource.data.cursor is string && request.resource.data.cursor.size() <= 1500
+        && (resource == null || resource.data.phase == 'reset-complete'
+          ? request.resource.data.phase == 'erasing' && request.resource.data.createdAt == request.time
+          : request.resource.data.kind == resource.data.kind && request.resource.data.space == resource.data.space
+            && request.resource.data.createdAt == resource.data.createdAt
+            && resource.data.phase != 'deleted'
+            && (resource.data.phase == 'erasing' && request.resource.data.phase in ['erasing','data-erased']
+              || resource.data.phase == 'data-erased' && request.resource.data.phase == (resource.data.kind == 'reset' ? 'reset-complete' : 'deleted')));
+    }
+    // Every collection named entries is public leaderboard data. The deletion
+    // walker needs document-name pagination across legacy boards without UID fields.
+    match /{path=**}/entries/{uid} {
+      allow list: if request.auth != null && exists(operationPath(request.auth.uid))
+        && get(operationPath(request.auth.uid)).data.phase == 'erasing'
+        && request.query.limit != null && request.query.limit <= 100;
+    }
     function statisticsAdmin() { return request.auth != null && request.auth.token.admin == true; }
     function validStatistics(data) {
       return data.keys().hasOnly(['version', 'counterId', 'counters', 'totalPlayMs', 'trackedSince', 'updatedAt'])
@@ -24,6 +55,7 @@ service cloud.firestore {
         && next.trackedSince <= previous.trackedSince;
     }
     match /gamespaces/{space}/profileStats/{uid} {
+      allow delete: if knownSpace(space) && erasing(space, uid);
       allow get: if knownSpace(space) && (owner(uid) || statisticsAdmin());
       allow list: if knownSpace(space) && statisticsAdmin() && request.query.limit != null && request.query.limit <= 100;
       allow create: if knownSpace(space) && owner(uid) && validStatistics(request.resource.data)
@@ -54,6 +86,7 @@ service cloud.firestore {
         && data.stageId is string && data.stageId.matches('^[a-f0-9-]{36}$') && data.createdAt == request.time;
     }
     match /gamespaces/{space}/players/{uid} {
+      allow delete: if knownSpace(space) && erasing(space, uid);
       allow get: if knownSpace(space) && owner(uid);
       allow list, delete: if false;
       allow create: if knownSpace(space) && owner(uid) && validRoot(request.resource.data) && request.resource.data.revision == 1 && rewardRootLink(space, uid);
@@ -62,11 +95,11 @@ service cloud.firestore {
         && request.resource.data.get('economyRevision',0) >= resource.data.get('economyRevision',0);
       match /objects/{hash} {
         allow get: if knownSpace(space) && owner(uid);
-        allow list: if false;
+        allow list: if knownSpace(space) && erasing(space, uid);
         allow create: if knownSpace(space) && owner(uid) && validObject(request.resource.data, hash);
         allow update: if knownSpace(space) && owner(uid) && validObject(request.resource.data, hash)
           && request.resource.data.payload == resource.data.payload && request.resource.data.byteLength == resource.data.byteLength;
-        allow delete: if knownSpace(space) && owner(uid);
+        allow delete: if knownSpace(space) && (owner(uid) || erasing(space, uid));
       }
     }
     function validEntry(data, board) {
@@ -104,6 +137,7 @@ service cloud.firestore {
         : next.levelReached > previous.levelReached || next.levelReached == previous.levelReached && next.totalScore > previous.totalScore);
     }
     match /gamespaces/{space}/leaderboards/{board}/entries/{uid} {
+      allow delete: if knownSpace(space) && erasing(space, uid);
       allow get: if knownSpace(space);
       // Approved 26/10: exact personal rank counts the public ordered prefix.
       // Firestore uses the same permission for document and aggregation queries.
@@ -123,6 +157,7 @@ service cloud.firestore {
         && (data.badge == null || data.badge in ['starter-badge-first-leaf', 'memory-badge-wisdom', 'memory-badge-memory-master', 'memory-badge-wisdom-seal', 'memory-badge-memory-keeper', 'memory-badge-four-seasons', 'memory-badge-forest-guardian', 'link-badge-link-master', 'link-badge-golden-bond', 'link-badge-lighthouse-guide', 'link-badge-ocean-knot', 'link-badge-guiding-lantern', 'link-badge-moonlit-promise', 'triple-badge-crystal-triad', 'triple-badge-triad-master', 'triple-badge-triangle-seal', 'triple-badge-crystal-keeper', 'triple-badge-three-dawn-rays', 'triple-badge-aurora-heart', 'letters-memory-badge-folded-leaf', 'letters-link-badge-wish-knot', 'letters-triple-badge-prism-heart', 'letters-royal-badge-royal-seal']);
     }
     match /gamespaces/{space}/publicCosmetics/{uid} {
+      allow delete: if knownSpace(space) && erasing(space, uid);
       allow get: if knownSpace(space);
       allow list: if knownSpace(space) && request.query.limit != null && request.query.limit <= 20;
       allow create, update: if knownSpace(space) && owner(uid) && validPublicCosmetics(request.resource.data);
@@ -372,7 +407,8 @@ service cloud.firestore {
         && n.claimed is list && n.claimed.hasOnly(allowed) && n.claimed.size() == n.claimed.toSet().size();
     }
     function rewardSpin(r, source) {
-      return r is map && r.keys().hasOnly(['operation','source','day','sector','coins','ordinal','sequence','wheel'])
+      // Spark accepts bounded client reward receipts; it does not verify AdMob SSV.
+      return source in ['free','ticket','ad'] && r is map && r.keys().hasOnly(['operation','source','day','sector','coins','ordinal','sequence','wheel'])
         && r.operation is string && r.operation.matches('^[A-Za-z0-9_-]{1,128}$') && r.source == source
         && rewardInt(r.day)
         && (source == 'free' ? !r.keys().hasAny(['ordinal','sequence']) : source == 'ad' ? rewardInt(r.ordinal) && r.ordinal > 0 && r.ordinal <= 10 && !r.keys().hasAny(['sequence']) : source == 'ticket' && rewardInt(r.sequence) && r.sequence > 0 && !r.keys().hasAny(['ordinal']))
@@ -637,6 +673,7 @@ service cloud.firestore {
         && n.updatedAt == request.time && rewardLinked(n,space,uid);
     }
     match /gamespaces/{space}/liveops/{uid} {
+      allow delete: if knownSpace(space) && erasing(space, uid);
       allow get: if knownSpace(space) && owner(uid);
       allow list, delete: if false;
       allow create: if knownSpace(space) && owner(uid)

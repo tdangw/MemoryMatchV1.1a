@@ -5,6 +5,12 @@
   background: linear-gradient(#03151e70, #041923bb), url('/assets/images/backgrounds/leaderboard-night-garden.webp') center / cover;
 }
 .game-selector > .adventure-header { display: none; }
+.home-app-exit {
+  position: absolute; top: max(10px, env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right));
+  z-index: 20; display: grid; place-items: center; width: 44px; height: 44px;
+  border: 1px solid #b99b5a66; border-radius: 50%; background: #0a2936cc; color: #ffe3a0;
+}
+.home-app-exit:focus-visible { outline: 3px solid #fff0b4; outline-offset: 3px; }
 .game-selector > .menu-wrapper {
   display: flex; flex-direction: column; justify-content: flex-start; align-items: stretch; gap: 16px;
   width: min(100%, 640px); height: 100%; min-height: 0; padding: 16px 0 20px;
@@ -72,7 +78,7 @@
   .game-selector .game-title, .game-selector .game-title:hover { font-size: 25px; line-height: 1.1; }
   .game-selector__title-line { display: inline; }
   .game-selector__title-line--adventure { margin-left: 4px; }
-  .game-selector__choices { --game-card-width: min(60vw, 360px); height: clamp(127px, calc(42dvh - max(0px, var(--menu-ad-space, 40px) - 40px)), 180px); padding-block: 6px; }
+  .game-selector__choices { --game-card-width: min(60vw, 360px); height: clamp(80px, calc(100dvh - var(--menu-ad-space, 58px) - 205px), 180px); padding-block: 6px; }
   .game-selector__label { min-height: 44px; padding: 8px 16px; }
   .game-selector__label strong { font-size: 22px; }
   .game-selector__controls { margin-top: 4px; }

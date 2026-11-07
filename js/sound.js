@@ -1,3 +1,4 @@
+import { isAppActive } from './appVisibility.js';
 // js/sound.js
 // Quản lý âm thanh của dự án
 import { createGameShellLifecycle } from './gameShell/gameShellLifecycle.js';
@@ -40,7 +41,7 @@ const clampVolume = (value, fallback) => {
 };
 
 export function playGameStartSound(settings) {
-  if (!settings?.sound || document.hidden) return;
+  if (!settings?.sound || !isAppActive()) return;
   const audio = sounds.gameStart;
   audio.currentTime = GAME_START_AUDIO_OFFSET_SECONDS;
   audio.volume = clampVolume(settings.soundVolume, 0.4);
@@ -70,7 +71,7 @@ const rewardCues = new Map(['summary', 'hint', 'shuffle', 'wave', 'freeze', 'dif
 export function playOwnedRewardCue(name, owner, settings) {
   if (!Object.hasOwn(rewardCueFiles, name)) throw new Error(`Unknown reward cue: ${name}`);
   const volume = settings?.sound ? clampVolume(settings.soundVolume, 0.4) : 0;
-  if (!owner.active || document.hidden || !volume) return;
+  if (!owner.active || !isAppActive() || !volume) return;
   const isCoin = name === 'coinDrop' || name === 'coinCollect';
   let pool = rewardCues.get(name);
   if (!pool) {
@@ -100,7 +101,7 @@ export function playOwnedRewardCue(name, owner, settings) {
     release.forget();
     audio.removeEventListener('ended', ended);
     audio.removeEventListener('error', failed);
-    document.removeEventListener('visibilitychange', hidden);
+    document.removeEventListener('appvisibilitychange', hidden);
     audio.pause();
     audio.currentTime = 0;
     if (cue.stop === stop) cue.stop = null;
@@ -115,10 +116,10 @@ export function playOwnedRewardCue(name, owner, settings) {
   Object.defineProperty(stop, 'owner', { get: () => currentOwner });
   ended = () => { if (audio.ended) stop(); };
   failed = () => stop();
-  hidden = () => { if (document.hidden) stop(); };
+  hidden = () => { if (!isAppActive()) stop(); };
   audio.addEventListener('ended', ended);
   audio.addEventListener('error', failed);
-  document.addEventListener('visibilitychange', hidden);
+  document.addEventListener('appvisibilitychange', hidden);
   cue.stop = stop;
   // A rejected, older play promise can only dispose its own voice.
   try { void audio.play().catch(stop); } catch { stop(); }
@@ -168,7 +169,7 @@ export function syncDefaultMusic(settings, shouldPlay = true) {
   }
 
   // Không được khởi động lại âm thanh khi tab/app đang ở nền.
-  if (document.hidden) {
+  if (!isAppActive()) {
     music.pause();
     return;
   }
@@ -195,7 +196,7 @@ function getBackgroundMusicVolume(settings) {
 
 export function playVictoryFlowerTheme(settings) {
   const theme = sounds.victoryFlowerTheme;
-  if (!theme || !settings?.music || document.hidden) return;
+  if (!theme || !settings?.music || !isAppActive()) return;
 
   theme.pause();
   theme.currentTime = 0;

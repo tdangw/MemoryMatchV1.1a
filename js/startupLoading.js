@@ -1,3 +1,4 @@
+import { isAppActive } from './appVisibility.js';
 const PHASES = ['modules', 'save', 'interface', 'home'];
 const SLOW_START_MS = 15000;
 const EXIT_MS = 180;
@@ -17,10 +18,10 @@ export function createStartupLoading({ onSlow = () => {}, onRetry = () => window
   let home = null;
   let exitPromise = null;
   const syncVisibility = () => {
-    root.toggleAttribute('data-background', document.hidden);
-    if (document.hidden && state === 'exiting') destroy();
+    root.toggleAttribute('data-background', !isAppActive());
+    if (!isAppActive() && state === 'exiting') destroy();
   };
-  document.addEventListener('visibilitychange', syncVisibility, {signal:owner.signal});
+  document.addEventListener('appvisibilitychange', syncVisibility, {signal:owner.signal});
   window.addEventListener('pagehide', destroy, {once:true, signal:owner.signal});
   syncVisibility();
   root.tabIndex = -1;
@@ -65,7 +66,7 @@ export function createStartupLoading({ onSlow = () => {}, onRetry = () => window
     if (home) home.inert = false;
     const restoreFocus = root.contains(document.activeElement);
     root.remove();
-    if (restoreFocus && !document.hidden) home?.querySelector('.game-selector__choice[tabindex="0"]')?.focus({preventScroll: true});
+    if (restoreFocus && isAppActive()) home?.querySelector('.game-selector__choice[tabindex="0"]')?.focus({preventScroll: true});
   }
   function fail(code = 'ST-INIT-001') {
     if (state === 'disposed') return;
@@ -87,7 +88,7 @@ export function createStartupLoading({ onSlow = () => {}, onRetry = () => window
     if (state === 'disposed') return Promise.resolve();
     if (exitPromise) return exitPromise;
     clearTimeout(slowStart);
-    if (document.hidden || matchMedia('(prefers-reduced-motion: reduce)').matches || typeof root.animate !== 'function') {
+    if (!isAppActive() || matchMedia('(prefers-reduced-motion: reduce)').matches || typeof root.animate !== 'function') {
       destroy(); return Promise.resolve();
     }
     state = 'exiting';

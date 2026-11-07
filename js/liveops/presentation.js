@@ -1,3 +1,4 @@
+import { isAppActive } from '../appVisibility.js';
 import { letterArtwork, openLetterActions, openLetterFusion } from './letterCrafting.js';
 import { showCollectionModal } from '../mainmenu.js';
 import { createRewardFeedback, captureRewardOrigin } from './rewardFeedback.js';
@@ -72,7 +73,7 @@ export function openLiveopsPage(kind, surface = {}) {
     let renderOnFinish=true;
     retry.hidden=true;busy = true; if(view)render();else root.setAttribute('aria-busy','true'); status.textContent = kind==='events'&&eventTab==='wheel'?'':'Đang kết nối…';
     try {
-      const result = rewarded ? await requestRewardedSpin() : await requestLiveops(command);
+      const result = rewarded ? await requestRewardedSpin(owns) : await requestLiveops(command);
       if (!owns()) return;
       observedAt = performance.now(); view = result; confirmedView=true; refreshAppWallet(); status.textContent = '';
       if(result.letterResult?.kind==='exchange' && result.letterResult.chestType)status.textContent=`Đã nhận ${CHEST_NAMES[result.letterResult.chestType]}. Mở trong Kho rương khi bạn muốn.`;
@@ -92,7 +93,7 @@ export function openLiveopsPage(kind, surface = {}) {
           try {
           if(freshSpin&&receipt?.wheel?.version===WHEEL_VERSION&&rotor){
           const angle = 5 * 360 - receipt.sector * WHEEL_ANGLE;
-          if (!wheelMotion.matches&&!document.hidden) {
+          if (!wheelMotion.matches&&isAppActive()) {
             animation = startWheelMotion({rotor,pointer:root.querySelector('.liveops__pointer'),angle,owner:local,settings:gameState.settings});
             try { await animation.finished; } catch (error) { if (error.name !== 'AbortError') throw error; }
           }
@@ -142,18 +143,18 @@ export function openLiveopsPage(kind, surface = {}) {
     tick();
   }
   function tick() {
-    if(!active()||document.hidden||!view||kind!=='missions')return;
+    if(!active()||!isAppActive()||!view||kind!=='missions')return;
     const now=Math.floor(view.serverNow+performance.now()-observedAt);
     updateMissionCountdown(root,view.state,now);
     const targetDay=Math.floor(now/DAY_MS);
     if(targetDay>view.state.day&&refreshDay!==targetDay&&!busy&&navigator.onLine){refreshDay=targetDay;void run({type:'status'});}
   }
   function visibility() {
-    if(document.hidden&&['running','paused'].includes(animation?.playState))animation.finish();
+    if(!isAppActive()&&['running','paused'].includes(animation?.playState))animation.finish();
     if(timer!==null){clearShellInterval(timer);timer=null;}
-    if(!document.hidden&&kind==='missions'){tick();timer=scope.interval(tick,60000);}
+    if(isAppActive()&&kind==='missions'){tick();timer=scope.interval(tick,60000);}
   }
-  scope.listen(document,'visibilitychange',visibility);
+  scope.listen(document,'appvisibilitychange',visibility);
   scope.own(()=>{if(timer!==null)clearShellInterval(timer);});
   const account=getAccountService();const accountKey=()=>{const identity=account?.getIdentity();return identity?`${identity.uid}:${identity.profileId}`:null;};let ownerKey=accountKey();
   if(account)scope.own(account.subscribe(()=>{

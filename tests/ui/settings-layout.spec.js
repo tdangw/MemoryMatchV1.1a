@@ -17,13 +17,13 @@ test('replacing settings while its previous close is pending keeps the shared co
 });
 for (const viewport of [{ width: 320, height: 740 }, { width: 412, height: 915 }, { width: 844, height: 390 }, { width: 1024, height: 900 }]) test(`settings actions scroll with their groups at ${viewport.width}`, async ({ page }) => {
   await page.setViewportSize(viewport); await page.goto('/'); await page.locator('[data-dock-action="settings"]').click();
-  await expect(page.locator('#settings-container .settings-section')).toHaveCount(3);
+  await expect(page.locator('#settings-container .settings-section .tab-section-title')).toHaveText(['Giao diện', 'Âm thanh', 'Hiển thị', 'Thông tin và dữ liệu']);
   expect(await page.locator('#settings-modal').evaluate(el => el.contains(document.activeElement))).toBe(true);
   await expect(page.locator('#settings-modal .app-modal__footer')).toHaveCount(0);
   const reset = page.locator('#settings-reset'); await reset.scrollIntoViewIfNeeded();
   expect(await reset.evaluate(el => !!el.closest('.app-modal__body') && getComputedStyle(el).position === 'static')).toBe(true);
   await reset.click(); await expect(page.locator('#reset-modal')).toBeVisible();
-  await page.locator('#reset-modal .app-modal__close').click(); await expect(page.locator('#reset-modal')).toHaveCount(0);
+  await page.locator('#reset-modal').getByRole('button', { name: 'Hủy', exact: true }).click(); await expect(page.locator('#reset-modal')).toHaveCount(0);
   await expect(page.locator('#settings-modal')).toBeVisible();
   await page.locator('#settings-help').click(); await expect(page.locator('#info-modal')).toBeVisible();
   await page.locator('#info-modal .app-modal__close').click(); await expect(page.locator('#info-modal')).toHaveCount(0);

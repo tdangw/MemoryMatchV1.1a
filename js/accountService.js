@@ -1,4 +1,9 @@
-import { onIdTokenChanged, signInAnonymously, GoogleAuthProvider, linkWithPopup, signInWithPopup, signInWithCredential } from "firebase/auth";
+import { isAppActive } from './appVisibility.js';
+import { onIdTokenChanged, signInAnonymously, signOut, GoogleAuthProvider, linkWithPopup, linkWithCredential, signInWithPopup, signInWithCredential, deleteUser, reauthenticateWithPopup, reauthenticateWithCredential } from "firebase/auth";
+import { isNativeGoogle, getNativeGoogleCredential, clearNativeGoogleSession } from './googleAccount.js';
+import { setDoc, onSnapshot } from 'firebase/firestore';
+import { clearAccountGameData, saveAccountResetMetadata } from './persistence.js';
+import { operationRef, loadLocalAccountOperation, saveLocalAccountOperation, readAccountOperation, startAccountOperation, eraseAccountData } from './accountDataOperations.js';
 import { getFirebaseBackend } from "./firebaseBackend.js";
 import { encodeCloudSnapshot } from "./cloudSnapshot.js";
 import { readCloudRoot, readCloudSnapshot, publishCloudSnapshot, collectCloudObjects, CloudConflictError, observeCloudRoot } from "./cloudStore.js";
@@ -38,9 +43,13 @@ function createAccountService(options) {
   let isCloudSaveEvent = createCloudSaveEventFilter(gameState.progress, gameState.coins, gameState.appearance);
   let stopCloudObserver = null;
   let remoteRoot = null;
+  let erasureTask = null;
+  let logoutTask = null;
+  let stopOperationObserver = null;
+  scope.own(() => stopOperationObserver?.(), 'listener');
   scope.own(() => stopCloudObserver?.(), "listener");
   const publicState = () => ({ ...state, conflict: Boolean(pending), bound: metadata?.uid === state.uid && Boolean(state.uid) });
-  const current = (id, uid = state.uid) => scope.active && generation === id && backend?.auth.currentUser?.uid === uid;
+  const current = (id, uid = state.uid) => scope.active && !erasureTask && generation === id && backend?.auth.currentUser?.uid === uid;
   const notify = () => {
     if (owner) setRankingOwner({ id: owner.id, uid: metadata?.uid === state.uid ? metadata.uid : owner.uid });
     for (const listener of listeners) { try { listener(publicState()); } catch (error) { console.error("Account listener failed", error); } }
@@ -52,7 +61,7 @@ function createAccountService(options) {
   const defaultName = uid => `Người chơi ${uid.slice(-5)}`;
 
   function scheduleSync(delay, manual = false) {
-    if (!scope.active || !metadata || retries >= MAX_RETRIES) return;
+    if (!scope.active || erasureTask || logoutTask || loadLocalAccountOperation() || !metadata || retries >= MAX_RETRIES) return;
     const wait = delay ?? Math.max(0, AUTO_SYNC_INTERVAL_MS - (Date.now() - lastUploadAt));
     const dueAt = Date.now() + wait;
     if (scheduled && scheduled.dueAt <= dueAt) return;
@@ -66,6 +75,12 @@ function createAccountService(options) {
   }
   function handleFailure(error) {
     if (!scope.active) return;
+    const localOperation = loadLocalAccountOperation();
+    if (localOperation) {
+      if (localOperation.kind === 'logout') setPhase('logout-pending', 'Đăng xuất chưa hoàn tất. Mở Hồ sơ để tiếp tục.');
+      else setPhase('erasure-pending', 'Yêu cầu xóa chưa hoàn tất. Mở Hồ sơ để tiếp tục.');
+      return;
+    }
     const offline = !navigator.onLine || ["unavailable", "auth/network-request-failed", "deadline-exceeded"].includes(error.code);
     setPhase(offline ? "offline" : "error", offline ? "Đang offline. Bản máy vẫn được lưu; sẽ gửi lại khi kết nối." : "Chưa đồng bộ được. Bản máy vẫn được giữ nguyên.");
     retries += 1;
@@ -73,6 +88,14 @@ function createAccountService(options) {
   }
   async function ensureGuest() {
     if (backend.auth.currentUser) return backend.auth.currentUser;
+    const operation = loadLocalAccountOperation();
+    if (operation) {
+      if (operation.kind !== 'delete' || !['auth-deleting','local-erasing'].includes(operation.phase)) throw new Error('Đăng nhập lại tài khoản để hoàn tất yêu cầu xóa.');
+      await clearAccountGameData();
+      saveLocalAccountOperation({ ...operation, phase: 'finished' });
+      location.reload();
+      return null;
+    }
     if (!navigator.onLine) throw Object.assign(new Error("Offline"), { code: "auth/network-request-failed" });
     if (!guestTask) guestTask = signInAnonymously(backend.auth).then(result => result.user).finally(() => { guestTask = null; });
     return guestTask;
@@ -82,6 +105,7 @@ function createAccountService(options) {
     void ensureGuest().catch(error => { if (scope.active && generation === id) handleFailure(error); });
   }
   async function persistMetadata(next, id) {
+    if (metadata?.uid === next.uid && metadata.resetAt && !next.resetAt) next = { ...next, resetAt: metadata.resetAt };
     if (!current(id)) return false;
     if (!await saveSyncMetadata(state.environment, next, () => current(id))) return false;
     if (!current(id)) return false;
@@ -107,10 +131,13 @@ function createAccountService(options) {
   }
   async function bindUser(user, force = false) {
     if (!scope.active) return;
+    if (erasureTask) return;
     if (!force && state.uid === user.uid && metadata?.uid === user.uid && !pending) {
       state.isAnonymous = user.isAnonymous; notify(); return;
     }
     const id = ++generation;
+    metadata = null;
+    stopOperationObserver?.(); stopOperationObserver = null;
     stopCloudObserver?.(); stopCloudObserver = null; remoteRoot = null;
     pending = null;
     options.onConflictCleared?.();
@@ -125,6 +152,31 @@ function createAccountService(options) {
     if (!current(id, user.uid)) return;
     owner = loadedOwner; metadata = loadedMetadata;
     state.playerName = metadata?.uid === user.uid ? metadata.playerName : defaultName(user.uid);
+    const operation = await readAccountOperation(backend.database, user.uid);
+    if (!current(id, user.uid)) return;
+    const localOperation = loadLocalAccountOperation();
+    if (operation && operation.phase !== 'reset-complete' || localOperation?.uid === user.uid) {
+      saveLocalAccountOperation(localOperation?.uid === user.uid ? localOperation : { uid: user.uid, kind: operation.kind, space: operation.space, playerName: state.playerName });
+      setPhase('erasure-pending', 'Yêu cầu xóa chưa hoàn tất. Mở Hồ sơ để tiếp tục.');
+      return;
+    }
+    if (operation?.phase === 'reset-complete' && operation.space === state.environment && metadata?.resetAt !== operation.createdAt.toMillis()) {
+      const localReset = { uid: user.uid, kind: 'reset', space: state.environment, playerName: state.playerName };
+      saveLocalAccountOperation(localReset);
+      await completeLocalReset(localReset, operation.createdAt.toMillis());
+      saveLocalAccountOperation({ ...localReset, phase: 'finished' });
+      location.reload();
+      return;
+    }
+    stopOperationObserver = onSnapshot(operationRef(backend.database, user.uid), snapshot => {
+      if (!current(id, user.uid) || snapshot.metadata.fromCache || !snapshot.exists()) return;
+      const next = snapshot.data();
+      if (next.phase !== 'reset-complete' || next.space === state.environment && metadata?.resetAt !== next.createdAt.toMillis()) {
+        const binding = bindUser(user, true);
+        const nextId = generation;
+        void binding.then(() => observeBoundUser(user, nextId)).catch(error => { if (current(nextId, user.uid)) handleFailure(error); });
+      }
+    }, error => { if (current(id, user.uid)) handleFailure(error); });
     const root = await readCloudRoot(backend.database, state.environment, user.uid);
     if (!current(id, user.uid)) return;
     if(metadata?.uid===user.uid && metadata.restoreNeedsReconcile && root){await pendingConflict(root,id);return;}
@@ -185,8 +237,9 @@ function createAccountService(options) {
     return collected;
   }
 
-  async function syncNow({ manual = false } = {}) {
-    if (networkTask) { await networkTask; return syncNow({manual}); }
+  async function syncNow({ manual = false, force = false } = {}) {
+    if (erasureTask || loadLocalAccountOperation()) return false;
+    if (networkTask) { await networkTask; return syncNow({manual, force}); }
     if (!navigator.onLine) { setPhase("offline", "Đang offline. Bản máy vẫn được lưu; sẽ gửi lại khi kết nối."); return false; }
     if (manual && backend && !backend.auth.currentUser) {
       const id = generation;
@@ -203,7 +256,7 @@ function createAccountService(options) {
     if (!backend || !state.uid || metadata?.uid !== state.uid || pending) { notifyConflict(); return false; }
     if (manual) retries = 0;
     const minimum = manual ? 15000 : AUTO_SYNC_INTERVAL_MS;
-    if (Date.now() - lastUploadAt < minimum) {
+    if (!force && Date.now() - lastUploadAt < minimum) {
       const remaining = minimum - (Date.now() - lastUploadAt);
       if (manual) setPhase("waiting", `Thay đổi đã lưu trên máy; sẽ đồng bộ trong ${Math.ceil(remaining / 1000)} giây.`);
       scheduleSync(remaining, manual); return false;
@@ -308,15 +361,27 @@ function createAccountService(options) {
   }
 
   async function requestGoogleLogin() {
+    if (logoutTask || erasureTask) throw new Error('Hãy đợi thao tác tài khoản hoàn tất.');
+    if (loadLocalAccountOperation()) throw new Error('Hãy hoàn tất yêu cầu xóa trước.');
     if (!backend) throw new Error("Chưa có kết nối. Hãy thử lại.");
     if (["connecting", "restoring", "syncing", "conflict"].includes(state.phase)) throw new Error("Hãy hoàn tất đồng bộ hoặc chọn bản lưu trước.");
     const user = await ensureGuest();
+    if (!user) return;
     if (metadata?.uid !== user.uid) await bindUser(user);
     if (pending) throw new Error("Hãy chọn bản lưu trước khi liên kết Google.");
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: "select_account" });
     try {
-      const result = user.isAnonymous ? await linkWithPopup(user, provider) : await signInWithPopup(backend.auth, provider);
+      const nativeCredential = isNativeGoogle() ? await getNativeGoogleCredential() : null;
+      let result;
+      try {
+        result = nativeCredential
+          ? user.isAnonymous ? await linkWithCredential(user, nativeCredential) : await signInWithCredential(backend.auth, nativeCredential)
+          : user.isAnonymous ? await linkWithPopup(user, provider) : await signInWithPopup(backend.auth, provider);
+      } catch (error) {
+        if (!nativeCredential || !['auth/credential-already-in-use', 'auth/email-already-in-use'].includes(error.code)) throw error;
+        result = await signInWithCredential(backend.auth, nativeCredential);
+      }
       if (state.uid === result.user.uid) { state.isAnonymous = result.user.isAnonymous; notify(); }
     } catch (error) {
       if (error.code !== "auth/credential-already-in-use" && error.code !== "auth/email-already-in-use") throw error;
@@ -326,7 +391,103 @@ function createAccountService(options) {
       await service.acceptGoogleCredential(credential);
     }
   }
+  async function completeLocalReset(operation, resetAt) {
+    await clearAccountGameData();
+    const freshOwner = await loadProfileOwner();
+    await saveAccountResetMetadata(state.environment, { uid: operation.uid, profileId: freshOwner.id, playerName: operation.playerName, resetAt, cloudRevision: 0, fingerprint: null, lastSyncedLocalRevision: 0 });
+  }
+  async function finishLogout(operation) {
+    generation += 1;
+    if (scheduled) { clearShellTimeout(scheduled.handle); scheduled = null; }
+    stopCloudObserver?.(); stopCloudObserver = null;
+    stopOperationObserver?.(); stopOperationObserver = null;
+    pending = null; remoteRoot = null;
+    setPhase('signing-out', 'Đang đăng xuất…');
+    if (networkTask) await networkTask;
+    await waitForProfileReplacement();
+    await clearNativeGoogleSession();
+    await signOut(backend.auth);
+    await clearAccountGameData();
+    saveLocalAccountOperation({ ...operation, phase: 'finished' });
+    location.reload();
+  }
+  function logout() {
+    if (logoutTask) return logoutTask;
+    logoutTask = performLogout().finally(() => { logoutTask = null; });
+    return logoutTask;
+  }
+  async function performLogout() {
+    if (erasureTask) return erasureTask;
+    const previous = loadLocalAccountOperation();
+    if (previous && previous.kind !== 'logout') throw new Error('Hãy hoàn tất yêu cầu xóa trước.');
+    if (!backend || getActiveGameScope()) throw new Error('Hãy về trang chính trước khi đăng xuất.');
+    const user = backend.auth.currentUser;
+    if (!previous && (!user || user.isAnonymous || !navigator.onLine || pending)) throw new Error('Kết nối mạng và đợi lưu tiến trình trước khi đăng xuất.');
+    if (!previous) {
+      if (!await syncNow({ manual: true, force: true }) || state.phase !== 'synced') throw new Error('Chưa lưu xong tiến trình. Hãy thử lại khi có kết nối.');
+      saveLocalAccountOperation({ kind: 'logout', uid: user.uid, space: state.environment });
+    }
+    const operation = previous || loadLocalAccountOperation();
+    erasureTask = finishLogout(operation);
+    try { return await erasureTask; }
+    catch (error) { setPhase('logout-pending', 'Đăng xuất chưa hoàn tất. Hãy tiếp tục để bảo vệ dữ liệu.'); throw error; }
+    finally { erasureTask = null; }
+  }
+  async function eraseCurrentAccount(kind) {
+    if (logoutTask) throw new Error('Hãy đợi đăng xuất hoàn tất.');
+    if (erasureTask) return erasureTask;
+    if (!['delete', 'reset'].includes(kind) || getActiveGameScope()) throw new Error('Hãy về trang chính trước khi xóa.');
+    const user = backend?.auth.currentUser;
+    if (!user || !navigator.onLine) throw new Error('Cần kết nối mạng và đăng nhập để tiếp tục.');
+    const uid = user.uid;
+    const previousPhase = state.phase;
+    const execute = async () => {
+      if (!user.isAnonymous) {
+        if (isNativeGoogle()) await reauthenticateWithCredential(user, await getNativeGoogleCredential());
+        else await reauthenticateWithPopup(user, new GoogleAuthProvider());
+      }
+      if (backend.auth.currentUser?.uid !== uid) throw new Error('Tài khoản đã thay đổi.');
+      const previous = await readAccountOperation(backend.database, uid);
+      const local = loadLocalAccountOperation();
+      if (previous?.phase === 'reset-complete' && local?.uid === uid && local.kind === 'reset') {
+        if (previous.space === state.environment && metadata?.resetAt !== previous.createdAt.toMillis()) await completeLocalReset(local, previous.createdAt.toMillis());
+        saveLocalAccountOperation({ ...local, phase: 'finished' });
+        location.reload();
+        return;
+      }
+      const operation = previous && previous.phase !== 'reset-complete' ? { uid, ...previous, playerName: local?.playerName || state.playerName } : { uid, kind, space: state.environment, playerName: state.playerName };
+      saveLocalAccountOperation(operation);
+      generation += 1;
+      if (scheduled) { clearShellTimeout(scheduled.handle); scheduled = null; }
+      stopCloudObserver?.(); stopCloudObserver = null; pending = null; remoteRoot = null;
+      setPhase('erasing', operation.kind === 'delete' ? 'Đang xóa tài khoản…' : 'Đang xóa dữ liệu…');
+      if (networkTask) await networkTask;
+      await waitForProfileReplacement();
+      const owns = () => scope.active && backend.auth.currentUser?.uid === uid;
+      if (!previous || previous.phase === 'reset-complete') await startAccountOperation(backend.database, operation);
+      if (!previous || previous.phase === 'reset-complete' || previous.phase === 'erasing') await eraseAccountData(backend.database, uid, operation, owns);
+      if (!owns()) throw new Error('Tài khoản đã thay đổi.');
+      if (operation.kind === 'delete') {
+        if (previous?.phase !== 'deleted') await setDoc(operationRef(backend.database, uid), { phase: 'deleted' }, { merge: true });
+        saveLocalAccountOperation({ ...operation, phase: 'auth-deleting' });
+        await deleteUser(user);
+        await clearAccountGameData();
+      } else {
+        const record = await readAccountOperation(backend.database, uid);
+        await completeLocalReset(operation, record.createdAt.toMillis());
+        await setDoc(operationRef(backend.database, uid), { phase: 'reset-complete' }, { merge: true });
+      }
+      saveLocalAccountOperation({ ...operation, phase: 'finished' });
+      location.reload();
+    };
+    erasureTask = execute();
+    try { return await erasureTask; }
+    catch (error) { setPhase(loadLocalAccountOperation() ? 'erasure-pending' : previousPhase, 'Chưa hoàn tất yêu cầu xóa. Kiểm tra kết nối rồi thử lại.'); throw error; }
+    finally { erasureTask = null; }
+  }
   async function setPlayerName(value) {
+    if (logoutTask || erasureTask) throw new Error('Hãy đợi thao tác tài khoản hoàn tất.');
+    if (loadLocalAccountOperation()) throw new Error('Hãy hoàn tất yêu cầu xóa trước.');
     const name = String(value).replace(/[\u0000-\u001f\u007f]/g, "").trim();
     if (!name || [...name].length > 20) throw new Error("Tên hiển thị cần từ 1–20 ký tự.");
     if (!metadata || metadata.uid !== state.uid || ["connecting", "syncing", "restoring", "conflict"].includes(state.phase)) throw new Error("Hãy đợi đồng bộ hoàn tất trước khi đổi tên.");
@@ -383,8 +544,14 @@ function createAccountService(options) {
     if (!scope.active) return;
     if (!backend || !owner) { setPhase("disabled", "Bản máy vẫn hoạt động. Sao lưu cloud chưa khả dụng ở môi trường này."); return; }
     state.environment = backend.environment;
+    const localOperation = loadLocalAccountOperation();
+    if (localOperation?.kind === 'logout') {
+      state.uid = localOperation.uid;
+      await logout();
+      return;
+    }
     scope.own(onIdTokenChanged(backend.auth, user => {
-      if (!scope.active) return;
+      if (!scope.active || erasureTask) return;
       if (user) {
         const binding = bindUser(user);
         const id = generation;
@@ -412,14 +579,14 @@ function createAccountService(options) {
         void binding.then(() => observeBoundUser(user, id)).catch(error => { if (current(id, user.uid)) handleFailure(error); });
       }
     });
-    scope.listen(document, "visibilitychange", () => {
-      if (!document.hidden) notifyConflict();
+    scope.listen(document, "appvisibilitychange", () => {
+      if (isAppActive()) notifyConflict();
     });
     scope.listen(window, "pagehide", event => { if (!event.persisted) service.dispose(); });
     notify();
   }
   function observeBoundUser(user, id) {
-    if (!current(id, user.uid) || stopCloudObserver) return;
+    if (!current(id, user.uid) || loadLocalAccountOperation() || stopCloudObserver) return;
     stopCloudObserver = observeCloudRoot(backend.database, state.environment, user.uid, root => {
       if (!current(id, user.uid) || root.revision <= (metadata?.cloudRevision || 0)) return;
       remoteRoot = root;
@@ -442,6 +609,7 @@ function createAccountService(options) {
     }
   }
   async function runRewardOperation(operation) {
+    if (erasureTask || loadLocalAccountOperation()) throw new Error('Hãy hoàn tất yêu cầu xóa trước.');
     if (networkTask) await networkTask;
     if (!backend || !metadata || metadata.uid !== state.uid || pending || getActiveGameScope()) throw new Error('Hãy hoàn tất đồng bộ trước khi nhận thưởng.');
     const id = generation, uid = state.uid, profileId = metadata.profileId;
@@ -468,9 +636,9 @@ function createAccountService(options) {
   const service = {
     ready: null,
     getState: publicState,
-    getIdentity: () => metadata?.uid === state.uid && state.uid && backend.auth.currentUser?.uid === state.uid ? { uid: state.uid, profileId: metadata.profileId, firstUid: owner?.firstUid || owner?.uid || state.uid, playerName: state.playerName, environment: state.environment, createdAt: Date.parse(backend.auth.currentUser.metadata.creationTime) || null } : null,
+    getIdentity: () => !['connecting', 'restoring', 'erasing', 'erasure-pending', 'signing-out', 'logout-pending'].includes(state.phase) && !erasureTask && !logoutTask && !loadLocalAccountOperation() && metadata?.uid === state.uid && state.uid && backend.auth.currentUser?.uid === state.uid ? { uid: state.uid, profileId: metadata.profileId, firstUid: owner?.firstUid || owner?.uid || state.uid, playerName: state.playerName, environment: state.environment, createdAt: Date.parse(backend.auth.currentUser.metadata.creationTime) || null } : null,
     subscribe(listener) { listeners.add(listener); listener(publicState()); return () => listeners.delete(listener); },
-    runRewardOperation, syncNow, chooseConflict, requestGoogleLogin, setPlayerName, restoreLocalBackup,
+    runRewardOperation, syncNow, chooseConflict, requestGoogleLogin, setPlayerName, restoreLocalBackup, eraseCurrentAccount, logout,
     acceptGoogleCredential: credential => signInWithCredential(backend.auth, credential),
     dispose() { scope.dispose(); listeners.clear(); if (instance === service) instance = null; },
   };

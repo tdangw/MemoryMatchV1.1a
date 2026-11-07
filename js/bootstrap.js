@@ -1,6 +1,7 @@
 import { createStartupLoading } from './startupLoading.js';
 import { preloadGameBackgrounds } from './gameShell/gameBackgroundTransition.js';
 import { createStartupRecovery, isStartupNetworkError } from './startupRecovery.js';
+import { acknowledgeFinishedAccountOperation } from './accountOperationJournal.js';
 
 async function bootstrap() {
   let stage = 'modules';
@@ -12,6 +13,7 @@ async function bootstrap() {
   const backgroundOwner = new AbortController();
   const backgrounds = preloadGameBackgrounds(backgroundOwner.signal);
   try {
+    acknowledgeFinishedAccountOperation();
     const { initializeApplication } = await import('./main.js');
     stage = 'initialize'; recovery.destroy();
     loading.complete('modules');

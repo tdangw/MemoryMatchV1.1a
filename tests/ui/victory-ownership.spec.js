@@ -123,7 +123,7 @@ test('a replaced summary cannot run its old pending continuation in the same par
     showLevelSummaryOverlay(window.summaryCompletion);
   });
   await expect(page.locator('#level-summary-modal')).toBeVisible();
-  await page.getByRole('button', { name: 'Next Level', exact: true }).click();
+  await page.getByRole('button', { name: 'Chơi tiếp', exact: true }).click();
   await page.evaluate(async () => (await import('/js/ui.js')).showLevelSummaryOverlay({ ...window.summaryCompletion, level: 101 }));
   await page.clock.runFor(500);
   expect(await page.evaluate(() => window.staleSummaryNext || false)).toBe(false);

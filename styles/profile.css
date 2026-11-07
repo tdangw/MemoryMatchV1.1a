@@ -22,9 +22,13 @@
 .account-play-since { margin-top: 10px !important; color: var(--tab-muted); font-size: 11px; }
 .account-play-since:empty { display: none; }
 .account-status:empty { display: none; }
-.account-status:empty + .profile-google { margin-top: 0; }
 .account-status { color: var(--tab-muted); font-size: 13px; }
-.profile-google { width: 100%; margin-top: 16px; }
+.profile-account-actions { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; margin-top: 14px; }
+.profile-account-actions > .tab-button { display: flex; box-sizing: border-box; align-items: center; justify-content: center; gap: 9px; width: 100%; min-width: 0; min-height: 48px; margin: 0; padding: 12px 14px; white-space: normal; text-align: center; line-height: 1.35; }
+.profile-account-actions > .tab-button[hidden] { display: none; }
+.profile-account-actions > .profile-logout { background: transparent; box-shadow: none; }
+.profile-account-actions > .profile-delete { border-color: #df938566; background: #c8665312; color: var(--tab-ink); box-shadow: none; }
+.profile-account-actions > .tab-button .ui-icon { flex: 0 0 20px; width: 20px; height: 20px; }
 .profile-name-form { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; flex: 1 1 100%; min-width: 0; margin: 0; font-size: 16px; }
 .profile-name-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 .profile-name-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
