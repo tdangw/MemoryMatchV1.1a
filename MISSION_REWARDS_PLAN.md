@@ -55,4 +55,9 @@ Unit kiểm0/1/2không nhận,3nhận; emulator147trường hợp giả bị t�
 M5: bỏ statusXu trùngtoast; kim tương phản xanh/viền sáng, giật38độ+hồi8độ;
 kho chữ6cột; bán bằng slider1..max và alignmentcenter như popup chữ khác;
 ghép dùng thunder→frozenUnlock→coinCollect theo ba pha. Âm thanh owner và
-reduced-motion giữ; không thêm grant/timer/animationloop. UI/review đang chốt.
+reduced-motion giữ; không thêm grant/timer/animationloop. M4/M5 đã đạt:
+61unit,37UI thuộc nhiệm vụ/chữ/wheel (rerun kho sau khi sửa co ảnh),
+147 yêu cầu giả bị từ chối trên artifact production; check/build đạt.
+Review độc lập không có P1/P2. Rules ngưỡng3 đã phát hành và đọc lại khớp
+artifact; không thay phần production khác, không tạo Hosting/APK.
+M4 commit `2471d41`; M5 ghi UI/audio/context. Không còn bước trong phạm vi.

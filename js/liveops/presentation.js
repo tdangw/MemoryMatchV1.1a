@@ -74,7 +74,7 @@ export function openLiveopsPage(kind, surface = {}) {
     try {
       const result = rewarded ? await requestRewardedSpin() : await requestLiveops(command);
       if (!owns()) return;
-      observedAt = performance.now(); view = result; confirmedView=true; refreshAppWallet(); status.textContent = kind==='events'&&eventTab==='wheel'?'':result.appliedCoins > 0 ? `Đã nhận ${result.appliedCoins} Xu.` : '';
+      observedAt = performance.now(); view = result; confirmedView=true; refreshAppWallet(); status.textContent = '';
       if(result.letterResult?.kind==='exchange' && result.letterResult.chestType)status.textContent=`Đã nhận ${CHEST_NAMES[result.letterResult.chestType]}. Mở trong Kho rương khi bạn muốn.`;
       else if(result.letterResult?.kind==='exchange')status.textContent=result.letterResult.itemId?`Đã nhận ${LETTER_REWARD_ITEMS.find(item=>item.id===result.letterResult.itemId).name}.`:`Đã nhận ${result.letterResult.coins} Xu.`;
       if (command?.type === 'fuseLetter' && result.state.letters.last?.kind === 'fuse') status.textContent = `Đã nhận chữ ${result.state.letters.last.received}.`;
@@ -299,13 +299,13 @@ export function openLiveopsPage(kind, surface = {}) {
 
   function sellSheet(letter, max) {
     const sheet=el('div','liveops__sale'), quantity=el('input','liveops__letter-quantity');
-    quantity.type='number';quantity.min='1';quantity.max=String(max);quantity.value='1';quantity.step='1';quantity.setAttribute('aria-label','Số chữ muốn bán');
-    quantity.inputMode='numeric';quantity.required=true;
+    quantity.type='range';quantity.min='1';quantity.max=String(max);quantity.value='1';quantity.step='1';quantity.setAttribute('aria-label','Số chữ muốn bán');quantity.id='letter-sale-quantity';
+    const amount=el('output','liveops__sale-amount');amount.setAttribute('for',quantity.id);amount.setAttribute('aria-live','polite');
     const description=el('p'),confirm=button('Xác nhận bán',()=>{ const n=Number(quantity.value);if(!Number.isSafeInteger(n)||n<1||n>max)return; sale.destroy();void run({type:'sellLetter',letter,quantity:n}); });
-    const update=()=>{const n=Number(quantity.value);confirm.disabled=!Number.isSafeInteger(n)||n<1||n>max;quantity.setAttribute('aria-invalid',String(confirm.disabled));description.textContent=confirm.disabled?`Bạn có ${max} chữ ${letter}. Nhập số lượng từ 1 đến ${max}.`:`Bán ${n} chữ ${letter}, nhận ${(n*LETTER_SELL_COINS).toLocaleString('vi-VN')} Xu. Bạn đang có ${max} chữ ${letter}.`;};
+    const update=()=>{const n=Number(quantity.value);confirm.disabled=!Number.isSafeInteger(n)||n<1||n>max||!Number.isSafeInteger(n*LETTER_SELL_COINS);quantity.setAttribute('aria-invalid',String(confirm.disabled));quantity.setAttribute('aria-valuetext',`${n} chữ`);amount.value=`${n.toLocaleString('vi-VN')} / ${max.toLocaleString('vi-VN')}`;description.textContent=confirm.disabled?'Chọn số lượng muốn bán.':`Bán ${n.toLocaleString('vi-VN')} chữ ${letter}, nhận ${(n*LETTER_SELL_COINS).toLocaleString('vi-VN')} Xu.`;};
     quantity.oninput=update;
-    const label=el('label','liveops__sale-quantity','Số lượng');label.append(quantity);sheet.append(description,label,confirm);update();
-    const sale=openAppModal({id:'letter-sale',title:'Bán chữ',content:sheet,owner:scope});sale.panel.classList.add('letter-sale-dialog');quantity.focus();return sale;
+    const label=el('label','liveops__sale-quantity','Số lượng');label.append(amount,quantity);sheet.append(description,label,confirm);update();
+    const sale=openAppModal({id:'letter-sale',title:'Bán chữ',content:sheet,owner:scope,alignment:'center',keepBanner:true});sale.panel.classList.add('letter-sale-dialog');quantity.focus();return sale;
   }
   function render() {
     if (!active()) return;

@@ -387,7 +387,7 @@
   1chữ ngẫu nhiên đều, có thể trùng đầu vào. Không đổi ownership trực tiếp.
 - Vòng quay10ô theo bảng thưởng06/11;1free+10ad tối đa/ngày,
   1vé/lượt riêng, vé không hết hạn. Không giả ad earned. Nhiệm vụ ngày
-  thắng3/ghép30/thắng không Gợi ý thưởng5/5/10Xu; hoàn thành đủ3nhiệm vụ
+  thắng3/ghép30/thắng3ván không Gợi ý thưởng5/5/10Xu; hoàn thành đủ3nhiệm vụ
   bấm rương nhận10Xu+1vé, không cần nhận từng quà trước. Tuần đủ4nhiệm vụ
   bấm rương nhận50Xu+2vé. Điểm danh10/10/15/15/20/25/50Xu và hỗ trợ theo
   bảng07/11 bên dưới; bảy lần thực nhận, bỏ ngày giữ lượt.
@@ -527,3 +527,19 @@
   Khi đủ điều kiện, nút hiện số Xu + icon Xu để nhận qua loot/audio hiện có.
 - Không đổi luật thưởng/save/rules.10UI và kiểm tra JS/CSS đạt; review
   độc lập không có finding. Không build/deploy/APK cho lượt chỉnh này.
+
+### Tinh chỉnh nhiệm vụ và chữ07/11/2026
+
+- Nhiệm vụ không Gợi ý cần3ván; giữ các quà đã nhận dưới mốc cũ, không
+  cấp lại. Generator/rules dùng cùng DAILY target; rương ngày cũng cần đủ3.
+- Không dòng báo Xu cố định sau nhận; toast giữ thông báo. Kim có màu xanh
+  tương phản, viền sáng/bóng tối, giật38độ và hồi8độ theo vạch, tối đa202
+  keyframe hữu hạn, không loop; giảm chuyển động và cleanup giữ như trước.
+- Kho chữ6cột/3hàng, ảnh co theo ô. Popup bán dùng alignmentcenter như
+  popup chữ khác, range1..số đang có, số chọn/tổng và giá cập nhật tại chỗ;
+  không ghi persistence khi kéo, chỉ gửi giao dịch khi xác nhận bán.
+- Ghép: thunder khi bấm/điện tại3ô, frozenUnlock khi vào pha hút chữ,
+  coinCollect khi hiện chữ mới. Không nhân tiếng receive; owner/mute/hidden
+  và đóng giữa request giữ, âm thanh không cấp quà.
+- Rules mốc3 đã phát hành, đọc lại khớp artifact đã kiểm thử147denial.
+  61unit và37UI trong phạm vi đạt; check/build đạt; không Hosting/APK.

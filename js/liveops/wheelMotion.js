@@ -18,8 +18,8 @@ export function wheelPointerFrames(angle){
   const times=[];
   for(let degrees=WHEEL_ANGLE/2;degrees<angle;degrees+=WHEEL_ANGLE)times.push(crossingTime(degrees/angle));
   for(let i=0;i<times.length;i++){
-    const start=times[i],next=times[i+1]??1,end=start+Math.min(70/WHEEL_SPIN_DURATION,(next-start)*.8);
-    frames.push({offset:start,transform:'rotate(0deg)'},{offset:start+(end-start)*.22,transform:'rotate(-22deg)'},{offset:end,transform:'rotate(0deg)'});
+    const start=times[i],next=times[i+1]??1,end=start+Math.min(105/WHEEL_SPIN_DURATION,(next-start)*.9);
+    frames.push({offset:start,transform:'rotate(0deg)'},{offset:start+(end-start)*.22,transform:'rotate(-38deg)'},{offset:start+(end-start)*.72,transform:'rotate(8deg)'},{offset:end,transform:'rotate(0deg)'});
   }
   frames.push({offset:1,transform:'rotate(0deg)'});return frames;
 }

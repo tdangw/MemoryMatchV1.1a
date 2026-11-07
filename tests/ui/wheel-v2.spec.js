@@ -100,7 +100,7 @@ test('ticker follows sector crossings and spin audio stops with the rotor or pag
  for(const interrupt of [false,true]){
   await reset(page);await page.evaluate(async()=>{(await import('/js/gameState.js')).gameState.settings.sound=true;spinAudio.length=0;});await center(page).click();
   const pointer=page.locator('.liveops__pointer');await expect.poll(()=>pointer.evaluate(node=>node.getAnimations().length)).toBe(1);
-  const frames=await pointer.evaluate(node=>node.getAnimations()[0].effect.getKeyframes());expect(frames.length).toBeLessThanOrEqual(152);expect(frames.some(frame=>frame.transform==='rotate(-22deg)')).toBe(true);
+  const frames=await pointer.evaluate(node=>node.getAnimations()[0].effect.getKeyframes());expect(frames.length).toBeLessThanOrEqual(202);expect(frames.some(frame=>frame.transform==='rotate(-38deg)')).toBe(true);expect(frames.some(frame=>frame.transform==='rotate(8deg)')).toBe(true);
   expect(await page.evaluate(()=>spinAudio.filter(cue=>cue==='play').length)).toBe(1);
   await page.evaluate(()=>window.dispatchEvent(new Event('offline')));expect(await pointer.evaluate(node=>node.getAnimations().length)).toBe(1);
   if(interrupt)await page.evaluate(()=>wheelModal.destroy());else await finishSpin(page);

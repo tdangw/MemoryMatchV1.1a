@@ -40,7 +40,7 @@ export function createRewardFeedback({ owner, host }) {
   let current = null;
   const clear = () => { current?.dispose(); current = null; };
   owner.own(clear);
-  return { clear, present(rewards, origin, { particles = true,contextualNames=false } = {}) {
+  return { clear, present(rewards, origin, { particles = true,contextualNames=false,audio=true } = {}) {
     if (!owner.active || !host.isConnected || !rewards?.length) return;
     clear();
     const scope = createGameShellLifecycle(), release = owner.own(() => scope.dispose()); current = scope;
@@ -50,7 +50,7 @@ export function createRewardFeedback({ owner, host }) {
     const prizes = rewards.map(reward => ({ ...describe(reward,contextualNames), kind:reward.kind, amount:reward.amount }));
     toast.textContent = `Đã nhận ${prizes.map(prize => prize.label).join(' + ')}`; layer.append(toast);
     const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-    const cue = phase => playRewardPhase(phase,owner);
+    const cue = phase => {if(audio)playRewardPhase(phase,owner);};
     if (!particles || reduced.matches || document.hidden) {
       (host.closest('.app-modal-overlay') || document.body).append(layer);scope.own(() => layer.remove(),'node');
       cue('receive');scope.timeout(() => scope.dispose(),1100);return;

@@ -25,6 +25,16 @@ const palette=(page,letter)=>page.locator('#letter-fusion-modal').getByRole('but
 const submit=page=>page.locator('#letter-fusion-modal').getByRole('button',{name:'Ghép',exact:true});
 const close=page=>page.locator('#letter-fusion-modal .app-modal__close').click();
 
+test('fusion audio follows immediate lightning, confirmed absorption and collected result; closing cancels late cues',async({page})=>{
+ await page.addInitScript(()=>{window.forgeAudio=[];window.forgePaused=[];HTMLMediaElement.prototype.play=function(){forgeAudio.push(this.src.split('/').at(-1));return Promise.resolve();};HTMLMediaElement.prototype.pause=function(){forgePaused.push(this.src.split('/').at(-1));};});
+ await ready(page,{A:1,M:2});await page.evaluate(async()=>{(await import('/js/gameState.js')).gameState.settings.sound=true;});await page.emulateMedia({reducedMotion:'no-preference'});await start(page);await palette(page,'M').click();await palette(page,'M').click();await page.evaluate(()=>fusionFixture.delay=true);await submit(page).click();
+ const audio=()=>page.evaluate(()=>forgeAudio.filter(name=>['explosion.ogg','unlock_1.mp3','coin-collect.mp3','reward.ogg'].includes(name)));
+ expect(await audio()).toEqual(['explosion.ogg']);await page.locator('.letter-forge__stage').evaluate(node=>node.getAnimations({subtree:true}).forEach(a=>a.finish()));await page.evaluate(()=>{fusionFixture.delay=false;fusionFixture.resolve();});await expect(page.locator('.letter-forge__stage')).toHaveAttribute('data-phase','revealing');expect(await audio()).toEqual(['explosion.ogg','unlock_1.mp3']);
+ await page.locator('.letter-forge__stage').evaluate(node=>node.getAnimations({subtree:true}).forEach(a=>a.finish()));await expect(page.locator('.letter-forge__stage')).toHaveAttribute('data-phase','result');expect(await audio()).toEqual(['explosion.ogg','unlock_1.mp3','coin-collect.mp3']);
+ await close(page);await page.evaluate(()=>fusionFixture.seed({A:1,M:2}));await openLetters(page);await start(page);await palette(page,'M').click();await palette(page,'M').click();await page.evaluate(()=>fusionFixture.delay=true);await submit(page).click();await close(page);await page.evaluate(()=>{fusionFixture.delay=false;fusionFixture.resolve();});await expect(page.locator('#letter-fusion-modal')).toHaveCount(0);
+ expect(await audio()).toEqual(['explosion.ogg','unlock_1.mp3','coin-collect.mp3','explosion.ogg']);expect(await page.evaluate(()=>forgePaused)).toContain('explosion.ogg');
+});
+
 test('mixed and repeated ingredients select locally, commit exactly three once and support another fusion',async({page})=>{
  await ready(page,{A:1,M:2,E:3});await start(page);await expect(submit(page)).toBeDisabled();
  await expect(palette(page,'A')).toBeDisabled();await palette(page,'M').click();await palette(page,'M').click();
@@ -141,17 +151,16 @@ test('compact recipe keeps all letters in one row above its reward and captures 
 });
 
 test('bottom shortcuts retain the tap menu and sale only needs quantity and confirmation',async({page},info)=>{
- await page.setViewportSize({width:320,height:740});await ready(page,{A:1,M:2,E:3});
+ await page.setViewportSize({width:320,height:740});await ready(page,{A:250,M:2,E:3});
  const tools=page.locator('.liveops__letter-tools');await expect(tools.getByRole('button',{name:'Ghép',exact:true})).toBeEnabled();await tools.getByRole('button',{name:'Bán',exact:true}).click();
- const sale=page.locator('#letter-sale'),quantity=sale.getByRole('spinbutton',{name:'Số chữ muốn bán',exact:true}),confirm=sale.getByRole('button',{name:'Xác nhận bán',exact:true});
+ const sale=page.locator('#letter-sale'),quantity=sale.getByRole('slider',{name:'Số chữ muốn bán',exact:true}),confirm=sale.getByRole('button',{name:'Xác nhận bán',exact:true});
  await expect(sale.locator('.liveops__sale button')).toHaveCount(1);await expect(sale.locator('input')).toHaveCount(1);await expect(sale).toContainText('Bán 1 chữ A, nhận 10 Xu');
- for(const n of ['0','2','1.5']){await quantity.fill(n);await expect(confirm).toBeDisabled();await expect(quantity).toHaveAttribute('aria-invalid','true');}
- await quantity.fill('1');await expect(confirm).toBeEnabled();await sale.screenshot({path:info.outputPath('simple-sale.png')});
+ await expect(sale).toHaveAttribute('data-dialog-alignment','center');await expect(quantity).toHaveAttribute('min','1');await expect(quantity).toHaveAttribute('max','250');await quantity.press('End');await expect(quantity).toHaveValue('250');await expect(sale).toContainText('2.500 Xu');await quantity.press('ArrowLeft');await expect(quantity).toHaveValue('249');await quantity.press('Home');await expect(quantity).toHaveValue('1');await quantity.press('End');await expect(confirm).toBeEnabled();await sale.screenshot({path:info.outputPath('simple-sale.png')});
  await confirm.evaluate(n=>{n.click();n.click();});await expect(sale).toHaveCount(0);await expect(page.locator('.liveops')).toHaveAttribute('aria-busy','false');expect(await page.evaluate(()=>fusionFixture.letters.counts.A)).toBe(0);expect(await page.evaluate(()=>fusionFixture.letters.sequence)).toBe(1);
  await page.getByRole('button',{name:/^Chữ M, \d+ chữ$/}).click();await expect(page.locator('#letter-action-modal')).toBeVisible();await expect(page.locator('#letter-action-modal').getByRole('button',{name:'Ghép',exact:true})).toBeVisible();await page.locator('#letter-action-modal .app-modal__close').click();
  await expect(page.getByRole('button',{name:/^Chữ M, \d+ chữ$/})).toHaveAttribute('aria-pressed','true');await tools.getByRole('button',{name:'Ghép',exact:true}).click();await expect(page.getByRole('button',{name:'Bỏ chữ M ở ô 1',exact:true})).toBeVisible();await close(page);
  await tools.getByRole('button',{name:'Bán',exact:true}).click();await quantity.fill('2');await expect(sale).toContainText('nhận 20 Xu');await sale.locator('.app-modal__close').click();expect(await page.evaluate(()=>fusionFixture.letters.counts.M)).toBe(2);
- const metrics=await page.locator('.liveops__letter-grid').evaluate(grid=>({columns:getComputedStyle(grid).gridTemplateColumns.split(' ').length,height:grid.getBoundingClientRect().height,maxCell:Math.max(...[...grid.children].map(n=>n.getBoundingClientRect().width))}));expect(metrics.columns).toBe(5);expect(metrics.height).toBeLessThan(240);expect(metrics.maxCell).toBeLessThanOrEqual(54);
+ const metrics=await page.locator('.liveops__letter-grid').evaluate(grid=>({columns:getComputedStyle(grid).gridTemplateColumns.split(' ').length,height:grid.getBoundingClientRect().height,maxCell:Math.max(...[...grid.children].map(n=>n.getBoundingClientRect().width))}));expect(metrics.columns).toBe(6);expect(metrics.height).toBeLessThan(160);expect(metrics.maxCell).toBeLessThanOrEqual(46);
 });
 
 test('hidden or reduced motion finishes local crafting animations without granting early or losing the result',async({page})=>{

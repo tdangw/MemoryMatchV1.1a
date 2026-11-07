@@ -3,6 +3,8 @@ import { createGameShellLifecycle } from '../gameShell/gameShellLifecycle.js';
 import { createIcon } from '../icons.js';
 import { LETTER_ALPHABET } from './config.js';
 import { createRewardFeedback } from './rewardFeedback.js';
+import { playOwnedRewardCue } from '../sound.js';
+import { gameState } from '../gameState.js';
 import '../../styles/letter-crafting.css';
 const node=(tag,cls,text)=>{const n=document.createElement(tag);n.className=cls;if(text!==undefined)n.textContent=text;return n;};
 export function letterArtwork(letter){
@@ -96,6 +98,7 @@ export function openLetterFusion({initialLetter,owner,current,getContext,execute
     const last=response.state?.letters.last;
     if(!last||last.kind!=='fuse'||last.sequence<=requestSequence||!sameIngredients(last,selected))return false;
     received=last.received;phase='revealing';error='';render();
+    playOwnedRewardCue('frozenUnlock',scope,gameState.settings);
     if(!motion.matches&&!document.hidden){
       const origin=stage.getBoundingClientRect(),center=action.getBoundingClientRect(),rects=slots.map(slot=>slot.getBoundingClientRect());
       const lightning=document.createElementNS('http://www.w3.org/2000/svg','svg');lightning.classList.add('letter-forge__lightning');lightning.setAttribute('viewBox',`0 0 ${origin.width} ${origin.height}`);effects.append(lightning);
@@ -111,7 +114,8 @@ export function openLetterFusion({initialLetter,owner,current,getContext,execute
       await Promise.all([...arcs,...flights]);effects.replaceChildren();if(!active())return true;
     }
     selected=[];phase='result';render();
-    feedback.present(response.committedRewards,null,{particles:false});
+    playOwnedRewardCue('coinCollect',scope,gameState.settings);
+    feedback.present(response.committedRewards,null,{particles:false,audio:false});
     if(!motion.matches&&!document.hidden){scope.animation(face.animate([{transform:'scale(.25)',opacity:0},{transform:'scale(1.12)',opacity:1},{transform:'scale(1)',opacity:1}],{duration:FORGE_MOTION.flash,easing:'ease-out'}));scope.animation(aura.animate([{transform:'scale(.8)',opacity:0},{transform:'scale(1.25)',opacity:.7,offset:.35},{transform:'scale(1.5)',opacity:0}],{duration:FORGE_MOTION.flash}));}
     return true;
   }
@@ -119,7 +123,7 @@ export function openLetterFusion({initialLetter,owner,current,getContext,execute
     if(!active()||['submitting','revealing','result'].includes(phase))return;
     const recovering=phase==='recover';if(!recovering&&(!valid()||!getContext().canUse))return;
     if(!recovering)requestSequence=getContext().sequence;
-    phase='submitting';error='';render();const chargeDone=startCharge();
+    phase='submitting';error='';render();playOwnedRewardCue('thunder',scope,gameState.settings);const chargeDone=startCharge();
     try{
       const response=await (recovering?refresh():execute([...selected]));if(!active())return;
       if(!response||response.error)throw new Error(response?.error||'Chưa thể ghép chữ. Hãy thử lại.');

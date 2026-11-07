@@ -36,6 +36,15 @@ test('mission counts sit inside bars and completed actions claim the displayed c
  await page.locator('.liveops-reward-feedback__particle').evaluateAll(nodes=>nodes.forEach(node=>node.getAnimations().forEach(a=>a.finish())));await expect(page.locator('.liveops-reward-feedback')).toHaveCount(0);
  expect(await page.evaluate(()=>missionAudio)).toEqual(expect.arrayContaining(['reward.ogg','coin_drop.mp3','coin-collect.mp3']));await expect(claim).toBeDisabled();
 });
+test('the no-hint mission and daily chest remain locked below three wins',async({page})=>{
+ await ready(page);
+ for(const count of [1,2,3]){
+  await page.evaluate(count=>eventsFixture.state.daily.noHint=count,count);await open(page);
+  await expect(page.locator('.liveops__mission').last().locator('.liveops__progress-row > span')).toHaveText(`${count}/3`);
+  await expect(page.locator('[data-focus-key="mission-win-without-hint"]')).toHaveText(count<3?'Chơi':'10');
+  if(count<3)await expect(page.locator('.liveops__bonus-art')).toBeDisabled();else await expect(page.locator('.liveops__bonus-art')).toBeEnabled();
+ }
+});
 test('seven daily tiles show and grant their exact new rewards including the opened support pack',async({page})=>{
  test.setTimeout(60000);await ready(page);await page.emulateMedia({reducedMotion:'no-preference'});
  await page.evaluate(()=>{eventsFixture.state.loginNext=0;for(const key of ['daily','weekly'])Object.assign(eventsFixture.state[key],{wins:0,matches:0,noHint:0,visits:0,claimed:[]});});
@@ -44,6 +53,7 @@ test('seven daily tiles show and grant their exact new rewards including the ope
   await page.locator(`.liveops__day[data-focus-key="login-day-${day}"]`).click();
   if(day===6)await finishOpening(page);
   const toast=page.locator('.liveops-reward-feedback__toast');await expect(toast).toContainText(`${[10,10,15,15,20,25,50][day]} Xu`);
+  await expect(page.locator('.liveops__status')).toBeEmpty();
   expect(await page.locator('.liveops-reward-feedback__particle[data-reward-kind="support"]').count()).toBe(day===6?3:1);
   await expect(page.locator('.liveops__day:enabled')).toHaveCount(0);
  }
