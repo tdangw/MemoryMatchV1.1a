@@ -1,5 +1,7 @@
 # Rà soát Sự kiện/Nhiệm vụ và gameplay — 29/10/2026
 
+> Báo cáo lịch sử, không phải backlog hoặc cấu hình hiện hành. Các thay đổi nhiệm vụ, vòng quay và quà test ngày07/11 đã tiến lên sau số liệu ở đây; xem CONTEXT.md và code/config. Kế hoạch rương/drop đã hoàn tất và được xóa; bằng chứng giữ trong COSMETIC_COMPLETION_GROUP_DROPS_RECEIPT.md. Không triển khai lại đề xuất trong audit nếu chưa có yêu cầu mới.
+
 > Cập nhật30/10: luật hiện hành được ghi ở mục9. Các mục1–8 là
 > lịch sử audit/chính sách tại thời điểm29/10, gồm cả đề xuất đã được
 > triển khai sau đó. Không dùng số100%/1000Xu hoặc30% chỉ nhóm đặc biệt
@@ -250,14 +252,14 @@ vẫn có thể nhiều lần chỉ nhận Xu/hỗ trợ. Không hứa5lần ch�
 
 **Chưa sửa chestCandidate/luật rương.** Chủ dự án đã giao lập kế hoạch
 cập nhật theo hướng này29/10. Kế hoạch hiện hành là
-`COSMETIC_COMPLETION_GROUP_DROPS_PLAN.md`, gồm bảng drop mới đã chốt:
+task rương/drop đã đóng (bằng chứng trong `COSMETIC_COMPLETION_GROUP_DROPS_RECEIPT.md`), gồm bảng drop đã chốt tại thời điểm đó:
 thường chữ5%/vé2%/huy hiệu6%; đặc biệt25%/10%/30%. Chưa triển khai các
 thay đổi đó, giá bán10Xu giữ nguyên. Các phép tính so sánh được in riêng
 bởi script phân tích, không bị dùng làm cấu hình runtime.
 
 ## 9. Chính sách sau triển khai30/10 — hai nhóm và ngoại hình chưa có
 
-Nguồn phạm vi: `COSMETIC_COMPLETION_GROUP_DROPS_PLAN.md`; bằng chứng
+Kế hoạch phạm vi đã hoàn tất và được xóa; bằng chứng
 nghiệm thu task được ghi trong receipt riêng của kế hoạch. Mục này cập
 nhật mô hình, không thay thế kiểm tra runtime hoặc dữ liệu chơi thật.
 

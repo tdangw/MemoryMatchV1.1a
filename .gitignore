@@ -31,6 +31,10 @@ android/keystores/
 runtime/
 docs/
 
+# Local audit and Play Console delivery material; current status stays in CONTEXT.md.
+/ADS_SECURITY_ACCOUNT_AUDIT.md
+/design/google-play/
+
 # Generated QA captures and validation reports; keep artwork sources/exports.
 /design/rewards-liveops/review/*
 !/design/rewards-liveops/review/alpha-validation.json

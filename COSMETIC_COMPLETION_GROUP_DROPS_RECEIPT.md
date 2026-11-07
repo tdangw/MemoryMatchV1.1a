@@ -1,6 +1,6 @@
 # Rương ưu tiên chưa có và quà nhóm thẻ — nghiệm thu
 
-Ngày30/10/2026. Nguồn phạm vi: COSMETIC_COMPLETION_GROUP_DROPS_PLAN.md.
+Ngày30/10/2026. Kế hoạch triển khai đã hoàn tất và được xóa; đây là bằng chứng lịch sử, không phải task active. Luật hiện hành xem CONTEXT.md và config nguồn.
 
 P0: giữ API/schema/candidate/receipt, energy/support, hourly gift. Chọn lọc
 pool chưa có thay pity; bảng normal/special không thay đổi phân loại gameplay.

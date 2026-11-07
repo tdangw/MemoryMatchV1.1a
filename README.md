@@ -50,9 +50,16 @@ Project Capacitor Android được giữ trong `android/`. Sau khi cài Android 
 npm run android:apk
 ```
 
-Để build release, cấu hình keystore theo `android/keystore.properties.example` rồi chạy `npm run android:apk:release`.
+Lệnh trên tạo APK Debug. Để build Release, cấu hình keystore theo `android/keystore.properties.example`, rồi dùng:
 
-Bản Android có banner ở trang chủ và bản đồ, áp dụng bảo vệ trẻ em cho mọi người chơi và không cá nhân hóa quảng cáo. Bản web không tải quảng cáo Android. Xem [hướng dẫn thử APK và chuẩn bị AdMob](docs/ads/HUONG_DAN_THU_APK.md). Trang quyền riêng tư có trong Cài đặt và được chuẩn bị tại `public/legal/privacy.html`; chưa tự đưa lên website khi build APK.
+```powershell
+npm run android:apk:release
+npm run android:aab
+```
+
+APK ở `android/app/build/outputs/apk/release/app-release.apk`; AAB ở `android/app/build/outputs/bundle/release/app-release.aab`. Hai lệnh đều build web Android và đồng bộ tài nguyên trước khi đóng gói. APK thử giữ nguyên phiên bản; chỉ cập nhật phiên bản khi tạo AAB đưa Store, với `versionCode` lớn hơn mọi mã đã upload. Không tự upload khi build. Xem `CONTEXT.md` để phân biệt nguồn hiện tại với bản APK/Play đã bàn giao.
+
+Bản Android đã bật banner ở menu/tab và ba màn chơi, video nhận thưởng và quảng cáo chuyển màn theo điều kiện. Áp dụng bảo vệ trẻ em cho mọi người chơi và không cá nhân hóa quảng cáo. Bản web không tải quảng cáo Android. Xem [hướng dẫn thử APK và AdMob](docs/ads/HUONG_DAN_THU_APK.md). Trang quyền riêng tư có trong Cài đặt và tại `public/legal/privacy.html`; build APK không tự deploy website. Biên bản bàn giao ở [Android/Play](ANDROID_RELEASE_RECEIPT.md).
 
 ## Cấu trúc
 
