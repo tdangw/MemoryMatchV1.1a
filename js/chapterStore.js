@@ -4,6 +4,7 @@ import { normalizeAchievementLedger } from './progression/achievementModel.js';
 import { normalizeAcquisitions } from './progression/acquisitionModel.js';
 import { normalizeRewardLedger } from './liveops/ledger.js';
 import { highestOwnedAdventureLevel, createProgressResult, keepProgressBest, sameRankingOwner, validateProgressResult, normalizeProgressMigration, normalizeProgressBests } from './progressRankingModel.js';
+import { migrateAdventureBests, mergeAdventureBests, keepAdventureRecord, validateAdventureRecord } from './adventureRankingModel.js';
 
 export const CHAPTER_DATABASE = "memoryMatchAdventure";
 const GAME_KEYS = ["memoryMatch", "linkConnect", "tripleConnect"];
@@ -45,7 +46,9 @@ export async function migrateChapterLevelRankings(database, owner, expectedRevis
     if (!previous || previous.revision !== expectedRevision) throw new Error('Migration revision changed.');
     const marker = normalizeProgressMigration(previous.data.progress.levelRankingMigration);
     const sameOwner = marker?.version === 3 && sameRankingOwner(marker.owner, owner);
-    if (sameOwner && marker.complete) { await complete; return { envelope: previous, complete: true }; }
+    const adventureMarker = normalizeProgressMigration(previous.data.progress.adventureRankingMigration, 4);
+    const sameAdventure = adventureMarker && sameRankingOwner(adventureMarker.owner, owner);
+    if (sameOwner && marker.complete && sameAdventure && adventureMarker.complete) { await complete; return { envelope: previous, complete: true }; }
     const stored = structuredClone(previous);
     const keys = GAME_IDS;
     function inspect(game, records) {
@@ -54,9 +57,10 @@ export async function migrateChapterLevelRankings(database, owner, expectedRevis
       if (Object.values(bests).some(value => !validateProgressResult(value))) throw new Error('Invalid level ranking history.');
       const level = highestOwnedAdventureLevel(records, owner, profileOwner, { certifiedOnly: stored.data.progress.gameplaySeason === 1 });
       if (level) bests.adventure = keepProgressBest(bests.adventure, createProgressResult(keys[game], 'adventure', level, owner));
+      profile.adventureBestsV4 = migrateAdventureBests(profile.adventureBestsV4, records, keys[game], owner, profileOwner);
     }
-    if (!sameOwner) for (const game of Object.keys(keys)) inspect(game, stored.data.progress[game]?.bestByLevel);
-    let afterKey = sameOwner ? marker.afterKey : null;
+    if (!sameAdventure) for (const game of Object.keys(keys)) inspect(game, stored.data.progress[game]?.bestByLevel);
+    let afterKey = sameAdventure ? adventureMarker.afterKey : null;
     let exhausted = false; let count = 0;
     await new Promise((resolve, reject) => {
       const request = transaction.objectStore('chapters').openCursor(afterKey ? IDBKeyRange.lowerBound(afterKey, true) : undefined);
@@ -73,7 +77,8 @@ export async function migrateChapterLevelRankings(database, owner, expectedRevis
       };
     });
     if (!isCurrent()) throw new Error('Migration cancelled.');
-    stored.data.progress.levelRankingMigration = { version: 3, owner: { ...owner }, afterKey, complete: exhausted };
+    stored.data.progress.levelRankingMigration = sameOwner && marker.complete ? marker : { version: 3, owner: { ...owner }, afterKey, complete: exhausted };
+    stored.data.progress.adventureRankingMigration = { version: 4, owner: { ...owner }, afterKey, complete: exhausted };
     stored.revision++; profiles.put(stored, 'active'); await complete;
     return { envelope: stored, complete: exhausted };
   } catch (error) {
@@ -143,6 +148,11 @@ export async function replaceChapterSnapshot(database, snapshot, envelope, expec
     }
     chapters.clear();
     for (const entry of snapshot.chapters) chapters.put(entry.value, entry.key);
+    if (metadata?.uid && metadata.profileId) for (const game of GAME_KEYS) {
+      const progress = envelope.data.progress[game];
+      if (progress) progress.adventureBestsV4 = mergeAdventureBests(progress.adventureBestsV4,
+        previous?.data.progress[game]?.adventureBestsV4, GAME_IDS[game], { uid: metadata.uid, profileId: metadata.profileId });
+    }
     profiles.put(envelope, "active");
     if (metadataKey) {
       const store = transaction.objectStore("metadata");
@@ -231,6 +241,11 @@ export async function writeChapterProfile(database, envelope, expectedRevision, 
       && (durableMarker.complete || !incomingMarker.complete && (durableMarker.afterKey || '') > (incomingMarker.afterKey || '')))) {
       stored.data.progress.levelRankingMigration = durableMarker;
     }
+    const durableAdventureMarker = normalizeProgressMigration(previous?.data.progress.adventureRankingMigration, 4);
+    const incomingAdventureMarker = normalizeProgressMigration(stored.data.progress.adventureRankingMigration, 4);
+    if (durableAdventureMarker && (!incomingAdventureMarker || sameRankingOwner(durableAdventureMarker.owner, incomingAdventureMarker.owner)
+      && (durableAdventureMarker.complete || !incomingAdventureMarker.complete && (durableAdventureMarker.afterKey || '') > (incomingAdventureMarker.afterKey || ''))))
+      stored.data.progress.adventureRankingMigration = durableAdventureMarker;
     const updated = new Map();
     for (const game of GAME_KEYS) {
       const progress = stored.data.progress[game];
@@ -243,6 +258,7 @@ export async function writeChapterProfile(database, envelope, expectedRevision, 
         if (!validateProgressResult(incoming) || sameRankingOwner(result.owner, incoming.owner) && result.levelReached > incoming.levelReached) mergedLevelBests[family] = result;
       }
       progress.levelBestsV3 = mergedLevelBests;
+      progress.adventureBestsV4 = mergeAdventureBests(progress.adventureBestsV4, original.adventureBestsV4, GAME_IDS[game]);
       const groups = splitResults(progress.bestByLevel);
       const claims = splitClaims(progress.claimedChests);
       const starts = splitResults(progress.startedLevels);
@@ -268,6 +284,14 @@ export async function writeChapterProfile(database, envelope, expectedRevision, 
           claimedChests: { ...oldChapter.claimedChests, ...claims.get(number) },
           startedLevels: { ...oldChapter.startedLevels, ...starts.get(number) },
         };
+        for (const [resultKey, result] of Object.entries(chapter.bestByLevel)) {
+          const oldRecord = oldChapter.bestByLevel[resultKey]?.adventureRecord;
+          if (validateAdventureRecord(oldRecord)) {
+            const nextRecord = result.adventureRecord;
+            if (!validateAdventureRecord(nextRecord) || sameRankingOwner(oldRecord.owner, nextRecord.owner))
+              result.adventureRecord = validateAdventureRecord(nextRecord) ? keepAdventureRecord(oldRecord, nextRecord) : oldRecord;
+          }
+        }
         chapters.put(chapter, key);
         updated.set(key, chapter);
       }

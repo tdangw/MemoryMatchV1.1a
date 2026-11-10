@@ -4,14 +4,14 @@ export const RANKING_FAMILIES = Object.freeze(['adventure', 'challenge', 'endles
 const games = new Set(['memory-match', 'link-connect', 'triple-connect']);
 export const sameRankingOwner = (a, b) => Boolean(a && b && (a.uid && b.uid ? a.uid === b.uid : a.profileId === b.profileId && a.uid === b.uid));
 export const validProgressLevel = level => Number.isSafeInteger(level) && level >= 1 && level <= MAX_ADVENTURE_LEVEL;
-export function normalizeProgressMigration(value) {
-  if (value?.version !== 3 || typeof value.complete !== 'boolean' || typeof value.owner?.profileId !== 'string' || !value.owner.profileId
+export function normalizeProgressMigration(value, version = 3) {
+  if (value?.version !== version || typeof value.complete !== 'boolean' || typeof value.owner?.profileId !== 'string' || !value.owner.profileId
     || !(value.owner.uid === null || typeof value.owner.uid === 'string' && value.owner.uid.length > 0)) return null;
   if (value.afterKey !== null) {
     const match = /^(memoryMatch|linkConnect|tripleConnect):([1-9]\d*)$/.exec(value.afterKey);
     if (!match || !Number.isSafeInteger(Number(match[2])) || Number(match[2]) > MAX_ADVENTURE_LEVEL / 100) return null;
   }
-  return { version: 3, owner: { ...value.owner }, afterKey: value.afterKey, complete: value.complete };
+  return { version, owner: { ...value.owner }, afterKey: value.afterKey, complete: value.complete };
 }
 export function validateProgressResult(result) {
   return Boolean(result?.rulesVersion === 3 && result.kind === 'progress' && games.has(result.gameId)

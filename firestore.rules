@@ -103,7 +103,7 @@ service cloud.firestore {
       }
     }
     function validEntry(data, board) {
-      return data.rulesVersion == 3 ? validProgressEntry(data, board) : data.rulesVersion in [1, 2] && data.resultId is string && data.resultId.matches('^[a-f0-9-]{36}$')
+      return data.rulesVersion == 4 ? validAdventureEntry(data, board) : data.rulesVersion == 3 ? validProgressEntry(data, board) : data.rulesVersion in [1, 2] && data.resultId is string && data.resultId.matches('^[a-f0-9-]{36}$')
         && data.gameId in ['memory-match', 'link-connect', 'triple-connect']
         && data.playerName is string && data.playerName.size() > 0 && data.playerName.size() <= 40
         && data.updatedAt == request.time
@@ -133,8 +133,28 @@ service cloud.firestore {
         && data.reachedAt == request.time;
     }
     function betterEntry(next, previous) {
-      return next.kind == previous.kind && (next.kind == 'progress' ? next.levelReached > previous.levelReached : next.kind == 'time' ? next.durationMs < previous.durationMs
+      return next.kind == previous.kind && (next.kind == 'adventure' ? betterAdventureEntry(next, previous) : next.kind == 'progress' ? next.levelReached > previous.levelReached : next.kind == 'time' ? next.durationMs < previous.durationMs
         : next.levelReached > previous.levelReached || next.levelReached == previous.levelReached && next.totalScore > previous.totalScore);
+    }
+    function validAdventureEntry(data, board) {
+      return data.keys().hasOnly(['rulesVersion','resultId','gameId','family','mode','kind','playerName','reachedAt','levelReached','metricsComplete','score','misses','moves'])
+        && data.keys().hasAll(['rulesVersion','resultId','gameId','family','mode','kind','playerName','reachedAt','levelReached','metricsComplete','score','misses','moves'])
+        && data.resultId is string && data.resultId.matches('^[a-f0-9-]{36}$')
+        && data.kind == 'adventure' && data.family == 'adventure'
+        && data.gameId in ['memory-match','link-connect','triple-connect'] && data.mode in ['easy','normal','hard','superHard']
+        && board == 'v4_' + data.gameId + '_adventure_' + data.mode
+        && data.playerName is string && data.playerName.size() > 0 && data.playerName.size() <= 40
+        && data.levelReached is int && data.levelReached > 0 && data.levelReached <= 9007199254740900
+        && data.metricsComplete is bool && data.score is int && data.moves is int && data.misses is int
+        && data.score <= 9007199254740991 && data.moves <= 9007199254740991 && data.misses <= 9007199254740991
+        && (data.metricsComplete ? data.score >= 0 && data.moves >= 0 && data.misses >= 0 && data.misses <= data.moves
+          : data.score == -1 && data.moves == 0 && data.misses == 0)
+        && data.reachedAt == request.time;
+    }
+    function betterAdventureEntry(next, previous) {
+      return next.levelReached > previous.levelReached || next.levelReached == previous.levelReached
+        && (next.score > previous.score || next.score == previous.score
+          && (next.misses < previous.misses || next.misses == previous.misses && next.moves < previous.moves));
     }
     match /gamespaces/{space}/leaderboards/{board}/entries/{uid} {
       allow delete: if knownSpace(space) && erasing(space, uid);

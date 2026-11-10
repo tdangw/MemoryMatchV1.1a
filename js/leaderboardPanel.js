@@ -10,18 +10,23 @@ import { getLeaderboardService } from './leaderboardService.js';
 import { readLeaderboard } from './leaderboardStore.js';
 import { readCachedLeaderboard } from './leaderboardStore.js';
 import { rankingBoardId } from './rankingResult.js';
+import { adventureRankingEnabled } from './adventureRankingAvailability.js';
 import { formatLeaderboardNumber, compactLeaderboardPages } from './leaderboardPresentation.js';
 import { createGameShellLifecycle, getActiveGameScope } from './gameShell/gameShellLifecycle.js';
 import { getAppPageScope } from './appPageLifecycle.js';
 let lastGame = null;
 const families = [['adventure', 'Hành trình'], ['challenge', 'Thử thách'], ['endless', 'Vô tận']];
 let lastFamily = 'adventure';
+let lastDifficulty = 'easy';
+const difficulties = [['easy','C'],['normal','B'],['hard','A'],['superHard','S']];
 
 export function openLeaderboards(gameId, onClose, surface = {}) {
   const scope = createGameShellLifecycle();
   let generation = 0;
   let selectedGame = gameId || lastGame || getRecentGameId();
   let selectedFamily = lastFamily;
+  let selectedDifficulty = lastDifficulty;
+  const enhanced = adventureRankingEnabled();
   let currentPage = 1;
   let currentKey = null;
   let loading = false;
@@ -29,10 +34,13 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
   let loadedPages = [1];
   const compactPager = window.matchMedia('(max-width: 700px)');
   const scrolls = new Map();
-  const content = document.createElement('div'); content.className = 'leaderboard-view';
+  const content = document.createElement('div'); content.className = enhanced ? 'leaderboard-view leaderboard-view--records' : 'leaderboard-view';
   const games = tabs('Trò chơi', GAME_DEFINITIONS.map(item => [item.id, item.title]), 'game');
   const familyPicker = button(''); familyPicker.className = 'leaderboard-family-picker';
   familyPicker.setAttribute('aria-haspopup', 'menu'); familyPicker.setAttribute('aria-expanded', 'false');
+  const difficultyPicker = document.createElement('div'); difficultyPicker.className = 'leaderboard-difficulties';
+  difficultyPicker.setAttribute('role', 'group'); difficultyPicker.setAttribute('aria-label', 'Độ khó');
+  for (const [mode, label] of difficulties) { const control = button(label); control.dataset.rankDifficulty = mode; control.setAttribute('aria-label', `Độ khó ${label}`); difficultyPicker.append(control); }
   const footer = document.createElement('div'); footer.className = 'leaderboard-footer';
   const status = document.createElement('p'); status.className = 'leaderboard-status'; status.setAttribute('aria-live', 'polite');
   const retry = button('Thử lại'); retry.classList.add('leaderboard-retry'); retry.hidden = true;
@@ -52,6 +60,8 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
   modal.panel.classList.add('leaderboard-panel');
   function updateFilters() {
     lastGame = selectedGame;
+    difficultyPicker.hidden = !enhanced || selectedFamily !== 'adventure';
+    for (const control of difficultyPicker.children) control.setAttribute('aria-pressed', String(control.dataset.rankDifficulty === selectedDifficulty));
     for (const item of games.children) {
       const selected = item.dataset.rankGame === selectedGame;
       item.setAttribute('aria-selected', String(selected)); item.tabIndex = selected ? 0 : -1;
@@ -131,6 +141,7 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
   }
   function createHeading() {
     const heading = document.createElement('div'); heading.className = 'leaderboard-heading leaderboard-heading--progress';
+    if (enhanced) { heading.classList.add('leaderboard-heading--filters'); heading.append(familyPicker, difficultyPicker); return heading; }
     const rank = document.createElement('span'); rank.textContent = 'Hạng';
     const player = document.createElement('span'); player.className = 'leaderboard-heading-player';
     const label = document.createElement('span'); label.textContent = 'Người chơi';
@@ -147,7 +158,9 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
     const id = ++generation;
     const uid = getAccountService()?.getIdentity()?.uid;
     if (currentKey) { scrolls.delete(`${currentKey}:${currentPage}`); scrolls.set(`${currentKey}:${currentPage}`, results.scrollTop); while (scrolls.size > 60) scrolls.delete(scrolls.keys().next().value); }
-    const board = { gameId: selectedGame, family: selectedFamily, kind: 'progress', rulesVersion: 3 };
+    const board = enhanced && selectedFamily === 'adventure'
+      ? { gameId: selectedGame, family: 'adventure', mode: selectedDifficulty, kind: 'adventure', rulesVersion: 4 }
+      : { gameId: selectedGame, family: selectedFamily, kind: 'progress', rulesVersion: 3 };
     const nextKey = `${uid || ''}:${rankingBoardId(board)}`;
     if (nextKey !== currentKey) loadedPages = [1];
     loading = true; currentPage = requestedPage; controls();
@@ -173,12 +186,8 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
       for (const [index, item] of data.top.entries()) {
         const rank = (currentPage - 1) * 10 + index + 1;
         const row = document.createElement('li');
-        const place = rankMarker(rank);
-        const avatar = document.createElement('span'); avatar.className = 'leaderboard-avatar'; avatar.append(cosmeticPortrait(cosmetics.selections.get(item.uid), { label: item.playerName }));
-        const name = document.createElement('span'); name.className = 'leaderboard-name'; name.textContent = item.playerName; name.title = item.playerName;
-        if (item.uid === uid) { row.classList.add('is-self'); name.setAttribute('aria-label', `${item.playerName}, bạn`); }
-        row.append(place, avatar, name);
-        row.append(metric(formatLeaderboardNumber(item.levelReached), 'leaderboard-metric', 'Màn')); list.append(row);
+        fillRankingRow(row, item, rank, cosmetics.selections.get(item.uid), item.uid === uid, enhanced, board.kind === 'adventure');
+        list.append(row);
       }
       results.dataset.offline = String(offline);
       if (data.top.length) { status.textContent = offline ? 'Chưa có kết nối.' : cosmetics.available ? '' : 'Chưa cập nhật được ảnh hồ sơ.'; renderResults(status, retry, list); }
@@ -186,12 +195,7 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
       if (data.own && uid) {
         const rowIndex = data.top.findIndex(item => item.uid === uid);
         const ownRank = data.ownRank || (rowIndex >= 0 ? (currentPage - 1) * 10 + rowIndex + 1 : null);
-        const rank = rankMarker(ownRank);
-        const avatar = document.createElement('span'); avatar.className = 'leaderboard-avatar'; avatar.append(cosmeticPortrait(cosmetics.selections.get(uid), { label: data.own.playerName || 'Bạn' }));
-        const name = document.createElement('span'); name.className = 'leaderboard-name'; name.textContent = data.own.playerName || 'Bạn'; name.title = name.textContent; name.setAttribute('aria-label', `${name.textContent}, bạn`);
-        const identity = document.createElement('div'); identity.className = 'leaderboard-own-identity';
-        const label = document.createElement('small'); label.textContent = 'Bạn'; identity.append(label, name);
-        own.replaceChildren(rank, avatar, identity, metric(formatLeaderboardNumber(data.own.levelReached), 'leaderboard-metric', 'Màn'));
+        fillRankingRow(own, data.own, ownRank, cosmetics.selections.get(uid), true, enhanced, board.kind === 'adventure', true);
       } else own.textContent = uid ? 'Bạn chưa có thành tích ở bảng này.' : '';
       results.scrollTop = refreshRequested ? 0 : scrolls.get(`${currentKey}:${currentPage}`) || 0;
       loading = false; controls(data);
@@ -218,6 +222,11 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
     selectGame(items[next]); items[next].focus();
   });
   scope.listen(familyPicker, 'click', () => openDropdown(familyPicker));
+  scope.listen(difficultyPicker, 'click', event => {
+    const control = event.target.closest('[data-rank-difficulty]');
+    if (!control || control.dataset.rankDifficulty === selectedDifficulty) return;
+    selectedDifficulty = lastDifficulty = control.dataset.rankDifficulty; updateFilters(); void load();
+  });
   scope.listen(retry, 'click', () => { if (!loading) void load(true); });
   scope.listen(previous, 'click', () => { if (!loading && currentPage > 1) void load(false, currentPage - 1); });
   scope.listen(next, 'click', () => { if (!loading && !next.disabled) void load(false, currentPage + 1); });
@@ -234,6 +243,37 @@ export function openLeaderboards(gameId, onClose, surface = {}) {
   updateFilters(); void load(true);
   return modal;
 }
+function fillRankingRow(row, item, rank, cosmetic, self, enhanced, adventure, pinned = false) {
+  const place = rankMarker(rank);
+  const avatar = document.createElement('span'); avatar.className = 'leaderboard-avatar';
+  avatar.append(cosmeticPortrait(cosmetic, { label: item.playerName || 'Bạn' }));
+  const name = document.createElement('span'); name.className = 'leaderboard-name'; name.textContent = item.playerName || 'Bạn'; name.title = name.textContent;
+  row.classList.toggle('is-self', self);
+  if (self) name.setAttribute('aria-label', `${name.textContent}, bạn`);
+  row.classList.toggle('leaderboard-card', enhanced);
+  row.classList.toggle('leaderboard-card--adventure', enhanced && adventure);
+  const identity = document.createElement('div'); identity.className = 'leaderboard-own-identity';
+  if (pinned) { const label = document.createElement('small'); label.textContent = 'Bạn'; identity.append(label); }
+  identity.append(name);
+  const level = metric(formatLeaderboardNumber(item.levelReached), 'leaderboard-metric', 'Màn');
+  if (!enhanced) { row.replaceChildren(place, avatar, pinned ? identity : name, level); return; }
+  identity.classList.add('leaderboard-card-name');
+  if (adventure) {
+    level.textContent = `Màn ${formatLeaderboardNumber(item.levelReached)}`; level.classList.add('leaderboard-card-level');
+    const stats = document.createElement('div'); stats.className = 'leaderboard-card-stats';
+    for (const [key, label] of [['moves','Lượt'],['misses','Sai'],['score','Điểm']]) {
+      const cell = document.createElement('div'), caption = document.createElement('small'); caption.textContent = label;
+      const value = item.metricsComplete === true ? formatLeaderboardNumber(item[key]) : '—';
+      cell.append(caption, metric(value, `leaderboard-card-stat leaderboard-card-stat--${key}`, label)); stats.append(cell);
+    }
+    row.replaceChildren(identity, level, place, avatar, stats);
+  } else {
+    const progress = document.createElement('div'); progress.className = 'leaderboard-card-progress';
+    const caption = document.createElement('small'); caption.textContent = 'Màn'; progress.append(caption, level);
+    row.replaceChildren(identity, place, avatar, progress);
+  }
+}
+
 function rankMarker(rank) {
   const place = document.createElement('span'); place.className = 'leaderboard-rank';
   place.textContent = rank ? formatLeaderboardNumber(rank) : '—';

@@ -15,6 +15,7 @@ import { normalizeRankedRun, normalizeRunBestsV2, recordLevelCheckpoint } from "
 import { getRankingOwner } from './rankingOwner.js';
 import { validateRankingResult } from './rankingResult.js';
 import { normalizeProgressBests, normalizeProgressMigration } from './progressRankingModel.js';
+import { createAdventureRecord, validateAdventureRecord, keepAdventureRecord, normalizeAdventureBests } from './adventureRankingModel.js';
 import { MASTERY_DIFFICULTIES, hasCertifiedCompletion, getMasteryBlock } from './progression/difficultyProgress.js';
 import { normalizePairSnapshot } from './pairSessionSnapshot.js';
 import { normalizeWaveProgress } from './progression/waveProgress.js';
@@ -105,6 +106,7 @@ export function hydrateGameState({
     getThemeSelectionManifest(),
   );
   gameState.progress.levelRankingMigration = normalizeProgressMigration(progress.levelRankingMigration) || undefined;
+  gameState.progress.adventureRankingMigration = normalizeProgressMigration(progress.adventureRankingMigration, 4) || undefined;
   const memorySessions = normalizeSessions(memoryMatch.sessionsByMode, "memory-match");
   gameState.progress.memoryMatch = {
     totalStars: normalizeNonNegativeInteger(memoryMatch.totalStars),
@@ -236,6 +238,8 @@ function normalizeBestByLevel(value) {
         ? { rulesVersion: 1, completedWaves: result.completedWaves } : {}),
       ...(Number.isSafeInteger(result.durationMs) && result.durationMs > 0 ? { durationMs: result.durationMs } : {}),
       ...(validateRankingResult(result.rankingResult) ? { rankingResult: structuredClone(result.rankingResult) } : {}),
+      ...(validateAdventureRecord(result.adventureRecord) && result.adventureRecord.mode === key.split(':')[0]
+        && result.adventureRecord.levelReached === Number(key.split(':')[1]) ? { adventureRecord: structuredClone(result.adventureRecord) } : {}),
     }]];
   }));
 }
@@ -259,6 +263,7 @@ function normalizeAdventure(progress, gameId) {
     })),
     runBestsV2: normalizeRunBestsV2(progress, gameId),
     levelBestsV3: normalizeProgressBests(progress.levelBestsV3, gameId),
+    adventureBestsV4: normalizeAdventureBests(progress.adventureBestsV4, gameId),
     runBests: Object.fromEntries(Object.entries(progress.runBests || {}).filter(([mode, result]) => ["challenge", "endless"].includes(mode)
       && result && Number.isSafeInteger(result.levelReached) && result.levelReached > 0 && Number.isSafeInteger(result.totalScore) && result.totalScore >= 0)),
   };
@@ -434,6 +439,14 @@ function recordGameResult(progress, { mode, level, score, stars, durationMs, wav
   if (previous.rankingResult) progress.bestByLevel[key].rankingResult = previous.rankingResult;
   const metrics = getActivePlayMetrics();
   const owner = metrics ? metrics.owner : getRankingOwner();
+  if (owner && wave && isNormalAdventureMode(mode)) {
+    const candidate = createAdventureRecord({ gameId, mode, level, score, wave, owner });
+    const sameLevel = validateAdventureRecord(previous.adventureRecord) && previous.adventureRecord.gameId === gameId
+      && previous.adventureRecord.mode === mode && previous.adventureRecord.levelReached === level ? previous.adventureRecord : null;
+    progress.bestByLevel[key].adventureRecord = keepAdventureRecord(sameLevel, candidate);
+    progress.adventureBestsV4 ||= {};
+    progress.adventureBestsV4[mode] = keepAdventureRecord(progress.adventureBestsV4[mode], candidate);
+  } else if (validateAdventureRecord(previous.adventureRecord)) progress.bestByLevel[key].adventureRecord = previous.adventureRecord;
   if (owner && isNormalAdventureMode(mode)) recordLevelCheckpoint(gameId, 'adventure', level, owner);
   const sameRankingOwner = previous.rankingResult && (owner?.uid ? owner.uid === previous.rankingResult.owner.uid : owner?.profileId === previous.rankingResult.owner.profileId);
   if (owner && isNormalAdventureMode(mode) && measuredTime && (!sameRankingOwner || measuredTime < previous.rankingResult.durationMs)) {

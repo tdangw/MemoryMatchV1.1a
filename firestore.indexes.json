@@ -9,6 +9,14 @@
       { "fieldPath": "levelReached", "order": "DESCENDING" },
       { "fieldPath": "totalScore", "order": "DESCENDING" },
       { "fieldPath": "__name__", "order": "ASCENDING" }
+    ] },
+    { "collectionGroup": "entries", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "levelReached", "order": "DESCENDING" },
+      { "fieldPath": "score", "order": "DESCENDING" },
+      { "fieldPath": "misses", "order": "ASCENDING" },
+      { "fieldPath": "moves", "order": "ASCENDING" },
+      { "fieldPath": "reachedAt", "order": "ASCENDING" },
+      { "fieldPath": "__name__", "order": "ASCENDING" }
     ] }
   ],
   "fieldOverrides": [

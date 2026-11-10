@@ -3,23 +3,27 @@ import { collectProgressRankingResults, rankingBoardId, comparePublicResults } f
 import { gameState } from './gameState.js';
 import { getRankingOwner } from './rankingOwner.js';
 import { keepProgressBest, sameRankingOwner, validateProgressResult } from './progressRankingModel.js';
+import { validateAdventureRecord, keepAdventureRecord } from './adventureRankingModel.js';
+import { adventureRankingEnabled } from './adventureRankingAvailability.js';
 import { getFirebaseBackend } from './firebaseBackend.js';
 import { getAccountService } from './accountService.js';
 import { submitRankingResult } from './leaderboardStore.js';
 import { createGameShellLifecycle, clearShellTimeout } from './gameShell/gameShellLifecycle.js';
-const QUEUE_LIMIT = 9;
+const QUEUE_LIMIT = 21;
+const validQueueResult = result => validateProgressResult(result) || validateAdventureRecord(result);
+const canPublish = result => result.kind !== 'adventure' || adventureRankingEnabled();
 let instance = null;
 export function normalizeLevelRankingQueue(value, owner = null) {
   const queue = {};
   for (const [id, result] of Object.entries(value?.queue || {})) {
     if (Object.keys(queue).length >= QUEUE_LIMIT) break;
-    if (!validateProgressResult(result)) continue;
+    if (!validQueueResult(result)) continue;
     const owned = !owner || (owner.profileQueue ? result.owner.profileId === owner.profileId && (!result.owner.uid || result.owner.uid === owner.uid)
       : owner.uid ? result.owner.uid === owner.uid : result.owner.profileId === owner.profileId && result.owner.uid === null);
     if (owned && id === `${result.owner.uid || result.owner.profileId}:${rankingBoardId(result)}`) queue[id] = result;
   }
-  const prefix = owner && `${owner.profileQueue ? owner.profileId : owner.uid || owner.profileId}:v3_`;
-  const receipts = Object.fromEntries(Object.entries(value?.receipts || {}).filter(([key, id]) => (!prefix || key.startsWith(prefix)) && key.length <= 512 && /:v3_(memory-match|link-connect|triple-connect)_(adventure|challenge|endless)$/.test(key) && /^[a-f0-9-]{36}$/.test(id)).slice(0, QUEUE_LIMIT));
+  const prefix = owner && `${owner.profileQueue ? owner.profileId : owner.uid || owner.profileId}:`;
+  const receipts = Object.fromEntries(Object.entries(value?.receipts || {}).filter(([key, id]) => (!prefix || key.startsWith(prefix)) && key.length <= 512 && /:(v3_(memory-match|link-connect|triple-connect)_(adventure|challenge|endless)|v4_(memory-match|link-connect|triple-connect)_adventure_(easy|normal|hard|superHard))$/.test(key) && /^[a-f0-9-]{36}$/.test(id)).slice(-QUEUE_LIMIT));
   return { queue, receipts, deferred: false };
 }
 export function adoptLevelRankingQueue(source, target, identity) {
@@ -27,10 +31,10 @@ export function adoptLevelRankingQueue(source, target, identity) {
   const to = normalizeLevelRankingQueue(target, { uid: identity.uid });
   if (identity.firstUid !== identity.uid) return [from, to];
   for (const [id, result] of Object.entries(from.queue)) {
-    if (!validateProgressResult(result) || result.owner.profileId !== identity.profileId || result.owner.uid && result.owner.uid !== identity.uid) continue;
+    if (!validQueueResult(result) || result.owner.profileId !== identity.profileId || result.owner.uid && result.owner.uid !== identity.uid) continue;
     const bound = { ...result, owner: { ...result.owner, uid: identity.uid } };
     const key = `${identity.uid}:${rankingBoardId(bound)}`;
-    if (to.receipts[key] !== bound.id && (!to.queue[key] || comparePublicResults(bound, to.queue[key], 'progress') < 0)) to.queue[key] = bound;
+    if (to.receipts[key] !== bound.id && (!to.queue[key] || comparePublicResults(bound, to.queue[key], bound.kind) < 0)) to.queue[key] = bound;
     delete from.queue[id]; from.receipts[id] = result.id;
   }
   return [from, to];
@@ -68,12 +72,16 @@ export function initializeLeaderboardService() {
             for (const [family, result] of Object.entries(migrated.progress[game]?.levelBestsV3 || {})) {
               if (sameRankingOwner(result.owner, owner)) target[family] = keepProgressBest(target[family], result);
             }
+            const adventure = gameState.progress[game].adventureBestsV4 ||= {};
+            for (const [mode, result] of Object.entries(migrated.progress[game]?.adventureBestsV4 || {}))
+              if (sameRankingOwner(result.owner, owner)) adventure[mode] = keepAdventureRecord(adventure[mode], result);
           }
           gameState.progress.levelRankingMigration = migrated.progress.levelRankingMigration;
+          gameState.progress.adventureRankingMigration = migrated.progress.adventureRankingMigration;
         }
         progress = (await loadPersistentGameData()).progress;
       }
-      const results = collectProgressRankingResults(progress);
+      const results = collectProgressRankingResults(progress).filter(canPublish);
       const groups = new Map();
       for (const result of results) {
         const groupKey = key(result.owner);
@@ -115,6 +123,7 @@ export function initializeLeaderboardService() {
       for (const groupKey of groupKeys) {
       const pending = await updateSyncMetadata(groupKey, previous => normalizeLevelRankingQueue(previous, { uid: identity.uid }), current);
       for (const [id, result] of Object.entries(pending?.queue || {})) {
+        if (!canPublish(result)) continue;
         if (!current()) return false;
         if (result.owner.uid ? result.owner.uid !== identity.uid : result.owner.profileId !== identity.profileId || identity.firstUid !== identity.uid) continue;
         // Bind a pre-login result once, before making its first network request.
@@ -146,7 +155,7 @@ export function initializeLeaderboardService() {
       if (retries !== 0 || !current()) return;
       try {
         const pending = await loadSyncMetadata(key({ uid: identity.uid }));
-        if (current() && Object.keys(pending?.queue || {}).length) schedule();
+        if (current() && Object.values(pending?.queue || {}).some(canPublish)) schedule();
       } catch { message = 'Chưa thể đồng bộ. Kỷ lục vẫn được giữ trên máy.'; }
     });
     return task;

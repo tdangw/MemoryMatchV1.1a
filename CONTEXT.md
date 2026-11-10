@@ -2,6 +2,8 @@
 
 ## Phạm vi hiện tại và nguồn sự thật
 
+- BXHv4 đã phát hành web test10/11 theo `LEADERBOARD_REFRESH_PLAN.md`: https://memorymatch-test.web.app, build87b12ffae370b5bf, data test-waves1. Rules dùng chung chỉ bổ sungBXH, rulesetd6bbe9d7-ab3c-4736-81a9-ad2b620f83d3 đã đọc lại đúng; indexCICAgOi3kJAK READY. 12board live tải được; ghép thẻ/lưu máy/dùng gợi ý vẫn đạt khi offline, giữ sửa local-first của chat mốc thưởng. Commit riêng phần BXH; không phát hành Hosting production/APK. Chi tiết QA/receipt/rollout trong kế hoạch; không đưa runtime/log/ảnh vào commit.
+
 - Các task triển khai đã giao về gameplay/runtime, nền động, sự kiện, vòng quay, nhiệm vụ, ghép chữ, tài khoản, quảng cáo và Android đã hoàn tất trong phạm vi được duyệt. Các kế hoạch cũ đã đóng; không dùng chúng để triển khai lại.
 - Lượt trang chủ mới đang có thay đổi riêng ở gameSelector/home-menu, ảnh adventure-cover và các test liên quan. Không đưa phần đang làm này vào commit Android hoặc coi là bản đã kiểm thử/bàn giao; người phụ trách lượt đó cập nhật trạng thái khi xong.
 - Đã xóa 10 kế hoạch hoàn tất/bị thay thế; không phục hồi chúng từ Git làm lệnh thực thi. Task mới cần kế hoạch thì tạo một kế hoạch hiện hành và ghi rõ tại đây. Giới hạn kiểm thử thiết bị hoặc các mục Play để sau không tự mở lại task cũ.
@@ -101,3 +103,11 @@
 - Bằng chứng Android/Play: ANDROID_RELEASE_RECEIPT.md. Bằng chứng gameplay/UI trước: COSMETIC_COMPLETION_GROUP_DROPS_RECEIPT.md,HOURLY_GIFT_RECEIPT.md,EVENTS_MOBILE_FESTIVAL_RECEIPT.md,DROP_ENERGY_SPECIAL_CARDS_RECEIPT.md,MENU_SHOP_PREVIEW_UI_RECEIPT.md,ANIMATED_BACKGROUNDS_IMPLEMENTATION_RECEIPT.md,docs/qa/technical-improvement/RECEIPT.md,docs/design/ui-consistency/RECEIPT.md. Audit lịch sử giữ nguyên vai trò bằng chứng, không là backlog.
 - Không xóa APK/AAB,cache,dist,node_modules,assets,khóa hay QA chỉ vì dọn task. Lượt đồng bộ này chỉ thay tài liệu và xóa kế hoạch đã đóng.
 - Theo yêu cầu commit: thư mục docs ngừng được Git theo dõi, vẫn giữ đầy đủ trên máy và được ignore. Tài liệu gốc điều hướng (CONTEXT/README/ARCHITECTURE), biên bản Android hợp nhất và việc xóa plan cũ vẫn commit; audit cũ/ảnh giao Play trong ADS_SECURITY_ACCOUNT_AUDIT.md và design/google-play là tài liệu local được ignore.
+
+
+## Phát hành BXH lên web test — 10/11/2026
+
+- Site memorymatch-test, build87b12ffae370b5bf, VITE_ADVENTURE_RANKING_V4=1 và VITE_FIREBASE_ENV=test. Không thay Hosting production; build riêng trong runtime để không ghi đè dist.
+- Backend dùng chung memorymatchv1-1a: chỉ thêm Rules BXH v4 và một index. Ruleset d6bbe9d7-ab3c-4736-81a9-ad2b620f83d3, SHA25611473f0e5cb75c9ab040082a4face7da8ef330bef7cd99ab2bcfbc36b2d2ec9a; indexCICAgOi3kJAK READY, không xóa index cũ. CLI Rules503 đã được xử lý qua retry/API tạo-biên dịch và phát hành, sau đó đọc lại đúng.
+- Xác minh12/12board, đúng test-waves1; bảng rỗng là dữ liệu thực, không tạo record giả. Trên bản test khi tắt mạng vẫn ghép được cặp, lưu sessionIndexedDB và dùng gợi ý trừ kho đúng; BXH dùng cache offline; pageErrors0. Không đồng nhất ca này với toàn bộ QA asset/cold-start hoặc máy S22U thật.
+- Commit chỉ chứa BXH, gồm các hunk riêng trong gameState/Rules và dòng context của BXH. Luồng thưởng local-first/ngoại hình/UI trước đó của chat khác vẫn giữ ngoài commit. Không đưa runtime/log/ảnh QA vào lịch sử. Nguồn thực thi và bằng chứng ngắn ở LEADERBOARD_REFRESH_PLAN.md.

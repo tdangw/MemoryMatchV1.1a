@@ -14,7 +14,7 @@ const source = readFileSync('js/leaderboardPanel.js', 'utf8')
     if (window.rankError) throw new Error('offline');
     const count = window.rankCount;
     const data = { page, hasNext: page * 10 < count, knownPages: Array.from({ length: Math.min(Math.ceil(count / 10), page + 1) }, (_, i) => i + 1),
-      top: Array.from({ length: Math.max(0, Math.min(10, count - (page - 1) * 10)) }, (_, i) => ({ uid: 'row-' + ((page - 1) * 10 + i), playerName: window.rankNames?.[i] || '<img src=x> Tên người chơi rất dài rất dài', durationMs: window.rankNames ? 41810 + i * 1370 : 1000, levelReached: window.rankNames ? 100000 - i : 10, totalScore: window.rankNames ? 128640 - i * 3500 : 12345 })), own: window.rankUid && !window.rankNoOwn ? { uid: window.rankUid, playerName: 'Người chơi Reks2', durationMs: 1000, levelReached: 10, totalScore: 12345 } : null, ownRank: window.rankUid?.startsWith('row-') ? Number(window.rankUid.slice(4)) + 1 : 42 };
+      top: Array.from({ length: Math.max(0, Math.min(10, count - (page - 1) * 10)) }, (_, i) => ({ uid: 'row-' + ((page - 1) * 10 + i), playerName: window.rankNames?.[i] || '<img src=x> Tên người chơi rất dài rất dài', durationMs: window.rankNames ? 41810 + i * 1370 : 1000, levelReached: window.rankNames ? 100000 - i : 10, totalScore: window.rankNames ? 128640 - i * 3500 : 12345, ...(board.kind === 'adventure' ? {metricsComplete: true, score: window.rankNames ? 128640-i*3500 : 12345, moves: 28+i, misses: i%3, ...(window.rankMetrics?.[board.mode] || {})} : {}) })), own: window.rankUid && !window.rankNoOwn ? { uid: window.rankUid, playerName: 'Người chơi Reks2', durationMs: 1000, levelReached: 10, totalScore: 12345, ...(board.kind === 'adventure' ? {metricsComplete:true,score:12345,moves:28,misses:0} : {}) } : null, ownRank: window.rankUid?.startsWith('row-') ? Number(window.rankUid.slice(4)) + 1 : 42 };
     data.loadedPages = [...new Set([...window.rankCache.keys()].map(key => JSON.parse(key)).filter(item => JSON.stringify(item.board) === JSON.stringify(board) && item.uid === uid).map(item => item.page).concat(page))];
     window.rankCache.set(JSON.stringify({ board, uid, page }), data); return data;
   };`);
@@ -51,14 +51,14 @@ test('all three game tabs fit one row in every skin on narrow and wide screens',
 });
 for (const count of [0, 1, 10, 11]) test(`record count ${count}, private own record and no repeated copy`, async ({ page }) => {
   await open(page, count);
-  if (count) await expect(page.locator('.leaderboard-heading')).toContainText('Màn');
+  if (count) await expect(page.locator('.leaderboard-difficulties')).toBeVisible();
   else await expect(page.locator('.leaderboard-status')).toHaveText('Chưa có thành tích.');
   await page.evaluate(() => { window.rankUid = 'row-0'; });
   await reopen(page);
   if (count) { await expect(page.locator('.leaderboard-list .is-self')).toHaveCount(1); await expect(page.locator('.leaderboard-own .leaderboard-rank')).toHaveText('1'); }
   await page.evaluate(() => { window.rankUid = 'outside'; });
   await reopen(page);
-  await expect(page.locator('.leaderboard-own .leaderboard-metric')).toHaveText('10');
+  await expect(page.locator('.leaderboard-own .leaderboard-card-level')).toHaveText('Màn 10');
   await expect(page.locator('.leaderboard-own')).toContainText('Bạn');
   await expect(page.locator('.leaderboard-view')).not.toContainText('Đã cập nhật');
   await expect(page.locator('.leaderboard-list img')).toHaveCount(0);
@@ -112,7 +112,7 @@ test('shared family menu opens without querying, supports keyboard and clamps ab
   await menu.locator('[data-rank-family="endless"]').press('Escape');
   await expect(menu).toHaveCount(0); await expect(anchor).toBeFocused();
   await anchor.click(); await menu.locator('[data-rank-family="adventure"]').press('Tab');
-  await expect(menu).toHaveCount(0); await expect(page.getByRole('button',{name:'Trang 1',exact:true})).toBeFocused();
+  await expect(menu).toHaveCount(0); await expect(page.getByRole('button',{name:'Độ khó C',exact:true})).toBeFocused();
   await anchor.click(); await menu.locator('[data-rank-family="adventure"]').press('Shift+Tab');
   await expect(menu).toHaveCount(0); await expect(page.locator('.leaderboard-results')).toBeFocused();
   await anchor.evaluate(node => { node.style.position = 'fixed'; node.style.bottom = '10px'; node.style.zIndex = '15000'; });
@@ -148,7 +148,7 @@ test('30 mount, picker cancel and mode changes release every page-owned resource
     await page.locator('[data-rank-family="adventure"]').press('Escape');
     await expect(page.getByRole('menu')).toHaveCount(0);
     await selectFamily(page, 'memory-match', 'challenge');
-    await expect(page.locator('.leaderboard-heading')).toContainText('Màn');
+    await expect(page.locator('.leaderboard-list li').first()).toContainText('Màn');
     await page.evaluate(() => window.rankCycleModal.destroy());
   }
   expect(await diagnostics()).toEqual(before);
@@ -184,8 +184,8 @@ for (const viewport of [{ width: 320, height: 740 }, { width: 412, height: 915 }
     expect(familyBox.y + familyBox.height).toBeLessThanOrEqual(headingBox.y + headingBox.height);
     await expect(page.locator('.leaderboard-heading .leaderboard-family-picker')).toHaveCount(1);
     await expect(page.locator('.leaderboard-view > .leaderboard-family-picker')).toHaveCount(0);
-    const playerLabel = await page.locator('.leaderboard-heading-player').boundingBox();
-    expect(playerLabel.x + playerLabel.width).toBeLessThanOrEqual(familyBox.x);
+    await expect(page.locator('.leaderboard-heading-player')).toHaveCount(0);
+    await expect(page.locator('.leaderboard-difficulties')).toBeHidden();
     await expect(page.locator('.leaderboard-tabs--game [aria-haspopup]')).toHaveCount(0);
     const pagerBox = await page.locator('.leaderboard-pager').boundingBox();
     expect(Math.abs(pagerBox.x + pagerBox.width / 2 - panelBox.x - panelBox.width / 2)).toBeLessThan(2);
@@ -253,7 +253,7 @@ test('final garden artwork, centered footer and background failure keep a usable
   await page.locator('.leaderboard-family-picker').click();
   await page.screenshot({ path: 'docs/design/app-tabs/qa/mobile-family-menu.png', animations: 'disabled' });
   await page.locator('[data-rank-family="adventure"]').press('Escape');
-  await selectFamily(page, 'memory-match', 'challenge'); await expect(page.locator('.leaderboard-heading')).toContainText('Màn');
+  await selectFamily(page, 'memory-match', 'challenge'); await expect(page.locator('.leaderboard-list li').first()).toContainText('Màn');
   await page.screenshot({ path: 'docs/design/app-tabs/qa/mobile-level-challenge.png', animations: 'disabled' });
   await page.setViewportSize({ width: 844, height: 390 }); await page.screenshot({ path: 'docs/design/app-tabs/qa/landscape-level.png', animations: 'disabled' });
   await page.setViewportSize({ width: 1024, height: 900 }); await page.screenshot({ path: 'docs/design/app-tabs/qa/desktop-level.png', animations: 'disabled' });
@@ -373,4 +373,49 @@ test('pinned rank uses the same gold silver bronze markers as the list', async (
       } else await expect(pinned.locator('.ui-icon--rank-medal')).toHaveCount(0);
     }
   }
+});
+
+test('twelve adventure filters show coherent metrics across five skins and phone sizes',async({page})=>{
+ test.setTimeout(120000);await open(page,4,true);await page.evaluate(()=>{window.rankUid='row-0';window.rankNames=['Người chơi Reks2','Thảo Nguyên','Nguyễn Hải Minh với tên dài','Minh Anh'];window.rankCosmetics=[['row-0',{avatar:'starter-avatar-little-sparrow',frame:'starter-frame-plain-wood',badge:'starter-badge-first-leaf'}]];});await reopen(page);
+ for(const game of ['memory-match','link-connect','triple-connect']){
+  await selectFamily(page,game,'adventure');
+  for(const [mode,label] of [['easy','C'],['normal','B'],['hard','A'],['superHard','S']]){
+   await page.getByRole('button',{name:`Độ khó ${label}`,exact:true}).click();await expect(page.locator('.leaderboard-results')).not.toHaveAttribute('aria-busy','true');
+   expect(await page.evaluate(()=>window.rankRequests.at(-1))).toMatchObject({gameId:game,kind:'adventure',rulesVersion:4,mode});
+   await expect(page.locator('.leaderboard-list li').first().locator('.leaderboard-card-stats')).toContainText('Lượt');
+   await expect(page.locator('.leaderboard-list li').first().locator('.leaderboard-card-stat--moves')).toHaveText('28');
+   await expect(page.locator('.leaderboard-list li').first().locator('.leaderboard-card-stat--misses')).toHaveText('0');
+  }
+ }
+ for(const skin of ['default','woodland','papercut','starship','storybook'])for(const size of [{width:320,height:740},{width:384,height:824},{width:390,height:844},{width:412,height:915},{width:844,height:390},{width:1024,height:900}]){
+  await page.setViewportSize(size);await page.evaluate(async skin=>await(await import('/js/uiSkin.js')).selectUiSkin(skin),skin);
+  const bounds=await page.locator('.leaderboard-list li').first().evaluate(row=>{const n=row.querySelector('.leaderboard-card-name').getBoundingClientRect(),a=row.querySelector('.leaderboard-avatar').getBoundingClientRect();return {ordered:n.bottom<=a.top,overflow:row.scrollWidth-row.clientWidth,stats:[...row.querySelectorAll('.leaderboard-card-stats > div')].map(n=>n.getBoundingClientRect().width)};});
+  expect(bounds.ordered).toBe(true);expect(bounds.overflow).toBeLessThanOrEqual(1);expect(Math.max(...bounds.stats)-Math.min(...bounds.stats)).toBeLessThan(1);
+  const panelOverflow=await page.locator('.leaderboard-panel').evaluate(n=>({amount:n.scrollWidth-n.clientWidth,offenders:[...n.querySelectorAll('*')].filter(e=>e.getBoundingClientRect().right>n.getBoundingClientRect().right+1).map(e=>e.className)}));expect(panelOverflow.amount,JSON.stringify({skin,size,panelOverflow})).toBeLessThanOrEqual(1);
+  for(const button of await page.locator('[data-rank-difficulty]').all()){const r=await button.boundingBox();expect(r.width).toBeGreaterThanOrEqual(44);expect(r.height).toBeGreaterThanOrEqual(44);}
+  if(size.width===384){mkdirSync('runtime/qa-leaderboard-refresh',{recursive:true});await page.screenshot({path:`runtime/qa-leaderboard-refresh/${skin}-384.png`});}
+ }
+ await selectFamily(page,'memory-match','challenge');await expect(page.locator('.leaderboard-difficulties')).toBeHidden();await expect(page.locator('.leaderboard-card-stats')).toHaveCount(0);
+ expect(await page.evaluate(()=>window.rankRequests.at(-1))).toMatchObject({kind:'progress',rulesVersion:3,family:'challenge'});
+});
+
+test('missing legacy metrics never look like zero and delayed difficulty responses cannot replace the selected board',async({page})=>{
+ await open(page,1);await page.evaluate(()=>{window.rankMetrics={easy:{metricsComplete:false,score:-1,moves:0,misses:0},normal:{score:1000},hard:{score:2000}};});await reopen(page);
+ await expect(page.locator('.leaderboard-list .leaderboard-card-stat')).toHaveText(['—','—','—']);
+ await page.evaluate(()=>{window.rankDeferred=true;});
+ await page.getByRole('button',{name:'Độ khó B',exact:true}).click();await expect.poll(()=>page.evaluate(()=>window.rankResolvers.length)).toBe(1);
+ await page.getByRole('button',{name:'Độ khó A',exact:true}).click();await expect.poll(()=>page.evaluate(()=>window.rankResolvers.length)).toBe(2);
+ await page.evaluate(()=>{window.rankDeferred=false;window.rankResolvers[1]();});
+ await expect(page.locator('.leaderboard-list .leaderboard-card-stat--score')).toHaveText('2.000');
+ await page.evaluate(()=>window.rankResolvers[0]());
+ await expect(page.locator('.leaderboard-list .leaderboard-card-stat--score')).toHaveText('2.000');
+ await expect(page.getByRole('button',{name:'Độ khó A',exact:true})).toHaveAttribute('aria-pressed','true');
+});
+
+test('release flag disabled preserves the existing v3 query and tab presentation',async({page})=>{
+ await page.route('**/js/adventureRankingAvailability.js*',route=>route.fulfill({contentType:'text/javascript',body:'export function adventureRankingEnabled(){return false;}'}));
+ await open(page,1);await expect(page.locator('.leaderboard-view--records')).toHaveCount(0);await expect(page.locator('.leaderboard-difficulties')).toBeHidden();
+ await expect(page.locator('.leaderboard-heading')).toContainText('Màn');
+ expect(await page.evaluate(()=>window.rankRequests.at(-1))).toMatchObject({kind:'progress',rulesVersion:3,family:'adventure'});
+ await expect(page.locator('.leaderboard-tabs--game [role=tab]')).toHaveCount(3);
 });

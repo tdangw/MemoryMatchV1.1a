@@ -9,7 +9,9 @@ export async function submitRankingResult({ database, environment, uid, playerNa
   if (!validateRankingResult(result)) throw new Error('Thành tích không hợp lệ.');
   const boardId = rankingBoardId(result);
   const ref = doc(entries(database, environment, boardId), uid);
-  const next = result.kind === 'progress' ? { rulesVersion: 3, resultId: result.id, gameId: result.gameId, family: result.family, kind: 'progress', playerName, reachedAt: serverTimestamp(), levelReached: result.levelReached }
+  const next = result.kind === 'adventure' ? { rulesVersion: 4, resultId: result.id, gameId: result.gameId, family: 'adventure', mode: result.mode, kind: 'adventure', playerName,
+    reachedAt: serverTimestamp(), levelReached: result.levelReached, metricsComplete: result.metricsComplete, score: result.score, misses: result.misses, moves: result.moves }
+    : result.kind === 'progress' ? { rulesVersion: 3, resultId: result.id, gameId: result.gameId, family: result.family, kind: 'progress', playerName, reachedAt: serverTimestamp(), levelReached: result.levelReached }
     : { rulesVersion: result.rulesVersion, resultId: result.id, gameId: result.gameId, mode: result.mode, kind: result.kind, playerName, updatedAt: serverTimestamp(),
     ...(result.kind === 'time' ? { level: result.level, durationMs: result.durationMs, score: result.score, stars: result.stars } : { levelReached: result.levelReached, totalScore: result.totalScore, outcome: result.outcome }) };
   let reads = 0;
@@ -48,8 +50,7 @@ export async function readLeaderboard({ database, environment, board, uid = null
   if (cached) { state.pages.delete(page); state.pages.set(page, cached); return { ...cached, knownPages: [...state.cursors.keys()], loadedPages: [...state.seenPages.keys()], cached: true }; }
   if (!state.cursors.has(page)) throw pageError('reset');
   const ref = entries(database, environment, boardId);
-  const ordering = board.kind === 'progress' ? [orderBy('levelReached', 'desc'), orderBy('reachedAt', 'asc')]
-    : board.kind === 'time' ? [orderBy('durationMs', 'asc')] : [orderBy('levelReached', 'desc'), orderBy('totalScore', 'desc')];
+  const ordering = rankingFields(board.kind).map(([field, direction]) => orderBy(field, direction));
   const ownReads = !state.ownTask && uid ? 1 : 0;
   if (!state.ownTask) state.ownTask = (uid ? getDocFromServer(doc(ref, uid)) : Promise.resolve(null)).then(async own => {
     state.own = own?.exists() ? { uid: own.id, ...own.data() } : null;
@@ -79,14 +80,19 @@ export async function readLeaderboard({ database, environment, board, uid = null
   }
   return result;
 }
-export function rankingCursor(row, kind) { return kind === 'progress' ? [row.levelReached, row.reachedAt, row.uid] : kind === 'time' ? [row.durationMs, row.uid] : [row.levelReached, row.totalScore, row.uid]; }
+function rankingFields(kind) {
+  if (kind === 'adventure') return [['levelReached','desc'],['score','desc'],['misses','asc'],['moves','asc'],['reachedAt','asc']];
+  if (kind === 'progress') return [['levelReached','desc'],['reachedAt','asc']];
+  return kind === 'time' ? [['durationMs','asc']] : [['levelReached','desc'],['totalScore','desc']];
+}
+export function rankingCursor(row, kind) { return [...rankingFields(kind).map(([field]) => row[field]), row.uid]; }
 export function assertOrderedPage(rows, kind, cursor = null, pages = new Map(), page = 1) {
   const compare = (a, b) => comparePublicResults(a, b, kind)
-    || (kind === 'progress' ? a.reachedAt.seconds - b.reachedAt.seconds || a.reachedAt.nanoseconds - b.reachedAt.nanoseconds : 0)
+    || (['progress','adventure'].includes(kind) ? a.reachedAt.seconds - b.reachedAt.seconds || a.reachedAt.nanoseconds - b.reachedAt.nanoseconds : 0)
     || (a.uid < b.uid ? -1 : a.uid > b.uid ? 1 : 0);
   const seen = new Set();
   for (const [number, cached] of pages) if (number !== page) for (const item of cached.top) seen.add(item.uid);
-  let previous = cursor ? (kind === 'time' ? { durationMs: cursor[0], uid: cursor[1] } : kind === 'progress' ? { levelReached: cursor[0], reachedAt: cursor[1], uid: cursor[2] } : { levelReached: cursor[0], totalScore: cursor[1], uid: cursor[2] }) : null;
+  let previous = cursor ? Object.fromEntries([...rankingFields(kind).map(([field], i) => [field, cursor[i]]), ['uid', cursor.at(-1)]]) : null;
   for (const row of rows) {
     if (seen.has(row.uid) || previous && compare(previous, row) >= 0) throw pageError('stale');
     seen.add(row.uid); previous = row;
