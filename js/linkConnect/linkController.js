@@ -312,14 +312,9 @@ export function startLinkLevel({
   board.seed = resume && pairSnapshot ? pairSnapshot.seed : crypto.randomUUID();
   board.themeId = themeId;
   linkGameState.rewardPolicyVersion = resume && pairSnapshot ? pairSnapshot.rewardPolicyVersion || 1 : 2;
-  if (level === 1 && !resume && !restart && !waveTransition) {
-    linkGameState.specialProgress = 0;
-    linkGameState.specialNoEnergyDropStreak = 0;
-  } else if (resume) {
-    const progressTarget = LINK_CONNECT_CONFIG.special.progressTarget;
-    if (Number.isFinite(specialProgress)) {
-      linkGameState.specialProgress = Math.max(0, Math.floor(specialProgress)) % progressTarget;
-    }
+  linkGameState.specialProgress = gameState.progress.linkConnect.specialProgress || 0;
+  if (level === 1 && !resume && !restart && !waveTransition) linkGameState.specialNoEnergyDropStreak = 0;
+  if (resume) {
     if (Number.isFinite(specialNoEnergyDropStreak)) {
       linkGameState.specialNoEnergyDropStreak = Math.min(
         LINK_CONNECT_CONFIG.special.energyDrop.guaranteeAfterMisses,
@@ -584,6 +579,7 @@ async function handleLinkTileClick(position) {
   linkGameState.matchedPairs += 1;
   const baseCoins = MATCH_COINS_PER_GROUP;
   const rewards = resolveLinkPairRewards(linkGameState, gameState.progress.linkConnect.items, { special: isSpecialMatch, premiumType, luckyReward: firstTile.luckyReward });
+  gameState.progress.linkConnect.specialProgress = linkGameState.specialProgress;
   const previousCoins = gameState.coins;
   increaseCoins(baseCoins + rewards.coins);
   const ticketDrop=linkTicketDrop(linkGameState.wave,firstTile,tile);
@@ -843,37 +839,38 @@ function useLinkFreeze() {
   showAppToast(`Đồng hồ đã đóng băng trong ${LINK_FREEZE_SECONDS} giây.`);
 }
 
-function getLinkBoardLayoutForViewport(layout) {
-  const viewport = window.visualViewport;
-  const width = viewport?.width ?? window.innerWidth;
-  const height = viewport?.height ?? window.innerHeight;
-  if (width <= height) return layout;
+function getLinkBoardLayoutForViewport(layout, viewport = window.visualViewport ?? {
+  width: window.innerWidth, height: window.innerHeight,
+}, config = GAME_SHELL_DEFAULTS) {
+  const landscape = viewport.width > viewport.height;
   return {
     ...layout,
     baseColumns: layout.columns,
-    columns: getCompactLandscapeColumns({
-      tileCount: layout.tileCount,
-      columns: layout.columns,
-      maxRows: GAME_SHELL_DEFAULTS.layout.compactLandscapeMaxRows,
-    }),
+    columns: landscape
+      ? getCompactLandscapeColumns({
+        tileCount: layout.tileCount,
+        columns: layout.columns,
+        maxRows: config.layout.compactLandscapeMaxRows,
+      })
+      : viewport.width <= config.breakpoints.mobile
+        ? layout.mobileColumns ?? layout.columns : layout.columns,
   };
 }
 
-function handleLinkCompactLandscapeChange({ landscape, config }) {
-  pendingCompactLayout = { landscape, maxRows: config.layout.compactLandscapeMaxRows };
+function handleLinkCompactLandscapeChange({ viewport, config }) {
+  pendingCompactLayout = { viewport, config };
   applyPendingLinkCompactLayout();
 }
 
 function applyPendingLinkCompactLayout() {
   if (!pendingCompactLayout || linkGameState.isLocked || !linkGameState.board) return false;
   const board = linkGameState.board;
-  const columns = pendingCompactLayout.landscape
-    ? getCompactLandscapeColumns({
-      tileCount: board.capacity,
-      columns: board.baseColumns,
-      maxRows: pendingCompactLayout.maxRows,
-    })
-    : board.baseColumns;
+  const modeLayout = getLinkModeLayout(linkGameState.mode);
+  const { columns } = getLinkBoardLayoutForViewport({
+    tileCount: board.capacity,
+    columns: board.baseColumns,
+    mobileColumns: isLinkChallengeMode(linkGameState.mode) ? board.baseColumns : modeLayout.mobileColumns,
+  }, pendingCompactLayout.viewport, pendingCompactLayout.config);
   const selectedTileId = selectedPosition
     ? getLinkBoardTile(board, selectedPosition)?.instanceId
     : null;

@@ -15,8 +15,9 @@ export async function publishPublicCosmetics({ database, environment, uid, selec
     if (!isCurrent()) throw new DOMException('Stale cosmetic owner.', 'AbortError');
     const previous = await transaction.get(ref);
     if (!isCurrent()) throw new DOMException('Stale cosmetic owner.', 'AbortError');
-    if (previous.exists() && previous.data().version === 1 && ['avatar', 'frame', 'badge'].every(slot => previous.data()[slot] === normalized[slot])) return;
-    transaction.set(ref, { version: 1, ...normalized, updatedAt: serverTimestamp() });
+    const version=selection.version===2?2:1;
+    if (previous.exists() && previous.data().version === version && JSON.stringify(normalizePublicCosmetics(previous.data()))===JSON.stringify(normalized)) return;
+    transaction.set(ref, { version, ...normalized, updatedAt: serverTimestamp() });
   });
   if (!isCurrent()) return false;
   remember(environment, uid, normalized); return true;

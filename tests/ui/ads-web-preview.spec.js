@@ -16,7 +16,7 @@ for (const size of [{ width: 412, height: 915 }, { width: 844, height: 390 }, { 
     expect(banner.y - (dock.y + dock.height)).toBeCloseTo(8, 0);
     expect(banner.height).toBe(50);
     expect(banner.y + banner.height).toBeLessThanOrEqual(size.height);
-    const controls = await page.locator('.game-selector__controls').boundingBox();
+    const controls = await page.locator('.game-selector > .menu-wrapper').boundingBox();
     expect(controls.y + controls.height).toBeLessThanOrEqual(dock.y + 1);
     await page.screenshot({ path: `docs/ads/qa/web-preview-${size.width}.png` });
     for (const tab of ['missions', 'events', 'profile', 'ranking', 'settings']) {
@@ -26,8 +26,6 @@ for (const size of [{ width: 412, height: 915 }, { width: 844, height: 390 }, { 
       await expect(preview(page)).toHaveCount(1);
     }
     for (const [game, title] of [['memory-match', 'Memory Match'], ['link-connect', 'Link Connect'], ['triple-connect', 'Triple Connect']]) {
-      await page.getByRole('button', { name: `Chọn ${title}`, exact: true }).click();
-      await expect(page.locator(`.game-selector__choice[data-game-id="${game}"]`)).toHaveClass(/is-selected/);
       await page.locator(`.game-selector__choice[data-game-id="${game}"]`).click();
       await expect(preview(page)).toHaveCount(1);
       for (const tab of ['shop', 'collection']) {
@@ -86,7 +84,7 @@ test('web preview releases nodes across suspension, background and 30 navigation
     for (let i = 0; i < 30; i++) { menus.openGameMenu('memory-match'); menus.showGameSelector(); }
   });
   await expect(preview(page)).toHaveCount(1);
-  await page.locator('.game-selector__choice.is-selected').click();
+  await page.locator('.game-selector__choice[data-game-id="memory-match"]').click();
   for (let i = 0; i < 10; i++) {
     for (const tab of ['shop', 'collection', 'map']) {
       await page.locator(`[data-dock-action="${tab}"]:visible`).click();
@@ -105,7 +103,7 @@ test('web preview releases nodes across suspension, background and 30 navigation
   await page.evaluate(() => { const input = document.createElement('input'); input.id = 'preview-focus'; document.body.append(input); input.focus(); });
   await expect(preview(page)).toHaveCount(0);
   await page.evaluate(() => document.getElementById('preview-focus').remove());
-  await page.locator('.game-selector__choice.is-selected').focus();
+  await page.locator('.game-selector__choice[data-game-id="memory-match"]').focus();
   await expect(preview(page)).toHaveCount(1);
   await page.evaluate(async () => { const runtime = await (await import('/js/ads/menuAds.js')).initializeMenuAds(); await runtime.dispose(); await runtime.dispose(); });
   await expect(preview(page)).toHaveCount(0);
@@ -120,7 +118,6 @@ test('30 gameplay restarts across three games release the previous banner owner'
     ['link-connect', 'Link Connect', '#link-actions-menu-toggle'],
     ['triple-connect', 'Triple Connect', '#triple-actions-menu-toggle'],
   ]) {
-    await page.getByRole('button', { name: `Chọn ${title}`, exact: true }).click();
     await page.locator(`.game-selector__choice[data-game-id="${game}"]`).click();
     await startMapLevel(page);
       await page.getByRole('button', { name: 'Bỏ qua', exact: true }).click();

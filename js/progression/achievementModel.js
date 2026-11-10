@@ -1,18 +1,13 @@
 import { festivalChestsEnabled } from '../liveops/availability.js';
-import { LETTER_REWARD_ITEMS } from '../liveops/letterCatalog.generated.js';
+import { COSMETIC_ITEMS } from './cosmeticCatalog.js';
 import { mergeSparkSave } from '../liveops/sparkModel.js';
-import { ACHIEVEMENT_ITEMS, EXTRA_COSMETIC_ITEMS } from './achievementCatalog.generated.js';
+import { ACHIEVEMENT_ITEMS } from './achievementCatalog.generated.js';
 import { mergeAcquisitions, extraOwnedIds } from './acquisitionModel.js';
 import { mergeRewardLedger } from '../liveops/ledger.js';
 import { MASTERY_DIFFICULTIES, hasCertifiedCompletion } from './difficultyProgress.js';
 import { isCompletedLevelResult } from '../adventureProgress.js';
 export { ACHIEVEMENT_ITEMS };
-export const PROFILE_COSMETIC_ITEMS = Object.freeze([
-  ...EXTRA_COSMETIC_ITEMS.filter(item => item.sourceKind === 'starter'),
-  ...ACHIEVEMENT_ITEMS.filter(item => item.type !== 'effect-cover'),
-  ...EXTRA_COSMETIC_ITEMS.filter(item => item.sourceKind !== 'starter'),
-  ...LETTER_REWARD_ITEMS,
-]);
+export const PROFILE_COSMETIC_ITEMS = COSMETIC_ITEMS;
 export const ACHIEVEMENT_COVERAGE_REVISION = 2;
 export const cosmeticItem = id => PROFILE_COSMETIC_ITEMS.find(item => item.id === id) || null;
 export const ACHIEVEMENT_GAME_KEYS = Object.freeze({ 'memory-match': 'memoryMatch', 'link-connect': 'linkConnect', 'triple-connect': 'tripleConnect' });

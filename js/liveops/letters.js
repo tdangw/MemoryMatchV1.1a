@@ -1,9 +1,11 @@
 import { CHEST_TYPES } from './chestConfig.js';
 import { LETTER_REWARD_ITEMS } from './letterCatalog.generated.js';
-import { LETTER_SETS, LETTER_FALLBACK_COINS, LETTER_ALPHABET, LETTER_SELL_COINS, LETTER_SALE_RECEIPT_PRICES } from './config.js';
+import { LETTER_SETS, LETTER_FALLBACK_COINS, LETTER_ALPHABET, LETTER_SELL_COINS, LETTER_SALE_RECEIPT_PRICES, LETTER_FUSION_FEE } from './config.js';
 const integer = n=>Number.isSafeInteger(n)&&n>=0;
 const record = n=>n!==null&&typeof n==='object'&&!Array.isArray(n);
 export const MISSING_FIRST_FUSION_POLICY = 'missing-first-v1';
+export const PAID_LETTER_FUSION_POLICY = 'paid-missing-first-v2';
+const supportedFusionPolicy = policy => [MISSING_FIRST_FUSION_POLICY,PAID_LETTER_FUSION_POLICY].includes(policy);
 const validIngredients = value => Array.isArray(value) && value.length === 3
   && [0,1,2].every(index => LETTER_ALPHABET.includes(value[index]));
 function fusionIngredients(value, receipt = false) {
@@ -35,7 +37,7 @@ export function selectFusionLetter(counts, roll) {
 export function prepareFusionCandidate(letters, operation) {
   if(letters.last?.operation===operation.operation)return {...operation,randomLetter:letters.last.received};
   if(operation.fusionPolicy===undefined)return operation;
-  if(operation.fusionPolicy!==MISSING_FIRST_FUSION_POLICY)throw new Error('Cách ghép chữ này chưa được hỗ trợ. Hãy cập nhật ứng dụng.');
+  if(!supportedFusionPolicy(operation.fusionPolicy))throw new Error('Cách ghép chữ này chưa được hỗ trợ. Hãy cập nhật ứng dụng.');
   return {...operation,randomLetter:selectFusionLetter(letters.counts,operation.fusionRoll)};
 }
 export function normalizeLetters(value) {
@@ -48,8 +50,8 @@ export function normalizeLetters(value) {
     if(last.kind==='sell'&&(!LETTER_ALPHABET.includes(last.letter)||!integer(last.quantity)||last.quantity<1||!integer(last.coins)||!LETTER_SALE_RECEIPT_PRICES.some(price=>last.coins===last.quantity*price)))throw new Error('Kết quả bán chữ chưa toàn vẹn.');
     if(last.kind==='fuse'){
       fusionIngredients(last,true);
-      if(!LETTER_ALPHABET.includes(last.received)||last.coins!==0)throw new Error('Kết quả ghép chữ chưa toàn vẹn.');
-      if(Object.hasOwn(last,'fusionPolicy')&&(last.fusionPolicy!==MISSING_FIRST_FUSION_POLICY||!Object.hasOwn(last,'ingredients')))
+      if(!LETTER_ALPHABET.includes(last.received)||last.coins!==(last.fusionPolicy===PAID_LETTER_FUSION_POLICY?-LETTER_FUSION_FEE:0))throw new Error('Kết quả ghép chữ chưa toàn vẹn.');
+      if(Object.hasOwn(last,'fusionPolicy')&&(!supportedFusionPolicy(last.fusionPolicy)||!Object.hasOwn(last,'ingredients')))
         throw new Error('Kết quả ghép chữ chưa được hỗ trợ.');
     }
     if(last.kind==='exchange'&&!last.chestType&&(!LETTER_SETS.some(set=>set.id===last.setId)||(last.itemId===null?![LETTER_FALLBACK_COINS,10000].includes(last.coins):!LETTER_REWARD_ITEMS.some(item=>item.id===last.itemId)||last.coins!==0)))throw new Error('Kết quả đổi bộ chữ chưa toàn vẹn.');
@@ -67,7 +69,7 @@ export function creditLetters(previous, earned) {
   }
   return state;
 }
-export function mutateLetters(previous, command, randomLetter) {
+export function mutateLetters(previous, command, randomLetter, coinsBalance) {
   const state=normalizeLetters(previous);
   if(state.last?.operation===command.operation)return {state,coins:0,result:state.last};
   if(command.sequence!==state.sequence+1)throw new Error('Lượt đổi chữ đã được xử lý. Hãy tải lại kho chữ.');
@@ -84,8 +86,12 @@ export function mutateLetters(previous, command, randomLetter) {
     const required=ingredients.reduce((counts,letter)=>{counts[letter]=(counts[letter]||0)+1;return counts;},{});
     if(!LETTER_ALPHABET.includes(randomLetter))throw new Error('Chữ nhận được không hợp lệ.');
     if(Object.hasOwn(command,'fusionPolicy')){
-      if(command.fusionPolicy!==MISSING_FIRST_FUSION_POLICY||!Object.hasOwn(command,'ingredients'))throw new Error('Cách ghép chữ không hợp lệ.');
+      if(!supportedFusionPolicy(command.fusionPolicy)||!Object.hasOwn(command,'ingredients'))throw new Error('Cách ghép chữ không hợp lệ.');
       if(randomLetter!==selectFusionLetter(state.counts,command.fusionRoll))throw new Error('Quà ghép chữ đã thay đổi. Hãy thử lại.');
+    }
+    if(command.fusionPolicy===PAID_LETTER_FUSION_POLICY){
+      if(!integer(coinsBalance)||coinsBalance<LETTER_FUSION_FEE)throw new Error('Không đủ Xu để ghép chữ.');
+      coins=-LETTER_FUSION_FEE;
     }
     for(const [letter,amount]of Object.entries(required))if((state.counts[letter]||0)<amount)throw new Error('Không đủ chữ đã chọn để ghép.');
     for(const [letter,amount]of Object.entries(required))state.counts[letter]-=amount;
@@ -93,7 +99,7 @@ export function mutateLetters(previous, command, randomLetter) {
     if(!integer(state.counts[randomLetter]))throw new Error('Kho chữ đã đầy.');
     // Old clients require last.letter; it is a display/read hint, not the source quantity.
     result={kind:'fuse',letter:ingredients[0],...(Object.hasOwn(command,'ingredients')?{ingredients}:{}),
-      ...(Object.hasOwn(command,'fusionPolicy')?{fusionPolicy:command.fusionPolicy}:{}),received:randomLetter,coins:0};
+      ...(Object.hasOwn(command,'fusionPolicy')?{fusionPolicy:command.fusionPolicy}:{}),received:randomLetter,coins};
   }else throw new Error('Thao tác chữ không hợp lệ.');
   state.sequence++;state.last={...result,sequence:state.sequence,operation:command.operation};
   return {state,coins,result:state.last};

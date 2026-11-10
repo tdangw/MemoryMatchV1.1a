@@ -24,12 +24,17 @@ export function initialLiveops(now) {
     spins: {}, event: { id: 'firefly-festival-01', points: 0, day: -1, dailyPoints: 0, claimed: [] } };
 }
 export function normalizeFact(fact) {
+  const batch=fact?.version===3;
+  const raw = [2,3].includes(fact?.version) && fact.day === null;
   if (!fact || !['memory-match', 'link-connect', 'triple-connect'].includes(fact.gameId)
     || !['easy', 'normal', 'hard', 'superHard', 'challenge', 'endless'].includes(fact.mode)
     || !/^[A-Za-z0-9_-]{1,120}$/.test(fact.roundId || '')
     || !Number.isSafeInteger(fact.matches) || fact.matches < 1 || fact.matches > 1000000
-    || typeof fact.noHint !== 'boolean' || !Number.isSafeInteger(fact.day) || fact.day < 0) throw new Error('Invalid settled round');
-  return { roundId: fact.roundId, gameId: fact.gameId, mode: fact.mode, matches: fact.matches, noHint: fact.noHint, day: fact.day };
+    || typeof fact.noHint !== 'boolean' || !raw && (!Number.isSafeInteger(fact.day) || fact.day < 0)
+    || fact.version !== undefined && ![2,3].includes(fact.version)
+    || batch&&(!Number.isInteger(fact.wins)||fact.wins<1||fact.wins>1000000||!Number.isInteger(fact.noHintWins)||fact.noHintWins<0||fact.noHintWins>fact.wins
+      ||!Number.isInteger(fact.points)||fact.points<5||fact.points>1000000)) throw new Error('Invalid settled round');
+  return { roundId: fact.roundId, gameId: fact.gameId, mode: fact.mode, matches: fact.matches, noHint: fact.noHint, day: fact.day, ...(fact.version!==undefined?{version:fact.version}:{}),...(batch?{wins:fact.wins,noHintWins:fact.noHintWins,points:fact.points}:{}) };
 }
 /** Deterministic transition, committed with all emitted receipts by the backend. */
 export function transitionLiveops(previous, command, { uid, now, sector, eventStartAt = null, adEarned = false }) {
@@ -64,14 +69,14 @@ export function transitionLiveops(previous, command, { uid, now, sector, eventSt
       const fact = normalizeFact(command.fact);
       if (fact.day !== state.day) throw new Error('Round period expired');
       for (const target of [state.daily, state.weekly]) {
-        target.wins = Math.min(1000000, target.wins + 1);
+        target.wins = Math.min(1000000, target.wins + (fact.wins??1));
         target.matches = Math.min(1000000, target.matches + fact.matches);
-        target.noHint = Math.min(1000000, target.noHint + Number(fact.noHint));
+        target.noHint = Math.min(1000000, target.noHint + (fact.noHintWins??Number(fact.noHint)));
       }
       const end = eventStartAt === null ? null : eventStartAt + 7 * DAY_MS;
       if (end !== null && now >= eventStartAt && now < end) {
         if (state.event.day !== state.day) { state.event.day = state.day; state.event.dailyPoints = 0; }
-        const earned = Math.min(40 - state.event.dailyPoints, ({ easy: 5, normal: 7, hard: 9, superHard: 12 })[fact.mode] || 5);
+        const earned = Math.min(40 - state.event.dailyPoints, fact.points??(({ easy: 5, normal: 7, hard: 9, superHard: 12 })[fact.mode] || 5));
         state.event.dailyPoints += earned; state.event.points = Math.min(100, state.event.points + earned);
       }
       break;

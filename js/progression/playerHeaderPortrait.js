@@ -11,12 +11,13 @@ export function mountPlayerHeaderPortrait(title,scope) {
   const host=document.createElement('button');host.type='button';host.className='player-header-portrait';
   host.setAttribute('aria-label','Mở hồ sơ');host.setAttribute('aria-haspopup','dialog');
   title.classList.add('player-header-title');title.prepend(host);let fingerprint=null;
-  function render(selection){
-    const next=JSON.stringify(['avatar','frame','badge'].map(slot=>selection?.[slot]||null));
+  function render(appearance){
+    const selection=appearance.profileCosmetics,levels=appearance.spark?.state?.cosmeticProgress?.levels || {};
+    const next=JSON.stringify(['avatar','frame','badge'].map(slot=>[selection?.[slot]||null,levels[selection?.[slot]]||1]));
     if(!scope.active||next===fingerprint)return;
-    fingerprint=next;host.replaceChildren(cosmeticPortrait(selection,{label:'Ngoại hình đang trang bị',size:128}));
+    fingerprint=next;host.replaceChildren(cosmeticPortrait(selection,{label:'Ngoại hình đang trang bị',size:128,levels}));
   }
-  render(gameState.appearance.profileCosmetics);
+  render(gameState.appearance);
   let opening=false,profile=null;
   scope.listen(host,'click',async()=>{
     if(opening||profile?.panel.isConnected||(scope.startup&&scope.startup.status!=='ready'))return;
@@ -28,7 +29,7 @@ export function mountPlayerHeaderPortrait(title,scope) {
     finally{opening=false;}
   });
   scope.own(subscribeToLocalCommit(({patch})=>{
-    if(patch.appearance)render(patch.appearance.profileCosmetics);
+    if(patch.appearance)render(patch.appearance);
   }),'listener');
   scope.own(()=>{host.remove();title.classList.remove('player-header-title');},'node');
 }

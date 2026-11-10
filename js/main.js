@@ -317,6 +317,11 @@ if (import.meta.env.VITE_FIREBASE_DISABLED !== '1') {
   void accountReady.then(() => import('./progression/publicCosmeticSync.js')).then(module => module.initializePublicCosmeticSync())
     .catch(error => console.warn('Public cosmetic startup unavailable', error.code || error.name));
   void accountReady.then(() => import('./analyticsService.js')).then(module => module.initializeAnalytics()).catch(error => console.warn('Analytics unavailable', error.code || error.name));
+} else {
+  // The durable device owner is also needed for offline facts and inventory.
+  // Disabling the network backend must not disable local account identity.
+  accountReady=initializeAccountService({onState:refreshAppAccount}).ready;
+  bindLiveopsAccount(getAccountService());
 }
 
 if (new URLSearchParams(window.location.search).has("effect-performance")) {

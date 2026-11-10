@@ -76,8 +76,9 @@ async function presentGiftOnMap(reward,owner) {
   } finally {scope.dispose();}
 }
 export function openHourlyGift(owner) {
-  const scope=createGameShellLifecycle(),identity=getAccountService()?.getIdentity();
-  const identityMatches=()=>getAccountService()?.getIdentity()?.uid===identity?.uid&&getAccountService()?.getIdentity()?.profileId===identity?.profileId;
+  const account=getAccountService(),getIdentity=()=>account?.getIdentity()||account?.getLocalIdentity();
+  const scope=createGameShellLifecycle(),identity=getIdentity();
+  const identityMatches=()=>getIdentity()?.uid===identity?.uid&&getIdentity()?.profileId===identity?.profileId;
   const current=()=>scope.active&&identityMatches();
   const content=el('div','hourly-gift'),hero=el('div','hourly-gift__hero'),art=createAdventureActionArt('gift');hero.append(art);
   const claim=el('button','app-button app-button--primary','Đang kiểm tra…');claim.type='button';claim.disabled=true;

@@ -1,0 +1,1695 @@
+{
+  "version": 1,
+  "records": [
+    {
+      "id": "memory-avatar-sapphire-owl",
+      "form": 2,
+      "master": "design/expedition/art-production/masters/memory-avatar-sapphire-owl-form2.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1b67d-f771-7cd3-8f39-9ae2b09baf88\\exec-4311de69-f13e-4cfd-a023-ed9d8b45d0bb.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        231,
+        235,
+        1020,
+        1063
+      ],
+      "sha256": "3811b2596380db5e87853be038dad13c0a40d214a70499a817d2314f938e8c4d",
+      "status": "generated-pending-alignment-qa",
+      "exports": null
+    },
+    {
+      "id": "memory-avatar-sapphire-owl",
+      "form": 3,
+      "master": "design/expedition/art-production/masters/memory-avatar-sapphire-owl-form3.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1b67d-f771-7cd3-8f39-9ae2b09baf88\\exec-28294d12-29fc-4189-8c0f-1539727156dc.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        34,
+        5,
+        1209,
+        1247
+      ],
+      "sha256": "1cf5356ec1126615e101add23171b83f3952f8d78ef1584c6540e5d59cf36990",
+      "status": "generated-pending-alignment-qa",
+      "exports": null
+    },
+    {
+      "id": "memory-frame-golden-laurel",
+      "form": 2,
+      "master": "design/expedition/art-production/masters/memory-frame-golden-laurel-form2.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1b67d-f771-7cd3-8f39-9ae2b09baf88\\exec-4ba33a76-fe68-49e8-aaf7-a40a1ad69c80.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        25,
+        39,
+        1229,
+        1224
+      ],
+      "sha256": "73ea56454a25cd805db4e51ceaf0d476cf97eb0d6d947f8d979f2c8aebf6aa34",
+      "status": "generated-pending-alignment-qa",
+      "exports": null
+    },
+    {
+      "id": "memory-frame-golden-laurel",
+      "form": 3,
+      "master": "design/expedition/art-production/masters/memory-frame-golden-laurel-form3.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1b67d-f771-7cd3-8f39-9ae2b09baf88\\exec-0b9efa81-e06c-46ba-a9e0-f6f657dd8513.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        10,
+        5,
+        1244,
+        1223
+      ],
+      "sha256": "1096066a586c78ee260abc9b8d59ef6b008b2973df3bce72009adfe83398854e",
+      "status": "generated-pending-alignment-qa",
+      "exports": null
+    },
+    {
+      "id": "memory-badge-wisdom",
+      "form": 2,
+      "master": "design/expedition/art-production/masters/memory-badge-wisdom-form2.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1b67d-f771-7cd3-8f39-9ae2b09baf88\\exec-f2d77e3e-7ab0-4c4d-ac7a-c1c88fdd7120.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        40,
+        105,
+        1216,
+        1137
+      ],
+      "sha256": "140e48fd149bb8b692e66dec14e0bd8afbc9cd070135d28b6401907531a06e76",
+      "status": "exported-qa-passed",
+      "exports": [
+        {
+          "path": "assets/achievements/evolution/v1/memory-badge-wisdom-form2-128.webp",
+          "dimensions": [
+            128,
+            128
+          ],
+          "bytes": 20558,
+          "sha256": "c74833ca8fc63cb7fda0a8e00d90f5568a26906851509cc8c881ea0246da118e"
+        },
+        {
+          "path": "assets/achievements/evolution/v1/memory-badge-wisdom-form2-256.webp",
+          "dimensions": [
+            256,
+            256
+          ],
+          "bytes": 62448,
+          "sha256": "61148e2629642a5010f573267d4aea14e9e6f8b547fdba9a31579d89be6a6ef8"
+        },
+        {
+          "path": "assets/achievements/evolution/v1/memory-badge-wisdom-form2-512.webp",
+          "dimensions": [
+            512,
+            512
+          ],
+          "bytes": 213866,
+          "sha256": "9a22f169085bf92b9f8a6ca9bfe87191d00262b00468a926900069fb85391df2"
+        }
+      ]
+    },
+    {
+      "id": "memory-badge-wisdom",
+      "form": 3,
+      "master": "design/expedition/art-production/masters/memory-badge-wisdom-form3.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1b67d-f771-7cd3-8f39-9ae2b09baf88\\exec-9565e9b2-1b48-49f5-acec-154f7234e629.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        12,
+        1,
+        1243,
+        1236
+      ],
+      "sha256": "68fc41d8d69f191f91e2203fff93e386d2ea65e8d2a0fc02e8568f308dcc539b",
+      "status": "exported-qa-passed",
+      "exports": [
+        {
+          "path": "assets/achievements/evolution/v1/memory-badge-wisdom-form3-128.webp",
+          "dimensions": [
+            128,
+            128
+          ],
+          "bytes": 16026,
+          "sha256": "8d2d57ca30c6a5fc9a3782ea2a85cfef434276631f84f6fec20f0841a87a6cba"
+        },
+        {
+          "path": "assets/achievements/evolution/v1/memory-badge-wisdom-form3-256.webp",
+          "dimensions": [
+            256,
+            256
+          ],
+          "bytes": 51784,
+          "sha256": "77177bb15afdc8dba928e7477d1db27b96b3f28eefffaeb2642c02a4514847ec"
+        },
+        {
+          "path": "assets/achievements/evolution/v1/memory-badge-wisdom-form3-512.webp",
+          "dimensions": [
+            512,
+            512
+          ],
+          "bytes": 175102,
+          "sha256": "b63b72a8ed983aabd38d20cdffd5281bb19cd16caa2177ac1ab72502ca1c6a5b"
+        }
+      ]
+    },
+    {
+      "id": "event-avatar-lantern-otter",
+      "form": 2,
+      "master": "design/expedition/art-production/masters/event-avatar-lantern-otter-form2.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1b67d-f771-7cd3-8f39-9ae2b09baf88\\exec-f28c0b89-8209-4412-b129-be64efa3c1ad.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        235,
+        232,
+        1013,
+        1031
+      ],
+      "sha256": "7c5d1081c8d55d688aecf130b8578f70fe78e836a2f0a9b95935be459fa8a156",
+      "status": "exported-qa-passed",
+      "preview": "design/expedition/three-form-preview/avatar-2.webp",
+      "promptStatus": "original-verbatim-not-archived; use PROMPT_GUIDE.md for new edits",
+      "exports": [
+        {
+          "path": "assets/achievements/evolution/v1/event-avatar-lantern-otter-form2-128.webp",
+          "dimensions": [
+            128,
+            128
+          ],
+          "bytes": 12166,
+          "sha256": "ebdb3b772b62f773aa3f353a074a800b130902a2d380895b0b73a4b9d54e506a"
+        },
+        {
+          "path": "assets/achievements/evolution/v1/event-avatar-lantern-otter-form2-256.webp",
+          "dimensions": [
+            256,
+            256
+          ],
+          "bytes": 38998,
+          "sha256": "107a85a8a59bb27f35b92a7267972db6ed5b96f0cd8d6701b54a31eead70ea4a"
+        },
+        {
+          "path": "assets/achievements/evolution/v1/event-avatar-lantern-otter-form2-512.webp",
+          "dimensions": [
+            512,
+            512
+          ],
+          "bytes": 135640,
+          "sha256": "c676479364516c74c671b6169f126fbaef428fcec54b94df3095947396df9228"
+        }
+      ]
+    },
+    {
+      "id": "event-avatar-lantern-otter",
+      "form": 3,
+      "master": "design/expedition/art-production/masters/event-avatar-lantern-otter-form3.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1b67d-f771-7cd3-8f39-9ae2b09baf88\\exec-53d913ea-bce9-4e34-a303-ee0c8454f3e8.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        234,
+        221,
+        1013,
+        1018
+      ],
+      "sha256": "634dcb0fc42e81a2712efeb43502e3c6baf933e45dab5e3952b7b5e8b9164971",
+      "status": "exported-qa-passed",
+      "preview": "design/expedition/three-form-preview/avatar-3.webp",
+      "promptStatus": "original-verbatim-not-archived; use PROMPT_GUIDE.md for new edits",
+      "exports": [
+        {
+          "path": "assets/achievements/evolution/v1/event-avatar-lantern-otter-form3-128.webp",
+          "dimensions": [
+            128,
+            128
+          ],
+          "bytes": 12688,
+          "sha256": "6428563c443265744d6094febdbc1534b06558c534d1eff481ac696cf7546ab5"
+        },
+        {
+          "path": "assets/achievements/evolution/v1/event-avatar-lantern-otter-form3-256.webp",
+          "dimensions": [
+            256,
+            256
+          ],
+          "bytes": 39970,
+          "sha256": "867957aca509b411c3f3fe74a0ab97fb3a218dedd664a82216df8b970f9d00d2"
+        },
+        {
+          "path": "assets/achievements/evolution/v1/event-avatar-lantern-otter-form3-512.webp",
+          "dimensions": [
+            512,
+            512
+          ],
+          "bytes": 133998,
+          "sha256": "2de8731b8619f8f43af1ba529a5fa71ebf6d1ac74ff696eedb5297de975b5ae6"
+        }
+      ]
+    },
+    {
+      "id": "starter-frame-plain-wood",
+      "form": 2,
+      "master": "design/expedition/art-production/masters/starter-frame-plain-wood-form2.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1b67d-f771-7cd3-8f39-9ae2b09baf88\\exec-beeeb721-4ed7-4831-8a96-2267421e7d7c.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        147,
+        170,
+        1098,
+        1111
+      ],
+      "sha256": "f9c6853bd9eb07b8777dd55fb4e6f041f55bac0e5ff69a3f593c1ccd8d7194c0",
+      "status": "exported-qa-passed",
+      "preview": "design/expedition/three-form-preview/frame-2.webp",
+      "promptStatus": "original-verbatim-not-archived; use PROMPT_GUIDE.md for new edits",
+      "exports": [
+        {
+          "path": "assets/achievements/evolution/v1/starter-frame-plain-wood-form2-128.webp",
+          "dimensions": [
+            128,
+            128
+          ],
+          "bytes": 8034,
+          "sha256": "06cbca567353adbad2d8066b1724b7188220b5a30e9e5d656d8cc669dd87fb14"
+        },
+        {
+          "path": "assets/achievements/evolution/v1/starter-frame-plain-wood-form2-256.webp",
+          "dimensions": [
+            256,
+            256
+          ],
+          "bytes": 23472,
+          "sha256": "59c07781e273296c56d655c3808c3c4641d66d3b116e50fd153c052a15cb6c06"
+        },
+        {
+          "path": "assets/achievements/evolution/v1/starter-frame-plain-wood-form2-512.webp",
+          "dimensions": [
+            512,
+            512
+          ],
+          "bytes": 76860,
+          "sha256": "06480941a961a65444732ddaa5a370714a10c4da56eb058077363ef58f58604d"
+        }
+      ]
+    },
+    {
+      "id": "starter-frame-plain-wood",
+      "form": 3,
+      "master": "design/expedition/art-production/masters/starter-frame-plain-wood-form3.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1b67d-f771-7cd3-8f39-9ae2b09baf88\\exec-e6b5fdd6-8fda-48b4-a895-d173f2f0b264.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        156,
+        168,
+        1089,
+        1101
+      ],
+      "sha256": "31d3dc9a47a8bc44b77ac958416b716a204345f73af66398cbb9393080d00e5f",
+      "status": "exported-qa-passed",
+      "preview": "design/expedition/three-form-preview/frame-3.webp",
+      "promptStatus": "original-verbatim-not-archived; use PROMPT_GUIDE.md for new edits",
+      "exports": [
+        {
+          "path": "assets/achievements/evolution/v1/starter-frame-plain-wood-form3-128.webp",
+          "dimensions": [
+            128,
+            128
+          ],
+          "bytes": 10718,
+          "sha256": "2afccccec274335c76f49376b61f32430b6b6d345a7a01fe51dbd9fe2d793a77"
+        },
+        {
+          "path": "assets/achievements/evolution/v1/starter-frame-plain-wood-form3-256.webp",
+          "dimensions": [
+            256,
+            256
+          ],
+          "bytes": 28844,
+          "sha256": "8abee49d9882dd312c837021f62cfa3dad4004273abe6ddde8c77aa68b2659d2"
+        },
+        {
+          "path": "assets/achievements/evolution/v1/starter-frame-plain-wood-form3-512.webp",
+          "dimensions": [
+            512,
+            512
+          ],
+          "bytes": 88058,
+          "sha256": "ddc4ea8a4dee9f59e775b48250cbf79e060e8abc53096bfe89e44ec9c07aa586"
+        }
+      ]
+    },
+    {
+      "id": "starter-badge-first-leaf",
+      "form": 2,
+      "master": "design/expedition/art-production/masters/starter-badge-first-leaf-form2.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1b67d-f771-7cd3-8f39-9ae2b09baf88\\exec-9d062717-875a-4208-b658-3b877cddd5cd.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        132,
+        140,
+        1102,
+        1124
+      ],
+      "sha256": "a209002d250b35c7271920b514cba1eccf7d98a320a3d3ac4fcfd81c97f1dfe0",
+      "status": "exported-qa-passed",
+      "preview": "design/expedition/three-form-preview/badge-2.webp",
+      "promptStatus": "original-verbatim-not-archived; use PROMPT_GUIDE.md for new edits",
+      "exports": [
+        {
+          "path": "assets/achievements/evolution/v1/starter-badge-first-leaf-form2-128.webp",
+          "dimensions": [
+            128,
+            128
+          ],
+          "bytes": 13750,
+          "sha256": "ada7cca774b8fdacd548bf38a9418e88963f7d663133eb32f0ada35f094dbb9b"
+        },
+        {
+          "path": "assets/achievements/evolution/v1/starter-badge-first-leaf-form2-256.webp",
+          "dimensions": [
+            256,
+            256
+          ],
+          "bytes": 43800,
+          "sha256": "6afdd6cb105b41905582b2c81b0ff4a87760f4e256f0bd69f882b1ccb006ebff"
+        },
+        {
+          "path": "assets/achievements/evolution/v1/starter-badge-first-leaf-form2-512.webp",
+          "dimensions": [
+            512,
+            512
+          ],
+          "bytes": 162804,
+          "sha256": "f1db032209848ac82b946d28d868644fa588bf79d33b78e2eb85b8c7f6ef183a"
+        }
+      ]
+    },
+    {
+      "id": "starter-badge-first-leaf",
+      "form": 3,
+      "master": "design/expedition/art-production/masters/starter-badge-first-leaf-form3.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1b67d-f771-7cd3-8f39-9ae2b09baf88\\exec-f319d4df-7702-4615-ac5b-0b1a5a227a47.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        126,
+        131,
+        1107,
+        1121
+      ],
+      "sha256": "cab2a9b5f5a826a17cf890fb1f259b564e3d76678f6cc8d5978e8514cbb69d2e",
+      "status": "exported-qa-passed",
+      "preview": "design/expedition/three-form-preview/badge-3.webp",
+      "promptStatus": "original-verbatim-not-archived; use PROMPT_GUIDE.md for new edits",
+      "exports": [
+        {
+          "path": "assets/achievements/evolution/v1/starter-badge-first-leaf-form3-128.webp",
+          "dimensions": [
+            128,
+            128
+          ],
+          "bytes": 17804,
+          "sha256": "9556169de075ad050fcd6fc0445b245ffeb324b9c926fdd51beed0e21423c7de"
+        },
+        {
+          "path": "assets/achievements/evolution/v1/starter-badge-first-leaf-form3-256.webp",
+          "dimensions": [
+            256,
+            256
+          ],
+          "bytes": 53950,
+          "sha256": "6c0f8ec6fd75ef484ea30cfc62e27451f6ac1cdaddaf0098d805c864662f6809"
+        },
+        {
+          "path": "assets/achievements/evolution/v1/starter-badge-first-leaf-form3-512.webp",
+          "dimensions": [
+            512,
+            512
+          ],
+          "bytes": 180764,
+          "sha256": "f19c0c75b1517b2d435a8d12d6e160f9e34fa727923bc9cdb8079d9f91604012"
+        }
+      ]
+    },
+    {
+      "id": "memory-avatar-sapphire-owl",
+      "form": 2,
+      "revision": "r2",
+      "master": "design/expedition/art-production/masters/memory-avatar-sapphire-owl-form2-r2.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-e1e4ab0f-7e57-43bd-b18c-ea781a3d81d5.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        49,
+        1234,
+        1238
+      ],
+      "sha256": "1076ac1e716db0fdd7b1d65dc402130b2a2bd21de54849c9cad5df4b31b2462c",
+      "status": "exported-qa-passed",
+      "exports": [
+        {
+          "path": "assets/achievements/evolution/v1/memory-avatar-sapphire-owl-form2-128.webp",
+          "dimensions": [
+            128,
+            128
+          ],
+          "bytes": 14066,
+          "sha256": "bb7dfe6e368066fc8f46bc49b09bc92f103d0fc6c8d9c10db7332c26678bf0d2"
+        },
+        {
+          "path": "assets/achievements/evolution/v1/memory-avatar-sapphire-owl-form2-256.webp",
+          "dimensions": [
+            256,
+            256
+          ],
+          "bytes": 46226,
+          "sha256": "a1be282831764170b939221e0f1babbda219ed7657a4ee00e81beb586609ec73"
+        },
+        {
+          "path": "assets/achievements/evolution/v1/memory-avatar-sapphire-owl-form2-512.webp",
+          "dimensions": [
+            512,
+            512
+          ],
+          "bytes": 163400,
+          "sha256": "5f55fc1b5946e65c3cdd538b6e4776d9816a83929d9abcb4b4bb5028399e1a8b"
+        }
+      ],
+      "promptReference": "prompts.json#memory-avatar-sapphire-owl/form2/r2"
+    },
+    {
+      "id": "memory-avatar-sapphire-owl",
+      "form": 3,
+      "revision": "r2",
+      "master": "design/expedition/art-production/masters/memory-avatar-sapphire-owl-form3-r2.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-0f69eb59-5e46-4986-aefa-0117b7a4c598.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        1234,
+        1254
+      ],
+      "sha256": "4891f429b2132a707cfd92c4b622ce4cccaa584b2553da43cd91e6fd530dea71",
+      "status": "exported-qa-passed",
+      "exports": [
+        {
+          "path": "assets/achievements/evolution/v1/memory-avatar-sapphire-owl-form3-128.webp",
+          "dimensions": [
+            128,
+            128
+          ],
+          "bytes": 14372,
+          "sha256": "2bf373ae6b79221a2a3711e412c58cf85f2bb08e16e71bfec2cb40bbdb367637"
+        },
+        {
+          "path": "assets/achievements/evolution/v1/memory-avatar-sapphire-owl-form3-256.webp",
+          "dimensions": [
+            256,
+            256
+          ],
+          "bytes": 47806,
+          "sha256": "a60bfae8de150b17bc9e0ea0aeca7d88820d72fd1ac56e9a5b017a78ad4ccdbd"
+        },
+        {
+          "path": "assets/achievements/evolution/v1/memory-avatar-sapphire-owl-form3-512.webp",
+          "dimensions": [
+            512,
+            512
+          ],
+          "bytes": 171830,
+          "sha256": "e26d63290d45eaff9aa46ae4fe55435ad1ef8ca46250377906944a370d5045bd"
+        }
+      ],
+      "promptReference": "prompts.json#memory-avatar-sapphire-owl/form3/r2"
+    },
+    {
+      "id": "memory-avatar-cherry-rabbit",
+      "form": 2,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-avatar-cherry-rabbit-form2.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-b50bf582-d666-415b-a8d6-18b1da8fb133.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        9,
+        1254,
+        1254
+      ],
+      "sha256": "7834663c322be3124fc15848f5aa4d61aee4b29976671fc702ad5c773107494f",
+      "status": "generated-pending-alignment-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-avatar-cherry-rabbit/form2/r1"
+    },
+    {
+      "id": "memory-avatar-cherry-rabbit",
+      "form": 3,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-avatar-cherry-rabbit-form3.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-89349f7d-5b95-4dfc-90e1-671393d6f92f.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        23,
+        1208,
+        1238
+      ],
+      "sha256": "e34bcd50bca80dfad5312b97bb07a4196cc33913ce84eebdf3255cbd46744c48",
+      "status": "generated-pending-alignment-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-avatar-cherry-rabbit/form3/r1"
+    },
+    {
+      "id": "memory-frame-cherry-blossom",
+      "form": 2,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-frame-cherry-blossom-form2.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-ae88e29d-ec2a-4aab-8c5a-e0a8c5bece2b.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        7,
+        1240,
+        1254
+      ],
+      "sha256": "7f5bb2cd7b23cb024feab21ae16dd56bb46ce74e1fdb5c7fe44b7da0adf57950",
+      "status": "generated-pending-alignment-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-frame-cherry-blossom/form2/r1"
+    },
+    {
+      "id": "memory-frame-cherry-blossom",
+      "form": 3,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-frame-cherry-blossom-form3.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-59c940e9-20de-4113-824b-9253db2d6f1b.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "sha256": "f833eb4923abe898b828f29b3d394ad45390877d1058f69aa476ad9c6f4fea20",
+      "status": "generated-pending-alignment-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-frame-cherry-blossom/form3/r1"
+    },
+    {
+      "id": "memory-frame-cherry-blossom",
+      "form": 3,
+      "revision": "r2",
+      "master": "design/expedition/art-production/masters/memory-frame-cherry-blossom-form3-r2.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-a81350ff-8a26-481d-83d6-2e91d37d92c1.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        1253,
+        1254
+      ],
+      "sha256": "48489e906c42c17fe44350bc60cc3125005e1746000cd3e7f02ad24de9143953",
+      "status": "generated-pending-alignment-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-frame-cherry-blossom/form3/r2"
+    },
+    {
+      "id": "memory-badge-memory-master",
+      "form": 2,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-badge-memory-master-form2.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-0075c743-9b9f-4348-aa26-fda882607280.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        8,
+        1246,
+        1254
+      ],
+      "sha256": "0846d3b08efd1921d91132165da0dcbd36ea38944927a0956b24d0cd4589eea6",
+      "status": "generated-pending-alignment-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-badge-memory-master/form2/r1"
+    },
+    {
+      "id": "memory-badge-memory-master",
+      "form": 3,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-badge-memory-master-form3.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-9dff126a-f8cc-47c1-926b-8ec5829b8c3c.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        7,
+        1228,
+        1234
+      ],
+      "sha256": "c9daed3cc894dead7f2474ce32645fa038a8bb08bad0620b645ca7737274fd59",
+      "status": "generated-pending-alignment-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-badge-memory-master/form3/r1"
+    },
+    {
+      "id": "memory-frame-golden-laurel",
+      "form": 2,
+      "revision": "r2",
+      "master": "design/expedition/art-production/masters/memory-frame-golden-laurel-form2-r2.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-99973592-b36e-4d72-a955-8703dff9f2ce.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        19,
+        1244,
+        1254
+      ],
+      "sha256": "d60f980ae88089e40c284ddc195785a7b37981c1fbe4194b967af1e5a39c16d7",
+      "status": "generated-pending-alignment-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-frame-golden-laurel/form2/r2"
+    },
+    {
+      "id": "memory-avatar-stellar-cat",
+      "form": 2,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-avatar-stellar-cat-form2.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-02ad7a1f-ed83-49c3-86c7-9ab342d4a8de.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        49,
+        29,
+        1214,
+        1230
+      ],
+      "sha256": "28d16f1e410f8ad2bcfa87201cc810456be863b332ef5c2447dda826c2d1e56d",
+      "status": "generated-pending-alignment-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-avatar-stellar-cat/form2/r1"
+    },
+    {
+      "id": "memory-avatar-stellar-cat",
+      "form": 3,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-avatar-stellar-cat-form3.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-642d80ed-bf90-4457-8fa0-8ce7d507a3c4.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        23,
+        1232,
+        1254
+      ],
+      "sha256": "81808c2790e39fa066b312e4f838ddb2024692d1f47dca4d20232af861d30e78",
+      "status": "generated-pending-alignment-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-avatar-stellar-cat/form3/r1"
+    },
+    {
+      "id": "memory-frame-sky-feather",
+      "form": 2,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-frame-sky-feather-form2.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-c7119538-f37b-49c3-a21d-ccd1cd668236.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        1242,
+        1254
+      ],
+      "sha256": "6c41ec9c91a07c0e84793d4ca4c3eb315e9e8def16a8bfb36fb79a0d5d27cdb0",
+      "status": "generated-pending-alignment-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-frame-sky-feather/form2/r1"
+    },
+    {
+      "id": "memory-frame-sky-feather",
+      "form": 3,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-frame-sky-feather-form3.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-455fe7f3-478c-4737-89e3-85e8d9af09a8.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "sha256": "6937ec1fa6ea49d52759afca715d3b453c85b87ad396ef76624ecc713b084659",
+      "status": "generated-pending-alignment-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-frame-sky-feather/form3/r1"
+    },
+    {
+      "id": "memory-avatar-scholar-squirrel",
+      "form": 2,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-avatar-scholar-squirrel-form2.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-a6e30bf2-9b2f-4bd6-b47e-29a0589a35ae.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        24,
+        51,
+        1240,
+        1230
+      ],
+      "sha256": "8ab3d7a58cafaf1b3cfc29befb5ce17e190b945a10ca45a64d398d9b84caff37",
+      "status": "generated-pending-alignment-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-avatar-scholar-squirrel/form2/r1"
+    },
+    {
+      "id": "memory-avatar-scholar-squirrel",
+      "form": 3,
+      "revision": "r2",
+      "master": "design/expedition/art-production/masters/memory-avatar-scholar-squirrel-form3-r2.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-660afb0f-719b-453a-aad0-0db30a0deab4.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        17,
+        1226,
+        1254
+      ],
+      "sha256": "2264e0bd75412e1e500d6a7317d1e99a594f9b6ce388d2fc706a98e3d237bb71",
+      "status": "generated-pending-alignment-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-avatar-scholar-squirrel/form3/r2"
+    },
+    {
+      "id": "memory-frame-sky-feather",
+      "form": 3,
+      "revision": "r2",
+      "master": "design/expedition/art-production/masters/memory-frame-sky-feather-form3-r2.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-f4cfd88f-5dd7-412e-93a6-03a1cec4a5a4.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        23,
+        1238,
+        1229
+      ],
+      "sha256": "7195fd33856c1f4197bc336c27ac68fb0b854a8bb2c65dec2995289ec93780fa",
+      "status": "generated-pending-alignment-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-frame-sky-feather/form3/r2"
+    },
+    {
+      "id": "memory-frame-golden-laurel",
+      "form": 3,
+      "revision": "r2",
+      "master": "design/expedition/art-production/masters/memory-frame-golden-laurel-form3-r2.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-18825367-9ce7-442d-a0c6-4757de68f4db.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        16,
+        1240,
+        1254
+      ],
+      "sha256": "eea2fa54f412e75475d62d1a6302bafffe0bb116a3ab4d6c1c0db1ab47a5e9df",
+      "status": "generated-pending-alignment-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-frame-golden-laurel/form3/r2"
+    },
+    {
+      "id": "memory-frame-gilded-pages",
+      "form": 2,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-frame-gilded-pages-form2.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-34fa12b3-5cb7-49eb-97b3-2107abf1b695.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        20,
+        1218,
+        1254
+      ],
+      "sha256": "626fdd094f21a07dba9a45854f91084b4e025dc8cb572ed07a00e51a2f55525e",
+      "status": "candidate-pending-product-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-frame-gilded-pages/form2/r1",
+      "qaNotes": "Three-form source comparison reviewed; full cross-match, eye anchors, edge alpha and small-size review pending. Not ready for runtime. Original-to-new opening aspect ratio and bottom book clearance require confirmation."
+    },
+    {
+      "id": "memory-frame-gilded-pages",
+      "form": 3,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-frame-gilded-pages-form3.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-7f857b31-6115-4342-9b8f-1bf688db4eb0.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        21,
+        20,
+        1228,
+        1254
+      ],
+      "sha256": "5bc96377d05a204b3d2ff0382f01d74a6696b2260f68bc956a5becbc721488f1",
+      "status": "candidate-pending-product-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-frame-gilded-pages/form3/r1",
+      "qaNotes": "Three-form source comparison reviewed; full cross-match, eye anchors, edge alpha and small-size review pending. Not ready for runtime. Original-to-new opening aspect ratio and bottom book clearance require confirmation."
+    },
+    {
+      "id": "memory-badge-wisdom-seal",
+      "form": 2,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-badge-wisdom-seal-form2.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-a1ff3123-0ae4-44bf-bb57-83294498b479.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        25,
+        1240,
+        1254
+      ],
+      "sha256": "52a760fad644461dbb22e0180992f09d594f7ffa6796e3edafa6571baf129228",
+      "status": "candidate-pending-product-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-badge-wisdom-seal/form2/r1",
+      "qaNotes": "Three-form source comparison reviewed; full cross-match, eye anchors, edge alpha and small-size review pending. Not ready for runtime."
+    },
+    {
+      "id": "memory-badge-wisdom-seal",
+      "form": 3,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-badge-wisdom-seal-form3.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-dc6536f5-d76e-418d-b1fe-be5b7f1df53d.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        24,
+        19,
+        1248,
+        1254
+      ],
+      "sha256": "ce19be63dd3046f25893a02af8d13b2b329d28a70a37a33a592ce958b2042b54",
+      "status": "candidate-pending-product-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-badge-wisdom-seal/form3/r1",
+      "qaNotes": "Three-form source comparison reviewed; full cross-match, eye anchors, edge alpha and small-size review pending. Not ready for runtime."
+    },
+    {
+      "id": "memory-avatar-stargazer-hedgehog",
+      "form": 2,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-avatar-stargazer-hedgehog-form2.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-ace66b68-35b9-4495-bf80-63bbacfa4266.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        1238,
+        1254
+      ],
+      "sha256": "7003602250f96285d2f6edcbbd52a884db22a6ca58b97b20982689b6af6e7819",
+      "status": "candidate-pending-product-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-avatar-stargazer-hedgehog/form2/r1",
+      "qaNotes": "Three-form source comparison reviewed; full cross-match, eye anchors, edge alpha and small-size review pending. Not ready for runtime."
+    },
+    {
+      "id": "memory-avatar-stargazer-hedgehog",
+      "form": 3,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-avatar-stargazer-hedgehog-form3.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-4e87c38f-326e-42ba-9ca8-29d912cfd696.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        23,
+        1235,
+        1236
+      ],
+      "sha256": "1ff8cc5d5b8b1e93e0480ced45a835e7b55f4166c4652be3ba09e56ddacca0a9",
+      "status": "candidate-pending-product-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-avatar-stargazer-hedgehog/form3/r1",
+      "qaNotes": "Three-form source comparison reviewed; full cross-match, eye anchors, edge alpha and small-size review pending. Not ready for runtime."
+    },
+    {
+      "id": "memory-frame-astral-orbit",
+      "form": 2,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-frame-astral-orbit-form2.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-a57427d9-9ff4-450e-aac2-f9fbbb574dc6.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        5,
+        1240,
+        1254
+      ],
+      "sha256": "6c4f167f550f2d8ad4cd9b6d16d3ffbf91c1d3edb91bf09c33c3b6b302426a24",
+      "status": "candidate-pending-product-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-frame-astral-orbit/form2/r1",
+      "qaNotes": "Three-form source comparison reviewed; full cross-match, eye anchors, edge alpha and small-size review pending. Not ready for runtime."
+    },
+    {
+      "id": "memory-frame-astral-orbit",
+      "form": 3,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-frame-astral-orbit-form3.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-f008d3a4-697b-4262-b51c-595dfd36ebeb.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        1242,
+        1254
+      ],
+      "sha256": "e2ed3b41d511c6007efaad9e52d85d020f8c545088a74700acd15e9f46539736",
+      "status": "needs-revision",
+      "exports": null,
+      "promptReference": "prompts.json#memory-frame-astral-orbit/form3/r1",
+      "qaNotes": "Gold orbit rail crosses the inner opening. Must move rail outside face opening before export; do not erase or crop it as a workaround."
+    },
+    {
+      "id": "memory-avatar-dreaming-deer",
+      "form": 2,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-avatar-dreaming-deer-form2.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-f414637a-4cf0-4313-b15b-e7563a5c66c3.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        25,
+        1240,
+        1254
+      ],
+      "sha256": "5501c8112d0135867739fd1a099da94eb9eda564d10d825b177bc44d6763ff55",
+      "status": "candidate-pending-product-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-avatar-dreaming-deer/form2/r1",
+      "qaNotes": "Three-form source comparison reviewed; full cross-match, eye anchors, edge alpha and small-size review pending. Not ready for runtime."
+    },
+    {
+      "id": "memory-avatar-dreaming-deer",
+      "form": 3,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-avatar-dreaming-deer-form3.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-c7b3de19-3eb9-4482-99d0-8dc6452a0b3d.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        31,
+        1240,
+        1254
+      ],
+      "sha256": "ecc37d61c79f84991ac568fb4661236e5ca4a040c595a6aed74b08cc6585d178",
+      "status": "candidate-pending-product-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-avatar-dreaming-deer/form3/r1",
+      "qaNotes": "Three-form source comparison reviewed; full cross-match, eye anchors, edge alpha and small-size review pending. Not ready for runtime."
+    },
+    {
+      "id": "memory-frame-silken-clouds",
+      "form": 2,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-frame-silken-clouds-form2.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-b8fbab2d-0d37-47f7-904d-331b84fbaf7d.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        20,
+        1254,
+        1254
+      ],
+      "sha256": "7053b9e4cc0c3b0e866a53031e92d5d5c300b9081a48f09a25a5e13fa4d809ff",
+      "status": "candidate-pending-product-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-frame-silken-clouds/form2/r1",
+      "qaNotes": "Three-form source comparison reviewed; full cross-match, eye anchors, edge alpha and small-size review pending. Not ready for runtime. Inner contour narrows at the ribbon folds; compare usable opening against original before acceptance."
+    },
+    {
+      "id": "memory-frame-silken-clouds",
+      "form": 3,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-frame-silken-clouds-form3.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-df31f8ff-48f5-4c05-bae6-6cf1812c6580.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        1248,
+        1254
+      ],
+      "sha256": "14073874276c7b86502fea78d0cbe075037d0fa08d30cccb84219f96af0fe38d",
+      "status": "candidate-pending-product-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-frame-silken-clouds/form3/r1",
+      "qaNotes": "Three-form source comparison reviewed; full cross-match, eye anchors, edge alpha and small-size review pending. Not ready for runtime. Inner contour narrows at the ribbon folds; compare usable opening against original before acceptance."
+    },
+    {
+      "id": "memory-badge-memory-keeper",
+      "form": 2,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-badge-memory-keeper-form2.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-2640767d-c612-4df2-ab98-603294736a5b.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        8,
+        1240,
+        1254
+      ],
+      "sha256": "db2abde229a833c68370040cde128bbf0e1360257f8fa032442cc5e77fe3fb68",
+      "status": "candidate-pending-product-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-badge-memory-keeper/form2/r1",
+      "qaNotes": "Three-form source comparison reviewed. Face anchors, small-size readability, alpha edges and full cross-match remain pending; not ready for runtime."
+    },
+    {
+      "id": "memory-badge-memory-keeper",
+      "form": 3,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-badge-memory-keeper-form3.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-0f54e2bc-d15a-46b8-98fa-3fc9dc2c1e47.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        17,
+        1241,
+        1235
+      ],
+      "sha256": "eb52bfb476fbab784b6ec28da30443c3327480dfcdf1c1c79e2f5e7572ff59ae",
+      "status": "candidate-pending-product-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-badge-memory-keeper/form3/r1",
+      "qaNotes": "Three-form source comparison reviewed. Face anchors, small-size readability, alpha edges and full cross-match remain pending; not ready for runtime."
+    },
+    {
+      "id": "memory-avatar-galaxy-whale",
+      "form": 2,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-avatar-galaxy-whale-form2.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-a2aa8ec5-5d4c-4ebb-8834-bc37c54739ad.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        31,
+        1234,
+        1254
+      ],
+      "sha256": "0acebf1ba43d7533ea548e976e0dc249a0a1e23d46977961dd981aab4fdb9844",
+      "status": "candidate-pending-product-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-avatar-galaxy-whale/form2/r1",
+      "qaNotes": "Three-form source comparison reviewed. Face anchors, small-size readability, alpha edges and full cross-match remain pending; not ready for runtime."
+    },
+    {
+      "id": "memory-avatar-galaxy-whale",
+      "form": 3,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-avatar-galaxy-whale-form3.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-3424e861-7099-4005-8cd7-e04717619ba0.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        47,
+        1236,
+        1234
+      ],
+      "sha256": "d9ccee310ed3cad5be3c554c139a67e27175d43699430a984c2bf3b262be9c25",
+      "status": "candidate-pending-product-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-avatar-galaxy-whale/form3/r1",
+      "qaNotes": "Three-form source comparison reviewed. Face anchors, small-size readability, alpha edges and full cross-match remain pending; not ready for runtime."
+    },
+    {
+      "id": "memory-frame-knowledge-gateway",
+      "form": 2,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-frame-knowledge-gateway-form2.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-4a2b4115-d7bc-4f19-883a-87e02eb66c16.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        23,
+        1238,
+        1254
+      ],
+      "sha256": "335eddfe34fd09d967d5d153a3519c2498b9fdb71c0bd0888774942931779161",
+      "status": "candidate-pending-product-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-frame-knowledge-gateway/form2/r1",
+      "qaNotes": "Three-form source comparison reviewed. Face anchors, small-size readability, alpha edges and full cross-match remain pending; not ready for runtime. Uniform opening alignment is provisional: original contour, aspect and bottom badge clearance require product QA."
+    },
+    {
+      "id": "memory-frame-knowledge-gateway",
+      "form": 3,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-frame-knowledge-gateway-form3.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-dbf65bc6-c6c9-4b04-800d-0ff24cba8de8.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "sha256": "c46a867509da25426d57eb3f2ca1b5436430e175e6743fa4904b1606038e1ee6",
+      "status": "candidate-pending-product-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-frame-knowledge-gateway/form3/r1",
+      "qaNotes": "Three-form source comparison reviewed. Face anchors, small-size readability, alpha edges and full cross-match remain pending; not ready for runtime. Uniform opening alignment is provisional: original contour, aspect and bottom badge clearance require product QA."
+    },
+    {
+      "id": "memory-avatar-chestnut-squirrel",
+      "form": 2,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-avatar-chestnut-squirrel-form2.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-427bf3ee-3e08-4b04-8fa7-2bc111669306.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        19,
+        1240,
+        1254
+      ],
+      "sha256": "cb0ac27ec504363be575cb3496be9d0fbc9576bd761c985d0619c45b0964177f",
+      "status": "candidate-pending-product-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-avatar-chestnut-squirrel/form2/r1",
+      "qaNotes": "Three-form source comparison reviewed. Face anchors, small-size readability, alpha edges and full cross-match remain pending; not ready for runtime."
+    },
+    {
+      "id": "memory-avatar-chestnut-squirrel",
+      "form": 3,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-avatar-chestnut-squirrel-form3.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-14f12814-fdbd-4049-8eb5-0159c8c7191c.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        24,
+        1240,
+        1254
+      ],
+      "sha256": "0e8fe7e6991d99196348eb4808cafea3a7544f0be3b52c42995b4dea6eba6914",
+      "status": "candidate-pending-product-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-avatar-chestnut-squirrel/form3/r1",
+      "qaNotes": "Three-form source comparison reviewed. Face anchors, small-size readability, alpha edges and full cross-match remain pending; not ready for runtime."
+    },
+    {
+      "id": "memory-frame-autumn-leaves",
+      "form": 2,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-frame-autumn-leaves-form2.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-0b13dbde-a93e-46f5-8dfa-64b80d025b5e.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        17,
+        1253,
+        1254
+      ],
+      "sha256": "96c5d0dad7df4108101594db0bbf74f2c37bb248d90024e89a1b3daf4c2ecb40",
+      "status": "candidate-pending-product-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-frame-autumn-leaves/form2/r1",
+      "qaNotes": "Three-form source comparison reviewed. Face anchors, small-size readability, alpha edges and full cross-match remain pending; not ready for runtime. Uniform opening alignment is provisional: original contour, aspect and bottom badge clearance require product QA."
+    },
+    {
+      "id": "memory-frame-autumn-leaves",
+      "form": 3,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-frame-autumn-leaves-form3.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-ac5f5e84-05eb-46e4-b03b-7c600b7aac77.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        1253,
+        1254
+      ],
+      "sha256": "ecdc584da78f966758f016a7854cedf5465b1ce48ce0a2c7ffed3dfbc6723fb3",
+      "status": "candidate-pending-product-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-frame-autumn-leaves/form3/r1",
+      "qaNotes": "Three-form source comparison reviewed. Face anchors, small-size readability, alpha edges and full cross-match remain pending; not ready for runtime. Uniform opening alignment is provisional: original contour, aspect and bottom badge clearance require product QA."
+    },
+    {
+      "id": "memory-badge-four-seasons",
+      "form": 2,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-badge-four-seasons-form2.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-97132226-83cd-439b-a619-7c73a739972d.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        23,
+        1225,
+        1254
+      ],
+      "sha256": "9322d7e864c6946ffaa8c555e79ecc693dacb2441364378c719e18aa63815093",
+      "status": "candidate-pending-product-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-badge-four-seasons/form2/r1",
+      "qaNotes": "Three-form source comparison reviewed. Face anchors, small-size readability, alpha edges and full cross-match remain pending; not ready for runtime."
+    },
+    {
+      "id": "memory-badge-four-seasons",
+      "form": 3,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-badge-four-seasons-form3.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-d900dbc3-27da-4fae-984a-b06e1ded15ed.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        17,
+        1253,
+        1238
+      ],
+      "sha256": "1de2f07444ead5cc9f30cf8eb7a9adb4d0dc98ff68d807f8ac488f30947d91a5",
+      "status": "candidate-pending-product-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-badge-four-seasons/form3/r1",
+      "qaNotes": "Three-form source comparison reviewed. Face anchors, small-size readability, alpha edges and full cross-match remain pending; not ready for runtime."
+    },
+    {
+      "id": "memory-avatar-snow-rabbit",
+      "form": 2,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-avatar-snow-rabbit-form2.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-59f83957-4478-4a1b-8aaa-3ab276d57d66.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        29,
+        1214,
+        1220
+      ],
+      "sha256": "a53448b9413b05820749ea436596fd9b28681df02662499b9f64a3a73d2bc857",
+      "status": "candidate-pending-product-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-avatar-snow-rabbit/form2/r1",
+      "qaNotes": "Three-form source comparison reviewed. Face anchors, small-size readability, alpha edges and full cross-match remain pending; not ready for runtime."
+    },
+    {
+      "id": "memory-avatar-snow-rabbit",
+      "form": 3,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-avatar-snow-rabbit-form3.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-9e2cbb05-aade-4956-8852-c8451b3c2061.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        22,
+        1240,
+        1238
+      ],
+      "sha256": "15b73f0cdeb49294c11b18f2c5baa05f5522402671caf5c57e7f9ac09a877635",
+      "status": "candidate-pending-product-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-avatar-snow-rabbit/form3/r1",
+      "qaNotes": "Three-form source comparison reviewed. Face anchors, small-size readability, alpha edges and full cross-match remain pending; not ready for runtime."
+    },
+    {
+      "id": "memory-frame-frosted-branch",
+      "form": 2,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-frame-frosted-branch-form2.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-417cff82-6c24-4475-b5f1-e1328a8a9e15.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        3,
+        1254,
+        1254
+      ],
+      "sha256": "c394c3e9cd487bd4e1f6be62c15bfcf62d5a25e361184132ce0d5dd6f2af8e22",
+      "status": "candidate-pending-product-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-frame-frosted-branch/form2/r1",
+      "qaNotes": "Three-form source comparison reviewed. Face anchors, small-size readability, alpha edges and full cross-match remain pending; not ready for runtime. Uniform opening alignment is provisional: original contour, aspect and bottom badge clearance require product QA. Check pale fringe and detached frost pixels on dark/light backgrounds."
+    },
+    {
+      "id": "memory-frame-frosted-branch",
+      "form": 3,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-frame-frosted-branch-form3.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-acd426ae-b058-41c6-b367-520513f1028d.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        6,
+        1253,
+        1254
+      ],
+      "sha256": "11c866dc84702d1343bf44f3b574e917b6906a6fa64519bd89cd01dd64291878",
+      "status": "candidate-pending-product-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-frame-frosted-branch/form3/r1",
+      "qaNotes": "Three-form source comparison reviewed. Face anchors, small-size readability, alpha edges and full cross-match remain pending; not ready for runtime. Uniform opening alignment is provisional: original contour, aspect and bottom badge clearance require product QA. Check pale fringe and detached frost pixels on dark/light backgrounds."
+    },
+    {
+      "id": "memory-avatar-honey-bear",
+      "form": 2,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-avatar-honey-bear-form2.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-f8392491-e3c9-4df4-8c19-19f9896492b3.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        19,
+        1234,
+        1254
+      ],
+      "sha256": "073f76ae2f792a85738466833b19ea29a6b1d2a890f9c3e5584dd13c63686944",
+      "status": "candidate-pending-product-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-avatar-honey-bear/form2/r1",
+      "qaNotes": "Three-form source comparison reviewed. Face anchors, small-size readability, alpha edges and full cross-match remain pending; not ready for runtime."
+    },
+    {
+      "id": "memory-avatar-honey-bear",
+      "form": 3,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-avatar-honey-bear-form3.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-0e4833be-3737-473a-beea-6906f638c1bb.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        39,
+        1240,
+        1232
+      ],
+      "sha256": "9107ee8bb0db4d97ab6d46cefb8b60f839b4e1068b29bdf725a321e73d57ed6a",
+      "status": "candidate-pending-product-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-avatar-honey-bear/form3/r1",
+      "qaNotes": "Three-form source comparison reviewed. Face anchors, small-size readability, alpha edges and full cross-match remain pending; not ready for runtime."
+    },
+    {
+      "id": "memory-frame-golden-honeycomb",
+      "form": 2,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-frame-golden-honeycomb-form2.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-00cbed53-c502-43c5-915d-a7219ebb0380.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "sha256": "f44a81fb8fce99b9e2d228352cd24e42989b15c863e0c0028d1283440d25cf21",
+      "status": "candidate-pending-product-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-frame-golden-honeycomb/form2/r1",
+      "qaNotes": "Three-form source comparison reviewed. Face anchors, small-size readability, alpha edges and full cross-match remain pending; not ready for runtime. Uniform opening alignment is provisional: original contour, aspect and bottom badge clearance require product QA. Check glow residue outside border and original opening size; no halo accepted as background."
+    },
+    {
+      "id": "memory-frame-golden-honeycomb",
+      "form": 3,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-frame-golden-honeycomb-form3.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-129ed86a-5b88-4192-ace0-44eb3e27b171.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        1244,
+        1254
+      ],
+      "sha256": "d04d3ea19ea242fce55d413de79c0e387dd6fe981f773cb29a579b79221077a9",
+      "status": "candidate-pending-product-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-frame-golden-honeycomb/form3/r1",
+      "qaNotes": "Three-form source comparison reviewed. Face anchors, small-size readability, alpha edges and full cross-match remain pending; not ready for runtime. Uniform opening alignment is provisional: original contour, aspect and bottom badge clearance require product QA. Check glow residue outside border and original opening size; no halo accepted as background."
+    },
+    {
+      "id": "memory-badge-forest-guardian",
+      "form": 2,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-badge-forest-guardian-form2.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-0bb65712-4cee-412a-adc9-e72dc7f07074.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        8,
+        1240,
+        1254
+      ],
+      "sha256": "d5375ccc691932985e07583d05a11256df732b0dcc272673243180ac189ea679",
+      "status": "candidate-pending-product-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-badge-forest-guardian/form2/r1",
+      "qaNotes": "Three-form source comparison reviewed. Face anchors, small-size readability, alpha edges and full cross-match remain pending; not ready for runtime."
+    },
+    {
+      "id": "memory-badge-forest-guardian",
+      "form": 3,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-badge-forest-guardian-form3.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-281f92fa-70b4-483c-9ccf-ef88cafac37d.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        0,
+        9,
+        1249,
+        1254
+      ],
+      "sha256": "ee262a77d1238541bb8323c2f8c6153be80d73e968af30b97df287fae2dbbd6d",
+      "status": "candidate-pending-product-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-badge-forest-guardian/form3/r1",
+      "qaNotes": "Three-form source comparison reviewed. Face anchors, small-size readability, alpha edges and full cross-match remain pending; not ready for runtime."
+    },
+    {
+      "id": "memory-avatar-dawn-crane",
+      "form": 2,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-avatar-dawn-crane-form2.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-1c0ad230-5ce4-4830-9a74-fd8856b71b47.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        65,
+        17,
+        1232,
+        1254
+      ],
+      "sha256": "8a52cc784c3cd8519c840f722bf86a3875812787524c03e6eb45d0d637e8f2e8",
+      "status": "candidate-pending-product-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-avatar-dawn-crane/form2/r1",
+      "qaNotes": "Three-form source comparison reviewed. Face anchors, small-size readability, alpha edges and full cross-match remain pending; not ready for runtime."
+    },
+    {
+      "id": "memory-avatar-dawn-crane",
+      "form": 3,
+      "revision": "r1",
+      "master": "design/expedition/art-production/masters/memory-avatar-dawn-crane-form3.png",
+      "generationSource": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-7510-79f3-a60e-a1a441cec2c1\\exec-213b2781-04b1-4ebe-9b1d-61d26406bb19.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "alphaBBox": [
+        49,
+        45,
+        1238,
+        1214
+      ],
+      "sha256": "59fced8496c5c8effc464dfba43748d224adcda098195eaaadba92234c6bc4ee",
+      "status": "candidate-pending-product-qa",
+      "exports": null,
+      "promptReference": "prompts.json#memory-avatar-dawn-crane/form3/r1",
+      "qaNotes": "Three-form source comparison reviewed. Face anchors, small-size readability, alpha edges and full cross-match remain pending; not ready for runtime."
+    }
+  ]
+}

@@ -15,9 +15,9 @@ export function requestRewardedSpin(isCurrent = () => true) {
 }
 async function perform(isCurrent) {
   if (!rewardedSpinAvailable() || !isAppActive() || !isCurrent()) throw new Error('Quảng cáo nhận thưởng hiện chưa khả dụng.');
-  const account = getAccountService(), identity = account?.getIdentity(), uid = identity?.uid;
-  const owns = () => account.getIdentity()?.uid === uid && account.getIdentity()?.profileId === identity.profileId;
-  if (!uid) throw new Error('Hãy kết nối tài khoản.');
+  const account = getAccountService(), localIdentity=()=>account?.getIdentity()||account?.getLocalIdentity(), identity=localIdentity(), uid=identity?.uid;
+  const owns = () => localIdentity()?.uid === uid && localIdentity()?.profileId === identity.profileId;
+  if (!uid) throw new Error('Chưa đọc được hồ sơ trên máy.');
   const prepared = await requestLiveops({ type: 'prepareAd' });
   const operation = prepared.adOperation, preparedAt = performance.now();
   const runtime = await initializeMenuAds();

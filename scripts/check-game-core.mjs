@@ -125,4 +125,21 @@ assert.deepEqual(gameState.progress.memoryMatch.sessionsByMode.challenge, {
 });
 assert.equal(gameState.progress.memoryMatch.items.hint, 0, "Sessions do not migrate inventory into the current save contract.");
 
-console.log("Shared game catalog checks passed.");
+
+// Reward cycles survive board resets and migrate old session-only saves.
+for (const key of ['memoryMatch', 'linkConnect']) {
+  hydrateGameState({ settings: { mode: 'challenge' }, progress: { [key]: {
+    sessionsByMode: { easy: { specialProgress: 3 }, challenge: { specialProgress: 7 } },
+  } } });
+  assert.equal(gameState.progress[key].specialProgress, 7);
+  for (const [value, expected] of [[0, 0], [9, 9], [10, 0], [23, 3], [-1, 0], [null, 0], ['bad', 0]]) {
+    hydrateGameState({ progress: { [key]: { specialProgress: value,
+      sessionsByMode: { easy: { specialProgress: 8 } } } } });
+    assert.equal(gameState.progress[key].specialProgress, expected);
+    const saved = structuredClone(gameState.progress);
+    hydrateGameState({ progress: saved });
+    assert.equal(gameState.progress[key].specialProgress, expected);
+  }
+}
+
+console.log("Shared game catalog and durable reward cycle checks passed.");

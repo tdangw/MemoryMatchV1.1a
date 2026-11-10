@@ -1,0 +1,80 @@
+    function cosmeticTypes() { return ['avatar','frame','badge']; }
+    function cosmeticType(id) { return COSMETIC_TYPE_LOOKUP; }
+    function cosmeticCounts(c) {
+      return c is map && c.keys().hasAll(cosmeticTypes()) && c.keys().hasOnly(cosmeticTypes())
+        && rewardInt(c.avatar) && rewardInt(c.frame) && rewardInt(c.badge);
+    }
+    function cosmeticValid(c) {
+      return c is map && c.keys().hasAll(['version','levels','fragments','sequence','last'])
+        && c.keys().hasOnly(['version','levels','fragments','sequence','last']) && c.version == 1
+        && c.levels is map && c.levels.keys().hasOnly(COSMETIC_IDS)
+        && c.levels.values().hasOnly([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21])
+        && cosmeticCounts(c.fragments) && rewardInt(c.sequence);
+    }
+    function cosmeticCountChange(n,o,type,delta) {
+      return n.avatar == o.avatar + (type == 'avatar' ? delta : 0)
+        && n.frame == o.frame + (type == 'frame' ? delta : 0)
+        && n.badge == o.badge + (type == 'badge' ? delta : 0);
+    }
+COSMETIC_SEED_HELPERS
+    function cosmeticSeed(n,o) {
+      let c = n.cosmeticProgress;
+      let old = o.get('cosmeticProgress',null);
+      let added = c.levels.diff(old == null ? {} : old.levels).addedKeys();
+      return chestBase(n,o,['cosmeticProgress']) && cosmeticValid(c)
+        && (old == null ? c.sequence == 0 && c.last == null && c.fragments == {'avatar':0,'frame':0,'badge':0} && c.levels.values().hasOnly([1])
+          : c.sequence == old.sequence && c.last == old.last && c.fragments == old.fragments
+        && c.levels.diff(old == null ? {} : old.levels).removedKeys().size() == 0
+        && c.levels.diff(old == null ? {} : old.levels).changedKeys().size() == 0
+COSMETIC_SEED_VALUES);
+    }
+    function cosmeticCopy(n,o,id) {
+      return cosmeticCopyOfType(n,o,id,cosmeticType(id));
+    }
+    function cosmeticCopyOfType(n,o,id,type) {
+      let c = n.cosmeticProgress;
+      let old = o.cosmeticProgress;
+      let level = old.levels.get(id,0);
+      return c.diff(old).affectedKeys().hasOnly(['levels','fragments']) && type in cosmeticTypes()
+        && c.levels.diff(old.levels).affectedKeys().hasOnly([id]) && c.levels[id] == (level < 21 ? level + 1 : 21)
+        && (level < 21 ? c.fragments == old.fragments
+          : c.fragments.diff(old.fragments).affectedKeys().hasOnly([type]) && rewardInt(c.fragments[type]) && c.fragments[type] == old.fragments[type] + 1);
+    }
+    function cosmeticReceive(n,o,changed) {
+      return changed.hasAny(['chests']) ? n.chests.last.poolVersion == 2 && n.chests.last.kind == 'item' && rewardChestOpen(n,o)
+        : cosmeticWheelReceive(n,o,changed,wheelChangedSpin(n.spins,wheelChangedField(n.spins,o.spins)));
+    }
+    function cosmeticWheelReceive(n,o,changed,r) {
+      return r.wheel.version == 3 && r.wheel.kind == 'item' && rewardSpinOnly(n,o,changed);
+    }
+    function cosmeticIngredients(n,o) {
+      return cosmeticCounts(n) && n.avatar + n.frame + n.badge == 3
+        && o.avatar >= n.avatar && o.frame >= n.frame && o.badge >= n.badge;
+    }
+    function cosmeticTrade(n,o) {
+      let c = n.cosmeticProgress;
+      let old = o.cosmeticProgress;
+      let r = c.last;
+      let sell = r.kind == 'sell';
+      return chestBase(n,o,sell ? ['cosmeticProgress'] : ['cosmeticProgress','chests']) && c.diff(old).affectedKeys().hasOnly(['fragments','sequence','last']) && cosmeticCounts(c.fragments) && rewardInt(c.sequence)
+        && c.levels == old.levels && c.sequence == old.sequence + 1 && r.sequence == c.sequence && r.version == 1
+        && r.operation is string && r.operation.matches('^[A-Za-z0-9_-]{1,128}$')
+        && (old.last == null || r.operation != old.last.operation)
+        && (sell ? r.keys().hasAll(['kind','type','quantity','coins','version','operation','sequence'])
+          && r.keys().hasOnly(['kind','type','quantity','coins','version','operation','sequence'])
+          && r.type in cosmeticTypes() && rewardInt(r.quantity) && r.quantity > 0 && r.coins == r.quantity * 100 && rewardInt(r.coins)
+          && old.fragments[r.type] >= r.quantity && cosmeticCountChange(c.fragments,old.fragments,r.type,-r.quantity)
+          : r.kind == 'fuse' && r.keys().hasAll(['kind','ingredients','chestType','fee','roll','version','operation','sequence'])
+          && r.keys().hasOnly(['kind','ingredients','chestType','fee','roll','version','operation','sequence'])
+          && cosmeticIngredients(r.ingredients,old.fragments) && r.fee == 20 && r.roll is number && r.roll >= 0 && r.roll < 1
+          && r.chestType == (r.roll * 3 < 1 ? 'avatar' : r.roll * 3 < 2 ? 'frame' : 'badge')
+          && c.fragments.avatar == old.fragments.avatar - r.ingredients.avatar
+          && c.fragments.frame == old.fragments.frame - r.ingredients.frame
+          && c.fragments.badge == old.fragments.badge - r.ingredients.badge
+          && chestGain(n.chests,o.chests,r.chestType));
+    }
+    function cosmeticUpdate(n,o,changed) {
+      return !o.keys().hasAny(['cosmeticProgress']) || n.cosmeticProgress.sequence == o.cosmeticProgress.sequence
+        ? (changed.hasOnly(['cosmeticProgress','revision','rootRevision','fingerprint','updatedAt']) ? cosmeticSeed(n,o) : cosmeticReceive(n,o,changed))
+        : cosmeticTrade(n,o);
+    }

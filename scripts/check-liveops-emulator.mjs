@@ -7,6 +7,7 @@ import { encodeCloudSnapshot } from '../js/cloudSnapshot.js';
 import { publishCloudSnapshot, readCloudRoot, readCloudSnapshot } from '../js/cloudStore.js';
 import { confirmSparkClock, readSparkState, sparkRef } from '../js/liveops/store.js';
 import { initialSparkState, transitionSpark, normalizeSparkSave } from '../js/liveops/sparkModel.js';
+import { DAILY } from '../js/liveops/model.js';
 if (!process.env.FIRESTORE_EMULATOR_HOST) throw Error('Isolated emulator required');
 const [emulatorHost,emulatorPort]=process.env.FIRESTORE_EMULATOR_HOST.split(':');
 const env=await initializeTestEnvironment({projectId:'demo-memory-match',firestore:{host:emulatorHost,port:Number(emulatorPort),rules:fs.readFileSync('firestore.rules','utf8')}});
@@ -118,7 +119,7 @@ try {
   }
   // Seed an old accepted period through the isolated test-admin context, then exercise real rollover rules.
   const actualNow=now,oldNow=now-7*86400000,seed=initialSparkState(oldNow);seed.revision=state.revision;
-  Object.assign(seed.daily,{wins:3,matches:30,noHint:1});Object.assign(seed.weekly,{wins:12,matches:120,noHint:3,visits:3});
+  Object.assign(seed.daily,{wins:3,matches:30,noHint:DAILY.find(item=>item.key==='noHint').target});Object.assign(seed.weekly,{wins:12,matches:120,noHint:3,visits:3});
   seed.tickets=state.tickets;seed.ticketEarned=state.ticketEarned;seed.ticketSpent=state.ticketSpent;seed.letters=state.letters;
   now=oldNow;let seeded;await env.withSecurityRulesDisabled(async context=>{seeded=await commit({type:'status'},{database:context.firestore(),state:seed});});accept(seeded);
   now=actualNow;const oldCoins=saved.profile.data.coins,oldLetters=structuredClone(state.letters);accept(await commit({type:'status'}));

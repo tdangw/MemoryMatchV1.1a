@@ -1,4 +1,4 @@
-import { doc, getDocFromServer, writeBatch, runTransaction, serverTimestamp, onSnapshot } from "firebase/firestore";
+import { doc, getDocFromServer, writeBatch, runTransaction, serverTimestamp, onSnapshot, Timestamp } from "firebase/firestore";
 import { CLOUD_SNAPSHOT_VERSION, decodeCloudSnapshot, manifestHashes, validateCloudManifest, fingerprintCloudManifest } from "./cloudSnapshot.js";
 
 const STAGING_BATCH_SIZE = 300;
@@ -31,12 +31,13 @@ export async function readCloudSnapshot(database, environment, uid, root, isCurr
 }
 
 /** Stage immutable payloads, then publish one CAS pointer. A failed upload cannot expose half a save. */
-export async function publishCloudSnapshot({ database, environment, uid, encoded, expectedRevision, playerName, isCurrent = () => true, onStagePlan = async () => true, reward = null, rewardRevision = 0, economyRevision = 0 }) {
+export async function publishCloudSnapshot({ database, environment, uid, encoded, expectedRevision, playerName, isCurrent = () => true, onStagePlan = async () => true, reward = null, rewardRevision = 0, economyRevision = 0, snapshotRewards = false }) {
+  if(snapshotRewards&&reward)throw new Error('Snapshot backup cannot publish reward transactions.');
   const previous = await readCloudRoot(database, environment, uid);
   if (!isCurrent()) throw new Error("Tài khoản đã thay đổi.");
   if ((previous?.revision || 0) !== expectedRevision) throw new CloudConflictError(previous);
   if ((previous?.economyRevision || 0) > economyRevision) throw new CloudConflictError(previous);
-  if ((previous?.rewardRevision || 0) > rewardRevision) throw new CloudConflictError(previous);
+  if (!snapshotRewards && (previous?.rewardRevision || 0) > rewardRevision) throw new CloudConflictError(previous);
   if (!reward && previous?.fingerprint === encoded.fingerprint && previous.playerName === playerName) return { root: previous, reads: 1, writes: 0 };
   const previousHashes = previous ? manifestHashes(previous.manifest) : new Set();
   const changed = [...encoded.objects].filter(([hash]) => !previousHashes.has(hash));
@@ -56,10 +57,11 @@ export async function publishCloudSnapshot({ database, environment, uid, encoded
     for (const [hash, value] of changed.slice(offset, offset + STAGING_BATCH_SIZE)) batch.set(objectRef(database, environment, uid, hash), { ...value, stageId, createdAt: serverTimestamp() });
     await batch.commit(); writes += Math.min(STAGING_BATCH_SIZE, changed.length - offset);
   }
+  const publishedRewardRevision=snapshotRewards?(previous?.rewardRevision||0):rewardRevision;
   const next = {
     snapshotVersion: CLOUD_SNAPSHOT_VERSION, formatVersion: 2, revision: expectedRevision + 1,
     manifest: encoded.manifest, fingerprint: encoded.fingerprint, byteLength: encoded.byteLength,
-    playerName, ...(economyRevision || previous?.economyRevision ? {economyRevision} : {}), ...(reward || previous?.rewardRevision ? { rewardRevision: reward ? reward.state.revision : rewardRevision } : {}), updatedAt: serverTimestamp(),
+    playerName, ...(economyRevision || previous?.economyRevision ? {economyRevision} : {}), ...(reward || previous?.rewardRevision ? { rewardRevision: reward ? reward.state.revision : publishedRewardRevision } : {}), updatedAt: serverTimestamp(),
   };
   try { await runTransaction(database, async transaction => {
     if (!isCurrent()) throw new Error("Tài khoản đã thay đổi.");
@@ -71,7 +73,7 @@ export async function publishCloudSnapshot({ database, environment, uid, encoded
       const stored = await transaction.get(ref); reads += 1;
       if ((stored.exists() ? stored.data().revision : 0) !== reward.expectedRevision) throw new CloudConflictError(root);
       const hourlyGift = reward.state.hourlyGift;
-      transaction.set(ref, { ...reward.state, ...(hourlyGift ? {hourlyGift:{...hourlyGift,claimedAt:reward.hourlyGiftClaim ? serverTimestamp() : stored.data().hourlyGift.claimedAt}} : {}), rootRevision: next.revision, fingerprint: next.fingerprint, updatedAt: serverTimestamp() });
+      transaction.set(ref, { ...reward.state, ...(hourlyGift ? {hourlyGift:{...hourlyGift,claimedAt:reward.hourlyGiftClaim ? reward.hourlyGiftClaimAt===undefined?serverTimestamp():Timestamp.fromMillis(reward.hourlyGiftClaimAt) : stored.data().hourlyGift.claimedAt}} : {}), rootRevision: next.revision, fingerprint: next.fingerprint, updatedAt: serverTimestamp() });
     }
     transaction.set(cloudProfileRef(database, environment, uid), next);
   }); } catch (error) {

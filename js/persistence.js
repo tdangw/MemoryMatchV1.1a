@@ -15,11 +15,15 @@ import {
 } from "./chapterStore.js";
 import { GAMEPLAY_SEASON, gameplaySeasonReset } from './progression/gameplaySeason.js';
 import { settleAchievementInventory, normalizeAchievementLedger, ACHIEVEMENT_GAME_KEYS, ACHIEVEMENT_COVERAGE_REVISION } from './progression/achievementModel.js';
-import { normalizeRewardLedger, validateRewardReceipt, MAX_PENDING_REWARD_ROUNDS } from './liveops/ledger.js';
+import { normalizeRewardLedger, validateRewardReceipt, MAX_PENDING_REWARD_ROUNDS, appendRewardFact } from './liveops/ledger.js';
 import { normalizeAcquisitions } from './progression/acquisitionModel.js';
 import { normalizeFact } from './liveops/model.js';
 import { CHEST_SUPPORTS } from './liveops/chestConfig.js';
 import { getGameProgressKey } from './gameCatalog.js';
+import { applyWheelAcquisitions } from './liveops/wheelCatalog.js';
+import { mergeAcquisitions } from './progression/acquisitionModel.js';
+import { mergeSparkSave } from './liveops/sparkModel.js';
+import { mergeRewardLedger } from './liveops/ledger.js';
 
 export const SAVE_FORMAT_VERSION = 2;
 const ROOT_STORAGE_KEY = "memoryMatchSave";
@@ -35,6 +39,7 @@ const SETTINGS_KEYS = new Set([
 let database = null;
 let initialization = null;
 let queue = Promise.resolve();
+let sparkOperations = Promise.resolve();
 let knownRevision = 0;
 let lastPersistenceError = null;
 let currentEnvelope = null;
@@ -166,8 +171,7 @@ export function savePersistentGameData({ coins, appearance, progress, settings, 
         const rewards = normalizeRewardLedger(envelope.data.appearance.rewards);
         const spark = normalizeSparkSave(envelope.data.appearance.spark), settledKey = `${item.fact.gameId}:${item.fact.mode}`;
         if (spark.settled[settledKey] !== item.fact.roundId && !rewards.pending.some(entry => entry.uid === item.uid && entry.fact.roundId === item.fact.roundId && entry.fact.gameId === item.fact.gameId)) {
-          if (rewards.pending.length >= MAX_PENDING_REWARD_ROUNDS) throw new Error('Reward upload queue is full');
-          rewards.pending.push(item);
+          appendRewardFact(rewards,item);
         }
         spark.settled[settledKey] = item.fact.roundId;
         envelope.data.appearance = { ...envelope.data.appearance, rewards, spark };
@@ -204,26 +208,124 @@ export const saveProgress = progress => savePersistentGameData({ progress });
 export const saveCoins = coins => savePersistentGameData({ coins });
 export const saveAppearance = (appearance, options = {}) => savePersistentGameData({ appearance, ...options });
 export const flushPersistentWrites = () => queue;
-/** Account-owned cloud transaction. The callback must not enqueue persistence work. */
-export function commitSparkOperation(operation, isCurrent = () => true) {
+/** Local reward projection and its replay intent share the existing profile transaction. */
+export function commitLocalSparkOperation(identity,prepare,isCurrent=()=>true){
+  return enqueue(async()=>{
+    await initialize();
+    if(!database||blocked||isLocalAccountDataLocked()||!isCurrent())throw new Error('Chưa thể lưu trên thiết bị.');
+    const previous=await readChapterProfile(database);
+    if(previous.revision!==knownRevision)throw new Error('Bản lưu thay đổi ở tab khác. Hãy tải lại.');
+    const data=structuredClone(previous.data),before=normalizeSparkSave(data.appearance.spark);
+    if(before.ownerUid&&![identity.uid,identity.profileId].includes(before.ownerUid))throw new Error('Bản lưu thuộc tài khoản khác.');
+    const result=prepare(data,before);
+    if(result.unchanged)return result;
+    const envelope=createEnvelope(data,knownRevision+1);
+    const deltas=rewardInventoryDeltas(previous.data.progress,data.progress);
+    currentEnvelope=await writeChapterProfile(database,envelope,knownRevision,{isCurrent});knownRevision=envelope.revision;
+    committedRewardCoins+=result.added||0;
+    for(const {id,delta}of deltas)committedRewardItems[id]+=delta;
+    notifyCommit({coins:data.coins,appearance:structuredClone(data.appearance),rewardInventory:structuredClone(data.progress),cloudEvent:true});
+    return result;
+  });
+}
+/** Bind undated device facts once, durably, before sending a reward publication. */
+export function bindPendingRewardFacts(identity, day, isCurrent = () => true) {
+  if (!Number.isSafeInteger(day) || day < 0) throw new Error('Invalid reward period');
   return enqueue(async () => {
+    await initialize();
+    if (!database || blocked || isLocalAccountDataLocked() || !isCurrent()) throw new Error('Chưa thể lưu kỳ nhiệm vụ.');
+    const previous = await readChapterProfile(database);
+    if (previous.revision !== knownRevision) throw new Error('Bản lưu thay đổi ở tab khác. Hãy tải lại.');
+    const data = structuredClone(previous.data), rewards = normalizeRewardLedger(data.appearance.rewards);
+    let changed = false;
+    for(const [key,item]of Object.entries(rewards.overflow||{})){
+      if(rewards.pending.length>=MAX_PENDING_REWARD_ROUNDS)break;
+      rewards.pending.push(item);delete rewards.overflow[key];changed=true;
+    }
+    if(rewards.overflow&&!Object.keys(rewards.overflow).length)delete rewards.overflow;
+    for (const item of rewards.pending) {
+      const own = item.uid === identity.uid || item.uid === identity.profileId && item.profileId === identity.profileId;
+      if (!own || item.profileId !== undefined && item.profileId !== identity.profileId) continue;
+      if (item.uid !== identity.uid) {item.uid = identity.uid;changed = true;}
+      if (item.fact.day === null) {item.fact.day = day;changed = true;}
+    }
+    if (!changed) return;
+    data.appearance.rewards = rewards;
+    const envelope = createEnvelope(data,knownRevision+1);
+    currentEnvelope = await writeChapterProfile(database,envelope,knownRevision,{isCurrent});
+    knownRevision = envelope.revision;
+    notifyCommit({appearance:structuredClone(data.appearance)});
+  });
+}
+/** Serialize reward publications, but never hold the device writer during network I/O. */
+export function commitSparkOperation(operation, isCurrent = () => true) {
+  const task = sparkOperations.catch(() => {}).then(async () => {
+    const epoch = rewardWriteEpoch;
+    const snapshot = await enqueue(async () => {
     await initialize();
     if (isLocalAccountDataLocked() || blocked || !database || !isCurrent()) throw new Error('Chưa thể lưu phần thưởng.');
     const snapshot = await exportChapterSnapshot(database);
     if (snapshot.profile.revision !== knownRevision) throw new Error('Bản lưu thay đổi ở tab khác. Hãy tải lại.');
+    return snapshot;
+    });
     const result = await operation(structuredClone(snapshot));
+    return enqueue(async () => {
     if (!isCurrent()) throw new Error('Tài khoản đã thay đổi. Quyền nhận đã được lưu.');
+    if (epoch !== rewardWriteEpoch || isLocalAccountDataLocked()) throw new Error('Bản lưu đã được thay thế. Quyền nhận được giữ để đối chiếu.');
     if (!result.data) return result;
-    const envelope = createEnvelope(result.data, knownRevision + 1);
-    const itemDeltas = rewardInventoryDeltas(snapshot.profile.data.progress, envelope.data.progress);
+    const latest = await readChapterProfile(database);
+    if (latest.revision !== knownRevision) throw new Error('Bản lưu thay đổi ở tab khác. Hãy tải lại.');
+    const rebased = latest.revision !== snapshot.profile.revision;
+    const data = rebased ? rebaseSparkPublication(snapshot.profile.data, result.data, latest.data) : result.data;
+    const envelope = createEnvelope(data, knownRevision + 1);
+    const itemDeltas = rewardInventoryDeltas(snapshot.profile.data.progress, result.data.progress);
     currentEnvelope = await writeChapterProfile(database, envelope, knownRevision, { isCurrent });
     knownRevision = envelope.revision;
     committedRewardCoins += result.added || 0;
     for (const { id, delta } of itemDeltas) committedRewardItems[id] += delta;
     // Snapshot already published by this operation. Updating RAM must not enqueue a second upload.
-    notifyCommit({ coins: envelope.data.coins, appearance: structuredClone(envelope.data.appearance), rewardInventory:structuredClone(envelope.data.progress), rewardPublished: true });
+    notifyCommit({ coins: envelope.data.coins, appearance: structuredClone(envelope.data.appearance), rewardInventory:structuredClone(envelope.data.progress), rewardPublished: !rebased });
     return result;
+    });
   });
+  sparkOperations = task;
+  return task;
+}
+
+/** Apply only the published reward delta to the latest device save. */
+function rebaseSparkPublication(before, published, latest) {
+  const data = structuredClone(latest);
+  data.coins += published.coins - before.coins;
+  if (!Number.isSafeInteger(data.coins) || data.coins < 0) throw new Error('Số dư đã thay đổi. Giao dịch được giữ để đối chiếu.');
+  for (const {game,item} of rewardItemPaths) {
+    const delta = rewardItemCount(published.progress,game,item) - rewardItemCount(before.progress,game,item);
+    if (!delta) continue;
+    const count = rewardItemCount(data.progress,game,item) + delta;
+    if (!Number.isSafeInteger(count) || count < 0 || count > GAMEPLAY_LIMITS.itemCount) throw new Error('Kho đã thay đổi. Giao dịch được giữ để đối chiếu.');
+    const profile = data.progress[game] || {};
+    data.progress[game] = {...profile,items:{...profile.items,[item]:count}};
+  }
+  const a = data.appearance, b = published.appearance;
+  const acquisitions = mergeAcquisitions(a.acquisitions,b.acquisitions);
+  const rewards = mergeRewardLedger(a.rewards,b.rewards);
+  const remaining = new Set((b.rewards?.pending || []).map(v=>`${v.uid}:${v.fact.gameId}:${v.fact.roundId}`));
+  const acknowledged = new Set((before.appearance.rewards?.pending || []).map(v=>`${v.uid}:${v.fact.gameId}:${v.fact.roundId}`).filter(key=>!remaining.has(key)));
+  rewards.pending = rewards.pending.filter(v=>!acknowledged.has(`${v.uid}:${v.fact.gameId}:${v.fact.roundId}`));
+  let spark=mergeSparkSave(a.spark,b.spark);
+  if(before.appearance.spark?.offline&&a.spark?.offline){
+    const beforeOut=before.appearance.spark.offline,afterOut=b.spark.offline;
+    const retained=new Set((afterOut?.operations||[]).map(entry=>entry.command.operation));
+    const acknowledged=new Set(beforeOut.operations.filter(entry=>!retained.has(entry.command.operation)).map(entry=>entry.command.operation));
+    const operations=a.spark.offline.operations.filter(entry=>!acknowledged.has(entry.command.operation));
+    if(operations.length){
+      const baseRevision=afterOut?.baseRevision??b.spark.state.revision;
+      spark={...spark,ownerUid:b.spark.ownerUid,state:{...a.spark.state,revision:baseRevision+operations.length},offline:{...a.spark.offline,
+        environment:afterOut?.environment||a.spark.offline.environment,baseRevision,operations,ownedIds:afterOut?.ownedIds||Object.keys(b.spark.state.cosmeticProgress?.levels||{}),
+        wheelOwnedIds:afterOut?.wheelOwnedIds||[...new Set([...a.spark.offline.wheelOwnedIds,...Object.values(b.acquisitions?.grants||{}).flatMap(grant=>grant.items)])]}};
+    }else{spark={...spark,state:b.spark.state};delete spark.offline;}
+  }
+  data.appearance = applyWheelAcquisitions({...a,acquisitions,rewards,spark},acquisitions);
+  return data;
 }
 /** Server receipts and wallet delta commit together; retry never adds twice. */
 export function commitLiveopsReceipts(uid, receipts, { isCurrent = () => true, acknowledgedRounds = [] } = {}) {

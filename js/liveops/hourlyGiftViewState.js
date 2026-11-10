@@ -3,7 +3,7 @@ import { getAccountService } from '../accountService.js';
 import { HOURLY_GIFT_MS } from './hourlyGift.js';
 let confirmed = null;
 const listeners = new Set();
-const identity = () => { const value=getAccountService()?.getIdentity();return `${value?.uid||''}:${value?.profileId||''}`; };
+const identity = () => { const account=getAccountService(),value=account?.getIdentity()||account?.getLocalIdentity();return `${value?.uid||''}:${value?.profileId||''}`; };
 export function publishHourlyGiftView(response) {
   confirmed={identity:identity(),claimedAt:response.state.hourlyGift?.claimedAt??null,serverNow:response.serverNow,observedAt:performance.now()};
   for(const listener of listeners)listener();

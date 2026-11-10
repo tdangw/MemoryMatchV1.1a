@@ -25,11 +25,14 @@ export function renderMissions(host, { view, tab, busy, run, play, renderEmpty, 
     selectTab(key); panel.replaceChildren();
     if (!view) { renderEmpty(panel); return; }
     const state = view.state, current = state[key], catalog = key === 'daily' ? DAILY : WEEKLY;
-    const countdown = node('p', 'liveops__countdown');countdown.dataset.period=key;panel.append(countdown);
+    const countdown = node('p', 'liveops__countdown');countdown.dataset.period=key;
+    if(key!=='daily')panel.append(countdown);
     if (key === 'daily') {
       const login = node('section', 'liveops__card liveops__login'), days = node('div', 'liveops__days');
       login.id = 'missions-login'; login.tabIndex = -1;
-      login.append(sectionHeading('Điểm danh 7 ngày', 'calendar'));
+      const heading=sectionHeading('Điểm danh 7 ngày', 'calendar'),value=node('span','');
+      countdown.dataset.format='compact';value.dataset.countdownValue='';
+      countdown.append(createIcon('restart'),value);heading.append(countdown);login.append(heading);
       for (const day of loginDayStates(state)) {
         const tile = node('button', 'liveops__day'); tile.type='button';tile.dataset.state = day.status;
         tile.disabled=busy||!canClaim||day.status!=='available';tile.dataset.focusKey=`login-day-${day.index}`;
@@ -93,7 +96,11 @@ export function updateMissionCountdown(root, state, now) {
   for (const label of root.querySelectorAll('.liveops__countdown')) {
     const end = (label.dataset.period === 'daily' ? state.day + 1 : state.week + 7) * DAY_MS;
     const minutes = Math.max(0, Math.ceil((end - now) / 60000));
-    const text = `Làm mới sau: ${Math.floor(minutes / 60)} giờ ${minutes % 60} phút`;
-    if (label.textContent !== text) label.textContent = text;
+    const description = `Làm mới sau: ${Math.floor(minutes / 60)} giờ ${minutes % 60} phút`;
+    const compact=label.dataset.format==='compact';
+    const text=compact?`${String(Math.floor(minutes/60)).padStart(2,'0')}:${String(minutes%60).padStart(2,'0')}`:description;
+    const value=compact?label.querySelector('[data-countdown-value]'):label;
+    if (value.textContent !== text) value.textContent = text;
+    if(compact){label.setAttribute('aria-label',description);label.title=description;}
   }
 }

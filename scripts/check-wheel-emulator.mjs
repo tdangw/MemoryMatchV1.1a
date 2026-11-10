@@ -19,8 +19,9 @@ const env=await initializeTestEnvironment({projectId:'demo-wheel-rewards',firest
 const uid='wheel-integration',space='test',db=env.authenticatedContext(uid).firestore(),second=env.authenticatedContext(uid).firestore();
 let saved={snapshotVersion:1,profile:{formatVersion:2,revision:1,data:{coins:100,appearance:{},progress:{},settings:{}}},chapters:[]},state=null,revision=0,now,ordinal=0,denied=0;
 const rolls=(sectorRoll,itemRoll=.5)=>[sectorRoll,itemRoll,.5,.5,.5,.5];
-const spin=(samples,source='ticket',candidate=null)=>({type:'spin',source,day:periods(now).day,sequence:(state?.ticketSpent||0)+1,operation:`wheel-${++ordinal}`,wheelVersion:2,wheelCandidate:candidate||createWheelCandidate(samples,ownedWheelItemIds(saved.profile.data.appearance)),...(source==='ad'?{earned:true,earnedAt:now,ordinal:state.spins.ads.length+1}:{})});
+const spin=(samples,source='ticket',candidate=null)=>({type:'spin',source,day:periods(now).day,sequence:(state?.ticketSpent||0)+1,operation:`wheel-${++ordinal}`,wheelVersion:2,wheelCandidate:candidate||createWheelCandidate(samples,ownedWheelItemIds(saved.profile.data.appearance),2),...(source==='ad'?{earned:true,earnedAt:now,ordinal:state.spins.ads.length+1}:{})});
 async function commit(command={type:'status'},options={}){
+ console.log('Wheel v2:',command.type,command.source||'',command.wheelCandidate?.sector??'',state?.spins.pastAds.length||0);
  const before=state,copy=structuredClone(saved),data=copy.profile.data;
  if(options.inventory){const {gameId,key,count}=options.inventory,game=getGameProgressKey(gameId);data.progress[game]={...(data.progress[game]||{}),items:{...(data.progress[game]?.items||{}),[key]:count}};}
  const prize=command.type==='claimWheelReward'?before?.pendingWheel?.wheel:command.wheelCandidate;
@@ -47,9 +48,9 @@ try{
   assert.equal(saved.profile.data.coins-before.profile.data.coins,result.spin.coins);
  }
  for(const [sample,amount]of [[0,5],[.999999,50]]){const result=accept(await commit(spin(rolls(.7,sample))));assert.equal(result.spin.coins,amount);}
- const stale=createWheelCandidate(rolls(.82),[]),beforeRaceCoins=saved.profile.data.coins;
+ const stale=createWheelCandidate(rolls(.82),[],2),beforeRaceCoins=saved.profile.data.coins;
  assert.ok(ownedWheelItemIds(saved.profile.data.appearance).includes(stale.itemId));const duplicate=accept(await commit(spin(rolls(.82),'ticket',stale)));assert.equal(duplicate.spin.coins,100);assert.equal(saved.profile.data.coins,beforeRaceCoins+100);
- const support=createWheelCandidate(rolls(.95,0),[]),held=spin(rolls(.95,0),'ticket',support),inventory={gameId:support.gameId,key:support.key,count:GAMEPLAY_LIMITS.itemCount};
+ const support=createWheelCandidate(rolls(.95,0),[],2),held=spin(rolls(.95,0),'ticket',support),inventory={gameId:support.gameId,key:support.key,count:GAMEPLAY_LIMITS.itemCount};
  const full=accept(await commit(held,{inventory}));assert.equal(full.wheelApplied,false);assert.equal(state.pendingWheel.operation,held.operation);
  await assert.rejects(commit(spin(rolls(.2))),error=>error.code==='rewards/wheel-pending');
  const claim={type:'claimWheelReward',wheelOperation:held.operation};const stillFull=transitionSpark(state,claim,{uid,now,ticketEarned:state.ticketEarned,supportCount:GAMEPLAY_LIMITS.itemCount});assert.equal(stillFull.wheelApplied,false);assert.deepEqual(stillFull.state,state);
@@ -74,7 +75,14 @@ try{
  const late=spin(rolls(.82),'ad');late.day=state.day-1;late.ordinal=10;late.earnedAt=now-DAY_MS+1000;
  // All forged histories still have room for one receipt; only the ordinal is invalid.
  for(const forgedOrdinal of [9,8,11])await reject(late,n=>{n.spins.pastAds.at(-1).ordinal=forgedOrdinal;});
- accept(await commit(late));assert.equal(state.spins.pastAds.at(-1).operation,late.operation);assert.equal(state.spins.pastAds.length,30);
+ for(const forgedOrdinal of [9,8,11])await reject({...late,type:'reserveAd'},n=>{n.pendingWheel.ordinal=forgedOrdinal;});
+ accept(await commit({...late,type:'reserveAd'}));
+ await reject(late,n=>{n.spins.pastAds.at(-1).wheel.coins=999;});
+ const coverage=async()=>{const response=await fetch(`http://${host}:${port}/emulator/v1/projects/demo-wheel-rewards:ruleCoverage`);return response.json();};
+ const coverageBefore=await coverage();
+ try{accept(await commit(late));}
+ finally{fs.writeFileSync('runtime/cosmetic-wheel-coverage.json',JSON.stringify({before:coverageBefore,after:await coverage()}));}
+ assert.equal(state.spins.pastAds.at(-1).operation,late.operation);assert.equal(state.spins.pastAds.length,30);
  const legacy={type:'spin',source:'ticket',day:state.day,sequence:state.ticketSpent+1,operation:'old-queued-eight-sector'};const old=accept(await commit(legacy,{legacySector:7}));assert.equal(old.spin.coins,25);assert.equal(old.spin.wheel,undefined);
  const forgedAd=spin(rolls(.2),'ad');await assert.rejects(commit(forgedAd));
  await reject({type:'status'},(n,o)=>{const r={...o.spins.ads.at(-1),operation:'ad-eleven',ordinal:11};n.spins.ads.push(r);});

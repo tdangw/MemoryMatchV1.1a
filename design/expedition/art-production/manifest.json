@@ -1,0 +1,730 @@
+{
+  "version": 1,
+  "status": "partial",
+  "expectedDesignCount": 202,
+  "expectedExportCount": 606,
+  "readyDesignCount": 10,
+  "readyExportCount": 30,
+  "records": [
+    {
+      "id": "memory-avatar-sapphire-owl",
+      "form": 2,
+      "status": "ready",
+      "master": "design/expedition/art-production/masters/memory-avatar-sapphire-owl-form2-r2.png",
+      "masterSha256": "1076ac1e716db0fdd7b1d65dc402130b2a2bd21de54849c9cad5df4b31b2462c",
+      "canvas": [
+        512,
+        512
+      ],
+      "alignment": {
+        "method": "uniform-scale-and-translate",
+        "scale": 0.39949748743718594,
+        "translation": [
+          5.515075376884425,
+          4.915829145728651
+        ],
+        "sourceAnchorBox": [
+          229,
+          233,
+          1025,
+          1024
+        ],
+        "targetAnchorBox": [
+          97,
+          97,
+          415,
+          415
+        ],
+        "anchorKind": "alpha-footprint"
+      },
+      "promptReference": "prompts.json#memory-avatar-sapphire-owl/form2/r2",
+      "promptStatus": "archived-verbatim",
+      "qa": {
+        "status": "passed",
+        "scope": "First six items: 216 cross-equipment combinations at 116 and 52px; source and three-form visual review",
+        "evidence": [
+          "aligned-review.png",
+          "cross-*.png"
+        ],
+        "limitations": "Cross-match with remaining 95 items will be verified as production continues."
+      },
+      "exports": [
+        {
+          "path": "assets/achievements/evolution/v1/memory-avatar-sapphire-owl-form2-128.webp",
+          "dimensions": [
+            128,
+            128
+          ],
+          "bytes": 14066,
+          "sha256": "bb7dfe6e368066fc8f46bc49b09bc92f103d0fc6c8d9c10db7332c26678bf0d2"
+        },
+        {
+          "path": "assets/achievements/evolution/v1/memory-avatar-sapphire-owl-form2-256.webp",
+          "dimensions": [
+            256,
+            256
+          ],
+          "bytes": 46226,
+          "sha256": "a1be282831764170b939221e0f1babbda219ed7657a4ee00e81beb586609ec73"
+        },
+        {
+          "path": "assets/achievements/evolution/v1/memory-avatar-sapphire-owl-form2-512.webp",
+          "dimensions": [
+            512,
+            512
+          ],
+          "bytes": 163400,
+          "sha256": "5f55fc1b5946e65c3cdd538b6e4776d9816a83929d9abcb4b4bb5028399e1a8b"
+        }
+      ]
+    },
+    {
+      "id": "memory-avatar-sapphire-owl",
+      "form": 3,
+      "status": "ready",
+      "master": "design/expedition/art-production/masters/memory-avatar-sapphire-owl-form3-r2.png",
+      "masterSha256": "4891f429b2132a707cfd92c4b622ce4cccaa584b2553da43cd91e6fd530dea71",
+      "canvas": [
+        512,
+        512
+      ],
+      "alignment": {
+        "method": "uniform-scale-and-translate",
+        "scale": 0.39949748743718594,
+        "translation": [
+          5.914572864321599,
+          4.316582914572848
+        ],
+        "sourceAnchorBox": [
+          230,
+          232,
+          1022,
+          1028
+        ],
+        "targetAnchorBox": [
+          97,
+          97,
+          415,
+          415
+        ],
+        "anchorKind": "alpha-footprint"
+      },
+      "promptReference": "prompts.json#memory-avatar-sapphire-owl/form3/r2",
+      "promptStatus": "archived-verbatim",
+      "qa": {
+        "status": "passed",
+        "scope": "First six items: 216 cross-equipment combinations at 116 and 52px; source and three-form visual review",
+        "evidence": [
+          "aligned-review.png",
+          "cross-*.png"
+        ],
+        "limitations": "Cross-match with remaining 95 items will be verified as production continues."
+      },
+      "exports": [
+        {
+          "path": "assets/achievements/evolution/v1/memory-avatar-sapphire-owl-form3-128.webp",
+          "dimensions": [
+            128,
+            128
+          ],
+          "bytes": 14372,
+          "sha256": "2bf373ae6b79221a2a3711e412c58cf85f2bb08e16e71bfec2cb40bbdb367637"
+        },
+        {
+          "path": "assets/achievements/evolution/v1/memory-avatar-sapphire-owl-form3-256.webp",
+          "dimensions": [
+            256,
+            256
+          ],
+          "bytes": 47806,
+          "sha256": "a60bfae8de150b17bc9e0ea0aeca7d88820d72fd1ac56e9a5b017a78ad4ccdbd"
+        },
+        {
+          "path": "assets/achievements/evolution/v1/memory-avatar-sapphire-owl-form3-512.webp",
+          "dimensions": [
+            512,
+            512
+          ],
+          "bytes": 171830,
+          "sha256": "e26d63290d45eaff9aa46ae4fe55435ad1ef8ca46250377906944a370d5045bd"
+        }
+      ]
+    },
+    {
+      "id": "memory-badge-wisdom",
+      "form": 2,
+      "status": "ready",
+      "master": "design/expedition/art-production/masters/memory-badge-wisdom-form2.png",
+      "masterSha256": "140e48fd149bb8b692e66dec14e0bd8afbc9cd070135d28b6401907531a06e76",
+      "canvas": [
+        512,
+        512
+      ],
+      "alignment": {
+        "method": "uniform-scale-and-translate",
+        "scale": 0.32751937984496127,
+        "translation": [
+          50.6453488372093,
+          52.610465116279045
+        ],
+        "sourceAnchorBox": [
+          40,
+          105,
+          1214,
+          1137
+        ],
+        "targetAnchorBox": [
+          56,
+          87,
+          456,
+          425
+        ],
+        "anchorKind": "alpha-footprint"
+      },
+      "promptReference": "prompts.json#memory-badge-wisdom/form2",
+      "promptStatus": "archived-verbatim",
+      "qa": {
+        "status": "passed",
+        "scope": "First six items: 216 cross-equipment combinations at 116 and 52px; source and three-form visual review",
+        "evidence": [
+          "aligned-review.png",
+          "cross-*.png"
+        ],
+        "limitations": "Cross-match with remaining 95 items will be verified as production continues."
+      },
+      "exports": [
+        {
+          "path": "assets/achievements/evolution/v1/memory-badge-wisdom-form2-128.webp",
+          "dimensions": [
+            128,
+            128
+          ],
+          "bytes": 20558,
+          "sha256": "c74833ca8fc63cb7fda0a8e00d90f5568a26906851509cc8c881ea0246da118e"
+        },
+        {
+          "path": "assets/achievements/evolution/v1/memory-badge-wisdom-form2-256.webp",
+          "dimensions": [
+            256,
+            256
+          ],
+          "bytes": 62448,
+          "sha256": "61148e2629642a5010f573267d4aea14e9e6f8b547fdba9a31579d89be6a6ef8"
+        },
+        {
+          "path": "assets/achievements/evolution/v1/memory-badge-wisdom-form2-512.webp",
+          "dimensions": [
+            512,
+            512
+          ],
+          "bytes": 213866,
+          "sha256": "9a22f169085bf92b9f8a6ca9bfe87191d00262b00468a926900069fb85391df2"
+        }
+      ]
+    },
+    {
+      "id": "memory-badge-wisdom",
+      "form": 3,
+      "status": "ready",
+      "master": "design/expedition/art-production/masters/memory-badge-wisdom-form3.png",
+      "masterSha256": "68fc41d8d69f191f91e2203fff93e386d2ea65e8d2a0fc02e8568f308dcc539b",
+      "canvas": [
+        512,
+        512
+      ],
+      "alignment": {
+        "method": "uniform-scale-and-translate",
+        "scale": 0.2736842105263158,
+        "translation": [
+          84.26315789473682,
+          86.72631578947366
+        ],
+        "sourceAnchorBox": [
+          12,
+          1,
+          1243,
+          1236
+        ],
+        "targetAnchorBox": [
+          56,
+          87,
+          456,
+          425
+        ],
+        "anchorKind": "alpha-footprint"
+      },
+      "promptReference": "prompts.json#memory-badge-wisdom/form3",
+      "promptStatus": "archived-verbatim",
+      "qa": {
+        "status": "passed",
+        "scope": "First six items: 216 cross-equipment combinations at 116 and 52px; source and three-form visual review",
+        "evidence": [
+          "aligned-review.png",
+          "cross-*.png"
+        ],
+        "limitations": "Cross-match with remaining 95 items will be verified as production continues."
+      },
+      "exports": [
+        {
+          "path": "assets/achievements/evolution/v1/memory-badge-wisdom-form3-128.webp",
+          "dimensions": [
+            128,
+            128
+          ],
+          "bytes": 16026,
+          "sha256": "8d2d57ca30c6a5fc9a3782ea2a85cfef434276631f84f6fec20f0841a87a6cba"
+        },
+        {
+          "path": "assets/achievements/evolution/v1/memory-badge-wisdom-form3-256.webp",
+          "dimensions": [
+            256,
+            256
+          ],
+          "bytes": 51784,
+          "sha256": "77177bb15afdc8dba928e7477d1db27b96b3f28eefffaeb2642c02a4514847ec"
+        },
+        {
+          "path": "assets/achievements/evolution/v1/memory-badge-wisdom-form3-512.webp",
+          "dimensions": [
+            512,
+            512
+          ],
+          "bytes": 175102,
+          "sha256": "b63b72a8ed983aabd38d20cdffd5281bb19cd16caa2177ac1ab72502ca1c6a5b"
+        }
+      ]
+    },
+    {
+      "id": "event-avatar-lantern-otter",
+      "form": 2,
+      "status": "ready",
+      "master": "design/expedition/art-production/masters/event-avatar-lantern-otter-form2.png",
+      "masterSha256": "7c5d1081c8d55d688aecf130b8578f70fe78e836a2f0a9b95935be459fa8a156",
+      "canvas": [
+        512,
+        512
+      ],
+      "alignment": {
+        "method": "uniform-scale-and-translate",
+        "scale": 0.3979974968710889,
+        "translation": [
+          7.649561952440536,
+          4.664580725907371
+        ],
+        "sourceAnchorBox": [
+          235,
+          232,
+          1013,
+          1031
+        ],
+        "targetAnchorBox": [
+          97,
+          97,
+          415,
+          415
+        ],
+        "anchorKind": "alpha-footprint"
+      },
+      "promptReference": null,
+      "promptStatus": "original-verbatim-not-archived; use PROMPT_GUIDE.md for new edits",
+      "qa": {
+        "status": "passed",
+        "scope": "First six items: 216 cross-equipment combinations at 116 and 52px; source and three-form visual review",
+        "evidence": [
+          "aligned-review.png",
+          "cross-*.png"
+        ],
+        "limitations": "Cross-match with remaining 95 items will be verified as production continues."
+      },
+      "exports": [
+        {
+          "path": "assets/achievements/evolution/v1/event-avatar-lantern-otter-form2-128.webp",
+          "dimensions": [
+            128,
+            128
+          ],
+          "bytes": 12166,
+          "sha256": "ebdb3b772b62f773aa3f353a074a800b130902a2d380895b0b73a4b9d54e506a"
+        },
+        {
+          "path": "assets/achievements/evolution/v1/event-avatar-lantern-otter-form2-256.webp",
+          "dimensions": [
+            256,
+            256
+          ],
+          "bytes": 38998,
+          "sha256": "107a85a8a59bb27f35b92a7267972db6ed5b96f0cd8d6701b54a31eead70ea4a"
+        },
+        {
+          "path": "assets/achievements/evolution/v1/event-avatar-lantern-otter-form2-512.webp",
+          "dimensions": [
+            512,
+            512
+          ],
+          "bytes": 135640,
+          "sha256": "c676479364516c74c671b6169f126fbaef428fcec54b94df3095947396df9228"
+        }
+      ]
+    },
+    {
+      "id": "event-avatar-lantern-otter",
+      "form": 3,
+      "status": "ready",
+      "master": "design/expedition/art-production/masters/event-avatar-lantern-otter-form3.png",
+      "masterSha256": "634dcb0fc42e81a2712efeb43502e3c6baf933e45dab5e3952b7b5e8b9164971",
+      "canvas": [
+        512,
+        512
+      ],
+      "alignment": {
+        "method": "uniform-scale-and-translate",
+        "scale": 0.3989962358845671,
+        "translation": [
+          7.225846925972405,
+          8.821831869510675
+        ],
+        "sourceAnchorBox": [
+          234,
+          221,
+          1013,
+          1018
+        ],
+        "targetAnchorBox": [
+          97,
+          97,
+          415,
+          415
+        ],
+        "anchorKind": "alpha-footprint"
+      },
+      "promptReference": null,
+      "promptStatus": "original-verbatim-not-archived; use PROMPT_GUIDE.md for new edits",
+      "qa": {
+        "status": "passed",
+        "scope": "First six items: 216 cross-equipment combinations at 116 and 52px; source and three-form visual review",
+        "evidence": [
+          "aligned-review.png",
+          "cross-*.png"
+        ],
+        "limitations": "Cross-match with remaining 95 items will be verified as production continues."
+      },
+      "exports": [
+        {
+          "path": "assets/achievements/evolution/v1/event-avatar-lantern-otter-form3-128.webp",
+          "dimensions": [
+            128,
+            128
+          ],
+          "bytes": 12688,
+          "sha256": "6428563c443265744d6094febdbc1534b06558c534d1eff481ac696cf7546ab5"
+        },
+        {
+          "path": "assets/achievements/evolution/v1/event-avatar-lantern-otter-form3-256.webp",
+          "dimensions": [
+            256,
+            256
+          ],
+          "bytes": 39970,
+          "sha256": "867957aca509b411c3f3fe74a0ab97fb3a218dedd664a82216df8b970f9d00d2"
+        },
+        {
+          "path": "assets/achievements/evolution/v1/event-avatar-lantern-otter-form3-512.webp",
+          "dimensions": [
+            512,
+            512
+          ],
+          "bytes": 133998,
+          "sha256": "2de8731b8619f8f43af1ba529a5fa71ebf6d1ac74ff696eedb5297de975b5ae6"
+        }
+      ]
+    },
+    {
+      "id": "starter-frame-plain-wood",
+      "form": 2,
+      "status": "ready",
+      "master": "design/expedition/art-production/masters/starter-frame-plain-wood-form2.png",
+      "masterSha256": "f9c6853bd9eb07b8777dd55fb4e6f041f55bac0e5ff69a3f593c1ccd8d7194c0",
+      "canvas": [
+        512,
+        512
+      ],
+      "alignment": {
+        "method": "uniform-scale-and-translate",
+        "scale": 0.39154160982264663,
+        "translation": [
+          13.939972714870407,
+          8.066848567530712
+        ],
+        "sourceAnchorBox": [
+          252,
+          268,
+          987,
+          1001
+        ],
+        "targetAnchorBox": [
+          111,
+          113,
+          402,
+          400
+        ],
+        "anchorKind": "inner-opening"
+      },
+      "promptReference": null,
+      "promptStatus": "original-verbatim-not-archived; use PROMPT_GUIDE.md for new edits",
+      "qa": {
+        "status": "passed",
+        "scope": "First six items: 216 cross-equipment combinations at 116 and 52px; source and three-form visual review",
+        "evidence": [
+          "aligned-review.png",
+          "cross-*.png"
+        ],
+        "limitations": "Cross-match with remaining 95 items will be verified as production continues."
+      },
+      "exports": [
+        {
+          "path": "assets/achievements/evolution/v1/starter-frame-plain-wood-form2-128.webp",
+          "dimensions": [
+            128,
+            128
+          ],
+          "bytes": 8034,
+          "sha256": "06cbca567353adbad2d8066b1724b7188220b5a30e9e5d656d8cc669dd87fb14"
+        },
+        {
+          "path": "assets/achievements/evolution/v1/starter-frame-plain-wood-form2-256.webp",
+          "dimensions": [
+            256,
+            256
+          ],
+          "bytes": 23472,
+          "sha256": "59c07781e273296c56d655c3808c3c4641d66d3b116e50fd153c052a15cb6c06"
+        },
+        {
+          "path": "assets/achievements/evolution/v1/starter-frame-plain-wood-form2-512.webp",
+          "dimensions": [
+            512,
+            512
+          ],
+          "bytes": 76860,
+          "sha256": "06480941a961a65444732ddaa5a370714a10c4da56eb058077363ef58f58604d"
+        }
+      ]
+    },
+    {
+      "id": "starter-frame-plain-wood",
+      "form": 3,
+      "status": "ready",
+      "master": "design/expedition/art-production/masters/starter-frame-plain-wood-form3.png",
+      "masterSha256": "31d3dc9a47a8bc44b77ac958416b716a204345f73af66398cbb9393080d00e5f",
+      "canvas": [
+        512,
+        512
+      ],
+      "alignment": {
+        "method": "uniform-scale-and-translate",
+        "scale": 0.39640883977900554,
+        "translation": [
+          9.933701657458556,
+          3.5911602209944533
+        ],
+        "sourceAnchorBox": [
+          258,
+          276,
+          986,
+          1000
+        ],
+        "targetAnchorBox": [
+          111,
+          113,
+          402,
+          400
+        ],
+        "anchorKind": "inner-opening"
+      },
+      "promptReference": null,
+      "promptStatus": "original-verbatim-not-archived; use PROMPT_GUIDE.md for new edits",
+      "qa": {
+        "status": "passed",
+        "scope": "First six items: 216 cross-equipment combinations at 116 and 52px; source and three-form visual review",
+        "evidence": [
+          "aligned-review.png",
+          "cross-*.png"
+        ],
+        "limitations": "Cross-match with remaining 95 items will be verified as production continues."
+      },
+      "exports": [
+        {
+          "path": "assets/achievements/evolution/v1/starter-frame-plain-wood-form3-128.webp",
+          "dimensions": [
+            128,
+            128
+          ],
+          "bytes": 10718,
+          "sha256": "2afccccec274335c76f49376b61f32430b6b6d345a7a01fe51dbd9fe2d793a77"
+        },
+        {
+          "path": "assets/achievements/evolution/v1/starter-frame-plain-wood-form3-256.webp",
+          "dimensions": [
+            256,
+            256
+          ],
+          "bytes": 28844,
+          "sha256": "8abee49d9882dd312c837021f62cfa3dad4004273abe6ddde8c77aa68b2659d2"
+        },
+        {
+          "path": "assets/achievements/evolution/v1/starter-frame-plain-wood-form3-512.webp",
+          "dimensions": [
+            512,
+            512
+          ],
+          "bytes": 88058,
+          "sha256": "ddc4ea8a4dee9f59e775b48250cbf79e060e8abc53096bfe89e44ec9c07aa586"
+        }
+      ]
+    },
+    {
+      "id": "starter-badge-first-leaf",
+      "form": 2,
+      "status": "ready",
+      "master": "design/expedition/art-production/masters/starter-badge-first-leaf-form2.png",
+      "masterSha256": "a209002d250b35c7271920b514cba1eccf7d98a320a3d3ac4fcfd81c97f1dfe0",
+      "canvas": [
+        512,
+        512
+      ],
+      "alignment": {
+        "method": "uniform-scale-and-translate",
+        "scale": 0.40447154471544716,
+        "translation": [
+          6.4410569105691025,
+          0.3739837398373993
+        ],
+        "sourceAnchorBox": [
+          132,
+          140,
+          1102,
+          1124
+        ],
+        "targetAnchorBox": [
+          56,
+          57,
+          456,
+          455
+        ],
+        "anchorKind": "alpha-footprint"
+      },
+      "promptReference": null,
+      "promptStatus": "original-verbatim-not-archived; use PROMPT_GUIDE.md for new edits",
+      "qa": {
+        "status": "passed",
+        "scope": "First six items: 216 cross-equipment combinations at 116 and 52px; source and three-form visual review",
+        "evidence": [
+          "aligned-review.png",
+          "cross-*.png"
+        ],
+        "limitations": "Cross-match with remaining 95 items will be verified as production continues."
+      },
+      "exports": [
+        {
+          "path": "assets/achievements/evolution/v1/starter-badge-first-leaf-form2-128.webp",
+          "dimensions": [
+            128,
+            128
+          ],
+          "bytes": 13750,
+          "sha256": "ada7cca774b8fdacd548bf38a9418e88963f7d663133eb32f0ada35f094dbb9b"
+        },
+        {
+          "path": "assets/achievements/evolution/v1/starter-badge-first-leaf-form2-256.webp",
+          "dimensions": [
+            256,
+            256
+          ],
+          "bytes": 43800,
+          "sha256": "6afdd6cb105b41905582b2c81b0ff4a87760f4e256f0bd69f882b1ccb006ebff"
+        },
+        {
+          "path": "assets/achievements/evolution/v1/starter-badge-first-leaf-form2-512.webp",
+          "dimensions": [
+            512,
+            512
+          ],
+          "bytes": 162804,
+          "sha256": "f1db032209848ac82b946d28d868644fa588bf79d33b78e2eb85b8c7f6ef183a"
+        }
+      ]
+    },
+    {
+      "id": "starter-badge-first-leaf",
+      "form": 3,
+      "status": "ready",
+      "master": "design/expedition/art-production/masters/starter-badge-first-leaf-form3.png",
+      "masterSha256": "cab2a9b5f5a826a17cf890fb1f259b564e3d76678f6cc8d5978e8514cbb69d2e",
+      "canvas": [
+        512,
+        512
+      ],
+      "alignment": {
+        "method": "uniform-scale-and-translate",
+        "scale": 0.402020202020202,
+        "translation": [
+          8.154545454545456,
+          4.335353535353562
+        ],
+        "sourceAnchorBox": [
+          126,
+          131,
+          1107,
+          1121
+        ],
+        "targetAnchorBox": [
+          56,
+          57,
+          456,
+          455
+        ],
+        "anchorKind": "alpha-footprint"
+      },
+      "promptReference": null,
+      "promptStatus": "original-verbatim-not-archived; use PROMPT_GUIDE.md for new edits",
+      "qa": {
+        "status": "passed",
+        "scope": "First six items: 216 cross-equipment combinations at 116 and 52px; source and three-form visual review",
+        "evidence": [
+          "aligned-review.png",
+          "cross-*.png"
+        ],
+        "limitations": "Cross-match with remaining 95 items will be verified as production continues."
+      },
+      "exports": [
+        {
+          "path": "assets/achievements/evolution/v1/starter-badge-first-leaf-form3-128.webp",
+          "dimensions": [
+            128,
+            128
+          ],
+          "bytes": 17804,
+          "sha256": "9556169de075ad050fcd6fc0445b245ffeb324b9c926fdd51beed0e21423c7de"
+        },
+        {
+          "path": "assets/achievements/evolution/v1/starter-badge-first-leaf-form3-256.webp",
+          "dimensions": [
+            256,
+            256
+          ],
+          "bytes": 53950,
+          "sha256": "6c0f8ec6fd75ef484ea30cfc62e27451f6ac1cdaddaf0098d805c864662f6809"
+        },
+        {
+          "path": "assets/achievements/evolution/v1/starter-badge-first-leaf-form3-512.webp",
+          "dimensions": [
+            512,
+            512
+          ],
+          "bytes": 180764,
+          "sha256": "f19c0c75b1517b2d435a8d12d6e160f9e34fa727923bc9cdb8079d9f91604012"
+        }
+      ]
+    }
+  ]
+}

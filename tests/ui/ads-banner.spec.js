@@ -15,10 +15,7 @@ async function settled(page) {
 async function visible(page) { await expect(page.locator('[data-fake-native-banner]')).toHaveCount(1); }
 async function absent(page) { await expect(page.locator('[data-fake-native-banner]')).toHaveCount(0); }
 async function openGameMap(page, game) {
-  const titles = { 'memory-match': 'Memory Match', 'link-connect': 'Link Connect', 'triple-connect': 'Triple Connect' };
-  await page.getByRole('button', { name: `Chọn ${titles[game]}`, exact: true }).click();
   const card = page.locator(`.game-selector__choice[data-game-id="${game}"]`);
-  await expect(card).toHaveClass(/is-selected/);
   await card.click();
 }
 
@@ -30,9 +27,10 @@ for (const viewport of [{ width: 412, height: 915 }, { width: 844, height: 390 }
     expect((await slot.boundingBox()).height).toBe(68);
     const dock = await page.locator('.adventure-dock').boundingBox();
     expect(dock.y + dock.height).toBeLessThanOrEqual(viewport.height - 68 + 1);
-    const selected = await page.locator('.game-selector__choice.is-selected').boundingBox();
+    await page.locator('.game-selector__choice[data-game-id="memory-match"]').scrollIntoViewIfNeeded();
+    const selected = await page.locator('.game-selector__choice[data-game-id="memory-match"]').boundingBox();
     expect(selected.y + selected.height).toBeLessThanOrEqual(dock.y + 1);
-    const controls = await page.locator('.game-selector__controls').boundingBox();
+    const controls = await page.locator('.game-selector > .menu-wrapper').boundingBox();
     expect(controls.y + controls.height).toBeLessThanOrEqual(dock.y + 1);
     await page.screenshot({ path: `docs/ads/qa/banner-mock-${viewport.width}.png` });
     for (const game of ['memory-match', 'link-connect', 'triple-connect']) {
@@ -96,7 +94,7 @@ test('foreground, keyboard, resize and page restoration reconcile one banner', a
   await page.evaluate(() => { const input = document.createElement('input'); input.id = 'ads-keyboard-test'; document.body.append(input); input.focus(); });
   await absent(page);
   await page.evaluate(() => document.getElementById('ads-keyboard-test').remove());
-  await page.locator('.game-selector__choice.is-selected').focus(); await visible(page);
+  await page.locator('.game-selector__choice[data-game-id="memory-match"]').focus(); await visible(page);
   await page.setViewportSize({ width: 844, height: 390 }); await settled(page); await visible(page);
   await page.evaluate(() => window.dispatchEvent(new Event('pagehide'))); await absent(page);
   await page.evaluate(() => window.dispatchEvent(new Event('pageshow'))); await visible(page);

@@ -72,6 +72,23 @@ for (const id of ['memory-match', 'link-connect']) test(`${id} first durable pai
   expect(restored.session.pairSnapshot.matchedPairs).toBe(id === "link-connect" ? 2 : 1);
   expect(restored.session.pairSnapshot.luckyAwards).toEqual(committed.session.pairSnapshot.luckyAwards);
   expect(restored.items).toEqual(committed.items);
+  // A new run discards the board checkpoint, but must keep the reward cycle.
+  for (let cycle = 0; cycle < 3; cycle++) {
+    const replay = await page.evaluate(async id => {
+      await (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu(id);
+      const { gameState, resetGame } = await import('/js/gameState.js');
+      const key = (await import('/js/gameCatalog.js')).getGameProgressKey(id);
+      if (id === 'memory-match') {
+        resetGame(); gameState.settings.mode = 'challenge';
+        await (await import('/js/gameController.js')).startNewMemoryRun(1, { skipIntro: true });
+      } else await (await import('/js/linkConnect/linkController.js')).startLinkLevel({ mode: 'challenge', level: 1, skipIntro: true });
+      const runtime = id === 'memory-match' ? gameState : (await import('/js/linkConnect/linkState.js')).linkGameState;
+      const saved = await (await import('/js/persistence.js')).loadPersistentGameData();
+      return { runtime: runtime.specialProgress, durable: saved.progress[key].specialProgress };
+    }, id);
+    expect(replay).toEqual({ runtime: committed.session.specialProgress, durable: committed.session.specialProgress });
+  }
+
 });
 test('Link bonus pair exits remain bounded and a restart cancels their pending presentation', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' }); await page.goto('/');
@@ -79,6 +96,8 @@ test('Link bonus pair exits remain bounded and a restart cancels their pending p
   await page.evaluate(async () => (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('link-connect'));
   for (let cycle = 0; cycle < 5; cycle++) {
     await page.evaluate(async () => {
+      // Isolate the red-card bonus from the persistent milestone bonus.
+      (await import('/js/gameState.js')).gameState.progress.linkConnect.specialProgress = 0;
       await (await import('/js/linkConnect/linkController.js')).startLinkLevel({ mode: 'challenge', level: 1, skipIntro: true });
       const { linkGameState } = await import('/js/linkConnect/linkState.js');
       const connection = (await import('/js/linkConnect/pathfinder.js')).findAvailableConnections(linkGameState.board.grid)[0];

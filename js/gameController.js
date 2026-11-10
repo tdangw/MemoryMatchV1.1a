@@ -197,9 +197,8 @@ export function initializeLevel(level, { reason = "new", session = null, skipInt
   gameState.timeLimit = timing.timeLimit;
   gameState.levelStartTime = timing.levelStartTime;
   sessionCheckpointTicks = 0;
+  gameState.specialProgress = gameState.progress.memoryMatch.specialProgress || 0;
   if (reason === "resume") {
-    gameState.specialProgress = Math.max(0, Math.floor(session?.specialProgress || 0))
-      % GAME_CONFIG.special.progressTarget;
     gameState.specialNoEnergyDropStreak = Math.min(
       GAME_CONFIG.special.energyDrop.guaranteeAfterMisses,
       Math.max(0, Math.floor(session?.specialNoEnergyDropStreak || 0)),

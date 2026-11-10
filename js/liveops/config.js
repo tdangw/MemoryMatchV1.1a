@@ -14,6 +14,7 @@ export const GROUP_LOOT_DROP_RATES = Object.freeze({
 // Compatibility export for callers describing the special-group policy.
 export const LETTER_DROP_CHANCE = GROUP_LOOT_DROP_RATES.special.letter;
 export const LETTER_SELL_COINS = 10;
+export const LETTER_FUSION_FEE = 10;
 // Historical sale receipts remain readable; new sales always use LETTER_SELL_COINS.
 export const LETTER_SALE_RECEIPT_PRICES = Object.freeze([LETTER_SELL_COINS, 1000]);
 export const LETTER_FALLBACK_COINS = 100;

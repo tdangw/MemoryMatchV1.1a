@@ -1,0 +1,621 @@
+{
+  "version": 1,
+  "tool": "built-in image_gen",
+  "records": [
+    {
+      "id": "memory-frame-golden-laurel",
+      "form": 2,
+      "transparent_background": true,
+      "reference": "public/assets/achievements/v1/memory-frame-golden-laurel-512.webp",
+      "prompt": "Edit target is the original frame shown in reference. Produce form 2 of a three-form collectible progression for Memory Match Adventure. Keep the original subject, gold/sapphire wisdom theme, polished dimensional painted game asset style and matching front view/coordinate alignment. An upgraded thick double laurel wreath with richer sculpted golden leaves alternating deep sapphire-blue enamel leaf panels, a substantial sapphire clasp at bottom. Preserve clean circular empty center and same ring alignment. The inner circular opening MUST remain fully transparent, with no face or image inside. Ring centered precisely. Do not place embellishments across the inner opening or at bottom center where a separate badge overlays. Transparent alpha background, square canvas, entire object safely inside canvas, no shadow/background panel. No text, numbers, labels, emoji, extraneous stars, sparkle particles or separate objects."
+    },
+    {
+      "id": "memory-frame-golden-laurel",
+      "form": 3,
+      "transparent_background": true,
+      "reference": "public/assets/achievements/v1/memory-frame-golden-laurel-512.webp",
+      "prompt": "Edit target is the original frame shown in reference. Produce form 3 of a three-form collectible progression for Memory Match Adventure. Keep the original subject, gold/sapphire wisdom theme, polished dimensional painted game asset style and matching front view/coordinate alignment. A majestic broad royal laurel frame, substantial gold laurel leaves and deep blue sapphire enamel branches, a three-point laurel crown at top and broad sculpted gold fan flourishes at bottom corners. Clearly more elaborate silhouette than middle form while inner opening stays identical. The inner circular opening MUST remain fully transparent, with no face or image inside. Ring centered precisely. Do not place embellishments across the inner opening or at bottom center where a separate badge overlays. Transparent alpha background, square canvas, entire object safely inside canvas, no shadow/background panel. No text, numbers, labels, emoji, extraneous stars, sparkle particles or separate objects."
+    },
+    {
+      "id": "memory-badge-wisdom",
+      "form": 2,
+      "transparent_background": true,
+      "reference": "public/assets/achievements/v1/memory-badge-wisdom-512.webp",
+      "prompt": "Edit target is the original badge shown in reference. Produce form 2 of a three-form collectible progression for Memory Match Adventure. Keep the original subject, gold/sapphire wisdom theme, polished dimensional painted game asset style and matching front view/coordinate alignment. An upgraded open ivory book with embossed blue sapphire hard covers, silver-gold page corners and two broad curled golden laurel branches. Large readable central book, cleaner and more dimensional than original. This is ONE small standalone badge, not a frame. Central emblem must read at 32px. No tiny detached ornaments. Transparent alpha background, square canvas, entire object safely inside canvas, no shadow/background panel. No text, numbers, labels, emoji, extraneous stars, sparkle particles or separate objects."
+    },
+    {
+      "id": "memory-badge-wisdom",
+      "form": 3,
+      "transparent_background": true,
+      "reference": "public/assets/achievements/v1/memory-badge-wisdom-512.webp",
+      "prompt": "Edit target is the original badge shown in reference. Produce form 3 of a three-form collectible progression for Memory Match Adventure. Keep the original subject, gold/sapphire wisdom theme, polished dimensional painted game asset style and matching front view/coordinate alignment. A royal wisdom insignia: open ivory book with vivid sapphire blue gold-inlaid covers, substantial radiant gold fan-like backing and a large three-point gold crown attached above the book. Bold coherent silhouette, visibly more prestigious and different from middle form. This is ONE small standalone badge, not a frame. Central emblem must read at 32px. No tiny detached ornaments. Transparent alpha background, square canvas, entire object safely inside canvas, no shadow/background panel. No text, numbers, labels, emoji, extraneous stars, sparkle particles or separate objects."
+    },
+    {
+      "id": "memory-avatar-sapphire-owl",
+      "form": 2,
+      "transparent_background": true,
+      "reference": "public/assets/achievements/v1/memory-avatar-sapphire-owl-512.webp",
+      "prompt": "Edit target: attached original sapphire owl avatar. Create form 2 of THREE for the SAME owl collectible in Memory Match Adventure. Preserve owl identity, wide bright golden eyes, face centered in same circular portrait coordinate system, same front orientation, same small readable 3D painted game illustration style and transparent outside. Middle evolution: substantially upgraded layered midnight-blue scholar cloak, silver feather shoulder armor, a sapphire clasp, elegant silver filigree on the small hat/crest; richer structured silhouette, face fully visible. Clearly beyond original but restrained. ONLY owl and clothing; no outer frame, wreath, badge, pedestal, particles, text, numerals or level labels. Keep safe border around all art and 1:1 square. Do not add unrelated floating decorations. Transparent alpha background."
+    },
+    {
+      "id": "memory-avatar-sapphire-owl",
+      "form": 3,
+      "transparent_background": true,
+      "reference": "public/assets/achievements/v1/memory-avatar-sapphire-owl-512.webp",
+      "prompt": "Edit target: attached original sapphire owl avatar. Create form 3 of THREE for the SAME owl collectible in Memory Match Adventure. Preserve owl identity, wide bright golden eyes, face centered in same circular portrait coordinate system, same front orientation, same small readable 3D painted game illustration style and transparent outside. Final evolution: magnificent sapphire arch-scholar owl, royal indigo and gold scholar mantle, broad sculpted gold feather collar, luminous blue sapphire crown with three substantial points at top, gold star-stitched garment. Much stronger regal silhouette than middle form, no surrounding ring. ONLY owl and clothing; no outer frame, wreath, badge, pedestal, particles, text, numerals or level labels. Keep safe border around all art and 1:1 square. Do not add unrelated floating decorations. Transparent alpha background."
+    },
+    {
+      "id": "memory-avatar-sapphire-owl",
+      "form": 2,
+      "revision": "r2",
+      "transparent_background": true,
+      "reference": "public/assets/achievements/v1/memory-avatar-sapphire-owl-512.webp",
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: identity-preserve. Edit target: original memory-avatar-sapphire-owl collectible in the reference. Create form 2, the middle evolution of three. Keep EXACT original owl identity, slightly tilted three-quarter head pose, asymmetrical eye positions, golden eyes, white facial feathers, blue feather silhouette, face center and eye line. Keep the original circular forest portrait composition and crop, including the forest inside the circle; outside the circle true transparent alpha. Upgrade only the clothing: structured midnight-blue scholar mantle with broad silver feather shoulder panels and one sapphire clasp below the face. A compact silver-blue brow ornament follows the existing blue head feathers; no tall hat. Distinct readable substantial garment shapes at small size. Do not straighten the head, zoom out, enlarge the crown, shift the face, add an outer frame, badge, pedestal, text, emoji, floating particles, watermark or detached ornaments. ONE square avatar asset only. Match the original circular footprint approximately x96..416 y96..416 on a 512 coordinate canvas; preserve all surrounding transparent margin. Polished dimensional painted game art, matching the reference.",
+      "master": "design/expedition/art-production/masters/memory-avatar-sapphire-owl-form2-r2.png"
+    },
+    {
+      "id": "memory-avatar-sapphire-owl",
+      "form": 3,
+      "revision": "r2",
+      "transparent_background": true,
+      "reference": "public/assets/achievements/v1/memory-avatar-sapphire-owl-512.webp",
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: identity-preserve. Edit target: original memory-avatar-sapphire-owl collectible in the reference. Create form 3, the final evolution of three. Keep EXACT original owl identity, slightly tilted three-quarter head pose, asymmetrical eye positions, golden eyes, white facial feathers, blue feather silhouette, face center and eye line. Keep the original circular forest portrait composition and crop, including the forest inside the circle; outside the circle true transparent alpha. Upgrade only the clothing: royal indigo arch-scholar mantle with broad sculpted gold feather shoulder panels, sapphire enamel inlays and a large blue sapphire clasp below the face. A low three-point gold sapphire diadem follows the existing slanted brow and blue head feathers, safely inside the circular crop; no tall crown. Visibly stronger gold-feather mantle silhouette than the silver middle form, keeping the same face fully visible. Distinct readable substantial garment shapes at small size. Do not straighten the head, zoom out, enlarge the crown, shift the face, add an outer frame, badge, pedestal, text, emoji, floating particles, watermark or detached ornaments. ONE square avatar asset only. Match the original circular footprint approximately x96..416 y96..416 on a 512 coordinate canvas; preserve all surrounding transparent margin. Polished dimensional painted game art, matching the reference.",
+      "master": "design/expedition/art-production/masters/memory-avatar-sapphire-owl-form3-r2.png"
+    },
+    {
+      "id": "memory-avatar-cherry-rabbit",
+      "form": 2,
+      "revision": "r1",
+      "transparent_background": true,
+      "reference": "public/assets/achievements/v1/memory-avatar-cherry-rabbit-512.webp",
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: identity-preserve. Edit target: original memory-avatar-cherry-rabbit collectible. Create form 2, middle evolution of three for Memory Match Adventure. Preserve the same ivory-white rabbit, warm amber eyes, pink nose, upright long ears, gentle smile, three-quarter head direction, paws resting on branch, and original face center, eye line and circular cherry-blossom landscape crop. Upgrade clothing: a soft rose-pink petal-shaped gardener cape fastened with one carved cherry blossom clasp beneath the chin, with pale green folded collar and broad embroidered petal panels. A compact pair of fresh cherry blossoms tucked beside the left ear, not across eyes. Substantial readable costume evolution while preserving the rabbit identity. Keep circular art footprint x96..416 y96..416 on 512 coordinate canvas with true transparent alpha outside; square canvas. Keep the blossom landscape INSIDE the circle, same scale and framing as original. One avatar only; no outer frame, badge, pedestal, lettering, numerals, watermark, emoji, contact sheet, detached sparkle clouds. Match polished dimensional painted game art of reference. Do not zoom out, shift face, straighten pose or cover face.",
+      "master": "design/expedition/art-production/masters/memory-avatar-cherry-rabbit-form2.png"
+    },
+    {
+      "id": "memory-avatar-cherry-rabbit",
+      "form": 3,
+      "revision": "r1",
+      "transparent_background": true,
+      "reference": "public/assets/achievements/v1/memory-avatar-cherry-rabbit-512.webp",
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: identity-preserve. Edit target: original memory-avatar-cherry-rabbit collectible. Create form 3, final evolution of three for Memory Match Adventure. Preserve the same ivory-white rabbit, warm amber eyes, pink nose, upright long ears, gentle smile, three-quarter head direction, paws resting on branch, and original face center, eye line and circular cherry-blossom landscape crop. Upgrade clothing: a ceremonial layered deep-rose and ivory blossom mantle, broad sculpted overlapping petal shoulders with warm gold seams and a luminous rose-quartz blossom clasp beneath the chin. A low branching cherry-blossom tiara of rose quartz petals and warm gold stems follows the ear bases without covering the ears or face. Keep substantial deep rose panels distinct from the soft pink middle form. Substantial readable costume evolution while preserving the rabbit identity. Keep circular art footprint x96..416 y96..416 on 512 coordinate canvas with true transparent alpha outside; square canvas. Keep the blossom landscape INSIDE the circle, same scale and framing as original. One avatar only; no outer frame, badge, pedestal, lettering, numerals, watermark, emoji, contact sheet, detached sparkle clouds. Match polished dimensional painted game art of reference. Do not zoom out, shift face, straighten pose or cover face.",
+      "master": "design/expedition/art-production/masters/memory-avatar-cherry-rabbit-form3.png"
+    },
+    {
+      "id": "memory-frame-cherry-blossom",
+      "form": 2,
+      "revision": "r1",
+      "transparent_background": true,
+      "reference": "public/assets/achievements/v1/memory-frame-cherry-blossom-512.webp",
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: precise-object-edit. Edit target: original memory-frame-cherry-blossom. Create form 2 middle evolution of three for Memory Match Adventure. Preserve the original oval opening, center and usable size, the warm gold scrolling branches, pink cherry blossoms and red buds. Upgrade the border into two interwoven rose-gold boughs with broad pale-pink porcelain petal clusters at upper sides and lower corners, deep rose enamel buds and a compact carved blossom finial above. Coherent sculptural flowering bough silhouette clearly beyond original, restrained middle form. Only ONE frame; center opening and exterior true transparent alpha. No avatar, scene, badge, built-in medal, text, numerals, emoji, watermarks or separate floating ornaments. Keep ornaments outward; never encroach on the original inner opening. Leave bottom center clear for separate badge. Match original untrimmed square 512 canvas coordinate system, opening approximately x112..401 y111..399. Preserve safe margin. Polished dimensional painted game art matching original.",
+      "master": "design/expedition/art-production/masters/memory-frame-cherry-blossom-form2.png"
+    },
+    {
+      "id": "memory-frame-cherry-blossom",
+      "form": 3,
+      "revision": "r1",
+      "transparent_background": true,
+      "reference": "public/assets/achievements/v1/memory-frame-cherry-blossom-512.webp",
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: precise-object-edit. Edit target: original memory-frame-cherry-blossom. Create form 3 final evolution of three for Memory Match Adventure. Preserve the original oval opening, center and usable size, the warm gold scrolling branches, pink cherry blossoms and red buds. Upgrade the border into an elaborate sweeping rose-gold flowering arbor, with broad translucent rose-quartz blossoms, ivory porcelain leaves, deeper rose enamel branch panels, and a low three-blossom crest above. Openwork gold branch fans extend outward at upper shoulders; paired large rose-quartz blossoms at lower sides. Clear final evolution beyond the original and porcelain middle form through substantial crystalline petals and a wider coherent arbor silhouette. Keep ornaments within safe canvas margins. Only ONE frame; center opening and exterior true transparent alpha. No avatar, scene, badge, built-in medal, text, numerals, emoji, watermarks or separate floating ornaments. Keep ornaments outward; never encroach on the original inner opening. Leave bottom center clear for separate badge. Match original untrimmed square 512 canvas coordinate system, opening approximately x112..401 y111..399. Preserve safe margin. Polished dimensional painted game art matching original.",
+      "master": "design/expedition/art-production/masters/memory-frame-cherry-blossom-form3.png"
+    },
+    {
+      "id": "memory-frame-cherry-blossom",
+      "form": 3,
+      "revision": "r2",
+      "transparent_background": true,
+      "reference": "public/assets/achievements/v1/memory-frame-cherry-blossom-512.webp",
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: precise-object-edit. Edit target: original memory-frame-cherry-blossom. Create form 3 final evolution of three for Memory Match Adventure. Preserve the original oval opening, center and usable size, the warm gold scrolling branches, pink cherry blossoms and red buds. Upgrade the border into an elaborate sweeping rose-gold flowering arbor, with broad translucent rose-quartz blossoms, ivory porcelain leaves, deeper rose enamel branch panels, and a low three-blossom crest above. Openwork gold branch fans extend outward at upper shoulders; paired large rose-quartz blossoms at lower sides. Clear final evolution beyond the original and porcelain middle form through substantial crystalline petals and a wider coherent arbor silhouette. Keep ornaments within safe canvas margins. Only ONE frame; center opening and exterior true transparent alpha. No avatar, scene, badge, built-in medal, text, numerals, emoji, watermarks or separate floating ornaments. Keep ornaments outward; never encroach on the original inner opening. Leave bottom center clear for separate badge. Match original untrimmed square 512 canvas coordinate system, opening approximately x112..401 y111..399. Preserve safe margin. Polished dimensional painted game art matching original. Critical correction: ALL outer branches and petal tips fully visible, 8 percent transparent canvas margin on every side. Thin the border enough that outer width is at most 1.55 times the inner opening width. Keep ornaments compact, no branches reaching canvas edges. Do not crop any object. Large inner opening approximately 58 percent of canvas width. Compact border comparable to original. Do not fill canvas with ornament.",
+      "master": "design/expedition/art-production/masters/memory-frame-cherry-blossom-form3-r2.png"
+    },
+    {
+      "id": "memory-badge-memory-master",
+      "form": 2,
+      "revision": "r1",
+      "transparent_background": true,
+      "reference": "public/assets/achievements/v1/memory-badge-memory-master-512.webp",
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: precise-object-edit. Edit target: original memory-badge-memory-master collectible badge. Create form 2 middle evolution of three, preserving the ivory owl with large sapphire-blue eyes perched on an open ivory book, gold and blue shield backing, red ribbon tails. Evolve into a broad blue enamel heraldic shield with layered sculpted golden feather shoulders, a compact sapphire brow piece on the owl, heavier blue-gold book corners, and two wide burgundy ribbon tabs. Keep owl face and open book large and legible at 32px. No tiny scattered gems; no text, letters, numerals, emoji, watermark, outer portrait ring, avatar scene or floating particles. ONE standalone badge only, true transparent alpha exterior, front-facing polished dimensional painted game art. Match original center and footprint, keep safe margin on every side. Substantial material and shield silhouette change, not only recoloring.",
+      "master": "design/expedition/art-production/masters/memory-badge-memory-master-form2.png"
+    },
+    {
+      "id": "memory-badge-memory-master",
+      "form": 3,
+      "revision": "r1",
+      "transparent_background": true,
+      "reference": "public/assets/achievements/v1/memory-badge-memory-master-512.webp",
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: precise-object-edit. Edit target: original memory-badge-memory-master collectible badge. Create form 3 final evolution of three, preserving the ivory owl with large sapphire-blue eyes perched on an open ivory book, gold and blue shield backing, red ribbon tails. Evolve into an imperial wisdom crest: an ivory owl with broad outstretched blue-and-gold sculpted wings above a large open ivory book, a low three-point sapphire crown on the owl, deep sapphire shield backing with a broad gold sun-fan edge and two short burgundy folded ribbon tabs. Large wings form a bold distinct final silhouette beyond the closed-wing middle form, with owl face and book unobscured. Keep owl face and open book large and legible at 32px. No tiny scattered gems; no text, letters, numerals, emoji, watermark, outer portrait ring, avatar scene or floating particles. ONE standalone badge only, true transparent alpha exterior, front-facing polished dimensional painted game art. Match original center and footprint, keep safe margin on every side. Substantial material and shield silhouette change, not only recoloring.",
+      "master": "design/expedition/art-production/masters/memory-badge-memory-master-form3.png"
+    },
+    {
+      "id": "memory-frame-golden-laurel",
+      "form": 2,
+      "revision": "r2",
+      "transparent_background": true,
+      "reference": "public/assets/achievements/v1/memory-frame-golden-laurel-512.webp",
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: precise-object-edit. Edit target: original memory-frame-golden-laurel, form 2 middle evolution. Keep exact original centered circular opening, golden laurel leaves, blue feather at lower right and sapphire clasp at bottom. Upgrade only border material and leaf structure: two elegant tightly interwoven rows of sculpted gold leaves alternating deep sapphire enamel leaf panels, compact sapphire bottom clasp. Keep the SAME narrow border envelope as reference, with maximum outer diameter 1.55 times the inner opening diameter. Opening must occupy at least 60 percent of the square canvas width, centered, and be completely transparent. ALL outer leaf tips fully inside canvas with at least 5 percent clear margin. Avoid enlarged bottom flourish; keep lower clasp no lower than original. Transparent alpha outside. ONE empty frame only, no avatar, badge, medal, scene, text, watermark, emoji, detached ornaments or glitter. Polished dimensional painted game art. Do not shrink opening or enlarge outer ornament envelope. Distinct middle evolution through blue enamel leaves and interwoven branch structure.",
+      "master": "design/expedition/art-production/masters/memory-frame-golden-laurel-form2-r2.png"
+    },
+    {
+      "id": "memory-avatar-stellar-cat",
+      "form": 2,
+      "revision": "r1",
+      "transparent_background": true,
+      "reference": "public/assets/achievements/v1/memory-avatar-stellar-cat-512.webp",
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: identity-preserve. Edit target: original memory-avatar-stellar-cat. Create form 2 middle evolution of three for Memory Match Adventure. Keep the same orange long-haired cat with bright green eyes, white chest fur, gently tilted head and moonlit riverside circular portrait, original perspective, face position and style. Evolution: a midnight-purple astronomer cape with broad silver crescent clasp and folded pale-blue collar. Substantial readable shapes distinct from both other forms. Keep EXACT face center, eye line, head tilt, character identity, paws and portrait crop. Preserve circular landscape inside the original circular footprint x96..416 y96..416 on a 512 canvas. Only change clothing/headwear, keep face unobscured. No outer frame or badge. ONE square asset only, polished dimensional painted game art matching original. True transparent alpha exterior. No text, labels, numerals, watermark, emoji, unrelated floating objects, particles, panels or contact sheets.",
+      "master": "design/expedition/art-production/masters/memory-avatar-stellar-cat-form2.png"
+    },
+    {
+      "id": "memory-avatar-stellar-cat",
+      "form": 3,
+      "revision": "r1",
+      "transparent_background": true,
+      "reference": "public/assets/achievements/v1/memory-avatar-stellar-cat-512.webp",
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: identity-preserve. Edit target: original memory-avatar-stellar-cat. Create form 3 final evolution of three for Memory Match Adventure. Keep the same orange long-haired cat with bright green eyes, white chest fur, gently tilted head and moonlit riverside circular portrait, original perspective, face position and style. Evolution: a layered violet celestial mantle with broad pearl-silver shoulder panels and a low crescent moon diadem between the ears. Substantial readable shapes distinct from both other forms. Keep EXACT face center, eye line, head tilt, character identity, paws and portrait crop. Preserve circular landscape inside the original circular footprint x96..416 y96..416 on a 512 canvas. Only change clothing/headwear, keep face unobscured. No outer frame or badge. ONE square asset only, polished dimensional painted game art matching original. True transparent alpha exterior. No text, labels, numerals, watermark, emoji, unrelated floating objects, particles, panels or contact sheets.",
+      "master": "design/expedition/art-production/masters/memory-avatar-stellar-cat-form3.png"
+    },
+    {
+      "id": "memory-frame-sky-feather",
+      "form": 2,
+      "revision": "r1",
+      "transparent_background": true,
+      "reference": "public/assets/achievements/v1/memory-frame-sky-feather-512.webp",
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: precise-object-edit. Edit target: original memory-frame-sky-feather. Create form 2 middle evolution of three for Memory Match Adventure. Keep the same blue feather wreath with gold feather tips, silver inner band and sapphire top clasp, original perspective, face position and style. Evolution: two swept rows of broad azure feathers with pearly silver vanes and compact sapphire clasps. Substantial readable shapes distinct from both other forms. Only the frame. Match EXACT original transparent inner opening center, shape and usable size. Border maximum outer width 1.55 times opening width. Keep border compact, adornments outward, bottom badge zone unobstructed. No avatar, scene or medal. All outer feathers safely inside canvas with 5 percent margin. ONE square asset only, polished dimensional painted game art matching original. True transparent alpha exterior. No text, labels, numerals, watermark, emoji, unrelated floating objects, particles, panels or contact sheets.",
+      "master": "design/expedition/art-production/masters/memory-frame-sky-feather-form2.png"
+    },
+    {
+      "id": "memory-frame-sky-feather",
+      "form": 3,
+      "revision": "r1",
+      "transparent_background": true,
+      "reference": "public/assets/achievements/v1/memory-frame-sky-feather-512.webp",
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: precise-object-edit. Edit target: original memory-frame-sky-feather. Create form 3 final evolution of three for Memory Match Adventure. Keep the same blue feather wreath with gold feather tips, silver inner band and sapphire top clasp, original perspective, face position and style. Evolution: sculpted outward-fanning cobalt and pale-blue wing feathers, gold quills and a low three-feather sapphire crest. Substantial readable shapes distinct from both other forms. Only the frame. Match EXACT original transparent inner opening center, shape and usable size. Border maximum outer width 1.55 times opening width. Keep border compact, adornments outward, bottom badge zone unobstructed. No avatar, scene or medal. All outer feathers safely inside canvas with 5 percent margin. ONE square asset only, polished dimensional painted game art matching original. True transparent alpha exterior. No text, labels, numerals, watermark, emoji, unrelated floating objects, particles, panels or contact sheets.",
+      "master": "design/expedition/art-production/masters/memory-frame-sky-feather-form3.png"
+    },
+    {
+      "id": "memory-avatar-scholar-squirrel",
+      "form": 2,
+      "revision": "r1",
+      "transparent_background": true,
+      "reference": "public/assets/achievements/v1/memory-avatar-scholar-squirrel-512.webp",
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: identity-preserve. Edit target: original memory-avatar-scholar-squirrel. Create form 2 middle evolution of three for Memory Match Adventure. Keep the same orange squirrel with amber eyes, large curled tail, navy scholar robe, holding closed blue book in warm library circular portrait, original perspective, face position and style. Evolution: a structured teal scholar coat with wide ivory cuffs, leather book strap and a low soft scholar cap. Substantial readable shapes distinct from both other forms. Keep EXACT face center, eye line, head tilt, character identity, paws and portrait crop. Preserve circular landscape inside the original circular footprint x96..416 y96..416 on a 512 canvas. Only change clothing/headwear, keep face unobscured. No outer frame or badge. ONE square asset only, polished dimensional painted game art matching original. True transparent alpha exterior. No text, labels, numerals, watermark, emoji, unrelated floating objects, particles, panels or contact sheets.",
+      "master": "design/expedition/art-production/masters/memory-avatar-scholar-squirrel-form2.png"
+    },
+    {
+      "id": "memory-avatar-scholar-squirrel",
+      "form": 3,
+      "revision": "r1",
+      "transparent_background": true,
+      "reference": "public/assets/achievements/v1/memory-avatar-scholar-squirrel-512.webp",
+      "status": "interrupted-by-user-pause-result-unconfirmed",
+      "prompt": "Use case: identity-preserve. Edit target: original memory-avatar-scholar-squirrel. Create form 3 final evolution of three for Memory Match Adventure. Keep the same orange squirrel with amber eyes, large curled tail, navy scholar robe, holding closed blue book in warm library circular portrait, original perspective, face position and style. Evolution: a burgundy master-scholar mantle with broad ivory lapels, sculpted gold acorn clasp and a compact burgundy academic cap. Substantial readable shapes distinct from both other forms. Keep EXACT face center, eye line, head tilt, character identity, paws and portrait crop. Preserve circular landscape inside the original circular footprint x96..416 y96..416 on a 512 canvas. Only change clothing/headwear, keep face unobscured. No outer frame or badge. ONE square asset only, polished dimensional painted game art matching original. True transparent alpha exterior. No text, labels, numerals, watermark, emoji, unrelated floating objects, particles, panels or contact sheets."
+    },
+    {
+      "id": "memory-avatar-scholar-squirrel",
+      "form": 3,
+      "revision": "r2",
+      "prompt": "Use case: identity-preserve. Edit target: original scholar squirrel collectible. Create form3 final evolution. Preserve EXACT orange squirrel identity, amber eyes, original slight head tilt, face center and eye line, large curled tail, paws holding closed blue book, warm library circular portrait. Dress in burgundy master-scholar mantle with broad ivory lapels, substantial gold embroidered acorn clasp, compact burgundy academic cap below ear tips. Stronger layered garment silhouette than teal middle form, face fully unobscured. Keep original circular crop x96..416 y96..416 on 512 coordinate square, landscape inside circle and true transparent alpha outside. Same portrait scale, not full body, no extra frame, badge or pedestal. Polished dimensional painted game art matching original. ONE avatar only, no text, numbers, watermark, emoji, unrelated floating objects or contact sheet.",
+      "reference": "public/assets/achievements/v1/memory-avatar-scholar-squirrel-512.webp",
+      "transparent_background": true,
+      "status": "generated-pending-alignment-qa",
+      "master": "design/expedition/art-production/masters/memory-avatar-scholar-squirrel-form3-r2.png"
+    },
+    {
+      "id": "memory-frame-sky-feather",
+      "form": 3,
+      "revision": "r2",
+      "prompt": "Use case: precise-object-edit. Edit target: original blue feather frame. Form3 final evolution: compact swept cobalt and pale azure wing-feather border, broad pearly silver feather vanes, fine gold quills, a low three-feather sapphire crest above. Keep sapphire upper clasp and silver inner band recognizable. Retain EXACT original oval transparent inner opening, center and usable size; do not shrink opening. Thin compact ornaments within original border envelope: outer width no more than 1.55 times opening width, 6 percent transparent margin every side. No feathers entering opening or separate bottom badge zone. Center and exterior MUST have true zero-alpha transparency, NO gray/cream cloudy background, no cast shadow, no haze or glow. Only ONE empty frame, no avatar, scene, text, badge, emoji, watermark. Polished dimensional painted game art matching original. Substantial final feather fans, distinct from middle interwoven feather rows, yet fully inside canvas.",
+      "reference": "public/assets/achievements/v1/memory-frame-sky-feather-512.webp",
+      "transparent_background": true,
+      "status": "generated-pending-alignment-qa",
+      "master": "design/expedition/art-production/masters/memory-frame-sky-feather-form3-r2.png"
+    },
+    {
+      "id": "memory-frame-golden-laurel",
+      "form": 3,
+      "revision": "r2",
+      "prompt": "Use case: precise-object-edit. Edit target: original golden laurel frame. Create form3 final evolution. Preserve same circular opening and original gold laurel identity, sapphire upper clasp, blue feather at lower right. Refine border into broad carved gold laurel leaves with deep-blue sapphire enamel stems and compact paired gold feather fans on upper sides, a low three-leaf crown at top. Distinct final sculptural silhouette beyond middle intertwined leaves, but keep ornaments compact within original border envelope. Inner opening must stay exact original size and center, truly transparent. Outer width at most 1.55 times opening width. No extended bottom flourishes; leave separate bottom badge zone clear. Whole frame fully inside square canvas, at least 5 percent transparent margin, no crop. Alpha zero in opening and exterior; no scene, avatar, badge, medal, glow cloud, text, numerals, emoji or watermark. ONE frame only, polished dimensional painted game art matching reference.",
+      "reference": "public/assets/achievements/v1/memory-frame-golden-laurel-512.webp",
+      "transparent_background": true,
+      "status": "generated-pending-alignment-qa",
+      "master": "design/expedition/art-production/masters/memory-frame-golden-laurel-form3-r2.png"
+    },
+    {
+      "id": "memory-frame-gilded-pages",
+      "form": 2,
+      "revision": "r1",
+      "reference": "public/assets/achievements/v1/memory-frame-gilded-pages-512.webp",
+      "transparent_background": true,
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: precise-object-edit. Edit target: original memory-frame-gilded-pages. Create form2, middle evolution of three. Preserve ivory folded book-page ring, gold curled supports, navy inset spine and open book at bottom, recognizable subject and polished dimensional painted game-art style. Evolution: layered ivory parchment page folds with broad cobalt leather corner bindings and gold scroll joints. Use substantial readable shapes, clearly distinct from both other forms. Only ONE empty frame. Keep EXACT original inner opening center, shape and usable size; no adornment inside opening. Compact border, outer width no more than 1.55 times inner opening width. All ornament tips fully inside canvas with 5 percent transparent margin. Leave bottom badge zone unobstructed. Opening and exterior true zero-alpha, no shadow/haze, avatar, scene or built-in medal. True transparent alpha background. No text, letters, numerals, captions, watermark, emoji, floating glitter, panels or contact sheet. One square asset only.",
+      "master": "design/expedition/art-production/masters/memory-frame-gilded-pages-form2.png"
+    },
+    {
+      "id": "memory-frame-gilded-pages",
+      "form": 3,
+      "revision": "r1",
+      "reference": "public/assets/achievements/v1/memory-frame-gilded-pages-512.webp",
+      "transparent_background": true,
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: precise-object-edit. Edit target: original memory-frame-gilded-pages. Create form3, final evolution of three. Preserve ivory folded book-page ring, gold curled supports, navy inset spine and open book at bottom, recognizable subject and polished dimensional painted game-art style. Evolution: sculpted fan-fold ivory pages alternating rich blue book spines, compact gilded page crown and thicker open-book base. Use substantial readable shapes, clearly distinct from both other forms. Only ONE empty frame. Keep EXACT original inner opening center, shape and usable size; no adornment inside opening. Compact border, outer width no more than 1.55 times inner opening width. All ornament tips fully inside canvas with 5 percent transparent margin. Leave bottom badge zone unobstructed. Opening and exterior true zero-alpha, no shadow/haze, avatar, scene or built-in medal. True transparent alpha background. No text, letters, numerals, captions, watermark, emoji, floating glitter, panels or contact sheet. One square asset only.",
+      "master": "design/expedition/art-production/masters/memory-frame-gilded-pages-form3.png"
+    },
+    {
+      "id": "memory-badge-wisdom-seal",
+      "form": 2,
+      "revision": "r1",
+      "reference": "public/assets/achievements/v1/memory-badge-wisdom-seal-512.webp",
+      "transparent_background": true,
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: precise-object-edit. Edit target: original memory-badge-wisdom-seal. Create form2, middle evolution of three. Preserve round antique-gold seal with diagonal gold key, five-point star above it and blue folded ribbons, recognizable subject and polished dimensional painted game-art style. Evolution: deep cobalt enamel medallion with a larger raised gold key and bold embossed star, broad royal blue ribbon loops. Use substantial readable shapes, clearly distinct from both other forms. ONE standalone badge. Keep original central symbol large and unmistakable at 32px. Bold material/structure changes; compact coherent silhouette. Preserve original center and footprint with safe margin. No portrait, empty frame, scene or detached ornaments. True transparent alpha background. No text, letters, numerals, captions, watermark, emoji, floating glitter, panels or contact sheet. One square asset only.",
+      "master": "design/expedition/art-production/masters/memory-badge-wisdom-seal-form2.png"
+    },
+    {
+      "id": "memory-badge-wisdom-seal",
+      "form": 3,
+      "revision": "r1",
+      "reference": "public/assets/achievements/v1/memory-badge-wisdom-seal-512.webp",
+      "transparent_background": true,
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: precise-object-edit. Edit target: original memory-badge-wisdom-seal. Create form3, final evolution of three. Preserve round antique-gold seal with diagonal gold key, five-point star above it and blue folded ribbons, recognizable subject and polished dimensional painted game-art style. Evolution: a faceted octagonal midnight-blue seal with a large ivory-and-gold key, raised gold star crest and short double-fold sapphire ribbons. Use substantial readable shapes, clearly distinct from both other forms. ONE standalone badge. Keep original central symbol large and unmistakable at 32px. Bold material/structure changes; compact coherent silhouette. Preserve original center and footprint with safe margin. No portrait, empty frame, scene or detached ornaments. True transparent alpha background. No text, letters, numerals, captions, watermark, emoji, floating glitter, panels or contact sheet. One square asset only.",
+      "master": "design/expedition/art-production/masters/memory-badge-wisdom-seal-form3.png"
+    },
+    {
+      "id": "memory-avatar-stargazer-hedgehog",
+      "form": 2,
+      "revision": "r1",
+      "reference": "public/assets/achievements/v1/memory-avatar-stargazer-hedgehog-512.webp",
+      "transparent_background": true,
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: identity-preserve. Edit target: original memory-avatar-stargazer-hedgehog. Create form2, middle evolution of three. Preserve brown-spined cream hedgehog wearing round gold glasses, holding brass telescope in celestial observatory, cheerful open mouth, recognizable subject and polished dimensional painted game-art style. Evolution: structured midnight teal astronomer coat with wide cream cuffs, brass astrolabe clasp and low star-chart cap. Use substantial readable shapes, clearly distinct from both other forms. Keep EXACT character identity, face center, eye line, head tilt, expression family, paws/props, original circular landscape crop and portrait scale; change clothing/materials only, no zoom out. Keep original circular footprint x96..416 y96..416 on 512 coordinate square, scene inside circle, alpha zero outside. No frame, badge or pedestal; face unobscured. True transparent alpha background. No text, letters, numerals, captions, watermark, emoji, floating glitter, panels or contact sheet. One square asset only.",
+      "master": "design/expedition/art-production/masters/memory-avatar-stargazer-hedgehog-form2.png"
+    },
+    {
+      "id": "memory-avatar-stargazer-hedgehog",
+      "form": 3,
+      "revision": "r1",
+      "reference": "public/assets/achievements/v1/memory-avatar-stargazer-hedgehog-512.webp",
+      "transparent_background": true,
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: identity-preserve. Edit target: original memory-avatar-stargazer-hedgehog. Create form3, final evolution of three. Preserve brown-spined cream hedgehog wearing round gold glasses, holding brass telescope in celestial observatory, cheerful open mouth, recognizable subject and polished dimensional painted game-art style. Evolution: deep indigo observatory-master mantle with broad ivory celestial collar, brass compass clasp and compact sapphire-trimmed scholar cap. Use substantial readable shapes, clearly distinct from both other forms. Keep EXACT character identity, face center, eye line, head tilt, expression family, paws/props, original circular landscape crop and portrait scale; change clothing/materials only, no zoom out. Keep original circular footprint x96..416 y96..416 on 512 coordinate square, scene inside circle, alpha zero outside. No frame, badge or pedestal; face unobscured. True transparent alpha background. No text, letters, numerals, captions, watermark, emoji, floating glitter, panels or contact sheet. One square asset only.",
+      "master": "design/expedition/art-production/masters/memory-avatar-stargazer-hedgehog-form3.png"
+    },
+    {
+      "id": "memory-frame-astral-orbit",
+      "form": 2,
+      "revision": "r1",
+      "reference": "public/assets/achievements/v1/memory-frame-astral-orbit-512.webp",
+      "transparent_background": true,
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: precise-object-edit. Edit target: original memory-frame-astral-orbit. Create form2, middle evolution of three. Preserve navy celestial ring with gold orbit rails, blue planets, crescent moons and compass-star top, recognizable subject and polished dimensional painted game-art style. Evolution: two narrow nested gold orbital rails over deep-blue enamel, larger smoothly sculpted blue planet clasps and pearl orbit nodes. Use substantial readable shapes, clearly distinct from both other forms. Only ONE empty frame. Keep EXACT original inner opening center, shape and usable size; no adornment inside opening. Compact border, outer width no more than 1.55 times inner opening width. All ornament tips fully inside canvas with 5 percent transparent margin. Leave bottom badge zone unobstructed. Opening and exterior true zero-alpha, no shadow/haze, avatar, scene or built-in medal. True transparent alpha background. No text, letters, numerals, captions, watermark, emoji, floating glitter, panels or contact sheet. One square asset only.",
+      "master": "design/expedition/art-production/masters/memory-frame-astral-orbit-form2.png"
+    },
+    {
+      "id": "memory-frame-astral-orbit",
+      "form": 3,
+      "revision": "r1",
+      "reference": "public/assets/achievements/v1/memory-frame-astral-orbit-512.webp",
+      "transparent_background": true,
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: precise-object-edit. Edit target: original memory-frame-astral-orbit. Create form3, final evolution of three. Preserve navy celestial ring with gold orbit rails, blue planets, crescent moons and compass-star top, recognizable subject and polished dimensional painted game-art style. Evolution: sculpted midnight-blue armillary ring with compact gold crescent wings and bold sapphire compass-star crest, pearl planet clasps. Use substantial readable shapes, clearly distinct from both other forms. Only ONE empty frame. Keep EXACT original inner opening center, shape and usable size; no adornment inside opening. Compact border, outer width no more than 1.55 times inner opening width. All ornament tips fully inside canvas with 5 percent transparent margin. Leave bottom badge zone unobstructed. Opening and exterior true zero-alpha, no shadow/haze, avatar, scene or built-in medal. True transparent alpha background. No text, letters, numerals, captions, watermark, emoji, floating glitter, panels or contact sheet. One square asset only.",
+      "master": "design/expedition/art-production/masters/memory-frame-astral-orbit-form3.png"
+    },
+    {
+      "id": "memory-avatar-dreaming-deer",
+      "form": 2,
+      "revision": "r1",
+      "reference": "public/assets/achievements/v1/memory-avatar-dreaming-deer-512.webp",
+      "transparent_background": true,
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: identity-preserve. Edit target: original memory-avatar-dreaming-deer. Create form2, middle evolution of three. Preserve spotted brown fawn with purple eyes, flowered small antlers, slight tilted head, reclining amid ivory clouds and lavender palace library, recognizable subject and polished dimensional painted game-art style. Evolution: lavender dream-reader cape with broad ivory petal collar, amethyst flower clasp and small ivory antler blossoms. Use substantial readable shapes, clearly distinct from both other forms. Keep EXACT character identity, face center, eye line, head tilt, expression family, paws/props, original circular landscape crop and portrait scale; change clothing/materials only, no zoom out. Keep original circular footprint x96..416 y96..416 on 512 coordinate square, scene inside circle, alpha zero outside. No frame, badge or pedestal; face unobscured. True transparent alpha background. No text, letters, numerals, captions, watermark, emoji, floating glitter, panels or contact sheet. One square asset only.",
+      "master": "design/expedition/art-production/masters/memory-avatar-dreaming-deer-form2.png"
+    },
+    {
+      "id": "memory-avatar-dreaming-deer",
+      "form": 3,
+      "revision": "r1",
+      "reference": "public/assets/achievements/v1/memory-avatar-dreaming-deer-512.webp",
+      "transparent_background": true,
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: identity-preserve. Edit target: original memory-avatar-dreaming-deer. Create form3, final evolution of three. Preserve spotted brown fawn with purple eyes, flowered small antlers, slight tilted head, reclining amid ivory clouds and lavender palace library, recognizable subject and polished dimensional painted game-art style. Evolution: layered plum and pearl dream-keeper mantle with broad silken cloud shoulder panels and compact amethyst blossom diadem around original antlers. Use substantial readable shapes, clearly distinct from both other forms. Keep EXACT character identity, face center, eye line, head tilt, expression family, paws/props, original circular landscape crop and portrait scale; change clothing/materials only, no zoom out. Keep original circular footprint x96..416 y96..416 on 512 coordinate square, scene inside circle, alpha zero outside. No frame, badge or pedestal; face unobscured. True transparent alpha background. No text, letters, numerals, captions, watermark, emoji, floating glitter, panels or contact sheet. One square asset only.",
+      "master": "design/expedition/art-production/masters/memory-avatar-dreaming-deer-form3.png"
+    },
+    {
+      "id": "memory-frame-silken-clouds",
+      "form": 2,
+      "revision": "r1",
+      "reference": "public/assets/achievements/v1/memory-frame-silken-clouds-512.webp",
+      "transparent_background": true,
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: precise-object-edit. Edit target: original memory-frame-silken-clouds. Create form2, middle evolution of three. Preserve gold circular border with ivory silken ribbons, rounded cloud puffs and pale-blue star gems, recognizable subject and polished dimensional painted game-art style. Evolution: twinned pearl satin ribbons folding into broad ivory clouds, slim champagne-gold supports and pale-blue crystal clasps. Use substantial readable shapes, clearly distinct from both other forms. Only ONE empty frame. Keep EXACT original inner opening center, shape and usable size; no adornment inside opening. Compact border, outer width no more than 1.55 times inner opening width. All ornament tips fully inside canvas with 5 percent transparent margin. Leave bottom badge zone unobstructed. Opening and exterior true zero-alpha, no shadow/haze, avatar, scene or built-in medal. True transparent alpha background. No text, letters, numerals, captions, watermark, emoji, floating glitter, panels or contact sheet. One square asset only.",
+      "master": "design/expedition/art-production/masters/memory-frame-silken-clouds-form2.png"
+    },
+    {
+      "id": "memory-frame-silken-clouds",
+      "form": 3,
+      "revision": "r1",
+      "reference": "public/assets/achievements/v1/memory-frame-silken-clouds-512.webp",
+      "transparent_background": true,
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: precise-object-edit. Edit target: original memory-frame-silken-clouds. Create form3, final evolution of three. Preserve gold circular border with ivory silken ribbons, rounded cloud puffs and pale-blue star gems, recognizable subject and polished dimensional painted game-art style. Evolution: sculpted pearlescent cloud scrolls alternating deep lavender satin folds, compact opal-star crest and broad coherent ivory ribbon sweeps. Use substantial readable shapes, clearly distinct from both other forms. Only ONE empty frame. Keep EXACT original inner opening center, shape and usable size; no adornment inside opening. Compact border, outer width no more than 1.55 times inner opening width. All ornament tips fully inside canvas with 5 percent transparent margin. Leave bottom badge zone unobstructed. Opening and exterior true zero-alpha, no shadow/haze, avatar, scene or built-in medal. True transparent alpha background. No text, letters, numerals, captions, watermark, emoji, floating glitter, panels or contact sheet. One square asset only.",
+      "master": "design/expedition/art-production/masters/memory-frame-silken-clouds-form3.png"
+    },
+    {
+      "id": "memory-badge-memory-keeper",
+      "form": 2,
+      "revision": "r1",
+      "group": 1,
+      "reference": "public/assets/achievements/v1/memory-badge-memory-keeper-512.webp",
+      "transparent_background": true,
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: precise-object-edit. Edit target: original memory-badge-memory-keeper. Create form2, middle evolution of three for Memory Match Adventure. Preserve a gold hourglass and diagonal gold ornate key on midnight-blue shield with ivory ribbons and polished dimensional painted game-art style. Evolution: wide sapphire hourglass uprights and ivory sand chambers, a bold gold key and short folded ivory ribbons, rounded shield backing. Large coherent readable shapes, distinct silhouette/material structure beyond original. ONE standalone badge, preserve original central symbols and meaning. Bold emblem readable at 32px, no tiny detached decoration. Match original center and footprint with safe margin. No avatar, surrounding portrait frame or landscape. Square canvas, genuine transparent alpha background. No text, numerals, labels, watermark, emoji, detached glitter or contact sheet. Deliver one asset only.",
+      "master": "design/expedition/art-production/masters/memory-badge-memory-keeper-form2.png"
+    },
+    {
+      "id": "memory-badge-memory-keeper",
+      "form": 3,
+      "revision": "r1",
+      "group": 1,
+      "reference": "public/assets/achievements/v1/memory-badge-memory-keeper-512.webp",
+      "transparent_background": true,
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: precise-object-edit. Edit target: original memory-badge-memory-keeper. Create form3, final evolution of three for Memory Match Adventure. Preserve a gold hourglass and diagonal gold ornate key on midnight-blue shield with ivory ribbons and polished dimensional painted game-art style. Evolution: an angular deep-indigo timekeeper shield with sculpted gold hourglass, large pearl-gold key and broad layered ivory-gold side wings. Large coherent readable shapes, distinct silhouette/material structure beyond original and middle form. ONE standalone badge, preserve original central symbols and meaning. Bold emblem readable at 32px, no tiny detached decoration. Match original center and footprint with safe margin. No avatar, surrounding portrait frame or landscape. Square canvas, genuine transparent alpha background. No text, numerals, labels, watermark, emoji, detached glitter or contact sheet. Deliver one asset only.",
+      "master": "design/expedition/art-production/masters/memory-badge-memory-keeper-form3.png"
+    },
+    {
+      "id": "memory-avatar-galaxy-whale",
+      "form": 2,
+      "revision": "r1",
+      "group": 1,
+      "reference": "public/assets/achievements/v1/memory-avatar-galaxy-whale-512.webp",
+      "transparent_background": true,
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: identity-preserve. Edit target: original memory-avatar-galaxy-whale. Create form2, middle evolution of three for Memory Match Adventure. Preserve happy blue galaxy whale with one large starry eye, ivory belly, open smiling mouth and raised tail among purple-gold clouds and polished dimensional painted game-art style. Evolution: broad pearl-blue celestial fin cuffs and flowing silver constellation bands following the whale body, compact crescent clasp below its cheek. Large coherent readable shapes, distinct silhouette/material structure beyond original. Keep EXACT face center, eye line, head direction/tilt, expression, anatomy, paws/props and portrait scale. Original circular scene and crop retained; artwork footprint x96..416 y96..416 on 512 coordinate square. Scene inside circle, true alpha outside. Upgrade costume or body adornments only, face unobstructed. No zoom out, extra limb, outer frame, badge or pedestal. Square canvas, genuine transparent alpha background. No text, numerals, labels, watermark, emoji, detached glitter or contact sheet. Deliver one asset only.",
+      "master": "design/expedition/art-production/masters/memory-avatar-galaxy-whale-form2.png"
+    },
+    {
+      "id": "memory-avatar-galaxy-whale",
+      "form": 3,
+      "revision": "r1",
+      "group": 1,
+      "reference": "public/assets/achievements/v1/memory-avatar-galaxy-whale-512.webp",
+      "transparent_background": true,
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: identity-preserve. Edit target: original memory-avatar-galaxy-whale. Create form3, final evolution of three for Memory Match Adventure. Preserve happy blue galaxy whale with one large starry eye, ivory belly, open smiling mouth and raised tail among purple-gold clouds and polished dimensional painted game-art style. Evolution: sculpted violet-opal fin armor and broad flowing pearly dorsal crest with coherent gold nebula inlays along body, no tall crown. Large coherent readable shapes, distinct silhouette/material structure beyond original and middle form. Keep EXACT face center, eye line, head direction/tilt, expression, anatomy, paws/props and portrait scale. Original circular scene and crop retained; artwork footprint x96..416 y96..416 on 512 coordinate square. Scene inside circle, true alpha outside. Upgrade costume or body adornments only, face unobstructed. No zoom out, extra limb, outer frame, badge or pedestal. Square canvas, genuine transparent alpha background. No text, numerals, labels, watermark, emoji, detached glitter or contact sheet. Deliver one asset only.",
+      "master": "design/expedition/art-production/masters/memory-avatar-galaxy-whale-form3.png"
+    },
+    {
+      "id": "memory-frame-knowledge-gateway",
+      "form": 2,
+      "revision": "r1",
+      "group": 1,
+      "reference": "public/assets/achievements/v1/memory-frame-knowledge-gateway-512.webp",
+      "transparent_background": true,
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: precise-object-edit. Edit target: original memory-frame-knowledge-gateway. Create form2, middle evolution of three for Memory Match Adventure. Preserve teal and gold circular library gateway with flanking bookcase columns, hanging lanterns, ivory scrolls and open book at bottom and polished dimensional painted game-art style. Evolution: layered emerald-enamel library columns with broad ivory page capitals, compact turquoise upper compass clasp and slim gold book spines. Large coherent readable shapes, distinct silhouette/material structure beyond original. ONE empty frame only. EXACT original inner opening shape, center and usable size. Keep all decorations OUTSIDE opening: no rail, ribbon, branch or bar crossing it. Compact border, outer width at most 1.55 times opening width, at least 5 percent clear margin every side, no cropped tips. Leave separate bottom badge zone clear. Inner opening and exterior true zero-alpha, no scene, avatar, medal, haze, cast shadow or glow cloud. Square canvas, genuine transparent alpha background. No text, numerals, labels, watermark, emoji, detached glitter or contact sheet. Deliver one asset only.",
+      "master": "design/expedition/art-production/masters/memory-frame-knowledge-gateway-form2.png"
+    },
+    {
+      "id": "memory-frame-knowledge-gateway",
+      "form": 3,
+      "revision": "r1",
+      "group": 1,
+      "reference": "public/assets/achievements/v1/memory-frame-knowledge-gateway-512.webp",
+      "transparent_background": true,
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: precise-object-edit. Edit target: original memory-frame-knowledge-gateway. Create form3, final evolution of three for Memory Match Adventure. Preserve teal and gold circular library gateway with flanking bookcase columns, hanging lanterns, ivory scrolls and open book at bottom and polished dimensional painted game-art style. Evolution: sculpted deep-teal archival arch with ivory fan-page capitals, paired opal lantern casings and a low turquoise compass crest. Large coherent readable shapes, distinct silhouette/material structure beyond original and middle form. ONE empty frame only. EXACT original inner opening shape, center and usable size. Keep all decorations OUTSIDE opening: no rail, ribbon, branch or bar crossing it. Compact border, outer width at most 1.55 times opening width, at least 5 percent clear margin every side, no cropped tips. Leave separate bottom badge zone clear. Inner opening and exterior true zero-alpha, no scene, avatar, medal, haze, cast shadow or glow cloud. Square canvas, genuine transparent alpha background. No text, numerals, labels, watermark, emoji, detached glitter or contact sheet. Deliver one asset only.",
+      "master": "design/expedition/art-production/masters/memory-frame-knowledge-gateway-form3.png"
+    },
+    {
+      "id": "memory-avatar-chestnut-squirrel",
+      "form": 2,
+      "revision": "r1",
+      "group": 1,
+      "reference": "public/assets/achievements/v1/memory-avatar-chestnut-squirrel-512.webp",
+      "transparent_background": true,
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: identity-preserve. Edit target: original memory-avatar-chestnut-squirrel. Create form2, middle evolution of three for Memory Match Adventure. Preserve orange squirrel with huge cream cheeks, two visible teeth, joyful open mouth, bushy curled tail and paws holding chestnut in autumn forest and polished dimensional painted game-art style. Evolution: russet woodland waistcoat with broad leaf-shaped olive collar and acorn clasp, compact soft leaf cap between ears. Large coherent readable shapes, distinct silhouette/material structure beyond original. Keep EXACT face center, eye line, head direction/tilt, expression, anatomy, paws/props and portrait scale. Original circular scene and crop retained; artwork footprint x96..416 y96..416 on 512 coordinate square. Scene inside circle, true alpha outside. Upgrade costume or body adornments only, face unobstructed. No zoom out, extra limb, outer frame, badge or pedestal. Square canvas, genuine transparent alpha background. No text, numerals, labels, watermark, emoji, detached glitter or contact sheet. Deliver one asset only.",
+      "master": "design/expedition/art-production/masters/memory-avatar-chestnut-squirrel-form2.png"
+    },
+    {
+      "id": "memory-avatar-chestnut-squirrel",
+      "form": 3,
+      "revision": "r1",
+      "group": 1,
+      "reference": "public/assets/achievements/v1/memory-avatar-chestnut-squirrel-512.webp",
+      "transparent_background": true,
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: identity-preserve. Edit target: original memory-avatar-chestnut-squirrel. Create form3, final evolution of three for Memory Match Adventure. Preserve orange squirrel with huge cream cheeks, two visible teeth, joyful open mouth, bushy curled tail and paws holding chestnut in autumn forest and polished dimensional painted game-art style. Evolution: layered auburn harvest-keeper mantle with cream chestnut-shell collar panels, carved amber acorn clasp and compact autumn-leaf brow circlet. Large coherent readable shapes, distinct silhouette/material structure beyond original and middle form. Keep EXACT face center, eye line, head direction/tilt, expression, anatomy, paws/props and portrait scale. Original circular scene and crop retained; artwork footprint x96..416 y96..416 on 512 coordinate square. Scene inside circle, true alpha outside. Upgrade costume or body adornments only, face unobstructed. No zoom out, extra limb, outer frame, badge or pedestal. Square canvas, genuine transparent alpha background. No text, numerals, labels, watermark, emoji, detached glitter or contact sheet. Deliver one asset only.",
+      "master": "design/expedition/art-production/masters/memory-avatar-chestnut-squirrel-form3.png"
+    },
+    {
+      "id": "memory-frame-autumn-leaves",
+      "form": 2,
+      "revision": "r1",
+      "group": 1,
+      "reference": "public/assets/achievements/v1/memory-frame-autumn-leaves-512.webp",
+      "transparent_background": true,
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: precise-object-edit. Edit target: original memory-frame-autumn-leaves. Create form2, middle evolution of three for Memory Match Adventure. Preserve carved brown wooden ring with orange-red maple leaves, golden oak leaves and clustered acorns and polished dimensional painted game-art style. Evolution: interwoven walnut and chestnut boughs with broad copper maple leaves, warm amber oak-leaf panels and compact acorn clasps. Large coherent readable shapes, distinct silhouette/material structure beyond original. ONE empty frame only. EXACT original inner opening shape, center and usable size. Keep all decorations OUTSIDE opening: no rail, ribbon, branch or bar crossing it. Compact border, outer width at most 1.55 times opening width, at least 5 percent clear margin every side, no cropped tips. Leave separate bottom badge zone clear. Inner opening and exterior true zero-alpha, no scene, avatar, medal, haze, cast shadow or glow cloud. Square canvas, genuine transparent alpha background. No text, numerals, labels, watermark, emoji, detached glitter or contact sheet. Deliver one asset only.",
+      "master": "design/expedition/art-production/masters/memory-frame-autumn-leaves-form2.png"
+    },
+    {
+      "id": "memory-frame-autumn-leaves",
+      "form": 3,
+      "revision": "r1",
+      "group": 1,
+      "reference": "public/assets/achievements/v1/memory-frame-autumn-leaves-512.webp",
+      "transparent_background": true,
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: precise-object-edit. Edit target: original memory-frame-autumn-leaves. Create form3, final evolution of three for Memory Match Adventure. Preserve carved brown wooden ring with orange-red maple leaves, golden oak leaves and clustered acorns and polished dimensional painted game-art style. Evolution: sculpted reddish burlwood boughs with deep amber translucent maple leaves, broad copper oak scrolls and low three-leaf harvest crest. Large coherent readable shapes, distinct silhouette/material structure beyond original and middle form. ONE empty frame only. EXACT original inner opening shape, center and usable size. Keep all decorations OUTSIDE opening: no rail, ribbon, branch or bar crossing it. Compact border, outer width at most 1.55 times opening width, at least 5 percent clear margin every side, no cropped tips. Leave separate bottom badge zone clear. Inner opening and exterior true zero-alpha, no scene, avatar, medal, haze, cast shadow or glow cloud. Square canvas, genuine transparent alpha background. No text, numerals, labels, watermark, emoji, detached glitter or contact sheet. Deliver one asset only.",
+      "master": "design/expedition/art-production/masters/memory-frame-autumn-leaves-form3.png"
+    },
+    {
+      "id": "memory-badge-four-seasons",
+      "form": 2,
+      "revision": "r1",
+      "group": 1,
+      "reference": "public/assets/achievements/v1/memory-badge-four-seasons-512.webp",
+      "transparent_background": true,
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: precise-object-edit. Edit target: original memory-badge-four-seasons. Create form2, middle evolution of three for Memory Match Adventure. Preserve quartered botanical seal: spring green leaf and white blossoms top left, summer green maple top right, icy white maple bottom left, orange autumn maple bottom right and polished dimensional painted game-art style. Evolution: four large raised enamel leaf panels in a thick ivory petal-cross divider, distinct green jade spring/summer, frosted blue-white winter and copper-orange autumn. Large coherent readable shapes, distinct silhouette/material structure beyond original. ONE standalone badge, preserve original central symbols and meaning. Bold emblem readable at 32px, no tiny detached decoration. Match original center and footprint with safe margin. No avatar, surrounding portrait frame or landscape. Square canvas, genuine transparent alpha background. No text, numerals, labels, watermark, emoji, detached glitter or contact sheet. Deliver one asset only.",
+      "master": "design/expedition/art-production/masters/memory-badge-four-seasons-form2.png"
+    },
+    {
+      "id": "memory-badge-four-seasons",
+      "form": 3,
+      "revision": "r1",
+      "group": 1,
+      "reference": "public/assets/achievements/v1/memory-badge-four-seasons-512.webp",
+      "transparent_background": true,
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: precise-object-edit. Edit target: original memory-badge-four-seasons. Create form3, final evolution of three for Memory Match Adventure. Preserve quartered botanical seal: spring green leaf and white blossoms top left, summer green maple top right, icy white maple bottom left, orange autumn maple bottom right and polished dimensional painted game-art style. Evolution: four sculpted crystalline leaf quadrants on a faceted quatrefoil seal with broad pearl dividers: jade spring, emerald summer, icy opal winter, amber autumn. Large coherent readable shapes, distinct silhouette/material structure beyond original and middle form. ONE standalone badge, preserve original central symbols and meaning. Bold emblem readable at 32px, no tiny detached decoration. Match original center and footprint with safe margin. No avatar, surrounding portrait frame or landscape. Square canvas, genuine transparent alpha background. No text, numerals, labels, watermark, emoji, detached glitter or contact sheet. Deliver one asset only.",
+      "master": "design/expedition/art-production/masters/memory-badge-four-seasons-form3.png"
+    },
+    {
+      "id": "memory-avatar-snow-rabbit",
+      "form": 2,
+      "revision": "r1",
+      "group": 2,
+      "reference": "public/assets/achievements/v1/memory-avatar-snow-rabbit-512.webp",
+      "transparent_background": true,
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: identity-preserve. Edit target: original memory-avatar-snow-rabbit. Create form2, middle evolution of three for Memory Match Adventure. Preserve white blue-eyed rabbit with pink nose, open happy mouth and paws on snowy evergreen branch, upright ears in snowy forest and polished dimensional painted game-art style. Evolution: soft ice-blue winter cape with broad pearl fleece collar and single snow-crystal clasp beneath chin, low knitted blue ear-base band. Large coherent readable shapes, distinct silhouette/material structure beyond original. Keep EXACT face center, eye line, head direction/tilt, expression, anatomy, paws/props and portrait scale. Original circular scene and crop retained; artwork footprint x96..416 y96..416 on 512 coordinate square. Scene inside circle, true alpha outside. Upgrade costume or body adornments only, face unobstructed. No zoom out, extra limb, outer frame, badge or pedestal. Square canvas, genuine transparent alpha background. No text, numerals, labels, watermark, emoji, detached glitter or contact sheet. Deliver one asset only.",
+      "master": "design/expedition/art-production/masters/memory-avatar-snow-rabbit-form2.png"
+    },
+    {
+      "id": "memory-avatar-snow-rabbit",
+      "form": 3,
+      "revision": "r1",
+      "group": 2,
+      "reference": "public/assets/achievements/v1/memory-avatar-snow-rabbit-512.webp",
+      "transparent_background": true,
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: identity-preserve. Edit target: original memory-avatar-snow-rabbit. Create form3, final evolution of three for Memory Match Adventure. Preserve white blue-eyed rabbit with pink nose, open happy mouth and paws on snowy evergreen branch, upright ears in snowy forest and polished dimensional painted game-art style. Evolution: layered deep glacier-blue snow-keeper mantle with broad white fur shoulder panels, carved opal snowflake clasp and low ice-crystal ear-base diadem. Large coherent readable shapes, distinct silhouette/material structure beyond original and middle form. Keep EXACT face center, eye line, head direction/tilt, expression, anatomy, paws/props and portrait scale. Original circular scene and crop retained; artwork footprint x96..416 y96..416 on 512 coordinate square. Scene inside circle, true alpha outside. Upgrade costume or body adornments only, face unobstructed. No zoom out, extra limb, outer frame, badge or pedestal. Square canvas, genuine transparent alpha background. No text, numerals, labels, watermark, emoji, detached glitter or contact sheet. Deliver one asset only.",
+      "master": "design/expedition/art-production/masters/memory-avatar-snow-rabbit-form3.png"
+    },
+    {
+      "id": "memory-frame-frosted-branch",
+      "form": 2,
+      "revision": "r1",
+      "group": 2,
+      "reference": "public/assets/achievements/v1/memory-frame-frosted-branch-512.webp",
+      "transparent_background": true,
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: precise-object-edit. Edit target: original memory-frame-frosted-branch. Create form2, middle evolution of three for Memory Match Adventure. Preserve silver-gold frosted branch ring with ivory buds and pale ice-blue crystal leaves and polished dimensional painted game-art style. Evolution: two interwoven silver birch twigs with broad pale-blue translucent ice leaves, ivory pearl buds and compact silver frost clasps. Large coherent readable shapes, distinct silhouette/material structure beyond original. ONE empty frame only. EXACT original inner opening shape, center and usable size. Keep all decorations OUTSIDE opening: no rail, ribbon, branch or bar crossing it. Compact border, outer width at most 1.55 times opening width, at least 5 percent clear margin every side, no cropped tips. Leave separate bottom badge zone clear. Inner opening and exterior true zero-alpha, no scene, avatar, medal, haze, cast shadow or glow cloud. Square canvas, genuine transparent alpha background. No text, numerals, labels, watermark, emoji, detached glitter or contact sheet. Deliver one asset only.",
+      "master": "design/expedition/art-production/masters/memory-frame-frosted-branch-form2.png"
+    },
+    {
+      "id": "memory-frame-frosted-branch",
+      "form": 3,
+      "revision": "r1",
+      "group": 2,
+      "reference": "public/assets/achievements/v1/memory-frame-frosted-branch-512.webp",
+      "transparent_background": true,
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: precise-object-edit. Edit target: original memory-frame-frosted-branch. Create form3, final evolution of three for Memory Match Adventure. Preserve silver-gold frosted branch ring with ivory buds and pale ice-blue crystal leaves and polished dimensional painted game-art style. Evolution: sculpted platinum frost boughs with broad faceted glacier-blue leaf fans, opal buds and a low three-crystal frost crest. Large coherent readable shapes, distinct silhouette/material structure beyond original and middle form. ONE empty frame only. EXACT original inner opening shape, center and usable size. Keep all decorations OUTSIDE opening: no rail, ribbon, branch or bar crossing it. Compact border, outer width at most 1.55 times opening width, at least 5 percent clear margin every side, no cropped tips. Leave separate bottom badge zone clear. Inner opening and exterior true zero-alpha, no scene, avatar, medal, haze, cast shadow or glow cloud. Square canvas, genuine transparent alpha background. No text, numerals, labels, watermark, emoji, detached glitter or contact sheet. Deliver one asset only.",
+      "master": "design/expedition/art-production/masters/memory-frame-frosted-branch-form3.png"
+    },
+    {
+      "id": "memory-avatar-honey-bear",
+      "form": 2,
+      "revision": "r1",
+      "group": 2,
+      "reference": "public/assets/achievements/v1/memory-avatar-honey-bear-512.webp",
+      "transparent_background": true,
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: identity-preserve. Edit target: original memory-avatar-honey-bear. Create form2, middle evolution of three for Memory Match Adventure. Preserve warm brown smiling bear with amber eyes, round ears, large dark nose, paws beside dripping honey pot in flowered forest and polished dimensional painted game-art style. Evolution: moss-green beekeeper vest with broad cream canvas collar, honeycomb clasp and compact soft straw cap above brows. Large coherent readable shapes, distinct silhouette/material structure beyond original. Keep EXACT face center, eye line, head direction/tilt, expression, anatomy, paws/props and portrait scale. Original circular scene and crop retained; artwork footprint x96..416 y96..416 on 512 coordinate square. Scene inside circle, true alpha outside. Upgrade costume or body adornments only, face unobstructed. No zoom out, extra limb, outer frame, badge or pedestal. Square canvas, genuine transparent alpha background. No text, numerals, labels, watermark, emoji, detached glitter or contact sheet. Deliver one asset only.",
+      "master": "design/expedition/art-production/masters/memory-avatar-honey-bear-form2.png"
+    },
+    {
+      "id": "memory-avatar-honey-bear",
+      "form": 3,
+      "revision": "r1",
+      "group": 2,
+      "reference": "public/assets/achievements/v1/memory-avatar-honey-bear-512.webp",
+      "transparent_background": true,
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: identity-preserve. Edit target: original memory-avatar-honey-bear. Create form3, final evolution of three for Memory Match Adventure. Preserve warm brown smiling bear with amber eyes, round ears, large dark nose, paws beside dripping honey pot in flowered forest and polished dimensional painted game-art style. Evolution: structured amber-and-olive woodland apiary coat with broad ivory canvas shoulder panels, carved honeycomb clasp and low woven straw brim hat leaving ears visible. Large coherent readable shapes, distinct silhouette/material structure beyond original and middle form. Keep EXACT face center, eye line, head direction/tilt, expression, anatomy, paws/props and portrait scale. Original circular scene and crop retained; artwork footprint x96..416 y96..416 on 512 coordinate square. Scene inside circle, true alpha outside. Upgrade costume or body adornments only, face unobstructed. No zoom out, extra limb, outer frame, badge or pedestal. Square canvas, genuine transparent alpha background. No text, numerals, labels, watermark, emoji, detached glitter or contact sheet. Deliver one asset only.",
+      "master": "design/expedition/art-production/masters/memory-avatar-honey-bear-form3.png"
+    },
+    {
+      "id": "memory-frame-golden-honeycomb",
+      "form": 2,
+      "revision": "r1",
+      "group": 2,
+      "reference": "public/assets/achievements/v1/memory-frame-golden-honeycomb-512.webp",
+      "transparent_background": true,
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: precise-object-edit. Edit target: original memory-frame-golden-honeycomb. Create form2, middle evolution of three for Memory Match Adventure. Preserve golden honeycomb ring filled with glowing amber honey, small white blossoms, green leaves and honey drops and polished dimensional painted game-art style. Evolution: two compact staggered rows of thick golden beeswax hexagons with amber resin cells and broad ivory blossom corner clasps. Large coherent readable shapes, distinct silhouette/material structure beyond original. ONE empty frame only. EXACT original inner opening shape, center and usable size. Keep all decorations OUTSIDE opening: no rail, ribbon, branch or bar crossing it. Compact border, outer width at most 1.55 times opening width, at least 5 percent clear margin every side, no cropped tips. Leave separate bottom badge zone clear. Inner opening and exterior true zero-alpha, no scene, avatar, medal, haze, cast shadow or glow cloud. Square canvas, genuine transparent alpha background. No text, numerals, labels, watermark, emoji, detached glitter or contact sheet. Deliver one asset only.",
+      "master": "design/expedition/art-production/masters/memory-frame-golden-honeycomb-form2.png"
+    },
+    {
+      "id": "memory-frame-golden-honeycomb",
+      "form": 3,
+      "revision": "r1",
+      "group": 2,
+      "reference": "public/assets/achievements/v1/memory-frame-golden-honeycomb-512.webp",
+      "transparent_background": true,
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: precise-object-edit. Edit target: original memory-frame-golden-honeycomb. Create form3, final evolution of three for Memory Match Adventure. Preserve golden honeycomb ring filled with glowing amber honey, small white blossoms, green leaves and honey drops and polished dimensional painted game-art style. Evolution: sculpted dark-amber crystalline honeycomb cells in a warm wax-gold lattice, bold ivory flower clusters and low three-cell honey crest. Large coherent readable shapes, distinct silhouette/material structure beyond original and middle form. ONE empty frame only. EXACT original inner opening shape, center and usable size. Keep all decorations OUTSIDE opening: no rail, ribbon, branch or bar crossing it. Compact border, outer width at most 1.55 times opening width, at least 5 percent clear margin every side, no cropped tips. Leave separate bottom badge zone clear. Inner opening and exterior true zero-alpha, no scene, avatar, medal, haze, cast shadow or glow cloud. Square canvas, genuine transparent alpha background. No text, numerals, labels, watermark, emoji, detached glitter or contact sheet. Deliver one asset only.",
+      "master": "design/expedition/art-production/masters/memory-frame-golden-honeycomb-form3.png"
+    },
+    {
+      "id": "memory-badge-forest-guardian",
+      "form": 2,
+      "revision": "r1",
+      "group": 2,
+      "reference": "public/assets/achievements/v1/memory-badge-forest-guardian-512.webp",
+      "transparent_background": true,
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: precise-object-edit. Edit target: original memory-badge-forest-guardian. Create form2, middle evolution of three for Memory Match Adventure. Preserve wooden shield with central green oak leaf, amber oval gem below, gold curling branches and paired acorns and polished dimensional painted game-art style. Evolution: carved walnut shield with one large raised jade oak leaf, broad copper bough edges and amber acorn clasp, two compact acorn clusters. Large coherent readable shapes, distinct silhouette/material structure beyond original. ONE standalone badge, preserve original central symbols and meaning. Bold emblem readable at 32px, no tiny detached decoration. Match original center and footprint with safe margin. No avatar, surrounding portrait frame or landscape. Square canvas, genuine transparent alpha background. No text, numerals, labels, watermark, emoji, detached glitter or contact sheet. Deliver one asset only.",
+      "master": "design/expedition/art-production/masters/memory-badge-forest-guardian-form2.png"
+    },
+    {
+      "id": "memory-badge-forest-guardian",
+      "form": 3,
+      "revision": "r1",
+      "group": 2,
+      "reference": "public/assets/achievements/v1/memory-badge-forest-guardian-512.webp",
+      "transparent_background": true,
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: precise-object-edit. Edit target: original memory-badge-forest-guardian. Create form3, final evolution of three for Memory Match Adventure. Preserve wooden shield with central green oak leaf, amber oval gem below, gold curling branches and paired acorns and polished dimensional painted game-art style. Evolution: faceted dark-burlwood guardian shield with large emerald oak leaf, sculpted branching gold-wood antler shoulders and deep amber heart gem. Large coherent readable shapes, distinct silhouette/material structure beyond original and middle form. ONE standalone badge, preserve original central symbols and meaning. Bold emblem readable at 32px, no tiny detached decoration. Match original center and footprint with safe margin. No avatar, surrounding portrait frame or landscape. Square canvas, genuine transparent alpha background. No text, numerals, labels, watermark, emoji, detached glitter or contact sheet. Deliver one asset only.",
+      "master": "design/expedition/art-production/masters/memory-badge-forest-guardian-form3.png"
+    },
+    {
+      "id": "memory-avatar-dawn-crane",
+      "form": 2,
+      "revision": "r1",
+      "group": 2,
+      "reference": "public/assets/achievements/v1/memory-avatar-dawn-crane-512.webp",
+      "transparent_background": true,
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: identity-preserve. Edit target: original memory-avatar-dawn-crane. Create form2, middle evolution of three for Memory Match Adventure. Preserve white crane with long pointed golden beak facing right, amber eye, red brow stripe and flowing head feathers beside golden dawn lake and reeds and polished dimensional painted game-art style. Evolution: broad pearl-and-peach feather collar with smooth copper reed-shaped shoulder bands and a compact warm amber clasp low on neck. Large coherent readable shapes, distinct silhouette/material structure beyond original. Keep EXACT face center, eye line, head direction/tilt, expression, anatomy, paws/props and portrait scale. Original circular scene and crop retained; artwork footprint x96..416 y96..416 on 512 coordinate square. Scene inside circle, true alpha outside. Upgrade costume or body adornments only, face unobstructed. No zoom out, extra limb, outer frame, badge or pedestal. Square canvas, genuine transparent alpha background. No text, numerals, labels, watermark, emoji, detached glitter or contact sheet. Deliver one asset only.",
+      "master": "design/expedition/art-production/masters/memory-avatar-dawn-crane-form2.png"
+    },
+    {
+      "id": "memory-avatar-dawn-crane",
+      "form": 3,
+      "revision": "r1",
+      "group": 2,
+      "reference": "public/assets/achievements/v1/memory-avatar-dawn-crane-512.webp",
+      "transparent_background": true,
+      "status": "generated-pending-alignment-qa",
+      "prompt": "Use case: identity-preserve. Edit target: original memory-avatar-dawn-crane. Create form3, final evolution of three for Memory Match Adventure. Preserve white crane with long pointed golden beak facing right, amber eye, red brow stripe and flowing head feathers beside golden dawn lake and reeds and polished dimensional painted game-art style. Evolution: layered ivory-gold sunlit feather mantle with broad rose-gold reed panels and sculpted low amber sunrise brow ornament following original head feathers. Large coherent readable shapes, distinct silhouette/material structure beyond original and middle form. Keep EXACT face center, eye line, head direction/tilt, expression, anatomy, paws/props and portrait scale. Original circular scene and crop retained; artwork footprint x96..416 y96..416 on 512 coordinate square. Scene inside circle, true alpha outside. Upgrade costume or body adornments only, face unobstructed. No zoom out, extra limb, outer frame, badge or pedestal. Square canvas, genuine transparent alpha background. No text, numerals, labels, watermark, emoji, detached glitter or contact sheet. Deliver one asset only.",
+      "master": "design/expedition/art-production/masters/memory-avatar-dawn-crane-form3.png"
+    }
+  ]
+}

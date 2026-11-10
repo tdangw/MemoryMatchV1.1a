@@ -11,26 +11,38 @@ const element = (tag, className, text) => {
   return node;
 };
 
-function picture(url, className, label = '') {
+function picture(url, className, label = '', fallback) {
   const image = element('img', className);
   image.src = url; image.alt = label; image.decoding = 'async';
   image.width = image.height = 256;
+  if(fallback)image.onerror=()=>{
+    image.onerror=()=>{image.onerror=null;const icon=createIcon('account');icon.classList.add(className);icon.setAttribute('aria-label',label);image.replaceWith(icon);};
+    if(fallback!==url)image.src=fallback;else image.onerror();
+  };
   return image;
 }
 
 /** All three layers share the catalog's untrimmed 512px coordinate system. */
-export function createCosmeticPortrait({ avatar, frame, badge, label = 'Ảnh đại diện' }) {
+export function createCosmeticPortrait({ avatar, frame, badge, fallbacks = {}, label = 'Ảnh đại diện' }) {
   const root = element('span', 'storybook-portrait');
   root.setAttribute('role', 'img'); root.setAttribute('aria-label', label);
   if (avatar) {
     const image = picture(avatar, 'storybook-portrait__avatar');
-    image.addEventListener('error', () => { image.remove(); root.prepend(createIcon('account')); }, { once: true });
+    image.onerror = () => {
+      image.onerror = () => { image.onerror=null;image.remove();root.prepend(createIcon('account')); };
+      if(fallbacks.avatar&&fallbacks.avatar!==avatar)image.src=fallbacks.avatar;
+      else image.onerror();
+    };
     root.append(image);
   }
   else root.append(createIcon('account'));
   for (const [slot, url] of [['frame', frame], ['badge', badge]]) if (url) {
     const image = picture(url, `storybook-portrait__${slot}`);
-    image.addEventListener('error', () => image.remove(), { once: true }); root.append(image);
+    image.onerror = () => {
+      image.onerror = () => {image.onerror=null;image.remove();};
+      if(fallbacks[slot]&&fallbacks[slot]!==url)image.src=fallbacks[slot];
+      else image.onerror();
+    };root.append(image);
   }
   return root;
 }
@@ -76,6 +88,7 @@ export function openCosmeticCustomization({ playerName, items, equipped, onSave,
   const content = element('div', 'storybook-customization');
   const hero = element('div', 'storybook-customization__hero');
   const name = element('h3', 'storybook-customization__name', playerName);
+  const formsButton=element('button','tab-button','Xem hình thái');formsButton.type='button';
   const tabs = element('div', 'storybook-tabs'); tabs.setAttribute('role', 'tablist'); tabs.setAttribute('aria-label', 'Đồ hồ sơ');
   const grid = element('div', 'storybook-inventory'); grid.setAttribute('role', 'tabpanel'); grid.id = 'storybook-cosmetics-grid';
   const error = element('p', 'storybook-customization__error'); error.setAttribute('role', 'alert');
@@ -84,11 +97,13 @@ export function openCosmeticCustomization({ playerName, items, equipped, onSave,
   previous.type = next.type = 'button';
   const pageLabel = element('span', 'storybook-inventory-page'); pageLabel.setAttribute('aria-live', 'polite');
   navigation.append(previous, pageLabel, next);
-  content.append(hero, name, tabs, element('p','storybook-customization__hint','Chọn một món để trang bị; chọn lại để bỏ.'), grid, navigation, error);
+  content.append(hero, name, tabs, formsButton, element('p','storybook-customization__hint','Chọn một món để trang bị; chọn lại để bỏ.'), grid, navigation, error);
   const tabButtons = [];
   function render() {
     const selected = slot => { const item = items.find(item => item.id === draft[slot]); return item?.previewImage || item?.image; };
-    hero.replaceChildren(createCosmeticPortrait({ avatar: selected('avatar'), frame: selected('frame'), badge: selected('badge'), label: playerName }));
+    const original=slot=>items.find(item=>item.id===draft[slot])?.originalPreviewImage;
+    hero.replaceChildren(createCosmeticPortrait({ avatar: selected('avatar'), frame: selected('frame'), badge: selected('badge'),fallbacks:{avatar:original('avatar'),frame:original('frame'),badge:original('badge')},label: playerName }));
+    formsButton.disabled=!items.find(item=>item.id===draft[category])?.formImages;
     for (const button of tabButtons) {
       const active = button.dataset.category === category;
       button.setAttribute('aria-selected', String(active)); button.tabIndex = active ? 0 : -1;
@@ -104,14 +119,21 @@ export function openCosmeticCustomization({ playerName, items, equipped, onSave,
       const button = element('button', 'storybook-item'); button.type = 'button';
       button.dataset.itemId = item.id; button.disabled = !item.owned;
       button.setAttribute('aria-pressed', String(draft[category] === item.id));
-      if (item.type === 'frame') button.append(createCosmeticPortrait({ avatar: selected('avatar'), frame: item.image }));
-      else button.append(picture(item.image, 'storybook-item__image'));
+      if (item.type === 'frame') button.append(createCosmeticPortrait({ avatar: selected('avatar'), frame: item.image,fallbacks:{avatar:original('avatar'),frame:item.originalImage} }));
+      else button.append(picture(item.image, 'storybook-item__image','',item.originalImage));
       button.append(element('strong', 'storybook-item__name', item.name), element('small', 'storybook-item__source', Number.isSafeInteger(item.level) ? `${item.gameName} · Màn ${item.level}` : item.gameName));
+      if(item.owned && item.cosmeticLevelLabel)button.append(element('span','storybook-item__level',item.cosmeticLevelLabel));
       if (!item.owned) button.append(createIcon('lock'));
       else if (draft[category] === item.id) button.append(createIcon('check'));
       return button;
     }));
   }
+  scope.listen(formsButton,'click',()=>{
+    const item=items.find(item=>item.id===draft[category]);if(!item?.formImages)return;
+    const content=element('div','storybook-cosmetic-forms');
+    for(const form of item.formImages){const figure=element('figure');figure.append(picture(form.image,'storybook-cosmetic-forms__image',item.name,form.fallback),element('figcaption','',form.label));content.append(figure);}
+    openAppModal({id:'cosmetic-forms-modal',title:item.name,content,owner:scope,alignment:'center'});
+  });
   for (const [id, label] of Object.entries(categoryNames)) {
     const button = element('button', 'storybook-tab', label); button.type = 'button';
     button.dataset.category = id; button.id = `storybook-tab-${id}`;

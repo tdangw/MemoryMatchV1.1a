@@ -4,10 +4,10 @@ import { isNativeGoogle, getNativeGoogleCredential, clearNativeGoogleSession } f
 import { setDoc, onSnapshot } from 'firebase/firestore';
 import { clearAccountGameData, saveAccountResetMetadata } from './persistence.js';
 import { operationRef, loadLocalAccountOperation, saveLocalAccountOperation, readAccountOperation, startAccountOperation, eraseAccountData } from './accountDataOperations.js';
-import { getFirebaseBackend } from "./firebaseBackend.js";
+import { getFirebaseBackend, getFirebaseEnvironment } from "./firebaseBackend.js";
 import { encodeCloudSnapshot } from "./cloudSnapshot.js";
 import { readCloudRoot, readCloudSnapshot, publishCloudSnapshot, collectCloudObjects, CloudConflictError, observeCloudRoot } from "./cloudStore.js";
-import { exportPersistentSnapshot, loadSyncMetadata, saveSyncMetadata, updateSyncMetadata, importPersistentSnapshot, getLocalRestoreBackups, loadProfileOwner, subscribeToLocalCommit } from "./persistence.js";
+import { exportPersistentSnapshot, loadPersistentGameData, loadSyncMetadata, saveSyncMetadata, updateSyncMetadata, importPersistentSnapshot, getLocalRestoreBackups, loadProfileOwner, subscribeToLocalCommit } from "./persistence.js";
 import { createGameShellLifecycle, getActiveGameScope, clearShellTimeout } from "./gameShell/gameShellLifecycle.js";
 import { getAppPageScope, subscribeToAppPages } from "./appPageLifecycle.js";
 import { replaceProfileSafely, waitForProfileReplacement } from "./profileOperations.js";
@@ -28,7 +28,7 @@ export function getAccountService() { return instance; }
 function createAccountService(options) {
   const scope = createGameShellLifecycle();
   const listeners = new Set();
-  const state = { phase: "connecting", uid: null, isAnonymous: true, playerName: "", environment: "local", message: "Đang kết nối tài khoản…", lastSavedAt: null, operations: null };
+  const state = { phase: "connecting", uid: null, isAnonymous: true, playerName: "", environment: getFirebaseEnvironment(), message: "Đang kết nối tài khoản…", lastSavedAt: null, operations: null };
   let backend = null;
   let metadata = null;
   let owner = null;
@@ -83,6 +83,11 @@ function createAccountService(options) {
     }
     const offline = !navigator.onLine || ["unavailable", "auth/network-request-failed", "deadline-exceeded"].includes(error.code);
     setPhase(offline ? "offline" : "error", offline ? "Đang offline. Bản máy vẫn được lưu; sẽ gửi lại khi kết nối." : "Chưa đồng bộ được. Bản máy vẫn được giữ nguyên.");
+    if (['permission-denied','unauthenticated','rewards/unsupported-candidate'].includes(error.code)) {
+      retries = MAX_RETRIES;
+      if (scheduled) {clearShellTimeout(scheduled.handle);scheduled = null;}
+      return;
+    }
     retries += 1;
     if (navigator.onLine && retries < MAX_RETRIES) scheduleSync(Math.min(900000, AUTO_SYNC_INTERVAL_MS * 2 ** retries));
   }
@@ -119,15 +124,15 @@ function createAccountService(options) {
     const preview = root ? await readCloudSnapshot(backend.database, state.environment, state.uid, { ...root, manifest: { profile: root.manifest.profile } }, () => current(id)) : null;
     if (!current(id)) return;
     pending = { root, preview, notifiedOwner: null };
-    setPhase("conflict", "Đang tải tiến trình…");
+    setPhase("conflict", "Đã lưu trên máy. Có dữ liệu cần đối chiếu.");
     notifyConflict();
   }
-  function notifyConflict() {
+  function notifyConflict(interactive=false) {
     const page = getAppPageScope();
-    if (!pending || state.phase === "restoring" || getActiveGameScope() || !page?.active || pending.notifiedOwner === page) return;
+    if (!pending || state.phase === "restoring" || getActiveGameScope() || !page?.active) return;
+    if(!interactive)return;
     pending.notifiedOwner = page;
-    const id = generation;
-    void chooseConflict("cloud").catch(error => { if (current(id)) handleFailure(error); });
+    options.onConflict?.({root:pending.root,cloud:pending.preview?.profile.data||null,choose:chooseConflict});
   }
   async function bindUser(user, force = false) {
     if (!scope.active) return;
@@ -182,7 +187,8 @@ function createAccountService(options) {
     if(metadata?.uid===user.uid && metadata.restoreNeedsReconcile && root){await pendingConflict(root,id);return;}
     let snapshot = await exportPersistentSnapshot();
     const rewardOwner = snapshot.profile.data.appearance.spark?.ownerUid;
-    if (rewardOwner && rewardOwner !== user.uid && !root) {
+    const localGuestRewards=rewardOwner===owner.id&&(!owner.uid||owner.uid===user.uid)&&snapshot.profile.data.appearance.spark?.offline?.profileId===owner.id;
+    if (rewardOwner && rewardOwner !== user.uid && !localGuestRewards && !root) {
       if (getActiveGameScope()) throw new Error('Hãy về trang chính để đổi tài khoản. Bản máy được giữ nguyên.');
       const next = { uid:user.uid, profileId:crypto.randomUUID(), cloudRevision:0, fingerprint:null,
         playerName:defaultName(user.uid), lastSyncedLocalRevision:0 };
@@ -253,7 +259,7 @@ function createAccountService(options) {
       try { await binding; } catch (error) { if (current(id, user.uid)) handleFailure(error); }
       return false;
     }
-    if (!backend || !state.uid || metadata?.uid !== state.uid || pending) { notifyConflict(); return false; }
+    if (!backend || !state.uid || metadata?.uid !== state.uid || pending) { notifyConflict(manual); return false; }
     if (manual) retries = 0;
     const minimum = manual ? 15000 : AUTO_SYNC_INTERVAL_MS;
     if (!force && Date.now() - lastUploadAt < minimum) {
@@ -272,10 +278,18 @@ function createAccountService(options) {
       setPhase("syncing", "Đang sao lưu…");
       await clearWork(uid, id);
       const snapshot = await exportPersistentSnapshot();
+      const rewardOperation=await loadSyncMetadata(`sparkPending:${state.environment}:${uid}:${owner.id}`);
+      const snapshotRewards=snapshot.profile.data.appearance.spark?.syncPolicy==='snapshot-v1';
+      if(!snapshotRewards&&(snapshot.profile.data.appearance.spark?.offline||rewardOperation)){
+        window.dispatchEvent(new Event('liveopssyncrequired'));
+        setPhase('waiting','Đã lưu trên máy. Đang đồng bộ phần thưởng.');
+        return false;
+      }
       const encoded = await encodeCloudSnapshot(snapshot);
       if (!current(id, uid)) return false;
       const result = await publishCloudSnapshot({
-        rewardRevision: snapshot.profile.data.appearance.spark?.state?.revision || 0,
+        snapshotRewards,
+        rewardRevision: snapshot.profile.data.appearance.spark?.offline?.baseRevision ?? snapshot.profile.data.appearance.spark?.state?.revision ?? 0,
         economyRevision: snapshot.profile.data.appearance.spark?.economyRevision || 0,
         database: backend.database, environment: state.environment, uid, encoded,
         expectedRevision: metadata.cloudRevision, playerName: state.playerName,
@@ -341,6 +355,9 @@ function createAccountService(options) {
       });
     } else {
       if(metadata.restoreNeedsReconcile)throw new Error('Bản phục hồi cần được đối chiếu với tiến trình đã đồng bộ.');
+      const local=await loadPersistentGameData();
+      if(local.appearance.spark?.syncPolicy!=='snapshot-v1'&&local.appearance.spark?.offline&&local.appearance.spark.offline.baseRevision!==latest?.rewardRevision)
+        throw new Error('Phần thưởng trên thiết bị đang chờ đối chiếu. Bạn vẫn có thể tiếp tục chơi bằng bản máy.');
       if (!await persistMetadata(next, id)) return false;
       if (!current(id, uid)) return false;
       pending = null; options.onConflictCleared?.(); state.playerName = next.playerName;
@@ -605,16 +622,24 @@ function createAccountService(options) {
     const root = remoteRoot; remoteRoot = null;
     if (root.revision > (metadata?.cloudRevision || 0)) {
       const id = generation; const uid = state.uid;
-      void pendingConflict(root, id).catch(error => { if (current(id, uid)) handleFailure(error); });
+      const profileId=metadata.profileId;
+      void Promise.all([loadSyncMetadata(`sparkPending:${state.environment}:${uid}:${profileId}`),loadPersistentGameData()]).then(async ([operation,data])=>{
+        if(!current(id,uid)||metadata?.profileId!==profileId||pending)return;
+        if(data.appearance.spark?.syncPolicy!=='snapshot-v1'&&(operation||data.appearance.spark?.offline?.profileId===profileId)){
+          window.dispatchEvent(new Event('liveopssyncrequired'));return;
+        }
+        await pendingConflict(root,id);
+      }).catch(error=>{if(current(id,uid))handleFailure(error);});
     }
   }
   async function runRewardOperation(operation) {
     if (erasureTask || loadLocalAccountOperation()) throw new Error('Hãy hoàn tất yêu cầu xóa trước.');
     if (networkTask) await networkTask;
-    if (!backend || !metadata || metadata.uid !== state.uid || pending || getActiveGameScope()) throw new Error('Hãy hoàn tất đồng bộ trước khi nhận thưởng.');
+    if(pending)throw Object.assign(new Error('Bản máy được giữ để đối chiếu. Bạn vẫn có thể chơi và dùng quà đã lưu.'),{code:'rewards/replay-conflict'});
+    if (!backend || !metadata || metadata.uid !== state.uid || getActiveGameScope()) throw new Error('Hãy hoàn tất đồng bộ trước khi nhận thưởng.');
     const id = generation, uid = state.uid, profileId = metadata.profileId;
-    const owns = () => current(id, uid) && metadata?.profileId === profileId && !pending && !getActiveGameScope();
-    const task = replaceProfileSafely(async () => {
+    const owns = () => current(id, uid) && metadata?.profileId === profileId && !pending;
+    const task = (async () => {
       if (!owns()) throw new Error('Tài khoản đã thay đổi.');
       const durableMetadata=await loadSyncMetadata(state.environment);
       if(durableMetadata?.restoreNeedsReconcile)throw new Error('Bản phục hồi cần được đối chiếu trước khi nhận thưởng.');
@@ -627,7 +652,7 @@ function createAccountService(options) {
         setPhase('synced', 'Đã sao lưu.');
       }
       return result;
-    });
+    })();
     networkTask = task;
     try { return await task; }
     catch (error) { if (owns() && error instanceof CloudConflictError) await pendingConflict(error.root, id); throw error; }
@@ -635,6 +660,8 @@ function createAccountService(options) {
   }
   const service = {
     ready: null,
+    getLocalIdentity: () => scope.active && owner && !erasureTask && !logoutTask && !loadLocalAccountOperation()
+      ? {uid:owner.uid || owner.id,profileId:owner.id,environment:state.environment} : null,
     getState: publicState,
     getIdentity: () => !['connecting', 'restoring', 'erasing', 'erasure-pending', 'signing-out', 'logout-pending'].includes(state.phase) && !erasureTask && !logoutTask && !loadLocalAccountOperation() && metadata?.uid === state.uid && state.uid && backend.auth.currentUser?.uid === state.uid ? { uid: state.uid, profileId: metadata.profileId, firstUid: owner?.firstUid || owner?.uid || state.uid, playerName: state.playerName, environment: state.environment, createdAt: Date.parse(backend.auth.currentUser.metadata.creationTime) || null } : null,
     subscribe(listener) { listeners.add(listener); listener(publicState()); return () => listeners.delete(listener); },

@@ -1,6 +1,6 @@
     function emptyChestCounts() { return {'c':0,'frame':0,'avatar':0,'badge':0}; }
     function emptyChests() { return {'version':1,'earned':emptyChestCounts(),'spent':emptyChestCounts(),'sourceEarned':emptyChestCounts(),'sequence':0,'last':null}; }
-    function emptyFestival() { return {'version':1,'earnedTotal':0,'completedCycles':0,'mask':0}; }
+    function emptyFestival() { return {'version':FESTIVAL_CURRENT_VERSION,'earnedTotal':0,'completedCycles':0,'mask':0}; }
     function chestCountMap(n) {
       return n is map && n.keys().hasOnly(['c','frame','avatar','badge']) && n.keys().hasAll(['c','frame','avatar','badge'])
         && rewardInt(n.c) && rewardInt(n.frame) && rewardInt(n.avatar) && rewardInt(n.badge);
@@ -11,18 +11,25 @@
         && n.spent.c <= n.earned.c && n.spent.frame <= n.earned.frame && n.spent.avatar <= n.earned.avatar && n.spent.badge <= n.earned.badge
         && n.sequence == n.spent.c + n.spent.frame + n.spent.avatar + n.spent.badge;
     }
+    function festivalAllMask(version) { return FESTIVAL_ALL_MASK; }
+    function festivalThreshold(version,delta) { return FESTIVAL_THRESHOLD; }
+    function festivalChest(version,delta) { return FESTIVAL_CHEST; }
     function festivalValid(n) {
-      return n.keys().hasOnly(['version','earnedTotal','completedCycles','mask']) && n.version == 1
+      return n.keys().hasOnly(['version','earnedTotal','completedCycles','mask']) && n.version in [1,FESTIVAL_CURRENT_VERSION]
         && rewardInt(n.earnedTotal) && rewardInt(n.completedCycles) && n.earnedTotal >= n.completedCycles * 100
-        && n.mask is int && n.mask >= 0 && n.mask < 15
-        && (n.mask % 2 == 0 || n.earnedTotal - n.completedCycles * 100 >= 25)
-        && (int(n.mask / 2) % 2 == 0 || n.earnedTotal - n.completedCycles * 100 >= 50)
-        && (int(n.mask / 4) % 2 == 0 || n.earnedTotal - n.completedCycles * 100 >= 75)
-        && (int(n.mask / 8) % 2 == 0 || n.earnedTotal - n.completedCycles * 100 >= 100);
+        && n.mask is int && n.mask >= 0 && n.mask < festivalAllMask(n.version)
+        && (FESTIVAL_MASK_REQUIREMENTS);
     }
     function chestBase(n,o,fields) {
-      return n.diff(o).affectedKeys().hasOnly(fields.concat(['revision','rootRevision','fingerprint','updatedAt']))
-        && n.revision == o.revision + 1 && n.updatedAt == request.time && n.day == int(request.time.toMillis() / 86400000);
+      return rewardBase(n,o,fields,n.diff(o).affectedKeys());
+    }
+    function rewardBase(n,o,fields,changed) {
+      return changed.hasOnly(fields.concat(['revision','rootRevision','fingerprint','updatedAt']))
+        && rewardRevision(n,o);
+    }
+    function rewardRevision(n,o) {
+      return n.revision == o.revision + 1 && n.updatedAt == request.time
+        && (n.day == int(request.time.toMillis() / 86400000) || n.day == o.day && n.day < int(request.time.toMillis() / 86400000));
     }
     function rewardChestInit(n,o) {
       return !o.keys().hasAny(['chests','festival']) && chestBase(n,o,['chests','festival'])
@@ -39,42 +46,68 @@
     }
     function rewardFestivalEarn(n,o) {
       return chestBase(n,o,['festival']) && festivalValid(n.festival) && n.festival.completedCycles == o.festival.completedCycles
-        && n.festival.mask == o.festival.mask && n.festival.earnedTotal >= o.festival.earnedTotal;
+        && n.festival.version == o.festival.version && n.festival.mask == o.festival.mask && n.festival.earnedTotal >= o.festival.earnedTotal;
     }
     function rewardFestivalClaim(n,o) {
       let prior = o.festival;
       let next = n.festival;
-      let delta = next.completedCycles == prior.completedCycles ? next.mask - prior.mask : 15 - prior.mask;
-      let threshold = delta == 1 ? 25 : delta == 2 ? 50 : delta == 4 ? 75 : 100;
-      let type = delta == 2 ? 'c' : delta == 4 ? 'frame' : 'avatar';
-      return chestBase(n,o,['festival','chests']) && festivalValid(next) && next.earnedTotal == prior.earnedTotal
-        && (next.completedCycles == prior.completedCycles && next.mask > prior.mask
-          || next.completedCycles == prior.completedCycles + 1 && next.mask == 0)
-        && delta in [1,2,4,8] && int(prior.mask / delta) % 2 == 0 && prior.earnedTotal - prior.completedCycles * 100 >= threshold
-        && (delta == 1 ? n.chests == o.chests : chestGain(n.chests,o.chests,type));
+      let rollover = next.completedCycles == prior.completedCycles + 1;
+      let delta = rollover ? festivalAllMask(prior.version) - prior.mask : next.mask - prior.mask;
+      let threshold = festivalThreshold(prior.version,delta);
+      let type = festivalChest(prior.version,delta);
+      return chestBase(n,o,['festival','chests']) && festivalValid(prior) && festivalValid(next) && next.earnedTotal == prior.earnedTotal
+        && (next.completedCycles == prior.completedCycles && next.mask > prior.mask && next.version == prior.version
+          || rollover && next.mask == 0 && next.version == FESTIVAL_CURRENT_VERSION)
+        && delta in (prior.version == 1 ? [1,2,4,8] : [1,2,4,8,16]) && int(prior.mask / delta) % 2 == 0
+        && prior.earnedTotal - prior.completedCycles * 100 >= threshold
+        && (type == '' ? n.chests == o.chests : chestGain(n.chests,o.chests,type));
     }
+    function chestPoolItem(r) { return CHEST_POOL_ITEM; }
     function validChestResult(r) {
       return r.keys().hasOnly(['chestType','gameId','poolVersion','kind','coins','reason','key','label','itemId','operation','sequence'])
-        && r.chestType in ['c','avatar','frame','badge'] && r.gameId in ['memory-match','link-connect','triple-connect'] && r.poolVersion == 1
+        && r.chestType in ['c','avatar','frame','badge'] && r.gameId in ['memory-match','link-connect','triple-connect'] && r.poolVersion in [1,2]
         && r.operation is string && r.operation.matches('^[A-Za-z0-9_-]{1,128}$') && rewardInt(r.coins)
         && (r.kind == 'coins' ? (r.reason == 'coins' ? r.coins == (r.chestType == 'c' ? 50 : r.chestType == 'avatar' ? 150 : 100)
-          : r.reason == 'overflow' ? r.coins == 10 : r.reason in ['duplicate','full'] && r.chestType != 'c' && r.coins in [100, (r.chestType == 'avatar' ? 300 : 200)])
-          : r.kind == 'item' ? r.coins == 0 && r.itemId in CHEST_POOL_LOOKUP
+          : r.reason == 'overflow' ? r.coins == 10 : r.poolVersion == 1 && r.reason in ['duplicate','full'] && r.chestType != 'c' && r.coins in [100, (r.chestType == 'avatar' ? 300 : 200)])
+          : r.kind == 'item' ? r.coins == 0 && chestPoolItem(r)
           : r.kind == 'support' && r.coins == 0 && r.key in CHEST_SUPPORT_LOOKUP);
     }
     function rewardChestOpen(n,o) {
       let last = n.chests.last;
-      return chestBase(n,o,['chests']) && n.chests.earned == o.chests.earned && n.chests.sourceEarned == o.chests.sourceEarned && chestCounts(n.chests)
+      // Prior counters were validated on creation/credit. Only one spent counter
+      // can change here; validate that delta and preserve every other field.
+      // Revalidating all twelve counters exceeds the Rules evaluation budget
+      // when the same atomic update also receives a cosmetic copy.
+      return chestBase(n,o,['chests','cosmeticProgress']) && n.chests.earned == o.chests.earned && n.chests.sourceEarned == o.chests.sourceEarned
+        && n.chests.diff(o.chests).affectedKeys().hasOnly(['spent','sequence','last'])
+        && rewardInt(n.chests.sequence)
         && n.chests.sequence == o.chests.sequence + 1 && last.sequence == n.chests.sequence && validChestResult(last)
+        && (last.poolVersion != 2 || last.kind != 'item' || cosmeticCopy(n,o,last.itemId))
         && (!(last.get('reason','') in ['duplicate','full']) || last.coins == 100)
         && n.chests.spent.diff(o.chests.spent).affectedKeys().hasOnly([last.chestType])
+        && rewardInt(n.chests.spent[last.chestType])
+        && n.chests.spent[last.chestType] <= n.chests.earned[last.chestType]
         && n.chests.spent[last.chestType] == o.chests.spent[last.chestType] + 1;
     }
-    function rewardSpinOnly(n,o) {
+    function rewardChestSale(n,o) {
+      let c = n.chests;
+      let old = o.chests;
+      let r = c.last;
+      return chestBase(n,o,['chests']) && chestCounts(c) && c.earned == old.earned && c.sourceEarned == old.sourceEarned
+        && r.keys().hasAll(['kind','chestType','quantity','coins','unitPrice','priceVersion','operation','sequence'])
+        && r.keys().hasOnly(['kind','chestType','quantity','coins','unitPrice','priceVersion','operation','sequence'])
+        && r.kind == 'sale' && r.priceVersion == 1 && r.chestType in ['c','avatar','frame','badge'] && rewardInt(r.quantity) && r.quantity > 0
+        && r.unitPrice == (r.chestType == 'c' ? 58 : 200) && r.coins == r.quantity * r.unitPrice && rewardInt(r.coins)
+        && r.operation is string && r.operation.matches('^[A-Za-z0-9_-]{1,128}$') && (old.last == null || r.operation != old.last.operation)
+        && c.sequence == old.sequence + r.quantity && r.sequence == c.sequence
+        && c.spent.diff(old.spent).affectedKeys().hasOnly([r.chestType]) && c.spent[r.chestType] == old.spent[r.chestType] + r.quantity;
+    }
+    function rewardSpinOnly(n,o,changed) {
       let spent = n.ticketSpent - o.ticketSpent;
-      return n.spins.pastAds != o.spins.pastAds ? chestBase(n,o,['spins','pendingWheel']) && rewardWheelLateSpin(n,o)
-        : chestBase(n,o,['spins','tickets','ticketSpent','pendingWheel'])
-        && rewardInt(n.tickets) && rewardInt(n.ticketSpent) && spent in [0,1] && n.tickets == o.tickets - spent
+      return n.spins.pastAds != o.spins.pastAds ? rewardBase(n,o,['spins','pendingWheel','cosmeticProgress'],changed) && rewardWheelLateSpin(n,o)
+        : rewardBase(n,o,['spins','tickets','ticketSpent','pendingWheel','cosmeticProgress'],changed)
+        && n.tickets is int && n.tickets >= 0 && n.ticketSpent is int && n.ticketSpent <= 9007199254740991
+        && spent in [0,1] && n.tickets == o.tickets - spent
         && (spent == 0 ? n.spins.ticket == o.spins.ticket : n.spins.ticket.sequence == n.ticketSpent && n.spins.ticket != o.spins.ticket)
         && (n.spins == o.spins ? spent == 0 && n.get('pendingWheel',null) == o.get('pendingWheel',null)
           : rewardWheelSpinUpdate(n,o));
@@ -95,8 +128,8 @@
       return chestBase(n,o,['hourlyGift','tickets'])
         && g.keys().hasOnly(['version','sequence','claimedAt','last']) && g.version == 1
         && rewardInt(g.sequence) && g.sequence == (previous == null ? 1 : previous.sequence + 1)
-        && g.claimedAt == request.time
-        && (previous == null || request.time >= previous.claimedAt + duration.value(HOURLY_GIFT_SECONDS,'s'))
+        && g.claimedAt is timestamp && g.claimedAt <= request.time && g.claimedAt.toMillis() >= o.day * 86400000
+        && (previous == null || g.claimedAt >= previous.claimedAt + duration.value(HOURLY_GIFT_SECONDS,'s'))
         && r.keys().hasOnly(['operation','sequence','kind','coins','gameId','key','tickets'])
         && r.operation is string && r.operation.matches('^[A-Za-z0-9_-]{1,128}$') && r.sequence == g.sequence
         && (r.kind == 'ticket' ? r.coins == 0 && r.gameId == null && r.key == null && (!r.keys().hasAny(['tickets']) || r.tickets == HOURLY_TEST_TICKETS)
@@ -104,16 +137,16 @@
           : r.kind == 'support' && r.coins == 0 && hourlySupport(r)))
         && rewardInt(n.tickets) && n.tickets == o.tickets + (r.kind == 'ticket' ? r.get('tickets',1) : 0);
     }
-    function dispatchRewardUpdate(n,o) {
-      let changed = n.diff(o).affectedKeys();
-      return changed.hasAny(['pendingWheel']) && !changed.hasAny(['spins']) ? rewardWheelClaim(n,o)
+    function dispatchRewardUpdate(n,o,changed) {
+      return changed.hasAny(['cosmeticProgress']) ? cosmeticUpdate(n,o,changed)
+        : changed.hasAny(['pendingWheel']) && !changed.hasAny(['spins']) ? (n.get('pendingWheel',null) != null && n.pendingWheel.get('phase','') == 'reserved-ad'
+          || o.get('pendingWheel',null) != null && o.pendingWheel.get('phase','') == 'reserved-ad' ? rewardWheelReservation(n,o,changed) : rewardWheelClaim(n,o))
         : changed.hasAny(['hourlyGift']) ? rewardHourlyGift(n,o) : n.day != o.day ? rewardPeriodRollover(n,o)
         : changed.hasAny(['chests','festival']) ? (!o.keys().hasAny(['chests','festival']) ? rewardChestInit(n,o)
           : changed.hasAny(['letters']) ? rewardChestExchange(n,o)
-          : changed.hasAny(['chests']) ? (n.chests.sequence != o.chests.sequence ? rewardChestOpen(n,o) : (changed.hasAny(['festival']) ? rewardFestivalClaim(n,o) : rewardChestSources(n,o)))
+          : changed.hasAny(['chests']) ? (n.chests.sequence != o.chests.sequence ? (n.chests.last.kind == 'sale' ? rewardChestSale(n,o) : rewardChestOpen(n,o)) : (changed.hasAny(['festival']) ? rewardFestivalClaim(n,o) : rewardChestSources(n,o)))
           : changed.hasOnly(['festival','revision','rootRevision','fingerprint','updatedAt']) ? (n.festival.earnedTotal != o.festival.earnedTotal ? rewardFestivalEarn(n,o) : (changed.hasAny(['festival']) ? rewardFestivalClaim(n,o) : rewardChestSources(n,o))) : rewardProgressFlush(n,o))
-        : changed.hasOnly(['spins','tickets','ticketSpent','pendingWheel','revision','rootRevision','fingerprint','updatedAt']) ? rewardSpinOnly(n,o)
-        : changed.hasOnly(['letters','revision','rootRevision','fingerprint','updatedAt']) ? rewardLetterUpdate(n,o)
+        : changed.hasOnly(['spins','tickets','ticketSpent','pendingWheel','revision','rootRevision','fingerprint','updatedAt']) ? rewardSpinOnly(n,o,changed)
         : changed.hasAny(['loginReward']) ? rewardMissionLogin(n,o)
         : changed.hasOnly(['letters','daily','weekly','event','tickets','ticketEarned','revision','rootRevision','fingerprint','updatedAt']) && n.daily.claimed == o.daily.claimed && n.weekly.claimed == o.weekly.claimed ? rewardProgressFlush(n,o)
         : changed.hasOnly(['daily','weekly','tickets','revision','rootRevision','fingerprint','updatedAt']) ? rewardMissionClaims(n,o)

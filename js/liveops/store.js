@@ -5,7 +5,8 @@ export async function readSparkState(database, environment, uid) {
   const snapshot = await getDocFromServer(sparkRef(database, environment, uid));
   if (!snapshot.exists()) return { state: null, timestamp: null };
   const data = snapshot.data();
-  return { state: data.revision === 0 ? null : normalizeSparkState(data), timestamp: data.updatedAt?.toMillis() || null };
+  return { state: data.revision === 0 ? null : normalizeSparkState(data), timestamp: data.updatedAt?.toMillis() || null,
+    link:{rootRevision:data.rootRevision??null,fingerprint:data.fingerprint??null} };
 }
 /** One server clock confirmation per account session, never polling or on every page mount. */
 export async function confirmSparkClock(database, environment, uid, isCurrent) {

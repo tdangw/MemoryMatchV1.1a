@@ -50,12 +50,14 @@ export const gameState = {
   progress: {
     themeSelectionHistory: {},
     memoryMatch: {
+      specialProgress: 0,
       totalStars: 0,
       totalScore: 0,
       bestByLevel: {},
       items: { hint: defaultHints, preview4: 0, preview8: 0, preview12: 0, previewAll: 0, time10: 0, time30: 0, time45: 0, time60: 0 },
     },
     linkConnect: {
+      specialProgress: 0,
       totalStars: 0,
       totalScore: 0,
       bestByLevel: {},
@@ -109,6 +111,7 @@ export function hydrateGameState({
   gameState.progress.adventureRankingMigration = normalizeProgressMigration(progress.adventureRankingMigration, 4) || undefined;
   const memorySessions = normalizeSessions(memoryMatch.sessionsByMode, "memory-match");
   gameState.progress.memoryMatch = {
+    specialProgress: normalizeRewardCycle(memoryMatch, settings.mode),
     totalStars: normalizeNonNegativeInteger(memoryMatch.totalStars),
     totalScore: normalizeNonNegativeInteger(memoryMatch.totalScore),
     bestByLevel: normalizeBestByLevel(memoryMatch.bestByLevel),
@@ -119,6 +122,7 @@ export function hydrateGameState({
   const linkConnect = progress?.linkConnect || {};
   const linkItems = linkConnect.items || {};
   gameState.progress.linkConnect = {
+    specialProgress: normalizeRewardCycle(linkConnect, settings.mode),
     totalStars: normalizeNonNegativeInteger(linkConnect.totalStars),
     totalScore: normalizeNonNegativeInteger(linkConnect.totalScore),
     bestByLevel: normalizeBestByLevel(linkConnect.bestByLevel),
@@ -153,6 +157,17 @@ export function hydrateGameState({
   };
   gameState.settings = normalizeSettings(settings, gameState.settings);
   gameState.appearance = normalizeAppearance(appearance);
+}
+
+// Old saves kept the cycle only in a session. Prefer the last selected mode
+// when migrating; once present, the durable value also owns a wrapped zero.
+function normalizeRewardCycle(progress, mode) {
+  const sessions = progress.sessionsByMode || {};
+  const selected = sessions[mode];
+  const legacy = Number.isFinite(selected?.specialProgress) ? selected
+    : Object.values(sessions).find(session => Number.isFinite(session?.specialProgress));
+  const value = Object.hasOwn(progress, 'specialProgress') ? progress.specialProgress : legacy?.specialProgress;
+  return normalizeNonNegativeInteger(value) % GAME_CONFIG.special.progressTarget;
 }
 
 export function commitThemeSelectionHistory(themeId, assets) {
@@ -391,7 +406,7 @@ export function resetGame() {
   gameState.moves = 0;
   gameState.misses = 0;
   gameState.combo = 0;
-  gameState.specialProgress = 0;
+  gameState.specialProgress = gameState.progress.memoryMatch.specialProgress || 0;
   gameState.specialNoEnergyDropStreak = 0;
   gameState.pendingEnergyCollections = 0;
   gameState.matchedPairs = 0;

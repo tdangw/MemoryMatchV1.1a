@@ -1,17 +1,36 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { WHEEL_SLOTS,WHEEL_ROLL_COUNT,createWheelRolls,wheelSector,createWheelCandidate,normalizeWheelCandidate,resolveWheelCandidate } from '../../js/liveops/wheelRewards.js';
-import { WHEEL_ITEMS,WHEEL_POOLS } from '../../js/liveops/wheelCatalog.js';
-import { CHEST_POOLS,CHEST_SUPPORTS,CHEST_POLICY } from '../../js/liveops/chestConfig.js';
+import { WHEEL_SLOTS,WHEEL_ROLL_COUNT,createWheelRolls,wheelSector,createWheelCandidate as createCurrentWheelCandidate,normalizeWheelCandidate,resolveWheelCandidate } from '../../js/liveops/wheelRewards.js';
+import { WHEEL_ITEMS,WHEEL_POOLS as CURRENT_WHEEL_POOLS } from '../../js/liveops/wheelCatalog.js';
+import { LEGACY_CHEST_POOLS as CHEST_POOLS,CHEST_SUPPORTS,CHEST_POLICY } from '../../js/liveops/chestConfig.js';
 import { WHEEL,DAY_MS } from '../../js/liveops/model.js';
 import { transitionSpark,normalizeSparkState,resolveSparkOperation } from '../../js/liveops/sparkModel.js';
 import { GAMEPLAY_LIMITS } from '../../js/gameplayTuning.js';
+// Preserve the exact v2 pending/receipt policy; v3 copies are covered by cosmetic-rewards.test.js.
+const WHEEL_POOLS={...CURRENT_WHEEL_POOLS,cosmetic:CURRENT_WHEEL_POOLS.cosmetic.filter(id=>!id.startsWith('starter-'))};
+const createWheelCandidate=(rolls,owned)=>createCurrentWheelCandidate(rolls,owned,2);
 const uid='wheel-test',now=Date.UTC(2026,10,5,12),day=Math.floor(now/DAY_MS);
 const midpoint=sector=>(WHEEL_SLOTS.slice(0,sector).reduce((sum,item)=>sum+item.weight,0)+WHEEL_SLOTS[sector].weight/2)/100;
 const rolls=(sector,...values)=>[midpoint(sector),...Array.from({length:5},(_,i)=>values[i]??.5)];
 const candidate=(sector,owned=[],...values)=>createWheelCandidate(rolls(sector,...values),owned);
 const initial=()=>transitionSpark(null,{type:'status'},{uid,now,ticketEarned:2}).state;
 const spin=(source='free',operation='spin')=>({type:'spin',source,day,operation,...(source==='ticket'?{sequence:1}:{})});
+
+test('late-ad reservation survives restart without granting and settles only the same candidate once',()=>{
+ const before=initial(),wheel=candidate(4),command={type:'spin',source:'ad',operation:'reserved',day:day-1,ordinal:1,earned:true,earnedAt:now-DAY_MS,wheelVersion:2,wheelCandidate:wheel};
+ const context={uid,now,ticketEarned:2};
+ const reserved=transitionSpark(before,{...command,type:'reserveAd'},context);
+ assert.equal(reserved.receipts.length,0);assert.equal(reserved.state.spins.pastAds.length,0);
+ const restarted=normalizeSparkState(JSON.parse(JSON.stringify(reserved.state)));
+ assert.throws(()=>transitionSpark(restarted,{type:'claimWheelReward',wheelOperation:command.operation},context));
+ assert.throws(()=>transitionSpark(restarted,{...command,wheelCandidate:candidate(0)},context));
+ assert.throws(()=>transitionSpark(restarted,{...command,operation:'different'},context));
+ const settled=transitionSpark(restarted,command,context);
+ assert.equal(settled.spinApplied,true);assert.equal(settled.receipts.length,1);assert.equal(settled.state.pendingWheel,null);
+ assert.equal(transitionSpark(settled.state,command,context).receipts.length,0);
+ const canceled=transitionSpark(restarted,{type:'cancelReservedAd',operation:command.operation},context);
+ assert.equal(canceled.state.pendingWheel,null);assert.equal(canceled.receipts.length,0);
+});
 
 test('ten weighted sectors cover exactly 100 intervals and every boundary',()=>{
  assert.equal(WHEEL_SLOTS.length,10);assert.equal(WHEEL_SLOTS.reduce((sum,s)=>sum+s.weight,0),100);
@@ -59,7 +78,7 @@ test('mystery box retains four existing chest policies while support box divides
 
 test('candidate normalization rejects cross-pool prizes, wrong amounts and unknown fields',()=>{
  const item=candidate(5),support=candidate(9),coin=candidate(0),full=candidate(5,WHEEL_POOLS.flip);
- for(const bad of [{...coin,version:3},{...coin,coins:100},{...coin,sector:10},{...coin,box:'flip'},{...item,itemId:WHEEL_POOLS.theme[0]},{...item,box:'theme'},{...item,coins:100},{...support,key:'unknown'},{...support,coins:100},{...support,gameId:'other'},{...full,reason:'coins'},{...full,coins:99},{...item,debug:true}])assert.throws(()=>normalizeWheelCandidate(bad));
+ for(const bad of [{...coin,version:4},{...coin,coins:100},{...coin,sector:10},{...coin,box:'flip'},{...item,itemId:WHEEL_POOLS.theme[0]},{...item,box:'theme'},{...item,coins:100},{...support,key:'unknown'},{...support,coins:100},{...support,gameId:'other'},{...full,reason:'coins'},{...full,coins:99},{...item,debug:true}])assert.throws(()=>normalizeWheelCandidate(bad));
 });
 
 test('fresh spin emits actual prize once; a concurrent unlock gives100 instead of reroll',()=>{

@@ -1,7 +1,8 @@
-import { CHEST_POLICY, CHEST_POOLS, CHEST_SUPPORTS } from './chestConfig.js';
-import { WHEEL_POOLS } from './wheelCatalog.js';
+import { CHEST_POLICY, CHEST_POOLS, LEGACY_CHEST_POOLS, CHEST_SUPPORTS } from './chestConfig.js';
+import { WHEEL_POOLS, wheelItem } from './wheelCatalog.js';
 
-export const WHEEL_VERSION = 2;
+export const WHEEL_VERSION = 3;
+export const supportedWheelVersion = version => version === 2 || version === WHEEL_VERSION;
 export const WHEEL_ANGLE = 36;
 export const WHEEL_ROLL_COUNT = 6;
 export const MYSTERY_CHEST_TYPES = Object.freeze(['c','avatar','frame','badge']);
@@ -38,33 +39,37 @@ export function wheelSector(roll) {
   invalid();
 }
 /** Pure replay of durable entropy. Call once using canonical ownership, then save the candidate. */
-export function createWheelCandidate(rolls,ownedIds=[]) {
+export function createWheelCandidate(rolls,ownedIds=[],version=WHEEL_VERSION) {
+  if(!supportedWheelVersion(version))invalid();
   if(!Array.isArray(rolls)||rolls.length!==WHEEL_ROLL_COUNT||!Array.from(rolls).every(unit))invalid();
-  const sector=wheelSector(rolls[0]),slot=WHEEL_SLOTS[sector],base={version:WHEEL_VERSION,sector};
+  const sector=wheelSector(rolls[0]),slot=WHEEL_SLOTS[sector],base={version,sector};
   if(slot.kind==='coins')return {...base,kind:'coins',coins:slot.coins};
   if(slot.kind==='randomCoins')return {...base,kind:'coins',coins:5+Math.floor(rolls[1]*46)};
   const owned=new Set(ownedIds),box={...base,box:slot.box};
   const support=(gameRoll,itemRoll)=>{const gameId=choose(GAMES,gameRoll),item=choose(CHEST_SUPPORTS[gameId],itemRoll);return {...box,kind:'support',coins:0,gameId,key:item.key};};
   if(slot.box==='support')return support(rolls[1],rolls[2]);
   const item=(pool,roll)=>{
+    if(version===WHEEL_VERSION&&pool.some(id=>wheelItem(id)?.category==='cosmetic'))return {...box,kind:'item',coins:0,itemId:choose(pool,roll)};
     const missing=pool.filter(id=>!owned.has(id));
     return missing.length?{...box,kind:'item',coins:0,itemId:choose(missing,roll)}:{...box,kind:'coins',coins:100,reason:'full'};
   };
-  if(slot.box!=='mystery')return item(WHEEL_POOLS[slot.box],rolls[1]);
+  if(slot.box!=='mystery')return item(version===2&&slot.box==='cosmetic'?WHEEL_POOLS.cosmetic.filter(id=>!id.startsWith('starter-')):WHEEL_POOLS[slot.box],rolls[1]);
   box.chestType=choose(MYSTERY_CHEST_TYPES,rolls[1]);
-  const policy=CHEST_POLICY[box.chestType],pool=CHEST_POOLS[box.chestType];
-  if(pool&&pool.every(id=>owned.has(id)))return {...box,kind:'coins',coins:100,reason:'full'};
+  const policy=CHEST_POLICY[box.chestType],pool=(version===2?LEGACY_CHEST_POOLS:CHEST_POOLS)[box.chestType];
+  if(version===2&&pool&&pool.every(id=>owned.has(id)))return {...box,kind:'coins',coins:100,reason:'full'};
   if(rolls[2]<policy.coinChance)return {...box,kind:'coins',coins:policy.coins,reason:'coins'};
   if(rolls[2]<policy.coinChance+policy.supportChance)return support(rolls[3],rolls[4]);
   return item(pool,rolls[4]);
 }
 
 export function wheelCandidatePool(candidate) {
-  return candidate.box==='mystery'?CHEST_POOLS[candidate.chestType]||[]:WHEEL_POOLS[candidate.box]||[];
+  if(candidate.box==='mystery')return (candidate.version===2?LEGACY_CHEST_POOLS:CHEST_POOLS)[candidate.chestType]||[];
+  const pool=WHEEL_POOLS[candidate.box]||[];
+  return candidate.version===2&&candidate.box==='cosmetic'?pool.filter(id=>!id.startsWith('starter-')):pool;
 }
 /** Historical receipts validate without needing today's ownership. No unknown fields survive. */
 export function normalizeWheelCandidate(value) {
-  if(!record(value)||value.version!==WHEEL_VERSION||!Number.isInteger(value.sector)||value.sector<0||value.sector>=WHEEL_SLOTS.length
+  if(!record(value)||!supportedWheelVersion(value.version)||!Number.isInteger(value.sector)||value.sector<0||value.sector>=WHEEL_SLOTS.length
     ||!['coins','item','support'].includes(value.kind)||!Number.isSafeInteger(value.coins)||value.coins<0)invalid();
   const slot=WHEEL_SLOTS[value.sector],fields=['version','sector','kind','coins'];
   if(slot.kind==='coins'||slot.kind==='randomCoins'){
@@ -86,8 +91,10 @@ export function normalizeWheelCandidate(value) {
         if(value.reason==='coins'){
           if(value.box!=='mystery'||value.coins!==CHEST_POLICY[value.chestType].coins)invalid();
         }else if(value.reason==='full'){
+          if(value.version===WHEEL_VERSION&&(value.box==='cosmetic'||value.box==='mystery'))invalid();
           if(!pool.length||value.coins!==100)invalid();
         }else if(value.reason==='duplicate'){
+          if(value.version===WHEEL_VERSION&&(value.box==='cosmetic'||value.box==='mystery'))invalid();
           fields.push('itemId');if(value.coins!==100||!pool.includes(value.itemId))invalid();
         }else invalid();
       }
@@ -99,7 +106,7 @@ export function normalizeWheelCandidate(value) {
 /** Ownership races convert the saved item; they never pick another item or another sector. */
 export function resolveWheelCandidate(value,ownedIds=[]) {
   const candidate=normalizeWheelCandidate(value),owned=new Set(ownedIds);
-  if(candidate.kind==='item'&&owned.has(candidate.itemId))return normalizeWheelCandidate({...candidate,kind:'coins',coins:100,reason:'duplicate'});
+  if(candidate.kind==='item'&&owned.has(candidate.itemId)&&!(candidate.version===WHEEL_VERSION&&wheelItem(candidate.itemId)?.category==='cosmetic'))return normalizeWheelCandidate({...candidate,kind:'coins',coins:100,reason:'duplicate'});
   if(candidate.kind==='coins'&&candidate.reason==='full'&&!wheelCandidatePool(candidate).every(id=>owned.has(id)))invalid();
   if(candidate.kind==='coins'&&candidate.reason==='duplicate'&&!owned.has(candidate.itemId))invalid();
   return candidate;

@@ -2,7 +2,7 @@ import { isAppActive } from '../appVisibility.js';
 import { openAppModal } from '../modal.js';
 import { createGameShellLifecycle } from '../gameShell/gameShellLifecycle.js';
 import { createIcon } from '../icons.js';
-import { LETTER_ALPHABET } from './config.js';
+import { LETTER_ALPHABET, LETTER_FUSION_FEE } from './config.js';
 import { createRewardFeedback } from './rewardFeedback.js';
 import { playOwnedRewardCue } from '../sound.js';
 import { gameState } from '../gameState.js';
@@ -88,11 +88,12 @@ export function openLetterFusion({initialLetter,owner,current,getContext,execute
       tile.setAttribute('aria-label',`Chọn chữ ${letter}, còn ${available}`);tile.dataset.empty=String(available<1);const glyph=letterArtwork(letter);glyph.classList.add('liveops__letter-glyph');tile.append(glyph,node('span','letter-forge__count',`×${available}`));
       tile.onclick=()=>{if(!active())return;if(phase==='result'){finishLocalMotion();selected=[];received=null;phase='select';requestSequence=null;feedback.clear();}if(phase==='select'&&selected.length<3){selected.push(letter);error='';render();}};palette.append(tile);
     }
-    description.textContent=phase==='result'?`Đã ghép được chữ ${received}`:'Ghép 3 chữ bất kỳ, ưu tiên chữ chưa có.';
-    status.textContent=error|| (phase==='result'?'Chọn chữ trong kho để ghép.':phase==='select'?(context.canUse?`Đã chọn ${selected.length}/3`:'Kết nối để ghép chữ.'):'');
-    action.setAttribute('aria-label',phase==='submitting'||phase==='revealing'?'Đang ghép…':phase==='result'?`Đã nhận chữ ${received}`:phase==='recover'?'Thử lại':'Ghép');
-    action.disabled=phase==='submitting'||phase==='revealing'||phase==='result'||(phase==='select'&&(!valid()||!context.canUse));
-    action.dataset.ready=String(phase==='select'&&valid()&&context.canUse);
+    const funded=(context.coins??gameState.coins)>=LETTER_FUSION_FEE;
+    description.textContent=phase==='result'?`Đã ghép được chữ ${received}`:`Ghép 3 chữ bất kỳ + ${LETTER_FUSION_FEE} Xu, ưu tiên chữ chưa có.`;
+    status.textContent=error|| (phase==='result'?'Chọn chữ trong kho để ghép.':phase==='select'?(!funded?`Cần ${LETTER_FUSION_FEE} Xu để ghép.`:context.canUse?`Đã chọn ${selected.length}/3`:'Về bản đồ để ghép chữ.'):'');
+    action.setAttribute('aria-label',phase==='submitting'||phase==='revealing'?'Đang ghép…':phase==='result'?`Đã nhận chữ ${received}`:phase==='recover'?'Thử lại':`Ghép · ${LETTER_FUSION_FEE} Xu`);
+    action.disabled=phase==='submitting'||phase==='revealing'||phase==='result'||(phase==='select'&&(!valid()||!context.canUse||!funded));
+    action.dataset.ready=String(phase==='select'&&valid()&&context.canUse&&funded);
   }
   slots.forEach((slot,i)=>scope.listen(slot,'click',()=>{if(active()&&phase==='select'){selected.splice(i,1);error='';render();}}));
   async function resolve(response){

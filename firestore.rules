@@ -169,9 +169,14 @@ service cloud.firestore {
     }
     // BEGIN generated public cosmetic contract
     function validPublicCosmetics(data) {
-      return data.keys().hasOnly(['version', 'avatar', 'frame', 'badge', 'updatedAt'])
+      return data.keys().hasOnly(['version', 'avatar', 'frame', 'badge', 'updatedAt', 'levels'])
         && data.keys().hasAll(['version', 'avatar', 'frame', 'badge', 'updatedAt'])
-        && data.version == 1 && data.updatedAt == request.time
+        && data.version in [1,2] && data.updatedAt == request.time
+        && (data.version == 1 ? !data.keys().hasAny(['levels'])
+          : data.levels is map && data.levels.keys().hasAll(['avatar','frame','badge']) && data.levels.keys().hasOnly(['avatar','frame','badge'])
+          && data.levels.avatar is int && (data.avatar == null ? data.levels.avatar == 0 : data.levels.avatar >= 1 && data.levels.avatar <= 21)
+          && data.levels.frame is int && (data.frame == null ? data.levels.frame == 0 : data.levels.frame >= 1 && data.levels.frame <= 21)
+          && data.levels.badge is int && (data.badge == null ? data.levels.badge == 0 : data.levels.badge >= 1 && data.levels.badge <= 21))
         && (data.avatar == null || data.avatar in ['starter-avatar-little-sparrow', 'memory-avatar-sapphire-owl', 'memory-avatar-cherry-rabbit', 'memory-avatar-stellar-cat', 'memory-avatar-scholar-squirrel', 'memory-avatar-stargazer-hedgehog', 'memory-avatar-dreaming-deer', 'memory-avatar-galaxy-whale', 'memory-avatar-chestnut-squirrel', 'memory-avatar-snow-rabbit', 'memory-avatar-honey-bear', 'memory-avatar-dawn-crane', 'link-avatar-autumn-fox', 'link-avatar-moonfox', 'link-avatar-galaxy-deer', 'link-avatar-sailor-beaver', 'link-avatar-pearl-dolphin', 'link-avatar-azure-turtle', 'link-avatar-royal-seahorse', 'link-avatar-lantern-cat', 'link-avatar-festival-sparrow', 'link-avatar-paperblossom-deer', 'link-avatar-glasslight-fox', 'triple-avatar-jade-dragon', 'triple-avatar-blue-panda', 'triple-avatar-sunset-dragon', 'triple-avatar-quartz-phoenix', 'triple-avatar-amethyst-unicorn', 'triple-avatar-platinum-dragon', 'triple-avatar-crystal-mech-cat', 'triple-avatar-aurora-snowfox', 'triple-avatar-jade-penguin', 'triple-avatar-polar-bear', 'triple-avatar-galactic-dragon', 'event-avatar-lantern-otter', 'letters-memory-avatar-moss-redpanda', 'letters-link-avatar-flower-fox', 'letters-triple-avatar-rose-dragon', 'letters-royal-avatar-dawn-lion'])
         && (data.frame == null || data.frame in ['starter-frame-plain-wood', 'memory-frame-golden-laurel', 'memory-frame-cherry-blossom', 'memory-frame-sky-feather', 'memory-frame-gilded-pages', 'memory-frame-astral-orbit', 'memory-frame-silken-clouds', 'memory-frame-knowledge-gateway', 'memory-frame-autumn-leaves', 'memory-frame-frosted-branch', 'memory-frame-golden-honeycomb', 'memory-frame-memory-crown', 'link-frame-moonblossom', 'link-frame-silver-moon', 'link-frame-stellar-orbit', 'link-frame-moon-coral', 'link-frame-silver-waves', 'link-frame-pearl-shell', 'link-frame-tidal-crown', 'link-frame-silk-lanterns', 'link-frame-osmanthus-branch', 'link-frame-moon-silk', 'link-frame-lantern-moon-gate', 'triple-frame-tri-crystal', 'triple-frame-prism', 'triple-frame-emerald', 'triple-frame-crystal-arch', 'triple-frame-three-wing-star', 'triple-frame-jade-gears', 'triple-frame-tri-star-crown', 'triple-frame-aurora-ribbon', 'triple-frame-azure-ice-ring', 'triple-frame-silver-meteor', 'triple-frame-aurora-crown', 'event-frame-firefly-glow', 'letters-memory-frame-memory-leaves', 'letters-link-frame-silk-lantern', 'letters-triple-frame-prism-glass', 'letters-royal-frame-journey-crown'])
         && (data.badge == null || data.badge in ['starter-badge-first-leaf', 'memory-badge-wisdom', 'memory-badge-memory-master', 'memory-badge-wisdom-seal', 'memory-badge-memory-keeper', 'memory-badge-four-seasons', 'memory-badge-forest-guardian', 'link-badge-link-master', 'link-badge-golden-bond', 'link-badge-lighthouse-guide', 'link-badge-ocean-knot', 'link-badge-guiding-lantern', 'link-badge-moonlit-promise', 'triple-badge-crystal-triad', 'triple-badge-triad-master', 'triple-badge-triangle-seal', 'triple-badge-crystal-keeper', 'triple-badge-three-dawn-rays', 'triple-badge-aurora-heart', 'letters-memory-badge-folded-leaf', 'letters-link-badge-wish-knot', 'letters-triple-badge-prism-heart', 'letters-royal-badge-royal-seal']);
@@ -185,9 +190,110 @@ service cloud.firestore {
     }
     // END generated public cosmetic contract
     // BEGIN Spark reward contract
+    function cosmeticTypes() { return ['avatar','frame','badge']; }
+    function cosmeticType(id) { return id.matches("^(starter-avatar-little-sparrow|memory-avatar-sapphire-owl|memory-avatar-cherry-rabbit|memory-avatar-stellar-cat|memory-avatar-scholar-squirrel|memory-avatar-stargazer-hedgehog|memory-avatar-dreaming-deer|memory-avatar-galaxy-whale|memory-avatar-chestnut-squirrel|memory-avatar-snow-rabbit|memory-avatar-honey-bear|memory-avatar-dawn-crane|link-avatar-autumn-fox|link-avatar-moonfox|link-avatar-galaxy-deer|link-avatar-sailor-beaver|link-avatar-pearl-dolphin|link-avatar-azure-turtle|link-avatar-royal-seahorse|link-avatar-lantern-cat|link-avatar-festival-sparrow|link-avatar-paperblossom-deer|link-avatar-glasslight-fox|triple-avatar-jade-dragon|triple-avatar-blue-panda|triple-avatar-sunset-dragon|triple-avatar-quartz-phoenix|triple-avatar-amethyst-unicorn|triple-avatar-platinum-dragon|triple-avatar-crystal-mech-cat|triple-avatar-aurora-snowfox|triple-avatar-jade-penguin|triple-avatar-polar-bear|triple-avatar-galactic-dragon|event-avatar-lantern-otter|letters-memory-avatar-moss-redpanda|letters-link-avatar-flower-fox|letters-triple-avatar-rose-dragon|letters-royal-avatar-dawn-lion)$") ? 'avatar' : id.matches("^(starter-frame-plain-wood|memory-frame-golden-laurel|memory-frame-cherry-blossom|memory-frame-sky-feather|memory-frame-gilded-pages|memory-frame-astral-orbit|memory-frame-silken-clouds|memory-frame-knowledge-gateway|memory-frame-autumn-leaves|memory-frame-frosted-branch|memory-frame-golden-honeycomb|memory-frame-memory-crown|link-frame-moonblossom|link-frame-silver-moon|link-frame-stellar-orbit|link-frame-moon-coral|link-frame-silver-waves|link-frame-pearl-shell|link-frame-tidal-crown|link-frame-silk-lanterns|link-frame-osmanthus-branch|link-frame-moon-silk|link-frame-lantern-moon-gate|triple-frame-tri-crystal|triple-frame-prism|triple-frame-emerald|triple-frame-crystal-arch|triple-frame-three-wing-star|triple-frame-jade-gears|triple-frame-tri-star-crown|triple-frame-aurora-ribbon|triple-frame-azure-ice-ring|triple-frame-silver-meteor|triple-frame-aurora-crown|event-frame-firefly-glow|letters-memory-frame-memory-leaves|letters-link-frame-silk-lantern|letters-triple-frame-prism-glass|letters-royal-frame-journey-crown)$") ? 'frame' : id.matches("^(starter-badge-first-leaf|memory-badge-wisdom|memory-badge-memory-master|memory-badge-wisdom-seal|memory-badge-memory-keeper|memory-badge-four-seasons|memory-badge-forest-guardian|link-badge-link-master|link-badge-golden-bond|link-badge-lighthouse-guide|link-badge-ocean-knot|link-badge-guiding-lantern|link-badge-moonlit-promise|triple-badge-crystal-triad|triple-badge-triad-master|triple-badge-triangle-seal|triple-badge-crystal-keeper|triple-badge-three-dawn-rays|triple-badge-aurora-heart|letters-memory-badge-folded-leaf|letters-link-badge-wish-knot|letters-triple-badge-prism-heart|letters-royal-badge-royal-seal)$") ? 'badge' : ''; }
+    function cosmeticCounts(c) {
+      return c is map && c.keys().hasAll(cosmeticTypes()) && c.keys().hasOnly(cosmeticTypes())
+        && rewardInt(c.avatar) && rewardInt(c.frame) && rewardInt(c.badge);
+    }
+    function cosmeticValid(c) {
+      return c is map && c.keys().hasAll(['version','levels','fragments','sequence','last'])
+        && c.keys().hasOnly(['version','levels','fragments','sequence','last']) && c.version == 1
+        && c.levels is map && c.levels.keys().hasOnly(["starter-avatar-little-sparrow","starter-frame-plain-wood","starter-badge-first-leaf","memory-avatar-sapphire-owl","memory-frame-golden-laurel","memory-badge-wisdom","memory-avatar-cherry-rabbit","memory-frame-cherry-blossom","memory-badge-memory-master","memory-avatar-stellar-cat","memory-frame-sky-feather","memory-avatar-scholar-squirrel","memory-frame-gilded-pages","memory-badge-wisdom-seal","memory-avatar-stargazer-hedgehog","memory-frame-astral-orbit","memory-avatar-dreaming-deer","memory-frame-silken-clouds","memory-badge-memory-keeper","memory-avatar-galaxy-whale","memory-frame-knowledge-gateway","memory-avatar-chestnut-squirrel","memory-frame-autumn-leaves","memory-badge-four-seasons","memory-avatar-snow-rabbit","memory-frame-frosted-branch","memory-avatar-honey-bear","memory-frame-golden-honeycomb","memory-badge-forest-guardian","memory-avatar-dawn-crane","memory-frame-memory-crown","link-avatar-autumn-fox","link-frame-moonblossom","link-badge-link-master","link-avatar-moonfox","link-frame-silver-moon","link-badge-golden-bond","link-avatar-galaxy-deer","link-frame-stellar-orbit","link-avatar-sailor-beaver","link-frame-moon-coral","link-badge-lighthouse-guide","link-avatar-pearl-dolphin","link-frame-silver-waves","link-avatar-azure-turtle","link-frame-pearl-shell","link-badge-ocean-knot","link-avatar-royal-seahorse","link-frame-tidal-crown","link-avatar-lantern-cat","link-frame-silk-lanterns","link-badge-guiding-lantern","link-avatar-festival-sparrow","link-frame-osmanthus-branch","link-avatar-paperblossom-deer","link-frame-moon-silk","link-badge-moonlit-promise","link-avatar-glasslight-fox","link-frame-lantern-moon-gate","triple-avatar-jade-dragon","triple-frame-tri-crystal","triple-badge-crystal-triad","triple-avatar-blue-panda","triple-frame-prism","triple-badge-triad-master","triple-avatar-sunset-dragon","triple-frame-emerald","triple-avatar-quartz-phoenix","triple-frame-crystal-arch","triple-badge-triangle-seal","triple-avatar-amethyst-unicorn","triple-frame-three-wing-star","triple-avatar-platinum-dragon","triple-frame-jade-gears","triple-badge-crystal-keeper","triple-avatar-crystal-mech-cat","triple-frame-tri-star-crown","triple-avatar-aurora-snowfox","triple-frame-aurora-ribbon","triple-badge-three-dawn-rays","triple-avatar-jade-penguin","triple-frame-azure-ice-ring","triple-avatar-polar-bear","triple-frame-silver-meteor","triple-badge-aurora-heart","triple-avatar-galactic-dragon","triple-frame-aurora-crown","event-avatar-lantern-otter","event-frame-firefly-glow","letters-memory-avatar-moss-redpanda","letters-memory-frame-memory-leaves","letters-memory-badge-folded-leaf","letters-link-avatar-flower-fox","letters-link-frame-silk-lantern","letters-link-badge-wish-knot","letters-triple-avatar-rose-dragon","letters-triple-frame-prism-glass","letters-triple-badge-prism-heart","letters-royal-avatar-dawn-lion","letters-royal-frame-journey-crown","letters-royal-badge-royal-seal"])
+        && c.levels.values().hasOnly([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21])
+        && cosmeticCounts(c.fragments) && rewardInt(c.sequence);
+    }
+    function cosmeticCountChange(n,o,type,delta) {
+      return n.avatar == o.avatar + (type == 'avatar' ? delta : 0)
+        && n.frame == o.frame + (type == 'frame' ? delta : 0)
+        && n.badge == o.badge + (type == 'badge' ? delta : 0);
+    }
+    function cosmeticSeed0(c,added) { return (!added.hasAny(['starter-avatar-little-sparrow']) || c.levels['starter-avatar-little-sparrow'] == 1) && (!added.hasAny(['starter-frame-plain-wood']) || c.levels['starter-frame-plain-wood'] == 1) && (!added.hasAny(['starter-badge-first-leaf']) || c.levels['starter-badge-first-leaf'] == 1) && (!added.hasAny(['memory-avatar-sapphire-owl']) || c.levels['memory-avatar-sapphire-owl'] == 1) && (!added.hasAny(['memory-frame-golden-laurel']) || c.levels['memory-frame-golden-laurel'] == 1) && (!added.hasAny(['memory-badge-wisdom']) || c.levels['memory-badge-wisdom'] == 1) && (!added.hasAny(['memory-avatar-cherry-rabbit']) || c.levels['memory-avatar-cherry-rabbit'] == 1) && (!added.hasAny(['memory-frame-cherry-blossom']) || c.levels['memory-frame-cherry-blossom'] == 1) && (!added.hasAny(['memory-badge-memory-master']) || c.levels['memory-badge-memory-master'] == 1) && (!added.hasAny(['memory-avatar-stellar-cat']) || c.levels['memory-avatar-stellar-cat'] == 1); }
+    function cosmeticSeed1(c,added) { return (!added.hasAny(['memory-frame-sky-feather']) || c.levels['memory-frame-sky-feather'] == 1) && (!added.hasAny(['memory-avatar-scholar-squirrel']) || c.levels['memory-avatar-scholar-squirrel'] == 1) && (!added.hasAny(['memory-frame-gilded-pages']) || c.levels['memory-frame-gilded-pages'] == 1) && (!added.hasAny(['memory-badge-wisdom-seal']) || c.levels['memory-badge-wisdom-seal'] == 1) && (!added.hasAny(['memory-avatar-stargazer-hedgehog']) || c.levels['memory-avatar-stargazer-hedgehog'] == 1) && (!added.hasAny(['memory-frame-astral-orbit']) || c.levels['memory-frame-astral-orbit'] == 1) && (!added.hasAny(['memory-avatar-dreaming-deer']) || c.levels['memory-avatar-dreaming-deer'] == 1) && (!added.hasAny(['memory-frame-silken-clouds']) || c.levels['memory-frame-silken-clouds'] == 1) && (!added.hasAny(['memory-badge-memory-keeper']) || c.levels['memory-badge-memory-keeper'] == 1) && (!added.hasAny(['memory-avatar-galaxy-whale']) || c.levels['memory-avatar-galaxy-whale'] == 1); }
+    function cosmeticSeed2(c,added) { return (!added.hasAny(['memory-frame-knowledge-gateway']) || c.levels['memory-frame-knowledge-gateway'] == 1) && (!added.hasAny(['memory-avatar-chestnut-squirrel']) || c.levels['memory-avatar-chestnut-squirrel'] == 1) && (!added.hasAny(['memory-frame-autumn-leaves']) || c.levels['memory-frame-autumn-leaves'] == 1) && (!added.hasAny(['memory-badge-four-seasons']) || c.levels['memory-badge-four-seasons'] == 1) && (!added.hasAny(['memory-avatar-snow-rabbit']) || c.levels['memory-avatar-snow-rabbit'] == 1) && (!added.hasAny(['memory-frame-frosted-branch']) || c.levels['memory-frame-frosted-branch'] == 1) && (!added.hasAny(['memory-avatar-honey-bear']) || c.levels['memory-avatar-honey-bear'] == 1) && (!added.hasAny(['memory-frame-golden-honeycomb']) || c.levels['memory-frame-golden-honeycomb'] == 1) && (!added.hasAny(['memory-badge-forest-guardian']) || c.levels['memory-badge-forest-guardian'] == 1) && (!added.hasAny(['memory-avatar-dawn-crane']) || c.levels['memory-avatar-dawn-crane'] == 1); }
+    function cosmeticSeed3(c,added) { return (!added.hasAny(['memory-frame-memory-crown']) || c.levels['memory-frame-memory-crown'] == 1) && (!added.hasAny(['link-avatar-autumn-fox']) || c.levels['link-avatar-autumn-fox'] == 1) && (!added.hasAny(['link-frame-moonblossom']) || c.levels['link-frame-moonblossom'] == 1) && (!added.hasAny(['link-badge-link-master']) || c.levels['link-badge-link-master'] == 1) && (!added.hasAny(['link-avatar-moonfox']) || c.levels['link-avatar-moonfox'] == 1) && (!added.hasAny(['link-frame-silver-moon']) || c.levels['link-frame-silver-moon'] == 1) && (!added.hasAny(['link-badge-golden-bond']) || c.levels['link-badge-golden-bond'] == 1) && (!added.hasAny(['link-avatar-galaxy-deer']) || c.levels['link-avatar-galaxy-deer'] == 1) && (!added.hasAny(['link-frame-stellar-orbit']) || c.levels['link-frame-stellar-orbit'] == 1) && (!added.hasAny(['link-avatar-sailor-beaver']) || c.levels['link-avatar-sailor-beaver'] == 1); }
+    function cosmeticSeed4(c,added) { return (!added.hasAny(['link-frame-moon-coral']) || c.levels['link-frame-moon-coral'] == 1) && (!added.hasAny(['link-badge-lighthouse-guide']) || c.levels['link-badge-lighthouse-guide'] == 1) && (!added.hasAny(['link-avatar-pearl-dolphin']) || c.levels['link-avatar-pearl-dolphin'] == 1) && (!added.hasAny(['link-frame-silver-waves']) || c.levels['link-frame-silver-waves'] == 1) && (!added.hasAny(['link-avatar-azure-turtle']) || c.levels['link-avatar-azure-turtle'] == 1) && (!added.hasAny(['link-frame-pearl-shell']) || c.levels['link-frame-pearl-shell'] == 1) && (!added.hasAny(['link-badge-ocean-knot']) || c.levels['link-badge-ocean-knot'] == 1) && (!added.hasAny(['link-avatar-royal-seahorse']) || c.levels['link-avatar-royal-seahorse'] == 1) && (!added.hasAny(['link-frame-tidal-crown']) || c.levels['link-frame-tidal-crown'] == 1) && (!added.hasAny(['link-avatar-lantern-cat']) || c.levels['link-avatar-lantern-cat'] == 1); }
+    function cosmeticSeed5(c,added) { return (!added.hasAny(['link-frame-silk-lanterns']) || c.levels['link-frame-silk-lanterns'] == 1) && (!added.hasAny(['link-badge-guiding-lantern']) || c.levels['link-badge-guiding-lantern'] == 1) && (!added.hasAny(['link-avatar-festival-sparrow']) || c.levels['link-avatar-festival-sparrow'] == 1) && (!added.hasAny(['link-frame-osmanthus-branch']) || c.levels['link-frame-osmanthus-branch'] == 1) && (!added.hasAny(['link-avatar-paperblossom-deer']) || c.levels['link-avatar-paperblossom-deer'] == 1) && (!added.hasAny(['link-frame-moon-silk']) || c.levels['link-frame-moon-silk'] == 1) && (!added.hasAny(['link-badge-moonlit-promise']) || c.levels['link-badge-moonlit-promise'] == 1) && (!added.hasAny(['link-avatar-glasslight-fox']) || c.levels['link-avatar-glasslight-fox'] == 1) && (!added.hasAny(['link-frame-lantern-moon-gate']) || c.levels['link-frame-lantern-moon-gate'] == 1) && (!added.hasAny(['triple-avatar-jade-dragon']) || c.levels['triple-avatar-jade-dragon'] == 1); }
+    function cosmeticSeed6(c,added) { return (!added.hasAny(['triple-frame-tri-crystal']) || c.levels['triple-frame-tri-crystal'] == 1) && (!added.hasAny(['triple-badge-crystal-triad']) || c.levels['triple-badge-crystal-triad'] == 1) && (!added.hasAny(['triple-avatar-blue-panda']) || c.levels['triple-avatar-blue-panda'] == 1) && (!added.hasAny(['triple-frame-prism']) || c.levels['triple-frame-prism'] == 1) && (!added.hasAny(['triple-badge-triad-master']) || c.levels['triple-badge-triad-master'] == 1) && (!added.hasAny(['triple-avatar-sunset-dragon']) || c.levels['triple-avatar-sunset-dragon'] == 1) && (!added.hasAny(['triple-frame-emerald']) || c.levels['triple-frame-emerald'] == 1) && (!added.hasAny(['triple-avatar-quartz-phoenix']) || c.levels['triple-avatar-quartz-phoenix'] == 1) && (!added.hasAny(['triple-frame-crystal-arch']) || c.levels['triple-frame-crystal-arch'] == 1) && (!added.hasAny(['triple-badge-triangle-seal']) || c.levels['triple-badge-triangle-seal'] == 1); }
+    function cosmeticSeed7(c,added) { return (!added.hasAny(['triple-avatar-amethyst-unicorn']) || c.levels['triple-avatar-amethyst-unicorn'] == 1) && (!added.hasAny(['triple-frame-three-wing-star']) || c.levels['triple-frame-three-wing-star'] == 1) && (!added.hasAny(['triple-avatar-platinum-dragon']) || c.levels['triple-avatar-platinum-dragon'] == 1) && (!added.hasAny(['triple-frame-jade-gears']) || c.levels['triple-frame-jade-gears'] == 1) && (!added.hasAny(['triple-badge-crystal-keeper']) || c.levels['triple-badge-crystal-keeper'] == 1) && (!added.hasAny(['triple-avatar-crystal-mech-cat']) || c.levels['triple-avatar-crystal-mech-cat'] == 1) && (!added.hasAny(['triple-frame-tri-star-crown']) || c.levels['triple-frame-tri-star-crown'] == 1) && (!added.hasAny(['triple-avatar-aurora-snowfox']) || c.levels['triple-avatar-aurora-snowfox'] == 1) && (!added.hasAny(['triple-frame-aurora-ribbon']) || c.levels['triple-frame-aurora-ribbon'] == 1) && (!added.hasAny(['triple-badge-three-dawn-rays']) || c.levels['triple-badge-three-dawn-rays'] == 1); }
+    function cosmeticSeed8(c,added) { return (!added.hasAny(['triple-avatar-jade-penguin']) || c.levels['triple-avatar-jade-penguin'] == 1) && (!added.hasAny(['triple-frame-azure-ice-ring']) || c.levels['triple-frame-azure-ice-ring'] == 1) && (!added.hasAny(['triple-avatar-polar-bear']) || c.levels['triple-avatar-polar-bear'] == 1) && (!added.hasAny(['triple-frame-silver-meteor']) || c.levels['triple-frame-silver-meteor'] == 1) && (!added.hasAny(['triple-badge-aurora-heart']) || c.levels['triple-badge-aurora-heart'] == 1) && (!added.hasAny(['triple-avatar-galactic-dragon']) || c.levels['triple-avatar-galactic-dragon'] == 1) && (!added.hasAny(['triple-frame-aurora-crown']) || c.levels['triple-frame-aurora-crown'] == 1) && (!added.hasAny(['event-avatar-lantern-otter']) || c.levels['event-avatar-lantern-otter'] == 1) && (!added.hasAny(['event-frame-firefly-glow']) || c.levels['event-frame-firefly-glow'] == 1) && (!added.hasAny(['letters-memory-avatar-moss-redpanda']) || c.levels['letters-memory-avatar-moss-redpanda'] == 1); }
+    function cosmeticSeed9(c,added) { return (!added.hasAny(['letters-memory-frame-memory-leaves']) || c.levels['letters-memory-frame-memory-leaves'] == 1) && (!added.hasAny(['letters-memory-badge-folded-leaf']) || c.levels['letters-memory-badge-folded-leaf'] == 1) && (!added.hasAny(['letters-link-avatar-flower-fox']) || c.levels['letters-link-avatar-flower-fox'] == 1) && (!added.hasAny(['letters-link-frame-silk-lantern']) || c.levels['letters-link-frame-silk-lantern'] == 1) && (!added.hasAny(['letters-link-badge-wish-knot']) || c.levels['letters-link-badge-wish-knot'] == 1) && (!added.hasAny(['letters-triple-avatar-rose-dragon']) || c.levels['letters-triple-avatar-rose-dragon'] == 1) && (!added.hasAny(['letters-triple-frame-prism-glass']) || c.levels['letters-triple-frame-prism-glass'] == 1) && (!added.hasAny(['letters-triple-badge-prism-heart']) || c.levels['letters-triple-badge-prism-heart'] == 1) && (!added.hasAny(['letters-royal-avatar-dawn-lion']) || c.levels['letters-royal-avatar-dawn-lion'] == 1) && (!added.hasAny(['letters-royal-frame-journey-crown']) || c.levels['letters-royal-frame-journey-crown'] == 1); }
+    function cosmeticSeed10(c,added) { return (!added.hasAny(['letters-royal-badge-royal-seal']) || c.levels['letters-royal-badge-royal-seal'] == 1); }
+    function cosmeticSeed(n,o) {
+      let c = n.cosmeticProgress;
+      let old = o.get('cosmeticProgress',null);
+      let added = c.levels.diff(old == null ? {} : old.levels).addedKeys();
+      return chestBase(n,o,['cosmeticProgress']) && cosmeticValid(c)
+        && (old == null ? c.sequence == 0 && c.last == null && c.fragments == {'avatar':0,'frame':0,'badge':0} && c.levels.values().hasOnly([1])
+          : c.sequence == old.sequence && c.last == old.last && c.fragments == old.fragments
+        && c.levels.diff(old == null ? {} : old.levels).removedKeys().size() == 0
+        && c.levels.diff(old == null ? {} : old.levels).changedKeys().size() == 0
+        && cosmeticSeed0(c,added)
+        && cosmeticSeed1(c,added)
+        && cosmeticSeed2(c,added)
+        && cosmeticSeed3(c,added)
+        && cosmeticSeed4(c,added)
+        && cosmeticSeed5(c,added)
+        && cosmeticSeed6(c,added)
+        && cosmeticSeed7(c,added)
+        && cosmeticSeed8(c,added)
+        && cosmeticSeed9(c,added)
+        && cosmeticSeed10(c,added));
+    }
+    function cosmeticCopy(n,o,id) {
+      return cosmeticCopyOfType(n,o,id,cosmeticType(id));
+    }
+    function cosmeticCopyOfType(n,o,id,type) {
+      let c = n.cosmeticProgress;
+      let old = o.cosmeticProgress;
+      let level = old.levels.get(id,0);
+      return c.diff(old).affectedKeys().hasOnly(['levels','fragments']) && type in cosmeticTypes()
+        && c.levels.diff(old.levels).affectedKeys().hasOnly([id]) && c.levels[id] == (level < 21 ? level + 1 : 21)
+        && (level < 21 ? c.fragments == old.fragments
+          : c.fragments.diff(old.fragments).affectedKeys().hasOnly([type]) && rewardInt(c.fragments[type]) && c.fragments[type] == old.fragments[type] + 1);
+    }
+    function cosmeticReceive(n,o,changed) {
+      return changed.hasAny(['chests']) ? n.chests.last.poolVersion == 2 && n.chests.last.kind == 'item' && rewardChestOpen(n,o)
+        : cosmeticWheelReceive(n,o,changed,wheelChangedSpin(n.spins,wheelChangedField(n.spins,o.spins)));
+    }
+    function cosmeticWheelReceive(n,o,changed,r) {
+      return r.wheel.version == 3 && r.wheel.kind == 'item' && rewardSpinOnly(n,o,changed);
+    }
+    function cosmeticIngredients(n,o) {
+      return cosmeticCounts(n) && n.avatar + n.frame + n.badge == 3
+        && o.avatar >= n.avatar && o.frame >= n.frame && o.badge >= n.badge;
+    }
+    function cosmeticTrade(n,o) {
+      let c = n.cosmeticProgress;
+      let old = o.cosmeticProgress;
+      let r = c.last;
+      let sell = r.kind == 'sell';
+      return chestBase(n,o,sell ? ['cosmeticProgress'] : ['cosmeticProgress','chests']) && c.diff(old).affectedKeys().hasOnly(['fragments','sequence','last']) && cosmeticCounts(c.fragments) && rewardInt(c.sequence)
+        && c.levels == old.levels && c.sequence == old.sequence + 1 && r.sequence == c.sequence && r.version == 1
+        && r.operation is string && r.operation.matches('^[A-Za-z0-9_-]{1,128}$')
+        && (old.last == null || r.operation != old.last.operation)
+        && (sell ? r.keys().hasAll(['kind','type','quantity','coins','version','operation','sequence'])
+          && r.keys().hasOnly(['kind','type','quantity','coins','version','operation','sequence'])
+          && r.type in cosmeticTypes() && rewardInt(r.quantity) && r.quantity > 0 && r.coins == r.quantity * 100 && rewardInt(r.coins)
+          && old.fragments[r.type] >= r.quantity && cosmeticCountChange(c.fragments,old.fragments,r.type,-r.quantity)
+          : r.kind == 'fuse' && r.keys().hasAll(['kind','ingredients','chestType','fee','roll','version','operation','sequence'])
+          && r.keys().hasOnly(['kind','ingredients','chestType','fee','roll','version','operation','sequence'])
+          && cosmeticIngredients(r.ingredients,old.fragments) && r.fee == 20 && r.roll is number && r.roll >= 0 && r.roll < 1
+          && r.chestType == (r.roll * 3 < 1 ? 'avatar' : r.roll * 3 < 2 ? 'frame' : 'badge')
+          && c.fragments.avatar == old.fragments.avatar - r.ingredients.avatar
+          && c.fragments.frame == old.fragments.frame - r.ingredients.frame
+          && c.fragments.badge == old.fragments.badge - r.ingredients.badge
+          && chestGain(n.chests,o.chests,r.chestType));
+    }
+    function cosmeticUpdate(n,o,changed) {
+      return !o.keys().hasAny(['cosmeticProgress']) || n.cosmeticProgress.sequence == o.cosmeticProgress.sequence
+        ? (changed.hasOnly(['cosmeticProgress','revision','rootRevision','fingerprint','updatedAt']) ? cosmeticSeed(n,o) : cosmeticReceive(n,o,changed))
+        : cosmeticTrade(n,o);
+    }
+
     function emptyChestCounts() { return {'c':0,'frame':0,'avatar':0,'badge':0}; }
     function emptyChests() { return {'version':1,'earned':emptyChestCounts(),'spent':emptyChestCounts(),'sourceEarned':emptyChestCounts(),'sequence':0,'last':null}; }
-    function emptyFestival() { return {'version':1,'earnedTotal':0,'completedCycles':0,'mask':0}; }
+    function emptyFestival() { return {'version':2,'earnedTotal':0,'completedCycles':0,'mask':0}; }
     function chestCountMap(n) {
       return n is map && n.keys().hasOnly(['c','frame','avatar','badge']) && n.keys().hasAll(['c','frame','avatar','badge'])
         && rewardInt(n.c) && rewardInt(n.frame) && rewardInt(n.avatar) && rewardInt(n.badge);
@@ -198,18 +304,25 @@ service cloud.firestore {
         && n.spent.c <= n.earned.c && n.spent.frame <= n.earned.frame && n.spent.avatar <= n.earned.avatar && n.spent.badge <= n.earned.badge
         && n.sequence == n.spent.c + n.spent.frame + n.spent.avatar + n.spent.badge;
     }
+    function festivalAllMask(version) { return version == 1 ? (15) : version == 2 ? (31) : 0; }
+    function festivalThreshold(version,delta) { return version == 1 ? (delta == 1 ? 25 : delta == 2 ? 50 : delta == 4 ? 75 : delta == 8 ? 100 : 0) : version == 2 ? (delta == 1 ? 10 : delta == 2 ? 25 : delta == 4 ? 50 : delta == 8 ? 75 : delta == 16 ? 100 : 0) : 0; }
+    function festivalChest(version,delta) { return version == 1 ? (delta == 1 ? '' : delta == 2 ? 'c' : delta == 4 ? 'frame' : delta == 8 ? 'avatar' : '') : version == 2 ? (delta == 1 ? '' : delta == 2 ? '' : delta == 4 ? 'c' : delta == 8 ? 'frame' : delta == 16 ? 'avatar' : '') : ''; }
     function festivalValid(n) {
-      return n.keys().hasOnly(['version','earnedTotal','completedCycles','mask']) && n.version == 1
+      return n.keys().hasOnly(['version','earnedTotal','completedCycles','mask']) && n.version in [1,2]
         && rewardInt(n.earnedTotal) && rewardInt(n.completedCycles) && n.earnedTotal >= n.completedCycles * 100
-        && n.mask is int && n.mask >= 0 && n.mask < 15
-        && (n.mask % 2 == 0 || n.earnedTotal - n.completedCycles * 100 >= 25)
-        && (int(n.mask / 2) % 2 == 0 || n.earnedTotal - n.completedCycles * 100 >= 50)
-        && (int(n.mask / 4) % 2 == 0 || n.earnedTotal - n.completedCycles * 100 >= 75)
-        && (int(n.mask / 8) % 2 == 0 || n.earnedTotal - n.completedCycles * 100 >= 100);
+        && n.mask is int && n.mask >= 0 && n.mask < festivalAllMask(n.version)
+        && (n.version == 1 ? ((int(n.mask / 1) % 2 == 0 || n.earnedTotal - n.completedCycles * 100 >= 25) && (int(n.mask / 2) % 2 == 0 || n.earnedTotal - n.completedCycles * 100 >= 50) && (int(n.mask / 4) % 2 == 0 || n.earnedTotal - n.completedCycles * 100 >= 75) && (int(n.mask / 8) % 2 == 0 || n.earnedTotal - n.completedCycles * 100 >= 100)) : n.version == 2 ? ((int(n.mask / 1) % 2 == 0 || n.earnedTotal - n.completedCycles * 100 >= 10) && (int(n.mask / 2) % 2 == 0 || n.earnedTotal - n.completedCycles * 100 >= 25) && (int(n.mask / 4) % 2 == 0 || n.earnedTotal - n.completedCycles * 100 >= 50) && (int(n.mask / 8) % 2 == 0 || n.earnedTotal - n.completedCycles * 100 >= 75) && (int(n.mask / 16) % 2 == 0 || n.earnedTotal - n.completedCycles * 100 >= 100)) : false);
     }
     function chestBase(n,o,fields) {
-      return n.diff(o).affectedKeys().hasOnly(fields.concat(['revision','rootRevision','fingerprint','updatedAt']))
-        && n.revision == o.revision + 1 && n.updatedAt == request.time && n.day == int(request.time.toMillis() / 86400000);
+      return rewardBase(n,o,fields,n.diff(o).affectedKeys());
+    }
+    function rewardBase(n,o,fields,changed) {
+      return changed.hasOnly(fields.concat(['revision','rootRevision','fingerprint','updatedAt']))
+        && rewardRevision(n,o);
+    }
+    function rewardRevision(n,o) {
+      return n.revision == o.revision + 1 && n.updatedAt == request.time
+        && (n.day == int(request.time.toMillis() / 86400000) || n.day == o.day && n.day < int(request.time.toMillis() / 86400000));
     }
     function rewardChestInit(n,o) {
       return !o.keys().hasAny(['chests','festival']) && chestBase(n,o,['chests','festival'])
@@ -226,42 +339,68 @@ service cloud.firestore {
     }
     function rewardFestivalEarn(n,o) {
       return chestBase(n,o,['festival']) && festivalValid(n.festival) && n.festival.completedCycles == o.festival.completedCycles
-        && n.festival.mask == o.festival.mask && n.festival.earnedTotal >= o.festival.earnedTotal;
+        && n.festival.version == o.festival.version && n.festival.mask == o.festival.mask && n.festival.earnedTotal >= o.festival.earnedTotal;
     }
     function rewardFestivalClaim(n,o) {
       let prior = o.festival;
       let next = n.festival;
-      let delta = next.completedCycles == prior.completedCycles ? next.mask - prior.mask : 15 - prior.mask;
-      let threshold = delta == 1 ? 25 : delta == 2 ? 50 : delta == 4 ? 75 : 100;
-      let type = delta == 2 ? 'c' : delta == 4 ? 'frame' : 'avatar';
-      return chestBase(n,o,['festival','chests']) && festivalValid(next) && next.earnedTotal == prior.earnedTotal
-        && (next.completedCycles == prior.completedCycles && next.mask > prior.mask
-          || next.completedCycles == prior.completedCycles + 1 && next.mask == 0)
-        && delta in [1,2,4,8] && int(prior.mask / delta) % 2 == 0 && prior.earnedTotal - prior.completedCycles * 100 >= threshold
-        && (delta == 1 ? n.chests == o.chests : chestGain(n.chests,o.chests,type));
+      let rollover = next.completedCycles == prior.completedCycles + 1;
+      let delta = rollover ? festivalAllMask(prior.version) - prior.mask : next.mask - prior.mask;
+      let threshold = festivalThreshold(prior.version,delta);
+      let type = festivalChest(prior.version,delta);
+      return chestBase(n,o,['festival','chests']) && festivalValid(prior) && festivalValid(next) && next.earnedTotal == prior.earnedTotal
+        && (next.completedCycles == prior.completedCycles && next.mask > prior.mask && next.version == prior.version
+          || rollover && next.mask == 0 && next.version == 2)
+        && delta in (prior.version == 1 ? [1,2,4,8] : [1,2,4,8,16]) && int(prior.mask / delta) % 2 == 0
+        && prior.earnedTotal - prior.completedCycles * 100 >= threshold
+        && (type == '' ? n.chests == o.chests : chestGain(n.chests,o.chests,type));
     }
+    function chestPoolItem(r) { return r.poolVersion == 1 ? (r.chestType == 'avatar' ? r.itemId.matches("^(memory-avatar-sapphire-owl|memory-avatar-cherry-rabbit|memory-avatar-stellar-cat|memory-avatar-scholar-squirrel|memory-avatar-stargazer-hedgehog|memory-avatar-dreaming-deer|memory-avatar-galaxy-whale|memory-avatar-chestnut-squirrel|memory-avatar-snow-rabbit|memory-avatar-honey-bear|memory-avatar-dawn-crane|link-avatar-autumn-fox|link-avatar-moonfox|link-avatar-galaxy-deer|link-avatar-sailor-beaver|link-avatar-pearl-dolphin|link-avatar-azure-turtle|link-avatar-royal-seahorse|link-avatar-lantern-cat|link-avatar-festival-sparrow|link-avatar-paperblossom-deer|link-avatar-glasslight-fox|triple-avatar-jade-dragon|triple-avatar-blue-panda|triple-avatar-sunset-dragon|triple-avatar-quartz-phoenix|triple-avatar-amethyst-unicorn|triple-avatar-platinum-dragon|triple-avatar-crystal-mech-cat|triple-avatar-aurora-snowfox|triple-avatar-jade-penguin|triple-avatar-polar-bear|triple-avatar-galactic-dragon|letters-memory-avatar-moss-redpanda|letters-link-avatar-flower-fox|letters-triple-avatar-rose-dragon|letters-royal-avatar-dawn-lion|event-avatar-lantern-otter)$") : r.chestType == 'frame' ? r.itemId.matches("^(memory-frame-golden-laurel|memory-frame-cherry-blossom|memory-frame-sky-feather|memory-frame-gilded-pages|memory-frame-astral-orbit|memory-frame-silken-clouds|memory-frame-knowledge-gateway|memory-frame-autumn-leaves|memory-frame-frosted-branch|memory-frame-golden-honeycomb|memory-frame-memory-crown|link-frame-moonblossom|link-frame-silver-moon|link-frame-stellar-orbit|link-frame-moon-coral|link-frame-silver-waves|link-frame-pearl-shell|link-frame-tidal-crown|link-frame-silk-lanterns|link-frame-osmanthus-branch|link-frame-moon-silk|link-frame-lantern-moon-gate|triple-frame-tri-crystal|triple-frame-prism|triple-frame-emerald|triple-frame-crystal-arch|triple-frame-three-wing-star|triple-frame-jade-gears|triple-frame-tri-star-crown|triple-frame-aurora-ribbon|triple-frame-azure-ice-ring|triple-frame-silver-meteor|triple-frame-aurora-crown|letters-memory-frame-memory-leaves|letters-link-frame-silk-lantern|letters-triple-frame-prism-glass|letters-royal-frame-journey-crown|event-frame-firefly-glow)$") : r.chestType == 'badge' ? r.itemId.matches("^(memory-badge-wisdom|memory-badge-memory-master|memory-badge-wisdom-seal|memory-badge-memory-keeper|memory-badge-four-seasons|memory-badge-forest-guardian|link-badge-link-master|link-badge-golden-bond|link-badge-lighthouse-guide|link-badge-ocean-knot|link-badge-guiding-lantern|link-badge-moonlit-promise|triple-badge-crystal-triad|triple-badge-triad-master|triple-badge-triangle-seal|triple-badge-crystal-keeper|triple-badge-three-dawn-rays|triple-badge-aurora-heart|letters-memory-badge-folded-leaf|letters-link-badge-wish-knot|letters-triple-badge-prism-heart|letters-royal-badge-royal-seal)$") : false) : (r.chestType == 'avatar' ? r.itemId.matches("^(starter-avatar-little-sparrow|memory-avatar-sapphire-owl|memory-avatar-cherry-rabbit|memory-avatar-stellar-cat|memory-avatar-scholar-squirrel|memory-avatar-stargazer-hedgehog|memory-avatar-dreaming-deer|memory-avatar-galaxy-whale|memory-avatar-chestnut-squirrel|memory-avatar-snow-rabbit|memory-avatar-honey-bear|memory-avatar-dawn-crane|link-avatar-autumn-fox|link-avatar-moonfox|link-avatar-galaxy-deer|link-avatar-sailor-beaver|link-avatar-pearl-dolphin|link-avatar-azure-turtle|link-avatar-royal-seahorse|link-avatar-lantern-cat|link-avatar-festival-sparrow|link-avatar-paperblossom-deer|link-avatar-glasslight-fox|triple-avatar-jade-dragon|triple-avatar-blue-panda|triple-avatar-sunset-dragon|triple-avatar-quartz-phoenix|triple-avatar-amethyst-unicorn|triple-avatar-platinum-dragon|triple-avatar-crystal-mech-cat|triple-avatar-aurora-snowfox|triple-avatar-jade-penguin|triple-avatar-polar-bear|triple-avatar-galactic-dragon|event-avatar-lantern-otter|letters-memory-avatar-moss-redpanda|letters-link-avatar-flower-fox|letters-triple-avatar-rose-dragon|letters-royal-avatar-dawn-lion)$") : r.chestType == 'frame' ? r.itemId.matches("^(starter-frame-plain-wood|memory-frame-golden-laurel|memory-frame-cherry-blossom|memory-frame-sky-feather|memory-frame-gilded-pages|memory-frame-astral-orbit|memory-frame-silken-clouds|memory-frame-knowledge-gateway|memory-frame-autumn-leaves|memory-frame-frosted-branch|memory-frame-golden-honeycomb|memory-frame-memory-crown|link-frame-moonblossom|link-frame-silver-moon|link-frame-stellar-orbit|link-frame-moon-coral|link-frame-silver-waves|link-frame-pearl-shell|link-frame-tidal-crown|link-frame-silk-lanterns|link-frame-osmanthus-branch|link-frame-moon-silk|link-frame-lantern-moon-gate|triple-frame-tri-crystal|triple-frame-prism|triple-frame-emerald|triple-frame-crystal-arch|triple-frame-three-wing-star|triple-frame-jade-gears|triple-frame-tri-star-crown|triple-frame-aurora-ribbon|triple-frame-azure-ice-ring|triple-frame-silver-meteor|triple-frame-aurora-crown|event-frame-firefly-glow|letters-memory-frame-memory-leaves|letters-link-frame-silk-lantern|letters-triple-frame-prism-glass|letters-royal-frame-journey-crown)$") : r.chestType == 'badge' ? r.itemId.matches("^(starter-badge-first-leaf|memory-badge-wisdom|memory-badge-memory-master|memory-badge-wisdom-seal|memory-badge-memory-keeper|memory-badge-four-seasons|memory-badge-forest-guardian|link-badge-link-master|link-badge-golden-bond|link-badge-lighthouse-guide|link-badge-ocean-knot|link-badge-guiding-lantern|link-badge-moonlit-promise|triple-badge-crystal-triad|triple-badge-triad-master|triple-badge-triangle-seal|triple-badge-crystal-keeper|triple-badge-three-dawn-rays|triple-badge-aurora-heart|letters-memory-badge-folded-leaf|letters-link-badge-wish-knot|letters-triple-badge-prism-heart|letters-royal-badge-royal-seal)$") : false); }
     function validChestResult(r) {
       return r.keys().hasOnly(['chestType','gameId','poolVersion','kind','coins','reason','key','label','itemId','operation','sequence'])
-        && r.chestType in ['c','avatar','frame','badge'] && r.gameId in ['memory-match','link-connect','triple-connect'] && r.poolVersion == 1
+        && r.chestType in ['c','avatar','frame','badge'] && r.gameId in ['memory-match','link-connect','triple-connect'] && r.poolVersion in [1,2]
         && r.operation is string && r.operation.matches('^[A-Za-z0-9_-]{1,128}$') && rewardInt(r.coins)
         && (r.kind == 'coins' ? (r.reason == 'coins' ? r.coins == (r.chestType == 'c' ? 50 : r.chestType == 'avatar' ? 150 : 100)
-          : r.reason == 'overflow' ? r.coins == 10 : r.reason in ['duplicate','full'] && r.chestType != 'c' && r.coins in [100, (r.chestType == 'avatar' ? 300 : 200)])
-          : r.kind == 'item' ? r.coins == 0 && r.itemId in (r.chestType == 'avatar' ? ["memory-avatar-sapphire-owl","memory-avatar-cherry-rabbit","memory-avatar-stellar-cat","memory-avatar-scholar-squirrel","memory-avatar-stargazer-hedgehog","memory-avatar-dreaming-deer","memory-avatar-galaxy-whale","memory-avatar-chestnut-squirrel","memory-avatar-snow-rabbit","memory-avatar-honey-bear","memory-avatar-dawn-crane","link-avatar-autumn-fox","link-avatar-moonfox","link-avatar-galaxy-deer","link-avatar-sailor-beaver","link-avatar-pearl-dolphin","link-avatar-azure-turtle","link-avatar-royal-seahorse","link-avatar-lantern-cat","link-avatar-festival-sparrow","link-avatar-paperblossom-deer","link-avatar-glasslight-fox","triple-avatar-jade-dragon","triple-avatar-blue-panda","triple-avatar-sunset-dragon","triple-avatar-quartz-phoenix","triple-avatar-amethyst-unicorn","triple-avatar-platinum-dragon","triple-avatar-crystal-mech-cat","triple-avatar-aurora-snowfox","triple-avatar-jade-penguin","triple-avatar-polar-bear","triple-avatar-galactic-dragon","letters-memory-avatar-moss-redpanda","letters-link-avatar-flower-fox","letters-triple-avatar-rose-dragon","letters-royal-avatar-dawn-lion","event-avatar-lantern-otter"] : (r.chestType == 'frame' ? ["memory-frame-golden-laurel","memory-frame-cherry-blossom","memory-frame-sky-feather","memory-frame-gilded-pages","memory-frame-astral-orbit","memory-frame-silken-clouds","memory-frame-knowledge-gateway","memory-frame-autumn-leaves","memory-frame-frosted-branch","memory-frame-golden-honeycomb","memory-frame-memory-crown","link-frame-moonblossom","link-frame-silver-moon","link-frame-stellar-orbit","link-frame-moon-coral","link-frame-silver-waves","link-frame-pearl-shell","link-frame-tidal-crown","link-frame-silk-lanterns","link-frame-osmanthus-branch","link-frame-moon-silk","link-frame-lantern-moon-gate","triple-frame-tri-crystal","triple-frame-prism","triple-frame-emerald","triple-frame-crystal-arch","triple-frame-three-wing-star","triple-frame-jade-gears","triple-frame-tri-star-crown","triple-frame-aurora-ribbon","triple-frame-azure-ice-ring","triple-frame-silver-meteor","triple-frame-aurora-crown","letters-memory-frame-memory-leaves","letters-link-frame-silk-lantern","letters-triple-frame-prism-glass","letters-royal-frame-journey-crown","event-frame-firefly-glow"] : (r.chestType == 'badge' ? ["memory-badge-wisdom","memory-badge-memory-master","memory-badge-wisdom-seal","memory-badge-memory-keeper","memory-badge-four-seasons","memory-badge-forest-guardian","link-badge-link-master","link-badge-golden-bond","link-badge-lighthouse-guide","link-badge-ocean-knot","link-badge-guiding-lantern","link-badge-moonlit-promise","triple-badge-crystal-triad","triple-badge-triad-master","triple-badge-triangle-seal","triple-badge-crystal-keeper","triple-badge-three-dawn-rays","triple-badge-aurora-heart","letters-memory-badge-folded-leaf","letters-link-badge-wish-knot","letters-triple-badge-prism-heart","letters-royal-badge-royal-seal"] : [])))
+          : r.reason == 'overflow' ? r.coins == 10 : r.poolVersion == 1 && r.reason in ['duplicate','full'] && r.chestType != 'c' && r.coins in [100, (r.chestType == 'avatar' ? 300 : 200)])
+          : r.kind == 'item' ? r.coins == 0 && chestPoolItem(r)
           : r.kind == 'support' && r.coins == 0 && r.key in (r.gameId == 'memory-match' ? ["hint","preview4","time30"] : (r.gameId == 'link-connect' ? ["hint","reshuffle","thunder","freeze"] : (r.gameId == 'triple-connect' ? ["hint","undo","shuffle","time"] : []))));
     }
     function rewardChestOpen(n,o) {
       let last = n.chests.last;
-      return chestBase(n,o,['chests']) && n.chests.earned == o.chests.earned && n.chests.sourceEarned == o.chests.sourceEarned && chestCounts(n.chests)
+      // Prior counters were validated on creation/credit. Only one spent counter
+      // can change here; validate that delta and preserve every other field.
+      // Revalidating all twelve counters exceeds the Rules evaluation budget
+      // when the same atomic update also receives a cosmetic copy.
+      return chestBase(n,o,['chests','cosmeticProgress']) && n.chests.earned == o.chests.earned && n.chests.sourceEarned == o.chests.sourceEarned
+        && n.chests.diff(o.chests).affectedKeys().hasOnly(['spent','sequence','last'])
+        && rewardInt(n.chests.sequence)
         && n.chests.sequence == o.chests.sequence + 1 && last.sequence == n.chests.sequence && validChestResult(last)
+        && (last.poolVersion != 2 || last.kind != 'item' || cosmeticCopy(n,o,last.itemId))
         && (!(last.get('reason','') in ['duplicate','full']) || last.coins == 100)
         && n.chests.spent.diff(o.chests.spent).affectedKeys().hasOnly([last.chestType])
+        && rewardInt(n.chests.spent[last.chestType])
+        && n.chests.spent[last.chestType] <= n.chests.earned[last.chestType]
         && n.chests.spent[last.chestType] == o.chests.spent[last.chestType] + 1;
     }
-    function rewardSpinOnly(n,o) {
+    function rewardChestSale(n,o) {
+      let c = n.chests;
+      let old = o.chests;
+      let r = c.last;
+      return chestBase(n,o,['chests']) && chestCounts(c) && c.earned == old.earned && c.sourceEarned == old.sourceEarned
+        && r.keys().hasAll(['kind','chestType','quantity','coins','unitPrice','priceVersion','operation','sequence'])
+        && r.keys().hasOnly(['kind','chestType','quantity','coins','unitPrice','priceVersion','operation','sequence'])
+        && r.kind == 'sale' && r.priceVersion == 1 && r.chestType in ['c','avatar','frame','badge'] && rewardInt(r.quantity) && r.quantity > 0
+        && r.unitPrice == (r.chestType == 'c' ? 58 : 200) && r.coins == r.quantity * r.unitPrice && rewardInt(r.coins)
+        && r.operation is string && r.operation.matches('^[A-Za-z0-9_-]{1,128}$') && (old.last == null || r.operation != old.last.operation)
+        && c.sequence == old.sequence + r.quantity && r.sequence == c.sequence
+        && c.spent.diff(old.spent).affectedKeys().hasOnly([r.chestType]) && c.spent[r.chestType] == old.spent[r.chestType] + r.quantity;
+    }
+    function rewardSpinOnly(n,o,changed) {
       let spent = n.ticketSpent - o.ticketSpent;
-      return n.spins.pastAds != o.spins.pastAds ? chestBase(n,o,['spins','pendingWheel']) && rewardWheelLateSpin(n,o)
-        : chestBase(n,o,['spins','tickets','ticketSpent','pendingWheel'])
-        && rewardInt(n.tickets) && rewardInt(n.ticketSpent) && spent in [0,1] && n.tickets == o.tickets - spent
+      return n.spins.pastAds != o.spins.pastAds ? rewardBase(n,o,['spins','pendingWheel','cosmeticProgress'],changed) && rewardWheelLateSpin(n,o)
+        : rewardBase(n,o,['spins','tickets','ticketSpent','pendingWheel','cosmeticProgress'],changed)
+        && n.tickets is int && n.tickets >= 0 && n.ticketSpent is int && n.ticketSpent <= 9007199254740991
+        && spent in [0,1] && n.tickets == o.tickets - spent
         && (spent == 0 ? n.spins.ticket == o.spins.ticket : n.spins.ticket.sequence == n.ticketSpent && n.spins.ticket != o.spins.ticket)
         && (n.spins == o.spins ? spent == 0 && n.get('pendingWheel',null) == o.get('pendingWheel',null)
           : rewardWheelSpinUpdate(n,o));
@@ -282,8 +421,8 @@ service cloud.firestore {
       return chestBase(n,o,['hourlyGift','tickets'])
         && g.keys().hasOnly(['version','sequence','claimedAt','last']) && g.version == 1
         && rewardInt(g.sequence) && g.sequence == (previous == null ? 1 : previous.sequence + 1)
-        && g.claimedAt == request.time
-        && (previous == null || request.time >= previous.claimedAt + duration.value(10,'s'))
+        && g.claimedAt is timestamp && g.claimedAt <= request.time && g.claimedAt.toMillis() >= o.day * 86400000
+        && (previous == null || g.claimedAt >= previous.claimedAt + duration.value(10,'s'))
         && r.keys().hasOnly(['operation','sequence','kind','coins','gameId','key','tickets'])
         && r.operation is string && r.operation.matches('^[A-Za-z0-9_-]{1,128}$') && r.sequence == g.sequence
         && (r.kind == 'ticket' ? r.coins == 0 && r.gameId == null && r.key == null && (!r.keys().hasAny(['tickets']) || r.tickets == 10)
@@ -291,23 +430,23 @@ service cloud.firestore {
           : r.kind == 'support' && r.coins == 0 && hourlySupport(r)))
         && rewardInt(n.tickets) && n.tickets == o.tickets + (r.kind == 'ticket' ? r.get('tickets',1) : 0);
     }
-    function dispatchRewardUpdate(n,o) {
-      let changed = n.diff(o).affectedKeys();
-      return changed.hasAny(['pendingWheel']) && !changed.hasAny(['spins']) ? rewardWheelClaim(n,o)
+    function dispatchRewardUpdate(n,o,changed) {
+      return changed.hasAny(['cosmeticProgress']) ? cosmeticUpdate(n,o,changed)
+        : changed.hasAny(['pendingWheel']) && !changed.hasAny(['spins']) ? (n.get('pendingWheel',null) != null && n.pendingWheel.get('phase','') == 'reserved-ad'
+          || o.get('pendingWheel',null) != null && o.pendingWheel.get('phase','') == 'reserved-ad' ? rewardWheelReservation(n,o,changed) : rewardWheelClaim(n,o))
         : changed.hasAny(['hourlyGift']) ? rewardHourlyGift(n,o) : n.day != o.day ? rewardPeriodRollover(n,o)
         : changed.hasAny(['chests','festival']) ? (!o.keys().hasAny(['chests','festival']) ? rewardChestInit(n,o)
           : changed.hasAny(['letters']) ? rewardChestExchange(n,o)
-          : changed.hasAny(['chests']) ? (n.chests.sequence != o.chests.sequence ? rewardChestOpen(n,o) : (changed.hasAny(['festival']) ? rewardFestivalClaim(n,o) : rewardChestSources(n,o)))
+          : changed.hasAny(['chests']) ? (n.chests.sequence != o.chests.sequence ? (n.chests.last.kind == 'sale' ? rewardChestSale(n,o) : rewardChestOpen(n,o)) : (changed.hasAny(['festival']) ? rewardFestivalClaim(n,o) : rewardChestSources(n,o)))
           : changed.hasOnly(['festival','revision','rootRevision','fingerprint','updatedAt']) ? (n.festival.earnedTotal != o.festival.earnedTotal ? rewardFestivalEarn(n,o) : (changed.hasAny(['festival']) ? rewardFestivalClaim(n,o) : rewardChestSources(n,o))) : rewardProgressFlush(n,o))
-        : changed.hasOnly(['spins','tickets','ticketSpent','pendingWheel','revision','rootRevision','fingerprint','updatedAt']) ? rewardSpinOnly(n,o)
-        : changed.hasOnly(['letters','revision','rootRevision','fingerprint','updatedAt']) ? rewardLetterUpdate(n,o)
+        : changed.hasOnly(['spins','tickets','ticketSpent','pendingWheel','revision','rootRevision','fingerprint','updatedAt']) ? rewardSpinOnly(n,o,changed)
         : changed.hasAny(['loginReward']) ? rewardMissionLogin(n,o)
         : changed.hasOnly(['letters','daily','weekly','event','tickets','ticketEarned','revision','rootRevision','fingerprint','updatedAt']) && n.daily.claimed == o.daily.claimed && n.weekly.claimed == o.weekly.claimed ? rewardProgressFlush(n,o)
         : changed.hasOnly(['daily','weekly','tickets','revision','rootRevision','fingerprint','updatedAt']) ? rewardMissionClaims(n,o)
         : validRewardState(n,o) && rewardTransition(n,o);
     }
 
-    function wheelPoolItem(w) { return w.box == 'mystery' ? (w.chestType == 'avatar' ? w.itemId.matches("^(memory-avatar-sapphire-owl|memory-avatar-cherry-rabbit|memory-avatar-stellar-cat|memory-avatar-scholar-squirrel|memory-avatar-stargazer-hedgehog|memory-avatar-dreaming-deer|memory-avatar-galaxy-whale|memory-avatar-chestnut-squirrel|memory-avatar-snow-rabbit|memory-avatar-honey-bear|memory-avatar-dawn-crane|link-avatar-autumn-fox|link-avatar-moonfox|link-avatar-galaxy-deer|link-avatar-sailor-beaver|link-avatar-pearl-dolphin|link-avatar-azure-turtle|link-avatar-royal-seahorse|link-avatar-lantern-cat|link-avatar-festival-sparrow|link-avatar-paperblossom-deer|link-avatar-glasslight-fox|triple-avatar-jade-dragon|triple-avatar-blue-panda|triple-avatar-sunset-dragon|triple-avatar-quartz-phoenix|triple-avatar-amethyst-unicorn|triple-avatar-platinum-dragon|triple-avatar-crystal-mech-cat|triple-avatar-aurora-snowfox|triple-avatar-jade-penguin|triple-avatar-polar-bear|triple-avatar-galactic-dragon|letters-memory-avatar-moss-redpanda|letters-link-avatar-flower-fox|letters-triple-avatar-rose-dragon|letters-royal-avatar-dawn-lion|event-avatar-lantern-otter)$") : w.chestType == 'frame' ? w.itemId.matches("^(memory-frame-golden-laurel|memory-frame-cherry-blossom|memory-frame-sky-feather|memory-frame-gilded-pages|memory-frame-astral-orbit|memory-frame-silken-clouds|memory-frame-knowledge-gateway|memory-frame-autumn-leaves|memory-frame-frosted-branch|memory-frame-golden-honeycomb|memory-frame-memory-crown|link-frame-moonblossom|link-frame-silver-moon|link-frame-stellar-orbit|link-frame-moon-coral|link-frame-silver-waves|link-frame-pearl-shell|link-frame-tidal-crown|link-frame-silk-lanterns|link-frame-osmanthus-branch|link-frame-moon-silk|link-frame-lantern-moon-gate|triple-frame-tri-crystal|triple-frame-prism|triple-frame-emerald|triple-frame-crystal-arch|triple-frame-three-wing-star|triple-frame-jade-gears|triple-frame-tri-star-crown|triple-frame-aurora-ribbon|triple-frame-azure-ice-ring|triple-frame-silver-meteor|triple-frame-aurora-crown|letters-memory-frame-memory-leaves|letters-link-frame-silk-lantern|letters-triple-frame-prism-glass|letters-royal-frame-journey-crown|event-frame-firefly-glow)$") : w.chestType == 'badge' ? w.itemId.matches("^(memory-badge-wisdom|memory-badge-memory-master|memory-badge-wisdom-seal|memory-badge-memory-keeper|memory-badge-four-seasons|memory-badge-forest-guardian|link-badge-link-master|link-badge-golden-bond|link-badge-lighthouse-guide|link-badge-ocean-knot|link-badge-guiding-lantern|link-badge-moonlit-promise|triple-badge-crystal-triad|triple-badge-triad-master|triple-badge-triangle-seal|triple-badge-crystal-keeper|triple-badge-three-dawn-rays|triple-badge-aurora-heart|letters-memory-badge-folded-leaf|letters-link-badge-wish-knot|letters-triple-badge-prism-heart|letters-royal-badge-royal-seal)$") : false) : (w.box == 'cosmetic' ? w.itemId.matches("^(memory-avatar-sapphire-owl|memory-frame-golden-laurel|memory-badge-wisdom|memory-avatar-cherry-rabbit|memory-frame-cherry-blossom|memory-badge-memory-master|memory-avatar-stellar-cat|memory-frame-sky-feather|memory-avatar-scholar-squirrel|memory-frame-gilded-pages|memory-badge-wisdom-seal|memory-avatar-stargazer-hedgehog|memory-frame-astral-orbit|memory-avatar-dreaming-deer|memory-frame-silken-clouds|memory-badge-memory-keeper|memory-avatar-galaxy-whale|memory-frame-knowledge-gateway|memory-avatar-chestnut-squirrel|memory-frame-autumn-leaves|memory-badge-four-seasons|memory-avatar-snow-rabbit|memory-frame-frosted-branch|memory-avatar-honey-bear|memory-frame-golden-honeycomb|memory-badge-forest-guardian|memory-avatar-dawn-crane|memory-frame-memory-crown|link-avatar-autumn-fox|link-frame-moonblossom|link-badge-link-master|link-avatar-moonfox|link-frame-silver-moon|link-badge-golden-bond|link-avatar-galaxy-deer|link-frame-stellar-orbit|link-avatar-sailor-beaver|link-frame-moon-coral|link-badge-lighthouse-guide|link-avatar-pearl-dolphin|link-frame-silver-waves|link-avatar-azure-turtle|link-frame-pearl-shell|link-badge-ocean-knot|link-avatar-royal-seahorse|link-frame-tidal-crown|link-avatar-lantern-cat|link-frame-silk-lanterns|link-badge-guiding-lantern|link-avatar-festival-sparrow|link-frame-osmanthus-branch|link-avatar-paperblossom-deer|link-frame-moon-silk|link-badge-moonlit-promise|link-avatar-glasslight-fox|link-frame-lantern-moon-gate|triple-avatar-jade-dragon|triple-frame-tri-crystal|triple-badge-crystal-triad|triple-avatar-blue-panda|triple-frame-prism|triple-badge-triad-master|triple-avatar-sunset-dragon|triple-frame-emerald|triple-avatar-quartz-phoenix|triple-frame-crystal-arch|triple-badge-triangle-seal|triple-avatar-amethyst-unicorn|triple-frame-three-wing-star|triple-avatar-platinum-dragon|triple-frame-jade-gears|triple-badge-crystal-keeper|triple-avatar-crystal-mech-cat|triple-frame-tri-star-crown|triple-avatar-aurora-snowfox|triple-frame-aurora-ribbon|triple-badge-three-dawn-rays|triple-avatar-jade-penguin|triple-frame-azure-ice-ring|triple-avatar-polar-bear|triple-frame-silver-meteor|triple-badge-aurora-heart|triple-avatar-galactic-dragon|triple-frame-aurora-crown|letters-memory-avatar-moss-redpanda|letters-memory-frame-memory-leaves|letters-memory-badge-folded-leaf|letters-link-avatar-flower-fox|letters-link-frame-silk-lantern|letters-link-badge-wish-knot|letters-triple-avatar-rose-dragon|letters-triple-frame-prism-glass|letters-triple-badge-prism-heart|letters-royal-avatar-dawn-lion|letters-royal-frame-journey-crown|letters-royal-badge-royal-seal|event-avatar-lantern-otter|event-frame-firefly-glow)$") : w.box == 'flip' ? w.itemId.matches("^(wheel-flip-memory-effect-moonflip|wheel-flip-memory-effect-spring-petals|wheel-flip-fade-scale|wheel-flip-pop|wheel-flip-slide-up|wheel-flip-flip-y|wheel-flip-zoom-rotate|wheel-flip-blur-in)$") : w.box == 'theme' ? w.itemId.matches("^(wheel-theme-shared-animals-land|wheel-theme-triple-animals-land|wheel-theme-shared-animals-air|wheel-theme-triple-animals-air|wheel-theme-shared-animals-sea|wheel-theme-triple-animals-sea|wheel-theme-shared-foods|wheel-theme-triple-foods|wheel-theme-shared-drinks|wheel-theme-triple-drinks|wheel-theme-shared-fruits|wheel-theme-triple-fruits|wheel-theme-shared-geometry|wheel-theme-triple-geometry|wheel-theme-shared-cyberpunk|wheel-theme-triple-cyberpunk|wheel-theme-shared-magic-rpg|wheel-theme-triple-magic-rpg|wheel-theme-shared-space|wheel-theme-triple-space|wheel-theme-shared-household|wheel-theme-triple-household|wheel-theme-shared-office-supplies|wheel-theme-triple-office-supplies|wheel-theme-shared-fashion|wheel-theme-triple-fashion|wheel-theme-shared-vehicles|wheel-theme-triple-vehicles|wheel-theme-shared-festivals|wheel-theme-triple-festivals|wheel-theme-shared-alphabet|wheel-theme-triple-alphabet|wheel-theme-shared-numbers-2|wheel-theme-triple-numbers-2|wheel-theme-shared-numbers-3|wheel-theme-triple-numbers-3|wheel-theme-shared-computer-symbols|wheel-theme-triple-computer-symbols)$") : w.box == 'path' ? w.itemId.matches("^(wheel-path-link-electric|wheel-path-triple-electric|wheel-path-link-laser|wheel-path-triple-laser|wheel-path-link-fire|wheel-path-triple-fire|wheel-path-link-magic|wheel-path-triple-magic|wheel-path-link-cyber|wheel-path-triple-cyber|wheel-path-link-rainbow|wheel-path-triple-rainbow|wheel-path-link-hydro|wheel-path-triple-hydro|wheel-path-link-plasma|wheel-path-triple-plasma|wheel-path-link-holy|wheel-path-triple-holy|wheel-path-link-shadow|wheel-path-triple-shadow|wheel-path-link-spiral|wheel-path-triple-spiral|wheel-path-link-dashed|wheel-path-triple-dashed|wheel-path-link-bullet|wheel-path-triple-bullet|wheel-path-link-kame|wheel-path-triple-kame|wheel-path-link-halo|wheel-path-triple-halo|wheel-path-link-matrix|wheel-path-triple-matrix|wheel-path-link-sonic|wheel-path-triple-sonic|wheel-path-link-chains|wheel-path-triple-chains|wheel-path-link-meteor|wheel-path-triple-meteor|wheel-path-link-poison|wheel-path-triple-poison|wheel-path-link-link-effect-meteor-route|wheel-path-triple-triple-effect-triad-converge)$") : w.box == 'exit' ? w.itemId.matches("^(wheel-exit-link-dissolve|wheel-exit-triple-dissolve|wheel-exit-link-finedust|wheel-exit-triple-finedust|wheel-exit-link-split4|wheel-exit-triple-split4|wheel-exit-link-split2|wheel-exit-triple-split2|wheel-exit-link-split8|wheel-exit-triple-split8|wheel-exit-link-triangles|wheel-exit-triple-triangles|wheel-exit-link-crumble|wheel-exit-triple-crumble|wheel-exit-link-gravity|wheel-exit-triple-gravity|wheel-exit-link-collide|wheel-exit-triple-collide|wheel-exit-link-portal|wheel-exit-triple-portal|wheel-exit-link-blackhole|wheel-exit-triple-blackhole|wheel-exit-link-freeze|wheel-exit-triple-freeze|wheel-exit-link-burn|wheel-exit-triple-burn|wheel-exit-link-pixel|wheel-exit-triple-pixel|wheel-exit-link-implode|wheel-exit-triple-implode|wheel-exit-link-slice|wheel-exit-triple-slice|wheel-exit-link-bubble|wheel-exit-triple-bubble|wheel-exit-link-origami|wheel-exit-triple-origami|wheel-exit-link-electric-shock|wheel-exit-triple-electric-shock|wheel-exit-link-ghost|wheel-exit-triple-ghost|wheel-exit-link-link-effect-moon-petals|wheel-exit-triple-triple-effect-crystal-bloom)$") : false); }
+    function wheelPoolItem(w) { return w.box == 'mystery' ? (w.chestType == 'avatar' ? (w.version == 2 ? w.itemId.matches("^(memory-avatar-sapphire-owl|memory-avatar-cherry-rabbit|memory-avatar-stellar-cat|memory-avatar-scholar-squirrel|memory-avatar-stargazer-hedgehog|memory-avatar-dreaming-deer|memory-avatar-galaxy-whale|memory-avatar-chestnut-squirrel|memory-avatar-snow-rabbit|memory-avatar-honey-bear|memory-avatar-dawn-crane|link-avatar-autumn-fox|link-avatar-moonfox|link-avatar-galaxy-deer|link-avatar-sailor-beaver|link-avatar-pearl-dolphin|link-avatar-azure-turtle|link-avatar-royal-seahorse|link-avatar-lantern-cat|link-avatar-festival-sparrow|link-avatar-paperblossom-deer|link-avatar-glasslight-fox|triple-avatar-jade-dragon|triple-avatar-blue-panda|triple-avatar-sunset-dragon|triple-avatar-quartz-phoenix|triple-avatar-amethyst-unicorn|triple-avatar-platinum-dragon|triple-avatar-crystal-mech-cat|triple-avatar-aurora-snowfox|triple-avatar-jade-penguin|triple-avatar-polar-bear|triple-avatar-galactic-dragon|letters-memory-avatar-moss-redpanda|letters-link-avatar-flower-fox|letters-triple-avatar-rose-dragon|letters-royal-avatar-dawn-lion|event-avatar-lantern-otter)$") : w.itemId.matches("^(starter-avatar-little-sparrow|memory-avatar-sapphire-owl|memory-avatar-cherry-rabbit|memory-avatar-stellar-cat|memory-avatar-scholar-squirrel|memory-avatar-stargazer-hedgehog|memory-avatar-dreaming-deer|memory-avatar-galaxy-whale|memory-avatar-chestnut-squirrel|memory-avatar-snow-rabbit|memory-avatar-honey-bear|memory-avatar-dawn-crane|link-avatar-autumn-fox|link-avatar-moonfox|link-avatar-galaxy-deer|link-avatar-sailor-beaver|link-avatar-pearl-dolphin|link-avatar-azure-turtle|link-avatar-royal-seahorse|link-avatar-lantern-cat|link-avatar-festival-sparrow|link-avatar-paperblossom-deer|link-avatar-glasslight-fox|triple-avatar-jade-dragon|triple-avatar-blue-panda|triple-avatar-sunset-dragon|triple-avatar-quartz-phoenix|triple-avatar-amethyst-unicorn|triple-avatar-platinum-dragon|triple-avatar-crystal-mech-cat|triple-avatar-aurora-snowfox|triple-avatar-jade-penguin|triple-avatar-polar-bear|triple-avatar-galactic-dragon|event-avatar-lantern-otter|letters-memory-avatar-moss-redpanda|letters-link-avatar-flower-fox|letters-triple-avatar-rose-dragon|letters-royal-avatar-dawn-lion)$")) : w.chestType == 'frame' ? (w.version == 2 ? w.itemId.matches("^(memory-frame-golden-laurel|memory-frame-cherry-blossom|memory-frame-sky-feather|memory-frame-gilded-pages|memory-frame-astral-orbit|memory-frame-silken-clouds|memory-frame-knowledge-gateway|memory-frame-autumn-leaves|memory-frame-frosted-branch|memory-frame-golden-honeycomb|memory-frame-memory-crown|link-frame-moonblossom|link-frame-silver-moon|link-frame-stellar-orbit|link-frame-moon-coral|link-frame-silver-waves|link-frame-pearl-shell|link-frame-tidal-crown|link-frame-silk-lanterns|link-frame-osmanthus-branch|link-frame-moon-silk|link-frame-lantern-moon-gate|triple-frame-tri-crystal|triple-frame-prism|triple-frame-emerald|triple-frame-crystal-arch|triple-frame-three-wing-star|triple-frame-jade-gears|triple-frame-tri-star-crown|triple-frame-aurora-ribbon|triple-frame-azure-ice-ring|triple-frame-silver-meteor|triple-frame-aurora-crown|letters-memory-frame-memory-leaves|letters-link-frame-silk-lantern|letters-triple-frame-prism-glass|letters-royal-frame-journey-crown|event-frame-firefly-glow)$") : w.itemId.matches("^(starter-frame-plain-wood|memory-frame-golden-laurel|memory-frame-cherry-blossom|memory-frame-sky-feather|memory-frame-gilded-pages|memory-frame-astral-orbit|memory-frame-silken-clouds|memory-frame-knowledge-gateway|memory-frame-autumn-leaves|memory-frame-frosted-branch|memory-frame-golden-honeycomb|memory-frame-memory-crown|link-frame-moonblossom|link-frame-silver-moon|link-frame-stellar-orbit|link-frame-moon-coral|link-frame-silver-waves|link-frame-pearl-shell|link-frame-tidal-crown|link-frame-silk-lanterns|link-frame-osmanthus-branch|link-frame-moon-silk|link-frame-lantern-moon-gate|triple-frame-tri-crystal|triple-frame-prism|triple-frame-emerald|triple-frame-crystal-arch|triple-frame-three-wing-star|triple-frame-jade-gears|triple-frame-tri-star-crown|triple-frame-aurora-ribbon|triple-frame-azure-ice-ring|triple-frame-silver-meteor|triple-frame-aurora-crown|event-frame-firefly-glow|letters-memory-frame-memory-leaves|letters-link-frame-silk-lantern|letters-triple-frame-prism-glass|letters-royal-frame-journey-crown)$")) : w.chestType == 'badge' ? (w.version == 2 ? w.itemId.matches("^(memory-badge-wisdom|memory-badge-memory-master|memory-badge-wisdom-seal|memory-badge-memory-keeper|memory-badge-four-seasons|memory-badge-forest-guardian|link-badge-link-master|link-badge-golden-bond|link-badge-lighthouse-guide|link-badge-ocean-knot|link-badge-guiding-lantern|link-badge-moonlit-promise|triple-badge-crystal-triad|triple-badge-triad-master|triple-badge-triangle-seal|triple-badge-crystal-keeper|triple-badge-three-dawn-rays|triple-badge-aurora-heart|letters-memory-badge-folded-leaf|letters-link-badge-wish-knot|letters-triple-badge-prism-heart|letters-royal-badge-royal-seal)$") : w.itemId.matches("^(starter-badge-first-leaf|memory-badge-wisdom|memory-badge-memory-master|memory-badge-wisdom-seal|memory-badge-memory-keeper|memory-badge-four-seasons|memory-badge-forest-guardian|link-badge-link-master|link-badge-golden-bond|link-badge-lighthouse-guide|link-badge-ocean-knot|link-badge-guiding-lantern|link-badge-moonlit-promise|triple-badge-crystal-triad|triple-badge-triad-master|triple-badge-triangle-seal|triple-badge-crystal-keeper|triple-badge-three-dawn-rays|triple-badge-aurora-heart|letters-memory-badge-folded-leaf|letters-link-badge-wish-knot|letters-triple-badge-prism-heart|letters-royal-badge-royal-seal)$")) : false) : (w.box == 'cosmetic' ? (w.version == 2 ? w.itemId.matches("^(memory-avatar-sapphire-owl|memory-frame-golden-laurel|memory-badge-wisdom|memory-avatar-cherry-rabbit|memory-frame-cherry-blossom|memory-badge-memory-master|memory-avatar-stellar-cat|memory-frame-sky-feather|memory-avatar-scholar-squirrel|memory-frame-gilded-pages|memory-badge-wisdom-seal|memory-avatar-stargazer-hedgehog|memory-frame-astral-orbit|memory-avatar-dreaming-deer|memory-frame-silken-clouds|memory-badge-memory-keeper|memory-avatar-galaxy-whale|memory-frame-knowledge-gateway|memory-avatar-chestnut-squirrel|memory-frame-autumn-leaves|memory-badge-four-seasons|memory-avatar-snow-rabbit|memory-frame-frosted-branch|memory-avatar-honey-bear|memory-frame-golden-honeycomb|memory-badge-forest-guardian|memory-avatar-dawn-crane|memory-frame-memory-crown|link-avatar-autumn-fox|link-frame-moonblossom|link-badge-link-master|link-avatar-moonfox|link-frame-silver-moon|link-badge-golden-bond|link-avatar-galaxy-deer|link-frame-stellar-orbit|link-avatar-sailor-beaver|link-frame-moon-coral|link-badge-lighthouse-guide|link-avatar-pearl-dolphin|link-frame-silver-waves|link-avatar-azure-turtle|link-frame-pearl-shell|link-badge-ocean-knot|link-avatar-royal-seahorse|link-frame-tidal-crown|link-avatar-lantern-cat|link-frame-silk-lanterns|link-badge-guiding-lantern|link-avatar-festival-sparrow|link-frame-osmanthus-branch|link-avatar-paperblossom-deer|link-frame-moon-silk|link-badge-moonlit-promise|link-avatar-glasslight-fox|link-frame-lantern-moon-gate|triple-avatar-jade-dragon|triple-frame-tri-crystal|triple-badge-crystal-triad|triple-avatar-blue-panda|triple-frame-prism|triple-badge-triad-master|triple-avatar-sunset-dragon|triple-frame-emerald|triple-avatar-quartz-phoenix|triple-frame-crystal-arch|triple-badge-triangle-seal|triple-avatar-amethyst-unicorn|triple-frame-three-wing-star|triple-avatar-platinum-dragon|triple-frame-jade-gears|triple-badge-crystal-keeper|triple-avatar-crystal-mech-cat|triple-frame-tri-star-crown|triple-avatar-aurora-snowfox|triple-frame-aurora-ribbon|triple-badge-three-dawn-rays|triple-avatar-jade-penguin|triple-frame-azure-ice-ring|triple-avatar-polar-bear|triple-frame-silver-meteor|triple-badge-aurora-heart|triple-avatar-galactic-dragon|triple-frame-aurora-crown|event-avatar-lantern-otter|event-frame-firefly-glow|letters-memory-avatar-moss-redpanda|letters-memory-frame-memory-leaves|letters-memory-badge-folded-leaf|letters-link-avatar-flower-fox|letters-link-frame-silk-lantern|letters-link-badge-wish-knot|letters-triple-avatar-rose-dragon|letters-triple-frame-prism-glass|letters-triple-badge-prism-heart|letters-royal-avatar-dawn-lion|letters-royal-frame-journey-crown|letters-royal-badge-royal-seal)$") : w.itemId.matches("^(starter-avatar-little-sparrow|starter-frame-plain-wood|starter-badge-first-leaf|memory-avatar-sapphire-owl|memory-frame-golden-laurel|memory-badge-wisdom|memory-avatar-cherry-rabbit|memory-frame-cherry-blossom|memory-badge-memory-master|memory-avatar-stellar-cat|memory-frame-sky-feather|memory-avatar-scholar-squirrel|memory-frame-gilded-pages|memory-badge-wisdom-seal|memory-avatar-stargazer-hedgehog|memory-frame-astral-orbit|memory-avatar-dreaming-deer|memory-frame-silken-clouds|memory-badge-memory-keeper|memory-avatar-galaxy-whale|memory-frame-knowledge-gateway|memory-avatar-chestnut-squirrel|memory-frame-autumn-leaves|memory-badge-four-seasons|memory-avatar-snow-rabbit|memory-frame-frosted-branch|memory-avatar-honey-bear|memory-frame-golden-honeycomb|memory-badge-forest-guardian|memory-avatar-dawn-crane|memory-frame-memory-crown|link-avatar-autumn-fox|link-frame-moonblossom|link-badge-link-master|link-avatar-moonfox|link-frame-silver-moon|link-badge-golden-bond|link-avatar-galaxy-deer|link-frame-stellar-orbit|link-avatar-sailor-beaver|link-frame-moon-coral|link-badge-lighthouse-guide|link-avatar-pearl-dolphin|link-frame-silver-waves|link-avatar-azure-turtle|link-frame-pearl-shell|link-badge-ocean-knot|link-avatar-royal-seahorse|link-frame-tidal-crown|link-avatar-lantern-cat|link-frame-silk-lanterns|link-badge-guiding-lantern|link-avatar-festival-sparrow|link-frame-osmanthus-branch|link-avatar-paperblossom-deer|link-frame-moon-silk|link-badge-moonlit-promise|link-avatar-glasslight-fox|link-frame-lantern-moon-gate|triple-avatar-jade-dragon|triple-frame-tri-crystal|triple-badge-crystal-triad|triple-avatar-blue-panda|triple-frame-prism|triple-badge-triad-master|triple-avatar-sunset-dragon|triple-frame-emerald|triple-avatar-quartz-phoenix|triple-frame-crystal-arch|triple-badge-triangle-seal|triple-avatar-amethyst-unicorn|triple-frame-three-wing-star|triple-avatar-platinum-dragon|triple-frame-jade-gears|triple-badge-crystal-keeper|triple-avatar-crystal-mech-cat|triple-frame-tri-star-crown|triple-avatar-aurora-snowfox|triple-frame-aurora-ribbon|triple-badge-three-dawn-rays|triple-avatar-jade-penguin|triple-frame-azure-ice-ring|triple-avatar-polar-bear|triple-frame-silver-meteor|triple-badge-aurora-heart|triple-avatar-galactic-dragon|triple-frame-aurora-crown|event-avatar-lantern-otter|event-frame-firefly-glow|letters-memory-avatar-moss-redpanda|letters-memory-frame-memory-leaves|letters-memory-badge-folded-leaf|letters-link-avatar-flower-fox|letters-link-frame-silk-lantern|letters-link-badge-wish-knot|letters-triple-avatar-rose-dragon|letters-triple-frame-prism-glass|letters-triple-badge-prism-heart|letters-royal-avatar-dawn-lion|letters-royal-frame-journey-crown|letters-royal-badge-royal-seal)$")) : w.box == 'flip' ? (w.version == 2 ? w.itemId.matches("^(wheel-flip-memory-effect-moonflip|wheel-flip-memory-effect-spring-petals|wheel-flip-fade-scale|wheel-flip-pop|wheel-flip-slide-up|wheel-flip-flip-y|wheel-flip-zoom-rotate|wheel-flip-blur-in)$") : w.itemId.matches("^(wheel-flip-memory-effect-moonflip|wheel-flip-memory-effect-spring-petals|wheel-flip-fade-scale|wheel-flip-pop|wheel-flip-slide-up|wheel-flip-flip-y|wheel-flip-zoom-rotate|wheel-flip-blur-in)$")) : w.box == 'theme' ? (w.version == 2 ? w.itemId.matches("^(wheel-theme-shared-animals-land|wheel-theme-triple-animals-land|wheel-theme-shared-animals-air|wheel-theme-triple-animals-air|wheel-theme-shared-animals-sea|wheel-theme-triple-animals-sea|wheel-theme-shared-foods|wheel-theme-triple-foods|wheel-theme-shared-drinks|wheel-theme-triple-drinks|wheel-theme-shared-fruits|wheel-theme-triple-fruits|wheel-theme-shared-geometry|wheel-theme-triple-geometry|wheel-theme-shared-cyberpunk|wheel-theme-triple-cyberpunk|wheel-theme-shared-magic-rpg|wheel-theme-triple-magic-rpg|wheel-theme-shared-space|wheel-theme-triple-space|wheel-theme-shared-household|wheel-theme-triple-household|wheel-theme-shared-office-supplies|wheel-theme-triple-office-supplies|wheel-theme-shared-fashion|wheel-theme-triple-fashion|wheel-theme-shared-vehicles|wheel-theme-triple-vehicles|wheel-theme-shared-festivals|wheel-theme-triple-festivals|wheel-theme-shared-alphabet|wheel-theme-triple-alphabet|wheel-theme-shared-numbers-2|wheel-theme-triple-numbers-2|wheel-theme-shared-numbers-3|wheel-theme-triple-numbers-3|wheel-theme-shared-computer-symbols|wheel-theme-triple-computer-symbols)$") : w.itemId.matches("^(wheel-theme-shared-animals-land|wheel-theme-triple-animals-land|wheel-theme-shared-animals-air|wheel-theme-triple-animals-air|wheel-theme-shared-animals-sea|wheel-theme-triple-animals-sea|wheel-theme-shared-foods|wheel-theme-triple-foods|wheel-theme-shared-drinks|wheel-theme-triple-drinks|wheel-theme-shared-fruits|wheel-theme-triple-fruits|wheel-theme-shared-geometry|wheel-theme-triple-geometry|wheel-theme-shared-cyberpunk|wheel-theme-triple-cyberpunk|wheel-theme-shared-magic-rpg|wheel-theme-triple-magic-rpg|wheel-theme-shared-space|wheel-theme-triple-space|wheel-theme-shared-household|wheel-theme-triple-household|wheel-theme-shared-office-supplies|wheel-theme-triple-office-supplies|wheel-theme-shared-fashion|wheel-theme-triple-fashion|wheel-theme-shared-vehicles|wheel-theme-triple-vehicles|wheel-theme-shared-festivals|wheel-theme-triple-festivals|wheel-theme-shared-alphabet|wheel-theme-triple-alphabet|wheel-theme-shared-numbers-2|wheel-theme-triple-numbers-2|wheel-theme-shared-numbers-3|wheel-theme-triple-numbers-3|wheel-theme-shared-computer-symbols|wheel-theme-triple-computer-symbols)$")) : w.box == 'path' ? (w.version == 2 ? w.itemId.matches("^(wheel-path-link-electric|wheel-path-triple-electric|wheel-path-link-laser|wheel-path-triple-laser|wheel-path-link-fire|wheel-path-triple-fire|wheel-path-link-magic|wheel-path-triple-magic|wheel-path-link-cyber|wheel-path-triple-cyber|wheel-path-link-rainbow|wheel-path-triple-rainbow|wheel-path-link-hydro|wheel-path-triple-hydro|wheel-path-link-plasma|wheel-path-triple-plasma|wheel-path-link-holy|wheel-path-triple-holy|wheel-path-link-shadow|wheel-path-triple-shadow|wheel-path-link-spiral|wheel-path-triple-spiral|wheel-path-link-dashed|wheel-path-triple-dashed|wheel-path-link-bullet|wheel-path-triple-bullet|wheel-path-link-kame|wheel-path-triple-kame|wheel-path-link-halo|wheel-path-triple-halo|wheel-path-link-matrix|wheel-path-triple-matrix|wheel-path-link-sonic|wheel-path-triple-sonic|wheel-path-link-chains|wheel-path-triple-chains|wheel-path-link-meteor|wheel-path-triple-meteor|wheel-path-link-poison|wheel-path-triple-poison|wheel-path-link-link-effect-meteor-route|wheel-path-triple-triple-effect-triad-converge)$") : w.itemId.matches("^(wheel-path-link-electric|wheel-path-triple-electric|wheel-path-link-laser|wheel-path-triple-laser|wheel-path-link-fire|wheel-path-triple-fire|wheel-path-link-magic|wheel-path-triple-magic|wheel-path-link-cyber|wheel-path-triple-cyber|wheel-path-link-rainbow|wheel-path-triple-rainbow|wheel-path-link-hydro|wheel-path-triple-hydro|wheel-path-link-plasma|wheel-path-triple-plasma|wheel-path-link-holy|wheel-path-triple-holy|wheel-path-link-shadow|wheel-path-triple-shadow|wheel-path-link-spiral|wheel-path-triple-spiral|wheel-path-link-dashed|wheel-path-triple-dashed|wheel-path-link-bullet|wheel-path-triple-bullet|wheel-path-link-kame|wheel-path-triple-kame|wheel-path-link-halo|wheel-path-triple-halo|wheel-path-link-matrix|wheel-path-triple-matrix|wheel-path-link-sonic|wheel-path-triple-sonic|wheel-path-link-chains|wheel-path-triple-chains|wheel-path-link-meteor|wheel-path-triple-meteor|wheel-path-link-poison|wheel-path-triple-poison|wheel-path-link-link-effect-meteor-route|wheel-path-triple-triple-effect-triad-converge)$")) : w.box == 'exit' ? (w.version == 2 ? w.itemId.matches("^(wheel-exit-link-dissolve|wheel-exit-triple-dissolve|wheel-exit-link-finedust|wheel-exit-triple-finedust|wheel-exit-link-split4|wheel-exit-triple-split4|wheel-exit-link-split2|wheel-exit-triple-split2|wheel-exit-link-split8|wheel-exit-triple-split8|wheel-exit-link-triangles|wheel-exit-triple-triangles|wheel-exit-link-crumble|wheel-exit-triple-crumble|wheel-exit-link-gravity|wheel-exit-triple-gravity|wheel-exit-link-collide|wheel-exit-triple-collide|wheel-exit-link-portal|wheel-exit-triple-portal|wheel-exit-link-blackhole|wheel-exit-triple-blackhole|wheel-exit-link-freeze|wheel-exit-triple-freeze|wheel-exit-link-burn|wheel-exit-triple-burn|wheel-exit-link-pixel|wheel-exit-triple-pixel|wheel-exit-link-implode|wheel-exit-triple-implode|wheel-exit-link-slice|wheel-exit-triple-slice|wheel-exit-link-bubble|wheel-exit-triple-bubble|wheel-exit-link-origami|wheel-exit-triple-origami|wheel-exit-link-electric-shock|wheel-exit-triple-electric-shock|wheel-exit-link-ghost|wheel-exit-triple-ghost|wheel-exit-link-link-effect-moon-petals|wheel-exit-triple-triple-effect-crystal-bloom)$") : w.itemId.matches("^(wheel-exit-link-dissolve|wheel-exit-triple-dissolve|wheel-exit-link-finedust|wheel-exit-triple-finedust|wheel-exit-link-split4|wheel-exit-triple-split4|wheel-exit-link-split2|wheel-exit-triple-split2|wheel-exit-link-split8|wheel-exit-triple-split8|wheel-exit-link-triangles|wheel-exit-triple-triangles|wheel-exit-link-crumble|wheel-exit-triple-crumble|wheel-exit-link-gravity|wheel-exit-triple-gravity|wheel-exit-link-collide|wheel-exit-triple-collide|wheel-exit-link-portal|wheel-exit-triple-portal|wheel-exit-link-blackhole|wheel-exit-triple-blackhole|wheel-exit-link-freeze|wheel-exit-triple-freeze|wheel-exit-link-burn|wheel-exit-triple-burn|wheel-exit-link-pixel|wheel-exit-triple-pixel|wheel-exit-link-implode|wheel-exit-triple-implode|wheel-exit-link-slice|wheel-exit-triple-slice|wheel-exit-link-bubble|wheel-exit-triple-bubble|wheel-exit-link-origami|wheel-exit-triple-origami|wheel-exit-link-electric-shock|wheel-exit-triple-electric-shock|wheel-exit-link-ghost|wheel-exit-triple-ghost|wheel-exit-link-link-effect-moon-petals|wheel-exit-triple-triple-effect-crystal-bloom)$")) : false); }
     function wheelPoolExists(w) { return w.box == 'mystery' ? w.chestType in ["avatar","frame","badge"] : w.box in ["cosmetic","flip","theme","path","exit"]; }
     function wheelSupportKeys(game) { return game == 'memory-match' ? ["hint","preview4","time30"] : game == 'link-connect' ? ["hint","reshuffle","thunder","freeze"] : game == 'triple-connect' ? ["hint","undo","shuffle","time"] : []; }
     function wheelSupportLabel(game,key) { return {"memory-match":{"hint":"Gợi ý 1 lượt","preview4":"Xem trước 4 thẻ","time30":"+30 giây"},"link-connect":{"hint":"Gợi ý","reshuffle":"Xáo trộn","thunder":"Sấm sét","freeze":"Đóng băng 30 giây"},"triple-connect":{"hint":"Gợi ý","undo":"Hoàn tác","shuffle":"Xáo trộn","time":"+30 giây"}}.get(game,{}).get(key,''); }
@@ -323,11 +462,12 @@ service cloud.firestore {
           : w.box != 'support' && (w.kind == 'item' ? wheelBoxKeys(w,['itemId']) && w.coins == 0 && wheelPoolItem(w)
             : w.kind == 'coins' && (w.reason == 'coins' ? wheelBoxKeys(w,['reason']) && w.box == 'mystery'
                 && w.coins == (w.chestType == 'c' ? 50 : w.chestType == 'avatar' ? 150 : 100)
-              : w.reason == 'full' ? wheelBoxKeys(w,['reason']) && w.coins == 100 && wheelPoolExists(w)
-              : w.reason == 'duplicate' && wheelBoxKeys(w,['reason','itemId']) && w.coins == 100 && wheelPoolItem(w))));
+              : w.reason == 'full' ? wheelBoxKeys(w,['reason']) && w.coins == 100 && (w.version == 2 || !(w.box in ['cosmetic','mystery'])) && wheelPoolExists(w)
+              : w.reason == 'duplicate' && wheelBoxKeys(w,['reason','itemId']) && w.coins == 100 && (w.version == 2 || !(w.box in ['cosmetic','mystery'])) && wheelPoolItem(w))));
     }
     function rewardWheelCandidate(w) {
-      return w is map && w.version == 2 && w.sector is int && w.sector >= 0 && w.sector < 10 && rewardInt(w.coins)
+      // Every prize branch below enforces zero, a fixed amount, or the 5..50 range.
+      return w is map && w.version in [2,3] && w.sector is int && w.sector >= 0 && w.sector < 10 && w.coins is int
         && (w.sector < 3 ? w.keys().hasOnly(['version','sector','kind','coins']) && w.kind == 'coins'
           && (w.sector < 2 ? w.coins == [5,10][w.sector] : w.coins >= 5 && w.coins <= 50) : wheelBoxPrize(w));
     }
@@ -338,8 +478,16 @@ service cloud.firestore {
       return field in ['free','ticket'] ? n[field] : n[field][n[field].size()-1];
     }
     function wheelPastOrdinal(ads,day,ordinal) {
+      return ads.size() == 0 || wheelPastOrdinalKeys(ads,day,ordinal);
+    }
+    // Prior receipts have integral days and ordinals 1..10. A radix of 11
+    // gives each (day,ordinal) a unique key; reject every ordinal >= the new one.
+    function wheelPastOrdinalKeys(ads,day,ordinal) {
       let count = ads.size();
-      return count == 0 || (count >= 10 ? (ads[0].day != day || ads[0].ordinal < ordinal) && (ads[1].day != day || ads[1].ordinal < ordinal) && (ads[2].day != day || ads[2].ordinal < ordinal) && (ads[3].day != day || ads[3].ordinal < ordinal) && (ads[4].day != day || ads[4].ordinal < ordinal) && (ads[5].day != day || ads[5].ordinal < ordinal) && (ads[6].day != day || ads[6].ordinal < ordinal) && (ads[7].day != day || ads[7].ordinal < ordinal) && (ads[8].day != day || ads[8].ordinal < ordinal) && (ads[9].day != day || ads[9].ordinal < ordinal) : (count <= 0 || (ads[0].day != day || ads[0].ordinal < ordinal)) && (count <= 1 || (ads[1].day != day || ads[1].ordinal < ordinal)) && (count <= 2 || (ads[2].day != day || ads[2].ordinal < ordinal)) && (count <= 3 || (ads[3].day != day || ads[3].ordinal < ordinal)) && (count <= 4 || (ads[4].day != day || ads[4].ordinal < ordinal)) && (count <= 5 || (ads[5].day != day || ads[5].ordinal < ordinal)) && (count <= 6 || (ads[6].day != day || ads[6].ordinal < ordinal)) && (count <= 7 || (ads[7].day != day || ads[7].ordinal < ordinal)) && (count <= 8 || (ads[8].day != day || ads[8].ordinal < ordinal)) && (count <= 9 || (ads[9].day != day || ads[9].ordinal < ordinal))) && (count >= 20 ? (ads[10].day != day || ads[10].ordinal < ordinal) && (ads[11].day != day || ads[11].ordinal < ordinal) && (ads[12].day != day || ads[12].ordinal < ordinal) && (ads[13].day != day || ads[13].ordinal < ordinal) && (ads[14].day != day || ads[14].ordinal < ordinal) && (ads[15].day != day || ads[15].ordinal < ordinal) && (ads[16].day != day || ads[16].ordinal < ordinal) && (ads[17].day != day || ads[17].ordinal < ordinal) && (ads[18].day != day || ads[18].ordinal < ordinal) && (ads[19].day != day || ads[19].ordinal < ordinal) : (count <= 10 || (ads[10].day != day || ads[10].ordinal < ordinal)) && (count <= 11 || (ads[11].day != day || ads[11].ordinal < ordinal)) && (count <= 12 || (ads[12].day != day || ads[12].ordinal < ordinal)) && (count <= 13 || (ads[13].day != day || ads[13].ordinal < ordinal)) && (count <= 14 || (ads[14].day != day || ads[14].ordinal < ordinal)) && (count <= 15 || (ads[15].day != day || ads[15].ordinal < ordinal)) && (count <= 16 || (ads[16].day != day || ads[16].ordinal < ordinal)) && (count <= 17 || (ads[17].day != day || ads[17].ordinal < ordinal)) && (count <= 18 || (ads[18].day != day || ads[18].ordinal < ordinal)) && (count <= 19 || (ads[19].day != day || ads[19].ordinal < ordinal))) && (count >= 29 ? (ads[20].day != day || ads[20].ordinal < ordinal) && (ads[21].day != day || ads[21].ordinal < ordinal) && (ads[22].day != day || ads[22].ordinal < ordinal) && (ads[23].day != day || ads[23].ordinal < ordinal) && (ads[24].day != day || ads[24].ordinal < ordinal) && (ads[25].day != day || ads[25].ordinal < ordinal) && (ads[26].day != day || ads[26].ordinal < ordinal) && (ads[27].day != day || ads[27].ordinal < ordinal) && (ads[28].day != day || ads[28].ordinal < ordinal) : (count <= 20 || (ads[20].day != day || ads[20].ordinal < ordinal)) && (count <= 21 || (ads[21].day != day || ads[21].ordinal < ordinal)) && (count <= 22 || (ads[22].day != day || ads[22].ordinal < ordinal)) && (count <= 23 || (ads[23].day != day || ads[23].ordinal < ordinal)) && (count <= 24 || (ads[24].day != day || ads[24].ordinal < ordinal)) && (count <= 25 || (ads[25].day != day || ads[25].ordinal < ordinal)) && (count <= 26 || (ads[26].day != day || ads[26].ordinal < ordinal)) && (count <= 27 || (ads[27].day != day || ads[27].ordinal < ordinal)) && (count <= 28 || (ads[28].day != day || ads[28].ordinal < ordinal)));
+      let base = day * 11;
+      let keys = (count >= 10 ? [(ads[0].day * 11 + ads[0].ordinal),(ads[1].day * 11 + ads[1].ordinal),(ads[2].day * 11 + ads[2].ordinal),(ads[3].day * 11 + ads[3].ordinal),(ads[4].day * 11 + ads[4].ordinal),(ads[5].day * 11 + ads[5].ordinal),(ads[6].day * 11 + ads[6].ordinal),(ads[7].day * 11 + ads[7].ordinal),(ads[8].day * 11 + ads[8].ordinal),(ads[9].day * 11 + ads[9].ordinal)] : [(count > 0 ? (ads[0].day * 11 + ads[0].ordinal) : -1),(count > 1 ? (ads[1].day * 11 + ads[1].ordinal) : -1),(count > 2 ? (ads[2].day * 11 + ads[2].ordinal) : -1),(count > 3 ? (ads[3].day * 11 + ads[3].ordinal) : -1),(count > 4 ? (ads[4].day * 11 + ads[4].ordinal) : -1),(count > 5 ? (ads[5].day * 11 + ads[5].ordinal) : -1),(count > 6 ? (ads[6].day * 11 + ads[6].ordinal) : -1),(count > 7 ? (ads[7].day * 11 + ads[7].ordinal) : -1),(count > 8 ? (ads[8].day * 11 + ads[8].ordinal) : -1),(count > 9 ? (ads[9].day * 11 + ads[9].ordinal) : -1)]).concat((count >= 20 ? [(ads[10].day * 11 + ads[10].ordinal),(ads[11].day * 11 + ads[11].ordinal),(ads[12].day * 11 + ads[12].ordinal),(ads[13].day * 11 + ads[13].ordinal),(ads[14].day * 11 + ads[14].ordinal),(ads[15].day * 11 + ads[15].ordinal),(ads[16].day * 11 + ads[16].ordinal),(ads[17].day * 11 + ads[17].ordinal),(ads[18].day * 11 + ads[18].ordinal),(ads[19].day * 11 + ads[19].ordinal)] : [(count > 10 ? (ads[10].day * 11 + ads[10].ordinal) : -1),(count > 11 ? (ads[11].day * 11 + ads[11].ordinal) : -1),(count > 12 ? (ads[12].day * 11 + ads[12].ordinal) : -1),(count > 13 ? (ads[13].day * 11 + ads[13].ordinal) : -1),(count > 14 ? (ads[14].day * 11 + ads[14].ordinal) : -1),(count > 15 ? (ads[15].day * 11 + ads[15].ordinal) : -1),(count > 16 ? (ads[16].day * 11 + ads[16].ordinal) : -1),(count > 17 ? (ads[17].day * 11 + ads[17].ordinal) : -1),(count > 18 ? (ads[18].day * 11 + ads[18].ordinal) : -1),(count > 19 ? (ads[19].day * 11 + ads[19].ordinal) : -1)])).concat((count >= 29 ? [(ads[20].day * 11 + ads[20].ordinal),(ads[21].day * 11 + ads[21].ordinal),(ads[22].day * 11 + ads[22].ordinal),(ads[23].day * 11 + ads[23].ordinal),(ads[24].day * 11 + ads[24].ordinal),(ads[25].day * 11 + ads[25].ordinal),(ads[26].day * 11 + ads[26].ordinal),(ads[27].day * 11 + ads[27].ordinal),(ads[28].day * 11 + ads[28].ordinal)] : [(count > 20 ? (ads[20].day * 11 + ads[20].ordinal) : -1),(count > 21 ? (ads[21].day * 11 + ads[21].ordinal) : -1),(count > 22 ? (ads[22].day * 11 + ads[22].ordinal) : -1),(count > 23 ? (ads[23].day * 11 + ads[23].ordinal) : -1),(count > 24 ? (ads[24].day * 11 + ads[24].ordinal) : -1),(count > 25 ? (ads[25].day * 11 + ads[25].ordinal) : -1),(count > 26 ? (ads[26].day * 11 + ads[26].ordinal) : -1),(count > 27 ? (ads[27].day * 11 + ads[27].ordinal) : -1),(count > 28 ? (ads[28].day * 11 + ads[28].ordinal) : -1)]));
+      let forbidden = ordinal == 1 ? [base + 1,base + 2,base + 3,base + 4,base + 5,base + 6,base + 7,base + 8,base + 9,base + 10] : ordinal == 2 ? [base + 2,base + 3,base + 4,base + 5,base + 6,base + 7,base + 8,base + 9,base + 10] : ordinal == 3 ? [base + 3,base + 4,base + 5,base + 6,base + 7,base + 8,base + 9,base + 10] : ordinal == 4 ? [base + 4,base + 5,base + 6,base + 7,base + 8,base + 9,base + 10] : ordinal == 5 ? [base + 5,base + 6,base + 7,base + 8,base + 9,base + 10] : ordinal == 6 ? [base + 6,base + 7,base + 8,base + 9,base + 10] : ordinal == 7 ? [base + 7,base + 8,base + 9,base + 10] : ordinal == 8 ? [base + 8,base + 9,base + 10] : ordinal == 9 ? [base + 9,base + 10] : ordinal == 10 ? [base + 10] : [];
+      return count <= 29 && ordinal >= 1 && ordinal <= 10 && !keys.hasAny(forbidden);
     }
     function rewardWheelSpinShape(n,o,field,r) {
       return n.spins.keys().hasOnly(['free','ads','pastAds','ticket'])
@@ -347,34 +495,68 @@ service cloud.firestore {
         && (field == 'free' ? o.spins.free == null && r.source == 'free' && r.day == n.day
           : field == 'ticket' ? r.source == 'ticket' && r.day == n.day && r.sequence == n.ticketSpent
           : r.source == 'ad' && n.spins[field].size() == o.spins[field].size() + 1
-            && n.spins[field].removeAll([r]) == o.spins[field]
+            && n.spins[field] == o.spins[field].concat([r])
             && (field == 'ads' ? r.day == n.day && n.spins.ads.size() <= 10 && r.ordinal == n.spins.ads.size()
               : n.spins.pastAds.size() <= 30 && r.day < n.day && r.day >= n.day - 3
                 && r.ordinal <= 10 && wheelPastOrdinal(o.spins.pastAds,r.day,r.ordinal)));
     }
     function rewardWheelPendingForSpin(n,o,r) {
       let next = n.get('pendingWheel',null);
-      return o.get('pendingWheel',null) == null && (r.keys().hasAny(['wheel'])
+      let prior = o.get('pendingWheel',null);
+      return (prior == null || prior.get('phase','') == 'reserved-ad' && r.source == 'ad' && r.operation == prior.operation
+        && r.day == prior.day && r.ordinal == prior.ordinal && r.wheel == prior.wheel) && (r.keys().hasAny(['wheel'])
         ? n.keys().hasAny(['pendingWheel']) && (next == null || r.wheel.kind == 'support' && next == {'operation':r.operation,'day':r.day,'wheel':r.wheel})
         : next == null);
     }
     function rewardWheelSpinUpdate(n,o) {
       let field = wheelChangedField(n.spins,o.spins);
       let r = wheelChangedSpin(n.spins,field);
-      return rewardWheelSpinShape(n,o,field,r) && rewardSpin(r,r.source) && rewardWheelPendingForSpin(n,o,r);
+      return (!r.keys().hasAny(['wheel']) || r.wheel.version != 3 || r.wheel.kind != 'item' || wheelCosmeticCopy(n,o,r))
+        && rewardWheelSpinShape(n,o,field,r) && rewardSpin(r,r.source) && rewardWheelPendingForSpin(n,o,r);
     }
     function rewardWheelLateSpin(n,o) {
       let prior = o.spins.pastAds;
       let next = n.spins.pastAds;
       let r = next[next.size()-1];
-      return n.spins.diff(o.spins).affectedKeys().hasOnly(['pastAds']) && next.size() <= 30 && next.size() == prior.size() + 1
-        && next.removeAll([r]) == prior && rewardSpin(r,'ad') && r.day < n.day && r.day >= n.day - 3
-        && wheelPastOrdinal(prior,r.day,r.ordinal) && rewardWheelPendingForSpin(n,o,r);
+      return (!r.keys().hasAny(['wheel']) || r.wheel.version != 3 || r.wheel.kind != 'item' || wheelCosmeticCopy(n,o,r))
+        && n.spins.diff(o.spins).affectedKeys().hasOnly(['pastAds']) && next.size() <= 30 && next.size() == prior.size() + 1
+        && next == prior.concat([r]) && rewardSpin(r,'ad') && r.day < n.day && r.day >= n.day - 3
+        && (o.get('pendingWheel',null) != null && o.pendingWheel.get('phase','') == 'reserved-ad'
+          || wheelPastOrdinal(prior,r.day,r.ordinal)) && rewardWheelPendingForSpin(n,o,r);
+    }
+    function rewardLateUpdate(n,o,changed) {
+      let r = n.spins.pastAds[n.spins.pastAds.size()-1];
+      return changed.hasOnly(['spins','pendingWheel','cosmeticProgress','revision','rootRevision','fingerprint','updatedAt'])
+        && rewardRevision(n,o)
+        && (!changed.hasAny(['cosmeticProgress']) || r.wheel.version == 3 && r.wheel.kind == 'item')
+        && rewardWheelLateSpin(n,o);
+    }
+    function wheelCosmeticCopy(n,o,r) {
+      let type = cosmeticType(r.wheel.itemId);
+      return type == '' ? n.get('cosmeticProgress',null) == o.get('cosmeticProgress',null) : cosmeticCopyOfType(n,o,r.wheel.itemId,type);
     }
     function rewardWheelClaim(n,o) {
       let pending = o.get('pendingWheel',null);
       return chestBase(n,o,['pendingWheel']) && pending != null && n.get('pendingWheel',null) == null
         && pending.keys().hasOnly(['operation','day','wheel']) && pending.wheel.kind == 'support' && rewardWheelCandidate(pending.wheel);
+    }
+    // Reservation checks history/quota without granting assets. Settlement validates the
+    // complete prize and cosmetic delta separately, within the Rules expression budget.
+    // No spin can alter history while a reservation is held (PendingForSpin above).
+    function rewardWheelReservation(n,o,changed) {
+      let prior = o.get('pendingWheel',null);
+      let next = n.get('pendingWheel',null);
+      return changed.hasOnly(['pendingWheel','revision','rootRevision','fingerprint','updatedAt']) && rewardRevision(n,o)
+        && (prior != null ? prior.get('phase','') == 'reserved-ad' && next == null
+          : next is map && next.keys().hasOnly(['operation','day','wheel','phase','ordinal','earnedAt'])
+            && next.phase == 'reserved-ad' && next.operation is string && next.operation.matches('^[A-Za-z0-9_-]{1,128}$')
+            && next.day is int && next.day < n.day && next.day >= n.day - 3
+            && next.ordinal is int && next.ordinal >= 1 && next.ordinal <= 10
+            && next.earnedAt is int && next.earnedAt <= request.time.toMillis()
+            && next.earnedAt >= request.time.toMillis() - 172800000
+            && int(next.earnedAt / 86400000) >= next.day && int(next.earnedAt / 86400000) <= next.day + 1
+            && next.wheel is map && next.wheel.size() <= 9
+            && wheelPastOrdinal(o.spins.pastAds,next.day,next.ordinal));
     }
 
     function missionSupport(r,game) {
@@ -431,14 +613,15 @@ service cloud.firestore {
       return source in ['free','ticket','ad'] && r is map && r.keys().hasOnly(['operation','source','day','sector','coins','ordinal','sequence','wheel'])
         && r.operation is string && r.operation.matches('^[A-Za-z0-9_-]{1,128}$') && r.source == source
         && rewardInt(r.day)
-        && (source == 'free' ? !r.keys().hasAny(['ordinal','sequence']) : source == 'ad' ? rewardInt(r.ordinal) && r.ordinal > 0 && r.ordinal <= 10 && !r.keys().hasAny(['sequence']) : source == 'ticket' && rewardInt(r.sequence) && r.sequence > 0 && !r.keys().hasAny(['ordinal']))
+        && (source == 'free' ? !r.keys().hasAny(['ordinal','sequence']) : source == 'ad' ? r.ordinal is int && r.ordinal > 0 && r.ordinal <= 10 && !r.keys().hasAny(['sequence']) : source == 'ticket' && rewardInt(r.sequence) && r.sequence > 0 && !r.keys().hasAny(['ordinal']))
         && (r.keys().hasAny(['wheel']) ? rewardWheelCandidate(r.wheel) && r.sector == r.wheel.sector && r.coins == r.wheel.coins
           : r.sector is int && r.sector >= 0 && r.sector < 8 && r.coins == [5,10,10,15,15,20,20,25][r.sector]);
     }
     function validRewardState(n, o) {
       let day = int(request.time.toMillis() / 86400000);
       let changed = n.diff(o).affectedKeys();
-      return n.keys().hasOnly(['version','revision','day','week','daily','weekly','loginNext','loginDay','loginReward','spins','tickets','ticketEarned','ticketSpent','event','cosmetics','letters','chests','festival','hourlyGift','pendingWheel','rootRevision','fingerprint','updatedAt'])
+      return n.keys().hasOnly(['version','revision','day','week','daily','weekly','loginNext','loginDay','loginReward','spins','tickets','ticketEarned','ticketSpent','event','cosmetics','letters','chests','festival','hourlyGift','pendingWheel','cosmeticProgress','rootRevision','fingerprint','updatedAt'])
+        && n.get('cosmeticProgress',null) == o.get('cosmeticProgress',null)
         && n.get('chests',null) == o.get('chests',null) && n.get('festival',null) == o.get('festival',null)
         && n.get('loginReward',null) == o.get('loginReward',null)
         && n.version == 1 && (n.revision is int && n.revision >= 0 && n.revision <= 9007199254740991) && n.revision > 0 && n.day == day && n.week == day - ((day + 3) % 7)
@@ -513,7 +696,7 @@ service cloud.firestore {
       return r.keys().hasAny(['ingredients']) ? r.ingredients : [r.letter,r.letter,r.letter];
     }
     // Stored counts already satisfy the canonical nonnegative-integer invariant.
-    function fusionAllOwned(counts) { return counts.keys().hasAll(['A','C','D','E','H','I','K','L','M','N','O','P','R','T','U','V','Y']) && !counts.values().hasAny([0]); }
+    function fusionAllOwned(counts) { return counts.size() == 17 && !counts.values().hasAny([0]); }
     function rewardFusionValue(n,o,ingredients,key) {
       let spent = (ingredients[0] == key ? 1 : 0) + (ingredients[1] == key ? 1 : 0) + (ingredients[2] == key ? 1 : 0);
       let old = o.counts.get(key,0);
@@ -524,14 +707,16 @@ service cloud.firestore {
       let r = n.last;
       let ingredients = fusionIngredients(r);
       return n.keys().hasOnly(['counts','earned','sequence','last']) && n.counts is map && n.earned == o.earned
-        && n.counts.keys().hasOnly(['A','C','D','E','H','I','K','L','M','N','O','P','R','T','U','V','Y']) && rewardInt(n.sequence) && n.sequence == o.sequence + 1 && r.sequence == n.sequence
+        // Previous keys are canonical; the exact affected-key whitelist below
+        // only permits validated ingredients/output, including additions/removals.
+        && rewardInt(n.sequence) && n.sequence == o.sequence + 1 && r.sequence == n.sequence
         && r.keys().hasOnly(['kind','letter','ingredients','received','coins','sequence','operation','fusionPolicy'])
-        && r.kind == 'fuse' && r.received in ['A','C','D','E','H','I','K','L','M','N','O','P','R','T','U','V','Y'] && r.coins == 0
+        && r.kind == 'fuse' && r.received in ['A','C','D','E','H','I','K','L','M','N','O','P','R','T','U','V','Y'] && r.coins == (r.get('fusionPolicy','') == 'paid-missing-first-v2' ? -10 : 0)
         && r.operation is string && r.operation.matches('^[A-Za-z0-9_-]{1,128}$')
         && (o.last == null || r.operation != o.last.operation)
         && (r.keys().hasAny(['ingredients']) ? ingredients is list && ingredients.size() == 3
           && ingredients.hasOnly(['A','C','D','E','H','I','K','L','M','N','O','P','R','T','U','V','Y']) && r.letter == ingredients[0] : r.letter in ['A','C','D','E','H','I','K','L','M','N','O','P','R','T','U','V','Y'])
-        && (!r.keys().hasAny(['fusionPolicy']) || r.fusionPolicy == 'missing-first-v1' && r.keys().hasAny(['ingredients'])
+        && (!r.keys().hasAny(['fusionPolicy']) || r.fusionPolicy in ['missing-first-v1','paid-missing-first-v2'] && r.keys().hasAny(['ingredients'])
           && (o.counts.get(r.received,0) == 0 || fusionAllOwned(o.counts)))
         && n.counts.diff(o.counts).affectedKeys().hasOnly(ingredients.concat([r.received]))
         && rewardFusionValue(n,o,ingredients,ingredients[0])
@@ -585,34 +770,35 @@ service cloud.firestore {
     function rewardExchangeValue(next,old,needed) { return next is int && next >= 0 && next == old - needed; }
     function rewardLetterExchange(n,o) {
       let required = letterRequirementMap(n.last.setId);
+      let keys = required.keys();
       return n.keys().hasOnly(['counts','earned','sequence','last']) && n.earned == o.earned
         && n.sequence == o.sequence + 1 && n.last.sequence == n.sequence
         && n.last.keys().hasOnly(['kind','setId','itemId','coins','sequence','operation','chestType']) && n.last.kind == 'exchange'
         && n.last.setId in ["memory-match","link-connect","triple-connect","adventure"] && n.last.operation is string && n.last.operation.matches('^[A-Za-z0-9_-]{1,128}$')
         && (n.last.get('chestType','') != '' ? n.last.chestType == chestForSet(n.last.setId) && n.last.itemId == null && n.last.coins == 0 : n.last.itemId == null ? n.last.coins == 100 : n.last.itemId in ["letters-memory-avatar-moss-redpanda","letters-memory-frame-memory-leaves","letters-memory-badge-folded-leaf","letters-link-avatar-flower-fox","letters-link-frame-silk-lantern","letters-link-badge-wish-knot","letters-triple-avatar-rose-dragon","letters-triple-frame-prism-glass","letters-triple-badge-prism-heart","letters-royal-avatar-dawn-lion","letters-royal-frame-journey-crown","letters-royal-badge-royal-seal"] && n.last.coins == 0)
-        && n.counts.diff(o.counts).affectedKeys().hasOnly(required.keys())
-        && (!required.keys().hasAny(['A']) || rewardExchangeValue(n.counts.get('A',0),o.counts.get('A',0),required.get('A',0)))
-        && (!required.keys().hasAny(['C']) || rewardExchangeValue(n.counts.get('C',0),o.counts.get('C',0),required.get('C',0)))
-        && (!required.keys().hasAny(['D']) || rewardExchangeValue(n.counts.get('D',0),o.counts.get('D',0),required.get('D',0)))
-        && (!required.keys().hasAny(['E']) || rewardExchangeValue(n.counts.get('E',0),o.counts.get('E',0),required.get('E',0)))
-        && (!required.keys().hasAny(['H']) || rewardExchangeValue(n.counts.get('H',0),o.counts.get('H',0),required.get('H',0)))
-        && (!required.keys().hasAny(['I']) || rewardExchangeValue(n.counts.get('I',0),o.counts.get('I',0),required.get('I',0)))
-        && (!required.keys().hasAny(['K']) || rewardExchangeValue(n.counts.get('K',0),o.counts.get('K',0),required.get('K',0)))
-        && (!required.keys().hasAny(['L']) || rewardExchangeValue(n.counts.get('L',0),o.counts.get('L',0),required.get('L',0)))
-        && (!required.keys().hasAny(['M']) || rewardExchangeValue(n.counts.get('M',0),o.counts.get('M',0),required.get('M',0)))
-        && (!required.keys().hasAny(['N']) || rewardExchangeValue(n.counts.get('N',0),o.counts.get('N',0),required.get('N',0)))
-        && (!required.keys().hasAny(['O']) || rewardExchangeValue(n.counts.get('O',0),o.counts.get('O',0),required.get('O',0)))
-        && (!required.keys().hasAny(['P']) || rewardExchangeValue(n.counts.get('P',0),o.counts.get('P',0),required.get('P',0)))
-        && (!required.keys().hasAny(['R']) || rewardExchangeValue(n.counts.get('R',0),o.counts.get('R',0),required.get('R',0)))
-        && (!required.keys().hasAny(['T']) || rewardExchangeValue(n.counts.get('T',0),o.counts.get('T',0),required.get('T',0)))
-        && (!required.keys().hasAny(['U']) || rewardExchangeValue(n.counts.get('U',0),o.counts.get('U',0),required.get('U',0)))
-        && (!required.keys().hasAny(['V']) || rewardExchangeValue(n.counts.get('V',0),o.counts.get('V',0),required.get('V',0)))
-        && (!required.keys().hasAny(['Y']) || rewardExchangeValue(n.counts.get('Y',0),o.counts.get('Y',0),required.get('Y',0)));
+        && n.counts.diff(o.counts).affectedKeys().hasOnly(keys)
+        && (!keys.hasAny(['A']) || rewardExchangeValue(n.counts.get('A',0),o.counts.get('A',0),required.get('A',0)))
+        && (!keys.hasAny(['C']) || rewardExchangeValue(n.counts.get('C',0),o.counts.get('C',0),required.get('C',0)))
+        && (!keys.hasAny(['D']) || rewardExchangeValue(n.counts.get('D',0),o.counts.get('D',0),required.get('D',0)))
+        && (!keys.hasAny(['E']) || rewardExchangeValue(n.counts.get('E',0),o.counts.get('E',0),required.get('E',0)))
+        && (!keys.hasAny(['H']) || rewardExchangeValue(n.counts.get('H',0),o.counts.get('H',0),required.get('H',0)))
+        && (!keys.hasAny(['I']) || rewardExchangeValue(n.counts.get('I',0),o.counts.get('I',0),required.get('I',0)))
+        && (!keys.hasAny(['K']) || rewardExchangeValue(n.counts.get('K',0),o.counts.get('K',0),required.get('K',0)))
+        && (!keys.hasAny(['L']) || rewardExchangeValue(n.counts.get('L',0),o.counts.get('L',0),required.get('L',0)))
+        && (!keys.hasAny(['M']) || rewardExchangeValue(n.counts.get('M',0),o.counts.get('M',0),required.get('M',0)))
+        && (!keys.hasAny(['N']) || rewardExchangeValue(n.counts.get('N',0),o.counts.get('N',0),required.get('N',0)))
+        && (!keys.hasAny(['O']) || rewardExchangeValue(n.counts.get('O',0),o.counts.get('O',0),required.get('O',0)))
+        && (!keys.hasAny(['P']) || rewardExchangeValue(n.counts.get('P',0),o.counts.get('P',0),required.get('P',0)))
+        && (!keys.hasAny(['R']) || rewardExchangeValue(n.counts.get('R',0),o.counts.get('R',0),required.get('R',0)))
+        && (!keys.hasAny(['T']) || rewardExchangeValue(n.counts.get('T',0),o.counts.get('T',0),required.get('T',0)))
+        && (!keys.hasAny(['U']) || rewardExchangeValue(n.counts.get('U',0),o.counts.get('U',0),required.get('U',0)))
+        && (!keys.hasAny(['V']) || rewardExchangeValue(n.counts.get('V',0),o.counts.get('V',0),required.get('V',0)))
+        && (!keys.hasAny(['Y']) || rewardExchangeValue(n.counts.get('Y',0),o.counts.get('Y',0),required.get('Y',0)));
     }
-    function rewardLetterUpdate(n,o) {
-      return n.diff(o).affectedKeys().hasOnly(['letters','revision','rootRevision','fingerprint','updatedAt'])
+    function rewardLetterUpdate(n,o,changed) {
+      return changed.hasOnly(['letters','revision','rootRevision','fingerprint','updatedAt'])
         && n.revision == o.revision + 1 && n.updatedAt == request.time
-        && n.day == int(request.time.toMillis() / 86400000)
+        && (n.day == int(request.time.toMillis() / 86400000) || n.day == o.day && n.day < int(request.time.toMillis() / 86400000))
         && (n.letters.last != null && n.letters.last.kind == 'exchange' ? rewardLetterExchange(n.letters,o.letters) : rewardLetters(n.letters,o.letters));
     }
     function rewardLetterCreditValue(amount, oldAmount, earned, oldEarned) {
@@ -652,14 +838,16 @@ service cloud.firestore {
     function rewardProgressFlush(n,o) {
       let changed = n.diff(o).affectedKeys();
       return changed.hasOnly(['festival','letters','daily','weekly','event','tickets','ticketEarned','revision','rootRevision','fingerprint','updatedAt'])
-        && n.revision == o.revision + 1 && n.updatedAt == request.time && n.day == int(request.time.toMillis() / 86400000)
+        && n.revision == o.revision + 1 && n.updatedAt == request.time
+        && (n.day == int(request.time.toMillis() / 86400000) || n.day == o.day && n.day < int(request.time.toMillis() / 86400000)
+          && n.daily == o.daily && n.weekly == o.weekly && n.event == o.event)
         && n.daily.claimed == o.daily.claimed && n.weekly.claimed == o.weekly.claimed
         && (!changed.hasAny(['daily']) || rewardCounter(n.daily,['win-three','match-thirty','win-without-hint','bonus']) && monotoneCounter(n.daily,o.daily))
         && (!changed.hasAny(['weekly']) || rewardCounter(n.weekly,['bonus']) && monotoneCounter(n.weekly,o.weekly))
         && n.tickets is int && n.tickets >= 0 && n.tickets <= 9007199254740991
         && n.ticketEarned is int && n.ticketEarned >= o.ticketEarned && n.ticketEarned <= 9007199254740991
         && n.tickets == o.tickets + n.ticketEarned - o.ticketEarned
-        && (!changed.hasAny(['festival']) || festivalValid(n.festival) && n.festival.completedCycles == o.festival.completedCycles && n.festival.mask == o.festival.mask && n.festival.earnedTotal >= o.festival.earnedTotal)
+        && (!changed.hasAny(['festival']) || festivalValid(n.festival) && n.festival.version == o.festival.version && n.festival.completedCycles == o.festival.completedCycles && n.festival.mask == o.festival.mask && n.festival.earnedTotal >= o.festival.earnedTotal)
         && (!changed.hasAny(['event']) || rewardEventProgress(n.event,o.event))
         && (!changed.hasAny(['letters']) || rewardLetterCredit(n.letters,o.letters));
     }
@@ -682,8 +870,8 @@ service cloud.firestore {
     function rewardInitial(n, space, uid) {
       let empty = {'wins':0,'matches':0,'noHint':0,'visits':0,'claimed':[]};
       let day = int(request.time.toMillis() / 86400000);
-      return n.keys().hasOnly(['version','revision','day','week','daily','weekly','loginNext','loginDay','loginReward','spins','tickets','ticketEarned','ticketSpent','event','cosmetics','letters','chests','festival','hourlyGift','pendingWheel','rootRevision','fingerprint','updatedAt'])
-        && n.get('loginReward',null) == null && n.get('pendingWheel',null) == null && n.get('hourlyGift',null) == null && n.version == 1 && n.revision == 1 && n.day == day && n.week == day - ((day + 3) % 7)
+      return n.keys().hasOnly(['version','revision','day','week','daily','weekly','loginNext','loginDay','loginReward','spins','tickets','ticketEarned','ticketSpent','event','cosmetics','letters','chests','festival','hourlyGift','pendingWheel','cosmeticProgress','rootRevision','fingerprint','updatedAt'])
+        && n.get('cosmeticProgress',null) == null && n.get('loginReward',null) == null && n.get('pendingWheel',null) == null && n.get('hourlyGift',null) == null && n.version == 1 && n.revision == 1 && n.day == day && n.week == day - ((day + 3) % 7)
         && n.daily == empty && n.weekly == empty && n.loginNext == 0 && n.loginDay == -1
         && n.spins == {'free':null,'ads':[],'pastAds':[],'ticket':null} && n.tickets == 0 && n.ticketEarned == 0 && n.ticketSpent == 0
         && n.event == {'id':'firefly-festival-01','week':n.week,'points':0,'day':day,'dailyPoints':0,'claimed':[]}
@@ -692,6 +880,14 @@ service cloud.firestore {
         && (!n.keys().hasAny(['chests','festival']) || n.chests == emptyChests() && n.festival == emptyFestival())
         && n.updatedAt == request.time && rewardLinked(n,space,uid);
     }
+    function rewardUpdate(n,o,space,uid) {
+      let changed = n.diff(o).affectedKeys();
+      return changed.hasOnly(['updatedAt']) ? n.updatedAt == request.time
+        : o.revision == 0 ? rewardInitial(n,space,uid)
+        : rewardLinked(n,space,uid) && (changed.hasAny(['letters']) && changed.hasOnly(['letters','revision','rootRevision','fingerprint','updatedAt'])
+          ? rewardLetterUpdate(n,o,changed) : changed.hasAny(['spins']) && n.spins.pastAds != o.spins.pastAds
+          ? rewardLateUpdate(n,o,changed) : dispatchRewardUpdate(n,o,changed));
+    }
     match /gamespaces/{space}/liveops/{uid} {
       allow delete: if knownSpace(space) && erasing(space, uid);
       allow get: if knownSpace(space) && owner(uid);
@@ -699,10 +895,7 @@ service cloud.firestore {
       allow create: if knownSpace(space) && owner(uid)
         && request.resource.data.keys().hasOnly(['version','revision','updatedAt'])
         && request.resource.data.version == 1 && request.resource.data.revision == 0 && request.resource.data.updatedAt == request.time;
-      allow update: if knownSpace(space) && owner(uid) && (
-        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['updatedAt']) && request.resource.data.updatedAt == request.time
-        || (resource.data.revision == 0 ? rewardInitial(request.resource.data,space,uid)
-          : rewardLinked(request.resource.data,space,uid) && dispatchRewardUpdate(request.resource.data,resource.data)));
+      allow update: if knownSpace(space) && owner(uid) && rewardUpdate(request.resource.data,resource.data,space,uid);
     }
     // END Spark reward contract
     match /{document=**} { allow read, write: if false; }

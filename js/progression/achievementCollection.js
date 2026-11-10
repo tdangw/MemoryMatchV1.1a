@@ -61,7 +61,7 @@ export function renderAchievementCollection(container, gameId, { block: requeste
       }
       const navigation = document.createElement('nav'); navigation.setAttribute('aria-label', 'Chọn nhóm thưởng');
       navigation.append(control('Nhóm trước', block <= 1, () => { block--; void render(); }), control('Nhóm sau', block >= maxBlock, () => { block++; void render(); }));
-      if(festivalChestsEnabled()&&onOpenChests)navigation.append(control('Xem Kho rương',false,onOpenChests));
+      if(festivalChestsEnabled()&&onOpenChests)navigation.append(control('Xem Kho lưu trữ',false,onOpenChests));
       group.append(navigation); root.replaceChildren(content, group);
     } catch (error) {
       if (current() && token === generation) root.replaceChildren(document.createTextNode('Chưa tải được Thành tích. Hãy thử lại.'), control('Thử lại', false, () => void render()));

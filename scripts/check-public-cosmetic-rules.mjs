@@ -29,6 +29,14 @@ try {
   await assertFails(getDoc(doc(b, 'gamespaces/unknown/publicCosmetics/cosmetic-a')));
   await assert.rejects(publishPublicCosmetics({ database: a, environment: 'test', uid: 'cosmetic-a', selection: { version: 1 }, isCurrent: () => false }), { name: 'AbortError' });
   assert.equal((await getDoc(ref)).data().avatar, selection.avatar);
+  const leveled={...selection,version:2,levels:{avatar:7,frame:21,badge:1}};
+  await assertSucceeds(publishPublicCosmetics({database:a,environment:'test',uid:'cosmetic-a',selection:leveled,expanded:true}));
+  observed=await readPublicCosmetics({database:b,environment:'test',uids:['cosmetic-a'],refresh:true});
+  assert.deepEqual(observed.selections.get('cosmetic-a').levels,leveled.levels);
+  for(const levels of [{avatar:22,frame:21,badge:1},{avatar:7,frame:0,badge:1},{avatar:7,frame:21,badge:1,coins:10}])
+    await assertFails(setDoc(ref,{...leveled,levels,updatedAt:serverTimestamp()}));
+  await assertFails(setDoc(ref,{...leveled,badge:null,updatedAt:serverTimestamp()}));
+  await assertSucceeds(setDoc(ref,{...leveled,badge:null,levels:{...leveled.levels,badge:0},updatedAt:serverTimestamp()}));
   const boardPath = 'gamespaces/test/leaderboards/v3_memory-match_adventure/entries/cosmetic-a';
   await env.withSecurityRulesDisabled(async context => { await setDoc(doc(context.firestore(), boardPath), { levelReached: 17, playerName: 'A', reachedAt: 123 }); });
   const before = (await getDoc(doc(b, boardPath))).data();

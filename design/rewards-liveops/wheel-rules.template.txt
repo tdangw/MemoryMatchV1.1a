@@ -14,11 +14,12 @@
           : w.box != 'support' && (w.kind == 'item' ? wheelBoxKeys(w,['itemId']) && w.coins == 0 && wheelPoolItem(w)
             : w.kind == 'coins' && (w.reason == 'coins' ? wheelBoxKeys(w,['reason']) && w.box == 'mystery'
                 && w.coins == (w.chestType == 'c' ? 50 : w.chestType == 'avatar' ? 150 : 100)
-              : w.reason == 'full' ? wheelBoxKeys(w,['reason']) && w.coins == 100 && wheelPoolExists(w)
-              : w.reason == 'duplicate' && wheelBoxKeys(w,['reason','itemId']) && w.coins == 100 && wheelPoolItem(w))));
+              : w.reason == 'full' ? wheelBoxKeys(w,['reason']) && w.coins == 100 && (w.version == 2 || !(w.box in ['cosmetic','mystery'])) && wheelPoolExists(w)
+              : w.reason == 'duplicate' && wheelBoxKeys(w,['reason','itemId']) && w.coins == 100 && (w.version == 2 || !(w.box in ['cosmetic','mystery'])) && wheelPoolItem(w))));
     }
     function rewardWheelCandidate(w) {
-      return w is map && w.version == 2 && w.sector is int && w.sector >= 0 && w.sector < 10 && rewardInt(w.coins)
+      // Every prize branch below enforces zero, a fixed amount, or the 5..50 range.
+      return w is map && w.version in [2,3] && w.sector is int && w.sector >= 0 && w.sector < 10 && w.coins is int
         && (w.sector < 3 ? w.keys().hasOnly(['version','sector','kind','coins']) && w.kind == 'coins'
           && (w.sector < 2 ? w.coins == [5,10][w.sector] : w.coins >= 5 && w.coins <= 50) : wheelBoxPrize(w));
     }
@@ -29,8 +30,16 @@
       return field in ['free','ticket'] ? n[field] : n[field][n[field].size()-1];
     }
     function wheelPastOrdinal(ads,day,ordinal) {
+      return ads.size() == 0 || wheelPastOrdinalKeys(ads,day,ordinal);
+    }
+    // Prior receipts have integral days and ordinals 1..10. A radix of 11
+    // gives each (day,ordinal) a unique key; reject every ordinal >= the new one.
+    function wheelPastOrdinalKeys(ads,day,ordinal) {
       let count = ads.size();
-      return count == 0 || WHEEL_PAST_AD_ORDINAL;
+      let base = day * 11;
+      let keys = WHEEL_PAST_AD_KEYS;
+      let forbidden = WHEEL_PAST_AD_FORBIDDEN;
+      return count <= 29 && ordinal >= 1 && ordinal <= 10 && !keys.hasAny(forbidden);
     }
     function rewardWheelSpinShape(n,o,field,r) {
       return n.spins.keys().hasOnly(['free','ads','pastAds','ticket'])
@@ -38,32 +47,66 @@
         && (field == 'free' ? o.spins.free == null && r.source == 'free' && r.day == n.day
           : field == 'ticket' ? r.source == 'ticket' && r.day == n.day && r.sequence == n.ticketSpent
           : r.source == 'ad' && n.spins[field].size() == o.spins[field].size() + 1
-            && n.spins[field].removeAll([r]) == o.spins[field]
+            && n.spins[field] == o.spins[field].concat([r])
             && (field == 'ads' ? r.day == n.day && n.spins.ads.size() <= 10 && r.ordinal == n.spins.ads.size()
               : n.spins.pastAds.size() <= 30 && r.day < n.day && r.day >= n.day - 3
                 && r.ordinal <= 10 && wheelPastOrdinal(o.spins.pastAds,r.day,r.ordinal)));
     }
     function rewardWheelPendingForSpin(n,o,r) {
       let next = n.get('pendingWheel',null);
-      return o.get('pendingWheel',null) == null && (r.keys().hasAny(['wheel'])
+      let prior = o.get('pendingWheel',null);
+      return (prior == null || prior.get('phase','') == 'reserved-ad' && r.source == 'ad' && r.operation == prior.operation
+        && r.day == prior.day && r.ordinal == prior.ordinal && r.wheel == prior.wheel) && (r.keys().hasAny(['wheel'])
         ? n.keys().hasAny(['pendingWheel']) && (next == null || r.wheel.kind == 'support' && next == {'operation':r.operation,'day':r.day,'wheel':r.wheel})
         : next == null);
     }
     function rewardWheelSpinUpdate(n,o) {
       let field = wheelChangedField(n.spins,o.spins);
       let r = wheelChangedSpin(n.spins,field);
-      return rewardWheelSpinShape(n,o,field,r) && rewardSpin(r,r.source) && rewardWheelPendingForSpin(n,o,r);
+      return (!r.keys().hasAny(['wheel']) || r.wheel.version != 3 || r.wheel.kind != 'item' || wheelCosmeticCopy(n,o,r))
+        && rewardWheelSpinShape(n,o,field,r) && rewardSpin(r,r.source) && rewardWheelPendingForSpin(n,o,r);
     }
     function rewardWheelLateSpin(n,o) {
       let prior = o.spins.pastAds;
       let next = n.spins.pastAds;
       let r = next[next.size()-1];
-      return n.spins.diff(o.spins).affectedKeys().hasOnly(['pastAds']) && next.size() <= 30 && next.size() == prior.size() + 1
-        && next.removeAll([r]) == prior && rewardSpin(r,'ad') && r.day < n.day && r.day >= n.day - 3
-        && wheelPastOrdinal(prior,r.day,r.ordinal) && rewardWheelPendingForSpin(n,o,r);
+      return (!r.keys().hasAny(['wheel']) || r.wheel.version != 3 || r.wheel.kind != 'item' || wheelCosmeticCopy(n,o,r))
+        && n.spins.diff(o.spins).affectedKeys().hasOnly(['pastAds']) && next.size() <= 30 && next.size() == prior.size() + 1
+        && next == prior.concat([r]) && rewardSpin(r,'ad') && r.day < n.day && r.day >= n.day - 3
+        && (o.get('pendingWheel',null) != null && o.pendingWheel.get('phase','') == 'reserved-ad'
+          || wheelPastOrdinal(prior,r.day,r.ordinal)) && rewardWheelPendingForSpin(n,o,r);
+    }
+    function rewardLateUpdate(n,o,changed) {
+      let r = n.spins.pastAds[n.spins.pastAds.size()-1];
+      return changed.hasOnly(['spins','pendingWheel','cosmeticProgress','revision','rootRevision','fingerprint','updatedAt'])
+        && rewardRevision(n,o)
+        && (!changed.hasAny(['cosmeticProgress']) || r.wheel.version == 3 && r.wheel.kind == 'item')
+        && rewardWheelLateSpin(n,o);
+    }
+    function wheelCosmeticCopy(n,o,r) {
+      let type = cosmeticType(r.wheel.itemId);
+      return type == '' ? n.get('cosmeticProgress',null) == o.get('cosmeticProgress',null) : cosmeticCopyOfType(n,o,r.wheel.itemId,type);
     }
     function rewardWheelClaim(n,o) {
       let pending = o.get('pendingWheel',null);
       return chestBase(n,o,['pendingWheel']) && pending != null && n.get('pendingWheel',null) == null
         && pending.keys().hasOnly(['operation','day','wheel']) && pending.wheel.kind == 'support' && rewardWheelCandidate(pending.wheel);
+    }
+    // Reservation checks history/quota without granting assets. Settlement validates the
+    // complete prize and cosmetic delta separately, within the Rules expression budget.
+    // No spin can alter history while a reservation is held (PendingForSpin above).
+    function rewardWheelReservation(n,o,changed) {
+      let prior = o.get('pendingWheel',null);
+      let next = n.get('pendingWheel',null);
+      return changed.hasOnly(['pendingWheel','revision','rootRevision','fingerprint','updatedAt']) && rewardRevision(n,o)
+        && (prior != null ? prior.get('phase','') == 'reserved-ad' && next == null
+          : next is map && next.keys().hasOnly(['operation','day','wheel','phase','ordinal','earnedAt'])
+            && next.phase == 'reserved-ad' && next.operation is string && next.operation.matches('^[A-Za-z0-9_-]{1,128}$')
+            && next.day is int && next.day < n.day && next.day >= n.day - 3
+            && next.ordinal is int && next.ordinal >= 1 && next.ordinal <= 10
+            && next.earnedAt is int && next.earnedAt <= request.time.toMillis()
+            && next.earnedAt >= request.time.toMillis() - 172800000
+            && int(next.earnedAt / 86400000) >= next.day && int(next.earnedAt / 86400000) <= next.day + 1
+            && next.wheel is map && next.wheel.size() <= 9
+            && wheelPastOrdinal(o.spins.pastAds,next.day,next.ordinal));
     }

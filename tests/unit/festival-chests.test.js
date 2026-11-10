@@ -2,15 +2,15 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { normalizeChests,normalizeFestival,earnChest,claimFestival,chestCandidate,openChest } from '../../js/liveops/chests.js';
 import { transitionSpark,applySpecialDrop,normalizeSparkState,normalizeSparkSave } from '../../js/liveops/sparkModel.js';
-import { CHEST_POOLS,CHEST_SUPPORTS } from '../../js/liveops/chestConfig.js';
+import { CHEST_POOLS,LEGACY_CHEST_POOLS,CHEST_SUPPORTS } from '../../js/liveops/chestConfig.js';
 import { LETTER_SETS } from '../../js/liveops/config.js';
 import { normalizeAcquisitions } from '../../js/progression/acquisitionModel.js';
 const now=Date.UTC(2026,9,27,9),uid='festival-owner';
 const run=(state,command,extra={})=>transitionSpark(state,command,{uid,now,festivalEnabled:true,fireflyEarned:state?.festival?.earnedTotal||0,...extra});
 test('claim milestones in any order; preserve overflow; completed cycles do not require opening',()=>{
-  for(const earned of [24,25,49,50,74,75,99,100,130,1000]){
+  for(const earned of [0,9,10,24,25,49,50,74,75,99,100,130,1000]){
     let state=run(null,{type:'status'},{fireflyEarned:earned}).state;
-    for(const points of [100,25,75,50]){
+    for(const points of [100,25,75,50,10]){
       if(earned<points){assert.throws(()=>run(state,{type:'claimFestival',points,cycle:0}));continue;}
       const cmd={type:'claimFestival',points,cycle:0},claimed=run(state,cmd);state=claimed.state;
       assert.equal(run(state,cmd).receipts.length,0);
@@ -20,13 +20,14 @@ test('claim milestones in any order; preserve overflow; completed cycles do not 
   }
 });
 test('ten thousand cycles retain bounded state and never subtract milestone sums',()=>{
-  let festival={version:1,earnedTotal:1000130,completedCycles:0,mask:0},chests=normalizeChests();
-  for(let cycle=0;cycle<10000;cycle++)for(const points of [25,50,75,100])({festival,chests}=claimFestival(festival,chests,{cycle,points}));
+  let festival={version:2,earnedTotal:1000130,completedCycles:0,mask:0},chests=normalizeChests();
+  for(let cycle=0;cycle<10000;cycle++)for(const points of [10,25,50,75,100])({festival,chests}=claimFestival(festival,chests,{cycle,points}));
   assert.equal(festival.earnedTotal-festival.completedCycles*100,130);assert.equal(chests.earned.avatar,10000);
   assert.ok(JSON.stringify({festival,chests}).length<350);
 });
-test('category boundaries, uniform subpools, duplicate and full by type; no implicit pity',()=>{
-  const pick=(type,n,owned=[],second=0)=>{let i=0;return chestCandidate(type,'memory-match',owned,()=>i++?second:n);};
+test('legacy v1 category boundaries, uniform subpools, duplicate and full by type; no implicit pity',()=>{
+  const CHEST_POOLS=LEGACY_CHEST_POOLS;
+  const pick=(type,n,owned=[],second=0)=>{let i=0;return chestCandidate(type,'memory-match',owned,()=>i++?second:n,1);};
   assert.equal(pick('c',.399999).coins,50);assert.equal(pick('c',.4).kind,'support');
   assert.equal(pick('avatar',.799999).kind,'support');assert.equal(pick('avatar',.8).kind,'item');
   const item=CHEST_POOLS.avatar[0],candidate=pick('avatar',.8);

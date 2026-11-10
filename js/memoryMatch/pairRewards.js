@@ -34,6 +34,7 @@ export function resolveMemoryPairRewards(state, { imageId, special = false }, ra
       state.specialNoEnergyDropStreak = 0;
       const reached = state.specialProgress + 1;
       state.specialProgress = reached % target;
+      state.progress.memoryMatch.specialProgress = state.specialProgress;
       presentation.energyProgress = reached;
       presentation.rewards.push(...resolveMemoryMilestoneRewards(reached, random, state.settings?.mode || 'easy', legacy ? 1 : 2));
     } else state.specialNoEnergyDropStreak++;

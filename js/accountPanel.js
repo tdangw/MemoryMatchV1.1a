@@ -52,6 +52,8 @@ export function showAccountPanel(surface = {}) {
   const account = document.createElement('section'); account.className = 'tab-card profile-account';
   const heading = document.createElement('h3'); heading.className = 'tab-section-title'; heading.textContent = 'Tài khoản';
   const status = document.createElement('p'); status.className = 'account-status'; status.setAttribute('aria-live', 'polite');
+  const reconcile=document.createElement('button');reconcile.type='button';reconcile.className='tab-button';reconcile.textContent='Đối chiếu dữ liệu';reconcile.hidden=true;
+  reconcile.onclick=()=>void service.syncNow({manual:true,force:true}).catch(error=>{if(!disposed)showAppToast(error.message||'Bản máy vẫn được giữ. Hãy thử lại sau.');});
   const google = document.createElement('button'); google.type = 'button'; google.className = 'tab-button profile-google';
   const logout = document.createElement('button'); logout.type = 'button'; logout.className = 'tab-button profile-logout'; logout.textContent = 'Đăng xuất';
   logout.onclick = () => {
@@ -70,7 +72,7 @@ export function showAccountPanel(surface = {}) {
   const erase = document.createElement('button'); erase.type = 'button'; erase.className = 'tab-button profile-delete'; erase.textContent = 'Xóa tài khoản';
   erase.onclick = () => showAccountErasureDialog('delete');
   const accountActions = document.createElement('div'); accountActions.className = 'profile-account-actions';
-  accountActions.append(google, logout, erase);
+  accountActions.append(reconcile,google, logout, erase);
   account.append(heading, status, accountActions); content.append(hero, account);
   let disposed = false; let unsubscribe; let releaseOwner;let currentUid=null,copyingUid=false;
   const cosmeticScope = createGameShellLifecycle();
@@ -86,7 +88,7 @@ export function showAccountPanel(surface = {}) {
   }
   activeView = { modal, dispose };
   avatar.onclick = () => openProfileCustomization({ playerName: playerName.textContent, owner: cosmeticScope,
-    onSaved: () => { if (!disposed) avatar.replaceChildren(cosmeticPortrait(gameState.appearance.profileCosmetics, { label: playerName.textContent, size: 256 })); } });
+    onSaved: () => { if (!disposed) avatar.replaceChildren(cosmeticPortrait(gameState.appearance.profileCosmetics, { label: playerName.textContent, size: 256, levels:gameState.appearance.spark?.state?.cosmeticProgress?.levels || {} })); } });
   releaseOwner = (surface.owner || getAppPageScope())?.own(dispose, 'cleanup');
   function closeEditor(focus = false) {
     form.hidden = true; playerName.hidden = false; edit.hidden = false; edit.setAttribute('aria-expanded', 'false'); error.textContent = ''; name.value = ''; editingUid = null;
@@ -100,9 +102,10 @@ export function showAccountPanel(surface = {}) {
     uidRow.hidden=!currentUid;
     uidValue.textContent=currentUid&&currentUid.length>14 ? `${currentUid.slice(0,6)}…${currentUid.slice(-4)}` : currentUid||'';
     copyUid.disabled=!currentUid||copyingUid;
-    avatar.replaceChildren(cosmeticPortrait(gameState.appearance.profileCosmetics, { label: playerName.textContent, size: 256 }));
+    avatar.replaceChildren(cosmeticPortrait(gameState.appearance.profileCosmetics, { label: playerName.textContent, size: 256, levels:gameState.appearance.spark?.state?.cosmeticProgress?.levels || {} }));
     accountType.textContent = state.isAnonymous === false ? 'Đã liên kết Google' : 'Tài khoản khách';
-    status.textContent = ({ connecting: 'Đang kết nối…', restoring: 'Đang tải tiến trình…', syncing: 'Đang lưu…', synced: '', waiting: 'Đang chờ lưu', offline: 'Chưa có kết nối', error: 'Chưa lưu được. Sẽ thử lại.', disabled: '', conflict: 'Đang tải tiến trình…' })[state.phase] || '';
+    reconcile.hidden=!state.conflict;
+    status.textContent = ({ connecting: 'Đang kết nối…', restoring: 'Đang tải tiến trình…', syncing: 'Đang lưu…', synced: '', waiting: 'Đang chờ lưu', offline: 'Chưa có kết nối', error: 'Chưa lưu được. Sẽ thử lại.', disabled: '', conflict: 'Đã lưu trên máy. Có dữ liệu cần đối chiếu.' })[state.phase] || '';
     const busy = saving || linking || ['connecting', 'restoring', 'syncing', 'conflict'].includes(state.phase);
     const erasing = ['erasing', 'erasure-pending'].includes(state.phase);
     const signingOut = ['signing-out', 'logout-pending'].includes(state.phase);
@@ -197,10 +200,11 @@ export function showCloudConflictDialog({ root, cloud, choose }) {
   local.textContent = describe("Trên thiết bị", { coins: gameState.coins, progress: gameState.progress });
   remote.textContent = cloud ? describe("Trực tuyến", cloud) : "Chưa có tiến trình trực tuyến.";
   const note = document.createElement("p");
-  note.textContent = "Chọn tiến trình để tiếp tục. Xu và vật phẩm không cộng gộp. Khi chọn bản trực tuyến, tiến trình trên thiết bị vẫn được giữ để khôi phục; thành tích trên bảng xếp hạng không thay đổi.";
+  note.textContent = "Xu và vật phẩm không cộng gộp. Khi chọn bản trực tuyến, bản trên thiết bị vẫn được giữ để khôi phục. Bạn có thể đóng cửa sổ này để tiếp tục chơi bằng dữ liệu trên máy.";
   content.append(local, remote, note);
-  const modal = openAppModal({ id: "cloud-conflict-modal", title: "Chọn tiến trình", icon: "account", content, keepBanner: false, dismissible: false, closeOnBackdrop: false, closeOnEscape: false, onClose: closeCloudConflictDialog, actions: [
-    { label: "Trên thiết bị", variant: "primary", onClick: async close => { if (await choose("local")) close(); return false; } },
+  const waitingRewards=gameState.appearance.spark?.offline&&gameState.appearance.spark.offline.baseRevision!==root?.rewardRevision;
+  const modal = openAppModal({ id: "cloud-conflict-modal", title: "Đối chiếu tiến trình", icon: "account", content, keepBanner: false, onClose: closeCloudConflictDialog, actions: [
+    { label: waitingRewards?'Tiếp tục trên thiết bị':"Trên thiết bị", variant: "primary", onClick: async close => { if (waitingRewards||await choose("local")) close(); return false; } },
     ...(root ? [{ label: "Trực tuyến", onClick: async close => { if (await choose("cloud")) close(); return false; } }] : []),
   ] });
   const view = { modal, release: null };

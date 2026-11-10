@@ -6,7 +6,7 @@ import { publishCloudSnapshot, readCloudRoot, readCloudSnapshot } from '../js/cl
 import { confirmSparkClock, readSparkState } from '../js/liveops/store.js';
 import { transitionSpark, normalizeSparkSave } from '../js/liveops/sparkModel.js';
 import { LETTER_ALPHABET, LETTER_SYNC_KEYS_PER_COMMIT } from '../js/liveops/config.js';
-import { MISSING_FIRST_FUSION_POLICY, prepareFusionCandidate } from '../js/liveops/letters.js';
+import { MISSING_FIRST_FUSION_POLICY, PAID_LETTER_FUSION_POLICY, prepareFusionCandidate } from '../js/liveops/letters.js';
 const [host,port]=(process.env.FIRESTORE_EMULATOR_HOST||'').split(':');
 if(!port)throw Error('Isolated emulator required');
 const env=await initializeTestEnvironment({projectId:'demo-letter-fusion',firestore:{host,port:Number(port),rules:fs.readFileSync('firestore.rules','utf8')}});
@@ -16,7 +16,7 @@ let state=null,revision=0,now;
 let operation=0;
 const next=(ingredients)=>({type:'fuseLetter',ingredients,sequence:state.letters.sequence+1,operation:`fusion-${++operation}`});
 async function commit(command={type:'status'},options={}){
-  const before=options.state||state,copy=structuredClone(saved),result=transitionSpark(before,command,{uid,now,randomLetter:options.received||command.randomLetter||'A',letterEarned:options.earned||before?.letters.earned||{}});
+  const before=options.state||state,copy=structuredClone(saved),result=transitionSpark(before,command,{uid,now,coinsBalance:copy.profile.data.coins,randomLetter:options.received||command.randomLetter||'A',letterEarned:options.earned||before?.letters.earned||{}});
   result.state.revision=(before?.revision||0)+1;
   copy.profile.data.coins+=result.receipts.reduce((sum,r)=>sum+r.coins,0);
   copy.profile.data.appearance.spark={...normalizeSparkSave(copy.profile.data.appearance.spark),ownerUid:uid,state:result.state,letterEarned:result.state.letters.earned};
@@ -50,6 +50,7 @@ try{
   assert.equal(results.filter(v=>v.status==='fulfilled').length,1);accept(results.find(v=>v.status==='fulfilled').value);
   await rejectForge((n,o)=>{for(const key of ['A','C','M'])n.letters.counts[key]=o.letters.counts[key];}); // Missing source spending.
   await rejectForge(n=>{n.letters.counts.E++;}); // Unrelated item grant.
+  await rejectForge(n=>{n.letters.counts.Z=1;}); // Unknown added key must also be denied by the delta whitelist.
   await rejectForge(n=>{n.letters.earned.E++;n.letters.counts.E++;}); // Forged earned credit in a fusion.
   await rejectForge(n=>{n.letters.last.ingredients=['A','C'];});
   await rejectForge(n=>{n.letters.last.ingredients=['A','C','M','Y'];});
@@ -91,5 +92,12 @@ try{
     n.letters.counts={...o.letters.counts,A:o.letters.counts.A-3,C:1};delete n.letters.last.ingredients;
   }}),/permission|PERMISSION|Missing|denied/);
   assert.equal(saved.profile.data.coins,coinsAfterSales);assert.ok(coinsAfterSales>beforePolicyCoins,'only approved sales change coins');
-  console.log(JSON.stringify({pass:true,valid:['three distinct','two same','three same','output matches inputs','legacy pending','legacy reader hint','lost-response recovery','sameUID race','missing-first','all-owned pre-consumption','stable entropy rebase','policy receipt replay','policy CAS race'],denied:15,fusionCoinsUnchanged:true}));
+  accept(await commit({type:'status'},{earned:{...state.letters.earned,C:state.letters.earned.C+1}}));
+  assert.ok(LETTER_ALPHABET.every(letter=>state.letters.counts[letter]>0));
+  const paid=prepareFusionCandidate(state.letters,{...next(['A','M','M']),fusionPolicy:PAID_LETTER_FUSION_POLICY,fusionRoll:.25});
+  const beforePaid=saved.profile.data.coins;
+  await assert.rejects(commit(paid,{forge:n=>{n.letters.last.coins=0;}}),/permission|PERMISSION|Missing|denied/);
+  accept(await commit(paid));assert.equal(saved.profile.data.coins,beforePaid-10);
+  assert.equal(transitionSpark(state,paid,{uid,now,coinsBalance:0,letterEarned:state.letters.earned}).receipts.length,0);
+  console.log(JSON.stringify({pass:true,valid:['three distinct','two same','three same','output matches inputs','legacy pending','legacy reader hint','lost-response recovery','sameUID race','missing-first','all-owned pre-consumption','stable entropy rebase','policy receipt replay','policy CAS race','paid all-owned -10 once'],denied:17,legacyFusionCoinsUnchanged:true}));
 }finally{await env.cleanup();}

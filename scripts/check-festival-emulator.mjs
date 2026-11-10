@@ -6,10 +6,12 @@ import { encodeCloudSnapshot } from '../js/cloudSnapshot.js';
 import { publishCloudSnapshot, readCloudRoot, readCloudSnapshot } from '../js/cloudStore.js';
 import { confirmSparkClock, sparkRef } from '../js/liveops/store.js';
 import { transitionSpark, normalizeSparkSave } from '../js/liveops/sparkModel.js';
-import { chestCandidate } from '../js/liveops/chests.js';
+import { chestCandidate as currentChestCandidate } from '../js/liveops/chests.js';
 import { CHEST_TYPES, CHEST_POOLS } from '../js/liveops/chestConfig.js';
 import { LETTER_SETS, LETTER_ALPHABET } from '../js/liveops/config.js';
 if (!process.env.FIRESTORE_EMULATOR_HOST) throw new Error('Isolated emulator required');
+// This regression covers the pre-upgrade client. New v2 copies/levels have their own emulator matrix.
+const chestCandidate=(type,gameId,ownedIds,random)=>currentChestCandidate(type,gameId,ownedIds,random,1);
 const env = await initializeTestEnvironment({ projectId:'demo-memory-match', firestore:{ host:'127.0.0.1',port:8180,rules:fs.readFileSync('firestore.rules','utf8') } });
 const uid='festival-integration',space='local-waves1',db=env.authenticatedContext(uid).firestore(),other=env.authenticatedContext('festival-other').firestore();
 let state=null, revision=0, now, saved={ snapshotVersion:1, profile:{formatVersion:2,revision:1,data:{coins:100,appearance:{},progress:{},settings:{}}},chapters:[] };
@@ -26,7 +28,9 @@ async function commit(command={type:'status'}, options={}) {
   copy.profile.data.appearance.acquisitions=grants;
   copy.profile.data.appearance.spark={...normalizeSparkSave(copy.profile.data.appearance.spark),ownerUid:uid,state:result.state,fireflyEarned:result.state.festival?.earnedTotal||0,
     economyRevision:(copy.profile.data.appearance.spark?.economyRevision||0)+1,letterEarned:result.state.letters.earned};
-  const encoded=await encodeCloudSnapshot(copy),out=await publishCloudSnapshot({database:db,environment:space,uid,encoded,expectedRevision:expected,playerName:'Người chơi',
+  const encoded=await encodeCloudSnapshot(copy);
+  if(options.mutate)options.mutate(result.state);
+  const out=await publishCloudSnapshot({database:db,environment:space,uid,encoded,expectedRevision:expected,playerName:'Người chơi',
     economyRevision:copy.profile.data.appearance.spark.economyRevision,rewardRevision:old?.revision||0,reward:{state:result.state,expectedRevision:old?.revision||0}});
   totals.reads+=out.reads;totals.writes+=out.writes;totals.bytes+=encoded.byteLength;totals.publications++;
   return {state:result.state,snapshot:copy,revision:out.root.revision,result};
@@ -40,9 +44,22 @@ try {
   const sourceReplay = transitionSpark(state,{type:'status'},{uid,now,festivalEnabled:true,sourceEarned:{c:0,avatar:1,frame:1,badge:1}});
   assert.deepEqual(sourceReplay.state.chests,state.chests);
   accept(await commit({type:'status'},{earned:130}));
-  for(const points of [100,75,50,25])accept(await commit({type:'claimFestival',cycle:0,points}));
+  for(const points of [100,75,50,25,10])accept(await commit({type:'claimFestival',cycle:0,points}));
   assert.equal(state.festival.completedCycles,1);assert.equal(state.festival.earnedTotal,130);assert.equal(saved.profile.data.coins,250);
   assert.equal(transitionSpark(state,{type:'claimFestival',cycle:0,points:25},{uid,now,festivalEnabled:true,fireflyEarned:130}).receipts.length,0);
+  // A version change in the middle of a cycle must be rejected, with a fully formed publication.
+  await assertFails(commit({type:'status'},{mutate:s=>{s.festival.version=1;}}));
+  await assertFails(commit({type:'status'},{mutate:s=>{s.festival.mask=4;}}));
+  await assertFails(commit({type:'status'},{mutate:s=>{s.festival.mask=3;}}));
+  await assertFails(commit({type:'status'},{mutate:s=>{s.festival.completedCycles++;s.festival.mask=0;}}));
+  // Simulate an existing v1 account at the current revision; finish its old rights before v2.
+  state.festival={version:1,earnedTotal:230,completedCycles:1,mask:1};
+  saved.profile.data.appearance.spark.state=structuredClone(state);saved.profile.data.appearance.spark.fireflyEarned=230;
+  await env.withSecurityRulesDisabled(async context=>updateDoc(sparkRef(context.firestore(),space,uid),{festival:state.festival}));
+  await assertFails(commit({type:'status'},{mutate:s=>{s.festival.version=2;}}));
+  for(const points of [100,50,75])accept(await commit({type:'claimFestival',cycle:1,points}));
+  assert.equal(state.festival.version,2);assert.equal(state.festival.completedCycles,2);assert.equal(state.festival.earnedTotal,230);
+  accept(await commit({type:'claimFestival',cycle:2,points:10}));
   // Bounded four-letter flushes then fixed chest recipe exchange.
   for(let offset=0;offset<LETTER_ALPHABET.length;offset+=4){const letters={...state.letters.earned};for(const key of LETTER_ALPHABET.slice(offset,offset+4))letters[key]=12;accept(await commit({type:'status'},{letters}));}
   for(const set of LETTER_SETS)accept(await commit({type:'exchangeLetterSet',setId:set.id,sequence:state.letters.sequence+1,operation:`exchange-${set.id}`}));

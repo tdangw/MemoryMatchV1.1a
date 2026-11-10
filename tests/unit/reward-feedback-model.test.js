@@ -12,10 +12,10 @@ test('committed login, daily all-clear and weekly receipts include only new coin
  for(const d of DAILY){r=step(state,{type:'daily',id:d.id});const rewards=collect(state,r);assert(rewards.some(v=>v.kind==='coins'));if(r.state.daily.claimed.includes('bonus'))assert(rewards.some(v=>v.kind==='ticket'));state=r.state;}
  state=initial();for(const w of WEEKLY)state.weekly[w.key]=w.target;r=step(state,{type:'weekly'});assert.deepEqual(collect(state,r),[{kind:'coins',amount:50},{kind:'ticket',amount:2}]);
 });
-test('festival grants both chest and coins once; mirroring gameplay tickets is not a second reward',()=>{
+test('festival grants the exact new chest milestone once; mirroring gameplay tickets is not a second reward',()=>{
  let state=initial();state=transitionSpark(state,{type:'status'},{uid,now,festivalEnabled:true,fireflyEarned:100}).state;
  const command={type:'claimFestival',cycle:0,points:50};const r=step(state,command);
- assert.deepEqual(collect(state,r),[{kind:'coins',amount:100},{kind:'chest',chestType:'c',amount:1}]);assert.deepEqual(collect(r.state,step(r.state,command)),[]);
+ assert.deepEqual(collect(state,r),[{kind:'chest',chestType:'c',amount:1}]);assert.deepEqual(collect(r.state,step(r.state,command)),[]);
  state=initial();const mirror=transitionSpark(state,{type:'status'},{uid,now,festivalEnabled:true,ticketEarned:3});assert.deepEqual(collect(state,mirror),[]);
 });
 test('support/acquisition/fused letter are presentation facts and empty replay has none',()=>{
