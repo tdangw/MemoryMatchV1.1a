@@ -1,0 +1,1694 @@
+{
+  "items": [
+    {
+      "id": "memory-avatar-sapphire-owl",
+      "name": "Cú Băng Lam",
+      "gameId": "memory-match",
+      "level": 1,
+      "type": "avatar",
+      "equipSlot": "avatar",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/memory-avatar-sapphire-owl-128.webp",
+        "256": "assets/achievements/v1/memory-avatar-sapphire-owl-256.webp",
+        "512": "assets/achievements/v1/memory-avatar-sapphire-owl-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "memory-match"
+    },
+    {
+      "id": "memory-frame-golden-laurel",
+      "name": "Vòng Nguyệt Quế",
+      "gameId": "memory-match",
+      "level": 2,
+      "type": "frame",
+      "equipSlot": "frame",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/memory-frame-golden-laurel-128.webp",
+        "256": "assets/achievements/v1/memory-frame-golden-laurel-256.webp",
+        "512": "assets/achievements/v1/memory-frame-golden-laurel-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "memory-match"
+    },
+    {
+      "id": "memory-badge-wisdom",
+      "name": "Trí Thức",
+      "gameId": "memory-match",
+      "level": 3,
+      "type": "badge",
+      "equipSlot": "badge",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/memory-badge-wisdom-128.webp",
+        "256": "assets/achievements/v1/memory-badge-wisdom-256.webp",
+        "512": "assets/achievements/v1/memory-badge-wisdom-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "memory-match"
+    },
+    {
+      "id": "memory-avatar-cherry-rabbit",
+      "name": "Thỏ Anh Đào",
+      "gameId": "memory-match",
+      "level": 5,
+      "type": "avatar",
+      "equipSlot": "avatar",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/memory-avatar-cherry-rabbit-128.webp",
+        "256": "assets/achievements/v1/memory-avatar-cherry-rabbit-256.webp",
+        "512": "assets/achievements/v1/memory-avatar-cherry-rabbit-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "memory-match"
+    },
+    {
+      "id": "memory-frame-cherry-blossom",
+      "name": "Hoa Anh Đào",
+      "gameId": "memory-match",
+      "level": 6,
+      "type": "frame",
+      "equipSlot": "frame",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/memory-frame-cherry-blossom-128.webp",
+        "256": "assets/achievements/v1/memory-frame-cherry-blossom-256.webp",
+        "512": "assets/achievements/v1/memory-frame-cherry-blossom-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "memory-match"
+    },
+    {
+      "id": "memory-badge-memory-master",
+      "name": "Đại Sư Ký Ức",
+      "gameId": "memory-match",
+      "level": 7,
+      "type": "badge",
+      "equipSlot": "badge",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/memory-badge-memory-master-128.webp",
+        "256": "assets/achievements/v1/memory-badge-memory-master-256.webp",
+        "512": "assets/achievements/v1/memory-badge-memory-master-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "memory-match"
+    },
+    {
+      "id": "memory-avatar-stellar-cat",
+      "name": "Mèo Tinh Tú",
+      "gameId": "memory-match",
+      "level": 8,
+      "type": "avatar",
+      "equipSlot": "avatar",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/memory-avatar-stellar-cat-128.webp",
+        "256": "assets/achievements/v1/memory-avatar-stellar-cat-256.webp",
+        "512": "assets/achievements/v1/memory-avatar-stellar-cat-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "memory-match"
+    },
+    {
+      "id": "memory-frame-sky-feather",
+      "name": "Lông Vũ Thiên Thanh",
+      "gameId": "memory-match",
+      "level": 9,
+      "type": "frame",
+      "equipSlot": "frame",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/memory-frame-sky-feather-128.webp",
+        "256": "assets/achievements/v1/memory-frame-sky-feather-256.webp",
+        "512": "assets/achievements/v1/memory-frame-sky-feather-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "memory-match"
+    },
+    {
+      "id": "memory-avatar-scholar-squirrel",
+      "name": "Sóc Thư Sinh",
+      "gameId": "memory-match",
+      "level": 11,
+      "type": "avatar",
+      "equipSlot": "avatar",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/memory-avatar-scholar-squirrel-128.webp",
+        "256": "assets/achievements/v1/memory-avatar-scholar-squirrel-256.webp",
+        "512": "assets/achievements/v1/memory-avatar-scholar-squirrel-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "memory-match"
+    },
+    {
+      "id": "memory-frame-gilded-pages",
+      "name": "Trang Sách Vàng",
+      "gameId": "memory-match",
+      "level": 12,
+      "type": "frame",
+      "equipSlot": "frame",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/memory-frame-gilded-pages-128.webp",
+        "256": "assets/achievements/v1/memory-frame-gilded-pages-256.webp",
+        "512": "assets/achievements/v1/memory-frame-gilded-pages-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "memory-match"
+    },
+    {
+      "id": "memory-badge-wisdom-seal",
+      "name": "Dấu Ấn Tri Thức",
+      "gameId": "memory-match",
+      "level": 13,
+      "type": "badge",
+      "equipSlot": "badge",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/memory-badge-wisdom-seal-128.webp",
+        "256": "assets/achievements/v1/memory-badge-wisdom-seal-256.webp",
+        "512": "assets/achievements/v1/memory-badge-wisdom-seal-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "memory-match"
+    },
+    {
+      "id": "memory-avatar-stargazer-hedgehog",
+      "name": "Nhím Chiêm Tinh",
+      "gameId": "memory-match",
+      "level": 14,
+      "type": "avatar",
+      "equipSlot": "avatar",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/memory-avatar-stargazer-hedgehog-128.webp",
+        "256": "assets/achievements/v1/memory-avatar-stargazer-hedgehog-256.webp",
+        "512": "assets/achievements/v1/memory-avatar-stargazer-hedgehog-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "memory-match"
+    },
+    {
+      "id": "memory-frame-astral-orbit",
+      "name": "Quỹ Đạo Sao",
+      "gameId": "memory-match",
+      "level": 15,
+      "type": "frame",
+      "equipSlot": "frame",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/memory-frame-astral-orbit-128.webp",
+        "256": "assets/achievements/v1/memory-frame-astral-orbit-256.webp",
+        "512": "assets/achievements/v1/memory-frame-astral-orbit-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "memory-match"
+    },
+    {
+      "id": "memory-avatar-dreaming-deer",
+      "name": "Hươu Mộng Mơ",
+      "gameId": "memory-match",
+      "level": 16,
+      "type": "avatar",
+      "equipSlot": "avatar",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/memory-avatar-dreaming-deer-128.webp",
+        "256": "assets/achievements/v1/memory-avatar-dreaming-deer-256.webp",
+        "512": "assets/achievements/v1/memory-avatar-dreaming-deer-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "memory-match"
+    },
+    {
+      "id": "memory-frame-silken-clouds",
+      "name": "Mây Lụa",
+      "gameId": "memory-match",
+      "level": 17,
+      "type": "frame",
+      "equipSlot": "frame",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/memory-frame-silken-clouds-128.webp",
+        "256": "assets/achievements/v1/memory-frame-silken-clouds-256.webp",
+        "512": "assets/achievements/v1/memory-frame-silken-clouds-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "memory-match"
+    },
+    {
+      "id": "memory-badge-memory-keeper",
+      "name": "Người Giữ Ký Ức",
+      "gameId": "memory-match",
+      "level": 18,
+      "type": "badge",
+      "equipSlot": "badge",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/memory-badge-memory-keeper-128.webp",
+        "256": "assets/achievements/v1/memory-badge-memory-keeper-256.webp",
+        "512": "assets/achievements/v1/memory-badge-memory-keeper-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "memory-match"
+    },
+    {
+      "id": "memory-avatar-galaxy-whale",
+      "name": "Cá Voi Ngân Hà",
+      "gameId": "memory-match",
+      "level": 19,
+      "type": "avatar",
+      "equipSlot": "avatar",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/memory-avatar-galaxy-whale-128.webp",
+        "256": "assets/achievements/v1/memory-avatar-galaxy-whale-256.webp",
+        "512": "assets/achievements/v1/memory-avatar-galaxy-whale-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "memory-match"
+    },
+    {
+      "id": "memory-frame-knowledge-gateway",
+      "name": "Cánh Cổng Tri Thức",
+      "gameId": "memory-match",
+      "level": 20,
+      "type": "frame",
+      "equipSlot": "frame",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/memory-frame-knowledge-gateway-128.webp",
+        "256": "assets/achievements/v1/memory-frame-knowledge-gateway-256.webp",
+        "512": "assets/achievements/v1/memory-frame-knowledge-gateway-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "memory-match"
+    },
+    {
+      "id": "memory-avatar-chestnut-squirrel",
+      "name": "Sóc Hạt Dẻ",
+      "gameId": "memory-match",
+      "level": 21,
+      "type": "avatar",
+      "equipSlot": "avatar",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/memory-avatar-chestnut-squirrel-128.webp",
+        "256": "assets/achievements/v1/memory-avatar-chestnut-squirrel-256.webp",
+        "512": "assets/achievements/v1/memory-avatar-chestnut-squirrel-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "memory-match"
+    },
+    {
+      "id": "memory-frame-autumn-leaves",
+      "name": "Vòng Lá Thu",
+      "gameId": "memory-match",
+      "level": 22,
+      "type": "frame",
+      "equipSlot": "frame",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/memory-frame-autumn-leaves-128.webp",
+        "256": "assets/achievements/v1/memory-frame-autumn-leaves-256.webp",
+        "512": "assets/achievements/v1/memory-frame-autumn-leaves-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "memory-match"
+    },
+    {
+      "id": "memory-badge-four-seasons",
+      "name": "Bốn Mùa Hội Tụ",
+      "gameId": "memory-match",
+      "level": 23,
+      "type": "badge",
+      "equipSlot": "badge",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/memory-badge-four-seasons-128.webp",
+        "256": "assets/achievements/v1/memory-badge-four-seasons-256.webp",
+        "512": "assets/achievements/v1/memory-badge-four-seasons-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "memory-match"
+    },
+    {
+      "id": "memory-avatar-snow-rabbit",
+      "name": "Thỏ Tuyết",
+      "gameId": "memory-match",
+      "level": 24,
+      "type": "avatar",
+      "equipSlot": "avatar",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/memory-avatar-snow-rabbit-128.webp",
+        "256": "assets/achievements/v1/memory-avatar-snow-rabbit-256.webp",
+        "512": "assets/achievements/v1/memory-avatar-snow-rabbit-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "memory-match"
+    },
+    {
+      "id": "memory-frame-frosted-branch",
+      "name": "Nhành Băng",
+      "gameId": "memory-match",
+      "level": 25,
+      "type": "frame",
+      "equipSlot": "frame",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/memory-frame-frosted-branch-128.webp",
+        "256": "assets/achievements/v1/memory-frame-frosted-branch-256.webp",
+        "512": "assets/achievements/v1/memory-frame-frosted-branch-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "memory-match"
+    },
+    {
+      "id": "memory-avatar-honey-bear",
+      "name": "Gấu Mật Ong",
+      "gameId": "memory-match",
+      "level": 26,
+      "type": "avatar",
+      "equipSlot": "avatar",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/memory-avatar-honey-bear-128.webp",
+        "256": "assets/achievements/v1/memory-avatar-honey-bear-256.webp",
+        "512": "assets/achievements/v1/memory-avatar-honey-bear-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "memory-match"
+    },
+    {
+      "id": "memory-frame-golden-honeycomb",
+      "name": "Tổ Ong Vàng",
+      "gameId": "memory-match",
+      "level": 27,
+      "type": "frame",
+      "equipSlot": "frame",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/memory-frame-golden-honeycomb-128.webp",
+        "256": "assets/achievements/v1/memory-frame-golden-honeycomb-256.webp",
+        "512": "assets/achievements/v1/memory-frame-golden-honeycomb-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "memory-match"
+    },
+    {
+      "id": "memory-badge-forest-guardian",
+      "name": "Người Giữ Rừng",
+      "gameId": "memory-match",
+      "level": 28,
+      "type": "badge",
+      "equipSlot": "badge",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/memory-badge-forest-guardian-128.webp",
+        "256": "assets/achievements/v1/memory-badge-forest-guardian-256.webp",
+        "512": "assets/achievements/v1/memory-badge-forest-guardian-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "memory-match"
+    },
+    {
+      "id": "memory-avatar-dawn-crane",
+      "name": "Hạc Bình Minh",
+      "gameId": "memory-match",
+      "level": 29,
+      "type": "avatar",
+      "equipSlot": "avatar",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/memory-avatar-dawn-crane-128.webp",
+        "256": "assets/achievements/v1/memory-avatar-dawn-crane-256.webp",
+        "512": "assets/achievements/v1/memory-avatar-dawn-crane-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "memory-match"
+    },
+    {
+      "id": "memory-frame-memory-crown",
+      "name": "Vương Miện Ký Ức",
+      "gameId": "memory-match",
+      "level": 30,
+      "type": "frame",
+      "equipSlot": "frame",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/memory-frame-memory-crown-128.webp",
+        "256": "assets/achievements/v1/memory-frame-memory-crown-256.webp",
+        "512": "assets/achievements/v1/memory-frame-memory-crown-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "memory-match"
+    },
+    {
+      "id": "link-avatar-autumn-fox",
+      "name": "Cáo Rừng Thu",
+      "gameId": "link-connect",
+      "level": 1,
+      "type": "avatar",
+      "equipSlot": "avatar",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/link-avatar-autumn-fox-128.webp",
+        "256": "assets/achievements/v1/link-avatar-autumn-fox-256.webp",
+        "512": "assets/achievements/v1/link-avatar-autumn-fox-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "link-connect"
+    },
+    {
+      "id": "link-frame-moonblossom",
+      "name": "Hoa Nguyệt",
+      "gameId": "link-connect",
+      "level": 2,
+      "type": "frame",
+      "equipSlot": "frame",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/link-frame-moonblossom-128.webp",
+        "256": "assets/achievements/v1/link-frame-moonblossom-256.webp",
+        "512": "assets/achievements/v1/link-frame-moonblossom-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "link-connect"
+    },
+    {
+      "id": "link-badge-link-master",
+      "name": "Bậc Thầy Kết Nối",
+      "gameId": "link-connect",
+      "level": 3,
+      "type": "badge",
+      "equipSlot": "badge",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/link-badge-link-master-128.webp",
+        "256": "assets/achievements/v1/link-badge-link-master-256.webp",
+        "512": "assets/achievements/v1/link-badge-link-master-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "link-connect"
+    },
+    {
+      "id": "link-avatar-moonfox",
+      "name": "Cáo Ánh Trăng",
+      "gameId": "link-connect",
+      "level": 5,
+      "type": "avatar",
+      "equipSlot": "avatar",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/link-avatar-moonfox-128.webp",
+        "256": "assets/achievements/v1/link-avatar-moonfox-256.webp",
+        "512": "assets/achievements/v1/link-avatar-moonfox-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "link-connect"
+    },
+    {
+      "id": "link-frame-silver-moon",
+      "name": "Vầng Trăng Bạc",
+      "gameId": "link-connect",
+      "level": 6,
+      "type": "frame",
+      "equipSlot": "frame",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/link-frame-silver-moon-128.webp",
+        "256": "assets/achievements/v1/link-frame-silver-moon-256.webp",
+        "512": "assets/achievements/v1/link-frame-silver-moon-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "link-connect"
+    },
+    {
+      "id": "link-badge-golden-bond",
+      "name": "Vòng Kết Nối",
+      "gameId": "link-connect",
+      "level": 7,
+      "type": "badge",
+      "equipSlot": "badge",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/link-badge-golden-bond-128.webp",
+        "256": "assets/achievements/v1/link-badge-golden-bond-256.webp",
+        "512": "assets/achievements/v1/link-badge-golden-bond-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "link-connect"
+    },
+    {
+      "id": "link-avatar-galaxy-deer",
+      "name": "Hươu Ngân Hà",
+      "gameId": "link-connect",
+      "level": 8,
+      "type": "avatar",
+      "equipSlot": "avatar",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/link-avatar-galaxy-deer-128.webp",
+        "256": "assets/achievements/v1/link-avatar-galaxy-deer-256.webp",
+        "512": "assets/achievements/v1/link-avatar-galaxy-deer-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "link-connect"
+    },
+    {
+      "id": "link-frame-stellar-orbit",
+      "name": "Tinh Hà",
+      "gameId": "link-connect",
+      "level": 9,
+      "type": "frame",
+      "equipSlot": "frame",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/link-frame-stellar-orbit-128.webp",
+        "256": "assets/achievements/v1/link-frame-stellar-orbit-256.webp",
+        "512": "assets/achievements/v1/link-frame-stellar-orbit-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "link-connect"
+    },
+    {
+      "id": "link-avatar-sailor-beaver",
+      "name": "Hải Ly Thủy Thủ",
+      "gameId": "link-connect",
+      "level": 11,
+      "type": "avatar",
+      "equipSlot": "avatar",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/link-avatar-sailor-beaver-128.webp",
+        "256": "assets/achievements/v1/link-avatar-sailor-beaver-256.webp",
+        "512": "assets/achievements/v1/link-avatar-sailor-beaver-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "link-connect"
+    },
+    {
+      "id": "link-frame-moon-coral",
+      "name": "San Hô Ánh Trăng",
+      "gameId": "link-connect",
+      "level": 12,
+      "type": "frame",
+      "equipSlot": "frame",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/link-frame-moon-coral-128.webp",
+        "256": "assets/achievements/v1/link-frame-moon-coral-256.webp",
+        "512": "assets/achievements/v1/link-frame-moon-coral-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "link-connect"
+    },
+    {
+      "id": "link-badge-lighthouse-guide",
+      "name": "Hải Đăng Dẫn Lối",
+      "gameId": "link-connect",
+      "level": 13,
+      "type": "badge",
+      "equipSlot": "badge",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/link-badge-lighthouse-guide-128.webp",
+        "256": "assets/achievements/v1/link-badge-lighthouse-guide-256.webp",
+        "512": "assets/achievements/v1/link-badge-lighthouse-guide-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "link-connect"
+    },
+    {
+      "id": "link-avatar-pearl-dolphin",
+      "name": "Cá Heo Ngọc",
+      "gameId": "link-connect",
+      "level": 14,
+      "type": "avatar",
+      "equipSlot": "avatar",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/link-avatar-pearl-dolphin-128.webp",
+        "256": "assets/achievements/v1/link-avatar-pearl-dolphin-256.webp",
+        "512": "assets/achievements/v1/link-avatar-pearl-dolphin-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "link-connect"
+    },
+    {
+      "id": "link-frame-silver-waves",
+      "name": "Sóng Bạc",
+      "gameId": "link-connect",
+      "level": 15,
+      "type": "frame",
+      "equipSlot": "frame",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/link-frame-silver-waves-128.webp",
+        "256": "assets/achievements/v1/link-frame-silver-waves-256.webp",
+        "512": "assets/achievements/v1/link-frame-silver-waves-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "link-connect"
+    },
+    {
+      "id": "link-avatar-azure-turtle",
+      "name": "Rùa Biển Lam",
+      "gameId": "link-connect",
+      "level": 16,
+      "type": "avatar",
+      "equipSlot": "avatar",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/link-avatar-azure-turtle-128.webp",
+        "256": "assets/achievements/v1/link-avatar-azure-turtle-256.webp",
+        "512": "assets/achievements/v1/link-avatar-azure-turtle-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "link-connect"
+    },
+    {
+      "id": "link-frame-pearl-shell",
+      "name": "Vỏ Trai Ánh Ngọc",
+      "gameId": "link-connect",
+      "level": 17,
+      "type": "frame",
+      "equipSlot": "frame",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/link-frame-pearl-shell-128.webp",
+        "256": "assets/achievements/v1/link-frame-pearl-shell-256.webp",
+        "512": "assets/achievements/v1/link-frame-pearl-shell-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "link-connect"
+    },
+    {
+      "id": "link-badge-ocean-knot",
+      "name": "Nút Thắt Đại Dương",
+      "gameId": "link-connect",
+      "level": 18,
+      "type": "badge",
+      "equipSlot": "badge",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/link-badge-ocean-knot-128.webp",
+        "256": "assets/achievements/v1/link-badge-ocean-knot-256.webp",
+        "512": "assets/achievements/v1/link-badge-ocean-knot-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "link-connect"
+    },
+    {
+      "id": "link-avatar-royal-seahorse",
+      "name": "Hải Mã Hoàng Gia",
+      "gameId": "link-connect",
+      "level": 19,
+      "type": "avatar",
+      "equipSlot": "avatar",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/link-avatar-royal-seahorse-128.webp",
+        "256": "assets/achievements/v1/link-avatar-royal-seahorse-256.webp",
+        "512": "assets/achievements/v1/link-avatar-royal-seahorse-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "link-connect"
+    },
+    {
+      "id": "link-frame-tidal-crown",
+      "name": "Vương Miện Hải Triều",
+      "gameId": "link-connect",
+      "level": 20,
+      "type": "frame",
+      "equipSlot": "frame",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/link-frame-tidal-crown-128.webp",
+        "256": "assets/achievements/v1/link-frame-tidal-crown-256.webp",
+        "512": "assets/achievements/v1/link-frame-tidal-crown-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "link-connect"
+    },
+    {
+      "id": "link-avatar-lantern-cat",
+      "name": "Mèo Hoa Đăng",
+      "gameId": "link-connect",
+      "level": 21,
+      "type": "avatar",
+      "equipSlot": "avatar",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/link-avatar-lantern-cat-128.webp",
+        "256": "assets/achievements/v1/link-avatar-lantern-cat-256.webp",
+        "512": "assets/achievements/v1/link-avatar-lantern-cat-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "link-connect"
+    },
+    {
+      "id": "link-frame-silk-lanterns",
+      "name": "Vòng Đèn Lụa",
+      "gameId": "link-connect",
+      "level": 22,
+      "type": "frame",
+      "equipSlot": "frame",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/link-frame-silk-lanterns-128.webp",
+        "256": "assets/achievements/v1/link-frame-silk-lanterns-256.webp",
+        "512": "assets/achievements/v1/link-frame-silk-lanterns-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "link-connect"
+    },
+    {
+      "id": "link-badge-guiding-lantern",
+      "name": "Ngọn Đèn Kết Nối",
+      "gameId": "link-connect",
+      "level": 23,
+      "type": "badge",
+      "equipSlot": "badge",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/link-badge-guiding-lantern-128.webp",
+        "256": "assets/achievements/v1/link-badge-guiding-lantern-256.webp",
+        "512": "assets/achievements/v1/link-badge-guiding-lantern-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "link-connect"
+    },
+    {
+      "id": "link-avatar-festival-sparrow",
+      "name": "Chim Sẻ Đêm Hội",
+      "gameId": "link-connect",
+      "level": 24,
+      "type": "avatar",
+      "equipSlot": "avatar",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/link-avatar-festival-sparrow-128.webp",
+        "256": "assets/achievements/v1/link-avatar-festival-sparrow-256.webp",
+        "512": "assets/achievements/v1/link-avatar-festival-sparrow-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "link-connect"
+    },
+    {
+      "id": "link-frame-osmanthus-branch",
+      "name": "Nhành Hoa Mộc",
+      "gameId": "link-connect",
+      "level": 25,
+      "type": "frame",
+      "equipSlot": "frame",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/link-frame-osmanthus-branch-128.webp",
+        "256": "assets/achievements/v1/link-frame-osmanthus-branch-256.webp",
+        "512": "assets/achievements/v1/link-frame-osmanthus-branch-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "link-connect"
+    },
+    {
+      "id": "link-avatar-paperblossom-deer",
+      "name": "Hươu Hoa Giấy",
+      "gameId": "link-connect",
+      "level": 26,
+      "type": "avatar",
+      "equipSlot": "avatar",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/link-avatar-paperblossom-deer-128.webp",
+        "256": "assets/achievements/v1/link-avatar-paperblossom-deer-256.webp",
+        "512": "assets/achievements/v1/link-avatar-paperblossom-deer-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "link-connect"
+    },
+    {
+      "id": "link-frame-moon-silk",
+      "name": "Dải Lụa Trăng",
+      "gameId": "link-connect",
+      "level": 27,
+      "type": "frame",
+      "equipSlot": "frame",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/link-frame-moon-silk-128.webp",
+        "256": "assets/achievements/v1/link-frame-moon-silk-256.webp",
+        "512": "assets/achievements/v1/link-frame-moon-silk-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "link-connect"
+    },
+    {
+      "id": "link-badge-moonlit-promise",
+      "name": "Lời Hẹn Dưới Trăng",
+      "gameId": "link-connect",
+      "level": 28,
+      "type": "badge",
+      "equipSlot": "badge",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/link-badge-moonlit-promise-128.webp",
+        "256": "assets/achievements/v1/link-badge-moonlit-promise-256.webp",
+        "512": "assets/achievements/v1/link-badge-moonlit-promise-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "link-connect"
+    },
+    {
+      "id": "link-avatar-glasslight-fox",
+      "name": "Cáo Lưu Ly",
+      "gameId": "link-connect",
+      "level": 29,
+      "type": "avatar",
+      "equipSlot": "avatar",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/link-avatar-glasslight-fox-128.webp",
+        "256": "assets/achievements/v1/link-avatar-glasslight-fox-256.webp",
+        "512": "assets/achievements/v1/link-avatar-glasslight-fox-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "link-connect"
+    },
+    {
+      "id": "link-frame-lantern-moon-gate",
+      "name": "Cổng Trăng Hoa Đăng",
+      "gameId": "link-connect",
+      "level": 30,
+      "type": "frame",
+      "equipSlot": "frame",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/link-frame-lantern-moon-gate-128.webp",
+        "256": "assets/achievements/v1/link-frame-lantern-moon-gate-256.webp",
+        "512": "assets/achievements/v1/link-frame-lantern-moon-gate-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "link-connect"
+    },
+    {
+      "id": "triple-avatar-jade-dragon",
+      "name": "Rồng Ngọc",
+      "gameId": "triple-connect",
+      "level": 1,
+      "type": "avatar",
+      "equipSlot": "avatar",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/triple-avatar-jade-dragon-128.webp",
+        "256": "assets/achievements/v1/triple-avatar-jade-dragon-256.webp",
+        "512": "assets/achievements/v1/triple-avatar-jade-dragon-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "triple-connect"
+    },
+    {
+      "id": "triple-frame-tri-crystal",
+      "name": "Tam Tinh",
+      "gameId": "triple-connect",
+      "level": 2,
+      "type": "frame",
+      "equipSlot": "frame",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/triple-frame-tri-crystal-128.webp",
+        "256": "assets/achievements/v1/triple-frame-tri-crystal-256.webp",
+        "512": "assets/achievements/v1/triple-frame-tri-crystal-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "triple-connect"
+    },
+    {
+      "id": "triple-badge-crystal-triad",
+      "name": "Tinh Thể Ánh Sáng",
+      "gameId": "triple-connect",
+      "level": 3,
+      "type": "badge",
+      "equipSlot": "badge",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/triple-badge-crystal-triad-128.webp",
+        "256": "assets/achievements/v1/triple-badge-crystal-triad-256.webp",
+        "512": "assets/achievements/v1/triple-badge-crystal-triad-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "triple-connect"
+    },
+    {
+      "id": "triple-avatar-blue-panda",
+      "name": "Gấu Trúc Lam",
+      "gameId": "triple-connect",
+      "level": 5,
+      "type": "avatar",
+      "equipSlot": "avatar",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/triple-avatar-blue-panda-128.webp",
+        "256": "assets/achievements/v1/triple-avatar-blue-panda-256.webp",
+        "512": "assets/achievements/v1/triple-avatar-blue-panda-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "triple-connect"
+    },
+    {
+      "id": "triple-frame-prism",
+      "name": "Lăng Kính",
+      "gameId": "triple-connect",
+      "level": 6,
+      "type": "frame",
+      "equipSlot": "frame",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/triple-frame-prism-128.webp",
+        "256": "assets/achievements/v1/triple-frame-prism-256.webp",
+        "512": "assets/achievements/v1/triple-frame-prism-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "triple-connect"
+    },
+    {
+      "id": "triple-badge-triad-master",
+      "name": "Bậc Thầy Bộ Ba",
+      "gameId": "triple-connect",
+      "level": 7,
+      "type": "badge",
+      "equipSlot": "badge",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/triple-badge-triad-master-128.webp",
+        "256": "assets/achievements/v1/triple-badge-triad-master-256.webp",
+        "512": "assets/achievements/v1/triple-badge-triad-master-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "triple-connect"
+    },
+    {
+      "id": "triple-avatar-sunset-dragon",
+      "name": "Rồng Hoàng Hôn",
+      "gameId": "triple-connect",
+      "level": 8,
+      "type": "avatar",
+      "equipSlot": "avatar",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/triple-avatar-sunset-dragon-128.webp",
+        "256": "assets/achievements/v1/triple-avatar-sunset-dragon-256.webp",
+        "512": "assets/achievements/v1/triple-avatar-sunset-dragon-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "triple-connect"
+    },
+    {
+      "id": "triple-frame-emerald",
+      "name": "Ngọc Lục Bảo",
+      "gameId": "triple-connect",
+      "level": 9,
+      "type": "frame",
+      "equipSlot": "frame",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/triple-frame-emerald-128.webp",
+        "256": "assets/achievements/v1/triple-frame-emerald-256.webp",
+        "512": "assets/achievements/v1/triple-frame-emerald-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "triple-connect"
+    },
+    {
+      "id": "triple-avatar-quartz-phoenix",
+      "name": "Phượng Hoàng Thạch Anh",
+      "gameId": "triple-connect",
+      "level": 11,
+      "type": "avatar",
+      "equipSlot": "avatar",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/triple-avatar-quartz-phoenix-128.webp",
+        "256": "assets/achievements/v1/triple-avatar-quartz-phoenix-256.webp",
+        "512": "assets/achievements/v1/triple-avatar-quartz-phoenix-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "triple-connect"
+    },
+    {
+      "id": "triple-frame-crystal-arch",
+      "name": "Vòm Pha Lê",
+      "gameId": "triple-connect",
+      "level": 12,
+      "type": "frame",
+      "equipSlot": "frame",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/triple-frame-crystal-arch-128.webp",
+        "256": "assets/achievements/v1/triple-frame-crystal-arch-256.webp",
+        "512": "assets/achievements/v1/triple-frame-crystal-arch-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "triple-connect"
+    },
+    {
+      "id": "triple-badge-triangle-seal",
+      "name": "Dấu Ấn Tam Giác",
+      "gameId": "triple-connect",
+      "level": 13,
+      "type": "badge",
+      "equipSlot": "badge",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/triple-badge-triangle-seal-128.webp",
+        "256": "assets/achievements/v1/triple-badge-triangle-seal-256.webp",
+        "512": "assets/achievements/v1/triple-badge-triangle-seal-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "triple-connect"
+    },
+    {
+      "id": "triple-avatar-amethyst-unicorn",
+      "name": "Kỳ Lân Tím",
+      "gameId": "triple-connect",
+      "level": 14,
+      "type": "avatar",
+      "equipSlot": "avatar",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/triple-avatar-amethyst-unicorn-128.webp",
+        "256": "assets/achievements/v1/triple-avatar-amethyst-unicorn-256.webp",
+        "512": "assets/achievements/v1/triple-avatar-amethyst-unicorn-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "triple-connect"
+    },
+    {
+      "id": "triple-frame-three-wing-star",
+      "name": "Cánh Sao Ba Nhánh",
+      "gameId": "triple-connect",
+      "level": 15,
+      "type": "frame",
+      "equipSlot": "frame",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/triple-frame-three-wing-star-128.webp",
+        "256": "assets/achievements/v1/triple-frame-three-wing-star-256.webp",
+        "512": "assets/achievements/v1/triple-frame-three-wing-star-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "triple-connect"
+    },
+    {
+      "id": "triple-avatar-platinum-dragon",
+      "name": "Rồng Bạch Kim",
+      "gameId": "triple-connect",
+      "level": 16,
+      "type": "avatar",
+      "equipSlot": "avatar",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/triple-avatar-platinum-dragon-128.webp",
+        "256": "assets/achievements/v1/triple-avatar-platinum-dragon-256.webp",
+        "512": "assets/achievements/v1/triple-avatar-platinum-dragon-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "triple-connect"
+    },
+    {
+      "id": "triple-frame-jade-gears",
+      "name": "Vòng Bánh Răng Ngọc",
+      "gameId": "triple-connect",
+      "level": 17,
+      "type": "frame",
+      "equipSlot": "frame",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/triple-frame-jade-gears-128.webp",
+        "256": "assets/achievements/v1/triple-frame-jade-gears-256.webp",
+        "512": "assets/achievements/v1/triple-frame-jade-gears-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "triple-connect"
+    },
+    {
+      "id": "triple-badge-crystal-keeper",
+      "name": "Người Giữ Tinh Thể",
+      "gameId": "triple-connect",
+      "level": 18,
+      "type": "badge",
+      "equipSlot": "badge",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/triple-badge-crystal-keeper-128.webp",
+        "256": "assets/achievements/v1/triple-badge-crystal-keeper-256.webp",
+        "512": "assets/achievements/v1/triple-badge-crystal-keeper-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "triple-connect"
+    },
+    {
+      "id": "triple-avatar-crystal-mech-cat",
+      "name": "Mèo Máy Pha Lê",
+      "gameId": "triple-connect",
+      "level": 19,
+      "type": "avatar",
+      "equipSlot": "avatar",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/triple-avatar-crystal-mech-cat-128.webp",
+        "256": "assets/achievements/v1/triple-avatar-crystal-mech-cat-256.webp",
+        "512": "assets/achievements/v1/triple-avatar-crystal-mech-cat-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "triple-connect"
+    },
+    {
+      "id": "triple-frame-tri-star-crown",
+      "name": "Vương Miện Tam Tinh",
+      "gameId": "triple-connect",
+      "level": 20,
+      "type": "frame",
+      "equipSlot": "frame",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/triple-frame-tri-star-crown-128.webp",
+        "256": "assets/achievements/v1/triple-frame-tri-star-crown-256.webp",
+        "512": "assets/achievements/v1/triple-frame-tri-star-crown-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "triple-connect"
+    },
+    {
+      "id": "triple-avatar-aurora-snowfox",
+      "name": "Cáo Tuyết Cực Quang",
+      "gameId": "triple-connect",
+      "level": 21,
+      "type": "avatar",
+      "equipSlot": "avatar",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/triple-avatar-aurora-snowfox-128.webp",
+        "256": "assets/achievements/v1/triple-avatar-aurora-snowfox-256.webp",
+        "512": "assets/achievements/v1/triple-avatar-aurora-snowfox-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "triple-connect"
+    },
+    {
+      "id": "triple-frame-aurora-ribbon",
+      "name": "Dải Cực Quang",
+      "gameId": "triple-connect",
+      "level": 22,
+      "type": "frame",
+      "equipSlot": "frame",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/triple-frame-aurora-ribbon-128.webp",
+        "256": "assets/achievements/v1/triple-frame-aurora-ribbon-256.webp",
+        "512": "assets/achievements/v1/triple-frame-aurora-ribbon-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "triple-connect"
+    },
+    {
+      "id": "triple-badge-three-dawn-rays",
+      "name": "Ba Tia Bình Minh",
+      "gameId": "triple-connect",
+      "level": 23,
+      "type": "badge",
+      "equipSlot": "badge",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/triple-badge-three-dawn-rays-128.webp",
+        "256": "assets/achievements/v1/triple-badge-three-dawn-rays-256.webp",
+        "512": "assets/achievements/v1/triple-badge-three-dawn-rays-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "triple-connect"
+    },
+    {
+      "id": "triple-avatar-jade-penguin",
+      "name": "Chim Cánh Cụt Ngọc",
+      "gameId": "triple-connect",
+      "level": 24,
+      "type": "avatar",
+      "equipSlot": "avatar",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/triple-avatar-jade-penguin-128.webp",
+        "256": "assets/achievements/v1/triple-avatar-jade-penguin-256.webp",
+        "512": "assets/achievements/v1/triple-avatar-jade-penguin-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "triple-connect"
+    },
+    {
+      "id": "triple-frame-azure-ice-ring",
+      "name": "Vòng Băng Lam",
+      "gameId": "triple-connect",
+      "level": 25,
+      "type": "frame",
+      "equipSlot": "frame",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/triple-frame-azure-ice-ring-128.webp",
+        "256": "assets/achievements/v1/triple-frame-azure-ice-ring-256.webp",
+        "512": "assets/achievements/v1/triple-frame-azure-ice-ring-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "triple-connect"
+    },
+    {
+      "id": "triple-avatar-polar-bear",
+      "name": "Gấu Bắc Cực",
+      "gameId": "triple-connect",
+      "level": 26,
+      "type": "avatar",
+      "equipSlot": "avatar",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/triple-avatar-polar-bear-128.webp",
+        "256": "assets/achievements/v1/triple-avatar-polar-bear-256.webp",
+        "512": "assets/achievements/v1/triple-avatar-polar-bear-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "triple-connect"
+    },
+    {
+      "id": "triple-frame-silver-meteor",
+      "name": "Thiên Thạch Bạc",
+      "gameId": "triple-connect",
+      "level": 27,
+      "type": "frame",
+      "equipSlot": "frame",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/triple-frame-silver-meteor-128.webp",
+        "256": "assets/achievements/v1/triple-frame-silver-meteor-256.webp",
+        "512": "assets/achievements/v1/triple-frame-silver-meteor-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "triple-connect"
+    },
+    {
+      "id": "triple-badge-aurora-heart",
+      "name": "Trái Tim Cực Quang",
+      "gameId": "triple-connect",
+      "level": 28,
+      "type": "badge",
+      "equipSlot": "badge",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/triple-badge-aurora-heart-128.webp",
+        "256": "assets/achievements/v1/triple-badge-aurora-heart-256.webp",
+        "512": "assets/achievements/v1/triple-badge-aurora-heart-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "triple-connect"
+    },
+    {
+      "id": "triple-avatar-galactic-dragon",
+      "name": "Rồng Thiên Hà",
+      "gameId": "triple-connect",
+      "level": 29,
+      "type": "avatar",
+      "equipSlot": "avatar",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/triple-avatar-galactic-dragon-128.webp",
+        "256": "assets/achievements/v1/triple-avatar-galactic-dragon-256.webp",
+        "512": "assets/achievements/v1/triple-avatar-galactic-dragon-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "triple-connect"
+    },
+    {
+      "id": "triple-frame-aurora-crown",
+      "name": "Vương Miện Cực Quang",
+      "gameId": "triple-connect",
+      "level": 30,
+      "type": "frame",
+      "equipSlot": "frame",
+      "achievementOnly": true,
+      "catalogVersion": 1,
+      "files": {
+        "128": "assets/achievements/v1/triple-frame-aurora-crown-128.webp",
+        "256": "assets/achievements/v1/triple-frame-aurora-crown-256.webp",
+        "512": "assets/achievements/v1/triple-frame-aurora-crown-512.webp"
+      },
+      "catalogSource": "achievement",
+      "origin": "triple-connect"
+    },
+    {
+      "id": "event-avatar-lantern-otter",
+      "name": "Rái Cá Đèn Lồng",
+      "type": "avatar",
+      "sourceKind": "event",
+      "series": "Sưu tập huy hiệu",
+      "files": {
+        "128": "assets/achievements/v1/event-avatar-lantern-otter-128.webp",
+        "256": "assets/achievements/v1/event-avatar-lantern-otter-256.webp",
+        "512": "assets/achievements/v1/event-avatar-lantern-otter-512.webp"
+      },
+      "catalogSource": "extra",
+      "origin": "event"
+    },
+    {
+      "id": "event-frame-firefly-glow",
+      "name": "Ánh Đom Đóm",
+      "type": "frame",
+      "sourceKind": "event",
+      "series": "Sưu tập huy hiệu",
+      "files": {
+        "128": "assets/achievements/v1/event-frame-firefly-glow-128.webp",
+        "256": "assets/achievements/v1/event-frame-firefly-glow-256.webp",
+        "512": "assets/achievements/v1/event-frame-firefly-glow-512.webp"
+      },
+      "catalogSource": "extra",
+      "origin": "event"
+    },
+    {
+      "id": "starter-avatar-little-sparrow",
+      "name": "Chim Sẻ Nhỏ",
+      "type": "avatar",
+      "sourceKind": "starter",
+      "series": "Khởi Đầu",
+      "files": {
+        "128": "assets/achievements/v1/starter-avatar-little-sparrow-128.webp",
+        "256": "assets/achievements/v1/starter-avatar-little-sparrow-256.webp",
+        "512": "assets/achievements/v1/starter-avatar-little-sparrow-512.webp"
+      },
+      "catalogSource": "extra",
+      "origin": "starter"
+    },
+    {
+      "id": "starter-frame-plain-wood",
+      "name": "Vòng Gỗ Mộc",
+      "type": "frame",
+      "sourceKind": "starter",
+      "series": "Khởi Đầu",
+      "files": {
+        "128": "assets/achievements/v1/starter-frame-plain-wood-128.webp",
+        "256": "assets/achievements/v1/starter-frame-plain-wood-256.webp",
+        "512": "assets/achievements/v1/starter-frame-plain-wood-512.webp"
+      },
+      "catalogSource": "extra",
+      "origin": "starter"
+    },
+    {
+      "id": "starter-badge-first-leaf",
+      "name": "Lá Đầu Tiên",
+      "type": "badge",
+      "sourceKind": "starter",
+      "series": "Khởi Đầu",
+      "files": {
+        "128": "assets/achievements/v1/starter-badge-first-leaf-128.webp",
+        "256": "assets/achievements/v1/starter-badge-first-leaf-256.webp",
+        "512": "assets/achievements/v1/starter-badge-first-leaf-512.webp"
+      },
+      "catalogSource": "extra",
+      "origin": "starter"
+    },
+    {
+      "id": "letters-memory-avatar-moss-redpanda",
+      "name": "Gấu Trúc Ký Ức",
+      "type": "avatar",
+      "sourceKind": "letters",
+      "series": "Sưu tập chữ",
+      "theme": "memory",
+      "files": {
+        "128": "assets/achievements/v1/letters-memory-avatar-moss-redpanda-128.webp",
+        "256": "assets/achievements/v1/letters-memory-avatar-moss-redpanda-256.webp",
+        "512": "assets/achievements/v1/letters-memory-avatar-moss-redpanda-512.webp"
+      },
+      "catalogSource": "letters",
+      "origin": "letters"
+    },
+    {
+      "id": "letters-memory-frame-memory-leaves",
+      "name": "Vòng Lá Hoài Niệm",
+      "type": "frame",
+      "sourceKind": "letters",
+      "series": "Sưu tập chữ",
+      "theme": "memory",
+      "files": {
+        "128": "assets/achievements/v1/letters-memory-frame-memory-leaves-128.webp",
+        "256": "assets/achievements/v1/letters-memory-frame-memory-leaves-256.webp",
+        "512": "assets/achievements/v1/letters-memory-frame-memory-leaves-512.webp"
+      },
+      "catalogSource": "letters",
+      "origin": "letters"
+    },
+    {
+      "id": "letters-memory-badge-folded-leaf",
+      "name": "Dấu Ấn Ký Ức",
+      "type": "badge",
+      "sourceKind": "letters",
+      "series": "Sưu tập chữ",
+      "theme": "memory",
+      "files": {
+        "128": "assets/achievements/v1/letters-memory-badge-folded-leaf-128.webp",
+        "256": "assets/achievements/v1/letters-memory-badge-folded-leaf-256.webp",
+        "512": "assets/achievements/v1/letters-memory-badge-folded-leaf-512.webp"
+      },
+      "catalogSource": "letters",
+      "origin": "letters"
+    },
+    {
+      "id": "letters-link-avatar-flower-fox",
+      "name": "Cáo Đèn Hoa",
+      "type": "avatar",
+      "sourceKind": "letters",
+      "series": "Sưu tập chữ",
+      "theme": "link",
+      "files": {
+        "128": "assets/achievements/v1/letters-link-avatar-flower-fox-128.webp",
+        "256": "assets/achievements/v1/letters-link-avatar-flower-fox-256.webp",
+        "512": "assets/achievements/v1/letters-link-avatar-flower-fox-512.webp"
+      },
+      "catalogSource": "letters",
+      "origin": "letters"
+    },
+    {
+      "id": "letters-link-frame-silk-lantern",
+      "name": "Tơ Duyên Hoa Đăng",
+      "type": "frame",
+      "sourceKind": "letters",
+      "series": "Sưu tập chữ",
+      "theme": "link",
+      "files": {
+        "128": "assets/achievements/v1/letters-link-frame-silk-lantern-128.webp",
+        "256": "assets/achievements/v1/letters-link-frame-silk-lantern-256.webp",
+        "512": "assets/achievements/v1/letters-link-frame-silk-lantern-512.webp"
+      },
+      "catalogSource": "letters",
+      "origin": "letters"
+    },
+    {
+      "id": "letters-link-badge-wish-knot",
+      "name": "Nút Thắt Nguyện Ước",
+      "type": "badge",
+      "sourceKind": "letters",
+      "series": "Sưu tập chữ",
+      "theme": "link",
+      "files": {
+        "128": "assets/achievements/v1/letters-link-badge-wish-knot-128.webp",
+        "256": "assets/achievements/v1/letters-link-badge-wish-knot-256.webp",
+        "512": "assets/achievements/v1/letters-link-badge-wish-knot-512.webp"
+      },
+      "catalogSource": "letters",
+      "origin": "letters"
+    },
+    {
+      "id": "letters-triple-avatar-rose-dragon",
+      "name": "Rồng Thạch Anh Hồng",
+      "type": "avatar",
+      "sourceKind": "letters",
+      "series": "Sưu tập chữ",
+      "theme": "triple",
+      "files": {
+        "128": "assets/achievements/v1/letters-triple-avatar-rose-dragon-128.webp",
+        "256": "assets/achievements/v1/letters-triple-avatar-rose-dragon-256.webp",
+        "512": "assets/achievements/v1/letters-triple-avatar-rose-dragon-512.webp"
+      },
+      "catalogSource": "letters",
+      "origin": "letters"
+    },
+    {
+      "id": "letters-triple-frame-prism-glass",
+      "name": "Vòng Kính Sắc Màu",
+      "type": "frame",
+      "sourceKind": "letters",
+      "series": "Sưu tập chữ",
+      "theme": "triple",
+      "files": {
+        "128": "assets/achievements/v1/letters-triple-frame-prism-glass-128.webp",
+        "256": "assets/achievements/v1/letters-triple-frame-prism-glass-256.webp",
+        "512": "assets/achievements/v1/letters-triple-frame-prism-glass-512.webp"
+      },
+      "catalogSource": "letters",
+      "origin": "letters"
+    },
+    {
+      "id": "letters-triple-badge-prism-heart",
+      "name": "Trái Tim Lăng Kính",
+      "type": "badge",
+      "sourceKind": "letters",
+      "series": "Sưu tập chữ",
+      "theme": "triple",
+      "files": {
+        "128": "assets/achievements/v1/letters-triple-badge-prism-heart-128.webp",
+        "256": "assets/achievements/v1/letters-triple-badge-prism-heart-256.webp",
+        "512": "assets/achievements/v1/letters-triple-badge-prism-heart-512.webp"
+      },
+      "catalogSource": "letters",
+      "origin": "letters"
+    },
+    {
+      "id": "letters-royal-avatar-dawn-lion",
+      "name": "Sư Tử Bình Minh",
+      "type": "avatar",
+      "sourceKind": "letters",
+      "series": "Sưu tập chữ",
+      "theme": "royal",
+      "files": {
+        "128": "assets/achievements/v1/letters-royal-avatar-dawn-lion-128.webp",
+        "256": "assets/achievements/v1/letters-royal-avatar-dawn-lion-256.webp",
+        "512": "assets/achievements/v1/letters-royal-avatar-dawn-lion-512.webp"
+      },
+      "catalogSource": "letters",
+      "origin": "letters"
+    },
+    {
+      "id": "letters-royal-frame-journey-crown",
+      "name": "Vương Miện Hành Trình",
+      "type": "frame",
+      "sourceKind": "letters",
+      "series": "Sưu tập chữ",
+      "theme": "royal",
+      "files": {
+        "128": "assets/achievements/v1/letters-royal-frame-journey-crown-128.webp",
+        "256": "assets/achievements/v1/letters-royal-frame-journey-crown-256.webp",
+        "512": "assets/achievements/v1/letters-royal-frame-journey-crown-512.webp"
+      },
+      "catalogSource": "letters",
+      "origin": "letters"
+    },
+    {
+      "id": "letters-royal-badge-royal-seal",
+      "name": "Ấn Hoàng Gia",
+      "type": "badge",
+      "sourceKind": "letters",
+      "series": "Sưu tập chữ",
+      "theme": "royal",
+      "files": {
+        "128": "assets/achievements/v1/letters-royal-badge-royal-seal-128.webp",
+        "256": "assets/achievements/v1/letters-royal-badge-royal-seal-256.webp",
+        "512": "assets/achievements/v1/letters-royal-badge-royal-seal-512.webp"
+      },
+      "catalogSource": "letters",
+      "origin": "letters"
+    }
+  ],
+  "counts": {
+    "avatar": 39,
+    "frame": 39,
+    "badge": 23
+  },
+  "total": 101,
+  "files": 303,
+  "bytes": 8652824,
+  "missing": [],
+  "badDimensions": [],
+  "notTransparent": [],
+  "unreferencedFiles": []
+}

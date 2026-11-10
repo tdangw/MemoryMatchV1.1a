@@ -166,3 +166,29 @@ Khi dev kết nối Firebase thật cũng phải bật cờ rõ ràng sau khi ba
 - Kiểm tra độc lập ranh giới offline trên chính web test: mở bàn Memory khi online, ngắt mạng, ghép một cặp và xác nhận session được lưu vàoIndexedDB; dùng một gợi ý offline và xác nhận tồn kho giảm đúng một. BXH đọc cache khi offline; không có pageerror. Không coi đây là chứng nhận toàn bộ cold-start/asset offline hoặc S22U thật.
 - Lỗi503 là dịch vụ phát hành Rules, không phải lỗi nhận/dùng quà. Giữ nguyên luồng local-first của chat “Giữ tiến trình mốc thưởng”; chỉ hunk BXH trong gameState/Rules được đưa vào commit, không gom logic thưởng/ngoại hình của các chat khác. Những thay đổi ngoài BXH đang có trong workspace vẫn giữ nguyên.
 - Kiểm tra trước commit: check:adventure-ranking và staged diff check đạt; không stage runtime/log/ảnh QA. Phát hành Hosting production vẫn ngoài phạm vi lượt này; rollback web test bằng bản build tắt cờ và giữ nguyên dữ liệu/indexes.
+
+
+## Phát hành theo yêu cầu chủ dự án — 10/11/2026
+
+Chủ dự án đã giao tiếp hai bước backend→Hosting và hoàn tất kế hoạch; quyền này thay ghi chú chưa có quyền phát hành ở trên. Đã đối chiếu bản local-first vừa phát hành với source ghép: service/persistence/account/cloud và controller mốc thưởng không thay đổi; gameState/chapterStore chỉ bổ sung record/migration BXH v4. Không có xung đột behavior/schema cần chủ dự án quyết định.
+
+- [x] R0: sao lưu/read-back backend. Máy chủ đã có Rules khớp source (ruleset d6bbe9d7-ab3c-4736-81a9-ad2b620f83d3) và3composite indexes READY, gồm index v4; không deploy lại cấu hình giống hệt hoặc xóa index cũ. Backup trong runtime/qa/leaderboard-release.
+- [x] R1: nghiệm thu bản ghép local-first+BXH bật cờ, emulator và production build.
+- [x] R2: Hosting production bật VITE_ADVENTURE_RANKING_V4=1; xác minh artifact public và12boardv4/6boardv3 bằng truy vấn thật không tạo thành tích giả.
+
+Snapshot phát hành `runtime/leaderboard-release` lấy bản local-first đã chạy và overlay riêng owner BXH, giữ rollback tại runtime/local-first-release. Không build từ checkout nhiều task đang cùng sửa.
+
+
+### Kết quả phát hành cuối — 10/11/2026
+
+- Không có xung đột với local-first: tám owner service/persistence/account/cloud/controller thưởng khớp bản đã chạy. GameState/chapterStore chỉ ghép các record/migration BXH theo kế hoạch. Rules thực tế đã bằng source và index v4 READY cùng hai index cũ, nên không redeploy backend trùng lặp hoặc xóa dữ liệu/index.
+- Snapshot runtime/leaderboard-release: full `npm run check` PASS gồm check:adventure-ranking; build bật v4 PASS387modules/18,29s.35UI PASS gồm23layout/filter/style/cached/stale và12offline/mốc thưởng;10ca service legacy được skip ở lượt không bật emulator, không tính là pass. Lượt emulator riêng sau đó: Rules mới12board/comparator/owner/deny/concurrency/missing/pagination/rank PASS; Rules legacy và snapshot backup PASS;4UI Firebase thật PASS (3trò offline→reload→publish đúng tuple, không đổi timestamp;1account backup giữ local-first).
+- Artifact production:4/4 UI PASS (320/384/1024px, đủ12filter, Challenge/Endless không hiện độ khó và cold boot offline thật). Không sửa source sản phẩm sau build. Đã lưu cờ `VITE_ADVENTURE_RANKING_V4=1` trong .env.production để những lần build production tiếp theo không tự quay lại BXH cũ; có thể override0 khi rollback.
+- Production read-only:12boardv4 và6boardv3 truy vấn thành công, kiểm ordering/schema và hạng1 cho dòng đầu nếu bảng có dữ liệu. Tài khoản anonymous dùng để xác minh đã xóa; không ghi thành tích giả. Bằng chứng runtime/qa/leaderboard-release/public-queries.json.
+- `npx firebase deploy --only hosting:production --project memorymatchv1-1a --non-interactive` từ snapshot exit0,3292file, release complete. URL https://memorymatchv1-1a.web.app. HTTPS index/sw/main/achievement bundle đều khớp SHA256 artifact; mở chính trang public ở384px và chọn đủ12filter thành công. Bằng chứng hosting-verified.json/public-384.png trong cùng thư mục QA; deploy/build/check/UI logs ở runtime/leaderboard-release/runtime/qa.
+- Hạng cá nhân khi có record, migration và exactly-once đã kiểm bằng emulator; các bảng public trống được giữ trống, không thêm dữ liệu để chụp ảnh. Không tuyên bố test điện thoại S22U vật lý. Không APK/commit, không đưa log/ảnh QA vào commit. Lượt phát hành này hoàn tất kế hoạch BXH; không đóng thay các gate ảnh/Android của task khác.
+- Rollback sẵn: artifact local-first trước tại runtime/local-first-release/dist; hoặc build với cờ0. Giữ nguyên Rules/indexes/record v4 khi rollback, không xóa tiến trình.
+
+### Bổ sung cấu hình localhost — 10/11/2026
+
+Ảnh chủ dự án gửi là Vite local cổng4173, không phải Hosting. Production đã bật nhưng .env.local thiếu VITE_ADVENTURE_RANKING_V4 nên dev kết nối Firebase thật vẫn theo mặc định v3. Đã thêm cờ1 vào cấu hình local, xác nhận module đang phục vụ DEV=true/cờ1 và mở chính localhost bằng browser riêng: cả3trò đều có4độ khó. Ảnh QA runtime/qa/leaderboard-release/local-384-enabled.png. Không thay dữ liệu, không build/deploy lại, không xóa cache/save người chơi.
