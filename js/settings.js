@@ -162,19 +162,13 @@ applyEffectsSettings(gameState.settings);
 bindSettingsControls();
 if (versionValue) versionValue.textContent = APP_VERSION;
 versionInfoButton?.addEventListener("click", showVersionInfo);
-document.getElementById('settings-privacy-policy').addEventListener('click', () => openAppModal({
-  id: 'privacy-policy-modal', title: 'Quyền riêng tư', content: PRIVACY_CONTENT, keepBanner: false,
-}));
-document.getElementById('settings-terms').addEventListener('click', () => openAppModal({
-  id: 'terms-modal', title: 'Điều khoản sử dụng', content: TERMS_CONTENT, keepBanner: false,
-}));
-
 export function showSettingsPanel(fromGame = false, onClose = () => {}, actions = navigation, surface = {}) {
   if (!settingsContainer || !settingsHome) return;
 
   gameState.isPaused = fromGame;
   syncSettingsControls();
   let nextAction = null;
+  let legalModal = null;
   let releasePrivacy = () => {};
   const adPrivacy = document.getElementById('settings-ad-privacy');
 
@@ -186,6 +180,9 @@ export function showSettingsPanel(fromGame = false, onClose = () => {}, actions 
     content: settingsContainer,
     size: "medium",
     onDestroy: () => {
+      legalModal?.destroy();
+      settingsContainer.querySelector('#settings-privacy-policy').onclick = null;
+      settingsContainer.querySelector('#settings-terms').onclick = null;
       releasePrivacy();
       adPrivacy.onclick = null;
       settingsContainer.style.display = "none";
@@ -202,6 +199,15 @@ export function showSettingsPanel(fromGame = false, onClose = () => {}, actions 
       nextAction?.();
     },
   });
+  for (const [buttonId, id, title, content] of [
+    ['settings-privacy-policy', 'privacy-policy-modal', 'Quyền riêng tư', PRIVACY_CONTENT],
+    ['settings-terms', 'terms-modal', 'Điều khoản sử dụng', TERMS_CONTENT],
+  ]) {
+    document.getElementById(buttonId).onclick = () => {
+      legalModal?.destroy();
+      legalModal = openAppModal({ id, title, content, size: 'fullscreen', keepBanner: false });
+    };
+  }
   settingsContainer.style.display = "grid";
   adPrivacy.disabled = false;
   releasePrivacy = subscribeAdPrivacy(state => { adPrivacy.hidden = !state.supported || !state.privacyRequired; });

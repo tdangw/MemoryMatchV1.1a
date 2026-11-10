@@ -65,6 +65,7 @@ export function openAppModal({
   const resumeMenuAds = screen || keepBanner ? null : suspendMenuAds(overlay);
   metrics?.clock.pause(overlay);
   overlay.className = screen ? 'app-screen-content' : "app-modal-overlay";
+  if (!screen && size === 'fullscreen') overlay.dataset.fullscreen = 'true';
   if (keepBanner) overlay.dataset.keepBanner = 'true';
   if (alignment === 'center') overlay.dataset.dialogAlignment = 'center';
   if (id) overlay.id = id;
@@ -84,7 +85,7 @@ export function openAppModal({
   if (icon) heading.appendChild(createIcon(icon));
   heading.appendChild(document.createTextNode(title));
   header.appendChild(heading);
-  if (["shop-modal","collection-modal","rankings-modal","account-modal","settings-modal","missions-screen","events-screen"].includes(id)) {
+  if (["shop-modal","collection-modal","rankings-modal","account-modal","settings-modal","missions-screen","events-screen","achievements-modal","adventure-chest-modal"].includes(id)) {
     panel.classList.add('app-modal--functional'); header.classList.add('app-modal__header--functional');
     if (id !== 'settings-modal') mountAppWallet(header, lifecycle);
   }
@@ -184,11 +185,11 @@ export function openAppModal({
     panel.appendChild(footer);
   }
 
-  decorateStorybookSurface(panel, document.documentElement.dataset.uiSkin === 'storybook');
+  decorateStorybookSurface(panel, size !== 'fullscreen' && document.documentElement.dataset.uiSkin === 'storybook');
   overlay.appendChild(panel);
   host.appendChild(overlay);
   lifecycle.own(suspendAmbientBackground());
-  if (!screen) connectDialogPlacement(overlay, panel, lifecycle);
+  if (!screen && size !== 'fullscreen') connectDialogPlacement(overlay, panel, lifecycle);
   panel.tabIndex = -1;
   (panel.querySelector("button:not([disabled]), input:not([disabled]), select:not([disabled])") || panel).focus();
 

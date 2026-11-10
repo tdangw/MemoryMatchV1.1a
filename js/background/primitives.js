@@ -72,6 +72,14 @@ export function createRegionRenderer({ document: doc, parent = doc.body, map = f
           animate(node, [{ transform:'translate(0,0)',opacity:.2 },{transform:`translate(${motion.endX}px,${motion.endY}px)`,opacity:.8,offset:.45},{transform:'translate(0,0)',opacity:.2}], {duration:7000,delay:-(region.phase||0),iterations:Infinity,easing:'ease-in-out'});
           continue;
         }
+        if (map && region.detail && region.kind === 'leaf') {
+          animate(node, [{transform:'translate(0,0) rotate(-12deg)',opacity:0},
+            {transform:'translate(0,0) rotate(-12deg)',opacity:.65,offset:.08},
+            {transform:`translate(${motion.endX}px,${motion.endY}px) rotate(${motion.rotation}deg)`,opacity:.55,offset:.85},
+            {transform:`translate(${motion.endX}px,${motion.endY}px) rotate(${motion.rotation}deg)`,opacity:0}],
+          {duration:10000,delay:-(region.phase||0),iterations:Infinity,easing:'ease-in-out'});
+          continue;
+        }
         const leaf = region.kind === 'leaf', fish = region.kind === 'fish';
         const end = `translate(${motion.endX}px, ${motion.endY}px) rotate(${motion.rotation}deg)`;
         animate(node, [

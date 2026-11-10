@@ -1,0 +1,8 @@
+/* Shared game-name artwork for map and gameplay headers. */
+.game-wordmark { position:relative; padding-block:3px 5px; line-height:1.2; letter-spacing:.2px; }
+.game-wordmark[data-wordmark-game="memory-match"] { font-family:Georgia,'Times New Roman',serif; font-weight:900; color:#ffe7a3; text-shadow:0 2px 0 #71431d,0 0 1px #321a12; }
+.game-wordmark[data-wordmark-game="link-connect"] { font-family:'Trebuchet MS','Segoe UI',sans-serif; font-style:italic; font-weight:900; text-transform:uppercase; letter-spacing:.6px; color:#a5f5e8; text-shadow:0 2px 0 #16544e,0 0 1px #062d32; }
+.game-wordmark[data-wordmark-game="triple-connect"] { font-family:'Segoe UI','Trebuchet MS',sans-serif; font-weight:900; letter-spacing:.4px; color:#efcaff; text-shadow:0 2px 0 #603c8d,0 0 1px #26133d; }
+.game-wordmark[data-wordmark-game="link-connect"]::after { content:''; position:absolute; bottom:1px; left:12%; right:12%; height:2px; border-radius:2px; background:linear-gradient(90deg,transparent,#67dcca 20%,#d5fff6 50%,#67dcca 80%,transparent); }
+.game-wordmark[data-wordmark-game="triple-connect"]::after { content:''; position:absolute; bottom:0; left:calc(50% - 3px); width:6px; height:3px; background:#d6a1fc; box-shadow:-10px 0 #b981e3,10px 0 #b981e3; transform:skewX(-25deg); }
+.game-shell-root [data-shell-region="title"] > .game-wordmark { display:inline-block; max-width:100%; font-size:clamp(19px,5vw,26px); vertical-align:middle; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }

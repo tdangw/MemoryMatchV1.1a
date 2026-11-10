@@ -205,7 +205,7 @@ test("Triple flies the third matching card beside its pair, not to the tray end"
       requestAnimationFrame(check);
     });
     const surface = document.querySelector(".triple-connect__surface").getBoundingClientRect();
-    const slot = document.querySelectorAll(".triple-connect__tray-slot")[2].getBoundingClientRect();
+    const slot = document.querySelectorAll(".triple-connect__tray-slot")[2].querySelector('.triple-connect__tile').getBoundingClientRect();
     const selected = document.querySelector(`.triple-connect__ghost[data-tile-id="${matchIds[2]}"]`);
     return {
       left: Number.parseFloat(selected.style.left),

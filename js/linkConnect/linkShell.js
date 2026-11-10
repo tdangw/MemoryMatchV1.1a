@@ -17,7 +17,7 @@ export function getLinkShell() {
   container.className = "link-connect-game game-shell-tokens";
   container.hidden = true;
   container.innerHTML = `
-      <div id="link-game-logo" data-shell-region="title" class="link-game-name game-name">Link Connect</div>
+      <div id="link-game-logo" data-shell-region="title" class="link-game-name game-name"><span class="game-wordmark" data-wordmark-game="link-connect">Link Connect</span></div>
       <div class="link-game-progress-hud" data-shell-region="progress" hidden></div>
       <header id="link-game-title" data-shell-region="hud" class="link-game-hud game-hud">
         <button id="link-actions-menu-toggle" class="link-connect-game__menu game-menu-toggle" type="button" aria-label="Tạm dừng" aria-controls="game-exit-modal" aria-haspopup="dialog" aria-expanded="false"></button>

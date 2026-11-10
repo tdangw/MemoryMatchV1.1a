@@ -9,6 +9,8 @@
 }
 .adventure-screen[data-screen="missions"] { --tab-background: url('/assets/images/backgrounds/missions-garden.webp'); }
 .adventure-screen[data-screen="events"] { --tab-background: url('/assets/images/backgrounds/friends-courtyard.webp'); }
+.adventure-screen[data-screen="achievements"] { --tab-background: url('/assets/images/backgrounds/profile-keepsake.webp'); }
+.adventure-screen[data-screen="treasure"] { --tab-background: url('/assets/images/backgrounds/missions-garden.webp'); }
 .adventure-screen[data-screen="profile"] { --tab-background: url('/assets/images/backgrounds/profile-keepsake.webp'); }
 .adventure-screen[data-screen="settings"] { --tab-background: url('/assets/images/backgrounds/settings-retreat.webp'); }
 .adventure-screen[data-screen] { --tab-header-height: 60px; }
@@ -33,13 +35,13 @@
 }
 .adventure-screen > .adventure-exit:hover { transform: none; filter: none; }
 .adventure-screen > .adventure-exit:focus-visible { outline: 2px solid var(--tab-gold); outline-offset: -3px; }
-.adventure-screen:is([data-screen="missions"], [data-screen="events"], [data-screen="profile"], [data-screen="settings"]) {
+.adventure-screen:is([data-screen="missions"], [data-screen="events"], [data-screen="profile"], [data-screen="settings"], [data-screen="achievements"], [data-screen="treasure"]) {
   background-color: #041c25;
   background-image: linear-gradient(#04192320, #04192340), var(--tab-background);
   background-size: cover;
   background-position: center;
 }
-:is(#account-modal, #settings-modal, #missions-screen, #events-screen, #rankings-modal, #shop-modal, #collection-modal) .app-modal__header {
+:is(#account-modal, #settings-modal, #missions-screen, #events-screen, #rankings-modal, #shop-modal, #collection-modal, #achievements-modal, #adventure-chest-modal) .app-modal__header {
   background: linear-gradient(#041923fc, #071f29f7);
   text-shadow: 0 1px 2px #0008;
   border-bottom: 1px solid #d9bc6e38;
@@ -93,3 +95,6 @@
 .tab-section-title { margin: 0 0 14px; color: var(--tab-gold); font-size: 16px; line-height: 1.4; }
 
 @media (prefers-reduced-motion: reduce) { .tab-button { transition: none; } .tab-button:active:not(:disabled) { transform: none; } }
+
+/* Map destinations use the same full-height content shell as missions/events. */
+:is(#achievements-modal,#adventure-chest-modal).app-screen-content > .app-modal { width:100%; height:100%; max-height:none; margin:0; padding:0; border:0; border-image:none; border-radius:0; }

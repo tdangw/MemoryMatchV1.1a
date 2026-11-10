@@ -74,8 +74,10 @@ function presentResolvedTripleExit({ shell, scope, previous, match, selected, ef
     render(next, { boardState: visualPreview });
     const priorTrayRects = captureTrayRects(root);
     const selectedGhost = ghosts[sourceNodes.findIndex((node) => node.dataset.tileId === selected?.tileId)];
-    const targetSlot = root.querySelectorAll(".triple-connect__tray-slot")[getResolvedTrayTargetIndex(previous, selected?.tileId)];
-    const targetRect = magnet ? selectedGhost.getBoundingClientRect() : targetSlot?.getBoundingClientRect();
+    const trayTarget = sourceNodes.find(node => node.dataset.tileId === selected?.tileId);
+    // The slot and its card have different bounds on mobile. Land on the
+    // preview's actual card so flight, removal ghosts and canvas share one size.
+    const targetRect = magnet ? selectedGhost.getBoundingClientRect() : trayTarget?.getBoundingClientRect();
     const trayFlight = magnet
       ? Promise.all(ghosts.map(ghost => presentResolvedTrayFlight({ scope, ghost, targetRect, duration: 220 })))
       : presentResolvedTrayFlight({ scope, ghost: selectedGhost, targetRect });
@@ -140,15 +142,6 @@ function createMatchTrayPreview(previous, next, match) {
     score: previous.score,
     matchedTriples: previous.matchedTriples,
   };
-}
-
-function getResolvedTrayTargetIndex(previous, selectedTileId) {
-  const selectedType = previous.tiles[selectedTileId]?.type;
-  if (!selectedType) return previous.tray.length;
-  return previous.tray.reduce(
-    (lastIndex, tileId, index) => (previous.tiles[tileId]?.type === selectedType ? index : lastIndex),
-    -1,
-  ) + 1;
 }
 
 function presentResolvedTrayFlight({ scope, ghost, targetRect, duration = TRAY_FLIGHT_DURATION_MS }) {
@@ -248,11 +241,15 @@ function presentMilestoneSequence({ shell, scope, source, milestones = [] }) {
   });
 }
 
-function createGhost(source, surfaceRect) {
-  const rect = source.getBoundingClientRect();
+function createGhost(source, surfaceRect, rect = source.getBoundingClientRect()) {
   const ghost = source.cloneNode(true);
+  ghost.classList.remove('is-tray-arrived', 'is-corner-stack', 'is-corner-stack-revealed', 'is-hinted', 'is-occluded', 'is-exposed');
+  ghost.disabled = false;
   ghost.classList.add("triple-connect__ghost");
+  ghost.setAttribute('aria-hidden', 'true');
+  ghost.tabIndex = -1;
   Object.assign(ghost.style, {
+    boxSizing: 'border-box',
     left: `${rect.left - surfaceRect.left}px`, top: `${rect.top - surfaceRect.top}px`,
     width: `${rect.width}px`, height: `${rect.height}px`,
   });
@@ -325,15 +322,9 @@ function presentTrayFlight({ shell, scope, selected, render, next }) {
       { transform: `translate(${shiftX}px, ${shiftY}px)` }, { transform: "translate(0, 0)" },
     ], { duration: 210, easing: "cubic-bezier(.2,.8,.2,1)" }));
   }
-  const ghost = source.cloneNode(true);
-  ghost.classList.add("triple-connect__ghost", "triple-connect__tray-flight");
-  Object.assign(ghost.style, {
-    left: `${sourceRect.left - surfaceRect.left}px`,
-    top: `${sourceRect.top - surfaceRect.top}px`,
-    width: `${sourceRect.width}px`,
-    height: `${sourceRect.height}px`,
-    transformOrigin: "top left",
-  });
+  const ghost = createGhost(source, surfaceRect, sourceRect);
+  ghost.classList.add("triple-connect__tray-flight");
+  ghost.style.transformOrigin = 'top left';
   surface.append(ghost);
   target.classList.add("is-tray-flight-target");
   const cleanup = () => {

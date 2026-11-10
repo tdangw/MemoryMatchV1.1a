@@ -30,13 +30,12 @@ for(const [width,height] of [[412,915],[844,390],[1024,900],[320,568]]) for(cons
       await page.locator('[data-treasure-tier="S"]').focus();await page.keyboard.press('Enter');await expect(page.locator('.treasure-detail')).toHaveAttribute('data-selected-tier','S');
       await page.locator('[data-treasure-tier="'+(['waiting','complete'].includes(state)?'S':'C')+'"]').click();
       if(width===844) {
-        const clipped=await page.locator('.treasure-dialog').evaluate(panel=>{
-          const body=panel.querySelector('.app-modal__body').getBoundingClientRect();
-          return [...panel.querySelectorAll('.treasure-card,.treasure-actions button,.treasure-collection-link')].some(el=>{const box=el.getBoundingClientRect();return box.top<body.top-1||box.bottom>body.bottom+1;});
-        });expect(clipped).toBe(false);
+        for(const selector of ['.treasure-card:first-child','.treasure-card:last-child','.treasure-collection-link']){
+          const control=page.locator(selector);await control.scrollIntoViewIfNeeded();await expect(control).toBeInViewport();
+        }
       }
       await page.locator('#adventure-chest-modal').screenshot({path:`docs/qa/gameplay-progression/treasure-${id}-${width}-${state}.png`});
-      await page.locator('#adventure-chest-modal .app-modal__close').click();await expect(page.locator('#adventure-chest-modal')).toHaveCount(0);
+      await page.locator('.adventure-screen[data-screen=treasure] > .adventure-exit').click();await expect(page.locator('#adventure-chest-modal')).toHaveCount(0);
     }
     // Large text remains scrollable without cutting off long names or the action.
     await page.addStyleTag({content:'.treasure-content {font-size:20px} .treasure-card strong {font-size:17px} .treasure-status {font-size:18px}'});

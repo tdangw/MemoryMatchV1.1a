@@ -1,23 +1,24 @@
+import { MAP_THEMES } from './mapThemes.js';
 import { mountAmbientBackground, refreshAmbientBackground, suspendAmbientBackground, scheduleAmbientIdle } from '../backgroundEffects.js';
 import { getGameBackgroundSource, preloadGameBackground, BACKGROUND_LOAD_DEADLINE_MS } from '../gameShell/gameBackgroundTransition.js';
 import { createGameShellLifecycle } from '../gameShell/gameShellLifecycle.js';
 
 const SCROLL_IDLE_MS = 140;
-let mapReadiness = null;
+const mapReadiness = new Map();
 const scopeScenes = new WeakMap();
 
-function prepareMapTexture(signal) {
+function prepareMapTexture(signal, descriptor) {
   if (signal.aborted) return Promise.resolve(false);
-  if (mapReadiness) return mapReadiness.promise;
-  const source = `${import.meta.env.BASE_URL}assets/adventure/moonlit-garden.webp`;
-  const entry = { promise: null }; mapReadiness = entry;
+  const source = `${import.meta.env.BASE_URL}${descriptor.source.slice(1)}`;
+  if (mapReadiness.has(source)) return mapReadiness.get(source).promise;
+  const entry = { promise: null }; mapReadiness.set(source, entry);
   const promise = new Promise(resolve => {
     const image = new Image(); let settled = false;
     const finish = loaded => {
       if (settled) return; settled = true; clearTimeout(deadline);
       signal.removeEventListener('abort', abort);
       image.onload = image.onerror = null; if (!loaded) image.src = '';
-      if (!loaded && mapReadiness === entry) mapReadiness = null;
+      if (!loaded && mapReadiness.get(source) === entry) mapReadiness.delete(source);
       resolve(loaded);
     };
     const deadline = setTimeout(() => finish(false), BACKGROUND_LOAD_DEADLINE_MS);
@@ -49,6 +50,8 @@ export function mountHomeAmbient(scope, root) {
 }
 
 export function mountMapAmbient(scope, root, trail, scroll, { mapDetails = true } = {}) {
+  const mapScene = MAP_THEMES[root.dataset.mapTheme];
+  if (!mapScene) throw new RangeError('Missing map scenery theme');
   const binding = createGameShellLifecycle();
   const releaseParent = scope.own(() => binding.dispose());
   binding.own(() => releaseParent.forget());
@@ -61,9 +64,9 @@ export function mountMapAmbient(scope, root, trail, scroll, { mapDetails = true 
   }
   const control = mountAmbientBackground({ scope, root, kind: 'map', onInactive: endScroll, onDispose: () => binding.dispose(), bindingListeners: 2,
     prepare: async signal => {
-      const [loaded, module] = await Promise.all([prepareMapTexture(signal), import('./scene.js')]);
+      const [loaded, module] = await Promise.all([prepareMapTexture(signal, mapScene), import('./scene.js')]);
       if (!loaded || signal.aborted) return null;
-      return options => module.createAmbientScene({ document, kind: 'map', root, trail, scroll, initialSource: '', mapDetails, ...options });
+      return options => module.createAmbientScene({ document, kind: 'map', root, trail, scroll, initialSource: '', mapDetails, mapScene, ...options });
     },
   });
   binding.listen(scroll, 'scroll', () => {

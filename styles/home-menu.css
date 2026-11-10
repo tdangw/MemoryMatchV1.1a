@@ -1,88 +1,53 @@
-/* Home owns the native swipe carousel; map and functional tabs stay separate. */
+/* Home cover owns its coordinate system; functional dock and ads keep their owners. */
 .game-selector.adventure-page {
-  grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto;
   justify-content: stretch; align-items: stretch;
-  background: linear-gradient(#03151e70, #041923bb), url('/assets/images/backgrounds/leaderboard-night-garden.webp') center / cover;
+  background: #194c5f url('/assets/images/home/adventure-cover.webp') center / cover;
 }
 .game-selector > .adventure-header { display: none; }
 .home-app-exit {
   position: absolute; top: max(10px, env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right));
   z-index: 20; display: grid; place-items: center; width: 44px; height: 44px;
-  border: 1px solid #b99b5a66; border-radius: 50%; background: #0a2936cc; color: #ffe3a0;
+  border: 1px solid #ffe3a088; border-radius: 50%; background: #123c50d9; color: #ffe3a0;
 }
 .home-app-exit:focus-visible { outline: 3px solid #fff0b4; outline-offset: 3px; }
 .game-selector > .menu-wrapper {
-  display: flex; flex-direction: column; justify-content: flex-start; align-items: stretch; gap: 16px;
-  width: min(100%, 640px); height: 100%; min-height: 0; padding: 16px 0 20px;
+  display: flex; align-items: center; justify-content: flex-start; flex-direction: column;
+  width: 100%; height: 100%; min-height: 0; padding: 0;
   overflow-y: auto; overscroll-behavior-y: contain;
 }
-.game-selector .game-title, .game-selector .game-title:hover {
-  flex-shrink: 0; box-sizing: border-box; width: 100%; margin: auto 0 0; padding: 0 12px;
-  color: #ffe3a0; -webkit-text-fill-color: currentColor;
-  font: 700 clamp(28px, 7vw, 38px)/1.08 Georgia, 'Times New Roman', serif;
-  letter-spacing: -.025em; text-align: center;
-  text-shadow: 0 2px 4px #0009;
-  animation: none; transform: none;
+.game-selector .game-title, .game-selector__label {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap;
 }
-.game-selector .game-title::after { display: none; }
-.game-selector__title-line { display: block; }
-.game-selector__title-line--adventure { letter-spacing: .015em; }
-.game-selector__carousel { width: 100%; min-width: 0; flex-shrink: 0; margin-bottom: auto; }
 .game-selector__choices {
-  --game-card-width: min(78vw, 350px);
-  position: relative; display: flex; gap: 16px;
-  width: 100%; height: clamp(300px, 53dvh, 490px); box-sizing: border-box;
-  padding: 10px calc((100% - var(--game-card-width)) / 2);
-  scroll-padding-inline: calc((100% - var(--game-card-width)) / 2);
-  overflow-x: auto; overflow-y: hidden; scrollbar-width: none;
-  scroll-snap-type: x mandatory; overscroll-behavior-x: contain;
+  position: relative; flex: 0 0 auto;
+  width: min(100%, 640px); height: 100%; min-height: 440px;
+  margin: 0; overflow: hidden; isolation: isolate;
 }
-.game-selector__choices::-webkit-scrollbar { display: none; }
+.game-selector__cover {
+  position: absolute; top: 0; left: 0; width: 100%; height: 112.972973%;
+  display: block; pointer-events: none; user-select: none;
+}
 .game-selector__choice {
-  position: relative; display: block; flex: 0 0 var(--game-card-width); min-width: 0; padding: 0;
-  overflow: hidden; isolation: isolate; box-sizing: border-box;
-  scroll-snap-align: center; scroll-snap-stop: always;
-  border: 1px solid #c6a365; border-radius: 22px;
-  background: linear-gradient(145deg, #174448, #071f29); color: #f9e2a7;
-  box-shadow: 0 4px 10px #0007;
-  text-align: center; cursor: pointer;
-  transform: scale(.92); opacity: .62;
-  transition: transform 160ms ease, opacity 160ms ease;
+  position: absolute; left: 15.5%; width: 69%; height: 16%;
+  padding: 0; border: 0; border-radius: 22%; background: url('/assets/images/home/adventure-cover.webp') 50% 43.51727982% / 144.927536% 706.081081%;
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
 }
-.game-selector__choice.is-selected { transform: scale(1); opacity: 1; }
-.game-selector__choice[data-game-id="link-connect"] { background: linear-gradient(145deg, #123c62, #071f29); }
-.game-selector__choice[data-game-id="triple-connect"] { background: linear-gradient(145deg, #463359, #101d30); }
-.game-selector__art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 52%; pointer-events: none; }
-.game-selector__label {
-  position: absolute; z-index: 1; left: 0; right: 0; bottom: 0;
-  display: flex; align-items: center; gap: 10px; min-height: 64px; box-sizing: border-box; padding: 12px 16px;
-  border-top: 1px solid #d8b67166;
-  background: linear-gradient(#123c40f5, #061e29fa);
+.game-selector__choice[data-game-id="memory-match"] { top: 42.2%; }
+.game-selector__choice[data-game-id="link-connect"] { top: 58.7%; height: 15%; background-size: 144.927536% 753.153153%; background-position-y: 59.91448276%; }
+.game-selector__choice[data-game-id="triple-connect"] { top: 74.3%; height: 14.8%; background-size: 144.927536% 763.330898%; background-position-y: 75.68274419%; }
+.game-selector__choice:focus-visible { outline: 4px solid #fff; outline-offset: -5px; box-shadow: inset 0 0 0 8px #174b83; }
+.game-selector__choice:active { transform: translateY(3px) scale(.96); }
+.game-selector > .adventure-footer { width: min(100%, 640px); }
+.game-selector .adventure-dock {
+  background: linear-gradient(#87502e, #502718); border-top: 2px solid #f1bd72;
+  border-radius: 18px 18px 0 0;
 }
-.game-selector__label strong { flex: 1; min-width: 0; white-space: nowrap; font: 700 clamp(20px, 5.5vw, 27px)/1.15 Georgia, 'Times New Roman', serif; color: #ffe2a1; }
-.game-selector__label > .ui-icon { flex: 0 0 22px; width: 22px; height: 22px; color: #ffe3a0; }
-.game-selector__controls { display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 10px; }
-.game-selector__arrow, .game-selector__dot {
-  display: grid; place-items: center; width: 44px; height: 44px; padding: 0;
-  border: 0; border-radius: 50%; color: #ffe3a0; background: transparent; cursor: pointer;
-}
-.game-selector__arrow { background: #0a2936cc; border: 1px solid #b99b5a66; }
-.game-selector__arrow:disabled { opacity: .25; cursor: default; }
-.game-selector__arrow:first-child > .ui-icon { transform: rotate(180deg); }
-.game-selector__dots { display: flex; justify-content: center; flex-wrap: wrap; max-width: calc(100vw - 140px); }
-.game-selector__dot::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #819c9d; }
-.game-selector__dot[aria-pressed="true"]::before { width: 20px; border-radius: 6px; background: #ffe3a0; }
-.game-selector__choice:focus-visible, .game-selector__arrow:focus-visible, .game-selector__dot:focus-visible { outline: 3px solid #fff0b4; outline-offset: 3px; }
-@media (orientation: landscape) and (height <= 600px) {
-  .game-selector > .menu-wrapper { gap: 6px; padding: 6px 0 10px; }
-  .game-selector .game-title, .game-selector .game-title:hover { font-size: 25px; line-height: 1.1; }
-  .game-selector__title-line { display: inline; }
-  .game-selector__title-line--adventure { margin-left: 4px; }
-  .game-selector__choices { --game-card-width: min(60vw, 360px); height: clamp(80px, calc(100dvh - var(--menu-ad-space, 58px) - 205px), 180px); padding-block: 6px; }
-  .game-selector__label { min-height: 44px; padding: 8px 16px; }
-  .game-selector__label strong { font-size: 22px; }
-  .game-selector__controls { margin-top: 4px; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .game-selector__choice { transition: none; }
+.game-selector .adventure-dock button { color: #fff1d3; }
+/* Wide screens retain the foreground cover's authored proportions. */
+@media (min-width: 700px), (orientation: landscape) {
+  .game-selector.adventure-page { background: #284c29 url('/assets/adventure/map-memory-match.webp') center / cover; }
+  .game-selector__choices { width: auto; height: 100%; min-height: 440px; aspect-ratio: 941 / 1480; }
 }

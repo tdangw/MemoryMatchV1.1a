@@ -57,10 +57,10 @@ html[data-ui-skin='storybook'] :is(#grid-container, .link-board, .triple-connect
 html[data-ui-skin='storybook'] .triple-connect__tray { background: #774722; border-color: #c79b54; }
 html[data-ui-skin='storybook'] .triple-connect__tray-slot:not(.is-locked) { background: #eed7a8; border-color: #bd955e; }
 html[data-ui-skin='storybook'] .app-screen-content .storybook-surface { width: min(620px, calc(100vw - 24px)); max-height: 100%; margin-inline: auto; }
-html[data-ui-skin='storybook'] :is(#account-modal, #settings-modal, #missions-screen, #events-screen, #rankings-modal, #shop-modal, #collection-modal) .app-modal__header {
+html[data-ui-skin='storybook'] :is(#account-modal, #settings-modal, #missions-screen, #events-screen, #achievements-modal, #adventure-chest-modal, #rankings-modal, #shop-modal, #collection-modal) .app-modal__header {
   background: transparent; border: 0; padding: 0 36px; text-shadow: none;
 }
-html[data-ui-skin='storybook'] :is(#account-modal, #settings-modal, #missions-screen, #events-screen) .app-modal__title { color: #fff2c6; }
+html[data-ui-skin='storybook'] :is(#account-modal, #settings-modal, #missions-screen, #events-screen, #achievements-modal, #adventure-chest-modal) .app-modal__title { color: #fff2c6; }
 html[data-ui-skin='storybook'] #level-summary-modal .level-summary-modal {
   background: transparent; border: 0; width: min(380px, calc(100vw - 24px)); color: #4b2916;
 }

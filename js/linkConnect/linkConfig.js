@@ -44,8 +44,8 @@ export const LINK_CONNECT_CONFIG = Object.freeze({
   }),
   modes: Object.freeze({
     easy: Object.freeze({ tileCount: 12, columns: 4, timeSeconds: STANDARD_WAVE_SECONDS['link-connect'].easy, coinReward: Object.freeze({ base: 25, speedMultiplier: 0.25 }) }),
-    normal: Object.freeze({ tileCount: 24, columns: 6, timeSeconds: STANDARD_WAVE_SECONDS['link-connect'].normal, coinReward: Object.freeze({ base: 40, speedMultiplier: 0.35 }) }),
-    hard: Object.freeze({ tileCount: 36, columns: 6, timeSeconds: STANDARD_WAVE_SECONDS['link-connect'].hard, coinReward: Object.freeze({ base: 55, speedMultiplier: 0.45 }) }),
+    normal: Object.freeze({ tileCount: 24, columns: 6, mobileColumns: 4, timeSeconds: STANDARD_WAVE_SECONDS['link-connect'].normal, coinReward: Object.freeze({ base: 40, speedMultiplier: 0.35 }) }),
+    hard: Object.freeze({ tileCount: 36, columns: 6, mobileColumns: 4, timeSeconds: STANDARD_WAVE_SECONDS['link-connect'].hard, coinReward: Object.freeze({ base: 55, speedMultiplier: 0.45 }) }),
     superHard: Object.freeze({ tileCount: 60, columns: 6, timeSeconds: STANDARD_WAVE_SECONDS['link-connect'].superHard, coinReward: Object.freeze({ base: 75, speedMultiplier: 0.55 }) }),
     endless: Object.freeze({ tileCount: 60, columns: 6, timeSeconds: 0, coinReward: Object.freeze({ base: 10, speedMultiplier: 0 }) }),
     challenge: Object.freeze({ tileCount: 12, columns: 4, timeSeconds: 60, coinReward: Object.freeze({ base: 30, speedMultiplier: 0.25 }) }),

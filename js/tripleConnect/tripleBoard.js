@@ -32,11 +32,11 @@ export function getNormalTripleLayout() {
   return TRIPLE_NORMAL_LAYOUT;
 }
 export function getTripleLayout(layoutId) {
-  const pattern = /^matrix-([0-9]{2})-(easy|normal|hard|super-hard|endless|challenge-[1-7])$/.exec(layoutId);
+  const pattern = /^matrix-(?:(v2)-)?([0-9]{2})-(easy|normal|hard|super-hard|endless|challenge-[1-7])$/.exec(layoutId);
   if (pattern) {
-    const baseId = pattern[2];
+    const [, revision, index, baseId] = pattern;
     const config = baseId.startsWith('challenge-') ? getTripleChallengeStage(Number(baseId.slice(10))) : getTripleModeConfig(baseId === 'super-hard' ? 'superHard' : baseId);
-    return compileTriplePattern({ index: Number(pattern[1]), config, baseLayout: getTripleLayout(baseId) });
+    return compileTriplePattern({ index: Number(index), config, baseLayout: getTripleLayout(baseId), version:revision?2:1 });
   }
   const layouts = [
     TRIPLE_EASY_LAYOUT,

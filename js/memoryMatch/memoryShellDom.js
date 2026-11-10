@@ -1,7 +1,7 @@
 // Build once before modules bind gameplay listeners. IDs remain public DOM hooks.
 const template = document.createElement("template");
 template.innerHTML = `<div id="game-container" class="game-shell-tokens" style="display: none;">
-      <div id="game-logo" data-shell-region="title" class="game-name">Memory Match</div>
+      <div id="game-logo" data-shell-region="title" class="game-name"><span class="game-wordmark" data-wordmark-game="memory-match">Memory Match</span></div>
 
       <div id="game-progress-hud" data-shell-region="progress" hidden></div>
 

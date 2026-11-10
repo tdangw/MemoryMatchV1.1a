@@ -6,7 +6,7 @@ import { getMasteryRewards } from './progression/masteryRewards.js';
 const empty = () => ({ missions:false, events:false, treasure:false, collection:false });
 
 /** Read-only eligibility, using the same catalog and mastery rules as each destination. */
-export function adventureRewardReadiness({ current = true, spark, uid, period, online = false, enabled = false, festivalEnabled = false, completed = {}, claim, block } = {}) {
+export function adventureRewardReadiness({ current = true, spark, uid, period, online = false, enabled = false, festivalEnabled = false, collectionIncludesChests = true, completed = {}, claim, block } = {}) {
   const ready = empty();
   if (!current) return ready;
   if (Number.isSafeInteger(block) && block > 0 && Number.isSafeInteger(block * 10)) {
@@ -16,7 +16,7 @@ export function adventureRewardReadiness({ current = true, spark, uid, period, o
   }
   const state = spark?.state;
   const ownsRemote = enabled && online && uid && spark?.ownerUid === uid && state;
-  if (ownsRemote && festivalEnabled && state.chests) ready.collection ||= CHEST_TYPES.some(type => state.chests.earned[type] > state.chests.spent[type]);
+  if (collectionIncludesChests && ownsRemote && festivalEnabled && state.chests) ready.collection ||= CHEST_TYPES.some(type => state.chests.earned[type] > state.chests.spent[type]);
   if (!ownsRemote) return ready;
   const letters = state.letters.counts;
   const letterSet = LETTER_SETS.some(set => Object.entries(set.required).every(([letter, count]) => (letters[letter] || 0) >= count));

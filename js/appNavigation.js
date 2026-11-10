@@ -29,11 +29,11 @@ let cloudState = "connecting";
 export function configureAppNavigation(next) { handlers = next; }
 export function openPlayerProfile(surface = {}) { return handlers.account?.(surface); }
 /** The same page owner serves dock buttons and map shortcuts. */
-export function openMenuDestination(root, action) {
+export function openMenuDestination(root, action, render) {
   const navigate = menuDestinations.get(root);
   if (!navigate) return false;
-  if (![...actions.map(item => item.id), 'missions', 'events', 'profile', 'map'].includes(action)) throw new RangeError('Unknown menu destination.');
-  return navigate(action);
+  if (![...actions.map(item => item.id), 'missions', 'events', 'profile', 'map', 'achievements', 'treasure'].includes(action)) throw new RangeError('Unknown menu destination.');
+  return navigate(action, render);
 }
 
 export function createAppDock(scope, { gameId = null, selected = null, onAction } = {}) {
@@ -99,7 +99,7 @@ export function decorateAdventureMenu(root, { gameId = null, onHome } = {}) {
     return exit;
   }
   if (gameId) header.append(createExit(scope));
-  const navigate = async action => {
+  const navigate = async (action, render) => {
     screen?.dispose();
     screen = null;
     setMenuAdTarget(action === 'map' ? adSlot : null);
@@ -123,6 +123,17 @@ export function decorateAdventureMenu(root, { gameId = null, onHome } = {}) {
     viewScope.own(() => clearMenuAdTarget(screenAdSlot));
     viewScope.own(() => { view.remove(); if (scope.active) root.hidden = false; }, 'node');
     const surface = { presentation: 'screen', host, owner: viewScope };
+    if(render){
+      try{
+        const panel=await render({owner:viewScope,surface,close:()=>navigate('map')});
+        if(!viewScope.active){panel?.destroy();return panel;}
+        if(panel)void panel.whenClosed.then(()=>{if(screen===viewScope&&viewScope.active)void navigate('map');});
+        return panel;
+      }catch(error){
+        if(screen===viewScope)await navigate('map');
+        throw error;
+      }
+    }
     if (action === 'profile') return handlers.account?.(surface);
     return handlers.action?.(action, { gameId, playing: false, root: view, scope: viewScope, surface });
   };

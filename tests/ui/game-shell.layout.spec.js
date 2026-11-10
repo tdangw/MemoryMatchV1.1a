@@ -219,3 +219,31 @@ test("Memory and Link resolve the shared shell gap from the same token", async (
   expect(gaps.every(({ resolved, token }) => resolved === token)).toBe(true);
   expect(gaps[0].resolved).toBe(gaps[1].resolved);
 });
+
+for (const game of games) for (const mode of ["normal", "hard"]) {
+  test(`${game.id} ${mode}: mobile four-column board survives viewport changes`, async ({ page }) => {
+    await page.setViewportSize({ width: 384, height: 824 });
+    await start(page, game, mode);
+    const originalTiles = await page.locator(`${game.board} ${game.tile}`).elementHandles();
+    for (const [width, height, columns] of [
+      [384, 824, 4], [384, 740, 4], [320, 740, 4],
+      [844, 390, 6], [700, 1000, 6], [412, 915, 4], [384, 824, 4],
+    ]) {
+      await page.setViewportSize({ width, height });
+      await settle(page);
+      await expect.poll(() => page.locator(game.board).evaluate((board, id) =>
+        Number(getComputedStyle(board).getPropertyValue(id === "memory-match" ? "--grid-columns" : "--link-columns")), game.id)).toBe(columns);
+      await assertFit(page, game);
+      if (game.id === "link-connect") {
+        const shape = await page.evaluate(async () => {
+          const { linkGameState } = await import('/js/linkConnect/linkState.js');
+          const { hasAvailableConnection } = await import('/js/linkConnect/pathfinder.js');
+          return { columns: linkGameState.board.columns, rows: linkGameState.board.rows,
+            playable: hasAvailableConnection(linkGameState.board.grid) };
+        });
+        expect(shape).toEqual({ columns, rows: (mode === "normal" ? 24 : 36) / columns, playable: true });
+      }
+    }
+    expect(await Promise.all(originalTiles.map(handle => handle.evaluate(element => element.isConnected)))).not.toContain(false);
+  });
+}

@@ -94,6 +94,7 @@ for (const gameId of ['memory-match', 'link-connect', 'triple-connect']) {
       await expect(page.locator('#adventure-level-modal')).toContainText(mode === 'endless' ? 'Không giới hạn' : 'Thời gian');
       expect(await page.evaluate(async ({gameId,mode}) => (await import('/js/sessionProgress.js')).getActiveSession(gameId,mode), {gameId,mode})).toBeNull();
       await page.locator('#adventure-level-modal').getByRole('button',{name:'Chơi',exact:true}).click();
+      await page.getByRole('button',{name:'Bỏ qua',exact:true}).click();
       await expect(page.locator('#adventure-level-modal')).toHaveCount(0);
       await expect(page.locator('.level-reward-overlay, #triple-round-start-modal')).toHaveCount(0);
       await expect.poll(() => page.evaluate(async ({ gameId, mode }) => {
@@ -150,7 +151,7 @@ for (const [gameId, title, progressKey] of [['memory-match', 'Memory Match', 'me
       await page.locator('[data-level="7"]').scrollIntoViewIfNeeded();
       await previewMapLevel(page, 7, 'easy');
       await expect(page.locator('.adventure-level-modes label')).toHaveText(['C', 'B', 'A', 'S']);
-      await expect(page.locator('.adventure-level-details')).toContainText('Gợi ý');
+      await expect(page.locator('.adventure-level-details')).not.toContainText('Gợi ý');
       if (viewport.width === 412) await page.screenshot({ path: `.firebase/level-preview-${gameId}.png` });
       await closeLevelPreview(page);
       await page.locator('[data-dock-action="settings"]').click();
@@ -239,14 +240,14 @@ test("chapter nodes stay mounted on mode changes, shared clear stays distinct fr
   await expect(page.locator("#adventure-chest-modal")).toContainText("Bạn đã mở Rương Mầm Non");
   const coins = await page.evaluate(async () => (await import("/js/gameState.js")).gameState.coins);
   expect(coins).toBe(730);
-  await page.locator("#adventure-chest-modal .app-modal__close").click();
+  await page.locator(".adventure-screen[data-screen=treasure] > .adventure-exit").click();
   await expect(page.locator("#adventure-chest-modal")).toHaveCount(0);
   await expect(page.locator('[data-chest="1"]')).toHaveAttribute('data-treasure-art-state', 'B:false');
   await page.locator('[data-chest="1"]').click();
   await expect(page.locator("#adventure-chest-modal .treasure-card.is-claimed")).toHaveCount(1);
   await expect(page.getByRole("button", {name:"Mở rương",exact:true})).toHaveCount(0);
   expect(await page.evaluate(async () => (await import("/js/gameState.js")).gameState.coins)).toBe(coins);
-  await page.locator("#adventure-chest-modal .app-modal__close").click();
+  await page.locator(".adventure-screen[data-screen=treasure] > .adventure-exit").click();
   await expect(page.locator('.app-modal-overlay')).toHaveCount(0);
   await page.screenshot({ path: ".firebase/adventure-map-mobile.png" });
 });
@@ -298,7 +299,7 @@ test("completed chapters archive safely and repeated chapter navigation keeps pa
   await page.locator('[data-chest="10"]').click();
   await page.getByRole('button', { name: 'Mở rương', exact: true }).click();
   await expect(page.locator('#adventure-chest-modal')).toContainText('Bạn đã mở Rương Mầm Non');
-  await page.locator('#adventure-chest-modal .app-modal__close').click();
+  await page.locator('.adventure-screen[data-screen=treasure] > .adventure-exit').click();
   await expect(page.locator('.app-modal-overlay')).toHaveCount(0);
   await expect(page.locator('#menu-container')).toHaveAttribute('data-map-chapter', '2');
   await page.evaluate(() => {
@@ -319,4 +320,35 @@ test("completed chapters archive safely and repeated chapter navigation keeps pa
   expect(await page.evaluate(() => Math.abs(document.querySelector('[data-level="105"]').getBoundingClientRect().top - window.__seamY))).toBeLessThan(1);
   expect(await page.locator('.adventure-map-node').count()).toBeLessThanOrEqual(122);
   expect(await page.evaluate(async () => (await import("/js/appPageLifecycle.js")).getAppPageScope().diagnostics())).toEqual(baseline);
+});
+
+
+test('map achievement shortcut opens only its own screen and releases owners on close',async({page},info)=>{
+  test.setTimeout(90000);
+  const errors=[];page.on('pageerror',error=>errors.push(error.message));
+  await page.goto('/');
+  for(const game of ['memory-match','link-connect','triple-connect']){
+    await page.evaluate(async game=>(await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu(game),game);
+    const control=page.locator('[data-map-destination="achievements"]');
+    await expect(control).toHaveAttribute('aria-label','Thành tích');
+    const baseline=await page.evaluate(async()=>(await import('/js/appPageLifecycle.js')).getAppPageScope().diagnostics());
+    for(const width of [320,412,1024]){
+      await page.setViewportSize({width,height:915});
+      await control.evaluate(button=>{button.click();button.click();});
+      const modal=page.locator('#achievements-modal');await expect(modal).toHaveCount(1);await expect(modal).toBeVisible();
+      await expect(modal.locator('.app-modal__title')).toHaveText('Thành tích');
+      await expect(modal.locator('.storybook-achievement-row')).toHaveCount(10);
+      await expect(modal.locator('.achievement-collection')).not.toHaveAttribute('aria-busy','true');
+      await expect(modal.getByRole('button',{name:'Xem Kho rương',exact:true})).toHaveCount(0);
+      await expect(modal.locator('[role=tablist]')).toHaveCount(0);
+      await expect(page.locator('#collection-modal')).toHaveCount(0);
+      await expect(page.locator('.adventure-screen[data-screen=achievements]')).toHaveCount(1);
+      await expect(page.locator('#menu-container')).toBeHidden();
+      expect(await modal.evaluate(root=>{const r=root.getBoundingClientRect();return r.left>=-1&&r.right<=innerWidth+1;})).toBe(true);
+      if(game==='memory-match'&&width===412)await page.screenshot({path:info.outputPath('map-achievements-412.png')});
+      await page.locator('.adventure-screen[data-screen=achievements] > .adventure-exit').click();await expect(modal).toHaveCount(0);
+      expect(await page.evaluate(async()=>(await import('/js/appPageLifecycle.js')).getAppPageScope().diagnostics())).toEqual(baseline);
+    }
+  }
+  expect(errors).toEqual([]);
 });

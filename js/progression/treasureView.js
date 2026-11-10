@@ -55,7 +55,7 @@ export function renderTreasureContent(content, view, { selected = view.activeTie
   else if (chest.state === 'waiting') actions.append(action(`Xem rương trước`,'previous',true));
   else actions.append(action('Chơi tiếp','play',true));
   detail.append(hero,heading,copy,progress,status,rewards,actions);
-  const collection = element('button','treasure-collection-link','Bộ sưu tập tranh');
+  const collection = element('button','treasure-collection-link','Xem thành tích');
   collection.type = 'button'; collection.dataset.treasureAction = 'collection';
   content.className = 'treasure-content'; content.dataset.phase = phase;
   content.replaceChildren(range,cards,detail,collection);

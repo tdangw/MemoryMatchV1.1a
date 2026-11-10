@@ -60,9 +60,10 @@ const rewardCueFiles = Object.freeze({
   hint: 'hint_1.mp3', shuffle: 'shuffle-cards-46455.mp3', wave: 'level-passed-143039.mp3', freeze: 'fx-time-freeze-107808.mp3',
   difficulty: 'game-ui-2.mp3',
   popupClose: 'click-pop-ui-2-262119.mp3',
+  homeStart: 'start-game-ui.mp3',
 });
 const uiCueOwner = createGameShellLifecycle();
-const rewardCues = new Map(['summary', 'hint', 'shuffle', 'wave', 'freeze', 'difficulty', 'popupClose'].map(name => {
+const rewardCues = new Map(['summary', 'hint', 'shuffle', 'wave', 'freeze', 'difficulty', 'popupClose', 'homeStart'].map(name => {
   const audio = new Audio(assetUrl(`assets/sounds/${rewardCueFiles[name]}`));
   audio.preload = 'auto';
   return [name, [{ audio, stop: null, gain: 1 }]];
@@ -239,6 +240,11 @@ export function enableButtonClickSounds(getSettings) {
       return;
     }
 
+    if (interactive.dataset.clickSound === 'homeStart') {
+      playOwnedRewardCue('homeStart', uiCueOwner, getSettings());
+      return;
+    }
+
     if (interactive.dataset.clickSound === 'gameStart') {
       playGameStartSound(getSettings());
       return;
@@ -252,7 +258,8 @@ export function enableButtonClickSounds(getSettings) {
 // ✅ Unlock âm thanh sau tương tác đầu tiên
 export function unlockSound() {
   const unlock = () => {
-    Object.values(sounds).filter(sound => sound && sound !== sounds.gameStart).forEach((sound) => {
+    // Button cues play directly in the gesture; warming click would add a second cue.
+    Object.values(sounds).filter(sound => sound && sound !== sounds.gameStart && sound !== sounds.click).forEach((sound) => {
       try {
         sound.play().catch(() => {});
         sound.pause();

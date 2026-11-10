@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test('map treasure and collection dots follow claim state, stay on their own icons and clean up',async({page})=>{
+test('map treasure and achievement dots follow claim state, stay on their own icons and clean up',async({page})=>{
   test.setTimeout(90000);await page.goto('/');
   for(const game of ['memory-match','link-connect','triple-connect']){
     await page.evaluate(async game=>(await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu(game),game);
@@ -14,7 +14,7 @@ test('map treasure and collection dots follow claim state, stay on their own ico
         for(const mode of ['easy','normal','hard','superHard'])for(let level=(block-1)*10+1;level<=block*10;level++)profile.bestByLevel[`${mode}:${level}`]={cleared:true,rulesVersion:1};
         dispatchEvent(new Event('resize'));
       },game);
-      for(const selector of ['.treasure-map-card','[data-map-destination="collection"]']){
+      for(const selector of ['.treasure-map-card','[data-map-destination="achievements"]']){
         const button=page.locator(selector);await expect(button).toHaveAttribute('data-reward-ready','true');
         const dot=button.locator('.adventure-reward-dot');await expect(dot).toBeVisible();
         const a=await button.boundingBox(),b=await dot.boundingBox();
@@ -23,9 +23,11 @@ test('map treasure and collection dots follow claim state, stay on their own ico
       }
       await page.evaluate(()=>{const {profile,block}=window.dotFixture;profile.claimedChests[block]={rulesVersion:1,tiers:{C:{},B:{},A:{},S:{}},collection:{}};dispatchEvent(new Event('resize'));});
       await expect(page.locator('.treasure-map-card .adventure-reward-dot')).toBeHidden();
-      await expect(page.locator('[data-map-destination="collection"] .adventure-reward-dot')).toBeHidden();
+      await expect(page.locator('[data-map-destination="achievements"] .adventure-reward-dot')).toBeHidden();
     }
+    const mapDots=await page.locator('#menu-container .adventure-reward-dot').elementHandles();
     await page.locator('#menu-container .adventure-header .adventure-exit').click();
-    await expect(page.locator('.adventure-reward-dot')).toHaveCount(0);
+    await expect(page.locator('.adventure-map-page')).toHaveCount(0);
+    expect(await Promise.all(mapDots.map(dot=>dot.evaluate(node=>node.isConnected)))).not.toContain(true);
   }
 });

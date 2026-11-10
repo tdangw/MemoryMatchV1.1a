@@ -7,9 +7,9 @@ import { trustedRewardPeriod } from './liveops/service.js';
 import { liveopsEnabled, festivalChestsEnabled } from './liveops/availability.js';
 import { mountHourlyGiftCountdown } from './liveops/hourlyGiftViewState.js';
 import '../styles/raised-actions.css';
-import { getPreviewDurationMs } from './config.js';
 import { getTheme } from "./themeCatalog.js";
-import { getEquippedThemeId } from "./appearance.js";
+import { CARD_BACKS, FLIP_EFFECTS, getEquippedThemeId } from "./appearance.js";
+import { LINK_PATH_EFFECTS, LINK_EXIT_EFFECTS } from "./linkConnect/linkEffects.js";
 import { createGameShellLifecycle } from './gameShell/gameShellLifecycle.js';
 import { createIcon } from "./icons.js";
 import { createAdventureActionArt } from './adventureActionArt.js';
@@ -32,6 +32,7 @@ import { renderTreasureMapCard } from './progression/treasureMapCard.js';
 import { confirmFirstPlay } from './tutorial/firstPlay.js';
 import { playOwnedRewardCue } from './sound.js';
 import { mountPlayerHeaderPortrait } from './progression/playerHeaderPortrait.js';
+import '../styles/map-themes.css';
 import { mountMapAmbient } from './background/bindings.js';
 import { refreshAmbientBackground } from './backgroundEffects.js';
 
@@ -63,6 +64,7 @@ export function mountAdventureMap(gameId) {
   const root = document.createElement("section");
   root.id = "menu-container";
   root.className = `adventure-map-page ${gameId}-menu`;
+  root.dataset.mapTheme = gameId;
   const body = document.createElement("main");
   body.className = "adventure-map-view";
   const scroll = document.createElement("div");
@@ -81,13 +83,13 @@ export function mountAdventureMap(gameId) {
   root.classList.add("game-shell-tokens");
   const title = document.createElement("h1");
   title.className = "adventure-map-title";
-  const titleText = document.createElement("span"); titleText.className = "adventure-map-name"; titleText.textContent = game.title; title.append(titleText);
+  const titleText = document.createElement("span"); titleText.className = "adventure-map-name game-wordmark"; titleText.dataset.wordmarkGame = gameId; titleText.textContent = game.title; title.append(titleText);
   mountPlayerHeaderPortrait(title,scope);
   root.querySelector(".adventure-header").insertBefore(title, root.querySelector(".app-wallet"));
   const header = root.querySelector('.adventure-header');
   const wallet = header.querySelector('.app-wallet'); wallet.classList.add('adventure-map-wallet'); body.prepend(wallet);
   header.classList.remove('has-app-wallet');
-  const shortcuts = document.createElement('nav'); shortcuts.className = 'adventure-map-shortcuts'; shortcuts.setAttribute('aria-label','Kho báu và Bộ sưu tập');
+  const shortcuts = document.createElement('nav'); shortcuts.className = 'adventure-map-shortcuts'; shortcuts.setAttribute('aria-label','Kho báu và Thành tích');
   const eventShortcuts = document.createElement('nav'); eventShortcuts.className = 'adventure-map-shortcuts adventure-map-shortcuts--events'; eventShortcuts.setAttribute('aria-label','Nhiệm vụ, Sự kiện và Quà tặng');
   let loading = false;
   let refreshGiftControl;
@@ -99,6 +101,7 @@ export function mountAdventureMap(gameId) {
       if(control.disabled)return;opening=true;control.disabled=true;
       try {
         if(destination==='hourly-gift'){const {openHourlyGift}=await import('./liveops/hourlyGiftPresentation.js');if(scope.active&&!loading){control.disabled=false;control.focus();openHourlyGift(scope);}}
+        else if(destination==='achievements')await openAchievementScreen(getViewedAdventureBlock(gameId));
         else await openMenuDestination(root,destination);
       }
       catch(error) { if(scope.active)showAppToast('Chưa mở được trang. Hãy thử lại.'); console.warn('Map shortcut unavailable',error.code||error.name); }
@@ -123,7 +126,7 @@ export function mountAdventureMap(gameId) {
   body.append(specials);
   const treasureCard = button("", "treasure-map-card");
   treasureCard.disabled = true;
-  treasureCard.classList.add('adventure-map-shortcut'); shortcuts.append(treasureCard,shortcut('Bộ sưu tập','collection','collection'));
+  treasureCard.classList.add('adventure-map-shortcut'); shortcuts.append(treasureCard,shortcut('Thành tích','collection','achievements'));
   scope.listen(treasureCard, "click", () => { if (!loading) openChest({chestNumber:Number(treasureCard.dataset.block)}); });
   function setBusy(busy) {
     loading = busy;
@@ -169,7 +172,7 @@ export function mountAdventureMap(gameId) {
   let bottomLevel = topLevel - 99;
   const refreshRewardIndicators = mountAdventureRewardIndicators({
     controls: { missions:eventShortcuts.querySelector('[data-map-destination="missions"]'), events:eventShortcuts.querySelector('[data-map-destination="events"]'),
-      treasure:treasureCard, collection:shortcuts.querySelector('[data-map-destination="collection"]') },
+      treasure:treasureCard, collection:shortcuts.querySelector('[data-map-destination="achievements"]') },
     owner:scope, subscribeCommit:subscribeToLocalCommit, subscribePeriod:subscribeRewardPeriod, subscribeAccount:getAccountService()?.subscribe,
     read:() => {
       const identity=getAccountService()?.getIdentity(), rankingOwner=getRankingOwner();
@@ -178,7 +181,7 @@ export function mountAdventureMap(gameId) {
           && (!mountedProfileId || rankingOwner?.profileId===mountedProfileId)
           && (!identity || rankingOwner?.profileId===identity.profileId && (!rankingOwner.uid || rankingOwner.uid===identity.uid)),
         spark:gameState.appearance.spark, uid:identity?.uid, period:trustedRewardPeriod(), online:navigator.onLine,
-        enabled:liveopsEnabled(), festivalEnabled:festivalChestsEnabled(), block,
+        enabled:liveopsEnabled(), festivalEnabled:festivalChestsEnabled(), collectionIncludesChests:false, block,
         completed:{...adjacentBest,...profile.bestByLevel}, claim:profile.claimedChests[block] || adjacentChests[block] };
     },
   });
@@ -401,25 +404,33 @@ export function mountAdventureMap(gameId) {
     }
     const details = document.createElement("ul"); details.className = "adventure-level-details";
     details.setAttribute("aria-live", "polite");
-    const themeButton = button('', 'adventure-preview-theme');
-    themeButton.setAttribute('aria-haspopup', 'dialog');
-    let openingThemes = false;
-    previewScope.listen(themeButton, 'click', async () => {
-      if (openingThemes || loading) return;
-      openingThemes = true; themeButton.disabled = true;
-      try {
-        if (!previewScope.active) return;
-        const themes = await showCollectionModal({ gameId, themesOnly: true, surface: { owner: previewScope } });
-        await themes.whenClosed;
-        if (previewScope.active) updatePreview();
-      } catch (error) {
-        console.warn('Theme selection unavailable', error);
-        if (previewScope.active) showAppToast('Chưa mở được chủ đề. Hãy thử lại.');
-      } finally {
-        openingThemes = false;
-        if (previewScope.active) { themeButton.disabled = false; themeButton.focus(); }
-      }
-    });
+    const loadout=gameId==='memory-match'
+      ? [{tab:'appearance',label:'Mặt lưng thẻ',icon:'cards',field:'cardBack',catalog:CARD_BACKS},
+        {tab:'flip',label:'Hiệu ứng lật',icon:'wand',field:'flipEffect',catalog:FLIP_EFFECTS}]
+      : [{tab:'path',label:'Đường nối',icon:'wand',field:gameId==='link-connect'?'linkPathEffect':'triplePathEffect',catalog:LINK_PATH_EFFECTS},
+        {tab:'exit',label:'Xóa thẻ',icon:'cards',field:gameId==='link-connect'?'linkExitEffect':'tripleExitEffect',catalog:LINK_EXIT_EFFECTS}];
+    let openingSelection=false;
+    function selectionButton(label,options){
+      const control=button('', 'adventure-preview-theme');control.setAttribute('aria-haspopup','dialog');
+      previewScope.listen(control,'click',async()=>{
+        if(openingSelection||loading)return;
+        openingSelection=true;control.disabled=true;
+        try{
+          const picker=await showCollectionModal({gameId,...options,surface:{owner:previewScope}});
+          await picker.whenClosed;
+          if(previewScope.active)updatePreview();
+        }catch(error){
+          console.warn('Pre-game selection unavailable',error);
+          if(previewScope.active)showAppToast(`Chưa mở được ${label.toLowerCase()}. Hãy thử lại.`);
+        }finally{
+          openingSelection=false;
+          if(previewScope.active){control.disabled=false;control.focus();}
+        }
+      });
+      return control;
+    }
+    const themeButton=selectionButton('Chủ đề',{themesOnly:true});
+    for(const item of loadout)item.control=selectionButton(item.label,{selectionTab:item.tab});
     function updatePreview() {
       const info = adapter.preview({ mode: selectedMode(), level, startedLevels: { ...adjacentStarted, ...profile.startedLevels } });
       const theme = getTheme(getEquippedThemeId(gameState.appearance, gameId));
@@ -435,25 +446,24 @@ export function mountAdventureMap(gameId) {
         metric(info.timeSeconds === 0 ? 'infinity' : 'timer', 'Thời gian', info.timeSeconds === 0 ? 'Không giới hạn' : `${info.timeSeconds}s`),
         metric('cards', 'Mục tiêu', groupLabel.trim()),
       ];
-      if (gameId === 'memory-match') stats.push(metric('eye', 'Xem trước', `${getPreviewDurationMs(selectedMode()) / 1000}s`));
-      stats.push(metric('wand', 'Gợi ý', `${info.hints} lượt`));
-      if (gameId === 'triple-connect') stats.push(metric('collection', 'Khay thẻ', info.assistNote.replace(/^Khay\s+/, '')));
       const themeTile = metric(theme.icon || 'images', 'Chủ đề', theme.title); themeTile.classList.add('adventure-preview-metric--theme');
       themeButton.textContent = theme.title;
       themeButton.setAttribute('aria-label', `Đổi chủ đề: ${theme.title}`);
       themeTile.lastChild.replaceWith(themeButton);
-      stats.push(themeTile); details.replaceChildren(...stats);
+      stats.push(themeTile);
+      for(const item of loadout){
+        const equipped=item.catalog.find(entry=>entry.id===gameState.appearance[item.field]);
+        if(!equipped)throw new RangeError(`Unknown equipped ${item.field}.`);
+        item.control.textContent=equipped.id==='default'?'Mặc định':equipped.title;
+        item.control.setAttribute('aria-label',`Đổi ${item.label.toLowerCase()}: ${item.control.textContent}`);
+        const tile=metric(item.icon,item.label,item.control.textContent);tile.classList.add('adventure-preview-metric--theme');
+        tile.lastChild.replaceWith(item.control);stats.push(tile);
+      }
+      details.replaceChildren(...stats);
     }
     updatePreview();
     if (!specialMode) content.append(choices);
-    if (specialMode) {
-      const rules = document.createElement("p");
-      rules.className = "adventure-level-goal";
-      rules.textContent = specialMode === 'endless'
-        ? 'Không giới hạn thời gian. Vượt liên tiếp các màn để lập kỷ lục.'
-        : 'Vượt các màn ngày càng khó trước khi hết giờ để lập kỷ lục.';
-      content.append(rules);
-    }
+    if(specialMode)content.classList.add('adventure-level-preview--special');
     content.append(details);
     if (!specialMode) previewScope.listen(choices, "change", event => {
       if (loading || event.target.disabled || !isNormalAdventureMode(event.target.value)) return;
@@ -496,10 +506,24 @@ export function mountAdventureMap(gameId) {
           console.error('Treasure level navigation failed',error.name);
         } finally { if(scope.active) setBusy(false); }
   }
+  function openAchievementScreen(block){
+    return openMenuDestination(root,'achievements',async({owner,surface})=>{
+      const {openAchievementsModal}=await import('./progression/achievementModal.js');
+      if(owner.active)return openAchievementsModal({gameId,block,owner,surface});
+    });
+  }
   function openChest(node) {
-    openJourneyTreasure({ gameId, block: node.chestNumber, owner: scope,
-      onClaimed: () => { if (scope.active) { patchNodes(); refreshAppWallet(); } },
-      onPlay: prepareLevelPreview,
+    void openMenuDestination(root,'treasure',({owner,surface,close})=>openJourneyTreasure({
+      gameId,block:node.chestNumber,owner,surface,
+      onClaimed:()=>{if(scope.active){patchNodes();refreshAppWallet();}},
+      onPlay:target=>{close();return prepareLevelPreview(target);},
+      onOpenAchievements:()=>{close();return openAchievementScreen(node.chestNumber).catch(error=>{
+        if(scope.active)showAppToast('Chưa mở được Thành tích. Hãy thử lại.');
+        console.warn('Achievements unavailable',error);
+      });},
+    })).catch(error=>{
+      if(scope.active)showAppToast('Chưa mở được kho báu. Hãy thử lại.');
+      console.warn('Treasure screen unavailable',error);
     });
   }
 

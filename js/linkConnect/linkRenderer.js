@@ -801,11 +801,19 @@ function readBoardGap(boardElement) {
 
 function mountLinkBoardLayout() {
   const { root, frame, board, title, progress, hud, milestones } = getLinkShell().refs;
+  let viewportShape = null;
   linkLayout = connectGameShellLayout({
     root, frame, board,
     chrome: [title, progress, hud, milestones],
-    onCompactLandscapeChange: change => onCompactLandscapeChange?.(change),
-    getShape: () => linkLayoutShape,
+    getShape: (viewport, config) => {
+      const landscape = viewport.width > viewport.height;
+      const nextShape = `${landscape}:${viewport.width <= config.breakpoints.mobile}`;
+      if (viewportShape !== nextShape) {
+        viewportShape = nextShape;
+        onCompactLandscapeChange?.({ landscape, viewport, config });
+      }
+      return linkLayoutShape;
+    },
     onMeasure: recordLinkLayoutPass,
     apply: ({ tileSize, boardWidth, boardHeight, gap, padding }) => {
       board.style.setProperty("--link-tile-size", `${tileSize}px`);

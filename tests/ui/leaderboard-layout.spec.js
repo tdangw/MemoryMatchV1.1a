@@ -389,10 +389,16 @@ test('twelve adventure filters show coherent metrics across five skins and phone
  }
  for(const skin of ['default','woodland','papercut','starship','storybook'])for(const size of [{width:320,height:740},{width:384,height:824},{width:390,height:844},{width:412,height:915},{width:844,height:390},{width:1024,height:900}]){
   await page.setViewportSize(size);await page.evaluate(async skin=>await(await import('/js/uiSkin.js')).selectUiSkin(skin),skin);
+  const filters=await page.locator('.leaderboard-heading--filters').evaluate(header=>{
+   const family=header.querySelector('.leaderboard-family-picker').getBoundingClientRect(),difficulties=header.querySelector('.leaderboard-difficulties').getBoundingClientRect();
+   return {sameRow:Math.abs((family.top+family.bottom-difficulties.top-difficulties.bottom)/2)<=1,ordered:family.right<=difficulties.left,overflow:header.scrollWidth-header.clientWidth};
+  });
+  expect(filters,{message:`Compact filter row ${skin} ${size.width}`}).toEqual({sameRow:true,ordered:true,overflow:0});
   const bounds=await page.locator('.leaderboard-list li').first().evaluate(row=>{const n=row.querySelector('.leaderboard-card-name').getBoundingClientRect(),a=row.querySelector('.leaderboard-avatar').getBoundingClientRect();return {ordered:n.bottom<=a.top,overflow:row.scrollWidth-row.clientWidth,stats:[...row.querySelectorAll('.leaderboard-card-stats > div')].map(n=>n.getBoundingClientRect().width)};});
   expect(bounds.ordered).toBe(true);expect(bounds.overflow).toBeLessThanOrEqual(1);expect(Math.max(...bounds.stats)-Math.min(...bounds.stats)).toBeLessThan(1);
   const panelOverflow=await page.locator('.leaderboard-panel').evaluate(n=>({amount:n.scrollWidth-n.clientWidth,offenders:[...n.querySelectorAll('*')].filter(e=>e.getBoundingClientRect().right>n.getBoundingClientRect().right+1).map(e=>e.className)}));expect(panelOverflow.amount,JSON.stringify({skin,size,panelOverflow})).toBeLessThanOrEqual(1);
-  for(const button of await page.locator('[data-rank-difficulty]').all()){const r=await button.boundingBox();expect(r.width).toBeGreaterThanOrEqual(44);expect(r.height).toBeGreaterThanOrEqual(44);}
+  // The compact selector keeps 44px height and uses 36px-wide letter buttons.
+  for(const button of await page.locator('[data-rank-difficulty]').all()){const r=await button.boundingBox();expect(r.width).toBeGreaterThanOrEqual(36);expect(r.height).toBeGreaterThanOrEqual(44);}
   if(size.width===384){mkdirSync('runtime/qa-leaderboard-refresh',{recursive:true});await page.screenshot({path:`runtime/qa-leaderboard-refresh/${skin}-384.png`});}
  }
  await selectFamily(page,'memory-match','challenge');await expect(page.locator('.leaderboard-difficulties')).toBeHidden();await expect(page.locator('.leaderboard-card-stats')).toHaveCount(0);

@@ -18,10 +18,11 @@
 .leaderboard-panel .app-modal__title .ui-icon { color: var(--ranking-gold); }
 .leaderboard-panel .app-modal__body { padding: 0 16px 12px; min-height: 0; min-width: 0; overflow: hidden; display: flex; flex-direction: column; }
 .leaderboard-view { display: flex; flex-direction: column; gap: 10px; min-height: 0; min-width: 0; height: 100%; }
-.leaderboard-view--records .leaderboard-heading--filters { display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px; }
-.leaderboard-difficulties { display:flex; gap:3px; }
+.leaderboard-view--records .leaderboard-heading--filters { display:flex; align-items:center; justify-content:space-between; flex-wrap:nowrap; gap:4px; padding:6px; }
+.leaderboard-heading--filters .leaderboard-family-picker { flex:0 0 auto; width:auto; }
+.leaderboard-difficulties { display:flex; flex:0 0 auto; gap:2px; margin-left:auto; }
 .leaderboard-difficulties[hidden] { display:none; }
-.leaderboard-panel .leaderboard-difficulties .app-button { min-width:44px; width:44px; min-height:44px; padding:4px; font-size:14px; font-weight:800; }
+.leaderboard-panel .leaderboard-difficulties .app-button { min-width:36px; width:36px; min-height:44px; padding:4px; font-size:14px; font-weight:800; }
 .leaderboard-difficulties .app-button[aria-pressed="true"] { color:var(--ranking-gold); border-color:var(--ranking-gold); background:var(--ui-raised, #19444a); }
 .leaderboard-list li.leaderboard-card, .leaderboard-own.leaderboard-card {
   display:grid; grid-template-columns:30px 56px minmax(0,1fr) auto; grid-template-rows:auto auto;
@@ -42,8 +43,6 @@
 .leaderboard-card-progress { grid-column:3 / -1; grid-row:2; justify-self:end; display:grid; gap:3px; text-align:right; }
 .leaderboard-card-progress .leaderboard-metric { font-size:20px; }
 @media (max-width:360px) {
-  .leaderboard-view--records .leaderboard-heading--filters { flex-direction:column; align-items:stretch; }
-  .leaderboard-view--records .leaderboard-difficulties { justify-content:space-between; }
   .leaderboard-list li.leaderboard-card, .leaderboard-own.leaderboard-card { grid-template-columns:28px 56px minmax(0,1fr) auto; gap:6px; padding:8px; }
   .leaderboard-card-stats .leaderboard-card-stat { font-size:12px; }
 }

@@ -184,11 +184,14 @@ function showSessionChoice({ label, session, onContinue, onNew }) {
 export async function showCollectionModal({
   initialChest = false,
   themesOnly = false,
+  selectionTab = null,
   fromGame = false,
   gameId = "memory-match",
   onClose = () => {},
   surface = {},
 } = {}) {
+  const selectionTitles={appearance:'Mặt lưng thẻ',flip:'Hiệu ứng lật',path:'Đường nối',exit:'Xóa thẻ'};
+  if(selectionTab&&!(gameId==='memory-match'?['appearance','flip']:['path','exit']).includes(selectionTab))throw new RangeError('Unknown pre-game selection.');
   // Khi mở từ item menu, trình duyệt truyền MouseEvent làm đối số đầu tiên.
   // Chỉ callback thực sự mới được dùng khi đóng để không gọi nhầm event như hàm.
   const closeHandler = typeof onClose === "function" ? onClose : () => {};
@@ -204,7 +207,7 @@ export async function showCollectionModal({
     id: "collection-modal",
     onDestroy: () => collectionScope.dispose(),
     icon: "collection",
-    title: themesOnly ? "Chủ đề" : "Bộ sưu tập",
+    title: themesOnly ? "Chủ đề" : selectionTab ? selectionTitles[selectionTab] : "Bộ sưu tập",
     content,
     size: "large",
     onClose: () => {
@@ -230,8 +233,12 @@ export async function showCollectionModal({
     disposeChest = mountChestInventory(grid, { owner: collectionScope, gameId,
       profile: fromGame ? null : () => { modal.destroy(); void openPlayerProfile(surface); } });
   };
-  const mountCollectionTabs = entries => mountCatalogTabs({ gameId, surface: 'collection', tablist: tabs, panel: grid,
-    tabs: [...entries, ...(festivalChestsEnabled() ? [{ id: 'chests', label: 'Kho rương', render: renderChests }] : [])]
+  const mountCollectionTabs = entries => {
+    if(selectionTab){
+      tabs.remove();entries.find(entry=>entry.id===selectionTab).render();return null;
+    }
+    return mountCatalogTabs({ gameId, surface: 'collection', tablist: tabs, panel: grid,
+    tabs: [...entries, ...(festivalChestsEnabled() ? [{ id: 'chests', label: 'Kho lưu trữ', render: renderChests }] : [])]
       .map(entry => ({ ...entry, render: () => {
         if (!collectionScope.active || activeTab === 'chests' && entry.id === 'chests') return;
         disposeChest?.(); disposeChest = null;
@@ -240,6 +247,7 @@ export async function showCollectionModal({
         grid.scrollTop = 0;
       } })),
   });
+  };
   content.append(tabs, grid);
 
   const renderAppearance = () => {

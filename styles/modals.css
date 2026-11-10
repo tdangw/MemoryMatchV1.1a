@@ -831,3 +831,32 @@ body.game-is-paused .shooting-star {
 /* Popup actions follow their label width while retaining a touch-sized height. */
 .app-modal .app-modal__footer { justify-items:center; }
 .app-modal .app-modal__footer > .app-button { width:fit-content; max-width:100%; min-width:0; padding-inline:24px; justify-self:center; }
+
+/* Fullscreen dialogs retain the modal focus, back and parent-cleanup contract. */
+.app-modal-overlay[data-fullscreen="true"] {
+  padding: 0;
+}
+.app-modal-overlay[data-fullscreen="true"] > .app-modal {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  animation: none;
+}
+.app-modal-overlay[data-fullscreen="true"] > .app-modal > .app-modal__header {
+  flex-shrink: 0;
+  margin: 0;
+  padding: max(10px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) 10px max(14px, env(safe-area-inset-left));
+}
+.app-modal-overlay[data-fullscreen="true"] > .app-modal > .app-modal__body {
+  flex: 1;
+  min-height: 0;
+  padding: 18px max(18px, env(safe-area-inset-right)) max(18px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+  overscroll-behavior: contain;
+}

@@ -22,6 +22,7 @@ for (const viewport of [{ width: 320, height: 740 }, { width: 412, height: 915 }
 });
 
 test('functional tab backgrounds load on demand and never appear on Home', async ({ page }) => {
+  await page.addInitScript(() => performance.setResourceTimingBufferSize(3000));
   await page.goto('/');
   await expect(page.locator('[data-dock-action="profile"]')).toBeVisible();
   const paths = ['missions-garden', 'friends-courtyard', 'profile-keepsake', 'settings-retreat'];

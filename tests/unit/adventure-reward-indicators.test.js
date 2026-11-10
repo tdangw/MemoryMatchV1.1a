@@ -141,3 +141,11 @@ test('mount refreshes after commit, account/visibility/period changes, reattache
     owner.dispose(); refresh(); assert.equal(unsubscribed,2); assert.equal(controls.events.children.length,0);
   }
 });
+
+
+test('achievement shortcut ignores unopened inventory while collection retains its chest indicator', () => {
+  const input=sample();
+  input.spark.state.chests={earned:{c:1,avatar:0,frame:0,badge:0},spent:{c:0,avatar:0,frame:0,badge:0}};
+  assert.equal(ready(input).collection,true);
+  assert.equal(ready({...input,collectionIncludesChests:false}).collection,false);
+});

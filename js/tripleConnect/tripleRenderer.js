@@ -121,20 +121,23 @@ export function createTripleRenderer(shell, { onLockedTraySlotClick } = {}) {
         badge.innerHTML = '<path d="M5 4h5v9a2 2 0 0 0 4 0V4h5v9a7 7 0 0 1-14 0Z" fill="#d95c58" stroke="#5d3430" stroke-width="1.5"/><path d="M5 4h5v4H5zm9 0h5v4h-5z" fill="#eaf5f0" stroke="#5d3430"/>';
         node.append(badge);
       }
-      const label = tile.magnet ? 'Thẻ nam châm' : lucky ? "Thẻ may mắn" : "Thẻ";
-      if (node.getAttribute("aria-label") !== label)
-        node.setAttribute("aria-label", label);
       const occluded = tile.location === "board" && !exposed;
       if (node.classList.contains("is-occluded") !== occluded)
         node.classList.toggle("is-occluded", occluded);
       if (node.classList.contains("is-exposed") !== exposed)
         node.classList.toggle("is-exposed", exposed);
-      node.dataset.tripleCoverDepth = String(Math.min(4, coverDepth));
+      node.dataset.tripleCoverDepth = String(Math.min(5, coverDepth));
       const pileId = boardView.pileByTileId.get(tile.id);
       const pileDepth = tile.location === "board" && pileId
         ? boardView.remainingDepthByPileId.get(pileId)
         : 1;
       node.classList.toggle("is-corner-stack", pileDepth > 1);
+      if (node.dataset.triplePileDepth !== String(pileDepth)) {
+        node.dataset.triplePileDepth = String(pileDepth);
+        node.style.setProperty('--triple-pile-thickness', `${Math.min(8, pileDepth + 1)}px`);
+      }
+      const label = pileDepth > 1 ? `Xấp ${pileDepth} thẻ` : tile.magnet ? 'Thẻ nam châm' : lucky ? "Thẻ may mắn" : "Thẻ";
+      if (node.getAttribute("aria-label") !== label) node.setAttribute('aria-label', label);
       if (tile.location === "tray") {
         const trayIndex = state.tray.indexOf(tile.id);
         const traySlot = traySlots[trayIndex];

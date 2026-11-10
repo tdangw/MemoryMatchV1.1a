@@ -2,16 +2,27 @@ import {writeFile} from 'node:fs/promises';
 import {test,expect} from '@playwright/test';
 import {seed,open,snapshot} from './helpers/treasureFixtures.js';
 
+// Seeded cleared levels can also open achievement acknowledgements on the map.
+// Acknowledge them through the real UI while exercising treasure lifecycle.
+test.beforeEach(async({page})=>{
+  await page.addLocatorHandler(page.locator('#achievement-notice-modal'),async()=>{
+    const notice=await page.locator('#achievement-notice-modal').elementHandle();
+    await page.locator('#achievement-notice-modal').getByRole('button',{name:'Tiếp tục',exact:true}).click();
+    await expect.poll(()=>notice.evaluate(node=>node.isConnected)).toBe(false);
+  },{noWaitAfter:true});
+});
+
+
 async function ownerCounts(page) { return page.evaluate(async()=> (await import('/js/appPageLifecycle.js')).getAppPageScope().diagnostics()); }
 
-test('thirty real modal cycles release resources and record one finite opening separately from commit',async({page},testInfo)=>{
+test('thirty real treasure screen cycles release resources and record one finite opening separately from commit',async({page},testInfo)=>{
   test.setTimeout(90000);await page.emulateMedia({reducedMotion:'no-preference'});await seed(page,'memory-match');
-  await open(page);await page.locator('#adventure-chest-modal .app-modal__close').click();await expect(page.locator('#adventure-chest-modal')).toHaveCount(0);
+  await open(page);await page.locator('.adventure-screen[data-screen=treasure] > .adventure-exit').click();await expect(page.locator('#adventure-chest-modal')).toHaveCount(0);
   const cdp=await page.context().newCDPSession(page);await cdp.send('Performance.enable');
   const metrics=async()=>{await cdp.send('HeapProfiler.collectGarbage');return Object.fromEntries((await cdp.send('Performance.getMetrics')).metrics.map(m=>[m.name,m.value]));};
   await expect(page.locator('.adventure-touch-particle')).toHaveCount(0);
   const baseline=await metrics(),counts=await ownerCounts(page);
-  for(let i=0;i<30;i++) {await open(page);await page.locator('#adventure-chest-modal .app-modal__close').click();await expect(page.locator('#adventure-chest-modal')).toHaveCount(0);}
+  for(let i=0;i<30;i++) {await open(page);await page.locator('.adventure-screen[data-screen=treasure] > .adventure-exit').click();await expect(page.locator('#adventure-chest-modal')).toHaveCount(0);}
   await expect(page.locator('.adventure-touch-particle')).toHaveCount(0);
   expect(await ownerCounts(page)).toEqual(counts);
   const after=await metrics();expect(after.JSEventListeners-baseline.JSEventListeners).toBeLessThanOrEqual(4);expect(after.Nodes-baseline.Nodes).toBeLessThanOrEqual(20);expect(after.JSHeapUsedSize-baseline.JSHeapUsedSize).toBeLessThan(2*1024*1024);
@@ -40,7 +51,7 @@ for(const interrupt of ['close','switch','reload','background','reduce']) test(`
   await page.emulateMedia({reducedMotion:'no-preference'});await seed(page,'memory-match');await open(page);
   await page.getByRole('button',{name:'Mở rương',exact:true}).click();await expect(page.locator('.treasure-content')).toHaveAttribute('data-phase','opening');
   expect((await snapshot(page,'memory-match')).coins).toBe(30);
-  if(interrupt==='close') {await page.locator('#adventure-chest-modal .app-modal__close').click();await expect(page.locator('#adventure-chest-modal')).toHaveCount(0);}
+  if(interrupt==='close') {await page.locator('.adventure-screen[data-screen=treasure] > .adventure-exit').click();await expect(page.locator('#adventure-chest-modal')).toHaveCount(0);}
   if(interrupt==='switch') {await page.evaluate(async()=> (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('link-connect'));await expect(page.locator('#adventure-chest-modal')).toHaveCount(0);}
   if(interrupt==='reload') await page.reload();
   if(interrupt==='background') await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,value:true});document.dispatchEvent(new Event('visibilitychange'));delete document.hidden;});

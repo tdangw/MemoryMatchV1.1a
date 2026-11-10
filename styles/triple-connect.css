@@ -177,23 +177,28 @@
 }
 
 .triple-connect__board .triple-connect__tile.is-occluded[data-triple-cover-depth="1"] {
-  opacity: 0.3;
-  filter: saturate(0.22) brightness(0.52) contrast(0.84);
+  opacity: 0.4;
+  filter: grayscale(1) brightness(0.72) contrast(0.9);
 }
 
 .triple-connect__board .triple-connect__tile.is-occluded[data-triple-cover-depth="2"] {
-  opacity: 0.18;
-  filter: saturate(0.12) brightness(0.4) contrast(0.78);
+  opacity: 0.24;
+  filter: grayscale(1) brightness(0.62) contrast(0.86);
 }
 
 .triple-connect__board .triple-connect__tile.is-occluded[data-triple-cover-depth="3"] {
-  opacity: 0.11;
-  filter: saturate(0.07) brightness(0.31) contrast(0.72);
+  opacity: 0.15;
+  filter: grayscale(1) brightness(0.54) contrast(0.82);
 }
 
 .triple-connect__board .triple-connect__tile.is-occluded[data-triple-cover-depth="4"] {
+  opacity: 0.1;
+  filter: grayscale(1) brightness(0.48) contrast(0.8);
+}
+
+.triple-connect__board .triple-connect__tile.is-occluded[data-triple-cover-depth="5"] {
   opacity: 0.07;
-  filter: saturate(0.04) brightness(0.25) contrast(0.66);
+  filter: grayscale(1) brightness(0.42) contrast(0.78);
 }
 
 .triple-connect__tile:disabled:not(.is-occluded) {
@@ -218,11 +223,26 @@
 }
 
 .triple-connect__board .triple-connect__tile.is-corner-stack::before {
-  content: none;
+  content: "";
+  position: absolute;
+  inset: 0;
+  translate: -3px var(--triple-pile-thickness);
+  z-index: -1;
+  border: 1px solid #839b9c;
+  border-radius: inherit;
+  background: repeating-linear-gradient(to bottom, #dddcc8 0 1px, #6e8790 1px 2px);
+  box-shadow: -2px 2px 0 #153c52, -3px 3px 3px rgb(0 0 0 / 40%);
+  pointer-events: none;
 }
 
 .triple-connect__board .triple-connect__tile.is-corner-stack {
-  box-shadow: -3px 3px 0 #173653, -6px 6px 0 #12304b, -9px 9px 0 #0e2a43;
+  overflow: visible;
+  box-shadow: inset 3px 0 #d5b775, inset 4px 0 #31586c, 0 2px 4px rgb(0 0 0 / 35%);
+}
+
+.triple-connect__board .triple-connect__tile.is-corner-stack > img {
+  position: relative;
+  background: inherit;
 }
 
 .triple-connect__board .triple-connect__tile.is-corner-stack-revealed {
@@ -393,17 +413,10 @@
 @keyframes triple-connect-tray-arrive {
   from {
     opacity: 0.22;
-    transform: scale(0.72);
-  }
-
-  64% {
-    opacity: 1;
-    transform: scale(1.1);
   }
 
   to {
     opacity: 1;
-    transform: scale(1);
   }
 }
 .triple-connect__line {
@@ -417,8 +430,15 @@
 }
 .triple-connect__ghost {
   position: absolute !important;
-  opacity: 0.8;
+  min-width: 0;
+  min-height: 0;
+  opacity: 1;
   pointer-events: none;
+}
+.triple-connect__surface > .triple-connect__ghost:not(.is-removing) {
+  filter: none;
+  border-color: rgb(248 254 255 / 98%);
+  background: #22517d;
 }
 .triple-round-summary dl {
   display: grid;

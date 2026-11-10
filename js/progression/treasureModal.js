@@ -14,7 +14,7 @@ import { renderTreasureContent } from './treasureView.js';
 import { dismissContextGuide, showContextGuide } from '../tutorial/contextGuide.js';
 
 /** A single modal owns selection and presentation; only the reward transaction grants inventory. */
-export function openJourneyTreasure({ gameId, block, owner, selectedTier, onClaimed = () => {}, onPlay }) {
+export function openJourneyTreasure({ gameId, block, owner, selectedTier, onClaimed = () => {}, onPlay, onOpenAchievements, surface = {} }) {
   const key = getGameProgressKey(gameId), profile = gameState.progress[key];
   const identity = JSON.stringify(getRankingOwner());
   const scope = createGameShellLifecycle();
@@ -24,7 +24,7 @@ export function openJourneyTreasure({ gameId, block, owner, selectedTier, onClai
   content.textContent = 'Đang mở kho báu…';
   let view, completed, selected = selectedTier, phase = 'idle', error = '', generation = 0;
   const current = () => scope.active && gameState.progress[key] === profile && identity === JSON.stringify(getRankingOwner()) && canLaunchGame();
-  const modal = openAppModal({ id: 'adventure-chest-modal', title: 'Kho báu hành trình', content, owner: scope,
+  const modal = openAppModal({ ...surface, id: 'adventure-chest-modal', title: 'Kho báu hành trình', content, owner: scope,
     alignment: 'center', keepBanner: true, onDestroy: () => scope.dispose() });
   modal.panel.classList.add('treasure-dialog');
   const draw = () => {
@@ -74,6 +74,7 @@ export function openJourneyTreasure({ gameId, block, owner, selectedTier, onClai
       if (target) { modal.destroy(); void onPlay?.(target); } return;
     }
     if (action==='collection') {
+      if(onOpenAchievements){void onOpenAchievements();return;}
       modal.destroy();
       const collection=document.createElement('div');
       const collectionScope = createGameShellLifecycle();

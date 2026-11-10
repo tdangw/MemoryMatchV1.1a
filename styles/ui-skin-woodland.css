@@ -41,9 +41,9 @@ html[data-ui-skin="woodland"] .adventure-dock { position: relative; isolation: i
 html[data-ui-skin="woodland"] .adventure-dock::before { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; border: 10px solid transparent; border-image: url('/assets/ui/woodland/nameplate.webp') 48 82 fill / 10px stretch; }
 html[data-ui-skin="woodland"] .adventure-dock button { color: #fff1c8; text-shadow: 0 1px #42230e; }
 html[data-ui-skin="woodland"] .adventure-dock button[aria-current="page"] { color: #4b2b18; text-shadow: none; background: url('/assets/ui/woodland/selected-tab.webp') center top / 100% 140% no-repeat; box-shadow: inset 0 -3px #66883a; border-radius: 10px; }
-html[data-ui-skin="woodland"] :is(#settings-modal, #account-modal, #missions-screen, #events-screen, #rankings-modal, #shop-modal, #collection-modal) .app-modal__header,
+html[data-ui-skin="woodland"] :is(#settings-modal, #account-modal, #missions-screen, #events-screen, #achievements-modal, #adventure-chest-modal, #rankings-modal, #shop-modal, #collection-modal) .app-modal__header,
 html[data-ui-skin="woodland"] .app-modal-overlay .app-modal__header { background: linear-gradient(#a46b38, #6b3c24); border-color: #d7a457; color: #fff0c5; }
-html[data-ui-skin="woodland"] :is(#settings-modal, #account-modal, #missions-screen, #events-screen, #rankings-modal, #shop-modal, #collection-modal) .app-modal__title,
+html[data-ui-skin="woodland"] :is(#settings-modal, #account-modal, #missions-screen, #events-screen, #achievements-modal, #adventure-chest-modal, #rankings-modal, #shop-modal, #collection-modal) .app-modal__title,
 html[data-ui-skin="woodland"] .app-modal-overlay .app-modal__title,
 html[data-ui-skin="woodland"] .app-modal__title > .ui-icon,
 html[data-ui-skin="woodland"] #shop-modal .shop-wallet { color: #fff0c5; }

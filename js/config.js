@@ -25,7 +25,7 @@ export const GAME_CONFIG = Object.freeze({
     hard: Object.freeze({
       tileCount: 36,
       columns: 6,
-      mobileColumns: 6,
+      mobileColumns: 4,
       timeSeconds: STANDARD_WAVE_SECONDS['memory-match'].hard,
       coinReward: Object.freeze({ base: 70, speedMultiplier: 0.65 }),
     }),
