@@ -1,0 +1,21 @@
+{
+  "date": "2026-11-10",
+  "tool": "built-in image_gen",
+  "references": ["public/assets/images/ui/v1/icon-search.webp", "public/assets/images/ui/v1/icon-undo.webp"],
+  "entries": [
+    {
+      "id": "support/time",
+      "master": "masters/time-v1.png",
+      "output": "exec-0c34826d-ab8b-47d7-be01-36ca100e9ea2.png",
+      "transparent_background": true,
+      "prompt": "Create ONE production mobile game inventory icon, transparent background. The two references establish the exact existing set style: polished cartoon fantasy gold outlined thick dimensional edges, bright clean material, simple recognizable object, no surrounding frame, excellent at 40px. Draw a front-facing STOPWATCH with a gold rim, a short gold winding knob at 12 o'clock and small side button at 2 o'clock, rich dark teal flat blank round face, small cream tick marks near the perimeter ONLY. Leave the entire central 65 percent of the dial completely EMPTY uniform dark teal, because game code will overlay large changing numbers. No clock hands, NO numbers, NO letters, no text, no shadow outside silhouette, no extra decorations, no square tile/background. Centered square composition, outer silhouette within 86 percent of canvas, consistent margin. True transparent alpha. Make the blank face large and centered, not tilted, minimal clean high quality matching the reference icon family."
+    },
+    {
+      "id": "support/thunder",
+      "master": "masters/thunder-v1.png",
+      "output": "exec-11c89d70-7026-47ce-9c72-1e8e760b9211.png",
+      "transparent_background": true,
+      "prompt": "Create ONE production inventory icon for a mobile fantasy puzzle game, true transparent background. The two references define the existing icon set: thick polished cartoon gold borders, simple dimensional glossy colored interior, crisp silhouette readable at 40 pixels, no surrounding tile. Draw a single bold downward zigzag LIGHTNING BOLT for a thunder assist power-up, rich luminous icy cyan and blue interior with a thick warm gold beveled rim matching the references. Front-facing, slight dimensional bevel, no perspective background, no cloud, no character, no extra sparks around it, no letters, numbers, words, watermark or emoji. Centered square composition, silhouette occupies 84 percent of canvas with balanced transparent margin. Strong simple broad zigzag shape, do not draw a magic wand. No external cast shadow; clean alpha edges."
+    }
+  ]
+}

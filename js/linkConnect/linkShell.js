@@ -2,6 +2,7 @@ import { createGameShell } from "../gameShell/gameShell.js";
 import { createGameShellHud } from "../gameShell/gameShellHud.js";
 import { formatClockTime } from "../uiCatalog.js";
 import { createIcon } from "../icons.js";
+import { createSupportItemIcon } from '../catalogArt.js';
 import { LINK_ITEMS, LINK_FREEZE_SECONDS } from "./linkItems.js";
 import { bindGameHudMenus } from "../gameShell/gameHudMenus.js";
 import { HUD_PROGRESS_TICK_MS } from "../gameShell/gameTimerProgress.js";
@@ -69,7 +70,7 @@ function createItemButtons(container) {
     button.className = "link-connect-game__item hud-tool-item";
     button.dataset.item = item.id;
     button.setAttribute("aria-label", item.title);
-    button.append(createIcon(item.icon));
+    button.append(createSupportItemIcon(item));
     const label = document.createElement("span");
     label.textContent = item.id === "hint" ? "Gợi ý" : item.title;
     const count = document.createElement("strong");

@@ -1,0 +1,37 @@
+{
+  "tool": "built-in image_gen",
+  "transparent_background": true,
+  "references": [
+    "design/shop-catalog/reference-four-column.png"
+  ],
+  "entries": [
+    {
+      "key": "exit/bubble",
+      "master": "illustrations/exit-bubble-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-4efac84c-1580-45d6-9dda-08a22b64cff9.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A cream playing card with a fine warm-gold rim and a small clean blue geometric diamond (drawn shape, not a font glyph), with the removal effect visibly changing the card. Card is the dominant big object, slightly tilted at most, pieces large and clear rather than microscopic. Same card design throughout this family. The card dissolving into five large clear translucent cyan and violet bubbles rising from its top edge, main card partly visible, no background water.",
+      "status": "generated-candidate"
+    },
+    {
+      "key": "exit/origami",
+      "master": "illustrations/exit-origami-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-2754f04a-48af-4643-b8d0-0224368ef0dd.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A cream playing card with a fine warm-gold rim and a small clean blue geometric diamond (drawn shape, not a font glyph), with the removal effect visibly changing the card. Card is the dominant big object, slightly tilted at most, pieces large and clear rather than microscopic. Same card design throughout this family. The cream card folding into a simple recognizable angular origami form, two or three clear paper folds with blue reverse sides, gold card edge still visible.",
+      "status": "generated-candidate"
+    },
+    {
+      "key": "exit/electric-shock",
+      "master": "illustrations/exit-electric-shock-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-b37f4e32-69dc-4635-b63f-7240bbfff4b3.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A cream playing card with a fine warm-gold rim and a small clean blue geometric diamond (drawn shape, not a font glyph), with the removal effect visibly changing the card. Card is the dominant big object, slightly tilted at most, pieces large and clear rather than microscopic. Same card design throughout this family. The cream card surrounded by vivid jagged cyan-white electrical arcs on its edges, two large branching lightning sparks, face remains clear.",
+      "status": "generated-candidate"
+    },
+    {
+      "key": "exit/ghost",
+      "master": "illustrations/exit-ghost-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-c07b5797-e64a-4cc0-a749-a08587866061.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A cream playing card with a fine warm-gold rim and a small clean blue geometric diamond (drawn shape, not a font glyph), with the removal effect visibly changing the card. Card is the dominant big object, slightly tilted at most, pieces large and clear rather than microscopic. Same card design throughout this family. The cream card becoming translucent pale-blue with two soft offset ghost silhouettes behind it, a clear fading effect, no ghost character or face.",
+      "status": "generated-candidate"
+    }
+  ]
+}

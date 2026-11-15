@@ -3,11 +3,12 @@ import { getLinkModeLayout, getLinkChallengeLayout, getLinkChallengeTime, getLin
 import { getTripleModeConfig, getTripleChallengeStage, getTripleTrayCapacity } from './tripleConnect/tripleConfig.js';
 import { getChapterNumber } from './adventureProgress.js';
 import { getGameMode } from './gameCatalog.js';
-import { calculateWaveTime, getLevelWaveCount } from './progression/gameplayRules.js';
+import { calculateWaveTime, getLevelWaveCount, getProgressionStarTargets } from './progression/gameplayRules.js';
 
 function wavePreview(gameId, mode, level, groupSize, preview) {
   const waves = getLevelWaveCount(level);
   return { ...preview, timeSeconds: calculateWaveTime({ gameId, mode, totalGroups: preview.tileCount / groupSize }),
+    threeStarScore: getProgressionStarTargets({ gameId, totalGroups: preview.tileCount / groupSize * waves, mode }).three,
     waves, target: `${preview.target} × ${waves} đợt` };
 }
 

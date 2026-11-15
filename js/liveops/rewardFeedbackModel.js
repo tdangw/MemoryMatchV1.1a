@@ -2,6 +2,14 @@ import { CHEST_TYPES } from './chestConfig.js';
 
 // Presentation facts only: never persisted or used to grant an entitlement.
 export const REWARD_FEEDBACK_LIMIT = 12;
+export function chestPresentationReward(result){
+  const reward=result.chestResult;if(!reward)return [];
+  if(reward.kind==='coins'||reward.kind==='sale')return [{kind:'coins',amount:reward.coins}];
+  if(reward.kind==='support')return [{kind:'support',gameId:reward.gameId,key:reward.key,amount:1}];
+  const cosmetic=result.cosmeticResult;
+  if(cosmetic?.fragments)return [{kind:'fragment',fragmentType:cosmetic.type,amount:cosmetic.fragments}];
+  return [{kind:'item',itemId:reward.itemId,amount:1,...(cosmetic?{level:cosmetic.level}:{})}];
+}
 /** A wheel grant is separate from mission/rollover grants in the same request. */
 export function committedWheelRewardsForTransition(result) {
   if (!result.wheelApplied) return [];

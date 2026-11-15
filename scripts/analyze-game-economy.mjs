@@ -45,7 +45,8 @@ const recipeSaleCosts = LETTER_SETS.map(set => ({ recipe:set.label,
   saleAlternative:total(Object.values(set.required), n => n)*LETTER_SELL_COINS }));
 const cosmeticCompletionFromEmpty = Object.entries(CHEST_POOLS).map(([type, ids]) => ({ type,items:ids.length,
   baselineRepeatPoolExpectedChests:round(ids.length*harmonic(ids.length)/cosmeticChance(CHEST_POLICY[type])),
-  expectedChests:round(ids.length/cosmeticChance(CHEST_POLICY[type])) }));
+  legacyUnownedPoolExpectedChests:round(ids.length/cosmeticChance(CHEST_POLICY[type])),
+  expectedChests:round(ids.length*harmonic(ids.length)/cosmeticChance(CHEST_POLICY[type])) }));
 const festivalDirect = total(FESTIVAL_MILESTONES, item => item.coins);
 const festivalBeforeCosmetics = festivalDirect + CHEST_POLICY.c.coinChance*CHEST_POLICY.c.coins
   + CHEST_POLICY.frame.coinChance*CHEST_POLICY.frame.coins + CHEST_POLICY.avatar.coinChance*CHEST_POLICY.avatar.coins;

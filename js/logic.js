@@ -257,7 +257,7 @@ async function checkMatch(roundId) {
       showMemoryCoinReward(second.element, previousCoins, totalCoins, matchCoins);
     }
     highlightTarget("#score");
-    updateLevelStarsDisplay(calculateProgressionStars({ score, totalGroups: waveTotalGroups(gameState.wave), mode: gameState.settings.mode, won: false }));
+    updateLevelStarsDisplay(calculateProgressionStars({ gameId: 'memory-match', score, totalGroups: waveTotalGroups(gameState.wave), mode: gameState.settings.mode, won: false }));
     updateComboDisplay(gameState.combo);
     if (resolvedCombo >= 2) {
       setTimeout(() => {
@@ -373,7 +373,7 @@ export async function checkLevelComplete() {
     const timeBonus = calculateFastFinishBonus({ mode: gameState.settings.mode, totalGroups,
       activeMs, allocatedSeconds: gameState.wave.allocatedSeconds });
     const finalScore = increaseScore(timeBonus);
-    const stars = calculateProgressionStars({ score: finalScore, totalGroups, mode: gameState.settings.mode, won: true });
+    const stars = calculateProgressionStars({ gameId: 'memory-match', score: finalScore, totalGroups, mode: gameState.settings.mode, won: true });
     const coinsEarned = calculateVictoryCoins({ gameId: 'memory-match', mode: gameState.settings.mode, totalGroups, stars });
     const progressResult = recordMemoryMatchResult({
       mode: gameState.settings.mode,

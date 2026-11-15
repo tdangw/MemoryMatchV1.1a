@@ -1,0 +1,4 @@
+.reward-info-host { position:relative; }
+button.reward-info-button { position:absolute; top:0; right:0; z-index:2; display:grid; place-items:center; box-sizing:border-box; width:24px; height:24px; min-width:0; min-height:0; margin:0; padding:0; border:0; border-radius:50%; background:transparent; box-shadow:none; color:var(--lo-gold,var(--ui-gold,#dec18b)); cursor:help; }
+button.reward-info-button > .ui-icon { width:14px; height:14px; padding:1px; border-radius:50%; background:var(--lo-panel,var(--ui-inset,#17343c)); }
+.reward-info-button:focus-visible { outline:2px solid currentColor; outline-offset:0; }

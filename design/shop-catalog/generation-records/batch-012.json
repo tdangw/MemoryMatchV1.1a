@@ -1,0 +1,37 @@
+{
+  "tool": "built-in image_gen",
+  "transparent_background": true,
+  "references": [
+    "design/shop-catalog/reference-four-column.png"
+  ],
+  "entries": [
+    {
+      "key": "flip/pop",
+      "master": "illustrations/flip-pop-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-890ce4f4-847c-43b9-92b8-18a983fa17c5.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A blue-backed cream playing card with thin gold rim and small simple geometric center diamond, and a clear gold or teal motion cue for the flip/reveal effect. Big simple forms, no labels, no letter on the card. Same card throughout this family. The card popping into view with three or four short broad gold impact rays around it, confident clean pop, no clutter.",
+      "status": "generated-candidate"
+    },
+    {
+      "key": "flip/slide-up",
+      "master": "illustrations/flip-slide-up-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-6b62099f-0fe7-4287-8b42-9540f7d2f5a7.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A blue-backed cream playing card with thin gold rim and small simple geometric center diamond, and a clear gold or teal motion cue for the flip/reveal effect. Big simple forms, no labels, no letter on the card. Same card throughout this family. The card sliding upward with two faint blue rectangular motion trails below it, one short upward swoosh, same card face.",
+      "status": "generated-candidate"
+    },
+    {
+      "key": "flip/flip-y",
+      "master": "illustrations/flip-flip-y-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-e247bb05-9b2b-478b-b7bc-3084052872f2.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A blue-backed cream playing card with thin gold rim and small simple geometric center diamond, and a clear gold or teal motion cue for the flip/reveal effect. Big simple forms, no labels, no letter on the card. Same card throughout this family. The card turning around its vertical axis, one visible slim blue back and clear cream front, one elegant curved gold rotation arrow drawn as a shape around its side.",
+      "status": "generated-candidate"
+    },
+    {
+      "key": "flip/zoom-rotate",
+      "master": "illustrations/flip-zoom-rotate-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-0de206ed-88a6-4b52-ac63-1c158452a846.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A blue-backed cream playing card with thin gold rim and small simple geometric center diamond, and a clear gold or teal motion cue for the flip/reveal effect. Big simple forms, no labels, no letter on the card. Same card throughout this family. The card tilted clockwise with one broad gold circular motion swoosh and two increasing-size translucent card outlines, indicating a rotating zoom reveal.",
+      "status": "generated-candidate"
+    }
+  ]
+}

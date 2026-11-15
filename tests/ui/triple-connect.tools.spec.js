@@ -26,7 +26,8 @@ test("Triple HUD uses the shared action menu and keeps tools separate", async ({
   await expect(page.locator('#game-exit-modal')).toBeVisible();
   await expect(
     page.locator('#game-exit-modal .app-modal__footer button'),
-  ).toHaveText(['Tiếp tục', 'Chơi lại', 'Cài đặt', 'Thoát game']);
+  ).toHaveText(['Tiếp tục', 'Chơi lại', 'Thoát game']);
+  await expect(page.locator('#game-exit-modal .app-modal__header').getByRole('button', { name: 'Cài đặt', exact: true })).toBeVisible();
   await expect(page.locator("#triple-tools-menu")).toBeHidden();
   const bounds = await page
     .locator('#game-exit-modal .app-modal')
@@ -70,7 +71,7 @@ test("Triple Time commits inventory, timer, and session in one transaction", asy
   await page.locator("#triple-tools-toggle").click();
   await expect(page.locator("#triple-tools-menu")).toBeVisible();
   await page.locator('[data-triple-item="time"]').click();
-  await expect(page.locator("[data-triple-timer]")).toHaveText("01:34");
+  await expect(page.locator("[data-triple-timer]")).toHaveText("01:30");
   await expect(page.locator('[data-triple-item-count="time"]')).toHaveText("0");
   const saved = await page.evaluate(async () =>
     (await import("/js/sessionProgress.js")).getActiveSession(
@@ -78,7 +79,7 @@ test("Triple Time commits inventory, timer, and session in one transaction", asy
       "easy",
     ),
   );
-  expect(saved.remainingTime).toBe(94);
+  expect(saved.remainingTime).toBe(90);
 });
 
 test("Triple Time is not available in Endless", async ({ page }) => {
@@ -113,7 +114,10 @@ test("Triple Time restores its committed inventory and timer after reload", asyn
   });
   await page.locator("#triple-tools-toggle").click();
   await page.locator('[data-triple-item="time"]').click();
+  await expect(page.locator('[data-triple-item-count="time"]')).toHaveText('0');
+  await expect.poll(()=>page.evaluate(async()=> (await import('/js/sessionProgress.js')).getActiveSession('triple-connect','easy')?.remainingTime)).toBe(90);
   await page.reload();
+  await expect(page.locator('.game-selector__choice').first()).toBeVisible();
   const restored = await page.evaluate(async () => {
     const { continueTripleConnectSession } = await import(
       "/js/tripleConnect/tripleController.js"
@@ -131,7 +135,7 @@ test("Triple Time restores its committed inventory and timer after reload", asyn
       count: getTripleItemCount("time"),
     };
   });
-  expect(restored).toEqual({ restored: true, timer: "01:34", count: 0 });
+  expect(restored).toEqual({ restored: true, timer: "01:30", count: 0 });
 });
 
 test("Triple Time rolls back coin, inventory, timer, and session when persistence fails", async ({

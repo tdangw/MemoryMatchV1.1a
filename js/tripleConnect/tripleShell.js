@@ -2,6 +2,7 @@ import { createGameShell } from "../gameShell/gameShell.js";
 import { createGameShellHud } from "../gameShell/gameShellHud.js";
 import { createIcon } from "../icons.js";
 import { TRIPLE_ITEMS } from "./tripleItems.js";
+import { createSupportItemIcon } from '../catalogArt.js';
 import { formatClockTime } from "../uiCatalog.js";
 import { TRIPLE_PRODUCT_DECISIONS, TRIPLE_TIME_ITEM_SECONDS } from "./tripleConfig.js";
 
@@ -29,7 +30,10 @@ export function getTripleShell() {
 export async function prepareTripleShellArtwork(startup) {
   const targets = getTripleShell().refs.root.querySelectorAll('[data-triple-icon]');
   await startup.batch(targets, target => {
-    if (!target.querySelector(':scope > .ui-icon')) target.prepend(createIcon(target.dataset.tripleIcon));
+    if (!target.querySelector(':scope > .ui-icon')) {
+      const item=target.hasAttribute('data-triple-item')?TRIPLE_ITEMS.find(item=>item.id===target.dataset.tripleItem):null;
+      target.prepend(item?createSupportItemIcon(item):createIcon(target.dataset.tripleIcon));
+    }
   });
 }
 

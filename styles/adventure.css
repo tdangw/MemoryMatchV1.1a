@@ -106,7 +106,6 @@
 .adventure-map-sprite { display: block; background-image: url('/assets/adventure/garden-sprites.webp'); background-size: 400% 400%; background-repeat: no-repeat; pointer-events: none; }
 .adventure-map-chest-art { width: 72px; height: 64px; background-position: 0% 100%; }
 .adventure-map-node--chest.is-claimed .adventure-map-chest-art { background-position: 33.333333% 100%; }
-.adventure-map-decoration { position: absolute; aspect-ratio: 1; transform: translate(-50%, -50%); }
 .adventure-map-stars { color: #ffe096; font-size: 17px; letter-spacing: 1px; line-height: 21px; text-shadow: 0 1px 3px #000; }
 .adventure-map-detail { color: #d1dedf; font-size: 12px; white-space: nowrap; line-height: 16px; max-width: 140px; overflow: hidden; text-overflow: ellipsis; }
 .adventure-map-node:focus-visible { outline: 2px solid #fff0c5; outline-offset: 2px; }
@@ -172,6 +171,9 @@
 .adventure-preview-metric > .ui-icon { grid-row:1/3; width:24px; height:24px; color:var(--ui-ink); }
 .adventure-preview-label { font-size:11px; line-height:1.2; color:var(--ui-muted); }
 .adventure-preview-metric strong { font-size:16px; line-height:1.25; overflow-wrap:anywhere; }
+.adventure-preview-metric--unlimited { grid-template-columns:16px minmax(0,1fr); column-gap:3px; padding-inline:5px; }
+.adventure-preview-metric--unlimited > .ui-icon { width:16px; height:16px; }
+.adventure-preview-metric--unlimited strong { font-size:clamp(10px,3.4vw,12px); white-space:nowrap; overflow-wrap:normal; }
 .adventure-preview-metric--theme { grid-column:1/-1; grid-template-columns:24px auto minmax(0,1fr); min-height:44px; }
 .adventure-preview-metric--theme > .ui-icon { grid-row:1; }
 .adventure-preview-theme { justify-self:end; min-height:32px; max-width:100%; padding:3px 6px; border:0; border-radius:5px; background:transparent; color:var(--ui-gold); font-family:inherit; font-size:13px; font-weight:700; line-height:1.2; text-decoration:underline; text-underline-offset:3px; cursor:pointer; }

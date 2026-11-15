@@ -35,10 +35,11 @@ export async function publishCloudSnapshot({ database, environment, uid, encoded
   if(snapshotRewards&&reward)throw new Error('Snapshot backup cannot publish reward transactions.');
   const previous = await readCloudRoot(database, environment, uid);
   if (!isCurrent()) throw new Error("Tài khoản đã thay đổi.");
+  if (!reward && previous?.fingerprint === encoded.fingerprint && previous.playerName === playerName
+    && (previous.economyRevision||0) === (economyRevision||0)) return { root: previous, reads: 1, writes: 0 };
   if ((previous?.revision || 0) !== expectedRevision) throw new CloudConflictError(previous);
   if ((previous?.economyRevision || 0) > economyRevision) throw new CloudConflictError(previous);
   if (!snapshotRewards && (previous?.rewardRevision || 0) > rewardRevision) throw new CloudConflictError(previous);
-  if (!reward && previous?.fingerprint === encoded.fingerprint && previous.playerName === playerName) return { root: previous, reads: 1, writes: 0 };
   const previousHashes = previous ? manifestHashes(previous.manifest) : new Set();
   const changed = [...encoded.objects].filter(([hash]) => !previousHashes.has(hash));
   const stageId = crypto.randomUUID();

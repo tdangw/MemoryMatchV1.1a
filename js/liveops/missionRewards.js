@@ -1,5 +1,9 @@
 import { CHEST_SUPPORTS } from './chestConfig.js';
 
+export const WEEKLY_JOURNEY_REWARDS = Object.freeze([
+  {points:20,coins:5},{points:50,coins:10},{points:80,coins:10},
+].map(reward=>Object.freeze(reward)));
+
 export const LOGIN_REWARDS = Object.freeze([
   [10,'link-connect'],[10,'memory-match'],[15,'triple-connect'],
   [15,'memory-match'],[20,'triple-connect'],[25,'link-connect'],[50,null],

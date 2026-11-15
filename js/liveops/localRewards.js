@@ -6,7 +6,7 @@ import {CHEST_TYPES,CHEST_VERSION} from './chestConfig.js';
 import {chestCandidate,randomChestGame} from './chests.js';
 import {chestSupportCount} from './supportInventory.js';
 import {festivalChestsEnabled} from './availability.js';
-import {createWheelRolls,createWheelCandidate,WHEEL_VERSION} from './wheelRewards.js';
+import {createWheelRolls,createWheelCandidate,WHEEL_VERSION,WHEEL_ODDS_VERSION} from './wheelRewards.js';
 import {prepareFusionCandidate,PAID_LETTER_FUSION_POLICY} from './letters.js';
 import {projectSparkRewards,sparkOutcome} from './rewardProjection.js';
 import {committedRewardsForTransition,committedWheelRewardsForTransition} from './rewardFeedbackModel.js';
@@ -14,9 +14,11 @@ import {DAY_MS} from './model.js';
 import {hourlyGiftCandidate} from './hourlyGift.js';
 import {createLoginCandidate} from './missionRewards.js';
 import {getFirebaseEnvironment} from '../firebaseEnvironment.js';
+import {STORAGE_PURCHASE_VERSION} from './storageCapacity.js';
+import {STORAGE_ACCESS_VERSION} from './storageModel.js';
 
 export const LOCAL_REWARD_SYNC_POLICY='snapshot-v1';
-const localTypes=new Set(['status','login','daily','dailyBonus','weekly','openChest','sellChest','sellCosmeticFragments','fuseCosmeticFragments','sellLetter','fuseLetter','exchangeLetterSet','claimFestival','claimWheelReward','claimHourlyGift','spin']);
+const localTypes=new Set(['status','login','daily','dailyBonus','weekly','openChest','sellChest','unlockStorageSlot','sellCosmeticFragments','fuseCosmeticFragments','sellLetter','fuseLetter','exchangeLetterSet','claimFestival','claimWheelReward','claimHourlyGift','spin']);
 export const canRunLocalReward=command=>localTypes.has(command.type)&&(command.type!=='spin'||['free','ticket','ad'].includes(command.source));
 export function localRewardNow(save,confirmedNow=null){
   if(confirmedNow!==null)return Math.max(save.state?.day*DAY_MS||0,confirmedNow);
@@ -50,9 +52,11 @@ export function runLocalReward(identity,command,{current,confirmedNow=null,festi
     const preparedAdded=projectSparkRewards(data,prepared,identity.uid,owned);
     let action={...structuredClone(command),operation:command.type==='spin'&&command.source==='ad'?command.operation:crypto.randomUUID()};
     const state=prepared.state;
+    if(['openChest','sellChest','sellCosmeticFragments','fuseCosmeticFragments'].includes(action.type))action.storageAccessVersion??=STORAGE_ACCESS_VERSION;
     if(action.type==='login'&&action.loginVersion===2)action.loginCandidate=createLoginCandidate(state.loginNext,Array.from({length:3},secureUnit));
     if(action.type==='spin'&&action.source==='free'&&state.spins.free)throw new Error('Bạn đã dùng lượt miễn phí của kỳ đã lưu. Dùng vé để quay tiếp.');
     if(['openChest','sellChest'].includes(action.type))action.sequence=(state.chests?.sequence||0)+1;
+    if(action.type==='unlockStorageSlot'){action.sequence=action.sequence??(state.storageUnlocks?.sequence||0)+1;action.storageVersion??=STORAGE_PURCHASE_VERSION;}
     if(['sellLetter','fuseLetter','exchangeLetterSet'].includes(action.type))action.sequence=state.letters.sequence+1;
     if(['sellCosmeticFragments','fuseCosmeticFragments'].includes(action.type))action.sequence=state.cosmeticProgress.sequence+1;
     if(action.type==='openChest'){
@@ -65,7 +69,8 @@ export function runLocalReward(identity,command,{current,confirmedNow=null,festi
     }
     if(action.type==='fuseLetter')action=prepareFusionCandidate(state.letters,{...action,fusionPolicy:PAID_LETTER_FUSION_POLICY,fusionRoll:secureUnit()});
     if(action.type==='spin'){
-      action.day=action.day??state.day;action.sequence=state.ticketSpent+1;action.wheelVersion=action.wheelVersion??WHEEL_VERSION;action.wheelRolls=action.wheelRolls??createWheelRolls(secureUnit);action.wheelCandidate=action.wheelCandidate??createWheelCandidate(action.wheelRolls,wheelOwned,action.wheelVersion);
+      action.wheelOddsVersion=action.wheelOddsVersion??(action.wheelRolls?1:WHEEL_ODDS_VERSION);
+      action.day=action.day??state.day;action.sequence=state.ticketSpent+1;action.wheelVersion=action.wheelVersion??WHEEL_VERSION;action.wheelRolls=action.wheelRolls??createWheelRolls(secureUnit);action.wheelCandidate=action.wheelCandidate??createWheelCandidate(action.wheelRolls,wheelOwned,action.wheelVersion,action.wheelOddsVersion);
     }
     const candidate=['openChest','claimHourlyGift'].includes(action.type)?action.candidate:action.type==='spin'?action.wheelCandidate:action.type==='claimWheelReward'?state.pendingWheel?.wheel:null;
     const supportCount=candidate?.kind==='support'?chestSupportCount(data.progress,candidate.gameId,candidate.key):0;

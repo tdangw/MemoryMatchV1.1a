@@ -1,0 +1,37 @@
+{
+  "tool": "built-in image_gen",
+  "transparent_background": true,
+  "references": [
+    "design/shop-catalog/reference-four-column.png"
+  ],
+  "entries": [
+    {
+      "key": "exit/link-effect-moon-petals",
+      "master": "illustrations/exit-link-effect-moon-petals-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-273ab866-df6f-448e-be15-0c0d04526c7f.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A cream playing card with a fine warm-gold rim and a small clean blue geometric diamond (drawn shape, not a font glyph), with the removal effect visibly changing the card. Card is the dominant big object, slightly tilted at most, pieces large and clear rather than microscopic. Same card design throughout this family. The cream card releasing a few large pale pink petals and soft gold moon-shaped glints as it disappears, elegant blue-white highlights, no labels.",
+      "status": "generated-candidate"
+    },
+    {
+      "key": "exit/triple-effect-crystal-bloom",
+      "master": "illustrations/exit-triple-effect-crystal-bloom-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-260a31ab-8ced-44e7-86ac-909a042f5598.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A cream playing card with a fine warm-gold rim and a small clean blue geometric diamond (drawn shape, not a font glyph), with the removal effect visibly changing the card. Card is the dominant big object, slightly tilted at most, pieces large and clear rather than microscopic. Same card design throughout this family. The cream card breaking into three large radiant cyan violet crystal petals with a small warm golden central light, compact crystal blossom removal effect.",
+      "status": "generated-candidate"
+    },
+    {
+      "key": "flip/bounce",
+      "master": "illustrations/flip-bounce-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-2fae742a-873b-429a-8b67-7e0a285db533.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A blue-backed cream playing card with thin gold rim and small simple geometric center diamond, and a clear gold or teal motion cue for the flip/reveal effect. Big simple forms, no labels, no letter on the card. Same card throughout this family. The card bouncing upward with a broad golden curved bounce swoosh below it and one faint previous card outline, lively but simple.",
+      "status": "generated-candidate"
+    },
+    {
+      "key": "flip/fade-scale",
+      "master": "illustrations/flip-fade-scale-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-df8bc8a5-45e9-4aea-8582-a6d3bd340d54.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A blue-backed cream playing card with thin gold rim and small simple geometric center diamond, and a clear gold or teal motion cue for the flip/reveal effect. Big simple forms, no labels, no letter on the card. Same card throughout this family. A clear medium card growing from one small translucent card outline behind it, soft blue fade and gentle gold halo, simple scale-up reveal.",
+      "status": "generated-candidate"
+    }
+  ]
+}

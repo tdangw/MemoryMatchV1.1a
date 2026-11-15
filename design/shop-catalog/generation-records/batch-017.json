@@ -1,0 +1,37 @@
+{
+  "tool": "built-in image_gen",
+  "transparent_background": true,
+  "references": [
+    "design/shop-catalog/reference-four-column.png"
+  ],
+  "entries": [
+    {
+      "key": "theme/fashion",
+      "master": "illustrations/theme-fashion-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-a85a36a8-dace-4475-bb4b-4298a43faf87.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A friendly high-quality illustrated representative object or character for this card theme, like the reference's deer, noodle bowl, fruit and planet icons. Warm dimensional casual game illustration, bright clear color, simple strong silhouette; not a contact sheet of cards and not a screenshot. A soft pink collared shirt paired with one small teal handbag with a gold clasp, friendly polished clothing and accessory theme icon.",
+      "status": "generated-candidate"
+    },
+    {
+      "key": "theme/vehicles",
+      "master": "illustrations/theme-vehicles-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-34d6bff8-2115-478d-850b-0daf1bd0dcfa.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A friendly high-quality illustrated representative object or character for this card theme, like the reference's deer, noodle bowl, fruit and planet icons. Warm dimensional casual game illustration, bright clear color, simple strong silhouette; not a contact sheet of cards and not a screenshot. One cute small sky-blue car in three-quarter view with two clearly visible dark wheels and warm-gold light details, no road or scene.",
+      "status": "generated-candidate"
+    },
+    {
+      "key": "theme/festivals",
+      "master": "illustrations/theme-festivals-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-60d399b9-2f94-4760-82fd-eceb729792d0.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A friendly high-quality illustrated representative object or character for this card theme, like the reference's deer, noodle bowl, fruit and planet icons. Warm dimensional casual game illustration, bright clear color, simple strong silhouette; not a contact sheet of cards and not a screenshot. One beautiful bright red festival lantern with simple warm-gold trim and a short gold tassel, no letters or calligraphy, festive warm highlights.",
+      "status": "generated-candidate"
+    },
+    {
+      "key": "theme/alphabet",
+      "master": "illustrations/theme-alphabet-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-50089bb2-0f54-4a90-9295-03621a3a3e14.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A friendly high-quality illustrated representative object or character for this card theme, like the reference's deer, noodle bowl, fruit and planet icons. Warm dimensional casual game illustration, bright clear color, simple strong silhouette; not a contact sheet of cards and not a screenshot. Three attractive small overlapping blue teal and violet game cards showing the game-content letters A B C in clean cream lettering, no other text.",
+      "status": "generated-candidate"
+    }
+  ]
+}

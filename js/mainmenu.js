@@ -1,13 +1,13 @@
 import { openPlayerProfile } from './appNavigation.js';
 import { festivalChestsEnabled } from './liveops/availability.js';
 import { mountChestInventory } from './liveops/chestPresentation.js';
+import { clearTooltip } from './tooltips.js';
 // Mainmenu.js
 import { getGameProgressKey } from './gameCatalog.js';
 import { canLaunchGame } from './profileOperations.js';
 import { createGameShellLifecycle } from "./gameShell/gameShellLifecycle.js";
-import { mountAdventureMap, getViewedAdventureBlock } from "./adventureMap.js";
-import { renderMasteryCollection } from './progression/masteryCollection.js';
-import { decorateAchievementEffectPreview } from './progression/achievementEffectPreview.js';
+import { mountAdventureMap } from "./adventureMap.js";
+import { decorateCatalogCard, prepareCatalogGroup } from './catalogArt.js';
 
 import { syncDefaultMusic } from "./sound.js";
 import { gameState, resetGame } from "./gameState.js";
@@ -199,9 +199,9 @@ export async function showCollectionModal({
   const content = document.createElement("div");
   content.className = "collection-content";
   const collectionScope = createGameShellLifecycle();
+  collectionScope.own(clearTooltip);
   const collectionProfile = gameState.progress[getGameProgressKey(gameId)];
   const isCollectionCurrent = () => collectionScope.active && canLaunchGame() && gameState.progress[getGameProgressKey(gameId)] === collectionProfile;
-  const collectionBlock = fromGame ? undefined : getViewedAdventureBlock(gameId);
   const modal = openAppModal({
     ...surface,
     id: "collection-modal",
@@ -291,7 +291,7 @@ export async function showCollectionModal({
       card.className = `theme-choice${equipped ? " is-equipped" : ""}`;
       const preview = document.createElement("div");
       preview.className = "appearance-preview theme-preview";
-      preview.append(createIcon(theme.icon));
+
       const name = document.createElement("strong");
       name.textContent = theme.title;
       const button = document.createElement("button");
@@ -325,9 +325,11 @@ export async function showCollectionModal({
         };
       }
       card.append(preview, name, button);
+      decorateCatalogCard(card, theme, "theme");
       choices.append(card);
     });
     group.append(heading, choices);
+    prepareCatalogGroup(group);
     grid.append(group);
   };
 
@@ -354,7 +356,7 @@ export async function showCollectionModal({
           card.className = `appearance-choice${equipped ? " is-equipped" : ""}`;
           const preview = document.createElement("div");
           preview.className = `link-effect-preview ${item.className}`;
-          if (!decorateAchievementEffectPreview(preview, item)) preview.append(createIcon(item.icon));
+
           const name = document.createElement("strong");
           name.textContent = item.title;
           const button = document.createElement("button");
@@ -378,13 +380,14 @@ export async function showCollectionModal({
             };
           }
           card.append(preview, name, button);
+          decorateCatalogCard(card, item, equippedKey.endsWith("PathEffect") ? "path" : "exit");
           choices.append(card);
         });
       group.append(heading, choices);
-      grid.append(group);
+      prepareCatalogGroup(group);
+    grid.append(group);
     };
     collectionTabs = await mountCollectionTabs([
-      { id: "pictures", label: "Thành tích", render: () => renderMasteryCollection(grid, gameId, { block: collectionBlock, owner: collectionScope, onOpenChests:openChests }) },
       { id: "themes", label: "Chủ đề", render: renderThemes },
       { id: "path", label: "Đường nối", render: () => renderLinkEffects("Hiệu ứng đường nối", "linkPathEffect", "ownedLinkPathEffects", LINK_PATH_EFFECTS) },
       { id: "exit", label: "Xóa thẻ", render: () => renderLinkEffects("Hiệu ứng xóa thẻ", "linkExitEffect", "ownedLinkExitEffects", LINK_EXIT_EFFECTS) },
@@ -405,7 +408,7 @@ export async function showCollectionModal({
         card.className = `appearance-choice${equipped ? " is-equipped" : ""}`;
         const preview = document.createElement("div");
         preview.className = `link-effect-preview ${item.className}`;
-        if (!decorateAchievementEffectPreview(preview, item)) preview.append(createIcon(item.icon));
+
         const name = document.createElement("strong");
         name.textContent = item.title;
         const button = document.createElement("button");
@@ -431,20 +434,20 @@ export async function showCollectionModal({
           };
         }
         card.append(preview, name, button);
+        decorateCatalogCard(card, item, kind);
         choices.append(card);
       });
       group.append(heading, choices);
-      grid.append(group);
+      prepareCatalogGroup(group);
+    grid.append(group);
     };
     collectionTabs = await mountCollectionTabs([
-      { id: "pictures", label: "Thành tích", render: () => renderMasteryCollection(grid, gameId, { block: collectionBlock, owner: collectionScope, onOpenChests:openChests }) },
       { id: "themes", label: "Chủ đề", render: renderThemes },
       { id: "path", label: "Đường nối", render: () => renderTripleEffects("Hiệu ứng đường nối", "path", "ownedTriplePathEffects", "triplePathEffect", LINK_PATH_EFFECTS) },
       { id: "exit", label: "Xóa thẻ", render: () => renderTripleEffects("Hiệu ứng xóa thẻ", "exit", "ownedTripleExitEffects", "tripleExitEffect", LINK_EXIT_EFFECTS) },
     ]);
   } else {
     collectionTabs = await mountCollectionTabs([
-      { id: "pictures", label: "Thành tích", render: () => renderMasteryCollection(grid, gameId, { block: collectionBlock, owner: collectionScope, onOpenChests:openChests }) },
       { id: "appearance", label: "Ngoại hình", render: renderAppearance },
       { id: "flip", label: "Hiệu ứng lật", render: renderFlipEffects },
       { id: "themes", label: "Chủ đề", render: renderThemes },
@@ -473,7 +476,7 @@ function renderCollectionAppearanceGroup(grid, title, type, items, isCurrent = (
         preview.className = `appearance-preview ${item.previewClass}`;
       else {
         preview.className = `appearance-effect-preview ${item.animationClass}`;
-        if (!decorateAchievementEffectPreview(preview, item)) preview.append(createIcon('images'));
+
       }
       preview.setAttribute("aria-hidden", "true");
       const name = document.createElement("strong");
@@ -507,10 +510,12 @@ function renderCollectionAppearanceGroup(grid, title, type, items, isCurrent = (
         };
       }
       card.append(preview, name, button);
+      decorateCatalogCard(card, item, type === "cardBack" ? "back" : "flip");
       choices.append(card);
     });
   group.append(heading, choices);
-  grid.append(group);
+  prepareCatalogGroup(group);
+    grid.append(group);
 }
 
 function applyCollectionCardBack() {

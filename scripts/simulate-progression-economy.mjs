@@ -18,7 +18,7 @@ for(const gameId of ['memory-match','link-connect','triple-connect']) for(const 
     // Endless has no countdown: use the timed Normal pace only to estimate duration.
     const activeMs=Math.round((budget || calculateWaveTime({gameId,mode:'normal',totalGroups:groups})*waves)*ratio*1000);
     score+=calculateFastFinishBonus({totalGroups,mode,activeMs,allocatedSeconds:budget});
-    const stars=calculateProgressionStars({score,totalGroups,mode,won:true});
+    const stars=calculateProgressionStars({gameId,score,totalGroups,mode,won:true});
     const coins=calculateVictoryCoins({gameId,mode,totalGroups,stars});
     const oldThreeStarCoins=gameId==='memory-match' ? calculateCoinReward(mode,Math.floor((layout.timeSeconds||60)*(1-ratio)))
       : gameId==='link-connect' ? calculateLinkCoinReward(mode,Math.floor((layout.timeSeconds||60)*(1-ratio)))

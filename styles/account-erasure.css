@@ -4,9 +4,12 @@
 .account-erasure-dialog .app-modal__body { padding: 8px 20px 20px; }
 .account-erasure { min-width: 0; text-align: center; }
 .account-erasure__stage > * { animation: account-erasure-enter 160ms ease-out both; }
-.account-erasure__step { margin: 0 0 14px !important; color: var(--dialog-muted); font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-.account-erasure__badge { display: grid; place-items: center; width: 58px; height: 58px; margin: 0 auto 14px; border: 1px solid color-mix(in srgb, var(--erasure-accent) 45%, transparent); border-radius: 18px; background: color-mix(in srgb, var(--erasure-accent) 9%, transparent); color: var(--erasure-accent); }
-.account-erasure__badge .ui-icon { width: 28px; height: 28px; }
+.account-erasure__steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 4px 0 20px; padding: 0; list-style: none; }
+.account-erasure__step { display: grid; gap: 7px; min-width: 0; color: var(--dialog-muted); font-size: 11px; font-weight: 650; line-height: 1.3; }
+.account-erasure__step::before { content: ''; height: 4px; border-radius: 4px; background: var(--dialog-line); }
+.account-erasure__step[data-state="complete"]::before,
+.account-erasure__step[data-state="current"]::before { background: var(--erasure-accent); }
+.account-erasure__step[aria-current="step"] { color: var(--dialog-ink); font-weight: 800; }
 .account-erasure__warning { margin: 0 !important; color: var(--dialog-ink); font-size: 15px; font-weight: 700; }
 .account-erasure__losses { display: grid; gap: 6px; margin: 12px 0; padding: 0; list-style: none; color: var(--dialog-muted); font-size: 13px; line-height: 1.45; }
 .account-erasure__identity { margin: 12px 0 18px !important; padding: 10px 12px; border: 1px solid var(--dialog-line); border-radius: 10px; background: color-mix(in srgb, var(--erasure-accent) 6%, transparent); color: var(--dialog-ink); font-size: 13px; line-height: 1.55; }
@@ -28,11 +31,9 @@
 .account-erasure__countdown strong { color: var(--erasure-accent); font-size: 36px; line-height: 1.2; font-variant-numeric: tabular-nums; }
 .account-erasure__progress { height: 6px; overflow: hidden; border-radius: 8px; background: color-mix(in srgb, var(--erasure-accent) 12%, transparent); }
 .account-erasure__progress-fill { display: block; width: 100%; height: 100%; transform: scaleX(0); transform-origin: left center; background: var(--erasure-accent); }
-.account-erasure-dialog[data-erasure-phase="submitting"] .account-erasure__badge { border-color: var(--dialog-line); }
 @keyframes account-erasure-enter { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 @media (max-width: 360px) {
   .account-erasure-dialog .app-modal__body { padding: 6px 14px 16px; }
-  .account-erasure__badge { width: 50px; height: 50px; margin-bottom: 10px; }
   .account-erasure__identity { margin-bottom: 14px !important; }
 }
 @media (prefers-reduced-motion: reduce) { .account-erasure__stage > * { animation: none; } }

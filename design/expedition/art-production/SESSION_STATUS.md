@@ -1,21 +1,18 @@
-# Art production — paused after two requested groups, 2026-11-09
+# Art production checkpoint — 2026-11-11
 
-User authorized exactly two additional groups of six items / 24 images, then pause. All 24 built-in imagegen calls finished successfully and all results were copied into project masters and registered immediately. No third group started. Resume only on user request. Same active plan: COSMETIC_UPGRADE_IMPLEMENTATION_PLAN.md, Gate 5.
+Same active plan: COSMETIC_UPGRADE_IMPLEMENTATION_PLAN.md. Gate 5 completed for the web test handoff.
 
-## Current totals
+- 101 items / 202 distinct evolution designs approved and exported as 606 transparent lossless WebP files (128/256/512). Manifest status complete. Original 303 images remain unchanged.
+- 236 preserved master records include superseded revisions; do not confuse master count with design count. All prompts/source hashes remain in prompts.json and journal.json. Final six frame repairs used built-in imagegen.
+- All 101 original/form2/form3 comparisons inspected; 303 mixed three-layer portraits viewed at116/52px, 23 badges ×3 forms at32px on dark/light. Frame connected openings, alpha, margins and shared face clearance checked. Possible13,689 avatar/frame and8,073 frame/badge pairs are covered by shared face-region geometry, not an individually rendered exhaustive matrix.
+- Opening masks are not claimed pixel-identical: minimum IoU0.879. Two final frames use an extra uniform fit of2.18%/1.22%, reducing opening width by1.46/0.85px at116 to retain outer ornaments. No protected face intrusion. No nonuniform warping or added generic overlay.
+- Exports total51,737,686bytes. All606 export hashes/dimensions and all606 corresponding APK entries verified. Runtime catalog regenerated from manifest:202/202 ready.
+- Product QA ledger: product-visual-approval.json; numerical evidence: product-qa-metrics.json. finalize_cosmetics.py uses Pillow/NumPy/SciPy for offline QA/export; it verifies approval hashes and does not change game logic.
 
-- 60/202 distinct designs have confirmed candidate sources; 142 designs have no candidate.
-- 66 master records include preserved revisions; do not confuse this with design count.
-- Manifest unchanged: 10/202 ready designs, 30/606 exported WebP files. Existing export bytes/dimensions/SHA256 verified again. Cross-match limitation remains first six items.
-- This session: 24 new candidates for 12 items, 12 per group. Jobs and exact prompts: jobs-two-groups-2026-11-09.json and prompts.json. Individual result-*.json and journal.json retain master/source/hash provenance.
-- Original/three-form visual sheets: two-groups-1-review-2026-11-09.png and two-groups-2-review-2026-11-09.png. Per-form checks and issues: two-groups-qa-2026-11-09.json. All 24 remain unapproved for product use.
+## Web and handoff
 
-## Pending work and continuation
+269unit PASS, npm run check PASS, web build PASS;49 targeted UI PASS plus5 full-art/forms UI PASS,3 production-worker offline PASS and1 emulator gameplay PASS. Three emulator script suites PASS (cosmetic boundaries/fees/replay, public rights, snapshot backup/CAS). Full-art UI cycles decoded202 portraits with exactly3layers, zero retained DOM nodes and552,044byte JS heap increase after GC; this is not a long-run leak or Android performance certification.
 
-- Complete product QA of these candidates: eye/face anchors, small-size readability, exact opening contour, alpha fringe, bottom-slot clearance and cross-equipment combinations. Source edge-contact findings need inspection/revision, not cropping to force a pass.
-- Frosted branch pale fringe and honeycomb exterior glow residue need checking. Candidate generation is not a ready milestone.
-- Earlier astral orbit form3 still needs revision because a gold rail crosses the opening. Earlier gilded-page, silken-cloud, laurel, cherry and sky frame revisions remain pending product QA. Prior item-specific notes: group-six-qa-2026-11-09.json and journal.json.
-- Scholar squirrel form3-r2 is already saved; do not regenerate the previously interrupted job accidentally.
-- Next ungenerated item in A1 is memory-frame-memory-crown; then continue A2 onward when resumed. Check journal before every new call.
+Expanded regression:90/98 passed; one forge test used an obsolete label and passed after correction. Seven audio cases remain unaccepted. Browser account-backup emulator test timed out before binding despite three isolated attempts; backend snapshot/owner/CAS checks passed. These remain explicit follow-up items, not silently closed gates.
 
-No logic/UI/offline/save/original assets/catalog mapping edited. No deploy/APK, no game check/build run. Only art source/alignment/provenance and existing manifest file validation performed. No new export approvals in this session.
+User authorized combining all existing working changes, commit/push, test Hosting and APK; physical Android verification belongs to user. User requested pausing after necessary delivery. Complete report: design/expedition/COSMETIC_ACCEPTANCE_2026-11-11.md. Do not deploy production or claim complete plan acceptance while follow-up items remain.

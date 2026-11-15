@@ -69,7 +69,7 @@ test('special preview blocks repeated launch and remains retryable after a faile
     window.launches = [];
     (await import('/js/adventureMap.js')).configureAdventureMap({ adapters: { 'memory-match': {
       goal: 'Ghép hết các cặp thẻ.',
-      preview: () => ({ timeSeconds: 0, target: '30 cặp · 60 thẻ', hints: 3 }),
+      preview: () => ({ timeSeconds: 0, target: '30 cặp · 60 thẻ', threeStarScore:930, hints: 3 }),
       launch: options => { window.launches.push(options); return new Promise(resolve => { window.finishLaunch = resolve; }); },
     } } });
     await (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('memory-match');

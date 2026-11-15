@@ -80,16 +80,21 @@ export function calculateFastFinishBonus({ totalGroups, activeMs, allocatedSecon
   return Math.round(3 * totalGroups * Math.max(0, 1 - activeMs / (allocatedSeconds * 1000)));
 }
 
-export function getProgressionStarTargets({ totalGroups, mode }) {
+const MEMORY_STAR_TARGET_PERCENT = 80;
+
+export function getProgressionStarTargets({ totalGroups, mode, gameId }) {
+  if (gameId !== undefined && !getGameDefinition(gameId)) throw new RangeError('Unknown game.');
   if (!getGameMode(mode) || !Number.isSafeInteger(totalGroups) || totalGroups < 1 || totalGroups > 5000)
     throw new RangeError('Invalid star target.');
   const endless = mode === 'endless';
-  return Object.freeze({ two: Math.ceil(totalGroups * (endless ? 12.5 : 13)),
-    three: Math.ceil(totalGroups * (endless ? 15.5 : 16.5)) });
+  const percent = gameId === 'memory-match' ? MEMORY_STAR_TARGET_PERCENT : 100;
+  const target = perGroup => Math.ceil(Math.ceil(totalGroups * perGroup) * percent / 100);
+  return Object.freeze({ two: target(endless ? 12.5 : 13),
+    three: target(endless ? 15.5 : 16.5) });
 }
 
-export function calculateProgressionStars({ totalGroups, mode, score, won }) {
-  const targets = getProgressionStarTargets({ totalGroups, mode });
+export function calculateProgressionStars({ totalGroups, mode, score, won, gameId }) {
+  const targets = getProgressionStarTargets({ totalGroups, mode, gameId });
   if (!Number.isSafeInteger(score) || score < 0 || typeof won !== 'boolean')
     throw new RangeError('Invalid result.');
   return score >= targets.three ? 3 : score >= targets.two ? 2 : won ? 1 : 0;

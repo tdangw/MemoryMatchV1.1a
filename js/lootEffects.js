@@ -1,6 +1,6 @@
 import { playRewardPhase } from './rewardAudio.js';
 import { getActiveGameScope } from './gameShell/gameShellLifecycle.js';
-import { createIcon } from "./icons.js";
+import { createRewardIcon } from './catalogArt.js';
 import { prefersReducedMotion } from "./motion.js";
 import { trackEffect } from "./gameShell/gameShellEffects.js";
 
@@ -14,11 +14,13 @@ export const LOOT_PRESETS = Object.freeze({
 
 export function playLootDrop(source, {
   icon = "energy",
+  supportKind = null,
   tier = "teal",
   target = null,
   holdMs = LOOT_HOLD_MS,
   onSettled,
   onCollected,
+  receiveCue = true,
   preset = "memory",
   timing = {},
 } = {}) {
@@ -31,7 +33,7 @@ export function playLootDrop(source, {
   const audioOwner=getActiveGameScope();
   if (!source) { onSettled?.(); onCollected?.(); return null; }
   if (prefersReducedMotion()) {
-    playRewardPhase('receive',audioOwner);
+    if(receiveCue)playRewardPhase('receive',audioOwner);
     onSettled?.();
     onCollected?.();
     return null;
@@ -50,12 +52,13 @@ export function playLootDrop(source, {
   const element = document.createElement("span");
   element.className = `game-loot-drop game-loot-drop--${tier}`;
   element.setAttribute("aria-hidden", "true");
-  element.append(createIcon(icon));
+  element.append(createRewardIcon(icon, supportKind));
   element.style.left = `${startX}px`;
   element.style.top = `${startY}px`;
   document.body.append(element);
   const lifecycle = entry.scope;
-  playRewardPhase('receive',audioOwner);playRewardPhase('drop',audioOwner);
+  if (receiveCue) playRewardPhase('receive', audioOwner);
+  playRewardPhase('drop', audioOwner);
   activeLoot.set(element, { lifecycle, entry, audioOwner });
 
   const drop = element.animate([

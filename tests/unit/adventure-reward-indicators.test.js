@@ -43,12 +43,12 @@ test('events recognize free spin, tickets, complete letter recipes and each uncl
     const first = Object.keys(recipe.required)[0]; state.letters.counts[first]--; assert.equal(ready(input).events,false);
   }
   state.letters.counts = {};
-  state.festival = { earnedTotal:24,completedCycles:0,mask:0 }; assert.equal(ready(input).events,false);
-  for (const [points,mask] of [[25,0],[50,1],[75,3],[100,7]]) {
-    state.festival = { earnedTotal:points,completedCycles:0,mask }; assert.equal(ready(input).events,true);
-    state.festival.mask |= (1 << ([25,50,75,100].indexOf(points))); assert.equal(ready(input).events,false);
+  state.festival = { version:2, earnedTotal:9,completedCycles:0,mask:0 }; assert.equal(ready(input).events,false);
+  for (const [points,mask] of [[10,0],[25,1],[50,3],[75,7],[100,15]]) {
+    state.festival = { version:2, earnedTotal:points,completedCycles:0,mask }; assert.equal(ready(input).events,true);
+    state.festival.mask |= (1 << ([10,25,50,75,100].indexOf(points))); assert.equal(ready(input).events,false);
   }
-  state.festival = { earnedTotal:124,completedCycles:1,mask:0 }; assert.equal(ready(input).events,false);
+  state.festival = { version:2, earnedTotal:109,completedCycles:1,mask:0 }; assert.equal(ready(input).events,false);
   state.festival.earnedTotal++; assert.equal(ready(input).events,true);
   input.festivalEnabled = false; assert.equal(ready(input).events,false);
 });
@@ -68,7 +68,7 @@ test('durable event rewards survive an unknown or expired clock while free/login
   assert.equal(ready(input).events,false); assert.equal(ready(input).missions,false);
   state.tickets=1; assert.equal(ready(input).events,true); state.tickets=0;
   state.letters.counts={...LETTER_SETS[0].required}; assert.equal(ready(input).events,true); state.letters.counts={};
-  state.festival={earnedTotal:25,completedCycles:0,mask:0}; assert.equal(ready(input).events,true); state.festival.mask=1;
+  state.festival={version:2,earnedTotal:10,completedCycles:0,mask:0}; assert.equal(ready(input).events,true); state.festival.mask=1;
   assert.equal(ready(input).events,false);
   input.period={uid,day:state.day}; assert.equal(ready(input).events,true); assert.equal(ready(input).missions,true);
   input.period.day++; assert.equal(ready(input).events,false); assert.equal(ready(input).missions,false);

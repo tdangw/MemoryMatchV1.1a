@@ -14,7 +14,7 @@ export async function requestLiveops(command={type:'status'}){
  if(hourlyFixture.fail)throw Error('network');
  if(hourlyFixture.delay)await new Promise(resolve=>hourlyFixture.resolve=resolve);
  now=Date.now()+offset;const cmd={...command};
- if(cmd.type==='claimHourlyGift'){hourlyFixture.claims++;cmd.operation=crypto.randomUUID();cmd.sequence=(state.hourlyGift?.sequence||0)+1;cmd.candidate=hourlyFixture.kind==='support'?{kind:'support',coins:0,gameId:hourlyFixture.gameId,key:hourlyFixture.key}:{kind:hourlyFixture.kind,coins:hourlyFixture.kind==='coins'?hourlyFixture.coins:0,gameId:null,key:null,...(hourlyFixture.kind==='ticket'?{tickets:10}:{})};}
+ if(cmd.type==='claimHourlyGift'){hourlyFixture.claims++;cmd.operation=crypto.randomUUID();cmd.sequence=(state.hourlyGift?.sequence||0)+1;cmd.candidate=hourlyFixture.kind==='support'?{kind:'support',coins:0,gameId:hourlyFixture.gameId,key:hourlyFixture.key}:{kind:hourlyFixture.kind,coins:hourlyFixture.kind==='coins'?hourlyFixture.coins:0,gameId:null,key:null,...(hourlyFixture.kind==='ticket'?{tickets:10}:hourlyFixture.kind==='chest'?{chestType:hourlyFixture.chestType}:{})};}
  const result=transitionSpark(state,cmd,{uid:'gift-test',now});state=result.state;
  for(const receipt of result.receipts){gameState.coins+=receipt.coins;if(receipt.support)creditChestSupport(gameState.progress,receipt.support);}
  return result;
@@ -64,7 +64,7 @@ test('outside popup effects, cooldown, retry and owner interruption preserve one
   await page.evaluate(kind=>hourlyFixture.kind=kind,kind);await advance(page);await open(page);await page.getByRole('button',{name:'Mở quà',exact:true}).click();await expect(page.locator('#hourly-gift-modal')).toHaveCount(0);await expect(page.locator('.hourly-gift-reveal')).toBeVisible();if(kind==='ticket'){await expect(page.locator('.hourly-gift__result')).toContainText('10 Vé quay');await expect(page.locator('.hourly-gift-particle')).toHaveCount(10);}
   await page.locator('#menu-container .adventure-header .adventure-exit').click();await expect(page.locator('.hourly-gift-reveal,.hourly-gift-particles')).toHaveCount(0,{timeout:7000});
   await page.evaluate(async()=>(await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('memory-match'));
-  expect(await page.evaluate(async()=>(await import('/js/appPageLifecycle.js')).getAppPageScope().diagnostics())).toEqual(baseline);
+  await expect.poll(()=>page.evaluate(async()=>(await import('/js/appPageLifecycle.js')).getAppPageScope().diagnostics())).toEqual(baseline);
   await expect(page.getByRole('button',{name:'Quà tặng',exact:true})).toBeDisabled();await expect(page.locator('#hourly-gift-modal')).toHaveCount(0);
  }
  expect(await page.evaluate(async()=>(await import('/js/gameState.js')).gameState.progress.memoryMatch.items.hint)).toBe(1);
@@ -73,7 +73,7 @@ test('outside popup effects, cooldown, retry and owner interruption preserve one
  await page.evaluate(()=>hourlyFixture.delay=true);await page.getByRole('button',{name:'Quà tặng',exact:true}).click();await page.keyboard.press('Escape');await expect(page.locator('#hourly-gift-modal')).toHaveCount(0);await page.evaluate(()=>{hourlyFixture.delay=false;hourlyFixture.resolve();});await expect(page.locator('.hourly-gift-particles')).toHaveCount(0);
  await advance(page);await open(page);await page.getByRole('button',{name:'Mở quà',exact:true}).click();await expect(page.locator('#hourly-gift-modal')).toHaveCount(0);await expect(page.locator('.hourly-gift-particle')).toHaveCount(5);await expect(page.locator('.hourly-gift-reveal,.hourly-gift-particles')).toHaveCount(0,{timeout:7000});
  expect(await page.evaluate(()=>hourlyFixture.claims)).toBe(4);
- expect(await page.evaluate(async()=>(await import('/js/appPageLifecycle.js')).getAppPageScope().diagnostics())).toEqual(baseline);
+ await expect.poll(()=>page.evaluate(async()=>(await import('/js/appPageLifecycle.js')).getAppPageScope().diagnostics())).toEqual(baseline);
 });
 
 
@@ -140,4 +140,15 @@ test('support reward toast stays on one compact line for every item at narrow si
  await page.waitForFunction(()=>document.querySelector('.hourly-gift-particle')?.getAnimations()[0]?.currentTime>=1900);
  await page.screenshot({path:info.outputPath('compact-support-toast.png')});
  await expect(page.locator('.hourly-gift-reveal > .adventure-action-art')).toHaveCSS('opacity','0');
+});
+
+test('gift chest renders matching artwork, credits storage and cleans up',async({page})=>{
+ await ready(page);await page.emulateMedia({reducedMotion:'no-preference'});
+ await page.evaluate(()=>{hourlyFixture.kind='chest';hourlyFixture.chestType='badge';});
+ await open(page);await page.getByRole('button',{name:'Mở quà',exact:true}).click();
+ await expect(page.locator('.hourly-gift__result [data-chest-type="badge"]')).toBeVisible();
+ await expect(page.locator('.hourly-gift-particle')).toHaveCount(1);
+ await expect(page.locator('.hourly-gift-reveal')).toHaveCount(0,{timeout:10000});
+ await expect(page.locator('.hourly-gift-particle')).toHaveCount(0);
+ expect(await page.evaluate(()=>hourlyFixture.claims)).toBe(1);
 });

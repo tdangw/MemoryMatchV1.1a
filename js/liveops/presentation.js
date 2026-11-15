@@ -1,4 +1,7 @@
 import { isAppActive } from '../appVisibility.js';
+import { clearTooltip } from '../tooltips.js';
+import { createRewardInfo } from '../rewardInfo.js';
+import { chestContents,wheelChestContents } from './chestInfo.js';
 import { createChestArt } from './chestArt.js';
 import { mountChestInventory } from './chestPresentation.js';
 import { letterArtwork, openLetterActions, openLetterFusion } from './letterCrafting.js';
@@ -36,6 +39,7 @@ import '../../styles/liveops.css';
 const el = (tag, className, text) => { const node = document.createElement(tag); node.className = className; if (text !== undefined) node.textContent = text; return node; };
 export function openLiveopsPage(kind, surface = {}) {
   const scope = createGameShellLifecycle(), root = el('div', 'liveops'), status = el('p', 'liveops__status', 'Đang tải tiến độ…');
+  scope.own(clearTooltip);
   status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
   let content = el('div', 'liveops__content'); root.append(status, content);
   const modal = openAppModal({ ...surface, id: `${kind}-screen`, title: kind === 'missions' ? 'Nhiệm vụ' : 'Sự kiện',
@@ -140,14 +144,15 @@ export function openLiveopsPage(kind, surface = {}) {
   const scrollHost = root.closest('.app-modal__body') || root.parentElement;
   const rememberScroll = key => { if(scrollHost)scrolls.set(key,scrollHost.scrollTop); };
   function renderMissions() {
-    mountMissions(content, {view, tab, busy, canClaim:Boolean(canClaim()), run, play, renderEmpty:renderConnection, canPlay:!getActiveGameScope(), selectTab:key=>{
-      if(key!==tab){rememberScroll(tab);tab=key;scope.frame(()=>{if(scrollHost)scrollHost.scrollTop=scrolls.get(key)||0;});}
+    mountMissions(content, {view, tab, busy, canClaim:Boolean(canClaim()), run, play, getNow:missionNow, renderEmpty:renderConnection, canPlay:!getActiveGameScope(), selectTab:key=>{
+      if(key!==tab){clearTooltip();rememberScroll(tab);tab=key;scope.frame(()=>{if(scrollHost)scrollHost.scrollTop=scrolls.get(key)||0;});}
     }});
     tick();
   }
+  function missionNow(){return Math.floor(view.serverNow+performance.now()-observedAt);}
   function tick() {
     if(!active()||!isAppActive()||!view||kind!=='missions')return;
-    const now=Math.floor(view.serverNow+performance.now()-observedAt);
+    const now=missionNow();
     updateMissionCountdown(root,view.state,now);
     const targetDay=Math.floor(now/DAY_MS);
     if(targetDay>view.state.day&&refreshDay!==targetDay&&!busy&&navigator.onLine){refreshDay=targetDay;void run({type:'status'});}
@@ -175,7 +180,7 @@ export function openLiveopsPage(kind, surface = {}) {
   function renderEvents() {
     const tabs = createTabs('events', [['wheel','Vòng quay'],['letters','Sưu tập chữ'],['festival','Sưu tập huy hiệu']], eventTab, (key, panel) => {
       if(key!==eventTab){rememberScroll(`event:${eventTab}`);scope.frame(()=>{if(scrollHost)scrollHost.scrollTop=scrolls.get(`event:${key}`)||0;});}
-      if(key!==eventTab){wheelPresentation?.dispose();animation?.cancel();}
+      if(key!==eventTab){clearTooltip();wheelPresentation?.dispose();animation?.cancel();}
       eventTab = key; panel.replaceChildren();
       resetConnection();
       const old = content; content = panel;
@@ -188,7 +193,7 @@ export function openLiveopsPage(kind, surface = {}) {
     festivalDialog?.destroy();
     const local=createGameShellLifecycle(),release=scope.own(()=>local.dispose());local.own(()=>release.forget());
     const body=el('div','liveops__festival-chest-dialog'),notice=el('p','');notice.setAttribute('role','status');
-    body.append(createChestArt(type),notice);
+    const preview=el('span','liveops__chest-preview reward-info-host');preview.append(createChestArt(type),createRewardInfo(chestContents(type),`Thông tin ${CHEST_NAMES[type]}`));body.append(preview,notice);
     festivalDialog=openAppModal({id:'festival-chest-modal',title:CHEST_NAMES[type],content:body,owner:scope,alignment:'center',keepBanner:true,onDestroy:()=>{local.dispose();festivalDialog=null;},actions:[
       {label:'Xem tỷ lệ',onClick:()=>{
         const policy=CHEST_POLICY[type],rates=el('div','liveops__chest-rates');
@@ -220,11 +225,12 @@ export function openLiveopsPage(kind, surface = {}) {
       const viewBeforeChest=item.chest?view?.state.chests.earned[item.chest]:0;
       reward.classList.add('liveops__festival-reward');reward.dataset.state=claimed?'claimed':ready?'ready':'locked';
       reward.setAttribute('aria-label',`${claimed?'Đã nhận':ready?'Nhận':'Chưa đủ'} ${item.coins?`${item.coins} Xu`:CHEST_NAMES[item.chest]} tại ${item.points} huy hiệu`);
-      reward.append(item.chest?createChestArt(item.chest):createIcon('coin'));
+      reward.append(createChestArt(item.chest||'coins'));
       if(claimed||!ready){const state=createIcon(claimed?'check':'lock');state.classList.add('liveops__festival-state');reward.append(state);}
       milestone.style.left=`${item.points}%`;milestone.dataset.state=reward.dataset.state;
       const marker=el('span','liveops__festival-marker');marker.setAttribute('aria-hidden','true');
-      milestone.append(reward,el('span','liveops__festival-point',String(item.points)),marker);road.append(milestone);
+      const rewardWrap=el('span','liveops__reward-with-info');rewardWrap.append(reward,createRewardInfo(item.chest?chestContents(item.chest):`${item.coins} Xu`,`Thông tin thưởng ${item.points} huy hiệu`));
+      milestone.append(rewardWrap,el('span','liveops__festival-point',String(item.points)),marker);road.append(milestone);
     }
     const bar=el('div','liveops__festival-progress');bar.setAttribute('role','progressbar');bar.setAttribute('aria-label','Huy hiệu đã thu thập');bar.setAttribute('aria-valuemin','0');bar.setAttribute('aria-valuemax','100');
     if(available!==null)bar.setAttribute('aria-valuenow',String(Math.min(100,available)));
@@ -237,9 +243,13 @@ export function openLiveopsPage(kind, surface = {}) {
     if(!wheelArt)wheelArt=createWheelArt();
     const rotor = wheelRotor || el('div', 'liveops__rotor');wheelRotor=rotor;
     if(!rotor.childElementCount){rotor.append(wheelArt.rotor);for(const [index,slot]of WHEEL_SLOTS.entries()){
-      const label=el('span','liveops__sector');label.style.setProperty('--sector',index);label.dataset.wheelSector=String(index);label.setAttribute('aria-hidden','true');
-      label.append(slot.box||index===2?createWheelGiftArt(slot.box||'coins'):createIcon('coin'),el('span','',slot.label.replace('Rương ','Rương\n')));rotor.append(label);
+      const label=el('span','liveops__sector');label.style.setProperty('--sector',index);label.dataset.wheelSector=String(index);
+      const box=slot.box||(index===2?'coins':null);
+      if(box){const preview=el('span','reward-info-host');preview.append(createWheelGiftArt(box),createRewardInfo(wheelChestContents(box),`Thông tin ${slot.label}`));label.append(preview);}
+      else{label.setAttribute('aria-hidden','true');label.append(createIcon('coin'));}
+      label.append(el('span','',slot.label.replace('Rương ','Rương\n')));rotor.append(label);
     }}
+    rotor.querySelectorAll('[data-tooltip-info]').forEach(info=>{info.hidden=busy;});
     refreshWheelGiftArt(rotor);
     if(!wheelPointer)wheelPointer=el('span','liveops__pointer');
     stage.append(rotor,wheelArt.rim,wheelPointer);stage.setAttribute('aria-label','Vòng quay mười ô: 5 Xu, 10 Xu và tám loại rương');
@@ -330,7 +340,7 @@ export function openLiveopsPage(kind, surface = {}) {
     exchange.setAttribute('aria-description',filled<total?'Thu thập đủ bộ chữ để mở khóa rương.':'Đổi bộ chữ lấy rương trong Kho lưu trữ.');
     exchange.dataset.locked=String(filled<total);exchange.append(createChestArt(set.chestType));
     if(filled<total)exchange.append(createIcon('lock'));
-    reward.append(exchange);recipePanel.append(reward);letters.append(word);
+    reward.classList.add('reward-info-host');reward.append(exchange,createRewardInfo(chestContents(set.chestType),`Thông tin ${CHEST_NAMES[set.chestType]}`));recipePanel.append(reward);letters.append(word);
     const inventory=panel('Kho chữ'),grid=el('div','liveops__letter-grid');inventory.classList.add('liveops__inventory');
     if(selectedLetter===null)selectedLetter=LETTER_ALPHABET.find(letter=>counts[letter]>0)||LETTER_ALPHABET[0];
     for(const letter of LETTER_ALPHABET){const count=counts[letter]||0,choice=button('',()=>showLetterMenu(letter),busy,`letter-${letter}`);
@@ -344,14 +354,16 @@ export function openLiveopsPage(kind, surface = {}) {
     const sheet=el('div','liveops__sale'), quantity=el('input','liveops__letter-quantity');
     quantity.type='range';quantity.min='1';quantity.max=String(max);quantity.value='1';quantity.step='1';quantity.setAttribute('aria-label','Số chữ muốn bán');quantity.id='letter-sale-quantity';
     const amount=el('output','liveops__sale-amount');amount.setAttribute('for',quantity.id);amount.setAttribute('aria-live','polite');
-    const description=el('p'),confirm=button('Xác nhận bán',()=>{ const n=Number(quantity.value);if(!Number.isSafeInteger(n)||n<1||n>max)return; sale.destroy();void run({type:'sellLetter',letter,quantity:n}); });
-    const update=()=>{const n=Number(quantity.value);confirm.disabled=!Number.isSafeInteger(n)||n<1||n>max||!Number.isSafeInteger(n*LETTER_SELL_COINS);quantity.setAttribute('aria-invalid',String(confirm.disabled));quantity.setAttribute('aria-valuetext',`${n} chữ`);amount.value=`${n.toLocaleString('vi-VN')} / ${max.toLocaleString('vi-VN')}`;description.textContent=confirm.disabled?'Chọn số lượng muốn bán.':`Bán ${n.toLocaleString('vi-VN')} chữ ${letter}, nhận ${(n*LETTER_SELL_COINS).toLocaleString('vi-VN')} Xu.`;};
+    const art=letterArtwork(letter);art.classList.add('liveops__sale-letter');
+    const description=el('p','',`Chọn số chữ ${letter} muốn bán.`),confirm=button('',()=>{ const n=Number(quantity.value);if(!Number.isSafeInteger(n)||n<1||n>max)return; sale.destroy();void run({type:'sellLetter',letter,quantity:n}); });
+    const update=()=>{const n=Number(quantity.value);confirm.disabled=!Number.isSafeInteger(n)||n<1||n>max||!Number.isSafeInteger(n*LETTER_SELL_COINS);quantity.setAttribute('aria-invalid',String(confirm.disabled));quantity.setAttribute('aria-valuetext',`${n} chữ`);amount.value=`${n.toLocaleString('vi-VN')} / ${max.toLocaleString('vi-VN')}`;confirm.textContent=confirm.disabled?'Bán':`Bán ${(n*LETTER_SELL_COINS).toLocaleString('vi-VN')} Xu`;};
     quantity.oninput=update;
-    const label=el('label','liveops__sale-quantity','Số lượng');label.append(amount,quantity);sheet.append(description,label,confirm);update();
+    const label=el('label','liveops__sale-quantity','Số lượng');label.append(amount,quantity);sheet.append(art,description,label,confirm);update();
     const sale=openAppModal({id:'letter-sale',title:'Bán chữ',content:sheet,owner:scope,alignment:'center',keepBanner:true});sale.panel.classList.add('letter-sale-dialog');quantity.focus();return sale;
   }
   function render() {
     if (!active()) return;
+    clearTooltip();
     const focusKey = document.activeElement?.dataset.focusKey, previousScroll=scrollHost?.scrollTop;
     resetConnection();
     content.replaceChildren();

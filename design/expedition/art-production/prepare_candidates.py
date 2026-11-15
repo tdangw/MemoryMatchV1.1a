@@ -28,6 +28,18 @@ def opening(im):
 def box(im, kind):
     return opening(im) if kind == 'frame' else im.getchannel('A').point(lambda a: 255 if a > 16 else 0).getbbox()
 
+def safe_frame_scale(im, source, target, scale):
+    """Uniformly retain outer tips, then verify face clearance before export."""
+    bounds = im.getchannel('A').point(lambda a: 255 if a > 128 else 0).getbbox()
+    cx, cy = (source[0]+source[2])/2, (source[1]+source[3])/2
+    tx, ty = (target[0]+target[2])/2, (target[1]+target[3])/2
+    if min(tx+scale*(bounds[0]-cx), ty+scale*(bounds[1]-cy),
+           512-tx-scale*(bounds[2]-cx), 512-ty-scale*(bounds[3]-cy)) > 0:
+        return scale
+    return min(scale, (tx-3)/(cx-bounds[0]), (509-tx)/(bounds[2]-cx),
+               (ty-3)/(cy-bounds[1]), (509-ty)/(bounds[3]-cy))
+
+
 def prepare():
     journal = json.loads((ART/'journal.json').read_text(encoding='utf-8-sig'))
     inventory = json.loads((ART.parent/'cosmetic-art-batches.json').read_text(encoding='utf-8-sig'))
@@ -38,13 +50,13 @@ def prepare():
     latest = {(r['id'],r['form']):r for r in journal['records']}
     for r in latest.values():
         item = items[r['id']]
-        master = ART/'masters'/f"{r['id']}-form{r['form']}-r2.png"
-        if not master.exists():
-            master = ROOT/r['master']
+        master = ROOT/r['master']
         base = Image.open(ROOT/'public'/item['baseFiles']['512']).convert('RGBA')
         src = Image.open(master).convert('RGBA')
         target, source = box(base,item['type']), box(src,item['type'])
         scale = min((target[2]-target[0])/(source[2]-source[0]), (target[3]-target[1])/(source[3]-source[1]))
+        if item['type'] == 'frame':
+            scale = safe_frame_scale(src, source, target, scale)
         tx = (target[0]+target[2])/2 - scale*(source[0]+source[2])/2
         ty = (target[1]+target[3])/2 - scale*(source[1]+source[3])/2
         aligned = src.transform((512,512),Image.Transform.AFFINE,(1/scale,0,-tx/scale,0,1/scale,-ty/scale),Image.Resampling.BICUBIC)

@@ -3,7 +3,7 @@ import { COIN_PARTICLE_LIMIT, COIN_SCATTER_ANGLE } from '../gameplayTuning.js';
 import { playRewardPhase } from '../rewardAudio.js';
 import { LOOT_PRESETS, LOOT_HOLD_MS } from '../lootEffects.js';
 import { createAdventureActionArt } from '../adventureActionArt.js';
-import { createIcon } from '../icons.js';
+import { createRewardIcon } from '../catalogArt.js';
 import { publishHourlyGiftView, hourlyGiftRemaining } from './hourlyGiftViewState.js';
 import { hourlyGiftTicketCount } from './hourlyGift.js';
 import { REWARD_FEEDBACK_LIMIT } from './rewardFeedbackModel.js';
@@ -11,7 +11,8 @@ import { openAppModal, showAppToast } from '../modal.js';
 import { createGameShellLifecycle } from '../gameShell/gameShellLifecycle.js';
 import { getAccountService } from '../accountService.js';
 import { requestLiveops } from './service.js';
-import { CHEST_SUPPORTS } from './chestConfig.js';
+import { createChestArt } from './chestArt.js';
+import { CHEST_SUPPORTS, CHEST_NAMES } from './chestConfig.js';
 import { playOwnedRewardCue } from '../sound.js';
 import { gameState } from '../gameState.js';
 import { refreshAppWallet } from '../appNavigation.js';
@@ -25,10 +26,12 @@ const supportIcons = {hint:'wand',preview4:'eye',time30:'timer',reshuffle:'shuff
 function describe(reward) {
   if(reward.kind==='ticket'){const amount=hourlyGiftTicketCount(reward);return {icon:'ticket',amount,label:`${amount} Vé quay`,target:'.adventure-map-shortcuts--events [aria-label="Sự kiện"]'};}
   if(reward.kind==='coins')return {icon:'coin',amount:reward.coins,label:`${reward.coins.toLocaleString('vi-VN')} Xu`,target:'.adventure-map-wallet'};
+  if(reward.kind==='chest')return {chestType:reward.chestType,amount:1,label:`${CHEST_NAMES[reward.chestType]} ×1`,target:'.adventure-map-shortcut[aria-label="Bộ sưu tập"]'};
   const item=CHEST_SUPPORTS[reward.gameId].find(item=>item.key===reward.key);
   const game={'memory-match':'Memory Match','link-connect':'Link Connect','triple-connect':'Triple Connect'}[reward.gameId];
   return {icon:supportIcons[reward.key],label:`${item.label} ×1 · ${game}`,target:'.adventure-map-shortcut[aria-label="Bộ sưu tập"]'};
 }
+const prizeArt=prize=>prize.chestType?createChestArt(prize.chestType):createRewardIcon(prize.icon);
 async function revealGift(art,result,prize,owner,audioOwner=owner) {
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
   const cue=name=>playOwnedRewardCue(name,owner,gameState.settings);
@@ -48,7 +51,7 @@ async function revealGift(art,result,prize,owner,audioOwner=owner) {
   const {dropMs,holdMs,flightMs,revealDelayMs}=GIFT_LOOT_TIMING;
   const duration=dropMs+holdMs+flightMs,landOffset=dropMs/duration,collectOffset=(dropMs+holdMs)/duration;
   for(let i=0;i<count;i++){
-    const p=el('span','hourly-gift-particle');p.append(createIcon(prize.icon));layer.append(p);
+    const p=el('span','hourly-gift-particle');p.append(prizeArt(prize));layer.append(p);
     const x=start.x-14,y=start.y-14,spread=count===1?0:Math.cos(i*COIN_SCATTER_ANGLE)*(16+Math.sqrt((i+1)/count)*42);
     const landed=`translate(${x+spread}px,${y+18+(i%4)*7}px) scale(1)`;
     animate(p,[{opacity:0,transform:`translate(${x}px,${y}px) scale(.5)`,offset:0},
@@ -69,7 +72,7 @@ async function presentGiftOnMap(reward,owner) {
   const scope=createGameShellLifecycle(),release=owner.own(()=>scope.dispose());scope.own(()=>release.forget());
   const floating=el('div','hourly-gift-reveal'),art=createAdventureActionArt('gift'),result=el('div','hourly-gift__result');
   floating.style.left=`${innerWidth/2}px`;floating.style.top=`${Math.max(16,(innerHeight-260)/2)}px`;
-  const prize=describe(reward);result.setAttribute('role','status');result.append(createIcon(prize.icon),el('strong','',prize.label));floating.append(art,result);document.body.append(floating);scope.own(()=>floating.remove(),'node');
+  const prize=describe(reward);result.setAttribute('role','status');result.append(prizeArt(prize),el('strong','',prize.label));floating.append(art,result);document.body.append(floating);scope.own(()=>floating.remove(),'node');
   try {
     await revealGift(art,result,prize,scope,owner);
     if(scope.active)await new Promise(resolve=>{const cancel=scope.own(resolve);scope.timeout(()=>{cancel.forget();resolve();},1000);});

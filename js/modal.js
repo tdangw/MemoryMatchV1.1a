@@ -217,7 +217,8 @@ export function openAppModal({
   return { overlay, panel, body, close, destroy, submit, whenClosed };
 }
 
-export function showAppToast(message, { tone = "info", duration = 1600, position = 'top' } = {}) {
+const toastDismissals = new WeakMap();
+export function showAppToast(message, { tone = "info", duration = 1600, position = 'top', presentation = 'standard' } = {}) {
   const centered = position === 'center';
   let region = document.querySelector(centered ? '.app-toast-region[data-position="center"]' : '.app-toast-region:not([data-position="center"])');
   if (!region) {
@@ -229,17 +230,26 @@ export function showAppToast(message, { tone = "info", duration = 1600, position
   }
 
   const existing = centered && region.querySelector('.app-toast:not(.is-closing)');
-  if (existing) { existing.textContent = message; return; }
+  if (existing) {
+    toastDismissals.get(existing)();
+    if (!region.isConnected) document.body.appendChild(region);
+  }
   const toast = document.createElement("div");
   toast.className = `app-toast app-toast--${tone}`;
+  if(presentation==='floating'){toast.classList.add('app-toast--floating');toast.style.setProperty('--app-toast-duration',`${duration}ms`);}
   toast.textContent = message;
   region.appendChild(toast);
 
-  setTimeout(() => {
+  let expiry = null, removal = null;
+  const dismiss = () => {
+    clearTimeout(expiry); clearTimeout(removal);
+    toast.remove();
+    if (!region.children.length) region.remove();
+  };
+  toastDismissals.set(toast, dismiss);
+  if (duration > 0) expiry = setTimeout(() => {
     toast.classList.add("is-closing");
-    setTimeout(() => {
-      toast.remove();
-      if (!region.children.length) region.remove();
-    }, UI_TIMING.modalCloseMs);
+    removal = setTimeout(dismiss, UI_TIMING.modalCloseMs);
   }, duration);
+  return dismiss;
 }

@@ -9,7 +9,7 @@ test('level submission locks difficulty and rejects repeated clicks until the la
     await(await import('/js/tutorial/tutorialProgress.js')).markTutorialFlag('skipped','memory-match');
     window.__launchCount = 0;
     (await import('/js/adventureMap.js')).configureAdventureMap({ adapters: { 'memory-match': {
-      goal: 'Ghép hết các cặp thẻ.', preview: () => ({ timeSeconds: 60, target: '6 cặp · 12 thẻ', hints: 3, assistNote: '' }),
+      goal: 'Ghép hết các cặp thẻ.', preview: () => ({ timeSeconds: 60, target: '6 cặp · 12 thẻ', threeStarScore:198, hints: 3, assistNote: '' }),
       launch: () => { window.__launchCount++; return new Promise(resolve => { window.__finishLaunch = resolve; }); },
     } } });
     await (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu('memory-match');
@@ -51,12 +51,19 @@ for (const [gameId, progressKey] of [['memory-match', 'memoryMatch'], ['link-con
     await expect(page.locator('[data-level="100"]')).toBeInViewport();
     await previewMapLevel(page, 1, 'easy');
     await expect(page.locator('.adventure-level-modes label')).toHaveText(['C', 'B', 'A', 'S']);
-    await expect(page.locator('#adventure-level-modal .app-modal__title')).toHaveText('Màn 1 · Dễ');
+    await expect(page.locator('#adventure-level-modal .app-modal__title')).toHaveText('Màn 1');
     await expect(page.locator('.adventure-level-details')).toContainText('Thời gian');
     await expect(page.locator('.adventure-level-result, .adventure-level-stars')).toHaveCount(0);
     await page.getByRole('radio', { name: 'Khó', exact: true }).check();
-    await expect(page.locator('#adventure-level-modal .app-modal__title')).toHaveText('Màn 1 · Khó');
+    await expect(page.locator('#adventure-level-modal .app-modal__title')).toHaveText('Màn 1');
+    await expect(page.getByRole('radio',{name:'Khó',exact:true})).toBeChecked();
+    const score=await page.evaluate(async game=>{
+      const previews=await import('/js/adventurePreview.js');
+      const preview=previews[{'memory-match':'previewMemoryLevel','link-connect':'previewLinkLevel','triple-connect':'previewTripleLevel'}[game]];
+      return preview('hard',1,{items:{hint:0},startedLevels:{}}).threeStarScore;
+    },gameId);
     await expect(page.locator('.adventure-level-details')).toContainText('Mục tiêu');
+    await expect(page.locator('.adventure-preview-metric').nth(1).locator('strong')).toHaveText(score.toLocaleString('vi-VN'));
     await closeLevelPreview(page);
   });
   for (const mode of ['easy', 'normal', 'superHard']) {
@@ -193,7 +200,7 @@ test('level preview supports native keyboard choices, escape/focus restoration a
   expect(await page.evaluate(async () => (await import('/js/appPageLifecycle.js')).getAppPageScope().diagnostics())).toEqual(baseline);
   await page.locator('[data-special-mode="challenge"]').click();
   await expect(page.locator('#adventure-level-modal .app-modal__title')).toHaveText('Thử thách');
-  await expect(page.locator('#adventure-level-modal .adventure-level-details')).toContainText('6 bộ ba');
+  await expect(page.locator('#adventure-level-modal .adventure-level-details')).toContainText('198');
   await expect(page.locator('#adventure-level-modal small')).toHaveCount(0);
   await expect(page.locator('.game-shell-root:visible')).toHaveCount(0);
 });

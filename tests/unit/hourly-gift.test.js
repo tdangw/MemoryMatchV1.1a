@@ -6,11 +6,30 @@ import { GAMEPLAY_LIMITS } from '../../js/gameplayTuning.js';
 const now = 1800000000000;
 const coins = {kind:'coins',coins:100,gameId:null,key:null};
 const command = (operation='claim-1',sequence=1,candidate=coins) => ({type:'claimHourlyGift',operation,sequence,candidate});
-test('equal categories and equal games select all supported items at boundaries',()=>{
+test('chest odds are ninety percent total and twenty-two point five percent per type; save and replay grant once',()=>{
+  const types=['c','frame','avatar','badge'],counts=Object.fromEntries(types.map(type=>[type,0]));
+  for(let i=0;i<10000;i++){
+    const samples=[(i+.5)/10000,((i%4)+.5)/4];
+    const reward=hourlyGiftCandidate(()=>samples.shift()??0);
+    if(reward.kind==='chest')counts[reward.chestType]++;
+  }
+  for(const type of types){
+    assert.equal(counts[type],2250);
+    const candidate={kind:'chest',chestType:type,coins:0,gameId:null,key:null},cmd=command(`chest-${type}`,1,candidate);
+    const first=transitionSpark(null,cmd,{uid:'user',now});
+    assert.equal(first.state.chests.earned[type],1);
+    const saved=normalizeSparkState(first.state);
+    assert.equal(saved.hourlyGift.last.chestType,type);
+    assert.equal(transitionSpark(saved,cmd,{uid:'user',now}).state.chests.earned[type],1);
+  }
+  assert.equal(validGiftReward({kind:'chest',chestType:'unknown',coins:0,gameId:null,key:null}),false);
+  assert.equal(validGiftReward({...coins,chestType:'c'}),false);
+});
+test('remaining ten percent preserves gift ratios and all supported items at boundaries',()=>{
   assert.deepEqual(hourlyGiftCandidate(()=>0),{kind:'ticket',tickets:10,coins:0,gameId:null,key:null});
-  assert.equal(hourlyGiftCandidate(()=>.249999).tickets,10);assert.equal(hourlyGiftCandidate(()=>.25).coins,5);assert.equal(hourlyGiftCandidate(()=>.499999).coins,5);assert.equal(hourlyGiftCandidate(()=>.5).coins,10);assert.equal(hourlyGiftCandidate(()=>.749999).coins,10);
+  assert.equal(hourlyGiftCandidate(()=>.024999).tickets,10);assert.equal(hourlyGiftCandidate(()=>.025).coins,5);assert.equal(hourlyGiftCandidate(()=>.049999).coins,5);assert.equal(hourlyGiftCandidate(()=>.05).coins,10);assert.equal(hourlyGiftCandidate(()=>.074999).coins,10);
   for(const [game,n] of [['memory-match',3],['link-connect',4],['triple-connect',4]]) for(let i=0;i<n;i++){
-    const samples=[.75,(['memory-match','link-connect','triple-connect'].indexOf(game)+.1)/3,(i+.1)/n];
+    const samples=[.075,(['memory-match','link-connect','triple-connect'].indexOf(game)+.1)/3,(i+.1)/n];
     const result=hourlyGiftCandidate(()=>samples.shift());assert.equal(result.kind,'support');assert.equal(result.gameId,game);
   }
   assert.throws(()=>hourlyGiftCandidate(()=>1));

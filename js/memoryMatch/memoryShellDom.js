@@ -1,3 +1,4 @@
+import { createSupportIcon } from '../catalogArt.js';
 // Build once before modules bind gameplay listeners. IDs remain public DOM hooks.
 const template = document.createElement("template");
 template.innerHTML = `<div id="game-container" class="game-shell-tokens" style="display: none;">
@@ -56,4 +57,5 @@ template.innerHTML = `<div id="game-container" class="game-shell-tokens" style="
       </div>
     </div>`;
 export const memoryRoot = template.content.firstElementChild;
+for (const [id, kind] of [['btn-hint','hint'],['btn-buy-time','time'],['btn-preview-cards','preview']]) memoryRoot.querySelector(`#${id}`).prepend(createSupportIcon(kind));
 document.querySelector(".main-wrapper").prepend(memoryRoot);

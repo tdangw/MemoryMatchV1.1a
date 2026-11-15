@@ -1,0 +1,37 @@
+{
+  "tool": "built-in image_gen",
+  "transparent_background": true,
+  "references": [
+    "design/shop-catalog/reference-four-column.png"
+  ],
+  "entries": [
+    {
+      "key": "theme/drinks",
+      "master": "illustrations/theme-drinks-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-82d29f02-5deb-4c23-8f59-934c9822bfd0.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A friendly high-quality illustrated representative object or character for this card theme, like the reference's deer, noodle bowl, fruit and planet icons. Warm dimensional casual game illustration, bright clear color, simple strong silhouette; not a contact sheet of cards and not a screenshot. A beautiful glass of purple fruit drink with a warm-gold straw, a citrus slice and two clear ice cubes, simple polished glass silhouette.",
+      "status": "generated-candidate"
+    },
+    {
+      "key": "theme/fruits",
+      "master": "illustrations/theme-fruits-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-9c738675-3203-4de1-819a-2f262702bf23.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A friendly high-quality illustrated representative object or character for this card theme, like the reference's deer, noodle bowl, fruit and planet icons. Warm dimensional casual game illustration, bright clear color, simple strong silhouette; not a contact sheet of cards and not a screenshot. A vivid small cluster of red apple, yellow banana and purple grapes, two fresh green leaves, friendly polished illustrative fruit icon.",
+      "status": "generated-candidate"
+    },
+    {
+      "key": "theme/geometry",
+      "master": "illustrations/theme-geometry-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-831a0e35-1e4c-45fa-a283-ff700da0fedd.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A friendly high-quality illustrated representative object or character for this card theme, like the reference's deer, noodle bowl, fruit and planet icons. Warm dimensional casual game illustration, bright clear color, simple strong silhouette; not a contact sheet of cards and not a screenshot. Three clean colorful dimensional geometric solids: a warm-gold cube, cyan triangular pyramid and pink sphere, compact balanced composition.",
+      "status": "generated-candidate"
+    },
+    {
+      "key": "theme/cyberpunk",
+      "master": "illustrations/theme-cyberpunk-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-68f90eed-0deb-42ea-b589-be524b228139.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A friendly high-quality illustrated representative object or character for this card theme, like the reference's deer, noodle bowl, fruit and planet icons. Warm dimensional casual game illustration, bright clear color, simple strong silhouette; not a contact sheet of cards and not a screenshot. A sleek compact futuristic blue visor headset with one bright magenta and cyan luminous accent, shiny readable high-tech object, no human head.",
+      "status": "generated-candidate"
+    }
+  ]
+}

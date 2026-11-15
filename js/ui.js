@@ -20,7 +20,7 @@ import { launchSummaryConfetti, showSummaryFireworks } from "victory-presentatio
 import { showAccountErasureDialog } from './accountErasureDialog.js';
 import { getTheme } from "./themeCatalog.js";
 import { getEquippedThemeId } from "./appearance.js";
-import { GAME_CONFIG, getStarScoreTargets, getTimerDirection, isEndlessMode, getMemoryMilestoneRewards } from "./config.js";
+import { GAME_CONFIG, getTimerDirection, isEndlessMode, getMemoryMilestoneRewards } from "./config.js";
 import { getGameModeLabel } from "./gameCatalog.js";
 import { formatClockTime, UI_COPY } from "./uiCatalog.js";
 import { prefersReducedMotion } from "./motion.js";
@@ -78,8 +78,8 @@ export function showMemoryCoinReward(tileElement, previousCoins, nextCoins, amou
 
 export function updateScoreDisplay(score) {
   getMemoryHud().stats({ score });
-  const target = gameState.wave ? getProgressionStarTargets({ totalGroups: waveTotalGroups(gameState.wave), mode: gameState.settings.mode }).three
-    : getStarScoreTargets(gameState.totalPairs, gameState.settings.mode).three;
+  const totalGroups = gameState.wave ? waveTotalGroups(gameState.wave) : Math.max(1, gameState.totalPairs);
+  const target = getProgressionStarTargets({ gameId: 'memory-match', totalGroups, mode: gameState.settings.mode }).three;
   getMemoryHud().stars({ score, target, record: gameRecordLabel(gameState.progress.memoryMatch, gameState.settings.mode, gameState.currentLevel) });
 }
 

@@ -484,6 +484,30 @@ export async function exportPersistentSnapshot() {
   if (snapshot.profile.revision !== knownRevision) throw new Error("Bản lưu vừa thay đổi ở tab khác. Hãy tải lại trước khi đồng bộ.");
   return snapshot;
 }
+/** Confirm only the offline reward operations included in a published snapshot. */
+export function acknowledgeOfflineSparkSnapshot({uid,profileId,environment,operationIds,baseRevision},isCurrent=()=>true){
+  const acknowledged=new Set(operationIds);
+  return enqueue(async()=>{
+    await initialize();
+    if(!database||blocked||isLocalAccountDataLocked()||!isCurrent())return false;
+    const previous=currentEnvelope;
+    if(!previous||previous.revision!==knownRevision)return false;
+    const data=structuredClone(previous.data),spark=normalizeSparkSave(data.appearance.spark),offline=spark.offline;
+    if(!offline)return true;
+    if(offline.uid!==uid||offline.profileId!==profileId||offline.environment!==environment
+      ||!Number.isSafeInteger(baseRevision)||baseRevision<offline.baseRevision
+      ||(spark.state?.revision||0)<baseRevision)return false;
+    const operations=offline.operations.filter(entry=>!acknowledged.has(entry.command.operation));
+    if(operations.length)spark.offline={...offline,baseRevision,operations};
+    else delete spark.offline;
+    data.appearance={...data.appearance,spark};
+    const envelope=createEnvelope(data,knownRevision+1);
+    currentEnvelope=await writeChapterProfile(database,envelope,knownRevision,{isCurrent});
+    knownRevision=envelope.revision;
+    notifyCommit({appearance:structuredClone(data.appearance)});
+    return true;
+  });
+}
 export async function loadSyncMetadata(environment) {
   await queue;
   await initialize();

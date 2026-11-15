@@ -8,7 +8,7 @@ import { liveopsEnabled } from './availability.js';
 import { DAY_MS } from './model.js';
 import { confirmSparkClock } from './store.js';
 import { secureSector, secureUnit, AD_DAILY_LIMIT } from './sparkModel.js';
-import { createWheelRolls, WHEEL_VERSION } from './wheelRewards.js';
+import { createWheelRolls, WHEEL_VERSION, WHEEL_ODDS_VERSION } from './wheelRewards.js';
 import { canRunLocalReward, runLocalReward } from './localRewards.js';
 
 let binding=null,clock=null;
@@ -48,7 +48,16 @@ export function bindLiveopsAccount(account){
   scope.own(account.subscribe(state=>{if(!['connecting','restoring','syncing'].includes(state.phase))refresh();}));
   scope.listen(window,'online',()=>{clock=null;refresh();});
   scope.listen(document,'appvisibilitychange',refresh);
-  scope.listen(window,'liveopssyncrequired',refresh);
+  scope.listen(window,'liveopssyncrequired',()=>{
+    const identity=account.getIdentity();
+    const confirmedNow=identity&&clockNow(identity);
+    if(identity&&confirmedNow!==null&&navigator.onLine&&isAppActive()&&!getActiveGameScope()){
+      const owns=()=>scope.active&&account.getIdentity()?.uid===identity.uid&&account.getIdentity()?.profileId===identity.profileId;
+      void bindPendingRewardFacts(identity,Math.floor(confirmedNow/DAY_MS),owns)
+        .then(()=>{if(owns())return requestLiveops();})
+        .catch(error=>console.info('Reward journal awaits reconciliation',error.code||error.name));
+    }else refresh();
+  });
   refresh();
   return()=>{scope.dispose();if(binding===scope){binding=null;clock=null;}};
 }
@@ -68,7 +77,7 @@ export async function requestLiveops(command={type:'status'}){
     if(result.state.pendingWheel)throw new Error('Hãy nhận phần quà đang chờ trước khi quay tiếp.');
     if(result.state.spins.ads.length>=AD_DAILY_LIMIT)throw new Error('Bạn đã dùng hết lượt quảng cáo hôm nay.');
     return {...result,adOperation:{type:'spin',source:'ad',operation:crypto.randomUUID(),ordinal:result.state.spins.ads.length+1,
-      sector:secureSector(),wheelVersion:WHEEL_VERSION,wheelRolls:createWheelRolls(secureUnit),day:result.state.day,profileId:captured.profileId}};
+      sector:secureSector(),wheelVersion:WHEEL_VERSION,wheelOddsVersion:WHEEL_ODDS_VERSION,wheelRolls:createWheelRolls(secureUnit),day:result.state.day,profileId:captured.profileId}};
   }
   if(!canRunLocalReward(command))throw new Error('Không thực hiện được thao tác này.');
   if(command.type==='spin'&&command.source==='ad')throw new Error('Hãy xem hết quảng cáo để nhận lượt quay.');

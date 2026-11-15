@@ -8,7 +8,7 @@ import { sameRankingOwner } from '../progressRankingModel.js';
 import { getAccountService } from '../accountService.js';
 import { canLaunchGame } from '../profileOperations.js';
 import { cosmeticArtUrl, cosmeticLevel } from './cosmeticArt.js';
-import { cosmeticLevelLabel } from './cosmeticProgression.js';
+import { cosmeticLevelLabel, cosmeticForm } from './cosmeticProgression.js';
 
 export { cosmeticPortrait } from './profilePortrait.js';
 export function openProfileCustomization({ playerName, owner, onSaved = () => {} }) {
@@ -24,6 +24,7 @@ export function openProfileCustomization({ playerName, owner, onSaved = () => {}
     previewImage: cosmeticArtUrl(item,256,cosmeticLevel(gameState.appearance,item.id)),
     originalImage:cosmeticArtUrl(item,128,1),originalPreviewImage:cosmeticArtUrl(item,256,1),
     cosmeticLevelLabel:cosmeticLevelLabel(cosmeticLevel(gameState.appearance,item.id)),
+    cosmeticForm:cosmeticForm(cosmeticLevel(gameState.appearance,item.id)),
     formImages:[1,7,21].map(level=>({label:cosmeticLevelLabel(level),image:cosmeticArtUrl(item,256,level),fallback:cosmeticArtUrl(item,256,1)})),
     gameName: item.gameId ? getGameDefinition(item.gameId).title : item.series, owned: owned.has(item.id),
   }));

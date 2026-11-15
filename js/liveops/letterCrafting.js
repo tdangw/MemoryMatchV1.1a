@@ -42,10 +42,11 @@ function lightningPath(start,end,index){
 /** Local selection never changes inventory; only the existing transaction can consume it. */
 export function openLetterFusion({initialLetter,owner,current,getContext,execute,refresh}){
   const scope=createGameShellLifecycle(),content=node('div','letter-forge');
-  const description=node('p','letter-forge__intro','Ghép 3 chữ bất kỳ, ưu tiên chữ chưa có.');
+  const description=node('p','letter-forge__intro','Chọn 3 chữ để đổi lấy 1 chữ ngẫu nhiên.');
   const stage=node('div','letter-forge__stage');
   const action=node('button','letter-forge__result');action.type='button';
   const aura=node('span','letter-forge__aura'),face=node('span','letter-forge__face');aura.setAttribute('aria-hidden','true');action.append(aura,face);stage.append(action);
+  const fee=node('p','letter-forge__fee',`Phí: ${LETTER_FUSION_FEE} Xu`);stage.append(fee);
   const effects=node('div','letter-forge__effects');effects.setAttribute('aria-hidden','true');stage.append(effects);
   const slotArt=[],slotCharges=[];
   const slots=Array.from({length:3},(_,i)=>{const b=node('button',`letter-forge__slot letter-forge__slot--${i+1}`);b.type='button';const art=node('span','letter-forge__slot-art'),charge=slotChargeArt();slotArt.push(art);slotCharges.push(charge);b.append(art,charge);stage.append(b);return b;});
@@ -69,7 +70,7 @@ export function openLetterFusion({initialLetter,owner,current,getContext,execute
     const finish=()=>{local.dispose();if(chargeScope===local)chargeScope=null;};
     return Promise.all(animations.map(animation=>animation.finished)).then(finish,finish);
   }
-  let selected=(getContext().counts[initialLetter]||0)>0?[initialLetter]:[],phase='select',received=null,error='',requestSequence=null;
+  let selected=(getContext().counts[initialLetter]||0)>0?[initialLetter]:[],phase='select',received=null,error='',requestSequence=null,feePaid=false,debitSequence=null;
   const active=()=>scope.active&&current();
   const valid=()=>{const context=getContext(),needed=multiset(selected);return selected.length===3&&Object.entries(needed).every(([letter,count])=>(context.counts[letter]||0)>=count);};
   function render(){
@@ -89,8 +90,10 @@ export function openLetterFusion({initialLetter,owner,current,getContext,execute
       tile.onclick=()=>{if(!active())return;if(phase==='result'){finishLocalMotion();selected=[];received=null;phase='select';requestSequence=null;feedback.clear();}if(phase==='select'&&selected.length<3){selected.push(letter);error='';render();}};palette.append(tile);
     }
     const funded=(context.coins??gameState.coins)>=LETTER_FUSION_FEE;
-    description.textContent=phase==='result'?`Đã ghép được chữ ${received}`:`Ghép 3 chữ bất kỳ + ${LETTER_FUSION_FEE} Xu, ưu tiên chữ chưa có.`;
-    status.textContent=error|| (phase==='result'?'Chọn chữ trong kho để ghép.':phase==='select'?(!funded?`Cần ${LETTER_FUSION_FEE} Xu để ghép.`:context.canUse?`Đã chọn ${selected.length}/3`:'Về bản đồ để ghép chữ.'):'');
+    description.textContent=phase==='result'?`Đã ghép được chữ ${received}`:'Chọn 3 chữ để đổi lấy 1 chữ ngẫu nhiên.';
+    fee.hidden=phase==='result'&&!feePaid;
+    fee.textContent=feePaid&&['revealing','result'].includes(phase)?`−${LETTER_FUSION_FEE} Xu`:`Phí: ${LETTER_FUSION_FEE} Xu`;
+    status.textContent=error|| (phase==='result'?'Chọn chữ trong kho để ghép.':phase==='select'?(!funded?`Cần ${LETTER_FUSION_FEE} Xu để ghép.`:context.canUse?'':'Về bản đồ để ghép chữ.'):'');
     action.setAttribute('aria-label',phase==='submitting'||phase==='revealing'?'Đang ghép…':phase==='result'?`Đã nhận chữ ${received}`:phase==='recover'?'Thử lại':`Ghép · ${LETTER_FUSION_FEE} Xu`);
     action.disabled=phase==='submitting'||phase==='revealing'||phase==='result'||(phase==='select'&&(!valid()||!context.canUse||!funded));
     action.dataset.ready=String(phase==='select'&&valid()&&context.canUse&&funded);
@@ -99,7 +102,11 @@ export function openLetterFusion({initialLetter,owner,current,getContext,execute
   async function resolve(response){
     const last=response.state?.letters.last;
     if(!last||last.kind!=='fuse'||last.sequence<=requestSequence||!sameIngredients(last,selected))return false;
-    received=last.received;phase='revealing';error='';render();
+    received=last.received;feePaid=last.coins<0;phase='revealing';error='';render();
+    if(feePaid&&debitSequence!==last.sequence){
+      debitSequence=last.sequence;
+      if(!motion.matches&&isAppActive())scope.animation(fee.animate([{opacity:0,transform:'translate(-50%,8px)'},{opacity:1,transform:'translate(-50%,0)'}],{duration:FORGE_MOTION.flash,easing:'ease-out'}));
+    }
     playOwnedRewardCue('frozenUnlock',scope,gameState.settings);
     if(!motion.matches&&isAppActive()){
       const origin=stage.getBoundingClientRect(),center=action.getBoundingClientRect(),rects=slots.map(slot=>slot.getBoundingClientRect());

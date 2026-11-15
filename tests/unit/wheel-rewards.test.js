@@ -35,11 +35,19 @@ test('late-ad reservation survives restart without granting and settles only the
 test('ten weighted sectors cover exactly 100 intervals and every boundary',()=>{
  assert.equal(WHEEL_SLOTS.length,10);assert.equal(WHEEL_SLOTS.reduce((sum,s)=>sum+s.weight,0),100);
  const frequencies=Array(10).fill(0);for(let i=0;i<100;i++)frequencies[wheelSector((i+.5)/100)]++;
- assert.deepEqual(frequencies,[40,25,15,1,2,2,1,2,2,10]);
+ assert.deepEqual(frequencies,[30,25,20,1,2,2,1,2,2,15]);
  let start=0;for(let sector=0;sector<10;sector++){assert.equal(wheelSector(start/100),sector);start+=WHEEL_SLOTS[sector].weight;assert.equal(wheelSector((start-.0001)/100),sector);}
  assert.equal(createWheelRolls(()=>.5).length,WHEEL_ROLL_COUNT);
  for(const bad of [-1,1,NaN,Infinity,'0']){assert.throws(()=>wheelSector(bad));assert.throws(()=>createWheelRolls(()=>bad));}
  for(const malformed of [[],Array(6),[.1],Array(7).fill(.1),[.1,.1,.1,null,.1,.1]])assert.throws(()=>createWheelCandidate(malformed));
+});
+test('legacy saved entropy keeps its old sector while newly generated rolls use the new odds',()=>{
+ const frequencies=Array(10).fill(0);for(let i=0;i<100;i++)frequencies[wheelSector((i+.5)/100,1)]++;
+ assert.deepEqual(frequencies,[40,25,15,1,2,2,1,2,2,10]);
+ const entropy=[.35,.5,.5,.5,.5,.5];
+ const old=createCurrentWheelCandidate(entropy,[],3,1),current=createCurrentWheelCandidate(entropy,[],3,2);
+ assert.equal(old.coins,5);assert.equal(current.coins,10);assert.deepEqual(normalizeWheelCandidate(JSON.parse(JSON.stringify(old))),old);
+ assert.throws(()=>wheelSector(.5,0));assert.throws(()=>wheelSector(.5,3));
 });
 
 test('coin prizes include both endpoints and uniform 46 integer random outcomes',()=>{

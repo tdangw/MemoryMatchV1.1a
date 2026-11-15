@@ -1,0 +1,30 @@
+{
+  "tool": "built-in image_gen",
+  "transparent_background": true,
+  "references": [
+    "design/shop-catalog/reference-four-column.png"
+  ],
+  "entries": [
+    {
+      "key": "back/midnight",
+      "master": "illustrations/back-midnight-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-5a54c5e9-d197-4caa-96c6-2c5a3900f894.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: One large beautiful collectible playing-card back, very slight tilt, softly dimensional rounded edges with a fine gold presentation rim. Faithfully show the existing back color/pattern specified, do not invent a different ornate motif or a new gameplay card design. A glossy deep navy-blue card back with a soft lighter-blue diagonal haze and exactly two small warm-white star dots near the upper-left area, no extra pattern.",
+      "status": "generated-candidate"
+    },
+    {
+      "key": "back/aurora",
+      "master": "illustrations/back-aurora-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-84b976c1-2448-4dce-bafe-72dee3ad8465.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: One large beautiful collectible playing-card back, very slight tilt, softly dimensional rounded edges with a fine gold presentation rim. Faithfully show the existing back color/pattern specified, do not invent a different ornate motif or a new gameplay card design. A glossy slate-blue and soft teal gradient card back with one broad gentle pale diagonal aurora light band, restrained smooth surface, no invented central ornament.",
+      "status": "generated-candidate"
+    },
+    {
+      "key": "back/candy",
+      "master": "illustrations/back-candy-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-fa049931-3488-4d15-b5fc-0a9e405de430.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: One large beautiful collectible playing-card back, very slight tilt, softly dimensional rounded edges with a fine gold presentation rim. Faithfully show the existing back color/pattern specified, do not invent a different ornate motif or a new gameplay card design. A glossy soft pink and violet gradient card back with a gentle warm peach lower corner, simple sweet pastel color field, no candy object or extra ornament.",
+      "status": "generated-candidate"
+    }
+  ]
+}

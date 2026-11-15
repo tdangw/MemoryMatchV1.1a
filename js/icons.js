@@ -1,10 +1,13 @@
 import { UI_ART_ICONS } from './uiArtManifest.js';
+import { chestFallbackIconPaths } from './chestArtFallback.js';
 const SVG_NS = "http://www.w3.org/2000/svg";
 const ICON_FALLBACK_NAMES = Object.freeze({ "star-empty": "star", "victory-home": "home", "victory-next": "arrow-right", freeze: "snowflake" });
 // Illustrations stay in rewards; functional controls share the vector icon set.
 const ILLUSTRATED_ICONS = new Set(['coin', 'star', 'star-empty', 'chest', 'chest-open', 'celebrate']);
 
 const ICON_PATHS = Object.freeze({
+  chest: chestFallbackIconPaths(),
+  'chest-open': chestFallbackIconPaths('open'),
   'collection-badge': '<path d="m7 15-2 7 5-2 2 3 2-3 5 2-2-7" fill="#1c8b74" stroke="#164d49" stroke-width="1"/><path d="m12 1 3 2 3.5.5.5 3.5 2 3-2 3-.5 3.5-3.5.5-3 2-3-2-3.5-.5L5 13l-2-3 2-3 .5-3.5L9 3Z" fill="#edbd58" stroke="#765021" stroke-width="1.2"/><path d="m12 3 2.5 1.7 2.8.4.4 2.8L19.5 10l-1.8 2.5-.4 2.8-2.8.4L12 17.5l-2.5-1.8-2.8-.4-.4-2.8L4.5 10l1.8-2.1.4-2.8 2.8-.4Z" fill="#174f60" stroke="#fff0b4" stroke-width=".7"/><rect x="7.4" y="6.5" width="5.5" height="7" rx="1" transform="rotate(-12 10 10)" fill="#75d2bd" stroke="#dcfff0" stroke-width=".6"/><rect x="11.1" y="6.8" width="5.5" height="7" rx="1" transform="rotate(12 14 10)" fill="#edbd58" stroke="#fff0b4" stroke-width=".6"/><path d="m9.6 9 1.2 1.2-1.2 1.2-1.2-1.2Zm4.5.1 1.2 1.2-1.2 1.2-1.2-1.2Z" fill="#174f60"/>',
   calendar: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 11h18m-13 4h2m4 0h2m-8 3h2"/>',
   cards: '<rect x="3" y="5" width="10" height="15" rx="2"/><rect x="11" y="3" width="10" height="15" rx="2"/><path d="m14 10 2 2 3-4"/>',
@@ -91,19 +94,20 @@ const ICON_PATHS = Object.freeze({
   "status-super-hard": '<circle cx="12" cy="12" r="7"/>',
 });
 
-export function createIcon(name) {
+export function createIcon(name, { vector = false } = {}) {
   const svg = document.createElementNS(SVG_NS, "svg");
   svg.classList.add("ui-icon", `ui-icon--${name}`);
   svg.setAttribute("viewBox", "0 0 24 24");
   svg.setAttribute("aria-hidden", "true");
   svg.setAttribute("focusable", "false");
+  if (vector) svg.dataset.iconArtwork = 'vector';
   renderIconArtwork(svg, name);
   return svg;
 }
 
 function renderIconArtwork(svg, name) {
   const fallbackName = ICON_FALLBACK_NAMES[name] || name;
-  const artwork = ILLUSTRATED_ICONS.has(name) || document.documentElement.dataset.uiSkin === 'storybook' ? UI_ART_ICONS[name] : null;
+  const artwork = svg.dataset.iconArtwork === 'vector' ? null : ILLUSTRATED_ICONS.has(name) || document.documentElement.dataset.uiSkin === 'storybook' ? UI_ART_ICONS[name] : null;
   svg.replaceChildren(); delete svg.dataset.uiArt;
   if (artwork) {
     const image = document.createElementNS(SVG_NS, 'image');
@@ -112,6 +116,7 @@ function renderIconArtwork(svg, name) {
     image.setAttribute('height', '24');
     image.setAttribute('preserveAspectRatio', 'xMidYMid meet');
     image.addEventListener('error', () => {
+      if (image.parentNode !== svg) return;
       svg.innerHTML = ICON_PATHS[fallbackName] || ICON_PATHS.info;
     }, { once: true });
     svg.dataset.uiArt = name;

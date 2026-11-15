@@ -38,6 +38,7 @@ html .liveops__letter-grid > button.tab-button { min-height:44px; min-width:44px
 .letter-sale-dialog { width:min(360px,calc(100vw - 24px)); }
 .liveops__sale { display:grid; gap:14px; }
 .liveops__sale > p { margin:0; font-size:14px; line-height:1.5; }
+.liveops__sale > .liveops__sale-letter { justify-self:center; width:80px; height:80px; }
 .liveops__sale-quantity { display:grid; grid-template-columns:auto minmax(0,1fr); align-items:center; gap:14px; }
 .liveops__sale-quantity > input { width:100%; min-height:44px; box-sizing:border-box; text-align:center; font-size:16px; }
 .liveops__sale-quantity > input[type='range'] { grid-column:1/-1; padding:0; border:0; background:transparent; accent-color:var(--ui-gold); }
@@ -139,46 +140,55 @@ html .liveops-page .liveops-surface .liveops__tabs button.tab-button[aria-select
 .liveops-surface .liveops__card-heading h3 { margin:0; }
 .liveops__card-heading > .ui-icon { width:24px; height:24px; }
 .liveops-surface .liveops__login { padding:8px; }
-.liveops__login .liveops__card-heading { display:grid; grid-template-columns:20px minmax(0,1fr) auto; gap:6px; margin-bottom:6px; }
-.liveops__login .liveops__card-heading h3 { font-size:clamp(14px,4vw,18px); white-space:nowrap; }
-.liveops__login .liveops__countdown { display:inline-flex; align-items:center; gap:4px; white-space:nowrap; }
-.liveops__login .liveops__countdown > .ui-icon { width:14px; height:14px; flex:none; }
-.liveops__login .liveops__card-heading > .ui-icon { width:20px; height:20px; }
+.liveops-surface .liveops__timed-heading { display:grid; grid-template-columns:20px minmax(0,1fr) auto; gap:6px; margin-bottom:6px; }
+.liveops__timed-heading h3 { min-width:0; font-size:clamp(12px,3.5vw,16px); white-space:nowrap; }
+.liveops__timed-heading .liveops__countdown { display:inline-flex; align-items:center; gap:4px; white-space:nowrap; }
+.liveops__timed-heading .liveops__countdown > .ui-icon { width:14px; height:14px; flex:none; }
+.liveops__countdown [data-countdown-value] { display:inline-block; min-width:6ch; text-align:right; }
+.liveops__timed-heading > .ui-icon { width:20px; height:20px; }
 .liveops-surface .liveops__days { gap:5px; }
 .liveops-surface .liveops__day { position:relative; gap:2px; padding:4px 3px; border:1px solid var(--lo-task-line); background:linear-gradient(145deg,var(--lo-task),color-mix(in srgb,var(--lo-task) 80%,var(--lo-line))); color:var(--lo-task-ink); border-radius:10px; }
 .liveops-surface .liveops__day[data-state="available"] { outline:2px solid var(--lo-claim-bottom); box-shadow:0 0 12px #e8c96f66,inset 0 0 0 2px #fff7; }
-.liveops-surface .liveops__day[data-state="received"] { background:color-mix(in srgb,var(--lo-task) 65%,#42694a); }
-.liveops-surface .liveops__day:disabled { cursor:default; }
-.liveops-surface .liveops__day[data-state="locked"] { opacity:.45; filter:grayscale(.7); }
-.liveops-surface .liveops__day[data-state="received"] { opacity:.7; }
+.liveops-surface .liveops__day[data-state="received"] { background:color-mix(in srgb,var(--lo-task) 80%,#42694a); }
+.liveops-surface .liveops__day:disabled { cursor:default; opacity:1; filter:none; }
+.liveops-surface .liveops__day[data-state="locked"] { background:color-mix(in srgb,var(--lo-task) 75%,var(--lo-panel)); border-style:dashed; }
 .liveops__day:focus-visible { outline:2px solid var(--lo-gold); outline-offset:2px; }
-.liveops__day-rewards { display:flex; align-items:center; justify-content:center; gap:5px; }
+.liveops__day-cell { display:grid; grid-column:span 2; min-width:0; }
+.liveops__day-cell > .reward-info-button { top:auto; bottom:4px; right:4px; }
+.liveops__day-rewards { display:flex; align-items:center; justify-content:center; gap:3px; }
 .liveops__day-prize { display:grid; justify-items:center; gap:1px; min-width:0; }
-.liveops__day-prize > .ui-icon { width:22px; height:22px; }
-.liveops__day-prize > small { font-size:10px; line-height:12px; font-weight:800; }
-.liveops__day-label { font-size:12px; line-height:14px; }
+.liveops__day-prize > .ui-icon { width:clamp(16px,5.5vw,22px); height:clamp(16px,5.5vw,22px); color:var(--lo-task-ink); }
+.liveops-surface .liveops__day .ui-icon[data-icon-artwork="vector"] { background:none; }
+.liveops-surface .liveops__day .ui-icon[data-icon-artwork="vector"] > * { visibility:visible; }
+.liveops__day-label { box-sizing:border-box; width:100%; padding-right:10px; font-size:clamp(10px,2.8vw,12px); line-height:14px; white-space:nowrap; }
 .liveops__day-status { position:absolute; right:3px; top:3px; display:flex; font-size:10px; line-height:12px; }
-.liveops__day-status > .ui-icon { width:12px; height:12px; flex:none; }
+.liveops__day-status > .ui-icon { width:10px; height:10px; flex:none; color:var(--lo-task-ink); }
 .liveops__section-title { display:flex; align-items:center; gap:12px; margin:6px 0 0; text-align:center; font-size:1.1rem; color:var(--lo-gold); }
 .liveops__section-title::before,.liveops__section-title::after { content:''; height:1px; flex:1; background:var(--lo-line); }
-.liveops-surface .liveops__mission { display:grid; grid-template-columns:48px minmax(0,1fr) auto; align-items:center; gap:9px; padding:9px; border:2px solid var(--lo-task-line); background:linear-gradient(135deg,var(--lo-task),color-mix(in srgb,var(--lo-task) 85%,var(--lo-line))); color:var(--lo-task-ink); border-radius:12px; }
+.liveops--missions { --mission-symbol-size:36px; --mission-reward-size:64px; }
+.liveops-surface .liveops__mission { display:grid; grid-template-columns:var(--mission-symbol-size) minmax(0,1fr) var(--mission-reward-size); align-items:center; gap:8px; padding:8px; border:2px solid var(--lo-task-line); background:linear-gradient(135deg,var(--lo-task),color-mix(in srgb,var(--lo-task) 85%,var(--lo-line))); color:var(--lo-task-ink); border-radius:12px; }
 .liveops__mission-symbol { display:grid; place-items:center; aspect-ratio:1; border-radius:9px; background:color-mix(in srgb,var(--lo-task-line) 42%,transparent); box-shadow:inset 0 1px 3px #0003; }
-.liveops__mission-symbol > .ui-icon { width:40px; height:40px; color:var(--lo-task-ink); }
-.liveops-surface .liveops__mission-body h3 { margin:0 0 6px; font-size:clamp(14px,3.8vw,18px); line-height:1.25; }
-.liveops__mission-action { max-width:115px; }
-html .liveops-page .liveops-surface .liveops__mission-action button { width:100%; margin:0; padding:7px 10px; font-size:13px; }
+.liveops__mission-symbol > .ui-icon { width:28px; height:28px; color:var(--lo-task-ink); }
+.liveops-surface .liveops__mission-body h3 { margin:0 0 4px; font-size:clamp(12px,3.4vw,15px); line-height:1.25; }
+.liveops__mission-body,.liveops__bonus-body { min-width:0; }
+.liveops--missions .liveops__progress { height:16px; }
+.liveops__mission-action { width:100%; min-width:0; }
+html .liveops-page .liveops-surface .liveops__mission-action button { box-sizing:border-box; width:100%; min-height:44px; margin:0; padding:6px; font-size:12px; line-height:1.2; }
 html .liveops-page .liveops-surface .liveops__mission-action .liveops__claim-coins { display:flex; align-items:center; justify-content:center; gap:5px; min-width:64px; }
 .liveops__claim-coins > .ui-icon { width:23px; height:23px; }
-.liveops__mission-complete { display:flex; align-items:center; gap:4px; margin:0; font-size:12px; }
-.liveops__mission-complete > .ui-icon { width:22px; height:22px; flex:none; }
-.liveops-surface .liveops__bonus { display:grid; grid-template-columns:minmax(0,1fr) 56px; gap:10px; align-items:center; padding:10px; }
+.liveops-surface .liveops__bonus { display:grid; grid-template-columns:var(--mission-symbol-size) minmax(0,1fr) var(--mission-reward-size); gap:8px; align-items:center; padding:8px; border-width:2px; }
 .liveops__bonus-body h3 { margin:0 0 6px; color:var(--lo-gold); font-size:13px; }
-.liveops__bonus-art { position:relative; width:56px; height:56px; display:grid; place-items:center; padding:3px; border:1px solid var(--lo-line); border-radius:10px; background:var(--lo-inset); }
-.liveops__bonus-art > .ui-icon:first-child { width:46px; height:46px; }
-.liveops__bonus-art > .ui-icon:last-child { position:absolute; right:1px; bottom:1px; width:17px; height:17px; color:var(--lo-gold); background:var(--lo-inset); border-radius:50%; }
+.liveops__bonus > .liveops__mission-symbol > .ui-icon { color:var(--lo-gold); }
+.liveops__bonus-art { position:relative; box-sizing:border-box; width:100%; height:44px; min-height:44px; display:grid; place-items:center; padding:3px; border:1px solid var(--lo-line); border-radius:24px; color:var(--lo-button-ink); background:linear-gradient(var(--lo-button-top),var(--lo-button-bottom)); box-shadow:inset 0 2px 0 #ffffff38,0 3px 0 #0004; }
+.liveops__bonus-art:focus-visible { outline:3px solid var(--lo-gold); outline-offset:3px; }
+.liveops__reward-with-info { position:relative; display:block; width:100%; }
+.liveops__bonus-reward { height:44px; }
+.liveops__bonus-art > .ui-icon:first-child { width:36px; height:36px; }
+.liveops__bonus-art > .ui-icon.liveops__bonus-state { position:absolute; right:2px; bottom:2px; width:16px; height:16px; color:var(--lo-gold); background:var(--lo-inset); border-radius:50%; }
 .liveops__bonus-art[data-state='locked'] { opacity:.45; filter:grayscale(.7); }
-.liveops__bonus-art[data-state='available'] { box-shadow:0 0 10px #e8c96f66; cursor:pointer; }
-.liveops__bonus-art[data-state='received'] { opacity:.6; }
+.liveops__bonus-art[data-state='available'] { box-shadow:inset 0 2px 0 #ffffff38,0 3px 0 #0004,0 0 10px #e8c96f66; cursor:pointer; }
+.liveops__bonus-art[data-state='received'] { opacity:.55; filter:grayscale(.6); }
+.liveops__mission[data-state='received'] :is(.liveops__mission-symbol,.liveops__mission-body),.liveops__bonus[data-state='received'] .liveops__bonus-body { opacity:.65; }
 .liveops__countdown { justify-self:end; min-height:15px; margin:0; color:var(--lo-muted); font-size:11px; line-height:15px; font-variant-numeric:tabular-nums; }
 .liveops-surface .liveops__wheel-card { position:relative; padding:32px 0 0; border:0; background:none; box-shadow:none; }
 .liveops-surface .liveops__wheel { width:min(100%,440px); margin:10px auto 14px; }
@@ -187,6 +197,9 @@ html .liveops-page .liveops-surface .liveops__mission-action .liveops__claim-coi
 .liveops__wheel-art--rim { z-index:2; }
 .liveops-surface .liveops__sector { z-index:1; display:grid; justify-items:center; gap:1px; width:clamp(28px,12cqi,52px); margin-left:clamp(-26px,-6cqi,-14px); margin-top:-24px; font-size:clamp(7px,2.4cqi,11px); line-height:1.15; color:#fff3c2; text-shadow:0 1px 2px #45290c; transform:rotate(calc(var(--sector)*36deg)) translateY(-34cqi); }
 .liveops__sector > :is(.wheel-gift-art,.ui-icon) { width:clamp(24px,10cqi,44px); height:clamp(24px,10cqi,44px); }
+.liveops__sector > .reward-info-host { display:block; width:clamp(24px,10cqi,44px); height:clamp(24px,10cqi,44px); }
+.liveops__sector .reward-info-host > .wheel-gift-art { width:100%; height:100%; }
+.liveops__sector .reward-info-host > .reward-info-button { left:100%; top:50%; right:auto; transform:translateY(-50%); }
 .liveops__sector > span { white-space:pre-line; }
 .liveops__wheel-rules { font-size:13px; line-height:1.5; }
 .liveops__wheel-rules ul { padding-left:20px; }
@@ -244,16 +257,20 @@ html .liveops-page .liveops-surface button.tab-button.liveops__festival-reward {
 html .liveops-page .liveops-surface button.liveops__festival-reward[data-state='locked'] { opacity:.42; filter:grayscale(.8); }
 html .liveops-page .liveops-surface button.liveops__festival-reward[data-state='claimed'] { opacity:.75; }
 .liveops__festival-reward[data-state='claimed'] > .liveops__festival-state { color:#8be5a2; }
+.liveops__journey-reward { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; height:48px; gap:2px; }
+.liveops__journey-reward > .liveops__chest-art { width:32px; height:32px; }
+.liveops__journey-reward[data-state='locked'] { opacity:.42; filter:grayscale(.8); }
+.liveops__journey-reward[data-state='claimed'] { opacity:.65; }
 .liveops__festival-progress { position:relative; height:20px; margin:6px 18px 0; overflow:hidden; border:1px solid var(--lo-line); border-radius:12px; background:var(--lo-inset); }
 .liveops__festival-fill { position:absolute; inset:0 auto 0 0; border-radius:inherit; background:linear-gradient(#a6df79,#4c9e47); }
 .liveops__festival-count { position:absolute; inset:0; display:grid; place-items:center; color:#fff9de; text-shadow:0 1px 2px #071b24,1px 0 2px #071b24,-1px 0 2px #071b24; font-size:12px; font-weight:800; }
 .liveops__festival-chest-dialog { display:grid; justify-items:center; gap:12px; }
 .liveops__festival-chest-dialog > .liveops__chest-art { width:96px; height:96px; }
+.liveops__chest-preview { display:block; width:96px; height:96px; margin-inline:auto; }
+.liveops__chest-preview > .liveops__chest-art { width:100%; height:100%; }
 .liveops__festival-chest-dialog > p:empty { display:none; }
 .liveops__chest-rates p { margin:0 0 10px; font-size:14px; line-height:1.5; }
 @media(max-width:360px) {
-  .liveops-surface .liveops__mission { grid-template-columns:38px minmax(0,1fr) 72px; gap:6px; padding:7px; }
-  .liveops__mission-symbol > .ui-icon { width:32px; height:32px; }
   html .liveops-page .liveops-surface .liveops__mission-action button { padding:6px; font-size:12px; }
   .liveops__ticket-balance { gap:3px; padding:6px; font-size:12px; }
   .liveops__ticket-balance > .ui-icon { display:none; }
@@ -299,8 +316,15 @@ html .liveops-page .liveops-surface .liveops__connection > .liveops__retry { mar
 
 .liveops__chest-card > .liveops__chest-art { width:48px; height:48px; }
 
-.storage__grid { display:grid; grid-template-columns:repeat(var(--storage-columns,4),minmax(0,1fr)); gap:8px; }
-.storage__item { display:grid; place-items:center; aspect-ratio:1; min-width:44px; min-height:44px; padding:4px; border:1px solid var(--ui-line); border-radius:10px; background:var(--ui-inset); }
+.storage__grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); grid-template-rows:repeat(6,auto); gap:8px; width:100%; max-width:384px; margin-inline:auto; }
+.storage__slot { display:grid; place-items:center; box-sizing:border-box; aspect-ratio:1; min-width:44px; min-height:44px; padding:4px; border:1px solid var(--ui-line); border-radius:10px; background:var(--ui-inset); }
+.storage__slot--empty { opacity:.55; }
+.storage__slot--locked { color:var(--ui-muted); cursor:pointer; background:var(--ui-surface); }
+.storage__slot--locked>.ui-icon { width:22px; height:22px; }
+.storage__pages>button { flex:0 0 auto; min-width:44px; min-height:44px; padding:4px 6px; }
+.storage__pages>button[aria-current=page] { background:var(--ui-primary); color:var(--ui-primary-ink,var(--ui-ink)); }
+.storage__slot-wrap { display:grid; min-width:0; }
+.storage__slot-wrap > .storage__item { width:100%; }
 .storage__item:focus-visible { outline:3px solid var(--ui-primary); outline-offset:2px; }
 .storage__item > .liveops__chest-art, .storage__item > .storage__fragment { width:100%; max-width:64px; height:auto; }
 .storage__fragment { display:block; width:64px; height:64px; fill:#60b9df; stroke:#173f63; stroke-width:2; stroke-linejoin:round; }
@@ -308,11 +332,30 @@ html .liveops-page .liveops-surface .liveops__connection > .liveops__retry { mar
 .storage__fragment[data-type='badge'] { fill:#bb91e7; stroke:#593378; }
 .storage__pages, .storage__actions { display:flex; justify-content:center; flex-wrap:wrap; gap:10px; margin:12px 0; }
 .storage__pages:empty { display:none; }
+.storage__pages { position:sticky; bottom:0; z-index:1; box-sizing:border-box; width:100%; max-width:100%; flex-wrap:nowrap; justify-content:safe center; gap:4px; margin:4px 0 0; padding:4px; overflow-x:auto; white-space:nowrap; scrollbar-width:none; background:var(--ui-surface); border-top:1px solid var(--ui-line); }
+.storage__pages::-webkit-scrollbar { display:none; }
 .storage__detail { display:grid; justify-items:center; gap:8px; }
+.storage__detail>.wheel-gift-art { width:96px; height:96px; }
 .storage__detail p { margin:0; text-align:center; }
+.storage__unlock { display:grid; gap:12px; text-align:center; }
+.storage__unlock>p { margin:0; }
+.storage__unlock-price { display:flex; justify-content:center; align-items:center; gap:6px; color:var(--ui-gold); }
+.storage__unlock-price>.ui-icon { width:22px; height:22px; }
+#storage-item-modal .storage__purchase-modal>.app-modal__footer { display:flex; justify-content:center; gap:10px; }
+#storage-item-modal .storage__purchase-modal>.app-modal__footer>.app-button { flex:0 1 96px; box-sizing:border-box; width:96px; max-width:96px; min-width:72px; height:44px; min-height:44px; padding:6px 12px; margin:0; }
 .storage__quantity, .storage__quantity input { display:block; width:100%; }
 .storage__actions > p, .storage__actions > label { flex-basis:100%; }
 .storage__actions label > input[type='number'] { width:64px; min-height:44px; margin-left:8px; }
 .storage__status { min-height:1.5em; }
-.storage__empty { grid-column:1/-1; text-align:center; }
 .storage__summary { max-height:50vh; overflow:auto; }
+.app-modal__header.storage__header { position:relative; gap:6px; padding-inline:12px; }
+.storage__heading { display:flex; align-items:center; gap:4px; min-width:0; }
+.storage__heading > .app-modal__title { min-width:0; font-size:clamp(16px,4.5vw,20px); }
+.storage__info { display:flex; flex:none; }
+.storage__info-button { display:grid; place-items:center; width:44px; height:44px; padding:0; border:0; border-radius:50%; background:transparent; color:var(--dialog-gold); cursor:pointer; }
+.storage__info-button > .ui-icon { width:22px; height:22px; }
+.storage__info-button:hover { background:var(--ui-inset); }
+.storage__info-button:focus-visible { outline:2px solid var(--dialog-gold); outline-offset:-3px; }
+.storage__rates { position:absolute; top:calc(100% + 6px); left:12px; right:12px; z-index:3; padding:12px; border:1px solid var(--dialog-line); border-radius:10px; background:var(--dialog-surface); color:var(--dialog-ink); font-size:13px; line-height:1.5; max-height:min(280px,calc(100dvh - 160px)); overflow:auto; box-shadow:0 4px 12px #0005; }
+
+.liveops--chests .liveops__status:empty { display:none; }

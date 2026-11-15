@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "assets:sync": "node scripts/generate-theme-manifest.mjs && node scripts/generate-game-shell-tokens.mjs && node scripts/generate-privacy-page.mjs",
+    "assets:sync": "node scripts/generate-theme-manifest.mjs && node scripts/generate-game-shell-tokens.mjs && node scripts/generate-privacy-page.mjs && node scripts/generate-shop-catalog-art.mjs",
     "shell:sync": "node scripts/generate-game-shell-tokens.mjs",
     "predev": "npm run assets:sync",
     "prebuild": "npm run assets:sync",

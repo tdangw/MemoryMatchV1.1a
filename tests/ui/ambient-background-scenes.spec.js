@@ -171,6 +171,7 @@ test('native sprite rotation and travel stay inside narrow portrait envelopes',a
   expect(result.count).toBe(4);expect(result.clipped).toEqual([]);expect(result.errors).toEqual([]);
 });
 test('all maps use bounded texture slots and suspend during scroll, popup and off', async ({ page }, testInfo) => {
+  await page.emulateMedia({reducedMotion:'no-preference'});
   for (const game of games) {
     await page.evaluate(async game => (await import('/tests/ui/helpers/gameNavigation.js')).openReadyGameMenu(game), game);
     await expect.poll(async () => (await diagnostics(page)).scene).toBe('map');

@@ -16,10 +16,9 @@ for (const gameId of ['memory-match','link-connect','triple-connect']) {
       window.claimedTiers = [];
       for (let i=0;i<4;i++) window.claimedTiers.push((await claimAdventureChest(id,1)).tier);
       if (await claimAdventureChest(id,1)) throw new Error('Duplicate chest granted');
-      await (await import('/js/mainmenu.js')).showCollectionModal({ gameId:id });
     }, gameId);
     expect(await page.evaluate(() => window.claimedTiers)).toEqual(['C','B','A','S']);
-    await page.getByRole('tab',{ name:'Thành tích', exact:true }).click();
+    await page.locator('[data-map-destination=achievements]').click();
     await expect(page.locator('.storybook-achievement-row')).toHaveCount(10);
     await expect(page.locator('.storybook-achievement-row [data-complete="true"]')).toHaveCount(40);
     await page.getByRole('button',{name:'Nhận 300 Xu',exact:true}).click();
@@ -28,11 +27,11 @@ for (const gameId of ['memory-match','link-connect','triple-connect']) {
     for (const [width,height] of [[320,568],[412,915],[844,390],[1024,900]]) {
       await page.setViewportSize({width,height});
       await expect(page.locator('.achievement-collection')).toBeVisible();
-      const overflow = await page.locator('#collection-modal .app-modal').evaluate(el => el.scrollWidth > el.clientWidth + 1);
+      const overflow = await page.locator('#achievements-modal .app-modal').evaluate(el => el.scrollWidth > el.clientWidth + 1);
       expect(overflow).toBe(false);
-      await page.locator('#collection-modal').screenshot({path:`docs/qa/gameplay-progression/collection-${gameId}-${width}.png`});
+      await page.locator('#achievements-modal').screenshot({path:`docs/qa/gameplay-progression/collection-${gameId}-${width}.png`});
     }
-    await page.locator('#collection-modal .app-modal__close').click();
+    await page.locator('.adventure-screen [data-dock-action=map]').click();
     const duplicate = await page.evaluate(async id => (await import('/js/adventureRewards.js')).claimAdventureCollection(id,1),gameId);
     expect(duplicate).toBeNull();
   });

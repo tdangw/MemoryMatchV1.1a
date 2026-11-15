@@ -1,23 +1,22 @@
 import { isAppActive } from '../appVisibility.js';
 import { createGameShellLifecycle } from '../gameShell/gameShellLifecycle.js';
-import { chestArtUrl } from './chestArt.js';
+import { createChestArt } from './chestArt.js';
 import { WHEEL_SLOTS } from './wheelRewards.js';
+import { CHEST_TYPES } from './chestConfig.js';
 import '../../styles/wheel-gifts.css';
 
 export const WHEEL_BOX_LABELS=Object.freeze({coins:WHEEL_SLOTS[2].label,...Object.fromEntries(WHEEL_SLOTS.filter(slot=>slot.box).map(slot=>[slot.box,slot.label]))});
-const artKinds=new Set(['coins','mystery','cosmetic','flip','theme','path','exit','support']);
-function refreshArt(art){
-  for(const state of ['closed','open'])art.querySelector(`.wheel-gift__image--${state}`).src=chestArtUrl(art.dataset.wheelBox,state);
-  art.dataset.skin=document.documentElement.dataset.uiSkin||'default';
-}
+const artKinds=new Set([...CHEST_TYPES,'coins','mystery','cosmetic','flip','theme','path','exit','support']);
 /** Each reward category has its own paired image, shared across all skins. */
 export function createWheelGiftArt(box){
   if(!artKinds.has(box))throw new TypeError(`Unknown wheel chest: ${box}`);
   const art=document.createElement('span');art.className='wheel-gift-art';art.dataset.wheelBox=box;art.setAttribute('aria-hidden','true');
-  for(const state of ['closed','open']){const image=document.createElement('img');image.className=`wheel-gift__image wheel-gift__image--${state}`;image.alt='';image.decoding='async';image.draggable=false;art.append(image);}
-  refreshArt(art);return art;
+  for(const state of ['closed','open']){const image=createChestArt(box,state);image.className=`wheel-gift__image wheel-gift__image--${state}`;art.append(image);}
+  art.dataset.skin=document.documentElement.dataset.uiSkin||'default';return art;
 }
-export function refreshWheelGiftArt(root){for(const art of root.querySelectorAll('.wheel-gift-art'))if(art.dataset.skin!==(document.documentElement.dataset.uiSkin||'default'))refreshArt(art);}
+// Artwork is skin-independent. Preserve its nodes, animation targets and fallback
+// instead of reassigning a failed URL when the surrounding skin changes.
+export function refreshWheelGiftArt(root){const skin=document.documentElement.dataset.uiSkin||'default';for(const art of root.querySelectorAll('.wheel-gift-art'))if(art.dataset.skin!==skin)art.dataset.skin=skin;}
 
 /** One finite image transition; the server grant is already committed. */
 export async function presentWheelGift(box,{owner,host,title=WHEEL_BOX_LABELS[box]}){

@@ -1252,11 +1252,6 @@ function recoverBlockedLinkBoard(board) {
     if (shuffled) renderLinkBoardShuffle(board, { onTileClick: handleLinkTileClick });
     else renderLinkBoard(board, { onTileClick: handleLinkTileClick });
     playPendingBoardTransforms();
-    showAppToast(
-      shuffled
-        ? `Đã mở toàn bộ ${unlockedPairs} cặp băng và xáo lại bàn.`
-        : `Đã mở toàn bộ ${unlockedPairs} cặp băng còn lại.`,
-    );
     return true;
   }
   if (ensurePlayableBoard(board)) {

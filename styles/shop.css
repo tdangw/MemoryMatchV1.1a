@@ -123,6 +123,7 @@
   overflow: hidden;
   padding: 14px;
 }
+html :is(#shop-modal,#collection-modal) .app-modal__body { padding-top:4px; }
 .shop-content {
   display: grid;
   width: 100%;
@@ -133,37 +134,47 @@
 .shop-tabs {
   display: flex;
   flex-wrap: nowrap;
-  gap: 8px;
+  align-self: start;
+  gap: 2px;
   overflow-x: auto;
-  padding-bottom: 2px;
+  padding: 1px;
+  border: 1px solid var(--ui-line);
+  border-radius: 14px;
+  background: var(--ui-inset);
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
 .shop-tabs::-webkit-scrollbar {
   display: none;
 }
-.shop-tab {
+html :is(#shop-modal, #collection-modal) .shop-tabs > .shop-tab {
+  box-sizing: border-box;
   white-space: nowrap;
-  flex: 0 0 auto;
-  min-width: 102px;
+  flex: 1 0 auto;
+  min-width: 0;
   min-height: 44px;
-  border: 1px solid rgb(255 255 255 / 13%);
+  padding: 6px 10px;
+  border: 1px solid transparent;
+  border-image: none;
   border-radius: 10px;
-  background: rgb(7 17 37 / 32%);
-  color: rgb(245 247 251 / 72%);
+  background: transparent;
+  color: var(--ui-muted);
+  box-shadow: none;
+  text-shadow: none;
   font:
-    700 0.82rem/1 "Segoe UI",
+    700 0.76rem/1.25 "Segoe UI",
     sans-serif;
   cursor: pointer;
 }
-.shop-tab.is-active {
-  border-color: rgb(242 191 91 / 44%);
-  background: rgb(242 191 91 / 16%);
-  color: #ffe09a;
+html :is(#shop-modal, #collection-modal) .shop-tabs > .shop-tab.is-active {
+  border-color: color-mix(in srgb, var(--ui-gold) 55%, transparent);
+  background: var(--ui-raised);
+  color: var(--ui-gold);
+  box-shadow: inset 0 1px #e1f1d538, inset 0 -2px #031a22;
 }
-
-.shop-tabs--catalog {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+html :is(#shop-modal, #collection-modal) .shop-tabs > .shop-tab:focus-visible {
+  outline: 2px solid var(--ui-focus);
+  outline-offset: -3px;
 }
 
 #shop-modal .shop-item-grid,
@@ -218,21 +229,6 @@
 
 /* Collection has exactly two rows: compact tabs and the active scrolling panel. */
 #collection-modal .collection-content > [role="tabpanel"] { min-height: 0; overflow-y: auto; }
-#collection-modal .collection-tabs {
-  display: flex;
-  flex-wrap: nowrap;
-  align-self: start;
-  gap: 8px;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-#collection-modal .collection-tabs > .shop-tab {
-  flex: 0 0 auto;
-  min-height: 48px;
-  padding: 8px 14px;
-  white-space: nowrap;
-  line-height: 1.25;
-}
 #collection-modal .collection-chest-panel .liveops { color: var(--ui-ink); }
 #collection-modal .collection-chest-panel .liveops__status { min-height: 1.4em; margin: 0 0 12px; }
 #collection-modal .collection-chest-panel .liveops__last-result:empty { display: none; }
@@ -462,18 +458,6 @@
   color: #ffe09a;
   font-size: 1.1rem;
 }
-#shop-confirm-modal .app-modal__footer {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-#shop-confirm-modal .app-button--secondary {
-  border-color: transparent;
-  background: transparent;
-  color: #f5f7fb;
-}
-#shop-confirm-modal .app-button--primary {
-  background: transparent;
-  color: #fff;
-}
 #theme-change-notice-modal .app-button--primary {
   background: transparent;
   color: #fff;
@@ -527,11 +511,9 @@
 #shop-confirm-modal .app-modal { border-color: #c6ac6b; border-radius: 20px; background: var(--dialog-surface); box-shadow: var(--dialog-edge); }
 #shop-confirm-modal .app-modal__header { min-height: 64px; padding: 12px 14px; background: #061f2966; border-bottom-color: #b6a16c40; }
 #shop-confirm-modal .app-modal__title { color: var(--dialog-gold); font-size: 20px; }
-#shop-confirm-modal .app-modal__footer { padding: 12px 14px 16px; gap: 8px; }
-#shop-confirm-modal .app-button { min-height: 44px; border-radius: 12px; }
 
 /* Collection and shop share content surfaces, not ornamental frames. */
 .theme-choice, .appearance-choice, #shop-modal .shop-item, .quick-assist__choice { border: 1px solid var(--ui-line); border-radius: 12px; background: var(--ui-surface); }
-#shop-modal .shop-buy-button, #collection-modal .shop-buy-button { min-height: 44px; min-width: 64px; padding: 8px 14px; background: var(--ui-raised); border: 1px solid var(--ui-line); color: var(--ui-ink); border-radius: 10px; }
+#shop-modal .shop-buy-button, #collection-modal .shop-buy-button { min-height: 44px; min-width: 64px; padding: 4px 14px; background: var(--ui-raised); border: 1px solid var(--ui-line); color: var(--ui-ink); border-radius: 10px; }
 #shop-modal .appearance-action--equip, #collection-modal .appearance-action--equip { background: var(--ui-primary); }
 #shop-modal .shop-buy-button:disabled, #collection-modal .shop-buy-button:disabled { background: var(--ui-inset); color: var(--ui-muted); }

@@ -11,7 +11,7 @@ export async function seed(page,id,{count=10,all=true,hints=0}={}) {
     await openReadyGameMenu(id);
   },{id,count,all,hints});
 }
-export async function open(page){await page.locator('[data-chest="1"]').click();await expect(page.locator('.treasure-card')).toHaveCount(4);}
+export async function open(page){const notice=page.locator('#achievement-notice-modal');if(await notice.count()){await notice.getByRole('button',{name:'Tiếp tục',exact:true}).click();await expect(notice).toHaveCount(0);}await page.locator('[data-chest="1"]').click();await expect(page.locator('.treasure-card')).toHaveCount(4);}
 export const snapshot=(page,id)=>page.evaluate(async id=>{
   const {gameState}=await import('/js/gameState.js'),key=(await import('/js/gameCatalog.js')).getGameProgressKey(id);
   return{coins:gameState.coins,hints:gameState.progress[key].items.hint,receipt:gameState.progress[key].claimedChests[1]};

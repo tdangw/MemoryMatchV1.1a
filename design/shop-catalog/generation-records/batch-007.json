@@ -1,0 +1,37 @@
+{
+  "tool": "built-in image_gen",
+  "transparent_background": true,
+  "references": [
+    "design/shop-catalog/reference-four-column.png"
+  ],
+  "entries": [
+    {
+      "key": "exit/split8",
+      "master": "illustrations/exit-split8-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-e72adc08-56f7-41ea-bc1f-9ce1bb578dab.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A cream playing card with a fine warm-gold rim and a small clean blue geometric diamond (drawn shape, not a font glyph), with the removal effect visibly changing the card. Card is the dominant big object, slightly tilted at most, pieces large and clear rather than microscopic. Same card design throughout this family. The same card splitting into eight large visible rectangular pieces, compact orderly explosion, cream faces and gold edges.",
+      "status": "generated-candidate"
+    },
+    {
+      "key": "exit/triangles",
+      "master": "illustrations/exit-triangles-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-970f446d-e6fc-44fe-b973-3395236fd2e4.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A cream playing card with a fine warm-gold rim and a small clean blue geometric diamond (drawn shape, not a font glyph), with the removal effect visibly changing the card. Card is the dominant big object, slightly tilted at most, pieces large and clear rather than microscopic. Same card design throughout this family. The card breaking into five or six large geometric triangular pieces with cyan and violet backs and cream faces, clear recognizable triangular fragmentation.",
+      "status": "generated-candidate"
+    },
+    {
+      "key": "exit/crumble",
+      "master": "illustrations/exit-crumble-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-cc147eab-25cd-4263-a828-35085f1649f6.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A cream playing card with a fine warm-gold rim and a small clean blue geometric diamond (drawn shape, not a font glyph), with the removal effect visibly changing the card. Card is the dominant big object, slightly tilted at most, pieces large and clear rather than microscopic. Same card design throughout this family. The card's lower-right half crumbling into several irregular chunky cream and gold pieces, rough physical fragments distinct from fine dust or regular pixels.",
+      "status": "generated-candidate"
+    },
+    {
+      "key": "exit/gravity",
+      "master": "illustrations/exit-gravity-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-cd6498fa-72e7-4f82-8d78-86d531b28c57.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A cream playing card with a fine warm-gold rim and a small clean blue geometric diamond (drawn shape, not a font glyph), with the removal effect visibly changing the card. Card is the dominant big object, slightly tilted at most, pieces large and clear rather than microscopic. Same card design throughout this family. The card visibly dropping downward, slightly tilted, with two faint descending ghost trails and a few falling small fragments beneath it, no arrow glyph.",
+      "status": "generated-candidate"
+    }
+  ]
+}

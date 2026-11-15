@@ -1,0 +1,37 @@
+{
+  "tool": "built-in image_gen",
+  "transparent_background": true,
+  "references": [
+    "design/shop-catalog/reference-four-column.png"
+  ],
+  "entries": [
+    {
+      "key": "theme/animals-land",
+      "master": "illustrations/theme-animals-land-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-7c0113ac-5a71-4292-8ba3-4e64106b8ddf.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A friendly high-quality illustrated representative object or character for this card theme, like the reference's deer, noodle bowl, fruit and planet icons. Warm dimensional casual game illustration, bright clear color, simple strong silhouette; not a contact sheet of cards and not a screenshot. One adorable friendly golden-brown deer head with small antlers and large kind eyes, a few simple green leaves beneath, like the reference's animal theme illustration.",
+      "status": "generated-candidate"
+    },
+    {
+      "key": "theme/animals-air",
+      "master": "illustrations/theme-animals-air-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-3a9834ec-a42f-419a-889e-bac4dd4f1dbb.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A friendly high-quality illustrated representative object or character for this card theme, like the reference's deer, noodle bowl, fruit and planet icons. Warm dimensional casual game illustration, bright clear color, simple strong silhouette; not a contact sheet of cards and not a screenshot. One friendly colorful small blue-and-gold bird with rounded wings partly open, a tiny soft white cloud accent, readable bird silhouette.",
+      "status": "generated-candidate"
+    },
+    {
+      "key": "theme/animals-sea",
+      "master": "illustrations/theme-animals-sea-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-efa0ce10-2241-462f-84e4-d14d362abc5a.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A friendly high-quality illustrated representative object or character for this card theme, like the reference's deer, noodle bowl, fruit and planet icons. Warm dimensional casual game illustration, bright clear color, simple strong silhouette; not a contact sheet of cards and not a screenshot. One friendly small green sea turtle with a clear patterned shell and one blue water curl, cute polished underwater-animal theme representative, no scene.",
+      "status": "generated-candidate"
+    },
+    {
+      "key": "theme/foods",
+      "master": "illustrations/theme-foods-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-d2a95261-8c39-4f66-a718-a548e110cea5.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A friendly high-quality illustrated representative object or character for this card theme, like the reference's deer, noodle bowl, fruit and planet icons. Warm dimensional casual game illustration, bright clear color, simple strong silhouette; not a contact sheet of cards and not a screenshot. An inviting warm bowl of noodles with one egg half and simple green garnish, gold-rimmed teal bowl, like the reference food theme icon.",
+      "status": "generated-candidate"
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "tool": "built-in image_gen",
+  "transparent_background": true,
+  "references": [
+    "design/shop-catalog/reference-four-column.png"
+  ],
+  "entries": [
+    {
+      "key": "flip/blur-in",
+      "master": "illustrations/flip-blur-in-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-41e4c900-e569-417f-bfb0-bdfc3ca6a4b5.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A blue-backed cream playing card with thin gold rim and small simple geometric center diamond, and a clear gold or teal motion cue for the flip/reveal effect. Big simple forms, no labels, no letter on the card. Same card throughout this family. The card emerging crisply from a soft short blue blur trail, left edge softly blurred and right face crisp, subtle warm highlights.",
+      "status": "generated-candidate"
+    },
+    {
+      "key": "flip/memory-effect-moonflip",
+      "master": "illustrations/flip-memory-effect-moonflip-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-36bb08f1-9f0d-414d-a9a5-d2c6c131cff1.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A blue-backed cream playing card with thin gold rim and small simple geometric center diamond, and a clear gold or teal motion cue for the flip/reveal effect. Big simple forms, no labels, no letter on the card. Same card throughout this family. The card revealing with a pale-gold crescent moon and two blue-white moonlight sparkles near its edge, elegant cream and midnight-blue treatment.",
+      "status": "generated-candidate"
+    },
+    {
+      "key": "flip/memory-effect-spring-petals",
+      "master": "illustrations/flip-memory-effect-spring-petals-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-68c693d0-1484-4549-a773-2808f1a04a85.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A blue-backed cream playing card with thin gold rim and small simple geometric center diamond, and a clear gold or teal motion cue for the flip/reveal effect. Big simple forms, no labels, no letter on the card. Same card throughout this family. The card revealing amidst three large pink spring petals and a small soft green leaf, delicate warm-gold trim and gentle lively motion.",
+      "status": "generated-candidate"
+    },
+    {
+      "key": "theme/default",
+      "master": "illustrations/theme-default-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-68d926cc-c246-424c-85b4-15686f503a90.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A friendly high-quality illustrated representative object or character for this card theme, like the reference's deer, noodle bowl, fruit and planet icons. Warm dimensional casual game illustration, bright clear color, simple strong silhouette; not a contact sheet of cards and not a screenshot. A small fan of three attractive blue-backed and cream-faced matching-game cards with thin gold edges and a simple drawn blue diamond motif.",
+      "status": "generated-candidate"
+    }
+  ]
+}

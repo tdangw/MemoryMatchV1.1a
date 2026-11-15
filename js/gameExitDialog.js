@@ -6,7 +6,7 @@ export function openGameExitDialog({ owner, trigger, onExit, onRestart, onSettin
   trigger.setAttribute('aria-expanded', 'true');
   let nextAction = null;
   const modal = openAppModal({
-    id: 'game-exit-modal', title: 'Tạm dừng', icon: 'menu', owner,
+    id: 'game-exit-modal', title: 'Tạm dừng', icon: 'menu', owner, alignment: 'center',
     content: '',
     size: 'small',
     actions: [

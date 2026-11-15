@@ -1,5 +1,6 @@
 import { createTreasureArt } from './treasureArt.js';
 import { createIcon } from '../icons.js';
+import { createRewardInfo } from '../rewardInfo.js';
 
 function element(tag, className, text) {
   const node = document.createElement(tag); node.className = className;
@@ -23,11 +24,11 @@ export function renderTreasureContent(content, view, { selected = view.activeTie
     card.setAttribute('aria-label', `${item.name}, ${item.completedLevels}/10 màn ${item.difficulty}, ${stateLabel}`);
     card.append(createTreasureArt(item.tier, item.state === 'claimed'), element('strong','',item.name),
       element('small','',item.state === 'claimed' ? 'Đã nhận' : item.state === 'ready' ? 'Có thể mở' : item.state === 'waiting' ? 'Chờ rương trước' : `${item.completedLevels}/10 · ${item.difficulty}`));
-    cards.append(card);
+    const slot=element('div','treasure-card-slot reward-info-host');slot.append(card,createRewardInfo(`${item.reward.coins} Xu · ${item.reward.hints} Gợi ý`,`Thông tin ${item.name}`));cards.append(slot);
   }
   const detail = element('section','treasure-detail'); detail.dataset.selectedTier = selected;
-  const hero = element('div','treasure-hero');
-  hero.append(createTreasureArt(selected, phase === 'success' || phase !== 'opening' && chest.state === 'claimed'));
+  const hero = element('div','treasure-hero reward-info-host');
+  hero.append(createTreasureArt(selected, phase === 'success' || phase !== 'opening' && chest.state === 'claimed'),createRewardInfo(`${chest.reward.coins} Xu · ${chest.reward.hints} Gợi ý`,`Thông tin ${chest.name}`));
   const heading = element('h3','',chest.name);
   const progress = element('progress','treasure-progress'); progress.max = 10; progress.value = chest.completedLevels;
   progress.setAttribute('aria-label', `${chest.name}: ${chest.completedLevels}/10 màn ${chest.difficulty}`);

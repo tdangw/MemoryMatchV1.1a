@@ -1,6 +1,6 @@
 import { initializeApp, deleteApp } from "firebase/app";
 import { getAuth, connectAuthEmulator } from "firebase/auth";
-import { getFirestore, connectFirestoreEmulator, terminate } from "firebase/firestore";
+import { initializeFirestore, connectFirestoreEmulator, terminate } from "firebase/firestore";
 import { getFirebaseEnvironment } from './firebaseEnvironment.js';
 export { getFirebaseEnvironment } from './firebaseEnvironment.js';
 
@@ -23,7 +23,8 @@ async function initializeBackend() {
   if (!config.apiKey || !config.projectId || !config.authDomain) throw new Error("Thiếu cấu hình Firebase.");
   const app = initializeApp(config);
   const auth = getAuth(app);
-  const database = getFirestore(app);
+  // Close WebChannel responses after data arrives instead of keeping a stream open.
+  const database = initializeFirestore(app, emulator ? {} : {experimentalForceLongPolling:true});
   if (emulator) {
     connectAuthEmulator(auth, "http://127.0.0.1:9199", { disableWarnings: true });
     connectFirestoreEmulator(database, "127.0.0.1", 8180);

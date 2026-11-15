@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { chestCandidate, earnChest, openChest } from '../../js/liveops/chests.js';
-import { CHEST_POOLS, CHEST_SUPPORTS } from '../../js/liveops/chestConfig.js';
+import { LEGACY_CHEST_POOLS as CHEST_POOLS, CHEST_SUPPORTS } from '../../js/liveops/chestConfig.js';
 
 const failRandom = () => { throw new Error('Unexpected reroll'); };
 const pick = (type, owned, category, item = 0) => {
@@ -9,7 +9,7 @@ const pick = (type, owned, category, item = 0) => {
   return chestCandidate(type, 'memory-match', owned, () => {
     assert.ok(draws.length, 'only category and selected subpool draw');
     return draws.shift();
-  });
+  }, 1);
 };
 
 test('new cosmetic candidates choose uniformly only from missing whitelist IDs', () => {
@@ -36,8 +36,8 @@ test('ownership filtering does not increase the 20% cosmetic branch or alter coi
     assert.equal(pick(type, owned, .4).kind, 'support');
     assert.equal(pick(type, owned, .799999).kind, 'support');
     assert.equal(pick(type, owned, .8).itemId, pool[0]);
-    assert.equal(chestCandidate(type, 'memory-match', pool, failRandom).coins, 100);
-    assert.equal(chestCandidate(type, 'memory-match', pool, failRandom).reason, 'full');
+    assert.equal(chestCandidate(type, 'memory-match', pool, failRandom, 1).coins, 100);
+    assert.equal(chestCandidate(type, 'memory-match', pool, failRandom, 1).reason, 'full');
     // A catalog addition needs no saved full-pool flag: an ownership list missing
     // the latest pool entry resumes the ordinary category roll immediately.
     assert.equal(pick(type, pool.slice(0, -1), .8).itemId, pool.at(-1));

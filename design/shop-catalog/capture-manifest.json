@@ -1,0 +1,607 @@
+{
+  "seed": 12345,
+  "entries": [
+    {
+      "kind": "path",
+      "id": "default",
+      "title": "Default",
+      "source": "connectionEngine",
+      "frameMs": 400
+    },
+    {
+      "kind": "path",
+      "id": "electric",
+      "title": "Electric",
+      "source": "connectionEngine",
+      "frameMs": 180
+    },
+    {
+      "kind": "path",
+      "id": "laser",
+      "title": "Laser",
+      "source": "connectionEngine",
+      "frameMs": 400
+    },
+    {
+      "kind": "path",
+      "id": "fire",
+      "title": "Fire",
+      "source": "connectionEngine",
+      "frameMs": 180
+    },
+    {
+      "kind": "path",
+      "id": "magic",
+      "title": "Magic",
+      "source": "connectionEngine",
+      "frameMs": 400
+    },
+    {
+      "kind": "path",
+      "id": "cyber",
+      "title": "Cyber",
+      "source": "connectionEngine",
+      "frameMs": 400
+    },
+    {
+      "kind": "path",
+      "id": "rainbow",
+      "title": "Rainbow",
+      "source": "connectionEngine",
+      "frameMs": 400
+    },
+    {
+      "kind": "path",
+      "id": "hydro",
+      "title": "Hydro",
+      "source": "connectionEngine",
+      "frameMs": 400
+    },
+    {
+      "kind": "path",
+      "id": "plasma",
+      "title": "Plasma",
+      "source": "connectionEngine",
+      "frameMs": 400
+    },
+    {
+      "kind": "path",
+      "id": "holy",
+      "title": "Holy",
+      "source": "connectionEngine",
+      "frameMs": 400
+    },
+    {
+      "kind": "path",
+      "id": "shadow",
+      "title": "Shadow",
+      "source": "connectionEngine",
+      "frameMs": 400
+    },
+    {
+      "kind": "path",
+      "id": "spiral",
+      "title": "Spiral",
+      "source": "connectionEngine",
+      "frameMs": 400
+    },
+    {
+      "kind": "path",
+      "id": "dashed",
+      "title": "Dashed",
+      "source": "connectionEngine",
+      "frameMs": 400
+    },
+    {
+      "kind": "path",
+      "id": "bullet",
+      "title": "Bullet",
+      "source": "connectionEngine",
+      "frameMs": 90
+    },
+    {
+      "kind": "path",
+      "id": "kame",
+      "title": "Kame",
+      "source": "connectionEngine",
+      "frameMs": 400
+    },
+    {
+      "kind": "path",
+      "id": "halo",
+      "title": "Halo",
+      "source": "connectionEngine",
+      "frameMs": 400
+    },
+    {
+      "kind": "path",
+      "id": "matrix",
+      "title": "Matrix",
+      "source": "connectionEngine",
+      "frameMs": 400
+    },
+    {
+      "kind": "path",
+      "id": "sonic",
+      "title": "Sonic",
+      "source": "connectionEngine",
+      "frameMs": 400
+    },
+    {
+      "kind": "path",
+      "id": "chains",
+      "title": "Chains",
+      "source": "connectionEngine",
+      "frameMs": 400
+    },
+    {
+      "kind": "path",
+      "id": "meteor",
+      "title": "Meteor",
+      "source": "connectionEngine",
+      "frameMs": 180
+    },
+    {
+      "kind": "path",
+      "id": "poison",
+      "title": "Poison",
+      "source": "connectionEngine",
+      "frameMs": 400
+    },
+    {
+      "kind": "path",
+      "id": "link-effect-meteor-route",
+      "title": "Tinh Tuyến",
+      "source": "connectionEngine",
+      "frameMs": 180
+    },
+    {
+      "kind": "path",
+      "id": "triple-effect-triad-converge",
+      "title": "Tam Tinh Hội Tụ",
+      "source": "connectionEngine",
+      "frameMs": 180
+    },
+    {
+      "kind": "exit",
+      "id": "default",
+      "title": "Default",
+      "source": "linkEffectAdapter/exitEngine/CSS",
+      "frameMs": 420
+    },
+    {
+      "kind": "exit",
+      "id": "dissolve",
+      "title": "Dissolve",
+      "source": "linkEffectAdapter/exitEngine/CSS",
+      "frameMs": 420
+    },
+    {
+      "kind": "exit",
+      "id": "finedust",
+      "title": "Fine Dust",
+      "source": "linkEffectAdapter/exitEngine/CSS",
+      "frameMs": 420
+    },
+    {
+      "kind": "exit",
+      "id": "split4",
+      "title": "Split 4",
+      "source": "linkEffectAdapter/exitEngine/CSS",
+      "frameMs": 420
+    },
+    {
+      "kind": "exit",
+      "id": "split2",
+      "title": "Split 2",
+      "source": "linkEffectAdapter/exitEngine/CSS",
+      "frameMs": 420
+    },
+    {
+      "kind": "exit",
+      "id": "split8",
+      "title": "Split 8",
+      "source": "linkEffectAdapter/exitEngine/CSS",
+      "frameMs": 420
+    },
+    {
+      "kind": "exit",
+      "id": "triangles",
+      "title": "Triangles",
+      "source": "linkEffectAdapter/exitEngine/CSS",
+      "frameMs": 420
+    },
+    {
+      "kind": "exit",
+      "id": "crumble",
+      "title": "Crumble",
+      "source": "linkEffectAdapter/exitEngine/CSS",
+      "frameMs": 420
+    },
+    {
+      "kind": "exit",
+      "id": "gravity",
+      "title": "Gravity",
+      "source": "linkEffectAdapter/exitEngine/CSS",
+      "frameMs": 420
+    },
+    {
+      "kind": "exit",
+      "id": "collide",
+      "title": "Collide",
+      "source": "linkEffectAdapter/exitEngine/CSS",
+      "frameMs": 420
+    },
+    {
+      "kind": "exit",
+      "id": "portal",
+      "title": "Portal",
+      "source": "linkEffectAdapter/exitEngine/CSS",
+      "frameMs": 420
+    },
+    {
+      "kind": "exit",
+      "id": "blackhole",
+      "title": "Black Hole",
+      "source": "linkEffectAdapter/exitEngine/CSS",
+      "frameMs": 420
+    },
+    {
+      "kind": "exit",
+      "id": "freeze",
+      "title": "Freeze",
+      "source": "linkEffectAdapter/exitEngine/CSS",
+      "frameMs": 420
+    },
+    {
+      "kind": "exit",
+      "id": "burn",
+      "title": "Burn",
+      "source": "linkEffectAdapter/exitEngine/CSS",
+      "frameMs": 420
+    },
+    {
+      "kind": "exit",
+      "id": "pixel",
+      "title": "Pixel",
+      "source": "linkEffectAdapter/exitEngine/CSS",
+      "frameMs": 420
+    },
+    {
+      "kind": "exit",
+      "id": "implode",
+      "title": "Implode",
+      "source": "linkEffectAdapter/exitEngine/CSS",
+      "frameMs": 420
+    },
+    {
+      "kind": "exit",
+      "id": "slice",
+      "title": "Slice",
+      "source": "linkEffectAdapter/exitEngine/CSS",
+      "frameMs": 420
+    },
+    {
+      "kind": "exit",
+      "id": "bubble",
+      "title": "Bubble",
+      "source": "linkEffectAdapter/exitEngine/CSS",
+      "frameMs": 420
+    },
+    {
+      "kind": "exit",
+      "id": "origami",
+      "title": "Origami",
+      "source": "linkEffectAdapter/exitEngine/CSS",
+      "frameMs": 420
+    },
+    {
+      "kind": "exit",
+      "id": "electric-shock",
+      "title": "Electric Shock",
+      "source": "linkEffectAdapter/exitEngine/CSS",
+      "frameMs": 420
+    },
+    {
+      "kind": "exit",
+      "id": "ghost",
+      "title": "Ghost",
+      "source": "linkEffectAdapter/exitEngine/CSS",
+      "frameMs": 420
+    },
+    {
+      "kind": "exit",
+      "id": "link-effect-moon-petals",
+      "title": "Cánh Hoa Nguyệt",
+      "source": "linkEffectAdapter/exitEngine/CSS",
+      "frameMs": 100
+    },
+    {
+      "kind": "exit",
+      "id": "triple-effect-crystal-bloom",
+      "title": "Tam Quang",
+      "source": "linkEffectAdapter/exitEngine/CSS",
+      "frameMs": 100
+    },
+    {
+      "kind": "flip",
+      "id": "memory-effect-moonflip",
+      "title": "Nguyệt Ảnh",
+      "source": "board.css/achievementFlip",
+      "frameMs": 120
+    },
+    {
+      "kind": "flip",
+      "id": "memory-effect-spring-petals",
+      "title": "Hoa Xuân",
+      "source": "board.css/achievementFlip",
+      "frameMs": 120
+    },
+    {
+      "kind": "flip",
+      "id": "bounce",
+      "title": "Bật nảy",
+      "source": "board.css/achievementFlip",
+      "frameMs": 120
+    },
+    {
+      "kind": "flip",
+      "id": "fade-scale",
+      "title": "Mờ phóng to",
+      "source": "board.css/achievementFlip",
+      "frameMs": 120
+    },
+    {
+      "kind": "flip",
+      "id": "pop",
+      "title": "Nảy nhanh",
+      "source": "board.css/achievementFlip",
+      "frameMs": 120
+    },
+    {
+      "kind": "flip",
+      "id": "slide-up",
+      "title": "Trượt lên",
+      "source": "board.css/achievementFlip",
+      "frameMs": 120
+    },
+    {
+      "kind": "flip",
+      "id": "flip-y",
+      "title": "Lật 3D",
+      "source": "board.css/achievementFlip",
+      "frameMs": 120
+    },
+    {
+      "kind": "flip",
+      "id": "zoom-rotate",
+      "title": "Xoay thu phóng",
+      "source": "board.css/achievementFlip",
+      "frameMs": 120
+    },
+    {
+      "kind": "flip",
+      "id": "blur-in",
+      "title": "Tan mờ",
+      "source": "board.css/achievementFlip",
+      "frameMs": 120
+    },
+    {
+      "kind": "back",
+      "id": "classic",
+      "title": "Hoàng hôn",
+      "source": "gameplay-effects.css",
+      "frameMs": 0
+    },
+    {
+      "kind": "back",
+      "id": "midnight",
+      "title": "Đêm sao",
+      "source": "gameplay-effects.css",
+      "frameMs": 0
+    },
+    {
+      "kind": "back",
+      "id": "aurora",
+      "title": "Cực quang",
+      "source": "gameplay-effects.css",
+      "frameMs": 0
+    },
+    {
+      "kind": "back",
+      "id": "candy",
+      "title": "Kẹo sắc màu",
+      "source": "gameplay-effects.css",
+      "frameMs": 0
+    },
+    {
+      "kind": "back",
+      "id": "moon-mountain",
+      "title": "Nguyệt Sơn",
+      "source": "gameplay-effects.css",
+      "frameMs": 0
+    },
+    {
+      "kind": "back",
+      "id": "moonlit-garden",
+      "title": "Nguyệt Viên",
+      "source": "gameplay-effects.css",
+      "frameMs": 0
+    },
+    {
+      "kind": "back",
+      "id": "starlight-path",
+      "title": "Tinh Lộ",
+      "source": "gameplay-effects.css",
+      "frameMs": 0
+    },
+    {
+      "kind": "back",
+      "id": "crystal-triad",
+      "title": "Tam Tinh",
+      "source": "gameplay-effects.css",
+      "frameMs": 0
+    },
+    {
+      "kind": "back",
+      "id": "lunar-pair",
+      "title": "Song Nguyệt",
+      "source": "gameplay-effects.css",
+      "frameMs": 0
+    },
+    {
+      "kind": "back",
+      "id": "azure-link",
+      "title": "Lam Tuyến",
+      "source": "gameplay-effects.css",
+      "frameMs": 0
+    },
+    {
+      "kind": "back",
+      "id": "crystal-trio-light",
+      "title": "Tam Quang",
+      "source": "gameplay-effects.css",
+      "frameMs": 0
+    },
+    {
+      "kind": "theme",
+      "id": "default",
+      "title": "Mặc định",
+      "source": "themeCatalog/getThemeCards",
+      "frameMs": 0
+    },
+    {
+      "kind": "theme",
+      "id": "animals-land",
+      "title": "Động vật trên cạn",
+      "source": "themeCatalog/getThemeCards",
+      "frameMs": 0
+    },
+    {
+      "kind": "theme",
+      "id": "animals-air",
+      "title": "Động vật trên không",
+      "source": "themeCatalog/getThemeCards",
+      "frameMs": 0
+    },
+    {
+      "kind": "theme",
+      "id": "animals-sea",
+      "title": "Động vật dưới biển",
+      "source": "themeCatalog/getThemeCards",
+      "frameMs": 0
+    },
+    {
+      "kind": "theme",
+      "id": "foods",
+      "title": "Đồ ăn",
+      "source": "themeCatalog/getThemeCards",
+      "frameMs": 0
+    },
+    {
+      "kind": "theme",
+      "id": "drinks",
+      "title": "Đồ uống",
+      "source": "themeCatalog/getThemeCards",
+      "frameMs": 0
+    },
+    {
+      "kind": "theme",
+      "id": "fruits",
+      "title": "Trái cây",
+      "source": "themeCatalog/getThemeCards",
+      "frameMs": 0
+    },
+    {
+      "kind": "theme",
+      "id": "geometry",
+      "title": "Hình học",
+      "source": "themeCatalog/getThemeCards",
+      "frameMs": 0
+    },
+    {
+      "kind": "theme",
+      "id": "cyberpunk",
+      "title": "Cyberpunk",
+      "source": "themeCatalog/getThemeCards",
+      "frameMs": 0
+    },
+    {
+      "kind": "theme",
+      "id": "magic-rpg",
+      "title": "RPG phép thuật",
+      "source": "themeCatalog/getThemeCards",
+      "frameMs": 0
+    },
+    {
+      "kind": "theme",
+      "id": "space",
+      "title": "Vũ trụ",
+      "source": "themeCatalog/getThemeCards",
+      "frameMs": 0
+    },
+    {
+      "kind": "theme",
+      "id": "household",
+      "title": "Vật dụng gia đình",
+      "source": "themeCatalog/getThemeCards",
+      "frameMs": 0
+    },
+    {
+      "kind": "theme",
+      "id": "office-supplies",
+      "title": "Đồ dùng văn phòng",
+      "source": "themeCatalog/getThemeCards",
+      "frameMs": 0
+    },
+    {
+      "kind": "theme",
+      "id": "fashion",
+      "title": "Thời trang & phụ kiện",
+      "source": "themeCatalog/getThemeCards",
+      "frameMs": 0
+    },
+    {
+      "kind": "theme",
+      "id": "vehicles",
+      "title": "Phương tiện giao thông",
+      "source": "themeCatalog/getThemeCards",
+      "frameMs": 0
+    },
+    {
+      "kind": "theme",
+      "id": "festivals",
+      "title": "Lễ hội",
+      "source": "themeCatalog/getThemeCards",
+      "frameMs": 0
+    },
+    {
+      "kind": "theme",
+      "id": "alphabet",
+      "title": "Chữ cái",
+      "source": "themeCatalog/getThemeCards",
+      "frameMs": 0
+    },
+    {
+      "kind": "theme",
+      "id": "numbers-2",
+      "title": "2 Số",
+      "source": "themeCatalog/getThemeCards",
+      "frameMs": 0
+    },
+    {
+      "kind": "theme",
+      "id": "numbers-3",
+      "title": "3 Số",
+      "source": "themeCatalog/getThemeCards",
+      "frameMs": 0
+    },
+    {
+      "kind": "theme",
+      "id": "computer-symbols",
+      "title": "Ký hiệu máy tính",
+      "source": "themeCatalog/getThemeCards",
+      "frameMs": 0
+    }
+  ]
+}

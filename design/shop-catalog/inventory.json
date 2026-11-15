@@ -1,0 +1,938 @@
+{
+  "support": {
+    "memory": [
+      {
+        "id": "time-30",
+        "icon": "timer",
+        "title": "30 giây",
+        "price": 360,
+        "type": "time",
+        "value": 30
+      },
+      {
+        "id": "time-45",
+        "icon": "timer",
+        "title": "45 giây",
+        "price": 504,
+        "type": "time",
+        "value": 45
+      },
+      {
+        "id": "time-60",
+        "icon": "timer",
+        "title": "60 giây",
+        "price": 648,
+        "type": "time",
+        "value": 60
+      },
+      {
+        "id": "hint-1",
+        "icon": "search",
+        "title": "1 lượt gợi ý",
+        "price": 58,
+        "type": "hint",
+        "value": 1
+      },
+      {
+        "id": "hint-2",
+        "icon": "search",
+        "title": "2 lượt gợi ý",
+        "price": 108,
+        "type": "hint",
+        "value": 2
+      },
+      {
+        "id": "hint-3",
+        "icon": "search",
+        "title": "3 lượt gợi ý",
+        "price": 151,
+        "type": "hint",
+        "value": 3
+      },
+      {
+        "id": "hint-5",
+        "icon": "search",
+        "title": "5 lượt gợi ý",
+        "price": 216,
+        "type": "hint",
+        "value": 5
+      },
+      {
+        "id": "reveal-4",
+        "icon": "puzzle",
+        "title": "Xem trước 4 thẻ",
+        "price": 58,
+        "type": "reveal-random",
+        "value": 4
+      },
+      {
+        "id": "reveal-8",
+        "icon": "puzzle",
+        "title": "Xem trước 8 thẻ",
+        "price": 108,
+        "type": "reveal-random",
+        "value": 8
+      },
+      {
+        "id": "reveal-12",
+        "icon": "puzzle",
+        "title": "Xem trước 12 thẻ",
+        "price": 158,
+        "type": "reveal-random",
+        "value": 12
+      },
+      {
+        "id": "reveal-all",
+        "icon": "puzzle",
+        "title": "Xem trước tất cả thẻ",
+        "price": 216,
+        "type": "reveal-all"
+      }
+    ],
+    "link": [
+      {
+        "id": "hint",
+        "title": "Gợi ý đường nối",
+        "icon": "search",
+        "price": 58
+      },
+      {
+        "id": "reshuffle",
+        "title": "Xáo trộn",
+        "icon": "shuffle",
+        "price": 108
+      },
+      {
+        "id": "thunder",
+        "title": "Sấm sét",
+        "icon": "wand",
+        "price": 180
+      },
+      {
+        "id": "freeze",
+        "title": "Đóng băng thời gian",
+        "icon": "freeze",
+        "price": 288
+      }
+    ],
+    "triple": [
+      {
+        "id": "hint",
+        "title": "Gợi ý",
+        "icon": "search",
+        "price": 58
+      },
+      {
+        "id": "time",
+        "title": "+30 giây",
+        "icon": "timer",
+        "value": 30,
+        "price": 360
+      },
+      {
+        "id": "undo",
+        "title": "Hoàn tác",
+        "icon": "undo",
+        "price": 108
+      },
+      {
+        "id": "shuffle",
+        "title": "Xáo trộn",
+        "icon": "shuffle",
+        "price": 108
+      }
+    ]
+  },
+  "permanent": [
+    {
+      "id": "tray-expansion",
+      "title": "Mở rộng khay",
+      "baseCapacity": 7,
+      "bonusCapacity": 3,
+      "experimentalPrice": 1,
+      "releasePrice": 3000
+    }
+  ],
+  "backs": [
+    {
+      "id": "classic",
+      "title": "Hoàng hôn",
+      "price": 0,
+      "previewClass": "card-back--classic"
+    },
+    {
+      "id": "midnight",
+      "title": "Đêm sao",
+      "price": 120,
+      "previewClass": "card-back--midnight"
+    },
+    {
+      "id": "aurora",
+      "title": "Cực quang",
+      "price": 180,
+      "previewClass": "card-back--aurora"
+    },
+    {
+      "id": "candy",
+      "title": "Kẹo sắc màu",
+      "price": 220,
+      "previewClass": "card-back--candy"
+    },
+    {
+      "id": "moon-mountain",
+      "title": "Nguyệt Sơn",
+      "price": 260,
+      "previewClass": "card-back--moon-mountain"
+    },
+    {
+      "id": "moonlit-garden",
+      "title": "Nguyệt Viên",
+      "price": 280,
+      "previewClass": "card-back--moonlit-garden"
+    },
+    {
+      "id": "starlight-path",
+      "title": "Tinh Lộ",
+      "price": 300,
+      "previewClass": "card-back--starlight-path"
+    },
+    {
+      "id": "crystal-triad",
+      "title": "Tam Tinh",
+      "price": 320,
+      "previewClass": "card-back--crystal-triad"
+    },
+    {
+      "id": "lunar-pair",
+      "title": "Song Nguyệt",
+      "price": 340,
+      "previewClass": "card-back--lunar-pair"
+    },
+    {
+      "id": "azure-link",
+      "title": "Lam Tuyến",
+      "price": 360,
+      "previewClass": "card-back--azure-link"
+    },
+    {
+      "id": "crystal-trio-light",
+      "title": "Tam Quang",
+      "price": 380,
+      "previewClass": "card-back--crystal-trio-light"
+    }
+  ],
+  "flips": [
+    {
+      "id": "memory-effect-moonflip",
+      "title": "Nguyệt Ảnh",
+      "price": null,
+      "achievementOnly": true,
+      "gameId": "memory-match",
+      "animationClass": "appear-storybook-moon"
+    },
+    {
+      "id": "memory-effect-spring-petals",
+      "title": "Hoa Xuân",
+      "price": null,
+      "achievementOnly": true,
+      "gameId": "memory-match",
+      "animationClass": "appear-storybook-petals"
+    },
+    {
+      "id": "bounce",
+      "title": "Bật nảy",
+      "price": 0,
+      "animationClass": "appear-bounce"
+    },
+    {
+      "id": "fade-scale",
+      "title": "Mờ phóng to",
+      "price": 90,
+      "animationClass": "appear-fade-scale"
+    },
+    {
+      "id": "pop",
+      "title": "Nảy nhanh",
+      "price": 110,
+      "animationClass": "appear-pop"
+    },
+    {
+      "id": "slide-up",
+      "title": "Trượt lên",
+      "price": 130,
+      "animationClass": "appear-slide-up"
+    },
+    {
+      "id": "flip-y",
+      "title": "Lật 3D",
+      "price": 170,
+      "animationClass": "appear-flip-y"
+    },
+    {
+      "id": "zoom-rotate",
+      "title": "Xoay thu phóng",
+      "price": 200,
+      "animationClass": "appear-zoom-rotate"
+    },
+    {
+      "id": "blur-in",
+      "title": "Tan mờ",
+      "price": 150,
+      "animationClass": "appear-blur-in"
+    }
+  ],
+  "paths": [
+    {
+      "id": "default",
+      "title": "Default",
+      "icon": "wand",
+      "price": 0,
+      "className": "link-path-overlay--default",
+      "defaultOwned": true
+    },
+    {
+      "id": "electric",
+      "title": "Electric",
+      "icon": "wand",
+      "price": 1,
+      "className": "link-path-overlay--electric",
+      "defaultOwned": false
+    },
+    {
+      "id": "laser",
+      "title": "Laser",
+      "icon": "star",
+      "price": 1,
+      "className": "link-path-overlay--laser",
+      "defaultOwned": false
+    },
+    {
+      "id": "fire",
+      "title": "Fire",
+      "icon": "celebrate",
+      "price": 1,
+      "className": "link-path-overlay--fire",
+      "defaultOwned": false
+    },
+    {
+      "id": "magic",
+      "title": "Magic",
+      "icon": "star",
+      "price": 1,
+      "className": "link-path-overlay--magic",
+      "defaultOwned": false
+    },
+    {
+      "id": "cyber",
+      "title": "Cyber",
+      "icon": "terminal",
+      "price": 1,
+      "className": "link-path-overlay--cyber",
+      "defaultOwned": false
+    },
+    {
+      "id": "rainbow",
+      "title": "Rainbow",
+      "icon": "celebrate",
+      "price": 1,
+      "className": "link-path-overlay--rainbow",
+      "defaultOwned": false
+    },
+    {
+      "id": "hydro",
+      "title": "Hydro",
+      "icon": "celebrate",
+      "price": 1,
+      "className": "link-path-overlay--hydro",
+      "defaultOwned": false
+    },
+    {
+      "id": "plasma",
+      "title": "Plasma",
+      "icon": "star",
+      "price": 1,
+      "className": "link-path-overlay--plasma",
+      "defaultOwned": false
+    },
+    {
+      "id": "holy",
+      "title": "Holy",
+      "icon": "star",
+      "price": 1,
+      "className": "link-path-overlay--holy",
+      "defaultOwned": false
+    },
+    {
+      "id": "shadow",
+      "title": "Shadow",
+      "icon": "moon",
+      "price": 1,
+      "className": "link-path-overlay--shadow",
+      "defaultOwned": false
+    },
+    {
+      "id": "spiral",
+      "title": "Spiral",
+      "icon": "restart",
+      "price": 1,
+      "className": "link-path-overlay--spiral",
+      "defaultOwned": false
+    },
+    {
+      "id": "dashed",
+      "title": "Dashed",
+      "icon": "more",
+      "price": 1,
+      "className": "link-path-overlay--dashed",
+      "defaultOwned": false
+    },
+    {
+      "id": "bullet",
+      "title": "Bullet",
+      "icon": "arrow-right",
+      "price": 1,
+      "className": "link-path-overlay--bullet",
+      "defaultOwned": false
+    },
+    {
+      "id": "kame",
+      "title": "Kame",
+      "icon": "play",
+      "price": 1,
+      "className": "link-path-overlay--kame",
+      "defaultOwned": false
+    },
+    {
+      "id": "halo",
+      "title": "Halo",
+      "icon": "star",
+      "price": 1,
+      "className": "link-path-overlay--halo",
+      "defaultOwned": false
+    },
+    {
+      "id": "matrix",
+      "title": "Matrix",
+      "icon": "terminal",
+      "price": 1,
+      "className": "link-path-overlay--matrix",
+      "defaultOwned": false
+    },
+    {
+      "id": "sonic",
+      "title": "Sonic",
+      "icon": "music",
+      "price": 1,
+      "className": "link-path-overlay--sonic",
+      "defaultOwned": false
+    },
+    {
+      "id": "chains",
+      "title": "Chains",
+      "icon": "link",
+      "price": 1,
+      "className": "link-path-overlay--chains",
+      "defaultOwned": false
+    },
+    {
+      "id": "meteor",
+      "title": "Meteor",
+      "icon": "celebrate",
+      "price": 1,
+      "className": "link-path-overlay--meteor",
+      "defaultOwned": false
+    },
+    {
+      "id": "poison",
+      "title": "Poison",
+      "icon": "leaf",
+      "price": 1,
+      "className": "link-path-overlay--poison",
+      "defaultOwned": false
+    },
+    {
+      "id": "link-effect-meteor-route",
+      "title": "Tinh Tuyến",
+      "icon": "star",
+      "price": null,
+      "achievementOnly": true,
+      "gameId": "link-connect",
+      "className": "link-path-overlay--link-effect-meteor-route"
+    },
+    {
+      "id": "triple-effect-triad-converge",
+      "title": "Tam Tinh Hội Tụ",
+      "icon": "star",
+      "price": null,
+      "achievementOnly": true,
+      "gameId": "triple-connect",
+      "className": "link-path-overlay--triple-effect-triad-converge"
+    }
+  ],
+  "exits": [
+    {
+      "id": "default",
+      "title": "Default",
+      "icon": "wand",
+      "price": 0,
+      "className": "link-tile--default",
+      "defaultOwned": true
+    },
+    {
+      "id": "dissolve",
+      "title": "Dissolve",
+      "icon": "wand",
+      "price": 1,
+      "className": "link-tile--dissolve",
+      "defaultOwned": false
+    },
+    {
+      "id": "finedust",
+      "title": "Fine Dust",
+      "icon": "star",
+      "price": 1,
+      "className": "link-tile--finedust",
+      "defaultOwned": false
+    },
+    {
+      "id": "split4",
+      "title": "Split 4",
+      "icon": "collection",
+      "price": 1,
+      "className": "link-tile--split4",
+      "defaultOwned": false
+    },
+    {
+      "id": "split2",
+      "title": "Split 2",
+      "icon": "slash",
+      "price": 1,
+      "className": "link-tile--split2",
+      "defaultOwned": false
+    },
+    {
+      "id": "split8",
+      "title": "Split 8",
+      "icon": "collection",
+      "price": 1,
+      "className": "link-tile--split8",
+      "defaultOwned": false
+    },
+    {
+      "id": "triangles",
+      "title": "Triangles",
+      "icon": "play",
+      "price": 1,
+      "className": "link-tile--triangles",
+      "defaultOwned": false
+    },
+    {
+      "id": "crumble",
+      "title": "Crumble",
+      "icon": "celebrate",
+      "price": 1,
+      "className": "link-tile--crumble",
+      "defaultOwned": false
+    },
+    {
+      "id": "gravity",
+      "title": "Gravity",
+      "icon": "arrow-right",
+      "price": 1,
+      "className": "link-tile--gravity",
+      "defaultOwned": false
+    },
+    {
+      "id": "collide",
+      "title": "Collide",
+      "icon": "celebrate",
+      "price": 1,
+      "className": "link-tile--collide",
+      "defaultOwned": false
+    },
+    {
+      "id": "portal",
+      "title": "Portal",
+      "icon": "restart",
+      "price": 1,
+      "className": "link-tile--portal",
+      "defaultOwned": false
+    },
+    {
+      "id": "blackhole",
+      "title": "Black Hole",
+      "icon": "moon",
+      "price": 1,
+      "className": "link-tile--blackhole",
+      "defaultOwned": false
+    },
+    {
+      "id": "freeze",
+      "title": "Freeze",
+      "icon": "star",
+      "price": 1,
+      "className": "link-tile--freeze",
+      "defaultOwned": false
+    },
+    {
+      "id": "burn",
+      "title": "Burn",
+      "icon": "celebrate",
+      "price": 1,
+      "className": "link-tile--burn",
+      "defaultOwned": false
+    },
+    {
+      "id": "pixel",
+      "title": "Pixel",
+      "icon": "terminal",
+      "price": 1,
+      "className": "link-tile--pixel",
+      "defaultOwned": false
+    },
+    {
+      "id": "implode",
+      "title": "Implode",
+      "icon": "play",
+      "price": 1,
+      "className": "link-tile--implode",
+      "defaultOwned": false
+    },
+    {
+      "id": "slice",
+      "title": "Slice",
+      "icon": "slash",
+      "price": 1,
+      "className": "link-tile--slice",
+      "defaultOwned": false
+    },
+    {
+      "id": "bubble",
+      "title": "Bubble",
+      "icon": "celebrate",
+      "price": 1,
+      "className": "link-tile--bubble",
+      "defaultOwned": false
+    },
+    {
+      "id": "origami",
+      "title": "Origami",
+      "icon": "arrow-right",
+      "price": 1,
+      "className": "link-tile--origami",
+      "defaultOwned": false
+    },
+    {
+      "id": "electric-shock",
+      "title": "Electric Shock",
+      "icon": "wand",
+      "price": 1,
+      "className": "link-tile--electric-shock",
+      "defaultOwned": false
+    },
+    {
+      "id": "ghost",
+      "title": "Ghost",
+      "icon": "moon",
+      "price": 1,
+      "className": "link-tile--ghost",
+      "defaultOwned": false
+    },
+    {
+      "id": "link-effect-moon-petals",
+      "title": "Cánh Hoa Nguyệt",
+      "icon": "star",
+      "price": null,
+      "achievementOnly": true,
+      "gameId": "link-connect",
+      "className": "link-tile--link-effect-moon-petals"
+    },
+    {
+      "id": "triple-effect-crystal-bloom",
+      "title": "Tam Quang",
+      "icon": "star",
+      "price": null,
+      "achievementOnly": true,
+      "gameId": "triple-connect",
+      "className": "link-tile--triple-effect-crystal-bloom"
+    }
+  ],
+  "themes": [
+    {
+      "id": "default",
+      "title": "Mặc định",
+      "kind": "image",
+      "price": 0,
+      "playable": true,
+      "assetCount": 1000
+    },
+    {
+      "id": "animals-land",
+      "title": "Động vật trên cạn",
+      "kind": "image",
+      "price": 1,
+      "playable": true,
+      "assetCount": 191
+    },
+    {
+      "id": "animals-air",
+      "title": "Động vật trên không",
+      "kind": "image",
+      "price": 1,
+      "playable": true,
+      "assetCount": 160
+    },
+    {
+      "id": "animals-sea",
+      "title": "Động vật dưới biển",
+      "kind": "image",
+      "price": 1,
+      "playable": true,
+      "assetCount": 160
+    },
+    {
+      "id": "foods",
+      "title": "Đồ ăn",
+      "kind": "image",
+      "price": 1,
+      "playable": true,
+      "assetCount": 192
+    },
+    {
+      "id": "drinks",
+      "title": "Đồ uống",
+      "kind": "image",
+      "price": 1,
+      "playable": true,
+      "assetCount": 185
+    },
+    {
+      "id": "fruits",
+      "title": "Trái cây",
+      "kind": "image",
+      "price": 1,
+      "playable": true,
+      "assetCount": 152
+    },
+    {
+      "id": "vegetables",
+      "title": "Rau củ",
+      "kind": "image",
+      "price": 1,
+      "playable": false,
+      "assetCount": 0
+    },
+    {
+      "id": "nature",
+      "title": "Thiên nhiên",
+      "kind": "image",
+      "price": 1,
+      "playable": false,
+      "assetCount": 0
+    },
+    {
+      "id": "flowers",
+      "title": "Hoa",
+      "kind": "image",
+      "price": 1,
+      "playable": false,
+      "assetCount": 0
+    },
+    {
+      "id": "trees",
+      "title": "Cây",
+      "kind": "image",
+      "price": 1,
+      "playable": false,
+      "assetCount": 0
+    },
+    {
+      "id": "leaves",
+      "title": "Lá",
+      "kind": "image",
+      "price": 1,
+      "playable": false,
+      "assetCount": 0
+    },
+    {
+      "id": "geometry",
+      "title": "Hình học",
+      "kind": "image",
+      "price": 1,
+      "playable": true,
+      "assetCount": 48
+    },
+    {
+      "id": "cyberpunk",
+      "title": "Cyberpunk",
+      "kind": "image",
+      "price": 1,
+      "playable": true,
+      "assetCount": 48
+    },
+    {
+      "id": "magic-rpg",
+      "title": "RPG phép thuật",
+      "kind": "image",
+      "price": 1,
+      "playable": true,
+      "assetCount": 48
+    },
+    {
+      "id": "space",
+      "title": "Vũ trụ",
+      "kind": "image",
+      "price": 1,
+      "playable": true,
+      "assetCount": 48
+    },
+    {
+      "id": "household",
+      "title": "Vật dụng gia đình",
+      "kind": "image",
+      "price": 1,
+      "playable": true,
+      "assetCount": 48
+    },
+    {
+      "id": "office-supplies",
+      "title": "Đồ dùng văn phòng",
+      "kind": "image",
+      "price": 1,
+      "playable": true,
+      "assetCount": 48
+    },
+    {
+      "id": "garden-tools",
+      "title": "Dụng cụ làm vườn",
+      "kind": "image",
+      "price": 1,
+      "playable": false,
+      "assetCount": 0
+    },
+    {
+      "id": "fashion",
+      "title": "Thời trang & phụ kiện",
+      "kind": "image",
+      "price": 1,
+      "playable": true,
+      "assetCount": 48
+    },
+    {
+      "id": "vehicles",
+      "title": "Phương tiện giao thông",
+      "kind": "image",
+      "price": 1,
+      "playable": true,
+      "assetCount": 48
+    },
+    {
+      "id": "historical-artifacts",
+      "title": "Cổ vật lịch sử",
+      "kind": "image",
+      "price": 1,
+      "playable": false,
+      "assetCount": 0
+    },
+    {
+      "id": "spy-gadgets",
+      "title": "Thiết bị gián điệp",
+      "kind": "image",
+      "price": 1,
+      "playable": false,
+      "assetCount": 0
+    },
+    {
+      "id": "festivals",
+      "title": "Lễ hội",
+      "kind": "image",
+      "price": 1,
+      "playable": true,
+      "assetCount": 48
+    },
+    {
+      "id": "instruments",
+      "title": "Nhạc cụ",
+      "kind": "image",
+      "price": 1,
+      "playable": false,
+      "assetCount": 0
+    },
+    {
+      "id": "mystery",
+      "title": "Huyền bí",
+      "kind": "image",
+      "price": 1,
+      "playable": false,
+      "assetCount": 0
+    },
+    {
+      "id": "alphabet",
+      "title": "Chữ cái",
+      "kind": "generated",
+      "price": 1,
+      "playable": true,
+      "assetCount": 48
+    },
+    {
+      "id": "numbers-2",
+      "title": "2 Số",
+      "kind": "generated",
+      "price": 1,
+      "playable": true,
+      "assetCount": 96
+    },
+    {
+      "id": "numbers-3",
+      "title": "3 Số",
+      "kind": "generated",
+      "price": 1,
+      "playable": true,
+      "assetCount": 900
+    },
+    {
+      "id": "computer-symbols",
+      "title": "Ký hiệu máy tính",
+      "kind": "generated",
+      "price": 1,
+      "playable": true,
+      "assetCount": 49
+    }
+  ],
+  "supportArt": {
+    "shop": "/assets/images/ui/v1/icon-shop.webp",
+    "collection": "/assets/images/ui/v1/icon-collection.webp",
+    "map": "/assets/images/ui/v1/icon-map.webp",
+    "trophy": "/assets/images/ui/v1/icon-trophy.webp",
+    "settings": "/assets/images/ui/v1/icon-settings.webp",
+    "account": "/assets/images/ui/v1/icon-account.webp",
+    "missions": "/assets/images/ui/v1/icon-missions.webp",
+    "events": "/assets/images/ui/v1/icon-events.webp",
+    "info": "/assets/images/ui/v1/icon-info.webp",
+    "play": "/assets/images/ui/v1/icon-play.webp",
+    "restart": "/assets/images/ui/v1/icon-restart.webp",
+    "search": "/assets/images/ui/v1/icon-search.webp",
+    "shuffle": "/assets/images/ui/v1/icon-shuffle.webp",
+    "snowflake": "/assets/images/ui/v1/icon-snowflake.webp",
+    "freeze": "/assets/images/ui/v1/icon-freeze.webp",
+    "eye": "/assets/images/ui/v1/icon-eye.webp",
+    "undo": "/assets/images/ui/v1/icon-undo.webp",
+    "expand": "/assets/images/ui/v1/icon-expand.webp",
+    "wand": "/assets/images/ui/v1/icon-wand.webp",
+    "exit": "/assets/images/ui/v1/icon-exit.webp",
+    "book": "/assets/images/ui/v1/icon-book.webp",
+    "energy": "/assets/images/ui/v1/icon-energy.webp",
+    "home": "/assets/images/ui/v1/night-home.webp",
+    "victory-home": "/assets/images/ui/v1/night-home.webp",
+    "arrow-right": "/assets/images/ui/v1/night-next.webp",
+    "victory-next": "/assets/images/ui/v1/night-next.webp",
+    "timer": "/assets/images/ui/v1/night-timer.webp",
+    "hourglass": "/assets/images/ui/v1/night-timer.webp",
+    "celebrate": "/assets/images/ui/v1/night-gift.webp",
+    "chest": "/assets/images/ui/v1/night-chest.webp",
+    "chest-open": "/assets/images/ui/v1/night-chest-open.webp",
+    "coin": "/assets/images/ui/v1/night-coin.webp",
+    "star": "/assets/images/ui/v1/night-star.webp",
+    "star-empty": "/assets/images/ui/v1/night-star.webp"
+  }
+}

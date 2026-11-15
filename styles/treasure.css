@@ -9,6 +9,7 @@
 .treasure-content { color: #e5f0ec; }
 .treasure-range { margin: 0 0 12px; color: #bed0ca; text-align: center; font-size: 13px; }
 .treasure-cards { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+.treasure-card-slot { display:grid; min-width:0; }
 .treasure-card { display: grid; justify-items: center; gap: 2px; min-width: 0; padding: 5px 6px 8px; border: 1px solid #55746f; border-radius: 13px; background: linear-gradient(#173c41,#102c33); color: #e5f0ec; font: inherit; cursor: pointer; box-shadow: inset 0 1px #d8edda12,0 2px 3px #0002; }
 .treasure-card[aria-pressed="true"] { border-color: #e9c97b; background: linear-gradient(#285154,#14353b); box-shadow: inset 0 0 0 1px #e9c97b55; }
 .treasure-card:focus-visible, .treasure-content button:focus-visible { outline: 2px solid #fff0be; outline-offset: 2px; }

@@ -2,21 +2,23 @@ import { CHEST_POLICY, CHEST_POOLS, LEGACY_CHEST_POOLS, CHEST_SUPPORTS } from '.
 import { WHEEL_POOLS, wheelItem } from './wheelCatalog.js';
 
 export const WHEEL_VERSION = 3;
+export const WHEEL_ODDS_VERSION = 2;
+const LEGACY_WEIGHTS = Object.freeze([40,25,15,1,2,2,1,2,2,10]);
 export const supportedWheelVersion = version => version === 2 || version === WHEEL_VERSION;
 export const WHEEL_ANGLE = 36;
 export const WHEEL_ROLL_COUNT = 6;
 export const MYSTERY_CHEST_TYPES = Object.freeze(['c','avatar','frame','badge']);
 export const WHEEL_SLOTS = Object.freeze([
-  {id:'coins-five',kind:'coins',coins:5,weight:40,label:'5 Xu'},
+  {id:'coins-five',kind:'coins',coins:5,weight:30,label:'5 Xu'},
   {id:'coins-ten',kind:'coins',coins:10,weight:25,label:'10 Xu'},
-  {id:'coins-random',kind:'randomCoins',weight:15,label:'Rương Xu'},
+  {id:'coins-random',kind:'randomCoins',weight:20,label:'Rương Xu'},
   {id:'box-mystery',kind:'box',box:'mystery',weight:1,label:'Rương Ngẫu nhiên'},
   {id:'box-cosmetic',kind:'box',box:'cosmetic',weight:2,label:'Rương Ngoại hình'},
   {id:'box-flip',kind:'box',box:'flip',weight:2,label:'Rương Lật thẻ'},
   {id:'box-theme',kind:'box',box:'theme',weight:1,label:'Rương Chủ đề'},
   {id:'box-path',kind:'box',box:'path',weight:2,label:'Rương Đường nối'},
   {id:'box-exit',kind:'box',box:'exit',weight:2,label:'Rương Xóa thẻ'},
-  {id:'box-support',kind:'box',box:'support',weight:10,label:'Rương Hỗ trợ'},
+  {id:'box-support',kind:'box',box:'support',weight:15,label:'Rương Hỗ trợ'},
 ].map(Object.freeze));
 const GAMES = Object.freeze(Object.keys(CHEST_SUPPORTS));
 const record = value => value !== null && typeof value === 'object' && !Array.isArray(value);
@@ -29,20 +31,20 @@ export function createWheelRolls(random) {
   if(!rolls.every(unit))invalid();
   return rolls;
 }
-export function wheelSector(roll) {
-  if(!unit(roll))invalid();
+export function wheelSector(roll,oddsVersion=WHEEL_ODDS_VERSION) {
+  if(!unit(roll)||![1,WHEEL_ODDS_VERSION].includes(oddsVersion))invalid();
   let cumulative=0;
   for(let i=0;i<WHEEL_SLOTS.length;i++){
-    cumulative+=WHEEL_SLOTS[i].weight;
+    cumulative+=oddsVersion===1?LEGACY_WEIGHTS[i]:WHEEL_SLOTS[i].weight;
     if(roll*100<cumulative)return i;
   }
   invalid();
 }
 /** Pure replay of durable entropy. Call once using canonical ownership, then save the candidate. */
-export function createWheelCandidate(rolls,ownedIds=[],version=WHEEL_VERSION) {
+export function createWheelCandidate(rolls,ownedIds=[],version=WHEEL_VERSION,oddsVersion=WHEEL_ODDS_VERSION) {
   if(!supportedWheelVersion(version))invalid();
   if(!Array.isArray(rolls)||rolls.length!==WHEEL_ROLL_COUNT||!Array.from(rolls).every(unit))invalid();
-  const sector=wheelSector(rolls[0]),slot=WHEEL_SLOTS[sector],base={version,sector};
+  const sector=wheelSector(rolls[0],oddsVersion),slot=WHEEL_SLOTS[sector],base={version,sector};
   if(slot.kind==='coins')return {...base,kind:'coins',coins:slot.coins};
   if(slot.kind==='randomCoins')return {...base,kind:'coins',coins:5+Math.floor(rolls[1]*46)};
   const owned=new Set(ownedIds),box={...base,box:slot.box};

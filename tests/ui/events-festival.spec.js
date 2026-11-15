@@ -157,7 +157,7 @@ test('mission scroll restores while collection tabs keep one scrolling panel',as
   });
   expect(tabs.before).toBeGreaterThan(0);expect(tabs.after).toBe(tabs.before);
   await page.evaluate(async()=>{eventsModal.destroy();window.collectionModal=await(await import('/js/mainmenu.js')).showCollectionModal({gameId:'memory-match'});});
-  await expect(page.locator('.achievement-collection .storybook-achievement-row').first()).toBeVisible();
+  await expect(page.locator('.appearance-choice').first()).toBeVisible();
   await page.getByRole('tab',{name:'Kho lưu trữ',exact:true}).click();
   await expect(page.locator('.storage__grid > .storage__item')).toHaveCount(3);
   const collection=await page.locator('.collection-chest-panel').evaluate(panel=>{
@@ -165,9 +165,9 @@ test('mission scroll restores while collection tabs keep one scrolling panel',as
   });
   expect(collection.top).toBeGreaterThanOrEqual(0);expect(collection.outer).toBe(0);
   await expect(page.locator('.collection-tabs')).toBeInViewport();
-  await page.getByRole('tab',{name:'Thành tích',exact:true}).click();
+  await page.getByRole('tab',{name:'Chủ đề',exact:true}).click();
   await expect(page.locator('.liveops--chests')).toHaveCount(0);
-  await expect(page.locator('.achievement-collection .storybook-achievement-row').first()).toBeVisible();
+  await expect(page.locator('.theme-choice').first()).toBeVisible();
 });
 
 test('offline keeps Play, saved grants and login navigation available',async({page,context})=>{

@@ -1,5 +1,9 @@
 # KẾ HOẠCH LEVEL NGOẠI HÌNH VÀ LÔ ẢNH — 08/11/2026
 
+## Trạng thái hiện hành — cập nhật 16/11/2026
+
+Các ghi nhận cũ bên dưới là lịch sử tại thời điểm ghi. Phần backup emulator timeout và hồi quy audio đã được chạy lại: ma trận emulator snapshot/offline/online/mất ACK reload/server fault/hai thiết bị đạt; audio 29 PASS/2 SKIP. Check/build PASS; art 202/202 sẵn sàng và profile UI decode đạt. Gate 6, O6 và Gate 7 vẫn chưa đóng do yêu cầu reviewer độc lập và xác nhận hiệu năng trên Android vật lý chưa có. Kho tạm là chỉ xem và tự chuyển khi có ô trống; trạng thái 5 trang chính/120 ô theo bổ sung 16/11 trong IMPLEMENTATION_NOTES.md thay các mô tả 3 trang cũ ở mục16. Không deploy Rules/Hosting hoặc tạo APK trong lượt này.
+
 Trạng thái08/11: đã được giao toàn task, bổ sung offline/local-first và phân công hai chat theo mục13–14 bên dưới. Kinh tế đã chốt: bán100Xu/mảnh, ghép3mảnh phí20Xu, ghép3chữ phí10Xu; nguồn ngoại hình chọn cả món mới và đã có trong101món; đổi hình ởLevel7và21. Kho rương đổi nhãn Kho lưu trữ, ô lưới icon và popup, có bán/mở nhiều rương theo mục8. Source logic đã bắt đầu tích hợp nhưng **chưa nghiệm thu**:50unit đạt trước phần bán rương; emulator đã chạy và đang lỗi ngân sách1000biểu thức ở nhận ngoại hình. Không dùng source hiện tại làm bản đã hoàn tất, không phát hành. Handoff chi tiết trong design/expedition/IMPLEMENTATION_NOTES.md. Ảnh đang tạo riêng, chưa gắn catalog sản phẩm. Tài liệu này thay thế phương án5bậc tiêu1/2/4/6/8mảnh và Max đổi thẳngXu cũ.
 
 ## 1. Phạm vi đã chốt
@@ -87,6 +91,8 @@ Chọn một model thuần dùng chung, adapter theo nguồn thưởng và proje
 
 ## 8. Bố cục giao diện
 
+**Chỉ dẫn mới11/11 ở mục16 thay hợp đồng kho cũ bên dưới:** mỗi rương riêng một ô,5trang×24ô,8ô đầu miễn phí,112ô còn lại mua riêng1000Xu/ô; quà vượt chỗ vẫn nhận và được giữ trong Kho tạm. Kho tạm chỉ xem, không mở/bán/ghép; khi có ô chính trống hoặc mua thêm ô, tài sản dư tự hiện ở ô chính theo projection từ counter hiện hữu. Mỗi lần Mở/Bán đúng1rương, bỏ slider và mở lô cho rương, giữ slider bán mảnh. Không dùng mô tả gom loại/mở nhiều cũ làm yêu cầu hiện hành.
+
 Nguồn bố cục được người dùng chỉ định: design/expedition/profile-preview/profile-mobile.png và collection-preview/collection-mobile.png. Những bản so sánh/giải thích trước đó không phải màn sản phẩm.
 
 - Profile giữ bố cục gọn và chỉ bộ đang trang bị như mẫu. Không thêm bảng giải thích, thanh mảnh cũ hoặc cả kho lên trang chính.
@@ -135,7 +141,7 @@ Bổ sung món tương lai bằng nguồn manifest/catalog và policy level dùn
 - [x] Gate 2 bổ sung — Phí20Xu ghép mảnh,10Xu ghép chữ; trừ nguyên liệu/phí/cấp kết quả atomic; UI hiện giá, xử lý thiếuXu; pending/receipt cũ không bị thu phí hồi tố.
 - [x] Gate 3 — Persistence/cloud/Auth/rules: migration idempotent, receipt/candidate cũ, crash/retry/two-device/UID/backup/reset/xóa; emulator cả allow/deny. Template/generator sinh lại rules; deploy rules theo quyền bổ sung09/11 bên dưới và xác minh hash sau phát hành.
 - [x] Gate 4 — UI theo mẫu, Level/Level Max, phối/thay trang bị, kho mảnh/Bán/Ghép, cấp rương vào kho và mở rương riêng. Test 320/412/ngang/desktop, thao tác nhanh, đóng popup khi pending, offline/retry, focus và không lộ chữ nội bộ.
-- [ ] Gate 5 — Pipeline và toàn bộ lô A0–A5, đủ 101 món/202 thiết kế/606 export, manifest/hash/alpha/alignment/cross-match/nhận diện nhỏ. Không dừng task toàn bộ sau một lô nếu đã được giao triển khai toàn task.
+- [x] Gate 5 — Pipeline và toàn bộ lô A0–A5, đủ 101 món/202 thiết kế/606 export, manifest/hash/alpha/alignment/cross-match/nhận diện nhỏ. Không dừng task toàn bộ sau một lô nếu đã được giao triển khai toàn task.
 - [ ] Gate 6 — Đồng bộ hình thái theo level tại profile/Bộ sưu tập/header/xếp hạng; vẫn ba ảnh/portrait. Đo trước/sau về frame, long task, heap/cache, node/listener/timer qua nhiều chu kỳ; reduced-motion và cleanup cho feedback mới. Không coi browser là chứng nhận điện thoại 60 FPS.
 - [ ] Gate 7 — Nghiệm thu tất cả luật/nguồn/ảnh; check/build, unit/contract/migration/emulator, UI mục tiêu/regression, review diff tách khỏi implementation và chạy lại kiểm tra trọng yếu. Một báo cáo chung; không APK/deploy/push nếu chưa được giao riêng.
 
@@ -230,3 +236,141 @@ Chọn sao lưu snapshot của phần thưởng đã commit trên máy thay cho 
 - [x] L4: deploy Hosting production; chỉ deploy Rules nếu thay đổi thật sự cần; đọc lại build/release, cập nhật một báo cáo nghiệm thu hiện hữu.
 
 Nghiệm thu nhánh local-first ngày10/11/2026: L1–L4 đạt; Hosting production đã phát hành và index/worker/hai JS bundles khớp SHA256 artifact. Không deploy Rules/indexes/APK; không đóng thay các gate ảnh/Android hoặc task BXH riêng. Chi tiết trong IMPLEMENTATION_NOTES.md, mục Khắc phục bắt buộc-online.
+
+## 15. Cửa hàng/Bộ sưu tập 4 cột và ảnh nội dung dùng chung — 10/11/2026
+
+### Trạng thái, phạm vi và thứ tự ưu tiên
+
+**Đã nghiệm thu phạm vi mục15 ngày11/11/2026.** Đây là phần bổ sung trong kế hoạch hiện hành, không là kế hoạch active thứ hai. Không mở lại các gate logic/offline đã nghiệm thu và không dùng phần này để đóng thay Gate5–7 của bộ202hình thái. Bằng chứng cuối tại IMPLEMENTATION_NOTES.md, mục Cửa hàng/Bộ sưu tập4cột.
+
+**Điều chỉnh mỹ thuật do chủ dự án yêu cầu khi xem bản tích hợp:** preview chụp trực tiếp đúng renderer nhưng chưa đẹp/dễ nhận biết như ảnh mẫu. Chuyển preview Đường nối/Xóa thẻ/Hiệu ứng lật/Chủ đề sang ảnh minh họa riêng theo phong cách mẫu4cột (vàng/teal, khối rõ, đọc được ở40px). Ảnh chụp thật vẫn là tài liệu đối chiếu màu, dạng và công dụng, không là hạn chế bắt buộc dùng nguyên screenshot làm ảnh cuối. Được tạo bitmap minh họa từ các tham chiếu này; không đổi renderer/gameplay, tên/ID/giá hoặc hứa hiệu ứng khác với runtime. Các mặt lưng đã có ảnh đẹp tiếp tục tái dùng; mặt lưng CSS đơn giản được trình bày rõ trên hình thẻ tương ứng. Chỉ dẫn mới này thay yêu cầu dùng nguyên capture/composite ở mục15.3/S2 dưới đây.
+
+**Đã chốt riêng với chủ dự án:**10chủ đề thiếu bộ thẻ gốc giữ icon hiện có và trạng thái chưa có sẵn; không tạo bộ thẻ mới, không tạo ảnh minh họa khiến chúng trông đã sẵn sàng. Phạm vi ảnh202hình thái của chat khác vẫn độc lập.
+
+Mục tiêu: Cửa hàng và các tab danh mục của Bộ sưu tập hiển thị4món/hàng, gọn và đồng đều; hình nhận diện nội dung nhất quán giữa các skin; ảnh xem trước diễn tả đúng món người chơi mua/trang bị. Giữ tiến trình, công dụng, số lượng trong gói, giá, trạng thái sở hữu/trang bị và giao dịch hiện hữu.
+
+Các chỉ dẫn UI mới nhất của chủ dự án có ưu tiên hơn mẫu cũ tại mục8/handoff:
+
+- **Vật phẩm hỗ trợ chỉ có trong Cửa hàng.** Không tạo tab Vật phẩm trong Bộ sưu tập. Số đang có vẫn cần xuất hiện ở Cửa hàng, nhưng chuyển thành nhãn nhỏ ở góc trên phải của ô.
+- Hiệu ứng, mặt lưng thẻ, chủ đề là quyền sở hữu lâu dài: không hiện số lượng. Hiện giá hoặc trạng thái Đã có/Đang dùng theo đúng hành vi thực tế của từng màn.
+- Không khôi phục tab Thành tích trong Bộ sưu tập, nút Xem hình thái, câu hướng dẫn hay ghi chú trò/Màn dưới vật phẩm trong phần Trang trí hồ sơ vừa được bỏ theo yêu cầu10/11.
+- Lưới4cột lần này không áp dụng cho popup Trang trí hồ sơ hoặc Kho lưu trữ. Kho giữ4×6/24ô, tabIDchests và hợp đồng ôchỉicon/tên-sốlượng trongpopup đang dùng. Không đưa badge số lượng vào Kho khi chưa được giao thay đổi riêng.
+- Không thêm mặt hàng, đổi danh mục/giá, rút gọn hoặc gộp ID. Giá rương ngoại hình10000Xu vẫn chỉ là dự kiến, không mở thêm bán rương.
+- Không đổi nền/khung/header/tab/navigation của skin ngoài điều chỉnh cần thiết cho lưới; không viết lại hoạt ảnh gameplay, persistence, ví, quảng cáo, journal, Rules hoặc đồng bộ.
+- Không tạo asset cho hai trò mới đang phác thảo; chỉ Memory Match, Link Connect và Triple Connect hiện hữu.
+
+### 15.1. Kết quả rà nguồn và ranh giới ownership
+
+| Phần | Owner/call site hiện có | Việc cần làm khi triển khai |
+|---|---|---|
+| Cửa hàng | js/shop.js, js/shopCatalog.js, js/linkConnect/linkItems.js, js/tripleConnect/tripleItems.js | Audit từng mặt hàng thực tế, dùng chung hình nhận diện; giữ boundary mua/xác nhận và refresh tồn kho |
+| Bộ sưu tập | js/mainmenu.js, js/catalogPreferences.js | Cùng cách trình bày danh mục4cột; giữ tabID, lựa chọn đã lưu và trang bị |
+| Icon và skin | js/icons.js, js/uiArtManifest.js, styles/ui-skin-icons.css, styles/ui-skin-storybook.css, styles/ui-style-packs.css | Hiện SVG ở skin mặc định; Storybook dùng WebP qua manifest, Woodland có thay ảnh bằng CSS. Tách đúng icon nội dung khỏi icon điều hướng/thao tác |
+| Preview và bố cục | styles/shop.css, styles/raised-actions.css, các skin và compositor Storybook | Rà cascade thực tế, tránh quy tắc skin nâng kích thước hoặc thay ảnh trở lại |
+| Hiệu ứng | js/linkConnect/linkEffects.js, js/flipEffectCatalog.js, js/effects và owner renderer tương ứng | Chụp hiệu ứng thật, không coi một class/icon chung là bằng chứng preview đúng |
+| Mặt lưng/chủ đề | js/appearance.js, js/themeCatalog.js, js/generated/themeAssetManifest.js, js/themeSelection.js | Render mặt lưng hiện có; ghép thẻ đúng theme. Không sửa generated output trực tiếp |
+| Ảnh ngoại hình202form | design/expedition/art-production và manifest/generator hình thái hiện hữu | Chỉ đọc tài nguyên được bàn giao; giữ ownership của chat ảnh |
+
+Các con số sơ bộ có thể dùng để audit:11gói hỗ trợ Memory Match,21hiệu ứng nối và21hiệu ứng xóa cơ bản dùng chung Link/Triple, ngoài phần thưởng achievementOnly. Không coi đây là tổng cuối cùng của toàn bộ asset: phải đối chiếu tất cả tab, lọc bán/đã có và các món thưởng trong S0. Mỗi hình thức hiển thị trùng cùng ID/ngữ nghĩa dùng lại asset; không xuất một bộ khác cho từng game/skin.
+
+Không chỉnh tay js/uiArtManifest.js hoặc các file generated. Phải truy nguồn generator trước khi thêm mapping vào manifest được sinh. Nếu cần manifest riêng cho ảnh nội dung thì chỉ một mapping có owner rõ, phục vụ ít nhất Cửa hàng và HUD/phần thưởng có cùng ngữ nghĩa, không dựng thêm hệ icon cạnh tranh.
+
+### 15.2. Hợp đồng bố cục và nội dung người chơi
+
+- Danh mục dùng4cột trên màn hình dọc mục tiêu320/384/390/412px; ngang và desktop vẫn4cột trong vùng nội dung có giới hạn rộng, không kéo ô quá lớn. Đo bề rộng khả dụng thật gồm padding, safe-area và khung skin; không chỉ dựa trên viewport.
+- Khoảng cách dự kiến6px; hình36–44px; nút giá có vùng chạm tối thiểu44px. Đây là thông số thiết kế cần đo ở S1, không phải kết quả đã đạt. Không thu font hoặc vùng chạm dưới mức dễ đọc chỉ để ép đủ4cột.
+- Mọi ô trong cùng nhóm có cùng cấu trúc và chiều cao. Dành sẵn vùng icon, tên tối đa2dòng và vùng hành động. Tên1dòng, có/không số lượng, đã có/chưa có đều không làm lệch hàng hoặc giá. Tên đầy đủ nằm trong nhãn truy cập và popup/tooltip hiện hữu; không cắt cụt gây nhầm món.
+- **Hỗ trợ:** icon + tên ngắn + nhãn góc “Có 5” + nút giáXu. Giữ chỗ/đệm cho nhãn để không che hình. Có0vẫn có cùng hình học. Dữ liệu cập nhật qua nguồn tồn kho hiện hữu sau mua/dùng/đổi hồ sơ; không tạo bản đếm riêng. Kiểm tra0/1/99/9999/số lớn nhất hợp lệ; quy tắc viết gọn số lớn phải không gây tràn và có số đầy đủ trong nội dung truy cập/chi tiết.
+- **Thời gian:** chữ số30/45/60 do code hiển thị trong mặt đồng hồ; chỉ số giây được thêm. Nhãn tồn kho ở góc là thông tin riêng, không dùng cùng vị trí hoặc chỉ ký hiệu × khiến người chơi nhầm. Không cần ba ảnh đồng hồ theo ba số.
+- **Gói gợi ý/xem thẻ:** phân biệt rõ số lượt/thẻ nhận trong một gói với số gói/lượt đang sở hữu. Giữ ngữ nghĩa tồn kho hiện tại, không quy đổi ngầm đơn vị. S0 phải đối chiếu từng loại, S1 minh họa trường hợp gói nhiều lượt; tên/chi tiết nêu rõ nội dung mua.
+- **Hiệu ứng/mặt lưng/chủ đề:** ảnh xem trước + tên + giáXu hoặc trạng thái đúng màn. Không thêm số lượng. Trạng thái Đang dùng chỉ khi thực sự đang trang bị; Đã có không được ngụ ý mua lần nữa hoặc tự trang bị.
+- Bỏ tiêu đề nhóm trùng tab như “Vật phẩm Triple Connect”; giữ heading cần thiết nếu một tab có nhiều nhóm khác nghĩa. Không tự dịch/đổi tên effect trong catalog hoặc gộp ba nhóm động vật thành một món như ảnh minh họa; chỉ dùng tên ngắn được đối chiếu với tên đầy đủ.
+- Nhấn giá tiếp tục mở popup xác nhận mua hiện hữu. Không đổi sang mua ngay từ việc chạm icon. Mở xem trước nếu cần dùng popup/owner hiện hữu và không chiếm hành vi mua hoặc chọn trang bị.
+- Giữ tab dạng dải liền, focus/keyboard, tooltip căn giữa, cặp nút xác nhận/Hủy vừa được chỉnh. Nội dung UI chỉ dùng ngôn ngữ sản phẩm; không nhãn debug, nội bộ, tên file, mã hiệu ứng hay hướng dẫn tích hợp. Không emoji/font làm hình trang trí.
+
+### 15.3. Phương án ảnh và tái sử dụng
+
+So sánh hai hướng trước triển khai:
+
+| Phương án | Lợi ích | Hạn chế | Quyết định |
+|---|---|---|---|
+| Giữ toàn bộ SVG/icon và đổi theo từng skin như hiện tại | Tải nhẹ, dễ đổi màu; ít công tạo ảnh | Hình nhận diện thay theo skin; ngôi sao/quà chung không thể hiện đúng hiệu ứng; khó đạt chất lượng minh họa đã xem | Giữ SVG cho control/fallback, không chọn làm hướng chính cho ảnh nội dung |
+| Một bộ hình nội dung dùng chung; tái dùng WebP, preview tạo từ nguồn thật | Đồng nhất nhận diện và gần chất lượng mẫu; dùng lại giữa các màn; preview có thể kiểm chứng | Cần audit, pipeline chụp/ghép, quản lý tải và cache | **Chọn**, chữ/số/trạng thái vẫn vẽ bằng code |
+
+Phân loại sản phẩm:
+
+1. **Hỗ trợ:** contact sheet WebP đang có, đối chiếu Gợi ý/Thời gian/Hoàn tác/Xáo trộn/Đóng băng/Xem thẻ/Mở rộng và mọi loại thật trong catalog. Chọn một bộ cùng nét vẽ, vật liệu, góc nhìn và vùng an toàn. Tái sử dụng ảnh đạt; chỉ vẽ mới món thiếu/lệch chất lượng. Đồng hồ phải có vùng trống đọc số rõ, không dùng đồng hồ cát để biểu thị số trong mặt đồng hồ. Một mẫu cho một chức năng; các gói chỉ đổi chữ số/badge bằng code. Không cần vẽ lại toàn bộ tài nguyên trước khi audit.
+2. **Đường nối:** render từ chính renderer đang phục vụ gameplay trên cùng hình học mẫu, chọn khoảnh khắc tiêu biểu của từng effectID. Giữ đúng màu, nét, đặc trưng; default là nét mặc định. Không vẽ bằng AI một hiệu ứng khác rồi gắn vào tên đang có. Link/Triple tái dùng nếu renderer/hành vi giống nhau; nếu khác phải ghi variant có lý do trong inventory.
+3. **Xóa thẻ:** một thẻ mẫu thống nhất, render hiệu ứng thật và chọn khung hình thể hiện rõ tan bụi, chia mảnh, cháy, đóng băng… Preview không hứa hẹn điều runtime không làm được. Chọn thời điểm riêng theo effect thay vì cùng một timestamp làm nhiều ảnh trống/giống nhau.
+4. **Chủ đề:** ghép2–3thẻ thực tế của đúng theme thành hình đại diện. Với chữ/số/hình học và theme sinh bằng code, render từ generator có sẵn; chữ/số mang ý nghĩa nội dung game được giữ. Không vẽ một bức minh họa mới không tồn tại trong bộ thẻ. Theme chưa đủ ảnh/không khả dụng giữ đúng trạng thái hiện tại.
+5. **Mặt lưng và hiệu ứng lật Memory Match:** cùng bố cục4cột. Mặt lưng lấy từ render CSS/asset hiện có; hiệu ứng lật chụp renderer thật với thẻ mẫu thống nhất. Audit cả hiệu ứng từ thành tích xuất hiện trong Bộ sưu tập; không bỏ sót vì chúng không bán trong Cửa hàng.
+6. **Điều hướng/thao tác, tiền, rương, portrait:** không thay theo lô hỗ trợ này. Giữ nguồn icon điều hướng hiện tại, ảnhXu và factory rương dùng chung đã có. Ảnh avatar/khung/huy hiệu tiếp tục contract riêng202form.
+
+Icon nội dung đã chọn phải có cùng nhận diện trong Cửa hàng, HUD hỗ trợ và nơi hiển thị phần thưởng cùng loại. Skin chỉ đổi bề mặt/viền/nút, không gán ảnh khác cho cùng chức năng. Ở cỡHUD nhỏ phải QA riêng độ tương phản; fallback SVG vẫn cùng ngữ nghĩa. Không đổi toàn cục icon search/timer/undo cho cả điều hướng và thống kê chỉ vì trùng tên. Audit call sites, định nghĩa ranh giới domain trước khi sửa registry chung; ít nhất hai consumer thật mới gom adapter.
+
+### 15.4. Hợp đồng tài nguyên và tích hợp
+
+- Namespace dự kiến riêng: design/shop-catalog/ cho brief/inventory/nguồn/QA; public/assets/shop-catalog/v1/ cho export dùng trong sản phẩm. Chốt cây thư mục và generator ở S0 trước ghi asset. Không dùng hoặc sửa design/expedition/art-production/{masters,prompts,journal,manifest} của chat ảnh hình thái.
+- Inventory/mapping gồm loại, IDcatalog, nguồn hoặc renderer, assetKey, đường dẫn, kích thước, hash, quyền tái sử dụng, trạng thái QA; với capture thêm frame/seed/trạng thái render cần để tái tạo. Có mapping đầy đủ cho mọi mục thực tế, không viết nhánh theo tên từng món trong rendererUI.
+- Tên ổn định theo ngữ nghĩa; dùng lại một file khi cùng hình. Asset sản phẩm WebP vuông, alpha sạch nếu là icon rời, không có giá, chữ sốthời gian, tồn kho, tên hay trạng thái gắn trong ảnh. Theme/capture nội dung chữ/số thật là ngoại lệ theo ngữ nghĩa, không phải nhãn UI.
+- Mục tiêu xuất128px cho ô/HUD nhỏ và256px khi cần xem lớn/DPR; lựa chọn src theo kích thước hiển thị, không tải cả hai bản cho mỗi ô. Không bắt buộc512px vào bundle; master giữ ngoài public. Mục tiêu nén ban đầu ≤12KiB/128 và≤32KiB/256 mỗi file; đo chất lượng và tổngbyte ở S0/S2, ghi riêng ngoại lệ có lý do thay vì làm mờ hình để đạt số.
+- Dùng công cụ sinh ảnh khi cần tạo bitmap hỗ trợ mới; ảnh hiệu ứng/chủ đề lấy từ renderer/asset thật. Khi triển khai phải áp dụng skill tương ứng cho tác vụ thực tế. Lưu nguồn/prompt thực tế nếu sinh ảnh; không dùng ảnh contact sheet cắt làm icon sản phẩm.
+- Tải theo tab/trang đang xem, chia sẻ URL/decoder/cache trình duyệt; không preload toàn catalog hoặc tất cả frame effect. Mỗi ô có kích thước dự trữ cố định tránh layout shift, lỗi ảnh fallback một lần có giới hạn. Callback ảnh cũ không được sửa ô mới sau đổi tab/skin/UID/đóng popup.
+- Android đưa export đã duyệt vào gói; web tích hợp qua asset/worker hiện hữu. Mất mạng vẫn xem được asset đã có cache/đóng gói và chơi bình thường. Ảnh thiếu chưa cache có fallback đúng chức năng, không retry vô hạn hoặc khóa mua/trang bị/gameplay. Không tuyên bố tất cả ảnh khả dụng khi chưa tải.
+- Chỉ bàn giao source thật đãQA: contact sheet/preview thiết kế không phải manifest sản phẩm. Gắn mapping/export vào source generator, không sửa output bằng tay. Không tạo hoặc chỉnh Rules do thay ảnh/bố cục.
+
+### 15.5. Gate S0–S5
+
+- [x] **S0 — Inventory, owner, baseline:** kiểm đủ catalog/call sites/skin overrides; xác định tồn kho và đơn vị từng hỗ trợ, khả năng chia sẻ Link/Triple; đánh dấu reuse/redraw/capture/composite cho từngID. Chốt namespace/generator và hợp đồng ảnh riêng, ghi baseline sốnode, network/byte, thời gian mởtab, layout và bộ ảnh đang có. Không ghi đè thay đổi dirty khác.
+- [x] **S1 — Mẫu bố cục/mỹ thuật trước runtime:** sửa minh họa4cột đã xem để tồn kho ở góc thay vì dòng Có5, không gộp danh mục hoặc đổi tên/giá. Mẫu có đồng hồ chứa30/45/60, gói nhiều lượt, số0/lớn, tên1–2dòng, đã có/đang dùng; minh họa hỗ trợ + nối + xóa + theme + nhóm Memory. Đo vùng nội dung thật trên320/384/390/412/ngang/desktop và5skin; duyệt mẫu trước triển khai rộng, không xin lại quyết định đã được chốt nếu người dùng đã duyệt chính mẫu đó.
+- [x] **S2 — Tạo/QA bộ ảnh:** tái sử dụng/tạo bổ sung icon; dựng harness riêng để capture hiệu ứng thật và ghép theme, không tiêu tài sản hay thay save người chơi. QA thu nhỏ36–44px, alpha, vùng an toàn, khác biệt giữa các effect, file/hash/budget, coverage theo inventory và khả năng tái tạo. Không để món không có preview chỉ vì không bán hoặc asset chưa được sinh.
+- [x] **S3 — Tích hợp ảnh dùng chung:** mapping và loader/fallback có owner rõ, gắn vào Cửa hàng/Bộ sưu tập/HUD/quà đúng ngữ nghĩa; giữ UI/public API/ID/schema. Kiểm đổi5skin, ảnh lỗi/offline, owner cũ, không request/giải mã lại theo tick hoặc theo mỗi click. Không thay ảnh điều hướng/stat ngoài phạm vi.
+- [x] **S4 — Triển khai lưới4cột:** dùng cơ chế tab/panel hiện hữu, tách dữ liệu item với trình bày; ràng buộc chiều cao icon/tên/action và badge góc. Giữ tồn kho live, gói nhận/giá/tiền, ownership/equip, focus/keyboard, popup xác nhận và tooltip. Không tạo ví, listener/scheduler hoặc bản đếm mới.
+- [x] **S5 — Nghiệm thu/review:** ma trận và tiêu chí dưới đây; reviewer đọc diff và chạy lại kiểm tra trọng yếu độc lập với bước viết code. Chỉ đánh dấu xong phạm vi shop khi mọi item/skin/gate đạt; báo riêng phần ảnh202form đang dở. Cập nhật bằng chứng thật vào IMPLEMENTATION_NOTES.md hiện có; không tạo báo cáo rời cho mỗi chỉnh UI. Check/build ở gate nghiệm thu phù hợp; không tự deploy Hosting/Rules, APK hoặc push.
+
+S1 là cổng kiểm tra mẫu cụ thể, không phải yêu cầu người dùng trả lời lại các quyết định đã chốt trong mục15. Nếu khi đo thực tế4cột không giữ được vùng chạm và nội dung đọc được ở320px/skin có khung dày, trình bày ảnh đo cùng hai phương án có thể thực hiện để chốt điều chỉnh; không âm thầm giảm cột hoặc thu nhỏ font/vùng chạm.
+
+### 15.6. Acceptance và bằng chứng cần lưu
+
+1. Tất cả tab thuộc phạm vi của ba trò có4cột thật; không tràn ngang trang, không che safe-area/quảng cáo, panel cuộn đúng owner. Ô/giá cùng hàng ổn định giữa tên dài/ngắn, số lượng0/lớn và mọi trạng thái. Kho4×6 và Trang trí hồ sơ không bị đổi theo selector chung.
+2. Nhìn ảnh nhỏ phân biệt được từng loại hỗ trợ; icon cùng chức năng giữ nhận diện khi đổi5skin và giữa shop/HUD/quà. Không nhân bộ ảnh theo game/skin; số giây, sốgói/lượt và tồn kho không nhầm đơn vị. Kiểm toàn item, không chỉ4món trong ảnh minh họa.
+3. Preview nối/xóa/lật đối chiếu renderer thật, theme đối chiếu thẻ thật, không dùng sao/quà chung thay cả họ effect. Chỉ báo đủcoverage sau inventory+mapping+file+QA đạt; export tồn tại không tự coi là đạt mỹ thuật.
+4. Unit/contract cho mapping, coverage, định dạng badge/số lớn và fallback cần thiết; UI mua từng loại/gói, hủy/xác nhận, thiếuXu, đã có/đang dùng, dùng hỗ trợ sau mua, trang bị/đổi tab/reopen/reload. Kiểm tiền và tồn kho không đổi ngoài hành động đã xác nhận; schema cũ/catalog preference giữ nguyên.
+5. Playwright mục tiêu trên320/384/390/412px, ngang844×390 và desktop1024px,5skin, cả3trò và mọi tab. Chụp/đọc ảnh thật để kiểm chữ tiếng Việt, độ tương phản và badge không che hình; máyS22U thật nếu có, không coi browser thay chứng nhận máy thật.
+6. Lặp30chu kỳ đổi tab/skin/mởđóng, thao tác nhanh, ảnh tải chậm/lỗi, đổi profile trong khi tải; sốnode/listener/timer/cache hữu hạn. Reduced-motion không ảnh hưởng trạng thái mua/trang bị; không thêm loop liên tục vào catalog. Đo lại sốnode, longtask, frame/thời gian mởtab và byte so với baseline; không tuyên bố60FPS nếu chưa đo.
+7. Test bảnweb build với worker thật: tab đã cache dùng offline, tab chưa cache fallback, restart/online lại không tạo request storm hoặc ảnh cũ sửa owner mới. Không xóa cache/save người dùng để đạt test; Android asset packaging kiểm tại lượt đóng gói được giao riêng.
+8. Diff cuối chỉ chứa thay đổi thuộc scope; giữ master/prompt/journal/manifest của chat ảnh, icon rương dùng chung và các chỉnh UI hiện có. Static/CSS ownership, test mục tiêu, check/build cần thiết ghi PASS/FAIL/SKIPPED cùng đường dẫn chứng cứ thật. Không chạy test/build trong lượt chỉ lập kế hoạch.
+
+### 15.7. Bằng chứng của lượt lập kế hoạch
+
+- Đã rà owner shop/mainmenu/icons/manifest/skin, catalog hỗ trợ/hiệu ứng/theme và phạm vi kế hoạch hiện hành. Bộ icon hiện là hỗn hợp SVG và WebP theo skin; chưa có coverage/QA thống nhất cho toàn bộ preview.
+- Ảnh minh họa đã gửi trong cuộc trò chuyện là tham chiếu thẩm mỹ và mật độ4cột. Còn phải sửa nhãn tồn kho góc, kiểm tên/danh mục và khả năng hiển thị thật ở S1; không dùng nguyên ảnh làm asset, không coi là kết quả nghiệm thu sản phẩm.
+- Trong lượt này chỉ bổ sung mục15 và nguồn phạm vi ở CONTEXT.md; chưa tạo namespace/ảnh/manifest mới, chưa sửa runtime, chưa chạy test/build hoặc deploy/APK. Toàn bộ gateS0–S5 chưa đánh dấu hoàn tất.
+
+## 16. Kho từng rương, mua từng ô và thao tác1rương — 11/11/2026
+
+Yêu cầu trực tiếp mới của chủ dự án; cùng kế hoạch hiện hành, không tạo kế hoạch active khác. Thay các mô tả cũ về gom rương theo loại/mở lô ở mục8, handoff và gate cũ trong đúng phạm vi Kho lưu trữ. Không đổi phạm vi bộ202hình thái.
+
+- Mỗi rương, kể cả trùng loại, chiếm một ô riêng. Mảnh vẫn gom theo loại. Giữ counter rương hiện hữu làm nguồn dữ liệu, không tạo kho/ví song song hoặc cấp lại rương khi migrate.
+-5trang chính,24ô/trang,4cột×6hàng. Miễn phí8ô đầu (hai hàng đầu trang1);112ô còn lại khóa, được mua bất kỳ ô riêng với1000Xu/ô. Mỗi lần xác nhận mua một ô vĩnh viễn; giữ nguyên ô đã mua khi restart/chuyển mạng.
+- Theo quyết định chủ dự án, vẫn nhận đủ rương khi vượt sức chứa. Phần dư nằm trong Kho tạm có phân trang24món; chỉ xem được. Khi mở/bán rương chính hoặc mua ô tạo chỗ trống, phần dư tự chuyển sang ô chính qua projection counter, không tạo ID/kho phụ hoặc receipt tài sản mới. Không buộc mua ô để nhận quà; chỉ cần mở/bán được sau khi có chỗ chính.
+- Mỗi lần bấm Mở hoặc Bán chỉ xử lý1rương; không slider, không batch hoặc popup tổng mở lô. Giữ backend/receipt cũ tương thích; slider bán mảnh và ghép mảnh hiện hữu không đổi.
+- Mở: lưu giao dịch trước, rồi dùng ảnh đóng/mở cùng factory rương, timeline hữu hạn560ms, tiếp theo hiệu ứng rơi/thu quà dùng reward feedback chung. Max12vật phẩm/32Xu particles theo owner cũ, không tạo loop. Đóng popup/đổi trang/đổi hồ sơ hủy phần hình, không hủy quà đã commit. Reduced-motion hiện quà ngay. Lỗi trình bày sau commit không được nói rương còn nguyên hoặc cấp lại quà.
+- Mở bên phải màu vàng, Bán bên trái xanh ngọc, Ghép tím; dùng nút nổi của cửa hàng. Các tab Cửa hàng/Bộ sưu tập cách tiêu đề4px, không đệm trên14px cũ.
+- Dữ liệu bổ sung duy nhất: spark.state.storageUnlocks={slots,sequence,last}, tùy chọn với save cũ;112index mua hợp lệ8–119. Mua qua unlockStorageSlot trong local reward writer/journal/receipt/CAS hiện hữu, policy1 giữ giá1000Xu khi replay. Ví và quyền mở ô commit cùng một transaction. Không đổi formatVersion, catalogID hoặc số dư rương cũ; không sửa Rules.
+
+Trạng thái: logic/UI mục16 và phần kho tạm đã kiểm chứng bổ sung ngày16/11; **không đóng toàn kế hoạch ngoại hình**. Gate tổng hợp O6/Gate7 và tích hợp nghệ thuật còn theo báo cáo nghiệm thu chung. Bằng chứng chi tiết mới nhất tại IMPLEMENTATION_NOTES.md; không deploy/Rules/APK/push/commit trong lượt này.
+
+- Popup mua ô: mô tả đúng “Mở rộng thêm ô lưu trữ”, giá1.000Xu riêng; Hủy–Mua cùng96×44px, cách10px, căn giữa và dùng phong cách nút xác nhận của cửa hàng. Chỉ hiện toast−1.000Xu nếu receipt xác nhận có khoản trừ thật; toast rộng vừa chữ, bay lên1400ms rồi được owner hiện hữu dọn. Reduced-motion giữ thông báo tĩnh gọn.
+- Trang trí hồ sơ: bỏ tick, giữ aria-pressed và viền vàng làm dấu chọn/đang dùng. Khóa20px và nhãnLevel cùng góc phải4px; chừa vùng đầu ô để không đè tên hoặc ảnh. Giữ nhãn bạcLevel7–20/vàngLevelMax, không đổi dữ liệu trang bị.
+- [x] Projection từng rương,5trang chính và Kho tạm chỉ xem/phân trang hữu hạn; rương dư tự lấp ô chính khi phát sinh chỗ, giữ đủ tài sản cũ.
+- [x] Mua từng ô qua writer/journal/receipt hiện hữu; xác minh không trừ hai lần, rollback khi lỗi và bền qua offline/restart.
+- [x] Mở/bán1rương, hiệu ứng hữu hạn có cleanup, modal/nút/toast/tab/profile đúng yêu cầu mới.
+- [x] Bổ sung16/11:32 unit storage/local-reward/Spark;27/27 UI Kho lưu trữ;2/2 UI production-worker offline; npm run check; npm run build; syntax/diff checks. Scenario mới xác nhận Kho tạm chỉ xem, không có thao tác Mở/Bán, tự hiện ở ô chính sau khi mua slot và mở rương. Chi tiết log tại báo cáo nghiệm thu hiện hành; không coi bộ test Kho báu bản đồ ngoài phạm vi là bằng chứng cho mục16.
+
+
+## Bàn giao bản thử 11/11/2026
+
+Chủ dự án giao hoàn tất phần còn lại, gom toàn bộ thay đổi hiện có để commit/push, cập nhật link test và tạo APK; kiểm chứng Android thật do chủ dự án tự làm. Sau bàn giao tạm dừng và ghi phần cần tiếp tục.
+
+Gate5 đã đạt202 thiết kế/606WebP, manifest/hash/alpha/căn và phối đã kiểm. Phần tích hợp web của Gate6 đã nhận đủ202 form, đúng ba lớp/portrait; đã kiểm202 lượt decode, không giữ DOM dư. Không dùng kết quả web để xác nhận Android60FPS. Gate6/O6/Gate7 vẫn chưa đóng nghiệm thu toàn phần:7ca âm thanh mở rộng chưa đạt và1ca UI sao lưu tài khoản giả lập timeout còn cần chẩn đoán. Các kiểm tra logic/ảnh/web chính và ba suite emulator backend đã đạt. Xem một báo cáo chung tại design/expedition/COSMETIC_ACCEPTANCE_2026-11-11.md; không hiểu báo cáo này là kế hoạch thứ hai hoặc cho phép phát hành production.

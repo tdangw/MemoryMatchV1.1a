@@ -1,0 +1,37 @@
+{
+  "tool": "built-in image_gen",
+  "transparent_background": true,
+  "references": [
+    "design/shop-catalog/reference-four-column.png"
+  ],
+  "entries": [
+    {
+      "key": "path/magic",
+      "master": "illustrations/path-magic-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-9575c5e5-6605-4514-9b41-80be8a14a343.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A luminous connecting route between matching cards, restrained glow, a few clear round endpoints. No thick gold border, jewelry or beads; retain the real effect color and topology while making a beautiful illustrative icon. A violet graceful curved connection stroke, two purple glowing endpoints and three clearly drawn sparkling four-point diamond shapes around the curve.",
+      "status": "generated-candidate"
+    },
+    {
+      "key": "path/cyber",
+      "master": "illustrations/path-cyber-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-784a9499-0f56-4ace-afbc-1ca29104a730.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A luminous connecting route between matching cards, restrained glow, a few clear round endpoints. No thick gold border, jewelry or beads; retain the real effect color and topology while making a beautiful illustrative icon. A cyan futuristic stepped circuit connection route with right-angle bends, small square endpoint terminals and one short secondary digital streak.",
+      "status": "generated-candidate"
+    },
+    {
+      "key": "path/rainbow",
+      "master": "illustrations/path-rainbow-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-12260e3e-f154-4af0-be02-a12bb4b04026.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A luminous connecting route between matching cards, restrained glow, a few clear round endpoints. No thick gold border, jewelry or beads; retain the real effect color and topology while making a beautiful illustrative icon. A beautiful short curved rainbow ribbon with clearly separated red gold green cyan violet bands and two soft glowing endpoints, one small sparkle.",
+      "status": "generated-candidate"
+    },
+    {
+      "key": "path/hydro",
+      "master": "illustrations/path-hydro-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-8517271b-5e3c-401e-9307-16b9576984cd.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A luminous connecting route between matching cards, restrained glow, a few clear round endpoints. No thick gold border, jewelry or beads; retain the real effect color and topology while making a beautiful illustrative icon. A flowing bright blue curved water connection ribbon with a white highlight and three clear suspended water droplets following its path.",
+      "status": "generated-candidate"
+    }
+  ]
+}

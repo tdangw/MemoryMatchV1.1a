@@ -1,7 +1,27 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createWaveProgress, normalizeWaveProgress, completeWave, activateNextWave, waveTotalGroups } from '../../js/progression/waveProgress.js';
-import { calculateWaveTime, calculateFastFinishBonus, calculateProgressionStars } from '../../js/progression/gameplayRules.js';
+import { calculateWaveTime, calculateFastFinishBonus, calculateProgressionStars, getProgressionStarTargets } from '../../js/progression/gameplayRules.js';
+
+test('Memory Match star targets are 80 percent across all modes without changing other games', () => {
+  for (const mode of ['easy', 'normal', 'hard', 'superHard', 'challenge', 'endless']) {
+    for (const totalGroups of [1, 3, 12, 18, 60, 150, 5000]) {
+      const previous = getProgressionStarTargets({ mode, totalGroups });
+      const memory = getProgressionStarTargets({ gameId: 'memory-match', mode, totalGroups });
+      assert.deepEqual(memory, { two: Math.ceil(previous.two * 80 / 100), three: Math.ceil(previous.three * 80 / 100) });
+      for (const gameId of ['link-connect', 'triple-connect']) {
+        assert.deepEqual(getProgressionStarTargets({ gameId, mode, totalGroups }), previous);
+      }
+      const stars = (score, won = false) => calculateProgressionStars({ gameId: 'memory-match', mode, totalGroups, score, won });
+      assert.equal(stars(memory.two - 1), 0);
+      assert.equal(stars(memory.two - 1, true), 1);
+      assert.equal(stars(memory.two), 2);
+      assert.equal(stars(memory.three - 1), 2);
+      assert.equal(stars(memory.three), 3);
+    }
+  }
+  assert.throws(() => getProgressionStarTargets({ gameId: 'unknown', mode: 'easy', totalGroups: 12 }), RangeError);
+});
 
 const fresh = (overrides = {}) => createWaveProgress({ attemptId: 'attempt-1', gameId: 'memory-match', mode: 'easy', level: 1, groupsPerWave: 6, ...overrides });
 

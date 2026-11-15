@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { initialSparkState, transitionSpark, normalizeSparkState, normalizeSparkSave, applyTicketDrop, applySpecialDrop, mergeSparkSave, resolveSparkOperation } from '../../js/liveops/sparkModel.js';
 import { GROUP_LOOT_DROP_RATES, LETTER_ALPHABET } from '../../js/liveops/config.js';
-import { DAY_MS, periods, WHEEL, DAILY } from '../../js/liveops/model.js';
+import { DAY_MS, periods, WHEEL, DAILY, WEEKLY } from '../../js/liveops/model.js';
 const uid='spark-owner', now=Date.UTC(2026,9,26,8);
 const run=(state,command={type:'status'},extra={})=>transitionSpark(state,command,{uid,now,...extra});
 const fact=(i,day=periods(now).day)=>({gameId:'memory-match',mode:'superHard',roundId:`r-${i}`,day,matches:12,noHint:true});
@@ -40,9 +40,10 @@ test('day/week bonuses add 1/2 tickets and coins exactly once including rollover
   {const r=run(state,{type:'dailyBonus'});state=r.state;coins+=r.receipts.reduce((a,b)=>a+b.coins,0);}
   assert.equal(coins,30); assert.equal(state.tickets,1);
   state=run(state,{type:'weekly'}).state; assert.equal(state.tickets,3); assert.equal(run(state,{type:'weekly'}).receipts.length,0);
+  let weeklyCoins=0;for(const item of WEEKLY){const result=run(state,{type:'weekly',id:item.id});state=result.state;weeklyCoins+=result.receipts.reduce((sum,receipt)=>sum+receipt.coins,0);}assert.equal(weeklyCoins,60);
   const reset=run(state,{type:'status'},{now:now+7*DAY_MS}); assert.equal(reset.state.tickets,3); assert.equal(reset.receipts.length,0);
   const pending=initialSparkState(now); Object.assign(pending.daily,{wins:3,matches:30,noHint:3}); Object.assign(pending.weekly,{wins:12,matches:120,noHint:3,visits:3});
-  const all=run(pending,{type:'status'},{now:now+7*DAY_MS}); assert.equal(all.state.tickets,3); assert.equal(all.receipts.reduce((a,b)=>a+b.coins,0),80);
+  const all=run(pending,{type:'status'},{now:now+7*DAY_MS}); assert.equal(all.state.tickets,3); assert.equal(all.receipts.reduce((a,b)=>a+b.coins,0),140);
 });
 test('settlement preserves weekly coin milestones while retired cosmetic scoring never grants items',()=>{
   const state=initialSparkState(now);state.cosmetics.granted=['firefly-festival-01'];

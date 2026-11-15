@@ -7,6 +7,7 @@ import { getRankingOwner } from '../rankingOwner.js';
 import { sameRankingOwner } from '../progressRankingModel.js';
 import { getAppPageScope } from '../appPageLifecycle.js';
 import { CHEST_NAMES } from '../liveops/chestConfig.js';
+import { clearTooltip } from '../tooltips.js';
 const names = { 'memory-match': 'Memory Match', 'link-connect': 'Link Connect', 'triple-connect': 'Triple Connect' };
 const types = { avatar: 'Ảnh đại diện', frame: 'Khung viền', badge: 'Huy hiệu', 'effect-cover': 'Hiệu ứng' };
 
@@ -22,12 +23,12 @@ export async function presentAchievementAnnouncements({ owner = getAppPageScope(
     const firstHint = item.grant.chestType ? 'Mở Bộ sưu tập → Kho lưu trữ để xem quà và mở khi bạn muốn.' : seen ? '' : profile ? 'Chạm ảnh đại diện trong Hồ sơ để thay đổi.' : `Bạn có thể chọn hiệu ứng trong Bộ sưu tập ${gameName}.`;
     const content = createAchievementNoticeContent({ gameName, level: item.level, name: item.grant.chestType ? CHEST_NAMES[item.grant.chestType] : item.name,
       category: item.grant.chestType ? 'Mở rương để khám phá quà bên trong' : types[item.type],
-      type: item.grant.chestType ? 'chest' : item.type, image: item.grant.chestType ? null : achievementAssetUrl(item), firstHint,
+      type: item.grant.chestType ? 'chest' : item.type, chestType:item.grant.chestType, image: item.grant.chestType ? null : achievementAssetUrl(item), firstHint,
       storedIn: item.grant.chestType ? 'Đã thêm vào Kho lưu trữ trong Bộ sưu tập' : profile ? 'Đã thêm vào Hồ sơ' : `Đã thêm vào Bộ sưu tập ${gameName}` });
     const error = document.createElement('p'); error.setAttribute('role', 'alert'); content.append(error);
     let continued = false;
     const modal = openAppModal({ id: 'achievement-notice-modal', title: 'Thành tích hoàn tất', content, owner,
-      alignment: 'center', dismissible: false, closeOnBackdrop: false, closeOnEscape: false,
+      alignment: 'center', dismissible: false, closeOnBackdrop: false, closeOnEscape: false, onDestroy:clearTooltip,
       actions: [{ label: 'Tiếp tục', variant: 'primary', onClick: async () => {
         if (!current()) return false;
         const appearance = structuredClone(gameState.appearance);

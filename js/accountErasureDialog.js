@@ -3,7 +3,6 @@ import { getAccountService } from './accountService.js';
 import { loadLocalAccountOperation } from './accountDataOperations.js';
 import { createGameShellLifecycle, getActiveGameScope, clearShellTimeout } from './gameShell/gameShellLifecycle.js';
 import { isAppActive } from './appVisibility.js';
-import { createIcon } from './icons.js';
 
 const GRACE_MS = 10000;
 function element(tag, className, text) {
@@ -34,9 +33,12 @@ export function showAccountErasureDialog(kind, { onClose } = {}) {
   let remaining = GRACE_MS, startedAt = null, progressAnimation = null;
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   const content = element('div', 'account-erasure');
+  const steps = element('ol', 'account-erasure__steps');
+  steps.setAttribute('aria-label', 'Tiến trình xác nhận xóa');
+  for (const label of ['Kiểm tra', 'Xác nhận', 'Thực hiện']) steps.append(element('li', 'account-erasure__step', label));
   const stage = element('div', 'account-erasure__stage');
   const error = element('p', 'account-erasure__error'); error.setAttribute('role', 'alert');
-  const actions = element('div', 'account-erasure__actions'); content.append(stage, error, actions);
+  const actions = element('div', 'account-erasure__actions'); content.append(steps, stage, error, actions);
   const owns = () => Boolean(originalUid && service?.getState().uid === originalUid);
   function stopTimer() { if (timer !== null) clearShellTimeout(timer); timer = null; }
   function cancel() {
@@ -59,25 +61,29 @@ export function showAccountErasureDialog(kind, { onClose } = {}) {
     return control;
   }
   function warning() {
-    const badge = element('div', 'account-erasure__badge'); badge.append(createIcon(deleting ? 'trash' : 'restart'));
-    const copy = element('p', 'account-erasure__warning', 'Thao tác này không thể hoàn tác.');
+    const copy = element('p', 'account-erasure__warning', 'Dữ liệu đã xóa không thể khôi phục.');
     const list = element('ul', 'account-erasure__losses');
     for (const text of ['Tiến trình của cả ba trò', 'Xu và toàn bộ vật phẩm', 'Thống kê và thứ hạng']) list.append(element('li', '', text));
     const identity = element('p', 'account-erasure__identity', deleting
       ? 'Tài khoản đăng nhập và dữ liệu trò chơi trên thiết bị này cũng sẽ bị xóa.'
       : 'Bạn vẫn giữ đăng nhập và tên tài khoản để chơi lại từ đầu.');
-    stage.append(badge, copy, list, identity);
+    stage.append(copy, list, identity);
   }
   function render() {
     if (!scope.active) return;
     modal.panel.dataset.erasurePhase = phase;
+    const currentStep = phase === 'challenge' ? 0 : phase === 'review' ? 1 : 2;
+    [...steps.children].forEach((step, index) => {
+      step.dataset.state = index < currentStep ? 'complete' : index === currentStep ? 'current' : 'upcoming';
+      if (index === currentStep) step.setAttribute('aria-current', 'step');
+      else step.removeAttribute('aria-current');
+    });
     stage.replaceChildren(); actions.replaceChildren(); error.textContent = message;
     if (phase === 'challenge' || phase === 'review') {
-      stage.append(element('p', 'account-erasure__step', phase === 'challenge' ? 'Bước 1 / 3' : 'Bước 2 / 3'));
       warning();
       if (phase === 'challenge') {
         const fieldset = element('fieldset', 'account-erasure__challenge');
-        fieldset.append(element('legend', '', 'Chọn đáp án để tiếp tục'));
+        fieldset.append(element('legend', '', 'Để tránh thao tác nhầm, hãy chọn đáp án đúng.'));
         fieldset.append(element('p', 'account-erasure__question', puzzle.question));
         const options = element('div', 'account-erasure__options');
         for (const value of puzzle.options) {
@@ -96,8 +102,8 @@ export function showAccountErasureDialog(kind, { onClose } = {}) {
         actions.append(button('Hủy', 'secondary', cancel), next);
       } else {
         stage.append(element('p', 'account-erasure__final', pending
-          ? 'Một phần dữ liệu có thể đã được xóa trong yêu cầu trước. Chỉ tiếp tục nếu bạn muốn hoàn tất yêu cầu này.'
-          : 'Đây là lần xác nhận cuối. Sau khi chọn xóa, bạn còn 10 giây để đổi ý.'));
+          ? 'Yêu cầu xóa trước đó chưa hoàn tất. Một phần dữ liệu có thể đã được xóa. Tiếp tục để hoàn tất yêu cầu này.'
+          : 'Vui lòng kiểm tra thông tin trước khi xác nhận. Sau khi chọn xóa, bạn có 10 giây để hủy.'));
         stage.append(element('p', 'account-erasure__connection', 'Cần kết nối mạng. Bạn có thể cần xác minh lại tài khoản Google.'));
         const confirm = button(pending ? 'Tiếp tục xóa' : deleting ? 'Xóa tài khoản' : 'Xóa dữ liệu', 'danger', () => {
           if (!owns()) { message = 'Tài khoản đã thay đổi. Hãy đóng cửa sổ này và thử lại từ Hồ sơ.'; render(); return; }
@@ -106,8 +112,6 @@ export function showAccountErasureDialog(kind, { onClose } = {}) {
         actions.append(button('Hủy', 'secondary', cancel), confirm);
       }
     } else if (phase === 'grace' || phase === 'submitting') {
-      stage.append(element('p', 'account-erasure__step', 'Bước 3 / 3'));
-      const badge = element('div', 'account-erasure__badge'); badge.append(createIcon(deleting ? 'trash' : 'restart')); stage.append(badge);
       stage.append(element('h3', 'account-erasure__grace-title', phase === 'grace' ? 'Bạn vẫn có thể hủy' : 'Đang xóa…'));
       stage.append(element('p', 'account-erasure__grace-copy', phase === 'grace'
         ? `${deleting ? 'Tài khoản' : 'Dữ liệu trò chơi'} sẽ được xóa sau thời gian chờ. Chọn Hủy nếu bạn muốn giữ lại.`

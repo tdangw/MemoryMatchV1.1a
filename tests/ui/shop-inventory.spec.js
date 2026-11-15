@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-for (const gameId of ["memory-match", "link-connect"]) {
+for (const gameId of ["memory-match", "link-connect", "triple-connect"]) {
   for (const fromMenu of [true, false]) {
     test(`${gameId}: buy every item ${fromMenu ? "before play" : "in game"}`, async ({ page }) => {
       await page.goto("/");
@@ -13,15 +13,16 @@ for (const gameId of ["memory-match", "link-connect"]) {
         gameState.remainingTime = 73;
         const items = gameId === "memory-match"
           ? (await import("/js/shopCatalog.js")).SHOP_ITEMS
-          : (await import("/js/linkConnect/linkItems.js")).LINK_ITEMS;
-        const key = gameId === "memory-match" ? "memoryMatch" : "linkConnect";
+          : gameId === 'link-connect' ? (await import("/js/linkConnect/linkItems.js")).LINK_ITEMS : (await import('/js/tripleConnect/tripleItems.js')).TRIPLE_ITEMS;
+        const key = gameId === "memory-match" ? "memoryMatch" : gameId === 'link-connect' ? "linkConnect" : 'tripleConnect';
         const before = { ...gameState.progress[key].items };
         (await import("/js/shop.js")).openShopOverlay({ gameId, fromMenu, linkConnect: gameId === "link-connect" });
         return { items, before, key };
       }, { gameId, fromMenu });
-      await expect(page.locator("#shop-modal .appearance-choice")).toHaveCount(gameId === "link-connect" ? 4 : 12);
+      await expect(page.locator("#shop-modal .appearance-choice")).toHaveCount(initial.items.length + (gameId === 'triple-connect' ? 1 : 0));
       for (const item of initial.items) {
-        const card = page.locator("#shop-modal .appearance-choice").filter({ has: page.getByText(item.title, { exact: true }) });
+        const card = page.locator(`#shop-modal [data-catalog-id="${item.id}"]`);
+        expect(await card.getAttribute('aria-label')).toContain(item.title);
         await card.locator(".shop-buy-button").click();
         await page.getByRole("button", { name: "Mua ngay", exact: true }).click();
         await expect(page.locator("#shop-confirm-modal")).toHaveCount(0);
@@ -34,7 +35,7 @@ for (const gameId of ["memory-match", "link-connect"]) {
       expect(after.coins).toBe(expectedCoins);
       expect(after.time).toBe(73);
       for (const item of initial.items.filter(item => item.type !== "hint")) {
-        const id = gameId === "link-connect" ? item.id : item.type === "time" ? `time${item.value}` : item.type === "reveal-all" ? "previewAll" : `preview${item.value}`;
+        const id = gameId !== "memory-match" ? item.id : item.type === "time" ? `time${item.value}` : item.type === "reveal-all" ? "previewAll" : `preview${item.value}`;
         expect(after.items[id]).toBe((initial.before[id] || 0) + 1);
       }
       if (gameId === "memory-match") expect(after.items.hint).toBe(initial.before.hint + 11);

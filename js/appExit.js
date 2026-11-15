@@ -1,3 +1,4 @@
+import '../styles/raised-actions.css';
 import { Capacitor } from '@capacitor/core';
 import { App } from '@capacitor/app';
 import { createIcon } from './icons.js';
@@ -10,9 +11,9 @@ const isAndroid = () => Capacitor.isNativePlatform() && Capacitor.getPlatform() 
 let starting = null;
 export function showAppExitConfirmation() {
   if (!isAndroid() || document.getElementById('app-exit-modal')) return;
-  openAppModal({ id: 'app-exit-modal', title: 'Thoát trò chơi?', icon: 'exit', keepBanner: false,
+  const modal = openAppModal({ id: 'app-exit-modal', title: 'Thoát trò chơi?', icon: 'exit', keepBanner: false, alignment: 'center',
     content: '<p>Tiến trình đã lưu trên thiết bị. Bạn có muốn thoát trò chơi không?</p>',
-    actions: [{ label: 'Ở lại', onClick: close => close() }, { label: 'Thoát game', onClick: async () => {
+    actions: [{ label: 'Hủy', variant: 'secondary', onClick: close => close() }, { label: 'Thoát game', variant: 'primary', onClick: async () => {
       try {
         await loadPersistentGameData();
         if (getPersistenceStatus().blocked) { showAppToast('Chưa lưu được dữ liệu. Hãy kiểm tra trước khi thoát.'); return false; }
@@ -22,6 +23,8 @@ export function showAppExitConfirmation() {
       return false;
     } }],
   });
+  modal.panel.classList.add('app-modal--confirmation');
+  modal.panel.querySelector('.app-button--primary').classList.add('ui-raised-action');
 }
 export function mountHomeExit(root, scope) {
   if (!isAndroid()) return;

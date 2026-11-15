@@ -519,7 +519,7 @@ export function playLinkEnergyFlight(start, end, {
       return { left: rect.left + rect.width * (.05 + ratio * .9), top: rect.top, width: 0, height: rect.height };
     },
   };
-  return playLootDrop(source, { target, preset: "linkEnergy", holdMs: LINK_CONNECT_TIMING.energyHoldMs, timing: { dropMs: LINK_CONNECT_TIMING.energyBurstMs, flightMs: LINK_CONNECT_TIMING.energyFlightMs }, onCollected: onArrive });
+  return playLootDrop(source, { target, preset: "linkEnergy", receiveCue:false, holdMs: LINK_CONNECT_TIMING.energyHoldMs, timing: { dropMs: LINK_CONNECT_TIMING.energyBurstMs, flightMs: LINK_CONNECT_TIMING.energyFlightMs }, onCollected: onArrive });
 }
 
 export function playLinkItemRewardFlight(source, itemId, { delayMs = 0 } = {}) {
@@ -528,7 +528,7 @@ export function playLinkItemRewardFlight(source, itemId, { delayMs = 0 } = {}) {
   const launch = () => {
     if (!source.isConnected) return null;
     const target = document.querySelector(`[data-item="${itemId}"]`) || document.getElementById("link-tools-toggle");
-    return playLootDrop(source, { target, icon: item.icon, preset: "linkItem", tier: "blue", holdMs: LINK_CONNECT_TIMING.itemRewardHoldMs, timing: { dropMs: LINK_CONNECT_TIMING.itemRewardBurstMs, flightMs: LINK_CONNECT_TIMING.itemRewardFlightMs } });
+    return playLootDrop(source, { target, icon: item.icon, supportKind: item.id === 'thunder' ? 'thunder' : null, preset: "linkItem", receiveCue:false, tier: "blue", holdMs: LINK_CONNECT_TIMING.itemRewardHoldMs, timing: { dropMs: LINK_CONNECT_TIMING.itemRewardBurstMs, flightMs: LINK_CONNECT_TIMING.itemRewardFlightMs } });
   };
   return delayMs > 0 ? scheduleTransientEffect(launch, delayMs) : launch();
 }

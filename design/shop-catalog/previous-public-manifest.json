@@ -1,0 +1,2083 @@
+{
+  "version": 1,
+  "assets": {
+    "support/hint": {
+      "source": {
+        "file": "docs/design/ui-images/masters/icons-v1.png",
+        "rect": [
+          0,
+          735,
+          210,
+          945
+        ],
+        "method": "reuse-approved-ui-art"
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/support-hint-128.webp",
+          "bytes": 5948,
+          "sha256": "b7593634ef8c389fb11649040458ca9c2044a7977620e4105f98f4e5280c1d31"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/support-hint-256.webp",
+          "bytes": 14834,
+          "sha256": "f8f9c433ea4ac8a05cff0af3328e07ce110dd801094a0d5bb2576bd8b812276d"
+        }
+      }
+    },
+    "support/undo": {
+      "source": {
+        "file": "docs/design/ui-images/masters/icons-v1.png",
+        "rect": [
+          1048,
+          735,
+          1254,
+          945
+        ],
+        "method": "reuse-approved-ui-art"
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/support-undo-128.webp",
+          "bytes": 6146,
+          "sha256": "f3c632f394ca24e0c5f59842aa132e84ea22b4d6bd1f9d510782925529eaee48"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/support-undo-256.webp",
+          "bytes": 15230,
+          "sha256": "ce5ee6231ff6e7da6fa566cd2e305da3c1723e5c013dfa4d4b7398ac798ac991"
+        }
+      }
+    },
+    "support/shuffle": {
+      "source": {
+        "file": "docs/design/ui-images/masters/icons-v1.png",
+        "rect": [
+          210,
+          735,
+          420,
+          945
+        ],
+        "method": "reuse-approved-ui-art"
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/support-shuffle-128.webp",
+          "bytes": 7084,
+          "sha256": "cae6dec006e75400ec2fccf818de16e811820ad88a0aeeba2c82a9086e0c2a66"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/support-shuffle-256.webp",
+          "bytes": 18172,
+          "sha256": "8b02209449b2a245b91ffd1da0652af87f3467dc7b34d2a48b18643e37285d9f"
+        }
+      }
+    },
+    "support/preview": {
+      "source": {
+        "file": "docs/design/ui-images/masters/icons-v1.png",
+        "rect": [
+          840,
+          735,
+          1048,
+          945
+        ],
+        "method": "reuse-approved-ui-art"
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/support-preview-128.webp",
+          "bytes": 4952,
+          "sha256": "55aa71493acffb6b5f4bd01121f5d04384d2d71e684d1c10b78815cd2e6f3e2c"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/support-preview-256.webp",
+          "bytes": 12666,
+          "sha256": "e635408a17886bab371d0b71471d4201e0db80abc53d986ebbf90ac1e479035b"
+        }
+      }
+    },
+    "support/freeze": {
+      "source": {
+        "file": "docs/design/ui-images/masters/icons-v1.png",
+        "rect": [
+          630,
+          735,
+          840,
+          945
+        ],
+        "method": "reuse-approved-ui-art"
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/support-freeze-128.webp",
+          "bytes": 8842,
+          "sha256": "df0c94535706ca239a887c7ffc74d7b8c6e103239a3eaa25cb465204358751b0"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/support-freeze-256.webp",
+          "bytes": 21736,
+          "sha256": "53282210978bf8d6de5c1343233a49121ba6b20ed0338f6017f575bc8dc278a0"
+        }
+      }
+    },
+    "support/expand": {
+      "source": {
+        "file": "docs/design/ui-images/masters/icons-v1.png",
+        "rect": [
+          0,
+          990,
+          210,
+          1200
+        ],
+        "method": "reuse-approved-ui-art"
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/support-expand-128.webp",
+          "bytes": 6548,
+          "sha256": "1155bc8e5a667d1375f893b66113e309ef33fa96172125b027d7c03f7b07525d"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/support-expand-256.webp",
+          "bytes": 14144,
+          "sha256": "648b67f14c1f0fe0c5290d6030882b4f4c7e56d956749fb6574264fabf5d579f"
+        }
+      }
+    },
+    "support/time": {
+      "source": {
+        "file": "design/shop-catalog/masters/time-v1.png",
+        "sha256": "3170f8a934214da6b0bd2c71068c870ff81e052b00717e8989580d458b89bae6",
+        "method": "imagegen"
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/support-time-128.webp",
+          "bytes": 4712,
+          "sha256": "3ff63c9b5bbf613dad3f55beb891f3f4cc15bb25fb7bb0a11666a4f5c06b5b61"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/support-time-256.webp",
+          "bytes": 11104,
+          "sha256": "c01b79262d15328842cddf93ffa855fb575f81a199e732669d6ac2eb30f7f745"
+        }
+      },
+      "numberAnchor": [
+        0.4893,
+        0.5675
+      ]
+    },
+    "support/thunder": {
+      "source": {
+        "file": "design/shop-catalog/masters/thunder-v1.png",
+        "sha256": "406c1333e7af454c88fecaa235a14f4ed887477b43a2fc5a3c58aeceeb046656",
+        "method": "imagegen"
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/support-thunder-128.webp",
+          "bytes": 4450,
+          "sha256": "937f5f22443e8fc068ebcbf2e677fdf568b65dc55610b1515239b04a6569010d"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/support-thunder-256.webp",
+          "bytes": 10320,
+          "sha256": "f69b2829311d8086b5d544dcaab8b83c26a93f76f33586e56b085a1362894cf2"
+        }
+      }
+    },
+    "path/default": {
+      "source": {
+        "file": "design/shop-catalog/captures/path-default.png",
+        "sha256": "bbe57fa31f0f9ce4fe8a4d182e614ce1e0d0d40128c1bf3e26c6ba61e072d323",
+        "method": "real-renderer",
+        "renderer": "connectionEngine",
+        "frameMs": 400,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/path-default-128.webp",
+          "bytes": 7440,
+          "sha256": "f19a0b3209280ef5384624920690c4fa27b0a346823e5e50b9533b1a70344ed0"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/path-default-256.webp",
+          "bytes": 19350,
+          "sha256": "aace1f50dd5c515233b9de9be0c295eb8acf8518b4d504bc9547ea17d439e363"
+        }
+      }
+    },
+    "path/electric": {
+      "source": {
+        "file": "design/shop-catalog/captures/path-electric.png",
+        "sha256": "3efe1df54911bb1b63b729cae84d3003931d8c377f37b6f85d055882542fa5fc",
+        "method": "real-renderer",
+        "renderer": "connectionEngine",
+        "frameMs": 180,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/path-electric-128.webp",
+          "bytes": 7088,
+          "sha256": "f66ddf7461a0bde6e32496e1155276b376c2c9dbf82177d45a8695eabb6be376"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/path-electric-256.webp",
+          "bytes": 19396,
+          "sha256": "c55d9bf85eb4da7eed9b3a22ce4d88b944dfc0589a6868983648957d7265e1c2"
+        }
+      }
+    },
+    "path/laser": {
+      "source": {
+        "file": "design/shop-catalog/captures/path-laser.png",
+        "sha256": "1d676e5c6abeddce35728e19d462975e6fe7bc52ee4fe49a6005e191bbf38720",
+        "method": "real-renderer",
+        "renderer": "connectionEngine",
+        "frameMs": 400,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/path-laser-128.webp",
+          "bytes": 8006,
+          "sha256": "a3c2076b2137b39908c344f956e23e7fb7b2240ebc517f603369b2fe1866590b"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/path-laser-256.webp",
+          "bytes": 20686,
+          "sha256": "feec34edc97f006eec8e8339c9c29bd5388f684676e7c3d7c7a3cfe91bf9573b"
+        }
+      }
+    },
+    "path/fire": {
+      "source": {
+        "file": "design/shop-catalog/captures/path-fire.png",
+        "sha256": "40d2fb1866c234e9b5ca2fcb1b0fc65d6533431e5f8404192e46b4c1e0043397",
+        "method": "real-renderer",
+        "renderer": "connectionEngine",
+        "frameMs": 180,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/path-fire-128.webp",
+          "bytes": 5974,
+          "sha256": "9a58bc1a814adfc9c662ac99cfb7c42923cfb717e89de7639e4af87530dfbe92"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/path-fire-256.webp",
+          "bytes": 15880,
+          "sha256": "33cf2fb8e971d4af2b1244e82a7f94cbf958cb31001b7eaa0120beaf86ed59c8"
+        }
+      }
+    },
+    "path/magic": {
+      "source": {
+        "file": "design/shop-catalog/captures/path-magic.png",
+        "sha256": "c71c765829eff141346722b6f27ab6943f213de16d93fd6dbc8c80cc766f3058",
+        "method": "real-renderer",
+        "renderer": "connectionEngine",
+        "frameMs": 400,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/path-magic-128.webp",
+          "bytes": 7914,
+          "sha256": "e22a552b2304c8ad88064797ffcb0942589db24d535c7986b1248db2c9383868"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/path-magic-256.webp",
+          "bytes": 20176,
+          "sha256": "117daf39f47fdae6ce2eafa726f014bf47408de22018b0561610e9b6a5149454"
+        }
+      }
+    },
+    "path/cyber": {
+      "source": {
+        "file": "design/shop-catalog/captures/path-cyber.png",
+        "sha256": "abbac9c1fd37c7c7533c5ff1d237afb3acb1fbce693fc2ad13fb3f97753bcd4d",
+        "method": "real-renderer",
+        "renderer": "connectionEngine",
+        "frameMs": 400,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/path-cyber-128.webp",
+          "bytes": 7962,
+          "sha256": "cdfe4b3771cda67f52107f279d798db3bc71c92d3d5a598a7df80a76c5c9a2a2"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/path-cyber-256.webp",
+          "bytes": 20164,
+          "sha256": "dea66be0f19912bb649aca8e7bfd586bb6e765372226e2789343ff0ee5b93142"
+        }
+      }
+    },
+    "path/rainbow": {
+      "source": {
+        "file": "design/shop-catalog/captures/path-rainbow.png",
+        "sha256": "31fc349e7bff74ba79ee2e9036c88b25c73ebe1ee72fb7ebb6b6321639017522",
+        "method": "real-renderer",
+        "renderer": "connectionEngine",
+        "frameMs": 400,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/path-rainbow-128.webp",
+          "bytes": 4144,
+          "sha256": "7fa8b37d56ee40cbe795a5ff88592449a29013e281a039fd4aee711d11441e2b"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/path-rainbow-256.webp",
+          "bytes": 10368,
+          "sha256": "3dd5de16897508cd5f8bb57f2d764e5351c72198c09215678742f548a5c41349"
+        }
+      }
+    },
+    "path/hydro": {
+      "source": {
+        "file": "design/shop-catalog/captures/path-hydro.png",
+        "sha256": "f1b1feb9aa6c792d442d66553f3378f4fa3d535249c06ef794467f97cd300f5e",
+        "method": "real-renderer",
+        "renderer": "connectionEngine",
+        "frameMs": 400,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/path-hydro-128.webp",
+          "bytes": 4460,
+          "sha256": "ea39915fd3e17e3bf82c71be5120bfb82673a84de9947746754830cae5f52303"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/path-hydro-256.webp",
+          "bytes": 11142,
+          "sha256": "bbf63234b6e41df48088ee9c2e2d21d041681cdef54b3a251930369fb8cb0e3f"
+        }
+      }
+    },
+    "path/plasma": {
+      "source": {
+        "file": "design/shop-catalog/captures/path-plasma.png",
+        "sha256": "3ad08e1240d47cb58e7eae34a0a02b196265a010507e20e703787c628e65677d",
+        "method": "real-renderer",
+        "renderer": "connectionEngine",
+        "frameMs": 400,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/path-plasma-128.webp",
+          "bytes": 8052,
+          "sha256": "d0718da5555a708bd81feef4a0f9a1bd216c3949d14db5509f7d73d3fc83ec27"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/path-plasma-256.webp",
+          "bytes": 21094,
+          "sha256": "0658b23160ff42f2599accfbe45286a4a36a7da33cf90ff1af7c77199c27f4a9"
+        }
+      }
+    },
+    "path/holy": {
+      "source": {
+        "file": "design/shop-catalog/captures/path-holy.png",
+        "sha256": "a275a520f4311621ca8982afe5a0ea51dc29051558861978f0f08c88c6d61e4f",
+        "method": "real-renderer",
+        "renderer": "connectionEngine",
+        "frameMs": 400,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/path-holy-128.webp",
+          "bytes": 7600,
+          "sha256": "3d71936b15ebb1148c2519325ad9a9a25f9ee7b8034f09949d18afd2c9dfcdc5"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/path-holy-256.webp",
+          "bytes": 20150,
+          "sha256": "fae3a7e4fc8148bd3914b3273775e37ce13e9f87beb1954edb957cecf5a092f8"
+        }
+      }
+    },
+    "path/shadow": {
+      "source": {
+        "file": "design/shop-catalog/captures/path-shadow.png",
+        "sha256": "86122b0075520540fdeba013cc687c01ed761bc33c8e9dd38e2e16906368151b",
+        "method": "real-renderer",
+        "renderer": "connectionEngine",
+        "frameMs": 400,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/path-shadow-128.webp",
+          "bytes": 8226,
+          "sha256": "2e799488e5e5c2c203e75f9153dd7795b72439e7b5432b9b81243057f493a689"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/path-shadow-256.webp",
+          "bytes": 21282,
+          "sha256": "b500ec65db8134674869cb928eb25459dca0eeb07a01bbd87711bdc1cf86389a"
+        }
+      }
+    },
+    "path/spiral": {
+      "source": {
+        "file": "design/shop-catalog/captures/path-spiral.png",
+        "sha256": "28b54ccccbf462a6e211c1d8c79cb28e8545af9243c46dae318bf2d1fd1db1b9",
+        "method": "real-renderer",
+        "renderer": "connectionEngine",
+        "frameMs": 400,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/path-spiral-128.webp",
+          "bytes": 7912,
+          "sha256": "480b5ce8a60b1d3fdce2a953e82e1c5d4b04e1e13f65fecab10121c78dd37450"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/path-spiral-256.webp",
+          "bytes": 20832,
+          "sha256": "bf40b878b656325727ea803d12db3d2dcbadb2d554796072fe7b87541a61a4c9"
+        }
+      }
+    },
+    "path/dashed": {
+      "source": {
+        "file": "design/shop-catalog/captures/path-dashed.png",
+        "sha256": "60f5e082312a7aa42228a149510695b6b5d9a0e4405631aa3f0e3864f1e6046b",
+        "method": "real-renderer",
+        "renderer": "connectionEngine",
+        "frameMs": 400,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/path-dashed-128.webp",
+          "bytes": 6848,
+          "sha256": "4427406f1d9afeb8f1bab081010bd34659563906e81479397b5d52482a93aefd"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/path-dashed-256.webp",
+          "bytes": 17140,
+          "sha256": "54a0d673d53786afd52a51f0ff8c5394ec9d2293e61f0936e8f5d084ec16f345"
+        }
+      }
+    },
+    "path/bullet": {
+      "source": {
+        "file": "design/shop-catalog/captures/path-bullet.png",
+        "sha256": "e919c30efc4e04e0d72941240b9d1181d477a1044506f837a8776deea80f8d44",
+        "method": "real-renderer",
+        "renderer": "connectionEngine",
+        "frameMs": 90,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/path-bullet-128.webp",
+          "bytes": 3252,
+          "sha256": "3afa58aa8918b3055bb82d7aa0e22e47d1fa275de373d1f0d93ff3c8649e17d6"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/path-bullet-256.webp",
+          "bytes": 7982,
+          "sha256": "2efeff5245e762a13f182a0ee926db7c899d452f624c4c66578c99f796cb11ea"
+        }
+      }
+    },
+    "path/kame": {
+      "source": {
+        "file": "design/shop-catalog/captures/path-kame.png",
+        "sha256": "0e88a1cba8eeff84a361be9734704993da73f62b61f6f89b18d06d52ccfc212d",
+        "method": "real-renderer",
+        "renderer": "connectionEngine",
+        "frameMs": 400,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/path-kame-128.webp",
+          "bytes": 5002,
+          "sha256": "7e817b4b459b089397da5fe3dbf4eee2ea4d4e13115418871ed1050caa13ff33"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/path-kame-256.webp",
+          "bytes": 12772,
+          "sha256": "91c7436f950db2d46850e907762644c99aba337406c731a9c0ee03ec3cba6f01"
+        }
+      }
+    },
+    "path/halo": {
+      "source": {
+        "file": "design/shop-catalog/captures/path-halo.png",
+        "sha256": "58e311da1cfcc7113db3e8dc9f634e16f0835e17e1e46911e472f831df1a285c",
+        "method": "real-renderer",
+        "renderer": "connectionEngine",
+        "frameMs": 400,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/path-halo-128.webp",
+          "bytes": 8366,
+          "sha256": "c99a3a56f41dc1a0cad39cdb2e827bad10f19bea68bcd1979b3d7954bc7dcb29"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/path-halo-256.webp",
+          "bytes": 20640,
+          "sha256": "3b32f3929707ea3ce93b3e7375d8b871661d6bc33584b0aa9cc9bd2baf1b527e"
+        }
+      }
+    },
+    "path/matrix": {
+      "source": {
+        "file": "design/shop-catalog/captures/path-matrix.png",
+        "sha256": "beb825a3e806e0176364f48d5aa9506592b4db1e3eff9371576b7304fb5f3ee7",
+        "method": "real-renderer",
+        "renderer": "connectionEngine",
+        "frameMs": 400,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/path-matrix-128.webp",
+          "bytes": 2974,
+          "sha256": "bc5ca0e01ba426389619158035a3c881e966a760329291c01af2c131183336e6"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/path-matrix-256.webp",
+          "bytes": 7072,
+          "sha256": "09dc86fa4365397c4e660b5c52a64a721b842c6655afda9deb82ec23caddd05b"
+        }
+      }
+    },
+    "path/sonic": {
+      "source": {
+        "file": "design/shop-catalog/captures/path-sonic.png",
+        "sha256": "5ad5f7299cf57eb3c8c6e9f4621084364feb6bf6735ecb6c08561b9176260c2a",
+        "method": "real-renderer",
+        "renderer": "connectionEngine",
+        "frameMs": 400,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/path-sonic-128.webp",
+          "bytes": 8406,
+          "sha256": "0628cd1b5d27f2a88377d6fdb852e465e6b4ad8c40de26cf2d4a5335a0da8c65"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/path-sonic-256.webp",
+          "bytes": 21372,
+          "sha256": "f79bf819bc8729e98db561f85b3855acd6bc9b2275d3bedf5ad1fecbf15bee31"
+        }
+      }
+    },
+    "path/chains": {
+      "source": {
+        "file": "design/shop-catalog/captures/path-chains.png",
+        "sha256": "c74b2fad706227966bedaeeae69757af530edc78ce51dbdc5ac995e0c1543640",
+        "method": "real-renderer",
+        "renderer": "connectionEngine",
+        "frameMs": 400,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/path-chains-128.webp",
+          "bytes": 7822,
+          "sha256": "6676b70f8bce869cdca7dfcd8d81f02e348c115a2257cb0fb6e4545c619a0e5c"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/path-chains-256.webp",
+          "bytes": 19566,
+          "sha256": "3ad1ee5ec408afc3d27befdec4610932a62759267a2c085207ac0ba3b7fd9576"
+        }
+      }
+    },
+    "path/meteor": {
+      "source": {
+        "file": "design/shop-catalog/captures/path-meteor.png",
+        "sha256": "f2d044cc6e7bf5b40ea5c9a52070f689f7195107246fd3d30a04604c4cd30108",
+        "method": "real-renderer",
+        "renderer": "connectionEngine",
+        "frameMs": 180,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/path-meteor-128.webp",
+          "bytes": 6976,
+          "sha256": "7df5724fc2a4862cb938ce312a4b796b71cf35db9208b7d5a867fcf54c0188c1"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/path-meteor-256.webp",
+          "bytes": 17334,
+          "sha256": "a828f1aa99e21af2c61adc4805944ba314f960d97a30d7ff9c569ed565199e21"
+        }
+      }
+    },
+    "path/poison": {
+      "source": {
+        "file": "design/shop-catalog/captures/path-poison.png",
+        "sha256": "5f90d759324dca1eae582d3e62fc1fd573859863202c773a45de32ccaa3eac94",
+        "method": "real-renderer",
+        "renderer": "connectionEngine",
+        "frameMs": 400,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/path-poison-128.webp",
+          "bytes": 7720,
+          "sha256": "6fcd7dd07cc6ce8e19d9a251cac7030294e09c94a641f27b11a636fc844c621b"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/path-poison-256.webp",
+          "bytes": 19358,
+          "sha256": "6f340d3d477929639730fdfce8445ca33ec94c415fda446c4f5eaca17d4b63d2"
+        }
+      }
+    },
+    "path/link-effect-meteor-route": {
+      "source": {
+        "file": "design/shop-catalog/captures/path-link-effect-meteor-route.png",
+        "sha256": "9fcf764c633b9b1f61c011457cab67a875b508f09915bdc2cb5c180897bd77ea",
+        "method": "real-renderer",
+        "renderer": "connectionEngine",
+        "frameMs": 180,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/path-link-effect-meteor-route-128.webp",
+          "bytes": 6992,
+          "sha256": "60da21a56e6a6d71fe98edefa25d22b5d4d4a96a8857da5a1446d3a78ee5eef5"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/path-link-effect-meteor-route-256.webp",
+          "bytes": 17780,
+          "sha256": "2611d64a6282fc06bcdb009029d1f59382458d1578d3c3131754d4bd202865e6"
+        }
+      }
+    },
+    "path/triple-effect-triad-converge": {
+      "source": {
+        "file": "design/shop-catalog/captures/path-triple-effect-triad-converge.png",
+        "sha256": "970387d6fe2b6fc5ad39b5f725cdb518301aee985047e175870f870f96e342db",
+        "method": "real-renderer",
+        "renderer": "connectionEngine",
+        "frameMs": 180,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/path-triple-effect-triad-converge-128.webp",
+          "bytes": 6966,
+          "sha256": "6221a154b0b02017a239f40d8ccdfb97ecd9fa0bd69094c52479840dc136ecd7"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/path-triple-effect-triad-converge-256.webp",
+          "bytes": 17814,
+          "sha256": "babe76ea1e345de91e1c0b82861a360acac4b998d8f9512cddefed9880f103d2"
+        }
+      }
+    },
+    "exit/default": {
+      "source": {
+        "file": "design/shop-catalog/captures/exit-default.png",
+        "sha256": "81689e68120ca9ab9650f7ba5c5e29680f47157fafed21f16523ae1c86256718",
+        "method": "real-renderer",
+        "renderer": "linkEffectAdapter/exitEngine/CSS",
+        "frameMs": 420,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/exit-default-128.webp",
+          "bytes": 3418,
+          "sha256": "3a855ead9bbd4bd7e232f6bc6b093791251027d0cd4ad9edd334a120285fbbf8"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/exit-default-256.webp",
+          "bytes": 6884,
+          "sha256": "c14fb4f43f72d922c830d793c0d337e78d5df159198eb70cf273d26441a34e30"
+        }
+      }
+    },
+    "exit/dissolve": {
+      "source": {
+        "file": "design/shop-catalog/captures/exit-dissolve.png",
+        "sha256": "bd7f33007da07fc93bdd860313756e643bf57dd99978953536899c1d5ed94d1e",
+        "method": "real-renderer",
+        "renderer": "linkEffectAdapter/exitEngine/CSS",
+        "frameMs": 420,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/exit-dissolve-128.webp",
+          "bytes": 2662,
+          "sha256": "4a9f9920bce6ba2063e6326152ea2e9956e48fae77003c1ae01fa957603fc38e"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/exit-dissolve-256.webp",
+          "bytes": 5254,
+          "sha256": "d5a2ceb225c1601a8ea955fb8219d4646e5df23f5ba0910c2ff7a382ae3ba7ca"
+        }
+      }
+    },
+    "exit/finedust": {
+      "source": {
+        "file": "design/shop-catalog/captures/exit-finedust.png",
+        "sha256": "282b7e0e4e700a39952fed703ee70aa765d99c0a4d6373e80d158471dcb85a57",
+        "method": "real-renderer",
+        "renderer": "linkEffectAdapter/exitEngine/CSS",
+        "frameMs": 420,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/exit-finedust-128.webp",
+          "bytes": 4238,
+          "sha256": "7fb91f65c7d7bb23aa2ef5f6027f1eed7f9f40d72ef7b04e71efab96d7246b99"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/exit-finedust-256.webp",
+          "bytes": 6116,
+          "sha256": "e1d403c0692a3829e27f12a9d6d5fd3a9ce10c386ed0d756c13c3ba45f9f6f75"
+        }
+      }
+    },
+    "exit/split4": {
+      "source": {
+        "file": "design/shop-catalog/captures/exit-split4.png",
+        "sha256": "6c08253a5e7c19368b8629dc8fa817a696bf2ac1beba2076ed804f13740b5798",
+        "method": "real-renderer",
+        "renderer": "linkEffectAdapter/exitEngine/CSS",
+        "frameMs": 420,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/exit-split4-128.webp",
+          "bytes": 5832,
+          "sha256": "fb9808938afa4cea6c731f0a2e0c06ebc9437360a67786513cf546856712fbc2"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/exit-split4-256.webp",
+          "bytes": 9388,
+          "sha256": "f161c53cb4acb11e5055e447755361d37acde8e354df75764aa3767f2bef018c"
+        }
+      }
+    },
+    "exit/split2": {
+      "source": {
+        "file": "design/shop-catalog/captures/exit-split2.png",
+        "sha256": "e7c07f3728c2705a435651d21e8c9f44658891df380da02b0f02679c59f96308",
+        "method": "real-renderer",
+        "renderer": "linkEffectAdapter/exitEngine/CSS",
+        "frameMs": 420,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/exit-split2-128.webp",
+          "bytes": 4288,
+          "sha256": "f9f5aba6d3cc3df67e3b2f3e03aed367baa55cca09eabc21a1874504e2a363da"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/exit-split2-256.webp",
+          "bytes": 7236,
+          "sha256": "e4248d9c7930b8b87030b388cd0cf550a9936b4dfbb3e831bec0e89351e5c70e"
+        }
+      }
+    },
+    "exit/split8": {
+      "source": {
+        "file": "design/shop-catalog/captures/exit-split8.png",
+        "sha256": "4f52177aeb05628f9b941f6eb9aef626a6e4e1c2e13671e5e08b5adf8e46fb15",
+        "method": "real-renderer",
+        "renderer": "linkEffectAdapter/exitEngine/CSS",
+        "frameMs": 420,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/exit-split8-128.webp",
+          "bytes": 6022,
+          "sha256": "4d3ecc7e1cb73f586b8e8fb9f5cfce65df42248dcf5f5ced9ada2a4aaa714503"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/exit-split8-256.webp",
+          "bytes": 9854,
+          "sha256": "a2190686c9ed473567a187428f02e9eee5549ab4e507e9c5c1389b3475689d5e"
+        }
+      }
+    },
+    "exit/triangles": {
+      "source": {
+        "file": "design/shop-catalog/captures/exit-triangles.png",
+        "sha256": "18dc75eab3808ee182672cb3980812f3f5e4f05e2221892c1f0612412c0b78b6",
+        "method": "real-renderer",
+        "renderer": "linkEffectAdapter/exitEngine/CSS",
+        "frameMs": 420,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/exit-triangles-128.webp",
+          "bytes": 6324,
+          "sha256": "98fe2934edd5a1e98476016e9d1da0d77dd8b36dcb7f9e9df299214da82b4a8b"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/exit-triangles-256.webp",
+          "bytes": 9144,
+          "sha256": "368a8c204f9be7e5b5ec62fbdf8031647239d5f50b21110bbe26aff6b96ee0d2"
+        }
+      }
+    },
+    "exit/crumble": {
+      "source": {
+        "file": "design/shop-catalog/captures/exit-crumble.png",
+        "sha256": "2383ec36373286313f215d62af3f594fe2a1470148ecdf32933a8740cad75947",
+        "method": "real-renderer",
+        "renderer": "linkEffectAdapter/exitEngine/CSS",
+        "frameMs": 420,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/exit-crumble-128.webp",
+          "bytes": 8606,
+          "sha256": "ea6b14d5cc845f7d1cfb47e1474ed646c983751e960caeef494cac933ff6db97"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/exit-crumble-256.webp",
+          "bytes": 12724,
+          "sha256": "b7d9900b54a32cefc4e6e09cd8b85f54283f6dd49efe043b3427c0bbc359252d"
+        }
+      }
+    },
+    "exit/gravity": {
+      "source": {
+        "file": "design/shop-catalog/captures/exit-gravity.png",
+        "sha256": "c5011150df36146e1e49ecb19ab4db9c2af8cb5d1d64d80d9561f8fe4afa0425",
+        "method": "real-renderer",
+        "renderer": "linkEffectAdapter/exitEngine/CSS",
+        "frameMs": 420,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/exit-gravity-128.webp",
+          "bytes": 3024,
+          "sha256": "45fddbd7d00940e8180ba3fbe47ffbc6f096c7b8319361a1170b62e323559cd8"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/exit-gravity-256.webp",
+          "bytes": 5968,
+          "sha256": "3f3275f16a92603b5588b46340d7ef183fb7be9ebc66b88453f003fd33ef07e3"
+        }
+      }
+    },
+    "exit/collide": {
+      "source": {
+        "file": "design/shop-catalog/captures/exit-collide.png",
+        "sha256": "9b7df5e59cd3387841204d8bf115c8fe7c967ed1501f4d9d8e6e2e2e711b83de",
+        "method": "real-renderer",
+        "renderer": "linkEffectAdapter/exitEngine/CSS",
+        "frameMs": 420,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/exit-collide-128.webp",
+          "bytes": 1088,
+          "sha256": "4b4300af689e1cdfe7b87104c87c1b9625cdf499712fc207f1f692a9a5be044a"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/exit-collide-256.webp",
+          "bytes": 2218,
+          "sha256": "11b5e18f5a9560d94ad237e9d6266019ce5ba7f4dba2168662968824a4318047"
+        }
+      }
+    },
+    "exit/portal": {
+      "source": {
+        "file": "design/shop-catalog/captures/exit-portal.png",
+        "sha256": "3317114d522e43ff280e6988a0df0d851499dde7434f63614b3f7643105d9bdd",
+        "method": "real-renderer",
+        "renderer": "linkEffectAdapter/exitEngine/CSS",
+        "frameMs": 420,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/exit-portal-128.webp",
+          "bytes": 2600,
+          "sha256": "134664d8e4c92031dce22c8cdc0bbe22dbc0775b9d23711a7f1b3cf724edfd06"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/exit-portal-256.webp",
+          "bytes": 4214,
+          "sha256": "3783353e47424141188665543caf9c41df76b9b7363e4e14b61b9d6f20fee352"
+        }
+      }
+    },
+    "exit/blackhole": {
+      "source": {
+        "file": "design/shop-catalog/captures/exit-blackhole.png",
+        "sha256": "d24310763b0dce7ee47d46d6f712ff7db05ecd965e4aed0ea61daf252428d0f0",
+        "method": "real-renderer",
+        "renderer": "linkEffectAdapter/exitEngine/CSS",
+        "frameMs": 420,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/exit-blackhole-128.webp",
+          "bytes": 2864,
+          "sha256": "1d16e4618a9403c1098b777a47f86aedcf19ed7b2e8ca546f22ea40f3c8d320a"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/exit-blackhole-256.webp",
+          "bytes": 4082,
+          "sha256": "6b018cd70f378f683438932854dde5ad7959c78c1edf8bafbeac1fcd22d8f043"
+        }
+      }
+    },
+    "exit/freeze": {
+      "source": {
+        "file": "design/shop-catalog/captures/exit-freeze.png",
+        "sha256": "cc09ee5321ea9f6acc521edd7285fd796cbe1890205500c2adec54c20ccb2ca0",
+        "method": "real-renderer",
+        "renderer": "linkEffectAdapter/exitEngine/CSS",
+        "frameMs": 420,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/exit-freeze-128.webp",
+          "bytes": 2860,
+          "sha256": "caa94f77c7e087a0e475666352d2c3fe9ba8a9cb14415c849742a541370fc60e"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/exit-freeze-256.webp",
+          "bytes": 5480,
+          "sha256": "e8ff47db0491d6a5f04d57e8ce429276b089c0c1a150d5df28e502e9ae2da2e6"
+        }
+      }
+    },
+    "exit/burn": {
+      "source": {
+        "file": "design/shop-catalog/captures/exit-burn.png",
+        "sha256": "d1d18b426836cf4f9f484b0228b30d2b4a1237cf2eda6276aa40db275272f278",
+        "method": "real-renderer",
+        "renderer": "linkEffectAdapter/exitEngine/CSS",
+        "frameMs": 420,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/exit-burn-128.webp",
+          "bytes": 2052,
+          "sha256": "acb0a009cc2a4f7321091745dc57e3a21624485120874968eed783308f0c5596"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/exit-burn-256.webp",
+          "bytes": 3938,
+          "sha256": "cb01025a225823a1b3681d9f1be5b16049bba1227e5161f8dcc75792651b905e"
+        }
+      }
+    },
+    "exit/pixel": {
+      "source": {
+        "file": "design/shop-catalog/captures/exit-pixel.png",
+        "sha256": "2aa38bd04c24b5bb03ebda20f2773f0956e7d4a78d3a5aeb9e4cbf8aadfdd6be",
+        "method": "real-renderer",
+        "renderer": "linkEffectAdapter/exitEngine/CSS",
+        "frameMs": 420,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/exit-pixel-128.webp",
+          "bytes": 6008,
+          "sha256": "1a17c44d5f8b1457769b81713bebe88fd428ec9fd20c36bab38fd946c6e75dd1"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/exit-pixel-256.webp",
+          "bytes": 7224,
+          "sha256": "3ef1d6885b2c80687abd90ccf5c6988b1ac88e18a7bb12a2465f60320d6c0735"
+        }
+      }
+    },
+    "exit/implode": {
+      "source": {
+        "file": "design/shop-catalog/captures/exit-implode.png",
+        "sha256": "fa7e18fe575be8220e0f70e49a4d9dba3f5b7709188074b41357c0a279e1a096",
+        "method": "real-renderer",
+        "renderer": "linkEffectAdapter/exitEngine/CSS",
+        "frameMs": 420,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/exit-implode-128.webp",
+          "bytes": 2196,
+          "sha256": "8ee425e7d865076932e2b939262f01cb2a46f0fd01adb40428ee663df8f7ce41"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/exit-implode-256.webp",
+          "bytes": 3976,
+          "sha256": "aa0ae75c3ebe4fafb683b78c35148c44d4ab810947f45e3aa97376cdf497bd51"
+        }
+      }
+    },
+    "exit/slice": {
+      "source": {
+        "file": "design/shop-catalog/captures/exit-slice.png",
+        "sha256": "822bd2e9a441afe33610b57307c3ba0ac1561b33b9168b2ebee8a9ddd0a40031",
+        "method": "real-renderer",
+        "renderer": "linkEffectAdapter/exitEngine/CSS",
+        "frameMs": 420,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/exit-slice-128.webp",
+          "bytes": 3490,
+          "sha256": "2b01133fc95658656a45a8d4facbfddbbacdf34c30794dcfcbbb3a735c67d977"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/exit-slice-256.webp",
+          "bytes": 5168,
+          "sha256": "65f7a2bf76a0813544e3970c3e7d9621de4d991eea7a813382b34e97fa479dcc"
+        }
+      }
+    },
+    "exit/bubble": {
+      "source": {
+        "file": "design/shop-catalog/captures/exit-bubble.png",
+        "sha256": "b3c2dc8ad78ec466cb6db8c591a13d7cb06f988916875569500cd0ff0fddf1d4",
+        "method": "real-renderer",
+        "renderer": "linkEffectAdapter/exitEngine/CSS",
+        "frameMs": 420,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/exit-bubble-128.webp",
+          "bytes": 5456,
+          "sha256": "f0943c68a2b3644221df2d68a223fdf735eb4812685d607d52d803a10e016cee"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/exit-bubble-256.webp",
+          "bytes": 8588,
+          "sha256": "8e1d8a15afe361e67cf29881c884f6ff63d093e9fa06d985b4bd44f99f806626"
+        }
+      }
+    },
+    "exit/origami": {
+      "source": {
+        "file": "design/shop-catalog/captures/exit-origami.png",
+        "sha256": "13e574ef63d752a8f3fd902b65911157990cedf4f68b8780327f3d3bc7604db2",
+        "method": "real-renderer",
+        "renderer": "linkEffectAdapter/exitEngine/CSS",
+        "frameMs": 420,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/exit-origami-128.webp",
+          "bytes": 3370,
+          "sha256": "913d5c617df2b54496d94f00e78533b536b9d7d088a37fcc59d61d047249bf28"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/exit-origami-256.webp",
+          "bytes": 6164,
+          "sha256": "6c7c7d9a5e7c3c9dace7485c5e15c9ce8b6cfd2015ad60ab6c16b2b48bbd6f53"
+        }
+      }
+    },
+    "exit/electric-shock": {
+      "source": {
+        "file": "design/shop-catalog/captures/exit-electric-shock.png",
+        "sha256": "087d15bf40c7fd0ae1638d8c07a29d39c4b3dd0ef943a74fc2f59c2611821988",
+        "method": "real-renderer",
+        "renderer": "linkEffectAdapter/exitEngine/CSS",
+        "frameMs": 420,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/exit-electric-shock-128.webp",
+          "bytes": 3206,
+          "sha256": "3e2192a8b54e2e752bf67566923ee193b370b506db7800f769e7c2117531a1cc"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/exit-electric-shock-256.webp",
+          "bytes": 6840,
+          "sha256": "efeef6149d9b530112157c2e4be96ead5b69573baab48822fb2b9101ce50738d"
+        }
+      }
+    },
+    "exit/ghost": {
+      "source": {
+        "file": "design/shop-catalog/captures/exit-ghost.png",
+        "sha256": "8ae0bcfc4b44d617037f61175f3d11846b46d975ce63bd6d5f3c79ef2d511136",
+        "method": "real-renderer",
+        "renderer": "linkEffectAdapter/exitEngine/CSS",
+        "frameMs": 420,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/exit-ghost-128.webp",
+          "bytes": 1596,
+          "sha256": "c9519837a5b5b08e6ee0e1b28a5a45c903d4ca9eafa1e47af296585d894c94d0"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/exit-ghost-256.webp",
+          "bytes": 3212,
+          "sha256": "358bd98f3e8dc3a7d04207cf5f04f4fc712e3e5094024ffe310a98cb904506f4"
+        }
+      }
+    },
+    "exit/link-effect-moon-petals": {
+      "source": {
+        "file": "design/shop-catalog/captures/exit-link-effect-moon-petals.png",
+        "sha256": "d60441c91c3814a07f7f586efdcb95c5f466e559cd13419e6b4573dbff31fa22",
+        "method": "real-renderer",
+        "renderer": "linkEffectAdapter/exitEngine/CSS",
+        "frameMs": 100,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/exit-link-effect-moon-petals-128.webp",
+          "bytes": 2762,
+          "sha256": "5c815350e15598344f6e1976934f96a92553ace910ca75e200ba6acc5cb42584"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/exit-link-effect-moon-petals-256.webp",
+          "bytes": 4624,
+          "sha256": "23c7413de73272312e01dbcc0dde2a777d72fccc573f8532298318b50124094c"
+        }
+      }
+    },
+    "exit/triple-effect-crystal-bloom": {
+      "source": {
+        "file": "design/shop-catalog/captures/exit-triple-effect-crystal-bloom.png",
+        "sha256": "fe66c16f9b39220bd5782875cb8a5062e4413a686e4079ec7943c831dd82c546",
+        "method": "real-renderer",
+        "renderer": "linkEffectAdapter/exitEngine/CSS",
+        "frameMs": 100,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/exit-triple-effect-crystal-bloom-128.webp",
+          "bytes": 2742,
+          "sha256": "a56b196efef01b66be1ec000d9873ec71428f639ccd39e0589bcdf933bf60e23"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/exit-triple-effect-crystal-bloom-256.webp",
+          "bytes": 4588,
+          "sha256": "2e4218160532070246bf6c50fe66032f43503c93dad32bc82b9a35bd5611edca"
+        }
+      }
+    },
+    "flip/memory-effect-moonflip": {
+      "source": {
+        "file": "design/shop-catalog/captures/flip-memory-effect-moonflip.png",
+        "sha256": "76aec39af0ea8631f1ef93c22c9952291e4585b69b2c01700d02b2a422ee9049",
+        "method": "real-renderer",
+        "renderer": "board.css/achievementFlip",
+        "frameMs": 120,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/flip-memory-effect-moonflip-128.webp",
+          "bytes": 1328,
+          "sha256": "01df76d5358c364072d5ff347fdfbd28cc793efaec0d9676df780648029bb803"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/flip-memory-effect-moonflip-256.webp",
+          "bytes": 2148,
+          "sha256": "6830e0746b469b3c44dd389e2e076b583a19f7f4c31a25a9936db9f261fe0e6a"
+        }
+      }
+    },
+    "flip/memory-effect-spring-petals": {
+      "source": {
+        "file": "design/shop-catalog/captures/flip-memory-effect-spring-petals.png",
+        "sha256": "cd22100e92c07683fd771863366803ff4afa4c8ccdf920d5fd6ea143d9f5a8d5",
+        "method": "real-renderer",
+        "renderer": "board.css/achievementFlip",
+        "frameMs": 120,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/flip-memory-effect-spring-petals-128.webp",
+          "bytes": 1436,
+          "sha256": "81af1fde9a83bde9e179905dae909be3b056ed839bfbc62bed78d99bbf70caad"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/flip-memory-effect-spring-petals-256.webp",
+          "bytes": 2350,
+          "sha256": "3433d88b41000f58e4a04a663b3a49a2675a3202d6da5355b37cba856fe5e676"
+        }
+      }
+    },
+    "flip/bounce": {
+      "source": {
+        "file": "design/shop-catalog/captures/flip-bounce.png",
+        "sha256": "6423580a6e8f24d88ac13e15b8e7f729340381a4e0eaf96cee2de085ba33cfb3",
+        "method": "real-renderer",
+        "renderer": "board.css/achievementFlip",
+        "frameMs": 120,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/flip-bounce-128.webp",
+          "bytes": 1448,
+          "sha256": "8c66beec791bd2e92733471d9ea78b137c81d7f31853a4eebc32b0354a2be8b3"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/flip-bounce-256.webp",
+          "bytes": 2534,
+          "sha256": "ce93ebe59ecb271f35da82888f8be99eaa62521f5c4b4fc2720272b149c110b3"
+        }
+      }
+    },
+    "flip/fade-scale": {
+      "source": {
+        "file": "design/shop-catalog/captures/flip-fade-scale.png",
+        "sha256": "b6097167b82cb2cf981aaaae06cd31b98c67ae7ce58824c5e127ee8ea6252491",
+        "method": "real-renderer",
+        "renderer": "board.css/achievementFlip",
+        "frameMs": 120,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/flip-fade-scale-128.webp",
+          "bytes": 1144,
+          "sha256": "35a79c341e62ee307ec9272408b28c7a51eab5ec9e02a1dac6997d7a259aa58f"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/flip-fade-scale-256.webp",
+          "bytes": 1756,
+          "sha256": "ccfd111a8decaefd4388b9e46d8b6a928cb2464fa79020ddf754e30d2cd1f4c0"
+        }
+      }
+    },
+    "flip/pop": {
+      "source": {
+        "file": "design/shop-catalog/captures/flip-pop.png",
+        "sha256": "f400de347a73ab8901e41c1a6b616ab3a36adde3fb945dcc66e7f02700551178",
+        "method": "real-renderer",
+        "renderer": "board.css/achievementFlip",
+        "frameMs": 120,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/flip-pop-128.webp",
+          "bytes": 1364,
+          "sha256": "2f176901c54e07d1a7b39914ee932b82d2e6067e08b7a159446ad70186b493f7"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/flip-pop-256.webp",
+          "bytes": 2262,
+          "sha256": "508079fea3918407ee247635faf05b736e1aeb4a3efc62c1b534566cdeefe849"
+        }
+      }
+    },
+    "flip/slide-up": {
+      "source": {
+        "file": "design/shop-catalog/captures/flip-slide-up.png",
+        "sha256": "3f32662d26f99a73a2908f19b919fe88c98a434ac78f3381aee4340abc5d33b6",
+        "method": "real-renderer",
+        "renderer": "board.css/achievementFlip",
+        "frameMs": 120,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/flip-slide-up-128.webp",
+          "bytes": 1324,
+          "sha256": "c5075b1a1ea12beb4370f2bc2ca8884a907d35186cb2140f5caf40cb474ae3b7"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/flip-slide-up-256.webp",
+          "bytes": 2196,
+          "sha256": "caaaf975cc00b49120d840222a5ec641c69dc54bbbc57bc87f02ed9bb31f264f"
+        }
+      }
+    },
+    "flip/flip-y": {
+      "source": {
+        "file": "design/shop-catalog/captures/flip-flip-y.png",
+        "sha256": "d885c714b866bca5ce8d0a771cb028774ee0397a99a2bd6842ca4607665a98f3",
+        "method": "real-renderer",
+        "renderer": "board.css/achievementFlip",
+        "frameMs": 120,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/flip-flip-y-128.webp",
+          "bytes": 1098,
+          "sha256": "b2e4006f1aaaa1015939d785825851f2567359ff0d24e70432c3cd06c75bc9a0"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/flip-flip-y-256.webp",
+          "bytes": 1666,
+          "sha256": "bb2a2c88c9f0fe5939bfe1836a40d03d498fd28d5f389f853877fc26331e4a6f"
+        }
+      }
+    },
+    "flip/zoom-rotate": {
+      "source": {
+        "file": "design/shop-catalog/captures/flip-zoom-rotate.png",
+        "sha256": "4269e396cf9f1b117d4dedee4484856e68cc4505920c582c6ac62fc7e522c320",
+        "method": "real-renderer",
+        "renderer": "board.css/achievementFlip",
+        "frameMs": 120,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/flip-zoom-rotate-128.webp",
+          "bytes": 1180,
+          "sha256": "a789627f3ec72c6939d21975b1c3534418f54ee4e6e36096569a1de601dc0e10"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/flip-zoom-rotate-256.webp",
+          "bytes": 1878,
+          "sha256": "3cabcc89875c3c717f838b0557b68b51c577181d4baadba6f76e03791c56dca2"
+        }
+      }
+    },
+    "flip/blur-in": {
+      "source": {
+        "file": "design/shop-catalog/captures/flip-blur-in.png",
+        "sha256": "846106a2fd36283ca17df84e81f22d46a23ee459bb8c3a743bae8171ed7cacd3",
+        "method": "real-renderer",
+        "renderer": "board.css/achievementFlip",
+        "frameMs": 120,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/flip-blur-in-128.webp",
+          "bytes": 1224,
+          "sha256": "9998fcf8c66bbbb7e952691e8240a0414296cfab78b60d27479d19ac63c1f653"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/flip-blur-in-256.webp",
+          "bytes": 1962,
+          "sha256": "5793479641b902e20bb139b1e11dc758e1496adea72a8e8bd28a95d96ac9b799"
+        }
+      }
+    },
+    "back/classic": {
+      "source": {
+        "file": "design/shop-catalog/captures/back-classic.png",
+        "sha256": "f53214f0e69b2325c68f97c5b11c019996c836cecb162864d88102f954a0c1fb",
+        "method": "real-renderer",
+        "renderer": "gameplay-effects.css",
+        "frameMs": 0,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/back-classic-128.webp",
+          "bytes": 1116,
+          "sha256": "a3be54eba0a1b044d686389f84364afd1b719f8d48d535ad3545a0d18210fb89"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/back-classic-256.webp",
+          "bytes": 1284,
+          "sha256": "f0de80d21a23375b9d287218665e73300c71ded6cb857d26352b49675a3a97e4"
+        }
+      }
+    },
+    "back/midnight": {
+      "source": {
+        "file": "design/shop-catalog/captures/back-midnight.png",
+        "sha256": "70c1ab050f3e08be0a64947e90ac2feab9771ec8e69940e5dcb7cf0be8cc8292",
+        "method": "real-renderer",
+        "renderer": "gameplay-effects.css",
+        "frameMs": 0,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/back-midnight-128.webp",
+          "bytes": 1270,
+          "sha256": "2fd623b37119173b5027f96d5ee3479deddb72ede305d166fbc6029ca9b488e1"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/back-midnight-256.webp",
+          "bytes": 1564,
+          "sha256": "3e06019e0e8f47ab4f9ba47650b6007e5c207c5256b406c35ab54f29f45d3e43"
+        }
+      }
+    },
+    "back/aurora": {
+      "source": {
+        "file": "design/shop-catalog/captures/back-aurora.png",
+        "sha256": "7efefaa81b2f3c2a6e16e1f3b18c99dafcd19116c3ab08dcd96e7ebec86a66f0",
+        "method": "real-renderer",
+        "renderer": "gameplay-effects.css",
+        "frameMs": 0,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/back-aurora-128.webp",
+          "bytes": 1180,
+          "sha256": "51eddf185a6c4c4f495d7eaea33759e53ddd6893024f3229bfaaa2c429bce918"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/back-aurora-256.webp",
+          "bytes": 1422,
+          "sha256": "54be0ae4788ee30712471be9b81727667532434d9d92fe040cf29cc649779919"
+        }
+      }
+    },
+    "back/candy": {
+      "source": {
+        "file": "design/shop-catalog/captures/back-candy.png",
+        "sha256": "21728c03eefce4b5089281d2feb05bbc0d199739deabe2b4e340bbdf8ca22bb3",
+        "method": "real-renderer",
+        "renderer": "gameplay-effects.css",
+        "frameMs": 0,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/back-candy-128.webp",
+          "bytes": 1228,
+          "sha256": "02867df9be849e1af1d876e4bd7685c1c371b4313053e9dd74694d4110f67a35"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/back-candy-256.webp",
+          "bytes": 1476,
+          "sha256": "da775e37dd4847aa1a9649bd53412cb7cf851bba61ce0e133dbb276230887034"
+        }
+      }
+    },
+    "back/moon-mountain": {
+      "source": {
+        "file": "design/shop-catalog/captures/back-moon-mountain.png",
+        "sha256": "facf9c52f1724f1c816c60bd67534b416fcd43f8981a4b60072dc57b2916d2d4",
+        "method": "real-renderer",
+        "renderer": "gameplay-effects.css",
+        "frameMs": 0,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/back-moon-mountain-128.webp",
+          "bytes": 2788,
+          "sha256": "fa3b05d9d10ed23dce135797170d840fe39c938a50aba357ad606b3d25307abe"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/back-moon-mountain-256.webp",
+          "bytes": 5868,
+          "sha256": "d8a0c9b936764d557dca533d45ac310c7bb65517801c8ce4d8b41deaf76f08d2"
+        }
+      }
+    },
+    "back/moonlit-garden": {
+      "source": {
+        "file": "design/shop-catalog/captures/back-moonlit-garden.png",
+        "sha256": "003395c1d240c1d08f44ad787c1680c883e5c800dad17ecd884f1064ccd1a435",
+        "method": "real-renderer",
+        "renderer": "gameplay-effects.css",
+        "frameMs": 0,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/back-moonlit-garden-128.webp",
+          "bytes": 3052,
+          "sha256": "e1f11164967eed7f48b368803eed9461de12d21c88ab2ad90881662c6446ae3d"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/back-moonlit-garden-256.webp",
+          "bytes": 7396,
+          "sha256": "fca73f7e58bf4fceea510ce0ad978c6069b4eeffedde48728228b018a511df08"
+        }
+      }
+    },
+    "back/starlight-path": {
+      "source": {
+        "file": "design/shop-catalog/captures/back-starlight-path.png",
+        "sha256": "9cda077225b510c5798e5fc6edc46636f7d73a7e0a50619649f1ef57f8860060",
+        "method": "real-renderer",
+        "renderer": "gameplay-effects.css",
+        "frameMs": 0,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/back-starlight-path-128.webp",
+          "bytes": 3102,
+          "sha256": "29f3c0e21c64b460b89eea952df4b82f7edfb46b89b4116f6c65de5ab6847dd7"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/back-starlight-path-256.webp",
+          "bytes": 7566,
+          "sha256": "f34b4ea0fe0d99e77325833d0a619c2b8c48433c98930e7f84b75f425cf480d3"
+        }
+      }
+    },
+    "back/crystal-triad": {
+      "source": {
+        "file": "design/shop-catalog/captures/back-crystal-triad.png",
+        "sha256": "89229c0b9bbc00c75a55c099d67f50f2f9f0ec15032da870454d4fae7537b421",
+        "method": "real-renderer",
+        "renderer": "gameplay-effects.css",
+        "frameMs": 0,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/back-crystal-triad-128.webp",
+          "bytes": 3032,
+          "sha256": "c9c4f8927809685e3b968646f785292818b39cf1c81a0b9dc5aacedae7adafe5"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/back-crystal-triad-256.webp",
+          "bytes": 7264,
+          "sha256": "6e9f8678891ee7606ec4ceaf31cfd6fbb9846869ad3122a9bd6a61300f9562b0"
+        }
+      }
+    },
+    "back/lunar-pair": {
+      "source": {
+        "file": "design/shop-catalog/captures/back-lunar-pair.png",
+        "sha256": "51197120324119beb3a0bebdede9bd25b90ae21e2b958b7fe6f99d0b0d7d2012",
+        "method": "real-renderer",
+        "renderer": "gameplay-effects.css",
+        "frameMs": 0,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/back-lunar-pair-128.webp",
+          "bytes": 2122,
+          "sha256": "828723735b54fa5dbbe76a7c184691a6bb8c8b580bf6e9c2ee4d22b2ed621957"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/back-lunar-pair-256.webp",
+          "bytes": 3778,
+          "sha256": "801d5e586252a18c543ce45db5997dbfeaaf168116516497dd4a66140a39b84d"
+        }
+      }
+    },
+    "back/azure-link": {
+      "source": {
+        "file": "design/shop-catalog/captures/back-azure-link.png",
+        "sha256": "fd38f47973c1e6fedf9aa9d4afa7c565809f7e5b2087c5ca25691fc3071f4623",
+        "method": "real-renderer",
+        "renderer": "gameplay-effects.css",
+        "frameMs": 0,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/back-azure-link-128.webp",
+          "bytes": 2066,
+          "sha256": "ddde72b5898fa8796177a72fbe6144720aed287fe85ef05ed4717113ac68c71d"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/back-azure-link-256.webp",
+          "bytes": 3618,
+          "sha256": "fcfff27d852ba679045952e44bfd99392afb88e2101dd519ac3c1fb90c4e6df5"
+        }
+      }
+    },
+    "back/crystal-trio-light": {
+      "source": {
+        "file": "design/shop-catalog/captures/back-crystal-trio-light.png",
+        "sha256": "e1a51a6bbb117a2a8a45f6485467cbf3b6fb313244adc0b7f4d7f0c44dc2b414",
+        "method": "real-renderer",
+        "renderer": "gameplay-effects.css",
+        "frameMs": 0,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/back-crystal-trio-light-128.webp",
+          "bytes": 1806,
+          "sha256": "28ff8d5a6d6da837a119d94159b8720178167ebf20341e320f7733f846a3b782"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/back-crystal-trio-light-256.webp",
+          "bytes": 3330,
+          "sha256": "a72b9724fd2715861833795520cac4e31b9b5584e0d2e745fd412af39909ba35"
+        }
+      }
+    },
+    "theme/default": {
+      "source": {
+        "file": "design/shop-catalog/captures/theme-default.png",
+        "sha256": "866db4285df51e6e1b6658a033d5f75aa07b6811eb05565515ec922419d5902e",
+        "method": "real-renderer",
+        "renderer": "themeCatalog/getThemeCards",
+        "frameMs": 0,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/theme-default-128.webp",
+          "bytes": 6010,
+          "sha256": "6464e063c21d2278e682f8044d1e75b27b75d6a03fbcc5b70b134ce8a0b914c3"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/theme-default-256.webp",
+          "bytes": 10066,
+          "sha256": "426255d8ff12ea8973594afd4aa89f3110c723fcdce66ddc0683360d77560133"
+        }
+      }
+    },
+    "theme/animals-land": {
+      "source": {
+        "file": "design/shop-catalog/captures/theme-animals-land.png",
+        "sha256": "3038fe196f1086830a2724036aad475e39ddb5fb5fe1582c76d91273b453542b",
+        "method": "real-renderer",
+        "renderer": "themeCatalog/getThemeCards",
+        "frameMs": 0,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/theme-animals-land-128.webp",
+          "bytes": 6074,
+          "sha256": "b71fe99333664c6f23ae1259f51731229723242b5de14168eac6b05e975ab3ac"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/theme-animals-land-256.webp",
+          "bytes": 10200,
+          "sha256": "5eb4462aa90ecfe0fe94ff0d587e62e6647e382dc5c8cc173bda8ebe14379a87"
+        }
+      }
+    },
+    "theme/animals-air": {
+      "source": {
+        "file": "design/shop-catalog/captures/theme-animals-air.png",
+        "sha256": "8d7c27cc8deb9936442687e3c8d30d1dd89c5cfe7e645ee98b0d0062b51cf629",
+        "method": "real-renderer",
+        "renderer": "themeCatalog/getThemeCards",
+        "frameMs": 0,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/theme-animals-air-128.webp",
+          "bytes": 6098,
+          "sha256": "e47be14eb438b480053e8c769591b69bdd4d25957993f5a9ed7eb0af501936f2"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/theme-animals-air-256.webp",
+          "bytes": 10266,
+          "sha256": "966febdeed36a0cb2b04dfd1bfaa810bbbba8c98a0673f5d904c71e877f4c287"
+        }
+      }
+    },
+    "theme/animals-sea": {
+      "source": {
+        "file": "design/shop-catalog/captures/theme-animals-sea.png",
+        "sha256": "72325dbef79254a5f81ca24f6672fde3990c141fe704bd9c1741eda53046c64a",
+        "method": "real-renderer",
+        "renderer": "themeCatalog/getThemeCards",
+        "frameMs": 0,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/theme-animals-sea-128.webp",
+          "bytes": 6742,
+          "sha256": "afeba9013fb5caebd4230e5824950975d6d79d445b533ecbf24948534ec56b30"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/theme-animals-sea-256.webp",
+          "bytes": 12790,
+          "sha256": "c04cb5509fc40ab67aaff6b2d4d158b4f78714fd072565a35ccd51080f947fe7"
+        }
+      }
+    },
+    "theme/foods": {
+      "source": {
+        "file": "design/shop-catalog/captures/theme-foods.png",
+        "sha256": "d147ef4f564a68ef19ad6ac17898b111ca417413f6424a57d9e1cb3cb288bfdd",
+        "method": "real-renderer",
+        "renderer": "themeCatalog/getThemeCards",
+        "frameMs": 0,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/theme-foods-128.webp",
+          "bytes": 6258,
+          "sha256": "ee7647a84fe717e5816f064bdbbdc28459b34f797fff8a088448051f424c01a2"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/theme-foods-256.webp",
+          "bytes": 11176,
+          "sha256": "887c4cf9a2932801c2736cf940925054d7f774260e48462feb31beb11c434e93"
+        }
+      }
+    },
+    "theme/drinks": {
+      "source": {
+        "file": "design/shop-catalog/captures/theme-drinks.png",
+        "sha256": "e3b5c1d9b9adbb3b929f9b18556f37cccc2974127e68c6f0e47d8243bf4a8998",
+        "method": "real-renderer",
+        "renderer": "themeCatalog/getThemeCards",
+        "frameMs": 0,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/theme-drinks-128.webp",
+          "bytes": 6012,
+          "sha256": "4cc8577bec41fef69d6c9334de375b5c4fa5cf3c2705d323668e251ee26388b5"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/theme-drinks-256.webp",
+          "bytes": 10214,
+          "sha256": "d9b7daaa1b4737966205f2544f4a8de0f736c64a87d9c289612b3ce377399d25"
+        }
+      }
+    },
+    "theme/fruits": {
+      "source": {
+        "file": "design/shop-catalog/captures/theme-fruits.png",
+        "sha256": "f3f878e19efc0c51288957058893394237954c5c88363cdcb70ed1e02f4b0999",
+        "method": "real-renderer",
+        "renderer": "themeCatalog/getThemeCards",
+        "frameMs": 0,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/theme-fruits-128.webp",
+          "bytes": 5850,
+          "sha256": "57e1ad986ab67a771c7c4b046b7578c340ef8c25d7545a968d4df57130887894"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/theme-fruits-256.webp",
+          "bytes": 9354,
+          "sha256": "93e5534bb356d8f27e6d75062e38246a99c9b2fe4d72ab50070ce144adb591b0"
+        }
+      }
+    },
+    "theme/geometry": {
+      "source": {
+        "file": "design/shop-catalog/captures/theme-geometry.png",
+        "sha256": "e0ea02a2993ed9881af647ec8d617d4571337f1f21ee4f810573e14be3a6c85c",
+        "method": "real-renderer",
+        "renderer": "themeCatalog/getThemeCards",
+        "frameMs": 0,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/theme-geometry-128.webp",
+          "bytes": 5604,
+          "sha256": "a2f4d3e1c1afaaab0500473fb04f26653b5d370bc70c1dfb3f31359c244d7e83"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/theme-geometry-256.webp",
+          "bytes": 8638,
+          "sha256": "4102ada54f6fbf38597ec5eb5ee57f557da4930f18f79ad909b7ed565ba5ae23"
+        }
+      }
+    },
+    "theme/cyberpunk": {
+      "source": {
+        "file": "design/shop-catalog/captures/theme-cyberpunk.png",
+        "sha256": "4ea11c38b2652a1f9fdef31be1c6632a298b917d3f6b644f51517a196386f5fd",
+        "method": "real-renderer",
+        "renderer": "themeCatalog/getThemeCards",
+        "frameMs": 0,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/theme-cyberpunk-128.webp",
+          "bytes": 5724,
+          "sha256": "8c0fcf77cfc1963b7db45568dbe752efa3ad70c0fd15313dfba7bad93540fe9d"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/theme-cyberpunk-256.webp",
+          "bytes": 9508,
+          "sha256": "880e70deab30b3347eb1b42bfa70151443dabf3df54bcf99a36ce5662297241a"
+        }
+      }
+    },
+    "theme/magic-rpg": {
+      "source": {
+        "file": "design/shop-catalog/captures/theme-magic-rpg.png",
+        "sha256": "a52b6f8acf476c2611d1d3f5bee4eb624ca572729dde8d05dbc4b4ca89842700",
+        "method": "real-renderer",
+        "renderer": "themeCatalog/getThemeCards",
+        "frameMs": 0,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/theme-magic-rpg-128.webp",
+          "bytes": 6114,
+          "sha256": "d9b37187f61453f8dd011845c18ec424ccae36d186cc8bc0c28858953b77c250"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/theme-magic-rpg-256.webp",
+          "bytes": 10212,
+          "sha256": "b6a3037ae2b5b459f07d8a14ddfa0171831e7a152993d7f89eff7acbd2220e70"
+        }
+      }
+    },
+    "theme/space": {
+      "source": {
+        "file": "design/shop-catalog/captures/theme-space.png",
+        "sha256": "59a4fc9695764edf181e577de6f9295d025e9df9e11db619d51f7125a5f17a69",
+        "method": "real-renderer",
+        "renderer": "themeCatalog/getThemeCards",
+        "frameMs": 0,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/theme-space-128.webp",
+          "bytes": 5532,
+          "sha256": "fe086a507db6a4e53ec407030214c28e84980cf9ff3f91f8a719870d740cd3cf"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/theme-space-256.webp",
+          "bytes": 9076,
+          "sha256": "b3f4bc555ee33dc6c6be38008bed6c8b21c3f0ffb8edcb87fe53df5b54114154"
+        }
+      }
+    },
+    "theme/household": {
+      "source": {
+        "file": "design/shop-catalog/captures/theme-household.png",
+        "sha256": "c0ea9f8edc2576fea92e40d2d49739d381189b9d70f4367a33cda2f4c855d02a",
+        "method": "real-renderer",
+        "renderer": "themeCatalog/getThemeCards",
+        "frameMs": 0,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/theme-household-128.webp",
+          "bytes": 6002,
+          "sha256": "9acc43004c0adc96d52583acefd6fc614d3bf4f7b74091d695371479955f526b"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/theme-household-256.webp",
+          "bytes": 9440,
+          "sha256": "6d332594f2ec83b1c9d0b47ba60740636df0014188849609589ed0a8818633b1"
+        }
+      }
+    },
+    "theme/office-supplies": {
+      "source": {
+        "file": "design/shop-catalog/captures/theme-office-supplies.png",
+        "sha256": "9971806d90a411e85f3761eb02cfa07f3e84f10790b4cd6eb071372076379b44",
+        "method": "real-renderer",
+        "renderer": "themeCatalog/getThemeCards",
+        "frameMs": 0,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/theme-office-supplies-128.webp",
+          "bytes": 5858,
+          "sha256": "e5f2c382f98d478d21e3cc22f06306cc33864fb4160f3ad477a6887610fcc544"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/theme-office-supplies-256.webp",
+          "bytes": 9222,
+          "sha256": "58a21f8e4bce2b92688ae8fb381e3cbe2da858fe82446b7e69184cd2e2bf94f6"
+        }
+      }
+    },
+    "theme/fashion": {
+      "source": {
+        "file": "design/shop-catalog/captures/theme-fashion.png",
+        "sha256": "589577ce1d676b12c898083bdbb12d0e3e0da0d2ffb124cff66d8f9083393837",
+        "method": "real-renderer",
+        "renderer": "themeCatalog/getThemeCards",
+        "frameMs": 0,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/theme-fashion-128.webp",
+          "bytes": 5874,
+          "sha256": "468611b7a53cecbfdcf260907414500aa5f986495136c7f8f18f67fc0c09baf6"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/theme-fashion-256.webp",
+          "bytes": 9672,
+          "sha256": "25ae129d6442d77a57ca5da4b8c039870fc00ce29ceb71986d7bac0f20d21613"
+        }
+      }
+    },
+    "theme/vehicles": {
+      "source": {
+        "file": "design/shop-catalog/captures/theme-vehicles.png",
+        "sha256": "43656b28147085da7de58e34145653999b84e59fb7797d9d1c744b51827ca025",
+        "method": "real-renderer",
+        "renderer": "themeCatalog/getThemeCards",
+        "frameMs": 0,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/theme-vehicles-128.webp",
+          "bytes": 6618,
+          "sha256": "3c98c79a924b1e3e68d9d8387b02911d67a4d25f14acd33b856230a78bdd5e44"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/theme-vehicles-256.webp",
+          "bytes": 11538,
+          "sha256": "8f0309f3f0818e1c91fa0e0076f8759b86cb98b678f97b12255b4056d0bdff44"
+        }
+      }
+    },
+    "theme/festivals": {
+      "source": {
+        "file": "design/shop-catalog/captures/theme-festivals.png",
+        "sha256": "c294d992dfdec8142bbf817275c3ccdeaa3082ee156fb2771d719c22b5dfd0ad",
+        "method": "real-renderer",
+        "renderer": "themeCatalog/getThemeCards",
+        "frameMs": 0,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/theme-festivals-128.webp",
+          "bytes": 6360,
+          "sha256": "fc130ad21d45f41b72ab3665a29872806be5a7809c33a648cea626956a69f71a"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/theme-festivals-256.webp",
+          "bytes": 10842,
+          "sha256": "c3935b6627ac042e0810bf47b5c048daf76c438258d3d57e9dbf0dc96da69976"
+        }
+      }
+    },
+    "theme/alphabet": {
+      "source": {
+        "file": "design/shop-catalog/captures/theme-alphabet.png",
+        "sha256": "3108420d92c6b62b55e069bf0983763a5db512236d631edf5c77ed74efa4cba9",
+        "method": "real-renderer",
+        "renderer": "themeCatalog/getThemeCards",
+        "frameMs": 0,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/theme-alphabet-128.webp",
+          "bytes": 5354,
+          "sha256": "bdbce9173e4b73509e32775b446749415c4a191d6b23a179c5afd79c09bae336"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/theme-alphabet-256.webp",
+          "bytes": 7914,
+          "sha256": "b2efc1c7448d2ce0ec839eb0688a453e684fd75d403413a05ad30b1da447f60b"
+        }
+      }
+    },
+    "theme/numbers-2": {
+      "source": {
+        "file": "design/shop-catalog/captures/theme-numbers-2.png",
+        "sha256": "4ca1d6e839a6b1aa18ab9eea43a4eb890543f89b2c736d0ed76fbf4e3f474513",
+        "method": "real-renderer",
+        "renderer": "themeCatalog/getThemeCards",
+        "frameMs": 0,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/theme-numbers-2-128.webp",
+          "bytes": 5704,
+          "sha256": "9567ebcbe13af7cfa444ab4db81e0d98c39986e5ac73b11de529927f1cb0f113"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/theme-numbers-2-256.webp",
+          "bytes": 8912,
+          "sha256": "882a0c35b225a995eab033d53dc48e9001cc41a8785bd656f4d8a38f28091656"
+        }
+      }
+    },
+    "theme/numbers-3": {
+      "source": {
+        "file": "design/shop-catalog/captures/theme-numbers-3.png",
+        "sha256": "8f0895d5ab06f4053184b95e9dfe70e67f8280153d6394dcdd8b217f54738587",
+        "method": "real-renderer",
+        "renderer": "themeCatalog/getThemeCards",
+        "frameMs": 0,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/theme-numbers-3-128.webp",
+          "bytes": 5756,
+          "sha256": "d8d01ab491557780d0c2b50075d216d84cd2e4548155c58dc0b518146418846c"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/theme-numbers-3-256.webp",
+          "bytes": 8940,
+          "sha256": "3a3ed1e5ff5e0bae6b2ed6e5b6817dfa7004896cd93f2fc8437f270343970032"
+        }
+      }
+    },
+    "theme/computer-symbols": {
+      "source": {
+        "file": "design/shop-catalog/captures/theme-computer-symbols.png",
+        "sha256": "1475f759f1d625ae77bf08f7086afc07b553a332b223088504be6ae6a7279650",
+        "method": "real-renderer",
+        "renderer": "themeCatalog/getThemeCards",
+        "frameMs": 0,
+        "seed": 12345
+      },
+      "files": {
+        "128": {
+          "url": "/assets/shop-catalog/v1/theme-computer-symbols-128.webp",
+          "bytes": 5374,
+          "sha256": "590ee20e987c8066240bec950f23b26e5ca6308886e13c029e59b7034cbed242"
+        },
+        "256": {
+          "url": "/assets/shop-catalog/v1/theme-computer-symbols-256.webp",
+          "bytes": 8168,
+          "sha256": "5ba1b7254b01d0e8385d1b221052570137de817d7a34f4dfb998924df51b08ad"
+        }
+      }
+    }
+  }
+}

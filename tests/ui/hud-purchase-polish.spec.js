@@ -93,7 +93,7 @@ for (const reducedMotion of ['no-preference', 'reduce']) test(`frozen pair unloc
       return { duration: getComputedStyle(tile.querySelector('.link-tile__frost-wipe-line') || tile).animationDuration, reduced: !tile.disabled };
     });
     if (reducedMotion === 'no-preference') {
-      expect(result.duration).toBe('0.8s');
+      expect(result.duration).toBe('0.6s');
       await page.evaluate(() => document.querySelectorAll('.link-tile__frost-wipe *').forEach(node => node.getAnimations().forEach(animation => animation.finish())));
     } else expect(result.reduced).toBe(true);
     await expect(page.locator('.link-tile__frost-wipe')).toHaveCount(0);

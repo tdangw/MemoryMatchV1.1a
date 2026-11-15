@@ -35,7 +35,7 @@ export function renderAchievementCollection(container, gameId, { block: requeste
         levels: ACHIEVEMENT_ITEMS.filter(item => item.gameId === gameId && item.level >= firstLevel && item.level < firstLevel + 10).map(item => {
           const grant = gameState.appearance.achievements.grants[`${gameId}:${item.level}`];
           const chestType = grant?.chestType || (!grant && festivalChestsEnabled() && ['avatar','frame','badge'].includes(item.type) ? item.type : null);
-          return { level:item.level, name:chestType ? CHEST_NAMES[chestType] : item.name,
+          return { level:item.level, chestType, name:chestType ? CHEST_NAMES[chestType] : item.name,
             image:chestType ? null : achievementAssetUrl(item,128), completed:MASTERY_DIFFICULTIES.map(mode=>hasCertifiedCompletion(completed,mode,item.level)) };
         }) });
       const mastery = getMasteryRewards({ completed: { ...rewardChapter.bestByLevel, ...profile.bestByLevel }, level: firstLevel,

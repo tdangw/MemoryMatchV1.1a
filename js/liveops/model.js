@@ -8,10 +8,10 @@ export const DAILY = Object.freeze([
   { id: 'win-without-hint', label: 'Thắng không dùng gợi ý', key: 'noHint', target: 3, coins: 10 },
 ]);
 export const WEEKLY = Object.freeze([
-  { id: 'weekly-wins', label: 'Thắng 12 ván', key: 'wins', target: 12 },
-  { id: 'weekly-matches', label: 'Ghép đúng 120 lần', key: 'matches', target: 120 },
-  { id: 'weekly-no-hint', label: 'Thắng 3 ván không dùng Gợi ý', key: 'noHint', target: 3 },
-  { id: 'weekly-visits', label: 'Điểm danh 3 ngày', key: 'visits', target: 3 },
+  { id: 'weekly-wins', label: 'Thắng 12 ván', key: 'wins', target: 12, coins:20 },
+  { id: 'weekly-matches', label: 'Ghép đúng 120 lần', key: 'matches', target: 120, coins:20 },
+  { id: 'weekly-no-hint', label: 'Thắng 3 ván không dùng Gợi ý', key: 'noHint', target: 3, coins:10 },
+  { id: 'weekly-visits', label: 'Điểm danh 3 ngày', key: 'visits', target: 3, coins:10 },
 ]);
 export function periods(now) {
   if (!Number.isSafeInteger(now) || now < 0) throw new Error('Invalid service time');

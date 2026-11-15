@@ -7,7 +7,7 @@ import { savePersistentGameData } from './persistence.js';
 import { stageMemorySession } from './memorySession.js';
 import { getActiveSession } from './sessionProgress.js';
 import { resolveMemoryPairRewards } from './memoryMatch/pairRewards.js';
-import { updateCoinDisplay, updateHintDisplay, updateMemoryAssistInventoryDisplay, updateMemorySpecialProgress, showLuckyRewardPopup } from './ui.js';
+import { updateCoinDisplay, updateHintDisplay, updateMemoryAssistInventoryDisplay, updateMemorySpecialProgress } from './ui.js';
 
 export async function handleMemorySpecialMatch(source, roundId = gameState.roundId) {
   if (!source || gameState.roundId !== roundId) return;
@@ -27,12 +27,21 @@ export function presentMemoryPairRewards(presentation, source, roundId) {
   updateMemoryAssistInventoryDisplay(); updateMemorySpecialProgress(gameState.specialProgress);
   const owner = getActiveGameScope();
   if (owner && (presentation.lucky || presentation.rewards.length)) playRewardPhase('receive', owner);
-  if (presentation.lucky) showLuckyRewardPopup(presentation.lucky);
-  if (presentation.energyProgress !== null) playLootDrop(source, { icon: 'energy', tier: 'energy', target: document.getElementById('memory-special-milestones') });
+  if (presentation.lucky) dropLuckyReward(presentation.lucky, source);
+  if (presentation.energyProgress !== null) playLootDrop(source, { icon: 'energy', tier: 'energy', target: document.getElementById('memory-special-milestones'), receiveCue:false });
   presentation.rewards.forEach((reward, index) => setTimeout(() => {
     if (gameState.roundId !== roundId) return;
-    if (reward.type === 'coins') { showLuckyRewardPopup(reward); return; }
+    if (reward.type === 'coins') { dropLuckyReward(reward, source); return; }
     const item = getMemoryItem(reward.type === 'hint' ? 'hint' : getMemoryItemId(reward.type === 'time-item' ? 'time' : 'preview', reward.value));
-    playLootDrop(source, { icon: item.icon, tier: item.tier, target: document.getElementById(item.type === 'time' ? 'btn-buy-time' : item.type === 'hint' ? 'btn-hint' : 'btn-preview-cards') });
+    playLootDrop(source, { icon: item.icon, tier: item.tier, target: document.getElementById(item.type === 'time' ? 'btn-buy-time' : item.type === 'hint' ? 'btn-hint' : 'btn-preview-cards'), receiveCue:false });
   }, index * 130));
+}
+
+function dropLuckyReward(reward, source) {
+  const coins = reward.type === 'coins', time = reward.type === 'time';
+  playLootDrop(source, {
+    icon: coins ? 'coin' : time ? 'timer' : 'search',
+    tier: coins ? 'gold' : time ? 'blue' : getMemoryItem('hint').tier,
+    target: document.getElementById(coins ? 'memory-game-coins' : time ? 'timer' : 'btn-hint'), receiveCue:false,
+  });
 }

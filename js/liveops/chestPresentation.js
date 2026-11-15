@@ -3,18 +3,11 @@ import {requestLiveops} from './service.js';
 import {loadPersistentGameData,subscribeToLocalCommit} from '../persistence.js';
 import {getActiveGameScope,createGameShellLifecycle} from '../gameShell/gameShellLifecycle.js';
 import {getAccountService} from '../accountService.js';
-import {CHEST_ITEMS} from './chestConfig.js';
 import {refreshAppWallet} from '../appNavigation.js';
 import {mountStorageGrid} from './storagePresentation.js';
 import '../../styles/liveops.css';
 
-function rewardDescription(reward){
-  if(reward.kind==='sale')return `Đã bán ${reward.quantity} rương · ${reward.coins} Xu`;
-  if(reward.kind==='item')return `${CHEST_ITEMS.find(item=>item.id===reward.itemId).name} · Xem trong Hồ sơ.`;
-  if(reward.kind==='support')return `${reward.label} · ${reward.gameId==='memory-match'?'Memory Match':reward.gameId==='link-connect'?'Link Connect':'Triple Connect'}.`;
-  return `${reward.coins} Xu`;
-}
-export function mountChestInventory(host,{owner,back,profile,initialType=null}){
+export function mountChestInventory(host,{owner,back,initialType=null}){
   const scope=createGameShellLifecycle(),release=owner.own(()=>scope.dispose());scope.own(()=>release.forget());
   const account=getAccountService(),localIdentity=()=>account?.getIdentity()||account?.getLocalIdentity();
   const identity=localIdentity();
@@ -23,11 +16,11 @@ export function mountChestInventory(host,{owner,back,profile,initialType=null}){
   status.setAttribute('role','status');
   if(back)root.append(action('Quay lại Bộ sưu tập',back));root.append(status,body);host.replaceChildren(root);
   let view=null,busy=false,loading=null;
-  const grid=mountStorageGrid(body,{owner:scope,current,getState:()=>view?.state,initialType,describe:rewardDescription,execute:async command=>{
+  const grid=mountStorageGrid(body,{owner:scope,current,getState:()=>view?.state,initialType,execute:async command=>{
     if(busy)throw new Error('Đang hoàn tất giao dịch trước.');
     if(getActiveGameScope())throw new Error('Về bản đồ để dùng vật phẩm trong kho.');
     busy=true;
-    try{const result=await requestLiveops(command);if(current()){view=result;status.textContent=result.offline?'Đã lưu trên máy. Chờ đồng bộ.':'Kho lưu trữ';refreshAppWallet();grid.render();}return result;}
+    try{const result=await requestLiveops(command);if(current()){view=result;status.textContent='';refreshAppWallet();grid.render();}return result;}
     finally{busy=false;}
   }});
   async function cached(){
@@ -41,17 +34,15 @@ export function mountChestInventory(host,{owner,back,profile,initialType=null}){
     if(loading||busy||!current())return loading;
     loading=(async()=>{
       await cached();if(!current())return;
-      if(getActiveGameScope()){status.textContent='Kho lưu trữ';return;}
-      try{const result=await requestLiveops();if(current()){view=result;status.textContent=result.offline?'Đã lưu trên máy. Chờ đồng bộ.':'Kho lưu trữ';grid.render();}}
+      if(getActiveGameScope()){status.textContent='';return;}
+      try{const result=await requestLiveops();if(current()){view=result;status.textContent='';grid.render();}}
       catch(error){if(current()){status.textContent='Đang xem dữ liệu đã lưu trên máy.';console.info('Storage awaits sync',error.code||error.name);}}
     })().finally(()=>{loading=null;});return loading;
   }
-  const tools=node('div','liveops__chest-tools');tools.append(action('Tải lại Kho lưu trữ',()=>void load()));
-  if(profile)tools.append(action('Xem trong Hồ sơ',profile));root.append(tools);
   scope.listen(window,'online',()=>void load());
   scope.own(subscribeToLocalCommit(({patch})=>{
-    if(!busy&&current()&&patch.appearance?.spark?.state){view={state:patch.appearance.spark.state};status.textContent=patch.appearance.spark.offline?'Đã lưu trên máy. Chờ đồng bộ.':'Kho lưu trữ';grid.render();}
+    if(!busy&&current()&&patch.appearance?.spark?.state){view={state:patch.appearance.spark.state};status.textContent='';grid.render();}
   }));
-  if(account)scope.own(account.subscribe(()=>{if(scope.active&&!current()){view=null;body.replaceChildren();status.textContent='Tài khoản đã thay đổi. Mở lại Kho lưu trữ.';}}));
+  if(account)scope.own(account.subscribe(()=>{if(scope.active&&!current()){grid.dispose();view=null;body.replaceChildren();status.textContent='Tài khoản đã thay đổi. Mở lại Kho lưu trữ.';}}));
   void load();return ()=>{scope.dispose();release.forget();};
 }

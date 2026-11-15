@@ -147,7 +147,7 @@ export const LINK_CONNECT_TIMING = Object.freeze({
   thunderNextPairDelayMs: 130,
   countdownResumeDelayMs: 1000,
   specialPairTransformMs: 720,
-  frozenPairUnlockMs: 800,
+  frozenPairUnlockMs: 600,
   energyBurstMs: 1100,
   energyHoldMs: 1000,
   energyFlightMs: 1050,

@@ -1,15 +1,12 @@
 /* Map scenery; map/gameplay title identity is owned by game-wordmark.css. */
 .adventure-map-page[data-map-theme="memory-match"] {
   --map-art: url('/assets/adventure/map-memory-match.webp'); --map-ground: #284c29; --map-seam: #6ca402; --map-route: #8b693f;
-  --map-decor: url('/assets/adventure/decor-memory-match.svg');
 }
 .adventure-map-page[data-map-theme="link-connect"] {
   --map-art: url('/assets/adventure/map-link-connect.webp'); --map-ground: #405e39; --map-seam: #345a33; --map-route: #568c79;
-  --map-decor: url('/assets/adventure/decor-link-connect.svg');
 }
 .adventure-map-page[data-map-theme="triple-connect"] {
   --map-art: url('/assets/adventure/map-triple-connect.webp'); --map-ground: #493457; --map-seam: #543c60; --map-route: #7b5aa3;
-  --map-decor: url('/assets/adventure/decor-triple-connect.svg');
 }
 .adventure-map-page[data-map-theme] { background: var(--map-ground); }
 .adventure-map-page[data-map-theme] .adventure-map-view { background: var(--map-ground); }
@@ -18,5 +15,4 @@
 }
 .adventure-map-page[data-map-theme] .adventure-map-path path { stroke: var(--map-route); }
 .adventure-map-page[data-map-theme] .adventure-map-path .adventure-map-path-ornament { stroke: #f4e7be; }
-.adventure-map-page[data-map-theme] .adventure-map-decoration { background-image: var(--map-decor); background-size: 100% 100%; }
 .adventure-map-page[data-map-theme] .adventure-map-detail { color: #fff; text-shadow: 0 1px 3px #142432, 0 1px 2px #142432; }

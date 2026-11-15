@@ -1,4 +1,6 @@
 import { normalizeHourlyGift, claimHourlyGift, hourlyGiftTicketCount } from './hourlyGift.js';
+import {normalizeStorageUnlocks,unlockStorageSlot} from './storageCapacity.js';
+import {assertStorageAccess} from './storageModel.js';
 import { normalizeChests, normalizeFestival, earnChest, claimFestival, openChest, sellChest, creditSourceChests } from './chests.js';
 import { normalizeLetterCounts, normalizeLetters, creditLetters, mutateLetters, exchangeLetterSet, nextLetterReward } from './letters.js';
 import { GROUP_LOOT_DROP_RATES, LETTER_ALPHABET, ACTIVE_EVENT_COLLECTION_ID, eventCollection } from './config.js';
@@ -7,7 +9,7 @@ import { normalizeWheelCandidate, resolveWheelCandidate, supportedWheelVersion, 
 import { cosmeticDefinition } from '../progression/cosmeticCatalog.js';
 import { normalizeCosmeticProgress, seedOwnedCosmetics, receiveCosmeticCopies, mutateCosmeticFragments } from '../progression/cosmeticProgression.js';
 import { GAMEPLAY_LIMITS } from '../gameplayTuning.js';
-import { normalizeLoginCandidate, normalizeLoginReward } from './missionRewards.js';
+import { normalizeLoginCandidate, normalizeLoginReward, WEEKLY_JOURNEY_REWARDS } from './missionRewards.js';
 export const AD_DAILY_LIMIT = 10;
 export const EVENT_ID = 'firefly-festival-01';
 export const MAX_LOCAL_REWARD_OPERATIONS = 512;
@@ -54,6 +56,7 @@ export function normalizeSparkState(value) {
     || s.ads.some((r, i) => r.source !== 'ad' || r.ordinal !== i + 1)) fail();
   const { rootRevision, fingerprint, updatedAt, ...state } = structuredClone(value);
   state.letters = normalizeLetters(value.letters);
+  if(value.storageUnlocks!==undefined)state.storageUnlocks=normalizeStorageUnlocks(value.storageUnlocks);
   if(value.cosmeticProgress!==undefined)state.cosmeticProgress=normalizeCosmeticProgress(value.cosmeticProgress);
   if(value.loginReward!==undefined&&value.loginReward!==null){state.loginReward=normalizeLoginReward(value.loginReward);if(state.loginReward.day>state.day)fail();}
   if (value.hourlyGift !== undefined) state.hourlyGift = normalizeHourlyGift(value.hourlyGift);
@@ -154,9 +157,10 @@ export function transitionSpark(previous, command, { uid, now, sector = 0, ticke
       state.daily.claimed.push('bonus'); addTickets(1); grant(`daily:${state.day}:bonus`, 10);
     }
   };
-  const claimDaily = item => {
-    if (state.daily[item.key] >= item.target && !state.daily.claimed.includes(item.id)) {
-      state.daily.claimed.push(item.id); grant(`daily:${state.day}:${item.id}`, item.coins);
+  const claimMission = (period,item) => {
+    const missions=state[period],date=period==='daily'?state.day:state.week;
+    if (missions[item.key] >= item.target && !missions.claimed.includes(item.id)) {
+      missions.claimed.push(item.id); grant(`${period}:${date}:${item.id}`, item.coins);
     }
   };
   const claimWeekly = () => {
@@ -165,16 +169,16 @@ export function transitionSpark(previous, command, { uid, now, sector = 0, ticke
     }
   };
   const eventCoins = () => {
-    for(const[points,coins]of [[20,5],[50,10],[80,10]])if(state.event.points>=points&&!state.event.claimed.includes(points)){
+    for(const {points,coins} of WEEKLY_JOURNEY_REWARDS)if(state.event.points>=points&&!state.event.claimed.includes(points)){
       state.event.claimed.push(points);grant(`event:${EVENT_ID}:${state.event.week}:${points}`,coins);
     }
   };
   eventCoins();
-  if (p.day !== state.day) { DAILY.forEach(claimDaily); dailyBonus(); state.daily = counters(); state.spins.free = null;
+  if (p.day !== state.day) { DAILY.forEach(item=>claimMission('daily',item)); dailyBonus(); state.daily = counters(); state.spins.free = null;
     state.spins.pastAds = [...state.spins.pastAds, ...state.spins.ads].filter(r => r.day >= p.day - 3);
     state.spins.ads = []; }
   if (p.week !== state.week) {
-    claimWeekly(); state.weekly = counters(); state.event.points = 0; state.event.claimed = []; state.event.week = p.week; state.cosmetics.week = p.week; state.cosmetics.points = 0;
+    WEEKLY.forEach(item=>claimMission('weekly',item));claimWeekly(); state.weekly = counters(); state.event.points = 0; state.event.claimed = []; state.event.week = p.week; state.cosmetics.week = p.week; state.cosmetics.points = 0;
   }
   if (state.event.day !== p.day) { state.event.day = p.day; state.event.dailyPoints = 0; }
   if (state.cosmetics.collectionId !== ACTIVE_EVENT_COLLECTION_ID) {
@@ -220,6 +224,7 @@ export function transitionSpark(previous, command, { uid, now, sector = 0, ticke
     if(!integer(supportCount)||supportCount>GAMEPLAY_LIMITS.itemCount)fail();
     return supportCount===GAMEPLAY_LIMITS.itemCount;
   };
+  assertStorageAccess(state,command);
   switch (command.type) {
     case 'reserveAd': {
       if(!id(command.operation)||command.source!=='ad'||!command.earned||!integer(command.day)||command.day>=p.day||command.day<p.day-3
@@ -246,9 +251,18 @@ export function transitionSpark(previous, command, { uid, now, sector = 0, ticke
       const claimed = claimHourlyGift(state.hourlyGift,command,command.claimedAt??now,supportCount);
       state.hourlyGift = claimed.state; hourlyGiftResult = claimed.result; hourlyGiftApplied = claimed.applied;
       if (claimed.applied) {
+        if (claimed.result.kind === 'chest') {
+          state.chests=earnChest(state.chests,claimed.result.chestType);
+          state.festival=normalizeFestival(state.festival);
+        }
         if (claimed.result.kind === 'ticket') addTickets(hourlyGiftTicketCount(claimed.result));
         grant(`hourly:${command.operation}`,claimed.result.coins,claimed.result.kind === 'support' ? {support:{gameId:claimed.result.gameId,key:claimed.result.key}} : {});
       }
+      break;
+    }
+    case 'unlockStorageSlot': {
+      const unlocked=unlockStorageSlot(state.storageUnlocks,command,coinsBalance);
+      if(unlocked.applied){state.storageUnlocks=unlocked.state;grant(`storage-slot:${command.operation}`,-unlocked.price);}
       break;
     }
     case 'status': break;
@@ -265,9 +279,13 @@ export function transitionSpark(previous, command, { uid, now, sector = 0, ticke
       loginApplied=true;state.loginDay = p.day; state.loginNext = (state.loginNext + 1) % 7;
       state.weekly.visits = Math.min(3, state.weekly.visits + 1);
     } break;
-    case 'daily': { const item = DAILY.find(v => v.id === command.id); if (!item) fail(); claimDaily(item); break; }
+    case 'daily': { const item = DAILY.find(v => v.id === command.id); if (!item) fail(); claimMission('daily',item); break; }
     case 'dailyBonus': {const received=state.daily.claimed.includes('bonus');dailyBonus();bonusApplied=!received&&state.daily.claimed.includes('bonus');break;}
-    case 'weekly': {const received=state.weekly.claimed.includes('bonus');claimWeekly();bonusApplied=!received&&state.weekly.claimed.includes('bonus');break;}
+    case 'weekly': {
+      if(command.id!==undefined){const item=WEEKLY.find(item=>item.id===command.id);if(!item)fail();claimMission('weekly',item);}
+      else{const received=state.weekly.claimed.includes('bonus');claimWeekly();bonusApplied=!received&&state.weekly.claimed.includes('bonus');}
+      break;
+    }
     case 'sellLetter':
     case 'fuseLetter': {
       const changed=mutateLetters(state.letters,command,randomLetter,coinsBalance);state.letters=changed.state;letterResult=changed.result;
@@ -372,6 +390,7 @@ export function resolveSparkOperation(state, operation, now) {
   if(operation.type==='claimWheelReward')return {command:operation,discarded:false};
   if(operation.type==='claimHourlyGift'){if(operation.sequence!==undefined&&operation.sequence<=(state?.hourlyGift?.sequence||0)&&state?.hourlyGift?.last.operation!==operation.operation)return {command:{type:'status'},discarded:true};return {command:operation,discarded:false};}
   if(operation.type==='claimFestival')return {command:operation,discarded:false};
+  if(operation.type==='unlockStorageSlot')return operation.sequence<=(state?.storageUnlocks?.sequence||0)&&!state?.storageUnlocks?.slots.includes(operation.slot)?{command:{type:'status'},discarded:true}:{command:operation,discarded:false};
   if(['openChest','sellChest'].includes(operation.type)){if(operation.sequence!==undefined&&operation.sequence<=(state?.chests?.sequence||0)&&state?.chests?.last?.operation!==operation.operation)return {command:{type:'status'},discarded:true};return {command:operation,discarded:false};}
   if(['sellCosmeticFragments','fuseCosmeticFragments'].includes(operation.type)){
     if(operation.sequence!==undefined&&operation.sequence<=(state?.cosmeticProgress?.sequence||0)&&state?.cosmeticProgress?.last?.operation!==operation.operation)return {command:{type:'status'},discarded:true};

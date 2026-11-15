@@ -1,0 +1,37 @@
+{
+  "tool": "built-in image_gen",
+  "transparent_background": true,
+  "references": [
+    "design/shop-catalog/reference-four-column.png"
+  ],
+  "entries": [
+    {
+      "key": "theme/magic-rpg",
+      "master": "illustrations/theme-magic-rpg-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-a03c4df3-4e37-4384-84c1-4ec87fe895f2.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A friendly high-quality illustrated representative object or character for this card theme, like the reference's deer, noodle bowl, fruit and planet icons. Warm dimensional casual game illustration, bright clear color, simple strong silhouette; not a contact sheet of cards and not a screenshot. A warm-gold magic staff tip with a large bright violet crystal and one small green magical leaf, compact fantasy adventure equipment icon, no text.",
+      "status": "generated-candidate"
+    },
+    {
+      "key": "theme/space",
+      "master": "illustrations/theme-space-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-c6bf83a0-ba56-4196-be9c-00fcd3da476e.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A friendly high-quality illustrated representative object or character for this card theme, like the reference's deer, noodle bowl, fruit and planet icons. Warm dimensional casual game illustration, bright clear color, simple strong silhouette; not a contact sheet of cards and not a screenshot. A beautiful small violet planet with a warm-gold ring and two small drawn golden stars, polished friendly cosmic theme icon like the reference.",
+      "status": "generated-candidate"
+    },
+    {
+      "key": "theme/household",
+      "master": "illustrations/theme-household-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-0cb4c5d7-48b2-4db5-9c80-00e68ed5433f.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A friendly high-quality illustrated representative object or character for this card theme, like the reference's deer, noodle bowl, fruit and planet icons. Warm dimensional casual game illustration, bright clear color, simple strong silhouette; not a contact sheet of cards and not a screenshot. A tiny attractive warm wood side table with a simple cream lamp and one teal cushion stool, recognizable household objects, compact uncluttered composition.",
+      "status": "generated-candidate"
+    },
+    {
+      "key": "theme/office-supplies",
+      "master": "illustrations/theme-office-supplies-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-12edaf02-688d-4770-b019-32869524b4c3.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A friendly high-quality illustrated representative object or character for this card theme, like the reference's deer, noodle bowl, fruit and planet icons. Warm dimensional casual game illustration, bright clear color, simple strong silhouette; not a contact sheet of cards and not a screenshot. A small blue notebook with a warm-gold pencil and a large silver paper clip, polished friendly office supplies icon, no written text on notebook.",
+      "status": "generated-candidate"
+    }
+  ]
+}

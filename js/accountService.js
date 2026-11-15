@@ -2,7 +2,7 @@ import { isAppActive } from './appVisibility.js';
 import { onIdTokenChanged, signInAnonymously, signOut, GoogleAuthProvider, linkWithPopup, linkWithCredential, signInWithPopup, signInWithCredential, deleteUser, reauthenticateWithPopup, reauthenticateWithCredential } from "firebase/auth";
 import { isNativeGoogle, getNativeGoogleCredential, clearNativeGoogleSession } from './googleAccount.js';
 import { setDoc, onSnapshot } from 'firebase/firestore';
-import { clearAccountGameData, saveAccountResetMetadata } from './persistence.js';
+import { acknowledgeOfflineSparkSnapshot, clearAccountGameData, saveAccountResetMetadata } from './persistence.js';
 import { operationRef, loadLocalAccountOperation, saveLocalAccountOperation, readAccountOperation, startAccountOperation, eraseAccountData } from './accountDataOperations.js';
 import { getFirebaseBackend, getFirebaseEnvironment } from "./firebaseBackend.js";
 import { encodeCloudSnapshot } from "./cloudSnapshot.js";
@@ -184,6 +184,12 @@ function createAccountService(options) {
     }, error => { if (current(id, user.uid)) handleFailure(error); });
     const root = await readCloudRoot(backend.database, state.environment, user.uid);
     if (!current(id, user.uid)) return;
+    const pendingSnapshotIntent=await loadSyncMetadata(`snapshotIntent:${state.environment}:${user.uid}:${owner.id}`);
+    if(pendingSnapshotIntent){
+      setPhase('waiting','Đang xác nhận bản sao lưu đã gửi.');
+      scheduleSync(0);
+      return;
+    }
     if(metadata?.uid===user.uid && metadata.restoreNeedsReconcile && root){await pendingConflict(root,id);return;}
     let snapshot = await exportPersistentSnapshot();
     const rewardOwner = snapshot.profile.data.appearance.spark?.ownerUid;
@@ -270,6 +276,29 @@ function createAccountService(options) {
     const id = generation;
     const uid = state.uid;
     const operation = async () => {
+      const snapshotIntentKey=`snapshotIntent:${state.environment}:${uid}:${owner.id}`;
+      const priorIntent=await loadSyncMetadata(snapshotIntentKey);
+      if(priorIntent){
+        const valid=priorIntent.version===1&&priorIntent.uid===uid&&priorIntent.profileId===owner.id&&priorIntent.environment===state.environment
+          &&Number.isSafeInteger(priorIntent.expectedRevision)&&priorIntent.expectedRevision>=0
+          &&Number.isSafeInteger(priorIntent.economyRevision)&&priorIntent.economyRevision>=0
+          &&typeof priorIntent.fingerprint==='string'&&/^[a-f0-9]{64}$/.test(priorIntent.fingerprint)
+          &&typeof priorIntent.playerName==='string'&&priorIntent.playerName.length>0;
+        if(!valid)throw new Error('Yêu cầu đồng bộ cũ không đúng định dạng. Bản máy vẫn được giữ nguyên.');
+        const root=await readCloudRoot(backend.database,state.environment,uid);
+        if(!current(id,uid))return false;
+        const committed=root&&root.revision>priorIntent.expectedRevision&&root.fingerprint===priorIntent.fingerprint
+          &&root.playerName===priorIntent.playerName&&(root.economyRevision||0)===priorIntent.economyRevision;
+        if(committed){
+          const confirmed={...metadata,cloudRevision:root.revision,fingerprint:root.fingerprint,playerName:root.playerName};
+          if(!await persistMetadata(confirmed,id))throw new Error('Cloud đã lưu. Bản xác nhận sẽ được thử lại khi có kết nối.');
+          if(priorIntent.sparkOutbox&&!await acknowledgeOfflineSparkSnapshot(priorIntent.sparkOutbox,()=>current(id,uid)))
+            throw new Error('Cloud đã lưu; phần thưởng mới trên máy vẫn được giữ để đồng bộ tiếp.');
+          if(!await saveSyncMetadata(snapshotIntentKey,null,()=>current(id,uid)))throw new Error('Cloud đã lưu. Bản xác nhận sẽ được thử lại khi có kết nối.');
+        }else if((root?.revision||0)===priorIntent.expectedRevision){
+          await saveSyncMetadata(snapshotIntentKey,null,()=>current(id,uid));
+        }else{await pendingConflict(root,id);return false;}
+      }
       const snapshotSaveGeneration = saveGeneration;
       const snapshotEvent = await loadSyncMetadata(eventKey(uid));
       if (!current(id, uid)) return false;
@@ -280,6 +309,8 @@ function createAccountService(options) {
       const snapshot = await exportPersistentSnapshot();
       const rewardOperation=await loadSyncMetadata(`sparkPending:${state.environment}:${uid}:${owner.id}`);
       const snapshotRewards=snapshot.profile.data.appearance.spark?.syncPolicy==='snapshot-v1';
+      const sparkOutbox=snapshotRewards?snapshot.profile.data.appearance.spark?.offline:null;
+      if(sparkOutbox)delete snapshot.profile.data.appearance.spark.offline;
       if(!snapshotRewards&&(snapshot.profile.data.appearance.spark?.offline||rewardOperation)){
         window.dispatchEvent(new Event('liveopssyncrequired'));
         setPhase('waiting','Đã lưu trên máy. Đang đồng bộ phần thưởng.');
@@ -287,6 +318,11 @@ function createAccountService(options) {
       }
       const encoded = await encodeCloudSnapshot(snapshot);
       if (!current(id, uid)) return false;
+      const intent={version:1,uid,profileId:owner.id,environment:state.environment,expectedRevision:metadata.cloudRevision||0,
+        economyRevision:snapshot.profile.data.appearance.spark?.economyRevision||0,fingerprint:encoded.fingerprint,playerName:state.playerName,
+        ...(sparkOutbox?{sparkOutbox:{uid,profileId:owner.id,environment:state.environment,
+          operationIds:sparkOutbox.operations.map(entry=>entry.command.operation),baseRevision:snapshot.profile.data.appearance.spark.state?.revision||0}}:{})};
+      if(!await saveSyncMetadata(snapshotIntentKey,intent,()=>current(id,uid)))throw new Error('Chưa lưu được mốc đồng bộ. Bản máy vẫn được giữ nguyên.');
       const result = await publishCloudSnapshot({
         snapshotRewards,
         rewardRevision: snapshot.profile.data.appearance.spark?.offline?.baseRevision ?? snapshot.profile.data.appearance.spark?.state?.revision ?? 0,
@@ -304,12 +340,18 @@ function createAccountService(options) {
       if (snapshotEvent?.profileId === owner.id) await updateSyncMetadata(eventKey(uid), event => event?.profileId === snapshotEvent.profileId ? { ...event, savedCounter: Math.max(event.savedCounter || 0, snapshotEvent.counter) } : event, () => current(id, uid));
       const next = { ...metadata, cloudRevision: result.root.revision, fingerprint: result.root.fingerprint, lastSyncedLocalRevision: snapshot.profile.revision, playerName: state.playerName };
       if (!await persistMetadata(next, id)) throw new Error("Cloud đã lưu nhưng chưa xác nhận được trên máy. Hãy kết nối lại để kiểm tra.");
+      if(sparkOutbox&&!await acknowledgeOfflineSparkSnapshot({uid,profileId:owner.id,environment:state.environment,
+        operationIds:sparkOutbox.operations.map(entry=>entry.command.operation),baseRevision:snapshot.profile.data.appearance.spark.state?.revision||0},()=>current(id,uid)))
+        throw new Error('Bản cloud đã lưu; giao dịch mới trên máy đang chờ đồng bộ tiếp.');
+      if(!await saveSyncMetadata(snapshotIntentKey,null,()=>current(id,uid)))throw new Error('Cloud đã lưu. Bản xác nhận sẽ được thử lại khi có kết nối.');
       if (!result.cleanupError) await saveSyncMetadata(workKey(uid), { jobs: [] }, () => current(id, uid));
       if (!current(id, uid)) return false;
       state.lastSavedAt = result.root.updatedAt?.toMillis?.() || Date.now(); state.operations = { reads: result.reads, writes: result.writes, bytes: encoded.byteLength };
       const changed = saveGeneration !== snapshotSaveGeneration || state.playerName !== result.root.playerName;
       setPhase(changed ? "waiting" : "synced", changed ? "Đã lưu một bản; các thay đổi mới đang chờ gửi." : "Đã sao lưu.");
       if (changed || result.cleanupError) scheduleSync();
+      if(navigator.onLine&&(snapshot.profile.data.appearance.rewards?.pending||[]).length)
+        window.dispatchEvent(new Event('liveopssyncrequired'));
       return true;
     };
     networkTask = operation().catch(async error => {

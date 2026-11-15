@@ -1,5 +1,7 @@
 import { openAppModal } from '../modal.js';
 import { createIcon } from '../icons.js';
+import { createRewardInfo } from '../rewardInfo.js';
+import { chestContents } from '../liveops/chestInfo.js';
 import { clearTooltip } from '../tooltips.js';
 import { decorateStorybookSurface } from './surface.js';
 import { createGameShellLifecycle } from '../gameShell/gameShellLifecycle.js';
@@ -48,11 +50,12 @@ export function createCosmeticPortrait({ avatar, frame, badge, fallbacks = {}, l
 }
 
 /** Pure presentation: callers supply a durable grant; this function cannot grant. */
-export function createAchievementNoticeContent({ gameName, level, name, category, image, type = 'item', firstHint = '', storedIn }) {
+export function createAchievementNoticeContent({ gameName, level, name, category, image, type = 'item', firstHint = '', storedIn, chestType }) {
   const content = element('div', 'storybook-achievement');
   const hero = element('div', 'storybook-achievement__hero'); hero.dataset.kind = type;
   const art = image ? picture(image, 'storybook-achievement__hero-image', name) : createIcon('chest');
   art.classList.add('storybook-achievement__hero-image'); hero.append(art);
+  if(chestType)hero.append(createRewardInfo(chestContents(chestType),`Thông tin ${name}`));
   content.append(element('p', 'storybook-achievement__source', `${gameName} · Màn ${level}`),
     element('p', 'storybook-achievement__condition', 'Đã hoàn thành cả bốn độ khó'),
     hero,
@@ -78,7 +81,7 @@ export function openStorybookModal({ kind, ...options }) {
 
 const categoryNames = { avatar: 'Ảnh đại diện', frame: 'Khung viền', badge: 'Huy hiệu' };
 
-/** Working selection stays here; durable save and public sync belong to caller. */
+/** Each selection is applied through the caller's durable save before rendering. */
 export function openCosmeticCustomization({ playerName, items, equipped, onSave, owner }) {
   const scope = createGameShellLifecycle();
   const draft = { ...equipped };
@@ -88,7 +91,6 @@ export function openCosmeticCustomization({ playerName, items, equipped, onSave,
   const content = element('div', 'storybook-customization');
   const hero = element('div', 'storybook-customization__hero');
   const name = element('h3', 'storybook-customization__name', playerName);
-  const formsButton=element('button','tab-button','Xem hình thái');formsButton.type='button';
   const tabs = element('div', 'storybook-tabs'); tabs.setAttribute('role', 'tablist'); tabs.setAttribute('aria-label', 'Đồ hồ sơ');
   const grid = element('div', 'storybook-inventory'); grid.setAttribute('role', 'tabpanel'); grid.id = 'storybook-cosmetics-grid';
   const error = element('p', 'storybook-customization__error'); error.setAttribute('role', 'alert');
@@ -97,13 +99,12 @@ export function openCosmeticCustomization({ playerName, items, equipped, onSave,
   previous.type = next.type = 'button';
   const pageLabel = element('span', 'storybook-inventory-page'); pageLabel.setAttribute('aria-live', 'polite');
   navigation.append(previous, pageLabel, next);
-  content.append(hero, name, tabs, formsButton, element('p','storybook-customization__hint','Chọn một món để trang bị; chọn lại để bỏ.'), grid, navigation, error);
+  content.append(hero, name, tabs, grid, navigation, error);
   const tabButtons = [];
   function render() {
     const selected = slot => { const item = items.find(item => item.id === draft[slot]); return item?.previewImage || item?.image; };
     const original=slot=>items.find(item=>item.id===draft[slot])?.originalPreviewImage;
     hero.replaceChildren(createCosmeticPortrait({ avatar: selected('avatar'), frame: selected('frame'), badge: selected('badge'),fallbacks:{avatar:original('avatar'),frame:original('frame'),badge:original('badge')},label: playerName }));
-    formsButton.disabled=!items.find(item=>item.id===draft[category])?.formImages;
     for (const button of tabButtons) {
       const active = button.dataset.category === category;
       button.setAttribute('aria-selected', String(active)); button.tabIndex = active ? 0 : -1;
@@ -119,21 +120,17 @@ export function openCosmeticCustomization({ playerName, items, equipped, onSave,
       const button = element('button', 'storybook-item'); button.type = 'button';
       button.dataset.itemId = item.id; button.disabled = !item.owned;
       button.setAttribute('aria-pressed', String(draft[category] === item.id));
-      if (item.type === 'frame') button.append(createCosmeticPortrait({ avatar: selected('avatar'), frame: item.image,fallbacks:{avatar:original('avatar'),frame:item.originalImage} }));
-      else button.append(picture(item.image, 'storybook-item__image','',item.originalImage));
-      button.append(element('strong', 'storybook-item__name', item.name), element('small', 'storybook-item__source', Number.isSafeInteger(item.level) ? `${item.gameName} · Màn ${item.level}` : item.gameName));
-      if(item.owned && item.cosmeticLevelLabel)button.append(element('span','storybook-item__level',item.cosmeticLevelLabel));
+      button.append(picture(item.image, 'storybook-item__image','',item.originalImage));
+      button.append(element('strong', 'storybook-item__name', item.name));
+      if(item.owned && item.cosmeticLevelLabel){
+        const level=element('span','storybook-item__level',item.cosmeticLevelLabel);
+        level.dataset.form=String(item.cosmeticForm || 1);
+        button.append(level);
+      }
       if (!item.owned) button.append(createIcon('lock'));
-      else if (draft[category] === item.id) button.append(createIcon('check'));
       return button;
     }));
   }
-  scope.listen(formsButton,'click',()=>{
-    const item=items.find(item=>item.id===draft[category]);if(!item?.formImages)return;
-    const content=element('div','storybook-cosmetic-forms');
-    for(const form of item.formImages){const figure=element('figure');figure.append(picture(form.image,'storybook-cosmetic-forms__image',item.name,form.fallback),element('figcaption','',form.label));content.append(figure);}
-    openAppModal({id:'cosmetic-forms-modal',title:item.name,content,owner:scope,alignment:'center'});
-  });
   for (const [id, label] of Object.entries(categoryNames)) {
     const button = element('button', 'storybook-tab', label); button.type = 'button';
     button.dataset.category = id; button.id = `storybook-tab-${id}`;
@@ -157,25 +154,31 @@ export function openCosmeticCustomization({ playerName, items, equipped, onSave,
     if (!button || !grid.contains(button) || button.disabled || modal.panel.getAttribute('aria-busy') === 'true') return;
     const item = items.find(candidate => candidate.id === button.dataset.itemId);
     if (!item || !item.owned || item.type !== category) return;
-    draft[category] = draft[category] === item.id ? null : item.id;
-    render();grid.querySelector(`[data-item-id="${item.id}"]`).focus({preventScroll:true});
+    const selection = { ...draft, [category]: draft[category] === item.id ? null : item.id };
+    void modal.submit(async () => {
+      error.textContent = '';
+      const saved = await onSave(selection);
+      if (!scope.active) return false;
+      if (!saved) {
+        error.textContent = 'Chưa lưu được thay đổi. Hãy thử lại.';
+        return false;
+      }
+      Object.assign(draft, selection);
+      render();
+      grid.querySelector(`[data-item-id="${item.id}"]`).focus({ preventScroll: true });
+      return false;
+    });
   });
   render();
   modal = openAppModal({ id: 'profile-customization-modal', alignment: 'center',
     title: 'Trang trí hồ sơ', content, owner, onDestroy: () => scope.dispose(),
-    actions: [{ label: 'Lưu thay đổi', variant: 'primary', onClick: async () => {
-      error.textContent = '';
-      if (!await onSave({ ...draft })) { error.textContent = 'Chưa lưu được thay đổi. Hãy thử lại.'; return false; }
-      return undefined;
-    } }],
   });
   modal.panel.focus({ preventScroll: true }); clearTooltip();
   return modal;
 }
 
-export function createAchievementListContent({ gameName, levels }) {
+export function createAchievementListContent({ levels }) {
   const content = element('div', 'storybook-collection');
-  content.append(element('p', 'storybook-collection__game', gameName), element('h3', 'storybook-collection__heading', 'Làm chủ từng màn'));
   for (const level of levels) {
     const row = element('article', 'storybook-achievement-row');
     const details = element('div', 'storybook-achievement-row__details');
@@ -188,8 +191,9 @@ export function createAchievementListContent({ gameName, levels }) {
       difficulties.append(badge);
     });
     details.append(difficulties, element('p', '', level.completed.every(Boolean) ? 'Đã hoàn thành' : `${level.completed.filter(Boolean).length}/4 độ khó`));
-    const reward = element('div', 'storybook-achievement-row__reward');
+    const reward = element('div', 'storybook-achievement-row__reward reward-info-host');
     reward.append(level.image ? picture(level.image, '', level.name) : createIcon('chest'), element('small', '', level.name));
+    if(level.chestType)reward.append(createRewardInfo(chestContents(level.chestType),`Thông tin ${level.name}`));
     row.append(details, reward); content.append(row);
   }
   content.append(element('p', 'storybook-collection__note', 'Mỗi màn nhận thưởng một lần.'));

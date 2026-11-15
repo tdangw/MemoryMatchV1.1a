@@ -1,0 +1,33 @@
+{
+  "tool": "built-in image_gen",
+  "transparent_background": true,
+  "references": [
+    "original-four-column-review"
+  ],
+  "entries": [
+    {
+      "key": "path/default",
+      "master": "illustrations/path-default-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-3ffdcf91-6de0-4aff-b5c8-2fcd7eef042d.png",
+      "prompt": "Create ONE standalone transparent-background production icon for the CONNECTION PATH tab of this mobile game. The reference shop image is the style target: copy the visual language of its corresponding path preview, not the UI frame. Polished luminous game effect illustration, simple and immediately readable at 40 pixels. No thick gold borders, no jewelry, no beads, no square tile, no scene, no text or watermark. Subject fills central 84 percent of a square canvas with balanced alpha margins. A single clear route, slightly dimensional glowing core with delicate halo; do not turn it into a weapon or a wand. Specific subject: a smooth slightly wavy luminous warm-white connection route with three small glowing round nodes, clean restrained mint-white light."
+    },
+    {
+      "key": "path/electric",
+      "master": "illustrations/path-electric-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-31cc66a5-a698-4797-bbaa-a09c40629e21.png",
+      "prompt": "Create ONE standalone transparent-background production icon for the CONNECTION PATH tab of this mobile game. The reference shop image is the style target: copy the visual language of its corresponding path preview, not the UI frame. Polished luminous game effect illustration, simple and immediately readable at 40 pixels. No thick gold borders, no jewelry, no beads, no square tile, no scene, no text or watermark. Subject fills central 84 percent of a square canvas with balanced alpha margins. A single clear route, slightly dimensional glowing core with delicate halo; do not turn it into a weapon or a wand. Specific subject: a bright cyan-white sharply zigzagging electrical connection bolt between two luminous blue endpoint dots, a few small branching sparks."
+    },
+    {
+      "key": "path/laser",
+      "master": "illustrations/path-laser-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-3e61953a-d9d6-45c7-8e80-5fe92dc0596f.png",
+      "prompt": "Create ONE standalone transparent-background production icon for the CONNECTION PATH tab of this mobile game. The reference shop image is the style target: copy the visual language of its corresponding path preview, not the UI frame. Polished luminous game effect illustration, simple and immediately readable at 40 pixels. No thick gold borders, no jewelry, no beads, no square tile, no scene, no text or watermark. Subject fills central 84 percent of a square canvas with balanced alpha margins. A single clear route, slightly dimensional glowing core with delicate halo; do not turn it into a weapon or a wand. Specific subject: a precise straight hot-pink and white laser connection beam slanting upward between two small glowing magenta endpoint dots, restrained red-pink halo."
+    },
+    {
+      "key": "path/fire",
+      "master": "illustrations/path-fire-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-ef5fcf9c-b25c-4701-b596-6b97ecc69337.png",
+      "prompt": "Create ONE standalone transparent-background production icon for the CONNECTION PATH tab of this mobile game. The reference shop image is the style target: copy the visual language of its corresponding path preview, not the UI frame. Polished luminous game effect illustration, simple and immediately readable at 40 pixels. No thick gold borders, no jewelry, no beads, no square tile, no scene, no text or watermark. Subject fills central 84 percent of a square canvas with balanced alpha margins. A single clear route, slightly dimensional glowing core with delicate halo; do not turn it into a weapon or a wand. Specific subject: an elegant curved flowing orange-gold connection route, with a few clearly defined flame tongues following the route and two glowing warm endpoints."
+    }
+  ]
+}

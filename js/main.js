@@ -7,6 +7,7 @@ import '../styles/ui-skin-woodland.css';
 import '../styles/ui-style-packs.css';
 import '../styles/ui-skin-storybook.css';
 import '../styles/achievement-effects.css';
+import '../styles/reward-info.css';
 import { initializeMenuAds } from './ads/menuAds.js';
 import { initializeProfileStatsService } from './profileStatsService.js';
 import { requestLiveops, bindLiveopsAccount } from './liveops/service.js';

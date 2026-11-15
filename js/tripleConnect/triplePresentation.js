@@ -232,6 +232,7 @@ function presentMilestoneSequence({ shell, scope, source, milestones = [] }) {
       preset: "linkItem",
       tier: "teal",
       holdMs: 0,
+      receiveCue:false,
       target: track,
       timing: { dropMs: 160, flightMs: 180 },
       onCollected: finish,
@@ -288,7 +289,7 @@ function presentCommittedRewards(shell, source, rewards = []) {
     const itemId = reward.type === "time" || reward.type === 'time-item' ? "time" : reward.type;
     playLootDrop(source, {
       icon: itemId === "time" ? "timer" : itemId === "hint" ? "search" : itemId === "undo" ? "undo" : "shuffle", preset: "linkItem", tier: "blue", holdMs: 0,
-      target: root.querySelector(`[data-triple-item="${itemId}"]`),
+      target: root.querySelector(`[data-triple-item="${itemId}"]`), receiveCue:false,
     });
   }
 }

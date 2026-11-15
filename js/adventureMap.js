@@ -15,13 +15,16 @@ import { createIcon } from "./icons.js";
 import { createAdventureActionArt } from './adventureActionArt.js';
 import { gameState } from "./gameState.js";
 import { GAME_MODES, getGameDefinition, getGameModeLabel } from "./gameCatalog.js";
-import { MAP_LEVEL_STEP, getMapLevelPoint, getMapChestPoint, createMapDecorations } from "./adventureMapLayout.js";
+import { MAP_LEVEL_STEP, getMapLevelPoint, getMapChestPoint } from "./adventureMapLayout.js";
 import { decorateAdventureMenu, refreshAppWallet, openMenuDestination } from "./appNavigation.js";
 import { prepareAdventureChapter } from "./adventureLaunch.js";
 import { createAdventureChapterNodes, getAdventureSummary, getAdventureLevelState, getAdventureChestState, isNormalAdventureMode } from "./adventureProgress.js";
 import { loadPersistentChapter, subscribeToLocalCommit } from "./persistence.js";
 import { openJourneyTreasure } from './progression/treasureModal.js';
 import { createTreasureArt } from './progression/treasureArt.js';
+import { MASTERY_CHEST_REWARDS } from './progression/masteryRewards.js';
+import { createRewardInfo } from './rewardInfo.js';
+import { clearTooltip } from './tooltips.js';
 import { treasureDefinition } from './progression/treasureCatalog.js';
 import { openAppModal, showAppToast } from "./modal.js";
 import { canLaunchGame } from "./profileOperations.js";
@@ -79,6 +82,7 @@ export function mountAdventureMap(gameId) {
   document.body.append(root);
   void ensureUiSkinRewards();
   const scope = decorateAdventureMenu(root, { gameId });
+  scope.own(clearTooltip);
   const ambient = mountMapAmbient(scope, root, trail, scroll);
   root.classList.add("game-shell-tokens");
   const title = document.createElement("h1");
@@ -125,8 +129,10 @@ export function mountAdventureMap(gameId) {
   }
   body.append(specials);
   const treasureCard = button("", "treasure-map-card");
+  const treasureInfo=createRewardInfo('Kho báu hành trình','Thông tin kho báu hành trình');
   treasureCard.disabled = true;
   treasureCard.classList.add('adventure-map-shortcut'); shortcuts.append(treasureCard,shortcut('Thành tích','collection','achievements'));
+  shortcuts.append(treasureInfo);
   scope.listen(treasureCard, "click", () => { if (!loading) openChest({chestNumber:Number(treasureCard.dataset.block)}); });
   function setBusy(busy) {
     loading = busy;
@@ -211,7 +217,7 @@ export function mountAdventureMap(gameId) {
     const level = Math.max(bottomLevel, Math.min(topLevel, topLevel - Math.round((scroll.scrollTop + scroll.clientHeight / 2 - 64) / step)));
     const block = Math.floor((level-1)/10)+1;
     const treasure = projectJourneyTreasure({completed:{...adjacentBest,...profile.bestByLevel},block,claim:profile.claimedChests[block] || adjacentChests[block]});
-    renderTreasureMapCard(treasureCard, treasure);
+    renderTreasureMapCard(treasureCard, treasure, treasureInfo);
     refreshRewardIndicators();
   }
   scope.listen(window, 'resize', updateTreasureCard);
@@ -238,6 +244,8 @@ export function mountAdventureMap(gameId) {
         control.classList.toggle("is-claimed", node.claimed);
         control.classList.toggle("is-ready", node.eligible);
         const definition = treasureDefinition(node.activeTier || 'S');
+        const reward=MASTERY_CHEST_REWARDS.find(reward=>reward.tier===definition.tier);
+        element.info.dataset.tooltip=`${definition.name}: ${reward.coins} Xu · ${reward.hints} Gợi ý`;
         element.detail.textContent = node.claimed ? 'Đã mở 4/4' : definition.name + '\n' + (node.eligible ? 'Có thể mở' : (node.exp / 10) + '/10');
         const artState = definition.tier + ':' + node.claimed;
         if (control.dataset.treasureArtState !== artState) {
@@ -272,7 +280,7 @@ export function mountAdventureMap(gameId) {
     trail.style.backgroundPositionY = `${((topLevel % MAP_TEXTURE_HEIGHT) * step) % MAP_TEXTURE_HEIGHT}px`;
     const nodes = mapNodes();
     renderedNodes = [];
-    trail.replaceChildren();
+    clearTooltip();trail.replaceChildren();
     const path = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     path.classList.add("adventure-map-path");
     const levelNodes = nodes.filter(node => node.kind === "level");
@@ -288,19 +296,6 @@ export function mountAdventureMap(gameId) {
     path.append(line, ornament);
     trail.append(path);
     trail.style.height = `${height}px`;
-    const scenery = document.createDocumentFragment();
-    for (const decoration of createMapDecorations(gameId, bottomLevel, topLevel)) {
-      const sprite = document.createElement("span");
-      sprite.className = "adventure-map-decoration adventure-map-sprite";
-      sprite.setAttribute("aria-hidden", "true");
-      sprite.dataset.scenery = String(decoration.id);
-      sprite.style.left = `${decoration.x / 4}%`;
-      sprite.style.top = `${decoration.y}px`;
-      sprite.style.width = `${decoration.size / 4}%`;
-      sprite.style.backgroundPosition = `${(decoration.slot % 4) * 100 / 3}% ${Math.floor(decoration.slot / 4) * 100 / 3}%`;
-      scenery.append(sprite);
-    }
-    trail.append(scenery);
     nodes.forEach((node, index) => {
       const cell = document.createElement("div");
       cell.className = "adventure-map-cell";
@@ -331,7 +326,9 @@ export function mountAdventureMap(gameId) {
       }
       cell.append(control, stars, detail);
       trail.append(cell);
-      renderedNodes.push({ node, control, stars, detail });
+      const info=node.kind==='chest'?createRewardInfo('Kho báu hành trình',`Thông tin kho báu Màn ${node.firstLevel}–${node.lastLevel}`):null;
+      if(info)cell.append(info);
+      renderedNodes.push({ node, control, stars, detail, info });
     });
     root.dataset.mapChapter = String(view.chapter);
     setBusy(false);
@@ -441,11 +438,11 @@ export function mountAdventureMap(gameId) {
         tile.append(createIcon(icon), caption, number);
         return tile;
       };
-      const [groupLabel] = info.target.split('·');
       const stats = [
         metric(info.timeSeconds === 0 ? 'infinity' : 'timer', 'Thời gian', info.timeSeconds === 0 ? 'Không giới hạn' : `${info.timeSeconds}s`),
-        metric('cards', 'Mục tiêu', groupLabel.trim()),
+        metric('star', 'Mục tiêu', info.threeStarScore.toLocaleString('vi-VN')),
       ];
+      if(info.timeSeconds===0)stats[0].classList.add('adventure-preview-metric--unlimited');
       const themeTile = metric(theme.icon || 'images', 'Chủ đề', theme.title); themeTile.classList.add('adventure-preview-metric--theme');
       themeButton.textContent = theme.title;
       themeButton.setAttribute('aria-label', `Đổi chủ đề: ${theme.title}`);

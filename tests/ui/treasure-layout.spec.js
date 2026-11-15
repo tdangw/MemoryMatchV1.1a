@@ -30,7 +30,7 @@ for(const [width,height] of [[412,915],[844,390],[1024,900],[320,568]]) for(cons
       await page.locator('[data-treasure-tier="S"]').focus();await page.keyboard.press('Enter');await expect(page.locator('.treasure-detail')).toHaveAttribute('data-selected-tier','S');
       await page.locator('[data-treasure-tier="'+(['waiting','complete'].includes(state)?'S':'C')+'"]').click();
       if(width===844) {
-        for(const selector of ['.treasure-card:first-child','.treasure-card:last-child','.treasure-collection-link']){
+        for(const selector of ['.treasure-card-slot:first-child > .treasure-card','.treasure-card-slot:last-child > .treasure-card','.treasure-collection-link']){
           const control=page.locator(selector);await control.scrollIntoViewIfNeeded();await expect(control).toBeInViewport();
         }
       }

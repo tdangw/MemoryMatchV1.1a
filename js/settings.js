@@ -9,6 +9,7 @@ import { APP_VERSION } from "./appMeta.js";
 import { setMeteorEffectsEnabled } from "./backgroundEffects.js";
 import { setBoardCoordinatesVisible } from "./grid.js";
 import { clearTooltip } from "./tooltips.js";
+import { createRewardInfo } from './rewardInfo.js';
 import { selectUiSkin, getUiSkin } from './uiSkin.js';
 import { UI_SKIN_CHOICES } from './uiSkinController.js';
 
@@ -25,6 +26,15 @@ const soundVolumeValue = document.getElementById("sound-volume-value");
 const musicVolumeValue = document.getElementById("music-volume-value");
 const versionInfoButton = document.getElementById("version-info");
 const versionValue = document.getElementById("settings-version-value");
+
+const coordinatesLabel = settingsContainer.querySelector('label[for="toggle-board-coordinates"]');
+const coordinatesLabelGroup = document.createElement('div');
+coordinatesLabelGroup.className = 'settings-label';
+coordinatesLabel.replaceWith(coordinatesLabelGroup);
+coordinatesLabelGroup.append(coordinatesLabel, createRewardInfo(
+  'Tính năng chỉ khả dụng trong Memory Match.',
+  'Thông tin tọa độ bàn cờ',
+));
 
 let onCloseFromMenu = () => {};
 let navigation = {};
@@ -61,6 +71,7 @@ function syncSettingsControls() {
 }
 
 let skinChoiceGeneration = 0;
+let dismissSkinLoading = () => {};
 function syncSkinChoices() {
   for (const choice of settingsContainer.querySelectorAll('[data-ui-skin-choice]')) {
     choice.setAttribute('aria-pressed', String(choice.dataset.uiSkinChoice === getUiSkin()));
@@ -73,13 +84,25 @@ function syncSkinChoices() {
 for (const choice of settingsContainer.querySelectorAll('[data-ui-skin-choice]')) {
   choice.addEventListener('click', async () => {
     const token = ++skinChoiceGeneration, status = document.getElementById('skin-status');
-    status.textContent = 'Đang chuẩn bị giao diện…';
+    status.textContent = '';
+    dismissSkinLoading();
+    const dismiss = showAppToast('Đang tải giao diện…', { position: 'center', duration: 0 });
+    dismissSkinLoading = dismiss;
     settingsContainer.querySelector('.skin-choices').setAttribute('aria-busy', 'true');
-    const result = await selectUiSkin(choice.dataset.uiSkinChoice);
+    let result;
+    try { result = await selectUiSkin(choice.dataset.uiSkinChoice); }
+    catch (error) { result = { status: 'error', error }; }
+    finally {
+      dismiss();
+      if (token === skinChoiceGeneration) {
+        dismissSkinLoading = () => {};
+        settingsContainer.querySelector('.skin-choices').removeAttribute('aria-busy');
+      }
+    }
     if (token !== skinChoiceGeneration) return;
-    settingsContainer.querySelector('.skin-choices').removeAttribute('aria-busy');
     syncSkinChoices();
     status.textContent = result.status === 'error' ? 'Chưa đổi được giao diện. Hãy thử lại.' : '';
+    if (result.status === 'error') showAppToast(status.textContent, { position: 'center', tone: 'error', duration: 3200 });
   });
 }
 
@@ -180,6 +203,10 @@ export function showSettingsPanel(fromGame = false, onClose = () => {}, actions 
     content: settingsContainer,
     size: "medium",
     onDestroy: () => {
+      clearTooltip();
+      skinChoiceGeneration++;
+      dismissSkinLoading(); dismissSkinLoading = () => {};
+      settingsContainer.querySelector('.skin-choices').removeAttribute('aria-busy');
       legalModal?.destroy();
       settingsContainer.querySelector('#settings-privacy-policy').onclick = null;
       settingsContainer.querySelector('#settings-terms').onclick = null;

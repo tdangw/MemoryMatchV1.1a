@@ -36,7 +36,7 @@ for (const gameId of GAMES) {
     const collection = page.locator("#collection-modal");
     const collectionTheme = collection.getByRole("tab", { name: "Chủ đề", exact: true });
     await collectionTheme.focus();
-    await collectionTheme.press("ArrowLeft");
+    await collection.getByRole("tab", { name: gameId === "memory-match" ? "Ngoại hình" : "Đường nối", exact: true }).click();
     const selectedCollectionTab = collection.getByRole("tab", { selected: true });
     const collectionTabName = await selectedCollectionTab.textContent();
     expect(collectionTabName).not.toBe("Chủ đề");

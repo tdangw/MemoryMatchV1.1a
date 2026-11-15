@@ -209,6 +209,10 @@
   animation: app-toast-in 180ms ease-out both;
 }
 .app-toast-region[data-position="center"] { top: 50%; transform: translate(-50%, -50%); }
+.app-toast.app-toast--floating { justify-self:center; box-sizing:border-box; width:max-content; max-width:100%; padding:6px 12px; border-radius:10px; white-space:nowrap; line-height:20px; box-shadow:0 3px 10px #0003; animation:app-toast-rise var(--app-toast-duration,1400ms) ease-out both; }
+.app-toast.app-toast--floating.is-closing { animation:none; opacity:0; transform:translateY(-48px); }
+@keyframes app-toast-rise { 0% {opacity:0;transform:translateY(8px);} 12% {opacity:1;transform:translateY(0);} 65% {opacity:1;transform:translateY(-24px);} 100% {opacity:0;transform:translateY(-48px);} }
+@media(prefers-reduced-motion:reduce) { .app-toast.app-toast--floating { animation:none; transform:none; } }
 
 .app-toast--success {
   border: 1px solid rgb(242 191 91 / 48%);
@@ -794,7 +798,7 @@ body.game-is-paused .shooting-star {
 #level-summary-modal .level-summary__stat { display: grid; grid-template-columns: 34px minmax(0,1fr) minmax(80px,auto); align-items: center; gap: 7px; min-height: 44px; box-sizing: border-box; padding: 4px 10px; border: 1px solid var(--dialog-line); border-radius: 14px; background: var(--dialog-night-inset); }
 #level-summary-modal .level-summary__stat > .ui-icon { width: 100%; height: auto; aspect-ratio: 1; }
 #level-summary-modal .level-summary__stat > span { min-width: 0; text-align: left; color: var(--dialog-ink); font: 800 clamp(12px,3.3cqw,16px)/1.15 "Trebuchet MS", "Segoe UI",sans-serif; }
-#level-summary-modal .level-summary__stat strong { display: block; min-width: 0; margin: 0; padding: 6px 8px; border: 1px solid var(--dialog-line); border-radius: 10px; background: var(--dialog-night-value); text-align: center; color: var(--dialog-ink); text-shadow: 0 1px #03131d; font: 900 clamp(14px,4cqw,20px)/1.1 "Trebuchet MS", "Segoe UI",sans-serif; }
+#level-summary-modal .level-summary__stat strong { display: block; min-width: 0; margin: 0; padding: 6px 8px; border: 0; border-radius: 0; background: none; text-align: center; color: var(--dialog-ink); text-shadow: none; font: 900 clamp(14px,4cqw,20px)/1.1 "Trebuchet MS", "Segoe UI",sans-serif; }
 #level-summary-modal .summary-coins strong { color: var(--dialog-gold); }
 #level-summary-modal .app-modal__footer { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); justify-items: center; gap: 10px; padding: 8px 26px 20px; border: 0; }
 #level-summary-modal .app-modal__footer .app-button { width: 100%; max-width: 200px; min-width: 0; min-height: 48px; padding: 8px; font-size: clamp(12px,3.6cqw,18px); }
@@ -831,6 +835,10 @@ body.game-is-paused .shooting-star {
 /* Popup actions follow their label width while retaining a touch-sized height. */
 .app-modal .app-modal__footer { justify-items:center; }
 .app-modal .app-modal__footer > .app-button { width:fit-content; max-width:100%; min-width:0; padding-inline:24px; justify-self:center; }
+
+/* Purchase and app exit share a balanced pair of compact confirmation actions. */
+.app-modal.app-modal--confirmation .app-modal__footer { grid-template-columns: repeat(2, minmax(0, 140px)); justify-content: center; align-items: start; gap: 10px; padding: 10px 14px 14px; }
+.app-modal.app-modal--confirmation .app-modal__footer > button.app-button { box-sizing: border-box; width: 100%; min-width: 0; min-height: 44px; margin: 0; padding: 6px 12px; gap: 5px; border: 1px solid var(--ui-line); border-image: none; border-radius: 12px; font-size: 13px; font-weight: 800; white-space: nowrap; }
 
 /* Fullscreen dialogs retain the modal focus, back and parent-cleanup contract. */
 .app-modal-overlay[data-fullscreen="true"] {

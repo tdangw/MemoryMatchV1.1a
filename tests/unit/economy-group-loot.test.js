@@ -19,10 +19,12 @@ test('economy scenario uses independent normal and special loot configuration', 
   }
 });
 
-test('cosmetic completion distinguishes the old repeated pool from the current unowned pool', () => {
+test('current repeat pool retains all 101 IDs and the legacy unowned baseline is explicit', () => {
   for (const row of model.cosmeticCompletionFromEmpty) {
-    assert.equal(row.expectedChests, row.items / .2);
-    assert.ok(row.baselineRepeatPoolExpectedChests > row.expectedChests);
+    assert.equal(row.legacyUnownedPoolExpectedChests, row.items / .2);
+    assert.equal(row.expectedChests, row.baselineRepeatPoolExpectedChests);
+    assert.ok(row.expectedChests > row.legacyUnownedPoolExpectedChests);
   }
-  assert.deepEqual(model.cosmeticCompletionFromEmpty.map(row => row.expectedChests), [190,190,110]);
+  assert.deepEqual(model.cosmeticCompletionFromEmpty.map(row => row.items), [39,39,23]);
+  assert.deepEqual(model.cosmeticCompletionFromEmpty.map(row => row.expectedChests), [829.441,829.441,429.444]);
 });

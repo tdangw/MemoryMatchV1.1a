@@ -32,7 +32,7 @@ test('wheel catalog contains only usable nondefault rights and preserves the fli
    assert.ok(!source.gameId||source.gameId===item.gameId);
   }
  }
- for(const starter of EXTRA_COSMETIC_ITEMS.filter(item=>item.sourceKind==='starter'))assert.equal(wheelItem(starter.id),null);
+ for(const starter of EXTRA_COSMETIC_ITEMS.filter(item=>item.sourceKind==='starter'))assert.equal(wheelItem(starter.id)?.itemId,starter.id);
  assert.equal(wheelItem('unknown'),null);
 });
 

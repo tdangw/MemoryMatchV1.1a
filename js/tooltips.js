@@ -146,13 +146,20 @@ export function clearTooltip() {
 function positionTooltip(anchor, element) {
   element.style.left = "0px";
   element.style.top = "0px";
+  // Catalog explanations share the surface center, including tabs at either edge.
+  const catalog = isCatalogAnchor(anchor) && anchor.closest('#shop-modal, #collection-modal');
+  const bounds = catalog ? catalog.querySelector('.app-modal__body').getBoundingClientRect() : null;
+  element.style.maxWidth = bounds ? `${Math.max(1, Math.min(240, bounds.width - VIEWPORT_GAP * 2))}px` : '';
   const rect = anchor.getBoundingClientRect();
   const size = element.getBoundingClientRect();
+  const centeredLeft = bounds ? bounds.left + (bounds.width - size.width) / 2 : rect.left + (rect.width - size.width) / 2;
   const candidates = [
-    { placement: "top", left: rect.left + (rect.width - size.width) / 2, top: rect.top - size.height - TOOLTIP_GAP },
-    { placement: "bottom", left: rect.left + (rect.width - size.width) / 2, top: rect.bottom + TOOLTIP_GAP },
-    { placement: "right", left: rect.right + TOOLTIP_GAP, top: rect.top + (rect.height - size.height) / 2 },
-    { placement: "left", left: rect.left - size.width - TOOLTIP_GAP, top: rect.top + (rect.height - size.height) / 2 },
+    { placement: "top", left: centeredLeft, top: rect.top - size.height - TOOLTIP_GAP },
+    { placement: "bottom", left: centeredLeft, top: rect.bottom + TOOLTIP_GAP },
+    ...(!catalog ? [
+      { placement: "right", left: rect.right + TOOLTIP_GAP, top: rect.top + (rect.height - size.height) / 2 },
+      { placement: "left", left: rect.left - size.width - TOOLTIP_GAP, top: rect.top + (rect.height - size.height) / 2 },
+    ] : []),
   ];
   const viewportWidth = document.documentElement.clientWidth;
   const viewportHeight = document.documentElement.clientHeight;
@@ -219,6 +226,7 @@ document.addEventListener("pointerdown", (event) => {
   if (event.pointerType !== "touch") return;
   const anchor = getAnchor(event.target);
   if (!anchor) return;
+  if (anchor.hasAttribute('data-tooltip-info')) return;
   pressAnchor = anchor;
   clearTimeout(pressTimer);
   pressTimer = setTimeout(() => {
@@ -251,6 +259,9 @@ document.addEventListener("click", (event) => {
     return;
   }
   const anchor = getAnchor(event.target);
+  if (anchor?.hasAttribute('data-tooltip-info')) {
+    event.preventDefault();event.stopPropagation();showTooltip(anchor);return;
+  }
   // Vùng thẻ trong cửa hàng/bộ sưu tập không có hành động trực tiếp, nên chạm
   // một lần vào đó có thể hiện giải thích ngay. Nút Mua/Trang bị vẫn giữ click gốc.
   if (anchor && isCatalogAnchor(anchor) && !event.target.closest("button:not(.shop-tab)")) {

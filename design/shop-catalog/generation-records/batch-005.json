@@ -1,0 +1,37 @@
+{
+  "tool": "built-in image_gen",
+  "transparent_background": true,
+  "references": [
+    "design/shop-catalog/reference-four-column.png"
+  ],
+  "entries": [
+    {
+      "key": "path/poison",
+      "master": "illustrations/path-poison-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-ed4604d3-43ee-4126-a154-5f12ea78d621.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A luminous connecting route between matching cards, restrained glow, a few clear round endpoints. No thick gold border, jewelry or beads; retain the real effect color and topology while making a beautiful illustrative icon. A neon lime-green curving connection stream with three clear rounded green droplets and small bubbles, visible pale core, no skull or text.",
+      "status": "generated-candidate"
+    },
+    {
+      "key": "path/link-effect-meteor-route",
+      "master": "illustrations/path-link-effect-meteor-route-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-36b6a80f-702a-4520-8726-4d90e8571342.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A luminous connecting route between matching cards, restrained glow, a few clear round endpoints. No thick gold border, jewelry or beads; retain the real effect color and topology while making a beautiful illustrative icon. A bright cyan-white graceful connection route with three small gold shooting stars traveling along it, two clear endpoint lights; stars are drawn geometric shapes.",
+      "status": "generated-candidate"
+    },
+    {
+      "key": "path/triple-effect-triad-converge",
+      "master": "illustrations/path-triple-effect-triad-converge-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-d3bf3bb1-95a5-493a-9f4f-0a00b64961d4.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A luminous connecting route between matching cards, restrained glow, a few clear round endpoints. No thick gold border, jewelry or beads; retain the real effect color and topology while making a beautiful illustrative icon. Three elegant luminous cyan connection trails from three clear endpoint lights converging into one brighter turquoise center, simple three-way convergence symbol.",
+      "status": "generated-candidate"
+    },
+    {
+      "key": "exit/default",
+      "master": "illustrations/exit-default-v2.png",
+      "source": "C:\\Users\\Dang\\.codex\\generated_images\\01a1bc02-c7c2-7453-a09d-a815ccbae0c6\\exec-59be9965-e61c-4de1-b635-94b530b137c5.png",
+      "prompt": "Create ONE standalone production catalog illustration for a polished casual fantasy mobile puzzle game. Match the corresponding preview category in the reference UI mockup, not its labels or UI frame. Large clear silhouette, attractive controlled color, soft dimensional material and clean highlights, immediately readable at 40 pixels. True transparent background, square composition, subject fills central 84 percent with balanced alpha margins. No surrounding tile, no background scene, no watermark, no label or UI text. Do not create a sheet or multiple unrelated icons. Only game letters or digits explicitly requested in the subject may be visible. Specific subject: A cream playing card with a fine warm-gold rim and a small clean blue geometric diamond (drawn shape, not a font glyph), with the removal effect visibly changing the card. Card is the dominant big object, slightly tilted at most, pieces large and clear rather than microscopic. Same card design throughout this family. One intact cream card, a small blue diamond centered, subtle warm edge glow; clean baseline card-removal preview with no extra special effects.",
+      "status": "generated-candidate"
+    }
+  ]
+}

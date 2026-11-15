@@ -1,4 +1,5 @@
 import { openAppModal } from '../modal.js';
+import { clearTooltip } from '../tooltips.js';
 import { gameState } from '../gameState.js';
 import { getGameProgressKey } from '../gameCatalog.js';
 import { getChapterNumber } from '../adventureProgress.js';
@@ -18,6 +19,7 @@ export function openJourneyTreasure({ gameId, block, owner, selectedTier, onClai
   const key = getGameProgressKey(gameId), profile = gameState.progress[key];
   const identity = JSON.stringify(getRankingOwner());
   const scope = createGameShellLifecycle();
+  scope.own(clearTooltip);
   const release = owner?.own(() => scope.dispose(), 'cleanup');
   scope.own(() => release?.forget());
   const content = document.createElement('div');
@@ -28,6 +30,7 @@ export function openJourneyTreasure({ gameId, block, owner, selectedTier, onClai
     alignment: 'center', keepBanner: true, onDestroy: () => scope.dispose() });
   modal.panel.classList.add('treasure-dialog');
   const draw = () => {
+    clearTooltip();
     dismissContextGuide(content);
     renderTreasureContent(content,view,{selected,phase,error});
     if (phase === 'idle') showContextGuide('chests',content.querySelector('.treasure-detail'),scope);

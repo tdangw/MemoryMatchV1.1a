@@ -9,7 +9,7 @@ fixture="import {committedRewardsForTransition} from '/js/liveops/rewardFeedback
 async function ready(page,counts={A:2,M:3,E:1}){
  await page.route('**/js/liveops/service.js*',route=>route.fulfill({contentType:'text/javascript',body:fixture}));
  await page.goto('/');await expect(page.locator('.game-selector__choice').first()).toBeVisible();
- await page.evaluate(async()=>{(await import('/js/gameState.js')).gameState.settings.sound=false;});
+ await page.evaluate(async()=>{(await import('/js/gameState.js')).gameState.settings.sound=false;(await import('/js/gameState.js')).gameState.coins=1000;});
  await page.evaluate(counts=>fusionFixture.seed(counts),counts);await openLetters(page);
 }
 async function openLetters(page){
@@ -22,7 +22,7 @@ async function start(page,letter='A'){
  await expect(page.locator('#letter-fusion-modal')).toBeVisible();await expect(page.locator('.letter-forge__slot[data-filled="true"]')).toHaveCount(1);
 }
 const palette=(page,letter)=>page.locator('#letter-fusion-modal').getByRole('button',{name:new RegExp(`^Chọn chữ ${letter}, còn \\d+$`)});
-const submit=page=>page.locator('#letter-fusion-modal').getByRole('button',{name:'Ghép',exact:true});
+const submit=page=>page.locator('#letter-fusion-modal').getByRole('button',{name:'Ghép · 10 Xu',exact:true});
 const close=page=>page.locator('#letter-fusion-modal .app-modal__close').click();
 
 test('fusion audio follows immediate lightning, confirmed absorption and collected result; closing cancels late cues',async({page})=>{
@@ -72,6 +72,12 @@ for(const [width,height]of [[320,740],[412,915],[844,390],[1024,900]])test(`fusi
   const recipes=await page.locator('.liveops__set-choices').evaluate(node=>({wrap:getComputedStyle(node).flexWrap,rows:new Set([...node.children].map(child=>Math.round(child.getBoundingClientRect().top))).size,scrollbar:getComputedStyle(node).scrollbarWidth}));
   expect(recipes.wrap).toBe('nowrap');expect(recipes.rows).toBe(1);expect(recipes.scrollbar).toBe('none');await expect(page.locator('.liveops__letter-grid button')).toHaveCount(17);
   await start(page);const modal=page.locator('#letter-fusion-modal');await expect(modal.locator('.letter-forge__slot')).toHaveCount(3);await expect(modal.locator('.letter-forge__palette button')).toHaveCount(17);
+  await expect(modal.locator('.letter-forge__intro')).toHaveText('Chọn 3 chữ để đổi lấy 1 chữ ngẫu nhiên.');
+  await expect(modal.locator('.letter-forge__status')).not.toContainText('Đã chọn');
+  await expect(modal.locator('.letter-forge__fee')).toHaveText('Phí: 10 Xu');
+  const feeBounds=await modal.locator('.letter-forge__fee').boundingBox(),buttonBounds=await modal.locator('.letter-forge__result').boundingBox();
+  expect(feeBounds.y).toBeGreaterThan(buttonBounds.y+buttonBounds.height);
+  expect(Math.abs(feeBounds.x+feeBounds.width/2-buttonBounds.x-buttonBounds.width/2)).toBeLessThan(1);
   const paletteLayout=await modal.locator('.letter-forge__palette').evaluate(grid=>({columns:getComputedStyle(grid).gridTemplateColumns.split(' ').length,rows:new Set([...grid.children].map(tile=>tile.offsetTop)).size,overflow:grid.scrollWidth>grid.clientWidth}));
   expect(paletteLayout,`${skin} / ${motion}`).toEqual({columns:6,rows:3,overflow:false});
   const glyphSizes=await modal.locator('.letter-forge__palette .liveops__letter-art').evaluateAll(nodes=>nodes.map(node=>{const style=getComputedStyle(node);return [parseFloat(style.width),parseFloat(style.height)];}));
@@ -159,13 +165,13 @@ test('compact recipe keeps equal letter sizes beside its chest across all four s
 test('bottom shortcuts retain the tap menu and sale only needs quantity and confirmation',async({page},info)=>{
  await page.setViewportSize({width:320,height:740});await ready(page,{A:250,M:2,E:3});
  const tools=page.locator('.liveops__letter-tools');await expect(tools.getByRole('button',{name:'Ghép',exact:true})).toBeEnabled();await tools.getByRole('button',{name:'Bán',exact:true}).click();
- const sale=page.locator('#letter-sale'),quantity=sale.getByRole('slider',{name:'Số chữ muốn bán',exact:true}),confirm=sale.getByRole('button',{name:'Xác nhận bán',exact:true});
- await expect(sale.locator('.liveops__sale button')).toHaveCount(1);await expect(sale.locator('input')).toHaveCount(1);await expect(sale).toContainText('Bán 1 chữ A, nhận 10 Xu');
- await expect(sale).toHaveAttribute('data-dialog-alignment','center');await expect(quantity).toHaveAttribute('min','1');await expect(quantity).toHaveAttribute('max','250');await quantity.press('End');await expect(quantity).toHaveValue('250');await expect(sale).toContainText('2.500 Xu');await quantity.press('ArrowLeft');await expect(quantity).toHaveValue('249');await quantity.press('Home');await expect(quantity).toHaveValue('1');await quantity.press('End');await expect(confirm).toBeEnabled();await sale.screenshot({path:info.outputPath('simple-sale.png')});
+ const sale=page.locator('#letter-sale'),quantity=sale.getByRole('slider',{name:'Số chữ muốn bán',exact:true}),confirm=sale.getByRole('button',{name:/^Bán [\d.]+ Xu$/});
+ await expect(sale.locator('.liveops__sale button')).toHaveCount(1);await expect(sale.locator('input')).toHaveCount(1);await expect(sale).toContainText('Chọn số chữ A muốn bán.');await expect(confirm).toHaveText('Bán 10 Xu');await expect(sale.locator('.liveops__sale-letter')).toBeVisible();
+ await expect(sale).toHaveAttribute('data-dialog-alignment','center');await expect(quantity).toHaveAttribute('min','1');await expect(quantity).toHaveAttribute('max','250');await quantity.press('End');await expect(quantity).toHaveValue('250');await expect(sale).toContainText('2.500 Xu');await quantity.press('ArrowLeft');await expect(quantity).toHaveValue('249');await quantity.press('Home');await expect(quantity).toHaveValue('1');await quantity.press('End');await expect(confirm).toBeEnabled();await sale.screenshot({path:info.outputPath('simple-sale.png')});await sale.screenshot({path:'runtime/qa/letter-sale-updated.png'});
  await confirm.evaluate(n=>{n.click();n.click();});await expect(sale).toHaveCount(0);await expect(page.locator('.liveops')).toHaveAttribute('aria-busy','false');expect(await page.evaluate(()=>fusionFixture.letters.counts.A)).toBe(0);expect(await page.evaluate(()=>fusionFixture.letters.sequence)).toBe(1);
  await page.getByRole('button',{name:/^Chữ M, \d+ chữ$/}).click();await expect(page.locator('#letter-action-modal')).toBeVisible();await expect(page.locator('#letter-action-modal').getByRole('button',{name:'Ghép',exact:true})).toBeVisible();await page.locator('#letter-action-modal .app-modal__close').click();
  await expect(page.getByRole('button',{name:/^Chữ M, \d+ chữ$/})).toHaveAttribute('aria-pressed','true');await tools.getByRole('button',{name:'Ghép',exact:true}).click();await expect(page.getByRole('button',{name:'Bỏ chữ M ở ô 1',exact:true})).toBeVisible();await close(page);
- await tools.getByRole('button',{name:'Bán',exact:true}).click();await quantity.fill('2');await expect(sale).toContainText('nhận 20 Xu');await sale.locator('.app-modal__close').click();expect(await page.evaluate(()=>fusionFixture.letters.counts.M)).toBe(2);
+ await tools.getByRole('button',{name:'Bán',exact:true}).click();await quantity.fill('2');await expect(sale).toContainText('Bán 20 Xu');await sale.locator('.app-modal__close').click();expect(await page.evaluate(()=>fusionFixture.letters.counts.M)).toBe(2);
  const metrics=await page.locator('.liveops__letter-grid').evaluate(grid=>({columns:getComputedStyle(grid).gridTemplateColumns.split(' ').length,height:grid.getBoundingClientRect().height,maxCell:Math.max(...[...grid.children].map(n=>n.getBoundingClientRect().width))}));expect(metrics.columns).toBe(6);expect(metrics.height).toBeLessThan(160);expect(metrics.maxCell).toBeLessThanOrEqual(46);
 });
 
@@ -198,7 +204,7 @@ test('closing twenty forges during absorption cancels ghosts and prevents detach
   const {createGameShellLifecycle}=await import('/js/gameShell/gameShellLifecycle.js'),{openLetterFusion}=await import('/js/liveops/letterCrafting.js');
   for(let i=0;i<20;i++){
    const owner=createGameShellLifecycle(),modal=openLetterFusion({initialLetter:'A',owner,current:()=>owner.active,getContext:()=>({counts:{A:1,M:2},sequence:0,canUse:true}),execute:async ingredients=>({state:{letters:{last:{kind:'fuse',ingredients,received:'C',sequence:1}}},committedRewards:[]}),refresh:async()=>null});
-   modal.panel.querySelector('[aria-label="Chọn chữ M, còn 2"]').click();modal.panel.querySelector('[aria-label="Chọn chữ M, còn 1"]').click();modal.panel.querySelector('[aria-label="Ghép"]').click();modal.panel.querySelector('.letter-forge__stage').getAnimations({subtree:true}).forEach(a=>a.finish());await new Promise(requestAnimationFrame);
+   modal.panel.querySelector('[aria-label="Chọn chữ M, còn 2"]').click();modal.panel.querySelector('[aria-label="Chọn chữ M, còn 1"]').click();modal.panel.querySelector('[aria-label="Ghép · 10 Xu"]').click();modal.panel.querySelector('.letter-forge__stage').getAnimations({subtree:true}).forEach(a=>a.finish());await new Promise(requestAnimationFrame);
    if(modal.panel.querySelectorAll('.letter-forge__ingredient').length!==3)throw Error('Absorption did not start');
    modal.destroy();owner.dispose();owner.dispose();await Promise.resolve();await Promise.resolve();
    if(document.querySelector('#letter-fusion-modal,.letter-forge__ingredient,.liveops-reward-feedback'))throw Error('Detached forge retained effects');

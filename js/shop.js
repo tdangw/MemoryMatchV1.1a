@@ -1,4 +1,5 @@
 import '../styles/raised-actions.css';
+import { decorateCatalogCard, prepareCatalogGroup, createSupportItemIcon } from './catalogArt.js';
 import { gameState, spendCoins } from "./gameState.js";
 import {
   updateCoinDisplay,
@@ -103,7 +104,7 @@ export function openQuickAssistOverlay(kind) {
     label.textContent = item.title;
     const quantity = document.createElement("span");
     quantity.textContent = `Đang có: ${count}`;
-    button.append(createIcon(item.icon), label, quantity);
+    button.append(createSupportItemIcon(item), label, quantity);
     button.addEventListener("click", () => modal.submit(async () => {
       if (!(await useMemoryAssistItem(item, roundId))) return false;
       if (gameState.roundId !== roundId || !modal.panel.isConnected) return false;
@@ -276,7 +277,7 @@ function renderLinkEffectShop(
     card.className = "appearance-choice";
     const preview = document.createElement("div");
     preview.className = `link-effect-preview ${item.className}`;
-    preview.append(createIcon(item.icon));
+
     const name = document.createElement("strong");
     name.textContent = item.title;
     const button = document.createElement("button");
@@ -309,9 +310,11 @@ function renderLinkEffectShop(
         );
     }
     card.append(preview, name, button);
+    decorateCatalogCard(card, item, equippedKey.endsWith("PathEffect") ? "path" : "exit");
     choices.append(card);
   });
   group.append(heading, choices);
+  prepareCatalogGroup(group);
   grid.append(group);
 }
 
@@ -374,7 +377,7 @@ function renderTripleItems(grid, roundId, modal) {
   card.className = "appearance-choice";
   const preview = document.createElement("div");
   preview.className = "appearance-preview theme-preview";
-  preview.append(createIcon("expand"));
+
   const name = document.createElement("strong");
   name.textContent = "Mở rộng khay";
   const description = document.createElement("small");
@@ -405,8 +408,10 @@ function renderTripleItems(grid, roundId, modal) {
       );
   }
   card.append(preview, name, description, button);
+  decorateCatalogCard(card, { id: "tray-expansion", title: "Mở rộng khay" }, "support", { capacity: { current: capacity, maximum: maximumCapacity } });
   choices.append(card);
   group.append(heading, choices);
+  prepareCatalogGroup(group);
   grid.append(group);
 }
 
@@ -433,7 +438,7 @@ function renderTripleEffectShop(
     card.className = "appearance-choice";
     const preview = document.createElement("div");
     preview.className = `link-effect-preview ${item.className}`;
-    preview.append(createIcon(item.icon));
+
     const name = document.createElement("strong");
     name.textContent = item.title;
     const button = document.createElement("button");
@@ -466,9 +471,11 @@ function renderTripleEffectShop(
         );
     }
     card.append(preview, name, button);
+    decorateCatalogCard(card, item, kind);
     choices.append(card);
   });
   group.append(heading, choices);
+  prepareCatalogGroup(group);
   grid.append(group);
 }
 
@@ -494,11 +501,12 @@ function renderInventoryItems(
     card.className = "appearance-choice";
     const preview = document.createElement("div");
     preview.className = "appearance-preview theme-preview";
-    preview.append(createIcon(item.icon));
+
     const name = document.createElement("strong");
     name.textContent = item.title;
     const count = document.createElement("small");
-    count.textContent = `Đang có: ${getCount(item)}`;
+    const ownedCount = getCount(item);
+    count.textContent = `Đang có: ${ownedCount}`;
     const button = document.createElement("button");
     button.type = "button";
     button.className = "app-button app-button--purchase shop-buy-button ui-raised-action";
@@ -514,9 +522,11 @@ function renderInventoryItems(
         refresh,
       );
     card.append(preview, name, count, button);
+    decorateCatalogCard(card, item, "support", { count: ownedCount });
     choices.append(card);
   });
   group.append(heading, choices);
+  prepareCatalogGroup(group);
   grid.append(group);
 }
 
@@ -565,7 +575,7 @@ function renderThemes(grid, roundId, modal, gameId) {
     card.className = "theme-choice";
     const preview = document.createElement("div");
     preview.className = "appearance-preview theme-preview";
-    preview.append(createIcon(theme.icon));
+
     const name = document.createElement("strong");
     name.textContent = theme.title;
     const button = document.createElement("button");
@@ -600,9 +610,11 @@ function renderThemes(grid, roundId, modal, gameId) {
         );
     }
     card.append(preview, name, button);
+    decorateCatalogCard(card, theme, "theme");
     choices.append(card);
   });
   group.append(heading, choices);
+  prepareCatalogGroup(group);
   grid.append(group);
 }
 
@@ -628,7 +640,7 @@ function renderAppearanceGroup(grid, title, type, items, roundId, modal) {
     } else {
       const preview = document.createElement("div");
       preview.className = "appearance-effect-preview";
-      preview.append(createIcon('images'));
+
       preview.classList.add(item.animationClass);
       card.append(preview);
     }
@@ -655,9 +667,11 @@ function renderAppearanceGroup(grid, title, type, items, roundId, modal) {
         );
     }
     card.append(name, button);
+    decorateCatalogCard(card, item, type === "cardBack" ? "back" : "flip");
     choices.append(card);
   });
   group.append(heading, choices);
+  prepareCatalogGroup(group);
   grid.append(group);
 }
 
@@ -738,6 +752,7 @@ function openPurchaseConfirmation(item, roundId, shopModal, onPurchase) {
       },
     ],
   });
+  confirmation.panel.classList.add('app-modal--confirmation');
   confirmation.panel.querySelector('.app-button--primary').classList.add('ui-raised-action');
 }
 

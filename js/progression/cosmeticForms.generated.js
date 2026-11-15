@@ -12,6 +12,570 @@ export const COSMETIC_FORMS = {
       "512": "assets/achievements/evolution/v1/event-avatar-lantern-otter-form3-512.webp"
     }
   },
+  "event-frame-firefly-glow": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/event-frame-firefly-glow-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/event-frame-firefly-glow-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/event-frame-firefly-glow-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/event-frame-firefly-glow-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/event-frame-firefly-glow-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/event-frame-firefly-glow-form3-512.webp"
+    }
+  },
+  "letters-link-avatar-flower-fox": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/letters-link-avatar-flower-fox-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/letters-link-avatar-flower-fox-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/letters-link-avatar-flower-fox-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/letters-link-avatar-flower-fox-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/letters-link-avatar-flower-fox-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/letters-link-avatar-flower-fox-form3-512.webp"
+    }
+  },
+  "letters-link-badge-wish-knot": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/letters-link-badge-wish-knot-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/letters-link-badge-wish-knot-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/letters-link-badge-wish-knot-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/letters-link-badge-wish-knot-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/letters-link-badge-wish-knot-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/letters-link-badge-wish-knot-form3-512.webp"
+    }
+  },
+  "letters-link-frame-silk-lantern": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/letters-link-frame-silk-lantern-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/letters-link-frame-silk-lantern-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/letters-link-frame-silk-lantern-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/letters-link-frame-silk-lantern-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/letters-link-frame-silk-lantern-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/letters-link-frame-silk-lantern-form3-512.webp"
+    }
+  },
+  "letters-memory-avatar-moss-redpanda": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/letters-memory-avatar-moss-redpanda-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/letters-memory-avatar-moss-redpanda-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/letters-memory-avatar-moss-redpanda-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/letters-memory-avatar-moss-redpanda-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/letters-memory-avatar-moss-redpanda-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/letters-memory-avatar-moss-redpanda-form3-512.webp"
+    }
+  },
+  "letters-memory-badge-folded-leaf": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/letters-memory-badge-folded-leaf-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/letters-memory-badge-folded-leaf-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/letters-memory-badge-folded-leaf-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/letters-memory-badge-folded-leaf-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/letters-memory-badge-folded-leaf-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/letters-memory-badge-folded-leaf-form3-512.webp"
+    }
+  },
+  "letters-memory-frame-memory-leaves": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/letters-memory-frame-memory-leaves-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/letters-memory-frame-memory-leaves-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/letters-memory-frame-memory-leaves-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/letters-memory-frame-memory-leaves-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/letters-memory-frame-memory-leaves-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/letters-memory-frame-memory-leaves-form3-512.webp"
+    }
+  },
+  "letters-royal-avatar-dawn-lion": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/letters-royal-avatar-dawn-lion-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/letters-royal-avatar-dawn-lion-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/letters-royal-avatar-dawn-lion-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/letters-royal-avatar-dawn-lion-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/letters-royal-avatar-dawn-lion-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/letters-royal-avatar-dawn-lion-form3-512.webp"
+    }
+  },
+  "letters-royal-badge-royal-seal": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/letters-royal-badge-royal-seal-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/letters-royal-badge-royal-seal-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/letters-royal-badge-royal-seal-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/letters-royal-badge-royal-seal-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/letters-royal-badge-royal-seal-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/letters-royal-badge-royal-seal-form3-512.webp"
+    }
+  },
+  "letters-royal-frame-journey-crown": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/letters-royal-frame-journey-crown-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/letters-royal-frame-journey-crown-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/letters-royal-frame-journey-crown-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/letters-royal-frame-journey-crown-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/letters-royal-frame-journey-crown-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/letters-royal-frame-journey-crown-form3-512.webp"
+    }
+  },
+  "letters-triple-avatar-rose-dragon": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/letters-triple-avatar-rose-dragon-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/letters-triple-avatar-rose-dragon-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/letters-triple-avatar-rose-dragon-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/letters-triple-avatar-rose-dragon-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/letters-triple-avatar-rose-dragon-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/letters-triple-avatar-rose-dragon-form3-512.webp"
+    }
+  },
+  "letters-triple-badge-prism-heart": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/letters-triple-badge-prism-heart-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/letters-triple-badge-prism-heart-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/letters-triple-badge-prism-heart-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/letters-triple-badge-prism-heart-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/letters-triple-badge-prism-heart-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/letters-triple-badge-prism-heart-form3-512.webp"
+    }
+  },
+  "letters-triple-frame-prism-glass": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/letters-triple-frame-prism-glass-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/letters-triple-frame-prism-glass-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/letters-triple-frame-prism-glass-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/letters-triple-frame-prism-glass-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/letters-triple-frame-prism-glass-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/letters-triple-frame-prism-glass-form3-512.webp"
+    }
+  },
+  "link-avatar-autumn-fox": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/link-avatar-autumn-fox-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/link-avatar-autumn-fox-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/link-avatar-autumn-fox-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/link-avatar-autumn-fox-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/link-avatar-autumn-fox-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/link-avatar-autumn-fox-form3-512.webp"
+    }
+  },
+  "link-avatar-azure-turtle": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/link-avatar-azure-turtle-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/link-avatar-azure-turtle-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/link-avatar-azure-turtle-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/link-avatar-azure-turtle-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/link-avatar-azure-turtle-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/link-avatar-azure-turtle-form3-512.webp"
+    }
+  },
+  "link-avatar-festival-sparrow": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/link-avatar-festival-sparrow-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/link-avatar-festival-sparrow-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/link-avatar-festival-sparrow-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/link-avatar-festival-sparrow-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/link-avatar-festival-sparrow-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/link-avatar-festival-sparrow-form3-512.webp"
+    }
+  },
+  "link-avatar-galaxy-deer": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/link-avatar-galaxy-deer-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/link-avatar-galaxy-deer-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/link-avatar-galaxy-deer-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/link-avatar-galaxy-deer-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/link-avatar-galaxy-deer-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/link-avatar-galaxy-deer-form3-512.webp"
+    }
+  },
+  "link-avatar-glasslight-fox": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/link-avatar-glasslight-fox-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/link-avatar-glasslight-fox-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/link-avatar-glasslight-fox-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/link-avatar-glasslight-fox-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/link-avatar-glasslight-fox-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/link-avatar-glasslight-fox-form3-512.webp"
+    }
+  },
+  "link-avatar-lantern-cat": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/link-avatar-lantern-cat-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/link-avatar-lantern-cat-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/link-avatar-lantern-cat-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/link-avatar-lantern-cat-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/link-avatar-lantern-cat-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/link-avatar-lantern-cat-form3-512.webp"
+    }
+  },
+  "link-avatar-moonfox": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/link-avatar-moonfox-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/link-avatar-moonfox-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/link-avatar-moonfox-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/link-avatar-moonfox-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/link-avatar-moonfox-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/link-avatar-moonfox-form3-512.webp"
+    }
+  },
+  "link-avatar-paperblossom-deer": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/link-avatar-paperblossom-deer-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/link-avatar-paperblossom-deer-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/link-avatar-paperblossom-deer-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/link-avatar-paperblossom-deer-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/link-avatar-paperblossom-deer-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/link-avatar-paperblossom-deer-form3-512.webp"
+    }
+  },
+  "link-avatar-pearl-dolphin": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/link-avatar-pearl-dolphin-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/link-avatar-pearl-dolphin-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/link-avatar-pearl-dolphin-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/link-avatar-pearl-dolphin-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/link-avatar-pearl-dolphin-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/link-avatar-pearl-dolphin-form3-512.webp"
+    }
+  },
+  "link-avatar-royal-seahorse": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/link-avatar-royal-seahorse-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/link-avatar-royal-seahorse-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/link-avatar-royal-seahorse-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/link-avatar-royal-seahorse-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/link-avatar-royal-seahorse-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/link-avatar-royal-seahorse-form3-512.webp"
+    }
+  },
+  "link-avatar-sailor-beaver": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/link-avatar-sailor-beaver-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/link-avatar-sailor-beaver-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/link-avatar-sailor-beaver-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/link-avatar-sailor-beaver-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/link-avatar-sailor-beaver-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/link-avatar-sailor-beaver-form3-512.webp"
+    }
+  },
+  "link-badge-golden-bond": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/link-badge-golden-bond-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/link-badge-golden-bond-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/link-badge-golden-bond-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/link-badge-golden-bond-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/link-badge-golden-bond-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/link-badge-golden-bond-form3-512.webp"
+    }
+  },
+  "link-badge-guiding-lantern": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/link-badge-guiding-lantern-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/link-badge-guiding-lantern-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/link-badge-guiding-lantern-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/link-badge-guiding-lantern-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/link-badge-guiding-lantern-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/link-badge-guiding-lantern-form3-512.webp"
+    }
+  },
+  "link-badge-lighthouse-guide": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/link-badge-lighthouse-guide-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/link-badge-lighthouse-guide-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/link-badge-lighthouse-guide-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/link-badge-lighthouse-guide-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/link-badge-lighthouse-guide-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/link-badge-lighthouse-guide-form3-512.webp"
+    }
+  },
+  "link-badge-link-master": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/link-badge-link-master-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/link-badge-link-master-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/link-badge-link-master-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/link-badge-link-master-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/link-badge-link-master-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/link-badge-link-master-form3-512.webp"
+    }
+  },
+  "link-badge-moonlit-promise": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/link-badge-moonlit-promise-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/link-badge-moonlit-promise-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/link-badge-moonlit-promise-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/link-badge-moonlit-promise-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/link-badge-moonlit-promise-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/link-badge-moonlit-promise-form3-512.webp"
+    }
+  },
+  "link-badge-ocean-knot": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/link-badge-ocean-knot-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/link-badge-ocean-knot-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/link-badge-ocean-knot-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/link-badge-ocean-knot-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/link-badge-ocean-knot-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/link-badge-ocean-knot-form3-512.webp"
+    }
+  },
+  "link-frame-lantern-moon-gate": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/link-frame-lantern-moon-gate-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/link-frame-lantern-moon-gate-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/link-frame-lantern-moon-gate-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/link-frame-lantern-moon-gate-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/link-frame-lantern-moon-gate-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/link-frame-lantern-moon-gate-form3-512.webp"
+    }
+  },
+  "link-frame-moon-coral": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/link-frame-moon-coral-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/link-frame-moon-coral-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/link-frame-moon-coral-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/link-frame-moon-coral-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/link-frame-moon-coral-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/link-frame-moon-coral-form3-512.webp"
+    }
+  },
+  "link-frame-moon-silk": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/link-frame-moon-silk-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/link-frame-moon-silk-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/link-frame-moon-silk-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/link-frame-moon-silk-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/link-frame-moon-silk-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/link-frame-moon-silk-form3-512.webp"
+    }
+  },
+  "link-frame-moonblossom": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/link-frame-moonblossom-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/link-frame-moonblossom-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/link-frame-moonblossom-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/link-frame-moonblossom-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/link-frame-moonblossom-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/link-frame-moonblossom-form3-512.webp"
+    }
+  },
+  "link-frame-osmanthus-branch": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/link-frame-osmanthus-branch-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/link-frame-osmanthus-branch-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/link-frame-osmanthus-branch-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/link-frame-osmanthus-branch-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/link-frame-osmanthus-branch-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/link-frame-osmanthus-branch-form3-512.webp"
+    }
+  },
+  "link-frame-pearl-shell": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/link-frame-pearl-shell-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/link-frame-pearl-shell-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/link-frame-pearl-shell-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/link-frame-pearl-shell-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/link-frame-pearl-shell-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/link-frame-pearl-shell-form3-512.webp"
+    }
+  },
+  "link-frame-silk-lanterns": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/link-frame-silk-lanterns-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/link-frame-silk-lanterns-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/link-frame-silk-lanterns-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/link-frame-silk-lanterns-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/link-frame-silk-lanterns-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/link-frame-silk-lanterns-form3-512.webp"
+    }
+  },
+  "link-frame-silver-moon": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/link-frame-silver-moon-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/link-frame-silver-moon-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/link-frame-silver-moon-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/link-frame-silver-moon-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/link-frame-silver-moon-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/link-frame-silver-moon-form3-512.webp"
+    }
+  },
+  "link-frame-silver-waves": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/link-frame-silver-waves-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/link-frame-silver-waves-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/link-frame-silver-waves-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/link-frame-silver-waves-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/link-frame-silver-waves-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/link-frame-silver-waves-form3-512.webp"
+    }
+  },
+  "link-frame-stellar-orbit": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/link-frame-stellar-orbit-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/link-frame-stellar-orbit-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/link-frame-stellar-orbit-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/link-frame-stellar-orbit-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/link-frame-stellar-orbit-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/link-frame-stellar-orbit-form3-512.webp"
+    }
+  },
+  "link-frame-tidal-crown": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/link-frame-tidal-crown-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/link-frame-tidal-crown-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/link-frame-tidal-crown-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/link-frame-tidal-crown-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/link-frame-tidal-crown-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/link-frame-tidal-crown-form3-512.webp"
+    }
+  },
+  "memory-avatar-cherry-rabbit": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/memory-avatar-cherry-rabbit-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-avatar-cherry-rabbit-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-avatar-cherry-rabbit-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/memory-avatar-cherry-rabbit-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-avatar-cherry-rabbit-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-avatar-cherry-rabbit-form3-512.webp"
+    }
+  },
+  "memory-avatar-chestnut-squirrel": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/memory-avatar-chestnut-squirrel-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-avatar-chestnut-squirrel-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-avatar-chestnut-squirrel-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/memory-avatar-chestnut-squirrel-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-avatar-chestnut-squirrel-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-avatar-chestnut-squirrel-form3-512.webp"
+    }
+  },
+  "memory-avatar-dawn-crane": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/memory-avatar-dawn-crane-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-avatar-dawn-crane-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-avatar-dawn-crane-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/memory-avatar-dawn-crane-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-avatar-dawn-crane-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-avatar-dawn-crane-form3-512.webp"
+    }
+  },
+  "memory-avatar-dreaming-deer": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/memory-avatar-dreaming-deer-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-avatar-dreaming-deer-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-avatar-dreaming-deer-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/memory-avatar-dreaming-deer-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-avatar-dreaming-deer-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-avatar-dreaming-deer-form3-512.webp"
+    }
+  },
+  "memory-avatar-galaxy-whale": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/memory-avatar-galaxy-whale-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-avatar-galaxy-whale-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-avatar-galaxy-whale-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/memory-avatar-galaxy-whale-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-avatar-galaxy-whale-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-avatar-galaxy-whale-form3-512.webp"
+    }
+  },
+  "memory-avatar-honey-bear": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/memory-avatar-honey-bear-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-avatar-honey-bear-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-avatar-honey-bear-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/memory-avatar-honey-bear-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-avatar-honey-bear-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-avatar-honey-bear-form3-512.webp"
+    }
+  },
   "memory-avatar-sapphire-owl": {
     "2": {
       "128": "assets/achievements/evolution/v1/memory-avatar-sapphire-owl-form2-128.webp",
@@ -24,6 +588,102 @@ export const COSMETIC_FORMS = {
       "512": "assets/achievements/evolution/v1/memory-avatar-sapphire-owl-form3-512.webp"
     }
   },
+  "memory-avatar-scholar-squirrel": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/memory-avatar-scholar-squirrel-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-avatar-scholar-squirrel-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-avatar-scholar-squirrel-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/memory-avatar-scholar-squirrel-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-avatar-scholar-squirrel-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-avatar-scholar-squirrel-form3-512.webp"
+    }
+  },
+  "memory-avatar-snow-rabbit": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/memory-avatar-snow-rabbit-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-avatar-snow-rabbit-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-avatar-snow-rabbit-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/memory-avatar-snow-rabbit-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-avatar-snow-rabbit-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-avatar-snow-rabbit-form3-512.webp"
+    }
+  },
+  "memory-avatar-stargazer-hedgehog": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/memory-avatar-stargazer-hedgehog-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-avatar-stargazer-hedgehog-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-avatar-stargazer-hedgehog-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/memory-avatar-stargazer-hedgehog-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-avatar-stargazer-hedgehog-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-avatar-stargazer-hedgehog-form3-512.webp"
+    }
+  },
+  "memory-avatar-stellar-cat": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/memory-avatar-stellar-cat-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-avatar-stellar-cat-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-avatar-stellar-cat-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/memory-avatar-stellar-cat-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-avatar-stellar-cat-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-avatar-stellar-cat-form3-512.webp"
+    }
+  },
+  "memory-badge-forest-guardian": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/memory-badge-forest-guardian-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-badge-forest-guardian-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-badge-forest-guardian-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/memory-badge-forest-guardian-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-badge-forest-guardian-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-badge-forest-guardian-form3-512.webp"
+    }
+  },
+  "memory-badge-four-seasons": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/memory-badge-four-seasons-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-badge-four-seasons-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-badge-four-seasons-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/memory-badge-four-seasons-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-badge-four-seasons-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-badge-four-seasons-form3-512.webp"
+    }
+  },
+  "memory-badge-memory-keeper": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/memory-badge-memory-keeper-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-badge-memory-keeper-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-badge-memory-keeper-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/memory-badge-memory-keeper-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-badge-memory-keeper-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-badge-memory-keeper-form3-512.webp"
+    }
+  },
+  "memory-badge-memory-master": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/memory-badge-memory-master-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-badge-memory-master-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-badge-memory-master-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/memory-badge-memory-master-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-badge-memory-master-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-badge-memory-master-form3-512.webp"
+    }
+  },
   "memory-badge-wisdom": {
     "2": {
       "128": "assets/achievements/evolution/v1/memory-badge-wisdom-form2-128.webp",
@@ -34,6 +694,162 @@ export const COSMETIC_FORMS = {
       "128": "assets/achievements/evolution/v1/memory-badge-wisdom-form3-128.webp",
       "256": "assets/achievements/evolution/v1/memory-badge-wisdom-form3-256.webp",
       "512": "assets/achievements/evolution/v1/memory-badge-wisdom-form3-512.webp"
+    }
+  },
+  "memory-badge-wisdom-seal": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/memory-badge-wisdom-seal-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-badge-wisdom-seal-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-badge-wisdom-seal-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/memory-badge-wisdom-seal-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-badge-wisdom-seal-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-badge-wisdom-seal-form3-512.webp"
+    }
+  },
+  "memory-frame-astral-orbit": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/memory-frame-astral-orbit-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-frame-astral-orbit-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-frame-astral-orbit-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/memory-frame-astral-orbit-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-frame-astral-orbit-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-frame-astral-orbit-form3-512.webp"
+    }
+  },
+  "memory-frame-autumn-leaves": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/memory-frame-autumn-leaves-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-frame-autumn-leaves-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-frame-autumn-leaves-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/memory-frame-autumn-leaves-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-frame-autumn-leaves-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-frame-autumn-leaves-form3-512.webp"
+    }
+  },
+  "memory-frame-cherry-blossom": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/memory-frame-cherry-blossom-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-frame-cherry-blossom-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-frame-cherry-blossom-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/memory-frame-cherry-blossom-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-frame-cherry-blossom-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-frame-cherry-blossom-form3-512.webp"
+    }
+  },
+  "memory-frame-frosted-branch": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/memory-frame-frosted-branch-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-frame-frosted-branch-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-frame-frosted-branch-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/memory-frame-frosted-branch-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-frame-frosted-branch-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-frame-frosted-branch-form3-512.webp"
+    }
+  },
+  "memory-frame-gilded-pages": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/memory-frame-gilded-pages-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-frame-gilded-pages-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-frame-gilded-pages-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/memory-frame-gilded-pages-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-frame-gilded-pages-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-frame-gilded-pages-form3-512.webp"
+    }
+  },
+  "memory-frame-golden-honeycomb": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/memory-frame-golden-honeycomb-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-frame-golden-honeycomb-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-frame-golden-honeycomb-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/memory-frame-golden-honeycomb-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-frame-golden-honeycomb-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-frame-golden-honeycomb-form3-512.webp"
+    }
+  },
+  "memory-frame-golden-laurel": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/memory-frame-golden-laurel-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-frame-golden-laurel-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-frame-golden-laurel-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/memory-frame-golden-laurel-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-frame-golden-laurel-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-frame-golden-laurel-form3-512.webp"
+    }
+  },
+  "memory-frame-knowledge-gateway": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/memory-frame-knowledge-gateway-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-frame-knowledge-gateway-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-frame-knowledge-gateway-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/memory-frame-knowledge-gateway-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-frame-knowledge-gateway-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-frame-knowledge-gateway-form3-512.webp"
+    }
+  },
+  "memory-frame-memory-crown": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/memory-frame-memory-crown-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-frame-memory-crown-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-frame-memory-crown-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/memory-frame-memory-crown-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-frame-memory-crown-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-frame-memory-crown-form3-512.webp"
+    }
+  },
+  "memory-frame-silken-clouds": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/memory-frame-silken-clouds-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-frame-silken-clouds-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-frame-silken-clouds-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/memory-frame-silken-clouds-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-frame-silken-clouds-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-frame-silken-clouds-form3-512.webp"
+    }
+  },
+  "memory-frame-sky-feather": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/memory-frame-sky-feather-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-frame-sky-feather-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-frame-sky-feather-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/memory-frame-sky-feather-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/memory-frame-sky-feather-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/memory-frame-sky-feather-form3-512.webp"
+    }
+  },
+  "starter-avatar-little-sparrow": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/starter-avatar-little-sparrow-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/starter-avatar-little-sparrow-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/starter-avatar-little-sparrow-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/starter-avatar-little-sparrow-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/starter-avatar-little-sparrow-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/starter-avatar-little-sparrow-form3-512.webp"
     }
   },
   "starter-badge-first-leaf": {
@@ -58,6 +874,342 @@ export const COSMETIC_FORMS = {
       "128": "assets/achievements/evolution/v1/starter-frame-plain-wood-form3-128.webp",
       "256": "assets/achievements/evolution/v1/starter-frame-plain-wood-form3-256.webp",
       "512": "assets/achievements/evolution/v1/starter-frame-plain-wood-form3-512.webp"
+    }
+  },
+  "triple-avatar-amethyst-unicorn": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/triple-avatar-amethyst-unicorn-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-avatar-amethyst-unicorn-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-avatar-amethyst-unicorn-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/triple-avatar-amethyst-unicorn-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-avatar-amethyst-unicorn-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-avatar-amethyst-unicorn-form3-512.webp"
+    }
+  },
+  "triple-avatar-aurora-snowfox": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/triple-avatar-aurora-snowfox-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-avatar-aurora-snowfox-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-avatar-aurora-snowfox-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/triple-avatar-aurora-snowfox-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-avatar-aurora-snowfox-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-avatar-aurora-snowfox-form3-512.webp"
+    }
+  },
+  "triple-avatar-blue-panda": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/triple-avatar-blue-panda-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-avatar-blue-panda-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-avatar-blue-panda-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/triple-avatar-blue-panda-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-avatar-blue-panda-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-avatar-blue-panda-form3-512.webp"
+    }
+  },
+  "triple-avatar-crystal-mech-cat": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/triple-avatar-crystal-mech-cat-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-avatar-crystal-mech-cat-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-avatar-crystal-mech-cat-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/triple-avatar-crystal-mech-cat-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-avatar-crystal-mech-cat-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-avatar-crystal-mech-cat-form3-512.webp"
+    }
+  },
+  "triple-avatar-galactic-dragon": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/triple-avatar-galactic-dragon-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-avatar-galactic-dragon-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-avatar-galactic-dragon-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/triple-avatar-galactic-dragon-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-avatar-galactic-dragon-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-avatar-galactic-dragon-form3-512.webp"
+    }
+  },
+  "triple-avatar-jade-dragon": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/triple-avatar-jade-dragon-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-avatar-jade-dragon-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-avatar-jade-dragon-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/triple-avatar-jade-dragon-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-avatar-jade-dragon-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-avatar-jade-dragon-form3-512.webp"
+    }
+  },
+  "triple-avatar-jade-penguin": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/triple-avatar-jade-penguin-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-avatar-jade-penguin-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-avatar-jade-penguin-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/triple-avatar-jade-penguin-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-avatar-jade-penguin-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-avatar-jade-penguin-form3-512.webp"
+    }
+  },
+  "triple-avatar-platinum-dragon": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/triple-avatar-platinum-dragon-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-avatar-platinum-dragon-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-avatar-platinum-dragon-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/triple-avatar-platinum-dragon-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-avatar-platinum-dragon-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-avatar-platinum-dragon-form3-512.webp"
+    }
+  },
+  "triple-avatar-polar-bear": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/triple-avatar-polar-bear-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-avatar-polar-bear-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-avatar-polar-bear-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/triple-avatar-polar-bear-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-avatar-polar-bear-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-avatar-polar-bear-form3-512.webp"
+    }
+  },
+  "triple-avatar-quartz-phoenix": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/triple-avatar-quartz-phoenix-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-avatar-quartz-phoenix-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-avatar-quartz-phoenix-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/triple-avatar-quartz-phoenix-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-avatar-quartz-phoenix-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-avatar-quartz-phoenix-form3-512.webp"
+    }
+  },
+  "triple-avatar-sunset-dragon": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/triple-avatar-sunset-dragon-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-avatar-sunset-dragon-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-avatar-sunset-dragon-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/triple-avatar-sunset-dragon-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-avatar-sunset-dragon-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-avatar-sunset-dragon-form3-512.webp"
+    }
+  },
+  "triple-badge-aurora-heart": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/triple-badge-aurora-heart-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-badge-aurora-heart-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-badge-aurora-heart-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/triple-badge-aurora-heart-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-badge-aurora-heart-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-badge-aurora-heart-form3-512.webp"
+    }
+  },
+  "triple-badge-crystal-keeper": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/triple-badge-crystal-keeper-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-badge-crystal-keeper-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-badge-crystal-keeper-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/triple-badge-crystal-keeper-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-badge-crystal-keeper-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-badge-crystal-keeper-form3-512.webp"
+    }
+  },
+  "triple-badge-crystal-triad": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/triple-badge-crystal-triad-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-badge-crystal-triad-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-badge-crystal-triad-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/triple-badge-crystal-triad-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-badge-crystal-triad-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-badge-crystal-triad-form3-512.webp"
+    }
+  },
+  "triple-badge-three-dawn-rays": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/triple-badge-three-dawn-rays-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-badge-three-dawn-rays-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-badge-three-dawn-rays-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/triple-badge-three-dawn-rays-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-badge-three-dawn-rays-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-badge-three-dawn-rays-form3-512.webp"
+    }
+  },
+  "triple-badge-triad-master": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/triple-badge-triad-master-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-badge-triad-master-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-badge-triad-master-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/triple-badge-triad-master-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-badge-triad-master-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-badge-triad-master-form3-512.webp"
+    }
+  },
+  "triple-badge-triangle-seal": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/triple-badge-triangle-seal-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-badge-triangle-seal-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-badge-triangle-seal-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/triple-badge-triangle-seal-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-badge-triangle-seal-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-badge-triangle-seal-form3-512.webp"
+    }
+  },
+  "triple-frame-aurora-crown": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/triple-frame-aurora-crown-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-frame-aurora-crown-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-frame-aurora-crown-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/triple-frame-aurora-crown-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-frame-aurora-crown-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-frame-aurora-crown-form3-512.webp"
+    }
+  },
+  "triple-frame-aurora-ribbon": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/triple-frame-aurora-ribbon-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-frame-aurora-ribbon-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-frame-aurora-ribbon-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/triple-frame-aurora-ribbon-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-frame-aurora-ribbon-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-frame-aurora-ribbon-form3-512.webp"
+    }
+  },
+  "triple-frame-azure-ice-ring": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/triple-frame-azure-ice-ring-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-frame-azure-ice-ring-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-frame-azure-ice-ring-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/triple-frame-azure-ice-ring-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-frame-azure-ice-ring-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-frame-azure-ice-ring-form3-512.webp"
+    }
+  },
+  "triple-frame-crystal-arch": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/triple-frame-crystal-arch-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-frame-crystal-arch-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-frame-crystal-arch-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/triple-frame-crystal-arch-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-frame-crystal-arch-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-frame-crystal-arch-form3-512.webp"
+    }
+  },
+  "triple-frame-emerald": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/triple-frame-emerald-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-frame-emerald-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-frame-emerald-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/triple-frame-emerald-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-frame-emerald-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-frame-emerald-form3-512.webp"
+    }
+  },
+  "triple-frame-jade-gears": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/triple-frame-jade-gears-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-frame-jade-gears-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-frame-jade-gears-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/triple-frame-jade-gears-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-frame-jade-gears-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-frame-jade-gears-form3-512.webp"
+    }
+  },
+  "triple-frame-prism": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/triple-frame-prism-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-frame-prism-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-frame-prism-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/triple-frame-prism-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-frame-prism-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-frame-prism-form3-512.webp"
+    }
+  },
+  "triple-frame-silver-meteor": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/triple-frame-silver-meteor-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-frame-silver-meteor-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-frame-silver-meteor-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/triple-frame-silver-meteor-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-frame-silver-meteor-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-frame-silver-meteor-form3-512.webp"
+    }
+  },
+  "triple-frame-three-wing-star": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/triple-frame-three-wing-star-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-frame-three-wing-star-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-frame-three-wing-star-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/triple-frame-three-wing-star-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-frame-three-wing-star-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-frame-three-wing-star-form3-512.webp"
+    }
+  },
+  "triple-frame-tri-crystal": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/triple-frame-tri-crystal-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-frame-tri-crystal-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-frame-tri-crystal-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/triple-frame-tri-crystal-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-frame-tri-crystal-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-frame-tri-crystal-form3-512.webp"
+    }
+  },
+  "triple-frame-tri-star-crown": {
+    "2": {
+      "128": "assets/achievements/evolution/v1/triple-frame-tri-star-crown-form2-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-frame-tri-star-crown-form2-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-frame-tri-star-crown-form2-512.webp"
+    },
+    "3": {
+      "128": "assets/achievements/evolution/v1/triple-frame-tri-star-crown-form3-128.webp",
+      "256": "assets/achievements/evolution/v1/triple-frame-tri-star-crown-form3-256.webp",
+      "512": "assets/achievements/evolution/v1/triple-frame-tri-star-crown-form3-512.webp"
     }
   }
 };
